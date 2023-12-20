@@ -1,600 +1,432 @@
-Return-Path: <netdev+bounces-59366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498E081A92D
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 23:28:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E76AA81A93E
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 23:36:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F2191C22B58
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 22:28:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1839C1C225B7
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 22:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172244BAA3;
-	Wed, 20 Dec 2023 22:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 387071DFF0;
+	Wed, 20 Dec 2023 22:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJS/veLA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cNxPTqtN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDDF4A99B;
-	Wed, 20 Dec 2023 22:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F52482EA
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 22:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5e89ba9810aso1949377b3.2;
-        Wed, 20 Dec 2023 14:27:12 -0800 (PST)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50e281b149aso260292e87.1
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 14:36:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703111231; x=1703716031; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JeIRg1BXOu9msonBeeuuhzQbFEtDSHChjz+pTQFF/DM=;
-        b=UJS/veLAfoH6Zs8KcCngRtuNSVNlolOhMXbtOcE3MzLuS4AgrE0BjR2dmBoN4HxhVt
-         lGJFFV4IWuEAqKIGpYqw5hHCRlcoDA2VBMsEBeM7JqElqgscehR2rC3Gh3lRj8HZqE/x
-         uVmt6aEJlorBcAT9NXWwlR7KHXbG9SJCMX1avY2SNrB0SI6OqlRxJFmS+8rOviI4O4aF
-         JM/7vAWzNVQaT0rS1IhZYN+JSIDgJ11r3SsN2TyOxwJ0hI1OJ6SmJBuD+3RyZ+BhdB/4
-         QLP768iGjttX6EWmduuUkpZHHiMDjBcRIbZLdAWaat/4KmuZSvTt3pWbqbhaveSw2MNn
-         Z8Ag==
+        d=gmail.com; s=20230601; t=1703111784; x=1703716584; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iiatxIfDMXNQI4m3ysDqaRyVAO9wDoVAK2thUd46rY8=;
+        b=cNxPTqtNX7kqRs9W0oNkE8PJgvpevxUNKoKSny3R8cyV18ZUXQ1TYjACrw3b7mQzbF
+         ervQShZEFn0wEeREgxizi556IMKf/G16hG8GzhtrBqyytu16enyCla0BSF5Doto7X8iA
+         40B4DEEov/mXOzV0nlIkExYaYtbM3VtdT1Ya0KUUj0FkMLjtHrg+gKlfKC3mVCw/2mFP
+         PxEUMk64LZCJxS4qLS9k5XfEyRfUEcTz6QWshcJDkMpMq4I2KQ/1wQIJky2VXJmXNEEI
+         fEVPmtYzX2iHodEG8NYdk6zvb/K22hkgca0ExdbqPiE5biyykVx2q1//hbYsnXaoMNbx
+         hzbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703111231; x=1703716031;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JeIRg1BXOu9msonBeeuuhzQbFEtDSHChjz+pTQFF/DM=;
-        b=gw/47Q+6x/o1C4Ba3W0ek2zOoMw45hEv8+bJFZUDNp8M6iW8RD1RsoyvauHYP3K+yy
-         jAkIzK+uuDlI2esneAZcHySp4X7m9JomQ9S4ew1lEITnck2MggwjdG/FallN3ppGg0ST
-         FvXmsiIyDRdo9AgUkKrjkXAF9wvnnfqltlv0/Eo4F6+ebhebNbObr0/pzteqBDq8mq1H
-         n5w4ADE5bTctbDutDu/82SPKUDujgE2nBJJ0YPgKOe7N7HYSvI/lQOUsOXfQbPyOZlfR
-         zC7QDpFIpWcPiX/R6tR1IOVdvHYf1KIWO1x8/1mFo9sUkRVhRSDY3XKJMMcO9nC1grwA
-         JcmQ==
-X-Gm-Message-State: AOJu0YykHJqCTJe+9M0GtN4OReGZLTk2vWyIkrjVhWnDehuI0AMvHDpb
-	+uthiT/lyFiBJETwXwOklp+Xm3YiONA=
-X-Google-Smtp-Source: AGHT+IFiN+S4ZAn59Ww75QoYyiyiGXrEwvLm1XlXF6IGFYfQaEtPSpSRCxyxPLPskdSowBW+yp4PSw==
-X-Received: by 2002:a81:920d:0:b0:5e7:6f9c:b194 with SMTP id j13-20020a81920d000000b005e76f9cb194mr447207ywg.15.1703111230734;
-        Wed, 20 Dec 2023 14:27:10 -0800 (PST)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:8cc1:afcb:3651:3dad])
-        by smtp.gmail.com with ESMTPSA id m125-20020a0dfc83000000b005ca4e49bb54sm284304ywf.142.2023.12.20.14.27.09
+        d=1e100.net; s=20230601; t=1703111784; x=1703716584;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iiatxIfDMXNQI4m3ysDqaRyVAO9wDoVAK2thUd46rY8=;
+        b=mfelJtHYhQ8P1HsJvKJ3kbTNE0mEFUtp8hYgNpzw7MkZVy7sBl40qNsbJGVWi10WWX
+         K1/VJ3NfaSh5WNzd8JacScI9R/Z0byPtzvde3VQ9M2J/jbSmrF+Be2BnO2QbRb7ddt2R
+         tcV4IZFSB5NeqB7+4xHOU+BS9mYk3wfyiJuoLAXOSamjWjzt/E2NcnoZajwenBiOQd5R
+         J92hfDesg7XEJE4zdorS92YV6tTXL3jmGxWEymcmhHrycGhyaJHrhucChDzvaEoQ2Fgr
+         8OALKVksQ9ETj/hxWrsiMboRLXfM/PJy7WClcv123ve3NdyW1pSTKLmzHl1GjYZDLHR4
+         UurQ==
+X-Gm-Message-State: AOJu0Yyk7BPndTEk0qo52tz+qcGsA0f/hzALgp6CydhngPjQN/shVHzE
+	B8e4G3ugliBQr3P2AnaOWI0=
+X-Google-Smtp-Source: AGHT+IHTeVoI1R3HC5TQP7IpzAsrbJYVGo0ZcF00wzMPedRTq6b0/nFK4pBwenJ59ElKl24JqjMOBg==
+X-Received: by 2002:a05:6512:b06:b0:50e:d27:a173 with SMTP id w6-20020a0565120b0600b0050e0d27a173mr9092608lfu.53.1703111783669;
+        Wed, 20 Dec 2023 14:36:23 -0800 (PST)
+Received: from mobilestation ([95.79.203.166])
+        by smtp.gmail.com with ESMTPSA id z2-20020a056512370200b0050e59400d59sm83192lfr.86.2023.12.20.14.36.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 14:27:10 -0800 (PST)
-From: thinker.li@gmail.com
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	kernel-team@meta.com,
-	andrii@kernel.org,
-	drosen@google.com
-Cc: sinquersw@gmail.com,
-	kuifeng@meta.com,
-	Kui-Feng Lee <thinker.li@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH bpf-next v15 11/14] bpf, net: switch to dynamic registration
-Date: Wed, 20 Dec 2023 14:26:51 -0800
-Message-Id: <20231220222654.1435895-12-thinker.li@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231220222654.1435895-1-thinker.li@gmail.com>
-References: <20231220222654.1435895-1-thinker.li@gmail.com>
+        Wed, 20 Dec 2023 14:36:23 -0800 (PST)
+Date: Thu, 21 Dec 2023 01:36:20 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v7 4/9] net: stmmac: Add multi-channel supports
+Message-ID: <vxcfrxtbfu4pya56m22icnizsyjzqqha5blzb7zpexqcur56uh@uv6vsjf77npa>
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <d329a3315a3f274bc64c229d645f81066eb5cefe.1702990507.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d329a3315a3f274bc64c229d645f81066eb5cefe.1702990507.git.siyanteng@loongson.cn>
 
-From: Kui-Feng Lee <thinker.li@gmail.com>
+On Tue, Dec 19, 2023 at 10:17:07PM +0800, Yanteng Si wrote:
+> Loongson platforms use a DWGMAC which supports multi-channel.
+> 
+> Added dwmac1000_dma_init_channel() and init_chan(), factor out
+> all the channel-specific setups from dwmac1000_dma_init() to the
+> new function dma_config(), then distinguish dma initialization
+> and multi-channel initialization through different parameters.
+> 
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 55 ++++++++++++++-----
+>  .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 17 ++++++
+>  .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 30 +++++-----
+>  3 files changed, 74 insertions(+), 28 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> index 5e80d3eec9db..0fb48e683970 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> @@ -12,7 +12,8 @@
+>    Author: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+>  *******************************************************************************/
+>  
+> -#include <asm/io.h>
+> +#include <linux/io.h>
+> +#include "stmmac.h"
+>  #include "dwmac1000.h"
+>  #include "dwmac_dma.h"
+>  
+> @@ -70,13 +71,16 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
+>  	writel(value, ioaddr + DMA_AXI_BUS_MODE);
+>  }
+>  
+> -static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+> -			       struct stmmac_dma_cfg *dma_cfg, int atds)
 
-Replace the static list of struct_ops types with per-btf struct_ops_tab to
-enable dynamic registration.
+> +static void dma_config(void __iomem *modeaddr, void __iomem *enaddr,
+> +					   struct stmmac_dma_cfg *dma_cfg, u32 dma_intr_mask,
+> +					   int atds)
 
-Both bpf_dummy_ops and bpf_tcp_ca now utilize the registration function
-instead of being listed in bpf_struct_ops_types.h.
+Please make sure the arguments are aligned with the function open
+parenthesis taking into account that tabs are of _8_ chars:
+Documentation/process/coding-style.rst.
 
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
----
- include/linux/bpf.h               |  33 ++++++----
- include/linux/btf.h               |  12 ++++
- kernel/bpf/bpf_struct_ops.c       | 100 ++++--------------------------
- kernel/bpf/bpf_struct_ops_types.h |  12 ----
- kernel/bpf/btf.c                  |  84 +++++++++++++++++++++++--
- net/bpf/bpf_dummy_struct_ops.c    |  11 +++-
- net/ipv4/bpf_tcp_ca.c             |  12 +++-
- 7 files changed, 145 insertions(+), 119 deletions(-)
- delete mode 100644 kernel/bpf/bpf_struct_ops_types.h
+>  {
+> -	u32 value = readl(ioaddr + DMA_BUS_MODE);
+> +	u32 value;
+>  	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
+>  	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
+>  
+> +	value = readl(modeaddr);
+> +
+>  	/*
+>  	 * Set the DMA PBL (Programmable Burst Length) mode.
+>  	 *
+> @@ -104,10 +108,34 @@ static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  	if (dma_cfg->aal)
+>  		value |= DMA_BUS_MODE_AAL;
+>  
+> -	writel(value, ioaddr + DMA_BUS_MODE);
+> +	writel(value, modeaddr);
+> +	writel(dma_intr_mask, enaddr);
+> +}
+> +
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index f2eccc1c1972..1d626f5a984f 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -1699,10 +1699,22 @@ struct bpf_struct_ops_common_value {
- 	enum bpf_struct_ops_state state;
- };
- 
-+/* This macro helps developer to register a struct_ops type and generate
-+ * type information correctly. Developers should use this macro to register
-+ * a struct_ops type instead of calling register_bpf_struct_ops() directly.
-+ */
-+#define REGISTER_BPF_STRUCT_OPS(st_ops, type)				\
-+	({								\
-+		struct bpf_struct_ops_##type {				\
-+			struct bpf_struct_ops_common_value common;	\
-+			struct type data ____cacheline_aligned_in_smp;	\
-+		};							\
-+		BTF_TYPE_EMIT(struct bpf_struct_ops_##type);		\
-+		register_bpf_struct_ops(st_ops);			\
-+	})
-+
- #if defined(CONFIG_BPF_JIT) && defined(CONFIG_BPF_SYSCALL)
- #define BPF_MODULE_OWNER ((void *)((0xeB9FUL << 2) + POISON_POINTER_DELTA))
--const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *btf, u32 type_id);
--void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log);
- bool bpf_struct_ops_get(const void *kdata);
- void bpf_struct_ops_put(const void *kdata);
- int bpf_struct_ops_map_sys_lookup_elem(struct bpf_map *map, void *key,
-@@ -1744,16 +1756,11 @@ struct bpf_dummy_ops {
- int bpf_struct_ops_test_run(struct bpf_prog *prog, const union bpf_attr *kattr,
- 			    union bpf_attr __user *uattr);
- #endif
-+int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
-+			     struct btf *btf,
-+			     struct bpf_verifier_log *log);
- void bpf_map_struct_ops_info_fill(struct bpf_map_info *info, struct bpf_map *map);
- #else
--static inline const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *btf, u32 type_id)
--{
--	return NULL;
--}
--static inline void bpf_struct_ops_init(struct btf *btf,
--				       struct bpf_verifier_log *log)
--{
--}
- static inline bool bpf_try_module_get(const void *data, struct module *owner)
- {
- 	return try_module_get(owner);
-@@ -1772,7 +1779,11 @@ static inline int bpf_struct_ops_link_create(union bpf_attr *attr)
- {
- 	return -EOPNOTSUPP;
- }
--
-+static inline int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
-+					   struct btf *btf,
-+					   struct bpf_verifier_log *log) {
-+	return -EOPNOTSUPP;
-+}
- #endif
- 
- #if defined(CONFIG_CGROUP_BPF) && defined(CONFIG_BPF_LSM)
-diff --git a/include/linux/btf.h b/include/linux/btf.h
-index a68604904f4e..bc3576b067f6 100644
---- a/include/linux/btf.h
-+++ b/include/linux/btf.h
-@@ -496,6 +496,7 @@ static inline void *btf_id_set8_contains(const struct btf_id_set8 *set, u32 id)
- }
- 
- struct bpf_verifier_log;
-+struct bpf_struct_ops;
- 
- #ifdef CONFIG_BPF_SYSCALL
- const struct btf_type *btf_type_by_id(const struct btf *btf, u32 type_id);
-@@ -520,6 +521,9 @@ btf_get_prog_ctx_type(struct bpf_verifier_log *log, const struct btf *btf,
- int get_kern_ctx_btf_id(struct bpf_verifier_log *log, enum bpf_prog_type prog_type);
- bool btf_types_are_same(const struct btf *btf1, u32 id1,
- 			const struct btf *btf2, u32 id2);
-+int register_bpf_struct_ops(struct bpf_struct_ops *st_ops);
-+const struct bpf_struct_ops_desc *bpf_struct_ops_find_value(struct btf *btf, u32 value_id);
-+const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *btf, u32 type_id);
- #else
- static inline const struct btf_type *btf_type_by_id(const struct btf *btf,
- 						    u32 type_id)
-@@ -572,6 +576,14 @@ static inline bool btf_types_are_same(const struct btf *btf1, u32 id1,
- {
- 	return false;
- }
-+static inline int register_bpf_struct_ops(struct bpf_struct_ops *st_ops)
-+{
-+	return -ENOTSUPP;
-+}
-+static inline const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *btf, u32 type_id)
-+{
-+	return NULL;
-+}
- #endif
- 
- static inline bool btf_type_is_struct_ptr(struct btf *btf, const struct btf_type *t)
-diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-index 5b80060067ee..b3ac6fb6f2be 100644
---- a/kernel/bpf/bpf_struct_ops.c
-+++ b/kernel/bpf/bpf_struct_ops.c
-@@ -61,35 +61,6 @@ static DEFINE_MUTEX(update_mutex);
- #define VALUE_PREFIX "bpf_struct_ops_"
- #define VALUE_PREFIX_LEN (sizeof(VALUE_PREFIX) - 1)
- 
--/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
-- * the map's value exposed to the userspace and its btf-type-id is
-- * stored at the map->btf_vmlinux_value_type_id.
-- *
-- */
--#define BPF_STRUCT_OPS_TYPE(_name)				\
--extern struct bpf_struct_ops bpf_##_name;			\
--								\
--struct bpf_struct_ops_##_name {					\
--	struct bpf_struct_ops_common_value common;		\
--	struct _name data ____cacheline_aligned_in_smp;		\
--};
--#include "bpf_struct_ops_types.h"
--#undef BPF_STRUCT_OPS_TYPE
--
--enum {
--#define BPF_STRUCT_OPS_TYPE(_name) BPF_STRUCT_OPS_TYPE_##_name,
--#include "bpf_struct_ops_types.h"
--#undef BPF_STRUCT_OPS_TYPE
--	__NR_BPF_STRUCT_OPS_TYPE,
--};
--
--static struct bpf_struct_ops_desc bpf_struct_ops[] = {
--#define BPF_STRUCT_OPS_TYPE(_name)				\
--	[BPF_STRUCT_OPS_TYPE_##_name] = { .st_ops = &bpf_##_name },
--#include "bpf_struct_ops_types.h"
--#undef BPF_STRUCT_OPS_TYPE
--};
--
- const struct bpf_verifier_ops bpf_struct_ops_verifier_ops = {
- };
- 
-@@ -144,9 +115,9 @@ static bool is_valid_value_type(struct btf *btf, s32 value_id,
- 	return true;
- }
- 
--static void bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
--				     struct btf *btf,
--				     struct bpf_verifier_log *log)
-+int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
-+			     struct btf *btf,
-+			     struct bpf_verifier_log *log)
- {
- 	struct bpf_struct_ops *st_ops = st_ops_desc->st_ops;
- 	const struct btf_member *member;
-@@ -160,7 +131,7 @@ static void bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
- 	    sizeof(value_name)) {
- 		pr_warn("struct_ops name %s is too long\n",
- 			st_ops->name);
--		return;
-+		return -EINVAL;
- 	}
- 	sprintf(value_name, "%s%s", VALUE_PREFIX, st_ops->name);
- 
-@@ -169,13 +140,13 @@ static void bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
- 	if (type_id < 0) {
- 		pr_warn("Cannot find struct %s in %s\n",
- 			st_ops->name, btf_get_name(btf));
--		return;
-+		return -EINVAL;
- 	}
- 	t = btf_type_by_id(btf, type_id);
- 	if (btf_type_vlen(t) > BPF_STRUCT_OPS_MAX_NR_MEMBERS) {
- 		pr_warn("Cannot support #%u members in struct %s\n",
- 			btf_type_vlen(t), st_ops->name);
--		return;
-+		return -EINVAL;
- 	}
- 
- 	value_id = btf_find_by_name_kind(btf, value_name,
-@@ -183,10 +154,10 @@ static void bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
- 	if (value_id < 0) {
- 		pr_warn("Cannot find struct %s in %s\n",
- 			value_name, btf_get_name(btf));
--		return;
-+		return -EINVAL;
- 	}
- 	if (!is_valid_value_type(btf, value_id, t, value_name))
--		return;
-+		return -EINVAL;
- 
- 	for_each_member(i, t, member) {
- 		const struct btf_type *func_proto;
-@@ -195,13 +166,13 @@ static void bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
- 		if (!*mname) {
- 			pr_warn("anon member in struct %s is not supported\n",
- 				st_ops->name);
--			break;
-+			return -EOPNOTSUPP;
- 		}
- 
- 		if (__btf_member_bitfield_size(t, member)) {
- 			pr_warn("bit field member %s in struct %s is not supported\n",
- 				mname, st_ops->name);
--			break;
-+			return -EOPNOTSUPP;
- 		}
- 
- 		func_proto = btf_type_resolve_func_ptr(btf,
-@@ -213,7 +184,7 @@ static void bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
- 					   &st_ops->func_models[i])) {
- 			pr_warn("Error in parsing func ptr %s in struct %s\n",
- 				mname, st_ops->name);
--			break;
-+			return -EINVAL;
- 		}
- 	}
- 
-@@ -221,6 +192,7 @@ static void bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
- 		if (st_ops->init(btf)) {
- 			pr_warn("Error in init bpf_struct_ops %s\n",
- 				st_ops->name);
-+			return -EINVAL;
- 		} else {
- 			st_ops_desc->type_id = type_id;
- 			st_ops_desc->type = t;
-@@ -229,54 +201,8 @@ static void bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
- 								 value_id);
- 		}
- 	}
--}
- 
--void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log)
--{
--	struct bpf_struct_ops_desc *st_ops_desc;
--	u32 i;
--
--	/* Ensure BTF type is emitted for "struct bpf_struct_ops_##_name" */
--#define BPF_STRUCT_OPS_TYPE(_name) BTF_TYPE_EMIT(struct bpf_struct_ops_##_name);
--#include "bpf_struct_ops_types.h"
--#undef BPF_STRUCT_OPS_TYPE
--
--	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
--		st_ops_desc = &bpf_struct_ops[i];
--		bpf_struct_ops_desc_init(st_ops_desc, btf, log);
--	}
--}
--
--static const struct bpf_struct_ops_desc *
--bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
--{
--	unsigned int i;
--
--	if (!value_id || !btf)
--		return NULL;
--
--	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
--		if (bpf_struct_ops[i].value_id == value_id)
--			return &bpf_struct_ops[i];
--	}
--
--	return NULL;
--}
--
--const struct bpf_struct_ops_desc *
--bpf_struct_ops_find(struct btf *btf, u32 type_id)
--{
--	unsigned int i;
--
--	if (!type_id || !btf)
--		return NULL;
--
--	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
--		if (bpf_struct_ops[i].type_id == type_id)
--			return &bpf_struct_ops[i];
--	}
--
--	return NULL;
-+	return 0;
- }
- 
- static int bpf_struct_ops_map_get_next_key(struct bpf_map *map, void *key,
-diff --git a/kernel/bpf/bpf_struct_ops_types.h b/kernel/bpf/bpf_struct_ops_types.h
-deleted file mode 100644
-index 5678a9ddf817..000000000000
---- a/kernel/bpf/bpf_struct_ops_types.h
-+++ /dev/null
-@@ -1,12 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--/* internal file - do not include directly */
--
--#ifdef CONFIG_BPF_JIT
--#ifdef CONFIG_NET
--BPF_STRUCT_OPS_TYPE(bpf_dummy_ops)
--#endif
--#ifdef CONFIG_INET
--#include <net/tcp.h>
--BPF_STRUCT_OPS_TYPE(tcp_congestion_ops)
--#endif
--#endif
-diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-index 3fa84c44b882..860b2946de3c 100644
---- a/kernel/bpf/btf.c
-+++ b/kernel/bpf/btf.c
-@@ -19,6 +19,7 @@
- #include <linux/bpf_verifier.h>
- #include <linux/btf.h>
- #include <linux/btf_ids.h>
-+#include <linux/bpf.h>
- #include <linux/bpf_lsm.h>
- #include <linux/skmsg.h>
- #include <linux/perf_event.h>
-@@ -5792,8 +5793,6 @@ struct btf *btf_parse_vmlinux(void)
- 	/* btf_parse_vmlinux() runs under bpf_verifier_lock */
- 	bpf_ctx_convert.t = btf_type_by_id(btf, bpf_ctx_convert_btf_id[0]);
- 
--	bpf_struct_ops_init(btf, log);
--
- 	refcount_set(&btf->refcnt, 1);
- 
- 	err = btf_alloc_id(btf);
-@@ -8489,10 +8488,11 @@ bool btf_type_ids_nocast_alias(struct bpf_verifier_log *log,
- }
- 
- static int
--btf_add_struct_ops(struct btf *btf, struct bpf_struct_ops *st_ops)
-+btf_add_struct_ops(struct btf *btf, struct bpf_struct_ops *st_ops,
-+		   struct bpf_verifier_log *log)
- {
- 	struct btf_struct_ops_tab *tab, *new_tab;
--	int i;
-+	int i, err;
- 
- 	if (!btf)
- 		return -ENOENT;
-@@ -8529,7 +8529,83 @@ btf_add_struct_ops(struct btf *btf, struct bpf_struct_ops *st_ops)
- 
- 	tab->ops[btf->struct_ops_tab->cnt].st_ops = st_ops;
- 
-+	err = bpf_struct_ops_desc_init(&tab->ops[btf->struct_ops_tab->cnt], btf, log);
-+	if (err)
-+		return err;
-+
- 	btf->struct_ops_tab->cnt++;
- 
- 	return 0;
- }
-+
-+const struct bpf_struct_ops_desc *
-+bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
-+{
-+	const struct bpf_struct_ops_desc *st_ops_list;
-+	unsigned int i;
-+	u32 cnt;
-+
-+	if (!value_id)
-+		return NULL;
-+	if (!btf->struct_ops_tab)
-+		return NULL;
-+
-+	cnt = btf->struct_ops_tab->cnt;
-+	st_ops_list = btf->struct_ops_tab->ops;
-+	for (i = 0; i < cnt; i++) {
-+		if (st_ops_list[i].value_id == value_id)
-+			return &st_ops_list[i];
-+	}
-+
-+	return NULL;
-+}
-+
-+const struct bpf_struct_ops_desc *
-+bpf_struct_ops_find(struct btf *btf, u32 type_id)
-+{
-+	const struct bpf_struct_ops_desc *st_ops_list;
-+	unsigned int i;
-+	u32 cnt;
-+
-+	if (!type_id)
-+		return NULL;
-+	if (!btf->struct_ops_tab)
-+		return NULL;
-+
-+	cnt = btf->struct_ops_tab->cnt;
-+	st_ops_list = btf->struct_ops_tab->ops;
-+	for (i = 0; i < cnt; i++) {
-+		if (st_ops_list[i].type_id == type_id)
-+			return &st_ops_list[i];
-+	}
-+
-+	return NULL;
-+}
-+
-+int register_bpf_struct_ops(struct bpf_struct_ops *st_ops)
-+{
-+	struct bpf_verifier_log *log;
-+	struct btf *btf;
-+	int err = 0;
-+
-+	btf = btf_get_module_btf(st_ops->owner);
-+	if (!btf)
-+		return -EINVAL;
-+
-+	log = kzalloc(sizeof(*log), GFP_KERNEL | __GFP_NOWARN);
-+	if (!log) {
-+		err = -ENOMEM;
-+		goto errout;
-+	}
-+
-+	log->level = BPF_LOG_KERNEL;
-+
-+	err = btf_add_struct_ops(btf, st_ops, log);
-+
-+errout:
-+	kfree(log);
-+	btf_put(btf);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(register_bpf_struct_ops);
-diff --git a/net/bpf/bpf_dummy_struct_ops.c b/net/bpf/bpf_dummy_struct_ops.c
-index ba2c58dba2da..42034c54a70f 100644
---- a/net/bpf/bpf_dummy_struct_ops.c
-+++ b/net/bpf/bpf_dummy_struct_ops.c
-@@ -7,7 +7,7 @@
- #include <linux/bpf.h>
- #include <linux/btf.h>
- 
--extern struct bpf_struct_ops bpf_bpf_dummy_ops;
-+static struct bpf_struct_ops bpf_bpf_dummy_ops;
- 
- /* A common type for test_N with return value in bpf_dummy_ops */
- typedef int (*dummy_ops_test_ret_fn)(struct bpf_dummy_ops_state *state, ...);
-@@ -256,7 +256,7 @@ static struct bpf_dummy_ops __bpf_bpf_dummy_ops = {
- 	.test_sleepable = bpf_dummy_test_sleepable,
- };
- 
--struct bpf_struct_ops bpf_bpf_dummy_ops = {
-+static struct bpf_struct_ops bpf_bpf_dummy_ops = {
- 	.verifier_ops = &bpf_dummy_verifier_ops,
- 	.init = bpf_dummy_init,
- 	.check_member = bpf_dummy_ops_check_member,
-@@ -265,4 +265,11 @@ struct bpf_struct_ops bpf_bpf_dummy_ops = {
- 	.unreg = bpf_dummy_unreg,
- 	.name = "bpf_dummy_ops",
- 	.cfi_stubs = &__bpf_bpf_dummy_ops,
-+	.owner = THIS_MODULE,
- };
-+
-+static int __init bpf_dummy_struct_ops_init(void)
-+{
-+	return REGISTER_BPF_STRUCT_OPS(&bpf_bpf_dummy_ops, bpf_dummy_ops);
-+}
-+late_initcall(bpf_dummy_struct_ops_init);
-diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
-index dffd8828079b..7e053b9faca3 100644
---- a/net/ipv4/bpf_tcp_ca.c
-+++ b/net/ipv4/bpf_tcp_ca.c
-@@ -12,7 +12,7 @@
- #include <net/bpf_sk_storage.h>
- 
- /* "extern" is to avoid sparse warning.  It is only used in bpf_struct_ops.c. */
--extern struct bpf_struct_ops bpf_tcp_congestion_ops;
-+static struct bpf_struct_ops bpf_tcp_congestion_ops;
- 
- static u32 unsupported_ops[] = {
- 	offsetof(struct tcp_congestion_ops, get_info),
-@@ -345,7 +345,7 @@ static struct tcp_congestion_ops __bpf_ops_tcp_congestion_ops = {
- 	.release = __bpf_tcp_ca_release,
- };
- 
--struct bpf_struct_ops bpf_tcp_congestion_ops = {
-+static struct bpf_struct_ops bpf_tcp_congestion_ops = {
- 	.verifier_ops = &bpf_tcp_ca_verifier_ops,
- 	.reg = bpf_tcp_ca_reg,
- 	.unreg = bpf_tcp_ca_unreg,
-@@ -356,10 +356,16 @@ struct bpf_struct_ops bpf_tcp_congestion_ops = {
- 	.validate = bpf_tcp_ca_validate,
- 	.name = "tcp_congestion_ops",
- 	.cfi_stubs = &__bpf_ops_tcp_congestion_ops,
-+	.owner = THIS_MODULE,
- };
- 
- static int __init bpf_tcp_ca_kfunc_init(void)
- {
--	return register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_tcp_ca_kfunc_set);
-+	int ret;
-+
-+	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_tcp_ca_kfunc_set);
-+	ret = ret ?: REGISTER_BPF_STRUCT_OPS(&bpf_tcp_congestion_ops, tcp_congestion_ops);
-+
-+	return ret;
- }
- late_initcall(bpf_tcp_ca_kfunc_init);
--- 
-2.34.1
+> +static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+> +							   struct stmmac_dma_cfg *dma_cfg, int atds)
+> +{
+> +	u32 dma_intr_mask;
+>  
+>  	/* Mask interrupts by writing to CSR7 */
+> -	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_INTR_ENA);
+> +	dma_intr_mask = DMA_INTR_DEFAULT_MASK;
+> +
+> +	dma_config(ioaddr + DMA_BUS_MODE, ioaddr + DMA_INTR_ENA,
+> +			  dma_cfg, dma_intr_mask, atds);
+> +}
+> +
+> +static void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *ioaddr,
+> +									   struct stmmac_dma_cfg *dma_cfg, u32 chan)
+> +{
+> +	u32 dma_intr_mask;
+> +
+> +	/* Mask interrupts by writing to CSR7 */
+> +	dma_intr_mask = DMA_INTR_DEFAULT_MASK;
+> +
+> +	if (dma_cfg->multi_msi_en)
+> +		dma_config(ioaddr + DMA_CHAN_BUS_MODE(chan),
+> +					ioaddr + DMA_CHAN_INTR_ENA(chan), dma_cfg,
 
+Why so complicated? stmmac_init_chan() is always supposed to be called
+in the same context as stmmac_dma_init() (stmmac_xdp_open() is wrong
+in not doing that). Seeing DW GMAC v3.x multi-channels feature is
+implemented as multiple sets of the same CSRs (except AV traffic
+control CSRs specific to channels 1 and higher which are left unused
+here anyway) you can just drop the stmmac_dma_ops.init() callback and
+convert dwmac1000_dma_init() to being dwmac1000_dma_init_channel()
+with no significant modifications:
+
+< you wouldn't need to have a separate dma_config() method.
+< you wouldn't need to check for the dma_cfg->multi_msi_en flag state
+since the stmmac_init_chan() method is called for as many times as
+there are channels available (at least 1 channel always exists).
+< just add atds argument.
+< just convert the method to using the chan-dependent CSR macros.
+
+> +					dma_intr_mask, dma_cfg->multi_msi_en);
+                                                                ^
+              +-------------------------------------------------+
+This is wrong + ATDS flag means Alternative Descriptor Size. This flag
+enables the 8 dword DMA-descriptors size with some DMA-desc fields
+semantics changed (see enh_desc.c and norm_desc.c). It's useful for
+PTP Timestamping, VLANs, AV feature, L3/L4 filtering, CSum offload
+Type 2 (if any of that available). It has nothing to do with the
+separate DMA IRQs. Just convert the stmmac_dma_ops.dma_init() callback
+to accepting the atds flag as an additional argument, use it here to
+activate the extended descriptor size and make sure the atds flag is
+passed to the stmmac_init_chan() method in the respective source code.
+
+>  }
+>  
+>  static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+> @@ -116,7 +144,7 @@ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+>  				  dma_addr_t dma_rx_phy, u32 chan)
+>  {
+>  	/* RX descriptor base address list must be written into DMA CSR3 */
+> -	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR);
+> +	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_CHAN_RCV_BASE_ADDR(chan));
+>  }
+>  
+>  static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+> @@ -125,7 +153,7 @@ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+>  				  dma_addr_t dma_tx_phy, u32 chan)
+>  {
+>  	/* TX descriptor base address list must be written into DMA CSR4 */
+> -	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR);
+> +	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_CHAN_TX_BASE_ADDR(chan));
+>  }
+>  
+>  static u32 dwmac1000_configure_fc(u32 csr6, int rxfifosz)
+> @@ -153,7 +181,7 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+>  					    void __iomem *ioaddr, int mode,
+>  					    u32 channel, int fifosz, u8 qmode)
+>  {
+> -	u32 csr6 = readl(ioaddr + DMA_CONTROL);
+> +	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
+>  
+>  	if (mode == SF_DMA_MODE) {
+>  		pr_debug("GMAC: enable RX store and forward mode\n");
+> @@ -175,14 +203,14 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+>  	/* Configure flow control based on rx fifo size */
+>  	csr6 = dwmac1000_configure_fc(csr6, fifosz);
+>  
+> -	writel(csr6, ioaddr + DMA_CONTROL);
+> +	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
+>  }
+>  
+>  static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
+>  					    void __iomem *ioaddr, int mode,
+>  					    u32 channel, int fifosz, u8 qmode)
+>  {
+> -	u32 csr6 = readl(ioaddr + DMA_CONTROL);
+> +	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
+>  
+>  	if (mode == SF_DMA_MODE) {
+>  		pr_debug("GMAC: enable TX store and forward mode\n");
+> @@ -209,7 +237,7 @@ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
+>  			csr6 |= DMA_CONTROL_TTC_256;
+>  	}
+>  
+> -	writel(csr6, ioaddr + DMA_CONTROL);
+> +	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
+>  }
+>  
+>  static void dwmac1000_dump_dma_regs(struct stmmac_priv *priv,
+> @@ -271,12 +299,13 @@ static int dwmac1000_get_hw_feature(void __iomem *ioaddr,
+>  static void dwmac1000_rx_watchdog(struct stmmac_priv *priv,
+>  				  void __iomem *ioaddr, u32 riwt, u32 queue)
+>  {
+> -	writel(riwt, ioaddr + DMA_RX_WATCHDOG);
+> +	writel(riwt, ioaddr + DMA_CHAN_RX_WATCHDOG(queue));
+>  }
+>  
+>  const struct stmmac_dma_ops dwmac1000_dma_ops = {
+>  	.reset = dwmac_dma_reset,
+
+>  	.init = dwmac1000_dma_init,
+
+This could be dropped. See my comment above.
+
+> +	.init_chan = dwmac1000_dma_init_channel,
+>  	.init_rx_chan = dwmac1000_dma_init_rx,
+>  	.init_tx_chan = dwmac1000_dma_init_tx,
+>  	.axi = dwmac1000_dma_axi,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> index e7aef136824b..395d5e4c3922 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> @@ -148,6 +148,9 @@
+>  					 DMA_STATUS_TI | \
+>  					 DMA_STATUS_MSK_COMMON)
+>  
+
+> +/* Following DMA defines are chanels oriented */
+
+s/chanels/channels
+
+> +#define DMA_CHAN_OFFSET			0x100
+
+DMA_CHAN_BASE_OFFSET? to be looking the same as in DW QoS Eth GMAC
+v4.x/v5.x (dwmac4_dma.h).
+
+> +
+>  #define NUM_DWMAC100_DMA_REGS	9
+>  #define NUM_DWMAC1000_DMA_REGS	23
+>  #define NUM_DWMAC4_DMA_REGS	27
+> @@ -170,4 +173,18 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			struct stmmac_extra_stats *x, u32 chan, u32 dir);
+>  int dwmac_dma_reset(void __iomem *ioaddr);
+>  
+> +static inline u32 dma_chan_base_addr(u32 base, u32 chan)
+> +{
+> +	return base + chan * DMA_CHAN_OFFSET;
+> +}
+> +
+> +#define DMA_CHAN_XMT_POLL_DEMAND(chan)	dma_chan_base_addr(DMA_XMT_POLL_DEMAND, chan)
+> +#define DMA_CHAN_INTR_ENA(chan)		dma_chan_base_addr(DMA_INTR_ENA, chan)
+> +#define DMA_CHAN_CONTROL(chan)		dma_chan_base_addr(DMA_CONTROL, chan)
+> +#define DMA_CHAN_STATUS(chan)		dma_chan_base_addr(DMA_STATUS, chan)
+> +#define DMA_CHAN_BUS_MODE(chan)		dma_chan_base_addr(DMA_BUS_MODE, chan)
+> +#define DMA_CHAN_RCV_BASE_ADDR(chan)	dma_chan_base_addr(DMA_RCV_BASE_ADDR, chan)
+> +#define DMA_CHAN_TX_BASE_ADDR(chan)	dma_chan_base_addr(DMA_TX_BASE_ADDR, chan)
+> +#define DMA_CHAN_RX_WATCHDOG(chan)	dma_chan_base_addr(DMA_RX_WATCHDOG, chan)
+> +
+>  #endif /* __DWMAC_DMA_H__ */
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> index 2f0df16fb7e4..968801c694e9 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> @@ -31,63 +31,63 @@ int dwmac_dma_reset(void __iomem *ioaddr)
+>  void dwmac_enable_dma_transmission(struct stmmac_priv *priv,
+>  				   void __iomem *ioaddr, u32 chan)
+>  {
+> -	writel(1, ioaddr + DMA_XMT_POLL_DEMAND);
+> +	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
+>  }
+>  
+>  void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			  u32 chan, bool rx, bool tx)
+>  {
+> -	u32 value = readl(ioaddr + DMA_INTR_ENA);
+> +	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  
+>  	if (rx)
+>  		value |= DMA_INTR_DEFAULT_RX;
+>  	if (tx)
+>  		value |= DMA_INTR_DEFAULT_TX;
+>  
+> -	writel(value, ioaddr + DMA_INTR_ENA);
+> +	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  }
+>  
+>  void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			   u32 chan, bool rx, bool tx)
+>  {
+> -	u32 value = readl(ioaddr + DMA_INTR_ENA);
+> +	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  
+>  	if (rx)
+>  		value &= ~DMA_INTR_DEFAULT_RX;
+>  	if (tx)
+>  		value &= ~DMA_INTR_DEFAULT_TX;
+>  
+> -	writel(value, ioaddr + DMA_INTR_ENA);
+> +	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
+>  }
+>  
+>  void dwmac_dma_start_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_CONTROL);
+> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+>  	value |= DMA_CONTROL_ST;
+> -	writel(value, ioaddr + DMA_CONTROL);
+> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+>  }
+>  
+>  void dwmac_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_CONTROL);
+> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+>  	value &= ~DMA_CONTROL_ST;
+> -	writel(value, ioaddr + DMA_CONTROL);
+> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+>  }
+>  
+>  void dwmac_dma_start_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_CONTROL);
+> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+>  	value |= DMA_CONTROL_SR;
+> -	writel(value, ioaddr + DMA_CONTROL);
+> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+>  }
+>  
+>  void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
+>  {
+> -	u32 value = readl(ioaddr + DMA_CONTROL);
+> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+>  	value &= ~DMA_CONTROL_SR;
+> -	writel(value, ioaddr + DMA_CONTROL);
+> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+>  }
+>  
+>  #ifdef DWMAC_DMA_DEBUG
+> @@ -167,7 +167,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
+>  	int ret = 0;
+>  	/* read the status register (CSR5) */
+> -	u32 intr_status = readl(ioaddr + DMA_STATUS);
+> +	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
+>  
+>  #ifdef DWMAC_DMA_DEBUG
+>  	/* Enable it to monitor DMA rx/tx status in case of critical problems */
+> @@ -237,7 +237,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
+>  
+>  	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
+
+> -	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
+> +	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
+
+Em, please explain the mask change. Bits CSR5[17:28] are defined as RO
+on a normal DW GMAC. Anyway it seems like the mask changes belongs to
+the patch 5/9.
+
+
+Except the last comment, AFAICS this patch provides a generic DW GMAC
+v3.x multi-channel support. Despite of several issues noted above the
+change in general looks very good.
+
+-Serge(y)
+
+>  
+>  	return ret;
+>  }
+> -- 
+> 2.31.4
+> 
 
