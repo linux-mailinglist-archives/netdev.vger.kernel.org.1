@@ -1,311 +1,139 @@
-Return-Path: <netdev+bounces-59128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C220A8196A4
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:01:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A7B8196CA
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:28:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFB261C24837
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:01:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4192A28883C
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C54A7472;
-	Wed, 20 Dec 2023 02:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E939E8813;
+	Wed, 20 Dec 2023 02:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eDgUbFiY"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD3B7488;
-	Wed, 20 Dec 2023 02:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4SvxZm4Cl8z29gGv;
-	Wed, 20 Dec 2023 09:59:44 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id D9C43140499;
-	Wed, 20 Dec 2023 10:00:57 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 20 Dec
- 2023 10:00:57 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <brauner@kernel.org>, <dchinner@redhat.com>,
-	<jlayton@kernel.org>, <jack@suse.cz>, <riel@surriel.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH v2] ipc/mqueue: fix potential sleeping issue in mqueue_flush_file
-Date: Wed, 20 Dec 2023 10:12:08 +0800
-Message-ID: <20231220021208.2634523-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F06B846B;
+	Wed, 20 Dec 2023 02:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=S6hBBZYUTdu1SR1857lmwvYGVoEU9Tl7+LRs2NQaAd8=; b=eDgUbFiY79P17VReQHuHCRVBo7
+	54vBKiszoO2sKY7W03M+6FSkyO0rohkApYaptKXK3LKWpI7Zfak54m+3ZnK9J4ZDbmbBFdcDQxFbr
+	dslLnFi8G5uCkYSrg0lS20kIcy4igWQQiR4gA27uEyRKbcNRO/ktcHzHww0Na68RZpkpf4DjL541j
+	cc/GMZtFRuGQ773feihpSavEJjh4LTktm7esjMe6LsShFXYKg9Y1o2p7CNjhLSiMs46I9yfAdd2Yi
+	Mh9rae7qDTWF+5rVls4KJl621Rt4hax8BQr9iuaHSpifQD5HJmJpijJ6mdn5jCTYGlj/R1frWIsLq
+	ClEtFCYg==;
+Received: from [50.53.46.231] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rFmJq-00FyTs-1y;
+	Wed, 20 Dec 2023 02:28:22 +0000
+Message-ID: <8fd18c6b-3a26-4cdc-a18f-48587d0ce79b@infradead.org>
+Date: Tue, 19 Dec 2023 18:28:22 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] wifi: cfg80211: address several kerneldoc warnings
+Content-Language: en-US
+To: Jonathan Corbet <corbet@lwn.net>,
+ Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <87plz1g2sc.fsf@meer.lwn.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <87plz1g2sc.fsf@meer.lwn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-I analyze the potential sleeping issue of the following processes:
-Thread A                                Thread B
-...                                     netlink_create  //ref = 1
-do_mq_notify                            ...
-  sock = netlink_getsockbyfilp          ...     //ref = 2
-  info->notify_sock = sock;             ...
-...                                     netlink_sendmsg
-...                                       skb = netlink_alloc_large_skb  //skb->head is vmalloced
-...                                       netlink_unicast
-...                                         sk = netlink_getsockbyportid //ref = 3
-...                                         netlink_sendskb
-...                                           __netlink_sendskb
-...                                             skb_queue_tail //put skb to sk_receive_queue
-...                                         sock_put //ref = 2
-...                                     ...
-...                                     netlink_release
-...                                       deferred_put_nlk_sk //ref = 1
-mqueue_flush_file
-  spin_lock
-  remove_notification
-    netlink_sendskb
-      sock_put  //ref = 0
-        sk_free
-          ...
-          __sk_destruct
-            netlink_sock_destruct
-              skb_queue_purge  //get skb from sk_receive_queue
-                ...
-                __skb_queue_purge_reason
-                  kfree_skb_reason
-                    __kfree_skb
-                    ...
-                    skb_release_all
-                      skb_release_head_state
-                        netlink_skb_destructor
-                          vfree(skb->head)  //sleeping while holding spinlock
 
-In netlink_sendmsg, if the memory pointed to by skb->head is allocated by
-vmalloc, and is put to sk_receive_queue queue, also the skb is not freed.
-When the mqueue executes flush, the sleeping bug will occur. Use mutex
-lock instead of spin lock in mqueue_flush_file.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
-v2: CCed some networking maintainer & netdev list
----
- ipc/mqueue.c | 48 ++++++++++++++++++++++++------------------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+On 12/19/23 16:01, Jonathan Corbet wrote:
+> include/net/cfg80211.h includes a number of kerneldoc entries for struct
+> members that do not exist, leading to these warnings:
+> 
+>   ./include/net/cfg80211.h:3192: warning: Excess struct member 'band_pref' description in 'cfg80211_bss_selection'
+>   ./include/net/cfg80211.h:3192: warning: Excess struct member 'adjust' description in 'cfg80211_bss_selection'
+>   ./include/net/cfg80211.h:6181: warning: Excess struct member 'bssid' description in 'wireless_dev'
+>   ./include/net/cfg80211.h:6181: warning: Excess struct member 'beacon_interval' description in 'wireless_dev'
+>   ./include/net/cfg80211.h:7299: warning: Excess struct member 'bss' description in 'cfg80211_rx_assoc_resp_data'
+> 
+> Remove and/or repair each entry to address the warnings and ensure a proper
+> docs build for the affected structures.
+> 
+> Signed-off-by: Jonathan Corbet <corbet@lwn.net>
 
-diff --git a/ipc/mqueue.c b/ipc/mqueue.c
-index 5eea4dc0509e..f6f92e3f82e4 100644
---- a/ipc/mqueue.c
-+++ b/ipc/mqueue.c
-@@ -118,9 +118,9 @@ struct posix_msg_tree_node {
-  * Solution: use _release and _acquire barriers.
-  *
-  * 3) There is intentionally no barrier when setting current->state
-- *    to TASK_INTERRUPTIBLE: spin_unlock(&info->lock) provides the
-+ *    to TASK_INTERRUPTIBLE: mutex_unlock(&info->lock) provides the
-  *    release memory barrier, and the wakeup is triggered when holding
-- *    info->lock, i.e. spin_lock(&info->lock) provided a pairing
-+ *    info->lock, i.e. mutex_lock(&info->lock) provided a pairing
-  *    acquire memory barrier.
-  */
- 
-@@ -132,7 +132,7 @@ struct ext_wait_queue {		/* queue of sleeping tasks */
- };
- 
- struct mqueue_inode_info {
--	spinlock_t lock;
-+	struct mutex lock;
- 	struct inode vfs_inode;
- 	wait_queue_head_t wait_q;
- 
-@@ -312,7 +312,7 @@ static struct inode *mqueue_get_inode(struct super_block *sb,
- 		inode->i_size = FILENT_SIZE;
- 		/* mqueue specific info */
- 		info = MQUEUE_I(inode);
--		spin_lock_init(&info->lock);
-+		mutex_init(&info->lock);
- 		init_waitqueue_head(&info->wait_q);
- 		INIT_LIST_HEAD(&info->e_wait_q[0].list);
- 		INIT_LIST_HEAD(&info->e_wait_q[1].list);
-@@ -523,11 +523,11 @@ static void mqueue_evict_inode(struct inode *inode)
- 
- 	ipc_ns = get_ns_from_inode(inode);
- 	info = MQUEUE_I(inode);
--	spin_lock(&info->lock);
-+	mutex_lock(&info->lock);
- 	while ((msg = msg_get(info)) != NULL)
- 		list_add_tail(&msg->m_list, &tmp_msg);
- 	kfree(info->node_cache);
--	spin_unlock(&info->lock);
-+	mutex_unlock(&info->lock);
- 
- 	list_for_each_entry_safe(msg, nmsg, &tmp_msg, m_list) {
- 		list_del(&msg->m_list);
-@@ -640,7 +640,7 @@ static ssize_t mqueue_read_file(struct file *filp, char __user *u_data,
- 	char buffer[FILENT_SIZE];
- 	ssize_t ret;
- 
--	spin_lock(&info->lock);
-+	mutex_lock(&info->lock);
- 	snprintf(buffer, sizeof(buffer),
- 			"QSIZE:%-10lu NOTIFY:%-5d SIGNO:%-5d NOTIFY_PID:%-6d\n",
- 			info->qsize,
-@@ -649,7 +649,7 @@ static ssize_t mqueue_read_file(struct file *filp, char __user *u_data,
- 			 info->notify.sigev_notify == SIGEV_SIGNAL) ?
- 				info->notify.sigev_signo : 0,
- 			pid_vnr(info->notify_owner));
--	spin_unlock(&info->lock);
-+	mutex_unlock(&info->lock);
- 	buffer[sizeof(buffer)-1] = '\0';
- 
- 	ret = simple_read_from_buffer(u_data, count, off, buffer,
-@@ -665,11 +665,11 @@ static int mqueue_flush_file(struct file *filp, fl_owner_t id)
- {
- 	struct mqueue_inode_info *info = MQUEUE_I(file_inode(filp));
- 
--	spin_lock(&info->lock);
-+	mutex_lock(&info->lock);
- 	if (task_tgid(current) == info->notify_owner)
- 		remove_notification(info);
- 
--	spin_unlock(&info->lock);
-+	mutex_unlock(&info->lock);
- 	return 0;
- }
- 
-@@ -680,13 +680,13 @@ static __poll_t mqueue_poll_file(struct file *filp, struct poll_table_struct *po
- 
- 	poll_wait(filp, &info->wait_q, poll_tab);
- 
--	spin_lock(&info->lock);
-+	mutex_lock(&info->lock);
- 	if (info->attr.mq_curmsgs)
- 		retval = EPOLLIN | EPOLLRDNORM;
- 
- 	if (info->attr.mq_curmsgs < info->attr.mq_maxmsg)
- 		retval |= EPOLLOUT | EPOLLWRNORM;
--	spin_unlock(&info->lock);
-+	mutex_unlock(&info->lock);
- 
- 	return retval;
- }
-@@ -724,7 +724,7 @@ static int wq_sleep(struct mqueue_inode_info *info, int sr,
- 		/* memory barrier not required, we hold info->lock */
- 		__set_current_state(TASK_INTERRUPTIBLE);
- 
--		spin_unlock(&info->lock);
-+		mutex_unlock(&info->lock);
- 		time = schedule_hrtimeout_range_clock(timeout, 0,
- 			HRTIMER_MODE_ABS, CLOCK_REALTIME);
- 
-@@ -734,7 +734,7 @@ static int wq_sleep(struct mqueue_inode_info *info, int sr,
- 			retval = 0;
- 			goto out;
- 		}
--		spin_lock(&info->lock);
-+		mutex_lock(&info->lock);
- 
- 		/* we hold info->lock, so no memory barrier required */
- 		if (READ_ONCE(ewp->state) == STATE_READY) {
-@@ -752,7 +752,7 @@ static int wq_sleep(struct mqueue_inode_info *info, int sr,
- 	}
- 	list_del(&ewp->list);
- out_unlock:
--	spin_unlock(&info->lock);
-+	mutex_unlock(&info->lock);
- out:
- 	return retval;
- }
-@@ -1125,7 +1125,7 @@ static int do_mq_timedsend(mqd_t mqdes, const char __user *u_msg_ptr,
- 	if (!info->node_cache)
- 		new_leaf = kmalloc(sizeof(*new_leaf), GFP_KERNEL);
- 
--	spin_lock(&info->lock);
-+	mutex_lock(&info->lock);
- 
- 	if (!info->node_cache && new_leaf) {
- 		/* Save our speculative allocation into the cache */
-@@ -1166,7 +1166,7 @@ static int do_mq_timedsend(mqd_t mqdes, const char __user *u_msg_ptr,
- 		simple_inode_init_ts(inode);
- 	}
- out_unlock:
--	spin_unlock(&info->lock);
-+	mutex_unlock(&info->lock);
- 	wake_up_q(&wake_q);
- out_free:
- 	if (ret)
-@@ -1230,7 +1230,7 @@ static int do_mq_timedreceive(mqd_t mqdes, char __user *u_msg_ptr,
- 	if (!info->node_cache)
- 		new_leaf = kmalloc(sizeof(*new_leaf), GFP_KERNEL);
- 
--	spin_lock(&info->lock);
-+	mutex_lock(&info->lock);
- 
- 	if (!info->node_cache && new_leaf) {
- 		/* Save our speculative allocation into the cache */
-@@ -1242,7 +1242,7 @@ static int do_mq_timedreceive(mqd_t mqdes, char __user *u_msg_ptr,
- 
- 	if (info->attr.mq_curmsgs == 0) {
- 		if (f.file->f_flags & O_NONBLOCK) {
--			spin_unlock(&info->lock);
-+			mutex_unlock(&info->lock);
- 			ret = -EAGAIN;
- 		} else {
- 			wait.task = current;
-@@ -1261,7 +1261,7 @@ static int do_mq_timedreceive(mqd_t mqdes, char __user *u_msg_ptr,
- 
- 		/* There is now free space in queue. */
- 		pipelined_receive(&wake_q, info);
--		spin_unlock(&info->lock);
-+		mutex_unlock(&info->lock);
- 		wake_up_q(&wake_q);
- 		ret = 0;
- 	}
-@@ -1391,7 +1391,7 @@ static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
- 	info = MQUEUE_I(inode);
- 
- 	ret = 0;
--	spin_lock(&info->lock);
-+	mutex_lock(&info->lock);
- 	if (notification == NULL) {
- 		if (info->notify_owner == task_tgid(current)) {
- 			remove_notification(info);
-@@ -1424,7 +1424,7 @@ static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
- 		info->notify_user_ns = get_user_ns(current_user_ns());
- 		inode_set_atime_to_ts(inode, inode_set_ctime_current(inode));
- 	}
--	spin_unlock(&info->lock);
-+	mutex_unlock(&info->lock);
- out_fput:
- 	fdput(f);
- out:
-@@ -1470,7 +1470,7 @@ static int do_mq_getsetattr(int mqdes, struct mq_attr *new, struct mq_attr *old)
- 	inode = file_inode(f.file);
- 	info = MQUEUE_I(inode);
- 
--	spin_lock(&info->lock);
-+	mutex_lock(&info->lock);
- 
- 	if (old) {
- 		*old = info->attr;
-@@ -1488,7 +1488,7 @@ static int do_mq_getsetattr(int mqdes, struct mq_attr *new, struct mq_attr *old)
- 		inode_set_atime_to_ts(inode, inode_set_ctime_current(inode));
- 	}
- 
--	spin_unlock(&info->lock);
-+	mutex_unlock(&info->lock);
- 	fdput(f);
- 	return 0;
- }
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+
+
+> ---
+>  include/net/cfg80211.h | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+> index b137a33a1b68..81c46c8e2a68 100644
+> --- a/include/net/cfg80211.h
+> +++ b/include/net/cfg80211.h
+> @@ -3180,8 +3180,8 @@ struct cfg80211_ibss_params {
+>   *
+>   * @behaviour: requested BSS selection behaviour.
+>   * @param: parameters for requestion behaviour.
+> - * @band_pref: preferred band for %NL80211_BSS_SELECT_ATTR_BAND_PREF.
+> - * @adjust: parameters for %NL80211_BSS_SELECT_ATTR_RSSI_ADJUST.
+> + * @param.band_pref: preferred band for %NL80211_BSS_SELECT_ATTR_BAND_PREF.
+> + * @param.adjust: parameters for %NL80211_BSS_SELECT_ATTR_RSSI_ADJUST.
+>   */
+>  struct cfg80211_bss_selection {
+>  	enum nl80211_bss_select_attr behaviour;
+> @@ -6013,7 +6013,6 @@ void wiphy_delayed_work_flush(struct wiphy *wiphy,
+>   *	wireless device if it has no netdev
+>   * @u: union containing data specific to @iftype
+>   * @connected: indicates if connected or not (STA mode)
+> - * @bssid: (private) Used by the internal configuration code
+>   * @wext: (private) Used by the internal wireless extensions compat code
+>   * @wext.ibss: (private) IBSS data part of wext handling
+>   * @wext.connect: (private) connection handling data
+> @@ -6033,8 +6032,6 @@ void wiphy_delayed_work_flush(struct wiphy *wiphy,
+>   * @mgmt_registrations: list of registrations for management frames
+>   * @mgmt_registrations_need_update: mgmt registrations were updated,
+>   *	need to propagate the update to the driver
+> - * @beacon_interval: beacon interval used on this device for transmitting
+> - *	beacons, 0 when not valid
+>   * @address: The address for this device, valid only if @netdev is %NULL
+>   * @is_running: true if this is a non-netdev device that has been started, e.g.
+>   *	the P2P Device.
+> @@ -7270,8 +7267,6 @@ void cfg80211_auth_timeout(struct net_device *dev, const u8 *addr);
+>  
+>  /**
+>   * struct cfg80211_rx_assoc_resp_data - association response data
+> - * @bss: the BSS that association was requested with, ownership of the pointer
+> - *	moves to cfg80211 in the call to cfg80211_rx_assoc_resp()
+>   * @buf: (Re)Association Response frame (header + body)
+>   * @len: length of the frame data
+>   * @uapsd_queues: bitmap of queues configured for uapsd. Same format
+> @@ -7281,6 +7276,8 @@ void cfg80211_auth_timeout(struct net_device *dev, const u8 *addr);
+>   * @ap_mld_addr: AP MLD address (in case of MLO)
+>   * @links: per-link information indexed by link ID, use links[0] for
+>   *	non-MLO connections
+> + * @links.bss: the BSS that association was requested with, ownership of the
+> + *      pointer moves to cfg80211 in the call to cfg80211_rx_assoc_resp()
+>   * @links.status: Set this (along with a BSS pointer) for links that
+>   *	were rejected by the AP.
+>   */
+
 -- 
-2.34.1
-
+#Randy
+https://people.kernel.org/tglx/notes-about-netiquette
+https://subspace.kernel.org/etiquette.html
 
