@@ -1,126 +1,157 @@
-Return-Path: <netdev+bounces-59095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D9658194E4
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:01:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CDAB8194F5
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:09:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4168B23708
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:01:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A971B23ADD
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45077E2;
-	Wed, 20 Dec 2023 00:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E0123AF;
+	Wed, 20 Dec 2023 00:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="PKTFgcrd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XzWaWIOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26623BE4C;
-	Wed, 20 Dec 2023 00:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 61D837DA;
-	Wed, 20 Dec 2023 00:01:40 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 61D837DA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1703030500; bh=jTG5dpMX6psNetWgHqT85RaanezwkMuMisj0ITm0ioU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PKTFgcrdEopAi67xnqTUoADR0ekAwSZca5EQZXRiu0s0VCrnJUSZH2jw0hKdL2XJr
-	 IvqONFHTjtT16Oaw8iLyEqeT37Lis2UYUH7FFM2s6SMD3+ymsLSXCuBjnppnSXtkGw
-	 VK/VxIGgopdoBXQfhTxuBd2AYIIK6lRbEok5KLAnsNqskfkHMU5qdGXzwCBaWkAapx
-	 /mBsniOra91aEquQtW9L73957O6dP6pvnDDujjlYcQVRkhGRurPpYUOJWOLGp0BJW3
-	 tSxIISBkmZvZfG0XN5vjgRM05ri1mabw8vJKzY1R39TVUbFucNYm8gheFr14Hz3itV
-	 1J3896O74KWdg==
-From: Jonathan Corbet <corbet@lwn.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: [PATCH] wifi: cfg80211: address several kerneldoc warnings
-Date: Tue, 19 Dec 2023 17:01:39 -0700
-Message-ID: <87plz1g2sc.fsf@meer.lwn.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9821FC9;
+	Wed, 20 Dec 2023 00:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-553dc379809so51316a12.0;
+        Tue, 19 Dec 2023 16:09:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703030954; x=1703635754; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wKuz/aOP9ywQDUYbzZm1chkeDVYYJSO+EMnUmdl7HN4=;
+        b=XzWaWIOL9m5v6reBhKbeXZQ1jxkOmFnRX7UpLlPhqaGVnMfMOBZeOK9brXUjDl3Mld
+         /JDu0ATVUCNyHhMGYdVMQireP1chG9SGcng/MADK4O59XSje3OuWxQcWo1gEN6Ke/XYo
+         y+0BWL6f+B1f8TkCEuh6X57wGBcT4fhegkJUn3lAWjgGC1E2V1F8QTdPICsmjCvRv17r
+         zwQxDo1PGo/K/ILnyYOjLhpEjIAYeZVLLnmbO79lLWpMYQjkLF0DDQrG5fwX8RSqHzMG
+         YjpJT9wqPGaYkqkwm/ops9BtGnpdYASn+3GrGZHMcPvk7qyT6TpyGZLF/bpfEHfmsh2W
+         dRkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703030954; x=1703635754;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wKuz/aOP9ywQDUYbzZm1chkeDVYYJSO+EMnUmdl7HN4=;
+        b=gaHraXgjvcyLngF33yis0xOwC7/nYjlhDVXj7aRJQWHJDZz41exavtXfJqatwGElf5
+         M+MUn0nqSAMbXuKwtZZAv16DK/gX7nPOl49vstJNeRXgnLZZv7FL9Gq7Br8TBfgMk3Wb
+         QEbBA3MsLVUheDs4waD30qLJ6EBW1+GAGOGZtqEgG7kmhonG2m0hpgSql6QZTMdXgNq5
+         y0uN8Ns/5XPYnE2tmVWH2ZZ8nMS0VLYXFfs36GnSzpw1OyseYOf5HRSuNYCaiWLwp8A5
+         w+E53vgjtspYbhJI/rkdxKqz+Z+LM9a7IbC9ox1Nz1vg3xdHgzXNFbR05aju2Qgd6kzc
+         yQ2g==
+X-Gm-Message-State: AOJu0YxZ1e3CdMHFX/F27Z3/Gl0e0AAgdEXg1RvlANnyMx+82uQla7ve
+	MaQW1Sv0gkR7uBMI5nuz3kw=
+X-Google-Smtp-Source: AGHT+IE0G2yZ2IeunFWFpQccuueX64mIkPbkZGPwOb8cUCs6IjPoUXntqh1xYI6G5jypIyCp+chBmw==
+X-Received: by 2002:a17:906:1054:b0:a26:8683:bc6c with SMTP id j20-20020a170906105400b00a268683bc6cmr573597ejj.36.1703030954570;
+        Tue, 19 Dec 2023 16:09:14 -0800 (PST)
+Received: from [192.168.8.100] ([85.255.233.166])
+        by smtp.gmail.com with ESMTPSA id by16-20020a170906a2d000b00a234491b96asm3880252ejb.63.2023.12.19.16.09.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Dec 2023 16:09:14 -0800 (PST)
+Message-ID: <e8e6e898-f69b-44c3-897b-a130b55175f1@gmail.com>
+Date: Wed, 20 Dec 2023 00:04:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 14/20] net: page pool: add io_uring memory provider
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+References: <20231219210357.4029713-1-dw@davidwei.uk>
+ <20231219210357.4029713-15-dw@davidwei.uk>
+ <CAHS8izP0-BtwxJpO3A_th+XAgpVokz4FGFct9RCRFBrK4YiLNQ@mail.gmail.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izP0-BtwxJpO3A_th+XAgpVokz4FGFct9RCRFBrK4YiLNQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-include/net/cfg80211.h includes a number of kerneldoc entries for struct
-members that do not exist, leading to these warnings:
+On 12/19/23 23:39, Mina Almasry wrote:
+> On Tue, Dec 19, 2023 at 1:04 PM David Wei <dw@davidwei.uk> wrote:
+>>
+>> From: Pavel Begunkov <asml.silence@gmail.com>
+>>
+>> Allow creating a special io_uring pp memory providers, which will be for
+>> implementing io_uring zerocopy receive.
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+> 
+> For your non-RFC versions, I think maybe you want to do a patch by
+> patch make W=1. I suspect this patch would build fail, because the
+> next patch adds the io_uring_pp_zc_ops. You're likely skipping this
+> step because this is an RFC, which is fine.
 
-  ./include/net/cfg80211.h:3192: warning: Excess struct member 'band_pref' description in 'cfg80211_bss_selection'
-  ./include/net/cfg80211.h:3192: warning: Excess struct member 'adjust' description in 'cfg80211_bss_selection'
-  ./include/net/cfg80211.h:6181: warning: Excess struct member 'bssid' description in 'wireless_dev'
-  ./include/net/cfg80211.h:6181: warning: Excess struct member 'beacon_interval' description in 'wireless_dev'
-  ./include/net/cfg80211.h:7299: warning: Excess struct member 'bss' description in 'cfg80211_rx_assoc_resp_data'
+Hmm? io_uring_pp_zc_ops is added is Patch 13, used in Patch 14.
+Compiles well.
 
-Remove and/or repair each entry to address the warnings and ensure a proper
-docs build for the affected structures.
 
-Signed-off-by: Jonathan Corbet <corbet@lwn.net>
----
- include/net/cfg80211.h | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+>> ---
+>>   include/net/page_pool/types.h | 1 +
+>>   net/core/page_pool.c          | 6 ++++++
+>>   2 files changed, 7 insertions(+)
+>>
+>> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+>> index fd846cac9fb6..f54ee759e362 100644
+>> --- a/include/net/page_pool/types.h
+>> +++ b/include/net/page_pool/types.h
+>> @@ -129,6 +129,7 @@ struct mem_provider;
+>>   enum pp_memory_provider_type {
+>>          __PP_MP_NONE, /* Use system allocator directly */
+>>          PP_MP_DMABUF_DEVMEM, /* dmabuf devmem provider */
+>> +       PP_MP_IOU_ZCRX, /* io_uring zerocopy receive provider */
+>>   };
+>>
+>>   struct pp_memory_provider_ops {
+>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>> index 9e3073d61a97..ebf5ff009d9d 100644
+>> --- a/net/core/page_pool.c
+>> +++ b/net/core/page_pool.c
+>> @@ -21,6 +21,7 @@
+>>   #include <linux/ethtool.h>
+>>   #include <linux/netdevice.h>
+>>   #include <linux/genalloc.h>
+>> +#include <linux/io_uring/net.h>
+>>
+>>   #include <trace/events/page_pool.h>
+>>
+>> @@ -242,6 +243,11 @@ static int page_pool_init(struct page_pool *pool,
+>>          case PP_MP_DMABUF_DEVMEM:
+>>                  pool->mp_ops = &dmabuf_devmem_ops;
+>>                  break;
+>> +#if defined(CONFIG_IO_URING)
+>> +       case PP_MP_IOU_ZCRX:
+>> +               pool->mp_ops = &io_uring_pp_zc_ops;
+>> +               break;
+>> +#endif
+>>          default:
+>>                  err = -EINVAL;
+>>                  goto free_ptr_ring;
+>> --
+>> 2.39.3
+>>
+> 
+> 
+> --
+> Thanks,
+> Mina
 
-diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
-index b137a33a1b68..81c46c8e2a68 100644
---- a/include/net/cfg80211.h
-+++ b/include/net/cfg80211.h
-@@ -3180,8 +3180,8 @@ struct cfg80211_ibss_params {
-  *
-  * @behaviour: requested BSS selection behaviour.
-  * @param: parameters for requestion behaviour.
-- * @band_pref: preferred band for %NL80211_BSS_SELECT_ATTR_BAND_PREF.
-- * @adjust: parameters for %NL80211_BSS_SELECT_ATTR_RSSI_ADJUST.
-+ * @param.band_pref: preferred band for %NL80211_BSS_SELECT_ATTR_BAND_PREF.
-+ * @param.adjust: parameters for %NL80211_BSS_SELECT_ATTR_RSSI_ADJUST.
-  */
- struct cfg80211_bss_selection {
- 	enum nl80211_bss_select_attr behaviour;
-@@ -6013,7 +6013,6 @@ void wiphy_delayed_work_flush(struct wiphy *wiphy,
-  *	wireless device if it has no netdev
-  * @u: union containing data specific to @iftype
-  * @connected: indicates if connected or not (STA mode)
-- * @bssid: (private) Used by the internal configuration code
-  * @wext: (private) Used by the internal wireless extensions compat code
-  * @wext.ibss: (private) IBSS data part of wext handling
-  * @wext.connect: (private) connection handling data
-@@ -6033,8 +6032,6 @@ void wiphy_delayed_work_flush(struct wiphy *wiphy,
-  * @mgmt_registrations: list of registrations for management frames
-  * @mgmt_registrations_need_update: mgmt registrations were updated,
-  *	need to propagate the update to the driver
-- * @beacon_interval: beacon interval used on this device for transmitting
-- *	beacons, 0 when not valid
-  * @address: The address for this device, valid only if @netdev is %NULL
-  * @is_running: true if this is a non-netdev device that has been started, e.g.
-  *	the P2P Device.
-@@ -7270,8 +7267,6 @@ void cfg80211_auth_timeout(struct net_device *dev, const u8 *addr);
- 
- /**
-  * struct cfg80211_rx_assoc_resp_data - association response data
-- * @bss: the BSS that association was requested with, ownership of the pointer
-- *	moves to cfg80211 in the call to cfg80211_rx_assoc_resp()
-  * @buf: (Re)Association Response frame (header + body)
-  * @len: length of the frame data
-  * @uapsd_queues: bitmap of queues configured for uapsd. Same format
-@@ -7281,6 +7276,8 @@ void cfg80211_auth_timeout(struct net_device *dev, const u8 *addr);
-  * @ap_mld_addr: AP MLD address (in case of MLO)
-  * @links: per-link information indexed by link ID, use links[0] for
-  *	non-MLO connections
-+ * @links.bss: the BSS that association was requested with, ownership of the
-+ *      pointer moves to cfg80211 in the call to cfg80211_rx_assoc_resp()
-  * @links.status: Set this (along with a BSS pointer) for links that
-  *	were rejected by the AP.
-  */
 -- 
-2.43.0
-
-
+Pavel Begunkov
 
