@@ -1,173 +1,133 @@
-Return-Path: <netdev+bounces-59329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E9181A7B2
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 21:37:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AFAA81A7B9
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 21:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E48A287085
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 20:37:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECADE1F24078
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 20:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DF14A984;
-	Wed, 20 Dec 2023 20:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EgjBIk3E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 830521DA49;
+	Wed, 20 Dec 2023 20:44:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B6548CF4;
-	Wed, 20 Dec 2023 20:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40c48d7a7a7so698505e9.3;
-        Wed, 20 Dec 2023 12:36:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703104574; x=1703709374; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yT4onLSCJnRO5OsDAsoEnYosn/gTLA+uZJCYGELgzHg=;
-        b=EgjBIk3EGX1vIK//UQixsKSQqlfL9c8wTIc07xiTB0xgbiAnI83CDBl4rrdQbOL70W
-         AwkhexIUP/i5nZOOqtPO2tCYjZMbGTcV1E0rhCWNBkLFe6wc8jhAfdMjz57idBHY60oo
-         b4Nr8DBq9fMT4cH8ILd+cWuCt4nZnKYzmGopy02l9UsZpz9Y79IuCvbUaKgCtKJa2VYl
-         ZyOHh3vdnMqP6lsYDJx1e0tX7IxyEuzxuJTxRy4rChdEUJD7zLl6UfXUSN2++poH1L2L
-         go20SpDqZBRVYAODSMCW/bWClEWmHCc+p23Q1M/whjbwk8EBDXca+j8FuuJeHRJU5zXk
-         rlEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703104574; x=1703709374;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yT4onLSCJnRO5OsDAsoEnYosn/gTLA+uZJCYGELgzHg=;
-        b=jbw7Da6jf310kEtoD7OWQ3dVyn/FOqrh2dP4lFrs4+EQ8KHOadAKo/ZFqqTCcfEJej
-         8tbMR58E/4N+3xdY41saq5btmr3lQvyEir5vPUUwtqOaSt1XwBM9rV//5oC2y4BWEd0Y
-         4vSI/p7UoOya+gNdJzObDdOoJYrTrjdnnJm78mlAIrbjpVuB17DrLNZ0l2vzkgDwgHlu
-         yZ2zkcRy97DD/Stm8dRy8rXqqnUpWIsILfOIOVNWpuPAoJPKGFIyHlPe+lZuUA8NnLUD
-         PSPK6KsPjTK4edozPaIgJ6ANETzpFAg4vWjhwr4H6pzryJj8Z/VMCZLJLWLjiyDRzOPG
-         ZkeA==
-X-Gm-Message-State: AOJu0YxAkiTnt0tdxdTj8R3NFn+r61C8EhxKE0RUhaouhTntQpEW0ziZ
-	4O9kgObUGlSwvPYSKBt4Zto=
-X-Google-Smtp-Source: AGHT+IEtwDmn2IbaAJwe9giXx+3hvOdMNOXDyWm03ZJR089ngNLl2e5wGYDa27uVUhlHEo6c4G1Paw==
-X-Received: by 2002:a05:600c:524f:b0:40c:2822:958f with SMTP id fc15-20020a05600c524f00b0040c2822958fmr127184wmb.73.1703104574143;
-        Wed, 20 Dec 2023 12:36:14 -0800 (PST)
-Received: from localhost.localdomain (82-149-12-148.dynamic.telemach.net. [82.149.12.148])
-        by smtp.gmail.com with ESMTPSA id v14-20020a05600c444e00b0040c58e410a3sm8703224wmn.14.2023.12.20.12.36.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 12:36:13 -0800 (PST)
-From: Jernej Skrabec <jernej.skrabec@gmail.com>
-To: robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	wens@csie.org,
-	samuel@sholland.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jernej Skrabec <jernej.skrabec@gmail.com>
-Subject: [PATCH v5 3/3] arm64: dts: allwinner: orange-pi-one-plus: Fix ethernet
-Date: Wed, 20 Dec 2023 21:35:37 +0100
-Message-ID: <20231220203537.83479-4-jernej.skrabec@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231220203537.83479-1-jernej.skrabec@gmail.com>
-References: <20231220203537.83479-1-jernej.skrabec@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB38482E5;
+	Wed, 20 Dec 2023 20:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.77.120) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 20 Dec
+ 2023 23:44:19 +0300
+Subject: Re: [PATCH net-next v2 19/21] net: ravb: Do not set promiscuous mode
+ if the interface is down
+To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-20-claudiu.beznea.uj@bp.renesas.com>
+ <69a80458-b607-2cee-e8b1-38eb8d56eca3@omp.ru>
+ <b7a3f560-d3ec-4f0b-9d34-02717f3e29ae@tuxon.dev>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <1e6a3316-eb9a-f783-6f76-c9439c4db498@omp.ru>
+Date: Wed, 20 Dec 2023 23:44:18 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <b7a3f560-d3ec-4f0b-9d34-02717f3e29ae@tuxon.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/20/2023 20:22:09
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182256 [Dec 20 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.120 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.77.120
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/20/2023 20:28:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/20/2023 7:12:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Orange Pi One Plus has two regulators that power the Realtek RTL8211E
-PHY. According to the datasheet, both regulators need to be enabled
-at the same time, or that "phy-io" should be enabled slightly earlier
-than "ephy" regulator.
+On 12/17/23 5:02 PM, claudiu beznea wrote:
 
-RTL8211E/RTL8211EG datasheet says:
+[...]
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> Do not allow setting promiscuous mode if the interface is down. In case
+>>> runtime PM is enabled, and while interface is down, the IP will be in reset
+>>> mode (as for some platforms disabling/enabling the clocks will switch the
+>>> IP to standby mode which will lead to losing registers' content).
+>>
+>>    Register.
+>>    Have this issue actually occurred for you?
+>>
+>>> Commit prepares for the addition of runtime PM.
+>>>
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> [...]
+>>
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index 1995cf7ff084..633346b6cd7c 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>> @@ -2164,6 +2164,9 @@ static void ravb_set_rx_mode(struct net_device *ndev)
+>>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>>  	unsigned long flags;
+>>>  
+>>> +	if (!netif_running(ndev))
+>>
+>>    Seems racy as well...
+> 
+> It is also called with rtnl_mutex locked at least though __dev_change_flags().
 
-  Note 4: 2.5V (or 1.8/1.5V) RGMII power should be risen simultaneously
-  or slightly earlier than 3.3V power. Rising 2.5V (or 1.8/1.5V) power
-  later than 3.3V power may lead to errors.
+   I'm tired of chasing the call tree for you. :-)
+   Since I'm hoping we'll agree on the ndo_get_stats() case, it would
+seem safer to use an is_opened flag here as well, like sh_eth.c does.
 
-Original submission ignored these rules, so it works in some cases but
-not all. On top of that, regulator voltages don't reflect actual ones
-in hardware. Rework ethernet and PHY nodes to properly reflect HW.
+[...]
 
-Fixes: 7ee32a17e0d6 ("arm64: dts: allwinner: h6: orangepi-one-plus: Enable ethernet")
-Signed-off-by: Jernej Skrabec <jernej.skrabec@gmail.com>
----
- .../allwinner/sun50i-h6-orangepi-one-plus.dts | 29 ++++++++++++++-----
- 1 file changed, 22 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dts b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dts
-index 29a081e72a9b..9c76eecaacce 100644
---- a/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dts
-+++ b/arch/arm64/boot/dts/allwinner/sun50i-h6-orangepi-one-plus.dts
-@@ -12,15 +12,15 @@ aliases {
- 		ethernet0 = &emac;
- 	};
- 
--	reg_gmac_3v3: gmac-3v3 {
-+	reg_gmac_2v5: gmac-2v5 {
- 		compatible = "regulator-fixed";
--		regulator-name = "vcc-gmac-3v3";
--		regulator-min-microvolt = <3300000>;
--		regulator-max-microvolt = <3300000>;
--		startup-delay-us = <100000>;
-+		regulator-name = "gmac-2v5";
-+		regulator-min-microvolt = <2500000>;
-+		regulator-max-microvolt = <2500000>;
- 		enable-active-high;
- 		gpio = <&pio 3 6 GPIO_ACTIVE_HIGH>; /* PD6 */
--		vin-supply = <&reg_aldo2>;
-+		off-on-delay-us = <100000>;
-+		vin-supply = <&reg_vcc5v>;
- 	};
- };
- 
-@@ -29,7 +29,6 @@ &emac {
- 	pinctrl-0 = <&ext_rgmii_pins>;
- 	phy-mode = "rgmii-id";
- 	phy-handle = <&ext_rgmii_phy>;
--	phy-supply = <&reg_gmac_3v3>;
- 	allwinner,rx-delay-ps = <200>;
- 	allwinner,tx-delay-ps = <200>;
- 	status = "okay";
-@@ -39,5 +38,21 @@ &mdio {
- 	ext_rgmii_phy: ethernet-phy@1 {
- 		compatible = "ethernet-phy-ieee802.3-c22";
- 		reg = <1>;
-+		/*
-+		 * The board uses 2.5V RGMII signalling. Power sequence to enable
-+		 * the phy is to enable GMAC-2V5 and GMAC-3V (aldo2) power rails
-+		 * at the same time and to wait 100ms. The driver enables phy-io
-+		 * first. Delay is achieved with enable-ramp-delay on reg_aldo2.
-+		 */
-+		phy-io-supply = <&reg_gmac_2v5>;
-+		ephy-supply = <&reg_aldo2>;
-+
-+		reset-gpios = <&pio 3 14 GPIO_ACTIVE_LOW>; /* PD14 */
-+		reset-assert-us = <15000>;
-+		reset-deassert-us = <40000>;
- 	};
- };
-+
-+&reg_aldo2 {
-+	regulator-enable-ramp-delay = <100000>;
-+};
--- 
-2.43.0
-
+MBR, Sergey
 
