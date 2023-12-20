@@ -1,85 +1,159 @@
-Return-Path: <netdev+bounces-59249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD5181A12C
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:34:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB2981A138
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:39:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AC25283AC5
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:34:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 093101C22F0A
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756C23AC02;
-	Wed, 20 Dec 2023 14:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA233D397;
+	Wed, 20 Dec 2023 14:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8rcmbsP"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="X0tJIcSN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589C33AC3A;
-	Wed, 20 Dec 2023 14:34:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4D93C433C9;
-	Wed, 20 Dec 2023 14:34:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703082847;
-	bh=41quJ9B/Oz6jQoPktZ6U8rZMIvvzNB3ljXVrZ23V5YI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i8rcmbsPOEOqfWS0i+q1CrU11T55QLB4YIizoU3/004XJQodh85CeyTsLbGRGcCrQ
-	 bQGZtXQluK2fld+DVQtBAhK4RVWDWXVd4Jkc9u/myze41Y/0QvSObtWmZDJbrNmNNF
-	 V1TCNoYEZ8Z3vETbDOUnSO7TJZOUqMu67hhC6OOwRQWcKMj9CiTUNN41NWGINguzUu
-	 95VsZ92ww+WoZ34zryXTP9Xe5A4lXCcSzKNhiGr3IpCEiv3021wJuAc39N8V7MYsuR
-	 ovH6YIf8jD51lHg5yR+cKAP2D38lSP8AB4isFMWlz8uki//CFLiTXoJGpYQXcofY/P
-	 rgeF3JKrxagVw==
-Date: Wed, 20 Dec 2023 15:34:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexander Sapozhnikov <alsp705@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [PATCH] net: fddi: skfp: Uninitialized data
-Message-ID: <20231220143401.GH882741@kernel.org>
-References: <20231219100819.17426-1-alsp705@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAA33D388;
+	Wed, 20 Dec 2023 14:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1703083139;
+	bh=R2rCuNyBRNg+TZc+54PKcT/z1boJ+LwN+LmqAXkaP/E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=X0tJIcSNYys6pId5gicm+KV2lXyiMvnfhqnbfLkeIrLVagWhtD9/nu0HkawJJDZ92
+	 9LsuYl+fGgBv71HfR/uf8KTiD3CMZSj0sOBklIQxsM7Nej+ajAsdmOsxJVrCS763gY
+	 By0r6Vufa3ZmiJ/gxTKM8ac/SMsKZn4nDWjaN/GCMp6wIsVjT34bLCAzM5MBUSlMrm
+	 nvLayth3R3flPJztmXFpey/7AbgNVk49+TAZ4dIIFW3PyrOZ29r95hz8Vtm0EvMiCI
+	 F2VOLNYuqLcFguIbZ419VfnJUrRi6jZMHEd73Z3z7rlO72UReuFNxBsXxX5mz/NMlw
+	 xFGETRxG0hMMQ==
+Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id F30873781F8F;
+	Wed, 20 Dec 2023 14:38:57 +0000 (UTC)
+Message-ID: <3b2d41cd-4c0a-4277-8650-e6da37139023@collabora.com>
+Date: Wed, 20 Dec 2023 16:38:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231219100819.17426-1-alsp705@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 1/4] riscv: dts: starfive: jh7100: Add sysmain and gmac
+ DT nodes
+Content-Language: en-US
+To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ Emil Renner Berthing <kernel@esmil.dk>, Conor Dooley <conor@kernel.org>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Jacob Keller <jacob.e.keller@intel.com>
+Cc: linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel@collabora.com
+References: <20231220004638.2463643-1-cristian.ciocaltea@collabora.com>
+ <20231220004638.2463643-2-cristian.ciocaltea@collabora.com>
+ <CAJM55Z9DhojDTDPEqx3NO5g61=ezRg-U9odixbZugcXRRVmS7w@mail.gmail.com>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <CAJM55Z9DhojDTDPEqx3NO5g61=ezRg-U9odixbZugcXRRVmS7w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 19, 2023 at 01:08:19PM +0300, Alexander Sapozhnikov wrote:
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+On 12/20/23 15:43, Emil Renner Berthing wrote:
+> Cristian Ciocaltea wrote:
+>> Provide the sysmain and gmac DT nodes supporting the DWMAC found on the
+>> StarFive JH7100 SoC.
+>>
+>> Co-developed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+>> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+>> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+>> ---
+>>  arch/riscv/boot/dts/starfive/jh7100.dtsi | 36 ++++++++++++++++++++++++
+>>  1 file changed, 36 insertions(+)
+>>
+>> diff --git a/arch/riscv/boot/dts/starfive/jh7100.dtsi b/arch/riscv/boot/dts/starfive/jh7100.dtsi
+>> index c216aaecac53..2ebdebe6a81c 100644
+>> --- a/arch/riscv/boot/dts/starfive/jh7100.dtsi
+>> +++ b/arch/riscv/boot/dts/starfive/jh7100.dtsi
+>> @@ -204,6 +204,37 @@ sdio1: mmc@10010000 {
+>>  			status = "disabled";
+>>  		};
+>>
+>> +		gmac: ethernet@10020000 {
+>> +			compatible = "starfive,jh7100-dwmac", "snps,dwmac";
+>> +			reg = <0x0 0x10020000 0x0 0x10000>;
+>> +			clocks = <&clkgen JH7100_CLK_GMAC_ROOT_DIV>,
+>> +				 <&clkgen JH7100_CLK_GMAC_AHB>,
+>> +				 <&clkgen JH7100_CLK_GMAC_PTP_REF>,
+>> +				 <&clkgen JH7100_CLK_GMAC_TX_INV>,
+>> +				 <&clkgen JH7100_CLK_GMAC_GTX>;
+>> +			clock-names = "stmmaceth", "pclk", "ptp_ref", "tx", "gtx";
+>> +			resets = <&rstgen JH7100_RSTN_GMAC_AHB>;
+>> +			reset-names = "ahb";
+>> +			interrupts = <6>, <7>;
+>> +			interrupt-names = "macirq", "eth_wake_irq";
+>> +			max-frame-size = <9000>;
+>> +			snps,multicast-filter-bins = <32>;
+>> +			snps,perfect-filter-entries = <128>;
+>> +			starfive,syscon = <&sysmain 0x70 0>;
+>> +			rx-fifo-depth = <32768>;
+>> +			tx-fifo-depth = <16384>;
+>> +			snps,axi-config = <&stmmac_axi_setup>;
+>> +			snps,fixed-burst;
+>> +			snps,force_thresh_dma_mode;
 > 
-> Signed-off-by: Alexander Sapozhnikov <alsp705@gmail.com>
+> Compared to v4 you're missing a
+> 
+>   snps,no-pbl-x8;
+> 
+> here. It might be the right thing to do, but then I would have expected
+> it to me mentioned in the cover letter version history.
 
-Hi,
+Oh yes, I missed to add this to the changelog, sorry!  I dropped that
+because the property is only valid for snps,dwmac-{3.50a, 4.10a, 4.20a,
+5.20} compatibles, while we have plain snps,dwmac to handle 3.7x.
 
-I think that more explanation is required regarding the problem
-this solves and how it might affect users.
+We could have probably used snps,dwmac-3.70a or snps,dwmac-3.710, but
+I'm not sure which is the exact chip revision and it wouldn't really
+change anything as there is no special handling for them in the
+snps,dwmac.yaml binding.
 
-> ---
->  drivers/net/fddi/skfp/pmf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/fddi/skfp/pmf.c b/drivers/net/fddi/skfp/pmf.c
-> index 563fb7f0b327..3f24fbd82a73 100644
-> --- a/drivers/net/fddi/skfp/pmf.c
-> +++ b/drivers/net/fddi/skfp/pmf.c
-> @@ -1084,7 +1084,7 @@ static int smt_set_para(struct s_smc *smc, struct smt_para *pa, int index,
->  	int		path ;
->  	int		port ;
->  	SK_LOC_DECL(u_char,byte_val) ;
-> -	SK_LOC_DECL(u_short,word_val) ;
-> +	SK_LOC_DECL(u_short, word_val) = 0 ;
->  	SK_LOC_DECL(u_long,long_val) ;
->  
->  	mac = index - INDEX_MAC ;
-> -- 
-> 2.40.1
-> 
-> 
+>> +			status = "disabled";
+>> +
+>> +			stmmac_axi_setup: stmmac-axi-config {
+>> +				snps,wr_osr_lmt = <16>;
+>> +				snps,rd_osr_lmt = <16>;
+>> +				snps,blen = <256 128 64 32 0 0 0>;
+>> +			};
+>> +		};
+>> +
+>>  		clkgen: clock-controller@11800000 {
+>>  			compatible = "starfive,jh7100-clkgen";
+>>  			reg = <0x0 0x11800000 0x0 0x10000>;
+>> @@ -218,6 +249,11 @@ rstgen: reset-controller@11840000 {
+>>  			#reset-cells = <1>;
+>>  		};
+>>
+>> +		sysmain: syscon@11850000 {
+>> +			compatible = "starfive,jh7100-sysmain", "syscon";
+>> +			reg = <0x0 0x11850000 0x0 0x10000>;
+>> +		};
+>> +
+>>  		i2c0: i2c@118b0000 {
+>>  			compatible = "snps,designware-i2c";
+>>  			reg = <0x0 0x118b0000 0x0 0x10000>;
+>> --
+>> 2.43.0
+>>
 
