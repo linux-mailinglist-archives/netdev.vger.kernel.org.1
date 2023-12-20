@@ -1,93 +1,138 @@
-Return-Path: <netdev+bounces-59324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C0E581A767
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 20:47:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DFB81A771
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 21:01:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE42A1F238B3
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 19:47:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24A201F23BC9
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 20:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074A848780;
-	Wed, 20 Dec 2023 19:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MldE3lCL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A9648796;
+	Wed, 20 Dec 2023 20:01:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCABC48CC1;
-	Wed, 20 Dec 2023 19:47:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B636C433C7;
-	Wed, 20 Dec 2023 19:47:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703101638;
-	bh=SvR08pJSv1fMG1aYuyzwnVSg2LeMS9zvV8dA/9nMRYA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=MldE3lCLoi/EpoxEXdCyGslvy/VW6URzDeZrdqU/DQOh4fCTEE0/QpqKI3k1UP6j8
-	 WkBj+Hopkz57N/o+t+5/U8kcbpEgM/XgNEI/03/EcaX2zDOHOWVQj5PRPVTUyuEcb6
-	 o3RRxJwZoZ7DV4WjotKkTAfENlPeMPgII1H79nRHf2nPNNo/A6eE0b+luOHlyN59+l
-	 R0qnin/B9YcZrz9rO8dBTQRbpiZL4ukeATlu4BCIMzYY8IgzKQ5Eyfr2/48ZQf8NqW
-	 /5DvfCMPIOb2IKEzqzQAG7TImalzihYptB6MycTE/sVtz5El9XfSmXAAO7eN8FH7Bb
-	 1CV4G80JJU19w==
-Date: Wed, 20 Dec 2023 11:47:17 -0800 (PST)
-From: Mat Martineau <martineau@kernel.org>
-To: Ido Schimmel <idosch@nvidia.com>
-cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, davem@davemloft.net, 
-    kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, 
-    nhorman@tuxdriver.com, matttbe@kernel.org, yotam.gi@gmail.com, 
-    jiri@resnulli.us, jacob.e.keller@intel.com, johannes@sipsolutions.net, 
-    andriy.shevchenko@linux.intel.com, fw@strlen.de
-Subject: Re: [PATCH net-next v2] genetlink: Use internal flags for multicast
- groups
-In-Reply-To: <20231220154358.2063280-1-idosch@nvidia.com>
-Message-ID: <1cce66bc-af3f-97d8-f898-130e81fcfcff@kernel.org>
-References: <20231220154358.2063280-1-idosch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83D848795;
+	Wed, 20 Dec 2023 20:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.77.120) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 20 Dec
+ 2023 23:00:55 +0300
+Subject: Re: [PATCH net-next v2 18/21] net: ravb: Return cached statistics if
+ the interface is down
+To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-19-claudiu.beznea.uj@bp.renesas.com>
+ <025040a9-f160-d5f3-e5b0-79fe4619aa9b@omp.ru>
+ <eed10979-c482-43fe-bbe4-4de5b276e2dd@tuxon.dev>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <00434866-a494-9253-6fdc-bcf634c69212@omp.ru>
+Date: Wed, 20 Dec 2023 23:00:54 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+In-Reply-To: <eed10979-c482-43fe-bbe4-4de5b276e2dd@tuxon.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/20/2023 19:44:45
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182256 [Dec 20 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.120 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.77.120
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/20/2023 19:51:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/20/2023 7:12:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, 20 Dec 2023, Ido Schimmel wrote:
+On 12/17/23 4:54 PM, claudiu beznea wrote:
 
-> As explained in commit e03781879a0d ("drop_monitor: Require
-> 'CAP_SYS_ADMIN' when joining "events" group"), the "flags" field in the
-> multicast group structure reuses uAPI flags despite the field not being
-> exposed to user space. This makes it impossible to extend its use
-> without adding new uAPI flags, which is inappropriate for internal
-> kernel checks.
->
-> Solve this by adding internal flags (i.e., "GENL_MCAST_*") and convert
-> the existing users to use them instead of the uAPI flags.
->
-> Tested using the reproducers in commit 44ec98ea5ea9 ("psample: Require
-> 'CAP_NET_ADMIN' when joining "packets" group") and commit e03781879a0d
-> ("drop_monitor: Require 'CAP_SYS_ADMIN' when joining "events" group").
->
-> No functional changes intended.
->
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
-> v2:
-> * Add a comment for each flag
-> ---
-> include/net/genetlink.h | 9 ++++++---
-> net/core/drop_monitor.c | 2 +-
-> net/mptcp/pm_netlink.c  | 2 +-
+[...]
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> Return the cached statistics in case the interface is down. There should be
+>>> no drawback to this, as most of the statistics are updated on the data path
+>>> and if runtime PM is enabled and the interface is down, the registers that
+>>> are explicitly read on ravb_get_stats() are zero anyway on most of the IP
+>>> variants.
+>>>
+>>> The commit prepares the code for the addition of runtime PM support.
+>>>
+>>> Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>> ---
+>>>
+>>> Changes in v2:
+>>> - none; this patch is new
+>>>
+>>>  drivers/net/ethernet/renesas/ravb_main.c | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index a2a64c22ec41..1995cf7ff084 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>> @@ -2110,6 +2110,9 @@ static struct net_device_stats *ravb_get_stats(struct net_device *ndev)
+>>>  	const struct ravb_hw_info *info = priv->info;
+>>>  	struct net_device_stats *nstats, *stats0, *stats1;
+>>>  
+>>> +	if (!netif_running(ndev))
+>>
+>>    I'm afraid this is racy as __LINK_STATE_START bit gets set
+>> by __dev_open() before calling the ndo_open() method... :-(
+> 
+> But (at least on my setup), both ndo_get_stats and ndo_open are called with
+> rtnl_mutex locked.
 
-Thanks Ido.
+   Unfortunately, it's not always so -- see e.g. netstat_show() in net/core/net-sysfs.c...
+ 
+[...]
 
-For the mptcp change:
-
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-
-
-> net/netlink/genetlink.c | 4 ++--
-> net/psample/psample.c   | 2 +-
-> 5 files changed, 11 insertions(+), 8 deletions(-)
+MBR, Sergey
 
