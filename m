@@ -1,428 +1,200 @@
-Return-Path: <netdev+bounces-59356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5F981A89B
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 22:46:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 464B681A8CC
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 23:12:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C372C1F22B17
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 21:46:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78B6D1C2224C
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 22:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8575B49F66;
-	Wed, 20 Dec 2023 21:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6958D49885;
+	Wed, 20 Dec 2023 22:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U25qhtsX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E2sqRB83"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFECA4B5B3
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 21:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5ca2e530041so3134977b3.3
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 13:45:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703108714; x=1703713514; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pSfGiYEOSrWhT7vJRbksaXM9O2Vnhi91teaNhuWoGzQ=;
-        b=U25qhtsXijsiUXIxGbvgjCdsU0ue2SJMUJ1dD4qjAW/y8Ttqr/7i1v0TzbT22g7dSW
-         NWncbdk2D5LxgYVViqP/Upq5yqUgIghEFazH1WAjOdYx9Pq7j40XC03yQQYMwlqVb3lZ
-         fo20dN6SI/LYnln5Xj5RpegyaClRZqO09GwQ/1rvKh1PRN9pMotbvVh7DWtHfeVsmX4B
-         jFmI1L949dVecdv/IlPFd9Ap2mb61RMqVFszL4hCDUxjfoPKk51Q30JHSck8Sg8WHSv9
-         nrLxFi+7/cpxFepgvOQvI+wVYXY+pe+szb+emypCf/I5SA1/nbdk/L6IoRHjeggdDDfe
-         xRDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703108714; x=1703713514;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pSfGiYEOSrWhT7vJRbksaXM9O2Vnhi91teaNhuWoGzQ=;
-        b=rzr9M8OgXOz3N5mri/JxSEWwy1XALCqee+Zl44Ml7D24lkeoh3Q49qzFaABReER4Yc
-         qStzo/2nzw4TcjqksNVWjoU1yVUOkIg8zyNid4SxUSSwc02FFZp9yD78yFL77hAL/wpg
-         jBkUTdExlgLMVczN1fPuwf2pS+W/paclwjTD2YV4hgFnTNjl0XSWmbxfJBuOPumIe9re
-         XakdFEc5cpPWIKl3dZtRqI3FaB3q/yRavmh6SD9m3rZDu/XPFoR2bLVK2HtjhWB+RqlD
-         0LTX/k+W1n5/jVXdd0W0R+AvqDqhthtzYNVlLmbbakarGYmX+DjUu0lDRj4CXSAiXbeT
-         BDhQ==
-X-Gm-Message-State: AOJu0Ywwte52YNy/8OGFUCoysgDVt90KO+s5/IKLOIcaP+2Y2/G0apDE
-	ZEAiPKCnEY76ibP+wrn7djlyyOZe1a1UwujtHA==
-X-Google-Smtp-Source: AGHT+IHGnbashIz1SnTXMKMKvKthPIu5jQx0h2f9n011BQPb1PwmsgUuJz+sHAqzL844RMkRhALqJcU2quPBzfn1uQ==
-X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:13cc:a33:a435:3fe9])
- (user=almasrymina job=sendgmr) by 2002:a05:690c:3510:b0:5d7:29d7:8a35 with
- SMTP id fq16-20020a05690c351000b005d729d78a35mr207421ywb.5.1703108714801;
- Wed, 20 Dec 2023 13:45:14 -0800 (PST)
-Date: Wed, 20 Dec 2023 13:45:02 -0800
-In-Reply-To: <20231220214505.2303297-1-almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA6A482DB;
+	Wed, 20 Dec 2023 22:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703110348; x=1734646348;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=9e+6wkkKW5Lx5bh9HH1JkxwQB65mB5SrlMZPDu0FCcE=;
+  b=E2sqRB83mefylDjiU70bdUuNa3JhxvQgxxn0KCgvD7twEaXSPLXQnxqv
+   CNJ/G4pqj0e6IOKxoQdvp0YBNGH0uwZZ70gF1RyDltvYabNdIm77OtFm4
+   JNesqb7yTpC4VxRmoqFgtGcCNdKd2Ur8MjK40tRMTtOdP3nA8MdES5qCg
+   tZm1woYZhiVoMSbCzZsjRgfME5h452sKedmWdx8KL3uJix8oRB7awJYYS
+   cWoH/1u7H9vHNOoDHavP9EcPAPdwlX3lC5R1T0q9Ous963mD++E1KXw4m
+   qAZPT5E98aYUM04V0XQUGzrhsn2OMiYv77t3zZTJ8QyLDAHupJwlcOFdI
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="462328277"
+X-IronPort-AV: E=Sophos;i="6.04,292,1695711600"; 
+   d="scan'208";a="462328277"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2023 14:12:19 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,292,1695711600"; 
+   d="scan'208";a="18106311"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Dec 2023 14:12:18 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 20 Dec 2023 14:12:18 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 20 Dec 2023 14:12:18 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 20 Dec 2023 14:12:15 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cyr3Bpg6n0WdtzdTo2PiXFyVttxPUYEgPzLr49HXVUv2YV/r1mNJKZ663twMgR2H3nqBjCzLcsXO9cI4xP0kBo2tK4T3m20c6LxL+LSLvWXc4rKme6efP8bumnojtQd8wUjwU7EPwQm4HcmeIzOwqsoj36iHdD/H6+vhVWlruMaZjVjFrXLNv2LtfhMBL+K1u/kDBzJXwJ+1859lq9GljO4Xc4cIGzh07svl11QuYZ0d8oVu7F10c+jxfjQRgdACuLlBPoR+AsMFTeVNHqTLaAiArJ0XRpug8pGrG0DdPscbQOl/SaI3nYgf2BTQgdCQQ4Zw4riGXhK9bvqANU7vUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=99btik5qUSJsSb5rfF+9fY+oc80mITcB++Dj+l8v0dg=;
+ b=TdZGYf8yCq0RbXp2NOfKqetQFk4miyqCsmJPKcOa5xLoYDTt8NZNVlYHt1iBpTG6+6vHzcjmemwtUCx5Nxga4Rg0sgbdMKg3BeNirIdT0sL6YeT5YKBcZqxjkbme9BVEcBDvYKEtmx9Itqz/IMNs/x8m916mQ9GR36q4YvFl/gVI1I71A20JhLUi6Z6vqMvNW0z0Ez8FNWe4JlVfMRkNJgaEGnYX1+NjpsXogyJ9K8kq9ho3FofiJ2qgRvaVVWG18h6imHck+8W1/PcXqyWX4dK82KAsCZGCAnNiURVlQGpkdNY23czBkgOJxyE3vSdr3NXXp3OsYqX1kCjA/NXyog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
+ by DM6PR11MB4707.namprd11.prod.outlook.com (2603:10b6:5:2a6::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.18; Wed, 20 Dec
+ 2023 22:12:13 +0000
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::ea27:681d:ec93:3851]) by PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::ea27:681d:ec93:3851%5]) with mapi id 15.20.7113.016; Wed, 20 Dec 2023
+ 22:12:13 +0000
+Message-ID: <7249a8c0-b97f-4634-a08b-06be503f8c71@intel.com>
+Date: Wed, 20 Dec 2023 14:12:10 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh+dt@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+	"Emil Renner Berthing" <kernel@esmil.dk>, Samin Guo
+	<samin.guo@starfivetech.com>, Alexandre Torgue
+	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, "Giuseppe Cavallaro"
+	<peppe.cavallaro@st.com>, Andrew Lunn <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kernel@collabora.com>
+References: <20231220002824.2462655-1-cristian.ciocaltea@collabora.com>
+ <20231220002824.2462655-2-cristian.ciocaltea@collabora.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20231220002824.2462655-2-cristian.ciocaltea@collabora.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0273.namprd03.prod.outlook.com
+ (2603:10b6:303:b5::8) To PH0PR11MB5095.namprd11.prod.outlook.com
+ (2603:10b6:510:3b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231220214505.2303297-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231220214505.2303297-4-almasrymina@google.com>
-Subject: [PATCH net-next v3 3/3] net: add netmem_ref to skb_frag_t
-From: Mina Almasry <almasrymina@google.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5095:EE_|DM6PR11MB4707:EE_
+X-MS-Office365-Filtering-Correlation-Id: 609097b9-0e28-42c9-9268-08dc01a8b7d8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fVZ/gC/koujLqPa2YGqmVbkA9VQ0ol1rPbaSGAO24fFAbexW9RdzYpHTerf0pNGlYjjxLlUTrx0YDWKQxnLK86A0oQGwNnXgO31bOBgZ6LCYbvh4mhTWOEV5bp2m8JcIgg0jegfS2OhHVvmg6U4IEEjDoZ4Nz0ONq0sWP3QwA4G6v3Nnfqg/3c7KIheXYQm32t+eMnfMMfqV0LxDMGWoguZ3ds/KTKyS63QYja/fXWGPkHxrWFYyB/r8yTwMh2t3vUcT5OCzutFIEVfvII5G6reh59y5h6iQn0d4Pmi1JRSimB39Hqij4amr3fHsEVHDz+SEQXF1kSRe1DfOntzulws6VKO6cW7vOqDwcAOIKcpD7yBoM8fBytuizAOjPsLtppQvjFWo7MwyZWozJOEr87rFu+IqtL8WFTaDg5lo1Rh882PM8dO64nkc+AsUdFNSoHN5HEt7ePXHxxCDxieSdJGkGLdKqfhBovIOxo2MmpMlaWFfztDb7q08/ETV0ehuyJN99tzhZOFlhdR8T/LY/60XHBo8QqFvn6/8Cmo+D1hlWb5UmvP48WoFjd7YkOcSNxgXNRsE+9jMxm4WFVnpOnXRLlWf243SOGQykQnQNXr2jBT/YPksoyVBpBZF9bClv+maBGOttJw48d5aRwB+F17ev2YSkIXZhJZV4xnXF1I=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(396003)(39860400002)(346002)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(478600001)(6486002)(38100700002)(31686004)(82960400001)(41300700001)(2616005)(6512007)(6506007)(53546011)(86362001)(8676002)(31696002)(7416002)(4326008)(5660300002)(2906002)(8936002)(36756003)(921008)(316002)(66946007)(66556008)(66476007)(110136005)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cUgzckRxVytYOEh3MU95SzdYTCtUOWZYU0xqUml5NjlLeXI3UW1mYXpJQjFt?=
+ =?utf-8?B?LzVxT2NyTVFkbXRxVmxFNlRPclgvL2RSNDBkVTE0NHN4eU1aWTN6ZTBYSFdZ?=
+ =?utf-8?B?VUFvZEdpdXkvVVozZU45MmR2OHU2d1ZkZXpTVE5OYnhrVDdHSGN1SU85UEs0?=
+ =?utf-8?B?TzlMMFo0cE9NTW05THVXNnZ0WTlCUTc4TDJqRUFBREVxSks2NzM2WmhkaTBX?=
+ =?utf-8?B?bUUrUkN6K1pRSWhLc2s0ME9TSXZZZFhiNXZLZW1IaG5RTkdHYXFYWjZQSlFv?=
+ =?utf-8?B?V21vT2lJaXZtakhCNUwzZnNXdmttWnpZYmF5M2hmS1BhUkZPWHNFZVdkeG1z?=
+ =?utf-8?B?OE02UEl4L3N4WjN2NWR0RlQxWVpoNlJIU3ZLUUN0RFM4MS9SSUlPREU5bk44?=
+ =?utf-8?B?RE9QaXJGZmRsYldQMGd3TDJXZUJIWkNGcmpveUNEMis5ZTRaMlFlN1FVQ1hV?=
+ =?utf-8?B?MnBFRHdFS095Z0xkNjBGY1A2UXU1bkJhNng1MDF2aVRvSDhJZ0FMVU5tdlhF?=
+ =?utf-8?B?TTBBbUlxY0ErSmZwZDRYZjlPSS9tVnAvaVc1TWdKdGRTbVNzaWNRWlFPUHBh?=
+ =?utf-8?B?SnRJTUxKYXRwTnN0dGNmY1oxUEdjVERWem10cTNpZVQ3ZUU5d3JkYU5jY1Jh?=
+ =?utf-8?B?MEdwdk9OVnhHaUUvd09aZ1c2ejhDWGFKODc1dUtXVCtQZFRZOEVzcmNIa3ps?=
+ =?utf-8?B?eHhiZ1krR2ZkcFZYYW5yUTluemU2bUZleDQ2R0kzWjBxdktLT3FiRlQ3eHhJ?=
+ =?utf-8?B?K3pwK2RhYnpPbVBpd2U0TlR1ZTV6M2tSWFpmM0poazNTTTQxMXRVVWNENENT?=
+ =?utf-8?B?Z2h1SEdtcjQ4SU81Ry93MGtST2hFSitiZkZYK0NqTVc0ZXJkK3hFbUxyOGw3?=
+ =?utf-8?B?TVpRZE1CV2h0SytpVzZLNm1XMit6dHdzb1VZQytRb2xyT01ONTVKdHBCNVI2?=
+ =?utf-8?B?TDdmRUVybWhZQi9EY0s0WVY1VVhwL2dHcnJha2JnTFhkNFVLeVczK2QvZk03?=
+ =?utf-8?B?RDhEUkJWRmtTL3gvTk1aa1VGQndnRXU0bEgxaTZyb2MwZDlScTRMZFRreEJE?=
+ =?utf-8?B?MmhGbUZFMEZUdXYxSVp3Z2dNVkJ2Zml5eEVTbWQ5WFNWZUZINmRFd2RVZkFa?=
+ =?utf-8?B?ZFAzQVdqQnM2SitldnNzbnE1UlcyRXFOVTBzem53R2l5RWdWMDY3YWNRdW13?=
+ =?utf-8?B?SVVrdGliRHF4RTRzS3JGMmptOVk5TVNXdHJOYnR2VitpekRMNi9qYVRENWZv?=
+ =?utf-8?B?SXpQRFV1S2VXMlkvQm5yN2s0Z1dSMVh1SmxYVTJIVmpKcW1FK1I0Z0tXNXR2?=
+ =?utf-8?B?eGdaY3llbTFkQ1lyc3hNVTllZUdBRTVlR2J1TGtPMXdjQjVUbEVOUW15ZkY2?=
+ =?utf-8?B?NUVOY3VLNG4wcTdTeGJlRGo3WHA1QXhRRFFzdVY2aFZOaFgydWNJM2xpdEpo?=
+ =?utf-8?B?aFdHU2lheG1yQjhocVNDUDMwS0JwUXJVQWRjT1czVDlGVy9kd1krUUk0WUhU?=
+ =?utf-8?B?RklWY0pjd2ZUbVU3WjYyd243OEtkQ0xyUU9aYU1KeUVINmhkT1M4WEdxeHpo?=
+ =?utf-8?B?WTVmRkd2djA2Y3l3UHJRY1pFQlc4NkJzWVFFRDEyVGQ2dkZ6WFdUcFJKVHFx?=
+ =?utf-8?B?eGI4ZTNGc1lmTkcyTzJkY2xIalUxaU5pZHF4ZVVFUnJlblZFUE13cjQ2eHhk?=
+ =?utf-8?B?Yk1LY2dlWFhZK0pkT2tUem9TNkpRQkUyTUxQejdPNi9jM3F5ckF6b2FDc1pF?=
+ =?utf-8?B?M2orNDc1MGJhWk5FdCtiM2UwV1Vhei9BN1FsQStjTkR5dTFTMDFFRzN3dE1o?=
+ =?utf-8?B?Y0xxamJRbWR5VTN6Yk5JTFNRME9PWVYvT3dtTnl4SkdNNVF2TW5DYTlUTTJG?=
+ =?utf-8?B?K3I3dzVwLzR1K3YrRkFXSWNqTnVxcTBOVzBjeDY4Q0ptMUkrenc4TDNQZC9K?=
+ =?utf-8?B?ZWRtZUZCelJQNC9xbENCTGpXNDd1aVhGcHlmWFhwZTE0d1F1QWdhWllya2Yy?=
+ =?utf-8?B?d2xYNFpGdDB2SHVCdmtGMVFobFk4cFBQMHhzQnp5RjhxNTZVY1Fvb0dsOXNq?=
+ =?utf-8?B?aWc1eEVzYjYzWmVJWHNVR3RhMlY3R0tsSWZkWERKMC8xRGRUWWtEeEFUK2dh?=
+ =?utf-8?B?Y1FoRDY3d2RRQWNjeVdhWjYveWV3VE1CQ1lsVWY0c0l0SldyS2IzUTZxYUt3?=
+ =?utf-8?B?R0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 609097b9-0e28-42c9-9268-08dc01a8b7d8
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2023 22:12:13.6463
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Sc4JWT7ESdcDtKxLoD14huUyY8KDEbyYFAsvLYuvEqzl0zrLwT3Fqct5b/fGjpwNxIMwuqBPFSZC9ObDqVDBhVec0pKDa0KzdOR7SVznnYU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4707
+X-OriginatorOrg: intel.com
 
-Use netmem_ref instead of page in skb_frag_t. Currently netmem_ref
-is always a struct page underneath, but the abstraction allows efforts
-to add support for skb frags not backed by pages.
 
-There is unfortunately 1 instance where the skb_frag_t is assumed to be
-a bio_vec in kcm. For this case, add a debug assert that the skb frag is
-indeed backed by a page, and do a cast.
 
-Add skb[_frag]_fill_netmem_*() and skb_add_rx_frag_netmem() helpers so
-that the API can be used to create netmem skbs.
+On 12/19/2023 4:28 PM, Cristian Ciocaltea wrote:
+> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
+> similar to the newer JH7110, but it requires only two interrupts and a
+> single reset line, which is 'ahb' instead of the commonly used
+> 'stmmaceth'.
+> 
+> Since the common binding 'snps,dwmac' allows selecting 'ahb' only in
+> conjunction with 'stmmaceth', extend the logic to also permit exclusive
+> usage of the 'ahb' reset name.  This ensures the following use cases are
+> supported:
+> 
+>   JH7110: reset-names = "stmmaceth", "ahb";
+>   JH7100: reset-names = "ahb";
+>   other:  reset-names = "stmmaceth";
+> 
+> Also note the need to use a different dwmac fallback, as v5.20 applies
+> to JH7110 only, while JH7100 relies on v3.7x.
+> 
+> Additionally, drop the reset description items from top-level binding as
+> they are already provided by the included snps,dwmac schema.
+> 
+> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+> ---
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-
----
-
-v3;
-- Renamed the fields in skb_frag_t.
-
-v2:
-- Add skb frag filling helpers.
-
----
- include/linux/skbuff.h | 92 +++++++++++++++++++++++++++++-------------
- net/core/skbuff.c      | 22 +++++++---
- net/kcm/kcmsock.c      | 10 ++++-
- 3 files changed, 89 insertions(+), 35 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 7ce38874dbd1..729c95e97be1 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -37,6 +37,7 @@
- #endif
- #include <net/net_debug.h>
- #include <net/dropreason-core.h>
-+#include <net/netmem.h>
- 
- /**
-  * DOC: skb checksums
-@@ -359,7 +360,11 @@ extern int sysctl_max_skb_frags;
-  */
- #define GSO_BY_FRAGS	0xFFFF
- 
--typedef struct bio_vec skb_frag_t;
-+typedef struct skb_frag {
-+	netmem_ref netmem;
-+	unsigned int len;
-+	unsigned int offset;
-+} skb_frag_t;
- 
- /**
-  * skb_frag_size() - Returns the size of a skb fragment
-@@ -367,7 +372,7 @@ typedef struct bio_vec skb_frag_t;
-  */
- static inline unsigned int skb_frag_size(const skb_frag_t *frag)
- {
--	return frag->bv_len;
-+	return frag->len;
- }
- 
- /**
-@@ -377,7 +382,7 @@ static inline unsigned int skb_frag_size(const skb_frag_t *frag)
-  */
- static inline void skb_frag_size_set(skb_frag_t *frag, unsigned int size)
- {
--	frag->bv_len = size;
-+	frag->len = size;
- }
- 
- /**
-@@ -387,7 +392,7 @@ static inline void skb_frag_size_set(skb_frag_t *frag, unsigned int size)
-  */
- static inline void skb_frag_size_add(skb_frag_t *frag, int delta)
- {
--	frag->bv_len += delta;
-+	frag->len += delta;
- }
- 
- /**
-@@ -397,7 +402,7 @@ static inline void skb_frag_size_add(skb_frag_t *frag, int delta)
-  */
- static inline void skb_frag_size_sub(skb_frag_t *frag, int delta)
- {
--	frag->bv_len -= delta;
-+	frag->len -= delta;
- }
- 
- /**
-@@ -417,7 +422,7 @@ static inline bool skb_frag_must_loop(struct page *p)
-  *	skb_frag_foreach_page - loop over pages in a fragment
-  *
-  *	@f:		skb frag to operate on
-- *	@f_off:		offset from start of f->bv_page
-+ *	@f_off:		offset from start of f->netmem
-  *	@f_len:		length from f_off to loop over
-  *	@p:		(temp var) current page
-  *	@p_off:		(temp var) offset from start of current page,
-@@ -2431,22 +2436,37 @@ static inline unsigned int skb_pagelen(const struct sk_buff *skb)
- 	return skb_headlen(skb) + __skb_pagelen(skb);
- }
- 
-+static inline void skb_frag_fill_netmem_desc(skb_frag_t *frag,
-+					     netmem_ref netmem, int off,
-+					     int size)
-+{
-+	frag->netmem = netmem;
-+	frag->offset = off;
-+	skb_frag_size_set(frag, size);
-+}
-+
- static inline void skb_frag_fill_page_desc(skb_frag_t *frag,
- 					   struct page *page,
- 					   int off, int size)
- {
--	frag->bv_page = page;
--	frag->bv_offset = off;
--	skb_frag_size_set(frag, size);
-+	skb_frag_fill_netmem_desc(frag, page_to_netmem(page), off, size);
-+}
-+
-+static inline void __skb_fill_netmem_desc_noacc(struct skb_shared_info *shinfo,
-+						int i, netmem_ref netmem,
-+						int off, int size)
-+{
-+	skb_frag_t *frag = &shinfo->frags[i];
-+
-+	skb_frag_fill_netmem_desc(frag, netmem, off, size);
- }
- 
- static inline void __skb_fill_page_desc_noacc(struct skb_shared_info *shinfo,
- 					      int i, struct page *page,
- 					      int off, int size)
- {
--	skb_frag_t *frag = &shinfo->frags[i];
--
--	skb_frag_fill_page_desc(frag, page, off, size);
-+	__skb_fill_netmem_desc_noacc(shinfo, i, page_to_netmem(page), off,
-+				     size);
- }
- 
- /**
-@@ -2462,10 +2482,10 @@ static inline void skb_len_add(struct sk_buff *skb, int delta)
- }
- 
- /**
-- * __skb_fill_page_desc - initialise a paged fragment in an skb
-+ * __skb_fill_netmem_desc - initialise a fragment in an skb
-  * @skb: buffer containing fragment to be initialised
-- * @i: paged fragment index to initialise
-- * @page: the page to use for this fragment
-+ * @i: fragment index to initialise
-+ * @netmem: the netmem to use for this fragment
-  * @off: the offset to the data with @page
-  * @size: the length of the data
-  *
-@@ -2474,10 +2494,13 @@ static inline void skb_len_add(struct sk_buff *skb, int delta)
-  *
-  * Does not take any additional reference on the fragment.
-  */
--static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
--					struct page *page, int off, int size)
-+static inline void __skb_fill_netmem_desc(struct sk_buff *skb, int i,
-+					  netmem_ref netmem, int off,
-+					  int size)
- {
--	__skb_fill_page_desc_noacc(skb_shinfo(skb), i, page, off, size);
-+	struct page *page = netmem_to_page(netmem);
-+
-+	__skb_fill_netmem_desc_noacc(skb_shinfo(skb), i, netmem, off, size);
- 
- 	/* Propagate page pfmemalloc to the skb if we can. The problem is
- 	 * that not all callers have unique ownership of the page but rely
-@@ -2485,7 +2508,21 @@ static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
- 	 */
- 	page = compound_head(page);
- 	if (page_is_pfmemalloc(page))
--		skb->pfmemalloc	= true;
-+		skb->pfmemalloc = true;
-+}
-+
-+static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
-+					struct page *page, int off, int size)
-+{
-+	__skb_fill_netmem_desc(skb, i, page_to_netmem(page), off, size);
-+}
-+
-+static inline void skb_fill_netmem_desc(struct sk_buff *skb, int i,
-+					netmem_ref netmem, int off,
-+					int size)
-+{
-+	__skb_fill_netmem_desc(skb, i, netmem, off, size);
-+	skb_shinfo(skb)->nr_frags = i + 1;
- }
- 
- /**
-@@ -2505,8 +2542,7 @@ static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
- static inline void skb_fill_page_desc(struct sk_buff *skb, int i,
- 				      struct page *page, int off, int size)
- {
--	__skb_fill_page_desc(skb, i, page, off, size);
--	skb_shinfo(skb)->nr_frags = i + 1;
-+	skb_fill_netmem_desc(skb, i, page_to_netmem(page), off, size);
- }
- 
- /**
-@@ -2532,6 +2568,8 @@ static inline void skb_fill_page_desc_noacc(struct sk_buff *skb, int i,
- 
- void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, int off,
- 		     int size, unsigned int truesize);
-+void skb_add_rx_frag_netmem(struct sk_buff *skb, int i, netmem_ref netmem,
-+			    int off, int size, unsigned int truesize);
- 
- void skb_coalesce_rx_frag(struct sk_buff *skb, int i, int size,
- 			  unsigned int truesize);
-@@ -3380,7 +3418,7 @@ static inline void skb_propagate_pfmemalloc(const struct page *page,
-  */
- static inline unsigned int skb_frag_off(const skb_frag_t *frag)
- {
--	return frag->bv_offset;
-+	return frag->offset;
- }
- 
- /**
-@@ -3390,7 +3428,7 @@ static inline unsigned int skb_frag_off(const skb_frag_t *frag)
-  */
- static inline void skb_frag_off_add(skb_frag_t *frag, int delta)
- {
--	frag->bv_offset += delta;
-+	frag->offset += delta;
- }
- 
- /**
-@@ -3400,7 +3438,7 @@ static inline void skb_frag_off_add(skb_frag_t *frag, int delta)
-  */
- static inline void skb_frag_off_set(skb_frag_t *frag, unsigned int offset)
- {
--	frag->bv_offset = offset;
-+	frag->offset = offset;
- }
- 
- /**
-@@ -3411,7 +3449,7 @@ static inline void skb_frag_off_set(skb_frag_t *frag, unsigned int offset)
- static inline void skb_frag_off_copy(skb_frag_t *fragto,
- 				     const skb_frag_t *fragfrom)
- {
--	fragto->bv_offset = fragfrom->bv_offset;
-+	fragto->offset = fragfrom->offset;
- }
- 
- /**
-@@ -3422,7 +3460,7 @@ static inline void skb_frag_off_copy(skb_frag_t *fragto,
-  */
- static inline struct page *skb_frag_page(const skb_frag_t *frag)
- {
--	return frag->bv_page;
-+	return netmem_to_page(frag->netmem);
- }
- 
- /**
-@@ -3526,7 +3564,7 @@ static inline void *skb_frag_address_safe(const skb_frag_t *frag)
- static inline void skb_frag_page_copy(skb_frag_t *fragto,
- 				      const skb_frag_t *fragfrom)
- {
--	fragto->bv_page = fragfrom->bv_page;
-+	fragto->netmem = fragfrom->netmem;
- }
- 
- bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t prio);
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 4d4b11b0a83d..8b55e927bbe9 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -845,16 +845,24 @@ struct sk_buff *__napi_alloc_skb(struct napi_struct *napi, unsigned int len,
- }
- EXPORT_SYMBOL(__napi_alloc_skb);
- 
--void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, int off,
--		     int size, unsigned int truesize)
-+void skb_add_rx_frag_netmem(struct sk_buff *skb, int i, netmem_ref netmem,
-+			    int off, int size, unsigned int truesize)
- {
- 	DEBUG_NET_WARN_ON_ONCE(size > truesize);
- 
--	skb_fill_page_desc(skb, i, page, off, size);
-+	skb_fill_netmem_desc(skb, i, netmem, off, size);
- 	skb->len += size;
- 	skb->data_len += size;
- 	skb->truesize += truesize;
- }
-+EXPORT_SYMBOL(skb_add_rx_frag_netmem);
-+
-+void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, int off,
-+		     int size, unsigned int truesize)
-+{
-+	skb_add_rx_frag_netmem(skb, i, page_to_netmem(page), off, size,
-+			       truesize);
-+}
- EXPORT_SYMBOL(skb_add_rx_frag);
- 
- void skb_coalesce_rx_frag(struct sk_buff *skb, int i, int size,
-@@ -1904,10 +1912,11 @@ int skb_copy_ubufs(struct sk_buff *skb, gfp_t gfp_mask)
- 
- 	/* skb frags point to kernel buffers */
- 	for (i = 0; i < new_frags - 1; i++) {
--		__skb_fill_page_desc(skb, i, head, 0, psize);
-+		__skb_fill_netmem_desc(skb, i, page_to_netmem(head), 0, psize);
- 		head = (struct page *)page_private(head);
- 	}
--	__skb_fill_page_desc(skb, new_frags - 1, head, 0, d_off);
-+	__skb_fill_netmem_desc(skb, new_frags - 1, page_to_netmem(head), 0,
-+			       d_off);
- 	skb_shinfo(skb)->nr_frags = new_frags;
- 
- release:
-@@ -3645,7 +3654,8 @@ skb_zerocopy(struct sk_buff *to, struct sk_buff *from, int len, int hlen)
- 		if (plen) {
- 			page = virt_to_head_page(from->head);
- 			offset = from->data - (unsigned char *)page_address(page);
--			__skb_fill_page_desc(to, 0, page, offset, plen);
-+			__skb_fill_netmem_desc(to, 0, page_to_netmem(page),
-+					       offset, plen);
- 			get_page(page);
- 			j = 1;
- 			len -= plen;
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index 65d1f6755f98..3180a54b2c68 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -636,9 +636,15 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
- 		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++)
- 			msize += skb_shinfo(skb)->frags[i].bv_len;
- 
-+		/* The cast to struct bio_vec* here assumes the frags are
-+		 * struct page based. WARN if there is no page in this skb.
-+		 */
-+		DEBUG_NET_WARN_ON_ONCE(
-+			!skb_frag_page(&skb_shinfo(skb)->frags[0]));
-+
- 		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE,
--			      skb_shinfo(skb)->frags, skb_shinfo(skb)->nr_frags,
--			      msize);
-+			      (const struct bio_vec *)skb_shinfo(skb)->frags,
-+			      skb_shinfo(skb)->nr_frags, msize);
- 		iov_iter_advance(&msg.msg_iter, txm->frag_offset);
- 
- 		do {
--- 
-2.43.0.472.g3155946c3a-goog
-
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
