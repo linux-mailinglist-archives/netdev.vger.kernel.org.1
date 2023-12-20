@@ -1,94 +1,77 @@
-Return-Path: <netdev+bounces-59156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CEF3819954
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:20:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D314819962
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0B6A1F21A8B
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 07:20:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFBF5287AFE
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 07:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BBE14A9E;
-	Wed, 20 Dec 2023 07:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4EC156E0;
+	Wed, 20 Dec 2023 07:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGOXvsiC"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="c7hUcWBW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEB71D6A4;
-	Wed, 20 Dec 2023 07:20:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B439C433C7;
-	Wed, 20 Dec 2023 07:20:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703056825;
-	bh=FamdYXFSfAwJfuU3q8bo/5Tud8VTp1JKVzw0CiL1Tik=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=DGOXvsiCgsSj/xiP2r1OvtqfaMRV44P40wkDVBDig273LsYltzDLRjHluAr7SLhkZ
-	 NQuOJ2aY1MMQYhDAsRKJ177xLXAliHZVwTDOMJGdOPXKTxX003VFPK1BDZB4EL+rIx
-	 Vs6NuVXcVgC0ErCceQR3Rxe4tIhOA2JjtANq+YIRSwrlfMjGu3PkbkhGplFCbU3R/w
-	 jAKwPQzCytboYvVzTBqgF/LcHq7U58JQYnok0ITS1mxWTkf7/ZEHmE3Is6NX1USDDU
-	 hsRDDM5ktNknyvfPdDTcGYNjmuSVzel//c7Fh4g+Fc7+Ug3LsC/BRBl+hc0/p3uAGm
-	 A7Ft9vLhO24CA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,  Johannes Berg
- <johannes@sipsolutions.net>,  linux-wireless@vger.kernel.org,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] wifi: cfg80211: address several kerneldoc warnings
-References: <87plz1g2sc.fsf@meer.lwn.net> <87jzp92xfx.fsf@kernel.org>
-	<124652c4-081a-42a4-9f58-e5f156f08e90@infradead.org>
-Date: Wed, 20 Dec 2023 09:20:22 +0200
-In-Reply-To: <124652c4-081a-42a4-9f58-e5f156f08e90@infradead.org> (Randy
-	Dunlap's message of "Tue, 19 Dec 2023 22:51:21 -0800")
-Message-ID: <87a5q5qr0p.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19710168CF;
+	Wed, 20 Dec 2023 07:24:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2745FC433C8;
+	Wed, 20 Dec 2023 07:24:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1703057084;
+	bh=vgYQHXoBYQ7wQ7dKTUVuiNyeocofAoyCY4vb5t7hD0E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c7hUcWBWpR0G15uXayfEHAucp0eeMFVTuEBNvQbBfQ3wnyv7jLXO+/eg2/+/a5G79
+	 VYVNMIzva2Kteua7Vp5SuuS44aB6//ECgCvAEDGhuPQsedqxVYllCbsatLjFhgO2kO
+	 ltxMYJbCUrXm/kE9Q0i3eznNwq+49neCz2CPhbSE=
+Date: Wed, 20 Dec 2023 08:24:42 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] icuv: make iucv_bus const
+Message-ID: <2023122030-faceless-refutable-6d17@gregkh>
+References: <2023121950-prankster-stomp-a1aa@gregkh>
+ <8ab61ee331b8087b8a26a2a38b3ae0c72cc31bb0.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ab61ee331b8087b8a26a2a38b3ae0c72cc31bb0.camel@linux.ibm.com>
 
-Randy Dunlap <rdunlap@infradead.org> writes:
+On Tue, Dec 19, 2023 at 04:25:13PM +0100, Niklas Schnelle wrote:
+> On Tue, 2023-12-19 at 16:07 +0100, Greg Kroah-Hartman wrote:
+> > Now that the driver core can properly handle constant struct bus_type,
+> > move the iucv_bus variable to be a constant structure as well, placing
+> > it into read-only memory which can not be modified at runtime.
+> > 
+> > Cc: Alexandra Winter <wintera@linux.ibm.com>
+> > Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > Cc: linux-s390@vger.kernel.org
+> > Cc: netdev@vger.kernel.org
+> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > ---
+> 
+> Nit: There seems to be a typo in the subject line s/icuv/iucv/
 
-> On 12/19/23 22:35, Kalle Valo wrote:
->> Jonathan Corbet <corbet@lwn.net> writes:
->> 
->>> include/net/cfg80211.h includes a number of kerneldoc entries for struct
->>> members that do not exist, leading to these warnings:
->>>
->>>   ./include/net/cfg80211.h:3192: warning: Excess struct member
->>> 'band_pref' description in 'cfg80211_bss_selection'
->>>   ./include/net/cfg80211.h:3192: warning: Excess struct member
->>> 'adjust' description in 'cfg80211_bss_selection'
->>>   ./include/net/cfg80211.h:6181: warning: Excess struct member
->>> 'bssid' description in 'wireless_dev'
->>>   ./include/net/cfg80211.h:6181: warning: Excess struct member
->>> 'beacon_interval' description in 'wireless_dev'
->>>   ./include/net/cfg80211.h:7299: warning: Excess struct member
->>> 'bss' description in 'cfg80211_rx_assoc_resp_data'
->>>
->>> Remove and/or repair each entry to address the warnings and ensure a proper
->>> docs build for the affected structures.
->>>
->>> Signed-off-by: Jonathan Corbet <corbet@lwn.net>
->> 
->> I try to periodically check for kerneldoc warnings in wireless trees but
->> I have never seen these. Am I missing something or did you do something
->> special (enable new warnings etc.)?
->
-> There are new patches from both Kees Cook and me to report Excess kernel-doc
-> descriptions, so now there are a bunch of kernel-doc warnings that we are working
-> to fix quickly.  :(
+Ugh, good catch, let me go send a v2, thanks!
 
-Got it, thanks. Good to know that I wasn't missing anything.
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+greg k-h
 
