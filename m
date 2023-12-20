@@ -1,105 +1,109 @@
-Return-Path: <netdev+bounces-59297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D77F81A462
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:20:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D17A81A4C7
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:23:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B93AC28C478
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:20:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 402A91C259D0
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF147482E0;
-	Wed, 20 Dec 2023 16:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB764A9A4;
+	Wed, 20 Dec 2023 16:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SqRvzSuo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="clU9cgF3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AA248788
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 16:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-35fa65d857eso4569855ab.1
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 08:13:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703088811; x=1703693611; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9vx/HFdJ2lGP0x5f/VDYThbANjquCkQv92UEoArWaHc=;
-        b=SqRvzSuoeI+NjaMkrNDx9kVx7ivVtk6ruRl0KpNvGkzfFnfozZY62w+5k/kL504Mm0
-         YWI1dmyAVy1jWto9ysfJz/jjRi3G3uHCjhChTr8hToRf9ECkwNK1zWIHVrER4a9Q0mpA
-         nSO0aECH8zTLT6bl79TBVhsPF6oRON6VrCgc3nqA+FrzZ4kG39INoJ1Zov4kpy1mgm2L
-         MqdyQSIcz9tsBcDCu7qKdNApgRw+7b+v1yDM+d1kYHOF1v1qiXpUeu96BOovLAkGzb8z
-         fC3ZzxT5X1o7uRVagtpTq3GkVjoSKPm2eAGQ50e+iQm6vLCUGjVT7PEsC8lG7fsdLGfE
-         Wq5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703088811; x=1703693611;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9vx/HFdJ2lGP0x5f/VDYThbANjquCkQv92UEoArWaHc=;
-        b=oWBWVJvL3zVCXtL8x73ThSt3gxZV5CkRbm/g6NwO0AW+gYWnZik3Xqi/mm4pP0/cA/
-         haY3ZJqolF6I4fE5U30AdHD7BiLyDFrAdxAWgspc/kI9+/mkSo0rAduuKfJOrppq8DBG
-         pK5LAW8Iyu6hjEoPBcoXBGj6h5xrhFRGUusmP5E1WbagcuBxWuVJXc20wKibhReoSxhX
-         g7QfjNSEW1M2QbbIAsWi6jyZWGWhN5YFoGBWzPmGmlee6HN+ujd1dUxtD3M5gK6igv4G
-         HP18pmks1oyQKYcMWT+yX7J8eUHdGmlAmCKLrfYwrvnnolq6QsLsuhwLf8vkDRD43uus
-         qzDg==
-X-Gm-Message-State: AOJu0YzsCbZBtboUwnYM7H8PHf/IGyf5Oat9Yvd/fAxuRq6Nodh7oCfV
-	P3hfUCe9csc5m9PyICGYNt7P5TbjWA4KNu3XFpGGnA==
-X-Google-Smtp-Source: AGHT+IEpgAg/HWnCmZqJjL8/DT/KxToKs2GVV1VyNx7BUzg35egsFGOwcKYViFaCHVJdtJ9H8atgHw==
-X-Received: by 2002:a6b:7a03:0:b0:7ba:7ff6:1be6 with SMTP id h3-20020a6b7a03000000b007ba7ff61be6mr154498iom.2.1703088811642;
-        Wed, 20 Dec 2023 08:13:31 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id w26-20020a5ed61a000000b007ba783a27c3sm284931iom.11.2023.12.20.08.13.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Dec 2023 08:13:31 -0800 (PST)
-Message-ID: <a40e1d72-98c9-43ec-ac0a-d8cc8d0d9af7@kernel.dk>
-Date: Wed, 20 Dec 2023 09:13:30 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B51482F2;
+	Wed, 20 Dec 2023 16:17:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F732C433C9;
+	Wed, 20 Dec 2023 16:17:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703089069;
+	bh=yiNywPcfnyASYER4gw7HzvtQFMt8fPzWYtnEf1VIzBc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=clU9cgF3ePrzVBDXkDLJ/Y2RvTmfJCYP5TiFw2k1l3+M/W+i5CRlaH67NhiSJK3Qn
+	 +oJa+vcpEIFqdcJ8HTb0RuDkib0CTGy5OC/yhL1p1UrVcnmSHnuAjzckBw9SRBwzTM
+	 TM7E2OS8hpzRZQRVKZhd57uRr8EuibcDSwmhBj/rwplZoqII7Haqi3KTwd6AEVB9hc
+	 +hNpKBEHvkLlwsZeeN8x68YH4LWAnk7UDcgJU2e/xjLjOTrT4PVhlx3AB+9jmK34QO
+	 /RR4VI/XsdxOoZysBYT156ljTHU0imSZef/Lqcgwf2yy6N0MOJXDHPm29wIzPBdhbk
+	 3piLOpPFztFnQ==
+Date: Wed, 20 Dec 2023 17:17:42 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: roopa@nvidia.com, razor@blackwall.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horatiu.vultur@microchip.com, henrik.bjoernlund@microchip.com,
+	bridge@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] bridge: cfm: fix enum typo in br_cc_ccm_tx_parse
+Message-ID: <20231220161742.GM882741@kernel.org>
+References: <20231220075914.2426376-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 08/20] io_uring: add mmap support for shared ifq
- ringbuffers
-Content-Language: en-US
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20231219210357.4029713-1-dw@davidwei.uk>
- <20231219210357.4029713-9-dw@davidwei.uk>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231219210357.4029713-9-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231220075914.2426376-1-linma@zju.edu.cn>
 
-On 12/19/23 2:03 PM, David Wei wrote:
-> From: David Wei <davidhwei@meta.com>
+On Wed, Dec 20, 2023 at 03:59:14PM +0800, Lin Ma wrote:
+> It appears that there is a typo in the code where the nlattr array is
+> being parsed with policy br_cfm_cc_ccm_tx_policy, but the instance is
+> being accessed via IFLA_BRIDGE_CFM_CC_RDI_INSTANCE, which is associated
+> with the policy br_cfm_cc_rdi_policy.
 > 
-> This patch adds mmap support for ifq rbuf rings. There are two rings and
-> a struct io_rbuf_ring that contains the head and tail ptrs into each
-> ring.
+> Though it seems like a harmless typo since these two enum owns the exact
+> same value (1 here), it is quite misleading hence fix it by using the
+> correct enum IFLA_BRIDGE_CFM_CC_CCM_TX_INSTANCE here.
 > 
-> Just like the io_uring SQ/CQ rings, userspace issues a single mmap call
-> using the io_uring fd w/ magic offset IORING_OFF_RBUF_RING. An opaque
-> ptr is returned to userspace, which is then expected to use the offsets
-> returned in the registration struct to get access to the head/tail and
-> rings.
+> Fixes: 2be665c3940d ("bridge: cfm: Netlink SET configuration Interface.")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Thanks Lin Ma,
 
--- 
-Jens Axboe
+I agree with your analysis, that the problem was introduced in the
+cited commit, and that it is resolved by your patch.
 
+However, as there is no user-visible bug I don't believe this reaches
+the bar for a 'fix' for Networking code. Accordingly, I think that
+the Fixes tag should be dropped. And, instead cited commit can be mentioned
+using something like "This problem was introduced by commit ...".
 
+Also, as I don't think it is a fix I think it should be targeted at the
+net-next tree:
+
+	Subject: [PATCH net-next vX] ...
+
+The above nits notwithstanding,
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> ---
+>  net/bridge/br_cfm_netlink.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bridge/br_cfm_netlink.c b/net/bridge/br_cfm_netlink.c
+> index 5c4c369f8536..2faab44652e7 100644
+> --- a/net/bridge/br_cfm_netlink.c
+> +++ b/net/bridge/br_cfm_netlink.c
+> @@ -362,7 +362,7 @@ static int br_cc_ccm_tx_parse(struct net_bridge *br, struct nlattr *attr,
+>  
+>  	memset(&tx_info, 0, sizeof(tx_info));
+>  
+> -	instance = nla_get_u32(tb[IFLA_BRIDGE_CFM_CC_RDI_INSTANCE]);
+> +	instance = nla_get_u32(tb[IFLA_BRIDGE_CFM_CC_CCM_TX_INSTANCE]);
+>  	nla_memcpy(&tx_info.dmac.addr,
+>  		   tb[IFLA_BRIDGE_CFM_CC_CCM_TX_DMAC],
+>  		   sizeof(tx_info.dmac.addr));
+> -- 
+> 2.17.1
+> 
+> 
 
