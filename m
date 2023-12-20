@@ -1,157 +1,207 @@
-Return-Path: <netdev+bounces-59098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CDAB8194F5
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:09:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008588194F2
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A971B23ADD
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:09:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E32F287AF6
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E0123AF;
-	Wed, 20 Dec 2023 00:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C721864;
+	Wed, 20 Dec 2023 00:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XzWaWIOL"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t/QlxG6R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2061.outbound.protection.outlook.com [40.107.243.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9821FC9;
-	Wed, 20 Dec 2023 00:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-553dc379809so51316a12.0;
-        Tue, 19 Dec 2023 16:09:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703030954; x=1703635754; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wKuz/aOP9ywQDUYbzZm1chkeDVYYJSO+EMnUmdl7HN4=;
-        b=XzWaWIOL9m5v6reBhKbeXZQ1jxkOmFnRX7UpLlPhqaGVnMfMOBZeOK9brXUjDl3Mld
-         /JDu0ATVUCNyHhMGYdVMQireP1chG9SGcng/MADK4O59XSje3OuWxQcWo1gEN6Ke/XYo
-         y+0BWL6f+B1f8TkCEuh6X57wGBcT4fhegkJUn3lAWjgGC1E2V1F8QTdPICsmjCvRv17r
-         zwQxDo1PGo/K/ILnyYOjLhpEjIAYeZVLLnmbO79lLWpMYQjkLF0DDQrG5fwX8RSqHzMG
-         YjpJT9wqPGaYkqkwm/ops9BtGnpdYASn+3GrGZHMcPvk7qyT6TpyGZLF/bpfEHfmsh2W
-         dRkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703030954; x=1703635754;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wKuz/aOP9ywQDUYbzZm1chkeDVYYJSO+EMnUmdl7HN4=;
-        b=gaHraXgjvcyLngF33yis0xOwC7/nYjlhDVXj7aRJQWHJDZz41exavtXfJqatwGElf5
-         M+MUn0nqSAMbXuKwtZZAv16DK/gX7nPOl49vstJNeRXgnLZZv7FL9Gq7Br8TBfgMk3Wb
-         QEbBA3MsLVUheDs4waD30qLJ6EBW1+GAGOGZtqEgG7kmhonG2m0hpgSql6QZTMdXgNq5
-         y0uN8Ns/5XPYnE2tmVWH2ZZ8nMS0VLYXFfs36GnSzpw1OyseYOf5HRSuNYCaiWLwp8A5
-         w+E53vgjtspYbhJI/rkdxKqz+Z+LM9a7IbC9ox1Nz1vg3xdHgzXNFbR05aju2Qgd6kzc
-         yQ2g==
-X-Gm-Message-State: AOJu0YxZ1e3CdMHFX/F27Z3/Gl0e0AAgdEXg1RvlANnyMx+82uQla7ve
-	MaQW1Sv0gkR7uBMI5nuz3kw=
-X-Google-Smtp-Source: AGHT+IE0G2yZ2IeunFWFpQccuueX64mIkPbkZGPwOb8cUCs6IjPoUXntqh1xYI6G5jypIyCp+chBmw==
-X-Received: by 2002:a17:906:1054:b0:a26:8683:bc6c with SMTP id j20-20020a170906105400b00a268683bc6cmr573597ejj.36.1703030954570;
-        Tue, 19 Dec 2023 16:09:14 -0800 (PST)
-Received: from [192.168.8.100] ([85.255.233.166])
-        by smtp.gmail.com with ESMTPSA id by16-20020a170906a2d000b00a234491b96asm3880252ejb.63.2023.12.19.16.09.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 16:09:14 -0800 (PST)
-Message-ID: <e8e6e898-f69b-44c3-897b-a130b55175f1@gmail.com>
-Date: Wed, 20 Dec 2023 00:04:13 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C7E184C;
+	Wed, 20 Dec 2023 00:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g8LNj3p9II288WOOskYnExysblvBGYGwXNukfwuw3YbJLpXiw1bNk19HSJrHZ0zW0CA/eRWwoQ6KoXrcPYxNMMVJl9kgf7inUq2aVGrrN21ee02gxnPAFzkx0M3h2oIDQepxU+fcCgl62/JOWOcUqQhRXh6lGiohW+BDE5XlvzQ6ysDvOCwBwwa+S92UBfqzwPhy+VSkGimDBPFXovuU6jzixgFHMG/KnFSfYCFjSunuW/E/M6LYtjVO0R0isILIbCyoxMOirZDcDTlQa2pcBUfNING74eh20tgLoXm+YAAIsoUojvryo8UYGiksBtU36DdZs/UVu2IM9UV+CHZFhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hRo62tfYbuaX/lnDoB4t44crQOE61g3ANhWS/TSWw4w=;
+ b=fzOBD3vGKITSToV8u9dSPIz+5YUrMEyia9J0NzlDRrgDVcYZvCQUy54/xCZjaPzmk2Ss/vxA/deN9tLpPwATShQcSQbKtRQ58hX5T9ztfENfY4OSNBwI0DZoG5ZcT0T5TMhoC9nap8cqoBL687pKav6zIEJBJ1NWImgyimVsLqsRleEzPWzlBEG6yq6eLLLZIwhuP7EOisioa4M7oBaC4qvliXdWxUsGY3OLc5na+MJQz0QmhIQjd5t1FZdPnFUSi3h1OWSQgfvc0BbSh8axtpHtDEJaQLlMOcNyixgcqKisMppjfW96gQlApvvo6YGxpUo0tna+EY+ybIYpCWKRBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hRo62tfYbuaX/lnDoB4t44crQOE61g3ANhWS/TSWw4w=;
+ b=t/QlxG6RJ/paJxuYhbYKo60lJUkoGBtdnv0+7B44Dhp1mS2GTfzrkBqapzoQCDBw5n3Mgav//bGwTOGVvUt3/rjcC2k0r/bh4PqbKazPaHDLCqzcfiUJe0Bue0SoyerE+4mHNaMmWewn9VkkZ41tGGBGJq2IhFr71oBPygDCFMM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ PH0PR12MB5482.namprd12.prod.outlook.com (2603:10b6:510:ea::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7091.38; Wed, 20 Dec 2023 00:09:12 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::3d14:1fe0:fcb0:958c]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::3d14:1fe0:fcb0:958c%2]) with mapi id 15.20.7091.028; Wed, 20 Dec 2023
+ 00:09:12 +0000
+Message-ID: <18b686c6-aec1-41ce-8d9c-572667c9a738@amd.com>
+Date: Tue, 19 Dec 2023 16:09:09 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/3] ice: Fix PF with enabled XDP going no-carrier
+ after reset
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>, maciej.fijalkowski@intel.com,
+ magnus.karlsson@intel.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Simon Horman <horms@kernel.org>, Chandan Kumar Rout <chandanx.rout@intel.com>
+References: <20231218192708.3397702-1-anthony.l.nguyen@intel.com>
+ <20231218192708.3397702-4-anthony.l.nguyen@intel.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20231218192708.3397702-4-anthony.l.nguyen@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR16CA0019.namprd16.prod.outlook.com
+ (2603:10b6:a03:1a0::32) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 14/20] net: page pool: add io_uring memory provider
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-References: <20231219210357.4029713-1-dw@davidwei.uk>
- <20231219210357.4029713-15-dw@davidwei.uk>
- <CAHS8izP0-BtwxJpO3A_th+XAgpVokz4FGFct9RCRFBrK4YiLNQ@mail.gmail.com>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izP0-BtwxJpO3A_th+XAgpVokz4FGFct9RCRFBrK4YiLNQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|PH0PR12MB5482:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1d9b0ef-06e2-4811-47a7-08dc00efe4fb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	LUF6TACtUVFj8SA4+hi3TiGQAkVR9j8F791x/vf0oXnAK25UN1OjwdKbhO1GQXU5jGG/GTPWivYpcKqoRMGn0X4lCNJL2V9CqLFT29gYGp+z2IQQrJJX4mqIjTCOxwX/bT1ynozZSLVxRPGyHkvtxtOd6pR03Ixe9Ru5/W/bHtuLocAu9D9vcBYHgzBkV6PQfkquO0VwxCrid3vlXq2+EfE//hihQxqiFk+9+X9mWmgo7Xg7b2YdyEWLFdB3ICCK49Ym7uowVTkUa1TBsZoPaBiySyKbDAqOp8g6XcSdYifyStSeu9cHd4A6F1Cy7/PG3CHl0Ye9HXP9hkwAsCialIGz5N3SvpPUMKgweFut7bxhS+ftIdp1DL/LHjAJHJFOzK+oP2nJMj+vfVt6VdR4mpKqn6W33KjfqhPMS5uDNxi5g89CwkBNmtYrD2934LAGbWavGomTUCncev5JQ1yu/O6WmSo/VoMlBSJcTuT7lEZ0akl/5vEuHWEWX7HZSgZZuDRDG3zVfRtrjsi/JK4WrLzE6tu1jETM5waiaeZj2b3lv9zM6evsYl532zBgfCsn1eWBn7IBWNpSQAvYUO0QDm60W6l+6WSpdlIvFVE/6uMqFJXlcNOeJkCIUpM9iv+PPS4ER1+YluB6RV8XKBvTxhmIAkHbsHk2tb8VSA2lK53KK6I3cuk9Xh/6vx6zKCFV
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(366004)(136003)(376002)(39860400002)(230922051799003)(230273577357003)(230173577357003)(1800799012)(64100799003)(186009)(451199024)(316002)(8936002)(8676002)(4326008)(54906003)(2906002)(6486002)(478600001)(6666004)(66946007)(66476007)(66556008)(31686004)(6506007)(31696002)(6512007)(5660300002)(83380400001)(38100700002)(36756003)(86362001)(7416002)(2616005)(53546011)(26005)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eVJSTEZSS1VUNVJFWkQ0QjBNSGJUTlhxaTFzYlArWVdyOUVNWGZ5ODkzTTk5?=
+ =?utf-8?B?TmtnSkE3VVBTMjlWVTJxTnhKb2N6MzZxZ1JsYjRmNnQ3cUdUODlYSkhHWWV4?=
+ =?utf-8?B?K0l3dVRtSnFHcXg3Uit0NG1lZnEwTE05UWltTWZOYXMyMlZOZUVORzJUcnp0?=
+ =?utf-8?B?aFJyZWp0TnY3bXVlVDRuM3lHRHB1a3A0RzdkZmZCWUxVVnh5RFBLMVdzMytv?=
+ =?utf-8?B?QnFhVmpoakc0dlUxSFVsTXE3UkV3dmhaRSs2UVdhYU8wRHdlcFo1VVRwM1Iw?=
+ =?utf-8?B?dWdCNW1CWUI5ZC9BTGhDYzhhNDFKbWdBcTZ6OThKNnpISFRXQlBsSDUyMFdM?=
+ =?utf-8?B?bGxsQkt6eTAwU04vRVFwSER3UEN5WXBjeXpKZDV6RVBlaHRja0VlR2RxL01l?=
+ =?utf-8?B?L3BCak1XaXlHV3QvN0xvL2Y1TGZaZkJhRTBEOW1YTzNaM1NGOUVkSkNNTEdS?=
+ =?utf-8?B?UlFHVUI5Q1FJditvUzhmRDVUNjdKRHJVQksraUFKQXFpNFFqdkd4WWw4UU9a?=
+ =?utf-8?B?YXk2UUxzT2R1M2ZCZlhmQmE0OWR3RGVUM3lTL0R4V0p5MUprdzVnY3A1Zkdk?=
+ =?utf-8?B?VHRIKzU5eHl4OWdIb3dINjRZL1NZd08vNjhRa3VQUDFKc0JVeFU2ZFluVGgx?=
+ =?utf-8?B?QlV1dldHYU5MUUJyUE93LzJHbmQyN0Q4MFplTlUyK0pRYVhyOVkrRHVsZUs4?=
+ =?utf-8?B?N3dZd0h0QlRoazhEcTJNRThNMG5XeDB2ZUJ1UDJweDVnbHg2U04zWGdOS3N5?=
+ =?utf-8?B?OVRYVDEyMGc3MEZ0MTFNMEl5eURsM3hUUGFuVnFuc0JrUXN4U2ZrSURNRDVv?=
+ =?utf-8?B?RzYrdWRYY0RxTmIzS1RrVUtlWWZFc3RqVE56aEpVanNqdWhkc09zK0g0RXlR?=
+ =?utf-8?B?Kzd5V0FDb3g3dFFGcTdkR0xubkVvRVR1RHUxV1o3TzVWeGI5WDFpckZTTkMv?=
+ =?utf-8?B?V0gxV2FjZVRneWE3V1l1RGQ2czdpTVpYZit4VnM3ZFFjbzN4UmMzblFGSGlV?=
+ =?utf-8?B?QWxGZmFnelNQR3M0dTZERlgwRExCMVJJNTRJcHg1eDYrMFh0ck1EUmd3eEta?=
+ =?utf-8?B?aks3VDcvZ2lCRkd0MkZ4WU15YWtKZ3g4MW13cDJkdVQ3YWhnSCtsb2pvVEIw?=
+ =?utf-8?B?YmVHUUZxVk15a1dlSnZDTmJMc3h1L3dZTEZjd3F4VGlqbXg4azZ5RG9ZS3R4?=
+ =?utf-8?B?bmc3TVRyeTdERFd5a0VWR084TXdyMjFMWjBuZkNERmcrTjFiUUY4QU9LWXdI?=
+ =?utf-8?B?b3hWV2tiNTBJUG4zNzV0NVJzRkg1QW5hSDQyeWN2NjlvU01HQUtuLzZBQTVW?=
+ =?utf-8?B?ZjA2QmFTLzhqWWR1ZG13ZGJHdDZSdVY3c256dm51VG9xWllFOSs5a284amxB?=
+ =?utf-8?B?NUNzaDZUeUY4MlNJVkNEbFkrWmYrQXBsZk05aXNMZkdiUk85SzFqV1lIY1Iy?=
+ =?utf-8?B?OFlRbnY5MTFTblk4UTJ6eGgrZUpqSjM0NmVzTHdqMzVyemZ5MURYa3J0MTVp?=
+ =?utf-8?B?MXV4L1ZZNCtVOTMrbGpCTVVaODNCQzJJYUhDc0xlRkZIbS9TK2N2aWNPQW9k?=
+ =?utf-8?B?V29Vd2RjWGJOZENHOThuSXRVWndmRllWM3lpYzRxTk9wRmZZcmpCYWQ2VTRV?=
+ =?utf-8?B?aVRpNnE3dDIzVUtkVHcvYkRwRFBNeWFtakNoSVlqeFI5UExOSmN1c29nUnI3?=
+ =?utf-8?B?NlJ4WE5FTklRZEJ3NmxTVUl0R3l1MmpiNXByOGdEVGZLdk1VSzFyVWNDdGJ3?=
+ =?utf-8?B?S3l0R29hUDliWm1zSGhma045RmF5eVJXa3JhbWNTRS85TzRrWjJ4UnRpS285?=
+ =?utf-8?B?eE1TUURmT3c4MGFVRTYvQ3JxeHk4QzhieW12TFlGUHJqZnEvcU9mNThzQnRa?=
+ =?utf-8?B?Z3Q2Rms4U0QwRGtPaEUwckRZVDRuNUIrYUVvV3laUGE3YjZQUWVCbjZzWDlk?=
+ =?utf-8?B?SlNLN25VRlZ5OGZORDlBZ1pHOVhkVDh2am90NjZrc2tVNEVQemdOYkF1QUcr?=
+ =?utf-8?B?aEJTY2VjeDlNYnY0NHl4KzZNUGw1Yml1ZFZ3SkJPNXNrUXJqSjBDUXhxR1BJ?=
+ =?utf-8?B?akhhT1FTNFJNb2hqeG4wdGoybEFHRnk4djdjQWcyTWtiWEE3L3ZDV2lFdm8v?=
+ =?utf-8?Q?isw5NH9OzND7e88hO1z81NvQJ?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1d9b0ef-06e2-4811-47a7-08dc00efe4fb
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2023 00:09:12.0275
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WZb+Ji6kLFqP4dCU/92njz4VaASWRDq2jvacq6/WW2Jdd/ZEJV2HWw6RbHbKzAf45cF97jwa0pf4zNzjURFhmg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5482
 
-On 12/19/23 23:39, Mina Almasry wrote:
-> On Tue, Dec 19, 2023 at 1:04 PM David Wei <dw@davidwei.uk> wrote:
->>
->> From: Pavel Begunkov <asml.silence@gmail.com>
->>
->> Allow creating a special io_uring pp memory providers, which will be for
->> implementing io_uring zerocopy receive.
->>
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->> Signed-off-by: David Wei <dw@davidwei.uk>
-> 
-> For your non-RFC versions, I think maybe you want to do a patch by
-> patch make W=1. I suspect this patch would build fail, because the
-> next patch adds the io_uring_pp_zc_ops. You're likely skipping this
-> step because this is an RFC, which is fine.
-
-Hmm? io_uring_pp_zc_ops is added is Patch 13, used in Patch 14.
-Compiles well.
-
-
->> ---
->>   include/net/page_pool/types.h | 1 +
->>   net/core/page_pool.c          | 6 ++++++
->>   2 files changed, 7 insertions(+)
->>
->> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
->> index fd846cac9fb6..f54ee759e362 100644
->> --- a/include/net/page_pool/types.h
->> +++ b/include/net/page_pool/types.h
->> @@ -129,6 +129,7 @@ struct mem_provider;
->>   enum pp_memory_provider_type {
->>          __PP_MP_NONE, /* Use system allocator directly */
->>          PP_MP_DMABUF_DEVMEM, /* dmabuf devmem provider */
->> +       PP_MP_IOU_ZCRX, /* io_uring zerocopy receive provider */
->>   };
->>
->>   struct pp_memory_provider_ops {
->> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
->> index 9e3073d61a97..ebf5ff009d9d 100644
->> --- a/net/core/page_pool.c
->> +++ b/net/core/page_pool.c
->> @@ -21,6 +21,7 @@
->>   #include <linux/ethtool.h>
->>   #include <linux/netdevice.h>
->>   #include <linux/genalloc.h>
->> +#include <linux/io_uring/net.h>
->>
->>   #include <trace/events/page_pool.h>
->>
->> @@ -242,6 +243,11 @@ static int page_pool_init(struct page_pool *pool,
->>          case PP_MP_DMABUF_DEVMEM:
->>                  pool->mp_ops = &dmabuf_devmem_ops;
->>                  break;
->> +#if defined(CONFIG_IO_URING)
->> +       case PP_MP_IOU_ZCRX:
->> +               pool->mp_ops = &io_uring_pp_zc_ops;
->> +               break;
->> +#endif
->>          default:
->>                  err = -EINVAL;
->>                  goto free_ptr_ring;
->> --
->> 2.39.3
->>
+On 12/18/2023 11:27 AM, Tony Nguyen wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
 > 
+> From: Larysa Zaremba <larysa.zaremba@intel.com>
+> 
+> Commit 6624e780a577fc596788 ("ice: split ice_vsi_setup into smaller
+> functions") has refactored a bunch of code involved in PFR. In this
+> process, TC queue number adjustment for XDP was lost. Bring it back.
+> 
+> Lack of such adjustment causes interface to go into no-carrier after a
+> reset, if XDP program is attached, with the following message:
+> 
+> ice 0000:b1:00.0: Failed to set LAN Tx queue context, error: -22
+> ice 0000:b1:00.0 ens801f0np0: Failed to open VSI 0x0006 on switch 0x0001
+> ice 0000:b1:00.0: enable VSI failed, err -22, VSI index 0, type ICE_VSI_PF
+> ice 0000:b1:00.0: PF VSI rebuild failed: -22
+> ice 0000:b1:00.0: Rebuild failed, unload and reload driver
+> 
+> Fixes: 6624e780a577 ("ice: split ice_vsi_setup into smaller functions")
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worker at Intel)
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_lib.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+> index de7ba87af45d..1bad6e17f9be 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> @@ -2371,6 +2371,9 @@ static int ice_vsi_cfg_tc_lan(struct ice_pf *pf, struct ice_vsi *vsi)
+>                  } else {
+>                          max_txqs[i] = vsi->alloc_txq;
+>                  }
+> +
+> +               if (vsi->type == ICE_VSI_PF)
+> +                       max_txqs[i] += vsi->num_xdp_txq;
+
+Since this new code is coming right after an existing
+		if (vsi->type == ICE_VSI_CHNL)
+it looks like it would make sense to make it an 'else if' in that last 
+block, e.g.:
+
+		if (vsi->type == ICE_VSI_CHNL) {
+			if (!vsi->alloc_txq && vsi->num_txq)
+				max_txqs[i] = vsi->num_txq;
+			else
+				max_txqs[i] = pf->num_lan_tx;
+		} else if (vsi->type == ICE_VSI_PF) {
+			max_txqs[i] += vsi->num_xdp_txq;
+		} else {
+			max_txqs[i] = vsi->alloc_txq;
+		}
+
+Of course this begins to verge on the switch/case/default format.
+
+sln
+
+
+>          }
+> 
+>          dev_dbg(dev, "vsi->tc_cfg.ena_tc = %d\n", vsi->tc_cfg.ena_tc);
 > --
-> Thanks,
-> Mina
-
--- 
-Pavel Begunkov
+> 2.41.0
+> 
+> 
 
