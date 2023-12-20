@@ -1,131 +1,132 @@
-Return-Path: <netdev+bounces-59127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C29E2819683
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:48:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5B0A8196AE
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:06:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 646D11F266D8
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:48:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9278D2880CC
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719787472;
-	Wed, 20 Dec 2023 01:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C49D748C;
+	Wed, 20 Dec 2023 02:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="1NBwCSJ0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jaNCwrYJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195C3BE68
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 01:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-593faaa1afbso484037eaf.0
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 17:47:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1703036874; x=1703641674; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iWOr9qiisUkjpabZ4ff5uQEtv5SlwPvl6ptfPUH6+qE=;
-        b=1NBwCSJ0R5wZO+TDS2xr5LsoLOzVRAJQFqlEqX8+X363Zk3NplTHe2jsc0P+8U6sa9
-         tYuCuRyLRGw8M+/GfgK4WALyakncfFtGnXoPZIoK/iiL2JtbVGhB2NTFdUCqgKWXFzmh
-         cDInygP8Xwfj5E+mmp+SQge/h7cM6Y/Dfzb1GtSONqUYAp3Nx+tonlMmrDbIJtAhk2jh
-         0TW8SxF2nH2A39z1ivRLCpH8cgHxATgJ8ZRtV3PzkLsm7ZS++u3Ww6/s2ZQTM43ciRAi
-         MDsuZ243hvywG3NH+KdM9iD6GjMzbkXMnR3tSdkroR1qEG/Bv/uS3CRq6kcq6DyNkh9x
-         vimQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703036874; x=1703641674;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iWOr9qiisUkjpabZ4ff5uQEtv5SlwPvl6ptfPUH6+qE=;
-        b=Y8y0MGjivzvp5CYjycmZLdXYYiVhK4HXxmU+0q6t3x2T0X5G4dUJWUxr3SCD8H4TnW
-         IfkKb8IVKkjeLEX/qXQYMdpJYSkGoPcgoL/NGUvYDxN1evMfFCEhJ6+RzBUxEhPWyQkO
-         mA+tMLfqAzswCJo2DpFRDYGJsuyeej3hmwvUaWRJIADIwOwhA374E0r5nDC24hvjow4z
-         r8fJ1PxPSfnrlaAYKLtTDb3HGiQG8BmBtqACE+DdId77ti5dUQa5b+81HOJfKMVBNzBv
-         yNZpvaqgzsZ2ibXluOfjxVQSU0/yj+zPfrRupPAD7WzyRBkLL/ew1jmGnEg/OSCvd+FF
-         0BHw==
-X-Gm-Message-State: AOJu0YwY7KZF+8kAppZm3Lh4pDPu3hgkzd5wGhfCd2mgb7I2ASoLZon/
-	tWiP07YbVlRH0UlODtjcu7/Ncw==
-X-Google-Smtp-Source: AGHT+IEPc5q69adE+uwGOOznPo/LLRclOSONBC0SbD6eTPV3X8+frIOBkj/zDV2/bnyByoCGvD9hfA==
-X-Received: by 2002:a05:6358:7255:b0:172:e226:c16f with SMTP id i21-20020a056358725500b00172e226c16fmr4467530rwa.4.1703036874054;
-        Tue, 19 Dec 2023 17:47:54 -0800 (PST)
-Received: from localhost (fwdproxy-prn-116.fbsv.net. [2a03:2880:ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id dw7-20020a17090b094700b00286f2b39a95sm2321150pjb.31.2023.12.19.17.47.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 17:47:53 -0800 (PST)
-From: David Wei <dw@davidwei.uk>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v4 5/5] netdevsim: add Makefile for selftests
-Date: Tue, 19 Dec 2023 17:47:47 -0800
-Message-Id: <20231220014747.1508581-6-dw@davidwei.uk>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20231220014747.1508581-1-dw@davidwei.uk>
-References: <20231220014747.1508581-1-dw@davidwei.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA98BE4C;
+	Wed, 20 Dec 2023 02:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=qya6je0ihv2fYYW7NmvzCuKXAHEO5f9H1K55chikLeg=; b=jaNCwrYJINLKkNUD/DMaMQLTq+
+	TXriMQsriA6uYn/PlkbsrJWVwyfUNNVQe7KjdOlXDG7I+PgNnrKqq5VpbkEZwwT69p5asd7Xa2h6E
+	NHOgfLi08rjkIpS3svfxj9JL1oCq9ops8eGDcfYtQWDdQ+VsCNDTMSv6pjdkcL+xuUjfxkF12fWn/
+	txOPHFTnlzBYfNFDeFlxobQ+KO+oO6SMR2gpKxaZUlln9bYGHhuQXQWahWag2ullhz7xlArLyS3+e
+	wJXb0XapysHLF1uhindIJUPE8w7N8LTHOLMtFWGsVDCBKQQhV72PgfS6efUk7hetby2TN/C4ntPGf
+	V9GP1YNg==;
+Received: from [50.53.46.231] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rFlym-00Fx9I-0K;
+	Wed, 20 Dec 2023 02:06:36 +0000
+Message-ID: <e4077345-0b0a-48a3-a710-cefbd2fcaf15@infradead.org>
+Date: Tue, 19 Dec 2023 18:06:35 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ethtool: reformat kerneldoc for struct
+ ethtool_link_settings
+Content-Language: en-US
+To: Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
+References: <87zfy5g35h.fsf@meer.lwn.net>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <87zfy5g35h.fsf@meer.lwn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add a Makefile for netdevsim selftests and add selftests path to
-MAINTAINERS
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- MAINTAINERS                                    |  1 +
- .../selftests/drivers/net/netdevsim/Makefile   | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/netdevsim/Makefile
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index dda78b4ce707..d086e49eac57 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14853,6 +14853,7 @@ NETDEVSIM
- M:	Jakub Kicinski <kuba@kernel.org>
- S:	Maintained
- F:	drivers/net/netdevsim/*
-+F:	tools/testing/selftests/drivers/net/netdevsim/*
- 
- NETEM NETWORK EMULATOR
- M:	Stephen Hemminger <stephen@networkplumber.org>
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-new file mode 100644
-index 000000000000..5bace0b7fb57
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-@@ -0,0 +1,18 @@
-+# SPDX-License-Identifier: GPL-2.0+ OR MIT
-+
-+TEST_PROGS = devlink.sh \
-+	devlink_in_netns.sh \
-+	devlink_trap.sh \
-+	ethtool-coalesce.sh \
-+	ethtool-fec.sh \
-+	ethtool-pause.sh \
-+	ethtool-ring.sh \
-+	fib.sh \
-+	hw_stats_l3.sh \
-+	nexthop.sh \
-+	peer.sh \
-+	psample.sh \
-+	tc-mq-visibility.sh \
-+	udp_tunnel_nic.sh \
-+
-+include ../../../lib.mk
+On 12/19/23 15:53, Jonathan Corbet wrote:
+> The kernel doc comments for struct ethtool_link_settings includes
+> documentation for three fields that were never present there, leading to
+> these docs-build warnings:
+> 
+>   ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'supported' description in 'ethtool_link_settings'
+>   ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'advertising' description in 'ethtool_link_settings'
+>   ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'lp_advertising' description in 'ethtool_link_settings'
+> 
+> Remove the entries to make the warnings go away.  There was some
+> information there on how data in >link_mode_masks is formatted; move that
+> to the body of the comment to preserve it.
+> 
+> Signed-off-by: Jonathan Corbet <corbet@lwn.net>
+
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+
+> ---
+>  include/uapi/linux/ethtool.h | 27 +++++++++++++++------------
+>  1 file changed, 15 insertions(+), 12 deletions(-)
+> 
+> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> index f7fba0dc87e5..50253287c321 100644
+> --- a/include/uapi/linux/ethtool.h
+> +++ b/include/uapi/linux/ethtool.h
+> @@ -2128,18 +2128,6 @@ enum ethtool_reset_flags {
+>   *	refused. For drivers: ignore this field (use kernel's
+>   *	__ETHTOOL_LINK_MODE_MASK_NBITS instead), any change to it will
+>   *	be overwritten by kernel.
+> - * @supported: Bitmap with each bit meaning given by
+> - *	%ethtool_link_mode_bit_indices for the link modes, physical
+> - *	connectors and other link features for which the interface
+> - *	supports autonegotiation or auto-detection.  Read-only.
+> - * @advertising: Bitmap with each bit meaning given by
+> - *	%ethtool_link_mode_bit_indices for the link modes, physical
+> - *	connectors and other link features that are advertised through
+> - *	autonegotiation or enabled for auto-detection.
+> - * @lp_advertising: Bitmap with each bit meaning given by
+> - *	%ethtool_link_mode_bit_indices for the link modes, and other
+> - *	link features that the link partner advertised through
+> - *	autonegotiation; 0 if unknown or not applicable.  Read-only.
+>   * @transceiver: Used to distinguish different possible PHY types,
+>   *	reported consistently by PHYLIB.  Read-only.
+>   * @master_slave_cfg: Master/slave port mode.
+> @@ -2181,6 +2169,21 @@ enum ethtool_reset_flags {
+>   * %set_link_ksettings() should validate all fields other than @cmd
+>   * and @link_mode_masks_nwords that are not described as read-only or
+>   * deprecated, and must ignore all fields described as read-only.
+> + *
+> + * @link_mode_masks is divided into three bitfields, each of length
+> + * @link_mode_masks_nwords:
+> + * - supported: Bitmap with each bit meaning given by
+> + *	%ethtool_link_mode_bit_indices for the link modes, physical
+> + *	connectors and other link features for which the interface
+> + *	supports autonegotiation or auto-detection.  Read-only.
+> + * - advertising: Bitmap with each bit meaning given by
+> + *	%ethtool_link_mode_bit_indices for the link modes, physical
+> + *	connectors and other link features that are advertised through
+> + *	autonegotiation or enabled for auto-detection.
+> + * - lp_advertising: Bitmap with each bit meaning given by
+> + *	%ethtool_link_mode_bit_indices for the link modes, and other
+> + *	link features that the link partner advertised through
+> + *	autonegotiation; 0 if unknown or not applicable.  Read-only.
+>   */
+>  struct ethtool_link_settings {
+>  	__u32	cmd;
+
 -- 
-2.39.3
-
+#Randy
+https://people.kernel.org/tglx/notes-about-netiquette
+https://subspace.kernel.org/etiquette.html
 
