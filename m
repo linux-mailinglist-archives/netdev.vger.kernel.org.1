@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-59178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A341B819B05
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:58:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F159D819B14
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:04:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFBD41C25879
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:58:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE1691C22213
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE1F1CA9A;
-	Wed, 20 Dec 2023 08:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B6B1CAA7;
+	Wed, 20 Dec 2023 09:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QWxxkVe4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="2cQHZ2CR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7D11F619
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 08:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753811F5E4
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 09:04:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-553ba2f0c8fso763084a12.1
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 00:57:12 -0800 (PST)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-553b3ee88c0so1153582a12.0
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 01:04:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1703062631; x=1703667431; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1703063056; x=1703667856; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IEnqSCPt7vUlkl/75m/D/rV7ai0B3mDjespBowAGqdw=;
-        b=QWxxkVe4T/dYb0MGmzq1wceWIamlOpyrtfyQPJa0CrqZrX27LysJE4cTHeAMs8flZu
-         KQVRxzuRvXfrvJCsGi366UDy4FbOFXg4mHDAAOjWeW4io+sypZUjvxLv2I1VIKkJo8XR
-         /aJG3mJaw/y5K54n2usYKpc97B6uk1aNrpXS68gVfsYHAt1NvTc5wBZWFYyQ9ve5YyCk
-         ME9tgPBVFlopDLik5rrh/CAv0PhfGfwF4yf+xno0w+n4oHzJ+hkTu0NHtjo3nokHXsby
-         IoiT+eFBn3Lp8aw4pehBkyMG7lxh+qTTMVlNzxnbNGrhPXeSED9F5RbZ4NZkVV5y/oZw
-         D2BQ==
+        bh=wNrhw/CtB6HBjPsyzRsg5bg1nYBtuWVDL8RmBJ988xw=;
+        b=2cQHZ2CRjpaN6Dgz3AL5pQ/LMi6aAJ9ELUmP48X72bJt4Mj7wW9NFxK/iarU5ZvAjE
+         /MypDNwa5J99TaXTntimRO9fxjpuq4pyn2kvuNjqnMp++o7O/LwDE53GP/0TXnWCAq2i
+         mZMLxGjwyszZd/7ADvq0Fr72tBV8JP4c+uWDSeuudMrYFoVzv3LFsRrF9/pptW0iOgYL
+         4/nlEy4xP2Mn46dMLNwXsnmUR9fLTX4TR84JImh/qFRKLDLv0SyBYFWz1sTyKEVnwJSm
+         ST3XkCa7+bvA6+M8L2CPJQ9/87kPfJ1EDNSQK3CW6pnB4jpKXMiuGIFTGK7scgUswcUI
+         htGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703062631; x=1703667431;
+        d=1e100.net; s=20230601; t=1703063056; x=1703667856;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IEnqSCPt7vUlkl/75m/D/rV7ai0B3mDjespBowAGqdw=;
-        b=NfvwIADii7+sl6zK/GGCNrRfpmNatbdmUrNICWOCxvlN5ZllZaJF4EtpxHh2dW/jaX
-         QgRqoHOqW4u5pMMTDLtOsBbOx68uwuKd1LYVTtxXw9HyJitGQR0qXrDFhCQzjMoMiC8e
-         vwjBfrULFzdJ2zBReCdZYKFfvaDmJMQsZs3Fhs8AfWJExd4N/5lZxJLzMgfOYSf8uF03
-         r5HHun6RIvNExZUR22sHe5UwfUzDpTWfdaJyiYt7tqe7lndI4OgzC6gn04gZwnChRkVB
-         f/AENvtrLsTncyTTH5iSbMEYHoxo5qcB18M9079Mxh52MvH+Bloxk8oo/CsHUUgvqhMq
-         UOpA==
-X-Gm-Message-State: AOJu0YxHbJ7ZMtps4rPgxZWVydlHozOTPWIWpekUUn80sKRzMg5VLomb
-	y9OwllH56p/s5BiAQ94z4wDAIJQktnpA2wM5iuU=
-X-Google-Smtp-Source: AGHT+IGiWLLG1AjDvxkCP+uBSuUdmjUYyycT2JXa+ixuF2DvXUSmRQ3Dtp8OQFcgJqoCqs6XfnqQSw==
-X-Received: by 2002:a50:c90c:0:b0:548:68a3:618e with SMTP id o12-20020a50c90c000000b0054868a3618emr5574610edh.9.1703062630842;
-        Wed, 20 Dec 2023 00:57:10 -0800 (PST)
+        bh=wNrhw/CtB6HBjPsyzRsg5bg1nYBtuWVDL8RmBJ988xw=;
+        b=tZeMZa/46pFF57f1J9LlNH0vGxiDhOwOJLIkpPOZHhu4B+ujv/O4izfT3qCT11cZzW
+         6ViL15Sfdd9epB5r91Z9dwWtUC50xdyB/nqIlw5rDYkRdyZN5ILTQhIO64BoZhPk14Fu
+         x7B/eG7X/CHW8qAB8LSuAaH3MDWwMeJIz1y+Kp7WW0VEFXUfJgaU9KO2Bb0XHJL/pxfy
+         3Y+GT4opKz6JM9wp1L7drltLcBJox8oreK4oyMUCUfwkTXjkA/vLTFhH0IYPRbQJuebT
+         Dco4yngJW3YGa5MkuVpPlUDgvVCESI/Xho40/QEPGcrHGAHxrksdTU6Q9wxTlrYhobMX
+         b6pw==
+X-Gm-Message-State: AOJu0YziFJZTxX1q5Ft9sX98Af1UOX3q64RLTZZ9rhW4CIAqpmcuVbjI
+	18hyIozP7gfCPW8NWkqirCom/wwOx/IZtxfsd8s=
+X-Google-Smtp-Source: AGHT+IG3bX8RIcGRXVGS9ruivNRfXbdaMKez8RKUUx63rp3ZVCCdP3FZGdahAgs8e1hgP5n9Fa50yg==
+X-Received: by 2002:a50:85c6:0:b0:54c:7b90:f40a with SMTP id q6-20020a5085c6000000b0054c7b90f40amr12847384edh.4.1703063055638;
+        Wed, 20 Dec 2023 01:04:15 -0800 (PST)
 Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id fi8-20020a056402550800b005528001d5c6sm6048384edb.62.2023.12.20.00.57.09
+        by smtp.gmail.com with ESMTPSA id e7-20020a50fb87000000b005532b0414aesm3679895edq.51.2023.12.20.01.04.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 00:57:10 -0800 (PST)
-Date: Wed, 20 Dec 2023 09:57:09 +0100
+        Wed, 20 Dec 2023 01:04:15 -0800 (PST)
+Date: Wed, 20 Dec 2023 10:04:14 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: David Wei <dw@davidwei.uk>
 Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
 	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v4 1/5] netdevsim: maintain a list of probed
- netdevsims
-Message-ID: <ZYKsZdjn-ZOp11L4@nanopsycho>
+Subject: Re: [PATCH net-next v4 3/5] netdevsim: forward skbs from one
+ connected port to another
+Message-ID: <ZYKuDmMh_PyouG8K@nanopsycho>
 References: <20231220014747.1508581-1-dw@davidwei.uk>
- <20231220014747.1508581-2-dw@davidwei.uk>
+ <20231220014747.1508581-4-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,108 +75,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231220014747.1508581-2-dw@davidwei.uk>
+In-Reply-To: <20231220014747.1508581-4-dw@davidwei.uk>
 
-Wed, Dec 20, 2023 at 02:47:43AM CET, dw@davidwei.uk wrote:
->This patch adds a linked list nsim_dev_list of probed netdevsims, added
->during nsim_drv_probe() and removed during nsim_drv_remove(). A mutex
->nsim_dev_list_lock protects the list.
-
-In the commit message, you should use imperative mood, command
-the codebase what to do:
-https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
-
-
+Wed, Dec 20, 2023 at 02:47:45AM CET, dw@davidwei.uk wrote:
+>Forward skbs sent from one netdevsim port to its connected netdevsim
+>port using dev_forward_skb, in a spirit similar to veth.
+>
+>Add a tx_dropped variable to struct netdevsim, tracking the number of
+>skbs that could not be forwarded using dev_forward_skb().
+>
+>The xmit() function accessing the peer ptr is protected by an RCU read
+>critical section. The rcu_read_lock() is functionally redundant as since
+>v5.0 all softirqs are implicitly RCU read critical sections; but it is
+>useful for human readers.
+>
+>If another CPU is concurrently in nsim_destroy(), then it will first set
+>the peer ptr to NULL. This does not affect any existing readers that
+>dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
+>a synchronize_rcu() before the netdev is actually unregistered and
+>freed. This ensures that any readers i.e. xmit() that got a non-NULL
+>peer will complete before the netdev is freed.
+>
+>Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
+>will dereference NULL, making it safe.
+>
+>The codepath to nsim_destroy() and nsim_create() takes both the newly
+>added nsim_dev_list_lock and rtnl_lock. This makes it safe with
+>concurrent calls to linking two netdevsims together.
 >
 >Signed-off-by: David Wei <dw@davidwei.uk>
 >---
-> drivers/net/netdevsim/dev.c       | 17 +++++++++++++++++
+> drivers/net/netdevsim/netdev.c    | 25 ++++++++++++++++++++++---
 > drivers/net/netdevsim/netdevsim.h |  1 +
-> 2 files changed, 18 insertions(+)
+> 2 files changed, 23 insertions(+), 3 deletions(-)
 >
->diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
->index b4d3b9cde8bd..e30a12130e07 100644
->--- a/drivers/net/netdevsim/dev.c
->+++ b/drivers/net/netdevsim/dev.c
->@@ -35,6 +35,9 @@
-> 
-> #include "netdevsim.h"
-> 
->+static LIST_HEAD(nsim_dev_list);
->+static DEFINE_MUTEX(nsim_dev_list_lock);
->+
-> static unsigned int
-> nsim_dev_port_index(enum nsim_dev_port_type type, unsigned int port_index)
+>diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+>index 434322f6a565..00ab3098eb9f 100644
+>--- a/drivers/net/netdevsim/netdev.c
+>+++ b/drivers/net/netdevsim/netdev.c
+>@@ -29,6 +29,8 @@
+> static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
 > {
->@@ -1531,6 +1534,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
-> 				 nsim_bus_dev->initial_net, &nsim_bus_dev->dev);
-> 	if (!devlink)
-> 		return -ENOMEM;
->+	mutex_lock(&nsim_dev_list_lock);
-
-I don't follow. You claim you use this mutex to protect the list.
-a) why don't you use spin-lock?
-b) why don't don't you take the lock just for list manipulation?
-
-
-> 	devl_lock(devlink);
-> 	nsim_dev = devlink_priv(devlink);
-> 	nsim_dev->nsim_bus_dev = nsim_bus_dev;
->@@ -1544,6 +1548,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
-> 	spin_lock_init(&nsim_dev->fa_cookie_lock);
+> 	struct netdevsim *ns = netdev_priv(dev);
+>+	struct netdevsim *peer_ns;
+>+	int ret = NETDEV_TX_OK;
 > 
-> 	dev_set_drvdata(&nsim_bus_dev->dev, nsim_dev);
->+	list_add(&nsim_dev->list, &nsim_dev_list);
-> 
-> 	nsim_dev->vfconfigs = kcalloc(nsim_bus_dev->max_vfs,
-> 				      sizeof(struct nsim_vf_config),
->@@ -1607,6 +1612,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
-> 
-> 	nsim_dev->esw_mode = DEVLINK_ESWITCH_MODE_LEGACY;
-> 	devl_unlock(devlink);
->+	mutex_unlock(&nsim_dev_list_lock);
-> 	return 0;
-> 
-> err_hwstats_exit:
->@@ -1668,8 +1674,18 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
-> {
-> 	struct nsim_dev *nsim_dev = dev_get_drvdata(&nsim_bus_dev->dev);
-> 	struct devlink *devlink = priv_to_devlink(nsim_dev);
->+	struct nsim_dev *pos, *tmp;
-> 
->+	mutex_lock(&nsim_dev_list_lock);
-> 	devl_lock(devlink);
+> 	if (!nsim_ipsec_tx(ns, skb))
+> 		goto out;
+>@@ -36,12 +38,29 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+> 	u64_stats_update_begin(&ns->syncp);
+> 	ns->tx_packets++;
+> 	ns->tx_bytes += skb->len;
 >+
->+	list_for_each_entry_safe(pos, tmp, &nsim_dev_list, list) {
->+		if (pos == nsim_dev) {
->+			list_del(&nsim_dev->list);
->+			break;
->+		}
+>+	rcu_read_lock();
+>+	peer_ns = rcu_dereference(ns->peer);
+>+	if (!peer_ns)
+>+		goto out_stats;
+>+
+>+	skb_tx_timestamp(skb);
+>+	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP)) {
+>+		ret = NET_XMIT_DROP;
+>+		ns->tx_dropped++;
+
+Idk, does not look fine to me to be in u64_stats_update section while
+calling dev_forward_skb()
+
+
 >+	}
 >+
-> 	nsim_dev_reload_destroy(nsim_dev);
+>+	rcu_read_unlock();
+> 	u64_stats_update_end(&ns->syncp);
 > 
-> 	nsim_bpf_dev_exit(nsim_dev);
->@@ -1681,6 +1697,7 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
-> 	kfree(nsim_dev->vfconfigs);
-> 	kfree(nsim_dev->fa_cookie);
-> 	devl_unlock(devlink);
->+	mutex_unlock(&nsim_dev_list_lock);
-> 	devlink_free(devlink);
-> 	dev_set_drvdata(&nsim_bus_dev->dev, NULL);
+>+	return ret;
+>+
+>+out_stats:
+>+	rcu_read_unlock();
+>+	u64_stats_update_end(&ns->syncp);
+> out:
+> 	dev_kfree_skb(skb);
+>-
+>-	return NETDEV_TX_OK;
+>+	return ret;
 > }
+> 
+> static void nsim_set_rx_mode(struct net_device *dev)
+>@@ -70,6 +89,7 @@ nsim_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+> 		start = u64_stats_fetch_begin(&ns->syncp);
+> 		stats->tx_bytes = ns->tx_bytes;
+> 		stats->tx_packets = ns->tx_packets;
+>+		stats->tx_dropped = ns->tx_dropped;
+> 	} while (u64_stats_fetch_retry(&ns->syncp, start));
+> }
+> 
+>@@ -302,7 +322,6 @@ static void nsim_setup(struct net_device *dev)
+> 	eth_hw_addr_random(dev);
+> 
+> 	dev->tx_queue_len = 0;
+>-	dev->flags |= IFF_NOARP;
+> 	dev->flags &= ~IFF_MULTICAST;
+> 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
+> 			   IFF_NO_QUEUE;
 >diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
->index 028c825b86db..babb61d7790b 100644
+>index 24fc3fbda791..083b1ee7a1a2 100644
 >--- a/drivers/net/netdevsim/netdevsim.h
 >+++ b/drivers/net/netdevsim/netdevsim.h
->@@ -277,6 +277,7 @@ struct nsim_vf_config {
+>@@ -98,6 +98,7 @@ struct netdevsim {
 > 
-> struct nsim_dev {
+> 	u64 tx_packets;
+> 	u64 tx_bytes;
+>+	u64 tx_dropped;
+> 	struct u64_stats_sync syncp;
+> 
 > 	struct nsim_bus_dev *nsim_bus_dev;
->+	struct list_head list;
-> 	struct nsim_fib_data *fib_data;
-> 	struct nsim_trap_data *trap_data;
-> 	struct dentry *ddir;
 >-- 
 >2.39.3
 >
