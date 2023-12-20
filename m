@@ -1,71 +1,76 @@
-Return-Path: <netdev+bounces-59266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91ABD81A21B
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:20:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A08B81A248
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:25:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 455CE1F24810
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:20:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9C3E282D02
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6481741212;
-	Wed, 20 Dec 2023 15:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351B241212;
+	Wed, 20 Dec 2023 15:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FPUCjTa2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99DD94120B;
-	Wed, 20 Dec 2023 15:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net 2/2] netfilter: nf_tables: skip set commit for deleted/destroyed sets
-Date: Wed, 20 Dec 2023 16:15:44 +0100
-Message-Id: <20231220151544.270214-3-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231220151544.270214-1-pablo@netfilter.org>
-References: <20231220151544.270214-1-pablo@netfilter.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFC54778D;
+	Wed, 20 Dec 2023 15:22:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34BEAC433C8;
+	Wed, 20 Dec 2023 15:22:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703085731;
+	bh=/VBEJow9gZvDr3dfVllZGJwgfM/5tIcquyK819mX7Wg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FPUCjTa2by5PlCM/epGHDql/dkP1aSRo7SsmjSgHp7GxMPmhqbjFPV9zEptgfMbQO
+	 dx8Xg/s1rJCz2HqfzQe7eOyL6jTqv2mghxi0SFz7w5MI+3WDqPmasE+N2nHoiYygNw
+	 +ILdlv/Kz7/A6cXBRXOw0cKqom6EsXzDxns3c5KRncm4xfBUcNdTWjLHSx2xJ4Goda
+	 nIK/AikrMbJwkhK+wz6yKU/oVfEP7aGDfo1rBCY/zQTgKdY9LlnhU5QniA6sUSjEuW
+	 qP0+sm7GvrbZzn1OGxPN2/kfS25No7hemBDnUnR+VaycRl9rtUoApcIAs0UJNLD1wG
+	 dBfVyCwZDBskQ==
+Received: (nullmailer pid 242348 invoked by uid 1000);
+	Wed, 20 Dec 2023 15:22:09 -0000
+Date: Wed, 20 Dec 2023 09:22:09 -0600
+From: Rob Herring <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Tobias Waldekranz <tobias@waldekranz.com>
+Subject: Re: [net-next PATCH v4 1/4] dt-bindings: net: phy: Document new LEDs
+ polarity property
+Message-ID: <20231220152209.GA229412-robh@kernel.org>
+References: <20231215212244.1658-1-ansuelsmth@gmail.com>
+ <20231215212244.1658-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215212244.1658-2-ansuelsmth@gmail.com>
 
-NFT_MSG_DELSET deactivates all elements in the set, skip
-set->ops->commit() to avoid the unnecessary clone (for the pipapo case)
-as well as the sync GC cycle, which could deactivate again expired
-elements in such set.
+On Fri, Dec 15, 2023 at 10:22:41PM +0100, Christian Marangi wrote:
+> Document new LEDs polarity property to define what mode the LED needs to
+> be put to turn it on.
+> 
+> Currently supported modes are:
+> 
+> - active-low
+> - active-high
+> - active-low-tristate
+> - active-high-tristate
 
-Fixes: 5f68718b34a5 ("netfilter: nf_tables: GC transaction API to avoid race with control plane")
-Reported-by: Kevin Rich <kevinrich1337@gmail.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_tables_api.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Why is having a polarity unique to LEDs on ethernet PHYs? It's not. We 
+already have 'active-low' established on several LED bindings. Please 
+move the definition to leds/common.yaml and extend it. I would simply 
+add an 'inactive-tristate' boolean property (if there's an actual user). 
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index c5c17c6e80ed..be04af433988 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -9887,7 +9887,7 @@ static void nft_set_commit_update(struct list_head *set_update_list)
- 	list_for_each_entry_safe(set, next, set_update_list, pending_update) {
- 		list_del_init(&set->pending_update);
- 
--		if (!set->ops->commit)
-+		if (!set->ops->commit || set->dead)
- 			continue;
- 
- 		set->ops->commit(set);
--- 
-2.30.2
+I do worry this continues to evolve until we've re-created the pinctrl 
+binding...
 
+Rob
 
