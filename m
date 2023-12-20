@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-59279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF43281A344
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:56:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C5381A345
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:56:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A37CC284F15
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:56:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0841A1C245AB
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC7C4174F;
-	Wed, 20 Dec 2023 15:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC444175B;
+	Wed, 20 Dec 2023 15:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsRjgXTQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cjsAg00g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7453F4123F
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 15:55:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56FF4C433C8;
-	Wed, 20 Dec 2023 15:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E0B41758
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 15:55:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BA59C433C9;
+	Wed, 20 Dec 2023 15:55:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703087741;
-	bh=YA4C2rvaNt3CD9I5+LSUNt6HD1Jzvog4UWBVauzIASg=;
+	s=k20201202; t=1703087745;
+	bh=4wi0Pzg5Dp9u/oU82+P5NtJx5wTvAIqnpsYLXhis7M4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MsRjgXTQvaNJV6Pn0wQ5v9GZ1sNoC8LhzuLUgT+2S5XIH9gONJCyTjC6C7HB+Q+2g
-	 gscP2EowsbU4sT16N2woumUILp6y7Wbj4yHC4Ug2yErMLgYzx9mvAK4gw8rZllEpgx
-	 h+x6zbDYbyVkmdUeqK0AoSp25MJdfCsW+ly/6yu0bOwzG+JBOd17IHWu5XRJbpr2wF
-	 BwMNxCjhCY7vTD2qmzwJ3YLp2aDh6RiBllEz3k99HJELq/R4UipC++HDQd1NRXRvCQ
-	 wzRL7KMb1O1Ncsrn0Eqj3m8PCZfBokKCPxVs0YOtadjR4nE/eiVvmtnBPryal1nMpC
-	 uXwc4h7HJE+zw==
+	b=cjsAg00g+cjGNh5I3zGGL61PvyWv2wu30ZftFW8y7vCJ3ghbJZB7D/c7Pwz4d0d6I
+	 VXHpgTG9BrtJRgnImGPMKRN33gAG6J9HyQs30uIc3oFlqQAzC0fO5NV5BjzkR7P4dJ
+	 KESVjJxDgFmZWvfwpTwemafAO3WU46pALWXJDA6lw55kR1C3IRwYoC6M29baF4ymvH
+	 Fk3/iEA8JJHd7FjegnMhJY5GrYyCcy3pAcwamlPX77Kb9ni5rt0ud3kUXfGo10T7Gd
+	 gEdDz5YN2Y8EFWiByhs+XH3fJlKkx2tz2TxHjXbl5q9Dm8CiSHvrj6t8Dh2jKuKlaI
+	 ZnMq1TBUYDECQ==
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
 To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -47,9 +47,9 @@ Cc: Russell King <rmk+kernel@armlinux.org.uk>,
 	=?UTF-8?q?Marek=20Moj=C3=ADk?= <marek.mojik@nic.cz>,
 	=?UTF-8?q?Maximili=C3=A1n=20Maliar?= <maximilian.maliar@nic.cz>,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH net-next 06/15] net: phy: realtek: use generic MDIO constants
-Date: Wed, 20 Dec 2023 16:55:09 +0100
-Message-ID: <20231220155518.15692-7-kabel@kernel.org>
+Subject: [PATCH net-next 07/15] net: phy: realtek: set is_c45 and fill in c45 IDs in PHY probe for rtl822x PHYs
+Date: Wed, 20 Dec 2023 16:55:10 +0100
+Message-ID: <20231220155518.15692-8-kabel@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231220155518.15692-1-kabel@kernel.org>
 References: <20231220155518.15692-1-kabel@kernel.org>
@@ -62,89 +62,86 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Drop the ad-hoc MDIO constants used in the driver and use generic
-constants instead.
+If the rtl822x was probed via clause 22 addressing, we need to set
+phydev->is_c45 and fill in phydev->c45_ids so that genphy_c45_*
+functions will work properly.
 
 Signed-off-by: Marek Behún <kabel@kernel.org>
 ---
- drivers/net/phy/realtek.c | 30 +++++++++++++-----------------
- 1 file changed, 13 insertions(+), 17 deletions(-)
+ drivers/net/phy/realtek.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index 8f11320b38a8..52a7022d6a64 100644
+index 52a7022d6a64..c621ce9378c5 100644
 --- a/drivers/net/phy/realtek.c
 +++ b/drivers/net/phy/realtek.c
-@@ -57,14 +57,6 @@
- #define RTL8366RB_POWER_SAVE			0x15
- #define RTL8366RB_POWER_SAVE_ON			BIT(12)
- 
--#define RTL_SUPPORTS_5000FULL			BIT(14)
--#define RTL_SUPPORTS_2500FULL			BIT(13)
--#define RTL_SUPPORTS_10000FULL			BIT(0)
--#define RTL_ADV_2500FULL			BIT(7)
--#define RTL_LPADV_10000FULL			BIT(11)
--#define RTL_LPADV_5000FULL			BIT(6)
--#define RTL_LPADV_2500FULL			BIT(5)
--
- #define RTL9000A_GINMR				0x14
- #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
- 
-@@ -653,11 +645,11 @@ static int rtl822x_get_features(struct phy_device *phydev)
- 		return val;
- 
- 	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
--			 phydev->supported, val & RTL_SUPPORTS_2500FULL);
-+			 phydev->supported, val & MDIO_PMA_SPEED_2_5G);
- 	linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
--			 phydev->supported, val & RTL_SUPPORTS_5000FULL);
-+			 phydev->supported, val & MDIO_PMA_SPEED_5G);
- 	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
--			 phydev->supported, val & RTL_SUPPORTS_10000FULL);
-+			 phydev->supported, val & MDIO_SPEED_10G);
- 
- 	return genphy_read_abilities(phydev);
- }
-@@ -671,10 +663,11 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
- 
- 		if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
- 				      phydev->advertising))
--			adv2500 = RTL_ADV_2500FULL;
-+			adv2500 = MDIO_AN_10GBT_CTRL_ADV2_5G;
- 
- 		ret = phy_modify_paged_changed(phydev, 0xa5d, 0x12,
--					       RTL_ADV_2500FULL, adv2500);
-+					       MDIO_AN_10GBT_CTRL_ADV2_5G,
-+					       adv2500);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -693,11 +686,14 @@ static int rtl822x_read_status(struct phy_device *phydev)
- 			return lpadv;
- 
- 		linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
--			phydev->lp_advertising, lpadv & RTL_LPADV_10000FULL);
-+				 phydev->lp_advertising,
-+				 lpadv & MDIO_AN_10GBT_STAT_LP10G);
- 		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
--			phydev->lp_advertising, lpadv & RTL_LPADV_5000FULL);
-+				 phydev->lp_advertising,
-+				 lpadv & MDIO_AN_10GBT_STAT_LP5G);
- 		linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
--			phydev->lp_advertising, lpadv & RTL_LPADV_2500FULL);
-+				 phydev->lp_advertising,
-+				 lpadv & MDIO_AN_10GBT_STAT_LP2_5G);
- 	}
- 
- 	ret = genphy_read_status(phydev);
-@@ -715,7 +711,7 @@ static bool rtlgen_supports_2_5gbps(struct phy_device *phydev)
- 	val = phy_read(phydev, 0x13);
- 	phy_write(phydev, RTL821x_PAGE_SELECT, 0);
- 
--	return val >= 0 && val & RTL_SUPPORTS_2500FULL;
-+	return val >= 0 && val & MDIO_PMA_SPEED_2_5G;
+@@ -636,6 +636,18 @@ static int rtlgen_write_mmd(struct phy_device *phydev, int dev, u16 reg,
+ 	return rtl821x_write_page(phydev, 0) ?: ret;
  }
  
- static int rtlgen_match_phy_device(struct phy_device *phydev)
++static int rtl822x_probe(struct phy_device *phydev)
++{
++	/* if the PHY was probed via c22, set is_c45 and fill in c45 IDs */
++	if (!phydev->is_c45) {
++		phydev->is_c45 = true;
++
++		return phy_get_c45_ids(phydev);
++	}
++
++	return 0;
++}
++
+ static int rtl822x_get_features(struct phy_device *phydev)
+ {
+ 	int val;
+@@ -961,6 +973,7 @@ static struct phy_driver realtek_drvs[] = {
+ 	}, {
+ 		.name		= "RTL8226 2.5Gbps PHY",
+ 		.match_phy_device = rtl8226_match_phy_device,
++		.probe		= rtl822x_probe,
+ 		.get_features	= rtl822x_get_features,
+ 		.config_aneg	= rtl822x_config_aneg,
+ 		.read_status	= rtl822x_read_status,
+@@ -973,6 +986,7 @@ static struct phy_driver realtek_drvs[] = {
+ 	}, {
+ 		PHY_ID_MATCH_EXACT(0x001cc840),
+ 		.name		= "RTL8226B_RTL8221B 2.5Gbps PHY",
++		.probe		= rtl822x_probe,
+ 		.get_features	= rtl822x_get_features,
+ 		.config_aneg	= rtl822x_config_aneg,
+ 		.read_status	= rtl822x_read_status,
+@@ -985,6 +999,7 @@ static struct phy_driver realtek_drvs[] = {
+ 	}, {
+ 		PHY_ID_MATCH_EXACT(0x001cc838),
+ 		.name           = "RTL8226-CG 2.5Gbps PHY",
++		.probe		= rtl822x_probe,
+ 		.get_features   = rtl822x_get_features,
+ 		.config_aneg    = rtl822x_config_aneg,
+ 		.read_status    = rtl822x_read_status,
+@@ -997,6 +1012,7 @@ static struct phy_driver realtek_drvs[] = {
+ 	}, {
+ 		PHY_ID_MATCH_EXACT(0x001cc848),
+ 		.name           = "RTL8226B-CG_RTL8221B-CG 2.5Gbps PHY",
++		.probe		= rtl822x_probe,
+ 		.get_features   = rtl822x_get_features,
+ 		.config_aneg    = rtl822x_config_aneg,
+ 		.read_status    = rtl822x_read_status,
+@@ -1009,6 +1025,7 @@ static struct phy_driver realtek_drvs[] = {
+ 	}, {
+ 		PHY_ID_MATCH_EXACT(0x001cc849),
+ 		.name           = "RTL8221B-VB-CG 2.5Gbps PHY",
++		.probe		= rtl822x_probe,
+ 		.get_features   = rtl822x_get_features,
+ 		.config_aneg    = rtl822x_config_aneg,
+ 		.read_status    = rtl822x_read_status,
+@@ -1021,6 +1038,7 @@ static struct phy_driver realtek_drvs[] = {
+ 	}, {
+ 		PHY_ID_MATCH_EXACT(0x001cc84a),
+ 		.name           = "RTL8221B-VM-CG 2.5Gbps PHY",
++		.probe		= rtl822x_probe,
+ 		.get_features   = rtl822x_get_features,
+ 		.config_aneg    = rtl822x_config_aneg,
+ 		.read_status    = rtl822x_read_status,
 -- 
 2.41.0
 
