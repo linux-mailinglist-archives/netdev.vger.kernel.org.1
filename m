@@ -1,53 +1,61 @@
-Return-Path: <netdev+bounces-59136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84089819720
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 04:25:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B79B981972A
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 04:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 706A31C24599
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:25:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C1451F264DB
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2445B8BE7;
-	Wed, 20 Dec 2023 03:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9588F8F41;
+	Wed, 20 Dec 2023 03:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vr2vQ5xS"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cXVOzxbg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B03E156DD;
-	Wed, 20 Dec 2023 03:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703042716; x=1734578716;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7tG7uUz/0Cp/tMpJo2Y2RuTuyuh7GtcWVTgWV880FJA=;
-  b=Vr2vQ5xSvyxoLfnu2n8eS0q5CqJCCNqBkIl7r+Dfe+p9XaG/4pk4/M8Z
-   GaKzs7dTT6F0FwZcyPDHQ7iE2Zl3bbKXuklWSLWPRsuQ/DnEMXENJzomF
-   k2BzMfj13f50DDf93JxNPkHMMZZoTK3Xwf0A/GNJ/e6sc22u9tPF1SLTB
-   igCSeHOYdPhnSodHbiUjNjsTNvMZ8FUknnxvPoSIVnYFR55AnuiVnncVE
-   VDiQgkk0XZAscQjABW20dA2RTKPUE2Mao2u0ggCFHp7uY1cDNbOw21+vY
-   1lX/233VToatD92ireL50VlapKHsP67YTcD0bnHIT2TicfUdcv7VJouzY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="481946535"
-X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="481946535"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 19:25:15 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="769440701"
-X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="769440701"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.107.26.22]) ([10.107.26.22])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 19:25:12 -0800
-Message-ID: <d76e2682-8763-49d0-b46a-5f874eb61985@linux.intel.com>
-Date: Wed, 20 Dec 2023 11:25:09 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401558BF9
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 03:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-28b71490fbbso1719437a91.0
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 19:30:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1703043005; x=1703647805; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sUq2OM1li7CxkIrkWDtdEiY2oiOCTUFA1jYnFMugiCM=;
+        b=cXVOzxbgih73++d5wcPrCVc2qsLgBxmovP11/hdJKm0a+YVR6sLiu64pug3jwsknkf
+         /HV/kphaJhQCMN+uYLD+s4R8+d7UYgj/jU38Pyf8U8jJSjXoYa+Is8WEeMfoDcdN50sf
+         kM1ZN6Ni5TJh2FKjzrT4+d4khQQ4X/xUewcyM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703043005; x=1703647805;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sUq2OM1li7CxkIrkWDtdEiY2oiOCTUFA1jYnFMugiCM=;
+        b=HckeWSKTdEfAxcZgk5mOyXLUr5x58z1wWe8xN+nIOd99bEqHFCjctc/+TgGKKN5sDC
+         fk0DNQFIZwEnBLiSnKqsm7HVJavrGjrNS/a9SfWfdpowmE+wi15Yro1SF19/J5vgxi/G
+         lo2g550zFnDlTnG1n95gcgaKR/ZxnOZjrMXzAm8z7wcPmp5pSA1/pBiY4ZAMPEfSsYwo
+         K+OzYreY6ES3A7U2kAgfU7hW6M1H5cHKRNyKxMSTGw92CpTSmuqDWiUMeT3SUIO1+Vwb
+         Ag7TG3FZJMVdfCenIUoxxv8waDek9d3ZW2H4LvLmO7uF3EdfBoSnLKvZFBZESYjU9zyd
+         Ld3A==
+X-Gm-Message-State: AOJu0YyH4Och3cGx/BIytFlM6H2hJwIOhAJAccPin5tbk3dny9exh1t4
+	aTqqbj2+Z7Aqi1YLOTB4VzFs+w==
+X-Google-Smtp-Source: AGHT+IEyUAv+ITNtl62B1KaAoSR3d91Ea/PTHOO2rzx6Z7ZW3/qRzKUylZEstlP7OvWBD6PwHNK7xg==
+X-Received: by 2002:a17:902:d491:b0:1d3:6a11:1fbd with SMTP id c17-20020a170902d49100b001d36a111fbdmr7432822plg.118.1703043005517;
+        Tue, 19 Dec 2023 19:30:05 -0800 (PST)
+Received: from [192.168.0.111] (d-174-140-102-53.fl.cpe.atlanticbb.net. [174.140.102.53])
+        by smtp.gmail.com with ESMTPSA id n16-20020a170903111000b001d3320f6143sm14934478plh.269.2023.12.19.19.30.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Dec 2023 19:30:05 -0800 (PST)
+Message-ID: <e6a4d942-0711-4035-840b-9b2b116ae70c@broadcom.com>
+Date: Tue, 19 Dec 2023 19:30:00 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,190 +63,146 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net 0/4] qbv cycle time extension/truncation
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231219081453.718489-1-faizal.abdul.rahim@linux.intel.com>
- <20231219165650.3amt4ftyt7gisz47@skbuf>
+Subject: Re: [PATCH v3 2/6] x86/vmware: Introduce vmware_hypercall API
 Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20231219165650.3amt4ftyt7gisz47@skbuf>
+To: kirill.shutemov@linux.intel.com
+Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
+ tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
+ richardcochran@gmail.com, linux-input@vger.kernel.org,
+ dmitry.torokhov@gmail.com, zackr@vmware.com,
+ linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
+ namit@vmware.com, timothym@vmware.com, akaher@vmware.com, jsipek@vmware.com,
+ dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+ tzimmermann@suse.de, mripard@kernel.org, maarten.lankhorst@linux.intel.com,
+ horms@kernel.org
+References: <20231219215751.9445-1-alexey.makhalov@broadcom.com>
+ <20231219215751.9445-3-alexey.makhalov@broadcom.com>
+ <20231219232023.u4dyuvbzbh565grk@box.shutemov.name>
+ <75eed318-2d22-429d-ab95-80610ba82934@broadcom.com>
+ <20231220005156.2rymnxu5bv6wdwlx@box.shutemov.name>
+From: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
+ xsFNBGVo9lkBEACeouRIm6Q3QTvjcnPczfBqgLffURstVJz5nqjnrNR4T+8dwNrZB8PTgOWA
+ QdGV4bIyqtNG7UHQuZ7sVKr2tx0gYJyQ5uZgncEHB5YIuhQ/CyAHrVmO+5/0/xWCLI0g44rF
+ ZJqsYw2JQ2+vayTWbR65rkOiKL8GOVFNZanDg80BRh6qCmCEMXd/tymxvgnvWpHtxMgukexk
+ 4vV9nV4XhxRVYdpLk8mBxsh+AEbHE+nbWgIuJDrmrZDGI2Dha7JFoB0Mi6hbbYd9BdkcHKQ7
+ 6c+S1xOrZL3jX7OIFhb4NNnEOhh8/+BDlyby478p6YsimNa7TgAUbrygGyfVG8usrZy8SvO+
+ vUbVQwqjcJaCK1xazK12dfuZm2kSMJUrJqa9ng6OMjkE2/WrtnK8ruFNSCdytzbuheT0nYUJ
+ Uwy84cU4p2K/N2C4vYjcn+IT+l1BFr5FViKYruoRLVH6zK/WOoZjA+Fc6tdM5nC1pgSB9c7h
+ XLQqDSzYPzk3nqeHWG1qJ0Hu7pscIrjxyNTIZ5le0TlpblJdoRcL5maDNw22yle8m4D18ERF
+ VrqNoqwW8fObMCHbd6C3m75lzerq1HhrSvLyU4UfprEyAcjOI1C0319SXfYlXDjKXRQyaDZP
+ wxln8uShSitSSnx0AsSAjcUa8Cc7km81+G2WSK3S2wVIAN11awARAQABzS5BbGV4ZXkgTWFr
+ aGFsb3YgPGFsZXhleS5tYWtoYWxvdkBicm9hZGNvbS5jb20+wsGNBBMBCAA3FiEEjLzRtST/
+ a5u42vOKbM7yHr5SJ3cFAmVo9lwFCQ0oaIACGwMECwkIBwUVCAkKCwUWAgMBAAAKCRBszvIe
+ vlInd0jTD/9bZtjehewLRrW3dRDAbLG/+J5g1K4X5qQPfAo42NrhZQlOTibL7ixwq7NSXynZ
+ V4Iu9jHAW++KXjxJzkg7zjBf9OOvvgCpqZGKYgWNvHHnX4eIVh8Ikp5JtvGPMBcRv7lJA5co
+ kb+RHo9iRrB1dvRIOsP1SlGS85SiNA0yvmgqwbigLDmDRSWtvvt9XPwU1iqF+1OopT3UE10i
+ /z+qE2ogcw2ADveBovq2W4JeQEBvlETwDKOdh8Q3UBHOqrZUrL7YjpUxgmb89FcjdDzUU95I
+ fCB5YxF0hUctxFH5Uujh2F4qk0m2rp7+aOGtxWCJUqkHXjgpOoxyn0FPZiZlDkst84NO5OSI
+ 5ZFPwaFqxUrFF+cFCY2O/UE2gpoK9Lt3gYNK6o2WIAtufuiYVdK6lANMkBgZ+t2fDLIN147a
+ 172zu8XnyJMTo+tVfUjxwqynoR/NSWpVPs0Ck3K0LGjQE0tJ6HZrH0vudXk3YaiqW+D4CtGh
+ I17Pk0h6x8LCdjmWmuDXoc99ezOEFSyWuTHjAYxx3cmgSUyIhdHtimuf0CVLTcFoBErb/5pJ
+ zjb11Cj0HP87FMH57bnD3qyfkBMOB6tztfdt3vkCBaWkxaiTGXNhwr4IiLUoi90yIdXDMcTj
+ /gvnjXgN+31iYgPWgTOdUEQud0DwDwuDwkzx/0x4sF1Dfc7BTQRlaPZcARAAuGkoYKWcrCh8
+ 5RffedM6uBZ4p5Z4+RVj05uq7hlAwhHUpLP/XGbgNzhJP375Lonmnuyg2x7oHxfiwOohuuiA
+ MnhSeEXn2qWZJuHosrYxs9y2zyiE/GTUAcqKiYBFa/96zOaZjHpNuQ5qSHYL64WhqvtmCQYg
+ fL+jes2Z4IXl2R7MrN9OE+G3A3pOAo8TZKUEmlUV85fSmgopIX+hCiSQmRNRtp2jK6hd2+38
+ YAXc+eRxYgXKaWX5zeBgNrfM7Oxeh/0iWRZPWstTvVH2xMlzywOB3e/fqg+Q3NlPGDrTyHoc
+ L86ZELSLcMTFn+RXw8lX8oVjTcQA0M8sQHB5g0JEWtMsFjnQZkJGCfeh0Odbn/F8nZ6LQQtu
+ +fjc/4n9vRun+PZjdhd3W9ZM9D87W9XJg9txIaYnoUXBLLpHK/OirFfr5cJTUf4svtE3EVXb
+ x6P9vr7zqUbE0f76h1eDPmyMwFAuibIXhNoEoKQtEjLX9aKgKYny3hczRiuQpA+6U4oTNn4S
+ /CEqphLPT53aMH0w4x0CebMPozf24ZE9YphdX8ECclLBlDL1/zx2xKrJNw8v6wdXMSfsybBW
+ 98b5b1eVBk1uc1UMlpDl7AIHyCMTjL9Ha85eoya/Hk9l93aVHgK04hOBY2ED1/ZRpj0M5P5m
+ tNX1JqZunpyvKooT1PrJr4UAEQEAAcLBfAQYAQgAJhYhBIy80bUk/2ubuNrzimzO8h6+Uid3
+ BQJlaPZeBQkNKGiAAhsMAAoJEGzO8h6+Uid3SDoQAI3XXqsehWKvyAVeGXPxmkk+Suos/nJC
+ xZWjp4U2xbbegBnNWladZoNdlVW/WV+FSFsN5IWztxQTWBMI12A0dx+Ooi9PSIANnlN+gQsA
+ 9WeQ5iDNveEHZyK1GmuqZ3M3YZ1r3T2KyzTnPPZQ1B8gMQ442bOBWe077MqtLaC0J1jHyWHU
+ j6BbUCAyR2/OCV/n1bH4wYIm2lgrOd2WuzoAGvju+j2g7hMRxw/xeHeu8S0czHuEZ0dC6fR1
+ ZKUOw03+mM/xRzL1be6RVS9AF7R5oDd11RrTOb7k14z0inFqSRrRwzOPKcuMxrApcquar336
+ 3FQuLcJLjBo/SAOh2JatOkkwkw5PZseqdwcAk5+wcCbdYy8J8ttR04iV1FzrdQp8HbVxGNo7
+ AlDn1qtoHzvJHSQG51tbXWfLIi1ek3tpwJWj08+Zo+M47X6B65g7wdrwCiiFfclhXhI1eJNy
+ fqqZgi3rxgu4sc5lmR846emZ/Tx85/nizqWCv7xUBxQwmhRPZRW+37vS2OLpyrTtBj3/tEM9
+ m9GMmTZqaJFeK7WCpprJV4jNHpWZuNAsQrdK1MrceIxb0/6wYe0xK79lScxms+zs9pGTrO4U
+ 5RoS4gXK65ECcBH8/mumV6oBmLrNxKUrzTczdo9PnkmRyZcAa6AndbjmQDznwxvTZu2LjMPC EuY0
+In-Reply-To: <20231220005156.2rymnxu5bv6wdwlx@box.shutemov.name>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
-On 20/12/2023 12:56 am, Vladimir Oltean wrote:
-> On Tue, Dec 19, 2023 at 03:14:49AM -0500, Faizal Rahim wrote:
->> According to IEEE Std. 802.1Q-2018 section Q.5 CycleTimeExtension,
->> the Cycle Time Extension variable allows this extension of the last old
->> cycle to be done in a defined way. If the last complete old cycle would
->> normally end less than OperCycleTimeExtension nanoseconds before the new
->> base time, then the last complete cycle before AdminBaseTime is reached
->> is extended so that it ends at AdminBaseTime.
+On 12/19/23 4:51 PM, kirill.shutemov@linux.intel.com wrote:
+> On Tue, Dec 19, 2023 at 04:17:40PM -0800, Alexey Makhalov wrote:
 >>
->> Changes in v3:
->> - Removed the last 3 patches related to fixing cycle time adjustment
->> for the "current entry". This is to simplify this patch series submission
->> which only covers cycle time adjustment for the "next entry".
->> - Negative correction calculation in get_cycle_time_correction() is
->>    guarded so that it doesn't exceed interval
->> - Some rename (macro, function)
->> - Transport commit message comments to the code comments
->> - Removed unnecessary null check
->> - Reword commit message
 >>
->> Changes in v2:
->> - Added 's64 cycle_time_correction' in 'sched_gate_list struct'.
->> - Removed sched_changed created in v1 since the new cycle_time_correction
->>    field can also serve to indicate the need for a schedule change.
->> - Added 'bool correction_active' in 'struct sched_entry' to represent
->>    the correction state from the entry's perspective and return corrected
->>    interval value when active.
->> - Fix cycle time correction logics for the next entry in advance_sched()
->> - Fix and implement proper cycle time correction logics for current
->>    entry in taprio_start_sched()
+>> On 12/19/23 3:20 PM, kirill.shutemov@linux.intel.com wrote:
+>>> On Tue, Dec 19, 2023 at 01:57:47PM -0800, Alexey Makhalov wrote:
+>>>> +static inline
+>>>> +unsigned long vmware_hypercall1(unsigned long cmd, unsigned long in1)
+>>> ...
+>>>> +static inline
+>>>> +unsigned long vmware_hypercall3(unsigned long cmd, unsigned long in1,
+>>>> +				uint32_t *out1, uint32_t *out2)
+>>> ...
+>>>> +static inline
+>>>> +unsigned long vmware_hypercall4(unsigned long cmd, unsigned long in1,
+>>>> +				uint32_t *out1, uint32_t *out2,
+>>>> +				uint32_t *out3)
+>>> ...
+>>>> +static inline
+>>>> +unsigned long vmware_hypercall5(unsigned long cmd, unsigned long in1,
+>>>> +				unsigned long in3, unsigned long in4,
+>>>> +				unsigned long in5, uint32_t *out2)
+>>> ...
+>>>> +static inline
+>>>> +unsigned long vmware_hypercall6(unsigned long cmd, unsigned long in1,
+>>>> +				unsigned long in3, uint32_t *out2,
+>>>> +				uint32_t *out3, uint32_t *out4,
+>>>> +				uint32_t *out5)
+>>> ...
+>>>> +static inline
+>>>> +unsigned long vmware_hypercall7(unsigned long cmd, unsigned long in1,
+>>>> +				unsigned long in3, unsigned long in4,
+>>>> +				unsigned long in5, uint32_t *out1,
+>>>> +				uint32_t *out2, uint32_t *out3)
+>>>
+>>> Naming is weird. The number in the name doesn't help much as there seems
+>>> no system on how many of the parameters are ins and outs.
 >>
->> v2 at:
->> https://lore.kernel.org/lkml/20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com/
->> v1 at:
->> https://lore.kernel.org/lkml/20230530082541.495-1-muhammad.husaini.zulkifli@intel.com/
+>> There was internal discussion on hypercall API naming. One of proposals was
+>> using 2 digits - number of input and number of output arguments.
+>> And it definitely looked weird. So, we agreed to have just single number  -
+>> total number of arguments excluding cmd.
 > 
-> I'm sorry that I stopped responding on your v2. I realized the discussion
-> reached a point where I couldn't figure out who is right without some
-> testing. I wanted to write a selftest to highlight the expected correct
-> behavior of the datapath during various schedule changes, and whether we
-> could ever end up with a negative interval after the correction. However,
-> writing that got quite complicated and that ended there.
+> Have you considered naming them by number of input parameters? Number of
+> output parameters as demanded by users.
 > 
-> How are you testing the behavior, and who reported the issues / what prompted
-> the changes? Honestly I'm not very confident in the changes we're
-> pushing down the linux-stable pipe. They don't look all that obvious, so
-> I still think that having selftests would help. If you don't have a
-> testing rig already assembled, and you don't want to start one, I might
-> want to give it a second try and cook something up myself.
+> So vmware_hypercall4() will become vmware_hypercall1() and current
+> vmware_hypercall1() and vmware_hypercall3() will go away.
 > 
-> Something really simple like:
-> - start schedule 1 with base-time A and cycle-time-extension B
-> - start schedule 2 with base-time C
-> - send one packet with isochron during the last cycle of schedule 1
+> It is still awful, but /maybe/ better that this, I donno.
 > 
-> By varying the parameters, we could check if the schedule is correctly
-> extended or truncated. We could configure the 2 schedules in such a way
-> that "extending" would mean that isochron's gate (from schedule 1) is
-> open (and thus, the packet will pass) and "truncating" would mean that
-> the packet is scheduled according to schedule 2 (where isochron's gate
-> will be always closed, so the packet will never pass).
-> 
-> We could then alter the cycle-time-extension relative to the base-times,
-> to force a truncation of 1, 2, 3 entries or more, and see that the
-> behavior is always correct.
 
-Hi Vladimir,
+Deprecating vmware_hypercall1 and vmware_hypercall3 in favor of 
+vmware_hypercall4 will generate less efficient code for the caller of 
+first ones.
+Using current vmware_hypercall4 instead of vmware_hypercall1 will force 
+the caller to allocate additional variables (register or on stack 
+memory) for hypercall asm inline to put additional output registers on. 
+And specifically to 'usage' of *out3 - compiler will unnecessary 
+'clobber' useful rdx, when hypervisor will keep it unchanged.
 
-No worries, I truly appreciate the time you took to review and reply.
+Unfortunately VMware hypercall ABI is not as beautiful as KVM one, 
+especially in number of output arguments and their ordering. rbp 
+register usage as an argument is a separate bummer((. So we have to work 
+with what we have.
 
-What prompted this in general is related to my project requirement to 
-enable software QBV cycle time extension, so there's a validation team that 
-created test cases to properly validate cycle time extension. Then I 
-noticed the code doesn't handle truncation properly also, since it's the 
-same code area, I just fixed it together.
+Current set of functions includes only 6 functions (for LB), which is 
+the optimum between readability, maintainability and performance. It 
+covers all current kernel callers and all new callers from yet to be 
+upstreamed patches that we have in Photon OS including 2 patches for x86 
+and arm64 guest support.
 
-Each time before sending the patch for upstream review, I normally will run 
-our test cases that only validates cycle time extension. For truncation, I 
-modify the test cases on my own and put logs to check if the 
-cycle_time_correction negative value is within the correct range. I 
-probably should have mentioned sooner that I have tested this myself, sorry 
-about that.
-
-Example of the test I run for cycle time extension:
-1) 2 boards connected back-to-back with i226 NIC. Board A as sender, Board 
-B as receiver
-2) Time is sync between 2 boards with phc2sys and ptp4l
-3) Run GCL1 on Board A with cycle time extension enabled:
-     tc qdisc replace dev $INTERFACE parent root handle 100 taprio \
-     num_tc 4 \
-     map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
-     queues 1@0 1@1 1@2 1@3 \
-     base-time 0 \
-     cycle-time-extension 1000000 \
-     sched-entry S 09 500000 \
-     sched-entry S 0a 500000 \
-     clockid CLOCK_TAI
-4) capture tcp dump on Board B
-5) Send packets from Board A to Board B with 200us interval via UDP Tai
-6) When packets reached Board B, trigger GCL2 to Board A:
-    CYCLETIME=1000000
-    APPLYTIME=1000000000 # 1s
-    CURRENT=$(date +%s%N)
-    BASE=$(( (CURRENT + APPLYTIME + (2*CYCLETIME)) - ((CURRENT + APPLYTIME)
-          % CYCLETIME) + ((CYCLETIME*3)/5) ))
-     tc qdisc replace dev $INTERFACE parent root handle 100 taprio \
-     num_tc 4 \
-     map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
-     queues 1@0 1@1 1@2 1@3 \
-     base-time $BASE \
-     cycle-time-extension 1000000 \
-     sched-entry S oc 500000 \
-     sched-entry S 08 500000 \
-     clockid CLOCK_TAI
-7) Analyze tcp dump data on Board B using wireshark, will observe packets 
-receive pattern changed.
-
-Note that I've hidden "Best Effort (default) 7001 → 7001" data from the 
-wireshark log so that it's easier to see the pattern.
-
-      TIMESTAMP               PRIORITY             PRIORITY    NOTES 
-
-1702896645.925014509	Critical Applications	7004 → 7004   GCL1
-1702896645.925014893	Critical Applications	7004 → 7004   GCL1
-1702896645.925514454	Excellent Effort	7003 → 7003   GCL1
-1702896645.925514835	Excellent Effort	7003 → 7003   GCL1
-1702896645.926014371	Critical Applications	7004 → 7004   GCL1
-1702896645.926014755	Critical Applications	7004 → 7004   GCL1
-1702896645.926514620	Excellent Effort	7003 → 7003   GCL1
-1702896645.926515004	Excellent Effort	7003 → 7003   GCL1
-1702896645.927014408	Critical Applications	7004 → 7004   GCL1
-1702896645.927014792	Critical Applications	7004 → 7004   GCL1
-1702896645.927514789	Excellent Effort	7003 → 7003   GCL1
-1702896645.927515173	Excellent Effort	7003 → 7003   GCL1
-1702896645.928168304	Excellent Effort	7003 → 7003   Extended
-1702896645.928368780	Excellent Effort	7003 → 7003   Extended
-1702896645.928569406	Excellent Effort	7003 → 7003   Extended
-1702896645.929614835	Background	        7002 → 7002   GCL2
-1702896645.929615219	Background	        7002 → 7002   GCL2
-1702896645.930614643	Background	        7002 → 7002   GCL2
-1702896645.930615027	Background	        7002 → 7002   GCL2
-1702896645.931614604	Background	        7002 → 7002   GCL2
-1702896645.931614991	Background	        7002 → 7002   GCL2
-
-The extended packets only will happen if cycle_time and interval fields
-are updated using cycle_time_correction. Without that patch, the extended 
-packets are not received.
-
-
-As for the negative truncation case, I just make the interval quite long, 
-and experimented with GCL2 base-time value so that it hits the "next entry" 
-in advance_sched(). Then I checked my logs in get_cycle_time_correction() 
-to see the truncation case and its values.
-
-Based on your feedback of the test required, I think that my existing 
-truncation test is not enough, but the extension test case part should be 
-good right ?
-
-Do let me know then, I'm more than willing to do more test for the 
-truncation case as per your suggestion, well basically, anything to help 
-speed up the patches series review process :)
-
-
-Appreciate your suggestion and help a lot, thank you.
-
-
-
-
+Regards,
+--Alexey
 
