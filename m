@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-59129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5B0A8196AE
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:06:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326218196B5
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9278D2880CC
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:06:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C69181F2211F
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C49D748C;
-	Wed, 20 Dec 2023 02:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84618749E;
+	Wed, 20 Dec 2023 02:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jaNCwrYJ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yAvZzdkw"
 X-Original-To: netdev@vger.kernel.org
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA98BE4C;
-	Wed, 20 Dec 2023 02:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443EC79DD;
+	Wed, 20 Dec 2023 02:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
 	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=qya6je0ihv2fYYW7NmvzCuKXAHEO5f9H1K55chikLeg=; b=jaNCwrYJINLKkNUD/DMaMQLTq+
-	TXriMQsriA6uYn/PlkbsrJWVwyfUNNVQe7KjdOlXDG7I+PgNnrKqq5VpbkEZwwT69p5asd7Xa2h6E
-	NHOgfLi08rjkIpS3svfxj9JL1oCq9ops8eGDcfYtQWDdQ+VsCNDTMSv6pjdkcL+xuUjfxkF12fWn/
-	txOPHFTnlzBYfNFDeFlxobQ+KO+oO6SMR2gpKxaZUlln9bYGHhuQXQWahWag2ullhz7xlArLyS3+e
-	wJXb0XapysHLF1uhindIJUPE8w7N8LTHOLMtFWGsVDCBKQQhV72PgfS6efUk7hetby2TN/C4ntPGf
-	V9GP1YNg==;
+	bh=0uJT5gTIpGFqVn5BDA+jA6ZegGHjTIiqXuV3kQHOKvc=; b=yAvZzdkwIn63b04Z6f4uZW2h/D
+	+1ftbdo1MCv7BJq6ZQJ8bXx0V6Gr3soCIeS0vXq9XZy8h9bIIAILJmQILjKYAxHlVWveRmNDDMAcY
+	5Fk1I+pma4h++A2doMPEyAICamKGL111P0OfoAC/cacCdiwWZDqq3xrcuL/Elr0kfoeCovdp5UHTI
+	7U3o2Lg+acCCHDXC6SHYua8vpqfCsD2ZBpIPIAmREF/WXPtXirq5cD/hnilrUue9X2jqC/b07zUJ/
+	c8PKKMLZ6bS0Sm/uHnybu4/z2N+orzi+1ZYoSYXwDxA9Lf6qjORUwwU8idpg+sjm4qOzg2HveJKii
+	PQYCwjpg==;
 Received: from [50.53.46.231] (helo=[192.168.254.15])
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rFlym-00Fx9I-0K;
-	Wed, 20 Dec 2023 02:06:36 +0000
-Message-ID: <e4077345-0b0a-48a3-a710-cefbd2fcaf15@infradead.org>
-Date: Tue, 19 Dec 2023 18:06:35 -0800
+	id 1rFm1k-00FxUJ-2E;
+	Wed, 20 Dec 2023 02:09:40 +0000
+Message-ID: <f5e1641a-3d92-4822-9ef9-202e6f5b8981@infradead.org>
+Date: Tue, 19 Dec 2023 18:09:40 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,84 +46,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net] ethtool: reformat kerneldoc for struct
- ethtool_link_settings
+ ethtool_fec_stats
 Content-Language: en-US
 To: Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
-References: <87zfy5g35h.fsf@meer.lwn.net>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, linux-kernel@vger.kernel.org
+References: <87v88tg32k.fsf@meer.lwn.net>
 From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <87zfy5g35h.fsf@meer.lwn.net>
+In-Reply-To: <87v88tg32k.fsf@meer.lwn.net>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 12/19/23 15:53, Jonathan Corbet wrote:
-> The kernel doc comments for struct ethtool_link_settings includes
-> documentation for three fields that were never present there, leading to
-> these docs-build warnings:
+On 12/19/23 15:55, Jonathan Corbet wrote:
+> The kerneldoc comment for struct ethtool_fec_stats attempts to describe the
+> "total" and "lanes" fields of the ethtool_fec_stat substructure in a way
+> leading to these warnings:
 > 
->   ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'supported' description in 'ethtool_link_settings'
->   ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'advertising' description in 'ethtool_link_settings'
->   ./include/uapi/linux/ethtool.h:2207: warning: Excess struct member 'lp_advertising' description in 'ethtool_link_settings'
+>   ./include/linux/ethtool.h:424: warning: Excess struct member 'lane' description in 'ethtool_fec_stats'
+>   ./include/linux/ethtool.h:424: warning: Excess struct member 'total' description in 'ethtool_fec_stats'
 > 
-> Remove the entries to make the warnings go away.  There was some
-> information there on how data in >link_mode_masks is formatted; move that
-> to the body of the comment to preserve it.
+> Reformat the comment to retain the information while eliminating the
+> warnings.
 > 
 > Signed-off-by: Jonathan Corbet <corbet@lwn.net>
 
 Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
 
 > ---
->  include/uapi/linux/ethtool.h | 27 +++++++++++++++------------
->  1 file changed, 15 insertions(+), 12 deletions(-)
+>  include/linux/ethtool.h | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-> index f7fba0dc87e5..50253287c321 100644
-> --- a/include/uapi/linux/ethtool.h
-> +++ b/include/uapi/linux/ethtool.h
-> @@ -2128,18 +2128,6 @@ enum ethtool_reset_flags {
->   *	refused. For drivers: ignore this field (use kernel's
->   *	__ETHTOOL_LINK_MODE_MASK_NBITS instead), any change to it will
->   *	be overwritten by kernel.
-> - * @supported: Bitmap with each bit meaning given by
-> - *	%ethtool_link_mode_bit_indices for the link modes, physical
-> - *	connectors and other link features for which the interface
-> - *	supports autonegotiation or auto-detection.  Read-only.
-> - * @advertising: Bitmap with each bit meaning given by
-> - *	%ethtool_link_mode_bit_indices for the link modes, physical
-> - *	connectors and other link features that are advertised through
-> - *	autonegotiation or enabled for auto-detection.
-> - * @lp_advertising: Bitmap with each bit meaning given by
-> - *	%ethtool_link_mode_bit_indices for the link modes, and other
-> - *	link features that the link partner advertised through
-> - *	autonegotiation; 0 if unknown or not applicable.  Read-only.
->   * @transceiver: Used to distinguish different possible PHY types,
->   *	reported consistently by PHYLIB.  Read-only.
->   * @master_slave_cfg: Master/slave port mode.
-> @@ -2181,6 +2169,21 @@ enum ethtool_reset_flags {
->   * %set_link_ksettings() should validate all fields other than @cmd
->   * and @link_mode_masks_nwords that are not described as read-only or
->   * deprecated, and must ignore all fields described as read-only.
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 689028257fcc..77c7a9ac0ece 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -409,8 +409,10 @@ struct ethtool_pause_stats {
+>   *	not entire FEC data blocks. This is a non-standard statistic.
+>   *	Reported to user space as %ETHTOOL_A_FEC_STAT_CORR_BITS.
+>   *
+> - * @lane: per-lane/PCS-instance counts as defined by the standard
+> - * @total: error counts for the entire port, for drivers incapable of reporting
+> + * For each of the above fields, the two substructure members are:
 > + *
-> + * @link_mode_masks is divided into three bitfields, each of length
-> + * @link_mode_masks_nwords:
-> + * - supported: Bitmap with each bit meaning given by
-> + *	%ethtool_link_mode_bit_indices for the link modes, physical
-> + *	connectors and other link features for which the interface
-> + *	supports autonegotiation or auto-detection.  Read-only.
-> + * - advertising: Bitmap with each bit meaning given by
-> + *	%ethtool_link_mode_bit_indices for the link modes, physical
-> + *	connectors and other link features that are advertised through
-> + *	autonegotiation or enabled for auto-detection.
-> + * - lp_advertising: Bitmap with each bit meaning given by
-> + *	%ethtool_link_mode_bit_indices for the link modes, and other
-> + *	link features that the link partner advertised through
-> + *	autonegotiation; 0 if unknown or not applicable.  Read-only.
->   */
->  struct ethtool_link_settings {
->  	__u32	cmd;
+> + * - @lanes: per-lane/PCS-instance counts as defined by the standard
+> + * - @total: error counts for the entire port, for drivers incapable of reporting
+>   *	per-lane stats
+>   *
+>   * Drivers should fill in either only total or per-lane statistics, core
 
 -- 
 #Randy
