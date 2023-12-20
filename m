@@ -1,151 +1,183 @@
-Return-Path: <netdev+bounces-59177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04281819AF5
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:56:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A341B819B05
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:58:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 373D31C21D9B
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:56:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFBD41C25879
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E57C1C6B1;
-	Wed, 20 Dec 2023 08:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE1F1CA9A;
+	Wed, 20 Dec 2023 08:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GLBUmqPM"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QWxxkVe4"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F06B1D545;
-	Wed, 20 Dec 2023 08:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D29F6C0004;
-	Wed, 20 Dec 2023 08:55:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1703062558;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jIY61KijjJ2vNLa1ITXpS8JKIrwLl179AtUUJno4JOc=;
-	b=GLBUmqPMZDyotGZ6JeE+hA5I1T5YZq26MZmBsAsheLlcBVtN96iJXX2b1xKNyh1UwzKBWy
-	YMFkQo3aa4j6nSAOCeciWlOYagyQzwdSnFjdTwtLeHmxxBbBuVEBQGKTXfBEYR0KD84TlB
-	g6y17BPTN9z7P6smKQoG0zuQxJduLIAgICgRUsdW09/fS3nM7DRdrmTaGnX8dYeZs4lU6Q
-	LIIX5dJIf0piuNKdhonW8WV5sFG+cYsZzKu+oUIfCpcNHyfdImmDDU8udDFehfQNx+0nBW
-	iDd9DUgc85RdYUrnN0iyL2sngOCiGYirpoh38fPGXGX8mDGkNPpq9VjiwApEzA==
-Date: Wed, 20 Dec 2023 09:55:56 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, netdev@vger.kernel.org,
- linux-wpan@vger.kernel.org
-Subject: pull-request: ieee802154 for net-next 2023-12-20
-Message-ID: <20231220095556.4d9cef91@xps-13>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7D11F619
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 08:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-553ba2f0c8fso763084a12.1
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 00:57:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1703062631; x=1703667431; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IEnqSCPt7vUlkl/75m/D/rV7ai0B3mDjespBowAGqdw=;
+        b=QWxxkVe4T/dYb0MGmzq1wceWIamlOpyrtfyQPJa0CrqZrX27LysJE4cTHeAMs8flZu
+         KQVRxzuRvXfrvJCsGi366UDy4FbOFXg4mHDAAOjWeW4io+sypZUjvxLv2I1VIKkJo8XR
+         /aJG3mJaw/y5K54n2usYKpc97B6uk1aNrpXS68gVfsYHAt1NvTc5wBZWFYyQ9ve5YyCk
+         ME9tgPBVFlopDLik5rrh/CAv0PhfGfwF4yf+xno0w+n4oHzJ+hkTu0NHtjo3nokHXsby
+         IoiT+eFBn3Lp8aw4pehBkyMG7lxh+qTTMVlNzxnbNGrhPXeSED9F5RbZ4NZkVV5y/oZw
+         D2BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703062631; x=1703667431;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IEnqSCPt7vUlkl/75m/D/rV7ai0B3mDjespBowAGqdw=;
+        b=NfvwIADii7+sl6zK/GGCNrRfpmNatbdmUrNICWOCxvlN5ZllZaJF4EtpxHh2dW/jaX
+         QgRqoHOqW4u5pMMTDLtOsBbOx68uwuKd1LYVTtxXw9HyJitGQR0qXrDFhCQzjMoMiC8e
+         vwjBfrULFzdJ2zBReCdZYKFfvaDmJMQsZs3Fhs8AfWJExd4N/5lZxJLzMgfOYSf8uF03
+         r5HHun6RIvNExZUR22sHe5UwfUzDpTWfdaJyiYt7tqe7lndI4OgzC6gn04gZwnChRkVB
+         f/AENvtrLsTncyTTH5iSbMEYHoxo5qcB18M9079Mxh52MvH+Bloxk8oo/CsHUUgvqhMq
+         UOpA==
+X-Gm-Message-State: AOJu0YxHbJ7ZMtps4rPgxZWVydlHozOTPWIWpekUUn80sKRzMg5VLomb
+	y9OwllH56p/s5BiAQ94z4wDAIJQktnpA2wM5iuU=
+X-Google-Smtp-Source: AGHT+IGiWLLG1AjDvxkCP+uBSuUdmjUYyycT2JXa+ixuF2DvXUSmRQ3Dtp8OQFcgJqoCqs6XfnqQSw==
+X-Received: by 2002:a50:c90c:0:b0:548:68a3:618e with SMTP id o12-20020a50c90c000000b0054868a3618emr5574610edh.9.1703062630842;
+        Wed, 20 Dec 2023 00:57:10 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id fi8-20020a056402550800b005528001d5c6sm6048384edb.62.2023.12.20.00.57.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Dec 2023 00:57:10 -0800 (PST)
+Date: Wed, 20 Dec 2023 09:57:09 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: David Wei <dw@davidwei.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 1/5] netdevsim: maintain a list of probed
+ netdevsims
+Message-ID: <ZYKsZdjn-ZOp11L4@nanopsycho>
+References: <20231220014747.1508581-1-dw@davidwei.uk>
+ <20231220014747.1508581-2-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231220014747.1508581-2-dw@davidwei.uk>
 
-Hello Dave, Jakub, Paolo, Eric.
+Wed, Dec 20, 2023 at 02:47:43AM CET, dw@davidwei.uk wrote:
+>This patch adds a linked list nsim_dev_list of probed netdevsims, added
+>during nsim_drv_probe() and removed during nsim_drv_remove(). A mutex
+>nsim_dev_list_lock protects the list.
 
-This is the ieee802154 pull-request for your *net-next* tree.
+In the commit message, you should use imperative mood, command
+the codebase what to do:
+https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
 
-Thanks,
-Miqu=C3=A8l
 
-The following changes since commit b85ea95d086471afb4ad062012a4d73cd328fa86:
+>
+>Signed-off-by: David Wei <dw@davidwei.uk>
+>---
+> drivers/net/netdevsim/dev.c       | 17 +++++++++++++++++
+> drivers/net/netdevsim/netdevsim.h |  1 +
+> 2 files changed, 18 insertions(+)
+>
+>diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+>index b4d3b9cde8bd..e30a12130e07 100644
+>--- a/drivers/net/netdevsim/dev.c
+>+++ b/drivers/net/netdevsim/dev.c
+>@@ -35,6 +35,9 @@
+> 
+> #include "netdevsim.h"
+> 
+>+static LIST_HEAD(nsim_dev_list);
+>+static DEFINE_MUTEX(nsim_dev_list_lock);
+>+
+> static unsigned int
+> nsim_dev_port_index(enum nsim_dev_port_type type, unsigned int port_index)
+> {
+>@@ -1531,6 +1534,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+> 				 nsim_bus_dev->initial_net, &nsim_bus_dev->dev);
+> 	if (!devlink)
+> 		return -ENOMEM;
+>+	mutex_lock(&nsim_dev_list_lock);
 
-  Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
+I don't follow. You claim you use this mutex to protect the list.
+a) why don't you use spin-lock?
+b) why don't don't you take the lock just for list manipulation?
 
-are available in the Git repository at:
 
-  git@gitolite.kernel.org:pub/scm/linux/kernel/git/wpan/wpan-next.git tags/=
-ieee802154-for-net-next-2023-12-20
-
-for you to fetch changes up to 2373699560a754079579b7722b50d1d38de1960e:
-
-  mac802154: Avoid new associations while disassociating (2023-12-15 11:14:=
-57 +0100)
-
-----------------------------------------------------------------
-This pull request mainly brings support for dynamic associations in the
-WPAN world. Thanks to the recent improvements it was possible to
-discover nearby devices, it is now also possible to associate with them
-to form a sub-network using a specific PAN ID. The support includes
-several functions, such as:
-* Requesting an association to a coordinator, waiting for the response
-* Sending a disassociation notification to a coordinator
-* Receiving an association request when we are coordinator, answering
-  the request (for now all devices are accepted up to a limit, to be
-  refined)
-* Sending a disassociation notification to a child
-* Users may request the list of associated devices (the parent and the
-  children).
-
-Here are a few example of userspace calls that can be made:
-iwpan dev <dev> associate pan_id 2 coord $COORD
-iwpan dev <dev> list_associations
-iwpan dev <dev> disassociate ext_addr $COORD
-
-There are as well two patches from Uwe turning remove callbacks into
-void functions.
-
-----------------------------------------------------------------
-Miquel Raynal (16):
-      ieee802154: Let PAN IDs be reset
-      ieee802154: Internal PAN management
-      ieee802154: Add support for user association requests
-      mac802154: Handle associating
-      ieee802154: Add support for user disassociation requests
-      mac802154: Handle disassociations
-      mac802154: Handle association requests from peers
-      ieee802154: Add support for limiting the number of associated devices
-      mac802154: Follow the number of associated devices
-      mac802154: Handle disassociation notifications from peers
-      ieee802154: Give the user the association list
-      mac80254: Provide real PAN coordinator info in beacons
-      mac802154: Use the PAN coordinator parameter when stamping packets
-      mac802154: Only allow PAN controllers to process association requests
-      ieee802154: Avoid confusing changes after associating
-      mac802154: Avoid new associations while disassociating
-
-Uwe Kleine-K=C3=B6nig (2):
-      ieee802154: fakelb: Convert to platform remove callback returning void
-      ieee802154: hwsim: Convert to platform remove callback returning void
-
- drivers/net/ieee802154/fakelb.c          |   5 +-
- drivers/net/ieee802154/mac802154_hwsim.c |   6 +--
- include/net/cfg802154.h                  |  72 +++++++++++++++++++++++++++=
-++
- include/net/ieee802154_netdev.h          |  60 ++++++++++++++++++++++++
- include/net/nl802154.h                   |  22 ++++++++-
- net/ieee802154/Makefile                  |   2 +-
- net/ieee802154/core.c                    |  24 ++++++++++
- net/ieee802154/nl802154.c                | 249 +++++++++++++++++++++++++++=
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------
- net/ieee802154/pan.c                     | 109 +++++++++++++++++++++++++++=
-+++++++++++++++++
- net/ieee802154/rdev-ops.h                |  30 ++++++++++++
- net/ieee802154/trace.h                   |  38 ++++++++++++++++
- net/mac802154/cfg.c                      | 175 +++++++++++++++++++++++++++=
-+++++++++++++++++++++++++++++++++++++++++++
- net/mac802154/ieee802154_i.h             |  27 +++++++++++
- net/mac802154/main.c                     |   2 +
- net/mac802154/rx.c                       |  36 +++++++++++++--
- net/mac802154/scan.c                     | 407 +++++++++++++++++++++++++++=
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 16 files changed, 1227 insertions(+), 37 deletions(-)
- create mode 100644 net/ieee802154/pan.c
+> 	devl_lock(devlink);
+> 	nsim_dev = devlink_priv(devlink);
+> 	nsim_dev->nsim_bus_dev = nsim_bus_dev;
+>@@ -1544,6 +1548,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+> 	spin_lock_init(&nsim_dev->fa_cookie_lock);
+> 
+> 	dev_set_drvdata(&nsim_bus_dev->dev, nsim_dev);
+>+	list_add(&nsim_dev->list, &nsim_dev_list);
+> 
+> 	nsim_dev->vfconfigs = kcalloc(nsim_bus_dev->max_vfs,
+> 				      sizeof(struct nsim_vf_config),
+>@@ -1607,6 +1612,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+> 
+> 	nsim_dev->esw_mode = DEVLINK_ESWITCH_MODE_LEGACY;
+> 	devl_unlock(devlink);
+>+	mutex_unlock(&nsim_dev_list_lock);
+> 	return 0;
+> 
+> err_hwstats_exit:
+>@@ -1668,8 +1674,18 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
+> {
+> 	struct nsim_dev *nsim_dev = dev_get_drvdata(&nsim_bus_dev->dev);
+> 	struct devlink *devlink = priv_to_devlink(nsim_dev);
+>+	struct nsim_dev *pos, *tmp;
+> 
+>+	mutex_lock(&nsim_dev_list_lock);
+> 	devl_lock(devlink);
+>+
+>+	list_for_each_entry_safe(pos, tmp, &nsim_dev_list, list) {
+>+		if (pos == nsim_dev) {
+>+			list_del(&nsim_dev->list);
+>+			break;
+>+		}
+>+	}
+>+
+> 	nsim_dev_reload_destroy(nsim_dev);
+> 
+> 	nsim_bpf_dev_exit(nsim_dev);
+>@@ -1681,6 +1697,7 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
+> 	kfree(nsim_dev->vfconfigs);
+> 	kfree(nsim_dev->fa_cookie);
+> 	devl_unlock(devlink);
+>+	mutex_unlock(&nsim_dev_list_lock);
+> 	devlink_free(devlink);
+> 	dev_set_drvdata(&nsim_bus_dev->dev, NULL);
+> }
+>diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+>index 028c825b86db..babb61d7790b 100644
+>--- a/drivers/net/netdevsim/netdevsim.h
+>+++ b/drivers/net/netdevsim/netdevsim.h
+>@@ -277,6 +277,7 @@ struct nsim_vf_config {
+> 
+> struct nsim_dev {
+> 	struct nsim_bus_dev *nsim_bus_dev;
+>+	struct list_head list;
+> 	struct nsim_fib_data *fib_data;
+> 	struct nsim_trap_data *trap_data;
+> 	struct dentry *ddir;
+>-- 
+>2.39.3
+>
 
