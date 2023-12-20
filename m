@@ -1,219 +1,149 @@
-Return-Path: <netdev+bounces-59164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6556A819994
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:33:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F31068199BC
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:40:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D7ED283242
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 07:33:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEF5D28239C
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 07:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD7615AD8;
-	Wed, 20 Dec 2023 07:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4B41947F;
+	Wed, 20 Dec 2023 07:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eaI1ixBT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GPx2PC9z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B34B1640D;
-	Wed, 20 Dec 2023 07:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BK4Dlpo022880;
-	Wed, 20 Dec 2023 07:32:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=BnD/wIZiRU3uaH33fmoB/ksRaZee7RDastjX3GeqY2c=; b=ea
-	I1ixBTee++GRkUQVKLhYJsx12ZZpiVVAQXk3lz3yC3r6YihSdPMhg3Me8xiMPu/j
-	gcAJL1QLfdk4Hn7F/YSy0xc2oE2UNySI6fIxf0hUEPYVYPBQcJ2qVDBHHssbAqNC
-	Kuiskpx0r3CCCusQWIWLvy6wuR5nyUm5pTq5sCnybROR/0sAOSeCC1NyL+eZ6F0o
-	flZ6Dayj2edj154r6tP1bEBZKLUuktBAADJ0g0En12Wvr/m5waeLy6dGZAyaQv3i
-	HSDNODvRmoYlI8KLlATygcMJ7lZLdyMta7m/R6j19Vcl1t8CEvn74rwhPzn/yWRl
-	9W0FgdZIDYS1IazDGgaw==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v3fa3hj2t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Dec 2023 07:32:58 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BK7WvM4019047
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Dec 2023 07:32:57 GMT
-Received: from [10.216.10.102] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 19 Dec
- 2023 23:32:48 -0800
-Message-ID: <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
-Date: Wed, 20 Dec 2023 13:02:45 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79361863B;
+	Wed, 20 Dec 2023 07:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD6D7C433C7;
+	Wed, 20 Dec 2023 07:40:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703058023;
+	bh=k13y4aQy798GDSgsKyZ5ZMNS3qH8QIkViAO9lA673gc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GPx2PC9zpycMDTfHo9YJO3DMnJDMthFukMzqDofVq9wxI4Yk7mP/tkieJT075it51
+	 HaSFrMAun1FMk/ueqesv0ZhCQiVQZ/QQQPcmvjOqvXKMp20Ak+hO3/CHvDpySrFkpL
+	 59K15d1edS4Mre6dJX90j7rZPf/hMqWK1GVts2oPU9/qFO65KRe6hgQBCMqNlV3inw
+	 Ao4SqkbOrGfYoYdIK0MT5a53tmvUXNgq86Vp423VOUCPDVqR4p/QrxGj0dN0GoC1ga
+	 4vOUZtXg15JvtMlGka8GY6kPOUwwkTAEOq4462A6AJKkqfB7Fn3LZTTehY20cuAsZS
+	 1GdDtcbphnXoA==
+Date: Wed, 20 Dec 2023 09:40:18 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Long Li <longli@microsoft.com>
+Cc: "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [Patch v4 0/3] Register with RDMA SOC interface and support for
+ CQ
+Message-ID: <20231220074018.GA136797@unreal>
+References: <1702692255-23640-1-git-send-email-longli@linuxonhyperv.com>
+ <20231217132548.GC4886@unreal>
+ <PH7PR21MB3263ADBB8113D2BF2DDC0552CE90A@PH7PR21MB3263.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
- 2.5G SGMII
-Content-Language: en-US
-To: Andrew Halaney <ahalaney@redhat.com>
-CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@quicinc.com>
-References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
- <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
-From: Sneh Shah <quic_snehshah@quicinc.com>
-In-Reply-To: <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 7Ut7UXyS2eIOhFoqn7Ux1zDtvLQ-HMcx
-X-Proofpoint-ORIG-GUID: 7Ut7UXyS2eIOhFoqn7Ux1zDtvLQ-HMcx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- phishscore=0 spamscore=0 suspectscore=0 mlxlogscore=999 impostorscore=0
- clxscore=1015 adultscore=0 mlxscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2312200050
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH7PR21MB3263ADBB8113D2BF2DDC0552CE90A@PH7PR21MB3263.namprd21.prod.outlook.com>
 
+On Mon, Dec 18, 2023 at 06:23:21PM +0000, Long Li wrote:
+> > Subject: Re: [Patch v4 0/3] Register with RDMA SOC interface and support for CQ
+> > 
+> > On Fri, Dec 15, 2023 at 06:04:12PM -0800, longli@linuxonhyperv.com wrote:
+> > > From: Long Li <longli@microsoft.com>
+> > >
+> > > This patchset add support for registering a RDMA device with SoC for
+> > > support of querying device capabilities, upcoming RC queue pairs and
+> > > CQ interrupts.
+> > >
+> > > This patchset is partially based on Ajay Sharma's work:
+> > > https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore
+> > > .kernel.org%2Fnetdev%2F1697494322-26814-1-git-send-email-sharmaajay%40
+> > >
+> > linuxonhyperv.com&data=05%7C02%7Clongli%40microsoft.com%7Caaadcacece2
+> > b
+> > >
+> > 44117bfd08dbff03b2c3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C
+> > 6383
+> > >
+> > 84163586869634%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJ
+> > QIjoiV2l
+> > >
+> > uMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=e4G1tI9
+> > VOTGv
+> > > rA3UF6YQZ%2BM2uDDd71sZpejOvhl2y60%3D&reserved=0
+> > >
+> > > Changes in v2:
+> > > Dropped the patches to create EQs for RC QP. They will be implemented
+> > > with RC patches.
+> > 
+> > You sent twice v2, never sent v3 and two days later sent v4 without even
+> > explaining why.
+> > 
+> > Can you please invest time and write more detailed changelog which will include
+> > v2, v3 and v4 changes?
+> > 
+> > Tanks
+> 
+> I'm sorry, the cover letter for the 2nd v2 should be v3 (it was a typo). The rest of the patches in that series are correctly labeled as v3.
+> 
+> For v3 and v4, I put the change log in the individual patches, as there are no changes to the cover letter. If you think I should put change logs in the cover letter, please let me know.
 
+For the future submission, yes, please write changelog in the cover letter.
 
-On 12/18/2023 9:50 PM, Andrew Halaney wrote:
-> On Mon, Dec 18, 2023 at 12:41:18PM +0530, Sneh Shah wrote:
->> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
->> mode for 1G/100M/10M speed.
->> Added changes to configure serdes phy and mac based on link speed.
->>
->> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
->> ---
->>  .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 31 +++++++++++++++++--
->>  1 file changed, 29 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> index d3bf42d0fceb..b3a28dc19161 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> @@ -21,6 +21,7 @@
->>  #define RGMII_IO_MACRO_CONFIG2		0x1C
->>  #define RGMII_IO_MACRO_DEBUG1		0x20
->>  #define EMAC_SYSTEM_LOW_POWER_DEBUG	0x28
->> +#define ETHQOS_MAC_AN_CTRL		0xE0
->>  
->>  /* RGMII_IO_MACRO_CONFIG fields */
->>  #define RGMII_CONFIG_FUNC_CLK_EN		BIT(30)
->> @@ -78,6 +79,10 @@
->>  #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
->>  #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
->>  
->> +/*ETHQOS_MAC_AN_CTRL bits */
->> +#define ETHQOS_MAC_AN_CTRL_RAN			BIT(9)
->> +#define ETHQOS_MAC_AN_CTRL_ANE			BIT(12)
->> +
-> 
-> nit: space please add a space before ETHQOS_MAC_AN_CTRL
-> 
-will take care of this in next patch
+Thanks
 
->>  struct ethqos_emac_por {
->>  	unsigned int offset;
->>  	unsigned int value;
->> @@ -109,6 +114,7 @@ struct qcom_ethqos {
->>  	unsigned int num_por;
->>  	bool rgmii_config_loopback_en;
->>  	bool has_emac_ge_3;
->> +	unsigned int serdes_speed;
->>  };
->>  
->>  static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
->> @@ -600,27 +606,47 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
->>  
->>  static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
->>  {
->> -	int val;
->> -
->> +	int val, mac_an_value;
->>  	val = readl(ethqos->mac_base + MAC_CTRL_REG);
->> +	mac_an_value = readl(ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
->>  
->>  	switch (ethqos->speed) {
->> +	case SPEED_2500:
->> +		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
->> +		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->> +			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->> +			      RGMII_IO_MACRO_CONFIG2);
->> +		if (ethqos->serdes_speed != SPEED_2500)
->> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
->> +		mac_an_value &= ~ETHQOS_MAC_AN_CTRL_ANE;
->> +		break;
->>  	case SPEED_1000:
->>  		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
->>  		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->>  			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->>  			      RGMII_IO_MACRO_CONFIG2);
->> +		if (ethqos->serdes_speed != SPEED_1000)
->> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
->> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
->>  		break;
->>  	case SPEED_100:
->>  		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
->> +		if (ethqos->serdes_speed != SPEED_1000)
->> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
->> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
->>  		break;
->>  	case SPEED_10:
->>  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
->>  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
->> +		if (ethqos->serdes_speed != SPEED_1000)
->> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
->> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
->>  		break;
->>  	}
->>  
->>  	writel(val, ethqos->mac_base + MAC_CTRL_REG);
->> +	writel(mac_an_value, ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
->> +	ethqos->serdes_speed = ethqos->speed;
 > 
-> I see these bits are generic and there's some functions in stmmac_pcs.h
-> that muck with these...
+> Subject: [Patch v4 2/3] RDMA/mana_ib: query device capabilities
+> Change in v4:
+> On query device failure, goto deregister_device, not ib_free_device
+> Change function name mana_ib_query_adapter_caps() to mana_ib_gd_query_adapter_caps() to better reflect this is a HWC request
 > 
-> Could you help me understand if this really should be Qualcomm specific,
-> or if this is something that should be considered for the more core bits
-> of the driver? I feel in either case we should take advantage of the
-> common definitions in that file if possible.
+> Subject: [Patch v4 3/3] RDMA/mana_ib: Add CQ interrupt support for RAW QP
+> Change in v3:
+> Removed unused varaible mana_ucontext in mana_ib_create_qp_rss().
+> Simplified error handling in mana_ib_create_qp_rss() on failure to allocate queues for rss table.
 > 
-we do have function dwmac_ctrl_ane in core driver which updates same registers. However, it does not have the option to reset ANE bit, it can only set bits. For SPEED_2500 we need to reset ANE bit. Hence I am adding it here. Not sure if we can extend dwmac_ctrl_ane function to reset bits as well.
->>  
->>  	return val;
->>  }
->> @@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>  				     "Failed to get serdes phy\n");
->>  
->>  	ethqos->speed = SPEED_1000;
->> +	ethqos->serdes_speed = SPEED_1000;
->>  	ethqos_update_link_clk(ethqos, SPEED_1000);
->>  	ethqos_set_func_clk_en(ethqos);
->>  
->> -- 
->> 2.17.1
->>
+> Thanks,
 > 
+> Long
+> 
+> > 
+> > >
+> > >
+> > > Long Li (3):
+> > >   RDMA/mana_ib: register RDMA device with GDMA
+> > >   RDMA/mana_ib: query device capabilities
+> > >   RDMA/mana_ib: Add CQ interrupt support for RAW QP
+> > >
+> > >  drivers/infiniband/hw/mana/cq.c               | 34 ++++++-
+> > >  drivers/infiniband/hw/mana/device.c           | 31 +++++--
+> > >  drivers/infiniband/hw/mana/main.c             | 69 ++++++++++----
+> > >  drivers/infiniband/hw/mana/mana_ib.h          | 53 +++++++++++
+> > >  drivers/infiniband/hw/mana/qp.c               | 90 ++++++++++++++++---
+> > >  .../net/ethernet/microsoft/mana/gdma_main.c   |  5 ++
+> > >  include/net/mana/gdma.h                       |  5 ++
+> > >  7 files changed, 252 insertions(+), 35 deletions(-)
+> > >
+> > > --
+> > > 2.25.1
+> > >
 
