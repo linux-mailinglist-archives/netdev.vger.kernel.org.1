@@ -1,39 +1,64 @@
-Return-Path: <netdev+bounces-59291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A8A881A3A3
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:04:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F9181A3AB
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:05:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5E22B222D6
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:04:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 194B11F26689
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B042946439;
-	Wed, 20 Dec 2023 16:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0DF46BBC;
+	Wed, 20 Dec 2023 16:02:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r+2gZ7NQ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bHDOQ1Gx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8F74776A;
-	Wed, 20 Dec 2023 16:01:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3DD0C433C7;
-	Wed, 20 Dec 2023 16:01:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703088102;
-	bh=CSa9vgnYzla1CprgzfBcXsc621DZ4W/ZOKDD7gCZCkY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=r+2gZ7NQizZOTLdTMypX8PTNe4zhCKmn5V4QP+/IHWYvtm1aEXom+X5RpsGOLGfzd
-	 J5HlOFlaQHyPrFTRqYzyPjP9zr6HocL48UO6BUY0igY2It6ekHCZ1CQ5c63yCJK/r/
-	 eCseZG9ZuAhuyDEVWuEZuXXx/O6G+zmp1kIHa2JsI2kjDaCdUEdd53sZqEDVwNvbmL
-	 OWOGHLzbxALpz8+0/MtVGNWn2wQ4logZp4feSFk2VdhBo+oCUjP4oCNy4Po8NXDxPx
-	 uUAC9UoWYQV/vfzkqRJd47OdhZxOfsSh2V7jY59ebMnFOmnMI0Tc1DMp8TJPhu+iFv
-	 ClBF4ZmNDM1bA==
-Message-ID: <d617df2b-620f-4a6f-b7dd-852bf156f904@kernel.org>
-Date: Wed, 20 Dec 2023 17:01:37 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF42E4779D
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 16:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7b8529ce303so14110739f.1
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 08:01:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703088117; x=1703692917; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DcPluFRGpggHy96amEkA7xW2rTce18tDWJabwptLjLY=;
+        b=bHDOQ1GxQ8Yp1oP7Z1viVusZcCiM0FEYQlxe8+at0oCig/v/2IjgmLZVFi9AZrrNVJ
+         YglNAsSwDkSAwN9xeHW0dK0fQqKCddl5YwX6PA+1Zt6kw3c7RY4578FMhSzxXlWm93Iu
+         nAOwKmUv18sVa+JoiJVYq7xnteapWbPS17pQvVJDtYWzfdOmhEvTiA61ew5nxqyQIiJD
+         KVrJt5c1c2p3ddC3o+GCtTSuva5LPrtAVdRDeZUDZc4I25SLgz1AKIn+gNDZWSPq06gD
+         3JIA6/MwG24sd4hLhV47AmaDo4B4HoFLc2LbtZVD6+dRWBPwXspleP6PC8el1jdgO09P
+         vtFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703088117; x=1703692917;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DcPluFRGpggHy96amEkA7xW2rTce18tDWJabwptLjLY=;
+        b=Y0NEHtyB1SIhlCGbaHBTePpaOW3oV+R9N4c4TiATVRxpkPwzBKNY0qOMLZCKdW5LMx
+         vPHaMudJHIPZN4KJwEZBaOHrftgLtKJmbe5RqMezDCiwBs4XSmgsTxfiz9I+F7mzb8M7
+         gFaDy9Tt5t1xEmcvrtEB1i3vC/nJfXwxuNo67T1GI1BgYhtpVeFbsf+uOElFUtYvb+g+
+         POfEN8MvQNZzusHogOSGlh4o0YHrnftcel4FetAMB4jaKnc91G+F5bCrKtHM8iEjqxC2
+         yFO+15LK98PlsJpV+D24g+hgSH+gHFYCTdba2yhSnvnjgEFdz0qfbWySBg3nQIr9TR8R
+         k+EA==
+X-Gm-Message-State: AOJu0YxmRtDwbkx803uhs1qB9Ino+irw/iRYs0uyPjJbeHmYa7v5qoNh
+	fZSpeBIvZoTuXcA7Nlk1wsI0Mg==
+X-Google-Smtp-Source: AGHT+IE94XHZiXNj4010rjiK9IYLWbQeslWZq7W3grQ3wlqAe4nOcprSIxzt6Fc/CX1vAmlDJY9Syw==
+X-Received: by 2002:a05:6e02:1b08:b0:35f:b559:c2c7 with SMTP id i8-20020a056e021b0800b0035fb559c2c7mr9877173ilv.3.1703088116729;
+        Wed, 20 Dec 2023 08:01:56 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id j9-20020a05663822c900b0046cdcd20b6fsm209616jat.163.2023.12.20.08.01.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Dec 2023 08:01:55 -0800 (PST)
+Message-ID: <57580a95-685d-4920-acbe-dc4e71f70bf5@kernel.dk>
+Date: Wed, 20 Dec 2023 09:01:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,286 +66,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 3/3] xdp: add multi-buff support for xdp
- running in generic mode
+Subject: Re: [RFC PATCH v3 06/20] io_uring: separate header for exported net
+ bits
 Content-Language: en-US
-To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
- toke@redhat.com, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
- sdf@google.com, Yan Zhai <yan@cloudflare.com>
-References: <cover.1702563810.git.lorenzo@kernel.org>
- <e73a75e0d0f81a3b20568675829df4763fa0d389.1702563810.git.lorenzo@kernel.org>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <e73a75e0d0f81a3b20568675829df4763fa0d389.1702563810.git.lorenzo@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20231219210357.4029713-1-dw@davidwei.uk>
+ <20231219210357.4029713-7-dw@davidwei.uk>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20231219210357.4029713-7-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 14/12/2023 15.29, Lorenzo Bianconi wrote:
-> Similar to native xdp, do not always linearize the skb in
-> netif_receive_generic_xdp routine but create a non-linear xdp_buff to be
-> processed by the eBPF program. This allow to add  multi-buffer support
-> for xdp running in generic mode.
+On 12/19/23 2:03 PM, David Wei wrote:
+> From: Pavel Begunkov <asml.silence@gmail.com>
 > 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->   net/core/dev.c | 153 +++++++++++++++++++++++++++++++++++++++++++------
->   1 file changed, 134 insertions(+), 19 deletions(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index d7857de03dba..47164acc3268 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4854,6 +4854,12 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
->   	xdp_init_buff(xdp, frame_sz, &rxqueue->xdp_rxq);
->   	xdp_prepare_buff(xdp, hard_start, skb_headroom(skb) - mac_len,
->   			 skb_headlen(skb) + mac_len, true);
-> +	if (skb_is_nonlinear(skb)) {
-> +		skb_shinfo(skb)->xdp_frags_size = skb->data_len;
-> +		xdp_buff_set_frags_flag(xdp);
-> +	} else {
-> +		xdp_buff_clear_frags_flag(xdp);
-> +	}
->   
->   	orig_data_end = xdp->data_end;
->   	orig_data = xdp->data;
-> @@ -4883,6 +4889,14 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
->   		skb->len += off; /* positive on grow, negative on shrink */
->   	}
->   
-> +	/* XDP frag metadata (e.g. nr_frags) are updated in eBPF helpers
-> +	 * (e.g. bpf_xdp_adjust_tail), we need to update data_len here.
-> +	 */
-> +	if (xdp_buff_has_frags(xdp))
-> +		skb->data_len = skb_shinfo(skb)->xdp_frags_size;
-> +	else
-> +		skb->data_len = 0;
-> +
->   	/* check if XDP changed eth hdr such SKB needs update */
->   	eth = (struct ethhdr *)xdp->data;
->   	if ((orig_eth_type != eth->h_proto) ||
-> @@ -4916,12 +4930,118 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
->   	return act;
->   }
->   
-> +static int netif_skb_segment_for_xdp(struct sk_buff **pskb,
+> We're exporting some io_uring bits to networking, e.g. for implementing
+> a net callback for io_uring cmds, but we don't want to expose more than
+> needed. Add a separate header for networking.
 
-This function "...segment_for_xdp" always reallocate SKB and copies all
-bits over.
-Should it have been named "skb_realloc_for_xdp" ?
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-I was really hopeing we can find a design to avoid doing this realloc.
-
-If the BPF-prog doesn't write into any of the fragments, then we can
-avoid this realloc (+copy) dance. We designed XDP multi-buff to have
-exactly the same layout+location as SKB in skb_shared_info, exactly to
-avoid having to reallocated.
-
-More comments inline below...
-
-> +				     struct bpf_prog *prog)
-> +{
-> +#if IS_ENABLED(CONFIG_PAGE_POOL)
-> +	struct softnet_data *sd = this_cpu_ptr(&softnet_data);
-> +	u32 size, truesize, len, max_head_size, off;
-> +	struct sk_buff *skb = *pskb, *nskb;
-> +	int err, i, head_off;
-> +	void *data;
-> +
-> +	/* XDP does not support fraglist so we need to linearize
-> +	 * the skb.
-> +	 */
-> +	if (skb_has_frag_list(skb) || !prog->aux->xdp_has_frags)
-> +		return -EOPNOTSUPP;
-> +
-> +	max_head_size = SKB_WITH_OVERHEAD(PAGE_SIZE - XDP_PACKET_HEADROOM);
-> +	if (skb->len > max_head_size + MAX_SKB_FRAGS * PAGE_SIZE)
-> +		return -ENOMEM;
-> +
-> +	size = min_t(u32, skb->len, max_head_size);
-> +	truesize = SKB_HEAD_ALIGN(size) + XDP_PACKET_HEADROOM;
-> +	data = page_pool_dev_alloc_va(sd->page_pool, &truesize);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	nskb = napi_build_skb(data, truesize);
-> +	if (!nskb) {
-> +		page_pool_free_va(sd->page_pool, data, true);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	skb_reserve(nskb, XDP_PACKET_HEADROOM);
-> +	skb_copy_header(nskb, skb);
-> +	skb_mark_for_recycle(nskb);
-> +
-> +	err = skb_copy_bits(skb, 0, nskb->data, size);
-
-This will likely copy part of the "frags" into the SKB "head" area.
-
-Especially for netstack generated TCP packets, this will change the
-segmentation layout significantly.  I wonder what (performance) effects
-this will have on further handling of these SKBs.
+-- 
+Jens Axboe
 
 
-
-> +	if (err) {
-> +		consume_skb(nskb);
-> +		return err;
-> +	}
-> +	skb_put(nskb, size);
-> +
-> +	head_off = skb_headroom(nskb) - skb_headroom(skb);
-> +	skb_headers_offset_update(nskb, head_off);
-> +
-> +	off = size;
-> +	len = skb->len - off;
-> +	for (i = 0; i < MAX_SKB_FRAGS && off < skb->len; i++) {
-> +		struct page *page;
-> +		u32 page_off;
-> +
-> +		size = min_t(u32, len, PAGE_SIZE);
-> +		truesize = size;
-> +
-> +		page = page_pool_dev_alloc(sd->page_pool, &page_off,
-> +					   &truesize);
-> +		if (!data) {
-> +			consume_skb(nskb);
-> +			return -ENOMEM;
-> +		}
-> +
-> +		skb_add_rx_frag(nskb, i, page, page_off, size, truesize);
-> +		err = skb_copy_bits(skb, off, page_address(page) + page_off,
-> +				    size);
-
-I think it is correct, but we can easily endup with the new SKB (nskb)
-having a different nskb->nr_frags.
-
-
-> +		if (err) {
-> +			consume_skb(nskb);
-> +			return err;
-> +		}
-> +
-> +		len -= size;
-> +		off += size;
-> +	}
-> +
-> +	consume_skb(skb);
-> +	*pskb = nskb;
-> +
-> +	return 0;
-> +#else
-> +	return -EOPNOTSUPP;
-> +#endif
-> +}
-> +
-> +static int netif_skb_check_for_xdp(struct sk_buff **pskb,
-> +				   struct bpf_prog *prog)
-> +{
-> +	struct sk_buff *skb = *pskb;
-> +	int err, hroom, troom;
-> +
-> +	if (!netif_skb_segment_for_xdp(pskb, prog))
-> +		return 0;
-
-IMHO the code call logic, does not make it easy to add cases where we
-can avoid the realloc.  With this patch, it feels like the realloc+copy
-code path is the "main" code path for XDP-generic.
-
-Our goal should be to avoid realloc.
-
-My goal for XDP multi-buff was/is that it can co-exist with GSO/GRO
-packets.  This patchset is a step in the direction of enabling GRO on
-devices with XDP (generic) loaded.  And I was really excited about this,
-but the overhead is going to be massive compared to normal GRO (without
-realloc+copy) that XDP end-users are going to be disappointed.
-
-
-> +
-> +	/* In case we have to go down the path and also linearize,
-> +	 * then lets do the pskb_expand_head() work just once here.
-> +	 */
-> +	hroom = XDP_PACKET_HEADROOM - skb_headroom(skb);
-> +	troom = skb->tail + skb->data_len - skb->end;
-> +	err = pskb_expand_head(skb,
-> +			       hroom > 0 ? ALIGN(hroom, NET_SKB_PAD) : 0,
-> +			       troom > 0 ? troom + 128 : 0, GFP_ATOMIC);
-> +	if (err)
-> +		return err;
-> +
-> +	return skb_linearize(skb);
-> +}
-> +
->   static u32 netif_receive_generic_xdp(struct sk_buff **pskb,
->   				     struct xdp_buff *xdp,
->   				     struct bpf_prog *xdp_prog)
->   {
->   	struct sk_buff *skb = *pskb;
-> -	u32 act = XDP_DROP;
-> +	u32 mac_len, act = XDP_DROP;
->   
->   	/* Reinjected packets coming from act_mirred or similar should
->   	 * not get XDP generic processing.
-> @@ -4929,41 +5049,36 @@ static u32 netif_receive_generic_xdp(struct sk_buff **pskb,
->   	if (skb_is_redirected(skb))
->   		return XDP_PASS;
->   
-> -	/* XDP packets must be linear and must have sufficient headroom
-> -	 * of XDP_PACKET_HEADROOM bytes. This is the guarantee that also
-> -	 * native XDP provides, thus we need to do it here as well.
-> +	/* XDP packets must have sufficient headroom of XDP_PACKET_HEADROOM
-> +	 * bytes. This is the guarantee that also native XDP provides,
-> +	 * thus we need to do it here as well.
-
-Some "native" XDP provider only have 192 bytes as HEADROOM and XDP code
-can this not being static (256 bytes).  So, perhaps it is time to allow
-XDP generic to only require 192 bytes?
-
->   	 */
-> +	mac_len = skb->data - skb_mac_header(skb);
-> +	__skb_push(skb, mac_len);
-> +
->   	if (skb_cloned(skb) || skb_is_nonlinear(skb) ||
->   	    skb_headroom(skb) < XDP_PACKET_HEADROOM) {
-> -		int hroom = XDP_PACKET_HEADROOM - skb_headroom(skb);
-> -		int troom = skb->tail + skb->data_len - skb->end;
-> -
-> -		/* In case we have to go down the path and also linearize,
-> -		 * then lets do the pskb_expand_head() work just once here.
-> -		 */
-> -		if (pskb_expand_head(skb,
-> -				     hroom > 0 ? ALIGN(hroom, NET_SKB_PAD) : 0,
-> -				     troom > 0 ? troom + 128 : 0, GFP_ATOMIC))
-> -			goto do_drop;
-> -		if (skb_linearize(skb))
-> +		if (netif_skb_check_for_xdp(pskb, xdp_prog))
->   			goto do_drop;
->   	}
->   
-> -	act = bpf_prog_run_generic_xdp(skb, xdp, xdp_prog);
-> +	__skb_pull(*pskb, mac_len);
-> +
-> +	act = bpf_prog_run_generic_xdp(*pskb, xdp, xdp_prog);
->   	switch (act) {
->   	case XDP_REDIRECT:
->   	case XDP_TX:
->   	case XDP_PASS:
->   		break;
->   	default:
-> -		bpf_warn_invalid_xdp_action(skb->dev, xdp_prog, act);
-> +		bpf_warn_invalid_xdp_action((*pskb)->dev, xdp_prog, act);
->   		fallthrough;
->   	case XDP_ABORTED:
-> -		trace_xdp_exception(skb->dev, xdp_prog, act);
-> +		trace_xdp_exception((*pskb)->dev, xdp_prog, act);
->   		fallthrough;
->   	case XDP_DROP:
->   	do_drop:
-> -		kfree_skb(skb);
-> +		kfree_skb(*pskb);
->   		break;
->   	}
->   
 
