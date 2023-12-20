@@ -1,607 +1,176 @@
-Return-Path: <netdev+bounces-59149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55D928197E2
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 05:51:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B7C8197E4
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 05:53:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CC191C249BB
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 04:51:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6080287319
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 04:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78ABCBE4E;
-	Wed, 20 Dec 2023 04:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89AEAC2D0;
+	Wed, 20 Dec 2023 04:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JNHOXwoN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1yXN7tr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293E6C2C5
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 04:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FAAC2C3;
+	Wed, 20 Dec 2023 04:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2cc6b56eadaso40873941fa.1
-        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 20:51:14 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d3ec3db764so1714905ad.2;
+        Tue, 19 Dec 2023 20:53:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703047873; x=1703652673; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=oY8NRVG5rLKrrD15x2U4hm4P0XTpgUCML4KaCFrYZ2M=;
-        b=JNHOXwoNStcDvxlicXVZOEHr51SqIZs4cpF15piMZBVq0mS6MdvIMMDN38jMMrzZ+l
-         8AYx1Cdc7M0CJRw7xL2nqkwFZBdHfv+4JzpvkjAvYqdnpbkbd1DiYpPfggnThlgDtzMx
-         qqdOgZ2MbDYCjipZGCjT/NyppVRHZSf4zbT8mP4To7Ve4PcDQDsFe+ijDo1zGQaiPLWr
-         FvK4mF5/TrEr+zRyKMHsESHLn9gtAgx+cujNKPCRbPLEnbS1R6HyfWAumvmSaQtVWZem
-         KLc4mxcJztjfmyCgQLqma7NlsGLM5/P0PWFe+dyuHNgFHvp8v5wy0THiFhbAHYFGm4aE
-         1rtQ==
+        d=gmail.com; s=20230601; t=1703048006; x=1703652806; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oCdzME/wc/7u1TobMBsXQV40LzKB+51jmYS/oXHHLXc=;
+        b=U1yXN7trYxo5D5Cxn2wMtvdgBW3I5iibYfDFs+EFVSw5RrbfgW0V2JnepSR/eknnuU
+         EpsL1gq9zU6faocDbEF/Ti5rt/BJZ6sCf9LKtG6rp+EtS/AXtm154DOsdw1KiJGz/8+Q
+         90xmBL1sHW2UxzNBmw3aYdpGUwgpof+FhbTMA/Fl+6aZVcqpgnRmy0MKJIgc5xP97YJy
+         F1wF+OcWP3zrw+0a0dThfuDTzdTIACAlYBAzUuGY2hZu+AvFIkVRkEnYjU9TMWyxGUmW
+         k1MbWzy4dpmD0LefHPRdQvz5G56rv0fzHrQSKfEr2fLUcwx+zoBHRPiuohAygutq9bhC
+         Nq5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703047873; x=1703652673;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1703048006; x=1703652806;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oY8NRVG5rLKrrD15x2U4hm4P0XTpgUCML4KaCFrYZ2M=;
-        b=myvBG3jc00j3K4QyAS6TB0UR0NKMn8G1HEMscWeFBck/DZPjRxXLwZHFLnOu0c+B8h
-         uTzPj28pE8UGi8jmi8bzXBHK/0jrtUzGa/iFKAjnlNbg00EAMlib8kpkZGchvYl8F1iS
-         VkmMLCsMFDms8n28rl6mqAri7ORjsOLhaA9pssNzVUOAF+TBYiJiz6HMZ92l1ISQZH5u
-         +Jkumx+60gmp/rydaqoHmefGgiBQt7oNH654/s/UCrL28rWKA3GsHnFzqI7lye4sdXPv
-         v7Mo/NH+BHUSW1HE+3JbtDLVnQOQs34PH5O7DX+zRng9I0iu5cXn+FJ6vR5WutvoxY6K
-         Ynrg==
-X-Gm-Message-State: AOJu0Yy0wJ+Gm8ey/pdb939Ydb/tY5J+EERnR345GjGK9CsId0JYO1Yf
-	ykQZIPQOvgEOyIbMbOVWPCFhH73MAyobszdF7L0=
-X-Google-Smtp-Source: AGHT+IHlM6S+H7uJTw38I5zmW/A1BFRX6ZoQy+u3xN/j2ZvBP4o0PvlQ6ig4ULKsH/3T1aafWTt4WwW3QZTa9Y//DjU=
-X-Received: by 2002:a2e:9403:0:b0:2cb:27cb:3d7d with SMTP id
- i3-20020a2e9403000000b002cb27cb3d7dmr9217155ljh.84.1703047872657; Tue, 19 Dec
- 2023 20:51:12 -0800 (PST)
+        bh=oCdzME/wc/7u1TobMBsXQV40LzKB+51jmYS/oXHHLXc=;
+        b=rE5XCdMQRrA3mriUyyQ+b2wzaQK1WiBM2T0NBYltjj3Z5GidlMHsjofugLiTpWnkM/
+         xgVKCwzyFXOgb6yYWrKEz9LPv43NDWG2emKDWMxj2ZsmyX4UBjq/piVFuho4XkI6+dNK
+         cVvNbI5Xjb3NZpTonZ6QdPhqz/4MygRSNih8eYQVpwgAacpkTOYEgB2io7akENIKfbuY
+         G/Is3ERQEP8KcC+x2DNaHQhgI/bhzcQrBdWpOGnGtCTFcxAZdYDoqKXAN+xpDfet5aeZ
+         h4ebF38e6FMGTD3rLE444TNrJOHQEqKJx/0dVZtQba80iHEtAtFg4Ac7ga5I3n9sLA1E
+         rLEA==
+X-Gm-Message-State: AOJu0YwmqkWB0eNs26ofu06VAp536AlnUby5Arj7eERb6aYSvKIk4thQ
+	hFwqaAQT0BOK5nMhzSSkqCctq/ZqFT+DPimB
+X-Google-Smtp-Source: AGHT+IF3u/O7Dv8UZexVlCWkA9GaEQFhA0ieTFtwHTi+OR/olqfkZ7X0BSr1dk7b18xZlKq863OlDg==
+X-Received: by 2002:a17:902:a58b:b0:1d0:8d57:482 with SMTP id az11-20020a170902a58b00b001d08d570482mr9234611plb.50.1703048006398;
+        Tue, 19 Dec 2023 20:53:26 -0800 (PST)
+Received: from tresc054937.tre-sc.gov.br ([187.94.103.218])
+        by smtp.gmail.com with ESMTPSA id u7-20020a170902b28700b001cfcd2fb7b0sm3049318plr.285.2023.12.19.20.53.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 20:53:25 -0800 (PST)
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Subject: [PATCH net-next] net: mdio: get/put device node during (un)registration
+Date: Wed, 20 Dec 2023 01:52:29 -0300
+Message-ID: <20231220045228.27079-2-luizluca@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231220042632.26825-1-luizluca@gmail.com> <20231220042632.26825-6-luizluca@gmail.com>
-In-Reply-To: <20231220042632.26825-6-luizluca@gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Wed, 20 Dec 2023 01:51:01 -0300
-Message-ID: <CAJq09z4OP6Djuv=HkntCqyLM1332pXzhW0qBd4fc-pfrSt+r1A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/7] net: dsa: realtek: Migrate user_mii_bus
- setup to realtek-dsa
-To: olteanv@gmail.com
-Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch, 
-	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello Vladimir,
+The __of_mdiobus_register() function was storing the device node in
+dev.of_node without increasing its reference count. It implicitly relied
+on the caller to maintain the allocated node until the mdiobus was
+unregistered.
 
-I'm sorry to bother you again but I would like your attention for two
-points that I'm not completely sure about.
+Now, __of_mdiobus_register() will acquire the node before assigning it,
+and of_mdiobus_unregister_callback() will be called at the end of
+mdio_unregister().
 
-> In the user MDIO driver, despite numerous references to SMI, including
-> its compatible string, there's nothing inherently specific about the SMI
-> interface in the user MDIO bus. Consequently, the code has been migrated
-> to the common module. All references to SMI have been eliminated, with
-> the exception of the compatible string, which will continue to function
-> as before.
->
-> The realtek-mdio will now use this driver instead of the generic DSA
-> driver ("dsa user smi"), which should not be used with OF[1].
->
-> There was a change in how the driver looks for the MDIO node in the
-> device tree. Now, it first checks for a child node named "mdio," which
-> is required by both interfaces in binding docs but used previously only
-> by realtek-mdio. If the node is not found, it will also look for a
-> compatible string, required only by SMI-connected devices in binding
-> docs and compatible with the old realtek-smi behavior.
->
-> The line assigning dev.of_node in mdio_bus has been removed since the
-> subsequent of_mdiobus_register will always overwrite it.
->
-> ds->user_mii_bus is only defined if all user ports do not declare a
-> phy-handle, providing a warning about the erroneous device tree[2].
->
-> With a single ds_ops for both interfaces, the ds_ops in realtek_priv is
-> no longer necessary. Now, the realtek_variant.ds_ops can be used
-> directly.
->
-> The realtek_priv.setup_interface() has been removed as we can directly
-> call the new common function.
->
-> The switch unregistration and the MDIO node decrement in refcount were
-> moved into realtek_common_remove() as both interfaces now need to put
-> the MDIO node.
->
-> [1] https://lkml.kernel.org/netdev/20220630200423.tieprdu5fpabflj7@bang-olufsen.dk/T/
-> [2] https://lkml.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/T/#u
->
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> ---
->  drivers/net/dsa/realtek/realtek-common.c | 87 +++++++++++++++++++++++-
->  drivers/net/dsa/realtek/realtek-common.h |  1 +
->  drivers/net/dsa/realtek/realtek-mdio.c   |  6 --
->  drivers/net/dsa/realtek/realtek-smi.c    | 68 ------------------
->  drivers/net/dsa/realtek/realtek.h        |  5 +-
->  drivers/net/dsa/realtek/rtl8365mb.c      | 49 ++-----------
->  drivers/net/dsa/realtek/rtl8366rb.c      | 52 ++------------
->  7 files changed, 100 insertions(+), 168 deletions(-)
->
-> diff --git a/drivers/net/dsa/realtek/realtek-common.c b/drivers/net/dsa/realtek/realtek-common.c
-> index bf3933a99072..b1f0095d5bce 100644
-> --- a/drivers/net/dsa/realtek/realtek-common.c
-> +++ b/drivers/net/dsa/realtek/realtek-common.c
-> @@ -1,6 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0+
->
->  #include <linux/module.h>
-> +#include <linux/of_mdio.h>
->
->  #include "realtek.h"
->  #include "realtek-common.h"
-> @@ -21,6 +22,85 @@ void realtek_common_unlock(void *ctx)
->  }
->  EXPORT_SYMBOL_GPL(realtek_common_unlock);
->
-> +static int realtek_common_user_mdio_read(struct mii_bus *bus, int addr,
-> +                                        int regnum)
-> +{
-> +       struct realtek_priv *priv = bus->priv;
-> +
-> +       return priv->ops->phy_read(priv, addr, regnum);
-> +}
-> +
-> +static int realtek_common_user_mdio_write(struct mii_bus *bus, int addr,
-> +                                         int regnum, u16 val)
-> +{
-> +       struct realtek_priv *priv = bus->priv;
-> +
-> +       return priv->ops->phy_write(priv, addr, regnum, val);
-> +}
-> +
-> +int realtek_common_setup_user_mdio(struct dsa_switch *ds)
-> +{
-> +       const char *compatible = "realtek,smi-mdio";
-> +       struct realtek_priv *priv =  ds->priv;
-> +       struct device_node *phy_node;
-> +       struct device_node *mdio_np;
-> +       struct dsa_port *dp;
-> +       int ret;
-> +
-> +       mdio_np = of_get_child_by_name(priv->dev->of_node, "mdio");
-> +       if (!mdio_np) {
-> +               mdio_np = of_get_compatible_child(priv->dev->of_node, compatible);
-> +               if (!mdio_np) {
-> +                       dev_err(priv->dev, "no MDIO bus node\n");
-> +                       return -ENODEV;
-> +               }
-> +       }
+Drivers can now release the node immediately after MDIO registration.
+Some of them are already doing that even before this patch.
 
-I just kept the code compatible with both realtek-smi and realtek-mdio
-(that was using the generic "DSA user mii"), even when it might
-violate the binding docs (for SMI with a node not named "mdio").
+Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+---
+ drivers/net/mdio/of_mdio.c | 12 +++++++++++-
+ drivers/net/phy/mdio_bus.c |  3 +++
+ include/linux/phy.h        |  3 +++
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
-You suggested using two new compatible strings for this driver
-("realtek,rtl8365mb-mdio" and "realtek,rtl8366rb-mdio"). However, it
-might still not be a good name as it is similar to the MDIO-connected
-subdriver of each variant. Anyway, if possible, I would like to keep
-it out of this series as it would first require a change in the
-bindings before any real code change and it might add some more path
-cycles.
+diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
+index 64ebcb6d235c..9b6cab6154e0 100644
+--- a/drivers/net/mdio/of_mdio.c
++++ b/drivers/net/mdio/of_mdio.c
+@@ -139,6 +139,11 @@ bool of_mdiobus_child_is_phy(struct device_node *child)
+ }
+ EXPORT_SYMBOL(of_mdiobus_child_is_phy);
+ 
++static void __of_mdiobus_unregister_callback(struct mii_bus *mdio)
++{
++	of_node_put(mdio->dev.of_node);
++}
++
+ /**
+  * __of_mdiobus_register - Register mii_bus and create PHYs from the device tree
+  * @mdio: pointer to mii_bus structure
+@@ -166,6 +171,8 @@ int __of_mdiobus_register(struct mii_bus *mdio, struct device_node *np,
+ 	 * the device tree are populated after the bus has been registered */
+ 	mdio->phy_mask = ~0;
+ 
++	mdio->__unregister_callback = __of_mdiobus_unregister_callback;
++	of_node_get(np);
+ 	device_set_node(&mdio->dev, of_fwnode_handle(np));
+ 
+ 	/* Get bus level PHY reset GPIO details */
+@@ -177,7 +184,7 @@ int __of_mdiobus_register(struct mii_bus *mdio, struct device_node *np,
+ 	/* Register the MDIO bus */
+ 	rc = __mdiobus_register(mdio, owner);
+ 	if (rc)
+-		return rc;
++		goto put_node;
+ 
+ 	/* Loop over the child nodes and register a phy_device for each phy */
+ 	for_each_available_child_of_node(np, child) {
+@@ -237,6 +244,9 @@ int __of_mdiobus_register(struct mii_bus *mdio, struct device_node *np,
+ unregister:
+ 	of_node_put(child);
+ 	mdiobus_unregister(mdio);
++
++put_node:
++	of_node_put(np);
+ 	return rc;
+ }
+ EXPORT_SYMBOL(__of_mdiobus_register);
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index 25dcaa49ab8b..1229b8e4c53b 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -787,6 +787,9 @@ void mdiobus_unregister(struct mii_bus *bus)
+ 		gpiod_set_value_cansleep(bus->reset_gpiod, 1);
+ 
+ 	device_del(&bus->dev);
++
++	if (bus->__unregister_callback)
++		bus->__unregister_callback(bus);
+ }
+ EXPORT_SYMBOL(mdiobus_unregister);
+ 
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index e5f1f41e399c..2b383da4d825 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -433,6 +433,9 @@ struct mii_bus {
+ 
+ 	/** @shared: shared state across different PHYs */
+ 	struct phy_package_shared *shared[PHY_MAX_ADDR];
++
++	/** @__unregister_callback: called at the last step of unregistration */
++	void (*__unregister_callback)(struct mii_bus *bus);
+ };
+ #define to_mii_bus(d) container_of(d, struct mii_bus, dev)
+ 
+-- 
+2.43.0
 
-> +       priv->user_mii_bus = devm_mdiobus_alloc(priv->dev);
-> +       if (!priv->user_mii_bus) {
-> +               ret = -ENOMEM;
-> +               goto err_put_node;
-> +       }
-> +       priv->user_mii_bus->priv = priv;
-> +       priv->user_mii_bus->name = "Realtek user MII";
-> +       priv->user_mii_bus->read = realtek_common_user_mdio_read;
-> +       priv->user_mii_bus->write = realtek_common_user_mdio_write;
-> +       snprintf(priv->user_mii_bus->id, MII_BUS_ID_SIZE, "Realtek-%d",
-> +                ds->index);
-> +       priv->user_mii_bus->parent = priv->dev;
-> +
-> +       /* When OF describes the MDIO, connecting ports with phy-handle,
-> +        * ds->user_mii_bus should not be used *
-> +        */
-> +       dsa_switch_for_each_user_port(dp, ds) {
-> +               phy_node = of_parse_phandle(dp->dn, "phy-handle", 0);
-> +               of_node_put(phy_node);
-> +               if (phy_node)
-> +                       continue;
-> +
-> +               dev_warn(priv->dev,
-> +                        "DS user_mii_bus in use as '%s' is missing phy-handle",
-> +                        dp->name);
-> +               ds->user_mii_bus = priv->user_mii_bus;
-> +               break;
-> +       }
-
-Does this check align with how should ds->user_mii_bus be used (in a
-first step for phasing it out, at least for this driver)?
-
-> +
-> +       ret = devm_of_mdiobus_register(priv->dev, priv->user_mii_bus, mdio_np);
-> +       if (ret) {
-> +               dev_err(priv->dev, "unable to register MDIO bus %s\n",
-> +                       priv->user_mii_bus->id);
-> +               goto err_put_node;
-> +       }
-> +
-> +       return 0;
-> +
-> +err_put_node:
-> +       of_node_put(mdio_np);
-> +
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(realtek_common_setup_user_mdio);
-> +
->  /* sets up driver private data struct, sets up regmaps, parse common device-tree
->   * properties and finally issues a hardware reset.
->   */
-> @@ -108,7 +188,7 @@ int realtek_common_register_switch(struct realtek_priv *priv)
->
->         priv->ds->priv = priv;
->         priv->ds->dev = priv->dev;
-> -       priv->ds->ops = priv->ds_ops;
-> +       priv->ds->ops = priv->variant->ds_ops;
->         priv->ds->num_ports = priv->num_ports;
->
->         ret = dsa_register_switch(priv->ds);
-> @@ -126,6 +206,11 @@ void realtek_common_remove(struct realtek_priv *priv)
->         if (!priv)
->                 return;
->
-> +       dsa_unregister_switch(priv->ds);
-> +
-> +       if (priv->user_mii_bus)
-> +               of_node_put(priv->user_mii_bus->dev.of_node);
-> +
->         /* leave the device reset asserted */
->         if (priv->reset)
->                 gpiod_set_value(priv->reset, 1);
-> diff --git a/drivers/net/dsa/realtek/realtek-common.h b/drivers/net/dsa/realtek/realtek-common.h
-> index 518d091ff496..b1c2a50d85cd 100644
-> --- a/drivers/net/dsa/realtek/realtek-common.h
-> +++ b/drivers/net/dsa/realtek/realtek-common.h
-> @@ -7,6 +7,7 @@
->
->  void realtek_common_lock(void *ctx);
->  void realtek_common_unlock(void *ctx);
-> +int realtek_common_setup_user_mdio(struct dsa_switch *ds);
->  struct realtek_priv *
->  realtek_common_probe(struct device *dev, struct regmap_config rc,
->                      struct regmap_config rc_nolock);
-> diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
-> index 967f6c1e8df0..e2b5432eeb26 100644
-> --- a/drivers/net/dsa/realtek/realtek-mdio.c
-> +++ b/drivers/net/dsa/realtek/realtek-mdio.c
-> @@ -142,7 +142,6 @@ int realtek_mdio_probe(struct mdio_device *mdiodev)
->         priv->bus = mdiodev->bus;
->         priv->mdio_addr = mdiodev->addr;
->         priv->write_reg_noack = realtek_mdio_write;
-> -       priv->ds_ops = priv->variant->ds_ops_mdio;
->
->         ret = realtek_common_register_switch(priv);
->         if (ret)
-> @@ -156,11 +155,6 @@ void realtek_mdio_remove(struct mdio_device *mdiodev)
->  {
->         struct realtek_priv *priv = dev_get_drvdata(&mdiodev->dev);
->
-> -       if (!priv)
-> -               return;
-> -
-> -       dsa_unregister_switch(priv->ds);
-> -
->         realtek_common_remove(priv);
->  }
->  EXPORT_SYMBOL_GPL(realtek_mdio_remove);
-> diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
-> index 2b2c6e34bae5..383689163057 100644
-> --- a/drivers/net/dsa/realtek/realtek-smi.c
-> +++ b/drivers/net/dsa/realtek/realtek-smi.c
-> @@ -31,7 +31,6 @@
->  #include <linux/spinlock.h>
->  #include <linux/skbuff.h>
->  #include <linux/of.h>
-> -#include <linux/of_mdio.h>
->  #include <linux/delay.h>
->  #include <linux/gpio/consumer.h>
->  #include <linux/platform_device.h>
-> @@ -339,63 +338,6 @@ static const struct regmap_config realtek_smi_nolock_regmap_config = {
->         .disable_locking = true,
->  };
->
-> -static int realtek_smi_mdio_read(struct mii_bus *bus, int addr, int regnum)
-> -{
-> -       struct realtek_priv *priv = bus->priv;
-> -
-> -       return priv->ops->phy_read(priv, addr, regnum);
-> -}
-> -
-> -static int realtek_smi_mdio_write(struct mii_bus *bus, int addr, int regnum,
-> -                                 u16 val)
-> -{
-> -       struct realtek_priv *priv = bus->priv;
-> -
-> -       return priv->ops->phy_write(priv, addr, regnum, val);
-> -}
-> -
-> -static int realtek_smi_setup_mdio(struct dsa_switch *ds)
-> -{
-> -       struct realtek_priv *priv =  ds->priv;
-> -       struct device_node *mdio_np;
-> -       int ret;
-> -
-> -       mdio_np = of_get_compatible_child(priv->dev->of_node, "realtek,smi-mdio");
-> -       if (!mdio_np) {
-> -               dev_err(priv->dev, "no MDIO bus node\n");
-> -               return -ENODEV;
-> -       }
-> -
-> -       priv->user_mii_bus = devm_mdiobus_alloc(priv->dev);
-> -       if (!priv->user_mii_bus) {
-> -               ret = -ENOMEM;
-> -               goto err_put_node;
-> -       }
-> -       priv->user_mii_bus->priv = priv;
-> -       priv->user_mii_bus->name = "SMI user MII";
-> -       priv->user_mii_bus->read = realtek_smi_mdio_read;
-> -       priv->user_mii_bus->write = realtek_smi_mdio_write;
-> -       snprintf(priv->user_mii_bus->id, MII_BUS_ID_SIZE, "SMI-%d",
-> -                ds->index);
-> -       priv->user_mii_bus->dev.of_node = mdio_np;
-> -       priv->user_mii_bus->parent = priv->dev;
-> -       ds->user_mii_bus = priv->user_mii_bus;
-> -
-> -       ret = devm_of_mdiobus_register(priv->dev, priv->user_mii_bus, mdio_np);
-> -       if (ret) {
-> -               dev_err(priv->dev, "unable to register MDIO bus %s\n",
-> -                       priv->user_mii_bus->id);
-> -               goto err_put_node;
-> -       }
-> -
-> -       return 0;
-> -
-> -err_put_node:
-> -       of_node_put(mdio_np);
-> -
-> -       return ret;
-> -}
-> -
->  int realtek_smi_probe(struct platform_device *pdev)
->  {
->         struct device *dev = &pdev->dev;
-> @@ -417,8 +359,6 @@ int realtek_smi_probe(struct platform_device *pdev)
->                 return PTR_ERR(priv->mdio);
->
->         priv->write_reg_noack = realtek_smi_write_reg_noack;
-> -       priv->setup_interface = realtek_smi_setup_mdio;
-> -       priv->ds_ops = priv->variant->ds_ops_smi;
->
->         ret = realtek_common_register_switch(priv);
->         if (ret)
-> @@ -432,14 +372,6 @@ void realtek_smi_remove(struct platform_device *pdev)
->  {
->         struct realtek_priv *priv = platform_get_drvdata(pdev);
->
-> -       if (!priv)
-> -               return;
-> -
-> -       dsa_unregister_switch(priv->ds);
-> -
-> -       if (priv->user_mii_bus)
-> -               of_node_put(priv->user_mii_bus->dev.of_node);
-> -
->         realtek_common_remove(priv);
->  }
->  EXPORT_SYMBOL_GPL(realtek_smi_remove);
-> diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-> index fbd0616c1df3..7af6dcc1bb24 100644
-> --- a/drivers/net/dsa/realtek/realtek.h
-> +++ b/drivers/net/dsa/realtek/realtek.h
-> @@ -60,7 +60,6 @@ struct realtek_priv {
->
->         spinlock_t              lock; /* Locks around command writes */
->         struct dsa_switch       *ds;
-> -       const struct dsa_switch_ops *ds_ops;
->         struct irq_domain       *irqdomain;
->         bool                    leds_disabled;
->
-> @@ -71,7 +70,6 @@ struct realtek_priv {
->         struct rtl8366_mib_counter *mib_counters;
->
->         const struct realtek_ops *ops;
-> -       int                     (*setup_interface)(struct dsa_switch *ds);
->         int                     (*write_reg_noack)(void *ctx, u32 addr, u32 data);
->
->         int                     vlan_enabled;
-> @@ -115,8 +113,7 @@ struct realtek_ops {
->  };
->
->  struct realtek_variant {
-> -       const struct dsa_switch_ops *ds_ops_smi;
-> -       const struct dsa_switch_ops *ds_ops_mdio;
-> +       const struct dsa_switch_ops *ds_ops;
->         const struct realtek_ops *ops;
->         unsigned int clk_delay;
->         u8 cmd_read;
-> diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-> index 58ec057b6c32..e890ad113ba3 100644
-> --- a/drivers/net/dsa/realtek/rtl8365mb.c
-> +++ b/drivers/net/dsa/realtek/rtl8365mb.c
-> @@ -828,17 +828,6 @@ static int rtl8365mb_phy_write(struct realtek_priv *priv, int phy, int regnum,
->         return 0;
->  }
->
-> -static int rtl8365mb_dsa_phy_read(struct dsa_switch *ds, int phy, int regnum)
-> -{
-> -       return rtl8365mb_phy_read(ds->priv, phy, regnum);
-> -}
-> -
-> -static int rtl8365mb_dsa_phy_write(struct dsa_switch *ds, int phy, int regnum,
-> -                                  u16 val)
-> -{
-> -       return rtl8365mb_phy_write(ds->priv, phy, regnum, val);
-> -}
-> -
->  static const struct rtl8365mb_extint *
->  rtl8365mb_get_port_extint(struct realtek_priv *priv, int port)
->  {
-> @@ -2017,12 +2006,10 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
->         if (ret)
->                 goto out_teardown_irq;
->
-> -       if (priv->setup_interface) {
-> -               ret = priv->setup_interface(ds);
-> -               if (ret) {
-> -                       dev_err(priv->dev, "could not set up MDIO bus\n");
-> -                       goto out_teardown_irq;
-> -               }
-> +       ret = realtek_common_setup_user_mdio(ds);
-> +       if (ret) {
-> +               dev_err(priv->dev, "could not set up MDIO bus\n");
-> +               goto out_teardown_irq;
->         }
->
->         /* Start statistics counter polling */
-> @@ -2116,28 +2103,7 @@ static int rtl8365mb_detect(struct realtek_priv *priv)
->         return 0;
->  }
->
-> -static const struct dsa_switch_ops rtl8365mb_switch_ops_smi = {
-> -       .get_tag_protocol = rtl8365mb_get_tag_protocol,
-> -       .change_tag_protocol = rtl8365mb_change_tag_protocol,
-> -       .setup = rtl8365mb_setup,
-> -       .teardown = rtl8365mb_teardown,
-> -       .phylink_get_caps = rtl8365mb_phylink_get_caps,
-> -       .phylink_mac_config = rtl8365mb_phylink_mac_config,
-> -       .phylink_mac_link_down = rtl8365mb_phylink_mac_link_down,
-> -       .phylink_mac_link_up = rtl8365mb_phylink_mac_link_up,
-> -       .port_stp_state_set = rtl8365mb_port_stp_state_set,
-> -       .get_strings = rtl8365mb_get_strings,
-> -       .get_ethtool_stats = rtl8365mb_get_ethtool_stats,
-> -       .get_sset_count = rtl8365mb_get_sset_count,
-> -       .get_eth_phy_stats = rtl8365mb_get_phy_stats,
-> -       .get_eth_mac_stats = rtl8365mb_get_mac_stats,
-> -       .get_eth_ctrl_stats = rtl8365mb_get_ctrl_stats,
-> -       .get_stats64 = rtl8365mb_get_stats64,
-> -       .port_change_mtu = rtl8365mb_port_change_mtu,
-> -       .port_max_mtu = rtl8365mb_port_max_mtu,
-> -};
-> -
-> -static const struct dsa_switch_ops rtl8365mb_switch_ops_mdio = {
-> +static const struct dsa_switch_ops rtl8365mb_switch_ops = {
->         .get_tag_protocol = rtl8365mb_get_tag_protocol,
->         .change_tag_protocol = rtl8365mb_change_tag_protocol,
->         .setup = rtl8365mb_setup,
-> @@ -2146,8 +2112,6 @@ static const struct dsa_switch_ops rtl8365mb_switch_ops_mdio = {
->         .phylink_mac_config = rtl8365mb_phylink_mac_config,
->         .phylink_mac_link_down = rtl8365mb_phylink_mac_link_down,
->         .phylink_mac_link_up = rtl8365mb_phylink_mac_link_up,
-> -       .phy_read = rtl8365mb_dsa_phy_read,
-> -       .phy_write = rtl8365mb_dsa_phy_write,
->         .port_stp_state_set = rtl8365mb_port_stp_state_set,
->         .get_strings = rtl8365mb_get_strings,
->         .get_ethtool_stats = rtl8365mb_get_ethtool_stats,
-> @@ -2167,8 +2131,7 @@ static const struct realtek_ops rtl8365mb_ops = {
->  };
->
->  const struct realtek_variant rtl8365mb_variant = {
-> -       .ds_ops_smi = &rtl8365mb_switch_ops_smi,
-> -       .ds_ops_mdio = &rtl8365mb_switch_ops_mdio,
-> +       .ds_ops = &rtl8365mb_switch_ops,
->         .ops = &rtl8365mb_ops,
->         .clk_delay = 10,
->         .cmd_read = 0xb9,
-> diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-> index e60a0a81d426..56619aa592ec 100644
-> --- a/drivers/net/dsa/realtek/rtl8366rb.c
-> +++ b/drivers/net/dsa/realtek/rtl8366rb.c
-> @@ -1027,12 +1027,10 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
->         if (ret)
->                 dev_info(priv->dev, "no interrupt support\n");
->
-> -       if (priv->setup_interface) {
-> -               ret = priv->setup_interface(ds);
-> -               if (ret) {
-> -                       dev_err(priv->dev, "could not set up MDIO bus\n");
-> -                       return -ENODEV;
-> -               }
-> +       ret = realtek_common_setup_user_mdio(ds);
-> +       if (ret) {
-> +               dev_err(priv->dev, "could not set up MDIO bus\n");
-> +               return -ENODEV;
->         }
->
->         return 0;
-> @@ -1772,17 +1770,6 @@ static int rtl8366rb_phy_write(struct realtek_priv *priv, int phy, int regnum,
->         return ret;
->  }
->
-> -static int rtl8366rb_dsa_phy_read(struct dsa_switch *ds, int phy, int regnum)
-> -{
-> -       return rtl8366rb_phy_read(ds->priv, phy, regnum);
-> -}
-> -
-> -static int rtl8366rb_dsa_phy_write(struct dsa_switch *ds, int phy, int regnum,
-> -                                  u16 val)
-> -{
-> -       return rtl8366rb_phy_write(ds->priv, phy, regnum, val);
-> -}
-> -
->  static int rtl8366rb_reset_chip(struct realtek_priv *priv)
->  {
->         int timeout = 10;
-> @@ -1848,35 +1835,9 @@ static int rtl8366rb_detect(struct realtek_priv *priv)
->         return 0;
->  }
->
-> -static const struct dsa_switch_ops rtl8366rb_switch_ops_smi = {
-> -       .get_tag_protocol = rtl8366_get_tag_protocol,
-> -       .setup = rtl8366rb_setup,
-> -       .phylink_get_caps = rtl8366rb_phylink_get_caps,
-> -       .phylink_mac_link_up = rtl8366rb_mac_link_up,
-> -       .phylink_mac_link_down = rtl8366rb_mac_link_down,
-> -       .get_strings = rtl8366_get_strings,
-> -       .get_ethtool_stats = rtl8366_get_ethtool_stats,
-> -       .get_sset_count = rtl8366_get_sset_count,
-> -       .port_bridge_join = rtl8366rb_port_bridge_join,
-> -       .port_bridge_leave = rtl8366rb_port_bridge_leave,
-> -       .port_vlan_filtering = rtl8366rb_vlan_filtering,
-> -       .port_vlan_add = rtl8366_vlan_add,
-> -       .port_vlan_del = rtl8366_vlan_del,
-> -       .port_enable = rtl8366rb_port_enable,
-> -       .port_disable = rtl8366rb_port_disable,
-> -       .port_pre_bridge_flags = rtl8366rb_port_pre_bridge_flags,
-> -       .port_bridge_flags = rtl8366rb_port_bridge_flags,
-> -       .port_stp_state_set = rtl8366rb_port_stp_state_set,
-> -       .port_fast_age = rtl8366rb_port_fast_age,
-> -       .port_change_mtu = rtl8366rb_change_mtu,
-> -       .port_max_mtu = rtl8366rb_max_mtu,
-> -};
-> -
-> -static const struct dsa_switch_ops rtl8366rb_switch_ops_mdio = {
-> +static const struct dsa_switch_ops rtl8366rb_switch_ops = {
->         .get_tag_protocol = rtl8366_get_tag_protocol,
->         .setup = rtl8366rb_setup,
-> -       .phy_read = rtl8366rb_dsa_phy_read,
-> -       .phy_write = rtl8366rb_dsa_phy_write,
->         .phylink_get_caps = rtl8366rb_phylink_get_caps,
->         .phylink_mac_link_up = rtl8366rb_mac_link_up,
->         .phylink_mac_link_down = rtl8366rb_mac_link_down,
-> @@ -1915,8 +1876,7 @@ static const struct realtek_ops rtl8366rb_ops = {
->  };
->
->  const struct realtek_variant rtl8366rb_variant = {
-> -       .ds_ops_smi = &rtl8366rb_switch_ops_smi,
-> -       .ds_ops_mdio = &rtl8366rb_switch_ops_mdio,
-> +       .ds_ops = &rtl8366rb_switch_ops,
->         .ops = &rtl8366rb_ops,
->         .clk_delay = 10,
->         .cmd_read = 0xa9,
-> --
-> 2.43.0
->
 
