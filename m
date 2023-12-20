@@ -1,143 +1,208 @@
-Return-Path: <netdev+bounces-59186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C1E819B99
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:44:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7DA1819BA3
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:46:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 589C8B25288
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:44:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12B5AB25446
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5D31F5FA;
-	Wed, 20 Dec 2023 09:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="hbt1/iby";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bScPBrRJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BACF1F5FF;
+	Wed, 20 Dec 2023 09:46:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303A41CAA7
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 09:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id B7E4A3200A6C;
-	Wed, 20 Dec 2023 04:44:04 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 20 Dec 2023 04:44:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1703065444;
-	 x=1703151844; bh=Ls+WKw9KClvsNkQvaepGMoohiyAloZB9fflQvlu/laE=; b=
-	hbt1/ibyBHT11K/+9XVI8kGscBCHgMDNNlt83Ly2VNSxh0w3i/6nMqjCxYpS3uaC
-	jz9a+2Ur6CeeinMgW4tJ/lIoC7JhqCsEBtqjFsuLiKNpU+X8SGVFzYa9c6cYvxWA
-	33z4pGtj2YGUMyS/WWOIT4vl9SMCr092+MVSJxdScKj31swYqt9TX56ajI9N12Ij
-	UU1TkjdC5vmZjqc6z3816Zr2QchkMW37ZWeSi7u80kYN1KJ6VnH8ILdgnsT6nmVl
-	AGulzPKAx0hOx6fcA4ln46Fx48suR0yv76VFku+I7CdYJF4pfCglABh5NP6Cc5mm
-	bf7Cys6zEcmrOheoilGYNw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1703065444; x=
-	1703151844; bh=Ls+WKw9KClvsNkQvaepGMoohiyAloZB9fflQvlu/laE=; b=b
-	ScPBrRJtS/Lk4mU7fKCaLmIiWAuqWC/8+6e9TAbJDsW5gWZeAXIQBCZgCKWE3rNe
-	v0oLtVd1ZaDQiohjeRVIYzpXmgKsPrPP88Rkgt4OTUAcTr2FME/zfD4NafPktSmr
-	6SvUoubGB7NIxVl9I3N9QVqzzHKmHYfOjFTWcooLjPETHX9H+YvgNI6AT/FBs6bx
-	cyMWTd51HtlpCyUn3Nk7QKyfiR/DDBDwx1i8p8hEzIk/oPyibGse96Q6qDxVusFa
-	GmaNs+r63VaStBQ70v7ZvK9WNIzGIj2QL9UmV9sEuoIQtuzz4DCohdMy8Xq3vMh2
-	0azh/2V072stVPhxTm1+w==
-X-ME-Sender: <xms:Y7eCZfSmc3W1-YPHy1NwGFWZeIxPYMWHaE2z75WOlBm9d-e0rg6UIg>
-    <xme:Y7eCZQxqI7NanAYuXJIINFE4368EgyvA_-KXJ4Iqq6TNQi0IIh95AF9Abf2V6tBdK
-    QOUh3kl4JmIxV2hZzs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdduvddgtdelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpefgkeeuleegieeghfduudeltdekfeffjeeuleehleefudettddtgfevueef
-    feeigeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:Y7eCZU1HyznyxYL_3b8Gq1GK97lxoQfX0Q2z0JtAo5H5uz3aQ2dnvw>
-    <xmx:Y7eCZfD1ewN4sQZ24Ek4vCCc2YlMrC7egLLkQsnXoB5WlQ2Kn7VgwA>
-    <xmx:Y7eCZYgbQfB1pgnYUe7z6gMfQzZWa1rdbeCmYYeaFyO8xa0XKGbUJg>
-    <xmx:ZLeCZbsR8ZeiYRI7X7DncSSPDAHjNgKYNrwgYimOUMrNffnda71UBA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 7F599B6008D; Wed, 20 Dec 2023 04:44:03 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1364-ga51d5fd3b7-fm-20231219.001-ga51d5fd3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070931F5E4
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 09:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rFt9w-00032F-RJ; Wed, 20 Dec 2023 10:46:36 +0100
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rFt9t-000DKM-LV; Wed, 20 Dec 2023 10:46:34 +0100
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rFt9u-007uXL-LS; Wed, 20 Dec 2023 10:46:34 +0100
+Date: Wed, 20 Dec 2023 10:46:34 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Eric Dumazet <edumazet@google.com>, kernel@pengutronix.de,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: Fix PHY loopback
+ configuration for KSZ8794 and KSZ8873
+Message-ID: <20231220094634.GG1697233@pengutronix.de>
+References: <20231121152426.4188456-1-o.rempel@pengutronix.de>
+ <20231121152426.4188456-1-o.rempel@pengutronix.de>
+ <20231121152426.4188456-3-o.rempel@pengutronix.de>
+ <20231121152426.4188456-3-o.rempel@pengutronix.de>
+ <20231207002823.2qx24nxjhn6e43w4@skbuf>
+ <20231207051502.GB1324895@pengutronix.de>
+ <20231207140030.ki625ety6cg3ujxn@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <0d7cddc9-03fa-43db-a579-14f3e822615b@app.fastmail.com>
-In-Reply-To: <658266e18643_19028729436@willemb.c.googlers.com.notmuch>
-References: <a9090be2-ca7c-494c-89cb-49b1db2438ba@corelatus.se>
- <658266e18643_19028729436@willemb.c.googlers.com.notmuch>
-Date: Wed, 20 Dec 2023 09:43:45 +0000
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
- "Thomas Lange" <thomas@corelatus.se>, Netdev <netdev@vger.kernel.org>,
- "Deepa Dinamani" <deepa.kernel@gmail.com>
-Cc: =?UTF-8?Q?J=C3=B6rn-Thorben_Hinz?= <jthinz@mailbox.tu-berlin.de>
-Subject: Re: net/core/sock.c lacks some SO_TIMESTAMPING_NEW support
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231207140030.ki625ety6cg3ujxn@skbuf>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Dec 20, 2023, at 04:00, Willem de Bruijn wrote:
-> Thomas Lange wrote:
->> diff --git a/net/core/sock.c b/net/core/sock.c
->> index 16584e2dd648..a56ec1d492c9 100644
->> --- a/net/core/sock.c
->> +++ b/net/core/sock.c
->> @@ -2821,6 +2821,7 @@ int __sock_cmsg_send(struct sock *sk, struct cm=
-sghdr *cmsg,
->>                  sockc->mark =3D *(u32 *)CMSG_DATA(cmsg);
->>                  break;
->>          case SO_TIMESTAMPING_OLD:
->> +       case SO_TIMESTAMPING_NEW:
->>                  if (cmsg->cmsg_len !=3D CMSG_LEN(sizeof(u32)))
->>                          return -EINVAL;
->>=20
->> However, looking through the module, it seems that sk_getsockopt() ha=
-s no
->> support for SO_TIMESTAMPING_NEW either, but sk_setsockopt() has.
->
-> Good point. Adding the author to see if this was a simple oversight or
-> there was a rationale at the time for leaving it out.
+On Thu, Dec 07, 2023 at 04:00:30PM +0200, Vladimir Oltean wrote:
+> On Thu, Dec 07, 2023 at 06:15:02AM +0100, Oleksij Rempel wrote:
+> > On Thu, Dec 07, 2023 at 02:28:23AM +0200, Vladimir Oltean wrote:
+> > > On Tue, Nov 21, 2023 at 04:24:26PM +0100, Oleksij Rempel wrote:
+> > > > Correct the PHY loopback bit handling in the ksz8_w_phy_bmcr and
+> > > > ksz8_r_phy_bmcr functions for KSZ8794 and KSZ8873 variants in the ksz8795
+> > > > driver. Previously, the code erroneously used Bit 7 of port register 0xD
+> > > > for both chip variants, which is actually for LED configuration. This
+> > > > update ensures the correct registers and bits are used for the PHY
+> > > > loopback feature:
+> > > > 
+> > > > - For KSZ8794: Use 0xF / Bit 7.
+> > > > - For KSZ8873: Use 0xD / Bit 0.
+> > > > 
+> > > > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > > > ---
+> > > 
+> > > How did you find, and how did you test this, and on which one of the switches?
+> > 
+> > I tested it by using "ethtool -t lanX" command on KSZ8873. Before this
+> > patch the link will stop to work _after_ end of the selftest. The
+> > selftest will fail too.
+> > 
+> > After this patch, the selftest is passed, except of the TCP test. And
+> > link is working _after_ the selftest,
+> 
+> So you are suggesting that this far-end loopback mode does work as
+> expected by the kernel.
+> 
+> But is that consistent with the description from the datasheet? It speaks
+> about an "originating PHY port", but maybe this is confusing, because
+> based on your test, even the CPU port could be originating the traffic
+> that gets looped back?
+> 
+> I see it says that far-end loopback goes through the switching fabric.
+> So the packet, on its return path from the loopback port, gets forwarded
+> by its MAC DA? That can't be, because the MAC DA lookup has already
+> determined the destination to be the loopback port (and no MAC SA<->DA
+> swapping should take place). Or it is forced by the switch to return
+> specifically to the originating port?
+> 
+> With a bridge between the 2 LAN ports, and lan1 put in loopback, what
+> happens if you send a broadcast packet towards lan1? Will you also see
+> it on lan2's link partner, or only on the CPU port?
+> 
+> It's not your fault, but this is all a bit confusing, and I'm not quite
+> able to match up the documentation with your results. I will trust the
+> experimental results, however.
 
-I'm fairly sure this was just a mistake on our side. For the cmsg case,
-I think we just missed it because there is no corresponding SO_TIMESTAMP=
-{,NS}
-version of this, so it fell through the cracks.
+I did following tests:
+ip l a name br0 type bridge
+ip l s dev br0 up
+ip l s lan1 master br0
+ip l s dev lan1 up
+ip l s lan2 master br0
+ip l s dev lan2 up
 
-In the patch above, I'm not entirely sure about what needs to happen
-with the old/new format, i.e. the
+# to avoid link drop with the loopback mode
+ethtool -s lan1 speed 100 duplex full autoneg off
+# currently no tool support loopback configuration, so set it directly
+# to the register
+mii -i lan1 -p 0 -r 0 -v 6120
 
-   sock_valbool_flag(sk, SOCK_TSTAMP_NEW, optname =3D=3D SO_TIMESTAMPING=
-_NEW)
+################# Test 1 ###########################
+# on DUT
+ping 192.168.2.200 -I lan1
 
-from setsockopt(). Is __sock_cmsg_send() allowed to turn on timestamping
-without it being first enabled using setsockopt()? If so, I think
-we need to set the flag here the same way that setsockopt does. If
-not, then I think we instead should check that the old/new format
-in the option sent via cmsg is the same that was set earlier with
-setsockopt.
+on eth0/cpu interface:
+00:03:20.656445 AF Unknown (4294967295), length 61: 
+        0x0000:  ffff 000e cd00 cdbe 0806 0001 0800 0604  ................
+        0x0010:  0001 000e cd00 cdbe c0a8 010e 0000 0000  ................
+        0x0020:  0000 c0a8 02c8 0000 0000 0000 0000 0000  ................
+        0x0030:  0000 0000 0000 0000 01                   .........
+00:03:20.656548 AF Unknown (4294967295), length 61: 
+        0x0000:  ffff 000e cd00 cdbe 0806 0001 0800 0604  ................
+        0x0010:  0001 000e cd00 cdbe c0a8 010e 0000 0000  ................
+        0x0020:  0000 c0a8 02c8 0000 0000 0000 0000 0000  ................
+        0x0030:  0000 0000 0000 0000 00                   .........
 
-For the missing getsockopt, there was even a patch earlier this year
-by J=C3=B6rn-Thorben Hinz [1], but I failed to realize that we need patch
-1/2 from his series regardless of patch 2/2.
+on lan1 remote system:
+100 701.752654927 00:0e:cd:00:cd:be → ff:ff:ff:ff:ff:ff ARP 60 Who has 192.168.2.200? Tell 192.168.1.14
 
-     Arnd
+on lan2 remote system:
+347 1071.154437549 00:0e:cd:00:cd:be → ff:ff:ff:ff:ff:ff ARP 60 Who has 192.168.2.200? Tell 192.168.1.14
 
-[1] https://lore.kernel.org/lkml/20230703175048.151683-2-jthinz@mailbox.=
-tu-berlin.de/
+
+################# Test 2 ###########################
+# send ping on on lan1 remote system:
+ping 172.17.0.1
+
+on eth0/cpu interface DUT:
+-- nothing --
+
+on lan1 remote system:
+109 946.617862621 80:61:5f:0c:29:54 → ff:ff:ff:ff:ff:ff ARP 42 Who has 172.17.0.1? Tell 172.17.0.12
+
+on lan2 remote system:
+-- nothing --
+
+################# Test 3 ###########################
+# send ping on on lan2 remote system:
+ping 172.17.0.122
+
+on eth0/cpu interface DUT:
+00:12:18.034220 AF Unknown (4294967295), length 61: 
+        0x0000:  ffff 8061 5f0c 2955 0806 0001 0800 0604  ...a_.)U........
+        0x0010:  0001 8061 5f0c 2955 ac11 000d 0000 0000  ...a_.)U........
+        0x0020:  0000 ac11 007a 0000 0000 0000 0000 0000  .....z..........
+        0x0030:  0000 0000 0000 0000 01                   .........
+00:12:18.034228 AF Unknown (4294967295), length 61: 
+        0x0000:  ffff 8061 5f0c 2955 0806 0001 0800 0604  ...a_.)U........
+        0x0010:  0001 8061 5f0c 2955 ac11 000d 0000 0000  ...a_.)U........
+        0x0020:  0000 ac11 007a 0000 0000 0000 0000 0000  .....z..........
+        0x0030:  0000 0000 0000 0000 00
+
+on lan1 remote system:
+-- nothing --
+
+on lan2 remote system:
+476 1608.560311470 80:61:5f:0c:29:55 → ff:ff:ff:ff:ff:ff ARP 42 Who has 172.17.0.122? Tell 172.17.0.13
+477 1608.560361808 80:61:5f:0c:29:55 → ff:ff:ff:ff:ff:ff ARP 60 Who has 172.17.0.122? Tell 172.17.0.13
+
+I also retest selftest results and noted that it is not working if
+port is part of bridge.
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
