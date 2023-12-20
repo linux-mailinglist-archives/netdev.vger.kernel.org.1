@@ -1,193 +1,209 @@
-Return-Path: <netdev+bounces-59314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 790E981A60C
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 18:11:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF5081A63C
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 18:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 311EF285A51
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:11:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 528811F24D77
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36ABC47790;
-	Wed, 20 Dec 2023 17:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B7A4779C;
+	Wed, 20 Dec 2023 17:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tU2u2bel"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KmNpOZui"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2057.outbound.protection.outlook.com [40.107.244.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70A847764
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 17:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CprnMbzaoQD0cESXMUhNmKouj522P5m2qxofpPh4JRPAuHw3ux2JUf/bhc/8qd4dah0+P0/DQ9+aEBAPtuZoe6tm7+ua3xRJN7D+ljpLF0Ddt7dC01xvYAMmssuvuqddNjxBw9MS2pEeLyo0s92dIYmhS09w3vblR63fQPyoiEahKw5XS/CIyxCLoshdtL2sJKy3mGpc3HEV2nqfG8loBVnw8c2ByeIdX6zGwGLsFYh6lZ6/V3J2iNGZZJ+thugSQ85/QfCkRiD+UkRKgvpetW45U6zCVZyTSWugKZXdOdAw8vNoPXXOLChTMCLkbimp552+4uyPB3/C5Phfo/yaTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pqs/Q7Pk2GFNBdkzm3zkFnacNoKdX760a0mXRuP+L7M=;
- b=gGYHOrsJW6O5J7k9Q/cSi7zXqR0sx/qGAmLLUbqVJfZHvWRz2DHCtBbQtj3l4efvwYSq8aQfB5cF9UPM/jKqsjHKd++US+gPFWqWVETHE6TJnl//ptmAVc+Aw7f+LyA2G6aFU2/mBy/k3fwIfkQX5FAAVtvTPlCQsQvm7f8FbrmfG2nVOd3woTsiW1mCqDCzqEveRyX5AiJL1MWXvOQhpOe78yaEsBbB6LyL4KwaQNcYipilvxiHbZojTQIfdIhstaZT1MDuY0j5pwz/204jg9oLZ7CRD7wQoQkmOjpeSSx4ts3YzES/5c2QTSrbltDFbZuqX887wYQg7THcaSA5WQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pqs/Q7Pk2GFNBdkzm3zkFnacNoKdX760a0mXRuP+L7M=;
- b=tU2u2belv/9qCG0V2VjbgBZhU11Zc6JNxcuhA2D+aIEAdjMLimeGYUDkj4804mvG/hsmtz1/iiyP9SBWVhQodlYbEMzY446V8S3FKSJTTDJiRydFXTG3zY+rB5WAEugoRugYHNAQz/kgA1IXIsWTWf+b33GQeDI5l8k75o21iRM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by CY5PR12MB6105.namprd12.prod.outlook.com (2603:10b6:930:2a::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.38; Wed, 20 Dec
- 2023 17:11:40 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bec4:77b3:e1d1:5615]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bec4:77b3:e1d1:5615%5]) with mapi id 15.20.7113.016; Wed, 20 Dec 2023
- 17:11:40 +0000
-Message-ID: <28644ecc-24a1-8155-e6e8-c75a2bc64356@amd.com>
-Date: Wed, 20 Dec 2023 09:11:38 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH iwl-next v3 2/2] ice: Implement 'flow-type ether' rules
-To: "Plachno, Lukasz" <lukasz.plachno@intel.com>,
- intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, Jakub Buchocki <jakubx.buchocki@intel.com>,
- Mateusz Pacuszka <mateuszx.pacuszka@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20231214043449.15835-1-lukasz.plachno@intel.com>
- <20231214043449.15835-3-lukasz.plachno@intel.com>
- <693fb63e-8369-9cf7-4b41-7afc00b30618@amd.com>
- <bf21c58e-a857-4096-932a-cc9718ab9779@intel.com>
-Content-Language: en-US
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <bf21c58e-a857-4096-932a-cc9718ab9779@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BY3PR04CA0011.namprd04.prod.outlook.com
- (2603:10b6:a03:217::16) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFDD4778C
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 17:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a269a271b5bso69990366b.1
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 09:23:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703093003; x=1703697803; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=u1Bsg3YVDtY8QT78kveIvWZicheI26GDORHP6nnZ1qw=;
+        b=KmNpOZui8Dgrt+vlCyLdXX8Xb2U2QhVoGoefGV/rgBeNbbRs6L/XKSi+9b6/6GI85C
+         StcdDn9LtJkLTti72qKuAqJlfrtQAguOoTbPoq4e1YmNsvfwI4lQOSpy63HP2aiGHe+4
+         fizEQU9ix7rnwFG86ZZ/Oor4o99j4iXENQGQFbhWPSH5v7sERCdnllAq4N8T6+LA0C8f
+         BlGeCdi8u5oGGkm8VOpq1J7Ox4CJ26xwom9ZFK0zQCyAsLbjfDmj5x6VgtkOWDERavDI
+         xBPoh6HW/92CSfKkH+ieyqTzcscORL0z9mGM03FPq5PyIC8JwoTBJU2C0irVknRm2MCD
+         wxnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703093003; x=1703697803;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u1Bsg3YVDtY8QT78kveIvWZicheI26GDORHP6nnZ1qw=;
+        b=lFQgj58iDdVI0qU7QhKU77pEnq3XzjANHOsFNzLtYjolX30tqCKKtzcuEP7t5OAWHo
+         8zkG/CO2Hn9JcjSNR0val4TS+qfnLC4Rg+qdDsZLLX6/sLOS97nonkWRAWW9CtHrIlLB
+         DFYh9aGeVlUBRaXI/N2SsQYGMGeAnZzLcETFPFuqXmzHHJ9Gkg+CZ/voMCv8OrIUwrdu
+         SDi+8prnOFNEo+uzrSlTLaGkZmKLunTCJDMeaSGuL/iSsYHzkVUUlfYFJBMLdHuema0K
+         SIdY41S7NP+7PMNDFNl4+zAq4LHkPGmylyggn0T5s0w4uZ3Uw07GgD64P3U6Zz8z7po+
+         bQHw==
+X-Gm-Message-State: AOJu0YzFQi5rWfO65sPrwETPOo2S20n8EnoUF16zkspVMMCkkEC0HscT
+	rkz9Rvu1sefi1aATKDmCwAnYgMfLQxM=
+X-Google-Smtp-Source: AGHT+IGRKWUm+rWdhTvpJCfl8wleyb90ZI/D11YeUcTmiLVD5aVCsHWJqjNj+Dp2uzsRCNWk7zom+g==
+X-Received: by 2002:a17:907:3da2:b0:a23:55c5:a657 with SMTP id he34-20020a1709073da200b00a2355c5a657mr3920540ejc.44.1703093002831;
+        Wed, 20 Dec 2023 09:23:22 -0800 (PST)
+Received: from ?IPV6:2a01:c23:c0e1:2b00:cc8d:2472:9da4:1ff3? (dynamic-2a01-0c23-c0e1-2b00-cc8d-2472-9da4-1ff3.c23.pool.telefonica.de. [2a01:c23:c0e1:2b00:cc8d:2472:9da4:1ff3])
+        by smtp.googlemail.com with ESMTPSA id hy25-20020a1709068a7900b00a2327e826ccsm29667ejc.201.2023.12.20.09.23.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Dec 2023 09:23:22 -0800 (PST)
+Message-ID: <cb28278d-c038-4dbf-81e7-097bf61dfb74@gmail.com>
+Date: Wed, 20 Dec 2023 18:23:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|CY5PR12MB6105:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1f3ea9e-7a1e-49d5-6f02-08dc017ebb58
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	vu4PXE4AXPmN1ulWpHWv+GyBo4TWzHKOIrxx3fdzqyKYOnb6pNqbnnjlMCH5kN0g6pAPKTlfkeBA1sznERN7qaoeXFIiaaYA0NrfvkJP/JiJNoOphl9QTUreUYB3VXhq7aj0H3VMbksCIbY+2SQvvwxKo9oAT2I0hMQ59fnAEqlJTSO+slBvqiuQ2lnCvIK+YKdP2YVERMNd3ohcfNU7N7bpLmWiRM1MMp+T2QsT56b16ghu9+7rgVE/qM8ewM+efNP5DZ83p5vFCWqg6RJ/p/v51ZcumGgonWFm5PTXFcZQTknUfNuPDpPdVmH4bOuzrSduL4QyyuZCnHjml0VQQc/9tXQh0UHQ5TCwA1SnDqUYUS8mRhTgEGyfEuwe/l1ge+qNDGx3E4aLzHWpccO133eTpj8ep5e/hL8iTAASLEJr94MHS3I/D0OJiJhbTln9mSxCPSwckA5bPC+/j2aQwr1LGw1oXlmGYzBVM20jPTwS26L1rj+DnDpN3xL1UIgYAkEHCLf6W4kuWG7rxCupQFAY4/FhYDKMZu+TDbvkNKRn/0FgTtiy2EZ68rKZEcG5Lqq1FVRo60ssT5rrPrKvgf1NJ/WFHQST45U8mkZweNp+4Pg8w9A7qaeVthnhVcnXJJTf5JQtl/aKc3wMY1y6HMpXxcvisq4YyzWfbrvc0ZhRprkMYgyGoJh5g5/qtpCF
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(346002)(376002)(39860400002)(366004)(230273577357003)(230173577357003)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(2906002)(5660300002)(31696002)(36756003)(41300700001)(38100700002)(478600001)(53546011)(6486002)(26005)(83380400001)(66556008)(66946007)(2616005)(66476007)(54906003)(316002)(6512007)(31686004)(6506007)(8676002)(8936002)(4326008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?alplN2JQZGVFSHBuTlAyVHNQNnpBeDJtWUN3ZHFCRDNtaGJ1VEwwck9nUzF4?=
- =?utf-8?B?d08ySW96RkdvdWREVisvWDgxZUYyMTl1NTVmVHR4OFhXOVY1Smw2dGJscXkz?=
- =?utf-8?B?bWhCMUlONHU0dE9hNEt4TDlLSWxRVUtxRHFQWk1BNzRJYUpTbWNXT0s5dDZT?=
- =?utf-8?B?RUEvK0tNL2tWMjd1cUQyOTB5Wkd4UkZ2OWdMa28vdlVWWG9qZnZYL3oyMHUv?=
- =?utf-8?B?Skl0aEk3OU51ZnExQnk2aXpRNGFvcVlSTTBtZEJzeGxPbndJRU1nTUEybW1o?=
- =?utf-8?B?WkRNbmxjTXNnZlY5R0Y0UFp6UzNEb3NUS1FnN3F0ME9kdlQyM1MyeWlFdjdW?=
- =?utf-8?B?MXZER3VHTGxyMEtpMHhHa3lvVUo1Z2FEZjU0a1A3N3grUlRVV0UzUFhFNzR4?=
- =?utf-8?B?YVFITkRtUURPb2pRL2F6NWtuRU16Z2tCL2t1NEJaR0lIdlhhSm4rUHRjempr?=
- =?utf-8?B?R0NpTWhyMHgwdW5PSStsWEY5WGhsdnBIQXY0ckpXTEo5NkIrVmM2UFJ0SVNn?=
- =?utf-8?B?MUd0dm1wSUpBNHByS21BL2FFbkNoWEREbEJXdmVEUHN1Q0hkTS9vUWY5Vjd2?=
- =?utf-8?B?RVlNR0xTdFpsUjBTcWdLcXhHZmdaNTUvcUZTV1ZLckEwWFhGdU1DVTIydmhL?=
- =?utf-8?B?bmVGZyt4NHdBZGxjaTJJZmMxNDdBWEs0VFZkRGkvNyt5WUdTdWZwbzFBM3dj?=
- =?utf-8?B?elh6NWNaNE5PbFlla2RIWTRmMHRrUGZKRzEvWWNYMElreEQxb2dxZXFiVFZv?=
- =?utf-8?B?QjJpeW5aNlFiUm0rVFA2ek9jZ1BRelAwYktxdnFCWUN3VytXTldXd1pFdm02?=
- =?utf-8?B?UlB0T2Z1eGxwSU5Xd2p3OERQSGRkUERmTXpjTXZEc2ZNZVJBVjlpS3RzTFRu?=
- =?utf-8?B?NVJudU90VW53a2JVUW9DUTQxcGt3UzFNcXVqQmFoR2xSdHdiSUJoMlZPZHFW?=
- =?utf-8?B?NnVqZDhHV0tjVVlIY3RPVGVoSVVIQ0FwelljcHJkejZNMFpmSWl2b1pkZkJX?=
- =?utf-8?B?L3BySnV5UzZHNTUvZzNneW4yWUdLYVA2VzcyUlRqZTg4N2k5d2RNZE9qRWlM?=
- =?utf-8?B?anEyV3pWVU5COEhPTXNTTHRhL0ttaVJVMmd0ekZnS2ozSnJJTzRFZXdDaEpj?=
- =?utf-8?B?OUVpSnlyY1ZwUllUYm9PQ3dEYml3dVVHYVdIUWpoMjV5UUlMSnAxcG55Mlgr?=
- =?utf-8?B?bkhiRlZVYm1tK1lQdlNrVldtMUMrNzZSUkM5Q25BWTdyMHNnSlVsMW5hYVZI?=
- =?utf-8?B?ZG43ZFNZck92MkRmbDNGWkczSjF4SHh5L1d0OWkvYmNOUzJ1bEN0VWlrV2sx?=
- =?utf-8?B?MlQxSzZHSk9ZaktuNmxRdUJ5OVArVnJNNEJBZk1PUmFYOEhSQmZzUDhyOXQ5?=
- =?utf-8?B?alRwTGFGM0ltNnNYSkQ1NG5oeUQwRVRmYnJGamVXL1oxeDdhb3JRRkc5ckE3?=
- =?utf-8?B?TkpkdFN1aStXWnVScGdueFNNaFBRODFWNUtRWEtGU0lsN0RDaFhsYW9RT1Ay?=
- =?utf-8?B?YVBIN1k0cmo4VkQ1dmRwdit0a2JMWnQxejFpU3pyOFRqR2tMM0JWVkx0YVRs?=
- =?utf-8?B?Qmt3dHlId21CV0pnRkR2Mm9qdzhvbEt5eDRUM3JKR2N2cDBhUTF0SWYyM0VV?=
- =?utf-8?B?UnNTdTdRZyt1VjExNVlodmJjQmRNNERPME16U1k2NHh1bEVpRFFLbUhNTWFH?=
- =?utf-8?B?L3VkSjZjODExSFlieHozRTdnT2pILzZ4NWFpaExSMDI0UkdvOFJ5S25Jclhw?=
- =?utf-8?B?RW5FQnQ4RjhVeVA5S01oS3ZLT3oxckt5RkhqU2xZM3ZXdURxMU8rUFpWVG1q?=
- =?utf-8?B?SkRSVndqQlpCMlVORHBneUxzclNNdjRrTFQwamhPZ2VaYVVoQXA2ZXBGMWpu?=
- =?utf-8?B?eTFzQlVVdXp5NDVwelJLb3JaYjljL0JRZmFGeHM0QXp6VEt1RzRWTTNEd1FZ?=
- =?utf-8?B?U0lFVXQ2dDhQaGlQZ1IrRk1WQVh6WTR5M3BweFQycFZEMEhLM1ZJVk9GVjRn?=
- =?utf-8?B?ZXI4ZFBPSmhFL0pIbXJmSVFUWWpoSVlRdWZ5OVRxZGZ3RXlYSVpqVkF4aGY0?=
- =?utf-8?B?SmZyMkU4OXBnMGd1bVlBenJyd3dkc2lud3NlSUhOMTl1Q1NNMGtqbEN1Z2tk?=
- =?utf-8?Q?+kUz2nSuH4U4IpzQCFFyMtrzJ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1f3ea9e-7a1e-49d5-6f02-08dc017ebb58
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2023 17:11:40.2011
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: emLU+LmC5cnC6PU6juWbJwB6P06iZ/nrBRqVh7eE4ll3MZajkTXJ2O4KNRgMgPfjhO21Ku9VvhAAr7EBtaeFqA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6105
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 13/15] net: phy: realtek: drop .read_page and
+ .write_page for rtl822x series
+Content-Language: en-US
+To: =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Russell King <rmk+kernel@armlinux.org.uk>,
+ Alexander Couzens <lynxis@fe80.eu>, Daniel Golle <daniel@makrotopia.org>,
+ Willy Liu <willy.liu@realtek.com>, Ioana Ciornei <ioana.ciornei@nxp.com>,
+ =?UTF-8?Q?Marek_Moj=C3=ADk?= <marek.mojik@nic.cz>,
+ =?UTF-8?Q?Maximili=C3=A1n_Maliar?= <maximilian.maliar@nic.cz>
+References: <20231220155518.15692-1-kabel@kernel.org>
+ <20231220155518.15692-14-kabel@kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20231220155518.15692-14-kabel@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 12/20/2023 6:19 AM, Plachno, Lukasz wrote:
-> Caution: This message originated from an External Source. Use proper 
-> caution when opening attachments, clicking links, or responding.
+On 20.12.2023 16:55, Marek Behún wrote:
+> Drop the .read_page() and .write_page() methods for rtl822x series.
 > 
+> The rtl822x driver methods are now reimplemented to only access clause
+> 45 registers and these are the last methods that explicitly access
+> clause 22 registers.
 > 
-> On 12/19/2023 6:35 PM, Brett Creeley wrote:
->>
->>
->> On 12/13/2023 8:34 PM, Lukasz Plachno wrote:
->>> Caution: This message originated from an External Source. Use proper
->>> caution when opening attachments, clicking links, or responding.
->>>
->>>
->>> From: Jakub Buchocki <jakubx.buchocki@intel.com>
->>>
->>> Add support for 'flow-type ether' Flow Director rules via ethtool.
->>>
->>> Rules not containing masks are processed by the Flow Director,
->>> and support the following set of input parameters in all combinations:
->>> src, dst, proto, vlan-etype, vlan, action.
->>>
->>> It is possible to specify address mask in ethtool parameters but only
->>> 00:00:00:00:00 and FF:FF:FF:FF:FF are valid.
->>> The same applies to proto, vlan-etype and vlan masks:
->>> only 0x0000 and 0xffff masks are valid.
->>
->> Would it be useful to have user facing error messages for invalid masks
->> stating what the valid masks are?
->>
+> If the underlying MDIO bus is clause 22, the paging mechanism is still
+> used internally in the .read_mmd() and .write_mmd() methods when
+> accessing registers in MMD 31.
 > 
-> Do you think about something like:
-> dev_warn("Driver only supports masks 00:00:00:00:00:00 and
-> FF:FF:FF:FF:FF:FF"),
-> or there is a way to pass custom message to ethtool to print it to user?
+> Signed-off-by: Marek Behún <kabel@kernel.org>
+> ---
+>  drivers/net/phy/realtek.c | 12 ------------
+>  1 file changed, 12 deletions(-)
+> 
+> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+> index cf608d390aa5..e2f68ac4b005 100644
+> --- a/drivers/net/phy/realtek.c
+> +++ b/drivers/net/phy/realtek.c
+> @@ -963,8 +963,6 @@ static struct phy_driver realtek_drvs[] = {
+>  		.read_status	= rtl822x_read_status,
+>  		.suspend	= genphy_c45_pma_suspend,
+>  		.resume		= rtl822x_resume,
+> -		.read_page	= rtl821x_read_page,
+> -		.write_page	= rtl821x_write_page,
+>  		.read_mmd	= rtlgen_read_mmd,
+>  		.write_mmd	= rtlgen_write_mmd,
+>  	}, {
+> @@ -975,8 +973,6 @@ static struct phy_driver realtek_drvs[] = {
+>  		.read_status	= rtl822x_read_status,
+>  		.suspend	= genphy_c45_pma_suspend,
+>  		.resume		= rtl822x_resume,
+> -		.read_page	= rtl821x_read_page,
+> -		.write_page	= rtl821x_write_page,
+>  		.read_mmd	= rtlgen_read_mmd,
+>  		.write_mmd	= rtlgen_write_mmd,
+>  	}, {
+> @@ -987,8 +983,6 @@ static struct phy_driver realtek_drvs[] = {
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend	= genphy_c45_pma_suspend,
+>  		.resume		= rtl822x_resume,
+> -		.read_page      = rtl821x_read_page,
+> -		.write_page     = rtl821x_write_page,
+>  		.read_mmd	= rtlgen_read_mmd,
+>  		.write_mmd	= rtlgen_write_mmd,
+>  	}, {
+> @@ -999,8 +993,6 @@ static struct phy_driver realtek_drvs[] = {
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend	= genphy_c45_pma_suspend,
+>  		.resume		= rtl822x_resume,
+> -		.read_page      = rtl821x_read_page,
+> -		.write_page     = rtl821x_write_page,
+>  		.read_mmd	= rtlgen_read_mmd,
+>  		.write_mmd	= rtlgen_write_mmd,
+>  	}, {
+> @@ -1011,8 +1003,6 @@ static struct phy_driver realtek_drvs[] = {
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend	= genphy_c45_pma_suspend,
+>  		.resume		= rtl822x_resume,
+> -		.read_page      = rtl821x_read_page,
+> -		.write_page     = rtl821x_write_page,
+>  		.read_mmd	= rtlgen_read_mmd,
+>  		.write_mmd	= rtlgen_write_mmd,
+>  	}, {
+> @@ -1023,8 +1013,6 @@ static struct phy_driver realtek_drvs[] = {
+>  		.read_status    = rtl822x_read_status,
+>  		.suspend	= genphy_c45_pma_suspend,
+>  		.resume		= rtl822x_resume,
+> -		.read_page      = rtl821x_read_page,
+> -		.write_page     = rtl821x_write_page,
+>  		.read_mmd	= rtlgen_read_mmd,
+>  		.write_mmd	= rtlgen_write_mmd,
+>  	}, {
 
-Using a dev_err()/dev_warn() was more along the lines of what I was 
-thinking.
+Dropping the read_page/write_page hooks will be problematic,
+because they are used by the PHY initialization in e.g.
+rtl8125a_2_hw_phy_config().
 
-Brett
-> 
->>>
->>> Signed-off-by: Jakub Buchocki <jakubx.buchocki@intel.com>
->>> Co-developed-by: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
->>> Signed-off-by: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
->>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->>> Signed-off-by: Lukasz Plachno <lukasz.plachno@intel.com>
->>> ---
->>>   .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 128 +++++++++++++++++-
->>>   drivers/net/ethernet/intel/ice/ice_fdir.c     |  27 ++++
->>>   drivers/net/ethernet/intel/ice/ice_fdir.h     |  11 ++
->>>   drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
->>>   4 files changed, 166 insertions(+), 1 deletion(-)
->>>
->>
->> [...]
 
