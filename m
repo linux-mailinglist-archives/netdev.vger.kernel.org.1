@@ -1,121 +1,127 @@
-Return-Path: <netdev+bounces-59368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A173981AAC7
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 00:10:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA0A81AACB
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 00:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D38B71C214EF
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 23:10:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69150282B8C
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 23:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FE64B14A;
-	Wed, 20 Dec 2023 22:53:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DCB4BA89;
+	Wed, 20 Dec 2023 22:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VwIuqz+G"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="WuXu8mYX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271494645E;
-	Wed, 20 Dec 2023 22:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40c39ef63d9so2031965e9.3;
-        Wed, 20 Dec 2023 14:53:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703112798; x=1703717598; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nclggf2he0zPUgzUtzVNusuGq5DYWatgL0vR1Ajc/sA=;
-        b=VwIuqz+Gg6+8CJntNRu363aVzqdj30oezjxtzHL2LsAXHLSI1L4o0NiCsyF+zHFmI2
-         /5X7F6Jzd0UVs/RanTHmdc4qJNUtRLyFGtTWLmiaOes4jJGd+wjtoPmj9dnlQUenSpfR
-         LueN2iILO7p+rdj+2y78zXrhog/GBaEKj9Ax+PhhD/vDabpcbL2DfxPCMvOvwVvnOAJ7
-         folq5DDmb4av63DEU6Ks6OUK/j8AZ0YcDDw5qWIvaSYRVgY2cgxJsiTtd7NNQ4tWAWa9
-         Pt/0U6FKlhdMRNUFNTRYoqsZvoIc7kEs0qzfiz7pk9HUZC3egr17HVXI0VS4Pd9zu72+
-         1YHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703112798; x=1703717598;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nclggf2he0zPUgzUtzVNusuGq5DYWatgL0vR1Ajc/sA=;
-        b=ngZcRfLbjvaJ2D6Dz5yghgV313B4iVcQWchEHlAbyIBbHbt7++NtuanZkvle7Pb2sQ
-         UGfsqN/IPuc9UfVDxeXgZnjunQAC6+NL95JAdlPJh9iVHQlAyBBCAdNPxzf0WiuvGMtV
-         kMjGa3Jq3IDG/Ij24klsVV8KfklD4GW0zICaXjV5kNBAmnNloWhqXnmZancvRAEOZzJ0
-         WjtsM5Agw6xjVYfEDqOBIWFtEUDprLdSjf0j+tl6uQODalCkpuSJWrpeRAjZB6Rhs6Mc
-         nlJtWZAc0MC7MqG3CJ4TcWW3/o6cfFrjpcfLo3MlcNevJjsCQs6KTIOGp+rvzZxjb/1f
-         wILg==
-X-Gm-Message-State: AOJu0YwvisihHAce/bWCIPihD6sgknIZnsZ9mgZtY1oP4ahA99GqGxKd
-	gU/Y3JyAHyIc0p/q+OaBq/k=
-X-Google-Smtp-Source: AGHT+IEo1z37b4hacYUj8UoMuL2erFGk05NYdH5xhxZpFqVleEHWWiPf6XIphny9MgRFLeQT953pFQ==
-X-Received: by 2002:a05:600c:b57:b0:40d:3d64:1145 with SMTP id k23-20020a05600c0b5700b0040d3d641145mr46511wmr.131.1703112798070;
-        Wed, 20 Dec 2023 14:53:18 -0800 (PST)
-Received: from Ansuel-xps. (host-95-250-248-68.retail.telecomitalia.it. [95.250.248.68])
-        by smtp.gmail.com with ESMTPSA id w20-20020a05600c475400b0040b4fca8620sm8815820wmo.37.2023.12.20.14.53.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 14:53:17 -0800 (PST)
-Message-ID: <6583705d.050a0220.6e903.083d@mx.google.com>
-X-Google-Original-Message-ID: <ZYNwWkr2znb7A--K@Ansuel-xps.>
-Date: Wed, 20 Dec 2023 23:53:14 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Tobias Waldekranz <tobias@waldekranz.com>
-Subject: Re: [net-next PATCH v4 1/4] dt-bindings: net: phy: Document new LEDs
- polarity property
-References: <20231215212244.1658-1-ansuelsmth@gmail.com>
- <20231215212244.1658-2-ansuelsmth@gmail.com>
- <20231220152209.GA229412-robh@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D9C4BAA2;
+	Wed, 20 Dec 2023 22:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 837767F5;
+	Wed, 20 Dec 2023 22:57:56 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 837767F5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1703113076; bh=FTflJJ/gBAnv1Hyfi9/f2DHUCIjnfK4oGhMjJoB3b58=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WuXu8mYXLhT8PHeJGxfwgC7ecnTEFlSmZB3lBN8EMyth8JUL3JfypObV/vrXdm3aU
+	 e0swOYVgPThkUNclWy7JDWLycmdLSKFwWPEAVBbhlTLfI7J7feVY2i92M9RD04HVG+
+	 hFn8MtyeG4jz8GHJFavLGvGT6lPqZqkv0zbCXuoeU/ekc2Q8EBq9V4AqI2L5FR2F5E
+	 KwfWNOPH7D0lw1ltDxBEEBhG49fZ73D9pRmvgYXcuKn4k+tnK1AKCNyeH4TiLM2xGb
+	 4XA543u+u1tLZUqZjCCPqW7SBXBvgqLFKpUEykJvUh9zRrH0kcEcKGRt2+JufJDN/x
+	 hvmnSw4KTp79A==
+From: Jonathan Corbet <corbet@lwn.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: [PATCH net] wifi: mac80211: address some kerneldoc warnings
+Date: Wed, 20 Dec 2023 15:57:55 -0700
+Message-ID: <87zfy4bhxo.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231220152209.GA229412-robh@kernel.org>
+Content-Type: text/plain
 
-On Wed, Dec 20, 2023 at 09:22:09AM -0600, Rob Herring wrote:
-> On Fri, Dec 15, 2023 at 10:22:41PM +0100, Christian Marangi wrote:
-> > Document new LEDs polarity property to define what mode the LED needs to
-> > be put to turn it on.
-> > 
-> > Currently supported modes are:
-> > 
-> > - active-low
-> > - active-high
-> > - active-low-tristate
-> > - active-high-tristate
-> 
-> Why is having a polarity unique to LEDs on ethernet PHYs? It's not. We 
-> already have 'active-low' established on several LED bindings. Please 
-> move the definition to leds/common.yaml and extend it. I would simply 
-> add an 'inactive-tristate' boolean property (if there's an actual user). 
->
+include/net/mac80111.h contains a number of either excess or incorrect
+kerneldoc entries for structure members, leading to these warnings:
 
-Should I also drop the active-low from the current schema that have it?
+  ./include/net/mac80211.h:491: warning: Excess struct member 'rssi' description in 'ieee80211_event'
+  ./include/net/mac80211.h:491: warning: Excess struct member 'mlme' description in 'ieee80211_event'
+  ./include/net/mac80211.h:491: warning: Excess struct member 'ba' description in 'ieee80211_event'
+  ./include/net/mac80211.h:777: warning: Excess struct member 'ack_enabled' description in 'ieee80211_bss_conf'
+  ./include/net/mac80211.h:1222: warning: Excess struct member 'ampdu_ack_len' description in 'ieee80211_tx_info'
+  ./include/net/mac80211.h:1222: warning: Excess struct member 'ampdu_len' description in 'ieee80211_tx_info'
+  ./include/net/mac80211.h:1222: warning: Excess struct member 'ack_signal' description in 'ieee80211_tx_info'
+  ./include/net/mac80211.h:2920: warning: Excess struct member 'radiotap_he' description in 'ieee80211_hw'
 
-Also we have led-active-low. (should we support both?)
+Fix or remove the entries as needed.  This change removes 208 warnings from
+a "make htmldocs" build.
 
-On the marvell10g series we are discussing of using tristate or not. We
-notice tristate might be confusing, would it be better to use
-inactive-high-impedance ?
+Signed-off-by: Jonathan Corbet <corbet@lwn.net>
+---
+ include/net/mac80211.h | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
 
-> I do worry this continues to evolve until we've re-created the pinctrl 
-> binding...
-> 
-
+diff --git a/include/net/mac80211.h b/include/net/mac80211.h
+index 77a71b1396b1..6d2e94bc841c 100644
+--- a/include/net/mac80211.h
++++ b/include/net/mac80211.h
+@@ -476,9 +476,9 @@ struct ieee80211_ba_event {
+ /**
+  * struct ieee80211_event - event to be sent to the driver
+  * @type: The event itself. See &enum ieee80211_event_type.
+- * @rssi: relevant if &type is %RSSI_EVENT
+- * @mlme: relevant if &type is %AUTH_EVENT
+- * @ba: relevant if &type is %BAR_RX_EVENT or %BA_FRAME_TIMEOUT
++ * @u.rssi: relevant if &type is %RSSI_EVENT
++ * @u.mlme: relevant if &type is %AUTH_EVENT
++ * @u.ba: relevant if &type is %BAR_RX_EVENT or %BA_FRAME_TIMEOUT
+  * @u:union holding the fields above
+  */
+ struct ieee80211_event {
+@@ -541,8 +541,6 @@ struct ieee80211_fils_discovery {
+  * @link_id: link ID, or 0 for non-MLO
+  * @htc_trig_based_pkt_ext: default PE in 4us units, if BSS supports HE
+  * @uora_exists: is the UORA element advertised by AP
+- * @ack_enabled: indicates support to receive a multi-TID that solicits either
+- *	ACK, BACK or both
+  * @uora_ocw_range: UORA element's OCW Range field
+  * @frame_time_rts_th: HE duration RTS threshold, in units of 32us
+  * @he_support: does this BSS support HE
+@@ -1150,11 +1148,6 @@ ieee80211_rate_get_vht_nss(const struct ieee80211_tx_rate *rate)
+  * @ack: union part for pure ACK data
+  * @ack.cookie: cookie for the ACK
+  * @driver_data: array of driver_data pointers
+- * @ampdu_ack_len: number of acked aggregated frames.
+- * 	relevant only if IEEE80211_TX_STAT_AMPDU was set.
+- * @ampdu_len: number of aggregated frames.
+- * 	relevant only if IEEE80211_TX_STAT_AMPDU was set.
+- * @ack_signal: signal strength of the ACK frame
+  */
+ struct ieee80211_tx_info {
+ 	/* common information */
+@@ -2835,8 +2828,6 @@ enum ieee80211_hw_flags {
+  *	the default is _GI | _BANDWIDTH.
+  *	Use the %IEEE80211_RADIOTAP_VHT_KNOWN_\* values.
+  *
+- * @radiotap_he: HE radiotap validity flags
+- *
+  * @radiotap_timestamp: Information for the radiotap timestamp field; if the
+  *	@units_pos member is set to a non-negative value then the timestamp
+  *	field will be added and populated from the &struct ieee80211_rx_status
 -- 
-	Ansuel
+2.43.0
+
 
