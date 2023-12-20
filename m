@@ -1,197 +1,257 @@
-Return-Path: <netdev+bounces-59258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1516681A183
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:53:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF4F81A1B6
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:00:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A2B01C21554
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:53:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAD09288AD9
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235AB3D965;
-	Wed, 20 Dec 2023 14:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AED3DB85;
+	Wed, 20 Dec 2023 14:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GxUHrDF6"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="u5S1OPD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11olkn2022.outbound.protection.outlook.com [40.92.19.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE893D96B
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 14:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3bb6e8708b7so621465b6e.1
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 06:53:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703083988; x=1703688788; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v/3mth73fxZlPywUOcj4ecaZ1hAZDVRVEaS8BXpK9jI=;
-        b=GxUHrDF6GDZoks+q9+gqjrPsBgkLZsitQGy7CQOk3l/dU8rsGqTYKwcEg51Mw9ZqgM
-         RvTY/frWha+ZQf1D4RC5PRE6z4EPMFURxCYz1AtuLIlUjk2uUZeeHcgkN5h1i//EvLZe
-         Sbc6s8Dr37knfhQTQ5o/27DKk2VjSC9H0TRwYiHBNDq4HRY9ZS6MBwCOBLlWLcAXnEQo
-         HSMua6ukMwN843RQZsDYi0bgjbpxuwjyZDUT7WKp3idyf3OELtgCZoQyJ3QAZdZDECt/
-         5W6HJFLq86nN0mMvwDK2wFlERgfysCkjkMQRXbofTBrZuTn3+juZE+bwPp7I45E/Jjbz
-         EZpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703083988; x=1703688788;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v/3mth73fxZlPywUOcj4ecaZ1hAZDVRVEaS8BXpK9jI=;
-        b=hqRoEhu+f+VrFQkCynYuavNMDHg6PvS9nmUAX8gA5HU6M8Y7Wp5fl99x9P3OJ+hlpP
-         6pyPOrFT5T2SSOmEwI2yLda/Ghr4r+y019FNniO6Q+g19giZDUuXPZttcX4lJL5X6ufs
-         FAKHeSszTw5kJGP79gOQHKpVSR9lYTTtY2I1Cjbj+GamWVpdj+RRVxULN9NgSBoVGFKy
-         aKTufJQRZOZE+8z7f7/bQPM0Zu36/CreESWt4ZKaBZavxQoazgMq9ucXp2K2acDxB65B
-         JiKPT73M3osq5Aue7oYglzw5RbI2lSlgQgyEY0CApuyb9lKSSxDcTLBp8Hjp387EZNxk
-         lzQg==
-X-Gm-Message-State: AOJu0Yxm+NqvFfCusQZVq7Hc0a/9M7i4uxa5FnQbpEfpoQF5DpJrmFMO
-	dOr5NpRyHXmceC+bNFInlMo=
-X-Google-Smtp-Source: AGHT+IFRC60in3pJ2ocmxpSKr96iOaTvVsnpN3Dy2rYAL5qEN8jkdT+ouTEIiP4ZhyJiTE1iQ9zfug==
-X-Received: by 2002:a05:6808:16a4:b0:3b8:b063:a1c9 with SMTP id bb36-20020a05680816a400b003b8b063a1c9mr23400350oib.83.1703083988627;
-        Wed, 20 Dec 2023 06:53:08 -0800 (PST)
-Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id n4-20020a0ce944000000b0067f6ef0a8d5sm561517qvo.115.2023.12.20.06.53.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 06:53:08 -0800 (PST)
-Date: Wed, 20 Dec 2023 09:53:07 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
- Arnd Bergmann <arnd@arndb.de>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Thomas Lange <thomas@corelatus.se>, 
- Netdev <netdev@vger.kernel.org>, 
- Deepa Dinamani <deepa.kernel@gmail.com>, 
- John Fastabend <john.fastabend@gmail.com>
-Message-ID: <6582ffd3e5dc7_1a34a429482@willemb.c.googlers.com.notmuch>
-In-Reply-To: <bff57ee057bdd15a2c951ff8b6e3aaa30f981cd2.camel@mailbox.tu-berlin.de>
-References: <a9090be2-ca7c-494c-89cb-49b1db2438ba@corelatus.se>
- <658266e18643_19028729436@willemb.c.googlers.com.notmuch>
- <0d7cddc9-03fa-43db-a579-14f3e822615b@app.fastmail.com>
- <bff57ee057bdd15a2c951ff8b6e3aaa30f981cd2.camel@mailbox.tu-berlin.de>
-Subject: Re: net/core/sock.c lacks some SO_TIMESTAMPING_NEW support
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0070C41212;
+	Wed, 20 Dec 2023 14:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SH6zQ4HXglFxk2uzOij4iA6X8vVaeUkLR30SBOueSnzMcL+8eky/QPQc3+ds3NPQfq0W+UYgAVTlpUFnzhB58bjdGPAqICP/09VLKjkoMSfULkMKR64moGep/kUL41nsiGLz5ln4N6wc8WkTvAinGOZ/yYSsK0o+NvXKkKMAAxRq3io5h6ePJVahPIHuOR38dBlVBhagLXxxjtfJOnxI/11CkOBZtAsBDQBUyNCPI5Ap4uHJ97xFoHDalOseqwR1RvZWuKy1Qk7IhaJxoqt1/ssxP9auary6KpC+awc3sTn5WSbaH1EcbSsUjbP84wwlC9mCWCTwinMvksrP8IB1ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0ZCXZUtRo8MGzXBZZdMyiHBxegVqZxsoBfvV85MxSlU=;
+ b=jDCsmm0kpTBDEudIvbFiwmVrO+ngbuu7DPceINX5NUDVASpHBFx3pCQTL8yQPSVNAii3y9VUmvJC7c309RmB3BJNchGomhpGAt8g4og1zn2ZW9ffzNWztITyTq/JU0Z86BGre1YpPXrWhrjhc+X9xoYyv0M0m7J9jdzwlHKrmcduYQZLqpcm2NsvH/NLnFB22JcyXzGpA6XLGGfZe6B07JZYWLy1aasoFWQOVSsVwby/w6D/Q+P5ikOrSnI6PsQ9C5st2nFTW1ooBOm/d+xiqeSThcZH/1DhjllShKKJ3WbLFxysK19O+fx4XQ3ZCmiEsvn/jL3C2RMcBZjkqZf0+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0ZCXZUtRo8MGzXBZZdMyiHBxegVqZxsoBfvV85MxSlU=;
+ b=u5S1OPD22ffkljkC41vaYSzgfgfwwWT36+EGNqckaXzyGcTxNavRF3dM0F0UM3McNTm1ZxhqHKMxwNXzqn+rTyNGSK0ZsHwcnIt/MmjGw7508HlrFvZXDKiAVcKP7xkxZ9H1WjDwDFfgp/+9UU4+dBsAMuPSffnXQgnR17ltNiv03MW0pSL4YDgp4Mm7WS4ToPbgmpNkuqYCxqKYXG0qRx7y2EDETsiYer6pLZqIfM+lAMyQkleBwEKtB1uaCBdGgAqdr8Y6InimH60SAHRYYq4X1LLhYcp0vp3fgd9AqYwbRN46JaW6khUDY4p0l58K7K3S/XX6eRTTKyLo4yasgw==
+Received: from PH7PR03MB7064.namprd03.prod.outlook.com (2603:10b6:510:2a5::8)
+ by CO1PR03MB5812.namprd03.prod.outlook.com (2603:10b6:303:9a::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.19; Wed, 20 Dec
+ 2023 14:59:31 +0000
+Received: from PH7PR03MB7064.namprd03.prod.outlook.com
+ ([fe80::9ca4:4c22:a89:9a8]) by PH7PR03MB7064.namprd03.prod.outlook.com
+ ([fe80::9ca4:4c22:a89:9a8%7]) with mapi id 15.20.7113.016; Wed, 20 Dec 2023
+ 14:59:31 +0000
+From: Min Li <lnimi@hotmail.com>
+To: richardcochran@gmail.com,
+	lee@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: [PATCH net-next v5 1/2] ptp: introduce PTP_CLOCK_EXTOFF event for the measured external offset
+Date: Wed, 20 Dec 2023 09:59:16 -0500
+Message-ID:
+ <PH7PR03MB7064C20AF7AC49FFB76F8277A096A@PH7PR03MB7064.namprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [W/E6sr60WkXPSL3NTOCFskRGcE6CsgCTssdjmALViCE=]
+X-ClientProxiedBy: YQBPR0101CA0331.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:6b::23) To PH7PR03MB7064.namprd03.prod.outlook.com
+ (2603:10b6:510:2a5::8)
+X-Microsoft-Original-Message-ID: <20231220145917.7076-1-lnimi@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR03MB7064:EE_|CO1PR03MB5812:EE_
+X-MS-Office365-Filtering-Correlation-Id: 492cbc7e-f25b-4c32-cf97-08dc016c4548
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	N5+17V7sMTZtRopwtFSHnkMQJc9GvTsLHOSbsyHe6ovLO6ZNsrj3MjK9J/u3EBF6a7DDAZQkMCDq7E+J7B3Goep+HWB3kiMhN+TcSMBiTA3ItzMG3zzeMd5F1lqx8AWTMmxS6CXlrvpZcnboYquAP0Bakr22hj8g5yEF28urLooxkFPfNsTEJjKew38Op/D+4Futb8xvsbs7odjU0xxYEdbPifg92R3/uLlF9/0BfnJ2lelN0Mh6B63WRkJNDSgpVCOkk631nT7RbakfArP5FlyzZ5qumTr+HfpBciGH+AJ9CWFCw93VuTc9NvIxbBvo7yGnHfEJ8VVce0R4rBzwRC/TUINxXOEB6vjCLMKKiq3CaEq68VsCk5wExDq4BDtAIbQWiwbJr07lJFF/CZL2P2BOELbOlcC6GCnUEJIKBI26iSgCPQl1nrYj0Od6a9JzR5ZVzVOaGiS6T/ADQYjKZRBB4GeY4PfAU45iOApHXNOIPhJ71xtfwRHR1ho4nbVHETh7edlws9m0d2b6sIAgrJ2n4UziSYDLHRlzlYcc4MKvgWxxVQQPe36MDXnLJsEC
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LZP5x7YLxY9L9qKfz+EduKhV9zNFgf1li0YQ7TkaVzw41AgeXCeQQP8pAY5V?=
+ =?us-ascii?Q?ZXV5TBoXb/B9fPBs3d1ONMqNG70laAOzPtpDMtvQfALQ7rfRUr0/xN1TGGv3?=
+ =?us-ascii?Q?4/+ru7NGByPIxbyiDDLGJeo2UIJ8ynX4DkpwGViCCz8tNAoaTqrCkTaowhCk?=
+ =?us-ascii?Q?FyDEFXLzA6lM1xCJyeOILktCCraFD6IyuINeQNAxF2B1NljBUPdznRjBhmOD?=
+ =?us-ascii?Q?EjARbINLE5XCBfjdv+/h1dRQuT8i/EXiWmdLie57ZvTeRXAlJECNQZp6ZyyI?=
+ =?us-ascii?Q?4NLL/mDBe5z1SRcYWPWxE8RkjQse+I+zFm00ahroVX1C31/0mnowdziw6xC3?=
+ =?us-ascii?Q?gIvhytrUtrHYAFxruaGYFvrL3Fq7wOXvruZeE1+uIvaREYKanSzoj80BmY79?=
+ =?us-ascii?Q?sSz0Nad3zNqRH67rbR2wdRGu3ysixUoUDlfdd7RCKI3ZMRbTEi8Ddbhmxgkp?=
+ =?us-ascii?Q?wubNqGPRQPu2annHehnMLr3dLFGD1SCTrPix03oV8cObEXr1yQoocpElxsCh?=
+ =?us-ascii?Q?ruEqlh4YlLky+CUiADj9OosVBwviEBT9VPcd9v/XOM9i0fCio6bLf5l+dCoV?=
+ =?us-ascii?Q?8VFBS/m2vunPij5OjOcqQX2TQK8OgONWwsB8sNeuYTKYROwYpia+dI1Zzv98?=
+ =?us-ascii?Q?hvbzLHVi8wkoScGT9lhjEFn6xc13Qkjw8ugKNPm/2Y/rvgB5vdOAR5qkO8xw?=
+ =?us-ascii?Q?e/BfxVKyBp2sux0x88mdqfQXcXBP0Rh2N8/TcvgbyZ1xxNPuGOoK82U2po3l?=
+ =?us-ascii?Q?yya6daDXvundgjQJQFnlsx+Ih0UPObIlx896rGA+kUaLQB7zZ5JIjR46xCJM?=
+ =?us-ascii?Q?4cOWkBVpiTU9BwFPJplE9XP9nQGhcbNa095wxrZM8Jp6xNxOHrI4dJGifOHw?=
+ =?us-ascii?Q?E5IBIlW3VKO8DOscwMbsyN734TvtXuiJMAoUGp8w+Y5ovsc2RYSzx4OP8SIC?=
+ =?us-ascii?Q?dN8EaSCDDAQe21sh5wDfLaKFFOLZNW4M0abbpsMBJ6vtqDKkiZdB9w5yPX+P?=
+ =?us-ascii?Q?YtShxrMI1RXj7mwDUhOzB8MHs31rRkawAwNA1G/SSlVUvLGwqqrOptD0XVaz?=
+ =?us-ascii?Q?2szbrD7cCqY4O9pkaAi+KYjvZKXGAHymbVQ/pP9WfTk6xdXWitH8LEz36eB4?=
+ =?us-ascii?Q?PYAvIb2Nt9sIZcgiKjhfHWGeiqt3xZKEUPHvkbcmuB0XQiFsG+kHhq9+lKPN?=
+ =?us-ascii?Q?CS3Wqi4rNX3BafIkVBwbHOwKshRx4whIgHdTFQ=3D=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-685f7.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 492cbc7e-f25b-4c32-cf97-08dc016c4548
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR03MB7064.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2023 14:59:31.6017
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR03MB5812
 
-J=C3=B6rn-Thorben Hinz wrote:
-> Hi Arnd,
-> =
+From: Min Li <min.li.xe@renesas.com>
 
-> thanks for indirectly pinging me here about the unfinished patches. I
-> kinda forgot about them over other things happening.
-> =
+This change is for the PHC devices that can measure the phase offset
+between PHC signal and the external signal, such as the 1PPS signal of
+GNSS. Reporting PTP_CLOCK_EXTOFF to user space will be piggy-backed to
+the existing ptp_extts_event so that application such as ts2phc can
+poll the external offset the same way as extts. Hence, ts2phc can use
+the offset to achieve the alignment between PHC and the external signal
+by the help of either SW or HW filters.
 
-> Happy to look back into them, it looks like it would be helpful to
-> apply them. Is it fine to just answer the remarks from earlier this
-> year, after a few months, in the same mail thread? Or preferable to
-> resubmit the series[1] first?
+Signed-off-by: Min Li <min.li.xe@renesas.com>
+---
+-Rebase to net-next tree
+-Fix the typo and ns2counters suggested by Simon
+-Remove inline from ptp_fc3.c suggested by Simon
+-Use flags field to identify extts and extoff event suggested by Richard
+-Fix indentation suggested by Simon
+-Rename PTP_EXTTS_EVENT_VALID flag suggested by Richard
 
-Please resubmit instead of reviving the old thread. Thanks for reviving
-that.
+ drivers/ptp/ptp_clock.c          | 16 +++++++++++++++-
+ include/linux/ptp_clock_kernel.h |  3 +++
+ include/uapi/linux/ptp_clock.h   | 11 +++++++++--
+ 3 files changed, 27 insertions(+), 3 deletions(-)
 
-IIRC the only open item was to limit the new BPF user to the new API?
-That only applies to patch 2/2.
-
-The missing sk_getsockopt SO_TIMESTAMPING_NEW might be breaking users,
-so is best sent stand-alone to net, rather than net-next.
-
-> Thorben
-> =
-
-> [1]
-> https://lore.kernel.org/lkml/20230703175048.151683-1-jthinz@mailbox.tu-=
-berlin.de/
-> =
-
-> On Wed, 2023-12-20 at 09:43 +0000, Arnd Bergmann wrote:
-> > On Wed, Dec 20, 2023, at 04:00, Willem de Bruijn wrote:
-> > > Thomas Lange wrote:
-> > > > diff --git a/net/core/sock.c b/net/core/sock.c
-> > > > index 16584e2dd648..a56ec1d492c9 100644
-> > > > --- a/net/core/sock.c
-> > > > +++ b/net/core/sock.c
-> > > > @@ -2821,6 +2821,7 @@ int __sock_cmsg_send(struct sock *sk,
-> > > > struct cmsghdr *cmsg,
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sockc->mark =3D *(u32 *)CMSG_DATA(cmsg);
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case SO_TIMESTAM=
-PING_OLD:
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case SO_TIMESTAMPING_NEW:
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (cmsg->cmsg_len !=3D CMSG_LEN(sizeof(u3=
-2)))
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 return -EINVAL;
-> > > > =
-
-> > > > However, looking through the module, it seems that
-> > > > sk_getsockopt() has no
-> > > > support for SO_TIMESTAMPING_NEW either, but sk_setsockopt() has.
-> > > =
-
-> > > Good point. Adding the author to see if this was a simple oversight=
-
-> > > or
-> > > there was a rationale at the time for leaving it out.
-> > =
-
-> > I'm fairly sure this was just a mistake on our side. For the cmsg
-> > case,
-> > I think we just missed it because there is no corresponding
-> > SO_TIMESTAMP{,NS}
-> > version of this, so it fell through the cracks.
-> > =
-
-> > In the patch above, I'm not entirely sure about what needs to happen
-> > with the old/new format, i.e. the
-> > =
-
-> > =C2=A0=C2=A0 sock_valbool_flag(sk, SOCK_TSTAMP_NEW, optname =3D=3D
-> > SO_TIMESTAMPING_NEW)
-> > =
-
-> > from setsockopt(). Is __sock_cmsg_send() allowed to turn on
-> > timestamping
-> > without it being first enabled using setsockopt()? If so, I think
-> > we need to set the flag here the same way that setsockopt does. If
-> > not, then I think we instead should check that the old/new format
-> > in the option sent via cmsg is the same that was set earlier with
-> > setsockopt.
-
-__sock_cmsg_send can only modify a subset of the bits in the
-timestamping feature bitmap, so a call to setsockopt is still needed
-
-But there is no ordering requirement, so the __sock_cmsg_send call can
-come before the setsockopt call. It would be odd, but the API allows it.
-> > =
-
-> > For the missing getsockopt, there was even a patch earlier this year
-> > by J=C3=B6rn-Thorben Hinz [1], but I failed to realize that we need p=
-atch
-> > 1/2 from his series regardless of patch 2/2.
-> > =
-
-> > =C2=A0=C2=A0=C2=A0=C2=A0 Arnd
-> > =
-
-> > [1]
-> > https://lore.kernel.org/lkml/20230703175048.151683-2-jthinz@mailbox.t=
-u-berlin.de/
-> =
-
-
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 15b804ba4..3aaf1a343 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -44,18 +44,31 @@ static void enqueue_external_timestamp(struct timestamp_event_queue *queue,
+ 				       struct ptp_clock_event *src)
+ {
+ 	struct ptp_extts_event *dst;
++	struct timespec64 offset_ts;
+ 	unsigned long flags;
+ 	s64 seconds;
+ 	u32 remainder;
+ 
+-	seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
++	if (src->type == PTP_CLOCK_EXTTS) {
++		seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
++	} else if (src->type == PTP_CLOCK_EXTOFF) {
++		offset_ts = ns_to_timespec64(src->offset);
++		seconds = offset_ts.tv_sec;
++		remainder = offset_ts.tv_nsec;
++	} else {
++		WARN(1, "%s: unknown type %d\n", __func__, src->type);
++		return;
++	}
+ 
+ 	spin_lock_irqsave(&queue->lock, flags);
+ 
+ 	dst = &queue->buf[queue->tail];
+ 	dst->index = src->index;
++	dst->flags = PTP_EXTTS_EVENT_VALID;
+ 	dst->t.sec = seconds;
+ 	dst->t.nsec = remainder;
++	if (src->type == PTP_CLOCK_EXTOFF)
++		dst->flags |= PTP_EXT_OFFSET;
+ 
+ 	/* Both WRITE_ONCE() are paired with READ_ONCE() in queue_cnt() */
+ 	if (!queue_free(queue))
+@@ -417,6 +430,7 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ 		break;
+ 
+ 	case PTP_CLOCK_EXTTS:
++	case PTP_CLOCK_EXTOFF:
+ 		/* Enqueue timestamp on selected queues */
+ 		spin_lock_irqsave(&ptp->tsevqs_lock, flags);
+ 		list_for_each_entry(tsevq, &ptp->tsevqs, qlist) {
+diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+index 1ef4e0f9b..6e4b8206c 100644
+--- a/include/linux/ptp_clock_kernel.h
++++ b/include/linux/ptp_clock_kernel.h
+@@ -200,6 +200,7 @@ struct ptp_clock;
+ enum ptp_clock_events {
+ 	PTP_CLOCK_ALARM,
+ 	PTP_CLOCK_EXTTS,
++	PTP_CLOCK_EXTOFF,
+ 	PTP_CLOCK_PPS,
+ 	PTP_CLOCK_PPSUSR,
+ };
+@@ -210,6 +211,7 @@ enum ptp_clock_events {
+  * @type:  One of the ptp_clock_events enumeration values.
+  * @index: Identifies the source of the event.
+  * @timestamp: When the event occurred (%PTP_CLOCK_EXTTS only).
++ * @offset:    When the event occurred (%PTP_CLOCK_EXTOFF only).
+  * @pps_times: When the event occurred (%PTP_CLOCK_PPSUSR only).
+  */
+ 
+@@ -218,6 +220,7 @@ struct ptp_clock_event {
+ 	int index;
+ 	union {
+ 		u64 timestamp;
++		s64 offset;
+ 		struct pps_event_time pps_times;
+ 	};
+ };
+diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
+index da700999c..a8f0c9d2b 100644
+--- a/include/uapi/linux/ptp_clock.h
++++ b/include/uapi/linux/ptp_clock.h
+@@ -32,6 +32,7 @@
+ #define PTP_RISING_EDGE    (1<<1)
+ #define PTP_FALLING_EDGE   (1<<2)
+ #define PTP_STRICT_FLAGS   (1<<3)
++#define PTP_EXT_OFFSET     (1<<4)
+ #define PTP_EXTTS_EDGES    (PTP_RISING_EDGE | PTP_FALLING_EDGE)
+ 
+ /*
+@@ -40,7 +41,8 @@
+ #define PTP_EXTTS_VALID_FLAGS	(PTP_ENABLE_FEATURE |	\
+ 				 PTP_RISING_EDGE |	\
+ 				 PTP_FALLING_EDGE |	\
+-				 PTP_STRICT_FLAGS)
++				 PTP_STRICT_FLAGS |	\
++				 PTP_EXT_OFFSET)
+ 
+ /*
+  * flag fields valid for the original PTP_EXTTS_REQUEST ioctl.
+@@ -50,6 +52,11 @@
+ 					 PTP_RISING_EDGE |	\
+ 					 PTP_FALLING_EDGE)
+ 
++/*
++ * flag fields valid for the ptp_extts_event report.
++ */
++#define PTP_EXTTS_EVENT_VALID	(PTP_ENABLE_FEATURE)
++
+ /*
+  * Bits of the ptp_perout_request.flags field:
+  */
+@@ -228,7 +235,7 @@ struct ptp_pin_desc {
+ #define PTP_MASK_EN_SINGLE  _IOW(PTP_CLK_MAGIC, 20, unsigned int)
+ 
+ struct ptp_extts_event {
+-	struct ptp_clock_time t; /* Time event occured. */
++	struct ptp_clock_time t; /* Time event occurred. */
+ 	unsigned int index;      /* Which channel produced the event. */
+ 	unsigned int flags;      /* Reserved for future use. */
+ 	unsigned int rsv[2];     /* Reserved for future use. */
+-- 
+2.39.2
 
 
