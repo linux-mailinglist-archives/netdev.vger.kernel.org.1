@@ -1,125 +1,246 @@
-Return-Path: <netdev+bounces-59294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2391381A3BE
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:07:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5807A81A454
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:19:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 566E71C24054
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:07:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C69B11F26A22
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F394644D;
-	Wed, 20 Dec 2023 16:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFFB4CE0A;
+	Wed, 20 Dec 2023 16:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GJQnnvRF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S9t+T1Al"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C0C46431
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 16:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7ba7d17184eso4949439f.0
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 08:06:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1703088388; x=1703693188; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VZ6OBeghSb+PMX3MCxqCEyg+gbKi+XvzXWAkModBVro=;
-        b=GJQnnvRF6tfW0wUXRjntfbgozsdVj7mmm5S92EVbZgEcxXeKbDVkGpC1YWVe/Pwkl9
-         kqXLafOUcmpNKSWF/VonxfFsufMAppMF3U6ZAWKLwdhIrj+e44TEPTVdrp+Yspw6yfxi
-         H9iDZJUTjbE6x8PHykXkftZ5+MXLVi65BtusBs4aQvFxeGZ8M7wgl45z/gc0byiCgYCN
-         EWGwNpMSUiz7lmGptO/eurFBlqecFGzAWJHozXxIXU0639oi53fmJxtMAyDr5vZco7Dg
-         +HEFqjRAVTmot9SGFAVCjsplBVUoghmKrhYbgQxeYiv+5Mfp1E4lU/FcOfxtbQI0SkUc
-         ziSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703088388; x=1703693188;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VZ6OBeghSb+PMX3MCxqCEyg+gbKi+XvzXWAkModBVro=;
-        b=MJL154wrd/fC25ljy9dGRS1fxa3frjo5fb1xN0uD+z2iz7RjAMRcmfdfDAl+JTx+f5
-         1pdTJKW8SwLJEcx7AaC5y1gvHKoFgxRYHH/nHaD5Q/9pdnB46F/sUSk9MCEnUh809v6K
-         rPF8NCelGIO9g3aW6QpDPuXLl214b16ruc5iUB5LChQvwzoqXWd9WzxW+ITqiAzST934
-         BfCa84+jjMwIu61SFFS0OkfG1W4gNLBELt3i2x+MJhYi8J5f3Njy7jm9GDx9h5gmNVMU
-         ye1WxDkeXF8CtoAx/2fcYYy9EyQBGJ7oo6ri43PGDhw6N3aN7MwjIdR5Kv/ZALiAlSZ/
-         072w==
-X-Gm-Message-State: AOJu0YwlBfggFKoIZQWEUBunpZg11hhJK7833VpfX5eCSdfT2TGXawL8
-	bDIdh4xIFkZal6JJsmHBKDTOWw==
-X-Google-Smtp-Source: AGHT+IG+QXQDe8FELkC+SxY/OEfKeHBY6Vv7IxIk2SPJPwttdSu5ZgVH5RwJHErLBv/bWIIE/Xsg+w==
-X-Received: by 2002:a6b:ea0a:0:b0:7b4:520c:de0b with SMTP id m10-20020a6bea0a000000b007b4520cde0bmr33657528ioc.1.1703088388407;
-        Wed, 20 Dec 2023 08:06:28 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ci13-20020a0566383d8d00b00466604d21d6sm6803961jab.124.2023.12.20.08.06.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Dec 2023 08:06:27 -0800 (PST)
-Message-ID: <7fa21652-36fa-4f13-9f36-c1b5ec681bb9@kernel.dk>
-Date: Wed, 20 Dec 2023 09:06:27 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F134CDFF
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 16:13:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E305CC433C7;
+	Wed, 20 Dec 2023 16:13:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703088783;
+	bh=+rnJiRj47sKUD4PY4FismhG5pyfaFnvG3DlWtViNHlI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=S9t+T1AluW3qLv1s5szz4DZmrwboazuwZgG/JfDYQZ0rKXCR+qufFR1NF65KWEIZG
+	 PTNuiURbpEHwlYR2X0JBFTV6VLw4FfLNTiBUeMELs70L8SFYMU6QRNik+SmfCdGjF5
+	 zesgl3k6Chz3/gTrpPo+MYom1yeiVGt/vVO7Wu3tGNHFDO15CMHlsECokT8BEh3roX
+	 L8NfMJdGVo5qHF8vn7RP8BlESa9TK8WXzpkuA8LwOexUZTCEe8qMyPGpdhYVfJTpZI
+	 y1rbuOXQP6101f9F7wKaSHwfw3r7rdvvf5j1jf7pFUNbyG4/Mhk0vUIwFarZLDCAOV
+	 qdfLWEl7M1twA==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Russell King <rmk+kernel@armlinux.org.uk>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH net-next] net: phy: extend genphy_c45_read_eee_abilities() to read capability 2 register
+Date: Wed, 20 Dec 2023 17:12:58 +0100
+Message-ID: <20231220161258.17541-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 10/20] io_uring: setup ZC for an Rx queue when
- registering an ifq
-Content-Language: en-US
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20231219210357.4029713-1-dw@davidwei.uk>
- <20231219210357.4029713-11-dw@davidwei.uk>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20231219210357.4029713-11-dw@davidwei.uk>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/19/23 2:03 PM, David Wei wrote:
-> From: David Wei <davidhwei@meta.com>
-> 
-> This patch sets up ZC for an Rx queue in a net device when an ifq is
-> registered with io_uring. The Rx queue is specified in the registration
-> struct.
-> 
-> For now since there is only one ifq, its destruction is implicit during
-> io_uring cleanup.
-> 
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  io_uring/zc_rx.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 43 insertions(+), 2 deletions(-)
-> 
-> diff --git a/io_uring/zc_rx.c b/io_uring/zc_rx.c
-> index 7e3e6f6d446b..259e08a34ab2 100644
-> --- a/io_uring/zc_rx.c
-> +++ b/io_uring/zc_rx.c
-> @@ -4,6 +4,7 @@
->  #include <linux/errno.h>
->  #include <linux/mm.h>
->  #include <linux/io_uring.h>
-> +#include <linux/netdevice.h>
->  
->  #include <uapi/linux/io_uring.h>
->  
-> @@ -11,6 +12,34 @@
->  #include "kbuf.h"
->  #include "zc_rx.h"
->  
-> +typedef int (*bpf_op_t)(struct net_device *dev, struct netdev_bpf *bpf);
+Extend the generic clause 45 PHY function reading EEE abilities to also
+read the IEEE 802.3-2018 45.2.3.11 "EEE control and capability 2"
+register.
 
-Let's get rid of this, since it isn't even typedef'ed on the networking
-side. Doesn't really buy us anything, and it's only used once anyway.
+The new helpers mii_eee_cap2_mod_linkmode_t() and
+linkmode_to_mii_eee_cap2_t() only parse the 2500baseT and 5000baseT
+EEE bits. The standard also defines bits for 400000baseR, 200000baseR
+and 25000baseT, but we don't have ethtool link bits for those now.
 
+Signed-off-by: Marek Behún <kabel@kernel.org>
+---
+ drivers/net/phy/phy-c45.c    | 47 +++++++++++++++++++++++++++++++++---
+ drivers/net/phy/phy_device.c | 12 ++++++++-
+ include/linux/mdio.h         | 37 ++++++++++++++++++++++++++++
+ include/linux/phy.h          |  2 ++
+ 4 files changed, 94 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 747d14bf152c..8819ff2ff932 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -830,6 +830,39 @@ static int genphy_c45_read_eee_cap1(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++/**
++ * genphy_c45_read_eee_cap2 - read supported EEE link modes from register 3.21
++ * @phydev: target phy_device struct
++ */
++static int genphy_c45_read_eee_cap2(struct phy_device *phydev)
++{
++	int val;
++
++	/* IEEE 802.3-2018 45.2.3.11 EEE control and capability 2
++	 * (Register 3.21)
++	 */
++	val = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_EEE_ABLE2);
++	if (val < 0)
++		return val;
++
++	/* The 802.3 2018 standard says the top 6 bits are reserved and should
++	 * read as 0.
++	 * If MDIO_PCS_EEE_ABLE2 is 0xffff assume EEE is not supported.
++	 */
++	if (val == 0xffff)
++		return 0;
++
++	mii_eee_cap2_mod_linkmode_t(phydev->supported_eee, val);
++
++	/* Some buggy devices may indicate EEE link modes in MDIO_PCS_EEE_ABLE2
++	 * which they don't support as indicated by BMSR, ESTATUS etc.
++	 */
++	linkmode_and(phydev->supported_eee, phydev->supported_eee,
++		     phydev->supported);
++
++	return 0;
++}
++
+ /**
+  * genphy_c45_read_eee_abilities - read supported EEE link modes
+  * @phydev: target phy_device struct
+@@ -838,9 +871,11 @@ int genphy_c45_read_eee_abilities(struct phy_device *phydev)
+ {
+ 	int val;
+ 
+-	/* There is not indicator whether optional register
+-	 * "EEE control and capability 1" (3.20) is supported. Read it only
+-	 * on devices with appropriate linkmodes.
++	/* There is not indicator whether optional registers
++	 * "EEE control and capability 1" (3.20) and
++	 * "EEE control and capability 2" (3.22) are supported. Read them only
++	 * on devices with appropriate
++	 * linkmodes.
+ 	 */
+ 	if (linkmode_intersects(phydev->supported, PHY_EEE_CAP1_FEATURES)) {
+ 		val = genphy_c45_read_eee_cap1(phydev);
+@@ -848,6 +883,12 @@ int genphy_c45_read_eee_abilities(struct phy_device *phydev)
+ 			return val;
+ 	}
+ 
++	if (linkmode_intersects(phydev->supported, PHY_EEE_CAP2_FEATURES)) {
++		val = genphy_c45_read_eee_cap2(phydev);
++		if (val)
++			return val;
++	}
++
+ 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT1L_Full_BIT,
+ 			      phydev->supported)) {
+ 		/* IEEE 802.3cg-2019 45.2.1.186b 10BASE-T1L PMA status register
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 0c52a9eff188..45e812a0d115 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -148,6 +148,14 @@ static const int phy_eee_cap1_features_array[] = {
+ __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap1_features) __ro_after_init;
+ EXPORT_SYMBOL_GPL(phy_eee_cap1_features);
+ 
++static const int phy_eee_cap2_features_array[] = {
++	ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++	ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
++};
++
++__ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap2_features) __ro_after_init;
++EXPORT_SYMBOL_GPL(phy_eee_cap2_features);
++
+ static void features_init(void)
+ {
+ 	/* 10/100 half/full*/
+@@ -232,7 +240,9 @@ static void features_init(void)
+ 	linkmode_set_bit_array(phy_eee_cap1_features_array,
+ 			       ARRAY_SIZE(phy_eee_cap1_features_array),
+ 			       phy_eee_cap1_features);
+-
++	linkmode_set_bit_array(phy_eee_cap2_features_array,
++			       ARRAY_SIZE(phy_eee_cap2_features_array),
++			       phy_eee_cap2_features);
+ }
+ 
+ void phy_device_free(struct phy_device *phydev)
+diff --git a/include/linux/mdio.h b/include/linux/mdio.h
+index 79ceee3c8673..606b2d6920b9 100644
+--- a/include/linux/mdio.h
++++ b/include/linux/mdio.h
+@@ -466,6 +466,43 @@ static inline u32 linkmode_to_mii_eee_cap1_t(unsigned long *adv)
+ 	return result;
+ }
+ 
++/**
++ * mii_eee_cap2_mod_linkmode_t()
++ * @adv: target the linkmode advertisement settings
++ * @val: register value
++ *
++ * A function that translates value of following registers to the linkmode:
++ * IEEE 802.3-2018 45.2.3.11 "EEE control and capability 2" register (3.21)
++ * IEEE 802.3-2018 45.2.7.15 "EEE advertisement 2" register (7.62)
++ * IEEE 802.3-2018 45.2.7.16 "EEE link partner ability 2" register (7.63)
++ */
++static inline void mii_eee_cap2_mod_linkmode_t(unsigned long *adv, u32 val)
++{
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++			 adv, val & MDIO_EEE_2_5GT);
++	linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
++			 adv, val & MDIO_EEE_5GT);
++}
++
++/**
++ * linkmode_to_mii_eee_cap2_t()
++ * @adv: the linkmode advertisement settings
++ *
++ * A function that translates linkmode to value for IEEE 802.3-2018 45.2.7.16
++ * "EEE advertisement 2" register (7.63)
++ */
++static inline u32 linkmode_to_mii_eee_cap2_t(unsigned long *adv)
++{
++	u32 result = 0;
++
++	if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, adv))
++		result |= MDIO_EEE_2_5GT;
++	if (linkmode_test_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, adv))
++		result |= MDIO_EEE_5GT;
++
++	return result;
++}
++
+ /**
+  * mii_10base_t1_adv_mod_linkmode_t()
+  * @adv: linkmode advertisement settings
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index e9e85d347587..dbaddd8f3cdf 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -54,6 +54,7 @@ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_features) __ro_after_init;
+ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_fec_features) __ro_after_init;
+ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_full_features) __ro_after_init;
+ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap1_features) __ro_after_init;
++extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap2_features) __ro_after_init;
+ 
+ #define PHY_BASIC_FEATURES ((unsigned long *)&phy_basic_features)
+ #define PHY_BASIC_T1_FEATURES ((unsigned long *)&phy_basic_t1_features)
+@@ -65,6 +66,7 @@ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap1_features) __ro_after_init;
+ #define PHY_10GBIT_FEC_FEATURES ((unsigned long *)&phy_10gbit_fec_features)
+ #define PHY_10GBIT_FULL_FEATURES ((unsigned long *)&phy_10gbit_full_features)
+ #define PHY_EEE_CAP1_FEATURES ((unsigned long *)&phy_eee_cap1_features)
++#define PHY_EEE_CAP2_FEATURES ((unsigned long *)&phy_eee_cap2_features)
+ 
+ extern const int phy_basic_ports_array[3];
+ extern const int phy_fibre_port_array[1];
 -- 
-Jens Axboe
+2.41.0
 
 
