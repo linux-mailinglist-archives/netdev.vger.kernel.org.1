@@ -1,51 +1,67 @@
-Return-Path: <netdev+bounces-59263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE8A81A1D7
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:08:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD9A81A1F7
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:14:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E8AF1C20C8D
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:08:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FA431F233EF
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53FD83DB9C;
-	Wed, 20 Dec 2023 15:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469A13F8D8;
+	Wed, 20 Dec 2023 15:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GldJfvYo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wacwklq8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE2A3FB04
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 15:08:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4829DC433C8;
-	Wed, 20 Dec 2023 15:08:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703084934;
-	bh=LyOF3M995Rdu4eqFMThvs28tuauoK4Tc2ZQnpozOGGY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GldJfvYovXFW6y9cNgA0FMsMjdIXGH3d7bVLW1L3sYDPtxnuSr181b/CTipnTY5nn
-	 QASOviQ93CIlK3aQMY6HyC041sR3R//un0wgd3FZRsG1T9mdgm9lHYOzXIQfq9g7QY
-	 BTjmgEpU033gEZrgc2CIBKX9gjEp7gswrNmWy4h9hGcbrBF8Yh6ePJ0998DHbDcPVe
-	 wn23Ow+YKCV1G0Ilp3yve74AML6j36A+TBgvgYUDGaRuPpaz+X356u18i320eUoQJr
-	 GE4z5lCEuxmdJCxyZLABJdpBZKJqvfncD88OoqveuZVbkZXnyihRwJ4LsjFXI5dUHC
-	 68n8WRszMTehw==
-Date: Wed, 20 Dec 2023 16:08:46 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
-	chenhuacai@loongson.cn, linux@armlinux.org.uk,
-	guyinggang@loongson.cn, netdev@vger.kernel.org,
-	chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v7 1/9] net: stmmac: Pass stmmac_priv and chan
- in some callbacks
-Message-ID: <20231220150846.GL882741@kernel.org>
-References: <cover.1702990507.git.siyanteng@loongson.cn>
- <8414049581ed11a2466dc75e0e1f2ef4be7d0fd9.1702990507.git.siyanteng@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01923D38F;
+	Wed, 20 Dec 2023 15:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703085284; x=1734621284;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ULvCCsVn4cqIVLiFeZesMLdDzimmihjmZz9S7LtZK9I=;
+  b=Wacwklq89/7WWhlBLn/54lbeuyQzWOtOPGArJ00suyr4/x3MkXFjzrSM
+   BE3b4YRMJ1Hp5Ccz1BNdRFL/O0D+eaPmtBjwFJizkXFJh2lkyN0OihB93
+   a36dx+YOEgk6uGYO53HZe1Y6/nx+WXIrpQVh/NZnmoTUqE3xEuPErF5x1
+   7EPaWhzvhkK8VUHyq674sHZLMCF4/WDOxIptsntzhVHvan9NueNVjFLNB
+   RoBAOzCrU47VSDNhwcTidWR9jfrWviCueAeuVdTl8iCjeKG1hS0u9PZOK
+   3KA2nSLuaB10ewudteP5POTpWyKFoLGx8lYrNYCoNd27x9tdfmBa2a3bB
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="9293728"
+X-IronPort-AV: E=Sophos;i="6.04,291,1695711600"; 
+   d="scan'208";a="9293728"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2023 07:14:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="776372196"
+X-IronPort-AV: E=Sophos;i="6.04,291,1695711600"; 
+   d="scan'208";a="776372196"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 20 Dec 2023 07:14:40 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rFyHO-00073J-1B;
+	Wed, 20 Dec 2023 15:14:38 +0000
+Date: Wed, 20 Dec 2023 23:13:56 +0800
+From: kernel test robot <lkp@intel.com>
+To: Hangyu Hua <hbh25y@gmail.com>, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	tgraf@suug.ch
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Hangyu Hua <hbh25y@gmail.com>
+Subject: Re: [PATCH] net: sched: em_text: fix possible memory leak in
+ em_text_destroy()
+Message-ID: <202312202228.58nFn5h0-lkp@intel.com>
+References: <20231220030838.11751-1-hbh25y@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,51 +70,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8414049581ed11a2466dc75e0e1f2ef4be7d0fd9.1702990507.git.siyanteng@loongson.cn>
+In-Reply-To: <20231220030838.11751-1-hbh25y@gmail.com>
 
-On Tue, Dec 19, 2023 at 10:17:04PM +0800, Yanteng Si wrote:
-> Loongson GMAC and GNET have some special features. To prepare for that,
-> pass stmmac_priv and chan to more callbacks, and adjust the callbacks
-> accordingly.
-> 
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c   |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c  |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c    |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h     |  3 ++-
->  drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c     |  3 ++-
->  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c  |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/hwif.h          | 11 ++++++-----
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   |  6 +++---
->  9 files changed, 18 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> index 137741b94122..7cdfa0bdb93a 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> @@ -395,7 +395,7 @@ static void sun8i_dwmac_dma_start_tx(struct stmmac_priv *priv,
->  	writel(v, ioaddr + EMAC_TX_CTL1);
->  }
->  
-> -static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr)
-> +static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
->  {
->  	u32 v;
->  
+Hi Hangyu,
 
-Hi Yanteng Si,
+kernel test robot noticed the following build warnings:
 
-perhaps dwmac-sun8i.c needs to be further updated for this change?
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master v6.7-rc6]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-  .../dwmac-sun8i.c:568:10: error: incompatible function pointer types initializing 'void (*)(struct stmmac_priv *, void *, struct stmmac_dma_cfg *, int)' with an expression of type 'void (void *, struct stmmac_dma_cfg *, int)' [-Wincompatible-function-pointer-types]
-    568 |         .init = sun8i_dwmac_dma_init,
-        |                 ^~~~~~~~~~~~~~~~~~~~
-  .../dwmac-sun8i.c:574:29: error: incompatible function pointer types initializing 'void (*)(struct stmmac_priv *, void *, u32)' (aka 'void (*)(struct stmmac_priv *, void *, unsigned int)') with an expression of type 'void (void *, u32)' (aka 'void (void *, unsigned int)') [-Wincompatible-function-pointer-types]
-    574 |         .enable_dma_transmission = sun8i_dwmac_enable_dma_transmission,
-        |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  2 errors generated.
+url:    https://github.com/intel-lab-lkp/linux/commits/Hangyu-Hua/net-sched-em_text-fix-possible-memory-leak-in-em_text_destroy/20231220-111317
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231220030838.11751-1-hbh25y%40gmail.com
+patch subject: [PATCH] net: sched: em_text: fix possible memory leak in em_text_destroy()
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20231220/202312202228.58nFn5h0-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231220/202312202228.58nFn5h0-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312202228.58nFn5h0-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/sched/em_text.c: In function 'em_text_destroy':
+>> net/sched/em_text.c:102:24: warning: passing argument 1 of 'kfree' makes pointer from integer without a cast [-Wint-conversion]
+     102 |                 kfree(m->data);
+         |                       ~^~~~~~
+         |                        |
+         |                        long unsigned int
+   In file included from net/sched/em_text.c:8:
+   include/linux/slab.h:227:24: note: expected 'const void *' but argument is of type 'long unsigned int'
+     227 | void kfree(const void *objp);
+         |            ~~~~~~~~~~~~^~~~
+
+
+vim +/kfree +102 net/sched/em_text.c
+
+    97	
+    98	static void em_text_destroy(struct tcf_ematch *m)
+    99	{
+   100		if (EM_TEXT_PRIV(m) && EM_TEXT_PRIV(m)->config) {
+   101			textsearch_destroy(EM_TEXT_PRIV(m)->config);
+ > 102			kfree(m->data);
+   103		}
+   104	}
+   105	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
