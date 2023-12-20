@@ -1,82 +1,87 @@
-Return-Path: <netdev+bounces-59243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E122581A0B2
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:06:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC66881A0CB
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 15:10:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FE521C22912
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:06:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 920171F2A463
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA6037D0A;
-	Wed, 20 Dec 2023 14:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rTzf0ap7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8306238FAC;
+	Wed, 20 Dec 2023 14:09:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EFD38DE3
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 14:06:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92EDCC433C8;
-	Wed, 20 Dec 2023 14:06:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703081206;
-	bh=SpCJMDeCD4HcYyrbVLA99GfUPdLi6W145asKWtGiHLk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rTzf0ap7hqC1j6y7Vgy7MnGAbNMIP4MnuuyMCchI5tfqdPru2AJrqYyZEZmhNYym6
-	 chQHop0N3jC3PEPCT1xGY77k1RzQNVNGyJWG7GYa2T5Bvzbz+Ia8D5oldgA6rRjehY
-	 tRynVWabzRhWqiRJMavYpTXwkn4beRyzyslVwasfaAx2DkUjCSPVEwXa4qEXSgFO0n
-	 uEcU57zBeqqU1/tIXiaoCPz5kbBvyGY8zp+qxVrGHMXo/PyKcd6/cFgdPcy2UPXuUh
-	 adZve6lKFNaZmFGf8FRsIqYUZg5K7q1t+FN6uiLMFCQpVWejTk/3wG5zMrKWnyy5Yz
-	 e5V6KCPAVyAjw==
-Date: Wed, 20 Dec 2023 15:06:40 +0100
-From: Simon Horman <horms@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Daniel Mendes <dmendes@redhat.com>,
-	Florian Westphal <fw@strlen.de>, David Miller <davem@davemloft.net>
-Subject: Re: [PATCH net] kselftest: rtnetlink.sh: use grep_fail when
- expecting the cmd fail
-Message-ID: <20231220140640.GG882741@kernel.org>
-References: <20231219065737.1725120-1-liuhangbin@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BCA39862;
+	Wed, 20 Dec 2023 14:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VyumN1T_1703081351;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VyumN1T_1703081351)
+          by smtp.aliyun-inc.com;
+          Wed, 20 Dec 2023 22:09:20 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de
+Cc: bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	coreteam@netfilter.org,
+	netfilter-devel@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org
+Subject: [RFC nf-next v3 0/2] netfilter: bpf: support prog update
+Date: Wed, 20 Dec 2023 22:09:09 +0800
+Message-Id: <1703081351-85579-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231219065737.1725120-1-liuhangbin@gmail.com>
 
-On Tue, Dec 19, 2023 at 02:57:37PM +0800, Hangbin Liu wrote:
-> run_cmd_grep_fail should be used when expecting the cmd fail, or the ret
-> will be set to 1, and the total test return 1 when exiting. This would cause
-> the result report to fail if run via run_kselftest.sh.
-> 
-> Before fix:
->  # ./rtnetlink.sh -t kci_test_addrlft
->  PASS: preferred_lft addresses have expired
->  # echo $?
->  1
-> 
-> After fix:
->  # ./rtnetlink.sh -t kci_test_addrlft
->  PASS: preferred_lft addresses have expired
->  # echo $?
->  0
-> 
-> Fixes: 9c2a19f71515 ("kselftest: rtnetlink.sh: add verbose flag")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-Thanks,
+This patches attempt to implements updating of progs within
+bpf netfilter link, allowing user update their ebpf netfilter
+prog in hot update manner.
 
-I agree that this corrects inverted logic wrt setting
-the global 'ret' value and in turn the exit value of the script.
+Besides, a corresponding test case has been added to verify
+whether the update works.
 
-I also agree that the problem was introduced by the cited commit.
+--
+v1:
+1. remove unnecessary context, access the prog directly via rcu.
+2. remove synchronize_rcu(), dealloc the nf_link via kfree_rcu.
+3. check the dead flag during the update.
+--
+v1->v2:
+1. remove unnecessary nf_prog, accessing nf_link->link.prog in direct.
+--
+v2->v3:
+1. access nf_link->link.prog via rcu_dereference_raw to avoid warning.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+
+D. Wythe (2):
+  netfilter: bpf: support prog update
+  selftests/bpf: Add netfilter link prog update test
+
+ net/netfilter/nf_bpf_link.c                        | 63 ++++++++++++----
+ .../bpf/prog_tests/netfilter_link_update_prog.c    | 83 ++++++++++++++++++++++
+ .../bpf/progs/test_netfilter_link_update_prog.c    | 24 +++++++
+ 3 files changed, 155 insertions(+), 15 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/netfilter_link_update_prog.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_netfilter_link_update_prog.c
+
+-- 
+1.8.3.1
+
 
