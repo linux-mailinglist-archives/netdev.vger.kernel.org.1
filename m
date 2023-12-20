@@ -1,138 +1,148 @@
-Return-Path: <netdev+bounces-59189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C301B819BF1
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:02:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54EEC819C2F
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:09:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 016661C24369
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:02:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8688E1C258A7
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB5620B0B;
-	Wed, 20 Dec 2023 10:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4113B36AFC;
+	Wed, 20 Dec 2023 10:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AU4OHWD7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7931A20DD3
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 10:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7ba74c2a1d6so56081939f.0
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 02:01:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703066485; x=1703671285;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OsQ6ErNzgNNrVVuDT54IjGEFY8eRo6Uqt7+OdHX/zF0=;
-        b=ZkKwX1cveCBivX5NX9NRVgI2UpYHVP4Mkp5ofZSZIP8nW0i0KfjqijL5q0241Pk79E
-         YLjN2CWPBgTNo71bayCxhjJ57KYSqiY2nGU8uxg3ATykGzGuCtQHwqtuBERfvNgRRUYm
-         aLoI8LvX8XFfPvFwyYDhV6AybdDEMmGyt127kYO2ZWpCvGJP8uiLRUaVrsScot0FRQVl
-         Bo8dRWRLcTqZnIckbFTce3lJweW9AgGO0c5fpHXcr3pjGTt8+Gk49TuPP1r9r3xESAy8
-         qmxdp6PFBPv6nZZMXrwvrzPFb6SNNu8DEGKPjqUfmtQNXRxpEXN9Nq//0AVYb7pg8EYo
-         UM8w==
-X-Gm-Message-State: AOJu0Yz7gBheqvQV3DP/lAM9mUSQvJGE3/T4EgoFCn1ouYmYztDfB+Ku
-	i/CTzqEaahHu1LrgjP4hX9CfYe3699Kl3rhoE49eghzpNUid
-X-Google-Smtp-Source: AGHT+IG5g/6KURzc6dFEf5ixBSIkefT2Gbyw+fETSPEut4fNx188Ul+HE7C8F3B6y0dOdUcHltKzpMy0WwrKcApz9TFBoTUVfUxG
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA54421104
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 10:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703066675;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fIGeUN2dP3Kfk2DN6cUDjpJQQIxLf4/llr+ahmqgJ9o=;
+	b=AU4OHWD7R/sp36AIAV17b9y9f+FcESgvDhnCeyb0q9WldF1YGOSDRX6qU0K2zrOKtgDOKv
+	J0dDxG+EyUKagF6hvB8v+C3P1rzoDje5BIeSp5l+q59QIKeXp8W7JVhDPnCkHG3dr28e9g
+	uHZXq91m6RPLGUedbVtRx8thgMRpDjI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-371-MZjr-7LVPD-4eoRcMCQdwA-1; Wed, 20 Dec 2023 05:04:31 -0500
+X-MC-Unique: MZjr-7LVPD-4eoRcMCQdwA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 86329101A52A;
+	Wed, 20 Dec 2023 10:04:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8BFAB51D5;
+	Wed, 20 Dec 2023 10:04:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <ZXxUx_nh4HNTaDJx@codewreck.org>
+References: <ZXxUx_nh4HNTaDJx@codewreck.org> <20231213152350.431591-1-dhowells@redhat.com> <20231215-einziehen-landen-94a63dd17637@brauner>
+To: Dominique Martinet <asmadeus@codewreck.org>
+Cc: dhowells@redhat.com, Christian Brauner <brauner@kernel.org>,
+    Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 00/39] netfs, afs, 9p: Delegate high-level I/O to netfslib
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:1e06:0:b0:35f:4dfd:c224 with SMTP id
- e6-20020a921e06000000b0035f4dfdc224mr1156581ile.0.1703066485653; Wed, 20 Dec
- 2023 02:01:25 -0800 (PST)
-Date: Wed, 20 Dec 2023 02:01:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e8099a060cee1003@google.com>
-Subject: [syzbot] [perf?] WARNING in perf_event_open
-From: syzbot <syzbot+07144c543a5c002c7305@syzkaller.appspotmail.com>
-To: acme@kernel.org, adrian.hunter@intel.com, 
-	alexander.shishkin@linux.intel.com, irogers@google.com, jolsa@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	mark.rutland@arm.com, mingo@redhat.com, namhyung@kernel.org, 
-	netdev@vger.kernel.org, peterz@infradead.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1384978.1703066666.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Dec 2023 10:04:26 +0000
+Message-ID: <1384979.1703066666@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-Hello,
+Dominique Martinet <asmadeus@codewreck.org> wrote:
 
-syzbot found the following issue on:
+> I'll go back to dhowell's tree to finally test 9p a bit,
+> sorry for lack of involvement just low on time all around.
 
-HEAD commit:    441c725ed592 selftests/bpf: Close cgrp fd before calling c..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1444d11ae80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8f565e10f0b1e1fc
-dashboard link: https://syzkaller.appspot.com/bug?extid=07144c543a5c002c7305
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+I've rebased my tree on -rc6 rather than linux-next for Christian to pull.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Ganesha keeps falling over:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8b0f45da11b1/disk-441c725e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2a5034980240/vmlinux-441c725e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2daadb549a4c/bzImage-441c725e.xz
+[root@carina build]# valgrind ./ganesha.nfsd -L /var/log/ganesha/ganesha.l=
+og -f /etc/ganesha/ganesha.conf -N NIV_EVENT -F
+=3D=3D38960=3D=3D Memcheck, a memory error detector
+=3D=3D38960=3D=3D Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward=
+ et al.
+=3D=3D38960=3D=3D Using Valgrind-3.22.0 and LibVEX; rerun with -h for copy=
+right info
+=3D=3D38960=3D=3D Command: ./ganesha.nfsd -L /var/log/ganesha/ganesha.log =
+-f /etc/ganesha/ganesha.conf -N NIV_EVENT -F
+=3D=3D38960=3D=3D =
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+07144c543a5c002c7305@syzkaller.appspotmail.com
+=3D=3D38960=3D=3D Thread 138:
+=3D=3D38960=3D=3D Invalid read of size 4
+=3D=3D38960=3D=3D    at 0x4DC32D6: pthread_cond_signal@@GLIBC_2.3.2 (pthre=
+ad_cond_signal.c:41)
+=3D=3D38960=3D=3D    by 0x489700C: sync_cb (fsal_helper.c:1837)
+=3D=3D38960=3D=3D    by 0x49D79DF: mdc_read_super_cb (mdcache_file.c:559)
+=3D=3D38960=3D=3D    by 0x49D7AC5: mdc_read_cb (mdcache_file.c:582)
+=3D=3D38960=3D=3D    by 0x7B4B81F: vfs_read2 (file.c:1317)
+=3D=3D38960=3D=3D    by 0x49D7BCF: mdcache_read2 (mdcache_file.c:617)
+=3D=3D38960=3D=3D    by 0x4897173: fsal_read (fsal_helper.c:1849)
+=3D=3D38960=3D=3D    by 0x4A10FD4: _9p_read (9p_read.c:134)
+=3D=3D38960=3D=3D    by 0x4A0A024: _9p_process_buffer (9p_interpreter.c:18=
+1)
+=3D=3D38960=3D=3D    by 0x4A09DCB: _9p_tcp_process_request (9p_interpreter=
+.c:133)
+=3D=3D38960=3D=3D    by 0x48CE182: _9p_execute (9p_dispatcher.c:315)
+=3D=3D38960=3D=3D    by 0x48CE508: _9p_worker_run (9p_dispatcher.c:412)
+=3D=3D38960=3D=3D  Address 0x24 is not stack'd, malloc'd or (recently) fre=
+e'd
+=3D=3D38960=3D=3D =
 
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5193 at kernel/events/core.c:1950 perf_event_validate_size kernel/events/core.c:1950 [inline]
-WARNING: CPU: 1 PID: 5193 at kernel/events/core.c:1950 __do_sys_perf_event_open+0x2748/0x2c70 kernel/events/core.c:12655
-Modules linked in:
-CPU: 1 PID: 5193 Comm: syz-executor.5 Not tainted 6.7.0-rc5-syzkaller-01532-g441c725ed592 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:perf_event_validate_size kernel/events/core.c:1950 [inline]
-RIP: 0010:__do_sys_perf_event_open+0x2748/0x2c70 kernel/events/core.c:12655
-Code: ff 48 8d b8 a8 00 00 00 e8 85 0a cf 08 bf 01 00 00 00 89 c3 89 c6 e8 77 74 d5 ff 83 eb 01 0f 84 2d ed ff ff e8 f9 78 d5 ff 90 <0f> 0b 90 e9 1f ed ff ff e8 eb 78 d5 ff be 03 00 00 00 48 89 ef e8
-RSP: 0018:ffffc90005187d90 EFLAGS: 00010246
-RAX: 0000000000040000 RBX: 00000000ffffffff RCX: ffffc90003d11000
-RDX: 0000000000040000 RSI: ffffffff81b224a7 RDI: 0000000000000005
-RBP: ffff888077570000 R08: 0000000000000005 R09: 0000000000000001
-R10: 0000000000000000 R11: ffffffff915e51d0 R12: ffff8880291ffb00
-R13: 1ffff92000a30fbd R14: ffff88807a94d940 R15: ffff888077570000
-FS:  00007fa10795c6c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000002a097000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7fa106c7cbe9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa10795c0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000012a
-RAX: ffffffffffffffda RBX: 00007fa106d9bf80 RCX: 00007fa106c7cbe9
-RDX: ffffffffffffffff RSI: 0000000000000000 RDI: 0000000020000000
-RBP: 00007fa106cc847a R08: 0000000000000001 R09: 0000000000000000
-R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fa106d9bf80 R15: 00007fff36da3b98
- </TASK>
+=3D=3D38960=3D=3D =
 
+=3D=3D38960=3D=3D Process terminating with default action of signal 11 (SI=
+GSEGV): dumping core
+=3D=3D38960=3D=3D  Access not within mapped region at address 0x24
+=3D=3D38960=3D=3D    at 0x4DC32D6: pthread_cond_signal@@GLIBC_2.3.2 (pthre=
+ad_cond_signal.c:41)
+=3D=3D38960=3D=3D    by 0x489700C: sync_cb (fsal_helper.c:1837)
+=3D=3D38960=3D=3D    by 0x49D79DF: mdc_read_super_cb (mdcache_file.c:559)
+=3D=3D38960=3D=3D    by 0x49D7AC5: mdc_read_cb (mdcache_file.c:582)
+=3D=3D38960=3D=3D    by 0x7B4B81F: vfs_read2 (file.c:1317)
+=3D=3D38960=3D=3D    by 0x49D7BCF: mdcache_read2 (mdcache_file.c:617)
+=3D=3D38960=3D=3D    by 0x4897173: fsal_read (fsal_helper.c:1849)
+=3D=3D38960=3D=3D    by 0x4A10FD4: _9p_read (9p_read.c:134)
+=3D=3D38960=3D=3D    by 0x4A0A024: _9p_process_buffer (9p_interpreter.c:18=
+1)
+=3D=3D38960=3D=3D    by 0x4A09DCB: _9p_tcp_process_request (9p_interpreter=
+.c:133)
+=3D=3D38960=3D=3D    by 0x48CE182: _9p_execute (9p_dispatcher.c:315)
+=3D=3D38960=3D=3D    by 0x48CE508: _9p_worker_run (9p_dispatcher.c:412)
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+David
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
