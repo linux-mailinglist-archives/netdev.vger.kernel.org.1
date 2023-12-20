@@ -1,194 +1,129 @@
-Return-Path: <netdev+bounces-59194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23CC3819CAF
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:25:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C33B5819CBA
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:28:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4D381F2A712
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:25:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 628AD1F210C7
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C99521361;
-	Wed, 20 Dec 2023 10:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E56E200CD;
+	Wed, 20 Dec 2023 10:28:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i927pW08"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WFNUzZsz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957AC21363
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 10:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703067770;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3tenCflcvwHDUupcimFI6COHvWVks/d4mt7BRqPCBH0=;
-	b=i927pW082998OCCHVinpFZ9nDQkG9ZzvLWuKuuOYYQ7JdcAp4WruzhD5DP9f/gm3LL+hJG
-	SzDe0l1gRsm7dLiHMKNApSCbNvDmbRm/GJ5QUyBawnhcLNa5q4wGwRfGQL62XrISS1HNAm
-	U/wp+MJ+kJgWNVpIOcX5vjgOEyltfx0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-CMEPLGxwPPiOkIOSXlg1BQ-1; Wed, 20 Dec 2023 05:22:48 -0500
-X-MC-Unique: CMEPLGxwPPiOkIOSXlg1BQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a268540bc61so19068766b.0
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 02:22:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703067767; x=1703672567;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3tenCflcvwHDUupcimFI6COHvWVks/d4mt7BRqPCBH0=;
-        b=CbLfzR2grWeKSj4CnmoAR6ZEF7ZxmfO3G9pmeJjO//AJ+QUSnPQTVybrOkqmqaSjQw
-         JEAAyvHPL6NCjRetkpdquK7NlTZ/RhOhle+38B9uPhk9k5N42ixP63MkBVAv75+uvalF
-         CQJG0TK9fp6mqPvTWkbbe5aqZeJagI2wAHzeUPHZnD906N1Axz9V6BOCCBfjuozb01r6
-         HrgqoDiBMk71t4FbM+viwV71JLRn4IrrD/bylw+eJJZa0aYFv5OYPhmSyb+YVGtBzAOz
-         lVgcz5/mmkkMA2mtpOZIqqHnE2gTHp0IZaWP5BaeWrLMTLxnnEfBh7WBf6bNTGXHNptG
-         Gg7g==
-X-Gm-Message-State: AOJu0YxzRN8Spe4YmjGzLJOKADsrgN4PErs8KnbhOvfR4aR0phbYbEFw
-	j9VMbHH49rKxagfu8v/ZS5ZZ65cDkalWzXELy8T2d8go/2F05nXJlfSizdAx+VzSgoaxo7wAeHG
-	x1Oq2gFtCOzU7Ib0E
-X-Received: by 2002:a17:907:72c3:b0:a23:679c:4683 with SMTP id du3-20020a17090772c300b00a23679c4683mr4746676ejc.4.1703067767651;
-        Wed, 20 Dec 2023 02:22:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGtUPRbx8MOeVOB8yA1mqeocJegsUUHrUmn8bGLwalPKHDnymDVFdMN/bgsTjAY0nQT2gkKMA==
-X-Received: by 2002:a17:907:72c3:b0:a23:679c:4683 with SMTP id du3-20020a17090772c300b00a23679c4683mr4746660ejc.4.1703067767211;
-        Wed, 20 Dec 2023 02:22:47 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-246-245.dyn.eolo.it. [146.241.246.245])
-        by smtp.gmail.com with ESMTPSA id i19-20020a170906265300b00a234c5d0834sm4115922ejc.175.2023.12.20.02.22.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 02:22:46 -0800 (PST)
-Message-ID: <533e8e80c4db4ecd34a2c49dd3de3e76810afe22.camel@redhat.com>
-Subject: Re: [PATCH v6 bpf-next 3/6] bpf: tcp: Handle BPF SYN Cookie in
- skb_steal_sock().
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mat Martineau <martineau@kernel.org>, Kuniyuki Iwashima
- <kuniyu@amazon.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, edumazet@google.com, 
- andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net,  kuni1840@gmail.com, martin.lau@linux.dev,
- netdev@vger.kernel.org,  mptcp@lists.linux.dev
-Date: Wed, 20 Dec 2023 11:22:45 +0100
-In-Reply-To: <7d00ad25-abaa-191d-8e80-32674377b053@kernel.org>
-References: 
-	<CANn89i+8e8VJ8cJX6vwLFhtj=BmT233nNr=F9H3nFs8BZgTbsQ@mail.gmail.com>
-	 <20231215023707.41864-1-kuniyu@amazon.com>
-	 <7d00ad25-abaa-191d-8e80-32674377b053@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2222030B;
+	Wed, 20 Dec 2023 10:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BK9M0p8013415;
+	Wed, 20 Dec 2023 10:27:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=iwWma8cZ9aS71ZfZwoeukmPm1JcbbrlRzgqA4zD+xZQ=;
+ b=WFNUzZszzkQrOaiZTRoYgHJ/Ir0+JVztUcP59yDaXg51htpfVJ4pkJfyT5eIoWjPuATO
+ zbMnddbNouq5fDlYABNidADjWhZnoOT37a/ALrtUQDIAgIbuNLvOVt5NEeJMNzjFW/sU
+ 9bb/9PVgUHqMFrgggF7C3mldKbVUrGgMrKd7wZnCX6bjIATcHX23SPOjfzj+tX+N7Mf6
+ hra958VusMgj6yO/earqP7aQm0cy+MAwLAvn34BKo7U9HS2T+5GOfZ343CwhnoePFz+Q
+ p713ho1TjoS64mY8iSXqyn1bhqviUTSjMV7ra9r6dINkrEj1n8uicLz9DcIjQwbkb1+n LQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3n4gvjnd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 10:27:52 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BK9v0wk002163;
+	Wed, 20 Dec 2023 10:27:51 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3n4gvjn0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 10:27:51 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BK7xdUe010900;
+	Wed, 20 Dec 2023 10:27:50 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1q7nnr6n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 10:27:49 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BKARk8128049954
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 20 Dec 2023 10:27:46 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2038B20065;
+	Wed, 20 Dec 2023 10:27:46 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A5DC62004B;
+	Wed, 20 Dec 2023 10:27:45 +0000 (GMT)
+Received: from [9.152.224.160] (unknown [9.152.224.160])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 20 Dec 2023 10:27:45 +0000 (GMT)
+Message-ID: <f43f77f9-416b-4ef6-9def-f0dd1b7a3efb@linux.ibm.com>
+Date: Wed, 20 Dec 2023 11:27:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 03/10] net/smc: unify the structs of accept or
+ confirm message for v1 and v2
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231219142616.80697-1-guwen@linux.alibaba.com>
+ <20231219142616.80697-4-guwen@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20231219142616.80697-4-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Xkfw8UmfKOyny7_hP9KLIrMxYIubc7sT
+X-Proofpoint-GUID: juB57zyeVn9VWg97zh-jhQs1JKxOQAqJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-20_02,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 phishscore=0 adultscore=0 suspectscore=0 mlxlogscore=775
+ spamscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
+ clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312200073
 
-On Tue, 2023-12-19 at 08:45 -0800, Mat Martineau wrote:
-> On Fri, 15 Dec 2023, Kuniyuki Iwashima wrote:
->=20
-> > From: Eric Dumazet <edumazet@google.com>
-> > Date: Thu, 14 Dec 2023 17:31:15 +0100
-> > > On Thu, Dec 14, 2023 at 4:56=E2=80=AFPM Kuniyuki Iwashima <kuniyu@ama=
-zon.com> wrote:
-> > > >=20
-> > > > We will support arbitrary SYN Cookie with BPF.
-> > > >=20
-> > > > If BPF prog validates ACK and kfunc allocates a reqsk, it will
-> > > > be carried to TCP stack as skb->sk with req->syncookie 1.  Also,
-> > > > the reqsk has its listener as req->rsk_listener with no refcnt
-> > > > taken.
-> > > >=20
-> > > > When the TCP stack looks up a socket from the skb, we steal
-> > > > inet_reqsk(skb->sk)->rsk_listener in skb_steal_sock() so that
-> > > > the skb will be processed in cookie_v[46]_check() with the
-> > > > listener.
-> > > >=20
-> > > > Note that we do not clear skb->sk and skb->destructor so that we
-> > > > can carry the reqsk to cookie_v[46]_check().
-> > > >=20
-> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > ---
-> > > >  include/net/request_sock.h | 15 +++++++++++++--
-> > > >  1 file changed, 13 insertions(+), 2 deletions(-)
-> > > >=20
-> > > > diff --git a/include/net/request_sock.h b/include/net/request_sock.=
-h
-> > > > index 26c630c40abb..8839133d6f6b 100644
-> > > > --- a/include/net/request_sock.h
-> > > > +++ b/include/net/request_sock.h
-> > > > @@ -101,10 +101,21 @@ static inline struct sock *skb_steal_sock(str=
-uct sk_buff *skb,
-> > > >         }
-> > > >=20
-> > > >         *prefetched =3D skb_sk_is_prefetched(skb);
-> > > > -       if (*prefetched)
-> > > > +       if (*prefetched) {
-> > > > +#if IS_ENABLED(CONFIG_SYN_COOKIES)
-> > > > +               if (sk->sk_state =3D=3D TCP_NEW_SYN_RECV && inet_re=
-qsk(sk)->syncookie) {
-> > > > +                       struct request_sock *req =3D inet_reqsk(sk)=
-;
-> > > > +
-> > > > +                       *refcounted =3D false;
-> > > > +                       sk =3D req->rsk_listener;
-> > > > +                       req->rsk_listener =3D NULL;
-> > >=20
-> > > I am not sure about interactions with MPTCP.
-> > >=20
-> > > I would be nice to have their feedback.
-> >=20
-> > Matthieu, Mat, Paolo, could you double check if the change
-> > above is sane ?
-> > https://lore.kernel.org/bpf/20231214155424.67136-4-kuniyu@amazon.com/
->=20
-> Hi Kuniyuki -
->=20
-> Yes, we will take a look. Haven't had time to look in detail yet but I=
-=20
-> wanted to let you know we saw your message and will follow up.
 
-I'm sorry for the late reply.
 
-AFAICS, from mptcp perspective, the main differences from built-in
-cookie validation are:
+On 19.12.23 15:26, Wen Gu wrote:
+> The structs of CLC accept and confirm messages for SMCv1 and SMCv2 are
+> separately defined and often casted to each other in the code, which may
+> increase the risk of errors caused by future divergence of them. So
+> unify them into one struct for better maintainability.
+> 
+> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
+>  net/smc/af_smc.c  | 52 +++++++++++++------------------------
+>  net/smc/smc_clc.c | 65 ++++++++++++++++++++---------------------------
+>  net/smc/smc_clc.h | 42 +++++++++++++-----------------
+>  3 files changed, 62 insertions(+), 97 deletions(-)
 
-- cookie allocation via mptcp_subflow_reqsk_alloc() and cookie
-'finalization' via cookie_tcp_reqsk_init() /
-mptcp_subflow_init_cookie_req(req, sk, skb) could refer 2 different
-listeners - within the same REUSEPORT group.
+Thanks a lot Wen Gu, I really love this.
+Using an unnamed union is a great solution here. Now the code is so much more
+readable and maintainable
 
-- incoming pure syn packets will not land into the TCP stack, so
-af_ops->route_req will not happen.
-
-I think both the above are problematic form mptcp.=C2=A0
-
-Potentially we can have both mptcp-enabled and plain tcp socket with
-the same reuseport group.=20
-
-Currently the mptcp code assumes the listener is mptcp
-cookie_tcp_reqsk_init(), the req is mptcp, too. I think we could fix
-this at the mptcp level, but no patch ready at the moment.
-
-Even the missing call to route_req() is problematic, as we use that to
-fetch required information from the initial syn for MP_JOIN subflows -
-yep, unfortunately mptcp needs to track of some state across MPJ syn
-and MPJ 3rd ack reception.
-
-Fixing this last item looks more difficult. I think it would be safer
-and simpler to avoid mptcp support for generic syncookie and ev enable
-it later - after we address things on the mptcp side.
-
-@Eric, were you looking to something else and/or more specific?
-
-Thanks!
-
-Paolo
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
 
 
 
