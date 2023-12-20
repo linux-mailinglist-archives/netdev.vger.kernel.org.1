@@ -1,208 +1,187 @@
-Return-Path: <netdev+bounces-59187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7DA1819BA3
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:46:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AAAF819BE9
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:02:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12B5AB25446
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:46:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0BD72883DE
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BACF1F5FF;
-	Wed, 20 Dec 2023 09:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE923208A6;
+	Wed, 20 Dec 2023 10:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="MoLMUGgP"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070931F5E4
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 09:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rFt9w-00032F-RJ; Wed, 20 Dec 2023 10:46:36 +0100
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1BF208C4;
+	Wed, 20 Dec 2023 10:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:Cc:To:References:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=EUpvZ7ImcN6iRBfQR5QrQA+ZGjPdmy3aiW0Hd3hcrnQ=; b=MoLMUGgP4+KzLa7czzl6ONHYAl
+	0EqEtrZ0BILxZDz94BF+D9YBpP5rnTozkKaFIFBIuUYKU1xIZNU+pAxJpzqEYCv27vgA7swaWERo7
+	BfOZ1gkpo4x8Og2VMsUKVEDuUGtw7SaW+P6LQYY6LopglGIUD5U5BonG/EK/64C1pnE2tboUg4frK
+	RQfiRG4qlnoMpAqhY95ffzvQ4Oc+iEIjj12ezG9e1K2/lGLTQJO0DPj1WdeFk9d3bikVLFZE6nlZk
+	WiznGcVG3CXkV5mT5ZXM58GZymTsxR8/mura55GcV6XQuCIzFlJGEq03UCW5r/VksscUb6bk0txps
+	kgd+K/EA==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rFt9t-000DKM-LV; Wed, 20 Dec 2023 10:46:34 +0100
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rFt9u-007uXL-LS; Wed, 20 Dec 2023 10:46:34 +0100
-Date: Wed, 20 Dec 2023 10:46:34 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com,
-	Eric Dumazet <edumazet@google.com>, kernel@pengutronix.de,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: Fix PHY loopback
- configuration for KSZ8794 and KSZ8873
-Message-ID: <20231220094634.GG1697233@pengutronix.de>
-References: <20231121152426.4188456-1-o.rempel@pengutronix.de>
- <20231121152426.4188456-1-o.rempel@pengutronix.de>
- <20231121152426.4188456-3-o.rempel@pengutronix.de>
- <20231121152426.4188456-3-o.rempel@pengutronix.de>
- <20231207002823.2qx24nxjhn6e43w4@skbuf>
- <20231207051502.GB1324895@pengutronix.de>
- <20231207140030.ki625ety6cg3ujxn@skbuf>
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rFtOB-000Bvm-31; Wed, 20 Dec 2023 11:01:19 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rFtOA-0008Xz-Gj; Wed, 20 Dec 2023 11:01:18 +0100
+Subject: LSF/MM/BPF: 2024: Call for Proposals
+References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+To: lsf-pc@lists.linuxfoundation.org
+Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-nvme@lists.infradead.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Daniel Borkmann <daniel@iogearbox.net>
+X-Forwarded-Message-Id: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+Message-ID: <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
+Date: Wed, 20 Dec 2023 11:01:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231207140030.ki625ety6cg3ujxn@skbuf>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27128/Tue Dec 19 10:36:48 2023)
 
-On Thu, Dec 07, 2023 at 04:00:30PM +0200, Vladimir Oltean wrote:
-> On Thu, Dec 07, 2023 at 06:15:02AM +0100, Oleksij Rempel wrote:
-> > On Thu, Dec 07, 2023 at 02:28:23AM +0200, Vladimir Oltean wrote:
-> > > On Tue, Nov 21, 2023 at 04:24:26PM +0100, Oleksij Rempel wrote:
-> > > > Correct the PHY loopback bit handling in the ksz8_w_phy_bmcr and
-> > > > ksz8_r_phy_bmcr functions for KSZ8794 and KSZ8873 variants in the ksz8795
-> > > > driver. Previously, the code erroneously used Bit 7 of port register 0xD
-> > > > for both chip variants, which is actually for LED configuration. This
-> > > > update ensures the correct registers and bits are used for the PHY
-> > > > loopback feature:
-> > > > 
-> > > > - For KSZ8794: Use 0xF / Bit 7.
-> > > > - For KSZ8873: Use 0xD / Bit 0.
-> > > > 
-> > > > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> > > > ---
-> > > 
-> > > How did you find, and how did you test this, and on which one of the switches?
-> > 
-> > I tested it by using "ethtool -t lanX" command on KSZ8873. Before this
-> > patch the link will stop to work _after_ end of the selftest. The
-> > selftest will fail too.
-> > 
-> > After this patch, the selftest is passed, except of the TCP test. And
-> > link is working _after_ the selftest,
-> 
-> So you are suggesting that this far-end loopback mode does work as
-> expected by the kernel.
-> 
-> But is that consistent with the description from the datasheet? It speaks
-> about an "originating PHY port", but maybe this is confusing, because
-> based on your test, even the CPU port could be originating the traffic
-> that gets looped back?
-> 
-> I see it says that far-end loopback goes through the switching fabric.
-> So the packet, on its return path from the loopback port, gets forwarded
-> by its MAC DA? That can't be, because the MAC DA lookup has already
-> determined the destination to be the loopback port (and no MAC SA<->DA
-> swapping should take place). Or it is forced by the switch to return
-> specifically to the originating port?
-> 
-> With a bridge between the 2 LAN ports, and lan1 put in loopback, what
-> happens if you send a broadcast packet towards lan1? Will you also see
-> it on lan2's link partner, or only on the CPU port?
-> 
-> It's not your fault, but this is all a bit confusing, and I'm not quite
-> able to match up the documentation with your results. I will trust the
-> experimental results, however.
+The annual Linux Storage, Filesystem, Memory Management, and BPF
+(LSF/MM/BPF) Summit for 2024 will be held from May 13 to May 15
+at the Hilton Salt Lake City Center in Salt Lake City, Utah, USA.
 
-I did following tests:
-ip l a name br0 type bridge
-ip l s dev br0 up
-ip l s lan1 master br0
-ip l s dev lan1 up
-ip l s lan2 master br0
-ip l s dev lan2 up
+LSF/MM/BPF is an invitation-only technical workshop to map out
+improvements to the Linux storage, filesystem, BPF, and memory
+management subsystems that will make their way into the mainline
+kernel within the coming years.
 
-# to avoid link drop with the loopback mode
-ethtool -s lan1 speed 100 duplex full autoneg off
-# currently no tool support loopback configuration, so set it directly
-# to the register
-mii -i lan1 -p 0 -r 0 -v 6120
+LSF/MM/BPF 2024 will be a three day, stand-alone conference with
+four subsystem-specific tracks, cross-track discussions, as well
+as BoF and hacking sessions:
 
-################# Test 1 ###########################
-# on DUT
-ping 192.168.2.200 -I lan1
+          https://events.linuxfoundation.org/lsfmmbpf/
 
-on eth0/cpu interface:
-00:03:20.656445 AF Unknown (4294967295), length 61: 
-        0x0000:  ffff 000e cd00 cdbe 0806 0001 0800 0604  ................
-        0x0010:  0001 000e cd00 cdbe c0a8 010e 0000 0000  ................
-        0x0020:  0000 c0a8 02c8 0000 0000 0000 0000 0000  ................
-        0x0030:  0000 0000 0000 0000 01                   .........
-00:03:20.656548 AF Unknown (4294967295), length 61: 
-        0x0000:  ffff 000e cd00 cdbe 0806 0001 0800 0604  ................
-        0x0010:  0001 000e cd00 cdbe c0a8 010e 0000 0000  ................
-        0x0020:  0000 c0a8 02c8 0000 0000 0000 0000 0000  ................
-        0x0030:  0000 0000 0000 0000 00                   .........
+On behalf of the committee I am issuing a call for agenda proposals
+that are suitable for cross-track discussion as well as technical
+subjects for the breakout sessions.
 
-on lan1 remote system:
-100 701.752654927 00:0e:cd:00:cd:be → ff:ff:ff:ff:ff:ff ARP 60 Who has 192.168.2.200? Tell 192.168.1.14
+If advance notice is required for visa applications then please
+point that out in your proposal or request to attend, and submit
+the topic as soon as possible.
 
-on lan2 remote system:
-347 1071.154437549 00:0e:cd:00:cd:be → ff:ff:ff:ff:ff:ff ARP 60 Who has 192.168.2.200? Tell 192.168.1.14
+We are asking that you please let us know you want to be invited
+by March 1, 2024. We realize that travel is an ever changing target,
+but it helps us to get an idea of possible attendance numbers.
+Clearly things can and will change, so consider the request to
+attend deadline more about planning and less about concrete plans.
 
+1) Fill out the following Google form to request attendance and
+suggest any topics for discussion:
 
-################# Test 2 ###########################
-# send ping on on lan1 remote system:
-ping 172.17.0.1
+          https://forms.gle/TGCgBDH1x5pXiWFo7
 
-on eth0/cpu interface DUT:
--- nothing --
+In previous years we have accidentally missed people's attendance
+requests because they either did not Cc lsf-pc@ or we simply missed
+them in the flurry of emails we get. Our community is large and our
+volunteers are busy, filling this out will help us to make sure we
+do not miss anybody.
 
-on lan1 remote system:
-109 946.617862621 80:61:5f:0c:29:54 → ff:ff:ff:ff:ff:ff ARP 42 Who has 172.17.0.1? Tell 172.17.0.12
+2) Proposals for agenda topics should ideally still be sent to the
+following lists to allow for discussion among your peers. This will
+help us figure out which topics are important for the agenda:
 
-on lan2 remote system:
--- nothing --
+          lsf-pc@lists.linux-foundation.org
 
-################# Test 3 ###########################
-# send ping on on lan2 remote system:
-ping 172.17.0.122
+... and Cc the mailing lists that are relevant for the topic in
+question:
 
-on eth0/cpu interface DUT:
-00:12:18.034220 AF Unknown (4294967295), length 61: 
-        0x0000:  ffff 8061 5f0c 2955 0806 0001 0800 0604  ...a_.)U........
-        0x0010:  0001 8061 5f0c 2955 ac11 000d 0000 0000  ...a_.)U........
-        0x0020:  0000 ac11 007a 0000 0000 0000 0000 0000  .....z..........
-        0x0030:  0000 0000 0000 0000 01                   .........
-00:12:18.034228 AF Unknown (4294967295), length 61: 
-        0x0000:  ffff 8061 5f0c 2955 0806 0001 0800 0604  ...a_.)U........
-        0x0010:  0001 8061 5f0c 2955 ac11 000d 0000 0000  ...a_.)U........
-        0x0020:  0000 ac11 007a 0000 0000 0000 0000 0000  .....z..........
-        0x0030:  0000 0000 0000 0000 00
+          FS:     linux-fsdevel@vger.kernel.org
+          MM:     linux-mm@kvack.org
+          Block:  linux-block@vger.kernel.org
+          ATA:    linux-ide@vger.kernel.org
+          SCSI:   linux-scsi@vger.kernel.org
+          NVMe:   linux-nvme@lists.infradead.org
+          BPF:    bpf@vger.kernel.org
 
-on lan1 remote system:
--- nothing --
+Please tag your proposal with [LSF/MM/BPF TOPIC] to make it easier
+to track. In addition, please make sure to start a new thread for
+each topic rather than following up to an existing one. Agenda
+topics and attendees will be selected by the program committee,
+but the final agenda will be formed by consensus of the attendees
+on the day.
 
-on lan2 remote system:
-476 1608.560311470 80:61:5f:0c:29:55 → ff:ff:ff:ff:ff:ff ARP 42 Who has 172.17.0.122? Tell 172.17.0.13
-477 1608.560361808 80:61:5f:0c:29:55 → ff:ff:ff:ff:ff:ff ARP 60 Who has 172.17.0.122? Tell 172.17.0.13
+3) This year we would also like to try and make sure we are
+including new members in the community that the program committee
+may not be familiar with. The Google form has an area for people to
+add required/optional attendees. Please encourage new members of the
+community to submit a request for an invite as well, but additionally
+if maintainers or long term community members could add nominees to
+the form it would help us make sure that new members get the proper
+consideration.
 
-I also retest selftest results and noted that it is not working if
-port is part of bridge.
+For discussion leaders, slides and visualizations are encouraged to
+outline the subject matter and focus the discussions. Please refrain
+from lengthy presentations and talks in order for sessions to be
+productive; the sessions are supposed to be interactive, inclusive
+discussions.
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+We are still looking into the virtual component. We will likely run
+something similar to what we did last year, but details on that will
+be forthcoming.
+
+2023: https://lwn.net/Articles/lsfmmbpf2023/
+
+2022: https://lwn.net/Articles/lsfmm2022/
+
+2019: https://lwn.net/Articles/lsfmm2019/
+
+2018: https://lwn.net/Articles/lsfmm2018/
+
+2017: https://lwn.net/Articles/lsfmm2017/
+
+2016: https://lwn.net/Articles/lsfmm2016/
+
+2015: https://lwn.net/Articles/lsfmm2015/
+
+2014: http://lwn.net/Articles/LSFMM2014/
+
+4) If you have feedback on last year's meeting that we can use to
+improve this year's, please also send that to:
+
+          lsf-pc@lists.linux-foundation.org
+
+Thank you on behalf of the program committee:
+
+          Amir Goldstein (Filesystems)
+          Jan Kara (Filesystems)
+          Martin K. Petersen (Storage)
+          Javier González (Storage)
+          Michal Hocko (MM)
+          Dan Williams (MM)
+          Daniel Borkmann (BPF)
+          Martin KaFai Lau (BPF)
+
 
