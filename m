@@ -1,150 +1,201 @@
-Return-Path: <netdev+bounces-59132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA5E8196D6
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:30:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED207819707
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 04:01:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07922287849
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 02:30:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75DF61F262FE
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 03:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABB18486;
-	Wed, 20 Dec 2023 02:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C228488;
+	Wed, 20 Dec 2023 03:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kacXMSXl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p7DU9Wi+"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4859DFC07;
-	Wed, 20 Dec 2023 02:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=vI6BjtvZa1OtwQfscOfCYySPSF4W/z+9OUCWNtr2S0Q=; b=kacXMSXlVR7wQyIQbqm2dFOL2y
-	75gcSjsTqGnIEzCDqmkcRrCl4P7oVgOF/TSgbLHJ1cu2wL2qo6F+g80/UW42QLcYUygeJvsTY14Jd
-	S0MgiIheFV2Xn7RnUkxrVk1mwSDHkql9aZbxtDS6aOdcw10uCHvaBxLOxSDXcbY5ZNUZv8v9yHzol
-	XFg45yBJZ2mgEzsldQC3sPM0meY9t1fEzsQzcKRaO5p/PS5buuDQiK83zPAi0GMDtQE+uj0mNIc+e
-	FBnrSm5aOvPjF0FHmt3bia5VdPmL7wGUcAUWRZbvnDD3AXoVJlp69GYLkyeNkTcuqobsFDKrZ2iMn
-	Nk4Mwiuw==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rFmL1-00FyTs-0t;
-	Wed, 20 Dec 2023 02:29:35 +0000
-Message-ID: <5e0e5d84-3891-47a1-bce1-beb26cd19b7b@infradead.org>
-Date: Tue, 19 Dec 2023 18:29:35 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034AC8BF6
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 03:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a2371eae8f1so192723166b.1
+        for <netdev@vger.kernel.org>; Tue, 19 Dec 2023 19:01:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1703041287; x=1703646087; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pH2MC+JCVirOX6aXBHXvKDTSAfz8y1doyFVsXiJxsJk=;
+        b=p7DU9Wi+ja7LZCfbmD8ln7S2AfqmXk3Y1DZtYbDRkFoe+uBmzXrXa128XRaSxb63IO
+         AL1HsirLfnxTnJuDr9noON9nEYKvmH/cHBl/322cNWjMy+soC9kv+5oJPMCOu2lVb49w
+         TejbBN4/F+khsFeYCv65rMGUA8ChBMIhsetl0UwZ91RxdtIPTGyfEr2CysDIEwZUHx0Q
+         jPR1FsEjE31b03CtKqJnX9l88UN9knsrp9tlQOGP0krI3kRcix6jo9BIZu8L7wR2ml0N
+         E3fi7jeX7jgExS6u1i1aXttuwnVUfF0emAbfGm/KL4mkurzotnUh0jRD6V5f/J7kFZjM
+         1y+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703041287; x=1703646087;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pH2MC+JCVirOX6aXBHXvKDTSAfz8y1doyFVsXiJxsJk=;
+        b=ixjRbnMysX9G4UUP8aZEKQAwvI97O0xqz2ndCDRQ0MSXjlZbCFLVjDVI1ODDNCOfaN
+         IstLj0QqJvgX1SfLIMlU8S1DceoiwnByGX0KwiLuHHrvZz80mU9JIOsJ9pCiMfTTYlnj
+         qSz2ctjYPdWtIhG9MtdOx5PR2HQKoDnz2nW9bIHgpTLGK+ghCVlbBNKAcuOxVYaC0YXv
+         tg9eRQej/3uBO63sBtZOK59Xp6r6LNiE8bIwrBTqtChdeqchXmArsZ9u0HZTLPwAZLMP
+         9OMulfVkhibvYgh0NxdgmddV0gTMBjU+PBckF6GHeBhCGzo9n8r3tqMkgfJX0XHRewWB
+         zm6A==
+X-Gm-Message-State: AOJu0YwmysZv+cW8eftjTmuEiSGC5+vM4qA1DycYiJbyqJ9/5cR72R4C
+	FI1v9uBUklU/ixzFJzEBOG0+boHllOeJE2yb8hzw3w==
+X-Google-Smtp-Source: AGHT+IFd0CMR8oOndSs9pPa6vty7A5RF77qbqSqiOEhvaFZJvbPWfZgqGjZmEwjrHvuDWKljCfDj1j1bwumMVK+pRi0=
+X-Received: by 2002:a17:906:86:b0:a1f:a27f:d58d with SMTP id
+ 6-20020a170906008600b00a1fa27fd58dmr7450375ejc.105.1703041286894; Tue, 19 Dec
+ 2023 19:01:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wifi: cfg80211: address several kerneldoc warnings
-Content-Language: en-US
-To: Jeff Johnson <quic_jjohnson@quicinc.com>, Jonathan Corbet
- <corbet@lwn.net>, Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <87plz1g2sc.fsf@meer.lwn.net>
- <56d7f97e-bc8b-465f-9e59-80028ccec995@quicinc.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <56d7f97e-bc8b-465f-9e59-80028ccec995@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231214020530.2267499-1-almasrymina@google.com>
+ <20231214020530.2267499-5-almasrymina@google.com> <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
+ <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
+ <20231215021114.ipvdx2bwtxckrfdg@google.com> <20231215190126.1040fa12@kernel.org>
+ <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com> <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
+In-Reply-To: <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 19 Dec 2023 19:01:14 -0800
+Message-ID: <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
+ of struct page in API
+To: Shakeel Butt <shakeelb@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
+	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
+	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
+	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
+	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
+	Stefano Stabellini <sstabellini@kernel.org>, 
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Dec 16, 2023 at 2:06=E2=80=AFPM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> On Sat, Dec 16, 2023 at 11:47=E2=80=AFAM Shakeel Butt <shakeelb@google.co=
+m> wrote:
+> >
+> > On Fri, Dec 15, 2023 at 7:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > >
+> > > On Fri, 15 Dec 2023 02:11:14 +0000 Shakeel Butt wrote:
+> > > > > From my POV it has to be the first one. We want to abstract the m=
+emory
+> > > > > type from the drivers as much as possible, not introduce N new me=
+mory
+> > > > > types and ask the driver to implement new code for each of them
+> > > > > separately.
+> > > >
+> > > > Agree with Mina's point. Let's aim to decouple memory types from
+> > > > drivers.
+> > >
+> > > What does "decouple" mean? Drivers should never convert netmem
+> > > to pages. Either a path in the driver can deal with netmem,
+> > > i.e. never touch the payload, or it needs pages.
+> >
+>
+> I'm guessing the paths in the driver that need pages will have to be
+> disabled for non-paged netmem, which is fine.
+>
+> One example that I ran into with GVE is that it calls page_address()
+> to copy small packets instead of adding them as a frag. I can add a
+> netmem_address() that returns page_address() for pages, and NULL for
+> non-pages (never passing non-pages to mm code). The driver can detect
+> that the netmem has no address, and disable the optimization for
+> non-paged netmem.
+>
+> > "Decouple" might not be the right word. What I wanted to say was to
+> > avoid too much specialization such that we have to have a new API for
+> > every new fancy thing.
+> >
+> > >
+> > > Perhaps we should aim to not export netmem_to_page(),
+> > > prevent modules from accessing it directly.
+> >
+> > +1.
+>
+
+I looked into this, but it turns out it's a slightly bigger change
+that needs some refactoring to make it work. There are few places
+where I believe I need to add netmem_to_page() that are exposed to the
+drivers via inline helpers, these are:
+
+- skb_frag_page(), which returns NULL if the netmem is not a page, but
+needs to do a netmem_to_page() to return the page otherwise.
+- The helpers inside skb_add_rx_frag(), which needs to do a
+netmem_to_page() to set skb->pfmemalloc.
+- Some of the page_pool APIs are exposed to the drivers as static
+inline helpers, and if I want the page_pool to use netmem internally
+the page_pool needs to do a netmem_to_page() in these helpers.
+
+The refactor is not an issue, but I was wondering if not exporting
+netmem_to_page() was worth moving the code around. I was thinking in
+the interim until netmem is adopted and has actual driver users we may
+prefer to just add a comment on the netmem_to_page() helper that says
+'try not to use this directly and use the netmem helpers instead'.
+
+> This is an aggressive approach and I like it. I'll try to make it work
+> (should be fine).
+>
+>
+> --
+> Thanks,
+> Mina
 
 
 
-On 12/19/23 17:00, Jeff Johnson wrote:
-> On 12/19/2023 4:01 PM, Jonathan Corbet wrote:
->> include/net/cfg80211.h includes a number of kerneldoc entries for struct
->> members that do not exist, leading to these warnings:
->>
->>   ./include/net/cfg80211.h:3192: warning: Excess struct member 'band_pref' description in 'cfg80211_bss_selection'
->>   ./include/net/cfg80211.h:3192: warning: Excess struct member 'adjust' description in 'cfg80211_bss_selection'
->>   ./include/net/cfg80211.h:6181: warning: Excess struct member 'bssid' description in 'wireless_dev'
->>   ./include/net/cfg80211.h:6181: warning: Excess struct member 'beacon_interval' description in 'wireless_dev'
->>   ./include/net/cfg80211.h:7299: warning: Excess struct member 'bss' description in 'cfg80211_rx_assoc_resp_data'
->>
->> Remove and/or repair each entry to address the warnings and ensure a proper
->> docs build for the affected structures.
->>
->> Signed-off-by: Jonathan Corbet <corbet@lwn.net>
->> ---
->>  include/net/cfg80211.h | 11 ++++-------
->>  1 file changed, 4 insertions(+), 7 deletions(-)
->>
->> diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
->> index b137a33a1b68..81c46c8e2a68 100644
->> --- a/include/net/cfg80211.h
->> +++ b/include/net/cfg80211.h
->> @@ -3180,8 +3180,8 @@ struct cfg80211_ibss_params {
->>   *
->>   * @behaviour: requested BSS selection behaviour.
->>   * @param: parameters for requestion behaviour.
->> - * @band_pref: preferred band for %NL80211_BSS_SELECT_ATTR_BAND_PREF.
->> - * @adjust: parameters for %NL80211_BSS_SELECT_ATTR_RSSI_ADJUST.
->> + * @param.band_pref: preferred band for %NL80211_BSS_SELECT_ATTR_BAND_PREF.
->> + * @param.adjust: parameters for %NL80211_BSS_SELECT_ATTR_RSSI_ADJUST.
->>   */
->>  struct cfg80211_bss_selection {
->>  	enum nl80211_bss_select_attr behaviour;
->> @@ -6013,7 +6013,6 @@ void wiphy_delayed_work_flush(struct wiphy *wiphy,
->>   *	wireless device if it has no netdev
->>   * @u: union containing data specific to @iftype
->>   * @connected: indicates if connected or not (STA mode)
->> - * @bssid: (private) Used by the internal configuration code
->>   * @wext: (private) Used by the internal wireless extensions compat code
->>   * @wext.ibss: (private) IBSS data part of wext handling
->>   * @wext.connect: (private) connection handling data
->> @@ -6033,8 +6032,6 @@ void wiphy_delayed_work_flush(struct wiphy *wiphy,
->>   * @mgmt_registrations: list of registrations for management frames
->>   * @mgmt_registrations_need_update: mgmt registrations were updated,
->>   *	need to propagate the update to the driver
->> - * @beacon_interval: beacon interval used on this device for transmitting
->> - *	beacons, 0 when not valid
->>   * @address: The address for this device, valid only if @netdev is %NULL
->>   * @is_running: true if this is a non-netdev device that has been started, e.g.
->>   *	the P2P Device.
->> @@ -7270,8 +7267,6 @@ void cfg80211_auth_timeout(struct net_device *dev, const u8 *addr);
->>  
->>  /**
->>   * struct cfg80211_rx_assoc_resp_data - association response data
->> - * @bss: the BSS that association was requested with, ownership of the pointer
->> - *	moves to cfg80211 in the call to cfg80211_rx_assoc_resp()
->>   * @buf: (Re)Association Response frame (header + body)
->>   * @len: length of the frame data
->>   * @uapsd_queues: bitmap of queues configured for uapsd. Same format
->> @@ -7281,6 +7276,8 @@ void cfg80211_auth_timeout(struct net_device *dev, const u8 *addr);
->>   * @ap_mld_addr: AP MLD address (in case of MLO)
->>   * @links: per-link information indexed by link ID, use links[0] for
->>   *	non-MLO connections
-> 
-> also missing the following?
->  * @links.addr: MLO per-link MAC address
-
-Yes, that should also be fixed at some point.
-
-What Jon is trying to do here is address a boatload of new kernel-doc warnings of the
-"Excess struct member" variety.
-
-> 
->> + * @links.bss: the BSS that association was requested with, ownership of the
->> + *      pointer moves to cfg80211 in the call to cfg80211_rx_assoc_resp()
->>   * @links.status: Set this (along with a BSS pointer) for links that
->>   *	were rejected by the AP.
->>   */
-> 
-> 
-
-Thanks.
--- 
-#Randy
-https://people.kernel.org/tglx/notes-about-netiquette
-https://subspace.kernel.org/etiquette.html
+--
+Thanks,
+Mina
 
