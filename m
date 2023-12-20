@@ -1,86 +1,157 @@
-Return-Path: <netdev+bounces-59213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C247D819E13
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:30:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D310D819E3E
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:38:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D78D28AD2F
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:30:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61AA1B20E98
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B60E21A09;
-	Wed, 20 Dec 2023 11:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5EE21374;
+	Wed, 20 Dec 2023 11:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nXZdhhbq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XNRmQV4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D08322310;
-	Wed, 20 Dec 2023 11:30:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ACEF7C433C7;
-	Wed, 20 Dec 2023 11:30:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703071825;
-	bh=MipMd8/XclHrPRB6dqSILhdXwlTf1VnPhP4xY1gGs+I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nXZdhhbqy+bQ/rqMv3JDvebkX3CLNh4cdZZwk8xXtP8iAWvzk8GV+ZS7jO7vEkMkB
-	 5TnyAnBH7f1rYQUu/SVWRrvEEo/pN7UxKA0A9ED0Socds2Wqexw7RIkb1hxOTZ6z/R
-	 bgoRsUFd6SgEdU/rpoq4GIInQqewE9bOdIWHHbbj07G/IudkVizv4yQczw6+UR/lH8
-	 UxhIGGmTERbE7KTfwACcuQ1gtp5hpsCb2mUtxearbzGYVRAHgaIE4WWeq/Sl+F4adq
-	 gT27WFnKgdzHCTMV76jvVTBFH7XL84PZtudykWqAsXsBmD2VuI6kl0VRuq/YSB14l8
-	 Mbiu6sEDVMYCw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8F0D2D8C985;
-	Wed, 20 Dec 2023 11:30:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FEF2135A;
+	Wed, 20 Dec 2023 11:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BKBM91A029635;
+	Wed, 20 Dec 2023 11:37:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XyJmZFNQjJdjPZR5ZR/LVt85GyOnRFs6uij6ZyeOJws=;
+ b=XNRmQV4SmH5utrQkjDChTd3Ct7i8lveaSkqFh7C+ls8d3buRdOmQ4dWJMFVgjpk1gJfv
+ UAqCSRwj9THZRzEiMUQVh8Hr+72cfPgKJjZvfHqg5U+TFujlJt8qzUfugCbtfty6uAr9
+ OjmdEYQhtxnDhQd0fu1y/ONbuozrIpDrHdtAtanAkpaM0Oy3aZBLubuDEORmJG3HQoHb
+ Ewv6Avj+3kdkq5bmiyv2N2IzCClxcH3/TB/z7Dtzx4hsBO6e4etWo9yT5Ei9A9NAY1XL
+ 0PISTwW6EAzSwx8d4qJv4E3qQlfjRIHN5wQbGGBU2lYxdNXoiOD9GUbb+Jzzg+ywb/st hA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3yb50bdf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 11:37:58 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BKBO1qJ002112;
+	Wed, 20 Dec 2023 11:37:58 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3yb50bd6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 11:37:58 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BKAcBVV004828;
+	Wed, 20 Dec 2023 11:37:56 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1pkyx800-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 11:37:56 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BKBbro47209602
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 20 Dec 2023 11:37:53 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7A46720040;
+	Wed, 20 Dec 2023 11:37:53 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2DF1C20043;
+	Wed, 20 Dec 2023 11:37:53 +0000 (GMT)
+Received: from [9.152.224.160] (unknown [9.152.224.160])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 20 Dec 2023 11:37:53 +0000 (GMT)
+Message-ID: <ab835e29-ad4a-4377-b80a-8ef6bb35ef7b@linux.ibm.com>
+Date: Wed, 20 Dec 2023 12:37:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] octeontx2-af: insert space after include
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170307182557.15860.5948663264630094873.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Dec 2023 11:30:25 +0000
-References: <202312181459+0800-wangjinchao@xfusion.com>
-In-Reply-To: <202312181459+0800-wangjinchao@xfusion.com>
-To: WangJinchao <wangjinchao@xfusion.com>
-Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
- jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stone.xulei@xfusion.com
-
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 18 Dec 2023 15:04:07 +0800 you wrote:
-> Maintain Consistent Formatting: Insert Space after #include
-> 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> Signed-off-by: Wang Jinchao <wangjinchao@xfusion.com>
-> ---
-> V2:
->     In accordance with Jakub's advice, modify the patch title.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2] octeontx2-af: insert space after include
-    https://git.kernel.org/netdev/net-next/c/b6895d0ac9d7
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 03/10] net/smc: unify the structs of accept or
+ confirm message for v1 and v2
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231219142616.80697-1-guwen@linux.alibaba.com>
+ <20231219142616.80697-4-guwen@linux.alibaba.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20231219142616.80697-4-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: MpqjPWw7u7JA0NR-yffqx25IKCsS4RuZ
+X-Proofpoint-GUID: wOPMZo8ahzEIcE_rVYubprY4USmvFRuM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-20_02,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ bulkscore=0 adultscore=0 priorityscore=1501 lowpriorityscore=0
+ suspectscore=0 mlxscore=0 impostorscore=0 mlxlogscore=633 clxscore=1015
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312200081
 
 
+
+On 19.12.23 15:26, Wen Gu wrote:
+>  struct smc_clc_msg_accept_confirm {	/* clc accept / confirm message */
+> -	struct smc_clc_msg_hdr hdr;
+> -	union {
+> -		struct smcr_clc_msg_accept_confirm r0; /* SMC-R */
+> -		struct { /* SMC-D */
+> -			struct smcd_clc_msg_accept_confirm_common d0;
+> -			u32 reserved5[3];
+> -		};
+> -	};
+> -} __packed;			/* format defined in RFC7609 */
+> -
+> -struct smc_clc_msg_accept_confirm_v2 {	/* clc accept / confirm message */
+>  	struct smc_clc_msg_hdr hdr;
+>  	union {
+>  		struct { /* SMC-R */
+>  			struct smcr_clc_msg_accept_confirm r0;
+> -			u8 eid[SMC_MAX_EID_LEN];
+> -			u8 reserved6[8];
+> -		} r1;
+> +			struct { /* v2 only */
+> +				u8 eid[SMC_MAX_EID_LEN];
+> +				u8 reserved6[8];
+> +			} __packed r1;
+> +		};
+>  		struct { /* SMC-D */
+>  			struct smcd_clc_msg_accept_confirm_common d0;
+> -			__be16 chid;
+> -			u8 eid[SMC_MAX_EID_LEN];
+> -			u8 reserved5[8];
+> -		} d1;
+> +			struct { /* v2 only, but 12 bytes reserved in v1 */
+> +				__be16 chid;
+> +				u8 eid[SMC_MAX_EID_LEN];
+> +				u8 reserved5[8];
+> +			} __packed d1;
+> +		};
+>  	};
+>  };
+
+
+I still think the __packed at the outmost level is the safest place.
+Like you have it now the compiler could place unused memory between
+ro and r1 or between d0 and d1.
+Afaik compilers don't do that, if the blocks are word-aligned, but 
+there is no guarantee. 
+
+Up to you. My R-b still applies.
+Sandy
 
