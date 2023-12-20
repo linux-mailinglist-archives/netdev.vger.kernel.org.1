@@ -1,96 +1,157 @@
-Return-Path: <netdev+bounces-59170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97988819A11
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:06:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDB918199F2
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 09:02:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 545AA284112
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:06:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8E211C22F90
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72159171CA;
-	Wed, 20 Dec 2023 08:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0C1168D5;
+	Wed, 20 Dec 2023 08:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vEu/s0jk"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CAC71DDCF;
-	Wed, 20 Dec 2023 08:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from localhost.localdomain (unknown [125.119.246.50])
-	by mail-app3 (Coremail) with SMTP id cC_KCgB37XDXnoJlw9gwAQ--.15347S4;
-	Wed, 20 Dec 2023 15:59:20 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: roopa@nvidia.com,
-	razor@blackwall.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horatiu.vultur@microchip.com,
-	henrik.bjoernlund@microchip.com,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6EB1CA93
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 08:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a235500d0e1so383743466b.2
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 00:01:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1703059311; x=1703664111; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q6qwFojeAseZiqFw0AS/OLjMh8l70gGs83fGIX57eS8=;
+        b=vEu/s0jkPZHYqnslqSPpyyE9UgQFXq4gQvQR1QOwZE6hQewzkbHbs7q9d70Rk7vTfj
+         7nGSYzjZ6ZVLzBjoupf6FYlW+yAMR9eCvtZkGc+eI5oXRNBEBXSH8hyKZvoDEEMHLsV3
+         tUUav1/2J9t5yPsa3cYuG1mQ4ieI95FeijRcCvOPk8HubLDqLfAa/XwyrBgmMquNRB2W
+         adHmrhCVMA09mSW4oqSPS5kQTh+VXPrnt7PqM0nQAu0VJ7hxifuIJ/DgWBp6XQvtE3jc
+         CRPIlSmZZl/1laCnBlxJlclQGkj/8NkcrSnNjtVYjPKrxaFO8Y8ai9T/dlBjuCvxt1ad
+         v3EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703059311; x=1703664111;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q6qwFojeAseZiqFw0AS/OLjMh8l70gGs83fGIX57eS8=;
+        b=xJGavIU7QRBlR35Rl6/tikaSYwiO8TmKVy4Q7Fl/nX1ifKUSzkU3yWu+IHtqiO3Yfy
+         d6fsjFL7G13CEhaIiQeXywzM+xb+x/8urkjU2LK2Ll0Nc3zL7/nQxlPRfjjdyVY6UcxX
+         cGFZjylmbYqjbrf98YrLN7KtjFe1YgTMOJXEeppUmJzkRimh8SrGO4k7Qzqd2oBMmH4Q
+         eC0WA474yNmBdDP/XopSj3uQCHQo/wfEFbmoTeruuShnG6oz8bzUtSp9y1WtJl5b7F5t
+         +u7fqKR5UrQ7k1YZXF6NRKuGP2tuN6CId58R0U5wP1MnimnuU1TzigNTZ0tBbZyPvRJO
+         JFSA==
+X-Gm-Message-State: AOJu0YxBZt+4XHj3Nv4lzoELCEM8wB4eUKgkYNS+KeLBIcPRb++W1Yqm
+	DyrsbPIWazUey/fzILO5XZZp1qpcfou4FK+6+DI=
+X-Google-Smtp-Source: AGHT+IFstkKIv3GmlshOA5zE0O5rfyM7nIKCAkrHm+VvYOOBKDV2Igl0hYuTtcgmlXX/gJ7an6xiyA==
+X-Received: by 2002:a17:906:257:b0:a23:48be:3eba with SMTP id 23-20020a170906025700b00a2348be3ebamr2540650ejl.142.1703059311081;
+        Wed, 20 Dec 2023 00:01:51 -0800 (PST)
+Received: from hades.. (ppp089210121239.access.hol.gr. [89.210.121.239])
+        by smtp.gmail.com with ESMTPSA id wq8-20020a170907064800b00a2697aaac78sm223206ejb.30.2023.12.20.00.01.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Dec 2023 00:01:50 -0800 (PST)
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+To: netdev@vger.kernel.org
+Cc: linyunsheng@huawei.com,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH v1] bridge: cfm: fix enum typo in br_cc_ccm_tx_parse
-Date: Wed, 20 Dec 2023 15:59:14 +0800
-Message-Id: <20231220075914.2426376-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cC_KCgB37XDXnoJlw9gwAQ--.15347S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zr4DXry3WFykAF4DXw1UKFg_yoW8JFy5pF
-	4rKFykCFs0yryYvw1jvF4Ivry7CF4DW3y3C3yq9r1Syrn8WF13CrZ8Gry3ur1xAF4Dtw45
-	AF15WrW3Xa98AFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY02Avz4vE14v_GF4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
-	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
-	17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
-	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
-	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-	73UjIFyTuYvjfUYMKZDUUUU
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+Subject: [PATCH net-next v2] page_pool: Rename frag_users to pagecnt_bias
+Date: Wed, 20 Dec 2023 10:01:46 +0200
+Message-Id: <20231220080147.740134-1-ilias.apalodimas@linaro.org>
+X-Mailer: git-send-email 2.37.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-It appears that there is a typo in the code where the nlattr array is
-being parsed with policy br_cfm_cc_ccm_tx_policy, but the instance is
-being accessed via IFLA_BRIDGE_CFM_CC_RDI_INSTANCE, which is associated
-with the policy br_cfm_cc_rdi_policy.
+Since [0] got merged, it's clear that 'pp_ref_count' is used to track
+the number of users for each page. On struct page_pool though we have
+a member called 'frag_users'. Despite of what the name suggests this is
+not the number of users. It instead represents the number of fragments of
+the current page. When we split the page this is set to the actual number
+of frags and later used in page_pool_drain_frag() to infer the real number
+of users.
 
-Though it seems like a harmless typo since these two enum owns the exact
-same value (1 here), it is quite misleading hence fix it by using the
-correct enum IFLA_BRIDGE_CFM_CC_CCM_TX_INSTANCE here.
+So let's rename it to something that matches the description above
 
-Fixes: 2be665c3940d ("bridge: cfm: Netlink SET configuration Interface.")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
+[0]
+Link: https://lore.kernel.org/netdev/20231212044614.42733-2-liangchen.linux@gmail.com/
+Signed-off-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 ---
- net/bridge/br_cfm_netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes since v1:
+- rename to pagecnt_bias instead of frag_cnt to match the mm subsystem
+- rebase on top of -main
+ include/net/page_pool/types.h | 2 +-
+ net/core/page_pool.c          | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/bridge/br_cfm_netlink.c b/net/bridge/br_cfm_netlink.c
-index 5c4c369f8536..2faab44652e7 100644
---- a/net/bridge/br_cfm_netlink.c
-+++ b/net/bridge/br_cfm_netlink.c
-@@ -362,7 +362,7 @@ static int br_cc_ccm_tx_parse(struct net_bridge *br, struct nlattr *attr,
- 
- 	memset(&tx_info, 0, sizeof(tx_info));
- 
--	instance = nla_get_u32(tb[IFLA_BRIDGE_CFM_CC_RDI_INSTANCE]);
-+	instance = nla_get_u32(tb[IFLA_BRIDGE_CFM_CC_CCM_TX_INSTANCE]);
- 	nla_memcpy(&tx_info.dmac.addr,
- 		   tb[IFLA_BRIDGE_CFM_CC_CCM_TX_DMAC],
- 		   sizeof(tx_info.dmac.addr));
--- 
-2.17.1
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 76481c465375..d47491ba973d 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -130,7 +130,7 @@ struct page_pool {
+
+ 	bool has_init_callback;
+
+-	long frag_users;
++	long pagecnt_bias;
+ 	struct page *frag_page;
+ 	unsigned int frag_offset;
+ 	u32 pages_state_hold_cnt;
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 4933762e5a6b..0e64d6b8e748 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -760,7 +760,7 @@ EXPORT_SYMBOL(page_pool_put_page_bulk);
+ static struct page *page_pool_drain_frag(struct page_pool *pool,
+ 					 struct page *page)
+ {
+-	long drain_count = BIAS_MAX - pool->frag_users;
++	long drain_count = BIAS_MAX - pool->pagecnt_bias;
+
+ 	/* Some user is still using the page frag */
+ 	if (likely(page_pool_unref_page(page, drain_count)))
+@@ -779,7 +779,7 @@ static struct page *page_pool_drain_frag(struct page_pool *pool,
+
+ static void page_pool_free_frag(struct page_pool *pool)
+ {
+-	long drain_count = BIAS_MAX - pool->frag_users;
++	long drain_count = BIAS_MAX - pool->pagecnt_bias;
+ 	struct page *page = pool->frag_page;
+
+ 	pool->frag_page = NULL;
+@@ -821,14 +821,14 @@ struct page *page_pool_alloc_frag(struct page_pool *pool,
+ 		pool->frag_page = page;
+
+ frag_reset:
+-		pool->frag_users = 1;
++		pool->pagecnt_bias = 1;
+ 		*offset = 0;
+ 		pool->frag_offset = size;
+ 		page_pool_fragment_page(page, BIAS_MAX);
+ 		return page;
+ 	}
+
+-	pool->frag_users++;
++	pool->pagecnt_bias++;
+ 	pool->frag_offset = *offset + size;
+ 	alloc_stat_inc(pool, fast);
+ 	return page;
+--
+2.37.2
 
 
