@@ -1,122 +1,133 @@
-Return-Path: <netdev+bounces-59113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D5B8195F0
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:51:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0047E8195F9
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:52:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA89F1F268B1
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:51:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93E6B1F268C4
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F961FAF;
-	Wed, 20 Dec 2023 00:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293F94690;
+	Wed, 20 Dec 2023 00:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="HRAb610L"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CP5SS0u5"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F88F79CC;
-	Wed, 20 Dec 2023 00:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1703033481;
-	bh=OG4CKpftW12C8hWZMEmPvli3ysw9HOAY2jVhYTdUGDk=;
-	h=Date:From:To:Cc:Subject:From;
-	b=HRAb610LJXF7IKnMu0jS+X0+lF3qLR9UnLnDBIed2rgWXfV/+DdvW4RJiZoWFPMiX
-	 eQoMYF+JVQPLEcL8x6e6WsImppE+bbre3GyHMhSN+5GPs7TvlspID8wPKevc3djfxa
-	 7PdXbG7jkbbX6TUSSfFFiIGU9KBgzeOGvNm3lqIECPQDDccudEjIjEzbp3qEEwy4BN
-	 AsC1DWkWQ7gbJ3VIVPgmI1iga2INwObJtCAmFHWeIEtmqjD8Zglwr7HmdByX9zJWte
-	 to9g2uzAovWSoy+20R55yELxnJYy3TI8y0EwLApAQdzdgDUmncqQi7vxr2r2EiDISO
-	 QyH+LVedsrveQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Svw3r3Z5dz4wdB;
-	Wed, 20 Dec 2023 11:51:20 +1100 (AEDT)
-Date: Wed, 20 Dec 2023 11:51:18 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Liu Jian <liujian56@huawei.com>, Willem de
- Bruijn <willemb@google.com>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20231220115118.218147ff@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DDA20FC;
+	Wed, 20 Dec 2023 00:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703033553; x=1734569553;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5ihFJyqQ2ix/Npm5ZpqxasGwhfpg78Kg+weGzieTxe8=;
+  b=CP5SS0u5Hamt33CNDs+VwVTBjTcN1pZBfaSuYb17l3cpb9D4IlEgu2nI
+   hpGhIG/j9HCu41TUB8lIqHI7J9kueNm3pyFS6xiBXzelLA9WOl0g65UB0
+   SOlwUifg2A1BEkhBSt8RnWLJeuUkdnhHIa2YKuo7keWHTU1q0/fhJTmAV
+   LIWGSJEA58xfAmDaccopy7UswRyMGR/bfdY1BFnlWDWvnnu1lZZzYB7a+
+   KBlRbf47NdxtPuk+2g0pjKJl4zr9Z3aR+9tGsl1L/i2WDk0dIRkJLTTob
+   HCu9CGtD8yryEtiPB8/JGH6FgsKe3X+SWR5b6dIY0uFu1X8tEkIJtjAF/
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="2566084"
+X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
+   d="scan'208";a="2566084"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 16:52:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="842073028"
+X-IronPort-AV: E=Sophos;i="6.04,289,1695711600"; 
+   d="scan'208";a="842073028"
+Received: from lveltman-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.33.252])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 16:51:59 -0800
+Received: by box.shutemov.name (Postfix, from userid 1000)
+	id 9AD0310A43B; Wed, 20 Dec 2023 03:51:56 +0300 (+03)
+Date: Wed, 20 Dec 2023 03:51:56 +0300
+From: kirill.shutemov@linux.intel.com
+To: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+	mingo@redhat.com, tglx@linutronix.de, x86@kernel.org,
+	netdev@vger.kernel.org, richardcochran@gmail.com,
+	linux-input@vger.kernel.org, dmitry.torokhov@gmail.com,
+	zackr@vmware.com, linux-graphics-maintainer@vmware.com,
+	pv-drivers@vmware.com, namit@vmware.com, timothym@vmware.com,
+	akaher@vmware.com, jsipek@vmware.com,
+	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+	tzimmermann@suse.de, mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com, horms@kernel.org
+Subject: Re: [PATCH v3 2/6] x86/vmware: Introduce vmware_hypercall API
+Message-ID: <20231220005156.2rymnxu5bv6wdwlx@box.shutemov.name>
+References: <20231219215751.9445-1-alexey.makhalov@broadcom.com>
+ <20231219215751.9445-3-alexey.makhalov@broadcom.com>
+ <20231219232023.u4dyuvbzbh565grk@box.shutemov.name>
+ <75eed318-2d22-429d-ab95-80610ba82934@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/F0QZ/zY980=Ou7ZKrHIgYyu";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <75eed318-2d22-429d-ab95-80610ba82934@broadcom.com>
 
---Sig_/F0QZ/zY980=Ou7ZKrHIgYyu
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Dec 19, 2023 at 04:17:40PM -0800, Alexey Makhalov wrote:
+> 
+> 
+> On 12/19/23 3:20 PM, kirill.shutemov@linux.intel.com wrote:
+> > On Tue, Dec 19, 2023 at 01:57:47PM -0800, Alexey Makhalov wrote:
+> > > +static inline
+> > > +unsigned long vmware_hypercall1(unsigned long cmd, unsigned long in1)
+> > ...
+> > > +static inline
+> > > +unsigned long vmware_hypercall3(unsigned long cmd, unsigned long in1,
+> > > +				uint32_t *out1, uint32_t *out2)
+> > ...
+> > > +static inline
+> > > +unsigned long vmware_hypercall4(unsigned long cmd, unsigned long in1,
+> > > +				uint32_t *out1, uint32_t *out2,
+> > > +				uint32_t *out3)
+> > ...
+> > > +static inline
+> > > +unsigned long vmware_hypercall5(unsigned long cmd, unsigned long in1,
+> > > +				unsigned long in3, unsigned long in4,
+> > > +				unsigned long in5, uint32_t *out2)
+> > ...
+> > > +static inline
+> > > +unsigned long vmware_hypercall6(unsigned long cmd, unsigned long in1,
+> > > +				unsigned long in3, uint32_t *out2,
+> > > +				uint32_t *out3, uint32_t *out4,
+> > > +				uint32_t *out5)
+> > ...
+> > > +static inline
+> > > +unsigned long vmware_hypercall7(unsigned long cmd, unsigned long in1,
+> > > +				unsigned long in3, unsigned long in4,
+> > > +				unsigned long in5, uint32_t *out1,
+> > > +				uint32_t *out2, uint32_t *out3)
+> > 
+> > Naming is weird. The number in the name doesn't help much as there seems
+> > no system on how many of the parameters are ins and outs.
+> 
+> There was internal discussion on hypercall API naming. One of proposals was
+> using 2 digits - number of input and number of output arguments.
+> And it definitely looked weird. So, we agreed to have just single number  -
+> total number of arguments excluding cmd.
 
-Hi all,
+Have you considered naming them by number of input parameters? Number of
+output parameters as demanded by users.
 
-Today's linux-next merge of the net-next tree got a conflict in:
+So vmware_hypercall4() will become vmware_hypercall1() and current
+vmware_hypercall1() and vmware_hypercall3() will go away.
 
-  tools/testing/selftests/net/Makefile
+It is still awful, but /maybe/ better that this, I donno.
 
-between commit:
-
-  2258b666482d ("selftests: add vlan hw filter tests")
-
-from the net tree and commit:
-
-  a0bc96c0cd6e ("selftests: net: verify fq per-band packet limit")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc tools/testing/selftests/net/Makefile
-index 9e5bf59a20bf,14bd68da7466..000000000000
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@@ -91,7 -91,7 +91,8 @@@ TEST_PROGS +=3D test_bridge_neigh_suppres
-  TEST_PROGS +=3D test_vxlan_nolocalbypass.sh
-  TEST_PROGS +=3D test_bridge_backup_port.sh
-  TEST_PROGS +=3D fdb_flush.sh
- +TEST_PROGS +=3D vlan_hw_filter.sh
-+ TEST_PROGS +=3D fq_band_pktlimit.sh
- =20
-  TEST_FILES :=3D settings
- =20
-
---Sig_/F0QZ/zY980=Ou7ZKrHIgYyu
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmWCOoYACgkQAVBC80lX
-0GyWQAf9H6JruRjUS9893bY3LpYu9kD/kjQbBrMz6gjnCN/BXSjZnwU1dyTEmITk
-iqibH3mHuSB5zdfjTmt7dMtlNuECAbJAYEtf9EyiwX1Zieo4EAk2/81xqP1DG5Wo
-oUe3Z/HsJ/9SE+h8cjXJ3R1dND2kq3zc+oPYtAdRuJKiFDQFW06w8XIgmLxS1ve5
-ktVVsOdscxjq5PT1qBYIGtxmAk90ZL0rGCv0/abGK0u1rziKpqsEiLDrN6a3zT9o
-y1DP5mdpXWTXIsLFubi1De+vvX+6eS+XwGiZCdcP45OIs9gmtRqvJCpwVbWjWFZE
-nmcevg6piOHgXQWWIzOTdz5mzhVxkw==
-=LSWa
------END PGP SIGNATURE-----
-
---Sig_/F0QZ/zY980=Ou7ZKrHIgYyu--
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
