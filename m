@@ -1,39 +1,64 @@
-Return-Path: <netdev+bounces-59221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E1F0819E92
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 13:00:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0DD0819E95
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 13:03:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FA831C21F28
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:00:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31897B22D09
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B8721A0C;
-	Wed, 20 Dec 2023 12:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BA021A0C;
+	Wed, 20 Dec 2023 12:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pgIg06XV"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="CDlW5m+b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA734219EE;
-	Wed, 20 Dec 2023 12:00:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CAC2C433C8;
-	Wed, 20 Dec 2023 12:00:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703073648;
-	bh=ngOvTFdwplz311q8i+5a5XP8onKcx4SXEJszH5Ve/cw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pgIg06XV2CmE8Q86sr4EYNMpsdPqjjiTPPg+EDtoR6Iq02olVGpradZwV7M3f6fxO
-	 jM8nDnd/SMcHoGFWfOAPmweHGomZ3uxjL0ApHuClUvi/XIcERDMClWrg8J2Fhb3+AJ
-	 SUv3tbTKHEYGUtqI5ojv0vTwX2/3GJ6uMpOcAhUCoWubNej6C+Z3fI6JQ8YGjcv5c7
-	 22OcG+Ktrq0DnOy6mYeufJgZaAMMegmjtTJhrWtl+nKhWLtrTWnmHbRXXjYWrN9hE3
-	 8zmtbGnx7lL37uIEGLyNZL3uIzxM7f00A8kWytmLt6I7H2ekYhnJYtI2mDB0vFQ8Bo
-	 LQFCeXIQ3RHqQ==
-Message-ID: <33bbb170-afdd-477f-9296-a9cede9bc2f2@kernel.org>
-Date: Wed, 20 Dec 2023 13:00:42 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04CA21A18
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 12:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40c580ba223so69510795e9.3
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 04:03:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1703073779; x=1703678579; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KUAWcggGlYjJDHpexg8uCDxDaM55qcNzqk8PKWCzWqM=;
+        b=CDlW5m+bL0/9rfOey+Q2NRkGHpblNC3XLSSvxH2MbACKf0iR6fZ6NwFEgmnfxQ3NlF
+         iDKdn93b0xTUkObxFB63ZMqN6pQj+VFgJdxBucazvcVsjIBH6hx32ncFRApfG0V3SZmf
+         upHQoLbam+1ekIyegXf/wQwsPBo2cvAnPrNsYatQeZjapJG4nseOi7eKxnZQ4IKQaXFE
+         u7W3S1G8RqqP4nc5LWBes4zgLEO98VIsYYJ75iWPT8KqYPmGsy9XB3GMxEOK4DkTrwsa
+         4OCPmelwpNuRjy5VwK0k9Ycor4GQV1c7sO2Ui9E/kShDXseW6ZOafn7piW+QiOrLc6J1
+         PvmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703073779; x=1703678579;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KUAWcggGlYjJDHpexg8uCDxDaM55qcNzqk8PKWCzWqM=;
+        b=GWdj3+Gr/Y5Jt0+SzNqlJVkISnLI71DlFD1KBXNI5RM0AXx2mWsdX9xPdNelMsyqII
+         ZmoDhxyhtEVYW0ykTL0PcUE8NTFtIqogG3bdH14DY057K07V6cqLuYRb5hz1Ce/cy7FZ
+         IWCpSinThH57bQKKpXfV57e+k8765Onrb6+7vz7EFYEMPjn+9O3AQvC+QYLDhGNVB9hb
+         safgXagEvV55GhQGfN5xjxP/I7PbAeHO0h2Zya+7ooB7AyHtCBEZADc029Z54RmS+6Ey
+         D0+ufmrzhV6doS97ybrMmouLXUhH7sCBNszKrAxVTlRLG5F2E/rNKjy909GW37ESz+6l
+         Y4yw==
+X-Gm-Message-State: AOJu0YyBYIefFZfw2Mz5fOvNuFwZJwpwSD+pc376JfADn+9ULzvKD9L6
+	KtGNcu43ip65OuSvrTivGiGlKw==
+X-Google-Smtp-Source: AGHT+IHTSCCX2cPlsO5ArlAPj0bWvwgIpkaJLzAeGri/FT7uuiMUHSi9oNF4nVsOpvT9KkzGyMAuaQ==
+X-Received: by 2002:a05:600c:35c9:b0:40d:18c4:d744 with SMTP id r9-20020a05600c35c900b0040d18c4d744mr2892179wmq.97.1703073779124;
+        Wed, 20 Dec 2023 04:02:59 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.103])
+        by smtp.gmail.com with ESMTPSA id fc14-20020a05600c524e00b0040d1746f672sm7185461wmb.14.2023.12.20.04.02.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Dec 2023 04:02:58 -0800 (PST)
+Message-ID: <5b6eaff5-5358-46ff-8072-8a70af1e5d5f@tuxon.dev>
+Date: Wed, 20 Dec 2023 14:02:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,79 +66,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 1/3] net: introduce page_pool pointer in
- softnet_data percpu struct
-To: Paolo Abeni <pabeni@redhat.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, kuba@kernel.org,
- Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- willemdebruijn.kernel@gmail.com, toke@redhat.com, davem@davemloft.net,
- edumazet@google.com, bpf@vger.kernel.org, lorenzo.bianconi@redhat.com,
- sdf@google.com, jasowang@redhat.com
-References: <cover.1702563810.git.lorenzo@kernel.org>
- <b1432fc51c694f1be8daabb19773744fcee13cf1.1702563810.git.lorenzo@kernel.org>
- <c49124012f186e06a4a379b060c85e4cca1a9d53.camel@redhat.com>
+Subject: Re: [PATCH net-next v2 10/21] net: ravb: Move delay mode set in the
+ driver's ndo_open API
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <c49124012f186e06a4a379b060c85e4cca1a9d53.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ geert+renesas@glider.be
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-11-claudiu.beznea.uj@bp.renesas.com>
+ <421c684d-7092-d7a8-e00a-6abe40c557c5@omp.ru>
+ <58b11076-3e8e-42a0-864f-7ad16abaccd6@tuxon.dev>
+ <c00db758-54ca-80a9-7ba3-9a6ce61f9224@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <c00db758-54ca-80a9-7ba3-9a6ce61f9224@omp.ru>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 19/12/2023 16.23, Paolo Abeni wrote:
-> On Thu, 2023-12-14 at 15:29 +0100, Lorenzo Bianconi wrote:
->> Allocate percpu page_pools in softnet_data.
->> Moreover add cpuid filed in page_pool struct in order to recycle the
->> page in the page_pool "hot" cache if napi_pp_put_page() is running on
->> the same cpu.
->> This is a preliminary patch to add xdp multi-buff support for xdp running
->> in generic mode.
+On 19.12.2023 20:40, Sergey Shtylyov wrote:
+> On 12/17/23 3:49 PM, claudiu beznea wrote:
+> 
+> [...]
+>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>
+>>>> Delay parse and set were done in the driver's probe API. As some IP
+>>>
+>>>    Parsing and setting?
+>>>
+>>>> variants switch to reset mode (and thus registers' content is lost) when
+>>>
+>>>    Register.
+>>>
+>>>> setting clocks (due to module standby functionality) to be able to
+>>>> implement runtime PM keep the delay parsing in the driver's probe function
+>>>> and move the delay apply function to the driver's ndo_open API.
+>>>
+>>>    Applying?
+>>>
+>>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>> [...]
+>>>
+>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> index 5e01e03e1b43..04eaa1967651 100644
+>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>> [...]
+>>>> @@ -1806,6 +1821,8 @@ static int ravb_open(struct net_device *ndev)
+>>>>  	if (info->nc_queues)
+>>>>  		napi_enable(&priv->napi[RAVB_NC]);
+>>>>  
+>>>> +	ravb_set_delay_mode(ndev);
+>>>> +
+>>>
+>>>    I suspect this belongs in ravb_dmac_init() now...
 >>
->> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->> ---
->>   include/linux/netdevice.h       |  1 +
->>   include/net/page_pool/helpers.h |  5 +++++
->>   include/net/page_pool/types.h   |  1 +
->>   net/core/dev.c                  | 39 ++++++++++++++++++++++++++++++++-
->>   net/core/page_pool.c            |  5 +++++
->>   net/core/skbuff.c               |  5 +++--
->>   6 files changed, 53 insertions(+), 3 deletions(-)
+>> I'm confused... Why? To me this seems more like MAC-PHY interface related.
 > 
-> @Jesper, @Ilias: could you please have a look at the pp bits?
+>    APSR's full name is AVB-DMAC product specific register. :-)
+
+As ravb_dmac_init() is called in multiple places I don't think it worth
+configuring delays more than once in ravb_open().
+
+Moreover TX/RX delay is something specific to the MAC-PHY interface (and
+could be influenced also by the wiring length b/w MAC and PHY).
+
+Just because it is in the DMAC address space I don't think it worth having
+it in ravb_dmac_init() (for the above mentioned reasons).
+
 > 
-
-I have some concerns... I'm still entertaining the idea, but we need to
-be aware of the tradeoffs we are making.
-
-(1)
-Adding PP to softnet_data means per CPU caching 256 pages in the
-ptr_ring (plus likely 64 in the alloc-cache).   Fortunately, PP starts
-out empty, so as long as this PP isn't used they don't get cached. But
-if used, then PP don't have a MM shrinker that removes these cached
-pages, in case system is under MM pressure.  I guess, you can argue that
-keeping this per netdev rx-queue would make memory usage even higher.
-This is a tradeoff, we are trading memory (waste) for speed.
-
-
-(2) (Question to Jakub I guess)
-How does this connect with Jakub's PP netlink stats interface?
-E.g. I find it very practical that this allow us get PP stats per
-netdev, but in this case there isn't a netdev.
-
-
-(3) (Implicit locking)
-PP have lockless "alloc" because it it relies on drivers NAPI context.
-The places where netstack access softnet_data provide similar protection
-that we can rely on for PP, so this is likely correct implementation
-wise.  But it will give people like Sebastian (Cc) more gray hair when
-figuring out how PREEMPT_RT handle these cases.
-
-(4)
-The optimization is needed for the case where we need to re-allocate and
-copy SKB fragments.  I think we should focus on avoiding this code path,
-instead of optimizing it.  For UDP it should be fairly easy, but for TCP
-this is harder.
-
---Jesper
+>> Though I'm not sure what ravb_dmac_init() purpose is.
+> 
+>    To configure and start the AVB-DMAC, apparently. :-)
+> 
+> [...]
+> 
+> MRB, Sergey
 
