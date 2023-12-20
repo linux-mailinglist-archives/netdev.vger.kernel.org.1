@@ -1,109 +1,126 @@
-Return-Path: <netdev+bounces-59096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9E938194EB
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:04:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D9658194E4
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 01:01:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73C6A1F2533C
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:04:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4168B23708
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 00:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD5C156E6;
-	Wed, 20 Dec 2023 00:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45077E2;
+	Wed, 20 Dec 2023 00:01:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhRrvTgo"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="PKTFgcrd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8305F14F65;
-	Wed, 20 Dec 2023 00:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-54bf9a54fe3so6353101a12.3;
-        Tue, 19 Dec 2023 16:04:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703030689; x=1703635489; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X5S0Pd7ohGCP42Ze9PIwQlcyhis2/KWJU2IYvv2awBs=;
-        b=jhRrvTgoHkSUKgKb2S/LItL6d8kiubhUi0Vk0cmIE4M57wY6KzPcZup279c4xrYKu8
-         LMSplnR0eR1+7qZfMeLEmqTLephs/8PUHKB9U5vJFI+lrzAbL4yIipbcUCNUYDumit0b
-         6dtJ8TwChg+a2s8dDSuu0GvZGKvWiXJvpu5Szmzmw/WTlS/QoVUNjPHyVbp6PqmVnky7
-         RCZBecKaUBOhwZ3UTzWHm3K1aMKzHP9fv6tJG4Wv7sOprFewCtsvZNBZDZB659+jrzfO
-         mtvJAgmg0asNxMhesWhyZjDp868RDAVFIhQQivrA7gyOaANA48ed1Rqtnu5u+zGFJfY0
-         INVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703030689; x=1703635489;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X5S0Pd7ohGCP42Ze9PIwQlcyhis2/KWJU2IYvv2awBs=;
-        b=U4ie9rz0zF9AGa43i6aAKC8vmkjyB9AGUHxYCs8RUSuz5vpUBCz7i88wHfTR5l0xyZ
-         DjB7peA7zbv/29WlLmjYyJ3Rc7B5m/cWHdOotCIuD2G9TFJzzvWDnmWmHiqOOSYS5nly
-         JhuV9W9aebzCgxwK6iiEuhhiIpTwpC0jyyurjQNoKmrIwel4rKLqFnEd5AwtyibpLsOu
-         6/ZvaPAVA6F6N3bZ2zoQiSI3pCLD0bKikC2YfDZh1pyREEbqsK/oBt66M/TYtAVXhkOr
-         WxR299gL42PbQxfGXDyE/2g6IXdAMi3Jmd3rf/Enj9fWJBiL+b3EDCcDLAbfHZjBVnO8
-         nfVA==
-X-Gm-Message-State: AOJu0Ywzc/BPtkDpL2qCzoHhw0d2oLP8SCe6MMZijwMThIpK5aBIMEMd
-	nRB0i7X6AtuYJuZ+Vyw0fO8SazVTmLc=
-X-Google-Smtp-Source: AGHT+IE6yCwTZBujm8ZJAl3PMp6/TjEdt/h167kHn1xj/TgFj5cDH4ksvPzCjeMqACT2bXHNrueQPg==
-X-Received: by 2002:a50:8754:0:b0:553:7303:96e5 with SMTP id 20-20020a508754000000b00553730396e5mr1718574edv.24.1703030689440;
-        Tue, 19 Dec 2023 16:04:49 -0800 (PST)
-Received: from [192.168.8.100] ([85.255.233.166])
-        by smtp.gmail.com with ESMTPSA id fk7-20020a056402398700b00552d39abdc1sm4751628edb.19.2023.12.19.16.04.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 16:04:49 -0800 (PST)
-Message-ID: <b0299ecf-ee31-4a7d-a86e-640ccf69c93a@gmail.com>
-Date: Tue, 19 Dec 2023 23:59:48 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26623BE4C;
+	Wed, 20 Dec 2023 00:01:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 61D837DA;
+	Wed, 20 Dec 2023 00:01:40 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 61D837DA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1703030500; bh=jTG5dpMX6psNetWgHqT85RaanezwkMuMisj0ITm0ioU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PKTFgcrdEopAi67xnqTUoADR0ekAwSZca5EQZXRiu0s0VCrnJUSZH2jw0hKdL2XJr
+	 IvqONFHTjtT16Oaw8iLyEqeT37Lis2UYUH7FFM2s6SMD3+ymsLSXCuBjnppnSXtkGw
+	 VK/VxIGgopdoBXQfhTxuBd2AYIIK6lRbEok5KLAnsNqskfkHMU5qdGXzwCBaWkAapx
+	 /mBsniOra91aEquQtW9L73957O6dP6pvnDDujjlYcQVRkhGRurPpYUOJWOLGp0BJW3
+	 tSxIISBkmZvZfG0XN5vjgRM05ri1mabw8vJKzY1R39TVUbFucNYm8gheFr14Hz3itV
+	 1J3896O74KWdg==
+From: Jonathan Corbet <corbet@lwn.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: [PATCH] wifi: cfg80211: address several kerneldoc warnings
+Date: Tue, 19 Dec 2023 17:01:39 -0700
+Message-ID: <87plz1g2sc.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 01/20] net: page_pool: add ppiov mangling helper
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-References: <20231219210357.4029713-1-dw@davidwei.uk>
- <20231219210357.4029713-2-dw@davidwei.uk>
- <CAHS8izMQ2u9KTBz+QhnmB483OW0hmma7Vy7OgoTGajM7FyJhiA@mail.gmail.com>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izMQ2u9KTBz+QhnmB483OW0hmma7Vy7OgoTGajM7FyJhiA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 12/19/23 23:22, Mina Almasry wrote:
-> On Tue, Dec 19, 2023 at 1:04 PM David Wei <dw@davidwei.uk> wrote:
->>
->> From: Pavel Begunkov <asml.silence@gmail.com>
->>
->> NOT FOR UPSTREAM
->>
->> The final version will depend on how ppiov looks like, but add a
->> convenience helper for now.
->>
-> 
-> Thanks, this patch becomes unnecessary once you pull in the latest
-> version of our changes; you could use net_iov_to_netmem() added here:
-> 
-> https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.3516870-9-almasrymina@google.com/
-> 
-> Not any kind of objection from me, just an FYI.
+include/net/cfg80211.h includes a number of kerneldoc entries for struct
+members that do not exist, leading to these warnings:
 
-Right, that's predicated, and that's why there are disclaimers
-saying that it depends on your paches final form, and many of
-such patches will get dropped as unnecessary.
+  ./include/net/cfg80211.h:3192: warning: Excess struct member 'band_pref' description in 'cfg80211_bss_selection'
+  ./include/net/cfg80211.h:3192: warning: Excess struct member 'adjust' description in 'cfg80211_bss_selection'
+  ./include/net/cfg80211.h:6181: warning: Excess struct member 'bssid' description in 'wireless_dev'
+  ./include/net/cfg80211.h:6181: warning: Excess struct member 'beacon_interval' description in 'wireless_dev'
+  ./include/net/cfg80211.h:7299: warning: Excess struct member 'bss' description in 'cfg80211_rx_assoc_resp_data'
 
+Remove and/or repair each entry to address the warnings and ensure a proper
+docs build for the affected structures.
+
+Signed-off-by: Jonathan Corbet <corbet@lwn.net>
+---
+ include/net/cfg80211.h | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index b137a33a1b68..81c46c8e2a68 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -3180,8 +3180,8 @@ struct cfg80211_ibss_params {
+  *
+  * @behaviour: requested BSS selection behaviour.
+  * @param: parameters for requestion behaviour.
+- * @band_pref: preferred band for %NL80211_BSS_SELECT_ATTR_BAND_PREF.
+- * @adjust: parameters for %NL80211_BSS_SELECT_ATTR_RSSI_ADJUST.
++ * @param.band_pref: preferred band for %NL80211_BSS_SELECT_ATTR_BAND_PREF.
++ * @param.adjust: parameters for %NL80211_BSS_SELECT_ATTR_RSSI_ADJUST.
+  */
+ struct cfg80211_bss_selection {
+ 	enum nl80211_bss_select_attr behaviour;
+@@ -6013,7 +6013,6 @@ void wiphy_delayed_work_flush(struct wiphy *wiphy,
+  *	wireless device if it has no netdev
+  * @u: union containing data specific to @iftype
+  * @connected: indicates if connected or not (STA mode)
+- * @bssid: (private) Used by the internal configuration code
+  * @wext: (private) Used by the internal wireless extensions compat code
+  * @wext.ibss: (private) IBSS data part of wext handling
+  * @wext.connect: (private) connection handling data
+@@ -6033,8 +6032,6 @@ void wiphy_delayed_work_flush(struct wiphy *wiphy,
+  * @mgmt_registrations: list of registrations for management frames
+  * @mgmt_registrations_need_update: mgmt registrations were updated,
+  *	need to propagate the update to the driver
+- * @beacon_interval: beacon interval used on this device for transmitting
+- *	beacons, 0 when not valid
+  * @address: The address for this device, valid only if @netdev is %NULL
+  * @is_running: true if this is a non-netdev device that has been started, e.g.
+  *	the P2P Device.
+@@ -7270,8 +7267,6 @@ void cfg80211_auth_timeout(struct net_device *dev, const u8 *addr);
+ 
+ /**
+  * struct cfg80211_rx_assoc_resp_data - association response data
+- * @bss: the BSS that association was requested with, ownership of the pointer
+- *	moves to cfg80211 in the call to cfg80211_rx_assoc_resp()
+  * @buf: (Re)Association Response frame (header + body)
+  * @len: length of the frame data
+  * @uapsd_queues: bitmap of queues configured for uapsd. Same format
+@@ -7281,6 +7276,8 @@ void cfg80211_auth_timeout(struct net_device *dev, const u8 *addr);
+  * @ap_mld_addr: AP MLD address (in case of MLO)
+  * @links: per-link information indexed by link ID, use links[0] for
+  *	non-MLO connections
++ * @links.bss: the BSS that association was requested with, ownership of the
++ *      pointer moves to cfg80211 in the call to cfg80211_rx_assoc_resp()
+  * @links.status: Set this (along with a BSS pointer) for links that
+  *	were rejected by the AP.
+  */
 -- 
-Pavel Begunkov
+2.43.0
+
+
 
