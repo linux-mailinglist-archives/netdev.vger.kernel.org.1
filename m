@@ -1,350 +1,370 @@
-Return-Path: <netdev+bounces-59234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516A3819FE5
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:35:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED392819FEA
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 14:36:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0747F286A55
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 13:35:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1982C1C224D1
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 13:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF2725548;
-	Wed, 20 Dec 2023 13:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD3836AE5;
+	Wed, 20 Dec 2023 13:36:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jvu8j17O"
+	dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b="qpVzXr/f"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sequoia-grove.ad.secure-endpoints.com (sequoia-grove.ad.secure-endpoints.com [208.125.0.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3E334540
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 13:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K4qHnN8bcUabR//elN5RMkNBP//0ofo2tdZo4ETeSPo0BNfJgk7gj8MjFUQS92OF3ws4iMGnPNNy5WW5AqIcmByVv3e+g9NRLAKQxIUO5ztGjMuUtcRbMXtdlX66dqxMvQAJtSOQwVWw8ig+Pq8l884NjjCo2l53HAW2LxqeDfgMdynxQ2g2pfh1gtinMNMQkTY21UXVsZFaB7v3SjvxZAUVJ5YEvan24/dd/f2mK8Zr6D6ZxQa1YR1WLaQfyfiuNYIFm6jyAF00mavGUAcd+v7M2NN7kb4JR1OokiH7z26zAdL/o4joonvbURPuGRifqPjR5JqVWLHclf38g8S2MA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mB1BLYuUQLIii5KzDsN96O+uIyeDmXDOn/llyW78ic4=;
- b=ZynJ8qCG03OyX/l4aexMfNZhVUlg89L6pscyxqH6R39uWTzCId62RUOwpDveMAEsH4fvBmVao3XieYzwORRsCB6cnhr5Qa/KnWks1VEaO/F3ScUW9tGp+f9jVMhQl3FN0CiYx54XIqFstsILUTb/5LrFAEs9FhwD1YD5iB4VFHJvYZYLmnyUgaKKM5gtjDPHW1acRYaJjQY5I69NPsV6eWSkF65Q7GGBX6QeRHHLrsQFclnCHGAGMe9mowFYsG5MlirTI16vFlS53VDUUUZn7+3y3+0Y/hRsiqVLXnKtF57fz+caCMs+c1ZYySzWmI84XpZMR7kMLLNAxTSHXheMnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mB1BLYuUQLIii5KzDsN96O+uIyeDmXDOn/llyW78ic4=;
- b=jvu8j17OnbItnLIlbvNqNJF4yhtdvcnAVnIzJsvEuZtS1nfdtnPXJpf0Jc4EctUyJUnlPrwNFpflPcONbzGvKkR6eToawX8Yn7mxeQt+uIXQdKZT/h47YmkFWsMQiQyyzBDIKODMwX+WvWBRprzTGrt7zUg5YgiJTWKQl+M6uL9MeVWiGHy3CaawG9QdQgesTc+w1CXwfC/wievHtapJYWvIOeRbQFGj9lxxxSQN7RMy6DK9xgCP6W64vM1bDBE0M6J2Xe8h4y50b6mAgdtxeRw+D5DClHF5iK+MvEkFJaum1zsQvFChMJYshhtgLNOIaiF9r4YeafmzXZsRuBLTYg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
- by PH7PR12MB9221.namprd12.prod.outlook.com (2603:10b6:510:2e8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.18; Wed, 20 Dec
- 2023 13:35:28 +0000
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::6f3c:cedb:bf1e:7504]) by DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::6f3c:cedb:bf1e:7504%4]) with mapi id 15.20.7113.016; Wed, 20 Dec 2023
- 13:35:28 +0000
-Message-ID: <5c6039e6-e373-4e38-9e45-7834551be4d0@nvidia.com>
-Date: Wed, 20 Dec 2023 15:35:20 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 07/20] nvme-tcp: RX DDGST offload
-Content-Language: en-US
-To: Aurelien Aptel <aaptel@nvidia.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
- "kbusch@kernel.org" <kbusch@kernel.org>, "axboe@fb.com" <axboe@fb.com>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "kuba@kernel.org" <kuba@kernel.org>
-Cc: Yoray Zack <yorayz@nvidia.com>,
- "aurelien.aptel@gmail.com" <aurelien.aptel@gmail.com>,
- Shai Malin <smalin@nvidia.com>, "malin1024@gmail.com" <malin1024@gmail.com>,
- Or Gerlitz <ogerlitz@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
- Gal Shalom <galshalom@nvidia.com>
-References: <20231214132623.119227-1-aaptel@nvidia.com>
- <20231214132623.119227-8-aaptel@nvidia.com>
-From: Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <20231214132623.119227-8-aaptel@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0339.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:d::15) To DM4PR12MB5040.namprd12.prod.outlook.com
- (2603:10b6:5:38b::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29D12D634
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 13:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=auristor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=auristor.com
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
+	d=auristor.com; s=MDaemon; r=y; t=1703079359; x=1703684159;
+	i=jaltman@auristor.com; q=dns/txt; h=Message-ID:Date:
+	MIME-Version:User-Agent:Subject:Content-Language:To:Cc:
+	References:From:Organization:In-Reply-To:Content-Type:
+	Content-Transfer-Encoding; bh=8/6Un6gYYbd+YxpW3ApIitxJxgZHCCKvXI
+	9dX8wctdQ=; b=qpVzXr/fNg2Bz9bhlHOORwt0AbvmZaY36UzlUvH2GLkIe/pzMc
+	ej0hBxd31U90ty4WULC2Ebfwlwdr8viAFXEFT/1X0cLQ9BasTSnzehILLEBE5Le2
+	um7tsxdTvyvDKGfdjxnQiKQwwRU+3wIGMnHxccAXjS1b2S78ZUKu8zuQ8=
+X-MDAV-Result: clean
+X-MDAV-Processed: sequoia-grove.ad.secure-endpoints.com, Wed, 20 Dec 2023 08:35:59 -0500
+Received: from [IPV6:2603:7000:73c:c800:b4b0:7f91:4ad9:4ee] by auristor.com (IPv6:2001:470:1f07:f77:28d9:68fb:855d:c2a5) (MDaemon PRO v23.5.1) 
+	with ESMTPSA id md5001003764615.msg; Wed, 20 Dec 2023 08:35:58 -0500
+X-Spam-Processed: sequoia-grove.ad.secure-endpoints.com, Wed, 20 Dec 2023 08:35:58 -0500
+	(not processed: message from trusted or authenticated source)
+X-MDRemoteIP: 2603:7000:73c:c800:b4b0:7f91:4ad9:4ee
+X-MDHelo: [IPV6:2603:7000:73c:c800:b4b0:7f91:4ad9:4ee]
+X-MDArrival-Date: Wed, 20 Dec 2023 08:35:58 -0500
+X-MDOrigin-Country: US, NA
+X-Authenticated-Sender: jaltman@auristor.com
+X-Return-Path: prvs=1718724d2e=jaltman@auristor.com
+X-Envelope-From: jaltman@auristor.com
+X-MDaemon-Deliver-To: netdev@vger.kernel.org
+Message-ID: <ad30af13-6389-4be5-9992-30bbebbe1bb3@auristor.com>
+Date: Wed, 20 Dec 2023 08:35:48 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|PH7PR12MB9221:EE_
-X-MS-Office365-Filtering-Correlation-Id: 23390da8-91ac-436e-1321-08dc016087ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	29wHAbbxNlHMpdm2aPoQwk2E6GncuyQKBGS5AyHeVHChrWjWwDvQGBGzYrXXulusS8eH31up80jUBLJRQ/9O9XaxkwtLy3/U5hnfotpgpqLvdAmj5A5dF0/vS0MGJCm06I1IWuccdMoIqsBixw6tWbQo6D7ccdI2Yv/R2L8ldrC+BofsgFmek+ThF2hoJcICNf3XCQmRT1Y+LkiQFUFi1VyoFJ8TVwaM7NQYVpJ7HrzVfJ5aPonAio5BLPhanvls4nKKwDyeELwX2n4jE4ntOlylwC2EK2vCvqGR8JHU+w86oGLJtlXuaLBIu+Qq7/cOukCoYfGmLILcEBASwvc2vkCMHaC5nM4aihwEDbb2Z/24IYPAoZjNDtpe1Z0kTQE5QtmHEGXgWGkX0rEkyWouT/e7P7RC1uMtGtXBonw4WweQK51L+9jTuq6EHeAQGuH2no6igk1yWRzUqGVIGasKeGH1284bC6nrj5n+FJivZ0/2kY7cBdMOQ9dagZJq3uDEWVoBks8jkg2Oi509A5maDAw5b9IlDUwHBS1gmN1lxWeLrSSZPAc94w1znNpJzHYuWv06/osdhd/DJLYX1XoqiiMpk1ensQ5CxdbC99i2xVAu7d+aFY9NC4RO1YS+PpXHwXWEh7p2Wf7LXgcpQcK9xT7W72ZbKWEfnfCeqyO14TU=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(366004)(39860400002)(346002)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(8676002)(8936002)(4326008)(36756003)(38100700002)(41300700001)(31696002)(86362001)(921008)(2906002)(5660300002)(7416002)(26005)(2616005)(6486002)(53546011)(107886003)(6666004)(31686004)(6512007)(6506007)(478600001)(54906003)(66556008)(66946007)(66476007)(83380400001)(110136005)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M056U1MwSFZMamRWUjZ3eUxlNUc0cDhNbEtsdHlZV09LeVZWWldRVnk3azJV?=
- =?utf-8?B?cDNVNHJtK0ZpTXZCV3ZPdDZmd2JUWXcwd1hGVlVWMTVTOGJvTzhYcW56U2tG?=
- =?utf-8?B?N3IwekJKaXJ1NmJ0SkRNaTFHMmk1bld2bFpKRS8rV1FnN2syYjhmSS90dDNu?=
- =?utf-8?B?bGhhQ1Baa1hQYkdIYUlWdFhhK3djUlF6eTI5Wk85RGFzbVhlWGhRYXVxSDc4?=
- =?utf-8?B?eDJQMEFzZUk5WEw2SDRiUEdHTER1S0VMRnp3WUVSbG54RkRMc1ovSW1tS3Za?=
- =?utf-8?B?UVRpNXpvLytGU0FGNzJXTjRrT21rUURyT1VlbDJabzR1RHFQankxRUxJU2U2?=
- =?utf-8?B?RysxUkI4dGtLL1dIRFFPR1FKbmhHSU43S1VtUFRBZVdjNjlFWEc2Z3o2bjlZ?=
- =?utf-8?B?dnRyM2ZkZXI3eThRNTkxMFJ3L21ES0lQd0Q3TW84NGlmaTFmZ0NFSEx1V1Vr?=
- =?utf-8?B?QWVQTXVOcURwM2YrSXhqamYxYnR6QjlEcC93S05zdlI5bnRPblE5TVFNdTZJ?=
- =?utf-8?B?U2x6ZHA4cWJPTHN4QXhiVXUwRlNvOWJXK0tiYVIrbk1paHdBc0o5WjVpMVAx?=
- =?utf-8?B?NGllU1lvQVp0VngwMUlEY0t2UEFNc0srRzVtbVhzTnJNcXI5ZE1TUGNXQXdh?=
- =?utf-8?B?Zkd4cHpBSEpXd1FqMzRORXFTUFUrSExiNmJQT3h0QTlCV2JRNkxmRGgxbjRK?=
- =?utf-8?B?MVp5cmFPYkdGTm1hTjQrTDJNOC9GZVQ2SkxZaDloNlJld0JyZ1dTekJLdnhp?=
- =?utf-8?B?T3R4eGh4LzRNVHZ2VzEweDE1SjNnbzZXdlFMUzBUTmJSOXJhdEtGL2svNzEz?=
- =?utf-8?B?NGx5ZDZ1bUJkL05kNkt5MStNUGw2bmJ3eXlSSmg2WVZuczlROUplOEJ6MkhI?=
- =?utf-8?B?TEJFYU9md0kycjhrZVJCZDB4V1AwWVhzMGVINDhodGV1TnhZMzA1RlBvUU1n?=
- =?utf-8?B?UTlqTmMwd0NaNWdycFgxMEQ3ZGh2M1dZcExHVm9hUytwRCtvdHlIL3lEQVM4?=
- =?utf-8?B?aUQwd21BUnpyNi95SVhwODlzNHdIdU9lRFlocG9rMXlJbHdlSzdQRkZlbFZr?=
- =?utf-8?B?VGY1eVplQVdQVldEZ2ZhUVlvd0hBOGMrNXQ3VUtoaEw0bENsVWpGRml2TnpD?=
- =?utf-8?B?UHppdkRVOHdNcXVxeG5LUDhJRnEyb2pvanJUUU5wUC9mbzBweU5xeEFpdm5S?=
- =?utf-8?B?VFdteUpHSG9Lak1JTXNWZ2xoVktHYThwSG5iVmFxL0JFek83QXhudHIxSWk2?=
- =?utf-8?B?b0F5MlFWQzJQQUZKSTlOeS95Z2lPa0Y1UzJGZFlUY00xdkFmYjFRV0ppcEFk?=
- =?utf-8?B?a2NpaFkyckNUbnZGVGpESDJUMllNR3pTaGtaTGJRK21tNlNJc1pVU3pmVk9Q?=
- =?utf-8?B?UEJTMFU2ekkwbTY4aFlvcmNUSytGN3Y5alo1SmMzUEFkcjVJMDFkSk1Fd09q?=
- =?utf-8?B?SDZybzAxTzhoVHBINkdiYVVVU3oyQTE5Uk5QNEtYMU9ybVZFYlVTQnlWTmZB?=
- =?utf-8?B?K3lQUTQ3MEJRUVdiNkhZM1pVQ2tvb3A0dHFtWHk1WGZZN1pFSEFZU29ZZ3h4?=
- =?utf-8?B?SEhGaFplVWRoWW40SWxxWWR1QnN3aW9tdnpEZFQ0ODd1RTNSRzBQMzFuZXZm?=
- =?utf-8?B?TERrRFdBd1dEQU5xekFEVVV5aEhIUkZrQXZpQ0lKdklONmtPZU5qM0JXdlpV?=
- =?utf-8?B?dTlxQmFaWWhTdlhsaFNsczRpclFPQUQ0M3JPd0FuVCs4VTV3bUpxMndRYktZ?=
- =?utf-8?B?WnFFZ3BPYWxSdGl0RFMrQ1FmSnIxMGdjN2hjTVcxWnRoRFIrbUJqbktBR3pB?=
- =?utf-8?B?QzNQbStrTTBsOW5JenU0MnlCVnNUdHNJWTNSM3czRlhHVDlIMW0wQXJ0ODhu?=
- =?utf-8?B?YVVDS3RQbXNxTTFSLzBybXd1RlZsMVU1SmlrSDhSWmRRenNZOTZmQ0lRSGJ2?=
- =?utf-8?B?WDhuMm5mSXNlVXltNC9wdG5KVnhhb1prRGdtOXkvSkYvdUZQamZ5RDhZMllC?=
- =?utf-8?B?Zjdlc2tCcWtuSzVhZ0Q4M0JwRStCeDIrY204L2JBbktGMmJXZVUweWVvUWhv?=
- =?utf-8?B?WFNVN0ppUENiKzlxVFFvSStPUzdnL05nbldDQjVxd3V6aG5wT1A2eXVELytD?=
- =?utf-8?B?Q1NoN0tEbHNvMmlmZ21GdUpraHlvVHMxcjhCYU5lS0IxNGQwMVRISTVmRWlY?=
- =?utf-8?B?Nmc9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23390da8-91ac-436e-1321-08dc016087ad
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2023 13:35:28.6957
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3n7Z31oNXLrWhqdzCKG8VTgqVanTIgLTC/qhih+8/3VJ81exae7wiO3d8wX/EdgaJV4OfRLCLHR47jnpvFPmEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9221
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/3] keys, dns: Allow key types (eg. DNS) to be
+ reclaimed immediately on expiry
+Content-Language: en-US
+To: David Howells <dhowells@redhat.com>,
+ Markus Suvanto <markus.suvanto@gmail.com>,
+ Marc Dionne <marc.dionne@auristor.com>
+Cc: linux-afs@lists.infradead.org, keyrings@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
+ Steve French <sfrench@us.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, netdev@vger.kernel.org
+References: <20231212144611.3100234-1-dhowells@redhat.com>
+ <20231212144611.3100234-4-dhowells@redhat.com>
+From: Jeffrey E Altman <jaltman@auristor.com>
+Organization: AuriStor, Inc.
+In-Reply-To: <20231212144611.3100234-4-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-MDCFSigsAdded: auristor.com
 
-
-
-On 14/12/2023 15:26, Aurelien Aptel wrote:
-> From: Yoray Zack <yorayz@nvidia.com>
-> 
-> Enable rx side of DDGST offload when supported.
-> 
-> At the end of the capsule, check if all the skb bits are on, and if not
-> recalculate the DDGST in SW and check it.
-> 
-> Signed-off-by: Yoray Zack <yorayz@nvidia.com>
-> Signed-off-by: Boris Pismenny <borisp@nvidia.com>
-> Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
-> Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
-> Signed-off-by: Shai Malin <smalin@nvidia.com>
-> Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+On 12/12/2023 9:46 AM, David Howells wrote:
+> If a key has an expiration time, then when that time passes, the key is
+> left around for a certain amount of time before being collected (5 mins by
+> default) so that EKEYEXPIRED can be returned instead of ENOKEY.  This is a
+> problem for DNS keys because we want to redo the DNS lookup immediately at
+> that point.
+>
+> Fix this by allowing key types to be marked such that keys of that type
+> don't have this extra period, but are reclaimed as soon as they expire and
+> turn this on for dns_resolver-type keys.  To make this easier to handle,
+> key->expiry is changed to be permanent if TIME64_MAX rather than 0.
+>
+> Furthermore, give such new-style negative DNS results a 10s default expiry
+> if no other expiry time is set rather than allowing it to stick around
+> indefinitely.  This shouldn't be zero as ls will follow a failing stat call
+> immediately with a second with AT_SYMLINK_NOFOLLOW added.
+>
+> Fixes: 1a4240f4764a ("DNS: Separate out CIFS DNS Resolver code")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Wang Lei <wang840925@gmail.com>
+> cc: Jeff Layton <jlayton@redhat.com>
+> cc: Steve French <sfrench@us.ibm.com>
+> cc: Marc Dionne <marc.dionne@auristor.com>
+> cc: Jarkko Sakkinen <jarkko@kernel.org>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: linux-afs@lists.infradead.org
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-nfs@vger.kernel.org
+> cc: ceph-devel@vger.kernel.org
+> cc: keyrings@vger.kernel.org
+> cc: netdev@vger.kernel.org
 > ---
->   drivers/nvme/host/tcp.c | 81 ++++++++++++++++++++++++++++++++++++++---
->   1 file changed, 76 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 09ffa8ba7e72..a7591eb90b96 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -143,6 +143,7 @@ enum nvme_tcp_queue_flags {
->   	NVME_TCP_Q_LIVE		= 1,
->   	NVME_TCP_Q_POLLING	= 2,
->   	NVME_TCP_Q_OFF_DDP	= 3,
-> +	NVME_TCP_Q_OFF_DDGST_RX = 4,
->   };
+>
+> Notes:
+>      Changes
+>      =======
+>      ver #3)
+>       - Don't add to TIME64_MAX (ie. permanent) when checking expiry time.
+>
+>   include/linux/key-type.h   |  1 +
+>   net/dns_resolver/dns_key.c | 10 +++++++++-
+>   security/keys/gc.c         | 31 +++++++++++++++++++++----------
+>   security/keys/internal.h   | 11 ++++++++++-
+>   security/keys/key.c        | 15 +++++----------
+>   security/keys/proc.c       |  2 +-
+>   6 files changed, 47 insertions(+), 23 deletions(-)
+>
+> diff --git a/include/linux/key-type.h b/include/linux/key-type.h
+> index 7d985a1dfe4a..5caf3ce82373 100644
+> --- a/include/linux/key-type.h
+> +++ b/include/linux/key-type.h
+> @@ -73,6 +73,7 @@ struct key_type {
 >   
->   enum nvme_tcp_recv_state {
-> @@ -180,6 +181,7 @@ struct nvme_tcp_queue {
->   	 *   is pending (ULP_DDP_RESYNC_PENDING).
->   	 */
->   	atomic64_t		resync_tcp_seq;
-> +	bool			ddp_ddgst_valid;
->   #endif
+>   	unsigned int flags;
+>   #define KEY_TYPE_NET_DOMAIN	0x00000001 /* Keys of this type have a net namespace domain */
+> +#define KEY_TYPE_INSTANT_REAP	0x00000002 /* Keys of this type don't have a delay after expiring */
 >   
->   	/* send state */
-> @@ -378,6 +380,30 @@ nvme_tcp_get_ddp_netdev_with_limits(struct nvme_tcp_ctrl *ctrl)
->   	return NULL;
->   }
->   
-> +static inline bool nvme_tcp_ddp_ddgst_ok(struct nvme_tcp_queue *queue)
-> +{
-> +	return queue->ddp_ddgst_valid;
-> +}
-> +
-> +static inline void nvme_tcp_ddp_ddgst_update(struct nvme_tcp_queue *queue,
-> +					     struct sk_buff *skb)
-> +{
-> +	if (queue->ddp_ddgst_valid)
-> +		queue->ddp_ddgst_valid = skb_is_ulp_crc(skb);
-> +}
-> +
-> +static void nvme_tcp_ddp_ddgst_recalc(struct ahash_request *hash,
-> +				      struct request *rq,
-> +				      __le32 *ddgst)
-> +{
-> +	struct nvme_tcp_request *req;
-> +
-> +	req = blk_mq_rq_to_pdu(rq);
-> +	ahash_request_set_crypt(hash, req->ddp.sg_table.sgl, (u8 *)ddgst,
-> +				req->data_len);
-> +	crypto_ahash_digest(hash);
-> +}
-> +
->   static bool nvme_tcp_resync_request(struct sock *sk, u32 seq, u32 flags);
->   static void nvme_tcp_ddp_teardown_done(void *ddp_ctx);
->   static const struct ulp_ddp_ulp_ops nvme_tcp_ddp_ulp_ops = {
-> @@ -467,6 +493,10 @@ static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
->   		return ret;
->   
->   	set_bit(NVME_TCP_Q_OFF_DDP, &queue->flags);
-> +	if (queue->data_digest &&
-> +	    ulp_ddp_is_cap_active(queue->ctrl->ddp_netdev,
-> +				  ULP_DDP_CAP_NVME_TCP_DDGST_RX))
-> +		set_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags);
->   
->   	return 0;
->   }
-> @@ -474,6 +504,7 @@ static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
->   static void nvme_tcp_unoffload_socket(struct nvme_tcp_queue *queue)
+>   	/* vet a description */
+>   	int (*vet_description)(const char *description);
+> diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+> index 01e54b46ae0b..3233f4f25fed 100644
+> --- a/net/dns_resolver/dns_key.c
+> +++ b/net/dns_resolver/dns_key.c
+> @@ -91,6 +91,7 @@ const struct cred *dns_resolver_cache;
+>   static int
+>   dns_resolver_preparse(struct key_preparsed_payload *prep)
 >   {
->   	clear_bit(NVME_TCP_Q_OFF_DDP, &queue->flags);
-> +	clear_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags);
->   	ulp_ddp_sk_del(queue->ctrl->ddp_netdev, queue->sock->sk);
+> +	const struct dns_server_list_v1_header *v1;
+>   	const struct dns_payload_header *bin;
+>   	struct user_key_payload *upayload;
+>   	unsigned long derrno;
+> @@ -122,6 +123,13 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+>   			return -EINVAL;
+>   		}
+>   
+> +		v1 = (const struct dns_server_list_v1_header *)bin;
+> +		if ((v1->status != DNS_LOOKUP_GOOD &&
+> +		     v1->status != DNS_LOOKUP_GOOD_WITH_BAD)) {
+> +			if (prep->expiry == TIME64_MAX)
+> +				prep->expiry = ktime_get_real_seconds() + 10;
+
+10 seconds is much longer than is needed to ensure that that the result 
+is available for
+a second stat() from "ls" in response to a failure.   I would be more 
+comfortable if this
+were one second.
+
+
+> +		}
+> +
+>   		result_len = datalen;
+>   		goto store_result;
+>   	}
+> @@ -314,7 +322,7 @@ static long dns_resolver_read(const struct key *key,
+>   
+>   struct key_type key_type_dns_resolver = {
+>   	.name		= "dns_resolver",
+> -	.flags		= KEY_TYPE_NET_DOMAIN,
+> +	.flags		= KEY_TYPE_NET_DOMAIN | KEY_TYPE_INSTANT_REAP,
+>   	.preparse	= dns_resolver_preparse,
+>   	.free_preparse	= dns_resolver_free_preparse,
+>   	.instantiate	= generic_key_instantiate,
+> diff --git a/security/keys/gc.c b/security/keys/gc.c
+> index 3c90807476eb..eaddaceda14e 100644
+> --- a/security/keys/gc.c
+> +++ b/security/keys/gc.c
+> @@ -66,6 +66,19 @@ void key_schedule_gc(time64_t gc_at)
+>   	}
 >   }
 >   
-> @@ -582,6 +613,20 @@ static void nvme_tcp_resync_response(struct nvme_tcp_queue *queue,
->   				     struct sk_buff *skb, unsigned int offset)
->   {}
->   
-> +static inline bool nvme_tcp_ddp_ddgst_ok(struct nvme_tcp_queue *queue)
+> +/*
+> + * Set the expiration time on a key.
+> + */
+> +void key_set_expiry(struct key *key, time64_t expiry)
 > +{
-> +	return false;
+> +	key->expiry = expiry;
+> +	if (expiry != TIME64_MAX) {
+> +		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
+> +			expiry += key_gc_delay;
+> +		key_schedule_gc(expiry);
+> +	}
 > +}
 > +
-> +static inline void nvme_tcp_ddp_ddgst_update(struct nvme_tcp_queue *queue,
-> +					     struct sk_buff *skb)
-> +{}
+>   /*
+>    * Schedule a dead links collection run.
+>    */
+> @@ -176,7 +189,6 @@ static void key_garbage_collector(struct work_struct *work)
+>   	static u8 gc_state;		/* Internal persistent state */
+>   #define KEY_GC_REAP_AGAIN	0x01	/* - Need another cycle */
+>   #define KEY_GC_REAPING_LINKS	0x02	/* - We need to reap links */
+> -#define KEY_GC_SET_TIMER	0x04	/* - We need to restart the timer */
+>   #define KEY_GC_REAPING_DEAD_1	0x10	/* - We need to mark dead keys */
+>   #define KEY_GC_REAPING_DEAD_2	0x20	/* - We need to reap dead key links */
+>   #define KEY_GC_REAPING_DEAD_3	0x40	/* - We need to reap dead keys */
+> @@ -184,21 +196,17 @@ static void key_garbage_collector(struct work_struct *work)
+>   
+>   	struct rb_node *cursor;
+>   	struct key *key;
+> -	time64_t new_timer, limit;
+> +	time64_t new_timer, limit, expiry;
+>   
+>   	kenter("[%lx,%x]", key_gc_flags, gc_state);
+>   
+>   	limit = ktime_get_real_seconds();
+> -	if (limit > key_gc_delay)
+> -		limit -= key_gc_delay;
+> -	else
+> -		limit = key_gc_delay;
+>   
+>   	/* Work out what we're going to be doing in this pass */
+>   	gc_state &= KEY_GC_REAPING_DEAD_1 | KEY_GC_REAPING_DEAD_2;
+>   	gc_state <<= 1;
+>   	if (test_and_clear_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags))
+> -		gc_state |= KEY_GC_REAPING_LINKS | KEY_GC_SET_TIMER;
+> +		gc_state |= KEY_GC_REAPING_LINKS;
+>   
+>   	if (test_and_clear_bit(KEY_GC_REAP_KEYTYPE, &key_gc_flags))
+>   		gc_state |= KEY_GC_REAPING_DEAD_1;
+> @@ -233,8 +241,11 @@ static void key_garbage_collector(struct work_struct *work)
+>   			}
+>   		}
+>   
+> -		if (gc_state & KEY_GC_SET_TIMER) {
+> -			if (key->expiry > limit && key->expiry < new_timer) {
+> +		expiry = key->expiry;
+> +		if (expiry != TIME64_MAX) {
+> +			if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
+> +				expiry += key_gc_delay;
+> +			if (expiry > limit && expiry < new_timer) {
+>   				kdebug("will expire %x in %lld",
+>   				       key_serial(key), key->expiry - limit);
+>   				new_timer = key->expiry;
+> @@ -276,7 +287,7 @@ static void key_garbage_collector(struct work_struct *work)
+>   	 */
+>   	kdebug("pass complete");
+>   
+> -	if (gc_state & KEY_GC_SET_TIMER && new_timer != (time64_t)TIME64_MAX) {
+> +	if (new_timer != TIME64_MAX) {
+>   		new_timer += key_gc_delay;
+>   		key_schedule_gc(new_timer);
+>   	}
+> diff --git a/security/keys/internal.h b/security/keys/internal.h
+> index 471cf36dedc0..2cffa6dc8255 100644
+> --- a/security/keys/internal.h
+> +++ b/security/keys/internal.h
+> @@ -167,6 +167,7 @@ extern unsigned key_gc_delay;
+>   extern void keyring_gc(struct key *keyring, time64_t limit);
+>   extern void keyring_restriction_gc(struct key *keyring,
+>   				   struct key_type *dead_type);
+> +void key_set_expiry(struct key *key, time64_t expiry);
+>   extern void key_schedule_gc(time64_t gc_at);
+>   extern void key_schedule_gc_links(void);
+>   extern void key_gc_keytype(struct key_type *ktype);
+> @@ -215,10 +216,18 @@ extern struct key *key_get_instantiation_authkey(key_serial_t target_id);
+>    */
+>   static inline bool key_is_dead(const struct key *key, time64_t limit)
+>   {
+> +	time64_t expiry = key->expiry;
 > +
-> +static void nvme_tcp_ddp_ddgst_recalc(struct ahash_request *hash,
-> +				      struct request *rq,
-> +				      __le32 *ddgst)
-> +{}
-> +
->   #endif
->   
->   static void nvme_tcp_init_iter(struct nvme_tcp_request *req,
-> @@ -842,6 +887,9 @@ static void nvme_tcp_init_recv_ctx(struct nvme_tcp_queue *queue)
->   	queue->pdu_offset = 0;
->   	queue->data_remaining = -1;
->   	queue->ddgst_remaining = 0;
-> +#ifdef CONFIG_ULP_DDP
-> +	queue->ddp_ddgst_valid = true;
-> +#endif
->   }
->   
->   static void nvme_tcp_error_recovery(struct nvme_ctrl *ctrl)
-> @@ -1107,6 +1155,10 @@ static int nvme_tcp_recv_data(struct nvme_tcp_queue *queue, struct sk_buff *skb,
->   		nvme_cid_to_rq(nvme_tcp_tagset(queue), pdu->command_id);
->   	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
->   
-> +	if (queue->data_digest &&
-> +	    test_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags))
-> +		nvme_tcp_ddp_ddgst_update(queue, skb);
-
-I think we can only use the test_bit(NVME_TCP_Q_OFF_DDGST_RX, 
-&queue->flags) in the if condition.
-We dont set this bit unless queue->data_digest is true, correct ?
-
-It is a micro optimization, but still can help.
-
-Otherwise looks good,
-
-Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-
-> +
->   	while (true) {
->   		int recv_len, ret;
->   
-> @@ -1135,7 +1187,8 @@ static int nvme_tcp_recv_data(struct nvme_tcp_queue *queue, struct sk_buff *skb,
->   		recv_len = min_t(size_t, recv_len,
->   				iov_iter_count(&req->iter));
->   
-> -		if (queue->data_digest)
-> +		if (queue->data_digest &&
-> +		    !test_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags))
->   			ret = skb_copy_and_hash_datagram_iter(skb, *offset,
->   				&req->iter, recv_len, queue->rcv_hash);
->   		else
-> @@ -1177,8 +1230,11 @@ static int nvme_tcp_recv_ddgst(struct nvme_tcp_queue *queue,
->   	char *ddgst = (char *)&queue->recv_ddgst;
->   	size_t recv_len = min_t(size_t, *len, queue->ddgst_remaining);
->   	off_t off = NVME_TCP_DIGEST_LENGTH - queue->ddgst_remaining;
-> +	struct request *rq;
->   	int ret;
->   
-> +	if (test_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags))
-> +		nvme_tcp_ddp_ddgst_update(queue, skb);
->   	ret = skb_copy_bits(skb, *offset, &ddgst[off], recv_len);
->   	if (unlikely(ret))
->   		return ret;
-> @@ -1189,9 +1245,25 @@ static int nvme_tcp_recv_ddgst(struct nvme_tcp_queue *queue,
->   	if (queue->ddgst_remaining)
->   		return 0;
->   
-> +	rq = nvme_cid_to_rq(nvme_tcp_tagset(queue),
-> +			    pdu->command_id);
-> +
-> +	if (test_bit(NVME_TCP_Q_OFF_DDGST_RX, &queue->flags)) {
-> +		/*
-> +		 * If HW successfully offloaded the digest
-> +		 * verification, we can skip it
-> +		 */
-> +		if (nvme_tcp_ddp_ddgst_ok(queue))
-> +			goto out;
-> +		/*
-> +		 * Otherwise we have to recalculate and verify the
-> +		 * digest with the software-fallback
-> +		 */
-> +		nvme_tcp_ddp_ddgst_recalc(queue->rcv_hash, rq,
-> +					  &queue->exp_ddgst);
+> +	if (expiry != TIME64_MAX) {
+> +		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
+> +			expiry += key_gc_delay;
+> +		if (expiry <= limit)
+> +			return true;
 > +	}
 > +
->   	if (queue->recv_ddgst != queue->exp_ddgst) {
-> -		struct request *rq = nvme_cid_to_rq(nvme_tcp_tagset(queue),
-> -					pdu->command_id);
->   		struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
+>   	return
+>   		key->flags & ((1 << KEY_FLAG_DEAD) |
+>   			      (1 << KEY_FLAG_INVALIDATED)) ||
+> -		(key->expiry > 0 && key->expiry <= limit) ||
+>   		key->domain_tag->removed;
+>   }
 >   
->   		req->status = cpu_to_le16(NVME_SC_DATA_XFER_ERROR);
-> @@ -1202,9 +1274,8 @@ static int nvme_tcp_recv_ddgst(struct nvme_tcp_queue *queue,
->   			le32_to_cpu(queue->exp_ddgst));
+> diff --git a/security/keys/key.c b/security/keys/key.c
+> index 0260a1902922..5b10641debd5 100644
+> --- a/security/keys/key.c
+> +++ b/security/keys/key.c
+> @@ -294,6 +294,7 @@ struct key *key_alloc(struct key_type *type, const char *desc,
+>   	key->uid = uid;
+>   	key->gid = gid;
+>   	key->perm = perm;
+> +	key->expiry = TIME64_MAX;
+>   	key->restrict_link = restrict_link;
+>   	key->last_used_at = ktime_get_real_seconds();
+>   
+> @@ -463,10 +464,7 @@ static int __key_instantiate_and_link(struct key *key,
+>   			if (authkey)
+>   				key_invalidate(authkey);
+>   
+> -			if (prep->expiry != TIME64_MAX) {
+> -				key->expiry = prep->expiry;
+> -				key_schedule_gc(prep->expiry + key_gc_delay);
+> -			}
+> +			key_set_expiry(key, prep->expiry);
+>   		}
 >   	}
 >   
-> +out:
->   	if (pdu->hdr.flags & NVME_TCP_F_DATA_SUCCESS) {
-> -		struct request *rq = nvme_cid_to_rq(nvme_tcp_tagset(queue),
-> -					pdu->command_id);
->   		struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
+> @@ -606,8 +604,7 @@ int key_reject_and_link(struct key *key,
+>   		atomic_inc(&key->user->nikeys);
+>   		mark_key_instantiated(key, -error);
+>   		notify_key(key, NOTIFY_KEY_INSTANTIATED, -error);
+> -		key->expiry = ktime_get_real_seconds() + timeout;
+> -		key_schedule_gc(key->expiry + key_gc_delay);
+> +		key_set_expiry(key, ktime_get_real_seconds() + timeout);
 >   
->   		nvme_tcp_end_request(rq, le16_to_cpu(req->status));
+>   		if (test_and_clear_bit(KEY_FLAG_USER_CONSTRUCT, &key->flags))
+>   			awaken = 1;
+> @@ -723,16 +720,14 @@ struct key_type *key_type_lookup(const char *type)
+>   
+>   void key_set_timeout(struct key *key, unsigned timeout)
+>   {
+> -	time64_t expiry = 0;
+> +	time64_t expiry = TIME64_MAX;
+>   
+>   	/* make the changes with the locks held to prevent races */
+>   	down_write(&key->sem);
+>   
+>   	if (timeout > 0)
+>   		expiry = ktime_get_real_seconds() + timeout;
+> -
+> -	key->expiry = expiry;
+> -	key_schedule_gc(key->expiry + key_gc_delay);
+> +	key_set_expiry(key, expiry);
+>   
+>   	up_write(&key->sem);
+>   }
+> diff --git a/security/keys/proc.c b/security/keys/proc.c
+> index d0cde6685627..4f4e2c1824f1 100644
+> --- a/security/keys/proc.c
+> +++ b/security/keys/proc.c
+> @@ -198,7 +198,7 @@ static int proc_keys_show(struct seq_file *m, void *v)
+>   
+>   	/* come up with a suitable timeout value */
+>   	expiry = READ_ONCE(key->expiry);
+> -	if (expiry == 0) {
+> +	if (expiry == TIME64_MAX) {
+>   		memcpy(xbuf, "perm", 5);
+>   	} else if (now >= expiry) {
+>   		memcpy(xbuf, "expd", 5);
+>
+>
+
+Beyond the default lifetime issue the change looks good to me.
+
+Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
+
+
 
