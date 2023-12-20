@@ -1,72 +1,64 @@
-Return-Path: <netdev+bounces-59216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D310D819E3E
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:38:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5FB819E49
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 12:41:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61AA1B20E98
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:38:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B61AF1F23571
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5EE21374;
-	Wed, 20 Dec 2023 11:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D50721378;
+	Wed, 20 Dec 2023 11:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XNRmQV4S"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="hCIQKu+V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FEF2135A;
-	Wed, 20 Dec 2023 11:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BKBM91A029635;
-	Wed, 20 Dec 2023 11:37:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XyJmZFNQjJdjPZR5ZR/LVt85GyOnRFs6uij6ZyeOJws=;
- b=XNRmQV4SmH5utrQkjDChTd3Ct7i8lveaSkqFh7C+ls8d3buRdOmQ4dWJMFVgjpk1gJfv
- UAqCSRwj9THZRzEiMUQVh8Hr+72cfPgKJjZvfHqg5U+TFujlJt8qzUfugCbtfty6uAr9
- OjmdEYQhtxnDhQd0fu1y/ONbuozrIpDrHdtAtanAkpaM0Oy3aZBLubuDEORmJG3HQoHb
- Ewv6Avj+3kdkq5bmiyv2N2IzCClxcH3/TB/z7Dtzx4hsBO6e4etWo9yT5Ei9A9NAY1XL
- 0PISTwW6EAzSwx8d4qJv4E3qQlfjRIHN5wQbGGBU2lYxdNXoiOD9GUbb+Jzzg+ywb/st hA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3yb50bdf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Dec 2023 11:37:58 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BKBO1qJ002112;
-	Wed, 20 Dec 2023 11:37:58 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3yb50bd6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Dec 2023 11:37:58 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BKAcBVV004828;
-	Wed, 20 Dec 2023 11:37:56 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1pkyx800-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Dec 2023 11:37:56 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BKBbro47209602
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 20 Dec 2023 11:37:53 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7A46720040;
-	Wed, 20 Dec 2023 11:37:53 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2DF1C20043;
-	Wed, 20 Dec 2023 11:37:53 +0000 (GMT)
-Received: from [9.152.224.160] (unknown [9.152.224.160])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 20 Dec 2023 11:37:53 +0000 (GMT)
-Message-ID: <ab835e29-ad4a-4377-b80a-8ef6bb35ef7b@linux.ibm.com>
-Date: Wed, 20 Dec 2023 12:37:52 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC24A22311
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 11:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40c69403b3eso55996875e9.3
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 03:41:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1703072481; x=1703677281; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SZWhqtv1uYgAtrEvWORH5Jkai5M2Z/ROl6KfWhfHkKU=;
+        b=hCIQKu+Vbkex63tChfosUR/zvPPmw6Hgoz9w9dgx8GYL58b5wM6+5PhSZbIAqqxRE1
+         5e4t3mYaXvvLzC4MK3+Q70+hWDNmhtOU9dW0tNa97vMIwD/ymWvpzsEYW+ZhF3mYRwgt
+         33B4Icep/S83qd8FvEa7KJ6zwiflKWri63WZosr2J0ZmMnRSOCFPSk4J5hzVluiz6FP8
+         0il8U5fYQf+ZWV0r7sfBahOPWGtz9XAcBwN3fn4S/IIbM4WtXKWsnk+CgIfy2Gd7dF2K
+         C806ZRENcOhTY2QP9iMfXJ/aOUzH/sV9SEtxdQy2GiuQO7cU/QmYgXQX9feCeOojev2c
+         jZqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703072481; x=1703677281;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SZWhqtv1uYgAtrEvWORH5Jkai5M2Z/ROl6KfWhfHkKU=;
+        b=ql9GqPidjQoWt4IjmDzRiPGqhBzo/lGS0rLf21PwF8KjYO7NhSYhvVvd0Wx3XFTZV+
+         sNAElOCEfWZj0BIkOg32nnRDdJzHYindhiK5vaqAAwGkoB0xYjLIYLs4GELKfO58d4C6
+         Nh6F9u0ayQEn9FYALWwmiKJmJs6kH41jvykzNJ+zQzZCo9JcEIOKdwgSw7r3+Nn9TsFw
+         pWp7ETtJCbGZtOgAz9VfW49HkeMtRQF/JTfXBRWrgl33T+/U8Oq/eKP6ExcCmmpovPx3
+         T7Gv15v6IPNamJZLC7n1GV0Jsps/Yb57toRPMgW2pngBOrIzJNMr3oCEhdKfzuMT5IYE
+         GM4g==
+X-Gm-Message-State: AOJu0YxwUpcWc03e7vnkU94qD6wcKUfC1sM1uEqGGe4xH3sisvIO+EYG
+	e03TRZ/L42GXZKqtmKyNCraitw==
+X-Google-Smtp-Source: AGHT+IGrOP3rCvSQlLOPOY+Br1f+srVKe7B5d6K6/Ee1K7y3SdFosWv+1eHUoS5ib1QvAzNgoIZg0w==
+X-Received: by 2002:a05:600c:1688:b0:40b:2a53:7913 with SMTP id k8-20020a05600c168800b0040b2a537913mr9715344wmn.13.1703072480998;
+        Wed, 20 Dec 2023 03:41:20 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.103])
+        by smtp.gmail.com with ESMTPSA id z5-20020a05600c0a0500b0040c2963e5f3sm7135141wmp.38.2023.12.20.03.41.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Dec 2023 03:41:20 -0800 (PST)
+Message-ID: <3d4511bd-fd96-4281-a5cb-ac1765bded31@tuxon.dev>
+Date: Wed, 20 Dec 2023 13:41:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,84 +66,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 03/10] net/smc: unify the structs of accept or
- confirm message for v1 and v2
+Subject: Re: [PATCH net-next v2 11/21] net: ravb: Move DBAT configuration to
+ the driver's ndo_open API
 Content-Language: en-US
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
-        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231219142616.80697-1-guwen@linux.alibaba.com>
- <20231219142616.80697-4-guwen@linux.alibaba.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20231219142616.80697-4-guwen@linux.alibaba.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ geert+renesas@glider.be
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-12-claudiu.beznea.uj@bp.renesas.com>
+ <a93c0673-2876-5bb2-29aa-0d0208b97b10@omp.ru>
+ <4721c4e6-cc0f-48bd-8b14-4a8217ada1fd@omp.ru>
+ <b17c6124-0b84-40b2-a254-cce617f73cf2@tuxon.dev>
+ <59ba595a-ab79-cc5d-feff-dad60e80c44f@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <59ba595a-ab79-cc5d-feff-dad60e80c44f@omp.ru>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MpqjPWw7u7JA0NR-yffqx25IKCsS4RuZ
-X-Proofpoint-GUID: wOPMZo8ahzEIcE_rVYubprY4USmvFRuM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-20_02,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- bulkscore=0 adultscore=0 priorityscore=1501 lowpriorityscore=0
- suspectscore=0 mlxscore=0 impostorscore=0 mlxlogscore=633 clxscore=1015
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312200081
 
 
 
-On 19.12.23 15:26, Wen Gu wrote:
->  struct smc_clc_msg_accept_confirm {	/* clc accept / confirm message */
-> -	struct smc_clc_msg_hdr hdr;
-> -	union {
-> -		struct smcr_clc_msg_accept_confirm r0; /* SMC-R */
-> -		struct { /* SMC-D */
-> -			struct smcd_clc_msg_accept_confirm_common d0;
-> -			u32 reserved5[3];
-> -		};
-> -	};
-> -} __packed;			/* format defined in RFC7609 */
-> -
-> -struct smc_clc_msg_accept_confirm_v2 {	/* clc accept / confirm message */
->  	struct smc_clc_msg_hdr hdr;
->  	union {
->  		struct { /* SMC-R */
->  			struct smcr_clc_msg_accept_confirm r0;
-> -			u8 eid[SMC_MAX_EID_LEN];
-> -			u8 reserved6[8];
-> -		} r1;
-> +			struct { /* v2 only */
-> +				u8 eid[SMC_MAX_EID_LEN];
-> +				u8 reserved6[8];
-> +			} __packed r1;
-> +		};
->  		struct { /* SMC-D */
->  			struct smcd_clc_msg_accept_confirm_common d0;
-> -			__be16 chid;
-> -			u8 eid[SMC_MAX_EID_LEN];
-> -			u8 reserved5[8];
-> -		} d1;
-> +			struct { /* v2 only, but 12 bytes reserved in v1 */
-> +				__be16 chid;
-> +				u8 eid[SMC_MAX_EID_LEN];
-> +				u8 reserved5[8];
-> +			} __packed d1;
-> +		};
->  	};
->  };
+On 19.12.2023 20:54, Sergey Shtylyov wrote:
+> On 12/17/23 3:54 PM, claudiu beznea wrote:
+> 
+> [...]
+> 
+>>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>>
+>>>>> DBAT setup was done in the driver's probe API. As some IP variants switch
+>>>>> to reset mode (and thus registers' content is lost) when setting clocks
+>>>>> (due to module standby functionality) to be able to implement runtime PM
+>>>>> move the DBAT configuration in the driver's ndo_open API.
+>>>>>
+>>>>> This commit prepares the code for the addition of runtime PM.
+>>>>>
+>>>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>
+>>>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>>>>
+>>>> [...]
+>>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>>>> index 04eaa1967651..6b8ca08be35e 100644
+>>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>>>> @@ -1822,6 +1822,7 @@ static int ravb_open(struct net_device *ndev)
+>>>>>  		napi_enable(&priv->napi[RAVB_NC]);
+>>>>>  
+>>>>>  	ravb_set_delay_mode(ndev);
+>>>>> +	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+>>>
+>>>    Looking at it again, I suspect this belong in ravb_dmac_init()...
+>>
+>> ravb_dmac_init() is called from multiple places in this driver, e.g.,
+> 
+>    It's purpose is to configure AVB-DMAC and DBAT is the AVB-DMAC register,
+> right?
 
+It is. But it is pointless to configure it more than one time after
+ravb_open() has been called as the register content is not changed until IP
+enters reset mode (though ravb_close() now).
 
-I still think the __packed at the outmost level is the safest place.
-Like you have it now the compiler could place unused memory between
-ro and r1 or between d0 and d1.
-Afaik compilers don't do that, if the blocks are word-aligned, but 
-there is no guarantee. 
+> 
+>> ravb_set_ringparam(), ravb_tx_timeout_work().
+> 
+>    I know. Its value is only calculated once, in ravb_probe(), right?
 
-Up to you. My R-b still applies.
-Sandy
+right
+
+> 
+>> I'm afraid we may broke the behavior of these if DBAT setup is moved
+
+I was wrong here. DBAT is not changed by IP while TX/RX is working.
+
+> 
+>    Do not be afraid! :-)
+> 
+>> in ravb_dmac_init(). This is also
+>> valid for setting delay (see patch 10/12).
+> 
+>    I don't think there will be a problem either... but maybe we
+> should call it in ravb_emac_init() indeed.
+> 
+> [...]
+> 
+> MBR, Sergey
 
