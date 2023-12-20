@@ -1,80 +1,121 @@
-Return-Path: <netdev+bounces-59316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D42081A65C
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 18:31:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 273C281A672
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 18:36:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FF7F1C25278
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:31:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ACFC1C24A4A
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A1347A54;
-	Wed, 20 Dec 2023 17:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E526E4777F;
+	Wed, 20 Dec 2023 17:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="ps1VYKic"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A76747A42;
-	Wed, 20 Dec 2023 17:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from alexious$zju.edu.cn ( [124.90.104.65] ) by
- ajax-webmail-mail-app4 (Coremail) ; Thu, 21 Dec 2023 01:30:59 +0800
- (GMT+08:00)
-Date: Thu, 21 Dec 2023 01:30:59 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: alexious@zju.edu.cn
-To: "Simon Horman" <horms@kernel.org>
-Cc: "Edward Cree" <ecree.xilinx@gmail.com>, 
-	"Martin Habets" <habetsm.xilinx@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-net-drivers@amd.com, linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH] sfc: fix a double-free bug in efx_probe_filters
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20231216155145.GN6288@kernel.org>
-References: <20231214152247.3482788-1-alexious@zju.edu.cn>
- <20231216155145.GN6288@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDAC482C2;
+	Wed, 20 Dec 2023 17:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 40F9AC0007;
+	Wed, 20 Dec 2023 17:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1703093760;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fV1sJxMriyTh60SAIXi7liP9zt+2ygBCARx0JGK9+4U=;
+	b=ps1VYKiciDXKUfDbjiWkSBN34+Qb+mbhQCYjPSZwOO0HdhCHI0u82ZTsWuNqBZctmkSGA7
+	70DC5cbNk4MxJq9m7kjenJaSCEAZvr3xt55QZMiROIc2q0RRi9mZTjZXIsXsUOrRkUU9Lx
+	3sAbnZqT78jUdW0ocXKc9zhczeGneQGerojtBts+AyOuR0xwEy370/nNwcGFltGXlf7Eql
+	dfntEUE1DzM6lizsRGe0Jkg+9oQEs4q7TCWA35k8Qk2pD3ph0WiJVFwfMoqPDkgNVPLbKx
+	g4so2m+oUR9EwiipDsthT3jSnQ3DAPrjE4BbFBgLAsn8oX+yGtb9SlGQbDRY8Q==
+From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
+To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: David Bauer <mail@david-bauer.net>,
+	mithat.guner@xeront.com,
+	erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net-next] net: dsa: mt7530: register OF node for internal MDIO bus
+Date: Wed, 20 Dec 2023 19:35:39 +0200
+Message-Id: <20231220173539.59071-1-arinc.unal@arinc9.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <310b8095.47cb8.18c8847dbe3.Coremail.alexious@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgBnbzfUJINlgjTSAA--.11842W
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/1tbiAgcPAGWCupcSuwAAsp
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Cj4gT24gVGh1LCBEZWMgMTQsIDIwMjMgYXQgMTE6MjI6NDZQTSArMDgwMCwgWmhpcGVuZyBMdSB3
-cm90ZToKPiA+IEluIGVmeF9wcm9iZV9maWx0ZXJzLCB0aGUgY2hhbm5lbC0+cnBzX2Zsb3dfaWQg
-aXMgZnJlZWQgaW4gYQo+ID4gZWZ4X2Zvcl9lYWNoX2NoYW5uZWwgbWFyY28gIHdoZW4gc3VjY2Vz
-cyBlcXVhbHMgdG8gMC4KPiA+IEhvd2V2ZXIsIGFmdGVyIHRoZSBmb2xsb3dpbmcgY2FsbCBjaGFp
-bjoKPiA+IAo+ID4gZWZ4X3Byb2JlX2ZpbHRlcnMKPiA+ICAgfC0+IGVmMTAwX25ldF9vcGVuCj4g
-PiAgICAgICAgIHwtPiBlZjEwMF9uZXRfc3RvcAo+ID4gICAgICAgICAgICAgICB8LT4gZWZ4X3Jl
-bW92ZV9maWx0ZXJzCj4gCj4gSSB0aGluayB0aGUgY2FsbCBjaGFpbiBtYXkgYmUgYSBiaXQgbW9y
-ZSBsaWtlOgo+IAo+IGVmMTAwX25ldF9vcGVuCj4gICB8LT4gZWZ4X3Byb2JlX2ZpbHRlcnMKPiAg
-IHwtPiBlZjEwMF9uZXRfc3RvcAo+ICAgICAgICAgfC0+IGVmeF9yZW1vdmVfZmlsdGVycwo+IAo+
-ID4gCj4gPiBUaGUgY2hhbm5lbC0+cnBzX2Zsb3dfaWQgaXMgZnJlZWQgYWdhaW4gaW4gdGhlIGVm
-eF9mb3JfZWFjaF9jaGFubmVsIG9mCj4gPiBlZnhfcmVtb3ZlX2ZpbHRlcnMsIHRyaWdnZXJpbmcg
-YSBkb3VibGUtZnJlZSBidWcuCj4gPiAKPiA+IEZpeGVzOiBhOWRjM2Q1NjEyY2UgKCJzZmNfZWYx
-MDA6IFJYIGZpbHRlciB0YWJsZSBtYW5hZ2VtZW50IGFuZCByZWxhdGVkIGd1YmJpbnMiKQo+ID4g
-U2lnbmVkLW9mZi1ieTogWmhpcGVuZyBMdSA8YWxleGlvdXNAemp1LmVkdS5jbj4KPiAKPiBUaGUg
-YWJvdmUgbml0IG5vdCB3aXRoc3RhbmRpbmcsIEkgYWdyZWUgd2l0aCB5b3VyIHJlYXNvbmluZy4K
-PiBBbmQgdGhhdCB0aGUgcHJvYmxlbSB3YXMgaW50cm9kdWNlZCBpbiB0aGUgY2l0ZWQgY29tbWl0
-Lgo+IAo+IFJldmlld2VkLWJ5OiBTaW1vbiBIb3JtYW4gPGhvcm1zQGtlcm5lbC5vcmc+CgpTb3Jy
-eSBmb3IgdGhlIGNhbGwtY2hhaW4ncyBwcm9ibGVtLCBJIHdhcyBub3QgZmFtaWxpYXIgd2l0aCBp
-dCBhdCB0aGF0IHRpbWUuClRoYW5rcyBmb3IgU2ltb24ncyBjb3JyZWN0aW9uLiBBcHByZWNpYXRl
-IQpJJ2xsIHNvb24gc2VuZCBhIHYyIHBhdGNoIHdpdGggdGhlIGNvcnJlY3RlZCBjYWxsLWNoYWlu
-IGFuZCBSQiB0YWdzLg==
+From: David Bauer <mail@david-bauer.net>
+
+The MT753x switches provide a switch-internal MDIO bus for the embedded
+PHYs.
+
+Register a OF sub-node on the switch OF-node for this internal MDIO bus.
+This allows to configure the embedded PHYs using device-tree.
+
+Signed-off-by: David Bauer <mail@david-bauer.net>
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+ drivers/net/dsa/mt7530.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 391c4dbdff42..f8ecc354630b 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2155,10 +2155,13 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
+ {
+ 	struct dsa_switch *ds = priv->ds;
+ 	struct device *dev = priv->dev;
++	struct device_node *np, *mnp;
+ 	struct mii_bus *bus;
+ 	static int idx;
+ 	int ret;
+ 
++	np = priv->dev->of_node;
++
+ 	bus = devm_mdiobus_alloc(dev);
+ 	if (!bus)
+ 		return -ENOMEM;
+@@ -2177,7 +2180,9 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
+ 	if (priv->irq)
+ 		mt7530_setup_mdio_irq(priv);
+ 
+-	ret = devm_mdiobus_register(dev, bus);
++	mnp = of_get_child_by_name(np, "mdio");
++	ret = devm_of_mdiobus_register(dev, bus, mnp);
++	of_node_put(mnp);
+ 	if (ret) {
+ 		dev_err(dev, "failed to register MDIO bus: %d\n", ret);
+ 		if (priv->irq)
+-- 
+2.40.1
+
 
