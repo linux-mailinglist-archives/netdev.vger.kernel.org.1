@@ -1,129 +1,232 @@
-Return-Path: <netdev+bounces-59289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6972A81A387
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:03:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A7F81A389
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 17:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08EE0B20E95
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:03:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2E311F2612F
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 16:03:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD774653F;
-	Wed, 20 Dec 2023 15:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD88482CB;
+	Wed, 20 Dec 2023 15:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="qKECT4L1";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="em/y0sMH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dtk5bSUS"
 X-Original-To: netdev@vger.kernel.org
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704844BA8D
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 15:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 52E055C04F1;
-	Wed, 20 Dec 2023 10:59:19 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 20 Dec 2023 10:59:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1703087959;
-	 x=1703174359; bh=oI/QH5S7nCjmlTpTJ97qy9H+hwq2JcPi2QdVTYUDwuY=; b=
-	qKECT4L1fgEZc8uzo2PFmDUDrz4Gg9dSLrRG2gf9c43u1UHuNTBVeSi9B1b0EjR4
-	GuXH4JXGy83TrXLtO+nZvF0znJwB1YGHlZ4/24ZSj9VBOq7J/jNYwuzf0htxY5zJ
-	9ydOXb9bGjfRk6nv5Rs5ROgHE+/dP3gQ6nyDN5vL+SrW6ox8vM0juNFhVra+mEMX
-	tSp48tHPmumomZnObiEMHQdoKCRp8Ad+k7rOgjpeSvsDNQY51izHZpVtEVihitRp
-	7OaViyNAQzOe4Y1PkFajUEUPj9RmmF32uMxdhBhARzimfEHmkmE5CUDPOdw65wuB
-	a7xCzjmy2h8bTmceo5vH6w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-transfer-encoding:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1703087959; x=
-	1703174359; bh=oI/QH5S7nCjmlTpTJ97qy9H+hwq2JcPi2QdVTYUDwuY=; b=e
-	m/y0sMHfHHdjZxBbIfS/c5Q8dayStsZnLRw40kY+etWMq1npjxt5OSIVa6G1xqar
-	LbbZljZUY+4JcCJySPJNaskYKwfOOq2y/mI+WZjAZH72IdgVWPVRI7IwoA6i+bn7
-	3gJEikO4H/n25fAWPQguKwJ96aBmoC1tBaiPGG5UdT1UW83VTJPSu1ZjjTYnp8G3
-	cCUEaPtye5EiGF4sLYQ6ZWmTWw/mqcM3+NrhnUYt9SFeOn69vM6+3roDMqF4qJIx
-	NpGj1dzYwLHGAW6+JowCbTJhSrXJhwXyOyu+rv8ak5Hxh2ywnCYecr0UlTTkayvI
-	qzfho+91dBNTZPBeBsdpQ==
-X-ME-Sender: <xms:Vg-DZVp52OqdybEU0bK13V2uR_vb3aN5JTHOhnc7rdccU_6yufqXDQ>
-    <xme:Vg-DZXqjIK6-VTsUc70ZdrD3Jz2TXcLvXElQpEBWBBIuGuUFDPHq6HLBByBk3Sc7w
-    R8PiRMNIIuKw55cnRg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdduvddgkeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepjeeghfeutdejjeehudevgeehveduffejkefhveefgfettdehgeeiledufeeu
-    vdfhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:Vw-DZSOPne77Cq0FxhJPxvU80Pr3T9l7n9UgE9x4ui3NelKk5zQaYA>
-    <xmx:Vw-DZQ7Q1ro6c5F5lHoh7uvdVqsRv5uXAZVxbh9QnD3IfwG1YkoUkA>
-    <xmx:Vw-DZU7ujrnQvllE7j4ObdolIPag8loK98D1mLzK63QtLyxmXzbAYw>
-    <xmx:Vw-DZSn2JkIQrnzQqHBYklZZpr_8fuNqMwXscLafWDp8v2VpshphAQ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id D3ABFB6008D; Wed, 20 Dec 2023 10:59:18 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1364-ga51d5fd3b7-fm-20231219.001-ga51d5fd3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E474A47771
+	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 15:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703087966;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QFekkLOHfS9CYH1irDgUqE2noE0/6vpj/TYA4n1czRU=;
+	b=Dtk5bSUS+X+Ghj4YEu5m/2Qf6J+knKGVrwEWAxr5Z1FO75ZuHuzSH53VGWgvS6V8yjv7zf
+	Q+SMdfo6JcsAAw+W4qnbr5NUn6Ld6xPc5tnNxRx2EaX4oTnwqxeXK6c0AsdojX2VkwgODL
+	UKVFwfy2zMU5MtJNJ7aEF9pu63cqluY=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-543-bq_a05oZM3aG0QZ4DW8Njg-1; Wed, 20 Dec 2023 10:59:24 -0500
+X-MC-Unique: bq_a05oZM3aG0QZ4DW8Njg-1
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6d9fa2f1156so3835425a34.3
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 07:59:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703087964; x=1703692764;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QFekkLOHfS9CYH1irDgUqE2noE0/6vpj/TYA4n1czRU=;
+        b=nFJTcEp9mWFU1QJkHj1ztBjDy2oldRKUIkYyEFrmZW8fmCwHzku76BAXvvCodO/Nb6
+         NkaLTo154MRBCb2rnf1HlCeyTUfWi4TIr1UKPoFrPlTrukKH37vkpHbKeGwL3uQj0+vr
+         8Ng+cqSvAK6x+c9jNriWVcL3JasfiWVBefjbZ2DLHr6Y4Vxi/w8Q2pfnr8sQZ9GKYpe1
+         Q/nU2yuPFlv5TgVQWmoTkJDZrDrR9/64bH3/lXnjZEVDUWoxiAL1N9loVWwIhrftWaLJ
+         pgyXfWGT7hMVuRXNqAmoQg1qLNvQyrbXFfVFW/95IC3UHnt2+D5wu8hJv4Ul7VBJFbpq
+         J9rw==
+X-Gm-Message-State: AOJu0YwJk1yUAmcRMM/Uk6yHk0FUXmR1Gxjvo20PmcXhxzfTvua0k8wp
+	K55LnHIwq9TsdeuoZH+BHOGByTkAkCgpl1QeirHg+1ekYb+qLcUNWAWx4ETv2GiagJjMUllAjvQ
+	FwZaTA5hkzq4TMRm1
+X-Received: by 2002:a05:6808:3a09:b0:3a7:6213:6897 with SMTP id gr9-20020a0568083a0900b003a762136897mr18486021oib.11.1703087963854;
+        Wed, 20 Dec 2023 07:59:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHyXE0D9wJpfoVdm7QRffLwuE2S8IrTtR9VN2B+Knu+scUActUZX4vewE4I3XtDRyBzU1hqag==
+X-Received: by 2002:a05:6808:3a09:b0:3a7:6213:6897 with SMTP id gr9-20020a0568083a0900b003a762136897mr18486005oib.11.1703087963567;
+        Wed, 20 Dec 2023 07:59:23 -0800 (PST)
+Received: from fedora ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id y8-20020ad45308000000b0067f032cf59bsm6251098qvr.27.2023.12.20.07.59.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Dec 2023 07:59:23 -0800 (PST)
+Date: Wed, 20 Dec 2023 09:59:20 -0600
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Sneh Shah <quic_snehshah@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kernel@quicinc.com
+Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
+ 2.5G SGMII
+Message-ID: <wvzhz4fmtheculsiag4t2pn2kaggyle2mzhvawbs4m5isvqjto@lmaonvq3c3e7>
+References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
+ <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
+ <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <6a7281bf-bc4a-4f75-bb88-7011908ae471@app.fastmail.com>
-In-Reply-To: <658302ffea24_1a4df629443@willemb.c.googlers.com.notmuch>
-References: <a9090be2-ca7c-494c-89cb-49b1db2438ba@corelatus.se>
- <658266e18643_19028729436@willemb.c.googlers.com.notmuch>
- <0d7cddc9-03fa-43db-a579-14f3e822615b@app.fastmail.com>
- <bff57ee057bdd15a2c951ff8b6e3aaa30f981cd2.camel@mailbox.tu-berlin.de>
- <6582ffd3e5dc7_1a34a429482@willemb.c.googlers.com.notmuch>
- <658302ffea24_1a4df629443@willemb.c.googlers.com.notmuch>
-Date: Wed, 20 Dec 2023 15:59:01 +0000
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
- =?UTF-8?Q?J=C3=B6rn-Thorben_Hinz?= <jthinz@mailbox.tu-berlin.de>,
- "Thomas Lange" <thomas@corelatus.se>, Netdev <netdev@vger.kernel.org>,
- "Deepa Dinamani" <deepa.kernel@gmail.com>,
- "John Fastabend" <john.fastabend@gmail.com>
-Subject: Re: net/core/sock.c lacks some SO_TIMESTAMPING_NEW support
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
 
-On Wed, Dec 20, 2023, at 15:06, Willem de Bruijn wrote:
-> Willem de Bruijn wrote:
->> J=C3=B6rn-Thorben Hinz wrote:
->>=20
->> __sock_cmsg_send can only modify a subset of the bits in the
->> timestamping feature bitmap, so a call to setsockopt is still needed
->>=20
->> But there is no ordering requirement, so the __sock_cmsg_send call can
->> come before the setsockopt call. It would be odd, but the API allows =
-it.
->
-> But no timestamp is returned unless setsockopt is called. So we can
-> continue to rely on that for selecting SOCK_TSTAMP_NEW.
+On Wed, Dec 20, 2023 at 01:02:45PM +0530, Sneh Shah wrote:
+> 
+> 
+> On 12/18/2023 9:50 PM, Andrew Halaney wrote:
+> > On Mon, Dec 18, 2023 at 12:41:18PM +0530, Sneh Shah wrote:
+> >> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
+> >> mode for 1G/100M/10M speed.
+> >> Added changes to configure serdes phy and mac based on link speed.
+> >>
+> >> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+> >> ---
+> >>  .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 31 +++++++++++++++++--
+> >>  1 file changed, 29 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> >> index d3bf42d0fceb..b3a28dc19161 100644
+> >> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> >> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> >> @@ -21,6 +21,7 @@
+> >>  #define RGMII_IO_MACRO_CONFIG2		0x1C
+> >>  #define RGMII_IO_MACRO_DEBUG1		0x20
+> >>  #define EMAC_SYSTEM_LOW_POWER_DEBUG	0x28
+> >> +#define ETHQOS_MAC_AN_CTRL		0xE0
+> >>  
+> >>  /* RGMII_IO_MACRO_CONFIG fields */
+> >>  #define RGMII_CONFIG_FUNC_CLK_EN		BIT(30)
+> >> @@ -78,6 +79,10 @@
+> >>  #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
+> >>  #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
+> >>  
+> >> +/*ETHQOS_MAC_AN_CTRL bits */
+> >> +#define ETHQOS_MAC_AN_CTRL_RAN			BIT(9)
+> >> +#define ETHQOS_MAC_AN_CTRL_ANE			BIT(12)
+> >> +
+> > 
+> > nit: space please add a space before ETHQOS_MAC_AN_CTRL
+> > 
+> will take care of this in next patch
+> 
+> >>  struct ethqos_emac_por {
+> >>  	unsigned int offset;
+> >>  	unsigned int value;
+> >> @@ -109,6 +114,7 @@ struct qcom_ethqos {
+> >>  	unsigned int num_por;
+> >>  	bool rgmii_config_loopback_en;
+> >>  	bool has_emac_ge_3;
+> >> +	unsigned int serdes_speed;
 
-Ok, makes sense. In that case the one-line patch should be sufficient.
+Another nit as I look closer: I think this should be grouped by phy_mode
+etc just for readability.
 
-> Only question is whether the kernel needs to enfornce the two
-> operations to be consistent in their choice between NEW and OLD. I
-> don't think so. If they are not, this would be a weird, likely
-> deliberate, edge case. It only affects the data returned to the
-> process, not kernel integrity.
+> >>  };
+> >>  
+> >>  static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
+> >> @@ -600,27 +606,47 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
+> >>  
+> >>  static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+> >>  {
+> >> -	int val;
+> >> -
+> >> +	int val, mac_an_value;
+> >>  	val = readl(ethqos->mac_base + MAC_CTRL_REG);
+> >> +	mac_an_value = readl(ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
+> >>  
+> >>  	switch (ethqos->speed) {
+> >> +	case SPEED_2500:
+> >> +		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+> >> +		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> >> +			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> >> +			      RGMII_IO_MACRO_CONFIG2);
+> >> +		if (ethqos->serdes_speed != SPEED_2500)
+> >> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+> >> +		mac_an_value &= ~ETHQOS_MAC_AN_CTRL_ANE;
+> >> +		break;
+> >>  	case SPEED_1000:
+> >>  		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+> >>  		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> >>  			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> >>  			      RGMII_IO_MACRO_CONFIG2);
+> >> +		if (ethqos->serdes_speed != SPEED_1000)
+> >> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+> >> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+> >>  		break;
+> >>  	case SPEED_100:
+> >>  		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
+> >> +		if (ethqos->serdes_speed != SPEED_1000)
+> >> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+> >> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+> >>  		break;
+> >>  	case SPEED_10:
+> >>  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+> >>  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
+> >> +		if (ethqos->serdes_speed != SPEED_1000)
+> >> +			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+> >> +		mac_an_value |= ETHQOS_MAC_AN_CTRL_RAN | ETHQOS_MAC_AN_CTRL_ANE;
+> >>  		break;
+> >>  	}
+> >>  
+> >>  	writel(val, ethqos->mac_base + MAC_CTRL_REG);
+> >> +	writel(mac_an_value, ethqos->mac_base + ETHQOS_MAC_AN_CTRL);
+> >> +	ethqos->serdes_speed = ethqos->speed;
+> > 
+> > I see these bits are generic and there's some functions in stmmac_pcs.h
+> > that muck with these...
+> > 
+> > Could you help me understand if this really should be Qualcomm specific,
+> > or if this is something that should be considered for the more core bits
+> > of the driver? I feel in either case we should take advantage of the
+> > common definitions in that file if possible.
+> > 
+> we do have function dwmac_ctrl_ane in core driver which updates same registers. However, it does not have the option to reset ANE bit, it can only set bits. For SPEED_2500 we need to reset ANE bit. Hence I am adding it here. Not sure if we can extend dwmac_ctrl_ane function to reset bits as well.
 
-There is the one corner case where a file descriptor is shared
-between tasks that disagree on the layout of the timestamp,
-or is accessed from different parts of an application that
-were built with inconsistent time32/time64 settings. Both of
-these are already impossible to fix in a generic way.
+I'd evaluate if you can update that function to clear the ANE bit when
+the ane boolean is false. From the usage I see I feel that makes sense,
+but correct me if you think I'm wrong.
+At the very least let's use the defines from there, and possibly add a
+new function if clearing is not acceptable in dwmac_ctrl_ane().
 
-      Arnd
+Stepping back, I was asking in general is the need to muck with ANE here
+is a Qualcomm specific problem, or is that a generic thing that should be
+handled in the core (and the phy_set_speed() bit stay here)? i.e. would
+any dwmac5 based IP need to do something like this for SPEED_2500?
+
+> >>  
+> >>  	return val;
+> >>  }
+> >> @@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+> >>  				     "Failed to get serdes phy\n");
+> >>  
+> >>  	ethqos->speed = SPEED_1000;
+> >> +	ethqos->serdes_speed = SPEED_1000;
+> >>  	ethqos_update_link_clk(ethqos, SPEED_1000);
+> >>  	ethqos_set_func_clk_en(ethqos);
+> >>  
+> >> -- 
+> >> 2.17.1
+> >>
+> > 
+> 
+
 
