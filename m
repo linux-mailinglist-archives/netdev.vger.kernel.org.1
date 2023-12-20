@@ -1,148 +1,157 @@
-Return-Path: <netdev+bounces-59190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54EEC819C2F
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:09:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A8BC819C47
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 11:09:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8688E1C258A7
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 078631F28E0B
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 10:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4113B36AFC;
-	Wed, 20 Dec 2023 10:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F10C208C3;
+	Wed, 20 Dec 2023 10:08:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AU4OHWD7"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IGSuSdtw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA54421104
-	for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 10:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703066675;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fIGeUN2dP3Kfk2DN6cUDjpJQQIxLf4/llr+ahmqgJ9o=;
-	b=AU4OHWD7R/sp36AIAV17b9y9f+FcESgvDhnCeyb0q9WldF1YGOSDRX6qU0K2zrOKtgDOKv
-	J0dDxG+EyUKagF6hvB8v+C3P1rzoDje5BIeSp5l+q59QIKeXp8W7JVhDPnCkHG3dr28e9g
-	uHZXq91m6RPLGUedbVtRx8thgMRpDjI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-371-MZjr-7LVPD-4eoRcMCQdwA-1; Wed, 20 Dec 2023 05:04:31 -0500
-X-MC-Unique: MZjr-7LVPD-4eoRcMCQdwA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 86329101A52A;
-	Wed, 20 Dec 2023 10:04:30 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8BFAB51D5;
-	Wed, 20 Dec 2023 10:04:27 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZXxUx_nh4HNTaDJx@codewreck.org>
-References: <ZXxUx_nh4HNTaDJx@codewreck.org> <20231213152350.431591-1-dhowells@redhat.com> <20231215-einziehen-landen-94a63dd17637@brauner>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: dhowells@redhat.com, Christian Brauner <brauner@kernel.org>,
-    Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 00/39] netfs, afs, 9p: Delegate high-level I/O to netfslib
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D1B20B03;
+	Wed, 20 Dec 2023 10:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BK95Ylu025177;
+	Wed, 20 Dec 2023 10:08:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=uhhFGihaGd26R0sRUHpGszdFchbJbZ+tsPToykepTJo=; b=IG
+	SuSdtw+ZP626NqXnqQXcHE0lzWt8MxPJICiHAFPFll8qgiSrXQar2/s3+9WCimQ0
+	Jpe8zDS/bqhcCpbIP2qMyzcuXl9YsjXMpLr8Xa4q1Pdqk6ZhZPc7xXEGJx5Pss7F
+	U+3prl+KSaveyd1McldjNzRfEg4pfQbYVqoWSj2OfjdM8iUf/PSyZr5HUmg1d2oH
+	xuuTt6UtmBpU9uLYEoLdNAQp9PauTqILA7FtDqzSLS9+lhTl0m+QzP7xcy47vBuN
+	CbVsIMPge5k/1C9d4gOGDRsmgBFx7ClEDOVEI9PkgN0UVliYcyKZyOC5uGTMxJeU
+	AAM/UdNUDOFSk3iTvgow==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v3v338aca-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 10:08:02 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BKA81wb001394
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 10:08:01 GMT
+Received: from [10.253.32.162] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 20 Dec
+ 2023 02:07:55 -0800
+Message-ID: <0c416e86-2fd3-4ace-a42f-83c7f4dd25b9@quicinc.com>
+Date: Wed, 20 Dec 2023 18:07:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1384978.1703066666.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Dec 2023 10:04:26 +0000
-Message-ID: <1384979.1703066666@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+CC: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
+        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
+References: <2e77e3b1-00b6-46b9-bfed-7cae3ffa15e9@linaro.org>
+ <7bae46fd-63fd-4b86-9a56-73052cf0ea95@quicinc.com>
+ <5a8095e6-b6a6-4d11-b006-31519e8d8622@linaro.org>
+ <7466b655-2b7e-44f2-a510-6e0cc1b95248@quicinc.com>
+ <602759ce-c93d-4111-9272-1dce7e4a170a@linaro.org>
+ <f656d1c7-ea86-405a-9165-9eb079ea6f2a@quicinc.com>
+ <20231215-gauze-sprinkled-172729f22b6c@spud>
+ <9eab958e-d91f-4f3c-aadd-6b34eaed2cef@quicinc.com>
+ <20231216-unearned-lucid-4bd2ddcd4ac2@spud>
+ <af1dff98-a63e-47b3-a709-6f4110a97529@quicinc.com>
+ <20231219-childcare-sugar-d1ecde8bd0b0@spud>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <20231219-childcare-sugar-d1ecde8bd0b0@spud>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: BOZj3fUucv2hHInaerU2IgGZJQhhZ2du
+X-Proofpoint-GUID: BOZj3fUucv2hHInaerU2IgGZJQhhZ2du
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ mlxscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015 priorityscore=1501
+ adultscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
+ definitions=main-2312200071
 
-Dominique Martinet <asmadeus@codewreck.org> wrote:
 
-> I'll go back to dhowell's tree to finally test 9p a bit,
-> sorry for lack of involvement just low on time all around.
 
-I've rebased my tree on -rc6 rather than linux-next for Christian to pull.
+On 12/19/2023 11:47 PM, Conor Dooley wrote:
+> On Sat, Dec 16, 2023 at 11:37:08PM +0800, Jie Luo wrote:
+>> On 12/16/2023 10:16 PM, Conor Dooley wrote:
+>>> On Sat, Dec 16, 2023 at 09:16:49PM +0800, Jie Luo wrote:
+>>>> On 12/15/2023 9:41 PM, Conor Dooley wrote:
+>>>>> On Fri, Dec 15, 2023 at 08:40:20PM +0800, Jie Luo wrote:
+>>>>>> On 12/15/2023 8:19 PM, Krzysztof Kozlowski wrote:
+>>>>>>> On 15/12/2023 12:42, Jie Luo wrote:
+> 
+>>>>>> There is also no enable control for the reference clocks since it is
+>>>>>> inputted by the hardware PIN connection, i will update these description
+>>>>>> in the DT to make it more clear.
+>>>>>
+>>>>> Again, this does not justify having custom properties for this clock,
+>>>>> as it is no different to other platforms. As far as I can tell, the only
+>>>>> thing that a standard "clocks" property cannot convey here is the
+>>>>> internal reference. I would suggest that since there is only one
+>>>>> internal clock frequency, the absence of this particular clock in the
+>>>>> "clocks" property can be used to determine that the reference is the
+>>>>> internal on
+>>>
+>>> I'm surprised you didn't pick up on this, but there are actually _2_
+>>> internal references, which I have just noticed while double checking the
+>>> binding patch.
+>>
+>> i noticed this, the reference clock source can be supported by clocks as
+>> you suggested here, it is really helpful.
+>>
+>>> What is the impact of using the 48 MHz or 96 MHz internal reference?
+>> They works on the different IPQ platform, 96MHZ internal reference is
+>> used on IPQ5018, the internal 48MHZ is used on the IPQ5332, that is
+>> same as what you describe above, the different clock source rate is
+>> selected as the different register value, then the PLL can do the
+>> corresponding config to output the correct clock rate, the external
+>> clock source is also same if the clock rate is same, just the different
+>> hardware PIN is selected if the external reference source is configured.
+> 
+> 
+> Ah, so there is only one internal reference frequency per device. Then
+> my suggestion to use the presence of the clock in the clocks property
+> should work, just the fallback to the internal reference is going to
+> depend on the compatible.
+> 
+> Thanks,
+> Conor.
 
-Ganesha keeps falling over:
+The reference clock source is configurable, normally there is the fix
+reference clock configured per each IPQ platform, but we should keep
+the reference clock source configurable in case of the reference clock
+source switch needed in the future.
 
-[root@carina build]# valgrind ./ganesha.nfsd -L /var/log/ganesha/ganesha.l=
-og -f /etc/ganesha/ganesha.conf -N NIV_EVENT -F
-=3D=3D38960=3D=3D Memcheck, a memory error detector
-=3D=3D38960=3D=3D Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward=
- et al.
-=3D=3D38960=3D=3D Using Valgrind-3.22.0 and LibVEX; rerun with -h for copy=
-right info
-=3D=3D38960=3D=3D Command: ./ganesha.nfsd -L /var/log/ganesha/ganesha.log =
--f /etc/ganesha/ganesha.conf -N NIV_EVENT -F
-=3D=3D38960=3D=3D =
-
-=3D=3D38960=3D=3D Thread 138:
-=3D=3D38960=3D=3D Invalid read of size 4
-=3D=3D38960=3D=3D    at 0x4DC32D6: pthread_cond_signal@@GLIBC_2.3.2 (pthre=
-ad_cond_signal.c:41)
-=3D=3D38960=3D=3D    by 0x489700C: sync_cb (fsal_helper.c:1837)
-=3D=3D38960=3D=3D    by 0x49D79DF: mdc_read_super_cb (mdcache_file.c:559)
-=3D=3D38960=3D=3D    by 0x49D7AC5: mdc_read_cb (mdcache_file.c:582)
-=3D=3D38960=3D=3D    by 0x7B4B81F: vfs_read2 (file.c:1317)
-=3D=3D38960=3D=3D    by 0x49D7BCF: mdcache_read2 (mdcache_file.c:617)
-=3D=3D38960=3D=3D    by 0x4897173: fsal_read (fsal_helper.c:1849)
-=3D=3D38960=3D=3D    by 0x4A10FD4: _9p_read (9p_read.c:134)
-=3D=3D38960=3D=3D    by 0x4A0A024: _9p_process_buffer (9p_interpreter.c:18=
-1)
-=3D=3D38960=3D=3D    by 0x4A09DCB: _9p_tcp_process_request (9p_interpreter=
-.c:133)
-=3D=3D38960=3D=3D    by 0x48CE182: _9p_execute (9p_dispatcher.c:315)
-=3D=3D38960=3D=3D    by 0x48CE508: _9p_worker_run (9p_dispatcher.c:412)
-=3D=3D38960=3D=3D  Address 0x24 is not stack'd, malloc'd or (recently) fre=
-e'd
-=3D=3D38960=3D=3D =
-
-=3D=3D38960=3D=3D =
-
-=3D=3D38960=3D=3D Process terminating with default action of signal 11 (SI=
-GSEGV): dumping core
-=3D=3D38960=3D=3D  Access not within mapped region at address 0x24
-=3D=3D38960=3D=3D    at 0x4DC32D6: pthread_cond_signal@@GLIBC_2.3.2 (pthre=
-ad_cond_signal.c:41)
-=3D=3D38960=3D=3D    by 0x489700C: sync_cb (fsal_helper.c:1837)
-=3D=3D38960=3D=3D    by 0x49D79DF: mdc_read_super_cb (mdcache_file.c:559)
-=3D=3D38960=3D=3D    by 0x49D7AC5: mdc_read_cb (mdcache_file.c:582)
-=3D=3D38960=3D=3D    by 0x7B4B81F: vfs_read2 (file.c:1317)
-=3D=3D38960=3D=3D    by 0x49D7BCF: mdcache_read2 (mdcache_file.c:617)
-=3D=3D38960=3D=3D    by 0x4897173: fsal_read (fsal_helper.c:1849)
-=3D=3D38960=3D=3D    by 0x4A10FD4: _9p_read (9p_read.c:134)
-=3D=3D38960=3D=3D    by 0x4A0A024: _9p_process_buffer (9p_interpreter.c:18=
-1)
-=3D=3D38960=3D=3D    by 0x4A09DCB: _9p_tcp_process_request (9p_interpreter=
-.c:133)
-=3D=3D38960=3D=3D    by 0x48CE182: _9p_execute (9p_dispatcher.c:315)
-=3D=3D38960=3D=3D    by 0x48CE508: _9p_worker_run (9p_dispatcher.c:412)
-
-David
-
+you are right, the reference clock source can be distinguished by
+checking the clock rate and the compatible string.
 
