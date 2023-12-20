@@ -1,117 +1,98 @@
-Return-Path: <netdev+bounces-59166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0BD8199C6
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:41:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 992708199D1
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 08:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AAF9B24BD4
-	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 07:41:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2796128568A
+	for <lists+netdev@lfdr.de>; Wed, 20 Dec 2023 07:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2FC1642F;
-	Wed, 20 Dec 2023 07:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D8116434;
+	Wed, 20 Dec 2023 07:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="C1PRSMih"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OYgU0HIf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07606168CF;
-	Wed, 20 Dec 2023 07:41:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BBE5C433C9;
-	Wed, 20 Dec 2023 07:41:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1703058083;
-	bh=eicNkkHSvbTuvKDaD0uy33eDZQ21rFcTjG+07eDtb24=;
-	h=From:To:Cc:Subject:Date:From;
-	b=C1PRSMihdU16ZQCKm3Os+pG4tQUmTaCzgOgApklcMglhb2QBLv1qzrSihzFFlLRFD
-	 Z0sJtaxJQHMHTLrHFvVEvm72DtefS/fO8R1Xdrk07PRQ9fCcGfYMpZ4P1PoBEpvF0P
-	 x/uUI8jCks/Cs1g/lwsznRtF/OL0Ev7qKbGFBXA8=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: wintera@linux.ibm.com,
-	wenjia@linux.ibm.com
-Cc: linux-kernel@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2] iucv: make iucv_bus const
-Date: Wed, 20 Dec 2023 08:41:18 +0100
-Message-ID: <2023122017-shelf-cadet-309c@gregkh>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D374C18E0B;
+	Wed, 20 Dec 2023 07:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 400C91BF204;
+	Wed, 20 Dec 2023 07:47:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1703058462;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b/Rm48/cqo114dbZkQAt3fLIDwYToj71lL7QWamBTuI=;
+	b=OYgU0HIfSxaUeX3rdkb77dYL3dwqnXhjOZl61WmcdzR/bQdBLcbH/DqizS3iOsdGowIkQ/
+	AHKBSjkZesWTyWs/4cw3ngvCDhA6U38YdRnbKH7zL6sYFVahyir4ChCkEHswey/1O7UFvr
+	JJmhRPFNZDa753LYIlFGonDIuMw5v58c+XIV13Dm9VYmXDbyGSYclAtW6KXSu5nkQ9PUuv
+	m7fpLgtxnn4OI7Fetu2gYztf868ztY64fE8NqjxzG8esnhzUQkw0RgRH+1DH2UuvyEbmsG
+	7WZwiBx+lfujeaZJMmiBaop6ii2WJSZqVfw7cyJUkItsrSdMI12aLriLUn1Y9w==
+Date: Wed, 20 Dec 2023 08:47:40 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>, Romuald
+ Despres <romuald.despres@qorvo.com>, Frederic Blain
+ <frederic.blain@qorvo.com>, Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem
+ Imberton <guilhem.imberton@qorvo.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next v5 01/11] ieee802154: Let PAN IDs be reset
+Message-ID: <20231220084740.6e16c1c4@xps-13>
+In-Reply-To: <51de3b76-78cf-5ee4-ec31-6cf368b584b7@datenfreihafen.org>
+References: <20231120110100.3808292-1-miquel.raynal@bootlin.com>
+	<51de3b76-78cf-5ee4-ec31-6cf368b584b7@datenfreihafen.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Lines: 58
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1878; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=eicNkkHSvbTuvKDaD0uy33eDZQ21rFcTjG+07eDtb24=; b=owGbwMvMwCRo6H6F97bub03G02pJDKlNs+YKRC5Sdahf1nZgq3vOe3uvU7ne7ksnn4/Zers4T K/f9PrljlgWBkEmBlkxRZYv23iO7q84pOhlaHsaZg4rE8gQBi5OAZjIgy0M88Nidga+3sl0acWR dx6zhDbH3xaz9mRYcOpe7JuZy3encuQxL3voL83qdvrrXgA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Now that the driver core can properly handle constant struct bus_type,
-move the iucv_bus variable to be a constant structure as well, placing
-it into read-only memory which can not be modified at runtime.
+Hi Stefan,
 
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-s390@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Acked-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-v2: add Alexandra ack
-    fix typo in subject line as pointed out by Niklas
+stefan@datenfreihafen.org wrote on Thu, 7 Dec 2023 21:27:59 +0100:
 
- include/net/iucv/iucv.h | 4 ++--
- net/iucv/iucv.c         | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> Hello Miquel,
+>=20
+>=20
+> On 20.11.23 12:01, Miquel Raynal wrote:
+> > On Wed, 2023-09-27 at 18:12:04 UTC, Miquel Raynal wrote: =20
+> >> Soon association and disassociation will be implemented, which will
+> >> require to be able to either change the PAN ID from 0xFFFF to a real
+> >> value when association succeeded, or to reset the PAN ID to 0xFFFF upon
+> >> disassociation. Let's allow to do that manually for now.
+> >>
+> >> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com> =20
+> >=20
+> > Applied to https://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-ne=
+xt.git staging. =20
+>=20
+> I can't see this, or any other patch from the series, in the staging bran=
+ch. Did you forget to push this out to kernel.org?
 
-diff --git a/include/net/iucv/iucv.h b/include/net/iucv/iucv.h
-index f9e88401d7da..8b2055d64a6b 100644
---- a/include/net/iucv/iucv.h
-+++ b/include/net/iucv/iucv.h
-@@ -80,7 +80,7 @@ struct iucv_array {
- 	u32 length;
- } __attribute__ ((aligned (8)));
- 
--extern struct bus_type iucv_bus;
-+extern const struct bus_type iucv_bus;
- extern struct device *iucv_root;
- 
- /*
-@@ -489,7 +489,7 @@ struct iucv_interface {
- 	int (*path_sever)(struct iucv_path *path, u8 userdata[16]);
- 	int (*iucv_register)(struct iucv_handler *handler, int smp);
- 	void (*iucv_unregister)(struct iucv_handler *handler, int smp);
--	struct bus_type *bus;
-+	const struct bus_type *bus;
- 	struct device *root;
- };
- 
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index 0ed6e34d6edd..6334f64f04d5 100644
---- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -67,7 +67,7 @@ static int iucv_bus_match(struct device *dev, struct device_driver *drv)
- 	return 0;
- }
- 
--struct bus_type iucv_bus = {
-+const struct bus_type iucv_bus = {
- 	.name = "iucv",
- 	.match = iucv_bus_match,
- };
--- 
-2.43.0
+While preparing the PR for net maintainers I realized that in the above
+message I actually pushed on the wpan repo instead of the wpan-next repo
+by mistake. This explain why you didn't see it on the
+wpan-next/[staging|master] branches. I've fixed my mess hopefully, and
+will anyway send the PR today as the patches have been in -next for a
+week or more already.
 
+Thanks,
+Miqu=C3=A8l
 
