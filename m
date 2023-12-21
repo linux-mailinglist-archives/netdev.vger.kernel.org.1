@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-59592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB97E81B7AB
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:28:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83D3281B7AF
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:29:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2491C23B4A
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:28:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B60351C23982
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:29:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384F17AE7B;
-	Thu, 21 Dec 2023 13:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A137B3BD;
+	Thu, 21 Dec 2023 13:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IYVIOrkP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HmnD2Njz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD38C7AE60
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67335760B8
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703165084;
+	s=mimecast20190719; t=1703165087;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OUiNmCjPvqOiTp/4UL00+cVpBnekg0L/g2EBDkgOp3k=;
-	b=IYVIOrkPLQSEGXEphPBOgvz31yzQXZX32sdbcIH18ZhQNJG3Z7oNVJcXHTA0e2LAO55b7G
-	Zj+2MHZNOdTi7aedbBL8DwEu/R/wtwquF2vLMnTKrrY2zHRN106tBH+SRVwfou5NOl7mC4
-	Im28zAZn7RNY51PT4oZqkX6EZGcAiUs=
+	bh=H0vMMTudDfb6r/qBW0AEkSH7nAY0KYX4o9qMLzBZ4rg=;
+	b=HmnD2Njz6LB7+UAj1oLidJ2whO2SdiOsRea0x8zQV1D9qFQGMvXQ/7YHdzh0HT+BMcxmSl
+	fBoIaTaMM3zptOiiTCdMYE2tcLFNhiF6Ja2OHH0GGpfvouBUspugagxkJTIzbF7n6TSMYR
+	W8ri1CKzs6x/dSxn+5n+UERdBO01ZkU=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-673-SL0um2dhP2aWOnnR2kR2cw-1; Thu, 21 Dec 2023 08:24:41 -0500
-X-MC-Unique: SL0um2dhP2aWOnnR2kR2cw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-206-7R1v-1MuMnWoS5GVhs_l5g-1; Thu, 21 Dec 2023 08:24:45 -0500
+X-MC-Unique: 7R1v-1MuMnWoS5GVhs_l5g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E6B2185A78A;
-	Thu, 21 Dec 2023 13:24:40 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0954485A58B;
+	Thu, 21 Dec 2023 13:24:44 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.39.195.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1FD1B40C6EB9;
-	Thu, 21 Dec 2023 13:24:37 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 214632026D66;
+	Thu, 21 Dec 2023 13:24:41 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -69,9 +69,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 09/40] netfs: Allow the netfs to make the io (sub)request alloc larger
-Date: Thu, 21 Dec 2023 13:23:04 +0000
-Message-ID: <20231221132400.1601991-10-dhowells@redhat.com>
+Subject: [PATCH v5 10/40] netfs: Add a ->free_subrequest() op
+Date: Thu, 21 Dec 2023 13:23:05 +0000
+Message-ID: <20231221132400.1601991-11-dhowells@redhat.com>
 In-Reply-To: <20231221132400.1601991-1-dhowells@redhat.com>
 References: <20231221132400.1601991-1-dhowells@redhat.com>
 Precedence: bulk
@@ -81,11 +81,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-Allow the network filesystem to specify extra space to be allocated on the
-end of the io (sub)request.  This allows cifs, for example, to use this
-space rather than allocating its own cifs_readdata struct.
+Add a ->free_subrequest() op so that the netfs can clean up data attached
+to a subrequest.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Jeff Layton <jlayton@kernel.org>
@@ -93,47 +92,34 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/objects.c    | 7 +++++--
- include/linux/netfs.h | 2 ++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ fs/netfs/objects.c    | 2 ++
+ include/linux/netfs.h | 1 +
+ 2 files changed, 3 insertions(+)
 
 diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
-index 85f428fc52e6..c4229c5f3f54 100644
+index c4229c5f3f54..1bd20bdad983 100644
 --- a/fs/netfs/objects.c
 +++ b/fs/netfs/objects.c
-@@ -22,7 +22,8 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
- 	struct netfs_io_request *rreq;
- 	int ret;
+@@ -145,6 +145,8 @@ static void netfs_free_subrequest(struct netfs_io_subrequest *subreq,
+ 	struct netfs_io_request *rreq = subreq->rreq;
  
--	rreq = kzalloc(sizeof(struct netfs_io_request), GFP_KERNEL);
-+	rreq = kzalloc(ctx->ops->io_request_size ?: sizeof(struct netfs_io_request),
-+		       GFP_KERNEL);
- 	if (!rreq)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -114,7 +115,9 @@ struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_request *rreq
- {
- 	struct netfs_io_subrequest *subreq;
- 
--	subreq = kzalloc(sizeof(struct netfs_io_subrequest), GFP_KERNEL);
-+	subreq = kzalloc(rreq->netfs_ops->io_subrequest_size ?:
-+			 sizeof(struct netfs_io_subrequest),
-+			 GFP_KERNEL);
- 	if (subreq) {
- 		INIT_LIST_HEAD(&subreq->rreq_link);
- 		refcount_set(&subreq->ref, 2);
+ 	trace_netfs_sreq(subreq, netfs_sreq_trace_free);
++	if (rreq->netfs_ops->free_subrequest)
++		rreq->netfs_ops->free_subrequest(subreq);
+ 	kfree(subreq);
+ 	netfs_stat_d(&netfs_n_rh_sreq);
+ 	netfs_put_request(rreq, was_async, netfs_rreq_trace_put_subreq);
 diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 7244ddebd974..d6f27000eeb0 100644
+index d6f27000eeb0..06f57d9d09f6 100644
 --- a/include/linux/netfs.h
 +++ b/include/linux/netfs.h
-@@ -210,6 +210,8 @@ struct netfs_io_request {
-  * Operations the network filesystem can/must provide to the helpers.
-  */
- struct netfs_request_ops {
-+	unsigned int	io_request_size;	/* Alloc size for netfs_io_request struct */
-+	unsigned int	io_subrequest_size;	/* Alloc size for netfs_io_subrequest struct */
+@@ -214,6 +214,7 @@ struct netfs_request_ops {
+ 	unsigned int	io_subrequest_size;	/* Alloc size for netfs_io_subrequest struct */
  	int (*init_request)(struct netfs_io_request *rreq, struct file *file);
  	void (*free_request)(struct netfs_io_request *rreq);
++	void (*free_subrequest)(struct netfs_io_subrequest *rreq);
  
+ 	void (*expand_readahead)(struct netfs_io_request *rreq);
+ 	bool (*clamp_length)(struct netfs_io_subrequest *subreq);
 
 
