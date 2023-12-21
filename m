@@ -1,361 +1,218 @@
-Return-Path: <netdev+bounces-59642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9F1381B8F8
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:57:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C113D81B8FC
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:57:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 187091C25D8A
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:57:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3839A1F22289
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F194627FA;
-	Thu, 21 Dec 2023 13:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SW0z6uSg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A1F634E9;
+	Thu, 21 Dec 2023 13:47:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF805992A
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703166374;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ItkjwwDsVZ/xObdgjN/x4hTsPTz5qF6sCues37aotyE=;
-	b=SW0z6uSgeWkoYK/wC/8Js4UEoZxKb7FUIKShXgodUtMdANJ3okDf7EnyT8Amd6GvK7v0Ie
-	L9eyDQ6UQPBEOMhOIISf2i0I8W1JF/Au66TX6Sm3x+hpCHnTs502imZyIAhhdBKNcF53Tz
-	xk06JYFs74bhICrym3C69RzviEIPc7o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-249-IfkceYV4N4O4lWcsvNwL0Q-1; Thu, 21 Dec 2023 08:46:09 -0500
-X-MC-Unique: IfkceYV4N4O4lWcsvNwL0Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D181185A781;
-	Thu, 21 Dec 2023 13:46:08 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.39.195.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F30DF3C25;
-	Thu, 21 Dec 2023 13:46:05 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Markus Suvanto <markus.suvanto@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>
-Cc: David Howells <dhowells@redhat.com>,
-	linux-afs@lists.infradead.org,
-	keyrings@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wang Lei <wang840925@gmail.com>,
-	Jeff Layton <jlayton@redhat.com>,
-	Steve French <sfrench@us.ibm.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v4 3/3] keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry
-Date: Thu, 21 Dec 2023 13:45:30 +0000
-Message-ID: <20231221134558.1659214-4-dhowells@redhat.com>
-In-Reply-To: <20231221134558.1659214-1-dhowells@redhat.com>
-References: <20231221134558.1659214-1-dhowells@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DBF634E0
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-35fcba1d1caso8001595ab.0
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 05:47:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703166445; x=1703771245;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zYmbYzVzn7HByDk5oMybWEBz22Fnu+k+OJxHPDIIIyU=;
+        b=ZpzmaWbuZtaAOIrX0qlJVkgTYUbi6LxuLyEemMp+kSlXMQM+HQLbIvbHqSUnK8Y0XT
+         LqRP44KOw74WOe7kVH3IsBgLUU9vGCeBaa+Rt2QHgGEE3FrGcy1XmToJcP3fEk15Iaow
+         qwFc8o+EQ73u4BOZ1BY0wXxhgMHhgvnsWf4VvVbzeujqkKchoMFdVBXqVamGbIFYug9R
+         +CeQJGCTGbjzLFzIaEAzKWefEagJOPDdMF3MaW/7fuHz3wcUrKP6GGzbs4XoA57dwcb/
+         zBm7LfW2utfk5vafVoccbWRJasNC+fPtaCwlUgFpp9Ko/g43kMjqhzRGDuQHynUGeKRv
+         S8pw==
+X-Gm-Message-State: AOJu0Yz/RVdKyutMwC1aHs5Ux2HEwxlcIMMAfI8qzc/PZZx/ZmAGVfGg
+	KkTdHMp/DBHOhENsCzaiBEuvOGT3Ky07ITd9+qMFlnrz0RTy
+X-Google-Smtp-Source: AGHT+IF/2vojpFnrGrDoAXLRTBQ6gFgJPpEqk8mYaOExY+rl9+QrhqlBdnRDT91vV1uwKyDAWVF8pBNoSuKNg5NIiMN0cUSv2S1j
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Received: by 2002:a05:6e02:3885:b0:35f:d8db:338e with SMTP id
+ cn5-20020a056e02388500b0035fd8db338emr59508ilb.4.1703166445079; Thu, 21 Dec
+ 2023 05:47:25 -0800 (PST)
+Date: Thu, 21 Dec 2023 05:47:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f3d57d060d0556a1@google.com>
+Subject: [syzbot] [net?] WARNING: ODEBUG bug in advance_sched
+From: syzbot <syzbot+ec9b5cce58002d184fb6@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-If a key has an expiration time, then when that time passes, the key is
-left around for a certain amount of time before being collected (5 mins by
-default) so that EKEYEXPIRED can be returned instead of ENOKEY.  This is a
-problem for DNS keys because we want to redo the DNS lookup immediately at
-that point.
+Hello,
 
-Fix this by allowing key types to be marked such that keys of that type
-don't have this extra period, but are reclaimed as soon as they expire and
-turn this on for dns_resolver-type keys.  To make this easier to handle,
-key->expiry is changed to be permanent if TIME64_MAX rather than 0.
+syzbot found the following issue on:
 
-Furthermore, give such new-style negative DNS results a 1s default expiry
-if no other expiry time is set rather than allowing it to stick around
-indefinitely.  This shouldn't be zero as ls will follow a failing stat call
-immediately with a second with AT_SYMLINK_NOFOLLOW added.
+HEAD commit:    1a44b0073b92 Merge tag 'ovl-fixes-6.7-rc7' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13ecdd9ee80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=314e9ad033a7d3a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=ec9b5cce58002d184fb6
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12d5bc6ee80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1465cbd6e80000
 
-Fixes: 1a4240f4764a ("DNS: Separate out CIFS DNS Resolver code")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Tested-by: Markus Suvanto <markus.suvanto@gmail.com>
-cc: Wang Lei <wang840925@gmail.com>
-cc: Jeff Layton <jlayton@redhat.com>
-cc: Steve French <sfrench@us.ibm.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jarkko Sakkinen <jarkko@kernel.org>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: ceph-devel@vger.kernel.org
-cc: keyrings@vger.kernel.org
-cc: netdev@vger.kernel.org
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/56ceeac02b60/disk-1a44b007.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/74fea7b7a52f/vmlinux-1a44b007.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3757dfd10a24/bzImage-1a44b007.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ec9b5cce58002d184fb6@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+ODEBUG: activate active (active state 1) object: ffff88801f9b1d00 object type: rcu_head hint: 0x0
+WARNING: CPU: 1 PID: 6703 at lib/debugobjects.c:514 debug_print_object+0x1a0/0x2a0 lib/debugobjects.c:514
+Modules linked in:
+CPU: 1 PID: 6703 Comm: syz-executor263 Not tainted 6.7.0-rc6-syzkaller-00044-g1a44b0073b92 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:debug_print_object+0x1a0/0x2a0 lib/debugobjects.c:514
+Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 4c 48 8b 14 dd a0 0c 2f 8b 41 56 4c 89 e6 48 c7 c7 00 00 2f 8b e8 b1 66 e5 fc 90 <0f> 0b 90 90 58 83 05 38 1c b1 0a 01 48 83 c4 18 5b 5d 41 5c 41 5d
+RSP: 0018:ffffc900001f0bd8 EFLAGS: 00010086
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffffff814db519
+RDX: ffff888022be3b80 RSI: ffffffff814db526 RDI: 0000000000000001
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffffffff8b2f06a0
+R13: ffffffff8ace3260 R14: 0000000000000000 R15: ffff88801cc40ad0
+FS:  0000555556866380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fe6293cf2d0 CR3: 0000000028c3c000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ debug_object_activate+0x327/0x490 lib/debugobjects.c:733
+ debug_rcu_head_queue kernel/rcu/rcu.h:227 [inline]
+ __call_rcu_common.constprop.0+0x2c/0x7a0 kernel/rcu/tree.c:2666
+ switch_schedules net/sched/sch_taprio.c:210 [inline]
+ advance_sched+0x59e/0xc60 net/sched/sch_taprio.c:984
+ __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
+ __hrtimer_run_queues+0x203/0xc20 kernel/time/hrtimer.c:1752
+ hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1814
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1065 [inline]
+ __sysvec_apic_timer_interrupt+0x105/0x400 arch/x86/kernel/apic/apic.c:1082
+ sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1076
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
+RIP: 0010:__sanitizer_cov_trace_switch+0x3b/0x90 kernel/kcov.c:341
+Code: 53 48 8b 46 08 48 83 f8 20 74 63 77 44 48 83 f8 08 74 53 48 83 f8 10 75 2f 41 bd 03 00 00 00 4c 8b 75 00 31 db 4d 85 f6 74 1e <48> 8b 74 dd 10 4c 89 e2 4c 89 ef 48 83 c3 01 48 8b 4c 24 28 e8 2c
+RSP: 0018:ffffc9000b956da0 EFLAGS: 00000202
+RAX: 0000000000000000 RBX: 0000000000000006 RCX: ffffffff8139fcf5
+RDX: ffff888022be3b80 RSI: 0000000000000007 RDI: 0000000000000001
+RBP: ffffffff8ac9d140 R08: 0000000000000001 R09: 0000000000000007
+R10: 0000000000000004 R11: 0000000000000001 R12: 0000000000000004
+R13: 0000000000000001 R14: 0000000000000008 R15: ffffc9000b956e85
+ unwind_next_frame+0x6b5/0x2390 arch/x86/kernel/unwind_orc.c:515
+ arch_stack_walk+0xfa/0x170 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0x96/0xd0 kernel/stacktrace.c:122
+ kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:522
+ ____kasan_slab_free mm/kasan/common.c:236 [inline]
+ ____kasan_slab_free+0x15b/0x1b0 mm/kasan/common.c:200
+ kasan_slab_free include/linux/kasan.h:164 [inline]
+ slab_free_hook mm/slub.c:1800 [inline]
+ slab_free_freelist_hook+0x114/0x1e0 mm/slub.c:1826
+ slab_free mm/slub.c:3809 [inline]
+ kmem_cache_free+0xf8/0x350 mm/slub.c:3831
+ kfree_skbmem+0xef/0x1b0 net/core/skbuff.c:1015
+ __kfree_skb net/core/skbuff.c:1073 [inline]
+ consume_skb net/core/skbuff.c:1288 [inline]
+ consume_skb+0xdf/0x170 net/core/skbuff.c:1282
+ netlink_broadcast_filtered+0x3e3/0xf20 net/netlink/af_netlink.c:1554
+ netlink_broadcast net/netlink/af_netlink.c:1576 [inline]
+ nlmsg_multicast include/net/netlink.h:1090 [inline]
+ nlmsg_notify+0x9e/0x220 net/netlink/af_netlink.c:2588
+ qdisc_notify.isra.0+0x1cd/0x330 net/sched/sch_api.c:1030
+ tc_modify_qdisc+0x914/0x1c40 net/sched/sch_api.c:1719
+ rtnetlink_rcv_msg+0x3c7/0xe00 net/core/rtnetlink.c:6558
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fe62934e759
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc987f8528 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000007 RCX: 00007fe62934e759
+RDX: 0000000004008000 RSI: 00000000200000c0 RDI: 0000000000000004
+RBP: 00000000000f4240 R08: 0000000100000000 R09: 0000000100000000
+R10: 0000000100000000 R11: 0000000000000246 R12: 00007ffc987f8580
+R13: 00000000000454f4 R14: 00007ffc987f854c R15: 0000000000000003
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	53                   	push   %rbx
+   1:	48 8b 46 08          	mov    0x8(%rsi),%rax
+   5:	48 83 f8 20          	cmp    $0x20,%rax
+   9:	74 63                	je     0x6e
+   b:	77 44                	ja     0x51
+   d:	48 83 f8 08          	cmp    $0x8,%rax
+  11:	74 53                	je     0x66
+  13:	48 83 f8 10          	cmp    $0x10,%rax
+  17:	75 2f                	jne    0x48
+  19:	41 bd 03 00 00 00    	mov    $0x3,%r13d
+  1f:	4c 8b 75 00          	mov    0x0(%rbp),%r14
+  23:	31 db                	xor    %ebx,%ebx
+  25:	4d 85 f6             	test   %r14,%r14
+  28:	74 1e                	je     0x48
+* 2a:	48 8b 74 dd 10       	mov    0x10(%rbp,%rbx,8),%rsi <-- trapping instruction
+  2f:	4c 89 e2             	mov    %r12,%rdx
+  32:	4c 89 ef             	mov    %r13,%rdi
+  35:	48 83 c3 01          	add    $0x1,%rbx
+  39:	48 8b 4c 24 28       	mov    0x28(%rsp),%rcx
+  3e:	e8                   	.byte 0xe8
+  3f:	2c                   	.byte 0x2c
+
+
 ---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Notes:
-    Changes
-    =======
-    ver #4)
-     - Reduce the negative timeout from 10s to 1s.
-    
-    ver #3)
-     - Don't add to TIME64_MAX (ie. permanent) when checking expiry time.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
- include/linux/key-type.h   |  1 +
- net/dns_resolver/dns_key.c | 10 +++++++++-
- security/keys/gc.c         | 31 +++++++++++++++++++++----------
- security/keys/internal.h   | 11 ++++++++++-
- security/keys/key.c        | 15 +++++----------
- security/keys/proc.c       |  2 +-
- 6 files changed, 47 insertions(+), 23 deletions(-)
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-diff --git a/include/linux/key-type.h b/include/linux/key-type.h
-index 7d985a1dfe4a..5caf3ce82373 100644
---- a/include/linux/key-type.h
-+++ b/include/linux/key-type.h
-@@ -73,6 +73,7 @@ struct key_type {
- 
- 	unsigned int flags;
- #define KEY_TYPE_NET_DOMAIN	0x00000001 /* Keys of this type have a net namespace domain */
-+#define KEY_TYPE_INSTANT_REAP	0x00000002 /* Keys of this type don't have a delay after expiring */
- 
- 	/* vet a description */
- 	int (*vet_description)(const char *description);
-diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-index 01e54b46ae0b..2a6d363763a2 100644
---- a/net/dns_resolver/dns_key.c
-+++ b/net/dns_resolver/dns_key.c
-@@ -91,6 +91,7 @@ const struct cred *dns_resolver_cache;
- static int
- dns_resolver_preparse(struct key_preparsed_payload *prep)
- {
-+	const struct dns_server_list_v1_header *v1;
- 	const struct dns_payload_header *bin;
- 	struct user_key_payload *upayload;
- 	unsigned long derrno;
-@@ -122,6 +123,13 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
- 			return -EINVAL;
- 		}
- 
-+		v1 = (const struct dns_server_list_v1_header *)bin;
-+		if ((v1->status != DNS_LOOKUP_GOOD &&
-+		     v1->status != DNS_LOOKUP_GOOD_WITH_BAD)) {
-+			if (prep->expiry == TIME64_MAX)
-+				prep->expiry = ktime_get_real_seconds() + 1;
-+		}
-+
- 		result_len = datalen;
- 		goto store_result;
- 	}
-@@ -314,7 +322,7 @@ static long dns_resolver_read(const struct key *key,
- 
- struct key_type key_type_dns_resolver = {
- 	.name		= "dns_resolver",
--	.flags		= KEY_TYPE_NET_DOMAIN,
-+	.flags		= KEY_TYPE_NET_DOMAIN | KEY_TYPE_INSTANT_REAP,
- 	.preparse	= dns_resolver_preparse,
- 	.free_preparse	= dns_resolver_free_preparse,
- 	.instantiate	= generic_key_instantiate,
-diff --git a/security/keys/gc.c b/security/keys/gc.c
-index 3c90807476eb..eaddaceda14e 100644
---- a/security/keys/gc.c
-+++ b/security/keys/gc.c
-@@ -66,6 +66,19 @@ void key_schedule_gc(time64_t gc_at)
- 	}
- }
- 
-+/*
-+ * Set the expiration time on a key.
-+ */
-+void key_set_expiry(struct key *key, time64_t expiry)
-+{
-+	key->expiry = expiry;
-+	if (expiry != TIME64_MAX) {
-+		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
-+			expiry += key_gc_delay;
-+		key_schedule_gc(expiry);
-+	}
-+}
-+
- /*
-  * Schedule a dead links collection run.
-  */
-@@ -176,7 +189,6 @@ static void key_garbage_collector(struct work_struct *work)
- 	static u8 gc_state;		/* Internal persistent state */
- #define KEY_GC_REAP_AGAIN	0x01	/* - Need another cycle */
- #define KEY_GC_REAPING_LINKS	0x02	/* - We need to reap links */
--#define KEY_GC_SET_TIMER	0x04	/* - We need to restart the timer */
- #define KEY_GC_REAPING_DEAD_1	0x10	/* - We need to mark dead keys */
- #define KEY_GC_REAPING_DEAD_2	0x20	/* - We need to reap dead key links */
- #define KEY_GC_REAPING_DEAD_3	0x40	/* - We need to reap dead keys */
-@@ -184,21 +196,17 @@ static void key_garbage_collector(struct work_struct *work)
- 
- 	struct rb_node *cursor;
- 	struct key *key;
--	time64_t new_timer, limit;
-+	time64_t new_timer, limit, expiry;
- 
- 	kenter("[%lx,%x]", key_gc_flags, gc_state);
- 
- 	limit = ktime_get_real_seconds();
--	if (limit > key_gc_delay)
--		limit -= key_gc_delay;
--	else
--		limit = key_gc_delay;
- 
- 	/* Work out what we're going to be doing in this pass */
- 	gc_state &= KEY_GC_REAPING_DEAD_1 | KEY_GC_REAPING_DEAD_2;
- 	gc_state <<= 1;
- 	if (test_and_clear_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags))
--		gc_state |= KEY_GC_REAPING_LINKS | KEY_GC_SET_TIMER;
-+		gc_state |= KEY_GC_REAPING_LINKS;
- 
- 	if (test_and_clear_bit(KEY_GC_REAP_KEYTYPE, &key_gc_flags))
- 		gc_state |= KEY_GC_REAPING_DEAD_1;
-@@ -233,8 +241,11 @@ static void key_garbage_collector(struct work_struct *work)
- 			}
- 		}
- 
--		if (gc_state & KEY_GC_SET_TIMER) {
--			if (key->expiry > limit && key->expiry < new_timer) {
-+		expiry = key->expiry;
-+		if (expiry != TIME64_MAX) {
-+			if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
-+				expiry += key_gc_delay;
-+			if (expiry > limit && expiry < new_timer) {
- 				kdebug("will expire %x in %lld",
- 				       key_serial(key), key->expiry - limit);
- 				new_timer = key->expiry;
-@@ -276,7 +287,7 @@ static void key_garbage_collector(struct work_struct *work)
- 	 */
- 	kdebug("pass complete");
- 
--	if (gc_state & KEY_GC_SET_TIMER && new_timer != (time64_t)TIME64_MAX) {
-+	if (new_timer != TIME64_MAX) {
- 		new_timer += key_gc_delay;
- 		key_schedule_gc(new_timer);
- 	}
-diff --git a/security/keys/internal.h b/security/keys/internal.h
-index 471cf36dedc0..2cffa6dc8255 100644
---- a/security/keys/internal.h
-+++ b/security/keys/internal.h
-@@ -167,6 +167,7 @@ extern unsigned key_gc_delay;
- extern void keyring_gc(struct key *keyring, time64_t limit);
- extern void keyring_restriction_gc(struct key *keyring,
- 				   struct key_type *dead_type);
-+void key_set_expiry(struct key *key, time64_t expiry);
- extern void key_schedule_gc(time64_t gc_at);
- extern void key_schedule_gc_links(void);
- extern void key_gc_keytype(struct key_type *ktype);
-@@ -215,10 +216,18 @@ extern struct key *key_get_instantiation_authkey(key_serial_t target_id);
-  */
- static inline bool key_is_dead(const struct key *key, time64_t limit)
- {
-+	time64_t expiry = key->expiry;
-+
-+	if (expiry != TIME64_MAX) {
-+		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
-+			expiry += key_gc_delay;
-+		if (expiry <= limit)
-+			return true;
-+	}
-+
- 	return
- 		key->flags & ((1 << KEY_FLAG_DEAD) |
- 			      (1 << KEY_FLAG_INVALIDATED)) ||
--		(key->expiry > 0 && key->expiry <= limit) ||
- 		key->domain_tag->removed;
- }
- 
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 0260a1902922..5b10641debd5 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -294,6 +294,7 @@ struct key *key_alloc(struct key_type *type, const char *desc,
- 	key->uid = uid;
- 	key->gid = gid;
- 	key->perm = perm;
-+	key->expiry = TIME64_MAX;
- 	key->restrict_link = restrict_link;
- 	key->last_used_at = ktime_get_real_seconds();
- 
-@@ -463,10 +464,7 @@ static int __key_instantiate_and_link(struct key *key,
- 			if (authkey)
- 				key_invalidate(authkey);
- 
--			if (prep->expiry != TIME64_MAX) {
--				key->expiry = prep->expiry;
--				key_schedule_gc(prep->expiry + key_gc_delay);
--			}
-+			key_set_expiry(key, prep->expiry);
- 		}
- 	}
- 
-@@ -606,8 +604,7 @@ int key_reject_and_link(struct key *key,
- 		atomic_inc(&key->user->nikeys);
- 		mark_key_instantiated(key, -error);
- 		notify_key(key, NOTIFY_KEY_INSTANTIATED, -error);
--		key->expiry = ktime_get_real_seconds() + timeout;
--		key_schedule_gc(key->expiry + key_gc_delay);
-+		key_set_expiry(key, ktime_get_real_seconds() + timeout);
- 
- 		if (test_and_clear_bit(KEY_FLAG_USER_CONSTRUCT, &key->flags))
- 			awaken = 1;
-@@ -723,16 +720,14 @@ struct key_type *key_type_lookup(const char *type)
- 
- void key_set_timeout(struct key *key, unsigned timeout)
- {
--	time64_t expiry = 0;
-+	time64_t expiry = TIME64_MAX;
- 
- 	/* make the changes with the locks held to prevent races */
- 	down_write(&key->sem);
- 
- 	if (timeout > 0)
- 		expiry = ktime_get_real_seconds() + timeout;
--
--	key->expiry = expiry;
--	key_schedule_gc(key->expiry + key_gc_delay);
-+	key_set_expiry(key, expiry);
- 
- 	up_write(&key->sem);
- }
-diff --git a/security/keys/proc.c b/security/keys/proc.c
-index d0cde6685627..4f4e2c1824f1 100644
---- a/security/keys/proc.c
-+++ b/security/keys/proc.c
-@@ -198,7 +198,7 @@ static int proc_keys_show(struct seq_file *m, void *v)
- 
- 	/* come up with a suitable timeout value */
- 	expiry = READ_ONCE(key->expiry);
--	if (expiry == 0) {
-+	if (expiry == TIME64_MAX) {
- 		memcpy(xbuf, "perm", 5);
- 	} else if (now >= expiry) {
- 		memcpy(xbuf, "expd", 5);
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
