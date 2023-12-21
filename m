@@ -1,566 +1,178 @@
-Return-Path: <netdev+bounces-59400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FDEF81ABF8
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 01:59:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDEBC81ABF9
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 01:59:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD60E1F23019
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 00:59:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86BF528446E
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 00:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319762917;
-	Thu, 21 Dec 2023 00:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED5764F;
+	Thu, 21 Dec 2023 00:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nijs1Hyc"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Gy+I/jbE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18420AD39
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 00:57:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC747C433C8;
-	Thu, 21 Dec 2023 00:57:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703120271;
-	bh=mPZ45g7E/ErK5M6cFuMHGLGPbLJ2Jzx9u/7HeG2cdLk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Nijs1HycomXNu7CVlS7QQlZeyOfrqwYUB9v7X4KEersxkl1gpBoaONn2ZXYh4JZq0
-	 lWvQ38H/DPrOn8BwRh+bD/CotqwrvBaTm1KZOUin7nUpNqi2piTcHWDb3LFlR17Zvg
-	 bBFSmoyX8YfuFMpOupVq5PC29JQvcanyR2QjV9FzO/dyrD9uOFVS+KRWcLyGjlPIBP
-	 cJKCYoR9eBxOsgDEn+FOcJbqE8H5rnT5sOs80rw7bXGfNbz43Cd0L7AWX3Lih2H060
-	 C+6j/JJnI+rWJRU0Tgf330WHVdtIRToc47Qag/ptPuNvrN/M+AuK+/V1yxN16tVcNJ
-	 5PInorykN9q6A==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Armen Ratner <armeng@nvidia.com>,
-	Daniel Jurgens <danielj@nvidia.com>
-Subject: [net-next 15/15] net/mlx5: Implement management PF Ethernet profile
-Date: Wed, 20 Dec 2023 16:57:21 -0800
-Message-ID: <20231221005721.186607-16-saeed@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231221005721.186607-1-saeed@kernel.org>
-References: <20231221005721.186607-1-saeed@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE962567;
+	Thu, 21 Dec 2023 00:58:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1703120338; x=1734656338;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=hCCNF7iGQcRhyplgbnTLU1frrwHgbZiRWW8sPPIWH8I=;
+  b=Gy+I/jbEtaUT5BmB+5QwQVBb7zb8RhD3NADQ9GmH/KBqhfyqHzzTkJ70
+   ovxNY6Ir4QRUx8JY22qRRzLQhl3m3p1WJzkz7Lk2ba7QVxL28HYYJ3+bp
+   kgLPCq+ZAbgzuiFmF8m/KgXirnhNZon1bHWQkxzc7qYQAu4hQSqju+luc
+   g=;
+X-IronPort-AV: E=Sophos;i="6.04,292,1695686400"; 
+   d="scan'208";a="260910136"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 00:58:52 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com (Postfix) with ESMTPS id B9C1A804D0;
+	Thu, 21 Dec 2023 00:58:49 +0000 (UTC)
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:3402]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.30:2525] with esmtp (Farcaster)
+ id b29cd697-4f61-493a-b153-a49eb6f7a4b6; Thu, 21 Dec 2023 00:58:49 +0000 (UTC)
+X-Farcaster-Flow-ID: b29cd697-4f61-493a-b153-a49eb6f7a4b6
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 21 Dec 2023 00:58:44 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.15.211) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Thu, 21 Dec 2023 00:58:39 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <edumazet@google.com>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <martineau@kernel.org>,
+	<matttbe@kernel.org>, <mptcp@lists.linux.dev>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v6 bpf-next 3/6] bpf: tcp: Handle BPF SYN Cookie in skb_steal_sock().
+Date: Thu, 21 Dec 2023 09:58:30 +0900
+Message-ID: <20231221005830.33710-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <533e8e80c4db4ecd34a2c49dd3de3e76810afe22.camel@redhat.com>
+References: <533e8e80c4db4ecd34a2c49dd3de3e76810afe22.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D045UWA003.ant.amazon.com (10.13.139.46) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-From: Armen Ratner <armeng@nvidia.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Wed, 20 Dec 2023 11:22:45 +0100
+> On Tue, 2023-12-19 at 08:45 -0800, Mat Martineau wrote:
+> > On Fri, 15 Dec 2023, Kuniyuki Iwashima wrote:
+> > 
+> > > From: Eric Dumazet <edumazet@google.com>
+> > > Date: Thu, 14 Dec 2023 17:31:15 +0100
+> > > > On Thu, Dec 14, 2023 at 4:56 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> > > > > 
+> > > > > We will support arbitrary SYN Cookie with BPF.
+> > > > > 
+> > > > > If BPF prog validates ACK and kfunc allocates a reqsk, it will
+> > > > > be carried to TCP stack as skb->sk with req->syncookie 1.  Also,
+> > > > > the reqsk has its listener as req->rsk_listener with no refcnt
+> > > > > taken.
+> > > > > 
+> > > > > When the TCP stack looks up a socket from the skb, we steal
+> > > > > inet_reqsk(skb->sk)->rsk_listener in skb_steal_sock() so that
+> > > > > the skb will be processed in cookie_v[46]_check() with the
+> > > > > listener.
+> > > > > 
+> > > > > Note that we do not clear skb->sk and skb->destructor so that we
+> > > > > can carry the reqsk to cookie_v[46]_check().
+> > > > > 
+> > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > > > ---
+> > > > >  include/net/request_sock.h | 15 +++++++++++++--
+> > > > >  1 file changed, 13 insertions(+), 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/include/net/request_sock.h b/include/net/request_sock.h
+> > > > > index 26c630c40abb..8839133d6f6b 100644
+> > > > > --- a/include/net/request_sock.h
+> > > > > +++ b/include/net/request_sock.h
+> > > > > @@ -101,10 +101,21 @@ static inline struct sock *skb_steal_sock(struct sk_buff *skb,
+> > > > >         }
+> > > > > 
+> > > > >         *prefetched = skb_sk_is_prefetched(skb);
+> > > > > -       if (*prefetched)
+> > > > > +       if (*prefetched) {
+> > > > > +#if IS_ENABLED(CONFIG_SYN_COOKIES)
+> > > > > +               if (sk->sk_state == TCP_NEW_SYN_RECV && inet_reqsk(sk)->syncookie) {
+> > > > > +                       struct request_sock *req = inet_reqsk(sk);
+> > > > > +
+> > > > > +                       *refcounted = false;
+> > > > > +                       sk = req->rsk_listener;
+> > > > > +                       req->rsk_listener = NULL;
+> > > > 
+> > > > I am not sure about interactions with MPTCP.
+> > > > 
+> > > > I would be nice to have their feedback.
+> > > 
+> > > Matthieu, Mat, Paolo, could you double check if the change
+> > > above is sane ?
+> > > https://lore.kernel.org/bpf/20231214155424.67136-4-kuniyu@amazon.com/
+> > 
+> > Hi Kuniyuki -
+> > 
+> > Yes, we will take a look. Haven't had time to look in detail yet but I 
+> > wanted to let you know we saw your message and will follow up.
+> 
+> I'm sorry for the late reply.
+> 
+> AFAICS, from mptcp perspective, the main differences from built-in
+> cookie validation are:
+> 
+> - cookie allocation via mptcp_subflow_reqsk_alloc() and cookie
+> 'finalization' via cookie_tcp_reqsk_init() /
+> mptcp_subflow_init_cookie_req(req, sk, skb) could refer 2 different
+> listeners - within the same REUSEPORT group.
+> 
+> - incoming pure syn packets will not land into the TCP stack, so
+> af_ops->route_req will not happen.
+> 
+> I think both the above are problematic form mptcp. 
+> 
+> Potentially we can have both mptcp-enabled and plain tcp socket with
+> the same reuseport group. 
+> 
+> Currently the mptcp code assumes the listener is mptcp
+> cookie_tcp_reqsk_init(), the req is mptcp, too. I think we could fix
+> this at the mptcp level, but no patch ready at the moment.
+> 
+> Even the missing call to route_req() is problematic, as we use that to
+> fetch required information from the initial syn for MP_JOIN subflows -
+> yep, unfortunately mptcp needs to track of some state across MPJ syn
+> and MPJ 3rd ack reception.
+> 
+> Fixing this last item looks more difficult. I think it would be safer
+> and simpler to avoid mptcp support for generic syncookie and ev enable
+> it later - after we address things on the mptcp side.
 
-Add management PF modules, which introduce support for the structures
-needed to create the resources for the MGMT PF to work.
-Also, add the necessary calls and functions to establish this
-functionality.
+Thanks for checking, Paolo!
 
-Signed-off-by: Armen Ratner <armeng@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Reviewed-by: Daniel Jurgens <danielj@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/dev.c |   3 +
- .../net/ethernet/mellanox/mlx5/core/ecpf.c    |   6 +
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +
- .../ethernet/mellanox/mlx5/core/en/mgmt_pf.c  | 268 ++++++++++++++++++
- .../net/ethernet/mellanox/mlx5/core/en_main.c |  24 +-
- .../net/ethernet/mellanox/mlx5/core/eswitch.c |   2 +-
- include/linux/mlx5/driver.h                   |   8 +
- include/linux/mlx5/mlx5_ifc.h                 |  14 +-
- 9 files changed, 323 insertions(+), 8 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en/mgmt_pf.c
+Ok, I will change kfunc in the next version so that it will return
+-EINVAL for mptcp listener, and later the issues above are sorted out,
+we can add mptcp support back.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index 76dc5a9b9648..f36232dead1a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-@@ -29,7 +29,7 @@ mlx5_core-$(CONFIG_MLX5_CORE_EN) += en/rqt.o en/tir.o en/rss.o en/rx_res.o \
- 		en/reporter_tx.o en/reporter_rx.o en/params.o en/xsk/pool.o \
- 		en/xsk/setup.o en/xsk/rx.o en/xsk/tx.o en/devlink.o en/ptp.o \
- 		en/qos.o en/htb.o en/trap.o en/fs_tt_redirect.o en/selq.o \
--		lib/crypto.o lib/sd.o
-+		en/mgmt_pf.o lib/crypto.o lib/sd.o
- 
- #
- # Netdev extra
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dev.c b/drivers/net/ethernet/mellanox/mlx5/core/dev.c
-index cf0477f53dc4..aa1b471e13fa 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/dev.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/dev.c
-@@ -190,6 +190,9 @@ bool mlx5_rdma_supported(struct mlx5_core_dev *dev)
- 	if (is_mp_supported(dev))
- 		return false;
- 
-+	if (mlx5_core_is_mgmt_pf(dev))
-+		return false;
-+
- 	return true;
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ecpf.c b/drivers/net/ethernet/mellanox/mlx5/core/ecpf.c
-index d000236ddbac..aa397e3ebe6d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/ecpf.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/ecpf.c
-@@ -75,6 +75,9 @@ int mlx5_ec_init(struct mlx5_core_dev *dev)
- 	if (!mlx5_core_is_ecpf(dev))
- 		return 0;
- 
-+	if (mlx5_core_is_mgmt_pf(dev))
-+		return 0;
-+
- 	return mlx5_host_pf_init(dev);
- }
- 
-@@ -85,6 +88,9 @@ void mlx5_ec_cleanup(struct mlx5_core_dev *dev)
- 	if (!mlx5_core_is_ecpf(dev))
- 		return;
- 
-+	if (mlx5_core_is_mgmt_pf(dev))
-+		return;
-+
- 	mlx5_host_pf_cleanup(dev);
- 
- 	err = mlx5_wait_for_pages(dev, &dev->priv.page_counters[MLX5_HOST_PF]);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index 84db05fb9389..922b63c25154 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -63,6 +63,7 @@
- #include "lib/sd.h"
- 
- extern const struct net_device_ops mlx5e_netdev_ops;
-+extern const struct net_device_ops mlx5e_mgmt_netdev_ops;
- struct page_pool;
- 
- #define MLX5E_METADATA_ETHER_TYPE (0x8CE4)
-@@ -1125,6 +1126,7 @@ static inline bool mlx5_tx_swp_supported(struct mlx5_core_dev *mdev)
- }
- 
- extern const struct ethtool_ops mlx5e_ethtool_ops;
-+extern const struct mlx5e_profile mlx5e_mgmt_pf_nic_profile;
- 
- int mlx5e_create_mkey(struct mlx5_core_dev *mdev, u32 pdn, u32 *mkey);
- int mlx5e_create_mdev_resources(struct mlx5_core_dev *mdev, bool create_tises);
-@@ -1230,6 +1232,8 @@ netdev_features_t mlx5e_features_check(struct sk_buff *skb,
- 				       struct net_device *netdev,
- 				       netdev_features_t features);
- int mlx5e_set_features(struct net_device *netdev, netdev_features_t features);
-+void mlx5e_nic_set_rx_mode(struct mlx5e_priv *priv);
-+
- #ifdef CONFIG_MLX5_ESWITCH
- int mlx5e_set_vf_mac(struct net_device *dev, int vf, u8 *mac);
- int mlx5e_set_vf_rate(struct net_device *dev, int vf, int min_tx_rate, int max_tx_rate);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/mgmt_pf.c b/drivers/net/ethernet/mellanox/mlx5/core/en/mgmt_pf.c
-new file mode 100644
-index 000000000000..77b5805895b9
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/mgmt_pf.c
-@@ -0,0 +1,268 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+// Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-+
-+#include <linux/kernel.h>
-+#include "en/params.h"
-+#include "en/health.h"
-+#include "lib/eq.h"
-+#include "en/dcbnl.h"
-+#include "en_accel/ipsec.h"
-+#include "en_accel/en_accel.h"
-+#include "en/trap.h"
-+#include "en/monitor_stats.h"
-+#include "en/hv_vhca_stats.h"
-+#include "en_rep.h"
-+#include "en.h"
-+
-+static int mgmt_pf_async_event(struct notifier_block *nb, unsigned long event, void *data)
-+{
-+	struct mlx5e_priv *priv = container_of(nb, struct mlx5e_priv, events_nb);
-+	struct mlx5_eqe   *eqe = data;
-+
-+	if (event != MLX5_EVENT_TYPE_PORT_CHANGE)
-+		return NOTIFY_DONE;
-+
-+	switch (eqe->sub_type) {
-+	case MLX5_PORT_CHANGE_SUBTYPE_DOWN:
-+	case MLX5_PORT_CHANGE_SUBTYPE_ACTIVE:
-+		queue_work(priv->wq, &priv->update_carrier_work);
-+		break;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+
-+	return NOTIFY_OK;
-+}
-+
-+static void mlx5e_mgmt_pf_enable_async_events(struct mlx5e_priv *priv)
-+{
-+	priv->events_nb.notifier_call = mgmt_pf_async_event;
-+	mlx5_notifier_register(priv->mdev, &priv->events_nb);
-+}
-+
-+static void mlx5e_disable_mgmt_pf_async_events(struct mlx5e_priv *priv)
-+{
-+	mlx5_notifier_unregister(priv->mdev, &priv->events_nb);
-+}
-+
-+static void mlx5e_modify_mgmt_pf_admin_state(struct mlx5_core_dev *mdev,
-+					     enum mlx5_port_status state)
-+{
-+	struct mlx5_eswitch *esw = mdev->priv.eswitch;
-+	int vport_admin_state;
-+
-+	mlx5_set_port_admin_status(mdev, state);
-+
-+	if (state == MLX5_PORT_UP)
-+		vport_admin_state = MLX5_VPORT_ADMIN_STATE_AUTO;
-+	else
-+		vport_admin_state = MLX5_VPORT_ADMIN_STATE_DOWN;
-+
-+	mlx5_eswitch_set_vport_state(esw, MLX5_VPORT_UPLINK, vport_admin_state);
-+}
-+
-+static void mlx5e_build_mgmt_pf_nic_params(struct mlx5e_priv *priv, u16 mtu)
-+{
-+	struct mlx5e_params *params = &priv->channels.params;
-+	struct mlx5_core_dev *mdev = priv->mdev;
-+	u8 rx_cq_period_mode;
-+
-+	params->sw_mtu = mtu;
-+	params->hard_mtu = MLX5E_ETH_HARD_MTU;
-+	params->num_channels = 1;
-+
-+	/* SQ */
-+	params->log_sq_size = is_kdump_kernel() ?
-+		MLX5E_PARAMS_MINIMUM_LOG_SQ_SIZE :
-+		MLX5E_PARAMS_DEFAULT_LOG_SQ_SIZE;
-+	MLX5E_SET_PFLAG(params, MLX5E_PFLAG_SKB_TX_MPWQE, mlx5e_tx_mpwqe_supported(mdev));
-+
-+	MLX5E_SET_PFLAG(params, MLX5E_PFLAG_RX_NO_CSUM_COMPLETE, false);
-+
-+	/* RQ */
-+	mlx5e_build_rq_params(mdev, params);
-+
-+	/* CQ moderation params */
-+	rx_cq_period_mode = MLX5_CAP_GEN(mdev, cq_period_start_from_cqe) ?
-+			MLX5_CQ_PERIOD_MODE_START_FROM_CQE :
-+			MLX5_CQ_PERIOD_MODE_START_FROM_EQE;
-+	params->rx_dim_enabled = MLX5_CAP_GEN(mdev, cq_moderation);
-+	params->tx_dim_enabled = MLX5_CAP_GEN(mdev, cq_moderation);
-+	mlx5e_set_rx_cq_mode_params(params, rx_cq_period_mode);
-+	mlx5e_set_tx_cq_mode_params(params, MLX5_CQ_PERIOD_MODE_START_FROM_EQE);
-+
-+	/* TX inline */
-+	mlx5_query_min_inline(mdev, &params->tx_min_inline_mode);
-+}
-+
-+static int mlx5e_mgmt_pf_init(struct mlx5_core_dev *mdev,
-+			      struct net_device *netdev)
-+{
-+	struct mlx5e_priv *priv = netdev_priv(netdev);
-+	struct mlx5e_flow_steering *fs;
-+	int err;
-+
-+	mlx5e_build_mgmt_pf_nic_params(priv, netdev->mtu);
-+
-+	mlx5e_timestamp_init(priv);
-+
-+	fs = mlx5e_fs_init(priv->profile, mdev,
-+			   !test_bit(MLX5E_STATE_DESTROYING, &priv->state),
-+			   priv->dfs_root);
-+	if (!fs) {
-+		err = -ENOMEM;
-+		mlx5_core_err(mdev, "FS initialization failed, %d\n", err);
-+		return err;
-+	}
-+	priv->fs = fs;
-+
-+	mlx5e_health_create_reporters(priv);
-+
-+	return 0;
-+}
-+
-+static void mlx5e_mgmt_pf_cleanup(struct mlx5e_priv *priv)
-+{
-+	mlx5e_health_destroy_reporters(priv);
-+	mlx5e_fs_cleanup(priv->fs);
-+	priv->fs = NULL;
-+}
-+
-+static int mlx5e_mgmt_pf_init_rx(struct mlx5e_priv *priv)
-+{
-+	struct mlx5_core_dev *mdev = priv->mdev;
-+	int err;
-+
-+	priv->rx_res = mlx5e_rx_res_create(mdev, 0, priv->max_nch, priv->drop_rq.rqn,
-+					   &priv->channels.params.packet_merge,
-+					   priv->channels.params.num_channels);
-+	if (!priv->rx_res)
-+		return -ENOMEM;
-+
-+	mlx5e_create_q_counters(priv);
-+
-+	err = mlx5e_open_drop_rq(priv, &priv->drop_rq);
-+	if (err) {
-+		mlx5_core_err(mdev, "open drop rq failed, %d\n", err);
-+		goto err_destroy_q_counters;
-+	}
-+
-+	err = mlx5e_create_flow_steering(priv->fs, priv->rx_res, priv->profile,
-+					 priv->netdev);
-+	if (err) {
-+		mlx5_core_warn(mdev, "create flow steering failed, %d\n", err);
-+		goto err_destroy_rx_res;
-+	}
-+
-+	return 0;
-+
-+err_destroy_rx_res:
-+	mlx5e_rx_res_destroy(priv->rx_res);
-+	priv->rx_res = NULL;
-+	mlx5e_close_drop_rq(&priv->drop_rq);
-+err_destroy_q_counters:
-+	mlx5e_destroy_q_counters(priv);
-+	return err;
-+}
-+
-+static void mlx5e_mgmt_pf_cleanup_rx(struct mlx5e_priv *priv)
-+{
-+	mlx5e_destroy_flow_steering(priv->fs, !!(priv->netdev->hw_features & NETIF_F_NTUPLE),
-+				    priv->profile);
-+	mlx5e_rx_res_destroy(priv->rx_res);
-+	priv->rx_res = NULL;
-+	mlx5e_close_drop_rq(&priv->drop_rq);
-+	mlx5e_destroy_q_counters(priv);
-+}
-+
-+static int mlx5e_mgmt_pf_init_tx(struct mlx5e_priv *priv)
-+{
-+	return 0;
-+}
-+
-+static void mlx5e_mgmt_pf_cleanup_tx(struct mlx5e_priv *priv)
-+{
-+}
-+
-+static void mlx5e_mgmt_pf_enable(struct mlx5e_priv *priv)
-+{
-+	struct net_device *netdev = priv->netdev;
-+	struct mlx5_core_dev *mdev = priv->mdev;
-+
-+	mlx5e_fs_init_l2_addr(priv->fs, netdev);
-+
-+	/* Marking the link as currently not needed by the Driver */
-+	if (!netif_running(netdev))
-+		mlx5e_modify_mgmt_pf_admin_state(mdev, MLX5_PORT_DOWN);
-+
-+	mlx5e_set_netdev_mtu_boundaries(priv);
-+	mlx5e_set_dev_port_mtu(priv);
-+
-+	mlx5e_mgmt_pf_enable_async_events(priv);
-+	if (mlx5e_monitor_counter_supported(priv))
-+		mlx5e_monitor_counter_init(priv);
-+
-+	mlx5e_hv_vhca_stats_create(priv);
-+	if (netdev->reg_state != NETREG_REGISTERED)
-+		return;
-+	mlx5e_dcbnl_init_app(priv);
-+
-+	mlx5e_nic_set_rx_mode(priv);
-+
-+	rtnl_lock();
-+	if (netif_running(netdev))
-+		mlx5e_open(netdev);
-+	udp_tunnel_nic_reset_ntf(priv->netdev);
-+	netif_device_attach(netdev);
-+	rtnl_unlock();
-+}
-+
-+static void mlx5e_mgmt_pf_disable(struct mlx5e_priv *priv)
-+{
-+	if (priv->netdev->reg_state == NETREG_REGISTERED)
-+		mlx5e_dcbnl_delete_app(priv);
-+
-+	rtnl_lock();
-+	if (netif_running(priv->netdev))
-+		mlx5e_close(priv->netdev);
-+	netif_device_detach(priv->netdev);
-+	rtnl_unlock();
-+
-+	mlx5e_nic_set_rx_mode(priv);
-+
-+	mlx5e_hv_vhca_stats_destroy(priv);
-+	if (mlx5e_monitor_counter_supported(priv))
-+		mlx5e_monitor_counter_cleanup(priv);
-+
-+	mlx5e_disable_mgmt_pf_async_events(priv);
-+	mlx5e_ipsec_cleanup(priv);
-+}
-+
-+static int mlx5e_mgmt_pf_update_rx(struct mlx5e_priv *priv)
-+{
-+	return mlx5e_refresh_tirs(priv, false, false);
-+}
-+
-+static int mlx5e_mgmt_pf_max_nch_limit(struct mlx5_core_dev *mdev)
-+{
-+	return 1;
-+}
-+
-+const struct mlx5e_profile mlx5e_mgmt_pf_nic_profile = {
-+	.init		   = mlx5e_mgmt_pf_init,
-+	.cleanup	   = mlx5e_mgmt_pf_cleanup,
-+	.init_rx	   = mlx5e_mgmt_pf_init_rx,
-+	.cleanup_rx	   = mlx5e_mgmt_pf_cleanup_rx,
-+	.init_tx	   = mlx5e_mgmt_pf_init_tx,
-+	.cleanup_tx	   = mlx5e_mgmt_pf_cleanup_tx,
-+	.enable		   = mlx5e_mgmt_pf_enable,
-+	.disable	   = mlx5e_mgmt_pf_disable,
-+	.update_rx	   = mlx5e_mgmt_pf_update_rx,
-+	.update_stats	   = mlx5e_stats_update_ndo_stats,
-+	.update_carrier	   = mlx5e_update_carrier,
-+	.rx_handlers       = &mlx5e_rx_handlers_nic,
-+	.max_tc		   = 1,
-+	.max_nch_limit	   = mlx5e_mgmt_pf_max_nch_limit,
-+	.stats_grps	   = mlx5e_nic_stats_grps,
-+	.stats_grps_num	   = mlx5e_nic_stats_grps_num
-+};
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index b8f08d64f66b..40626b6108fb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -3799,7 +3799,7 @@ mlx5e_get_stats(struct net_device *dev, struct rtnl_link_stats64 *stats)
- 	stats->tx_errors = stats->tx_aborted_errors + stats->tx_carrier_errors;
- }
- 
--static void mlx5e_nic_set_rx_mode(struct mlx5e_priv *priv)
-+void mlx5e_nic_set_rx_mode(struct mlx5e_priv *priv)
- {
- 	if (mlx5e_is_uplink_rep(priv))
- 		return; /* no rx mode for uplink rep */
-@@ -5004,6 +5004,15 @@ const struct net_device_ops mlx5e_netdev_ops = {
- #endif
- };
- 
-+const struct net_device_ops mlx5e_mgmt_netdev_ops = {
-+	.ndo_open		= mlx5e_open,
-+	.ndo_stop		= mlx5e_close,
-+	.ndo_start_xmit		= mlx5e_xmit,
-+	.ndo_get_stats64	= mlx5e_get_stats,
-+	.ndo_change_mtu		= mlx5e_change_nic_mtu,
-+	.ndo_set_rx_mode	= mlx5e_set_rx_mode,
-+};
-+
- static u32 mlx5e_choose_lro_timeout(struct mlx5_core_dev *mdev, u32 wanted_timeout)
- {
- 	int i;
-@@ -5143,7 +5152,11 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
- 
- 	SET_NETDEV_DEV(netdev, mdev->device);
- 
--	netdev->netdev_ops = &mlx5e_netdev_ops;
-+	if (mlx5_core_is_mgmt_pf(mdev))
-+		netdev->netdev_ops = &mlx5e_mgmt_netdev_ops;
-+	else
-+		netdev->netdev_ops = &mlx5e_netdev_ops;
-+
- 	netdev->xdp_metadata_ops = &mlx5e_xdp_metadata_ops;
- 	netdev->xsk_tx_metadata_ops = &mlx5e_xsk_tx_metadata_ops;
- 
-@@ -6094,13 +6107,18 @@ static int mlx5e_suspend(struct auxiliary_device *adev, pm_message_t state)
- static int _mlx5e_probe(struct auxiliary_device *adev)
- {
- 	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
--	const struct mlx5e_profile *profile = &mlx5e_nic_profile;
- 	struct mlx5_core_dev *mdev = edev->mdev;
-+	const struct mlx5e_profile *profile;
- 	struct mlx5e_dev *mlx5e_dev;
- 	struct net_device *netdev;
- 	struct mlx5e_priv *priv;
- 	int err;
- 
-+	if (mlx5_core_is_mgmt_pf(mdev))
-+		profile = &mlx5e_mgmt_pf_nic_profile;
-+	else
-+		profile = &mlx5e_nic_profile;
-+
- 	mlx5e_dev = mlx5e_create_devlink(&adev->dev, mdev);
- 	if (IS_ERR(mlx5e_dev))
- 		return PTR_ERR(mlx5e_dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-index 3047d7015c52..3bf419d06d53 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-@@ -1665,7 +1665,7 @@ int mlx5_esw_sf_max_hpf_functions(struct mlx5_core_dev *dev, u16 *max_sfs, u16 *
- 	void *hca_caps;
- 	int err;
- 
--	if (!mlx5_core_is_ecpf(dev)) {
-+	if (!mlx5_core_is_ecpf(dev) || mlx5_core_is_mgmt_pf(dev)) {
- 		*max_sfs = 0;
- 		return 0;
- 	}
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index cd286b681970..2bba88c67f58 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -1224,6 +1224,14 @@ static inline bool mlx5_core_is_ecpf(const struct mlx5_core_dev *dev)
- 	return dev->caps.embedded_cpu;
- }
- 
-+static inline bool mlx5_core_is_mgmt_pf(const struct mlx5_core_dev *dev)
-+{
-+	if (!MLX5_CAP_GEN_2(dev, local_mng_port_valid))
-+		return false;
-+
-+	return MLX5_CAP_GEN_2(dev, local_mng_port);
-+}
-+
- static inline bool
- mlx5_core_is_ecpf_esw_manager(const struct mlx5_core_dev *dev)
- {
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index bf2d51952e48..586569209254 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -1954,8 +1954,10 @@ enum {
- struct mlx5_ifc_cmd_hca_cap_2_bits {
- 	u8	   reserved_at_0[0x80];
- 
--	u8         migratable[0x1];
--	u8         reserved_at_81[0x1f];
-+	u8	   migratable[0x1];
-+	u8	   reserved_at_81[0x19];
-+	u8	   local_mng_port[0x1];
-+	u8	   reserved_at_9b[0x5];
- 
- 	u8	   max_reformat_insert_size[0x8];
- 	u8	   max_reformat_insert_offset[0x8];
-@@ -1973,7 +1975,13 @@ struct mlx5_ifc_cmd_hca_cap_2_bits {
- 
- 	u8	   allowed_object_for_other_vhca_access[0x40];
- 
--	u8	   reserved_at_140[0x60];
-+	u8	   reserved_at_140[0x20];
-+
-+	u8	   reserved_at_160[0xa];
-+	u8	   local_mng_port_valid[0x1];
-+	u8	   reserved_at_16b[0x15];
-+
-+	u8	   reserved_at_180[0x20];
- 
- 	u8	   flow_table_type_2_type[0x8];
- 	u8	   reserved_at_1a8[0x3];
--- 
-2.43.0
 
+> 
+> @Eric, were you looking to something else and/or more specific?
 
