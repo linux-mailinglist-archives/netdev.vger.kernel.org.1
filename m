@@ -1,177 +1,171 @@
-Return-Path: <netdev+bounces-59738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A50481BE79
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 19:50:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 175E681BE89
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 19:55:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A00DB24D27
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:50:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5175FB2326E
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D40464AA1;
-	Thu, 21 Dec 2023 18:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871C564AAD;
+	Thu, 21 Dec 2023 18:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OCeeHp6E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A5F1E48C;
-	Thu, 21 Dec 2023 18:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.104] (178.176.75.203) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 21 Dec
- 2023 21:50:07 +0300
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: Re: [PATCH net-next v2 20/21] net: ravb: Do not apply RX CSUM
- settings to hardware if the interface is down
-To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
-	<geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
- <20231214114600.2451162-21-claudiu.beznea.uj@bp.renesas.com>
- <247ad9d9-298e-017b-f6e4-e672ee458ee7@omp.ru>
- <322c95f1-d42d-447d-89d1-7c61112b0cfd@tuxon.dev>
-Organization: Open Mobile Platform
-Message-ID: <101991df-0a00-b939-49db-d6fd425d0b50@omp.ru>
-Date: Thu, 21 Dec 2023 21:50:06 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8E56518A;
+	Thu, 21 Dec 2023 18:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40d352c826eso13890875e9.0;
+        Thu, 21 Dec 2023 10:55:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703184939; x=1703789739; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:to:from:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MzRL/kaIkL+FCfYHWzRmGBN8H4sfOu7t1rXgZsR+1BI=;
+        b=OCeeHp6E/s9POgGBtHV81Ovrl6uILmF1bEqlnjjGr+6F6CVslAavmcNQ71qV5EOrgp
+         FKeJy46mwowvvW7S8ssRyGso4V/BCTuzFb8swp9C+aZpLWw3IecDO/901jm7PcE7Y6EP
+         jYvQ5xXR8xHaD0j3WRIszttescjdbaHNG3tKzCHRZCkqhu1aEkXVTMX5msA4zaQW2Fsx
+         LstUcQaSWxd+0SBpJp0+Ide+kimeZ9/OA1pnW69KwyZtVbFRA6CGh8xs5CsmxKWrBPqL
+         /TF4RAvTxPTWf9XOAyMukyymnhQYjcXZbvHCne/kLs0NbxQVV6gQUQed4kSUg3taP8el
+         Ux2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703184939; x=1703789739;
+        h=content-transfer-encoding:in-reply-to:references:to:from:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MzRL/kaIkL+FCfYHWzRmGBN8H4sfOu7t1rXgZsR+1BI=;
+        b=BsCh6K+WriuFnOhq1vpG3akSvhfzFggakma8+pT3s6H3j3r1EAmlCzp7FlXcfx79l3
+         2vDjRsLaxm/UhFC/qogxmC/bFi57TetlhP0J3MQrbf3nEUsuKwA5gPhUzlFpK8QyyeRB
+         JOlGMuW0NdMhD49gGInv260ERRe0g6mU6GgQNB2GAO6DNkUsJJVBJ/EThgaDSIL2pDy2
+         cHKKmZBjagApKt8f5mNtAOG3J6DWasWB+aa3DANRY61fjQbz9H2I8chJBwr9GyGLU1w0
+         Vyvw3gYD/52oRtSjU1cnrDVaq4ahIUxr0BtwZrU7SSghbeY8ZCEb8VOLSanfiYR1ed0d
+         9PHg==
+X-Gm-Message-State: AOJu0YxiLbfJ26l3XG3/A5NWqIxEdczLJ792/oKyjoZPQMV4FNCWrrwa
+	KCwGFbYvooCwvLl4mROyhYI=
+X-Google-Smtp-Source: AGHT+IGFUlVEOxzVfAgpmsAytp27NgQaIZj3k+0l8jqfEuwmqyRYB6ovrt47LAB8sA/sjM71fvPKBg==
+X-Received: by 2002:a05:600c:3511:b0:40b:5e21:dd34 with SMTP id h17-20020a05600c351100b0040b5e21dd34mr103969wmq.98.1703184939049;
+        Thu, 21 Dec 2023 10:55:39 -0800 (PST)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id iv11-20020a05600c548b00b0040b4b2a15ebsm4317478wmb.28.2023.12.21.10.55.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Dec 2023 10:55:38 -0800 (PST)
+Message-ID: <e8b01e54-b623-44ec-84d5-406ea3b0c80b@gmail.com>
+Date: Thu, 21 Dec 2023 19:55:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <322c95f1-d42d-447d-89d1-7c61112b0cfd@tuxon.dev>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Subject: [PATCH net-next 1/3] net: gso: add HBH extension header offload
+ support
+From: Richard Gobert <richardbgobert@gmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <f4eff69d-3917-4c42-8c6b-d09597ac4437@gmail.com>
+In-Reply-To: <f4eff69d-3917-4c42-8c6b-d09597ac4437@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/21/2023 18:35:23
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182285 [Dec 21 2023]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.203 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.203 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.203
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 12/21/2023 18:38:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 12/21/2023 5:11:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 12/17/23 5:34 PM, claudiu beznea wrote:
+This commit adds net_offload to IPv6 Hop-by-Hop extension headers (as it
+is done for routing and dstopts) since it is supported in GSO and GRO.
+This allows to remove specific HBH conditionals in GSO and GRO when
+pulling and parsing an incoming packet.
 
-[...]
+Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+---
+ net/ipv6/exthdrs_offload.c | 11 +++++++++++
+ net/ipv6/ip6_offload.c     | 25 +++++++++++--------------
+ 2 files changed, 22 insertions(+), 14 deletions(-)
 
->>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>
->>> Do not apply the RX CSUM settings to hardware if the interface is down. In
->>> case runtime PM is enabled, and while the interface is down, the IP will be
->>> in reset mode (as for some platforms disabling/enabling the clocks will
->>> switch the IP to standby mode, which will lead to losing registers'
->>
->>    To/From perhaps?
->>    And just "register".
->>
->>> content) and applying settings in reset mode is not an option. Instead,
->>> cache the RX CSUM settings and apply them in ravb_open().
->>
->>    Have this issue actually occurred for you?
-> 
-> Setting RX CSUM while the if is down? No.
-> 
->>> Commit prepares for the addition of runtime PM.
->>>
->>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->> [...]
->>
->>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>> index 633346b6cd7c..9ff943dff522 100644
->>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->>> @@ -1868,6 +1868,15 @@ static int ravb_open(struct net_device *ndev)
->>>  	if (info->gptp || info->ccc_gac)
->>>  		ravb_ptp_init(ndev, priv->pdev);
->>>  
->>> +	/* Apply features that might have been changed while the interface
->>> +	 * was down.
->>> +	 */
->>> +	if (ndev->hw_features & NETIF_F_RXCSUM) {
->>
->>    I'm afraid this is a wrong field; we need ndev->features, no?
-> 
-> RX CSUM is not enabled for all ravb aware devices (see struct
-> ravb_hw_info::net_hw_features). We should be setting the ECMR only for
-> these ones. ravb_hw_info::net_hw_features is set in ndev->hw_features in
-> probe(). So here code checks if platforms supports RXCSUM and then below it
-> applies what has been requested though ndo_set_features(), if any.
+diff --git a/net/ipv6/exthdrs_offload.c b/net/ipv6/exthdrs_offload.c
+index 06750d65d480..4c00398f4dca 100644
+--- a/net/ipv6/exthdrs_offload.c
++++ b/net/ipv6/exthdrs_offload.c
+@@ -16,6 +16,10 @@ static const struct net_offload dstopt_offload = {
+ 	.flags		=	INET6_PROTO_GSO_EXTHDR,
+ };
+ 
++static const struct net_offload hbh_offload = {
++	.flags		=	INET6_PROTO_GSO_EXTHDR,
++};
++
+ int __init ipv6_exthdrs_offload_init(void)
+ {
+ 	int ret;
+@@ -28,9 +32,16 @@ int __init ipv6_exthdrs_offload_init(void)
+ 	if (ret)
+ 		goto out_rt;
+ 
++	ret = inet6_add_offload(&hbh_offload, IPPROTO_HOPOPTS);
++	if (ret)
++		goto out_dstopts;
++
+ out:
+ 	return ret;
+ 
++out_dstopts:
++	inet6_del_offload(&dstopt_offload, IPPROTO_DSTOPTS);
++
+ out_rt:
+ 	inet6_del_offload(&rthdr_offload, IPPROTO_ROUTING);
+ 	goto out;
+diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+index d6314287338d..0e0b5fed0995 100644
+--- a/net/ipv6/ip6_offload.c
++++ b/net/ipv6/ip6_offload.c
+@@ -45,15 +45,13 @@ static int ipv6_gso_pull_exthdrs(struct sk_buff *skb, int proto)
+ 		struct ipv6_opt_hdr *opth;
+ 		int len;
+ 
+-		if (proto != NEXTHDR_HOP) {
+-			ops = rcu_dereference(inet6_offloads[proto]);
++		ops = rcu_dereference(inet6_offloads[proto]);
+ 
+-			if (unlikely(!ops))
+-				break;
++		if (unlikely(!ops))
++			break;
+ 
+-			if (!(ops->flags & INET6_PROTO_GSO_EXTHDR))
+-				break;
+-		}
++		if (!(ops->flags & INET6_PROTO_GSO_EXTHDR))
++			break;
+ 
+ 		if (unlikely(!pskb_may_pull(skb, 8)))
+ 			break;
+@@ -171,13 +169,12 @@ static int ipv6_exthdrs_len(struct ipv6hdr *iph,
+ 
+ 	proto = iph->nexthdr;
+ 	for (;;) {
+-		if (proto != NEXTHDR_HOP) {
+-			*opps = rcu_dereference(inet6_offloads[proto]);
+-			if (unlikely(!(*opps)))
+-				break;
+-			if (!((*opps)->flags & INET6_PROTO_GSO_EXTHDR))
+-				break;
+-		}
++		*opps = rcu_dereference(inet6_offloads[proto]);
++		if (unlikely(!(*opps)))
++			break;
++		if (!((*opps)->flags & INET6_PROTO_GSO_EXTHDR))
++			break;
++
+ 		opth = (void *)opth + optlen;
+ 		optlen = ipv6_optlen(opth);
+ 		len += optlen;
+-- 
+2.36.1
 
-  OK. But we don't need this snippet here anyway...
-
->>> +		u32 val = (ndev->features & NETIF_F_RXCSUM) ? ECMR_RCSC : 0;
->>> +
->>> +		ravb_modify(ndev, ECMR, ECMR_RCSC, val);
->>> +	}
->>> +
->>
->>    The ECMR setting is already done in ravb_emac_init_rcar(), no need
->> to duplicate it here, I think...
-> 
-> Ok, it worth being moved there.
-
-   No need to move, it's already there...
-
-[...]
->>> @@ -2337,6 +2346,9 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
->>>  	struct ravb_private *priv = netdev_priv(ndev);
->>>  	unsigned long flags;
->>>  
->>> +	if (!netif_running(ndev))
->>
->>    Racy as well...
-> 
-> It's also called with rtnl_mutex locked.
-
-   Well, at least the only place that calls the ndo_set_features()
-method, __netdev_update_features() calls ASSERT_RTNL() at the start.
-However, since we'd have to use the is_opened flag anyway, let's rely
-on it instead...
-
-[...]
-
-MBR, Sergey
 
