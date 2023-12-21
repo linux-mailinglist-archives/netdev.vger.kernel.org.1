@@ -1,105 +1,106 @@
-Return-Path: <netdev+bounces-59690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E730F81BC80
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:59:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F4381BC8F
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:04:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE99FB20C1D
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:59:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 657651F2445A
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A79959922;
-	Thu, 21 Dec 2023 16:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5255822B;
+	Thu, 21 Dec 2023 17:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oIaXa8H9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5K5dtRl"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8D559909;
-	Thu, 21 Dec 2023 16:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 47FBDE0006;
-	Thu, 21 Dec 2023 16:58:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1703177940;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=64g4WXHsmtstsXFWVKn4+jC7SrQnUgEAndJzQ+FYA9s=;
-	b=oIaXa8H9AfHKgs3Zfmu8VPmK09bSKs+HtjTMOjRenfZ44LykxNabiA4r4NX3YJW/++hQjx
-	R86criDYih8pJkoQ5c5pKQPtbZAwBRYmHtQkR8Rq64WHSmvIGOqJ4iMUUkeYPXKc631cnr
-	LbFO7vYXlg9qkgzIsrJ0ueQOqpt8D5vB4NCCLYycBrDJnFtRXk//pfK2JajnoeANTfVLOA
-	WHbOI70ihS71u57Zl9ZIuestgOaqYj00AhO0kLyvNAWyg7G7oI4FuBsJdaZ9vEVpSWRtJs
-	Dq558tUtybtDXPh3o0iuR4w7bEsUcKvqYCfJ9enC7Vtyipz8vuZy1o120z0xVQ==
-Date: Thu, 21 Dec 2023 17:58:57 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
- linux-kernel@vger.kernel.org, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, Eric
- Dumazet <edumazet@google.com>, Vinod Koul <vkoul@kernel.org>, Jose Abreu
- <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- linux-arm-msm@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- linux-arm-kernel@lists.infradead.org
-Subject: Re: [Linux-stm32] [PATCH net-next] net: stmmac: dwmac-qcom-ethqos:
- Add support for 2.5G SGMII
-Message-ID: <20231221175857.6d2874ff@device-28.home>
-In-Reply-To: <vvlnwiobrgcwuam6lkud2np5xqocj6asjf627j3gekkhm4hfp5@vhdd47fyortm>
-References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
-	<4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
-	<8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
-	<wvzhz4fmtheculsiag4t2pn2kaggyle2mzhvawbs4m5isvqjto@lmaonvq3c3e7>
-	<8f94489d-5f0e-4166-a14e-4959098a5c80@quicinc.com>
-	<vvlnwiobrgcwuam6lkud2np5xqocj6asjf627j3gekkhm4hfp5@vhdd47fyortm>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4CF85990A
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-554473c653aso28258a12.0
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 09:04:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703178262; x=1703783062; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XjAUPTWASIOdoiBXIpeMpz5TlvjISpvY13QHruxO8Is=;
+        b=D5K5dtRli2sp0CgsTotfY370uhTIDvaIWoYocaYt8ee5MGdzExI7jSGfETxi0qbgvl
+         ImtCqcw9G2YpbLEZ/On/pIKiATMIb1hF8p99opzX7+m78TqIDrAlnD7szp5HxZwLgn0D
+         RN+gA0UCne55+Xvm/ouHtZQUGrMrPNoYZR4grMYjSvnn7S8+vz05kH+iopcZNNcpYuPg
+         POjXpeXyO4fTORiKyr2C3jzt5t2AelwYB/E64bSjmsQePU77mm3x54szAJTA8nGGZgZu
+         7RK9Xqxd7HexJStKjPFUQSiHY0gNbGGqQ9fhOwjCHShX3zDW69olLsqgUsJEYnp8grPB
+         4Y0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703178262; x=1703783062;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XjAUPTWASIOdoiBXIpeMpz5TlvjISpvY13QHruxO8Is=;
+        b=d2CFrDo4nCWdZ2gKkPqUs3fDKwabC6Gwfq20XXLCxqC3Wpw6ePVqgyny7EYzO5QRvK
+         sMqwy+ODCk5z9SZk7jjUacC1C81dpFNpG5WicaG8HNekHdKn6LCwt13+RK5dbg5YkQQC
+         TfQRka7iP4/if+6qzp816AH5ltqKyJ3caaf9M+1ndxpX4hcTl8J/pjT2NUXvleoiz45m
+         JUsh6DeaMGSjT1FPnqFIryGy1cnC0mUCIAfyCEWHRR9WqcuqQmC5ZZ0qn5Mv7XpmJns8
+         nfTQfamBooq9qcaEV+sjjuxvqhr/J/Sy1kGFtEGEMahd5k9EKaO86FoBd9HtrIt1dKo6
+         /oQg==
+X-Gm-Message-State: AOJu0YzAqA8A8Xx2Z569d8hghMDJvf4iTohFOjMhaJ9ucwD5nFZFmm6X
+	hcV33NlaGv6+74DKIeWgJRc=
+X-Google-Smtp-Source: AGHT+IEsNCduYVD886oerEpoqwUt5NvYzr2p41VseixEllBGSGKgIMNnFb/S8+H3lPyF9PtHKBB0tw==
+X-Received: by 2002:a50:9ea1:0:b0:54b:d16:4c0e with SMTP id a30-20020a509ea1000000b0054b0d164c0emr11855832edf.15.1703178261837;
+        Thu, 21 Dec 2023 09:04:21 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id y4-20020aa7d504000000b00553894fc87dsm1406779edq.8.2023.12.21.09.04.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 09:04:20 -0800 (PST)
+Date: Thu, 21 Dec 2023 19:04:18 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linus.walleij@linaro.org" <linus.walleij@linaro.org>,
+	"andrew@lunn.ch" <andrew@lunn.ch>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
+Subject: Re: [PATCH net-next v2 1/7] net: dsa: realtek: drop cleanup from
+ realtek_ops
+Message-ID: <20231221170418.6jiaydos3cc7qkyp@skbuf>
+References: <20231220042632.26825-1-luizluca@gmail.com>
+ <20231220042632.26825-2-luizluca@gmail.com>
+ <w2xqtfeafqxkbocemv3u7p6gfwib2kad2tjbfzlf7d22uvopnq@4a2zktggci3o>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <w2xqtfeafqxkbocemv3u7p6gfwib2kad2tjbfzlf7d22uvopnq@4a2zktggci3o>
 
-Hello Andrew,
-
-On Thu, 21 Dec 2023 08:30:49 -0600
-Andrew Halaney <ahalaney@redhat.com> wrote:
-
-[...]
+On Wed, Dec 20, 2023 at 01:57:41PM +0000, Alvin Šipraga wrote:
+> On Wed, Dec 20, 2023 at 01:24:24AM -0300, Luiz Angelo Daros de Luca wrote:
+> > It was never used and never referenced.
+> > 
+> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> > Reviewed-by: Alvin Šipraga <alsi@bang-olufsen.dk>
 > 
-> Note, I'm struggling to keep up with the standards at play here, so if
-> someone else who's a bit more wise on these topics has an opinion I'd
-> listen to them. I find myself rewatching this presentation from
-> Maxime/Antoine as a primer on all of this:
-> 
->     https://www.youtube.com/watch?v=K962S9gTBVM
+> You should always put your Signed-off-by last when sending patches.
 
-:)
+I'm not so sure about that.
 
-> If anyone's got any recommended resources for me to read in particular I
-> am all ears.
-
-I think Russell and Andrew did a good job clarifying some quirks with
-all these standards :
-
-https://elixir.bootlin.com/linux/latest/source/Documentation/networking/phy.rst#L229
-
-There are some more info in Andrew's LPC talk here :
-http://vger.kernel.org/lpc_net2018_talks/phylink-and-sfp-slides.pdf
-
-(more phylink related though)
-
-But I agree that this is hard to fully grasp, there are so many
-variants everywhere, some standard, some ad-hoc standards, etc.
-
-Maxime
+When you send a patch, it gets reviewed and then accepted all in the
+same version, the Reviewed-by tag will be after your sign off. It makes
+more sense to me that if you send a patch with a review tag carried
+over, you put it in the same place where it would sit if it was received
+on the final patch version. Idk, not too big of a deal.
 
