@@ -1,77 +1,100 @@
-Return-Path: <netdev+bounces-59540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2BE181B30E
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:03:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7150B81B30F
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:03:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4DBB1C2397F
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:03:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 266E81F2366E
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970A14D580;
-	Thu, 21 Dec 2023 10:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FB24D590;
+	Thu, 21 Dec 2023 10:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1gT/WhHL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RKHnoG1U"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2F84D11C
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 10:03:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=HeK61wtCrn9BWwLsjuCFW9plJ6a6LDMdNhk+e/GRqCw=; b=1g
-	T/WhHLm1sb192RCOIi/zhVSnul0IxZxhy/vrkZQb10JCJqR0bHgfqDBSSZXYdt+WEemlcmpUYJlak
-	zDtWjdAUJcWzgyLs4jJI6cbRUYXpTEyeoNXdpWY0wclfsH6ChBLW1J19yivWZX4LhGpz9GMHycgn1
-	MBVzv5+iFaKwyoE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rGFte-003Uz1-Dz; Thu, 21 Dec 2023 11:03:18 +0100
-Date: Thu, 21 Dec 2023 11:03:18 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: netdev@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>, Wei Lei <quic_leiwei@quicinc.com>
-Subject: Re: [PATCH net-next] net: sfp: fix PHY discovery for FS SFP-10G-T
- module
-Message-ID: <d7e37e48-a557-4dad-91a5-85283dd3fc5f@lunn.ch>
-References: <20231219162415.29409-1-kabel@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78624D11C
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 10:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703153022; x=1734689022;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2pdqU/fhOSnNppi5YRr6U/bIHHK77ykrv+xLE5+YdNk=;
+  b=RKHnoG1UnjQjjS8W54e4rVgFiJB6Hebc+5ssaE+a7lwAPEj1OaLbHKlB
+   mpfqABNhBLOwvyR1wSUFlOdUyShQnuA3ywSJuFuPVNPaEJtEWmNYGKWL0
+   8a2KgFPFjEFcvS6HnF6JFk6yx8SL97sGRnN5wJPKUDX7XtJBNBQ0ilrH9
+   9zCJm9XblVpZL+XjOi/BoIQKgv0+lxljLn1QJ/N+hyXyPKdOsqXOSRcog
+   pTmNzjMHf5QNL5GstsQ3CS8C3yN9VKNV1Cpb9DGcp69Ut/EapdkHnDCXn
+   ASY4cs7KnEYA7bRHpM1LOtAIv9fpAbcoCqb/4IJthHylbEEPGnTZ6DpS5
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="482133660"
+X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
+   d="scan'208";a="482133660"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 02:03:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="949875380"
+X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
+   d="scan'208";a="949875380"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
+  by orsmga005.jf.intel.com with ESMTP; 21 Dec 2023 02:03:40 -0800
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v4 iwl-next 0/6] ice: fix timestamping in reset process
+Date: Thu, 21 Dec 2023 11:03:20 +0100
+Message-Id: <20231221100326.1030761-1-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231219162415.29409-1-kabel@kernel.org>
 
-On Tue, Dec 19, 2023 at 05:24:15PM +0100, Marek Behún wrote:
-> Commit 2f3ce7a56c6e ("net: sfp: rework the RollBall PHY waiting code")
-> changed the long wait before accessing RollBall / FS modules into
-> probing for PHY every 1 second, and trying 25 times.
-> 
-> Wei Lei reports that this does not work correctly on FS modules: when
-> initializing, they may report values different from 0xffff in PHY ID
-> registers for some MMDs, causing get_phy_c45_ids() to find some bogus
-> MMD.
-> 
-> Fix this by adding the module_t_wait member back, and setting it to 4
-> seconds for FS modules.
-> 
-> Fixes: 2f3ce7a56c6e ("net: sfp: rework the RollBall PHY waiting code")
-> Reported-by: Wei Lei <quic_leiwei@quicinc.com>
-> Signed-off-by: Marek Behún <kabel@kernel.org>
+PTP reset process has multiple places where timestamping can end up in
+an incorrect state.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This series introduces a proper state machine for PTP and refactors
+a large part of the code to ensure that timestamping does not break.
 
-    Andrew
+
+Jacob Keller (5):
+  ice: pass reset type to PTP reset functions
+  ice: rename verify_cached to has_ready_bitmap
+  ice: rename ice_ptp_tx_cfg_intr
+  ice: factor out ice_ptp_rebuild_owner()
+  ice: stop destroying and reinitalizing Tx tracker during reset
+
+Karol Kolacinski (1):
+  ice: introduce PTP state machine
+
+V2 -> V3: rebased the series fixed Tx timestamps missing
+V1 -> V2: rebased the series and dropped already merged patches
+
+ drivers/net/ethernet/intel/ice/ice.h         |   1 -
+ drivers/net/ethernet/intel/ice/ice_ethtool.c |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c    |   4 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 231 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ptp.h     |  34 ++-
+ 5 files changed, 166 insertions(+), 106 deletions(-)
+
+
+base-commit: 67b40ee196fd2fd6d9b7f9b58912587c837bdc39
+-- 
+2.40.1
+
 
