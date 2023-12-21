@@ -1,106 +1,288 @@
-Return-Path: <netdev+bounces-59691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F4381BC8F
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:04:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5C2F81BC98
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:08:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 657651F2445A
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:04:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861582840A9
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5255822B;
-	Thu, 21 Dec 2023 17:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5145822D;
+	Thu, 21 Dec 2023 17:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5K5dtRl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U12SdpwP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4CF85990A
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E8259908
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:07:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-554473c653aso28258a12.0
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 09:04:23 -0800 (PST)
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7811db57cb4so65066085a.0
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 09:07:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703178262; x=1703783062; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XjAUPTWASIOdoiBXIpeMpz5TlvjISpvY13QHruxO8Is=;
-        b=D5K5dtRli2sp0CgsTotfY370uhTIDvaIWoYocaYt8ee5MGdzExI7jSGfETxi0qbgvl
-         ImtCqcw9G2YpbLEZ/On/pIKiATMIb1hF8p99opzX7+m78TqIDrAlnD7szp5HxZwLgn0D
-         RN+gA0UCne55+Xvm/ouHtZQUGrMrPNoYZR4grMYjSvnn7S8+vz05kH+iopcZNNcpYuPg
-         POjXpeXyO4fTORiKyr2C3jzt5t2AelwYB/E64bSjmsQePU77mm3x54szAJTA8nGGZgZu
-         7RK9Xqxd7HexJStKjPFUQSiHY0gNbGGqQ9fhOwjCHShX3zDW69olLsqgUsJEYnp8grPB
-         4Y0Q==
+        d=gmail.com; s=20230601; t=1703178478; x=1703783278; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FmCRKRUpBy9ZPc6yTej9Koy6uWjJ+ei8EtSFS6dCLhc=;
+        b=U12SdpwPMpIXGGVy9J8Zk6+Opq8vo6QMSyDVEyiK0bMZ3TlxNOy6titdk+PWiu1VXM
+         +vzidyKcHKQrdEMKF/B6Cnbiwo7gfUZMQMOzMlD0dX6HxZZFo16UR7J+Iunm2wiyc2xY
+         eVhYhmAtZMmHGCK3HbV/WdcquaF23MrlYi+LTzmCfc0eX5alJCwnb1Du3v8P6/52a5Wo
+         BGiS81+wqnPl3VMMoNzsseCf0FY0+iKsA+YeI6RfDxwD2sNLvcC9sYOyzWskI6N++RzK
+         ollIk+hpmXSfjEZ7SKw0TcgF+9uO7bdrqYUmCwv8pLVcSfzdQ73nRshl/jQztgfyZyZX
+         3q1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703178262; x=1703783062;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XjAUPTWASIOdoiBXIpeMpz5TlvjISpvY13QHruxO8Is=;
-        b=d2CFrDo4nCWdZ2gKkPqUs3fDKwabC6Gwfq20XXLCxqC3Wpw6ePVqgyny7EYzO5QRvK
-         sMqwy+ODCk5z9SZk7jjUacC1C81dpFNpG5WicaG8HNekHdKn6LCwt13+RK5dbg5YkQQC
-         TfQRka7iP4/if+6qzp816AH5ltqKyJ3caaf9M+1ndxpX4hcTl8J/pjT2NUXvleoiz45m
-         JUsh6DeaMGSjT1FPnqFIryGy1cnC0mUCIAfyCEWHRR9WqcuqQmC5ZZ0qn5Mv7XpmJns8
-         nfTQfamBooq9qcaEV+sjjuxvqhr/J/Sy1kGFtEGEMahd5k9EKaO86FoBd9HtrIt1dKo6
-         /oQg==
-X-Gm-Message-State: AOJu0YzAqA8A8Xx2Z569d8hghMDJvf4iTohFOjMhaJ9ucwD5nFZFmm6X
-	hcV33NlaGv6+74DKIeWgJRc=
-X-Google-Smtp-Source: AGHT+IEsNCduYVD886oerEpoqwUt5NvYzr2p41VseixEllBGSGKgIMNnFb/S8+H3lPyF9PtHKBB0tw==
-X-Received: by 2002:a50:9ea1:0:b0:54b:d16:4c0e with SMTP id a30-20020a509ea1000000b0054b0d164c0emr11855832edf.15.1703178261837;
-        Thu, 21 Dec 2023 09:04:21 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id y4-20020aa7d504000000b00553894fc87dsm1406779edq.8.2023.12.21.09.04.19
+        d=1e100.net; s=20230601; t=1703178478; x=1703783278;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FmCRKRUpBy9ZPc6yTej9Koy6uWjJ+ei8EtSFS6dCLhc=;
+        b=etIn66RxjcScCmny6va0bNmUJSMYNPH836hNn3KG++BVrl4QDtsMDaYDgEAL4iMw26
+         x0Gh5XWXAODusx1o3Tnmfh3RUfphbToy07vff0/vExeHVTUldZy2UKbELUcCUF5/qVIj
+         ORvs8HRqcIFNY3jIAY/ypylfIYaUou47tpBSb9yErh5sG0kVcWNzBTwQVZm962QpBap7
+         VVJFVxb9KVEkOngTkCEYVMKGwSmgu+bkrUc1aPoqajkIZGOWN5LPE1ZemlhrWd9Dbev6
+         lruhTyGFSuqWvcObvLvMYPeKWqme9YWHrrzPg0e2v4NT8LVJCCVMW1PxT4jWMux+F39P
+         0SpQ==
+X-Gm-Message-State: AOJu0YyZcQAc7FWaLtO9ZrYI47QVR5jPM1bxm1SePzsmlax4djicCWyt
+	TVo51jskNAjCeJxwg54M3oc=
+X-Google-Smtp-Source: AGHT+IHewtv5ImuQWhN2Ksa7uIOsk55JL0WGOxWn8h/5Tu9foUwxIwG5SN7Um1C8+LoEVdXtjAI8WA==
+X-Received: by 2002:a05:620a:11a6:b0:77f:71dd:d64 with SMTP id c6-20020a05620a11a600b0077f71dd0d64mr1301894qkk.13.1703178477704;
+        Thu, 21 Dec 2023 09:07:57 -0800 (PST)
+Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
+        by smtp.gmail.com with ESMTPSA id n8-20020a0cec48000000b0067f33b99ed1sm746157qvq.94.2023.12.21.09.07.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 09:04:20 -0800 (PST)
-Date: Thu, 21 Dec 2023 19:04:18 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
-Subject: Re: [PATCH net-next v2 1/7] net: dsa: realtek: drop cleanup from
- realtek_ops
-Message-ID: <20231221170418.6jiaydos3cc7qkyp@skbuf>
-References: <20231220042632.26825-1-luizluca@gmail.com>
- <20231220042632.26825-2-luizluca@gmail.com>
- <w2xqtfeafqxkbocemv3u7p6gfwib2kad2tjbfzlf7d22uvopnq@4a2zktggci3o>
+        Thu, 21 Dec 2023 09:07:57 -0800 (PST)
+Date: Thu, 21 Dec 2023 12:07:56 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Arnd Bergmann <arnd@arndb.de>, 
+ Thomas Lange <thomas@corelatus.se>, 
+ Netdev <netdev@vger.kernel.org>, 
+ Deepa Dinamani <deepa.kernel@gmail.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+Message-ID: <658470ecd37f1_82de329452@willemb.c.googlers.com.notmuch>
+In-Reply-To: <7cf460a9eea4f52f928d8624fb9e8c54b7f15566.camel@mailbox.tu-berlin.de>
+References: <a9090be2-ca7c-494c-89cb-49b1db2438ba@corelatus.se>
+ <658266e18643_19028729436@willemb.c.googlers.com.notmuch>
+ <0d7cddc9-03fa-43db-a579-14f3e822615b@app.fastmail.com>
+ <bff57ee057bdd15a2c951ff8b6e3aaa30f981cd2.camel@mailbox.tu-berlin.de>
+ <6582ffd3e5dc7_1a34a429482@willemb.c.googlers.com.notmuch>
+ <7cf460a9eea4f52f928d8624fb9e8c54b7f15566.camel@mailbox.tu-berlin.de>
+Subject: Re: net/core/sock.c lacks some SO_TIMESTAMPING_NEW support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <w2xqtfeafqxkbocemv3u7p6gfwib2kad2tjbfzlf7d22uvopnq@4a2zktggci3o>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 20, 2023 at 01:57:41PM +0000, Alvin Šipraga wrote:
-> On Wed, Dec 20, 2023 at 01:24:24AM -0300, Luiz Angelo Daros de Luca wrote:
-> > It was never used and never referenced.
-> > 
-> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> > Reviewed-by: Alvin Šipraga <alsi@bang-olufsen.dk>
-> 
-> You should always put your Signed-off-by last when sending patches.
+J=C3=B6rn-Thorben Hinz wrote:
+> On Wed, 2023-12-20 at 09:53 -0500, Willem de Bruijn wrote:
+> > J=C3=B6rn-Thorben Hinz wrote:
+> > > Hi Arnd,
+> > > =
 
-I'm not so sure about that.
+> > > thanks for indirectly pinging me here about the unfinished patches.=
 
-When you send a patch, it gets reviewed and then accepted all in the
-same version, the Reviewed-by tag will be after your sign off. It makes
-more sense to me that if you send a patch with a review tag carried
-over, you put it in the same place where it would sit if it was received
-on the final patch version. Idk, not too big of a deal.
+> > > I
+> > > kinda forgot about them over other things happening.
+> > > =
+
+> > > Happy to look back into them, it looks like it would be helpful to
+> > > apply them. Is it fine to just answer the remarks from earlier this=
+
+> > > year, after a few months, in the same mail thread? Or preferable to=
+
+> > > resubmit the series[1] first?
+> > =
+
+> > Please resubmit instead of reviving the old thread. Thanks for
+> > reviving
+> > that.
+> Thanks for the hint, will do so! (Maybe after Christmas.)
+> =
+
+> > =
+
+> > IIRC the only open item was to limit the new BPF user to the new API?=
+
+> > That only applies to patch 2/2.
+> Another point was to not change the behavior of
+> getsockopt(SO_TIMESTAMPING_OLD), that=E2=80=99s just a minor change.
+> =
+
+> About limiting BPF to the SO_TIMESTAMPING_NEW, I am unsure if this is
+> feasible, necessary, or even makes a difference (for a BPF program). In=
+
+> many places, BPF just passes-through calls like to get-/setsockopt(),
+> only testing whether this call is explicitly allowed from BPF space.
+> =
+
+> Also, due to its nature, BPF code often has to re-provide defines, see
+> for example tools/testing/selftests/bpf/progs/bpf_tracing_net.h This is=
+
+> also the case for SO_TIMESTAMPING_*. A limitation of BPF to
+> SO_TIMESTAMPING_NEW could only be done in the allowed get-/setsockopt()=
+
+> calls, not through any BPF-provided defines.
+> =
+
+> I will take another look at this aspect and add my comments/findings to=
+
+> a resubmission.
+> =
+
+> > =
+
+> > The missing sk_getsockopt SO_TIMESTAMPING_NEW might be breaking
+> > users,
+> > so is best sent stand-alone to net, rather than net-next.
+> Hmm, I initially sent both patches together and to bpf-next since the
+> second, BPF-related patch depends (for the included selftest) on the
+> first one already being applied.
+> =
+
+> I=E2=80=99m unsure how to split them because of the dependency. Would o=
+ne add a
+> comment that commit X needs to be pulled in from net for commit Y to be=
+
+> applied in bpf-next? (That sounds bound to break something.)
+>
+> Also, getsockopt(SO_TIMESTAMPING_NEW) has been missing since 2019,
+> since SO_TIMESTAMPING_NEW was added. Do you think it is still "urgent"
+> enough to provide it through net instead of net-next/bpf-next?
+
+net gets pulled into net-next at least once a week. If you submit this
+patch now, it will likely be in bpf-next by the time we get to the
+second more involved patch.
+
+This report was a reminder that the current omission can actually
+break users, so having it as a fix that goes to stable is warranted.
+The Fixes tag will be
+
+Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
+
+
+> > =
+
+> > > Thorben
+> > > =
+
+> > > [1]
+> > > https://lore.kernel.org/lkml/20230703175048.151683-1-jthinz@mailbox=
+.tu-berlin.de/
+> > > =
+
+> > > On Wed, 2023-12-20 at 09:43 +0000, Arnd Bergmann wrote:
+> > > > On Wed, Dec 20, 2023, at 04:00, Willem de Bruijn wrote:
+> > > > > Thomas Lange wrote:
+> > > > > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > > > > index 16584e2dd648..a56ec1d492c9 100644
+> > > > > > --- a/net/core/sock.c
+> > > > > > +++ b/net/core/sock.c
+> > > > > > @@ -2821,6 +2821,7 @@ int __sock_cmsg_send(struct sock *sk,
+> > > > > > struct cmsghdr *cmsg,
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sockc->mark =3D *(u32 *)CMSG_DATA(cmsg)=
+;
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case SO_TIME=
+STAMPING_OLD:
+> > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case SO_TIMESTAMPING_NE=
+W:
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (cmsg->cmsg_len !=3D CMSG_LEN(sizeof=
+(u32)))
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 return -EINVAL;
+> > > > > > =
+
+> > > > > > However, looking through the module, it seems that
+> > > > > > sk_getsockopt() has no
+> > > > > > support for SO_TIMESTAMPING_NEW either, but sk_setsockopt()
+> > > > > > has.
+> > > > > =
+
+> > > > > Good point. Adding the author to see if this was a simple
+> > > > > oversight
+> > > > > or
+> > > > > there was a rationale at the time for leaving it out.
+> > > > =
+
+> > > > I'm fairly sure this was just a mistake on our side. For the cmsg=
+
+> > > > case,
+> > > > I think we just missed it because there is no corresponding
+> > > > SO_TIMESTAMP{,NS}
+> > > > version of this, so it fell through the cracks.
+> > > > =
+
+> > > > In the patch above, I'm not entirely sure about what needs to
+> > > > happen
+> > > > with the old/new format, i.e. the
+> > > > =
+
+> > > > =C2=A0=C2=A0 sock_valbool_flag(sk, SOCK_TSTAMP_NEW, optname =3D=3D=
+
+> > > > SO_TIMESTAMPING_NEW)
+> > > > =
+
+> > > > from setsockopt(). Is __sock_cmsg_send() allowed to turn on
+> > > > timestamping
+> > > > without it being first enabled using setsockopt()? If so, I think=
+
+> > > > we need to set the flag here the same way that setsockopt does.
+> > > > If
+> > > > not, then I think we instead should check that the old/new format=
+
+> > > > in the option sent via cmsg is the same that was set earlier with=
+
+> > > > setsockopt.
+> > =
+
+> > __sock_cmsg_send can only modify a subset of the bits in the
+> > timestamping feature bitmap, so a call to setsockopt is still needed
+> > =
+
+> > But there is no ordering requirement, so the __sock_cmsg_send call
+> > can
+> > come before the setsockopt call. It would be odd, but the API allows
+> > it.
+> > > > =
+
+> > > > For the missing getsockopt, there was even a patch earlier this
+> > > > year
+> > > > by J=C3=B6rn-Thorben Hinz [1], but I failed to realize that we ne=
+ed
+> > > > patch
+> > > > 1/2 from his series regardless of patch 2/2.
+> > > > =
+
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 Arnd
+> > > > =
+
+> > > > [1]
+> > > > https://lore.kernel.org/lkml/20230703175048.151683-2-jthinz@mailb=
+ox.tu-berlin.de/
+> > > =
+
+> > =
+
+> > =
+
+> =
+
+
+
 
