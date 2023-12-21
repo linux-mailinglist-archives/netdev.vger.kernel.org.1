@@ -1,105 +1,169 @@
-Return-Path: <netdev+bounces-59562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 717EE81B4B0
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:11:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFF9381B4D2
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:23:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02D35B217D8
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:11:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E7BB1F256D1
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A766AB9F;
-	Thu, 21 Dec 2023 11:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FE16BB4D;
+	Thu, 21 Dec 2023 11:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Dbb3N+HA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c0rqv1YD"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04B56A02F;
-	Thu, 21 Dec 2023 11:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3BLBAq1v122527;
-	Thu, 21 Dec 2023 05:10:52 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1703157052;
-	bh=QmXACMYRAncvaes6ymYI0iABfyRzCf/v2jYHx0VjiXg=;
-	h=From:To:CC:Subject:Date;
-	b=Dbb3N+HAhf8TWCggogCK90QFBYwAIM7OvHkJ8UA01C+Y6LjjDgLKkYnsPzU1VhTi+
-	 GP29/yHzIKYjyw6i73gGes6dbeRjlZbAjRo5vSetr8SfV8mEikD28+TlbkqOVWdBvx
-	 djCgLf5r+L1uiRiCMIDafH+CIBcrhS3um4EsRYec=
-Received: from DFLE107.ent.ti.com (dfle107.ent.ti.com [10.64.6.28])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3BLBAqQr049082
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 21 Dec 2023 05:10:52 -0600
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 21
- Dec 2023 05:10:52 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 21 Dec 2023 05:10:52 -0600
-Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3BLBAp7d113056;
-	Thu, 21 Dec 2023 05:10:52 -0600
-From: Chintan Vankar <c-vankar@ti.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>,
-        Grygorii Strashko
-	<grygorii.strashko@ti.com>,
-        Roger Quadros <rogerq@kernel.org>,
-        "Siddharth
- Vadapalli" <s-vadapalli@ti.com>,
-        Paolo Abeni <pabeni@redhat.com>, "Jakub
- Kicinski" <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Chintan Vankar
-	<c-vankar@ti.com>
-Subject: [RFC PATCH net-next] net: ethernet: ti: am65-cpsw-nuss: Enable SGMII mode for J784S4 CPSW9G
-Date: Thu, 21 Dec 2023 16:40:46 +0530
-Message-ID: <20231221111046.761843-1-c-vankar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF236BB3D;
+	Thu, 21 Dec 2023 11:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d3e2972f65so2766495ad.3;
+        Thu, 21 Dec 2023 03:23:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703157792; x=1703762592; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iurPx6U1Yq+NZr3UnEVxu22VONJz6nR4G9rGokJKtfI=;
+        b=c0rqv1YDPQQkIOq2WVrS0ll7SYfRhXpKkU4dq8CIGijAiL6DATbORglgiJmRMC9Sh6
+         gS7L+hF735IEUZ03YKm2jVTx2oD2w/u+eLPt6vUvx1ERFOhPFKdTBp21BEFzQN01FemJ
+         cRw1MfVokkK59mEQGT9RTXm77yX8wMpxQjwiOHDi3b1A/c8lAT3GKdPvkMyExLb9Prnp
+         L14sAnbZ42si5kXlcqYq/sjDf7gt61RxpNsAsylSg/zUkG1Tak9b1I9PgC2PbXs0oEgp
+         pdKkqFlJkd5a896iXimXL7hZ6Ac3b7BJcUDnr6ZTTyw8CDnUrauLx1DXAmyTA9YfnAyA
+         kcIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703157792; x=1703762592;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iurPx6U1Yq+NZr3UnEVxu22VONJz6nR4G9rGokJKtfI=;
+        b=ulfuYX+Dr1G+WC0pC0okK45ycZbvqMZszk7p4zkU+HJ/gYgmyHs2mxG7F8fMzA4hYn
+         yxuVR/NqXCikrqBlnEAOmimO4bwHjLGriTeeKX3gIm5GcWv7bJvqztrCQfQ7ngWJJk/a
+         kiJHzAvrUMAYg9CRnNY9o6lFnTOoeNt+q82dgyHy0tloHbKOZ0jgCv0CK2q0BugWMQ1I
+         LtevQj6XQ1SQdTuBVAZi+9is9Ap3EvK1xwvOsTGlcuiBxCvGOJzNWwiZLGpDyYAYDaID
+         SDJNUWusI719QmkjiT2w9LFtT8of6dIoTADaWa8b+byEbQv9PuOxMDsTyEENJgX9h1FK
+         fZ8A==
+X-Gm-Message-State: AOJu0YzwoDso9qiCJMf/LtwcttkqRipqOJnl3G5LxFx9X3ScV35nHL9g
+	PG+zAuzg+aSE0Y/oNoMNR0M=
+X-Google-Smtp-Source: AGHT+IExJqNXn7XmZ803oCoArKhVQWyZmpB8PHbShkKvYBOvRSlQv57Xx7zYUNX6P4EjV6J0PZjwGg==
+X-Received: by 2002:a17:902:684c:b0:1d3:f285:15a5 with SMTP id f12-20020a170902684c00b001d3f28515a5mr1727435pln.35.1703157791960;
+        Thu, 21 Dec 2023 03:23:11 -0800 (PST)
+Received: from archie.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id ju22-20020a170903429600b001d1cd7e4acesm1410398plb.68.2023.12.21.03.23.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 03:23:11 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id E149C1026AE88; Thu, 21 Dec 2023 18:23:07 +0700 (WIB)
+Date: Thu, 21 Dec 2023 18:23:07 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Kernel Janitors <kernel-janitors@vger.kernel.org>,
+	Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Justin Stitt <justinstitt@google.com>,
+	Kunwu Chan <chentao@kylinos.cn>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Nathan Chancellor <nathan@kernel.org>,
+	"Steven Rostedt (Google)" <rostedt@goodmis.org>,
+	Karsten Keil <isdn@linux-pingi.de>,
+	Karsten Keil <keil@b1-systems.de>,
+	YouHong Li <liyouhong@kylinos.cn>
+Subject: Re: [PATCH net 1/2] MAINTAINERS: Remove Karsten Keil
+Message-ID: <ZYQgGxKOKqIe4TIL@archie.me>
+References: <20231221091419.11764-1-bagasdotme@gmail.com>
+ <20231221091419.11764-2-bagasdotme@gmail.com>
+ <2023122156-diocese-movie-3d75@gregkh>
+ <ZYQYUgZrewi2Up50@archie.me>
+ <2023122116-favoring-roulette-554f@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ZMxuX3fRkHidytpf"
+Content-Disposition: inline
+In-Reply-To: <2023122116-favoring-roulette-554f@gregkh>
 
-TI's J784S4 SoC supports SGMII mode with CPSW9G instance of the CPSW
-Ethernet Switch. Thus, enable it by adding SGMII mode to the
-extra_modes member of the "j784s4_cpswxg_pdata" SoC data.
 
-Signed-off-by: Chintan Vankar <c-vankar@ti.com>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+--ZMxuX3fRkHidytpf
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 7651f90f51f2..9aa5a6108521 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2855,7 +2855,8 @@ static const struct am65_cpsw_pdata j784s4_cpswxg_pdata = {
- 	.quirks = 0,
- 	.ale_dev_id = "am64-cpswxg",
- 	.fdqring_mode = K3_RINGACC_RING_MODE_MESSAGE,
--	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_USXGMII),
-+	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_SGMII) |
-+		       BIT(PHY_INTERFACE_MODE_USXGMII),
- };
- 
- static const struct of_device_id am65_cpsw_nuss_of_mtable[] = {
--- 
-2.34.1
+On Thu, Dec 21, 2023 at 11:54:02AM +0100, Greg Kroah-Hartman wrote:
+> On Thu, Dec 21, 2023 at 05:49:54PM +0700, Bagas Sanjaya wrote:
+> > On Thu, Dec 21, 2023 at 10:32:09AM +0100, Greg Kroah-Hartman wrote:
+> > > On Thu, Dec 21, 2023 at 04:14:18PM +0700, Bagas Sanjaya wrote:
+> > > > He's no longer active maintaining ISDN/mISDN subsystem: his last me=
+ssage
+> > > > on kernel mailing lists was three years ago [1] and last commit act=
+ivity
+> > > > from him was 1e1589ad8b5cb5 ("mISDN: Support DR6 indication in mISD=
+Nipac
+> > > > driver") in 2016 when he gave Acked-by: from his @b1-systems.de add=
+ress.
+> > > >=20
+> > > > Move him to CREDITS, as netdev people should already handle ISDN/mI=
+SDN
+> > > > patches.
+> > > >=20
+> > > > Link: https://lore.kernel.org/r/0ee243a9-9937-ad26-0684-44b18e77266=
+2@linux-pingi.de/ [1]
+> > > > Cc: Karsten Keil <isdn@linux-pingi.de>
+> > > > Cc: Karsten Keil <keil@b1-systems.de>
+> > > > Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> > >=20
+> > > Are you sure he's not active?  It doesn't take much work to keep an o=
+ld
+> > > subsystem like this alive, last I remember, real changes were accepted
+> > > just fine.
+> >=20
+> > As for LKML messages, yes; he doesn't post any new messages since 2020.
+> >=20
+> > >=20
+> > > Perhaps just don't send coding style cleanups to old subsystems?  :)
+> > >=20
+> > > I would not take these unless Karsten agrees that he no longer wants =
+to
+> > > maintain this.
+> >=20
+> > OK, I will send a private message to him asking for continuing maintain=
+er
+> > role. If there's no response from him by the new year, then it's safe to
+> > route this through net tree instead (hence [PATCH net]).
+>=20
+> Why are you arbritrarily saying that "no response in 2 weeks, during the
+> time of the year almost all of Europe is on vacation, means we drop
+> someone from the MAINTAINERS file"?
+>=20
 
+Because I'm impatient. Maybe I can wait for right timing to reroll once
+Karsten agrees to remove his MAINTAINERS entry.
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--ZMxuX3fRkHidytpf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZYQgGwAKCRD2uYlJVVFO
+o+uUAQDfsKMoaQFtaOT6DpcRB+FMAkidQGmnQpY0Aq69jjG64gD+JIUIecWepwwo
+X4o7niyGHz992tTPL+VyT7bt9eZfIQg=
+=BYT9
+-----END PGP SIGNATURE-----
+
+--ZMxuX3fRkHidytpf--
 
