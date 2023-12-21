@@ -1,91 +1,83 @@
-Return-Path: <netdev+bounces-59751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3349181BFC9
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 21:56:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC92481BFCE
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3948281622
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 20:56:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F2D51F2597D
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 21:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ADF476915;
-	Thu, 21 Dec 2023 20:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CDC76918;
+	Thu, 21 Dec 2023 21:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eonZBhU7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVFyFFt+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B60768F4
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 20:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a2345aaeb05so144661966b.0
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 12:56:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703192208; x=1703797008; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Eh1HbWakz9QAqXKTcTVYi4kubyNrrE+y7FwTSgKlLWk=;
-        b=eonZBhU74aNj4xXHvT4MpZ+CMOH7jRWKndNdrBz6bTaPUjNmxXIcFYDT6dnT3K4xHL
-         HsuRXC6vVc5Qot/LrldbQgcRuLBI6t99byppw9AC/tASXJW1kfljmI3YsWzpRxc25zqI
-         ekcd63lr/Ne0XFml8z/alWA3UgGtjzYxaofXVGyUGtCks38ySQkcorkWWUlVigqt5nvV
-         Ng7KRbemJmEyS8zhE2xbMLaJ2TZ/nxmPQ98Lg/WtCdIuFhHnnGfDKdhxt+S786RMxFnW
-         XcGH4dx1oGpkgUui3xywX97xetUXyXS6E14VYVlqC4gA4A/jw05nBzg7TAHyXDjDlfeu
-         hHzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703192208; x=1703797008;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Eh1HbWakz9QAqXKTcTVYi4kubyNrrE+y7FwTSgKlLWk=;
-        b=JbaJAbp7rmNpNP7zVWcVyj8ThtHibD8Yc4XaH5xryom4rk+cB6+7+0O173/wF3z1kF
-         gjgie7EkoWsEuut4ILjsp+fFPzYK5wLVHlo0ivobmEp5sXoHrzKy0mgqnBMVaKgsb5Jg
-         VvMB/Gp3Cjri/ScMAiVqGZ0bAs4nMljVThyKh8LOQUannPIgsQNKre8EeME+v39IvtW+
-         oMzGB18iVdYm2iLj5zqkGIrLv8H6fyhAwJuges0YVDqLuVTYu8ZwNK8yhyHD1byjhFa3
-         qiEG6ainp2NHF/+zpX/FVj1YVJO+Hijp7FKZlw1ueIZp/26til8krMb28SyrAsIKLrGR
-         3wXQ==
-X-Gm-Message-State: AOJu0YynEd4hJshZQ3NdEEjMtDis4xL0qfE3b/BS6zxvvIv+TOnhPZxp
-	sKdzixl10mhZk+v1S9K7Ni6V1ypXrPrxUheh2wa0h5naRMA=
-X-Google-Smtp-Source: AGHT+IHy3bxokS2kvGUw/5qcNicLOFlDRldajoB2eLgAW7rYkYiJvH9iMF5Q8g7x5wELBGiZ068evcH2YMFnJgeZFSM=
-X-Received: by 2002:a17:906:caa:b0:a23:2aa8:99fe with SMTP id
- k10-20020a1709060caa00b00a232aa899femr238802ejh.9.1703192208560; Thu, 21 Dec
- 2023 12:56:48 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6609768EF;
+	Thu, 21 Dec 2023 21:00:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2FA4BC433C9;
+	Thu, 21 Dec 2023 21:00:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703192443;
+	bh=IdpDgbuY2oX7DYDsVvR4h18IvSFqZXv5OJGoLHv/qHs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UVFyFFt+v++xv902/wHmAtYQeLw50gvs+VxidLSA1LEuZ59W3fwvGoXA8MAo5Jtdj
+	 UaBxLOQ0bjU2F7r1V+mvsbVSSygdI5x6pTnna6WJpKvl0REzSQZGGcIaeNpwrCuiHG
+	 zSzdGFpT+ldkm+Ss/7TLd6/TCfi18TvW34u1KsITVTbS6OO1oPpvXVuDbIVm0rBwLQ
+	 glB/ij/N6sa3PccXBm6kYTlOWp6SbeywEijmJnvA51FJijXkURs2bN8drTgdkPvJay
+	 YL3qswgEc4mqRhOLfR2OEO1BqHfZP0ZX+dIMLWyunFsFzgMDK1ciSdw5rTZ0VkWT+0
+	 W7nm2rLerZS0Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14B01DD4EF0;
+	Thu, 21 Dec 2023 21:00:43 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: James Dutton <james.dutton@gmail.com>
-Date: Thu, 21 Dec 2023 20:56:12 +0000
-Message-ID: <CAAMvbhEKuYwgXBkkhR6TX8hwje88whAhNaC9A9ssnvXj-mBkDw@mail.gmail.com>
-Subject: TCP/IP over USB-C
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] Networking for v6.7-rc7
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170319244307.10957.3551363919740430843.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Dec 2023 21:00:43 +0000
+References: <20231221144131.366000-1-pabeni@redhat.com>
+In-Reply-To: <20231221144131.366000-1-pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+Hello:
 
-I wish to connect two laptops together with a USB-C cable and ssh between them.
-I.e. TCP/IP over USB-C.
-This seems to work fine on MacOS, but I was wondering if anyone had
-managed to get this working on Linux ?
-The USB-C i have is:
-00:0d.0 USB controller: Intel Corporation Tiger Lake-LP Thunderbolt 4
-USB Controller (rev 01)
-00:0d.2 USB controller: Intel Corporation Tiger Lake-LP Thunderbolt 4
-NHI #0 (rev 01)
-00:14.0 USB controller: Intel Corporation Tiger Lake-LP USB 3.2 Gen
-2x1 xHCI Host Controller (rev 20)
+This pull request was applied to netdev/net.git (main)
+by Linus Torvalds <torvalds@linux-foundation.org>:
 
-According to the specs, it should be able to function in either host
-or device mode.
-One motivation for this is that TCP/IP over USB-C should work at 10
-Gbits/second or more, so a very cheap 10G ethernet using a USB-C
-cable.
+On Thu, 21 Dec 2023 15:41:31 +0100 you wrote:
+> Hi Linus!
+> 
+> We are not aware of any standing regressions, and we do not
+> plan to send a PR next week - unless very bad things happen.
+> 
+> Let me leverage this opportunity to wish you a merry winter
+> holiday and happy new year!
+> 
+> [...]
 
-Kind Regards
+Here is the summary with links:
+  - [GIT,PULL] Networking for v6.7-rc7
+    https://git.kernel.org/netdev/net/c/7c5e046bdcb2
 
-James
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
