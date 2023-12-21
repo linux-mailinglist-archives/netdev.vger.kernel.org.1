@@ -1,39 +1,78 @@
-Return-Path: <netdev+bounces-59573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5949281B5C1
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:28:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F4E681B69C
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:56:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13E46285F54
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:28:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A19761C258EF
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D2A6E5A4;
-	Thu, 21 Dec 2023 12:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7ECE74E20;
+	Thu, 21 Dec 2023 12:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vGCmU/UP"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="m+y+MMPN";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="1PkUc/n9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647F06EB4D;
-	Thu, 21 Dec 2023 12:28:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA82C433C8;
-	Thu, 21 Dec 2023 12:28:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703161683;
-	bh=J2GyZ8aGWp7U98Pt2mOw9MgQsZYwZuIkfyz563PoLJE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vGCmU/UP6emTfpnku2LK8WhzlJtNBm0gInWGLiJwT1pK5dlFdWmmvu/IQCbLKRvMn
-	 onWiX0ramxB7xXhsRoA2X2yK0Tu1AvdJJH5ZcLAwQHQfw5rsltGUwdoDEHb/Twwv5P
-	 JqL05R8B1tPbBfQQICKplp6BXQm/5XkZ5hdjXE2cVHcuYvR8yMWRpbR2D4pk1KJX93
-	 3Rgx3m1GK1UsieoQer5CGjr6n+vl4/IWn5LLRfJh+i6uePjCmEPRmd4EyKUdqwbTRe
-	 G6yOu8ky5T6eL6Jp81XbeWf5UBUxgpshG/Ox/mU0Jnk6PKmg1QJ9AJChTH+9BfvL6R
-	 4N3RKrCii2X1A==
-Message-ID: <37f1df31-82c7-49ae-8f21-0939b04115e6@kernel.org>
-Date: Thu, 21 Dec 2023 14:27:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1952F745DA;
+	Thu, 21 Dec 2023 12:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1703162606; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=Wq9ySTquNiMobs7AXzCSyDv0JLXJwKd2uBLFEIiy5nDC+iKcQMAkGkhGiAeito4dYI
+    RCxFXozwpoaV8Llbi8BpJ1kQu65Ee1h0uEn80SO9oQFpHQpOiyUlrkxLno9khEuC+c9W
+    NcoQZSuh8xuBxi8+O4nfKzfXxmI5uGbRcxRvE27ca4zl0YzVf0Zuh3yf755GY31RXyWP
+    PQ+qq7xLfANUqyLb62QTu+3vp47MMPWl5Zn5Wulq5C38Z5UF+n6p8wEgnulPQVH5h3rP
+    4eRrgu+w2qhJv98gLEiC754FgAOV2cRq/TeukYsQmnn6Tj67CmdYeocLAokV9QjYhlvD
+    phbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1703162606;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=OnJHWMr4vKk6XiP+r2QVT4TOIv0IyaSpezaB4ruSasQ=;
+    b=LRmyhNWo4ueMoafgKUBUVF8n7YiQFmPUERRcZNBbFF0A1uhkOA3ZEHkJnSz+OQkamj
+    Y5xWLwbiD9dACGXBaUVgR11mWlKTrWpig0xQJj5TPQ5J5q1FV9Ez9bp1RJ/1kC4b7Yo8
+    nnY3vIG5t4NprKnB/u5x/Z5KDlRoBpWIF3fuSf+H4DjrDvHrX/lKVDcI7P35FmecM6Pf
+    snuKsrjB8kHYdDQ7U7rkEALw81AmlkKwXCO2OTeuCGtDCZ2rVe8VKp9NNfaqvb/AKTGy
+    wvm7HqsJcUskmI/1tvt44Y8ngQ/eaHBpnpVdO2YPNfBj/QGvOx8lEIkfOaYm/5IRDft0
+    Nevw==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1703162606;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=OnJHWMr4vKk6XiP+r2QVT4TOIv0IyaSpezaB4ruSasQ=;
+    b=m+y+MMPN1c6s50wYacRg/AdJVOFOE4fLj+Oj8B+ZXwwnES6hONFnt0RNR230qovwLt
+    y2eoFp5u2X3k2A5oZ7Nsm0HFYXrtEOcpJuOSL+il4ZN1YtpbYyLBPkFSR636qy0Gk4AF
+    x1LVLlu7x6B1PZMIpJknBrFEY282ALxtN8bKEARYooqx5P7sdgOTRifkbSwAScQnGHvl
+    pfIfM2qD7VN8yyrAwGorpDd5BK8IvtSXa0TYaJxQn51brYHrgI6Pl6a6ahUrHp5VsBqa
+    0w4gdSehYfBZMkUyX3ItKMNJInANGbn+fCzmJAMwM29nvHvmOCMYAdCXsIhHZgzcqsQt
+    OP2w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1703162606;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=OnJHWMr4vKk6XiP+r2QVT4TOIv0IyaSpezaB4ruSasQ=;
+    b=1PkUc/n9l2QdJ0x4TRkT6IaD6mtyw4PdYlyRs7wjmbvoUmiirEAz8BctcRDO67WlYu
+    FqArJUDaTqs9y3vVtYCw==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFr0USKM1xaWml9uO48Qn+p+6Jpeor1RA=="
+Received: from [IPV6:2a00:6020:4a8e:5010:4fcd:cedc:3d60:abc3]
+    by smtp.strato.de (RZmta 49.10.0 AUTH)
+    with ESMTPSA id Kf147azBLChQlHf
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Thu, 21 Dec 2023 13:43:26 +0100 (CET)
+Message-ID: <0338581d-89f0-4cca-a360-7693a27eba37@hartkopp.net>
+Date: Thu, 21 Dec 2023 13:43:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,128 +80,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 1/8] dt-bindings: net: Add support for AM65x
- SR1.0 in ICSSG
+Subject: Re: [RFC] Questionable RCU/BH usage in cgw_create_job().
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+References: <20231031112349.y0aLoBrz@linutronix.de>
+ <ba5d5420-a3ef-4368-ba36-3a84ed1458cf@hartkopp.net>
+ <20231031165245.-pTSiGsg@linutronix.de>
+ <20231130164330.bYbMzPz7@linutronix.de>
+ <94c27fa1-bf19-48ae-bc20-7530d97bbd5f@hartkopp.net>
 Content-Language: en-US
-To: Diogo Ivo <diogo.ivo@siemens.com>, danishanwar@ti.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-Cc: Jan Kiszka <jan.kiszka@siemens.com>
-References: <20231219174548.3481-1-diogo.ivo@siemens.com>
- <20231219174548.3481-2-diogo.ivo@siemens.com>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231219174548.3481-2-diogo.ivo@siemens.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <94c27fa1-bf19-48ae-bc20-7530d97bbd5f@hartkopp.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Sebastian,
 
-On 19/12/2023 19:45, Diogo Ivo wrote:
-> Silicon Revision 1.0 of the AM65x came with a slightly different ICSSG
-> support: Only 2 PRUs per slice are available and instead 2 additional
-> DMA channels are used for management purposes. We have no restrictions
-> on specified PRUs, but the DMA channels need to be adjusted.
+I've sent a RFC patch to be reviewed here:
+
+https://lore.kernel.org/linux-can/20231221123703.8170-1-socketcan@hartkopp.net/T/#u
+
+I hope your suggestion to use rcu_replace_pointer()
+in the implemented way fits the requirements.
+
+Best regards,
+Oliver
+
+On 2023-11-30 20:56, Oliver Hartkopp wrote:
+> Hi Sebastian,
 > 
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
-> ---
->  .../bindings/net/ti,icssg-prueth.yaml         | 62 +++++++++++++------
->  1 file changed, 44 insertions(+), 18 deletions(-)
+> On 30.11.23 17:43, Sebastian Andrzej Siewior wrote:
+>> On 2023-10-31 17:52:47 [+0100], To Oliver Hartkopp wrote:
 > 
-> diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> index 229c8f32019f..fbe51731854a 100644
-> --- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> +++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> @@ -19,30 +19,15 @@ allOf:
->  properties:
->    compatible:
->      enum:
-> -      - ti,am642-icssg-prueth  # for AM64x SoC family
-> -      - ti,am654-icssg-prueth  # for AM65x SoC family
-> +      - ti,am642-icssg-prueth      # for AM64x SoC family
-> +      - ti,am654-icssg-prueth      # for AM65x SoC family, SR2.x
-
-You don't need to explicitly mention SR2.x here and in the rest of the patches.
-That way there are fewer changes.
-
-> +      - ti,am654-icssg-prueth-sr1  # for AM65x SoC family, SR1.0
->  
->    sram:
->      $ref: /schemas/types.yaml#/definitions/phandle
->      description:
->        phandle to MSMC SRAM node
->  
-> -  dmas:
-> -    maxItems: 10
-> -
-> -  dma-names:
-> -    items:
-> -      - const: tx0-0
-> -      - const: tx0-1
-> -      - const: tx0-2
-> -      - const: tx0-3
-> -      - const: tx1-0
-> -      - const: tx1-1
-> -      - const: tx1-2
-> -      - const: tx1-3
-> -      - const: rx0
-> -      - const: rx1
-> -
->    ti,mii-g-rt:
->      $ref: /schemas/types.yaml#/definitions/phandle
->      description:
-> @@ -122,6 +107,47 @@ properties:
->        - required:
->            - port@1
->  
-> +if:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - ti,am654-icssg-prueth-sr1
-> +then:
-> +  properties:
-> +    dmas:
-> +      maxItems: 12
-> +    dma-names:
-> +      items:
-> +        - const: tx0-0
-> +        - const: tx0-1
-> +        - const: tx0-2
-> +        - const: tx0-3
-> +        - const: tx1-0
-> +        - const: tx1-1
-> +        - const: tx1-2
-> +        - const: tx1-3
-> +        - const: rx0
-> +        - const: rx1
-> +        - const: rxmgm0
-> +        - const: rxmgm1
-> +else:
-> +  properties:
-> +    dmas:
-> +      maxItems: 10
-> +    dma-names:
-> +      items:
-> +        - const: tx0-0
-> +        - const: tx0-1
-> +        - const: tx0-2
-> +        - const: tx0-3
-> +        - const: tx1-0
-> +        - const: tx1-1
-> +        - const: tx1-2
-> +        - const: tx1-3
-> +        - const: rx0
-> +        - const: rx1
-> +
->  required:
->    - compatible
->    - sram
-
--- 
-cheers,
--roger
+>>> The point is to replace/ update cf_mod at runtime while following RCU
+>>> rules so always either new or the old object is observed. Never an
+>>> intermediate step.
+>>
+>> Do you want me to take care of it?
+> 
+> Yes, sorry.
+> 
+> In fact I've searched some time what would fit best without getting a 
+> clear picture.
+> 
+> As the changes triggered by the netlink update should come into action 
+> with the next processed CAN frame I have thought about adding a shadow 
+> 'mod' structure which is written instantly.
+> And then a flag could be set, that is switched by the next incoming CAN 
+> frame.
+> 
+> I just would have a problem with performing some memory allocation for 
+> the 'mod' updates which might take some unpredictable time.
+> 
+> If you have some cool ideas please let me know. I'm unsure what is the 
+> most effective and performant approach for this use case.
+> 
+> Many thanks,
+> Oliver
+> 
 
