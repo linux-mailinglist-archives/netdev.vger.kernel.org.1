@@ -1,167 +1,193 @@
-Return-Path: <netdev+bounces-59823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B9981C211
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:44:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCBF381C227
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 944B72880BA
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:44:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52B41288372
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53527995A;
-	Thu, 21 Dec 2023 23:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240E079491;
+	Thu, 21 Dec 2023 23:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UESf6E2n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a0hZSfwR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0115B79485
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 23:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a2343c31c4bso164660366b.1
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 15:44:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703202276; x=1703807076; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QYgALaqHaxsIKBoPdNM24Kf+9GYUu7tWwLOH1j6ljO4=;
-        b=UESf6E2nuapnO/93cfBZC6naRm3boMYkXVPonh+ZnJUinJ+lDpZwSCVdeq6CLi3DhW
-         IT1l2KyQMY+m+HME1TJeUiSrERaAZFvty05AmQ/QSTF9E62XAzG0y2iukD3u+TSoUZRS
-         GLWvh2TPZBe4pIR1Os5U14sJlpo/2t/QI4YJlXQFQ7gf63HJb6JwwJdOyB92yB81PrI7
-         I5rhWj/6fKhsL9cTj5CBZd5nFSXAhjsbadmxDMHVvzczXnQZisn3E68Nr5tLddpvg0IR
-         z0qWGIjF2Yxkmoi1oyz+8D+nyihH2gz/ANd/ui49xAn6FelycX3wD4RXuZrAi7KnGjeR
-         m0OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703202276; x=1703807076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QYgALaqHaxsIKBoPdNM24Kf+9GYUu7tWwLOH1j6ljO4=;
-        b=VO0nRtGLeOak0BN5P0NzTYNukTo8EygUez0cV56Bbd7U9oFoIF2NBqFiaa+vZoVWXd
-         NDeY8CD//5grCQkAfW2Rg6MALuowJl3ZrNqa6Ic6rhWUBfJ4FytCKHeGakgqw8Xqt89z
-         6Dgyx3X7MqvOkPjMEgdhjp3xuHKX6czkzg6J2CUFc/zUEKOn4IHXzo3yMnU3bujrHL0e
-         /674DZK8Suyd5JajVlkXm6XMnvo7curEzSP5yHZCNPzjppu4KTuhtyClsLqvBsnTLOSh
-         QFrJQWmDks/s/prsKegv+pgDl2fOCXyfH/i0mOv0lJbNgslaEESji8qhDs6pqb8g2SCf
-         D8tw==
-X-Gm-Message-State: AOJu0Yx1vBQgJkghPHekdIb2ee5NB7RoZbp9eZQoZuOIYT3yJMyrsZLe
-	dfBz3ht/5hNASVhmiGIbD9VPCn2jL98kQXeCXFdqBltq2lFV
-X-Google-Smtp-Source: AGHT+IF4YnX0GSegTZt10iFN/e+vBJQA9vJmhfDn27MRVIde4Hmgf0/aWtBQ1RkOZ0Yu0ijPN37izKe8CoGFD+mtOmI=
-X-Received: by 2002:a17:906:81d6:b0:a23:526e:4425 with SMTP id
- e22-20020a17090681d600b00a23526e4425mr215040ejx.66.1703202276017; Thu, 21 Dec
- 2023 15:44:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239497948F
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 23:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703202900; x=1734738900;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=idk4xD1otRU1CeUWDuCrnsskJHabauA2vT+m19g+h6U=;
+  b=a0hZSfwRK8v5JjS4nu9+J7u85U0DxZipTGLDO0S4cQO8DojyQ38ZOj9k
+   eRZh6i6r+4KMOv3fxprSAZj+fytdgt+TR5Rlc6E8dp/CbWsQktntFOHif
+   F3e+U6KWDAl4ajx2HiaIilswcMRpukS3gDA2tKR4ddLK+NMTcAulmEMfv
+   R77QFTLv2pyahOjFGtixkIygTjF3gEAD44h3OzEN84tp7BiydXLizrbjn
+   iVgQBUDWWxj+7PAJFBn3D4lilnHkgXL5+giiun/Rfosj6dwOuWlDNv0W6
+   wqPhfzddC0w3xkLOP7mqo71UWgfVnrnDbJnQlC3s4r4oJGtHoRv8TkV2Q
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="482234106"
+X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
+   d="scan'208";a="482234106"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 15:54:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="753095923"
+X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
+   d="scan'208";a="753095923"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Dec 2023 15:54:55 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 21 Dec 2023 15:54:54 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 21 Dec 2023 15:54:54 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 21 Dec 2023 15:54:54 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 21 Dec 2023 15:54:54 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kXngSthl6B4pK+TmnG5o39H2khCTFz8eAVVFLSULQFeW/FWsgH4AzEOylcqGR85Q0A3IbqMA7ZDyl2z0EX1r1J37fQSSzy7fAqHIDxzEgqBuuUga6eJ8dSqSn8T6K3cjMZHGIJCT7XC0EI1/pLsYgZCmZEZm1wCVda18ncSV8jRb08bcNYDmVrhTwYyXSJ1kbiL2wc7l4FRxOzdkEFaCiTBEBeG9SsBLj+CZUrECeyJZeYfT/9oh76A2bwMhVa4JpEETKhLORCMvnXDZ9o7Ch1yYr8/d9XsNStufuIBWgh1E9h0cobbpmg/R2Uzjb/3TDiX7pFkQ5YVNvWHTM1i8lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=idk4xD1otRU1CeUWDuCrnsskJHabauA2vT+m19g+h6U=;
+ b=Ht1Te1VT0oIV5CmRRqhTUcp2HXzzXtYE6603Lipzb1+9Z7rVYoVzpeiEfEH2rUk6P6d9eFLgtKwp7lkSQvBfOjR4ZQOetRdKoTpoNy1x9flJj/5WhKRHbMkTikQEmJprOY4k68SiivEbLU8iHNvTtxzlGqhq2cmF63lVvfWXnF2elmBNra0OzrnES8ZUQWXyhX+UdqaXLWJ/EaPaXlZt6q8W9E1HdxW+k/PEczdTogWW/irBgrwhKvf8W+OM3fVARLvycVgIixPmT5Ye/K9p4dLuRfV4PP1MkNcyr4ree74CAljFm6oLcEsFc3C49RZivWbtHTI65KASsA1qJuf8Jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
+ by PH7PR11MB8011.namprd11.prod.outlook.com (2603:10b6:510:24a::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.21; Thu, 21 Dec
+ 2023 23:54:47 +0000
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::ea27:681d:ec93:3851]) by PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::ea27:681d:ec93:3851%5]) with mapi id 15.20.7113.019; Thu, 21 Dec 2023
+ 23:54:47 +0000
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+To: "Sokolowski, Jan" <jan.sokolowski@intel.com>, "Kolacinski, Karol"
+	<karol.kolacinski@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Kolacinski, Karol"
+	<karol.kolacinski@intel.com>
+Subject: RE: [PATCH v4 iwl-next 5/6] ice: factor out ice_ptp_rebuild_owner()
+Thread-Topic: [PATCH v4 iwl-next 5/6] ice: factor out ice_ptp_rebuild_owner()
+Thread-Index: AQHaM/UE0YXo0RXBA0CrExLsxullerCzhqCAgADjgcA=
+Date: Thu, 21 Dec 2023 23:54:47 +0000
+Message-ID: <PH0PR11MB50955504B9A5D9F778734F58D695A@PH0PR11MB5095.namprd11.prod.outlook.com>
+References: <20231221100326.1030761-1-karol.kolacinski@intel.com>
+ <20231221100326.1030761-6-karol.kolacinski@intel.com>
+ <PH7PR11MB58194ED84F05726358D2A06B9995A@PH7PR11MB5819.namprd11.prod.outlook.com>
+In-Reply-To: <PH7PR11MB58194ED84F05726358D2A06B9995A@PH7PR11MB5819.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5095:EE_|PH7PR11MB8011:EE_
+x-ms-office365-filtering-correlation-id: 6636bafb-37f0-4502-da34-08dc028036a3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: IXII7Jjm1TANhGbiJf7B1Oavl4gLJbX0RA4A2pDZSypYz0kNiLgK3Ckr55lcbGJbOUyabrO3JmrOHK9hI/WJiWjn0RL0asjDYib6DkbtrHwdy7ENyLMDVkP11wRTv3wlR8+/mTNzf276lHtJCX9YSKpZirWserFusMJM9AVyF/cnwzFGc0NpyWUXhMt5vX20KuB3e15jgBK2N4m57t+BY+CK7gTeivnAbiPLyN1+O3zK5DytjyiDohYT+xRneE+lbiIBXFJ7lDXOgXPlCnLLIvbFDSMY6VN9wZIgiAUIqFzp1lvM8SSLaFRPGYgeDP/07jCr5bqPTyVBqYdG7Z9zNeceQOReO8W0i1/1cStVcKsvxzypLn27K51Qksi08IVkxykvbuEjgSBF2aK0zNHf3nSSp+vMcCreHK2mcdSM2EZ0Xzq2YXl5L68fMMwtEz5TzQlrbHtn02j4mznMgKFbJYRyiU9brhG5EH95kSfKfG8uGaHzwiNyE7aSjzgNXPpsi4koW0c7u6tXmlQnEOpi9B6mI+71AC4JLWwWYK6a2vwmI6WHC6CXiDt4KTZxe3fvAyzJAkV2PH4IMsf9XC8qMJyuE5QYM84n5E1+wqswWr8sFOOs7H1HA3RBG6zeVdol
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(396003)(136003)(366004)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(478600001)(55016003)(4326008)(38100700002)(52536014)(122000001)(5660300002)(54906003)(110136005)(316002)(66476007)(66946007)(76116006)(66556008)(66446008)(8676002)(8936002)(64756008)(26005)(83380400001)(107886003)(7696005)(71200400001)(9686003)(53546011)(6506007)(41300700001)(86362001)(33656002)(2906002)(38070700009)(82960400001)(4744005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?KKCMEcYQUHkNGaB3jSsAMZ/29Z/S+Gb9p+k9Dk+/KGLep32ryZvWgKhEJj5p?=
+ =?us-ascii?Q?3+E+8Decgd8hJoWCxGBEhzK5z9UVCMW5pIbWTJrtqj2x4IY3+y4WG8eYDIHI?=
+ =?us-ascii?Q?exwe5I+eNXP07QvT7v1gCSmr7MtQ+IpDdeCdP1F+axLBeION+ONKnOB54j9R?=
+ =?us-ascii?Q?OAypLVUMxURAYIh9AaQ9gjpLdbOsPrtDXYBJ37SgoFjSSMJbMvFDGLWdiCUC?=
+ =?us-ascii?Q?3sTL2ZGGub+4pYSTYCmOjwvf3gYQNJP+QotDauw5skLbiiSy56kesbJ8yvrZ?=
+ =?us-ascii?Q?9Gn9j4hE+Su4GnXl2vTmXGXVAyNoGA5TuDigROwJFTdcdNshYV8OfSbFgEMc?=
+ =?us-ascii?Q?6h4v6ali46mqxuGo8NkSUSux79FG/FQ76Y6j0/f45SYMoLh/AoBQL20Y/Go/?=
+ =?us-ascii?Q?tKpGSV5wRxfkmHU54g+Ssze4M3i+IMwJzGXaG2dBVtCRdMeb8N/OXAC+dx/4?=
+ =?us-ascii?Q?eqeDy6Or2WzLjzlXB4UGMIN7d1SgAnJc5myLoOzjHbakXS413ZvIFjyZ2tze?=
+ =?us-ascii?Q?6n2qGLSrwdIWDYImTXVXLBLz3LhOHNWPqv5SJ7kK3Mec8OHezGfyDhk0qF5V?=
+ =?us-ascii?Q?yLx478fTEV6Xmd6zbCaX/CeyEjgn7tZHR2hsYDfi5jRcERzKZ3N+80+Hxjw2?=
+ =?us-ascii?Q?sOUb3N08Dkw/+6BHtReFjT0a+4N4UAP7H6h04r0KspXRZJbkBpP+rj4xOvS5?=
+ =?us-ascii?Q?MQA83+d8VBlIm2Uebhdd/0gzYO21EOJTuQE7IAjnYWhkJnqkQGlJvH4xvqy4?=
+ =?us-ascii?Q?4lOUiG03HDEc8//d3BC8AxY70+ZeBTiqpoOafFi3/QCmXWk5DvAG2oZmyMcZ?=
+ =?us-ascii?Q?Na/2tkgi+DP1Q3A7sslISCvBBQrdH4bx6eeyd/WP0C7ISeuljPOHDNonLSmR?=
+ =?us-ascii?Q?7IFq6srgXQkMGgCXrksxkRXHHcXtOjApZ57wwRaWR2UhuD/8BTF9w5M5mSYJ?=
+ =?us-ascii?Q?eSPT1MTzarZhU/iixCgeWLYdyA4Rhdqb5ueg3B8MenM8SD0XSbCIrzBsiJ4p?=
+ =?us-ascii?Q?HDw1S5upsKtXfSIgO/orez5nyNOWWiLdeNzJy6pzir0U+A9bhLOSfN/E33wp?=
+ =?us-ascii?Q?DH1bq6qaHHp2JuaP/r6ZRt6RUq0hEE0vsf+nkUTpkpuAEm9JIR5gQ9D+RjsX?=
+ =?us-ascii?Q?WF1RCl+KsZBQk/Fk6bnk+42B2XV1PzOL3fvyZYzNDJEABsvOQo/KJWmlIHNr?=
+ =?us-ascii?Q?4Y6nEspmBn8fs54yzVQGV6muhLUYQBkZ9t7361f3ksTSDvN7OtZ2PX+Bo4fW?=
+ =?us-ascii?Q?ucJ3xEyjvYmS3WZAAoYyd01RgFEvn5J4N1xIVhk5XHGihCL4lEI/uiyhjror?=
+ =?us-ascii?Q?Mp0Oq7dHK+SmMHMQxC3A49XPutykVJfkeLCyzcxlzCTV8ECHXnuwtaUZ7Byk?=
+ =?us-ascii?Q?7lNgiTF3yltNbPEN0RcJlzMz5l43NE+KGNf/8QJFwhETtX2zYbQCMCfn7sLT?=
+ =?us-ascii?Q?YYgHEsLMNL3hXZQ4jTIrQLwLSwblA9fPRT9bkKp8f32d7yLTX8WgW5RqbN7H?=
+ =?us-ascii?Q?HrlYKZJpMfsZWXh+sWcjoOooPz7ZKq9z5IYPqFGSbt2u3NOLmtt3iRAKmJFg?=
+ =?us-ascii?Q?I1JATvI+cdY5avGnGmwoDE5GWPHwuG0cCx4qj20C?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231220214505.2303297-1-almasrymina@google.com>
- <20231220214505.2303297-3-almasrymina@google.com> <20231221232343.qogdsoavt7z45dfc@google.com>
-In-Reply-To: <20231221232343.qogdsoavt7z45dfc@google.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 21 Dec 2023 15:44:22 -0800
-Message-ID: <CAHS8izOp_m9SyPjNth-iYBXH2qQQpc9PuZaHbpUL=H0W=CVHgQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/3] net: introduce abstraction for network memory
-To: Shakeel Butt <shakeelb@google.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6636bafb-37f0-4502-da34-08dc028036a3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Dec 2023 23:54:47.4946
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /wwWQLAOCnamhODyasIc3lQAC+A1I8LoPvLBY7YL6qJdRmEBAGmQ454y5wIHTs3CX1tGXfSTJYNzWnjigZ1DspzZ3vGsvq3GmQbhhbDJ6aQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8011
+X-OriginatorOrg: intel.com
 
-On Thu, Dec 21, 2023 at 3:23=E2=80=AFPM Shakeel Butt <shakeelb@google.com> =
-wrote:
+
+
+> -----Original Message-----
+> From: Sokolowski, Jan <jan.sokolowski@intel.com>
+> Sent: Thursday, December 21, 2023 2:20 AM
+> To: Kolacinski, Karol <karol.kolacinski@intel.com>; intel-wired-lan@lists=
+.osuosl.org
+> Cc: netdev@vger.kernel.org; Nguyen, Anthony L <anthony.l.nguyen@intel.com=
+>;
+> Brandeburg, Jesse <jesse.brandeburg@intel.com>; Keller, Jacob E
+> <jacob.e.keller@intel.com>; Kolacinski, Karol <karol.kolacinski@intel.com=
 >
-> On Wed, Dec 20, 2023 at 01:45:01PM -0800, Mina Almasry wrote:
-> > Add the netmem_ref type, an abstraction for network memory.
+> Subject: RE: [PATCH v4 iwl-next 5/6] ice: factor out ice_ptp_rebuild_owne=
+r()
+>=20
+> >From: Jacob Keller <jacob.e.keller@intel.com>
 > >
-> > To add support for new memory types to the net stack, we must first
-> > abstract the current memory type. Currently parts of the net stack
-> > use struct page directly:
-> >
-> > - page_pool
-> > - drivers
-> > - skb_frag_t
-> >
-> > Originally the plan was to reuse struct page* for the new memory types,
-> > and to set the LSB on the page* to indicate it's not really a page.
-> > However, for compiler type checking we need to introduce a new type.
-> >
-> > netmem_ref is introduced to abstract the underlying memory type. Curren=
-tly
-> > it's a no-op abstraction that is always a struct page underneath. In
-> > parallel there is an undergoing effort to add support for devmem to the
-> > net stack:
-> >
-> > https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@goo=
-gle.com/
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >
-> > v3:
-> >
-> > - Modify struct netmem from a union of struct page + new types to an op=
-aque
-> >   netmem_ref type.  I went with:
-> >
-> >   +typedef void *__bitwise netmem_ref;
-> >
-> >   rather than this that Jakub recommended:
-> >
-> >   +typedef unsigned long __bitwise netmem_ref;
-> >
-> >   Because with the latter the compiler issues warnings to cast NULL to
-> >   netmem_ref. I hope that's ok.
-> >
->
-> Can you share what the warning was? You might just need __force
-> attribute. However you might need this __force a lot. I wonder if you
-> can just follow struct encoded_page example verbatim here.
->
+> >The ice_ptp_reset() function uses a goto to skip past clock owner
+> >operations if performing a PF reset or if the device is not the clock
+> >owner. This is a bit confusing. Factor this out into
+> >ice_ptp_rebuild_owner() instead.
+>=20
+> To me at least, the wording of the title (Factor out) is kinda
+> confusing when compared to the message itself, as if you were going
+> to remove the ice_ptp_rebuild_owner anyway.
+>=20
+> Other than that, LGTM.
+>=20
 
-The warning is like so:
-
-./include/net/page_pool/helpers.h: In function =E2=80=98page_pool_alloc=E2=
-=80=99:
-./include/linux/stddef.h:8:14: warning: returning =E2=80=98void *=E2=80=99 =
-from a
-function with return type =E2=80=98netmem_ref=E2=80=99 {aka =E2=80=98long u=
-nsigned int=E2=80=99} makes
-integer from pointer without a cast [-Wint-conversion]
-    8 | #define NULL ((void *)0)
-      |              ^
-./include/net/page_pool/helpers.h:132:24: note: in expansion of macro
-=E2=80=98NULL=E2=80=99
-  132 |                 return NULL;
-      |                        ^~~~
-
-And happens in all the code where:
-
-netmem_ref func()
-{
-    return NULL;
-}
-
-It's fixable by changing the return to `return (netmem_ref NULL);` or
-`return 0;`, but I feel like netmem_ref should be some type which
-allows a cast from NULL implicitly.
-
-Also as you (and patchwork) noticed, __bitwise should not be used with
-void*; it's only meant for integer types. Sorry I missed that in the
-docs and was not running make C=3D2.
-
---=20
-Thanks,
-Mina
+Ya, the idea is to split the functionality into a separate function.
 
