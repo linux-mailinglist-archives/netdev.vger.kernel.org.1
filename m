@@ -1,185 +1,244 @@
-Return-Path: <netdev+bounces-59417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DBE181ACA5
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:33:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D0E81ACA8
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:34:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5481F286606
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:33:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B5641F241EE
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA8D19D;
-	Thu, 21 Dec 2023 02:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D79D19D;
+	Thu, 21 Dec 2023 02:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrP1WMZw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fDP5HKyR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C1B1843
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 02:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703126006;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5a0totasfvFwZIblW4qXBdcjfAygTJ0zVbYLxO+qMnc=;
-	b=UrP1WMZw+vzUczvfbxeJ4hGJJQic/0ZoootdzbBIW+2zb6fk0DEtru9U4Cy17aNTFiofQ7
-	LXHwjqAo33fR8LtjjRlmq2eoY/TekAl2SQEGTPUHvbVLR4thotVtpA7BxJMmKeCdvdQJcL
-	lxDfnT9edXJgLakVuc2CbcbaaxU2XCw=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-646-FdMoIEgHMQqtMEOU67lcmw-1; Wed, 20 Dec 2023 21:33:24 -0500
-X-MC-Unique: FdMoIEgHMQqtMEOU67lcmw-1
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6d0908565f8so394885b3a.1
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 18:33:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDF38BED
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 02:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50e23a4df33so425116e87.2
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 18:34:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703126047; x=1703730847; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=53JhHH2dwPvdH3Iluo2Dzh27wvgV06NmTEZZFQKP9RI=;
+        b=fDP5HKyRayZ8weqZNU2oYozXYXq1ompA+t2MwKJ1B5GDsvyK950H3po0Qc5r4hu6CX
+         RpOhzSEr5qRzfNPEMOz759WE91TpR9Yu1t7y5a1VzrwpdRtL8pNvZJ++eFmT4aR0eLCO
+         W0A5HNb03WG+8QqX7r0KzFEhCX9yqnnnsZNe8Lp8k1hIFzCVMl8OcZArnlosbUqxHVsM
+         71mtuoOL1T+JBrlf1pXdeW2yKzm53tM2iznZLjQtMeX840rql1rsd8rmoXU0tfEazcBy
+         /tCDLMSTDfxUoSegmJlMRwR/vMcvPYglglsmwA1g2usWtF3+HCQrY+nQ4ir5lJeIId7h
+         p6Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703126003; x=1703730803;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5a0totasfvFwZIblW4qXBdcjfAygTJ0zVbYLxO+qMnc=;
-        b=PX+rB9ljxZTxp09KvDijnYKDZWTcPR4AcW35+142OfTDEdh9A0Lf+yu3hzivU8BplQ
-         XYDxY284bAaxfDAT+s5WB1K4poHTwWYqHZhP7EY2+dBL4PKUzQNrFdJc1uDQ86aPTfL+
-         xuGJp2Jq25/4igXbw7nPRc9dQrQym32whsl9DJ1RC7EnwHbVObfjpNkAwmN/CUZjZUIe
-         ZOe9+TI1S3kCaByiamtWxROJrReQD4XonSmcBtMu6UfNAv0cqRSQvMdoY08gl9JPk6ID
-         OlBuzPg/0tkGaUIUF9SCd+UDzdme8vyQuafibuI+hwgnCkm5hrLlmFr6eC76QZAZZJQu
-         r64g==
-X-Gm-Message-State: AOJu0YyuFC5XSk4Sh4pjqiKJqUGOWkomVCMW6JbhDtgrmG+KUe0cndgZ
-	pyvaErK5z7AGyK/Rd26Ba+8vw3h01QSxtRaFDEP1kheMW4EqjGWOjXVm0cgKIe1FgpEjA4WY3FI
-	ze35CxIkiGq1gieaxZA4FnbloW+8RU/My
-X-Received: by 2002:a05:6a00:428a:b0:6d9:471d:faee with SMTP id bx10-20020a056a00428a00b006d9471dfaeemr2568764pfb.55.1703126003606;
-        Wed, 20 Dec 2023 18:33:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFvNTtsHVi+NyeUO0tGmuPBmvsTAynsN/eV3C4oEjj91VnICK+2rcyqXiyLi2OseyD5girnnKsziyM5XzUlxx0=
-X-Received: by 2002:a05:6a00:428a:b0:6d9:471d:faee with SMTP id
- bx10-20020a056a00428a00b006d9471dfaeemr2568755pfb.55.1703126003294; Wed, 20
- Dec 2023 18:33:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703126047; x=1703730847;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=53JhHH2dwPvdH3Iluo2Dzh27wvgV06NmTEZZFQKP9RI=;
+        b=mwNLaRtcR3Og7KOwMo4pVbgoh5rz+xy0S/uicZrshJwEJaRNZXL9L6q9humYPP/7/r
+         MzoRt7RIT3RjZjQlXAYnq4kP7p2yT6ULCGfHLBuvh91XC2XpfjXIoquPh5Xlto71SVA6
+         kpPl6zBIVPK2EN2jctITdzxW3GY+urdF5BHfmP4LrldJYIST8NifSekP24c4wLKE9gsP
+         tzuJgl80dAUX+J6PhxL/RhR8/hrY7ScYaX8GMxQ/U13dDyza6SR8DJjhFduzNl2A1XF7
+         x7Y80QGpzhDyagAD+eAe/xXQw5NnKOqzkCZRgS+K8djrK3pTT9Miw6fqYfAGYZnHvbVF
+         yjog==
+X-Gm-Message-State: AOJu0YwM7lbyiMHhZr54LUsRgYbWjt9MrUx492aPc4tSrM4Yrkei7hXY
+	gMzsUvkBJyy/jGNn+MqTCt0=
+X-Google-Smtp-Source: AGHT+IETNuNEMM5lqI9Za/svdvZsoLFU5rD+ObEeyxw1yigqMb/A0LJKvXKvd9NzxJbGJW5BOVruCQ==
+X-Received: by 2002:a05:6512:3ba2:b0:50e:335f:6f50 with SMTP id g34-20020a0565123ba200b0050e335f6f50mr4512402lfv.124.1703126047261;
+        Wed, 20 Dec 2023 18:34:07 -0800 (PST)
+Received: from mobilestation ([95.79.203.166])
+        by smtp.gmail.com with ESMTPSA id k18-20020ac24572000000b0050e36a32b15sm130379lfm.239.2023.12.20.18.34.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Dec 2023 18:34:06 -0800 (PST)
+Date: Thu, 21 Dec 2023 05:34:04 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v7 7/9] net: stmmac: dwmac-loongson: Add GNET
+ support
+Message-ID: <pbju43fy4upk32xcgrerkafnwjvs55p5x4kdaavhia4z7wjoqm@mk55pgs7eczz>
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <caf9e822c2f628f09e02760cfa81a1bd4af0b8d6.1702990507.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205113444.63015-1-linyunsheng@huawei.com>
- <20231205113444.63015-7-linyunsheng@huawei.com> <CACGkMEvVezZnHK-gRWY+MUd_6awnprb024scqPNmMQ05P8rWTQ@mail.gmail.com>
- <424670ab-23d8-663b-10cb-d88906767956@huawei.com> <CACGkMEsMdP1B-9RaqibJYfFsd_qJpB+Kta5BnyD_WXH=W2w_OQ@mail.gmail.com>
- <c5b5d36c-d0ca-c943-5355-343214d92c26@huawei.com>
-In-Reply-To: <c5b5d36c-d0ca-c943-5355-343214d92c26@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 21 Dec 2023 10:33:11 +0800
-Message-ID: <CACGkMEs8HWq_NFNk=Pp3qxuo7AWBsybXT78LPgC-nKaP_u3LqA@mail.gmail.com>
-Subject: Re: [PATCH net-next 6/6] tools: virtio: introduce vhost_net_test
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <caf9e822c2f628f09e02760cfa81a1bd4af0b8d6.1702990507.git.siyanteng@loongson.cn>
 
-On Wed, Dec 20, 2023 at 8:45=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2023/12/12 12:35, Jason Wang wrote:>>>> +done:
-> >>>> +       backend.fd =3D tun_alloc();
-> >>>> +       assert(backend.fd >=3D 0);
-> >>>> +       vdev_info_init(&dev, features);
-> >>>> +       vq_info_add(&dev, 256);
-> >>>> +       run_test(&dev, &dev.vqs[0], delayed, batch, reset, nbufs);
-> >>>
-> >>> I'd expect we are testing some basic traffic here. E.g can we use a
-> >>> packet socket then we can test both tx and rx?
-> >>
-> >> Yes, only rx for tun is tested.
-> >> Do you have an idea how to test the tx too? As I am not familar enough
-> >> with vhost_net and tun yet.
-> >
-> > Maybe you can have a packet socket to bind to the tun/tap. Then you can=
- test:
-> >
-> > 1) TAP RX: by write a packet via virtqueue through vhost_net and read
-> > it from packet socket
-> > 2) TAP TX:  by write via packet socket and read it from the virtqueue
-> > through vhost_net
->
-> When implementing the TAP TX by adding VHOST_NET_F_VIRTIO_NET_HDR,
-> I found one possible use of uninitialized data in vhost_net_build_xdp().
->
-> And vhost_hlen is set to sizeof(struct virtio_net_hdr_mrg_rxbuf) and
-> sock_hlen is set to zero in vhost_net_set_features() for both tx and rx
-> queue.
->
-> For vhost_net_build_xdp() called by handle_tx_copy():
->
-> The (gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) checking below may cause a
-> read of uninitialized data if sock_hlen is zero.
+On Tue, Dec 19, 2023 at 10:26:47PM +0800, Yanteng Si wrote:
+> Add Loongson GNET (GMAC with PHY) support. Current GNET does not support
+> half duplex mode, and GNET on LS7A only supports ANE when speed is set to
+> 1000M.
+> 
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 79 +++++++++++++++++++
+>  .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  6 ++
+>  include/linux/stmmac.h                        |  2 +
+>  3 files changed, 87 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 2c08d5495214..9e4953c7e4e0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -168,6 +168,83 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
+>  	.config = loongson_gmac_config,
+>  };
+>  
+> +static void loongson_gnet_fix_speed(void *priv, unsigned int speed, unsigned int mode)
+> +{
+> +	struct net_device *ndev = dev_get_drvdata(priv);
+> +	struct stmmac_priv *ptr = netdev_priv(ndev);
+> +
+> +	/* The controller and PHY don't work well together.
+> +	 * We need to use the PS bit to check if the controller's status
+> +	 * is correct and reset PHY if necessary.
+> +	 */
 
-Which data is uninitialized here?
+> +	if (speed == SPEED_1000)
+> +		if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS */)
+> +			phy_restart_aneg(ndev->phydev);
 
->
-> And it seems vhost_hdr is skipped in get_tx_bufs():
-> https://elixir.bootlin.com/linux/latest/source/drivers/vhost/net.c#L616
->
-> static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
->                                struct iov_iter *from)
-> {
-> ...
->         buflen +=3D SKB_DATA_ALIGN(len + pad);
->         alloc_frag->offset =3D ALIGN((u64)alloc_frag->offset, SMP_CACHE_B=
-YTES);
->         if (unlikely(!vhost_net_page_frag_refill(net, buflen,
->                                                  alloc_frag, GFP_KERNEL))=
-)
->                 return -ENOMEM;
->
->         buf =3D (char *)page_address(alloc_frag->page) + alloc_frag->offs=
-et;
->         copied =3D copy_page_from_iter(alloc_frag->page,
->                                      alloc_frag->offset +
->                                      offsetof(struct tun_xdp_hdr, gso),
->                                      sock_hlen, from);
->         if (copied !=3D sock_hlen)
->                 return -EFAULT;
->
->         hdr =3D buf;
->         gso =3D &hdr->gso;
->
->         if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
->             vhost16_to_cpu(vq, gso->csum_start) +
->             vhost16_to_cpu(vq, gso->csum_offset) + 2 >
->             vhost16_to_cpu(vq, gso->hdr_len)) {
-> ...
-> }
->
-> I seems the handle_tx_copy() does not handle the VHOST_NET_F_VIRTIO_NET_H=
-DR
-> case correctly, Or do I miss something obvious here?
+{} around the outer if please.
 
-In get_tx_bufs() we did:
+> +}
+> +
+> +static int loongson_gnet_data(struct pci_dev *pdev,
+> +			      struct plat_stmmacenet_data *plat)
+> +{
+> +	loongson_default_data(pdev, plat);
+> +
+> +	plat->multicast_filter_bins = 256;
+> +
 
-        *len =3D init_iov_iter(vq, &msg->msg_iter, nvq->vhost_hlen, *out);
+> +	plat->mdio_bus_data->phy_mask = 0xfffffffb;
 
-Which covers this case?
+~BIT(2)?
 
-Thanks
+> +
+> +	plat->phy_addr = 2;
+> +	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
+> +
+> +	plat->bsp_priv = &pdev->dev;
+> +	plat->fix_mac_speed = loongson_gnet_fix_speed;
+> +
+> +	plat->dma_cfg->pbl = 32;
+> +	plat->dma_cfg->pblx8 = true;
+> +
+> +	plat->clk_ref_rate = 125000000;
+> +	plat->clk_ptp_rate = 125000000;
+> +
+> +	return 0;
+> +}
+> +
+> +static int loongson_gnet_config(struct pci_dev *pdev,
+> +				struct plat_stmmacenet_data *plat,
+> +				struct stmmac_resources *res,
+> +				struct device_node *np)
+> +{
+> +	int ret;
+> +	u32 version = readl(res->addr + GMAC_VERSION);
+> +
+> +	switch (version & 0xff) {
 
->
-> >
-> > Thanks
-> >
-> >>
-> >>>
-> >>> Thanks
-> >>
-> >
-> > .
-> >
->
+> +	case DWLGMAC_CORE_1_00:
+> +		ret = loongson_dwmac_config_multi_msi(pdev, plat, res, np, 8);
+> +		break;
+> +	default:
+> +		ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
 
+Hm, do you have two versions of Loongson GNET? What does the second
+one contain in the GMAC_VERSION register then? Can't you distinguish
+them by the PCI IDs (device, subsystem, revision)?
+
+-Serge(y)
+
+> +		break;
+> +	}
+> +
+> +	switch (pdev->revision) {
+> +	case 0x00:
+> +		plat->flags |=
+> +			FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1) |
+> +			FIELD_PREP(STMMAC_FLAG_DISABLE_FORCE_1000, 1);
+> +		break;
+> +	case 0x01:
+> +		plat->flags |=
+> +			FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static struct stmmac_pci_info loongson_gnet_pci_info = {
+> +	.setup = loongson_gnet_data,
+> +	.config = loongson_gnet_config,
+> +};
+> +
+>  static int loongson_dwmac_probe(struct pci_dev *pdev,
+>  				const struct pci_device_id *id)
+>  {
+> @@ -318,9 +395,11 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+>  			 loongson_dwmac_resume);
+>  
+>  #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+> +#define PCI_DEVICE_ID_LOONGSON_GNET	0x7a13
+>  
+>  static const struct pci_device_id loongson_dwmac_id_table[] = {
+>  	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> +	{ PCI_DEVICE_DATA(LOONGSON, GNET, &loongson_gnet_pci_info) },
+>  	{}
+>  };
+>  MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> index 8105ce47c6ad..d6939eb9a0d8 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> @@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
+>  		return 0;
+>  	}
+>  
+> +	if (FIELD_GET(STMMAC_FLAG_DISABLE_FORCE_1000, priv->plat->flags)) {
+> +		if (cmd->base.speed == SPEED_1000 &&
+> +		    cmd->base.autoneg != AUTONEG_ENABLE)
+> +			return -EOPNOTSUPP;
+> +	}
+> +
+>  	return phylink_ethtool_ksettings_set(priv->phylink, cmd);
+>  }
+>  
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index f07f79d50b06..067030cdb60f 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -222,6 +222,8 @@ struct dwmac4_addrs {
+>  #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
+>  #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
+>  #define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+> +#define STMMAC_FLAG_DISABLE_HALF_DUPLEX	BIT(14)
+> +#define STMMAC_FLAG_DISABLE_FORCE_1000	BIT(15)
+>  
+>  struct plat_stmmacenet_data {
+>  	int bus_id;
+> -- 
+> 2.31.4
+> 
 
