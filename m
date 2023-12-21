@@ -1,208 +1,101 @@
-Return-Path: <netdev+bounces-59456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2846581AE51
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 06:20:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 136E681AE57
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 06:26:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8321B1F24455
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 05:20:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDF161F241BE
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 05:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3DEF8F77;
-	Thu, 21 Dec 2023 05:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EFD9463;
+	Thu, 21 Dec 2023 05:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="iraqdgt1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECBA945A
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 05:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R561e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0VywPxAu_1703136042;
-Received: from 30.221.144.254(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VywPxAu_1703136042)
-          by smtp.aliyun-inc.com;
-          Thu, 21 Dec 2023 13:20:43 +0800
-Message-ID: <46097ac2-c498-4b9f-898f-27ef097b9c85@linux.alibaba.com>
-Date: Thu, 21 Dec 2023 13:20:40 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737AB678;
+	Thu, 21 Dec 2023 05:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from localhost.localdomain (1.general.khfeng.us.vpn [10.172.68.174])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id E3D2B421F1;
+	Thu, 21 Dec 2023 05:26:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1703136366;
+	bh=k5+SIK5H7uUjKHZKy6p8fuly9LFUOLMpMXnhcGKCNrY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=iraqdgt1oQXN4WRngqJ8sdZmx4mFyCAOr+A6ZIMHEwa90P9+q8aMmYZZdzq32L43l
+	 n64lAHvrgh2t4jmeATTaMFEz0xiPS0JKcqmV4sof/CRC+LTN+Bm0yH9UWfQfhFcnd/
+	 mKNOSbXbq4khCA2F4+QoWyUYmgikKu2u0/Q9/SK9iBkQz/pwjLh0/FvgDW04LzNUY1
+	 s0D4ydC61KGkrQBPqOYn9uh1DPwZXZMghva0btNNv0J4aO2LUfeUlTGPCgfqqom7kD
+	 ujttD5tA2SIwB8UxvA/vxKyr6G2Et9c16hblYyNV0/o+p5tCZTktApHTtIXj9C+lw3
+	 o/RLJsSXGl0Og==
+From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+To: hkallweit1@gmail.com,
+	nic_swsd@realtek.com
+Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] r8169: Fix PCI error on system resume
+Date: Thu, 21 Dec 2023 13:25:10 +0800
+Message-Id: <20231221052510.443674-1-kai.heng.feng@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] virtio-net: switch napi_tx without downing nic
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- netdev@vger.kernel.org, virtualization@lists.linux-foundation.org
-References: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
- <d26c6d0b-92a1-4baa-bceb-dc267b5b60e6@linux.dev>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <d26c6d0b-92a1-4baa-bceb-dc267b5b60e6@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Some r8168 NICs stop working upon system resume:
 
+[  688.051096] r8169 0000:02:00.1 enp2s0f1: rtl_ep_ocp_read_cond == 0 (loop: 10, delay: 10000).
+[  688.175131] r8169 0000:02:00.1 enp2s0f1: Link is Down
+...
+[  691.534611] r8169 0000:02:00.1 enp2s0f1: PCI error (cmd = 0x0407, status_errs = 0x0000)
 
-在 2023/12/21 上午11:02, Zhu Yanjun 写道:
-> 在 2023/12/20 16:07, Heng Qi 写道:
->> virtio-net has two ways to switch napi_tx: one is through the
->> module parameter, and the other is through coalescing parameter
->> settings (provided that the nic status is down).
->>
->> Sometimes we face performance regression caused by napi_tx,
->> then we need to switch napi_tx when debugging. However, the
->> existing methods are a bit troublesome, such as needing to
->> reload the driver or turn off the network card. So try to make
->> this update.
->
-> What scenario can trigger this? We want to make tests on our device.
+Not sure if it's related, but those NICs have a BMC device at function
+0:
+02:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. Realtek RealManage BMC [10ec:816e] (rev 1a)
 
-Hi Zhu Yanjun, you can use the following cmds:
+Since increase the loop wait on rtl_ep_ocp_read_cond can eliminate the
+issue, so let rtl8168ep_driver_start() to wait a bit longer.
 
-ethtool -C tx-frames 0, to disable napi_tx
-ethtool -C tx-frames 1, to enable napi_tx
+Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+---
+v2:
+ - Wording
 
-Thanks.
+ drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->
-> Zhu Yanjun
->
->>
->> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
->> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
->> ---
->>   drivers/net/virtio_net.c | 81 ++++++++++++++++++----------------------
->>   1 file changed, 37 insertions(+), 44 deletions(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index 10614e9f7cad..12f8e1f9971c 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -3559,16 +3559,37 @@ static int 
->> virtnet_coal_params_supported(struct ethtool_coalesce *ec)
->>       return 0;
->>   }
->>   -static int virtnet_should_update_vq_weight(int dev_flags, int weight,
->> -                       int vq_weight, bool *should_update)
->> +static void virtnet_switch_napi_tx(struct virtnet_info *vi, u32 qstart,
->> +                   u32 qend, u32 tx_frames)
->>   {
->> -    if (weight ^ vq_weight) {
->> -        if (dev_flags & IFF_UP)
->> -            return -EBUSY;
->> -        *should_update = true;
->> -    }
->> +    struct net_device *dev = vi->dev;
->> +    int new_weight, cur_weight;
->> +    struct netdev_queue *txq;
->> +    struct send_queue *sq;
->>   -    return 0;
->> +    new_weight = tx_frames ? NAPI_POLL_WEIGHT : 0;
->> +    for (; qstart < qend; qstart++) {
->> +        sq = &vi->sq[qstart];
->> +        cur_weight = sq->napi.weight;
->> +        if (!(new_weight ^ cur_weight))
->> +            continue;
->> +
->> +        if (!(dev->flags & IFF_UP)) {
->> +            sq->napi.weight = new_weight;
->> +            continue;
->> +        }
->> +
->> +        if (cur_weight)
->> +            virtnet_napi_tx_disable(&sq->napi);
->> +
->> +        txq = netdev_get_tx_queue(dev, qstart);
->> +        __netif_tx_lock_bh(txq);
->> +        sq->napi.weight = new_weight;
->> +        __netif_tx_unlock_bh(txq);
->> +
->> +        if (!cur_weight)
->> +            virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
->> +    }
->>   }
->>     static int virtnet_set_coalesce(struct net_device *dev,
->> @@ -3577,25 +3598,11 @@ static int virtnet_set_coalesce(struct 
->> net_device *dev,
->>                   struct netlink_ext_ack *extack)
->>   {
->>       struct virtnet_info *vi = netdev_priv(dev);
->> -    int ret, queue_number, napi_weight;
->> -    bool update_napi = false;
->> -
->> -    /* Can't change NAPI weight if the link is up */
->> -    napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
->> -    for (queue_number = 0; queue_number < vi->max_queue_pairs; 
->> queue_number++) {
->> -        ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
->> - vi->sq[queue_number].napi.weight,
->> -                              &update_napi);
->> -        if (ret)
->> -            return ret;
->> -
->> -        if (update_napi) {
->> -            /* All queues that belong to [queue_number, 
->> vi->max_queue_pairs] will be
->> -             * updated for the sake of simplicity, which might not 
->> be necessary
->> -             */
->> -            break;
->> -        }
->> -    }
->> +    int ret;
->> +
->> +    /* Param tx_frames can be used to switch napi_tx */
->> +    virtnet_switch_napi_tx(vi, 0, vi->max_queue_pairs,
->> +                   ec->tx_max_coalesced_frames);
->>         if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
->>           ret = virtnet_send_notf_coal_cmds(vi, ec);
->> @@ -3605,11 +3612,6 @@ static int virtnet_set_coalesce(struct 
->> net_device *dev,
->>       if (ret)
->>           return ret;
->>   -    if (update_napi) {
->> -        for (; queue_number < vi->max_queue_pairs; queue_number++)
->> -            vi->sq[queue_number].napi.weight = napi_weight;
->> -    }
->> -
->>       return ret;
->>   }
->>   @@ -3641,19 +3643,13 @@ static int 
->> virtnet_set_per_queue_coalesce(struct net_device *dev,
->>                         struct ethtool_coalesce *ec)
->>   {
->>       struct virtnet_info *vi = netdev_priv(dev);
->> -    int ret, napi_weight;
->> -    bool update_napi = false;
->> +    int ret;
->>         if (queue >= vi->max_queue_pairs)
->>           return -EINVAL;
->>   -    /* Can't change NAPI weight if the link is up */
->> -    napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
->> -    ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
->> -                          vi->sq[queue].napi.weight,
->> -                          &update_napi);
->> -    if (ret)
->> -        return ret;
->> +    /* Param tx_frames can be used to switch napi_tx */
->> +    virtnet_switch_napi_tx(vi, queue, queue, 
->> ec->tx_max_coalesced_frames);
->>         if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
->>           ret = virtnet_send_notf_coal_vq_cmds(vi, ec, queue);
->> @@ -3663,9 +3659,6 @@ static int 
->> virtnet_set_per_queue_coalesce(struct net_device *dev,
->>       if (ret)
->>           return ret;
->>   -    if (update_napi)
->> -        vi->sq[queue].napi.weight = napi_weight;
->> -
->>       return 0;
->>   }
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index bb787a52bc75..81fd31f6fac4 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -1211,7 +1211,7 @@ static void rtl8168ep_driver_start(struct rtl8169_private *tp)
+ {
+ 	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_START);
+ 	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
+-	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 10);
++	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
+ }
+ 
+ static void rtl8168_driver_start(struct rtl8169_private *tp)
+-- 
+2.34.1
 
 
