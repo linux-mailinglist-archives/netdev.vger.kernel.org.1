@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-59800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C3C81C0C1
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:04:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1722E81C0C3
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:04:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FBC8B22BD6
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:04:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 836411F23E99
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D53E177F18;
-	Thu, 21 Dec 2023 22:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3535F7996B;
+	Thu, 21 Dec 2023 22:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VNrssb7G"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="brBMn4+h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E4378E96
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606247946F
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-67ad5b37147so6485716d6.2
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:03:14 -0800 (PST)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7812275feccso51904685a.3
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:03:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1703196194; x=1703800994; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1703196195; x=1703800995; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=N73Ek6amI3EtrryGZaxWELka+hK+ecQp1+9/j6U1oaM=;
-        b=VNrssb7GedoW74r4/eA8/BOU5V1oPCtp4Xbr1H4S9etRSro9M8Pq3OCVFYezO9I3IE
-         oY9sdezfiCaVECu/NEwfTS5Zq9NvElcjOiJYhJLo4d2XUXsFyeRdnaJPifbazRP5rlft
-         132TxDJEBIYHSiYTf5MHGNKzaEdfqy4S0v3vo=
+        bh=dl1nCMP/IENAjGJAG4PO16xVzVSysXH7bwmdxo7nOag=;
+        b=brBMn4+hKlFv+nIctJ+gJxUb4ZrAHdkzeYwVn7IhS4aaI+O+uFSvztRZEO2CDb2FIM
+         a2UDbifgeYGIdhrHUD4pNaUxl/qgsBkLtmx4qxXs5gnateExNIdudhK0EROv5XjI1NT4
+         SxUQ3ZZa7//Th8MKgDT2rnlhdDJPS5aEPGuiY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703196194; x=1703800994;
+        d=1e100.net; s=20230601; t=1703196195; x=1703800995;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N73Ek6amI3EtrryGZaxWELka+hK+ecQp1+9/j6U1oaM=;
-        b=Sa88Vr9O2komOIrBWfFyadeVfXUbfVpoT6rhRc4pXXAxuaL9CyEruDCRq+OFNoqkTU
-         bDnwXmPDLlfCTt9iAD7hUT6Z9t1YZSX3OqDH8xyQdfVZY+xWT9xi2PzqU9rNhsCg/+la
-         bKu1dUIr4v1i/yV3qT2ahfwCe4aY7zwLzVk9j2+5I85mVBS8YQ0Ys2j5ya2wFj940/JE
-         CK0zMuQ63q9Ef0jtuknzoVbjMD/VTVf0wzCA+CrJwbv6dAb1nTS58MTZYHQnY7WnovAu
-         J9c15k9ljM4Zmhl3EygFI0T0ZNyZujeJnO7yeXtqEocpdqubChd4SRwlQEoF6RB6bd5z
-         vWlg==
-X-Gm-Message-State: AOJu0YxTKZHb8aUfPkawh29nvnITXLBBz/hQDrfsUaNNn9fma0d5rPZH
-	4ZtAf53KQOcJs4rQBKbNlQQ45Q6g3/3C
-X-Google-Smtp-Source: AGHT+IEPyEdVo9LGQTTAUqgGjUxxx6mGYYzXK/0VihzStM19kcEBdSiec8xf7esFxz9knLoR6hE3Sg==
-X-Received: by 2002:a05:6214:c4b:b0:67f:3074:97ec with SMTP id r11-20020a0562140c4b00b0067f307497ecmr329487qvj.108.1703196193664;
-        Thu, 21 Dec 2023 14:03:13 -0800 (PST)
+        bh=dl1nCMP/IENAjGJAG4PO16xVzVSysXH7bwmdxo7nOag=;
+        b=RGz8J931PGilepCyyy1EB2EuODlgl2EBk5oVc59m39xJckW+3E98pgCdQzqJzbSlt/
+         pT6B7/g/uiMhbSsUDZVKeEHbkCzzU+rgUKHWZwI3svQ+27O7AA2XQdUG1qUaYc6OPHvN
+         3oyGkHIW2WHwAA2hiCYk7k4VRw07QOY44vevjoNHSlp1TZPwo9/I3RlS+NFZbGG/yHF7
+         spUZh+UssagHcZ8oN/1b6B/H3C2qnAXLbDp3jtiM1f0sHF4dPXlIbT/idc2suyfRKMvw
+         yxUCK4OzvtxA5e+Gls4wbICi7Ibb3ZTm8fVYdK+PDA/sdhqrAWtTMqY0K2lkaZyO1gvi
+         Q5lg==
+X-Gm-Message-State: AOJu0YzQaAyZMgVPISovPXQRNnftXkn5J9Jb3Bj2ndKTZq9Wu3FdgQhV
+	bX5l7T+wzqvBBYTaNgn30Dojoxf4Ax9X7i1W6wWP2Z6r+g==
+X-Google-Smtp-Source: AGHT+IGVpK8CJW3i7W7Xl68AaiRUo1qo2hdYPOatYKGr4N/ssOxNlgUKa5kF17KsishbsgKJAUpO9Q==
+X-Received: by 2002:a05:6214:519c:b0:67f:6056:7dc5 with SMTP id kl28-20020a056214519c00b0067f60567dc5mr478612qvb.66.1703196195045;
+        Thu, 21 Dec 2023 14:03:15 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id ee14-20020a0562140a4e00b0067f712874fbsm905198qvb.129.2023.12.21.14.03.12
+        by smtp.gmail.com with ESMTPSA id ee14-20020a0562140a4e00b0067f712874fbsm905198qvb.129.2023.12.21.14.03.13
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Dec 2023 14:03:12 -0800 (PST)
+        Thu, 21 Dec 2023 14:03:14 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 10/13] bnxt_en: Refactor ntuple filter removal logic in bnxt_cfg_ntp_filters().
-Date: Thu, 21 Dec 2023 14:02:15 -0800
-Message-Id: <20231221220218.197386-11-michael.chan@broadcom.com>
+Subject: [PATCH net-next 11/13] bnxt_en: Add ntuple matching flags to the bnxt_ntuple_filter structure.
+Date: Thu, 21 Dec 2023 14:02:16 -0800
+Message-Id: <20231221220218.197386-12-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231221220218.197386-1-michael.chan@broadcom.com>
 References: <20231221220218.197386-1-michael.chan@broadcom.com>
@@ -73,111 +73,273 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000206cd2060d0c44ac"
+	boundary="000000000000372f91060d0c449a"
 
---000000000000206cd2060d0c44ac
+--000000000000372f91060d0c449a
 Content-Transfer-Encoding: 8bit
 
-Refactor the logic into a new function bnxt_del_ntp_filters().  The
-same call will be used when the user deletes an ntuple filter.
-
-The bnxt_hwrm_cfa_ntuple_filter_free() function to call fw to free
-the ntuple filter is exported so that the ethtool logic can call it.
+aRFS filters match all 5 tuples.  User defined ntuple filters may
+specify some of the tuples as wildcards.  To support that, we add the
+ntuple_flags to the bnxt_ntuple_filter struct to specify which tuple
+fields are to be matched.  The matching tuple fields will then be
+passed to the firmware in bnxt_hwrm_cfa_ntuple_filter_alloc() to create
+the proper filter.
 
 Reviewed-by: Vasundhara Volam <vasundhara-v.volam@broadcom.com>
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 35 ++++++++++++-----------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  3 ++
- 2 files changed, 22 insertions(+), 16 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 81 +++++++++++++------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     | 10 +++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 58 +++++++------
+ 3 files changed, 99 insertions(+), 50 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 186c7dde51e2..1549a1e4edac 100644
+index 1549a1e4edac..f9c7562ae619 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5605,8 +5605,8 @@ int bnxt_hwrm_l2_filter_alloc(struct bnxt *bp, struct bnxt_l2_filter *fltr)
- 	return rc;
- }
+@@ -5638,6 +5638,14 @@ int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
+ #define BNXT_NTP_TUNNEL_FLTR_FLAG				\
+ 		CFA_NTUPLE_FILTER_ALLOC_REQ_ENABLES_TUNNEL_TYPE
  
--static int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
--					    struct bnxt_ntuple_filter *fltr)
-+int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
-+				     struct bnxt_ntuple_filter *fltr)
- {
- 	struct hwrm_cfa_ntuple_filter_free_input *req;
- 	int rc;
-@@ -14007,6 +14007,21 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- }
- #endif
- 
-+void bnxt_del_ntp_filter(struct bnxt *bp, struct bnxt_ntuple_filter *fltr)
++void bnxt_fill_ipv6_mask(__be32 mask[4])
 +{
-+	spin_lock_bh(&bp->ntp_fltr_lock);
-+	if (!test_and_clear_bit(BNXT_FLTR_INSERTED, &fltr->base.state)) {
-+		spin_unlock_bh(&bp->ntp_fltr_lock);
-+		return;
-+	}
-+	hlist_del_rcu(&fltr->base.hash);
-+	bp->ntp_fltr_count--;
-+	spin_unlock_bh(&bp->ntp_fltr_lock);
-+	bnxt_del_l2_filter(bp, fltr->l2_fltr);
-+	clear_bit(fltr->base.sw_id, bp->ntp_fltr_bmap);
-+	kfree_rcu(fltr, base.rcu);
++	int i;
++
++	for (i = 0; i < 4; i++)
++		mask[i] = cpu_to_be32(~0);
 +}
 +
- static void bnxt_cfg_ntp_filters(struct bnxt *bp)
+ static int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
+ 					     struct bnxt_ntuple_filter *fltr)
  {
- 	int i;
-@@ -14038,20 +14053,8 @@ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
- 					set_bit(BNXT_FLTR_VALID, &fltr->base.state);
- 			}
+@@ -5672,24 +5680,28 @@ static int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
+ 	req->ip_protocol = keys->basic.ip_proto;
  
--			if (del) {
--				spin_lock_bh(&bp->ntp_fltr_lock);
--				if (!test_and_clear_bit(BNXT_FLTR_INSERTED, &fltr->base.state)) {
--					spin_unlock_bh(&bp->ntp_fltr_lock);
--					continue;
--				}
--				hlist_del_rcu(&fltr->base.hash);
--				bp->ntp_fltr_count--;
--				spin_unlock_bh(&bp->ntp_fltr_lock);
--				bnxt_del_l2_filter(bp, fltr->l2_fltr);
--				synchronize_rcu();
--				clear_bit(fltr->base.sw_id, bp->ntp_fltr_bmap);
--				kfree(fltr);
--			}
-+			if (del)
-+				bnxt_del_ntp_filter(bp, fltr);
+ 	if (keys->basic.n_proto == htons(ETH_P_IPV6)) {
+-		int i;
+-
+ 		req->ethertype = htons(ETH_P_IPV6);
+ 		req->ip_addr_type =
+ 			CFA_NTUPLE_FILTER_ALLOC_REQ_IP_ADDR_TYPE_IPV6;
+-		*(struct in6_addr *)&req->src_ipaddr[0] =
+-			keys->addrs.v6addrs.src;
+-		*(struct in6_addr *)&req->dst_ipaddr[0] =
+-			keys->addrs.v6addrs.dst;
+-		for (i = 0; i < 4; i++) {
+-			req->src_ipaddr_mask[i] = cpu_to_be32(0xffffffff);
+-			req->dst_ipaddr_mask[i] = cpu_to_be32(0xffffffff);
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_IP) {
++			*(struct in6_addr *)&req->src_ipaddr[0] =
++				keys->addrs.v6addrs.src;
++			bnxt_fill_ipv6_mask(req->src_ipaddr_mask);
++		}
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_DST_IP) {
++			*(struct in6_addr *)&req->dst_ipaddr[0] =
++				keys->addrs.v6addrs.dst;
++			bnxt_fill_ipv6_mask(req->dst_ipaddr_mask);
  		}
+ 	} else {
+-		req->src_ipaddr[0] = keys->addrs.v4addrs.src;
+-		req->src_ipaddr_mask[0] = cpu_to_be32(0xffffffff);
+-		req->dst_ipaddr[0] = keys->addrs.v4addrs.dst;
+-		req->dst_ipaddr_mask[0] = cpu_to_be32(0xffffffff);
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_IP) {
++			req->src_ipaddr[0] = keys->addrs.v4addrs.src;
++			req->src_ipaddr_mask[0] = cpu_to_be32(0xffffffff);
++		}
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_DST_IP) {
++			req->dst_ipaddr[0] = keys->addrs.v4addrs.dst;
++			req->dst_ipaddr_mask[0] = cpu_to_be32(0xffffffff);
++		}
  	}
- 	if (test_and_clear_bit(BNXT_HWRM_PF_UNLOAD_SP_EVENT, &bp->sp_event))
+ 	if (keys->control.flags & FLOW_DIS_ENCAPSULATION) {
+ 		req->enables |= cpu_to_le32(BNXT_NTP_TUNNEL_FLTR_FLAG);
+@@ -5697,10 +5709,14 @@ static int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
+ 			CFA_NTUPLE_FILTER_ALLOC_REQ_TUNNEL_TYPE_ANYTUNNEL;
+ 	}
+ 
+-	req->src_port = keys->ports.src;
+-	req->src_port_mask = cpu_to_be16(0xffff);
+-	req->dst_port = keys->ports.dst;
+-	req->dst_port_mask = cpu_to_be16(0xffff);
++	if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_PORT) {
++		req->src_port = keys->ports.src;
++		req->src_port_mask = cpu_to_be16(0xffff);
++	}
++	if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_DST_PORT) {
++		req->dst_port = keys->ports.dst;
++		req->dst_port_mask = cpu_to_be16(0xffff);
++	}
+ 
+ 	resp = hwrm_req_hold(bp, req);
+ 	rc = hwrm_req_send(bp, req);
+@@ -13882,24 +13898,38 @@ static bool bnxt_fltr_match(struct bnxt_ntuple_filter *f1,
+ 	struct flow_keys *keys1 = &f1->fkeys;
+ 	struct flow_keys *keys2 = &f2->fkeys;
+ 
++	if (f1->ntuple_flags != f2->ntuple_flags)
++		return false;
++
+ 	if (keys1->basic.n_proto != keys2->basic.n_proto ||
+ 	    keys1->basic.ip_proto != keys2->basic.ip_proto)
+ 		return false;
+ 
+ 	if (keys1->basic.n_proto == htons(ETH_P_IP)) {
+-		if (keys1->addrs.v4addrs.src != keys2->addrs.v4addrs.src ||
+-		    keys1->addrs.v4addrs.dst != keys2->addrs.v4addrs.dst)
++		if (((f1->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_IP) &&
++		     keys1->addrs.v4addrs.src != keys2->addrs.v4addrs.src) ||
++		    ((f1->ntuple_flags & BNXT_NTUPLE_MATCH_DST_IP) &&
++		     keys1->addrs.v4addrs.dst != keys2->addrs.v4addrs.dst))
+ 			return false;
+ 	} else {
+-		if (memcmp(&keys1->addrs.v6addrs.src, &keys2->addrs.v6addrs.src,
+-			   sizeof(keys1->addrs.v6addrs.src)) ||
+-		    memcmp(&keys1->addrs.v6addrs.dst, &keys2->addrs.v6addrs.dst,
+-			   sizeof(keys1->addrs.v6addrs.dst)))
++		if (((f1->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_IP) &&
++		     memcmp(&keys1->addrs.v6addrs.src,
++			    &keys2->addrs.v6addrs.src,
++			    sizeof(keys1->addrs.v6addrs.src))) ||
++		    ((f1->ntuple_flags & BNXT_NTUPLE_MATCH_DST_IP) &&
++		     memcmp(&keys1->addrs.v6addrs.dst,
++			    &keys2->addrs.v6addrs.dst,
++			    sizeof(keys1->addrs.v6addrs.dst))))
+ 			return false;
+ 	}
+ 
+-	if (keys1->ports.ports == keys2->ports.ports &&
+-	    keys1->control.flags == keys2->control.flags &&
++	if (((f1->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_PORT) &&
++	     keys1->ports.src != keys2->ports.src) ||
++	    ((f1->ntuple_flags & BNXT_NTUPLE_MATCH_DST_PORT) &&
++	     keys1->ports.dst != keys2->ports.dst))
++		return false;
++
++	if (keys1->control.flags == keys2->control.flags &&
+ 	    f1->l2_fltr == f2->l2_fltr)
+ 		return true;
+ 
+@@ -13981,6 +14011,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	}
+ 
+ 	new_fltr->l2_fltr = l2_fltr;
++	new_fltr->ntuple_flags = BNXT_NTUPLE_MATCH_ALL;
+ 
+ 	idx = bnxt_get_ntp_filter_idx(bp, fkeys, skb);
+ 	rcu_read_lock();
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index f37d98d7962a..60f62bc36d2c 100644
+index 60f62bc36d2c..dc1bc163c82f 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2636,6 +2636,8 @@ int bnxt_hwrm_func_drv_unrgtr(struct bnxt *bp);
- void bnxt_del_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr);
- int bnxt_hwrm_l2_filter_free(struct bnxt *bp, struct bnxt_l2_filter *fltr);
+@@ -1358,6 +1358,15 @@ struct bnxt_ntuple_filter {
+ 	struct bnxt_filter_base	base;
+ 	struct flow_keys	fkeys;
+ 	struct bnxt_l2_filter	*l2_fltr;
++	u32			ntuple_flags;
++#define BNXT_NTUPLE_MATCH_SRC_IP	1
++#define BNXT_NTUPLE_MATCH_DST_IP	2
++#define BNXT_NTUPLE_MATCH_SRC_PORT	4
++#define BNXT_NTUPLE_MATCH_DST_PORT	8
++#define BNXT_NTUPLE_MATCH_ALL		(BNXT_NTUPLE_MATCH_SRC_IP |	\
++					 BNXT_NTUPLE_MATCH_DST_IP |	\
++					 BNXT_NTUPLE_MATCH_SRC_PORT |	\
++					 BNXT_NTUPLE_MATCH_DST_PORT)
+ 	u32			flow_id;
+ };
+ 
+@@ -2638,6 +2647,7 @@ int bnxt_hwrm_l2_filter_free(struct bnxt *bp, struct bnxt_l2_filter *fltr);
  int bnxt_hwrm_l2_filter_alloc(struct bnxt *bp, struct bnxt_l2_filter *fltr);
-+int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
-+				     struct bnxt_ntuple_filter *fltr);
+ int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
+ 				     struct bnxt_ntuple_filter *fltr);
++void bnxt_fill_ipv6_mask(__be32 mask[4]);
  int bnxt_get_nr_rss_ctxs(struct bnxt *bp, int rx_rings);
  int bnxt_hwrm_vnic_cfg(struct bnxt *bp, u16 vnic_id);
  int __bnxt_hwrm_get_tx_rings(struct bnxt *bp, u16 fid, int *tx_rings);
-@@ -2685,6 +2687,7 @@ u32 bnxt_get_ntp_filter_idx(struct bnxt *bp, struct flow_keys *fkeys,
- 			    const struct sk_buff *skb);
- int bnxt_insert_ntp_filter(struct bnxt *bp, struct bnxt_ntuple_filter *fltr,
- 			   u32 idx);
-+void bnxt_del_ntp_filter(struct bnxt *bp, struct bnxt_ntuple_filter *fltr);
- int bnxt_get_max_rings(struct bnxt *, int *, int *, bool);
- int bnxt_restore_pf_fw_resources(struct bnxt *bp);
- int bnxt_get_port_parent_id(struct net_device *dev,
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 8cc762a12a3e..558dd1f9a18e 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -1100,20 +1100,23 @@ static int bnxt_grxclsrule(struct bnxt *bp, struct ethtool_rxnfc *cmd)
+ 		else
+ 			goto fltr_err;
+ 
+-		fs->h_u.tcp_ip4_spec.ip4src = fkeys->addrs.v4addrs.src;
+-		fs->m_u.tcp_ip4_spec.ip4src = cpu_to_be32(~0);
+-
+-		fs->h_u.tcp_ip4_spec.ip4dst = fkeys->addrs.v4addrs.dst;
+-		fs->m_u.tcp_ip4_spec.ip4dst = cpu_to_be32(~0);
+-
+-		fs->h_u.tcp_ip4_spec.psrc = fkeys->ports.src;
+-		fs->m_u.tcp_ip4_spec.psrc = cpu_to_be16(~0);
+-
+-		fs->h_u.tcp_ip4_spec.pdst = fkeys->ports.dst;
+-		fs->m_u.tcp_ip4_spec.pdst = cpu_to_be16(~0);
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_IP) {
++			fs->h_u.tcp_ip4_spec.ip4src = fkeys->addrs.v4addrs.src;
++			fs->m_u.tcp_ip4_spec.ip4src = cpu_to_be32(~0);
++		}
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_DST_IP) {
++			fs->h_u.tcp_ip4_spec.ip4dst = fkeys->addrs.v4addrs.dst;
++			fs->m_u.tcp_ip4_spec.ip4dst = cpu_to_be32(~0);
++		}
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_PORT) {
++			fs->h_u.tcp_ip4_spec.psrc = fkeys->ports.src;
++			fs->m_u.tcp_ip4_spec.psrc = cpu_to_be16(~0);
++		}
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_DST_PORT) {
++			fs->h_u.tcp_ip4_spec.pdst = fkeys->ports.dst;
++			fs->m_u.tcp_ip4_spec.pdst = cpu_to_be16(~0);
++		}
+ 	} else {
+-		int i;
+-
+ 		if (fkeys->basic.ip_proto == IPPROTO_TCP)
+ 			fs->flow_type = TCP_V6_FLOW;
+ 		else if (fkeys->basic.ip_proto == IPPROTO_UDP)
+@@ -1121,19 +1124,24 @@ static int bnxt_grxclsrule(struct bnxt *bp, struct ethtool_rxnfc *cmd)
+ 		else
+ 			goto fltr_err;
+ 
+-		*(struct in6_addr *)&fs->h_u.tcp_ip6_spec.ip6src[0] =
+-			fkeys->addrs.v6addrs.src;
+-		*(struct in6_addr *)&fs->h_u.tcp_ip6_spec.ip6dst[0] =
+-			fkeys->addrs.v6addrs.dst;
+-		for (i = 0; i < 4; i++) {
+-			fs->m_u.tcp_ip6_spec.ip6src[i] = cpu_to_be32(~0);
+-			fs->m_u.tcp_ip6_spec.ip6dst[i] = cpu_to_be32(~0);
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_IP) {
++			*(struct in6_addr *)&fs->h_u.tcp_ip6_spec.ip6src[0] =
++				fkeys->addrs.v6addrs.src;
++			bnxt_fill_ipv6_mask(fs->m_u.tcp_ip6_spec.ip6src);
++		}
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_DST_IP) {
++			*(struct in6_addr *)&fs->h_u.tcp_ip6_spec.ip6dst[0] =
++				fkeys->addrs.v6addrs.dst;
++			bnxt_fill_ipv6_mask(fs->m_u.tcp_ip6_spec.ip6dst);
++		}
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_SRC_PORT) {
++			fs->h_u.tcp_ip6_spec.psrc = fkeys->ports.src;
++			fs->m_u.tcp_ip6_spec.psrc = cpu_to_be16(~0);
++		}
++		if (fltr->ntuple_flags & BNXT_NTUPLE_MATCH_DST_PORT) {
++			fs->h_u.tcp_ip6_spec.pdst = fkeys->ports.dst;
++			fs->m_u.tcp_ip6_spec.pdst = cpu_to_be16(~0);
+ 		}
+-		fs->h_u.tcp_ip6_spec.psrc = fkeys->ports.src;
+-		fs->m_u.tcp_ip6_spec.psrc = cpu_to_be16(~0);
+-
+-		fs->h_u.tcp_ip6_spec.pdst = fkeys->ports.dst;
+-		fs->m_u.tcp_ip6_spec.pdst = cpu_to_be16(~0);
+ 	}
+ 
+ 	fs->ring_cookie = fltr->base.rxq;
 -- 
 2.30.1
 
 
---000000000000206cd2060d0c44ac
+--000000000000372f91060d0c449a
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -248,14 +410,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOMU/F9QIUSAPS8Y0gUPJEJtTh7B/yau
-UgFykWn5wotjMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
-MTIyMDMxNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGKCCK3Ax40Ey80DH/75oMMkVJmKHbtW
+XVSApvXXPPOvMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
+MTIyMDMxNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCfLRLMIqlFJMMKHetYioeRydh8gH3ykTn+/nsCbaJrwCMessFr
-4742IqLcFB9WyqSZbR5Iu7JdB4Kh/993I1ptMwZnI80m0UBFCYwqriDwfiTcX+3N5k8BM9FGEzIa
-NXvDRanxT2AGwM95c7isbLpId4URaEHR40TFlabfufcvPPbDm3cHeDR4RcgO8FG1n99HhAWykbu6
-XB/Eu9DTWsnU9VlCU5QI/ArClsFNJOj9HmOxGZRer3OYnizghqGSOZXJ5T13flUBJBKA6XUNFsqQ
-KkDbNoAoMARR9ShPn8bD0jDA+KHOVesYfapwB8bfjd3+Agn0Elm77qUknQYjR+iM
---000000000000206cd2060d0c44ac--
+ATANBgkqhkiG9w0BAQEFAASCAQAkeBQG2jv0BRpFRlG2V6PhUth6H+uilfA2DWNV2cRI+vSQmBy7
+ggK9S2UscIZtGShdY7E8jsrwxhm9oH2P5zeJKy5BLKVVAclL3wSjzuHexFHobKUx3yRUT9NqospZ
+GoBImn4PjzHQUYrNZgwjZZYL4FPiTw1Nq+FoR7qpiw9zdOTDnTWrrK8U++6bxAYEVkMa5TF9jgHZ
+nWoDyXiplFObtvcgjNjmfjUbgI1uFByH91fkOxH9ph1MrHQU+rojFF8ex0Hvm00gW+yCg845HkH2
+2/2O4ikN63nX/74uVXL8faKwc76sw3vhK1bFAmSp0itFtb89I9ChWY7ZMmsat/B4
+--000000000000372f91060d0c449a--
 
