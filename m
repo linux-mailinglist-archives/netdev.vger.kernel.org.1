@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-59795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3D6581C0BB
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:03:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEEC881C0BC
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:03:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D2591C235D1
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:03:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 597661F2306B
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B98878E9B;
-	Thu, 21 Dec 2023 22:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E383E79466;
+	Thu, 21 Dec 2023 22:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LOxeG+0/"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="iEZyTIbp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E495177F1E
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6463178E96
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3ba52d0f9feso901232b6e.0
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:03:06 -0800 (PST)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-67f09756761so7249376d6.3
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:03:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1703196186; x=1703800986; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1703196187; x=1703800987; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E7l0mnqIPqOq/K5r8EEeydQcBixUFFKrKBkKyUSitwg=;
-        b=LOxeG+0/NSvLCrlH/2XEmsbhLq/jY0NAN35KMGstUTjzyNfHNhj7803IjVmM8YACJs
-         5YFbYyYJ4Kl1IWdbPnfsFJ8GyptXwRE0Snsw2An/W8cTr2hYAOHyCMIgqao4MEHMa6gP
-         5+hBUyVhU9V0Ltll5SAsIIK9NUyG4ybbZR/2Q=
+        bh=Vb1I1zcZo3kJ+opNRuVVS6d0xLRJyfpmk72i1AdN+uw=;
+        b=iEZyTIbpfSGk1l6vN1k7H1W1JJ1OzsZNgomiuTbHwoV8hTW0JHd2g6xTRiU7mqD8UU
+         jSqE4gxWr7KIX53WxbK9mYlepv35aUEaXpBZMecpoWhxdLGVhoqAOSMfGhxw4PSHVq0V
+         PsOeqvFEfZBJvJyzEwFRgqKD/is+NB5PNY2Tc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703196186; x=1703800986;
+        d=1e100.net; s=20230601; t=1703196187; x=1703800987;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E7l0mnqIPqOq/K5r8EEeydQcBixUFFKrKBkKyUSitwg=;
-        b=wVTo/yF1T/v16msumD/x+mpCm3LMKR5YaWiJMCqaavvMoDhM9pdfJwGPmwGv6bGnLK
-         LtkAN0U6xAP/1k5zy3r2T347GSsbIrsQQefCy35TiIJk0mYWx4M81ypG1LLZy3+SvD3s
-         RQxrID3gYNzwvVImSK1VWy/W96nJ+l/zh/wRkIaRUiq2qDixPGM8LisDRVl7BluAKYEn
-         t4CLHzm96mGzjHORKh9O52vM5YCGvTsZQ4GgGoK9ygJfFHhKk+7hVUrVxWPAYSmwXYWh
-         LSl276xwEkZTPlZgYD4Qut1cgiM7NnBb+oeej0mFmwhDXEPdOHMY/Wz5ZzAmNI4x87fv
-         Helw==
-X-Gm-Message-State: AOJu0Yxu/Oqo8kD3CqDpnmhz1M8QS7Hx/WtoV8/Fw2nc2XJtVnQvk7Zd
-	7+Vupx56CKAUs0IXhYDsJ24AEjsI7OVE
-X-Google-Smtp-Source: AGHT+IG+YnyxbkyEzKi5JzZp9IBeSaYB3gMe41CP59dTGaQsMxHsWBBaFrCeDDFgNgGLQXRGZCq1ZA==
-X-Received: by 2002:a05:6808:2083:b0:3b8:b063:5049 with SMTP id s3-20020a056808208300b003b8b0635049mr363602oiw.74.1703196185478;
-        Thu, 21 Dec 2023 14:03:05 -0800 (PST)
+        bh=Vb1I1zcZo3kJ+opNRuVVS6d0xLRJyfpmk72i1AdN+uw=;
+        b=c1xNLgGIwiHb9CwJG/wVotcgVkCef24qGzszON4G9HwkxbOq5/eSrfY2Xvxa7c+Kiq
+         x4nsg0yk2zhh71Ob0joX2dLOfseRXSiqBUy3yTwSSXilg3Hxx+3boOFlkgkcZhxXdwSI
+         YrHJETZM3Mey8AysxpiH7k7a0qoVork2f5UQ0BbJYtY0zBvVCChBOHfAnFvnyq0HCuKN
+         Xvtc8pwFD9iJgTw4bYn0Lmd1Mfk/iYXcQIevTQ3Yz6gZdGCE1b68mVfPyow2sAQnbJEd
+         QCs5OfFWH6NsnErZo+idyimhXpzSZob/P38XWLH+IDibpM91UAZ2V2QcKPcAhKXI89nR
+         CCHQ==
+X-Gm-Message-State: AOJu0YwYelx6UzFa4Rom8t8cry+yYuQgAxQbG/vGNSePuUAaKHKXSoXb
+	APTfFX+p2ABYKkIQdNOm4+mnpuqipPYF
+X-Google-Smtp-Source: AGHT+IEXXEOJUjfEscUCtz2fEIj9UqQ7/w+8xLC0YUofF8UH1FJwCKFq8JgivnBzBtI7lpuCo9bx1Q==
+X-Received: by 2002:a05:6214:400c:b0:67f:3261:637c with SMTP id kd12-20020a056214400c00b0067f3261637cmr402722qvb.86.1703196187319;
+        Thu, 21 Dec 2023 14:03:07 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id ee14-20020a0562140a4e00b0067f712874fbsm905198qvb.129.2023.12.21.14.03.04
+        by smtp.gmail.com with ESMTPSA id ee14-20020a0562140a4e00b0067f712874fbsm905198qvb.129.2023.12.21.14.03.05
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Dec 2023 14:03:05 -0800 (PST)
+        Thu, 21 Dec 2023 14:03:06 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 05/13] bnxt_en: Add function to calculate Toeplitz hash
-Date: Thu, 21 Dec 2023 14:02:10 -0800
-Message-Id: <20231221220218.197386-6-michael.chan@broadcom.com>
+Subject: [PATCH net-next 06/13] bnxt_en: Add bnxt_lookup_ntp_filter_from_idx() function
+Date: Thu, 21 Dec 2023 14:02:11 -0800
+Message-Id: <20231221220218.197386-7-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231221220218.197386-1-michael.chan@broadcom.com>
 References: <20231221220218.197386-1-michael.chan@broadcom.com>
@@ -73,207 +73,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a999ae060d0c436c"
+	boundary="000000000000bf9aef060d0c4381"
 
---000000000000a999ae060d0c436c
+--000000000000bf9aef060d0c4381
 Content-Transfer-Encoding: 8bit
 
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-
-For ntuple filters added by aRFS, the Toeplitz hash calculated by our
-NIC is available and is used to store the ntuple filter for quick
-retrieval.  In the next patches, user defined ntuple filter support
-will be added and we need to calculate the same hash for these
-filters.  The same hash function needs to be used so we can detect
-duplicates.
-
-Add the function bnxt_toeplitz() to calculate the Toeplitz hash for
-user defined ntuple filters.  bnxt_toeplitz() uses the same Toeplitz
-key and the same key length as the NIC.
-
-bnxt_get_ntp_filter_idx() is added to return the hash index.  For
-aRFS, the hash comes from the NIC.  For user defined ntuple, we call
-bnxt_toeplitz() to calculate the hash index.
+Add the helper function to look up the ntuple filter from the
+hash index and use it in bnxt_rx_flow_steer().  The helper function
+will also be used by user defined ntuple filters in the next
+patches.
 
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 100 +++++++++++++++++++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  11 +++
- 2 files changed, 108 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 26 +++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 31289803ff92..66ec7d4d1398 100644
+index 66ec7d4d1398..267ffcffa2b4 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4199,13 +4199,22 @@ static void bnxt_init_vnics(struct bnxt *bp)
- 		vnic->fw_l2_ctx_id = INVALID_HW_RING_ID;
- 
- 		if (bp->vnic_info[i].rss_hash_key) {
--			if (i == 0)
-+			if (!i) {
-+				u8 *key = (void *)vnic->rss_hash_key;
-+				int k;
-+
-+				bp->toeplitz_prefix = 0;
- 				get_random_bytes(vnic->rss_hash_key,
- 					      HW_HASH_KEY_SIZE);
--			else
-+				for (k = 0; k < 8; k++) {
-+					bp->toeplitz_prefix <<= 8;
-+					bp->toeplitz_prefix |= key[k];
-+				}
-+			} else {
- 				memcpy(vnic->rss_hash_key,
- 				       bp->vnic_info[0].rss_hash_key,
- 				       HW_HASH_KEY_SIZE);
-+			}
- 		}
- 	}
- }
-@@ -5374,6 +5383,79 @@ static struct bnxt_l2_filter *bnxt_lookup_l2_filter(struct bnxt *bp,
- 	return fltr;
+@@ -13895,6 +13895,21 @@ static bool bnxt_fltr_match(struct bnxt_ntuple_filter *f1,
+ 	return false;
  }
  
-+#define BNXT_IPV4_4TUPLE(bp, fkeys)					\
-+	(((fkeys)->basic.ip_proto == IPPROTO_TCP &&			\
-+	  (bp)->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV4) ||	\
-+	 ((fkeys)->basic.ip_proto == IPPROTO_UDP &&			\
-+	  (bp)->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV4))
-+
-+#define BNXT_IPV6_4TUPLE(bp, fkeys)					\
-+	(((fkeys)->basic.ip_proto == IPPROTO_TCP &&			\
-+	  (bp)->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV6) ||	\
-+	 ((fkeys)->basic.ip_proto == IPPROTO_UDP &&			\
-+	  (bp)->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV6))
-+
-+static u32 bnxt_get_rss_flow_tuple_len(struct bnxt *bp, struct flow_keys *fkeys)
++static struct bnxt_ntuple_filter *
++bnxt_lookup_ntp_filter_from_idx(struct bnxt *bp,
++				struct bnxt_ntuple_filter *fltr, u32 idx)
 +{
-+	if (fkeys->basic.n_proto == htons(ETH_P_IP)) {
-+		if (BNXT_IPV4_4TUPLE(bp, fkeys))
-+			return sizeof(fkeys->addrs.v4addrs) +
-+			       sizeof(fkeys->ports);
++	struct bnxt_ntuple_filter *f;
++	struct hlist_head *head;
 +
-+		if (bp->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_IPV4)
-+			return sizeof(fkeys->addrs.v4addrs);
++	head = &bp->ntp_fltr_hash_tbl[idx];
++	hlist_for_each_entry_rcu(f, head, base.hash) {
++		if (bnxt_fltr_match(f, fltr))
++			return f;
 +	}
-+
-+	if (fkeys->basic.n_proto == htons(ETH_P_IPV6)) {
-+		if (BNXT_IPV6_4TUPLE(bp, fkeys))
-+			return sizeof(fkeys->addrs.v6addrs) +
-+			       sizeof(fkeys->ports);
-+
-+		if (bp->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6)
-+			return sizeof(fkeys->addrs.v6addrs);
-+	}
-+
-+	return 0;
++	return NULL;
 +}
 +
-+static u32 bnxt_toeplitz(struct bnxt *bp, struct flow_keys *fkeys,
-+			 const unsigned char *key)
-+{
-+	u64 prefix = bp->toeplitz_prefix, hash = 0;
-+	struct bnxt_ipv4_tuple tuple4;
-+	struct bnxt_ipv6_tuple tuple6;
-+	int i, j, len = 0;
-+	u8 *four_tuple;
-+
-+	len = bnxt_get_rss_flow_tuple_len(bp, fkeys);
-+	if (!len)
-+		return 0;
-+
-+	if (fkeys->basic.n_proto == htons(ETH_P_IP)) {
-+		tuple4.v4addrs = fkeys->addrs.v4addrs;
-+		tuple4.ports = fkeys->ports;
-+		four_tuple = (unsigned char *)&tuple4;
-+	} else {
-+		tuple6.v6addrs = fkeys->addrs.v6addrs;
-+		tuple6.ports = fkeys->ports;
-+		four_tuple = (unsigned char *)&tuple6;
-+	}
-+
-+	for (i = 0, j = 8; i < len; i++, j++) {
-+		u8 byte = four_tuple[i];
-+		int bit;
-+
-+		for (bit = 0; bit < 8; bit++, prefix <<= 1, byte <<= 1) {
-+			if (byte & 0x80)
-+				hash ^= prefix;
-+		}
-+		prefix |= (j < HW_HASH_KEY_SIZE) ? key[j] : 0;
-+	}
-+
-+	/* The valid part of the hash is in the upper 32 bits. */
-+	return (hash >> 32) & BNXT_NTP_FLTR_HASH_MASK;
-+}
-+
- #ifdef CONFIG_RFS_ACCEL
- static struct bnxt_l2_filter *
- bnxt_lookup_l2_filter_from_key(struct bnxt *bp, struct bnxt_l2_key *key)
-@@ -13770,6 +13852,18 @@ static int bnxt_setup_tc(struct net_device *dev, enum tc_setup_type type,
- 	}
- }
- 
-+static u32 bnxt_get_ntp_filter_idx(struct bnxt *bp, struct flow_keys *fkeys,
-+				   const struct sk_buff *skb)
-+{
-+	struct bnxt_vnic_info *vnic;
-+
-+	if (skb)
-+		return skb_get_hash_raw(skb) & BNXT_NTP_FLTR_HASH_MASK;
-+
-+	vnic = &bp->vnic_info[0];
-+	return bnxt_toeplitz(bp, fkeys, (void *)vnic->rss_hash_key);
-+}
-+
- #ifdef CONFIG_RFS_ACCEL
- static bool bnxt_fltr_match(struct bnxt_ntuple_filter *f1,
- 			    struct bnxt_ntuple_filter *f2)
-@@ -13862,7 +13956,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- 
- 	new_fltr->l2_fltr = l2_fltr;
- 
--	idx = skb_get_hash_raw(skb) & BNXT_NTP_FLTR_HASH_MASK;
-+	idx = bnxt_get_ntp_filter_idx(bp, fkeys, skb);
+ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 			      u16 rxq_index, u32 flow_id)
+ {
+@@ -13959,12 +13974,11 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	idx = bnxt_get_ntp_filter_idx(bp, fkeys, skb);
  	head = &bp->ntp_fltr_hash_tbl[idx];
  	rcu_read_lock();
- 	hlist_for_each_entry_rcu(fltr, head, base.hash) {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 5d67b8299328..3f4e4708f7d8 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1370,6 +1370,16 @@ struct bnxt_l2_key {
- 	};
- };
+-	hlist_for_each_entry_rcu(fltr, head, base.hash) {
+-		if (bnxt_fltr_match(fltr, new_fltr)) {
+-			rc = fltr->base.sw_id;
+-			rcu_read_unlock();
+-			goto err_free;
+-		}
++	fltr = bnxt_lookup_ntp_filter_from_idx(bp, new_fltr, idx);
++	if (fltr) {
++		rcu_read_unlock();
++		rc = fltr->base.sw_id;
++		goto err_free;
+ 	}
+ 	rcu_read_unlock();
  
-+struct bnxt_ipv4_tuple {
-+	struct flow_dissector_key_ipv4_addrs v4addrs;
-+	struct flow_dissector_key_ports ports;
-+};
-+
-+struct bnxt_ipv6_tuple {
-+	struct flow_dissector_key_ipv6_addrs v6addrs;
-+	struct flow_dissector_key_ports ports;
-+};
-+
- #define BNXT_L2_KEY_SIZE	(sizeof(struct bnxt_l2_key) / 4)
- 
- struct bnxt_l2_filter {
-@@ -2413,6 +2423,7 @@ struct bnxt {
- 	struct hlist_head	l2_fltr_hash_tbl[BNXT_L2_FLTR_HASH_SIZE];
- 
- 	u32			hash_seed;
-+	u64			toeplitz_prefix;
- 
- 	/* To protect link related settings during link changes and
- 	 * ethtool settings changes.
 -- 
 2.30.1
 
 
---000000000000a999ae060d0c436c
+--000000000000bf9aef060d0c4381
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -344,14 +208,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMPiqdQpy7m0pHYo7mE7TtTE/hqd2wZt
-MlqXgUVb4IUlMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
-MTIyMDMwNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPQDq3dt57Oehemgkn6Xxh0cW5DfZ3Hw
+9S3RoNbIY3cgMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
+MTIyMDMwN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBbUSEdvXp18cHg1sx51L2Frn+t+tWl9tTnzQ+pBRyUFvO/9KQj
-1FJ5ZOsl7gjorMEdMSeS5aqNMl73xI2dvyrhYaOEBBDLp8CtOrW4fB2JOa2+1/PhJm1JtgXruOJe
-ygCDfoiDrbFWAeFinThKYyWFNO0fRBlFRuA9GoHr506YRiHqGm/gT3W8VwjvkHwUJAIl3VmeBYqK
-Gvg1R1Hly+VrgJ/EkkPdajP6fBYtztI+3P2fTTlq3VcshyCLDrnGddcKZ6CbBP/MO9VHzMGKg+dA
-5cEZW24mBiV3sZZyEkIgBhmqgsGzITQDRXKM4KDjlNvzZXfrLHUJWc0Ep3mkqniM
---000000000000a999ae060d0c436c--
+ATANBgkqhkiG9w0BAQEFAASCAQCM0bjCtB68402xczIl+ZTjJe1tlBv9aV3iUA6kAlzhKw9XpM67
+LAdwC/Z1FkNFO+sE1CpS4mecv9qN6M0yhFPtKXlIGL+RfLSIFEzo1oW/fQRQMFhOd2LRAP9d7wo3
+0q0nxpSatOVmw1575yrnjpUYj3OCg6lGL9q1A9dNQE/d+CxlZAVYKfRNnAsr1gbNSBVO64HzC4JY
+P0swraw9Y8aM5/0dooHVhggRCHe9DrYd4Tnkmq9PRfHlTS9MpmNnOWSzevQaQ60USd2TbuQas8Sp
+i/dafznM7UReUt1lz/QYELX9TPFkvsyiOyGNBj75pNfWtGQP+gYKNLi1WR9d7isb
+--000000000000bf9aef060d0c4381--
 
