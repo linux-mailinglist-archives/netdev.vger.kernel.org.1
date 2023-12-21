@@ -1,215 +1,241 @@
-Return-Path: <netdev+bounces-59453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FFFC81AE1A
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 05:45:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE71C81AE4E
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 06:18:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB9902856DD
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 04:45:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F3AD1C21CB7
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 05:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CA38C00;
-	Thu, 21 Dec 2023 04:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ht5ME5rv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E9E8F63;
+	Thu, 21 Dec 2023 05:18:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEEA8C01
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 04:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9f3697c1-ed15-4a3d-9113-c4437f421bb3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1703133914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DHb76aSNb1k1y8CaP40aRSr7bCjiDbODP1MzfmC5MjU=;
-	b=Ht5ME5rvebzLnnielGBDTsqP6zUs+njqfZcoCsI1DrfreqvT8cdBej7mAqHpyIEGUjMQyg
-	Pf3JV5S8jaeSuT/Ugqdjpm+f3iUA40SMnr4DfMdMmiseHk5Hkitm0h4dKVRPzvnu8rDTCl
-	DQJA45ckgVoVwgKtzDUceUV2n0tjnO8=
-Date: Wed, 20 Dec 2023 20:45:08 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFE79474
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 05:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0VywS86E_1703135900;
+Received: from 30.221.144.254(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VywS86E_1703135900)
+          by smtp.aliyun-inc.com;
+          Thu, 21 Dec 2023 13:18:21 +0800
+Message-ID: <084142b9-7e0d-4eae-82d2-0736494953cd@linux.alibaba.com>
+Date: Thu, 21 Dec 2023 13:18:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf 1/2] bpf: Avoid iter->offset making backward progress
- in bpf_iter_udp
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
- 'Andrii Nakryiko ' <andrii@kernel.org>, netdev@vger.kernel.org,
- kernel-team@meta.com, Aditi Ghag <aditi.ghag@isovalent.com>,
- bpf@vger.kernel.org
-References: <20231219193259.3230692-1-martin.lau@linux.dev>
- <8d15f3a7-b7bc-1a45-0bdf-a0ccc311f576@iogearbox.net>
- <fc1b5650-72bb-4b09-bab4-f61b2186f673@linux.dev>
-In-Reply-To: <fc1b5650-72bb-4b09-bab4-f61b2186f673@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] virtio-net: switch napi_tx without downing nic
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ netdev@vger.kernel.org, virtualization@lists.linux-foundation.org
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
+ <6582fe057cb9_1a34a429435@willemb.c.googlers.com.notmuch>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <6582fe057cb9_1a34a429435@willemb.c.googlers.com.notmuch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 12/20/23 11:10 AM, Martin KaFai Lau wrote:
-> Good catch. It will unnecessary skip in the following batch/bucket if there is 
-> changes in the current batch/bucket.
-> 
->  From looking at the loop again, I think it is better not to change the 
-> iter->offset during the for loop. Only update iter->offset after the for loop 
-> has concluded.
-> 
-> The non-zero iter->offset is only useful for the first bucket, so does a test on 
-> the first bucket (state->bucket == bucket) before skipping sockets. Something 
-> like this:
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 89e5a806b82e..a993f364d6ae 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -3139,6 +3139,7 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->       struct net *net = seq_file_net(seq);
->       struct udp_table *udptable;
->       unsigned int batch_sks = 0;
-> +    int bucket, bucket_offset;
->       bool resized = false;
->       struct sock *sk;
-> 
-> @@ -3162,14 +3163,14 @@ static struct sock *bpf_iter_udp_batch(struct seq_file 
-> *seq)
->       iter->end_sk = 0;
->       iter->st_bucket_done = false;
->       batch_sks = 0;
-> +    bucket = state->bucket;
-> +    bucket_offset = 0;
-> 
->       for (; state->bucket <= udptable->mask; state->bucket++) {
->           struct udp_hslot *hslot2 = &udptable->hash2[state->bucket];
-> 
-> -        if (hlist_empty(&hslot2->head)) {
-> -            iter->offset = 0;
-> +        if (hlist_empty(&hslot2->head))
->               continue;
-> -        }
-> 
->           spin_lock_bh(&hslot2->lock);
->           udp_portaddr_for_each_entry(sk, &hslot2->head) {
-> @@ -3177,8 +3178,9 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->                   /* Resume from the last iterated socket at the
->                    * offset in the bucket before iterator was stopped.
->                    */
-> -                if (iter->offset) {
-> -                    --iter->offset;
-> +                if (state->bucket == bucket &&
-> +                    bucket_offset < iter->offset) {
-> +                    ++bucket_offset;
->                       continue;
->                   }
->                   if (iter->end_sk < iter->max_sk) {
-> @@ -3192,10 +3194,10 @@ static struct sock *bpf_iter_udp_batch(struct seq_file 
-> *seq)
-> 
->           if (iter->end_sk)
->               break;
-> +    }
-> 
-> -        /* Reset the current bucket's offset before moving to the next bucket. */
-> +    if (state->bucket != bucket)
->           iter->offset = 0;
-> -    }
-> 
->       /* All done: no batch made. */
->       if (!iter->end_sk)
 
-I think I found another bug in the current bpf_iter_udp_batch(). The 
-"state->bucket--;" at the end of the batch() function is wrong also. It does not 
-need to go back to the previous bucket. After realloc with a larger batch array, 
-it should retry on the "state->bucket" as is. I tried to force the bind() to use 
-bucket 0 and bind a larger so_reuseport set (24 sockets). WARN_ON(state->bucket 
-< 0) triggered.
 
-Going back to this bug (backward progress on --iter->offset), I think it is a 
-bit cleaner to always reset iter->offset to 0 and advance iter->offset to the 
-resume_offset only when needed. Something like this:
+在 2023/12/20 下午10:45, Willem de Bruijn 写道:
+> Heng Qi wrote:
+>> virtio-net has two ways to switch napi_tx: one is through the
+>> module parameter, and the other is through coalescing parameter
+>> settings (provided that the nic status is down).
+>>
+>> Sometimes we face performance regression caused by napi_tx,
+>> then we need to switch napi_tx when debugging. However, the
+>> existing methods are a bit troublesome, such as needing to
+>> reload the driver or turn off the network card. So try to make
+>> this update.
+>>
+>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+>> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> The commit does not explain why it is safe to do so.
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 89e5a806b82e..184aa966a006 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -3137,16 +3137,18 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
-  	struct bpf_udp_iter_state *iter = seq->private;
-  	struct udp_iter_state *state = &iter->state;
-  	struct net *net = seq_file_net(seq);
-+	int resume_bucket, resume_offset;
-  	struct udp_table *udptable;
-  	unsigned int batch_sks = 0;
-  	bool resized = false;
-  	struct sock *sk;
+virtnet_napi_tx_disable ensures that already scheduled tx napi ends and 
+no new tx napi will be scheduled.
 
-+	resume_bucket = state->bucket;
-+	resume_offset = iter->offset;
-+
-  	/* The current batch is done, so advance the bucket. */
--	if (iter->st_bucket_done) {
-+	if (iter->st_bucket_done)
-  		state->bucket++;
--		iter->offset = 0;
--	}
+Afterwards, if the __netif_tx_lock_bh lock is held, the stack cannot 
+send the packet.
 
-  	udptable = udp_get_table_seq(seq, net);
+Then we can safely toggle the weight to indicate where to clear the buffers.
 
-@@ -3166,10 +3168,9 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
-  	for (; state->bucket <= udptable->mask; state->bucket++) {
-  		struct udp_hslot *hslot2 = &udptable->hash2[state->bucket];
+>
+> The tx-napi weights are not really weights: it is a boolean whether
+> napi is used for transmit cleaning, or whether packets are cleaned
+> in ndo_start_xmit.
 
--		if (hlist_empty(&hslot2->head)) {
--			iter->offset = 0;
-+		iter->offset = 0;
-+		if (hlist_empty(&hslot2->head))
-  			continue;
--		}
+Right.
 
-  		spin_lock_bh(&hslot2->lock);
-  		udp_portaddr_for_each_entry(sk, &hslot2->head) {
-@@ -3177,8 +3178,9 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
-  				/* Resume from the last iterated socket at the
-  				 * offset in the bucket before iterator was stopped.
-  				 */
--				if (iter->offset) {
--					--iter->offset;
-+				if (state->bucket == resume_bucket &&
-+				    iter->offset < resume_offset) {
-+					++iter->offset;
-  					continue;
-  				}
-  				if (iter->end_sk < iter->max_sk) {
-@@ -3192,9 +3194,6 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>
+> There certainly are some subtle issues with regard to pausing/waking
+> queues when switching between modes.
 
-  		if (iter->end_sk)
-  			break;
--
--		/* Reset the current bucket's offset before moving to the next bucket. */
--		iter->offset = 0;
-  	}
+What are "subtle issues" and if there are any, we find them.
+So far my test results show it's working fine.
 
-  	/* All done: no batch made. */
-@@ -3210,10 +3209,6 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
-  	}
-  	if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2)) {
-  		resized = true;
--		/* After allocating a larger batch, retry one more time to grab
--		 * the whole bucket.
--		 */
--		state->bucket--;
-  		goto again;
-  	}
-  done:
+>
+> Calling napi_enable/napi_disable without bringing down the device is
+> allowed. The actually napi.weight field is only updated when neither
+> napi nor ndo_start_xmit is running.
+
+YES.
+
+> So I don't see an immediate issue.
+
+Switching napi_tx requires reloading the driver or downing the nic, 
+which is troublesome.
+I think it would be better if we could find a better way.
+
+Thanks!
+
+>
+>
+>> ---
+>>   drivers/net/virtio_net.c | 81 ++++++++++++++++++----------------------
+>>   1 file changed, 37 insertions(+), 44 deletions(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 10614e9f7cad..12f8e1f9971c 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -3559,16 +3559,37 @@ static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+>>   	return 0;
+>>   }
+>>   
+>> -static int virtnet_should_update_vq_weight(int dev_flags, int weight,
+>> -					   int vq_weight, bool *should_update)
+>> +static void virtnet_switch_napi_tx(struct virtnet_info *vi, u32 qstart,
+>> +				   u32 qend, u32 tx_frames)
+>>   {
+>> -	if (weight ^ vq_weight) {
+>> -		if (dev_flags & IFF_UP)
+>> -			return -EBUSY;
+>> -		*should_update = true;
+>> -	}
+>> +	struct net_device *dev = vi->dev;
+>> +	int new_weight, cur_weight;
+>> +	struct netdev_queue *txq;
+>> +	struct send_queue *sq;
+>>   
+>> -	return 0;
+>> +	new_weight = tx_frames ? NAPI_POLL_WEIGHT : 0;
+>> +	for (; qstart < qend; qstart++) {
+>> +		sq = &vi->sq[qstart];
+>> +		cur_weight = sq->napi.weight;
+>> +		if (!(new_weight ^ cur_weight))
+>> +			continue;
+>> +
+>> +		if (!(dev->flags & IFF_UP)) {
+>> +			sq->napi.weight = new_weight;
+>> +			continue;
+>> +		}
+>> +
+>> +		if (cur_weight)
+>> +			virtnet_napi_tx_disable(&sq->napi);
+>> +
+>> +		txq = netdev_get_tx_queue(dev, qstart);
+>> +		__netif_tx_lock_bh(txq);
+>> +		sq->napi.weight = new_weight;
+>> +		__netif_tx_unlock_bh(txq);
+>> +
+>> +		if (!cur_weight)
+>> +			virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
+>> +	}
+>>   }
+>>   
+>>   static int virtnet_set_coalesce(struct net_device *dev,
+>> @@ -3577,25 +3598,11 @@ static int virtnet_set_coalesce(struct net_device *dev,
+>>   				struct netlink_ext_ack *extack)
+>>   {
+>>   	struct virtnet_info *vi = netdev_priv(dev);
+>> -	int ret, queue_number, napi_weight;
+>> -	bool update_napi = false;
+>> -
+>> -	/* Can't change NAPI weight if the link is up */
+>> -	napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+>> -	for (queue_number = 0; queue_number < vi->max_queue_pairs; queue_number++) {
+>> -		ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
+>> -						      vi->sq[queue_number].napi.weight,
+>> -						      &update_napi);
+>> -		if (ret)
+>> -			return ret;
+>> -
+>> -		if (update_napi) {
+>> -			/* All queues that belong to [queue_number, vi->max_queue_pairs] will be
+>> -			 * updated for the sake of simplicity, which might not be necessary
+>> -			 */
+>> -			break;
+>> -		}
+>> -	}
+>> +	int ret;
+>> +
+>> +	/* Param tx_frames can be used to switch napi_tx */
+>> +	virtnet_switch_napi_tx(vi, 0, vi->max_queue_pairs,
+>> +			       ec->tx_max_coalesced_frames);
+>>   
+>>   	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
+>>   		ret = virtnet_send_notf_coal_cmds(vi, ec);
+>> @@ -3605,11 +3612,6 @@ static int virtnet_set_coalesce(struct net_device *dev,
+>>   	if (ret)
+>>   		return ret;
+>>   
+>> -	if (update_napi) {
+>> -		for (; queue_number < vi->max_queue_pairs; queue_number++)
+>> -			vi->sq[queue_number].napi.weight = napi_weight;
+>> -	}
+>> -
+>>   	return ret;
+>>   }
+>>   
+>> @@ -3641,19 +3643,13 @@ static int virtnet_set_per_queue_coalesce(struct net_device *dev,
+>>   					  struct ethtool_coalesce *ec)
+>>   {
+>>   	struct virtnet_info *vi = netdev_priv(dev);
+>> -	int ret, napi_weight;
+>> -	bool update_napi = false;
+>> +	int ret;
+>>   
+>>   	if (queue >= vi->max_queue_pairs)
+>>   		return -EINVAL;
+>>   
+>> -	/* Can't change NAPI weight if the link is up */
+>> -	napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+>> -	ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
+>> -					      vi->sq[queue].napi.weight,
+>> -					      &update_napi);
+>> -	if (ret)
+>> -		return ret;
+>> +	/* Param tx_frames can be used to switch napi_tx */
+>> +	virtnet_switch_napi_tx(vi, queue, queue, ec->tx_max_coalesced_frames);
+>>   
+>>   	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+>>   		ret = virtnet_send_notf_coal_vq_cmds(vi, ec, queue);
+>> @@ -3663,9 +3659,6 @@ static int virtnet_set_per_queue_coalesce(struct net_device *dev,
+>>   	if (ret)
+>>   		return ret;
+>>   
+>> -	if (update_napi)
+>> -		vi->sq[queue].napi.weight = napi_weight;
+>> -
+>>   	return 0;
+>>   }
+>>   
+>> -- 
+>> 2.19.1.6.gb485710b
+>>
 
 
