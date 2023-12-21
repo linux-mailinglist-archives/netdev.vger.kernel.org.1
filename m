@@ -1,45 +1,53 @@
-Return-Path: <netdev+bounces-59809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7627681C19B
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:06:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C498081C1A1
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:12:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0367E28565B
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:06:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0352A1C2441B
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968E378E8F;
-	Thu, 21 Dec 2023 23:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21E678E90;
+	Thu, 21 Dec 2023 23:12:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b="m5FWgqV9"
+	dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b="cXXV+fkJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mr85p00im-zteg06022001.me.com (mr85p00im-zteg06022001.me.com [17.58.23.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4032E78E90;
-	Thu, 21 Dec 2023 23:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.faucet.nz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=faucet.nz;
- h=Content-Transfer-Encoding: MIME-Version: Message-Id: Date: Subject: Cc:
- To: From; q=dns/txt; s=fe-4ed8c67516; t=1703199957;
- bh=l60SR+53LmctJjdJT6+f0RpMxenYz9binUoltgUVMmE=;
- b=m5FWgqV9zNfPV+auhA9mYWbBFfs0BokrE6vja+oSSKrmOZZwdE73azw1L4uhNf7VE6rLuGDdl
- PV2UhMDM1hIcpABWJPrKyOfJJ0Q1rh/nX5M2KTU2rLsn/8/q8j4tTsJUtCAQZfdIB+zRfLFzvXN
- DAnLpwunFyVGkJIs5XGdj6A=
-From: Brad Cowie <brad@faucet.nz>
-To: netdev@vger.kernel.org
-Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netfilter-devel@vger.kernel.org,
- linux-kernel@vger.kernel.org, pshelar@ovn.org, dev@openvswitch.org, Brad
- Cowie <brad@faucet.nz>
-Subject: [PATCH net] netfilter: nf_nat: fix action not being set for all ct states
-Date: Fri, 22 Dec 2023 11:43:11 +1300
-Message-Id: <20231221224311.130319-1-brad@faucet.nz>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27918745E6
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 23:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danm.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=danm.net; s=sig1;
+	t=1703200347; bh=DCyDcGB+njyvZgduAOSYZ57kEuruZLX4DxL5rDhZZEc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=cXXV+fkJVcexXshAtBA9kqoVzxZi82it4LAoVoRl4eliL18HhCFsbd8RyT/tzi1Ks
+	 m7aaW3XhS8S+TqeuoeNyJ7IcQTl1s4KDvYUu07QGPU/Z6Pem/dO33pLm7xZ35AtckL
+	 FcNdEAmrnYLHV8jJgahIucatEc0iQgtfQLGeipUJeL0KtQLPx1eUKBDE5G/DyNc3k0
+	 9dwLiRv2OwdHFU3jW3zQlhkrcX1agIKHQBMw4loHfRMDhWzIBy6kM8DZumG+tyBtqP
+	 dLuyeGgN5vb5Mb/+WL40zWSOBvIqMB24o1Rsx8uBodbrBJ1uYD+X2W2Fpc7oi8NNXZ
+	 A3hlQld2axaNw==
+Received: from hitch.danm.net (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+	by mr85p00im-zteg06022001.me.com (Postfix) with ESMTPSA id A7BD2800127;
+	Thu, 21 Dec 2023 23:12:26 +0000 (UTC)
+From: Dan Moulding <dan@danm.net>
+To: dan@danm.net
+Cc: Alex Henrie <alexhenrie24@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [REGRESSION] net/ipv6/addrconf: Temporary addresses with short lifetimes generating when they shouldn't, causing applications to fail
+Date: Thu, 21 Dec 2023 16:10:57 -0700
+Message-ID: <20231221231115.12402-1-dan@danm.net>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,52 +55,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Report-Abuse-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-ForwardEmail-Version: 0.4.40
-X-ForwardEmail-Sender: rfc822; brad@faucet.nz, smtp.forwardemail.net,
- 149.28.215.223
-X-ForwardEmail-ID: 6584c00e068c01ef26868e78
+X-Proofpoint-ORIG-GUID: 2x4J6n-3fdC5FS1JBV_-vkus0m_RhcGg
+X-Proofpoint-GUID: 2x4J6n-3fdC5FS1JBV_-vkus0m_RhcGg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-21_11,2023-12-21_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 spamscore=0
+ phishscore=0 clxscore=1030 mlxlogscore=528 adultscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2312210177
 
-This fixes openvswitch's handling of nat packets in the related state.
+I started running v6.7-rc5 on a desktop and began having problems
+where Chromium would frequently fail to load pages and give an
+"ERR_NETWORK_CHANGED" message instead. I also noticed instability in
+avahi-daemon (it would stop resolving local names and/or consume 100%
+CPU). Eventually I discovered that what is happening is that new
+temporary IPv6 addresses for a ULA address are being generated once
+every second, with very short preferred lifetimes (and I had an
+interface with thousands of such temporary addresses). I also found
+that it seems to be triggered when one of the devices on the network
+sends a router advertisement with a prefix that has a preferred
+lifetime of 0 (presumably it's sending that because it wants to
+deprecate that prefix).
 
-In nf_ct_nat_execute(), which is called from nf_ct_nat(), ICMP/ICMPv6
-packets in the IP_CT_RELATED or IP_CT_RELATED_REPLY state, which have
-not been dropped, will follow the goto, however the placement of the
-goto label means that updating the action bit field will be bypassed.
+I bisected it to commit 629df6701c8a ("net: ipv6/addrconf: clamp
+preferred_lft to the minimum required"). Upon reviewing that change, I
+see that it has changed when generation of temporary addresses will be
+allowed. I believe that change might have inadvertently caused the
+kernel to violate RFC 4941 and might need to be reverted.
 
-This causes ovs_nat_update_key() to not be called from ovs_ct_nat()
-which means the openvswitch match key for the ICMP/ICMPv6 packet is not
-updated and the pre-nat value will be retained for the key, which will
-result in the wrong openflow rule being matched for that packet.
+In particular RFC 4941 specifies that the preferred lifetime of a
+temporary address must not be greater than the preferred lifetime of
+the public address it is derived from. However, this change allows a
+temporary address to be generated with a preferred lifetime greater
+than the public address' preferred lifetime.
 
-Move the goto label above where the action bit field is being set so
-that it is updated in all cases where the packet is accepted.
+From RFC 4941:
 
-Fixes: ebddb1404900 ("net: move the nat function to nf_nat_ovs for ovs and tc")
-Signed-off-by: Brad Cowie <brad@faucet.nz>
----
- net/netfilter/nf_nat_ovs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+    4.  When creating a temporary address, the lifetime values MUST be
+        derived from the corresponding prefix as follows:
 
-diff --git a/net/netfilter/nf_nat_ovs.c b/net/netfilter/nf_nat_ovs.c
-index 551abd2da614..0f9a559f6207 100644
---- a/net/netfilter/nf_nat_ovs.c
-+++ b/net/netfilter/nf_nat_ovs.c
-@@ -75,9 +75,10 @@ static int nf_ct_nat_execute(struct sk_buff *skb, struct nf_conn *ct,
- 	}
- 
- 	err = nf_nat_packet(ct, ctinfo, hooknum, skb);
-+out:
- 	if (err == NF_ACCEPT)
- 		*action |= BIT(maniptype);
--out:
-+
- 	return err;
- }
- 
--- 
-2.34.1
+        *  Its Valid Lifetime is the lower of the Valid Lifetime of the
+           public address or TEMP_VALID_LIFETIME.
 
+        *  Its Preferred Lifetime is the lower of the Preferred Lifetime
+           of the public address or TEMP_PREFERRED_LIFETIME -
+           DESYNC_FACTOR.
+
+Previously temporary addresses would not be generated for an interface
+if the administratively configured preferred lifetime on that
+interface was too short. This change tries to avoid that, and allow
+generating temporary addresses even on interfaces with very short
+configured lifetimes, by simply increasing the preferred lifetime of
+the generated address. However, doing so runs afoul of the above
+requirement. It allows the preferred lifetime of the temporary address
+to be increased to a value that is larger than the public address'
+preferred lifetime. For example, in my case where the router
+advertisement causes the public address' preferred lifetime to be set
+to 0, the current code allows a temporary address to be generated with
+a preferred lifetime of (regen_advance + age + 1), which is obviously
+greater than 0. It also, in my case, leads to new temporary addresses
+with very short lifetimes being generated, about once every second,
+leading to the application-level issues I described above.
+
+Cheers,
+
+-- Dan
 
