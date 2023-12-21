@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-59556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD75181B456
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:50:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6CF781B46B
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 623311F253B3
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:50:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 938AD28194A
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E976AB9E;
-	Thu, 21 Dec 2023 10:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6FA6ABB7;
+	Thu, 21 Dec 2023 10:52:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J4XqYdcv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtpvG06C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2506A02C;
-	Thu, 21 Dec 2023 10:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBDA697A6;
+	Thu, 21 Dec 2023 10:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d2e6e14865so4481095ad.0;
-        Thu, 21 Dec 2023 02:49:59 -0800 (PST)
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6d9f7af8918so485071a34.0;
+        Thu, 21 Dec 2023 02:52:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703155799; x=1703760599; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703155942; x=1703760742; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4N2RE6AvTzpax8v3fM5XZeoxUYCbygA0gYkrnpQaZuA=;
-        b=J4XqYdcvwQiBW/wqqCzmONM6McXGJpbhsfNq2BeQNKILYOxHJEQ/v11GEgtRW67Ghp
-         QUiYAs8aDRgJCHEqJEJ3RVHlEWwQR5/b+WcWGgmOgqqxkxnA+7jMHT3oYNHfHOSTmoiE
-         fzXNHdXRe9t6AgnLIgHhBkRtP6wrgnaOS7pGRjWRO9PxR8usf452hoNoBpoST7GAnJ0D
-         0/lWxew48bPtzrVyvgVCekXK/3s7QS4z1BQqTp5vgnxpVJ//M2uz0jPzZCtVru888ZPH
-         QCGNo7ejrmL/no/PvIyxxZvZTKrVh2EXdjsYZKHqn5UHUPiFZnBE99gv/l5oERsATldH
-         IINQ==
+        bh=3V2bqFbXFz6uzfuAS3EMaj60alCFn4Hya5TWFrc6X7E=;
+        b=YtpvG06CYl+FDHybVEb/ZxQDQEiWnV6BGj3Mhgop3OA4nD4yg7p10pyWofpy2el8wi
+         nWwqpCHpyjQy8A1YA23kfs4z22AZarQK0Tkm4984RmxDeg7zZ6HCbpllQQiVuuyB/FpV
+         5ty+IAcU2r49/ha3tu9acrRycY8Z4QOHc2xK/tQDr0neVTss3chybcjQnDo/2PXch7Xv
+         34KY9/Zq73sI+fUwagP+pm1/sORUCmm20H/IiHzoU3bmSdz8ZugcoS1hxZBMYjVTqM/o
+         K251G3q0/DrNTkVMLsxpHgnGwW5FvdwRZquZ7CVyPQgRhdPJQhfaxHCIjDFT3MClDL1Y
+         AP5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703155799; x=1703760599;
+        d=1e100.net; s=20230601; t=1703155942; x=1703760742;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4N2RE6AvTzpax8v3fM5XZeoxUYCbygA0gYkrnpQaZuA=;
-        b=PbyWI+9+5Y4qUdJObm89AqtXfSMhU3mGd9WX4BA8ydVqYGxUXGDlO8jRcVrfn5l8xW
-         VS3oN5+4Bdu1pX+bgyiaTbVcm90hBURjFm690XOk130rBBTn4imI5PQqJn0HephjRAd1
-         SoOmuKeoSP0XoaS72H/q7hubMxEdaB1IW4qu+dcnsM8/PBXfWMfBV+Z51twMQgKtLE17
-         /FIUOacPzlkybUg0xb555Xie720sJ2apoe/i5vzdKmDGQY0Cho5vb7aF3SgW3VEmwedP
-         Udd62mWnQTSr5if480u0EYAa2HcUJZkXmOvritTD8WVPpHUQ4riBykK62Kk+Iuqm9H4W
-         92pQ==
-X-Gm-Message-State: AOJu0YyJI+90/I8ht7AsqzTp4uPFdr/MH62siohGTRRpMmTMMWcLI1Xo
-	8o1UjrZghjq02/wT7kfKvvA=
-X-Google-Smtp-Source: AGHT+IHC0clJbYsgR3ZfoFMNQ9eOgk1PTWwZbhRHnRtS1TdPoI8n7SNRoFsLB3+Pl4pwpKSnAb4aMQ==
-X-Received: by 2002:a17:902:d509:b0:1d2:fa24:2266 with SMTP id b9-20020a170902d50900b001d2fa242266mr12567233plg.6.1703155798908;
-        Thu, 21 Dec 2023 02:49:58 -0800 (PST)
+        bh=3V2bqFbXFz6uzfuAS3EMaj60alCFn4Hya5TWFrc6X7E=;
+        b=EsbUTWFQ8pc8ewjhy5I9cw5NxZvZtGJUiKKfUwx80Mzi58Zri7yPEmL5wK1E+Tdkfe
+         AX/jYQ5EEZ/HZBBLKTs6+5l5Fom7I1huJ0HsoRHfjOafXZCXYRWPMQ/j4qruQJqDLnvx
+         zCi10IUme6FlSTbYuT5h6IAu6MQS6qeDMSji+Wh7gKgmzY/Bl/VdixAxElKefY5mmESE
+         5HfZAM+eMtsWCgasauuJc5GiHw99gZ+Gz4JlMftxtHBviVHQw0jwqL/r948J1w3x61jS
+         C//A2SAisbB1j6xLXmboVZSe1ZsKh6QUmdpKrlOau9ZlwnVAFJi0AXGH2qlPYNs5WWkk
+         klVg==
+X-Gm-Message-State: AOJu0Yzi6XBxn2Vq6kR9hns4ubneQ4Nz7PaCYMras20Dl7L6Hd3M6Y5e
+	LBPsBocS65bMcs1K9bMA/Lc=
+X-Google-Smtp-Source: AGHT+IFl2rzPibrLT4xBwUK8vXKFc6W5IyhD8xzAPhynxnUm6Us+9LLSahTk+9jzj64K1Mvvu6RZXg==
+X-Received: by 2002:a05:6359:a0f:b0:172:e0d4:43c9 with SMTP id el15-20020a0563590a0f00b00172e0d443c9mr964626rwb.10.1703155941859;
+        Thu, 21 Dec 2023 02:52:21 -0800 (PST)
 Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id y8-20020a17090264c800b001d1cd7e4ad2sm1348515pli.125.2023.12.21.02.49.58
+        by smtp.gmail.com with ESMTPSA id q20-20020aa79834000000b006d978ad1c56sm598412pfl.54.2023.12.21.02.52.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 02:49:58 -0800 (PST)
+        Thu, 21 Dec 2023 02:52:21 -0800 (PST)
 Received: by archie.me (Postfix, from userid 1000)
-	id 2A7791025E0AC; Thu, 21 Dec 2023 17:49:54 +0700 (WIB)
-Date: Thu, 21 Dec 2023 17:49:54 +0700
+	id DE4F01025E0AC; Thu, 21 Dec 2023 17:52:16 +0700 (WIB)
+Date: Thu, 21 Dec 2023 17:52:16 +0700
 From: Bagas Sanjaya <bagasdotme@gmail.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
@@ -75,11 +75,11 @@ Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Karsten Keil <isdn@linux-pingi.de>,
 	Karsten Keil <keil@b1-systems.de>,
 	YouHong Li <liyouhong@kylinos.cn>
-Subject: Re: [PATCH net 1/2] MAINTAINERS: Remove Karsten Keil
-Message-ID: <ZYQYUgZrewi2Up50@archie.me>
+Subject: Re: [PATCH net 0/2] ISDN/mISDN maintenanceship cleanup
+Message-ID: <ZYQY4OW4U28OY-i0@archie.me>
 References: <20231221091419.11764-1-bagasdotme@gmail.com>
- <20231221091419.11764-2-bagasdotme@gmail.com>
- <2023122156-diocese-movie-3d75@gregkh>
+ <ba2ac330-d977-4637-93bc-99ee953faab8@gmail.com>
+ <2023122121-yiddish-unproven-d793@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,63 +87,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vTDxja+sUVdToaj8"
+	protocol="application/pgp-signature"; boundary="mrhndHuSUZHXM3O1"
 Content-Disposition: inline
-In-Reply-To: <2023122156-diocese-movie-3d75@gregkh>
+In-Reply-To: <2023122121-yiddish-unproven-d793@gregkh>
 
 
---vTDxja+sUVdToaj8
+--mrhndHuSUZHXM3O1
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 21, 2023 at 10:32:09AM +0100, Greg Kroah-Hartman wrote:
-> On Thu, Dec 21, 2023 at 04:14:18PM +0700, Bagas Sanjaya wrote:
-> > He's no longer active maintaining ISDN/mISDN subsystem: his last message
-> > on kernel mailing lists was three years ago [1] and last commit activity
-> > from him was 1e1589ad8b5cb5 ("mISDN: Support DR6 indication in mISDNipac
-> > driver") in 2016 when he gave Acked-by: from his @b1-systems.de address.
+On Thu, Dec 21, 2023 at 10:32:58AM +0100, Greg Kroah-Hartman wrote:
+> On Thu, Dec 21, 2023 at 04:17:37PM +0700, Bagas Sanjaya wrote:
+> > On 12/21/23 16:14, Bagas Sanjaya wrote:
+> > > When I'm looking at simple typofix against ISDN subsystem [1], I find
+> > > out more about subsystem activity. It turns out that the subsystem
+> > > maintainer has been inactive since 3 years ago. And also, when I test
+> > > sending "Lorem ipsum" message to the subsystem mailing list, it gets
+> > > bounced.
+> > >=20
 > >=20
-> > Move him to CREDITS, as netdev people should already handle ISDN/mISDN
-> > patches.
+> > Oops, sorry not adding the link.
 > >=20
-> > Link: https://lore.kernel.org/r/0ee243a9-9937-ad26-0684-44b18e772662@li=
-nux-pingi.de/ [1]
-> > Cc: Karsten Keil <isdn@linux-pingi.de>
-> > Cc: Karsten Keil <keil@b1-systems.de>
-> > Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> > [1]: https://lore.kernel.org/lkml/20231221024758.1317603-1-liyouhong@ky=
+linos.cn/
 >=20
-> Are you sure he's not active?  It doesn't take much work to keep an old
-> subsystem like this alive, last I remember, real changes were accepted
-> just fine.
+> I too like to ignore pointless changes like this at times.  Just because
+> others do, does NOT mean that the subsystem is not being maintained.
 
-As for LKML messages, yes; he doesn't post any new messages since 2020.
+Unless maintainers in question agree after their inactivity.
 
->=20
-> Perhaps just don't send coding style cleanups to old subsystems?  :)
->=20
-> I would not take these unless Karsten agrees that he no longer wants to
-> maintain this.
-
-OK, I will send a private message to him asking for continuing maintainer
-role. If there's no response from him by the new year, then it's safe to
-route this through net tree instead (hence [PATCH net]).
-
-Thanks.
+Ciao!
 
 --=20
 An old man doll... just what I always wanted! - Clara
 
---vTDxja+sUVdToaj8
+--mrhndHuSUZHXM3O1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZYQYTgAKCRD2uYlJVVFO
-owYLAP9jcvHw7NMOSzovxwxjoUi/bpB1EK0qoM6z6CNZjGfdGAEAs5rTbKJZHo9P
-NW7yJNyW95AR3T94fVPUBioTGiyjsAU=
-=PYnq
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZYQY4AAKCRD2uYlJVVFO
+oyzDAQDV0vQYfA1X7q9/0rAvwBI4TYCCe68k3H+T31bEqvwjWwEAwFw+NsdY7K/O
+rO+vF4hMLPGDdjm3BRdpB5MsdoouKgk=
+=NBX+
 -----END PGP SIGNATURE-----
 
---vTDxja+sUVdToaj8--
+--mrhndHuSUZHXM3O1--
 
