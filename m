@@ -1,119 +1,105 @@
-Return-Path: <netdev+bounces-59561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BB081B498
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:02:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 717EE81B4B0
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:11:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDF7AB21B02
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:02:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02D35B217D8
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84C86DCEE;
-	Thu, 21 Dec 2023 11:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A766AB9F;
+	Thu, 21 Dec 2023 11:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Dbb3N+HA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.astralinux.ru (mail.astralinux.ru [217.74.38.119])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3906BB3D;
-	Thu, 21 Dec 2023 11:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.astralinux.ru (Postfix) with ESMTP id B20161868DE9;
-	Thu, 21 Dec 2023 14:02:05 +0300 (MSK)
-Received: from mail.astralinux.ru ([127.0.0.1])
-	by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id uNA77BV8vq19; Thu, 21 Dec 2023 14:02:05 +0300 (MSK)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.astralinux.ru (Postfix) with ESMTP id 49B811868DC5;
-	Thu, 21 Dec 2023 14:02:05 +0300 (MSK)
-X-Virus-Scanned: amavisd-new at astralinux.ru
-Received: from mail.astralinux.ru ([127.0.0.1])
-	by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 1z0oOcMoKVIi; Thu, 21 Dec 2023 14:02:05 +0300 (MSK)
-Received: from new-mail.astralinux.ru (unknown [10.177.185.102])
-	by mail.astralinux.ru (Postfix) with ESMTPS id 997A11868E4C;
-	Thu, 21 Dec 2023 14:02:04 +0300 (MSK)
-Received: from rbta-msk-lt-156703.astralinux.ru (unknown [10.177.232.135])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4SwnZ34sJVzfYks;
-	Thu, 21 Dec 2023 14:02:03 +0300 (MSK)
-From: Alexey Panov <apanov@astralinux.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Alexey Panov <apanov@astralinux.ru>,
-	ericvh@kernel.org,
-	lucho@ionkov.net,
-	asmadeus@codewreck.org,
-	linux_oss@crudebyte.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	v9fs@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Hangyu Hua <hbh25y@gmail.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10 1/1] 9p/net: fix possible memory leak in p9_check_errors()
-Date: Thu, 21 Dec 2023 14:01:22 +0300
-Message-Id: <20231221110122.9838-2-apanov@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231221110122.9838-1-apanov@astralinux.ru>
-References: <20231221110122.9838-1-apanov@astralinux.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04B56A02F;
+	Thu, 21 Dec 2023 11:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3BLBAq1v122527;
+	Thu, 21 Dec 2023 05:10:52 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1703157052;
+	bh=QmXACMYRAncvaes6ymYI0iABfyRzCf/v2jYHx0VjiXg=;
+	h=From:To:CC:Subject:Date;
+	b=Dbb3N+HAhf8TWCggogCK90QFBYwAIM7OvHkJ8UA01C+Y6LjjDgLKkYnsPzU1VhTi+
+	 GP29/yHzIKYjyw6i73gGes6dbeRjlZbAjRo5vSetr8SfV8mEikD28+TlbkqOVWdBvx
+	 djCgLf5r+L1uiRiCMIDafH+CIBcrhS3um4EsRYec=
+Received: from DFLE107.ent.ti.com (dfle107.ent.ti.com [10.64.6.28])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3BLBAqQr049082
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 21 Dec 2023 05:10:52 -0600
+Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 21
+ Dec 2023 05:10:52 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 21 Dec 2023 05:10:52 -0600
+Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3BLBAp7d113056;
+	Thu, 21 Dec 2023 05:10:52 -0600
+From: Chintan Vankar <c-vankar@ti.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+        Grygorii Strashko
+	<grygorii.strashko@ti.com>,
+        Roger Quadros <rogerq@kernel.org>,
+        "Siddharth
+ Vadapalli" <s-vadapalli@ti.com>,
+        Paolo Abeni <pabeni@redhat.com>, "Jakub
+ Kicinski" <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Chintan Vankar
+	<c-vankar@ti.com>
+Subject: [RFC PATCH net-next] net: ethernet: ti: am65-cpsw-nuss: Enable SGMII mode for J784S4 CPSW9G
+Date: Thu, 21 Dec 2023 16:40:46 +0530
+Message-ID: <20231221111046.761843-1-c-vankar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-From: Hangyu Hua <hbh25y@gmail.com>
+TI's J784S4 SoC supports SGMII mode with CPSW9G instance of the CPSW
+Ethernet Switch. Thus, enable it by adding SGMII mode to the
+extra_modes member of the "j784s4_cpswxg_pdata" SoC data.
 
-[ Upstream commit ce07087964208eee2ca2f9ee4a98f8b5d9027fe6 ]
-
-When p9pdu_readf() is called with "s?d" attribute, it allocates a pointer
-that will store a string. But when p9pdu_readf() fails while handling "d"
-then this pointer will not be freed in p9_check_errors().
-
-Fixes: 51a87c552dfd ("9p: rework client code to use new protocol support =
-functions")
-Reviewed-by: Christian Schoenebeck <linux_oss@crudebyte.com>
-Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
-Message-ID: <20231027030302.11927-1-hbh25y@gmail.com>
-Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D218235
-Signed-off-by: Alexey Panov <apanov@astralinux.ru>
+Signed-off-by: Chintan Vankar <c-vankar@ti.com>
 ---
- net/9p/client.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/9p/client.c b/net/9p/client.c
-index e8862cd4f91b..cd85a4b6448b 100644
---- a/net/9p/client.c
-+++ b/net/9p/client.c
-@@ -520,11 +520,14 @@ static int p9_check_errors(struct p9_client *c, str=
-uct p9_req_t *req)
- 		return 0;
-=20
- 	if (!p9_is_proto_dotl(c)) {
--		char *ename;
-+		char *ename =3D NULL;
-+
- 		err =3D p9pdu_readf(&req->rc, c->proto_version, "s?d",
- 				  &ename, &ecode);
--		if (err)
-+		if (err) {
-+			kfree(ename);
- 			goto out_err;
-+		}
-=20
- 		if (p9_is_proto_dotu(c) && ecode < 512)
- 			err =3D -ecode;
---=20
-2.30.2
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 7651f90f51f2..9aa5a6108521 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -2855,7 +2855,8 @@ static const struct am65_cpsw_pdata j784s4_cpswxg_pdata = {
+ 	.quirks = 0,
+ 	.ale_dev_id = "am64-cpswxg",
+ 	.fdqring_mode = K3_RINGACC_RING_MODE_MESSAGE,
+-	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_USXGMII),
++	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_SGMII) |
++		       BIT(PHY_INTERFACE_MODE_USXGMII),
+ };
+ 
+ static const struct of_device_id am65_cpsw_nuss_of_mtable[] = {
+-- 
+2.34.1
+
 
