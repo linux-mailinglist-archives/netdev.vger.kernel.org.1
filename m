@@ -1,178 +1,154 @@
-Return-Path: <netdev+bounces-59745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9255E81BF35
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 20:44:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C744A81BF32
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 20:41:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2936F2872F4
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 19:44:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42A96B22D0D
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 19:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10571651B8;
-	Thu, 21 Dec 2023 19:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PgFiJ2lm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4E0651B6;
+	Thu, 21 Dec 2023 19:40:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625C3651B3;
-	Thu, 21 Dec 2023 19:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a268836254aso142673166b.1;
-        Thu, 21 Dec 2023 11:44:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703187845; x=1703792645; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pbdJM7jcrT7OuR7e65CGFmz1ctkL4cu4WD9zPciMeig=;
-        b=PgFiJ2lmymCG6ahweFrUKY7xpQ3otwfO4JeLMTSHwBi1Gqa5gHifCqOX62WoKLswij
-         Q2LJT+J8Yc8amTB/Ps0p16q7/ErAyRWkscfHLfDkTut01JD1LfrIAIgY4/prx0WhlPo/
-         ILvOTn+IUitI27iGqloIOo124ZOeH+HdDz1Idg3hYpDnjSR7n38f6Nz3FKVRg88rxy1a
-         vJyF+117bUv8ZbjZb8nYd5tjN3B36i1cNIVZpr+znGkwB8Q5LJXSBsP8QKbld2pqwiIE
-         09/YbqWW/f6lcuNwFnEaQMYd4hA8+1X94z00zQnMUcF6AQ04qi9LwH7E8VnL0yEJ1x82
-         ZvRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703187845; x=1703792645;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbdJM7jcrT7OuR7e65CGFmz1ctkL4cu4WD9zPciMeig=;
-        b=X02kUXKlX1A4gHEPct48bBgNOuGIJXrDx4mP27i5M4R5LesiVlRPGAPr+/24F/gHih
-         t0Lv8aUNO0CkPWRIqTfx5H12/qF16s8JP/lFln+6KS5+TiS1OlwHl++HoC7yNue4ZcUJ
-         QSUwLUCTI3vc0kZ0UaHB1vOL4bdY4ewBgO1ZxKDvwBG6ugCyeUfrsrND0WZo3ZUbJKXf
-         iUmcPu2ef+MAmaesRaVPYVIsfVZPfZucvAmwOWVR4a3vO4q/mx0XnJ5dKQYRYo8Ybd/r
-         0T2olo+nhEyAtPDD5xVrMBOq7ReIr317lXxYn+wwK+I36VgzilMYHgWtxNT+TPmTxI4y
-         RJIA==
-X-Gm-Message-State: AOJu0YzTCdJwM7auN/aNfxgZecwqyOImllXjgwmIO1S9qXtJyfS/21TU
-	Vyx0tP+Avyw0Rk9sGrSDBeY=
-X-Google-Smtp-Source: AGHT+IFtRsBBU/iMf3HpwSw1YOa7QY160mG45mUhzQkYn/EGkHHNai5PQFJqYl622MpVHW5Cu6iQiA==
-X-Received: by 2002:a17:906:74de:b0:a1e:437c:6a6d with SMTP id z30-20020a17090674de00b00a1e437c6a6dmr123779ejl.95.1703187845387;
-        Thu, 21 Dec 2023 11:44:05 -0800 (PST)
-Received: from [192.168.8.100] ([185.69.145.35])
-        by smtp.gmail.com with ESMTPSA id cl2-20020a170906c4c200b00a19afc16d23sm1264296ejb.104.2023.12.21.11.44.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Dec 2023 11:44:05 -0800 (PST)
-Message-ID: <3986f106-051d-46c8-8ec3-82558f670253@gmail.com>
-Date: Thu, 21 Dec 2023 19:36:27 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E0820317;
+	Thu, 21 Dec 2023 19:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.75.203) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 21 Dec
+ 2023 22:40:40 +0300
+Subject: Re: [PATCH net-next v2 13/21] net: ravb: Set config mode in ndo_open
+ and reset mode in ndo_close
+To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-14-claudiu.beznea.uj@bp.renesas.com>
+ <78688143-e777-c98b-01eb-813f0fe67491@omp.ru>
+ <ba18b668-94c0-4cab-9d2c-87ac6c3f8f8e@tuxon.dev>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <ab1bf608-db37-59ab-a28a-9ecef81d385c@omp.ru>
+Date: Thu, 21 Dec 2023 22:40:39 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 13/20] io_uring: implement pp memory provider for
- zc rx
+In-Reply-To: <ba18b668-94c0-4cab-9d2c-87ac6c3f8f8e@tuxon.dev>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20231219210357.4029713-1-dw@davidwei.uk>
- <20231219210357.4029713-14-dw@davidwei.uk>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20231219210357.4029713-14-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/21/2023 19:09:30
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182285 [Dec 21 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.203 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.203 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.203
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/21/2023 19:13:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/21/2023 5:11:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 12/19/23 21:03, David Wei wrote:
-> From: Pavel Begunkov <asml.silence@gmail.com>
-> 
-> We're adding a new pp memory provider to implement io_uring zerocopy
-> receive. It'll be "registered" in pp and used in later paches.
-> 
-> The typical life cycle of a buffer goes as follows: first it's allocated
-> to a driver with the initial refcount set to 1. The drivers fills it
-> with data, puts it into an skb and passes down the stack, where it gets
-> queued up to a socket. Later, a zc io_uring request will be receiving
-> data from the socket from a task context. At that point io_uring will
-> tell the userspace that this buffer has some data by posting an
-> appropriate completion. It'll also elevating the refcount by
-> IO_ZC_RX_UREF, so the buffer is not recycled while userspace is reading
-> the data. When the userspace is done with the buffer it should return it
-> back to io_uring by adding an entry to the buffer refill ring. When
-> necessary io_uring will poll the refill ring, compare references
-> including IO_ZC_RX_UREF and reuse the buffer.
-> 
-> Initally, all buffers are placed in a spinlock protected ->freelist.
-> It's a slow path stash, where buffers are considered to be unallocated
-> and not exposed to core page pool. On allocation, pp will first try
-> all its caches, and the ->alloc_pages callback if everything else
-> failed.
-> 
-> The hot path for io_pp_zc_alloc_pages() is to grab pages from the refill
-> ring. The consumption from the ring is always done in the attached napi
-> context, so no additional synchronisation required. If that fails we'll
-> be getting buffers from the ->freelist.
-> 
-> Note: only ->freelist are considered unallocated for page pool, so we
-> only add pages_state_hold_cnt when allocating from there. Subsequently,
-> as page_pool_return_page() and others bump the ->pages_state_release_cnt
-> counter, io_pp_zc_release_page() can only use ->freelist, which is not a
-> problem as it's not a slow path.
-> 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
-...
-> +static void io_zc_rx_ring_refill(struct page_pool *pp,
-> +				 struct io_zc_rx_ifq *ifq)
-> +{
-> +	unsigned int entries = io_zc_rx_rqring_entries(ifq);
-> +	unsigned int mask = ifq->rq_entries - 1;
-> +	struct io_zc_rx_pool *pool = ifq->pool;
-> +
-> +	if (unlikely(!entries))
-> +		return;
-> +
-> +	while (entries--) {
-> +		unsigned int rq_idx = ifq->cached_rq_head++ & mask;
-> +		struct io_uring_rbuf_rqe *rqe = &ifq->rqes[rq_idx];
-> +		u32 pgid = rqe->off / PAGE_SIZE;
-> +		struct io_zc_rx_buf *buf = &pool->bufs[pgid];
-> +
-> +		if (!io_zc_rx_put_buf_uref(buf))
-> +			continue;
+On 12/17/23 4:15 PM, claudiu beznea wrote:
 
-It's worth to note that here we have to add a dma sync as per
-discussions with page pool folks.
+[...]
 
-> +		io_zc_add_pp_cache(pp, buf);
-> +		if (pp->alloc.count >= PP_ALLOC_CACHE_REFILL)
-> +			break;
-> +	}
-> +	smp_store_release(&ifq->ring->rq.head, ifq->cached_rq_head);
-> +}
-> +
-> +static void io_zc_rx_refill_slow(struct page_pool *pp, struct io_zc_rx_ifq *ifq)
-> +{
-> +	struct io_zc_rx_pool *pool = ifq->pool;
-> +
-> +	spin_lock_bh(&pool->freelist_lock);
-> +	while (pool->free_count && pp->alloc.count < PP_ALLOC_CACHE_REFILL) {
-> +		struct io_zc_rx_buf *buf;
-> +		u32 pgid;
-> +
-> +		pgid = pool->freelist[--pool->free_count];
-> +		buf = &pool->bufs[pgid];
-> +
-> +		io_zc_add_pp_cache(pp, buf);
-> +		pp->pages_state_hold_cnt++;
-> +		trace_page_pool_state_hold(pp, io_zc_buf_to_pp_page(buf),
-> +					   pp->pages_state_hold_cnt);
-> +	}
-> +	spin_unlock_bh(&pool->freelist_lock);
-> +}
-...
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> As some IP variants switch to reset mode (and thus registers' content is
+>>
+>>    Register.
+>>
+>>> lost) when setting clocks (due to module standby functionality) to be able
+>>> to implement runtime PM and save more power, set the IP's operation mode to
+>>
+>>    Operating.
+>>
+>>> reset at the end of the probe. Along with it, in the ndo_open API the IP
+>>> will be switched to configuration, then operational mode. In the ndo_close
+>>> API, the IP will be switched back to reset mode. This allows implementing
+>>> runtime PM and, along with it, save more power when the IP is not used.
+>>>
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> [..]
+>>
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index db9222fc57c2..31a1f8a83652 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> [...]
+>>> @@ -1821,13 +1845,19 @@ static int ravb_open(struct net_device *ndev)
+>>>  	if (info->nc_queues)
+>>>  		napi_enable(&priv->napi[RAVB_NC]);
+>>>  
+>>> +	/* Set AVB config mode */
+>>> +	error = ravb_set_config_mode(ndev);
+>>> +	if (error)
+>>> +		goto out_napi_off;
+>>> +
+>>
+>>    I suspect this too belongs in ravb_dmac_init() now...
+> 
+> What I can do here is to keep PTP/GAC specific settings from
+> ravb_set_config_mode() in a separate function close to PTP setup and remove
+> ravb_set_config_mode() at all as ravb_dmac_init() switches anyway the IP to
+> config mode. But with this I don't know how the PTP/GAC will be influenced
 
--- 
-Pavel Begunkov
+   My manuals say there are certain limitations (currently reflected in
+ravb_set_config_mode()) WRT setting CCC.CSEL and CCC.GAC bits.
+
+> as I don't have a setup to check it. From my memories, the commit that
+> introduces the setup of PTP when switching to config mode did this by
+> intention, so I'm not sure weather playing around with this is the way to
+> go forward. Do you remember something specific about this?
+
+   I haven't ever tested PTP, IIRC...
+
+[...]
+
+MBR, Sergey
 
