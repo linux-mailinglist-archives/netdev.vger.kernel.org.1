@@ -1,169 +1,153 @@
-Return-Path: <netdev+bounces-59563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFF9381B4D2
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:23:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95CD381B4F7
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:32:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E7BB1F256D1
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:23:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4CCA1C23BC0
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FE16BB4D;
-	Thu, 21 Dec 2023 11:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c0rqv1YD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30FE6DD18;
+	Thu, 21 Dec 2023 11:32:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF236BB3D;
-	Thu, 21 Dec 2023 11:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d3e2972f65so2766495ad.3;
-        Thu, 21 Dec 2023 03:23:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703157792; x=1703762592; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iurPx6U1Yq+NZr3UnEVxu22VONJz6nR4G9rGokJKtfI=;
-        b=c0rqv1YDPQQkIOq2WVrS0ll7SYfRhXpKkU4dq8CIGijAiL6DATbORglgiJmRMC9Sh6
-         gS7L+hF735IEUZ03YKm2jVTx2oD2w/u+eLPt6vUvx1ERFOhPFKdTBp21BEFzQN01FemJ
-         cRw1MfVokkK59mEQGT9RTXm77yX8wMpxQjwiOHDi3b1A/c8lAT3GKdPvkMyExLb9Prnp
-         L14sAnbZ42si5kXlcqYq/sjDf7gt61RxpNsAsylSg/zUkG1Tak9b1I9PgC2PbXs0oEgp
-         pdKkqFlJkd5a896iXimXL7hZ6Ac3b7BJcUDnr6ZTTyw8CDnUrauLx1DXAmyTA9YfnAyA
-         kcIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703157792; x=1703762592;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iurPx6U1Yq+NZr3UnEVxu22VONJz6nR4G9rGokJKtfI=;
-        b=ulfuYX+Dr1G+WC0pC0okK45ycZbvqMZszk7p4zkU+HJ/gYgmyHs2mxG7F8fMzA4hYn
-         yxuVR/NqXCikrqBlnEAOmimO4bwHjLGriTeeKX3gIm5GcWv7bJvqztrCQfQ7ngWJJk/a
-         kiJHzAvrUMAYg9CRnNY9o6lFnTOoeNt+q82dgyHy0tloHbKOZ0jgCv0CK2q0BugWMQ1I
-         LtevQj6XQ1SQdTuBVAZi+9is9Ap3EvK1xwvOsTGlcuiBxCvGOJzNWwiZLGpDyYAYDaID
-         SDJNUWusI719QmkjiT2w9LFtT8of6dIoTADaWa8b+byEbQv9PuOxMDsTyEENJgX9h1FK
-         fZ8A==
-X-Gm-Message-State: AOJu0YzwoDso9qiCJMf/LtwcttkqRipqOJnl3G5LxFx9X3ScV35nHL9g
-	PG+zAuzg+aSE0Y/oNoMNR0M=
-X-Google-Smtp-Source: AGHT+IExJqNXn7XmZ803oCoArKhVQWyZmpB8PHbShkKvYBOvRSlQv57Xx7zYUNX6P4EjV6J0PZjwGg==
-X-Received: by 2002:a17:902:684c:b0:1d3:f285:15a5 with SMTP id f12-20020a170902684c00b001d3f28515a5mr1727435pln.35.1703157791960;
-        Thu, 21 Dec 2023 03:23:11 -0800 (PST)
-Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id ju22-20020a170903429600b001d1cd7e4acesm1410398plb.68.2023.12.21.03.23.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 03:23:11 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id E149C1026AE88; Thu, 21 Dec 2023 18:23:07 +0700 (WIB)
-Date: Thu, 21 Dec 2023 18:23:07 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Janitors <kernel-janitors@vger.kernel.org>,
-	Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Justin Stitt <justinstitt@google.com>,
-	Kunwu Chan <chentao@kylinos.cn>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Nathan Chancellor <nathan@kernel.org>,
-	"Steven Rostedt (Google)" <rostedt@goodmis.org>,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Karsten Keil <keil@b1-systems.de>,
-	YouHong Li <liyouhong@kylinos.cn>
-Subject: Re: [PATCH net 1/2] MAINTAINERS: Remove Karsten Keil
-Message-ID: <ZYQgGxKOKqIe4TIL@archie.me>
-References: <20231221091419.11764-1-bagasdotme@gmail.com>
- <20231221091419.11764-2-bagasdotme@gmail.com>
- <2023122156-diocese-movie-3d75@gregkh>
- <ZYQYUgZrewi2Up50@archie.me>
- <2023122116-favoring-roulette-554f@gregkh>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7055D6BB55;
+	Thu, 21 Dec 2023 11:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SwpDQ3sllzsSSJ;
+	Thu, 21 Dec 2023 19:31:50 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id DD81318005E;
+	Thu, 21 Dec 2023 19:32:08 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 21 Dec
+ 2023 19:32:08 +0800
+Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
+ of struct page in API
+To: Mina Almasry <almasrymina@google.com>, Shakeel Butt <shakeelb@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Thomas Gleixner
+	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Michael Chan <michael.chan@broadcom.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP
+ Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand
+	<shailend@google.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+	<salil.mehta@huawei.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Thomas Petazzoni
+	<thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, Russell King
+	<linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, Geetha
+ sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin
+	<john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>, Mark Lee
+	<Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, "K. Y.
+ Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei
+ Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
+	<jaswinder.singh@linaro.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi Gunasekaran
+	<r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, Jiawen Wu
+	<jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, Ronak
+ Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers
+	<pv-drivers@vmware.com>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
+	<shayne.chen@mediatek.com>, Kalle Valo <kvalo@kernel.org>, Juergen Gross
+	<jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Oleksandr
+ Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko
+	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
+	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi
+	<stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+	<justinstitt@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>
+References: <20231214020530.2267499-1-almasrymina@google.com>
+ <20231214020530.2267499-5-almasrymina@google.com>
+ <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
+ <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
+ <20231215021114.ipvdx2bwtxckrfdg@google.com>
+ <20231215190126.1040fa12@kernel.org>
+ <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
+ <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
+ <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com>
+Date: Thu, 21 Dec 2023 19:32:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ZMxuX3fRkHidytpf"
-Content-Disposition: inline
-In-Reply-To: <2023122116-favoring-roulette-554f@gregkh>
+In-Reply-To: <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
+On 2023/12/20 11:01, Mina Almasry wrote:
 
---ZMxuX3fRkHidytpf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+...
 
-On Thu, Dec 21, 2023 at 11:54:02AM +0100, Greg Kroah-Hartman wrote:
-> On Thu, Dec 21, 2023 at 05:49:54PM +0700, Bagas Sanjaya wrote:
-> > On Thu, Dec 21, 2023 at 10:32:09AM +0100, Greg Kroah-Hartman wrote:
-> > > On Thu, Dec 21, 2023 at 04:14:18PM +0700, Bagas Sanjaya wrote:
-> > > > He's no longer active maintaining ISDN/mISDN subsystem: his last me=
-ssage
-> > > > on kernel mailing lists was three years ago [1] and last commit act=
-ivity
-> > > > from him was 1e1589ad8b5cb5 ("mISDN: Support DR6 indication in mISD=
-Nipac
-> > > > driver") in 2016 when he gave Acked-by: from his @b1-systems.de add=
-ress.
-> > > >=20
-> > > > Move him to CREDITS, as netdev people should already handle ISDN/mI=
-SDN
-> > > > patches.
-> > > >=20
-> > > > Link: https://lore.kernel.org/r/0ee243a9-9937-ad26-0684-44b18e77266=
-2@linux-pingi.de/ [1]
-> > > > Cc: Karsten Keil <isdn@linux-pingi.de>
-> > > > Cc: Karsten Keil <keil@b1-systems.de>
-> > > > Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> > >=20
-> > > Are you sure he's not active?  It doesn't take much work to keep an o=
-ld
-> > > subsystem like this alive, last I remember, real changes were accepted
-> > > just fine.
-> >=20
-> > As for LKML messages, yes; he doesn't post any new messages since 2020.
-> >=20
-> > >=20
-> > > Perhaps just don't send coding style cleanups to old subsystems?  :)
-> > >=20
-> > > I would not take these unless Karsten agrees that he no longer wants =
-to
-> > > maintain this.
-> >=20
-> > OK, I will send a private message to him asking for continuing maintain=
-er
-> > role. If there's no response from him by the new year, then it's safe to
-> > route this through net tree instead (hence [PATCH net]).
->=20
-> Why are you arbritrarily saying that "no response in 2 weeks, during the
-> time of the year almost all of Europe is on vacation, means we drop
-> someone from the MAINTAINERS file"?
->=20
+>>>> Perhaps we should aim to not export netmem_to_page(),
+>>>> prevent modules from accessing it directly.
+>>>
+>>> +1.
+>>
+> 
+> I looked into this, but it turns out it's a slightly bigger change
+> that needs some refactoring to make it work. There are few places
+> where I believe I need to add netmem_to_page() that are exposed to the
+> drivers via inline helpers, these are:
+> 
+> - skb_frag_page(), which returns NULL if the netmem is not a page, but
+> needs to do a netmem_to_page() to return the page otherwise.
 
-Because I'm impatient. Maybe I can wait for right timing to reroll once
-Karsten agrees to remove his MAINTAINERS entry.
+Is it possible to introduce something like skb_frag_netmem() for
+netmem? so that we can keep most existing users of skb_frag_page()
+unchanged and avoid adding additional checking overhead for existing
+users.
 
-Thanks.
+> - The helpers inside skb_add_rx_frag(), which needs to do a
+> netmem_to_page() to set skb->pfmemalloc.
 
---=20
-An old man doll... just what I always wanted! - Clara
+Similar as above, perhaps introduce something like skb_add_rx_netmem_frag()?
 
---ZMxuX3fRkHidytpf
-Content-Type: application/pgp-signature; name="signature.asc"
+> - Some of the page_pool APIs are exposed to the drivers as static
+> inline helpers, and if I want the page_pool to use netmem internally
+> the page_pool needs to do a netmem_to_page() in these helpers.
+> 
+> The refactor is not an issue, but I was wondering if not exporting
+> netmem_to_page() was worth moving the code around. I was thinking in
+> the interim until netmem is adopted and has actual driver users we may
+> prefer to just add a comment on the netmem_to_page() helper that says
+> 'try not to use this directly and use the netmem helpers instead'.
+> 
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZYQgGwAKCRD2uYlJVVFO
-o+uUAQDfsKMoaQFtaOT6DpcRB+FMAkidQGmnQpY0Aq69jjG64gD+JIUIecWepwwo
-X4o7niyGHz992tTPL+VyT7bt9eZfIQg=
-=BYT9
------END PGP SIGNATURE-----
-
---ZMxuX3fRkHidytpf--
 
