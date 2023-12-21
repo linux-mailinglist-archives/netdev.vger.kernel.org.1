@@ -1,101 +1,91 @@
-Return-Path: <netdev+bounces-59457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 136E681AE57
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 06:26:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD4F381AE8B
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 06:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDF161F241BE
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 05:26:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A462B22CFC
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 05:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EFD9463;
-	Thu, 21 Dec 2023 05:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB3C9479;
+	Thu, 21 Dec 2023 05:57:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="iraqdgt1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dqwjj4oX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737AB678;
-	Thu, 21 Dec 2023 05:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from localhost.localdomain (1.general.khfeng.us.vpn [10.172.68.174])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id E3D2B421F1;
-	Thu, 21 Dec 2023 05:26:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1703136366;
-	bh=k5+SIK5H7uUjKHZKy6p8fuly9LFUOLMpMXnhcGKCNrY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=iraqdgt1oQXN4WRngqJ8sdZmx4mFyCAOr+A6ZIMHEwa90P9+q8aMmYZZdzq32L43l
-	 n64lAHvrgh2t4jmeATTaMFEz0xiPS0JKcqmV4sof/CRC+LTN+Bm0yH9UWfQfhFcnd/
-	 mKNOSbXbq4khCA2F4+QoWyUYmgikKu2u0/Q9/SK9iBkQz/pwjLh0/FvgDW04LzNUY1
-	 s0D4ydC61KGkrQBPqOYn9uh1DPwZXZMghva0btNNv0J4aO2LUfeUlTGPCgfqqom7kD
-	 ujttD5tA2SIwB8UxvA/vxKyr6G2Et9c16hblYyNV0/o+p5tCZTktApHTtIXj9C+lw3
-	 o/RLJsSXGl0Og==
-From: Kai-Heng Feng <kai.heng.feng@canonical.com>
-To: hkallweit1@gmail.com,
-	nic_swsd@realtek.com
-Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] r8169: Fix PCI error on system resume
-Date: Thu, 21 Dec 2023 13:25:10 +0800
-Message-Id: <20231221052510.443674-1-kai.heng.feng@canonical.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A16BA2F;
+	Thu, 21 Dec 2023 05:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703138235; x=1734674235;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=q7xMvSItx2ksMDOvKsjxR17eYh2ozzldS7CGKU1ltVs=;
+  b=Dqwjj4oXQwpPfjXSAYH/mC3l8UeWBSGFEuk8vXPco+nOwtIUmZPNoi9C
+   k18pXjWyFAQS+527ajOvC7UZN1cKORbcB28d2XBCqdjFbC6DG/GSlEhhH
+   +dq1Qh9SBZVi2iYFLD3q2iQHmGelG3XNySL+EdQhDEWMOfTqlvOCL/ktt
+   0kCmiEv/zNBFvgoWnJBuCRs1vPp0UmT+/1egP/dVLOYx+7dyaENFXgX1c
+   /iARRYLmVQjSkFcoNIB1PjzkPL90K+6tkbhV1uEMN8VmkAtLi/MFEg1Nl
+   ZN3a7msBy95dBnvvICmCP51r1THr0xcN+2hw0JW7S9imSNf24dG5phyjm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="394816071"
+X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
+   d="scan'208";a="394816071"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2023 21:57:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
+   d="scan'208";a="24848961"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.215.242.241]) ([10.215.242.241])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2023 21:57:11 -0800
+Message-ID: <173386ab-d0d3-4563-b1be-c06108506a82@linux.intel.com>
+Date: Thu, 21 Dec 2023 13:57:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net 0/4] qbv cycle time extension/truncation
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231219081453.718489-1-faizal.abdul.rahim@linux.intel.com>
+ <CANn89iJvbXKgT3OSyLYMXpvoOXc+OEUt1eTzbHnZ0wG8ibvqcw@mail.gmail.com>
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <CANn89iJvbXKgT3OSyLYMXpvoOXc+OEUt1eTzbHnZ0wG8ibvqcw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Some r8168 NICs stop working upon system resume:
 
-[  688.051096] r8169 0000:02:00.1 enp2s0f1: rtl_ep_ocp_read_cond == 0 (loop: 10, delay: 10000).
-[  688.175131] r8169 0000:02:00.1 enp2s0f1: Link is Down
-...
-[  691.534611] r8169 0000:02:00.1 enp2s0f1: PCI error (cmd = 0x0407, status_errs = 0x0000)
 
-Not sure if it's related, but those NICs have a BMC device at function
-0:
-02:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. Realtek RealManage BMC [10ec:816e] (rev 1a)
+On 20/12/2023 1:02 am, Eric Dumazet wrote:
+> On Tue, Dec 19, 2023 at 9:17 AM Faizal Rahim
+> <faizal.abdul.rahim@linux.intel.com> wrote:
+>>
+>> According to IEEE Std. 802.1Q-2018 section Q.5 CycleTimeExtension,
+>> the Cycle Time Extension variable allows this extension of the last old
+>> cycle to be done in a defined way. If the last complete old cycle would
+>> normally end less than OperCycleTimeExtension nanoseconds before the new
+>> base time, then the last complete cycle before AdminBaseTime is reached
+>> is extended so that it ends at AdminBaseTime.
+>>
+> 
+> Hmm... Is this series fixing any of the pending syzbot bugs ?
 
-Since increase the loop wait on rtl_ep_ocp_read_cond can eliminate the
-issue, so let rtl8168ep_driver_start() to wait a bit longer.
-
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
----
-v2:
- - Wording
-
- drivers/net/ethernet/realtek/r8169_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index bb787a52bc75..81fd31f6fac4 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -1211,7 +1211,7 @@ static void rtl8168ep_driver_start(struct rtl8169_private *tp)
- {
- 	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_START);
- 	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
--	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 10);
-+	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
- }
- 
- static void rtl8168_driver_start(struct rtl8169_private *tp)
--- 
-2.34.1
-
+Not really I think ? I found some bugs in this area when I tried to 
+enable/fix software QBV cycle time extension for my project.
 
