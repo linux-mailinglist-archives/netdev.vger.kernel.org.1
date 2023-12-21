@@ -1,202 +1,143 @@
-Return-Path: <netdev+bounces-59746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E617881BF40
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 20:51:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD16881BF44
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 20:55:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16EEC1C2365C
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 19:51:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BDB11F242E6
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 19:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7404F651BB;
-	Thu, 21 Dec 2023 19:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kCviRpgY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C44651AC;
+	Thu, 21 Dec 2023 19:55:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2801745C7
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 19:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-466aa903d22so230354137.0
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 11:51:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703188286; x=1703793086; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=34gLZNGDneOrL80YLJTy2KL/mWwjxUIXyDqa+JQefhY=;
-        b=kCviRpgY1s8l7SkjmBzrgYa1CWDBG0DVb36Ko0a64kpsENEhm7aMlsxid1Ajuxo1Pq
-         AQyows/J6+4WGIJLG/fmIBI5ISUYAW82kxS6KFXNSQlyBQKlaOkwjk6e2SPncruIQnK/
-         yGo2VjysTMPI0MLsE3McoPVwYv425Jjr+jF+lhhGf1CoKqhAijjwxPd8A7PVJ81b7k4T
-         FrSBajp55Gk9wyb7+kDmYuY8+iGLC2ZBmVjQfJ8m2iRBdF/Mtfsw/Qbl2QQ5BdGjkF+l
-         RArCn+2B5Kz/aYxHTK+kZrrrZ6xjAgFey8Lktzho5CZfWyENnGRade037nCHZaTQnu4K
-         XNEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703188286; x=1703793086;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=34gLZNGDneOrL80YLJTy2KL/mWwjxUIXyDqa+JQefhY=;
-        b=lOJtxKGsxR5FyDdcWcjplIyg2tonrRIp8wCTMiu/KXnYuPoBxFz1hL3Ea3Ku+tJIhQ
-         zqT3qB+I5RXihB80YYZcpFD9q9fsWNGMA65SUuR0quoWAlD+fXofWj4nVA3r+Zs6jSps
-         YEQ6/IUFa4gYwV9l9H+3KZDLAfqRfh9ba94HvXjBk7kBDyzMgu73v1LAnF3xnjiQqJOq
-         sz+qg5QgjJAPrx37Wb+MT6ty0IrA7FoUZocJsuQv7Nh7x+NrMmR81u8PaZ12fO6Efkur
-         gEqNXXXDHtmAVFA3g2T2HNLnqEvlOgkzg110M5yyZAkxCPHJhvukObzYRgQHbrqtbbuC
-         6B2Q==
-X-Gm-Message-State: AOJu0Yx9jHB400DA03oE01BPGTH9KLuELQuJLB11q7d+Fvi+LTPb5nZk
-	XcrO+u8n2h//cnWclVBGEAOLEzS+EFyEZBNVLgF4rL6sIIs3
-X-Google-Smtp-Source: AGHT+IHROzNd3Evq3cE5OAf0hjgsWgnNTB7VyKwI8WYsM4q5q0ayArwDT+3UGbqoqOGbMUV1p2WAMZHxLHNInNYHhag=
-X-Received: by 2002:a05:6102:a54:b0:466:5029:a26c with SMTP id
- i20-20020a0561020a5400b004665029a26cmr103095vss.35.1703188285588; Thu, 21 Dec
- 2023 11:51:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54A773185;
+	Thu, 21 Dec 2023 19:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.75.203) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 21 Dec
+ 2023 22:54:52 +0300
+Subject: Re: [PATCH net-next v2 11/21] net: ravb: Move DBAT configuration to
+ the driver's ndo_open API
+To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231214114600.2451162-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231214114600.2451162-12-claudiu.beznea.uj@bp.renesas.com>
+ <a93c0673-2876-5bb2-29aa-0d0208b97b10@omp.ru>
+ <4721c4e6-cc0f-48bd-8b14-4a8217ada1fd@omp.ru>
+ <b17c6124-0b84-40b2-a254-cce617f73cf2@tuxon.dev>
+ <59ba595a-ab79-cc5d-feff-dad60e80c44f@omp.ru>
+ <3d4511bd-fd96-4281-a5cb-ac1765bded31@tuxon.dev>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <3aa8a9f5-fe7b-1484-ac89-64b4a1d5face@omp.ru>
+Date: Thu, 21 Dec 2023 22:54:52 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219210357.4029713-1-dw@davidwei.uk> <20231219210357.4029713-20-dw@davidwei.uk>
-In-Reply-To: <20231219210357.4029713-20-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 21 Dec 2023 11:51:09 -0800
-Message-ID: <CAHS8izOjeb-DMJNAgQaqv2dJaSHsLPSAeMPNWeViLhhHVouSnw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 19/20] net: page pool: generalise ppiov dma address get
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <3d4511bd-fd96-4281-a5cb-ac1765bded31@tuxon.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 12/21/2023 19:37:26
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182285 [Dec 21 2023]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.203 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.203 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.203
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/21/2023 19:41:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/21/2023 5:11:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Tue, Dec 19, 2023 at 1:04=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-> From: Pavel Begunkov <asml.silence@gmail.com>
->
-> io_uring pp memory provider doesn't have contiguous dma addresses,
-> implement page_pool_iov_dma_addr() via callbacks.
->
-> Note: it might be better to stash dma address into struct page_pool_iov.
->
+On 12/20/23 2:41 PM, claudiu beznea wrote:
 
-This is the approach already taken in v1 & RFC v5. I suspect you'd be
-able to take advantage when you rebase.
+[...]
 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  include/net/page_pool/helpers.h | 5 +----
->  include/net/page_pool/types.h   | 2 ++
->  io_uring/zc_rx.c                | 8 ++++++++
->  net/core/page_pool.c            | 9 +++++++++
->  4 files changed, 20 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/help=
-ers.h
-> index aca3a52d0e22..10dba1f2aa0c 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -105,10 +105,7 @@ static inline unsigned int page_pool_iov_idx(const s=
-truct page_pool_iov *ppiov)
->  static inline dma_addr_t
->  page_pool_iov_dma_addr(const struct page_pool_iov *ppiov)
->  {
-> -       struct dmabuf_genpool_chunk_owner *owner =3D page_pool_iov_owner(=
-ppiov);
-> -
-> -       return owner->base_dma_addr +
-> -              ((dma_addr_t)page_pool_iov_idx(ppiov) << PAGE_SHIFT);
-> +       return ppiov->pp->mp_ops->ppiov_dma_addr(ppiov);
->  }
->
->  static inline unsigned long
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.=
-h
-> index f54ee759e362..1b9266835ab6 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -125,6 +125,7 @@ struct page_pool_stats {
->  #endif
->
->  struct mem_provider;
-> +struct page_pool_iov;
->
->  enum pp_memory_provider_type {
->         __PP_MP_NONE, /* Use system allocator directly */
-> @@ -138,6 +139,7 @@ struct pp_memory_provider_ops {
->         void (*scrub)(struct page_pool *pool);
->         struct page *(*alloc_pages)(struct page_pool *pool, gfp_t gfp);
->         bool (*release_page)(struct page_pool *pool, struct page *page);
-> +       dma_addr_t (*ppiov_dma_addr)(const struct page_pool_iov *ppiov);
->  };
->
->  extern const struct pp_memory_provider_ops dmabuf_devmem_ops;
-> diff --git a/io_uring/zc_rx.c b/io_uring/zc_rx.c
-> index f7d99d569885..20fb89e6bad7 100644
-> --- a/io_uring/zc_rx.c
-> +++ b/io_uring/zc_rx.c
-> @@ -600,12 +600,20 @@ static void io_pp_zc_destroy(struct page_pool *pp)
->         percpu_ref_put(&ifq->ctx->refs);
->  }
->
-> +static dma_addr_t io_pp_zc_ppiov_dma_addr(const struct page_pool_iov *pp=
-iov)
-> +{
-> +       struct io_zc_rx_buf *buf =3D io_iov_to_buf((struct page_pool_iov =
-*)ppiov);
-> +
-> +       return buf->dma;
-> +}
-> +
->  const struct pp_memory_provider_ops io_uring_pp_zc_ops =3D {
->         .alloc_pages            =3D io_pp_zc_alloc_pages,
->         .release_page           =3D io_pp_zc_release_page,
->         .init                   =3D io_pp_zc_init,
->         .destroy                =3D io_pp_zc_destroy,
->         .scrub                  =3D io_pp_zc_scrub,
-> +       .ppiov_dma_addr         =3D io_pp_zc_ppiov_dma_addr,
->  };
->  EXPORT_SYMBOL(io_uring_pp_zc_ops);
->
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index ebf5ff009d9d..6586631ecc2e 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -1105,10 +1105,19 @@ static bool mp_dmabuf_devmem_release_page(struct =
-page_pool *pool,
->         return true;
->  }
->
-> +static dma_addr_t mp_dmabuf_devmem_ppiov_dma_addr(const struct page_pool=
-_iov *ppiov)
-> +{
-> +       struct dmabuf_genpool_chunk_owner *owner =3D page_pool_iov_owner(=
-ppiov);
-> +
-> +       return owner->base_dma_addr +
-> +              ((dma_addr_t)page_pool_iov_idx(ppiov) << PAGE_SHIFT);
-> +}
-> +
->  const struct pp_memory_provider_ops dmabuf_devmem_ops =3D {
->         .init                   =3D mp_dmabuf_devmem_init,
->         .destroy                =3D mp_dmabuf_devmem_destroy,
->         .alloc_pages            =3D mp_dmabuf_devmem_alloc_pages,
->         .release_page           =3D mp_dmabuf_devmem_release_page,
-> +       .ppiov_dma_addr         =3D mp_dmabuf_devmem_ppiov_dma_addr,
->  };
->  EXPORT_SYMBOL(dmabuf_devmem_ops);
-> --
-> 2.39.3
->
+>>>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>>>
+>>>>>> DBAT setup was done in the driver's probe API. As some IP variants switch
+>>>>>> to reset mode (and thus registers' content is lost) when setting clocks
+>>>>>> (due to module standby functionality) to be able to implement runtime PM
+>>>>>> move the DBAT configuration in the driver's ndo_open API.
+>>>>>>
+>>>>>> This commit prepares the code for the addition of runtime PM.
+>>>>>>
+>>>>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>>
+>>>>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>>>>>
+>>>>> [...]
+>>>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>>>>> index 04eaa1967651..6b8ca08be35e 100644
+>>>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>>>>> @@ -1822,6 +1822,7 @@ static int ravb_open(struct net_device *ndev)
+>>>>>>  		napi_enable(&priv->napi[RAVB_NC]);
+>>>>>>  
+>>>>>>  	ravb_set_delay_mode(ndev);
+>>>>>> +	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+>>>>
+>>>>    Looking at it again, I suspect this belong in ravb_dmac_init()...
+>>>
+>>> ravb_dmac_init() is called from multiple places in this driver, e.g.,
+>>
+>>    It's purpose is to configure AVB-DMAC and DBAT is the AVB-DMAC register,
+>> right?
+> 
+> It is. But it is pointless to configure it more than one time after
+> ravb_open() has been called as the register content is not changed until IP
+> enters reset mode (though ravb_close() now).
 
+   The same is true for the most registers set by ravb_dmac_init()!
 
---=20
-Thanks,
-Mina
+[...]
+
+MBR, Sergey
 
