@@ -1,144 +1,456 @@
-Return-Path: <netdev+bounces-59413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8724481AC89
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:14:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4486581AC8B
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:14:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAC631C231AC
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:14:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACF7E1F230A2
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC96417D9;
-	Thu, 21 Dec 2023 02:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7575715CC;
+	Thu, 21 Dec 2023 02:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CJdJxtyl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8oE6JyE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6709E5239;
-	Thu, 21 Dec 2023 02:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2F33C3D
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 02:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-1d03f03cda9so1025585ad.0;
-        Wed, 20 Dec 2023 18:14:18 -0800 (PST)
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-50e587fb62fso474625e87.2
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 18:14:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703124858; x=1703729658; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WL++AB9fEIg1cmTcH4bF69I0i+DU0llPfZn2l0Zd/Hg=;
-        b=CJdJxtylFdG3wbewoQG+3LqW9frrHZE0w94JMaNb70KbkwKSVXV4v5rVLk44p4GtB2
-         W2+7IfjxobIERVDzFOGOUojArLxwjZ67OtssYJzpg/KXPSsWakGsO7dFrOXrFn8FU7n4
-         Nkrt4cgwBpQRh4RLxjJM9dQrOsRyOUPQRvxAkHzHWeuzFkNVW5MghjaPwzTvztWF7WPv
-         yS0+FDwqfY7Pqv+2zPpFBYYX+fgKPUyYbPzDdr+hQZKow+6rlJ1Z6uVOTCKzC0u8CMDA
-         n5DDBGXru1MUykM0Ugt8bGPLgt7jMpExhKFJCjOTD6v6V4N2AWdm0I57dD6fitxkHjd9
-         kF8A==
+        d=gmail.com; s=20230601; t=1703124886; x=1703729686; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WXiToYDD25zcl2nH/iKHu0xEos0ACUC+dThBNCk+Vio=;
+        b=W8oE6JyEbrvt4eg6XJkK8M9G3NxD/7wEjhZ3pU8wkWfYFsrmSpx+k8ZVs6mC0C/6jx
+         WLZRGaF4WpKk0K5PzKaYsMXVHifUDc9Jb/k7lDfSe4mqWANRgeqK29MquHkWgppt019h
+         7DqW3TVnsv3nfFP6o8/DRB+5reL6mJbOibayOAR9pQwdV/4h8LCIcldBRlCwfj/Yl1OM
+         TNH5MhqPVSi3B4822ACgWheLt0W0+KPZuDEYkhbn6ALtlzkDuyDh8dLXsVJoMgZCqtiu
+         P8rPqnmLeowFTFT7A+55SkI6HW2o9EQCu5ozc6UueqVb/riB11hJAE0hMog3R/Wbztug
+         LQCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703124858; x=1703729658;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WL++AB9fEIg1cmTcH4bF69I0i+DU0llPfZn2l0Zd/Hg=;
-        b=IWjhl1gDSTBBSxvrPV/KNgNLCalzUQrOhiwu4YbIOAhLt53Cwn0pKSYcVSQi+iI/tD
-         /qvuVct+1jnWE9v57baJWypYkGAdZaWKdiXKZSR/+8v4a9aN5F5cZB/RD05y27GQ7m/T
-         SouHfj73zN9RPLjsa+SNSUCLlUbADfEUTSfABTbYXVYOQEyXpcSWpB4tm/LjdDgIKwYw
-         420YGjZn9aPmisFGcJ88B8VSaS8tNTkf+3R4ekt6uMgbRg0rpTs8/vXc3ReqIfg89xN0
-         LJTQTn9KDOdkwfQfO7f9VWr3BiAUIh7NTBbIya6k0mdgaRWA9kJQTyl2ZuFKIfNub/u0
-         fZoQ==
-X-Gm-Message-State: AOJu0YzNFXi7XX1WQ2MPDzu/D1WNl8/7ukUysPUP/KzKWK2SX73QkVLB
-	rZH/Qjfjbk5E4g03XoUf1xE=
-X-Google-Smtp-Source: AGHT+IGwFP91a18RpuxtpHPd7L2kZvYwl+quhbkCGdcqcS1J4Q94aNm2kW9YRAmUNgaF3AZtl0Ma8g==
-X-Received: by 2002:a17:902:d2cb:b0:1d3:99c9:5454 with SMTP id n11-20020a170902d2cb00b001d399c95454mr17688921plc.4.1703124857671;
-        Wed, 20 Dec 2023 18:14:17 -0800 (PST)
-Received: from [127.0.0.1] (061239074230.ctinets.com. [61.239.74.230])
-        by smtp.gmail.com with ESMTPSA id t9-20020a170902bc4900b001d3aafd228dsm397249plz.75.2023.12.20.18.14.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Dec 2023 18:14:17 -0800 (PST)
-Message-ID: <a2634a6e-6630-4db7-8b66-81b315038f9e@gmail.com>
-Date: Thu, 21 Dec 2023 10:14:09 +0800
+        d=1e100.net; s=20230601; t=1703124886; x=1703729686;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WXiToYDD25zcl2nH/iKHu0xEos0ACUC+dThBNCk+Vio=;
+        b=EI0ZdVl7yblgsSji0eg9D/lVjn2XF5M29cAGWXp+9pR0jggAP8gs7qHABjavmvWpc5
+         MVDJP5mwUddPHfYiZRLFTzBnJhqxnVWslJLzz1Fs+yuq597FtvDQcUHXHJvMUCaaWw6d
+         odbYiGdFWcfMljEncmOj8jkRQx4yekp8qYMC9M6LAdRGh1QULdQ4XgUZJfgNawn14xFS
+         EG/pS6hU+7IK/SaqB/Cgl++vUv9vNpoOlvHy7/nc+eu7Gm3RV6n3D0EenbpiWc5Nd51B
+         ujSO+BmojfFlJ28vl7ino/1ow0ongZCeipQrjkBg0xS/s752kW6KvZ6LHlr/ZjHAhPlJ
+         K13w==
+X-Gm-Message-State: AOJu0Yx2cEom8ET2Hi/KzmNRoGU0RIFMVa9TzTIOTwWYAOkfjD3b+xvl
+	XyatwAkz+/Sn3MsrbwcKRu4BI22IWazUIA==
+X-Google-Smtp-Source: AGHT+IFyH+/sx+TWSxwWDtwG8ktb7ZL5JeHiyzwtNput1x8WaT1DL9lnbViNBF47jvLQ653BdrG7nA==
+X-Received: by 2002:ac2:5591:0:b0:50e:21c3:fb23 with SMTP id v17-20020ac25591000000b0050e21c3fb23mr4537725lfg.72.1703124885974;
+        Wed, 20 Dec 2023 18:14:45 -0800 (PST)
+Received: from mobilestation ([95.79.203.166])
+        by smtp.gmail.com with ESMTPSA id l5-20020ac24a85000000b0050e555b934fsm126661lfp.280.2023.12.20.18.14.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Dec 2023 18:14:45 -0800 (PST)
+Date: Thu, 21 Dec 2023 05:14:43 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v7 5/9] net: stmmac: Add Loongson-specific
+ register definitions
+Message-ID: <t25ka7blbx2d2d654s5swbtvecip73yd5wpdqiy3xijjmswvni@bxf4dh56x4zl>
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <bbc826f622b501bc490e838644c9c502185a78df.1702990507.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: sched: em_text: fix possible memory leak in
- em_text_destroy()
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, tgraf@suug.ch,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231220030838.11751-1-hbh25y@gmail.com>
- <CAM0EoMnPgKFK5uyx5YJUYc1F7U0058aYOQb6H6ewcz9Y8OouAw@mail.gmail.com>
- <CAM0EoM=4ZRteGbjAdBuLGtbM_qpnJoUuky-Yj+i+3FOqXXra+Q@mail.gmail.com>
-Content-Language: en-US
-From: Hangyu Hua <hbh25y@gmail.com>
-In-Reply-To: <CAM0EoM=4ZRteGbjAdBuLGtbM_qpnJoUuky-Yj+i+3FOqXXra+Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bbc826f622b501bc490e838644c9c502185a78df.1702990507.git.siyanteng@loongson.cn>
 
-On 21/12/2023 00:05, Jamal Hadi Salim wrote:
-> On Wed, Dec 20, 2023 at 6:55 AM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
->>
->> Hi Hangyu,
->> While the fix looks correct - can you please describe how you came
->> across this issue? Was it a tool or by inspection? Do you have a text
->> case that triggered something etc, etc.
-
-I discovered this accidentally when I used gdb to debug a program that 
-uses em_text. And I think putting the code in the commit log will will 
-make it too bulky.
-
->>
->> On Tue, Dec 19, 2023 at 10:09 PM Hangyu Hua <hbh25y@gmail.com> wrote:
->>>
->>> m->data needs to be freed when em_text_destroy is called.
->>>
->>> Fixes: d675c989ed2d ("[PKT_SCHED]: Packet classification based on textsearch (ematch)")
->>> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
->>> ---
->>>   net/sched/em_text.c | 4 +++-
->>>   1 file changed, 3 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/net/sched/em_text.c b/net/sched/em_text.c
->>> index 6f3c1fb2fb44..b9d5d4dca2c9 100644
->>> --- a/net/sched/em_text.c
->>> +++ b/net/sched/em_text.c
->>> @@ -97,8 +97,10 @@ static int em_text_change(struct net *net, void *data, int len,
->>>
->>>   static void em_text_destroy(struct tcf_ematch *m)
->>>   {
->>> -       if (EM_TEXT_PRIV(m) && EM_TEXT_PRIV(m)->config)
->>> +       if (EM_TEXT_PRIV(m) && EM_TEXT_PRIV(m)->config) {
->>>                  textsearch_destroy(EM_TEXT_PRIV(m)->config);
->>> +               kfree(m->data);
->>> +       }
->>>   }
->>>
->>
+On Tue, Dec 19, 2023 at 10:26:45PM +0800, Yanteng Si wrote:
+> There are two types of Loongson DWGMAC. The first type shares the same
+> register definitions and has similar logic as dwmac1000. The second type
+> uses several different register definitions, we think it is necessary to
+> distinguish rx and tx, so we split these bits into two.
 > 
-> the bot just complained about needing a cast, use this:
-> struct text_match *
+> Simply put, we split some single bit fields into double bits fileds:
+> 
+>      Name              Tx          Rx
+> 
+> DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
+> DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
+> DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
+> DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
+> DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
+> 
+> Therefore, when using, TX and RX must be set at the same time.
 
-I see. I will send a v2 later.
-
-Thanks,
-Hangyu
+Thanks for the updated patch. It looks much clearer now. Thanks to
+that I came up with a better and less invasive solution. See my last
+comment for details.
 
 > 
-> cheers,
-> jamal
->> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
->>
->> cheers,
->> jamal
->>
->>>   static int em_text_dump(struct sk_buff *skb, struct tcf_ematch *m)
->>> --
->>> 2.34.1
->>>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  |  2 ++
+>  .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 10 ++++--
+>  .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 35 +++++++++++++++++++
+>  .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 35 +++++++++++++++----
+>  drivers/net/ethernet/stmicro/stmmac/hwif.c    |  3 +-
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  1 +
+>  include/linux/stmmac.h                        |  1 +
+>  8 files changed, 78 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> index 721c1f8e892f..48ab21243b26 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> @@ -34,6 +34,7 @@
+>  #define DWMAC_CORE_5_00		0x50
+>  #define DWMAC_CORE_5_10		0x51
+>  #define DWMAC_CORE_5_20		0x52
+
+> +#define DWLGMAC_CORE_1_00	0x10
+
+This doesn't look correct because these IDs have been defined for the
+Synopsys IP-core enumerations. Loongson GNET is definitely based on
+some DW GMAC v3.x IP-core, but instead of updating the USERVER field
+vendor just overwrote the GMAC_VERSION.SNPSVER field. From that
+perspective the correct solution would be to override the
+priv->synopsys_id field with a correct IP-core version (0x37?). See my
+last comment for details of how to do that.
+
+>  #define DWXGMAC_CORE_2_10	0x21
+>  #define DWXGMAC_CORE_2_20	0x22
+>  #define DWXLGMAC_CORE_2_00	0x20
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 0d79104d7fd3..fb7506bbc21b 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -101,6 +101,8 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+>  		plat->mdio_bus_data->needs_reset = true;
+>  	}
+>  
+
+> +	plat->flags |= STMMAC_FLAG_HAS_LGMAC;
+> +
+
+If what I suggest in the last comment is implemented this will be
+unnecessary.
+
+>  	/* Enable pci device */
+>  	ret = pci_enable_device(pdev);
+>  	if (ret) {
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> index 0fb48e683970..a01fe6b7540a 100644
+
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+
+None of the generic parts (dwmac1000_dma.c, dwmac_dma.h, dwmac_lib.c)
+will need to be modified if you implement what I suggest in the last
+comment.
+
+> @@ -118,7 +118,10 @@ static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+
+See my comment to patch 4/9. This method can be fully dropped in favor
+of having the dwmac1000_dma_init_channel() function implemented.
+
+>  	u32 dma_intr_mask;
+>  
+>  	/* Mask interrupts by writing to CSR7 */
+> -	dma_intr_mask = DMA_INTR_DEFAULT_MASK;
+> +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC)
+> +		dma_intr_mask = DMA_INTR_DEFAULT_MASK_LOONGSON;
+> +	else
+> +		dma_intr_mask = DMA_INTR_DEFAULT_MASK;
+>  
+>  	dma_config(ioaddr + DMA_BUS_MODE, ioaddr + DMA_INTR_ENA,
+>  			  dma_cfg, dma_intr_mask, atds);
+> @@ -130,7 +133,10 @@ static void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *i
+>  	u32 dma_intr_mask;
+>  
+>  	/* Mask interrupts by writing to CSR7 */
+> -	dma_intr_mask = DMA_INTR_DEFAULT_MASK;
+> +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC)
+> +		dma_intr_mask = DMA_INTR_DEFAULT_MASK_LOONGSON;
+> +	else
+> +		dma_intr_mask = DMA_INTR_DEFAULT_MASK;
+>  
+>  	if (dma_cfg->multi_msi_en)
+>  		dma_config(ioaddr + DMA_CHAN_BUS_MODE(chan),
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> index 395d5e4c3922..7d33798c0e72 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+> @@ -70,16 +70,23 @@
+>  #define DMA_CONTROL_SR		0x00000002	/* Start/Stop Receive */
+>  
+>  /* DMA Normal interrupt */
+> +#define DMA_INTR_ENA_NIE_TX_LOONGSON 0x00040000	/* Normal Loongson Tx Summary */
+> +#define DMA_INTR_ENA_NIE_RX_LOONGSON 0x00020000	/* Normal Loongson Rx Summary */
+>  #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
+>  #define DMA_INTR_ENA_TIE 0x00000001	/* Transmit Interrupt */
+>  #define DMA_INTR_ENA_TUE 0x00000004	/* Transmit Buffer Unavailable */
+>  #define DMA_INTR_ENA_RIE 0x00000040	/* Receive Interrupt */
+>  #define DMA_INTR_ENA_ERE 0x00004000	/* Early Receive */
+>  
+> +#define DMA_INTR_NORMAL_LOONGSON	(DMA_INTR_ENA_NIE_TX_LOONGSON | \
+> +			 DMA_INTR_ENA_NIE_RX_LOONGSON | DMA_INTR_ENA_RIE | \
+> +			 DMA_INTR_ENA_TIE)
+>  #define DMA_INTR_NORMAL	(DMA_INTR_ENA_NIE | DMA_INTR_ENA_RIE | \
+>  			DMA_INTR_ENA_TIE)
+>  
+>  /* DMA Abnormal interrupt */
+> +#define DMA_INTR_ENA_AIE_TX_LOONGSON 0x00010000	/* Abnormal Loongson Tx Summary */
+> +#define DMA_INTR_ENA_AIE_RX_LOONGSON 0x00008000	/* Abnormal Loongson Rx Summary */
+>  #define DMA_INTR_ENA_AIE 0x00008000	/* Abnormal Summary */
+>  #define DMA_INTR_ENA_FBE 0x00002000	/* Fatal Bus Error */
+>  #define DMA_INTR_ENA_ETE 0x00000400	/* Early Transmit */
+> @@ -91,10 +98,14 @@
+>  #define DMA_INTR_ENA_TJE 0x00000008	/* Transmit Jabber */
+>  #define DMA_INTR_ENA_TSE 0x00000002	/* Transmit Stopped */
+>  
+> +#define DMA_INTR_ABNORMAL_LOONGSON	(DMA_INTR_ENA_AIE_TX_LOONGSON | \
+> +				DMA_INTR_ENA_AIE_RX_LOONGSON | DMA_INTR_ENA_FBE | \
+> +				DMA_INTR_ENA_UNE)
+>  #define DMA_INTR_ABNORMAL	(DMA_INTR_ENA_AIE | DMA_INTR_ENA_FBE | \
+>  				DMA_INTR_ENA_UNE)
+>  
+>  /* DMA default interrupt mask */
+> +#define DMA_INTR_DEFAULT_MASK_LOONGSON	(DMA_INTR_NORMAL_LOONGSON | DMA_INTR_ABNORMAL_LOONGSON)
+>  #define DMA_INTR_DEFAULT_MASK	(DMA_INTR_NORMAL | DMA_INTR_ABNORMAL)
+>  #define DMA_INTR_DEFAULT_RX	(DMA_INTR_ENA_RIE)
+>  #define DMA_INTR_DEFAULT_TX	(DMA_INTR_ENA_TIE)
+> @@ -111,9 +122,15 @@
+>  #define DMA_STATUS_TS_SHIFT	20
+>  #define DMA_STATUS_RS_MASK	0x000e0000	/* Receive Process State */
+>  #define DMA_STATUS_RS_SHIFT	17
+> +#define DMA_STATUS_NIS_TX_LOONGSON	0x00040000	/* Normal Loongson Tx Interrupt Summary */
+> +#define DMA_STATUS_NIS_RX_LOONGSON	0x00020000	/* Normal Loongson Rx Interrupt Summary */
+>  #define DMA_STATUS_NIS	0x00010000	/* Normal Interrupt Summary */
+> +#define DMA_STATUS_AIS_TX_LOONGSON	0x00010000	/* Abnormal Loongson Tx Interrupt Summary */
+> +#define DMA_STATUS_AIS_RX_LOONGSON	0x00008000	/* Abnormal Loongson Rx Interrupt Summary */
+>  #define DMA_STATUS_AIS	0x00008000	/* Abnormal Interrupt Summary */
+>  #define DMA_STATUS_ERI	0x00004000	/* Early Receive Interrupt */
+> +#define DMA_STATUS_FBI_TX_LOONGSON	0x00002000	/* Fatal Loongson Tx Bus Error Interrupt */
+> +#define DMA_STATUS_FBI_RX_LOONGSON	0x00001000	/* Fatal Loongson Rx Bus Error Interrupt */
+>  #define DMA_STATUS_FBI	0x00002000	/* Fatal Bus Error Interrupt */
+>  #define DMA_STATUS_ETI	0x00000400	/* Early Transmit Interrupt */
+>  #define DMA_STATUS_RWT	0x00000200	/* Receive Watchdog Timeout */
+> @@ -128,10 +145,21 @@
+>  #define DMA_STATUS_TI	0x00000001	/* Transmit Interrupt */
+>  #define DMA_CONTROL_FTF		0x00100000	/* Flush transmit FIFO */
+>  
+> +#define DMA_STATUS_MSK_COMMON_LOONGSON		(DMA_STATUS_NIS_TX_LOONGSON | \
+> +					 DMA_STATUS_NIS_RX_LOONGSON | DMA_STATUS_AIS_TX_LOONGSON | \
+> +					 DMA_STATUS_AIS_RX_LOONGSON | DMA_STATUS_FBI_TX_LOONGSON | \
+> +					 DMA_STATUS_FBI_RX_LOONGSON)
+>  #define DMA_STATUS_MSK_COMMON		(DMA_STATUS_NIS | \
+>  					 DMA_STATUS_AIS | \
+>  					 DMA_STATUS_FBI)
+>  
+> +#define DMA_STATUS_MSK_RX_LOONGSON		(DMA_STATUS_ERI | \
+> +					 DMA_STATUS_RWT | \
+> +					 DMA_STATUS_RPS | \
+> +					 DMA_STATUS_RU | \
+> +					 DMA_STATUS_RI | \
+> +					 DMA_STATUS_OVF | \
+> +					 DMA_STATUS_MSK_COMMON_LOONGSON)
+>  #define DMA_STATUS_MSK_RX		(DMA_STATUS_ERI | \
+>  					 DMA_STATUS_RWT | \
+>  					 DMA_STATUS_RPS | \
+> @@ -140,6 +168,13 @@
+>  					 DMA_STATUS_OVF | \
+>  					 DMA_STATUS_MSK_COMMON)
+>  
+> +#define DMA_STATUS_MSK_TX_LOONGSON		(DMA_STATUS_ETI | \
+> +					 DMA_STATUS_UNF | \
+> +					 DMA_STATUS_TJT | \
+> +					 DMA_STATUS_TU | \
+> +					 DMA_STATUS_TPS | \
+> +					 DMA_STATUS_TI | \
+> +					 DMA_STATUS_MSK_COMMON_LOONGSON)
+>  #define DMA_STATUS_MSK_TX		(DMA_STATUS_ETI | \
+>  					 DMA_STATUS_UNF | \
+>  					 DMA_STATUS_TJT | \
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> index 968801c694e9..a6e2ab4d0f4a 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+> @@ -167,6 +167,9 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
+>  	int ret = 0;
+>  	/* read the status register (CSR5) */
+> +	u32 nor_intr_status;
+> +	u32 abnor_intr_status;
+> +	u32 fb_intr_status;
+>  	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
+>  
+>  #ifdef DWMAC_DMA_DEBUG
+> @@ -176,13 +179,31 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  	show_rx_process_state(intr_status);
+>  #endif
+>  
+> -	if (dir == DMA_DIR_RX)
+> -		intr_status &= DMA_STATUS_MSK_RX;
+> -	else if (dir == DMA_DIR_TX)
+> -		intr_status &= DMA_STATUS_MSK_TX;
+> +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC) {
+> +		if (dir == DMA_DIR_RX)
+> +			intr_status &= DMA_STATUS_MSK_RX_LOONGSON;
+> +		else if (dir == DMA_DIR_TX)
+> +			intr_status &= DMA_STATUS_MSK_TX_LOONGSON;
+> +
+> +		nor_intr_status = intr_status & \
+> +			(DMA_STATUS_NIS_TX_LOONGSON | DMA_STATUS_NIS_RX_LOONGSON);
+> +		abnor_intr_status = intr_status & \
+> +			(DMA_STATUS_AIS_TX_LOONGSON | DMA_STATUS_AIS_RX_LOONGSON);
+> +		fb_intr_status = intr_status & \
+> +			(DMA_STATUS_FBI_TX_LOONGSON | DMA_STATUS_FBI_RX_LOONGSON);
+> +	} else {
+> +		if (dir == DMA_DIR_RX)
+> +			intr_status &= DMA_STATUS_MSK_RX;
+> +		else if (dir == DMA_DIR_TX)
+> +			intr_status &= DMA_STATUS_MSK_TX;
+> +
+> +		nor_intr_status = intr_status & DMA_STATUS_NIS;
+> +		abnor_intr_status = intr_status & DMA_STATUS_AIS;
+> +		fb_intr_status = intr_status & DMA_STATUS_FBI;
+> +	}
+>  
+>  	/* ABNORMAL interrupts */
+> -	if (unlikely(intr_status & DMA_STATUS_AIS)) {
+> +	if (unlikely(abnor_intr_status)) {
+>  		if (unlikely(intr_status & DMA_STATUS_UNF)) {
+>  			ret = tx_hard_error_bump_tc;
+>  			x->tx_undeflow_irq++;
+> @@ -205,13 +226,13 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>  			x->tx_process_stopped_irq++;
+>  			ret = tx_hard_error;
+>  		}
+> -		if (unlikely(intr_status & DMA_STATUS_FBI)) {
+> +		if (unlikely(intr_status & fb_intr_status)) {
+>  			x->fatal_bus_error_irq++;
+>  			ret = tx_hard_error;
+>  		}
+>  	}
+>  	/* TX/RX NORMAL interrupts */
+> -	if (likely(intr_status & DMA_STATUS_NIS)) {
+> +	if (likely(nor_intr_status)) {
+>  		if (likely(intr_status & DMA_STATUS_RI)) {
+>  			u32 value = readl(ioaddr + DMA_INTR_ENA);
+>  			/* to schedule NAPI on real RIE event. */
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> index 1bd34b2a47e8..3724cf698de6 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> @@ -59,7 +59,8 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
+>  		dev_info(priv->device, "Enhanced/Alternate descriptors\n");
+>  
+>  		/* GMAC older than 3.50 has no extended descriptors */
+
+> -		if (priv->synopsys_id >= DWMAC_CORE_3_50) {
+> +		if (priv->synopsys_id >= DWMAC_CORE_3_50 ||
+> +		    priv->synopsys_id == DWLGMAC_CORE_1_00) {
+
+This could be left as is if the priv->synopsys_id field is overwritten
+with a correct value (see my last comment). 
+
+>  			dev_info(priv->device, "Enabled extended descriptors\n");
+>  			priv->extend_desc = 1;
+>  		} else {
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index d868eb8dafc5..9764d2ab7e46 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -7218,6 +7218,7 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
+>  	 * riwt_off field from the platform.
+>  	 */
+
+>  	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
+> +		(priv->synopsys_id == DWLGMAC_CORE_1_00) ||
+
+the same comment here.
+
+>  	    (priv->plat->has_xgmac)) && (!priv->plat->riwt_off)) {
+>  		priv->use_riwt = 1;
+>  		dev_info(priv->device,
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index dee5ad6e48c5..f07f79d50b06 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -221,6 +221,7 @@ struct dwmac4_addrs {
+>  #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+>  #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
+>  #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
+> +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+
+Seeing the patch in the current state would overcomplicate the generic
+code and the only functions you need to update are
+dwmac_dma_interrupt()
+dwmac1000_dma_init_channel()
+you can have these methods re-defined with all the Loongson GNET
+specifics in the low-level platform driver (dwmac-loongson.c). After
+that you can just override the mac_device_info.dma pointer with a
+fixed stmmac_dma_ops descriptor. Here is what should be done for that:
+
+1. Keep the Patch 4/9 with my comments fixed. First it will be partly
+useful for your GNET device. Second in general it's a correct
+implementation of the normal DW GMAC v3.x multi-channels feature and
+will be useful for the DW GMACs with that feature enabled.
+
+2. Create the Loongson GNET-specific
+stmmac_dma_ops.dma_interrupt()
+stmmac_dma_ops.init_chan()
+methods in the dwmac-loongson.c driver. Don't forget to move all the
+Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
+
+3. Create a Loongson GNET-specific platform setup method with the next
+semantics:
+   + allocate stmmac_dma_ops instance and initialize it with
+     dwmac1000_dma_ops.
+   + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
+     the pointers to the methods defined in 2.
+   + allocate mac_device_info instance and initialize the
+     mac_device_info.dma field with a pointer to the new
+     stmmac_dma_ops instance.
+   + call dwmac1000_setup() or initialize mac_device_info in a way
+     it's done in dwmac1000_setup() (the later might be better so you
+     wouldn't need to export the dwmac1000_setup() function).
+   + override stmmac_priv.synopsys_id with a correct value.
+
+4. Initialize plat_stmmacenet_data.setup() with the pointer to the
+method created in 3.
+
+If I didn't miss something stmmac_hwif_init() will call the
+platform-specific setup method right after fetching the SNPSVER field
+value. Your setup method will allocate mac_device_info structure then,
+will pre-initialize the GNET-specific DMA ops field and fix the
+Synopsys ID with a proper value (as described in 3 above). The rest of
+the ops descriptors will be initialized in the loop afterwards based
+on the specified device ID.
+
+-Serge(y)
+
+>  
+>  struct plat_stmmacenet_data {
+>  	int bus_id;
+> -- 
+> 2.31.4
+> 
 
