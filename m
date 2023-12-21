@@ -1,114 +1,185 @@
-Return-Path: <netdev+bounces-59416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A92681AC9A
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:26:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DBE181ACA5
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:33:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 199DE285E7F
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:26:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5481F286606
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4963617D9;
-	Thu, 21 Dec 2023 02:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA8D19D;
+	Thu, 21 Dec 2023 02:33:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eAuycK6U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrP1WMZw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2571843;
-	Thu, 21 Dec 2023 02:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-28b99bca6easo66007a91.1;
-        Wed, 20 Dec 2023 18:26:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703125585; x=1703730385; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MJpfC3kc2UL6o363XO7Gt4DaAH8UXw1+4tDspztGViQ=;
-        b=eAuycK6Uktob4M92iES8O1fUzJTm7+Mc7W1i7nDV04cS4aSFVbxP/GBecqpROod5QL
-         zljk4XtXlJDtqndSQN1rHiIscW1sGrN9etkWMuQGKqQqA9sMFlJXUayul+jd/juMrhiZ
-         wIdN6JP/Z8zvHEiTLTaCD4Onku2loFBuKcR2W14aats19AUw9wvjnD3jnbwm9sPuY+pK
-         0yR+sIDav27ciraCej5EPSypykfP69Tx5EDuVloqOv3EDesCjh5UKh1q8hLlMXzIa0Ti
-         xxg3zqjCbbz9EsZd5V29YJlBcymfUCJjofBike/SEwWc2ecFdU/iNkrWrb9iTeULRMWS
-         JdDQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C1B1843
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 02:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703126006;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5a0totasfvFwZIblW4qXBdcjfAygTJ0zVbYLxO+qMnc=;
+	b=UrP1WMZw+vzUczvfbxeJ4hGJJQic/0ZoootdzbBIW+2zb6fk0DEtru9U4Cy17aNTFiofQ7
+	LXHwjqAo33fR8LtjjRlmq2eoY/TekAl2SQEGTPUHvbVLR4thotVtpA7BxJMmKeCdvdQJcL
+	lxDfnT9edXJgLakVuc2CbcbaaxU2XCw=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-FdMoIEgHMQqtMEOU67lcmw-1; Wed, 20 Dec 2023 21:33:24 -0500
+X-MC-Unique: FdMoIEgHMQqtMEOU67lcmw-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6d0908565f8so394885b3a.1
+        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 18:33:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703125585; x=1703730385;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MJpfC3kc2UL6o363XO7Gt4DaAH8UXw1+4tDspztGViQ=;
-        b=SKsQu/LTk8cepFovJuZ72wAuM65oDq6grhKMHiJQ3loiEBfqfeD3hxWzFS+wbYLF+c
-         bHb7vwZ39GlK799VfvONspNzOgkGrut/c2eVkMT72YwnJ0XvTrBWhGiOwz1NPXcuWf7R
-         XfuFZv+aemijnS7/cDZW6MLZjYeB7rQDu8u/T+7DuHbaioCAB0AOSkTczVIHokZQYMFh
-         EeNNPCYnOrThZ43gcmEXXAEYNelCBO+jbCoTKF9dtHKxcIckcwtAVaDKyledU0ZyS+cO
-         AdBrT+scvSSNzh5y27O3S6WdOGGAToVjMPatPqEtKw1zt9xWza2ZGy0+YxuA2tXWOdj+
-         1c0A==
-X-Gm-Message-State: AOJu0Yy+up59mhopQ/bpF0Dws/4RoQuihDwr8TLXJOepJZWOWHUNxid/
-	fxEXiQGSzoj0PUikDu7tUoCZgPAHqfNAbVe+
-X-Google-Smtp-Source: AGHT+IHkBuUQpGqS3DVr2KGUl3jagO1YFuspC5zC5APjTftv6Oj5rVsVVEeqXf9QueneaHe8XuBBQw==
-X-Received: by 2002:a17:90a:fd85:b0:28b:c22f:b1c1 with SMTP id cx5-20020a17090afd8500b0028bc22fb1c1mr5322596pjb.1.1703125585307;
-        Wed, 20 Dec 2023 18:26:25 -0800 (PST)
-Received: from hbh25y.mshome.net (061239074230.ctinets.com. [61.239.74.230])
-        by smtp.gmail.com with ESMTPSA id 17-20020a17090a195100b0028b1fce7c01sm4691716pjh.37.2023.12.20.18.26.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Dec 2023 18:26:24 -0800 (PST)
-From: Hangyu Hua <hbh25y@gmail.com>
-To: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	tgraf@suug.ch
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hangyu Hua <hbh25y@gmail.com>
-Subject: [PATCH v2] net: sched: em_text: fix possible memory leak in em_text_destroy()
-Date: Thu, 21 Dec 2023 10:25:31 +0800
-Message-Id: <20231221022531.9772-1-hbh25y@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1703126003; x=1703730803;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5a0totasfvFwZIblW4qXBdcjfAygTJ0zVbYLxO+qMnc=;
+        b=PX+rB9ljxZTxp09KvDijnYKDZWTcPR4AcW35+142OfTDEdh9A0Lf+yu3hzivU8BplQ
+         XYDxY284bAaxfDAT+s5WB1K4poHTwWYqHZhP7EY2+dBL4PKUzQNrFdJc1uDQ86aPTfL+
+         xuGJp2Jq25/4igXbw7nPRc9dQrQym32whsl9DJ1RC7EnwHbVObfjpNkAwmN/CUZjZUIe
+         ZOe9+TI1S3kCaByiamtWxROJrReQD4XonSmcBtMu6UfNAv0cqRSQvMdoY08gl9JPk6ID
+         OlBuzPg/0tkGaUIUF9SCd+UDzdme8vyQuafibuI+hwgnCkm5hrLlmFr6eC76QZAZZJQu
+         r64g==
+X-Gm-Message-State: AOJu0YyuFC5XSk4Sh4pjqiKJqUGOWkomVCMW6JbhDtgrmG+KUe0cndgZ
+	pyvaErK5z7AGyK/Rd26Ba+8vw3h01QSxtRaFDEP1kheMW4EqjGWOjXVm0cgKIe1FgpEjA4WY3FI
+	ze35CxIkiGq1gieaxZA4FnbloW+8RU/My
+X-Received: by 2002:a05:6a00:428a:b0:6d9:471d:faee with SMTP id bx10-20020a056a00428a00b006d9471dfaeemr2568764pfb.55.1703126003606;
+        Wed, 20 Dec 2023 18:33:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFvNTtsHVi+NyeUO0tGmuPBmvsTAynsN/eV3C4oEjj91VnICK+2rcyqXiyLi2OseyD5girnnKsziyM5XzUlxx0=
+X-Received: by 2002:a05:6a00:428a:b0:6d9:471d:faee with SMTP id
+ bx10-20020a056a00428a00b006d9471dfaeemr2568755pfb.55.1703126003294; Wed, 20
+ Dec 2023 18:33:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231205113444.63015-1-linyunsheng@huawei.com>
+ <20231205113444.63015-7-linyunsheng@huawei.com> <CACGkMEvVezZnHK-gRWY+MUd_6awnprb024scqPNmMQ05P8rWTQ@mail.gmail.com>
+ <424670ab-23d8-663b-10cb-d88906767956@huawei.com> <CACGkMEsMdP1B-9RaqibJYfFsd_qJpB+Kta5BnyD_WXH=W2w_OQ@mail.gmail.com>
+ <c5b5d36c-d0ca-c943-5355-343214d92c26@huawei.com>
+In-Reply-To: <c5b5d36c-d0ca-c943-5355-343214d92c26@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 21 Dec 2023 10:33:11 +0800
+Message-ID: <CACGkMEs8HWq_NFNk=Pp3qxuo7AWBsybXT78LPgC-nKaP_u3LqA@mail.gmail.com>
+Subject: Re: [PATCH net-next 6/6] tools: virtio: introduce vhost_net_test
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-m->data needs to be freed when em_text_destroy is called.
+On Wed, Dec 20, 2023 at 8:45=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2023/12/12 12:35, Jason Wang wrote:>>>> +done:
+> >>>> +       backend.fd =3D tun_alloc();
+> >>>> +       assert(backend.fd >=3D 0);
+> >>>> +       vdev_info_init(&dev, features);
+> >>>> +       vq_info_add(&dev, 256);
+> >>>> +       run_test(&dev, &dev.vqs[0], delayed, batch, reset, nbufs);
+> >>>
+> >>> I'd expect we are testing some basic traffic here. E.g can we use a
+> >>> packet socket then we can test both tx and rx?
+> >>
+> >> Yes, only rx for tun is tested.
+> >> Do you have an idea how to test the tx too? As I am not familar enough
+> >> with vhost_net and tun yet.
+> >
+> > Maybe you can have a packet socket to bind to the tun/tap. Then you can=
+ test:
+> >
+> > 1) TAP RX: by write a packet via virtqueue through vhost_net and read
+> > it from packet socket
+> > 2) TAP TX:  by write via packet socket and read it from the virtqueue
+> > through vhost_net
+>
+> When implementing the TAP TX by adding VHOST_NET_F_VIRTIO_NET_HDR,
+> I found one possible use of uninitialized data in vhost_net_build_xdp().
+>
+> And vhost_hlen is set to sizeof(struct virtio_net_hdr_mrg_rxbuf) and
+> sock_hlen is set to zero in vhost_net_set_features() for both tx and rx
+> queue.
+>
+> For vhost_net_build_xdp() called by handle_tx_copy():
+>
+> The (gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) checking below may cause a
+> read of uninitialized data if sock_hlen is zero.
 
-Fixes: d675c989ed2d ("[PKT_SCHED]: Packet classification based on textsearch (ematch)")
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
----
-	
-	v2: fix a type usage error
+Which data is uninitialized here?
 
- net/sched/em_text.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> And it seems vhost_hdr is skipped in get_tx_bufs():
+> https://elixir.bootlin.com/linux/latest/source/drivers/vhost/net.c#L616
+>
+> static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+>                                struct iov_iter *from)
+> {
+> ...
+>         buflen +=3D SKB_DATA_ALIGN(len + pad);
+>         alloc_frag->offset =3D ALIGN((u64)alloc_frag->offset, SMP_CACHE_B=
+YTES);
+>         if (unlikely(!vhost_net_page_frag_refill(net, buflen,
+>                                                  alloc_frag, GFP_KERNEL))=
+)
+>                 return -ENOMEM;
+>
+>         buf =3D (char *)page_address(alloc_frag->page) + alloc_frag->offs=
+et;
+>         copied =3D copy_page_from_iter(alloc_frag->page,
+>                                      alloc_frag->offset +
+>                                      offsetof(struct tun_xdp_hdr, gso),
+>                                      sock_hlen, from);
+>         if (copied !=3D sock_hlen)
+>                 return -EFAULT;
+>
+>         hdr =3D buf;
+>         gso =3D &hdr->gso;
+>
+>         if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+>             vhost16_to_cpu(vq, gso->csum_start) +
+>             vhost16_to_cpu(vq, gso->csum_offset) + 2 >
+>             vhost16_to_cpu(vq, gso->hdr_len)) {
+> ...
+> }
+>
+> I seems the handle_tx_copy() does not handle the VHOST_NET_F_VIRTIO_NET_H=
+DR
+> case correctly, Or do I miss something obvious here?
 
-diff --git a/net/sched/em_text.c b/net/sched/em_text.c
-index 6f3c1fb2fb44..f176afb70559 100644
---- a/net/sched/em_text.c
-+++ b/net/sched/em_text.c
-@@ -97,8 +97,10 @@ static int em_text_change(struct net *net, void *data, int len,
- 
- static void em_text_destroy(struct tcf_ematch *m)
- {
--	if (EM_TEXT_PRIV(m) && EM_TEXT_PRIV(m)->config)
-+	if (EM_TEXT_PRIV(m) && EM_TEXT_PRIV(m)->config) {
- 		textsearch_destroy(EM_TEXT_PRIV(m)->config);
-+		kfree(EM_TEXT_PRIV(m));
-+	}
- }
- 
- static int em_text_dump(struct sk_buff *skb, struct tcf_ematch *m)
--- 
-2.34.1
+In get_tx_bufs() we did:
+
+        *len =3D init_iov_iter(vq, &msg->msg_iter, nvq->vhost_hlen, *out);
+
+Which covers this case?
+
+Thanks
+
+>
+> >
+> > Thanks
+> >
+> >>
+> >>>
+> >>> Thanks
+> >>
+> >
+> > .
+> >
+>
 
 
