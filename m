@@ -1,172 +1,281 @@
-Return-Path: <netdev+bounces-59635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2486081B890
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:48:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E6D81B8AD
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BD4C1F269E5
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:48:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C05C1C21882
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277C96D6F4;
-	Thu, 21 Dec 2023 13:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5298E768E4;
+	Thu, 21 Dec 2023 13:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G3OoJFs4"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="B/qCbiFU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2077.outbound.protection.outlook.com [40.107.21.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D556D6FB
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703165261; x=1734701261;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=aleQJPWuPPAp07EORrmo8USwM+efZBPIKfnkxAkmJec=;
-  b=G3OoJFs4y24CPWAJA0MuTi2MPXnSM4HK57IQnpYAMLa+4tNBzPg3HtMV
-   6fZqQZXmLgOQgqABmQCy6mSB6pzGcA9VH3xWylRr6tU2TyirNHRiXu121
-   KdKq82AJZ8tOu+Nj7oCL9la+/kFhELxZy2fZOw7Eiow8Uq2F4EBCt2SHd
-   k9BWNZPLOrO0SQ9crj8nWRtfPMVnHsDUfmc6qz6Q0Y6M69buLx02qR1Gq
-   68dllaQSkdbLqFmHdCwpHED1Tt72jgqco/B1EOaqkVWOMyOAo/5xKkobs
-   /HVz+cSCimN9RFPRojDLlZ8v1nyq5azefIZDsbip76u5APknkM2y9llkR
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="386400167"
-X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="386400167"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 05:27:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="18683812"
-Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
-  by fmviesa001.fm.intel.com with ESMTP; 21 Dec 2023 05:27:37 -0800
-From: Andrii Staikov <andrii.staikov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Andrii Staikov <andrii.staikov@intel.com>,
-	Karen Ostrowska <karen.ostrowska@intel.com>,
-	Mateusz Palczewski <mateusz.palczewski@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net  v5] i40e: Restore VF MSI-X state during PCI reset
-Date: Thu, 21 Dec 2023 14:27:35 +0100
-Message-Id: <20231221132735.1246164-1-andrii.staikov@intel.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D2C745E1;
+	Thu, 21 Dec 2023 13:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gSpjHq5v03FKAO2s1RkVJHHqgMX47ms79Os9LHKViaInGngDfhpctJOzrUnHnkOUcQd9QGq2CA9llAyhKWAoci1kJcG1OY6/xhmSqjLrz7OO7EDJbJiK2FUUV20chWR+qzRPRWy49HConArExTWJzOtzsdzXcD6rRHjOFIYolTrfP8k7OarkSGCaF4Zcwn2MeCnN34za3W51Tvf3cXTKB2/SMVgGqO1zqpztv6s7uOCJlAikbQ9na8OjmmEd1Za8n0nmdCbMSl0OyQTcm73NH1Hg6zxv7VkyXbSc/f4RKRuZjwhM9KcB0wXJEApKNgt9vf4oaZYsZLBBIRjcb0IznA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=un7DN+8SLop1TbxMisqKf7dXiDAHw0iiRbhk8/R66kY=;
+ b=RwtSKDMGwG3eqaaAazvrFvkRP8mqc7EIo7G8tN8KbrEDyEhRdCF51W2lhgwPFB+RElC1BIaOj8Daf1HhcRZLByzWbfGH6nFel+9NEwdmY+XSKWWIfhyNUPH+8uKaJgDX1jtfS4nLDS3p5GvLgVH2S0swNFd7D5Hiu9kYPV4NYTlUgXL+oWCGJf6sPDiUr16H+c+nINJI0ab2ack+oY5tvKDXapYttZx2VmNTT6UVZi6OY4HpH38CSc37Ovxt3mwsiKaHAvq+0xcW7EAtae9UrLHUgUK9HL10Rma7QsH1DhhYuQVlAeAFSK89HpN0I6t7YU/Y7V4EzOGzEjtDepHikg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=un7DN+8SLop1TbxMisqKf7dXiDAHw0iiRbhk8/R66kY=;
+ b=B/qCbiFUh1ZURI8XO0OrkfolbPb3wlxpIn6HOmRkV/dgcwjhlrt0N0daRV3GxizTnvy+nW9Ny5S6JuelG6Nu7erPcpeyGi/xrE3rvItTco+jPz7k4joxPWIlMjsu8rohki2a6hdnLBPS42hYFuvrKi1FYpnk+Rg56tMTHfNVv6U=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DBBPR04MB8044.eurprd04.prod.outlook.com (2603:10a6:10:1e5::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.20; Thu, 21 Dec
+ 2023 13:35:35 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7113.016; Thu, 21 Dec 2023
+ 13:35:33 +0000
+Date: Thu, 21 Dec 2023 15:35:26 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 net 0/4] qbv cycle time extension/truncation
+Message-ID: <20231221133526.n5tvtkm42lntg3xc@skbuf>
+References: <20231219081453.718489-1-faizal.abdul.rahim@linux.intel.com>
+ <20231219165650.3amt4ftyt7gisz47@skbuf>
+ <d76e2682-8763-49d0-b46a-5f874eb61985@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d76e2682-8763-49d0-b46a-5f874eb61985@linux.intel.com>
+X-ClientProxiedBy: AM9P192CA0003.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21d::8) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB8044:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4711cece-6158-4d0d-23f0-08dc0229b4c2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	tvWkSQ9+YJuePtEzTSIIQxneo9CKfSxbw82ylaYPjPXP/SLbdJZ2fjfVIR/NqHVP66kW961ok0cq+gI9BD1Q1Pn6oKCXsuvx5ydEmPqyAUi8+5cR3Kclo1qVSPyjzHLUP8zRaNEzR/CbzmY7GZYydAww8hIBGKXo9YvuGx1ncQTrqtU/bbKI0M2cN5Wa6BqKRWJGGIF2d2iBZYoXPnl82O8ajbu6M4NHmGGKOnH3gi/1OjxIPE0TA0A4Ndnd8E6kKcW3oz6gKmMvosL+T+WUvYpEvc7Ohyr+5dOf2Ve16AyRuSD28WgS3W/Oskx5RqFk84lq6wq6iWNoaHQcvr0R6ZI9lefrlHrJi5FKZGCdYN3vDiEEssIADoTIg4nKx3e5H9X5YDtyChDZNPfUvFxg8cmjtbd5uCPktZ+2bXa0SSBdz5Ci5MLUfdAxsTR7Eib+p4NenYjueXF00rcvhMYomRJjNQvgQ6zfmEVxjhib7DJr0u+lIqXC7Qry10C3ZLZGSGmOWO+JZVo8Jc4ZZe3NUsXYEqT7sKdF4eCRaRgv+Oo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(396003)(39860400002)(136003)(346002)(376002)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(38100700002)(966005)(86362001)(83380400001)(33716001)(41300700001)(6486002)(44832011)(5660300002)(66476007)(316002)(8936002)(9686003)(4326008)(66946007)(66556008)(6512007)(54906003)(6916009)(1076003)(26005)(478600001)(7416002)(8676002)(2906002)(6506007)(6666004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aDNOeE5UN2ZrbkpSWTNzQ2VIeWlEcTBJcEV6SDZEMC8xUXdEWFBkSFIvSlp5?=
+ =?utf-8?B?bUJubWlZUUM5QS9iWXRNcWpqZk0vK000blpEOGkvODFYY2hpT3JaVWtwUi9i?=
+ =?utf-8?B?WWRGU0ZQNmg2TXNnTXV2TTZlRUZiWXU2NitxemNTcmhZcnpqNlJoZmJ2ajg1?=
+ =?utf-8?B?c0ZsVC9hNWtoclZzSWFTZUtSM2lXYjB4QW1sMkIwd3pMVHpURkhXaXR1Rk1L?=
+ =?utf-8?B?V21PaHpLRjJ4cVhrMnNQcm44OU90T2R1RENxM1kzREpGVlNMN080aG5hNzV2?=
+ =?utf-8?B?UzJLVUVJMGtmUjlCUUVNcUdYQlFoS3huUXhBbW1lRlkyUFZuRWM1Tllna0Rq?=
+ =?utf-8?B?Z3loVFg0Q0M5YjRKV0liakJyYnhjUWRYQUNpU3BIN1FadmFGVzVOd09Oa0tX?=
+ =?utf-8?B?ZERmcDZTRFJ6QW1Od2VPN25YMEhvZ3dLWUozTGJITGxHdEFyektwRllZVEE4?=
+ =?utf-8?B?MlFkNGlXK2V0c05VRzl3S2IyWG9RS3F0WkIrWkx1Uk16dnBnaDhaSjBnMWdP?=
+ =?utf-8?B?NWM1YnowbG1OK0FBS1hQTWh5VkRlZmlxR2IzbTZQRVdSemVtSDhzd0VuOWlk?=
+ =?utf-8?B?QUhUNnNpVW5hVDJLQUlMRGQrL3BoTWIrWWJWU1lhUkVBck5VZEttSnE3ZzlB?=
+ =?utf-8?B?Vmh1VGlhekw3RGhLNXV5VkduWjZyNUpFc1ZYS1NOa2gzQU0yOVdLL0gxV0Ex?=
+ =?utf-8?B?MjdkdmtkWlIrcS9ycFJwUG53SEsvT2htMWVqN1NoYW5TWkxSMC9wSjhjekd0?=
+ =?utf-8?B?dnc1a2QwLzhCREIvdVpnY3owc1lYSXM0aWtsTmZQNmNvRkVlUm1TRGF0TXhq?=
+ =?utf-8?B?eTFmWWVPa0Zma1MrR1BnOS9LR2FKMlpZSlNaZ1cyVEpJZkxGUVNQZ0U0SWhG?=
+ =?utf-8?B?b3lhSFdXUFlKUmxkY1hudTlTbnBGQ0hLT3hseHpLTk0rK0pZMFZRaHAwVUFR?=
+ =?utf-8?B?ZTVlcDJWZFpBdmFSVk13K1I4MjdYYUVEY3pPZXZOYUJNQzEvZStxNTZxTWJR?=
+ =?utf-8?B?Y3pCZWJ2TUwwaXBiaEQ1bmU3U2Z5TUU5WXdkWGhkR1Y4a2M2dGRDOXh5bjk4?=
+ =?utf-8?B?LzlHTHVlRTVzeG1TdEx5UG1xWDdYNVVDRzhTRE9iNDlQNlk5aWdCdzV5QjZZ?=
+ =?utf-8?B?aTBGV2ZtbVBCUEEvZ2Q0R1h5OGV5elhGUktlUXlvczhhMHJQWnRQT3g2OE0y?=
+ =?utf-8?B?Z1FEN0hSeGdGS3h4d2xnS3RoRVhUNC91MTlnYzhvcXkzaUNMMWlnQWtpNlI5?=
+ =?utf-8?B?cVpSVWpGZ0xoYnFKQmFUdU4reTNZSk5mSnZUOU1GcHRZNGtBOFJRU0dJVEFy?=
+ =?utf-8?B?amRRWU5STG1SWHJVcjBsc3B2U0UxTzRFK0dBSDBQSUZlVmx6Y3dmdE5udFVv?=
+ =?utf-8?B?M25ZTVVLQkRNYkFpVTVacWpqdGpuNE9hSG10Y3NwN0gzcG9qcUxEck1uSSt6?=
+ =?utf-8?B?WkdHU2gzYno2YXJHRkFDcjJMV3FMNkd6eVdwZFlTVXg3U2ZGcW1Eb0RockV4?=
+ =?utf-8?B?SmljcXFyTUNRWlI3VGJnSHJ2UjBpMW50bEFUelNXUGdGSDZaZ0RDdU1SUm9x?=
+ =?utf-8?B?b29jcGphSEs0S21jQTZLV2dZT1BHV0I3dG5UTDFHZkZWZ3pUS3M3ekRBZGs1?=
+ =?utf-8?B?N0JCR3RlNEtBV21oVHc5bGJ6QU1YbGJPbFZYdGFxUFRqZ2F1aVFjNERWblcw?=
+ =?utf-8?B?VWF1dnVrV0dNcU53dmpYaDl5MFpLZ0RIK3lIMm1NQUFobVB0U3B3S2tpSzJy?=
+ =?utf-8?B?L1IyeTdNZnJwSExoTjZueVB4MlgyOUlBNXA1T2Rma0doVHZvTGQvSXhua09Y?=
+ =?utf-8?B?cmR4OGZMNjdxWm5tZkpyeHFCbmIxRUdkM3EvU2pyeG5lTTA1eVd6S3N4RjBL?=
+ =?utf-8?B?dXBPVzR5bDJ1dk1TUEQxcW5YQU5adjBUTGJoZmpjUXAzU3JLaTJwQUl1TG9R?=
+ =?utf-8?B?Sk90Ly9JR1dVVDZCMWVmZkxmOUFEbmpSZ285aWFCUHNhckVyWWhsbVAyVUhQ?=
+ =?utf-8?B?QjF0b2x0Nmt6VzRyQURqRmlqOVpFQVNvVVNDRmxaWjJyNlcvY2RTUVZ0ZnhP?=
+ =?utf-8?B?OFVySThOYmcwYytWVnIyY2NIOWNqZktIVEkza1d3aXR4L3Nqd1VNdnllc1lW?=
+ =?utf-8?B?T3dZRGZZZzZDOFZOZWViU2F5QjF1dHVCQXZtVkF3Wmw5M1ZqMC84cWk0QTN5?=
+ =?utf-8?B?U1E9PQ==?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4711cece-6158-4d0d-23f0-08dc0229b4c2
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2023 13:35:33.2891
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CKWGK6ZVfj/4tEn0AZjA4lV7weRTsRsJPbOWQMllUDJkCGmRBaidEIlLC0PZe7N2uBqgHq0vpxyUk7yyrs7Xdg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB8044
 
-During a PCI FLR the MSI-X Enable flag in the VF PCI MSI-X capability
-register will be cleared. This can lead to issues when a VF is
-assigned to a VM because in these cases the VF driver receives no
-indication of the PF PCI error/reset and additionally it is incapable
-of restoring the cleared flag in the hypervisor configuration space
-without fully reinitializing the driver interrupt functionality.
+(sorry, I started writing this email yesterday, I noticed the
+conversation continued with Paolo)
 
-Since the VF driver is unable to easily resolve this condition on its own,
-restore the VF MSI-X flag during the PF PCI reset handling.
+On Wed, Dec 20, 2023 at 11:25:09AM +0800, Abdul Rahim, Faizal wrote:
+> Hi Vladimir,
+> 
+> No worries, I truly appreciate the time you took to review and reply.
+> 
+> What prompted this in general is related to my project requirement to enable
+> software QBV cycle time extension, so there's a validation team that created
+> test cases to properly validate cycle time extension. Then I noticed the
+> code doesn't handle truncation properly also, since it's the same code area,
+> I just fixed it together.
 
-Fixes: 19b7960b2da1 ("i40e: implement split PCI error reset handler")
-Co-developed-by: Karen Ostrowska <karen.ostrowska@intel.com>
-Signed-off-by: Karen Ostrowska <karen.ostrowska@intel.com>
-Co-developed-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
-Signed-off-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
----
-v1 -> v2: Fix signed-off tags
-https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20231204131041.3369693-1-andrii.staikov@intel.com/
+We tend to do patch triage between 'net' and 'net-next' based on the
+balance between the urgency/impact of the fix and its complexity.
 
-v2 -> v3: use @vf_dev in pci_get_device() instead of NULL and remove unnecessary call
-https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20231206125127.218350-1-andrii.staikov@intel.com/
+While it's undoubtable that there are issues with taprio's handling of
+dynamic schedules, you've mentioned yourself that you only hit those
+issues as part of some new development work - they weren't noticed by
+end users. And fixing them is not quite trivial, there are also FIXMEs
+in taprio which suggest so. I'm worried that the fixes may also impact
+the code from stable trees in unforeseen ways.
 
-v3 -> v4: wrap the added functionality into the CONFIG_PCI_IOV define as
-this is VF-related functionality
-https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20231212122452.3250691-1-andrii.staikov@intel.com/
+So I would recommend moving the development of these fixes to 'net-next',
+if possible.
 
-v4 -> v5: fix RB tags
----
- drivers/net/ethernet/intel/i40e/i40e_main.c   |  3 +++
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 26 +++++++++++++++++++
- .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  3 +++
- 3 files changed, 32 insertions(+)
+> Each time before sending the patch for upstream review, I normally will run
+> our test cases that only validates cycle time extension. For truncation, I
+> modify the test cases on my own and put logs to check if the
+> cycle_time_correction negative value is within the correct range. I probably
+> should have mentioned sooner that I have tested this myself, sorry about
+> that.
+> 
+> Example of the test I run for cycle time extension:
+> 1) 2 boards connected back-to-back with i226 NIC. Board A as sender, Board B
+> as receiver
+> 2) Time is sync between 2 boards with phc2sys and ptp4l
+> 3) Run GCL1 on Board A with cycle time extension enabled:
+>     tc qdisc replace dev $INTERFACE parent root handle 100 taprio \
+>     num_tc 4 \
+>     map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
+>     queues 1@0 1@1 1@2 1@3 \
+>     base-time 0 \
+>     cycle-time-extension 1000000 \
+>     sched-entry S 09 500000 \
+>     sched-entry S 0a 500000 \
+>     clockid CLOCK_TAI
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 7bb1f64833eb..bbe2d115fb15 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -16513,6 +16513,9 @@ static void i40e_pci_error_reset_done(struct pci_dev *pdev)
- 		return;
- 
- 	i40e_reset_and_rebuild(pf, false, false);
-+#ifdef CONFIG_PCI_IOV
-+	i40e_restore_all_vfs_msi_state(pdev);
-+#endif /* CONFIG_PCI_IOV */
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 3f99eb198245..d60f5419d6bd 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -154,6 +154,32 @@ void i40e_vc_notify_reset(struct i40e_pf *pf)
- 			     (u8 *)&pfe, sizeof(struct virtchnl_pf_event));
- }
- 
-+#ifdef CONFIG_PCI_IOV
-+void i40e_restore_all_vfs_msi_state(struct pci_dev *pdev)
-+{
-+	u16 vf_id;
-+	u16 pos;
-+
-+	/* Continue only if this is a PF */
-+	if (!pdev->is_physfn)
-+		return;
-+
-+	if (!pci_num_vf(pdev))
-+		return;
-+
-+	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
-+	if (pos) {
-+		struct pci_dev *vf_dev = NULL;
-+
-+		pci_read_config_word(pdev, pos + PCI_SRIOV_VF_DID, &vf_id);
-+		while ((vf_dev = pci_get_device(pdev->vendor, vf_id, vf_dev))) {
-+			if (vf_dev->is_virtfn && vf_dev->physfn == pdev)
-+				pci_restore_msi_state(vf_dev);
-+		}
-+	}
-+}
-+#endif /* CONFIG_PCI_IOV */
-+
- /**
-  * i40e_vc_notify_vf_reset
-  * @vf: pointer to the VF structure
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-index 2ee0f8a23248..5fd607c0de0a 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-@@ -137,6 +137,9 @@ int i40e_ndo_set_vf_spoofchk(struct net_device *netdev, int vf_id, bool enable);
- 
- void i40e_vc_notify_link_state(struct i40e_pf *pf);
- void i40e_vc_notify_reset(struct i40e_pf *pf);
-+#ifdef CONFIG_PCI_IOV
-+void i40e_restore_all_vfs_msi_state(struct pci_dev *pdev);
-+#endif /* CONFIG_PCI_IOV */
- int i40e_get_vf_stats(struct net_device *netdev, int vf_id,
- 		      struct ifla_vf_stats *vf_stats);
- 
--- 
-2.25.1
+Why do you need PTP sync? Cannot this test run between 2 veth ports?
 
+> 4) capture tcp dump on Board B
+> 5) Send packets from Board A to Board B with 200us interval via UDP Tai
+
+What is udp_tai? This program?
+https://gist.github.com/jeez/bd3afeff081ba64a695008dd8215866f
+
+> 6) When packets reached Board B, trigger GCL2 to Board A:
+>    CYCLETIME=1000000
+>    APPLYTIME=1000000000 # 1s
+>    CURRENT=$(date +%s%N)
+>    BASE=$(( (CURRENT + APPLYTIME + (2*CYCLETIME)) - ((CURRENT + APPLYTIME)
+>          % CYCLETIME) + ((CYCLETIME*3)/5) ))
+>     tc qdisc replace dev $INTERFACE parent root handle 100 taprio \
+>     num_tc 4 \
+>     map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
+>     queues 1@0 1@1 1@2 1@3 \
+>     base-time $BASE \
+>     cycle-time-extension 1000000 \
+>     sched-entry S oc 500000 \
+>     sched-entry S 08 500000 \
+>     clockid CLOCK_TAI
+> 7) Analyze tcp dump data on Board B using wireshark, will observe packets
+> receive pattern changed.
+> 
+> Note that I've hidden "Best Effort (default) 7001 → 7001" data from the
+> wireshark log so that it's easier to see the pattern.
+> 
+>      TIMESTAMP               PRIORITY             PRIORITY    NOTES
+> 
+> 1702896645.925014509	Critical Applications	7004 → 7004   GCL1
+> 1702896645.925014893	Critical Applications	7004 → 7004   GCL1
+> 1702896645.925514454	Excellent Effort	7003 → 7003   GCL1
+> 1702896645.925514835	Excellent Effort	7003 → 7003   GCL1
+> 1702896645.926014371	Critical Applications	7004 → 7004   GCL1
+> 1702896645.926014755	Critical Applications	7004 → 7004   GCL1
+> 1702896645.926514620	Excellent Effort	7003 → 7003   GCL1
+> 1702896645.926515004	Excellent Effort	7003 → 7003   GCL1
+> 1702896645.927014408	Critical Applications	7004 → 7004   GCL1
+> 1702896645.927014792	Critical Applications	7004 → 7004   GCL1
+> 1702896645.927514789	Excellent Effort	7003 → 7003   GCL1
+> 1702896645.927515173	Excellent Effort	7003 → 7003   GCL1
+> 1702896645.928168304	Excellent Effort	7003 → 7003   Extended
+> 1702896645.928368780	Excellent Effort	7003 → 7003   Extended
+> 1702896645.928569406	Excellent Effort	7003 → 7003   Extended
+> 1702896645.929614835	Background	        7002 → 7002   GCL2
+> 1702896645.929615219	Background	        7002 → 7002   GCL2
+> 1702896645.930614643	Background	        7002 → 7002   GCL2
+> 1702896645.930615027	Background	        7002 → 7002   GCL2
+> 1702896645.931614604	Background	        7002 → 7002   GCL2
+> 1702896645.931614991	Background	        7002 → 7002   GCL2
+> 
+> The extended packets only will happen if cycle_time and interval fields
+> are updated using cycle_time_correction. Without that patch, the extended
+> packets are not received.
+> 
+> 
+> As for the negative truncation case, I just make the interval quite long,
+> and experimented with GCL2 base-time value so that it hits the "next entry"
+> in advance_sched(). Then I checked my logs in get_cycle_time_correction() to
+> see the truncation case and its values.
+> 
+> Based on your feedback of the test required, I think that my existing
+> truncation test is not enough, but the extension test case part should be
+> good right ?
+> 
+> Do let me know then, I'm more than willing to do more test for the
+> truncation case as per your suggestion, well basically, anything to help
+> speed up the patches series review process :)
+> 
+> 
+> Appreciate your suggestion and help a lot, thank you.
+
+Do you think you could automate a test suite which only measures software
+TX timestamps and works on veth?
+
+I prepared this very small patch set just to give you a head start
+(the skeleton). You'll still have to add the logic for individual tests.
+https://lore.kernel.org/netdev/20231221132521.2314811-1-vladimir.oltean@nxp.com/
+I'm terribly sorry, but this is the most I can do due to my current lack
+of spare time, unfortunately.
+
+If you've never run kselftests before, you'll need some kernel options
+to enable VRF support. From my notes I have this list below, but there
+may be more missing options.
+
+CONFIG_IP_MULTIPLE_TABLES=y
+CONFIG_NET_L3_MASTER_DEV=y
+CONFIG_NET_VRF=y
+
+Let me know if you face any trouble or if I can help in some way.
+Thanks for doing this.
 
