@@ -1,111 +1,190 @@
-Return-Path: <netdev+bounces-59754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA5381BFF3
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:21:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A33281BFF6
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:22:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DCB01F25621
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 21:21:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AD1C1F2590B
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 21:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007E576DAB;
-	Thu, 21 Dec 2023 21:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6331C76DB3;
+	Thu, 21 Dec 2023 21:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJYRjmeW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FpmkzEA9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5B576DA0
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 21:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703193676;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F81tgorPPC8rKY7lw2woaVz+TujoboSyrJwm0fUy2JE=;
-	b=ZJYRjmeW8m6zza1LejJqTCMbBcOGgKILoLhXL4oEJSkGt5FqJ02MVwE40iHQTsjdHpzdVZ
-	j/KaSU4dnQpY5NAwG3HNDVw58TPOGWqrc/AjJYcoYuMMBXP/0lmeXOkYkvspYeYE7r5Emv
-	YzsK1KmfhzyTr1EICm6ZbtVQk9vDvps=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-480-k5tZw5skOG-zrOzXrJrKGg-1; Thu, 21 Dec 2023 16:21:14 -0500
-X-MC-Unique: k5tZw5skOG-zrOzXrJrKGg-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2cca8cbe588so193101fa.1
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:21:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABBE76DA0
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 21:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a23350cd51cso150052166b.2
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:22:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1703193762; x=1703798562; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PYUr/8SYAD8b39z5juYQlTN6Eyhymmps+aUneiJvKeo=;
+        b=FpmkzEA9zPl1p8a8GRZ2EVpHgvpop64pjFzbvtKGeEmVSlITDOSbAwhZmGY+Z3hGQf
+         EfbybPZAetvjfvuKXxyxYj7QxhZ2W+JsgwjTXZ2OUgijqkzKgZkp1uE+/M7m4R7/gk8n
+         d/Y3pzKykKim3eHpFzJlY61a6YdfTYQ91lVfEvmuzRpgIiKqjkP9L6E96qpkDmLbiLOC
+         Q2CdsYR8vd8HgotAH7t2Hu4EZvNGuI+OFtgzFGyUbGbhoVXoJyPkudIkYuf+5Fe5Mp6s
+         SO/qasNNqy8DFA7YxARunFCUD938SijQQvF8tGqKAJvqVSpXtH2pXwDGX5HSMQNByikg
+         S1rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703193673; x=1703798473;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=F81tgorPPC8rKY7lw2woaVz+TujoboSyrJwm0fUy2JE=;
-        b=JXA7SnUpph7+FO7EPp39YTVcy2upxJmCoIt7Nm1+rlLVXIPRT09gR32B+/t/6LzAuZ
-         Br8RgOWnuCoDMgQ0T3kb0RyRc4P7SVSSlwc66/WV+ELOuhTtigrJNpCOAGUaM5V4NU49
-         4Axf8F92XwH/J1fSSE8k+n4tLCcU5W44B41CMyvLzq8aGTGNKrDxzAkNg5ShXsz33eEZ
-         DhbPm1472gCHobcgKr8aUo6TECsdco6f+EENpu5ekcytlq701f5TY0j8R7G5Tbiy01m7
-         IIXMMB3GjRZXhoBHUoiszOVI6BQpvxYhMNmo9RGy+Gg4Nu/2kwUJjbuD+lz/XCtPlJWK
-         I3Rg==
-X-Gm-Message-State: AOJu0YxwIoTsPqWaEfuf4mtmO17zQEcwmpQmJUgZF2vFcW9Xgue1tToI
-	WFKdaf2njnClrQbWFX5HMQG3+wkZAsFxMCIufg319PX0MBSh22zNn5LfCyKZHOSSyV4mH1r+5fq
-	RN6VYZzkYtqZF0rFdgM3Ad8RPFjM2Ld6r
-X-Received: by 2002:a05:6512:4849:b0:50e:6878:a70d with SMTP id ep9-20020a056512484900b0050e6878a70dmr210074lfb.2.1703193673206;
-        Thu, 21 Dec 2023 13:21:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG+lIo/RAFZgRrBMPm4uZK/j79wlB6DaXSbFR6dJpfNdOtMSOXsf0F1KWB6luiPPUS/0JiMvQ==
-X-Received: by 2002:a05:6512:4849:b0:50e:6878:a70d with SMTP id ep9-20020a056512484900b0050e6878a70dmr210065lfb.2.1703193672738;
-        Thu, 21 Dec 2023 13:21:12 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-246-124.dyn.eolo.it. [146.241.246.124])
-        by smtp.gmail.com with ESMTPSA id k27-20020a17090627db00b00a268ee9017fsm1368933ejc.157.2023.12.21.13.21.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 13:21:12 -0800 (PST)
-Message-ID: <344024e9f616635b36462111abec59aa98e92f53.camel@redhat.com>
-Subject: Re: [PATCH net-next] net/ipv6: Remove gc_link warn on in
- fib6_info_release
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org
-Date: Thu, 21 Dec 2023 22:21:10 +0100
-In-Reply-To: <1eb090e960de282556174c4fbd5ac0b344ec2626.camel@redhat.com>
-References: <20231219030742.25715-1-dsahern@kernel.org>
-	 <CANn89iLczu8fXUGxJt8LGEhoUbkNrKyh=5zjZXR4U-HfKPwPsg@mail.gmail.com>
-	 <1eb090e960de282556174c4fbd5ac0b344ec2626.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20230601; t=1703193762; x=1703798562;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PYUr/8SYAD8b39z5juYQlTN6Eyhymmps+aUneiJvKeo=;
+        b=GvNvlDYOgCe/2BsohxDP41YKEXdrNfM2VsICM8INV2dSfXBmvRKthepHnyOhqdYCur
+         ds8K0hq3VSKahaqpTtjglhrJNlW0t57WgUlREblVQBOIqqbaFU1tHC/GPQ0ziY2vGcwd
+         fpp6AoJOuaEPqhN2aclXBRpVqT4VrnxhXqsvUY5JokgePg7CuNrmRmWeALt2vHp6rZhQ
+         YvYu6w2NYiiFSo0KbopztwzgyWxMvEfJNEgRc7O7P2WgflJb937pLDXFYddp9Snp0tAm
+         5gJPLkFxTURRc0PLrw5/DSQTnTTIfwH7afBhgk3VeyigbIryJMYZ2qNj37gdJrAzDE+b
+         2bPg==
+X-Gm-Message-State: AOJu0YziFh+/mQiTvzLxWc9WJDXe5Fg/ROT9vXl7Txngq4Q/7y+EljuP
+	dk4eD+4tWGAjCEYowU3JqGd3HYNzRyvLTK4vGO7oXCDheCwP
+X-Google-Smtp-Source: AGHT+IHDM2f7ijWZdoTjSAk3eayoWKc0Ruh5BmMJXvkM5vwkTlpIi6/Ha1gNGgAwpihHFrBWvplldaFAdyXrCwDNcxM=
+X-Received: by 2002:a17:906:fb16:b0:a26:a296:2ba4 with SMTP id
+ lz22-20020a170906fb1600b00a26a2962ba4mr241429ejb.69.1703193761749; Thu, 21
+ Dec 2023 13:22:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20231214020530.2267499-1-almasrymina@google.com>
+ <20231214020530.2267499-5-almasrymina@google.com> <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
+ <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
+ <20231215021114.ipvdx2bwtxckrfdg@google.com> <20231215190126.1040fa12@kernel.org>
+ <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
+ <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
+ <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com> <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com>
+In-Reply-To: <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 21 Dec 2023 13:22:27 -0800
+Message-ID: <CAHS8izP63wXGH+Q3y1H=ycT=AHYnhGveBnuyF_rYioAjZ=Hn=g@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
+ of struct page in API
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Shakeel Butt <shakeelb@google.com>, Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
+	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
+	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
+	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
+	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
+	Stefano Stabellini <sstabellini@kernel.org>, 
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2023-12-21 at 22:11 +0100, Paolo Abeni wrote:
-> On Tue, 2023-12-19 at 09:34 +0100, Eric Dumazet wrote:
-> > On Tue, Dec 19, 2023 at 4:07=E2=80=AFAM David Ahern <dsahern@kernel.org=
-> wrote:
-> > >=20
-> > > A revert of
-> > >    3dec89b14d37 ("net/ipv6: Remove expired routes with a separated li=
-st of routes")
-> > > was sent for net-next. Revert the remainder of 5a08d0065a915
-> > > which added a warn on if a fib entry is still on the gc_link list
-> > > to avoid compile failures when net is merged to net-next
-> > >=20
-> > > Signed-off-by: David Ahern <dsahern@kernel.org>
-> >=20
-> > Reviewed-by: Eric Dumazet <edumazet@google.com>
->=20
-> Oops, I notice a bit too late I should have processed this one before
-> merging back net into net-next.
+On Thu, Dec 21, 2023 at 3:32=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2023/12/20 11:01, Mina Almasry wrote:
+>
+> ...
+>
+> >>>> Perhaps we should aim to not export netmem_to_page(),
+> >>>> prevent modules from accessing it directly.
+> >>>
+> >>> +1.
+> >>
+> >
+> > I looked into this, but it turns out it's a slightly bigger change
+> > that needs some refactoring to make it work. There are few places
+> > where I believe I need to add netmem_to_page() that are exposed to the
+> > drivers via inline helpers, these are:
+> >
+> > - skb_frag_page(), which returns NULL if the netmem is not a page, but
+> > needs to do a netmem_to_page() to return the page otherwise.
+>
+> Is it possible to introduce something like skb_frag_netmem() for
+> netmem? so that we can keep most existing users of skb_frag_page()
+> unchanged and avoid adding additional checking overhead for existing
+> users.
+>
 
-Actually is not too late. I'll apply this commit just before merging
-back net. Sorry for the noise.
+In my experience most current skb_frag_page() users need specifically
+the struct page*. Example is illegal_highdma() which
+PageHighMem(skb_frag_page())
 
-/P
+But RFC v5 adds skb_frag_netmem() for callsites that want a netmem and
+don't care about specifically a page:
 
+https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.3516870=
+-10-almasrymina@google.com/
+
+> > - The helpers inside skb_add_rx_frag(), which needs to do a
+> > netmem_to_page() to set skb->pfmemalloc.
+>
+> Similar as above, perhaps introduce something like skb_add_rx_netmem_frag=
+()?
+>
+
+Yes, v3 of this series adds skb_add_rx_frag_netmem():
+
+https://patchwork.kernel.org/project/netdevbpf/patch/20231220214505.2303297=
+-4-almasrymina@google.com/
+
+> > - Some of the page_pool APIs are exposed to the drivers as static
+> > inline helpers, and if I want the page_pool to use netmem internally
+> > the page_pool needs to do a netmem_to_page() in these helpers.
+> >
+> > The refactor is not an issue, but I was wondering if not exporting
+> > netmem_to_page() was worth moving the code around. I was thinking in
+> > the interim until netmem is adopted and has actual driver users we may
+> > prefer to just add a comment on the netmem_to_page() helper that says
+> > 'try not to use this directly and use the netmem helpers instead'.
+> >
+>
+
+
+--=20
+Thanks,
+Mina
 
