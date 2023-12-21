@@ -1,85 +1,104 @@
-Return-Path: <netdev+bounces-59811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D73081C1A3
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:12:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AFD181C1DA
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:23:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F6DC1C245B2
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:12:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDAAD1F25E3D
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340ED77620;
-	Thu, 21 Dec 2023 23:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A67E79943;
+	Thu, 21 Dec 2023 23:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gvjjT3V4"
+	dkim=pass (1024-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b="L2gO5BZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C480378E9C;
-	Thu, 21 Dec 2023 23:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-67ac0ef6bb8so6484276d6.1;
-        Thu, 21 Dec 2023 15:12:46 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5913E7995F;
+	Thu, 21 Dec 2023 23:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mailbox.tu-berlin.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=campus.tu-berlin.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703200365; x=1703805165; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RwWjnQ9Plt1oqDMzGG0AXj2S4ylf5A0WSUb1d1LBEOk=;
-        b=gvjjT3V45phMaW0h+RLLx8XWYG89gZXO4kq/Oskclm2ziRyeZW6y4p1CKfAswn/9zG
-         J3gkN49FnYbHQWI1cdg2GtBcT0LRQ/gGXfI61Ozf9W+rAUdlN8ZGPJHBy5Z752H1sKxC
-         AWUjMfU1zuTjF/3QANlNJPm42h4QgK8JfBUXK0p7B39l/zI7AnlAQRQ4mTHso7u8QtPS
-         vxC8tWq3ViiXgP1FraEiFtFr0s+Jz7bNEuBXAdVz6zy3gmCgnW+EpRVpqt7d+fokj8se
-         Lo2n1TohuZGOCnQ6i3bBNbzHIwgbU5ClrL8B2ZbZwuGMwrHLFnlHxaI2UEyWVvoGQbGR
-         eMqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703200365; x=1703805165;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RwWjnQ9Plt1oqDMzGG0AXj2S4ylf5A0WSUb1d1LBEOk=;
-        b=CKqqjj0j9iLiYvYJs2/YaS2orsjoumwsiZnKDzPMNly1YR1E8VqRrV5kIig51zpOa9
-         srKBU0JnlhbLWvf113ngDd6L63Mc5MK2M1rkFtyF6hQL0mlPltcjvEpJdiGTOVPFl9Cw
-         5t437H+QkuJmmTut9uGa0Mo/tAzgWoWlwo33dRPWy87DMuiE563g/6Mfsocdwf0M21s9
-         lFeh8OfkM22jJCCu8fByU7cFDvC1CH2ro6amGHy5jMXL02EjXorXx+t6PJTnu8B5VQZ4
-         CrfnD+dV1M055xmpQbNoaKvjXUGKu+eY+HvD/OYt3gs4wTeguIxKxfKwatbxNHPjiqSH
-         88Ow==
-X-Gm-Message-State: AOJu0YxbE28hwmGlLHJVQzoc7kj6jvyu7cR1UxYxEwtZIbBkmdyVV6Pg
-	QunoufsmS0eA5DQFgxa59ga/Ii0q7ctMRxOTllMiaiHI8CA=
-X-Google-Smtp-Source: AGHT+IGVES8qh/TPwb94zIco8hdLk9Dx59bNisGk1U6h9zaT/VmDbCugA55FQSwFVZTKNMgF2oR7qu+zZ5ZSN9tuA8M=
-X-Received: by 2002:a05:6214:ac5:b0:67a:cd6a:754c with SMTP id
- g5-20020a0562140ac500b0067acd6a754cmr717679qvi.33.1703200365383; Thu, 21 Dec
- 2023 15:12:45 -0800 (PST)
+  d=tu-berlin.de; l=1833; s=dkim-tub; t=1703200787;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ti5eomPIZbnykEiRIHFWHoRdnkVM3Lii6pCaOjMdzxI=;
+  b=L2gO5BZF/pQ8Nx6bOGFAyVa79pauEyOKNK1HfHIfviPLnJFR80/4eyCD
+   b0vaArE4+7GDSuNHxERPVBWOs3UnArBZG1Vqwmc7Dd6BkOsqCkzdOpB2Y
+   U451QFFETkJK1rkn1NZnhCQo3PRwkBiX9NakQpdWksjcZDgqK3yJytl1p
+   c=;
+X-CSE-ConnectionGUID: THVcGfoHSOaMWzOeFXAlZw==
+X-CSE-MsgGUID: uvaIDAWJQ+yjFuvgSaLsfw==
+X-IronPort-AV: E=Sophos;i="6.04,294,1695679200"; 
+   d="scan'208";a="14652823"
+Received: from mail.tu-berlin.de ([141.23.12.141])
+  by mailrelay.tu-berlin.de with ESMTP; 22 Dec 2023 00:19:44 +0100
+From: =?UTF-8?q?J=C3=B6rn-Thorben=20Hinz?= <jthinz@mailbox.tu-berlin.de>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?J=C3=B6rn-Thorben=20Hinz?= <jthinz@mailbox.tu-berlin.de>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
+	<willemb@google.com>, Deepa Dinamani <deepa.kernel@gmail.com>
+Subject: [PATCH net] net: Implement missing getsockopt(SO_TIMESTAMPING_NEW)
+Date: Fri, 22 Dec 2023 00:19:01 +0100
+Message-ID: <20231221231901.67003-1-jthinz@mailbox.tu-berlin.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Chris Rankin <rankincj@gmail.com>
-Date: Thu, 21 Dec 2023 23:12:34 +0000
-Message-ID: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
-Subject: Does Linux still support UP?
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
+socket option SO_TIMESTAMPING_NEW. Setting the option is handled in
+sk_setsockopt(), querying it was not handled in sk_getsockopt(), though.
 
-I have an ancient i586 UP machine that happily runs vanilla Linux
-6.4.16, but which locks up shortly after booting vanilla 6.5.0. The
-kernel *seems* to run into trouble as soon as the networking layer
-becomes busy. However, its SysRq-S/U/B sequence still seems to work as
-expected and so obviously *something* is still responding somewhere.
+Following remarks on an earlier submission of this patch, keep the old
+behavior of getsockopt(SO_TIMESTAMPING_OLD) which returns the active
+flags even if they actually have been set through SO_TIMESTAMPING_NEW.
 
-This problem still exists in vanilla 6.6.8.
+The new getsockopt(SO_TIMESTAMPING_NEW) is stricter, returning flags
+only if they have been set through the same option.
 
-FWIW I have raised this bug in bugzilla:
-https://bugzilla.kernel.org/show_bug.cgi?id=218296
+Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
+Link: https://lore.kernel.org/lkml/20230703175048.151683-1-jthinz@mailbox.tu-berlin.de/
+Link: https://lore.kernel.org/netdev/0d7cddc9-03fa-43db-a579-14f3e822615b@app.fastmail.com/
+Signed-off-by: Jörn-Thorben Hinz <jthinz@mailbox.tu-berlin.de>
+---
+ net/core/sock.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Thanks for any help here,
-Cheers,
-Chris
+diff --git a/net/core/sock.c b/net/core/sock.c
+index fef349dd72fa..51d52859e942 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1711,9 +1711,16 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 		break;
+ 
+ 	case SO_TIMESTAMPING_OLD:
++	case SO_TIMESTAMPING_NEW:
+ 		lv = sizeof(v.timestamping);
+-		v.timestamping.flags = READ_ONCE(sk->sk_tsflags);
+-		v.timestamping.bind_phc = READ_ONCE(sk->sk_bind_phc);
++		/* For the later-added case SO_TIMESTAMPING_NEW: Be strict about only
++		 * returning the flags when they were set through the same option.
++		 * Don't change the beviour for the old case SO_TIMESTAMPING_OLD.
++		 */
++		if (optname == SO_TIMESTAMPING_OLD || sock_flag(sk, SOCK_TSTAMP_NEW)) {
++			v.timestamping.flags = READ_ONCE(sk->sk_tsflags);
++			v.timestamping.bind_phc = READ_ONCE(sk->sk_bind_phc);
++		}
+ 		break;
+ 
+ 	case SO_RCVTIMEO_OLD:
+-- 
+2.39.2
+
 
