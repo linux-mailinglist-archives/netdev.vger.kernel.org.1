@@ -1,553 +1,704 @@
-Return-Path: <netdev+bounces-59782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C9A781C04A
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:36:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C76F281C04E
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:39:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02FD6289015
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 21:36:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CD561F25317
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 21:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853BF77F35;
-	Thu, 21 Dec 2023 21:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F0A77B23;
+	Thu, 21 Dec 2023 21:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DirNs8SB"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Nm4+QEEm"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2088.outbound.protection.outlook.com [40.107.237.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA6F77620
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 21:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z5SBMfJiCRcbWlyHqs1TQPPoKmeLSWrwmLYU8zHzUVEJ7a275sf/qBonyVEhIn3DeTHe1Nwejx3jruyZlWbitygJfhE/2U+PopjfB9XltIOBf8pG4L1XUsbl1HN3WlPa3+ZgKPRu1C7fasQB9YookCypQ1/UW0uON3QHBljAj5F353NiMTPSK4se5oKMOyfKALiClT14BIg9RNtIMPz20Fk3riP3gBmE81vtOgdPuNHgbj2JviWq7PjSTFnQB6JPBXtrW/Mq6w4zXgBezfXtUszmiyiZaxlZsYqv1o/ZW+Zk2pxhjFDJG0g/FNzPo9kimJH4LFjpLS2nhoR4SaAR4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u5XQTBOL/L1JB7W8dkjc65TxCcZPV9Ju+395GeoUiyE=;
- b=UC0NqJZjvCtZC8g3LsD9z+sJz0YtoW9tcDSwhM2rGRL16npYtZgeQCP08MLUBk126o910PfY1LXtyy3v+yuIeun2FakADjNtghDxVAR4QQzJFQE8u4hZ9jQXhFDHRbFNLpimL+01jtTvG7a9H4/cwrUZxhqs8SiGJkrtFKncuI69y9RRGyjcd76fiHOBnxq0idYaxfpZMmIX4vLABv9zh7FxFqLxILgFE1ojlFVhAwa7yffLGri0zCg46O+uMEFNx+zfmeitteUxZH82S1uzIf5RaTK7VphqcdNhA0cbWSg4AlPHxbFG8Uruz2ndDgUCLn/NQeTR46I91NkGLiL5MA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u5XQTBOL/L1JB7W8dkjc65TxCcZPV9Ju+395GeoUiyE=;
- b=DirNs8SBY6N6DvuBQeENcF4KqIOAjf5wH0ZH/BB0OlT1jrzyOGDRvUMC/AWqProM3/DZJiy+3tDbFachQCSmrrBkb6Vom4kRRD0XkCrqzuoFc6i/ZtkPi2F8+Y2iXVWHLd3CZOIWJ8YwfhMjMfHmVA+aXh5ir9IXwfx/P+dzjiUUvkhEn3Dk5bp/uu4GwxblNbSl/KVA231z5QiIyGXVA2Kx04/waAok9Wvb6Pea2PimOp5FoFjLlfmfH/sNPW9bpUoh5ebdQTvs6ITsycSsUbV0l/aF8Ht+qeELLjShS+0bcAsseByZT3yxOEjS5qgw4TDnb1Q7SuWmVmAVZmoXxQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
- by MW4PR12MB7481.namprd12.prod.outlook.com (2603:10b6:303:212::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.19; Thu, 21 Dec
- 2023 21:35:42 +0000
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::eb39:938e:7503:c21e]) by SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::eb39:938e:7503:c21e%3]) with mapi id 15.20.7113.019; Thu, 21 Dec 2023
- 21:35:42 +0000
-From: Aurelien Aptel <aaptel@nvidia.com>
-To: linux-nvme@lists.infradead.org,
-	netdev@vger.kernel.org,
-	sagi@grimberg.me,
-	hch@lst.de,
-	kbusch@kernel.org,
-	axboe@fb.com,
-	chaitanyak@nvidia.com,
-	davem@davemloft.net,
-	kuba@kernel.org
-Cc: Aurelien Aptel <aaptel@nvidia.com>,
-	aurelien.aptel@gmail.com,
-	smalin@nvidia.com,
-	malin1024@gmail.com,
-	ogerlitz@nvidia.com,
-	yorayz@nvidia.com,
-	borisp@nvidia.com,
-	galshalom@nvidia.com,
-	mgurtovoy@nvidia.com
-Subject: [PATCH v22 20/20] net/mlx5e: NVMEoTCP, statistics
-Date: Thu, 21 Dec 2023 21:33:58 +0000
-Message-Id: <20231221213358.105704-21-aaptel@nvidia.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231221213358.105704-1-aaptel@nvidia.com>
-References: <20231221213358.105704-1-aaptel@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: LO4P265CA0288.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:38f::16) To SJ1PR12MB6075.namprd12.prod.outlook.com
- (2603:10b6:a03:45e::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4CFE7765B
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 21:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d408d0bb87so7734845ad.0
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:39:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703194745; x=1703799545; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KY9LTnUabSNd0ZzjKC7FGUjUxod9ELJvEzlRhsdvP3w=;
+        b=Nm4+QEEmFVhCxnSxRcxdjssHHZ5RNHR3EITnSPSvslxNxlxe5WIo/JnIgdBZMSW7XJ
+         WfKexk4ubT283ionOYIp8oE3NyS+7LqSY4L6Fl1kMDes1zBmP/jN4iotPZ0JTQjvk3k6
+         cBQN37YZyhOMhdn8fly8aU+ksFkzd9dP61gG6d1BCbWgKOzg+sAwZNigZqWUl6vqEyH0
+         Q73+axDjmvUvVJrneb4Ogv3fR2Jw9jJs4b9zDvl4sxmTbPJ55+nmd04oFW7xJzHOkXKh
+         zDoIvo5FSSEN66yFK8/C2LuA2bn/aMtaezOa+Kc3RtQ+sb6DSK0IjuZNEQFJey7KK6vG
+         tC/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703194745; x=1703799545;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KY9LTnUabSNd0ZzjKC7FGUjUxod9ELJvEzlRhsdvP3w=;
+        b=G/F8pxvzS2M+42qsFWW3SWg8QCs87mJPef4oml1lDojJdubuw3oiEHqS9qjc74Ax9Q
+         V5pOS36YmUk0zrh7YONhciuGc0mEXDlTab4/8DIMXX2fkdw5VPaf2mALcHl2WuEH2bFx
+         YCt1cGg7woqvb0Qhmyj9NPIEDlruhA3b5e0899SGj1/s4mgARqsozUt4s2sqd1X4D+rN
+         aMnqpHeXAZUwuxZWfzpU9s7JY2bVOZYb+orYDAz3/M3ASuIUe+wCSurzs2WbQ47EWuYQ
+         AD4za2tKq6Dmxm8CNMzjpe8qHh5k1I3/Azt0NrLPvF+M+cNap+dmHG6sCSwdPVAZbQY6
+         ys0w==
+X-Gm-Message-State: AOJu0YzUEosSaEssUyY8MnGfIpBpA27IVvrYrH97hPt6nAkXgLLSbGyg
+	wgwFMoKmaQ7zPK5a0YDXHrZqTr2kL8YNjbBgW3RZ5jVNoA==
+X-Google-Smtp-Source: AGHT+IFgUc3vlsUIM69zRNf3BLoMG7NcAm0cTqnGrfEJ+PobMbUFMBU2t0FYMJ/b6p3ZZyXxceqd9A==
+X-Received: by 2002:a17:903:32c1:b0:1d0:6ffd:9e21 with SMTP id i1-20020a17090332c100b001d06ffd9e21mr278641plr.115.1703194745099;
+        Thu, 21 Dec 2023 13:39:05 -0800 (PST)
+Received: from [192.168.50.25] ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id ix22-20020a170902f81600b001cfce833b6fsm2095607plb.204.2023.12.21.13.39.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Dec 2023 13:39:04 -0800 (PST)
+Message-ID: <6aab67d6-d3cc-42f5-8ec5-dbd439d7886f@mojatatu.com>
+Date: Thu, 21 Dec 2023 18:38:59 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|MW4PR12MB7481:EE_
-X-MS-Office365-Filtering-Correlation-Id: 677d6aed-fc7a-4d93-aaff-08dc026cc86a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yHXAN5dT/N0nbUOALjsjWqRODpbsUvDU2qeb0LLRRCULmXfWIccl8c6b49vUr/DD1TZR/TnepcbXBoM40yptJWZ83U3W1Wa3JYivUCWUDBvGCX8MsEIx5qW1yBInrbT0wyj9+DrmnfssqxsXoRTjJ0xbdKmk7Q2jZ5kbjatp0AT+rcy3SWJamm7cYUbvBemhW4OFPRi5h45PKJT+F1DcKDZI5Y3JhFM7EC4eY95dGgyeZZLIA+djaOdswK7cFa/5FIsVp7vAwGAxPRZq6JsXq0uJ5nGAcxhLxMNeGNc5o27zzjyJhhaPKqu/fb7imP0k7u4inobS1yQS9T8K8SQU9bQYGgHv57cvGs2Ytt70uM15HaDVHvqYdOgKixrY04nceEW0h89gSGOBHe8jDKMQy7rARLZBIlAEwUJTTR9Sfpdt2luyqvwofooz5d9p2XGe5whhz04Ln4GdE3wN7L7n/RpPFxO/rUUsvdOiT56ns/63Yc04azE+kZRoTvE9Q3fT19ppKv5KOHIpMbvTuSgchRGv6C2CHdGy0AgnHsWYVSTKhl/fGXjNOyKW7XJHqY7bdlMztkPsrmEQJ2qko3PQ59oiGI8Il7732ADWEe2vxCM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(396003)(39860400002)(366004)(376002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(66946007)(8676002)(8936002)(66556008)(478600001)(66476007)(83380400001)(316002)(6666004)(30864003)(7416002)(4326008)(6506007)(6512007)(6486002)(2906002)(2616005)(107886003)(26005)(1076003)(41300700001)(36756003)(5660300002)(86362001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1eD45vSo6+tKrnS6UKiaizoNN0K2kYxIo95MQCI+Rhe1mLyE3SMPHtcc9ZnQ?=
- =?us-ascii?Q?4NkLMUH7YHMFcNgjOuSz+7aeY5qAFD2bpUBVtv5cDwjvospEmKcJDWgv7Ny+?=
- =?us-ascii?Q?1gqcOctMMExSNzhZYgBUoTM7qCQ2k0TEzBZEu4y4OLrN8Sl1c7FltouhTkCg?=
- =?us-ascii?Q?Z41bKubVhZNHqj9fShW5ZHL43AxVfs/guHxgqil7zubu+/dHjwZ67aS7J5qR?=
- =?us-ascii?Q?LgFto1ACuISDckF0K3zzlyISNSDH/QRHekkeJsHC2VnFd8eXsUYtuABXIF2o?=
- =?us-ascii?Q?Q7j+9Y2vbQFE4I7HduyvTmqglOrpx4O9zj9bK/rcz/nsCnV/O7qhrWqtgNgt?=
- =?us-ascii?Q?1sA3Fwrx46LZfIO18ff7dOcJMn0vqb+DYR9Vn9slj1ZYwrPi2vC/RRooX0uW?=
- =?us-ascii?Q?Vrma2nZn+SffdmwYrC7m5R9iNfhPlFhlGitS7pdRLFRs1rataYhxMrl/Ky6W?=
- =?us-ascii?Q?e5wJoO1PzWdbpgVAZGQNe5Ct90TsTuFAnSGzqojwutR/nmTAt7WWNL1S8ptD?=
- =?us-ascii?Q?jqXo+DoWMNX/EjqwholXMBxWaH2kyKUpNGBB1AXGk6GotJvb+Mell4BOkSaG?=
- =?us-ascii?Q?K2KhuncIkM+FF2wUMEqi2yI+xILPaoWvTLl+9T8jA7hk+4oTUNevhvbv/Zpi?=
- =?us-ascii?Q?PH1ewe8cH75/PR/gre9XQE7ayu89vVRmCTmRbZkl0uiP64Ox5VA6AMczaFKo?=
- =?us-ascii?Q?AwcoPR54FVHqPIJwr8ehAoeohMN72YynZkn2C46Tib88XKD3SvFHWB/zkuZ7?=
- =?us-ascii?Q?oo4BUQRnuCwz+SDSt/haanQV1jsyllVf9fLtIB5szbhHfN2bKFjUtIwQ2FY1?=
- =?us-ascii?Q?2DVfbrTmK4CisTEB5oedj83y25RmHpDobjrKQCTaQjjYCdZDIGnXDWtYtEhD?=
- =?us-ascii?Q?QXyGQa1Ww1B1liohKAsmYttlvY2mRU+yafGyPJTVsemdWvEP2Yd6kTFGWHgg?=
- =?us-ascii?Q?Ewfjw5FQBiW3Wm8bCZz0EQ3VZoYJ0Hl3jQTCariRJDOZonog9NBHo15C4Rkg?=
- =?us-ascii?Q?45aMbJj5g8M+2xgJs4gYm3pmyzYbDrALHejPTgaeTuJ1tRsNrcsRP0lONOCa?=
- =?us-ascii?Q?dFprz/GAIEyYOKpkUTJwz8tVIYcocOy5ZztPo1KTZyfguFm/Y4jUhjGV6rxr?=
- =?us-ascii?Q?ys/LDdaaeiFDlb1uqeFpdofvC6+Nz3dN7Ljq5t7twX3eCXG2K0KZXD/B4001?=
- =?us-ascii?Q?Hhj8t/m0aIgc91OXafHyhM0COogbNgSw2Scd632mrWjTOCltyV2YP2BjB8pj?=
- =?us-ascii?Q?DcE8RjmLk8ihyYwqwtbl9WAHub8qhuzIAjy6AX4RsMCnZ27PJUj59YU17l54?=
- =?us-ascii?Q?V1/DWXFY3xArJeZAOuJe7wvppXInZ6nR7qzLSuKZzIk3JXg0tzLoDxInIOOP?=
- =?us-ascii?Q?028IvD9zvHXzQKx/6E2T08fdSmVPiGUZptwZ76PILH+dTmkJN1bfZB0L+1um?=
- =?us-ascii?Q?7KYOgys4kZmVboqC5+7KJS+zat5YAoOLEspsCm/p6FQFbZ4OI1g7KsHL5Ff8?=
- =?us-ascii?Q?BQMa+4EGhAbMUB4RKWEHalea4njfcNa+3Apsjt8ETFe+JJwGHR0yHfYZuzpI?=
- =?us-ascii?Q?U2q/MieM8eqK99/5R0BurZmAcQAN4LmmUIh/02mH?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 677d6aed-fc7a-4d93-aaff-08dc026cc86a
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2023 21:35:42.4682
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LH1LfwysRicpFrYWUZXduQ655o42QrRD/KegIY2kG6owOzN7mH5BXMGIDqBWjr6Jy2V1BbTG9a7/S8wW+FffGg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7481
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net/sched: Retire ipt action
+To: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
+ stephen@networkplumber.org, dsahern@gmail.com, fw@strlen.de,
+ victor@mojatatu.com
+References: <20231221213105.476630-1-jhs@mojatatu.com>
+ <20231221213105.476630-2-jhs@mojatatu.com>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20231221213105.476630-2-jhs@mojatatu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-NVMEoTCP offload statistics include both control and data path
-statistic: counters for the netdev ddp ops, offloaded packets/bytes,
-resync and dropped packets.
+On 21/12/2023 18:31, Jamal Hadi Salim wrote:
+> The tc ipt action was intended to run all netfilter/iptables target.
+> Unfortunately it has not benefitted over the years from proper updates when
+> netfilter changes, and for that reason it has remained rudimentary.
+> Pinging a bunch of people that i was aware were using this indicates that
+> removing it wont affect them.
+> Retire it to reduce maintenance efforts. Buh-bye.
+> 
+> Reviewed-by: Victor Noguiera <victor@mojatatu.com>
+> Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> ---
+>   include/net/tc_act/tc_ipt.h               |  17 -
+>   include/net/tc_wrapper.h                  |   4 -
+>   include/uapi/linux/pkt_cls.h              |   4 +-
+>   include/uapi/linux/tc_act/tc_ipt.h        |  20 -
+>   net/sched/Makefile                        |   1 -
+>   net/sched/act_ipt.c                       | 464 ----------------------
+>   tools/testing/selftests/tc-testing/config |   1 -
+>   tools/testing/selftests/tc-testing/tdc.sh |   1 -
+>   8 files changed, 2 insertions(+), 510 deletions(-)
+>   delete mode 100644 include/net/tc_act/tc_ipt.h
+>   delete mode 100644 include/uapi/linux/tc_act/tc_ipt.h
+>   delete mode 100644 net/sched/act_ipt.c
+> 
+> diff --git a/include/net/tc_act/tc_ipt.h b/include/net/tc_act/tc_ipt.h
+> deleted file mode 100644
+> index 4225fcb1c6ba..000000000000
+> --- a/include/net/tc_act/tc_ipt.h
+> +++ /dev/null
+> @@ -1,17 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> -#ifndef __NET_TC_IPT_H
+> -#define __NET_TC_IPT_H
+> -
+> -#include <net/act_api.h>
+> -
+> -struct xt_entry_target;
+> -
+> -struct tcf_ipt {
+> -	struct tc_action	common;
+> -	u32			tcfi_hook;
+> -	char			*tcfi_tname;
+> -	struct xt_entry_target	*tcfi_t;
+> -};
+> -#define to_ipt(a) ((struct tcf_ipt *)a)
+> -
+> -#endif /* __NET_TC_IPT_H */
+> diff --git a/include/net/tc_wrapper.h b/include/net/tc_wrapper.h
+> index a6d481b5bcbc..a608546bcefc 100644
+> --- a/include/net/tc_wrapper.h
+> +++ b/include/net/tc_wrapper.h
+> @@ -117,10 +117,6 @@ static inline int tc_act(struct sk_buff *skb, const struct tc_action *a,
+>   	if (a->ops->act == tcf_ife_act)
+>   		return tcf_ife_act(skb, a, res);
+>   #endif
+> -#if IS_BUILTIN(CONFIG_NET_ACT_IPT)
+> -	if (a->ops->act == tcf_ipt_act)
+> -		return tcf_ipt_act(skb, a, res);
+> -#endif
+>   #if IS_BUILTIN(CONFIG_NET_ACT_SIMP)
+>   	if (a->ops->act == tcf_simp_act)
+>   		return tcf_simp_act(skb, a, res);
+> diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+> index c7082cc60d21..2fec9b51d28d 100644
+> --- a/include/uapi/linux/pkt_cls.h
+> +++ b/include/uapi/linux/pkt_cls.h
+> @@ -99,7 +99,7 @@ enum {
+>    * versions.
+>    */
+>   #define TCA_ACT_GACT 5
+> -#define TCA_ACT_IPT 6
+> +#define TCA_ACT_IPT 6 /* obsoleted, can be reused */
+>   #define TCA_ACT_PEDIT 7
+>   #define TCA_ACT_MIRRED 8
+>   #define TCA_ACT_NAT 9
+> @@ -120,7 +120,7 @@ enum tca_id {
+>   	TCA_ID_UNSPEC = 0,
+>   	TCA_ID_POLICE = 1,
+>   	TCA_ID_GACT = TCA_ACT_GACT,
+> -	TCA_ID_IPT = TCA_ACT_IPT,
+> +	TCA_ID_IPT = TCA_ACT_IPT, /* Obsoleted, can be reused */
+>   	TCA_ID_PEDIT = TCA_ACT_PEDIT,
+>   	TCA_ID_MIRRED = TCA_ACT_MIRRED,
+>   	TCA_ID_NAT = TCA_ACT_NAT,
+> diff --git a/include/uapi/linux/tc_act/tc_ipt.h b/include/uapi/linux/tc_act/tc_ipt.h
+> deleted file mode 100644
+> index c48d7da6750d..000000000000
+> --- a/include/uapi/linux/tc_act/tc_ipt.h
+> +++ /dev/null
+> @@ -1,20 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> -#ifndef __LINUX_TC_IPT_H
+> -#define __LINUX_TC_IPT_H
+> -
+> -#include <linux/pkt_cls.h>
+> -
+> -enum {
+> -	TCA_IPT_UNSPEC,
+> -	TCA_IPT_TABLE,
+> -	TCA_IPT_HOOK,
+> -	TCA_IPT_INDEX,
+> -	TCA_IPT_CNT,
+> -	TCA_IPT_TM,
+> -	TCA_IPT_TARG,
+> -	TCA_IPT_PAD,
+> -	__TCA_IPT_MAX
+> -};
+> -#define TCA_IPT_MAX (__TCA_IPT_MAX - 1)
+> -
+> -#endif
 
-Expose the statistics using ulp_ddp_ops->get_stats()
-instead of the regular statistics flow.
+Sorry I missed this, wouldn't this break compilation in userspace?
 
-Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
-Signed-off-by: Boris Pismenny <borisp@nvidia.com>
-Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
-Signed-off-by: Yoray Zack <yorayz@nvidia.com>
-Signed-off-by: Shai Malin <smalin@nvidia.com>
-Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/Makefile  |  3 +-
- .../mellanox/mlx5/core/en_accel/nvmeotcp.c    | 52 ++++++++++++---
- .../mellanox/mlx5/core/en_accel/nvmeotcp.h    | 16 +++++
- .../mlx5/core/en_accel/nvmeotcp_rxtx.c        | 11 +++-
- .../mlx5/core/en_accel/nvmeotcp_stats.c       | 66 +++++++++++++++++++
- .../ethernet/mellanox/mlx5/core/en_stats.h    |  8 +++
- 6 files changed, 145 insertions(+), 11 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp_stats.c
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index 2db0bd83d517..3c4e9a242131 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-@@ -109,7 +109,8 @@ mlx5_core-$(CONFIG_MLX5_EN_TLS) += en_accel/ktls_stats.o \
- 				   en_accel/fs_tcp.o en_accel/ktls.o en_accel/ktls_txrx.o \
- 				   en_accel/ktls_tx.o en_accel/ktls_rx.o
- 
--mlx5_core-$(CONFIG_MLX5_EN_NVMEOTCP) += en_accel/fs_tcp.o en_accel/nvmeotcp.o en_accel/nvmeotcp_rxtx.o
-+mlx5_core-$(CONFIG_MLX5_EN_NVMEOTCP) += en_accel/fs_tcp.o en_accel/nvmeotcp.o \
-+					en_accel/nvmeotcp_rxtx.o en_accel/nvmeotcp_stats.o
- 
- mlx5_core-$(CONFIG_MLX5_SW_STEERING) += steering/dr_domain.o steering/dr_table.o \
- 					steering/dr_matcher.o steering/dr_rule.o \
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.c
-index 462e0d97f82c..371ab23292f5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.c
-@@ -616,9 +616,15 @@ mlx5e_nvmeotcp_queue_init(struct net_device *netdev,
- {
- 	struct nvme_tcp_ddp_config *nvme_config = &config->nvmeotcp;
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
-+	struct mlx5e_nvmeotcp_sw_stats *sw_stats;
- 	struct mlx5_core_dev *mdev = priv->mdev;
- 	struct mlx5e_nvmeotcp_queue *queue;
- 	int queue_id, err;
-+	u32 channel_ix;
-+
-+	channel_ix = mlx5e_get_channel_ix_from_io_cpu(&priv->channels.params,
-+						      config->io_cpu);
-+	sw_stats = &priv->nvmeotcp->sw_stats;
- 
- 	if (config->type != ULP_DDP_NVME) {
- 		err = -EOPNOTSUPP;
-@@ -645,11 +651,11 @@ mlx5e_nvmeotcp_queue_init(struct net_device *netdev,
- 	queue->id = queue_id;
- 	queue->dgst = nvme_config->dgst;
- 	queue->pda = nvme_config->cpda;
--	queue->channel_ix = mlx5e_get_channel_ix_from_io_cpu(&priv->channels.params,
--							     config->io_cpu);
-+	queue->channel_ix = channel_ix;
- 	queue->size = nvme_config->queue_size;
- 	queue->max_klms_per_wqe = MLX5E_MAX_KLM_PER_WQE(mdev);
- 	queue->priv = priv;
-+	queue->sw_stats = sw_stats;
- 	init_completion(&queue->static_params_done);
- 
- 	err = mlx5e_nvmeotcp_queue_rx_init(queue, config, netdev);
-@@ -661,6 +667,7 @@ mlx5e_nvmeotcp_queue_init(struct net_device *netdev,
- 	if (err)
- 		goto destroy_rx;
- 
-+	atomic64_inc(&sw_stats->rx_nvmeotcp_sk_add);
- 	write_lock_bh(&sk->sk_callback_lock);
- 	ulp_ddp_set_ctx(sk, queue);
- 	write_unlock_bh(&sk->sk_callback_lock);
-@@ -674,6 +681,7 @@ mlx5e_nvmeotcp_queue_init(struct net_device *netdev,
- free_queue:
- 	kfree(queue);
- out:
-+	atomic64_inc(&sw_stats->rx_nvmeotcp_sk_add_fail);
- 	return err;
- }
- 
-@@ -687,6 +695,8 @@ mlx5e_nvmeotcp_queue_teardown(struct net_device *netdev,
- 
- 	queue = container_of(ulp_ddp_get_ctx(sk), struct mlx5e_nvmeotcp_queue, ulp_ddp_ctx);
- 
-+	atomic64_inc(&queue->sw_stats->rx_nvmeotcp_sk_del);
-+
- 	WARN_ON(refcount_read(&queue->ref_count) != 1);
- 	mlx5e_nvmeotcp_destroy_rx(priv, queue, mdev);
- 
-@@ -818,25 +828,34 @@ mlx5e_nvmeotcp_ddp_setup(struct net_device *netdev,
- 			 struct ulp_ddp_io *ddp)
- {
- 	struct scatterlist *sg = ddp->sg_table.sgl;
-+	struct mlx5e_nvmeotcp_sw_stats *sw_stats;
- 	struct mlx5e_nvmeotcp_queue_entry *nvqt;
- 	struct mlx5e_nvmeotcp_queue *queue;
- 	struct mlx5_core_dev *mdev;
- 	int i, size = 0, count = 0;
-+	int ret = 0;
- 
- 	queue = container_of(ulp_ddp_get_ctx(sk),
- 			     struct mlx5e_nvmeotcp_queue, ulp_ddp_ctx);
-+	sw_stats = queue->sw_stats;
- 	mdev = queue->priv->mdev;
- 	count = dma_map_sg(mdev->device, ddp->sg_table.sgl, ddp->nents,
- 			   DMA_FROM_DEVICE);
- 
--	if (count <= 0)
--		return -EINVAL;
-+	if (count <= 0) {
-+		ret = -EINVAL;
-+		goto ddp_setup_fail;
-+	}
- 
--	if (WARN_ON(count > mlx5e_get_max_sgl(mdev)))
--		return -ENOSPC;
-+	if (WARN_ON(count > mlx5e_get_max_sgl(mdev))) {
-+		ret = -ENOSPC;
-+		goto ddp_setup_fail;
-+	}
- 
--	if (!mlx5e_nvmeotcp_validate_sgl(sg, count, READ_ONCE(netdev->mtu)))
--		return -EOPNOTSUPP;
-+	if (!mlx5e_nvmeotcp_validate_sgl(sg, count, READ_ONCE(netdev->mtu))) {
-+		ret = -EOPNOTSUPP;
-+		goto ddp_setup_fail;
-+	}
- 
- 	for (i = 0; i < count; i++)
- 		size += sg_dma_len(&sg[i]);
-@@ -848,8 +867,13 @@ mlx5e_nvmeotcp_ddp_setup(struct net_device *netdev,
- 	nvqt->ccid_gen++;
- 	nvqt->sgl_length = count;
- 	mlx5e_nvmeotcp_post_klm_wqe(queue, KLM_UMR, ddp->command_id, count);
--
-+	atomic64_inc(&sw_stats->rx_nvmeotcp_ddp_setup);
- 	return 0;
-+
-+ddp_setup_fail:
-+	dma_unmap_sg(mdev->device, ddp->sg_table.sgl, count, DMA_FROM_DEVICE);
-+	atomic64_inc(&sw_stats->rx_nvmeotcp_ddp_setup_fail);
-+	return ret;
- }
- 
- void mlx5e_nvmeotcp_ctx_complete(struct mlx5e_icosq_wqe_info *wi)
-@@ -896,6 +920,7 @@ mlx5e_nvmeotcp_ddp_teardown(struct net_device *netdev,
- 	q_entry->queue = queue;
- 
- 	mlx5e_nvmeotcp_post_klm_wqe(queue, KLM_INV_UMR, ddp->command_id, 0);
-+	atomic64_inc(&queue->sw_stats->rx_nvmeotcp_ddp_teardown);
- }
- 
- static void
-@@ -929,6 +954,14 @@ void mlx5e_nvmeotcp_put_queue(struct mlx5e_nvmeotcp_queue *queue)
- 	}
- }
- 
-+static int mlx5e_ulp_ddp_get_stats(struct net_device *dev,
-+				   struct ulp_ddp_stats *stats)
-+{
-+	struct mlx5e_priv *priv = netdev_priv(dev);
-+
-+	return mlx5e_nvmeotcp_get_stats(priv, stats);
-+}
-+
- int set_ulp_ddp_nvme_tcp(struct net_device *netdev, bool enable)
- {
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
-@@ -1028,6 +1061,7 @@ const struct ulp_ddp_dev_ops mlx5e_nvmeotcp_ops = {
- 	.resync = mlx5e_nvmeotcp_ddp_resync,
- 	.set_caps = mlx5e_ulp_ddp_set_caps,
- 	.get_caps = mlx5e_ulp_ddp_get_caps,
-+	.get_stats = mlx5e_ulp_ddp_get_stats,
- };
- 
- void mlx5e_nvmeotcp_cleanup_rx(struct mlx5e_priv *priv)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.h
-index 13817d8a0aae..41b5b304e598 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.h
-@@ -9,6 +9,15 @@
- #include "en.h"
- #include "en/params.h"
- 
-+struct mlx5e_nvmeotcp_sw_stats {
-+	atomic64_t rx_nvmeotcp_sk_add;
-+	atomic64_t rx_nvmeotcp_sk_add_fail;
-+	atomic64_t rx_nvmeotcp_sk_del;
-+	atomic64_t rx_nvmeotcp_ddp_setup;
-+	atomic64_t rx_nvmeotcp_ddp_setup_fail;
-+	atomic64_t rx_nvmeotcp_ddp_teardown;
-+};
-+
- struct mlx5e_nvmeotcp_queue_entry {
- 	struct mlx5e_nvmeotcp_queue *queue;
- 	u32 sgl_length;
-@@ -52,6 +61,7 @@ struct mlx5e_nvmeotcp_queue_handler {
-  *	@sk: The socket used by the NVMe-TCP queue
-  *	@crc_rx: CRC Rx offload indication for this queue
-  *	@priv: mlx5e netdev priv
-+ *	@sw_stats: Global software statistics for nvmeotcp offload
-  *	@static_params_done: Async completion structure for the initial umr mapping
-  *	synchronization
-  *	@sq_lock: Spin lock for the icosq
-@@ -88,6 +98,7 @@ struct mlx5e_nvmeotcp_queue {
- 	u8 crc_rx:1;
- 	/* for ddp invalidate flow */
- 	struct mlx5e_priv *priv;
-+	struct mlx5e_nvmeotcp_sw_stats *sw_stats;
- 	/* end of data-path section */
- 
- 	struct completion static_params_done;
-@@ -97,6 +108,7 @@ struct mlx5e_nvmeotcp_queue {
- };
- 
- struct mlx5e_nvmeotcp {
-+	struct mlx5e_nvmeotcp_sw_stats sw_stats;
- 	struct ida queue_ids;
- 	struct rhashtable queue_hash;
- 	struct ulp_ddp_dev_caps ddp_caps;
-@@ -113,6 +125,7 @@ void mlx5e_nvmeotcp_ddp_inv_done(struct mlx5e_icosq_wqe_info *wi);
- void mlx5e_nvmeotcp_ctx_complete(struct mlx5e_icosq_wqe_info *wi);
- static inline void mlx5e_nvmeotcp_init_rx(struct mlx5e_priv *priv) {}
- void mlx5e_nvmeotcp_cleanup_rx(struct mlx5e_priv *priv);
-+int mlx5e_nvmeotcp_get_stats(struct mlx5e_priv *priv, struct ulp_ddp_stats *stats);
- extern const struct ulp_ddp_dev_ops mlx5e_nvmeotcp_ops;
- #else
- 
-@@ -121,5 +134,8 @@ static inline void mlx5e_nvmeotcp_cleanup(struct mlx5e_priv *priv) {}
- static inline int set_ulp_ddp_nvme_tcp(struct net_device *dev, bool en) { return -EOPNOTSUPP; }
- static inline void mlx5e_nvmeotcp_init_rx(struct mlx5e_priv *priv) {}
- static inline void mlx5e_nvmeotcp_cleanup_rx(struct mlx5e_priv *priv) {}
-+static inline int mlx5e_nvmeotcp_get_stats(struct mlx5e_priv *priv,
-+					   struct ulp_ddp_stats *stats)
-+{ return 0; }
- #endif
- #endif /* __MLX5E_NVMEOTCP_H__ */
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp_rxtx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp_rxtx.c
-index 269d8075f3c2..6ed9acdec376 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp_rxtx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp_rxtx.c
-@@ -140,6 +140,7 @@ mlx5e_nvmeotcp_rebuild_rx_skb_nonlinear(struct mlx5e_rq *rq, struct sk_buff *skb
- 	int ccoff, cclen, hlen, ccid, remaining, fragsz, to_copy = 0;
- 	struct net_device *netdev = rq->netdev;
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
-+	struct mlx5e_rq_stats *stats = rq->stats;
- 	struct mlx5e_nvmeotcp_queue_entry *nqe;
- 	skb_frag_t org_frags[MAX_SKB_FRAGS];
- 	struct mlx5e_nvmeotcp_queue *queue;
-@@ -151,12 +152,14 @@ mlx5e_nvmeotcp_rebuild_rx_skb_nonlinear(struct mlx5e_rq *rq, struct sk_buff *skb
- 	queue = mlx5e_nvmeotcp_get_queue(priv->nvmeotcp, queue_id);
- 	if (unlikely(!queue)) {
- 		dev_kfree_skb_any(skb);
-+		stats->nvmeotcp_drop++;
- 		return false;
- 	}
- 
- 	cqe128 = container_of(cqe, struct mlx5e_cqe128, cqe64);
- 	if (cqe_is_nvmeotcp_resync(cqe)) {
- 		nvmeotcp_update_resync(queue, cqe128);
-+		stats->nvmeotcp_resync++;
- 		mlx5e_nvmeotcp_put_queue(queue);
- 		return true;
- 	}
-@@ -230,7 +233,8 @@ mlx5e_nvmeotcp_rebuild_rx_skb_nonlinear(struct mlx5e_rq *rq, struct sk_buff *skb
- 						 org_nr_frags,
- 						 frag_index);
- 	}
--
-+	stats->nvmeotcp_packets++;
-+	stats->nvmeotcp_bytes += cclen;
- 	mlx5e_nvmeotcp_put_queue(queue);
- 	return true;
- }
-@@ -242,6 +246,7 @@ mlx5e_nvmeotcp_rebuild_rx_skb_linear(struct mlx5e_rq *rq, struct sk_buff *skb,
- 	int ccoff, cclen, hlen, ccid, remaining, fragsz, to_copy = 0;
- 	struct net_device *netdev = rq->netdev;
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
-+	struct mlx5e_rq_stats *stats = rq->stats;
- 	struct mlx5e_nvmeotcp_queue_entry *nqe;
- 	struct mlx5e_nvmeotcp_queue *queue;
- 	struct mlx5e_cqe128 *cqe128;
-@@ -251,12 +256,14 @@ mlx5e_nvmeotcp_rebuild_rx_skb_linear(struct mlx5e_rq *rq, struct sk_buff *skb,
- 	queue = mlx5e_nvmeotcp_get_queue(priv->nvmeotcp, queue_id);
- 	if (unlikely(!queue)) {
- 		dev_kfree_skb_any(skb);
-+		stats->nvmeotcp_drop++;
- 		return false;
- 	}
- 
- 	cqe128 = container_of(cqe, struct mlx5e_cqe128, cqe64);
- 	if (cqe_is_nvmeotcp_resync(cqe)) {
- 		nvmeotcp_update_resync(queue, cqe128);
-+		stats->nvmeotcp_resync++;
- 		mlx5e_nvmeotcp_put_queue(queue);
- 		return true;
- 	}
-@@ -330,6 +337,8 @@ mlx5e_nvmeotcp_rebuild_rx_skb_linear(struct mlx5e_rq *rq, struct sk_buff *skb,
- 				       hlen + cclen, remaining);
- 	}
- 
-+	stats->nvmeotcp_packets++;
-+	stats->nvmeotcp_bytes += cclen;
- 	mlx5e_nvmeotcp_put_queue(queue);
- 	return true;
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp_stats.c
-new file mode 100644
-index 000000000000..af1838154bf8
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp_stats.c
-@@ -0,0 +1,66 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+// Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES.
-+
-+#include "en_accel/nvmeotcp.h"
-+
-+struct ulp_ddp_counter_map {
-+	size_t eth_offset;
-+	size_t mlx_offset;
-+};
-+
-+#define DECLARE_ULP_SW_STAT(fld) \
-+	{ offsetof(struct ulp_ddp_stats, fld), \
-+	  offsetof(struct mlx5e_nvmeotcp_sw_stats, fld) }
-+
-+#define DECLARE_ULP_RQ_STAT(fld) \
-+	{ offsetof(struct ulp_ddp_stats, rx_ ## fld), \
-+	  offsetof(struct mlx5e_rq_stats, fld) }
-+
-+#define READ_CTR_ATOMIC64(ptr, dsc, i) \
-+	atomic64_read((atomic64_t *)((char *)(ptr) + (dsc)[i].mlx_offset))
-+
-+#define READ_CTR(ptr, desc, i) \
-+	(*((u64 *)((char *)(ptr) + (desc)[i].mlx_offset)))
-+
-+#define SET_ULP_STAT(ptr, desc, i, val) \
-+	(*(u64 *)((char *)(ptr) + (desc)[i].eth_offset) = (val))
-+
-+/* Global counters */
-+static const struct ulp_ddp_counter_map sw_stats_desc[] = {
-+	DECLARE_ULP_SW_STAT(rx_nvmeotcp_sk_add),
-+	DECLARE_ULP_SW_STAT(rx_nvmeotcp_sk_del),
-+	DECLARE_ULP_SW_STAT(rx_nvmeotcp_ddp_setup),
-+	DECLARE_ULP_SW_STAT(rx_nvmeotcp_ddp_setup_fail),
-+	DECLARE_ULP_SW_STAT(rx_nvmeotcp_ddp_teardown),
-+};
-+
-+/* Per-rx-queue counters */
-+static const struct ulp_ddp_counter_map rq_stats_desc[] = {
-+	DECLARE_ULP_RQ_STAT(nvmeotcp_drop),
-+	DECLARE_ULP_RQ_STAT(nvmeotcp_resync),
-+	DECLARE_ULP_RQ_STAT(nvmeotcp_packets),
-+	DECLARE_ULP_RQ_STAT(nvmeotcp_bytes),
-+};
-+
-+int mlx5e_nvmeotcp_get_stats(struct mlx5e_priv *priv, struct ulp_ddp_stats *stats)
-+{
-+	unsigned int i, ch, n = 0;
-+
-+	if (!priv->nvmeotcp)
-+		return 0;
-+
-+	for (i = 0; i < ARRAY_SIZE(sw_stats_desc); i++, n++)
-+		SET_ULP_STAT(stats, sw_stats_desc, i,
-+			     READ_CTR_ATOMIC64(&priv->nvmeotcp->sw_stats, sw_stats_desc, i));
-+
-+	for (i = 0; i < ARRAY_SIZE(rq_stats_desc); i++, n++) {
-+		u64 sum = 0;
-+
-+		for (ch = 0; ch < priv->stats_nch; ch++)
-+			sum += READ_CTR(&priv->channel_stats[ch]->rq, rq_stats_desc, i);
-+
-+		SET_ULP_STAT(stats, rq_stats_desc, i, sum);
-+	}
-+
-+	return n;
-+}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-index 12b3607afecd..929a0723812f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-@@ -128,6 +128,8 @@ void mlx5e_stats_rmon_get(struct mlx5e_priv *priv,
- 			  const struct ethtool_rmon_hist_range **ranges);
- void mlx5e_get_link_ext_stats(struct net_device *dev,
- 			      struct ethtool_link_ext_stats *stats);
-+struct ulp_ddp_stats;
-+void mlx5e_stats_ulp_ddp_get(struct mlx5e_priv *priv, struct ulp_ddp_stats *stats);
- 
- /* Concrete NIC Stats */
- 
-@@ -396,6 +398,12 @@ struct mlx5e_rq_stats {
- 	u64 tls_resync_res_skip;
- 	u64 tls_err;
- #endif
-+#ifdef CONFIG_MLX5_EN_NVMEOTCP
-+	u64 nvmeotcp_drop;
-+	u64 nvmeotcp_resync;
-+	u64 nvmeotcp_packets;
-+	u64 nvmeotcp_bytes;
-+#endif
- };
- 
- struct mlx5e_sq_stats {
--- 
-2.34.1
+> diff --git a/net/sched/Makefile b/net/sched/Makefile
+> index b5fd49641d91..82c3f78ca486 100644
+> --- a/net/sched/Makefile
+> +++ b/net/sched/Makefile
+> @@ -13,7 +13,6 @@ obj-$(CONFIG_NET_ACT_POLICE)	+= act_police.o
+>   obj-$(CONFIG_NET_ACT_GACT)	+= act_gact.o
+>   obj-$(CONFIG_NET_ACT_MIRRED)	+= act_mirred.o
+>   obj-$(CONFIG_NET_ACT_SAMPLE)	+= act_sample.o
+> -obj-$(CONFIG_NET_ACT_IPT)	+= act_ipt.o
+>   obj-$(CONFIG_NET_ACT_NAT)	+= act_nat.o
+>   obj-$(CONFIG_NET_ACT_PEDIT)	+= act_pedit.o
+>   obj-$(CONFIG_NET_ACT_SIMP)	+= act_simple.o
+> diff --git a/net/sched/act_ipt.c b/net/sched/act_ipt.c
+> deleted file mode 100644
+> index 598d6e299152..000000000000
+> --- a/net/sched/act_ipt.c
+> +++ /dev/null
+> @@ -1,464 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-or-later
+> -/*
+> - * net/sched/act_ipt.c		iptables target interface
+> - *
+> - *TODO: Add other tables. For now we only support the ipv4 table targets
+> - *
+> - * Copyright:	Jamal Hadi Salim (2002-13)
+> - */
+> -
+> -#include <linux/types.h>
+> -#include <linux/kernel.h>
+> -#include <linux/string.h>
+> -#include <linux/errno.h>
+> -#include <linux/skbuff.h>
+> -#include <linux/rtnetlink.h>
+> -#include <linux/module.h>
+> -#include <linux/init.h>
+> -#include <linux/slab.h>
+> -#include <net/netlink.h>
+> -#include <net/pkt_sched.h>
+> -#include <linux/tc_act/tc_ipt.h>
+> -#include <net/tc_act/tc_ipt.h>
+> -#include <net/tc_wrapper.h>
+> -#include <net/ip.h>
+> -
+> -#include <linux/netfilter_ipv4/ip_tables.h>
+> -
+> -
+> -static struct tc_action_ops act_ipt_ops;
+> -static struct tc_action_ops act_xt_ops;
+> -
+> -static int ipt_init_target(struct net *net, struct xt_entry_target *t,
+> -			   char *table, unsigned int hook)
+> -{
+> -	struct xt_tgchk_param par;
+> -	struct xt_target *target;
+> -	struct ipt_entry e = {};
+> -	int ret = 0;
+> -
+> -	target = xt_request_find_target(AF_INET, t->u.user.name,
+> -					t->u.user.revision);
+> -	if (IS_ERR(target))
+> -		return PTR_ERR(target);
+> -
+> -	t->u.kernel.target = target;
+> -	memset(&par, 0, sizeof(par));
+> -	par.net       = net;
+> -	par.table     = table;
+> -	par.entryinfo = &e;
+> -	par.target    = target;
+> -	par.targinfo  = t->data;
+> -	par.hook_mask = 1 << hook;
+> -	par.family    = NFPROTO_IPV4;
+> -
+> -	ret = xt_check_target(&par, t->u.target_size - sizeof(*t), 0, false);
+> -	if (ret < 0) {
+> -		module_put(t->u.kernel.target->me);
+> -		return ret;
+> -	}
+> -	return 0;
+> -}
+> -
+> -static void ipt_destroy_target(struct xt_entry_target *t, struct net *net)
+> -{
+> -	struct xt_tgdtor_param par = {
+> -		.target   = t->u.kernel.target,
+> -		.targinfo = t->data,
+> -		.family   = NFPROTO_IPV4,
+> -		.net      = net,
+> -	};
+> -	if (par.target->destroy != NULL)
+> -		par.target->destroy(&par);
+> -	module_put(par.target->me);
+> -}
+> -
+> -static void tcf_ipt_release(struct tc_action *a)
+> -{
+> -	struct tcf_ipt *ipt = to_ipt(a);
+> -
+> -	if (ipt->tcfi_t) {
+> -		ipt_destroy_target(ipt->tcfi_t, a->idrinfo->net);
+> -		kfree(ipt->tcfi_t);
+> -	}
+> -	kfree(ipt->tcfi_tname);
+> -}
+> -
+> -static const struct nla_policy ipt_policy[TCA_IPT_MAX + 1] = {
+> -	[TCA_IPT_TABLE]	= { .type = NLA_STRING, .len = IFNAMSIZ },
+> -	[TCA_IPT_HOOK]	= NLA_POLICY_RANGE(NLA_U32, NF_INET_PRE_ROUTING,
+> -					   NF_INET_NUMHOOKS),
+> -	[TCA_IPT_INDEX]	= { .type = NLA_U32 },
+> -	[TCA_IPT_TARG]	= { .len = sizeof(struct xt_entry_target) },
+> -};
+> -
+> -static int __tcf_ipt_init(struct net *net, unsigned int id, struct nlattr *nla,
+> -			  struct nlattr *est, struct tc_action **a,
+> -			  const struct tc_action_ops *ops,
+> -			  struct tcf_proto *tp, u32 flags)
+> -{
+> -	struct tc_action_net *tn = net_generic(net, id);
+> -	bool bind = flags & TCA_ACT_FLAGS_BIND;
+> -	struct nlattr *tb[TCA_IPT_MAX + 1];
+> -	struct tcf_ipt *ipt;
+> -	struct xt_entry_target *td, *t;
+> -	char *tname;
+> -	bool exists = false;
+> -	int ret = 0, err;
+> -	u32 hook = 0;
+> -	u32 index = 0;
+> -
+> -	if (nla == NULL)
+> -		return -EINVAL;
+> -
+> -	err = nla_parse_nested_deprecated(tb, TCA_IPT_MAX, nla, ipt_policy,
+> -					  NULL);
+> -	if (err < 0)
+> -		return err;
+> -
+> -	if (tb[TCA_IPT_INDEX] != NULL)
+> -		index = nla_get_u32(tb[TCA_IPT_INDEX]);
+> -
+> -	err = tcf_idr_check_alloc(tn, &index, a, bind);
+> -	if (err < 0)
+> -		return err;
+> -	exists = err;
+> -	if (exists && bind)
+> -		return 0;
+> -
+> -	if (tb[TCA_IPT_HOOK] == NULL || tb[TCA_IPT_TARG] == NULL) {
+> -		if (exists)
+> -			tcf_idr_release(*a, bind);
+> -		else
+> -			tcf_idr_cleanup(tn, index);
+> -		return -EINVAL;
+> -	}
+> -
+> -	td = (struct xt_entry_target *)nla_data(tb[TCA_IPT_TARG]);
+> -	if (nla_len(tb[TCA_IPT_TARG]) != td->u.target_size) {
+> -		if (exists)
+> -			tcf_idr_release(*a, bind);
+> -		else
+> -			tcf_idr_cleanup(tn, index);
+> -		return -EINVAL;
+> -	}
+> -
+> -	if (!exists) {
+> -		ret = tcf_idr_create(tn, index, est, a, ops, bind,
+> -				     false, flags);
+> -		if (ret) {
+> -			tcf_idr_cleanup(tn, index);
+> -			return ret;
+> -		}
+> -		ret = ACT_P_CREATED;
+> -	} else {
+> -		if (bind)/* dont override defaults */
+> -			return 0;
+> -
+> -		if (!(flags & TCA_ACT_FLAGS_REPLACE)) {
+> -			tcf_idr_release(*a, bind);
+> -			return -EEXIST;
+> -		}
+> -	}
+> -
+> -	err = -EINVAL;
+> -	hook = nla_get_u32(tb[TCA_IPT_HOOK]);
+> -	switch (hook) {
+> -	case NF_INET_PRE_ROUTING:
+> -		break;
+> -	case NF_INET_POST_ROUTING:
+> -		break;
+> -	default:
+> -		goto err1;
+> -	}
+> -
+> -	if (tb[TCA_IPT_TABLE]) {
+> -		/* mangle only for now */
+> -		if (nla_strcmp(tb[TCA_IPT_TABLE], "mangle"))
+> -			goto err1;
+> -	}
+> -
+> -	tname = kstrdup("mangle", GFP_KERNEL);
+> -	if (unlikely(!tname))
+> -		goto err1;
+> -
+> -	t = kmemdup(td, td->u.target_size, GFP_KERNEL);
+> -	if (unlikely(!t))
+> -		goto err2;
+> -
+> -	err = ipt_init_target(net, t, tname, hook);
+> -	if (err < 0)
+> -		goto err3;
+> -
+> -	ipt = to_ipt(*a);
+> -
+> -	spin_lock_bh(&ipt->tcf_lock);
+> -	if (ret != ACT_P_CREATED) {
+> -		ipt_destroy_target(ipt->tcfi_t, net);
+> -		kfree(ipt->tcfi_tname);
+> -		kfree(ipt->tcfi_t);
+> -	}
+> -	ipt->tcfi_tname = tname;
+> -	ipt->tcfi_t     = t;
+> -	ipt->tcfi_hook  = hook;
+> -	spin_unlock_bh(&ipt->tcf_lock);
+> -	return ret;
+> -
+> -err3:
+> -	kfree(t);
+> -err2:
+> -	kfree(tname);
+> -err1:
+> -	tcf_idr_release(*a, bind);
+> -	return err;
+> -}
+> -
+> -static int tcf_ipt_init(struct net *net, struct nlattr *nla,
+> -			struct nlattr *est, struct tc_action **a,
+> -			struct tcf_proto *tp,
+> -			u32 flags, struct netlink_ext_ack *extack)
+> -{
+> -	return __tcf_ipt_init(net, act_ipt_ops.net_id, nla, est,
+> -			      a, &act_ipt_ops, tp, flags);
+> -}
+> -
+> -static int tcf_xt_init(struct net *net, struct nlattr *nla,
+> -		       struct nlattr *est, struct tc_action **a,
+> -		       struct tcf_proto *tp,
+> -		       u32 flags, struct netlink_ext_ack *extack)
+> -{
+> -	return __tcf_ipt_init(net, act_xt_ops.net_id, nla, est,
+> -			      a, &act_xt_ops, tp, flags);
+> -}
+> -
+> -static bool tcf_ipt_act_check(struct sk_buff *skb)
+> -{
+> -	const struct iphdr *iph;
+> -	unsigned int nhoff, len;
+> -
+> -	if (!pskb_may_pull(skb, sizeof(struct iphdr)))
+> -		return false;
+> -
+> -	nhoff = skb_network_offset(skb);
+> -	iph = ip_hdr(skb);
+> -	if (iph->ihl < 5 || iph->version != 4)
+> -		return false;
+> -
+> -	len = skb_ip_totlen(skb);
+> -	if (skb->len < nhoff + len || len < (iph->ihl * 4u))
+> -		return false;
+> -
+> -	return pskb_may_pull(skb, iph->ihl * 4u);
+> -}
+> -
+> -TC_INDIRECT_SCOPE int tcf_ipt_act(struct sk_buff *skb,
+> -				  const struct tc_action *a,
+> -				  struct tcf_result *res)
+> -{
+> -	char saved_cb[sizeof_field(struct sk_buff, cb)];
+> -	int ret = 0, result = 0;
+> -	struct tcf_ipt *ipt = to_ipt(a);
+> -	struct xt_action_param par;
+> -	struct nf_hook_state state = {
+> -		.net	= dev_net(skb->dev),
+> -		.in	= skb->dev,
+> -		.hook	= ipt->tcfi_hook,
+> -		.pf	= NFPROTO_IPV4,
+> -	};
+> -
+> -	if (skb_protocol(skb, false) != htons(ETH_P_IP))
+> -		return TC_ACT_UNSPEC;
+> -
+> -	if (skb_unclone(skb, GFP_ATOMIC))
+> -		return TC_ACT_UNSPEC;
+> -
+> -	if (!tcf_ipt_act_check(skb))
+> -		return TC_ACT_UNSPEC;
+> -
+> -	if (state.hook == NF_INET_POST_ROUTING) {
+> -		if (!skb_dst(skb))
+> -			return TC_ACT_UNSPEC;
+> -
+> -		state.out = skb->dev;
+> -	}
+> -
+> -	memcpy(saved_cb, skb->cb, sizeof(saved_cb));
+> -
+> -	spin_lock(&ipt->tcf_lock);
+> -
+> -	tcf_lastuse_update(&ipt->tcf_tm);
+> -	bstats_update(&ipt->tcf_bstats, skb);
+> -
+> -	/* yes, we have to worry about both in and out dev
+> -	 * worry later - danger - this API seems to have changed
+> -	 * from earlier kernels
+> -	 */
+> -	par.state    = &state;
+> -	par.target   = ipt->tcfi_t->u.kernel.target;
+> -	par.targinfo = ipt->tcfi_t->data;
+> -
+> -	memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
+> -
+> -	ret = par.target->target(skb, &par);
+> -
+> -	switch (ret) {
+> -	case NF_ACCEPT:
+> -		result = TC_ACT_OK;
+> -		break;
+> -	case NF_DROP:
+> -		result = TC_ACT_SHOT;
+> -		ipt->tcf_qstats.drops++;
+> -		break;
+> -	case XT_CONTINUE:
+> -		result = TC_ACT_PIPE;
+> -		break;
+> -	default:
+> -		net_notice_ratelimited("tc filter: Bogus netfilter code %d assume ACCEPT\n",
+> -				       ret);
+> -		result = TC_ACT_OK;
+> -		break;
+> -	}
+> -	spin_unlock(&ipt->tcf_lock);
+> -
+> -	memcpy(skb->cb, saved_cb, sizeof(skb->cb));
+> -
+> -	return result;
+> -
+> -}
+> -
+> -static int tcf_ipt_dump(struct sk_buff *skb, struct tc_action *a, int bind,
+> -			int ref)
+> -{
+> -	unsigned char *b = skb_tail_pointer(skb);
+> -	struct tcf_ipt *ipt = to_ipt(a);
+> -	struct xt_entry_target *t;
+> -	struct tcf_t tm;
+> -	struct tc_cnt c;
+> -
+> -	/* for simple targets kernel size == user size
+> -	 * user name = target name
+> -	 * for foolproof you need to not assume this
+> -	 */
+> -
+> -	spin_lock_bh(&ipt->tcf_lock);
+> -	t = kmemdup(ipt->tcfi_t, ipt->tcfi_t->u.user.target_size, GFP_ATOMIC);
+> -	if (unlikely(!t))
+> -		goto nla_put_failure;
+> -
+> -	c.bindcnt = atomic_read(&ipt->tcf_bindcnt) - bind;
+> -	c.refcnt = refcount_read(&ipt->tcf_refcnt) - ref;
+> -	strcpy(t->u.user.name, ipt->tcfi_t->u.kernel.target->name);
+> -
+> -	if (nla_put(skb, TCA_IPT_TARG, ipt->tcfi_t->u.user.target_size, t) ||
+> -	    nla_put_u32(skb, TCA_IPT_INDEX, ipt->tcf_index) ||
+> -	    nla_put_u32(skb, TCA_IPT_HOOK, ipt->tcfi_hook) ||
+> -	    nla_put(skb, TCA_IPT_CNT, sizeof(struct tc_cnt), &c) ||
+> -	    nla_put_string(skb, TCA_IPT_TABLE, ipt->tcfi_tname))
+> -		goto nla_put_failure;
+> -
+> -	tcf_tm_dump(&tm, &ipt->tcf_tm);
+> -	if (nla_put_64bit(skb, TCA_IPT_TM, sizeof(tm), &tm, TCA_IPT_PAD))
+> -		goto nla_put_failure;
+> -
+> -	spin_unlock_bh(&ipt->tcf_lock);
+> -	kfree(t);
+> -	return skb->len;
+> -
+> -nla_put_failure:
+> -	spin_unlock_bh(&ipt->tcf_lock);
+> -	nlmsg_trim(skb, b);
+> -	kfree(t);
+> -	return -1;
+> -}
+> -
+> -static struct tc_action_ops act_ipt_ops = {
+> -	.kind		=	"ipt",
+> -	.id		=	TCA_ID_IPT,
+> -	.owner		=	THIS_MODULE,
+> -	.act		=	tcf_ipt_act,
+> -	.dump		=	tcf_ipt_dump,
+> -	.cleanup	=	tcf_ipt_release,
+> -	.init		=	tcf_ipt_init,
+> -	.size		=	sizeof(struct tcf_ipt),
+> -};
+> -
+> -static __net_init int ipt_init_net(struct net *net)
+> -{
+> -	struct tc_action_net *tn = net_generic(net, act_ipt_ops.net_id);
+> -
+> -	return tc_action_net_init(net, tn, &act_ipt_ops);
+> -}
+> -
+> -static void __net_exit ipt_exit_net(struct list_head *net_list)
+> -{
+> -	tc_action_net_exit(net_list, act_ipt_ops.net_id);
+> -}
+> -
+> -static struct pernet_operations ipt_net_ops = {
+> -	.init = ipt_init_net,
+> -	.exit_batch = ipt_exit_net,
+> -	.id   = &act_ipt_ops.net_id,
+> -	.size = sizeof(struct tc_action_net),
+> -};
+> -
+> -static struct tc_action_ops act_xt_ops = {
+> -	.kind		=	"xt",
+> -	.id		=	TCA_ID_XT,
+> -	.owner		=	THIS_MODULE,
+> -	.act		=	tcf_ipt_act,
+> -	.dump		=	tcf_ipt_dump,
+> -	.cleanup	=	tcf_ipt_release,
+> -	.init		=	tcf_xt_init,
+> -	.size		=	sizeof(struct tcf_ipt),
+> -};
+> -
+> -static __net_init int xt_init_net(struct net *net)
+> -{
+> -	struct tc_action_net *tn = net_generic(net, act_xt_ops.net_id);
+> -
+> -	return tc_action_net_init(net, tn, &act_xt_ops);
+> -}
+> -
+> -static void __net_exit xt_exit_net(struct list_head *net_list)
+> -{
+> -	tc_action_net_exit(net_list, act_xt_ops.net_id);
+> -}
+> -
+> -static struct pernet_operations xt_net_ops = {
+> -	.init = xt_init_net,
+> -	.exit_batch = xt_exit_net,
+> -	.id   = &act_xt_ops.net_id,
+> -	.size = sizeof(struct tc_action_net),
+> -};
+> -
+> -MODULE_AUTHOR("Jamal Hadi Salim(2002-13)");
+> -MODULE_DESCRIPTION("Iptables target actions");
+> -MODULE_LICENSE("GPL");
+> -MODULE_ALIAS("act_xt");
+> -
+> -static int __init ipt_init_module(void)
+> -{
+> -	int ret1, ret2;
+> -
+> -	ret1 = tcf_register_action(&act_xt_ops, &xt_net_ops);
+> -	if (ret1 < 0)
+> -		pr_err("Failed to load xt action\n");
+> -
+> -	ret2 = tcf_register_action(&act_ipt_ops, &ipt_net_ops);
+> -	if (ret2 < 0)
+> -		pr_err("Failed to load ipt action\n");
+> -
+> -	if (ret1 < 0 && ret2 < 0) {
+> -		return ret1;
+> -	} else
+> -		return 0;
+> -}
+> -
+> -static void __exit ipt_cleanup_module(void)
+> -{
+> -	tcf_unregister_action(&act_ipt_ops, &ipt_net_ops);
+> -	tcf_unregister_action(&act_xt_ops, &xt_net_ops);
+> -}
+> -
+> -module_init(ipt_init_module);
+> -module_exit(ipt_cleanup_module);
+> diff --git a/tools/testing/selftests/tc-testing/config b/tools/testing/selftests/tc-testing/config
+> index 012aa33b341b..c60acba951c2 100644
+> --- a/tools/testing/selftests/tc-testing/config
+> +++ b/tools/testing/selftests/tc-testing/config
+> @@ -82,7 +82,6 @@ CONFIG_NET_ACT_GACT=m
+>   CONFIG_GACT_PROB=y
+>   CONFIG_NET_ACT_MIRRED=m
+>   CONFIG_NET_ACT_SAMPLE=m
+> -CONFIG_NET_ACT_IPT=m
+>   CONFIG_NET_ACT_NAT=m
+>   CONFIG_NET_ACT_PEDIT=m
+>   CONFIG_NET_ACT_SIMP=m
+> diff --git a/tools/testing/selftests/tc-testing/tdc.sh b/tools/testing/selftests/tc-testing/tdc.sh
+> index 407fa53822a0..c53ede8b730d 100755
+> --- a/tools/testing/selftests/tc-testing/tdc.sh
+> +++ b/tools/testing/selftests/tc-testing/tdc.sh
+> @@ -20,7 +20,6 @@ try_modprobe act_ct
+>   try_modprobe act_ctinfo
+>   try_modprobe act_gact
+>   try_modprobe act_gate
+> -try_modprobe act_ipt
+>   try_modprobe act_mirred
+>   try_modprobe act_mpls
+>   try_modprobe act_nat
 
 
