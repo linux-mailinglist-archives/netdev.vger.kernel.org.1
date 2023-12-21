@@ -1,153 +1,454 @@
-Return-Path: <netdev+bounces-59687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59BE981BC70
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:56:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36BA281BC78
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C81EFB21001
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:56:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A06171F22643
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA2663514;
-	Thu, 21 Dec 2023 16:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA8558229;
+	Thu, 21 Dec 2023 16:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="C8glIE8E"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ShvUzgiw"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2087.outbound.protection.outlook.com [40.107.243.87])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B64D58237
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 16:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DMJbyyoHdrL4gFHDoBE40JQWi7M+RHE0A3MewUws+pKjdBNOb4wkqBvAE1UVwMvz6bMo/G4F9PiTmj9a9Rg625a6zlY5BqpdR1H+p/iqWHBrTxqvP0X3fVwGoYFC/RsJ/P0iPtCoMXpLUIBT3r14WJT5ZoH4k4nyQthddma2cfLTusCu6PKMG0iqvryoa1SpmNA2Hqu1gDRE4loR67WNmn2/oukBRiHZcpCfFE/8BYN90+ryGENxWhHsUIEwLA56Od1Zusr8MgDUgHRrU5bQm02Yc0niOvTSPNRcaCI7pLFk0RIQSMolhmfLYlarjKNh+7LK27f0wWjCAGEN2FGlQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j96YuFyhNhFErZtiu9bLXAG48V2JlY058cR9AlTRTyU=;
- b=VbqFcI3UlkpmyY4Dxt3B+xy6pbhg7O7X7ok43v9s6VmwAM8h+pc96TRl37+bntFDXJItQClJ3BnpK4SDOb7lSY4Oqxc7bbxP8Fbt5UED/x4YatsGlKrL18ebSOJ5JnYN+K/Ln0dWP0HS4djySnoPDHSIsqONHvI+yAHF1q0prQqTHzuFbgC6/CnR682F7q5ZZIkOBx9Di9Vd1rpYk/QoYVq8wNZDM9MaRfCS/UEr8VG4Jju+f9EC/lok0Zn6NGJb4HrxMq/8wnXZL8gkJ+lzr5Sh5dZO9BpDHIOU5QvFfpM9JkGOujsErHFaWof4araPsJD0f/24w7k646yRURK5lA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j96YuFyhNhFErZtiu9bLXAG48V2JlY058cR9AlTRTyU=;
- b=C8glIE8E7IJuOdeIZvGM+l6Byvint6eZocZSUGYZt6n4DXM5B/IX6851uQko1vbrUO3vYnvv5nvXQ9w/ae7hDaPzApVQ56S0P5idJkkEFbnnruyq+yDzG7717MN8Klx6VFRBYN0NoFTb0sYPDlZbbY26U3NWsfJl7FBe9567RZ9DdBidCerV6PBEbgkg2tvmdX1MKWRDZsFihXMM4VxlXNGU2z4kkK3YjPI+hnXzQOK+dXOoojQmj3NhVzMunVWkPplx27dOsJY6tFK19yXmYFQcOG7WsZPezfdpMDNrxzd5iHCCVWsiveidtYvYbFrFgLSMO3fEmNh09OQaxqtgFw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8)
- by MW6PR12MB8868.namprd12.prod.outlook.com (2603:10b6:303:242::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.21; Thu, 21 Dec
- 2023 16:54:51 +0000
-Received: from MN2PR12MB4373.namprd12.prod.outlook.com
- ([fe80::ff68:f81b:d451:9765]) by MN2PR12MB4373.namprd12.prod.outlook.com
- ([fe80::ff68:f81b:d451:9765%4]) with mapi id 15.20.7113.019; Thu, 21 Dec 2023
- 16:54:50 +0000
-Date: Thu, 21 Dec 2023 11:54:49 -0500
-From: Benjamin Poirier <bpoirier@nvidia.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Petr Machata <petrm@nvidia.com>,
-	Roopa Prabhu <roopa@nvidia.com>
-Subject: Re: [PATCH iproute2-next 01/20] bridge: vni: Accept 'del' command
-Message-ID: <ZYRt2VCTVnGxI_1j@d3>
-References: <20231211140732.11475-1-bpoirier@nvidia.com>
- <20231211140732.11475-2-bpoirier@nvidia.com>
- <20231220195708.2f69e265@hermes.local>
- <20231221080624.35b03477@hermes.local>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231221080624.35b03477@hermes.local>
-X-ClientProxiedBy: YQBPR0101CA0279.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:68::10) To MN2PR12MB4373.namprd12.prod.outlook.com
- (2603:10b6:208:261::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEE258221
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 16:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <35550a06-c1fe-4e96-9705-ba0474cd94d1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1703177775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dMCYkMM2NSBZF87b2hNzRnFk+D/F+OEGKsL46dDU7h4=;
+	b=ShvUzgiwN2CpaC4h3xQRpkNdujC5TKt+MX9IBeeqT6MHDREB/iR30ttLGjJpsxVoJBJBZ7
+	kYKxwhESWKKCW5xkC8i4dd6GwOVNog94jESNef5HbWqvDhGhhIkNgjjtyk5q4wHpX6wfQY
+	gsPjqFtyejxdHV5Rkmfv8s7CiW5cGrM=
+Date: Thu, 21 Dec 2023 16:56:09 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4373:EE_|MW6PR12MB8868:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1b895d40-6b2f-4c76-ff0f-08dc02458c2d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	5TJVq1K/TZizNlmriW+74maH9EGwIZRIVLJ4evChI6COwAwrlvzGQ+WBXdUdgFjlzd1+YMIKj7pm5Rz5gevy7p3HgqYyVyL51C0jKJbZtjx38eAVUosWEyxs1F1MWr193Igm3RaPZiK1ngxinYYLptzSGm9W+Lq3OaKiJ7wFVGSe9vT4J7Rh1YZ/O2dOl2EQBpenq3scidy/OtfhZEgqdMZ75xt440VTzONTcXkAXFEyW681JaPx6yqtc3TxwB9iYG3OuD+16lt8LS0idwJVLuK6RXD+sbfoFOLrEjYuyUNxIDLNyJcy9EanOJQjrEnmPxNQFlgBYlAvaXgNVu273lrTStEW1Z6XPuyUKOoylwtC5ojMeY0Fg+ClkwNuEmA4AsP+I2VjJ4oDVwwIh4sG277CYzxYMc6yQIuvZX6SpDyUnsGI/hOJmlfGUkpAb6fiI1e2ahkd8UweR8gqw/GJ3MXwoY/WWJoACXDH9ancs/Yd6x7d3OD8112ku1UG22d75c3gq/MuKBR4Go7U76TTFPsDNGMj2L4v+JlzoRkzJ+rmW8crPxRDErJKo2eHupIu
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(136003)(39860400002)(396003)(376002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(6916009)(66556008)(6486002)(66946007)(9686003)(6506007)(6512007)(66476007)(53546011)(478600001)(107886003)(83380400001)(26005)(2906002)(4001150100001)(5660300002)(54906003)(8936002)(8676002)(316002)(4326008)(86362001)(38100700002)(41300700001)(33716001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?GucTVzQEZY1GURyPmjTDswPDF7XOHk7e8TIZ8cVBvBZR3Ktw9WqjDDaP9CV5?=
- =?us-ascii?Q?lTT2SwPa3UtYKt//nd3osZszgguOYI0rIJBcl4OjgAICCHkCnSYJkbT/Ki21?=
- =?us-ascii?Q?0pR2j6vWCsRqqGyWyb6NOFvLZOZfSXuNBTbNLj6erZ9XLu2yLBUu0G6uzaL7?=
- =?us-ascii?Q?giZLb3977HT5pnxBVsfKZ4TyS1o2EzZa5r5iJ59A3k40VmKQdi1/R7l0CHkD?=
- =?us-ascii?Q?7ely/vQ3elI3nPgoGImUbQddrxuDOzoXHmmVPbjD5qQT3nFSd4duLnM5PQaO?=
- =?us-ascii?Q?PhoiaUggg0AQdyaQkHktlP2+wAxtqVnKNH5F9lW6SfZjN+iTAubFAz1y7ivj?=
- =?us-ascii?Q?3JySlyQX+OYVr7E1OjzSmxJjTNL14oa8ZAw9VVlV8AN8IhAB+2T+lbwyFamQ?=
- =?us-ascii?Q?yVMnj8cUdH2tXOhxj4QrSXlQ/uNjExusKsa7Ore7gOXMOKVEeNC7i8d1wkMj?=
- =?us-ascii?Q?tGLUrJoGIBcf0LKzImUgC9ZA+4fu5LtisVZs5cphL2HmOEIy34dIyOBrKewH?=
- =?us-ascii?Q?rRFGJ3tHDkw4wZSVU1qjU6WiLHgy0547PMqiwf253Dfx6vq7uf6GUWGXEw7V?=
- =?us-ascii?Q?sgHliMnJh7b3YRgEi3W2dKYEWX8syzeN03+MlwlvT1Cf6ugPZmeEbPuli69v?=
- =?us-ascii?Q?hT23FzvJQ2tRCpxZoa772CWZcaIAXbqxz0/qtkAInp6p8KEh9BO3qk32LNyA?=
- =?us-ascii?Q?os+ACzm6kSHUDAMgxs1MCA+5wnj8sNEvOJjzYK5LA6LIXBdBfOCEANFS3/Rr?=
- =?us-ascii?Q?9jPTwhKBZwadDpZoG6LJ2b1Nxn9i6miGLSP/9NWsS5tlhy2qckpX16mDk7+Y?=
- =?us-ascii?Q?U3Q1yZTeDf3z6DoqD9Wft+z0geLgB6mkeTkToQn7iCBcBI1Jcc736t4MbO9B?=
- =?us-ascii?Q?56AG53G/17tp3iASYth/DD+Tvd8XlsLIzwPvTxcQT84ZDsESZdWKCvqOyuvY?=
- =?us-ascii?Q?zj5j0JmcnfT8138IdA91AjF987LIGBb6wQ6wRgQjAKK9jTtcycOfUdc9a4M3?=
- =?us-ascii?Q?pTEiWOt/g1ZoNiRhS9qXIyzxp7L1N31jONMiAf4Gip9dT0rElpF9KbLP8WVC?=
- =?us-ascii?Q?zeUxCGQRdRm88SVaOZfPBQMpiUnI2BIVBOy3DBPVxwI4fSwozHXt18S053K6?=
- =?us-ascii?Q?zlm9cQIosym2vzZfOy0SsX/U+KjVJVagNsyFd+Cxc0nvwYtAmX0KP1wSNV8r?=
- =?us-ascii?Q?iAgd5CxskOji1Tvnb3/qnfYspdCXKCv+5zUohf4qT5ZVU/yPlDNrL8eRa3nb?=
- =?us-ascii?Q?9+TFsl3lljEQnGobWkjfIX6JAPPV8mgE0KdZ8R1lK5ONXAiagUze/FZIKSvP?=
- =?us-ascii?Q?TQAv0KsaYkxWlzR57DUSNeUjbEc8DxQBbuxKaqL/EZymOrdA76mJ0ivV8xGh?=
- =?us-ascii?Q?AKKbxc7YyDbJQqr7LlSF8fsiIpIv5CIQFIOrdKe3VjsC3adew5Hf/OwXvZjx?=
- =?us-ascii?Q?PZVh+rOi5PU5rQ9NlDH9CWJHNrOVfjQF/Hj5DiQpWEdGoEfSA089tbEEAI+2?=
- =?us-ascii?Q?uQ/BQkWEIN3REmQ2VNwZKhOTK77atFygxk5aFVib/AJvvfnK4QxN6AkBD8PS?=
- =?us-ascii?Q?LGPA6XaeYpu53x7TPhdVPGWH4Hz+dmrKyYiw8NjH?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1b895d40-6b2f-4c76-ff0f-08dc02458c2d
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4373.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2023 16:54:50.9005
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dT6y/pD8mRuvaStmx1SmcdjBhZJ9ibx5NRlJIcznjVQ3wu1DodN01cU51qie1GcfNtoV6cobTXTUlsQ6TTEimA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8868
+Subject: Re: [PATCH v1] ptp: ocp: add Adva timecard support
+Content-Language: en-US
+To: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com,
+ jonathan.lemon@gmail.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231221153755.2690-1-maimon.sagi@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20231221153755.2690-1-maimon.sagi@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 2023-12-21 08:06 -0800, Stephen Hemminger wrote:
-> On Wed, 20 Dec 2023 19:57:08 -0800
-> Stephen Hemminger <stephen@networkplumber.org> wrote:
+On 21/12/2023 15:37, Sagi Maimon wrote:
+> Adding support for the Adva timecard.
+> The card uses different drivers to provide access to the
+> firmware SPI flash (Altera based).
+> Other parts of the code are the same and could be reused.
 > 
-> > On Mon, 11 Dec 2023 09:07:13 -0500
-> > Benjamin Poirier <bpoirier@nvidia.com> wrote:
-> > 
-> > > `bridge vni help` shows "bridge vni { add | del } ..." but currently
-> > > `bridge vni del ...` errors out unexpectedly:
-> > > 	# bridge vni del
-> > > 	Command "del" is unknown, try "bridge vni help".
-> > > 
-> > > Recognize 'del' as a synonym of the original 'delete' command.
-> > > 
-> > > Fixes: 45cd32f9f7d5 ("bridge: vxlan device vnifilter support")
-> > > Reviewed-by: Petr Machata <petrm@nvidia.com>
-> > > Tested-by: Petr Machata <petrm@nvidia.com>
-> > > Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>  
-> > 
-> > Please no.
-> > We are blocking uses of matches() and now other commands will want more synonyms
-> > Instead fix the help and doc.
+> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> ---
+>   drivers/ptp/ptp_ocp.c | 257 ++++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 247 insertions(+), 10 deletions(-)
 > 
-> I changed my mind. This is fine. The commands in iproute2 are inconsistent (no surprise)
-> and plenty of places take del (and not delete??)
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index 4021d3d325f9..73e91b8a2887 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
+> @@ -34,6 +34,9 @@
+>   #define PCI_VENDOR_ID_OROLIA			0x1ad7
+>   #define PCI_DEVICE_ID_OROLIA_ARTCARD		0xa000
+>   
+> +#define PCI_VENDOR_ID_ADVA			0xad5a
+> +#define PCI_DEVICE_ID_ADVA_TIMECARD		0x0400
+> +
+>   static struct class timecard_class = {
+>   	.name		= "timecard",
+>   };
+> @@ -63,6 +66,13 @@ struct ocp_reg {
+>   	u32	status_drift;
+>   };
+>   
+> +struct servo_val {
+> +	u32	servo_offset_p_val;
+> +	u32	servo_offset_i_val;
+> +	u32	servo_drift_p_val;
+> +	u32	servo_drift_i_val;
+> +};
+> +
 
-Indeed. Thank you for the update. In that case, can you take the series
-as-is or should I still reduce the overall patch count and resubmit?
+I don't really like naming here. Let's go with ptp_ocp prefix first.
+Then it's more like configuration rather than actual values, so I would
+say ptp_ocp_servo_conf is better here. And let's remove "_val" - no real
+need for this suffix.
+
+>   #define OCP_CTRL_ENABLE		BIT(0)
+>   #define OCP_CTRL_ADJUST_TIME	BIT(1)
+>   #define OCP_CTRL_ADJUST_OFFSET	BIT(2)
+> @@ -401,6 +411,12 @@ static const struct ocp_attr_group fb_timecard_groups[];
+>   
+>   static const struct ocp_attr_group art_timecard_groups[];
+>   
+> +static int ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
+> +
+> +static const struct ocp_attr_group adva_timecard_groups[];
+> +
+> +static const struct ocp_sma_op ocp_adva_sma_op;
+> +
+>   struct ptp_ocp_eeprom_map {
+>   	u16	off;
+>   	u16	len;
+> @@ -835,10 +851,122 @@ static struct ocp_resource ocp_art_resource[] = {
+>   	{ }
+>   };
+>   
+> +static struct ocp_resource ocp_adva_resource[] = {
+> +	{
+> +		OCP_MEM_RESOURCE(reg),
+> +		.offset = 0x01000000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(ts0),
+> +		.offset = 0x01010000, .size = 0x10000, .irq_vec = 1,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 0,
+> +			.irq_fcn = ptp_ocp_ts_irq,
+> +			.enable = ptp_ocp_ts_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(ts1),
+> +		.offset = 0x01020000, .size = 0x10000, .irq_vec = 2,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 1,
+> +			.irq_fcn = ptp_ocp_ts_irq,
+> +			.enable = ptp_ocp_ts_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(ts2),
+> +		.offset = 0x01060000, .size = 0x10000, .irq_vec = 6,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 2,
+> +			.irq_fcn = ptp_ocp_ts_irq,
+> +			.enable = ptp_ocp_ts_enable,
+> +		},
+> +	},
+> +	/* Timestamp for PHC and/or PPS generator */
+> +	{
+> +		OCP_EXT_RESOURCE(pps),
+> +		.offset = 0x010C0000, .size = 0x10000, .irq_vec = 0,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 5,
+> +			.irq_fcn = ptp_ocp_ts_irq,
+> +			.enable = ptp_ocp_ts_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(signal_out[0]),
+> +		.offset = 0x010D0000, .size = 0x10000, .irq_vec = 11,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 1,
+> +			.irq_fcn = ptp_ocp_signal_irq,
+> +			.enable = ptp_ocp_signal_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(pps_to_ext),
+> +		.offset = 0x01030000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(pps_to_clk),
+> +		.offset = 0x01040000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(tod),
+> +		.offset = 0x01050000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(image),
+> +		.offset = 0x00020000, .size = 0x1000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(pps_select),
+> +		.offset = 0x00130000, .size = 0x1000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(sma_map1),
+> +		.offset = 0x00140000, .size = 0x1000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(sma_map2),
+> +		.offset = 0x00220000, .size = 0x1000,
+> +	},
+> +	{
+> +		OCP_SERIAL_RESOURCE(gnss_port),
+> +		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
+> +		.extra = &(struct ptp_ocp_serial_port) {
+> +			.baud = 9600,
+> +		},
+> +	},
+> +	{
+> +			OCP_MEM_RESOURCE(freq_in[0]),
+> +			.offset = 0x01200000, .size = 0x10000,
+> +	},
+> +	{
+> +			OCP_SPI_RESOURCE(spi_flash),
+> +			.offset = 0x00310400, .size = 0x10000, .irq_vec = 9,
+> +			.extra = &(struct ptp_ocp_flash_info) {
+> +				.name = "spi_altera", .pci_offset = 0,
+> +				.data_size = sizeof(struct altera_spi_platform_data),
+> +				.data = &(struct altera_spi_platform_data) {
+> +					.num_chipselect = 1,
+> +					.num_devices = 1,
+> +					.devices = &(struct spi_board_info) {
+> +						.modalias = "spi-nor",
+> +					},
+> +				},
+> +			},
+> +	},
+> +	{
+> +		.setup = ptp_ocp_adva_board_init,
+> +	},
+> +	{ }
+> +};
+> +
+>   static const struct pci_device_id ptp_ocp_pcidev_id[] = {
+>   	{ PCI_DEVICE_DATA(FACEBOOK, TIMECARD, &ocp_fb_resource) },
+>   	{ PCI_DEVICE_DATA(CELESTICA, TIMECARD, &ocp_fb_resource) },
+>   	{ PCI_DEVICE_DATA(OROLIA, ARTCARD, &ocp_art_resource) },
+> +	{ PCI_DEVICE_DATA(ADVA, TIMECARD, &ocp_adva_resource) },
+>   	{ }
+>   };
+>   MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
+> @@ -917,6 +1045,27 @@ static const struct ocp_selector ptp_ocp_art_sma_out[] = {
+>   	{ }
+>   };
+>   
+> +static const struct ocp_selector ptp_ocp_adva_sma_in[] = {
+> +	{ .name = "10Mhz",	.value = 0x0000,      .frequency = 10000000},
+> +	{ .name = "PPS1",	.value = 0x0001,      .frequency = 1 },
+> +	{ .name = "PPS2",	.value = 0x0002,      .frequency = 1 },
+> +	{ .name = "TS1",	.value = 0x0004,      .frequency = 0 },
+> +	{ .name = "TS2",	.value = 0x0008,      .frequency = 0 },
+> +	{ .name = "FREQ1",	.value = 0x0100,      .frequency = 0 },
+> +	{ .name = "None",	.value = SMA_DISABLE, .frequency = 0 },
+> +	{ }
+> +};
+> +
+> +static const struct ocp_selector ptp_ocp_adva_sma_out[] = {
+> +	{ .name = "10Mhz",	.value = 0x0000,  .frequency = 10000000},
+> +	{ .name = "PHC",	.value = 0x0001,  .frequency = 1 },
+> +	{ .name = "GNSS1",	.value = 0x0004,  .frequency = 1 },
+> +	{ .name = "GEN1",	.value = 0x0040 },
+> +	{ .name = "GND",	.value = 0x2000 },
+> +	{ .name = "VCC",	.value = 0x4000 },
+> +	{ }
+> +};
+> +
+>   struct ocp_sma_op {
+>   	const struct ocp_selector *tbl[2];
+>   	void (*init)(struct ptp_ocp *bp);
+> @@ -1363,20 +1512,20 @@ ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
+>   }
+>   
+>   static int
+> -ptp_ocp_init_clock(struct ptp_ocp *bp)
+> +ptp_ocp_init_clock(struct ptp_ocp *bp, struct servo_val *servo_vals)
+>   {
+>   	struct timespec64 ts;
+>   	u32 ctrl;
+>   
+> +
+
+no need for the second empty line
+
+>   	ctrl = OCP_CTRL_ENABLE;
+>   	iowrite32(ctrl, &bp->reg->ctrl);
+>   
+> -	/* NO DRIFT Correction */
+> -	/* offset_p:i 1/8, offset_i: 1/16, drift_p: 0, drift_i: 0 */
+> -	iowrite32(0x2000, &bp->reg->servo_offset_p);
+> -	iowrite32(0x1000, &bp->reg->servo_offset_i);
+> -	iowrite32(0,	  &bp->reg->servo_drift_p);
+> -	iowrite32(0,	  &bp->reg->servo_drift_i);
+> +	/* servo configuration */
+> +	iowrite32(servo_vals->servo_offset_p_val, &bp->reg->servo_offset_p);
+> +	iowrite32(servo_vals->servo_offset_i_val, &bp->reg->servo_offset_i);
+> +	iowrite32(servo_vals->servo_drift_p_val, &bp->reg->servo_drift_p);
+> +	iowrite32(servo_vals->servo_drift_p_val, &bp->reg->servo_drift_i);
+>   
+>   	/* latch servo values */
+>   	ctrl |= OCP_CTRL_ADJUST_SERVO;
+> @@ -2362,6 +2511,14 @@ static const struct ocp_sma_op ocp_fb_sma_op = {
+>   	.set_output	= ptp_ocp_sma_fb_set_output,
+>   };
+>   
+> +static const struct ocp_sma_op ocp_adva_sma_op = {
+> +	.tbl		= { ptp_ocp_adva_sma_in, ptp_ocp_adva_sma_out },
+> +	.init		= ptp_ocp_sma_fb_init,
+> +	.get		= ptp_ocp_sma_fb_get,
+> +	.set_inputs	= ptp_ocp_sma_fb_set_inputs,
+> +	.set_output	= ptp_ocp_sma_fb_set_output,
+> +};
+> +
+>   static int
+>   ptp_ocp_set_pins(struct ptp_ocp *bp)
+>   {
+> @@ -2420,6 +2577,7 @@ static int
+>   ptp_ocp_fb_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>   {
+>   	int err;
+> +	struct servo_val servo_vals;
+>   
+>   	bp->flash_start = 1024 * 4096;
+>   	bp->eeprom_map = fb_eeprom_map;
+> @@ -2441,7 +2599,14 @@ ptp_ocp_fb_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>   		return err;
+>   	ptp_ocp_sma_init(bp);
+>   
+> -	return ptp_ocp_init_clock(bp);
+> +	/* NO DRIFT Correction */
+> +	/* offset_p:i 1/8, offset_i: 1/16, drift_p: 0, drift_i: 0 */
+> +	servo_vals.servo_offset_p_val = 0x2000;
+> +	servo_vals.servo_offset_i_val = 0x1000;
+> +	servo_vals.servo_drift_p_val = 0;
+> +	servo_vals.servo_drift_p_val = 0;
+
+instead of adding this to every particular initialization function,
+struct ptp_ocp_servo_conf can be put to .extra field of the resource
+holding init function. This will move all configuration points to the
+list of card-specific resources, the place to have differences of cards
+and will make the code cleaner and eliminate all these local structs.
+We can potentially create another static function to configure servo
+part, but it's up to you.
+
+> +
+> +	return ptp_ocp_init_clock(bp, &servo_vals);
+>   }
+>   
+>   static bool
+> @@ -2583,6 +2748,7 @@ static int
+>   ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>   {
+>   	int err;
+> +	struct servo_val servo_vals;
+>   
+>   	bp->flash_start = 0x1000000;
+>   	bp->eeprom_map = art_eeprom_map;
+> @@ -2603,7 +2769,49 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>   	if (err)
+>   		return err;
+>   
+> -	return ptp_ocp_init_clock(bp);
+> +	/* NO DRIFT Correction */
+> +	/* offset_p:i 1/8, offset_i: 1/16, drift_p: 0, drift_i: 0 */
+> +	servo_vals.servo_offset_p_val = 0x2000;
+> +	servo_vals.servo_offset_i_val = 0x1000;
+> +	servo_vals.servo_drift_p_val = 0;
+> +	servo_vals.servo_drift_p_val = 0;
+> +
+> +	return ptp_ocp_init_clock(bp, &servo_vals);
+> +}
+> +
+> +/* ADVA specific board initializers; last "resource" registered. */
+> +static int
+> +ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+> +{
+> +	int err;
+> +	struct servo_val servo_vals;
+> +
+> +	bp->flash_start = 0xA00000;
+> +	bp->fw_version = ioread32(&bp->image->version);
+> +	bp->sma_op = &ocp_adva_sma_op;
+> +
+> +	ptp_ocp_fb_set_version(bp);
+> +
+> +	ptp_ocp_tod_init(bp);
+> +	ptp_ocp_nmea_out_init(bp);
+> +	ptp_ocp_signal_init(bp);
+> +
+> +	err = ptp_ocp_attr_group_add(bp, adva_timecard_groups);
+> +	if (err)
+> +		return err;
+> +
+> +	err = ptp_ocp_set_pins(bp);
+> +	if (err)
+> +		return err;
+> +	ptp_ocp_sma_init(bp);
+> +
+> +	/* offset_p:i 3/4, offset_i: 1/16, drift_p: 0, drift_i: 0 */
+> +	servo_vals.servo_offset_p_val = 0xc000;
+> +	servo_vals.servo_offset_i_val = 0x1000;
+> +	servo_vals.servo_drift_p_val = 0;
+> +	servo_vals.servo_drift_p_val = 0;
+> +
+> +	return ptp_ocp_init_clock(bp, &servo_vals);
+>   }
+>   
+>   static ssize_t
+> @@ -3578,6 +3786,35 @@ static const struct ocp_attr_group art_timecard_groups[] = {
+>   	{ },
+>   };
+>   
+> +static struct attribute *adva_timecard_attrs[] = {
+> +	&dev_attr_serialnum.attr,
+> +	&dev_attr_gnss_sync.attr,
+> +	&dev_attr_clock_source.attr,
+> +	&dev_attr_available_clock_sources.attr,
+> +	&dev_attr_sma1.attr,
+> +	&dev_attr_sma2.attr,
+> +	&dev_attr_sma3.attr,
+> +	&dev_attr_sma4.attr,
+> +	&dev_attr_available_sma_inputs.attr,
+> +	&dev_attr_available_sma_outputs.attr,
+> +	&dev_attr_clock_status_drift.attr,
+> +	&dev_attr_clock_status_offset.attr,
+> +	&dev_attr_ts_window_adjust.attr,
+> +	&dev_attr_tod_correction.attr,
+> +	NULL,
+> +};
+> +
+> +static const struct attribute_group adva_timecard_group = {
+> +	.attrs = adva_timecard_attrs,
+> +};
+> +
+> +static const struct ocp_attr_group adva_timecard_groups[] = {
+> +	{ .cap = OCP_CAP_BASIC,	    .group = &adva_timecard_group },
+> +	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
+> +	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq0_group },
+> +	{ },
+> +};
+> +
+>   static void
+>   gpio_input_map(char *buf, struct ptp_ocp *bp, u16 map[][2], u16 bit,
+>   	       const char *def)
+
+starting from here ...
+
+> @@ -4492,7 +4729,7 @@ ptp_ocp_remove(struct pci_dev *pdev)
+>   	cancel_delayed_work_sync(&bp->sync_work);
+>   	for (i = 0; i < OCP_SMA_NUM; i++) {
+>   		if (bp->sma[i].dpll_pin) {
+> -			dpll_pin_unregister(bp->dpll, bp->sma[i].dpll_pin, &dpll_pins_ops, bp);
+> +			dpll_pin_unregister(bp->dpll, bp->sma[i].dpll_pin, &dpll_pins_ops, &bp->sma[i]);
+>   			dpll_pin_put(bp->sma[i].dpll_pin);
+>   		}
+>   	}
+
+the chuck is already in a different patch and is reviewed actually, no
+need to post it again.
 
