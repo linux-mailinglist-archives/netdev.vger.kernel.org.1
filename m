@@ -1,121 +1,461 @@
-Return-Path: <netdev+bounces-59676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59DAE81BB98
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:14:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F9E681BBB6
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:16:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDF43B23DE7
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:14:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C82B71F23BB5
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:16:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2769155E5B;
-	Thu, 21 Dec 2023 16:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F2655E71;
+	Thu, 21 Dec 2023 16:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XVVT+V4W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BEJl7ONK"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96C155E59;
-	Thu, 21 Dec 2023 16:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 565394000E;
-	Thu, 21 Dec 2023 16:10:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1703175002;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gkK4AF7fmwjohH95nu92SeMkvjofU4OWgRfUvJJb7ok=;
-	b=XVVT+V4WzVh0CEE9G8BJkmzJRuMJPSQ0fYIRuhZoeEavFCYf+D5n6Zado9dytxztGLfT/8
-	huvois90EhKVW2xd3vXCoMdFQ5S+qgQrr/Mii/p065Lwxne1Q86RVhkEsL4swDNJy74sQr
-	yBwIl52k3LlbDMeiitvK8XKNJMj/HU0IHl8rGSVRWI8XnGhnpZYw29azFYWsCAXVFmF2C7
-	jw0vR8P4X8tzsWNHYs9XRasAPRvSGf9ZBktAryAf3iX6/9FmDNl61Cm9ql7qKn3+dfgaYu
-	8QbZph68Rk/3hSO4bYbGr2Nrp+FVsie2NdrLIwAKq3evuE7ED1D/d3eGVwqQdg==
-Date: Thu, 21 Dec 2023 17:10:00 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
- <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
- <dentproject@linuxfoundation.org>, Liam Girdwood <lgirdwood@gmail.com>
-Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <20231221171000.45310167@kmaincent-XPS-13-7390>
-In-Reply-To: <ffda1003-b752-402e-8e51-e2e24a840cff@sirena.org.uk>
-References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
-	<20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
-	<20231204225956.GG981228@pengutronix.de>
-	<20231205064527.GJ981228@pengutronix.de>
-	<4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
-	<20231205140203.GK981228@pengutronix.de>
-	<88ed0c94-d052-4564-be0c-79a0f502eda8@sirena.org.uk>
-	<20231221163610.47038996@kmaincent-XPS-13-7390>
-	<ffda1003-b752-402e-8e51-e2e24a840cff@sirena.org.uk>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C2E58219;
+	Thu, 21 Dec 2023 16:16:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82354C433C8;
+	Thu, 21 Dec 2023 16:16:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703175368;
+	bh=OwON6BSUO01DLEqWe8FDyxpOo9+ASV5bGIDHEtl7Q6k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BEJl7ONKUfmwqm48GXAC4dR83mYi/nKLhbgyUTjyvvhRgoAd7CQEyLyueqLyUcKHI
+	 Au3PiZqNMMXVp5RVoFcRHsDMxTYSYJrlhUzdszzqRNRWNWPVCHCpr5krtXPkpDICsY
+	 hWRgUOFDF1K4TfDFu/mgnjwvXRo+9SAI7NJbUyYLsNr2ucIxTgNjGLDPG7T0yvIRdq
+	 O/e58TBW9uixW6WcqWO58cbL5cKtDS2yoDrfFj9F4S9KpWknjb7wqNxwp4InwQzCjA
+	 r2WWKz1FIGCx4qU6c985UsOG9h0t5orLiZ1vvvqsXXjL1j31jtSL2HfDbG+IaYF9s+
+	 Zb8KxHbYt2x3A==
+Date: Thu, 21 Dec 2023 16:16:04 +0000
+From: Lee Jones <lee@kernel.org>
+To: Min Li <lnimi@hotmail.com>
+Cc: richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
+Subject: Re: [PATCH net-next v5 2/2] ptp: add FemtoClock3 Wireless as ptp
+ hardware clock
+Message-ID: <20231221161604.GP10102@google.com>
+References: <20231220145917.7076-1-lnimi@hotmail.com>
+ <PH7PR03MB70640D32D7AEC51BFE83A02FA096A@PH7PR03MB7064.namprd03.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PH7PR03MB70640D32D7AEC51BFE83A02FA096A@PH7PR03MB7064.namprd03.prod.outlook.com>
 
-On Thu, 21 Dec 2023 15:43:21 +0000
-Mark Brown <broonie@kernel.org> wrote:
+On Wed, 20 Dec 2023, Min Li wrote:
 
-> On Thu, Dec 21, 2023 at 04:36:10PM +0100, K=C3=B6ry Maincent wrote:
-> > Mark Brown <broonie@kernel.org> wrote: =20
->=20
-> > > OK...  I mean, if they're not using the regulator framework I'm not s=
-ure
-> > > it has much impact - there are plenty of internal regulators in devic=
-es
-> > > already so it wouldn't be *too* unusual other than the fact that AFAI=
-CT
-> > > this is somewhat split between devices within the subsystem?  Neither=
- of
-> > > the messages was super clear. =20
->=20
-> > PSE Power Interface (which is kind of the RJ45 in PSE world) have simil=
-ar
-> > functionalities as regulators. We wondered if registering a regulator f=
-or
-> > each PSE PI (RJ45 ports) is a good idea. The point is that the PSE
-> > controller driver will be its own regulator consumer.
-> > I can't find any example in Linux with such a case of a driver being a
-> > provider and a consumer of its own regulator. This idea of a regulator
-> > biting its own tail seems weird to me. Maybe it is better to implement =
-the
-> > PSE functionalities even if they are like the regulator functionalities=
-. =20
->=20
-> Is it at all plausible that a system (perhaps an embedded one) might use
-> something other than PSE?
+> From: Min Li <min.li.xe@renesas.com>
+> 
+> The RENESAS FemtoClock3 Wireless is a high-performance jitter attenuator,
+> frequency translator, and clock synthesizer. The device is comprised of 3
+> digital PLLs (DPLL) to track CLKIN inputs and three independent low phase
+> noise fractional output dividers (FOD) that output low phase noise clocks.
+> 
+> FemtoClock3 supports one Time Synchronization (Time Sync) channel to enable
+> an external processor to control the phase and frequency of the Time Sync
+> channel and to take phase measurements using the TDC. Intended applications
+> are synchronization using the precision time protocol (PTP) and
+> synchronization with 0.5 Hz and 1 Hz signals from GNSS.
+> 
+> Signed-off-by: Min Li <min.li.xe@renesas.com>
+> ---
+>  drivers/ptp/Kconfig                |   12 +
+>  drivers/ptp/Makefile               |    1 +
+>  drivers/ptp/ptp_fc3.c              | 1036 ++++++++++++++++++++++++++++
+>  drivers/ptp/ptp_fc3.h              |   45 ++
+>  include/linux/mfd/idtRC38xxx_reg.h |  273 ++++++++
 
-Do you mean to supply power to a RJ45 port?
-This can be done with a simple regulator. In that case we use the pse_regul=
-ator
-driver which is a regulator consumer.
-I don't know about other cases. Oleksij do you?
+Why MFD?  Where else is this being used?
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+>  5 files changed, 1367 insertions(+)
+>  create mode 100644 drivers/ptp/ptp_fc3.c
+>  create mode 100644 drivers/ptp/ptp_fc3.h
+>  create mode 100644 include/linux/mfd/idtRC38xxx_reg.h
+> 
+> diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
+> index 5dd5f188e..604541dcb 100644
+> --- a/drivers/ptp/Kconfig
+> +++ b/drivers/ptp/Kconfig
+> @@ -155,6 +155,18 @@ config PTP_1588_CLOCK_IDTCM
+>  	  To compile this driver as a module, choose M here: the module
+>  	  will be called ptp_clockmatrix.
+>  
+> +config PTP_1588_CLOCK_FC3W
+> +	tristate "RENESAS FemtoClock3 Wireless as PTP clock"
+> +	depends on PTP_1588_CLOCK && I2C
+> +	default n
+> +	help
+> +	  This driver adds support for using Renesas FemtoClock3 Wireless
+> +	  as a PTP clock. This clock is only useful if your time stamping
+> +	  MAC is connected to the RENESAS chip.
+> +
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called ptp_fc3.
+> +
+>  config PTP_1588_CLOCK_MOCK
+>  	tristate "Mock-up PTP clock"
+>  	depends on PTP_1588_CLOCK
+> diff --git a/drivers/ptp/ptp_fc3.h b/drivers/ptp/ptp_fc3.h
+> new file mode 100644
+> index 000000000..897101579
+> --- /dev/null
+> +++ b/drivers/ptp/ptp_fc3.h
+> @@ -0,0 +1,45 @@
+> +/* SPDX-License-Identifier: GPL-2.0+ */
+> +/*
+> + * PTP hardware clock driver for the FemtoClock3 family of timing and
+> + * synchronization devices.
+> + *
+> + * Copyright (C) 2023 Integrated Device Technology, Inc., a Renesas Company.
+> + */
+> +#ifndef PTP_IDTFC3_H
+> +#define PTP_IDTFC3_H
+> +
+> +#include <linux/ktime.h>
+> +#include <linux/ptp_clock.h>
+> +#include <linux/regmap.h>
+> +
+> +#define FW_FILENAME	"idtfc3.bin"
+> +
+> +#define MAX_FFO_PPB	(244000)
+> +#define TDC_GET_PERIOD	(10)
+> +
+> +struct idtfc3 {
+> +	struct ptp_clock_info	caps;
+> +	struct ptp_clock	*ptp_clock;
+> +	struct device		*dev;
+> +	/* Mutex to protect operations from being interrupted */
+> +	struct mutex		*lock;
+> +	struct device		*mfd;
+
+parent
+
+Also, you can derive this from 'dev' above.  You don't need both.
+
+> +	struct regmap		*regmap;
+> +	struct idtfc3_hw_param	hw_param;
+> +	u32			sub_sync_count;
+> +	u32			ns_per_sync;
+> +	int			tdc_offset_sign;
+> +	u64			tdc_apll_freq;
+> +	u32			time_ref_freq;
+> +	u16			fod_n;
+> +	u8			lpf_mode;
+> +	/* Time counter */
+> +	u32			last_counter;
+> +	s64			ns;
+> +	u32			ns_per_counter;
+> +	u32			tc_update_period;
+> +	u32			tc_write_timeout;
+> +	s64			tod_write_overhead;
+> +};
+> +
+> +#endif /* PTP_IDTFC3_H */
+> diff --git a/include/linux/mfd/idtRC38xxx_reg.h b/include/linux/mfd/idtRC38xxx_reg.h
+> new file mode 100644
+> index 000000000..edddaae61
+> --- /dev/null
+> +++ b/include/linux/mfd/idtRC38xxx_reg.h
+> @@ -0,0 +1,273 @@
+> +/* SPDX-License-Identifier: GPL-2.0+ */
+> +/*
+> + * Register Map - Based on PolarBear_CSRs.RevA.xlsx (2023-04-21)
+> + *
+> + * Copyright (C) 2023 Integrated Device Technology, Inc., a Renesas Company.
+> + */
+> +#ifndef HAVE_IDTRC38XXX_REG
+> +#define HAVE_IDTRC38XXX_REG
+
+MFD not HAVE.
+
+> +
+> +/* GLOBAL */
+
+Everything in here is global?
+
+> +#define SOFT_RESET_CTRL		(0x15) /* Specific to FC3W */
+> +#define MISC_CTRL		(0x14) /* Specific to FC3A */
+> +#define APLL_REINIT		BIT(1)
+> +#define APLL_REINIT_VFC3A	BIT(2)
+> +
+> +#define DEVICE_ID		(0x2)
+> +#define DEVICE_ID_MASK		(0x1000) /* Bit 12 is 1 if FC3W and 0 if FC3A */
+> +#define DEVICE_ID_SHIFT		(12)
+> +
+> +/* FOD */
+> +#define FOD_0		(0x300)
+> +#define FOD_0_VFC3A	(0x400)
+> +#define FOD_1		(0x340)
+> +#define FOD_1_VFC3A	(0x440)
+> +#define FOD_2		(0x380)
+> +#define FOD_2_VFC3A	(0x480)
+> +
+> +/* TDCAPLL */
+> +#define TDC_CTRL		(0x44a) /* Specific to FC3W */
+> +#define TDC_ENABLE_CTRL		(0x169) /* Specific to FC3A */
+> +#define TDC_DAC_CAL_CTRL	(0x16a) /* Specific to FC3A */
+> +#define TDC_EN			BIT(0)
+> +#define TDC_DAC_RECAL_REQ	BIT(1)
+> +#define TDC_DAC_RECAL_REQ_VFC3A	BIT(0)
+> +
+> +#define TDC_FB_DIV_INT_CNFG		(0x442)
+> +#define TDC_FB_DIV_INT_CNFG_VFC3A	(0x162)
+> +#define TDC_FB_DIV_INT_MASK		GENMASK(7, 0)
+> +#define TDC_REF_DIV_CNFG		(0x443)
+> +#define TDC_REF_DIV_CNFG_VFC3A		(0x163)
+> +#define TDC_REF_DIV_CONFIG_MASK		GENMASK(2, 0)
+> +
+> +/* TIME SYNC CHANNEL */
+> +#define TIME_CLOCK_SRC		(0xa01) /* Specific to FC3W */
+> +#define TIME_CLOCK_COUNT	(0xa00) /* Specific to FC3W */
+> +#define TIME_CLOCK_COUNT_MASK	GENMASK(5, 0)
+> +
+> +#define SUB_SYNC_GEN_CNFG	(0xa04)
+> +
+> +#define TOD_COUNTER_READ_REQ		(0xa5f)
+> +#define TOD_COUNTER_READ_REQ_VFC3A	(0x6df)
+> +#define TOD_SYNC_LOAD_VAL_CTRL		(0xa10)
+> +#define TOD_SYNC_LOAD_VAL_CTRL_VFC3A	(0x690)
+> +#define SYNC_COUNTER_MASK		GENMASK(51, 0)
+> +#define SUB_SYNC_COUNTER_MASK		GENMASK(30, 0)
+> +#define TOD_SYNC_LOAD_REQ_CTRL		(0xa21)
+> +#define TOD_SYNC_LOAD_REQ_CTRL_VFC3A	(0x6a1)
+> +#define SYNC_LOAD_ENABLE		BIT(1)
+> +#define SUB_SYNC_LOAD_ENABLE		BIT(0)
+> +#define SYNC_LOAD_REQ			BIT(0)
+> +
+> +#define LPF_MODE_CNFG		(0xa80)
+> +#define LPF_MODE_CNFG_VFC3A	(0x700)
+> +enum lpf_mode {
+> +	LPF_DISABLED = 0,
+> +	LPF_WP       = 1,
+> +	LPF_HOLDOVER = 2,
+> +	LPF_WF       = 3,
+> +	LPF_INVALID  = 4
+> +};
+> +#define LPF_CTRL	(0xa98)
+> +#define LPF_CTRL_VFC3A	(0x718)
+> +#define LPF_EN		BIT(0)
+> +
+> +#define LPF_BW_CNFG	(0xa81)
+> +#define LPF_BW_SHIFT	GENMASK(7, 3)
+> +#define LPF_BW_MULT		GENMASK(2, 0)
+> +#define LPF_BW_SHIFT_DEFAULT	(0xb)
+> +#define LPF_BW_MULT_DEFAULT		(0x0)
+> +#define LPF_BW_SHIFT_1PPS		(0x5)
+> +
+> +#define LPF_WR_PHASE_CTRL	(0xaa8)
+> +#define LPF_WR_PHASE_CTRL_VFC3A	(0x728)
+> +#define LPF_WR_FREQ_CTRL	(0xab0)
+> +#define LPF_WR_FREQ_CTRL_VFC3A	(0x730)
+> +
+> +#define TIME_CLOCK_TDC_FANOUT_CNFG	(0xB00)
+> +#define TIME_SYNC_TO_TDC_EN	BIT(0)
+> +#define SIG1_MUX_SEL_MASK	GENMASK(7, 4)
+> +#define SIG2_MUX_SEL_MASK	GENMASK(11, 8)
+> +enum tdc_mux_sel {
+> +	REF0 = 0,
+> +	REF1 = 1,
+> +	REF2 = 2,
+> +	REF3 = 3,
+> +	REF_CLK5 = 4,
+> +	REF_CLK6 = 5,
+> +	DPLL_FB_TO_TDC = 6,
+> +	DPLL_FB_DIVIDED_TO_TDC = 7,
+> +	TIME_CLK_DIVIDED = 8,
+> +	TIME_SYNC = 9,
+> +};
+> +
+> +#define TIME_CLOCK_MEAS_CNFG	(0xB04)
+> +#define TDC_MEAS_MODE	BIT(0)
+> +enum tdc_meas_mode {
+> +	CONTINUOUS = 0,
+> +	ONE_SHOT = 1,
+> +	MEAS_MODE_INVALID = 2,
+> +};
+> +
+> +#define TIME_CLOCK_MEAS_DIV_CNFG	(0xB08)
+> +#define TIME_REF_DIV_MASK	GENMASK(29, 24)
+> +
+> +#define TIME_CLOCK_MEAS_CTRL	(0xB10)
+> +#define TDC_MEAS_EN	BIT(0)
+> +#define TDC_MEAS_START	BIT(1)
+> +
+> +#define TDC_FIFO_READ_REQ	(0xB2F)
+> +#define TDC_FIFO_READ		(0xB30)
+> +#define COARSE_MEAS_MASK	GENMASK(39, 13)
+> +#define FINE_MEAS_MASK		GENMASK(12, 0)
+> +
+> +#define TDC_FIFO_CTRL		(0xB12)
+> +#define FIFO_CLEAR		BIT(0)
+> +#define TDC_FIFO_STS		(0xB38)
+> +#define FIFO_FULL		BIT(1)
+> +#define FIFO_EMPTY		BIT(0)
+> +#define TDC_FIFO_EVENT		(0xB39)
+> +#define FIFO_OVERRUN		BIT(1)
+> +
+> +/* DPLL */
+> +#define MAX_REFERENCE_INDEX	(3)
+> +#define MAX_NUM_REF_PRIORITY	(4)
+> +
+> +#define MAX_DPLL_INDEX	(2)
+> +
+> +#define DPLL_STS		(0x580)
+> +#define DPLL_STS_VFC3A		(0x571)
+> +#define DPLL_STATE_STS_MASK	(0x70)
+> +#define DPLL_STATE_STS_SHIFT	(4)
+> +#define DPLL_REF_SEL_STS_MASK	(0x6)
+> +#define DPLL_REF_SEL_STS_SHIFT	(1)
+> +
+> +#define DPLL_REF_PRIORITY_CNFG			(0x502)
+> +#define DPLL_REFX_PRIORITY_DISABLE_MASK		(0xf)
+> +#define DPLL_REF0_PRIORITY_ENABLE_AND_SET_MASK	(0x31)
+> +#define DPLL_REF1_PRIORITY_ENABLE_AND_SET_MASK	(0xc2)
+> +#define DPLL_REF2_PRIORITY_ENABLE_AND_SET_MASK	(0x304)
+> +#define DPLL_REF3_PRIORITY_ENABLE_AND_SET_MASK	(0xc08)
+> +#define DPLL_REF0_PRIORITY_SHIFT		(4)
+> +#define DPLL_REF1_PRIORITY_SHIFT		(6)
+> +#define DPLL_REF2_PRIORITY_SHIFT		(8)
+> +#define DPLL_REF3_PRIORITY_SHIFT		(10)
+> +
+> +enum dpll_state {
+> +	DPLL_STATE_MIN             = 0,
+> +	DPLL_STATE_FREERUN         = DPLL_STATE_MIN,
+> +	DPLL_STATE_LOCKED          = 1,
+> +	DPLL_STATE_HOLDOVER        = 2,
+> +	DPLL_STATE_WRITE_FREQUENCY = 3,
+> +	DPLL_STATE_ACQUIRE         = 4,
+> +	DPLL_STATE_HITLESS_SWITCH  = 5,
+> +	DPLL_STATE_MAX             = DPLL_STATE_HITLESS_SWITCH
+> +};
+> +
+> +/* REFMON */
+> +#define LOSMON_STS_0		(0x81e)
+> +#define LOSMON_STS_0_VFC3A	(0x18e)
+> +#define LOSMON_STS_1		(0x82e)
+> +#define LOSMON_STS_1_VFC3A	(0x19e)
+> +#define LOSMON_STS_2		(0x83e)
+> +#define LOSMON_STS_2_VFC3A	(0x1ae)
+> +#define LOSMON_STS_3		(0x84e)
+> +#define LOSMON_STS_3_VFC3A	(0x1be)
+> +#define LOS_STS_MASK		(0x1)
+> +
+> +#define FREQMON_STS_0		(0x874)
+> +#define FREQMON_STS_0_VFC3A	(0x1d4)
+> +#define FREQMON_STS_1		(0x894)
+> +#define FREQMON_STS_1_VFC3A	(0x1f4)
+> +#define FREQMON_STS_2		(0x8b4)
+> +#define FREQMON_STS_2_VFC3A	(0x214)
+> +#define FREQMON_STS_3		(0x8d4)
+> +#define FREQMON_STS_3_VFC3A	(0x234)
+> +#define FREQ_FAIL_STS_SHIFT	(31)
+> +
+> +/* Firmware interface */
+> +#define TIME_CLK_FREQ_ADDR	(0xffa0)
+> +#define XTAL_FREQ_ADDR		(0xffa1)
+> +
+> +/*
+> + * Return register address and field mask based on passed in firmware version
+> + */
+> +#define IDTFC3_FW_REG(FW, VER, REG)	(((FW) < (VER)) ? (REG) : (REG##_##VER))
+> +#define IDTFC3_FW_FIELD(FW, VER, FIELD)	(((FW) < (VER)) ? (FIELD) : (FIELD##_##VER))
+> +enum fw_version {
+> +	V_DEFAULT = 0,
+> +	VFC3W     = 1,
+> +	VFC3A     = 2
+> +};
+> +
+> +/* XTAL_FREQ_ADDR/TIME_CLK_FREQ_ADDR */
+> +enum {
+> +	FREQ_MIN     = 0,
+> +	FREQ_25M     = 1,
+> +	FREQ_49_152M = 2,
+> +	FREQ_50M     = 3,
+> +	FREQ_100M    = 4,
+> +	FREQ_125M    = 5,
+> +	FREQ_250M    = 6,
+> +	FREQ_MAX
+> +};
+> +
+> +struct idtfc3_hw_param {
+> +	u32 xtal_freq;
+> +	u32 time_clk_freq;
+> +};
+> +
+> +struct idtfc3_fwrc {
+> +	u8 hiaddr;
+> +	u8 loaddr;
+> +	u8 value;
+> +	u8 reserved;
+> +} __packed;
+
+How much of the last 300 lines are actually being used?
+
+> +static inline void idtfc3_default_hw_param(struct idtfc3_hw_param *hw_param)
+> +{
+> +	hw_param->xtal_freq = 49152000;
+> +	hw_param->time_clk_freq = 25000000;
+> +}
+
+This is an odd use of an inline function.
+
+Why not define them and use them else where?
+
+> +static inline int idtfc3_set_hw_param(struct idtfc3_hw_param *hw_param,
+> +				      u16 addr, u8 val)
+> +{
+> +	if (addr == XTAL_FREQ_ADDR)
+> +		switch (val) {
+> +		case FREQ_49_152M:
+> +			hw_param->xtal_freq = 49152000;
+> +			break;
+> +		case FREQ_50M:
+> +			hw_param->xtal_freq = 50000000;
+> +			break;
+> +		default:
+> +			return -EINVAL;
+> +		}
+> +	else if (addr == TIME_CLK_FREQ_ADDR)
+> +		switch (val) {
+> +		case FREQ_25M:
+> +			hw_param->time_clk_freq = 25000000;
+> +			break;
+> +		case FREQ_50M:
+> +			hw_param->time_clk_freq = 50000000;
+> +			break;
+> +		case FREQ_100M:
+> +			hw_param->time_clk_freq = 100000000;
+> +			break;
+> +		case FREQ_125M:
+> +			hw_param->time_clk_freq = 125000000;
+> +			break;
+> +		case FREQ_250M:
+> +			hw_param->time_clk_freq = 250000000;
+> +			break;
+> +		default:
+> +			return -EINVAL;
+> +		}
+> +	else
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+
+As above.  Why is this being shoved in here?
+
+> +#endif
+
+-- 
+Lee Jones [李琼斯]
 
