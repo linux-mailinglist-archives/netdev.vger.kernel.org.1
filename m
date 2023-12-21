@@ -1,115 +1,131 @@
-Return-Path: <netdev+bounces-59702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CD2681BD4C
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:34:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27EA181BD61
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:37:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC76B1C23370
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:34:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8753283433
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:37:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0053862804;
-	Thu, 21 Dec 2023 17:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACFD6281B;
+	Thu, 21 Dec 2023 17:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiLC3W/b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d36LhB8w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC7C62813;
-	Thu, 21 Dec 2023 17:34:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 339C3C433C7;
-	Thu, 21 Dec 2023 17:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1F973197;
+	Thu, 21 Dec 2023 17:35:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6EA8C433C9;
+	Thu, 21 Dec 2023 17:35:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703180049;
-	bh=tZpLiDPgbcp1+gCDmMjOIB9hnwodSBsk4RRE8sDpJcA=;
+	s=k20201202; t=1703180143;
+	bh=ZwPaf2YiUAFo26j3q+Xlvg2stXM5VfmpeeF0eOmjf18=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FiLC3W/bBfhAafv1SxSf2paV6MA+73GTSjIQPNTVbA3a/z5CbQ+uegwTThhTO2ell
-	 Ly0HSOa6lw8Gt+vasc30GJ6UNe7o4ukCOPF3gmVncl5YUsKFBudcN3BrWYSXE+JJ5J
-	 83jUoXjp58UcFNmJMU9Mru0z0sVo/Yqg9E4Cae9tChCV31ZdQ/GYxhMdDLOXMPkW4A
-	 v9hiboc7vpYqeAFE42xg7JLDXtSAjldYSFCMqVONES7nfnnW/6HNgSaTdfV6Yvd3BJ
-	 +//arj+dNTqLygKmB0+69WmoVf19UiPi9cq7DYpGPc0NKhsGgMI1EbOeE1ukcuDyz4
-	 qwy+vxFz8M9hg==
-Date: Thu, 21 Dec 2023 17:34:02 +0000
-From: Mark Brown <broonie@kernel.org>
-To: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
+	b=d36LhB8whBedTR6PvrUN8kBNxy5VVeXx/gnDo/RuoDW7EwBn3Ignp76RRvD4Kf+7m
+	 3R8//3v7rzp5IqRQ/O1f2+4UfRIKrHaULzME/PN/3jAiFEYq0hmVGkBZ55+l9C3rp1
+	 eubtwp0zXx1MvMSr3TMoB3j/tef37M07mxbt898/pKr69KHkyEyLc4RZox8yILGLTr
+	 jNI6k4z88V5BvpCsX/drBcZ05xGDp3RjhV9O1JuhZRWxa4Qfjm5vtvEvz1oX6IWqhK
+	 H85PInpBeHPVdrfZlinvKJv7ynW3tQblOcn/zlqNviuwu3X8wIe6V8yMwCYhzX29oh
+	 ggf+TsBmwf6aQ==
+Date: Thu, 21 Dec 2023 18:35:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aahil Awatramani <aahila@google.com>
+Cc: Mahesh Bandewar <maheshb@google.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>,
-	Liam Girdwood <lgirdwood@gmail.com>
-Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <8a8b0735-f1fa-401d-9f92-bb9ce8bd1e7d@sirena.org.uk>
-References: <20231204225956.GG981228@pengutronix.de>
- <20231205064527.GJ981228@pengutronix.de>
- <4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
- <20231205140203.GK981228@pengutronix.de>
- <88ed0c94-d052-4564-be0c-79a0f502eda8@sirena.org.uk>
- <20231221163610.47038996@kmaincent-XPS-13-7390>
- <ffda1003-b752-402e-8e51-e2e24a840cff@sirena.org.uk>
- <20231221171000.45310167@kmaincent-XPS-13-7390>
- <501f671d-4e03-490b-a9d6-e1f39bb99115@sirena.org.uk>
- <20231221181955.422e676e@kmaincent-XPS-13-7390>
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH next] bonding: Extending LACP MUX State Machine to
+ include a Collecting State.
+Message-ID: <20231221173531.GA1202958@kernel.org>
+References: <20231221023650.3208767-1-aahila@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="SyGCkrmxiABQ1d98"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231221181955.422e676e@kmaincent-XPS-13-7390>
-X-Cookie: Results are not typical.
+In-Reply-To: <20231221023650.3208767-1-aahila@google.com>
 
+On Thu, Dec 21, 2023 at 02:36:50AM +0000, Aahil Awatramani wrote:
+> Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
+> the LACP MUX state machine for separated handling of an initial
+> Collecting state before the Collecting and Distributing state. This
+> enables a port to be in a state where it can receive incoming packets
+> while not still distributing. This is useful for reducing packet loss when
+> a port begins distributing before its partner is able to collect.
+> Additionally this also brings the 802.3ad bonding driver's implementation
+> closer to the LACP specification which already predefined this behaviour.
+> 
+> With this change, 802.3ad mode will use new
+> bond_set_slave_txrx_{enabled|disabled}_flags() set of functions only
+> instead of the earlier one (bond_set_slave_{active|inactive}_flags).
+> Additionally, it adds new functions such as
+> bond_set_slave_tx_disabled_flags and bond_set_slave_rx_enabled_flags to
+> precisely manage the port's collecting and distributing states.
+> Previously, there was no dedicated method to disable TX while keeping RX
+> enabled, which this patch addresses.
+> 
+> Note that the regular flow process in the kernel's bonding driver remains
+> unaffected by this patch. The extension requires explicit opt-in by the
+> user (in order to ensure no disruptions for existing setups) via netlink
+> or sysfs support using the new bonding parameter lacp_extended_mux. The
+> default value for lacp_extended_mux is set to 0 so as to preserve existing
+> behaviour.
+> 
+> Signed-off-by: Aahil Awatramani <aahila@google.com>
 
---SyGCkrmxiABQ1d98
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+...
 
-On Thu, Dec 21, 2023 at 06:19:55PM +0100, K=F6ry Maincent wrote:
+> @@ -1906,6 +2005,46 @@ static void ad_initialize_port(struct port *port, int lacp_fast)
+>  	}
+>  }
+>  
+> +/**
+> + * ad_enable_collecting - enable a port's receive
+> + * @port: the port we're looking at
+> + * @update_slave_arr: Does slave array need update?
 
-> So we will have PSE drivers which are regulators consumer for the chip,
-> regulator providers for all its ports and regulator consumers also for al=
-l its
-> ports. Is it clearer? Would that sound ok for you?
+The line above documenting @update_slave_arr
+should be removed as the parameter is not in
+the function definition below.
 
-That does sound fine, and like there's a use case for substituting in a
-non-PSE regulator in embedded systems so we get something for the effort.
-You might want to take a look at the arizona MFD for an example of a
-driver for a device which includes a regulator that may optionally be
-unused - it's not ideal but it does work.
+> + *
+> + * Enable @port if it's in an active aggregator
+> + */
+> +static void ad_enable_collecting(struct port *port)
+> +{
+> +	if (port->aggregator->is_active) {
+> +		struct slave *slave = port->slave;
+> +
+> +		slave_dbg(slave->bond->dev, slave->dev,
+> +			  "Enabling collecting on port %d (LAG %d)\n",
+> +			  port->actor_port_number,
+> +			  port->aggregator->aggregator_identifier);
+> +		__enable_collecting_port(port);
+> +	}
+> +}
 
---SyGCkrmxiABQ1d98
-Content-Type: application/pgp-signature; name="signature.asc"
+The above is a pretty minor problem, but the bots are likely
+to complain about it, so please fix it in v2 after waiting
+for feedback from others on this patch.
 
------BEGIN PGP SIGNATURE-----
+When posting v2 please target it at the net-next tree.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWEdwkACgkQJNaLcl1U
-h9D2YwgAhrLCcIl4Dri+vJaS3qntIoQNnzudbw464z0YawWeutbUGmUF1yTPrL3r
-310g2eca0UDhGXTI0jksOmy1IQHZNleh2psZ5n7qAHqzLPRKj5h3IbQZ7DtogYbd
-eWSdibMpOp8cqtYnMCNRjIznmGYfZPepV4TawWqarPC5qbO7pN3fjjawYc9YD1Hp
-94vhC35OOxe28vLxszoFVHpioVq3qYSFTfDMlaiAL+7sFNTlP+hbZeY09NP9jLU6
-gBlqjJSnrE81CEBI/M+TdmFlfhGn71d1BlH7E+CRHCv96ExNBiXQKrBJSB7ItHnq
-g89pBtKDvcVWHTk/9AI6B1JWV/FoqA==
-=tjbD
------END PGP SIGNATURE-----
+	Subject: [PATCH net-next v2] ...
 
---SyGCkrmxiABQ1d98--
+-- 
+pw-bot: changes-requested
 
