@@ -1,52 +1,58 @@
-Return-Path: <netdev+bounces-59500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C142981B210
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:22:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B3481B21D
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:23:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65467B241C7
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 09:22:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 007321C245E3
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 09:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49C24177B;
-	Thu, 21 Dec 2023 09:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF23446A2;
+	Thu, 21 Dec 2023 09:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HQsCbD6e"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Zbt+M9Fv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1120142057;
-	Thu, 21 Dec 2023 09:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ChggBcLmx6xwxdONtamQnLuhemi42z+fo6lA2pWbhwU=; b=HQsCbD6eY5xpXuXZGUXu93WyEe
-	nOyyL37w1Bep+gwZr3pQn4nY6yLqcGcVt2/ot24rvwDI0W1nyIuWB8OQjXvQ9j0fjr6eGQ/apIKk9
-	0SpolhYokHIzP8K8Nh8QqsbPAmZV2GV4Q9o1SZjW7Hz4OiSyf+UYz55x6+AlH6w08F4A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rGF10-003UXK-3p; Thu, 21 Dec 2023 10:06:50 +0100
-Date: Thu, 21 Dec 2023 10:06:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jernej Skrabec <jernej.skrabec@gmail.com>
-Cc: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, wens@csie.org, samuel@sholland.org,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH v5 1/3] phy: handle optional regulator for PHY
-Message-ID: <f729baa5-7986-4841-8cd6-fc4bdc652f75@lunn.ch>
-References: <20231220203537.83479-1-jernej.skrabec@gmail.com>
- <20231220203537.83479-2-jernej.skrabec@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FB920DFD;
+	Thu, 21 Dec 2023 09:11:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07B60C433C8;
+	Thu, 21 Dec 2023 09:11:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1703149867;
+	bh=/WzNv9MnpdH5DL+RbcHgW/lhQEnlhmwuWZbe7H2FjoI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Zbt+M9FvnqygUuM7jlyguqNlW2VmMiyfgcxqdiEa3FDBXrccfvI55WRXCFP5zcIrl
+	 jWL/AidAA8QFWGEt6e6VJyeOh0sQv36uLT2RzJQCClFYma8Dl/19W5HYdmNAQLC4p8
+	 b/dZVANnIoJp+s3NmVmALYa6SKFkzZBaTHMVBI3A=
+Date: Thu, 21 Dec 2023 10:11:04 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: "Gan, Yi Fang" <yi.fang.gan@intel.com>
+Cc: Andrew Halaney <ahalaney@redhat.com>,
+	Javier Martinez Canillas <javierm@redhat.com>,
+	John Stultz <jstultz@google.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Looi Hong Aun <hong.aun.looi@intel.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Lai Peter Jun Ann <peter.jun.ann.lai@intel.com>,
+	Choong Yong Liang <yong.liang.choong@intel.com>
+Subject: Re: [PATCH net v2 0/2] Fix phylink unloadable issue
+Message-ID: <2023122141-smuggling-confidant-d1d8@gregkh>
+References: <20231221085109.2830794-1-yi.fang.gan@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,42 +61,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231220203537.83479-2-jernej.skrabec@gmail.com>
+In-Reply-To: <20231221085109.2830794-1-yi.fang.gan@intel.com>
 
-> +static int
-> +fwnode_regulator_get_bulk_enabled(struct device *dev,
-> +				  struct fwnode_handle *fwnode,
-> +				  struct regulator_bulk_data **consumers)
-> +{
-> +	struct device_node *np;
-> +	int ret, reg_cnt;
-> +
-> +	np = to_of_node(fwnode);
-> +	if (!np)
-> +		return 0;
-> +
-> +	reg_cnt = of_regulator_bulk_get_all(dev, np, consumers);
-> +	if (reg_cnt < 0) {
-> +		ret = reg_cnt;
-> +		goto clean_consumers;
-> +	}
-> +
-> +	if (reg_cnt == 0)
-> +		return 0;
+On Thu, Dec 21, 2023 at 04:51:07PM +0800, Gan, Yi Fang wrote:
+> Add module_exit_stub() for phylink module.
+> 
+> Changes since v1:
+> - Introduce a helper macro for module_exit() boilerplate
+> 
+> This series is the combination of following:
+> v1 with empty phylink_exit():
+> https://lore.kernel.org/all/20231127101603.807593-1-yi.fang.gan@intel.com/
+> v1 of module_exit_stub():
+> https://lore.kernel.org/all/20231212094352.2263283-1-yi.fang.gan@intel.com/
 
-I've not used regulators much, but i think you can combine these two
-into one. Its guaranteed *consumer is NULL if reg_cnt == 0. And
-kfree() is happy with a NULL pointer.
+As I said before, no, this isn't ok.  Why just resubmit a patch when
+it's already been rejected?
 
-> +
-> +	ret = regulator_bulk_enable(reg_cnt, *consumers);
-> +	if (ret)
-> +		goto clean_consumers;
+This patch series should NOT be accepted as-is, you know this!
 
-I would expect this to be part of mdio_device_reset(), same as the
-GPIO, and reset controller, but first obviously. And parsing DT should
-happen in a similar place to parsing the reset GPIO and reset
-controller.
+Also, you are not following the documented and REQUIRED rules for Intel
+developers to be submitting kernel patches, so on that reason alone
+these need to be rejected.
 
-	Andrew
+Please work with the Intel internel developers to do this correctly if
+you wish to submit this again in the future.
+
+greg k-h
 
