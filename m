@@ -1,88 +1,139 @@
-Return-Path: <netdev+bounces-59507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C8C881B25D
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:31:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56F7B81B265
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:32:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F2ED288B75
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 09:31:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A852DB27171
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 09:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8464D105;
-	Thu, 21 Dec 2023 09:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5855E24A16;
+	Thu, 21 Dec 2023 09:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HGG1wa2r"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Lv/x3rDs"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEC44D108;
-	Thu, 21 Dec 2023 09:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8Q5cOIVW2NXQCgE8m7MOSUxp7IMMRSApRmgjadLhzFs=; b=HGG1wa2raGGp05ho8o8RKqOknz
-	KILTqZixOLLzlW1a6Z03U2rsSkmIsk7JIuRgI+NqiPxoYcBVRpxgdeLiYbBbxyAt0MoyPCTeDj6WD
-	QpTNzCi+vTCe8a4ZECCa54w7drc3WtfQ5+bzb8g+u5Wd8ssmwJrO+OiPSAZ6JbRIKrRo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rGFKu-003Uho-BE; Thu, 21 Dec 2023 10:27:24 +0100
-Date: Thu, 21 Dec 2023 10:27:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Bauer <mail@david-bauer.net>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next] net: dsa: mt7530: register OF node for internal
- MDIO bus
-Message-ID: <8e248f59-007a-4c53-877f-6026f4a74d0b@lunn.ch>
-References: <20231220173539.59071-1-arinc.unal@arinc9.com>
- <d78949f0-bb03-82ea-b40f-1bb92b41e200@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF6B3398E;
+	Thu, 21 Dec 2023 09:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BL6IGer019052;
+	Thu, 21 Dec 2023 01:28:53 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=v99kQxAd
+	tpEt3M6lqd22NVNMCYcE19GlNI8tMkZFstg=; b=Lv/x3rDsY5XWTIraMr6ncsZH
+	VXM6VqEAs3HhmIP171zhZGRFEK/wBeDye6mfSDtVxdaFHpDk3OamMKx8HX+Cu3Pi
+	nH5+QGFfwfMy+rPjn9LKYXSb5QZ2upqf1k8921cNM8HBys0fpxkbIZEOwaAvGUZ5
+	/jmsNTjPJ73KOAJ52TpyQ+Xgj/lobiRMl0/ZRflWF6ICuakdWOzL5Hr76O6wW2F/
+	AQPa7nQhnjDTc8LBt8Pmwhkb+4TI68JDmD48N9bAakROWeV+F/hWoE//Sh1vY9iI
+	ry2p5ZYUr77VJSzAZnDWgfXqHdEkw3InRrNt0HuKcvG/o3uX+cQkkujQ5X+s4A==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3v4fyr13xm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 21 Dec 2023 01:28:52 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 21 Dec
+ 2023 01:28:51 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 21 Dec 2023 01:28:51 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id CF3173F7048;
+	Thu, 21 Dec 2023 01:28:50 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <sedara@marvell.com>,
+        <srasheed@marvell.com>, <egallen@redhat.com>, <mschmidt@redhat.com>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <horms@kernel.org>,
+        <wizhao@redhat.com>, <kheib@redhat.com>, <konguyen@redhat.com>
+Subject: [PATCH net-next v1 0/8] add octeon_ep_vf driver
+Date: Thu, 21 Dec 2023 01:28:36 -0800
+Message-ID: <20231221092844.2885872-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d78949f0-bb03-82ea-b40f-1bb92b41e200@ti.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: DE6Jo0w6wJOuWpOLhhIXLwXbE3f1lhEm
+X-Proofpoint-ORIG-GUID: DE6Jo0w6wJOuWpOLhhIXLwXbE3f1lhEm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-> > @@ -2177,7 +2180,9 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
-> >  	if (priv->irq)
-> >  		mt7530_setup_mdio_irq(priv);
-> >  
-> > -	ret = devm_mdiobus_register(dev, bus);
-> > +	mnp = of_get_child_by_name(np, "mdio");
-> 
-> If the node is not found, then the return value would be NULL.
-> Though devm_of_mdiobus_register() and of_node_put() take care of NULL references,
-> other drivers that use devm_of_mdiobus_register() mostly perform a early exit if the node is NULL.
+This driver implements networking functionality of Marvell's Octeon
+PCI Endpoint NIC VF.
 
-Actually, many don't as well. of_mdiobus_register() falls back to
-mdiobus_register() is np==NULL. That causes a scan of the bus to find
-all the PHYs and you can then use phy_find_first() to access them.
+This driver support following devices:
+ * Network controller: Cavium, Inc. Device b203
+ * Network controller: Cavium, Inc. Device b403
+ * Network controller: Cavium, Inc. Device b103
+ * Network controller: Cavium, Inc. Device b903
+ * Network controller: Cavium, Inc. Device ba03
+ * Network controller: Cavium, Inc. Device bc03
+ * Network controller: Cavium, Inc. Device bd03
 
-So this code is O.K.
+Shinas Rasheed (8):
+  octeon_ep_vf: Add driver framework and device initialization
+  octeon_ep_vf: add hardware configuration APIs
+  octeon_ep_vf: add VF-PF mailbox communication.
+  octeon_ep_vf: add Tx/Rx ring resource setup and cleanup
+  octeon_ep_vf: add support for ndo ops
+  octeon_ep_vf: add Tx/Rx processing and interrupt support
+  octeon_ep_vf: add ethtool support
+  octeon_ep_vf: update MAINTAINERS
 
-   Andrew
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/marvell/octeon_ep_vf.rst         |   24 +
+ MAINTAINERS                                   |    9 +
+ drivers/net/ethernet/marvell/Kconfig          |    1 +
+ drivers/net/ethernet/marvell/Makefile         |    1 +
+ .../net/ethernet/marvell/octeon_ep_vf/Kconfig |   19 +
+ .../ethernet/marvell/octeon_ep_vf/Makefile    |   10 +
+ .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  488 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_cnxk.c      |  500 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_config.h    |  160 +++
+ .../marvell/octeon_ep_vf/octep_vf_ethtool.c   |  307 ++++
+ .../marvell/octeon_ep_vf/octep_vf_main.c      | 1231 +++++++++++++++++
+ .../marvell/octeon_ep_vf/octep_vf_main.h      |  338 +++++
+ .../marvell/octeon_ep_vf/octep_vf_mbox.c      |  430 ++++++
+ .../marvell/octeon_ep_vf/octep_vf_mbox.h      |  166 +++
+ .../marvell/octeon_ep_vf/octep_vf_regs_cn9k.h |  154 +++
+ .../marvell/octeon_ep_vf/octep_vf_regs_cnxk.h |  162 +++
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        |  511 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_rx.h        |  224 +++
+ .../marvell/octeon_ep_vf/octep_vf_tx.c        |  332 +++++
+ .../marvell/octeon_ep_vf/octep_vf_tx.h        |  276 ++++
+ 21 files changed, 5344 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/marvell/octeon_ep_vf.rst
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/Kconfig
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/Makefile
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_config.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_ethtool.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_mbox.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_mbox.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_regs_cn9k.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_regs_cnxk.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_tx.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_tx.h
+
+-- 
+2.25.1
+
 
