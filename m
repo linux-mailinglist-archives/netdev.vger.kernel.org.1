@@ -1,341 +1,164 @@
-Return-Path: <netdev+bounces-59576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33FC81B6B0
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:58:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD5081B6BF
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:00:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C22FB25F57
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:58:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E11081C2110A
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C60573198;
-	Thu, 21 Dec 2023 12:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE8C79957;
+	Thu, 21 Dec 2023 12:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iItmko6m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKXPFz4q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F80C77F11
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 12:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BC5740BB;
+	Thu, 21 Dec 2023 12:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cca5d81826so256421fa.2
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 04:53:31 -0800 (PST)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a22f59c6ae6so89984466b.1;
+        Thu, 21 Dec 2023 04:55:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703163209; x=1703768009; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=19pXwZCShdha5tJ35ukqpBu0otaQvagtTsK1B3NRxNs=;
-        b=iItmko6mlpm9mdiioYJ0gZiYLEpSLzz5+TqGlCHtw9flV+2CO/rch74WpszrT5n9P0
-         EHmiPAiOuggDO3YosIrazVqsZcyJlER6dIiBMhe9uuxWvyuauwWjgTWQSXrZxnBop4SF
-         zMKuPE9KKdCCyzslGKu8ZY0lMYEXG5reYy572299P8uetVRJXmfaFKFeWCh9jrcLngqb
-         hEP5uILhsS4I9E7aZo+ygcM6IzZJvPt/mVOfMcb35wWRJOAmnNKAW4ScUtsk2+n09gin
-         lu8C6qSOEg3hlLHzLXVyWf7bUBtnPAsHAoY3o1kKjaRGGOi9p3hpgrd+JQzHuyK7GcPz
-         4pTg==
+        d=gmail.com; s=20230601; t=1703163335; x=1703768135; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OEbMK9xuhcVgV7c3YqDiWD2jNh0hvbrRAI7AYOQ2W6A=;
+        b=MKXPFz4qMKs3axT2e10j/c3Jvt2IeZ2dPF4mvDQFzMwL5gVrR7jaqI0RrSr3SXCwkJ
+         hPubyaH6SgnZJi1kau2QBqVExX0wBkA4vhqbZ1FEVR3Y8nePcYCH6YHsrReAZsE6D+FM
+         j8LaaWuy9xwYH/AuZ7GNOqHwXDs6JdA2g9U5S+ofiwnw+kSq13JNvmHqNAtqwfBkDiSJ
+         V5d+33cEzPf3haSwzlXR4yZjgrZxWzap6+m4CSFrtOr0j3T13nxmzm7YqZsCi4JB7Qxh
+         At7SaGD1uOcTL/m0+RCLTwP8ZphIAt3Mu7B3NFclclxxrTOQui3y2qk+UlldGqt6lotq
+         1E8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703163209; x=1703768009;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1703163335; x=1703768135;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=19pXwZCShdha5tJ35ukqpBu0otaQvagtTsK1B3NRxNs=;
-        b=nwZR3YXZA6+fl/TaKpq/kNhCO+Ze9oTdMcA45npcDPGCPVuLUU8Y4p6PqHV1uazD0x
-         WRQDwHNn0gsRK5XRidfKIpsIzUm8PhWcZRVOo2NX7NTfMKK8hYxo3YzShwVn7AqMTUev
-         P9xd+nisR14YQw36rHFctd8zdPWhFO/PvIi3ee7/azpgeg4xjQmsX63p+O6Vjao7lq3l
-         v/2QgLDhmtee9ZGnLtJptln0Fp2zVH996YZPi8OhzyOAhQIcDNDw5l9RxGw339359v2W
-         DJebN8O4AahbKSUBh7N2pHM6QjkakNnC7OEeD58rK/stPUvRv7+GHbFOHaqUGBVa6MXk
-         Yg0g==
-X-Gm-Message-State: AOJu0YxFIJJ3BFSja7EnCIugJLiEShwd1wHwCO79wABqzyeomxCxbSEN
-	2KIcgG8T+jPIippPxnWnzaQ=
-X-Google-Smtp-Source: AGHT+IHa6Zw6E2nLW+jL/su0+SHF5/Tvd03Oa5jRbUNRn6cpvaQHsUOmMfTe3wJb4oA8xm7G2zgHwQ==
-X-Received: by 2002:a2e:3503:0:b0:2cc:a596:836a with SMTP id z3-20020a2e3503000000b002cca596836amr59782ljz.50.1703163209096;
-        Thu, 21 Dec 2023 04:53:29 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id x22-20020a05651c105600b002cc540b56f9sm255675ljm.3.2023.12.21.04.53.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 04:53:28 -0800 (PST)
-Date: Thu, 21 Dec 2023 15:53:26 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v7 1/9] net: stmmac: Pass stmmac_priv and chan
- in some callbacks
-Message-ID: <grfyq7hezxecs3q6lcqhpukc223pfh6cdyrsoddwelli76667d@47njoehuvkqo>
-References: <cover.1702990507.git.siyanteng@loongson.cn>
- <8414049581ed11a2466dc75e0e1f2ef4be7d0fd9.1702990507.git.siyanteng@loongson.cn>
- <zjyo2kibcrgirfc5pcvbeqbq2dmhpjkilvq3zwsmugee2gc3cf@e7dhxkrr3ha2>
- <8eacd500-b092-4031-91d1-f2edccf18d21@loongson.cn>
+        bh=OEbMK9xuhcVgV7c3YqDiWD2jNh0hvbrRAI7AYOQ2W6A=;
+        b=htbVQfwzHVANObIfpaXaq+XArDzrYys6kPx8Zr+i8oVPSdMevPowXqQoQSw7ERt16k
+         sNi7omWkdDzxnzeTRGP+SoSUbcjgWxxPO3PuTLbCeoL8V2fqr8KDBrSjdCs1Lt6ciLKe
+         k3E+o8F2cKW2qX4lLs8e78UafhI5PHy4iJ7MzEEpy36/9Q8pEgbWF6AmgzXZYrwbgdCP
+         5qNeBG6Nh+mrjmnkEGhMk3pzLmoechgQSIu4Kp5xAqehWBloj8HU4WGB4MsXmIsUKMei
+         2jgz+oOwl6j0/H04d/uVtdzWY2LR+Uc5TrSuRwZ42B0dKq6nk/JyqAayBAdTfbQ+uTKT
+         RRNQ==
+X-Gm-Message-State: AOJu0Ywoqr4E+uxNSieLvcYF7bjeJPhs4L9nhyhkDVz313g0WUGbrvAP
+	VyKvkDovNRVoB0+L1NIw7E6m+xiPIgM=
+X-Google-Smtp-Source: AGHT+IEdbnO9pJQltMwNTWpHRYKwH/rpW/SG162vA+X1ki+tS+DqD3PNklJDamk6Wr+akjGE+q6fGg==
+X-Received: by 2002:a17:907:160c:b0:a23:748e:f3eb with SMTP id cw12-20020a170907160c00b00a23748ef3ebmr1831280ejd.286.1703163334468;
+        Thu, 21 Dec 2023 04:55:34 -0800 (PST)
+Received: from ?IPV6:2a01:c23:b8a5:3600:c010:4b2f:ccc7:a870? (dynamic-2a01-0c23-b8a5-3600-c010-4b2f-ccc7-a870.c23.pool.telefonica.de. [2a01:c23:b8a5:3600:c010:4b2f:ccc7:a870])
+        by smtp.googlemail.com with ESMTPSA id az16-20020a170907905000b00a26ace114ddsm228013ejc.49.2023.12.21.04.55.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Dec 2023 04:55:34 -0800 (PST)
+Message-ID: <5fff816d-e2d6-4632-a6c8-b6c4045058db@gmail.com>
+Date: Thu, 21 Dec 2023 13:55:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8eacd500-b092-4031-91d1-f2edccf18d21@loongson.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] r8169: Fix PCI error on system resume
+Content-Language: en-US
+To: Kai-Heng Feng <kai.heng.feng@canonical.com>, nic_swsd@realtek.com
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231221052510.443674-1-kai.heng.feng@canonical.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20231221052510.443674-1-kai.heng.feng@canonical.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 21, 2023 at 07:50:08PM +0800, Yanteng Si wrote:
+On 21.12.2023 06:25, Kai-Heng Feng wrote:
+> Some r8168 NICs stop working upon system resume:
 > 
-> 在 2023/12/21 02:18, Serge Semin 写道:
-> > Hi Yanteng
-> > 
-> > On Tue, Dec 19, 2023 at 10:17:04PM +0800, Yanteng Si wrote:
-> > > Loongson GMAC and GNET have some special features. To prepare for that,
-> > > pass stmmac_priv and chan to more callbacks, and adjust the callbacks
-> > > accordingly.
-> > > 
-> > > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> > > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> > > ---
-> > >   drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c   |  2 +-
-> > >   drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c |  2 +-
-> > >   drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c  |  2 +-
-> > >   drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c    |  2 +-
-> > >   drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h     |  3 ++-
-> > >   drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c     |  3 ++-
-> > >   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c  |  2 +-
-> > >   drivers/net/ethernet/stmicro/stmmac/hwif.h          | 11 ++++++-----
-> > >   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   |  6 +++---
-> > >   9 files changed, 18 insertions(+), 15 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> > > index 137741b94122..7cdfa0bdb93a 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> > > @@ -395,7 +395,7 @@ static void sun8i_dwmac_dma_start_tx(struct stmmac_priv *priv,
-> > >   	writel(v, ioaddr + EMAC_TX_CTL1);
-> > >   }
-> > > -static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr)
-> > > +static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
-> > As Simon correctly noted this prototype is incomplete. Although AFAICS
-> > you never use a pointer to stmmac_priv in this method. So I guess you
-> > could fix the callback prototype instead.
-> > 
-> > >   {
-> > >   	u32 v;
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > index daf79cdbd3ec..5e80d3eec9db 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > @@ -70,7 +70,7 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
-> > >   	writel(value, ioaddr + DMA_AXI_BUS_MODE);
-> > >   }
-> > > -static void dwmac1000_dma_init(void __iomem *ioaddr,
-> > > +static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			       struct stmmac_dma_cfg *dma_cfg, int atds)
-> > >   {
-> > >   	u32 value = readl(ioaddr + DMA_BUS_MODE);
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
-> > > index dea270f60cc3..105e7d4d798f 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
-> > > @@ -18,7 +18,7 @@
-> > >   #include "dwmac100.h"
-> > >   #include "dwmac_dma.h"
-> > > -static void dwmac100_dma_init(void __iomem *ioaddr,
-> > > +static void dwmac100_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			      struct stmmac_dma_cfg *dma_cfg, int atds)
-> > >   {
-> > >   	/* Enable Application Access by writing to DMA CSR0 */
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> > > index 84d3a8551b03..dc54c4e793fd 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> > > @@ -152,7 +152,7 @@ static void dwmac410_dma_init_channel(struct stmmac_priv *priv,
-> > >   	       ioaddr + DMA_CHAN_INTR_ENA(dwmac4_addrs, chan));
-> > >   }
-> > > -static void dwmac4_dma_init(void __iomem *ioaddr,
-> > > +static void dwmac4_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			    struct stmmac_dma_cfg *dma_cfg, int atds)
-> > >   {
-> > >   	u32 value = readl(ioaddr + DMA_SYS_BUS_MODE);
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > index 72672391675f..e7aef136824b 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > @@ -152,7 +152,8 @@
-> > >   #define NUM_DWMAC1000_DMA_REGS	23
-> > >   #define NUM_DWMAC4_DMA_REGS	27
-> > > -void dwmac_enable_dma_transmission(void __iomem *ioaddr);
-> > > +void dwmac_enable_dma_transmission(struct stmmac_priv *priv,
-> > > +				   void __iomem *ioaddr, u32 chan);
-> > >   void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			  u32 chan, bool rx, bool tx);
-> > >   void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > index 7907d62d3437..2f0df16fb7e4 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > @@ -28,7 +28,8 @@ int dwmac_dma_reset(void __iomem *ioaddr)
-> > >   }
-> > >   /* CSR1 enables the transmit DMA to check for new descriptor */
-> > > -void dwmac_enable_dma_transmission(void __iomem *ioaddr)
-> > > +void dwmac_enable_dma_transmission(struct stmmac_priv *priv,
-> > > +				   void __iomem *ioaddr, u32 chan)
-> > >   {
-> > >   	writel(1, ioaddr + DMA_XMT_POLL_DEMAND);
-> > >   }
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > > index 3cde695fec91..a06f9573876f 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > > @@ -19,7 +19,7 @@ static int dwxgmac2_dma_reset(void __iomem *ioaddr)
-> > >   				  !(value & XGMAC_SWR), 0, 100000);
-> > >   }
-> > > -static void dwxgmac2_dma_init(void __iomem *ioaddr,
-> > > +static void dwxgmac2_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			      struct stmmac_dma_cfg *dma_cfg, int atds)
-> > >   {
-> > >   	u32 value = readl(ioaddr + XGMAC_DMA_SYSBUS_MODE);
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> > > index 7be04b54738b..a44aa3671fb8 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> > > @@ -175,8 +175,8 @@ struct dma_features;
-> > >   struct stmmac_dma_ops {
-> > >   	/* DMA core initialization */
-> > >   	int (*reset)(void __iomem *ioaddr);
-> > > -	void (*init)(void __iomem *ioaddr, struct stmmac_dma_cfg *dma_cfg,
-> > > -		     int atds);
-> > > +	void (*init)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > +		     struct stmmac_dma_cfg *dma_cfg, int atds);
-> > There is a good chance this change is also unnecessary. I'll post my
-> > comment about that to Patch 4/9.
-> > 
-> > >   	void (*init_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			  struct stmmac_dma_cfg *dma_cfg, u32 chan);
-> > >   	void (*init_rx_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > @@ -198,7 +198,8 @@ struct stmmac_dma_ops {
-> > >   	/* To track extra statistic (if supported) */
-> > >   	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
-> > >   				  void __iomem *ioaddr);
-> > 
-> > > -	void (*enable_dma_transmission) (void __iomem *ioaddr);
-> > > +	void (*enable_dma_transmission)(struct stmmac_priv *priv,
-> > > +					void __iomem *ioaddr, u32 chan);
-> > Why do you need the pointer to the stmmac_priv structure instance
-> > here? I failed to find a place you using it in the subsequent patches.
-> it's here：
+> [  688.051096] r8169 0000:02:00.1 enp2s0f1: rtl_ep_ocp_read_cond == 0 (loop: 10, delay: 10000).
+> [  688.175131] r8169 0000:02:00.1 enp2s0f1: Link is Down
+> ...
+> [  691.534611] r8169 0000:02:00.1 enp2s0f1: PCI error (cmd = 0x0407, status_errs = 0x0000)
 > 
-> @@ -70,7 +70,7 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct
-> stmmac_axi *axi)
->      writel(value, ioaddr + DMA_AXI_BUS_MODE);
->  }
+> Not sure if it's related, but those NICs have a BMC device at function
+> 0:
+> 02:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. Realtek RealManage BMC [10ec:816e] (rev 1a)
 > 
+> Since increase the loop wait on rtl_ep_ocp_read_cond can eliminate the
+> issue, so let rtl8168ep_driver_start() to wait a bit longer.
+> 
+As this fixes an actual issue, the patch should target net and have a Fixes tag.
 
+> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> ---
+> v2:
+>  - Wording
+> 
+>  drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index bb787a52bc75..81fd31f6fac4 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -1211,7 +1211,7 @@ static void rtl8168ep_driver_start(struct rtl8169_private *tp)
+>  {
+>  	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_START);
+>  	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
+> -	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 10);
+> +	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
+>  }
+>  
+>  static void rtl8168_driver_start(struct rtl8169_private *tp)
 
-> -static void dwmac1000_dma_init(void __iomem *ioaddr,
-> +static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem
-
-Em, my comment was about enable_dma_transmission() ! I don't see you
-using the stmmac_priv pointer in any updates for that method.
-
-> *ioaddr,
->                     struct stmmac_dma_cfg *dma_cfg, int atds)
->  {
->      u32 value = readl(ioaddr + DMA_BUS_MODE);
-> 
-> @@ -118,7 +118,10 @@ static void dwmac1000_dma_init(struct stmmac_priv
-> *priv, void __iomem *ioaddr,
-> 
->      u32 dma_intr_mask;
-> 
->      /* Mask interrupts by writing to CSR7 */
-> -    dma_intr_mask = DMA_INTR_DEFAULT_MASK;
-> +    if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC)
-> +        dma_intr_mask = DMA_INTR_DEFAULT_MASK_LOONGSON;
-> +    else
-> +        dma_intr_mask = DMA_INTR_DEFAULT_MASK;
-> 
->      dma_config(ioaddr + DMA_BUS_MODE, ioaddr + DMA_INTR_ENA,
-> 
->                dma_cfg, dma_intr_mask, atds);
-> 
-> 
-
-> Thank you for all your comments, I need some time to understand. :)
-
-Don't hesitate to ask should any question arise in my comments regard.
-
--Serge(y)
-
-> 
-> 
-> Thanks,
-> 
-> Yanteng
-> 
-> > 
-> > * Sigh, just a general note in case if somebody would wish to make
-> > * things a bit more optimised and less complicated. The purpose of the
-> > * enable_dma_transmission() callback is to re-activate the DMA-engine
-> > * - exit from suspension and start poll-demanding the DMA descriptors.
-> > * In QoS GMAC and XGMAC the same is done by updating the Tx tail
-> > * pointer.  It's implemented in stmmac_set_tx_tail_ptr(). So basically
-> > * both stmmac_enable_dma_transmission() and stmmac_set_tx_tail_ptr()
-> > * should be almost always called side-by-side. Alas the current
-> > * generic driver part doesn't do that. If it did in a some common way
-> > * you wouldn't have needed the enable_dma_transmission() update
-> > * because it would have already been updated to accept the
-> > * channel/queue parameter.
-> > 
-> > -Serge(y)
-> > 
-> > >   	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			       u32 chan, bool rx, bool tx);
-> > >   	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > @@ -240,7 +241,7 @@ struct stmmac_dma_ops {
-> > >   };
-> > >   #define stmmac_dma_init(__priv, __args...) \
-> > > -	stmmac_do_void_callback(__priv, dma, init, __args)
-> > > +	stmmac_do_void_callback(__priv, dma, init, __priv, __args)
-> > >   #define stmmac_init_chan(__priv, __args...) \
-> > >   	stmmac_do_void_callback(__priv, dma, init_chan, __priv, __args)
-> > >   #define stmmac_init_rx_chan(__priv, __args...) \
-> > > @@ -258,7 +259,7 @@ struct stmmac_dma_ops {
-> > >   #define stmmac_dma_diagnostic_fr(__priv, __args...) \
-> > >   	stmmac_do_void_callback(__priv, dma, dma_diagnostic_fr, __args)
-> > >   #define stmmac_enable_dma_transmission(__priv, __args...) \
-> > > -	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __args)
-> > > +	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __priv, __args)
-> > >   #define stmmac_enable_dma_irq(__priv, __args...) \
-> > >   	stmmac_do_void_callback(__priv, dma, enable_dma_irq, __priv, __args)
-> > >   #define stmmac_disable_dma_irq(__priv, __args...) \
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > index 47de466e432c..d868eb8dafc5 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > @@ -2558,7 +2558,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
-> > >   				       true, priv->mode, true, true,
-> > >   				       xdp_desc.len);
-> > > -		stmmac_enable_dma_transmission(priv, priv->ioaddr);
-> > > +		stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
-> > >   		xsk_tx_metadata_to_compl(meta,
-> > >   					 &tx_q->tx_skbuff_dma[entry].xsk_meta);
-> > > @@ -4679,7 +4679,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
-> > >   	netdev_tx_sent_queue(netdev_get_tx_queue(dev, queue), skb->len);
-> > > -	stmmac_enable_dma_transmission(priv, priv->ioaddr);
-> > > +	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
-> > >   	stmmac_flush_tx_descriptors(priv, queue);
-> > >   	stmmac_tx_timer_arm(priv, queue);
-> > > @@ -4899,7 +4899,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
-> > >   		u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
-> > >   	}
-> > > -	stmmac_enable_dma_transmission(priv, priv->ioaddr);
-> > > +	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
-> > >   	entry = STMMAC_GET_ENTRY(entry, priv->dma_conf.dma_tx_size);
-> > >   	tx_q->cur_tx = entry;
-> > > -- 
-> > > 2.31.4
-> > > 
-> 
 
