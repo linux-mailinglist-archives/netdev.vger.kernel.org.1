@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-59565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5D4E81B510
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:40:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442A181B525
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:45:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 848AB1F2609F
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:40:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7652F1C20C08
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FEEE6D1A4;
-	Thu, 21 Dec 2023 11:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52356D1B7;
+	Thu, 21 Dec 2023 11:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L6FQjRuz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+5QWSzc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94709E54D;
-	Thu, 21 Dec 2023 11:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6894D1DA3B;
+	Thu, 21 Dec 2023 11:45:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-552d39ac3ccso3300553a12.0;
-        Thu, 21 Dec 2023 03:40:19 -0800 (PST)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a2335d81693so127148866b.0;
+        Thu, 21 Dec 2023 03:45:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703158818; x=1703763618; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703159113; x=1703763913; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bJViXlN43+iRsc7tQtP7onxHtkm7MD4wbNdvp5+uNq0=;
-        b=L6FQjRuzG2z56YRznS4CdjT6BnAQEpk0hrVKcPVIUpON/r7a0IwdDGAmzSVzqJzr9f
-         hJkzvHVxcbu3thDDqjFbOnc4Fa8XqOK+sClTuXSsLuOtJFccZUIVEhslpVTpbUpDw0MJ
-         CmS4uyzm4XhzDtRkjir5ltE6MfFmZUCGVKr4xd2cotL/oyk2qYSRyA6RNklFpyW3P6Ct
-         LwtELTNXpYckLhBB/VF0eoWXnXPXN6JVfCMhmPX6OnZ5UkEMNisKvoeU5z0ce7cDRTit
-         aZZvtdZK0x/o/kCeLHiMpwBhtiy+NecZIm1he/5poMDYlklNVRIJJdZThU2lOfJqnvrD
-         rMNA==
+        bh=Dv3qX1FhzTLBhx/de5Ik2+RkLdw2EvpPJKlWc4zn7Zg=;
+        b=P+5QWSzc5h99Gmipp0HHLbW0SCNW1MzY7ng70Mp7URkTFGsna8vcj1YO52458PQlu3
+         OdosLVAcasjV1vxHj8OAwsCGqwjIeDHF0myw6SnxzdYLQL3dAqvch8MyUGKw72gzHN+m
+         7WRnBXl54l8eFPAx+n2+yGnSWLFZ/xbNk5w/XJsHtNUcCT6eckyNG24c206JFymZmHpb
+         +1frOl92W+pFhZDZ1EooWEMZcxNigTGbi6VYND3x2SFJBtMIvBXABj6P+s/zl5to4IuM
+         cQCbc1rDTyrpGntgk9nm0gLc1hdbCu/cz+9SXUj5BP6DcyEOEF6XZl4IUcx8W2TKMBDJ
+         ayJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703158818; x=1703763618;
+        d=1e100.net; s=20230601; t=1703159113; x=1703763913;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bJViXlN43+iRsc7tQtP7onxHtkm7MD4wbNdvp5+uNq0=;
-        b=UdXAWjyVY1zka5WNeSFqVFS8nXfyNFz8rlZ5v9XlWmc3SGbcyCl1HP+IK/MHRnn0dq
-         vruR6/kGf/Ura+LwiGSFJg7z77v53bCpFTan6Qbpyhci7pDuU3Gz8NI3RJ3qOsH3ZMzo
-         umtZ1JXldO7qG3bUaqFKnrxl5W8YjTaHXX8do7XTSljGldXse2xdDka75II75mXqs2xT
-         JQsTQ5pJlw3UszFVEOFtDk97qdu8eIrsPgtuMq1/yMbf7Zl4TCPTL37M1gwyIpU/Kh1N
-         oWOMzx7VW2vCj7dONUbs38A4JGToA+cUVnXUuNNf737aMcxiAE3AKoJMvBk/pOaoQWx/
-         fSnw==
-X-Gm-Message-State: AOJu0Yxkg8+firhke8HUjghDmO2ko8ptAPkblROpBNSxn+bGhBYiZkJv
-	xwgVeNiWWZvkTKgaB1QETPA=
-X-Google-Smtp-Source: AGHT+IEDP4KlQfXb97OTp6b1RY5N4TnRaYKKc8FDlEs3gNJ8KxokH95ou0MoSVqWAdcmuBYFXdvanw==
-X-Received: by 2002:a17:906:5350:b0:a23:8949:66f4 with SMTP id j16-20020a170906535000b00a23894966f4mr645571ejo.59.1703158817606;
-        Thu, 21 Dec 2023 03:40:17 -0800 (PST)
+        bh=Dv3qX1FhzTLBhx/de5Ik2+RkLdw2EvpPJKlWc4zn7Zg=;
+        b=PFnVaqIRkGTokD7N83E0ZTsP1gHZqowNbtUQRIxpN8PH+K3sxSTz7IBoaSultZZG5h
+         +QxDihHELKmoHQrDEpdBgfTiSerR0JMpj1KI3STDPwC2a2N5nLgX38YQh3FoNHn6WRIQ
+         wlRkF0xA8M2AVLJ6ymDhzBMoeQXI0hXWxCQjIbuQase+Fr6/lCn1KndISJLkvwNWnT73
+         EftHfMNWjdVef5S4X2Pe9Ds9QZAZqdg/m3YJOhHxOOcI5Xx8BnukLpB789nNja2/2wuE
+         KKYSpHFXiYCRMaMzEEqiy6Yb/GcsTiPpCejKarqXMh5P7iR41uXeI7l9pDMyhesNfRRQ
+         3lUw==
+X-Gm-Message-State: AOJu0YzIFFlI+4S+/IWNa8444v7GX3j85vDyE6Fe4o/avzbjysORUds0
+	i7yhRToRvR8wGxk68jrZ2Lg=
+X-Google-Smtp-Source: AGHT+IE0IRYr9V+lQg47qf/RXmlrFTPiUy4YqmUsACwvpuKKYqrlXke3x5A4mm+32jZQ20iRgcqOwg==
+X-Received: by 2002:a17:906:f2c8:b0:a23:62fd:e2f6 with SMTP id gz8-20020a170906f2c800b00a2362fde2f6mr711558ejb.30.1703159112231;
+        Thu, 21 Dec 2023 03:45:12 -0800 (PST)
 Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id fr1-20020a170906890100b00a236193fe3esm862124ejc.96.2023.12.21.03.40.16
+        by smtp.gmail.com with ESMTPSA id ad21-20020a170907259500b00a2686968ee8sm861454ejc.58.2023.12.21.03.45.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 03:40:17 -0800 (PST)
-Date: Thu, 21 Dec 2023 12:40:15 +0100
+        Thu, 21 Dec 2023 03:45:11 -0800 (PST)
+Date: Thu, 21 Dec 2023 12:45:09 +0100
 From: Dimitri Fedrau <dima.fedrau@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -66,13 +66,12 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] net: phy: marvell-88q2xxx: add driver for the
+Subject: Re: [PATCH v3 0/4] net: phy: marvell-88q2xxx: add driver for the
  Marvell 88Q2220 PHY
-Message-ID: <20231221114015.GA109788@debian>
+Message-ID: <20231221114509.GB109788@debian>
 References: <20231219093554.GA6393@debian>
  <20231221072853.107678-1-dima.fedrau@gmail.com>
- <20231221072853.107678-5-dima.fedrau@gmail.com>
- <c2433183-7893-43b1-8de8-9ed847f8a721@lunn.ch>
+ <c3addf0d-3693-41ef-9f8f-b9f28487c88d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,38 +80,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c2433183-7893-43b1-8de8-9ed847f8a721@lunn.ch>
+In-Reply-To: <c3addf0d-3693-41ef-9f8f-b9f28487c88d@lunn.ch>
 
-Am Thu, Dec 21, 2023 at 10:53:27AM +0100 schrieb Andrew Lunn:
-> > -static int mv88q2xxxx_get_sqi(struct phy_device *phydev)
-> > +static int mv88q2xxx_get_sqi(struct phy_device *phydev)
-> >  {
-> >  	int ret;
-> >  
-> > @@ -208,7 +283,8 @@ static int mv88q2xxxx_get_sqi(struct phy_device *phydev)
-> >  		/* Read the SQI from the vendor specific receiver status
-> >  		 * register
-> >  		 */
-> > -		ret = phy_read_mmd(phydev, MDIO_MMD_PCS, 0x8230);
-> > +		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
-> > +				   MDIO_MMD_PCS_MV_RX_STAT);
-> >  		if (ret < 0)
-> >  			return ret;
-> >  
-> > @@ -230,11 +306,208 @@ static int mv88q2xxxx_get_sqi(struct phy_device *phydev)
-> >  	return ret & 0x0F;
-> >  }
-> >  
-> > -static int mv88q2xxxx_get_sqi_max(struct phy_device *phydev)
-> > +static int mv88q2xxx_get_sqi_max(struct phy_device *phydev)
-> >  {
-> >  	return 15;
-> >  }
+Am Thu, Dec 21, 2023 at 10:44:39AM +0100 schrieb Andrew Lunn:
+> On Thu, Dec 21, 2023 at 08:28:47AM +0100, Dimitri Fedrau wrote:
+> > Changes in v2:
+> > 	- used defines MDIO_CTRL1_LPOWER and MDIO_PMA_CTRL1_SPEED1000
+> > 	  in mv88q222x_config_aneg_preinit
+> > 	- use genphy_c45_loopback
+> > 	- mv88q2xxx_read_status reads speed, master or slave state when
+> > 	  autonegotiation is enabled
+> > 	- added defines for magic values in mv88q222x_get_sqi
 > 
-> This could be a patch of its own.
+> Please create a new thread for each version of the patch. The
+> automation does not like new versions appended onto old versions, so
+> this might not of been build tested.
 >
-Will fix this in V4.
-
+Ok. Thanks for reviewing my code and your patience.
 >      Andrew
 
 Best regards,
