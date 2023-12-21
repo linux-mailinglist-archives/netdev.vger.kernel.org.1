@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-59819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 448F581C1EE
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:25:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 878C381C1F4
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:27:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF87FB237A8
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:25:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9D541C21EC9
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E05579975;
-	Thu, 21 Dec 2023 23:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2C47947C;
+	Thu, 21 Dec 2023 23:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wnNxhZAx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nJrlg1/9"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88B17AE9A
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 23:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCAC78E8F
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 23:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shakeelb.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-db402e6f61dso1739084276.3
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 15:23:46 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbdb5c2b1beso1604672276.0
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 15:27:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703201026; x=1703805826; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1703201238; x=1703806038; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cU9mOyLPoF6ZxNM7jnDLVtHU9dKeo3lsrx7E6D/L6sI=;
-        b=wnNxhZAx2RX0s8u6x7TtIydkNLm9qrU/5oV+9s1dYUn/reNnhbQcTmYo412fswQsde
-         GTe9gBz4/PxwrYLPd7c8jYKNA+Gt64zuW02eb4Tc74FAARKDjPbtiXiS0Eco9wdbYbxj
-         EjeRxMWB5ROkVOvQmNr7HbKbYZSReB20ppFx6qDbB44V0vHxVHylDsO3yT7JxT0H7kw4
-         qBb8RTQucI51BXHWCUmLaFFdjRGJeHFZW9FVI8lhXA5W62Vt9XFzbCBwTF8QlMRMPBRi
-         bqN8xg9zjgUyu6uTIm+EBxBtkou4FKqzNYDPOdDvXPwiD/ujdwsyGI0lQvUM7OX5vsuy
-         LHfQ==
+        bh=TQBK3S+cxkss8EKQd6OTegL/cKtMcOEpQ7fU5gL2SH4=;
+        b=nJrlg1/9MsnYkYSlpCdysaWME5jsY7BOeIB6SURa0FBW520SU7TwqQJNMse0oWSVuN
+         0oUGTCxGmN+I351T6b2HvFRJD2QYJfPBtfdd6r+qdMLQXUoimHxvsqKBenyfl+/weepN
+         WWd4WHTz63z3kvqzzULHw5lyYmElT7c1LjKP0oBqTz+sHWIkdDibsU/6dZQhnGHwHxcP
+         IgA7H+DKZPpHcCostzbnAOY8j1IlA158aWRTXkH4Xf+x962B9nWRCPmBxBxV5Pmc4nVr
+         Q6FK0AXYtSsiGWT2wUoYKYHadAt5+R3+d1GSmj923qoG7zXpSPawlUK1rlCO4yqUyxnJ
+         e1+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703201026; x=1703805826;
+        d=1e100.net; s=20230601; t=1703201238; x=1703806038;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cU9mOyLPoF6ZxNM7jnDLVtHU9dKeo3lsrx7E6D/L6sI=;
-        b=urmYi/ZUjIzMd1/I00Th3sVpEJBVnJjegGw8k+WGpU/Jzg7vzyMiOBmN9yVjW7Clr9
-         c7PXXC6CflR0YJw655fEOrDynvv9Q7p287e9bzJ5Sd5meMvHUw4GYjyKW++Cn13JVqSu
-         iHCCzl5n4UgC4TkDewE2xM6ZeepdntaGGve+hB/3hTBBJbpR2Aj/vdyjB/t6Y2Oq2cKB
-         gtlN3kYbCuPcwqPD0ka8xgXRF+rhMKJ6/DoXUYYMAYWBn5sfy3MOAZGyTyQF11+W2sYU
-         hdEFpWHh/iEMg1FI/bx96QhAIkjPizU6NH9gUaxK0wyKfkQ3sWbUpjo/wHG1j786mxCl
-         lkOg==
-X-Gm-Message-State: AOJu0Yy+pO9HGXi6qXUefhIXt2vm8GLNv+WucerfKl+OM3K/DCFXr0iN
-	nfBOQmIigVN8NhtirW8jFQH0OMWHvxxq546IPp3G
-X-Google-Smtp-Source: AGHT+IHWiT1s/e6el8Gbfa2jmdYfbMdaJTd+pS4T1tXJHPKsVM+5WAmrvhPrUoUOQ5Wk4tJyK70wKIQ5Qx+mgg==
+        bh=TQBK3S+cxkss8EKQd6OTegL/cKtMcOEpQ7fU5gL2SH4=;
+        b=GMu5mK6RPfNDeBe24WcEVTBabDXAZ60ft2cVK7j/sXHOQqzyO0OyxztERbkoiAEOVU
+         JPNSKRpLTkrtbxdxpqZcLFEKptVSFDRs1IN1Gpx+uFrFGQ+hH85RPLxDwohxTOEe/MGU
+         IRL6O7I0zDpr/4Awt14MRNEk2NrKWMuo2mdqgxbLYZzUkM0pnWT56thBN8qJziIUB171
+         crz2aCLb8D7M4149/ezByuk2X7Psi1fPPZVUm8XCjNn3qptsRnF9J1OX2zlqegqgg1m0
+         pcCrfGZnQtqY4LcjH+KAIc2k3heGDBOPKSbkobCf3DhoEbik0KQf9qjv0QyI0n4k6JTA
+         BUsw==
+X-Gm-Message-State: AOJu0YwBnmpszPz3q/JtqOMgObbMOTkFQ0nWbI5xXhhehjjSovxqUaKP
+	ZfSE9vez8r/xsP89iPYtpOwbLLw4HGg1uGRfx16M
+X-Google-Smtp-Source: AGHT+IHz6Vx9BVCm69eXFOwEY+5r5/zDa9Kri6vSrgY7qRPuVVIYL/un696UdtbG9xPdf62Sv/ozrRMtnVdK/Q==
 X-Received: from shakeelb.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:262e])
- (user=shakeelb job=sendgmr) by 2002:a25:bcc2:0:b0:db5:47c1:e82d with SMTP id
- l2-20020a25bcc2000000b00db547c1e82dmr189052ybm.6.1703201025720; Thu, 21 Dec
- 2023 15:23:45 -0800 (PST)
-Date: Thu, 21 Dec 2023 23:23:43 +0000
-In-Reply-To: <20231220214505.2303297-3-almasrymina@google.com>
+ (user=shakeelb job=sendgmr) by 2002:a25:844e:0:b0:dbd:2c5a:6c53 with SMTP id
+ r14-20020a25844e000000b00dbd2c5a6c53mr188580ybm.6.1703201238254; Thu, 21 Dec
+ 2023 15:27:18 -0800 (PST)
+Date: Thu, 21 Dec 2023 23:27:16 +0000
+In-Reply-To: <20231220214505.2303297-4-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231220214505.2303297-1-almasrymina@google.com> <20231220214505.2303297-3-almasrymina@google.com>
-Message-ID: <20231221232343.qogdsoavt7z45dfc@google.com>
-Subject: Re: [PATCH net-next v3 2/3] net: introduce abstraction for network memory
+References: <20231220214505.2303297-1-almasrymina@google.com> <20231220214505.2303297-4-almasrymina@google.com>
+Message-ID: <20231221232716.4fspnvngfuqhaycu@google.com>
+Subject: Re: [PATCH net-next v3 3/3] net: add netmem_ref to skb_frag_t
 From: Shakeel Butt <shakeelb@google.com>
 To: Mina Almasry <almasrymina@google.com>
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
@@ -75,49 +75,34 @@ Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Dec 20, 2023 at 01:45:01PM -0800, Mina Almasry wrote:
-> Add the netmem_ref type, an abstraction for network memory.
-> 
-> To add support for new memory types to the net stack, we must first
-> abstract the current memory type. Currently parts of the net stack
-> use struct page directly:
-> 
-> - page_pool
-> - drivers
-> - skb_frag_t
-> 
-> Originally the plan was to reuse struct page* for the new memory types,
-> and to set the LSB on the page* to indicate it's not really a page.
-> However, for compiler type checking we need to introduce a new type.
-> 
-> netmem_ref is introduced to abstract the underlying memory type. Currently
-> it's a no-op abstraction that is always a struct page underneath. In
-> parallel there is an undergoing effort to add support for devmem to the
-> net stack:
-> 
-> https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@google.com/
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
-> ---
-> 
-> v3:
-> 
-> - Modify struct netmem from a union of struct page + new types to an opaque
->   netmem_ref type.  I went with:
-> 
->   +typedef void *__bitwise netmem_ref;
-> 
->   rather than this that Jakub recommended:
-> 
->   +typedef unsigned long __bitwise netmem_ref;
-> 
->   Because with the latter the compiler issues warnings to cast NULL to
->   netmem_ref. I hope that's ok.
-> 
+On Wed, Dec 20, 2023 at 01:45:02PM -0800, Mina Almasry wrote:
+> diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
+> index 65d1f6755f98..3180a54b2c68 100644
+> --- a/net/kcm/kcmsock.c
+> +++ b/net/kcm/kcmsock.c
+> @@ -636,9 +636,15 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
+>  		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++)
+>  			msize += skb_shinfo(skb)->frags[i].bv_len;
 
-Can you share what the warning was? You might just need __force
-attribute. However you might need this __force a lot. I wonder if you
-can just follow struct encoded_page example verbatim here.
+Don't you need the above to cast to bio_vec to get bv_len? skb_frag_t
+does not have bv_len anymore.
 
+>  
+> +		/* The cast to struct bio_vec* here assumes the frags are
+> +		 * struct page based. WARN if there is no page in this skb.
+> +		 */
+> +		DEBUG_NET_WARN_ON_ONCE(
+> +			!skb_frag_page(&skb_shinfo(skb)->frags[0]));
+> +
+>  		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE,
+> -			      skb_shinfo(skb)->frags, skb_shinfo(skb)->nr_frags,
+> -			      msize);
+> +			      (const struct bio_vec *)skb_shinfo(skb)->frags,
+> +			      skb_shinfo(skb)->nr_frags, msize);
+>  		iov_iter_advance(&msg.msg_iter, txm->frag_offset);
+>  
+>  		do {
+> -- 
+> 2.43.0.472.g3155946c3a-goog
+> 
 
