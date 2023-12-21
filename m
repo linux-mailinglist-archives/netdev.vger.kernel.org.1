@@ -1,118 +1,229 @@
-Return-Path: <netdev+bounces-59462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3304881AEDB
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 07:38:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6916281AF0E
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 08:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 656701C22C1C
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 06:38:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB34C1F23603
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 07:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3E3B678;
-	Thu, 21 Dec 2023 06:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60424BA57;
+	Thu, 21 Dec 2023 07:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jBtKBo2Z"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Xk0Tc1Jd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE5B11733;
-	Thu, 21 Dec 2023 06:38:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9343DC433C8;
-	Thu, 21 Dec 2023 06:38:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703140716;
-	bh=Yhl/ykyxVA6LA1kDZOxQMgUP3Z7vfjny1ZSJoKucqog=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=jBtKBo2ZiBpDcT422t0EOms8MP/5gNWYSaAN1ggNe2OggUvouJznOezeC94w6b1Z6
-	 cTAX5Rrnp/va+W1GfKitWezNesm2EIoqYKPnvu3vIdjaTTgEiJr58GuXy1Oc3CZXX8
-	 KK5lDh23OJ6Vj1fHORrGFO7wWF8ZjKASNFD2//xaAjVwp0lu1KPO1TqVgpKvSmANOq
-	 veWV8V6Fndry8QbjxQkrO1LIM9K5eVkZbu3uQ2cb6Sy3VAcnohMYZlsKq6cNomkKM7
-	 Cz0u9b+SIwnDAo/oLZzh5fiv29mgP6wX2hJeVDCVRb9BE7fnU/ychZW+Yrv9DsR9zl
-	 RdooDQ6blXDIw==
-From: Kalle Valo <kvalo@kernel.org>
-To: "Ma, Jun" <majun@amd.com>
-Cc: Mario Limonciello <mario.limonciello@amd.com>,  Johannes Berg
- <johannes@sipsolutions.net>,  "David S . Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
-  Paolo Abeni <pabeni@redhat.com>,  "open list:MAC80211"
- <linux-wireless@vger.kernel.org>,  "open list:NETWORKING [GENERAL]"
- <netdev@vger.kernel.org>,  open list <linux-kernel@vger.kernel.org>,  Jun
- Ma <Jun.ma2@amd.com>
-Subject: Re: [PATCH] wifi: mac80211: Use subsystem appropriate debug call
-References: <20231215145439.57286-1-mario.limonciello@amd.com>
-	<87frzzsfoi.fsf@kernel.org>
-	<46bf6ed5-31f6-48f4-b63d-f532e163204e@amd.com>
-Date: Thu, 21 Dec 2023 08:38:32 +0200
-In-Reply-To: <46bf6ed5-31f6-48f4-b63d-f532e163204e@amd.com> (Jun Ma's message
-	of "Thu, 21 Dec 2023 13:57:50 +0800")
-Message-ID: <87cyv0oyaf.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80102BA33;
+	Thu, 21 Dec 2023 07:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1703142304; x=1734678304;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=pSSf6YfEkI/G5MSolcsXuueZnr34EfrXqIHSzGNN4Dg=;
+  b=Xk0Tc1JdZL3k+FpTu/bQFv3EK5UFdl9d2O8emhO4oiYg2Y1zSBp8iKHe
+   Y6oKQTNAqF1oc/tkQiDhvQ57rceoXH06pxVFPa0dokOJoCdIzGWp+oitk
+   1lEMHUkNZzGY1F5jY29joKZlPfB0yNtvTGzj2MvmARQSL9+Me4Y3QGjAt
+   A=;
+X-IronPort-AV: E=Sophos;i="6.04,293,1695686400"; 
+   d="scan'208";a="377868137"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 07:05:00 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com (Postfix) with ESMTPS id 2E85C40E6D;
+	Thu, 21 Dec 2023 07:04:59 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:18773]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.218:2525] with esmtp (Farcaster)
+ id 475f4d02-2202-4e06-889b-24000d3373ac; Thu, 21 Dec 2023 07:04:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 475f4d02-2202-4e06-889b-24000d3373ac
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 21 Dec 2023 07:04:58 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.143.88.82) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 21 Dec 2023 07:04:53 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <martin.lau@linux.dev>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <edumazet@google.com>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<yonghong.song@linux.dev>
+Subject: Re: [PATCH v7 bpf-next 6/6] selftest: bpf: Test bpf_sk_assign_tcp_reqsk().
+Date: Thu, 21 Dec 2023 16:04:43 +0900
+Message-ID: <20231221070443.68167-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <bd21939e-c6c8-4fb2-a4b6-e085a2230c8e@linux.dev>
+References: <bd21939e-c6c8-4fb2-a4b6-e085a2230c8e@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWB004.ant.amazon.com (10.13.139.134) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-"Ma, Jun" <majun@amd.com> writes:
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Date: Wed, 20 Dec 2023 22:35:26 -0800
+> On 12/20/23 5:28 PM, Kuniyuki Iwashima wrote:
+> > +static int tcp_validate_header(struct tcp_syncookie *ctx)
+> > +{
+> > +	s64 csum;
+> > +
+> > +	if (tcp_reload_headers(ctx))
+> > +		goto err;
+> > +
+> > +	csum = bpf_csum_diff(0, 0, (void *)ctx->tcp, ctx->tcp->doff * 4, 0);
+> > +	if (csum < 0)
+> > +		goto err;
+> > +
+> > +	if (ctx->ipv4) {
+> > +		/* check tcp_v4_csum(csum) is 0 if not on lo. */
+> > +
+> > +		csum = bpf_csum_diff(0, 0, (void *)ctx->ipv4, ctx->ipv4->ihl * 4, 0);
+> > +		if (csum < 0)
+> > +			goto err;
+> > +
+> > +		if (csum_fold(csum) != 0)
+> > +			goto err;
+> > +	} else if (ctx->ipv6) {
+> > +		/* check tcp_v6_csum(csum) is 0 if not on lo. */
+> > +	}
+> > +
+> > +	return 0;
+> > +err:
+> > +	return -1;
+> > +}
+> > +
+> > +static int tcp_parse_option(__u32 index, struct tcp_syncookie *ctx)
+> > +{
+> > +	char opcode, opsize;
+> > +
+> > +	if (ctx->ptr + 1 > ctx->data_end)
+> > +		goto stop;
+> > +
+> > +	opcode = *ctx->ptr++;
+> > +
+> > +	if (opcode == TCPOPT_EOL)
+> > +		goto stop;
+> > +
+> > +	if (opcode == TCPOPT_NOP)
+> > +		goto next;
+> > +
+> > +	if (ctx->ptr + 1 > ctx->data_end)
+> > +		goto stop;
+> > +
+> > +	opsize = *ctx->ptr++;
+> > +
+> > +	if (opsize < 2)
+> > +		goto stop;
+> > +
+> > +	switch (opcode) {
+> > +	case TCPOPT_MSS:
+> > +		if (opsize == TCPOLEN_MSS && ctx->tcp->syn &&
+> > +		    ctx->ptr + (TCPOLEN_MSS - 2) < ctx->data_end)
+> > +			ctx->attrs.mss = get_unaligned_be16(ctx->ptr);
+> > +		break;
+> > +	case TCPOPT_WINDOW:
+> > +		if (opsize == TCPOLEN_WINDOW && ctx->tcp->syn &&
+> > +		    ctx->ptr + (TCPOLEN_WINDOW - 2) < ctx->data_end) {
+> > +			ctx->attrs.wscale_ok = 1;
+> > +			ctx->attrs.snd_wscale = *ctx->ptr;
+> > +		}
+> > +		break;
+> > +	case TCPOPT_TIMESTAMP:
+> > +		if (opsize == TCPOLEN_TIMESTAMP &&
+> > +		    ctx->ptr + (TCPOLEN_TIMESTAMP - 2) < ctx->data_end) {
+> > +			ctx->attrs.rcv_tsval = get_unaligned_be32(ctx->ptr);
+> > +			ctx->attrs.rcv_tsecr = get_unaligned_be32(ctx->ptr + 4);
+> > +
+> > +			if (ctx->tcp->syn && ctx->attrs.rcv_tsecr)
+> > +				ctx->attrs.tstamp_ok = 0;
+> > +			else
+> > +				ctx->attrs.tstamp_ok = 1;
+> > +		}
+> > +		break;
+> > +	case TCPOPT_SACK_PERM:
+> > +		if (opsize == TCPOLEN_SACK_PERM && ctx->tcp->syn &&
+> > +		    ctx->ptr + (TCPOLEN_SACK_PERM - 2) < ctx->data_end)
+> > +			ctx->attrs.sack_ok = 1;
+> > +		break;
+> > +	}
+> > +
+> > +	ctx->ptr += opsize - 2;
+> > +next:
+> > +	return 0;
+> > +stop:
+> > +	return 1;
+> > +}
+> > +
+> > +static void tcp_parse_options(struct tcp_syncookie *ctx)
+> > +{
+> > +	ctx->ptr = (char *)(ctx->tcp + 1);
+> > +
+> > +	bpf_loop(40, tcp_parse_option, ctx, 0);
+> > +}
+> > +
+> > +static int tcp_validate_sysctl(struct tcp_syncookie *ctx)
+> > +{
+> > +	if ((ctx->ipv4 && ctx->attrs.mss != MSS_LOCAL_IPV4) ||
+> > +	    (ctx->ipv6 && ctx->attrs.mss != MSS_LOCAL_IPV6))
+> > +		goto err;
+> > +
+> > +	if (!ctx->attrs.wscale_ok || ctx->attrs.snd_wscale != 7)
+> > +		goto err;
+> > +
+> > +	if (!ctx->attrs.tstamp_ok)
+> 
+> The bpf-ci reported error in cpuv4. The email from bot+bpf-ci@kernel.org has the 
+> link.
 
-> Hi,
->
-> On 12/18/2023 11:17 PM, Kalle Valo wrote:
->> Mario Limonciello <mario.limonciello@amd.com> writes:
->> 
->>> mac80211 doesn't use dev_dbg() but instead various macros from
->>> net/mac80211/debug.h. Adjust wbrf code to use wiphy_dbg() instead.
->>>
->>> Cc: Jun Ma <Jun.ma2@amd.com>
->>> Reported-by: kvalo@kernel.org
->>> Closes:
->>> https://lore.kernel.org/amd-gfx/8bd60010-7534-4c22-9337-c4219946d8d6@amd.com/T/#mfe2f29372c45130d27745912faf33d9f7ce50118
->>> Fixes: d34be4310cbe ("wifi: mac80211: Add support for WBRF features")
->>> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
->>> ---
->>>  net/mac80211/wbrf.c | 4 ++--
->>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/net/mac80211/wbrf.c b/net/mac80211/wbrf.c
->>> index a05c5b971789..12c23e14f884 100644
->>> --- a/net/mac80211/wbrf.c
->>> +++ b/net/mac80211/wbrf.c
->>> @@ -23,8 +23,8 @@ void ieee80211_check_wbrf_support(struct ieee80211_local *local)
->>>  		return;
->>>  
->>>  	local->wbrf_supported = acpi_amd_wbrf_supported_producer(dev);
->>> -	dev_dbg(dev, "WBRF is %s supported\n",
->>> -		local->wbrf_supported ? "" : "not");
->>> +	wiphy_dbg(wiphy, "WBRF is %s supported\n",
->>> +		  local->wbrf_supported ? "" : "not");
->>>  }
->> 
->> This won't work, I still see the debug message:
->> 
->> [  333.765867] ieee80211 phy0: WBRF is not supported
->> 
->> The issue seems to be that mac80211 defines DEBUG in
->> net/mac80211/Makefile:
->> 
->> ccflags-y += -DDEBUG
->> 
->> That -DDEBUG should be cleaned up, but I think separately. It's just
->> that I cannot come up with any good proposal, all the macros in
->> net/mac80211/debug.h require sdata and we don't have that in this stage.
->> Any ideas?
->
-> I will submit a patch that only compiles wbrf.c when CONFIG_AMD_WBRF=y
+I like the mail from the bot, it's useful, but it seems that
+it's sent to the patch author only when the CI passes ?
 
-But does this mean that the debug is still printed when CONFIG_AMD_WBRF
-is enabled? And I would assume all distros enable that, right?
+But yeah, I found the failed test.
+https://github.com/kernel-patches/bpf/actions/runs/7284164398/job/19849657597
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+> 
+> I tried the following:
+> 
+> 	if (!ctx->attrs.tstamp_ok) {
+> 		bpf_printk("ctx->attrs.tstamp_ok %u",
+> 			ctx->attrs.tstamp_ok);
+> 		goto err;
+> 	}
+> 
+> 
+> The above prints tstamp_ok as 1 while there is a "if (!ctx->attrs.tstamp_ok)" 
+> test before it.
+> 
+> Yonghong and I debugged it quite a bit. verifier concluded the 
+> ctx->attrs.tstamp_ok is 0. We knew some red herring like cpuv4 has fewer 
+> register spilling but not able to root cause it yet.
+> 
+> In the mean time, there are existing selftests parsing the tcp header. For 
+> example, the test_parse_tcp_hdr_opt[_dynptr].c. Not as complete as your 
+> tcp_parse_option() but should be pretty close. It does not use bpf_loop. It uses 
+> a bounded loop + a subprog (the parse_hdr_opt in the selftests) instead. You can 
+> consider a similar construct to see if it works around the cpuv4 CI issue for 
+> the time being.
+
+Sure, I'll install the latest clang/llvm and check if the test
+passes without bpf_loop().
+
+Thanks!
+
 
