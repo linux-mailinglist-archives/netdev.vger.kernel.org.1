@@ -1,68 +1,62 @@
-Return-Path: <netdev+bounces-59634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89F2B81B88E
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:48:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2486081B890
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:48:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE4841C2593B
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:48:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BD4C1F269E5
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4EA46D6ED;
-	Thu, 21 Dec 2023 13:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277C96D6F4;
+	Thu, 21 Dec 2023 13:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mE7vbur8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G3OoJFs4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165846D6E7;
-	Thu, 21 Dec 2023 13:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D556D6FB
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703165237; x=1734701237;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=q2093ZnsMZvgQaMPyjj3n9Ui20GdMLK+vKTbvIUoFAc=;
-  b=mE7vbur89We6B47HVffqqYirgoBNFgOe5xZgM2IWpP/WhAWml6LUD/Jw
-   qpdHvejaWhFHriPLP3aeNJVERABHLgo5ARrEV/iRemTDlLmGy5IpHV4wh
-   Rw6H5rxXUmdRDcP0u5qqsDJgntXCCH5o0VPiM0A/NStytemVZpDQ7U7S2
-   VFS58BhkkodBL5juoKb80ost/2dYWEpLeL8tceS4hr5DL3HWkEQWjeyow
-   iQ6Du2Vvp953Ew2hiOftNFKSGCcseMllFjBNv814mVGAtlRq97D2e8QvZ
-   7RQ0Pmc4qIFmjBffcn1LbVIFvBqIQHEnqsCLZY49LoAHeY+93PGab5VkC
+  t=1703165261; x=1734701261;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=aleQJPWuPPAp07EORrmo8USwM+efZBPIKfnkxAkmJec=;
+  b=G3OoJFs4y24CPWAJA0MuTi2MPXnSM4HK57IQnpYAMLa+4tNBzPg3HtMV
+   6fZqQZXmLgOQgqABmQCy6mSB6pzGcA9VH3xWylRr6tU2TyirNHRiXu121
+   KdKq82AJZ8tOu+Nj7oCL9la+/kFhELxZy2fZOw7Eiow8Uq2F4EBCt2SHd
+   k9BWNZPLOrO0SQ9crj8nWRtfPMVnHsDUfmc6qz6Q0Y6M69buLx02qR1Gq
+   68dllaQSkdbLqFmHdCwpHED1Tt72jgqco/B1EOaqkVWOMyOAo/5xKkobs
+   /HVz+cSCimN9RFPRojDLlZ8v1nyq5azefIZDsbip76u5APknkM2y9llkR
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="3205579"
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="386400167"
 X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="3205579"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 05:27:17 -0800
+   d="scan'208";a="386400167"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 05:27:39 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="24955815"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orviesa001.jf.intel.com with ESMTP; 21 Dec 2023 05:27:14 -0800
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org
+   d="scan'208";a="18683812"
+Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
+  by fmviesa001.fm.intel.com with ESMTP; 21 Dec 2023 05:27:37 -0800
+From: Andrii Staikov <andrii.staikov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	maciej.fijalkowski@intel.com,
-	echaudro@redhat.com,
-	lorenzo@kernel.org,
-	tirthendu.sarkar@intel.com
-Subject: [PATCH v3 bpf 4/4] i40e: handle multi-buffer packets that are shrunk by xdp prog
-Date: Thu, 21 Dec 2023 14:26:56 +0100
-Message-Id: <20231221132656.384606-5-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20231221132656.384606-1-maciej.fijalkowski@intel.com>
-References: <20231221132656.384606-1-maciej.fijalkowski@intel.com>
+	Andrii Staikov <andrii.staikov@intel.com>,
+	Karen Ostrowska <karen.ostrowska@intel.com>,
+	Mateusz Palczewski <mateusz.palczewski@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net  v5] i40e: Restore VF MSI-X state during PCI reset
+Date: Thu, 21 Dec 2023 14:27:35 +0100
+Message-Id: <20231221132735.1246164-1-andrii.staikov@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,175 +65,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+During a PCI FLR the MSI-X Enable flag in the VF PCI MSI-X capability
+register will be cleared. This can lead to issues when a VF is
+assigned to a VM because in these cases the VF driver receives no
+indication of the PF PCI error/reset and additionally it is incapable
+of restoring the cleared flag in the hypervisor configuration space
+without fully reinitializing the driver interrupt functionality.
 
-XDP programs can shrink packets by calling the bpf_xdp_adjust_tail()
-helper function. For multi-buffer packets this may lead to reduction of
-frag count stored in skb_shared_info area of the xdp_buff struct. This
-results in issues with the current handling of XDP_PASS and XDP_DROP
-cases.
+Since the VF driver is unable to easily resolve this condition on its own,
+restore the VF MSI-X flag during the PF PCI reset handling.
 
-For XDP_PASS, currently skb is being built using frag count of
-xdp_buffer before it was processed by XDP prog and thus will result in
-an inconsistent skb when frag count gets reduced by XDP prog. To fix
-this, get correct frag count while building the skb instead of using
-pre-obtained frag count.
-
-For XDP_DROP, current page recycling logic will not reuse the page but
-instead will adjust the pagecnt_bias so that the page can be freed. This
-again results in inconsistent behavior as the page count has already
-been changed by the helper while freeing the frag(s) as part of
-shrinking the packet. To fix this, only adjust pagecnt_bias for buffers
-that are stillpart of the packet post-xdp prog run.
-
-Fixes: e213ced19bef ("i40e: add support for XDP multi-buffer Rx")
-Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+Fixes: 19b7960b2da1 ("i40e: implement split PCI error reset handler")
+Co-developed-by: Karen Ostrowska <karen.ostrowska@intel.com>
+Signed-off-by: Karen Ostrowska <karen.ostrowska@intel.com>
+Co-developed-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
+Signed-off-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Reviewed-by: Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_txrx.c | 42 ++++++++++++---------
- 1 file changed, 24 insertions(+), 18 deletions(-)
+v1 -> v2: Fix signed-off tags
+https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20231204131041.3369693-1-andrii.staikov@intel.com/
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-index b82df5bdfac0..b098ca2c11af 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-@@ -2099,7 +2099,8 @@ static void i40e_put_rx_buffer(struct i40e_ring *rx_ring,
- static void i40e_process_rx_buffs(struct i40e_ring *rx_ring, int xdp_res,
- 				  struct xdp_buff *xdp)
- {
--	u32 next = rx_ring->next_to_clean;
-+	u32 nr_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
-+	u32 next = rx_ring->next_to_clean, i = 0;
- 	struct i40e_rx_buffer *rx_buffer;
+v2 -> v3: use @vf_dev in pci_get_device() instead of NULL and remove unnecessary call
+https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20231206125127.218350-1-andrii.staikov@intel.com/
+
+v3 -> v4: wrap the added functionality into the CONFIG_PCI_IOV define as
+this is VF-related functionality
+https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20231212122452.3250691-1-andrii.staikov@intel.com/
+
+v4 -> v5: fix RB tags
+---
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  3 +++
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 26 +++++++++++++++++++
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  3 +++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 7bb1f64833eb..bbe2d115fb15 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -16513,6 +16513,9 @@ static void i40e_pci_error_reset_done(struct pci_dev *pdev)
+ 		return;
  
- 	xdp->flags = 0;
-@@ -2112,10 +2113,10 @@ static void i40e_process_rx_buffs(struct i40e_ring *rx_ring, int xdp_res,
- 		if (!rx_buffer->page)
- 			continue;
+ 	i40e_reset_and_rebuild(pf, false, false);
++#ifdef CONFIG_PCI_IOV
++	i40e_restore_all_vfs_msi_state(pdev);
++#endif /* CONFIG_PCI_IOV */
+ }
  
--		if (xdp_res == I40E_XDP_CONSUMED)
--			rx_buffer->pagecnt_bias++;
--		else
-+		if (xdp_res != I40E_XDP_CONSUMED)
- 			i40e_rx_buffer_flip(rx_buffer, xdp->frame_sz);
-+		else if (i++ <= nr_frags)
-+			rx_buffer->pagecnt_bias++;
+ /**
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 3f99eb198245..d60f5419d6bd 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -154,6 +154,32 @@ void i40e_vc_notify_reset(struct i40e_pf *pf)
+ 			     (u8 *)&pfe, sizeof(struct virtchnl_pf_event));
+ }
  
- 		/* EOP buffer will be put in i40e_clean_rx_irq() */
- 		if (next == rx_ring->next_to_process)
-@@ -2129,20 +2130,20 @@ static void i40e_process_rx_buffs(struct i40e_ring *rx_ring, int xdp_res,
-  * i40e_construct_skb - Allocate skb and populate it
-  * @rx_ring: rx descriptor ring to transact packets on
-  * @xdp: xdp_buff pointing to the data
-- * @nr_frags: number of buffers for the packet
-  *
-  * This function allocates an skb.  It then populates it with the page
-  * data from the current receive descriptor, taking care to set up the
-  * skb correctly.
-  */
- static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
--					  struct xdp_buff *xdp,
--					  u32 nr_frags)
-+					  struct xdp_buff *xdp)
- {
- 	unsigned int size = xdp->data_end - xdp->data;
- 	struct i40e_rx_buffer *rx_buffer;
-+	struct skb_shared_info *sinfo;
- 	unsigned int headlen;
- 	struct sk_buff *skb;
-+	u32 nr_frags;
- 
- 	/* prefetch first cache line of first page */
- 	net_prefetch(xdp->data);
-@@ -2180,6 +2181,10 @@ static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
- 	memcpy(__skb_put(skb, headlen), xdp->data,
- 	       ALIGN(headlen, sizeof(long)));
- 
-+	if (unlikely(xdp_buff_has_frags(xdp))) {
-+		sinfo = xdp_get_shared_info_from_buff(xdp);
-+		nr_frags = sinfo->nr_frags;
-+	}
- 	rx_buffer = i40e_rx_bi(rx_ring, rx_ring->next_to_clean);
- 	/* update all of the pointers */
- 	size -= headlen;
-@@ -2199,9 +2204,8 @@ static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
- 	}
- 
- 	if (unlikely(xdp_buff_has_frags(xdp))) {
--		struct skb_shared_info *sinfo, *skinfo = skb_shinfo(skb);
-+		struct skb_shared_info *skinfo = skb_shinfo(skb);
- 
--		sinfo = xdp_get_shared_info_from_buff(xdp);
- 		memcpy(&skinfo->frags[skinfo->nr_frags], &sinfo->frags[0],
- 		       sizeof(skb_frag_t) * nr_frags);
- 
-@@ -2224,17 +2228,17 @@ static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
-  * i40e_build_skb - Build skb around an existing buffer
-  * @rx_ring: Rx descriptor ring to transact packets on
-  * @xdp: xdp_buff pointing to the data
-- * @nr_frags: number of buffers for the packet
-  *
-  * This function builds an skb around an existing Rx buffer, taking care
-  * to set up the skb correctly and avoid any memcpy overhead.
-  */
- static struct sk_buff *i40e_build_skb(struct i40e_ring *rx_ring,
--				      struct xdp_buff *xdp,
--				      u32 nr_frags)
-+				      struct xdp_buff *xdp)
- {
- 	unsigned int metasize = xdp->data - xdp->data_meta;
-+	struct skb_shared_info *sinfo;
- 	struct sk_buff *skb;
-+	u32 nr_frags;
- 
- 	/* Prefetch first cache line of first page. If xdp->data_meta
- 	 * is unused, this points exactly as xdp->data, otherwise we
-@@ -2243,6 +2247,11 @@ static struct sk_buff *i40e_build_skb(struct i40e_ring *rx_ring,
- 	 */
- 	net_prefetch(xdp->data_meta);
- 
-+	if (unlikely(xdp_buff_has_frags(xdp))) {
-+		sinfo = xdp_get_shared_info_from_buff(xdp);
-+		nr_frags = sinfo->nr_frags;
-+	}
++#ifdef CONFIG_PCI_IOV
++void i40e_restore_all_vfs_msi_state(struct pci_dev *pdev)
++{
++	u16 vf_id;
++	u16 pos;
 +
- 	/* build an skb around the page buffer */
- 	skb = napi_build_skb(xdp->data_hard_start, xdp->frame_sz);
- 	if (unlikely(!skb))
-@@ -2255,9 +2264,6 @@ static struct sk_buff *i40e_build_skb(struct i40e_ring *rx_ring,
- 		skb_metadata_set(skb, metasize);
++	/* Continue only if this is a PF */
++	if (!pdev->is_physfn)
++		return;
++
++	if (!pci_num_vf(pdev))
++		return;
++
++	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
++	if (pos) {
++		struct pci_dev *vf_dev = NULL;
++
++		pci_read_config_word(pdev, pos + PCI_SRIOV_VF_DID, &vf_id);
++		while ((vf_dev = pci_get_device(pdev->vendor, vf_id, vf_dev))) {
++			if (vf_dev->is_virtfn && vf_dev->physfn == pdev)
++				pci_restore_msi_state(vf_dev);
++		}
++	}
++}
++#endif /* CONFIG_PCI_IOV */
++
+ /**
+  * i40e_vc_notify_vf_reset
+  * @vf: pointer to the VF structure
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
+index 2ee0f8a23248..5fd607c0de0a 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
+@@ -137,6 +137,9 @@ int i40e_ndo_set_vf_spoofchk(struct net_device *netdev, int vf_id, bool enable);
  
- 	if (unlikely(xdp_buff_has_frags(xdp))) {
--		struct skb_shared_info *sinfo;
--
--		sinfo = xdp_get_shared_info_from_buff(xdp);
- 		xdp_update_skb_shared_info(skb, nr_frags,
- 					   sinfo->xdp_frags_size,
- 					   nr_frags * xdp->frame_sz,
-@@ -2546,7 +2552,7 @@ static int i40e_clean_rx_irq(struct i40e_ring *rx_ring, int budget,
- 			/* Update ntc and bump cleaned count if not in the
- 			 * middle of mb packet.
- 			 */
--			if (rx_ring->next_to_clean == ntp) {
-+			if (!xdp->data) {
- 				rx_ring->next_to_clean =
- 					rx_ring->next_to_process;
- 				cleaned_count++;
-@@ -2602,9 +2608,9 @@ static int i40e_clean_rx_irq(struct i40e_ring *rx_ring, int budget,
- 			total_rx_bytes += size;
- 		} else {
- 			if (ring_uses_build_skb(rx_ring))
--				skb = i40e_build_skb(rx_ring, xdp, nfrags);
-+				skb = i40e_build_skb(rx_ring, xdp);
- 			else
--				skb = i40e_construct_skb(rx_ring, xdp, nfrags);
-+				skb = i40e_construct_skb(rx_ring, xdp);
+ void i40e_vc_notify_link_state(struct i40e_pf *pf);
+ void i40e_vc_notify_reset(struct i40e_pf *pf);
++#ifdef CONFIG_PCI_IOV
++void i40e_restore_all_vfs_msi_state(struct pci_dev *pdev);
++#endif /* CONFIG_PCI_IOV */
+ int i40e_get_vf_stats(struct net_device *netdev, int vf_id,
+ 		      struct ifla_vf_stats *vf_stats);
  
- 			/* drop if we failed to retrieve a buffer */
- 			if (!skb) {
 -- 
-2.34.1
+2.25.1
 
 
