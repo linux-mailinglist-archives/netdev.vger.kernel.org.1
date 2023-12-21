@@ -1,118 +1,149 @@
-Return-Path: <netdev+bounces-59570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4275A81B567
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:00:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A60C81B596
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:15:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2202287734
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:00:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 370CF2855D9
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:15:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6F46E2A1;
-	Thu, 21 Dec 2023 12:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B6A6E58C;
+	Thu, 21 Dec 2023 12:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="em4ElZ17"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A9B6BB3D;
-	Thu, 21 Dec 2023 12:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Swprt3Wtwz4f3jZR;
-	Thu, 21 Dec 2023 19:59:58 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id DAB961A0552;
-	Thu, 21 Dec 2023 19:59:59 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-	by APP1 (Coremail) with SMTP id cCh0CgB3xw26KIRl_5H6EA--.61666S2;
-	Thu, 21 Dec 2023 19:59:58 +0800 (CST)
-Subject: Re: [syzbot] [mm?] BUG: unable to handle kernel paging request in
- copy_from_kernel_nofault
-To: Thomas Gleixner <tglx@linutronix.de>, bpf <bpf@vger.kernel.org>
-Cc: syzbot <syzbot+72aa0161922eba61b50e@syzkaller.appspotmail.com>,
- akpm@linux-foundation.org, bp@alien8.de, bp@suse.de,
- dave.hansen@linux.intel.com, hpa@zytor.com, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, luto@kernel.org, mingo@redhat.com,
- netdev@vger.kernel.org, peterz@infradead.org,
- syzkaller-bugs@googlegroups.com, x86@kernel.org, Jann Horn
- <jannh@google.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>
-References: <000000000000c84343060a850bd0@google.com> <87jzqb1133.ffs@tglx>
- <CAG48ez06TZft=ATH1qh2c5mpS5BT8UakwNkzi6nvK5_djC-4Nw@mail.gmail.com>
- <87r0jwquhv.ffs@tglx>
-From: Hou Tao <houtao@huaweicloud.com>
-Message-ID: <e24b125c-8ff4-9031-6c53-67ff2e01f316@huaweicloud.com>
-Date: Thu, 21 Dec 2023 19:59:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E236E2B3;
+	Thu, 21 Dec 2023 12:15:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A74EC433C7;
+	Thu, 21 Dec 2023 12:15:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703160932;
+	bh=BbU0PP8oYWJdM9bAVDZTUjeJS2wucv05BGpqxRDvan4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=em4ElZ17lGvvcurK6W6ClBaDMa4NA5krzm1vGOHhw+V9u5AghPSMhw2y18BoWz2aa
+	 s2jXZ1s8vDiiFO3lkTAS7vUp9au+CwHQwpbAd96x3Z9DfihfcatuzUtywMVPok9Cm+
+	 dSNsYzECyjOhOTiCA1H853Sc5JgxqsDjbaxa7tNNdecbE9sf9oSQazukseYiN0LPGT
+	 9Igzt2o58Gjwtbv5HNbYcyLXtRyNInVnY2/i3/ra7lwP02TIDxWU/H036kGKXvYYft
+	 tho3ssmJ5nujl1LsikLHRePVF4k67MDHeqr5LB6BDwML0PL67X5vXlcf8jH+AERF2x
+	 2Lg5wUWey3/XA==
+Date: Thu, 21 Dec 2023 13:15:29 +0100
+From: Alejandro Colomar <alx@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexey Tikhonov <atikhono@redhat.com>
+Cc: libc-alpha@sourceware.org, linux-man@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] unix.7: SO_PEERCRED: Mention listen(2)
+Message-ID: <ZYQsYametqHWshUZ@debian>
+References: <CABPeg3Z5p2yapwEwPdHqDZiDL-W_gVgMc39A0Kdd95LNd+OwHA@mail.gmail.com>
+ <20231221014911.39497-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87r0jwquhv.ffs@tglx>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-CM-TRANSID:cCh0CgB3xw26KIRl_5H6EA--.61666S2
-X-Coremail-Antispam: 1UD129KBjvdXoWruF1kGryUCFWDXr13ZFW3Awb_yoWkKFcEq3
-	42934kurZ7uF42yr1xtr4a9r1rtw4kArWFq398ArWavFnIva9xG395trZ3Ww4UGwnagFZ3
-	JFW5Z3srKrnI9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbIxYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-	kEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCYjI0SjxkI62AI
-	1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAF
-	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
-	7IU13rcDUUUUU==
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="eszc7SolOqkaafF8"
+Content-Disposition: inline
+In-Reply-To: <20231221014911.39497-1-kuniyu@amazon.com>
 
-Hi Thomas,
 
-On 12/9/2023 5:01 AM, Thomas Gleixner wrote:
-> diff --git a/arch/x86/mm/maccess.c b/arch/x86/mm/maccess.c
-> index 6993f026adec..8e846833aa37 100644
-> --- a/arch/x86/mm/maccess.c
-> +++ b/arch/x86/mm/maccess.c
-> @@ -3,6 +3,8 @@
->  #include <linux/uaccess.h>
->  #include <linux/kernel.h>
->  
-> +#include <uapi/asm/vsyscall.h>
-> +
->  #ifdef CONFIG_X86_64
->  bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size)
->  {
-> @@ -15,6 +17,9 @@ bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size)
->  	if (vaddr < TASK_SIZE_MAX + PAGE_SIZE)
->  		return false;
->  
-> +	if ((vaddr & PAGE_MASK) == VSYSCALL_ADDR)
-> +		return false;
-> +
->  	/*
->  	 * Allow everything during early boot before 'x86_virt_bits'
->  	 * is initialized.  Needed for instruction decoding in early
+--eszc7SolOqkaafF8
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Dec 2023 13:15:29 +0100
+From: Alejandro Colomar <alx@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexey Tikhonov <atikhono@redhat.com>
+Cc: libc-alpha@sourceware.org, linux-man@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] unix.7: SO_PEERCRED: Mention listen(2)
 
-Tested-by: Hou Tao <houtao1@huawei.com>
+Hi Kuniyuki, Alexey,
 
-Could you please post a formal patch for the fix ? The patch fixes the
-oops when using bpf_probe_read_kernel() or similar bpf helpers [1] to
-read from vsyscall address and you can take my tested-by tag if it is
-necessary.
+On Thu, Dec 21, 2023 at 10:49:11AM +0900, Kuniyuki Iwashima wrote:
+> From: Alexey Tikhonov <atikhono@redhat.com>
+> Date: Wed, 20 Dec 2023 18:28:34 +0100
+> > In case of connected AF_UNIX stream sockets, server-side
+> > credentials are set at the time of a call to listen(2),
+> > not when client-side calls connect(2).
+> >=20
+> > This is important if server side process changes UID/GID
+> > after listen(2) and before connect(2).
+> >=20
+> > Reproducer is available in https://bugzilla.redhat.com/show_bug.cgi?id=
+=3D2247682
+> >=20
+> > Behavior was confirmed in the email thread
+> > https://lore.kernel.org/linux-man/CABPeg3a9L0142gmdZZ+0hoD+Q3Vgv0BQ21g8=
+Z+gf2kznWouErA@mail.gmail.com/
+> >=20
+> > Signed-off-by: Alexey Tikhonov <atikhono@redhat.com>
+>=20
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>=20
+> Thanks!
 
-[1]:
-https://lore.kernel.org/bpf/CABOYnLynjBoFZOf3Z4BhaZkc5hx_kHfsjiW+UWLoB=w33LvScw@mail.gmail.com/
+Thank you both for the patch and review!
 
+Patch applied:
+<https://www.alejandro-colomar.es/src/alx/linux/man-pages/man-pages.git/com=
+mit/?h=3Dcontrib&id=3Db34c2340657cfe467a0c2cde4933422bddf4348b>
+
+Have a lovely day,
+Alex
+
+> > ---
+> >  man7/unix.7 | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/man7/unix.7 b/man7/unix.7
+> > index e9edad467..71cdfc758 100644
+> > --- a/man7/unix.7
+> > +++ b/man7/unix.7
+> > @@ -331,7 +331,8 @@ This read-only socket option returns the
+> >  credentials of the peer process connected to this socket.
+> >  The returned credentials are those that were in effect at the time
+> >  of the call to
+> > -.BR connect (2)
+> > +.BR connect (2),
+> > +.BR listen (2),
+> >  or
+> >  .BR socketpair (2).
+> >  .IP
+> > --=20
+> > 2.41.0
+
+--=20
+<https://www.alejandro-colomar.es/>
+Looking for a remote C programming job at the moment.
+
+--eszc7SolOqkaafF8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmWELGEACgkQnowa+77/
+2zK0gA//eDdNC3swAfCFYJyS3bLB/V8kyIL2aFnfPeuE/HgdPDCAGCMDmqta34AU
+Ts2xuWXy3GkKUwxnoGeNEDGuINMQGhYOdAEkstyuJpRbu9ewjoeVpDL/U9fFJqW8
+U64DWNZrBbXWaXMgPG1rTqd1TXmVg4gVBZna8G9r2+aqoLodMnLHdB6GjQtQUdSA
+spTpj7H1XHmPLyqJP28JxhZxpe9qy6qBpjBGladkedN6nbmGfc26n3pogf0s+6lO
+5sIbDa000ciVPAuPzN0LRhdSQRpfrwz8ucqf3+e70P5pBdQ6tPQAogTI+XvVS7v5
+Ctq0AGcWVDKX0z1VJI8Nrz3Wn3TkWPLKe6Evr01OKjI88CKT5WKmnV0K8PAd+5Mz
+qIKSrSPrPDusFN/jk9osL0F5x00ETYNZJNx5uUEuGKerYVZBOCCCDLgTo7D1tebF
+6rsJ3tX+rYYdVFarEFzno0I3J0QiOSLq1q9qX5EK2Hrkhc3FkPbz+dReshTnirw0
+0fNihiGuCetnauxR4x8VikrS3G6WaTOmBQ1Xk1rVWl+l9m7wTY3pp1KdAbraY1kC
+3Sr5vJlB+PmR+8+8Rgbvw+JOKsmsbtQwLjzq0aOjMG68zjZUKRkqruXjiaW9jhr6
+6XfHd/Ab+tbM6h98A9MsrB94axVwdohto5XdGE/TFNdjF8FyP/o=
+=vkWt
+-----END PGP SIGNATURE-----
+
+--eszc7SolOqkaafF8--
 
