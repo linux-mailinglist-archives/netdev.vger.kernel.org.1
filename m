@@ -1,216 +1,207 @@
-Return-Path: <netdev+bounces-59427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4733881ACCA
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:56:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A37A981ACDD
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 04:03:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3BC028448D
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:56:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C5911F21D02
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1E62104;
-	Thu, 21 Dec 2023 02:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4083D9F;
+	Thu, 21 Dec 2023 03:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NpPWB6QM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hBKipCWj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979ABAD2C
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 02:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703127409;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C944685
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 03:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d26c6d0b-92a1-4baa-bceb-dc267b5b60e6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1703127822;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Dy9GExM8H85FeptYc4aP4CuqEGh1LXnHJxON2C2sOE4=;
-	b=NpPWB6QMFbmjeV+EhQX6zOWsz17H8lQsaUxKmbSRXpYsCK5wZUvBm9O4hfc0N8RewJ7GxO
-	OX82x1IbfZmTMhCSaink7WApvDT56xYh/GWFzUxOouHxIrhLhuaRYZrX6l10rrJPljRKzu
-	Wgxl4TQVXrD4RGaDQCuNMIHi7RSB0rY=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-142-gwEqXRh6NXKh05Gf-T-ZLw-1; Wed, 20 Dec 2023 21:56:48 -0500
-X-MC-Unique: gwEqXRh6NXKh05Gf-T-ZLw-1
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6d9dfab5b16so396423a34.0
-        for <netdev@vger.kernel.org>; Wed, 20 Dec 2023 18:56:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703127407; x=1703732207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dy9GExM8H85FeptYc4aP4CuqEGh1LXnHJxON2C2sOE4=;
-        b=oc0bOX9zvBCD+9vNA3YxepTVheIYU1uXi4HUOORSp/OWD2V2lO7ISoC4EGubBUqZHQ
-         uWpBEEWTLwOT62LbAQnxykwqMafMNSazvjprF50jIYVTjO/czlPMbEymPJhSM3vnvujU
-         LvoBivOdc7Rog2QvMp0x9nTYysVvmuajUMajevr204BtF3wyawVYVvGqEVPWSJLrFCO9
-         wmLOKBFVUY1bs+AzDLWTmCe9BmReAqflLSDpWADEo2z1ecTuf25jlWzQGl9qRekFqDL3
-         iSFV8V1GHBqjBjLvChmYVUhXTlGFMjQMZUZKGLutfKdg3gN9ZPDght16Q970Og6GdEBY
-         Z0IQ==
-X-Gm-Message-State: AOJu0YyACDOXjQQhPCAnChssoHYBADclPfNtQFTmSNhXDTy+0n23yxWJ
-	xWrseXrI7uT4Kvtu+RZcGIRURFWItpXDS+YWQLl2FbMp6TfW+/2GkZOH7/6Y+a/ivFBWqd04nfg
-	M8jiqZPIGBnwZ+hHfOoNZJBzVF46FJ20t
-X-Received: by 2002:a05:6808:6493:b0:3ba:d81:8408 with SMTP id fh19-20020a056808649300b003ba0d818408mr23393848oib.41.1703127407406;
-        Wed, 20 Dec 2023 18:56:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFyl65VFlMHa3cUJ5xXSrW3xmo3VJtJx7xqAR/g/kwK7zYwdc5eHGcz9muBKfu2b/AhN640Cu/VtJUrszNnCjY=
-X-Received: by 2002:a05:6808:6493:b0:3ba:d81:8408 with SMTP id
- fh19-20020a056808649300b003ba0d818408mr23393843oib.41.1703127407171; Wed, 20
- Dec 2023 18:56:47 -0800 (PST)
+	bh=lSGR6BpM5LFLg85n+qCyVz2si87tNmxs2mEQFIna14A=;
+	b=hBKipCWj3UruqG+L4NKeZjsgmC+JvKKYeQdn3Yk7Hb8HEG9/KnaGCQZGCdN4dBp6qY0SMO
+	3PyG06A3VqzLBRJPRpyFxSpWwmmlMUrjqeLOYr5cF+vgp68MVwp4RxEw1p2ZclKddxacDe
+	BhZwQK2feRyhDn+SpbNaIDIiAQCEins=
+Date: Thu, 21 Dec 2023 11:02:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205113444.63015-1-linyunsheng@huawei.com>
- <20231205113444.63015-7-linyunsheng@huawei.com> <CACGkMEvVezZnHK-gRWY+MUd_6awnprb024scqPNmMQ05P8rWTQ@mail.gmail.com>
- <424670ab-23d8-663b-10cb-d88906767956@huawei.com> <CACGkMEsMdP1B-9RaqibJYfFsd_qJpB+Kta5BnyD_WXH=W2w_OQ@mail.gmail.com>
- <c5b5d36c-d0ca-c943-5355-343214d92c26@huawei.com> <CACGkMEs8HWq_NFNk=Pp3qxuo7AWBsybXT78LPgC-nKaP_u3LqA@mail.gmail.com>
- <8401fefd-d0da-efb9-78ab-cc4974a35801@huawei.com>
-In-Reply-To: <8401fefd-d0da-efb9-78ab-cc4974a35801@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 21 Dec 2023 10:56:36 +0800
-Message-ID: <CACGkMEvKOWpxpBR+YRuiJJ3aEsdxU2q+qVwmFw=L5gS3e7A35w@mail.gmail.com>
-Subject: Re: [PATCH net-next 6/6] tools: virtio: introduce vhost_net_test
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next] virtio-net: switch napi_tx without downing nic
+To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
+ virtualization@lists.linux-foundation.org
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Dec 21, 2023 at 10:48=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.c=
-om> wrote:
->
-> On 2023/12/21 10:33, Jason Wang wrote:
-> > On Wed, Dec 20, 2023 at 8:45=E2=80=AFPM Yunsheng Lin <linyunsheng@huawe=
-i.com> wrote:
-> >>
-> >> On 2023/12/12 12:35, Jason Wang wrote:>>>> +done:
-> >>>>>> +       backend.fd =3D tun_alloc();
-> >>>>>> +       assert(backend.fd >=3D 0);
-> >>>>>> +       vdev_info_init(&dev, features);
-> >>>>>> +       vq_info_add(&dev, 256);
-> >>>>>> +       run_test(&dev, &dev.vqs[0], delayed, batch, reset, nbufs);
-> >>>>>
-> >>>>> I'd expect we are testing some basic traffic here. E.g can we use a
-> >>>>> packet socket then we can test both tx and rx?
-> >>>>
-> >>>> Yes, only rx for tun is tested.
-> >>>> Do you have an idea how to test the tx too? As I am not familar enou=
-gh
-> >>>> with vhost_net and tun yet.
-> >>>
-> >>> Maybe you can have a packet socket to bind to the tun/tap. Then you c=
-an test:
-> >>>
-> >>> 1) TAP RX: by write a packet via virtqueue through vhost_net and read
-> >>> it from packet socket
-> >>> 2) TAP TX:  by write via packet socket and read it from the virtqueue
-> >>> through vhost_net
-> >>
-> >> When implementing the TAP TX by adding VHOST_NET_F_VIRTIO_NET_HDR,
-> >> I found one possible use of uninitialized data in vhost_net_build_xdp(=
-).
-> >>
-> >> And vhost_hlen is set to sizeof(struct virtio_net_hdr_mrg_rxbuf) and
-> >> sock_hlen is set to zero in vhost_net_set_features() for both tx and r=
-x
-> >> queue.
-> >>
-> >> For vhost_net_build_xdp() called by handle_tx_copy():
-> >>
-> >> The (gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) checking below may caus=
-e a
-> >> read of uninitialized data if sock_hlen is zero.
-> >
-> > Which data is uninitialized here?
->
-> The 'gso', as the sock_hlen is zero, there is no copying for:
->
->          copied =3D copy_page_from_iter(alloc_frag->page,
->                                       alloc_frag->offset +
->                                       offsetof(struct tun_xdp_hdr, gso),
->                                       sock_hlen, from);
+在 2023/12/20 16:07, Heng Qi 写道:
+> virtio-net has two ways to switch napi_tx: one is through the
+> module parameter, and the other is through coalescing parameter
+> settings (provided that the nic status is down).
+> 
+> Sometimes we face performance regression caused by napi_tx,
+> then we need to switch napi_tx when debugging. However, the
+> existing methods are a bit troublesome, such as needing to
+> reload the driver or turn off the network card. So try to make
+> this update.
 
-I think you're right. This is something we need to fix.
+What scenario can trigger this? We want to make tests on our device.
 
-Or we can drop VHOST_NET_F_VIRTIO_NET_HDR as we managed to survive for year=
-s:
+Zhu Yanjun
 
-https://patchwork.ozlabs.org/project/netdev/patch/1528429842-22835-1-git-se=
-nd-email-jasowang@redhat.com/#1930760
-
->
-> >
-> >>
-> >> And it seems vhost_hdr is skipped in get_tx_bufs():
-> >> https://elixir.bootlin.com/linux/latest/source/drivers/vhost/net.c#L61=
-6
-> >>
-> >> static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
-> >>                                struct iov_iter *from)
-> >> {
-> >> ...
-> >>         buflen +=3D SKB_DATA_ALIGN(len + pad);
-> >>         alloc_frag->offset =3D ALIGN((u64)alloc_frag->offset, SMP_CACH=
-E_BYTES);
-> >>         if (unlikely(!vhost_net_page_frag_refill(net, buflen,
-> >>                                                  alloc_frag, GFP_KERNE=
-L)))
-> >>                 return -ENOMEM;
-> >>
-> >>         buf =3D (char *)page_address(alloc_frag->page) + alloc_frag->o=
-ffset;
-> >>         copied =3D copy_page_from_iter(alloc_frag->page,
-> >>                                      alloc_frag->offset +
-> >>                                      offsetof(struct tun_xdp_hdr, gso)=
-,
-> >>                                      sock_hlen, from);
-> >>         if (copied !=3D sock_hlen)
-> >>                 return -EFAULT;
-> >>
-> >>         hdr =3D buf;
-> >>         gso =3D &hdr->gso;
-> >>
-> >>         if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
-> >>             vhost16_to_cpu(vq, gso->csum_start) +
-> >>             vhost16_to_cpu(vq, gso->csum_offset) + 2 >
-> >>             vhost16_to_cpu(vq, gso->hdr_len)) {
-> >> ...
-> >> }
-> >>
-> >> I seems the handle_tx_copy() does not handle the VHOST_NET_F_VIRTIO_NE=
-T_HDR
-> >> case correctly, Or do I miss something obvious here?
-> >
-> > In get_tx_bufs() we did:
-> >
-> >         *len =3D init_iov_iter(vq, &msg->msg_iter, nvq->vhost_hlen, *ou=
-t);
-> >
-> > Which covers this case?
->
-> It does not seems to cover it, as the vhost_hdr is just skipped without a=
-ny
-> handling in get_tx_bufs():
-> https://elixir.bootlin.com/linux/v6.7-rc6/source/drivers/vhost/net.c#L616
-
-My understanding is that in this case vhost can't do more than this as
-the socket doesn't know vnet_hdr.
-
-Let's see if Michael is ok with this.
-
-Thanks
-
->
-> >
-> > Thanks
->
+> 
+> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>   drivers/net/virtio_net.c | 81 ++++++++++++++++++----------------------
+>   1 file changed, 37 insertions(+), 44 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 10614e9f7cad..12f8e1f9971c 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3559,16 +3559,37 @@ static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+>   	return 0;
+>   }
+>   
+> -static int virtnet_should_update_vq_weight(int dev_flags, int weight,
+> -					   int vq_weight, bool *should_update)
+> +static void virtnet_switch_napi_tx(struct virtnet_info *vi, u32 qstart,
+> +				   u32 qend, u32 tx_frames)
+>   {
+> -	if (weight ^ vq_weight) {
+> -		if (dev_flags & IFF_UP)
+> -			return -EBUSY;
+> -		*should_update = true;
+> -	}
+> +	struct net_device *dev = vi->dev;
+> +	int new_weight, cur_weight;
+> +	struct netdev_queue *txq;
+> +	struct send_queue *sq;
+>   
+> -	return 0;
+> +	new_weight = tx_frames ? NAPI_POLL_WEIGHT : 0;
+> +	for (; qstart < qend; qstart++) {
+> +		sq = &vi->sq[qstart];
+> +		cur_weight = sq->napi.weight;
+> +		if (!(new_weight ^ cur_weight))
+> +			continue;
+> +
+> +		if (!(dev->flags & IFF_UP)) {
+> +			sq->napi.weight = new_weight;
+> +			continue;
+> +		}
+> +
+> +		if (cur_weight)
+> +			virtnet_napi_tx_disable(&sq->napi);
+> +
+> +		txq = netdev_get_tx_queue(dev, qstart);
+> +		__netif_tx_lock_bh(txq);
+> +		sq->napi.weight = new_weight;
+> +		__netif_tx_unlock_bh(txq);
+> +
+> +		if (!cur_weight)
+> +			virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
+> +	}
+>   }
+>   
+>   static int virtnet_set_coalesce(struct net_device *dev,
+> @@ -3577,25 +3598,11 @@ static int virtnet_set_coalesce(struct net_device *dev,
+>   				struct netlink_ext_ack *extack)
+>   {
+>   	struct virtnet_info *vi = netdev_priv(dev);
+> -	int ret, queue_number, napi_weight;
+> -	bool update_napi = false;
+> -
+> -	/* Can't change NAPI weight if the link is up */
+> -	napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+> -	for (queue_number = 0; queue_number < vi->max_queue_pairs; queue_number++) {
+> -		ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
+> -						      vi->sq[queue_number].napi.weight,
+> -						      &update_napi);
+> -		if (ret)
+> -			return ret;
+> -
+> -		if (update_napi) {
+> -			/* All queues that belong to [queue_number, vi->max_queue_pairs] will be
+> -			 * updated for the sake of simplicity, which might not be necessary
+> -			 */
+> -			break;
+> -		}
+> -	}
+> +	int ret;
+> +
+> +	/* Param tx_frames can be used to switch napi_tx */
+> +	virtnet_switch_napi_tx(vi, 0, vi->max_queue_pairs,
+> +			       ec->tx_max_coalesced_frames);
+>   
+>   	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
+>   		ret = virtnet_send_notf_coal_cmds(vi, ec);
+> @@ -3605,11 +3612,6 @@ static int virtnet_set_coalesce(struct net_device *dev,
+>   	if (ret)
+>   		return ret;
+>   
+> -	if (update_napi) {
+> -		for (; queue_number < vi->max_queue_pairs; queue_number++)
+> -			vi->sq[queue_number].napi.weight = napi_weight;
+> -	}
+> -
+>   	return ret;
+>   }
+>   
+> @@ -3641,19 +3643,13 @@ static int virtnet_set_per_queue_coalesce(struct net_device *dev,
+>   					  struct ethtool_coalesce *ec)
+>   {
+>   	struct virtnet_info *vi = netdev_priv(dev);
+> -	int ret, napi_weight;
+> -	bool update_napi = false;
+> +	int ret;
+>   
+>   	if (queue >= vi->max_queue_pairs)
+>   		return -EINVAL;
+>   
+> -	/* Can't change NAPI weight if the link is up */
+> -	napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+> -	ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
+> -					      vi->sq[queue].napi.weight,
+> -					      &update_napi);
+> -	if (ret)
+> -		return ret;
+> +	/* Param tx_frames can be used to switch napi_tx */
+> +	virtnet_switch_napi_tx(vi, queue, queue, ec->tx_max_coalesced_frames);
+>   
+>   	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+>   		ret = virtnet_send_notf_coal_vq_cmds(vi, ec, queue);
+> @@ -3663,9 +3659,6 @@ static int virtnet_set_per_queue_coalesce(struct net_device *dev,
+>   	if (ret)
+>   		return ret;
+>   
+> -	if (update_napi)
+> -		vi->sq[queue].napi.weight = napi_weight;
+> -
+>   	return 0;
+>   }
+>   
 
 
