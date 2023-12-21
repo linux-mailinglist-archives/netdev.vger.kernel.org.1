@@ -1,149 +1,94 @@
-Return-Path: <netdev+bounces-59571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A60C81B596
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:15:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4974C81B5AF
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:21:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 370CF2855D9
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:15:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05376285DB6
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B6A6E58C;
-	Thu, 21 Dec 2023 12:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5F96E5AA;
+	Thu, 21 Dec 2023 12:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="em4ElZ17"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qFfoiIPP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E236E2B3;
-	Thu, 21 Dec 2023 12:15:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A74EC433C7;
-	Thu, 21 Dec 2023 12:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3B96E59D;
+	Thu, 21 Dec 2023 12:21:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80874C433C7;
+	Thu, 21 Dec 2023 12:21:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703160932;
-	bh=BbU0PP8oYWJdM9bAVDZTUjeJS2wucv05BGpqxRDvan4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=em4ElZ17lGvvcurK6W6ClBaDMa4NA5krzm1vGOHhw+V9u5AghPSMhw2y18BoWz2aa
-	 s2jXZ1s8vDiiFO3lkTAS7vUp9au+CwHQwpbAd96x3Z9DfihfcatuzUtywMVPok9Cm+
-	 dSNsYzECyjOhOTiCA1H853Sc5JgxqsDjbaxa7tNNdecbE9sf9oSQazukseYiN0LPGT
-	 9Igzt2o58Gjwtbv5HNbYcyLXtRyNInVnY2/i3/ra7lwP02TIDxWU/H036kGKXvYYft
-	 tho3ssmJ5nujl1LsikLHRePVF4k67MDHeqr5LB6BDwML0PL67X5vXlcf8jH+AERF2x
-	 2Lg5wUWey3/XA==
-Date: Thu, 21 Dec 2023 13:15:29 +0100
-From: Alejandro Colomar <alx@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexey Tikhonov <atikhono@redhat.com>
-Cc: libc-alpha@sourceware.org, linux-man@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] unix.7: SO_PEERCRED: Mention listen(2)
-Message-ID: <ZYQsYametqHWshUZ@debian>
-References: <CABPeg3Z5p2yapwEwPdHqDZiDL-W_gVgMc39A0Kdd95LNd+OwHA@mail.gmail.com>
- <20231221014911.39497-1-kuniyu@amazon.com>
+	s=k20201202; t=1703161305;
+	bh=ZXuqDithbYzkJx1AnJD01RR/3/aFDMJ/KwOLs+ao4Ig=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qFfoiIPPpBn54ZRPtowtPIyJNd5wCXGhD6jFqz/hcGpdCrFmJh9m77Tm68CiVR4yr
+	 /bAXl00l6GijRJ2onq1v+mu4duw+dtp4vsHOW+XOO6mFM4KpM++1OD3ozGXeYTMVUz
+	 8PCo1Zm94qM8YcJ8MttVJ+V7uvSeeZybdsvuAzynInLzwUbdcftyKSNgygddOAZI9A
+	 CepIq0TyRWBU5gSGEL01JMZzFeRTRXfnrIWQSLqxtR/J3LosB1j1hwzgw79UukpXCi
+	 WsttznHuUY0u7xNFXXXRXnL/3nFyC43098XNU5+Px1yQLrRDRHMuXLamC8r5xshK9P
+	 R1DMxuHSoaEJQ==
+Message-ID: <4027f264-c7e9-4b7d-b88b-ced20e431314@kernel.org>
+Date: Thu, 21 Dec 2023 14:21:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="eszc7SolOqkaafF8"
-Content-Disposition: inline
-In-Reply-To: <20231221014911.39497-1-kuniyu@amazon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next] net: ethernet: ti: am65-cpsw-nuss: Enable
+ SGMII mode for J784S4 CPSW9G
+To: Chintan Vankar <c-vankar@ti.com>, Dan Carpenter
+ <dan.carpenter@linaro.org>, Grygorii Strashko <grygorii.strashko@ti.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20231221111046.761843-1-c-vankar@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231221111046.761843-1-c-vankar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
---eszc7SolOqkaafF8
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 21 Dec 2023 13:15:29 +0100
-From: Alejandro Colomar <alx@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexey Tikhonov <atikhono@redhat.com>
-Cc: libc-alpha@sourceware.org, linux-man@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] unix.7: SO_PEERCRED: Mention listen(2)
 
-Hi Kuniyuki, Alexey,
+On 21/12/2023 13:10, Chintan Vankar wrote:
+> TI's J784S4 SoC supports SGMII mode with CPSW9G instance of the CPSW
+> Ethernet Switch. Thus, enable it by adding SGMII mode to the
+> extra_modes member of the "j784s4_cpswxg_pdata" SoC data.
+> 
+> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
 
-On Thu, Dec 21, 2023 at 10:49:11AM +0900, Kuniyuki Iwashima wrote:
-> From: Alexey Tikhonov <atikhono@redhat.com>
-> Date: Wed, 20 Dec 2023 18:28:34 +0100
-> > In case of connected AF_UNIX stream sockets, server-side
-> > credentials are set at the time of a call to listen(2),
-> > not when client-side calls connect(2).
-> >=20
-> > This is important if server side process changes UID/GID
-> > after listen(2) and before connect(2).
-> >=20
-> > Reproducer is available in https://bugzilla.redhat.com/show_bug.cgi?id=
-=3D2247682
-> >=20
-> > Behavior was confirmed in the email thread
-> > https://lore.kernel.org/linux-man/CABPeg3a9L0142gmdZZ+0hoD+Q3Vgv0BQ21g8=
-Z+gf2kznWouErA@mail.gmail.com/
-> >=20
-> > Signed-off-by: Alexey Tikhonov <atikhono@redhat.com>
->=20
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->=20
-> Thanks!
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
-Thank you both for the patch and review!
+Please send without RFC in subject.
 
-Patch applied:
-<https://www.alejandro-colomar.es/src/alx/linux/man-pages/man-pages.git/com=
-mit/?h=3Dcontrib&id=3Db34c2340657cfe467a0c2cde4933422bddf4348b>
+> ---
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index 7651f90f51f2..9aa5a6108521 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -2855,7 +2855,8 @@ static const struct am65_cpsw_pdata j784s4_cpswxg_pdata = {
+>  	.quirks = 0,
+>  	.ale_dev_id = "am64-cpswxg",
+>  	.fdqring_mode = K3_RINGACC_RING_MODE_MESSAGE,
+> -	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_USXGMII),
+> +	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_SGMII) |
+> +		       BIT(PHY_INTERFACE_MODE_USXGMII),
+>  };
+>  
+>  static const struct of_device_id am65_cpsw_nuss_of_mtable[] = {
 
-Have a lovely day,
-Alex
-
-> > ---
-> >  man7/unix.7 | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/man7/unix.7 b/man7/unix.7
-> > index e9edad467..71cdfc758 100644
-> > --- a/man7/unix.7
-> > +++ b/man7/unix.7
-> > @@ -331,7 +331,8 @@ This read-only socket option returns the
-> >  credentials of the peer process connected to this socket.
-> >  The returned credentials are those that were in effect at the time
-> >  of the call to
-> > -.BR connect (2)
-> > +.BR connect (2),
-> > +.BR listen (2),
-> >  or
-> >  .BR socketpair (2).
-> >  .IP
-> > --=20
-> > 2.41.0
-
---=20
-<https://www.alejandro-colomar.es/>
-Looking for a remote C programming job at the moment.
-
---eszc7SolOqkaafF8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmWELGEACgkQnowa+77/
-2zK0gA//eDdNC3swAfCFYJyS3bLB/V8kyIL2aFnfPeuE/HgdPDCAGCMDmqta34AU
-Ts2xuWXy3GkKUwxnoGeNEDGuINMQGhYOdAEkstyuJpRbu9ewjoeVpDL/U9fFJqW8
-U64DWNZrBbXWaXMgPG1rTqd1TXmVg4gVBZna8G9r2+aqoLodMnLHdB6GjQtQUdSA
-spTpj7H1XHmPLyqJP28JxhZxpe9qy6qBpjBGladkedN6nbmGfc26n3pogf0s+6lO
-5sIbDa000ciVPAuPzN0LRhdSQRpfrwz8ucqf3+e70P5pBdQ6tPQAogTI+XvVS7v5
-Ctq0AGcWVDKX0z1VJI8Nrz3Wn3TkWPLKe6Evr01OKjI88CKT5WKmnV0K8PAd+5Mz
-qIKSrSPrPDusFN/jk9osL0F5x00ETYNZJNx5uUEuGKerYVZBOCCCDLgTo7D1tebF
-6rsJ3tX+rYYdVFarEFzno0I3J0QiOSLq1q9qX5EK2Hrkhc3FkPbz+dReshTnirw0
-0fNihiGuCetnauxR4x8VikrS3G6WaTOmBQ1Xk1rVWl+l9m7wTY3pp1KdAbraY1kC
-3Sr5vJlB+PmR+8+8Rgbvw+JOKsmsbtQwLjzq0aOjMG68zjZUKRkqruXjiaW9jhr6
-6XfHd/Ab+tbM6h98A9MsrB94axVwdohto5XdGE/TFNdjF8FyP/o=
-=vkWt
------END PGP SIGNATURE-----
-
---eszc7SolOqkaafF8--
+-- 
+cheers,
+-roger
 
