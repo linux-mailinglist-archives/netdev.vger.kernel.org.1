@@ -1,130 +1,217 @@
-Return-Path: <netdev+bounces-59656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4520E81B9CA
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:45:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5AB681BA05
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:58:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4B9B1F227AF
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:45:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E67D288C75
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43303200B9;
-	Thu, 21 Dec 2023 14:45:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7176E360B7;
+	Thu, 21 Dec 2023 14:58:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVLeW797"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o/Cy6s+G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC71A1D6BD;
-	Thu, 21 Dec 2023 14:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a22f59c6ae6so104881166b.1;
-        Thu, 21 Dec 2023 06:45:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703169945; x=1703774745; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rrwv3J31Qk9UonkvLPYM6smDy/xDXM7xflFYKfVBtBA=;
-        b=mVLeW7977tPTu1qck7qfNaYi6fNZNtr0adCbkZ2hYn6ek4L6ya5+EjE1bNkWDBbZWN
-         +Lp9S/3yqPHUb/RvG5o2WSDricYZa44TpLQWf/UbX0i3SkFM0rh9zg9f+6FORBGg4Uu9
-         jBZKjikbj2Mp4/47s47zZSu84CFrclrZbntDPn4eKRCOhbD1grrVnA0Vxi41Edvd/q2o
-         V+S6V5w0HpuZqqErNa7zfABo6+aiHmPTm5NniKfD1e4oP+TdPRVI4f+Yehuqy2zUc5xj
-         qs3U3kSOw7VVSWh+32tmxjglch45j0eTjLp8bvAnbdMvwIH4MCYnRJzzChU/xldIMY+Z
-         vZpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703169945; x=1703774745;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rrwv3J31Qk9UonkvLPYM6smDy/xDXM7xflFYKfVBtBA=;
-        b=AwbUWe7Y1YdUJA0EDIp2JlBS360V8GDetx431vHFP6x/rqmmoeG0TI3qDgCYeepfNu
-         xxlnACtMtnm5pI9tfPk2En9N+3c/SIc1AdzVcFh0YKtZ0Ws/qsLhSMeL17ELE77zj8us
-         8TzF5BXECYc33Ru/0q0unH6lWUw4kNSURThdwI+yBVM+Wl2RCg9sxlMkNXMNZwDy3O5v
-         29DUcsc80q5q5HXonoXV3yeKHSh1NTdJazm0KeayO701EXplj8hwoY72D/pKVUxgdjmV
-         IM7f2AD7teSKcYXqtjZEsfoy9eoOx9bQHrCxJD1VXkR6QAUZWGGInmuJAZ66t2HozIK4
-         MJvQ==
-X-Gm-Message-State: AOJu0YzjIHShNGjDZtWqmEfOXsiQbRzZ0LoExGZI4k5JxwbPhKaiazIA
-	gyVTXNJHohqMTjMkJHTQMMM=
-X-Google-Smtp-Source: AGHT+IEKcKQfIa5EKtsdTp84TcmMedo4p6ScCtWLgcaDPVjwDofCkKt7udmqLFHMDFjjZlXQGJSvNg==
-X-Received: by 2002:a17:906:221a:b0:a22:dca3:4190 with SMTP id s26-20020a170906221a00b00a22dca34190mr3882533ejs.109.1703169944887;
-        Thu, 21 Dec 2023 06:45:44 -0800 (PST)
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id h15-20020a17090791cf00b00a1db76f99c8sm1030441ejz.93.2023.12.21.06.45.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 06:45:44 -0800 (PST)
-Date: Thu, 21 Dec 2023 15:45:42 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Stefan Eichenberger <eichest@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] net: phy: marvell-88q2xxx: add driver for the
- Marvell 88Q2220 PHY
-Message-ID: <20231221144542.GA122328@debian>
-References: <20231219093554.GA6393@debian>
- <20231221072853.107678-1-dima.fedrau@gmail.com>
- <20231221072853.107678-5-dima.fedrau@gmail.com>
- <ZYRCDTWgHbM2qAom@eichest-laptop>
- <20231221141636.GA122124@debian>
- <59fed161-6c08-4537-b02d-19e67e342dd8@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928D53608F
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:58:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <639b1f3f-cb53-4058-8426-14bd50f2b78f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1703170691;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=niE33GNZcLoMtGzvup30KdDGzzPVNngjh64sC0Ozats=;
+	b=o/Cy6s+GbpYUSAjVDq3Vf3DXQIdbth3hgLPExI8iTmyxbC8qZtDQvGCb5zjen5wPJ7Rd4Q
+	pIewh0j3TNYzWuLRgPyhjZ4pEGOizNGnbzznKv8z2K7ULvW9FsDSG2NUNc0P5iXUGbBgTN
+	loNJUfBdd6FyLfbYNhOZpjTc1OthjPI=
+Date: Thu, 21 Dec 2023 06:58:04 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59fed161-6c08-4537-b02d-19e67e342dd8@lunn.ch>
+Subject: Re: [PATCH bpf 1/2] bpf: Avoid iter->offset making backward progress
+ in bpf_iter_udp
+Content-Language: en-US
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
+ 'Andrii Nakryiko ' <andrii@kernel.org>, netdev@vger.kernel.org,
+ kernel-team@meta.com, Aditi Ghag <aditi.ghag@isovalent.com>,
+ bpf@vger.kernel.org
+References: <20231219193259.3230692-1-martin.lau@linux.dev>
+ <8d15f3a7-b7bc-1a45-0bdf-a0ccc311f576@iogearbox.net>
+ <fc1b5650-72bb-4b09-bab4-f61b2186f673@linux.dev>
+ <9f3697c1-ed15-4a3d-9113-c4437f421bb3@linux.dev>
+ <8787f5c0-fed0-b8fa-997b-4d17d9966f13@iogearbox.net>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <8787f5c0-fed0-b8fa-997b-4d17d9966f13@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Am Thu, Dec 21, 2023 at 03:25:56PM +0100 schrieb Andrew Lunn:
-> > Without setting the master-slave option it didn't work. I think its
-> > mandatory.
+On 12/21/23 5:21 AM, Daniel Borkmann wrote:
+> On 12/21/23 5:45 AM, Martin KaFai Lau wrote:
+>> On 12/20/23 11:10 AM, Martin KaFai Lau wrote:
+>>> Good catch. It will unnecessary skip in the following batch/bucket if there 
+>>> is changes in the current batch/bucket.
+>>>
+>>>  From looking at the loop again, I think it is better not to change the 
+>>> iter->offset during the for loop. Only update iter->offset after the for loop 
+>>> has concluded.
+>>>
+>>> The non-zero iter->offset is only useful for the first bucket, so does a test 
+>>> on the first bucket (state->bucket == bucket) before skipping sockets. 
+>>> Something like this:
+>>>
+>>> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+>>> index 89e5a806b82e..a993f364d6ae 100644
+>>> --- a/net/ipv4/udp.c
+>>> +++ b/net/ipv4/udp.c
+>>> @@ -3139,6 +3139,7 @@ static struct sock *bpf_iter_udp_batch(struct seq_file 
+>>> *seq)
+>>>       struct net *net = seq_file_net(seq);
+>>>       struct udp_table *udptable;
+>>>       unsigned int batch_sks = 0;
+>>> +    int bucket, bucket_offset;
+>>>       bool resized = false;
+>>>       struct sock *sk;
+>>>
+>>> @@ -3162,14 +3163,14 @@ static struct sock *bpf_iter_udp_batch(struct 
+>>> seq_file *seq)
+>>>       iter->end_sk = 0;
+>>>       iter->st_bucket_done = false;
+>>>       batch_sks = 0;
+>>> +    bucket = state->bucket;
+>>> +    bucket_offset = 0;
+>>>
+>>>       for (; state->bucket <= udptable->mask; state->bucket++) {
+>>>           struct udp_hslot *hslot2 = &udptable->hash2[state->bucket];
+>>>
+>>> -        if (hlist_empty(&hslot2->head)) {
+>>> -            iter->offset = 0;
+>>> +        if (hlist_empty(&hslot2->head))
+>>>               continue;
+>>> -        }
+>>>
+>>>           spin_lock_bh(&hslot2->lock);
+>>>           udp_portaddr_for_each_entry(sk, &hslot2->head) {
+>>> @@ -3177,8 +3178,9 @@ static struct sock *bpf_iter_udp_batch(struct seq_file 
+>>> *seq)
+>>>                   /* Resume from the last iterated socket at the
+>>>                    * offset in the bucket before iterator was stopped.
+>>>                    */
+>>> -                if (iter->offset) {
+>>> -                    --iter->offset;
+>>> +                if (state->bucket == bucket &&
+>>> +                    bucket_offset < iter->offset) {
+>>> +                    ++bucket_offset;
+>>>                       continue;
+>>>                   }
+>>>                   if (iter->end_sk < iter->max_sk) {
+>>> @@ -3192,10 +3194,10 @@ static struct sock *bpf_iter_udp_batch(struct 
+>>> seq_file *seq)
+>>>
+>>>           if (iter->end_sk)
+>>>               break;
+>>> +    }
+>>>
+>>> -        /* Reset the current bucket's offset before moving to the next 
+>>> bucket. */
+>>> +    if (state->bucket != bucket)
+>>>           iter->offset = 0;
+>>> -    }
+>>>
+>>>       /* All done: no batch made. */
+>>>       if (!iter->end_sk)
+>>
+>> I think I found another bug in the current bpf_iter_udp_batch(). The 
+>> "state->bucket--;" at the end of the batch() function is wrong also. It does 
+>> not need to go back to the previous bucket. After realloc with a larger batch 
+>> array, it should retry on the "state->bucket" as is. I tried to force the 
+>> bind() to use bucket 0 and bind a larger so_reuseport set (24 sockets). 
+>> WARN_ON(state->bucket < 0) triggered.
+>>
+>> Going back to this bug (backward progress on --iter->offset), I think it is a 
+>> bit cleaner to always reset iter->offset to 0 and advance iter->offset to the 
+>> resume_offset only when needed. Something like this:
 > 
-> I don't think it is. The PHY should have a default setting for
-> master-slave. Often its based on the typical use case. If its
-> typically inside a switch, then it should default to prefer-master. If
-> its typically in an end system, then it should be prefer-slave.
+> Hm, my assumption was.. why not do something like the below, and fully start over?
 > 
-That would be the case if you use a forced configuration. I think this
-is already implemented by reading out the MDIO_PMA_PMD_BT1_CTRL in        
-genphy_c45_pma_baset1_read_master_slave. Probably the problem arises    
-with following lines which prevents an inital read of the configuration:
+> I'm mostly puzzled about the side-effects here, in particular, if for the rerun 
+> the sockets
+> in the bucket could already have changed.. maybe I'm still missing something - 
+> what do
+> we need to deal with exactly worst case when we need to go and retry everything, 
+> and what
+> guarantees do we have?
+> 
+> (only compile tested)
+> 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 89e5a806b82e..ca62a4bb7bec 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -3138,7 +3138,8 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>       struct udp_iter_state *state = &iter->state;
+>       struct net *net = seq_file_net(seq);
+>       struct udp_table *udptable;
+> -    unsigned int batch_sks = 0;
+> +    int orig_bucket, orig_offset;
+> +    unsigned int i, batch_sks = 0;
+>       bool resized = false;
+>       struct sock *sk;
+> 
+> @@ -3149,7 +3150,8 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>       }
+> 
+>       udptable = udp_get_table_seq(seq, net);
+> -
+> +    orig_bucket = state->bucket;
+> +    orig_offset = iter->offset;
+>   again:
+>       /* New batch for the next bucket.
+>        * Iterate over the hash table to find a bucket with sockets matching
+> @@ -3211,9 +3213,15 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>       if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2)) {
+>           resized = true;
+>           /* After allocating a larger batch, retry one more time to grab
+> -         * the whole bucket.
+> +         * the whole bucket. Drop the current refs since for the next
+> +         * attempt the composition could have changed, thus start over.
+>            */
+> -        state->bucket--;
+> +        for (i = 0; i < iter->end_sk; i++) {
+> +            sock_put(iter->batch[i]);
+> +            iter->batch[i] = NULL;
+> +        }
+> +        state->bucket = orig_bucket;
+> +        iter->offset = orig_offset;
 
-static int mv88q2xxx_config_init(struct phy_device *phydev)
-{
-        int ret;
-                                                                        
-        /* The 88Q2XXX PHYs do have the extended ability register available, but
-         * register MDIO_PMA_EXTABLE where they should signalize it does not
-         * work according to specification. Therefore, we force it here.
-         */
-        phydev->pma_extable = MDIO_PMA_EXTABLE_BT1;
+It does not need to start over from the orig_bucket. Once it advanced to the 
+next bucket (state->bucket++), the orig_bucket is done. Otherwise, it may need 
+to make backward progress here on the state->bucket. The batch size too small 
+happens on the current state->bucket, so it should retry with the same 
+state->bucket after realloc_batch(). If the state->bucket happens to be the 
+orig_bucket (mean it has not advanced), it will skip the same orig_offset.
 
-        if (phydev->drv->phy_id == MARVELL_PHY_ID_88Q2220)
-                return 0;
+If the orig_bucket had changed (e.g. having more sockets than the last time it 
+was batched) after state->bucket++, it is arguably fine because it was added 
+after the orig_bucket was completely captured in a batch before. The same goes 
+for (orig_bucket-1) that could have changed during the whole udp_table iteration.
 
-        /* Read the current PHY configuration */
-        ret = genphy_c45_read_pma(phydev);
-        if (ret)
-                return ret;
+>           goto again;
+>       }
+>   done:
 
-        return mv88q2xxx_config_aneg(phydev);
-}
-
-If I type in "ethtool -s eth0 autoneg on" I don't have to set the 
-master-slave option. Is the assumption here that we always start with a 
-forced configuration ? If yes, then I have to fix it.
-
->     Andrew
-
-	Dimitri
 
