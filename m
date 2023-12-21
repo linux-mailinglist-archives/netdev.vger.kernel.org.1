@@ -1,236 +1,230 @@
-Return-Path: <netdev+bounces-59804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1723E81C0E4
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:19:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C4381C0EF
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:21:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74E49B21FD2
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:19:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7AA71C237CF
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57AA077F14;
-	Thu, 21 Dec 2023 22:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08DC77F18;
+	Thu, 21 Dec 2023 22:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oi1kv71E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CRpF4i0/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9C077F1C
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cdee34ac-f193-4481-b6ce-3f933a86afec@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1703197154;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FHBV/GCJUU5+YbTEpSGoF/px6XCo1bxI4jgFlUp4ktQ=;
-	b=oi1kv71Elpk8lxdKJc7ZkZQRZOCxXei5ysbrvvvvh0hhvyZkHUUU7WRlP2FfODUw9mdGHl
-	RSZ8vaCZbBWZci0L7PnGQXk3RGBdbrtmPMr1bOA2SXXQabmknFDL+lki6hKzWiXUKLAS8x
-	xOc/htg9HZk7CMMc9xhuhF51Rvb63+Y=
-Date: Thu, 21 Dec 2023 14:19:07 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC3576DAA;
+	Thu, 21 Dec 2023 22:21:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD12C433C7;
+	Thu, 21 Dec 2023 22:21:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703197272;
+	bh=QgXF77VH1quUhBSUHnfmL14IOGo1ToPCIsuSoRp28oM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CRpF4i0/6Uwc4vIfioIc95uffcYv2DC2hR8KxwZCE238XwNPgiOvE6WvGz5elA3Qi
+	 LDbNOISdmiVDiDK2kY/GeKgJgf/OVFmPsstYpvuoVu/syOfVvM70Il5p62loK9Hoiy
+	 T1ZF+MGKJt45QFgWOO3ZE5o1LJEkwQTVb6VRxxL/vACAURdpSisaqdTtcP5W7rmWga
+	 oCcZfsW5D09OyQjVs0Rop88P5wdvt/1NXooobClx0HbP+SSyoFeNyUomULsn61hcEU
+	 el8bh7xuNSr42ymb82aEKaNSKCHlzsK3su/Sb0apnXp1zH1NRm3eGXOhOml1JomaGK
+	 hjCH76QgIL/BQ==
+Received: (nullmailer pid 194830 invoked by uid 1000);
+	Thu, 21 Dec 2023 22:21:09 -0000
+Date: Thu, 21 Dec 2023 16:21:09 -0600
+From: Rob Herring <robh@kernel.org>
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>, Samin Guo <samin.guo@starfivetech.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Andrew Lunn <andrew@lunn.ch>, Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+Message-ID: <20231221222109.GA186673-robh@kernel.org>
+References: <20231220002824.2462655-1-cristian.ciocaltea@collabora.com>
+ <20231220002824.2462655-2-cristian.ciocaltea@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf 1/2] bpf: Avoid iter->offset making backward progress
- in bpf_iter_udp
-Content-Language: en-US
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
- 'Andrii Nakryiko ' <andrii@kernel.org>, netdev@vger.kernel.org,
- kernel-team@meta.com, Aditi Ghag <aditi.ghag@isovalent.com>,
- bpf@vger.kernel.org
-References: <20231219193259.3230692-1-martin.lau@linux.dev>
- <8d15f3a7-b7bc-1a45-0bdf-a0ccc311f576@iogearbox.net>
- <fc1b5650-72bb-4b09-bab4-f61b2186f673@linux.dev>
- <9f3697c1-ed15-4a3d-9113-c4437f421bb3@linux.dev>
- <8787f5c0-fed0-b8fa-997b-4d17d9966f13@iogearbox.net>
- <639b1f3f-cb53-4058-8426-14bd50f2b78f@linux.dev>
- <fb4068fd-6f69-845f-813f-d8691a966010@iogearbox.net>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <fb4068fd-6f69-845f-813f-d8691a966010@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231220002824.2462655-2-cristian.ciocaltea@collabora.com>
 
-On 12/21/23 12:27 PM, Daniel Borkmann wrote:
-> On 12/21/23 3:58 PM, Martin KaFai Lau wrote:
->> On 12/21/23 5:21 AM, Daniel Borkmann wrote:
->>> On 12/21/23 5:45 AM, Martin KaFai Lau wrote:
->>>> On 12/20/23 11:10 AM, Martin KaFai Lau wrote:
->>>>> Good catch. It will unnecessary skip in the following batch/bucket if there 
->>>>> is changes in the current batch/bucket.
->>>>>
->>>>>  From looking at the loop again, I think it is better not to change the 
->>>>> iter->offset during the for loop. Only update iter->offset after the for 
->>>>> loop has concluded.
->>>>>
->>>>> The non-zero iter->offset is only useful for the first bucket, so does a 
->>>>> test on the first bucket (state->bucket == bucket) before skipping sockets. 
->>>>> Something like this:
->>>>>
->>>>> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
->>>>> index 89e5a806b82e..a993f364d6ae 100644
->>>>> --- a/net/ipv4/udp.c
->>>>> +++ b/net/ipv4/udp.c
->>>>> @@ -3139,6 +3139,7 @@ static struct sock *bpf_iter_udp_batch(struct 
->>>>> seq_file *seq)
->>>>>       struct net *net = seq_file_net(seq);
->>>>>       struct udp_table *udptable;
->>>>>       unsigned int batch_sks = 0;
->>>>> +    int bucket, bucket_offset;
->>>>>       bool resized = false;
->>>>>       struct sock *sk;
->>>>>
->>>>> @@ -3162,14 +3163,14 @@ static struct sock *bpf_iter_udp_batch(struct 
->>>>> seq_file *seq)
->>>>>       iter->end_sk = 0;
->>>>>       iter->st_bucket_done = false;
->>>>>       batch_sks = 0;
->>>>> +    bucket = state->bucket;
->>>>> +    bucket_offset = 0;
->>>>>
->>>>>       for (; state->bucket <= udptable->mask; state->bucket++) {
->>>>>           struct udp_hslot *hslot2 = &udptable->hash2[state->bucket];
->>>>>
->>>>> -        if (hlist_empty(&hslot2->head)) {
->>>>> -            iter->offset = 0;
->>>>> +        if (hlist_empty(&hslot2->head))
->>>>>               continue;
->>>>> -        }
->>>>>
->>>>>           spin_lock_bh(&hslot2->lock);
->>>>>           udp_portaddr_for_each_entry(sk, &hslot2->head) {
->>>>> @@ -3177,8 +3178,9 @@ static struct sock *bpf_iter_udp_batch(struct 
->>>>> seq_file *seq)
->>>>>                   /* Resume from the last iterated socket at the
->>>>>                    * offset in the bucket before iterator was stopped.
->>>>>                    */
->>>>> -                if (iter->offset) {
->>>>> -                    --iter->offset;
->>>>> +                if (state->bucket == bucket &&
->>>>> +                    bucket_offset < iter->offset) {
->>>>> +                    ++bucket_offset;
->>>>>                       continue;
->>>>>                   }
->>>>>                   if (iter->end_sk < iter->max_sk) {
->>>>> @@ -3192,10 +3194,10 @@ static struct sock *bpf_iter_udp_batch(struct 
->>>>> seq_file *seq)
->>>>>
->>>>>           if (iter->end_sk)
->>>>>               break;
->>>>> +    }
->>>>>
->>>>> -        /* Reset the current bucket's offset before moving to the next 
->>>>> bucket. */
->>>>> +    if (state->bucket != bucket)
->>>>>           iter->offset = 0;
->>>>> -    }
->>>>>
->>>>>       /* All done: no batch made. */
->>>>>       if (!iter->end_sk)
->>>>
->>>> I think I found another bug in the current bpf_iter_udp_batch(). The 
->>>> "state->bucket--;" at the end of the batch() function is wrong also. It does 
->>>> not need to go back to the previous bucket. After realloc with a larger 
->>>> batch array, it should retry on the "state->bucket" as is. I tried to force 
->>>> the bind() to use bucket 0 and bind a larger so_reuseport set (24 sockets). 
->>>> WARN_ON(state->bucket < 0) triggered.
->>>>
->>>> Going back to this bug (backward progress on --iter->offset), I think it is 
->>>> a bit cleaner to always reset iter->offset to 0 and advance iter->offset to 
->>>> the resume_offset only when needed. Something like this:
->>>
->>> Hm, my assumption was.. why not do something like the below, and fully start 
->>> over?
->>>
->>> I'm mostly puzzled about the side-effects here, in particular, if for the 
->>> rerun the sockets
->>> in the bucket could already have changed.. maybe I'm still missing something 
->>> - what do
->>> we need to deal with exactly worst case when we need to go and retry 
->>> everything, and what
->>> guarantees do we have?
->>>
->>> (only compile tested)
->>>
->>> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
->>> index 89e5a806b82e..ca62a4bb7bec 100644
->>> --- a/net/ipv4/udp.c
->>> +++ b/net/ipv4/udp.c
->>> @@ -3138,7 +3138,8 @@ static struct sock *bpf_iter_udp_batch(struct seq_file 
->>> *seq)
->>>       struct udp_iter_state *state = &iter->state;
->>>       struct net *net = seq_file_net(seq);
->>>       struct udp_table *udptable;
->>> -    unsigned int batch_sks = 0;
->>> +    int orig_bucket, orig_offset;
->>> +    unsigned int i, batch_sks = 0;
->>>       bool resized = false;
->>>       struct sock *sk;
->>>
->>> @@ -3149,7 +3150,8 @@ static struct sock *bpf_iter_udp_batch(struct seq_file 
->>> *seq)
->>>       }
->>>
->>>       udptable = udp_get_table_seq(seq, net);
->>> -
->>> +    orig_bucket = state->bucket;
->>> +    orig_offset = iter->offset;
->>>   again:
->>>       /* New batch for the next bucket.
->>>        * Iterate over the hash table to find a bucket with sockets matching
->>> @@ -3211,9 +3213,15 @@ static struct sock *bpf_iter_udp_batch(struct seq_file 
->>> *seq)
->>>       if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2)) {
->>>           resized = true;
->>>           /* After allocating a larger batch, retry one more time to grab
->>> -         * the whole bucket.
->>> +         * the whole bucket. Drop the current refs since for the next
->>> +         * attempt the composition could have changed, thus start over.
->>>            */
->>> -        state->bucket--;
->>> +        for (i = 0; i < iter->end_sk; i++) {
->>> +            sock_put(iter->batch[i]);
->>> +            iter->batch[i] = NULL;
->>> +        }
->>> +        state->bucket = orig_bucket;
->>> +        iter->offset = orig_offset;
->>
->> It does not need to start over from the orig_bucket. Once it advanced to the 
->> next bucket (state->bucket++), the orig_bucket is done. Otherwise, it may need 
->> to make backward progress here on the state->bucket. The batch size too small 
->> happens on the current state->bucket, so it should retry with the same 
->> state->bucket after realloc_batch(). If the state->bucket happens to be the 
->> orig_bucket (mean it has not advanced), it will skip the same orig_offset.
->>
->> If the orig_bucket had changed (e.g. having more sockets than the last time it 
->> was batched) after state->bucket++, it is arguably fine because it was added 
->> after the orig_bucket was completely captured in a batch before. The same goes 
->> for (orig_bucket-1) that could have changed during the whole udp_table iteration.
+On Wed, Dec 20, 2023 at 02:28:22AM +0200, Cristian Ciocaltea wrote:
+> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
+> similar to the newer JH7110, but it requires only two interrupts and a
+> single reset line, which is 'ahb' instead of the commonly used
+> 'stmmaceth'.
 > 
-> Fair, I was thinking in relation to the above to avoid such inconsistency, hence 
-> the drop of the refs. 
-Ah, for the ref drop, the bpf_iter_udp_realloc_batch() earlier did the sock_put 
-on the iter->batch[]. It is done in the bpf_iter_udp_put_batch(). When it 
-retries with a larger iter->batch[] array, it does retry from the very first 
-udp_sk of the state->bucket again. Thus, the intention is to do the best effort 
-to capture the whole bucket under the "spin_lock_bh(&hslot2->lock)".
-
-> I think it's probably fine to argue either way on how semantics
-> should be as long as the code doesn't get overly complex for covering this corner
-> case.
+> Since the common binding 'snps,dwmac' allows selecting 'ahb' only in
+> conjunction with 'stmmaceth', extend the logic to also permit exclusive
+> usage of the 'ahb' reset name.  This ensures the following use cases are
+> supported:
 > 
-> Thanks,
-> Daniel
+>   JH7110: reset-names = "stmmaceth", "ahb";
+>   JH7100: reset-names = "ahb";
+>   other:  reset-names = "stmmaceth";
+> 
+> Also note the need to use a different dwmac fallback, as v5.20 applies
+> to JH7110 only, while JH7100 relies on v3.7x.
+> 
+> Additionally, drop the reset description items from top-level binding as
+> they are already provided by the included snps,dwmac schema.
+> 
+> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   | 11 ++-
+>  .../bindings/net/starfive,jh7110-dwmac.yaml   | 75 +++++++++++++------
+>  2 files changed, 60 insertions(+), 26 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 5c2769dc689a..90c4db178c67 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -95,6 +95,7 @@ properties:
+>          - snps,dwmac-5.20
+>          - snps,dwxgmac
+>          - snps,dwxgmac-2.10
+> +        - starfive,jh7100-dwmac
+>          - starfive,jh7110-dwmac
+>  
+>    reg:
+> @@ -144,10 +145,12 @@ properties:
+>        - description: AHB reset
+>  
+>    reset-names:
+> -    minItems: 1
+> -    items:
+> -      - const: stmmaceth
+> -      - const: ahb
+> +    oneOf:
+> +      - items:
+> +          - enum: [stmmaceth, ahb]
+> +      - items:
+> +          - const: stmmaceth
+> +          - const: ahb
+>  
+>    power-domains:
+>      maxItems: 1
+> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> index 5e7cfbbebce6..f5f0bff5be0f 100644
+> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> @@ -16,16 +16,20 @@ select:
+>      compatible:
+>        contains:
+>          enum:
+> +          - starfive,jh7100-dwmac
+>            - starfive,jh7110-dwmac
+>    required:
+>      - compatible
+>  
+>  properties:
+>    compatible:
+> -    items:
+> -      - enum:
+> -          - starfive,jh7110-dwmac
+> -      - const: snps,dwmac-5.20
+> +    oneOf:
+> +      - items:
+> +          - const: starfive,jh7100-dwmac
+> +          - const: snps,dwmac
+> +      - items:
+> +          - const: starfive,jh7110-dwmac
+> +          - const: snps,dwmac-5.20
+>  
+>    reg:
+>      maxItems: 1
+> @@ -46,24 +50,6 @@ properties:
+>        - const: tx
+>        - const: gtx
+>  
+> -  interrupts:
+> -    minItems: 3
+> -    maxItems: 3
+> -
+> -  interrupt-names:
+> -    minItems: 3
+> -    maxItems: 3
+> -
+> -  resets:
+> -    items:
+> -      - description: MAC Reset signal.
+> -      - description: AHB Reset signal.
+> -
+> -  reset-names:
+> -    items:
+> -      - const: stmmaceth
+> -      - const: ahb
+> -
+>    starfive,tx-use-rgmii-clk:
+>      description:
+>        Tx clock is provided by external rgmii clock.
+> @@ -94,6 +80,51 @@ required:
+>  allOf:
+>    - $ref: snps,dwmac.yaml#
+>  
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: starfive,jh7100-dwmac
+> +    then:
+> +      properties:
+> +        interrupts:
+> +          minItems: 2
+> +          maxItems: 2
+> +
+> +        interrupt-names:
+> +          minItems: 2
+> +          maxItems: 2
+> +
+> +        resets:
+> +          maxItems: 1
+> +
+> +        reset-names:
+> +          const: ahb
 
+Just 'maxItems: 1'
+
+> +
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: starfive,jh7110-dwmac
+> +    then:
+> +      properties:
+> +        interrupts:
+> +          minItems: 3
+> +          maxItems: 3
+> +
+> +        interrupt-names:
+> +          minItems: 3
+> +          maxItems: 3
+> +
+> +        resets:
+> +          minItems: 2
+> +          maxItems: 2
+
+max is already 2. Drop.
+
+> +
+> +        reset-names:
+> +          items:
+> +            - const: stmmaceth
+> +            - const: ahb
+
+Already defined the names. Just 'minItems: 2'.
+
+> +
+>  unevaluatedProperties: false
+>  
+>  examples:
+> -- 
+> 2.43.0
+> 
 
