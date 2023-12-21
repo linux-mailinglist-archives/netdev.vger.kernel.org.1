@@ -1,165 +1,124 @@
-Return-Path: <netdev+bounces-59554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F6481B36F
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:22:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B169C81B44C
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:49:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6912F286465
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:22:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E36B01C245FE
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944BE4F20E;
-	Thu, 21 Dec 2023 10:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5DCF6E2CE;
+	Thu, 21 Dec 2023 10:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pOezKcBg"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="MVCsGBgw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF524F203
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 10:22:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C4EAC433C7;
-	Thu, 21 Dec 2023 10:21:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703154120;
-	bh=TnlGSDRYO2VtwTMmn2N8mU+2YLb9Mo7YlEStyST94Z4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pOezKcBggbq7/fDAcEZURdhVTCbBeaEFCrktPDya7X4/Zsd+2GysWaQHwkTwGRvrC
-	 cnsfdPXGg4R3BmcPGXRWHn8vgrGL+1T2BS/WVZrTqHV6rEr/L7szYLnTwRYiYoua64
-	 WvgaOWI7FpkZC4XGqdk7rchiO1EO+ekjCkcjLaSDeYW/u+K0CWjsGw6DuRG9ebVOor
-	 2vi8thpiGzqjSlJzToplwySe25ldwRfMPw+pD0DVkmk5LmPEW4ML9XpVydTtp5fLK2
-	 aNXw4jzqYesS17ZOYW65CTJNZ5rO8M2d6BL71qqj6ffi7qbs1Wxwiw4ZaEgJkhJyQf
-	 nvxlh5UmN+h9w==
-Date: Thu, 21 Dec 2023 11:21:53 +0100
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <rmk+kernel@armlinux.org.uk>, Alexander
- Couzens <lynxis@fe80.eu>, Daniel Golle <daniel@makrotopia.org>, Willy Liu
- <willy.liu@realtek.com>, Ioana Ciornei <ioana.ciornei@nxp.com>, Marek
- =?UTF-8?B?TW9qw61r?= <marek.mojik@nic.cz>, =?UTF-8?B?TWF4aW1pbGnDoW4=?=
- Maliar <maximilian.maliar@nic.cz>
-Subject: Re: [PATCH net-next 13/15] net: phy: realtek: drop .read_page and
- .write_page for rtl822x series
-Message-ID: <20231221112153.436d8bdb@dellmb>
-In-Reply-To: <cb28278d-c038-4dbf-81e7-097bf61dfb74@gmail.com>
-References: <20231220155518.15692-1-kabel@kernel.org>
-	<20231220155518.15692-14-kabel@kernel.org>
-	<cb28278d-c038-4dbf-81e7-097bf61dfb74@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5536D6E2D0;
+	Thu, 21 Dec 2023 10:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=03H+pBQS1ta2kxx072C7tlZMZAl9+818xz/DLtnYhoQ=; b=MVCsGBgwS6FdnTJbAFLR7tEtVq
+	uUXf22UlAFfYMZqPEZk/PqYg8TTqS0wVbIexAZh8I/QSP3x+61zJVyS3C8nw2O9n3Si965k+05GXv
+	tH67ShV0Hwes3/2V+wbLhgwgUvv6bkWUrWPvSJiOsfhC/pmNJgxqHb7rzZOImoAU+sa2yE/fHByYc
+	mTmE6pjaVEx57x7K7nMaSLiwB1aUs5H3GpjcES8G1RTP1AqXGrgbGoVIUH85F25IeGMtUnwuLdm1y
+	KYhy/bNwjSY4ADZQGWOwrOGXPiDsLRtrV5/4eeVOLpWSacp/JHWLj09GDgsUkGNkfvnGyaDeYcvFG
+	ju+W5XfQ==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rGGbd-000ORA-7a; Thu, 21 Dec 2023 11:48:45 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2023-12-21
+Date: Thu, 21 Dec 2023 11:48:44 +0100
+Message-Id: <20231221104844.1374-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27130/Thu Dec 21 10:38:20 2023)
 
-On Wed, 20 Dec 2023 18:23:21 +0100
-Heiner Kallweit <hkallweit1@gmail.com> wrote:
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-> On 20.12.2023 16:55, Marek Beh=C3=BAn wrote:
-> > Drop the .read_page() and .write_page() methods for rtl822x series.
-> >=20
-> > The rtl822x driver methods are now reimplemented to only access clause
-> > 45 registers and these are the last methods that explicitly access
-> > clause 22 registers.
-> >=20
-> > If the underlying MDIO bus is clause 22, the paging mechanism is still
-> > used internally in the .read_mmd() and .write_mmd() methods when
-> > accessing registers in MMD 31.
-> >=20
-> > Signed-off-by: Marek Beh=C3=BAn <kabel@kernel.org>
-> > ---
-> >  drivers/net/phy/realtek.c | 12 ------------
-> >  1 file changed, 12 deletions(-)
-> >=20
-> > diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> > index cf608d390aa5..e2f68ac4b005 100644
-> > --- a/drivers/net/phy/realtek.c
-> > +++ b/drivers/net/phy/realtek.c
-> > @@ -963,8 +963,6 @@ static struct phy_driver realtek_drvs[] =3D {
-> >  		.read_status	=3D rtl822x_read_status,
-> >  		.suspend	=3D genphy_c45_pma_suspend,
-> >  		.resume		=3D rtl822x_resume,
-> > -		.read_page	=3D rtl821x_read_page,
-> > -		.write_page	=3D rtl821x_write_page,
-> >  		.read_mmd	=3D rtlgen_read_mmd,
-> >  		.write_mmd	=3D rtlgen_write_mmd,
-> >  	}, {
-> > @@ -975,8 +973,6 @@ static struct phy_driver realtek_drvs[] =3D {
-> >  		.read_status	=3D rtl822x_read_status,
-> >  		.suspend	=3D genphy_c45_pma_suspend,
-> >  		.resume		=3D rtl822x_resume,
-> > -		.read_page	=3D rtl821x_read_page,
-> > -		.write_page	=3D rtl821x_write_page,
-> >  		.read_mmd	=3D rtlgen_read_mmd,
-> >  		.write_mmd	=3D rtlgen_write_mmd,
-> >  	}, {
-> > @@ -987,8 +983,6 @@ static struct phy_driver realtek_drvs[] =3D {
-> >  		.read_status    =3D rtl822x_read_status,
-> >  		.suspend	=3D genphy_c45_pma_suspend,
-> >  		.resume		=3D rtl822x_resume,
-> > -		.read_page      =3D rtl821x_read_page,
-> > -		.write_page     =3D rtl821x_write_page,
-> >  		.read_mmd	=3D rtlgen_read_mmd,
-> >  		.write_mmd	=3D rtlgen_write_mmd,
-> >  	}, {
-> > @@ -999,8 +993,6 @@ static struct phy_driver realtek_drvs[] =3D {
-> >  		.read_status    =3D rtl822x_read_status,
-> >  		.suspend	=3D genphy_c45_pma_suspend,
-> >  		.resume		=3D rtl822x_resume,
-> > -		.read_page      =3D rtl821x_read_page,
-> > -		.write_page     =3D rtl821x_write_page,
-> >  		.read_mmd	=3D rtlgen_read_mmd,
-> >  		.write_mmd	=3D rtlgen_write_mmd,
-> >  	}, {
-> > @@ -1011,8 +1003,6 @@ static struct phy_driver realtek_drvs[] =3D {
-> >  		.read_status    =3D rtl822x_read_status,
-> >  		.suspend	=3D genphy_c45_pma_suspend,
-> >  		.resume		=3D rtl822x_resume,
-> > -		.read_page      =3D rtl821x_read_page,
-> > -		.write_page     =3D rtl821x_write_page,
-> >  		.read_mmd	=3D rtlgen_read_mmd,
-> >  		.write_mmd	=3D rtlgen_write_mmd,
-> >  	}, {
-> > @@ -1023,8 +1013,6 @@ static struct phy_driver realtek_drvs[] =3D {
-> >  		.read_status    =3D rtl822x_read_status,
-> >  		.suspend	=3D genphy_c45_pma_suspend,
-> >  		.resume		=3D rtl822x_resume,
-> > -		.read_page      =3D rtl821x_read_page,
-> > -		.write_page     =3D rtl821x_write_page,
-> >  		.read_mmd	=3D rtlgen_read_mmd,
-> >  		.write_mmd	=3D rtlgen_write_mmd,
-> >  	}, { =20
->=20
-> Dropping the read_page/write_page hooks will be problematic,
-> because they are used by the PHY initialization in e.g.
-> rtl8125a_2_hw_phy_config().
+The following pull-request contains BPF updates for your *net* tree.
 
-I see.=20
+We've added 3 non-merge commits during the last 5 day(s) which contain
+a total of 4 files changed, 45 insertions(+).
 
-Maybe it would be simpler to just remove it from this series.
+The main changes are:
 
-Looking at all instances of paged access in r8169, most of them seem to
-access the vendor 2 MMD registers. Also the person from Realtek says
-that MMD registers are available also on 1gbps PHYs.
+1) Fix a syzkaller splat which triggered an oob issue in bpf_link_show_fdinfo(),
+   from Jiri Olsa.
 
-Looking at PHY specs for RTL8211 series, all of them (as old as 2009)
-seem to document MMD access.
+2) Fix another syzkaller-found issue which triggered a NULL pointer dereference
+   in BPF sockmap for unconnected unix sockets, from John Fastabend.
 
-So I think we can safely add .read_mmd() and .write_mmd() methods to
-all the PHYs in realtek.c that may be used by r8169, and then we can
-change the relevant phy_read/write/modify_paged calls into
-phy_read/write/modify_mmd in r8169 according to the formula.
+Please consider pulling these changes from:
 
-(The relevant accesses being those where page is set to value >=3D 0xa00.)
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
 
-What do you think?
+Thanks a lot!
 
-Marek
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Eric Dumazet, Hou Tao, Jakub Sitnicki, Pengfei Xu
+
+----------------------------------------------------------------
+
+The following changes since commit e307b5a845c5951dabafc48d00b6424ee64716c4:
+
+  octeontx2-af: Fix pause frame configuration (2023-12-11 10:55:12 +0000)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 117211aa739a926e6555cfea883be84bee6f1695:
+
+  bpf: Add missing BPF_LINK_TYPE invocations (2023-12-15 16:34:12 -0800)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Jiri Olsa (1):
+      bpf: Add missing BPF_LINK_TYPE invocations
+
+John Fastabend (2):
+      bpf: syzkaller found null ptr deref in unix_bpf proto add
+      bpf: sockmap, test for unconnected af_unix sock
+
+Martin KaFai Lau (1):
+      Merge branch ' bpf fix for unconnect af_unix socket'
+
+ include/linux/bpf_types.h                          |  4 +++
+ include/net/sock.h                                 |  5 ++++
+ net/core/sock_map.c                                |  2 ++
+ .../selftests/bpf/prog_tests/sockmap_basic.c       | 34 ++++++++++++++++++++++
+ 4 files changed, 45 insertions(+)
 
