@@ -1,122 +1,118 @@
-Return-Path: <netdev+bounces-59569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3279E81B54B
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:53:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4275A81B567
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:00:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E476C286FC6
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:53:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2202287734
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 12:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D38C6E2B0;
-	Thu, 21 Dec 2023 11:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YBWEViC8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6F46E2A1;
+	Thu, 21 Dec 2023 12:00:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458C96D1BF;
-	Thu, 21 Dec 2023 11:53:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F97C433C8;
-	Thu, 21 Dec 2023 11:53:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1703159618;
-	bh=9F3/qY0cutpNDstJcL0vWDIU0kGQbc9WJFFcC7ONXR8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YBWEViC8peSP97B4GVtN/b9ZMnFpTFSCfSCXTvs9sDwrOkQuAXoz5R/cpgoli+vVS
-	 MEMoVVff3fFLIfpfN6vi1ZurcRLrm+w+je3b3DLGNd2yaVnwAgPxinIx9zwh+HHZEW
-	 6u06M4hZvbfT3imPqjcQVUzdMSP8vBn3qs1l47Fk=
-Date: Thu, 21 Dec 2023 12:53:36 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Janitors <kernel-janitors@vger.kernel.org>,
-	Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Justin Stitt <justinstitt@google.com>,
-	Kunwu Chan <chentao@kylinos.cn>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Nathan Chancellor <nathan@kernel.org>,
-	"Steven Rostedt (Google)" <rostedt@goodmis.org>,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Karsten Keil <keil@b1-systems.de>,
-	YouHong Li <liyouhong@kylinos.cn>
-Subject: Re: [PATCH net 1/2] MAINTAINERS: Remove Karsten Keil
-Message-ID: <2023122125-departure-squishier-95d4@gregkh>
-References: <20231221091419.11764-1-bagasdotme@gmail.com>
- <20231221091419.11764-2-bagasdotme@gmail.com>
- <2023122156-diocese-movie-3d75@gregkh>
- <ZYQYUgZrewi2Up50@archie.me>
- <2023122116-favoring-roulette-554f@gregkh>
- <ZYQgGxKOKqIe4TIL@archie.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A9B6BB3D;
+	Thu, 21 Dec 2023 12:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Swprt3Wtwz4f3jZR;
+	Thu, 21 Dec 2023 19:59:58 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id DAB961A0552;
+	Thu, 21 Dec 2023 19:59:59 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP1 (Coremail) with SMTP id cCh0CgB3xw26KIRl_5H6EA--.61666S2;
+	Thu, 21 Dec 2023 19:59:58 +0800 (CST)
+Subject: Re: [syzbot] [mm?] BUG: unable to handle kernel paging request in
+ copy_from_kernel_nofault
+To: Thomas Gleixner <tglx@linutronix.de>, bpf <bpf@vger.kernel.org>
+Cc: syzbot <syzbot+72aa0161922eba61b50e@syzkaller.appspotmail.com>,
+ akpm@linux-foundation.org, bp@alien8.de, bp@suse.de,
+ dave.hansen@linux.intel.com, hpa@zytor.com, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, luto@kernel.org, mingo@redhat.com,
+ netdev@vger.kernel.org, peterz@infradead.org,
+ syzkaller-bugs@googlegroups.com, x86@kernel.org, Jann Horn
+ <jannh@google.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>
+References: <000000000000c84343060a850bd0@google.com> <87jzqb1133.ffs@tglx>
+ <CAG48ez06TZft=ATH1qh2c5mpS5BT8UakwNkzi6nvK5_djC-4Nw@mail.gmail.com>
+ <87r0jwquhv.ffs@tglx>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <e24b125c-8ff4-9031-6c53-67ff2e01f316@huaweicloud.com>
+Date: Thu, 21 Dec 2023 19:59:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZYQgGxKOKqIe4TIL@archie.me>
+In-Reply-To: <87r0jwquhv.ffs@tglx>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-CM-TRANSID:cCh0CgB3xw26KIRl_5H6EA--.61666S2
+X-Coremail-Antispam: 1UD129KBjvdXoWruF1kGryUCFWDXr13ZFW3Awb_yoWkKFcEq3
+	42934kurZ7uF42yr1xtr4a9r1rtw4kArWFq398ArWavFnIva9xG395trZ3Ww4UGwnagFZ3
+	JFW5Z3srKrnI9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbIxYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCYjI0SjxkI62AI
+	1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAF
+	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU13rcDUUUUU==
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
 
-On Thu, Dec 21, 2023 at 06:23:07PM +0700, Bagas Sanjaya wrote:
-> On Thu, Dec 21, 2023 at 11:54:02AM +0100, Greg Kroah-Hartman wrote:
-> > On Thu, Dec 21, 2023 at 05:49:54PM +0700, Bagas Sanjaya wrote:
-> > > On Thu, Dec 21, 2023 at 10:32:09AM +0100, Greg Kroah-Hartman wrote:
-> > > > On Thu, Dec 21, 2023 at 04:14:18PM +0700, Bagas Sanjaya wrote:
-> > > > > He's no longer active maintaining ISDN/mISDN subsystem: his last message
-> > > > > on kernel mailing lists was three years ago [1] and last commit activity
-> > > > > from him was 1e1589ad8b5cb5 ("mISDN: Support DR6 indication in mISDNipac
-> > > > > driver") in 2016 when he gave Acked-by: from his @b1-systems.de address.
-> > > > > 
-> > > > > Move him to CREDITS, as netdev people should already handle ISDN/mISDN
-> > > > > patches.
-> > > > > 
-> > > > > Link: https://lore.kernel.org/r/0ee243a9-9937-ad26-0684-44b18e772662@linux-pingi.de/ [1]
-> > > > > Cc: Karsten Keil <isdn@linux-pingi.de>
-> > > > > Cc: Karsten Keil <keil@b1-systems.de>
-> > > > > Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> > > > 
-> > > > Are you sure he's not active?  It doesn't take much work to keep an old
-> > > > subsystem like this alive, last I remember, real changes were accepted
-> > > > just fine.
-> > > 
-> > > As for LKML messages, yes; he doesn't post any new messages since 2020.
-> > > 
-> > > > 
-> > > > Perhaps just don't send coding style cleanups to old subsystems?  :)
-> > > > 
-> > > > I would not take these unless Karsten agrees that he no longer wants to
-> > > > maintain this.
-> > > 
-> > > OK, I will send a private message to him asking for continuing maintainer
-> > > role. If there's no response from him by the new year, then it's safe to
-> > > route this through net tree instead (hence [PATCH net]).
-> > 
-> > Why are you arbritrarily saying that "no response in 2 weeks, during the
-> > time of the year almost all of Europe is on vacation, means we drop
-> > someone from the MAINTAINERS file"?
-> > 
-> 
-> Because I'm impatient.
+Hi Thomas,
 
-Then kernel development might not be the best thing to work on as
-patience is required here.
+On 12/9/2023 5:01 AM, Thomas Gleixner wrote:
+> diff --git a/arch/x86/mm/maccess.c b/arch/x86/mm/maccess.c
+> index 6993f026adec..8e846833aa37 100644
+> --- a/arch/x86/mm/maccess.c
+> +++ b/arch/x86/mm/maccess.c
+> @@ -3,6 +3,8 @@
+>  #include <linux/uaccess.h>
+>  #include <linux/kernel.h>
+>  
+> +#include <uapi/asm/vsyscall.h>
+> +
+>  #ifdef CONFIG_X86_64
+>  bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size)
+>  {
+> @@ -15,6 +17,9 @@ bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size)
+>  	if (vaddr < TASK_SIZE_MAX + PAGE_SIZE)
+>  		return false;
+>  
+> +	if ((vaddr & PAGE_MASK) == VSYSCALL_ADDR)
+> +		return false;
+> +
+>  	/*
+>  	 * Allow everything during early boot before 'x86_virt_bits'
+>  	 * is initialized.  Needed for instruction decoding in early
 
-> Maybe I can wait for right timing to reroll once
-> Karsten agrees to remove his MAINTAINERS entry.
+Tested-by: Hou Tao <houtao1@huawei.com>
 
-That's up to Karsten, not you.
+Could you please post a formal patch for the fix ? The patch fixes the
+oops when using bpf_probe_read_kernel() or similar bpf helpers [1] to
+read from vsyscall address and you can take my tested-by tag if it is
+necessary.
 
-Again, please relax, slow down, and perhaps work on something more
-technical, like actual kernel fixes?
+[1]:
+https://lore.kernel.org/bpf/CABOYnLynjBoFZOf3Z4BhaZkc5hx_kHfsjiW+UWLoB=w33LvScw@mail.gmail.com/
 
-thanks,
-
-greg k-h
 
