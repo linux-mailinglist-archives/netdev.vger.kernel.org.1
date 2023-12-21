@@ -1,1027 +1,130 @@
-Return-Path: <netdev+bounces-59655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6340C81B9BD
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:42:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4520E81B9CA
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:45:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2BB51F229C9
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:42:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4B9B1F227AF
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776B1360BC;
-	Thu, 21 Dec 2023 14:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43303200B9;
+	Thu, 21 Dec 2023 14:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="alEkS0ta"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVLeW797"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22A1360B2
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703169705;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=OlbaQf4LUULkeplImJ1JZak1wRpgwcAC/tvF/dEg/mU=;
-	b=alEkS0taoyujgpBozPoymHpQocnYttBpe2kYKbFngSCo7IICfP52YVPYB0BkNYC+/HlolC
-	H3TV/aPdV//c21uzfub3qs9kJRnDeMhUoB7lLD/5K/fdouPwRXs6NPtZM/ZI701EV5uLQ6
-	zOvCbDJLetHpe5o6jXHvrnhooBpw/nA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-mj0F3z1PPRGFzhq6A6-JAA-1; Thu, 21 Dec 2023 09:41:40 -0500
-X-MC-Unique: mj0F3z1PPRGFzhq6A6-JAA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B8E0185A589;
-	Thu, 21 Dec 2023 14:41:39 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.53])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 334AF51D5;
-	Thu, 21 Dec 2023 14:41:38 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.7-rc7
-Date: Thu, 21 Dec 2023 15:41:31 +0100
-Message-ID: <20231221144131.366000-1-pabeni@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC71A1D6BD;
+	Thu, 21 Dec 2023 14:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a22f59c6ae6so104881166b.1;
+        Thu, 21 Dec 2023 06:45:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703169945; x=1703774745; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rrwv3J31Qk9UonkvLPYM6smDy/xDXM7xflFYKfVBtBA=;
+        b=mVLeW7977tPTu1qck7qfNaYi6fNZNtr0adCbkZ2hYn6ek4L6ya5+EjE1bNkWDBbZWN
+         +Lp9S/3yqPHUb/RvG5o2WSDricYZa44TpLQWf/UbX0i3SkFM0rh9zg9f+6FORBGg4Uu9
+         jBZKjikbj2Mp4/47s47zZSu84CFrclrZbntDPn4eKRCOhbD1grrVnA0Vxi41Edvd/q2o
+         V+S6V5w0HpuZqqErNa7zfABo6+aiHmPTm5NniKfD1e4oP+TdPRVI4f+Yehuqy2zUc5xj
+         qs3U3kSOw7VVSWh+32tmxjglch45j0eTjLp8bvAnbdMvwIH4MCYnRJzzChU/xldIMY+Z
+         vZpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703169945; x=1703774745;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rrwv3J31Qk9UonkvLPYM6smDy/xDXM7xflFYKfVBtBA=;
+        b=AwbUWe7Y1YdUJA0EDIp2JlBS360V8GDetx431vHFP6x/rqmmoeG0TI3qDgCYeepfNu
+         xxlnACtMtnm5pI9tfPk2En9N+3c/SIc1AdzVcFh0YKtZ0Ws/qsLhSMeL17ELE77zj8us
+         8TzF5BXECYc33Ru/0q0unH6lWUw4kNSURThdwI+yBVM+Wl2RCg9sxlMkNXMNZwDy3O5v
+         29DUcsc80q5q5HXonoXV3yeKHSh1NTdJazm0KeayO701EXplj8hwoY72D/pKVUxgdjmV
+         IM7f2AD7teSKcYXqtjZEsfoy9eoOx9bQHrCxJD1VXkR6QAUZWGGInmuJAZ66t2HozIK4
+         MJvQ==
+X-Gm-Message-State: AOJu0YzjIHShNGjDZtWqmEfOXsiQbRzZ0LoExGZI4k5JxwbPhKaiazIA
+	gyVTXNJHohqMTjMkJHTQMMM=
+X-Google-Smtp-Source: AGHT+IEKcKQfIa5EKtsdTp84TcmMedo4p6ScCtWLgcaDPVjwDofCkKt7udmqLFHMDFjjZlXQGJSvNg==
+X-Received: by 2002:a17:906:221a:b0:a22:dca3:4190 with SMTP id s26-20020a170906221a00b00a22dca34190mr3882533ejs.109.1703169944887;
+        Thu, 21 Dec 2023 06:45:44 -0800 (PST)
+Received: from debian ([93.184.186.109])
+        by smtp.gmail.com with ESMTPSA id h15-20020a17090791cf00b00a1db76f99c8sm1030441ejz.93.2023.12.21.06.45.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 06:45:44 -0800 (PST)
+Date: Thu, 21 Dec 2023 15:45:42 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Stefan Eichenberger <eichest@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/4] net: phy: marvell-88q2xxx: add driver for the
+ Marvell 88Q2220 PHY
+Message-ID: <20231221144542.GA122328@debian>
+References: <20231219093554.GA6393@debian>
+ <20231221072853.107678-1-dima.fedrau@gmail.com>
+ <20231221072853.107678-5-dima.fedrau@gmail.com>
+ <ZYRCDTWgHbM2qAom@eichest-laptop>
+ <20231221141636.GA122124@debian>
+ <59fed161-6c08-4537-b02d-19e67e342dd8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
-
-Hi Linus!
-
-We are not aware of any standing regressions, and we do not
-plan to send a PR next week - unless very bad things happen.
-
-Let me leverage this opportunity to wish you a merry winter
-holiday and happy new year!
-
-The following changes since commit c7402612e2e61b76177f22e6e7f705adcbecc6fe:
-
-  Merge tag 'net-6.7-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-12-14 13:11:49 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.7-rc7
-
-for you to fetch changes up to 74769d810ead7e7af1a481f07a4d890861a6a4cc:
-
-  Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf (2023-12-21 12:27:29 +0100)
-
-----------------------------------------------------------------
-Including fixes from WiFi and bpf.
-
-Current release - regressions:
-
-  - bpf: syzkaller found null ptr deref in unix_bpf proto add
-
-  - eth: i40e: fix ST code value for clause 45
-
-Previous releases - regressions:
-
-  - core: return error from sk_stream_wait_connect() if sk_wait_event() fails
-
-  - ipv6: revert remove expired routes with a separated list of routes
-
-  - wifi rfkill:
-    - set GPIO direction
-    - fix crash with WED rx support enabled
-
-  - bluetooth:
-    - fix deadlock in vhci_send_frame
-    - fix use-after-free in bt_sock_recvmsg
-
-  - eth: mlx5e: fix a race in command alloc flow
-
-  - eth: ice: fix PF with enabled XDP going no-carrier after reset
-
-  - eth: bnxt_en: do not map packet buffers twice
-
-Previous releases - always broken:
-
-  - core:
-    - check vlan filter feature in vlan_vids_add_by_dev() and vlan_vids_del_by_dev()
-    - check dev->gso_max_size in gso_features_check()
-
-  - mptcp: fix inconsistent state on fastopen race
-
-  - phy: skip LED triggers on PHYs on SFP modules
-
-  - eth: mlx5e:
-    - fix double free of encap_header
-    - fix slab-out-of-bounds in mlx5_query_nic_vport_mac_list()
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alex Lu (1):
-      Bluetooth: Add more enc key size check
-
-Andy Gospodarek (1):
-      bnxt_en: do not map packet buffers twice
-
-Arnd Bergmann (1):
-      Bluetooth: hci_event: shut up a false-positive warning
-
-Avraham Stern (1):
-      wifi: iwlwifi: pcie: avoid a NULL pointer dereference
-
-Carolina Jubran (1):
-      net/mlx5e: XDP, Drop fragmented packets larger than MTU size
-
-Chen-Yu Tsai (1):
-      wifi: cfg80211: Add my certificate
-
-Chris Mi (1):
-      net/mlx5e: Decrease num_block_tc when unblock tc offload
-
-Dan Carpenter (2):
-      net/mlx5e: Fix error code in mlx5e_tc_action_miss_mapping_get()
-      net/mlx5e: Fix error codes in alloc_branch_attr()
-
-Daniel Golle (1):
-      net: phy: skip LED triggers on PHYs on SFP modules
-
-Dave Ertman (1):
-      ice: alter feature support check for SRIOV and LAG
-
-David Ahern (1):
-      net/ipv6: Revert remove expired routes with a separated list of routes
-
-David S. Miller (2):
-      Merge branch 'mptcp-misc-fixes'
-      Merge tag 'for-net-2023-12-15' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-
-Dinghao Liu (1):
-      net/mlx5e: fix a potential double-free in fs_udp_create_groups
-
-Edward Adam Davis (1):
-      wifi: mac80211: check if the existing link config remains unchanged
-
-Eric Dumazet (3):
-      net: sched: ife: fix potential use-after-free
-      net/rose: fix races in rose_kill_by_device()
-      net: check dev->gso_max_size in gso_features_check()
-
-Felix Fietkau (1):
-      wifi: mt76: fix crash with WED rx support enabled
-
-Frédéric Danis (1):
-      Bluetooth: L2CAP: Send reject on command corrupted request
-
-Geliang Tang (2):
-      selftests: mptcp: join: fix subflow_send_ack lookup
-      mailmap: add entries for Geliang Tang
-
-Hangbin Liu (1):
-      kselftest: rtnetlink.sh: use grep_fail when expecting the cmd fail
-
-Hyunwoo Kim (1):
-      Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-
-Ivan Vecera (1):
-      i40e: Fix ST code value for Clause 45
-
-Jacob Keller (1):
-      ice: stop trashing VF VSI aggregator node ID information
-
-Jakub Kicinski (3):
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'mlx5-fixes-2023-12-13' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
-      Merge tag 'wireless-2023-12-14' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-
-Jianbo Liu (1):
-      net/mlx5e: Fix overrun reported by coverity
-
-Jijie Shao (1):
-      net: hns3: add new maintainer for the HNS3 ethernet driver
-
-Jiri Olsa (1):
-      bpf: Add missing BPF_LINK_TYPE invocations
-
-Johannes Berg (7):
-      wifi: ieee80211: don't require protected vendor action frames
-      wifi: iwlwifi: pcie: add another missing bh-disable for rxq->lock
-      wifi: mac80211: don't re-add debugfs during reconfig
-      wifi: mac80211: check defragmentation succeeded
-      wifi: mac80211: mesh: check element parsing succeeded
-      wifi: mac80211: mesh_plink: fix matches_local logic
-      wifi: cfg80211: fix certs build to not depend on file order
-
-John Fastabend (2):
-      bpf: syzkaller found null ptr deref in unix_bpf proto add
-      bpf: sockmap, test for unconnected af_unix sock
-
-Lai Peter Jun Ann (1):
-      net: stmmac: fix incorrect flag check in timestamp interrupt
-
-Larysa Zaremba (1):
-      ice: Fix PF with enabled XDP going no-carrier after reset
-
-Liu Jian (2):
-      net: check vlan filter feature in vlan_vids_add_by_dev() and vlan_vids_del_by_dev()
-      selftests: add vlan hw filter tests
-
-Lorenzo Bianconi (1):
-      net: ethernet: mtk_wed: fix possible NULL pointer dereference in mtk_wed_wo_queue_tx_clean()
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: Fix not notifying when connection encryption changes
-      Bluetooth: hci_event: Fix not checking if HCI_OP_INQUIRY has been sent
-      Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
-
-Martin KaFai Lau (1):
-      Merge branch ' bpf fix for unconnect af_unix socket'
-
-Matthieu Baerts (1):
-      mptcp: fill in missing MODULE_DESCRIPTION()
-
-Michal Schmidt (1):
-      ice: fix theoretical out-of-bounds access in ethtool link modes
-
-Moshe Shemesh (1):
-      net/mlx5: Fix fw tracer first block check
-
-Paolo Abeni (4):
-      mptcp: fix inconsistent state on fastopen race
-      Merge branch 'check-vlan-filter-feature-in-vlan_vids_add_by_dev-and-vlan_vids_del_by_dev'
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-
-Rahul Rameshbabu (2):
-      net/mlx5e: Correct snprintf truncation handling for fw_version buffer
-      net/mlx5e: Correct snprintf truncation handling for fw_version buffer used by representors
-
-Ronald Wahl (1):
-      net: ks8851: Fix TX stall caused by TX buffer overrun
-
-Rouven Czerwinski (1):
-      net: rfkill: gpio: set GPIO direction
-
-Shifeng Li (2):
-      net/mlx5e: Fix slab-out-of-bounds in mlx5_query_nic_vport_mac_list()
-      net/mlx5e: Fix a race in command alloc flow
-
-Shigeru Yoshida (1):
-      net: Return error from sk_stream_wait_connect() if sk_wait_event() fails
-
-Suman Ghosh (1):
-      octeontx2-pf: Fix graceful exit during PFC configuration failure
-
-Thomas Weißschuh (1):
-      net: avoid build bug in skb extension length calculation
-
-Vlad Buslov (4):
-      Revert "net/mlx5e: fix double free of encap_header in update funcs"
-      Revert "net/mlx5e: fix double free of encap_header"
-      net/mlx5e: fix double free of encap_header
-      net/mlx5: Refactor mlx5_flow_destination->rep pointer to vport num
-
-Vladimir Oltean (2):
-      net: mscc: ocelot: fix eMAC TX RMON stats for bucket 256-511 and above
-      net: mscc: ocelot: fix pMAC TX RMON stats for bucket 256-511 and above
-
-Xiao Yao (1):
-      Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE
-
-Ying Hsu (1):
-      Bluetooth: Fix deadlock in vhci_send_frame
-
-Yury Norov (1):
-      net: mana: select PAGE_POOL
-
-Zhipeng Lu (1):
-      ethernet: atheros: fix a memleak in atl1e_setup_ring_resources
-
-duanqiangwen (1):
-      net: libwx: fix memory leak on free page
-
- .mailmap                                           |  4 +
- MAINTAINERS                                        |  1 +
- drivers/bluetooth/hci_vhci.c                       | 10 ++-
- drivers/net/ethernet/atheros/atl1e/atl1e_main.c    |  5 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c      | 11 +--
- drivers/net/ethernet/intel/i40e/i40e_register.h    |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_type.h        |  4 +-
- drivers/net/ethernet/intel/ice/ice_ethtool.c       |  4 +-
- drivers/net/ethernet/intel/ice/ice_lag.c           |  2 +
- drivers/net/ethernet/intel/ice/ice_lib.c           |  7 +-
- .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c    | 17 ++++-
- drivers/net/ethernet/mediatek/mtk_wed_wo.c         |  3 +
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c      | 12 +--
- .../ethernet/mellanox/mlx5/core/diag/fw_tracer.c   |  2 +-
- .../mellanox/mlx5/core/en/fs_tt_redirect.c         |  1 +
- .../ethernet/mellanox/mlx5/core/en/tc/act/mirred.c |  5 +-
- .../net/ethernet/mellanox/mlx5/core/en/tc_tun.c    | 50 +++++++------
- .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |  3 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c   |  4 +-
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c         |  2 +-
- .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    | 10 ++-
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.h  |  3 +-
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c | 31 +++++---
- .../mellanox/mlx5/core/eswitch_offloads_termtbl.c  |  4 +-
- drivers/net/ethernet/mellanox/mlx5/core/vport.c    |  2 +-
- drivers/net/ethernet/micrel/ks8851.h               |  3 +
- drivers/net/ethernet/micrel/ks8851_common.c        | 20 ++---
- drivers/net/ethernet/micrel/ks8851_spi.c           | 42 +++++++----
- drivers/net/ethernet/microsoft/Kconfig             |  1 +
- drivers/net/ethernet/mscc/ocelot_stats.c           | 16 ++--
- .../net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c  |  2 +-
- drivers/net/ethernet/wangxun/libwx/wx_lib.c        | 82 ++------------------
- drivers/net/ethernet/wangxun/libwx/wx_type.h       |  1 -
- drivers/net/phy/phy_device.c                       |  6 +-
- drivers/net/wireless/intel/iwlwifi/pcie/rx.c       |  2 +-
- drivers/net/wireless/intel/iwlwifi/pcie/trans.c    |  4 +-
- drivers/net/wireless/mediatek/mt76/dma.c           | 10 ++-
- include/linux/bpf_types.h                          |  4 +
- include/linux/ieee80211.h                          |  3 +-
- include/net/bluetooth/hci_core.h                   |  9 ++-
- include/net/ip6_fib.h                              | 64 ++++------------
- include/net/sock.h                                 |  5 ++
- net/8021q/vlan_core.c                              |  9 ++-
- net/bluetooth/af_bluetooth.c                       |  7 +-
- net/bluetooth/hci_event.c                          | 30 +++++---
- net/bluetooth/l2cap_core.c                         | 21 ++++--
- net/bluetooth/mgmt.c                               | 25 +++++--
- net/bluetooth/smp.c                                |  7 ++
- net/core/dev.c                                     |  3 +
- net/core/skbuff.c                                  |  2 +
- net/core/sock_map.c                                |  2 +
- net/core/stream.c                                  |  2 +-
- net/ife/ife.c                                      |  1 +
- net/ipv6/ip6_fib.c                                 | 55 ++------------
- net/ipv6/route.c                                   |  6 +-
- net/mac80211/cfg.c                                 |  4 +-
- net/mac80211/driver-ops.c                          |  6 +-
- net/mac80211/mesh_plink.c                          | 16 ++--
- net/mac80211/mlme.c                                |  4 +-
- net/mptcp/crypto_test.c                            |  1 +
- net/mptcp/protocol.c                               |  6 +-
- net/mptcp/protocol.h                               |  9 ++-
- net/mptcp/subflow.c                                | 28 ++++---
- net/mptcp/token_test.c                             |  1 +
- net/rfkill/rfkill-gpio.c                           |  8 ++
- net/rose/af_rose.c                                 | 39 ++++++++--
- net/wireless/certs/wens.hex                        | 87 ++++++++++++++++++++++
- .../selftests/bpf/prog_tests/sockmap_basic.c       | 34 +++++++++
- tools/testing/selftests/net/Makefile               |  1 +
- tools/testing/selftests/net/mptcp/mptcp_join.sh    |  8 +-
- tools/testing/selftests/net/rtnetlink.sh           |  2 +-
- tools/testing/selftests/net/vlan_hw_filter.sh      | 29 ++++++++
- 74 files changed, 561 insertions(+), 369 deletions(-)
- create mode 100644 net/wireless/certs/wens.hex
- create mode 100755 tools/testing/selftests/net/vlan_hw_filter.sh
-The following changes since commit c7402612e2e61b76177f22e6e7f705adcbecc6fe:
-
-  Merge tag 'net-6.7-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-12-14 13:11:49 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.7-rc7
-
-for you to fetch changes up to 74769d810ead7e7af1a481f07a4d890861a6a4cc:
-
-  Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf (2023-12-21 12:27:29 +0100)
-
-----------------------------------------------------------------
-Including fixes from WiFi and bpf.
-
-Current release - regressions:
-
-  - bpf: syzkaller found null ptr deref in unix_bpf proto add
-
-  - eth: i40e: fix ST code value for clause 45
-
-Previous releases - regressions:
-
-  - core: return error from sk_stream_wait_connect() if sk_wait_event() fails
-
-  - ipv6: revert remove expired routes with a separated list of routes
-
-  - wifi rfkill:
-    - set GPIO direction
-    - fix crash with WED rx support enabled
-
-  - bluetooth:
-    - fix deadlock in vhci_send_frame
-    - fix use-after-free in bt_sock_recvmsg
-
-  - eth: mlx5e: fix a race in command alloc flow
-
-  - eth: ice: fix PF with enabled XDP going no-carrier after reset
-
-  - eth: bnxt_en: do not map packet buffers twice
-
-Previous releases - always broken:
-
-  - core:
-    - check vlan filter feature in vlan_vids_add_by_dev() and vlan_vids_del_by_dev()
-    - check dev->gso_max_size in gso_features_check()
-
-  - mptcp: fix inconsistent state on fastopen race
-
-  - phy: skip LED triggers on PHYs on SFP modules
-
-  - eth: mlx5e:
-    - fix double free of encap_header
-    - fix slab-out-of-bounds in mlx5_query_nic_vport_mac_list()
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alex Lu (1):
-      Bluetooth: Add more enc key size check
-
-Andy Gospodarek (1):
-      bnxt_en: do not map packet buffers twice
-
-Arnd Bergmann (1):
-      Bluetooth: hci_event: shut up a false-positive warning
-
-Avraham Stern (1):
-      wifi: iwlwifi: pcie: avoid a NULL pointer dereference
-
-Carolina Jubran (1):
-      net/mlx5e: XDP, Drop fragmented packets larger than MTU size
-
-Chen-Yu Tsai (1):
-      wifi: cfg80211: Add my certificate
-
-Chris Mi (1):
-      net/mlx5e: Decrease num_block_tc when unblock tc offload
-
-Dan Carpenter (2):
-      net/mlx5e: Fix error code in mlx5e_tc_action_miss_mapping_get()
-      net/mlx5e: Fix error codes in alloc_branch_attr()
-
-Daniel Golle (1):
-      net: phy: skip LED triggers on PHYs on SFP modules
-
-Dave Ertman (1):
-      ice: alter feature support check for SRIOV and LAG
-
-David Ahern (1):
-      net/ipv6: Revert remove expired routes with a separated list of routes
-
-David S. Miller (2):
-      Merge branch 'mptcp-misc-fixes'
-      Merge tag 'for-net-2023-12-15' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-
-Dinghao Liu (1):
-      net/mlx5e: fix a potential double-free in fs_udp_create_groups
-
-Edward Adam Davis (1):
-      wifi: mac80211: check if the existing link config remains unchanged
-
-Eric Dumazet (3):
-      net: sched: ife: fix potential use-after-free
-      net/rose: fix races in rose_kill_by_device()
-      net: check dev->gso_max_size in gso_features_check()
-
-Felix Fietkau (1):
-      wifi: mt76: fix crash with WED rx support enabled
-
-Frédéric Danis (1):
-      Bluetooth: L2CAP: Send reject on command corrupted request
-
-Geliang Tang (2):
-      selftests: mptcp: join: fix subflow_send_ack lookup
-      mailmap: add entries for Geliang Tang
-
-Hangbin Liu (1):
-      kselftest: rtnetlink.sh: use grep_fail when expecting the cmd fail
-
-Hyunwoo Kim (1):
-      Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-
-Ivan Vecera (1):
-      i40e: Fix ST code value for Clause 45
-
-Jacob Keller (1):
-      ice: stop trashing VF VSI aggregator node ID information
-
-Jakub Kicinski (3):
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'mlx5-fixes-2023-12-13' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
-      Merge tag 'wireless-2023-12-14' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-
-Jianbo Liu (1):
-      net/mlx5e: Fix overrun reported by coverity
-
-Jijie Shao (1):
-      net: hns3: add new maintainer for the HNS3 ethernet driver
-
-Jiri Olsa (1):
-      bpf: Add missing BPF_LINK_TYPE invocations
-
-Johannes Berg (7):
-      wifi: ieee80211: don't require protected vendor action frames
-      wifi: iwlwifi: pcie: add another missing bh-disable for rxq->lock
-      wifi: mac80211: don't re-add debugfs during reconfig
-      wifi: mac80211: check defragmentation succeeded
-      wifi: mac80211: mesh: check element parsing succeeded
-      wifi: mac80211: mesh_plink: fix matches_local logic
-      wifi: cfg80211: fix certs build to not depend on file order
-
-John Fastabend (2):
-      bpf: syzkaller found null ptr deref in unix_bpf proto add
-      bpf: sockmap, test for unconnected af_unix sock
-
-Lai Peter Jun Ann (1):
-      net: stmmac: fix incorrect flag check in timestamp interrupt
-
-Larysa Zaremba (1):
-      ice: Fix PF with enabled XDP going no-carrier after reset
-
-Liu Jian (2):
-      net: check vlan filter feature in vlan_vids_add_by_dev() and vlan_vids_del_by_dev()
-      selftests: add vlan hw filter tests
-
-Lorenzo Bianconi (1):
-      net: ethernet: mtk_wed: fix possible NULL pointer dereference in mtk_wed_wo_queue_tx_clean()
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: Fix not notifying when connection encryption changes
-      Bluetooth: hci_event: Fix not checking if HCI_OP_INQUIRY has been sent
-      Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
-
-Martin KaFai Lau (1):
-      Merge branch ' bpf fix for unconnect af_unix socket'
-
-Matthieu Baerts (1):
-      mptcp: fill in missing MODULE_DESCRIPTION()
-
-Michal Schmidt (1):
-      ice: fix theoretical out-of-bounds access in ethtool link modes
-
-Moshe Shemesh (1):
-      net/mlx5: Fix fw tracer first block check
-
-Paolo Abeni (4):
-      mptcp: fix inconsistent state on fastopen race
-      Merge branch 'check-vlan-filter-feature-in-vlan_vids_add_by_dev-and-vlan_vids_del_by_dev'
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-
-Rahul Rameshbabu (2):
-      net/mlx5e: Correct snprintf truncation handling for fw_version buffer
-      net/mlx5e: Correct snprintf truncation handling for fw_version buffer used by representors
-
-Ronald Wahl (1):
-      net: ks8851: Fix TX stall caused by TX buffer overrun
-
-Rouven Czerwinski (1):
-      net: rfkill: gpio: set GPIO direction
-
-Shifeng Li (2):
-      net/mlx5e: Fix slab-out-of-bounds in mlx5_query_nic_vport_mac_list()
-      net/mlx5e: Fix a race in command alloc flow
-
-Shigeru Yoshida (1):
-      net: Return error from sk_stream_wait_connect() if sk_wait_event() fails
-
-Suman Ghosh (1):
-      octeontx2-pf: Fix graceful exit during PFC configuration failure
-
-Thomas Weißschuh (1):
-      net: avoid build bug in skb extension length calculation
-
-Vlad Buslov (4):
-      Revert "net/mlx5e: fix double free of encap_header in update funcs"
-      Revert "net/mlx5e: fix double free of encap_header"
-      net/mlx5e: fix double free of encap_header
-      net/mlx5: Refactor mlx5_flow_destination->rep pointer to vport num
-
-Vladimir Oltean (2):
-      net: mscc: ocelot: fix eMAC TX RMON stats for bucket 256-511 and above
-      net: mscc: ocelot: fix pMAC TX RMON stats for bucket 256-511 and above
-
-Xiao Yao (1):
-      Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE
-
-Ying Hsu (1):
-      Bluetooth: Fix deadlock in vhci_send_frame
-
-Yury Norov (1):
-      net: mana: select PAGE_POOL
-
-Zhipeng Lu (1):
-      ethernet: atheros: fix a memleak in atl1e_setup_ring_resources
-
-duanqiangwen (1):
-      net: libwx: fix memory leak on free page
-
- .mailmap                                           |  4 +
- MAINTAINERS                                        |  1 +
- drivers/bluetooth/hci_vhci.c                       | 10 ++-
- drivers/net/ethernet/atheros/atl1e/atl1e_main.c    |  5 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c      | 11 +--
- drivers/net/ethernet/intel/i40e/i40e_register.h    |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_type.h        |  4 +-
- drivers/net/ethernet/intel/ice/ice_ethtool.c       |  4 +-
- drivers/net/ethernet/intel/ice/ice_lag.c           |  2 +
- drivers/net/ethernet/intel/ice/ice_lib.c           |  7 +-
- .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c    | 17 ++++-
- drivers/net/ethernet/mediatek/mtk_wed_wo.c         |  3 +
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c      | 12 +--
- .../ethernet/mellanox/mlx5/core/diag/fw_tracer.c   |  2 +-
- .../mellanox/mlx5/core/en/fs_tt_redirect.c         |  1 +
- .../ethernet/mellanox/mlx5/core/en/tc/act/mirred.c |  5 +-
- .../net/ethernet/mellanox/mlx5/core/en/tc_tun.c    | 50 +++++++------
- .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |  3 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c   |  4 +-
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c         |  2 +-
- .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    | 10 ++-
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.h  |  3 +-
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c | 31 +++++---
- .../mellanox/mlx5/core/eswitch_offloads_termtbl.c  |  4 +-
- drivers/net/ethernet/mellanox/mlx5/core/vport.c    |  2 +-
- drivers/net/ethernet/micrel/ks8851.h               |  3 +
- drivers/net/ethernet/micrel/ks8851_common.c        | 20 ++---
- drivers/net/ethernet/micrel/ks8851_spi.c           | 42 +++++++----
- drivers/net/ethernet/microsoft/Kconfig             |  1 +
- drivers/net/ethernet/mscc/ocelot_stats.c           | 16 ++--
- .../net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c  |  2 +-
- drivers/net/ethernet/wangxun/libwx/wx_lib.c        | 82 ++------------------
- drivers/net/ethernet/wangxun/libwx/wx_type.h       |  1 -
- drivers/net/phy/phy_device.c                       |  6 +-
- drivers/net/wireless/intel/iwlwifi/pcie/rx.c       |  2 +-
- drivers/net/wireless/intel/iwlwifi/pcie/trans.c    |  4 +-
- drivers/net/wireless/mediatek/mt76/dma.c           | 10 ++-
- include/linux/bpf_types.h                          |  4 +
- include/linux/ieee80211.h                          |  3 +-
- include/net/bluetooth/hci_core.h                   |  9 ++-
- include/net/ip6_fib.h                              | 64 ++++------------
- include/net/sock.h                                 |  5 ++
- net/8021q/vlan_core.c                              |  9 ++-
- net/bluetooth/af_bluetooth.c                       |  7 +-
- net/bluetooth/hci_event.c                          | 30 +++++---
- net/bluetooth/l2cap_core.c                         | 21 ++++--
- net/bluetooth/mgmt.c                               | 25 +++++--
- net/bluetooth/smp.c                                |  7 ++
- net/core/dev.c                                     |  3 +
- net/core/skbuff.c                                  |  2 +
- net/core/sock_map.c                                |  2 +
- net/core/stream.c                                  |  2 +-
- net/ife/ife.c                                      |  1 +
- net/ipv6/ip6_fib.c                                 | 55 ++------------
- net/ipv6/route.c                                   |  6 +-
- net/mac80211/cfg.c                                 |  4 +-
- net/mac80211/driver-ops.c                          |  6 +-
- net/mac80211/mesh_plink.c                          | 16 ++--
- net/mac80211/mlme.c                                |  4 +-
- net/mptcp/crypto_test.c                            |  1 +
- net/mptcp/protocol.c                               |  6 +-
- net/mptcp/protocol.h                               |  9 ++-
- net/mptcp/subflow.c                                | 28 ++++---
- net/mptcp/token_test.c                             |  1 +
- net/rfkill/rfkill-gpio.c                           |  8 ++
- net/rose/af_rose.c                                 | 39 ++++++++--
- net/wireless/certs/wens.hex                        | 87 ++++++++++++++++++++++
- .../selftests/bpf/prog_tests/sockmap_basic.c       | 34 +++++++++
- tools/testing/selftests/net/Makefile               |  1 +
- tools/testing/selftests/net/mptcp/mptcp_join.sh    |  8 +-
- tools/testing/selftests/net/rtnetlink.sh           |  2 +-
- tools/testing/selftests/net/vlan_hw_filter.sh      | 29 ++++++++
- 74 files changed, 561 insertions(+), 369 deletions(-)
- create mode 100644 net/wireless/certs/wens.hex
- create mode 100755 tools/testing/selftests/net/vlan_hw_filter.sh
-The following changes since commit c7402612e2e61b76177f22e6e7f705adcbecc6fe:
-
-  Merge tag 'net-6.7-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-12-14 13:11:49 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.7-rc7
-
-for you to fetch changes up to 74769d810ead7e7af1a481f07a4d890861a6a4cc:
-
-  Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf (2023-12-21 12:27:29 +0100)
-
-----------------------------------------------------------------
-Including fixes from WiFi and bpf.
-
-Current release - regressions:
-
-  - bpf: syzkaller found null ptr deref in unix_bpf proto add
-
-  - eth: i40e: fix ST code value for clause 45
-
-Previous releases - regressions:
-
-  - core: return error from sk_stream_wait_connect() if sk_wait_event() fails
-
-  - ipv6: revert remove expired routes with a separated list of routes
-
-  - wifi rfkill:
-    - set GPIO direction
-    - fix crash with WED rx support enabled
-
-  - bluetooth:
-    - fix deadlock in vhci_send_frame
-    - fix use-after-free in bt_sock_recvmsg
-
-  - eth: mlx5e: fix a race in command alloc flow
-
-  - eth: ice: fix PF with enabled XDP going no-carrier after reset
-
-  - eth: bnxt_en: do not map packet buffers twice
-
-Previous releases - always broken:
-
-  - core:
-    - check vlan filter feature in vlan_vids_add_by_dev() and vlan_vids_del_by_dev()
-    - check dev->gso_max_size in gso_features_check()
-
-  - mptcp: fix inconsistent state on fastopen race
-
-  - phy: skip LED triggers on PHYs on SFP modules
-
-  - eth: mlx5e:
-    - fix double free of encap_header
-    - fix slab-out-of-bounds in mlx5_query_nic_vport_mac_list()
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alex Lu (1):
-      Bluetooth: Add more enc key size check
-
-Andy Gospodarek (1):
-      bnxt_en: do not map packet buffers twice
-
-Arnd Bergmann (1):
-      Bluetooth: hci_event: shut up a false-positive warning
-
-Avraham Stern (1):
-      wifi: iwlwifi: pcie: avoid a NULL pointer dereference
-
-Carolina Jubran (1):
-      net/mlx5e: XDP, Drop fragmented packets larger than MTU size
-
-Chen-Yu Tsai (1):
-      wifi: cfg80211: Add my certificate
-
-Chris Mi (1):
-      net/mlx5e: Decrease num_block_tc when unblock tc offload
-
-Dan Carpenter (2):
-      net/mlx5e: Fix error code in mlx5e_tc_action_miss_mapping_get()
-      net/mlx5e: Fix error codes in alloc_branch_attr()
-
-Daniel Golle (1):
-      net: phy: skip LED triggers on PHYs on SFP modules
-
-Dave Ertman (1):
-      ice: alter feature support check for SRIOV and LAG
-
-David Ahern (1):
-      net/ipv6: Revert remove expired routes with a separated list of routes
-
-David S. Miller (2):
-      Merge branch 'mptcp-misc-fixes'
-      Merge tag 'for-net-2023-12-15' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-
-Dinghao Liu (1):
-      net/mlx5e: fix a potential double-free in fs_udp_create_groups
-
-Edward Adam Davis (1):
-      wifi: mac80211: check if the existing link config remains unchanged
-
-Eric Dumazet (3):
-      net: sched: ife: fix potential use-after-free
-      net/rose: fix races in rose_kill_by_device()
-      net: check dev->gso_max_size in gso_features_check()
-
-Felix Fietkau (1):
-      wifi: mt76: fix crash with WED rx support enabled
-
-Frédéric Danis (1):
-      Bluetooth: L2CAP: Send reject on command corrupted request
-
-Geliang Tang (2):
-      selftests: mptcp: join: fix subflow_send_ack lookup
-      mailmap: add entries for Geliang Tang
-
-Hangbin Liu (1):
-      kselftest: rtnetlink.sh: use grep_fail when expecting the cmd fail
-
-Hyunwoo Kim (1):
-      Bluetooth: af_bluetooth: Fix Use-After-Free in bt_sock_recvmsg
-
-Ivan Vecera (1):
-      i40e: Fix ST code value for Clause 45
-
-Jacob Keller (1):
-      ice: stop trashing VF VSI aggregator node ID information
-
-Jakub Kicinski (3):
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'mlx5-fixes-2023-12-13' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
-      Merge tag 'wireless-2023-12-14' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-
-Jianbo Liu (1):
-      net/mlx5e: Fix overrun reported by coverity
-
-Jijie Shao (1):
-      net: hns3: add new maintainer for the HNS3 ethernet driver
-
-Jiri Olsa (1):
-      bpf: Add missing BPF_LINK_TYPE invocations
-
-Johannes Berg (7):
-      wifi: ieee80211: don't require protected vendor action frames
-      wifi: iwlwifi: pcie: add another missing bh-disable for rxq->lock
-      wifi: mac80211: don't re-add debugfs during reconfig
-      wifi: mac80211: check defragmentation succeeded
-      wifi: mac80211: mesh: check element parsing succeeded
-      wifi: mac80211: mesh_plink: fix matches_local logic
-      wifi: cfg80211: fix certs build to not depend on file order
-
-John Fastabend (2):
-      bpf: syzkaller found null ptr deref in unix_bpf proto add
-      bpf: sockmap, test for unconnected af_unix sock
-
-Lai Peter Jun Ann (1):
-      net: stmmac: fix incorrect flag check in timestamp interrupt
-
-Larysa Zaremba (1):
-      ice: Fix PF with enabled XDP going no-carrier after reset
-
-Liu Jian (2):
-      net: check vlan filter feature in vlan_vids_add_by_dev() and vlan_vids_del_by_dev()
-      selftests: add vlan hw filter tests
-
-Lorenzo Bianconi (1):
-      net: ethernet: mtk_wed: fix possible NULL pointer dereference in mtk_wed_wo_queue_tx_clean()
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: Fix not notifying when connection encryption changes
-      Bluetooth: hci_event: Fix not checking if HCI_OP_INQUIRY has been sent
-      Bluetooth: hci_core: Fix hci_conn_hash_lookup_cis
-
-Martin KaFai Lau (1):
-      Merge branch ' bpf fix for unconnect af_unix socket'
-
-Matthieu Baerts (1):
-      mptcp: fill in missing MODULE_DESCRIPTION()
-
-Michal Schmidt (1):
-      ice: fix theoretical out-of-bounds access in ethtool link modes
-
-Moshe Shemesh (1):
-      net/mlx5: Fix fw tracer first block check
-
-Paolo Abeni (4):
-      mptcp: fix inconsistent state on fastopen race
-      Merge branch 'check-vlan-filter-feature-in-vlan_vids_add_by_dev-and-vlan_vids_del_by_dev'
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-
-Rahul Rameshbabu (2):
-      net/mlx5e: Correct snprintf truncation handling for fw_version buffer
-      net/mlx5e: Correct snprintf truncation handling for fw_version buffer used by representors
-
-Ronald Wahl (1):
-      net: ks8851: Fix TX stall caused by TX buffer overrun
-
-Rouven Czerwinski (1):
-      net: rfkill: gpio: set GPIO direction
-
-Shifeng Li (2):
-      net/mlx5e: Fix slab-out-of-bounds in mlx5_query_nic_vport_mac_list()
-      net/mlx5e: Fix a race in command alloc flow
-
-Shigeru Yoshida (1):
-      net: Return error from sk_stream_wait_connect() if sk_wait_event() fails
-
-Suman Ghosh (1):
-      octeontx2-pf: Fix graceful exit during PFC configuration failure
-
-Thomas Weißschuh (1):
-      net: avoid build bug in skb extension length calculation
-
-Vlad Buslov (4):
-      Revert "net/mlx5e: fix double free of encap_header in update funcs"
-      Revert "net/mlx5e: fix double free of encap_header"
-      net/mlx5e: fix double free of encap_header
-      net/mlx5: Refactor mlx5_flow_destination->rep pointer to vport num
-
-Vladimir Oltean (2):
-      net: mscc: ocelot: fix eMAC TX RMON stats for bucket 256-511 and above
-      net: mscc: ocelot: fix pMAC TX RMON stats for bucket 256-511 and above
-
-Xiao Yao (1):
-      Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE
-
-Ying Hsu (1):
-      Bluetooth: Fix deadlock in vhci_send_frame
-
-Yury Norov (1):
-      net: mana: select PAGE_POOL
-
-Zhipeng Lu (1):
-      ethernet: atheros: fix a memleak in atl1e_setup_ring_resources
-
-duanqiangwen (1):
-      net: libwx: fix memory leak on free page
-
- .mailmap                                           |  4 +
- MAINTAINERS                                        |  1 +
- drivers/bluetooth/hci_vhci.c                       | 10 ++-
- drivers/net/ethernet/atheros/atl1e/atl1e_main.c    |  5 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c      | 11 +--
- drivers/net/ethernet/intel/i40e/i40e_register.h    |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_type.h        |  4 +-
- drivers/net/ethernet/intel/ice/ice_ethtool.c       |  4 +-
- drivers/net/ethernet/intel/ice/ice_lag.c           |  2 +
- drivers/net/ethernet/intel/ice/ice_lib.c           |  7 +-
- .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c    | 17 ++++-
- drivers/net/ethernet/mediatek/mtk_wed_wo.c         |  3 +
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c      | 12 +--
- .../ethernet/mellanox/mlx5/core/diag/fw_tracer.c   |  2 +-
- .../mellanox/mlx5/core/en/fs_tt_redirect.c         |  1 +
- .../ethernet/mellanox/mlx5/core/en/tc/act/mirred.c |  5 +-
- .../net/ethernet/mellanox/mlx5/core/en/tc_tun.c    | 50 +++++++------
- .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |  3 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c   |  4 +-
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c         |  2 +-
- .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    | 10 ++-
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.h  |  3 +-
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c | 31 +++++---
- .../mellanox/mlx5/core/eswitch_offloads_termtbl.c  |  4 +-
- drivers/net/ethernet/mellanox/mlx5/core/vport.c    |  2 +-
- drivers/net/ethernet/micrel/ks8851.h               |  3 +
- drivers/net/ethernet/micrel/ks8851_common.c        | 20 ++---
- drivers/net/ethernet/micrel/ks8851_spi.c           | 42 +++++++----
- drivers/net/ethernet/microsoft/Kconfig             |  1 +
- drivers/net/ethernet/mscc/ocelot_stats.c           | 16 ++--
- .../net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c  |  2 +-
- drivers/net/ethernet/wangxun/libwx/wx_lib.c        | 82 ++------------------
- drivers/net/ethernet/wangxun/libwx/wx_type.h       |  1 -
- drivers/net/phy/phy_device.c                       |  6 +-
- drivers/net/wireless/intel/iwlwifi/pcie/rx.c       |  2 +-
- drivers/net/wireless/intel/iwlwifi/pcie/trans.c    |  4 +-
- drivers/net/wireless/mediatek/mt76/dma.c           | 10 ++-
- include/linux/bpf_types.h                          |  4 +
- include/linux/ieee80211.h                          |  3 +-
- include/net/bluetooth/hci_core.h                   |  9 ++-
- include/net/ip6_fib.h                              | 64 ++++------------
- include/net/sock.h                                 |  5 ++
- net/8021q/vlan_core.c                              |  9 ++-
- net/bluetooth/af_bluetooth.c                       |  7 +-
- net/bluetooth/hci_event.c                          | 30 +++++---
- net/bluetooth/l2cap_core.c                         | 21 ++++--
- net/bluetooth/mgmt.c                               | 25 +++++--
- net/bluetooth/smp.c                                |  7 ++
- net/core/dev.c                                     |  3 +
- net/core/skbuff.c                                  |  2 +
- net/core/sock_map.c                                |  2 +
- net/core/stream.c                                  |  2 +-
- net/ife/ife.c                                      |  1 +
- net/ipv6/ip6_fib.c                                 | 55 ++------------
- net/ipv6/route.c                                   |  6 +-
- net/mac80211/cfg.c                                 |  4 +-
- net/mac80211/driver-ops.c                          |  6 +-
- net/mac80211/mesh_plink.c                          | 16 ++--
- net/mac80211/mlme.c                                |  4 +-
- net/mptcp/crypto_test.c                            |  1 +
- net/mptcp/protocol.c                               |  6 +-
- net/mptcp/protocol.h                               |  9 ++-
- net/mptcp/subflow.c                                | 28 ++++---
- net/mptcp/token_test.c                             |  1 +
- net/rfkill/rfkill-gpio.c                           |  8 ++
- net/rose/af_rose.c                                 | 39 ++++++++--
- net/wireless/certs/wens.hex                        | 87 ++++++++++++++++++++++
- .../selftests/bpf/prog_tests/sockmap_basic.c       | 34 +++++++++
- tools/testing/selftests/net/Makefile               |  1 +
- tools/testing/selftests/net/mptcp/mptcp_join.sh    |  8 +-
- tools/testing/selftests/net/rtnetlink.sh           |  2 +-
- tools/testing/selftests/net/vlan_hw_filter.sh      | 29 ++++++++
- 74 files changed, 561 insertions(+), 369 deletions(-)
- create mode 100644 net/wireless/certs/wens.hex
- create mode 100755 tools/testing/selftests/net/vlan_hw_filter.sh
-
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59fed161-6c08-4537-b02d-19e67e342dd8@lunn.ch>
+
+Am Thu, Dec 21, 2023 at 03:25:56PM +0100 schrieb Andrew Lunn:
+> > Without setting the master-slave option it didn't work. I think its
+> > mandatory.
+> 
+> I don't think it is. The PHY should have a default setting for
+> master-slave. Often its based on the typical use case. If its
+> typically inside a switch, then it should default to prefer-master. If
+> its typically in an end system, then it should be prefer-slave.
+> 
+That would be the case if you use a forced configuration. I think this
+is already implemented by reading out the MDIO_PMA_PMD_BT1_CTRL in        
+genphy_c45_pma_baset1_read_master_slave. Probably the problem arises    
+with following lines which prevents an inital read of the configuration:
+
+static int mv88q2xxx_config_init(struct phy_device *phydev)
+{
+        int ret;
+                                                                        
+        /* The 88Q2XXX PHYs do have the extended ability register available, but
+         * register MDIO_PMA_EXTABLE where they should signalize it does not
+         * work according to specification. Therefore, we force it here.
+         */
+        phydev->pma_extable = MDIO_PMA_EXTABLE_BT1;
+
+        if (phydev->drv->phy_id == MARVELL_PHY_ID_88Q2220)
+                return 0;
+
+        /* Read the current PHY configuration */
+        ret = genphy_c45_read_pma(phydev);
+        if (ret)
+                return ret;
+
+        return mv88q2xxx_config_aneg(phydev);
+}
+
+If I type in "ethtool -s eth0 autoneg on" I don't have to set the 
+master-slave option. Is the assumption here that we always start with a 
+forced configuration ? If yes, then I have to fix it.
+
+>     Andrew
+
+	Dimitri
 
