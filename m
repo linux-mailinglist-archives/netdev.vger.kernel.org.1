@@ -1,107 +1,115 @@
-Return-Path: <netdev+bounces-59669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E86EA81BADD
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:35:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABF6081BAF6
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:37:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E064F1C229FD
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:35:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFA111C25A06
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256EE41C7A;
-	Thu, 21 Dec 2023 15:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6424F55E46;
+	Thu, 21 Dec 2023 15:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJCPJQpP"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X/Xz+CqP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB76360B3
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 15:35:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66998C433C8;
-	Thu, 21 Dec 2023 15:35:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703172925;
-	bh=MRVxiUU/5WhXcsoURMm4LApVrWo9wUSaDt/JjoevQs8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tJCPJQpPNph9pG0BBZn/XdIkiSaFTgkKt/OQTQlWywW92h8xv3o20oUswuydj5Yu1
-	 zjur+uQiynr2diojouIXHrNHU/SLwWlf3zYEphwQGqgHFGYh2IREMTxnnFQs34ACQ+
-	 xUnBkNB1nWKiCMggrmbAjhVIQsj/qSy/vlYqazcO6HB81JZCAlt7hAQBfJSFAHk72j
-	 4KQfGzW4qZqCMH5flhX9V5ky2uTsbZveDVf36vUTNbC2B4yYB+3Ih+Do9oMKNr8nU0
-	 8+H6nZ7vHbwGCv8LYuKiaufZgCzZUiGLErxLDArOYGA0+FkMTntvs5/wv3BD0J5XOd
-	 NBy4aFLzEBtJw==
-Date: Thu, 21 Dec 2023 16:35:19 +0100
-From: Simon Horman <horms@kernel.org>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-next v2] i40e: add trace events related to SFP module
- IOCTLs
-Message-ID: <20231221153519.GB1056991@kernel.org>
-References: <20231220173837.3326983-1-aleksandr.loktionov@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AB953A1C;
+	Thu, 21 Dec 2023 15:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7DADC1BF20A;
+	Thu, 21 Dec 2023 15:36:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1703172973;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qih4URF6rrbQJOr6/rCfK90mkaE3j03/vJR1RzN9ObQ=;
+	b=X/Xz+CqPOdunaGw7bvYkZ5aRHYFvdVD+OXsd/tSQfSOuFvqesHloinh7kqzKp1E8nrXMtF
+	Muc5f5onNiea/qpkIvsKlQptW/EoZEErHWPtLCBD4pvseQ/V+m2cAaHkqOH44kbOZ0ELEJ
+	MIUnWt3/iUBKSMDJJ6LgUiXQ0SXtHijZUa+41AcIlogzuOBr+duepnfPg2Z0YFkwDWTXt6
+	lBuVt2thCnx/s+TTf8OPy28e3fGKUMLvZqeO+DWZ+oUdiclrF/l+uw3KltprYCQ/X7D0mH
+	yt2uckt4zAbF1Iba9A8SYadiNcrBvEXPjgs8/GIgJ2UXSQVfBRrEvFXGQzNS/A==
+Date: Thu, 21 Dec 2023 16:36:10 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
+ <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
+ <dentproject@linuxfoundation.org>, Liam Girdwood <lgirdwood@gmail.com>
+Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <20231221163610.47038996@kmaincent-XPS-13-7390>
+In-Reply-To: <88ed0c94-d052-4564-be0c-79a0f502eda8@sirena.org.uk>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+	<20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+	<20231204225956.GG981228@pengutronix.de>
+	<20231205064527.GJ981228@pengutronix.de>
+	<4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
+	<20231205140203.GK981228@pengutronix.de>
+	<88ed0c94-d052-4564-be0c-79a0f502eda8@sirena.org.uk>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231220173837.3326983-1-aleksandr.loktionov@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, Dec 20, 2023 at 06:38:37PM +0100, Aleksandr Loktionov wrote:
-> Add trace events related to SFP module IOCTLs for troubleshooting.
-> 
-> Example:
->         echo "i40e_*" >/sys/kernel/tracing/set_ftrace_filter
->         echo "i40e_ioctl*" >/sys/kernel/tracing/events/i40e/filter
->         echo 1  >/sys/kernel/tracing/tracing_on
->         echo 1  >/sys/kernel/tracing/events/i40e/enable
->         ...
->         cat     /sys/kernel/tracing/trace
-> 
-> Riewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
-> v1->v2 applied to proper git branch
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_ethtool.c |  5 +++++
->  drivers/net/ethernet/intel/i40e/i40e_trace.h   | 18 ++++++++++++++++++
->  2 files changed, 23 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> index c841779..bdf2b6b 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> @@ -1074,6 +1074,7 @@ static int i40e_get_link_ksettings(struct net_device *netdev,
->  	ethtool_link_ksettings_zero_link_mode(ks, supported);
->  	ethtool_link_ksettings_zero_link_mode(ks, advertising);
->  
-> +	i40e_trace(ioctl_get_link_ksettings, pf, hw_link_info->link_info);
->  	if (link_up)
->  		i40e_get_settings_link_up(hw, ks, netdev, pf);
->  	else
+On Tue, 5 Dec 2023 15:57:28 +0000
+Mark Brown <broonie@kernel.org> wrote:
 
-Hi Aleksandr,
+> On Tue, Dec 05, 2023 at 03:02:03PM +0100, Oleksij Rempel wrote:
+> > On Tue, Dec 05, 2023 at 12:55:18PM +0000, Mark Brown wrote: =20
+> > > On Tue, Dec 05, 2023 at 07:45:27AM +0100, Oleksij Rempel wrote: =20
+>=20
+> > > > CC regulator devs here too. =20
+>=20
+> > > Again, I'm not sure what if any question there is? =20
+>=20
+> > PSE is kind of PMIC for Ethernet ports. I assume, it is good to let you
+> > know at least about existence drivers. =20
+>=20
+> OK...  I mean, if they're not using the regulator framework I'm not sure
+> it has much impact - there are plenty of internal regulators in devices
+> already so it wouldn't be *too* unusual other than the fact that AFAICT
+> this is somewhat split between devices within the subsystem?  Neither of
+> the messages was super clear.
 
-I think that i40e_trace.h needs to be included in i40e_ethtool.c
-as part of this patch.
+PSE Power Interface (which is kind of the RJ45 in PSE world) have similar
+functionalities as regulators. We wondered if registering a regulator for
+each PSE PI (RJ45 ports) is a good idea. The point is that the PSE controll=
+er
+driver will be its own regulator consumer.
+I can't find any example in Linux with such a case of a driver being a prov=
+ider
+and a consumer of its own regulator. This idea of a regulator biting its own
+tail seems weird to me. Maybe it is better to implement the PSE functionali=
+ties
+even if they are like the regulator functionalities.
 
- .../i40e_ethtool.c: In function ‘i40e_get_link_ksettings’:
- .../i40e_ethtool.c:1077:9: error: implicit declaration of function ‘i40e_trace’ [-Werror=implicit-function-declaration]
- 1077 |         i40e_trace(ioctl_get_link_ksettings, pf, hw_link_info->link_info);
-      |         ^~~~~~~~~~
+What do you think?
 
-...
-
-Flagged by gcc-13 W=1 build
-
-...
-
--- 
-pw-bot: changes-requested
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
