@@ -1,105 +1,82 @@
-Return-Path: <netdev+bounces-59505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391C281B23B
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:27:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C90681B242
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:28:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD117B25F0C
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 09:27:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B157CB26CB6
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 09:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD05F4F8BB;
-	Thu, 21 Dec 2023 09:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B28208C4;
+	Thu, 21 Dec 2023 09:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJ7eYtZl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="peRf5dwv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749374F8B5;
-	Thu, 21 Dec 2023 09:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d045097b4cso3737425ad.0;
-        Thu, 21 Dec 2023 01:17:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703150265; x=1703755065; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zy5fYk5yDFfc5MecTU/b1uM8JTuFAaLBpt7UpnKQhPg=;
-        b=GJ7eYtZl5fkJaYKWVtAKMGTapD1PaNl1UDI61nsvPIPzwLiCcAu/pvYWc2zqShQzfk
-         fMnVHlwV0Y5n0yXyv4B2c2dyxnAIkVE0W9IfvPDZY8YFi6D/itwP92qtYCavYzd+fSPm
-         c2s3N6JJcgB4HHyxhfGloEMz3Yos5SB6p8/vORKEVMNR5PmUoTl7OcdBZdpJ2WcSyHpu
-         7edAvEqg4wNPh7jJUK+XsWHZM0WfM3TcrwhGmdbh/6rar81TblcVCBFLvAzVTVUQXJ55
-         L7OsQsja+EzVw87kFPwYrvfhO0V7KPtrnh1r/oxSghVv3fbwGwe2tpgO/rYUWdm7Aqnm
-         jj3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703150265; x=1703755065;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zy5fYk5yDFfc5MecTU/b1uM8JTuFAaLBpt7UpnKQhPg=;
-        b=hUz8rpuam1AmK7FRPEzTEeICyQ+94975fb86jMuZGz6+taIMFF3SmhIL+F9gOEOBZL
-         O5IvtJ1RSgYP9iui8MPIZmzLtxH9cwcY6oCqTbY01pFTMlEkv55ApP0U3iexgjkb6tU6
-         CZbwF4CzoU7zSP1efVNQgD7KEemGn/RXc6CUeRGcqIOCLUd30UzjOCSWoMU0h1dyOMmm
-         gRfZKi9CEhMvDnFb62rYA/IY+GnOQ+ySmhZtwLdMx/DP5Ys8SF+HMwalMZPhVsdXjaqh
-         tl26VU6TyMgG7/cQR41+8sMs8HAeozTv0vhBAb/YW521AoTz4vbqGjFYsD15FODMQp/G
-         8vJg==
-X-Gm-Message-State: AOJu0YxEI+y9XYww+3WPAje03MCVpNI5BXQ34ixHxxJ4a2cyu91veuD+
-	TpIA6JjrDqWnDq/fYrTNkMxqFAVYpbX4Pw==
-X-Google-Smtp-Source: AGHT+IGJwATCU53PsVXUBLoFjApVwkYLAw1meIU+j4poFsW15zB8XY5w9vKHGO85ifAtXUYKuACnnw==
-X-Received: by 2002:a17:902:da89:b0:1d3:c202:3d4 with SMTP id j9-20020a170902da8900b001d3c20203d4mr4807069plx.15.1703150265495;
-        Thu, 21 Dec 2023 01:17:45 -0800 (PST)
-Received: from [192.168.0.106] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id h15-20020a170902ac8f00b001bc930d4517sm1144692plr.42.2023.12.21.01.17.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Dec 2023 01:17:45 -0800 (PST)
-Message-ID: <ba2ac330-d977-4637-93bc-99ee953faab8@gmail.com>
-Date: Thu, 21 Dec 2023 16:17:37 +0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35768219E4;
+	Thu, 21 Dec 2023 09:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bhUM1XijalfIIIJGc6XtFDdiTTA83ZKMMJW0N2PSJ5E=; b=peRf5dwvFRD8WvXs6Z1Jv+lm33
+	2s6gLOzX6ieSPJym3uodnNNcv5tgAS1xPHktD36vAWi8AzYsHtBx/GWobLW2AUJtOGoScRGqdRsKW
+	5n5opFOfsR1jZtcpvqnrBnBctByjfZi2wcV35PUV3pyOukIZYFlRb/KhLAPpGKryXsp8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rGFGJ-003Udl-8V; Thu, 21 Dec 2023 10:22:39 +0100
+Date: Thu, 21 Dec 2023 10:22:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Gan, Yi Fang" <yi.fang.gan@intel.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Javier Martinez Canillas <javierm@redhat.com>,
+	John Stultz <jstultz@google.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Looi Hong Aun <hong.aun.looi@intel.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Lai Peter Jun Ann <peter.jun.ann.lai@intel.com>,
+	Choong Yong Liang <yong.liang.choong@intel.com>
+Subject: Re: [PATCH net v2 2/2] net: phylink: Add module_exit_stub()
+Message-ID: <0f85171e-cb9c-47dd-bb7d-f58537e24a54@lunn.ch>
+References: <20231221085109.2830794-1-yi.fang.gan@intel.com>
+ <20231221085109.2830794-3-yi.fang.gan@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/2] ISDN/mISDN maintenanceship cleanup
-Content-Language: en-US
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Kernel Janitors <kernel-janitors@vger.kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>,
- "Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
- Justin Stitt <justinstitt@google.com>, Kunwu Chan <chentao@kylinos.cn>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Nathan Chancellor <nathan@kernel.org>,
- "Steven Rostedt (Google)" <rostedt@goodmis.org>,
- Karsten Keil <isdn@linux-pingi.de>, Karsten Keil <keil@b1-systems.de>,
- YouHong Li <liyouhong@kylinos.cn>
-References: <20231221091419.11764-1-bagasdotme@gmail.com>
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <20231221091419.11764-1-bagasdotme@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221085109.2830794-3-yi.fang.gan@intel.com>
 
-On 12/21/23 16:14, Bagas Sanjaya wrote:
-> When I'm looking at simple typofix against ISDN subsystem [1], I find
-> out more about subsystem activity. It turns out that the subsystem
-> maintainer has been inactive since 3 years ago. And also, when I test
-> sending "Lorem ipsum" message to the subsystem mailing list, it gets
-> bounced.
-> 
+On Thu, Dec 21, 2023 at 04:51:09PM +0800, Gan, Yi Fang wrote:
+> In delete_module(), if mod->init callback is defined but mod->exit
+> callback is not defined, it will assume the module cannot be removed
+> and return EBUSY. The module_exit() is missing from current phylink
+> module drive causing failure while unloading it.
 
-Oops, sorry not adding the link.
+You are missing justification it is actually safe to remove
+phylink. Maybe Russell King deliberately did not implement
+module_exit() because it can explode in interesting ways if it was?
 
-[1]: https://lore.kernel.org/lkml/20231221024758.1317603-1-liyouhong@kylinos.cn/
-
--- 
-An old man doll... just what I always wanted! - Clara
-
+	Andrew
 
