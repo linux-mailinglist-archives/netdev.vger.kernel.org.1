@@ -1,330 +1,111 @@
-Return-Path: <netdev+bounces-59579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 500CA81B70D
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:12:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6774881B70E
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:12:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3930280E0E
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:12:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 075821F24825
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 13:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B9673179;
-	Thu, 21 Dec 2023 13:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="NCywbBhC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB0A73197;
+	Thu, 21 Dec 2023 13:12:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044516D1C2
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 13:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 1B35A2085F;
-	Thu, 21 Dec 2023 14:12:26 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D7Dd1mc4viiW; Thu, 21 Dec 2023 14:12:25 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 2500C2084E;
-	Thu, 21 Dec 2023 14:12:25 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2500C2084E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1703164345;
-	bh=owGmLiAlUqhhur4zZNZPqbcAS7mhNEj1UHoMjSGoIMU=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=NCywbBhCpRasSYZD3Hty5B1JSjP61nG97af7H467bQWx6vSd5o/tW1PFnGSFsH+Ph
-	 LcwDMjFI//qLXJJ3UPlojYPz+abHWUQbwaxZ1WrFoQJoqtVQgdTrN5essh/DFSnG6A
-	 d3bY8u44lcGw1E9my/iGG3SIgNToU3+czUoiCG6Aalo8oAZyIFiZ4leRo3Z3ECqJzN
-	 Luv60dvXPZ1GF30q4aErODMYZxYdCYXdCOYRtJmtY7xVeL+xBIr/WL59A+mq58eNUS
-	 LaLhA19/tVlTUjrEOyb0DkaHnLjh/0UE5y0nKSHoAILoRsqrwnaGSR4kBTkaDZFWo3
-	 NdH+oqn5/9fVA==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id 205A580004A;
-	Thu, 21 Dec 2023 14:12:25 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 21 Dec 2023 14:12:24 +0100
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Thu, 21 Dec
- 2023 14:12:24 +0100
-Date: Thu, 21 Dec 2023 14:12:14 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Antony Antony
-	<antony.antony@secunet.com>, "David S. Miller" <davem@davemloft.net>, "Jakub
- Kicinski" <kuba@kernel.org>, <devel@linux-ipsec.org>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v4 ipsec-next 1/2] xfrm: introduce forwarding of ICMP Error
- messages
-Message-ID: <224967daf3e2fea76e9d3e8c0ce88d573fa05303.1703164284.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
-References: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476576F602;
+	Thu, 21 Dec 2023 13:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=auristor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3bb69f38855so492222b6e.1;
+        Thu, 21 Dec 2023 05:12:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703164354; x=1703769154;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J9sf1n32OXYC12G8mzkhZo6OE4CGgDXLFkI6meoazzQ=;
+        b=TQR80AjVvK3TrN8fDmO8pnO/Kihdlahs/6ZRCvH0nehhziO9phOBIGBap0wk1TRz7T
+         FAPKpIsHY3BpHAwgB7hFpayeA8DmVdX3DlLpCvjs6YC5d46jiYCGBEqALPP2M9bQzKbT
+         Db//A3IJDdZkmZOVJpLbqFL8rs45ZMDOJzvFVyQ/VusHvQGtXRpPysnjsAIyOb0YbM+g
+         Z+LpIM2gLE7C4X5RgRHRdQDsoFDD3aJTNfvPgUrAAHQ845PwrwTxa03VX21HyBgzjxEn
+         5e1ucv7kDcaVjCFWG+lXonJqfmmyIuY2mYuuSajzeN/F+TbCbQ/BP3xGnm6/WiTpsISA
+         kbmQ==
+X-Gm-Message-State: AOJu0YzKDqT8kwu/Q8gEHFhXjfX+Y9o7skPzubCo+X8CuYiAlo4Z7RRZ
+	E3lM5Cod9w+FOcf4LnPS/dCmWRNhBXagYg==
+X-Google-Smtp-Source: AGHT+IFsMAY7qX/6ThEvAPcatTeAg5u2Su4PY3IDFWeoA+u1fj64OLZu9mTwEMF4XKas62EIGR6QYA==
+X-Received: by 2002:a05:6358:6a46:b0:173:aea:cd6a with SMTP id c6-20020a0563586a4600b001730aeacd6amr1561024rwh.33.1703164354126;
+        Thu, 21 Dec 2023 05:12:34 -0800 (PST)
+Received: from hemlock.fiveisland.rocks ([2001:470:1d:225:6d9:f5ff:fe15:325d])
+        by smtp.gmail.com with ESMTPSA id fe15-20020a05622a4d4f00b00425b3fd33f2sm805639qtb.90.2023.12.21.05.12.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 05:12:32 -0800 (PST)
+From: Marc Dionne <marc.dionne@auristor.com>
+To: netdev@vger.kernel.org,
+	Jordan Rife <jrife@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Willem de Bruijn <willemb@google.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: Save and restore msg_namelen in sock_sendmsg
+Date: Thu, 21 Dec 2023 09:12:30 -0400
+Message-ID: <20231221131230.2025000-1-marc.dionne@auristor.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
 
-This commit aligns with RFC 4301, Section 6, and addresses the
-requirement to forward unauthenticated ICMP error messages that do not
-match any xfrm policies. It utilizes the ICMP payload as an skb and
-performs a reverse lookup. If a policy match is found, forward
-the packet.
+Commit 86a7e0b69bd5 ("net: prevent rewrite of msg_name in
+sock_sendmsg()") made sock_sendmsg save the incoming msg_name pointer
+and restore it before returning, to insulate the caller against
+msg_name being changed by the called code.  If the address length
+was also changed however, we may return with an inconsistent structure
+where the length doesn't match the address, and attempts to reuse it may
+lead to lost packets.
 
-The ICMP payload typically contains a partial IP packet that is likely
-responsible for the error message.
+For example, a kernel that doesn't have commit 1c5950fc6fe9 ("udp6: fix
+potential access to stale information") will replace a v4 mapped address
+with its ipv4 equivalent, and shorten namelen accordingly from 28 to 16.
+If the caller attempts to reuse the resulting msg structure, it will have
+the original ipv6 (v4 mapped) address but an incorrect v4 length.
 
-The following error types will be forwarded:
-- IPv4 ICMP error types: ICMP_DEST_UNREACH & ICMP_TIME_EXCEEDED
-- IPv6 ICMPv6 error types: ICMPV6_DEST_UNREACH, ICMPV6_PKT_TOOBIG,
-			   ICMPV6_TIME_EXCEED
-
-To implement this feature, a reverse lookup has been added to the xfrm
-forward path, making use of the ICMP payload as the skb.
-
-To enable this functionality from user space, the XFRM_POLICY_ICMP flag
-should be added to the outgoing and forward policies, and the
-XFRM_STATE_ICMP flag should be set on incoming states.
-
-e.g.
-ip xfrm policy add flag icmp tmpl
-
-ip xfrm policy
-src 192.0.2.0/24 dst 192.0.1.0/25
-	dir out priority 2084302 ptype main flag icmp
-
-ip xfrm state add ...flag icmp
-
-ip xfrm state
-root@west:~#ip x s
-src 192.1.2.23 dst 192.1.2.45
-	proto esp spi 0xa7b76872 reqid 16389 mode tunnel
-	replay-window 32 flag icmp af-unspec
-
-Changes since v3: no code chage
- - add missing white spaces detected by checkpatch.pl
-
-Changes since v2: reviewed by Steffen Klassert
- - user consume_skb instead of kfree_skb for the inner skb
- - fixed newskb leaks in error paths
- - free the newskb once inner flow is decoded with change due to
-   commit 7a0207094f1b ("xfrm: policy: replace session decode with flow dissector")
- - if xfrm_decode_session_reverse() on inner payload fails ignore.
-   do not increment error counter
-
-Changes since v1:
-- Move IPv6 variable declaration inside IS_ENABLED(CONFIG_IPV6)
-
-Changes since RFC:
-- Fix calculation of ICMPv6 header length
-
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
+Fixes: 86a7e0b69bd5 ("net: prevent rewrite of msg_name in sock_sendmsg()")
+Signed-off-by: Marc Dionne <marc.dionne@auristor.com>
 ---
- net/xfrm/xfrm_policy.c | 142 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 140 insertions(+), 2 deletions(-)
+ net/socket.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index c13dc3ef7910..bc99984e8d39 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -29,6 +29,7 @@
- #include <linux/audit.h>
- #include <linux/rhashtable.h>
- #include <linux/if_tunnel.h>
-+#include <linux/icmp.h>
- #include <net/dst.h>
- #include <net/flow.h>
- #include <net/inet_ecn.h>
-@@ -3503,6 +3504,128 @@ static inline int secpath_has_nontransport(const struct sec_path *sp, int k, int
- 	return 0;
- }
-
-+static bool icmp_err_packet(const struct flowi *fl, unsigned short family)
-+{
-+	const struct flowi4 *fl4 = &fl->u.ip4;
-+
-+	if (family == AF_INET &&
-+	    fl4->flowi4_proto == IPPROTO_ICMP &&
-+	    (fl4->fl4_icmp_type == ICMP_DEST_UNREACH ||
-+	     fl4->fl4_icmp_type == ICMP_TIME_EXCEEDED))
-+		return true;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+	if (family == AF_INET6) {
-+		const struct flowi6 *fl6 = &fl->u.ip6;
-+
-+		if (fl6->flowi6_proto == IPPROTO_ICMPV6 &&
-+		    (fl6->fl6_icmp_type == ICMPV6_DEST_UNREACH ||
-+		    fl6->fl6_icmp_type == ICMPV6_PKT_TOOBIG ||
-+		    fl6->fl6_icmp_type == ICMPV6_TIME_EXCEED))
-+			return true;
-+	}
-+#endif
-+	return false;
-+}
-+
-+static bool xfrm_icmp_flow_decode(struct sk_buff *skb, unsigned short family,
-+				  const struct flowi *fl, struct flowi *fl1)
-+{
-+	bool ret = true;
-+	struct sk_buff *newskb = skb_clone(skb, GFP_ATOMIC);
-+	int hl = family == AF_INET ? (sizeof(struct iphdr) +  sizeof(struct icmphdr)) :
-+		 (sizeof(struct ipv6hdr) + sizeof(struct icmp6hdr));
-+
-+	if (!newskb)
-+		return true;
-+
-+	if (!pskb_pull(newskb, hl))
-+		goto out;
-+
-+	skb_reset_network_header(newskb);
-+
-+	if (xfrm_decode_session_reverse(dev_net(skb->dev), newskb, fl1, family) < 0)
-+		goto out;
-+
-+	fl1->flowi_oif = fl->flowi_oif;
-+	fl1->flowi_mark = fl->flowi_mark;
-+	fl1->flowi_tos = fl->flowi_tos;
-+	nf_nat_decode_session(newskb, fl1, family);
-+	ret = false;
-+
-+out:
-+	consume_skb(newskb);
-+	return ret;
-+}
-+
-+static bool xfrm_selector_inner_icmp_match(struct sk_buff *skb, unsigned short family,
-+					   const struct xfrm_selector *sel,
-+					   const struct flowi *fl)
-+{
-+	bool ret = false;
-+
-+	if (icmp_err_packet(fl, family)) {
-+		struct flowi fl1;
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return ret;
-+
-+		ret = xfrm_selector_match(sel, &fl1, family);
-+	}
-+
-+	return ret;
-+}
-+
-+static inline struct
-+xfrm_policy *xfrm_in_fwd_icmp(struct sk_buff *skb,
-+			      const struct flowi *fl, unsigned short family,
-+			      u32 if_id)
-+{
-+	struct xfrm_policy *pol = NULL;
-+
-+	if (icmp_err_packet(fl, family)) {
-+		struct flowi fl1;
-+		struct net *net = dev_net(skb->dev);
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return pol;
-+
-+		pol = xfrm_policy_lookup(net, &fl1, family, XFRM_POLICY_FWD, if_id);
-+	}
-+
-+	return pol;
-+}
-+
-+static inline struct
-+dst_entry *xfrm_out_fwd_icmp(struct sk_buff *skb, struct flowi *fl,
-+			     unsigned short family, struct dst_entry *dst)
-+{
-+	if (icmp_err_packet(fl, family)) {
-+		struct net *net = dev_net(skb->dev);
-+		struct dst_entry *dst2;
-+		struct flowi fl1;
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return dst;
-+
-+		dst_hold(dst);
-+
-+		dst2 = xfrm_lookup(net, dst, &fl1, NULL, (XFRM_LOOKUP_QUEUE | XFRM_LOOKUP_ICMP));
-+
-+		if (IS_ERR(dst2))
-+			return dst;
-+
-+		if (dst2->xfrm) {
-+			dst_release(dst);
-+			dst = dst2;
-+		} else {
-+			dst_release(dst2);
-+		}
-+	}
-+
-+	return dst;
-+}
-+
- int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 			unsigned short family)
+diff --git a/net/socket.c b/net/socket.c
+index 3379c64217a4..89d79205bf50 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -757,6 +757,7 @@ int sock_sendmsg(struct socket *sock, struct msghdr *msg)
  {
-@@ -3549,9 +3672,17 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
-
- 		for (i = sp->len - 1; i >= 0; i--) {
- 			struct xfrm_state *x = sp->xvec[i];
-+			int ret = 0;
-+
- 			if (!xfrm_selector_match(&x->sel, &fl, family)) {
--				XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMISMATCH);
--				return 0;
-+				ret = true;
-+				if (x->props.flags & XFRM_STATE_ICMP &&
-+				    xfrm_selector_inner_icmp_match(skb, family, &x->sel, &fl))
-+					ret = false;
-+				if (ret) {
-+					XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMISMATCH);
-+					return 0;
-+				}
- 			}
- 		}
- 	}
-@@ -3574,6 +3705,9 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 		return 0;
- 	}
-
-+	if (!pol && dir == XFRM_POLICY_FWD)
-+		pol = xfrm_in_fwd_icmp(skb, &fl, family, if_id);
-+
- 	if (!pol) {
- 		if (net->xfrm.policy_default[dir] == XFRM_USERPOLICY_BLOCK) {
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINNOPOLS);
-@@ -3707,6 +3841,10 @@ int __xfrm_route_forward(struct sk_buff *skb, unsigned short family)
- 		res = 0;
- 		dst = NULL;
- 	}
-+
-+	if (dst && !dst->xfrm)
-+		dst = xfrm_out_fwd_icmp(skb, &fl, family, dst);
-+
- 	skb_dst_set(skb, dst);
- 	return res;
+ 	struct sockaddr_storage *save_addr = (struct sockaddr_storage *)msg->msg_name;
+ 	struct sockaddr_storage address;
++	int save_len = msg->msg_namelen;
+ 	int ret;
+ 
+ 	if (msg->msg_name) {
+@@ -766,6 +767,7 @@ int sock_sendmsg(struct socket *sock, struct msghdr *msg)
+ 
+ 	ret = __sock_sendmsg(sock, msg);
+ 	msg->msg_name = save_addr;
++	msg->msg_namelen = save_len;
+ 
+ 	return ret;
  }
---
-2.30.2
+-- 
+2.43.0
 
 
