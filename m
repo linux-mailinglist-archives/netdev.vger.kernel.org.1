@@ -1,117 +1,106 @@
-Return-Path: <netdev+bounces-59410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF67581AC51
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:49:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A493981AC80
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 03:07:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82D551F2465A
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 01:49:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11A99B22590
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 02:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C454A15B7;
-	Thu, 21 Dec 2023 01:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZpQxh141"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF03215CC;
+	Thu, 21 Dec 2023 02:07:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DE71843;
-	Thu, 21 Dec 2023 01:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1703123369; x=1734659369;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rCL33iD9VHLmj2113xvxmnVgCiJ8bLLkMHBSdPz3nxc=;
-  b=ZpQxh141rSYjvMRZtOQolGfYc7ylUsJa/k1PolbS0A6CTYDal/E8KMol
-   ri6BGHLf7GwVktUPnpCOJiwKCWnQjN7FttTyjlp/h0cX5g4bnd5mV+14e
-   wDQr5f2AmMuZ863J30u16kWVhvL8t531ffIsOsodD1yA9H36Y9qCr/nsN
-   I=;
-X-IronPort-AV: E=Sophos;i="6.04,292,1695686400"; 
-   d="scan'208";a="626864022"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 01:49:27 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com (Postfix) with ESMTPS id 8B31960AF0;
-	Thu, 21 Dec 2023 01:49:26 +0000 (UTC)
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:23105]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.56.23:2525] with esmtp (Farcaster)
- id 1d767abf-b576-4d75-85f6-d51b9e4f64c3; Thu, 21 Dec 2023 01:49:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 1d767abf-b576-4d75-85f6-d51b9e4f64c3
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 21 Dec 2023 01:49:25 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.15.211) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 21 Dec 2023 01:49:22 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <atikhono@redhat.com>
-CC: <alx@kernel.org>, <kuniyu@amazon.com>, <libc-alpha@sourceware.org>,
-	<linux-man@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH] unix.7: SO_PEERCRED: Mention listen(2)
-Date: Thu, 21 Dec 2023 10:49:11 +0900
-Message-ID: <20231221014911.39497-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CABPeg3Z5p2yapwEwPdHqDZiDL-W_gVgMc39A0Kdd95LNd+OwHA@mail.gmail.com>
-References: <CABPeg3Z5p2yapwEwPdHqDZiDL-W_gVgMc39A0Kdd95LNd+OwHA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E164416;
+	Thu, 21 Dec 2023 02:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4SwYgm6mTtz1fyN7;
+	Thu, 21 Dec 2023 10:06:12 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id E4DA31400D5;
+	Thu, 21 Dec 2023 10:07:26 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 21 Dec
+ 2023 10:07:26 +0800
+Subject: Re: [PATCH net-next] page_pool: Rename frag_users to frag_cnt
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: <netdev@vger.kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-kernel@vger.kernel.org>
+References: <20231215073119.543560-1-ilias.apalodimas@linaro.org>
+ <6fddeb22-0906-e04c-3a84-7836bef9ffa2@huawei.com>
+ <CAC_iWjLiOdUqLmRHjZmwv9QBsBvYNV=zn30JrRbJa05qMyDBmw@mail.gmail.com>
+ <fb0f33d8-d09a-57fc-83b0-ccf152277355@huawei.com>
+ <CAC_iWjKH5ZCUwVWc2EisfjeLVF=ko967hqpdAc7G4FdsZCq7NA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <d853acde-7d69-c715-4207-fb77da1fb203@huawei.com>
+Date: Thu, 21 Dec 2023 10:07:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+In-Reply-To: <CAC_iWjKH5ZCUwVWc2EisfjeLVF=ko967hqpdAc7G4FdsZCq7NA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-From: Alexey Tikhonov <atikhono@redhat.com>
-Date: Wed, 20 Dec 2023 18:28:34 +0100
-> In case of connected AF_UNIX stream sockets, server-side
-> credentials are set at the time of a call to listen(2),
-> not when client-side calls connect(2).
+On 2023/12/20 15:56, Ilias Apalodimas wrote:
+> Hi Yunsheng,
+>>>>>  #ifdef CONFIG_PAGE_POOL_STATS
+>>>>>       /* these stats are incremented while in softirq context */
+>>>>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>>>>> index 9b203d8660e4..19a56a52ac8f 100644
+>>>>> --- a/net/core/page_pool.c
+>>>>> +++ b/net/core/page_pool.c
+>>>>> @@ -659,7 +659,7 @@ EXPORT_SYMBOL(page_pool_put_page_bulk);
+>>>>>  static struct page *page_pool_drain_frag(struct page_pool *pool,
+>>>>>                                        struct page *page)
+>>>>>  {
+>>>>> -     long drain_count = BIAS_MAX - pool->frag_users;
+>>>>> +     long drain_count = BIAS_MAX - pool->frag_cnt;
+>>>>
+>>>> drain_count = pool->refcnt_bais;
+>>>
+>>> I think this is a typo right? This still remains
+>>
+>> It would be better to invert logic too, as it is mirroring:
+>>
+>> https://elixir.bootlin.com/linux/v6.7-rc5/source/mm/page_alloc.c#L4745
 > 
-> This is important if server side process changes UID/GID
-> after listen(2) and before connect(2).
-> 
-> Reproducer is available in https://bugzilla.redhat.com/show_bug.cgi?id=2247682
-> 
-> Behavior was confirmed in the email thread
-> https://lore.kernel.org/linux-man/CABPeg3a9L0142gmdZZ+0hoD+Q3Vgv0BQ21g8Z+gf2kznWouErA@mail.gmail.com/
-> 
-> Signed-off-by: Alexey Tikhonov <atikhono@redhat.com>
+> This is still a bit confusing for me since the actual bias is the
+> number of fragments that you initially split the page. But I am fine
+Acctually there are two bais numbers for a page used by
+page_pool_alloc_frag().
+the one for page->pp_ref_count, which already use the BIAS_MAX, which
+indicates the initial bais number:
+https://elixir.bootlin.com/linux/latest/source/net/core/page_pool.c#L779
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Another one for pool->frag_users indicating the runtime bais number, which
+need changing when a page is split into more fragments:
+https://elixir.bootlin.com/linux/latest/source/net/core/page_pool.c#L776
+https://elixir.bootlin.com/linux/latest/source/net/core/page_pool.c#L783
 
-Thanks!
-
-
-> ---
->  man7/unix.7 | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> with having a common approach. I'll send the rename again shortly, and
+> I can send the logic invert a bit later (or feel free to send it,
+> since it was your idea).
 > 
-> diff --git a/man7/unix.7 b/man7/unix.7
-> index e9edad467..71cdfc758 100644
-> --- a/man7/unix.7
-> +++ b/man7/unix.7
-> @@ -331,7 +331,8 @@ This read-only socket option returns the
->  credentials of the peer process connected to this socket.
->  The returned credentials are those that were in effect at the time
->  of the call to
-> -.BR connect (2)
-> +.BR connect (2),
-> +.BR listen (2),
->  or
->  .BR socketpair (2).
->  .IP
-> -- 
-> 2.41.0
+> Thanks
+> /Ilias
+> .
+> 
 
