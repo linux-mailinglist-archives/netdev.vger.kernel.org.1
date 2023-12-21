@@ -1,104 +1,107 @@
-Return-Path: <netdev+bounces-59812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AFD181C1DA
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:23:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA64581C1E2
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:24:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDAAD1F25E3D
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:23:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A713328A544
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A67E79943;
-	Thu, 21 Dec 2023 23:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1487948F;
+	Thu, 21 Dec 2023 23:23:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b="L2gO5BZF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z4sjFA9I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5913E7995F;
-	Thu, 21 Dec 2023 23:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mailbox.tu-berlin.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=campus.tu-berlin.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3748C79463;
+	Thu, 21 Dec 2023 23:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d0c4d84bf6so9628655ad.1;
+        Thu, 21 Dec 2023 15:23:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tu-berlin.de; l=1833; s=dkim-tub; t=1703200787;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Ti5eomPIZbnykEiRIHFWHoRdnkVM3Lii6pCaOjMdzxI=;
-  b=L2gO5BZF/pQ8Nx6bOGFAyVa79pauEyOKNK1HfHIfviPLnJFR80/4eyCD
-   b0vaArE4+7GDSuNHxERPVBWOs3UnArBZG1Vqwmc7Dd6BkOsqCkzdOpB2Y
-   U451QFFETkJK1rkn1NZnhCQo3PRwkBiX9NakQpdWksjcZDgqK3yJytl1p
-   c=;
-X-CSE-ConnectionGUID: THVcGfoHSOaMWzOeFXAlZw==
-X-CSE-MsgGUID: uvaIDAWJQ+yjFuvgSaLsfw==
-X-IronPort-AV: E=Sophos;i="6.04,294,1695679200"; 
-   d="scan'208";a="14652823"
-Received: from mail.tu-berlin.de ([141.23.12.141])
-  by mailrelay.tu-berlin.de with ESMTP; 22 Dec 2023 00:19:44 +0100
-From: =?UTF-8?q?J=C3=B6rn-Thorben=20Hinz?= <jthinz@mailbox.tu-berlin.de>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: =?UTF-8?q?J=C3=B6rn-Thorben=20Hinz?= <jthinz@mailbox.tu-berlin.de>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
-	<willemb@google.com>, Deepa Dinamani <deepa.kernel@gmail.com>
-Subject: [PATCH net] net: Implement missing getsockopt(SO_TIMESTAMPING_NEW)
-Date: Fri, 22 Dec 2023 00:19:01 +0100
-Message-ID: <20231221231901.67003-1-jthinz@mailbox.tu-berlin.de>
-X-Mailer: git-send-email 2.39.2
+        d=gmail.com; s=20230601; t=1703201009; x=1703805809; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=44efa604H7dap1Uoz4pi8g2Yhc0/Ub6AzcNX/ixcVz8=;
+        b=Z4sjFA9I0AN8dbeQHtQ5emqZi4CGYyBMYt+OPQnnTV4eRfL+R1ezF+qnCwTi5+YrOy
+         /F7S/wnW7R3L11hbYjs64rfhGhxUommIAkmspqyjL/8hLKL5NN8jq7hm/lPjnUSZTsdV
+         lzk4RZsZEpeWYD4lxPLo+AybyGXeKPETToDUmBVMn2WDoljiXc8qZV5icPvHMsXtGCZh
+         0aEpFZieMboteIAPVTCBUhEVrdLNDWN5QIZH2b10ethWu+UMq2/AdLpcnyZH9fc7M23T
+         3zOZMqpO3z3zssrbbiCGPT7isw+pthorReaaSEHrUZWOzUMyqT+Mv7+V/IEuU/0tkrWY
+         si0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703201009; x=1703805809;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=44efa604H7dap1Uoz4pi8g2Yhc0/Ub6AzcNX/ixcVz8=;
+        b=g/vBn5qaKPm6spY3xGJ5jypu64cdDXDLOSL8UpfFrbP1JprgpM8FltuMF3vGJmp5uK
+         CFGD8A++Y8NcHuKjQ9NJQtZD22A2bcA6GnGYOMOZ/ZiQafG5hyqz0nqt1JTM0UAYJB3u
+         p92guDICMtbNyzvXxS20zBcSMSFB392h+DtBEgD5NRvTelCj5Ip7e4cvmPlwD812VmGz
+         qjJCpqfV47zTndi22ml7FDtfVhq8kXy3sLARUX7ysA7dpIna+qdhVIlCeGsd31TauRQC
+         Q97RchsRfNnxIS0lRQCtHhPk0E5dfuGq3pDB2XYngEP4cuAjhcFcmGC3x7h0Xhfo9II+
+         e3Qg==
+X-Gm-Message-State: AOJu0Yx6Zvoior5Wsr2OSSHhmkt9A7R+t5LVNkoVMt56+e/igYrxBorH
+	OgLi7FgtgioS7ljA3LQydxU=
+X-Google-Smtp-Source: AGHT+IGGYY3FOustE/KZZ9HpLjvya6H59DLAclwpPQTUzTjk6ZGYzcGX+k6ZOp2OTIaoQet3pb0QwQ==
+X-Received: by 2002:a17:903:41c8:b0:1d3:efbe:6033 with SMTP id u8-20020a17090341c800b001d3efbe6033mr357171ple.81.1703201009474;
+        Thu, 21 Dec 2023 15:23:29 -0800 (PST)
+Received: from john.rmac-pubwifi.localzone (fw.royalmoore.com. [72.21.11.210])
+        by smtp.gmail.com with ESMTPSA id g15-20020a1709029f8f00b001d3e33a73d5sm2139641plq.279.2023.12.21.15.23.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 15:23:28 -0800 (PST)
+From: John Fastabend <john.fastabend@gmail.com>
+To: jakub@cloudflare.com,
+	rivendell7@gmail.com,
+	kuniyu@amazon.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf 0/5] fix sockmap + stream  af_unix memleak
+Date: Thu, 21 Dec 2023 15:23:22 -0800
+Message-Id: <20231221232327.43678-1-john.fastabend@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 
-Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
-socket option SO_TIMESTAMPING_NEW. Setting the option is handled in
-sk_setsockopt(), querying it was not handled in sk_getsockopt(), though.
+There was a memleak when streaming af_unix sockets were inserted into
+multiple sockmap slots and/or maps. This is because each insert would
+call a proto update operatino and these must be allowed to be called
+multiple times. The streaming af_unix implementation recently added
+a refcnt to handle a use after free issue, however it introduced a
+memleak when inserted into multiple maps.
 
-Following remarks on an earlier submission of this patch, keep the old
-behavior of getsockopt(SO_TIMESTAMPING_OLD) which returns the active
-flags even if they actually have been set through SO_TIMESTAMPING_NEW.
+This series fixes the memleak, adds a note in the code so we remember
+that proto updates need to support this. And then we add three tests
+for each of the slightly different iterations of adding sockets into
+multiple maps. I kept them as 3 independent test cases here. I have
+some slight preference for this they could however be a single test,
+but then you don't get to run them independently which was sort of
+useful while debugging.
 
-The new getsockopt(SO_TIMESTAMPING_NEW) is stricter, returning flags
-only if they have been set through the same option.
+John Fastabend (5):
+  bpf: sockmap, fix proto update hook to avoid dup calls
+  bpf: sockmap, added comments describing update proto rules
+  bpf: sockmap, add tests for proto updates many to single map
+  bpf: sockmap, add tests for proto updates single socket to many map
+  bpf: sockmap, add tests for proto updates replace socket
 
-Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
-Link: https://lore.kernel.org/lkml/20230703175048.151683-1-jthinz@mailbox.tu-berlin.de/
-Link: https://lore.kernel.org/netdev/0d7cddc9-03fa-43db-a579-14f3e822615b@app.fastmail.com/
-Signed-off-by: Jörn-Thorben Hinz <jthinz@mailbox.tu-berlin.de>
----
- net/core/sock.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ include/linux/skmsg.h                         |   5 +
+ net/unix/unix_bpf.c                           |  21 +-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 199 +++++++++++++++++-
+ 3 files changed, 221 insertions(+), 4 deletions(-)
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index fef349dd72fa..51d52859e942 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1711,9 +1711,16 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case SO_TIMESTAMPING_OLD:
-+	case SO_TIMESTAMPING_NEW:
- 		lv = sizeof(v.timestamping);
--		v.timestamping.flags = READ_ONCE(sk->sk_tsflags);
--		v.timestamping.bind_phc = READ_ONCE(sk->sk_bind_phc);
-+		/* For the later-added case SO_TIMESTAMPING_NEW: Be strict about only
-+		 * returning the flags when they were set through the same option.
-+		 * Don't change the beviour for the old case SO_TIMESTAMPING_OLD.
-+		 */
-+		if (optname == SO_TIMESTAMPING_OLD || sock_flag(sk, SOCK_TSTAMP_NEW)) {
-+			v.timestamping.flags = READ_ONCE(sk->sk_tsflags);
-+			v.timestamping.bind_phc = READ_ONCE(sk->sk_bind_phc);
-+		}
- 		break;
- 
- 	case SO_RCVTIMEO_OLD:
 -- 
-2.39.2
+2.33.0
 
 
