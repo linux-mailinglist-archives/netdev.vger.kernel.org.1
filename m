@@ -1,111 +1,120 @@
-Return-Path: <netdev+bounces-59491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2994F81B0B5
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 09:52:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EDEC81B0B8
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 09:52:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C2BE1C209F8
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 08:52:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC08A1F23CB4
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 08:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3389E1B271;
-	Thu, 21 Dec 2023 08:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC46E1C687;
+	Thu, 21 Dec 2023 08:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O9ZCSyie"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="tCl0HfaC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B927A1A72A
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 08:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703148743;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7X7gmc4/l29hpAVyJ8b4AW2EtmNt/iVyKE8KES1vr/o=;
-	b=O9ZCSyieLXNjHxbkdraEi7qS1T0Jf2lXs18kOvdZOLpVfBbl6GxtJBjPRKOb+bOqb2iUSw
-	vIE1rGAsPN6zPlg9EWjIGisJdCezz0NiOT7of+ICm/MkuZFnpujk1oiFfGIVC2toZ07zXk
-	5eZWh4DI92oR98SrBTFVaf9KWRjxQGU=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-75-mUSRRpT_NeC7_aP-_gp5GQ-1; Thu, 21 Dec 2023 03:52:21 -0500
-X-MC-Unique: mUSRRpT_NeC7_aP-_gp5GQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a236e1a1720so6210366b.0
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 00:52:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1211A737
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 08:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a233bf14cafso59199566b.2
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 00:52:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1703148764; x=1703753564; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FTIeI4DoPouDjkk2jweCozK50yrWApKhZHnyb+L8pDY=;
+        b=tCl0HfaC6gpWclJVr+uRVlaLWmt0SfABWXaVH0xERTEXjwgwQjs+6KKfWQ9izwXkqp
+         GNssuQcbIqeBeG09t1O50sSlSyIKq1GWOAP7kdZcb4HMP/59tscVwoJQ0K17eFCXlE1I
+         7zkxnUQQ6j0esiCoRrC9g02KI3r5LYzHIzXJWLaoB96FA5wyOOVdAtkIldXpDMmzYyXx
+         oULUS8qVr40jna8sKGV3GCAuIxSy1Quo+RK/UvrtgM23bNJXMXBlH/VegEjPSuXTW2AX
+         Ok5tZnqw/iUVz4opoNq5rVgAzhjxL26WB5hhWC6LtPeh7fN03/vAHxFFCfBynC0D48e0
+         5rhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703148740; x=1703753540;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7X7gmc4/l29hpAVyJ8b4AW2EtmNt/iVyKE8KES1vr/o=;
-        b=dXCMQuTr91GBin7vJqJ4KqCPWC4qjr6lN3tWF6zA3yDBGg46kcTJFQfbfmAy4CBWF6
-         M8ORbsdxVr6XU975rQHjFDG4LyK1CmV7M1A5GZQ6qzR3CIkbyelS0Zm7dhZtOxIwuCWe
-         foULcN00c9PvMrVQEbSKxDOMnpH4yQtei9joCfkhYE02LktJ6XRS/w7cqjsyvAu2qjHn
-         CT2qrl1wTm9RMhouhrFSYdquLjuLoO+ikVd3k6+THUVPnIJZOiNrIV18lV30Zp+erQlN
-         sgQXnlD1FjSYO6bRU4cFrxflf2N3VJ2io82wpBbMjQtfWvJXmc9LEcOSbv7VRe9vr3ZF
-         8SdQ==
-X-Gm-Message-State: AOJu0Yz4MXgqrUSunmszZaH5BilfCl3zzyLVVn+FwH6fjxz4OYzrFqGY
-	UGMU7D9apRN4DdYmxNiMC/fFk7ebO9/3u9LEmWg+69pV9kQy8xf24B+oE5TLRf/BaFuRI2UD0SI
-	UvaZbt0peH22l8PVM
-X-Received: by 2002:a17:906:f586:b0:a24:71aa:5d9a with SMTP id cm6-20020a170906f58600b00a2471aa5d9amr5989567ejd.4.1703148740469;
-        Thu, 21 Dec 2023 00:52:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEkWOmvfm5Uc4lvCyixclsvCOA+olyWgz5y1O8rGNnBK5PHkuVgH/Hw/d0KoPDQe95elbqLbQ==
-X-Received: by 2002:a17:906:f586:b0:a24:71aa:5d9a with SMTP id cm6-20020a170906f58600b00a2471aa5d9amr5989546ejd.4.1703148740174;
-        Thu, 21 Dec 2023 00:52:20 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-246-124.dyn.eolo.it. [146.241.246.124])
-        by smtp.gmail.com with ESMTPSA id p10-20020a170907910a00b00a26aaa47cc0sm166290ejq.129.2023.12.21.00.52.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 00:52:19 -0800 (PST)
-Message-ID: <023377a7f227f8cd7d5eb73017dbe3f691b29b17.camel@redhat.com>
-Subject: Re: [PATCH v3 net 0/4] qbv cycle time extension/truncation
-From: Paolo Abeni <pabeni@redhat.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, Faizal Rahim
-	 <faizal.abdul.rahim@linux.intel.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Date: Thu, 21 Dec 2023 09:52:18 +0100
-In-Reply-To: <20231219165650.3amt4ftyt7gisz47@skbuf>
-References: <20231219081453.718489-1-faizal.abdul.rahim@linux.intel.com>
-	 <20231219165650.3amt4ftyt7gisz47@skbuf>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20230601; t=1703148764; x=1703753564;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FTIeI4DoPouDjkk2jweCozK50yrWApKhZHnyb+L8pDY=;
+        b=Ax0tJKWE8wt8opPiNMlhpUpoX1vWAVVXlbwHFLN9Zs2BSUOH8g8OqFEGXjCL2NNab5
+         pu8544hy6wzRzbrCTv15RPJCR1Uqj679htKB4LwYmOwN8jnu6jYoKr/Pigcwjtoklay4
+         CbBn3ilrCN2LxVhBTDJ0ZImptvXaTKEvCHg0U7fQQqrOleM88VM2THFxnmM6raBnNxpQ
+         eO+Gs6RX1PHfUuY4Uhv3e5lRQNALpx5PgWnNr5iX7cBK9gZm/GAliCxBUNGjd62ZnqKe
+         aRmsvA2BIV07QUseMcgFgwYvgbH7c7othxX5bx9MHCUY8jL7WeXrhXdklM+kSqIKYVzW
+         6ezg==
+X-Gm-Message-State: AOJu0YwHCAxSf+2bf/PPXGbV9P6m/M4iH6dA/fHpWpLpjXWwk3YvFB3p
+	xYhIQp8e8ZyQDdhs46XTkcC0nDpiXygwPAotCZw=
+X-Google-Smtp-Source: AGHT+IEWMOTPB9r62Wb7FIh3oonVv5j6dbF/GZFxvecSF5+3yVgCdDo/ASxWxlvTlimQhzhpshBYqg==
+X-Received: by 2002:a17:906:4e82:b0:a26:98ff:6464 with SMTP id v2-20020a1709064e8200b00a2698ff6464mr994115eju.17.1703148763984;
+        Thu, 21 Dec 2023 00:52:43 -0800 (PST)
+Received: from [192.168.0.161] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id rh9-20020a17090720e900b00a269e87ad84sm707136ejb.189.2023.12.21.00.52.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Dec 2023 00:52:43 -0800 (PST)
+Message-ID: <dff34170-fc5d-4344-b6a2-6af2b2903208@blackwall.org>
+Date: Thu, 21 Dec 2023 10:52:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] bridge: cfm: fix enum typo in
+ br_cc_ccm_tx_parse
+To: Lin Ma <linma@zju.edu.cn>, roopa@nvidia.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horatiu.vultur@microchip.com, henrik.bjoernlund@microchip.com,
+ bridge@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, horms@kernel.org
+References: <20231220163451.2720130-1-linma@zju.edu.cn>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20231220163451.2720130-1-linma@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2023-12-19 at 18:56 +0200, Vladimir Oltean wrote:
-> How are you testing the behavior, and who reported the issues / what prom=
-pted
-> the changes? Honestly I'm not very confident in the changes we're
-> pushing down the linux-stable pipe. They don't look all that obvious, so
-> I still think that having selftests would help.
+On 20/12/2023 18:34, Lin Ma wrote:
+> It appears that there is a typo in the code where the nlattr array is
+> being parsed with policy br_cfm_cc_ccm_tx_policy, but the instance is
+> being accessed via IFLA_BRIDGE_CFM_CC_RDI_INSTANCE, which is associated
+> with the policy br_cfm_cc_rdi_policy.
+> 
+> This problem was introduced by commit 2be665c3940d ("bridge: cfm: Netlink
+> SET configuration Interface.").
+> 
+> Though it seems like a harmless typo since these two enum owns the exact
+> same value (1 here), it is quite misleading hence fix it by using the
+> correct enum IFLA_BRIDGE_CFM_CC_CCM_TX_INSTANCE here.
+> 
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> ---
+> V1 -> V2: remove Fixes tag as this patch resolves nothing but a typo.
+> 
+>  net/bridge/br_cfm_netlink.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bridge/br_cfm_netlink.c b/net/bridge/br_cfm_netlink.c
+> index 5c4c369f8536..2faab44652e7 100644
+> --- a/net/bridge/br_cfm_netlink.c
+> +++ b/net/bridge/br_cfm_netlink.c
+> @@ -362,7 +362,7 @@ static int br_cc_ccm_tx_parse(struct net_bridge *br, struct nlattr *attr,
+>  
+>  	memset(&tx_info, 0, sizeof(tx_info));
+>  
+> -	instance = nla_get_u32(tb[IFLA_BRIDGE_CFM_CC_RDI_INSTANCE]);
+> +	instance = nla_get_u32(tb[IFLA_BRIDGE_CFM_CC_CCM_TX_INSTANCE]);
+>  	nla_memcpy(&tx_info.dmac.addr,
+>  		   tb[IFLA_BRIDGE_CFM_CC_CCM_TX_DMAC],
+>  		   sizeof(tx_info.dmac.addr));
 
-I agree with Vladimir, this looks quite a bit too complex for a net fix
-at this late point of the cycle. Given the period of the year, I think
-it could be too late even for net-next - for this cycle.
-
-It would be great if you could add some self-tests.
-
-@Faizal: I understand your setup is quite complex, but it would be
-great if you could come-up with something similar that could fit=20
-tools/testing/selftests/net
-
-Thanks!
-
-Paolo
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
