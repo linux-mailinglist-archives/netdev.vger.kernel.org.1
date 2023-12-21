@@ -1,111 +1,98 @@
-Return-Path: <netdev+bounces-59664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED03F81BA5F
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:16:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441AF81BA7B
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 16:22:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26FC51C24143
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:16:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F336C287A31
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 497B041A85;
-	Thu, 21 Dec 2023 15:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3671853A00;
+	Thu, 21 Dec 2023 15:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LI1zAhr8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zo8tzaxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B159B52F60;
-	Thu, 21 Dec 2023 15:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B652539F6
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 15:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-54c79968ffbso991371a12.3;
-        Thu, 21 Dec 2023 07:16:14 -0800 (PST)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5542ac8b982so642091a12.3
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 07:21:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703171773; x=1703776573; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TqbYPdC+pzdSRXmHEIhagjUyGTTzN7gMcr6zGrguEvA=;
-        b=LI1zAhr8VGz2Vn3/49osDKl/ZycprmJFaqEfF5QZOFI8mfOZPnX4WspxID/24bwMgZ
-         kX46tVh0ztM+78kdV3Uw/Mev+8EaFCbTT9RKk0mgsRKW5YfAcgx0cH2/rseg3rqeQWa+
-         9mT9/2S3BN7CEdNw8XMuigfKxcV/1Y3538bZvpCbsYt6hjC4tn9w924ooAt5kqcd8/MZ
-         RwTi96RgB0FYrrFLFBBWLt5dV9/5fcSWYXyJFiX6g5tqRcmz2wGcVOIiqlFLqEN/9dgT
-         TeWNLk91HnFXDxCxcp5scKAe8iaV2R206hS/wV9yRmkQrYN3UOyLS/5G1hxeO8SPsh7D
-         Qc9g==
+        d=gmail.com; s=20230601; t=1703172098; x=1703776898; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vIV7OpE5vlpQJDAlqfBZxGDcITKCVdruImRYaoEJi+c=;
+        b=Zo8tzaxuP0prh9x5gpuumHMf/FtOhp6XCi+X3RwTCHU4V+mH9ROYC3X2MpquuWxk2z
+         OPgvXdpWgwhaVIxE3m1MpBUWZINOYA4RsdU6NDvOX+ieF7TB9Mj4fsp0qkOPpxg3T9/z
+         dGcMmrGKQrOArNxuKMBlPfttuUw/y+0wAcTXUwnjZ90l0IKz7mup+tkNmyEE6hJWv1FK
+         r8GZfiEdgDDhmJK9r030iLMbE6YcbRY9Ecz+TsOdno4O8Nu0yGsMNokHx42vANtZ/Tjz
+         +uVdn/dMysICGFdv6tkSAnEMh+er4tSu/yX7TayoSOdXD0r5Fy9ww5Qfqv5n8a/MLmNB
+         +SMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703171773; x=1703776573;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TqbYPdC+pzdSRXmHEIhagjUyGTTzN7gMcr6zGrguEvA=;
-        b=AwNcWYJn/iQnW4k5guMXgEmUmNxwlbap6pRuKRBTwhUHTnQAAuH2z9MifwL84ojSOD
-         8KoXPmLFGYEFReeYjPchBZ7QvBxEcDSOcUwfSk/eX07mSlwSG2JMAPLF/2cDs3XYzLbC
-         aLlKQcyTKpDkoqKrepN3LhSCp9rtuBKtp6CZIcDHaJ0FCrYKY8AEB/HZ3YuC4i4bW4gV
-         0F4SznGQst1x+CA6dz3kMs+fpo9k7jkY+si44SNBG8TzN4GtGWFPktgsj9ctnqRkO3mg
-         jfoxlSC/JlBmsDOJWiT+MAX0Ahagaky7cPgydNpP7mvs5kwMM6lRDomCMabdu+qOewic
-         Ltyw==
-X-Gm-Message-State: AOJu0Yw8fZfE9dyvZphzuv4qH5xLfP8rXwRki5vVj9JP94UOtKa+Peac
-	FJddze2ilRu2aj28tgEtd48=
-X-Google-Smtp-Source: AGHT+IHJjhFl8aucUSYY9VqO85+850iDGfZwpNYK/Qur+Y7lQw4rO6QDuDU6rtJXE5crDceVW8fznQ==
-X-Received: by 2002:a50:cdcf:0:b0:553:d641:a662 with SMTP id h15-20020a50cdcf000000b00553d641a662mr1897345edj.16.1703171772730;
-        Thu, 21 Dec 2023 07:16:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703172098; x=1703776898;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vIV7OpE5vlpQJDAlqfBZxGDcITKCVdruImRYaoEJi+c=;
+        b=dR/zm+FCXpgk9hPrH9JYK8o+G/lOU0vBRodqnaNY4HPhQ8/+6nnP6BGkKCTFcnUTQB
+         5B43RSP4Dsj7ODwn7mYEuv88TEMR807HDl//F6ejL3W7BCVbAdGFFzMtATogafDyj1yV
+         aY3lIe9E/rfwLuZwOMCkvhI6BSwsq02Xp0hLCgYs/1S222Yki9izTqprVpb2JX4F/5ky
+         S7/2QQT7DjKKfWnjkt7jXXrm+QiT1lHsvr53W51oWGGZeWdSDEJWBTjRE0KFw/ANd+v9
+         ihr6FF0ef0zaM/VgZOvjOSFoaMsEU+L4ufaLLr7fqtyPXaJLba4QvfH11tb3h4D/VZtX
+         +RzQ==
+X-Gm-Message-State: AOJu0YwxRNQU/0OMZdCAr5h56nSyXD+nluSG296IKwaWwM98nvpM5aJN
+	hd8QZYA12BT76BLtSo1W1B4=
+X-Google-Smtp-Source: AGHT+IGksvPr935i8JJfGXGKV2vNTE8BH3POtfbbMSxM8bteud58jV8vSyXi2GR8QvtY1c+yyxWzKw==
+X-Received: by 2002:a05:6402:2152:b0:54d:412:c8f4 with SMTP id bq18-20020a056402215200b0054d0412c8f4mr9807081edb.84.1703172097634;
+        Thu, 21 Dec 2023 07:21:37 -0800 (PST)
 Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id o15-20020aa7d3cf000000b00553a094dd5csm1273484edr.32.2023.12.21.07.16.09
+        by smtp.gmail.com with ESMTPSA id p20-20020aa7cc94000000b00553b746e17esm1293898edt.83.2023.12.21.07.21.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 07:16:10 -0800 (PST)
-Date: Thu, 21 Dec 2023 17:16:07 +0200
+        Thu, 21 Dec 2023 07:21:36 -0800 (PST)
+Date: Thu, 21 Dec 2023 17:21:33 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Bauer <mail@david-bauer.net>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next] net: dsa: mt7530: register OF node for internal
- MDIO bus
-Message-ID: <20231221151607.ujobhh4aet4obxdz@skbuf>
-References: <20231220173539.59071-1-arinc.unal@arinc9.com>
- <20231220173539.59071-1-arinc.unal@arinc9.com>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	arinc.unal@arinc9.com
+Subject: Re: [PATCH net-next v2 0/7] net: dsa: realtek: variants to drivers,
+ interfaces to a common module
+Message-ID: <20231221152133.a53rlyiha7kqyk5q@skbuf>
+References: <20231220042632.26825-1-luizluca@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231220173539.59071-1-arinc.unal@arinc9.com>
- <20231220173539.59071-1-arinc.unal@arinc9.com>
+In-Reply-To: <20231220042632.26825-1-luizluca@gmail.com>
 
-On Wed, Dec 20, 2023 at 07:35:39PM +0200, Arınç ÜNAL wrote:
-> From: David Bauer <mail@david-bauer.net>
+On Wed, Dec 20, 2023 at 01:24:23AM -0300, Luiz Angelo Daros de Luca wrote:
+> The current driver consists of two interface modules (SMI and MDIO) and two family/variant modules (RTL8365MB and RTL8366RB). The SMI and MDIO modules serve as the platform and MDIO drivers, respectively, calling functions from the variant modules. In this setup, one interface module can be loaded independently of the other, but both variants must be loaded (if not disabled at build time) for any type of interface. This approach doesn't scale well, especially with the addition of more switch variants (e.g., RTL8366B), leading to loaded but unused modules. Additionally, this also seems to be upside down, as the specific driver code normally depends on the more generic functions and not the other way around.
 > 
-> The MT753x switches provide a switch-internal MDIO bus for the embedded
-> PHYs.
+> The series begins by removing an unused function pointer at realtek_ops->cleanup.
 > 
-> Register a OF sub-node on the switch OF-node for this internal MDIO bus.
-> This allows to configure the embedded PHYs using device-tree.
+> Each variant module was converted into real drivers, serving as both a platform driver (for switches connected using the SMI interface) and an MDIO driver (for MDIO-connected switches). The relationship between the variant and interface modules is reversed, with the variant module now calling both interface functions (if not disabled at build time). While in most devices only one interface is likely used, the interface code is significantly smaller than a variant module, consuming fewer resources than the previous code. With variant modules now functioning as real drivers, compatible strings are published only in a single variant module, preventing conflicts.
 > 
-> Signed-off-by: David Bauer <mail@david-bauer.net>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
+> The patch series introduces a new common module for functions shared by both variants. This module also absorbs the two previous interface modules, as they would always be loaded anyway.
+> 
+> The series relocates the user MII driver from realtek-smi to common. It is now used by MDIO-connected switches instead of the generic DSA driver. There's a change in how this driver locates the MDIO node. It now searches for either a child named "mdio" (compatible with realtek-mdio and binding docs) or a child with the compatible string (compatible with realtek-smi).
+> 
+> The dsa_switch in realtek_priv->ds is now embedded in the struct. It is always in use and avoids dynamic memory allocation.
+> 
+> Testing has been performed with an RTL8367S (rtl8365mb) using MDIO interface and an RTL8366RB (rtl8366) with SMI interface.
 
-Can you please not assign "bus" to ds->user_mii_bus unless there is no
-"mdio" OF node? We don't need ds->user_mii_bus populated when it is
-described in device tree.
+Could you please do word wrapping at around 80 characters per line,
+so that the cover letter doesn't look horrible when used as the message
+for the merge commit? Thanks.
 
