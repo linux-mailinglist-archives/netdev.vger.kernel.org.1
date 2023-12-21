@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-59387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F6F781ABEB
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 01:57:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E930A81ABEC
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 01:58:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F468B227B8
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 00:57:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A76BA287721
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 00:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6646A5B;
-	Thu, 21 Dec 2023 00:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DB064A;
+	Thu, 21 Dec 2023 00:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+h3tcK1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIj2e/07"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEB73C3D
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 00:57:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14F2AC433CB;
-	Thu, 21 Dec 2023 00:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BA24419
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 00:57:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A87F5C433C9;
+	Thu, 21 Dec 2023 00:57:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703120251;
-	bh=UZ7kMK6YqULZRSQeJ3RnO4x/uLmqBiT0Qc8PDohHlyA=;
+	s=k20201202; t=1703120252;
+	bh=1J1Hrmr7kj4mwlZUoo6RowLhNLFh8tok6WYRe44EibE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N+h3tcK1E37DhWkapTqFiF713ptVXoCagpRUBEsLXyOCbW00vkHJjEd9ysBKe6PGL
-	 xtJpBPw0gNNHyAw+1CuUZl3UtrhUvrC8Q4cOHzY9/wIo5E0GpgvjTN/mMSN6rf3fEG
-	 4K5emfY324Vb1OnphakFYPglLg9nrcK5lmK9wpS5FRuCXuIX53m1jeoH5Rv6RHnmyM
-	 dhqITgp/pTvwfs2V9FI0XgxMDD2cxy/YzGAh8SnBzNSHIlIg7GLYQHf473QaXO2qPg
-	 tXDANgFYby17sXayGQdFBOxnJYtU8zYilyVXJ329X1JoyZEmMtxdZ/eC1KyhMAfG6H
-	 8CbmQhRuRrRgg==
+	b=cIj2e/072Z5YzYVkiqI1dFz5nnAh/lZLIz+v5KiUqNXiDrIz1aX/gk79t3K/uWIvK
+	 ycy0veRYAu79puO3HfF9Q2SynESIUFtORAsXF1pIiNfoBeZSJJ/rNE4FYudPIEWL7H
+	 tO+wfVcDtg4+BYdKhimA7U6kcdk0d5OphWhXOuyvrN6RA06podDKOPQ3Wa9JLe+/6H
+	 MIHLnviYB3+NqO5ZmO1bh1eG5MQh4G8aA2bYSmTMNpCYCXpwgyM/savBAULpgjhzsa
+	 LRxulxHVXfQqa88bQU0w3ApjaQi4fNcAZxrVm/FxgiRFRnj9j4/dH5lEIZSp3mPMRG
+	 FNzyBghFTbfog==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -39,10 +39,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [net-next 02/15] net/mlx5: Fix query of sd_group field
-Date: Wed, 20 Dec 2023 16:57:08 -0800
-Message-ID: <20231221005721.186607-3-saeed@kernel.org>
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>
+Subject: [net-next 03/15] net/mlx5: SD, Introduce SD lib
+Date: Wed, 20 Dec 2023 16:57:09 -0800
+Message-ID: <20231221005721.186607-4-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231221005721.186607-1-saeed@kernel.org>
 References: <20231221005721.186607-1-saeed@kernel.org>
@@ -56,92 +57,164 @@ Content-Transfer-Encoding: 8bit
 
 From: Tariq Toukan <tariqt@nvidia.com>
 
-The sd_group field moved in the HW spec from the MPIR register
-to the vport context.
-Align the query accordingly.
+Add Socket-Direct API with empty/minimal implementation.
+We fill-in the implementation gradually in downstream patches.
 
-Fixes: f5e956329960 ("net/mlx5: Expose Management PCIe Index Register (MPIR)")
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/vport.c   | 21 +++++++++++++++++++
- include/linux/mlx5/mlx5_ifc.h                 | 10 ++++++---
- include/linux/mlx5/vport.h                    |  1 +
- 3 files changed, 29 insertions(+), 3 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |  2 +-
+ .../ethernet/mellanox/mlx5/core/lib/mlx5.h    | 11 ++++
+ .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 60 +++++++++++++++++++
+ .../net/ethernet/mellanox/mlx5/core/lib/sd.h  | 38 ++++++++++++
+ 4 files changed, 110 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-index 5a31fb47ffa5..c95a84b7db3a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-@@ -440,6 +440,27 @@ int mlx5_query_nic_vport_system_image_guid(struct mlx5_core_dev *mdev,
- }
- EXPORT_SYMBOL_GPL(mlx5_query_nic_vport_system_image_guid);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+index c44870b175f9..76dc5a9b9648 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+@@ -29,7 +29,7 @@ mlx5_core-$(CONFIG_MLX5_CORE_EN) += en/rqt.o en/tir.o en/rss.o en/rx_res.o \
+ 		en/reporter_tx.o en/reporter_rx.o en/params.o en/xsk/pool.o \
+ 		en/xsk/setup.o en/xsk/rx.o en/xsk/tx.o en/devlink.o en/ptp.o \
+ 		en/qos.o en/htb.o en/trap.o en/fs_tt_redirect.o en/selq.o \
+-		lib/crypto.o
++		lib/crypto.o lib/sd.o
  
-+int mlx5_query_nic_vport_sd_group(struct mlx5_core_dev *mdev, u8 *sd_group)
+ #
+ # Netdev extra
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h
+index 2b5826a785c4..0810b92b48d0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h
+@@ -54,4 +54,15 @@ static inline struct net_device *mlx5_uplink_netdev_get(struct mlx5_core_dev *md
+ {
+ 	return mdev->mlx5e_res.uplink_netdev;
+ }
++
++struct mlx5_sd;
++
++static inline struct mlx5_sd *mlx5_get_sd(struct mlx5_core_dev *dev)
 +{
-+	int outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
-+	u32 *out;
-+	int err;
-+
-+	out = kvzalloc(outlen, GFP_KERNEL);
-+	if (!out)
-+		return -ENOMEM;
-+
-+	err = mlx5_query_nic_vport_context(mdev, 0, out);
-+	if (err)
-+		goto out;
-+
-+	*sd_group = MLX5_GET(query_nic_vport_context_out, out,
-+			     nic_vport_context.sd_group);
-+out:
-+	kvfree(out);
-+	return err;
++	return NULL;
 +}
 +
- int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid)
- {
- 	u32 *out;
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index fee20fc010c2..bf2d51952e48 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -4030,8 +4030,13 @@ struct mlx5_ifc_nic_vport_context_bits {
- 	u8	   affiliation_criteria[0x4];
- 	u8	   affiliated_vhca_id[0x10];
- 
--	u8	   reserved_at_60[0xd0];
-+	u8	   reserved_at_60[0xa0];
- 
-+	u8	   reserved_at_100[0x1];
-+	u8         sd_group[0x3];
-+	u8	   reserved_at_104[0x1c];
++static inline void mlx5_set_sd(struct mlx5_core_dev *dev, struct mlx5_sd *sd)
++{
++}
+ #endif
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+new file mode 100644
+index 000000000000..ea37238c4519
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+@@ -0,0 +1,60 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/* Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
 +
-+	u8	   reserved_at_120[0x10];
- 	u8         mtu[0x10];
- 
- 	u8         system_image_guid[0x40];
-@@ -10116,8 +10121,7 @@ struct mlx5_ifc_mpir_reg_bits {
- 	u8         reserved_at_20[0x20];
- 
- 	u8         local_port[0x8];
--	u8         reserved_at_28[0x15];
--	u8         sd_group[0x3];
-+	u8         reserved_at_28[0x18];
- 
- 	u8         reserved_at_60[0x20];
- };
-diff --git a/include/linux/mlx5/vport.h b/include/linux/mlx5/vport.h
-index fbb9bf447889..c36cc6d82926 100644
---- a/include/linux/mlx5/vport.h
-+++ b/include/linux/mlx5/vport.h
-@@ -72,6 +72,7 @@ int mlx5_query_nic_vport_mtu(struct mlx5_core_dev *mdev, u16 *mtu);
- int mlx5_modify_nic_vport_mtu(struct mlx5_core_dev *mdev, u16 mtu);
- int mlx5_query_nic_vport_system_image_guid(struct mlx5_core_dev *mdev,
- 					   u64 *system_image_guid);
-+int mlx5_query_nic_vport_sd_group(struct mlx5_core_dev *mdev, u8 *sd_group);
- int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid);
- int mlx5_modify_nic_vport_node_guid(struct mlx5_core_dev *mdev,
- 				    u16 vport, u64 node_guid);
++#include "lib/sd.h"
++#include "mlx5_core.h"
++
++#define sd_info(__dev, format, ...) \
++	dev_info((__dev)->device, "Socket-Direct: " format, ##__VA_ARGS__)
++#define sd_warn(__dev, format, ...) \
++	dev_warn((__dev)->device, "Socket-Direct: " format, ##__VA_ARGS__)
++
++struct mlx5_sd {
++};
++
++static int mlx5_sd_get_host_buses(struct mlx5_core_dev *dev)
++{
++	return 1;
++}
++
++struct mlx5_core_dev *
++mlx5_sd_primary_get_peer(struct mlx5_core_dev *primary, int idx)
++{
++	if (idx == 0)
++		return primary;
++
++	return NULL;
++}
++
++int mlx5_sd_ch_ix_get_dev_ix(struct mlx5_core_dev *dev, int ch_ix)
++{
++	return ch_ix % mlx5_sd_get_host_buses(dev);
++}
++
++int mlx5_sd_ch_ix_get_vec_ix(struct mlx5_core_dev *dev, int ch_ix)
++{
++	return ch_ix / mlx5_sd_get_host_buses(dev);
++}
++
++struct mlx5_core_dev *mlx5_sd_ch_ix_get_dev(struct mlx5_core_dev *primary, int ch_ix)
++{
++	int mdev_idx = mlx5_sd_ch_ix_get_dev_ix(primary, ch_ix);
++
++	return mlx5_sd_primary_get_peer(primary, mdev_idx);
++}
++
++int mlx5_sd_init(struct mlx5_core_dev *dev)
++{
++	return 0;
++}
++
++void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
++{
++}
++
++struct auxiliary_device *mlx5_sd_get_adev(struct mlx5_core_dev *dev,
++					  struct auxiliary_device *adev,
++					  int idx)
++{
++	return adev;
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h
+new file mode 100644
+index 000000000000..137efaf9aabc
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h
+@@ -0,0 +1,38 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/* Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++
++#ifndef __MLX5_LIB_SD_H__
++#define __MLX5_LIB_SD_H__
++
++#define MLX5_SD_MAX_GROUP_SZ 2
++
++struct mlx5_sd;
++
++struct mlx5_core_dev *mlx5_sd_primary_get_peer(struct mlx5_core_dev *primary, int idx);
++int mlx5_sd_ch_ix_get_dev_ix(struct mlx5_core_dev *dev, int ch_ix);
++int mlx5_sd_ch_ix_get_vec_ix(struct mlx5_core_dev *dev, int ch_ix);
++struct mlx5_core_dev *mlx5_sd_ch_ix_get_dev(struct mlx5_core_dev *primary, int ch_ix);
++struct auxiliary_device *mlx5_sd_get_adev(struct mlx5_core_dev *dev,
++					  struct auxiliary_device *adev,
++					  int idx);
++
++int mlx5_sd_init(struct mlx5_core_dev *dev);
++void mlx5_sd_cleanup(struct mlx5_core_dev *dev);
++
++#define mlx5_sd_for_each_dev_from_to(i, primary, ix_from, to, pos)	\
++	for (i = ix_from;							\
++	     (pos = mlx5_sd_primary_get_peer(primary, i)) && pos != (to); i++)
++
++#define mlx5_sd_for_each_dev(i, primary, pos)				\
++	mlx5_sd_for_each_dev_from_to(i, primary, 0, NULL, pos)
++
++#define mlx5_sd_for_each_dev_to(i, primary, to, pos)			\
++	mlx5_sd_for_each_dev_from_to(i, primary, 0, to, pos)
++
++#define mlx5_sd_for_each_secondary(i, primary, pos)			\
++	mlx5_sd_for_each_dev_from_to(i, primary, 1, NULL, pos)
++
++#define mlx5_sd_for_each_secondary_to(i, primary, to, pos)		\
++	mlx5_sd_for_each_dev_from_to(i, primary, 1, to, pos)
++
++#endif /* __MLX5_LIB_SD_H__ */
 -- 
 2.43.0
 
