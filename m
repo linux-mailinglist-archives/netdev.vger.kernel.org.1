@@ -1,217 +1,235 @@
-Return-Path: <netdev+bounces-59653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92C6781B995
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:32:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2391A81B9A4
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 15:34:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FC4F1F25AA8
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:32:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F23A1F21B01
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 14:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4A480C;
-	Thu, 21 Dec 2023 14:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41108846B;
+	Thu, 21 Dec 2023 14:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UF4OojNF"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JdkrmPQQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BDC3608F
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so12960a12.0
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 06:32:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703169123; x=1703773923; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZ2azlvSqFCZX8jb2QITC8fbT5+vgCFvbH7RV3zxDzc=;
-        b=UF4OojNFQ4HWe9YK+pwWgyE5PDsB0NrSiXLqTR0Qnj2Ri088RxNmJSGExoxQdZWiUC
-         DZi5yOlnWk8nKoJ8oJpwdHmtCgWhQQRwlPuSdASNDGN0hVPysShCka5syfXEttchvqM/
-         tMgP/isZ9MV+T4oDtwPkSbuQtGqc+fLzSPI2y8v4BLte5qKjk2ktDA+0rFgCrR5wKeu7
-         koSpN2Clv/F9M/J7JYgg4TZwfly6OZJ0erkT7SbelHeCGBfK4kBckR2Ni5CljbtI2p2k
-         as9fvnN+4JChoBFrKFw3uP34/XXHYf8V3JABxDU2g+speGa++V//0ZRA5WadVRcvhI5K
-         4UEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703169123; x=1703773923;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IZ2azlvSqFCZX8jb2QITC8fbT5+vgCFvbH7RV3zxDzc=;
-        b=bpisqDXLNLzLVyfxaGszuDsLT4hLvFYzaEi+MQRkbsTt0TXWRXHY0NOd7b6G37IBch
-         L6PdyjLd0TDy0e6bmqs+0hvH/E3VL62llt0Du4v6MHejRqq7p8Mq/vM2xwKAcyI1WyqM
-         qNZEGcqhx56Aoepxv9VvLwmBdM0uYsWL0XMFIPoqlKqgS9ZajTaax2MeyFV0NqN0iM71
-         yaDH7sQ+YAmbiIhwMFSWfFb/SfHndvLXaTyerSJJfxTKgUi6e3V6YbEjzR21ZzzpXN+4
-         xhyNoUTLkr3rrBudmaz7vm7KqecUTEkCBjbagV/IO4imsVkjGweob4ZrIMopjbUdnu29
-         SSnQ==
-X-Gm-Message-State: AOJu0Ywjp2NIlqRMyR+10PjeVNw2yTUYaqUw92mnYQN1mhI8G05UC9Ff
-	spEkd70xlkYtncmrDACM9s5k1pZBGnuRAB+GQrhcLUwpi+WP
-X-Google-Smtp-Source: AGHT+IHMWzYEbgP04SLDFsLT0lc+p/y3I3VmZDVD0uJFDXWiJxfT5AF9q9m7VvwlOsfQ5IWzPYUDWQX0j2s3riUqbYA=
-X-Received: by 2002:a50:8e08:0:b0:553:5578:2fc9 with SMTP id
- 8-20020a508e08000000b0055355782fc9mr90879edw.5.1703169122494; Thu, 21 Dec
- 2023 06:32:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740C0816
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7b3b6c67-05e0-4a90-8142-66f055e15d83@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1703169276;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e6iOTHH/qin4z7nteRbrVZQnh9ljwpfWeOWXpZKN3Zc=;
+	b=JdkrmPQQ6P9zXTmRJkJGRSA7QblRDYiBvB77/9C1sp5dKOestp+db8LAbS6S72Drc/3THZ
+	l5FbH03BUo8v2GgKBKg2U02H24wACnFJQkvl4EiVOGiRbpFr7XgQV3aazYbbquxcU11YmI
+	6XVnU7TY9fq49kYGJd3vdWenWe9WcHY=
+Date: Thu, 21 Dec 2023 22:34:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231023192217.426455-1-dima@arista.com> <20231023192217.426455-2-dima@arista.com>
-In-Reply-To: <20231023192217.426455-2-dima@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 21 Dec 2023 15:31:49 +0100
-Message-ID: <CANn89i+Uwg87xAS9m8fm1f1daQj-YyugperN3HnvgbB6g+hOuw@mail.gmail.com>
-Subject: Re: [PATCH v16 net-next 01/23] net/tcp: Prepare tcp_md5sig_pool for TCP-AO
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	Andy Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>, 
-	Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>, 
-	David Laight <David.Laight@aculab.com>, Dmitry Safonov <0x7f454c46@gmail.com>, 
-	Donald Cassidy <dcassidy@redhat.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Eric W. Biederman" <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Ivan Delalande <colona@arista.com>, 
-	Leonard Crestez <cdleonard@gmail.com>, "Nassiri, Mohammad" <mnassiri@ciena.com>, 
-	Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>, 
-	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org, 
-	Steen Hegelund <Steen.Hegelund@microchip.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next] virtio-net: switch napi_tx without downing nic
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ netdev@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
+ <d26c6d0b-92a1-4baa-bceb-dc267b5b60e6@linux.dev>
+ <46097ac2-c498-4b9f-898f-27ef097b9c85@linux.alibaba.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <46097ac2-c498-4b9f-898f-27ef097b9c85@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 23, 2023 at 9:22=E2=80=AFPM Dmitry Safonov <dima@arista.com> wr=
-ote:
->
-> TCP-AO, similarly to TCP-MD5, needs to allocate tfms on a slow-path,
-> which is setsockopt() and use crypto ahash requests on fast paths,
-> which are RX/TX softirqs. Also, it needs a temporary/scratch buffer
-> for preparing the hash.
->
-> Rework tcp_md5sig_pool in order to support other hashing algorithms
-> than MD5. It will make it possible to share pre-allocated crypto_ahash
-> descriptors and scratch area between all TCP hash users.
->
-> Internally tcp_sigpool calls crypto_clone_ahash() API over pre-allocated
-> crypto ahash tfm. Kudos to Herbert, who provided this new crypto API.
->
-> I was a little concerned over GFP_ATOMIC allocations of ahash and
-> crypto_request in RX/TX (see tcp_sigpool_start()), so I benchmarked both
-> "backends" with different algorithms, using patched version of iperf3[2].
-> On my laptop with i7-7600U @ 2.80GHz:
->
->                          clone-tfm                per-CPU-requests
-> TCP-MD5                  2.25 Gbits/sec           2.30 Gbits/sec
-> TCP-AO(hmac(sha1))       2.53 Gbits/sec           2.54 Gbits/sec
-> TCP-AO(hmac(sha512))     1.67 Gbits/sec           1.64 Gbits/sec
-> TCP-AO(hmac(sha384))     1.77 Gbits/sec           1.80 Gbits/sec
-> TCP-AO(hmac(sha224))     1.29 Gbits/sec           1.30 Gbits/sec
-> TCP-AO(hmac(sha3-512))    481 Mbits/sec            480 Mbits/sec
-> TCP-AO(hmac(md5))        2.07 Gbits/sec           2.12 Gbits/sec
-> TCP-AO(hmac(rmd160))     1.01 Gbits/sec            995 Mbits/sec
-> TCP-AO(cmac(aes128))     [not supporetd yet]      2.11 Gbits/sec
->
-> So, it seems that my concerns don't have strong grounds and per-CPU
-> crypto_request allocation can be dropped/removed from tcp_sigpool once
-> ciphers get crypto_clone_ahash() support.
->
-> [1]: https://lore.kernel.org/all/ZDefxOq6Ax0JeTRH@gondor.apana.org.au/T/#=
-u
-> [2]: https://github.com/0x7f454c46/iperf/tree/tcp-md5-ao
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> Acked-by: David Ahern <dsahern@kernel.org>
->
 
-...
+在 2023/12/21 13:20, Heng Qi 写道:
+>
+>
+> 在 2023/12/21 上午11:02, Zhu Yanjun 写道:
+>> 在 2023/12/20 16:07, Heng Qi 写道:
+>>> virtio-net has two ways to switch napi_tx: one is through the
+>>> module parameter, and the other is through coalescing parameter
+>>> settings (provided that the nic status is down).
+>>>
+>>> Sometimes we face performance regression caused by napi_tx,
+>>> then we need to switch napi_tx when debugging. However, the
+>>> existing methods are a bit troublesome, such as needing to
+>>> reload the driver or turn off the network card. So try to make
+>>> this update.
+>>
+>> What scenario can trigger this? We want to make tests on our device.
+>
+> Hi Zhu Yanjun, you can use the following cmds:
+>
+> ethtool -C tx-frames 0, to disable napi_tx
+> ethtool -C tx-frames 1, to enable napi_tx
 
-> +int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
-> +{
-> +       int i, ret;
-> +
-> +       /* slow-path */
-> +       mutex_lock(&cpool_mutex);
-> +       ret =3D sigpool_reserve_scratch(scratch_size);
-> +       if (ret)
-> +               goto out;
-> +       for (i =3D 0; i < cpool_populated; i++) {
-> +               if (!cpool[i].alg)
-> +                       continue;
-> +               if (strcmp(cpool[i].alg, alg))
-> +                       continue;
-> +
-> +               if (kref_read(&cpool[i].kref) > 0)
-> +                       kref_get(&cpool[i].kref);
 
-This sequence is racy.
+Thanks a lot. Just now I made tests on our device. I confirmed that 
+virtion_net driver can work well after running "ethtool -C NIC tx-frames 
+0 && sleep 3 && ethtool -C NIC tx-frames 1".
 
-You must use kref_get_unless_zero().
+You can add "Reviewed-and-tested-by: Zhu Yanjun <yanjun.zhu@linux.dev>"
 
-> +               else
-> +                       kref_init(&cpool[i].kref);
-> +               ret =3D i;
-> +               goto out;
-> +       }
-> +
-> +
+Thanks,
 
-syzbot reported:
+Zhu Yanjun
 
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 2 PID: 31702 at lib/refcount.c:25
-refcount_warn_saturate+0x1ca/0x210 lib/refcount.c:25
-Modules linked in:
-CPU: 2 PID: 31702 Comm: syz-executor.3 Not tainted
-6.7.0-rc6-syzkaller-00044-g1a44b0073b92 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:refcount_warn_saturate+0x1ca/0x210 lib/refcount.c:25
-Code: ff 89 de e8 58 a3 25 fd 84 db 0f 85 e6 fe ff ff e8 1b a8 25 fd
-c6 05 9a 88 a1 0a 01 90 48 c7 c7 00 9d 2e 8b e8 b7 ec eb fc 90 <0f> 0b
-90 90 e9 c3 fe ff ff e8 f8 a7 25 fd c6 05 75 88 a1 0a 01 90
-RSP: 0018:ffffc900296df850 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002c40a000
-RDX: 0000000000040000 RSI: ffffffff814db526 RDI: 0000000000000001
-RBP: ffffffff92b5b7b0 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000002 R12: 0000000000000010
-R13: ffffffff92b5b7b0 R14: 0000000000000001 R15: 0000000000000000
-FS: 0000000000000000(0000) GS:ffff88802c800000(0063) knlGS:00000000f7efdb40
-CS: 0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 00000000f7354000 CR3: 0000000050ee3000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-<TASK>
-__refcount_add include/linux/refcount.h:199 [inline]
-__refcount_inc include/linux/refcount.h:250 [inline]
-refcount_inc include/linux/refcount.h:267 [inline]
-kref_get include/linux/kref.h:45 [inline]
-tcp_sigpool_alloc_ahash+0x9cb/0xce0 net/ipv4/tcp_sigpool.c:166
-tcp_md5_alloc_sigpool+0x1b/0x40 net/ipv4/tcp.c:4379
-tcp_md5_do_add+0x192/0x460 net/ipv4/tcp_ipv4.c:1403
-tcp_v6_parse_md5_keys+0x68d/0x860 net/ipv6/tcp_ipv6.c:676
-do_tcp_setsockopt+0x1302/0x2880 net/ipv4/tcp.c:3644
-tcp_setsockopt+0xd4/0x100 net/ipv4/tcp.c:3726
-do_sock_setsockopt+0x222/0x470 net/socket.c:2311
-__sys_setsockopt+0x1a6/0x270 net/socket.c:2334
-__do_sys_setsockopt net/socket.c:2343 [inline]
-__se_sys_setsockopt net/socket.c:2340 [inline]
-__ia32_sys_setsockopt+0xbc/0x150 net/socket.c:2340
-do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
-__do_fast_syscall_32+0x62/0xe0 arch/x86/entry/common.c:321
-do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:346
-entry_SYSENTER_compat_after_hwframe+0x70/0x7a
-RIP: 0023:0xf7f02579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00
-00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a
-59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000f7efd5ac EFLAGS: 00000292 ORIG_RAX: 000000000000016e
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000000006
-RDX: 000000000000000e RSI: 0000000020000000 RDI: 00000000000000d8
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000292 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+>
+> Thanks.
+>
+>>
+>> Zhu Yanjun
+>>
+>>>
+>>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+>>> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>>> ---
+>>>   drivers/net/virtio_net.c | 81 
+>>> ++++++++++++++++++----------------------
+>>>   1 file changed, 37 insertions(+), 44 deletions(-)
+>>>
+>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>>> index 10614e9f7cad..12f8e1f9971c 100644
+>>> --- a/drivers/net/virtio_net.c
+>>> +++ b/drivers/net/virtio_net.c
+>>> @@ -3559,16 +3559,37 @@ static int 
+>>> virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+>>>       return 0;
+>>>   }
+>>>   -static int virtnet_should_update_vq_weight(int dev_flags, int 
+>>> weight,
+>>> -                       int vq_weight, bool *should_update)
+>>> +static void virtnet_switch_napi_tx(struct virtnet_info *vi, u32 
+>>> qstart,
+>>> +                   u32 qend, u32 tx_frames)
+>>>   {
+>>> -    if (weight ^ vq_weight) {
+>>> -        if (dev_flags & IFF_UP)
+>>> -            return -EBUSY;
+>>> -        *should_update = true;
+>>> -    }
+>>> +    struct net_device *dev = vi->dev;
+>>> +    int new_weight, cur_weight;
+>>> +    struct netdev_queue *txq;
+>>> +    struct send_queue *sq;
+>>>   -    return 0;
+>>> +    new_weight = tx_frames ? NAPI_POLL_WEIGHT : 0;
+>>> +    for (; qstart < qend; qstart++) {
+>>> +        sq = &vi->sq[qstart];
+>>> +        cur_weight = sq->napi.weight;
+>>> +        if (!(new_weight ^ cur_weight))
+>>> +            continue;
+>>> +
+>>> +        if (!(dev->flags & IFF_UP)) {
+>>> +            sq->napi.weight = new_weight;
+>>> +            continue;
+>>> +        }
+>>> +
+>>> +        if (cur_weight)
+>>> +            virtnet_napi_tx_disable(&sq->napi);
+>>> +
+>>> +        txq = netdev_get_tx_queue(dev, qstart);
+>>> +        __netif_tx_lock_bh(txq);
+>>> +        sq->napi.weight = new_weight;
+>>> +        __netif_tx_unlock_bh(txq);
+>>> +
+>>> +        if (!cur_weight)
+>>> +            virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
+>>> +    }
+>>>   }
+>>>     static int virtnet_set_coalesce(struct net_device *dev,
+>>> @@ -3577,25 +3598,11 @@ static int virtnet_set_coalesce(struct 
+>>> net_device *dev,
+>>>                   struct netlink_ext_ack *extack)
+>>>   {
+>>>       struct virtnet_info *vi = netdev_priv(dev);
+>>> -    int ret, queue_number, napi_weight;
+>>> -    bool update_napi = false;
+>>> -
+>>> -    /* Can't change NAPI weight if the link is up */
+>>> -    napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+>>> -    for (queue_number = 0; queue_number < vi->max_queue_pairs; 
+>>> queue_number++) {
+>>> -        ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
+>>> - vi->sq[queue_number].napi.weight,
+>>> -                              &update_napi);
+>>> -        if (ret)
+>>> -            return ret;
+>>> -
+>>> -        if (update_napi) {
+>>> -            /* All queues that belong to [queue_number, 
+>>> vi->max_queue_pairs] will be
+>>> -             * updated for the sake of simplicity, which might not 
+>>> be necessary
+>>> -             */
+>>> -            break;
+>>> -        }
+>>> -    }
+>>> +    int ret;
+>>> +
+>>> +    /* Param tx_frames can be used to switch napi_tx */
+>>> +    virtnet_switch_napi_tx(vi, 0, vi->max_queue_pairs,
+>>> +                   ec->tx_max_coalesced_frames);
+>>>         if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL))
+>>>           ret = virtnet_send_notf_coal_cmds(vi, ec);
+>>> @@ -3605,11 +3612,6 @@ static int virtnet_set_coalesce(struct 
+>>> net_device *dev,
+>>>       if (ret)
+>>>           return ret;
+>>>   -    if (update_napi) {
+>>> -        for (; queue_number < vi->max_queue_pairs; queue_number++)
+>>> -            vi->sq[queue_number].napi.weight = napi_weight;
+>>> -    }
+>>> -
+>>>       return ret;
+>>>   }
+>>>   @@ -3641,19 +3643,13 @@ static int 
+>>> virtnet_set_per_queue_coalesce(struct net_device *dev,
+>>>                         struct ethtool_coalesce *ec)
+>>>   {
+>>>       struct virtnet_info *vi = netdev_priv(dev);
+>>> -    int ret, napi_weight;
+>>> -    bool update_napi = false;
+>>> +    int ret;
+>>>         if (queue >= vi->max_queue_pairs)
+>>>           return -EINVAL;
+>>>   -    /* Can't change NAPI weight if the link is up */
+>>> -    napi_weight = ec->tx_max_coalesced_frames ? NAPI_POLL_WEIGHT : 0;
+>>> -    ret = virtnet_should_update_vq_weight(dev->flags, napi_weight,
+>>> -                          vi->sq[queue].napi.weight,
+>>> -                          &update_napi);
+>>> -    if (ret)
+>>> -        return ret;
+>>> +    /* Param tx_frames can be used to switch napi_tx */
+>>> +    virtnet_switch_napi_tx(vi, queue, queue, 
+>>> ec->tx_max_coalesced_frames);
+>>>         if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+>>>           ret = virtnet_send_notf_coal_vq_cmds(vi, ec, queue);
+>>> @@ -3663,9 +3659,6 @@ static int 
+>>> virtnet_set_per_queue_coalesce(struct net_device *dev,
+>>>       if (ret)
+>>>           return ret;
+>>>   -    if (update_napi)
+>>> -        vi->sq[queue].napi.weight = napi_weight;
+>>> -
+>>>       return 0;
+>>>   }
+>
 
