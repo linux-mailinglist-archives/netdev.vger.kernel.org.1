@@ -1,123 +1,141 @@
-Return-Path: <netdev+bounces-59709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37BC981BDA6
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:53:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D76081BDBA
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 18:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 098041C248FE
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:53:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D36BB23F67
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 17:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179B4634E2;
-	Thu, 21 Dec 2023 17:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC9F634E5;
+	Thu, 21 Dec 2023 17:57:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fMKAtZYn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IjGXpRix"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20DABA2F
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:53:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41850C433C7;
-	Thu, 21 Dec 2023 17:53:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703181226;
-	bh=otq+51sDpwuu6FdVfb96T5VYHgIqRfkiIi00Cq4xl9U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fMKAtZYn7RXsk9D4FCAKPmbWPs0JgyV8JvO1iDvieiXgvM59HvqaSQq9HFe/SPEh4
-	 15tcp632Gr21i1Vizbyw/Al5sTGvwW3UZ9etsuQH8G0LPExkwGnF+yrSWixhFnfrap
-	 xzl0C+oDRgmkRiq18vxCnabVxykSMiLyqYtPvnI+GKLsx5TIQQztClmDEL8/jowZuM
-	 ebb+YQ5yKgRFVb4xxpnqVkrPO3Lf0SC8As6Eh97GbjIuu2rRn41AirsnPh/A8PkAx2
-	 G1BkOKsUlbcpUWU/zEdJ0kW4gwaubnKRoxk0upd2WtgmczONJQy54c14tGEIEyGb8D
-	 2fgymRwc0J81g==
-Date: Thu, 21 Dec 2023 18:53:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jinjian Song <songjinjian@hotmail.com>
-Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.com,
-	vsankar@lenovo.com, danielwinkler@google.com, nmarupaka@google.com,
-	joey.zhao@fibocom.com, liuqf@fibocom.com, felix.yan@fibocom.com,
-	Jinjian Song <jinjian.song@fibocom.com>
-Subject: Re: [PATCH v1] net: wwan: t7xx: Add fastboot interface
-Message-ID: <20231221175332.GD1202958@kernel.org>
-References: <MEYP282MB26975911A05EB464E9548BA8BB95A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E7E634EE;
+	Thu, 21 Dec 2023 17:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-78106c385a1so66129185a.0;
+        Thu, 21 Dec 2023 09:57:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703181456; x=1703786256; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yKQZO+oMIxb+L/35Gcm255u4NIVS88PO7HEdsHog3wA=;
+        b=IjGXpRixsi04pEsokBErT+i5kAExUqsBlgN1Y682v8KOagsNeJVkg6TRQhFcl2V95q
+         I4ndVS4ULJAs8lpkDf9260Lqzyg3tMytPZKq/z6/GzjWVjDPKHi77kT3191bj3ZrvogC
+         xpTDrvK5is6MJceykQ1JqS9o0cePAy8nsboCWU5Qt6zCFmwn9ZvhqsN2AF/FS6Ufcn77
+         ALF2xlkStjXuYgR6tERXtTRh5bV0QrvUB1xpSfw/dule5/5rrgshd/bvcVP8bTQGjoiV
+         JGxAlpgVo8bJ26mTMZF+xll8J6vYdKqiQfPzlLHlCr9h/N3u3F1gzdz5pGniQXoPY+cc
+         7QxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703181456; x=1703786256;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yKQZO+oMIxb+L/35Gcm255u4NIVS88PO7HEdsHog3wA=;
+        b=Fj/JY4oFM6gCc9Ku/YnZku4oNQztYCCDWrzPqqsq03LwWZrc3dOII9Ef3Nq3E6J+lo
+         lVqI6ydmlQP4AddochodpztvhNIhs9hE7JvowIhhl9+MzRhnZdRUvjUHmH9G7A0vnv3Z
+         br9YZLdtKddMeij1vPPrKYG1G8NT/BwBsixaNRFlr8uwezpq8cRzaQnVNJOcbO4+7T1+
+         FFPtOM0HpSrFSpKsfbv+DZjaVOGBuC8S3r46ialj0yDCXh6YNpZv4wYe8ODRiJXxPKkI
+         Y+u93wW90bvaTvsJjMVKjwk9L+j74pnSb5/VmMOqhdKX8HCy6xSudbSssZ1TPdBDyBes
+         h9yQ==
+X-Gm-Message-State: AOJu0YyEb5rEGPy2bBu5ymYOM5Gl7NZFUD1ogdfqH+YUbmn5EExv532d
+	FinqoyOtsFDzjvwGh+6Y2MM=
+X-Google-Smtp-Source: AGHT+IHeQR5V4He933XknvRdXl6RsNFfLpQkv8oih7pCPZe+NZwEhGAafy625/SchTXpsN4V+l3ATQ==
+X-Received: by 2002:a05:620a:2610:b0:781:ee6:6318 with SMTP id z16-20020a05620a261000b007810ee66318mr167785qko.141.1703181455992;
+        Thu, 21 Dec 2023 09:57:35 -0800 (PST)
+Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
+        by smtp.gmail.com with ESMTPSA id b21-20020a05620a271500b007811eef5044sm541285qkp.72.2023.12.21.09.57.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 09:57:35 -0800 (PST)
+Date: Thu, 21 Dec 2023 12:57:35 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: David Wei <dw@davidwei.uk>, 
+ io-uring@vger.kernel.org, 
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, 
+ Pavel Begunkov <asml.silence@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, 
+ Mina Almasry <almasrymina@google.com>, 
+ magnus.karlsson@intel.com, 
+ bjorn@kernel.org
+Message-ID: <65847c8f83f71_82de329487@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20231219210357.4029713-8-dw@davidwei.uk>
+References: <20231219210357.4029713-1-dw@davidwei.uk>
+ <20231219210357.4029713-8-dw@davidwei.uk>
+Subject: Re: [RFC PATCH v3 07/20] io_uring: add interface queue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MEYP282MB26975911A05EB464E9548BA8BB95A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 21, 2023 at 03:09:51PM +0800, Jinjian Song wrote:
-> From: Jinjian Song <jinjian.song@fibocom.com>
+David Wei wrote:
+> From: David Wei <davidhwei@meta.com>
 > 
-> To support cases such as firmware update or core dump, the t7xx
-> device is capable of signaling the host that a special port needs
-> to be created before the handshake phase.
+> This patch introduces a new object in io_uring called an interface queue
+> (ifq) which contains:
 > 
-> Adds the infrastructure required to create the early ports which
-> also requires a different configuration of CLDMA queues.
+> * A pool region allocated by userspace and registered w/ io_uring where
+>   Rx data is written to.
+> * A net device and one specific Rx queue in it that will be configured
+>   for ZC Rx.
+> * A pair of shared ringbuffers w/ userspace, dubbed registered buf
+>   (rbuf) rings. Each entry contains a pool region id and an offset + len
+>   within that region. The kernel writes entries into the completion ring
+>   to tell userspace where RX data is relative to the start of a region.
+>   Userspace writes entries into the refill ring to tell the kernel when
+>   it is done with the data.
 > 
-> On early detection of wwan device in fastboot mode, driver sets
-> up CLDMA0 HW tx/rx queues for raw data transfer and then create
-> fastboot port to user space.
+> For now, each io_uring instance has a single ifq, and each ifq has a
+> single pool region associated with one Rx queue.
 > 
-> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
+> Add a new opcode to io_uring_register that sets up an ifq. Size and
+> offsets of shared ringbuffers are returned to userspace for it to mmap.
+> The implementation will be added in a later patch.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
 
-...
+This is quite similar to AF_XDP, of course. Is it at all possible to
+reuse all or some of that? If not, why not?
 
-> @@ -729,8 +792,17 @@ static int t7xx_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  
->  	t7xx_pcie_mac_interrupts_dis(t7xx_dev);
->  
-> +	ret = sysfs_create_group(&t7xx_dev->pdev->dev.kobj,
-> +				 &t7xx_mode_attribute_group);
-> +	if (ret) {
-> +		t7xx_md_exit(t7xx_dev);
-> +		return ret;
-> +	}
+As a side effect, unification would also show a path of moving AF_XDP
+from its custom allocator to the page_pool infra.
 
-Hi Jinjian,
+Related: what is the story wrt the process crashing while user memory
+is posted to the NIC or present in the kernel stack.
 
-Please consider using goto labels for unwind on error in this function.
-Something like this (completely untested!):
+SO_DEVMEM already demonstrates zerocopy into user buffers using usdma.
+To a certain extent that and asyncronous I/O with iouring are two
+independent goals. SO_DEVMEM imposes limitations on the stack because
+it might hold opaque device mem. That is too strong for this case.
 
-	if (ret)
-		goto err_md_exit;
+But for this iouring provider, is there anything ioring specific about
+it beyond being user memory? If not, maybe just call it a umem
+provider, and anticipate it being usable for AF_XDP in the future too?
 
-	...
-	if (ret)
-		goto err_remove_group;
-
-	...
-	return 0;
-
-err_remove_group:
-	sysfs_remove_group(&t7xx_dev->pdev->dev.kobj,
-			   &t7xx_mode_attribute_group);
-err_md_exit:
-	t7xx_md_exit(t7xx_dev);
-	return ret;
-
-The reason that I as for this more idiomatic form is that,
-in my experience, it is less error prone and easier
-to maintain.
-
-> +
->  	ret = t7xx_interrupt_init(t7xx_dev);
->  	if (ret) {
-> +		sysfs_remove_group(&t7xx_dev->pdev->dev.kobj,
-> +				   &t7xx_mode_attribute_group);
->  		t7xx_md_exit(t7xx_dev);
->  		return ret;
->  	}
+Besides delivery up to the intended socket, packets may also end up
+in other code paths, such as packet sockets or forwarding. All of
+this is simpler with userspace backed buffers than with device mem.
+But good to call out explicitly how this is handled. MSG_ZEROCOPY
+makes a deep packet copy in unexpected code paths, for instance. To
+avoid indefinite latency to buffer reclaim.
 
