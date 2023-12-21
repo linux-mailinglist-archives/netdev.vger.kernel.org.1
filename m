@@ -1,124 +1,108 @@
-Return-Path: <netdev+bounces-59551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C350F81B32E
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:08:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8133881B344
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 11:12:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DB2B289061
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3EB71C23362
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 10:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E1A51C25;
-	Thu, 21 Dec 2023 10:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C554D5A8;
+	Thu, 21 Dec 2023 10:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="grskYiz6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bw8TdFBd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61A250254;
-	Thu, 21 Dec 2023 10:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BL63YSW029032;
-	Thu, 21 Dec 2023 10:07:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-type; s=qcppdkim1; bh=ENy9zIRzfqmgFGIyKdRN
-	Aiv5Sae6mMm9M3jFcJx5ZFY=; b=grskYiz6yeeOq+ZecajThBjUfg1O86H5mVuu
-	gWlFg/9LZNudd44R8lbJo+lBgKFil4Ksg+7nSCeekL0cBjNMFdGKUGLEvPsluFOn
-	PWrc1+hd4oxNksWnt3eQSp481hkbrgBlgjgXcEG5x+J1X3hLh7dPlSUgsxm5Zyn9
-	b90ZUGhXIqB6TaU426jS1HcRtmZ2bI9VfEmVgWkNds2jqmaJiH1qbMunQI6JZFCc
-	P8aXRqdQ5ew9Uhnbu0+aZmh7UZdeI+Qisqj/pE5e7YoqZhPOvXBTOUW4GCMfS1vq
-	+kDgdOG7RVLSKvKMtS6Ui6Gfhpz7IKwItH13PTs4tztQyOObvg==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v3v33c87c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Dec 2023 10:07:40 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BLA7EDq008062
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Dec 2023 10:07:14 GMT
-Received: from sarannya-linux.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 21 Dec 2023 02:07:09 -0800
-From: Sarannya S <quic_sarannya@quicinc.com>
-To: <quic_bjorande@quicinc.com>, <bjorn.andersson@kernel.org>,
-        <andersson@kernel.org>, <quic_clew@quicinc.com>,
-        <mathieu.poirier@linaro.org>
-CC: <linux-kernel@vger.kernel.org>, <quic_sarannya@quicinc.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "open list:NETWORKING
- [GENERAL]" <netdev@vger.kernel.org>
-Subject: [PATCH V1] net: qrtr: ns: Return 0 if server port is not present
-Date: Thu, 21 Dec 2023 15:36:51 +0530
-Message-ID: <1703153211-3717-2-git-send-email-quic_sarannya@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1703153211-3717-1-git-send-email-quic_sarannya@quicinc.com>
-References: <1703153211-3717-1-git-send-email-quic_sarannya@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF6951C20;
+	Thu, 21 Dec 2023 10:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703153566; x=1734689566;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CvUxQutvmhA/Tex/Z1ZHD66YcYgZjGrHj75tI6g3a1s=;
+  b=bw8TdFBd/ykc2uZaxsjH7rnvl+4Bgf4vPHI8vu7pQRTNnjokEyQ2gSUH
+   mDpnH8PxaRIoY3lVLq2XDPz2jFkjfIMpDMQmgPxekvPXpNATsWbvrPsKn
+   74sYULD4x/AZ0+iJBvx2rLMcpjtTXinAeo1lhMHkBQW9A8pY8hvXkIsAI
+   qu5cPC6v5jSSuX5i+tWUMyQ8X2lnExlW6TMSZqJEc97GzW51TghlFEB/E
+   9gkLYd7Xpx57/vtH9j2N6gWDTtu+iblPXT2f1dbKBH1wvU41+1AoxTgoI
+   FSgz//II11TBG9G8pMR9qdbHb6Dd7La4OwI/VBpiHBVa8EkYqn8RaoP1/
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="17507251"
+X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
+   d="scan'208";a="17507251"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 02:12:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="780148554"
+X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
+   d="scan'208";a="780148554"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.215.242.241]) ([10.215.242.241])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 02:12:42 -0800
+Message-ID: <d4a29e26-b9cb-4bf9-9dc5-b85f29d3619d@linux.intel.com>
+Date: Thu, 21 Dec 2023 18:12:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: qVrbWCGQWVpjBwfPIQWPCzb_PiyBJj0e
-X-Proofpoint-GUID: qVrbWCGQWVpjBwfPIQWPCzb_PiyBJj0e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- mlxscore=0 malwarescore=0 mlxlogscore=734 clxscore=1015 priorityscore=1501
- adultscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
- definitions=main-2312210075
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net 0/4] qbv cycle time extension/truncation
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231219081453.718489-1-faizal.abdul.rahim@linux.intel.com>
+ <20231219165650.3amt4ftyt7gisz47@skbuf>
+ <023377a7f227f8cd7d5eb73017dbe3f691b29b17.camel@redhat.com>
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <023377a7f227f8cd7d5eb73017dbe3f691b29b17.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When a 'DEL_CLIENT' message is received from the remote, the corresponding
-server port gets deleted. A DEL_SERVER message is then announced for this
-server. As part of handling the subsequent DEL_SERVER message, the name-
-server attempts to delete the server port which results in a '-ENOENT' error.
-The return value from server_del() is then propagated back to qrtr_ns_worker,
-causing excessive error prints.
-To address this, return 0 from control_cmd_del_server() without checking the
-return value of server_del(), since the above scenario is not an error case
-and hence server_del() doesn't have any other error return value.
 
-Signed-off-by: Sarannya Sasikumar <quic_sarannya@quicinc.com>
----
- net/qrtr/ns.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
-index b1db0b5..abb0c70 100644
---- a/net/qrtr/ns.c
-+++ b/net/qrtr/ns.c
-@@ -512,7 +512,9 @@ static int ctrl_cmd_del_server(struct sockaddr_qrtr *from,
- 	if (!node)
- 		return -ENOENT;
- 
--	return server_del(node, port, true);
-+	server_del(node, port, true);
-+
-+	return 0;
- }
- 
- static int ctrl_cmd_new_lookup(struct sockaddr_qrtr *from,
--- 
-2.7.4
+On 21/12/2023 4:52 pm, Paolo Abeni wrote:
+> On Tue, 2023-12-19 at 18:56 +0200, Vladimir Oltean wrote:
+>> How are you testing the behavior, and who reported the issues / what prompted
+>> the changes? Honestly I'm not very confident in the changes we're
+>> pushing down the linux-stable pipe. They don't look all that obvious, so
+>> I still think that having selftests would help.
+> 
+> I agree with Vladimir, this looks quite a bit too complex for a net fix
+> at this late point of the cycle. Given the period of the year, I think
+> it could be too late even for net-next - for this cycle.
+> 
+
+Would it be better to just submit into net-next and target for the next 
+cycle ? I'm okay with that.
+
+> It would be great if you could add some self-tests.
+> 
+> @Faizal: I understand your setup is quite complex, but it would be
+> great if you could come-up with something similar that could fit
+> tools/testing/selftests/net
+> 
+> Thanks!
+> 
+> Paolo
+> 
+
+Ohh my bad, I thought selftest is just to develop and run the test case 
+locally, but it seems that it also refers to integrating it into the 
+existing selftest framework ?
+Got it. I'll explore that and cover extension/truncation cases.
+
 
 
