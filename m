@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-59797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF3881C0BD
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:04:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA3C81C0BE
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 23:04:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3145F1C2408C
-	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:04:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEFB61F236FE
+	for <lists+netdev@lfdr.de>; Thu, 21 Dec 2023 22:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB70079479;
-	Thu, 21 Dec 2023 22:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777C179485;
+	Thu, 21 Dec 2023 22:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VsCbPqpU"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GxUfd6eU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAF97946F
-	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AD778E96
+	for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-67ad277a06bso6797486d6.1
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:03:09 -0800 (PST)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-67f91d48863so1870046d6.0
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 14:03:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1703196189; x=1703800989; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1703196190; x=1703800990; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=P4gSX1SZyeut/T2PdVLNXG93+Z7gXvfdfLf+sytFx1U=;
-        b=VsCbPqpURxXSobfwFvWotj7Y/+kiv5LHt/SvnmAnXrO1drBp2WHtMAvUpqYkah02+P
-         BVsOgRvY+xq+xEwJ6XrzMmrhW7jcTz3+kx5w57Suad6yYYF+TszsqNRI3Fg1p/tIpv8n
-         prfkoA/l3suNJLwtDFH6w88IQk//ewXdfYOzI=
+        bh=P8gGcfNNc2KAPI3HEk9A1doa8CGHlSv5HW4n1p8PaIw=;
+        b=GxUfd6eUEpLa3He7eztwYv9VnZd1VFPnev2Ij99WumLNeupa0vI3ue9w4JlzMd4rGr
+         MvN1PNakXAVJrVnwDYczef2V7sud54+1Ce22p6PUB1e+tzdvI21HrDFOei6kor85cpHb
+         trRFqsRE38UsLhYcXK8jVAhlEVQ5hPA+7Vw2M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703196189; x=1703800989;
+        d=1e100.net; s=20230601; t=1703196190; x=1703800990;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P4gSX1SZyeut/T2PdVLNXG93+Z7gXvfdfLf+sytFx1U=;
-        b=trIzgtRnAWgp00lQvR6FQFZGthWCux5hbCNEzchWbJAp95TJxAJdcdgtKMd94q8Qto
-         fJHk+K79gpkUgDJymxebEDWGygiseYhNkvz2aQH9Tg13lfPkXxucYPNqkLRNzQ3dB65b
-         GkfeoND0Qszh7DHvjBjLVTOj3HMT3I3fOdHPEE4zoniaTr1PFuX+PNzOKA/AmhU4Y1FK
-         oV5lh8iZzQHWJy0L65E3Wh5dTY3v7EQm+kidbPQeYG3QEEAXcb4Jk0nMY9CkIgPDuuqG
-         OJwdcyFnr3w+/pxo+KDQQV3JX7iy44Bjp8v2Ny8CGbIhX6OU4/NvfW358c0yhaitVUSo
-         tzDQ==
-X-Gm-Message-State: AOJu0YxHPirhjXPpHJUuabnE+euE+y6T3ifLb7KkvzR6+m7b01MIRcxu
-	YIafyECfPxTu58zQTHruzvxn0F43hMk7
-X-Google-Smtp-Source: AGHT+IE75nVJ4Rn1CUf9GKjzPybSxTdWu+cYPDoTjLkn/Z/lNSVx85/Vay8zHcWm+J8eyO5b1RVs0w==
-X-Received: by 2002:a05:6214:2403:b0:67f:356:5731 with SMTP id fv3-20020a056214240300b0067f03565731mr590662qvb.44.1703196189016;
-        Thu, 21 Dec 2023 14:03:09 -0800 (PST)
+        bh=P8gGcfNNc2KAPI3HEk9A1doa8CGHlSv5HW4n1p8PaIw=;
+        b=mcEOPofwh52cPn4G0lvHZoDX0Xms5mW8RGPYJ5hIIXHF0jiD/jPPfomiO8kqXv9LMx
+         uksCZuefSHQAY5Kg1xNjv0vv5tvSFlnhRvhiBO1DAUsrWHzPHnO8h9fjj5hLsm+lAmfA
+         uZxM3EguvzImmQlS77Ya1JNICYZIlnZW6Ki15Oh8jhijsUhv6gItw6k9XV5Yw86DkHjt
+         CXcQzFgl6xlh/13dNyGxKlu3gHKP163eMq5DjCpI742ZwYTqeZZcEq8lKBVc+sji0y64
+         taJV7qWwNvB0shcbO6sSVr01zFS6mdwQ2TO9imtNOceV2ZiCe+YpkS2CkdzcZsquVyd+
+         zXVw==
+X-Gm-Message-State: AOJu0Yze6HHsCX8lN1NocV1/BQyDZTVO+a74WZyfY0vOAfjFSuUA94ip
+	Vy3b7bcyC9W8bA5TnXRRs3Nxun/SnUXRud4PTURmgqD2FQ==
+X-Google-Smtp-Source: AGHT+IE69cprUHrb8APYVFl/GgChehUQNievYpvtZSeFQiI2dnf6Msq/mv9XIYoYbw3E7aJSjylbiw==
+X-Received: by 2002:ad4:5d6c:0:b0:67f:35bc:8e68 with SMTP id fn12-20020ad45d6c000000b0067f35bc8e68mr553027qvb.11.1703196190553;
+        Thu, 21 Dec 2023 14:03:10 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id ee14-20020a0562140a4e00b0067f712874fbsm905198qvb.129.2023.12.21.14.03.07
+        by smtp.gmail.com with ESMTPSA id ee14-20020a0562140a4e00b0067f712874fbsm905198qvb.129.2023.12.21.14.03.09
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Dec 2023 14:03:08 -0800 (PST)
+        Thu, 21 Dec 2023 14:03:10 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 07/13] bnxt_en: Add new BNXT_FLTR_INSERTED flag to bnxt_filter_base struct.
-Date: Thu, 21 Dec 2023 14:02:12 -0800
-Message-Id: <20231221220218.197386-8-michael.chan@broadcom.com>
+Subject: [PATCH net-next 08/13] bnxt_en: Refactor filter insertion logic in bnxt_rx_flow_steer().
+Date: Thu, 21 Dec 2023 14:02:13 -0800
+Message-Id: <20231221220218.197386-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231221220218.197386-1-michael.chan@broadcom.com>
 References: <20231221220218.197386-1-michael.chan@broadcom.com>
@@ -73,85 +73,285 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d9e928060d0c4335"
+	boundary="000000000000f1756b060d0c435d"
 
---000000000000d9e928060d0c4335
+--000000000000f1756b060d0c435d
 Content-Transfer-Encoding: 8bit
 
-Change the unused flag to BNXT_FLTR_INSERTED.  To prepare for multiple
-pathways that an ntuple filter can be deleted, we add this flag.  These
-filter structures can be retreived from the RCU hash table but only
-the caller that sees that the BNXT_FLTR_INSERTED flag is set can delete
-the filter structure and clear the flag under spinlock.
+Add a new function bnxt_insert_ntp_filter() to insert the ntuple filter
+into the hash table and other basic setup.  We'll use this function
+to insert a user defined filter from ethtool.
+
+Also, export bnxt_lookup_ntp_filter_from_idx() and bnxt_get_ntp_filter_idx()
+for similar purposes.  All ntuple related functions are now no longer
+compiled only for CONFIG_RFS_ACCEL
 
 Reviewed-by: Vasundhara Volam <vasundhara-v.volam@broadcom.com>
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 10 ++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  2 +-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 87 +++++++++--------------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  6 ++
+ 2 files changed, 41 insertions(+), 52 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 267ffcffa2b4..16eae3bd90e5 100644
+index 16eae3bd90e5..f5d6c746f677 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5343,6 +5343,10 @@ void bnxt_del_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr)
- 	if (!atomic_dec_and_test(&fltr->refcnt))
- 		return;
- 	spin_lock_bh(&bp->ntp_fltr_lock);
-+	if (!test_and_clear_bit(BNXT_FLTR_INSERTED, &fltr->base.state)) {
-+		spin_unlock_bh(&bp->ntp_fltr_lock);
-+		return;
-+	}
- 	hlist_del_rcu(&fltr->base.hash);
- 	if (fltr->base.flags) {
- 		clear_bit(fltr->base.sw_id, bp->ntp_fltr_bmap);
-@@ -5489,6 +5493,7 @@ static int bnxt_init_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr,
- 	}
- 	head = &bp->l2_fltr_hash_tbl[idx];
- 	hlist_add_head_rcu(&fltr->base.hash, head);
-+	set_bit(BNXT_FLTR_INSERTED, &fltr->base.state);
- 	atomic_set(&fltr->refcnt, 1);
- 	return 0;
+@@ -4800,7 +4800,6 @@ static void bnxt_clear_ring_indices(struct bnxt *bp)
+ 
+ static void bnxt_free_ntp_fltrs(struct bnxt *bp, bool all)
+ {
+-#ifdef CONFIG_RFS_ACCEL
+ 	int i;
+ 
+ 	/* Under rtnl_lock and all our NAPIs have been disabled.  It's
+@@ -4828,12 +4827,10 @@ static void bnxt_free_ntp_fltrs(struct bnxt *bp, bool all)
+ 	bitmap_free(bp->ntp_fltr_bmap);
+ 	bp->ntp_fltr_bmap = NULL;
+ 	bp->ntp_fltr_count = 0;
+-#endif
  }
-@@ -13996,6 +14001,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- 	new_fltr->base.type = BNXT_FLTR_TYPE_NTUPLE;
- 	new_fltr->base.flags = BNXT_ACT_RING_DST;
- 	hlist_add_head_rcu(&new_fltr->base.hash, head);
-+	set_bit(BNXT_FLTR_INSERTED, &new_fltr->base.state);
- 	bp->ntp_fltr_count++;
- 	spin_unlock_bh(&bp->ntp_fltr_lock);
  
-@@ -14042,6 +14048,10 @@ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
+ static int bnxt_alloc_ntp_fltrs(struct bnxt *bp)
+ {
+-#ifdef CONFIG_RFS_ACCEL
+ 	int i, rc = 0;
  
- 			if (del) {
- 				spin_lock_bh(&bp->ntp_fltr_lock);
-+				if (!test_and_clear_bit(BNXT_FLTR_INSERTED, &fltr->base.state)) {
-+					spin_unlock_bh(&bp->ntp_fltr_lock);
-+					continue;
-+				}
- 				hlist_del_rcu(&fltr->base.hash);
- 				bp->ntp_fltr_count--;
- 				spin_unlock_bh(&bp->ntp_fltr_lock);
+ 	if (!(bp->flags & BNXT_FLAG_RFS) || bp->ntp_fltr_bmap)
+@@ -4849,9 +4846,6 @@ static int bnxt_alloc_ntp_fltrs(struct bnxt *bp)
+ 		rc = -ENOMEM;
+ 
+ 	return rc;
+-#else
+-	return 0;
+-#endif
+ }
+ 
+ static void bnxt_free_l2_filters(struct bnxt *bp, bool all)
+@@ -5611,7 +5605,6 @@ int bnxt_hwrm_l2_filter_alloc(struct bnxt *bp, struct bnxt_l2_filter *fltr)
+ 	return rc;
+ }
+ 
+-#ifdef CONFIG_RFS_ACCEL
+ static int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
+ 					    struct bnxt_ntuple_filter *fltr)
+ {
+@@ -5715,7 +5708,6 @@ static int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
+ 	hwrm_req_drop(bp, req);
+ 	return rc;
+ }
+-#endif
+ 
+ static int bnxt_hwrm_set_vnic_filter(struct bnxt *bp, u16 vnic_id, u16 idx,
+ 				     const u8 *mac_addr)
+@@ -9673,7 +9665,6 @@ static int bnxt_setup_vnic(struct bnxt *bp, u16 vnic_id)
+ 
+ static int bnxt_alloc_rfs_vnics(struct bnxt *bp)
+ {
+-#ifdef CONFIG_RFS_ACCEL
+ 	int i, rc = 0;
+ 
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
+@@ -9702,9 +9693,6 @@ static int bnxt_alloc_rfs_vnics(struct bnxt *bp)
+ 			break;
+ 	}
+ 	return rc;
+-#else
+-	return 0;
+-#endif
+ }
+ 
+ /* Allow PF, trusted VFs and VFs with default VLAN to be in promiscuous mode */
+@@ -10032,7 +10020,6 @@ static int bnxt_setup_int_mode(struct bnxt *bp)
+ 	return rc;
+ }
+ 
+-#ifdef CONFIG_RFS_ACCEL
+ static unsigned int bnxt_get_max_func_rss_ctxs(struct bnxt *bp)
+ {
+ 	return bp->hw_resc.max_rsscos_ctxs;
+@@ -10042,7 +10029,6 @@ static unsigned int bnxt_get_max_func_vnics(struct bnxt *bp)
+ {
+ 	return bp->hw_resc.max_vnics;
+ }
+-#endif
+ 
+ unsigned int bnxt_get_max_func_stat_ctxs(struct bnxt *bp)
+ {
+@@ -12156,7 +12142,6 @@ static bool bnxt_rfs_supported(struct bnxt *bp)
+ /* If runtime conditions support RFS */
+ static bool bnxt_rfs_capable(struct bnxt *bp)
+ {
+-#ifdef CONFIG_RFS_ACCEL
+ 	int vnics, max_vnics, max_rss_ctxs;
+ 
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
+@@ -12192,9 +12177,6 @@ static bool bnxt_rfs_capable(struct bnxt *bp)
+ 	netdev_warn(bp->dev, "Unable to reserve resources to support NTUPLE filters.\n");
+ 	bnxt_hwrm_reserve_rings(bp, 0, 0, 0, 0, 0, 1);
+ 	return false;
+-#else
+-	return false;
+-#endif
+ }
+ 
+ static netdev_features_t bnxt_fix_features(struct net_device *dev,
+@@ -13857,8 +13839,8 @@ static int bnxt_setup_tc(struct net_device *dev, enum tc_setup_type type,
+ 	}
+ }
+ 
+-static u32 bnxt_get_ntp_filter_idx(struct bnxt *bp, struct flow_keys *fkeys,
+-				   const struct sk_buff *skb)
++u32 bnxt_get_ntp_filter_idx(struct bnxt *bp, struct flow_keys *fkeys,
++			    const struct sk_buff *skb)
+ {
+ 	struct bnxt_vnic_info *vnic;
+ 
+@@ -13869,7 +13851,30 @@ static u32 bnxt_get_ntp_filter_idx(struct bnxt *bp, struct flow_keys *fkeys,
+ 	return bnxt_toeplitz(bp, fkeys, (void *)vnic->rss_hash_key);
+ }
+ 
+-#ifdef CONFIG_RFS_ACCEL
++int bnxt_insert_ntp_filter(struct bnxt *bp, struct bnxt_ntuple_filter *fltr,
++			   u32 idx)
++{
++	struct hlist_head *head;
++	int bit_id;
++
++	spin_lock_bh(&bp->ntp_fltr_lock);
++	bit_id = bitmap_find_free_region(bp->ntp_fltr_bmap, BNXT_MAX_FLTR, 0);
++	if (bit_id < 0) {
++		spin_unlock_bh(&bp->ntp_fltr_lock);
++		return -ENOMEM;
++	}
++
++	fltr->base.sw_id = (u16)bit_id;
++	fltr->base.type = BNXT_FLTR_TYPE_NTUPLE;
++	fltr->base.flags |= BNXT_ACT_RING_DST;
++	head = &bp->ntp_fltr_hash_tbl[idx];
++	hlist_add_head_rcu(&fltr->base.hash, head);
++	set_bit(BNXT_FLTR_INSERTED, &fltr->base.state);
++	bp->ntp_fltr_count++;
++	spin_unlock_bh(&bp->ntp_fltr_lock);
++	return 0;
++}
++
+ static bool bnxt_fltr_match(struct bnxt_ntuple_filter *f1,
+ 			    struct bnxt_ntuple_filter *f2)
+ {
+@@ -13900,7 +13905,7 @@ static bool bnxt_fltr_match(struct bnxt_ntuple_filter *f1,
+ 	return false;
+ }
+ 
+-static struct bnxt_ntuple_filter *
++struct bnxt_ntuple_filter *
+ bnxt_lookup_ntp_filter_from_idx(struct bnxt *bp,
+ 				struct bnxt_ntuple_filter *fltr, u32 idx)
+ {
+@@ -13915,6 +13920,7 @@ bnxt_lookup_ntp_filter_from_idx(struct bnxt *bp,
+ 	return NULL;
+ }
+ 
++#ifdef CONFIG_RFS_ACCEL
+ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 			      u16 rxq_index, u32 flow_id)
+ {
+@@ -13923,8 +13929,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	struct flow_keys *fkeys;
+ 	struct ethhdr *eth = (struct ethhdr *)skb_mac_header(skb);
+ 	struct bnxt_l2_filter *l2_fltr;
+-	int rc = 0, idx, bit_id;
+-	struct hlist_head *head;
++	int rc = 0, idx;
+ 	u32 flags;
+ 
+ 	if (ether_addr_equal(dev->dev_addr, eth->h_dest)) {
+@@ -13977,7 +13982,6 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	new_fltr->l2_fltr = l2_fltr;
+ 
+ 	idx = bnxt_get_ntp_filter_idx(bp, fkeys, skb);
+-	head = &bp->ntp_fltr_hash_tbl[idx];
+ 	rcu_read_lock();
+ 	fltr = bnxt_lookup_ntp_filter_from_idx(bp, new_fltr, idx);
+ 	if (fltr) {
+@@ -13987,33 +13991,20 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	}
+ 	rcu_read_unlock();
+ 
+-	spin_lock_bh(&bp->ntp_fltr_lock);
+-	bit_id = bitmap_find_free_region(bp->ntp_fltr_bmap, BNXT_MAX_FLTR, 0);
+-	if (bit_id < 0) {
+-		spin_unlock_bh(&bp->ntp_fltr_lock);
+-		rc = -ENOMEM;
+-		goto err_free;
+-	}
+-
+-	new_fltr->base.sw_id = (u16)bit_id;
+ 	new_fltr->flow_id = flow_id;
+ 	new_fltr->base.rxq = rxq_index;
+-	new_fltr->base.type = BNXT_FLTR_TYPE_NTUPLE;
+-	new_fltr->base.flags = BNXT_ACT_RING_DST;
+-	hlist_add_head_rcu(&new_fltr->base.hash, head);
+-	set_bit(BNXT_FLTR_INSERTED, &new_fltr->base.state);
+-	bp->ntp_fltr_count++;
+-	spin_unlock_bh(&bp->ntp_fltr_lock);
+-
+-	bnxt_queue_sp_work(bp, BNXT_RX_NTP_FLTR_SP_EVENT);
+-
+-	return new_fltr->base.sw_id;
++	rc = bnxt_insert_ntp_filter(bp, new_fltr, idx);
++	if (!rc) {
++		bnxt_queue_sp_work(bp, BNXT_RX_NTP_FLTR_SP_EVENT);
++		return new_fltr->base.sw_id;
++	}
+ 
+ err_free:
+ 	bnxt_del_l2_filter(bp, l2_fltr);
+ 	kfree(new_fltr);
+ 	return rc;
+ }
++#endif
+ 
+ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
+ {
+@@ -14066,14 +14057,6 @@ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
+ 		netdev_info(bp->dev, "Receive PF driver unload event!\n");
+ }
+ 
+-#else
+-
+-static void bnxt_cfg_ntp_filters(struct bnxt *bp)
+-{
+-}
+-
+-#endif /* CONFIG_RFS_ACCEL */
+-
+ static int bnxt_udp_tunnel_set_port(struct net_device *netdev, unsigned int table,
+ 				    unsigned int entry, struct udp_tunnel_info *ti)
+ {
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 3f4e4708f7d8..867cab036e13 100644
+index 867cab036e13..73e2fe705caf 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1348,7 +1348,7 @@ struct bnxt_filter_base {
- 	u16			vf_idx;
- 	unsigned long		state;
- #define BNXT_FLTR_VALID		0
--#define BNXT_FLTR_UPDATE	1
-+#define BNXT_FLTR_INSERTED	1
- 
- 	struct rcu_head         rcu;
- };
+@@ -2678,6 +2678,12 @@ int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
+ int bnxt_fw_init_one(struct bnxt *bp);
+ bool bnxt_hwrm_reset_permitted(struct bnxt *bp);
+ int bnxt_setup_mq_tc(struct net_device *dev, u8 tc);
++struct bnxt_ntuple_filter *bnxt_lookup_ntp_filter_from_idx(struct bnxt *bp,
++				struct bnxt_ntuple_filter *fltr, u32 idx);
++u32 bnxt_get_ntp_filter_idx(struct bnxt *bp, struct flow_keys *fkeys,
++			    const struct sk_buff *skb);
++int bnxt_insert_ntp_filter(struct bnxt *bp, struct bnxt_ntuple_filter *fltr,
++			   u32 idx);
+ int bnxt_get_max_rings(struct bnxt *, int *, int *, bool);
+ int bnxt_restore_pf_fw_resources(struct bnxt *bp);
+ int bnxt_get_port_parent_id(struct net_device *dev,
 -- 
 2.30.1
 
 
---000000000000d9e928060d0c4335
+--000000000000f1756b060d0c435d
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -222,14 +422,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIEAyc1QlMc7p2IJHYgdZL3Glm56FGZAu
-pXxIIYHdbaFKMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
-MTIyMDMwOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBLoWV/dH/12s1xD0eyXVzVubh8G3l2e
+HzWVqpmF6ypKMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
+MTIyMDMxMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAC6w8SeD2mEZlejp9KDKoH94YsmNMHbebUaDOjCgmSbTIoANLf
-/OFUNJJm8K/PrdM3uD5hraUtDuZSNc4BN3FsGaqdLzB1sWECbzkXS5kPok+cQiDO/rHTkXIE06nn
-nD/88/ojQqKK0nzoiVMu9UAFN1lPSieCm1x5+AQX/9V3NMzCqgbug5Jg0/2GQWSYCCVCgb/1RniH
-CNE7GhBUCIcU+t8KvCei7uVicbZSQ7KksaZf7gB8svakD4Q8n8ECtJpdSCZnJjTxLKnrcDWJwPT4
-gpNUsb+Lv22GAdk5H1w91QX8QZyQgVYI7xyRKBNY/167S0aAHQpkp92f3MKTLBJk
---000000000000d9e928060d0c4335--
+ATANBgkqhkiG9w0BAQEFAASCAQBRvVbmn3S28ZIAtiEzVPp5vLZ9xSq8EG3AXnJ9ad7/6B8N5krj
+VmS/ICOwkTmvafEEt6KAPrdpPBfZd5Kwpk9E0uGGXCdABtpYAzKUiBB3/Qit13omM2ShvAqsgyBH
+vKfM0fQBAc/WQFFhauc3g87wa8nhXntCo+39hXYh5nqKjDq5IOBcbedmAHRLVswvhB6eAC+hCuKC
+3SW2CKDtUrTWESRPS0RetChtMXZZptHPMhBS4XRGPX5eJ7QDzRAaguxw//cvVll4dLqThui204po
+k3S4ANkPDzTC9HxFuD3tn1tSgxde1yPv1O09UovpoLZNWel2XScVu1MouGJKjXOx
+--000000000000f1756b060d0c435d--
 
