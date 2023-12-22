@@ -1,200 +1,123 @@
-Return-Path: <netdev+bounces-59829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D838681C27C
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 01:58:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF29A81C29C
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 02:14:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90071286308
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 00:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C685287CC4
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 01:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C111EA53;
-	Fri, 22 Dec 2023 00:58:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B125A49;
+	Fri, 22 Dec 2023 01:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="jVmhShe6"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="DGOi1nn7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0EEA23
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 00:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d3aa0321b5so11996815ad.2
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 16:58:31 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81208A23
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 01:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40c6e2a47f6so14329265e9.0
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:14:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1703206711; x=1703811511; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6A+TjkUWIwQ6TSSjVf/ogRxUA7iSKOeOZ2zirRp12rk=;
-        b=jVmhShe6q0vwD2bKKxm7hJGfWESeG6XuSVhNnSHfZKUh2+8KfHRt+jDx3zxOisjCHm
-         pgRg5dmxQj/4bwR77D74gy/CenxRtcTK/Ko7aBHFmlqY+gqGkBBJUkYE7K08fGtm4HHB
-         b/WxJIm5dHSiKk1y44+Gnj/WZnAKJH23BAJ15G+YN18rl6ZLX9wUmiDm+IBM6HSyh5Dt
-         JICBCZs8HKrnussEMfllLTpuuHQ5zn23G248XiPYNoaZggr87cJW5gd9O6yk7ahcnMMY
-         fvF/NRBWD10NuazB51Zpuu9GvK0CJyaDKtx/usgeM7mE65QIHr+aRCCcKxCO5QupeT2q
-         XyZw==
+        d=arista.com; s=google; t=1703207647; x=1703812447; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4AYqORwDz1jRnysZB/QYLSUyIuQ8pE/C0Rq3AFW3pZQ=;
+        b=DGOi1nn73FKmTiKQd1CfexRMt7DeaMr/0Ee7gwKRCnaaptE0WaufQa1bG362/1mhVT
+         ROEeOfmyKiOUEBS4cg7nIHhjr0RBI3IMq3i5fcXKkDfksgEHE8FkoXKOt/SJfN1IsBRK
+         0Myr3/BiHhcJ9U+e9Z5sTFMQ0t4Pl75F+wj4QKT91bdkjjAkxCT6/2VDHrfCO7wbP30f
+         Ta048lqwT4spZllunZmRWt3Vez+mphp9oeYPZZSSDsDrHj1EyfahPFRqmXlDVLsMOgvY
+         E63TFmoePnk538E7cM3DhvhRvjtp3LkjWdbd/Eahjr7t32kQ1loHlStZ+oZ0K9wbXyKR
+         Hykg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703206711; x=1703811511;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6A+TjkUWIwQ6TSSjVf/ogRxUA7iSKOeOZ2zirRp12rk=;
-        b=ndWivCGD3GNFVrOlEQV3pQtc1ADiH+0of+w6zJ0zUeJPAw73U55B0Dl9ZJ9cQAASvv
-         7veTaIEKdj4+C8skPhUTlJf3VYcedQG906z4snnZBTBjHGrHTXm7rNyqkn+qIHG9F4Rr
-         uLGZoWmZf7UMbuq7TsO8zH9F8iGOW6N5iP4XGS59RNIfKvlLejpsnnfQo2rzVV1YDoCu
-         +nqIwuzC44Dyf/9e7s7Wq2fQ9lLhYX/dnqxW85uJWANoiRuuym+rEeARD0hTEOmFi09w
-         vgkP4/6wPXRf5VGFkuZ64v0XCs8Z+U+WwdzospRPovYwykL9c2Zy+hjfQ/9YWjXVTwgP
-         g22A==
-X-Gm-Message-State: AOJu0YzFN5PxNrFacRXBDOHft1P+ksELgS9YVF57xNn2ZGI4mTrezAqf
-	f/knQrvbU8tLAdHsluQRvi7lEvPTkk2Z1g==
-X-Google-Smtp-Source: AGHT+IG3i4mBFiSNX9ntkMr3bk7SVdUSm0InbqJ8XMVeGQuAORVEyzJwcfSKT6vwpI4sZ0fmk2dSwQ==
-X-Received: by 2002:a17:902:ef93:b0:1d3:fa43:6a08 with SMTP id iz19-20020a170902ef9300b001d3fa436a08mr449570plb.44.1703206711135;
-        Thu, 21 Dec 2023 16:58:31 -0800 (PST)
-Received: from ?IPV6:2620:10d:c085:21c1::14f8? ([2620:10d:c090:400::4:865e])
-        by smtp.gmail.com with ESMTPSA id s14-20020a170902ea0e00b001d34126d64dsm281563plg.222.2023.12.21.16.58.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Dec 2023 16:58:30 -0800 (PST)
-Message-ID: <7694087c-6867-45ec-ba72-cc0c12933903@davidwei.uk>
-Date: Thu, 21 Dec 2023 16:58:29 -0800
+        d=1e100.net; s=20230601; t=1703207647; x=1703812447;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4AYqORwDz1jRnysZB/QYLSUyIuQ8pE/C0Rq3AFW3pZQ=;
+        b=VURbAesdHXMSUC7t/Vs0pESGv9U7IXUds6u18wVcGA6Mjdc4b7B/lMZ1AurtQLm4xc
+         UDAANIphdXqN+rxf3ixmtkFIhur3MGzl3nqIRBOAd03s38/c/EYlKvNo57RE/4TAhxfj
+         jw8y92L2o5rk2sr1gWr2P5ZtPa2NwGsSw8Hisi3hgGGlTUar83CXKwVKHoLsGrFHUozT
+         9fV2A8N0JC9qSWbXB65V8+5CHlIlzIUZ1/dm2zTOVdP/dNuZ4uY5hrV8XjFUkSBhI1rG
+         CQ4Gp6InZVrl5SukgbwWyeMpbvhLRpOMdEAZ6SMWQr6TignA0/NdXqjPsATqY7YhBNTV
+         OfRA==
+X-Gm-Message-State: AOJu0YwPAerdFeskWPuDXzCSJmnaIb+Q84gXtJBGAE5o9oNx4RHYE1Oz
+	2HBal3jEemqTYbs7xKyRDRQ6qZcH4LqW
+X-Google-Smtp-Source: AGHT+IFPw/KAJEzLFeKSdjiM6DqfzEUf2lLQrvkGjEV4RVjI8hJHmBeNh0BLw7UldWaB4NAqc0CgCw==
+X-Received: by 2002:a05:600c:a:b0:40c:4716:5116 with SMTP id g10-20020a05600c000a00b0040c47165116mr148388wmc.260.1703207646782;
+        Thu, 21 Dec 2023 17:14:06 -0800 (PST)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id bh20-20020a05600c3d1400b0040d15dcb77asm12893958wmb.23.2023.12.21.17.14.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 17:14:06 -0800 (PST)
+From: Dmitry Safonov <dima@arista.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Dmitry Safonov <dima@arista.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net/tcp_sigpool: Use kref_get_unless_zero()
+Date: Fri, 22 Dec 2023 01:13:59 +0000
+Message-ID: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/5] netdevsim: forward skbs from one
- connected port to another
-Content-Language: en-GB
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-References: <20231220014747.1508581-1-dw@davidwei.uk>
- <20231220014747.1508581-4-dw@davidwei.uk> <ZYKuDmMh_PyouG8K@nanopsycho>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <ZYKuDmMh_PyouG8K@nanopsycho>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Mailer: b4 0.13-dev-b6b4b
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1703207639; l=1189; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=HyHdpdpf+8IPxstZOUIyu9E1qEH2nY16X0RtlouQwOg=; b=1K3hRfXyCvhRQ6tlDUVpu06PCZt8oDM0ZZhz0g7Nxd18BnbJmRTO5Ih0UErsTrnhYl4Dz5sdM v509Cm+vOnoA4npCoa1gjoitDE2qU4McLkx2ymxr8+hREeqwNpNCezb
+X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
+Content-Transfer-Encoding: 8bit
 
-On 2023-12-20 01:04, Jiri Pirko wrote:
-> Wed, Dec 20, 2023 at 02:47:45AM CET, dw@davidwei.uk wrote:
->> Forward skbs sent from one netdevsim port to its connected netdevsim
->> port using dev_forward_skb, in a spirit similar to veth.
->>
->> Add a tx_dropped variable to struct netdevsim, tracking the number of
->> skbs that could not be forwarded using dev_forward_skb().
->>
->> The xmit() function accessing the peer ptr is protected by an RCU read
->> critical section. The rcu_read_lock() is functionally redundant as since
->> v5.0 all softirqs are implicitly RCU read critical sections; but it is
->> useful for human readers.
->>
->> If another CPU is concurrently in nsim_destroy(), then it will first set
->> the peer ptr to NULL. This does not affect any existing readers that
->> dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
->> a synchronize_rcu() before the netdev is actually unregistered and
->> freed. This ensures that any readers i.e. xmit() that got a non-NULL
->> peer will complete before the netdev is freed.
->>
->> Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
->> will dereference NULL, making it safe.
->>
->> The codepath to nsim_destroy() and nsim_create() takes both the newly
->> added nsim_dev_list_lock and rtnl_lock. This makes it safe with
->> concurrent calls to linking two netdevsims together.
->>
->> Signed-off-by: David Wei <dw@davidwei.uk>
->> ---
->> drivers/net/netdevsim/netdev.c    | 25 ++++++++++++++++++++++---
->> drivers/net/netdevsim/netdevsim.h |  1 +
->> 2 files changed, 23 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
->> index 434322f6a565..00ab3098eb9f 100644
->> --- a/drivers/net/netdevsim/netdev.c
->> +++ b/drivers/net/netdevsim/netdev.c
->> @@ -29,6 +29,8 @@
->> static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
->> {
->> 	struct netdevsim *ns = netdev_priv(dev);
->> +	struct netdevsim *peer_ns;
->> +	int ret = NETDEV_TX_OK;
->>
->> 	if (!nsim_ipsec_tx(ns, skb))
->> 		goto out;
->> @@ -36,12 +38,29 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
->> 	u64_stats_update_begin(&ns->syncp);
->> 	ns->tx_packets++;
->> 	ns->tx_bytes += skb->len;
->> +
->> +	rcu_read_lock();
->> +	peer_ns = rcu_dereference(ns->peer);
->> +	if (!peer_ns)
->> +		goto out_stats;
->> +
->> +	skb_tx_timestamp(skb);
->> +	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP)) {
->> +		ret = NET_XMIT_DROP;
->> +		ns->tx_dropped++;
-> 
-> Idk, does not look fine to me to be in u64_stats_update section while
-> calling dev_forward_skb()
+The freeing and re-allocation of algorithm are protected by cpool_mutex,
+so it doesn't fix an actual use-after-free, but avoids a deserved
+refcount_warn_saturate() warning.
 
-I see, it's a type of spinlock. I will fix this.
+A trivial fix for the racy behavior.
 
-> 
-> 
->> +	}
->> +
->> +	rcu_read_unlock();
->> 	u64_stats_update_end(&ns->syncp);
->>
->> +	return ret;
->> +
->> +out_stats:
->> +	rcu_read_unlock();
->> +	u64_stats_update_end(&ns->syncp);
->> out:
->> 	dev_kfree_skb(skb);
->> -
->> -	return NETDEV_TX_OK;
->> +	return ret;
->> }
->>
->> static void nsim_set_rx_mode(struct net_device *dev)
->> @@ -70,6 +89,7 @@ nsim_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
->> 		start = u64_stats_fetch_begin(&ns->syncp);
->> 		stats->tx_bytes = ns->tx_bytes;
->> 		stats->tx_packets = ns->tx_packets;
->> +		stats->tx_dropped = ns->tx_dropped;
->> 	} while (u64_stats_fetch_retry(&ns->syncp, start));
->> }
->>
->> @@ -302,7 +322,6 @@ static void nsim_setup(struct net_device *dev)
->> 	eth_hw_addr_random(dev);
->>
->> 	dev->tx_queue_len = 0;
->> -	dev->flags |= IFF_NOARP;
->> 	dev->flags &= ~IFF_MULTICAST;
->> 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
->> 			   IFF_NO_QUEUE;
->> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
->> index 24fc3fbda791..083b1ee7a1a2 100644
->> --- a/drivers/net/netdevsim/netdevsim.h
->> +++ b/drivers/net/netdevsim/netdevsim.h
->> @@ -98,6 +98,7 @@ struct netdevsim {
->>
->> 	u64 tx_packets;
->> 	u64 tx_bytes;
->> +	u64 tx_dropped;
->> 	struct u64_stats_sync syncp;
->>
->> 	struct nsim_bus_dev *nsim_bus_dev;
->> -- 
->> 2.39.3
->>
+Fixes: 8c73b26315aa ("net/tcp: Prepare tcp_md5sig_pool for TCP-AO")
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Dmitry Safonov <dima@arista.com>
+---
+ net/ipv4/tcp_sigpool.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
+index 55b310a722c7..8512cb09ebc0 100644
+--- a/net/ipv4/tcp_sigpool.c
++++ b/net/ipv4/tcp_sigpool.c
+@@ -162,9 +162,8 @@ int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
+ 		if (strcmp(cpool[i].alg, alg))
+ 			continue;
+ 
+-		if (kref_read(&cpool[i].kref) > 0)
+-			kref_get(&cpool[i].kref);
+-		else
++		/* pairs with tcp_sigpool_release() */
++		if (!kref_get_unless_zero(&cpool[i].kref))
+ 			kref_init(&cpool[i].kref);
+ 		ret = i;
+ 		goto out;
+
+---
+base-commit: 1a44b0073b9235521280e19d963b6dfef7888f18
+change-id: 20231222-tcp-ao-kref_get_unless_zero-fe7105781ba4
+
+Best regards,
+-- 
+Dmitry Safonov <dima@arista.com>
+
 
