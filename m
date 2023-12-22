@@ -1,111 +1,114 @@
-Return-Path: <netdev+bounces-59939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFD4B81CBAE
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:03:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A7281CC1D
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71B8BB24799
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:03:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 439851F21988
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F72C24209;
-	Fri, 22 Dec 2023 15:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13D723750;
+	Fri, 22 Dec 2023 15:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ErT6Wgi+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XC+QmaXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8951A241FF;
-	Fri, 22 Dec 2023 15:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7810827e54eso123282985a.2;
-        Fri, 22 Dec 2023 07:03:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703257384; x=1703862184; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tzmZecV+oKdYBapCJ37Nvj5P7ttQFJPgIUktVMqWwtY=;
-        b=ErT6Wgi+cDZcY/gprcpJYfKf47HwDo/PI/XP+V8nkVOM38NDo52bFX9Y4kTgnKlO99
-         r+DWqBv6wDFVKe3tQmqjRei4nowO+oKdNgzUmR4f9quxUubY+VG3+F1vxtKL6OTF/ihZ
-         RS0NNxMR8RtK0mmzQlL6GxHUOd4M/QnUetciefD8tEeh+dr1A1rVQ0Cpt0bj/SjK2p6r
-         DIj+hFcmYEN7tTKy+3QRi8jo7+Olt5ukDTGBeTwdAQru2QPwDY7CyDAMST9wUKn0BZD/
-         6UqG27EoNTboRlQzWcNUVCsOs+GRDWTsUp/ofJKtKEj0WV3ReAgu4IU1OaIqnqCkW9cn
-         eY8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703257384; x=1703862184;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tzmZecV+oKdYBapCJ37Nvj5P7ttQFJPgIUktVMqWwtY=;
-        b=RuhMjDWKSnB+SHfyQLI0+R+Tghb2dj9+gUFEj/eXovQUG276umowSSPRXmvF77vfJZ
-         USQToxRFYZ44bikjJTQAzaj3YgPCI9bK8Bs4C6GKakj05HmV0uYNpwbAWE6JMFw2zcNe
-         Kzune6DRdDPJuEA4Pim+EGgJWrZZJyeeCgGlYXP8RantsjF6xLsFzlicK+SEaTkRgALn
-         tx/7NBGbppxbKwI4Nqg4HbX48c9XsczPZrrCXiYv+BFO8DNBINpDZKzYoRH/HwFx8Sth
-         WmdzXHs/5kL1+m8k1H1IBKjs2ZxUcjuvRNuJw1bbmnFuqpBsWn1c/4DZNjL4QBFAivTs
-         12Xg==
-X-Gm-Message-State: AOJu0YxpQPFdIh+QG7ONxqkCp8fqDdDjzrBfn+PqBQNBAWdgy4za7l7e
-	RjV4ZbExvnE9UzfHbtziw5QC3lIJeRk=
-X-Google-Smtp-Source: AGHT+IF/GXVTZuBXwvERU34ObI/nr9TJjabP7/zdJB9ykOdzRBNbYlbfEw90YhSANkoQPdXymaAp9Q==
-X-Received: by 2002:a05:620a:b10:b0:77d:4cb9:89ac with SMTP id t16-20020a05620a0b1000b0077d4cb989acmr1786274qkg.32.1703257384242;
-        Fri, 22 Dec 2023 07:03:04 -0800 (PST)
-Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id q26-20020ae9e41a000000b007810de6a161sm1394913qkc.55.2023.12.22.07.03.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 07:03:03 -0800 (PST)
-Date: Fri, 22 Dec 2023 10:03:03 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Cc: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Deepa Dinamani <deepa.kernel@gmail.com>
-Message-ID: <6585a52790fd0_d4884294ea@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20231221231901.67003-1-jthinz@mailbox.tu-berlin.de>
-References: <20231221231901.67003-1-jthinz@mailbox.tu-berlin.de>
-Subject: Re: [PATCH net] net: Implement missing
- getsockopt(SO_TIMESTAMPING_NEW)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F441CFAE;
+	Fri, 22 Dec 2023 15:21:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26A53C433C7;
+	Fri, 22 Dec 2023 15:20:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703258462;
+	bh=iX0Xb3DzNg0RLtiR7Ftv64MGPrNCueNmT2jA8JMDSTc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XC+QmaXWjch3Ig5LrrCP59Zkx3mObA7fWJ1Q1lRqOFjmW3GvsADNUmFT6mb8MV2+1
+	 c0/zOy2wHoicBpnjsnSC9xXvseeLYIaxRB3qwsNjDfMPV7HXTJfx0w0niRMy7HJYAv
+	 SSNE7RQOKF1iB9nON+PL32PHWIMG4ZixM1qK9LHfx6zDvrPXO+vu21VLj2MmmhYusm
+	 c5tWUEoHvSflJ4dvepzVI3+pf9JbrsIVnFB1vISbAWR/zvq0fgmrpT/2V1Wg1hnlLM
+	 /jzu8DEgcbLY4aOG246g+wpbPcQ8W3FoLAMUq4LhOH9UBufCZG0ZP+/n1vdl0McLxZ
+	 HTrTDY4Rg1Vxg==
+Date: Fri, 22 Dec 2023 15:20:56 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, Rob Herring <robh@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Tobias Waldekranz <tobias@waldekranz.com>
+Subject: Re: [net-next PATCH v4 1/4] dt-bindings: net: phy: Document new LEDs
+ polarity property
+Message-ID: <20231222-pennant-staging-00e984b69fd3@spud>
+References: <20231215212244.1658-1-ansuelsmth@gmail.com>
+ <20231215212244.1658-2-ansuelsmth@gmail.com>
+ <20231220152209.GA229412-robh@kernel.org>
+ <6583705d.050a0220.6e903.083d@mx.google.com>
+ <ce55a08f-ebe0-4e1b-a235-695e71611203@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ACY50QdLIAKkfKEE"
+Content-Disposition: inline
+In-Reply-To: <ce55a08f-ebe0-4e1b-a235-695e71611203@lunn.ch>
+
+
+--ACY50QdLIAKkfKEE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-J=C3=B6rn-Thorben Hinz wrote:
-> Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
-> socket option SO_TIMESTAMPING_NEW. Setting the option is handled in
-> sk_setsockopt(), querying it was not handled in sk_getsockopt(), though=
-.
-> =
+On Thu, Dec 21, 2023 at 10:43:17AM +0100, Andrew Lunn wrote:
+> > On the marvell10g series we are discussing of using tristate or not. We
+> > notice tristate might be confusing, would it be better to use
+> > inactive-high-impedance ?
+>=20
+> The pincfg-node.yaml binding has:
+>=20
+>   drive-open-drain:
+>     oneOf:
+>       - type: boolean
+>       - $ref: /schemas/types.yaml#/definitions/uint32
+>         const: 1    # No known cases of 0
+>         deprecated: true
+>     description: drive with open drain
+>=20
+>   drive-open-source:
+>     type: boolean
+>     description: drive with open source
+>=20
+> I'm not sure what the deprecated means. Is it that a value is
+> deprecated, not the property as a whole?
 
-> Following remarks on an earlier submission of this patch, keep the old
-> behavior of getsockopt(SO_TIMESTAMPING_OLD) which returns the active
-> flags even if they actually have been set through SO_TIMESTAMPING_NEW.
-> =
+Yeah, it means that only the boolean form of this property should be
+used going forward.
 
-> The new getsockopt(SO_TIMESTAMPING_NEW) is stricter, returning flags
-> only if they have been set through the same option.
-> =
+The comment suggests that the value had no meaning in the first place,
+and that testing for presence alone has been sufficient all along.
 
-> Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
-> Link: https://lore.kernel.org/lkml/20230703175048.151683-1-jthinz@mailb=
-ox.tu-berlin.de/
-> Link: https://lore.kernel.org/netdev/0d7cddc9-03fa-43db-a579-14f3e82261=
-5b@app.fastmail.com/
-> Signed-off-by: J=C3=B6rn-Thorben Hinz <jthinz@mailbox.tu-berlin.de>
+--ACY50QdLIAKkfKEE
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>=
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZYWpWAAKCRB4tDGHoIJi
+0nnAAP9Pp+WgES0a44Nu33QCKEOpR+c3dWUvVwkgw87y9/9RvQEAx1yZPbwpfc2j
+IS7xvOVrdb8Oi3EV3e5CNZjVM0WKGg8=
+=uxDU
+-----END PGP SIGNATURE-----
+
+--ACY50QdLIAKkfKEE--
 
