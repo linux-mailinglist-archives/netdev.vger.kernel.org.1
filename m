@@ -1,115 +1,111 @@
-Return-Path: <netdev+bounces-59892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 078A381C95F
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:50:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33BDF81C974
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:57:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B21A1F235D4
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 11:50:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1AA72877F4
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 11:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1765612E6A;
-	Fri, 22 Dec 2023 11:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z3fdMWKz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2597D1773B;
+	Fri, 22 Dec 2023 11:57:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8904517984
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 11:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703245800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b2Kc5SDyR2sa98m7GGfG0OJjTCYVmXAF9D404GjbeCw=;
-	b=Z3fdMWKzmq9xFsgzjCyz7FmcfkE5bkyrFKDmlgPZywArH41lN6tW1ez1MpCNx9yVDhBtWt
-	QfCENsiBuK4uIlX2gwelTb/rOs0JzYfK+8Md2RfmpDUoQjfU9D31ZMBrTYFMT8eSpYAv1Z
-	aROca5jeXbu5xgZQss6gJMRTl6AziO8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-399-gMeN3nQqMpKa8ASINIbPcw-1; Fri, 22 Dec 2023 06:49:57 -0500
-X-MC-Unique: gMeN3nQqMpKa8ASINIbPcw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2C45868A20;
-	Fri, 22 Dec 2023 11:49:55 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 71FCC2026D66;
-	Fri, 22 Dec 2023 11:49:52 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20231221230153.GA1607352@dev-arch.thelio-3990X>
-References: <20231221230153.GA1607352@dev-arch.thelio-3990X> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-38-dhowells@redhat.com>
-To: Nathan Chancellor <nathan@kernel.org>,
-    Anna Schumaker <Anna.Schumaker@Netapp.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>
-Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-    Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 37/40] netfs: Optimise away reads above the point at which there can be no data
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4DD18044;
+	Fri, 22 Dec 2023 11:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net-next 0/8] Netfilter updates for net-next
+Date: Fri, 22 Dec 2023 12:57:06 +0100
+Message-Id: <20231222115714.364393-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2202547.1703245791.1@warthog.procyon.org.uk>
-Date: Fri, 22 Dec 2023 11:49:51 +0000
-Message-ID: <2202548.1703245791@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Transfer-Encoding: 8bit
 
-Nathan Chancellor <nathan@kernel.org> wrote:
+Hi,
 
-> It appears that ctx->inode.i_mapping is NULL in netfs_inode_init(). This
-> patch appears to cure the problem for me but I am not sure if it is
-> proper or not.
+The following patchset contains Netfilter updates for net-next:
 
-I'm not sure that's the best way.  It kind of indicates that
-nfs_netfs_inode_init() is not being called in the right place - it should
-really be called after alloc_inode() has called inode_init_always().
+1) Add locking for NFT_MSG_GETSETELEM_RESET requests, to address a
+   race scenario with two concurrent processes running a dump-and-reset
+   which exposes negative counters to userspace, from Phil Sutter.
 
-However, mapping_set_release_always() makes ->release_folio() and
-->invalidate_folio() always called for an inode's folios, even if PG_private
-is not set - the idea being that this allows netfslib to update the
-"zero_point" when a page we've written to the server gets invalidated here,
-thereby requiring us to go fetch it again.
+2) Use GFP_KERNEL in pipapo GC, from Florian Westphal.
 
-Now, NFS doesn't make use of this feature and fscache and cachefiles don't use
-it directly, so we might not want to call mapping_set_release_always() for
-NFS.
+3) Reorder nf_flowtable struct members, place the read-mostly parts
+   accessed by the datapath first. From Florian Westphal.
 
-I'm not sure NFS can even reliably make use of it unless it's using a lease
-unless it gets change notifications from the server.
+4) Set on dead flag for NFT_MSG_NEWSET in abort path,
+   from Florian Westphal.
 
-So I'm thinking of applying your patch but add a comment to say why we're
-doing it.  A better way, though, is to move the call to nfs_netfs_inode_init()
-and give it a flag to say whether or not we want the facility.
+5) Support filtering zone in ctnetlink, from Felix Huettner.
 
-David
+6) Bail out if user tries to redefine an existing chain with different
+   type in nf_tables.
 
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-23-12-22
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 56794e5358542b7c652f202946e53bfd2373b5e0:
+
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-12-21 22:17:23 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-23-12-22
+
+for you to fetch changes up to aaba7ddc8507f4ad5bbd07988573967632bc2385:
+
+  netfilter: nf_tables: validate chain type update if available (2023-12-22 12:15:28 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 23-12-22
+
+----------------------------------------------------------------
+Felix Huettner (1):
+      netfilter: ctnetlink: support filtering by zone
+
+Florian Westphal (3):
+      netfilter: nft_set_pipapo: prefer gfp_kernel allocation
+      netfilter: flowtable: reorder nf_flowtable struct members
+      netfilter: nf_tables: mark newset as dead on transaction abort
+
+Pablo Neira Ayuso (1):
+      netfilter: nf_tables: validate chain type update if available
+
+Phil Sutter (3):
+      netfilter: nf_tables: Pass const set to nft_get_set_elem
+      netfilter: nf_tables: Introduce nft_set_dump_ctx_init()
+      netfilter: nf_tables: Add locking for NFT_MSG_GETSETELEM_RESET requests
+
+ include/net/netfilter/nf_flow_table.h              |   9 +-
+ net/netfilter/nf_conntrack_netlink.c               |  12 +-
+ net/netfilter/nf_tables_api.c                      | 147 +++++--
+ net/netfilter/nft_set_pipapo.c                     |   2 +-
+ tools/testing/selftests/netfilter/.gitignore       |   2 +
+ tools/testing/selftests/netfilter/Makefile         |   3 +-
+ .../selftests/netfilter/conntrack_dump_flush.c     | 430 +++++++++++++++++++++
+ 7 files changed, 567 insertions(+), 38 deletions(-)
+ create mode 100644 tools/testing/selftests/netfilter/conntrack_dump_flush.c
 
