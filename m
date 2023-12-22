@@ -1,123 +1,196 @@
-Return-Path: <netdev+bounces-59830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF29A81C29C
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 02:14:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AE3B81C2A3
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 02:18:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C685287CC4
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 01:14:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFDAE1C21FC4
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 01:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B125A49;
-	Fri, 22 Dec 2023 01:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F52A50;
+	Fri, 22 Dec 2023 01:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="DGOi1nn7"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="g+Tq8jtD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81208A23
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 01:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BDFA23
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 01:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40c6e2a47f6so14329265e9.0
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:14:08 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33621d443a7so1334486f8f.3
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:17:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1703207647; x=1703812447; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4AYqORwDz1jRnysZB/QYLSUyIuQ8pE/C0Rq3AFW3pZQ=;
-        b=DGOi1nn73FKmTiKQd1CfexRMt7DeaMr/0Ee7gwKRCnaaptE0WaufQa1bG362/1mhVT
-         ROEeOfmyKiOUEBS4cg7nIHhjr0RBI3IMq3i5fcXKkDfksgEHE8FkoXKOt/SJfN1IsBRK
-         0Myr3/BiHhcJ9U+e9Z5sTFMQ0t4Pl75F+wj4QKT91bdkjjAkxCT6/2VDHrfCO7wbP30f
-         Ta048lqwT4spZllunZmRWt3Vez+mphp9oeYPZZSSDsDrHj1EyfahPFRqmXlDVLsMOgvY
-         E63TFmoePnk538E7cM3DhvhRvjtp3LkjWdbd/Eahjr7t32kQ1loHlStZ+oZ0K9wbXyKR
-         Hykg==
+        d=arista.com; s=google; t=1703207873; x=1703812673; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lk9Vc1mIX7j2zXFqM2XQS4Kz0AH76zHaX+lPmxzhQHQ=;
+        b=g+Tq8jtDUR9i+B+bDbX+3ZZW1Q56ZOpeXkIzkVkXsBzyGk7irLaoLUuqTuGcezgo1Y
+         pGllN+OcFYJMn32kPT6JNjUN3FATaWZ4WtCeY6cso8smjZcmDDwaDhfA05SXFAhzp3Zb
+         9m03xDa1o0fNQsTd+eZJXdO1QaDiuKR/NmGCF7dmh0NWGPWAn+FYhhPP+gXNVQu2jav+
+         xai8T85hF0Ax2zCZl0rDRW88hmcidr6oB3dg3QjwFCj/l1ttKQxJAUP89ByjjpbxyMAE
+         N2lz0vF73F4mcYOVa6KtoJ+VchFsH4FrZQHOvJwP6mZlKmWyhZg61shjyk1e1tGQSn1D
+         kZZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703207647; x=1703812447;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4AYqORwDz1jRnysZB/QYLSUyIuQ8pE/C0Rq3AFW3pZQ=;
-        b=VURbAesdHXMSUC7t/Vs0pESGv9U7IXUds6u18wVcGA6Mjdc4b7B/lMZ1AurtQLm4xc
-         UDAANIphdXqN+rxf3ixmtkFIhur3MGzl3nqIRBOAd03s38/c/EYlKvNo57RE/4TAhxfj
-         jw8y92L2o5rk2sr1gWr2P5ZtPa2NwGsSw8Hisi3hgGGlTUar83CXKwVKHoLsGrFHUozT
-         9fV2A8N0JC9qSWbXB65V8+5CHlIlzIUZ1/dm2zTOVdP/dNuZ4uY5hrV8XjFUkSBhI1rG
-         CQ4Gp6InZVrl5SukgbwWyeMpbvhLRpOMdEAZ6SMWQr6TignA0/NdXqjPsATqY7YhBNTV
-         OfRA==
-X-Gm-Message-State: AOJu0YwPAerdFeskWPuDXzCSJmnaIb+Q84gXtJBGAE5o9oNx4RHYE1Oz
-	2HBal3jEemqTYbs7xKyRDRQ6qZcH4LqW
-X-Google-Smtp-Source: AGHT+IFPw/KAJEzLFeKSdjiM6DqfzEUf2lLQrvkGjEV4RVjI8hJHmBeNh0BLw7UldWaB4NAqc0CgCw==
-X-Received: by 2002:a05:600c:a:b0:40c:4716:5116 with SMTP id g10-20020a05600c000a00b0040c47165116mr148388wmc.260.1703207646782;
-        Thu, 21 Dec 2023 17:14:06 -0800 (PST)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id bh20-20020a05600c3d1400b0040d15dcb77asm12893958wmb.23.2023.12.21.17.14.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 17:14:06 -0800 (PST)
-From: Dmitry Safonov <dima@arista.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Dmitry Safonov <dima@arista.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net/tcp_sigpool: Use kref_get_unless_zero()
-Date: Fri, 22 Dec 2023 01:13:59 +0000
-Message-ID: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1703207873; x=1703812673;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lk9Vc1mIX7j2zXFqM2XQS4Kz0AH76zHaX+lPmxzhQHQ=;
+        b=lAbm8bmCr5nmNJ1cUf4DrElqLQd7Pfz8OChgyigi81fmQLc9n86TbRtRXiHOezBHhp
+         v9kLRsH4lPGu7EMa0cofLUuYUcnKJ1w1LD7DGntB8kYu1n2TPnugcG80kOHvk4G5pPbQ
+         caxCjy7njd4wy5RtBtD4/FZ2izzQV+zD1RMGw2Gt+yHR93C+LqgDLM0BimckxZAI2Vvh
+         21JeKA7ccMJlcQela7B4vS331y1gZLvZ4bvoLH+cFDqG7R0+71WSnIcHlSeB5PzWG+7o
+         n2edzupVuf1bdMvSDLaQTPRbvOnB4iPfErZB8wK1gzRQoQ9hUS73mmKWWVrB/4ZzMM72
+         uTrQ==
+X-Gm-Message-State: AOJu0YwGabhuunhhMzG4fXW023J/TXyv05S80px0ePfZxa1NLJELuCuM
+	0QCXmKZDjg15Sv/EetSwejSGqGOD8coj
+X-Google-Smtp-Source: AGHT+IGZwVTodj5gVaeFxy87JYmpFXqpjDmcNC37vMGtpmyoiXSVTCO30ByOyXU1YANWRL760lFBAw==
+X-Received: by 2002:a05:600c:b42:b0:40d:3f4b:1c88 with SMTP id k2-20020a05600c0b4200b0040d3f4b1c88mr261316wmr.244.1703207872904;
+        Thu, 21 Dec 2023 17:17:52 -0800 (PST)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id bg6-20020a05600c3c8600b00405c7591b09sm5135414wmb.35.2023.12.21.17.17.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Dec 2023 17:17:52 -0800 (PST)
+Message-ID: <05729f32-44ec-416d-963d-5218ca890fb8@arista.com>
+Date: Fri, 22 Dec 2023 01:17:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.13-dev-b6b4b
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1703207639; l=1189; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=HyHdpdpf+8IPxstZOUIyu9E1qEH2nY16X0RtlouQwOg=; b=1K3hRfXyCvhRQ6tlDUVpu06PCZt8oDM0ZZhz0g7Nxd18BnbJmRTO5Ih0UErsTrnhYl4Dz5sdM v509Cm+vOnoA4npCoa1gjoitDE2qU4McLkx2ymxr8+hREeqwNpNCezb
-X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 net-next 01/23] net/tcp: Prepare tcp_md5sig_pool for
+ TCP-AO
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+ Ard Biesheuvel <ardb@kernel.org>, Bob Gilligan <gilligan@arista.com>,
+ Dan Carpenter <error27@gmail.com>, David Laight <David.Laight@aculab.com>,
+ Dmitry Safonov <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
+ Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
+ "Gaillardetz, Dominik" <dgaillar@ciena.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+ Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
+ "Nassiri, Mohammad" <mnassiri@ciena.com>,
+ Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>,
+ "Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org,
+ Steen Hegelund <Steen.Hegelund@microchip.com>
+References: <20231023192217.426455-1-dima@arista.com>
+ <20231023192217.426455-2-dima@arista.com>
+ <CANn89i+Uwg87xAS9m8fm1f1daQj-YyugperN3HnvgbB6g+hOuw@mail.gmail.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <CANn89i+Uwg87xAS9m8fm1f1daQj-YyugperN3HnvgbB6g+hOuw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The freeing and re-allocation of algorithm are protected by cpool_mutex,
-so it doesn't fix an actual use-after-free, but avoids a deserved
-refcount_warn_saturate() warning.
+Hi Eric,
 
-A trivial fix for the racy behavior.
+On 12/21/23 14:31, Eric Dumazet wrote:
+> On Mon, Oct 23, 2023 at 9:22 PM Dmitry Safonov <dima@arista.com> wrote:
+...
+>> +int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
+>> +{
+>> +       int i, ret;
+>> +
+>> +       /* slow-path */
+>> +       mutex_lock(&cpool_mutex);
+>> +       ret = sigpool_reserve_scratch(scratch_size);
+>> +       if (ret)
+>> +               goto out;
+>> +       for (i = 0; i < cpool_populated; i++) {
+>> +               if (!cpool[i].alg)
+>> +                       continue;
+>> +               if (strcmp(cpool[i].alg, alg))
+>> +                       continue;
+>> +
+>> +               if (kref_read(&cpool[i].kref) > 0)
+>> +                       kref_get(&cpool[i].kref);
+> 
+> This sequence is racy.
+> 
+> You must use kref_get_unless_zero().
 
-Fixes: 8c73b26315aa ("net/tcp: Prepare tcp_md5sig_pool for TCP-AO")
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Dmitry Safonov <dima@arista.com>
----
- net/ipv4/tcp_sigpool.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Thanks for this report, I've sent a trivial fixup here:
+https://lore.kernel.org/all/20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com/T/#u
 
-diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
-index 55b310a722c7..8512cb09ebc0 100644
---- a/net/ipv4/tcp_sigpool.c
-+++ b/net/ipv4/tcp_sigpool.c
-@@ -162,9 +162,8 @@ int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
- 		if (strcmp(cpool[i].alg, alg))
- 			continue;
- 
--		if (kref_read(&cpool[i].kref) > 0)
--			kref_get(&cpool[i].kref);
--		else
-+		/* pairs with tcp_sigpool_release() */
-+		if (!kref_get_unless_zero(&cpool[i].kref))
- 			kref_init(&cpool[i].kref);
- 		ret = i;
- 		goto out;
+> 
+>> +               else
+>> +                       kref_init(&cpool[i].kref);
+>> +               ret = i;
+>> +               goto out;
+>> +       }
+>> +
+>> +
+> 
+> syzbot reported:
+> 
+> refcount_t: addition on 0; use-after-free.
+> WARNING: CPU: 2 PID: 31702 at lib/refcount.c:25
+> refcount_warn_saturate+0x1ca/0x210 lib/refcount.c:25
+> Modules linked in:
+> CPU: 2 PID: 31702 Comm: syz-executor.3 Not tainted
+> 6.7.0-rc6-syzkaller-00044-g1a44b0073b92 #0
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
+> 1.16.2-debian-1.16.2-1 04/01/2014
+> RIP: 0010:refcount_warn_saturate+0x1ca/0x210 lib/refcount.c:25
+> Code: ff 89 de e8 58 a3 25 fd 84 db 0f 85 e6 fe ff ff e8 1b a8 25 fd
+> c6 05 9a 88 a1 0a 01 90 48 c7 c7 00 9d 2e 8b e8 b7 ec eb fc 90 <0f> 0b
+> 90 90 e9 c3 fe ff ff e8 f8 a7 25 fd c6 05 75 88 a1 0a 01 90
+> RSP: 0018:ffffc900296df850 EFLAGS: 00010286
+> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002c40a000
+> RDX: 0000000000040000 RSI: ffffffff814db526 RDI: 0000000000000001
+> RBP: ffffffff92b5b7b0 R08: 0000000000000001 R09: 0000000000000000
+> R10: 0000000000000001 R11: 0000000000000002 R12: 0000000000000010
+> R13: ffffffff92b5b7b0 R14: 0000000000000001 R15: 0000000000000000
+> FS: 0000000000000000(0000) GS:ffff88802c800000(0063) knlGS:00000000f7efdb40
+> CS: 0010 DS: 002b ES: 002b CR0: 0000000080050033
+> CR2: 00000000f7354000 CR3: 0000000050ee3000 CR4: 0000000000350ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+> <TASK>
+> __refcount_add include/linux/refcount.h:199 [inline]
+> __refcount_inc include/linux/refcount.h:250 [inline]
+> refcount_inc include/linux/refcount.h:267 [inline]
+> kref_get include/linux/kref.h:45 [inline]
+> tcp_sigpool_alloc_ahash+0x9cb/0xce0 net/ipv4/tcp_sigpool.c:166
+> tcp_md5_alloc_sigpool+0x1b/0x40 net/ipv4/tcp.c:4379
+> tcp_md5_do_add+0x192/0x460 net/ipv4/tcp_ipv4.c:1403
+> tcp_v6_parse_md5_keys+0x68d/0x860 net/ipv6/tcp_ipv6.c:676
+> do_tcp_setsockopt+0x1302/0x2880 net/ipv4/tcp.c:3644
+> tcp_setsockopt+0xd4/0x100 net/ipv4/tcp.c:3726
+> do_sock_setsockopt+0x222/0x470 net/socket.c:2311
+> __sys_setsockopt+0x1a6/0x270 net/socket.c:2334
+> __do_sys_setsockopt net/socket.c:2343 [inline]
+> __se_sys_setsockopt net/socket.c:2340 [inline]
+> __ia32_sys_setsockopt+0xbc/0x150 net/socket.c:2340
+> do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+> __do_fast_syscall_32+0x62/0xe0 arch/x86/entry/common.c:321
+> do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:346
+> entry_SYSENTER_compat_after_hwframe+0x70/0x7a
+> RIP: 0023:0xf7f02579
+> Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00
+> 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a
+> 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+> RSP: 002b:00000000f7efd5ac EFLAGS: 00000292 ORIG_RAX: 000000000000016e
+> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000000006
+> RDX: 000000000000000e RSI: 0000000020000000 RDI: 00000000000000d8
+> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000292 R12: 0000000000000000
+> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
 
----
-base-commit: 1a44b0073b9235521280e19d963b6dfef7888f18
-change-id: 20231222-tcp-ao-kref_get_unless_zero-fe7105781ba4
-
-Best regards,
--- 
-Dmitry Safonov <dima@arista.com>
+Thanks,
+            Dmitry
 
 
