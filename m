@@ -1,110 +1,85 @@
-Return-Path: <netdev+bounces-59904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 469DE81C9C5
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:20:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE05881C9D0
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB8961F25FF8
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:20:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93BC31F21826
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB5317993;
-	Fri, 22 Dec 2023 12:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42182179AE;
+	Fri, 22 Dec 2023 12:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UcOQscON"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YHVDKGYk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832E818C34
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 12:20:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D070BC433C9;
-	Fri, 22 Dec 2023 12:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703247626;
-	bh=dPPuCkOiZDPqth/dkNqxCzcTEt/rvx5sLFCvDL7ZzzQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UcOQscONbEtWKd2O6oWpPeejsdQLRCs3kpo/Zi6Fswkf2ja2ntePX3RhyFAougSLh
-	 tAIZPdRbdJ6GSdnHM2fw+ZJh+cPNWKg5CJJbAASOVV5GYupuAs0U07UgPkSwwn0Tvx
-	 mVzhQLQyKxcHegB45+uxvxBUwQZz12oXIxaBSkHEl79NV5eneyeq0uvHKPnzJ4JZva
-	 Xc5+XGVe/Q9Sn1uiS+EWXclt9Jz/EuOInQj11A4VBjaXo4BKGWeg458qMge7H3C4Aw
-	 0mocywrYflE6SO5BvlYE95s0oUzlJdF6kBUZdNsLxHf2yfNbBbg5vt0ZtswD1G10Bq
-	 2NmersTe7n94w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B72D9DD4EE5;
-	Fri, 22 Dec 2023 12:20:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8805168DC
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 12:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2cc259392a6so21125121fa.2
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 04:22:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703247732; x=1703852532; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UgVRQlz/8NCchVQ195lMgTdFBHOGyUcRndgz7s8ppPw=;
+        b=YHVDKGYknfPSH+lSuJ22Yc20D/msBuVT2RDh6++kICR1t3fk53lyBE12lA2lDygAYJ
+         kf+8L3A32o55r9PgmzB+6uzDSNJM7qUbQp69qtJvCBJwkja4rKzqoQcDAaXcgCg7R9Br
+         THVncCpKoGFOyg49Zvn4TeYpJBHH7ZoCN6D705YmO61mbfkOlWcjVx4mSTzDv2fGMKI8
+         ABiI6XUWSYBgDiUPWxzVaakfM6rbK0nVgx1zPWla6bdvkn272GEfvWuWavR/r3x662z+
+         DRB7Q4FnYWJqzHtXdQN2dR2MQEVgu04msIPnHwnCSvECiU7jA+OsBBRgqFCPeEVj23mj
+         z7zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703247732; x=1703852532;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UgVRQlz/8NCchVQ195lMgTdFBHOGyUcRndgz7s8ppPw=;
+        b=DLFp9pQsIoruS0xJ5/TE+RKFM8bQ74dHQbfafImdH8jJFyKL3zE2CXiHDOfv9jXWOJ
+         tQwpf/SMrj1Ju5HzjhdUEgmpmyr6unqzNdk31FiMhTJFdIYVURKFBty3KcHpUeEBI6Zo
+         Ik2fWu5kIlWYXCV3eIW1G4lzG8x9vyMAEdoLUBP77FJNRwGJDKrx+fWrVFMHUGRn5rPq
+         o/kZ7cjsB7Z8znGGyOVWHrGMkGBQ0rH7tokKOuILzVopPtpfdCGpThza4IqUhFqhT4jg
+         he5CoYB4a4/+wNpcWQUY4u2rjPytmxf7d9j1YCl+C4XKoQUqEdsegK6dMb2TuzfHBCQf
+         NWdQ==
+X-Gm-Message-State: AOJu0YxPZ3nBF43v+WCWYGLNIVsCk0t/8ABFcnx7+/xGmlkLGxRgsZkd
+	AiLSdenPYH3DktNLIEboE0z6o/7Js+8bDtn+szhUWYmROvs=
+X-Google-Smtp-Source: AGHT+IHYBbTfCLlTljkkNVMvSGOY3tzGdshjQ6x3bBx7ue0HaVkK5bEgqbd6FyBzDFgBfDla7NM9nMQGBa1Yuy67Cjg=
+X-Received: by 2002:a05:6512:3f26:b0:50e:5c71:51f1 with SMTP id
+ y38-20020a0565123f2600b0050e5c7151f1mr693623lfa.62.1703247731919; Fri, 22 Dec
+ 2023 04:22:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/15][pull request] intel: use bitfield operations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170324762674.22950.17567228741152319878.git-patchwork-notify@kernel.org>
-Date: Fri, 22 Dec 2023 12:20:26 +0000
-References: <20231218194833.3397815-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20231218194833.3397815-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, jesse.brandeburg@intel.com
+From: Lucas Pereira <lucasvp@gmail.com>
+Date: Fri, 22 Dec 2023 09:22:01 -0300
+Message-ID: <CAG7fG-YswhncaXn1JrpDsyji8yjaDmN-Ph5VrBxKszh10oeFVg@mail.gmail.com>
+Subject: Re: Stop traffic on an established ipsec tunnel
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Dear Netdev List Members,
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+I hope this email finds you well. My name is Lucas, and I am reaching
+out for assistance with an issue I previously posted on this list,
+which remains unresolved. The link to the prior discussion is:
 
-On Mon, 18 Dec 2023 11:48:15 -0800 you wrote:
-> Jesse Brandeburg says:
-> 
-> After repeatedly getting review comments on new patches, and sporadic
-> patches to fix parts of our drivers, we should just convert the Intel code
-> to use FIELD_PREP() and FIELD_GET().  It's then "common" in the code and
-> hopefully future change-sets will see the context and do-the-right-thing.
-> 
-> [...]
+https://lore.kernel.org/netdev/CAG7fG-adZdzc-8JG0dbHUQo+cpUunfm_qOi8iP3TqQPsD94=SQ@mail.gmail.com/#t
 
-Here is the summary with links:
-  - [net-next,01/15] e1000e: make lost bits explicit
-    https://git.kernel.org/netdev/net-next/c/236f31bb21c0
-  - [net-next,02/15] intel: add bit macro includes where needed
-    https://git.kernel.org/netdev/net-next/c/3314f2097dee
-  - [net-next,03/15] intel: legacy: field prep conversion
-    https://git.kernel.org/netdev/net-next/c/4d893c104cda
-  - [net-next,04/15] i40e: field prep conversion
-    https://git.kernel.org/netdev/net-next/c/9e3ab72c0499
-  - [net-next,05/15] iavf: field prep conversion
-    https://git.kernel.org/netdev/net-next/c/9b7f18042d4c
-  - [net-next,06/15] ice: field prep conversion
-    https://git.kernel.org/netdev/net-next/c/23eca34e5558
-  - [net-next,07/15] ice: fix pre-shifted bit usage
-    https://git.kernel.org/netdev/net-next/c/7173be21ae29
-  - [net-next,08/15] igc: field prep conversion
-    https://git.kernel.org/netdev/net-next/c/c82e64868afd
-  - [net-next,09/15] intel: legacy: field get conversion
-    https://git.kernel.org/netdev/net-next/c/b9a452545075
-  - [net-next,10/15] igc: field get conversion
-    https://git.kernel.org/netdev/net-next/c/a8e0c7a6800d
-  - [net-next,11/15] i40e: field get conversion
-    https://git.kernel.org/netdev/net-next/c/62589808d73b
-  - [net-next,12/15] iavf: field get conversion
-    https://git.kernel.org/netdev/net-next/c/65db56d5fa8f
-  - [net-next,13/15] ice: field get conversion
-    https://git.kernel.org/netdev/net-next/c/5a259f8e0baf
-  - [net-next,14/15] ice: cleanup inconsistent code
-    https://git.kernel.org/netdev/net-next/c/316a28daa805
-  - [net-next,15/15] idpf: refactor some missing field get/prep conversions
-    https://git.kernel.org/netdev/net-next/c/6aa7ca3c7dcc
+I am seeking guidance or suggestions on how to proceed with resolving
+this problem. Any help or direction would be greatly appreciated. If
+further information is needed, I am happy to provide it.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thank you in advance for your attention and assistance.
 
+Best regards,
 
+Lucas
 
