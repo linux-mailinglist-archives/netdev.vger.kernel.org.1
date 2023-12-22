@@ -1,141 +1,156 @@
-Return-Path: <netdev+bounces-59945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB4F81CD74
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:04:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFDBD81CD76
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B45C1C20993
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:04:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EE921C21209
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFA32554E;
-	Fri, 22 Dec 2023 17:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFEA286B5;
+	Fri, 22 Dec 2023 17:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="K95WPd53"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gg4GBzNz"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF4A28DAE
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 17:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1BC2640005;
-	Fri, 22 Dec 2023 17:04:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1703264676;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mX0s0cjF1WpVnPF54K/BTuGonIeqLRmPb8+Gqk7wA68=;
-	b=K95WPd533r/JzM2JbJxqB7NosmYYky6pAyKZINNP8BdfWXex9yPYmnkSYGpHJ3ZYNfyy3C
-	JVRdpamotGD1g2GmYd4RsT0OcFlsuyndBdzW9BYfE2cPB9eqFjytpIBGVS+PyOfH2h5C6G
-	BbpKEitc3v1eYE4s6VrfHnhqUV35b2dmDH301Aud/u99N5irqtSgvI1VWsJf89iyfNUn1G
-	Js3kyi+DCTbJFR/A12zWVdZWIFFJ9bNhsgY6Lw4ZX6IG37CEoKZhnbnKH0uwNIwenI5Adi
-	50nr+w1m4wlhGLax7n4IXN0pIhbJu2HTUKhdsoe8GskVpSHgBJ5ShrLtwA2i4A==
-Message-ID: <2cf4c7c0-603d-4c06-a677-69410b02019b@arinc9.com>
-Date: Fri, 22 Dec 2023 20:04:27 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A38F2554E
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 17:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso13400a12.1
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 09:05:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1703264713; x=1703869513; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=suT3rRgCdZ72g5cYYKn0C20yE9EAeFYJlJ8TGpajvHU=;
+        b=Gg4GBzNzBm12efBFQIsZh5+eHzc2buvpmKSk15OBOy6NPzsLWXTfPJG2cFxoN21Oq0
+         oTDmVRfzfYZ/0uLCcV/mtxwD3OTiyDDN/dkk77WxjnA3GWHzj1wyHwPO9J8Xu8Mh1g9u
+         UEM18noP3vW+gbceNPFj0yD1nKdQ+o3tKQTay8bp1tOJvVMJ8ZY2JhIl4TzXuCAbJDje
+         S9deQ9rcfFjz63pt5cRMGQBJIBesk4+fE3d2M9pn6caQ/CUIK/zO+CZu8RoQ/e83RqHs
+         gki3DtKCHUbTQAqC3TjJfdanf28UiodCwqQuBRo8RFkZNCcTUfuxo/ww0cz313vC/gXL
+         UHlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703264713; x=1703869513;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=suT3rRgCdZ72g5cYYKn0C20yE9EAeFYJlJ8TGpajvHU=;
+        b=RmTNjU840qLPaiIcLfbu6KSwpK6PDdPd72xywuz9VLWwBbN0wkUhsXRsIUL5hyul4W
+         DNqNNUJmTepODvtMUOF3KXdAjOxvjiwdzoO4vfxcu+FXh4A+AxtyQyAivg5mFXgiDdKU
+         iNyglulRx4Ot34SID2Xlj1qoboJ0Q94/rw3gariRAKDbKKlvbZwiquXEo2M5m6+S9gWC
+         SyaicKhKKUIV+EQp46NjbeiKeqX/EoguXiN9uB1bUzmDYpdQ+SxTtMcbodLf6r3w3HfJ
+         27z4CbMA+IvuW2SIr9cXiQ+Vo46tsM2iE8KVg0mGv4gPv5ROiesVGNTkr/YxjslZbY/0
+         fr9A==
+X-Gm-Message-State: AOJu0YzplVeZw033LQZ2kasQFkGSKBDj6vN1VikqRaBjY9NxlC2ksIZV
+	LgBbOhWdPctzonBpZUit9DMP997IYCrg8s/5vkMs5uZl+HkF
+X-Google-Smtp-Source: AGHT+IGVZYTZt8K/6qsHfHXTAIqzF7GU9bRgBpioItOpJDdxHMExq54P4yO7KE1C3x5MnavFyTRv0sGeMt20TpodsoA=
+X-Received: by 2002:a50:9310:0:b0:553:773b:b7b2 with SMTP id
+ m16-20020a509310000000b00553773bb7b2mr150640eda.6.1703264713356; Fri, 22 Dec
+ 2023 09:05:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 5/7] net: dsa: realtek: Migrate user_mii_bus
- setup to realtek-dsa
-Content-Language: en-US
-To: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
- Vladimir Oltean <olteanv@gmail.com>
-Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
- "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
- "andrew@lunn.ch" <andrew@lunn.ch>,
- "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20231220042632.26825-1-luizluca@gmail.com>
- <20231220042632.26825-6-luizluca@gmail.com>
- <CAJq09z4OP6Djuv=HkntCqyLM1332pXzhW0qBd4fc-pfrSt+r1A@mail.gmail.com>
- <20231221174746.hylsmr3f7g5byrsi@skbuf>
- <d74e47b6-ff02-41f4-9929-02109ce39e12@arinc9.com>
- <20231222104831.js4xiwdklazytgeu@skbuf>
- <hs5nbkipaunm75s3yyoa2it3omumxotyzdudyzrzxeqopmnwal@z5zpbrxwfsqi>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <hs5nbkipaunm75s3yyoa2it3omumxotyzdudyzrzxeqopmnwal@z5zpbrxwfsqi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+References: <20231219170017.73902-1-edumazet@google.com> <CADvbK_e+J2nut4Q5NE3oAdUqEDXAFZrecs4zY+CrLE9ob8AtZg@mail.gmail.com>
+In-Reply-To: <CADvbK_e+J2nut4Q5NE3oAdUqEDXAFZrecs4zY+CrLE9ob8AtZg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 22 Dec 2023 18:05:02 +0100
+Message-ID: <CANn89iJjAPmuT3ynBcoADkTs3e4V3=AY9=D+WDHMntQZ+typUA@mail.gmail.com>
+Subject: Re: [PATCH net-next] sctp: fix busy polling
+To: Xin Long <lucien.xin@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Jacob Moroni <jmoroni@google.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 22.12.2023 14:13, Alvin Šipraga wrote:
-> On Fri, Dec 22, 2023 at 12:48:31PM +0200, Vladimir Oltean wrote:
->> On Thu, Dec 21, 2023 at 09:34:52PM +0300, Arınç ÜNAL wrote:
->>> On 21.12.2023 20:47, Vladimir Oltean wrote:
->>>> ds->user_mii_bus helps when
->>>> (1) the switch probes with platform_data (not on OF), or
->>>> (2) the switch probes on OF but its MDIO bus is not described in OF
->>>>
->>>> Case (2) is also eliminated because realtek_smi_setup_mdio() bails out
->>>> if it cannot find the "mdio" node described in OF. So the ds->user_mii_bus
->>>> assignment is only ever executed when the bus has an OF node, aka when
->>>> it is not useful.
->>>
->>> I don't like the fact that the driver bails out if it doesn't find the
->>> "mdio" child node. This basically forces the hardware design to use the
->>> MDIO bus of the switch. Hardware designs which don't use the MDIO bus of
->>> the switch are perfectly valid.
->>>
->>> It looks to me that, to make all types of hardware designs work, we must
->>> not use ds->user_mii_bus for switch probes on OF. Case (2) is one of the
->>> cases of the ethernet controller lacking link definitions in OF so we
->>> should enforce link definitions on ethernet controllers. This way, we make
->>> sure all types of hardware designs work and are described in OF properly.
->>>
->>> Arınç
->>
->> The bindings for the realtek switches can be extended in compatible ways,
->> e.g. by making the 'mdio' node optional. If we want that to mean "there
->> is no internal PHY that needs to be used", there is no better time than
->> now to drop the driver's linkage to ds->user_mii_bus, while its bindings
->> still strictly require an 'mdio' node.
->>
->> If we don't drop that linkage _before_ making 'mdio' optional, there
->> is no way to disprove the existence of device trees which lack a link
->> description on user ports (which is now possible).
-> 
-> I strongly agree and I think that the direction you have suggested is
-> crystal clear, Vladimir. Nothing prohibits us from relaxing the bindings
-> later on to support whatever hardware Arınç is describing.
-> 
-> But for my own understanding - and maybe this is more a question for
-> Arınç since he brought it up up - what does this supposed hardware look
-> like, where the internal MDIO bus is not used? Here are my two (probably
-> wrong?) guesses:
-> 
-> (1) you use the MDIO bus of the parent Ethernet controller and access
->      the internal PHYs directly, hence the internal MDIO bus goes unused;
-> 
-> (2) none of the internal PHYs are actually used, so only the so-called
->      extension ports are available.
-> 
-> I don't know if (1) really qualifies. And (2) is also a bit strange,
-> because this family of switches has variants with up to only three
-> extension ports, most often two, which doesn't make for much of a
-> switch.
-> 
-> So while I agree in theory with your remark Arınç, I'm just wondering if
-> you had something specific in mind.
+On Fri, Dec 22, 2023 at 5:08=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
+te:
+>
+> On Tue, Dec 19, 2023 at 12:00=E2=80=AFPM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> >
+> > Busy polling while holding the socket lock makes litle sense,
+> > because incoming packets wont reach our receive queue.
+> >
+> > Fixes: 8465a5fcd1ce ("sctp: add support for busy polling to sctp protoc=
+ol")
+> > Reported-by: Jacob Moroni <jmoroni@google.com>
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+> > Cc: Xin Long <lucien.xin@gmail.com>
+> > ---
+> >  net/sctp/socket.c | 10 ++++------
+> >  1 file changed, 4 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> > index 5fb02bbb4b349ef9ab9c2790cccb30fb4c4e897c..6b9fcdb0952a0fe599ae5d1=
+d1cc6fa9557a3a3bc 100644
+> > --- a/net/sctp/socket.c
+> > +++ b/net/sctp/socket.c
+> > @@ -2102,6 +2102,10 @@ static int sctp_recvmsg(struct sock *sk, struct =
+msghdr *msg, size_t len,
+> >         if (unlikely(flags & MSG_ERRQUEUE))
+> >                 return inet_recv_error(sk, msg, len, addr_len);
+> >
+> > +       if (sk_can_busy_loop(sk) &&
+> > +           skb_queue_empty_lockless(&sk->sk_receive_queue))
+> > +               sk_busy_loop(sk, flags & MSG_DONTWAIT);
+> > +
+> Here is no any sk_state check, if the SCTP socket(TCP type) has been
+> already closed by peer, will sctp_recvmsg() block here?
 
-I was speaking in the sense of all switches with CPU ports, which is
-controlled by the DSA subsystem on Linux.
+Busy polling is only polling the NIC queue, hoping to feed this socket
+for incoming packets.
 
-I am only stating the fact that if we don't take the literal approach with
-hardware descriptions on the driver implementation, there will always be
-cases where the drivers will fail to support certain hardware designs.
+Using more than a lockless read of sk->sk_receive_queue is not really neces=
+sary,
+and racy anyway.
 
-Arınç
+Eliezer Tamir added a check against sk_state for no good reason in
+TCP, my plan is to remove it.
+
+There are other states where it still makes sense to allow busy polling.
+
+
+>
+> Maybe here it needs a `!(sk->sk_shutdown & RCV_SHUTDOWN)` check,
+> which is set when it's closed by the peer.
+
+See above. Keep this as simple as possible...
+
+
+>
+> Thanks
+>
+> >         lock_sock(sk);
+> >
+> >         if (sctp_style(sk, TCP) && !sctp_sstate(sk, ESTABLISHED) &&
+> > @@ -9046,12 +9050,6 @@ struct sk_buff *sctp_skb_recv_datagram(struct so=
+ck *sk, int flags, int *err)
+> >                 if (sk->sk_shutdown & RCV_SHUTDOWN)
+> >                         break;
+> >
+> > -               if (sk_can_busy_loop(sk)) {
+> > -                       sk_busy_loop(sk, flags & MSG_DONTWAIT);
+> > -
+> > -                       if (!skb_queue_empty_lockless(&sk->sk_receive_q=
+ueue))
+> > -                               continue;
+> > -               }
+> >
+> >                 /* User doesn't want to wait.  */
+> >                 error =3D -EAGAIN;
+> > --
+> > 2.43.0.472.g3155946c3a-goog
+> >
 
