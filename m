@@ -1,186 +1,123 @@
-Return-Path: <netdev+bounces-59917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2698F81CA9F
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:22:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 428A981CACB
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:37:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 880F61F215E1
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:22:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D70761F23771
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA96A18B00;
-	Fri, 22 Dec 2023 13:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD41419465;
+	Fri, 22 Dec 2023 13:37:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DIrzMt4B"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NeqxTdbq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A88B200A5
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 13:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-50e587fb62fso2676768e87.2
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 05:22:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703251352; x=1703856152; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vCg4NGFhBfmCLnD5+0zz/s65Er4SqV6IwYzGmR8Vu14=;
-        b=DIrzMt4Bnp4BK4VzMkff3D0ucGFWr7sVUX2o++J4S9ibsbU2Qulm4SpVL+ox9UYvAL
-         LptZsXrz9UFPxV2A/+jD1FuMlH8yNWvADAuaiSx6f1C/eSwUkRbZxGycS/cVqg9cAGCi
-         O3AiuyQZH36AyHIMKMj6PiMZuMeaC4p9mSJGt553zYld90cVb0N6RBvJ6pMTzJcGH/kH
-         F6x5lKFlfS9c22gvTwVGkBhOGGtQ4/ThzlBtsOOSZkxJXzWVXDOP2lY9Dml69ZcMegVu
-         NZHjj8ATEwWOs75ZKO71SapfU0WZWfisvRrg97K9bAyD4qAr8tkb3unA/JDJXmxXn3yu
-         MEew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703251352; x=1703856152;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vCg4NGFhBfmCLnD5+0zz/s65Er4SqV6IwYzGmR8Vu14=;
-        b=IMTVj8vOlndDYhIfTks4/haVXAGk1XTD7R8xxtfpXB1A/g1r+E8D9e3Q6kONa23Ix0
-         EzpDuJ0GBhEhSUYMCfiEeucz/QJHkM+a2m/NLkO8J+7ycO4z5rp7Au8VisjUCQodL/mq
-         DUMWLbS3eEaSQAtAYf6smAfdyRllEYkZ6c3ButSBedAmAaSph4iT0eyUmtBGXno+E3ke
-         OhFH8aZxbq9zP9SYqR9HI+6tiPhh0TFkdmXHEU6O5BMJkuRknEiJ4F6dXW/XaTY3EO32
-         yda4sJWq9CqacadTbWBViZijZaeeWX80ZxqTgDxMb91+l7cTbq6GMEN+Uk8X6rGr/OyV
-         2Wpg==
-X-Gm-Message-State: AOJu0YyyS6aV8xAPFvu0c/S3cNno3Rf4vWI9bx/SBo/HiGy2uSdlEHBt
-	aOlBPzH2tbV8SlPNcOxisk9ZpWzCJqsFOjlT2N49DwtXxM8Mtg==
-X-Google-Smtp-Source: AGHT+IEm2K9H4BRA+l/wrsKkcMi1cxDqAKEX9W7cDmtxAKS7BiLw5eyeiIHC45GgDw1CYe0oxjDL24n7vB4o8r07TJA=
-X-Received: by 2002:a19:5504:0:b0:50e:3107:29cd with SMTP id
- n4-20020a195504000000b0050e310729cdmr666976lfe.34.1703251351603; Fri, 22 Dec
- 2023 05:22:31 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A071CAA9;
+	Fri, 22 Dec 2023 13:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BMDaILU032374;
+	Fri, 22 Dec 2023 13:36:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=bky3hG1Jynbv2MF60GqEpZXdaKhDc+ZIc+AoWweCBRc=;
+ b=NeqxTdbqAhiAELgaPdsvIDEqPWr+x/n5MrzKZyUGGFh9/O1LO0g4Bwk1msMPUon2d/YU
+ 9BmKyi97JPOKz0qr1mNie/aAIckXxOPbD2zG4/d/EHfV/c6sW/bcj5njQBFQM3A/ONnf
+ 6nxT0rFln4z6ecxLCiPMShs2xoq9czyaUyn1NjcDLSo7qefeU4zLr6AkMnG1NkUjxxbP
+ kwjNi39gJKaP7t3k4+1u16ECYZ9wG7HfayD3RFWSBKIX1HlV6HMftqdMTZ4+t3g/j8E9
+ wvUsbrPPeAjOVskZ+LaxeOAYkHhQgNm+MWe/m0kjVBMDWrruXVBLvYRsVqzmxj1vR2+f Wg== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3v12p4dqtc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 22 Dec 2023 13:36:57 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3BMDQXLh024975;
+	Fri, 22 Dec 2023 13:36:56 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3v12bksdjn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 22 Dec 2023 13:36:56 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BMDauGU000703;
+	Fri, 22 Dec 2023 13:36:56 GMT
+Received: from localhost.localdomain (dhcp-10-175-57-47.vpn.oracle.com [10.175.57.47])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3v12bksdgb-1;
+	Fri, 22 Dec 2023 13:36:55 +0000
+From: Vegard Nossum <vegard.nossum@oracle.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vegard Nossum <vegard.nossum@oracle.com>,
+        Breno Leitao <leitao@debian.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH net-next] Documentation: add pyyaml to requirements.txt
+Date: Fri, 22 Dec 2023 14:36:28 +0100
+Message-Id: <20231222133628.3010641-1-vegard.nossum@oracle.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231218162326.173127-1-romain.gantois@bootlin.com>
- <0351C5C2-FEE2-4AED-84C8-9DCACCE4ED0A@aol.com> <20231222123023.voxoxfcckxsz2vce@skbuf>
-In-Reply-To: <20231222123023.voxoxfcckxsz2vce@skbuf>
-From: Lucas Pereira <lucasvp@gmail.com>
-Date: Fri, 22 Dec 2023 10:22:21 -0300
-Message-ID: <CAG7fG-bDdtTxWkv8690+LHE5DVMKUn_+pQGsFVHxjXYPrLnN_w@mail.gmail.com>
-Subject: RE: [PATCH net 0/1] Prevent DSA tags from breaking COE
-To: Vladimir Oltean <olteanv@gmail.com>, Household Cang <canghousehold@aol.com>
-Cc: Romain Gantois <romain.gantois@bootlin.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, Sylvain Girard <sylvain.girard@se.com>, 
-	Pascal EBERHARD <pascal.eberhard@se.com>, Richard Tresidder <rtresidd@electromag.com.au>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-22_08,2023-12-21_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 spamscore=0
+ adultscore=0 phishscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312220099
+X-Proofpoint-GUID: ffs6MtFJ0j2KMLTJF7Z6CpvALAI9ZP9r
+X-Proofpoint-ORIG-GUID: ffs6MtFJ0j2KMLTJF7Z6CpvALAI9ZP9r
 
-Dear community collaborators,
+Commit f061c9f7d058 ("Documentation: Document each netlink family") added
+a new Python script that is invoked during 'make htmldocs' and which reads
+the netlink YAML spec files.
 
-First of all, I would like to thank you for the prompt response and
-the suggestions provided.
+Using the virtualenv from scripts/sphinx-pre-install, we get this new
+error wen running 'make htmldocs':
 
-We conducted the tests as indicated, but unfortunately, the problem
-persists. It seems to me that if it were a Checksum-related issue, the
-behavior would be different, as the VPN and communication work
-normally for several days before failing suddenly.
+  Traceback (most recent call last):
+    File "./tools/net/ynl/ynl-gen-rst.py", line 26, in <module>
+      import yaml
+  ModuleNotFoundError: No module named 'yaml'
+  make[2]: *** [Documentation/Makefile:112: Documentation/networking/netlink_spec/rt_link.rst] Error 1
+  make[1]: *** [Makefile:1708: htmldocs] Error 2
 
-We have observed that the only effective ways to reestablish
-communication, so far, are through a system reboot or by changing the
-authentication cipher, such as switching from MD5 to SHA1.
-Interestingly, when switching back to the MD5 cipher, the
-communication fails to function again.
+Fix this by adding 'pyyaml' to requirements.txt.
 
-I am immensely grateful for the help received so far and would greatly
-appreciate any further suggestions or recommendations that you might
-offer to resolve this challenge.
+Note: This was somehow present in the original patch submission:
+<https://lore.kernel.org/all/20231103135622.250314-1-leitao@debian.org/>
+I'm not sure why the pyyaml requirement disappeared in the meantime.
 
-Sincerely,
-Lucas
+Fixes: f061c9f7d058 ("Documentation: Document each netlink family")
+Cc: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
+---
+ Documentation/sphinx/requirements.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
-________________________________
-De: Vladimir Oltean <olteanv@gmail.com>
-Enviado: sexta-feira, 22 de dezembro de 2023 09:30
-Para: Household Cang <canghousehold@aol.com>
-Cc: Romain Gantois <romain.gantois@bootlin.com>; Alexandre Torgue
-<alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
-David S. Miller <davem@davemloft.net>; Eric Dumazet
-<edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-<pabeni@redhat.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>;
-Miquel Raynal <miquel.raynal@bootlin.com>; Maxime Chevallier
-<maxime.chevallier@bootlin.com>; Sylvain Girard
-<sylvain.girard@se.com>; Pascal EBERHARD <pascal.eberhard@se.com>;
-Richard Tresidder <rtresidd@electromag.com.au>; netdev@vger.kernel.org
-<netdev@vger.kernel.org>; linux-stm32@st-md-mailman.stormreply.com
-<linux-stm32@st-md-mailman.stormreply.com>;
-linux-arm-kernel@lists.infradead.org
-<linux-arm-kernel@lists.infradead.org>
-Assunto: Re: [PATCH net 0/1] Prevent DSA tags from breaking COE
+diff --git a/Documentation/sphinx/requirements.txt b/Documentation/sphinx/requirements.txt
+index 335b53df35e2..a8a1aff6445e 100644
+--- a/Documentation/sphinx/requirements.txt
++++ b/Documentation/sphinx/requirements.txt
+@@ -1,3 +1,4 @@
+ # jinja2>=3.1 is not compatible with Sphinx<4.0
+ jinja2<3.1
+ Sphinx==2.4.4
++pyyaml
+-- 
+2.34.1
 
-Hi Lucas,
-
-On Thu, Dec 21, 2023 at 02:40:34AM -0500, Household Cang wrote:
-> > On Dec 18, 2023, at 11:23 AM, Romain Gantois <romain.gantois@bootlin.co=
-m> wrote:
-> >
-> > This is a bugfix for an issue that was recently brought up in two
-> > reports:
-> >
-> > https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c54495@boo=
-tlin.com/
-> > https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@ele=
-ctromag.com.au/
-> >
-> Add me in to be the 3rd report...
-> RK3568 GMAC0 (eth1) to MT7531BE (CPU port)
-> Current workaround for me is ethtool -K eth1 rx off tx off
-
-Is "rx off" actually required, or just "tx off"?
-
-> https://lore.kernel.org/netdev/m3clft2k7umjtny546ot3ayebattksibty3yyttpff=
-vdixl65p@7dpqsr5nisbk/T/#t
->
-> Question on the patch to be built: how would I know if my setup could
-> take advantage of the HW checksum offload? RK3658=E2=80=99s eth0 on stmma=
-c is
-> doing fine, and eth0 is not on a DSA switch. Does this mean eth1
-> should be able to do hw checksum offload once the stmmac driver is
-> fixed?
-
-The MT7531BE switch requires transmitted packets to have an additional
-header which indicates what switch port is targeted. So the packet
-structure is not the same as what eth0 transmits.
-
-Your GMAC datasheet should explain what packets it is able to offload
-L4 checksumming for, quite plainly. Probably MAC + IP + TCP yes, but
-MAC + MTK DSA + IP + TCP no.
-
-The bug is that the network stack thinks that the GMAC is able to
-offload TX checksums for these MTK DSA tagged packets, so it does not
-calculate the checksum in software, leaving the task up to the hardware.
-My guess is that the hardware doesn't recognize the packets as something
-that is offloadable, so it doesn't calculate the checksum either, and
-that's the story of how you end up with packets with bad checksums.
-
-The patch to be built should analyze the packet before passing it to a
-hardware offload engine which will do nothing. The driver still declares
-the NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM features because it is able to
-offload checksumming for _some_ packets, but it falls back to the
-software checksum helper for the rest. This includes your MTK DSA tagged
-packets. They can be checksummed in software even with the DSA tag added,
-because that uses the more generic mechanism with skb->csum_start and
-skb->csum_offset, which DSA is compatible with, just fine. The GMAC
-driver, most likely because of the lack of hardware support, does not
-look at skb->csum_start and skb->csum_offset (aka it does not declare
-the NETIF_F_HW_CSUM feature), so it cannot offload checksumming for your
-switch traffic unless that was specifically baked into the RTL.
-
-More details in the "Switch tagging protocols" section of
-Documentation/networking/dsa/dsa.rst.
 
