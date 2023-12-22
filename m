@@ -1,138 +1,105 @@
-Return-Path: <netdev+bounces-59868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3A2181C757
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 10:35:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7575F81C7D9
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 11:10:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89D5B2872B6
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 09:35:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32BB82872C2
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 10:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8701DDB5;
-	Fri, 22 Dec 2023 09:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8836B10A0C;
+	Fri, 22 Dec 2023 10:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+YyTnkp"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Ivr/vWLx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1B1F9D2;
-	Fri, 22 Dec 2023 09:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d40eec5e12so9531135ad.1;
-        Fri, 22 Dec 2023 01:35:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703237709; x=1703842509; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wwPu6jjtuGsrJCEXn679QmZIcAlxcsMnJvedEVXZ1AU=;
-        b=d+YyTnkpOj83iHZROk1NNBFLdPMNvUBPpHYU7jdkMSCn8iVDU+eV4KZU1g5+uqfi0m
-         Kgjb1Ujy/y4ecPv88kK5qYUt/P4T/pXGsMEEWSNxyaOJ2BfcXDWF/3zGcwVkHLEjY2O5
-         QvlEHd62EOEiS7k9zW3MyYq9zHghl2SJQL+XImLG6dvYXkASeWPyK+MQPxrkLu3B9TIC
-         a/ZjaOQr2AvI90iqd/G6qhwIyQUDrxXM819al8HAgOiukblbJ/PKQO45Ui8gXj64DFX6
-         zMa78z+kaBSS/qQ6bMrYxzpIvyDTf3QDpzQ3JI+H6DeaGFY+R3tLQYA4EjP1g0yNkmd7
-         LIWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703237709; x=1703842509;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wwPu6jjtuGsrJCEXn679QmZIcAlxcsMnJvedEVXZ1AU=;
-        b=ogqsKn9BIYhkTz3zFpgYqtQNmjY5eu2924mjNTzwhdTHrLVuyCLHrViNsF8wP8/Uh0
-         MuGMPl/9z6TCJq7SEC+28orQL+jOwMahFOhWsFmzh+DA1lwbx0WxGPyr1GSMzcAaXnyP
-         UJ0XSmlSNRW5CrYRE2qKvlEQX8jOuj2HnHiI9rrL6cwz4IeJ9NuLe3JfVRgJ4gMc3mrt
-         59BdLh77QuC+pQ/YzU/kWB9bOKzwpl+2Cv078cyBj822feL2VD5IQfpLIH9t1rRAySzv
-         dfe7mSEJHXvAhFStfhwI209BuLq3+QeDWzY1zP88KMi3pLyNbt5YqXUa6X4DF/lSwhUZ
-         8QjQ==
-X-Gm-Message-State: AOJu0Yzl+GmW8Ur3PKiLSWd/zziPxsKgzb2EvLwy80MnYDSsBlom04J9
-	1OMASk1x0SpMThNWo0QaDfU=
-X-Google-Smtp-Source: AGHT+IGOqVOFAzemBdD47i50Yv4SnhOpn/HJacgaR7nR0TGc5qK7EjVKm+ZdkY4r9TiwFo0WCBbVEQ==
-X-Received: by 2002:a17:902:d584:b0:1d3:62b9:838a with SMTP id k4-20020a170902d58400b001d362b9838amr1081319plh.132.1703237708854;
-        Fri, 22 Dec 2023 01:35:08 -0800 (PST)
-Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id g5-20020a170902868500b001d096757ac1sm2997245plo.47.2023.12.22.01.35.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 01:35:08 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id 201151192C10C; Fri, 22 Dec 2023 16:35:04 +0700 (WIB)
-Date: Fri, 22 Dec 2023 16:35:04 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Chris Rankin <rankincj@gmail.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A292101E6;
+	Fri, 22 Dec 2023 10:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1703239803;
+	bh=sOvFaR1NZ9Jh9l7ePgit1IhBHGU3t9hoYasnTch1on0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ivr/vWLxd06/abc0srWkJe31YnwBPe4FM/GeC2JhVeVwItQ71/tG++Tf1N1zAz2dJ
+	 ha0XR6bRgIQ7XXEZt7VN77vhdQz1XLDDGa3JEjGMKFsL2LdJcutpntXSkc6Rd6nluV
+	 WkYvPju9/yI96zSjwK0BMoHrEfEPhxB9Xlscy58sLEm3PikQNG1IQ7Iq4ukFVGrUVV
+	 CWVnlD7SAzilSj7RvP7/7txeAPYzCOl7mqZarGCqAYWsP6JbGGclutTS4NN/UCmlkv
+	 Y3728o0ktMZJMC4pvZiNlVy7S/j4sr2WPWxMwd2y4JkFxDepiG1S8INOLLNteqG6zs
+	 zTVAWrOH5uY0w==
+Received: from localhost (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 8A9183781F92;
+	Fri, 22 Dec 2023 10:10:03 +0000 (UTC)
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Yue Haibing <yuehaibing@huawei.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Qingfang DENG <qingfang.deng@siflower.com.cn>
-Subject: Re: Does Linux still support UP?
-Message-ID: <ZYVYSBKhc-uvO8_o@archie.me>
-References: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	kernel@collabora.com
+Subject: [PATCH v3 0/2] StarFive DWMAC support for JH7100
+Date: Fri, 22 Dec 2023 12:09:58 +0200
+Message-ID: <20231222101001.2541758-1-cristian.ciocaltea@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="BGJpeMhm1VRD5QR7"
-Content-Disposition: inline
-In-Reply-To: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
+This is just a subset of the initial patch series [1] adding networking
+support for StarFive JH7100 SoC.
 
---BGJpeMhm1VRD5QR7
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[1]: https://lore.kernel.org/lkml/20231218214451.2345691-1-cristian.ciocaltea@collabora.com/
 
-[also Cc: netdev folks and get_maintainer output for include/net/neighbour.=
-h]
+Changes in v3:
+ - Optimized jh7110 resets & reset-names properties (Rob)
+ - Added R-b tag from Jacob in PATCH 1
+ - v2:
+   https://lore.kernel.org/lkml/20231220002824.2462655-1-cristian.ciocaltea@collabora.com/
 
-On Thu, Dec 21, 2023 at 11:12:34PM +0000, Chris Rankin wrote:
-> Hi,
->=20
-> I have an ancient i586 UP machine that happily runs vanilla Linux
-> 6.4.16, but which locks up shortly after booting vanilla 6.5.0. The
-> kernel *seems* to run into trouble as soon as the networking layer
-> becomes busy. However, its SysRq-S/U/B sequence still seems to work as
-> expected and so obviously *something* is still responding somewhere.
->=20
-> This problem still exists in vanilla 6.6.8.
->=20
-> FWIW I have raised this bug in bugzilla:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D218296
->=20
+Changes in v2:
+ - Add the missing binding patch (Conor)
+ - v1:
+   https://lore.kernel.org/lkml/20231219231040.2459358-1-cristian.ciocaltea@collabora.com/
 
-To be honest, you need to bisect. For reference, see
-Documentation/admin-guide/bug-bisect.rst in the kernel sources.
-Since you have problem with your old machine, you may want to compile
-the kernel (which is a prerequisite for bisection) on faster machine,
-then transfer the kernel image + modules into your old machine to
-be installed there. Without bisection, no one will look into this
-regression.
+Cristian Ciocaltea (2):
+  dt-bindings: net: starfive,jh7110-dwmac: Add JH7100 SoC compatible
+  net: stmmac: dwmac-starfive: Add support for JH7100 SoC
 
-Thanks.
+ .../devicetree/bindings/net/snps,dwmac.yaml   | 11 +--
+ .../bindings/net/starfive,jh7110-dwmac.yaml   | 72 +++++++++++++------
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  6 +-
+ .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 32 +++++++--
+ 4 files changed, 88 insertions(+), 33 deletions(-)
 
---=20
-An old man doll... just what I always wanted! - Clara
+-- 
+2.43.0
 
---BGJpeMhm1VRD5QR7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZYVYQgAKCRD2uYlJVVFO
-ozJkAQCKyHu9R9zl9W8ZRbFK01mKcm88orrgBonnDmeisJzNAAD7BKlWE/dbnM/p
-BujSYdzYOoj3yK4CuQ/N4D/7kUqCAg8=
-=Pvek
------END PGP SIGNATURE-----
-
---BGJpeMhm1VRD5QR7--
 
