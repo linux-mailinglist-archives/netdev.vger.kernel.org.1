@@ -1,114 +1,110 @@
-Return-Path: <netdev+bounces-59940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A7281CC1D
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:21:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1110681CC66
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:50:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 439851F21988
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:21:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFBA8285D03
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13D723750;
-	Fri, 22 Dec 2023 15:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XC+QmaXW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D68123775;
+	Fri, 22 Dec 2023 15:50:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F441CFAE;
-	Fri, 22 Dec 2023 15:21:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26A53C433C7;
-	Fri, 22 Dec 2023 15:20:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703258462;
-	bh=iX0Xb3DzNg0RLtiR7Ftv64MGPrNCueNmT2jA8JMDSTc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XC+QmaXWjch3Ig5LrrCP59Zkx3mObA7fWJ1Q1lRqOFjmW3GvsADNUmFT6mb8MV2+1
-	 c0/zOy2wHoicBpnjsnSC9xXvseeLYIaxRB3qwsNjDfMPV7HXTJfx0w0niRMy7HJYAv
-	 SSNE7RQOKF1iB9nON+PL32PHWIMG4ZixM1qK9LHfx6zDvrPXO+vu21VLj2MmmhYusm
-	 c5tWUEoHvSflJ4dvepzVI3+pf9JbrsIVnFB1vISbAWR/zvq0fgmrpT/2V1Wg1hnlLM
-	 /jzu8DEgcbLY4aOG246g+wpbPcQ8W3FoLAMUq4LhOH9UBufCZG0ZP+/n1vdl0McLxZ
-	 HTrTDY4Rg1Vxg==
-Date: Fri, 22 Dec 2023 15:20:56 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, Rob Herring <robh@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A716F23753;
+	Fri, 22 Dec 2023 15:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from luzhipeng.223.5.5.5 (unknown [122.235.244.73])
+	by mail-app4 (Coremail) with SMTP id cS_KCgAHfTQtsIVlegLlAA--.3975S2;
+	Fri, 22 Dec 2023 23:50:06 +0800 (CST)
+From: Zhipeng Lu <alexious@zju.edu.cn>
+To: alexious@zju.edu.cn
+Cc: Simon Horman <horms@kernel.org>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Martin Habets <habetsm.xilinx@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Tobias Waldekranz <tobias@waldekranz.com>
-Subject: Re: [net-next PATCH v4 1/4] dt-bindings: net: phy: Document new LEDs
- polarity property
-Message-ID: <20231222-pennant-staging-00e984b69fd3@spud>
-References: <20231215212244.1658-1-ansuelsmth@gmail.com>
- <20231215212244.1658-2-ansuelsmth@gmail.com>
- <20231220152209.GA229412-robh@kernel.org>
- <6583705d.050a0220.6e903.083d@mx.google.com>
- <ce55a08f-ebe0-4e1b-a235-695e71611203@lunn.ch>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-net-drivers@amd.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] [v2] sfc: fix a double-free bug in efx_probe_filters
+Date: Fri, 22 Dec 2023 23:49:52 +0800
+Message-Id: <20231222154952.3531636-1-alexious@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ACY50QdLIAKkfKEE"
-Content-Disposition: inline
-In-Reply-To: <ce55a08f-ebe0-4e1b-a235-695e71611203@lunn.ch>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cS_KCgAHfTQtsIVlegLlAA--.3975S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFWDZF48ZrWfAFW8Ww1DGFg_yoW8GF4xpa
+	yYk3y2gr1rXF15W3WkJ3s7ZF98AayDXa4jgFnIkw4fuw1qyrn8Cw1Sqaya9ryDArW3Aa1a
+	v3sYyr1UZ3ZxAFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc2xSY4AK67AK6ryrMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
+	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7VUjLiSJUUUUU==
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
+In efx_probe_filters, the channel->rps_flow_id is freed in a
+efx_for_each_channel marco  when success equals to 0.
+However, after the following call chain:
 
---ACY50QdLIAKkfKEE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+ef100_net_open
+  |-> efx_probe_filters
+  |-> ef100_net_stop
+        |-> efx_remove_filters
 
-On Thu, Dec 21, 2023 at 10:43:17AM +0100, Andrew Lunn wrote:
-> > On the marvell10g series we are discussing of using tristate or not. We
-> > notice tristate might be confusing, would it be better to use
-> > inactive-high-impedance ?
->=20
-> The pincfg-node.yaml binding has:
->=20
->   drive-open-drain:
->     oneOf:
->       - type: boolean
->       - $ref: /schemas/types.yaml#/definitions/uint32
->         const: 1    # No known cases of 0
->         deprecated: true
->     description: drive with open drain
->=20
->   drive-open-source:
->     type: boolean
->     description: drive with open source
->=20
-> I'm not sure what the deprecated means. Is it that a value is
-> deprecated, not the property as a whole?
+The channel->rps_flow_id is freed again in the efx_for_each_channel of
+efx_remove_filters, triggering a double-free bug.
+---
+Changelog:
 
-Yeah, it means that only the boolean form of this property should be
-used going forward.
+v2: Correct the call-chain description in commit message and change
+patch subject.
 
-The comment suggests that the value had no meaning in the first place,
-and that testing for presence alone has been sufficient all along.
+Fixes: a9dc3d5612ce ("sfc_ef100: RX filter table management and related gubbins")
+Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+---
+ drivers/net/ethernet/sfc/rx_common.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
---ACY50QdLIAKkfKEE
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
+index d2f35ee15eff..fac227d372db 100644
+--- a/drivers/net/ethernet/sfc/rx_common.c
++++ b/drivers/net/ethernet/sfc/rx_common.c
+@@ -823,8 +823,10 @@ int efx_probe_filters(struct efx_nic *efx)
+ 		}
+ 
+ 		if (!success) {
+-			efx_for_each_channel(channel, efx)
++			efx_for_each_channel(channel, efx) {
+ 				kfree(channel->rps_flow_id);
++				channel->rps_flow_id = NULL;
++			}
+ 			efx->type->filter_table_remove(efx);
+ 			rc = -ENOMEM;
+ 			goto out_unlock;
+-- 
+2.34.1
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZYWpWAAKCRB4tDGHoIJi
-0nnAAP9Pp+WgES0a44Nu33QCKEOpR+c3dWUvVwkgw87y9/9RvQEAx1yZPbwpfc2j
-IS7xvOVrdb8Oi3EV3e5CNZjVM0WKGg8=
-=uxDU
------END PGP SIGNATURE-----
-
---ACY50QdLIAKkfKEE--
 
