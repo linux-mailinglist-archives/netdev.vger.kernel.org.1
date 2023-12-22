@@ -1,110 +1,135 @@
-Return-Path: <netdev+bounces-59941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1110681CC66
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:50:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB43281CC8F
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:08:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFBA8285D03
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:50:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C23284C68
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D68123775;
-	Fri, 22 Dec 2023 15:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9702241E6;
+	Fri, 22 Dec 2023 16:08:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAb6F+ud"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A716F23753;
-	Fri, 22 Dec 2023 15:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from luzhipeng.223.5.5.5 (unknown [122.235.244.73])
-	by mail-app4 (Coremail) with SMTP id cS_KCgAHfTQtsIVlegLlAA--.3975S2;
-	Fri, 22 Dec 2023 23:50:06 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: Simon Horman <horms@kernel.org>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Martin Habets <habetsm.xilinx@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-net-drivers@amd.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] [v2] sfc: fix a double-free bug in efx_probe_filters
-Date: Fri, 22 Dec 2023 23:49:52 +0800
-Message-Id: <20231222154952.3531636-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F76E241E4
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 16:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6dba02a162aso1481360a34.0
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 08:08:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703261294; x=1703866094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ElRCe8a8yXJNEP/4xNq1GJbF+qLn0LeEYLNfeZtVlCQ=;
+        b=EAb6F+udr+4jXkywaU7mK4t7d1Dv8IgEOMFKVtNDwaNIBCqcu968kJDhZsiFKQTeqn
+         GJbKtqlQylz0jxX76IpuoE/T01YZuHkGsg33dNJpwnL0FKvopTnE9apWwKGbcRZ/hnih
+         uWAaUqdkJ4VbnJVLEvywS5NIODqYB4E6VRjqu0UB4io4oeK80QHVhiNHhu5MuDwTz6nc
+         MC1mruvaH6Km7z/3IeQ+HnLbqyoFSxzZ8xxSSHVmgJUFjtmEx72SgiCfKIbMZ24/yGDl
+         3NtqwmPlJNgHTr3veKoMn4qMr2aEAXm3JJjEDf1oA8Fy0FZBtPF12HNskKqKoZhEPmEK
+         TI6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703261294; x=1703866094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ElRCe8a8yXJNEP/4xNq1GJbF+qLn0LeEYLNfeZtVlCQ=;
+        b=oYdeF1qaMYluyRKaGEl1fb5vZKkysUQYmZ2HFm2xTPhZMtPGem8WhQ8k2A2Stfqstg
+         g9Sz/5IIIDUZyd+qL9oQ5LpwQ+3pRYCKSyhi9BS/JVPlw1/jeI5mPR0qld7kBpIQUEC8
+         NM6Okvw8ZhqZyOfs6tcem8da9k53bCQeHZimXNiaACxYROXpvOHZ7jrpZxyz3qI5uo9t
+         BDYvCb1u3Y1e7jzB+L6qCVxXzBNiILDOgb6yDKfhzkoJjyo2K+u1rLfOifoaaEMo6KBV
+         tt0jyiOnnuVWmySSCqUYZSKdmeYHpGSe20HSJ9M76Ww7Xqlzpsf1Qhm4356TCmCiUV77
+         awoA==
+X-Gm-Message-State: AOJu0YwLVIvwlsEbN8X9XTvoM7x4qysbJDCieptJ3JCfi5l+ITyUxwTw
+	r7M/i80gcaiFmIwi4rfvYdl8TALLLGGob3Ixk/o=
+X-Google-Smtp-Source: AGHT+IHeuZPoHCgzP1xTNSRTr+jcGHBKoXerisAERztrVzZ4Z+EHG+ePsNe3orio1a6OuOn4hPRJ7Od7nfHmUEvFohw=
+X-Received: by 2002:a9d:6d06:0:b0:6db:a784:e63c with SMTP id
+ o6-20020a9d6d06000000b006dba784e63cmr1588029otp.52.1703261294438; Fri, 22 Dec
+ 2023 08:08:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cS_KCgAHfTQtsIVlegLlAA--.3975S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFWDZF48ZrWfAFW8Ww1DGFg_yoW8GF4xpa
-	yYk3y2gr1rXF15W3WkJ3s7ZF98AayDXa4jgFnIkw4fuw1qyrn8Cw1Sqaya9ryDArW3Aa1a
-	v3sYyr1UZ3ZxAFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc2xSY4AK67AK6ryrMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUjLiSJUUUUU==
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
+References: <20231219170017.73902-1-edumazet@google.com>
+In-Reply-To: <20231219170017.73902-1-edumazet@google.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 22 Dec 2023 11:08:03 -0500
+Message-ID: <CADvbK_e+J2nut4Q5NE3oAdUqEDXAFZrecs4zY+CrLE9ob8AtZg@mail.gmail.com>
+Subject: Re: [PATCH net-next] sctp: fix busy polling
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Jacob Moroni <jmoroni@google.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In efx_probe_filters, the channel->rps_flow_id is freed in a
-efx_for_each_channel marco  when success equals to 0.
-However, after the following call chain:
+On Tue, Dec 19, 2023 at 12:00=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> Busy polling while holding the socket lock makes litle sense,
+> because incoming packets wont reach our receive queue.
+>
+> Fixes: 8465a5fcd1ce ("sctp: add support for busy polling to sctp protocol=
+")
+> Reported-by: Jacob Moroni <jmoroni@google.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+> Cc: Xin Long <lucien.xin@gmail.com>
+> ---
+>  net/sctp/socket.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> index 5fb02bbb4b349ef9ab9c2790cccb30fb4c4e897c..6b9fcdb0952a0fe599ae5d1d1=
+cc6fa9557a3a3bc 100644
+> --- a/net/sctp/socket.c
+> +++ b/net/sctp/socket.c
+> @@ -2102,6 +2102,10 @@ static int sctp_recvmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len,
+>         if (unlikely(flags & MSG_ERRQUEUE))
+>                 return inet_recv_error(sk, msg, len, addr_len);
+>
+> +       if (sk_can_busy_loop(sk) &&
+> +           skb_queue_empty_lockless(&sk->sk_receive_queue))
+> +               sk_busy_loop(sk, flags & MSG_DONTWAIT);
+> +
+Here is no any sk_state check, if the SCTP socket(TCP type) has been
+already closed by peer, will sctp_recvmsg() block here?
 
-ef100_net_open
-  |-> efx_probe_filters
-  |-> ef100_net_stop
-        |-> efx_remove_filters
+Maybe here it needs a `!(sk->sk_shutdown & RCV_SHUTDOWN)` check,
+which is set when it's closed by the peer.
 
-The channel->rps_flow_id is freed again in the efx_for_each_channel of
-efx_remove_filters, triggering a double-free bug.
----
-Changelog:
+Thanks
 
-v2: Correct the call-chain description in commit message and change
-patch subject.
-
-Fixes: a9dc3d5612ce ("sfc_ef100: RX filter table management and related gubbins")
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
----
- drivers/net/ethernet/sfc/rx_common.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
-index d2f35ee15eff..fac227d372db 100644
---- a/drivers/net/ethernet/sfc/rx_common.c
-+++ b/drivers/net/ethernet/sfc/rx_common.c
-@@ -823,8 +823,10 @@ int efx_probe_filters(struct efx_nic *efx)
- 		}
- 
- 		if (!success) {
--			efx_for_each_channel(channel, efx)
-+			efx_for_each_channel(channel, efx) {
- 				kfree(channel->rps_flow_id);
-+				channel->rps_flow_id = NULL;
-+			}
- 			efx->type->filter_table_remove(efx);
- 			rc = -ENOMEM;
- 			goto out_unlock;
--- 
-2.34.1
-
+>         lock_sock(sk);
+>
+>         if (sctp_style(sk, TCP) && !sctp_sstate(sk, ESTABLISHED) &&
+> @@ -9046,12 +9050,6 @@ struct sk_buff *sctp_skb_recv_datagram(struct sock=
+ *sk, int flags, int *err)
+>                 if (sk->sk_shutdown & RCV_SHUTDOWN)
+>                         break;
+>
+> -               if (sk_can_busy_loop(sk)) {
+> -                       sk_busy_loop(sk, flags & MSG_DONTWAIT);
+> -
+> -                       if (!skb_queue_empty_lockless(&sk->sk_receive_que=
+ue))
+> -                               continue;
+> -               }
+>
+>                 /* User doesn't want to wait.  */
+>                 error =3D -EAGAIN;
+> --
+> 2.43.0.472.g3155946c3a-goog
+>
 
