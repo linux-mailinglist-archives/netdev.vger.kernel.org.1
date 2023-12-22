@@ -1,107 +1,195 @@
-Return-Path: <netdev+bounces-59915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25E8E81CA74
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:02:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A6581CA86
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57AB11C21F84
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:02:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D37F9B23AA6
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32E419448;
-	Fri, 22 Dec 2023 13:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA19818C2E;
+	Fri, 22 Dec 2023 13:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQMNahIL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n3uscbi9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272E199A1
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 13:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703250135;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2kygMq0mAMv991cW3YZ7Hd3ppnOgYBjhmi7vw/LesYI=;
-	b=NQMNahILgu3aQbYD3RwVLqx49Kb0QJEdivz2twAyGjHa6qSDNBTLYUKgF8/XeHtVYBwG23
-	13LoOIPgSk1/yThVctxuhb3ZW+Fg65A0lHF3Z4fJV/jGMRyPAz09wA/66Jb0kIqAvSP3Ug
-	LyVx0B4CVrW72jzYFnomvW9RH6rZUpc=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-15--QeBZETQMO6dAe6PTzC6cQ-1; Fri,
- 22 Dec 2023 08:02:12 -0500
-X-MC-Unique: -QeBZETQMO6dAe6PTzC6cQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5329D386914F;
-	Fri, 22 Dec 2023 13:02:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 82A9251E3;
-	Fri, 22 Dec 2023 13:02:07 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20231221132400.1601991-5-dhowells@redhat.com>
-References: <20231221132400.1601991-5-dhowells@redhat.com> <20231221132400.1601991-1-dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: dhowells@redhat.com, Gao Xiang <xiang@kernel.org>,
-    Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
-    Jeffle Xu <jefflexu@linux.alibaba.com>,
-    Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-erofs@lists.ozlabs.org
-Subject: [PATCH] Fix EROFS Kconfig
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1DE182A1;
+	Fri, 22 Dec 2023 13:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02C95C433C8;
+	Fri, 22 Dec 2023 13:10:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703250621;
+	bh=FvnyuJhk+7r4BtcMqRVLyVhaGuE1vRlM7xCE2lBtl7A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n3uscbi9mTpk09tfQXWBQ9C4fr4b7ys8h9nWXJ+dSxDHEvAhtzC0LA8Mpmq7UU9bh
+	 /O+Hbhgj4cTQjhxCD6LWD9Wrbw3+MDFQC/4GoOYK7VkfhqC26sWFVxOjz4XsUoJ3uO
+	 zy2noqDBRjs9Rt+8kevLk1rOqHEm0xIk5VsggD7a4HwgE8saYXz1Icj5lwBWDvLqDC
+	 3S5d9o7MIkkqBj+cKblTWKrpwGdL5VjPyKVzhhp+uUYMkJv1UrAsp4NjPp0UufB6nQ
+	 GkmluEfetP6hcN9BONpkijLX6AGQkXLjqwZBkKVE1EmQj2jtuejkasB8hQRTzgUzfN
+	 OHX/sIUETpHbQ==
+Date: Fri, 22 Dec 2023 14:10:12 +0100
+From: Simon Horman <horms@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
+	vimleshk@marvell.com, sedara@marvell.com, egallen@redhat.com,
+	mschmidt@redhat.com, pabeni@redhat.com, kuba@kernel.org,
+	wizhao@redhat.com, kheib@redhat.com, konguyen@redhat.com,
+	Veerasenareddy Burru <vburru@marvell.com>,
+	Satananda Burla <sburla@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v1 4/8] octeon_ep_vf: add Tx/Rx ring resource
+ setup and cleanup
+Message-ID: <20231222131012.GG1202958@kernel.org>
+References: <20231221092844.2885872-1-srasheed@marvell.com>
+ <20231221092844.2885872-5-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2265064.1703250126.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 Dec 2023 13:02:06 +0000
-Message-ID: <2265065.1703250126@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221092844.2885872-5-srasheed@marvell.com>
 
-This needs an additional change (see attached).
+On Thu, Dec 21, 2023 at 01:28:40AM -0800, Shinas Rasheed wrote:
+> Implement Tx/Rx ring resource allocation and cleanup.
+> 
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 
-diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
-index 1d318f85232d..1949763e66aa 100644
---- a/fs/erofs/Kconfig
-+++ b/fs/erofs/Kconfig
-@@ -114,7 +114,8 @@ config EROFS_FS_ZIP_DEFLATE
- =
+Hi Shinas,
 
- config EROFS_FS_ONDEMAND
- 	bool "EROFS fscache-based on-demand read support"
--	depends on CACHEFILES_ONDEMAND && (EROFS_FS=3Dm && FSCACHE || EROFS_FS=3D=
-y && FSCACHE=3Dy)
-+	depends on CACHEFILES_ONDEMAND && FSCACHE && \
-+		(EROFS_FS=3Dm && NETFS_SUPPORT || EROFS_FS=3Dy && NETFS_SUPPORT=3Dy)
- 	default n
- 	help
- 	  This permits EROFS to use fscache-backed data blobs with on-demand
+some minor feedback from my side which you might consider addressing
+if you have to respin the series for some other reason.
 
+...
+
+> +/**
+> + * octep_vf_setup_oq() - Setup a Rx queue.
+> + *
+> + * @oct: Octeon device private data structure.
+> + * @q_no: Rx queue number to be setup.
+> + *
+> + * Allocate resources for a Rx queue.
+> + */
+> +static int octep_vf_setup_oq(struct octep_vf_device *oct, int q_no)
+> +{
+> +	struct octep_vf_oq *oq;
+> +	u32 desc_ring_size;
+> +
+> +	oq = vzalloc(sizeof(*oq));
+> +	if (!oq)
+> +		goto create_oq_fail;
+> +	oct->oq[q_no] = oq;
+> +
+> +	oq->octep_vf_dev = oct;
+> +	oq->netdev = oct->netdev;
+> +	oq->dev = &oct->pdev->dev;
+> +	oq->q_no = q_no;
+> +	oq->max_count = CFG_GET_OQ_NUM_DESC(oct->conf);
+> +	oq->ring_size_mask = oq->max_count - 1;
+> +	oq->buffer_size = CFG_GET_OQ_BUF_SIZE(oct->conf);
+> +	oq->max_single_buffer_size = oq->buffer_size - OCTEP_VF_OQ_RESP_HW_SIZE;
+> +
+> +	/* When the hardware/firmware supports additional capabilities,
+> +	 * additional header is filled-in by Octeon after length field in
+> +	 * Rx packets. this header contains additional packet information.
+> +	 */
+> +	if (oct->fw_info.rx_ol_flags)
+> +		oq->max_single_buffer_size -= OCTEP_VF_OQ_RESP_HW_EXT_SIZE;
+> +
+> +	oq->refill_threshold = CFG_GET_OQ_REFILL_THRESHOLD(oct->conf);
+> +
+> +	desc_ring_size = oq->max_count * OCTEP_VF_OQ_DESC_SIZE;
+> +	oq->desc_ring = dma_alloc_coherent(oq->dev, desc_ring_size,
+> +					   &oq->desc_ring_dma, GFP_KERNEL);
+> +
+> +	if (unlikely(!oq->desc_ring)) {
+> +		dev_err(oq->dev,
+> +			"Failed to allocate DMA memory for OQ-%d !!\n", q_no);
+> +		goto desc_dma_alloc_err;
+> +	}
+> +
+> +	oq->buff_info = (struct octep_vf_rx_buffer *)
+> +			vzalloc(oq->max_count * OCTEP_VF_OQ_RECVBUF_SIZE);
+
+nit: There is no need to cast the return value of vzalloc()
+
+	oq->buff_info = vzalloc(oq->max_count * OCTEP_VF_OQ_RECVBUF_SIZE);
+
+> +	if (unlikely(!oq->buff_info)) {
+> +		dev_err(&oct->pdev->dev,
+> +			"Failed to allocate buffer info for OQ-%d\n", q_no);
+> +		goto buf_list_err;
+> +	}
+> +
+> +	if (octep_vf_oq_fill_ring_buffers(oq))
+> +		goto oq_fill_buff_err;
+> +
+> +	octep_vf_oq_reset_indices(oq);
+> +	oct->hw_ops.setup_oq_regs(oct, q_no);
+> +	oct->num_oqs++;
+> +
+> +	return 0;
+> +
+> +oq_fill_buff_err:
+> +	vfree(oq->buff_info);
+> +	oq->buff_info = NULL;
+> +buf_list_err:
+> +	dma_free_coherent(oq->dev, desc_ring_size,
+> +			  oq->desc_ring, oq->desc_ring_dma);
+> +	oq->desc_ring = NULL;
+> +desc_dma_alloc_err:
+> +	vfree(oq);
+> +	oct->oq[q_no] = NULL;
+> +create_oq_fail:
+> +	return -1;
+> +}
+
+...
+
+> +/**
+> + * octep_vf_free_iq() - Free Tx queue resources.
+> + *
+> + * @iq: Octeon Tx queue data structure.
+> + *
+> + * Free all the resources allocated for a Tx queue.
+> + */
+> +static void octep_vf_free_iq(struct octep_vf_iq *iq)
+> +{
+> +	struct octep_vf_device *oct = iq->octep_vf_dev;
+> +	u64 desc_ring_size, sglist_size;
+> +	int q_no = iq->q_no;
+> +
+> +	desc_ring_size = OCTEP_VF_IQ_DESC_SIZE * CFG_GET_IQ_NUM_DESC(oct->conf);
+> +
+> +	if (iq->buff_info)
+> +		vfree(iq->buff_info);
+
+nit: vfree can handle a NULL argument, so  there is no need to protect it
+     with a if condition
+
+> +
+> +	if (iq->desc_ring)
+> +		dma_free_coherent(iq->dev, desc_ring_size,
+> +				  iq->desc_ring, iq->desc_ring_dma);
+> +
+> +	sglist_size = OCTEP_VF_SGLIST_SIZE_PER_PKT *
+> +		      CFG_GET_IQ_NUM_DESC(oct->conf);
+> +	if (iq->sglist)
+> +		dma_free_coherent(iq->dev, sglist_size,
+> +				  iq->sglist, iq->sglist_dma);
+> +
+> +	vfree(iq);
+> +	oct->iq[q_no] = NULL;
+> +	oct->num_iqs--;
+>  }
+
+...
 
