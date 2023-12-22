@@ -1,254 +1,184 @@
-Return-Path: <netdev+bounces-59971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB79F81CF2D
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 21:14:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6460981CF3F
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 21:28:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 351461F23083
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 20:14:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 893D91C23016
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 20:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438902E841;
-	Fri, 22 Dec 2023 20:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D062E841;
+	Fri, 22 Dec 2023 20:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MmSdDrmv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bitWPi3l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E842E832;
-	Fri, 22 Dec 2023 20:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703276074; x=1734812074;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7KvrfUBuDJWsLYn6DKnutSiX/U794E0nm9Hg9vcFODI=;
-  b=MmSdDrmvFPEyDuI5g4YtavFmqhnM1VpVyuEk2IIWSYkllNlHWoVmP5U/
-   cmvuxV/XQHtNqc+2vdA/MfB2r5jYE8f9srY5eh433A9UtqEL5BWUThOzt
-   gimB7tymDPAt+lejWDnJhEFH8L8mYR2hc/Zz9+sbgZlpkrcqflsS1wUgK
-   6pQBN08vwMGjKtVbmphRXTTOoMfPuMlvYxyVyw5tTkqx5xLfToP9h+V+P
-   LoBOSHYG7U0FS4FnKZV5QMM2myQYAEwTtR/htqDaQniXIasrTx+yjjkJk
-   ZG7FBL8UYvxPSqVF0+gVX9uWUHuOE9NJQe5KqKwI4kp9p8yTBXYkSnt3e
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="462593278"
-X-IronPort-AV: E=Sophos;i="6.04,297,1695711600"; 
-   d="scan'208";a="462593278"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2023 12:14:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="843034099"
-X-IronPort-AV: E=Sophos;i="6.04,297,1695711600"; 
-   d="scan'208";a="843034099"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga008.fm.intel.com with ESMTP; 22 Dec 2023 12:14:29 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rGluK-0009q3-0q;
-	Fri, 22 Dec 2023 20:14:19 +0000
-Date: Sat, 23 Dec 2023 04:10:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Mina Almasry <almasrymina@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Shakeel Butt <shakeelb@google.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v3 3/3] net: add netmem_ref to skb_frag_t
-Message-ID: <202312230340.iCf8sOop-lkp@intel.com>
-References: <20231220214505.2303297-4-almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8F12EAE1
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 20:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2ca04b1cc37so21266041fa.1
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 12:28:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703276916; x=1703881716; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g8KCgAtJEhFigBqmWI4FasDDRgNNkyQ3i0vzuUXXhsw=;
+        b=bitWPi3l54iH6gQqvopWQZ8Xlh1IGR+vZo5Zu3mgtyRGzI1Kne0usGB0vPKJHznOrj
+         2XEJCiYkaEPkdrnwzgs4lmZ7d3vEcD6hRhmjMu77LIG+Fme8JS12KltorUiO4xoSWn1t
+         xgWHZoLjN0Kf7Hhhb9f2N6LUKfrr/1KhJdzG3+DhhEsF7TAiG9Dno/4oZLXaq/c9/Zto
+         t4WYyihI76+t0LFgUajB2WJjcO3Imj8hGm/mI7ipHdBMSVmVn0qEbzxbxCiYXXiT0KT1
+         BKczGjvQ/I00fHiE0Y3wyEtRG4mWuqIjaKSB1wM3EmmPGjxqpJI+QZlZ5SH1GnRO62Ly
+         5lIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703276916; x=1703881716;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g8KCgAtJEhFigBqmWI4FasDDRgNNkyQ3i0vzuUXXhsw=;
+        b=Mer71zWnNPWJ8+p6/zH5BHKyx3geRjPqWQHx+xVEWmJ0Aejrnxd9//ZV48pcZdB0YM
+         eT2OFvNzDlVfCDVQY9hDGf0esdP+5+xDOtlr3YtH+7iI9bpgL8eBimET13XmVt0awjoz
+         X3eseYaCG9Eo22GwhKy5Ui+iZrdq6uD6SFRuFRcsUucQfH0MtrrDSSO5u6jpL5Oa0Pst
+         /jguvVP+AC10PBbeZ/T4CfOnzHftoTaC+e0H6TYOtEdjDBOjV7r3HaFFZqfAWbdum0qX
+         /wSq75ZseYEm8po+TkB6XBtmlGC5RakFP3wsEPjg0V1wLxxUD/3pWervkfIHStb1n+av
+         +K0Q==
+X-Gm-Message-State: AOJu0YwPJs2bJ0N7FHcWFZWhbmCD/fs2VNk28Trf129b+WiDh7WJg6w/
+	WZAq0OYEvXeg6j0B4aFZaxJaBoejGIS6wbSd/Uw=
+X-Google-Smtp-Source: AGHT+IEGG8NR93oVzHCzlSojpiagkapZLO7hVBJFJwGIw2IdGJ6YzF5hFybXChumNXzy5mzmQBKj442bacB/mBWmCPg=
+X-Received: by 2002:a2e:904d:0:b0:2cc:803a:a8ac with SMTP id
+ n13-20020a2e904d000000b002cc803aa8acmr2084588ljg.8.1703276916082; Fri, 22 Dec
+ 2023 12:28:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231220214505.2303297-4-almasrymina@google.com>
+References: <20231220042632.26825-1-luizluca@gmail.com> <20231220042632.26825-6-luizluca@gmail.com>
+ <CAJq09z4OP6Djuv=HkntCqyLM1332pXzhW0qBd4fc-pfrSt+r1A@mail.gmail.com>
+ <20231221174746.hylsmr3f7g5byrsi@skbuf> <d74e47b6-ff02-41f4-9929-02109ce39e12@arinc9.com>
+ <20231222104831.js4xiwdklazytgeu@skbuf> <hs5nbkipaunm75s3yyoa2it3omumxotyzdudyzrzxeqopmnwal@z5zpbrxwfsqi>
+ <2cf4c7c0-603d-4c06-a677-69410b02019b@arinc9.com>
+In-Reply-To: <2cf4c7c0-603d-4c06-a677-69410b02019b@arinc9.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Fri, 22 Dec 2023 17:28:24 -0300
+Message-ID: <CAJq09z4LKwkumhR2CiLzczoFM1Ut-yAr9zHZLypopes8t_nrew@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/7] net: dsa: realtek: Migrate user_mii_bus
+ setup to realtek-dsa
+To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>, 
+	Vladimir Oltean <olteanv@gmail.com>, "linus.walleij@linaro.org" <linus.walleij@linaro.org>, 
+	"andrew@lunn.ch" <andrew@lunn.ch>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Mina,
+> >>>> ds->user_mii_bus helps when
+> >>>> (1) the switch probes with platform_data (not on OF), or
+> >>>> (2) the switch probes on OF but its MDIO bus is not described in OF
+> >>>>
+> >>>> Case (2) is also eliminated because realtek_smi_setup_mdio() bails o=
+ut
+> >>>> if it cannot find the "mdio" node described in OF. So the ds->user_m=
+ii_bus
+> >>>> assignment is only ever executed when the bus has an OF node, aka wh=
+en
+> >>>> it is not useful.
+> >>>
+> >>> I don't like the fact that the driver bails out if it doesn't find th=
+e
+> >>> "mdio" child node. This basically forces the hardware design to use t=
+he
+> >>> MDIO bus of the switch. Hardware designs which don't use the MDIO bus=
+ of
+> >>> the switch are perfectly valid.
+> >>>
+> >>> It looks to me that, to make all types of hardware designs work, we m=
+ust
+> >>> not use ds->user_mii_bus for switch probes on OF. Case (2) is one of =
+the
+> >>> cases of the ethernet controller lacking link definitions in OF so we
+> >>> should enforce link definitions on ethernet controllers. This way, we=
+ make
+> >>> sure all types of hardware designs work and are described in OF prope=
+rly.
+> >>>
+> >>> Ar=C4=B1n=C3=A7
+> >>
+> >> The bindings for the realtek switches can be extended in compatible wa=
+ys,
+> >> e.g. by making the 'mdio' node optional. If we want that to mean "ther=
+e
+> >> is no internal PHY that needs to be used", there is no better time tha=
+n
+> >> now to drop the driver's linkage to ds->user_mii_bus, while its bindin=
+gs
+> >> still strictly require an 'mdio' node.
+> >>
+> >> If we don't drop that linkage _before_ making 'mdio' optional, there
+> >> is no way to disprove the existence of device trees which lack a link
+> >> description on user ports (which is now possible).
+> >
+> > I strongly agree and I think that the direction you have suggested is
+> > crystal clear, Vladimir. Nothing prohibits us from relaxing the binding=
+s
+> > later on to support whatever hardware Ar=C4=B1n=C3=A7 is describing.
+> >
+> > But for my own understanding - and maybe this is more a question for
+> > Ar=C4=B1n=C3=A7 since he brought it up up - what does this supposed har=
+dware look
+> > like, where the internal MDIO bus is not used? Here are my two (probabl=
+y
+> > wrong?) guesses:
+> >
+> > (1) you use the MDIO bus of the parent Ethernet controller and access
+> >      the internal PHYs directly, hence the internal MDIO bus goes unuse=
+d;
+> >
+> > (2) none of the internal PHYs are actually used, so only the so-called
+> >      extension ports are available.
+> >
+> > I don't know if (1) really qualifies. And (2) is also a bit strange,
+> > because this family of switches has variants with up to only three
+> > extension ports, most often two, which doesn't make for much of a
+> > switch.
+> >
+> > So while I agree in theory with your remark Ar=C4=B1n=C3=A7, I'm just w=
+ondering if
+> > you had something specific in mind.
+>
+> I was speaking in the sense of all switches with CPU ports, which is
+> controlled by the DSA subsystem on Linux.
+>
+> I am only stating the fact that if we don't take the literal approach wit=
+h
+> hardware descriptions on the driver implementation, there will always be
+> cases where the drivers will fail to support certain hardware designs.
 
-kernel test robot noticed the following build errors:
+Hi Arin=C3=A7,
 
-[auto build test ERROR on net-next/main]
+The old code was already requiring a single switch child node
+describing the internal MDIO bus akin to binding docs. I believe what
+we use to match it, being the name or the compatible string property,
+wouldn't improve the diversity of HW we could support. This series
+doesn't want to solve all issues and limitations nor prepare the
+ground for different HWs. It's mostly a reorganization without nice
+new stuff.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mina-Almasry/vsock-virtio-use-skb_frag_-helpers/20231222-164637
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231220214505.2303297-4-almasrymina%40google.com
-patch subject: [PATCH net-next v3 3/3] net: add netmem_ref to skb_frag_t
-config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20231223/202312230340.iCf8sOop-lkp@intel.com/config)
-compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project d3ef86708241a3bee902615c190dead1638c4e09)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231223/202312230340.iCf8sOop-lkp@intel.com/reproduce)
+After this series, we could easily turn the mdio node optional,
+skipping the MDIO bus when not found. Anyway, if such HW appears just
+now, I believe we could simply workaround it by declaring an empty
+mdio node.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312230340.iCf8sOop-lkp@intel.com/
+Regards,
 
-All errors (new ones prefixed by >>):
-
->> net/kcm/kcmsock.c:637:39: error: no member named 'bv_len' in 'struct skb_frag'
-     637 |                         msize += skb_shinfo(skb)->frags[i].bv_len;
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~ ^
-   1 error generated.
-
-
-vim +637 net/kcm/kcmsock.c
-
-cd6e111bf5be5c Tom Herbert       2016-03-07  578  
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  579  /* Write any messages ready on the kcm socket.  Called with kcm sock lock
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  580   * held.  Return bytes actually sent or error.
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  581   */
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  582  static int kcm_write_msgs(struct kcm_sock *kcm)
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  583  {
-c31a25e1db486f David Howells     2023-06-09  584  	unsigned int total_sent = 0;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  585  	struct sock *sk = &kcm->sk;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  586  	struct kcm_psock *psock;
-c31a25e1db486f David Howells     2023-06-09  587  	struct sk_buff *head;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  588  	int ret = 0;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  589  
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  590  	kcm->tx_wait_more = false;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  591  	psock = kcm->tx_psock;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  592  	if (unlikely(psock && psock->tx_stopped)) {
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  593  		/* A reserved psock was aborted asynchronously. Unreserve
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  594  		 * it and we'll retry the message.
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  595  		 */
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  596  		unreserve_psock(kcm);
-cd6e111bf5be5c Tom Herbert       2016-03-07  597  		kcm_report_tx_retry(kcm);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  598  		if (skb_queue_empty(&sk->sk_write_queue))
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  599  			return 0;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  600  
-c31a25e1db486f David Howells     2023-06-09  601  		kcm_tx_msg(skb_peek(&sk->sk_write_queue))->started_tx = false;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  602  	}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  603  
-c31a25e1db486f David Howells     2023-06-09  604  retry:
-c31a25e1db486f David Howells     2023-06-09  605  	while ((head = skb_peek(&sk->sk_write_queue))) {
-c31a25e1db486f David Howells     2023-06-09  606  		struct msghdr msg = {
-c31a25e1db486f David Howells     2023-06-09  607  			.msg_flags = MSG_DONTWAIT | MSG_SPLICE_PAGES,
-c31a25e1db486f David Howells     2023-06-09  608  		};
-c31a25e1db486f David Howells     2023-06-09  609  		struct kcm_tx_msg *txm = kcm_tx_msg(head);
-c31a25e1db486f David Howells     2023-06-09  610  		struct sk_buff *skb;
-c31a25e1db486f David Howells     2023-06-09  611  		unsigned int msize;
-c31a25e1db486f David Howells     2023-06-09  612  		int i;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  613  
-c31a25e1db486f David Howells     2023-06-09  614  		if (!txm->started_tx) {
-c31a25e1db486f David Howells     2023-06-09  615  			psock = reserve_psock(kcm);
-c31a25e1db486f David Howells     2023-06-09  616  			if (!psock)
-c31a25e1db486f David Howells     2023-06-09  617  				goto out;
-c31a25e1db486f David Howells     2023-06-09  618  			skb = head;
-c31a25e1db486f David Howells     2023-06-09  619  			txm->frag_offset = 0;
-c31a25e1db486f David Howells     2023-06-09  620  			txm->sent = 0;
-c31a25e1db486f David Howells     2023-06-09  621  			txm->started_tx = true;
-c31a25e1db486f David Howells     2023-06-09  622  		} else {
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  623  			if (WARN_ON(!psock)) {
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  624  				ret = -EINVAL;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  625  				goto out;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  626  			}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  627  			skb = txm->frag_skb;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  628  		}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  629  
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  630  		if (WARN_ON(!skb_shinfo(skb)->nr_frags)) {
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  631  			ret = -EINVAL;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  632  			goto out;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  633  		}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  634  
-c31a25e1db486f David Howells     2023-06-09  635  		msize = 0;
-c31a25e1db486f David Howells     2023-06-09  636  		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++)
-c31a25e1db486f David Howells     2023-06-09 @637  			msize += skb_shinfo(skb)->frags[i].bv_len;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  638  
-b2e5852793b6eb Mina Almasry      2023-12-20  639  		/* The cast to struct bio_vec* here assumes the frags are
-b2e5852793b6eb Mina Almasry      2023-12-20  640  		 * struct page based. WARN if there is no page in this skb.
-b2e5852793b6eb Mina Almasry      2023-12-20  641  		 */
-b2e5852793b6eb Mina Almasry      2023-12-20  642  		DEBUG_NET_WARN_ON_ONCE(
-b2e5852793b6eb Mina Almasry      2023-12-20  643  			!skb_frag_page(&skb_shinfo(skb)->frags[0]));
-b2e5852793b6eb Mina Almasry      2023-12-20  644  
-c31a25e1db486f David Howells     2023-06-09  645  		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE,
-b2e5852793b6eb Mina Almasry      2023-12-20  646  			      (const struct bio_vec *)skb_shinfo(skb)->frags,
-b2e5852793b6eb Mina Almasry      2023-12-20  647  			      skb_shinfo(skb)->nr_frags, msize);
-c31a25e1db486f David Howells     2023-06-09  648  		iov_iter_advance(&msg.msg_iter, txm->frag_offset);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  649  
-c31a25e1db486f David Howells     2023-06-09  650  		do {
-264ba53fac79b0 David Howells     2023-06-09  651  			ret = sock_sendmsg(psock->sk->sk_socket, &msg);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  652  			if (ret <= 0) {
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  653  				if (ret == -EAGAIN) {
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  654  					/* Save state to try again when there's
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  655  					 * write space on the socket
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  656  					 */
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  657  					txm->frag_skb = skb;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  658  					ret = 0;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  659  					goto out;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  660  				}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  661  
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  662  				/* Hard failure in sending message, abort this
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  663  				 * psock since it has lost framing
-71a2fae50895b3 Bhaskar Chowdhury 2021-03-27  664  				 * synchronization and retry sending the
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  665  				 * message from the beginning.
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  666  				 */
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  667  				kcm_abort_tx_psock(psock, ret ? -ret : EPIPE,
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  668  						   true);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  669  				unreserve_psock(kcm);
-9f8d0dc0ec4a4b David Howells     2023-06-15  670  				psock = NULL;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  671  
-c31a25e1db486f David Howells     2023-06-09  672  				txm->started_tx = false;
-cd6e111bf5be5c Tom Herbert       2016-03-07  673  				kcm_report_tx_retry(kcm);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  674  				ret = 0;
-c31a25e1db486f David Howells     2023-06-09  675  				goto retry;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  676  			}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  677  
-c31a25e1db486f David Howells     2023-06-09  678  			txm->sent += ret;
-c31a25e1db486f David Howells     2023-06-09  679  			txm->frag_offset += ret;
-cd6e111bf5be5c Tom Herbert       2016-03-07  680  			KCM_STATS_ADD(psock->stats.tx_bytes, ret);
-c31a25e1db486f David Howells     2023-06-09  681  		} while (msg.msg_iter.count > 0);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  682  
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  683  		if (skb == head) {
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  684  			if (skb_has_frag_list(skb)) {
-c31a25e1db486f David Howells     2023-06-09  685  				txm->frag_skb = skb_shinfo(skb)->frag_list;
-c31a25e1db486f David Howells     2023-06-09  686  				txm->frag_offset = 0;
-c31a25e1db486f David Howells     2023-06-09  687  				continue;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  688  			}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  689  		} else if (skb->next) {
-c31a25e1db486f David Howells     2023-06-09  690  			txm->frag_skb = skb->next;
-c31a25e1db486f David Howells     2023-06-09  691  			txm->frag_offset = 0;
-c31a25e1db486f David Howells     2023-06-09  692  			continue;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  693  		}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  694  
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  695  		/* Successfully sent the whole packet, account for it. */
-c31a25e1db486f David Howells     2023-06-09  696  		sk->sk_wmem_queued -= txm->sent;
-c31a25e1db486f David Howells     2023-06-09  697  		total_sent += txm->sent;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  698  		skb_dequeue(&sk->sk_write_queue);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  699  		kfree_skb(head);
-cd6e111bf5be5c Tom Herbert       2016-03-07  700  		KCM_STATS_INCR(psock->stats.tx_msgs);
-c31a25e1db486f David Howells     2023-06-09  701  	}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  702  out:
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  703  	if (!head) {
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  704  		/* Done with all queued messages. */
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  705  		WARN_ON(!skb_queue_empty(&sk->sk_write_queue));
-9f8d0dc0ec4a4b David Howells     2023-06-15  706  		if (psock)
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  707  			unreserve_psock(kcm);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  708  	}
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  709  
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  710  	/* Check if write space is available */
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  711  	sk->sk_write_space(sk);
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  712  
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  713  	return total_sent ? : ret;
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  714  }
-ab7ac4eb9832e3 Tom Herbert       2016-03-07  715  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Luiz
 
