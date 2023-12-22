@@ -1,196 +1,130 @@
-Return-Path: <netdev+bounces-59831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE3B81C2A3
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 02:18:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 422C681C2A8
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 02:19:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFDAE1C21FC4
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 01:17:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B1701F25226
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 01:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F52A50;
-	Fri, 22 Dec 2023 01:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F77A65C;
+	Fri, 22 Dec 2023 01:19:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="g+Tq8jtD"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="r3FR2Ils"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BDFA23
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 01:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33621d443a7so1334486f8f.3
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:17:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F875A41
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 01:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-28c0df4b42eso14599a91.1
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 17:19:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1703207873; x=1703812673; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lk9Vc1mIX7j2zXFqM2XQS4Kz0AH76zHaX+lPmxzhQHQ=;
-        b=g+Tq8jtDUR9i+B+bDbX+3ZZW1Q56ZOpeXkIzkVkXsBzyGk7irLaoLUuqTuGcezgo1Y
-         pGllN+OcFYJMn32kPT6JNjUN3FATaWZ4WtCeY6cso8smjZcmDDwaDhfA05SXFAhzp3Zb
-         9m03xDa1o0fNQsTd+eZJXdO1QaDiuKR/NmGCF7dmh0NWGPWAn+FYhhPP+gXNVQu2jav+
-         xai8T85hF0Ax2zCZl0rDRW88hmcidr6oB3dg3QjwFCj/l1ttKQxJAUP89ByjjpbxyMAE
-         N2lz0vF73F4mcYOVa6KtoJ+VchFsH4FrZQHOvJwP6mZlKmWyhZg61shjyk1e1tGQSn1D
-         kZZQ==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1703207970; x=1703812770; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D6EeMDzilZ/pUpH5h1rkc4Fh1Cz8xn5Zj8+wsdoEnpg=;
+        b=r3FR2IlsF/z9SMtjFda2TQMOAV3ngRwTYKOfXHFOWgyVazM8rHIGD1kFSJEDLUIDvD
+         u6g0Ob8jhOvmEo8M6wrrj+JeVqqY+cvdTv1zYdB0okJ6LG9xa/gke0p5zy9D2xWjUjpr
+         PtBOEuE67YZf6k1Nhcldk8BMaDEPUlrJW4ofS8RF8ll10n3fxoU64DviDergKUueaIo0
+         MHz9X0Y1ZcLzr6GLtIiGdnXUOFKmAOgndKP4yVDVIrES+8PVthkNKlz30UXnhXQSg4Ra
+         zy48F6nuGMx1LHk5G5NNpLjjdXXfapGlQKvEePYrAauTHBxzg2ULhu0RfHEZpEt6ZvZH
+         HYKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703207873; x=1703812673;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lk9Vc1mIX7j2zXFqM2XQS4Kz0AH76zHaX+lPmxzhQHQ=;
-        b=lAbm8bmCr5nmNJ1cUf4DrElqLQd7Pfz8OChgyigi81fmQLc9n86TbRtRXiHOezBHhp
-         v9kLRsH4lPGu7EMa0cofLUuYUcnKJ1w1LD7DGntB8kYu1n2TPnugcG80kOHvk4G5pPbQ
-         caxCjy7njd4wy5RtBtD4/FZ2izzQV+zD1RMGw2Gt+yHR93C+LqgDLM0BimckxZAI2Vvh
-         21JeKA7ccMJlcQela7B4vS331y1gZLvZ4bvoLH+cFDqG7R0+71WSnIcHlSeB5PzWG+7o
-         n2edzupVuf1bdMvSDLaQTPRbvOnB4iPfErZB8wK1gzRQoQ9hUS73mmKWWVrB/4ZzMM72
-         uTrQ==
-X-Gm-Message-State: AOJu0YwGabhuunhhMzG4fXW023J/TXyv05S80px0ePfZxa1NLJELuCuM
-	0QCXmKZDjg15Sv/EetSwejSGqGOD8coj
-X-Google-Smtp-Source: AGHT+IGZwVTodj5gVaeFxy87JYmpFXqpjDmcNC37vMGtpmyoiXSVTCO30ByOyXU1YANWRL760lFBAw==
-X-Received: by 2002:a05:600c:b42:b0:40d:3f4b:1c88 with SMTP id k2-20020a05600c0b4200b0040d3f4b1c88mr261316wmr.244.1703207872904;
-        Thu, 21 Dec 2023 17:17:52 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id bg6-20020a05600c3c8600b00405c7591b09sm5135414wmb.35.2023.12.21.17.17.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Dec 2023 17:17:52 -0800 (PST)
-Message-ID: <05729f32-44ec-416d-963d-5218ca890fb8@arista.com>
-Date: Fri, 22 Dec 2023 01:17:48 +0000
+        d=1e100.net; s=20230601; t=1703207970; x=1703812770;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D6EeMDzilZ/pUpH5h1rkc4Fh1Cz8xn5Zj8+wsdoEnpg=;
+        b=TA5Taq/t8vurHPTnx/+ofiabktMbo5UuqiyX2wBM8sDdZTV9gPEve+YEkfjCOOuqxP
+         zl/bI5N01GTlZS49LxeT8a5TOjtaqwjLmulpPAcki0bpkU7IZ1xXXHTMsbmeztLRmCN7
+         Ugo2VvPfoK2v50pn8HJxghBwXrEbmNaQbxxMDBSCLg2f8z8ANE7Hzy4G3OqsLSgJ88QX
+         jVrm36IVjhqzzxxDITtHOnOj9EyNclsItOWjir7VGSn6jXByhGcD3MEmwhzfsdiLCxxu
+         f4cAn0coJBMY7oOCOGd9v8UJ7sz3fSuqlx4TZIU6QRy4yBVzQ04+NFkwdBn1zfjM6nq4
+         pm0g==
+X-Gm-Message-State: AOJu0Yz9wOJoK3LGolER3oRLrwg35edgaovyaHiGTRpDON1r2402Wht5
+	wbc5Nl0OTn2jRGMKCwVJVCuqkO1bM6zfew==
+X-Google-Smtp-Source: AGHT+IEAgdeCYX9DNslzUtHX4OfVtJfXqbUwBExnZ+MOwXcJzxt1qqFpQ6yaM/9KXVl6e303tVEs+Q==
+X-Received: by 2002:a17:90a:dc03:b0:28b:f32c:7996 with SMTP id i3-20020a17090adc0300b0028bf32c7996mr694945pjv.38.1703207970151;
+        Thu, 21 Dec 2023 17:19:30 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id e9-20020a170902b78900b001cfb4d36eb1sm2248689pls.215.2023.12.21.17.19.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 17:19:29 -0800 (PST)
+Date: Thu, 21 Dec 2023 17:19:26 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
+ dsahern@gmail.com, fw@strlen.de, victor@mojatatu.com
+Subject: Re: [PATCH net-next 1/2] net/sched: Retire ipt action
+Message-ID: <20231221171926.31a88e27@hermes.local>
+In-Reply-To: <6aab67d6-d3cc-42f5-8ec5-dbd439d7886f@mojatatu.com>
+References: <20231221213105.476630-1-jhs@mojatatu.com>
+	<20231221213105.476630-2-jhs@mojatatu.com>
+	<6aab67d6-d3cc-42f5-8ec5-dbd439d7886f@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 net-next 01/23] net/tcp: Prepare tcp_md5sig_pool for
- TCP-AO
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
- Ard Biesheuvel <ardb@kernel.org>, Bob Gilligan <gilligan@arista.com>,
- Dan Carpenter <error27@gmail.com>, David Laight <David.Laight@aculab.com>,
- Dmitry Safonov <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
- Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
- <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
- "Gaillardetz, Dominik" <dgaillar@ciena.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
- "Nassiri, Mohammad" <mnassiri@ciena.com>,
- Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>,
- "Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org,
- Steen Hegelund <Steen.Hegelund@microchip.com>
-References: <20231023192217.426455-1-dima@arista.com>
- <20231023192217.426455-2-dima@arista.com>
- <CANn89i+Uwg87xAS9m8fm1f1daQj-YyugperN3HnvgbB6g+hOuw@mail.gmail.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <CANn89i+Uwg87xAS9m8fm1f1daQj-YyugperN3HnvgbB6g+hOuw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Eric,
+On Thu, 21 Dec 2023 18:38:59 -0300
+Pedro Tammela <pctammela@mojatatu.com> wrote:
 
-On 12/21/23 14:31, Eric Dumazet wrote:
-> On Mon, Oct 23, 2023 at 9:22 PM Dmitry Safonov <dima@arista.com> wrote:
+> On 21/12/2023 18:31, Jamal Hadi Salim wrote:
+> > The tc ipt action was intended to run all netfilter/iptables target.
+> > Unfortunately it has not benefitted over the years from proper updates when
+> > netfilter changes, and for that reason it has remained rudimentary.
+> > Pinging a bunch of people that i was aware were using this indicates that
+> > removing it wont affect them.
+> > Retire it to reduce maintenance efforts. Buh-bye.
+> > 
+> > Reviewed-by: Victor Noguiera <victor@mojatatu.com>
+> > Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> > ---
+
 ...
->> +int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
->> +{
->> +       int i, ret;
->> +
->> +       /* slow-path */
->> +       mutex_lock(&cpool_mutex);
->> +       ret = sigpool_reserve_scratch(scratch_size);
->> +       if (ret)
->> +               goto out;
->> +       for (i = 0; i < cpool_populated; i++) {
->> +               if (!cpool[i].alg)
->> +                       continue;
->> +               if (strcmp(cpool[i].alg, alg))
->> +                       continue;
->> +
->> +               if (kref_read(&cpool[i].kref) > 0)
->> +                       kref_get(&cpool[i].kref);
-> 
-> This sequence is racy.
-> 
-> You must use kref_get_unless_zero().
 
-Thanks for this report, I've sent a trivial fixup here:
-https://lore.kernel.org/all/20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com/T/#u
-
+> > diff --git a/include/uapi/linux/tc_act/tc_ipt.h b/include/uapi/linux/tc_act/tc_ipt.h
+> > deleted file mode 100644
+> > index c48d7da6750d..000000000000
+> > --- a/include/uapi/linux/tc_act/tc_ipt.h
+> > +++ /dev/null
+> > @@ -1,20 +0,0 @@
+> > -/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> > -#ifndef __LINUX_TC_IPT_H
+> > -#define __LINUX_TC_IPT_H
+> > -
+> > -#include <linux/pkt_cls.h>
+> > -
+> > -enum {
+> > -	TCA_IPT_UNSPEC,
+> > -	TCA_IPT_TABLE,
+> > -	TCA_IPT_HOOK,
+> > -	TCA_IPT_INDEX,
+> > -	TCA_IPT_CNT,
+> > -	TCA_IPT_TM,
+> > -	TCA_IPT_TARG,
+> > -	TCA_IPT_PAD,
+> > -	__TCA_IPT_MAX
+> > -};
+> > -#define TCA_IPT_MAX (__TCA_IPT_MAX - 1)
+> > -
+> > -#endif  
 > 
->> +               else
->> +                       kref_init(&cpool[i].kref);
->> +               ret = i;
->> +               goto out;
->> +       }
->> +
->> +
-> 
-> syzbot reported:
-> 
-> refcount_t: addition on 0; use-after-free.
-> WARNING: CPU: 2 PID: 31702 at lib/refcount.c:25
-> refcount_warn_saturate+0x1ca/0x210 lib/refcount.c:25
-> Modules linked in:
-> CPU: 2 PID: 31702 Comm: syz-executor.3 Not tainted
-> 6.7.0-rc6-syzkaller-00044-g1a44b0073b92 #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-> 1.16.2-debian-1.16.2-1 04/01/2014
-> RIP: 0010:refcount_warn_saturate+0x1ca/0x210 lib/refcount.c:25
-> Code: ff 89 de e8 58 a3 25 fd 84 db 0f 85 e6 fe ff ff e8 1b a8 25 fd
-> c6 05 9a 88 a1 0a 01 90 48 c7 c7 00 9d 2e 8b e8 b7 ec eb fc 90 <0f> 0b
-> 90 90 e9 c3 fe ff ff e8 f8 a7 25 fd c6 05 75 88 a1 0a 01 90
-> RSP: 0018:ffffc900296df850 EFLAGS: 00010286
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002c40a000
-> RDX: 0000000000040000 RSI: ffffffff814db526 RDI: 0000000000000001
-> RBP: ffffffff92b5b7b0 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000002 R12: 0000000000000010
-> R13: ffffffff92b5b7b0 R14: 0000000000000001 R15: 0000000000000000
-> FS: 0000000000000000(0000) GS:ffff88802c800000(0063) knlGS:00000000f7efdb40
-> CS: 0010 DS: 002b ES: 002b CR0: 0000000080050033
-> CR2: 00000000f7354000 CR3: 0000000050ee3000 CR4: 0000000000350ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
-> <TASK>
-> __refcount_add include/linux/refcount.h:199 [inline]
-> __refcount_inc include/linux/refcount.h:250 [inline]
-> refcount_inc include/linux/refcount.h:267 [inline]
-> kref_get include/linux/kref.h:45 [inline]
-> tcp_sigpool_alloc_ahash+0x9cb/0xce0 net/ipv4/tcp_sigpool.c:166
-> tcp_md5_alloc_sigpool+0x1b/0x40 net/ipv4/tcp.c:4379
-> tcp_md5_do_add+0x192/0x460 net/ipv4/tcp_ipv4.c:1403
-> tcp_v6_parse_md5_keys+0x68d/0x860 net/ipv6/tcp_ipv6.c:676
-> do_tcp_setsockopt+0x1302/0x2880 net/ipv4/tcp.c:3644
-> tcp_setsockopt+0xd4/0x100 net/ipv4/tcp.c:3726
-> do_sock_setsockopt+0x222/0x470 net/socket.c:2311
-> __sys_setsockopt+0x1a6/0x270 net/socket.c:2334
-> __do_sys_setsockopt net/socket.c:2343 [inline]
-> __se_sys_setsockopt net/socket.c:2340 [inline]
-> __ia32_sys_setsockopt+0xbc/0x150 net/socket.c:2340
-> do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
-> __do_fast_syscall_32+0x62/0xe0 arch/x86/entry/common.c:321
-> do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:346
-> entry_SYSENTER_compat_after_hwframe+0x70/0x7a
-> RIP: 0023:0xf7f02579
-> Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00
-> 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a
-> 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-> RSP: 002b:00000000f7efd5ac EFLAGS: 00000292 ORIG_RAX: 000000000000016e
-> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000000006
-> RDX: 000000000000000e RSI: 0000000020000000 RDI: 00000000000000d8
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000292 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+> Sorry I missed this, wouldn't this break compilation in userspace?
 
-Thanks,
-            Dmitry
-
+Yes, it breaks iproute2 build if tc_ipt.h is removed.
 
