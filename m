@@ -1,249 +1,115 @@
-Return-Path: <netdev+bounces-59891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85B4381C941
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:36:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 078A381C95F
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:50:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF2C12880A3
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 11:36:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B21A1F235D4
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 11:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBAD17983;
-	Fri, 22 Dec 2023 11:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1765612E6A;
+	Fri, 22 Dec 2023 11:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="gNj+mQbT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z3fdMWKz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360E017754
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 11:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40d4a222818so1319005e9.0
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 03:36:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1703244965; x=1703849765; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HsLRo2DIKSewvWiB6cWyV1wSBBaL30FyPbtjX4uqQKY=;
-        b=gNj+mQbTDv8d8dwteG2N4qs+CeyHCVhfvADC8D3YFwuGmQ2Bqi/9ze3aXQeBe2NrgQ
-         /1U8BRrDFfkcwiFAOhTVed9VY/aKqD67Gc0Sgeggzk+F22iU/Re/V2FJMe4/uKCjy0by
-         7S5oem7Ng40/qOpcRY4xqB98jHzzNtskw+Ej/F2Ad1UxQzZutCfke/jSUd+CcB0CwLtL
-         Md95gLewHHnctAk6/D9Z/9WFVL0ouF9PcnXJs91SWSvrN4hosyvt7yubs9sX+cfWQVGr
-         HdkjViFc4uFZE7LyUpMgLeyiqXCOR/8I4EWy/ag/rseBcnqJZvzDmlGrJB774h01Quux
-         QyTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703244965; x=1703849765;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HsLRo2DIKSewvWiB6cWyV1wSBBaL30FyPbtjX4uqQKY=;
-        b=M/suyp/hl5PsbHJNVkaZyJI6GJiRXO4pbfQkYG6VE9udRbVQOcFgbHW2FSNfmXLP9N
-         TzbBhhhWpoUhLPi043oQHuZaS0wiBxlZ3aHqbefZ7kBeqMYV0QvO2U7k4IuTgW2OopDf
-         Ft7/5VsdWT4HBnacMYlXEUtPwrtkuUGdjjn36Mf8IfQvRqJncDc8rQB1MbDTcb1WfzzX
-         Clblhd/pma/7dZKeB9a/j9PUxHC1q3HPlsedh/TxSrseSULjp0bZofP90ULyS6I/qbNP
-         q0Uw9B6IMcEHY30y5kN3fZIWQR5awVnB3MQS3PKzznZ/HqiH2Mj23ySpm3uGNT2dlnnQ
-         rMNw==
-X-Gm-Message-State: AOJu0YzeLZuNU79iVI+mauOO5THrs0moYN62alSFfPUwsxZbasntGxiZ
-	dnAeLRKSx8Fz72Jzvnr18rKzy+U3ksuxtw==
-X-Google-Smtp-Source: AGHT+IFcFPeDA0acQZKW640OyJDex0TiliPYaarL2xbU38P0SMq4rAADkwLj6sp9yQWME4bXCha9BQ==
-X-Received: by 2002:a05:600c:4683:b0:40d:427e:9b12 with SMTP id p3-20020a05600c468300b0040d427e9b12mr656598wmo.132.1703244965378;
-        Fri, 22 Dec 2023 03:36:05 -0800 (PST)
-Received: from claudiu-X670E-Pro-RS.. ([82.78.167.124])
-        by smtp.gmail.com with ESMTPSA id fl6-20020a05600c0b8600b0040b30be6244sm6802472wmb.24.2023.12.22.03.36.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 03:36:05 -0800 (PST)
-From: Claudiu <claudiu.beznea@tuxon.dev>
-X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
-To: s.shtylyov@omp.ru,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	yoshihiro.shimoda.uh@renesas.com,
-	wsa+renesas@sang-engineering.com,
-	mitsuhiro.kimura.kc@renesas.com
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	claudiu.beznea@tuxon.dev,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH net v2 1/1] net: ravb: Wait for operation mode to be applied
-Date: Fri, 22 Dec 2023 13:35:52 +0200
-Message-Id: <20231222113552.2049088-2-claudiu.beznea.uj@bp.renesas.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231222113552.2049088-1-claudiu.beznea.uj@bp.renesas.com>
-References: <20231222113552.2049088-1-claudiu.beznea.uj@bp.renesas.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8904517984
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 11:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703245800;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b2Kc5SDyR2sa98m7GGfG0OJjTCYVmXAF9D404GjbeCw=;
+	b=Z3fdMWKzmq9xFsgzjCyz7FmcfkE5bkyrFKDmlgPZywArH41lN6tW1ez1MpCNx9yVDhBtWt
+	QfCENsiBuK4uIlX2gwelTb/rOs0JzYfK+8Md2RfmpDUoQjfU9D31ZMBrTYFMT8eSpYAv1Z
+	aROca5jeXbu5xgZQss6gJMRTl6AziO8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-399-gMeN3nQqMpKa8ASINIbPcw-1; Fri, 22 Dec 2023 06:49:57 -0500
+X-MC-Unique: gMeN3nQqMpKa8ASINIbPcw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2C45868A20;
+	Fri, 22 Dec 2023 11:49:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 71FCC2026D66;
+	Fri, 22 Dec 2023 11:49:52 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20231221230153.GA1607352@dev-arch.thelio-3990X>
+References: <20231221230153.GA1607352@dev-arch.thelio-3990X> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-38-dhowells@redhat.com>
+To: Nathan Chancellor <nathan@kernel.org>,
+    Anna Schumaker <Anna.Schumaker@Netapp.com>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 37/40] netfs: Optimise away reads above the point at which there can be no data
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2202547.1703245791.1@warthog.procyon.org.uk>
+Date: Fri, 22 Dec 2023 11:49:51 +0000
+Message-ID: <2202548.1703245791@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Nathan Chancellor <nathan@kernel.org> wrote:
 
-CSR.OPS bits specify the current operating mode and (according to
-documentation) they are updated by HW when the operating mode change
-request is processed. To comply with this check CSR.OPS before proceeding.
+> It appears that ctx->inode.i_mapping is NULL in netfs_inode_init(). This
+> patch appears to cure the problem for me but I am not sure if it is
+> proper or not.
 
-Commit introduces ravb_set_opmode() that does all the necessities for
-setting the operating mode (set DMA.CCC and wait for CSR.OPS) and call it
-where needed. This should comply with all the HW manuals requirements as
-different manual variants specify that different modes need to be checked
-in CSR.OPS when setting DMA.CCC.
+I'm not sure that's the best way.  It kind of indicates that
+nfs_netfs_inode_init() is not being called in the right place - it should
+really be called after alloc_inode() has called inode_init_always().
 
-Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
----
- drivers/net/ethernet/renesas/ravb_main.c | 52 ++++++++++++++----------
- 1 file changed, 31 insertions(+), 21 deletions(-)
+However, mapping_set_release_always() makes ->release_folio() and
+->invalidate_folio() always called for an inode's folios, even if PG_private
+is not set - the idea being that this allows netfslib to update the
+"zero_point" when a page we've written to the server gets invalidated here,
+thereby requiring us to go fetch it again.
 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 664eda4b5a11..ae99d035a3b6 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -66,14 +66,15 @@ int ravb_wait(struct net_device *ndev, enum ravb_reg reg, u32 mask, u32 value)
- 	return -ETIMEDOUT;
- }
- 
--static int ravb_config(struct net_device *ndev)
-+static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
- {
-+	u32 csr_opmode = 1UL << opmode;
- 	int error;
- 
--	/* Set config mode */
--	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
--	/* Check if the operating mode is changed to the config mode */
--	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
-+	/* Set operating mode */
-+	ravb_modify(ndev, CCC, CCC_OPC, opmode);
-+	/* Check if the operating mode is changed to the requested one */
-+	error = ravb_wait(ndev, CSR, CSR_OPS, csr_opmode);
- 	if (error)
- 		netdev_err(ndev, "failed to switch device to config mode\n");
- 
-@@ -673,7 +674,7 @@ static int ravb_dmac_init(struct net_device *ndev)
- 	int error;
- 
- 	/* Set CONFIG mode */
--	error = ravb_config(ndev);
-+	error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- 	if (error)
- 		return error;
- 
-@@ -682,9 +683,7 @@ static int ravb_dmac_init(struct net_device *ndev)
- 		return error;
- 
- 	/* Setting the control will start the AVB-DMAC process. */
--	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_OPERATION);
--
--	return 0;
-+	return ravb_set_opmode(ndev, CCC_OPC_OPERATION);
- }
- 
- static void ravb_get_tx_tstamp(struct net_device *ndev)
-@@ -1046,7 +1045,7 @@ static int ravb_stop_dma(struct net_device *ndev)
- 		return error;
- 
- 	/* Stop AVB-DMAC process */
--	return ravb_config(ndev);
-+	return ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- }
- 
- /* E-MAC interrupt handler */
-@@ -2560,21 +2559,23 @@ static int ravb_set_gti(struct net_device *ndev)
- 	return 0;
- }
- 
--static void ravb_set_config_mode(struct net_device *ndev)
-+static int ravb_set_config_mode(struct net_device *ndev)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	const struct ravb_hw_info *info = priv->info;
-+	int error;
- 
- 	if (info->gptp) {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- 		/* Set CSEL value */
- 		ravb_modify(ndev, CCC, CCC_CSEL, CCC_CSEL_HPB);
- 	} else if (info->ccc_gac) {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG |
--			    CCC_GAC | CCC_CSEL_HPB);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
- 	} else {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- 	}
-+
-+	return error;
- }
- 
- /* Set tx and rx clock internal delay modes */
-@@ -2794,7 +2795,9 @@ static int ravb_probe(struct platform_device *pdev)
- 	ndev->ethtool_ops = &ravb_ethtool_ops;
- 
- 	/* Set AVB config mode */
--	ravb_set_config_mode(ndev);
-+	error = ravb_set_config_mode(ndev);
-+	if (error)
-+		goto out_disable_gptp_clk;
- 
- 	if (info->gptp || info->ccc_gac) {
- 		/* Set GTI value */
-@@ -2902,6 +2905,7 @@ static void ravb_remove(struct platform_device *pdev)
- 	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	const struct ravb_hw_info *info = priv->info;
-+	int error;
- 
- 	unregister_netdev(ndev);
- 	if (info->nc_queues)
-@@ -2917,8 +2921,9 @@ static void ravb_remove(struct platform_device *pdev)
- 	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
- 			  priv->desc_bat_dma);
- 
--	/* Set reset mode */
--	ravb_write(ndev, CCC_OPC_RESET, CCC);
-+	error = ravb_set_opmode(ndev, CCC_OPC_RESET);
-+	if (error)
-+		netdev_err(ndev, "Failed to reset ndev\n");
- 
- 	clk_disable_unprepare(priv->gptp_clk);
- 	clk_disable_unprepare(priv->refclk);
-@@ -3000,8 +3005,11 @@ static int __maybe_unused ravb_resume(struct device *dev)
- 	int ret = 0;
- 
- 	/* If WoL is enabled set reset mode to rearm the WoL logic */
--	if (priv->wol_enabled)
--		ravb_write(ndev, CCC_OPC_RESET, CCC);
-+	if (priv->wol_enabled) {
-+		ret = ravb_set_opmode(ndev, CCC_OPC_RESET);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	/* All register have been reset to default values.
- 	 * Restore all registers which where setup at probe time and
-@@ -3009,7 +3017,9 @@ static int __maybe_unused ravb_resume(struct device *dev)
- 	 */
- 
- 	/* Set AVB config mode */
--	ravb_set_config_mode(ndev);
-+	ret = ravb_set_config_mode(ndev);
-+	if (ret)
-+		return ret;
- 
- 	if (info->gptp || info->ccc_gac) {
- 		/* Set GTI value */
--- 
-2.39.2
+Now, NFS doesn't make use of this feature and fscache and cachefiles don't use
+it directly, so we might not want to call mapping_set_release_always() for
+NFS.
+
+I'm not sure NFS can even reliably make use of it unless it's using a lease
+unless it gets change notifications from the server.
+
+So I'm thinking of applying your patch but add a comment to say why we're
+doing it.  A better way, though, is to move the call to nfs_netfs_inode_init()
+and give it a flag to say whether or not we want the facility.
+
+David
 
 
