@@ -1,83 +1,76 @@
-Return-Path: <netdev+bounces-59935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBEE481CB64
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:35:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 096F081CB76
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:45:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80807285625
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:35:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B9111C22176
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6C71D55D;
-	Fri, 22 Dec 2023 14:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8C322F1B;
+	Fri, 22 Dec 2023 14:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XId1mLs9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CbXjkuss"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA50820B3E;
-	Fri, 22 Dec 2023 14:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B997B22F04;
+	Fri, 22 Dec 2023 14:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cc6eecd319so23373291fa.1;
-        Fri, 22 Dec 2023 06:35:18 -0800 (PST)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ccae380df2so4886101fa.1;
+        Fri, 22 Dec 2023 06:45:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703255717; x=1703860517; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703256302; x=1703861102; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=19330V05jnim9tqHKI81rhlyn9YLwEeYkPtMUaA5/Ts=;
-        b=XId1mLs9waS/iCPC0kdr8be+cCgUTBuwqHek5XDM7nAJe85rUPPaeBD9mWbAfeDTml
-         VJ5GYechl4HLIvhPrxcjT1kt4f1ElLtW2RFY5MmzRMKU/Whx/j+HmbeThrfUrBtk5WP1
-         zxEvdPbjPbKnyr/1/i8RGeg02q+Et6DY4sgG4StOqls+8ExuBy4wHS4SnGbSosFmoL4i
-         hVX/WUDfzfWQvWoPmzqaC3mrepP5jnN1/1RswLrHlBp8RyITfSZkR97r5sCcIsnSJVgJ
-         n0ayGRkRc48PoxBCSOqMq+qtgLR4CVqQvu2Xk1ogv0BembC/SI7pvwHtARJrtl/PwMoP
-         el6Q==
+        bh=yGdflJjpqTzGgrTpB9z3udClEdTa0y2wd5bxJETyASg=;
+        b=CbXjkuss0JXiAm6ZeQOZ4QYG1YKHykCR9PluzsYQBvwoD72tnrKY2//UpjuuwPywfo
+         K0xYO32frS6d1B1AfV+FOSBjjlvS+Z0JCn3XDmnv5uUdTN38x4Sz7NIZAhJ+pZjPejdZ
+         7KDZzlqcsf736KQgCNMxolOtoVtD2N8wlNKd81UJsAjgyOftnVRMArhwJScn/8dp5Owz
+         XeVVXY7OX4BG04rT+HafufhEbltl5c/jGI+hhiVVXAISZN8jlKJH8ISqrLX65kqSkFgi
+         6Fxlt4rhtSgvFp075yrlghJwgO2v011/bt+Egn+HwsPvLgGMdFlmPbvi4YsPiuq5V/AY
+         fjng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703255717; x=1703860517;
+        d=1e100.net; s=20230601; t=1703256302; x=1703861102;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=19330V05jnim9tqHKI81rhlyn9YLwEeYkPtMUaA5/Ts=;
-        b=cpC21A3DGNlZyKvfbewbYwS4yiEjPEbgtbmy3cZRj1ORyXZ/sSpVFqZOhv0tI0PPNG
-         GDs6s9ok+nPCdQYtmQXFrPADFjcM0FBaUIbkVJURbZBwkTuDFy6gD1l/6+wSVX8s8JVb
-         8Zy0gx6PQtUdI2QTGPDrdWmEvzNKOVaY0PhTwA1GeElcKdY5K/LF3agzDOXG0o4x5kdF
-         xUZXMhQkn+RBxQ81YNfQ8yneWBshcQAcJgwbnd3WdlcPC38wQLll8F4JXtdMRxId49Rb
-         MOuEfxmMLesYLSU1e8y3lhblzWqYXMjAtAGqQ9RmzVIyuQpWjH1FCLqgLEazbzpTzJl9
-         TtTQ==
-X-Gm-Message-State: AOJu0Yz3yFg4Ako3k8m2E9KxNiPH13c1ozCU7ujjw0n68E2aEWITRZvt
-	aO8+bIMJxt4gOZK0BQG5DR0=
-X-Google-Smtp-Source: AGHT+IFlxZdfsMnhVXkg7K6QHgzJwzt8L6U+FZduAFeGCwFFfJVANfYA42Q8L/dP9lI4kDiqivutKQ==
-X-Received: by 2002:a2e:a418:0:b0:2cc:96fd:b79e with SMTP id p24-20020a2ea418000000b002cc96fdb79emr812350ljn.33.1703255716554;
-        Fri, 22 Dec 2023 06:35:16 -0800 (PST)
+        bh=yGdflJjpqTzGgrTpB9z3udClEdTa0y2wd5bxJETyASg=;
+        b=LQl9LNmqOPbHoMa3YsBf9L04LN/02ZsYZrfCgVqW7ImCXKcqUQG5csj1aXArdAt6Wl
+         KcyZWzTX8zsW074uvmAOp/EU6FRh9mAHsUJF9FjRPo6I4j9erq7YqcRK0TRpxmFbvl43
+         igupZPCe6AbMTnpP8J4dVXpN9DoBILkEstYomdj4jn5KHtBgHo5QGF01idAmbAzihNi/
+         sSagz+gGJxatvtzOpE6lf8/MQIqHJiKLggfFZ4W0XFNLvXhgSLKmZj9QRAWjnA5Q+xiQ
+         T4q//tlIiy5RrJwMLyaonOX9tETOnvQyF76CVb3Rjmkk8eBlkbsLBxRRcgCdyLnDFZqk
+         BEpg==
+X-Gm-Message-State: AOJu0Yyg4wYksSeeNkitL9eGOvpX7378KJ8GvqjFTf6e4g0gKXw0lCRB
+	mnSjM1nYVr6kKte5Uuhucck=
+X-Google-Smtp-Source: AGHT+IFQ7bVzkfn7UHoPdtCntTVZBHNA/6WaE0c0joJuTXolxhHj6vDvJOSq0tamCojdPZB333Wu0g==
+X-Received: by 2002:a2e:8742:0:b0:2cc:620e:873 with SMTP id q2-20020a2e8742000000b002cc620e0873mr665971ljj.15.1703256301472;
+        Fri, 22 Dec 2023 06:45:01 -0800 (PST)
 Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id p25-20020a2e9ad9000000b002ccaddac048sm161994ljj.64.2023.12.22.06.35.14
+        by smtp.gmail.com with ESMTPSA id d18-20020a2eb052000000b002cc6c35aa5bsm616191ljl.128.2023.12.22.06.45.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 06:35:15 -0800 (PST)
-Date: Fri, 22 Dec 2023 17:35:12 +0300
+        Fri, 22 Dec 2023 06:45:01 -0800 (PST)
+Date: Fri, 22 Dec 2023 17:44:58 +0300
 From: Serge Semin <fancer.lancer@gmail.com>
-To: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+To: Leong Ching Swee <leong.ching.swee@intel.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	Prasad Sodagudi <psodagud@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>, 
-	Rob Herring <robh@kernel.org>, kernel@quicinc.com
-Subject: Re: [PATCH net-next v8 3/3] net: stmmac: Add driver support for
- DWMAC5 common safety IRQ
-Message-ID: <xdcrwxh7e4t2zkgdcfwzjr2z4ouwgv3vr4drwvshadxmpwyqkd@j3kj3p2u7nd7>
-References: <20231221073620.232619-1-quic_jsuraj@quicinc.com>
- <20231221073620.232619-4-quic_jsuraj@quicinc.com>
- <yromhtr73rwsr6hizr4tq37vfvyzfue7wzpmufqyscwspzffza@uhfcrn573acd>
- <aec2dc6a-ffa4-4753-a764-77dfe1af995a@quicinc.com>
+	Conor Dooley <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v1 0/4] net: stmmac: Enable Per DMA Channel
+ interrupt
+Message-ID: <kmmjm4sf5geudch54nmehl3ibkpwvlgbhpf7y6quhqy3gnqg32@gcvwlvzec6pn>
+References: <20231222054451.2683242-1-leong.ching.swee@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,216 +79,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aec2dc6a-ffa4-4753-a764-77dfe1af995a@quicinc.com>
+In-Reply-To: <20231222054451.2683242-1-leong.ching.swee@intel.com>
 
-On Fri, Dec 22, 2023 at 02:13:49PM +0530, Suraj Jaiswal wrote:
-> HI Serge,
-> please find commnet inline.
+Hi Leong
+
+On Fri, Dec 22, 2023 at 01:44:47PM +0800, Leong Ching Swee wrote:
+> From: Swee Leong Ching <leong.ching.swee@intel.com>
 > 
-> Thanks
-> Suraj
-> 
-> On 12/21/2023 6:19 PM, Serge Semin wrote:
-> > Hi Suraj
-> > 
-> > On Thu, Dec 21, 2023 at 01:06:20PM +0530, Suraj Jaiswal wrote:
-> >> Add support to listen HW safety IRQ like ECC(error
-> >> correction code), DPP(data path parity), FSM(finite state
-> >> machine) fault in common IRQ line.
-> >>
-> >> Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-> > 
-> > Thanks for taking my notes into account. One more comment is further
-> > below.
-> > 
-> >> ---
-> >>  drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
-> >>  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  3 ++
-> >>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 37 +++++++++++++++++++
-> >>  .../ethernet/stmicro/stmmac/stmmac_platform.c |  8 ++++
-> >>  4 files changed, 49 insertions(+)
-> >>
-> >> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-> >> index 721c1f8e892f..b9233b09b80f 100644
-> >> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> >> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> >> @@ -344,6 +344,7 @@ enum request_irq_err {
-> >>  	REQ_IRQ_ERR_ALL,
-> >>  	REQ_IRQ_ERR_TX,
-> >>  	REQ_IRQ_ERR_RX,
-> >> +	REQ_IRQ_ERR_SFTY,
-> >>  	REQ_IRQ_ERR_SFTY_UE,
-> >>  	REQ_IRQ_ERR_SFTY_CE,
-> >>  	REQ_IRQ_ERR_LPI,
-> >> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> >> index 9f89acf31050..ca3d93851bed 100644
-> >> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> >> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> >> @@ -31,6 +31,7 @@ struct stmmac_resources {
-> >>  	int wol_irq;
-> >>  	int lpi_irq;
-> >>  	int irq;
-> >> +	int sfty_irq;
-> >>  	int sfty_ce_irq;
-> >>  	int sfty_ue_irq;
-> >>  	int rx_irq[MTL_MAX_RX_QUEUES];
-> >> @@ -297,6 +298,7 @@ struct stmmac_priv {
-> >>  	void __iomem *ptpaddr;
-> >>  	void __iomem *estaddr;
-> >>  	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
-> >> +	int sfty_irq;
-> >>  	int sfty_ce_irq;
-> >>  	int sfty_ue_irq;
-> >>  	int rx_irq[MTL_MAX_RX_QUEUES];
-> >> @@ -305,6 +307,7 @@ struct stmmac_priv {
-> >>  	char int_name_mac[IFNAMSIZ + 9];
-> >>  	char int_name_wol[IFNAMSIZ + 9];
-> >>  	char int_name_lpi[IFNAMSIZ + 9];
-> >> +	char int_name_sfty[IFNAMSIZ + 10];
-> >>  	char int_name_sfty_ce[IFNAMSIZ + 10];
-> >>  	char int_name_sfty_ue[IFNAMSIZ + 10];
-> >>  	char int_name_rx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 14];
-> >> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> >> index 47de466e432c..7d4e827dfeab 100644
-> >> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> >> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> >> @@ -3592,6 +3592,10 @@ static void stmmac_free_irq(struct net_device *dev,
-> >>  		if (priv->wol_irq > 0 && priv->wol_irq != dev->irq)
-> >>  			free_irq(priv->wol_irq, dev);
-> >>  		fallthrough;
-> >> +	case REQ_IRQ_ERR_SFTY:
-> >> +		if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq)
-> >> +			free_irq(priv->sfty_irq, dev);
-> >> +		fallthrough;
-> >>  	case REQ_IRQ_ERR_WOL:
-> >>  		free_irq(dev->irq, dev);
-> >>  		fallthrough;
-> >> @@ -3661,6 +3665,23 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
-> >>  		}
-> >>  	}
-> >>  
-> >> +	/* Request the common Safety Feature Correctible/Uncorrectible
-> >> +	 * Error line in case of another line is used
-> >> +	 */
-> >> +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
-> >> +		int_name = priv->int_name_sfty;
-> >> +		sprintf(int_name, "%s:%s", dev->name, "safety");
-> >> +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
-> >> +				  0, int_name, dev);
-> >> +		if (unlikely(ret < 0)) {
-> >> +			netdev_err(priv->dev,
-> >> +				   "%s: alloc sfty MSI %d (error: %d)\n",
-> >> +				   __func__, priv->sfty_irq, ret);
-> >> +			irq_err = REQ_IRQ_ERR_SFTY;
-> >> +			goto irq_error;
-> >> +		}
-> >> +	}
-> >> +
-> >>  	/* Request the Safety Feature Correctible Error line in
-> >>  	 * case of another line is used
-> >>  	 */
-> >> @@ -3798,6 +3819,21 @@ static int stmmac_request_irq_single(struct net_device *dev)
-> >>  		}
-> >>  	}
-> >>  
-> >> +	/* Request the common Safety Feature Correctible/Uncorrectible
-> >> +	 * Error line in case of another line is used
-> >> +	 */
-> >> +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
-> > 
-> >> +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
-> >> +				  IRQF_SHARED, dev->name, dev);
-> > 
-> > Just noticed yesterday that stmmac_safety_interrupt() is also called
-> > from the stmmac_interrupt() handler which is supposed to be registered
-> > on the generic "mac" IRQ. Won't it cause races around the CSRs
-> > (doubtfully but still worth to note) and the errors handling
-> > (stmmac_global_err()) in case if both IRQs are raised simultaneously?
-> > At the very least it looks suspicious and worth double-checking.
-> > 
-> > I also found out that nobody seemed to care that the same handler is
-> > registered on MAC, WoL and LPI IRQ lines. Hmm, no race-related
-> > problems have been reported so far for the platforms with separate
-> > WoL/LPI IRQs. It's either a lucky coincident or the IRQs are always
-> > assigned to the same CPU or the IRQs handle is indeed free of races.
-> > In anyway it looks suspicious too. At the very least AFAICS the DMA
-> > IRQ-handler is indeed racy on the status CSR access. It isn't
-> > cleared-on-read, but write-one-to-clear. So the statistics might be
-> > calculated more than once for the same CSR state. There might be some
-> > other problems I failed to spot on the first glance.
-> > 
-> > David, Eric, Jacub, Paolo, your opinion about the note above?
-> > 
-> > -Serge(y)
-> > 
+> Hi,
+> Add Per DMA Channel interrupt feature for DWXGMAC IP.
+>  
+> Patchset (link below) contains per DMA channel interrupt, But it was 
+> achieved.
+> https://lore.kernel.org/lkml/20230821203328.GA2197059-
+> robh@kernel.org/t/#m849b529a642e1bff89c05a07efc25d6a94c8bfb4
+>  
+> Some of the changes in this patchset are based on reviewer comment on 
+> patchset mentioned beforehand.
 
-> <Suraj> We are adding common IRQ similar to already present code for correcteable/uncorrecable https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L3592.
-
-From that perspective your change in stmmac_request_irq_multi_msi() is
-correct, but stmmac_request_irq_single() is another story. The first
-one method implies assigning the individual IRQ handlers to all
-available lines. The later method assigns the _common_ handler to all
-the lines. The common handler already calls the Safety IRQ handler -
-stmmac_safety_feat_interrupt(). So should the safety IRQ line is
-separately available it's possible to have the Safety IRQ handlers
-executed concurrently - in framework of the common IRQ events handling
-(if safety IRQ is raised during the common IRQ being handled) and
-individual Safety IRQ. It's prune to the race condition I pointed out
-to in my message above. Did you consider that problem?
-
-> Also, we need the sfty IRQ handling as soon as the fault occured & that can only be handled if we have handler attached with sfty IRQ.
-> stmmac_interrupt() will only be triggerd when interrupt triggered for rx/tx packet .
-> while registerting with sfty IRQ will get triggered as soon as emac HW detect the fault. 
-
-Please read my comment more carefully. The safety IRQ can be raised
-during the common IRQ handling, thus the
-stmmac_safety_feat_interrupt() method might get to be concurrently
-executed.
+Thanks for resubmitting the patches. At some point in the past they
+saved me some time in fixing the DW XGMAC on my platform.
 
 -Serge(y)
 
->    
-> >> +		if (unlikely(ret < 0)) {
-> >> +			netdev_err(priv->dev,
-> >> +				   "%s: ERROR: allocating the sfty IRQ %d (%d)\n",
-> >> +				   __func__, priv->sfty_irq, ret);
-> >> +			irq_err = REQ_IRQ_ERR_SFTY;
-> >> +			goto irq_error;
-> >> +		}
-> >> +	}
-> >> +
-> >>  	return 0;
-> >>  
-> >>  irq_error:
-> >> @@ -7462,6 +7498,7 @@ int stmmac_dvr_probe(struct device *device,
-> >>  	priv->dev->irq = res->irq;
-> >>  	priv->wol_irq = res->wol_irq;
-> >>  	priv->lpi_irq = res->lpi_irq;
-> >> +	priv->sfty_irq = res->sfty_irq;
-> >>  	priv->sfty_ce_irq = res->sfty_ce_irq;
-> >>  	priv->sfty_ue_irq = res->sfty_ue_irq;
-> >>  	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
-> >> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> >> index 70eadc83ca68..ab250161fd79 100644
-> >> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> >> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> >> @@ -743,6 +743,14 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
-> >>  		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
-> >>  	}
-> >>  
-> >> +	stmmac_res->sfty_irq =
-> >> +		platform_get_irq_byname_optional(pdev, "sfty");
-> >> +	if (stmmac_res->sfty_irq < 0) {
-> >> +		if (stmmac_res->sfty_irq == -EPROBE_DEFER)
-> >> +			return -EPROBE_DEFER;
-> >> +		dev_info(&pdev->dev, "IRQ safety IRQ not found\n");
-> >> +	}
-> >> +
-> >>  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
-> >>  
-> >>  	return PTR_ERR_OR_ZERO(stmmac_res->addr);
-> >> -- 
-> >> 2.25.1
-> >>
-> >>
+> 
+> Swee Leong Ching (4):
+>   dt-bindings: net: snps,dwmac: per channel irq
+>   net: stmmac: Make MSI interrupt routine generic
+>   net: stmmac: Add support for TX/RX channel interrupt
+>   net: stmmac: Use interrupt mode INTM=1 for per channel irq
+> 
+>  .../devicetree/bindings/net/snps,dwmac.yaml   | 24 ++++++++++----
+>  .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  4 +--
+>  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  2 +-
+>  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 ++
+>  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 32 +++++++++++--------
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 29 +++++++++--------
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c | 24 ++++++++++++++
+>  include/linux/stmmac.h                        |  4 +--
+>  8 files changed, 84 insertions(+), 38 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
+> 
 
