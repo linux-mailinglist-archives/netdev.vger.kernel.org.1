@@ -1,156 +1,91 @@
-Return-Path: <netdev+bounces-59946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFDBD81CD76
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:05:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7540181CD77
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EE921C21209
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:05:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 170882841E4
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFEA286B5;
-	Fri, 22 Dec 2023 17:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E03A24B5D;
+	Fri, 22 Dec 2023 17:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gg4GBzNz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xf5ySuHd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A38F2554E
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 17:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3A02554F
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 17:08:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso13400a12.1
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 09:05:15 -0800 (PST)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso13465a12.1
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 09:08:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703264713; x=1703869513; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1703264931; x=1703869731; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=suT3rRgCdZ72g5cYYKn0C20yE9EAeFYJlJ8TGpajvHU=;
-        b=Gg4GBzNzBm12efBFQIsZh5+eHzc2buvpmKSk15OBOy6NPzsLWXTfPJG2cFxoN21Oq0
-         oTDmVRfzfYZ/0uLCcV/mtxwD3OTiyDDN/dkk77WxjnA3GWHzj1wyHwPO9J8Xu8Mh1g9u
-         UEM18noP3vW+gbceNPFj0yD1nKdQ+o3tKQTay8bp1tOJvVMJ8ZY2JhIl4TzXuCAbJDje
-         S9deQ9rcfFjz63pt5cRMGQBJIBesk4+fE3d2M9pn6caQ/CUIK/zO+CZu8RoQ/e83RqHs
-         gki3DtKCHUbTQAqC3TjJfdanf28UiodCwqQuBRo8RFkZNCcTUfuxo/ww0cz313vC/gXL
-         UHlQ==
+        bh=jvL3+601FO4FmDW7IiGM8+XlQhIFBVTWGDHRzdI2Dvg=;
+        b=xf5ySuHdhHPJbS/p7B8Yi/wVKVNyga/85BswprStLYqXih6hpGKDsbtUlB/KzJbg5w
+         lj+KJaHLY77TwwvK20/Y52S8P/xosT8jSTdRpJvO7SwFMapdRY4s+J0TCt+wtbmBBdpe
+         QF0o/iSwWYV3w5j+jZNWWiMlZZvQCACt+/ifd8rXbYco1lspC2HU4NsIiqxLGToMJ7Bc
+         q9cjL62nZNGfQU7EUHRPQRzelOgTKwFj6SYGZsSjVg3rL+S6jDVEG0wm/6Q+0XssRa+V
+         XbA2sGlLCVYOWQcSaScmkHi7x9lwvgfXjNG4ZpESNnYcHDByMmVA4ecCjMZgvMqa8hcN
+         VT3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703264713; x=1703869513;
+        d=1e100.net; s=20230601; t=1703264931; x=1703869731;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=suT3rRgCdZ72g5cYYKn0C20yE9EAeFYJlJ8TGpajvHU=;
-        b=RmTNjU840qLPaiIcLfbu6KSwpK6PDdPd72xywuz9VLWwBbN0wkUhsXRsIUL5hyul4W
-         DNqNNUJmTepODvtMUOF3KXdAjOxvjiwdzoO4vfxcu+FXh4A+AxtyQyAivg5mFXgiDdKU
-         iNyglulRx4Ot34SID2Xlj1qoboJ0Q94/rw3gariRAKDbKKlvbZwiquXEo2M5m6+S9gWC
-         SyaicKhKKUIV+EQp46NjbeiKeqX/EoguXiN9uB1bUzmDYpdQ+SxTtMcbodLf6r3w3HfJ
-         27z4CbMA+IvuW2SIr9cXiQ+Vo46tsM2iE8KVg0mGv4gPv5ROiesVGNTkr/YxjslZbY/0
-         fr9A==
-X-Gm-Message-State: AOJu0YzplVeZw033LQZ2kasQFkGSKBDj6vN1VikqRaBjY9NxlC2ksIZV
-	LgBbOhWdPctzonBpZUit9DMP997IYCrg8s/5vkMs5uZl+HkF
-X-Google-Smtp-Source: AGHT+IGVZYTZt8K/6qsHfHXTAIqzF7GU9bRgBpioItOpJDdxHMExq54P4yO7KE1C3x5MnavFyTRv0sGeMt20TpodsoA=
-X-Received: by 2002:a50:9310:0:b0:553:773b:b7b2 with SMTP id
- m16-20020a509310000000b00553773bb7b2mr150640eda.6.1703264713356; Fri, 22 Dec
- 2023 09:05:13 -0800 (PST)
+        bh=jvL3+601FO4FmDW7IiGM8+XlQhIFBVTWGDHRzdI2Dvg=;
+        b=EWzqmhvWK3UlF9EsL3NVNqkVzMVw8OJT8SySDnj/d4787R/AHeDkGn9dXw9xN2tbOI
+         pT2cs2fr5MnWMxq33JggrIY4DIk6khgKPOp+tD74JNPljfTcLu7N4+rffAvvTnYUD0fW
+         f+MIZs4zA+btM6gL3UgAkVIMPMGRvFxhbsjYW9tbswPn6CZxgtQPBAzKEnLD2Pp8IOnP
+         VQvgRLVpeJT4g3oER9xFYaNK4TAKXZRBzowv0Qky/eFv/9jbooEujMPeqLUy+CscWaJY
+         toEw5h/4/9M7qCQCAVyd372fL0Da8i8Vq8oC7QHp5LYbeWR9BrhZdfzknDa0S1xm9MJZ
+         m3Vw==
+X-Gm-Message-State: AOJu0Ywl0T31j9Ovd0EEwEPt49Hr1q+zoIiTM5qRsb9xF2E6qDJEiQ+j
+	03qun50ZnJLI5wFXlTqY156evUZRjgzfhbHXe1j8dt7zQC0w79oE+0UHehn8diEC
+X-Google-Smtp-Source: AGHT+IH79fMt2lbndlOwVElyQ8+edbXGd3G7O8O8KzaRaFwc0qtg8B2j9WmAYooczh/yN+jnNV6CKxIwfZnoumUL+VA=
+X-Received: by 2002:a05:6402:33cb:b0:554:53d0:23f1 with SMTP id
+ a11-20020a05640233cb00b0055453d023f1mr112130edc.0.1703264930632; Fri, 22 Dec
+ 2023 09:08:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219170017.73902-1-edumazet@google.com> <CADvbK_e+J2nut4Q5NE3oAdUqEDXAFZrecs4zY+CrLE9ob8AtZg@mail.gmail.com>
-In-Reply-To: <CADvbK_e+J2nut4Q5NE3oAdUqEDXAFZrecs4zY+CrLE9ob8AtZg@mail.gmail.com>
+References: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
+In-Reply-To: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 22 Dec 2023 18:05:02 +0100
-Message-ID: <CANn89iJjAPmuT3ynBcoADkTs3e4V3=AY9=D+WDHMntQZ+typUA@mail.gmail.com>
-Subject: Re: [PATCH net-next] sctp: fix busy polling
-To: Xin Long <lucien.xin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Jacob Moroni <jmoroni@google.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Date: Fri, 22 Dec 2023 18:08:39 +0100
+Message-ID: <CANn89i+vgVCCdyy8zwdAfTS1SW7JcFRYkcvu+m-F07yHv6jDcg@mail.gmail.com>
+Subject: Re: [PATCH] net/tcp_sigpool: Use kref_get_unless_zero()
+To: Dmitry Safonov <dima@arista.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 22, 2023 at 5:08=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
-te:
+On Fri, Dec 22, 2023 at 2:14=E2=80=AFAM Dmitry Safonov <dima@arista.com> wr=
+ote:
 >
-> On Tue, Dec 19, 2023 at 12:00=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > Busy polling while holding the socket lock makes litle sense,
-> > because incoming packets wont reach our receive queue.
-> >
-> > Fixes: 8465a5fcd1ce ("sctp: add support for busy polling to sctp protoc=
-ol")
-> > Reported-by: Jacob Moroni <jmoroni@google.com>
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-> > Cc: Xin Long <lucien.xin@gmail.com>
-> > ---
-> >  net/sctp/socket.c | 10 ++++------
-> >  1 file changed, 4 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-> > index 5fb02bbb4b349ef9ab9c2790cccb30fb4c4e897c..6b9fcdb0952a0fe599ae5d1=
-d1cc6fa9557a3a3bc 100644
-> > --- a/net/sctp/socket.c
-> > +++ b/net/sctp/socket.c
-> > @@ -2102,6 +2102,10 @@ static int sctp_recvmsg(struct sock *sk, struct =
-msghdr *msg, size_t len,
-> >         if (unlikely(flags & MSG_ERRQUEUE))
-> >                 return inet_recv_error(sk, msg, len, addr_len);
-> >
-> > +       if (sk_can_busy_loop(sk) &&
-> > +           skb_queue_empty_lockless(&sk->sk_receive_queue))
-> > +               sk_busy_loop(sk, flags & MSG_DONTWAIT);
-> > +
-> Here is no any sk_state check, if the SCTP socket(TCP type) has been
-> already closed by peer, will sctp_recvmsg() block here?
-
-Busy polling is only polling the NIC queue, hoping to feed this socket
-for incoming packets.
-
-Using more than a lockless read of sk->sk_receive_queue is not really neces=
-sary,
-and racy anyway.
-
-Eliezer Tamir added a check against sk_state for no good reason in
-TCP, my plan is to remove it.
-
-There are other states where it still makes sense to allow busy polling.
-
-
+> The freeing and re-allocation of algorithm are protected by cpool_mutex,
+> so it doesn't fix an actual use-after-free, but avoids a deserved
+> refcount_warn_saturate() warning.
 >
-> Maybe here it needs a `!(sk->sk_shutdown & RCV_SHUTDOWN)` check,
-> which is set when it's closed by the peer.
-
-See above. Keep this as simple as possible...
-
-
+> A trivial fix for the racy behavior.
 >
-> Thanks
->
-> >         lock_sock(sk);
-> >
-> >         if (sctp_style(sk, TCP) && !sctp_sstate(sk, ESTABLISHED) &&
-> > @@ -9046,12 +9050,6 @@ struct sk_buff *sctp_skb_recv_datagram(struct so=
-ck *sk, int flags, int *err)
-> >                 if (sk->sk_shutdown & RCV_SHUTDOWN)
-> >                         break;
-> >
-> > -               if (sk_can_busy_loop(sk)) {
-> > -                       sk_busy_loop(sk, flags & MSG_DONTWAIT);
-> > -
-> > -                       if (!skb_queue_empty_lockless(&sk->sk_receive_q=
-ueue))
-> > -                               continue;
-> > -               }
-> >
-> >                 /* User doesn't want to wait.  */
-> >                 error =3D -EAGAIN;
-> > --
-> > 2.43.0.472.g3155946c3a-goog
-> >
+> Fixes: 8c73b26315aa ("net/tcp: Prepare tcp_md5sig_pool for TCP-AO")
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
+
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
