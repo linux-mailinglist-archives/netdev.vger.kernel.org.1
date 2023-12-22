@@ -1,73 +1,77 @@
-Return-Path: <netdev+bounces-59914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DF8581CA59
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:57:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25E8E81CA74
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:02:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31DC61C21450
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:57:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57AB11C21F84
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B7A18631;
-	Fri, 22 Dec 2023 12:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32E419448;
+	Fri, 22 Dec 2023 13:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="H0413PwB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQMNahIL"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E625618AEB
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 12:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 56FF920849;
-	Fri, 22 Dec 2023 13:57:12 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y7IyoMvRjZZU; Fri, 22 Dec 2023 13:57:11 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272E199A1
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 13:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703250135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2kygMq0mAMv991cW3YZ7Hd3ppnOgYBjhmi7vw/LesYI=;
+	b=NQMNahILgu3aQbYD3RwVLqx49Kb0QJEdivz2twAyGjHa6qSDNBTLYUKgF8/XeHtVYBwG23
+	13LoOIPgSk1/yThVctxuhb3ZW+Fg65A0lHF3Z4fJV/jGMRyPAz09wA/66Jb0kIqAvSP3Ug
+	LyVx0B4CVrW72jzYFnomvW9RH6rZUpc=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-15--QeBZETQMO6dAe6PTzC6cQ-1; Fri,
+ 22 Dec 2023 08:02:12 -0500
+X-MC-Unique: -QeBZETQMO6dAe6PTzC6cQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 8BF9620185;
-	Fri, 22 Dec 2023 13:57:11 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 8BF9620185
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1703249831;
-	bh=sQnj/97h2xd558yeV3yZEWlfDV8XUJYiUKIBxdUSHDs=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=H0413PwBm1xuJNpmO/1jBZ9dGRJOKLvv5j0MuJklF3BH8csnrgLYMEA4JarhPM5um
-	 YTq9hAS4W9DEjwBHsA4pcOYjQ2K3YExRcYl8vXqhw+l3TghDe7SEnFkbJ5C7vrd6NC
-	 Ywlu7xozjfiVChsWETPWZlBIh1QBZTQvFqXeZP6xRAJHsIU8EjUvEgyMAwYhQn0RnW
-	 tviZO3KJ5Xe173iYDe765IZC5ED5/LyIVJJ0+hbzOfXYDaErGx7srUd/DXCm5I0Rhb
-	 DP1RL1b5h/UW2Gx7Em2aQA/uKCR+nWBcB/NTlTS+Ksk08miw2yqPLvxEAIWo7FPU85
-	 4dtLOsNqW/LGQ==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 7FB8B80004A;
-	Fri, 22 Dec 2023 13:57:11 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 22 Dec 2023 13:57:11 +0100
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Fri, 22 Dec
- 2023 13:57:10 +0100
-Date: Fri, 22 Dec 2023 13:57:04 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Antony Antony
-	<antony.antony@secunet.com>, "David S. Miller" <davem@davemloft.net>,
-	<devel@linux-ipsec.org>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v5 ipsec-next] xfrm: introduce forwarding of ICMP Error
- messages
-Message-ID: <38d9daba2f601602ef115942f82b80e56b54c560.1703249432.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
-References: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5329D386914F;
+	Fri, 22 Dec 2023 13:02:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 82A9251E3;
+	Fri, 22 Dec 2023 13:02:07 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20231221132400.1601991-5-dhowells@redhat.com>
+References: <20231221132400.1601991-5-dhowells@redhat.com> <20231221132400.1601991-1-dhowells@redhat.com>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: dhowells@redhat.com, Gao Xiang <xiang@kernel.org>,
+    Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
+    Jeffle Xu <jefflexu@linux.alibaba.com>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, linux-erofs@lists.ozlabs.org
+Subject: [PATCH] Fix EROFS Kconfig
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,259 +79,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-ID: <2265064.1703250126.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Dec 2023 13:02:06 +0000
+Message-ID: <2265065.1703250126@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-This commit aligns with RFC 4301, Section 6, and addresses the
-requirement to forward unauthenticated ICMP error messages that do not
-match any xfrm policies. It utilizes the ICMP payload as an skb and
-performs a reverse lookup. If a policy match is found, forward
-the packet.
+This needs an additional change (see attached).
 
-The ICMP payload typically contains a partial IP packet that is likely
-responsible for the error message.
+diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
+index 1d318f85232d..1949763e66aa 100644
+--- a/fs/erofs/Kconfig
++++ b/fs/erofs/Kconfig
+@@ -114,7 +114,8 @@ config EROFS_FS_ZIP_DEFLATE
+ =
 
-The following error types will be forwarded:
-- IPv4 ICMP error types: ICMP_DEST_UNREACH & ICMP_TIME_EXCEEDED
-- IPv6 ICMPv6 error types: ICMPV6_DEST_UNREACH, ICMPV6_PKT_TOOBIG,
-			   ICMPV6_TIME_EXCEED
-
-To implement this feature, a reverse lookup has been added to the xfrm
-forward path, making use of the ICMP payload as the skb.
-
-To enable this functionality from user space, the XFRM_POLICY_ICMP flag
-should be added to the outgoing and forward policies, and the
-XFRM_STATE_ICMP flag should be set on incoming states.
-
-e.g.
-ip xfrm policy add flag icmp tmpl
-
-ip xfrm policy
-src 192.0.2.0/24 dst 192.0.1.0/25
-	dir out priority 2084302 ptype main flag icmp
-
-ip xfrm state add ...flag icmp
-
-ip xfrm state
-root@west:~#ip x s
-src 192.1.2.23 dst 192.1.2.45
-	proto esp spi 0xa7b76872 reqid 16389 mode tunnel
-	replay-window 32 flag icmp af-unspec
-
-Changes since v4:
-- split the series to only ICMP erorr forwarding
-
-Changes since v3: no code chage
- - add missing white spaces detected by checkpatch.pl
-
-Changes since v2: reviewed by Steffen Klassert
- - user consume_skb instead of kfree_skb for the inner skb
- - fixed newskb leaks in error paths
- - free the newskb once inner flow is decoded with change due to
-   commit 7a0207094f1b ("xfrm: policy: replace session decode with flow dissector")
- - if xfrm_decode_session_reverse() on inner payload fails ignore.
-   do not increment error counter
-
-Changes since v1:
-- Move IPv6 variable declaration inside IS_ENABLED(CONFIG_IPV6)
-
-Changes since RFC:
-- Fix calculation of ICMPv6 header length
-
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
- net/xfrm/xfrm_policy.c | 142 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 140 insertions(+), 2 deletions(-)
-
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index c13dc3ef7910..bc99984e8d39 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -29,6 +29,7 @@
- #include <linux/audit.h>
- #include <linux/rhashtable.h>
- #include <linux/if_tunnel.h>
-+#include <linux/icmp.h>
- #include <net/dst.h>
- #include <net/flow.h>
- #include <net/inet_ecn.h>
-@@ -3503,6 +3504,128 @@ static inline int secpath_has_nontransport(const struct sec_path *sp, int k, int
- 	return 0;
- }
-
-+static bool icmp_err_packet(const struct flowi *fl, unsigned short family)
-+{
-+	const struct flowi4 *fl4 = &fl->u.ip4;
-+
-+	if (family == AF_INET &&
-+	    fl4->flowi4_proto == IPPROTO_ICMP &&
-+	    (fl4->fl4_icmp_type == ICMP_DEST_UNREACH ||
-+	     fl4->fl4_icmp_type == ICMP_TIME_EXCEEDED))
-+		return true;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+	if (family == AF_INET6) {
-+		const struct flowi6 *fl6 = &fl->u.ip6;
-+
-+		if (fl6->flowi6_proto == IPPROTO_ICMPV6 &&
-+		    (fl6->fl6_icmp_type == ICMPV6_DEST_UNREACH ||
-+		    fl6->fl6_icmp_type == ICMPV6_PKT_TOOBIG ||
-+		    fl6->fl6_icmp_type == ICMPV6_TIME_EXCEED))
-+			return true;
-+	}
-+#endif
-+	return false;
-+}
-+
-+static bool xfrm_icmp_flow_decode(struct sk_buff *skb, unsigned short family,
-+				  const struct flowi *fl, struct flowi *fl1)
-+{
-+	bool ret = true;
-+	struct sk_buff *newskb = skb_clone(skb, GFP_ATOMIC);
-+	int hl = family == AF_INET ? (sizeof(struct iphdr) +  sizeof(struct icmphdr)) :
-+		 (sizeof(struct ipv6hdr) + sizeof(struct icmp6hdr));
-+
-+	if (!newskb)
-+		return true;
-+
-+	if (!pskb_pull(newskb, hl))
-+		goto out;
-+
-+	skb_reset_network_header(newskb);
-+
-+	if (xfrm_decode_session_reverse(dev_net(skb->dev), newskb, fl1, family) < 0)
-+		goto out;
-+
-+	fl1->flowi_oif = fl->flowi_oif;
-+	fl1->flowi_mark = fl->flowi_mark;
-+	fl1->flowi_tos = fl->flowi_tos;
-+	nf_nat_decode_session(newskb, fl1, family);
-+	ret = false;
-+
-+out:
-+	consume_skb(newskb);
-+	return ret;
-+}
-+
-+static bool xfrm_selector_inner_icmp_match(struct sk_buff *skb, unsigned short family,
-+					   const struct xfrm_selector *sel,
-+					   const struct flowi *fl)
-+{
-+	bool ret = false;
-+
-+	if (icmp_err_packet(fl, family)) {
-+		struct flowi fl1;
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return ret;
-+
-+		ret = xfrm_selector_match(sel, &fl1, family);
-+	}
-+
-+	return ret;
-+}
-+
-+static inline struct
-+xfrm_policy *xfrm_in_fwd_icmp(struct sk_buff *skb,
-+			      const struct flowi *fl, unsigned short family,
-+			      u32 if_id)
-+{
-+	struct xfrm_policy *pol = NULL;
-+
-+	if (icmp_err_packet(fl, family)) {
-+		struct flowi fl1;
-+		struct net *net = dev_net(skb->dev);
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return pol;
-+
-+		pol = xfrm_policy_lookup(net, &fl1, family, XFRM_POLICY_FWD, if_id);
-+	}
-+
-+	return pol;
-+}
-+
-+static inline struct
-+dst_entry *xfrm_out_fwd_icmp(struct sk_buff *skb, struct flowi *fl,
-+			     unsigned short family, struct dst_entry *dst)
-+{
-+	if (icmp_err_packet(fl, family)) {
-+		struct net *net = dev_net(skb->dev);
-+		struct dst_entry *dst2;
-+		struct flowi fl1;
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return dst;
-+
-+		dst_hold(dst);
-+
-+		dst2 = xfrm_lookup(net, dst, &fl1, NULL, (XFRM_LOOKUP_QUEUE | XFRM_LOOKUP_ICMP));
-+
-+		if (IS_ERR(dst2))
-+			return dst;
-+
-+		if (dst2->xfrm) {
-+			dst_release(dst);
-+			dst = dst2;
-+		} else {
-+			dst_release(dst2);
-+		}
-+	}
-+
-+	return dst;
-+}
-+
- int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 			unsigned short family)
- {
-@@ -3549,9 +3672,17 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
-
- 		for (i = sp->len - 1; i >= 0; i--) {
- 			struct xfrm_state *x = sp->xvec[i];
-+			int ret = 0;
-+
- 			if (!xfrm_selector_match(&x->sel, &fl, family)) {
--				XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMISMATCH);
--				return 0;
-+				ret = true;
-+				if (x->props.flags & XFRM_STATE_ICMP &&
-+				    xfrm_selector_inner_icmp_match(skb, family, &x->sel, &fl))
-+					ret = false;
-+				if (ret) {
-+					XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMISMATCH);
-+					return 0;
-+				}
- 			}
- 		}
- 	}
-@@ -3574,6 +3705,9 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 		return 0;
- 	}
-
-+	if (!pol && dir == XFRM_POLICY_FWD)
-+		pol = xfrm_in_fwd_icmp(skb, &fl, family, if_id);
-+
- 	if (!pol) {
- 		if (net->xfrm.policy_default[dir] == XFRM_USERPOLICY_BLOCK) {
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINNOPOLS);
-@@ -3707,6 +3841,10 @@ int __xfrm_route_forward(struct sk_buff *skb, unsigned short family)
- 		res = 0;
- 		dst = NULL;
- 	}
-+
-+	if (dst && !dst->xfrm)
-+		dst = xfrm_out_fwd_icmp(skb, &fl, family, dst);
-+
- 	skb_dst_set(skb, dst);
- 	return res;
- }
---
-2.30.2
+ config EROFS_FS_ONDEMAND
+ 	bool "EROFS fscache-based on-demand read support"
+-	depends on CACHEFILES_ONDEMAND && (EROFS_FS=3Dm && FSCACHE || EROFS_FS=3D=
+y && FSCACHE=3Dy)
++	depends on CACHEFILES_ONDEMAND && FSCACHE && \
++		(EROFS_FS=3Dm && NETFS_SUPPORT || EROFS_FS=3Dy && NETFS_SUPPORT=3Dy)
+ 	default n
+ 	help
+ 	  This permits EROFS to use fscache-backed data blobs with on-demand
 
 
