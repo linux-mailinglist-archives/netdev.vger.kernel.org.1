@@ -1,162 +1,95 @@
-Return-Path: <netdev+bounces-59856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29D481C4C4
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 06:47:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A811E81C51B
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 07:29:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E50BF1C24F4D
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 05:47:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C7DF1F25F1F
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 06:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC14D63A7;
-	Fri, 22 Dec 2023 05:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0B57484;
+	Fri, 22 Dec 2023 06:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dY98KLm9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJwt4U0I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D40BD530;
-	Fri, 22 Dec 2023 05:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703223986; x=1734759986;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jKRp9iRvAm9GuBLgpwNJYxVqDu1ubCTAkbYv82hvvk0=;
-  b=dY98KLm9GcJddDdUEzvEZ6nxPLnhxeJK88g56ZM5qFJuwB2fmfdSM9Wp
-   JTU+ph/CNMCA1MC+hdOz866tnWcOe/UVzJy3JBgc6IzTSBY0r62lnjErX
-   NabGus/LaLVAuEOONaB/9+4S51xUJgu4whyMBfWO9a3SC//zrIbwSniH3
-   GM6RxAseGCNVkPH4RbAc0geIsRXgP2u4Y9WqH99Gc6IlgRL6+NiqzHMBf
-   0554amnJO4UiBBo8Gw86cpG812+epFU5ySW+VvVFZhbPzkyWQvKgCTh+T
-   82puphggOLGKbz3xxCZ02kJPikPjMkyUTbzVywOHpy3y8KPkFvckumwPq
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="9470609"
-X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
-   d="scan'208";a="9470609"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 21:46:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="900324247"
-X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
-   d="scan'208";a="900324247"
-Received: from pg-esw-build.png.intel.com ([10.226.214.57])
-  by orsmga004.jf.intel.com with ESMTP; 21 Dec 2023 21:46:21 -0800
-From: Leong Ching Swee <leong.ching.swee@intel.com>
-To: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Swee Leong Ching <leong.ching.swee@intel.com>,
-	Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-Subject: [PATCH net-next v1 4/4] net: stmmac: Use interrupt mode INTM=1 for per channel irq
-Date: Fri, 22 Dec 2023 13:44:51 +0800
-Message-Id: <20231222054451.2683242-5-leong.ching.swee@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231222054451.2683242-1-leong.ching.swee@intel.com>
-References: <20231222054451.2683242-1-leong.ching.swee@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550E4C129
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 06:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2041d5a95d9so996809fac.0
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:28:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703226529; x=1703831329; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XQp9X/pT+p0u0F4+59ONINm2AvREuuxsbBNOfWhCRyk=;
+        b=GJwt4U0IVnH5y4/s1FfVoLazQIrVdfzqBZ+7+8B7lEpG3ia2xnvoJN2h+jyttspyFG
+         Odbv2SjT1CtErQ5MLeoOv5Uu/A6/7AxzF7Z+Y+kQWCOWrNxjYVmzXjGKa8YmIvAtf9AD
+         xZnUAphmageEIcgBfeCbHe90WIchdF5v8Qtgaq2Xh1k4T/3hfi2aN/8kbxW+Hr9Rekwx
+         Y5muKT87N96TF7j5xXhc7fzstFHnrMtr4eW5Igu3NyIGKUpTK2J5GPfTY/q6w9VFndbS
+         oZep3bCruhaKx+SNnxYMPSkXetjjebodCzoPB/nwF2BzTPYLGaYxSSoyZrMmHcojKbmK
+         0uSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703226529; x=1703831329;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XQp9X/pT+p0u0F4+59ONINm2AvREuuxsbBNOfWhCRyk=;
+        b=UMdy7FMmE6StteDcttT3GUIacOyvLEG8UQxD7BkSJlx6DlU/6Su7W4beZHtDg5KARn
+         9ZnkMovyrYI2saJnSQ72Rlgj7h7PKRZOCHhhz9gujECojOB9SRZA1haZRkRIAMjEViMO
+         v68wo/rDyoJ9OMvpThpOtCBe/wA6o6jzGGHqbfGThfYDeBWkQ/OoHw4yGlCC3Ib9ZMVg
+         91EkaC66dcDsH92RqVzPvY8OJrgjrll4ynL57e/DbwGp+z02voEi4na6Ftc78Iinbezf
+         r5Il/WbVzpVg1m2uF4WIzSXMNNlrjOWB7+9gOMkh7JmtKYGmKNG71PenuMnhLQaGPghs
+         djLw==
+X-Gm-Message-State: AOJu0Yyu+JcCR/5PqNAptSDLHVdd8QJGuymq4IvaGV9ktEcUFOY3kUfB
+	TAYlMhPf7xP/i65IUpEehwk=
+X-Google-Smtp-Source: AGHT+IEX8S/lvr9lnS4Jip0UIiGUOedGx8NAacMQIppZm21TQMeAJXFoGsCCznjhaEG5DYh+uGyWVQ==
+X-Received: by 2002:a05:6870:5250:b0:1fa:fc26:7f81 with SMTP id o16-20020a056870525000b001fafc267f81mr916297oai.14.1703226529327;
+        Thu, 21 Dec 2023 22:28:49 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id j6-20020a632306000000b005c621e0de25sm2733409pgj.71.2023.12.21.22.28.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 22:28:48 -0800 (PST)
+Date: Fri, 22 Dec 2023 14:28:45 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org,
+	"Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+Subject: Re: [RFC PATCH for-faizal 0/4] tc-taprio selftests
+Message-ID: <ZYUsnTuoUi2qCdLj@Laptop-X1>
+References: <20231221132521.2314811-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221132521.2314811-1-vladimir.oltean@nxp.com>
 
-From: Swee Leong Ching <leong.ching.swee@intel.com>
+On Thu, Dec 21, 2023 at 03:25:17PM +0200, Vladimir Oltean wrote:
+> Unfortunately the isochron version from debian will not work on veth
+> pairs, I had to make some changes and add the --omit-hwts option to
+> the sender and receiver programs. The modified version is on this branch
+> here, I will merge the changes to 'master' once I have enough confidence
+> in them.
+> https://github.com/vladimiroltean/isochron/tree/omit-hwts
+> 
+> For testing the tc-taprio software scheduling path, we don't need PTP
+> synchronization or hardware timestamps anyway.
+> 
+> This is just a skeleton that I'm hoping Faizal can pick up and extend
+> with more test cases for dynamic schedule changes. It should run
+> primarily on the veth driver, but should behave the same on any network
+> driver as well, including those who also have tc-taprio offload.
 
-Enable per DMA channel interrupt that uses shared peripheral
-interrupt (SPI), so only per channel TX and RX intr (TI/RI)
-are handled by TX/RX ISR without calling common interrupt ISR.
-
-Signed-off-by: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-Signed-off-by: Swee Leong Ching <leong.ching.swee@intel.com>
----
- .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 ++
- .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 32 +++++++++++--------
- 2 files changed, 22 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-index 207ff1799f2c..04bf731cb7ea 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-@@ -346,6 +346,9 @@
- /* DMA Registers */
- #define XGMAC_DMA_MODE			0x00003000
- #define XGMAC_SWR			BIT(0)
-+#define XGMAC_DMA_MODE_INTM_MASK	GENMASK(13, 12)
-+#define XGMAC_DMA_MODE_INTM_SHIFT	12
-+#define XGMAC_DMA_MODE_INTM_MODE1	0x1
- #define XGMAC_DMA_SYSBUS_MODE		0x00003004
- #define XGMAC_WR_OSR_LMT		GENMASK(29, 24)
- #define XGMAC_WR_OSR_LMT_SHIFT		24
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-index 3cde695fec91..dcb9f094415d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-@@ -31,6 +31,13 @@ static void dwxgmac2_dma_init(void __iomem *ioaddr,
- 		value |= XGMAC_EAME;
- 
- 	writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
-+
-+	if (dma_cfg->multi_irq_en) {
-+		value = readl(ioaddr + XGMAC_DMA_MODE);
-+		value &= ~XGMAC_DMA_MODE_INTM_MASK;
-+		value |= (XGMAC_DMA_MODE_INTM_MODE1 << XGMAC_DMA_MODE_INTM_SHIFT);
-+		writel(value, ioaddr + XGMAC_DMA_MODE);
-+	}
- }
- 
- static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv,
-@@ -365,19 +372,18 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
- 	}
- 
- 	/* TX/RX NORMAL interrupts */
--	if (likely(intr_status & XGMAC_NIS)) {
--		if (likely(intr_status & XGMAC_RI)) {
--			u64_stats_update_begin(&rxq_stats->syncp);
--			rxq_stats->rx_normal_irq_n++;
--			u64_stats_update_end(&rxq_stats->syncp);
--			ret |= handle_rx;
--		}
--		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
--			u64_stats_update_begin(&txq_stats->syncp);
--			txq_stats->tx_normal_irq_n++;
--			u64_stats_update_end(&txq_stats->syncp);
--			ret |= handle_tx;
--		}
-+	if (likely(intr_status & XGMAC_RI)) {
-+		u64_stats_update_begin(&rxq_stats->syncp);
-+		rxq_stats->rx_normal_irq_n++;
-+		u64_stats_update_end(&rxq_stats->syncp);
-+		ret |= handle_rx;
-+	}
-+
-+	if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
-+		u64_stats_update_begin(&txq_stats->syncp);
-+		txq_stats->tx_normal_irq_n++;
-+		u64_stats_update_end(&txq_stats->syncp);
-+		ret |= handle_tx;
- 	}
- 
- 	/* Clear interrupts */
--- 
-2.34.1
-
+Tested-by: Hangbin Liu <liuhangbin@gmail.com>
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
