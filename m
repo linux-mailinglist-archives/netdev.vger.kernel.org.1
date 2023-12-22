@@ -1,38 +1,39 @@
-Return-Path: <netdev+bounces-59874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5719781C80F
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 11:23:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 699A681C80D
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 11:23:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 599021C24FDB
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 10:23:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB4E51F239EB
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 10:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D269B12E7B;
-	Fri, 22 Dec 2023 10:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0AD6107A9;
+	Fri, 22 Dec 2023 10:23:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3392C125BE
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 10:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208E311718
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 10:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp84t1703240512t7vdrf0d
+X-QQ-mid: bizesmtp84t1703240516tsj6nfa2
 Received: from wxdbg.localdomain.com ( [125.119.246.92])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 22 Dec 2023 18:21:42 +0800 (CST)
+	id ; Fri, 22 Dec 2023 18:21:55 +0800 (CST)
 X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: 3M0okmaRx3i6xiiU4p2dD+B75Kdammuixt83iA86vTE2bEh9E20pXBTvvM5dd
-	zNJBAVTOXIKv6cH3LMYGnRmd+igstdZnTTX7uH93PaqCDArfLS9qIBmMegLeNmZC69VIppC
-	AgHxpt/oRBikiCbXdR+1jQz/9q/j4lwvXrQ+aKkTf0GHMSSY/WX8WqZxhZxULvrNA27lXiZ
-	h2WGc+fOOtmLzIYzKKFNkE0jVvSFqOAq6PgIeb14zCPeVRNsjUkv0FhA1yezEBKN9Dcmab8
-	TE6KdnXdqUiElndNH9sBs15jm/edobfMVhO+V7u06qkM4JUgsi4VbWdhsLDhcORlo0Zy0NT
-	OsuZJPH32K2DsW7+rAXMNqq+Lp3LimBHYQ4o+xl/6ePllMHPlbCMbJGes+QSA==
+X-QQ-FEAT: 5q30pvLz2ieeRpzzrevRP8Wwvf+tqZzMArSYboWkmXQKGXpnEL3dI5F2N0IH4
+	/EGqz+1/eemAzOe0ofx+ZI3uNH4F15IUrvJFSdbBhg+mG1QxBFlT9qitlaOOKymcCDpB55l
+	qCXLwIB1ik/VnOPaEUvNw3HwBfY0FmESzFFYi/MwuA7epKNXCJHMgnYkVFGFztt7YsB0noW
+	kWS/nrZYRChqtkocKHdOHRngx9XuypSQqUsuyXkFrTJw5CAL2XhpYaa1W5PryB8ZdvleaIq
+	2i3T2NXQgiKiDwIEfTnRoadhQLPj+R8GuCVheyF0S0s7TlWMTbJMPfAyYWDz/1qz0wt0KAZ
+	aAmQmfjAqrVB4vqiDeapVL91JQHnGciz6IszwcWuNs5unQiuDBzC1WIMAB1OYPLbJ9nDdhg
+	6npXIXTNHq0=
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 11629371763147510632
+X-BIZMAIL-ID: 13425975966908633895
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -43,10 +44,12 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v6 0/8] Implement more ethtool_ops for Wangxun
-Date: Fri, 22 Dec 2023 18:16:31 +0800
-Message-Id: <20231222101639.1499997-1-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v6 1/8] net: libwx: add phylink to libwx
+Date: Fri, 22 Dec 2023 18:16:32 +0800
+Message-Id: <20231222101639.1499997-2-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20231222101639.1499997-1-jiawenwu@trustnetic.com>
+References: <20231222101639.1499997-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,58 +60,96 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-Provide ethtool functions to operate pause param, ring param, coalesce
-channel number and msglevel, for driver txgbe/ngbe.
+For the following implementation, add struct phylink and phylink_config
+to wx structure. Add the helper function for converting phylink to wx,
+implement ethtool ksetting and nway reset in libwx.
 
-v5 -> v6:
-- Minor fixes address on Jakub Kicinski's comments.
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+---
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 26 +++++++++++++++++++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  5 ++++
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  8 ++++++
+ 3 files changed, 39 insertions(+)
 
-v4 -> v5:
-- Fix build error reported by kernel test robot.
-
-v3 -> v4:
-- Repartition the patches of phylink.
-- Handle failure to allocate memory while changing ring parameters.
-- Minor fixes about formatting.
-
-v2 -> v3:
-- Address comments:
-  https://lore.kernel.org/all/ZW2loxTO6oKNYLew@shell.armlinux.org.uk/
-
-v1 -> v2:
-- Add phylink support for ngbe.
-- Fix issue on interrupts when queue number is changed.
-- Add more marco defines.
-- Fix return codes.
-
-Jiawen Wu (8):
-  net: libwx: add phylink to libwx
-  net: txgbe: use phylink bits added in libwx
-  net: ngbe: convert phylib to phylink
-  net: wangxun: add flow control support
-  net: wangxun: add ethtool_ops for ring parameters
-  net: wangxun: add coalesce options support
-  net: wangxun: add ethtool_ops for channel number
-  net: wangxun: add ethtool_ops for msglevel
-
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 236 +++++++++++++++
- .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  27 ++
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 275 +++++++++++++++++-
- drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   1 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 154 ++++++++--
- drivers/net/ethernet/wangxun/libwx/wx_lib.h   |   3 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  94 +++++-
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |  82 +++++-
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  85 +++---
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 114 ++++----
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.h |   1 -
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   7 +-
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |  82 +++++-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  62 +++-
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |  57 ++--
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  15 +-
- 16 files changed, 1110 insertions(+), 185 deletions(-)
-
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index 6e9e5f01c152..ba37ba6f03e4 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -185,3 +185,29 @@ void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info)
+ 	}
+ }
+ EXPORT_SYMBOL(wx_get_drvinfo);
++
++int wx_nway_reset(struct net_device *netdev)
++{
++	struct wx *wx = netdev_priv(netdev);
++
++	return phylink_ethtool_nway_reset(wx->phylink);
++}
++EXPORT_SYMBOL(wx_nway_reset);
++
++int wx_get_link_ksettings(struct net_device *netdev,
++			  struct ethtool_link_ksettings *cmd)
++{
++	struct wx *wx = netdev_priv(netdev);
++
++	return phylink_ethtool_ksettings_get(wx->phylink, cmd);
++}
++EXPORT_SYMBOL(wx_get_link_ksettings);
++
++int wx_set_link_ksettings(struct net_device *netdev,
++			  const struct ethtool_link_ksettings *cmd)
++{
++	struct wx *wx = netdev_priv(netdev);
++
++	return phylink_ethtool_ksettings_set(wx->phylink, cmd);
++}
++EXPORT_SYMBOL(wx_set_link_ksettings);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
+index 16d1a09369a6..f15cc445ae0f 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
+@@ -13,4 +13,9 @@ void wx_get_mac_stats(struct net_device *netdev,
+ void wx_get_pause_stats(struct net_device *netdev,
+ 			struct ethtool_pause_stats *stats);
+ void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info);
++int wx_nway_reset(struct net_device *netdev);
++int wx_get_link_ksettings(struct net_device *netdev,
++			  struct ethtool_link_ksettings *cmd);
++int wx_set_link_ksettings(struct net_device *netdev,
++			  const struct ethtool_link_ksettings *cmd);
+ #endif /* _WX_ETHTOOL_H_ */
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 83f9bb7b3c22..5b064c434053 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -7,6 +7,7 @@
+ #include <linux/bitfield.h>
+ #include <linux/netdevice.h>
+ #include <linux/if_vlan.h>
++#include <linux/phylink.h>
+ #include <net/ip.h>
+ 
+ #define WX_NCSI_SUP                             0x8000
+@@ -939,6 +940,8 @@ struct wx {
+ 	int speed;
+ 	int duplex;
+ 	struct phy_device *phydev;
++	struct phylink *phylink;
++	struct phylink_config phylink_config;
+ 
+ 	bool wol_hw_supported;
+ 	bool ncsi_enabled;
+@@ -1044,4 +1047,9 @@ rd64(struct wx *wx, u32 reg)
+ #define wx_dbg(wx, fmt, arg...) \
+ 	dev_dbg(&(wx)->pdev->dev, fmt, ##arg)
+ 
++static inline struct wx *phylink_to_wx(struct phylink_config *config)
++{
++	return container_of(config, struct wx, phylink_config);
++}
++
+ #endif /* _WX_TYPE_H_ */
 -- 
 2.27.0
 
