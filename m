@@ -1,183 +1,149 @@
-Return-Path: <netdev+bounces-59943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20BF681CD1E
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:33:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8748781CD5B
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:57:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A0A11C225AA
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:33:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 139EF1F22F0C
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9367424A10;
-	Fri, 22 Dec 2023 16:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED2A24B5D;
+	Fri, 22 Dec 2023 16:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="LNIKYppQ"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="PfLQvdsF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FBC24A09;
-	Fri, 22 Dec 2023 16:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BM18cL7013901;
-	Fri, 22 Dec 2023 08:33:21 -0800
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2168.outbound.protection.outlook.com [104.47.57.168])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3v3ntrw4qv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Dec 2023 08:33:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UkxmUpYxx68o3QTWwdesTKla1rB+11TzIjJqUbx+76A/APZZi1S7MPPuO951rOOVPzRr4wkQm8xoxZ7bLU/mflV6uUnQKWnxXVGDHjrkRy9DKxD/ZhAQGPYnRVPVK8nESvHwq/l5V7wvT0lpZLjA6dqZc+VR1EL6uSQRlBt+jB/YSYjMc4Uetrwr4dHpYukO2Tj8FkLNHyL90mJt6zo/wc+h37VO+fUrEXVbyWvQGJpvtiGJuM/RqQ5l/xbZRPIkOGK2a6aTRLEYX4vs6wQNEOHkTb7mYu5dyXa3yazu7tpWVVEHU2XQqmZAEkGYQJ98YWbZt1Vv62P2D4t9YXMqgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K5NrphJvCLyQ/NDmmNvuRl+RKD10kFAsIh7btJ+Gxt8=;
- b=UZ8zYMDhcz6OBaSS/HQiivZY8UHA9pyfBVmgi50UtwT8GLElo1UGa2QeNnqz6RKByLKBg98u3WBRwnSV6pf3WuOVhc74Y84Ht0ylb2DF6l9f2eIJrcX6Zi2TpGQ6GUB5NU+y9QfsIY1b/6Hwe5bJacFx/YoOJP6XiZGHHmgLX75YCWifxRNzCcq09QbtQk4nLnar5Mr2BADV/84cYm0y1ZyjA+vvZ3OPDi/V7PoSyP/DuEWwR5wx6nLYqa/1qIqVogJCjctHOVPgoRwiqLohnMhL8xoKQJMrgLroEJjHLXK15ixRxoSeVlzic8qVkWfe68u6gjB6WR1aDRf63g+eWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K5NrphJvCLyQ/NDmmNvuRl+RKD10kFAsIh7btJ+Gxt8=;
- b=LNIKYppQ89RMvl4FlOlMxqbO7pwXJrIJPDq4lMcvOEnwqHIQ0wTzw6zsoOXCMGfLto/DsD7AO9tyDIFk7EA+vVI7iyp5DmLxzF0+0tezt0s3ftA9dLCPT3XJyu9QgK+ylebqcCF//+7dCdAAyr67t0NS1KZrLdQET7/3pPUb2NQ=
-Received: from PH0PR18MB4734.namprd18.prod.outlook.com (2603:10b6:510:cd::24)
- by SA0PR18MB3694.namprd18.prod.outlook.com (2603:10b6:806:99::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.10; Fri, 22 Dec
- 2023 16:33:19 +0000
-Received: from PH0PR18MB4734.namprd18.prod.outlook.com
- ([fe80::ca1e:e4b2:a920:25a9]) by PH0PR18MB4734.namprd18.prod.outlook.com
- ([fe80::ca1e:e4b2:a920:25a9%3]) with mapi id 15.20.7135.008; Fri, 22 Dec 2023
- 16:33:19 +0000
-From: Shinas Rasheed <srasheed@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Haseeb Gani
-	<hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>,
-        Sathesh B Edara
-	<sedara@marvell.com>,
-        "egallen@redhat.com" <egallen@redhat.com>,
-        "mschmidt@redhat.com" <mschmidt@redhat.com>,
-        "pabeni@redhat.com"
-	<pabeni@redhat.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "wizhao@redhat.com"
-	<wizhao@redhat.com>,
-        "kheib@redhat.com" <kheib@redhat.com>,
-        "konguyen@redhat.com" <konguyen@redhat.com>,
-        Veerasenareddy Burru
-	<vburru@marvell.com>,
-        Satananda Burla <sburla@marvell.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>
-Subject: RE: [EXT] Re: [PATCH net-next v1 4/8] octeon_ep_vf: add Tx/Rx ring
- resource setup and cleanup
-Thread-Topic: [EXT] Re: [PATCH net-next v1 4/8] octeon_ep_vf: add Tx/Rx ring
- resource setup and cleanup
-Thread-Index: AQHaM/A/9U7l3gj46UylAz3my4xwv7C1SIMAgAA4G3A=
-Date: Fri, 22 Dec 2023 16:33:18 +0000
-Message-ID: 
- <PH0PR18MB4734C94753260D2C92849419C794A@PH0PR18MB4734.namprd18.prod.outlook.com>
-References: <20231221092844.2885872-1-srasheed@marvell.com>
- <20231221092844.2885872-5-srasheed@marvell.com>
- <20231222131012.GG1202958@kernel.org>
-In-Reply-To: <20231222131012.GG1202958@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR18MB4734:EE_|SA0PR18MB3694:EE_
-x-ms-office365-filtering-correlation-id: 4ba6ec61-0f0a-4fac-77fc-08dc030bb4a1
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- Ia70tHg4vFmg0ejtO0Ua09zNBL428fO1oOnAWBU2z5mKIw2Yx8KNswWDyukcBeUfIGWqJ5ZMK1ahFnddOCvT2BtRNR/5rdp4S97NVkTryvscQ+BOAXeC3QobLZwp/MWra+IZfTGuDUZu5vMyfngCk1R9wdpG4966LojV4bhQ7l8PRT4MbKfXrrFYBBN9AAYEN+QOd1WmgSTREEE4XZ4dLyFJBgrAn/vFB3aziu0KPbusW3v9McOkYBt5H9m2RjlO979xU+D7Lj8BeeQnv+QLXTXyArfQ2wn1sU1D+23ScMpdTRxCfHNXAvtRarDjXUaOUGoakd/Jrj8m8AzTASjmKsRk+hZ7OI8AjKazVLBJjNB3IAUB4sDnCEo0WP2DD1/m6fR5sBJaoT7WtHSli8jhOZ032Wj1RpeYjN2BUMAScozZZkRtzMFj55VqHjjkdReBd3X8Y9XqeZV+posH14PE9dGJk3/A5tN7IOgJGh5F5JQb1shxHhRf2yJkG5GUz+brCSm4h+Zm4LGVys9/ThWhfQ2OoouUm1QPpPhJUEJUetiPisqkRhkZHuT7dUgyf1hcPj2xKQzKYWUWoeDVEX3c/OND1jzd5xCL+Do/1Jyup/rNqKR6xm2iMbzvKuPJxS9H
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4734.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(39860400002)(396003)(346002)(376002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(38070700009)(33656002)(86362001)(8936002)(5660300002)(9686003)(52536014)(4326008)(8676002)(7696005)(6506007)(71200400001)(2906002)(4744005)(55016003)(26005)(6916009)(316002)(54906003)(64756008)(66446008)(83380400001)(76116006)(7416002)(66946007)(66476007)(66556008)(478600001)(38100700002)(122000001)(41300700001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?KNbDEO3AhOCkRTnfhhjv+xs3Q3SA975zkHK3DI1zSUVnlvQEE31iR3qGpmhw?=
- =?us-ascii?Q?Enu/Bcr9YEbj9C7jOb+w6MOaQzS4/9SdHRnceqt7wwo66OTQeZeDmUYHyzEC?=
- =?us-ascii?Q?SQ+izfegUjoO67k9WQ/XbMA1k5PGkPVB/TjumLDWiZdf5yAU4R5i6OwPjSNz?=
- =?us-ascii?Q?54pi2OYuSe3ABkc79wq8g4s1r29h81iHNtZ/2P0Ng/VtF/igQ9acaS03hrkH?=
- =?us-ascii?Q?dIjUMKoGG6ujB9KFieoRuedbj3cDcAVjhoQuNWVkQbdzN4DwozsWhSk6PXyc?=
- =?us-ascii?Q?9FIRBoFYIZ3ZMy+VCs3PxR1KuyEVU7SoagVlf0MeFaVZGToawhUy+Ldqzqy0?=
- =?us-ascii?Q?xapYxVW4UPYzdHqZmM7TVmh0TX5oFwdQkSxhRCCPHk+GVqy6pYlosC9vQJjt?=
- =?us-ascii?Q?l0yqoJDyhql1g/3f2xe617Myuy6OqgXCadbeIbPpsjtdGX8TZYZLoSHKFtA5?=
- =?us-ascii?Q?dek1D9WYxA7nYZFeXSGy/6oCgWMLPhUbsZJe7a1QFFgLj5O5cGyiTawCKZWP?=
- =?us-ascii?Q?NpbWOz8K7vmcKv3vEvxnUhSaUXRN8y+yq929ZSIY3p23yRFOINjjKrwWdAAR?=
- =?us-ascii?Q?5/DTsoIJtulXA73Nsnnh309zz0KkKF1ZsEqqRZr7aPNrdn0cbnhNSYFkD039?=
- =?us-ascii?Q?s4ok0xBGb1aB/iJrAYzpZ4ZoFjsOGNfEgYbL14u2IUVkmjji0xuPg1oQpoWy?=
- =?us-ascii?Q?lniqSzG/z/vqPN+ARGFkbHMbit8n92eCm/SDEEJLEBBbeAZw9rDUmch3NmSa?=
- =?us-ascii?Q?c9eOhO543N8KpwvA5zZcP9q8eAo0RPX7dtw38efvDYskE+UZ+GOYAKGXY7KI?=
- =?us-ascii?Q?C90Awh/VX7LxMtEdewwZwHNqgKqjmRO/VuHLYgumyFlVvmbWTDpC/5ppBKY3?=
- =?us-ascii?Q?kSL72q23KuGjEEpHgY8Ip09+bKokZ/bBVnytQ+ly51yci/uLQmYC2r/NywIZ?=
- =?us-ascii?Q?L0iwBiSE9/OvQ7RTpItduyU3WSQY5KtBVOZmon6Tz8X8HqfePgE57A/279qu?=
- =?us-ascii?Q?0+mpahfZ06eQ8rqOqyTRRhcYzkpyB0LkbrSbYQJprE6FtsZ07MCNlUVD45C9?=
- =?us-ascii?Q?X8wsYNKzEuoHiBmEFh93Wd0OohujzztlIkZs3Z0z6A4aPYVRs05N5PT2iqFr?=
- =?us-ascii?Q?VL4xtHSH0SIdzj5fefuZ671srO/YAl/eIEVKfVL4l+AT/lJqB0lbd9xgp061?=
- =?us-ascii?Q?oE0pp5z8vBySfCDj9ku3AQrYww5PEOrn46WXqHnxYG+aPmuJf/2Inl10I2gs?=
- =?us-ascii?Q?y+uyKYSlqhMiAqth45EgmblKsBJbO22bxCoAx+wriobRE88C/QY5CfkKPQqq?=
- =?us-ascii?Q?S/mKiAHXV82wMLwbYSHCdhWj02li1U2nNEo3gt2g2qRVkSOySkpkJ+q9cqKQ?=
- =?us-ascii?Q?1t2GXUl4alrLDhtzGuHcuQM3y2L2Q2sswc6EjdAcs33h3uNr1LX/7coBFMYh?=
- =?us-ascii?Q?XEQMYhApI81mH5tADn9JkygiGgJ90mnEq+qDgESmSTjMMpywex+jwFmsRjJi?=
- =?us-ascii?Q?s/QJdv30YO7p24sEDdq5WtKFis7J9qusPgSGAayCZRzOYSMRo/S/F1fOOUik?=
- =?us-ascii?Q?Vh7F9j0/i+W6ilHdaHvbG/ErRG1ohy6c7IC7p3kJ?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C3F28DA5
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 16:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CBEC7E0002;
+	Fri, 22 Dec 2023 16:56:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1703264217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qhhqAqsBJwBedqKyVQRdHpU7N9vMH9jiJb/eK7IItZo=;
+	b=PfLQvdsF9otELgB7RsMok7cCa9drXWub1ro0EPMft0gqFAYyAZFjCI6p3/1X2zY8mC/tQf
+	an2PtC3DUF70USlGBVxNK18pnnXE6vXzQbXXlVIK0tvD+mVvHR/nCmvU7uRT+M6QcsWjiz
+	WjgcNt/sYkSIztsAe3WYGwIO72pf+nKTbrNohUbsXWYPOS136sXiy2o2Qb2r+c0qPChhbq
+	+KvfKLh+GsAyOr5fSYkqWqRCRzJTTFbWS9dnlckfyjw7gRtcY5JwyNyxgNIRp/Rr/R/6se
+	9rcUQIsoczQBzR47ED/8naTz/NasWbkeGl7RA2nELxX9v0aNxwQ1EkQ/+NUrHA==
+Message-ID: <461d86e8-21db-47fc-a878-7c532a592ac7@arinc9.com>
+Date: Fri, 22 Dec 2023 19:56:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4734.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ba6ec61-0f0a-4fac-77fc-08dc030bb4a1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Dec 2023 16:33:18.9656
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PeSbMjAZsy/gjLmxyRdLQuoE9FMGFVcpnp04Cf7FbmLUSS3XrzdQx0ixbkZAkB/ttjQjWz2zL8bNKOPDU4Hs5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR18MB3694
-X-Proofpoint-GUID: 4k1jOUlXMF18SFjPOawfjmB454CqfH4e
-X-Proofpoint-ORIG-GUID: 4k1jOUlXMF18SFjPOawfjmB454CqfH4e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 5/7] net: dsa: realtek: Migrate user_mii_bus
+ setup to realtek-dsa
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>, linus.walleij@linaro.org,
+ alsi@bang-olufsen.dk, andrew@lunn.ch, f.fainelli@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org
+References: <20231220042632.26825-1-luizluca@gmail.com>
+ <20231220042632.26825-6-luizluca@gmail.com>
+ <CAJq09z4OP6Djuv=HkntCqyLM1332pXzhW0qBd4fc-pfrSt+r1A@mail.gmail.com>
+ <20231221174746.hylsmr3f7g5byrsi@skbuf>
+ <d74e47b6-ff02-41f4-9929-02109ce39e12@arinc9.com>
+ <20231222104831.js4xiwdklazytgeu@skbuf>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20231222104831.js4xiwdklazytgeu@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-> Hi Shinas,
->=20
-> some minor feedback from my side which you might consider addressing
-> if you have to respin the series for some other reason.
->=20
-+
-> > +	oq->buff_info =3D (struct octep_vf_rx_buffer *)
-> > +			vzalloc(oq->max_count *
-> OCTEP_VF_OQ_RECVBUF_SIZE);
->=20
-> nit: There is no need to cast the return value of vzalloc()
->=20
-> 	oq->buff_info =3D vzalloc(oq->max_count *
-> OCTEP_VF_OQ_RECVBUF_SIZE);
->>....
-> > +	if (iq->buff_info)
-> > +		vfree(iq->buff_info);
->=20
-> nit: vfree can handle a NULL argument, so  there is no need to protect it
->      with a if condition
->=20
+On 22.12.2023 13:48, Vladimir Oltean wrote:
+> On Thu, Dec 21, 2023 at 09:34:52PM +0300, Arınç ÜNAL wrote:
+>> On 21.12.2023 20:47, Vladimir Oltean wrote:
+>>> ds->user_mii_bus helps when
+>>> (1) the switch probes with platform_data (not on OF), or
+>>> (2) the switch probes on OF but its MDIO bus is not described in OF
+>>>
+>>> Case (2) is also eliminated because realtek_smi_setup_mdio() bails out
+>>> if it cannot find the "mdio" node described in OF. So the ds->user_mii_bus
+>>> assignment is only ever executed when the bus has an OF node, aka when
+>>> it is not useful.
+>>
+>> I don't like the fact that the driver bails out if it doesn't find the
+>> "mdio" child node. This basically forces the hardware design to use the
+>> MDIO bus of the switch. Hardware designs which don't use the MDIO bus of
+>> the switch are perfectly valid.
+>>
+>> It looks to me that, to make all types of hardware designs work, we must
+>> not use ds->user_mii_bus for switch probes on OF. Case (2) is one of the
+>> cases of the ethernet controller lacking link definitions in OF so we
+>> should enforce link definitions on ethernet controllers. This way, we make
+>> sure all types of hardware designs work and are described in OF properly.
+>>
+>> Arınç
+> 
+> The bindings for the realtek switches can be extended in compatible ways,
+> e.g. by making the 'mdio' node optional. If we want that to mean "there
+> is no internal PHY that needs to be used", there is no better time than
+> now to drop the driver's linkage to ds->user_mii_bus, while its bindings
+> still strictly require an 'mdio' node.
 
-Thanks for the input. I'll wait for feedback from others a little while lon=
-ger and then address these in the next version.
+"There is no internal PHY that needs to be used" is not the right statement
+for all cases. The internal PHYs can be wired to another MDIO bus or they
+may be described as fixed-link which would mean using the MDIO bus to read
+link information from the PHYs becomes unnecessary. These may be very rare
+hardware designs to come across but they are valid hardware descriptions in
+OF. So "the MDIO bus of the switch is not being used for the purpose of
+reading/writing from/to the PHYs (and not necessarily internal PHYs)" is
+the correct statement.
+
+> 
+> If we don't drop that linkage _before_ making 'mdio' optional, there
+> is no way to disprove the existence of device trees which lack a link
+> description on user ports (which is now possible). So the driver will
+> always have to pay the penalty of mdiobus_register(ds->user_mii_bus),
+> which will always enumerate the internal PHYs even if they will end up
+> unused, as you say should be possible. Listing the MDIO bus in OF
+> deactivates bus scanning, which speeds up probing and booting in most
+> cases.
+> 
+> There are other ways to reduce that PHY enumeration pain, like manually
+> setting the bus->phy_mask and moving code around such that it gets
+> executed only once in the presence of -EPROBE_DEFER. This is what Klaus
+> Kudielka had to go through with mv88e6xxx, all because the Turris Omnia
+> device tree lacks phy-handle to the internal PHYs, his boot time shot up
+> by a wide margin.
+> https://lore.kernel.org/lkml/449bde236c08d5ab5e54abd73b645d8b29955894.camel@gmail.com/
+> commit 2c7e46edbd03 ("net: dsa: mv88e6xxx: mask apparently non-existing phys during probing")
+> commit 2cb0658d4f88 ("net: dsa: mv88e6xxx: move call to mv88e6xxx_mdios_register()")
+> 
+> We support device trees with 'hidden' switch internal MDIO buses and it
+> would be unwise to break them. But they are a self-inflicted pain and it
+> would be even more unwise for me to go on record not discouraging their use.
+> Honestly, I don't want any more of them.
+
+Looks like with the direction you're suggesting here, we can enforce link
+descriptions and, at the same time, support device trees with undescribed
+switch MDIO bus on DSA. So I see all this as a step in the right direction.
+
+So yeah, let's keep ds->user_mii_bus for switch probes on OF without the
+switch MDIO bus defined, provided these switches have an MDIO bus.
+
+We should also align all DSA subdrivers with this understanding. I will
+modify the MDIO bus patch I submitted for the MT7530 DSA subdriver
+accordingly.
+
+I was wondering of moving the MDIO bus registration from DSA subdrivers to
+the DSA core driver but probably it's not generic enough across switch
+models with multiple MDIO buses and whatnot to manage this.
+
+Arınç
 
