@@ -1,127 +1,133 @@
-Return-Path: <netdev+bounces-59951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF37481CD8F
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:29:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED4FD81CDA6
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:36:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E442A1C2130C
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:29:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A98022866B7
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9BD2554E;
-	Fri, 22 Dec 2023 17:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D17D28E17;
+	Fri, 22 Dec 2023 17:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="sLojr7lN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q3k0cDpD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2723728DB9
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 17:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-204520717b3so303048fac.0
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 09:29:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DB928DCB
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 17:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e3295978aso2668143e87.1
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 09:36:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1703266169; x=1703870969; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yK8w4D9q9h+4zcpBo7jGy1OpU0oyfdJVEALOxCqfbJA=;
-        b=sLojr7lN3yQK9RV8KpLSiHV+ke+0zJiObXZnI5AqNWsAV7VuUz/NrTPSy21GQXsiVs
-         OZ+BDX5XRYVPX8EfZ/Koq3iH1JsiR5QXBBO7kKmjWEQo62AWazX04OQ05GhPGEmy4Xih
-         4vY8zztOR9+GnnheYyBrPVh776CODm5luXkpUWxJJOIzCHCE5TYI4HdOpOHc7W5FQhWn
-         LE0je5ut5tYWloKYlMC2YzgqvOWqYpHVTjAofRrHjOhVGnXNXImDzcqVeKp7RKtQf1YL
-         M7hlN2jzEEoCxqQxA2cjaUq2rdDzrKK0o1v0UvEqX3GCTWUroQX41AZgc1+Cx2p1MzRP
-         kt5w==
+        d=linaro.org; s=google; t=1703266597; x=1703871397; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GRRqwNTeln7AqmPD355mpYiA2677w+gW66bx5JAwu9g=;
+        b=Q3k0cDpD5imkukXPlK1B//iCBzV1CK3RpKzngHC92p8gAyEHHkaapqiOpseBZS2Y6W
+         dd5DMd7c2+b5NvR3wvBGzP1B/NZm6UHONAGnPF1JpOjoXcGqP+v6N154LJdL91HWo9BT
+         s5uEWksyI/jjhJSqa9YD3rjzAvtgiQhuHpeTe+gL3fb4aYYlrg5lS92negT9ApImIphR
+         vb1zOlgixxJnRl0rPS8HKdWLwNejccKQXParAMVUTPrlhgpbFH/qWQAAunYSZhgi6who
+         F4cTlie3cZ5BBKJNICz05610En/asN4X8qCV+ZlTnewGF8cHy0g3AKazfLruMi7l0RDG
+         wPtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703266169; x=1703870969;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1703266597; x=1703871397;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yK8w4D9q9h+4zcpBo7jGy1OpU0oyfdJVEALOxCqfbJA=;
-        b=OypoqlVLiMmV5+nu5sz4trWZEw7SFBf5fPH3rVIl/68aursOMifoIIPhqdJ5/2Wpx5
-         kBs1C1dBRsLiHwUPf+/PPfEuBstWhD09I+JoeIX67xkelzEgd5opiiaNYLf9+zTEfsjd
-         ZpamjfUNBJLElkEV6pWIewdAr7DgWb+dI+S728KPdrWYvYABAnpzs++yeeUu1zf9B+QS
-         vh6vwCWR8kDJxWTs8SrwDWZaDrEnljw3e0m0s7ZObMnOpNJZMoNopgx8IBq6GHT8ALcX
-         MymZaDGWt4NX8B7ezKabcFJX+2kl3fWTfX+NEfa1uXibmyOs2mX1nBrYknWEkdZuInYJ
-         Eemg==
-X-Gm-Message-State: AOJu0YxsZBNBuXoLuS4A9/vpJiTw2cFkgXbuV2lrhrkA4sFQfijUW3Q1
-	qgXO8+A5R2hV2KJr0S211wjhWP7ae246bG5p6CSC8z/7MzW2GQ==
-X-Google-Smtp-Source: AGHT+IHcBQPSeFOQykFyy/FvQtCW9YSQjA7w87VHTcDNnysE7vlanFRsNKfyZdy0tse8aCJJVCIPjQ==
-X-Received: by 2002:a05:6870:3283:b0:203:f0b0:8f60 with SMTP id q3-20020a056870328300b00203f0b08f60mr1985114oac.2.1703266169176;
-        Fri, 22 Dec 2023 09:29:29 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id j6-20020a632306000000b005c621e0de25sm3819346pgj.71.2023.12.22.09.29.28
+        bh=GRRqwNTeln7AqmPD355mpYiA2677w+gW66bx5JAwu9g=;
+        b=DCS5GHao6TxjdRd6gzBa6P0bfAQhqBnIT6zJPlxspWSQKdNF1/U050rDzEcyKeafde
+         ISvub9YTn4lw2F70370uxXiLlbUXI+QlbcZzh+N3cWjO9k8NxZshVcOtxByc/vmGBf78
+         jO00jEBoi+gj62gt/jbTb0hQE1vwTqkw6v5aQ0SkBK/neGeCSuLvM/VQwZqzx+gmCUb9
+         JE7t8TISXLk1Y8bsT9ey6+9gaz8TC/+AuVHE4QMj4oGb2Zwq//tuJHeMlGsCS5T/v/QY
+         rnuCWBHfLJJfgEgGbU0kbE2bOvoDp0Nl25KYXIWkSEUeYMg9HFEw6Jnzo8ZNwYSDU1hP
+         uARA==
+X-Gm-Message-State: AOJu0YzUKWCYNQdrcWM45FHzbwsN55UV8C20ZHYB1eQeh0Q45A6EVaqm
+	SlfnteJS7/YR9Jsa8AMK2Ex16g0U+A+xvA==
+X-Google-Smtp-Source: AGHT+IEtx8yLnVnzvo7D4FZIQdIfRojh7dZCireBKzc0PoMsNmMiQgrmN/XKJjtXhT6xr+X9Rii+eQ==
+X-Received: by 2002:ac2:47f7:0:b0:50e:1b2b:f2dd with SMTP id b23-20020ac247f7000000b0050e1b2bf2ddmr832523lfp.53.1703266596758;
+        Fri, 22 Dec 2023 09:36:36 -0800 (PST)
+Received: from [127.0.1.1] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id h14-20020a056512220e00b0050e709c8deasm43036lfu.226.2023.12.22.09.36.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 09:29:28 -0800 (PST)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute] configure: drop test for ATM
-Date: Fri, 22 Dec 2023 09:29:06 -0800
-Message-ID: <20231222172919.12610-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
+        Fri, 22 Dec 2023 09:36:36 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH net v4 0/3] Fix a regression in the Gemini ethernet
+ controller.
+Date: Fri, 22 Dec 2023 18:36:34 +0100
+Message-Id: <20231222-new-gemini-ethernet-regression-v4-0-a36e71b0f32b@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACLJhWUC/4XNuw7CMAwF0F9BmQlq7BAIE/+BGPpwW0uQIqcqo
+ Kr/TigLiKHj9ePcUUUSpqgOq1EJDRy5CynY9UqVbR4a0lylrCADNJChDnTXDV05sKa+JQnUa6F
+ GKL5fNZZuBxX5sq68SshNqObHXHBS6Vad07Dl2HfynEsHM68+vtku+YPRmfaYIW6tLQjweOGQS
+ 7fppJntAb49t+hB8pwtwXlrsKrzPw+/PDCLHiYv966wuLNFTfsfb5qmF10YLhxyAQAA
+To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, Household Cang <canghousehold@aol.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+X-Mailer: b4 0.12.4
 
-The ATM qdisc was removed by:
-commit 8a20feb6388f ("tc: drop support for ATM qdisc")
-but configure check was not removed.
+These fixes were developed on top of the earlier fixes.
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+Finding the right solution is hard because the Gemini checksumming
+engine is completely undocumented in the datasheets.
+
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- configure | 23 -----------------------
- 1 file changed, 23 deletions(-)
+Changes in v4:
+- Properly drop all MTU/TSO muckery in the TX function, the
+  whole approach is bogus.
+- Make the raw etherype retrieveal return __be16, it is the
+  callers job to deal with endianness (as per the pattern
+  from if_vlan.h)
+- Use __vlan_get_protocol() instead of vlan_get_protocol()
+- Only actively bypass the TSS if the frame is over a certain
+  size.
+- Drop comment that no longer applies.
+- Link to v3: https://lore.kernel.org/r/20231221-new-gemini-ethernet-regression-v3-0-a96b4374bfe8@linaro.org
 
-diff --git a/configure b/configure
-index eb689341d17d..488c5f880962 100755
---- a/configure
-+++ b/configure
-@@ -26,26 +26,6 @@ check_toolchain()
-     echo "YACC:=${YACC}" >>$CONFIG
- }
- 
--check_atm()
--{
--    cat >$TMPDIR/atmtest.c <<EOF
--#include <atm.h>
--int main(int argc, char **argv) {
--	struct atm_qos qos;
--	(void) text2qos("aal5,ubr:sdu=9180,rx:none",&qos,0);
--	return 0;
--}
--EOF
--
--    if $CC -I$INCLUDE -o $TMPDIR/atmtest $TMPDIR/atmtest.c -latm >/dev/null 2>&1; then
--	echo "TC_CONFIG_ATM:=y" >>$CONFIG
--	echo yes
--    else
--	echo no
--    fi
--    rm -f $TMPDIR/atmtest.c $TMPDIR/atmtest
--}
--
- check_xtables()
- {
- 	if ! ${PKG_CONFIG} xtables --exists; then
-@@ -616,9 +596,6 @@ check_toolchain
- 
- echo "TC schedulers"
- 
--echo -n " ATM	"
--check_atm
--
- check_xtables
- if ! grep -q TC_CONFIG_NO_XT $CONFIG; then
- 	echo -n " IPT	"
+Changes in v3:
+- Fix a whitespace bug in the first patch.
+- Add generic accessors to obtain the raw ethertype of an
+  ethernet frame. VLAN already have the right accessors.
+- Link to v2: https://lore.kernel.org/r/20231216-new-gemini-ethernet-regression-v2-0-64c269413dfa@linaro.org
+
+Changes in v2:
+- Drop the TSO and length checks altogether, this was never
+  working properly.
+- Plan to make a proper TSO implementation in the next kernel
+  cycle.
+- Link to v1: https://lore.kernel.org/r/20231215-new-gemini-ethernet-regression-v1-0-93033544be23@linaro.org
+
+---
+Linus Walleij (3):
+      net: ethernet: cortina: Drop software checksum and TSO
+      if_ether: Add an accessor to read the raw ethertype
+      net: ethernet: cortina: Bypass checksumming engine of alien ethertypes
+
+ drivers/net/ethernet/cortina/gemini.c | 62 +++++++++++++++--------------------
+ include/linux/if_ether.h              | 16 +++++++++
+ 2 files changed, 42 insertions(+), 36 deletions(-)
+---
+base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
+change-id: 20231203-new-gemini-ethernet-regression-3c672de9cfd9
+
+Best regards,
 -- 
-2.43.0
+Linus Walleij <linus.walleij@linaro.org>
 
 
