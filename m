@@ -1,76 +1,77 @@
-Return-Path: <netdev+bounces-59936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 096F081CB76
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:45:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8949C81CB85
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:51:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B9111C22176
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:45:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0326FB23388
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8C322F1B;
-	Fri, 22 Dec 2023 14:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AA822F0D;
+	Fri, 22 Dec 2023 14:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CbXjkuss"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RNxAc1t/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B997B22F04;
-	Fri, 22 Dec 2023 14:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C6B23740;
+	Fri, 22 Dec 2023 14:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ccae380df2so4886101fa.1;
-        Fri, 22 Dec 2023 06:45:03 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40d4103aed7so17502965e9.3;
+        Fri, 22 Dec 2023 06:51:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703256302; x=1703861102; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703256663; x=1703861463; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yGdflJjpqTzGgrTpB9z3udClEdTa0y2wd5bxJETyASg=;
-        b=CbXjkuss0JXiAm6ZeQOZ4QYG1YKHykCR9PluzsYQBvwoD72tnrKY2//UpjuuwPywfo
-         K0xYO32frS6d1B1AfV+FOSBjjlvS+Z0JCn3XDmnv5uUdTN38x4Sz7NIZAhJ+pZjPejdZ
-         7KDZzlqcsf736KQgCNMxolOtoVtD2N8wlNKd81UJsAjgyOftnVRMArhwJScn/8dp5Owz
-         XeVVXY7OX4BG04rT+HafufhEbltl5c/jGI+hhiVVXAISZN8jlKJH8ISqrLX65kqSkFgi
-         6Fxlt4rhtSgvFp075yrlghJwgO2v011/bt+Egn+HwsPvLgGMdFlmPbvi4YsPiuq5V/AY
-         fjng==
+        bh=tNp4E7G3he8UV4jpGDCQDUTxTixBCD4JOV37xRazdPw=;
+        b=RNxAc1t/mCofFWyOII/xtudTHXXHfs2B4I3jGWhEh0cFZDX7cGjeB23BDGbHCeKQxE
+         fpcYlOTPHySsRGEnNkccRjcph4xkkuSePqvpGfQOjVAnoKRAsiuPQG90VGgdPRg+hGsP
+         I+yiRs8N9onKss4sLe1MDr9/S77kwwJ04061B+Jo3BzRfBp8P9mhI9Scjhomlkge/zu+
+         SAWASghX6QNQIEw0OeCt77oIco60gh+79+nxObSjOEuDwDRREIOIGjwPjsbccYbWZwzh
+         7NqT7bWEXgrFDNDaJemWrEk3Rq2WE9PLbeDzr5U0Y/uelAG885Wpzy9mbq/OMTGtuRRp
+         Rg2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703256302; x=1703861102;
+        d=1e100.net; s=20230601; t=1703256663; x=1703861463;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yGdflJjpqTzGgrTpB9z3udClEdTa0y2wd5bxJETyASg=;
-        b=LQl9LNmqOPbHoMa3YsBf9L04LN/02ZsYZrfCgVqW7ImCXKcqUQG5csj1aXArdAt6Wl
-         KcyZWzTX8zsW074uvmAOp/EU6FRh9mAHsUJF9FjRPo6I4j9erq7YqcRK0TRpxmFbvl43
-         igupZPCe6AbMTnpP8J4dVXpN9DoBILkEstYomdj4jn5KHtBgHo5QGF01idAmbAzihNi/
-         sSagz+gGJxatvtzOpE6lf8/MQIqHJiKLggfFZ4W0XFNLvXhgSLKmZj9QRAWjnA5Q+xiQ
-         T4q//tlIiy5RrJwMLyaonOX9tETOnvQyF76CVb3Rjmkk8eBlkbsLBxRRcgCdyLnDFZqk
-         BEpg==
-X-Gm-Message-State: AOJu0Yyg4wYksSeeNkitL9eGOvpX7378KJ8GvqjFTf6e4g0gKXw0lCRB
-	mnSjM1nYVr6kKte5Uuhucck=
-X-Google-Smtp-Source: AGHT+IFQ7bVzkfn7UHoPdtCntTVZBHNA/6WaE0c0joJuTXolxhHj6vDvJOSq0tamCojdPZB333Wu0g==
-X-Received: by 2002:a2e:8742:0:b0:2cc:620e:873 with SMTP id q2-20020a2e8742000000b002cc620e0873mr665971ljj.15.1703256301472;
-        Fri, 22 Dec 2023 06:45:01 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id d18-20020a2eb052000000b002cc6c35aa5bsm616191ljl.128.2023.12.22.06.45.00
+        bh=tNp4E7G3he8UV4jpGDCQDUTxTixBCD4JOV37xRazdPw=;
+        b=LOvKhXhpaAmDwc0MK+qMfdQ+HjsB6w9efoyVq35BSMaJbzjn0a1J5stxzmKXkZVUQp
+         SQF2UfFEQNTSI65MaU1jtmO9DZMJBqZ3aHnQhlvySDhytc7eb7C6Z8OLr++f/WLKoJMm
+         d0P9MBTvVBSJSb9LKf9pjW2A56n7U732kMVRg96Uzv0qOMRFLqpCxKixtNYcwfGR1XOp
+         jmAWaVnPEM9+CLmq/gSKY3Iz60sMOd2E0qAypSenQrvRlj98e9wS2BbCuZbqn8PsDStS
+         2V/PRoHBhmdZJx7uFWD2yMh4PLIPtnotPjZ8QIc3qIKYIFgW5GEQWpdgCEym4/RK43UW
+         nZKQ==
+X-Gm-Message-State: AOJu0YzIgF71hBhOC+DDO7JdEmSnVsGtIfr79mFLXcnVloCLqOVHxZdg
+	TNho2pq6uCimYjMeim7uZM0=
+X-Google-Smtp-Source: AGHT+IGwck3aN97hbUoaagXBuZKIstvcQ6Uu7YqkJpAZlMvwwphtTuaRf7/0nxAeG5R7YOHAdcawAg==
+X-Received: by 2002:a05:600c:1390:b0:40c:2c52:ae3f with SMTP id u16-20020a05600c139000b0040c2c52ae3fmr848063wmf.19.1703256662842;
+        Fri, 22 Dec 2023 06:51:02 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id jx23-20020a170906ca5700b00a269840ab2csm2112537ejb.208.2023.12.22.06.51.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 06:45:01 -0800 (PST)
-Date: Fri, 22 Dec 2023 17:44:58 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Leong Ching Swee <leong.ching.swee@intel.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v1 0/4] net: stmmac: Enable Per DMA Channel
- interrupt
-Message-ID: <kmmjm4sf5geudch54nmehl3ibkpwvlgbhpf7y6quhqy3gnqg32@gcvwlvzec6pn>
-References: <20231222054451.2683242-1-leong.ching.swee@intel.com>
+        Fri, 22 Dec 2023 06:51:02 -0800 (PST)
+Date: Fri, 22 Dec 2023 16:51:00 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jagan Teki <jagan@amarulasolutions.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"Andrew F. Davis" <afd@ti.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Michael Nazzareno Trimarchi <michael@amarulasolutions.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	Fabio Estevam <festevam@gmail.com>
+Subject: Re: PHY issue with SJA1105Q/DP84849I Design
+Message-ID: <20231222145100.sfcuux7ayxtxgogo@skbuf>
+References: <CAMty3ZCn+yGr2MG3WYg+i4DsZWk5b-xEw0SDvNbeGzs6pMwjfQ@mail.gmail.com>
+ <CAMty3ZCn+yGr2MG3WYg+i4DsZWk5b-xEw0SDvNbeGzs6pMwjfQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,48 +80,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231222054451.2683242-1-leong.ching.swee@intel.com>
+In-Reply-To: <CAMty3ZCn+yGr2MG3WYg+i4DsZWk5b-xEw0SDvNbeGzs6pMwjfQ@mail.gmail.com>
+ <CAMty3ZCn+yGr2MG3WYg+i4DsZWk5b-xEw0SDvNbeGzs6pMwjfQ@mail.gmail.com>
 
-Hi Leong
+On Wed, Dec 20, 2023 at 12:49:30PM +0530, Jagan Teki wrote:
+> [ 1255.021656] Modules linked in: mdio_netlink(O) bnep tag_sja1105 sja1105 pcs_xpcs brcmfmac brcmutil imx_sdma coda_vpu v4l2_jpeg imx_vdoa evbug
+> [ 1255.034578] CPU: 0 PID: 374 Comm: ip Tainted: G           O       6.1.58 #1
 
-On Fri, Dec 22, 2023 at 01:44:47PM +0800, Leong Ching Swee wrote:
-> From: Swee Leong Ching <leong.ching.swee@intel.com>
-> 
-> Hi,
-> Add Per DMA Channel interrupt feature for DWXGMAC IP.
->  
-> Patchset (link below) contains per DMA channel interrupt, But it was 
-> achieved.
-> https://lore.kernel.org/lkml/20230821203328.GA2197059-
-> robh@kernel.org/t/#m849b529a642e1bff89c05a07efc25d6a94c8bfb4
->  
-> Some of the changes in this patchset are based on reviewer comment on 
-> patchset mentioned beforehand.
-
-Thanks for resubmitting the patches. At some point in the past they
-saved me some time in fixing the DW XGMAC on my platform.
-
--Serge(y)
-
-> 
-> Swee Leong Ching (4):
->   dt-bindings: net: snps,dwmac: per channel irq
->   net: stmmac: Make MSI interrupt routine generic
->   net: stmmac: Add support for TX/RX channel interrupt
->   net: stmmac: Use interrupt mode INTM=1 for per channel irq
-> 
->  .../devicetree/bindings/net/snps,dwmac.yaml   | 24 ++++++++++----
->  .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  4 +--
->  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  2 +-
->  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 ++
->  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 32 +++++++++++--------
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 29 +++++++++--------
->  .../ethernet/stmicro/stmmac/stmmac_platform.c | 24 ++++++++++++++
->  include/linux/stmmac.h                        |  4 +--
->  8 files changed, 84 insertions(+), 38 deletions(-)
-> 
-> -- 
-> 2.34.1
-> 
-> 
+Can you please reproduce the issue with no out-of-tree modules used
+(here mdio_netlink)?
 
