@@ -1,202 +1,138 @@
-Return-Path: <netdev+bounces-59867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D3881C6EA
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 09:54:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3A2181C757
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 10:35:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91C07B20E79
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 08:54:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89D5B2872B6
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 09:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A408BC8F9;
-	Fri, 22 Dec 2023 08:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8701DDB5;
+	Fri, 22 Dec 2023 09:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="UtB45gC5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+YyTnkp"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2715DC8EE;
-	Fri, 22 Dec 2023 08:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=a/icFs/vjCT6R1zos3pJn3NYi+OarKNXzvYLpYsbkHI=; b=UtB45gC5rA9kZM1HFfgnbZ0OY9
-	pm9vPzBR6DueD9EgkBgCAbIhczKcVwlysTsAoMYbDrXImgjLkjJSZWSdGPQmmEjMMMj47TrqAAil2
-	HNxxpW3DmIqq00x33rNq5xh6OQq4dLgfAUd9l5DjBt65pDLiNvsotF7bJ5fU9HCd9LYUzICoIpcb0
-	GZvK8zQPanTosAOTx+91HEh0eLNS4vqcvJVoRX1TGjZFRJ16eQ0OnRI9zK/bKb9/b+BJnR4y9/4kG
-	27p4JF2a72YXq2Rn2ZDV+d7uQrciZ5jAf6uQ4xfdCED6X77DKaAVyQJUv7Ytbu5HRmMY77J1KUbKs
-	jk5brX7Q==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rGbIP-000JZ9-N8; Fri, 22 Dec 2023 09:54:17 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2023-12-22
-Date: Fri, 22 Dec 2023 09:54:16 +0100
-Message-Id: <20231222085416.5438-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1B1F9D2;
+	Fri, 22 Dec 2023 09:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d40eec5e12so9531135ad.1;
+        Fri, 22 Dec 2023 01:35:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703237709; x=1703842509; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wwPu6jjtuGsrJCEXn679QmZIcAlxcsMnJvedEVXZ1AU=;
+        b=d+YyTnkpOj83iHZROk1NNBFLdPMNvUBPpHYU7jdkMSCn8iVDU+eV4KZU1g5+uqfi0m
+         Kgjb1Ujy/y4ecPv88kK5qYUt/P4T/pXGsMEEWSNxyaOJ2BfcXDWF/3zGcwVkHLEjY2O5
+         QvlEHd62EOEiS7k9zW3MyYq9zHghl2SJQL+XImLG6dvYXkASeWPyK+MQPxrkLu3B9TIC
+         a/ZjaOQr2AvI90iqd/G6qhwIyQUDrxXM819al8HAgOiukblbJ/PKQO45Ui8gXj64DFX6
+         zMa78z+kaBSS/qQ6bMrYxzpIvyDTf3QDpzQ3JI+H6DeaGFY+R3tLQYA4EjP1g0yNkmd7
+         LIWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703237709; x=1703842509;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wwPu6jjtuGsrJCEXn679QmZIcAlxcsMnJvedEVXZ1AU=;
+        b=ogqsKn9BIYhkTz3zFpgYqtQNmjY5eu2924mjNTzwhdTHrLVuyCLHrViNsF8wP8/Uh0
+         MuGMPl/9z6TCJq7SEC+28orQL+jOwMahFOhWsFmzh+DA1lwbx0WxGPyr1GSMzcAaXnyP
+         UJ0XSmlSNRW5CrYRE2qKvlEQX8jOuj2HnHiI9rrL6cwz4IeJ9NuLe3JfVRgJ4gMc3mrt
+         59BdLh77QuC+pQ/YzU/kWB9bOKzwpl+2Cv078cyBj822feL2VD5IQfpLIH9t1rRAySzv
+         dfe7mSEJHXvAhFStfhwI209BuLq3+QeDWzY1zP88KMi3pLyNbt5YqXUa6X4DF/lSwhUZ
+         8QjQ==
+X-Gm-Message-State: AOJu0Yzl+GmW8Ur3PKiLSWd/zziPxsKgzb2EvLwy80MnYDSsBlom04J9
+	1OMASk1x0SpMThNWo0QaDfU=
+X-Google-Smtp-Source: AGHT+IGOqVOFAzemBdD47i50Yv4SnhOpn/HJacgaR7nR0TGc5qK7EjVKm+ZdkY4r9TiwFo0WCBbVEQ==
+X-Received: by 2002:a17:902:d584:b0:1d3:62b9:838a with SMTP id k4-20020a170902d58400b001d362b9838amr1081319plh.132.1703237708854;
+        Fri, 22 Dec 2023 01:35:08 -0800 (PST)
+Received: from archie.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id g5-20020a170902868500b001d096757ac1sm2997245plo.47.2023.12.22.01.35.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Dec 2023 01:35:08 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id 201151192C10C; Fri, 22 Dec 2023 16:35:04 +0700 (WIB)
+Date: Fri, 22 Dec 2023 16:35:04 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Chris Rankin <rankincj@gmail.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Yue Haibing <yuehaibing@huawei.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Qingfang DENG <qingfang.deng@siflower.com.cn>
+Subject: Re: Does Linux still support UP?
+Message-ID: <ZYVYSBKhc-uvO8_o@archie.me>
+References: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27130/Thu Dec 21 10:38:20 2023)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BGJpeMhm1VRD5QR7"
+Content-Disposition: inline
+In-Reply-To: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
 
-The following pull-request contains BPF updates for your *net-next* tree.
+--BGJpeMhm1VRD5QR7
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We've added 22 non-merge commits during the last 3 day(s) which contain
-a total of 23 files changed, 652 insertions(+), 431 deletions(-).
+[also Cc: netdev folks and get_maintainer output for include/net/neighbour.=
+h]
 
-The main changes are:
+On Thu, Dec 21, 2023 at 11:12:34PM +0000, Chris Rankin wrote:
+> Hi,
+>=20
+> I have an ancient i586 UP machine that happily runs vanilla Linux
+> 6.4.16, but which locks up shortly after booting vanilla 6.5.0. The
+> kernel *seems* to run into trouble as soon as the networking layer
+> becomes busy. However, its SysRq-S/U/B sequence still seems to work as
+> expected and so obviously *something* is still responding somewhere.
+>=20
+> This problem still exists in vanilla 6.6.8.
+>=20
+> FWIW I have raised this bug in bugzilla:
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D218296
+>=20
 
-1) Add verifier support for annotating user's global BPF subprogram arguments
-   with few commonly requested annotations for a better developer experience,
-   from Andrii Nakryiko.
+To be honest, you need to bisect. For reference, see
+Documentation/admin-guide/bug-bisect.rst in the kernel sources.
+Since you have problem with your old machine, you may want to compile
+the kernel (which is a prerequisite for bisection) on faster machine,
+then transfer the kernel image + modules into your old machine to
+be installed there. Without bisection, no one will look into this
+regression.
 
-   These tags are:
-     - Ability to annotate a special PTR_TO_CTX argument
-     - Ability to annotate a generic PTR_TO_MEM as non-NULL
+Thanks.
 
-2) Support BPF verifier tracking of BPF_JNE which helps cases when the compiler
-   transforms (unsigned) "a > 0" into "if a == 0 goto xxx" and the like, from
-   Menglong Dong.
+--=20
+An old man doll... just what I always wanted! - Clara
 
-3) Fix a warning in bpf_mem_cache's check_obj_size() as reported by LKP, from Hou Tao.
+--BGJpeMhm1VRD5QR7
+Content-Type: application/pgp-signature; name="signature.asc"
 
-4) Re-support uid/gid options when mounting bpffs which had to be reverted with
-   the prior token series revert to avoid conflicts, from Daniel Borkmann.
+-----BEGIN PGP SIGNATURE-----
 
-5) Fix a libbpf NULL pointer dereference in bpf_object__collect_prog_relos() found
-   from fuzzing the library with malformed ELF files, from Mingyi Zhang.
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZYVYQgAKCRD2uYlJVVFO
+ozJkAQCKyHu9R9zl9W8ZRbFK01mKcm88orrgBonnDmeisJzNAAD7BKlWE/dbnM/p
+BujSYdzYOoj3yK4CuQ/N4D/7kUqCAg8=
+=Pvek
+-----END PGP SIGNATURE-----
 
-6) Skip DWARF sections in libbpf's linker sanity check given compiler options to
-   generate compressed debug sections can trigger a rejection due to misalignment,
-   from Alyssa Ross.
-
-7) Fix an unnecessary use of the comma operator in BPF verifier, from Simon Horman.
-
-8) Fix format specifier for unsigned long values in cpustat sample, from Colin Ian King.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot & wishing you all happy holidays!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Andrii Nakryiko, Christian Brauner, Daniel Borkmann, Dave Marchevsky, 
-Eduard Zingerman, kernel test robot, Randy Dunlap, Sergei Trofimovich, 
-Shung-Hsi Yu
-
-----------------------------------------------------------------
-
-The following changes since commit 1728df7fc11bf09322852ff05e73908244011594:
-
-  Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next (2023-12-19 18:35:28 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to 5abde62465222edd3080b70099bd809f166d5d7d:
-
-  bpf: Avoid unnecessary use of comma operator in verifier (2023-12-21 22:40:25 +0100)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (3):
-      Merge branch 'bpf-support-to-track-bpf_jne'
-      Merge branch 'enhance-bpf-global-subprogs-with-argument-tags'
-      Merge branch 'bpf-fix-warning-in-check_obj_size'
-
-Alyssa Ross (1):
-      libbpf: Skip DWARF sections in linker sanity check
-
-Andrii Nakryiko (10):
-      bpf: abstract away global subprog arg preparation logic from reg state setup
-      bpf: reuse btf_prepare_func_args() check for main program BTF validation
-      bpf: prepare btf_prepare_func_args() for handling static subprogs
-      bpf: move subprog call logic back to verifier.c
-      bpf: reuse subprog argument parsing logic for subprog call checks
-      bpf: support 'arg:xxx' btf_decl_tag-based hints for global subprog args
-      bpf: add support for passing dynptr pointer to global subprog
-      libbpf: add __arg_xxx macros for annotating global func args
-      selftests/bpf: add global subprog annotation tests
-      selftests/bpf: add freplace of BTF-unreliable main prog test
-
-Colin Ian King (1):
-      samples/bpf: Use %lu format specifier for unsigned long values
-
-Daniel Borkmann (1):
-      bpf: Re-support uid and gid when mounting bpffs
-
-Hou Tao (3):
-      selftests/bpf: Close cgrp fd before calling cleanup_cgroup_environment()
-      bpf: Use c->unit_size to select target cache during free
-      selftests/bpf: Remove tests for zeroed-array kptr
-
-Menglong Dong (4):
-      bpf: make the verifier tracks the "not equal" for regs
-      selftests/bpf: remove reduplicated s32 casting in "crafted_cases"
-      selftests/bpf: activate the OP_NE logic in range_cond()
-      selftests/bpf: add testcase to verifier_bounds.c for BPF_JNE
-
-Mingyi Zhang (1):
-      libbpf: Fix NULL pointer dereference in bpf_object__collect_prog_relos
-
-Simon Horman (1):
-      bpf: Avoid unnecessary use of comma operator in verifier
-
- include/linux/bpf.h                                |   7 +-
- include/linux/bpf_verifier.h                       |  29 ++-
- kernel/bpf/btf.c                                   | 282 ++++++---------------
- kernel/bpf/inode.c                                 |  53 +++-
- kernel/bpf/memalloc.c                              | 105 +-------
- kernel/bpf/verifier.c                              | 224 +++++++++++++---
- samples/bpf/cpustat_user.c                         |   4 +-
- tools/lib/bpf/bpf_helpers.h                        |   3 +
- tools/lib/bpf/libbpf.c                             |   2 +
- tools/lib/bpf/linker.c                             |   3 +
- .../testing/selftests/bpf/benchs/bench_htab_mem.c  |   1 +
- .../selftests/bpf/prog_tests/fexit_bpf2bpf.c       |  30 ++-
- tools/testing/selftests/bpf/prog_tests/log_fixup.c |   4 +-
- .../testing/selftests/bpf/prog_tests/reg_bounds.c  |  27 +-
- tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
- .../selftests/bpf/progs/cgrp_kfunc_failure.c       |   2 +-
- .../selftests/bpf/progs/freplace_unreliable_prog.c |  20 ++
- .../selftests/bpf/progs/task_kfunc_failure.c       |   2 +-
- tools/testing/selftests/bpf/progs/test_bpf_ma.c    | 100 ++++----
- .../selftests/bpf/progs/test_global_func5.c        |   2 +-
- .../testing/selftests/bpf/progs/verifier_bounds.c  |  62 +++++
- .../bpf/progs/verifier_btf_unreliable_prog.c       |  20 ++
- .../selftests/bpf/progs/verifier_global_subprogs.c |  99 +++++++-
- 23 files changed, 652 insertions(+), 431 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/freplace_unreliable_prog.c
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_btf_unreliable_prog.c
+--BGJpeMhm1VRD5QR7--
 
