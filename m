@@ -1,101 +1,97 @@
-Return-Path: <netdev+bounces-59847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5385781C3A8
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 04:51:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62CCE81C3A9
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 04:52:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 859CF1C23A17
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 03:51:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 015C01F217A7
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 03:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE016D6F9;
-	Fri, 22 Dec 2023 03:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56D46D6F9;
+	Fri, 22 Dec 2023 03:52:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LW28Xmpm"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="CKsInn/b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D74E5390
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 03:51:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-35fcea0ac1aso7487935ab.1
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 19:51:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD55F17C7
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 03:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-5e75005bd0cso16141747b3.1
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 19:52:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703217072; x=1703821872; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=06aQVNDxgv4h6atnxJTE9zGZR62G00VbRyrZMDcVcvo=;
-        b=LW28Xmpm9DyGfcPEaa07QkHygBOlpXdp3iPsv3x+iUotSlWLM+AoburMDTJU/c6BGP
-         mU/PyslRSu7tqzkzz1gy1T8nHpS2NirR1n2Q6EE37hSnox7yHHGm8xo/1cRjmX5E6mnI
-         BI4j3n5I3NmQBUcEspCTmv9id/za2MauOEFavL05P/72TkOCx9tZukHXHta7FVkl90ME
-         C90cwZ0sNtw8Nt7Zh79d5nz3nfsvyUOTTjd+D5LyZXU2H9fb4liVhc4ucnCMjByHSymu
-         n4RskL7wqRozG2MVbXsvpUsgCTbUuOEoFl1YWW7UCfQprAdi1pqSGTi9GCWosHP+QClr
-         MPtQ==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1703217141; x=1703821941; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZX+s+xxsJSFiXqCRMbxcM3vWwIgmpi3wCqWLp2B/Wlc=;
+        b=CKsInn/bxdluo/xwBlBG/o7w44Q64j1wjh50TJZHVLMUTtpt0CfV7NFpC051sxNMvF
+         NBNl6xex07QlsBdJsCZCVsaYZsv42sW+VE2Y1D0QAMZg7YgYZ6YBF08uhnwrw8WF/Qgm
+         yZmiqK1cIIJzPZWLlXGRiJPCK7kgdJF2VdqGMCLEDKI5olrJ9SxWc3m2dmyxuRFciDmV
+         QbtafCFZ8pRKAfYdjGOqaG0fFLjeffvhoEMy6L5BzRL4Dj78FP4rIV4FZhcVqjoAicpJ
+         0Sl0uJ6zimJgfgZPLmc5jYzniF0DF3sqaJ1bx93ouMZ6XuRQ749so3c2/W6VIC9Kg4T/
+         /Miw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703217072; x=1703821872;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=06aQVNDxgv4h6atnxJTE9zGZR62G00VbRyrZMDcVcvo=;
-        b=EaotABs790ws4cx9GAxxBK1jrqTL6smK7QgZS2lxS7HnxVW0/dXVfockfIAHS+j54r
-         jpKtcPZZlQuML2O/cmV8qmLat+SAqoxFsFEVLSgNuDstlUf3J1L8KWIh+Ey+OnaPyg8m
-         gLXlMiW4riK3iIPx4MQpse4RJxNMRiRoY5093m2zJjtyp/tXoXBYfWaxQv4FgMIZErSn
-         lp9w8QdjnuQwjSCSQoHnhmmoaP55NWkA9hUiG6eMc0ID828pV2g0lTLGw95/lRy5QdXq
-         vkLiPhSRVNjAVc6VZo58SBA+9sDFk58OKWDF3cZgI2Iw+lFtvAlo401wtnK/iL+jpTLR
-         Mq/Q==
-X-Gm-Message-State: AOJu0Yxx8qVLs36pzgbg0bOwwkpaJpj5eht4O4IOaftci6KEflMtI8N7
-	xaSJ+tEayiwl/xlUQIr+YWI=
-X-Google-Smtp-Source: AGHT+IFWC1xb/wkdXEuUtMuglCZBzdnnuzHCzgA5V/p8qrg/Q5FW3z+45V7nAWTOW3uog9Md3/msaw==
-X-Received: by 2002:a05:6e02:174c:b0:35f:b84f:ee5a with SMTP id y12-20020a056e02174c00b0035fb84fee5amr799408ill.75.1703217072239;
-        Thu, 21 Dec 2023 19:51:12 -0800 (PST)
-Received: from ?IPV6:2601:282:1e82:2350:c5db:e362:3bdb:d2c7? ([2601:282:1e82:2350:c5db:e362:3bdb:d2c7])
-        by smtp.googlemail.com with ESMTPSA id r12-20020a92ce8c000000b0035fb6c37421sm893286ilo.30.2023.12.21.19.51.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Dec 2023 19:51:11 -0800 (PST)
-Message-ID: <6f24a4f8-fb07-409b-955a-9aad4ab37ca5@gmail.com>
-Date: Thu, 21 Dec 2023 20:51:10 -0700
+        d=1e100.net; s=20230601; t=1703217141; x=1703821941;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZX+s+xxsJSFiXqCRMbxcM3vWwIgmpi3wCqWLp2B/Wlc=;
+        b=oSv58E3OzS6FyZvbIrwGRpMlOXrowPsnW80gR7NpxGSTaJl2nDbB57YTdwOqIdaxEq
+         Jxe2Qou4IQWoZ0IGRQjBUFORaOYmeIAeqaG9QWwSLnHdNRcNotwPWSIzvQUcJJ0t3mmF
+         BvSYvIz6GAe/8k2vyiwS8nJIar5EfEwBxeU7tASjbxX9Df8c/7JEKgUulifvV6K7FljH
+         putRjW8onLnazyN8vWtel91uYxIRYbYOZ8Ne3fzdDCxoX76goXFXkzPBNqYVy7rsNJJQ
+         CSDaaWlxiPikDxCOfwqeJoEP4R02bLNzXYFDP8gYLHU5Rq13F6S4VVvNZqra5ujE5IzC
+         e4OA==
+X-Gm-Message-State: AOJu0YyQXX0HqcMxJodW/AagXCIL/hRpPH+T3FAXV+vkkV4q2os3PW3J
+	j9TfgAapb7PmgAqT2xzgK7DSOrE5q1ugbw==
+X-Google-Smtp-Source: AGHT+IEvuFLpNcX8o/vC6t0uzsboPO5dkqs2MMMaqx1vv6G/HhNg/kmA1+v8f5nU4gvF61e5UI2Xug==
+X-Received: by 2002:a81:8a06:0:b0:5d7:1940:b381 with SMTP id a6-20020a818a06000000b005d71940b381mr783222ywg.77.1703217141765;
+        Thu, 21 Dec 2023 19:52:21 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id p2-20020a170902c70200b001cfc35d1326sm2427111plp.177.2023.12.21.19.52.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Dec 2023 19:52:21 -0800 (PST)
+Date: Thu, 21 Dec 2023 19:52:18 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: David Ahern <dsahern@gmail.com>
+Cc: Pedro Tammela <pctammela@mojatatu.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ jiri@resnulli.us, xiyou.wangcong@gmail.com, fw@strlen.de,
+ victor@mojatatu.com
+Subject: Re: [PATCH net-next 1/2] net/sched: Retire ipt action
+Message-ID: <20231221195218.3fc45303@hermes.local>
+In-Reply-To: <e17d5e1e-acd0-4185-ab9d-3efe2833cdd1@gmail.com>
+References: <20231221213105.476630-1-jhs@mojatatu.com>
+	<20231221213105.476630-2-jhs@mojatatu.com>
+	<6aab67d6-d3cc-42f5-8ec5-dbd439d7886f@mojatatu.com>
+	<20231221171926.31a88e27@hermes.local>
+	<e17d5e1e-acd0-4185-ab9d-3efe2833cdd1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] net/sched: retire tc ipt action
-Content-Language: en-US
-To: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- stephen@networkplumber.org, fw@strlen.de, pctammela@mojatatu.com,
- victor@mojatatu.com
-References: <20231221213105.476630-1-jhs@mojatatu.com>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20231221213105.476630-1-jhs@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 12/21/23 2:31 PM, Jamal Hadi Salim wrote:
-> In keeping up with my status as a hero who removes code: another one bites the
-> dust.
-> The tc ipt action was intended to run all netfilter/iptables target.
-> Unfortunately it has not benefitted over the years from proper updates when
-> netfilter changes, and for that reason it has remained rudimentary.
-> Pinging a bunch of people that i was aware were using this indicates that
-> removing it wont affect them.
-> Retire it to reduce maintenance efforts.
-> So Long, ipt, and Thanks for all the Fish.
+On Thu, 21 Dec 2023 19:02:40 -0700
+David Ahern <dsahern@gmail.com> wrote:
+
+> On 12/21/23 6:19 PM, Stephen Hemminger wrote:
+> > 
+> > Yes, it breaks iproute2 build if tc_ipt.h is removed.  
 > 
-> Jamal Hadi Salim (2):
->   net/sched: Retire ipt action
->   net/sched: Remove CONFIG_NET_ACT_IPT from default configs
-> 
+> iproute2 header sync would need to remove it. It only breaks apps that
+> do not import uapi files from the kernel.
 
-Acked-by: David Ahern <dsahern@kernel.org>
-
-
+The problem is that when tc_ipt.h is removed, there are defines still used.
+Will need to coordinate removal of ipt support in iproute2 at same time.
 
