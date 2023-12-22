@@ -1,108 +1,281 @@
-Return-Path: <netdev+bounces-59850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3826D81C3F8
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 05:34:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 575C281C475
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 05:56:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73EB61C245BF
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 04:34:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1081F284109
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 04:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722602115;
-	Fri, 22 Dec 2023 04:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADC16D6FD;
+	Fri, 22 Dec 2023 04:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="qGy5QGaF"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="FYFbvffS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A711B5395;
-	Fri, 22 Dec 2023 04:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from HP-EliteBook-x360-830-G8-Notebook-PC.. (unknown [10.101.196.174])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id A9F334137C;
-	Fri, 22 Dec 2023 04:34:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1703219657;
-	bh=cq3bS43kQ1OV36R627XQD8f9TpMkA/PC5nZ9emNcAsE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=qGy5QGaF7gYWurnr7jkmMMi9LB145iqDV/c8NTEgZ6+iSzvuG/9jSQ4AFGTGh3mv9
-	 lZgThBY8uC7bvoGaYSWc6xcoCkHK6xPND4AbPASorMZpuDbe0FbBKxI7aCTN3tvUd+
-	 BTlFZNqsGnMIKwwvB3wx24vhmlK3PaM/ZgAl2+LyR/htE7PUnS7LbJCFY0l+B5eYMZ
-	 7ox3rw3qzljQRQmtswrNJCcYLx7jf7qE2+re1blk8U3njgfBtm0Ua+Zu9IGoPNCJxB
-	 L6pq8fxFGfTTtwaMZGGGrhSeZ1IhHWht1SOGE3sF8212T1EGW5iL9zJJQVvFuZe6x2
-	 fxBHk0YNQLn6A==
-From: Kai-Heng Feng <kai.heng.feng@canonical.com>
-To: hkallweit1@gmail.com,
-	nic_swsd@realtek.com
-Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] r8169: Fix PCI error on system resume
-Date: Fri, 22 Dec 2023 12:34:09 +0800
-Message-Id: <20231222043410.464730-1-kai.heng.feng@canonical.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE278F58
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 04:54:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6da5d410432so1088388a34.2
+        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 20:54:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1703220883; x=1703825683; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bxctZQusd6bBRe1zeqqjjQDcp9DdNMcDk9VOdMbD+HY=;
+        b=FYFbvffSLotgZ/48aBj1qwV46+kJ0I/co0RgzJqX6EYc8cNMItpTM3n5JC0owSaPlb
+         lUhiMZk7zZAflcA1b96iuRqPkRzUsWo17qq/yz75wn3kzS0VL5zXrI6TjKduAEdlT4VW
+         KXXYsbZHdzd6wilo2VVY3WZ5ifOX+gie6EXwxXy0z/ZP3h/riuBdJcbupqB23mB4Tes2
+         a907cHm/OrL25XVhbkBorHIWIi5ESGcZu02edTZE9CgyTBhH6SnyJIoPkVYFt1HhjYxg
+         +ttLEs8F44543rkdUtlwUUSZd4aYyuv6QKxwa0Fdlm7roSgQ+7ul4hplh9uO+HsX372u
+         E6Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703220883; x=1703825683;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bxctZQusd6bBRe1zeqqjjQDcp9DdNMcDk9VOdMbD+HY=;
+        b=h7KR9/SHtbJMQzxGik0xd6vUPj2K2Cr64GKXS6VSOr4kWFtm1BzAXyQTVkM1kfmpsc
+         DMyqVRF5JjTC9dqxL9CskWAqmyo/ZeXntogQpCDDZiB+dXNtFVkmOTRkl5N7iWu9fo0F
+         +dju+EHYxV9w15Z5F1yUoqIqyebtcrcNb84yha2qWV6n4rq4uJs6GiiQMLjWehiylCbc
+         4Za8wdDOfglGvZwUtk838AIvaVG669yqdBxSPS69biW+x5OWKsmNVJxpmoWIevNAYS6x
+         IdtatZR93oJlgkcq1fPbv7KWEo1fyh4qnsYjqDPgRvVz/a01suEKWriBUW+aXKtUVvK+
+         KIzA==
+X-Gm-Message-State: AOJu0YwKDxuG+Wpo/U7F+z9qSHP5pxCZ2IN8GZqj8fnIFIN4QNOto/La
+	HqH0Ku3DxNAC9+d2JGdFAodK+v7hwOVv/w==
+X-Google-Smtp-Source: AGHT+IFlGJM4LTU3qKlH5NCR9oqFjYeEVj29Ryp5x641uQkLKaR/3ddA5Hrr5CeVeoEWigh8teBt+g==
+X-Received: by 2002:a9d:65c2:0:b0:6db:af9a:b3c5 with SMTP id z2-20020a9d65c2000000b006dbaf9ab3c5mr700589oth.41.1703220883318;
+        Thu, 21 Dec 2023 20:54:43 -0800 (PST)
+Received: from ?IPV6:2620:10d:c085:21c1::1007? ([2620:10d:c090:400::4:b6d3])
+        by smtp.gmail.com with ESMTPSA id o23-20020a63e357000000b005c66a7d70fdsm2163702pgj.61.2023.12.21.20.54.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Dec 2023 20:54:42 -0800 (PST)
+Message-ID: <33935a3b-4064-4d85-b3f7-c5e51b8dce5b@davidwei.uk>
+Date: Thu, 21 Dec 2023 20:54:25 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/5] netdevsim: maintain a list of probed
+ netdevsims
+Content-Language: en-GB
+From: David Wei <dw@davidwei.uk>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20231220014747.1508581-1-dw@davidwei.uk>
+ <20231220014747.1508581-2-dw@davidwei.uk> <ZYKsZdjn-ZOp11L4@nanopsycho>
+ <b09032d1-c9f3-4f44-9815-9d1b2a65068d@davidwei.uk>
+In-Reply-To: <b09032d1-c9f3-4f44-9815-9d1b2a65068d@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Some r8168 NICs stop working upon system resume:
+On 2023-12-21 16:45, David Wei wrote:
+> On 2023-12-20 00:57, Jiri Pirko wrote:
+>> Wed, Dec 20, 2023 at 02:47:43AM CET, dw@davidwei.uk wrote:
+>>> This patch adds a linked list nsim_dev_list of probed netdevsims, added
+>>> during nsim_drv_probe() and removed during nsim_drv_remove(). A mutex
+>>> nsim_dev_list_lock protects the list.
+>>
+>> In the commit message, you should use imperative mood, command
+>> the codebase what to do:
+>> https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
+> 
+> Thanks, I didn't know about this. Will edit the commit messages.
+> 
+>>
+>>
+>>>
+>>> Signed-off-by: David Wei <dw@davidwei.uk>
+>>> ---
+>>> drivers/net/netdevsim/dev.c       | 17 +++++++++++++++++
+>>> drivers/net/netdevsim/netdevsim.h |  1 +
+>>> 2 files changed, 18 insertions(+)
+>>>
+>>> diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+>>> index b4d3b9cde8bd..e30a12130e07 100644
+>>> --- a/drivers/net/netdevsim/dev.c
+>>> +++ b/drivers/net/netdevsim/dev.c
+>>> @@ -35,6 +35,9 @@
+>>>
+>>> #include "netdevsim.h"
+>>>
+>>> +static LIST_HEAD(nsim_dev_list);
+>>> +static DEFINE_MUTEX(nsim_dev_list_lock);
+>>> +
+>>> static unsigned int
+>>> nsim_dev_port_index(enum nsim_dev_port_type type, unsigned int port_index)
+>>> {
+>>> @@ -1531,6 +1534,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>> 				 nsim_bus_dev->initial_net, &nsim_bus_dev->dev);
+>>> 	if (!devlink)
+>>> 		return -ENOMEM;
+>>> +	mutex_lock(&nsim_dev_list_lock);
+>>
+>> I don't follow. You claim you use this mutex to protect the list.
+>> a) why don't you use spin-lock?
+> 
+> I'm using a mutex unless I know (or someone else who knows better point
+> out) that a spinlock is better. It is simple, there are fewer gotchas,
+> and I anticipate actual contention here to be near 0. The
+> nsim_bus_dev_list is also protected by a mutex.
+> 
+> Is a spinlock better here and if so why?
+> 
+>> b) why don't don't you take the lock just for list manipulation?
+> 
+> Many code paths interact here, touching drivers and netdevs. There is an
+> ordering of locks being taken:
+> 
+> 1. nsim_bus_dev->dev.mutex
+> 2. devlink->lock
+> 3. rtnl_lock
+> 
+> I was careful to avoid deadlocking by acquiring locks in the same order.
+> But looking at it again, I can reduce the critical section by acquiring
+> nsim_dev_list_lock after devlink->lock, thanks.
 
-[  688.051096] r8169 0000:02:00.1 enp2s0f1: rtl_ep_ocp_read_cond == 0 (loop: 10, delay: 10000).
-[  688.175131] r8169 0000:02:00.1 enp2s0f1: Link is Down
-...
-[  691.534611] r8169 0000:02:00.1 enp2s0f1: PCI error (cmd = 0x0407, status_errs = 0x0000)
+Looking at this again, I need to prevent concurrent nsim_dev
+modifications _and_ nsim_dev_port modifications. This is because
+nsim_dev_peer_write() needs to traverse both of those lists to link up
+two netdevsims.
 
-Not sure if it's related, but those NICs have a BMC device at function
-0:
-02:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. Realtek RealManage BMC [10ec:816e] (rev 1a)
+I cannot use the existing devlink->lock for this, because to take it in
+nsim_dev_peer_write() I need to first safely get a nsim_dev. That's why
+in the patch I take nsim_dev_list_lock early with a seemingly large
+critical section.
 
-Trial and error shows that increase the loop wait on
-rtl_ep_ocp_read_cond to 30 can eliminate the issue, so let
-rtl8168ep_driver_start() to wait a bit longer.
+I think the following locking scheme would work:
 
-Fixes: e6d6ca6e1204 ("r8169: Add support for another RTL8168FP")
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
----
-v3:
- - Wording
- - Add Fixes tag
- - Denote 'net' in subject
+In nsim_drv_probe():
 
-v2:
- - Wording
+1. Take nsim_dev_list_lock
+2. Take devlink->lock
+3. Construct nsim_dev
+4. Construct all nsim_dev_ports
+  a. Take rtnl_lock for each netdevsim port
+5. Add to nsim_dev_list
+6. Release devlink->lock
+7. Release nsim_dev_list_lock
 
- drivers/net/ethernet/realtek/r8169_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Maybe 5 and 6 can be swapped, but I don't think it matters.
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index bb787a52bc75..81fd31f6fac4 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -1211,7 +1211,7 @@ static void rtl8168ep_driver_start(struct rtl8169_private *tp)
- {
- 	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_START);
- 	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
--	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 10);
-+	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
- }
- 
- static void rtl8168_driver_start(struct rtl8169_private *tp)
--- 
-2.34.1
+In nsim_drv_remove():
 
+1. Take nsim_dev_list_lock
+2. Take devlink->lock
+3. Remove from nsim_dev_list
+4. Destroy nsim_dev
+5. Destroy all nsim_dev_ports
+  a. During which, take rtnl_lock for each netdevsim
+6. Release devlink->lock
+7. Release nsim_dev_list_lock
+
+Similarly, maybe 2 and 3 can be swapped.
+
+In nsim_drv_port_add():
+
+1. Take devlink->lock
+2. Take rtnl_lock and create netdevsim
+3. Add to port_list
+4. Release devlink->lock
+
+In nsim_dev_port_del():
+
+1. Take devlink->lock
+2. Remove from port_list
+3. Take rtnl_lock and destroy netdevsim
+4. Release devlink->lock
+
+In nsim_dev_peer_write():
+
+1. Take nsim_dev_list_lock
+   No concurrent modifications to nsim_dev_list, get peer nsim_dev
+2. Take devlink->lock
+   No concurrent modifications to port_list, get peer port and check
+   current port in private_data still exists
+3. Do the linking
+4. Release devlink->lock
+5. Release nsim_dev_list_lock
+
+In v4 I am taking rtnl_lock which may be a mistake. I don't know if
+there are other code paths that can modify a netdevsim's underlying
+net_device without taking devlink lock. If so, then I'd also need to
+take rtnl_lock after devlink->lock.
+
+> 
+>>
+>>
+>>> 	devl_lock(devlink);
+>>> 	nsim_dev = devlink_priv(devlink);
+>>> 	nsim_dev->nsim_bus_dev = nsim_bus_dev;
+>>> @@ -1544,6 +1548,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>> 	spin_lock_init(&nsim_dev->fa_cookie_lock);
+>>>
+>>> 	dev_set_drvdata(&nsim_bus_dev->dev, nsim_dev);
+>>> +	list_add(&nsim_dev->list, &nsim_dev_list);
+>>>
+>>> 	nsim_dev->vfconfigs = kcalloc(nsim_bus_dev->max_vfs,
+>>> 				      sizeof(struct nsim_vf_config),
+>>> @@ -1607,6 +1612,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>>
+>>> 	nsim_dev->esw_mode = DEVLINK_ESWITCH_MODE_LEGACY;
+>>> 	devl_unlock(devlink);
+>>> +	mutex_unlock(&nsim_dev_list_lock);
+>>> 	return 0;
+>>>
+>>> err_hwstats_exit:
+>>> @@ -1668,8 +1674,18 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
+>>> {
+>>> 	struct nsim_dev *nsim_dev = dev_get_drvdata(&nsim_bus_dev->dev);
+>>> 	struct devlink *devlink = priv_to_devlink(nsim_dev);
+>>> +	struct nsim_dev *pos, *tmp;
+>>>
+>>> +	mutex_lock(&nsim_dev_list_lock);
+>>> 	devl_lock(devlink);
+>>> +
+>>> +	list_for_each_entry_safe(pos, tmp, &nsim_dev_list, list) {
+>>> +		if (pos == nsim_dev) {
+>>> +			list_del(&nsim_dev->list);
+>>> +			break;
+>>> +		}
+>>> +	}
+>>> +
+>>> 	nsim_dev_reload_destroy(nsim_dev);
+>>>
+>>> 	nsim_bpf_dev_exit(nsim_dev);
+>>> @@ -1681,6 +1697,7 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
+>>> 	kfree(nsim_dev->vfconfigs);
+>>> 	kfree(nsim_dev->fa_cookie);
+>>> 	devl_unlock(devlink);
+>>> +	mutex_unlock(&nsim_dev_list_lock);
+>>> 	devlink_free(devlink);
+>>> 	dev_set_drvdata(&nsim_bus_dev->dev, NULL);
+>>> }
+>>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+>>> index 028c825b86db..babb61d7790b 100644
+>>> --- a/drivers/net/netdevsim/netdevsim.h
+>>> +++ b/drivers/net/netdevsim/netdevsim.h
+>>> @@ -277,6 +277,7 @@ struct nsim_vf_config {
+>>>
+>>> struct nsim_dev {
+>>> 	struct nsim_bus_dev *nsim_bus_dev;
+>>> +	struct list_head list;
+>>> 	struct nsim_fib_data *fib_data;
+>>> 	struct nsim_trap_data *trap_data;
+>>> 	struct dentry *ddir;
+>>> -- 
+>>> 2.39.3
+>>>
 
