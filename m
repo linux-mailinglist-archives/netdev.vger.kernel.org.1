@@ -1,95 +1,165 @@
-Return-Path: <netdev+bounces-59858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A811E81C51B
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 07:29:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D941D81C539
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 07:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C7DF1F25F1F
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 06:29:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 019DA1C24A2D
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 06:42:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0B57484;
-	Fri, 22 Dec 2023 06:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJwt4U0I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BF063C3;
+	Fri, 22 Dec 2023 06:42:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550E4C129
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 06:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2041d5a95d9so996809fac.0
-        for <netdev@vger.kernel.org>; Thu, 21 Dec 2023 22:28:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703226529; x=1703831329; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XQp9X/pT+p0u0F4+59ONINm2AvREuuxsbBNOfWhCRyk=;
-        b=GJwt4U0IVnH5y4/s1FfVoLazQIrVdfzqBZ+7+8B7lEpG3ia2xnvoJN2h+jyttspyFG
-         Odbv2SjT1CtErQ5MLeoOv5Uu/A6/7AxzF7Z+Y+kQWCOWrNxjYVmzXjGKa8YmIvAtf9AD
-         xZnUAphmageEIcgBfeCbHe90WIchdF5v8Qtgaq2Xh1k4T/3hfi2aN/8kbxW+Hr9Rekwx
-         Y5muKT87N96TF7j5xXhc7fzstFHnrMtr4eW5Igu3NyIGKUpTK2J5GPfTY/q6w9VFndbS
-         oZep3bCruhaKx+SNnxYMPSkXetjjebodCzoPB/nwF2BzTPYLGaYxSSoyZrMmHcojKbmK
-         0uSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703226529; x=1703831329;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XQp9X/pT+p0u0F4+59ONINm2AvREuuxsbBNOfWhCRyk=;
-        b=UMdy7FMmE6StteDcttT3GUIacOyvLEG8UQxD7BkSJlx6DlU/6Su7W4beZHtDg5KARn
-         9ZnkMovyrYI2saJnSQ72Rlgj7h7PKRZOCHhhz9gujECojOB9SRZA1haZRkRIAMjEViMO
-         v68wo/rDyoJ9OMvpThpOtCBe/wA6o6jzGGHqbfGThfYDeBWkQ/OoHw4yGlCC3Ib9ZMVg
-         91EkaC66dcDsH92RqVzPvY8OJrgjrll4ynL57e/DbwGp+z02voEi4na6Ftc78Iinbezf
-         r5Il/WbVzpVg1m2uF4WIzSXMNNlrjOWB7+9gOMkh7JmtKYGmKNG71PenuMnhLQaGPghs
-         djLw==
-X-Gm-Message-State: AOJu0Yyu+JcCR/5PqNAptSDLHVdd8QJGuymq4IvaGV9ktEcUFOY3kUfB
-	TAYlMhPf7xP/i65IUpEehwk=
-X-Google-Smtp-Source: AGHT+IEX8S/lvr9lnS4Jip0UIiGUOedGx8NAacMQIppZm21TQMeAJXFoGsCCznjhaEG5DYh+uGyWVQ==
-X-Received: by 2002:a05:6870:5250:b0:1fa:fc26:7f81 with SMTP id o16-20020a056870525000b001fafc267f81mr916297oai.14.1703226529327;
-        Thu, 21 Dec 2023 22:28:49 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id j6-20020a632306000000b005c621e0de25sm2733409pgj.71.2023.12.21.22.28.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 22:28:48 -0800 (PST)
-Date: Fri, 22 Dec 2023 14:28:45 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org,
-	"Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-Subject: Re: [RFC PATCH for-faizal 0/4] tc-taprio selftests
-Message-ID: <ZYUsnTuoUi2qCdLj@Laptop-X1>
-References: <20231221132521.2314811-1-vladimir.oltean@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DDA8F49;
+	Fri, 22 Dec 2023 06:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4SxHkX5yS8z1R5Yr;
+	Fri, 22 Dec 2023 14:41:08 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 55F071400FD;
+	Fri, 22 Dec 2023 14:42:24 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 22 Dec
+ 2023 14:42:23 +0800
+Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
+ of struct page in API
+To: Mina Almasry <almasrymina@google.com>
+CC: Shakeel Butt <shakeelb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<bpf@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
+	<hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Michael Chan
+	<michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst
+	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>, Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas
+	<mw@semihalf.com>, Russell King <linux@armlinux.org.uk>, Sunil Goutham
+	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau
+	<nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
+	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu
+ Vultur <horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, "K. Y.
+ Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei
+ Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
+	<jaswinder.singh@linaro.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi Gunasekaran
+	<r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, Jiawen Wu
+	<jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, Ronak
+ Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers
+	<pv-drivers@vmware.com>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
+	<shayne.chen@mediatek.com>, Kalle Valo <kvalo@kernel.org>, Juergen Gross
+	<jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Oleksandr
+ Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko
+	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
+	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi
+	<stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+	<justinstitt@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>
+References: <20231214020530.2267499-1-almasrymina@google.com>
+ <20231214020530.2267499-5-almasrymina@google.com>
+ <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
+ <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
+ <20231215021114.ipvdx2bwtxckrfdg@google.com>
+ <20231215190126.1040fa12@kernel.org>
+ <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
+ <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
+ <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
+ <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com>
+ <CAHS8izP63wXGH+Q3y1H=ycT=AHYnhGveBnuyF_rYioAjZ=Hn=g@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <7c6d35e3-165f-5883-1c1b-fce82c976028@huawei.com>
+Date: Fri, 22 Dec 2023 14:42:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231221132521.2314811-1-vladimir.oltean@nxp.com>
+In-Reply-To: <CAHS8izP63wXGH+Q3y1H=ycT=AHYnhGveBnuyF_rYioAjZ=Hn=g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On Thu, Dec 21, 2023 at 03:25:17PM +0200, Vladimir Oltean wrote:
-> Unfortunately the isochron version from debian will not work on veth
-> pairs, I had to make some changes and add the --omit-hwts option to
-> the sender and receiver programs. The modified version is on this branch
-> here, I will merge the changes to 'master' once I have enough confidence
-> in them.
-> https://github.com/vladimiroltean/isochron/tree/omit-hwts
+On 2023/12/22 5:22, Mina Almasry wrote:
+> On Thu, Dec 21, 2023 at 3:32 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2023/12/20 11:01, Mina Almasry wrote:
+>>
+>> ...
+>>
+>>>>>> Perhaps we should aim to not export netmem_to_page(),
+>>>>>> prevent modules from accessing it directly.
+>>>>>
+>>>>> +1.
+>>>>
+>>>
+>>> I looked into this, but it turns out it's a slightly bigger change
+>>> that needs some refactoring to make it work. There are few places
+>>> where I believe I need to add netmem_to_page() that are exposed to the
+>>> drivers via inline helpers, these are:
+>>>
+>>> - skb_frag_page(), which returns NULL if the netmem is not a page, but
+>>> needs to do a netmem_to_page() to return the page otherwise.
+>>
+>> Is it possible to introduce something like skb_frag_netmem() for
+>> netmem? so that we can keep most existing users of skb_frag_page()
+>> unchanged and avoid adding additional checking overhead for existing
+>> users.
+>>
 > 
-> For testing the tc-taprio software scheduling path, we don't need PTP
-> synchronization or hardware timestamps anyway.
-> 
-> This is just a skeleton that I'm hoping Faizal can pick up and extend
-> with more test cases for dynamic schedule changes. It should run
-> primarily on the veth driver, but should behave the same on any network
-> driver as well, including those who also have tc-taprio offload.
+> In my experience most current skb_frag_page() users need specifically
+> the struct page*. Example is illegal_highdma() which
+> PageHighMem(skb_frag_page())
 
-Tested-by: Hangbin Liu <liuhangbin@gmail.com>
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+For illegal_highdma() case, is it possible to use something like
+skb_readabe_frag() checking to avoid calling skb_frag_page() for netmem?
+
+> 
+> But RFC v5 adds skb_frag_netmem() for callsites that want a netmem and
+> don't care about specifically a page:
+> 
+> https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.3516870-10-almasrymina@google.com/
+> 
+>>> - The helpers inside skb_add_rx_frag(), which needs to do a
+>>> netmem_to_page() to set skb->pfmemalloc.
+>>
+>> Similar as above, perhaps introduce something like skb_add_rx_netmem_frag()?
+>>
+> 
+> Yes, v3 of this series adds skb_add_rx_frag_netmem():
+> 
+> https://patchwork.kernel.org/project/netdevbpf/patch/20231220214505.2303297-4-almasrymina@google.com/
 
