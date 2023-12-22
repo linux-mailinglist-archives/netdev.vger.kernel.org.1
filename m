@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-59987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8881781D065
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 00:20:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8C0B81D076
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 00:30:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4597A284E4C
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 23:20:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D863C1C21545
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 23:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA9A35F0C;
-	Fri, 22 Dec 2023 23:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5AC33CF8;
+	Fri, 22 Dec 2023 23:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FnDwrvs7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YLaQR1cT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F15335EFD;
-	Fri, 22 Dec 2023 23:20:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5532BC433CD;
-	Fri, 22 Dec 2023 23:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19ED033CF3;
+	Fri, 22 Dec 2023 23:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 897C7C433C9;
+	Fri, 22 Dec 2023 23:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703287231;
-	bh=oI1RQYQCD9YiMYzDf3+5VQivEeECJlJPQdyNt0c+WQo=;
+	s=k20201202; t=1703287824;
+	bh=eaKEvVSQFOin/RXhdONJzZWiXqaT5GAiyvY3GOOgkFk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FnDwrvs7wF6jLuJgCmzGKsG53ObkjwJJoVP0FPUCBEPgQ+XD7gE/m0kWxObuNeO7C
-	 rpHGJS+o1dY43S9FhEVdJfJ9JhkpCW8u2tFkIr1g1rttHH7SoCU7PAVtpJJIDCekJn
-	 QbBABHre1a/EmRozd51uQdeGZ1HqbKo0Q2xT38ypQDbV6TKu5D7DHAP2rM6ZpUvrz4
-	 //qpdaa+qj+ni2UkaG0Xry5cw63ynmb2CKMNY9rJJiq27B47mrP9Av2Z1yPWs1VqCI
-	 P9o4jre++3oEALOrHn83uW9q1c0ix9RMjcl8E3f97KZkCs3rRQAr+u9PZGoQO3rX25
-	 ROoDOVIF8p7Ew==
+	b=YLaQR1cT2vLlax9tvbu7bpagCCT8hTeuHwE9oN391/vvjx+GdtqehN87+NSeVHOve
+	 jmXwCnZtIsxqraxRAN7K4DyAuhATI17lw3l1SuS8X3/UpSy93+2k0gX1K8Je41EL7E
+	 yaalckUn8/jSwYWGaj0LIVMhOtcSYRwO864L7uzSbfgjHmHucEz3SDZRXbXvDZMhvQ
+	 i3SyrMUdoKmeEvR2WUveagHM+5EWmBHjaG+/AymwXpNe/aX9s9G8m7LaDrXtLAeQqW
+	 4L0JPE2Y22U9/RKvPd5GEbyLqVtbWwdBjgumXAYxCLpO54b7gqjTqe1CNYEfAjIJgs
+	 X/K+505NVdmSw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 39434DD4EE5;
-	Fri, 22 Dec 2023 23:20:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6F159DD4EE5;
+	Fri, 22 Dec 2023 23:30:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,35 +43,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: skbuff: Remove some excess struct-member documentation
+Subject: Re: [PATCH net-next] selftest/tcp-ao: Rectify out-of-tree build
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170328723122.4715.10503862336858743750.git-patchwork-notify@kernel.org>
-Date: Fri, 22 Dec 2023 23:20:31 +0000
-References: <87cyv3javh.fsf@meer.lwn.net>
-In-Reply-To: <87cyv3javh.fsf@meer.lwn.net>
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <170328782445.9123.3749808837264846896.git-patchwork-notify@kernel.org>
+Date: Fri, 22 Dec 2023 23:30:24 +0000
+References: <20231219-b4-tcp-ao-selftests-out-of-tree-v1-1-0fff92d26eac@arista.com>
+In-Reply-To: <20231219-b4-tcp-ao-selftests-out-of-tree-v1-1-0fff92d26eac@arista.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, 0x7f454c46@gmail.com,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lkp@intel.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 18 Dec 2023 17:26:26 -0700 you wrote:
-> Remove documentation for nonexistent structure members, addressing these
-> warnings:
+On Tue, 19 Dec 2023 02:03:05 +0000 you wrote:
+> Trivial fix for out-of-tree build that I wasn't testing previously:
 > 
->   ./include/linux/skbuff.h:1063: warning: Excess struct member 'sp' description in 'sk_buff'
->   ./include/linux/skbuff.h:1063: warning: Excess struct member 'nf_bridge' description in 'sk_buff'
-> 
-> Signed-off-by: Jonathan Corbet <corbet@lwn.net>
+> 1. Create a directory for library object files, fixes:
+> > gcc lib/kconfig.c -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing -I ../../../../../usr/include/ -iquote /tmp/kselftest/kselftest/net/tcp_ao/lib -I ../../../../include/  -o /tmp/kselftest/kselftest/net/tcp_ao/lib/kconfig.o -c
+> > Assembler messages:
+> > Fatal error: can't create /tmp/kselftest/kselftest/net/tcp_ao/lib/kconfig.o: No such file or directory
+> > make[1]: *** [Makefile:46: /tmp/kselftest/kselftest/net/tcp_ao/lib/kconfig.o] Error 1
 > 
 > [...]
 
 Here is the summary with links:
-  - net: skbuff: Remove some excess struct-member documentation
-    https://git.kernel.org/netdev/net-next/c/dcc3e46472d6
+  - [net-next] selftest/tcp-ao: Rectify out-of-tree build
+    https://git.kernel.org/netdev/net-next/c/826eb9bcc184
 
 You are awesome, thank you!
 -- 
