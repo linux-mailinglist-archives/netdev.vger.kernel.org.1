@@ -1,107 +1,153 @@
-Return-Path: <netdev+bounces-59862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A2481C57E
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 08:23:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9557281C5FF
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 08:55:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D54B9289ABB
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 07:23:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 351E31F25745
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 07:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B178F6F;
-	Fri, 22 Dec 2023 07:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="jV9Sc+v6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACBDE944B;
+	Fri, 22 Dec 2023 07:55:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9127DC8CA
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 07:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 024BA207BE;
-	Fri, 22 Dec 2023 08:23:07 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9g92GwRj6jxK; Fri, 22 Dec 2023 08:23:06 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 7BB2F206B1;
-	Fri, 22 Dec 2023 08:23:06 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 7BB2F206B1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1703229786;
-	bh=auCwJJVZYPsoKZ39Wva6y46O/CZ6sjYwE5C8ZfMRqnM=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=jV9Sc+v64GnLmDb+8mFunSTYQlboJ5b3yLyhxLi7H2kGjCGR6bA8e8dxGHvVkvs2K
-	 G2ZSbJGYzlEjPAKtdCj9XhR+sgOjRk9O8H0l32wJoEpILWeglly4fhZrV+oIBaWXTZ
-	 KOcwTmDFegzOWNY4pyBRSpsGZVZnBCu2Fvtv+1sF/v7pzpamBsebioeT3erHzC14kL
-	 21d9lDT5lkBg95dOyJA908o455ypOw57jDMf8EBAY+4pW76DgtPWhG75UJRBsJ8DiF
-	 K/vHWZVjVE0XXyaXDWvvJeRSnHnkCcZljqJxVS0lAt+7NrMOZUWkJLxahaTAmCjyfr
-	 VBjAxiGRQDZzg==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id 6FD7180004A;
-	Fri, 22 Dec 2023 08:23:06 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 22 Dec 2023 08:23:06 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Fri, 22 Dec
- 2023 08:23:05 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 86E9D3182B45; Fri, 22 Dec 2023 08:23:05 +0100 (CET)
-Date: Fri, 22 Dec 2023 08:23:05 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Antony Antony <antony.antony@secunet.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, <devel@linux-ipsec.org>, Jakub Kicinski
-	<kuba@kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v4 ipsec-next 2/2] xfrm: fix source address in icmp error
- generation from IPsec gateway
-Message-ID: <ZYU5WXhf1F+BJMAY@gauss3.secunet.de>
-References: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
- <bbc29793e3865a33937ae70f10016a4bc41b71fa.1703164284.git.antony.antony@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7BEBE47
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 07:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rGaMz-00027g-BL; Fri, 22 Dec 2023 08:54:57 +0100
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rGaMu-000hcp-CW; Fri, 22 Dec 2023 08:54:53 +0100
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rGaMv-008FUz-CD; Fri, 22 Dec 2023 08:54:53 +0100
+Date: Fri, 22 Dec 2023 08:54:53 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Mark Brown <broonie@kernel.org>
+Cc: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>,
+	Liam Girdwood <lgirdwood@gmail.com>
+Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <20231222075453.GJ1697233@pengutronix.de>
+References: <20231205064527.GJ981228@pengutronix.de>
+ <4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
+ <20231205140203.GK981228@pengutronix.de>
+ <88ed0c94-d052-4564-be0c-79a0f502eda8@sirena.org.uk>
+ <20231221163610.47038996@kmaincent-XPS-13-7390>
+ <ffda1003-b752-402e-8e51-e2e24a840cff@sirena.org.uk>
+ <20231221171000.45310167@kmaincent-XPS-13-7390>
+ <501f671d-4e03-490b-a9d6-e1f39bb99115@sirena.org.uk>
+ <20231221174246.GI1697233@pengutronix.de>
+ <81f0ddba-5008-43a4-a41c-c7b6ba8e2e3b@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <bbc29793e3865a33937ae70f10016a4bc41b71fa.1703164284.git.antony.antony@secunet.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <81f0ddba-5008-43a4-a41c-c7b6ba8e2e3b@sirena.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Dec 21, 2023 at 02:12:36PM +0100, Antony Antony wrote:
-> ---
->  net/ipv4/icmp.c | 1 -
->  1 file changed, 1 deletion(-)
+On Thu, Dec 21, 2023 at 06:05:28PM +0000, Mark Brown wrote:
+> On Thu, Dec 21, 2023 at 06:42:46PM +0100, Oleksij Rempel wrote:
 > 
-> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-> index e63a3bf99617..bec234637122 100644
-> --- a/net/ipv4/icmp.c
-> +++ b/net/ipv4/icmp.c
-> @@ -555,7 +555,6 @@ static struct rtable *icmp_route_lookup(struct net *net,
->  					    XFRM_LOOKUP_ICMP);
->  	if (!IS_ERR(rt2)) {
->  		dst_release(&rt->dst);
-> -		memcpy(fl4, &fl4_dec, sizeof(*fl4));
->  		rt = rt2;
->  	} else if (PTR_ERR(rt2) == -EPERM) {
->  		if (rt)
+> > The main question is - how to represent a remote consumer (Powered
+> > Device)? It looks for me like having a dummy regulator consumer for each
+> > (PSE PI) withing the PSE framework is the simplest thing to do. User
+> > should enable this dummy consumer from user space by using already
+> > existing interface in case of PoDL - ETHTOOL_A_PODL_PSE_ADMIN_CONTROL
+> > or new interface for Clause 33 PSE.
+> 
+> That's not even a dummy consumer - the physical power output from the
+> system is a real, physical thing that we can point at just as much as
+> any other physical device.  Some kind of library/helper thing that
+> connects up with other interfaces for controlling network ports like you
+> suggest above does seem like a good fit here.
 
-This is generic icmp code, so I want to see an Ack from one of
-the netdev Maintainers before I merge this into the ipsec-next
-tree. Alternatively, you can just split the patchset and route
-this one to net or net-next.
+@Köry,
+
+It will be good if you add vin-supply property to your DTs. It will
+allow to track all needed dependencies. If I interpret PD692x0/PD69208
+manuals properly, each Manager may have only one Vmain shared for
+different ports. But different managers may have different Vmains.
+
+I assume, regulator tree will be like this:
+Vmain-0
+  manager@0 (assigned to ethernet-pse@3c controller)
+    port0
+    port1
+    ..
+  manager@1 (assigned to ethernet-pse@3c controller)
+    port0
+    port1
+    ..
+
+More complex system may look like:
+Vmain-0
+  manager@0 (ethernet-pse@3c)
+    port0
+    port1
+    ..
+Vmain-1
+  manager@1 (ethernet-pse@3c)
+    port0
+    port1
+    ..
+
+
+Not sure how to properly represent even more complex system with
+multiple controllers, in this case manager names will overlap:
+Vmain-0
+  manager@0 (ethernet-pse@3c)
+    port0
+    port1
+    ..
+  manager@0 (ethernet-pse@4c) <----
+    port0
+    port1
+    ..
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
