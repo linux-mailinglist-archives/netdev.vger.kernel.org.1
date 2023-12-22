@@ -1,147 +1,108 @@
-Return-Path: <netdev+bounces-59849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE3681C3D5
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 05:25:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3826D81C3F8
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 05:34:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89E89B21351
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 04:25:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73EB61C245BF
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 04:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D1E210B;
-	Fri, 22 Dec 2023 04:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722602115;
+	Fri, 22 Dec 2023 04:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mS0XZ7lK"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="qGy5QGaF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8891C2F;
-	Fri, 22 Dec 2023 04:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6d774533e73so1448778b3a.1;
-        Thu, 21 Dec 2023 20:25:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703219118; x=1703823918; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FI28OOdgrC3b3WvGuekm1c4zR7iBHpXdXn/h9IBkfrU=;
-        b=mS0XZ7lKfSKGDL7TzvQmV3rZgTwqV7Q3COdsYp6/vXssxlHRpClYujQszUg4WXxSEg
-         vedYzRxF61cGQ8Rigtx7EPkneDZChQ5WzQPl5wtE1uvCocZM0i2BNP/wft7ZbmU7Sxym
-         DLFSzCoIohLLW3kCFBxItu4ecp+wZma48ARXgUF8u5jmg3uoUzJqghkwDpoiI/bJ1aEG
-         ISxEmtHOMKF1bZFVUXFit+QwCrC0R2HaGU0NjWMUlXyLInb7SuGThdK1cqOdZ16ITD+3
-         d0N4i2moWTdwSbtEEJTzidkNUj4iAc7BMePOd3D/uFRhkxbwJbtCmOdOHGMtl/j6N2iS
-         Y1dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703219118; x=1703823918;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FI28OOdgrC3b3WvGuekm1c4zR7iBHpXdXn/h9IBkfrU=;
-        b=acv7VSqSDJogMROZsjVRgbNyKaDXnSJ2uTvNVamYrK7R2u1ucdXvDpSAkXUCFIZd5X
-         veUs2nxGj2yhVPltuNOdxP8XX2+zShJPbuCkYSUUEosJYEzXkpXHO0XdXyam6QZ54nBY
-         06WlwqnzjKjAOr/AP6HyNnunP9QQHSvGpCwTfblUTboPumbxhA+fci4rlj8eneBd0V5h
-         mcG69Tk3DR1nBULE5T2A3RnUjZ6fnkimz7EE6eViXnyZV6hxOBOhgGi5kNWwWqTlT0/Y
-         Q8gsHAOJcbbZ1p/RUbFPWBN7GK7/HzvwW7Ca8kL0UZvdeL7dVw5gEcfzpu3Bkd8jDHdf
-         641w==
-X-Gm-Message-State: AOJu0YzY+55DxxCamnIUK8jIw/gqAs6pfLn2563hsWLMaBZfcGG+8m+5
-	Jl6473ZDMYmGLPOyH69uEMc=
-X-Google-Smtp-Source: AGHT+IGtH6T3Jw9IPcPlpeNp3K8Lkb+hHArZ83pzbQZ/Ic8gDBms+SUAFEYYClpAcqmIu9vUW0Sprw==
-X-Received: by 2002:aa7:85d0:0:b0:6d9:4687:c38d with SMTP id z16-20020aa785d0000000b006d94687c38dmr771382pfn.68.1703219117848;
-        Thu, 21 Dec 2023 20:25:17 -0800 (PST)
-Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id m20-20020a635814000000b005ab281d0777sm2328915pgb.20.2023.12.21.20.25.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 20:25:17 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id 80ED811978D9B; Fri, 22 Dec 2023 11:25:13 +0700 (WIB)
-Date: Fri, 22 Dec 2023 11:25:13 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Dmitry Safonov <dima@arista.com>, Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A711B5395;
+	Fri, 22 Dec 2023 04:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from HP-EliteBook-x360-830-G8-Notebook-PC.. (unknown [10.101.196.174])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id A9F334137C;
+	Fri, 22 Dec 2023 04:34:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1703219657;
+	bh=cq3bS43kQ1OV36R627XQD8f9TpMkA/PC5nZ9emNcAsE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=qGy5QGaF7gYWurnr7jkmMMi9LB145iqDV/c8NTEgZ6+iSzvuG/9jSQ4AFGTGh3mv9
+	 lZgThBY8uC7bvoGaYSWc6xcoCkHK6xPND4AbPASorMZpuDbe0FbBKxI7aCTN3tvUd+
+	 BTlFZNqsGnMIKwwvB3wx24vhmlK3PaM/ZgAl2+LyR/htE7PUnS7LbJCFY0l+B5eYMZ
+	 7ox3rw3qzljQRQmtswrNJCcYLx7jf7qE2+re1blk8U3njgfBtm0Ua+Zu9IGoPNCJxB
+	 L6pq8fxFGfTTtwaMZGGGrhSeZ1IhHWht1SOGE3sF8212T1EGW5iL9zJJQVvFuZe6x2
+	 fxBHk0YNQLn6A==
+From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+To: hkallweit1@gmail.com,
+	nic_swsd@realtek.com
+Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Dmitry Safonov <0x7f454c46@gmail.com>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	YouHong Li <liyouhong@kylinos.cn>
-Subject: Re: [PATCH] net/tcp_sigpool: Use kref_get_unless_zero()
-Message-ID: <ZYUPqXO7VYJ79HMc@archie.me>
-References: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3] r8169: Fix PCI error on system resume
+Date: Fri, 22 Dec 2023 12:34:09 +0800
+Message-Id: <20231222043410.464730-1-kai.heng.feng@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="sBQ04bcKWONUwGSt"
-Content-Disposition: inline
-In-Reply-To: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
+Content-Transfer-Encoding: 8bit
 
+Some r8168 NICs stop working upon system resume:
 
---sBQ04bcKWONUwGSt
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[  688.051096] r8169 0000:02:00.1 enp2s0f1: rtl_ep_ocp_read_cond == 0 (loop: 10, delay: 10000).
+[  688.175131] r8169 0000:02:00.1 enp2s0f1: Link is Down
+...
+[  691.534611] r8169 0000:02:00.1 enp2s0f1: PCI error (cmd = 0x0407, status_errs = 0x0000)
 
-On Fri, Dec 22, 2023 at 01:13:59AM +0000, Dmitry Safonov wrote:
-> The freeing and re-allocation of algorithm are protected by cpool_mutex,
-> so it doesn't fix an actual use-after-free, but avoids a deserved
-> refcount_warn_saturate() warning.
->=20
-> A trivial fix for the racy behavior.
->=20
-> Fixes: 8c73b26315aa ("net/tcp: Prepare tcp_md5sig_pool for TCP-AO")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> ---
->  net/ipv4/tcp_sigpool.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->=20
-> diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
-> index 55b310a722c7..8512cb09ebc0 100644
-> --- a/net/ipv4/tcp_sigpool.c
-> +++ b/net/ipv4/tcp_sigpool.c
-> @@ -162,9 +162,8 @@ int tcp_sigpool_alloc_ahash(const char *alg, size_t s=
-cratch_size)
->  		if (strcmp(cpool[i].alg, alg))
->  			continue;
-> =20
-> -		if (kref_read(&cpool[i].kref) > 0)
-> -			kref_get(&cpool[i].kref);
-> -		else
-> +		/* pairs with tcp_sigpool_release() */
-> +		if (!kref_get_unless_zero(&cpool[i].kref))
->  			kref_init(&cpool[i].kref);
->  		ret =3D i;
->  		goto out;
->=20
-> ---
-> base-commit: 1a44b0073b9235521280e19d963b6dfef7888f18
-> change-id: 20231222-tcp-ao-kref_get_unless_zero-fe7105781ba4
->=20
+Not sure if it's related, but those NICs have a BMC device at function
+0:
+02:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. Realtek RealManage BMC [10ec:816e] (rev 1a)
 
-No observable regressions when booting the kernel with this patch applied.
+Trial and error shows that increase the loop wait on
+rtl_ep_ocp_read_cond to 30 can eliminate the issue, so let
+rtl8168ep_driver_start() to wait a bit longer.
 
-Tested-by: Bagas Sanjaya <bagasdotme@gmail.com>
+Fixes: e6d6ca6e1204 ("r8169: Add support for another RTL8168FP")
+Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+---
+v3:
+ - Wording
+ - Add Fixes tag
+ - Denote 'net' in subject
 
---=20
-An old man doll... just what I always wanted! - Clara
+v2:
+ - Wording
 
---sBQ04bcKWONUwGSt
-Content-Type: application/pgp-signature; name="signature.asc"
+ drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
------BEGIN PGP SIGNATURE-----
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index bb787a52bc75..81fd31f6fac4 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -1211,7 +1211,7 @@ static void rtl8168ep_driver_start(struct rtl8169_private *tp)
+ {
+ 	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_START);
+ 	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
+-	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 10);
++	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
+ }
+ 
+ static void rtl8168_driver_start(struct rtl8169_private *tp)
+-- 
+2.34.1
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZYUPpgAKCRD2uYlJVVFO
-o5zSAP9XM+SDEqMkhUuRetgAbHF2sJx0QgYDoulGVSRNB/T7QQEAnhMonLXOsrps
-YmuFq34V+WZllvw9pPxO6RgmAEqSbAk=
-=vig/
------END PGP SIGNATURE-----
-
---sBQ04bcKWONUwGSt--
 
