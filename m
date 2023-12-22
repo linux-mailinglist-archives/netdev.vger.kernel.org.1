@@ -1,223 +1,300 @@
-Return-Path: <netdev+bounces-59966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4BA281CE92
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 19:48:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A3FC81CEA2
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 20:03:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF90A1C224FF
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:48:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 005142864AD
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 19:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDFF2C1B0;
-	Fri, 22 Dec 2023 18:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF182C1B8;
+	Fri, 22 Dec 2023 19:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nPI+ZugZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUTOe3So"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567042C1A0
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 18:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703270932; x=1734806932;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=k3EVJOnTT7rMleaEiKamQZBORXyDmB/+GsgkO/t77Lw=;
-  b=nPI+ZugZwaVCskK8VdKUGCCPur1RqsNFGKqGg6r8952oRpr9f2BKXMnB
-   rqLn6LBUMUuv/DQOz9nOr7LmZcGWYCqPs3LGu24g75pCH7dQRTGBSZlDE
-   gsACgQVjYAYdSW18FPKTWoH3jUk3HX0/04Offssly7C5g8NDv4OOCIzI3
-   7ENTqE5eUaAi1HWx/10XhoIsWug18/gwZnq8exEkO4JNU0zSHQSnf1QbT
-   aj4hce8YJOEcAKMx7xmLnBeKHSx3ZAU1Y440f1rz+vsgVr7JliL2RAmNo
-   ZrGoDAXFBple8D5/34CtRDIed6fKDO178/ZxbLqAAP7ej5v46dQpLf5nh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="395887413"
-X-IronPort-AV: E=Sophos;i="6.04,297,1695711600"; 
-   d="scan'208";a="395887413"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2023 10:48:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="777114592"
-X-IronPort-AV: E=Sophos;i="6.04,297,1695711600"; 
-   d="scan'208";a="777114592"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Dec 2023 10:48:51 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 22 Dec 2023 10:48:50 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 22 Dec 2023 10:48:50 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 22 Dec 2023 10:48:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aNrCtUUX95ph6Kb+VfCZmQ+GKoMCUeKstkP5v9Vkr7ZsijVZFOIiE3QlX/A4E3sFTFtjz1N+juLvwy5iii7PmvT4ItLm9spkjiO55bPXXTSbY0fZ5hcSaq4cGfEBvhk6vwXsocz5WFPZW6E/wdYPyYzF2vzKNWU7fkzJGhox8CD1hUfkN4pAsZYo2UcM6dEkk6rUHYsJdJxJVOPAN5tJrsIiuoZlA4aWkm3kwTLCcc9CiwG9cW01gER4oDeZFpUj8RRYoFymz7gCrL6GR6oeeeL2BtXpQOjJNuOWnuOX9Cish7ieglB+i84Qy4hfjksXOVA704m014K0nDKEOevhcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=20MrQj5N69TnH8h1nRCDldIfjP6dZfzFdqvycSiBBYQ=;
- b=f47uR7aWcRgKMbVlGKsNLKZiFi0wNrhIM5J6UVgBTJ/2n+GCgrOxL15y8M8rGVsJA8TIDhz9ElycTUmWmKrKXtNDOdpNojcOX0C1BY44A8ueB3YCXlbN80gfQ9L6e/aBkQ+I+3em5IShfNQEyCYj4Q06dUt5yKz/hRhQpxsZahjx5mgYIPE/yb9AI/1JaJIoeHkH6GwNhPE+660XuvCtXABkGjE9cmKj4Sb6Vn8jvIS64uiSH/l9YKQr4E8clUkly7fet8KZWow9wgrHQ1eem0uJGRMu1PRqk0Rw0YwZMnLMbrN+kliHBY0bTNzOrXzsd3gBAQ93c6Yrl5Ac//F2TQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CY8PR11MB7195.namprd11.prod.outlook.com (2603:10b6:930:93::19)
- by DM4PR11MB7328.namprd11.prod.outlook.com (2603:10b6:8:104::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.21; Fri, 22 Dec
- 2023 18:48:48 +0000
-Received: from CY8PR11MB7195.namprd11.prod.outlook.com
- ([fe80::6e9a:e84e:338b:751b]) by CY8PR11MB7195.namprd11.prod.outlook.com
- ([fe80::6e9a:e84e:338b:751b%7]) with mapi id 15.20.7113.019; Fri, 22 Dec 2023
- 18:48:48 +0000
-From: "Register, Scott" <scott.register@intel.com>
-To: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "marcin.szycik@linux.intel.com"
-	<marcin.szycik@linux.intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 15/15] idpf: refactor some
- missing field get/prep conversions
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 15/15] idpf: refactor some
- missing field get/prep conversions
-Thread-Index: AQHaJ9/8RJYel8+zIU2Awc0NZZjsl7C1vwKg
-Date: Fri, 22 Dec 2023 18:48:48 +0000
-Message-ID: <CY8PR11MB7195F60B544779EAE94818999794A@CY8PR11MB7195.namprd11.prod.outlook.com>
-References: <20231206010114.2259388-1-jesse.brandeburg@intel.com>
- <20231206010114.2259388-16-jesse.brandeburg@intel.com>
-In-Reply-To: <20231206010114.2259388-16-jesse.brandeburg@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR11MB7195:EE_|DM4PR11MB7328:EE_
-x-ms-office365-filtering-correlation-id: 73772e85-9f41-48a3-0181-08dc031ea208
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cSuL3W84t0WWWnb/IsKHtz6fRLrfAZOMYFeCtLrfGru8xjEhLNaUvX1/uPjY6Q41QoNaPv/5BIgd6LJRe43Sk0OXknSLs5WUgW4QWcONv4oKGz/GGL5BNfT59W565YBePVVoHNbI9tXPvSsJjoiPiStgPDwxRRBg8/ZJJP90UQdI7bzR9u6zGJzVOyO4ruXmkDBPcegaYgrfePVdQmgTGlk5i+NRXd5VrF4+gSZmL4OxW4HsPHDIiRrCBbDB3z3aJ+2XowwE1r5a5bsV19gDlhUC2vYRmi3i/wtalF1vt6fl8gS7eVG2BUdtlR1n4K8+tMwklNu5R3+ksDsVo+Ya+vluRgRlxIRtkWfIaCUkRexZ49ssmNYS9tb7AIV1kiTSe1qXPyTikCdWiiVQdmjoeiWi9cZxStJKWWtiU7giZGbh+BKAuG8n208BeiEsye9KJyBLCSjWKPBiO9wADZ3TFkjFpn295TPDJAqBvkesJtqBcnm6jbWyk1mvz4y5ll2fwZuBjsqAv6jXjXKsCG+wNqa8cprBwAj6euxbFrxca6stqWroQJGCB84Z7CAhbZbPUmNWYwo9LAY8qki57vwg5dQ81SSg/OwW8NcEo0zSlE92IiUk5ti9jrwm9RVm5oRt
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR11MB7195.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(136003)(396003)(376002)(366004)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(7696005)(38100700002)(83380400001)(33656002)(41300700001)(86362001)(122000001)(82960400001)(5660300002)(8936002)(4326008)(8676002)(66946007)(66476007)(54906003)(64756008)(52536014)(66446008)(76116006)(110136005)(71200400001)(6506007)(9686003)(316002)(66556008)(53546011)(478600001)(2906002)(38070700009)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7rYsYBRkBLJnjHy+MOyyjoFiyV7IXuzuOKlcXxuu1vhQxH+j6XPzYl2s+H9Y?=
- =?us-ascii?Q?xYQSytHSe2ToMKUia8Sh42hOZAH4cA8OCWaIenHZgOxC7sJWYquF8YIj2tHq?=
- =?us-ascii?Q?H9OCdBwZ5x4jd6BLQN0lNvEVS7SnrVU6T/7gZViK0aSFPWiHpKQuoZxhRhz4?=
- =?us-ascii?Q?xuX6y3uIC6XwYmSJAy/Dg2HEpmOldVVBIly3nYpUSCsyJS/PpN6bHzl0BJo8?=
- =?us-ascii?Q?COxBkTEjCB+B6n3Zb8v9piglQqB8xNCZIPj7ufoiGFiFk5O+pzZjAhjKeaJ8?=
- =?us-ascii?Q?KIHTFU7UQ4f4yK9DFK13yq8CDXjq0dmpgbxAr/MgNcwv0sW7x0xzc7kT8h5i?=
- =?us-ascii?Q?Iyk/hntFQWlwTQl94VN8bc7O07y4urfaYtTf6X3ZYUejPeBiQAzaxSrmL41T?=
- =?us-ascii?Q?J7+9KF60bZhB3n3ZPA3urdtNtrn1WXKH92mSI7BUpS5AMdEqV1qLmnTRooPK?=
- =?us-ascii?Q?3T3Mkx1ENU0P9QOTL+jJmvaCEd7fqWjQynXz0a6D4xW/yf3ZtuWxuwybk4pA?=
- =?us-ascii?Q?PANDKQWSnv1M0TN95OjlUpnYmJwildjBxuq1zOEYrA3TYBKkFiSaP3BFWCC7?=
- =?us-ascii?Q?eYoeQJe/PKIWJdd36q8wthByfW/lMZkD0iVcB5FC0rynxJHY5g4m4HUWTmxA?=
- =?us-ascii?Q?dtd9zmea8F4N/8fXUgGl3gXenRA7JtDp9oKiBdUyMSzdh88eSh3zNski1eMt?=
- =?us-ascii?Q?T3L4S1PgsbzmRR0j1a5Ci5FzvTJXaYCTjvlOCjqTE+LDq29baZp+WTU3vcgK?=
- =?us-ascii?Q?3n+ltfRJ18hVP9cF3ZSNjXUjjgf5RqTMCydEM7siSbPLcUtytFIf7cNjc2fS?=
- =?us-ascii?Q?8wfzuwXs0XGJhmWpdBmmBEJ1ikFa8QIavWWZlClbRHA/kcZ8XhXSGnAHb+rR?=
- =?us-ascii?Q?Mqn/wGA07sl4ZnKRCrWTnxWI6DTCiuwBOlMm50p0hWDY4r7tDppMHIqiPx1/?=
- =?us-ascii?Q?KVnUjdNObuAfp820DveONkV0UWMoVJmA3hpvTTFktiDkcCr2zl3c7iwffxNG?=
- =?us-ascii?Q?nlQYJRCwffKv8pJl6WUfYBbFxEgrb+xJKxylfN0319dF6X+vFkxL9KLjRH6J?=
- =?us-ascii?Q?xynTCYRiCcvMHh0RY4V7f1LonhVmdxtWiKKGv1LLTBX2vfV81dAA2pIthDZC?=
- =?us-ascii?Q?8mxPERKSrvhIbTCA551E47M7m6wn2XuQc8AsHoZCXCkrFkA25jiq7qv0upMI?=
- =?us-ascii?Q?ypCLfFDYQcStHjf9bMuK5kTF7N9Ls0hm0Buw7SJfWL4p0EGt9KTBncIZ5CV7?=
- =?us-ascii?Q?7PIqzXammK6oqTnhmhwJQbiLB/OudN5a4pdM7Po92MvWYwSYikfwLMdORprh?=
- =?us-ascii?Q?sBUyqhIeigIaYf0J29FQKhLEoh0p21O49ujAeK6TVxH8t/l/3c0eL00rDHui?=
- =?us-ascii?Q?pWahdxZ9r319U84x6eUr9NvZrEQo5cZ3GGl38/mMinUHeWZpWYYuLFNcRPNw?=
- =?us-ascii?Q?iEiNap5N6qFy+tYpCiy2qKK/zLMlN/Y6aimSYnYAstIXbKwqHbi0c8Cb8pH2?=
- =?us-ascii?Q?0zST8P5jB+vMxVMb6EP8GRAZBJDJVvL84Mm+qxhakWGt7N6L/m6XJ+4IY4aH?=
- =?us-ascii?Q?xOSjnsfDypAx/GF2fbX/WPEm8oGyL87MT5KR/mBB5mbq/gNJdyF4p+izR1Ss?=
- =?us-ascii?Q?9rhJUO+KXTY6UamAfgUNXTteirVqlzM8+f3n5MtONdvB?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5FA2C1AE;
+	Fri, 22 Dec 2023 19:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-50e558e16e7so2064076e87.1;
+        Fri, 22 Dec 2023 11:02:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703271772; x=1703876572; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/WNkEye7dFIS+EDfctJcq2mxRq3d7CRsgYJhjbfmoKo=;
+        b=MUTOe3SouwXWEGAtnMDavX8jq7hGtd1/fVdid09sv8UZHaN8nu80Vrmu0xupSoW04j
+         6KT7biNLvK1EUGnVzmB3BNcLI8SabzNAOBlDcH/K7tGVMjSizHUMEN6q3cOt/5vsxcZH
+         b2Dnu7FrmnDY1VANk3qXfUdqgZyCgtdq90RvSeHnQL/Mo0dp7I1Q6qXd9yV/85kt6a5L
+         aPgmcy6M2UrQ3WpCgZmStQnDnjyRQK/dqrp0EcOLxy6GBZBO+6+cfMGxnputGV4fm4Gq
+         dSH1LrPCZabsqw6mDu5cKLtdExbqW8S6znFekkAE0S6YhlYx4H2EdiSDJGyhjUuTdmyF
+         xJQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703271772; x=1703876572;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/WNkEye7dFIS+EDfctJcq2mxRq3d7CRsgYJhjbfmoKo=;
+        b=GRmZ4o2TIV7M1NjUudAAMzh7h87ZsRklgUoKXwydoSRWWA/y+MougtmKB+lxbdZ/Lz
+         +tzqpy52bWAfwFFFf/as5MN8z7rYirXcdPHJcNVsB8VkH2n64toZU25+tBT+kavpFyGR
+         7WTBOsgVavcFCZ4Q6Crm9BwttH9EbqAxrMn7WGp3rPmJbYAVPL6bH8hAh+18otqrW3yG
+         J8pJAxSIp6J4O9ANEHwvJ8fr8KdgLBfriMfqNmrVLJN1LH+s15xl3F9mfVk4ReqY2ya7
+         KkwEK4pW99fsEUQtui/T7fMa/1deRpNuwiXt4GdT6zRkQBoypSNhtnVAzPQAwykCFLN5
+         Lr4Q==
+X-Gm-Message-State: AOJu0YwfrXR0Cxu4+TqfnVqVhFQXgQJVbMmvIJGOyoylBp3zfYhBrIag
+	V49fFe21o7F11ntlGNiBfB4=
+X-Google-Smtp-Source: AGHT+IGz/FqM2N1Z4rL+rLpRsvL9Un5LXgILvgOSlHba9sLT12TSLmn3JXu/fLGcWUryA565wKYB2g==
+X-Received: by 2002:a19:2d42:0:b0:50e:4b79:b825 with SMTP id t2-20020a192d42000000b0050e4b79b825mr982189lft.20.1703271771959;
+        Fri, 22 Dec 2023 11:02:51 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id q17-20020ac25fd1000000b0050e3719148fsm608211lfg.235.2023.12.22.11.02.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Dec 2023 11:02:51 -0800 (PST)
+Date: Fri, 22 Dec 2023 22:02:47 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Leong Ching Swee <leong.ching.swee@intel.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	Teoh Ji Sheng <ji.sheng.teoh@intel.com>
+Subject: Re: [PATCH net-next v1 2/4] net: stmmac: Make MSI interrupt routine
+ generic
+Message-ID: <zwlnzllanmd6wtmn6ts7pd6y2sxgbauy4ffgqlf3yaq4uo65tw@ybigwcjpk7uf>
+References: <20231222054451.2683242-1-leong.ching.swee@intel.com>
+ <20231222054451.2683242-3-leong.ching.swee@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR11MB7195.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73772e85-9f41-48a3-0181-08dc031ea208
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Dec 2023 18:48:48.1705
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: D6IObUZeuY9OOfjD+uZuWvZtLXCb41HYTnYia4lS0lKqLCdvxCDaQC0QRwv+jBJZkFYu5JA+EMTV9vXfYYyzvia6NJHVauFGo/pUK5TEnlI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7328
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231222054451.2683242-3-leong.ching.swee@intel.com>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Jesse Brandeburg
-> Sent: Tuesday, December 5, 2023 5:01 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Brandeburg, Jesse
-> <jesse.brandeburg@intel.com>; Lobakin, Aleksander
-> <aleksander.lobakin@intel.com>; marcin.szycik@linux.intel.com;
-> horms@kernel.org; netdev@vger.kernel.org
-> Subject: [Intel-wired-lan] [PATCH iwl-next v2 15/15] idpf: refactor some
-> missing field get/prep conversions
->=20
-> Most of idpf correctly uses FIELD_GET and FIELD_PREP, but a couple spots
-> were missed so fix those.
->=20
-> Automated conversion with coccinelle script and manually fixed up,
-> including audits for opportunities to convert to {get,encode,replace}
-> bits functions.
->=20
-> Add conversions to le16_get/encode/replace_bits where appropriate. And
-> in one place fix up a cast from a u16 to a u16.
->=20
-> @prep2@
-> constant shift,mask;
-> type T;
-> expression a;
-> @@
-> -(((T)(a) << shift) & mask)
-> +FIELD_PREP(mask, a)
->=20
-> @prep@
-> constant shift,mask;
-> type T;
-> expression a;
-> @@
-> -((T)((a) << shift) & mask)
-> +FIELD_PREP(mask, a)
->=20
-> @get@
-> constant shift,mask;
-> type T;
-> expression a;
-> @@
-> -((T)((a) & mask) >> shift)
-> +FIELD_GET(mask, a)
->=20
-> and applied via:
-> spatch --sp-file field_prep.cocci --in-place --dir \
->  drivers/net/ethernet/intel/
->=20
-> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+On Fri, Dec 22, 2023 at 01:44:49PM +0800, Leong Ching Swee wrote:
+> From: Swee Leong Ching <leong.ching.swee@intel.com>
+> 
+> There is no support for per DMA channel interrupt for non-MSI platform,
+> where the MAC's per channel interrupt hooks up to interrupt controller(GIC)
+> through shared peripheral interrupt(SPI) to handle interrupt from TX/RX
+> transmit channel.
+> 
+> This patch generalize the existing MSI ISR to also support non-MSI
+> platform.
+> 
+> Signed-off-by: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
+> Signed-off-by: Swee Leong Ching <leong.ching.swee@intel.com>
 > ---
-> v2: merged this patch into larger series, modified after Olek's comments
-> to include bits encoding where changing lines for prep or get.
-> ---
->  .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  7 +--
->  drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 58 +++++++++----------
->  2 files changed, 30 insertions(+), 35 deletions(-)
+>  .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  4 +--
+>  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  2 +-
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 29 ++++++++++---------
+>  include/linux/stmmac.h                        |  4 +--
+>  4 files changed, 21 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> index 60283543ffc8..f0ec69af96c9 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> @@ -952,7 +952,7 @@ static int stmmac_config_single_msi(struct pci_dev *pdev,
+>  
+>  	res->irq = pci_irq_vector(pdev, 0);
+>  	res->wol_irq = res->irq;
+> -	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
+> +	plat->flags &= ~STMMAC_FLAG_MULTI_IRQ_EN;
+>  	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
+>  		 __func__);
+>  
+> @@ -1004,7 +1004,7 @@ static int stmmac_config_multi_msi(struct pci_dev *pdev,
+>  	if (plat->msi_sfty_ue_vec < STMMAC_MSI_VEC_MAX)
+>  		res->sfty_ue_irq = pci_irq_vector(pdev, plat->msi_sfty_ue_vec);
+>  
+> -	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> +	plat->flags |= STMMAC_FLAG_MULTI_IRQ_EN;
+>  	dev_info(&pdev->dev, "%s: multi MSI enablement successful\n", __func__);
+>  
+>  	return 0;
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> index 84d3a8551b03..5f649106ffcd 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> @@ -175,7 +175,7 @@ static void dwmac4_dma_init(void __iomem *ioaddr,
+>  
+>  	value = readl(ioaddr + DMA_BUS_MODE);
+>  
+> -	if (dma_cfg->multi_msi_en) {
+> +	if (dma_cfg->multi_irq_en) {
+>  		value &= ~DMA_BUS_MODE_INTM_MASK;
+>  		value |= (DMA_BUS_MODE_INTM_MODE1 << DMA_BUS_MODE_INTM_SHIFT);
+>  	}
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 47de466e432c..30cc9edb4198 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -129,8 +129,8 @@ static irqreturn_t stmmac_interrupt(int irq, void *dev_id);
+>  /* For MSI interrupts handling */
+>  static irqreturn_t stmmac_mac_interrupt(int irq, void *dev_id);
+>  static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id);
 
-Tested-by: Scott Register <scott.register@intel.com>
+> -static irqreturn_t stmmac_msi_intr_tx(int irq, void *data);
+> -static irqreturn_t stmmac_msi_intr_rx(int irq, void *data);
+> +static irqreturn_t stmmac_tx_queue_interrupt(int irq, void *data);
+> +static irqreturn_t stmmac_rx_queue_interrupt(int irq, void *data);
+
+Let's use the next names instead:
+
++static irqreturn_t stmmac_dma_tx_interrupt(int irq, void *data);
++static irqreturn_t stmmac_dma_rx_interrupt(int irq, void *data);
+
+It would be semantically more correct and would refer to the
+stmmac_dma_interrupt() handler.
+
+>  static void stmmac_reset_rx_queue(struct stmmac_priv *priv, u32 queue);
+>  static void stmmac_reset_tx_queue(struct stmmac_priv *priv, u32 queue);
+>  static void stmmac_reset_queues_param(struct stmmac_priv *priv);
+> @@ -3602,7 +3602,7 @@ static void stmmac_free_irq(struct net_device *dev,
+>  	}
+>  }
+>  
+> -static int stmmac_request_irq_multi_msi(struct net_device *dev)
+> +static int stmmac_request_irq_multi(struct net_device *dev)
+>  {
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  	enum request_irq_err irq_err;
+> @@ -3701,13 +3701,13 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  	for (i = 0; i < priv->plat->rx_queues_to_use; i++) {
+>  		if (i >= MTL_MAX_RX_QUEUES)
+>  			break;
+
+> -		if (priv->rx_irq[i] == 0)
+> +		if (priv->rx_irq[i] <= 0)
+
+Why? What about just using a temporary variable in
+stmmac_get_platform_resources() to get the Per-channel DMA IRQs and
+not saving error number in priv->rx_irq[]?
+
+>  			continue;
+>  
+>  		int_name = priv->int_name_rx_irq[i];
+>  		sprintf(int_name, "%s:%s-%d", dev->name, "rx", i);
+>  		ret = request_irq(priv->rx_irq[i],
+> -				  stmmac_msi_intr_rx,
+> +				  stmmac_rx_queue_interrupt,
+>  				  0, int_name, &priv->dma_conf.rx_queue[i]);
+>  		if (unlikely(ret < 0)) {
+>  			netdev_err(priv->dev,
+> @@ -3726,13 +3726,13 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  	for (i = 0; i < priv->plat->tx_queues_to_use; i++) {
+>  		if (i >= MTL_MAX_TX_QUEUES)
+>  			break;
+
+> -		if (priv->tx_irq[i] == 0)
+> +		if (priv->tx_irq[i] <= 0)
+
+ditto.
+
+>  			continue;
+>  
+>  		int_name = priv->int_name_tx_irq[i];
+>  		sprintf(int_name, "%s:%s-%d", dev->name, "tx", i);
+>  		ret = request_irq(priv->tx_irq[i],
+> -				  stmmac_msi_intr_tx,
+> +				  stmmac_tx_queue_interrupt,
+>  				  0, int_name, &priv->dma_conf.tx_queue[i]);
+>  		if (unlikely(ret < 0)) {
+>  			netdev_err(priv->dev,
+
+Please fix the error message strings in stmmac_request_irq_multi_msi()
+too.
+
+> @@ -3811,8 +3811,8 @@ static int stmmac_request_irq(struct net_device *dev)
+>  	int ret;
+>  
+>  	/* Request the IRQ lines */
+> -	if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN)
+> -		ret = stmmac_request_irq_multi_msi(dev);
+> +	if (priv->plat->flags & STMMAC_FLAG_MULTI_IRQ_EN)
+> +		ret = stmmac_request_irq_multi(dev);
+>  	else
+>  		ret = stmmac_request_irq_single(dev);
+>  
+> @@ -6075,7 +6075,7 @@ static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> -static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
+> +static irqreturn_t stmmac_tx_queue_interrupt(int irq, void *data)
+>  {
+>  	struct stmmac_tx_queue *tx_q = (struct stmmac_tx_queue *)data;
+>  	struct stmmac_dma_conf *dma_conf;
+> @@ -6107,7 +6107,7 @@ static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> -static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
+> +static irqreturn_t stmmac_rx_queue_interrupt(int irq, void *data)
+>  {
+>  	struct stmmac_rx_queue *rx_q = (struct stmmac_rx_queue *)data;
+>  	struct stmmac_dma_conf *dma_conf;
+> @@ -7456,8 +7456,11 @@ int stmmac_dvr_probe(struct device *device,
+>  	priv->plat = plat_dat;
+>  	priv->ioaddr = res->addr;
+>  	priv->dev->base_addr = (unsigned long)res->addr;
+> -	priv->plat->dma_cfg->multi_msi_en =
+> -		(priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN);
+> +
+
+> +	if (res->rx_irq[0] > 0 && res->tx_irq[0] > 0) {
+> +		priv->plat->flags |= STMMAC_FLAG_MULTI_IRQ_EN;
+> +		priv->plat->dma_cfg->multi_irq_en = true;
+> +	}
+
+This is wrong. It activates the stmmac_request_irq_multi_msi() method
+to assign all the IRQ handlers to the individual IRQs. Even if DMA
+IRQs line are available it doesn't mean that for instance Safety
+Feature IRQs too. So it's better to rely on the glue drivers to set
+that flag as before and leave the code as is.
+
+-Serge(y) 
+
+>  
+>  	priv->dev->irq = res->irq;
+>  	priv->wol_irq = res->wol_irq;
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index dee5ad6e48c5..b950e6f9761d 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -98,7 +98,7 @@ struct stmmac_dma_cfg {
+>  	int mixed_burst;
+>  	bool aal;
+>  	bool eame;
+> -	bool multi_msi_en;
+> +	bool multi_irq_en;
+>  	bool dche;
+>  };
+>  
+> @@ -215,7 +215,7 @@ struct dwmac4_addrs {
+>  #define STMMAC_FLAG_TSO_EN			BIT(4)
+>  #define STMMAC_FLAG_SERDES_UP_AFTER_PHY_LINKUP	BIT(5)
+>  #define STMMAC_FLAG_VLAN_FAIL_Q_EN		BIT(6)
+> -#define STMMAC_FLAG_MULTI_MSI_EN		BIT(7)
+> +#define STMMAC_FLAG_MULTI_IRQ_EN		BIT(7)
+>  #define STMMAC_FLAG_EXT_SNAPSHOT_EN		BIT(8)
+>  #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
+>  #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+> -- 
+> 2.34.1
+> 
+> 
 
