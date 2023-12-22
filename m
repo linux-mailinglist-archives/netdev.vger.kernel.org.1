@@ -1,154 +1,111 @@
-Return-Path: <netdev+bounces-59938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F2B81CB88
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:51:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFD4B81CBAE
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 16:03:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD545B236CE
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 14:51:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71B8BB24799
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 15:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB4323773;
-	Fri, 22 Dec 2023 14:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F72C24209;
+	Fri, 22 Dec 2023 15:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LLDxFUjZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ErT6Wgi+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C6023740;
-	Fri, 22 Dec 2023 14:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8951A241FF;
+	Fri, 22 Dec 2023 15:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50e39ac39bcso2406059e87.3;
-        Fri, 22 Dec 2023 06:51:10 -0800 (PST)
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7810827e54eso123282985a.2;
+        Fri, 22 Dec 2023 07:03:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703256668; x=1703861468; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jtUnE4xxhx15CW5JpLi7TOoE2wmO68jA2bGdTJ/24bk=;
-        b=LLDxFUjZkrkpNZ/4nteSQlIob1g1VT6ZnYKWpW7UHKVoaD1zMuTqcg4T3WZ52dJw5A
-         vu5Xk/BcEdstcAAP3R1vj2ZXuUI6azF84vXoRErjR3KBvBjKitE/Cv93QmJWo537k0YJ
-         dU8rSW4kYfpmL3L7iu+VvUpN2sh/SmNOF6IyEckcOXwG799ch4hevZT1yNCyrc69nlaN
-         GZ0IFzSx2E0q4vGgorW19JXG7kV0mC7V2LkWeYPj4eDhJonWCg+9G9ST5MVLoGqfvYnr
-         h59gVs91TI/A/UuN1Y/pG2Z8mqFddzM4jCtv7Z7W+1QrTbgZdWBpnmK5Ht3ngK6P6xYx
-         qyYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703256668; x=1703861468;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1703257384; x=1703862184; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jtUnE4xxhx15CW5JpLi7TOoE2wmO68jA2bGdTJ/24bk=;
-        b=AC9569AXhnB8lM301uYA9fmZFS34rMKnz+w6Ol0CVXY8+af4F187YMnrBnh/ywK71G
-         mPgb89xv45RR7N8n5Q6JlxZWbibMXbEmpjKO4mF8SpHQcL/BqyC4jlsg2llToZ12D+kk
-         ajyXyj/5Qg0WNcaT4jfJNBwDEnqyR5/4GV2W9YLmVGqmWWjkRWgO0xw1RyTNez7gAal3
-         1csk8lV5sXqAS9StZls0feraJTIypOnTVqh/yazlh7ZUe1hV1mYOTr8JhaptVVBQZcUn
-         fcYYFIGj0XJwQ/XThdgdLOZeoTxmbIfjb2hQ8gkd5+0s6nxgJ/ALPiH2FnxNZF4GfPGn
-         mVVw==
-X-Gm-Message-State: AOJu0YyGkuxmsguXYxAZmiqa21K/KU01PKLy7ysDgo3aXy26EG7wA5AV
-	PBkT2Y+Bq6gE+AOSEQDpLu0=
-X-Google-Smtp-Source: AGHT+IHL1Qfai+8qWEquMbFEUPJRFgvR0ti3liSz/epY51csYe8OPA6HRw50x/Gp8NzXQAMmvk8UaQ==
-X-Received: by 2002:a19:700e:0:b0:50e:5a39:bbeb with SMTP id h14-20020a19700e000000b0050e5a39bbebmr393705lfc.173.1703256668116;
-        Fri, 22 Dec 2023 06:51:08 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id m13-20020ac2424d000000b0050e697f2d0esm192153lfl.61.2023.12.22.06.51.06
+        bh=tzmZecV+oKdYBapCJ37Nvj5P7ttQFJPgIUktVMqWwtY=;
+        b=ErT6Wgi+cDZcY/gprcpJYfKf47HwDo/PI/XP+V8nkVOM38NDo52bFX9Y4kTgnKlO99
+         r+DWqBv6wDFVKe3tQmqjRei4nowO+oKdNgzUmR4f9quxUubY+VG3+F1vxtKL6OTF/ihZ
+         RS0NNxMR8RtK0mmzQlL6GxHUOd4M/QnUetciefD8tEeh+dr1A1rVQ0Cpt0bj/SjK2p6r
+         DIj+hFcmYEN7tTKy+3QRi8jo7+Olt5ukDTGBeTwdAQru2QPwDY7CyDAMST9wUKn0BZD/
+         6UqG27EoNTboRlQzWcNUVCsOs+GRDWTsUp/ofJKtKEj0WV3ReAgu4IU1OaIqnqCkW9cn
+         eY8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703257384; x=1703862184;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tzmZecV+oKdYBapCJ37Nvj5P7ttQFJPgIUktVMqWwtY=;
+        b=RuhMjDWKSnB+SHfyQLI0+R+Tghb2dj9+gUFEj/eXovQUG276umowSSPRXmvF77vfJZ
+         USQToxRFYZ44bikjJTQAzaj3YgPCI9bK8Bs4C6GKakj05HmV0uYNpwbAWE6JMFw2zcNe
+         Kzune6DRdDPJuEA4Pim+EGgJWrZZJyeeCgGlYXP8RantsjF6xLsFzlicK+SEaTkRgALn
+         tx/7NBGbppxbKwI4Nqg4HbX48c9XsczPZrrCXiYv+BFO8DNBINpDZKzYoRH/HwFx8Sth
+         WmdzXHs/5kL1+m8k1H1IBKjs2ZxUcjuvRNuJw1bbmnFuqpBsWn1c/4DZNjL4QBFAivTs
+         12Xg==
+X-Gm-Message-State: AOJu0YxpQPFdIh+QG7ONxqkCp8fqDdDjzrBfn+PqBQNBAWdgy4za7l7e
+	RjV4ZbExvnE9UzfHbtziw5QC3lIJeRk=
+X-Google-Smtp-Source: AGHT+IF/GXVTZuBXwvERU34ObI/nr9TJjabP7/zdJB9ykOdzRBNbYlbfEw90YhSANkoQPdXymaAp9Q==
+X-Received: by 2002:a05:620a:b10:b0:77d:4cb9:89ac with SMTP id t16-20020a05620a0b1000b0077d4cb989acmr1786274qkg.32.1703257384242;
+        Fri, 22 Dec 2023 07:03:04 -0800 (PST)
+Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
+        by smtp.gmail.com with ESMTPSA id q26-20020ae9e41a000000b007810de6a161sm1394913qkc.55.2023.12.22.07.03.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 06:51:07 -0800 (PST)
-Date: Fri, 22 Dec 2023 17:51:04 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Leong Ching Swee <leong.ching.swee@intel.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	Rohan G Thomas <rohan.g.thomas@intel.com>
-Subject: Re: [PATCH net-next v1 1/4] dt-bindings: net: snps,dwmac: per
- channel irq
-Message-ID: <tly7rej6uz7r36j3nm2yk6mhrbdxkvwyphj3oosar5xd3ucpey@hv4dro7emw3h>
-References: <20231222054451.2683242-1-leong.ching.swee@intel.com>
- <20231222054451.2683242-2-leong.ching.swee@intel.com>
+        Fri, 22 Dec 2023 07:03:03 -0800 (PST)
+Date: Fri, 22 Dec 2023 10:03:03 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Cc: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Deepa Dinamani <deepa.kernel@gmail.com>
+Message-ID: <6585a52790fd0_d4884294ea@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20231221231901.67003-1-jthinz@mailbox.tu-berlin.de>
+References: <20231221231901.67003-1-jthinz@mailbox.tu-berlin.de>
+Subject: Re: [PATCH net] net: Implement missing
+ getsockopt(SO_TIMESTAMPING_NEW)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231222054451.2683242-2-leong.ching.swee@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 22, 2023 at 01:44:48PM +0800, Leong Ching Swee wrote:
-> From: Swee Leong Ching <leong.ching.swee@intel.com>
-> 
-> Add dt-bindings for per channel irq.
-> 
-> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
-> Signed-off-by: Swee Leong Ching <leong.ching.swee@intel.com>
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml   | 24 +++++++++++++------
->  1 file changed, 17 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 5c2769dc689a..e72dded824f4 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -103,17 +103,27 @@ properties:
->  
->    interrupts:
->      minItems: 1
-> -    items:
-> -      - description: Combined signal for various interrupt events
-> -      - description: The interrupt to manage the remote wake-up packet detection
-> -      - description: The interrupt that occurs when Rx exits the LPI state
-> +    maxItems: 19
->  
->    interrupt-names:
->      minItems: 1
-> +    maxItems: 19
->      items:
-> -      - const: macirq
-> -      - enum: [eth_wake_irq, eth_lpi]
-> -      - const: eth_lpi
-> +      oneOf:
-> +        - description: Combined signal for various interrupt events
-> +          const: macirq
-> +        - description: The interrupt to manage the remote wake-up packet detection
-> +          const: eth_wake_irq
-> +        - description: The interrupt that occurs when Rx exits the LPI state
-> +          const: eth_lpi
-> +        - description: DMA Tx per-channel interrupt
-> +          pattern: '^dma_tx[0-7]?$'
-> +        - description: DMA Rx per-channel interrupt
-> +          pattern: '^dma_rx[0-7]?$'
-> +
+J=C3=B6rn-Thorben Hinz wrote:
+> Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
+> socket option SO_TIMESTAMPING_NEW. Setting the option is handled in
+> sk_setsockopt(), querying it was not handled in sk_getsockopt(), though=
+.
+> =
 
-> +    allOf:
-> +      - contains:
-> +          const: macirq
+> Following remarks on an earlier submission of this patch, keep the old
+> behavior of getsockopt(SO_TIMESTAMPING_OLD) which returns the active
+> flags even if they actually have been set through SO_TIMESTAMPING_NEW.
+> =
 
-As Rob correctly noted it's also better to make sure that 'macirq' is
-placed first in the array. So instead of the constraint above I guess
-the next one would make sure both the array has 'macirq' name and it's
-the first item:
+> The new getsockopt(SO_TIMESTAMPING_NEW) is stricter, returning flags
+> only if they have been set through the same option.
+> =
 
-allOf:
-  - maxItems: 34
-    items:
-      - const: macirq
+> Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
+> Link: https://lore.kernel.org/lkml/20230703175048.151683-1-jthinz@mailb=
+ox.tu-berlin.de/
+> Link: https://lore.kernel.org/netdev/0d7cddc9-03fa-43db-a579-14f3e82261=
+5b@app.fastmail.com/
+> Signed-off-by: J=C3=B6rn-Thorben Hinz <jthinz@mailbox.tu-berlin.de>
 
--Serge(y)
-
->  
->    clocks:
->      minItems: 1
-> -- 
-> 2.34.1
-> 
-> 
+Reviewed-by: Willem de Bruijn <willemb@google.com>=
 
