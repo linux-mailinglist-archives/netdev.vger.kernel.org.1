@@ -1,72 +1,110 @@
-Return-Path: <netdev+bounces-59903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E04481C99F
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:01:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 469DE81C9C5
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 13:20:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A831F260C3
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:01:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB8961F25FF8
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 12:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229B01799C;
-	Fri, 22 Dec 2023 12:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB5317993;
+	Fri, 22 Dec 2023 12:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UcOQscON"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F01B1A707;
-	Fri, 22 Dec 2023 12:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.43.141] (port=37472 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1rGeDG-005iDe-Rv; Fri, 22 Dec 2023 13:01:12 +0100
-Date: Fri, 22 Dec 2023 13:01:10 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Felix Huettner <felix.huettner@mail.schwarz>
-Cc: linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kadlec@netfilter.org, fw@strlen.de,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	shuah@kernel.org, luca.czesla@mail.schwarz,
-	max.lamprecht@mail.schwarz
-Subject: Re: [PATCH net-next v2] net: ctnetlink: support filtering by zone
-Message-ID: <ZYV6hgP35k6Bwk+H@calendula>
-References: <ZWSCPKtDuYRG1XWt@kernel-bug-kernel-bug>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832E818C34
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 12:20:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D070BC433C9;
+	Fri, 22 Dec 2023 12:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703247626;
+	bh=dPPuCkOiZDPqth/dkNqxCzcTEt/rvx5sLFCvDL7ZzzQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UcOQscONbEtWKd2O6oWpPeejsdQLRCs3kpo/Zi6Fswkf2ja2ntePX3RhyFAougSLh
+	 tAIZPdRbdJ6GSdnHM2fw+ZJh+cPNWKg5CJJbAASOVV5GYupuAs0U07UgPkSwwn0Tvx
+	 mVzhQLQyKxcHegB45+uxvxBUwQZz12oXIxaBSkHEl79NV5eneyeq0uvHKPnzJ4JZva
+	 Xc5+XGVe/Q9Sn1uiS+EWXclt9Jz/EuOInQj11A4VBjaXo4BKGWeg458qMge7H3C4Aw
+	 0mocywrYflE6SO5BvlYE95s0oUzlJdF6kBUZdNsLxHf2yfNbBbg5vt0ZtswD1G10Bq
+	 2NmersTe7n94w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B72D9DD4EE5;
+	Fri, 22 Dec 2023 12:20:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZWSCPKtDuYRG1XWt@kernel-bug-kernel-bug>
-X-Spam-Score: -1.8 (-)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/15][pull request] intel: use bitfield operations
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170324762674.22950.17567228741152319878.git-patchwork-notify@kernel.org>
+Date: Fri, 22 Dec 2023 12:20:26 +0000
+References: <20231218194833.3397815-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20231218194833.3397815-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, jesse.brandeburg@intel.com
 
-On Mon, Nov 27, 2023 at 11:49:16AM +0000, Felix Huettner wrote:
-> conntrack zones are heavily used by tools like openvswitch to run
-> multiple virtual "routers" on a single machine. In this context each
-> conntrack zone matches to a single router, thereby preventing
-> overlapping IPs from becoming issues.
-> In these systems it is common to operate on all conntrack entries of a
-> given zone, e.g. to delete them when a router is deleted. Previously this
-> required these tools to dump the full conntrack table and filter out the
-> relevant entries in userspace potentially causing performance issues.
-> 
-> To do this we reuse the existing CTA_ZONE attribute. This was previous
-> parsed but not used during dump and flush requests. Now if CTA_ZONE is
-> set we filter these operations based on the provided zone.
-> However this means that users that previously passed CTA_ZONE will
-> experience a difference in functionality.
-> 
-> Alternatively CTA_FILTER could have been used for the same
-> functionality. However it is not yet supported during flush requests and
-> is only available when using AF_INET or AF_INET6.
+Hello:
 
-For the record, this is applied to nf-next.
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
+
+On Mon, 18 Dec 2023 11:48:15 -0800 you wrote:
+> Jesse Brandeburg says:
+> 
+> After repeatedly getting review comments on new patches, and sporadic
+> patches to fix parts of our drivers, we should just convert the Intel code
+> to use FIELD_PREP() and FIELD_GET().  It's then "common" in the code and
+> hopefully future change-sets will see the context and do-the-right-thing.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/15] e1000e: make lost bits explicit
+    https://git.kernel.org/netdev/net-next/c/236f31bb21c0
+  - [net-next,02/15] intel: add bit macro includes where needed
+    https://git.kernel.org/netdev/net-next/c/3314f2097dee
+  - [net-next,03/15] intel: legacy: field prep conversion
+    https://git.kernel.org/netdev/net-next/c/4d893c104cda
+  - [net-next,04/15] i40e: field prep conversion
+    https://git.kernel.org/netdev/net-next/c/9e3ab72c0499
+  - [net-next,05/15] iavf: field prep conversion
+    https://git.kernel.org/netdev/net-next/c/9b7f18042d4c
+  - [net-next,06/15] ice: field prep conversion
+    https://git.kernel.org/netdev/net-next/c/23eca34e5558
+  - [net-next,07/15] ice: fix pre-shifted bit usage
+    https://git.kernel.org/netdev/net-next/c/7173be21ae29
+  - [net-next,08/15] igc: field prep conversion
+    https://git.kernel.org/netdev/net-next/c/c82e64868afd
+  - [net-next,09/15] intel: legacy: field get conversion
+    https://git.kernel.org/netdev/net-next/c/b9a452545075
+  - [net-next,10/15] igc: field get conversion
+    https://git.kernel.org/netdev/net-next/c/a8e0c7a6800d
+  - [net-next,11/15] i40e: field get conversion
+    https://git.kernel.org/netdev/net-next/c/62589808d73b
+  - [net-next,12/15] iavf: field get conversion
+    https://git.kernel.org/netdev/net-next/c/65db56d5fa8f
+  - [net-next,13/15] ice: field get conversion
+    https://git.kernel.org/netdev/net-next/c/5a259f8e0baf
+  - [net-next,14/15] ice: cleanup inconsistent code
+    https://git.kernel.org/netdev/net-next/c/316a28daa805
+  - [net-next,15/15] idpf: refactor some missing field get/prep conversions
+    https://git.kernel.org/netdev/net-next/c/6aa7ca3c7dcc
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
