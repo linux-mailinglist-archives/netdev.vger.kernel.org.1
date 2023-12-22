@@ -1,175 +1,3033 @@
-Return-Path: <netdev+bounces-59955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E0A81CDA9
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:37:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18EEE81CDAB
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 18:38:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9C1A1C21E71
-	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:37:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE13E2867A2
+	for <lists+netdev@lfdr.de>; Fri, 22 Dec 2023 17:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8512C1A0;
-	Fri, 22 Dec 2023 17:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE032554E;
+	Fri, 22 Dec 2023 17:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S4sQesgO"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="wDTmS0B9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E47728E3B
-	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 17:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-50e44c1b35fso2517011e87.3
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 09:36:41 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A95F28E1B
+	for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 17:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so1586433a12.1
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 09:38:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703266599; x=1703871399; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FbEsIRMQk4NPPKjRL9zFJNtECaKyqE/EOexWnszdu60=;
-        b=S4sQesgOYUw/AB/iTZZJYXFQpOpttIt+P7pNjemDsbrE5eKy0EwSHddbwkz0xeXmXL
-         R/zvPaEYA51Fkp4RD6+322y4O2Bc66XL9FSmdnhW2fvHdj3gzWichOHApLCn2AGgu/fb
-         pW1UeCceJwqeZeVw2c7vzM2pXfcQidU79S2acvOYYCuE+xk6U9fG+RL3685Bx7ufeEqY
-         4xiC8LY2dUB239JC8Zr4tMtOqOvrT1U5JCiIXN1BKAVPybQMUgWRlMwGoad2N1p9gLHz
-         xz2zSB/KYbIhMwYVmlZkIgE5XV1i8BZZiEeiSRUcftfrlCgYpYz4cyAPxOqpjlvf0+Yy
-         UEmw==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1703266689; x=1703871489; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7U2qze6DdgZ57EH8Sr1mioB6Pi1TuLEa+5uBjc1dmkM=;
+        b=wDTmS0B9s2zJAF/o32IyuaxjqXJyI5s1ByYPS54+B9WcxsUoxHR6/Fvoc0cZiSQDpy
+         7ySrd01+/o3+M5wSSWmWPYhp+gRwlhwf+8nlJ+gE5s1EoTZDqprEWBRl2f33ddZgPVFt
+         vwMB6jqVJEt4PK4bb0y6NqR8EAXAnxznaVkJFbGfMTmXr4mwouRCL6qKHWdPSa+WqUZe
+         N89d3OrM4gmqOYMG/0noq6PpX4mXIbcuc9qK/DPDoYJ3IoIJASqhmNi1QH2GBCIrMM67
+         +m2GNikndLPo16ZGKxCLr8ATTve1ksQ9/mGyCLP5qkjerQ4iYkjVFQynJwaWk6SwSRZB
+         eK0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703266599; x=1703871399;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FbEsIRMQk4NPPKjRL9zFJNtECaKyqE/EOexWnszdu60=;
-        b=Easj5Rws8Mr2qdU4jin1fIZGFB0rpJXo9zENFa90P+clCrGJaXJIISvC5mh2j4jjAJ
-         ju1lbaWjVdcDq7idsFfFIBAJOVx2vxULnKJAS/6IRYvARe5p/dSDtWwD1ZTzOT5zTCRx
-         e/6poi25sssu0mstHuXFKz5A6bX7VzanrITaQaHkZbJa5L7rA6pzDHRMqs1dOULP7tCf
-         zawT3dWNeKkIc+/jAVJ5EqEjZtzEbLYwymeM0n0LGYD1E84lwFCfdOqVscw9CXpOkGLQ
-         3d+Iv186kQmV0ZhltcHJrnmbkEKdP3aALL1XCl2chwH0glClCTab7xqgQLGYZdCPfcLn
-         3C9g==
-X-Gm-Message-State: AOJu0YwkPTNLCB3rNcH2TUBgWo7D0tV1iXpQCURyvbwyeQFVVzLJlqfm
-	rWUfDZKde4db8TF7HfT7WoCf912TY3YcoocUWOwqvT4CViE=
-X-Google-Smtp-Source: AGHT+IEe8HXFB31Kj3ZC/ZARJ16nD3ADWWlNASCZ3odHPGFVGdQWL3/JhVRwApg43qVZEg3gSpwmig==
-X-Received: by 2002:ac2:547c:0:b0:50e:54aa:750d with SMTP id e28-20020ac2547c000000b0050e54aa750dmr844404lfn.85.1703266599561;
-        Fri, 22 Dec 2023 09:36:39 -0800 (PST)
-Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id h14-20020a056512220e00b0050e709c8deasm43036lfu.226.2023.12.22.09.36.38
+        d=1e100.net; s=20230601; t=1703266689; x=1703871489;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7U2qze6DdgZ57EH8Sr1mioB6Pi1TuLEa+5uBjc1dmkM=;
+        b=ZDDAZaGZpp2DCA1lzubQFtNqPjNbfp+k0xZ20fa7sIZ7JouRXBIAHkZ6dCRSZHGapR
+         keiMh4FXrahNxPXWqf4UK4lpFrXPZtFCvysTMQIwjEaTHII9yb60hfUk9r+p3L2Ghd9H
+         0ICJFI4rC/53Pg3liJ1g8/+UULXeZE8jUn2YRieidGiprq6nVkBMm01mFJVV2h6a5I4L
+         oYcOpcr8E8Ve4mFilxErdwijwcGL4ANiryo6l5IYxNugZSoyf7ZagC8Hty5stOdI484O
+         QQfTxPSJqJGylGcirn5ZDXvuyYrIflLctweLW+3dsdFjBfnSYefPHs0OatyTXHp56r4c
+         tpNg==
+X-Gm-Message-State: AOJu0YzDm6Rwjqt8hfdekiQ2s3SbM/4+lMuPnNjRalqrha5qCDjvRUC5
+	Z6iHjHtgXYL53CrydSV5ZwO6FuOGuejUQz8HBtvLlB//xOjCGQ==
+X-Google-Smtp-Source: AGHT+IG+UzHkDGkVo/Rv0e8/gR6lmQ9aMGnwIIMzXEO/W+eCsau03smeajQ4mWAXx/mTsh26CddKdA==
+X-Received: by 2002:a17:902:684a:b0:1d3:a11a:6bbc with SMTP id f10-20020a170902684a00b001d3a11a6bbcmr1436448pln.127.1703266688960;
+        Fri, 22 Dec 2023 09:38:08 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id iw19-20020a170903045300b001d0b6caddb1sm3694055plb.137.2023.12.22.09.38.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 09:36:39 -0800 (PST)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 22 Dec 2023 18:36:37 +0100
-Subject: [PATCH net v4 3/3] net: ethernet: cortina: Bypass checksumming
- engine of alien ethertypes
+        Fri, 22 Dec 2023 09:38:08 -0800 (PST)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [RFC iproute2-next] remove support for iptables action
+Date: Fri, 22 Dec 2023 09:37:22 -0800
+Message-ID: <20231222173758.13097-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231222-new-gemini-ethernet-regression-v4-3-a36e71b0f32b@linaro.org>
-References: <20231222-new-gemini-ethernet-regression-v4-0-a36e71b0f32b@linaro.org>
-In-Reply-To: <20231222-new-gemini-ethernet-regression-v4-0-a36e71b0f32b@linaro.org>
-To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Vladimir Oltean <olteanv@gmail.com>, Household Cang <canghousehold@aol.com>
-Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.12.4
+Content-Transfer-Encoding: 8bit
 
-We had workarounds were the ethernet checksumming engine would be bypassed
-for larger frames, this fixed devices using DSA, but regressed devices
-where the ethernet was connected directly to a PHY.
+This is a trial ballon to see how wide the impact would be.
+Also, removes the actions-general doc because it is very out of date
+and has lots of grammar issues.
 
-The devices with a PHY connected directly can't handle large frames
-either way, with or without bypass. Looking at the size of the frame
-is probably just wrong.
+Do we want to go this far and kill all of tc-xt?
 
-Rework the workaround such that we don't activate the checksumming engine if
-the ethertype inside the actual frame is something else than 0x0800
-(IPv4) or 0x86dd (IPv6). These are the only frames the checksumming engine
-can actually handle. VLAN framing (0x8100) also works fine.
-
-We can't inspect skb->protocol because DSA frames will sometimes have a
-custom ethertype despite skb->protocol is e.g. 0x0800.
-
-If the frame is ALSO over the size of an ordinary ethernet frame,
-we will actively bypass the checksumming engine. (Always doing this
-makes the hardware unstable.)
-
-After this both devices with direct ethernet attached such as D-Link
-DNS-313 and devices with a DSA switch with a custom ethertype such as
-D-Link DIR-685 work fine.
-
-Fixes: d4d0c5b4d279 ("net: ethernet: cortina: Handle large frames")
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/net/ethernet/cortina/gemini.c | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+ configure                            | 181 ----------
+ doc/actions/actions-general          | 256 --------------
+ include/ip6tables.h                  |  21 --
+ include/iptables.h                   |  26 --
+ include/iptables/internal.h          |  14 -
+ include/libiptc/ipt_kernel_headers.h |  16 -
+ include/libiptc/libip6tc.h           | 162 ---------
+ include/libiptc/libiptc.h            | 173 ---------
+ include/libiptc/libxtc.h             |  34 --
+ include/libiptc/xtcshared.h          |  21 --
+ man/man8/tc-xt.8                     |  42 ---
+ tc/Makefile                          |  24 --
+ tc/em_ipset.c                        | 260 --------------
+ tc/em_ipt.c                          | 207 -----------
+ tc/m_ipt.c                           | 511 ---------------------------
+ tc/m_xt.c                            | 400 ---------------------
+ tc/m_xt_old.c                        | 432 ----------------------
+ 17 files changed, 2780 deletions(-)
+ delete mode 100644 doc/actions/actions-general
+ delete mode 100644 include/ip6tables.h
+ delete mode 100644 include/iptables.h
+ delete mode 100644 include/iptables/internal.h
+ delete mode 100644 include/libiptc/ipt_kernel_headers.h
+ delete mode 100644 include/libiptc/libip6tc.h
+ delete mode 100644 include/libiptc/libiptc.h
+ delete mode 100644 include/libiptc/libxtc.h
+ delete mode 100644 include/libiptc/xtcshared.h
+ delete mode 100644 man/man8/tc-xt.8
+ delete mode 100644 tc/em_ipset.c
+ delete mode 100644 tc/em_ipt.c
+ delete mode 100644 tc/m_ipt.c
+ delete mode 100644 tc/m_xt.c
+ delete mode 100644 tc/m_xt_old.c
 
-diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-index 5e399c6e095b..db828e4f258f 100644
---- a/drivers/net/ethernet/cortina/gemini.c
-+++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -29,6 +29,7 @@
- #include <linux/of_net.h>
- #include <linux/of_platform.h>
- #include <linux/etherdevice.h>
-+#include <linux/if_ether.h>
- #include <linux/if_vlan.h>
- #include <linux/skbuff.h>
- #include <linux/phy.h>
-@@ -1142,22 +1143,38 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 	struct gmac_txdesc *txd;
- 	skb_frag_t *skb_frag;
- 	dma_addr_t mapping;
-+	u16 ethertype;
- 	void *buffer;
+diff --git a/configure b/configure
+index 78bc52c008f8..2a7579e0dbc8 100755
+--- a/configure
++++ b/configure
+@@ -53,142 +53,6 @@ check_xtables()
+ 	fi
+ }
  
- 	/* TODO: implement proper TSO using MTU in word3 */
- 	word1 = skb->len;
- 	word3 = SOF_BIT | skb->len;
+-check_xt()
+-{
+-    #check if we have xtables from iptables >= 1.4.5.
+-    cat >$TMPDIR/ipttest.c <<EOF
+-#include <xtables.h>
+-#include <linux/netfilter.h>
+-static struct xtables_globals test_globals = {
+-	.option_offset = 0,
+-	.program_name = "tc-ipt",
+-	.program_version = XTABLES_VERSION,
+-	.orig_opts = NULL,
+-	.opts = NULL,
+-	.exit_err = NULL,
+-};
+-
+-int main(int argc, char **argv)
+-{
+-	xtables_init_all(&test_globals, NFPROTO_IPV4);
+-	return 0;
+-}
+-EOF
+-
+-    if $CC -I$INCLUDE $IPTC -o $TMPDIR/ipttest $TMPDIR/ipttest.c $IPTL \
+-	$(${PKG_CONFIG} xtables --cflags --libs) -ldl >/dev/null 2>&1; then
+-	echo "TC_CONFIG_XT:=y" >>$CONFIG
+-	echo "using xtables"
+-    fi
+-    rm -f $TMPDIR/ipttest.c $TMPDIR/ipttest
+-}
+-
+-check_xt_old()
+-{
+-    # bail if previous XT checks has already succeeded.
+-    grep -q TC_CONFIG_XT $CONFIG && return
+-
+-    #check if we don't need our internal header ..
+-    cat >$TMPDIR/ipttest.c <<EOF
+-#include <xtables.h>
+-char *lib_dir;
+-unsigned int global_option_offset = 0;
+-const char *program_version = XTABLES_VERSION;
+-const char *program_name = "tc-ipt";
+-struct afinfo afinfo = {
+-	.libprefix      = "libxt_",
+-};
+-
+-void exit_error(enum exittype status, const char *msg, ...)
+-{
+-}
+-
+-int main(int argc, char **argv) {
+-
+-	return 0;
+-}
+-
+-EOF
+-
+-    if $CC -I$INCLUDE $IPTC -o $TMPDIR/ipttest $TMPDIR/ipttest.c $IPTL -ldl >/dev/null 2>&1; then
+-	echo "TC_CONFIG_XT_OLD:=y" >>$CONFIG
+-	echo "using old xtables (no need for xt-internal.h)"
+-    fi
+-    rm -f $TMPDIR/ipttest.c $TMPDIR/ipttest
+-}
+-
+-check_xt_old_internal_h()
+-{
+-    # bail if previous XT checks has already succeeded.
+-    grep -q TC_CONFIG_XT $CONFIG && return
+-
+-    #check if we need our own internal.h
+-    cat >$TMPDIR/ipttest.c <<EOF
+-#include <xtables.h>
+-#include "xt-internal.h"
+-char *lib_dir;
+-unsigned int global_option_offset = 0;
+-const char *program_version = XTABLES_VERSION;
+-const char *program_name = "tc-ipt";
+-struct afinfo afinfo = {
+-	.libprefix      = "libxt_",
+-};
+-
+-void exit_error(enum exittype status, const char *msg, ...)
+-{
+-}
+-
+-int main(int argc, char **argv) {
+-
+-	return 0;
+-}
+-
+-EOF
+-	if $CC -I$INCLUDE $IPTC -o $TMPDIR/ipttest $TMPDIR/ipttest.c $IPTL -ldl >/dev/null 2>&1; then
+-	    echo "using old xtables with xt-internal.h"
+-	    echo "TC_CONFIG_XT_OLD_H:=y" >>$CONFIG
+-	fi
+-	rm -f $TMPDIR/ipttest.c $TMPDIR/ipttest
+-}
+-
+-check_lib_dir()
+-{
+-	LIBDIR=$(echo $LIBDIR | sed "s|\${prefix}|$PREFIX|")
+-
+-	echo -n "lib directory: "
+-	echo "$LIBDIR"
+-	echo "LIBDIR:=$LIBDIR" >> $CONFIG
+-}
+-
+-check_ipt()
+-{
+-	if ! grep TC_CONFIG_XT $CONFIG > /dev/null; then
+-		echo "using iptables"
+-	fi
+-}
+-
+-check_ipt_lib_dir()
+-{
+-	IPT_LIB_DIR=$(${PKG_CONFIG} --variable=xtlibdir xtables)
+-	if [ -n "$IPT_LIB_DIR" ]; then
+-		echo $IPT_LIB_DIR
+-		echo "IPT_LIB_DIR:=$IPT_LIB_DIR" >> $CONFIG
+-		return
+-	fi
+-
+-	for dir in /lib /usr/lib /usr/local/lib; do
+-		for file in "xtables" "iptables"; do
+-			file="$dir/$file/lib*t_*so"
+-			if [ -f $file ]; then
+-				echo ${file%/*}
+-				echo "IPT_LIB_DIR:=${file%/*}" >> $CONFIG
+-				return
+-			fi
+-		done
+-	done
+-	echo "not found!"
+-}
+-
+ check_setns()
+ {
+     cat >$TMPDIR/setnstest.c <<EOF
+@@ -234,35 +98,6 @@ EOF
+     rm -f $TMPDIR/name_to_handle_at_test.c $TMPDIR/name_to_handle_at_test
+ }
  
--	if (skb->ip_summed == CHECKSUM_PARTIAL) {
-+	/* Dig out the the ethertype actually in the buffer and not what the
-+	 * protocol claims to be. This is the raw data that the checksumming
-+	 * offload engine will have to deal with.
-+	 */
-+	ethertype = ntohs(skb_eth_raw_ethertype(skb));
-+	/* This is the only VLAN type supported by this hardware so check for
-+	 * that: the checksumming engine can handle IP and IPv6 inside 802.1Q.
-+	 */
-+	if (ethertype == ETH_P_8021Q)
-+		ethertype = ntohs(__vlan_get_protocol(skb, htons(ethertype), NULL));
-+
-+	if (ethertype != ETH_P_IP && ethertype != ETH_P_IPV6) {
-+		/* Hardware offloaded checksumming isn't working on non-IP frames.
-+		 * This happens for example on some DSA switches using a custom
-+		 * ethertype. When a frame gets bigger than a standard ethernet
-+		 * frame, it also needs to actively bypass the checksumming engine.
-+		 * There is no clear explanation to why it is like this, the
-+		 * reference manual has left the TSS completely undocumented.
-+		 */
-+		if (skb->len > ETH_FRAME_LEN)
-+			word1 |= TSS_BYPASS_BIT;
-+	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
- 		int tcp = 0;
+-check_ipset()
+-{
+-    cat >$TMPDIR/ipsettest.c <<EOF
+-#include <linux/netfilter/ipset/ip_set.h>
+-#ifndef IP_SET_INVALID
+-#define IPSET_DIM_MAX 3
+-typedef unsigned short ip_set_id_t;
+-#endif
+-#include <linux/netfilter/xt_set.h>
+-
+-struct xt_set_info info;
+-#if IPSET_PROTOCOL == 6 || IPSET_PROTOCOL == 7
+-int main(void)
+-{
+-	return IPSET_MAXNAMELEN;
+-}
+-#else
+-#error unknown ipset version
+-#endif
+-EOF
+-
+-    if $CC -I$INCLUDE -o $TMPDIR/ipsettest $TMPDIR/ipsettest.c >/dev/null 2>&1; then
+-	echo "TC_CONFIG_IPSET:=y" >>$CONFIG
+-	echo "yes"
+-    else
+-	echo "no"
+-    fi
+-    rm -f $TMPDIR/ipsettest.c $TMPDIR/ipsettest
+-}
  
--		/* We do not switch off the checksumming on non TCP/UDP
--		 * frames: as is shown from tests, the checksumming engine
--		 * is smart enough to see that a frame is not actually TCP
--		 * or UDP and then just pass it through without any changes
--		 * to the frame.
--		 */
--		if (skb->protocol == htons(ETH_P_IP)) {
-+		if (ethertype == ETH_P_IP) {
- 			word1 |= TSS_IP_CHKSUM_BIT;
- 			tcp = ip_hdr(skb)->protocol == IPPROTO_TCP;
- 		} else { /* IPv6 */
-
+ check_elf()
+ {
+@@ -620,24 +455,8 @@ echo "TC schedulers"
+ echo -n " ATM	"
+ check_atm
+ 
+-check_xtables
+-if ! grep -q TC_CONFIG_NO_XT $CONFIG; then
+-	echo -n " IPT	"
+-	check_xt
+-	check_xt_old
+-	check_xt_old_internal_h
+-	check_ipt
+-
+-	echo -n " IPSET  "
+-	check_ipset
+-fi
+-
+ echo
+ check_lib_dir
+-if ! grep -q TC_CONFIG_NO_XT $CONFIG; then
+-	echo -n "iptables modules directory: "
+-	check_ipt_lib_dir
+-fi
+ 
+ echo -n "libc has setns: "
+ check_setns
+diff --git a/doc/actions/actions-general b/doc/actions/actions-general
+deleted file mode 100644
+index a0074a58c653..000000000000
+--- a/doc/actions/actions-general
++++ /dev/null
+@@ -1,256 +0,0 @@
+-
+-This documented is slightly dated but should give you idea of how things
+-work.
+-
+-What is it?
+------------
+-
+-An extension to the filtering/classification architecture of Linux Traffic
+-Control.
+-Up to 2.6.8 the only action that could be "attached" to a filter was policing.
+-i.e you could say something like:
+-
+------
+-tc filter add dev lo parent ffff: protocol ip prio 10 u32 match ip src \
+-127.0.0.1/32 flowid 1:1 police mtu 4000 rate 1500kbit burst 90k
+------
+-
+-which implies "if a packet is seen on the ingress of the lo device with
+-a source IP address of 127.0.0.1/32 we give it a classification id  of 1:1 and
+-we execute a policing action which rate limits its bandwidth utilization
+-to 1.5Mbps".
+-
+-The new extensions allow for more than just policing actions to be added.
+-They are also fully backward compatible. If you have a kernel that doesn't
+-understand them, then the effect is null i.e if you have a newer tc
+-but older kernel, the actions are not installed. Likewise if you
+-have a newer kernel but older tc, obviously the tc will use current
+-syntax which will work fine. Of course to get the required effect you need
+-both newer tc and kernel. If you are reading this you have the
+-right tc ;->
+-
+-A side effect is that we can now get stateless firewalling to work with tc.
+-Essentially this is now an alternative to iptables.
+-I won't go into details of my dislike for iptables at times, but
+-scalability is one of the main issues; however, if you need stateful
+-classification - use netfilter (for now).
+-
+-This stuff works on both ingress and egress qdiscs.
+-
+-Features
+---------
+-
+-1) new additional syntax and actions enabled. Note old syntax is still valid.
+-
+-Essentially this is still the same syntax as tc with a new construct
+-"action". The syntax is of the form:
+-tc filter add <DEVICE> parent 1:0 protocol ip prio 10 <Filter description>
+-flowid 1:1 action <ACTION description>*
+-
+-You can have as many actions as you want (within sensible reasoning).
+-
+-In the past the only real action was the policer; i.e you could do something
+-along the lines of:
+-tc filter add dev lo parent ffff: protocol ip prio 10 u32 \
+-match ip src 127.0.0.1/32 flowid 1:1 \
+-police mtu 4000 rate 1500kbit burst 90k
+-
+-Although you can still use the same syntax, now you can say:
+-
+-tc filter add dev lo parent 1:0 protocol ip prio 10 u32 \
+-match ip src 127.0.0.1/32 flowid 1:1 \
+-action police mtu 4000 rate 1500kbit burst 90k
+-
+-" generic Actions" (gact) at the moment are:
+-{ drop, pass, reclassify, continue}
+-(If you have others, no listed here give me a reason and we will add them)
+-+drop says to drop the packet
+-+pass and ok (are equivalent) says to accept it
+-+reclassify requests for reclassification of the packet
+-+continue requests for next lookup to match
+-
+-2)In order to take advantage of some of the targets written by the
+-iptables people, a classifier can have a packet being massaged by an
+-iptable target. I have only tested with mangler targets up to now.
+-(in fact anything that is not in the mangling table is disabled right now)
+-
+-In terms of hooks:
+-*ingress is mapped to pre-routing hook
+-*egress is mapped to post-routing hook
+-I don't see much value in the other hooks, if you see it and email me good
+-reasons, the addition is trivial.
+-
+-Example syntax for iptables targets usage becomes:
+-tc filter add ..... u32 <u32 syntax> action ipt -j <iptables target syntax>
+-
+-example:
+-tc filter add dev lo parent ffff: protocol ip prio 8 u32 \
+-match ip dst 127.0.0.8/32 flowid 1:12 \
+-action ipt -j mark --set-mark 2
+-
+-NOTE: flowid 1:12 is parsed flowid 0x1:0x12.  Make sure if you want flowid
+-decimal 12, then use flowid 1:c.
+-
+-3) A feature i call pipe
+-The motivation is derived from Unix pipe mechanism but applied to packets.
+-Essentially take a matching packet and pass it through
+-action1 | action2 | action3 etc.
+-You could do something similar to this with the tc policer and the "continue"
+-operator but this rather restricts it to just the policer and requires
+-multiple rules (and lookups, hence quiet inefficient);
+-
+-as an example -- and please note that this is just an example _not_ The
+-Word Youve Been Waiting For (yes i have had problems giving examples
+-which ended becoming dogma in documents and people modifying them a little
+-to look clever);
+-
+-i selected the metering rates to be small so that i can show better how
+-things work.
+-
+-The script below does the following:
+-- an incoming packet from 10.0.0.21 is first given a firewall mark of 1.
+-
+-- It is then metered to make sure it does not exceed its allocated rate of
+-1Kbps. If it doesn't exceed rate, this is where we terminate action execution.
+-
+-- If it does exceed its rate, its "color" changes to a mark of 2 and it is
+-then passed through a second meter.
+-
+--The second meter is shared across all flows on that device [i am surpised
+-that this seems to be not a well know feature of the policer; Bert was telling
+-me that someone was writing a qdisc just to do sharing across multiple devices;
+-it must be the summer heat again; weve had someone doing that every year around
+-summer  -- the key to sharing is to use a operator "index" in your policer
+-rules (example "index 20"). All your rules have to use the same index to
+-share.]
+-
+--If the second meter is exceeded the color of the flow changes further to 3.
+-
+--We then pass the packet to another meter which is shared across all devices
+-in the system. If this meter is exceeded we drop the packet.
+-
+-Note the mark can be used further up the system to do things like policy
+-or more interesting things on the egress.
+-
+------------------- cut here -------------------------------
+-#
+-# Add an ingress qdisc on eth0
+-tc qdisc add dev eth0 ingress
+-#
+-#if you see an incoming packet from 10.0.0.21
+-tc filter add dev eth0 parent ffff: protocol ip prio 1 \
+-u32 match ip src 10.0.0.21/32 flowid 1:15 \
+-#
+-# first give it a mark of 1
+-action ipt -j mark --set-mark 1 index 2 \
+-#
+-# then pass it through a policer which allows 1kbps; if the flow
+-# doesn't exceed that rate, this is where we stop, if it exceeds we
+-# pipe the packet to the next action
+-action police rate 1kbit burst 9k pipe \
+-#
+-# which marks the packet fwmark as 2 and pipes
+-action ipt -j mark --set-mark 2 \
+-#
+-# next attempt to borrow b/width from a meter
+-# used across all flows incoming on eth0("index 30")
+-# and if that is exceeded we pipe to the next action
+-action police index 30 mtu 5000 rate 1kbit burst 10k pipe \
+-# mark it as fwmark 3 if exceeded
+-action ipt -j mark --set-mark 3 \
+-# and then attempt to borrow from a meter used by all devices in the
+-# system. Should this be exceeded, drop the packet on the floor.
+-action police index 20 mtu 5000 rate 1kbit burst 90k drop
+----------------------------------
+-
+-Now lets see the actions installed with
+-"tc filter show parent ffff: dev eth0"
+-
+--------- output -----------
+-jroot# tc filter show parent ffff: dev eth0
+-filter protocol ip pref 1 u32
+-filter protocol ip pref 1 u32 fh 800: ht divisor 1
+-filter protocol ip pref 1 u32 fh 800::800 order 2048 key ht 800 bkt 0 flowid 1:15
+-
+-   action order 1: tablename: mangle  hook: NF_IP_PRE_ROUTING
+-        target MARK set 0x1  index 2
+-
+-   action order 2: police 1 action pipe rate 1Kbit burst 9Kb mtu 2Kb
+-
+-   action order 3: tablename: mangle  hook: NF_IP_PRE_ROUTING
+-        target MARK set 0x2  index 1
+-
+-   action order 4: police 30 action pipe rate 1Kbit burst 10Kb mtu 5000b
+-
+-   action order 5: tablename: mangle  hook: NF_IP_PRE_ROUTING
+-        target MARK set 0x3  index 3
+-
+-   action order 6: police 20 action drop rate 1Kbit burst 90Kb mtu 5000b
+-
+-  match 0a000015/ffffffff at 12
+--------------------------------
+-
+-Note the ordering of the actions is based on the order in which we entered
+-them. In the future i will add explicit priorities.
+-
+-Now lets run a ping -f from 10.0.0.21 to this host; stop the ping after
+-you see a few lines of dots
+-
+-----
+-[root@jzny hadi]# ping -f  10.0.0.22
+-PING 10.0.0.22 (10.0.0.22): 56 data bytes
+-....................................................................................................................................................................................................................................................................................................................................................................................................................................................
+---- 10.0.0.22 ping statistics ---
+-2248 packets transmitted, 1811 packets received, 19% packet loss
+-round-trip min/avg/max = 0.7/9.3/20.1 ms
+------------------------------
+-
+-Now lets take a look at the stats with "tc -s filter show parent ffff: dev eth0"
+-
+---------------
+-jroot# tc -s filter show parent ffff: dev eth0
+-filter protocol ip pref 1 u32
+-filter protocol ip pref 1 u32 fh 800: ht divisor 1
+-filter protocol ip pref 1 u32 fh 800::800 order 2048 key ht 800 bkt 0 flowid 1:1
+-5
+-
+-   action order 1: tablename: mangle  hook: NF_IP_PRE_ROUTING
+-        target MARK set 0x1  index 2
+-         Sent 188832 bytes 2248 pkts (dropped 0, overlimits 0)
+-
+-   action order 2: police 1 action pipe rate 1Kbit burst 9Kb mtu 2Kb
+-         Sent 188832 bytes 2248 pkts (dropped 0, overlimits 2122)
+-
+-   action order 3: tablename: mangle  hook: NF_IP_PRE_ROUTING
+-        target MARK set 0x2  index 1
+-         Sent 178248 bytes 2122 pkts (dropped 0, overlimits 0)
+-
+-   action order 4: police 30 action pipe rate 1Kbit burst 10Kb mtu 5000b
+-         Sent 178248 bytes 2122 pkts (dropped 0, overlimits 1945)
+-
+-   action order 5: tablename: mangle  hook: NF_IP_PRE_ROUTING
+-        target MARK set 0x3  index 3
+-         Sent 163380 bytes 1945 pkts (dropped 0, overlimits 0)
+-
+-   action order 6: police 20 action drop rate 1Kbit burst 90Kb mtu 5000b
+-         Sent 163380 bytes 1945 pkts (dropped 0, overlimits 437)
+-
+-  match 0a000015/ffffffff at 12
+--------------------------------
+-
+-Neat, eh?
+-
+-
+-Want to  write an action module?
+-------------------------------
+-Its easy. Either look at the code or send me email. I will document at
+-some point; will also accept documentation.
+-
+-TODO
+-----
+-
+-Lotsa goodies/features coming. Requests also being accepted.
+-At the moment the focus has been on getting the architecture in place.
+-Expect new things in the spurious time i have to work on this
+-(particularly around end of year when i have typically get time off
+-from work).
+diff --git a/include/ip6tables.h b/include/ip6tables.h
+deleted file mode 100644
+index bfb286826af5..000000000000
+--- a/include/ip6tables.h
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _IP6TABLES_USER_H
+-#define _IP6TABLES_USER_H
+-
+-#include <netinet/ip.h>
+-#include <xtables.h>
+-#include <libiptc/libip6tc.h>
+-#include <iptables/internal.h>
+-
+-/* Your shared library should call one of these. */
+-extern int do_command6(int argc, char *argv[], char **table,
+-		       struct xtc_handle **handle, bool restore);
+-
+-extern int for_each_chain6(int (*fn)(const xt_chainlabel, int, struct xtc_handle *), int verbose, int builtinstoo, struct xtc_handle *handle);
+-extern int flush_entries6(const xt_chainlabel chain, int verbose, struct xtc_handle *handle);
+-extern int delete_chain6(const xt_chainlabel chain, int verbose, struct xtc_handle *handle);
+-void print_rule6(const struct ip6t_entry *e, struct xtc_handle *h, const char *chain, int counters);
+-
+-extern struct xtables_globals ip6tables_globals;
+-
+-#endif /*_IP6TABLES_USER_H*/
+diff --git a/include/iptables.h b/include/iptables.h
+deleted file mode 100644
+index eb91f2918658..000000000000
+--- a/include/iptables.h
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _IPTABLES_USER_H
+-#define _IPTABLES_USER_H
+-
+-#include <netinet/ip.h>
+-#include <xtables.h>
+-#include <libiptc/libiptc.h>
+-#include <iptables/internal.h>
+-
+-/* Your shared library should call one of these. */
+-extern int do_command4(int argc, char *argv[], char **table,
+-		      struct xtc_handle **handle, bool restore);
+-extern int delete_chain4(const xt_chainlabel chain, int verbose,
+-			struct xtc_handle *handle);
+-extern int flush_entries4(const xt_chainlabel chain, int verbose,
+-			struct xtc_handle *handle);
+-extern int for_each_chain4(int (*fn)(const xt_chainlabel, int, struct xtc_handle *),
+-		int verbose, int builtinstoo, struct xtc_handle *handle);
+-extern void print_rule4(const struct ipt_entry *e,
+-		struct xtc_handle *handle, const char *chain, int counters);
+-
+-extern struct xtables_globals iptables_globals;
+-
+-extern struct xtables_globals xtables_globals;
+-
+-#endif /*_IPTABLES_USER_H*/
+diff --git a/include/iptables/internal.h b/include/iptables/internal.h
+deleted file mode 100644
+index 1fd137250031..000000000000
+--- a/include/iptables/internal.h
++++ /dev/null
+@@ -1,14 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef IPTABLES_INTERNAL_H
+-#define IPTABLES_INTERNAL_H 1
+-
+-#define IPTABLES_VERSION "1.6.0"
+-
+-/**
+- * Program's own name and version.
+- */
+-extern const char *program_name, *program_version;
+-
+-extern int line;
+-
+-#endif /* IPTABLES_INTERNAL_H */
+diff --git a/include/libiptc/ipt_kernel_headers.h b/include/libiptc/ipt_kernel_headers.h
+deleted file mode 100644
+index 3d2a2a3277e9..000000000000
+--- a/include/libiptc/ipt_kernel_headers.h
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/* This is the userspace/kernel interface for Generic IP Chains,
+-   required for libc6. */
+-#ifndef _FWCHAINS_KERNEL_HEADERS_H
+-#define _FWCHAINS_KERNEL_HEADERS_H
+-
+-#include <limits.h>
+-
+-#include <netinet/ip.h>
+-#include <netinet/in.h>
+-#include <netinet/ip_icmp.h>
+-#include <netinet/tcp.h>
+-#include <netinet/udp.h>
+-#include <net/if.h>
+-#include <sys/types.h>
+-#endif
+diff --git a/include/libiptc/libip6tc.h b/include/libiptc/libip6tc.h
+deleted file mode 100644
+index cd588de7a96d..000000000000
+--- a/include/libiptc/libip6tc.h
++++ /dev/null
+@@ -1,162 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _LIBIP6TC_H
+-#define _LIBIP6TC_H
+-/* Library which manipulates firewall rules. Version 0.2. */
+-
+-#include <linux/types.h>
+-#include <libiptc/ipt_kernel_headers.h>
+-#ifdef __cplusplus
+-#	include <climits>
+-#else
+-#	include <limits.h> /* INT_MAX in ip6_tables.h */
+-#endif
+-#include <linux/netfilter_ipv6/ip6_tables.h>
+-#include <libiptc/xtcshared.h>
+-
+-#define ip6tc_handle xtc_handle
+-#define ip6t_chainlabel xt_chainlabel
+-
+-#define IP6TC_LABEL_ACCEPT "ACCEPT"
+-#define IP6TC_LABEL_DROP "DROP"
+-#define IP6TC_LABEL_QUEUE   "QUEUE"
+-#define IP6TC_LABEL_RETURN "RETURN"
+-
+-/* Does this chain exist? */
+-int ip6tc_is_chain(const char *chain, struct xtc_handle *const handle);
+-
+-/* Take a snapshot of the rules. Returns NULL on error. */
+-struct xtc_handle *ip6tc_init(const char *tablename);
+-
+-/* Cleanup after ip6tc_init(). */
+-void ip6tc_free(struct xtc_handle *h);
+-
+-/* Iterator functions to run through the chains.  Returns NULL at end. */
+-const char *ip6tc_first_chain(struct xtc_handle *handle);
+-const char *ip6tc_next_chain(struct xtc_handle *handle);
+-
+-/* Get first rule in the given chain: NULL for empty chain. */
+-const struct ip6t_entry *ip6tc_first_rule(const char *chain,
+-					  struct xtc_handle *handle);
+-
+-/* Returns NULL when rules run out. */
+-const struct ip6t_entry *ip6tc_next_rule(const struct ip6t_entry *prev,
+-					 struct xtc_handle *handle);
+-
+-/* Returns a pointer to the target name of this position. */
+-const char *ip6tc_get_target(const struct ip6t_entry *e,
+-			     struct xtc_handle *handle);
+-
+-/* Is this a built-in chain? */
+-int ip6tc_builtin(const char *chain, struct xtc_handle *const handle);
+-
+-/* Get the policy of a given built-in chain */
+-const char *ip6tc_get_policy(const char *chain,
+-			     struct xt_counters *counters,
+-			     struct xtc_handle *handle);
+-
+-/* These functions return TRUE for OK or 0 and set errno. If errno ==
+-   0, it means there was a version error (ie. upgrade libiptc). */
+-/* Rule numbers start at 1 for the first rule. */
+-
+-/* Insert the entry `fw' in chain `chain' into position `rulenum'. */
+-int ip6tc_insert_entry(const xt_chainlabel chain,
+-		       const struct ip6t_entry *e,
+-		       unsigned int rulenum,
+-		       struct xtc_handle *handle);
+-
+-/* Atomically replace rule `rulenum' in `chain' with `fw'. */
+-int ip6tc_replace_entry(const xt_chainlabel chain,
+-			const struct ip6t_entry *e,
+-			unsigned int rulenum,
+-			struct xtc_handle *handle);
+-
+-/* Append entry `fw' to chain `chain'. Equivalent to insert with
+-   rulenum = length of chain. */
+-int ip6tc_append_entry(const xt_chainlabel chain,
+-		       const struct ip6t_entry *e,
+-		       struct xtc_handle *handle);
+-
+-/* Check whether a matching rule exists */
+-int ip6tc_check_entry(const xt_chainlabel chain,
+-		       const struct ip6t_entry *origfw,
+-		       unsigned char *matchmask,
+-		       struct xtc_handle *handle);
+-
+-/* Delete the first rule in `chain' which matches `fw'. */
+-int ip6tc_delete_entry(const xt_chainlabel chain,
+-		       const struct ip6t_entry *origfw,
+-		       unsigned char *matchmask,
+-		       struct xtc_handle *handle);
+-
+-/* Delete the rule in position `rulenum' in `chain'. */
+-int ip6tc_delete_num_entry(const xt_chainlabel chain,
+-			   unsigned int rulenum,
+-			   struct xtc_handle *handle);
+-
+-/* Check the packet `fw' on chain `chain'. Returns the verdict, or
+-   NULL and sets errno. */
+-const char *ip6tc_check_packet(const xt_chainlabel chain,
+-			       struct ip6t_entry *,
+-			       struct xtc_handle *handle);
+-
+-/* Flushes the entries in the given chain (ie. empties chain). */
+-int ip6tc_flush_entries(const xt_chainlabel chain,
+-			struct xtc_handle *handle);
+-
+-/* Zeroes the counters in a chain. */
+-int ip6tc_zero_entries(const xt_chainlabel chain,
+-		       struct xtc_handle *handle);
+-
+-/* Creates a new chain. */
+-int ip6tc_create_chain(const xt_chainlabel chain,
+-		       struct xtc_handle *handle);
+-
+-/* Deletes a chain. */
+-int ip6tc_delete_chain(const xt_chainlabel chain,
+-		       struct xtc_handle *handle);
+-
+-/* Renames a chain. */
+-int ip6tc_rename_chain(const xt_chainlabel oldname,
+-		       const xt_chainlabel newname,
+-		       struct xtc_handle *handle);
+-
+-/* Sets the policy on a built-in chain. */
+-int ip6tc_set_policy(const xt_chainlabel chain,
+-		     const xt_chainlabel policy,
+-		     struct xt_counters *counters,
+-		     struct xtc_handle *handle);
+-
+-/* Get the number of references to this chain */
+-int ip6tc_get_references(unsigned int *ref, const xt_chainlabel chain,
+-			 struct xtc_handle *handle);
+-
+-/* read packet and byte counters for a specific rule */
+-struct xt_counters *ip6tc_read_counter(const xt_chainlabel chain,
+-					unsigned int rulenum,
+-					struct xtc_handle *handle);
+-
+-/* zero packet and byte counters for a specific rule */
+-int ip6tc_zero_counter(const xt_chainlabel chain,
+-		       unsigned int rulenum,
+-		       struct xtc_handle *handle);
+-
+-/* set packet and byte counters for a specific rule */
+-int ip6tc_set_counter(const xt_chainlabel chain,
+-		      unsigned int rulenum,
+-		      struct xt_counters *counters,
+-		      struct xtc_handle *handle);
+-
+-/* Makes the actual changes. */
+-int ip6tc_commit(struct xtc_handle *handle);
+-
+-/* Get raw socket. */
+-int ip6tc_get_raw_socket(void);
+-
+-/* Translates errno numbers into more human-readable form than strerror. */
+-const char *ip6tc_strerror(int err);
+-
+-extern void dump_entries6(struct xtc_handle *const);
+-
+-extern const struct xtc_ops ip6tc_ops;
+-
+-#endif /* _LIBIP6TC_H */
+diff --git a/include/libiptc/libiptc.h b/include/libiptc/libiptc.h
+deleted file mode 100644
+index 1bfe4e18e73e..000000000000
+--- a/include/libiptc/libiptc.h
++++ /dev/null
+@@ -1,173 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _LIBIPTC_H
+-#define _LIBIPTC_H
+-/* Library which manipulates filtering rules. */
+-
+-#include <linux/types.h>
+-#include <libiptc/ipt_kernel_headers.h>
+-#ifdef __cplusplus
+-#	include <climits>
+-#else
+-#	include <limits.h> /* INT_MAX in ip_tables.h */
+-#endif
+-#include <linux/netfilter_ipv4/ip_tables.h>
+-#include <libiptc/xtcshared.h>
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-#define iptc_handle xtc_handle
+-#define ipt_chainlabel xt_chainlabel
+-
+-#define IPTC_LABEL_ACCEPT  "ACCEPT"
+-#define IPTC_LABEL_DROP    "DROP"
+-#define IPTC_LABEL_QUEUE   "QUEUE"
+-#define IPTC_LABEL_RETURN  "RETURN"
+-
+-/* Does this chain exist? */
+-int iptc_is_chain(const char *chain, struct xtc_handle *const handle);
+-
+-/* Take a snapshot of the rules.  Returns NULL on error. */
+-struct xtc_handle *iptc_init(const char *tablename);
+-
+-/* Cleanup after iptc_init(). */
+-void iptc_free(struct xtc_handle *h);
+-
+-/* Iterator functions to run through the chains.  Returns NULL at end. */
+-const char *iptc_first_chain(struct xtc_handle *handle);
+-const char *iptc_next_chain(struct xtc_handle *handle);
+-
+-/* Get first rule in the given chain: NULL for empty chain. */
+-const struct ipt_entry *iptc_first_rule(const char *chain,
+-					struct xtc_handle *handle);
+-
+-/* Returns NULL when rules run out. */
+-const struct ipt_entry *iptc_next_rule(const struct ipt_entry *prev,
+-				       struct xtc_handle *handle);
+-
+-/* Returns a pointer to the target name of this entry. */
+-const char *iptc_get_target(const struct ipt_entry *e,
+-			    struct xtc_handle *handle);
+-
+-/* Is this a built-in chain? */
+-int iptc_builtin(const char *chain, struct xtc_handle *const handle);
+-
+-/* Get the policy of a given built-in chain */
+-const char *iptc_get_policy(const char *chain,
+-			    struct xt_counters *counter,
+-			    struct xtc_handle *handle);
+-
+-/* These functions return TRUE for OK or 0 and set errno.  If errno ==
+-   0, it means there was a version error (ie. upgrade libiptc). */
+-/* Rule numbers start at 1 for the first rule. */
+-
+-/* Insert the entry `e' in chain `chain' into position `rulenum'. */
+-int iptc_insert_entry(const xt_chainlabel chain,
+-		      const struct ipt_entry *e,
+-		      unsigned int rulenum,
+-		      struct xtc_handle *handle);
+-
+-/* Atomically replace rule `rulenum' in `chain' with `e'. */
+-int iptc_replace_entry(const xt_chainlabel chain,
+-		       const struct ipt_entry *e,
+-		       unsigned int rulenum,
+-		       struct xtc_handle *handle);
+-
+-/* Append entry `e' to chain `chain'.  Equivalent to insert with
+-   rulenum = length of chain. */
+-int iptc_append_entry(const xt_chainlabel chain,
+-		      const struct ipt_entry *e,
+-		      struct xtc_handle *handle);
+-
+-/* Check whether a mathching rule exists */
+-int iptc_check_entry(const xt_chainlabel chain,
+-		      const struct ipt_entry *origfw,
+-		      unsigned char *matchmask,
+-		      struct xtc_handle *handle);
+-
+-/* Delete the first rule in `chain' which matches `e', subject to
+-   matchmask (array of length == origfw) */
+-int iptc_delete_entry(const xt_chainlabel chain,
+-		      const struct ipt_entry *origfw,
+-		      unsigned char *matchmask,
+-		      struct xtc_handle *handle);
+-
+-/* Delete the rule in position `rulenum' in `chain'. */
+-int iptc_delete_num_entry(const xt_chainlabel chain,
+-			  unsigned int rulenum,
+-			  struct xtc_handle *handle);
+-
+-/* Check the packet `e' on chain `chain'.  Returns the verdict, or
+-   NULL and sets errno. */
+-const char *iptc_check_packet(const xt_chainlabel chain,
+-			      struct ipt_entry *entry,
+-			      struct xtc_handle *handle);
+-
+-/* Flushes the entries in the given chain (ie. empties chain). */
+-int iptc_flush_entries(const xt_chainlabel chain,
+-		       struct xtc_handle *handle);
+-
+-/* Zeroes the counters in a chain. */
+-int iptc_zero_entries(const xt_chainlabel chain,
+-		      struct xtc_handle *handle);
+-
+-/* Creates a new chain. */
+-int iptc_create_chain(const xt_chainlabel chain,
+-		      struct xtc_handle *handle);
+-
+-/* Deletes a chain. */
+-int iptc_delete_chain(const xt_chainlabel chain,
+-		      struct xtc_handle *handle);
+-
+-/* Renames a chain. */
+-int iptc_rename_chain(const xt_chainlabel oldname,
+-		      const xt_chainlabel newname,
+-		      struct xtc_handle *handle);
+-
+-/* Sets the policy on a built-in chain. */
+-int iptc_set_policy(const xt_chainlabel chain,
+-		    const xt_chainlabel policy,
+-		    struct xt_counters *counters,
+-		    struct xtc_handle *handle);
+-
+-/* Get the number of references to this chain */
+-int iptc_get_references(unsigned int *ref,
+-			const xt_chainlabel chain,
+-			struct xtc_handle *handle);
+-
+-/* read packet and byte counters for a specific rule */
+-struct xt_counters *iptc_read_counter(const xt_chainlabel chain,
+-				       unsigned int rulenum,
+-				       struct xtc_handle *handle);
+-
+-/* zero packet and byte counters for a specific rule */
+-int iptc_zero_counter(const xt_chainlabel chain,
+-		      unsigned int rulenum,
+-		      struct xtc_handle *handle);
+-
+-/* set packet and byte counters for a specific rule */
+-int iptc_set_counter(const xt_chainlabel chain,
+-		     unsigned int rulenum,
+-		     struct xt_counters *counters,
+-		     struct xtc_handle *handle);
+-
+-/* Makes the actual changes. */
+-int iptc_commit(struct xtc_handle *handle);
+-
+-/* Get raw socket. */
+-int iptc_get_raw_socket(void);
+-
+-/* Translates errno numbers into more human-readable form than strerror. */
+-const char *iptc_strerror(int err);
+-
+-extern void dump_entries(struct xtc_handle *const);
+-
+-extern const struct xtc_ops iptc_ops;
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-
+-#endif /* _LIBIPTC_H */
+diff --git a/include/libiptc/libxtc.h b/include/libiptc/libxtc.h
+deleted file mode 100644
+index 1e9596a6e01c..000000000000
+--- a/include/libiptc/libxtc.h
++++ /dev/null
+@@ -1,34 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _LIBXTC_H
+-#define _LIBXTC_H
+-/* Library which manipulates filtering rules. */
+-
+-#include <libiptc/ipt_kernel_headers.h>
+-#include <linux/netfilter/x_tables.h>
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-#ifndef XT_MIN_ALIGN
+-/* xt_entry has pointers and u_int64_t's in it, so if you align to
+-   it, you'll also align to any crazy matches and targets someone
+-   might write */
+-#define XT_MIN_ALIGN (__alignof__(struct xt_entry))
+-#endif
+-
+-#ifndef XT_ALIGN
+-#define XT_ALIGN(s) (((s) + ((XT_MIN_ALIGN)-1)) & ~((XT_MIN_ALIGN)-1))
+-#endif
+-
+-#define XTC_LABEL_ACCEPT  "ACCEPT"
+-#define XTC_LABEL_DROP    "DROP"
+-#define XTC_LABEL_QUEUE   "QUEUE"
+-#define XTC_LABEL_RETURN  "RETURN"
+-
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#endif /* _LIBXTC_H */
+diff --git a/include/libiptc/xtcshared.h b/include/libiptc/xtcshared.h
+deleted file mode 100644
+index 278a58f4eb9f..000000000000
+--- a/include/libiptc/xtcshared.h
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _LIBXTC_SHARED_H
+-#define _LIBXTC_SHARED_H 1
+-
+-typedef char xt_chainlabel[32];
+-struct xtc_handle;
+-struct xt_counters;
+-
+-struct xtc_ops {
+-	int (*commit)(struct xtc_handle *);
+-	void (*free)(struct xtc_handle *);
+-	int (*builtin)(const char *, struct xtc_handle *const);
+-	int (*is_chain)(const char *, struct xtc_handle *const);
+-	int (*flush_entries)(const xt_chainlabel, struct xtc_handle *);
+-	int (*create_chain)(const xt_chainlabel, struct xtc_handle *);
+-	int (*set_policy)(const xt_chainlabel, const xt_chainlabel,
+-			  struct xt_counters *, struct xtc_handle *);
+-	const char *(*strerror)(int);
+-};
+-
+-#endif /* _LIBXTC_SHARED_H */
+diff --git a/man/man8/tc-xt.8 b/man/man8/tc-xt.8
+deleted file mode 100644
+index f6dc5addf254..000000000000
+--- a/man/man8/tc-xt.8
++++ /dev/null
+@@ -1,42 +0,0 @@
+-.TH "iptables action in tc" 8 "3 Mar 2016" "iproute2" "Linux"
+-
+-.SH NAME
+-xt - tc iptables action
+-.SH SYNOPSIS
+-.in +8
+-.ti -8
+-.BR tc " ... " "action xt \-j"
+-.IR TARGET " [ " TARGET_OPTS " ]"
+-.SH DESCRIPTION
+-The
+-.B xt
+-action allows one to call arbitrary iptables targets for packets matching the filter
+-this action is attached to.
+-.SH OPTIONS
+-.TP
+-.BI -j " TARGET \fR[\fI TARGET_OPTS \fR]"
+-Perform a jump to the given iptables target, optionally passing any target
+-specific options in
+-.IR TARGET_OPTS .
+-.SH EXAMPLES
+-The following will attach a
+-.B u32
+-filter to the
+-.B ingress
+-qdisc matching ICMP replies and using the
+-.B xt
+-action to make the kernel yell 'PONG' each time:
+-
+-.RS
+-.EX
+-tc qdisc add dev eth0 ingress
+-tc filter add dev eth0 parent ffff: proto ip u32 \\
+-	match ip protocol 1 0xff \\
+-	match ip icmp_type 0 0xff \\
+-	action xt -j LOG --log-prefix PONG
+-.EE
+-.RE
+-.SH SEE ALSO
+-.BR tc (8),
+-.BR tc-u32 (8),
+-.BR iptables-extensions (8)
+diff --git a/tc/Makefile b/tc/Makefile
+index 9cb0d0edde93..ec98f51f101c 100644
+--- a/tc/Makefile
++++ b/tc/Makefile
+@@ -80,27 +80,6 @@ TCMODULES += q_ets.o
+ 
+ TCSO :=
+ 
+-ifneq ($(TC_CONFIG_NO_XT),y)
+-  ifeq ($(TC_CONFIG_XT),y)
+-    TCSO += m_xt.so
+-    TCMODULES += em_ipt.o
+-    ifeq ($(TC_CONFIG_IPSET),y)
+-      TCMODULES += em_ipset.o
+-    endif
+-  else
+-    ifeq ($(TC_CONFIG_XT_OLD),y)
+-      TCSO += m_xt_old.so
+-    else
+-      ifeq ($(TC_CONFIG_XT_OLD_H),y)
+-        CFLAGS += -DTC_CONFIG_XT_H
+-        TCSO += m_xt_old.so
+-      else
+-        TCMODULES += m_ipt.o
+-      endif
+-    endif
+-  endif
+-endif
+-
+ TCOBJ += $(TCMODULES)
+ LDLIBS += -L. -lm
+ 
+@@ -116,9 +95,6 @@ TCLIB += tc_stab.o
+ TCLIB += tc_qevent.o
+ 
+ CFLAGS += -DCONFIG_GACT -DCONFIG_GACT_PROB
+-ifneq ($(IPT_LIB_DIR),)
+-	CFLAGS += -DIPT_LIB_DIR=\"$(IPT_LIB_DIR)\"
+-endif
+ 
+ LEX := flex
+ CFLAGS += -DYY_NO_INPUT
+diff --git a/tc/em_ipset.c b/tc/em_ipset.c
+deleted file mode 100644
+index f97abaf3cfb7..000000000000
+--- a/tc/em_ipset.c
++++ /dev/null
+@@ -1,260 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/*
+- * em_ipset.c		IPset Ematch
+- *
+- * (C) 2012 Florian Westphal <fw@strlen.de>
+- *
+- * Parts taken from iptables libxt_set.h:
+- * Copyright (C) 2000-2002 Joakim Axelsson <gozem@linux.nu>
+- *                         Patrick Schaaf <bof@bof.de>
+- *                         Martin Josefsson <gandalf@wlug.westbo.se>
+- * Copyright (C) 2003-2010 Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+- */
+-
+-#include <stdbool.h>
+-#include <stdio.h>
+-#include <errno.h>
+-#include <netdb.h>
+-#include <unistd.h>
+-#include <string.h>
+-#include <stdlib.h>
+-#include <getopt.h>
+-
+-#include <xtables.h>
+-#include <linux/netfilter/ipset/ip_set.h>
+-
+-#ifndef IPSET_INVALID_ID
+-typedef __u16 ip_set_id_t;
+-
+-enum ip_set_dim {
+-	IPSET_DIM_ZERO = 0,
+-	IPSET_DIM_ONE,
+-	IPSET_DIM_TWO,
+-	IPSET_DIM_THREE,
+-	IPSET_DIM_MAX = 6,
+-};
+-#endif /* IPSET_INVALID_ID */
+-
+-#include <linux/netfilter/xt_set.h>
+-#include "m_ematch.h"
+-
+-#ifndef IPSET_INVALID_ID
+-#define IPSET_INVALID_ID	65535
+-#define SO_IP_SET		83
+-
+-union ip_set_name_index {
+-	char name[IPSET_MAXNAMELEN];
+-	__u16 index;
+-};
+-
+-#define IP_SET_OP_GET_BYNAME	0x00000006	/* Get set index by name */
+-struct ip_set_req_get_set {
+-	unsigned int op;
+-	unsigned int version;
+-	union ip_set_name_index set;
+-};
+-
+-#define IP_SET_OP_GET_BYINDEX	0x00000007	/* Get set name by index */
+-/* Uses ip_set_req_get_set */
+-
+-#define IP_SET_OP_VERSION	0x00000100	/* Ask kernel version */
+-struct ip_set_req_version {
+-	unsigned int op;
+-	unsigned int version;
+-};
+-#endif /* IPSET_INVALID_ID */
+-
+-extern struct ematch_util ipset_ematch_util;
+-
+-static int get_version(unsigned int *version)
+-{
+-	int res, sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+-	struct ip_set_req_version req_version;
+-	socklen_t size = sizeof(req_version);
+-
+-	if (sockfd < 0) {
+-		fputs("Can't open socket to ipset.\n", stderr);
+-		return -1;
+-	}
+-
+-	req_version.op = IP_SET_OP_VERSION;
+-	res = getsockopt(sockfd, SOL_IP, SO_IP_SET, &req_version, &size);
+-	if (res != 0) {
+-		perror("xt_set getsockopt");
+-		close(sockfd);
+-		return -1;
+-	}
+-
+-	*version = req_version.version;
+-	return sockfd;
+-}
+-
+-static int do_getsockopt(struct ip_set_req_get_set *req)
+-{
+-	int sockfd, res;
+-	socklen_t size = sizeof(struct ip_set_req_get_set);
+-
+-	sockfd = get_version(&req->version);
+-	if (sockfd < 0)
+-		return -1;
+-	res = getsockopt(sockfd, SOL_IP, SO_IP_SET, req, &size);
+-	if (res != 0)
+-		perror("Problem when communicating with ipset");
+-	close(sockfd);
+-	if (res != 0)
+-		return -1;
+-
+-	if (size != sizeof(struct ip_set_req_get_set)) {
+-		fprintf(stderr,
+-			"Incorrect return size from kernel during ipset lookup, (want %zu, got %zu)\n",
+-			sizeof(struct ip_set_req_get_set), (size_t)size);
+-		return -1;
+-	}
+-
+-	return res;
+-}
+-
+-static int
+-get_set_byid(char *setname, unsigned int idx)
+-{
+-	struct ip_set_req_get_set req;
+-	int res;
+-
+-	req.op = IP_SET_OP_GET_BYINDEX;
+-	req.set.index = idx;
+-	res = do_getsockopt(&req);
+-	if (res != 0)
+-		return -1;
+-	if (req.set.name[0] == '\0') {
+-		fprintf(stderr,
+-			"Set with index %i in kernel doesn't exist.\n", idx);
+-		return -1;
+-	}
+-
+-	strncpy(setname, req.set.name, IPSET_MAXNAMELEN);
+-	return 0;
+-}
+-
+-static int
+-get_set_byname(const char *setname, struct xt_set_info *info)
+-{
+-	struct ip_set_req_get_set req;
+-	int res;
+-
+-	req.op = IP_SET_OP_GET_BYNAME;
+-	strlcpy(req.set.name, setname, IPSET_MAXNAMELEN);
+-	res = do_getsockopt(&req);
+-	if (res != 0)
+-		return -1;
+-	if (req.set.index == IPSET_INVALID_ID)
+-		return -1;
+-	info->index = req.set.index;
+-	return 0;
+-}
+-
+-static int
+-parse_dirs(const char *opt_arg, struct xt_set_info *info)
+-{
+-	char *saved = strdup(opt_arg);
+-	char *ptr, *tmp = saved;
+-
+-	if (!tmp) {
+-		perror("strdup");
+-		return -1;
+-	}
+-
+-	while (info->dim < IPSET_DIM_MAX && tmp != NULL) {
+-		info->dim++;
+-		ptr = strsep(&tmp, ",");
+-		if (strncmp(ptr, "src", 3) == 0)
+-			info->flags |= (1 << info->dim);
+-		else if (strncmp(ptr, "dst", 3) != 0) {
+-			fputs("You must specify (the comma separated list of) 'src' or 'dst'\n", stderr);
+-			free(saved);
+-			return -1;
+-		}
+-	}
+-
+-	if (tmp)
+-		fprintf(stderr, "Can't be more src/dst options than %u", IPSET_DIM_MAX);
+-	free(saved);
+-	return tmp ? -1 : 0;
+-}
+-
+-static void ipset_print_usage(FILE *fd)
+-{
+-	fprintf(fd,
+-	    "Usage: ipset(SETNAME FLAGS)\n" \
+-	    "where: SETNAME:= string\n" \
+-	    "       FLAGS  := { FLAG[,FLAGS] }\n" \
+-	    "       FLAG   := { src | dst }\n" \
+-	    "\n" \
+-	    "Example: 'ipset(bulk src,dst)'\n");
+-}
+-
+-static int ipset_parse_eopt(struct nlmsghdr *n, struct tcf_ematch_hdr *hdr,
+-			    struct bstr *args)
+-{
+-	struct xt_set_info set_info = {};
+-	int ret;
+-
+-#define PARSE_ERR(CARG, FMT, ARGS...) \
+-	em_parse_error(EINVAL, args, CARG, &ipset_ematch_util, FMT, ##ARGS)
+-
+-	if (args == NULL)
+-		return PARSE_ERR(args, "ipset: missing set name");
+-
+-	if (args->len >= IPSET_MAXNAMELEN)
+-		return PARSE_ERR(args, "ipset: set name too long (max %u)", IPSET_MAXNAMELEN - 1);
+-	ret = get_set_byname(args->data, &set_info);
+-	if (ret < 0)
+-		return PARSE_ERR(args, "ipset: unknown set name '%s'", args->data);
+-
+-	if (args->next == NULL)
+-		return PARSE_ERR(args, "ipset: missing set flags");
+-
+-	args = bstr_next(args);
+-	if (parse_dirs(args->data, &set_info))
+-		return PARSE_ERR(args, "ipset: error parsing set flags");
+-
+-	if (args->next) {
+-		args = bstr_next(args);
+-		return PARSE_ERR(args, "ipset: unknown parameter");
+-	}
+-
+-	addraw_l(n, MAX_MSG, hdr, sizeof(*hdr));
+-	addraw_l(n, MAX_MSG, &set_info, sizeof(set_info));
+-
+-#undef PARSE_ERR
+-	return 0;
+-}
+-
+-static int ipset_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
+-			    int data_len)
+-{
+-	int i;
+-	char setname[IPSET_MAXNAMELEN];
+-	const struct xt_set_info *set_info = data;
+-
+-	if (data_len != sizeof(*set_info)) {
+-		fprintf(stderr, "xt_set_info struct size mismatch\n");
+-		return -1;
+-	}
+-
+-	if (get_set_byid(setname, set_info->index))
+-		return -1;
+-	fputs(setname, fd);
+-	for (i = 1; i <= set_info->dim; i++) {
+-		fprintf(fd, "%s%s", i == 1 ? " " : ",", set_info->flags & (1 << i) ? "src" : "dst");
+-	}
+-
+-	return 0;
+-}
+-
+-struct ematch_util ipset_ematch_util = {
+-	.kind = "ipset",
+-	.kind_num = TCF_EM_IPSET,
+-	.parse_eopt = ipset_parse_eopt,
+-	.print_eopt = ipset_print_eopt,
+-	.print_usage = ipset_print_usage
+-};
+diff --git a/tc/em_ipt.c b/tc/em_ipt.c
+deleted file mode 100644
+index 69efefd8c5e3..000000000000
+--- a/tc/em_ipt.c
++++ /dev/null
+@@ -1,207 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/*
+- * em_ipt.c		IPtables extensions matching Ematch
+- *
+- * (C) 2018 Eyal Birger <eyal.birger@gmail.com>
+- */
+-
+-#include <getopt.h>
+-
+-#include <linux/tc_ematch/tc_em_ipt.h>
+-#include <linux/pkt_cls.h>
+-#include <xtables.h>
+-#include "m_ematch.h"
+-
+-static void em_ipt_print_usage(FILE *fd)
+-{
+-	fprintf(fd,
+-		"Usage: ipt([-6] -m MATCH_NAME [MATCH_OPTS])\n"
+-		"Example: 'ipt(-m policy --reqid 1 --pol ipsec --dir in)'\n");
+-}
+-
+-static struct option original_opts[] = {
+-	{
+-		.name = "match",
+-		.has_arg = 1,
+-		.val = 'm'
+-	},
+-	{
+-		.name = "ipv6",
+-		.val = '6'
+-	},
+-	{}
+-};
+-
+-static struct xtables_globals em_tc_ipt_globals = {
+-	.option_offset = 0,
+-	.program_name = "tc-em-ipt",
+-	.program_version = "0.1",
+-	.orig_opts = original_opts,
+-	.opts = original_opts,
+-#if (XTABLES_VERSION_CODE >= 11)
+-	.compat_rev = xtables_compatible_revision,
+-#endif
+-};
+-
+-static struct xt_entry_match *fake_xt_entry_match(int data_size, void *data)
+-{
+-	struct xt_entry_match *m;
+-
+-	m = xtables_calloc(1, XT_ALIGN(sizeof(*m)) + data_size);
+-	if (!m)
+-		return NULL;
+-
+-	if (data)
+-		memcpy(m->data, data, data_size);
+-
+-	m->u.user.match_size = data_size;
+-	return m;
+-}
+-
+-static void scrub_match(struct xtables_match *match)
+-{
+-	match->mflags = 0;
+-	free(match->m);
+-	match->m = NULL;
+-}
+-
+-/* IPv4 and IPv6 share the same hooking enumeration */
+-#define HOOK_PRE_ROUTING 0
+-#define HOOK_POST_ROUTING 4
+-
+-static __u32 em_ipt_hook(struct nlmsghdr *n)
+-{
+-	struct tcmsg *t = NLMSG_DATA(n);
+-
+-	if (t->tcm_parent != TC_H_ROOT &&
+-	    t->tcm_parent == TC_H_MAJ(TC_H_INGRESS))
+-		return HOOK_PRE_ROUTING;
+-
+-	return HOOK_POST_ROUTING;
+-}
+-
+-static int em_ipt_parse_eopt_argv(struct nlmsghdr *n,
+-				  struct tcf_ematch_hdr *hdr,
+-				  int argc, char **argv)
+-{
+-	struct xtables_globals tmp_tcipt_globals = em_tc_ipt_globals;
+-	struct xtables_match *match = NULL;
+-	__u8 nfproto = NFPROTO_IPV4;
+-
+-	while (1) {
+-		struct option *opts;
+-		int c;
+-
+-		c = getopt_long(argc, argv, "6m:", tmp_tcipt_globals.opts,
+-				NULL);
+-		if (c == -1)
+-			break;
+-
+-		switch (c) {
+-		case 'm':
+-			xtables_init_all(&tmp_tcipt_globals, nfproto);
+-
+-			match = xtables_find_match(optarg, XTF_TRY_LOAD, NULL);
+-			if (!match || !match->x6_parse) {
+-				fprintf(stderr, " failed to find match %s\n\n",
+-					optarg);
+-				return -1;
+-			}
+-
+-			match->m = fake_xt_entry_match(match->size, NULL);
+-			if (!match->m) {
+-				printf(" %s error\n", match->name);
+-				return -1;
+-			}
+-
+-			if (match->init)
+-				match->init(match->m);
+-
+-			opts = xtables_options_xfrm(tmp_tcipt_globals.orig_opts,
+-						    tmp_tcipt_globals.opts,
+-						    match->x6_options,
+-						    &match->option_offset);
+-			if (!opts) {
+-				scrub_match(match);
+-				return -1;
+-			}
+-
+-			tmp_tcipt_globals.opts = opts;
+-			break;
+-
+-		case '6':
+-			nfproto = NFPROTO_IPV6;
+-			break;
+-
+-		default:
+-			if (!match) {
+-				fprintf(stderr, "failed to find match %s\n\n",
+-					optarg);
+-				return -1;
+-
+-			}
+-			xtables_option_mpcall(c, argv, 0, match, NULL);
+-			break;
+-		}
+-	}
+-
+-	if (!match) {
+-		fprintf(stderr, " failed to parse parameters (%s)\n", *argv);
+-		return -1;
+-	}
+-
+-	/* check that we passed the correct parameters to the match */
+-	xtables_option_mfcall(match);
+-
+-	addraw_l(n, MAX_MSG, hdr, sizeof(*hdr));
+-	addattr32(n, MAX_MSG, TCA_EM_IPT_HOOK, em_ipt_hook(n));
+-	addattrstrz(n, MAX_MSG, TCA_EM_IPT_MATCH_NAME, match->name);
+-	addattr8(n, MAX_MSG, TCA_EM_IPT_MATCH_REVISION, match->revision);
+-	addattr8(n, MAX_MSG, TCA_EM_IPT_NFPROTO, nfproto);
+-	addattr_l(n, MAX_MSG, TCA_EM_IPT_MATCH_DATA, match->m->data,
+-		  match->size);
+-
+-	xtables_free_opts(1);
+-
+-	scrub_match(match);
+-	return 0;
+-}
+-
+-static int em_ipt_print_epot(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
+-			     int data_len)
+-{
+-	struct rtattr *tb[TCA_EM_IPT_MAX + 1];
+-	struct xtables_match *match;
+-	const char *mname;
+-	__u8 nfproto;
+-
+-	if (parse_rtattr(tb, TCA_EM_IPT_MAX, data, data_len) < 0)
+-		return -1;
+-
+-	nfproto = rta_getattr_u8(tb[TCA_EM_IPT_NFPROTO]);
+-
+-	xtables_init_all(&em_tc_ipt_globals, nfproto);
+-
+-	mname = rta_getattr_str(tb[TCA_EM_IPT_MATCH_NAME]);
+-	match = xtables_find_match(mname, XTF_TRY_LOAD, NULL);
+-	if (!match)
+-		return -1;
+-
+-	match->m = fake_xt_entry_match(RTA_PAYLOAD(tb[TCA_EM_IPT_MATCH_DATA]),
+-				       RTA_DATA(tb[TCA_EM_IPT_MATCH_DATA]));
+-	if (!match->m)
+-		return -1;
+-
+-	match->print(NULL, match->m, 0);
+-
+-	scrub_match(match);
+-	return 0;
+-}
+-
+-struct ematch_util ipt_ematch_util = {
+-	.kind = "ipt",
+-	.kind_num = TCF_EM_IPT,
+-	.parse_eopt_argv = em_ipt_parse_eopt_argv,
+-	.print_eopt = em_ipt_print_epot,
+-	.print_usage = em_ipt_print_usage
+-};
+diff --git a/tc/m_ipt.c b/tc/m_ipt.c
+deleted file mode 100644
+index 2538f769b0ee..000000000000
+--- a/tc/m_ipt.c
++++ /dev/null
+@@ -1,511 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * m_ipt.c	iptables based targets
+- *		utilities mostly ripped from iptables <duh, its the linux way>
+- *
+- * Authors:  J Hadi Salim (hadi@cyberus.ca)
+- */
+-
+-#include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-#include <iptables.h>
+-#include <linux/netfilter.h>
+-#include <linux/netfilter_ipv4/ip_tables.h>
+-#include "utils.h"
+-#include "tc_util.h"
+-#include <linux/tc_act/tc_ipt.h>
+-#include <stdio.h>
+-#include <dlfcn.h>
+-#include <getopt.h>
+-#include <errno.h>
+-#include <string.h>
+-#include <netdb.h>
+-#include <stdlib.h>
+-#include <ctype.h>
+-#include <stdarg.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <sys/wait.h>
+-
+-static const char *pname = "tc-ipt";
+-static const char *tname = "mangle";
+-static const char *pversion = "0.1";
+-
+-static const char *ipthooks[] = {
+-	"NF_IP_PRE_ROUTING",
+-	"NF_IP_LOCAL_IN",
+-	"NF_IP_FORWARD",
+-	"NF_IP_LOCAL_OUT",
+-	"NF_IP_POST_ROUTING",
+-};
+-
+-static struct option original_opts[] = {
+-	{"jump", 1, 0, 'j'},
+-	{0, 0, 0, 0}
+-};
+-
+-static struct xtables_target *t_list;
+-static struct option *opts = original_opts;
+-static unsigned int global_option_offset;
+-#define OPTION_OFFSET 256
+-
+-char *lib_dir;
+-
+-void
+-xtables_register_target(struct xtables_target *me)
+-{
+-	me->next = t_list;
+-	t_list = me;
+-
+-}
+-
+-static void exit_tryhelp(int status)
+-{
+-	fprintf(stderr, "Try `%s -h' or '%s --help' for more information.\n",
+-		pname, pname);
+-	exit(status);
+-}
+-
+-static void exit_error(enum xtables_exittype status, char *msg, ...)
+-{
+-	va_list args;
+-
+-	va_start(args, msg);
+-	fprintf(stderr, "%s v%s: ", pname, pversion);
+-	vfprintf(stderr, msg, args);
+-	va_end(args);
+-	fprintf(stderr, "\n");
+-	if (status == PARAMETER_PROBLEM)
+-		exit_tryhelp(status);
+-	if (status == VERSION_PROBLEM)
+-		fprintf(stderr,
+-			"Perhaps iptables or your kernel needs to be upgraded.\n");
+-	exit(status);
+-}
+-
+-/* stolen from iptables 1.2.11
+-They should really have them as a library so i can link to them
+-Email them next time i remember
+-*/
+-
+-static void free_opts(struct option *local_opts)
+-{
+-	if (local_opts != original_opts) {
+-		free(local_opts);
+-		opts = original_opts;
+-		global_option_offset = 0;
+-	}
+-}
+-
+-static struct option *
+-merge_options(struct option *oldopts, const struct option *newopts,
+-	      unsigned int *option_offset)
+-{
+-	struct option *merge;
+-	unsigned int num_old, num_new, i;
+-
+-	for (num_old = 0; oldopts[num_old].name; num_old++);
+-	for (num_new = 0; newopts[num_new].name; num_new++);
+-
+-	*option_offset = global_option_offset + OPTION_OFFSET;
+-
+-	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
+-	memcpy(merge, oldopts, num_old * sizeof(struct option));
+-	for (i = 0; i < num_new; i++) {
+-		merge[num_old + i] = newopts[i];
+-		merge[num_old + i].val += *option_offset;
+-	}
+-	memset(merge + num_old + num_new, 0, sizeof(struct option));
+-
+-	return merge;
+-}
+-
+-static void *
+-fw_calloc(size_t count, size_t size)
+-{
+-	void *p;
+-
+-	if ((p = (void *) calloc(count, size)) == NULL) {
+-		perror("iptables: calloc failed");
+-		exit(1);
+-	}
+-	return p;
+-}
+-
+-static struct xtables_target *
+-find_t(char *name)
+-{
+-	struct xtables_target *m;
+-
+-	for (m = t_list; m; m = m->next) {
+-		if (strcmp(m->name, name) == 0)
+-			return m;
+-	}
+-
+-	return NULL;
+-}
+-
+-static struct xtables_target *
+-get_target_name(const char *name)
+-{
+-	void *handle;
+-	char *error;
+-	char *new_name, *lname;
+-	struct xtables_target *m;
+-	char path[strlen(lib_dir) + sizeof("/libipt_.so") + strlen(name)];
+-
+-#ifdef NO_SHARED_LIBS
+-	return NULL;
+-#endif
+-
+-	new_name = calloc(1, strlen(name) + 1);
+-	lname = calloc(1, strlen(name) + 1);
+-	if (!new_name)
+-		exit_error(PARAMETER_PROBLEM, "get_target_name");
+-	if (!lname)
+-		exit_error(PARAMETER_PROBLEM, "get_target_name");
+-
+-	strcpy(new_name, name);
+-	strcpy(lname, name);
+-
+-	if (isupper(lname[0])) {
+-		int i;
+-
+-		for (i = 0; i < strlen(name); i++) {
+-			lname[i] = tolower(lname[i]);
+-		}
+-	}
+-
+-	if (islower(new_name[0])) {
+-		int i;
+-
+-		for (i = 0; i < strlen(new_name); i++) {
+-			new_name[i] = toupper(new_name[i]);
+-		}
+-	}
+-
+-	/* try libxt_xx first */
+-	sprintf(path, "%s/libxt_%s.so", lib_dir, new_name);
+-	handle = dlopen(path, RTLD_LAZY);
+-	if (!handle) {
+-		/* try libipt_xx next */
+-		sprintf(path, "%s/libipt_%s.so", lib_dir, new_name);
+-		handle = dlopen(path, RTLD_LAZY);
+-
+-		if (!handle) {
+-			sprintf(path, "%s/libxt_%s.so", lib_dir, lname);
+-			handle = dlopen(path, RTLD_LAZY);
+-		}
+-
+-		if (!handle) {
+-			sprintf(path, "%s/libipt_%s.so", lib_dir, lname);
+-			handle = dlopen(path, RTLD_LAZY);
+-		}
+-		/* ok, lets give up .. */
+-		if (!handle) {
+-			fputs(dlerror(), stderr);
+-			printf("\n");
+-			free(new_name);
+-			free(lname);
+-			return NULL;
+-		}
+-	}
+-
+-	m = dlsym(handle, new_name);
+-	if ((error = dlerror()) != NULL) {
+-		m = (struct xtables_target *) dlsym(handle, lname);
+-		if ((error = dlerror()) != NULL) {
+-			m = find_t(new_name);
+-			if (m == NULL) {
+-				m = find_t(lname);
+-				if (m == NULL) {
+-					fputs(error, stderr);
+-					fprintf(stderr, "\n");
+-					dlclose(handle);
+-					free(new_name);
+-					free(lname);
+-					return NULL;
+-				}
+-			}
+-		}
+-	}
+-
+-	free(new_name);
+-	free(lname);
+-	return m;
+-}
+-
+-static void set_revision(char *name, u_int8_t revision)
+-{
+-	/* Old kernel sources don't have ".revision" field,
+-	*  but we stole a byte from name. */
+-	name[IPT_FUNCTION_MAXNAMELEN - 2] = '\0';
+-	name[IPT_FUNCTION_MAXNAMELEN - 1] = revision;
+-}
+-
+-/*
+- * we may need to check for version mismatch
+-*/
+-static int build_st(struct xtables_target *target, struct ipt_entry_target *t)
+-{
+-	if (target) {
+-		size_t size;
+-
+-		size =
+-		    XT_ALIGN(sizeof(struct ipt_entry_target)) + target->size;
+-
+-		if (t == NULL) {
+-			target->t = fw_calloc(1, size);
+-			target->t->u.target_size = size;
+-
+-			if (target->init != NULL)
+-				target->init(target->t);
+-			set_revision(target->t->u.user.name, target->revision);
+-		} else {
+-			target->t = t;
+-		}
+-		strcpy(target->t->u.user.name, target->name);
+-		return 0;
+-	}
+-
+-	return -1;
+-}
+-
+-static int parse_ipt(struct action_util *a, int *argc_p,
+-		     char ***argv_p, int tca_id, struct nlmsghdr *n)
+-{
+-	struct xtables_target *m = NULL;
+-	struct ipt_entry fw;
+-	struct rtattr *tail;
+-	int c;
+-	int rargc = *argc_p;
+-	char **argv = *argv_p;
+-	int argc = 0, iargc = 0;
+-	char k[FILTER_NAMESZ];
+-	int size = 0;
+-	int iok = 0, ok = 0;
+-	__u32 hook = 0, index = 0;
+-
+-	lib_dir = getenv("IPTABLES_LIB_DIR");
+-	if (!lib_dir)
+-		lib_dir = IPT_LIB_DIR;
+-
+-	{
+-		int i;
+-
+-		for (i = 0; i < rargc; i++) {
+-			if (!argv[i] || strcmp(argv[i], "action") == 0)
+-				break;
+-		}
+-		iargc = argc = i;
+-	}
+-
+-	if (argc <= 2) {
+-		fprintf(stderr, "bad arguments to ipt %d vs %d\n", argc, rargc);
+-		return -1;
+-	}
+-
+-	while (1) {
+-		c = getopt_long(argc, argv, "j:", opts, NULL);
+-		if (c == -1)
+-			break;
+-		switch (c) {
+-		case 'j':
+-			m = get_target_name(optarg);
+-			if (m != NULL) {
+-
+-				if (build_st(m, NULL) < 0) {
+-					printf(" %s error\n", m->name);
+-					return -1;
+-				}
+-				opts =
+-				    merge_options(opts, m->extra_opts,
+-						  &m->option_offset);
+-			} else {
+-				fprintf(stderr, " failed to find target %s\n\n", optarg);
+-				return -1;
+-			}
+-			ok++;
+-			break;
+-
+-		default:
+-			memset(&fw, 0, sizeof(fw));
+-			if (m) {
+-				m->parse(c - m->option_offset, argv, 0,
+-					 &m->tflags, NULL, &m->t);
+-			} else {
+-				fprintf(stderr, " failed to find target %s\n\n", optarg);
+-				return -1;
+-
+-			}
+-			ok++;
+-			break;
+-
+-		}
+-	}
+-
+-	if (iargc > optind) {
+-		if (matches(argv[optind], "index") == 0) {
+-			if (get_u32(&index, argv[optind + 1], 10)) {
+-				fprintf(stderr, "Illegal \"index\"\n");
+-				free_opts(opts);
+-				return -1;
+-			}
+-			iok++;
+-
+-			optind += 2;
+-		}
+-	}
+-
+-	if (!ok && !iok) {
+-		fprintf(stderr, " ipt Parser BAD!! (%s)\n", *argv);
+-		return -1;
+-	}
+-
+-	/* check that we passed the correct parameters to the target */
+-	if (m)
+-		m->final_check(m->tflags);
+-
+-	{
+-		struct tcmsg *t = NLMSG_DATA(n);
+-
+-		if (t->tcm_parent != TC_H_ROOT
+-		    && t->tcm_parent == TC_H_MAJ(TC_H_INGRESS)) {
+-			hook = NF_IP_PRE_ROUTING;
+-		} else {
+-			hook = NF_IP_POST_ROUTING;
+-		}
+-	}
+-
+-	tail = addattr_nest(n, MAX_MSG, tca_id);
+-	fprintf(stdout, "tablename: %s hook: %s\n ", tname, ipthooks[hook]);
+-	fprintf(stdout, "\ttarget: ");
+-
+-	if (m)
+-		m->print(NULL, m->t, 0);
+-	fprintf(stdout, " index %d\n", index);
+-
+-	if (strlen(tname) > 16) {
+-		size = 16;
+-		k[15] = 0;
+-	} else {
+-		size = 1 + strlen(tname);
+-	}
+-	strncpy(k, tname, size);
+-
+-	addattr_l(n, MAX_MSG, TCA_IPT_TABLE, k, size);
+-	addattr_l(n, MAX_MSG, TCA_IPT_HOOK, &hook, 4);
+-	addattr_l(n, MAX_MSG, TCA_IPT_INDEX, &index, 4);
+-	if (m)
+-		addattr_l(n, MAX_MSG, TCA_IPT_TARG, m->t, m->t->u.target_size);
+-	addattr_nest_end(n, tail);
+-
+-	argc -= optind;
+-	argv += optind;
+-	*argc_p = rargc - iargc;
+-	*argv_p = argv;
+-
+-	optind = 0;
+-	free_opts(opts);
+-	/* Clear flags if target will be used again */
+-	m->tflags = 0;
+-	m->used = 0;
+-	/* Free allocated memory */
+-	free(m->t);
+-
+-
+-	return 0;
+-
+-}
+-
+-static int
+-print_ipt(struct action_util *au, FILE * f, struct rtattr *arg)
+-{
+-	struct rtattr *tb[TCA_IPT_MAX + 1];
+-	struct ipt_entry_target *t = NULL;
+-	struct xtables_target *m;
+-	__u32 hook;
+-
+-	if (arg == NULL)
+-		return 0;
+-
+-	lib_dir = getenv("IPTABLES_LIB_DIR");
+-	if (!lib_dir)
+-		lib_dir = IPT_LIB_DIR;
+-
+-	parse_rtattr_nested(tb, TCA_IPT_MAX, arg);
+-
+-	if (tb[TCA_IPT_TABLE] == NULL) {
+-		fprintf(stderr,  "Missing ipt table name, assuming mangle\n");
+-	} else {
+-		fprintf(f, "tablename: %s ",
+-			rta_getattr_str(tb[TCA_IPT_TABLE]));
+-	}
+-
+-	if (tb[TCA_IPT_HOOK] == NULL) {
+-		fprintf(stderr, "Missing ipt hook name\n ");
+-		return -1;
+-	}
+-
+-	hook = rta_getattr_u32(tb[TCA_IPT_HOOK]);
+-	fprintf(f, " hook: %s\n", ipthooks[hook]);
+-
+-	if (tb[TCA_IPT_TARG] == NULL) {
+-		fprintf(stderr, "Missing ipt target parameters\n");
+-		return -1;
+-	}
+-
+-
+-	t = RTA_DATA(tb[TCA_IPT_TARG]);
+-	m = get_target_name(t->u.user.name);
+-	if (m != NULL) {
+-		if (build_st(m, t) < 0) {
+-			fprintf(stderr, " %s error\n", m->name);
+-			return -1;
+-		}
+-
+-		opts =
+-			merge_options(opts, m->extra_opts,
+-				      &m->option_offset);
+-	} else {
+-		fprintf(stderr, " failed to find target %s\n\n",
+-			t->u.user.name);
+-		return -1;
+-	}
+-
+-	fprintf(f, "\ttarget ");
+-	m->print(NULL, m->t, 0);
+-	if (tb[TCA_IPT_INDEX] == NULL) {
+-		fprintf(stderr, "Missing ipt target index\n");
+-	} else {
+-		__u32 index;
+-
+-		index = rta_getattr_u32(tb[TCA_IPT_INDEX]);
+-		fprintf(f, "\n\tindex %u", index);
+-	}
+-
+-	if (tb[TCA_IPT_CNT]) {
+-		struct tc_cnt *c  = RTA_DATA(tb[TCA_IPT_CNT]);
+-
+-		fprintf(f, " ref %d bind %d", c->refcnt, c->bindcnt);
+-	}
+-	if (show_stats) {
+-		if (tb[TCA_IPT_TM]) {
+-			struct tcf_t *tm = RTA_DATA(tb[TCA_IPT_TM]);
+-
+-			print_tm(f, tm);
+-		}
+-	}
+-	fprintf(f, "\n");
+-
+-	free_opts(opts);
+-
+-	return 0;
+-}
+-
+-struct action_util ipt_action_util = {
+-	.id = "ipt",
+-	.parse_aopt = parse_ipt,
+-	.print_aopt = print_ipt,
+-};
+diff --git a/tc/m_xt.c b/tc/m_xt.c
+deleted file mode 100644
+index 658084378124..000000000000
+--- a/tc/m_xt.c
++++ /dev/null
+@@ -1,400 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * m_xt.c	xtables based targets
+- *		utilities mostly ripped from iptables <duh, its the linux way>
+- *
+- * Authors:  J Hadi Salim (hadi@cyberus.ca)
+- */
+-
+-#include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-#include <net/if.h>
+-#include <limits.h>
+-#include <linux/netfilter.h>
+-#include <linux/netfilter_ipv4/ip_tables.h>
+-#include <xtables.h>
+-#include "utils.h"
+-#include "tc_util.h"
+-#include <linux/tc_act/tc_ipt.h>
+-#include <stdio.h>
+-#include <dlfcn.h>
+-#include <getopt.h>
+-#include <errno.h>
+-#include <string.h>
+-#include <netdb.h>
+-#include <stdlib.h>
+-#include <ctype.h>
+-#include <stdarg.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <sys/wait.h>
+-#ifndef XT_LIB_DIR
+-#       define XT_LIB_DIR "/lib/xtables"
+-#endif
+-
+-#ifndef __ALIGN_KERNEL
+-#define __ALIGN_KERNEL(x, a)	\
+-	__ALIGN_KERNEL_MASK(x, (typeof(x))(a) - 1)
+-#define __ALIGN_KERNEL_MASK(x, mask) \
+-	(((x) + (mask)) & ~(mask))
+-#endif
+-
+-#ifndef ALIGN
+-#define ALIGN(x, a)	__ALIGN_KERNEL((x), (a))
+-#endif
+-
+-static const char *tname = "mangle";
+-
+-char *lib_dir;
+-
+-static const char * const ipthooks[] = {
+-	"NF_IP_PRE_ROUTING",
+-	"NF_IP_LOCAL_IN",
+-	"NF_IP_FORWARD",
+-	"NF_IP_LOCAL_OUT",
+-	"NF_IP_POST_ROUTING",
+-};
+-
+-static struct option original_opts[] = {
+-	{
+-		.name = "jump",
+-		.has_arg = 1,
+-		.val = 'j'
+-	},
+-	{0, 0, 0, 0}
+-};
+-
+-static struct xtables_globals tcipt_globals = {
+-	.option_offset = 0,
+-	.program_name = "tc-ipt",
+-	.program_version = "0.2",
+-	.orig_opts = original_opts,
+-	.opts = original_opts,
+-	.exit_err = NULL,
+-#if XTABLES_VERSION_CODE >= 11
+-	.compat_rev = xtables_compatible_revision,
+-#endif
+-};
+-
+-/*
+- * we may need to check for version mismatch
+-*/
+-static int
+-build_st(struct xtables_target *target, struct xt_entry_target *t)
+-{
+-
+-	size_t size =
+-		    XT_ALIGN(sizeof(struct xt_entry_target)) + target->size;
+-
+-	if (t == NULL) {
+-		target->t = xtables_calloc(1, size);
+-		target->t->u.target_size = size;
+-		strncpy(target->t->u.user.name, target->name,
+-			sizeof(target->t->u.user.name) - 1);
+-		target->t->u.user.revision = target->revision;
+-
+-		if (target->init != NULL)
+-			target->init(target->t);
+-	} else {
+-		target->t = t;
+-	}
+-	return 0;
+-
+-}
+-
+-static void set_lib_dir(void)
+-{
+-
+-	lib_dir = getenv("XTABLES_LIBDIR");
+-	if (!lib_dir) {
+-		lib_dir = getenv("IPTABLES_LIB_DIR");
+-		if (lib_dir)
+-			fprintf(stderr, "using deprecated IPTABLES_LIB_DIR\n");
+-	}
+-	if (lib_dir == NULL)
+-		lib_dir = XT_LIB_DIR;
+-
+-}
+-
+-static int get_xtables_target_opts(struct xtables_globals *globals,
+-				   struct xtables_target *m)
+-{
+-	struct option *opts;
+-
+-#if XTABLES_VERSION_CODE >= 6
+-	opts = xtables_options_xfrm(globals->orig_opts,
+-				    globals->opts,
+-				    m->x6_options,
+-				    &m->option_offset);
+-#else
+-	opts = xtables_merge_options(globals->opts,
+-				     m->extra_opts,
+-				     &m->option_offset);
+-#endif
+-	if (!opts)
+-		return -1;
+-	globals->opts = opts;
+-	return 0;
+-}
+-
+-static int parse_ipt(struct action_util *a, int *argc_p,
+-		     char ***argv_p, int tca_id, struct nlmsghdr *n)
+-{
+-	struct xtables_target *m = NULL;
+-#if XTABLES_VERSION_CODE >= 6
+-	struct ipt_entry fw = {};
+-#endif
+-	struct rtattr *tail;
+-
+-	int c;
+-	char **argv = *argv_p;
+-	int argc;
+-	char k[FILTER_NAMESZ];
+-	int size = 0;
+-	int iok = 0, ok = 0;
+-	__u32 hook = 0, index = 0;
+-
+-	/* copy tcipt_globals because .opts will be modified by iptables */
+-	struct xtables_globals tmp_tcipt_globals = tcipt_globals;
+-
+-	xtables_init_all(&tmp_tcipt_globals, NFPROTO_IPV4);
+-	set_lib_dir();
+-
+-	/* parse only up until the next action */
+-	for (argc = 0; argc < *argc_p; argc++) {
+-		if (!argv[argc] || !strcmp(argv[argc], "action"))
+-			break;
+-	}
+-
+-	if (argc <= 2) {
+-		fprintf(stderr,
+-			"too few arguments for xt, need at least '-j <target>'\n");
+-		return -1;
+-	}
+-
+-	while (1) {
+-		c = getopt_long(argc, argv, "j:", tmp_tcipt_globals.opts, NULL);
+-		if (c == -1)
+-			break;
+-		switch (c) {
+-		case 'j':
+-			m = xtables_find_target(optarg, XTF_TRY_LOAD);
+-			if (!m) {
+-				fprintf(stderr,
+-					" failed to find target %s\n\n",
+-					optarg);
+-				return -1;
+-			}
+-
+-			if (build_st(m, NULL) < 0) {
+-				printf(" %s error\n", m->name);
+-				return -1;
+-			}
+-
+-			if (get_xtables_target_opts(&tmp_tcipt_globals,
+-						    m) < 0) {
+-				fprintf(stderr,
+-					" failed to find additional options for target %s\n\n",
+-					optarg);
+-				return -1;
+-			}
+-			ok++;
+-			break;
+-
+-		default:
+-#if XTABLES_VERSION_CODE >= 6
+-			if (m != NULL && m->x6_parse != NULL) {
+-				xtables_option_tpcall(c, argv, 0, m, &fw);
+-#else
+-			if (m != NULL && m->parse != NULL) {
+-				m->parse(c - m->option_offset, argv, 0,
+-					 &m->tflags, NULL, &m->t);
+-#endif
+-			} else {
+-				fprintf(stderr,
+-					"failed to find target %s\n\n", optarg);
+-				return -1;
+-
+-			}
+-			ok++;
+-			break;
+-		}
+-	}
+-
+-	if (argc > optind) {
+-		if (matches(argv[optind], "index") == 0) {
+-			if (get_u32(&index, argv[optind + 1], 10)) {
+-				fprintf(stderr, "Illegal \"index\"\n");
+-				xtables_free_opts(1);
+-				return -1;
+-			}
+-			iok++;
+-
+-			optind += 2;
+-		}
+-	}
+-
+-	if (!ok && !iok) {
+-		fprintf(stderr, " ipt Parser BAD!! (%s)\n", *argv);
+-		return -1;
+-	}
+-
+-	/* check that we passed the correct parameters to the target */
+-#if XTABLES_VERSION_CODE >= 6
+-	if (m)
+-		xtables_option_tfcall(m);
+-#else
+-	if (m && m->final_check)
+-		m->final_check(m->tflags);
+-#endif
+-
+-	{
+-		struct tcmsg *t = NLMSG_DATA(n);
+-
+-		if (t->tcm_parent != TC_H_ROOT
+-		    && t->tcm_parent == TC_H_MAJ(TC_H_INGRESS)) {
+-			hook = NF_IP_PRE_ROUTING;
+-		} else {
+-			hook = NF_IP_POST_ROUTING;
+-		}
+-	}
+-
+-	tail = addattr_nest(n, MAX_MSG, tca_id);
+-	fprintf(stdout, "tablename: %s hook: %s\n ", tname, ipthooks[hook]);
+-	fprintf(stdout, "\ttarget: ");
+-
+-	if (m) {
+-		if (m->print)
+-			m->print(NULL, m->t, 0);
+-		else
+-			printf("%s ", m->name);
+-	}
+-	fprintf(stdout, " index %d\n", index);
+-
+-	if (strlen(tname) >= 16) {
+-		size = 15;
+-		k[15] = 0;
+-	} else {
+-		size = 1 + strlen(tname);
+-	}
+-	strncpy(k, tname, size);
+-
+-	addattr_l(n, MAX_MSG, TCA_IPT_TABLE, k, size);
+-	addattr_l(n, MAX_MSG, TCA_IPT_HOOK, &hook, 4);
+-	addattr_l(n, MAX_MSG, TCA_IPT_INDEX, &index, 4);
+-	if (m)
+-		addattr_l(n, MAX_MSG, TCA_IPT_TARG, m->t, m->t->u.target_size);
+-	addattr_nest_end(n, tail);
+-
+-	argv += optind;
+-	*argc_p -= argc;
+-	*argv_p = argv;
+-
+-	optind = 0;
+-	xtables_free_opts(1);
+-
+-	if (m) {
+-		/* Clear flags if target will be used again */
+-		m->tflags = 0;
+-		m->used = 0;
+-		/* Free allocated memory */
+-		free(m->t);
+-	}
+-
+-	return 0;
+-
+-}
+-
+-static int
+-print_ipt(struct action_util *au, FILE *f, struct rtattr *arg)
+-{
+-	struct xtables_target *m;
+-	struct rtattr *tb[TCA_IPT_MAX + 1];
+-	struct xt_entry_target *t = NULL;
+-	__u32 hook;
+-
+-	if (arg == NULL)
+-		return 0;
+-
+-	/* copy tcipt_globals because .opts will be modified by iptables */
+-	struct xtables_globals tmp_tcipt_globals = tcipt_globals;
+-
+-	xtables_init_all(&tmp_tcipt_globals, NFPROTO_IPV4);
+-	set_lib_dir();
+-
+-	parse_rtattr_nested(tb, TCA_IPT_MAX, arg);
+-
+-	if (tb[TCA_IPT_TABLE] == NULL) {
+-		fprintf(stderr, "Missing ipt table name, assuming mangle\n");
+-	} else {
+-		fprintf(f, "tablename: %s ",
+-			rta_getattr_str(tb[TCA_IPT_TABLE]));
+-	}
+-
+-	if (tb[TCA_IPT_HOOK] == NULL) {
+-		fprintf(stderr, "Missing ipt hook name\n ");
+-		return -1;
+-	}
+-
+-	if (tb[TCA_IPT_TARG] == NULL) {
+-		fprintf(stderr, "Missing ipt target parameters\n");
+-		return -1;
+-	}
+-
+-	hook = rta_getattr_u32(tb[TCA_IPT_HOOK]);
+-	fprintf(f, " hook: %s\n", ipthooks[hook]);
+-
+-	t = RTA_DATA(tb[TCA_IPT_TARG]);
+-	m = xtables_find_target(t->u.user.name, XTF_TRY_LOAD);
+-	if (!m) {
+-		fprintf(stderr, " failed to find target %s\n\n",
+-			t->u.user.name);
+-		return -1;
+-	}
+-	if (build_st(m, t) < 0) {
+-		fprintf(stderr, " %s error\n", m->name);
+-		return -1;
+-	}
+-
+-	if (get_xtables_target_opts(&tmp_tcipt_globals, m) < 0) {
+-		fprintf(stderr,
+-			" failed to find additional options for target %s\n\n",
+-			t->u.user.name);
+-		return -1;
+-	}
+-	fprintf(f, "\ttarget ");
+-	m->print(NULL, m->t, 0);
+-	if (tb[TCA_IPT_INDEX] == NULL) {
+-		fprintf(f, " [NULL ipt target index ]\n");
+-	} else {
+-		__u32 index;
+-
+-		index = rta_getattr_u32(tb[TCA_IPT_INDEX]);
+-		fprintf(f, "\n\tindex %u", index);
+-	}
+-
+-	if (tb[TCA_IPT_CNT]) {
+-		struct tc_cnt *c  = RTA_DATA(tb[TCA_IPT_CNT]);
+-
+-		fprintf(f, " ref %d bind %d", c->refcnt, c->bindcnt);
+-	}
+-	if (show_stats) {
+-		if (tb[TCA_IPT_TM]) {
+-			struct tcf_t *tm = RTA_DATA(tb[TCA_IPT_TM]);
+-
+-			print_tm(f, tm);
+-		}
+-	}
+-	print_nl();
+-
+-	xtables_free_opts(1);
+-
+-	return 0;
+-}
+-
+-struct action_util xt_action_util = {
+-	.id = "xt",
+-	.parse_aopt = parse_ipt,
+-	.print_aopt = print_ipt,
+-};
+diff --git a/tc/m_xt_old.c b/tc/m_xt_old.c
+deleted file mode 100644
+index 9987d606a59c..000000000000
+--- a/tc/m_xt_old.c
++++ /dev/null
+@@ -1,432 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * m_xt.c	xtables based targets
+- *		utilities mostly ripped from iptables <duh, its the linux way>
+- *
+- * Authors:  J Hadi Salim (hadi@cyberus.ca)
+- */
+-
+-/*XXX: in the future (xtables 1.4.3?) get rid of everything tagged
+- * as TC_CONFIG_XT_H */
+-
+-#include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-#include <net/if.h>
+-#include <linux/netfilter.h>
+-#include <linux/netfilter_ipv4/ip_tables.h>
+-#include <xtables.h>
+-#include "utils.h"
+-#include "tc_util.h"
+-#include <linux/tc_act/tc_ipt.h>
+-#include <stdio.h>
+-#include <getopt.h>
+-#include <errno.h>
+-#include <string.h>
+-#include <netdb.h>
+-#include <stdlib.h>
+-#include <ctype.h>
+-#include <stdarg.h>
+-#include <limits.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <sys/wait.h>
+-#ifdef TC_CONFIG_XT_H
+-#include "xt-internal.h"
+-#endif
+-
+-#ifndef ALIGN
+-#define ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a)-1)
+-#define __ALIGN_MASK(x, mask)	(((x)+(mask))&~(mask))
+-#endif
+-
+-static const char *pname = "tc-ipt";
+-static const char *tname = "mangle";
+-static const char *pversion = "0.2";
+-
+-static const char *ipthooks[] = {
+-	"NF_IP_PRE_ROUTING",
+-	"NF_IP_LOCAL_IN",
+-	"NF_IP_FORWARD",
+-	"NF_IP_LOCAL_OUT",
+-	"NF_IP_POST_ROUTING",
+-};
+-
+-static struct option original_opts[] = {
+-	{"jump", 1, 0, 'j'},
+-	{0, 0, 0, 0}
+-};
+-
+-static struct option *opts = original_opts;
+-static unsigned int global_option_offset;
+-char *lib_dir;
+-const char *program_version = XTABLES_VERSION;
+-const char *program_name = "tc-ipt";
+-struct afinfo afinfo = {
+-	.family         = AF_INET,
+-	.libprefix      = "libxt_",
+-	.ipproto        = IPPROTO_IP,
+-	.kmod           = "ip_tables",
+-	.so_rev_target  = IPT_SO_GET_REVISION_TARGET,
+-};
+-
+-
+-#define OPTION_OFFSET 256
+-
+-/*XXX: TC_CONFIG_XT_H */
+-static void free_opts(struct option *local_opts)
+-{
+-	if (local_opts != original_opts) {
+-		free(local_opts);
+-		opts = original_opts;
+-		global_option_offset = 0;
+-	}
+-}
+-
+-/*XXX: TC_CONFIG_XT_H */
+-static struct option *
+-merge_options(struct option *oldopts, const struct option *newopts,
+-	      unsigned int *option_offset)
+-{
+-	struct option *merge;
+-	unsigned int num_old, num_new, i;
+-
+-	for (num_old = 0; oldopts[num_old].name; num_old++);
+-	for (num_new = 0; newopts[num_new].name; num_new++);
+-
+-	*option_offset = global_option_offset + OPTION_OFFSET;
+-
+-	merge = malloc(sizeof(struct option) * (num_new + num_old + 1));
+-	memcpy(merge, oldopts, num_old * sizeof(struct option));
+-	for (i = 0; i < num_new; i++) {
+-		merge[num_old + i] = newopts[i];
+-		merge[num_old + i].val += *option_offset;
+-	}
+-	memset(merge + num_old + num_new, 0, sizeof(struct option));
+-
+-	return merge;
+-}
+-
+-
+-/*XXX: TC_CONFIG_XT_H */
+-#ifndef TRUE
+-#define TRUE 1
+-#endif
+-#ifndef FALSE
+-#define FALSE 0
+-#endif
+-
+-/*XXX: TC_CONFIG_XT_H */
+-int
+-check_inverse(const char option[], int *invert, int *my_optind, int argc)
+-{
+-	if (option && strcmp(option, "!") == 0) {
+-		if (*invert)
+-			exit_error(PARAMETER_PROBLEM,
+-				   "Multiple `!' flags not allowed");
+-		*invert = TRUE;
+-		if (my_optind != NULL) {
+-			++*my_optind;
+-			if (argc && *my_optind > argc)
+-				exit_error(PARAMETER_PROBLEM,
+-					   "no argument following `!'");
+-		}
+-
+-		return TRUE;
+-	}
+-	return FALSE;
+-}
+-
+-/*XXX: TC_CONFIG_XT_H */
+-void exit_error(enum exittype status, const char *msg, ...)
+-{
+-	va_list args;
+-
+-	va_start(args, msg);
+-	fprintf(stderr, "%s v%s: ", pname, pversion);
+-	vfprintf(stderr, msg, args);
+-	va_end(args);
+-	fprintf(stderr, "\n");
+-	/* On error paths, make sure that we don't leak memory */
+-	exit(status);
+-}
+-
+-/*XXX: TC_CONFIG_XT_H */
+-static void set_revision(char *name, u_int8_t revision)
+-{
+-	/* Old kernel sources don't have ".revision" field,
+-	*  but we stole a byte from name. */
+-	name[IPT_FUNCTION_MAXNAMELEN - 2] = '\0';
+-	name[IPT_FUNCTION_MAXNAMELEN - 1] = revision;
+-}
+-
+-/*
+- * we may need to check for version mismatch
+-*/
+-int
+-build_st(struct xtables_target *target, struct xt_entry_target *t)
+-{
+-
+-	size_t size =
+-		    XT_ALIGN(sizeof(struct xt_entry_target)) + target->size;
+-
+-	if (t == NULL) {
+-		target->t = fw_calloc(1, size);
+-		target->t->u.target_size = size;
+-		strcpy(target->t->u.user.name, target->name);
+-		set_revision(target->t->u.user.name, target->revision);
+-
+-		if (target->init != NULL)
+-			target->init(target->t);
+-	} else {
+-		target->t = t;
+-	}
+-	return 0;
+-
+-}
+-
+-inline void set_lib_dir(void)
+-{
+-
+-	lib_dir = getenv("XTABLES_LIBDIR");
+-	if (!lib_dir) {
+-		lib_dir = getenv("IPTABLES_LIB_DIR");
+-		if (lib_dir)
+-			fprintf(stderr, "using deprecated IPTABLES_LIB_DIR\n");
+-	}
+-	if (lib_dir == NULL)
+-		lib_dir = XT_LIB_DIR;
+-
+-}
+-
+-static int parse_ipt(struct action_util *a, int *argc_p,
+-		     char ***argv_p, int tca_id, struct nlmsghdr *n)
+-{
+-	struct xtables_target *m = NULL;
+-	struct ipt_entry fw;
+-	struct rtattr *tail;
+-	int c;
+-	int rargc = *argc_p;
+-	char **argv = *argv_p;
+-	int argc = 0, iargc = 0;
+-	char k[FILTER_NAMESZ];
+-	int size = 0;
+-	int iok = 0, ok = 0;
+-	__u32 hook = 0, index = 0;
+-
+-	set_lib_dir();
+-
+-	{
+-		int i;
+-
+-		for (i = 0; i < rargc; i++) {
+-			if (!argv[i] || strcmp(argv[i], "action") == 0)
+-				break;
+-		}
+-		iargc = argc = i;
+-	}
+-
+-	if (argc <= 2) {
+-		fprintf(stderr, "bad arguments to ipt %d vs %d\n", argc, rargc);
+-		return -1;
+-	}
+-
+-	while (1) {
+-		c = getopt_long(argc, argv, "j:", opts, NULL);
+-		if (c == -1)
+-			break;
+-		switch (c) {
+-		case 'j':
+-			m = find_target(optarg, TRY_LOAD);
+-			if (m != NULL) {
+-
+-				if (build_st(m, NULL) < 0) {
+-					printf(" %s error\n", m->name);
+-					return -1;
+-				}
+-				opts =
+-				    merge_options(opts, m->extra_opts,
+-						  &m->option_offset);
+-			} else {
+-				fprintf(stderr, " failed to find target %s\n\n", optarg);
+-				return -1;
+-			}
+-			ok++;
+-			break;
+-
+-		default:
+-			memset(&fw, 0, sizeof(fw));
+-			if (m) {
+-				m->parse(c - m->option_offset, argv, 0,
+-					 &m->tflags, NULL, &m->t);
+-			} else {
+-				fprintf(stderr, " failed to find target %s\n\n", optarg);
+-				return -1;
+-
+-			}
+-			ok++;
+-			break;
+-
+-		}
+-	}
+-
+-	if (iargc > optind) {
+-		if (matches(argv[optind], "index") == 0) {
+-			if (get_u32(&index, argv[optind + 1], 10)) {
+-				fprintf(stderr, "Illegal \"index\"\n");
+-				free_opts(opts);
+-				return -1;
+-			}
+-			iok++;
+-
+-			optind += 2;
+-		}
+-	}
+-
+-	if (!ok && !iok) {
+-		fprintf(stderr, " ipt Parser BAD!! (%s)\n", *argv);
+-		return -1;
+-	}
+-
+-	/* check that we passed the correct parameters to the target */
+-	if (m)
+-		m->final_check(m->tflags);
+-
+-	{
+-		struct tcmsg *t = NLMSG_DATA(n);
+-
+-		if (t->tcm_parent != TC_H_ROOT
+-		    && t->tcm_parent == TC_H_MAJ(TC_H_INGRESS)) {
+-			hook = NF_IP_PRE_ROUTING;
+-		} else {
+-			hook = NF_IP_POST_ROUTING;
+-		}
+-	}
+-
+-	tail = addattr_nest(n, MAX_MSG, tca_id);
+-	fprintf(stdout, "tablename: %s hook: %s\n ", tname, ipthooks[hook]);
+-	fprintf(stdout, "\ttarget: ");
+-
+-	if (m)
+-		m->print(NULL, m->t, 0);
+-	fprintf(stdout, " index %d\n", index);
+-
+-	if (strlen(tname) > 16) {
+-		size = 16;
+-		k[15] = 0;
+-	} else {
+-		size = 1 + strlen(tname);
+-	}
+-	strncpy(k, tname, size);
+-
+-	addattr_l(n, MAX_MSG, TCA_IPT_TABLE, k, size);
+-	addattr_l(n, MAX_MSG, TCA_IPT_HOOK, &hook, 4);
+-	addattr_l(n, MAX_MSG, TCA_IPT_INDEX, &index, 4);
+-	if (m)
+-		addattr_l(n, MAX_MSG, TCA_IPT_TARG, m->t, m->t->u.target_size);
+-	addattr_nest_end(n, tail);
+-
+-	argc -= optind;
+-	argv += optind;
+-	*argc_p = rargc - iargc;
+-	*argv_p = argv;
+-
+-	optind = 0;
+-	free_opts(opts);
+-	/* Clear flags if target will be used again */
+-	m->tflags = 0;
+-	m->used = 0;
+-	/* Free allocated memory */
+-	free(m->t);
+-
+-
+-	return 0;
+-
+-}
+-
+-static int
+-print_ipt(struct action_util *au, FILE * f, struct rtattr *arg)
+-{
+-	struct rtattr *tb[TCA_IPT_MAX + 1];
+-	struct xt_entry_target *t = NULL;
+-	struct xtables_target *m;
+-	__u32 hook;
+-
+-	if (arg == NULL)
+-		return 0;
+-
+-	set_lib_dir();
+-
+-	parse_rtattr_nested(tb, TCA_IPT_MAX, arg);
+-
+-	if (tb[TCA_IPT_TABLE] == NULL) {
+-		fprintf(stderr, "Missing ipt table name, assuming mangle\n");
+-	} else {
+-		fprintf(f, "tablename: %s ",
+-			rta_getattr_str(tb[TCA_IPT_TABLE]));
+-	}
+-
+-	if (tb[TCA_IPT_HOOK] == NULL) {
+-		fprintf(stderr, "Missing ipt hook name\n");
+-		return -1;
+-	}
+-
+-	if (tb[TCA_IPT_TARG] == NULL) {
+-		fprintf(stderr, "Missing ipt target parameters\n");
+-		return -1;
+-	}
+-
+-	hook = rta_getattr_u32(tb[TCA_IPT_HOOK]);
+-	fprintf(f, " hook: %s\n", ipthooks[hook]);
+-
+-	t = RTA_DATA(tb[TCA_IPT_TARG]);
+-	m = find_target(t->u.user.name, TRY_LOAD);
+-	if (m != NULL) {
+-		if (build_st(m, t) < 0) {
+-			fprintf(stderr, " %s error\n", m->name);
+-			return -1;
+-		}
+-
+-		opts =
+-			merge_options(opts, m->extra_opts,
+-				      &m->option_offset);
+-	} else {
+-		fprintf(stderr, " failed to find target %s\n\n",
+-			t->u.user.name);
+-		return -1;
+-	}
+-	fprintf(f, "\ttarget ");
+-	m->print(NULL, m->t, 0);
+-	if (tb[TCA_IPT_INDEX] == NULL) {
+-		fprintf(f, " [NULL ipt target index ]\n");
+-	} else {
+-		__u32 index;
+-
+-		index = rta_getattr_u32(tb[TCA_IPT_INDEX]);
+-		fprintf(f, "\n\tindex %u", index);
+-	}
+-
+-	if (tb[TCA_IPT_CNT]) {
+-		struct tc_cnt *c  = RTA_DATA(tb[TCA_IPT_CNT]);
+-
+-		fprintf(f, " ref %d bind %d", c->refcnt, c->bindcnt);
+-	}
+-	if (show_stats) {
+-		if (tb[TCA_IPT_TM]) {
+-			struct tcf_t *tm = RTA_DATA(tb[TCA_IPT_TM]);
+-
+-			print_tm(f, tm);
+-		}
+-	}
+-	fprintf(f, "\n");
+-
+-	free_opts(opts);
+-
+-	return 0;
+-}
+-
+-struct action_util ipt_action_util = {
+-	.id = "ipt",
+-	.parse_aopt = parse_ipt,
+-	.print_aopt = print_ipt,
+-};
 -- 
-2.34.1
+2.43.0
 
 
