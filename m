@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-60047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 090C681D226
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 05:23:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 015AC81D227
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 05:23:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1226D1C227E0
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 04:23:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 261641C22AF8
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 04:23:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4E84C85;
-	Sat, 23 Dec 2023 04:22:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42224469E;
+	Sat, 23 Dec 2023 04:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bGCGuJUR"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YytfycR2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E9C469E
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 04:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9B14A3E
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 04:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-67f8a5ed1a0so11116956d6.2
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 20:22:41 -0800 (PST)
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-67f8d9fe99fso11710896d6.2
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 20:22:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1703305361; x=1703910161; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1703305362; x=1703910162; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kcsTa7bRud7e3sZv2VpHzDuK9M7W9RmOTUL9cMcaBKc=;
-        b=bGCGuJUR7iOuOI6v+EWiVAYr7XGKM0DDOAfdVHhqm5Bb4aeghKMP1aELO3yhgjsLam
-         eDLEYwvBGjcfSL8zdSukrhMGqRn6IRzqIufA6CDa0jgQj0Az4naojKsdqrtjq6hvvq9n
-         Z/+S49mC2NVyROAxd4/w8f9v6g7JWG0hRbAF0=
+        bh=vntG+VJ9MwzzkGrqeL/xHB7Z0gMdEBgBANUl1EKMJNQ=;
+        b=YytfycR2Wxs/Wd0M0gqiNvkz3zsX9WXRmXJHDcLcO74gpWD8SKdnf5xiXApA6vmgbV
+         gt0olMsq3fI7XZYNysWQ0EXj/5BW/Kq0P3gGZ6DnQJxciy9hQuTl5oAXgbfcwEI22/R3
+         idr7AG0ywdxTY46pxJ/LBsIj6XHPU9h+KB1yw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703305361; x=1703910161;
+        d=1e100.net; s=20230601; t=1703305362; x=1703910162;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kcsTa7bRud7e3sZv2VpHzDuK9M7W9RmOTUL9cMcaBKc=;
-        b=HTLhwzhxHM6ZWG1B1FXFMJGzGV7ReA2Jcw03P7wN1WvbKieGfyrVvF+PjbOywnFqck
-         zxy3hS0F3KFvXlehtcqsvGt5XRfuAzK9LdH9xW5kOjm3Bnv7CZqBIxTsJ9gO/o1xAikN
-         us/MvIJM9hgRd5tAZBf8hTAwl1x7hVV2G1NWi2zmAhs6r5uF/4Az0EV4TI2K8HB8ZFEs
-         q9gk6AGiBTa1HDQQ/x3V4BYQ6SKZjzcyBtBHRk2ODy3q1SKN0Mpw4CVIQ1YmZOnTz68F
-         NoGj+GhAuLfXxy4Gq6srigMahRDx2XMtEC83uEanW2IGktwrcpxiUYQiaWbEWTyGlTP3
-         Ki4Q==
-X-Gm-Message-State: AOJu0YyrG+HtUxXvCxatSCb8QwkHdRAa6JzEDItJ6mb/7lavTk21NkwB
-	gqwv42WlciJqKiwpRb6dNnmuEt7cwzcNT5DkJJFS3gygGA==
-X-Google-Smtp-Source: AGHT+IFmF/QwTNShr/BtSFwMqcNwO1wU6+9JhYvHV0g8e2AM5LLgSjVYuXoUupqhCYVkN6nWR5q18Q==
-X-Received: by 2002:a05:6214:1d03:b0:67f:2fde:1678 with SMTP id e3-20020a0562141d0300b0067f2fde1678mr3623274qvd.42.1703305360912;
-        Fri, 22 Dec 2023 20:22:40 -0800 (PST)
+        bh=vntG+VJ9MwzzkGrqeL/xHB7Z0gMdEBgBANUl1EKMJNQ=;
+        b=iBLj5dQ/CmrgSQ7yTr5XHD10zll80jTGshEbSXMcgiIwyBTvALtkfbVF2qfLO9gEk/
+         BbpU9gqwvKsYREGb1G4AP5/E4oRNnwZosK0XsIFuSeggogYqqPhjjOsZbJcKL4Q0vS0O
+         ou3rdDRlbNHQyJIZHHFQp5p8pMp49HEtD862fvPnmZJ88Ph2XeBwq/3P61Hg0O2JTdMq
+         30bnnm1Hq4/LmGGsvS7D1+FArzOgvolsDUBlilBmfGFBcbFEcxG80r48Gqc6G9SV2+LF
+         R64d+J/yRGFpZu4eNOiPwSITEyJHRWhvXi6YEDQpu+LJNqvSRAjh/2bhfxaUS91PH5wB
+         vkcQ==
+X-Gm-Message-State: AOJu0YyXWqHuixcwAFtzR0Y6JbmPTApQRyUg4vCa6FCW6kgiv4NQz/yt
+	fRlPtP6kvRJGAyiFPgU0ZG4ESTVfrUu3
+X-Google-Smtp-Source: AGHT+IGwCW3Tx6pos/g8W2I8W0EkKFxldnJHL/Ac18rH2LkgUz5wT/g/p8f17W7zyubzZW11XDzV+A==
+X-Received: by 2002:a05:6214:258d:b0:67f:7599:84ad with SMTP id fq13-20020a056214258d00b0067f759984admr3505153qvb.84.1703305362311;
+        Fri, 22 Dec 2023 20:22:42 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id ek5-20020ad45985000000b0067f8046a1acsm1299916qvb.144.2023.12.22.20.22.39
+        by smtp.gmail.com with ESMTPSA id ek5-20020ad45985000000b0067f8046a1acsm1299916qvb.144.2023.12.22.20.22.41
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Dec 2023 20:22:40 -0800 (PST)
+        Fri, 22 Dec 2023 20:22:41 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v2 03/13] bnxt_en: Re-structure the bnxt_ntuple_filter structure.
-Date: Fri, 22 Dec 2023 20:22:00 -0800
-Message-Id: <20231223042210.102485-4-michael.chan@broadcom.com>
+Subject: [PATCH net-next v2 04/13] bnxt_en: Refactor L2 filter alloc/free firmware commands.
+Date: Fri, 22 Dec 2023 20:22:01 -0800
+Message-Id: <20231223042210.102485-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231223042210.102485-1-michael.chan@broadcom.com>
 References: <20231223042210.102485-1-michael.chan@broadcom.com>
@@ -73,200 +73,303 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000001b178060d25aff4"
+	boundary="00000000000016199b060d25af5e"
 
---00000000000001b178060d25aff4
+--00000000000016199b060d25af5e
 Content-Transfer-Encoding: 8bit
 
-With the new bnxt_l2_filter structure, we can now re-structure the
-bnxt_ntuple_filter structure to point to the bnxt_l2_filter structure.
-We eliminate the L2 ether address info from the ntuple filter structure
-as we can get the information from the L2 filter structure.  Note that
-the source L2 MAC address is no longer used.
+Refactor the L2 filter alloc/free logic so that these filters can be
+added/deleted by the user.
+
+The bp->ntp_fltr_bmap allocated size is also increased to allow enough
+IDs for L2 filters.
 
 Reviewed-by: Vasundhara Volam <vasundhara-v.volam@broadcom.com>
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 62 ++++++++++++++---------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  4 +-
- 2 files changed, 40 insertions(+), 26 deletions(-)
+v2: Fix compile error when CONFIG_BNXT_SRIOV is disabled (reported by
+    kernel test robot).
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 163 +++++++++++++++-------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |   3 +
+ 2 files changed, 112 insertions(+), 54 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 8e9a02629450..62e4f35c6f0f 100644
+index 62e4f35c6f0f..571f2c443c2e 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4804,6 +4804,7 @@ static void bnxt_free_ntp_fltrs(struct bnxt *bp, bool all)
+@@ -4834,7 +4834,7 @@ static int bnxt_alloc_ntp_fltrs(struct bnxt *bp)
+ 		INIT_HLIST_HEAD(&bp->ntp_fltr_hash_tbl[i]);
  
- 		head = &bp->ntp_fltr_hash_tbl[i];
- 		hlist_for_each_entry_safe(fltr, tmp, head, base.hash) {
-+			bnxt_del_l2_filter(bp, fltr->l2_fltr);
- 			if (!all && (fltr->base.flags & BNXT_ACT_FUNC_DST))
- 				continue;
- 			hlist_del(&fltr->base.hash);
-@@ -5373,6 +5374,20 @@ static struct bnxt_l2_filter *bnxt_lookup_l2_filter(struct bnxt *bp,
+ 	bp->ntp_fltr_count = 0;
+-	bp->ntp_fltr_bmap = bitmap_zalloc(BNXT_NTP_FLTR_MAX_FLTR, GFP_KERNEL);
++	bp->ntp_fltr_bmap = bitmap_zalloc(BNXT_MAX_FLTR, GFP_KERNEL);
+ 
+ 	if (!bp->ntp_fltr_bmap)
+ 		rc = -ENOMEM;
+@@ -5396,6 +5396,15 @@ static int bnxt_init_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr,
+ 	ether_addr_copy(fltr->l2_key.dst_mac_addr, key->dst_mac_addr);
+ 	fltr->l2_key.vlan = key->vlan;
+ 	fltr->base.type = BNXT_FLTR_TYPE_L2;
++	if (fltr->base.flags) {
++		int bit_id;
++
++		bit_id = bitmap_find_free_region(bp->ntp_fltr_bmap,
++						 BNXT_MAX_FLTR, 0);
++		if (bit_id < 0)
++			return -ENOMEM;
++		fltr->base.sw_id = (u16)bit_id;
++	}
+ 	head = &bp->l2_fltr_hash_tbl[idx];
+ 	hlist_add_head_rcu(&fltr->base.hash, head);
+ 	atomic_set(&fltr->refcnt, 1);
+@@ -5429,6 +5438,96 @@ static struct bnxt_l2_filter *bnxt_alloc_l2_filter(struct bnxt *bp,
  	return fltr;
  }
  
-+#ifdef CONFIG_RFS_ACCEL
-+static struct bnxt_l2_filter *
-+bnxt_lookup_l2_filter_from_key(struct bnxt *bp, struct bnxt_l2_key *key)
++static u16 bnxt_vf_target_id(struct bnxt_pf_info *pf, u16 vf_idx)
 +{
-+	struct bnxt_l2_filter *fltr;
-+	u32 idx;
++#ifdef CONFIG_BNXT_SRIOV
++	struct bnxt_vf_info *vf = &pf->vf[vf_idx];
 +
-+	idx = jhash2(&key->filter_key, BNXT_L2_KEY_SIZE, bp->hash_seed) &
-+	      BNXT_L2_FLTR_HASH_MASK;
-+	fltr = bnxt_lookup_l2_filter(bp, key, idx);
-+	return fltr;
-+}
++	return vf->fw_fid;
++#else
++	return INVALID_HW_RING_ID;
 +#endif
++}
 +
- static int bnxt_init_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr,
- 			       struct bnxt_l2_key *key, u32 idx)
- {
-@@ -5432,7 +5447,6 @@ static int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
- #define BNXT_NTP_FLTR_FLAGS					\
- 	(CFA_NTUPLE_FILTER_ALLOC_REQ_ENABLES_L2_FILTER_ID |	\
- 	 CFA_NTUPLE_FILTER_ALLOC_REQ_ENABLES_ETHERTYPE |	\
--	 CFA_NTUPLE_FILTER_ALLOC_REQ_ENABLES_SRC_MACADDR |	\
- 	 CFA_NTUPLE_FILTER_ALLOC_REQ_ENABLES_IPADDR_TYPE |	\
- 	 CFA_NTUPLE_FILTER_ALLOC_REQ_ENABLES_SRC_IPADDR |	\
- 	 CFA_NTUPLE_FILTER_ALLOC_REQ_ENABLES_SRC_IPADDR_MASK |	\
-@@ -5463,7 +5477,7 @@ static int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
- 	if (rc)
- 		return rc;
- 
--	l2_fltr = bp->vnic_info[0].l2_filters[fltr->l2_fltr_idx];
-+	l2_fltr = fltr->l2_fltr;
- 	req->l2_filter_id = l2_fltr->base.filter_id;
- 
- 
-@@ -5478,7 +5492,6 @@ static int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
- 	req->enables = cpu_to_le32(BNXT_NTP_FLTR_FLAGS);
- 
- 	req->ethertype = htons(ETH_P_IP);
--	memcpy(req->src_macaddr, fltr->src_mac_addr, ETH_ALEN);
- 	req->ip_addr_type = CFA_NTUPLE_FILTER_ALLOC_REQ_IP_ADDR_TYPE_IPV4;
- 	req->ip_protocol = keys->basic.ip_proto;
- 
-@@ -13730,8 +13743,7 @@ static bool bnxt_fltr_match(struct bnxt_ntuple_filter *f1,
- 
- 	if (keys1->ports.ports == keys2->ports.ports &&
- 	    keys1->control.flags == keys2->control.flags &&
--	    ether_addr_equal(f1->src_mac_addr, f2->src_mac_addr) &&
--	    ether_addr_equal(f1->dst_mac_addr, f2->dst_mac_addr))
-+	    f1->l2_fltr == f2->l2_fltr)
- 		return true;
- 
- 	return false;
-@@ -13744,29 +13756,32 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- 	struct bnxt_ntuple_filter *fltr, *new_fltr;
- 	struct flow_keys *fkeys;
- 	struct ethhdr *eth = (struct ethhdr *)skb_mac_header(skb);
--	int rc = 0, idx, bit_id, l2_idx = 0;
-+	struct bnxt_l2_filter *l2_fltr;
-+	int rc = 0, idx, bit_id;
- 	struct hlist_head *head;
- 	u32 flags;
- 
--	if (!ether_addr_equal(dev->dev_addr, eth->h_dest)) {
--		struct bnxt_vnic_info *vnic = &bp->vnic_info[0];
--		int off = 0, j;
-+	if (ether_addr_equal(dev->dev_addr, eth->h_dest)) {
-+		l2_fltr = bp->vnic_info[0].l2_filters[0];
-+		atomic_inc(&l2_fltr->refcnt);
-+	} else {
-+		struct bnxt_l2_key key;
- 
--		netif_addr_lock_bh(dev);
--		for (j = 0; j < vnic->uc_filter_count; j++, off += ETH_ALEN) {
--			if (ether_addr_equal(eth->h_dest,
--					     vnic->uc_list + off)) {
--				l2_idx = j + 1;
--				break;
--			}
--		}
--		netif_addr_unlock_bh(dev);
--		if (!l2_idx)
-+		ether_addr_copy(key.dst_mac_addr, eth->h_dest);
-+		key.vlan = 0;
-+		l2_fltr = bnxt_lookup_l2_filter_from_key(bp, &key);
-+		if (!l2_fltr)
++int bnxt_hwrm_l2_filter_free(struct bnxt *bp, struct bnxt_l2_filter *fltr)
++{
++	struct hwrm_cfa_l2_filter_free_input *req;
++	u16 target_id = 0xffff;
++	int rc;
++
++	if (fltr->base.flags & BNXT_ACT_FUNC_DST) {
++		struct bnxt_pf_info *pf = &bp->pf;
++
++		if (fltr->base.vf_idx >= pf->active_vfs)
 +			return -EINVAL;
-+		if (l2_fltr->base.flags & BNXT_ACT_FUNC_DST) {
-+			bnxt_del_l2_filter(bp, l2_fltr);
- 			return -EINVAL;
-+		}
- 	}
- 	new_fltr = kzalloc(sizeof(*new_fltr), GFP_ATOMIC);
--	if (!new_fltr)
-+	if (!new_fltr) {
-+		bnxt_del_l2_filter(bp, l2_fltr);
- 		return -ENOMEM;
++
++		target_id = bnxt_vf_target_id(pf, fltr->base.vf_idx);
++		if (target_id == INVALID_HW_RING_ID)
++			return -EINVAL;
 +	}
++
++	rc = hwrm_req_init(bp, req, HWRM_CFA_L2_FILTER_FREE);
++	if (rc)
++		return rc;
++
++	req->target_id = cpu_to_le16(target_id);
++	req->l2_filter_id = fltr->base.filter_id;
++	return hwrm_req_send(bp, req);
++}
++
++int bnxt_hwrm_l2_filter_alloc(struct bnxt *bp, struct bnxt_l2_filter *fltr)
++{
++	struct hwrm_cfa_l2_filter_alloc_output *resp;
++	struct hwrm_cfa_l2_filter_alloc_input *req;
++	u16 target_id = 0xffff;
++	int rc;
++
++	if (fltr->base.flags & BNXT_ACT_FUNC_DST) {
++		struct bnxt_pf_info *pf = &bp->pf;
++
++		if (fltr->base.vf_idx >= pf->active_vfs)
++			return -EINVAL;
++
++		target_id = bnxt_vf_target_id(pf, fltr->base.vf_idx);
++	}
++	rc = hwrm_req_init(bp, req, HWRM_CFA_L2_FILTER_ALLOC);
++	if (rc)
++		return rc;
++
++	req->target_id = cpu_to_le16(target_id);
++	req->flags = cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_PATH_RX);
++
++	if (!BNXT_CHIP_TYPE_NITRO_A0(bp))
++		req->flags |=
++			cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_OUTERMOST);
++	req->dst_id = cpu_to_le16(fltr->base.fw_vnic_id);
++	req->enables =
++		cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR |
++			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_DST_ID |
++			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR_MASK);
++	ether_addr_copy(req->l2_addr, fltr->l2_key.dst_mac_addr);
++	eth_broadcast_addr(req->l2_addr_mask);
++
++	if (fltr->l2_key.vlan) {
++		req->enables |=
++			cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_IVLAN |
++				CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_IVLAN_MASK |
++				CFA_L2_FILTER_ALLOC_REQ_ENABLES_NUM_VLANS);
++		req->num_vlans = 1;
++		req->l2_ivlan = cpu_to_le16(fltr->l2_key.vlan);
++		req->l2_ivlan_mask = cpu_to_le16(0xfff);
++	}
++
++	resp = hwrm_req_hold(bp, req);
++	rc = hwrm_req_send(bp, req);
++	if (!rc) {
++		fltr->base.filter_id = resp->l2_filter_id;
++		set_bit(BNXT_FLTR_VALID, &fltr->base.state);
++	}
++	hwrm_req_drop(bp, req);
++	return rc;
++}
++
+ #ifdef CONFIG_RFS_ACCEL
+ static int bnxt_hwrm_cfa_ntuple_filter_free(struct bnxt *bp,
+ 					    struct bnxt_ntuple_filter *fltr)
+@@ -5538,8 +5637,6 @@ static int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
+ static int bnxt_hwrm_set_vnic_filter(struct bnxt *bp, u16 vnic_id, u16 idx,
+ 				     const u8 *mac_addr)
+ {
+-	struct hwrm_cfa_l2_filter_alloc_output *resp;
+-	struct hwrm_cfa_l2_filter_alloc_input *req;
+ 	struct bnxt_l2_filter *fltr;
+ 	struct bnxt_l2_key key;
+ 	int rc;
+@@ -5550,66 +5647,33 @@ static int bnxt_hwrm_set_vnic_filter(struct bnxt *bp, u16 vnic_id, u16 idx,
+ 	if (IS_ERR(fltr))
+ 		return PTR_ERR(fltr);
  
- 	fkeys = &new_fltr->fkeys;
- 	if (!skb_flow_dissect_flow_keys(skb, fkeys, 0)) {
-@@ -13793,8 +13808,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- 		goto err_free;
- 	}
- 
--	memcpy(new_fltr->dst_mac_addr, eth->h_dest, ETH_ALEN);
--	memcpy(new_fltr->src_mac_addr, eth->h_source, ETH_ALEN);
-+	new_fltr->l2_fltr = l2_fltr;
- 
- 	idx = skb_get_hash_raw(skb) & BNXT_NTP_FLTR_HASH_MASK;
- 	head = &bp->ntp_fltr_hash_tbl[idx];
-@@ -13819,9 +13833,9 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- 
- 	new_fltr->base.sw_id = (u16)bit_id;
- 	new_fltr->flow_id = flow_id;
--	new_fltr->l2_fltr_idx = l2_idx;
- 	new_fltr->base.rxq = rxq_index;
- 	new_fltr->base.type = BNXT_FLTR_TYPE_NTUPLE;
-+	new_fltr->base.flags = BNXT_ACT_RING_DST;
- 	hlist_add_head_rcu(&new_fltr->base.hash, head);
- 	bp->ntp_fltr_count++;
- 	spin_unlock_bh(&bp->ntp_fltr_lock);
-@@ -13831,6 +13845,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- 	return new_fltr->base.sw_id;
- 
- err_free:
-+	bnxt_del_l2_filter(bp, l2_fltr);
- 	kfree(new_fltr);
+-	rc = hwrm_req_init(bp, req, HWRM_CFA_L2_FILTER_ALLOC);
++	fltr->base.fw_vnic_id = bp->vnic_info[vnic_id].fw_vnic_id;
++	rc = bnxt_hwrm_l2_filter_alloc(bp, fltr);
+ 	if (rc)
+-		return rc;
+-
+-	req->flags = cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_PATH_RX);
+-	if (!BNXT_CHIP_TYPE_NITRO_A0(bp))
+-		req->flags |=
+-			cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_OUTERMOST);
+-	req->dst_id = cpu_to_le16(bp->vnic_info[vnic_id].fw_vnic_id);
+-	req->enables =
+-		cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR |
+-			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_DST_ID |
+-			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR_MASK);
+-	memcpy(req->l2_addr, mac_addr, ETH_ALEN);
+-	req->l2_addr_mask[0] = 0xff;
+-	req->l2_addr_mask[1] = 0xff;
+-	req->l2_addr_mask[2] = 0xff;
+-	req->l2_addr_mask[3] = 0xff;
+-	req->l2_addr_mask[4] = 0xff;
+-	req->l2_addr_mask[5] = 0xff;
+-
+-	resp = hwrm_req_hold(bp, req);
+-	rc = hwrm_req_send(bp, req);
+-	if (rc) {
+ 		bnxt_del_l2_filter(bp, fltr);
+-	} else {
+-		fltr->base.filter_id = resp->l2_filter_id;
+-		set_bit(BNXT_FLTR_VALID, &fltr->base.state);
++	else
+ 		bp->vnic_info[vnic_id].l2_filters[idx] = fltr;
+-	}
+-	hwrm_req_drop(bp, req);
  	return rc;
  }
-@@ -13871,6 +13886,7 @@ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
- 				hlist_del_rcu(&fltr->base.hash);
- 				bp->ntp_fltr_count--;
- 				spin_unlock_bh(&bp->ntp_fltr_lock);
-+				bnxt_del_l2_filter(bp, fltr->l2_fltr);
- 				synchronize_rcu();
- 				clear_bit(fltr->base.sw_id, bp->ntp_fltr_bmap);
- 				kfree(fltr);
+ 
+ static int bnxt_hwrm_clear_vnic_filter(struct bnxt *bp)
+ {
+-	struct hwrm_cfa_l2_filter_free_input *req;
+ 	u16 i, j, num_of_vnics = 1; /* only vnic 0 supported */
+-	int rc;
++	int rc = 0;
+ 
+ 	/* Any associated ntuple filters will also be cleared by firmware. */
+-	rc = hwrm_req_init(bp, req, HWRM_CFA_L2_FILTER_FREE);
+-	if (rc)
+-		return rc;
+-	hwrm_req_hold(bp, req);
+ 	for (i = 0; i < num_of_vnics; i++) {
+ 		struct bnxt_vnic_info *vnic = &bp->vnic_info[i];
+ 
+ 		for (j = 0; j < vnic->uc_filter_count; j++) {
+-			struct bnxt_l2_filter *fltr;
+-
+-			fltr = vnic->l2_filters[j];
+-			req->l2_filter_id = fltr->base.filter_id;
++			struct bnxt_l2_filter *fltr = vnic->l2_filters[j];
+ 
+-			rc = hwrm_req_send(bp, req);
++			bnxt_hwrm_l2_filter_free(bp, fltr);
+ 			bnxt_del_l2_filter(bp, fltr);
+ 		}
+ 		vnic->uc_filter_count = 0;
+ 	}
+-	hwrm_req_drop(bp, req);
++
+ 	return rc;
+ }
+ 
+@@ -11898,7 +11962,6 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp)
+ {
+ 	struct net_device *dev = bp->dev;
+ 	struct bnxt_vnic_info *vnic = &bp->vnic_info[0];
+-	struct hwrm_cfa_l2_filter_free_input *req;
+ 	struct netdev_hw_addr *ha;
+ 	int i, off = 0, rc;
+ 	bool uc_update;
+@@ -11910,19 +11973,12 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp)
+ 	if (!uc_update)
+ 		goto skip_uc;
+ 
+-	rc = hwrm_req_init(bp, req, HWRM_CFA_L2_FILTER_FREE);
+-	if (rc)
+-		return rc;
+-	hwrm_req_hold(bp, req);
+ 	for (i = 1; i < vnic->uc_filter_count; i++) {
+ 		struct bnxt_l2_filter *fltr = vnic->l2_filters[i];
+ 
+-		req->l2_filter_id = fltr->base.filter_id;
+-
+-		rc = hwrm_req_send(bp, req);
++		bnxt_hwrm_l2_filter_free(bp, fltr);
+ 		bnxt_del_l2_filter(bp, fltr);
+ 	}
+-	hwrm_req_drop(bp, req);
+ 
+ 	vnic->uc_filter_count = 1;
+ 
+@@ -13823,8 +13879,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	rcu_read_unlock();
+ 
+ 	spin_lock_bh(&bp->ntp_fltr_lock);
+-	bit_id = bitmap_find_free_region(bp->ntp_fltr_bmap,
+-					 BNXT_NTP_FLTR_MAX_FLTR, 0);
++	bit_id = bitmap_find_free_region(bp->ntp_fltr_bmap, BNXT_MAX_FLTR, 0);
+ 	if (bit_id < 0) {
+ 		spin_unlock_bh(&bp->ntp_fltr_lock);
+ 		rc = -ENOMEM;
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 77c7084e47cd..72e99f2a5c68 100644
+index 72e99f2a5c68..5d67b8299328 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1355,10 +1355,8 @@ struct bnxt_filter_base {
+@@ -2398,6 +2398,7 @@ struct bnxt {
+ 	int			db_size;
  
- struct bnxt_ntuple_filter {
- 	struct bnxt_filter_base	base;
--	u8			dst_mac_addr[ETH_ALEN];
--	u8			src_mac_addr[ETH_ALEN];
- 	struct flow_keys	fkeys;
--	u8			l2_fltr_idx;
-+	struct bnxt_l2_filter	*l2_fltr;
- 	u32			flow_id;
- };
- 
+ #define BNXT_NTP_FLTR_MAX_FLTR	4096
++#define BNXT_MAX_FLTR		(BNXT_NTP_FLTR_MAX_FLTR + BNXT_L2_FLTR_MAX_FLTR)
+ #define BNXT_NTP_FLTR_HASH_SIZE	512
+ #define BNXT_NTP_FLTR_HASH_MASK	(BNXT_NTP_FLTR_HASH_SIZE - 1)
+ 	struct hlist_head	ntp_fltr_hash_tbl[BNXT_NTP_FLTR_HASH_SIZE];
+@@ -2621,6 +2622,8 @@ int bnxt_hwrm_func_drv_rgtr(struct bnxt *bp, unsigned long *bmap,
+ 			    int bmap_size, bool async_only);
+ int bnxt_hwrm_func_drv_unrgtr(struct bnxt *bp);
+ void bnxt_del_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr);
++int bnxt_hwrm_l2_filter_free(struct bnxt *bp, struct bnxt_l2_filter *fltr);
++int bnxt_hwrm_l2_filter_alloc(struct bnxt *bp, struct bnxt_l2_filter *fltr);
+ int bnxt_get_nr_rss_ctxs(struct bnxt *bp, int rx_rings);
+ int bnxt_hwrm_vnic_cfg(struct bnxt *bp, u16 vnic_id);
+ int __bnxt_hwrm_get_tx_rings(struct bnxt *bp, u16 fid, int *tx_rings);
 -- 
 2.30.1
 
 
---00000000000001b178060d25aff4
+--00000000000016199b060d25af5e
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -337,14 +440,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPfWdfQuSia4bP9M2nU1BBBQg5mw5mbW
-iAgx6xfuGZc4MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
-MzA0MjI0MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMvOPC8vYnWe6UpN7fy2pILEn5Lol9eB
+kUu/LTR6m92cMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
+MzA0MjI0MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCyFLQwZKX5UiNmluBFvu7LmFK3yMeAX30TcBM8a8W/XQFT2heb
-6i+SHgnSBPtEu5YeLm8wSuOl4y0x1Uo65haf2ZmnLQGouZ17QIdJerkkNBXRpQPjTFB9klnIYFPh
-yFuMnDtwaohjlvxTSUC6llXCu02Hj6a0vjo2oDXyJY23+n2WqIWlotefw8CjhdLIzsAmgnbTOPAe
-UATf/mHy+1U6U+905hIWmM3gvDKeTll3p1TI8ElBsFM0tCS+qoQO9Om67k15+u8GmGA8QYJeuHpF
-DWQsfXV5ZfvrET/zgqIDJIbbRndTh/fdtYGmB6qbp23pcopJjN/P+sqRL2mi9n/y
---00000000000001b178060d25aff4--
+ATANBgkqhkiG9w0BAQEFAASCAQABHzHsHLf1fmbk8k/FHDd+1zNEispUe1SU69+WsTGAIBIR5BCk
+By8rtcz4QJo3/5AzUI8SKUlGCiQ0LvNTdYOLgFFryaHP5ji9Aema513lR/2662Glk7pEdv9xox4R
+IF4NsjsnwORuyzbnMHCza6fUKHh3MldD1o6ZkAgUYvhxsOukcJTn7qA+4JClEwq11hzCmrJOG5gg
+H4+cQBuxqv3lE1G9gSp8Rl2pOUxIzDqfLVxsMih0m1GjrSPM6WWkcQOMxGi+5dzr681w20jXhMUQ
+7KkZF93X44IjLqam6IKUcEAvoe3fC9WCZ9AggoKIMaIsQniZ/9155DTUSRqyFiKG
+--00000000000016199b060d25af5e--
 
