@@ -1,178 +1,150 @@
-Return-Path: <netdev+bounces-60071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E452A81D42E
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:32:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D7C181D43A
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:40:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E6311F22536
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 13:32:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCD35B21259
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 13:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE224D314;
-	Sat, 23 Dec 2023 13:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5715AD313;
+	Sat, 23 Dec 2023 13:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="bQ4xY7K0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858E4D505;
-	Sat, 23 Dec 2023 13:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=27;SR=0;TI=SMTPD_---0Vz1O0tF_1703338328;
-Received: from 30.25.242.252(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Vz1O0tF_1703338328)
-          by smtp.aliyun-inc.com;
-          Sat, 23 Dec 2023 21:32:11 +0800
-Message-ID: <fac01751-73dc-4d93-b9c0-b637fece8334@linux.alibaba.com>
-Date: Sat, 23 Dec 2023 21:32:07 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B06D300;
+	Sat, 23 Dec 2023 13:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BNDe5eZ030737;
+	Sat, 23 Dec 2023 05:40:05 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=lX8YURiG
+	ITqZVl4eN7Nqst0RXg0e6i6f6bCuPtfWJjo=; b=bQ4xY7K0uJ+5IN4lwNGg5NQH
+	wDpd8z+uEWhRowkhGzWN7VdQH/HQf4nlI9ahl9ilWKr/rFmuG9lc/Ua+Y8jyecma
+	r8ysEd0C7/0pbfB7Iq2Yc7cnoD5SCrmTrfTxLMTT4bbQsTHmHwxB9jLsMPq5IDNp
+	oyK5L6LrBTOeSb5TH9cJrgUlpxRzGFuxdrwLq7tiYr5anCgZIuON0HoJ2QxYqEXT
+	6aBDWha8QYVMf7tgR9E8/6h8TOoxTNSrQK2Irn+fCfzESIgTKpcr1H7AY7VJ+79N
+	TAKKatfHpdqQyGVvCqPVOEdcJ0Cgii4uDaukSKlm1TGBeJyAUeZVsaRVKkrmkA==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3v5wspg81x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sat, 23 Dec 2023 05:40:04 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 23 Dec
+ 2023 05:40:03 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sat, 23 Dec 2023 05:40:03 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 5864F3F707C;
+	Sat, 23 Dec 2023 05:40:02 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <sedara@marvell.com>,
+        <srasheed@marvell.com>, <egallen@redhat.com>, <mschmidt@redhat.com>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <horms@kernel.org>,
+        <wizhao@redhat.com>, <kheib@redhat.com>, <konguyen@redhat.com>
+Subject: [PATCH net-next v2 0/8] add octeon_ep_vf driver
+Date: Sat, 23 Dec 2023 05:39:52 -0800
+Message-ID: <20231223134000.2906144-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Fix EROFS Kconfig
-To: Jingbo Xu <jefflexu@linux.alibaba.com>,
- David Howells <dhowells@redhat.com>, Gao Xiang <xiang@kernel.org>
-Cc: Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
- Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
- Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- Jeff Layton <jlayton@kernel.org>
-References: <20231221132400.1601991-5-dhowells@redhat.com>
- <20231221132400.1601991-1-dhowells@redhat.com>
- <2265065.1703250126@warthog.procyon.org.uk>
- <d50555e9-3b8e-41d4-bec6-317aaaec5ff0@linux.alibaba.com>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <d50555e9-3b8e-41d4-bec6-317aaaec5ff0@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: WWI6X4cPuudqvOLDttD9gXiMQ0GttIIj
+X-Proofpoint-ORIG-GUID: WWI6X4cPuudqvOLDttD9gXiMQ0GttIIj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-Hi David and Jingbo,
+This driver implements networking functionality of Marvell's Octeon
+PCI Endpoint NIC VF.
 
-On 2023/12/23 11:55, Jingbo Xu wrote:
-> Hi,
-> 
-> On 12/22/23 9:02 PM, David Howells wrote:
->> This needs an additional change (see attached).
->>
->> diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
->> index 1d318f85232d..1949763e66aa 100644
->> --- a/fs/erofs/Kconfig
->> +++ b/fs/erofs/Kconfig
->> @@ -114,7 +114,8 @@ config EROFS_FS_ZIP_DEFLATE
->>   
->>   config EROFS_FS_ONDEMAND
->>   	bool "EROFS fscache-based on-demand read support"
->> -	depends on CACHEFILES_ONDEMAND && (EROFS_FS=m && FSCACHE || EROFS_FS=y && FSCACHE=y)
->> +	depends on CACHEFILES_ONDEMAND && FSCACHE && \
->> +		(EROFS_FS=m && NETFS_SUPPORT || EROFS_FS=y && NETFS_SUPPORT=y)
->>   	default n
->>   	help
->>   	  This permits EROFS to use fscache-backed data blobs with on-demand
->>
-> 
-> Thanks for the special reminder.  I noticed that it has been included in
-> this commit[*] in the dev tree.
-> 
-> [*]
-> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/commit/?h=netfs-lib&id=7472173cc3baf4a0bd8c803e56c37efdb8388f1c
-> 
-> 
-> Besides I noticed an issue when trying to configure EROFS_FS_ONDEMAND.
-> The above kconfig indicates that EROFS_FS_ONDEMAND depends on
-> NETFS_SUPPORT, while NETFS_SUPPORT has no prompt in menuconfig and can
-> only be selected by, e.g. fs/ceph/Kconfig:
-> 
-> 	config CEPH_FS
->          select NETFS_SUPPORT
-> 
-> IOW EROFS_FS_ONDEMAND will not be prompted and has no way being
-> configured if NETFS_SUPPORT itself is not selected by any other filesystem.
-> 
-> 
-> I tried to fix this in following way:
-> 
-> diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
-> index 1949763e66aa..5b7b71e537f1 100644
-> --- a/fs/erofs/Kconfig
-> +++ b/fs/erofs/Kconfig
-> @@ -5,6 +5,7 @@ config EROFS_FS
->          depends on BLOCK
->          select FS_IOMAP
->          select LIBCRC32C
-> +       select NETFS_SUPPORT if EROFS_FS_ONDEMAND
->          help
->            EROFS (Enhanced Read-Only File System) is a lightweight read-only
->            file system with modern designs (e.g. no buffer heads, inline
-> @@ -114,8 +115,10 @@ config EROFS_FS_ZIP_DEFLATE
-> 
->   config EROFS_FS_ONDEMAND
->          bool "EROFS fscache-based on-demand read support"
-> -       depends on CACHEFILES_ONDEMAND && FSCACHE && \
-> -               (EROFS_FS=m && NETFS_SUPPORT || EROFS_FS=y &&
-> NETFS_SUPPORT=y)
-> +       depends on EROFS_FS
-> +       select FSCACHE
->          default n
->          help
->            This permits EROFS to use fscache-backed data blobs with on-demand
-> 
-> 
-> But still the dependency for CACHEFILES_ONDEMAND and CACHEFILES can not
-> be resolved.  Though CACHEFILES is not a must during the linking stage
-> as EROFS only calls fscache APIs directly, CACHEFILES is indeed needed
-> to ensure that the EROFS on-demand functionality works at runtime.
-> 
-> If we let EROFS_FS_ONDEMAND select CACHEFILES_ONDEMAND, then only
-> CACHEFILES_ONDEMAND will be selected while CACHEFILES can be still N.
-> Maybe EROFS_FS_ONDEMAND needs to selct both CACHEFILES_ONDEMAND and
-> CACHEFILES?
+This driver support following devices:
+ * Network controller: Cavium, Inc. Device b203
+ * Network controller: Cavium, Inc. Device b403
+ * Network controller: Cavium, Inc. Device b103
+ * Network controller: Cavium, Inc. Device b903
+ * Network controller: Cavium, Inc. Device ba03
+ * Network controller: Cavium, Inc. Device bc03
+ * Network controller: Cavium, Inc. Device bd03
 
-I think the main point here is that we don't have an explicit
-menuconfig item for either netfs or fscache directly.
+Changes:
+V2:
+  - Removed linux/version.h header file from inclusion in
+    octep_vf_main.c
+  - Corrected Makefile entry to include building octep_vf_mbox.c in
+    [6/8] patch.
+  - Removed redundant vzalloc pointer cast and vfree pointer check in
+    [6/8] patch.
 
-In principle, EROFS ondemand feature only needs fscache "volume
-and cookie" management framework as well as cachefiles since
-they're all needed to manage EROFS cached blobs, but I'm fine
-if that needs NETFS_SUPPORT is also enabled.
+V1: https://lore.kernel.org/all/20231221092844.2885872-1-srasheed@marvell.com/
 
-If netfs doesn't have a plan for a new explicit menuconfig
-item for users to use, I think we have to enable as below:
+Shinas Rasheed (8):
+  octeon_ep_vf: Add driver framework and device initialization
+  octeon_ep_vf: add hardware configuration APIs
+  octeon_ep_vf: add VF-PF mailbox communication.
+  octeon_ep_vf: add Tx/Rx ring resource setup and cleanup
+  octeon_ep_vf: add support for ndo ops
+  octeon_ep_vf: add Tx/Rx processing and interrupt support
+  octeon_ep_vf: add ethtool support
+  octeon_ep_vf: update MAINTAINERS
 
-diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
-index 1d318f85232d..fffd3919343e 100644
---- a/fs/erofs/Kconfig
-+++ b/fs/erofs/Kconfig
-@@ -114,8 +114,11 @@ config EROFS_FS_ZIP_DEFLATE
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/marvell/octeon_ep_vf.rst         |   24 +
+ MAINTAINERS                                   |    9 +
+ drivers/net/ethernet/marvell/Kconfig          |    1 +
+ drivers/net/ethernet/marvell/Makefile         |    1 +
+ .../net/ethernet/marvell/octeon_ep_vf/Kconfig |   19 +
+ .../ethernet/marvell/octeon_ep_vf/Makefile    |   10 +
+ .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  488 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_cnxk.c      |  500 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_config.h    |  160 +++
+ .../marvell/octeon_ep_vf/octep_vf_ethtool.c   |  307 ++++
+ .../marvell/octeon_ep_vf/octep_vf_main.c      | 1230 +++++++++++++++++
+ .../marvell/octeon_ep_vf/octep_vf_main.h      |  338 +++++
+ .../marvell/octeon_ep_vf/octep_vf_mbox.c      |  430 ++++++
+ .../marvell/octeon_ep_vf/octep_vf_mbox.h      |  166 +++
+ .../marvell/octeon_ep_vf/octep_vf_regs_cn9k.h |  154 +++
+ .../marvell/octeon_ep_vf/octep_vf_regs_cnxk.h |  162 +++
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        |  511 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_rx.h        |  224 +++
+ .../marvell/octeon_ep_vf/octep_vf_tx.c        |  331 +++++
+ .../marvell/octeon_ep_vf/octep_vf_tx.h        |  276 ++++
+ 21 files changed, 5342 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/marvell/octeon_ep_vf.rst
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/Kconfig
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/Makefile
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_config.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_ethtool.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_mbox.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_mbox.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_regs_cn9k.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_regs_cnxk.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_tx.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_tx.h
 
-  config EROFS_FS_ONDEMAND
-  	bool "EROFS fscache-based on-demand read support"
--	depends on CACHEFILES_ONDEMAND && (EROFS_FS=m && FSCACHE || EROFS_FS=y && FSCACHE=y)
--	default n
-+	depends on EROFS_FS
-+	select NETFS_SUPPORT
-+	select FSCACHE
-+	select CACHEFILES
-+	select CACHEFILES_ONDEMAND
-  	help
-  	  This permits EROFS to use fscache-backed data blobs with on-demand
-  	  read support.
---
-2.39.3
+-- 
+2.25.1
 
-But cachefiles won't be complied as modules anymore. Does it
-sounds good?
-
-Thanks,
-Gao Xiang
 
