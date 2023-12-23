@@ -1,81 +1,41 @@
-Return-Path: <netdev+bounces-60003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29F4981D0E3
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 01:54:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D94FF81D0E9
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 02:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BABF1C21BC6
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 00:54:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 518BAB237CF
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 01:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91609396;
-	Sat, 23 Dec 2023 00:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471BC644;
+	Sat, 23 Dec 2023 01:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PPNKgoJH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxnIR1Oj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CA01376
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 00:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d2e6e14865so15741015ad.0
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 16:54:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703292850; x=1703897650; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v/OUgEHqJzfbmhRHvlImtbrLIayt04REq9M8W1Cd2/M=;
-        b=PPNKgoJH4FDkQGtGSv8Ecu2efuH7Ta23awnyRI9wsbyILvW9OGHZQ2SKWvfps1MCE1
-         Ypy+h/dFKfdbnvbDgMEyrZQMKqKo9aMP2ytBt/g995M4XBmzic2PpyyZIdnJP6+auSfD
-         7a4r6wWPq8gXGLfWAArcbxf+LSerqwOJRs8XCO/8ZSF+4x/SxyCF7gizx/4OYTuqBKm1
-         ppVKoGzqjcXNBVTqD0rkPsVoONzTB+yI99JeogrL3BSwlkGfYJNiQnJByvAAzHcLTrb6
-         Jo34pWUMVVwvsMIXEWpRM1e1Hz7eCbnA546LAqDAvh8c6yN8u6XCKyuWuLHPcmOjGa7B
-         t1uQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703292850; x=1703897650;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v/OUgEHqJzfbmhRHvlImtbrLIayt04REq9M8W1Cd2/M=;
-        b=ZpiskiRZe8W0jII68YGZe1vznrJ1G17PI7OmQBl4yQXVQFPq/Yi2IkZw7ZMxM66Fw8
-         mqlfSW0GdkmCuX2YRNRqz9g6psdaDiE+hMAPZH08Pk/AEJNz5aJQMcLj0SoH6CisDCD1
-         /pHN/9FfKH5iv3nx8b3k9/Lh2AAy3VsIey3Bc6t75iNdGKdIoJXL0uLuBY67EHBor7Sv
-         DNrhyoFxPN0QQAgQBLYbcmPPEDba1k45kFK0NTHTz3TcufbsdA3RDQZYPb4pLCAlSkWg
-         DGOeIufbOWsifg1qgWaSusMEWEZPXuCfx2V4WtxGVLYE08WPV9jo5xIVbNDnSZMlH6eC
-         GLKw==
-X-Gm-Message-State: AOJu0YyM202qxSRUhGHOcznUpsbraBlRhoXvqurSkCXhVFjbLo0z2cXh
-	9aHL2APKxHzQlPK5zXmTG48I/KyW+CFgWFYd
-X-Google-Smtp-Source: AGHT+IEgqdXZsfxlDx4mqkS8NmgEoWf3hM1OgrlMXKnvDOdg4udC2jzJkhCTK4ICA4hVKDAMAZwtmQ==
-X-Received: by 2002:a17:902:e9c4:b0:1d4:14a0:bf66 with SMTP id 4-20020a170902e9c400b001d414a0bf66mr1357280plk.23.1703292849698;
-        Fri, 22 Dec 2023 16:54:09 -0800 (PST)
-Received: from tresc054937.tre-sc.gov.br ([187.94.103.218])
-        by smtp.gmail.com with ESMTPSA id iz11-20020a170902ef8b00b001d076c2e336sm4028257plb.100.2023.12.22.16.54.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 16:54:09 -0800 (PST)
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linus.walleij@linaro.org,
-	alsi@bang-olufsen.dk,
-	andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	arinc.unal@arinc9.com,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Subject: [PATCH net-next v3 8/8] Revert "net: dsa: OF-ware slave_mii_bus"
-Date: Fri, 22 Dec 2023 21:46:36 -0300
-Message-ID: <20231223005253.17891-9-luizluca@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231223005253.17891-1-luizluca@gmail.com>
-References: <20231223005253.17891-1-luizluca@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243431368;
+	Sat, 23 Dec 2023 01:10:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 91B11C433C9;
+	Sat, 23 Dec 2023 01:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703293827;
+	bh=u75DN3s2OPwUPSX6ZbFKV/tG2RZIBlNRA4FZBD+I1Ss=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jxnIR1OjSuNcMTMGFa7J8mOHMZygrB+UlmEmoyhNTuHvsJpDWOvSByleDRIpLShdu
+	 mIetg5OIUzjZON1o9+7fpdulGJ5VTf/jqc9hBk5WW7uDVwh9E8aWcNxWp8NRKSVPqb
+	 SCOT8mQFVIeb2uuHi0B3QBYeYzgjczTf94yHEqeIEdrpDZFIXh0rfRpdWB5b0ok0/g
+	 I/91kbDCgE8zDaAzuwv5vINa9o3+g09CwaoZrm+YvclbkrR4RuGnxO4fMSXGXVoWyd
+	 z/4aME7Ue0G/Kgt8VhpZA4rr5cz6DcyE0A59tcpo5kw6EmMkaOHGA6ECtV4Rcxfu/3
+	 SUcVPc7Nse6pQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78D8BC41620;
+	Sat, 23 Dec 2023 01:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,56 +43,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v11 00/10] net: ethernet: am65-cpsw: Add mqprio,
+ frame preemption & coalescing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170329382749.26300.2655743385787592194.git-patchwork-notify@kernel.org>
+Date: Sat, 23 Dec 2023 01:10:27 +0000
+References: <20231219105805.80617-1-rogerq@kernel.org>
+In-Reply-To: <20231219105805.80617-1-rogerq@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, vladimir.oltean@nxp.com,
+ s-vadapalli@ti.com, r-gunasekaran@ti.com, vigneshr@ti.com, srk@ti.com,
+ horms@kernel.org, p-varis@ti.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-This reverts commit fe7324b932222574a0721b80e72c6c5fe57960d1.
+Hello:
 
-The use of user_mii_bus is inappropriate when the hardware is described
-with a device-tree [1].
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Since all drivers currently implementing ds_switch_ops.phy_{read,write}
-were not updated to utilize the MDIO information from OF with the
-generic "dsa user mii", they might not be affected by this change.
+On Tue, 19 Dec 2023 12:57:55 +0200 you wrote:
+> Hi,
+> 
+> This series adds mqprio qdisc offload in channel mode,
+> Frame Preemption MAC merge support and RX/TX coalesing
+> for AM65 CPSW driver.
+> 
+> In v11 following changes were made
+> - Fix patch "net: ethernet: ti: am65-cpsw: add mqprio qdisc offload in channel mode"
+> by including units.h
+> 
+> [...]
 
-[1] https://lkml.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/T/#u
+Here is the summary with links:
+  - [net-next,v11,01/10] selftests: forwarding: ethtool_mm: support devices with higher rx-min-frag-size
+    https://git.kernel.org/netdev/net-next/c/2491d66ae66c
+  - [net-next,v11,02/10] selftests: forwarding: ethtool_mm: fall back to aggregate if device does not report pMAC stats
+    https://git.kernel.org/netdev/net-next/c/c8659bd9d1c0
+  - [net-next,v11,03/10] net: ethernet: am65-cpsw: Build am65-cpsw-qos only if required
+    https://git.kernel.org/netdev/net-next/c/c92b1321bbf3
+  - [net-next,v11,04/10] net: ethernet: am65-cpsw: Rename TI_AM65_CPSW_TAS to TI_AM65_CPSW_QOS
+    https://git.kernel.org/netdev/net-next/c/d0f9535b3182
+  - [net-next,v11,05/10] net: ethernet: am65-cpsw: cleanup TAPRIO handling
+    https://git.kernel.org/netdev/net-next/c/5db81bdc486d
+  - [net-next,v11,06/10] net: ethernet: ti: am65-cpsw: Move code to avoid forward declaration
+    https://git.kernel.org/netdev/net-next/c/1374841ad477
+  - [net-next,v11,07/10] net: ethernet: am65-cpsw: Move register definitions to header file
+    https://git.kernel.org/netdev/net-next/c/8f5a75610698
+  - [net-next,v11,08/10] net: ethernet: ti: am65-cpsw: add mqprio qdisc offload in channel mode
+    https://git.kernel.org/netdev/net-next/c/bc8d62e16ec2
+  - [net-next,v11,09/10] net: ethernet: ti: am65-cpsw-qos: Add Frame Preemption MAC Merge support
+    https://git.kernel.org/netdev/net-next/c/49a2eb906824
+  - [net-next,v11,10/10] net: ethernet: ti: am65-cpsw: add sw tx/rx irq coalescing based on hrtimers
+    https://git.kernel.org/netdev/net-next/c/e4918f9d4882
 
-Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
----
- net/dsa/dsa.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
-
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index ac7be864e80d..09d2f5d4b3dd 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -15,7 +15,6 @@
- #include <linux/slab.h>
- #include <linux/rtnetlink.h>
- #include <linux/of.h>
--#include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <net/dsa_stubs.h>
- #include <net/sch_generic.h>
-@@ -626,7 +625,6 @@ static void dsa_switch_teardown_tag_protocol(struct dsa_switch *ds)
- 
- static int dsa_switch_setup(struct dsa_switch *ds)
- {
--	struct device_node *dn;
- 	int err;
- 
- 	if (ds->setup)
-@@ -666,10 +664,7 @@ static int dsa_switch_setup(struct dsa_switch *ds)
- 
- 		dsa_user_mii_bus_init(ds);
- 
--		dn = of_get_child_by_name(ds->dev->of_node, "mdio");
--
--		err = of_mdiobus_register(ds->user_mii_bus, dn);
--		of_node_put(dn);
-+		err = mdiobus_register(ds->user_mii_bus);
- 		if (err < 0)
- 			goto free_user_mii_bus;
- 	}
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
