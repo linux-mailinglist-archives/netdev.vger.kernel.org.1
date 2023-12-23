@@ -1,112 +1,107 @@
-Return-Path: <netdev+bounces-60080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14AD881D44C
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:44:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 855DB81D456
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:56:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 480571C2101E
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 13:44:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7D781C20F20
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 13:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280F41A70C;
-	Sat, 23 Dec 2023 13:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171CED520;
+	Sat, 23 Dec 2023 13:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GJp9ItfW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0USso2l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0EB120325;
-	Sat, 23 Dec 2023 13:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BNCwl3n002659;
-	Sat, 23 Dec 2023 05:42:11 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	pfpt0220; bh=sT/f1hfl/EBvfxZWGVwC5G1MjcRtNUfR5ptF8nvX4cQ=; b=GJp
-	9ItfWp0JUqlQ+MZvoFTS6cyttVbQ+QU/GP8gJ8qMo3kQVVOjctSQokm/rxFWoOff
-	lrZpRraAFzSLYL92GnzK4o+hmMqSaxZBNxjerqcWcuPQ+lps7SycSwjTn5V/AGqG
-	R75nY1VCYA7n8cO1v4SB0sd0/HiaNf1xiRwDRwi0Ep6ZYuDTNRPVB4PIwIp96FEA
-	tmFpC0OoENg5xjyg2fG6Alytr/2wiz7uqyzs/JUn4sSjIVIQvDuRMm2anTLgMTLF
-	OkTWnhN0GLhuuEm8+1VvmpFeXJjgRmgT3JwTUGleNlAUPs2i3W3WxRjdPXS50N+m
-	nrmsx+tEckQT41eLt5g==
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3v5yxnr24s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sat, 23 Dec 2023 05:42:11 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 23 Dec
- 2023 05:42:09 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sat, 23 Dec 2023 05:42:09 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id BC27A3F706B;
-	Sat, 23 Dec 2023 05:42:08 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <sedara@marvell.com>,
-        <srasheed@marvell.com>, <egallen@redhat.com>, <mschmidt@redhat.com>,
-        <pabeni@redhat.com>, <kuba@kernel.org>, <horms@kernel.org>,
-        <wizhao@redhat.com>, <kheib@redhat.com>, <konguyen@redhat.com>
-Subject: [PATCH net-next v2 8/8] octeon_ep_vf: update MAINTAINERS
-Date: Sat, 23 Dec 2023 05:40:00 -0800
-Message-ID: <20231223134000.2906144-9-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231223134000.2906144-1-srasheed@marvell.com>
-References: <20231223134000.2906144-1-srasheed@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E073D11CA3;
+	Sat, 23 Dec 2023 13:56:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ED9BC433C8;
+	Sat, 23 Dec 2023 13:56:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703339774;
+	bh=402FMcsFLXTqiwyZScGBRIUGS4WdpQxLxaKJLbakZgo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F0USso2le2eZ6W5yiS3ameFhrGVcs/wFTu6sS4H3Wgws6f3HZ5DzD48BDmEX8+rN9
+	 syg2nhieCnSpkaqNVqk0JAQ25LR3fAjjemoSbS1pArgN+r+aZrooNJEQG7e3sq9Kro
+	 obtuHJ3VclUqZyHYEbkfWoKo2lby9oGtn6zDZSvZM7zC2cOtSI8YlmbdqhHlR8w/TJ
+	 reJ0Hn9MeXv5xHTyHflitfMw8Imdiu4hDmINru33Mf8StPuW4LvcJII6YhoSV7E2EE
+	 yIiQXCOcqatX9WQA/OGzUMgBlV/SyTx389uNpOZmF0GtV+JUv+rLzgpG2hWqXTgIaA
+	 D6w062dsJGdBA==
+Date: Sat, 23 Dec 2023 13:56:08 +0000
+From: Simon Horman <horms@kernel.org>
+To: Sarannya S <quic_sarannya@quicinc.com>
+Cc: quic_bjorande@quicinc.com, andersson@kernel.org, quic_clew@quicinc.com,
+	mathieu.poirier@linaro.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: [PATCH V1] net: qrtr: ns: Ignore ENODEV failures in ns
+Message-ID: <20231223135333.GA201037@kernel.org>
+References: <1703153211-3717-1-git-send-email-quic_sarannya@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: wfpRzWlVS99DIinwqhbAoF1JFygcwCaP
-X-Proofpoint-GUID: wfpRzWlVS99DIinwqhbAoF1JFygcwCaP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1703153211-3717-1-git-send-email-quic_sarannya@quicinc.com>
 
-add MAINTAINERS for octeon_ep_vf driver.
+[Dropped bjorn.andersson@kernel.org, as the correct address seems
+ to be andersson@kernel.org, which is already in the CC list.
+ kernel.org rejected sending this email without that update.]
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V2:
-  - No changes
+On Thu, Dec 21, 2023 at 03:36:50PM +0530, Sarannya S wrote:
+> From: Chris Lew <quic_clew@quicinc.com>
+> 
+> Ignore the ENODEV failures returned by kernel_sendmsg(). These errors
+> indicate that either the local port has been closed or the remote has
+> gone down. Neither of these scenarios are fatal and will eventually be
+> handled through packets that are later queued on the control port.
+> 
+> Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+> Signed-off-by: Sarannya Sasikumar <quic_sarannya@quicinc.com>
+> ---
+>  net/qrtr/ns.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+> index abb0c70..8234339 100644
+> --- a/net/qrtr/ns.c
+> +++ b/net/qrtr/ns.c
+> @@ -157,7 +157,7 @@ static int service_announce_del(struct sockaddr_qrtr *dest,
+>  	msg.msg_namelen = sizeof(*dest);
+>  
+>  	ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+> -	if (ret < 0)
+> +	if (ret < 0 && ret != -ENODEV)
+>  		pr_err("failed to announce del service\n");
+>  
+>  	return ret;
 
-V1: https://lore.kernel.org/all/20231221092844.2885872-9-srasheed@marvell.com/
+Hi,
 
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+The caller of service_announce_del() ignores it's return value.
+So the only action on error is the pr_err() call above, and so
+with this patch -ENODEV is indeed ignored.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index dda78b4ce707..42e144c5b1e3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12858,6 +12858,15 @@ L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/ethernet/marvell/octeon_ep
- 
-+MARVELL OCTEON ENDPOINT VF DRIVER
-+M:	Veerasenareddy Burru <vburru@marvell.com>
-+M:	Sathesh Edara <sedara@marvell.com>
-+M:	Shinas Rasheed <srasheed@marvell.com>
-+M:	Satananda Burla <sburla@marvell.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	drivers/net/ethernet/marvell/octeon_ep_vf
-+
- MARVELL OCTEONTX2 PHYSICAL FUNCTION DRIVER
- M:	Sunil Goutham <sgoutham@marvell.com>
- M:	Geetha sowjanya <gakula@marvell.com>
--- 
-2.25.1
+However, I wonder if it would make things clearer to the reader (me?)
+if the return type of service_announce_del was updated void. Because
+as things stand -ENODEV may be returned, which implies something might
+handle that, even though it doe not.
 
+The above notwithstanding, this change looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
