@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-60050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D0F481D229
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 05:23:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED4B981D22A
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 05:23:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1FDC1F2330C
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 04:23:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B9E11C22BFB
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 04:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A076FD7;
-	Sat, 23 Dec 2023 04:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD461392;
+	Sat, 23 Dec 2023 04:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bpJo8FcO"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ow/6HvLs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAEA6AB6
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 04:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124841375
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 04:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-67f8a5ed1a0so11117176d6.2
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 20:22:46 -0800 (PST)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-67f0d22e4faso15140866d6.3
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 20:22:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1703305365; x=1703910165; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1703305367; x=1703910167; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mwYV0S7y9KO68Z7l2DMCEihNf5uZQ9U3SmO/Pc2JcT8=;
-        b=bpJo8FcOJ5oeWjCf3rXGYA42FJFhmJ8bNCHLcuOC+4W8s0wjOcq9FFLrZ9m5RBpwEK
-         IUu/g15TSXEY5rJ44uiDPIXXwQpZomG/IZCd85YemdLxiWpWjxdSy3ymkvictBxlwqze
-         EdZb3IBlPY7fwtLdaQ12QPsVJntimO2pwDa6U=
+        bh=/9Lpj6NR1Wc0IWXKM8jZHfh0aQ6rrgPLjIdaXPrKqYw=;
+        b=Ow/6HvLsLF0G5onkmFIHqora6BJu2J07Dxnv/CjEy67Tm/UOT+v0+jqNiakMRr0xb6
+         CwMWJTUIU5i03EJRxy1KDQWFZ0wj2k2jyejr1Ch37X4pgEYQb0i4bUHUBb3DI8qz66W4
+         KAhOVCHIsSVig8apyI4Bh5Y82BEUXulM3WOk0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703305365; x=1703910165;
+        d=1e100.net; s=20230601; t=1703305367; x=1703910167;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mwYV0S7y9KO68Z7l2DMCEihNf5uZQ9U3SmO/Pc2JcT8=;
-        b=kQDQXPfet19xWVePlG5xgEbtnuyRQ8JeDsoPA69z9vQOforyB/ko0xCI2Tjki6LoWH
-         9Dl05gqswYOVrKh22GV9d5nhBChPEs2Di70vtuE93j6dd0F9TEAaYBX/WJgb+Nv6kjNj
-         ZyhKaTCgIcRO/jlr6tWh7VtVDE8jwxwWDiOV5/rCO+6p4hCjGzPUpZtUEOokVbk9j692
-         sX28lcTQkZjy5FCWM13usLsLSWro5Au0hXJbssxUZYrxfaOJBYK2DMMpV93aPl3mziRj
-         URdJTGCidWClhhXUVV95+79ai5LebR5mYkugbXKzrL+lN4fb6/HyHBRr2iVC6TA8O+FW
-         OlrA==
-X-Gm-Message-State: AOJu0YxiNaEyJnX/YRHrdtBpg8jaCk0guSTPCZJ0qDdkuUHwg9pxu0ng
-	xXWyC7WBrxSFH82EQbQGUtjg5/zL2hMH
-X-Google-Smtp-Source: AGHT+IG4NftX2vDYr/A6u0AlKZcvJJgfkI0158MBvHgXIUSmajmm/VP+HkUUCfa6yKC1IUQ1NkzZqA==
-X-Received: by 2002:a05:6214:caf:b0:67f:6b08:ec42 with SMTP id s15-20020a0562140caf00b0067f6b08ec42mr3850055qvs.25.1703305365471;
-        Fri, 22 Dec 2023 20:22:45 -0800 (PST)
+        bh=/9Lpj6NR1Wc0IWXKM8jZHfh0aQ6rrgPLjIdaXPrKqYw=;
+        b=G8hEXMrGldq8V5nA9QoiYwWnfOKCakWDzx4dQ/csqZmllXLvGapzMT5sC7XvFYWZw3
+         9cgrCTkDYFyFV7aUd2aqNaCfOHr3cppJ542EG++klWshInQPNg5OjNfnqWAz/HGsWgbV
+         wsaygkPwVjMg1+TefyyF6E2LZmYkMujOQvBcMUniL7Z8OQqUwdTU45gx+qFWV7a4Mm9z
+         QWAZ+AgvgA+88MZoImzQvMtqvmIqU9S7V7bTeSk2sUg2Oh9nVpUuc+VRl43ECbstC0Wq
+         vX0i51lpYFOwQTVSBg5A9FCkUVPsJXyV/o4qTWIRXXhhsZpOU9U/djLlcTkazN2biuBN
+         dfwg==
+X-Gm-Message-State: AOJu0YwamVIpXFONeIsMVNF5+L0bkDw+QhEchBw4ajAzY3en4VzL24Kc
+	Cx4DEfB0A1OJky1pWwuuVgo/oXD83RtLrDDUK025dtZvQQ==
+X-Google-Smtp-Source: AGHT+IG2H9uOVUU8kXLsK5/1gW2IVMefBj0n09Txia6tTDz2gCtWV4RNxe2RYdz2gz172JfeMDtR/A==
+X-Received: by 2002:a05:6214:d64:b0:67f:8030:11b6 with SMTP id 4-20020a0562140d6400b0067f803011b6mr3479672qvs.1.1703305366773;
+        Fri, 22 Dec 2023 20:22:46 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id ek5-20020ad45985000000b0067f8046a1acsm1299916qvb.144.2023.12.22.20.22.43
+        by smtp.gmail.com with ESMTPSA id ek5-20020ad45985000000b0067f8046a1acsm1299916qvb.144.2023.12.22.20.22.45
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Dec 2023 20:22:44 -0800 (PST)
+        Fri, 22 Dec 2023 20:22:46 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v2 06/13] bnxt_en: Add bnxt_lookup_ntp_filter_from_idx() function
-Date: Fri, 22 Dec 2023 20:22:03 -0800
-Message-Id: <20231223042210.102485-7-michael.chan@broadcom.com>
+Subject: [PATCH net-next v2 07/13] bnxt_en: Add new BNXT_FLTR_INSERTED flag to bnxt_filter_base struct.
+Date: Fri, 22 Dec 2023 20:22:04 -0800
+Message-Id: <20231223042210.102485-8-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231223042210.102485-1-michael.chan@broadcom.com>
 References: <20231223042210.102485-1-michael.chan@broadcom.com>
@@ -73,72 +73,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000466be6060d25afc4"
+	boundary="0000000000005ab6de060d25af36"
 
---000000000000466be6060d25afc4
+--0000000000005ab6de060d25af36
 Content-Transfer-Encoding: 8bit
 
-Add the helper function to look up the ntuple filter from the
-hash index and use it in bnxt_rx_flow_steer().  The helper function
-will also be used by user defined ntuple filters in the next
-patches.
+Change the unused flag to BNXT_FLTR_INSERTED.  To prepare for multiple
+pathways that an ntuple filter can be deleted, we add this flag.  These
+filter structures can be retreived from the RCU hash table but only
+the caller that sees that the BNXT_FLTR_INSERTED flag is set can delete
+the filter structure and clear the flag under spinlock.
 
+Reviewed-by: Vasundhara Volam <vasundhara-v.volam@broadcom.com>
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 26 +++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 10 ++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  2 +-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index e9b382832a14..7027391316e5 100644
+index 7027391316e5..0aecf89b4fb9 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -13899,6 +13899,21 @@ static bool bnxt_fltr_match(struct bnxt_ntuple_filter *f1,
- 	return false;
- }
- 
-+static struct bnxt_ntuple_filter *
-+bnxt_lookup_ntp_filter_from_idx(struct bnxt *bp,
-+				struct bnxt_ntuple_filter *fltr, u32 idx)
-+{
-+	struct bnxt_ntuple_filter *f;
-+	struct hlist_head *head;
-+
-+	head = &bp->ntp_fltr_hash_tbl[idx];
-+	hlist_for_each_entry_rcu(f, head, base.hash) {
-+		if (bnxt_fltr_match(f, fltr))
-+			return f;
+@@ -5343,6 +5343,10 @@ void bnxt_del_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr)
+ 	if (!atomic_dec_and_test(&fltr->refcnt))
+ 		return;
+ 	spin_lock_bh(&bp->ntp_fltr_lock);
++	if (!test_and_clear_bit(BNXT_FLTR_INSERTED, &fltr->base.state)) {
++		spin_unlock_bh(&bp->ntp_fltr_lock);
++		return;
 +	}
-+	return NULL;
-+}
-+
- static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- 			      u16 rxq_index, u32 flow_id)
- {
-@@ -13963,12 +13978,11 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
- 	idx = bnxt_get_ntp_filter_idx(bp, fkeys, skb);
- 	head = &bp->ntp_fltr_hash_tbl[idx];
- 	rcu_read_lock();
--	hlist_for_each_entry_rcu(fltr, head, base.hash) {
--		if (bnxt_fltr_match(fltr, new_fltr)) {
--			rc = fltr->base.sw_id;
--			rcu_read_unlock();
--			goto err_free;
--		}
-+	fltr = bnxt_lookup_ntp_filter_from_idx(bp, new_fltr, idx);
-+	if (fltr) {
-+		rcu_read_unlock();
-+		rc = fltr->base.sw_id;
-+		goto err_free;
+ 	hlist_del_rcu(&fltr->base.hash);
+ 	if (fltr->base.flags) {
+ 		clear_bit(fltr->base.sw_id, bp->ntp_fltr_bmap);
+@@ -5489,6 +5493,7 @@ static int bnxt_init_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr,
  	}
- 	rcu_read_unlock();
+ 	head = &bp->l2_fltr_hash_tbl[idx];
+ 	hlist_add_head_rcu(&fltr->base.hash, head);
++	set_bit(BNXT_FLTR_INSERTED, &fltr->base.state);
+ 	atomic_set(&fltr->refcnt, 1);
+ 	return 0;
+ }
+@@ -14000,6 +14005,7 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
+ 	new_fltr->base.type = BNXT_FLTR_TYPE_NTUPLE;
+ 	new_fltr->base.flags = BNXT_ACT_RING_DST;
+ 	hlist_add_head_rcu(&new_fltr->base.hash, head);
++	set_bit(BNXT_FLTR_INSERTED, &new_fltr->base.state);
+ 	bp->ntp_fltr_count++;
+ 	spin_unlock_bh(&bp->ntp_fltr_lock);
  
+@@ -14046,6 +14052,10 @@ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
+ 
+ 			if (del) {
+ 				spin_lock_bh(&bp->ntp_fltr_lock);
++				if (!test_and_clear_bit(BNXT_FLTR_INSERTED, &fltr->base.state)) {
++					spin_unlock_bh(&bp->ntp_fltr_lock);
++					continue;
++				}
+ 				hlist_del_rcu(&fltr->base.hash);
+ 				bp->ntp_fltr_count--;
+ 				spin_unlock_bh(&bp->ntp_fltr_lock);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 3f4e4708f7d8..867cab036e13 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -1348,7 +1348,7 @@ struct bnxt_filter_base {
+ 	u16			vf_idx;
+ 	unsigned long		state;
+ #define BNXT_FLTR_VALID		0
+-#define BNXT_FLTR_UPDATE	1
++#define BNXT_FLTR_INSERTED	1
+ 
+ 	struct rcu_head         rcu;
+ };
 -- 
 2.30.1
 
 
---000000000000466be6060d25afc4
+--0000000000005ab6de060d25af36
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -209,14 +223,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICoTjtvy5xtlBGmIUIzz+FoCSiFjz3vn
-IhKud7Rv1z5dMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
-MzA0MjI0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAVAcGAsBh+Qix4gd4Sm8a7aTia8g8mK
+C+VUszPfjkdsMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
+MzA0MjI0N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAck2fczXawIanQo3I6/BiJy2nHRIrlMogq+6IoJTUSLHTC27H9
-zWgifCGJQWoIQxMWXwX5UwUy+eU/Lzv5iAnB8eEvgdw3QeRwRUqtQqpAqc2Q0ynDaFiMQxIc2+6R
-xFrAeSruPRt65Tt+bEnrYevN4YVL+sEnc88RgLvtM5rX0sSMB7hhnn4ennyX+oW3mdMRi3dYYj8d
-NR+kXDgJNx4WlSnYVOSsaSeir4ltOrOxpLErnEqkMXJQBPKvX7DNbAmf74d/AJKJsDky7TlfMXlD
-LjOM7q+TspW0pBpWgAak/06YkRrPwo/CbPEuGXzfp6OwohOKYhUQXY4aDCaxJSmN
---000000000000466be6060d25afc4--
+ATANBgkqhkiG9w0BAQEFAASCAQAdvMqV/FzuPpZuP/+RF44FeuzEBlqmmzoDqg3oxuSqtgQODIlG
+65tjUpjAz7Ufta3ARhV52Yc8tCR1lwt4oMlh4X4V7tTJmYkuu2tui0caGFQOy+QPdkZgKJw++uBU
+Ezu0KeNhG4/gwoiKaK8iF+P9OHRgu1givOvmV6sE4AOkzzElGhXqzAnmmnaGZaMGAUfy8UGiwYmU
+KJsZj7h8zcRFje+yAQXWX687k+eaVob3nSrgM/vPRr0f5a6McbdicN+GdDSYbjEqFhFxwx46yOG+
+D8lLwOr7XKX3OrRfTUbeoAsLXfTc6DzOIHrxeYBGmH63RsdV7r/CTtnbJ1iizDfT
+--0000000000005ab6de060d25af36--
 
