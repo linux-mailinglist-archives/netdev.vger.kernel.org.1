@@ -1,118 +1,177 @@
-Return-Path: <netdev+bounces-60069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C265981D419
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 13:59:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3247381D425
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:08:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 699321F22097
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 12:59:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C5BFB215BC
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 13:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CD9D28E;
-	Sat, 23 Dec 2023 12:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D40AD2F2;
+	Sat, 23 Dec 2023 13:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KLsuF9ZQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nsOfF3qK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27373D26E
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 12:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-35fe994dab5so3413335ab.0
-        for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 04:59:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703336368; x=1703941168; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X+OMMnbBlHqC8tR2V6U21vMMBDhENceX7jdbNuVCiTU=;
-        b=KLsuF9ZQRzzgKySjAD1jkJgiR0Wnk7oSJ6rnm1qmwN0GkH7xC1/cdzH1Ytl32uXvfT
-         hyVoKRZziXJwt2oI3GJd5H+VR2QYaSKENZPrYMEx7WMV9zPaVvjKKn11AscW3M14kfJk
-         Y3uj+JpvC1AFp9pgnaY5yylgkDDdztvFQfU3O4+Y4ZM8WBC/Ju7SXl8i6YnGnbdJJObU
-         v5mxq92fLIndELf2TZ2xwbVNHvHxWFK8VCPHSBQSW0EiA5xDxLv/XwqHzKgO7HjQwcM1
-         LActGMnRu/tOu6LIaj3kMXhY0JW3TU2SQSzwn4yKW3jyLne5MCv2R98SU/D1JWEN4a8B
-         T5/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703336368; x=1703941168;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X+OMMnbBlHqC8tR2V6U21vMMBDhENceX7jdbNuVCiTU=;
-        b=kL4URph6u1vnf0kFuT9U+ei51kbik4CitEETrxW1dYz62KcexLgP/I4YdSVWkbmeLZ
-         /EddgBVaTShWiaP5zsrF9E9SPvLW1ZjXrsM8n3iRL3AODsxyWQV48weVj0CxC4yMx1l1
-         +MJLOZi3s2YWNqmZy/x1juAEExVeVEA3cD5IXsfrldU/XqPEmC6vWjT77OFpsGSsewfm
-         FgBdCA5e4CgexqZkTlL9KYRPsj/NWJQrna+Sn8rKCCioQHSKWEMRj1VdCMyZ0c7vDC05
-         pXqT8ZrtcY7tssUA0imVTmvglYdcAQAuOZmbscOaGn4H46q/0MstMiF6FpJTwktGwMvx
-         XCCQ==
-X-Gm-Message-State: AOJu0YwzKi1iIcvHazBSNFv7Tkw4lsKrMRo13SMnkQyxYgFACSRXRKof
-	DtqJGUZcFl2Va03uBoNtgsOhrQ//UFPuLktsN+A=
-X-Google-Smtp-Source: AGHT+IEpTvJyZxItwLvR3GlTwI5Ltx08S8tpdbTNZa28WrKVAjOoL7i/9i254s+9vJpP+m3WH9Iz5Q==
-X-Received: by 2002:a05:6e02:349f:b0:35f:eb24:6bbe with SMTP id bp31-20020a056e02349f00b0035feb246bbemr2166045ilb.41.1703336368697;
-        Sat, 23 Dec 2023 04:59:28 -0800 (PST)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d21-20020a170902c19500b001d0c3328a63sm5106996pld.66.2023.12.23.04.59.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Dec 2023 04:59:28 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Benjamin Poirier <bpoirier@nvidia.com>,
-	Jay Vosburgh <jay.vosburgh@canonical.com>,
-	David Miller <davem@davemloft.net>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net] selftests: bonding: do not set port down when adding to bond
-Date: Sat, 23 Dec 2023 20:59:22 +0800
-Message-ID: <20231223125922.3280841-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60D7D2E4
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 13:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703336898; x=1734872898;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MpQqVfyCGYPIBmeczRWmjfwjXI8tjDbCoscWLJwemlo=;
+  b=nsOfF3qKkjUoo/ANKL+imw4TB8MqFKv+tqeMAK2cgh9QOGdqguUxICB5
+   VBGJvv7KvRQZBVBM6VyoG0WKf8jLa3golX7w7fJQPDcs95c6xuZmALkSG
+   Ehfz3Eo8yGc+X3Hy8O4XqYEi2hMEYCbibKKJrmP1eW8MHIWKEXtrmi9sW
+   qQpKa02NAAeWo2jPmxT9gmhEpCBxJTDqvsN7OsaEtr4yvOtOf3ADCUTms
+   5n8dRz6Ss3CcaZbzvfZHVQpV3PDdsHfZqxEkUDd+FsCLW+Ya+/ccYcT0g
+   52TYNHOYCv5WUrX9ZdIwNZ37EHohVgRTf1flDc3eVCJI4DQe5uIkoGLdz
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="427360766"
+X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
+   d="scan'208";a="427360766"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2023 05:08:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="867979835"
+X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
+   d="scan'208";a="867979835"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 23 Dec 2023 05:08:15 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rH1it-000B3h-1s;
+	Sat, 23 Dec 2023 13:07:37 +0000
+Date: Sat, 23 Dec 2023 21:07:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com
+Subject: Re: [PATCH net-next 08/13] bnxt_en: Refactor filter insertion logic
+ in bnxt_rx_flow_steer().
+Message-ID: <202312232032.AGxw3c0P-lkp@intel.com>
+References: <20231221220218.197386-9-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221220218.197386-9-michael.chan@broadcom.com>
 
-Similar to commit be809424659c ("selftests: bonding: do not set port down
-before adding to bond"). The bond-arp-interval-causes-panic test failed
-after commit a4abfa627c38 ("net: rtnetlink: Enslave device before bringing
-it up") as the kernel will set the port down _after_ adding to bond if setting
-port down specifically.
+Hi Michael,
 
-Fix it by removing the link down operation when adding to bond.
+kernel test robot noticed the following build errors:
 
-Fixes: 2ffd57327ff1 ("selftests: bonding: cause oops in bond_rr_gen_slave_id")
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- .../drivers/net/bonding/bond-arp-interval-causes-panic.sh   | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+[auto build test ERROR on net-next/main]
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-index 4917dbb35a44..5667febee328 100755
---- a/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/bond-arp-interval-causes-panic.sh
-@@ -30,16 +30,16 @@ ip netns exec server ip addr add ${server_ip4}/24 dev eth0
- 
- ip netns exec client ip link add dev bond0 down type bond mode 1 \
- 	miimon 100 all_slaves_active 1
--ip netns exec client ip link set dev eth0 down master bond0
-+ip netns exec client ip link set dev eth0 master bond0
- ip netns exec client ip link set dev bond0 up
- ip netns exec client ip addr add ${client_ip4}/24 dev bond0
- ip netns exec client ping -c 5 $server_ip4 >/dev/null
- 
--ip netns exec client ip link set dev eth0 down nomaster
-+ip netns exec client ip link set dev eth0 nomaster
- ip netns exec client ip link set dev bond0 down
- ip netns exec client ip link set dev bond0 type bond mode 0 \
- 	arp_interval 1000 arp_ip_target "+${server_ip4}"
--ip netns exec client ip link set dev eth0 down master bond0
-+ip netns exec client ip link set dev eth0 master bond0
- ip netns exec client ip link set dev bond0 up
- ip netns exec client ping -c 5 $server_ip4 >/dev/null
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Chan/bnxt_en-Refactor-bnxt_ntuple_filter-structure/20231222-174043
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231221220218.197386-9-michael.chan%40broadcom.com
+patch subject: [PATCH net-next 08/13] bnxt_en: Refactor filter insertion logic in bnxt_rx_flow_steer().
+config: powerpc-randconfig-001-20231223 (https://download.01.org/0day-ci/archive/20231223/202312232032.AGxw3c0P-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231223/202312232032.AGxw3c0P-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312232032.AGxw3c0P-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/broadcom/bnxt/bnxt.c:5524:35: error: subscript of pointer to incomplete type 'struct bnxt_vf_info'
+           struct bnxt_vf_info *vf = &pf->vf[vf_idx];
+                                      ~~~~~~^
+   drivers/net/ethernet/broadcom/bnxt/bnxt.h:1332:9: note: forward declaration of 'struct bnxt_vf_info'
+           struct bnxt_vf_info     *vf;
+                  ^
+   drivers/net/ethernet/broadcom/bnxt/bnxt.c:5526:11: error: incomplete definition of type 'struct bnxt_vf_info'
+           return vf->fw_fid;
+                  ~~^
+   drivers/net/ethernet/broadcom/bnxt/bnxt.h:1332:9: note: forward declaration of 'struct bnxt_vf_info'
+           struct bnxt_vf_info     *vf;
+                  ^
+   drivers/net/ethernet/broadcom/bnxt/bnxt.c:13652:44: warning: shift count >= width of type [-Wshift-count-overflow]
+           if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64)) != 0 &&
+                                                     ^~~~~~~~~~~~~~~~
+   include/linux/dma-mapping.h:77:54: note: expanded from macro 'DMA_BIT_MASK'
+   #define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
+                                                        ^ ~~~
+>> drivers/net/ethernet/broadcom/bnxt/bnxt.c:14024:9: error: implicit declaration of function 'rps_may_expire_flow' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+                                   if (rps_may_expire_flow(bp->dev, fltr->base.rxq,
+                                       ^
+   1 warning and 3 errors generated.
+
+
+vim +/rps_may_expire_flow +14024 drivers/net/ethernet/broadcom/bnxt/bnxt.c
+
+c0c050c58d8409 Michael Chan   2015-10-22  14008  
+c0c050c58d8409 Michael Chan   2015-10-22  14009  static void bnxt_cfg_ntp_filters(struct bnxt *bp)
+c0c050c58d8409 Michael Chan   2015-10-22  14010  {
+c0c050c58d8409 Michael Chan   2015-10-22  14011  	int i;
+c0c050c58d8409 Michael Chan   2015-10-22  14012  
+c0c050c58d8409 Michael Chan   2015-10-22  14013  	for (i = 0; i < BNXT_NTP_FLTR_HASH_SIZE; i++) {
+c0c050c58d8409 Michael Chan   2015-10-22  14014  		struct hlist_head *head;
+c0c050c58d8409 Michael Chan   2015-10-22  14015  		struct hlist_node *tmp;
+c0c050c58d8409 Michael Chan   2015-10-22  14016  		struct bnxt_ntuple_filter *fltr;
+c0c050c58d8409 Michael Chan   2015-10-22  14017  		int rc;
+c0c050c58d8409 Michael Chan   2015-10-22  14018  
+c0c050c58d8409 Michael Chan   2015-10-22  14019  		head = &bp->ntp_fltr_hash_tbl[i];
+25f995fba56014 Michael Chan   2023-12-21  14020  		hlist_for_each_entry_safe(fltr, tmp, head, base.hash) {
+c0c050c58d8409 Michael Chan   2015-10-22  14021  			bool del = false;
+c0c050c58d8409 Michael Chan   2015-10-22  14022  
+25f995fba56014 Michael Chan   2023-12-21  14023  			if (test_bit(BNXT_FLTR_VALID, &fltr->base.state)) {
+25f995fba56014 Michael Chan   2023-12-21 @14024  				if (rps_may_expire_flow(bp->dev, fltr->base.rxq,
+c0c050c58d8409 Michael Chan   2015-10-22  14025  							fltr->flow_id,
+25f995fba56014 Michael Chan   2023-12-21  14026  							fltr->base.sw_id)) {
+c0c050c58d8409 Michael Chan   2015-10-22  14027  					bnxt_hwrm_cfa_ntuple_filter_free(bp,
+c0c050c58d8409 Michael Chan   2015-10-22  14028  									 fltr);
+c0c050c58d8409 Michael Chan   2015-10-22  14029  					del = true;
+c0c050c58d8409 Michael Chan   2015-10-22  14030  				}
+c0c050c58d8409 Michael Chan   2015-10-22  14031  			} else {
+c0c050c58d8409 Michael Chan   2015-10-22  14032  				rc = bnxt_hwrm_cfa_ntuple_filter_alloc(bp,
+c0c050c58d8409 Michael Chan   2015-10-22  14033  								       fltr);
+c0c050c58d8409 Michael Chan   2015-10-22  14034  				if (rc)
+c0c050c58d8409 Michael Chan   2015-10-22  14035  					del = true;
+c0c050c58d8409 Michael Chan   2015-10-22  14036  				else
+25f995fba56014 Michael Chan   2023-12-21  14037  					set_bit(BNXT_FLTR_VALID, &fltr->base.state);
+c0c050c58d8409 Michael Chan   2015-10-22  14038  			}
+c0c050c58d8409 Michael Chan   2015-10-22  14039  
+c0c050c58d8409 Michael Chan   2015-10-22  14040  			if (del) {
+c0c050c58d8409 Michael Chan   2015-10-22  14041  				spin_lock_bh(&bp->ntp_fltr_lock);
+86982cc60c9a86 Michael Chan   2023-12-21  14042  				if (!test_and_clear_bit(BNXT_FLTR_INSERTED, &fltr->base.state)) {
+86982cc60c9a86 Michael Chan   2023-12-21  14043  					spin_unlock_bh(&bp->ntp_fltr_lock);
+86982cc60c9a86 Michael Chan   2023-12-21  14044  					continue;
+86982cc60c9a86 Michael Chan   2023-12-21  14045  				}
+25f995fba56014 Michael Chan   2023-12-21  14046  				hlist_del_rcu(&fltr->base.hash);
+c0c050c58d8409 Michael Chan   2015-10-22  14047  				bp->ntp_fltr_count--;
+c0c050c58d8409 Michael Chan   2015-10-22  14048  				spin_unlock_bh(&bp->ntp_fltr_lock);
+9fa270ccc095df Michael Chan   2023-12-21  14049  				bnxt_del_l2_filter(bp, fltr->l2_fltr);
+c0c050c58d8409 Michael Chan   2015-10-22  14050  				synchronize_rcu();
+25f995fba56014 Michael Chan   2023-12-21  14051  				clear_bit(fltr->base.sw_id, bp->ntp_fltr_bmap);
+c0c050c58d8409 Michael Chan   2015-10-22  14052  				kfree(fltr);
+c0c050c58d8409 Michael Chan   2015-10-22  14053  			}
+c0c050c58d8409 Michael Chan   2015-10-22  14054  		}
+c0c050c58d8409 Michael Chan   2015-10-22  14055  	}
+19241368443ff9 Jeffrey Huang  2016-02-26  14056  	if (test_and_clear_bit(BNXT_HWRM_PF_UNLOAD_SP_EVENT, &bp->sp_event))
+9a005c3898aa07 Jonathan Lemon 2020-02-24  14057  		netdev_info(bp->dev, "Receive PF driver unload event!\n");
+c0c050c58d8409 Michael Chan   2015-10-22  14058  }
+c0c050c58d8409 Michael Chan   2015-10-22  14059  
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
