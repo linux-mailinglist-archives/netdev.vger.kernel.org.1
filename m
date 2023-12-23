@@ -1,67 +1,58 @@
-Return-Path: <netdev+bounces-60099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7966A81D53C
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:25:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A28581D547
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:29:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0222028304D
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:25:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06E0E1F21B63
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABEEC1094E;
-	Sat, 23 Dec 2023 17:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BB012E7F;
+	Sat, 23 Dec 2023 17:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="khN6mjZJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SGjc16AT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA5812E4C
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 17:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703352319; x=1734888319;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8Gmznqo30uZrkAtxT6dU+7NcE2umT81kQB26aiSA/wU=;
-  b=khN6mjZJAuUUVpExwhDCutqsTT30dsp2ifQHRuttmKrqjcZMdSoYwYei
-   GqAQNAncPYV8zJFHi0db4F1LkEuEoTTdsUq9O35bxa7tTAkxFX2FVdl4W
-   4hIBi2GfS6bQE6pkm/oEQaViWyQcBZXWyWVra89kwLHMl9+FU7l6CY++m
-   6DjNPo2vLLZFOtRT0G9ZR9txXLUVo1movPSDdXEPxM6E79KkjFW3GX47S
-   gyP5mOVYJ6M5QKuTLtjDYiBJN1dme5Hr8mWQrSMbQDmlvwvdby29Y5MTn
-   5LKAzh2/PD8J9jagdjjYtk7U7iwKD6+48gP06v+BD3BtTxD7OJ1xQRwjx
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="3452130"
-X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
-   d="scan'208";a="3452130"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2023 09:25:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="753581772"
-X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
-   d="scan'208";a="753581772"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 23 Dec 2023 09:25:14 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rH5jv-000BGJ-2D;
-	Sat, 23 Dec 2023 17:24:54 +0000
-Date: Sun, 24 Dec 2023 01:23:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2BE12E71;
+	Sat, 23 Dec 2023 17:29:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5621DC433C8;
+	Sat, 23 Dec 2023 17:29:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703352545;
+	bh=7xG6o54wRSyxhLE5knTREAIYMUB47waY0f2uTnrJ8Y0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SGjc16ATLDegO3xcDc4uo3f6yfiQzSUA2ip8Lfmg7uIgVBm84VUfpA7fdKtjtQQX2
+	 mCEStsb6okKJO0jI6XNhhImL2WgbTaQ6cOT5uvz9kfPlpCC3Cy3fmy7PksUfrKJjmu
+	 SQj2gEx3c3zy6WoFu1sJV5+bmA0dl0AyvtOJpCaigrxgv4DBqj4j4xo9ugO6hV2z6d
+	 sKOmklTMiLes054XPs2Uka7IMCJXmS6e3dYQBa/EYbGoNSdffgLRDFKjqDwzqpY3Br
+	 HEskgr05zQdv+o11jRs1yqfLNLSJzefrqZCLOc3q4zboFQbZ+DfuRa1UJSBK5omam4
+	 d4OOg7/WaXLNw==
+Date: Sat, 23 Dec 2023 17:28:58 +0000
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: torvalds@linux-foundation.org,
+	Markus Suvanto <markus.suvanto@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next 3/6] virtio_net: support device stats
-Message-ID: <202312240155.ow7kvQZO-lkp@intel.com>
-References: <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
+	linux-afs@lists.infradead.org, keyrings@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Edward Adam Davis <eadavis@qq.com>
+Subject: Re: [GIT PULL] afs, dns: Fix dynamic root interaction with negative
+ DNS
+Message-ID: <20231223172858.GI201037@kernel.org>
+References: <1843374.1703172614@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,54 +61,113 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1843374.1703172614@warthog.procyon.org.uk>
 
-Hi Xuan,
++ Edward Adam Davis <eadavis@qq.com>
 
-kernel test robot noticed the following build warnings:
+On Thu, Dec 21, 2023 at 03:30:14PM +0000, David Howells wrote:
+> Hi Linus,
+> 
+> Could you apply this, please?  It's intended to improve the interaction of
+> arbitrary lookups in the AFS dynamic root that hit DNS lookup failures[1]
+> where kafs behaves differently from openafs and causes some applications to
+> fail that aren't expecting that.  Further, negative DNS results aren't
+> getting removed and are causing failures to persist.
+> 
+>  (1) Always delete unused (particularly negative) dentries as soon as
+>      possible so that they don't prevent future lookups from retrying.
+> 
+>  (2) Fix the handling of new-style negative DNS lookups in ->lookup() to
+>      make them return ENOENT so that userspace doesn't get confused when
+>      stat succeeds but the following open on the looked up file then fails.
+> 
+>  (3) Fix key handling so that DNS lookup results are reclaimed almost as
+>      soon as they expire rather than sitting round either forever or for an
+>      additional 5 mins beyond a set expiry time returning EKEYEXPIRED.
+>      They persist for 1s as /bin/ls will do a second stat call if the first
+>      fails.
+> 
+> Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
+> 
+> Thanks,
+> David
+> 
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=216637 [1]
+> Link: https://lore.kernel.org/r/20231211163412.2766147-1-dhowells@redhat.com/ # v1
+> Link: https://lore.kernel.org/r/20231211213233.2793525-1-dhowells@redhat.com/ # v2
+> Link: https://lore.kernel.org/r/20231212144611.3100234-1-dhowells@redhat.com/ # v3
+> Link: https://lore.kernel.org/r/20231221134558.1659214-1-dhowells@redhat.com/ # v4
+> ---
+> The following changes since commit ceb6a6f023fd3e8b07761ed900352ef574010bcb:
+> 
+>   Linux 6.7-rc6 (2023-12-17 15:19:28 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/afs-fixes-20231221
+> 
+> for you to fetch changes up to 39299bdd2546688d92ed9db4948f6219ca1b9542:
+> 
+>   keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry (2023-12-21 13:47:38 +0000)
+> 
+> ----------------------------------------------------------------
+> AFS fixes
+> 
+> ----------------------------------------------------------------
+> David Howells (3):
+>       afs: Fix the dynamic root's d_delete to always delete unused dentries
+>       afs: Fix dynamic root lookup DNS check
+>       keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry
 
-[auto build test WARNING on mst-vhost/linux-next]
-[also build test WARNING on linus/master v6.7-rc6]
-[cannot apply to net-next/main horms-ipvs/master next-20231222]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Hi Linus, David, Edward, Networking maintainers, all,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_net-introduce-device-stats-feature-and-structures/20231222-175505
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-patch link:    https://lore.kernel.org/r/20231222033021.20649-4-xuanzhuo%40linux.alibaba.com
-patch subject: [PATCH net-next 3/6] virtio_net: support device stats
-config: arc-haps_hs_defconfig (https://download.01.org/0day-ci/archive/20231224/202312240155.ow7kvQZO-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231224/202312240155.ow7kvQZO-lkp@intel.com/reproduce)
+This is a heads up that my understanding is that the last patch introduces
+a buffer overrun for which a patch has been posted. Ordinarily I would
+think that the fix should go through net. But the above patches aren't in
+net yet.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312240155.ow7kvQZO-lkp@intel.com/
+Given a) we're now in a holiday season and b) the severity of this
+problem is unclear (to me), perhaps it is best to wait a bit then
+post the fix to net?
 
-All warnings (new ones prefixed by >>):
+Link: https://lore.kernel.org/netdev/tencent_7D663C8936BA96F837124A4474AF76ED6709@qq.com/
 
-   In file included from include/linux/virtio_net.h:8,
-                    from drivers/net/virtio_net.c:12:
->> include/uapi/linux/virtio_net.h:419:45: warning: left shift count >= width of type [-Wshift-count-overflow]
-     419 | #define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
-         |                                             ^~
-   drivers/net/virtio_net.c:215:17: note: in expansion of macro 'VIRTIO_NET_STATS_TYPE_CVQ'
-     215 |                 VIRTIO_NET_STATS_TYPE_##TYPE,                   \
-         |                 ^~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/virtio_net.c:224:9: note: in expansion of macro 'VIRTNET_DEVICE_STATS_MAP_ITEM'
-     224 |         VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+N.B. The hash in the fixes tag for the fix patch is now incorrect.
 
+For reference the fix, from the link above, is below.
+I've fixed the hash for the fixes tag and added the posted review tag.
+And added my own SoB, because the patch is in this email.
 
-vim +419 include/uapi/linux/virtio_net.h
+From: Edward Adam Davis <eadavis@qq.com>
 
-ba106d1c676c80 Xuan Zhuo 2023-12-22  418  
-ba106d1c676c80 Xuan Zhuo 2023-12-22 @419  #define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
-ba106d1c676c80 Xuan Zhuo 2023-12-22  420  
+bin will be forcibly converted to "struct dns_server_list_v1_header *", so it 
+is necessary to compare datalen with sizeof(*v1).
 
+Fixes: 39299bdd2546 ("keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry")
+Reported-and-tested-by: syzbot+94bbb75204a05da3d89f@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Signed-off-by: Simon Horman <horms@kernel.org>
+
+---
+ net/dns_resolver/dns_key.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index 3233f4f25fed..15f19521021c 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -104,7 +104,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ 
+ 	if (data[0] == 0) {
+ 		/* It may be a server list. */
+-		if (datalen <= sizeof(*bin))
++		if (datalen <= sizeof(*v1))
+ 			return -EINVAL;
+ 
+ 		bin = (const struct dns_payload_header *)data;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
+
 
