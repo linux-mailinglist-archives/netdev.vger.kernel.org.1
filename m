@@ -1,50 +1,69 @@
-Return-Path: <netdev+bounces-60101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1235481D568
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:48:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CF9881D575
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:56:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4446C1C20CD1
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:48:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF2451F21B33
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC29111C8A;
-	Sat, 23 Dec 2023 17:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B890D11C8A;
+	Sat, 23 Dec 2023 17:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAeXLlZE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ShZG86xi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D6E11718
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 17:48:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAA04C433C8;
-	Sat, 23 Dec 2023 17:48:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703353731;
-	bh=03Mw3pTrVcalUFwXHgizomiqyu9j2TDfmFEEnJjsgSE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GAeXLlZEsG7ROdqI2PXNz8MBASajy2ZNVJ88sgC51YVXI0A1RuK4prwwUGUBCcKNA
-	 ZWvhbhh2RtVAO/X3fa7jKu197+ZctY+cgk0J5Y0Jxg5dFLQLGie1/NZOAq5Of0FwOY
-	 yUNUC0g0xz5Q3vO2cnMtKqXuhakspKlilGAFsPJa/RrpPkTCFZ9inDvUn1rsRNpgVB
-	 Dn9AC8x0JNbd7us27h5eIwDxpkXWX/+oSjqEOe2sWkxtwJfmOZJldEiqw9kbFwWXDB
-	 0CQQavMbPWhcvnsbnq8AecfdCU9kQfpzD5CF/kHglUhUPQdgFSKP5iqzjbHTVSwboB
-	 /1P4KefGIGucg==
-Date: Sat, 23 Dec 2023 17:48:45 +0000
-From: Simon Horman <horms@kernel.org>
-To: Aurelien Aptel <aaptel@nvidia.com>
-Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
-	sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
-	chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
-	aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
-	ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
-	galshalom@nvidia.com, mgurtovoy@nvidia.com
-Subject: Re: [PATCH v22 16/20] net/mlx5e: NVMEoTCP, queue init/teardown
-Message-ID: <20231223174845.GJ201037@kernel.org>
-References: <20231221213358.105704-1-aaptel@nvidia.com>
- <20231221213358.105704-17-aaptel@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADAC15E81
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 17:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703354179; x=1734890179;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YHooJR/cUNFJYIbiIdxX4l/G+Qo7iSORCh9uZSLuUNQ=;
+  b=ShZG86xiJBZ1u0XHeKpCeqZhYhmal0Sbgm0PI2q9OVau4+9h9PMmOgMR
+   vWYWujDKOz/YtkvFxWnmejIGd/PrxA+R42jPgYdhRjhjaFxPIV3SuIgYW
+   bwSBtZsYXEyVCry4V1OwFqsDAFh5thHtTrz+tFu9zIOveNP0I53ZDTXSr
+   042NtXZZYRBAXK9M8RjOxQA7z5yd/yCLVSO9Ek91Olu6gJST2Ru6iENEp
+   ww6LcHe6cVOh4v/OhIv24QXtfh7TzeBf5qcXrT0Iwt7M+7wZPQPzwn79O
+   puy3Ff3juiouO5bEeyEp5Cdx6MKBOHGK8ccveVH0LJ8qu3YDRJaVaKUQt
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="482383889"
+X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
+   d="scan'208";a="482383889"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2023 09:56:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="950622648"
+X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
+   d="scan'208";a="950622648"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 23 Dec 2023 09:56:15 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rH6EN-000BHu-0H;
+	Sat, 23 Dec 2023 17:56:11 +0000
+Date: Sun, 24 Dec 2023 01:55:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next 1/6] virtio_net: introduce device stats feature
+ and structures
+Message-ID: <202312240125.00z3nxGY-lkp@intel.com>
+References: <20231222033021.20649-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,102 +72,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231221213358.105704-17-aaptel@nvidia.com>
-mlx5e_open_cqFrom: Simon Horman <horms@kernel.org>
+In-Reply-To: <20231222033021.20649-2-xuanzhuo@linux.alibaba.com>
 
-On Thu, Dec 21, 2023 at 09:33:54PM +0000, Aurelien Aptel wrote:
-> From: Ben Ben-Ishay <benishay@nvidia.com>
-> 
-> Adds the ddp ops of sk_add, sk_del and offload limits.
-> 
-> When nvme-tcp establishes new queue/connection, the sk_add op is called.
-> We allocate a hardware context to offload operations for this queue:
-> - use a steering rule based on the connection 5-tuple to mark packets
->   of this queue/connection with a flow-tag in their completion (cqe)
-> - use a dedicated TIR to identify the queue and maintain the HW context
-> - use a dedicated ICOSQ to maintain the HW context by UMR postings
-> - use a dedicated tag buffer for buffer registration
-> - maintain static and progress HW contexts by posting the proper WQEs.
-> 
-> When nvme-tcp teardowns a queue/connection, the sk_del op is called.
-> We teardown the queue and free the corresponding contexts.
-> 
-> The offload limits we advertise deal with the max SG supported.
-> 
-> [Re-enabled calling open/close icosq out of en_main.c]
-> 
-> Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
-> Signed-off-by: Boris Pismenny <borisp@nvidia.com>
-> Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
-> Signed-off-by: Yoray Zack <yorayz@nvidia.com>
-> Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Hi Xuan,
 
-...
+kernel test robot noticed the following build errors:
 
-> +static int
-> +mlx5e_nvmeotcp_build_icosq(struct mlx5e_nvmeotcp_queue *queue, struct mlx5e_priv *priv, int io_cpu)
-> +{
-> +	u16 max_sgl, max_klm_per_wqe, max_umr_per_ccid, sgl_rest, wqebbs_rest;
-> +	struct mlx5e_channel *c = priv->channels.c[queue->channel_ix];
-> +	struct mlx5e_sq_param icosq_param = {};
-> +	struct mlx5e_create_cq_param ccp = {};
-> +	struct dim_cq_moder icocq_moder = {};
-> +	struct mlx5e_icosq *icosq;
-> +	int err = -ENOMEM;
-> +	u16 log_icosq_sz;
-> +	u32 max_wqebbs;
-> +
-> +	icosq = &queue->sq;
-> +	max_sgl = mlx5e_get_max_sgl(priv->mdev);
-> +	max_klm_per_wqe = queue->max_klms_per_wqe;
-> +	max_umr_per_ccid = max_sgl / max_klm_per_wqe;
-> +	sgl_rest = max_sgl % max_klm_per_wqe;
-> +	wqebbs_rest = sgl_rest ? MLX5E_KLM_UMR_WQEBBS(sgl_rest) : 0;
-> +	max_wqebbs = (MLX5E_KLM_UMR_WQEBBS(max_klm_per_wqe) *
-> +		     max_umr_per_ccid + wqebbs_rest) * queue->size;
-> +	log_icosq_sz = order_base_2(max_wqebbs);
-> +
-> +	mlx5e_build_icosq_param(priv->mdev, log_icosq_sz, &icosq_param);
-> +	ccp.napi = &queue->qh.napi;
-> +	ccp.ch_stats = &priv->channel_stats[queue->channel_ix]->ch;
-> +	ccp.node = cpu_to_node(io_cpu);
-> +	ccp.ix = queue->channel_ix;
-> +
-> +	err = mlx5e_open_cq(priv, icocq_moder, &icosq_param.cqp, &ccp, &icosq->cq);
+[auto build test ERROR on mst-vhost/linux-next]
+[also build test ERROR on linus/master v6.7-rc6 next-20231222]
+[cannot apply to net-next/main horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Hi Aurelien and Ben,
+url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_net-introduce-device-stats-feature-and-structures/20231222-175505
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20231222033021.20649-2-xuanzhuo%40linux.alibaba.com
+patch subject: [PATCH net-next 1/6] virtio_net: introduce device stats feature and structures
+config: x86_64-buildonly-randconfig-002-20231223 (https://download.01.org/0day-ci/archive/20231224/202312240125.00z3nxGY-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231224/202312240125.00z3nxGY-lkp@intel.com/reproduce)
 
-This doesn't seem to compile with gcc-13 with allmodconfig on x86_64:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312240125.00z3nxGY-lkp@intel.com/
 
- .../nvmeotcp.c: In function 'mlx5e_nvmeotcp_build_icosq':
- .../nvmeotcp.c:472:29: error: passing argument 1 of 'mlx5e_open_cq' from incompatible pointer type [-Werror=incompatible-pointer-types]
-   472 |         err = mlx5e_open_cq(priv, icocq_moder, &icosq_param.cqp, &ccp, &icosq->cq);
-       |                             ^~~~
-       |                             |
-       |                             struct mlx5e_priv *
- In file included from .../nvmeotcp.h:9,
-                  from .../nvmeotcp.c:7:
- ....h:1065:41: note: expected 'struct mlx5_core_dev *' but argument is of type 'struct mlx5e_priv *'
-  1065 | int mlx5e_open_cq(struct mlx5_core_dev *mdev, struct dim_cq_moder moder,
-       |                   ~~~~~~~~~~~~~~~~~~~~~~^~~~
- cc1: all warnings being treated as errors
+All errors (new ones prefixed by >>):
 
-> +	if (err)
-> +		goto err_nvmeotcp_sq;
-> +	err = mlx5e_open_icosq(c, &priv->channels.params, &icosq_param, icosq,
-> +			       mlx5e_nvmeotcp_icosq_err_cqe_work);
-> +	if (err)
-> +		goto close_cq;
-> +
-> +	spin_lock_init(&queue->sq_lock);
-> +	return 0;
-> +
-> +close_cq:
-> +	mlx5e_close_cq(&icosq->cq);
-> +err_nvmeotcp_sq:
-> +	return err;
-> +}
+   In file included from <built-in>:1:
+>> ./usr/include/linux/virtio_net.h:454:2: error: unknown type name 'u8'
+           u8 type;
+           ^
+   ./usr/include/linux/virtio_net.h:455:2: error: unknown type name 'u8'
+           u8 reserved;
+           ^
+   2 errors generated.
 
-...
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
