@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-59994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6607981D0D2
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 01:30:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 151EF81D0D1
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 01:30:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ACB81F2346C
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 00:30:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F8781C219C2
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 00:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83C4645;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FBF38E;
 	Sat, 23 Dec 2023 00:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oCdp59If"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lhm8+48V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A8217C6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A0F15D1;
 	Sat, 23 Dec 2023 00:30:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1AD16C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0DC51C433C7;
 	Sat, 23 Dec 2023 00:30:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1703291426;
-	bh=DEBxA0a3DbUGEy+wDh9q9I2/DY1LYJS6opQJPvEnoUU=;
+	bh=hgmAaiMzKBq1y5mt7jfkVG6RaLKmk6mxp8EN9a6nwEA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oCdp59Ifg1LF1Vmh4ebbLKrEbnUiWOGw9/5OISuF2ExvvwxEE/LFRQL9rR1Z+jM5S
-	 BXwRPU2xI/sdOb4KWtNa8ywrDxMtP7M8TXp1qvYXJPYbXm84MSdvXFPDaWRWW6VtJB
-	 aetm4FM4hKRBHxwwLuIzT4P/RJQM3bpXQDBhesQ5Ypbr+0o519oxNIanBF9n8ZEwxJ
-	 yadSFMp2qrOGBjJ0JGow7IYmhfYE/IFNevB3aqjP23V2L7hybk/eJRdePOMIEOTWz2
-	 dbQW+Ee2LCkOyZxUy3r1BYul/xePuQ2aSsat63oDUUKnco/nYoW1U0OCrh1arqUtJv
-	 82lJBjtE/TegQ==
+	b=lhm8+48VF5q8akh34GtbsdCnts87FqB8lM6duk89LsJLBm1RJSYcmqfvnQkv77w1v
+	 kebhQK8Twc4/kF1dYSrimDjvDUSJXcnyMGllS7oXySZcKBmtCZ/7c00GM0zc0pbDjH
+	 ec/76+Xo0VmFSt5LBn+1eKZFGk6IyVldiznQjQk4OqyP5fHO34YWrsH3Y1QYRiA5Ii
+	 KbDJ4xK3ZsTe9FP5pG0IAvU+FWEJsA5n52aFzDn79ObLEQE2913ffeKOdnec4JedE9
+	 gbBRg3N7hHMAHHIye6gBqZI+w+tLS8/7hQwUVkgWdD3KoBuOpOJtkMAEvz86SnHwLP
+	 HKsRGBoIsYfOQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F04CFDD4EEA;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E8822DD4EE0;
 	Sat, 23 Dec 2023 00:30:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,38 +43,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] selftests/net: remove unneeded semicolon
+Subject: Re: [PATCH net-next 0/8] Convert net selftests to run in unique namespace
+ (last part)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170329142598.4887.4551927362465419413.git-patchwork-notify@kernel.org>
+ <170329142594.4887.13268245236275835692.git-patchwork-notify@kernel.org>
 Date: Sat, 23 Dec 2023 00:30:25 +0000
-References: <20231219055404.31978-1-jiapeng.chong@linux.alibaba.com>
-In-Reply-To: <20231219055404.31978-1-jiapeng.chong@linux.alibaba.com>
-To: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- abaci@linux.alibaba.com
+References: <20231219094856.1740079-1-liuhangbin@gmail.com>
+In-Reply-To: <20231219094856.1740079-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, dsahern@kernel.org,
+ linux-kselftest@vger.kernel.org, po-hsu.lin@canonical.com, fw@strlen.de,
+ kafai@fb.com, sbrivio@redhat.com, keescook@chromium.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue, 19 Dec 2023 13:54:04 +0800 you wrote:
-> No functional modification involved.
+On Tue, 19 Dec 2023 17:48:48 +0800 you wrote:
+> Here is the last part of converting net selftests to run in unique namespace.
+> This part converts all left tests. After the conversion, we can run the net
+> sleftests in parallel. e.g.
 > 
-> ./tools/testing/selftests/net/tcp_ao/setsockopt-closed.c:121:2-3: Unneeded semicolon.
-> 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=7771
-> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+>  # ./run_kselftest.sh -n -t net:reuseport_bpf
+>  TAP version 13
+>  1..1
+>  # selftests: net: reuseport_bpf
+>  ok 1 selftests: net: reuseport_bpf
+>   mod 10...
+>  # Socket 0: 0
+>  # Socket 1: 1
+>  ...
+>  # Socket 4: 19
+>  # Testing filter add without bind...
+>  # SUCCESS
 > 
 > [...]
 
 Here is the summary with links:
-  - selftests/net: remove unneeded semicolon
-    https://git.kernel.org/netdev/net-next/c/6530b29f77c8
+  - [net-next,1/8] selftests/net: convert gre_gso.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/b84c2faeb986
+  - [net-next,2/8] selftests/net: convert netns-name.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/f6476dedf08d
+  - [net-next,3/8] selftests/net: convert rtnetlink.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/d3b6b1116127
+  - [net-next,4/8] selftests/net: convert stress_reuseport_listen.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/098f1ce08bbc
+  - [net-next,5/8] selftests/net: convert xfrm_policy.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/976fd1fe4f58
+  - [net-next,6/8] selftests/net: use unique netns name for setup_loopback.sh setup_veth.sh
+    https://git.kernel.org/netdev/net-next/c/4416c5f53b43
+  - [net-next,7/8] selftests/net: convert pmtu.sh to run it in unique namespace
+    https://git.kernel.org/netdev/net-next/c/378f082eaf37
+  - [net-next,8/8] kselftest/runner.sh: add netns support
+    https://git.kernel.org/netdev/net-next/c/9d0b4ad82d61
 
 You are awesome, thank you!
 -- 
