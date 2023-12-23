@@ -1,155 +1,200 @@
-Return-Path: <netdev+bounces-60043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82F4881D204
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 04:55:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F18E81D223
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 05:22:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 239161F22ADD
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 03:55:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35CB9B2376D
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 04:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56FA1370;
-	Sat, 23 Dec 2023 03:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786DD10F4;
+	Sat, 23 Dec 2023 04:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OgbQWB2d"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB7E10F4;
-	Sat, 23 Dec 2023 03:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=26;SR=0;TI=SMTPD_---0Vz0J.hE_1703303701;
-Received: from 30.212.153.241(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0Vz0J.hE_1703303701)
-          by smtp.aliyun-inc.com;
-          Sat, 23 Dec 2023 11:55:04 +0800
-Message-ID: <d50555e9-3b8e-41d4-bec6-317aaaec5ff0@linux.alibaba.com>
-Date: Sat, 23 Dec 2023 11:55:00 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43DB9440
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 04:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-67f911e9ac4so11044656d6.3
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 20:22:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1703305357; x=1703910157; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JdaKJLn3fQqnuEM3cwtCDAqVF5Ov8LNOvZAl93yulyk=;
+        b=OgbQWB2dH8Mas5A9FuS6dGPL21V1BmHFerNQ0o10ryuooN6K9vbZJDLiGX5hzV3Phe
+         tmRVC5McWrQmD5FebSjiLLFOzd2aU6dzkPKt9GOpZggUka5m1Mxpvi7T40pWzs4jjimP
+         VgMwJ1qLoQugT5f/wgYqxFC2xmguKX5yRGIXI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703305357; x=1703910157;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JdaKJLn3fQqnuEM3cwtCDAqVF5Ov8LNOvZAl93yulyk=;
+        b=djB2laizNDrhw2XAezslBgHBwVU0HrZcFCFPgs3Ix9IEJjRlQyMm2iOdFYWiF+224O
+         vsD3vSYgp5IM1jZTX5/+RTUFAX+w0ughwEYC6a7AVZV8gdxXvGApJ76tgW7ugi1KpTnf
+         Kp+GhTwHix+/07tRy73aZTGzmV9TXCx/rUhNexpXGoiyAi+P/1/u3tcMPWYE7zXVfAHq
+         Hs1dQj4lCNONChCFWDLPdqyt01yyVmiRCjUKrWu7xQZfufeA8Xeg1zyVl5p203Lwh28Y
+         b+IerpkLNw0EQvt3vC/m3SLimTpHbhJPTHh8rTc1RtK9Gg7SVUHkowo577YH/wMYgdnK
+         X9iA==
+X-Gm-Message-State: AOJu0YxFKwRJC0jK5nobxJzrz2t2I1Dbtia7X59ph1JynjP8xypT9gnh
+	VBnkRc+Wksp1nmQbVi8UvqwEhookB5Il
+X-Google-Smtp-Source: AGHT+IH6jxjOon3fCgjsEANubFU75nK03kfdRxtmxQfmfdjPxWexQNgM9V+ocwqKMVT3nodvQ6eEcA==
+X-Received: by 2002:a05:6214:ca4:b0:67f:5db:f4f2 with SMTP id s4-20020a0562140ca400b0067f05dbf4f2mr3425852qvs.52.1703305356131;
+        Fri, 22 Dec 2023 20:22:36 -0800 (PST)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id ek5-20020ad45985000000b0067f8046a1acsm1299916qvb.144.2023.12.22.20.22.34
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Dec 2023 20:22:35 -0800 (PST)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com
+Subject: [PATCH net-next v2 00/13] bnxt_en: Add basic ntuple filter support
+Date: Fri, 22 Dec 2023 20:21:57 -0800
+Message-Id: <20231223042210.102485-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.32.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Fix EROFS Kconfig
-Content-Language: en-US
-To: David Howells <dhowells@redhat.com>, Gao Xiang <xiang@kernel.org>
-Cc: Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
- Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
- Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- Jeff Layton <jlayton@kernel.org>
-References: <20231221132400.1601991-5-dhowells@redhat.com>
- <20231221132400.1601991-1-dhowells@redhat.com>
- <2265065.1703250126@warthog.procyon.org.uk>
-From: Jingbo Xu <jefflexu@linux.alibaba.com>
-In-Reply-To: <2265065.1703250126@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000c03d63060d25aec5"
 
-Hi,
+--000000000000c03d63060d25aec5
+Content-Transfer-Encoding: 8bit
 
-On 12/22/23 9:02 PM, David Howells wrote:
-> This needs an additional change (see attached).
-> 
-> diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
-> index 1d318f85232d..1949763e66aa 100644
-> --- a/fs/erofs/Kconfig
-> +++ b/fs/erofs/Kconfig
-> @@ -114,7 +114,8 @@ config EROFS_FS_ZIP_DEFLATE
->  
->  config EROFS_FS_ONDEMAND
->  	bool "EROFS fscache-based on-demand read support"
-> -	depends on CACHEFILES_ONDEMAND && (EROFS_FS=m && FSCACHE || EROFS_FS=y && FSCACHE=y)
-> +	depends on CACHEFILES_ONDEMAND && FSCACHE && \
-> +		(EROFS_FS=m && NETFS_SUPPORT || EROFS_FS=y && NETFS_SUPPORT=y)
->  	default n
->  	help
->  	  This permits EROFS to use fscache-backed data blobs with on-demand
-> 
+The current driver only supports ntuple filters added by aRFS.  This
+patch series adds basic support for user defined TCP/UDP ntuple filters
+added by the user using ethtool.  Many of the patches are refactoring
+patches to make the existing code more general to support both aRFS
+and user defined filters.  aRFS filters always have the Toeplitz hash
+value from the NIC.  A Toepliz hash function is added in patch 5 to
+get the same hash value for user defined filters.  The hash is used
+to store all ntuple filters in the table and all filters must be
+hashed identically using the same function and key.
 
-Thanks for the special reminder.  I noticed that it has been included in
-this commit[*] in the dev tree.
+v2: Fix compile error in patch #4 when CONFIG_BNXT_SRIOV is disabled.
 
-[*]
-https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/commit/?h=netfs-lib&id=7472173cc3baf4a0bd8c803e56c37efdb8388f1c
+Michael Chan (12):
+  bnxt_en: Refactor bnxt_ntuple_filter structure.
+  bnxt_en: Add bnxt_l2_filter hash table.
+  bnxt_en: Re-structure the bnxt_ntuple_filter structure.
+  bnxt_en: Refactor L2 filter alloc/free firmware commands.
+  bnxt_en: Add bnxt_lookup_ntp_filter_from_idx() function
+  bnxt_en: Add new BNXT_FLTR_INSERTED flag to bnxt_filter_base struct.
+  bnxt_en: Refactor filter insertion logic in bnxt_rx_flow_steer().
+  bnxt_en: Refactor the hash table logic for ntuple filters.
+  bnxt_en: Refactor ntuple filter removal logic in
+    bnxt_cfg_ntp_filters().
+  bnxt_en: Add ntuple matching flags to the bnxt_ntuple_filter
+    structure.
+  bnxt_en: Add support for ntuple filters added from ethtool.
+  bnxt_en: Add support for ntuple filter deletion by ethtool.
 
+Pavan Chebbi (1):
+  bnxt_en: Add function to calculate Toeplitz hash
 
-Besides I noticed an issue when trying to configure EROFS_FS_ONDEMAND.
-The above kconfig indicates that EROFS_FS_ONDEMAND depends on
-NETFS_SUPPORT, while NETFS_SUPPORT has no prompt in menuconfig and can
-only be selected by, e.g. fs/ceph/Kconfig:
-
-	config CEPH_FS
-        select NETFS_SUPPORT
-
-IOW EROFS_FS_ONDEMAND will not be prompted and has no way being
-configured if NETFS_SUPPORT itself is not selected by any other filesystem.
-
-
-I tried to fix this in following way:
-
-diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
-index 1949763e66aa..5b7b71e537f1 100644
---- a/fs/erofs/Kconfig
-+++ b/fs/erofs/Kconfig
-@@ -5,6 +5,7 @@ config EROFS_FS
-        depends on BLOCK
-        select FS_IOMAP
-        select LIBCRC32C
-+       select NETFS_SUPPORT if EROFS_FS_ONDEMAND
-        help
-          EROFS (Enhanced Read-Only File System) is a lightweight read-only
-          file system with modern designs (e.g. no buffer heads, inline
-@@ -114,8 +115,10 @@ config EROFS_FS_ZIP_DEFLATE
-
- config EROFS_FS_ONDEMAND
-        bool "EROFS fscache-based on-demand read support"
--       depends on CACHEFILES_ONDEMAND && FSCACHE && \
--               (EROFS_FS=m && NETFS_SUPPORT || EROFS_FS=y &&
-NETFS_SUPPORT=y)
-+       depends on EROFS_FS
-+       select FSCACHE
-        default n
-        help
-          This permits EROFS to use fscache-backed data blobs with on-demand
-
-
-But still the dependency for CACHEFILES_ONDEMAND and CACHEFILES can not
-be resolved.  Though CACHEFILES is not a must during the linking stage
-as EROFS only calls fscache APIs directly, CACHEFILES is indeed needed
-to ensure that the EROFS on-demand functionality works at runtime.
-
-If we let EROFS_FS_ONDEMAND select CACHEFILES_ONDEMAND, then only
-CACHEFILES_ONDEMAND will be selected while CACHEFILES can be still N.
-Maybe EROFS_FS_ONDEMAND needs to selct both CACHEFILES_ONDEMAND and
-CACHEFILES?
-
-Besides if we make EROFS_FS_ONDEMAND depends on CACHEFILES_ONDEMAND,
-then there will be a recursive dependency loop, as
-
-fs/netfs/Kconfig:3:error: recursive dependency detected!
-fs/netfs/Kconfig:3:	symbol NETFS_SUPPORT is selected by EROFS_FS_ONDEMAND
-fs/erofs/Kconfig:116:	symbol EROFS_FS_ONDEMAND depends on
-CACHEFILES_ONDEMAND
-fs/cachefiles/Kconfig:30:	symbol CACHEFILES_ONDEMAND depends on CACHEFILES
-fs/cachefiles/Kconfig:3:	symbol CACHEFILES depends on NETFS_SUPPORT
-
-
-Hi Xiang, any better idea?
-
-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 719 +++++++++++++-----
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  92 ++-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 371 +++++++--
+ 3 files changed, 936 insertions(+), 246 deletions(-)
 
 -- 
-Thanks,
-Jingbo
+2.30.1
+
+
+--000000000000c03d63060d25aec5
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGir3dkBFDlK6QUhiamarxw6ZdeO5ETi
+1kpbNvPCU3ImMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
+MzA0MjIzN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQA5WDZ+hkP86bxhi8Tuggf9thEbVUD08yPxtaemW3M2JUPe4JHx
+RTKW8Mu2LjsSO7vIJe6HFcFgEBhASEFXFA9cVs+4iXY1JjzcnaAtWXR+OrWuQpB2a7TBLALzxfLu
+uy3O++BXRkncY8EVP0I3XcENqol/eGRAiPEKoOCsqHIE8sLZIHWk6ZXDnYM7BqZ0SS6JlPv9CVeg
+WB5c4SApgA1Gr90ah2jwaZxAdWu3AzcHuBHOa2wxOpGBmT5DzcX9E8RFeObqN0+h2a/79iIqlbd1
+WAiuxQNMUnXzkpmIy70Jbq6aBjrH7aPDYzYDXkQAh/L8TDHX9qZSe55PmyxAhi8r
+--000000000000c03d63060d25aec5--
 
