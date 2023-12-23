@@ -1,130 +1,92 @@
-Return-Path: <netdev+bounces-60060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7889481D2AF
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 07:23:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D8B81D2C4
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 07:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 182781F23289
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 06:23:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31BB21C224F0
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 06:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADB753A6;
-	Sat, 23 Dec 2023 06:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F136E4A11;
+	Sat, 23 Dec 2023 06:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GwIM5UA+"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fq9ZAJdV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738556AB6
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 06:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703312624; x=1734848624;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BmsPPm3X9FukrKuoK8rzzxZ/RObXZnA0uGPF96SNcDw=;
-  b=GwIM5UA+yveVtXtxuJi0mmx7hllH0FIe9OaAyx1aAN5Lij89TuPFcrm0
-   FAon2qZ4IWN7HWakm351TqpauCdzZ874pF610B7Z7jCe7uXeOrNaWApQo
-   SZJxDI84WAz+YdJqIZWK84C9+RfANJEOitZwSxt2c1coQOzAOpTVDuQyQ
-   Ztpbo5g6Y/KmtV0lmhsyJqJQgxP3vxja9oNEj6DDLBolJwosO6IlLHrmJ
-   NRAtqdkPdgUXToHI+r56ZPIItbpNl1xhQzcrWbniuHO0GyDO8yK5CzdRK
-   2Tex5qx10M0VHoJPC+VGzVlaaxk/AmkCCk+V2KqjfEfu8JrGJ2XBolGB0
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="381166661"
-X-IronPort-AV: E=Sophos;i="6.04,298,1695711600"; 
-   d="scan'208";a="381166661"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2023 22:23:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="780808569"
-X-IronPort-AV: E=Sophos;i="6.04,298,1695711600"; 
-   d="scan'208";a="780808569"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga007.fm.intel.com with ESMTP; 22 Dec 2023 22:23:40 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rGvQ3-000ANF-15;
-	Sat, 23 Dec 2023 06:23:37 +0000
-Date: Sat, 23 Dec 2023 14:22:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: Re: [PATCH net-next 04/13] bnxt_en: Refactor L2 filter alloc/free
- firmware commands.
-Message-ID: <202312231448.DVjORC4c-lkp@intel.com>
-References: <20231221220218.197386-5-michael.chan@broadcom.com>
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.196])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84C59440;
+	Sat, 23 Dec 2023 06:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=vOQW7
+	eM1tXoOjk7SXdvzeBTeJxvvs01bGEkLMLHzGlM=; b=fq9ZAJdVBLs2TEdvyWkE0
+	g0eWgruRMKOKe2oYEZaTWgRw1gVQ0Ei51CyupvPQDrcW9gRibFxRXJWK5W/eLVlw
+	Hm7A8Mqp8RU4FjDVJIsa7McLmvVPy6ANlwq4vfkjavOLYMkNKztbKCfS7TZWubDC
+	HTN1InDfPTHDN8ZdZ2DwMY=
+Received: from localhost.localdomain (unknown [111.202.47.2])
+	by zwqz-smtp-mta-g4-2 (Coremail) with SMTP id _____wD3n6RYg4ZlvWoXBA--.33533S2;
+	Sat, 23 Dec 2023 14:51:04 +0800 (CST)
+From: wangkeqi <wangkeqi_chris@163.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wangkeqi <wangkeqiwang@didiglobal.com>
+Subject: [PATCH] connector: Fix proc_event_num_listeners count not cleared
+Date: Sat, 23 Dec 2023 14:50:32 +0800
+Message-Id: <20231223065032.20498-1-wangkeqi_chris@163.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231221220218.197386-5-michael.chan@broadcom.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3n6RYg4ZlvWoXBA--.33533S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7XFykGrWkAw4xKFyfJFWUurg_yoW8JrWfpF
+	ZrurWjyF48XayxWwn8JF4j9FyrXaykXry2kF4xG3sxWrn8WrZ2qF4rtFZF9a43J348Kr1Y
+	vw1qqF98uan8CaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jSjgxUUUUU=
+X-CM-SenderInfo: 5zdqwy5htlsupkul2qqrwthudrp/1tbiQBxP3GVOAnnTogAAsu
 
-Hi Michael,
+From: wangkeqi <wangkeqiwang@didiglobal.com>
 
-kernel test robot noticed the following build errors:
+When we register a cn_proc listening event, the proc_event_num_listener
+variable will be incremented by one, but if PROC_CN_MCAST_IGNORE is
+not called, the count will not decrease.
+This will cause the proc_*_connector function to take the wrong path.
+It will reappear when the forkstat tool exits via ctrl + c.
+We solve this problem by determining whether
+there are still listeners to clear proc_event_num_listener.
 
-[auto build test ERROR on net-next/main]
+Signed-off-by: wangkeqi <wangkeqiwang@didiglobal.com>
+---
+ drivers/connector/cn_proc.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Chan/bnxt_en-Refactor-bnxt_ntuple_filter-structure/20231222-174043
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231221220218.197386-5-michael.chan%40broadcom.com
-patch subject: [PATCH net-next 04/13] bnxt_en: Refactor L2 filter alloc/free firmware commands.
-config: powerpc-randconfig-001-20231223 (https://download.01.org/0day-ci/archive/20231223/202312231448.DVjORC4c-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231223/202312231448.DVjORC4c-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312231448.DVjORC4c-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/net/ethernet/broadcom/bnxt/bnxt.c:5443:35: error: subscript of pointer to incomplete type 'struct bnxt_vf_info'
-           struct bnxt_vf_info *vf = &pf->vf[vf_idx];
-                                      ~~~~~~^
-   drivers/net/ethernet/broadcom/bnxt/bnxt.h:1332:9: note: forward declaration of 'struct bnxt_vf_info'
-           struct bnxt_vf_info     *vf;
-                  ^
->> drivers/net/ethernet/broadcom/bnxt/bnxt.c:5445:11: error: incomplete definition of type 'struct bnxt_vf_info'
-           return vf->fw_fid;
-                  ~~^
-   drivers/net/ethernet/broadcom/bnxt/bnxt.h:1332:9: note: forward declaration of 'struct bnxt_vf_info'
-           struct bnxt_vf_info     *vf;
-                  ^
-   drivers/net/ethernet/broadcom/bnxt/bnxt.c:13583:44: warning: shift count >= width of type [-Wshift-count-overflow]
-           if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64)) != 0 &&
-                                                     ^~~~~~~~~~~~~~~~
-   include/linux/dma-mapping.h:77:54: note: expanded from macro 'DMA_BIT_MASK'
-   #define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
-                                                        ^ ~~~
-   1 warning and 2 errors generated.
-
-
-vim +5443 drivers/net/ethernet/broadcom/bnxt/bnxt.c
-
-  5440	
-  5441	static u16 bnxt_vf_target_id(struct bnxt_pf_info *pf, u16 vf_idx)
-  5442	{
-> 5443		struct bnxt_vf_info *vf = &pf->vf[vf_idx];
-  5444	
-> 5445		return vf->fw_fid;
-  5446	}
-  5447	
-
+diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
+index 44b19e696..3d5e6d705 100644
+--- a/drivers/connector/cn_proc.c
++++ b/drivers/connector/cn_proc.c
+@@ -108,8 +108,9 @@ static inline void send_msg(struct cn_msg *msg)
+ 		filter_data[1] = 0;
+ 	}
+ 
+-	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
+-			     cn_filter, (void *)filter_data);
++	if (cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
++			     cn_filter, (void *)filter_data) == -ESRCH)
++		atomic_set(&proc_event_num_listeners, 0);
+ 
+ 	local_unlock(&local_event.lock);
+ }
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.27.0
+
 
