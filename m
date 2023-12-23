@@ -1,177 +1,178 @@
-Return-Path: <netdev+bounces-60070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3247381D425
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:08:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E452A81D42E
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:32:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C5BFB215BC
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 13:08:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E6311F22536
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 13:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D40AD2F2;
-	Sat, 23 Dec 2023 13:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nsOfF3qK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE224D314;
+	Sat, 23 Dec 2023 13:32:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60D7D2E4
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 13:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703336898; x=1734872898;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MpQqVfyCGYPIBmeczRWmjfwjXI8tjDbCoscWLJwemlo=;
-  b=nsOfF3qKkjUoo/ANKL+imw4TB8MqFKv+tqeMAK2cgh9QOGdqguUxICB5
-   VBGJvv7KvRQZBVBM6VyoG0WKf8jLa3golX7w7fJQPDcs95c6xuZmALkSG
-   Ehfz3Eo8yGc+X3Hy8O4XqYEi2hMEYCbibKKJrmP1eW8MHIWKEXtrmi9sW
-   qQpKa02NAAeWo2jPmxT9gmhEpCBxJTDqvsN7OsaEtr4yvOtOf3ADCUTms
-   5n8dRz6Ss3CcaZbzvfZHVQpV3PDdsHfZqxEkUDd+FsCLW+Ya+/ccYcT0g
-   52TYNHOYCv5WUrX9ZdIwNZ37EHohVgRTf1flDc3eVCJI4DQe5uIkoGLdz
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="427360766"
-X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
-   d="scan'208";a="427360766"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2023 05:08:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10932"; a="867979835"
-X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
-   d="scan'208";a="867979835"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 23 Dec 2023 05:08:15 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rH1it-000B3h-1s;
-	Sat, 23 Dec 2023 13:07:37 +0000
-Date: Sat, 23 Dec 2023 21:07:20 +0800
-From: kernel test robot <lkp@intel.com>
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: Re: [PATCH net-next 08/13] bnxt_en: Refactor filter insertion logic
- in bnxt_rx_flow_steer().
-Message-ID: <202312232032.AGxw3c0P-lkp@intel.com>
-References: <20231221220218.197386-9-michael.chan@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858E4D505;
+	Sat, 23 Dec 2023 13:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=27;SR=0;TI=SMTPD_---0Vz1O0tF_1703338328;
+Received: from 30.25.242.252(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Vz1O0tF_1703338328)
+          by smtp.aliyun-inc.com;
+          Sat, 23 Dec 2023 21:32:11 +0800
+Message-ID: <fac01751-73dc-4d93-b9c0-b637fece8334@linux.alibaba.com>
+Date: Sat, 23 Dec 2023 21:32:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231221220218.197386-9-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Fix EROFS Kconfig
+To: Jingbo Xu <jefflexu@linux.alibaba.com>,
+ David Howells <dhowells@redhat.com>, Gao Xiang <xiang@kernel.org>
+Cc: Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
+ Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
+ Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
+ Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+ linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ Jeff Layton <jlayton@kernel.org>
+References: <20231221132400.1601991-5-dhowells@redhat.com>
+ <20231221132400.1601991-1-dhowells@redhat.com>
+ <2265065.1703250126@warthog.procyon.org.uk>
+ <d50555e9-3b8e-41d4-bec6-317aaaec5ff0@linux.alibaba.com>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <d50555e9-3b8e-41d4-bec6-317aaaec5ff0@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Michael,
+Hi David and Jingbo,
 
-kernel test robot noticed the following build errors:
+On 2023/12/23 11:55, Jingbo Xu wrote:
+> Hi,
+> 
+> On 12/22/23 9:02 PM, David Howells wrote:
+>> This needs an additional change (see attached).
+>>
+>> diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
+>> index 1d318f85232d..1949763e66aa 100644
+>> --- a/fs/erofs/Kconfig
+>> +++ b/fs/erofs/Kconfig
+>> @@ -114,7 +114,8 @@ config EROFS_FS_ZIP_DEFLATE
+>>   
+>>   config EROFS_FS_ONDEMAND
+>>   	bool "EROFS fscache-based on-demand read support"
+>> -	depends on CACHEFILES_ONDEMAND && (EROFS_FS=m && FSCACHE || EROFS_FS=y && FSCACHE=y)
+>> +	depends on CACHEFILES_ONDEMAND && FSCACHE && \
+>> +		(EROFS_FS=m && NETFS_SUPPORT || EROFS_FS=y && NETFS_SUPPORT=y)
+>>   	default n
+>>   	help
+>>   	  This permits EROFS to use fscache-backed data blobs with on-demand
+>>
+> 
+> Thanks for the special reminder.  I noticed that it has been included in
+> this commit[*] in the dev tree.
+> 
+> [*]
+> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/commit/?h=netfs-lib&id=7472173cc3baf4a0bd8c803e56c37efdb8388f1c
+> 
+> 
+> Besides I noticed an issue when trying to configure EROFS_FS_ONDEMAND.
+> The above kconfig indicates that EROFS_FS_ONDEMAND depends on
+> NETFS_SUPPORT, while NETFS_SUPPORT has no prompt in menuconfig and can
+> only be selected by, e.g. fs/ceph/Kconfig:
+> 
+> 	config CEPH_FS
+>          select NETFS_SUPPORT
+> 
+> IOW EROFS_FS_ONDEMAND will not be prompted and has no way being
+> configured if NETFS_SUPPORT itself is not selected by any other filesystem.
+> 
+> 
+> I tried to fix this in following way:
+> 
+> diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
+> index 1949763e66aa..5b7b71e537f1 100644
+> --- a/fs/erofs/Kconfig
+> +++ b/fs/erofs/Kconfig
+> @@ -5,6 +5,7 @@ config EROFS_FS
+>          depends on BLOCK
+>          select FS_IOMAP
+>          select LIBCRC32C
+> +       select NETFS_SUPPORT if EROFS_FS_ONDEMAND
+>          help
+>            EROFS (Enhanced Read-Only File System) is a lightweight read-only
+>            file system with modern designs (e.g. no buffer heads, inline
+> @@ -114,8 +115,10 @@ config EROFS_FS_ZIP_DEFLATE
+> 
+>   config EROFS_FS_ONDEMAND
+>          bool "EROFS fscache-based on-demand read support"
+> -       depends on CACHEFILES_ONDEMAND && FSCACHE && \
+> -               (EROFS_FS=m && NETFS_SUPPORT || EROFS_FS=y &&
+> NETFS_SUPPORT=y)
+> +       depends on EROFS_FS
+> +       select FSCACHE
+>          default n
+>          help
+>            This permits EROFS to use fscache-backed data blobs with on-demand
+> 
+> 
+> But still the dependency for CACHEFILES_ONDEMAND and CACHEFILES can not
+> be resolved.  Though CACHEFILES is not a must during the linking stage
+> as EROFS only calls fscache APIs directly, CACHEFILES is indeed needed
+> to ensure that the EROFS on-demand functionality works at runtime.
+> 
+> If we let EROFS_FS_ONDEMAND select CACHEFILES_ONDEMAND, then only
+> CACHEFILES_ONDEMAND will be selected while CACHEFILES can be still N.
+> Maybe EROFS_FS_ONDEMAND needs to selct both CACHEFILES_ONDEMAND and
+> CACHEFILES?
 
-[auto build test ERROR on net-next/main]
+I think the main point here is that we don't have an explicit
+menuconfig item for either netfs or fscache directly.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Chan/bnxt_en-Refactor-bnxt_ntuple_filter-structure/20231222-174043
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231221220218.197386-9-michael.chan%40broadcom.com
-patch subject: [PATCH net-next 08/13] bnxt_en: Refactor filter insertion logic in bnxt_rx_flow_steer().
-config: powerpc-randconfig-001-20231223 (https://download.01.org/0day-ci/archive/20231223/202312232032.AGxw3c0P-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231223/202312232032.AGxw3c0P-lkp@intel.com/reproduce)
+In principle, EROFS ondemand feature only needs fscache "volume
+and cookie" management framework as well as cachefiles since
+they're all needed to manage EROFS cached blobs, but I'm fine
+if that needs NETFS_SUPPORT is also enabled.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312232032.AGxw3c0P-lkp@intel.com/
+If netfs doesn't have a plan for a new explicit menuconfig
+item for users to use, I think we have to enable as below:
 
-All errors (new ones prefixed by >>):
+diff --git a/fs/erofs/Kconfig b/fs/erofs/Kconfig
+index 1d318f85232d..fffd3919343e 100644
+--- a/fs/erofs/Kconfig
++++ b/fs/erofs/Kconfig
+@@ -114,8 +114,11 @@ config EROFS_FS_ZIP_DEFLATE
 
-   drivers/net/ethernet/broadcom/bnxt/bnxt.c:5524:35: error: subscript of pointer to incomplete type 'struct bnxt_vf_info'
-           struct bnxt_vf_info *vf = &pf->vf[vf_idx];
-                                      ~~~~~~^
-   drivers/net/ethernet/broadcom/bnxt/bnxt.h:1332:9: note: forward declaration of 'struct bnxt_vf_info'
-           struct bnxt_vf_info     *vf;
-                  ^
-   drivers/net/ethernet/broadcom/bnxt/bnxt.c:5526:11: error: incomplete definition of type 'struct bnxt_vf_info'
-           return vf->fw_fid;
-                  ~~^
-   drivers/net/ethernet/broadcom/bnxt/bnxt.h:1332:9: note: forward declaration of 'struct bnxt_vf_info'
-           struct bnxt_vf_info     *vf;
-                  ^
-   drivers/net/ethernet/broadcom/bnxt/bnxt.c:13652:44: warning: shift count >= width of type [-Wshift-count-overflow]
-           if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64)) != 0 &&
-                                                     ^~~~~~~~~~~~~~~~
-   include/linux/dma-mapping.h:77:54: note: expanded from macro 'DMA_BIT_MASK'
-   #define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
-                                                        ^ ~~~
->> drivers/net/ethernet/broadcom/bnxt/bnxt.c:14024:9: error: implicit declaration of function 'rps_may_expire_flow' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-                                   if (rps_may_expire_flow(bp->dev, fltr->base.rxq,
-                                       ^
-   1 warning and 3 errors generated.
+  config EROFS_FS_ONDEMAND
+  	bool "EROFS fscache-based on-demand read support"
+-	depends on CACHEFILES_ONDEMAND && (EROFS_FS=m && FSCACHE || EROFS_FS=y && FSCACHE=y)
+-	default n
++	depends on EROFS_FS
++	select NETFS_SUPPORT
++	select FSCACHE
++	select CACHEFILES
++	select CACHEFILES_ONDEMAND
+  	help
+  	  This permits EROFS to use fscache-backed data blobs with on-demand
+  	  read support.
+--
+2.39.3
 
+But cachefiles won't be complied as modules anymore. Does it
+sounds good?
 
-vim +/rps_may_expire_flow +14024 drivers/net/ethernet/broadcom/bnxt/bnxt.c
-
-c0c050c58d8409 Michael Chan   2015-10-22  14008  
-c0c050c58d8409 Michael Chan   2015-10-22  14009  static void bnxt_cfg_ntp_filters(struct bnxt *bp)
-c0c050c58d8409 Michael Chan   2015-10-22  14010  {
-c0c050c58d8409 Michael Chan   2015-10-22  14011  	int i;
-c0c050c58d8409 Michael Chan   2015-10-22  14012  
-c0c050c58d8409 Michael Chan   2015-10-22  14013  	for (i = 0; i < BNXT_NTP_FLTR_HASH_SIZE; i++) {
-c0c050c58d8409 Michael Chan   2015-10-22  14014  		struct hlist_head *head;
-c0c050c58d8409 Michael Chan   2015-10-22  14015  		struct hlist_node *tmp;
-c0c050c58d8409 Michael Chan   2015-10-22  14016  		struct bnxt_ntuple_filter *fltr;
-c0c050c58d8409 Michael Chan   2015-10-22  14017  		int rc;
-c0c050c58d8409 Michael Chan   2015-10-22  14018  
-c0c050c58d8409 Michael Chan   2015-10-22  14019  		head = &bp->ntp_fltr_hash_tbl[i];
-25f995fba56014 Michael Chan   2023-12-21  14020  		hlist_for_each_entry_safe(fltr, tmp, head, base.hash) {
-c0c050c58d8409 Michael Chan   2015-10-22  14021  			bool del = false;
-c0c050c58d8409 Michael Chan   2015-10-22  14022  
-25f995fba56014 Michael Chan   2023-12-21  14023  			if (test_bit(BNXT_FLTR_VALID, &fltr->base.state)) {
-25f995fba56014 Michael Chan   2023-12-21 @14024  				if (rps_may_expire_flow(bp->dev, fltr->base.rxq,
-c0c050c58d8409 Michael Chan   2015-10-22  14025  							fltr->flow_id,
-25f995fba56014 Michael Chan   2023-12-21  14026  							fltr->base.sw_id)) {
-c0c050c58d8409 Michael Chan   2015-10-22  14027  					bnxt_hwrm_cfa_ntuple_filter_free(bp,
-c0c050c58d8409 Michael Chan   2015-10-22  14028  									 fltr);
-c0c050c58d8409 Michael Chan   2015-10-22  14029  					del = true;
-c0c050c58d8409 Michael Chan   2015-10-22  14030  				}
-c0c050c58d8409 Michael Chan   2015-10-22  14031  			} else {
-c0c050c58d8409 Michael Chan   2015-10-22  14032  				rc = bnxt_hwrm_cfa_ntuple_filter_alloc(bp,
-c0c050c58d8409 Michael Chan   2015-10-22  14033  								       fltr);
-c0c050c58d8409 Michael Chan   2015-10-22  14034  				if (rc)
-c0c050c58d8409 Michael Chan   2015-10-22  14035  					del = true;
-c0c050c58d8409 Michael Chan   2015-10-22  14036  				else
-25f995fba56014 Michael Chan   2023-12-21  14037  					set_bit(BNXT_FLTR_VALID, &fltr->base.state);
-c0c050c58d8409 Michael Chan   2015-10-22  14038  			}
-c0c050c58d8409 Michael Chan   2015-10-22  14039  
-c0c050c58d8409 Michael Chan   2015-10-22  14040  			if (del) {
-c0c050c58d8409 Michael Chan   2015-10-22  14041  				spin_lock_bh(&bp->ntp_fltr_lock);
-86982cc60c9a86 Michael Chan   2023-12-21  14042  				if (!test_and_clear_bit(BNXT_FLTR_INSERTED, &fltr->base.state)) {
-86982cc60c9a86 Michael Chan   2023-12-21  14043  					spin_unlock_bh(&bp->ntp_fltr_lock);
-86982cc60c9a86 Michael Chan   2023-12-21  14044  					continue;
-86982cc60c9a86 Michael Chan   2023-12-21  14045  				}
-25f995fba56014 Michael Chan   2023-12-21  14046  				hlist_del_rcu(&fltr->base.hash);
-c0c050c58d8409 Michael Chan   2015-10-22  14047  				bp->ntp_fltr_count--;
-c0c050c58d8409 Michael Chan   2015-10-22  14048  				spin_unlock_bh(&bp->ntp_fltr_lock);
-9fa270ccc095df Michael Chan   2023-12-21  14049  				bnxt_del_l2_filter(bp, fltr->l2_fltr);
-c0c050c58d8409 Michael Chan   2015-10-22  14050  				synchronize_rcu();
-25f995fba56014 Michael Chan   2023-12-21  14051  				clear_bit(fltr->base.sw_id, bp->ntp_fltr_bmap);
-c0c050c58d8409 Michael Chan   2015-10-22  14052  				kfree(fltr);
-c0c050c58d8409 Michael Chan   2015-10-22  14053  			}
-c0c050c58d8409 Michael Chan   2015-10-22  14054  		}
-c0c050c58d8409 Michael Chan   2015-10-22  14055  	}
-19241368443ff9 Jeffrey Huang  2016-02-26  14056  	if (test_and_clear_bit(BNXT_HWRM_PF_UNLOAD_SP_EVENT, &bp->sp_event))
-9a005c3898aa07 Jonathan Lemon 2020-02-24  14057  		netdev_info(bp->dev, "Receive PF driver unload event!\n");
-c0c050c58d8409 Michael Chan   2015-10-22  14058  }
-c0c050c58d8409 Michael Chan   2015-10-22  14059  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Gao Xiang
 
