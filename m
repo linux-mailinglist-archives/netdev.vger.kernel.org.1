@@ -1,136 +1,106 @@
-Return-Path: <netdev+bounces-60115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95E7181D73D
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 00:34:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BCB981D741
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 00:36:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4016A1F2185C
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 23:34:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FD721C2101E
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 23:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396BF18E17;
-	Sat, 23 Dec 2023 23:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846A619BD3;
+	Sat, 23 Dec 2023 23:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BIwArM19"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cPpeo/+D"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD19B1D53A
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 23:34:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703374478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R6MwvTNgc3edtUi1oD2vuk843ZSwVQ67y6EiHuffl3Q=;
-	b=BIwArM198Y63jmtTzb//YZZO68MbriEysh40Mc6j31T4vlHcBWC+Aq7l0P6Qg4Ogl8n3AX
-	b5ksB2ggzZduUKUG62W4zkPh/Jkyo1M8t/W3VNyzxgPpNZLYlnWETRvTWXQ4/D20jmG7v4
-	YhAbgsIUpLt0rN4h5644QzSzw4Zhk58=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-646-9lITgyanOQahtKf1ir0iaA-1; Sat, 23 Dec 2023 18:34:34 -0500
-X-MC-Unique: 9lITgyanOQahtKf1ir0iaA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F06B9807F54;
-	Sat, 23 Dec 2023 23:34:33 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0546951D5;
-	Sat, 23 Dec 2023 23:34:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <0000000000009b39bc060c73e209@google.com>
-References: <0000000000009b39bc060c73e209@google.com>
-To: syzbot <syzbot+94bbb75204a05da3d89f@syzkaller.appspotmail.com>
-Cc: dhowells@redhat.com, davem@davemloft.net, edumazet@google.com,
-    jarkko@kernel.org, jmorris@namei.org, keyrings@vger.kernel.org,
-    kuba@kernel.org, linux-kernel@vger.kernel.org,
-    linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-    pabeni@redhat.com, paul@paul-moore.com, serge@hallyn.com,
-    syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] KASAN: slab-out-of-bounds Read in dns_resolver_preparse
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3641D527;
+	Sat, 23 Dec 2023 23:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-554ae571341so313851a12.1;
+        Sat, 23 Dec 2023 15:36:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703374575; x=1703979375; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=29EMoIYluWAxowNn35akgo5ZU3ui59UzWlGkKdTNPS8=;
+        b=cPpeo/+DDbg97Z/uMU9Err1ZLkNtfB7Ld5Nek5BjdqzrDlBwYXOTQ7/4aPBwvk7RUD
+         P/k4TBN3nmFLzU+EWn60ELJ94NhjUx4PhJ6UoGQWhxlFsBZsR3qOAJb9sVFawAYnihoa
+         jhIv6DN7+w+P51KNVIogpdmK3xqUeqC0lR95z7MaJcbexmN8ny+Rd72wMWvnq9+6xx5r
+         vPVxzYyq+tAE2Z4yMTYgPXDx0QXKL0waceGtJwpKbVIedkgM3keV+oOApPW6FamFJrZ6
+         d7ds7GY8SXdxEm8oD99nDBbIaGlErNtoHyLmuyT/myvLMfDV41jqnjF5dDaq3paIz/yo
+         cZlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703374575; x=1703979375;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=29EMoIYluWAxowNn35akgo5ZU3ui59UzWlGkKdTNPS8=;
+        b=Pe7OyhcrGszFUr8qy2AU9CVMkKJOluWljCvszPdgEgtBTfqBqjuZFUA0K5Cfm8ccYz
+         QRNW2+Nx7gqC9gdLPaPO/0LOn3g3HENuqvSLg/yh68W8BLQlZY/fHx2QHNOU8IDgouHr
+         cPSu/aQL74QMzNDZiOWbt/a/A/1SQS4sBiabByslqEa/nAMHgR2CnSivp+y+vwFL3PBf
+         gCKqWlUzce70U2c3v7zptUGiF9EwwP1Uj/6a5yosI4RL4DQquxze+1PjkNT4DbwoAPDx
+         PKiQ8s9+AARO5ETeNoxB2dthDxaaUWlHldr5e5Gi7W8MUBXIpgEOSB/2mPq5FkNoiACk
+         QBmw==
+X-Gm-Message-State: AOJu0Yyi8QQ2lCWqSot6l1cSYgNh52r5iDSasTx6diybvYYFCB6UBg1U
+	GFNeO3mV5CJu/+fP5V9OgXk=
+X-Google-Smtp-Source: AGHT+IEbdbFV/XUqsIdTT8Cecpt5mzbVRU09mEu6QbZDa2yrAmwDjRdOigSYiup4qbUHBpR5xWPnUg==
+X-Received: by 2002:a17:906:cb81:b0:a23:6d24:94cd with SMTP id mf1-20020a170906cb8100b00a236d2494cdmr1698251ejb.14.1703374574683;
+        Sat, 23 Dec 2023 15:36:14 -0800 (PST)
+Received: from localhost ([5.255.99.108])
+        by smtp.gmail.com with ESMTPSA id jt4-20020a170906dfc400b00a2369d8ca07sm3472088ejc.203.2023.12.23.15.36.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Dec 2023 15:36:14 -0800 (PST)
+From: Maxim Mikityanskiy <maxtram95@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Hayes Wang <hayeswang@realtek.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Douglas Anderson <dianders@chromium.org>,
+	Grant Grundler <grundler@chromium.org>,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Maxim Mikityanskiy <maxtram95@gmail.com>
+Subject: [PATCH net 0/2] r8152: Fix a regression with usbguard
+Date: Sun, 24 Dec 2023 01:35:21 +0200
+Message-ID: <20231223233523.4411-1-maxtram95@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2592300.1703374471.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 23 Dec 2023 23:34:31 +0000
-Message-ID: <2592301.1703374471@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Content-Transfer-Encoding: 8bit
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t master
+Introduction of r8152-cfgselector broke hotplug of Realtek USB NICs on
+machines that use usbguard. These patches are supposed to fix it.
 
-diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-index 2a6d363763a2..f18ca02aa95a 100644
---- a/net/dns_resolver/dns_key.c
-+++ b/net/dns_resolver/dns_key.c
-@@ -91,8 +91,6 @@ const struct cred *dns_resolver_cache;
- static int
- dns_resolver_preparse(struct key_preparsed_payload *prep)
- {
--	const struct dns_server_list_v1_header *v1;
--	const struct dns_payload_header *bin;
- 	struct user_key_payload *upayload;
- 	unsigned long derrno;
- 	int ret;
-@@ -103,27 +101,28 @@ dns_resolver_preparse(struct key_preparsed_payload *=
-prep)
- 		return -EINVAL;
- =
+Tested on RTL8153 (0bda:8153) that has two configuration descriptors:
+vendor and CDC.
 
- 	if (data[0] =3D=3D 0) {
-+		const struct dns_server_list_v1_header *v1;
-+
- 		/* It may be a server list. */
--		if (datalen <=3D sizeof(*bin))
-+		if (datalen <=3D sizeof(*v1))
- 			return -EINVAL;
- =
+P.S. I'm not sure whether it's supposed to go through the USB or netdev
+tree, therefore submitting to both mailing lists and marking for "net",
+but please advise.
 
--		bin =3D (const struct dns_payload_header *)data;
--		kenter("[%u,%u],%u", bin->content, bin->version, datalen);
--		if (bin->content !=3D DNS_PAYLOAD_IS_SERVER_LIST) {
-+		v1 =3D (const struct dns_server_list_v1_header *)data;
-+		kenter("[%u,%u],%u", v1->hdr.content, v1->hdr.version, datalen);
-+		if (v1->hdr.content !=3D DNS_PAYLOAD_IS_SERVER_LIST) {
- 			pr_warn_ratelimited(
- 				"dns_resolver: Unsupported content type (%u)\n",
--				bin->content);
-+				v1->hdr.content);
- 			return -EINVAL;
- 		}
- =
+Maxim Mikityanskiy (2):
+  USB: Allow usb_device_driver to override usb_choose_configuration
+  r8152: Switch to using choose_configuration
 
--		if (bin->version !=3D 1) {
-+		if (v1->hdr.version !=3D 1) {
- 			pr_warn_ratelimited(
- 				"dns_resolver: Unsupported server list version (%u)\n",
--				bin->version);
-+				v1->hdr.version);
- 			return -EINVAL;
- 		}
- =
+ drivers/net/usb/r8152.c    | 18 +++++++++---------
+ drivers/usb/core/generic.c | 10 ++++++++++
+ include/linux/usb.h        |  3 +++
+ 3 files changed, 22 insertions(+), 9 deletions(-)
 
--		v1 =3D (const struct dns_server_list_v1_header *)bin;
- 		if ((v1->status !=3D DNS_LOOKUP_GOOD &&
- 		     v1->status !=3D DNS_LOOKUP_GOOD_WITH_BAD)) {
- 			if (prep->expiry =3D=3D TIME64_MAX)
+-- 
+2.43.0
 
 
