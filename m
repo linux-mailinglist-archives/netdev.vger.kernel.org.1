@@ -1,58 +1,50 @@
-Return-Path: <netdev+bounces-60100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A28581D547
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:29:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1235481D568
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:48:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06E0E1F21B63
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:29:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4446C1C20CD1
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BB012E7F;
-	Sat, 23 Dec 2023 17:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC29111C8A;
+	Sat, 23 Dec 2023 17:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SGjc16AT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAeXLlZE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2BE12E71;
-	Sat, 23 Dec 2023 17:29:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5621DC433C8;
-	Sat, 23 Dec 2023 17:29:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D6E11718
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 17:48:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAA04C433C8;
+	Sat, 23 Dec 2023 17:48:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703352545;
-	bh=7xG6o54wRSyxhLE5knTREAIYMUB47waY0f2uTnrJ8Y0=;
+	s=k20201202; t=1703353731;
+	bh=03Mw3pTrVcalUFwXHgizomiqyu9j2TDfmFEEnJjsgSE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SGjc16ATLDegO3xcDc4uo3f6yfiQzSUA2ip8Lfmg7uIgVBm84VUfpA7fdKtjtQQX2
-	 mCEStsb6okKJO0jI6XNhhImL2WgbTaQ6cOT5uvz9kfPlpCC3Cy3fmy7PksUfrKJjmu
-	 SQj2gEx3c3zy6WoFu1sJV5+bmA0dl0AyvtOJpCaigrxgv4DBqj4j4xo9ugO6hV2z6d
-	 sKOmklTMiLes054XPs2Uka7IMCJXmS6e3dYQBa/EYbGoNSdffgLRDFKjqDwzqpY3Br
-	 HEskgr05zQdv+o11jRs1yqfLNLSJzefrqZCLOc3q4zboFQbZ+DfuRa1UJSBK5omam4
-	 d4OOg7/WaXLNw==
-Date: Sat, 23 Dec 2023 17:28:58 +0000
+	b=GAeXLlZEsG7ROdqI2PXNz8MBASajy2ZNVJ88sgC51YVXI0A1RuK4prwwUGUBCcKNA
+	 ZWvhbhh2RtVAO/X3fa7jKu197+ZctY+cgk0J5Y0Jxg5dFLQLGie1/NZOAq5Of0FwOY
+	 yUNUC0g0xz5Q3vO2cnMtKqXuhakspKlilGAFsPJa/RrpPkTCFZ9inDvUn1rsRNpgVB
+	 Dn9AC8x0JNbd7us27h5eIwDxpkXWX/+oSjqEOe2sWkxtwJfmOZJldEiqw9kbFwWXDB
+	 0CQQavMbPWhcvnsbnq8AecfdCU9kQfpzD5CF/kHglUhUPQdgFSKP5iqzjbHTVSwboB
+	 /1P4KefGIGucg==
+Date: Sat, 23 Dec 2023 17:48:45 +0000
 From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: torvalds@linux-foundation.org,
-	Markus Suvanto <markus.suvanto@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
-	Steve French <smfrench@gmail.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org, keyrings@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Edward Adam Davis <eadavis@qq.com>
-Subject: Re: [GIT PULL] afs, dns: Fix dynamic root interaction with negative
- DNS
-Message-ID: <20231223172858.GI201037@kernel.org>
-References: <1843374.1703172614@warthog.procyon.org.uk>
+To: Aurelien Aptel <aaptel@nvidia.com>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+	sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+	chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
+	aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
+	ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+	galshalom@nvidia.com, mgurtovoy@nvidia.com
+Subject: Re: [PATCH v22 16/20] net/mlx5e: NVMEoTCP, queue init/teardown
+Message-ID: <20231223174845.GJ201037@kernel.org>
+References: <20231221213358.105704-1-aaptel@nvidia.com>
+ <20231221213358.105704-17-aaptel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,113 +53,102 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1843374.1703172614@warthog.procyon.org.uk>
+In-Reply-To: <20231221213358.105704-17-aaptel@nvidia.com>
+mlx5e_open_cqFrom: Simon Horman <horms@kernel.org>
 
-+ Edward Adam Davis <eadavis@qq.com>
-
-On Thu, Dec 21, 2023 at 03:30:14PM +0000, David Howells wrote:
-> Hi Linus,
+On Thu, Dec 21, 2023 at 09:33:54PM +0000, Aurelien Aptel wrote:
+> From: Ben Ben-Ishay <benishay@nvidia.com>
 > 
-> Could you apply this, please?  It's intended to improve the interaction of
-> arbitrary lookups in the AFS dynamic root that hit DNS lookup failures[1]
-> where kafs behaves differently from openafs and causes some applications to
-> fail that aren't expecting that.  Further, negative DNS results aren't
-> getting removed and are causing failures to persist.
+> Adds the ddp ops of sk_add, sk_del and offload limits.
 > 
->  (1) Always delete unused (particularly negative) dentries as soon as
->      possible so that they don't prevent future lookups from retrying.
+> When nvme-tcp establishes new queue/connection, the sk_add op is called.
+> We allocate a hardware context to offload operations for this queue:
+> - use a steering rule based on the connection 5-tuple to mark packets
+>   of this queue/connection with a flow-tag in their completion (cqe)
+> - use a dedicated TIR to identify the queue and maintain the HW context
+> - use a dedicated ICOSQ to maintain the HW context by UMR postings
+> - use a dedicated tag buffer for buffer registration
+> - maintain static and progress HW contexts by posting the proper WQEs.
 > 
->  (2) Fix the handling of new-style negative DNS lookups in ->lookup() to
->      make them return ENOENT so that userspace doesn't get confused when
->      stat succeeds but the following open on the looked up file then fails.
+> When nvme-tcp teardowns a queue/connection, the sk_del op is called.
+> We teardown the queue and free the corresponding contexts.
 > 
->  (3) Fix key handling so that DNS lookup results are reclaimed almost as
->      soon as they expire rather than sitting round either forever or for an
->      additional 5 mins beyond a set expiry time returning EKEYEXPIRED.
->      They persist for 1s as /bin/ls will do a second stat call if the first
->      fails.
+> The offload limits we advertise deal with the max SG supported.
 > 
-> Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
+> [Re-enabled calling open/close icosq out of en_main.c]
 > 
-> Thanks,
-> David
-> 
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=216637 [1]
-> Link: https://lore.kernel.org/r/20231211163412.2766147-1-dhowells@redhat.com/ # v1
-> Link: https://lore.kernel.org/r/20231211213233.2793525-1-dhowells@redhat.com/ # v2
-> Link: https://lore.kernel.org/r/20231212144611.3100234-1-dhowells@redhat.com/ # v3
-> Link: https://lore.kernel.org/r/20231221134558.1659214-1-dhowells@redhat.com/ # v4
-> ---
-> The following changes since commit ceb6a6f023fd3e8b07761ed900352ef574010bcb:
-> 
->   Linux 6.7-rc6 (2023-12-17 15:19:28 -0800)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/afs-fixes-20231221
-> 
-> for you to fetch changes up to 39299bdd2546688d92ed9db4948f6219ca1b9542:
-> 
->   keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry (2023-12-21 13:47:38 +0000)
-> 
-> ----------------------------------------------------------------
-> AFS fixes
-> 
-> ----------------------------------------------------------------
-> David Howells (3):
->       afs: Fix the dynamic root's d_delete to always delete unused dentries
->       afs: Fix dynamic root lookup DNS check
->       keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry
+> Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
+> Signed-off-by: Boris Pismenny <borisp@nvidia.com>
+> Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
+> Signed-off-by: Yoray Zack <yorayz@nvidia.com>
+> Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
-Hi Linus, David, Edward, Networking maintainers, all,
+...
 
-This is a heads up that my understanding is that the last patch introduces
-a buffer overrun for which a patch has been posted. Ordinarily I would
-think that the fix should go through net. But the above patches aren't in
-net yet.
+> +static int
+> +mlx5e_nvmeotcp_build_icosq(struct mlx5e_nvmeotcp_queue *queue, struct mlx5e_priv *priv, int io_cpu)
+> +{
+> +	u16 max_sgl, max_klm_per_wqe, max_umr_per_ccid, sgl_rest, wqebbs_rest;
+> +	struct mlx5e_channel *c = priv->channels.c[queue->channel_ix];
+> +	struct mlx5e_sq_param icosq_param = {};
+> +	struct mlx5e_create_cq_param ccp = {};
+> +	struct dim_cq_moder icocq_moder = {};
+> +	struct mlx5e_icosq *icosq;
+> +	int err = -ENOMEM;
+> +	u16 log_icosq_sz;
+> +	u32 max_wqebbs;
+> +
+> +	icosq = &queue->sq;
+> +	max_sgl = mlx5e_get_max_sgl(priv->mdev);
+> +	max_klm_per_wqe = queue->max_klms_per_wqe;
+> +	max_umr_per_ccid = max_sgl / max_klm_per_wqe;
+> +	sgl_rest = max_sgl % max_klm_per_wqe;
+> +	wqebbs_rest = sgl_rest ? MLX5E_KLM_UMR_WQEBBS(sgl_rest) : 0;
+> +	max_wqebbs = (MLX5E_KLM_UMR_WQEBBS(max_klm_per_wqe) *
+> +		     max_umr_per_ccid + wqebbs_rest) * queue->size;
+> +	log_icosq_sz = order_base_2(max_wqebbs);
+> +
+> +	mlx5e_build_icosq_param(priv->mdev, log_icosq_sz, &icosq_param);
+> +	ccp.napi = &queue->qh.napi;
+> +	ccp.ch_stats = &priv->channel_stats[queue->channel_ix]->ch;
+> +	ccp.node = cpu_to_node(io_cpu);
+> +	ccp.ix = queue->channel_ix;
+> +
+> +	err = mlx5e_open_cq(priv, icocq_moder, &icosq_param.cqp, &ccp, &icosq->cq);
 
-Given a) we're now in a holiday season and b) the severity of this
-problem is unclear (to me), perhaps it is best to wait a bit then
-post the fix to net?
+Hi Aurelien and Ben,
 
-Link: https://lore.kernel.org/netdev/tencent_7D663C8936BA96F837124A4474AF76ED6709@qq.com/
+This doesn't seem to compile with gcc-13 with allmodconfig on x86_64:
 
-N.B. The hash in the fixes tag for the fix patch is now incorrect.
+ .../nvmeotcp.c: In function 'mlx5e_nvmeotcp_build_icosq':
+ .../nvmeotcp.c:472:29: error: passing argument 1 of 'mlx5e_open_cq' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   472 |         err = mlx5e_open_cq(priv, icocq_moder, &icosq_param.cqp, &ccp, &icosq->cq);
+       |                             ^~~~
+       |                             |
+       |                             struct mlx5e_priv *
+ In file included from .../nvmeotcp.h:9,
+                  from .../nvmeotcp.c:7:
+ ....h:1065:41: note: expected 'struct mlx5_core_dev *' but argument is of type 'struct mlx5e_priv *'
+  1065 | int mlx5e_open_cq(struct mlx5_core_dev *mdev, struct dim_cq_moder moder,
+       |                   ~~~~~~~~~~~~~~~~~~~~~~^~~~
+ cc1: all warnings being treated as errors
 
-For reference the fix, from the link above, is below.
-I've fixed the hash for the fixes tag and added the posted review tag.
-And added my own SoB, because the patch is in this email.
+> +	if (err)
+> +		goto err_nvmeotcp_sq;
+> +	err = mlx5e_open_icosq(c, &priv->channels.params, &icosq_param, icosq,
+> +			       mlx5e_nvmeotcp_icosq_err_cqe_work);
+> +	if (err)
+> +		goto close_cq;
+> +
+> +	spin_lock_init(&queue->sq_lock);
+> +	return 0;
+> +
+> +close_cq:
+> +	mlx5e_close_cq(&icosq->cq);
+> +err_nvmeotcp_sq:
+> +	return err;
+> +}
 
-From: Edward Adam Davis <eadavis@qq.com>
-
-bin will be forcibly converted to "struct dns_server_list_v1_header *", so it 
-is necessary to compare datalen with sizeof(*v1).
-
-Fixes: 39299bdd2546 ("keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry")
-Reported-and-tested-by: syzbot+94bbb75204a05da3d89f@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-Signed-off-by: Simon Horman <horms@kernel.org>
-
----
- net/dns_resolver/dns_key.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-index 3233f4f25fed..15f19521021c 100644
---- a/net/dns_resolver/dns_key.c
-+++ b/net/dns_resolver/dns_key.c
-@@ -104,7 +104,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
- 
- 	if (data[0] == 0) {
- 		/* It may be a server list. */
--		if (datalen <= sizeof(*bin))
-+		if (datalen <= sizeof(*v1))
- 			return -EINVAL;
- 
- 		bin = (const struct dns_payload_header *)data;
--- 
-2.43.0
-
-
+...
 
