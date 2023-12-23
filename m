@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-60083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C8BD81D464
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 15:02:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A1C81D465
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 15:02:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA4BA1F21CF4
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:02:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E02D91F21F5C
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 14:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E85DD529;
-	Sat, 23 Dec 2023 14:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7E5DDBE;
+	Sat, 23 Dec 2023 14:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="h8c385V2"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="IWnVMb+b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50FADDA5
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 14:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46722DDA5
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 14:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-781048954d9so205811385a.1
-        for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 06:02:06 -0800 (PST)
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-67f47b15fa3so19493946d6.1
+        for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 06:02:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703340125; x=1703944925; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=I7R/2bDk9lZWXERudlbTjvKb59TzofmLv9XCU6Xn8E8=;
-        b=h8c385V2YM50axc5tm7Jxtw0ir78t3AMiqFKpmAxdaJcBbDkXHzoFTJTUBMYEfazC/
-         rmR9A9SCprCC9jrKN1EvP4j8eMKHfyP4kcgHVkxQsXU95RmTUHn2tZgxU68ucv8KcysM
-         ODFotEaonz6t8hhw7jamk9KxBlRF66D7jtysxxwjGMI5P38yNSYR4Ox79TjMLFPkuu/X
-         kr9P1563hnJ0U8hnXaL2m5Swfz+yTv1QZQXduZb0GhprYitYKK4bMeQ2uG8q4s5BdBkv
-         OHDJPcBvaFu1FuTzUzNuaSu+PhStf7gKXNXf1EY2KUEj/ngxaNyfdM2pTBXKRHVUoKBb
-         OQ4A==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703340130; x=1703944930; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9o75PhI3xzZFY6wRbm+k1VjTX3cvEH8O/7qf7mb8L+o=;
+        b=IWnVMb+bx7gsXKbD8mBZqFansmGCy8QbA/6eQ6xaYMHxk66uqw/ch0T60emkAlx5aE
+         aHJGLuPmdvPtfrpojcEyQk4WsQ12ZI4nbbfQ6MLMIzMtBa2GmwJmxF5suYMt31/0H9Th
+         5Hgjt6kbD/OVT1nl675IHyTnwDVDjjaOISFJr0au6MqDSP80UYEPxwyDURRySg/GNIHo
+         l0U9OUerLZ27DSaluJKtaOgaREh6tcsJ2nlk9eE3L+LT1jPgrQekHrw1k3YNXQ02yx/n
+         xp3KoK/pixalD32Kysl0/IjqnN9xoDHjTfmwdwEgnjoT7ndmVtdwN+hHNVOasXs9Q5Ev
+         xxSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703340125; x=1703944925;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I7R/2bDk9lZWXERudlbTjvKb59TzofmLv9XCU6Xn8E8=;
-        b=fKKlG2lHc2C9KOwRA8ohkC3uFBO8BnjO+nXJr7K4g5dn0HuoBS1zAzZZMlwFyRY6bv
-         LSTm983YXUEMyjYQmYn4d4jCOhLlxEmg5mkotcqb4NAjThKCC4oHZhj7IsN4y1KKK0sv
-         URXRchVD1fhTbsp9CMymVx2hJVDBpEkPu+/ewbcZyCewpqoxEkIMAzE8evziBOlH3kFo
-         ozhNnhLsSLSVaQWAi0XO1mqWU94ZSK8FlCF5TKRKtyTI4bf7VCsbdcDpxcRdfZtTuolA
-         Roy3LBqrK72ea6PrXqEMqsyBVa6y+WeV6C70OWayj8RqtGWdv6h4gtwly0ujHJ76XLDA
-         +vog==
-X-Gm-Message-State: AOJu0YyvzsLLfu4Z0sHAeMVyItw/yh8Yak3+XiOaV17RZ3F2c3zFqlcu
-	ugXAVkxdkXYSQ0wMJcSdA5Ko7mZv9YKa
-X-Google-Smtp-Source: AGHT+IGlAdUewqdATbPzUCUS6JbmACwNbwOXXhBnnlmU5vbESSqiHAPWRluYoJionTWwFG/OFJeP2Q==
-X-Received: by 2002:a05:620a:22a4:b0:781:23f4:16a8 with SMTP id p4-20020a05620a22a400b0078123f416a8mr3293816qkh.94.1703340125530;
-        Sat, 23 Dec 2023 06:02:05 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703340130; x=1703944930;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9o75PhI3xzZFY6wRbm+k1VjTX3cvEH8O/7qf7mb8L+o=;
+        b=cFvxF75fkO7Qol0HQl/DDyM8IIuPeBGQVLZS66FqwqlU/O56WzW+0X95QbjOIuXqxM
+         nvNeNvaghQbv0LFRpTGKi8zusCIbnwt4B5KUM2+Sv33mZpurLNwVKZx0vb/slv3zobG3
+         XLUWUmCzQAPdj5ULvCzI8SdSndxdAlnCjyQPRis6Rd+HFQv3CgvHEJ786nHpKtDVg8tK
+         tVww482meObqCkvNL+GAJPnhmOL/t5q8g8V4XVE19mWZFbibt4SyfTMxi6VZUr2ufjXL
+         116sNpADcr0Gdcg0iyv1ETtwiY/GAOzE6/INGyhQide9XSCGP6ai87La+knUiNGL1TcM
+         NLWw==
+X-Gm-Message-State: AOJu0YyAk0AF1LgIk3DxVjQBjnm7l/RwF2o/0Ua0/7/K+KBaAEXiLDuV
+	d67jV8ZDXFpkNL4JKtw35S/RpdP4GfXs
+X-Google-Smtp-Source: AGHT+IH7tDwFSbUS2YrlmrJpnhg9GQA6gRYAoI6s59t+cE6qDj6rFPxMnyvpqA3fIlO/2QaOyajkbA==
+X-Received: by 2002:a05:6214:2b06:b0:67f:65c1:2a54 with SMTP id jx6-20020a0562142b0600b0067f65c12a54mr4395697qvb.57.1703340130237;
+        Sat, 23 Dec 2023 06:02:10 -0800 (PST)
 Received: from majuu.waya ([174.91.6.24])
-        by smtp.gmail.com with ESMTPSA id 25-20020a05620a04d900b0077f0a4bd3c6sm2062968qks.77.2023.12.23.06.02.02
+        by smtp.gmail.com with ESMTPSA id 25-20020a05620a04d900b0077f0a4bd3c6sm2062968qks.77.2023.12.23.06.02.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Dec 2023 06:02:04 -0800 (PST)
+        Sat, 23 Dec 2023 06:02:06 -0800 (PST)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -69,10 +70,12 @@ Cc: jiri@resnulli.us,
 	pctammela@mojatatu.com,
 	victor@mojatatu.com,
 	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net-next 0/5] net/sched: Remove UAPI support for retired TC qdiscs and classifiers
-Date: Sat, 23 Dec 2023 09:01:49 -0500
-Message-Id: <20231223140154.1319084-1-jhs@mojatatu.com>
+Subject: [PATCH net-next 1/5] net/sched: Remove uapi support for rsvp classifier
+Date: Sat, 23 Dec 2023 09:01:50 -0500
+Message-Id: <20231223140154.1319084-2-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231223140154.1319084-1-jhs@mojatatu.com>
+References: <20231223140154.1319084-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,28 +84,102 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Classifiers RSVP and tcindex as well as qdiscs dsmark, CBQ and ATM have already
-been deleted. This patchset removes their UAPI support.
+commit 265b4da82dbf ("net/sched: Retire rsvp classifier") retired the TC RSVP
+classifier.
+Remove UAPI for it. Iproute2 will sync by equally removing it from user space.
 
-User space - with a focus on iproute2 - typically copies these UAPI headers for
-different kernels.
-These deletion patches are coordinated with the iproute2 maintainers to make
-sure that they delete any user space code referencing removed objects at their
-leisure.
+Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ include/uapi/linux/pkt_cls.h       | 31 ------------------------------
+ tools/include/uapi/linux/pkt_cls.h | 31 ------------------------------
+ 2 files changed, 62 deletions(-)
 
-Jamal Hadi Salim (5):
-  net/sched: Remove uapi support for rsvp classifier
-  net/sched: Remove uapi support for tcindex classifier
-  net/sched: Remove uapi support for dsmark qdisc
-  net/sched: Remove uapi support for ATM qdisc
-  net/sched: Remove uapi support for CBQ qdisc
-
- include/uapi/linux/pkt_cls.h         |  47 ------------
- include/uapi/linux/pkt_sched.h       | 109 ---------------------------
- tools/include/uapi/linux/pkt_cls.h   |  47 ------------
- tools/include/uapi/linux/pkt_sched.h | 109 ---------------------------
- 4 files changed, 312 deletions(-)
-
+diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+index c7082cc60d21..0d85f7faad53 100644
+--- a/include/uapi/linux/pkt_cls.h
++++ b/include/uapi/linux/pkt_cls.h
+@@ -280,37 +280,6 @@ struct tc_u32_pcnt {
+ 
+ #define TC_U32_MAXDEPTH 8
+ 
+-
+-/* RSVP filter */
+-
+-enum {
+-	TCA_RSVP_UNSPEC,
+-	TCA_RSVP_CLASSID,
+-	TCA_RSVP_DST,
+-	TCA_RSVP_SRC,
+-	TCA_RSVP_PINFO,
+-	TCA_RSVP_POLICE,
+-	TCA_RSVP_ACT,
+-	__TCA_RSVP_MAX
+-};
+-
+-#define TCA_RSVP_MAX (__TCA_RSVP_MAX - 1 )
+-
+-struct tc_rsvp_gpi {
+-	__u32	key;
+-	__u32	mask;
+-	int	offset;
+-};
+-
+-struct tc_rsvp_pinfo {
+-	struct tc_rsvp_gpi dpi;
+-	struct tc_rsvp_gpi spi;
+-	__u8	protocol;
+-	__u8	tunnelid;
+-	__u8	tunnelhdr;
+-	__u8	pad;
+-};
+-
+ /* ROUTE filter */
+ 
+ enum {
+diff --git a/tools/include/uapi/linux/pkt_cls.h b/tools/include/uapi/linux/pkt_cls.h
+index 3faee0199a9b..82eccb6a4994 100644
+--- a/tools/include/uapi/linux/pkt_cls.h
++++ b/tools/include/uapi/linux/pkt_cls.h
+@@ -204,37 +204,6 @@ struct tc_u32_pcnt {
+ 
+ #define TC_U32_MAXDEPTH 8
+ 
+-
+-/* RSVP filter */
+-
+-enum {
+-	TCA_RSVP_UNSPEC,
+-	TCA_RSVP_CLASSID,
+-	TCA_RSVP_DST,
+-	TCA_RSVP_SRC,
+-	TCA_RSVP_PINFO,
+-	TCA_RSVP_POLICE,
+-	TCA_RSVP_ACT,
+-	__TCA_RSVP_MAX
+-};
+-
+-#define TCA_RSVP_MAX (__TCA_RSVP_MAX - 1 )
+-
+-struct tc_rsvp_gpi {
+-	__u32	key;
+-	__u32	mask;
+-	int	offset;
+-};
+-
+-struct tc_rsvp_pinfo {
+-	struct tc_rsvp_gpi dpi;
+-	struct tc_rsvp_gpi spi;
+-	__u8	protocol;
+-	__u8	tunnelid;
+-	__u8	tunnelhdr;
+-	__u8	pad;
+-};
+-
+ /* ROUTE filter */
+ 
+ enum {
 -- 
 2.34.1
 
