@@ -1,94 +1,123 @@
-Return-Path: <netdev+bounces-60098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFFB681D539
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:17:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7966A81D53C
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:25:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AE9E1C2112B
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:17:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0222028304D
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A70110A14;
-	Sat, 23 Dec 2023 17:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABEEC1094E;
+	Sat, 23 Dec 2023 17:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="QkHt9b8m"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="khN6mjZJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91175208C0
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 17:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d3e05abcaeso17138445ad.1
-        for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 09:17:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1703351820; x=1703956620; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7cNloK2zmpSI/pe5rFD+LQ8j7TbMA6oNjqdHHE0gWF4=;
-        b=QkHt9b8m9YO74zc1F5bKM8QTnUddPdh2/K8428TPC7/W5IxTAlkqZwTvtmuk4rqDu/
-         mxnU60cNJp4yh3s3CJjMGfTcT/rOHcexmAw+hGEGdm+bL/W4Equw7izNppI8j2NBATeL
-         NNwiy3UP3X0SBQrUdgsmjJHVSdiMFxACXQkhZ0YV05dqa3zXvkWuLp3hLggvApE02JVc
-         414Zzs2IXOzUGyc3PeKlahtQUMTO6w78Cr20OpKps+oh8C2HFQxmoLHet7MK/DECoWgs
-         Nbmd0qwzu37dInwAv4APFsW9BbCsghO8EYcH9ZVrr3eVJ/Ez7Uc6J9XDQyWJ3uXJJYkA
-         Z/YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703351820; x=1703956620;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7cNloK2zmpSI/pe5rFD+LQ8j7TbMA6oNjqdHHE0gWF4=;
-        b=OFpFfAJwQ0JH+qYBBWHyylJlci532nd6657uQMFRfxunWVwG7mBBW4GCg4F76j6yY2
-         ZVXDG5iNiqA3CKZdqsdI/PSXWFHkheOjzwXpUolntZP61QDz1Aab0blwuXZe/mSltLIs
-         b5pqU3TN1c55hKcEHmAITij9MdYMg6yD0zCcKlEARad8j6DYI0HpHFyFETGppvOvQlZu
-         cXlsB8ktOrBsd9yNPVosOKD8Lue9U+gpMGe7KEphNGBvR+ucXwM53PUGRTKWRc7Bp0SX
-         OTO6apJIWKM2XIPvOa1p2pHk8rUlxC1WPOkjMP2v6dEGhZlmy7JeAY5ZhIxMzGFsx9SA
-         OBXw==
-X-Gm-Message-State: AOJu0Yzo+VA8Zl+NnIgH6zbfr+/lZx3RJPxgbvAF82xUYQKzgSDkIoH5
-	+wBH8+kiyY03GV/Y3QoNS3GlZcE3yXlkLdjLDr1IYd73+wtb3g==
-X-Google-Smtp-Source: AGHT+IETlOW+t5TZx2HLceDyDeUBp+Lh0734HBd2Yhg12Nq9skzAKYWxQ0erCmv0QhOW/WOchQuuxw==
-X-Received: by 2002:a17:902:dacd:b0:1d4:2d8d:3545 with SMTP id q13-20020a170902dacd00b001d42d8d3545mr1094558plx.71.1703351819847;
-        Sat, 23 Dec 2023 09:16:59 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id n7-20020a170902e54700b001d38a7e6a30sm5309216plf.70.2023.12.23.09.16.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Dec 2023 09:16:59 -0800 (PST)
-Date: Sat, 23 Dec 2023 09:16:57 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- netdev@vger.kernel.org, dsahern@gmail.com, pctammela@mojatatu.com,
- victor@mojatatu.com
-Subject: Re: [PATCH net-next 1/5] net/sched: Remove uapi support for rsvp
- classifier
-Message-ID: <20231223091657.498a1595@hermes.local>
-In-Reply-To: <20231223140154.1319084-2-jhs@mojatatu.com>
-References: <20231223140154.1319084-1-jhs@mojatatu.com>
-	<20231223140154.1319084-2-jhs@mojatatu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA5812E4C
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 17:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703352319; x=1734888319;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8Gmznqo30uZrkAtxT6dU+7NcE2umT81kQB26aiSA/wU=;
+  b=khN6mjZJAuUUVpExwhDCutqsTT30dsp2ifQHRuttmKrqjcZMdSoYwYei
+   GqAQNAncPYV8zJFHi0db4F1LkEuEoTTdsUq9O35bxa7tTAkxFX2FVdl4W
+   4hIBi2GfS6bQE6pkm/oEQaViWyQcBZXWyWVra89kwLHMl9+FU7l6CY++m
+   6DjNPo2vLLZFOtRT0G9ZR9txXLUVo1movPSDdXEPxM6E79KkjFW3GX47S
+   gyP5mOVYJ6M5QKuTLtjDYiBJN1dme5Hr8mWQrSMbQDmlvwvdby29Y5MTn
+   5LKAzh2/PD8J9jagdjjYtk7U7iwKD6+48gP06v+BD3BtTxD7OJ1xQRwjx
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="3452130"
+X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
+   d="scan'208";a="3452130"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2023 09:25:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="753581772"
+X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
+   d="scan'208";a="753581772"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga006.jf.intel.com with ESMTP; 23 Dec 2023 09:25:14 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rH5jv-000BGJ-2D;
+	Sat, 23 Dec 2023 17:24:54 +0000
+Date: Sun, 24 Dec 2023 01:23:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next 3/6] virtio_net: support device stats
+Message-ID: <202312240155.ow7kvQZO-lkp@intel.com>
+References: <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
 
-On Sat, 23 Dec 2023 09:01:50 -0500
-Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+Hi Xuan,
 
-> diff --git a/tools/include/uapi/linux/pkt_cls.h b/tools/include/uapi/linux/pkt_cls.h
-> index 3faee0199a9b..82eccb6a4994 100644
-> --- a/tools/include/uapi/linux/pkt_cls.h
-> +++ b/tools/include/uapi/linux/pkt_cls.h
-> @@ -204,37 +204,6 @@ struct tc_u32_pcnt {
->  
+kernel test robot noticed the following build warnings:
 
-Seems like a mistake for kernel source tree to include two copies of same file.
-Shouldn't there be an automated make rule to update?
+[auto build test WARNING on mst-vhost/linux-next]
+[also build test WARNING on linus/master v6.7-rc6]
+[cannot apply to net-next/main horms-ipvs/master next-20231222]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_net-introduce-device-stats-feature-and-structures/20231222-175505
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20231222033021.20649-4-xuanzhuo%40linux.alibaba.com
+patch subject: [PATCH net-next 3/6] virtio_net: support device stats
+config: arc-haps_hs_defconfig (https://download.01.org/0day-ci/archive/20231224/202312240155.ow7kvQZO-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231224/202312240155.ow7kvQZO-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312240155.ow7kvQZO-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from include/linux/virtio_net.h:8,
+                    from drivers/net/virtio_net.c:12:
+>> include/uapi/linux/virtio_net.h:419:45: warning: left shift count >= width of type [-Wshift-count-overflow]
+     419 | #define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
+         |                                             ^~
+   drivers/net/virtio_net.c:215:17: note: in expansion of macro 'VIRTIO_NET_STATS_TYPE_CVQ'
+     215 |                 VIRTIO_NET_STATS_TYPE_##TYPE,                   \
+         |                 ^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/virtio_net.c:224:9: note: in expansion of macro 'VIRTNET_DEVICE_STATS_MAP_ITEM'
+     224 |         VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +419 include/uapi/linux/virtio_net.h
+
+ba106d1c676c80 Xuan Zhuo 2023-12-22  418  
+ba106d1c676c80 Xuan Zhuo 2023-12-22 @419  #define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
+ba106d1c676c80 Xuan Zhuo 2023-12-22  420  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
