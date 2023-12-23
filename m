@@ -1,127 +1,148 @@
-Return-Path: <netdev+bounces-60096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D00FA81D52C
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:54:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4FCC81D532
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 18:05:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B87EB21483
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 16:54:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA4D61C20FA3
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBEFF9F7;
-	Sat, 23 Dec 2023 16:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B253C10961;
+	Sat, 23 Dec 2023 17:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EfhpbhPj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cathwpfz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A831094E
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 16:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d427518d52so7761305ad.0
-        for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 08:54:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703350480; x=1703955280; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Cl2y8bp5DP0WXpicZBityHmZ7Mzi+yYDnrkxrmO55L4=;
-        b=EfhpbhPj1QVseZY+s39kxkKqoKbOX27j6nwZdKDdsrDx9WpAV8irVwua/5E/xRvNZ+
-         b72WMjJFM+r+PVlRyuw2BfS8QY/tzJQf8UikgXFoflWUlaDej2XS05Fk0NDuWlpqHCN0
-         y0KD9k/1ntPOW1uSB7Ji/t0MC1NGuomBiuD8xL5iGVbxm/3HQtP2ou3rF1LRUdoNEleU
-         mMv9v0wdB+YAtGGWOPesA6P1/NVT4wCWzKmLNuubSGXFQa874LFBOHfjIDGpjG50xNIY
-         Toue1ACzoY+w2jCVeSnlLsRb6HilMkNnHUYXTEUHTe0VsOWiIKe33qHiD0yzIXQs4SXE
-         oDZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703350480; x=1703955280;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cl2y8bp5DP0WXpicZBityHmZ7Mzi+yYDnrkxrmO55L4=;
-        b=ECXwe9SdrxDLxgJ7IsqPoDyUeazgxqSm/+htq2vhuoZWnW8Esp6ovO35Gi1cL+JwSu
-         Ape0bcgefc9DUiBP3EK6HgfF9YTpvsV8mXOM6LGk4luUef+llck8n4ZKrzKklcEXy9Sx
-         kkyhgYNwqaRdRusv3KOFs54uKhklZI+J2oRnEFjVLxR57ehyOZkowmqbYEm42m+D2lFl
-         4iFNOqFw2jSD35nONJAJTPZwBHsxT0K/eBHvLJOEzgw9xCFL7OyVqf3YYMuy36W9oSf8
-         4+P8WskNLbWT8yiBOyoW7qTZlSgxxZZ2AX0cAZkL102zosuCAlvM9wMAjs3b2B8DAghD
-         fmVw==
-X-Gm-Message-State: AOJu0YycuZV9VwUowe4CBctyYTJXGBvApcV96PdMsJ/ytGO8gI5AGe1q
-	dgOQjA3CvKfkPhvrgOgJfVU=
-X-Google-Smtp-Source: AGHT+IFxVIgBbZ0169XvBdChj4B0me2WW3MuvWqzf4gG8HeSRT9e3bhh1Qoe1ZaZKHM5CjBeffa2Fw==
-X-Received: by 2002:a17:902:f9cc:b0:1d3:b814:8319 with SMTP id kz12-20020a170902f9cc00b001d3b8148319mr4408459plb.19.1703350479551;
-        Sat, 23 Dec 2023 08:54:39 -0800 (PST)
-Received: from [192.168.159.133] ([37.175.117.55])
-        by smtp.gmail.com with ESMTPSA id a8-20020a656548000000b005cdf90c21ecsm2591986pgw.67.2023.12.23.08.54.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 23 Dec 2023 08:54:37 -0800 (PST)
-Message-ID: <f1bde74d-3762-4faf-9827-094d19bffc66@gmail.com>
-Date: Sat, 23 Dec 2023 17:54:33 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C675510798
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 17:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703351095; x=1734887095;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kEFd7MhTmJumlNW/XsckxCIHQkiQQHT0Q8nvzk57iQk=;
+  b=cathwpfzosvWnfJo/bTkodgsthtuZrggO3vrS+nYCWwadPTLH9ccKi5Y
+   XS/UTwCc5iTiE1sV8pXKIOCL9NHR0rGiu9D/PqY9npPW4mcJuz8jlXs71
+   K6o+YKrgan+lHCkGvjlBUt+PyBD04bM7UQcU8uuL+q3o+dZ4dH6Y0ubg+
+   UCFf8gdM/7LHEjknLNNBMZakG2rDlVfDAqAvce/y1Sy8dXYnmp8au33O1
+   iXTpyd1hVRI0poXgHmoi/oBNQrnG4NMi6p32W/7WzDHNE4zGBzBuNmanH
+   5yTh6mnwkj4fbahOpN6eBMdQTKzSYLtZ7qoYRiY3REC6sS0DyMRfk1pWY
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="395095584"
+X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
+   d="scan'208";a="395095584"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2023 09:04:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="727163995"
+X-IronPort-AV: E=Sophos;i="6.04,299,1695711600"; 
+   d="scan'208";a="727163995"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 23 Dec 2023 09:04:52 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rH5QU-000BEF-26;
+	Sat, 23 Dec 2023 17:04:43 +0000
+Date: Sun, 24 Dec 2023 01:03:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next 3/6] virtio_net: support device stats
+Message-ID: <202312240041.YOiIXVkG-lkp@intel.com>
+References: <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/8] net: dsa: realtek: drop cleanup from
- realtek_ops
-Content-Language: en-US
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org
-Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, arinc.unal@arinc9.com
-References: <20231223005253.17891-1-luizluca@gmail.com>
- <20231223005253.17891-2-luizluca@gmail.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231223005253.17891-2-luizluca@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
+
+Hi Xuan,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on mst-vhost/linux-next]
+[also build test WARNING on linus/master v6.7-rc6]
+[cannot apply to net-next/main horms-ipvs/master next-20231222]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_net-introduce-device-stats-feature-and-structures/20231222-175505
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20231222033021.20649-4-xuanzhuo%40linux.alibaba.com
+patch subject: [PATCH net-next 3/6] virtio_net: support device stats
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20231224/202312240041.YOiIXVkG-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231224/202312240041.YOiIXVkG-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312240041.YOiIXVkG-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/virtio_net.c:224:2: warning: shift count >= width of type [-Wshift-count-overflow]
+           VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/virtio_net.c:215:3: note: expanded from macro 'VIRTNET_DEVICE_STATS_MAP_ITEM'
+                   VIRTIO_NET_STATS_TYPE_##TYPE,                   \
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   <scratch space>:61:1: note: expanded from here
+   VIRTIO_NET_STATS_TYPE_CVQ
+   ^~~~~~~~~~~~~~~~~~~~~~~~~
+   include/uapi/linux/virtio_net.h:419:45: note: expanded from macro 'VIRTIO_NET_STATS_TYPE_CVQ'
+   #define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
+                                               ^  ~~
+   1 warning generated.
 
 
+vim +224 drivers/net/virtio_net.c
 
-On 12/23/2023 1:46 AM, Luiz Angelo Daros de Luca wrote:
-> It was never used and never referenced.
-> 
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> Reviewed-by: Alvin Šipraga <alsi@bang-olufsen.dk>
+   212	
+   213	#define VIRTNET_DEVICE_STATS_MAP_ITEM(TYPE, type, queue_type)	\
+   214		{							\
+   215			VIRTIO_NET_STATS_TYPE_##TYPE,			\
+   216			sizeof(struct virtio_net_stats_ ## type),	\
+   217			ARRAY_SIZE(virtnet_stats_ ## type ##_desc),	\
+   218			VIRTNET_STATS_Q_TYPE_##queue_type,		\
+   219			VIRTIO_NET_STATS_TYPE_REPLY_##TYPE,		\
+   220			&virtnet_stats_##type##_desc[0]			\
+   221		}
+   222	
+   223	static struct virtnet_stats_map virtio_net_stats_map[] = {
+ > 224		VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
+   225	
+   226		VIRTNET_DEVICE_STATS_MAP_ITEM(RX_BASIC, rx_basic, RX),
+   227		VIRTNET_DEVICE_STATS_MAP_ITEM(RX_CSUM,  rx_csum,  RX),
+   228		VIRTNET_DEVICE_STATS_MAP_ITEM(RX_GSO,   rx_gso,   RX),
+   229		VIRTNET_DEVICE_STATS_MAP_ITEM(RX_SPEED, rx_speed, RX),
+   230	
+   231		VIRTNET_DEVICE_STATS_MAP_ITEM(TX_BASIC, tx_basic, TX),
+   232		VIRTNET_DEVICE_STATS_MAP_ITEM(TX_CSUM,  tx_csum,  TX),
+   233		VIRTNET_DEVICE_STATS_MAP_ITEM(TX_GSO,   tx_gso,   TX),
+   234		VIRTNET_DEVICE_STATS_MAP_ITEM(TX_SPEED, tx_speed, TX),
+   235	};
+   236	
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-Florian
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
