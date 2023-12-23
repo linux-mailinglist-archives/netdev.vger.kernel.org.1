@@ -1,223 +1,82 @@
-Return-Path: <netdev+bounces-60057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5A1B81D230
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 05:24:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B738A81D254
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 06:06:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9C781C22E7E
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 04:24:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56C86B23E4B
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 05:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B7546A2;
-	Sat, 23 Dec 2023 04:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8292117;
+	Sat, 23 Dec 2023 05:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OhO6Sh5i"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W2x3Lvyj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E819BA52
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 04:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-67f9ace0006so5638336d6.0
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 20:22:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1703305375; x=1703910175; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LHgxlClLedtf/QNWAeWSiDEJFKKyJcNJjwQNrtyL6uY=;
-        b=OhO6Sh5izuWhasWLXjsZBd4pDWrkU2y/TLU7q9bC3z0r4CKGsogFszl1m9SEons3x1
-         AlrLGMPTotpYwdz0GS3sN9YQGFCrsHQSQXxzNEvZ7jmC6jHY4OYCfDIxs/WALSdazOfV
-         1OV4RTIhRlaVNNqfcfM008EGHwJfVf2iwXGDc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703305375; x=1703910175;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LHgxlClLedtf/QNWAeWSiDEJFKKyJcNJjwQNrtyL6uY=;
-        b=egflOnLCIFvougyKe6HklK6N9oiqIM2FxQDzdTSJ2Nz5J+b3w50D08RG5u/sXz3Gk+
-         MOgHTTcuYESSUrBm7nzYyQkj5HJDz7xGftdg35QhsCqWYM43tTgZNTVVANJmWaAj6Nzf
-         1glq5jRQHOdakw3fcUhLO4MkUJGxnO6lbShOzRu5XuTcwFrAStWGGCFA4J3iCe6G4MlZ
-         fvIyqb0DTYZ8X2YY2qph9389iOTDjGTRs17bruWdHIGL9l6V9XoQYlt7WSbjhwDGB/Te
-         qTg4BIsWaEWW+5grYo16QOTlfwLRQtj+RyvaX9iJ3a3mz7ev+xHf1sj8TqEI3X3KWmZC
-         omUg==
-X-Gm-Message-State: AOJu0YxzuU2SCa5vqgqL3xzKG55APY+MSdvHIa6Fm7S9Dry3RIfkoTSo
-	LrpjwGouFI661ao0PsaIGhnkaH81MgzK
-X-Google-Smtp-Source: AGHT+IHJpjjSEhIRG6RNJXQuOTeTUEv9iIM++AFU8G+Z+U+J+KZA2H/NDDP27qjasORPieWynClpCw==
-X-Received: by 2002:a05:6214:14ae:b0:67f:ad87:70b with SMTP id bo14-20020a05621414ae00b0067fad87070bmr615068qvb.95.1703305375162;
-        Fri, 22 Dec 2023 20:22:55 -0800 (PST)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id ek5-20020ad45985000000b0067f8046a1acsm1299916qvb.144.2023.12.22.20.22.54
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Dec 2023 20:22:54 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v2 13/13] bnxt_en: Add support for ntuple filter deletion by ethtool.
-Date: Fri, 22 Dec 2023 20:22:10 -0800
-Message-Id: <20231223042210.102485-14-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20231223042210.102485-1-michael.chan@broadcom.com>
-References: <20231223042210.102485-1-michael.chan@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E589472;
+	Sat, 23 Dec 2023 05:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=zx4nae/0xrclCjM8gAvAdTEa4EkprooF8E0KRFjjTTA=; b=W2x3Lvyj9SRKw6ImeEDNTMJn6I
+	fPPLv9QZaKEiD8a+mGzc6aECqvM6jNHaLkTsgxKPL6dIcBbDiYXiDNMKua1pHpmbHxMiVJ5A0wdKq
+	h/YWUP7M0xbNEsu0qpKwO1StTqy5GNaK5pQ0+jA2vGyRqcjHjcg6HBCykljX6+KGte8zxLjnuTqdk
+	XHuz+KY+xL1aETOSS6eG/hTS/qUOZ9ijrULUZVGrfnV1KJT+iWHAkDbUT62OjyeExVae1/+fwWt7H
+	TTfTtJ2pPhih6XH3D7quUZF5gmk/BstZGg4dDHolSMAiK3D7rBElrq4wTNwMfMjBO4BZt7CfNTN57
+	5rZFACmQ==;
+Received: from [50.53.46.231] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rGuDF-007Ohp-2e;
+	Sat, 23 Dec 2023 05:06:13 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org
+Subject: [PATCH] net: phy: linux/phy.h: fix Excess kernel-doc description warning
+Date: Fri, 22 Dec 2023 21:06:13 -0800
+Message-ID: <20231223050613.13978-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d9e1e1060d25af20"
-
---000000000000d9e1e1060d25af20
 Content-Transfer-Encoding: 8bit
 
-Add logic to delete a user specified ntuple filter from ethtool.
+Remove the @phy_timer: line to prevent the kernel-doc warning:
 
-Reviewed-by: Vasundhara Volam <vasundhara-v.volam@broadcom.com>
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+include/linux/phy.h:768: warning: Excess struct member 'phy_timer' description in 'phy_device'
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org
 ---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 29 +++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ include/linux/phy.h |    1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index c3b9be328b87..5629ba9f4b2e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1341,6 +1341,31 @@ static int bnxt_srxclsrlins(struct bnxt *bp, struct ethtool_rxnfc *cmd)
- 	return rc;
- }
- 
-+static int bnxt_srxclsrldel(struct bnxt *bp, struct ethtool_rxnfc *cmd)
-+{
-+	struct ethtool_rx_flow_spec *fs = &cmd->fs;
-+	struct bnxt_filter_base *fltr_base;
-+
-+	rcu_read_lock();
-+	fltr_base = bnxt_get_one_fltr_rcu(bp, bp->ntp_fltr_hash_tbl,
-+					  BNXT_NTP_FLTR_HASH_SIZE,
-+					  fs->location);
-+	if (fltr_base) {
-+		struct bnxt_ntuple_filter *fltr;
-+
-+		fltr = container_of(fltr_base, struct bnxt_ntuple_filter, base);
-+		rcu_read_unlock();
-+		if (!(fltr->base.flags & BNXT_ACT_NO_AGING))
-+			return -EINVAL;
-+		bnxt_hwrm_cfa_ntuple_filter_free(bp, fltr);
-+		bnxt_del_ntp_filter(bp, fltr);
-+		return 0;
-+	}
-+
-+	rcu_read_unlock();
-+	return -ENOENT;
-+}
-+
- static u64 get_ethtool_ipv4_rss(struct bnxt *bp)
- {
- 	if (bp->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_IPV4)
-@@ -1532,6 +1557,10 @@ static int bnxt_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
- 		rc = bnxt_srxclsrlins(bp, cmd);
- 		break;
- 
-+	case ETHTOOL_SRXCLSRLDEL:
-+		rc = bnxt_srxclsrldel(bp, cmd);
-+		break;
-+
- 	default:
- 		rc = -EOPNOTSUPP;
- 		break;
--- 
-2.30.1
-
-
---000000000000d9e1e1060d25af20
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDjvGuqNb6Xfk8MTgfICdhCxYPtM6iyP
-mrWN755jB0m2MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIy
-MzA0MjI1NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAtS3R2CzuEEtGsSy69C6FF+SGKoYdi5OBEmlEEjba4QscdTK5g
-3ljAmBy+6cddqz1s8KZ//ran7iRycaK5lz917tmyw6lcUkpDzgB6qpPzw7qc4PhAkEZZAIvjImOP
-V9K55TDjZuv2W6cBR7iq1c0Vg0fHiAU51kTZIhPgQuCHtlwnTbN3Z1D1uU98R7glWaVNNp5Pt4/A
-nhzFP3+BmMNOMlUUbivUhIsmYQf1Utp0cPEXYQH17NaTN5gPGaON/AdqXPB7T6lxhKO3Lq2vdb7G
-+E7gWKhIgMn24RlAQqHGVKTXoKrgKFpGGhgxmBDixv0v+pxnh97NItz7TV3ecKzl
---000000000000d9e1e1060d25af20--
+diff -- a/include/linux/phy.h b/include/linux/phy.h
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -569,7 +569,6 @@ struct macsec_ops;
+  *      - Bits [31:24] are reserved for defining generic
+  *        PHY driver behavior.
+  * @irq: IRQ number of the PHY's interrupt (-1 if none)
+- * @phy_timer: The timer for handling the state machine
+  * @phylink: Pointer to phylink instance for this PHY
+  * @sfp_bus_attached: Flag indicating whether the SFP bus has been attached
+  * @sfp_bus: SFP bus attached to this PHY's fiber port
 
