@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-60117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C06A581D743
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 00:36:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AA081D745
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 00:36:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EE821F21E0A
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 23:36:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A2661C2175F
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 23:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCB01D6B8;
-	Sat, 23 Dec 2023 23:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A49208D7;
+	Sat, 23 Dec 2023 23:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cuV4PJFv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8guBJqe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F451D53A;
-	Sat, 23 Dec 2023 23:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA66A1EB4C;
+	Sat, 23 Dec 2023 23:36:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-554766d5ceaso1235190a12.3;
-        Sat, 23 Dec 2023 15:36:17 -0800 (PST)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a234dc0984fso309312766b.0;
+        Sat, 23 Dec 2023 15:36:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703374576; x=1703979376; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703374578; x=1703979378; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MxAwVffICgZgnvkf9i6jEa55fTAlwYeW47z9VTGjJBc=;
-        b=cuV4PJFvl5wHbAnNFI6i3k/6Ksg0k+b8JP13wYhlIeBRr+NCaGADySGxdANRyoQcEm
-         03fLKh0RDl8fuJRokrrGUcR++Ofwh5aTVGdA9cYKFS8fHfpWIw47T2a3wsZMQVrSjrJH
-         Zd4rAwjVRsKDatQtT36ZpN6emId+/FQSmwW81358rs/BMdkW84ZR/QfaRZp3y2vmkDwv
-         +Un/4XiSDRaI150++jxfpcMhJ1149BAmadTeEEdcWPKW5n0TDfS0XS5VuFIUdu4Pis28
-         qhTBFF8IH6XflFqH0jE1zxjJNIZjX0pOUaDmbZAgqzrfEBtryKYWKlCjAj2ogx1DgF76
-         iMQg==
+        bh=SEx7xfusdmQXhw9i1ARuI4xTKHuwCraW+mZTw9408Ng=;
+        b=C8guBJqeVhRERRNaCa9+/2aGM2dPSEA/sjochhL+HECyet3sT5IV9UHmDFOWjn5Wvc
+         26fxZqUYEEPmcVD5Rde85X0+topdoIV4mfrXYIHHOd7nlggxNuVR4zuLllz/SPfK4BSz
+         +ICm9aemSLKjIqA+FGTbHI1U6yDhJCnS4gC8KOF358qEJTdUjqdQT54WqjMBLKcBGhw8
+         2DMX7uK1x8E66S2ill87uvbvQGFciFEinjtQeNni5DNtkR4TZ5TKtLjqlcHaQkTwnlf7
+         rUg2uWqNbjoi8Dvz57RXDDnRWdEqkAUDlLLEHKZ3UmRVfNHYzuCm78wbevYIltS8CFwu
+         Pw2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703374576; x=1703979376;
+        d=1e100.net; s=20230601; t=1703374578; x=1703979378;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MxAwVffICgZgnvkf9i6jEa55fTAlwYeW47z9VTGjJBc=;
-        b=arwVMLcAHtJcDQjvMtjp6Oy7ujJn82jfRPoQpiCoroC7cG3X4NlnwqbaWPSqtKnq2+
-         WcjOxJBu0gJRgQNgDFkL2a03clpU2BG51yReq7KRKMsMXNTWPoeITJ5RZOXvwHtHV2cL
-         RSepcq5uBU30o5wBv9sb1q1n5bTP2wy68Z+UJRiT5/tFyw7DPzeFqTtKPmKeU9Y/X0v4
-         8YDs2T6efnpfLJLsQ2CM1iPTuXZYpu5NWDjaqbpGgPeMwj6yuour1+i74kRjTLiSKEPn
-         UzY8zO+AsbTSvHZAR3fz/qLRRNsKNc+qry/T5AF/9OmPbJ/hchekT1rpmatCn75NFd7o
-         AhQA==
-X-Gm-Message-State: AOJu0YzLwUNtb32vYyxWtxyH/Y/ZA89Az8YDXT8ZEp1O5R4kp3D+byl4
-	x0ZupGDcRKHHvlRsXFV72F4=
-X-Google-Smtp-Source: AGHT+IG2H4GUtRqMWAnpiZokIOZ/Tmr7TebvSbHOTZWm4bHW4VBi/2kji+vpQDOKJBzb85qg+2GwkQ==
-X-Received: by 2002:a50:d756:0:b0:554:7a21:241e with SMTP id i22-20020a50d756000000b005547a21241emr1408048edj.40.1703374576312;
-        Sat, 23 Dec 2023 15:36:16 -0800 (PST)
+        bh=SEx7xfusdmQXhw9i1ARuI4xTKHuwCraW+mZTw9408Ng=;
+        b=gf+0kb0j7cvqwD2XFKAkxIANMX+iAYZ9NGkyHHfOViXhT6+1LMBFduSslc9OvKN0sv
+         Gg2n/Mvdn58W4dS4K41tvhJaJHgT22Uk97L4t4X2YTejqNzYmztma1UjMoD2OCOd9Vik
+         qOAf5+ClF//NEkjnY2XwLdjTraX2aw140Q9wgQiCPFMCOnsdwARgIus1sKqWa2FxvitJ
+         B1vBOkhjpCVFHL9Ftfr1QqG7HTyO6jHE2NHm9S8H+kiT6qGFSXBPky8hH8UWObFokCWm
+         RDSRnpRt51QS+G7DyRmriiInEzQK4Do8cotLUHJVvf5sXofSAOvDmO9r/KHUbMxYa1DZ
+         TcfA==
+X-Gm-Message-State: AOJu0YzwelW4NWzRe0GZ5gl7SSgbD5QAwApGGGNlB0ICGrW+wm0kLtAV
+	WsSYX494zPiC8jl9vxr54Ps=
+X-Google-Smtp-Source: AGHT+IED6CmEiqkckDFO7TKKuz2PVr3JXMUmSXr8UjGO661pcIN+s9cs+OU/YKyJwYUNALMab8msJQ==
+X-Received: by 2002:a17:906:74c2:b0:a23:6b80:c1db with SMTP id z2-20020a17090674c200b00a236b80c1dbmr1800681ejl.95.1703374577793;
+        Sat, 23 Dec 2023 15:36:17 -0800 (PST)
 Received: from localhost ([5.255.99.108])
-        by smtp.gmail.com with ESMTPSA id a14-20020a50ff0e000000b0054d360bdfd6sm4404930edu.73.2023.12.23.15.36.15
+        by smtp.gmail.com with ESMTPSA id gs16-20020a170906f19000b00a269910e708sm3473555ejb.206.2023.12.23.15.36.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Dec 2023 15:36:15 -0800 (PST)
+        Sat, 23 Dec 2023 15:36:17 -0800 (PST)
 From: Maxim Mikityanskiy <maxtram95@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
@@ -70,9 +70,9 @@ Cc: Eric Dumazet <edumazet@google.com>,
 	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Maxim Mikityanskiy <maxtram95@gmail.com>
-Subject: [PATCH net 1/2] USB: Allow usb_device_driver to override usb_choose_configuration
-Date: Sun, 24 Dec 2023 01:35:22 +0200
-Message-ID: <20231223233523.4411-2-maxtram95@gmail.com>
+Subject: [PATCH net 2/2] r8152: Switch to using choose_configuration
+Date: Sun, 24 Dec 2023 01:35:23 +0200
+Message-ID: <20231223233523.4411-3-maxtram95@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231223233523.4411-1-maxtram95@gmail.com>
 References: <20231223233523.4411-1-maxtram95@gmail.com>
@@ -84,69 +84,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-usb_choose_configuration is called in two cases: on probe and on
-authorization. If a usb_device_driver wants to override the default
-configuration (like r8152 does to choose the vendor config), it can do
-that on probe, but it has no control over what happens on authorization.
-This breaks the intention on machines that use usbguard (all devices are
-not authorized by default, and the permitted ones get the authorization
-a moment later), because a wrong configuration ends up being selected.
+With the introduction of r8152-cfgselector, the following regression
+appeared on machines that use usbguard: the netdev appears only when the
+USB device is inserted the first time (before the module is loaded), but
+on the second and next insertions no netdev is registered.
 
-Allow usb_device_driver to override usb_choose_configuration
-specifically.
+It happens because the device is probed as unauthorized, and usbguard
+gives it an authorization a moment later. If the module is not loaded,
+it's normally loaded slower than the authorization is given, and
+everything works. If the module is already loaded, the cfgselector's
+probe function runs first, but then usb_authorize_device kicks in and
+changes the configuration to something chosen by the standard
+usb_choose_configuration. rtl8152_probe refuses to probe non-vendor
+configurations, and the user ends up without a netdev.
 
+The previous commit added possibility to override
+usb_choose_configuration. Use it to fix the bug and pick the right
+configuration on both probe and authorization.
+
+Fixes: ec51fbd1b8a2 ("r8152: add USB device driver for config selection")
 Signed-off-by: Maxim Mikityanskiy <maxtram95@gmail.com>
 ---
- drivers/usb/core/generic.c | 10 ++++++++++
- include/linux/usb.h        |  3 +++
- 2 files changed, 13 insertions(+)
+ drivers/net/usb/r8152.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/usb/core/generic.c b/drivers/usb/core/generic.c
-index 740342a2812a..a1bc4f875d37 100644
---- a/drivers/usb/core/generic.c
-+++ b/drivers/usb/core/generic.c
-@@ -59,10 +59,20 @@ int usb_choose_configuration(struct usb_device *udev)
- 	int num_configs;
- 	int insufficient_power = 0;
- 	struct usb_host_config *c, *best;
-+	struct usb_device_driver *udriver = NULL;
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 9bf2140fd0a1..f0ac31a94f3c 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -10070,6 +10070,11 @@ static struct usb_driver rtl8152_driver = {
+ };
  
- 	if (usb_device_is_owned(udev))
- 		return 0;
- 
-+	if (udev->dev.driver) {
-+		udriver = to_usb_device_driver(udev->dev.driver);
-+		if (udriver->choose_configuration) {
-+			i = udriver->choose_configuration(udev);
-+			if (i != -EOPNOTSUPP)
-+				return max(i, -1);
-+		}
-+	}
+ static int rtl8152_cfgselector_probe(struct usb_device *udev)
++{
++	return 0;
++}
 +
- 	best = NULL;
++static int rtl8152_cfgselector_choose_configuration(struct usb_device *udev)
+ {
+ 	struct usb_host_config *c;
+ 	int i, num_configs;
+@@ -10078,7 +10083,7 @@ static int rtl8152_cfgselector_probe(struct usb_device *udev)
+ 	 * driver supports it.
+ 	 */
+ 	if (__rtl_get_hw_ver(udev) == RTL_VER_UNKNOWN)
+-		return 0;
++		return -EOPNOTSUPP;
+ 
+ 	/* The vendor mode is not always config #1, so to find it out. */
  	c = udev->config;
- 	num_configs = udev->descriptor.bNumConfigurations;
-diff --git a/include/linux/usb.h b/include/linux/usb.h
-index 8c61643acd49..4f59b10f2fdd 100644
---- a/include/linux/usb.h
-+++ b/include/linux/usb.h
-@@ -1259,6 +1259,8 @@ struct usb_driver {
-  *	device.  If it is, probe returns zero and uses dev_set_drvdata()
-  *	to associate driver-specific data with the device.  If unwilling
-  *	to manage the device, return a negative errno value.
-+ * @choose_configuration: Called from usb_choose_configuration, allows the
-+ *	driver to override the default configuration.
-  * @disconnect: Called when the device is no longer accessible, usually
-  *	because it has been (or is being) disconnected or the driver's
-  *	module is being unloaded.
-@@ -1283,6 +1285,7 @@ struct usb_device_driver {
+@@ -10094,20 +10099,15 @@ static int rtl8152_cfgselector_probe(struct usb_device *udev)
+ 	}
  
- 	bool (*match) (struct usb_device *udev);
- 	int (*probe) (struct usb_device *udev);
-+	int (*choose_configuration) (struct usb_device *udev);
- 	void (*disconnect) (struct usb_device *udev);
+ 	if (i == num_configs)
+-		return -ENODEV;
+-
+-	if (usb_set_configuration(udev, c->desc.bConfigurationValue)) {
+-		dev_err(&udev->dev, "Failed to set configuration %d\n",
+-			c->desc.bConfigurationValue);
+-		return -ENODEV;
+-	}
++		return -EOPNOTSUPP;
  
- 	int (*suspend) (struct usb_device *udev, pm_message_t message);
+-	return 0;
++	return c->desc.bConfigurationValue;
+ }
+ 
+ static struct usb_device_driver rtl8152_cfgselector_driver = {
+ 	.name =		MODULENAME "-cfgselector",
+ 	.probe =	rtl8152_cfgselector_probe,
++	.choose_configuration = rtl8152_cfgselector_choose_configuration,
+ 	.id_table =	rtl8152_table,
+ 	.generic_subclass = 1,
+ 	.supports_autosuspend = 1,
 -- 
 2.43.0
 
