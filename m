@@ -1,102 +1,114 @@
-Return-Path: <netdev+bounces-60092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53E9C81D4D7
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 16:22:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 480F381D508
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 17:16:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E726D1F218B7
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 15:22:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E12831F21D9A
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 16:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEFFDF5C;
-	Sat, 23 Dec 2023 15:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D60F4FC;
+	Sat, 23 Dec 2023 16:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b="c3DtDiPW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C2opNiBy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mr85p00im-hyfv06011401.me.com (mr85p00im-hyfv06011401.me.com [17.58.23.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBACE12E4C
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 15:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danm.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=danm.net; s=sig1;
-	t=1703344958; bh=ovGTlMDPRAGKzno3u31CFlIC7HFqSBjL48kKASqoQW4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=c3DtDiPWp1lf3yECMzAwbWceyad9k0h3W7JXDa6qf5inhdNeKd8Gu31a43mkIz27g
-	 65HUH+FnCfIEftGhQGxo/GF7eYJxnaVG2T1IFUtA6UIAFo2jILd8gjVKUzjMedNZM0
-	 VHtUr1yrj+TmCQ2SYXufc80cjiAck099GAGMB1QGRgH2BuZGTEqnqEp04rmYiDWN4C
-	 1R6vN2tMAdjH0o1ncCbr7B0CBZ11ZmCF4VYDpcSd7VWZaSGfadD6+Ebf/1El8PgqF6
-	 5U7BTSMaeL/D3AD37UqkBPi5PymsFa863200G+Lka/itTR85fK9tChS0524ncTGfSU
-	 lFtHaU8NuYl8w==
-Received: from hitch.danm.net (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-hyfv06011401.me.com (Postfix) with ESMTPSA id 1EB61357AE1A;
-	Sat, 23 Dec 2023 15:22:36 +0000 (UTC)
-From: Dan Moulding <dan@danm.net>
-To: alexhenrie24@gmail.com
-Cc: bagasdotme@gmail.com,
-	dan@danm.net,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	regressions@lists.linux.dev
-Subject: Re: [REGRESSION] net/ipv6/addrconf: Temporary addresses with short lifetimes generating when they shouldn't, causing applications to fail
-Date: Sat, 23 Dec 2023 08:22:35 -0700
-Message-ID: <20231223152235.15713-1-dan@danm.net>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231222234237.44823-1-alexhenrie24@gmail.com>
-References: <20231222234237.44823-1-alexhenrie24@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F72910940
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 16:16:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47BC9C433C7;
+	Sat, 23 Dec 2023 16:16:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703348185;
+	bh=f6XRhGA0PIrVr5jO83uDKPfvkDOspkDBnTp99j76Jrg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C2opNiByGKD5maRl0kTzi9At2bqp7NG0bWskrbL9ck+ky2pJh9vXhIP3Yv+xLT9Cq
+	 vDoJMT4H9l+z5tWY99wzbpudnpSoBLws215w+cq2/XZlfXvX9p6/3DXZ79dft6xQ75
+	 MMEV/wkciBjMSOSgDuYCkqaBmwod8NoD9E3qj2GVhJUxHvNzp5Iqtsx+svsAqPabbU
+	 zuI84nA3rzqNx28e/bjIrHp5ym5dy2clu8XLxI+vB7RnYpToD9umYYMm39P5wywk0K
+	 Lc7OUmDbrfnDWO1J4xBtSIPURPtU821IjrSEim2kGlFID7pq3822NtILUmMWUNt8Lr
+	 Cm4uLNRq5Eo0Q==
+Date: Sat, 23 Dec 2023 16:16:20 +0000
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Coco Li <lixiaoyan@google.com>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH net-next] net-device: move gso_partial_features to
+ net_device_read_tx
+Message-ID: <20231223161620.GF201037@kernel.org>
+References: <20231221140747.1171134-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: IVspz_wVv4nBP_guhifhXr4Xdh0VPXjO
-X-Proofpoint-GUID: IVspz_wVv4nBP_guhifhXr4Xdh0VPXjO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-23_06,2023-12-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0 spamscore=0
- phishscore=0 clxscore=1030 malwarescore=0 mlxlogscore=938 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2312230121
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221140747.1171134-1-edumazet@google.com>
 
-> Sorry for the unintended consequences, and thank you for the detailed
-> explanation. Does this patch fix the problem for you?
+On Thu, Dec 21, 2023 at 02:07:47PM +0000, Eric Dumazet wrote:
+> dev->gso_partial_features is read from tx fast path for GSO packets.
+> 
+> Move it to appropriate section to avoid a cache line miss.
+> 
+> Fixes: 43a71cd66b9c ("net-device: reorganize net_device fast path variables")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Coco Li <lixiaoyan@google.com>
+> Cc: David Ahern <dsahern@kernel.org>
 
-Thanks. I think this patch may resolve the application-level issues
-I'm seeing.
+Thanks Eric,
 
-However, it looks to me like this would still violate the RFC. The
-temoporary address' preferred liftime must be lower than /both/ the
-preferred lifetime of the public address and TEMP_PREFERRED_LIFETIME -
-DESYNC_FACTOR.
+FWIIW, this change looks good to me.
 
-These two existing lines ensure that it will meet the requirement:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-	cfg.preferred_lft = cnf_temp_preferred_lft + age - idev->desync_factor;
-	cfg.preferred_lft = min_t(__u32, ifp->prefered_lft, cfg.preferred_lft);
+I have a follow-up question below.
 
-Once that has been computed, cfg.preferred_lft is already at its
-maximum allowed value. There is no case where the RFC allows
-increasing that value after doing that computation.
+...
 
-I think the safest thing to do is revert this change, and try to find
-some other way to achieve the goal of preventing the user from
-administratively setting a preferred lifetime that prevents temporary
-addresses from being generated, when the user wants to use the privacy
-extensions. For example, this could be done where administratively
-configured values are accepted (wherever that is), and either generate
-a warning or reject the change, if the value provided by the user is
-lower than REGEN_ADVANCE.
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 75c7725e5e4fdf59da55923cd803e084956b0fa0..5d1ec780122919c31e4215358d736aef3f8a0acd 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2114,6 +2114,7 @@ struct net_device {
+>  	const struct net_device_ops *netdev_ops;
+>  	const struct header_ops *header_ops;
+>  	struct netdev_queue	*_tx;
+> +	netdev_features_t	gso_partial_features;
+>  	unsigned int		real_num_tx_queues;
+>  	unsigned int		gso_max_size;
+>  	unsigned int		gso_ipv4_max_size;
 
--- Dan
+While looking at this I came to wonder if it would
+be worth adding a 16bit pad a little below this hunk
+so that tc_to_txq sits on it's own cacheline.
+
+I'm unsure if the access pattern of tc_to_txq makes this worthwhile.
+But if so it would be a simple tweak.
+
+With such a change in place, on top of your patch, the diff of pahole output
+on x86_64 is:
+
+@@ -7432,10 +7432,9 @@
+        s16                        num_tc;               /*    54     2 */
+        unsigned int               mtu;                  /*    56     4 */
+        short unsigned int         needed_headroom;      /*    60     2 */
+-       struct netdev_tc_txq       tc_to_txq[16];        /*    62    64 */
+-
+-       /* XXX 2 bytes hole, try to pack */
+-
++       u16                        pad1;                 /*    62     2 */
++       /* --- cacheline 1 boundary (64 bytes) --- */
++       struct netdev_tc_txq       tc_to_txq[16];        /*    64    64 */
+        /* --- cacheline 2 boundary (128 bytes) --- */
+        struct xps_dev_maps *      xps_maps[2];          /*   128    16 */
+        struct nf_hook_entries *   nf_hooks_egress;      /*   144     8 */
 
