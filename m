@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-59998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-59999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3728581D0DE
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 01:54:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEE3E81D0DF
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 01:54:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A8951C21B25
-	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 00:54:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DC9328107C
+	for <lists+netdev@lfdr.de>; Sat, 23 Dec 2023 00:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA2365B;
-	Sat, 23 Dec 2023 00:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137D0384;
+	Sat, 23 Dec 2023 00:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khIRsKd0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h64JUqLU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5EAF1373
-	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 00:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90379ECB
+	for <netdev@vger.kernel.org>; Sat, 23 Dec 2023 00:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7ba737ee9b5so124551639f.0
-        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 16:53:51 -0800 (PST)
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3ba52d0f9feso1801104b6e.0
+        for <netdev@vger.kernel.org>; Fri, 22 Dec 2023 16:53:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703292830; x=1703897630; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703292834; x=1703897634; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SI8Z0wy+Gbr/WEZjswv2pZaS7VBFMFDdyunTtoeb/x4=;
-        b=khIRsKd0uwntAYprVNSuwkrKWoazJEw+DGGMm/3hJ1HYIqKMyGMvxsu7njcfrVmlic
-         jgzNWLzORlQR5NpN8W12bZhzd97CbyuMGMEmrpYLHG2CabxuhN0xIlN5JUAcLwprNtd1
-         yxubZzhxzpDmpqGF0khc03+cma2P90GjKPOdPV3Kofcfn6L+CAg0Ro6IZdcnl6lbCzNV
-         5FYLDRwxLwqZd3R6mEmVYavKYbUIVN+Svu2VxZTmMPflVZATQ/OtLOc5qI6RNcRmoqgp
-         kuMyOceWfW+tgXsfn0ce54chSf98T7Sxv4JRv7NcSDjb6hmVAd+6cjHCb4DVwPGlUQ1s
-         z3eQ==
+        bh=+cK7kJHTVafdsQS7PU7GA+orFROjeokysvEhQHyINr0=;
+        b=h64JUqLUEZI+Uk9PptFFlHKdPuHYht4uSmr5eHBmm6LijwndRjrbFafybROxJRauaL
+         umb7rMOoA8aFqU2bdl9Ol8NHomzgDKsbwBp42Y5akzW29iOvfbc6X0ezl+0AdGbgHDX+
+         fpjVA6IgPTwQbKc4KXcL3ZIeFGZLPLpWRIl7N/ephdEqzk+7aciH3EX1qGelR6oVEyEX
+         EhfeHDOyLv9O2qT0ueLwqQUGjYYITpCdE9oP30Yd6DHrF1DDgrjBAQ2+AZxHnbCC3GEo
+         Qn60PKZMxi+VZhotwPVM3vpKCnAulMYyVKagYceQZMNRjUTS4RVCGiZZkKwZP+YU4hvt
+         d7Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703292830; x=1703897630;
+        d=1e100.net; s=20230601; t=1703292834; x=1703897634;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SI8Z0wy+Gbr/WEZjswv2pZaS7VBFMFDdyunTtoeb/x4=;
-        b=JC/kBxyXbeDp2pkrfzrpvSHzUvq+pogpxtb323YhV2ZeBGbAZmYXj8YIxEUcp+zpdl
-         BoxwltvvAGFnrxNl/7q/o1biCOBp5guF2iEjLR3sbQzeHiTpgAVjBWuKUZa10i3qfekt
-         NzqfvkmR35dHyK4vsMBVun6IDZdJM3P9MzlpWvLZL8R4RXNeTFWHEqXuIVG3ICjtfxQH
-         ZGeGyyZPuQ/yOQV2xbPaNH2cd393D0w+rgB2M8Uv/uIZH05Wk9lDudf4MFd+iiEQ9Yju
-         ufWbBgW1K5jZVn9P0446sxDDyX5wVJ7HxNYh78dg6Db2ICqqSwkepv2FgIpHiyKJ1Jsp
-         kwyg==
-X-Gm-Message-State: AOJu0YxSMhY4sqmeGoWofgtq8fbf90Kl83p4IZa+jijgFDnjG0UzZkZa
-	IXLelrmLDuS3laWQypiMi9NJQ2vMfeMhE8hM
-X-Google-Smtp-Source: AGHT+IFarJQ+cP15px78HmtAG5tyyt7h706pdFQsvTeLdoS/gyVnEtv9Ckzoj2oVkDalNc+0H+qtBw==
-X-Received: by 2002:a05:6e02:2184:b0:35f:ea98:1dbf with SMTP id j4-20020a056e02218400b0035fea981dbfmr507375ila.62.1703292830040;
-        Fri, 22 Dec 2023 16:53:50 -0800 (PST)
+        bh=+cK7kJHTVafdsQS7PU7GA+orFROjeokysvEhQHyINr0=;
+        b=GJPyv5aFBdLo+RgKIXNAWfcxIPi3Jpg+dsa8Iy+h9uhxle4XnnQGp65jO+1MpyLWCA
+         EhvzjV0yEAuj1/1Ci5vqU32DmJENp7j9tH0mTIlX+dhTOmR9BH0xn1/YyDuhpTtb3QLe
+         ZmxmjP/5ATKMg1GnFldyBqsEKKtCjY2OMFU0EOcjhhVrr93ej2VYARGDoFPrY7CnSb+H
+         PGV9SMyqiX1zd99TiRkn/+8CM9Z3HuJgMKu5+Ogrh63Rm9CMxVSUxWTu1uDfc1Vx72Ia
+         6NumeNrv9UXxap0HItVRl60qQVLnT/V2c4/kV2et+RR92nRggUNyF6A8e2cJt/4AcJJN
+         qWMg==
+X-Gm-Message-State: AOJu0YxuVYvDF4sUgEs3DkAc5HN0eEOE6lVc6daJa8p6oZiDhGWSfmmQ
+	AhM3DdHjfcFxVj0jdmISUBeJWL2jWGDwPdtz
+X-Google-Smtp-Source: AGHT+IEw54J38M7Q0R06FS6kYxPBTo8/nvCXXSp6PbkiuDtDPOHnqSFfz0l57qxPbnFL17dD6b/UjA==
+X-Received: by 2002:a05:6808:4447:b0:3bb:89aa:dfaa with SMTP id ep7-20020a056808444700b003bb89aadfaamr2540673oib.40.1703292833872;
+        Fri, 22 Dec 2023 16:53:53 -0800 (PST)
 Received: from tresc054937.tre-sc.gov.br ([187.94.103.218])
-        by smtp.gmail.com with ESMTPSA id iz11-20020a170902ef8b00b001d076c2e336sm4028257plb.100.2023.12.22.16.53.46
+        by smtp.gmail.com with ESMTPSA id iz11-20020a170902ef8b00b001d076c2e336sm4028257plb.100.2023.12.22.16.53.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 16:53:49 -0800 (PST)
+        Fri, 22 Dec 2023 16:53:53 -0800 (PST)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org,
@@ -70,9 +70,9 @@ Cc: linus.walleij@linaro.org,
 	pabeni@redhat.com,
 	arinc.unal@arinc9.com,
 	Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Subject: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
-Date: Fri, 22 Dec 2023 21:46:31 -0300
-Message-ID: <20231223005253.17891-4-luizluca@gmail.com>
+Subject: [PATCH net-next v3 4/8] net: dsa: realtek: merge common and interface modules into realtek-dsa
+Date: Fri, 22 Dec 2023 21:46:32 -0300
+Message-ID: <20231223005253.17891-5-luizluca@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231223005253.17891-1-luizluca@gmail.com>
 References: <20231223005253.17891-1-luizluca@gmail.com>
@@ -84,681 +84,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some code can be shared between both interface modules (MDIO and SMI)
-and among variants. These interface functions migrated to a common
-module:
-
-- realtek_common_lock
-- realtek_common_unlock
-- realtek_common_probe
-- realtek_common_register_switch
-- realtek_common_remove
-
-The reset during probe was moved to the end of the common probe. This way,
-we avoid a reset if anything else fails.
+Since realtek-common and realtek-{smi,mdio} are always loaded together,
+we can optimize resource usage by consolidating them into a single
+module.
 
 Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 ---
- drivers/net/dsa/realtek/Makefile         |   2 +
- drivers/net/dsa/realtek/realtek-common.c | 132 +++++++++++++++++++++++
- drivers/net/dsa/realtek/realtek-common.h |  16 +++
- drivers/net/dsa/realtek/realtek-mdio.c   | 114 +++-----------------
- drivers/net/dsa/realtek/realtek-smi.c    | 117 ++++----------------
- drivers/net/dsa/realtek/realtek.h        |   6 +-
- drivers/net/dsa/realtek/rtl8365mb.c      |   9 +-
- drivers/net/dsa/realtek/rtl8366rb.c      |   9 +-
- 8 files changed, 194 insertions(+), 211 deletions(-)
- create mode 100644 drivers/net/dsa/realtek/realtek-common.c
- create mode 100644 drivers/net/dsa/realtek/realtek-common.h
+ drivers/net/dsa/realtek/Kconfig          | 4 ++--
+ drivers/net/dsa/realtek/Makefile         | 7 ++++---
+ drivers/net/dsa/realtek/realtek-common.c | 1 +
+ drivers/net/dsa/realtek/realtek-mdio.c   | 4 ----
+ drivers/net/dsa/realtek/realtek-smi.c    | 4 ----
+ 5 files changed, 7 insertions(+), 13 deletions(-)
 
+diff --git a/drivers/net/dsa/realtek/Kconfig b/drivers/net/dsa/realtek/Kconfig
+index 9d182fde11b4..6989972eebc3 100644
+--- a/drivers/net/dsa/realtek/Kconfig
++++ b/drivers/net/dsa/realtek/Kconfig
+@@ -16,14 +16,14 @@ menuconfig NET_DSA_REALTEK
+ if NET_DSA_REALTEK
+ 
+ config NET_DSA_REALTEK_MDIO
+-	tristate "Realtek MDIO interface support"
++	bool "Realtek MDIO interface support"
+ 	depends on OF
+ 	help
+ 	  Select to enable support for registering switches configured
+ 	  through MDIO.
+ 
+ config NET_DSA_REALTEK_SMI
+-	tristate "Realtek SMI interface support"
++	bool "Realtek SMI interface support"
+ 	depends on OF
+ 	help
+ 	  Select to enable support for registering switches connected
 diff --git a/drivers/net/dsa/realtek/Makefile b/drivers/net/dsa/realtek/Makefile
-index 0aab57252a7c..f4f9c6340d5f 100644
+index f4f9c6340d5f..cea0e761d20f 100644
 --- a/drivers/net/dsa/realtek/Makefile
 +++ b/drivers/net/dsa/realtek/Makefile
-@@ -1,4 +1,6 @@
+@@ -1,8 +1,9 @@
  # SPDX-License-Identifier: GPL-2.0
-+obj-$(CONFIG_NET_DSA_REALTEK)		+= realtek-dsa.o
-+realtek-dsa-objs			:= realtek-common.o
- obj-$(CONFIG_NET_DSA_REALTEK_MDIO) 	+= realtek-mdio.o
- obj-$(CONFIG_NET_DSA_REALTEK_SMI) 	+= realtek-smi.o
+ obj-$(CONFIG_NET_DSA_REALTEK)		+= realtek-dsa.o
+-realtek-dsa-objs			:= realtek-common.o
+-obj-$(CONFIG_NET_DSA_REALTEK_MDIO) 	+= realtek-mdio.o
+-obj-$(CONFIG_NET_DSA_REALTEK_SMI) 	+= realtek-smi.o
++realtek-dsa-objs-y			:= realtek-common.o
++realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_MDIO) += realtek-mdio.o
++realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_SMI) += realtek-smi.o
++realtek-dsa-objs			:= $(realtek-dsa-objs-y)
  obj-$(CONFIG_NET_DSA_REALTEK_RTL8366RB) += rtl8366.o
+ rtl8366-objs 				:= rtl8366-core.o rtl8366rb.o
+ obj-$(CONFIG_NET_DSA_REALTEK_RTL8365MB) += rtl8365mb.o
 diff --git a/drivers/net/dsa/realtek/realtek-common.c b/drivers/net/dsa/realtek/realtek-common.c
-new file mode 100644
-index 000000000000..80b37e5fe780
---- /dev/null
+index 80b37e5fe780..dcf859ea78ab 100644
+--- a/drivers/net/dsa/realtek/realtek-common.c
 +++ b/drivers/net/dsa/realtek/realtek-common.c
-@@ -0,0 +1,132 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+
-+#include <linux/module.h>
-+
-+#include "realtek.h"
-+#include "realtek-common.h"
-+
-+void realtek_common_lock(void *ctx)
-+{
-+	struct realtek_priv *priv = ctx;
-+
-+	mutex_lock(&priv->map_lock);
-+}
-+EXPORT_SYMBOL_GPL(realtek_common_lock);
-+
-+void realtek_common_unlock(void *ctx)
-+{
-+	struct realtek_priv *priv = ctx;
-+
-+	mutex_unlock(&priv->map_lock);
-+}
-+EXPORT_SYMBOL_GPL(realtek_common_unlock);
-+
-+struct realtek_priv *
-+realtek_common_probe(struct device *dev, struct regmap_config rc,
-+		     struct regmap_config rc_nolock)
-+{
-+	const struct realtek_variant *var;
-+	struct realtek_priv *priv;
-+	int ret;
-+
-+	var = of_device_get_match_data(dev);
-+	if (!var)
-+		return ERR_PTR(-EINVAL);
-+
-+	priv = devm_kzalloc(dev, size_add(sizeof(*priv), var->chip_data_sz),
-+			    GFP_KERNEL);
-+	if (!priv)
-+		return ERR_PTR(-ENOMEM);
-+
-+	mutex_init(&priv->map_lock);
-+
-+	rc.lock_arg = priv;
-+	priv->map = devm_regmap_init(dev, NULL, priv, &rc);
-+	if (IS_ERR(priv->map)) {
-+		ret = PTR_ERR(priv->map);
-+		dev_err(dev, "regmap init failed: %d\n", ret);
-+		return ERR_PTR(ret);
-+	}
-+
-+	priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc_nolock);
-+	if (IS_ERR(priv->map_nolock)) {
-+		ret = PTR_ERR(priv->map_nolock);
-+		dev_err(dev, "regmap init failed: %d\n", ret);
-+		return ERR_PTR(ret);
-+	}
-+
-+	/* Link forward and backward */
-+	priv->dev = dev;
-+	priv->variant = var;
-+	priv->ops = var->ops;
-+	priv->chip_data = (void *)priv + sizeof(*priv);
-+
-+	dev_set_drvdata(dev, priv);
-+	spin_lock_init(&priv->lock);
-+
-+	priv->leds_disabled = of_property_read_bool(dev->of_node,
-+						    "realtek,disable-leds");
-+
-+	/* TODO: if power is software controlled, set up any regulators here */
-+
-+	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
-+	if (IS_ERR(priv->reset)) {
-+		dev_err(dev, "failed to get RESET GPIO\n");
-+		return ERR_CAST(priv->reset);
-+	}
-+	if (priv->reset) {
-+		gpiod_set_value(priv->reset, 1);
-+		dev_dbg(dev, "asserted RESET\n");
-+		msleep(REALTEK_HW_STOP_DELAY);
-+		gpiod_set_value(priv->reset, 0);
-+		msleep(REALTEK_HW_START_DELAY);
-+		dev_dbg(dev, "deasserted RESET\n");
-+	}
-+
-+	return priv;
-+}
-+EXPORT_SYMBOL(realtek_common_probe);
-+
-+int realtek_common_register_switch(struct realtek_priv *priv)
-+{
-+	int ret;
-+
-+	ret = priv->ops->detect(priv);
-+	if (ret) {
-+		dev_err_probe(priv->dev, ret, "unable to detect switch\n");
-+		return ret;
-+	}
-+
-+	priv->ds = devm_kzalloc(priv->dev, sizeof(*priv->ds), GFP_KERNEL);
-+	if (!priv->ds)
-+		return -ENOMEM;
-+
-+	priv->ds->priv = priv;
-+	priv->ds->dev = priv->dev;
-+	priv->ds->ops = priv->ds_ops;
-+	priv->ds->num_ports = priv->num_ports;
-+
-+	ret = dsa_register_switch(priv->ds);
-+	if (ret) {
-+		dev_err_probe(priv->dev, ret, "unable to register switch\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(realtek_common_register_switch);
-+
-+void realtek_common_remove(struct realtek_priv *priv)
-+{
-+	if (!priv)
-+		return;
-+
-+	/* leave the device reset asserted */
-+	if (priv->reset)
-+		gpiod_set_value(priv->reset, 1);
-+}
-+EXPORT_SYMBOL(realtek_common_remove);
-+
-+MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
-+MODULE_DESCRIPTION("Realtek DSA switches common module");
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/net/dsa/realtek/realtek-common.h b/drivers/net/dsa/realtek/realtek-common.h
-new file mode 100644
-index 000000000000..518d091ff496
---- /dev/null
-+++ b/drivers/net/dsa/realtek/realtek-common.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+
-+#ifndef _REALTEK_COMMON_H
-+#define _REALTEK_COMMON_H
-+
-+#include <linux/regmap.h>
-+
-+void realtek_common_lock(void *ctx);
-+void realtek_common_unlock(void *ctx);
-+struct realtek_priv *
-+realtek_common_probe(struct device *dev, struct regmap_config rc,
-+		     struct regmap_config rc_nolock);
-+int realtek_common_register_switch(struct realtek_priv *priv);
-+void realtek_common_remove(struct realtek_priv *priv);
-+
-+#endif /* _REALTEK_COMMON_H */
+@@ -128,5 +128,6 @@ void realtek_common_remove(struct realtek_priv *priv)
+ EXPORT_SYMBOL(realtek_common_remove);
+ 
+ MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
++MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
+ MODULE_DESCRIPTION("Realtek DSA switches common module");
+ MODULE_LICENSE("GPL");
 diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
-index 58966d0625c8..1eed09ab3aa1 100644
+index 1eed09ab3aa1..967f6c1e8df0 100644
 --- a/drivers/net/dsa/realtek/realtek-mdio.c
 +++ b/drivers/net/dsa/realtek/realtek-mdio.c
-@@ -26,6 +26,7 @@
- 
- #include "realtek.h"
- #include "realtek-mdio.h"
-+#include "realtek-common.h"
- 
- /* Read/write via mdiobus */
- #define REALTEK_MDIO_CTRL0_REG		31
-@@ -100,20 +101,6 @@ static int realtek_mdio_read(void *ctx, u32 reg, u32 *val)
- 	return ret;
+@@ -177,7 +177,3 @@ void realtek_mdio_shutdown(struct mdio_device *mdiodev)
+ 	dev_set_drvdata(&mdiodev->dev, NULL);
  }
- 
--static void realtek_mdio_lock(void *ctx)
--{
--	struct realtek_priv *priv = ctx;
+ EXPORT_SYMBOL_GPL(realtek_mdio_shutdown);
 -
--	mutex_lock(&priv->map_lock);
--}
--
--static void realtek_mdio_unlock(void *ctx)
--{
--	struct realtek_priv *priv = ctx;
--
--	mutex_unlock(&priv->map_lock);
--}
--
- static const struct regmap_config realtek_mdio_regmap_config = {
- 	.reg_bits = 10, /* A4..A0 R4..R0 */
- 	.val_bits = 16,
-@@ -124,8 +111,8 @@ static const struct regmap_config realtek_mdio_regmap_config = {
- 	.reg_read = realtek_mdio_read,
- 	.reg_write = realtek_mdio_write,
- 	.cache_type = REGCACHE_NONE,
--	.lock = realtek_mdio_lock,
--	.unlock = realtek_mdio_unlock,
-+	.lock = realtek_common_lock,
-+	.unlock = realtek_common_unlock,
- };
- 
- static const struct regmap_config realtek_mdio_nolock_regmap_config = {
-@@ -143,96 +130,23 @@ static const struct regmap_config realtek_mdio_nolock_regmap_config = {
- 
- int realtek_mdio_probe(struct mdio_device *mdiodev)
- {
--	struct realtek_priv *priv;
- 	struct device *dev = &mdiodev->dev;
--	const struct realtek_variant *var;
--	struct regmap_config rc;
--	struct device_node *np;
-+	struct realtek_priv *priv;
- 	int ret;
- 
--	var = of_device_get_match_data(dev);
--	if (!var)
--		return -EINVAL;
--
--	priv = devm_kzalloc(&mdiodev->dev,
--			    size_add(sizeof(*priv), var->chip_data_sz),
--			    GFP_KERNEL);
--	if (!priv)
--		return -ENOMEM;
--
--	mutex_init(&priv->map_lock);
-+	priv = realtek_common_probe(dev, realtek_mdio_regmap_config,
-+				    realtek_mdio_nolock_regmap_config);
-+	if (IS_ERR(priv))
-+		return PTR_ERR(priv);
- 
--	rc = realtek_mdio_regmap_config;
--	rc.lock_arg = priv;
--	priv->map = devm_regmap_init(dev, NULL, priv, &rc);
--	if (IS_ERR(priv->map)) {
--		ret = PTR_ERR(priv->map);
--		dev_err(dev, "regmap init failed: %d\n", ret);
--		return ret;
--	}
--
--	rc = realtek_mdio_nolock_regmap_config;
--	priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
--	if (IS_ERR(priv->map_nolock)) {
--		ret = PTR_ERR(priv->map_nolock);
--		dev_err(dev, "regmap init failed: %d\n", ret);
--		return ret;
--	}
--
--	priv->mdio_addr = mdiodev->addr;
- 	priv->bus = mdiodev->bus;
--	priv->dev = &mdiodev->dev;
--	priv->chip_data = (void *)priv + sizeof(*priv);
--
--	priv->clk_delay = var->clk_delay;
--	priv->cmd_read = var->cmd_read;
--	priv->cmd_write = var->cmd_write;
--	priv->ops = var->ops;
--
-+	priv->mdio_addr = mdiodev->addr;
- 	priv->write_reg_noack = realtek_mdio_write;
-+	priv->ds_ops = priv->variant->ds_ops_mdio;
- 
--	np = dev->of_node;
--
--	dev_set_drvdata(dev, priv);
--
--	/* TODO: if power is software controlled, set up any regulators here */
--	priv->leds_disabled = of_property_read_bool(np, "realtek,disable-leds");
--
--	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
--	if (IS_ERR(priv->reset)) {
--		dev_err(dev, "failed to get RESET GPIO\n");
--		return PTR_ERR(priv->reset);
--	}
--
--	if (priv->reset) {
--		gpiod_set_value(priv->reset, 1);
--		dev_dbg(dev, "asserted RESET\n");
--		msleep(REALTEK_HW_STOP_DELAY);
--		gpiod_set_value(priv->reset, 0);
--		msleep(REALTEK_HW_START_DELAY);
--		dev_dbg(dev, "deasserted RESET\n");
--	}
--
--	ret = priv->ops->detect(priv);
--	if (ret) {
--		dev_err(dev, "unable to detect switch\n");
--		return ret;
--	}
--
--	priv->ds = devm_kzalloc(dev, sizeof(*priv->ds), GFP_KERNEL);
--	if (!priv->ds)
--		return -ENOMEM;
--
--	priv->ds->dev = dev;
--	priv->ds->num_ports = priv->num_ports;
--	priv->ds->priv = priv;
--	priv->ds->ops = var->ds_ops_mdio;
--
--	ret = dsa_register_switch(priv->ds);
--	if (ret) {
--		dev_err(priv->dev, "unable to register switch ret = %d\n", ret);
-+	ret = realtek_common_register_switch(priv);
-+	if (ret)
- 		return ret;
--	}
- 
- 	return 0;
- }
-@@ -247,9 +161,7 @@ void realtek_mdio_remove(struct mdio_device *mdiodev)
- 
- 	dsa_unregister_switch(priv->ds);
- 
--	/* leave the device reset asserted */
--	if (priv->reset)
--		gpiod_set_value(priv->reset, 1);
-+	realtek_common_remove(priv);
- }
- EXPORT_SYMBOL_GPL(realtek_mdio_remove);
- 
+-MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
+-MODULE_DESCRIPTION("Driver for Realtek ethernet switch connected via MDIO interface");
+-MODULE_LICENSE("GPL");
 diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
-index 31ac409acfd0..fc54190839cf 100644
+index fc54190839cf..2b2c6e34bae5 100644
 --- a/drivers/net/dsa/realtek/realtek-smi.c
 +++ b/drivers/net/dsa/realtek/realtek-smi.c
-@@ -41,12 +41,13 @@
- 
- #include "realtek.h"
- #include "realtek-smi.h"
-+#include "realtek-common.h"
- 
- #define REALTEK_SMI_ACK_RETRY_COUNT		5
- 
- static inline void realtek_smi_clk_delay(struct realtek_priv *priv)
- {
--	ndelay(priv->clk_delay);
-+	ndelay(priv->variant->clk_delay);
+@@ -456,7 +456,3 @@ void realtek_smi_shutdown(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, NULL);
  }
- 
- static void realtek_smi_start(struct realtek_priv *priv)
-@@ -209,7 +210,7 @@ static int realtek_smi_read_reg(struct realtek_priv *priv, u32 addr, u32 *data)
- 	realtek_smi_start(priv);
- 
- 	/* Send READ command */
--	ret = realtek_smi_write_byte(priv, priv->cmd_read);
-+	ret = realtek_smi_write_byte(priv, priv->variant->cmd_read);
- 	if (ret)
- 		goto out;
- 
-@@ -250,7 +251,7 @@ static int realtek_smi_write_reg(struct realtek_priv *priv,
- 	realtek_smi_start(priv);
- 
- 	/* Send WRITE command */
--	ret = realtek_smi_write_byte(priv, priv->cmd_write);
-+	ret = realtek_smi_write_byte(priv, priv->variant->cmd_write);
- 	if (ret)
- 		goto out;
- 
-@@ -311,20 +312,6 @@ static int realtek_smi_read(void *ctx, u32 reg, u32 *val)
- 	return realtek_smi_read_reg(priv, reg, val);
- }
- 
--static void realtek_smi_lock(void *ctx)
--{
--	struct realtek_priv *priv = ctx;
+ EXPORT_SYMBOL_GPL(realtek_smi_shutdown);
 -
--	mutex_lock(&priv->map_lock);
--}
--
--static void realtek_smi_unlock(void *ctx)
--{
--	struct realtek_priv *priv = ctx;
--
--	mutex_unlock(&priv->map_lock);
--}
--
- static const struct regmap_config realtek_smi_regmap_config = {
- 	.reg_bits = 10, /* A4..A0 R4..R0 */
- 	.val_bits = 16,
-@@ -335,8 +322,8 @@ static const struct regmap_config realtek_smi_regmap_config = {
- 	.reg_read = realtek_smi_read,
- 	.reg_write = realtek_smi_write,
- 	.cache_type = REGCACHE_NONE,
--	.lock = realtek_smi_lock,
--	.unlock = realtek_smi_unlock,
-+	.lock = realtek_common_lock,
-+	.unlock = realtek_common_unlock,
- };
- 
- static const struct regmap_config realtek_smi_nolock_regmap_config = {
-@@ -411,99 +398,32 @@ static int realtek_smi_setup_mdio(struct dsa_switch *ds)
- 
- int realtek_smi_probe(struct platform_device *pdev)
- {
--	const struct realtek_variant *var;
- 	struct device *dev = &pdev->dev;
- 	struct realtek_priv *priv;
--	struct regmap_config rc;
--	struct device_node *np;
- 	int ret;
- 
--	var = of_device_get_match_data(dev);
--	np = dev->of_node;
--
--	priv = devm_kzalloc(dev, sizeof(*priv) + var->chip_data_sz, GFP_KERNEL);
--	if (!priv)
--		return -ENOMEM;
--	priv->chip_data = (void *)priv + sizeof(*priv);
--
--	mutex_init(&priv->map_lock);
--
--	rc = realtek_smi_regmap_config;
--	rc.lock_arg = priv;
--	priv->map = devm_regmap_init(dev, NULL, priv, &rc);
--	if (IS_ERR(priv->map)) {
--		ret = PTR_ERR(priv->map);
--		dev_err(dev, "regmap init failed: %d\n", ret);
--		return ret;
--	}
--
--	rc = realtek_smi_nolock_regmap_config;
--	priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
--	if (IS_ERR(priv->map_nolock)) {
--		ret = PTR_ERR(priv->map_nolock);
--		dev_err(dev, "regmap init failed: %d\n", ret);
--		return ret;
--	}
--
--	/* Link forward and backward */
--	priv->dev = dev;
--	priv->clk_delay = var->clk_delay;
--	priv->cmd_read = var->cmd_read;
--	priv->cmd_write = var->cmd_write;
--	priv->ops = var->ops;
--
--	priv->setup_interface = realtek_smi_setup_mdio;
--	priv->write_reg_noack = realtek_smi_write_reg_noack;
--
--	dev_set_drvdata(dev, priv);
--	spin_lock_init(&priv->lock);
--
--	/* TODO: if power is software controlled, set up any regulators here */
--
--	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
--	if (IS_ERR(priv->reset)) {
--		dev_err(dev, "failed to get RESET GPIO\n");
--		return PTR_ERR(priv->reset);
--	}
--	if (priv->reset) {
--		gpiod_set_value(priv->reset, 1);
--		dev_dbg(dev, "asserted RESET\n");
--		msleep(REALTEK_HW_STOP_DELAY);
--		gpiod_set_value(priv->reset, 0);
--		msleep(REALTEK_HW_START_DELAY);
--		dev_dbg(dev, "deasserted RESET\n");
--	}
-+	priv = realtek_common_probe(dev, realtek_smi_regmap_config,
-+				    realtek_smi_nolock_regmap_config);
-+	if (IS_ERR(priv))
-+		return PTR_ERR(priv);
- 
- 	/* Fetch MDIO pins */
- 	priv->mdc = devm_gpiod_get_optional(dev, "mdc", GPIOD_OUT_LOW);
- 	if (IS_ERR(priv->mdc))
- 		return PTR_ERR(priv->mdc);
-+
- 	priv->mdio = devm_gpiod_get_optional(dev, "mdio", GPIOD_OUT_LOW);
- 	if (IS_ERR(priv->mdio))
- 		return PTR_ERR(priv->mdio);
- 
--	priv->leds_disabled = of_property_read_bool(np, "realtek,disable-leds");
-+	priv->write_reg_noack = realtek_smi_write_reg_noack;
-+	priv->setup_interface = realtek_smi_setup_mdio;
-+	priv->ds_ops = priv->variant->ds_ops_smi;
- 
--	ret = priv->ops->detect(priv);
--	if (ret) {
--		dev_err(dev, "unable to detect switch\n");
-+	ret = realtek_common_register_switch(priv);
-+	if (ret)
- 		return ret;
--	}
--
--	priv->ds = devm_kzalloc(dev, sizeof(*priv->ds), GFP_KERNEL);
--	if (!priv->ds)
--		return -ENOMEM;
- 
--	priv->ds->dev = dev;
--	priv->ds->num_ports = priv->num_ports;
--	priv->ds->priv = priv;
--
--	priv->ds->ops = var->ds_ops_smi;
--	ret = dsa_register_switch(priv->ds);
--	if (ret) {
--		dev_err_probe(dev, ret, "unable to register switch\n");
--		return ret;
--	}
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(realtek_smi_probe);
-@@ -516,12 +436,11 @@ void realtek_smi_remove(struct platform_device *pdev)
- 		return;
- 
- 	dsa_unregister_switch(priv->ds);
-+
- 	if (priv->user_mii_bus)
- 		of_node_put(priv->user_mii_bus->dev.of_node);
- 
--	/* leave the device reset asserted */
--	if (priv->reset)
--		gpiod_set_value(priv->reset, 1);
-+	realtek_common_remove(priv);
- }
- EXPORT_SYMBOL_GPL(realtek_smi_remove);
- 
-diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-index e9ee778665b2..fbd0616c1df3 100644
---- a/drivers/net/dsa/realtek/realtek.h
-+++ b/drivers/net/dsa/realtek/realtek.h
-@@ -58,11 +58,9 @@ struct realtek_priv {
- 	struct mii_bus		*bus;
- 	int			mdio_addr;
- 
--	unsigned int		clk_delay;
--	u8			cmd_read;
--	u8			cmd_write;
- 	spinlock_t		lock; /* Locks around command writes */
- 	struct dsa_switch	*ds;
-+	const struct dsa_switch_ops *ds_ops;
- 	struct irq_domain	*irqdomain;
- 	bool			leds_disabled;
- 
-@@ -79,6 +77,8 @@ struct realtek_priv {
- 	int			vlan_enabled;
- 	int			vlan4k_enabled;
- 
-+	const struct realtek_variant *variant;
-+
- 	char			buf[4096];
- 	void			*chip_data; /* Per-chip extra variant data */
- };
-diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-index a4d0abd5a6bf..972a73662641 100644
---- a/drivers/net/dsa/realtek/rtl8365mb.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb.c
-@@ -103,6 +103,7 @@
- #include "realtek.h"
- #include "realtek-smi.h"
- #include "realtek-mdio.h"
-+#include "realtek-common.h"
- 
- /* Family-specific data and limits */
- #define RTL8365MB_PHYADDRMAX		7
-@@ -691,7 +692,7 @@ static int rtl8365mb_phy_ocp_read(struct realtek_priv *priv, int phy,
- 	u32 val;
- 	int ret;
- 
--	mutex_lock(&priv->map_lock);
-+	realtek_common_lock(priv);
- 
- 	ret = rtl8365mb_phy_poll_busy(priv);
- 	if (ret)
-@@ -724,7 +725,7 @@ static int rtl8365mb_phy_ocp_read(struct realtek_priv *priv, int phy,
- 	*data = val & 0xFFFF;
- 
- out:
--	mutex_unlock(&priv->map_lock);
-+	realtek_common_unlock(priv);
- 
- 	return ret;
- }
-@@ -735,7 +736,7 @@ static int rtl8365mb_phy_ocp_write(struct realtek_priv *priv, int phy,
- 	u32 val;
- 	int ret;
- 
--	mutex_lock(&priv->map_lock);
-+	realtek_common_lock(priv);
- 
- 	ret = rtl8365mb_phy_poll_busy(priv);
- 	if (ret)
-@@ -766,7 +767,7 @@ static int rtl8365mb_phy_ocp_write(struct realtek_priv *priv, int phy,
- 		goto out;
- 
- out:
--	mutex_unlock(&priv->map_lock);
-+	realtek_common_unlock(priv);
- 
- 	return 0;
- }
-diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-index cc2fd636ec23..e60a0a81d426 100644
---- a/drivers/net/dsa/realtek/rtl8366rb.c
-+++ b/drivers/net/dsa/realtek/rtl8366rb.c
-@@ -24,6 +24,7 @@
- #include "realtek.h"
- #include "realtek-smi.h"
- #include "realtek-mdio.h"
-+#include "realtek-common.h"
- 
- #define RTL8366RB_PORT_NUM_CPU		5
- #define RTL8366RB_NUM_PORTS		6
-@@ -1707,7 +1708,7 @@ static int rtl8366rb_phy_read(struct realtek_priv *priv, int phy, int regnum)
- 	if (phy > RTL8366RB_PHY_NO_MAX)
- 		return -EINVAL;
- 
--	mutex_lock(&priv->map_lock);
-+	realtek_common_lock(priv);
- 
- 	ret = regmap_write(priv->map_nolock, RTL8366RB_PHY_ACCESS_CTRL_REG,
- 			   RTL8366RB_PHY_CTRL_READ);
-@@ -1735,7 +1736,7 @@ static int rtl8366rb_phy_read(struct realtek_priv *priv, int phy, int regnum)
- 		phy, regnum, reg, val);
- 
- out:
--	mutex_unlock(&priv->map_lock);
-+	realtek_common_unlock(priv);
- 
- 	return ret;
- }
-@@ -1749,7 +1750,7 @@ static int rtl8366rb_phy_write(struct realtek_priv *priv, int phy, int regnum,
- 	if (phy > RTL8366RB_PHY_NO_MAX)
- 		return -EINVAL;
- 
--	mutex_lock(&priv->map_lock);
-+	realtek_common_lock(priv);
- 
- 	ret = regmap_write(priv->map_nolock, RTL8366RB_PHY_ACCESS_CTRL_REG,
- 			   RTL8366RB_PHY_CTRL_WRITE);
-@@ -1766,7 +1767,7 @@ static int rtl8366rb_phy_write(struct realtek_priv *priv, int phy, int regnum,
- 		goto out;
- 
- out:
--	mutex_unlock(&priv->map_lock);
-+	realtek_common_unlock(priv);
- 
- 	return ret;
- }
+-MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
+-MODULE_DESCRIPTION("Driver for Realtek ethernet switch connected via SMI interface");
+-MODULE_LICENSE("GPL");
 -- 
 2.43.0
 
