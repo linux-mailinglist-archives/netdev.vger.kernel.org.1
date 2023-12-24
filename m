@@ -1,103 +1,89 @@
-Return-Path: <netdev+bounces-60151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBE781DCE7
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 23:47:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F63681DCDE
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 23:27:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB065281D00
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 22:47:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79A3A1C20D10
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 22:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF21EAD9;
-	Sun, 24 Dec 2023 22:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC6BFC1A;
+	Sun, 24 Dec 2023 22:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="Gh625lmY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fUzc5jdf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx14lb.world4you.com (mx14lb.world4you.com [81.19.149.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E51101D0
-	for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 22:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cCptRauw8t5sQ+p3gOt6TSNfDWhbM5MoDu9rtKW3GNs=; b=Gh625lmYN1gp566kDfw2i00ZVy
-	MCDkznfnmVcd6ieAAUk8EspBgxx8edo0bWBmxcFKQ308o+cFpal3e4VcG7GuXKkvOlC5fRnqIQAcY
-	w8+VM3URbQsNy/vWKrtxkZC730MxVi+WXBLgdIlj3s4jOMhLEfYYkqTGwf89nByU02Zs=;
-Received: from [88.117.59.246] (helo=[10.0.0.160])
-	by mx14lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1rHWZF-0002gE-3A;
-	Sun, 24 Dec 2023 23:03:30 +0100
-Message-ID: <b232b24f-abe9-4f62-ab6f-e3c80524ac38@engleder-embedded.com>
-Date: Sun, 24 Dec 2023 23:03:29 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DA1101D0
+	for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 22:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7811c58ee93so218788485a.0
+        for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 14:26:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1703456814; x=1704061614; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f3Jh/2CeSRvov2QcWQ5b6F4rC5weMXxkwbr30ulDs9w=;
+        b=fUzc5jdfDEX30NF8FOwWFzHunNe2PkiJeoYoHSwYR0C1TP1UhgCoWBsINelNWlfDdm
+         Pjz6SYeg2uFZtJwpFw+09DbvbMALtaaM3UFDd/TejPGJ7IBNWFKnPn7VeudeHini9Zds
+         VF50hOYVIAntg6atwlk3MWMibdgI+9jmLN5u53h4JmHgXkhhYGxQK3bMtkQHHv+9r58y
+         v1fFLVTnEIa+XtOXsstEgw86p7kzasMZEqmWpavLQvlFjatnskLxPJf6RCc0K81ImQXT
+         oNL/R2djAIgWsOTX0bTGKsNTSzftoXVOSSXzOQfjpfShsLfL9Mj67xSL3jGaN2zAf9bb
+         OZiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703456814; x=1704061614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f3Jh/2CeSRvov2QcWQ5b6F4rC5weMXxkwbr30ulDs9w=;
+        b=exYY3V3VpldkxQAzvvLbWPMjHbN8Uo5VQMGZ3niX3gjTJjrvs9I+tz7VnHYr5OlvPo
+         MfqYYRmPZCDG0EQzO8tHAI8I74WtYxzfIpHgb0QKQgf9txDM8Ckjz/TZVopQkVEq3M7g
+         Kk2eRrkNQVUVmRhJDG+1CRH2N2wz5Oj96+AYL/VgiB1vwh7AfQFXZQYUYhT0ICnMNY4K
+         Uj6Oimsi2YMFxoeTgnZ+V40oybT8hYsQ+VPcEjFY5g67330W/IRbfo6+pk/8s6eaN//7
+         6lX1M4DWYx58mtgj+gKGDGzzXWFCqs8wRygNwkwbQpolh6FjNNqe4UG2D5ropy+3Bs6c
+         CEXw==
+X-Gm-Message-State: AOJu0YyEbluSEQwla0lyw2XJacNWTiroKlwS5iq4OzUaBIHjd7rsWQjQ
+	3PiNvBg/E6DN3d2nreK8ALr6woQ4KhNA3yH7vOFDKsOFneONkw==
+X-Google-Smtp-Source: AGHT+IHyY+ImRr8Mt00sdQQgvA/xRB2o+fX11DmOXhgJM2HpsJOZ/Khb2F3sDwWoJvf1fALr296ZHh5MK1/i60qKvB8=
+X-Received: by 2002:a05:620a:2a13:b0:77f:9626:d230 with SMTP id
+ o19-20020a05620a2a1300b0077f9626d230mr5781919qkp.72.1703456814158; Sun, 24
+ Dec 2023 14:26:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] Revert "net: ethtool: add support for
- symmetric-xor RSS hash"
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, ahmed.zaki@intel.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, Jeff Guo <jia.guo@intel.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-References: <20231222210000.51989-1-gerhard@engleder-embedded.com>
- <20231224205412.GA5962@kernel.org>
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <20231224205412.GA5962@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-2-luizluca@gmail.com>
+In-Reply-To: <20231223005253.17891-2-luizluca@gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sun, 24 Dec 2023 23:26:42 +0100
+Message-ID: <CACRpkda36RJoBwdQGocikin_AiaiDs_aDXRL6XvxhCvMBovz9w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/8] net: dsa: realtek: drop cleanup from realtek_ops
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, alsi@bang-olufsen.dk, andrew@lunn.ch, 
+	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	arinc.unal@arinc9.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 24.12.23 21:54, Simon Horman wrote:
-> + Jeff Guo <jia.guo@intel.com>
->    Jesse Brandeburg <jesse.brandeburg@intel.com>
->    Tony Nguyen <anthony.l.nguyen@intel.com>
-> 
-> On Fri, Dec 22, 2023 at 10:00:00PM +0100, Gerhard Engleder wrote:
->> This reverts commit 13e59344fb9d3c9d3acd138ae320b5b67b658694.
->>
->> The tsnep driver and at least also the macb driver implement the ethtool
->> operation set_rxnfc but not the get_rxfh operation. With this commit
->> set_rxnfc returns -EOPNOTSUPP if get_rxfh is not implemented. This renders
->> set_rxnfc unuseable for drivers without get_rxfh.
->>
->> Make set_rxfnc working again for drivers without get_rxfh by reverting
->> that commit.
->>
->> Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-> 
-> Hi Gerhard,
-> 
-> I think it would be nice to find a way forwards that resolved
-> the regression without reverting the feature. But, if that doesn't work
-> out, I think the following two patches need to be reverted first in
-> order to avoid breaking (x86_64 allmodconfig) builds.
-> 
->   352e9bf23813 ("ice: enable symmetric-xor RSS for Toeplitz hash function")
->   4a3de3fb0eb6 ("iavf: enable symmetric-xor RSS for Toeplitz hash function")
+On Sat, Dec 23, 2023 at 1:53=E2=80=AFAM Luiz Angelo Daros de Luca
+<luizluca@gmail.com> wrote:
 
-Hi Simon,
+> It was never used and never referenced.
+>
+> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> Reviewed-by: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
 
-frist I thought about fixing, but then I was afraid that the rxfh check 
-in ethtool_set_rxnfc() may also affect other drivers with ethtool
-get_rxfh() too. I'm not an expert in that area, so I thought it is not a 
-good idea to fix stuff that I don't understand and cannot test.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-Taking a second look, rxfh is only checked if RXH_XFRM_SYM_XOR is set 
-and this flag is introduced with the same commit. So it should be safe
-to do the rxfh check only if ethtool get_rxfh() is available.
+Yours,
+Linus Walleij
 
