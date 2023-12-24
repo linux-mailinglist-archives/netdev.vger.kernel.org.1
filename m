@@ -1,114 +1,103 @@
-Return-Path: <netdev+bounces-60149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB1D281DC80
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 22:31:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBE781DCE7
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 23:47:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A3DCB213C2
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 21:31:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB065281D00
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 22:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB59EADC;
-	Sun, 24 Dec 2023 21:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF21EAD9;
+	Sun, 24 Dec 2023 22:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BhoQfGkU"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="Gh625lmY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx14lb.world4you.com (mx14lb.world4you.com [81.19.149.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6F010788;
-	Sun, 24 Dec 2023 21:31:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44CDDC433C7;
-	Sun, 24 Dec 2023 21:31:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703453463;
-	bh=V3y8H0LCCFvixptpsJ19a+YP7/R9X0uB52si6Uy778I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BhoQfGkUjBTljkttuo6xzfiFBCBPrCrulCgOE4WtrxGdlND12xvTWzwlnY7yfU0Rz
-	 b8sliqRHJ/VlxfQMIIHIojLaK7jLhObzgW3zWPOscmdTyOCiOEf48qEsv2Y71KVkdD
-	 zV0/0us9JWfp+bSKHt1tHEHivMwMajDJb13VExpUy96ybpOXZVlkX7boiDSdtZ1BjK
-	 +AfRjS0v2MQJtexT9SjkBsCIao6r3UAxqX5hdQdoC59Y6BBdW2hLLWfo2nboB7LFSb
-	 /gV6Z+fPthMIMO6lAh5mBC8QEPCJ/5MRm1FoTzOvAGheXNJoJHZtmf5/FoNL7j180n
-	 MgRp+AV/clsGg==
-Date: Sun, 24 Dec 2023 21:30:57 +0000
-From: Simon Horman <horms@kernel.org>
-To: Zhipeng Lu <alexious@zju.edu.cn>
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simo Sorce <simo@redhat.com>, Steve Dickson <steved@redhat.com>,
-	Kevin Coffman <kwc@citi.umich.edu>, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] SUNRPC: fix a memleak in gss_import_v2_context
-Message-ID: <20231224213057.GC5962@kernel.org>
-References: <20231224082035.3538560-1-alexious@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E51101D0
+	for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 22:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cCptRauw8t5sQ+p3gOt6TSNfDWhbM5MoDu9rtKW3GNs=; b=Gh625lmYN1gp566kDfw2i00ZVy
+	MCDkznfnmVcd6ieAAUk8EspBgxx8edo0bWBmxcFKQ308o+cFpal3e4VcG7GuXKkvOlC5fRnqIQAcY
+	w8+VM3URbQsNy/vWKrtxkZC730MxVi+WXBLgdIlj3s4jOMhLEfYYkqTGwf89nByU02Zs=;
+Received: from [88.117.59.246] (helo=[10.0.0.160])
+	by mx14lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1rHWZF-0002gE-3A;
+	Sun, 24 Dec 2023 23:03:30 +0100
+Message-ID: <b232b24f-abe9-4f62-ab6f-e3c80524ac38@engleder-embedded.com>
+Date: Sun, 24 Dec 2023 23:03:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231224082035.3538560-1-alexious@zju.edu.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] Revert "net: ethtool: add support for
+ symmetric-xor RSS hash"
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>, ahmed.zaki@intel.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, Jeff Guo <jia.guo@intel.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <20231222210000.51989-1-gerhard@engleder-embedded.com>
+ <20231224205412.GA5962@kernel.org>
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20231224205412.GA5962@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On Sun, Dec 24, 2023 at 04:20:33PM +0800, Zhipeng Lu wrote:
-> The ctx->mech_used.data allocated by kmemdup is not freed in neither
-> gss_import_v2_context nor it only caller radeon_driver_open_kms.
-> Thus, this patch reform the last call of gss_import_v2_context to the
-> gss_krb5_import_ctx_v2, preventing the memleak while keepping the return
-> formation.
+On 24.12.23 21:54, Simon Horman wrote:
+> + Jeff Guo <jia.guo@intel.com>
+>    Jesse Brandeburg <jesse.brandeburg@intel.com>
+>    Tony Nguyen <anthony.l.nguyen@intel.com>
 > 
-> Fixes: 47d848077629 ("gss_krb5: handle new context format from gssd")
-> Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
-> ---
->  net/sunrpc/auth_gss/gss_krb5_mech.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+> On Fri, Dec 22, 2023 at 10:00:00PM +0100, Gerhard Engleder wrote:
+>> This reverts commit 13e59344fb9d3c9d3acd138ae320b5b67b658694.
+>>
+>> The tsnep driver and at least also the macb driver implement the ethtool
+>> operation set_rxnfc but not the get_rxfh operation. With this commit
+>> set_rxnfc returns -EOPNOTSUPP if get_rxfh is not implemented. This renders
+>> set_rxnfc unuseable for drivers without get_rxfh.
+>>
+>> Make set_rxfnc working again for drivers without get_rxfh by reverting
+>> that commit.
+>>
+>> Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 > 
-> diff --git a/net/sunrpc/auth_gss/gss_krb5_mech.c b/net/sunrpc/auth_gss/gss_krb5_mech.c
-> index e31cfdf7eadc..1e54bd63e3f0 100644
-> --- a/net/sunrpc/auth_gss/gss_krb5_mech.c
-> +++ b/net/sunrpc/auth_gss/gss_krb5_mech.c
-> @@ -398,6 +398,7 @@ gss_import_v2_context(const void *p, const void *end, struct krb5_ctx *ctx,
->  	u64 seq_send64;
->  	int keylen;
->  	u32 time32;
-> +	int ret;
->  
->  	p = simple_get_bytes(p, end, &ctx->flags, sizeof(ctx->flags));
->  	if (IS_ERR(p))
-> @@ -450,8 +451,14 @@ gss_import_v2_context(const void *p, const void *end, struct krb5_ctx *ctx,
->  	}
->  	ctx->mech_used.len = gss_kerberos_mech.gm_oid.len;
->  
-> -	return gss_krb5_import_ctx_v2(ctx, gfp_mask);
-> +	ret = gss_krb5_import_ctx_v2(ctx, gfp_mask);
-> +	if (ret) {
-> +		p = ERR_PTR(ret);
-> +		goto out_free;
-> +	};
-
-Hi Zhipeng Lu,
-
-I think you need to handle the non-error case here:
-
-	return 0;
-
->  
-> +out_free:
-> +	kfree(ctx->mech_used.data);
->  out_err:
->  	return PTR_ERR(p);
->  }
-> -- 
-> 2.34.1
+> Hi Gerhard,
 > 
+> I think it would be nice to find a way forwards that resolved
+> the regression without reverting the feature. But, if that doesn't work
+> out, I think the following two patches need to be reverted first in
+> order to avoid breaking (x86_64 allmodconfig) builds.
+> 
+>   352e9bf23813 ("ice: enable symmetric-xor RSS for Toeplitz hash function")
+>   4a3de3fb0eb6 ("iavf: enable symmetric-xor RSS for Toeplitz hash function")
+
+Hi Simon,
+
+frist I thought about fixing, but then I was afraid that the rxfh check 
+in ethtool_set_rxnfc() may also affect other drivers with ethtool
+get_rxfh() too. I'm not an expert in that area, so I thought it is not a 
+good idea to fix stuff that I don't understand and cannot test.
+
+Taking a second look, rxfh is only checked if RXH_XFRM_SYM_XOR is set 
+and this flag is introduced with the same commit. So it should be safe
+to do the rxfh check only if ethtool get_rxfh() is available.
 
