@@ -1,89 +1,161 @@
-Return-Path: <netdev+bounces-60150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F63681DCDE
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 23:27:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD05081DD36
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 00:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79A3A1C20D10
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 22:26:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 137EB281B07
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 23:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC6BFC1A;
-	Sun, 24 Dec 2023 22:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919AC101D0;
+	Sun, 24 Dec 2023 23:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fUzc5jdf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qz6FTb/8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DA1101D0
-	for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 22:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7811c58ee93so218788485a.0
-        for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 14:26:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0603310785
+	for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 23:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40d4ebcc207so19232005e9.3
+        for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 15:12:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703456814; x=1704061614; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f3Jh/2CeSRvov2QcWQ5b6F4rC5weMXxkwbr30ulDs9w=;
-        b=fUzc5jdfDEX30NF8FOwWFzHunNe2PkiJeoYoHSwYR0C1TP1UhgCoWBsINelNWlfDdm
-         Pjz6SYeg2uFZtJwpFw+09DbvbMALtaaM3UFDd/TejPGJ7IBNWFKnPn7VeudeHini9Zds
-         VF50hOYVIAntg6atwlk3MWMibdgI+9jmLN5u53h4JmHgXkhhYGxQK3bMtkQHHv+9r58y
-         v1fFLVTnEIa+XtOXsstEgw86p7kzasMZEqmWpavLQvlFjatnskLxPJf6RCc0K81ImQXT
-         oNL/R2djAIgWsOTX0bTGKsNTSzftoXVOSSXzOQfjpfShsLfL9Mj67xSL3jGaN2zAf9bb
-         OZiQ==
+        d=gmail.com; s=20230601; t=1703459528; x=1704064328; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=22pu1/6xlX+a75gXXvL3MgBrEnDW6LIOr+2SSTJfJG4=;
+        b=Qz6FTb/8dHCsFisLovHJAV6rosMAIl030c3DHP31wqC5HLYZ/jVrTpKpHrAy0Zs+G6
+         yQfWNu/FWrlN5TmnSocboO0js/+GsYg5qcvUopA1fkdeZltsWc9+lDF0zR1ujD6Rwd4w
+         MhNCqX56EKDgtXWliU15vp6dYPyJHtWzPDcO8Fb7PpkcQqbEr5bvyxCB06aZ4oEs6t4E
+         6GyvNjA6spEH789PrCs3tS/q6gD7pkjCOJYCBselERFLXWak4mt7axYDz8i47B4MZws6
+         sEUKaJzzOJJdkVA0uuF5BTxFPbD0Djs9tJqg1uHE0s7Rtkea3vl8KFo9bEWfz7NdD+3K
+         YC4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703456814; x=1704061614;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f3Jh/2CeSRvov2QcWQ5b6F4rC5weMXxkwbr30ulDs9w=;
-        b=exYY3V3VpldkxQAzvvLbWPMjHbN8Uo5VQMGZ3niX3gjTJjrvs9I+tz7VnHYr5OlvPo
-         MfqYYRmPZCDG0EQzO8tHAI8I74WtYxzfIpHgb0QKQgf9txDM8Ckjz/TZVopQkVEq3M7g
-         Kk2eRrkNQVUVmRhJDG+1CRH2N2wz5Oj96+AYL/VgiB1vwh7AfQFXZQYUYhT0ICnMNY4K
-         Uj6Oimsi2YMFxoeTgnZ+V40oybT8hYsQ+VPcEjFY5g67330W/IRbfo6+pk/8s6eaN//7
-         6lX1M4DWYx58mtgj+gKGDGzzXWFCqs8wRygNwkwbQpolh6FjNNqe4UG2D5ropy+3Bs6c
-         CEXw==
-X-Gm-Message-State: AOJu0YyEbluSEQwla0lyw2XJacNWTiroKlwS5iq4OzUaBIHjd7rsWQjQ
-	3PiNvBg/E6DN3d2nreK8ALr6woQ4KhNA3yH7vOFDKsOFneONkw==
-X-Google-Smtp-Source: AGHT+IHyY+ImRr8Mt00sdQQgvA/xRB2o+fX11DmOXhgJM2HpsJOZ/Khb2F3sDwWoJvf1fALr296ZHh5MK1/i60qKvB8=
-X-Received: by 2002:a05:620a:2a13:b0:77f:9626:d230 with SMTP id
- o19-20020a05620a2a1300b0077f9626d230mr5781919qkp.72.1703456814158; Sun, 24
- Dec 2023 14:26:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703459528; x=1704064328;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=22pu1/6xlX+a75gXXvL3MgBrEnDW6LIOr+2SSTJfJG4=;
+        b=nm6VD6VkFQb9EEy9O5Vdldb5OUVPIEgaHeAks0JB8BKzMwY1Z5TgUL+/gxVeNnmiKt
+         K6tBeC7TcI2H+FZuzncx3CAmiE8gce9ZLKvQ6Kmq7fSkK+CZ+PjXGMxo/AY6i4T1aOZK
+         36zwiPqef7zuSIutkFWVXZhCDfVdUirTMxtjn88nwOu0Z//RUPzDj9sZ6U8daIEckBks
+         L0Pviq5NT3L7LFR13tLBVWkqKRkJQs05k1wAP02QYrb6jVdOzjm0PRe7IuP9/oKOJ1PW
+         dkiY9DfBpXyS0Q7rJFHZoQR1zhVoBy6aZy4jK0hYn6s1CeiUgFlzXPiADlwDDKaBvifH
+         uocw==
+X-Gm-Message-State: AOJu0Yx0GRV75mZ80v3K8yLLks8vVpQNPYpdH5/148/f8zSO1KmpSBUs
+	F1WELX31o4bLo8vLwKbHmAM=
+X-Google-Smtp-Source: AGHT+IFwUdRDwHNow4dHAf5C2Gj37jKeS8ilKlrkQ0jyN57YBTsDKGVqij2Z3hwXTnefA3AucUhDeA==
+X-Received: by 2002:a05:600c:4685:b0:40d:343d:2e08 with SMTP id p5-20020a05600c468500b0040d343d2e08mr2596438wmo.98.1703459527758;
+        Sun, 24 Dec 2023 15:12:07 -0800 (PST)
+Received: from ?IPV6:2a01:c23:bda7:ca00:b4b1:6451:f5bb:61f2? (dynamic-2a01-0c23-bda7-ca00-b4b1-6451-f5bb-61f2.c23.pool.telefonica.de. [2a01:c23:bda7:ca00:b4b1:6451:f5bb:61f2])
+        by smtp.googlemail.com with ESMTPSA id s4-20020a1709062ec400b00a234585cc79sm4275370eji.188.2023.12.24.15.12.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 24 Dec 2023 15:12:07 -0800 (PST)
+Message-ID: <5ca7edbb-cf61-45b2-b9ba-888cb157ecbb@gmail.com>
+Date: Mon, 25 Dec 2023 00:12:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-2-luizluca@gmail.com>
-In-Reply-To: <20231223005253.17891-2-luizluca@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 24 Dec 2023 23:26:42 +0100
-Message-ID: <CACRpkda36RJoBwdQGocikin_AiaiDs_aDXRL6XvxhCvMBovz9w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/8] net: dsa: realtek: drop cleanup from realtek_ops
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, alsi@bang-olufsen.dk, andrew@lunn.ch, 
-	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
+To: Marc MERLIN <marc@merlins.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231206084448.53b48c49@kernel.org>
+ <e6f227ee701e1ee37e8f568b1310d240a2b8935a.camel@sipsolutions.net>
+ <a44865f5-3a07-d60a-c333-59c012bfa2fb@intel.com>
+ <20231207094021.1419b5d0@kernel.org> <20231211045200.GC24475@merlins.org>
+ <83dc80d3-1c26-405d-a08d-2db4bc318ac8@gmail.com>
+ <20231215174634.GA10053@merlins.org> <20231224163043.GA6759@merlins.org>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20231224163043.GA6759@merlins.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Dec 23, 2023 at 1:53=E2=80=AFAM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
+On 24.12.2023 17:30, Marc MERLIN wrote:
+> On Fri, Dec 15, 2023 at 09:46:34AM -0800, Marc MERLIN wrote:
+>> On Fri, Dec 15, 2023 at 02:42:01PM +0100, Heiner Kallweit wrote:
+>>> Why don't you simply disable runtime pm for the affected device as a
+>>> workaround? This can be done via sysfs.
+>>
+>> 1) because I didn't know what the exact bug was and how to work around it :)
+> 
+> Mmmh, so I need to test an ubuntu kernel (6.5.0-14) because of sound
+> issues in mainline TOT, and I can't boot the kernel to completion
+> without hititng this hang bug. I'm not exactly sure which part of the
+> boot triggers it.
+> 
+> I can't patch that kernel easily. How exactly do I disable runtime PM
+> from the kernel command line for "that device" which I'm not even sure
 
-> It was never used and never referenced.
->
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> Reviewed-by: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
+Change <device>/power/control from "auto" to "on".
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> which one it is.  If it's the eth device, I already removed the igc
+> module to prevent it from loading, and I also removed the ethtool
+> binary, but I'm still getting the hang.
+> 
+> On the plus side, with 6.6.8 and the old patch which I understand is not
+> the ideal solution, I can confirm that I've been running problem free
+> until now, so thanks again for that interim patch.
+> 
+> Thanks,
+> Marc
 
-Yours,
-Linus Walleij
 
