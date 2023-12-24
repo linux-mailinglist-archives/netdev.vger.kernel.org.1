@@ -1,149 +1,103 @@
-Return-Path: <netdev+bounces-60129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38B5781D850
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 09:25:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AC1281D861
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 09:41:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B72821F21940
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 08:25:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14BF4B217E0
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 08:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68651139F;
-	Sun, 24 Dec 2023 08:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E591FECB;
+	Sun, 24 Dec 2023 08:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xienUmTN"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D730E20E0;
-	Sun, 24 Dec 2023 08:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from luzhipeng.223.5.5.5 (unknown [122.235.137.177])
-	by mail-app3 (Coremail) with SMTP id cC_KCgCHjBnQ6odlNstjAQ--.7480S2;
-	Sun, 24 Dec 2023 16:24:48 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Simo Sorce <simo@redhat.com>,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] SUNRPC: fix some memleaks in gssx_dec_option_array
-Date: Sun, 24 Dec 2023 16:24:22 +0800
-Message-Id: <20231224082424.3539726-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E062620F8
+	for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 08:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2f475009-709a-4e0b-8711-51fd4a938763@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1703407249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xniFk5TJQq0x7QayvNm1iGquiN4ClihcHbvk3cB5Wr8=;
+	b=xienUmTNwVbZOK1fCRRuTF/pyRI3LSa8h3F28wXiqiRFdldSl45s8MZSI144ao72lAz5K5
+	WjicJjyDQgnZgGWdDEHUgCQusr6AsEai9V9QVCGddubOc5MiimFIZ6AALjCHrJGIHBWnmE
+	69LzA6n/LmcZjK56FETnRAxkiCUNlEc=
+Date: Sun, 24 Dec 2023 16:40:42 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next 1/6] virtio_net: introduce device stats feature
+ and structures
+To: kernel test robot <lkp@intel.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev
+References: <20231222033021.20649-2-xuanzhuo@linux.alibaba.com>
+ <202312240125.00z3nxGY-lkp@intel.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <202312240125.00z3nxGY-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cC_KCgCHjBnQ6odlNstjAQ--.7480S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ar48AFWkWw48KrykAr1xAFb_yoW8Cw18pF
-	Z3Kr98AF1Iqr1xJF1aywsYv3WYyFs5tFW7Wry2kanxZw1fJr1F9w4vkryjgF1ayrZ3uw1U
-	W3WUury8uwn0yFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc2xSY4AK67AK6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JU6T5dUUUUU=
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
+X-Migadu-Flow: FLOW_OUT
 
-The creds and oa->data need to be freed in the error-handling paths after
-there allocation. So this patch add these deallocations in the
-corresponding paths.
+在 2023/12/24 1:55, kernel test robot 写道:
+> Hi Xuan,
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on mst-vhost/linux-next]
+> [also build test ERROR on linus/master v6.7-rc6 next-20231222]
+> [cannot apply to net-next/main horms-ipvs/master]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_net-introduce-device-stats-feature-and-structures/20231222-175505
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+> patch link:    https://lore.kernel.org/r/20231222033021.20649-2-xuanzhuo%40linux.alibaba.com
+> patch subject: [PATCH net-next 1/6] virtio_net: introduce device stats feature and structures
+> config: x86_64-buildonly-randconfig-002-20231223 (https://download.01.org/0day-ci/archive/20231224/202312240125.00z3nxGY-lkp@intel.com/config)
+> compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231224/202312240125.00z3nxGY-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202312240125.00z3nxGY-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>     In file included from <built-in>:1:
+>>> ./usr/include/linux/virtio_net.h:454:2: error: unknown type name 'u8'
+>             u8 type;
+>             ^
+>     ./usr/include/linux/virtio_net.h:455:2: error: unknown type name 'u8'
+>             u8 reserved;
+I can reproduce this problem.
+Replacing u8 as __u8 can fix this problem.
+Not sure whether __u8 is correct to the whole patches.
 
-Fixes: 1d658336b05f ("SUNRPC: Add RPC based upcall mechanism for RPCGSS auth")
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
----
- net/sunrpc/auth_gss/gss_rpc_xdr.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+Zhu Yanjun
 
-diff --git a/net/sunrpc/auth_gss/gss_rpc_xdr.c b/net/sunrpc/auth_gss/gss_rpc_xdr.c
-index d79f12c2550a..de533b20231b 100644
---- a/net/sunrpc/auth_gss/gss_rpc_xdr.c
-+++ b/net/sunrpc/auth_gss/gss_rpc_xdr.c
-@@ -250,8 +250,8 @@ static int gssx_dec_option_array(struct xdr_stream *xdr,
- 
- 	creds = kzalloc(sizeof(struct svc_cred), GFP_KERNEL);
- 	if (!creds) {
--		kfree(oa->data);
--		return -ENOMEM;
-+		err = -ENOMEM;
-+		goto free_oa;
- 	}
- 
- 	oa->data[0].option.data = CREDS_VALUE;
-@@ -265,29 +265,41 @@ static int gssx_dec_option_array(struct xdr_stream *xdr,
- 
- 		/* option buffer */
- 		p = xdr_inline_decode(xdr, 4);
--		if (unlikely(p == NULL))
--			return -ENOSPC;
-+		if (unlikely(p == NULL)) {
-+			err = -ENOSPC
-+			goto free_creds;
-+		}
- 
- 		length = be32_to_cpup(p);
- 		p = xdr_inline_decode(xdr, length);
--		if (unlikely(p == NULL))
--			return -ENOSPC;
-+		if (unlikely(p == NULL)) {
-+			err = -ENOSPC
-+			goto free_creds;
-+		}
- 
- 		if (length == sizeof(CREDS_VALUE) &&
- 		    memcmp(p, CREDS_VALUE, sizeof(CREDS_VALUE)) == 0) {
- 			/* We have creds here. parse them */
- 			err = gssx_dec_linux_creds(xdr, creds);
- 			if (err)
--				return err;
-+				goto free_creds;
- 			oa->data[0].value.len = 1; /* presence */
- 		} else {
- 			/* consume uninteresting buffer */
- 			err = gssx_dec_buffer(xdr, &dummy);
- 			if (err)
--				return err;
-+				goto free_creds;
- 		}
- 	}
- 	return 0;
-+
-+free_creds:
-+	kfree(creds);
-+free_oa:
-+	kfree(oa->data);
-+	oa->data = NULL;
-+err:
-+	return err;
- }
- 
- static int gssx_dec_status(struct xdr_stream *xdr,
--- 
-2.34.1
+>             ^
+>     2 errors generated.
+> 
 
 
