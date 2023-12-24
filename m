@@ -1,92 +1,102 @@
-Return-Path: <netdev+bounces-60139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4EF881DB88
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 17:46:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6DF81DBA0
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 17:54:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60B95281E49
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 16:46:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34AE0281ECB
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 16:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43525746B;
-	Sun, 24 Dec 2023 16:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0oKoeIv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A03748A;
+	Sun, 24 Dec 2023 16:54:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F26AC8C4;
-	Sun, 24 Dec 2023 16:46:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB4FEC433C7;
-	Sun, 24 Dec 2023 16:46:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703436385;
-	bh=QeU2Ly31P1TyQMfLFugJcRwwIS7qI78WGMHA0AHX//Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d0oKoeIvOCAvGd7wK2QpmXT9nhxMGY36BGiWznZGkEcDiW4GZPxZH6TNMTnwMtN0o
-	 dyAFenzJqw4HW5ZDilKuxKevA2XVvz421PWLjjZBTjvSDn2mPSZMCHKOUcKvRnuog7
-	 H8SiAxS3Vw+CXQAN54Bo0liY6rx+Tu6Siq4rM1i0zt4W8bxHYdnqE3xJfFMMA9dDJV
-	 I2xPN3kFm63uBXbkmf1nsDKVqNoKLIFXk3sdm3nC2XAknk/M+5hj/uXvPECRQ4t/Uo
-	 wlNVqVgHXIDNCrMSzV8ETG96vuf412HK5VemAkpbfPGl9rDOovz3P6SLi9TfoFlm8L
-	 FJMpBOlLk/ExA==
-Date: Sun, 24 Dec 2023 16:46:20 +0000
-From: Simon Horman <horms@kernel.org>
-To: Vegard Nossum <vegard.nossum@oracle.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Breno Leitao <leitao@debian.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next] Documentation: add pyyaml to requirements.txt
-Message-ID: <20231224164620.GB228041@kernel.org>
-References: <20231222133628.3010641-1-vegard.nossum@oracle.com>
+Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8E1CA68;
+	Sun, 24 Dec 2023 16:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from localhost.localdomain (unknown [39.174.92.167])
+	by mail-app4 (Coremail) with SMTP id cS_KCgA3OaRAYohlOrPzAA--.30851S4;
+	Mon, 25 Dec 2023 00:54:26 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH net v1] net/sched: cls_api: complement tcf_tfilter_dump_policy
+Date: Mon, 25 Dec 2023 00:54:13 +0800
+Message-Id: <20231224165413.831486-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgA3OaRAYohlOrPzAA--.30851S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFW7Aw1fAr43ZF1UXw17GFg_yoW8WF1xpF
+	ZrW348C34DXFyUJws7G3Z7ZF9IgrZxZw4UWrZYk34IvwnxWrnxGayftayak3ZFkF48Arsx
+	tF98t3yDWa1DuF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26F
+	4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
+	7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
+	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
+	628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
+	GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
+	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
+	XdbUUUUUU==
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231222133628.3010641-1-vegard.nossum@oracle.com>
 
-On Fri, Dec 22, 2023 at 02:36:28PM +0100, Vegard Nossum wrote:
-> Commit f061c9f7d058 ("Documentation: Document each netlink family") added
-> a new Python script that is invoked during 'make htmldocs' and which reads
-> the netlink YAML spec files.
-> 
-> Using the virtualenv from scripts/sphinx-pre-install, we get this new
-> error wen running 'make htmldocs':
-> 
->   Traceback (most recent call last):
->     File "./tools/net/ynl/ynl-gen-rst.py", line 26, in <module>
->       import yaml
->   ModuleNotFoundError: No module named 'yaml'
->   make[2]: *** [Documentation/Makefile:112: Documentation/networking/netlink_spec/rt_link.rst] Error 1
->   make[1]: *** [Makefile:1708: htmldocs] Error 2
-> 
-> Fix this by adding 'pyyaml' to requirements.txt.
-> 
-> Note: This was somehow present in the original patch submission:
-> <https://lore.kernel.org/all/20231103135622.250314-1-leitao@debian.org/>
-> I'm not sure why the pyyaml requirement disappeared in the meantime.
-> 
-> Fixes: f061c9f7d058 ("Documentation: Document each netlink family")
-> Cc: Breno Leitao <leitao@debian.org>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
+In function `tc_dump_tfilter`, the attributes array is parsed via
+tcf_tfilter_dump_policy which only describes TCA_DUMP_FLAGS. However,
+the NLA TCA_CHAIN is also accessed with `nla_get_u32`. According to the
+commit 5e2424708da7 ("xfrm: add forgotten nla_policy for
+XFRMA_MTIMER_THRESH"), such a missing piece could lead to a potential
+heap data leak.
 
-I think the patch at the link above went through a few revisions
-and landed as:
+The access to TCA_CHAIN is introduced in commit 5bc1701881e3 ("net:
+sched: introduce multichain support for filters") and no nla_policy is
+provided for parsing at that point. Later on, tcf_tfilter_dump_policy is
+introduced in commit f8ab1807a9c9 ("net: sched: introduce terse dump
+flag") while still ignoring the fact that TCA_CHAIN needs a check. This
+patch does that by complementing the policy.
 
-  f061c9f7d058 ("Documentation: Document each netlink family")
+Note that other functions that access TCA_CHAIN, like tc_new_tfilter,
+are not vulnerable as they choose rtm_tca_policy as the parsing policy
+which describes the TCA_CHAIN already.
 
-And that along the way the requirements.txt update got lost.
+Fixes: 5bc1701881e3 ("net: sched: introduce multichain support for filters")
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+ net/sched/cls_api.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index 1976bd163986..2b5b8eca2ee3 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -2732,6 +2732,7 @@ static bool tcf_chain_dump(struct tcf_chain *chain, struct Qdisc *q, u32 parent,
+ }
+ 
+ static const struct nla_policy tcf_tfilter_dump_policy[TCA_MAX + 1] = {
++	[TCA_CHAIN]      = { .type = NLA_U32 },
+ 	[TCA_DUMP_FLAGS] = NLA_POLICY_BITFIELD32(TCA_DUMP_FLAGS_TERSE),
+ };
+ 
+-- 
+2.17.1
+
 
