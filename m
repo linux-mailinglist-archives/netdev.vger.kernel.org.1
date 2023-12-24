@@ -1,113 +1,138 @@
-Return-Path: <netdev+bounces-60131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16ED681D86C
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 09:55:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A48D681D8B1
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 11:22:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE101281EBF
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 08:55:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B14CC1C20C1C
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 10:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4751117;
-	Sun, 24 Dec 2023 08:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2486620F8;
+	Sun, 24 Dec 2023 10:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kMVuhCXa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJE0Zlcj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F98846A0
-	for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 08:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <dc506381-1408-46b7-9be0-403f819cee38@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1703408119;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fVdcs3Ctk02ImHVSOg5WJdjGh4KoKAx3MLEgb2sROMI=;
-	b=kMVuhCXaaUDu80xzk+hBmL1uVtHsgUQRz3HWzVXFVcnMsCMnU7zLtGKzYxkpMyBg6LWb9N
-	lfNKLCJbuJ6LU5mO+qFmlRjkPOv+iq2lylAkiSXdoFmVbNQx7klaGL7GJSofYFBjP1qwYY
-	PTiRndgO9bo+MC+SbjH6i5M7FehVmR8=
-Date: Sun, 24 Dec 2023 16:55:08 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47A61C14;
+	Sun, 24 Dec 2023 10:22:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D836C433C8;
+	Sun, 24 Dec 2023 10:22:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703413346;
+	bh=Mz3pMSB8AjrvYpQ8ki/iSGNLj09VhVMZQeVWluYkSd8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JJE0Zlcj+tInWq2AOu3L5Vnjnko/yhnlqURWlLSiYwRt8tmcst790+zxfWdTLgean
+	 5RijS9FPQ652dJz8U3/5DQDiZVyd205o63i8bbBlds02njxwKwczlDF28DGZaXZUqh
+	 3h4VswN1DXDwLtAIPLxt4/I4cbGsBymBc+CQIbQZez7WAAdaiMWXIOPauUIKWeEDh1
+	 O2mTIdogSZ3qO3yDXy51nJ4Z+nbvR6BXAcmEWI1zuBquKtvxOF0aSZJ1USTWK3BYIj
+	 yPOTqI58raqlS+JAAAgMwktYS0PZ1bkQfdjK37YZo3NTMG95sKcxnjjDK3hP7RKaOZ
+	 ogUsOeHTQN2GA==
+Date: Sun, 24 Dec 2023 10:22:19 +0000
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Edward Adam Davis <eadavis@qq.com>,
+	Markus Suvanto <markus.suvanto@gmail.com>,
+	Jeffrey E Altman <jaltman@auristor.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org, keyrings@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] keys, dns: Fix missing size check of V1 server-list
+ header
+Message-ID: <20231224102219.GB215659@kernel.org>
+References: <CAHk-=wgJz36ZE66_8gXjP_TofkkugXBZEpTr_Dtc_JANsH1SEw@mail.gmail.com>
+ <1843374.1703172614@warthog.procyon.org.uk>
+ <20231223172858.GI201037@kernel.org>
+ <2592945.1703376169@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 3/6] virtio_net: support device stats
-To: kernel test robot <lkp@intel.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev
-References: <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
- <202312240155.ow7kvQZO-lkp@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <202312240155.ow7kvQZO-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2592945.1703376169@warthog.procyon.org.uk>
 
-在 2023/12/24 1:23, kernel test robot 写道:
-> Hi Xuan,
+On Sun, Dec 24, 2023 at 12:02:49AM +0000, David Howells wrote:
+> Hi Linus, Edward,
 > 
-> kernel test robot noticed the following build warnings:
+> Here's Linus's patch dressed up with a commit message.  I would marginally
+> prefer just to insert the missing size check, but I'm also fine with Linus's
+> approach for now until we have different content types or newer versions.
 > 
-> [auto build test WARNING on mst-vhost/linux-next]
-> [also build test WARNING on linus/master v6.7-rc6]
-> [cannot apply to net-next/main horms-ipvs/master next-20231222]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> Note that I'm not sure whether I should require Linus's S-o-b since he made
+> modifications or whether I should use a Codeveloped-by line for him.
 > 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_net-introduce-device-stats-feature-and-structures/20231222-175505
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-> patch link:    https://lore.kernel.org/r/20231222033021.20649-4-xuanzhuo%40linux.alibaba.com
-> patch subject: [PATCH net-next 3/6] virtio_net: support device stats
-> config: arc-haps_hs_defconfig (https://download.01.org/0day-ci/archive/20231224/202312240155.ow7kvQZO-lkp@intel.com/config)
-> compiler: arc-elf-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231224/202312240155.ow7kvQZO-lkp@intel.com/reproduce)
+> David
+> ---
+> From: Edward Adam Davis <eadavis@qq.com>
 > 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202312240155.ow7kvQZO-lkp@intel.com/
+> keys, dns: Fix missing size check of V1 server-list header
 > 
-> All warnings (new ones prefixed by >>):
+> The dns_resolver_preparse() function has a check on the size of the payload
+> for the basic header of the binary-style payload, but is missing a check
+> for the size of the V1 server-list payload header after determining that's
+> what we've been given.
 > 
->     In file included from include/linux/virtio_net.h:8,
->                      from drivers/net/virtio_net.c:12:
->>> include/uapi/linux/virtio_net.h:419:45: warning: left shift count >= width of type [-Wshift-count-overflow]
->       419 | #define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
->           |                                             ^~
->     drivers/net/virtio_net.c:215:17: note: in expansion of macro 'VIRTIO_NET_STATS_TYPE_CVQ'
->       215 |                 VIRTIO_NET_STATS_TYPE_##TYPE,                   \
->           |                 ^~~~~~~~~~~~~~~~~~~~~~
->     drivers/net/virtio_net.c:224:9: note: in expansion of macro 'VIRTNET_DEVICE_STATS_MAP_ITEM'
->       224 |         VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
->           |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> Fix this by getting rid of the the pointer to the basic header and just
+> assuming that we have a V1 server-list payload and moving the V1 server
+> list pointer inside the if-statement.  Dealing with other types and
+> versions can be left for when such have been defined.
 > 
+> This can be tested by doing the following with KASAN enabled:
 > 
-> vim +419 include/uapi/linux/virtio_net.h
+>         echo -n -e '\x0\x0\x1\x2' | keyctl padd dns_resolver foo @p
 > 
-> ba106d1c676c80 Xuan Zhuo 2023-12-22  418
-> ba106d1c676c80 Xuan Zhuo 2023-12-22 @419  #define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
+> and produces an oops like the following:
+> 
+>         BUG: KASAN: slab-out-of-bounds in dns_resolver_preparse+0xc9f/0xd60 net/dns_resolver/dns_key.c:127
+>         Read of size 1 at addr ffff888028894084 by task syz-executor265/5069
+>         ...
+>         Call Trace:
+>          <TASK>
+>          __dump_stack lib/dump_stack.c:88 [inline]
+>          dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+>          print_address_description mm/kasan/report.c:377 [inline]
+>          print_report+0xc3/0x620 mm/kasan/report.c:488
+>          kasan_report+0xd9/0x110 mm/kasan/report.c:601
+>          dns_resolver_preparse+0xc9f/0xd60 net/dns_resolver/dns_key.c:127
+>          __key_create_or_update+0x453/0xdf0 security/keys/key.c:842
+>          key_create_or_update+0x42/0x50 security/keys/key.c:1007
+>          __do_sys_add_key+0x29c/0x450 security/keys/keyctl.c:134
+>          do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>          do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+>          entry_SYSCALL_64_after_hwframe+0x62/0x6a
+> 
+> This patch was originally by Edward Adam Davis, but was modified by Linus.
+> 
+> Fixes: b946001d3bb1 ("keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry")
+> Reported-and-tested-by: syzbot+94bbb75204a05da3d89f@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/r/0000000000009b39bc060c73e209@google.com/
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Tested-by: David Howells <dhowells@redhat.com>
 
-#define VIRTIO_NET_STATS_TYPE_CVQ       (1ULL << 32)
-The above can fix this problem.
-Not sure whether this is appropriate for the whole patches.
+Thanks.
 
-Zhu Yanjun
+FWIIW, I prefer this approach where v1 and bin don't alias each other,
+and the scope of v1 is constrained to the block where it is used.
 
-> ba106d1c676c80 Xuan Zhuo 2023-12-22  420
-> 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
+...
 
