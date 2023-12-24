@@ -1,124 +1,117 @@
-Return-Path: <netdev+bounces-60121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30ED781D759
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 01:08:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A515681D772
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 01:58:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 177A9B216CD
-	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 00:08:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3942EB21467
+	for <lists+netdev@lfdr.de>; Sun, 24 Dec 2023 00:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8906360;
-	Sun, 24 Dec 2023 00:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787DB379;
+	Sun, 24 Dec 2023 00:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dT1xG/wM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="icaeB3+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743B9190;
-	Sun, 24 Dec 2023 00:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5942c83c97fso1772014eaf.1;
-        Sat, 23 Dec 2023 16:08:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703376480; x=1703981280; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mH/XJuSscVimadN+6htDE4Pbf9Ag1leUGBOfxxjvsqE=;
-        b=dT1xG/wMS/x5KClYOjaLzn6VYb9yeRO9+a6FmBpw0w58iRjE4DVaj6ADeAiy9nMPIM
-         XBAHnwPkaTCCPfcr89iLQDxyG5TBg4W4iNogj0Q9Kzc23qqnrstZPh+LxWsL9vC4eH82
-         5MFGnuGcUl/5QwyIgjgai3NOOnqMFHguICp+aPFysfLUd5qOVPn0g0HRRYywEQH56rkZ
-         i3Li/MXaxxNnNjxKqPoWTdw1tkWKd4872F0j3vPCPwRj/O2twV1ZmJCNFE+Qg4lsH1oF
-         gw/UK1LU9nHF+MD9xEetzbm3eo7KLOCOVHsvDB0dRbGw50dHx8SUHqUdIh/BARo6LUkg
-         lkbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703376480; x=1703981280;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mH/XJuSscVimadN+6htDE4Pbf9Ag1leUGBOfxxjvsqE=;
-        b=Hasx4vYilHpbBR6HeuSoH5UIB85LaYAIStOcZR+yyRRY/ywGer2ZNF1K7meuhDJr/l
-         llLs7egH6t/YV2MQAXUCV+T7ToMV2qM5N+Xn0f0HmvMSHDXIhZakpoQNZicJ3eoYIFkz
-         +kqFHAwTy9Hron6xtgAbYX7Blt4E+YCnC3djrZf8rq+hgSf2K0Bxh7FR60unSmknW1hr
-         OxCGVo7q6o7/LTtPoXKtoJfgQ+ulxI8ZZPria85mir+l3R6ggyTQVAC1oQrhynPNN6zl
-         /p9DZelp8yLStGjZFJVQXOCiDsccD55i7aeoiC77E4U3dkoQ6/86W3PRofr/PgraFW16
-         fDiQ==
-X-Gm-Message-State: AOJu0YwRiigWH7wkDH/YBGyfMReBHH0Chg+WUfn48p83wQ9UQVMi45OB
-	ohxZ/PAox2vhcuYzk28MdJ6fm9iJjrZjRtO+y1k=
-X-Google-Smtp-Source: AGHT+IGmruJyaWFI9jMngVnqF9R+SWkg/WC0/VLm5IuhmrIjbtlLlauBGchbUe19YPqx/v124ZPs1r4WRaMTrP2SSfQ=
-X-Received: by 2002:a4a:8c61:0:b0:594:5bbd:9acb with SMTP id
- v30-20020a4a8c61000000b005945bbd9acbmr521758ooj.2.1703376480317; Sat, 23 Dec
- 2023 16:08:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204F5EBB;
+	Sun, 24 Dec 2023 00:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703379483; x=1734915483;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4d0I8vRHbzVyHrLROf04Yy7sbIuPKbG+MABm9FG8Q0c=;
+  b=icaeB3+2CtPxGND6w54UVvQgT5a4gp03mu8YQf6O5BpvicddrspjTh07
+   xdN9FZ8uy/Mec7JsjHK3S054xZfvjcNp+HENkk1IK+OEqCiDmE+mjYIxF
+   yKaE2soHtjus7KvuHQPinbCyKUTcBkcdvVulK6LVBWTxiySZ9IQ5Rh/zN
+   13YsEqpa3rl/WkHn0UGL4F9YHR+wQLeIFMXMNkpsnq/gHw3UbHjiFQaGN
+   rlfk5/fcJ0ZAM+6ZyCNRopsHNVyr+2Ci9+y8pGAPixMyVeZeU8iZsbrmu
+   u3CxfeGGMoYwh28iSCGcCrQIb/9ZB19vx1z+P3Bwran0ZwUoor2qgQDzk
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="14894219"
+X-IronPort-AV: E=Sophos;i="6.04,300,1695711600"; 
+   d="scan'208";a="14894219"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2023 16:58:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10933"; a="780943460"
+X-IronPort-AV: E=Sophos;i="6.04,300,1695711600"; 
+   d="scan'208";a="780943460"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by fmsmga007.fm.intel.com with ESMTP; 23 Dec 2023 16:58:00 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rHCoW-000Bi9-2T;
+	Sun, 24 Dec 2023 00:57:57 +0000
+Date: Sun, 24 Dec 2023 08:57:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com,
+	jonathan.lemon@gmail.com, vadfed@fb.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	maimon.sagi@gmail.com
+Subject: Re: [PATCH v1] ptp: ocp: add Adva timecard support
+Message-ID: <202312240816.FklJZk9r-lkp@intel.com>
+References: <20231221153755.2690-1-maimon.sagi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231222234237.44823-1-alexhenrie24@gmail.com> <20231223152235.15713-1-dan@danm.net>
-In-Reply-To: <20231223152235.15713-1-dan@danm.net>
-From: Alex Henrie <alexhenrie24@gmail.com>
-Date: Sat, 23 Dec 2023 17:07:24 -0700
-Message-ID: <CAMMLpeTCZDakqdkxm+jvQHxbRXhCYd4_PK+VVqMAmZHjSPuPRw@mail.gmail.com>
-Subject: Re: [REGRESSION] net/ipv6/addrconf: Temporary addresses with short
- lifetimes generating when they shouldn't, causing applications to fail
-To: Dan Moulding <dan@danm.net>
-Cc: bagasdotme@gmail.com, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221153755.2690-1-maimon.sagi@gmail.com>
 
-On Sat, Dec 23, 2023 at 8:22=E2=80=AFAM Dan Moulding <dan@danm.net> wrote:
->
-> > Sorry for the unintended consequences, and thank you for the detailed
-> > explanation. Does this patch fix the problem for you?
->
-> Thanks. I think this patch may resolve the application-level issues
-> I'm seeing.
->
-> However, it looks to me like this would still violate the RFC. The
-> temoporary address' preferred liftime must be lower than /both/ the
-> preferred lifetime of the public address and TEMP_PREFERRED_LIFETIME -
-> DESYNC_FACTOR.
->
-> These two existing lines ensure that it will meet the requirement:
->
->         cfg.preferred_lft =3D cnf_temp_preferred_lft + age - idev->desync=
-_factor;
->         cfg.preferred_lft =3D min_t(__u32, ifp->prefered_lft, cfg.preferr=
-ed_lft);
->
-> Once that has been computed, cfg.preferred_lft is already at its
-> maximum allowed value. There is no case where the RFC allows
-> increasing that value after doing that computation.
+Hi Sagi,
 
-TEMP_PREFERRED_LIFETIME is an administratively set variable: The user
-can change it to whatever they want whenever they want, and the
-operating system can adjust it automatically too. It might be more
-clear to increase cnf_temp_preferred_lft before those two lines, but
-the effect is the same as increasing cfg.preferred_lft afterwards.
-Unless there's something else I'm missing, I don't see how this
-approach could violate the RFC.
+kernel test robot noticed the following build warnings:
 
-> I think the safest thing to do is revert this change, and try to find
-> some other way to achieve the goal of preventing the user from
-> administratively setting a preferred lifetime that prevents temporary
-> addresses from being generated, when the user wants to use the privacy
-> extensions. For example, this could be done where administratively
-> configured values are accepted (wherever that is), and either generate
-> a warning or reject the change, if the value provided by the user is
-> lower than REGEN_ADVANCE.
+[auto build test WARNING on net/main]
+[also build test WARNING on net-next/main linus/master v6.7-rc6 next-20231222]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-It's fine to revert the commit for version 6.7 (after all, I think
-everyone wants a break for the holidays). Hopefully by version 6.8 we
-can agree on a way to support users who want to randomize their IPv6
-address as frequently as the network allows.
+url:    https://github.com/intel-lab-lkp/linux/commits/Sagi-Maimon/ptp-ocp-add-Adva-timecard-support/20231222-182253
+base:   net/main
+patch link:    https://lore.kernel.org/r/20231221153755.2690-1-maimon.sagi%40gmail.com
+patch subject: [PATCH v1] ptp: ocp: add Adva timecard support
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20231224/202312240816.FklJZk9r-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231224/202312240816.FklJZk9r-lkp@intel.com/reproduce)
 
--Alex
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312240816.FklJZk9r-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/ptp/ptp_ocp.c:418:32: warning: tentative definition of variable with internal linkage has incomplete non-array type 'const struct ocp_sma_op' [-Wtentative-definition-incomplete-type]
+   static const struct ocp_sma_op ocp_adva_sma_op;
+                                  ^
+   drivers/ptp/ptp_ocp.c:377:15: note: forward declaration of 'struct ocp_sma_op'
+           const struct ocp_sma_op *sma_op;
+                        ^
+   1 warning generated.
+
+
+vim +418 drivers/ptp/ptp_ocp.c
+
+   417	
+ > 418	static const struct ocp_sma_op ocp_adva_sma_op;
+   419	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
