@@ -1,102 +1,56 @@
-Return-Path: <netdev+bounces-60185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D870E81DFB7
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 11:25:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5306281DFB9
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 11:28:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0530B210A4
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:25:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 785581C21708
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8332E401;
-	Mon, 25 Dec 2023 10:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FFB130D0B;
+	Mon, 25 Dec 2023 10:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="jVrouFQg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sQqXoraS"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic318-22.consmr.mail.gq1.yahoo.com (sonic318-22.consmr.mail.gq1.yahoo.com [98.137.70.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F6635883
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 10:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1703499895; bh=aG3x/Gwjn4cN307RnrwhQb++OwappqX7kReZEfjgj5c=; h=Date:From:To:Cc:In-Reply-To:References:Subject:From:Subject:Reply-To; b=jVrouFQgsySEUWGUYXeA57nsyHQWkDGCn/dP9smlmwy+mWKsZ+tspD0/94KCmqrwbrg3vWTl5/pV0niDsMs97ygImvlOsjxy9wEuBgtxjq3Dq2RY41YZkJx0U0kP5q/8UvBieVGW5bVPVkVl+t3Q/IWYssMEBB6sgeRPc/X6UOiHPA/C6SKFoA84fWb2cLJUD8d0K53aQvL9pCK0cF0ziKyVZ9ijgRiqmr1DacIVdKEDNEdU/eFZvcpypOzXJkt10PaBgyPt5U5biLlZZAy+kyJpxphVjo79Z8DkdgMmsYrmM9BiFIZI1/1LVH4oXLKzPSt9TfdI5pZfZ+c3EjvYiQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1703499895; bh=3I+A1BGOEHxw7N2aHAggKOCR/+Zl54N2fMGMpZCnUyA=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=pXN0Dqtckzp0zcvA5VodjZzwC8jFQvhXYL4MF3+KcKGAaE6R3AYAs3pn/VdCj8/Y0GchcEOHhv72M6ix5TUGRcFH5gGQpFQxevioKuze6WsQojh80FkL0vMA7kOKHsDtyoYae7PxnD63jO2mK7cZBQzcI5FoGSyDEdU2eP2rhkWFrPqTazFYTL0D54povoQKfInQtFFHOGfLbWO2aiYli4GTzIZqehY8wkZg0HF642Jqvd/IBKIEi3pGF7XsBMGNDrdd6wqCOHTcUYK1p31GVvZN2pl4aZxezdJztWxbjXJIZUwlKTkT0/3d8XApCH3EFjse9LaQNvOgrjUexpuwSA==
-X-YMail-OSG: ma3XuzoVM1kp7oHntbDC7ULbgl_mNUnqWmmT2dfa1HIQTXZShKwT5OVkuvXlSua
- 0bU6XyzGKjoG_Ni0aPOrdXJKxLoJQY87KOPs3oqhZuU1oZue.7vMKZIDROFpub6Md35lil2BtbGn
- jHkKVgDd0kzO3y8.fNIoI2wobeQtqwhmGkSxsRXejNwDSPypio_lPJHi3ltky5ONAtNI9N_nPaiZ
- yEmPxoz8J5JKSoEmkjoTOPRsAsXcd8IKuembJdAk0eDyLSiXyV_cntdLFumq02UAboxqYnVNEq7u
- PXtKAUFbTF2kTrikyuF3PDaBiOfELNRpw6u8rRMtZhvs15EKP6vT2dLw2ExcsN7Iu2Vewi4bL.kt
- GNM8zjXC0dFBL7U3s8QcJMxzfrAq7F12CFRfXXp8GZCbwAS4oGiweLUdSDrDOp2f_dSw4v7nE1iY
- cHLnRFrEa5QrJT2fBNC4W1PDbfTmBlp8G.c2u4Pq6pZ2VYEkC9dRDnKTO.xk1.KJwDVqBgB4aG8M
- TVLt2obpHHdy8SLj79T5VidVMh9.5Q2Ui9N7R2rclw5d6ZpqMt9Fubi04zKlYXnENilNFxRzqIaT
- Oa8PMxusQkda63NTPii.eroJq8cxuz0jX3FsqZuoiv5DVDfo_aDiuWbxFwK4tsN6LOxpq45NBfFy
- 7ww6jWY4jkW1gRl7elyc58jDGfJYej55v3fvVwQ_Vmvq8SqjzJ5lD8E75w4LQpEdQEhWt_fMV4N9
- 5dpT3Ui7lOnSydQA3RUpO4AL.GGXYtjsp4CP0hSIdB8VUD5EmG9JkqaonOJUd7H2PTJokWGCjqin
- 6PxTqkLHLFjH_luoqRJT4XcU_rsRfmr5ypLus9v..UmSrKnk2nKNNIP5oiqccdMrOBYaTEHXJVqq
- OtupeWDlethxkgV2KtrsEABaByzqFAEsA0VnpEWPY3KIXlVZfz1eKLkAGBmRl4wZEiMLPi4EhKji
- 7VNVeaWq8us4NN4ZYdaYC3NXX5_i3IOVZPwZrQl5MWI.iBtunf_kJ5qdvpavkQkMAY5NMTK7WWrm
- 8n.9QAxGSYLawv8K1V5WTwhPg3bzGxTlF7rI7ehEL_WrK4IOnEKr7jNocYVU8vpr9cZKR49qSzyc
- tjFeTVn8M44JLSE7yPg1.Qu6fZInzuvw4yTE2pyjuGJEla4DbP8FxriaETzG48pzKu4m6WGF2018
- 6hVX._wv5R6wA7zKc_VoLytJR65lWogW.BBhlByzzeg1gUXxhQFQvSmnEtzJGk_Nucgz91TOnTCD
- vVASxJ0la.7SHbdSXFZgGXjGpQ4SsUvnDcYSXFj6RQStMptBVbhUyhxwjon_yaf.poN9_K8H87so
- airQraoakhcB8UyPkwzKOX9z77qSDkIVAcC56A5nZxYCfAbS6aCAsc4U9N5Ba21dtbjlmRpc3Y0I
- f1BZAfOluGZCa31VQdII37_pD0l_gTLMk6b1Bykwk5QlzioknYy.pvkdZbfJ3nUFpKzM0ke8i.Lx
- rrKEyFgVHFbq79yqZ96f_E0YZH2KhGbatill2ELqZMq92o_N_Y09Ncvi8OIo0L.6J0tP4Vq7lX7A
- alo7_rIp3Zk6.kjhljvJOF6yzNTbnp8f0fbALi.Rt6JYEtXa5.omnbrBc2ha3JncNiIKRSgUuNR4
- S0JCR9hCkTYSZqAE8LT0_nqYVrHPkzfoL1nCnqbZhelCQRS1PjjQAWd53qai3KwSjT_KxMlOIpKx
- QQSKA.UVZvb3kAx85bQ9LILHB5od1y7Hs4Y7Dz6u42ThGBrK_rAbwmc_tcpn57GvmQltw0pPGfaf
- hhEO9f3.A_XCFkp7qJzg6Wx8dCTAxKs4jqC0yX3uKpKfio9mmYAAlprqJX4dJEU7oKiGNt4y9hA4
- 5ME0Y7iGtJq0D_abayrn6e2Fq44csmjHbtYlpkayNsBEsSVCOOckATb5yRLACmQcex2I2zcoRxH2
- B4LBJkPYH4xEjPWnADSRXJiwV1hHlHQFlaxs6FDYQdK4i5q5IhlDHHSsnMwd2rmmSnQsABovpKxQ
- aBiJZCMrZy.xtj62nlXDztqSV2o7lP69_L2guyMmfkkecAbA4K1kEh.fQDPkIp_fTKXgQX3lZD2V
- ZfMkU87EDDztmfi3fzg5jcUMcnZKZP9EBSdzM_zcHcscDnkYbjFz09pzul.dRO7VltyUSGrWLGkF
- vE1dEAVgLlIEY39FKgdPeIfC.npY07aqg7yTIP42xvjvgs79_aTSpHn.LItciy6cSUk_PMS228sE
- Nr89L5EfR3rQrhOl_e0ER83vFU1JPBjTV_Q--
-X-Sonic-MF: <chaosesqueteam@yahoo.com>
-X-Sonic-ID: a9a50c8d-9fac-4aaf-8c30-4f44041f89dc
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic318.consmr.mail.gq1.yahoo.com with HTTP; Mon, 25 Dec 2023 10:24:55 +0000
-Date: Mon, 25 Dec 2023 10:24:51 +0000 (UTC)
-From: "chaosesqueteam@yahoo.com" <chaosesqueteam@yahoo.com>
-To: "polarian@polarian.dev" <polarian@polarian.dev>, 
-	"misc@openbsd.org" <misc@openbsd.org>, 
-	"tech@openbsd.org" <tech@openbsd.org>, Jan Stary <hans@stare.cz>, 
-	Rudy Zijlstra <rudy@grumpydevil.homelinux.org>
-Cc: Richard Stallman <rms@gnu.org>, Bruce Perens <bruce@perens.com>, 
-	Aditya Pakki <pakki001@umn.edu>, 
-	Anna Schumaker <anna.schumaker@netapp.com>, 
-	"ansgar@debian.org" <ansgar@debian.org>, 
-	"blukashev@sempervictus.com" <blukashev@sempervictus.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, 
-	Dave Wysochanski <dwysocha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"editor@lwn.net" <editor@lwn.net>, 
-	"esr@thyrsus.com" <esr@thyrsus.com>, 
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, 
-	"J. Bruce Fields" <bfields@fieldses.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Networking <netdev@vger.kernel.org>, 
-	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>, 
-	"moglen@columbia.edu" <moglen@columbia.edu>, 
-	"skraw.ml@ithnet.com" <skraw.ml@ithnet.com>, 
-	"tcallawa@redhat.com" <tcallawa@redhat.com>, 
-	"torvalds@linuxfoundation.org" <torvalds@linuxfoundation.org>, 
-	"torvalds@osdl.org" <torvalds@osdl.org>, 
-	Trond Myklebust <trond.myklebust@hammerspace.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, 
-	Julia Lawall <julia.lawall@inria.fr>, 
-	Paolo Abeni <pabeni@redhat.com>, 
-	"jon@elytron.openbsd.amsterdam" <jon@elytron.openbsd.amsterdam>, 
-	"netbsd-current-users@netbsd.org" <netbsd-current-users@netbsd.org>, 
-	"netbsd-users@netbsd.org" <netbsd-users@netbsd.org>
-Message-ID: <609690527.4210086.1703499891491@mail.yahoo.com>
-In-Reply-To: <e274b55d-9818-0919-fb90-bc6d0b522b0e@grumpydevil.homelinux.org>
-References: <549578214.4148875.1703446908152.ref@mail.yahoo.com> <549578214.4148875.1703446908152@mail.yahoo.com> <e274b55d-9818-0919-fb90-bc6d0b522b0e@grumpydevil.homelinux.org>
-Subject: Re: I can't get contributors for my C project. Can you help?
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BB22E41A
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 10:28:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 394A1C433C7;
+	Mon, 25 Dec 2023 10:28:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703500121;
+	bh=VUk9KD28SFTgH+2+etqxTGW1fQIO2k2iFLdUmLIGD9U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sQqXoraSPj/AZrOh1rAkuGxDrFCRwr9HhKol3sNWawCMhT6u3bEwM6Et+mJ9z0Ooj
+	 QcDeo2aiNWqda4/2Y9ghBXxdmOdHda2W1/4n1zabRc2Fqq+3KJsdcOOn8quxugWD3V
+	 Zqiv4WnH7IK4kruZu8v1pVZcogKXTZ4IRNZRou+fw2w6T4W8iJmIRtrEVnl4CT2I0f
+	 8fLKKiiYXyv6I6kTlkeVkRW9SG2+mjyPgc8nW4YhFdAsBCaG6GhK4/bHwmBmKLwp0D
+	 JCa5nvXszAUx17Opgh4wIm1RysEto53M/ooumZF8WpGuccw3FWVia2TTfaMYV6olP3
+	 OifeUuUDY3sPA==
+Date: Mon, 25 Dec 2023 11:28:31 +0100
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <rmk+kernel@armlinux.org.uk>, Alexander
+ Couzens <lynxis@fe80.eu>, Daniel Golle <daniel@makrotopia.org>, Willy Liu
+ <willy.liu@realtek.com>, Ioana Ciornei <ioana.ciornei@nxp.com>, Marek
+ =?UTF-8?B?TW9qw61r?= <marek.mojik@nic.cz>, =?UTF-8?B?TWF4aW1pbGnDoW4=?=
+ Maliar <maximilian.maliar@nic.cz>
+Subject: Re: [PATCH net-next 00/15] Realtek RTL822x PHY rework to c45 and
+ SerDes interface switching
+Message-ID: <20231225112831.65e3a942@thinkpad>
+In-Reply-To: <5b9ae8ea-5817-47b0-9d51-0b15098db5cf@gmail.com>
+References: <20231220155518.15692-1-kabel@kernel.org>
+	<f75e5812-93fe-4744-a160-b5505fecd47d@gmail.com>
+	<20231220172518.50f56aaa@dellmb>
+	<5b9ae8ea-5817-47b0-9d51-0b15098db5cf@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,120 +58,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.21952 YMailNorrin
+Content-Transfer-Encoding: quoted-printable
 
-Pathetic
+On Sat, 23 Dec 2023 20:09:33 +0100
+Heiner Kallweit <hkallweit1@gmail.com> wrote:
 
+> On 20.12.2023 17:25, Marek Beh=C3=BAn wrote:
+> > On Wed, 20 Dec 2023 17:20:07 +0100
+> > Heiner Kallweit <hkallweit1@gmail.com> wrote:
+> >  =20
+> >> On 20.12.2023 16:55, Marek Beh=C3=BAn wrote: =20
+> >>> Hi,
+> >>>
+> >>> this series reworks the realtek PHY driver's support for rtl822x
+> >>> 2.5G transceivers:
+> >>>
+> >>> - First I change the driver so that the high level driver methods
+> >>>   only use clause 45 register accesses (the only clause 22 accesses
+> >>>   are left when accessing c45 registers indirectly, if the MDIO bus
+> >>>   does not support clause 45 accesses).
+> >>>   The driver starts using the genphy_c45_* methods.
+> >>>
+> >>>   At this point the driver is ready to be used on a MDIO bus capable
+> >>>   of only clause 45 accesses, but will still work on clause 22 only
+> >>>   MDIO bus.
+> >>>
+> >>> - I then add support for SerDes mode switching between 2500base-x
+> >>>   and sgmii, based on autonegotiated copper speed.
+> >>>
+> >>> All this is done so that we can support another 2.5G copper SFP
+> >>> module, which is enabled by the last patch.
+> >>>    =20
+> >>
+> >> Has been verified that the RTL8125-integrated PHY's still work
+> >> properly with this patch set?
+> >> =20
+> >=20
+> > Hi Heiner,
+> >=20
+> > no, I wanted to send you an email to test this. I do not have the
+> > controllers with integrates PHYs.
+> >=20
+> > Can you test this?
+> >=20
+> > Also do you have a controller where the rtlgen driver is used but it
+> > only supports 1gbps ? I.e. where the PHY ID is RTL_GENERIC_PHYID
+> > (0x001cc800).
+> >=20
+> > I am asking because I am told that it also is clause 45, so the drivers
+> > can potentially be merged completely (the rtl822x_ functions can be
+> > merged with rtlgen_ functions and everything rewritten to clause 45,
+> > and gentphy_c45_ functions can be used).
+> >  =20
+> At least on RTL8168h indirect MMD reads return 0 always.
+> IIRC this was the reason why the rtlgen functions use the vendor-specific
+> registers.
 
+Looking at the code in r8169_phy_config.c, I see function
+  rtl8168h_config_eee_phy()
+with three paged writes to vendor registers, but the writes do not access
+the same registers as the .read_mmd() methods for the PCS_EEE / AN_EEE regi=
+sters
+in realtek.c PHY driver.
 
+It seems for now it would be best to keep the methods for paged
+accesses.
 
+Could you test the patchset without the patch that removes the paged
+access methods?
 
+The rewrite of the read_mmd / write_mmd methods should not cause
+problems. I am told by the realtek contact you gave me that:
 
-On Sunday, December 24, 2023 at 03:25:55 PM EST, Rudy Zijlstra <rudy@grumpydevil.homelinux.org> wrote: 
+  If FE PHY supports EEE, then it will support MMD register and it will
+  also support use internal registers to access theses MMD registers.
 
-
-
-
-
-blacklisted. Long ago i needed to do that...
-
-On 24-12-2023 20:41, chaosesqueteam@yahoo.com wrote:
-> Note: This is about Unreal map support in this project: sf.net/p/chaosesqueanthology/tickets/2/
-> Which is an opensource project. White people will not help
-> me because, as Polaris here says, they are feminist scum.
->
->> Hello,
->> In case this is not a troll,
-> It is not
->> and is a stupid narcissistic teenager who
-> Also incorrect. 37 years old.
->
->> thinks the way open source functions is via extremism and horrific
->> sexism, and promotion of terrorism, I will respond.
-> I've likely been an opensource/freesoftware programmer longer than you.
-> Maybe not; maybe so; but I'm not the neophyte you take me to be.
->
->> Congratulations, you will not find a single contributor, if you think
->> that storming into a public mailing list spewing sexist comments, and
-> "All opensource C programmers are pro-women's right's dick-chopping faggots
-> as their new-testament demi-god tells them to be (matthew 19 greek)"
->
-> I thought there was more religious plularity amongst them.
-> There used to be.
->
-> Want a religious war? We can do that if that's what you're up for.
-> If you are all our enemies than we'll treat you as such.
-> Do you understand what I am saying: ? Do you?
->
->> then supporting terrorism is the way open source functions, then you
-> Why shouldn't one (morally) "support" those who slaughter feminists, and
-> in the alternative,
-> ensure men may marry female children, as YHWH's Law commands in
-> Devarim chapter 22 verse 28 (greek, hebrew, latin, not english (white fuck))
-> ?
->
-> Tell me?
-> Should I "not support" the hellenistic greeks who put the Amazons to the sword?
-> And introduced an epoc of rape for young virgin child brides? (Zeus was a rapist)
-> (white faggot males seethe while clutching their New Testament "BETTER A MILLSTONE")
-> (english) ("CHOP OFF DICK FOR HEAVEN!!!" "NO MALE NORE FEEMALLE!!")
->
-> In hebrew it's called "tahphas" btw. Also supported by the actual God you white scum
-> try to bury.
->
->> have the complete wrong idea.
-> When I started opensource/freesoftware programming it wasn't all woman
-> worshiping faggot white christian scum. Guess it is now. Regardless of
-> whether your pro-woman teachings are acknowleged from the New Testament
-> or not by you.
-> (hint: that's where they're from, uneducated trash)
->
->> Best choice of action would be to not speak any further, and at the
-> How would that get me contributors to assist in additional map format support?
-> It wouldn't.
->> minimum apologise to Jan,
-> Jan is some cunt who opposes child brides and is mad that the taliban are
-> raping their little girl wives as we speak.
-> No I will not apologize to Jan.
-> Especially since you allready gave up the "secret" that no opensource programmers
-> will help anyone who isn't a woman worshiping faggot piece of shit.
->
-> I'm so fucking glad your feminists have been killed in
-> 1) Central Asia
-> 2) Iran.
->
-> Anyone opposed to men having young virgin girls as brides, deserves that fate.
->> but I doubt anyone will take you seriously
-> I'm simply asking for some more map format compatability.
-> I did several myself.
->
->> moving forward now anyways.
->> Best way to deal with people like this is simply to ignore. Note to the
-> Best way to deal with feminists is to kill them dead: like the Taliban did.
-> The only way men can get their rights back is to do what the Hellenistic Greeks
-> did in their history: that is to slaughter people like you who uphold women's
-> rights.
->
->> mailing list is I did offlist the user in response to their previous
->> email, which was aimed to provide feedback on how to properly ask for
->> help, and how openbsd is not a freelancing community for random C
->> projects. I did not receive a response so they obviously aren't here
->> for any decent reason, and are likely a troll.
->> Please now get out my mailbox and go somewhere else, I rather read
->> constructive emails instead of spiteful sh*t.
-> Want me to physically fuck you up dipshit?
-> How about you go talk to a wall.
->
-> My emails are about Unreal Map support in an opensource engine.
-> Not you showing how much of a white faggot that you are.
-> Do you understand that?
->
-> sf.net/p/chaosesqueanthology/tickets/2/
->> Take care,
->> --
->> Polarian
->> GPG signature: 0770E5312238C760
->> Website: https://polarian.dev
->> JID/XMPP: polarian@icebound.dev
+Marek
 
