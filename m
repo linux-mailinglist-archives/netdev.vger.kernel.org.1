@@ -1,131 +1,133 @@
-Return-Path: <netdev+bounces-60168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07DB181DF05
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:09:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5670681DF3A
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:45:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AEE71F21C4D
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 08:09:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0479281A25
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 08:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A34E315B0;
-	Mon, 25 Dec 2023 08:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900CA186B;
+	Mon, 25 Dec 2023 08:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wq2mzm4p"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Xbus/8kE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93601C14;
-	Mon, 25 Dec 2023 08:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703491769; x=1735027769;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2aChuv2hSCHAdNRDTEHx6SASmQDX/0FLKZ+/kzJ26Qo=;
-  b=Wq2mzm4pPXfRnp3qY1wpyHNxUEoSA6YQ2IWv5njvNG3B1XnIIVTkaZna
-   lM3ov/E1D8SXjgKyrDwSwIBuQkpuu7j2ePMnd9rc2uMuLuMkwAlqhgRWQ
-   uiwSaL6DLevdR9TJPmStNhDVjmwedsLhMZ9wqyHWeU++nYKb8phSCi78Z
-   Wj5y9t915fdKeB1gcixNTKrllsdBLVpfcYvmdegCq6WaYAeeSqm7eieY3
-   qEEBGYH8CBiIjopkvblGk62wz/tYv6WqmdM8Ex8hhdWF7c9mjQrk2YNp8
-   wkpBHn7xYm/n/3jxa8UFhaElmtDVbJ+F0M/bLIkgDu0serlZyg/+oupXY
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="3107834"
-X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
-   d="scan'208";a="3107834"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 00:09:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
-   d="scan'208";a="19397032"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orviesa002.jf.intel.com with ESMTP; 25 Dec 2023 00:09:24 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rHg1Z-000D8v-1B;
-	Mon, 25 Dec 2023 08:09:21 +0000
-Date: Mon, 25 Dec 2023 16:09:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Aahil Awatramani <aahila@google.com>,
-	Mahesh Bandewar <maheshb@google.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH next] bonding: Extending LACP MUX State Machine to
- include a Collecting State.
-Message-ID: <202312251524.jjgo5nFR-lkp@intel.com>
-References: <20231221023650.3208767-1-aahila@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C21CA71;
+	Mon, 25 Dec 2023 08:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BP7tY9Y012547;
+	Mon, 25 Dec 2023 08:44:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=qcppdkim1; bh=/z5k1zu
+	1LE8h0VJkvzAkkY25daJVDH5BqekPkzmPob0=; b=Xbus/8kE8Kk39mFe4IjhNVY
+	b+iHfW5E8EiCgzGk1XySlad+S8EDYgn63/VVPmnVSzk+3w0jdFIEn1iMeg8JPggZ
+	z7HBQz26qyqE0amXtv08id6Jq1DicU+1dfTYQB/OeZKJBBBqEB3o7/IslekiQbS4
+	bnk/HNZWm5mMahapxmCOLMqaCGicn/zc6WHjCKrhKf4WycuwvEP/fseM1eNdqOCG
+	iz1Kn0f5WDG+UmgVaTzRLM7CND/evffInAdl8e7bHvw7i9ro5v9oG3Iqe7UiBSuh
+	aTYF11QaM5sVKOODzc5TrybCRSxr5XJzo1yEOFf0H+rDRwH+GNcKsYytexur9Mw=
+	=
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v5ruf36vx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Dec 2023 08:44:42 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BP8ifaZ016570
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Dec 2023 08:44:41 GMT
+Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 25 Dec 2023 00:44:36 -0800
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_srichara@quicinc.com>
+Subject: [PATCH v4 0/5] support ipq5332 platform
+Date: Mon, 25 Dec 2023 16:44:19 +0800
+Message-ID: <20231225084424.30986-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231221023650.3208767-1-aahila@google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 0NI6FhxF2T9qnW6BZ_PmZ8WZZOP0SmTr
+X-Proofpoint-ORIG-GUID: 0NI6FhxF2T9qnW6BZ_PmZ8WZZOP0SmTr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ mlxscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 adultscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312250066
 
-Hi Aahil,
+For IPQ5332 platform, there are two MAC PCSs, and qca8084 is
+connected with one of them.
 
-kernel test robot noticed the following build warnings:
+1. The Ethernet LDO needs to be enabled to make the PHY GPIO
+   reset taking effect, which uses the MDIO bus level reset.
 
-[auto build test WARNING on next-20231222]
+2. The SoC GCC uniphy AHB and SYS clocks need to be enabled
+   to make the ethernet PHY device accessible.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Aahil-Awatramani/bonding-Extending-LACP-MUX-State-Machine-to-include-a-Collecting-State/20231222-174732
-base:   next-20231222
-patch link:    https://lore.kernel.org/r/20231221023650.3208767-1-aahila%40google.com
-patch subject: [PATCH next] bonding: Extending LACP MUX State Machine to include a Collecting State.
-config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20231225/202312251524.jjgo5nFR-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231225/202312251524.jjgo5nFR-lkp@intel.com/reproduce)
+3. To provide the clock to the ethernet, the CMN clock needs
+   to be initialized for selecting reference clock and enabling
+   the output clock.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312251524.jjgo5nFR-lkp@intel.com/
+4. Support optional MDIO clock frequency config.
 
-All warnings (new ones prefixed by >>):
+5. Update dt-bindings doc for the new added properties.
 
->> drivers/net/bonding/bond_3ad.c:2016: warning: Excess function parameter 'update_slave_arr' description in 'ad_enable_collecting'
+Changes in v2:
+	* remove the PHY related features such as PHY address
+	  program and clock initialization.
+	* leverage the MDIO level GPIO reset for qca8084 PHY.
+
+Changes in v3:
+	* fix the christmas-tree format issue.
+	* improve the dt-binding changes.
+
+Changes in v4:
+	* improve the CMN PLL reference clock config.
+	* improve the dt-binding changes.
+
+Luo Jie (5):
+  net: mdio: ipq4019: move eth_ldo_rdy before MDIO bus register
+  net: mdio: ipq4019: enable the SoC uniphy clocks for ipq5332 platform
+  net: mdio: ipq4019: configure CMN PLL clock for ipq5332
+  net: mdio: ipq4019: support MDIO clock frequency divider
+  dt-bindings: net: ipq4019-mdio: Document ipq5332 platform
+
+ .../bindings/net/qcom,ipq4019-mdio.yaml       | 141 ++++++++-
+ drivers/net/mdio/mdio-ipq4019.c               | 288 ++++++++++++++++--
+ 2 files changed, 399 insertions(+), 30 deletions(-)
 
 
-vim +2016 drivers/net/bonding/bond_3ad.c
-
-  2007	
-  2008	/**
-  2009	 * ad_enable_collecting - enable a port's receive
-  2010	 * @port: the port we're looking at
-  2011	 * @update_slave_arr: Does slave array need update?
-  2012	 *
-  2013	 * Enable @port if it's in an active aggregator
-  2014	 */
-  2015	static void ad_enable_collecting(struct port *port)
-> 2016	{
-  2017		if (port->aggregator->is_active) {
-  2018			struct slave *slave = port->slave;
-  2019	
-  2020			slave_dbg(slave->bond->dev, slave->dev,
-  2021				  "Enabling collecting on port %d (LAG %d)\n",
-  2022				  port->actor_port_number,
-  2023				  port->aggregator->aggregator_identifier);
-  2024			__enable_collecting_port(port);
-  2025		}
-  2026	}
-  2027	
-
+base-commit: 3b83fa94cf316aaf9ad9a367ac8031a06d31649b
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.42.0
+
 
