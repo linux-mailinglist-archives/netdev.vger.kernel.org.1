@@ -1,307 +1,216 @@
-Return-Path: <netdev+bounces-60165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3022C81DEF9
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:01:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 175A481DEFA
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:03:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C6091F21E1A
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 08:01:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 630F0B20A1F
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 08:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37E61847;
-	Mon, 25 Dec 2023 08:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11EAD7E9;
+	Mon, 25 Dec 2023 08:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uFYR3r8O"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jPeSbpXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7261815AF
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 08:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f6cea3db-aef6-43a9-96a9-04fe42e6a1f3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1703491306;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=27COKKbl8lKkw/RUrBiHtSV6Z6kbls3FJ3K8W2HBwPY=;
-	b=uFYR3r8O4WM+TUzJTBO/7vrNkR0Illmy2D/bY3YNGjihEpeYy/nvws/mMpcNKNISmbbVgF
-	b5/PO4sPVjTg4o9g5nam3O/Hl/D6mf93K31xViobtlfFQlWKJ+4HMRLAbvLQyBMbFPyuuN
-	rWDj+ec5HkJRPz8VAQiGyuvGx6xA9O8=
-Date: Mon, 25 Dec 2023 16:01:39 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E62515B9
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 08:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703491418; x=1735027418;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YF4SmKXofh7nHuTx3FTSTXEnNuGeV5C0EQgmjinClYY=;
+  b=jPeSbpXi4DvmENiqJjdLdk0/p+Xq/sOb1ns7c9yvQ4C78bnmqunhQnsk
+   oXtlYMhxBXBk39JbC4ydcjiOTac+Yzy5ybbM4RLUnen7SeDnm5r4vTaCA
+   xMz9xTr8bFujDWRnX8V9wkgi4R7J4xO62qcg4t0+98PT+EFBhItx5K46T
+   jiVVFFQh3m28e/sE5P630ppCAVD5iys652G6rcw2jxpWXCrRttRswczhY
+   XsF3kI9Ru9pXXfF7Yitrc71fuu8JK1AT3scARn+TA1YD2mfqxiok1X5Pf
+   6Z0JYJP1ASVi9N3zrVc8BZfZBi5nrUWJlfhkWEv2QCwPeRNSOf8OxoIsq
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="393434796"
+X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
+   d="scan'208";a="393434796"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 00:03:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="777679578"
+X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
+   d="scan'208";a="777679578"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Dec 2023 00:03:34 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 25 Dec 2023 00:03:32 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 25 Dec 2023 00:03:32 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 25 Dec 2023 00:03:32 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YTZmJKAruoCSy6gZjiowoQpfMxcWjQOWQ+smh+3YfKCvHxkYpIL4y+HETAbtV8U4Rtnd6mjiYiojgoeh+q3wyc/cGJ90Hmi/br9z4MmTKcHI2NBj2Cooho0GnaARrnglok5XZZiLrBc9EN9AnXdNm9e9gl9AaEOJOlnYqho4X1kCdzm6XlqzhxX2jM5vX5caWjA7kOlok27Nv2CSV6acJwlt0rOnS1yMkXQpjeDQ0waBxLToEOlj6c6K0YoAPE1cGLZbnvx8aGqso0zX5iP6k8/lpC3+8PVVeqiu4GQmxtH7Ni8eJOuJG+p1Pz8vzQHgaKAq7eXv1f1HSznsyjVTVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qmZPbmg0qAThboAsUjUULcXX2Md+ue0oNsWctj2v8nc=;
+ b=I9Hsj73F55HiRGQJH5L8OpTfWAAT0Zw0vEDx5QgP4MUSHXQQo2fRYYJfytm4QTI7rL9KUcTTRy1iDj67K5aNZqnSFcbMFJKz0ilrF2CeYrh2/MveAjIBXUZwqQ5jW+6KshicB+GamsdymAWyACURS0KxnKYfRY4NvE0Kf0gRSICRkTZunfKSQseW0X9z6tWD9sKf9RoXDRjllhDDFud8WeU8z59HAdc1XpnaBMKP2hSxds1PN8kXhsEQfAJ2k8rWY6ub697d3S9mipufC+51W0IQ4t9QleGxml2RY3gPGU0s4yr/YtiOUQPSqV+yEH7eBZT10DatfA3/3xneiTanwQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB6738.namprd11.prod.outlook.com (2603:10b6:303:20c::13)
+ by DS0PR11MB7631.namprd11.prod.outlook.com (2603:10b6:8:14e::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.26; Mon, 25 Dec
+ 2023 08:03:30 +0000
+Received: from MW4PR11MB6738.namprd11.prod.outlook.com
+ ([fe80::4ecc:bb1b:9233:a6a7]) by MW4PR11MB6738.namprd11.prod.outlook.com
+ ([fe80::4ecc:bb1b:9233:a6a7%5]) with mapi id 15.20.7113.023; Mon, 25 Dec 2023
+ 08:03:30 +0000
+Message-ID: <79d4bf3e-fdc7-4273-aa1e-9b5e8194696b@intel.com>
+Date: Mon, 25 Dec 2023 10:03:23 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net v3] net: ethtool: do runtime PM
+ outside RTNL
+Content-Language: en-US
+To: Heiner Kallweit <hkallweit1@gmail.com>, Marc MERLIN <marc@merlins.org>
+CC: Jakub Kicinski <kuba@kernel.org>, Johannes Berg
+	<johannes@sipsolutions.net>, <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231206084448.53b48c49@kernel.org>
+ <e6f227ee701e1ee37e8f568b1310d240a2b8935a.camel@sipsolutions.net>
+ <a44865f5-3a07-d60a-c333-59c012bfa2fb@intel.com>
+ <20231207094021.1419b5d0@kernel.org> <20231211045200.GC24475@merlins.org>
+ <83dc80d3-1c26-405d-a08d-2db4bc318ac8@gmail.com>
+ <20231215174634.GA10053@merlins.org> <20231224163043.GA6759@merlins.org>
+ <5ca7edbb-cf61-45b2-b9ba-888cb157ecbb@gmail.com>
+From: Sasha Neftin <sasha.neftin@intel.com>
+In-Reply-To: <5ca7edbb-cf61-45b2-b9ba-888cb157ecbb@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0088.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cd::19) To MW4PR11MB6738.namprd11.prod.outlook.com
+ (2603:10b6:303:20c::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 1/6] virtio_net: introduce device stats feature
- and structures
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev
-References: <20231222033021.20649-1-xuanzhuo@linux.alibaba.com>
- <20231222033021.20649-2-xuanzhuo@linux.alibaba.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20231222033021.20649-2-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB6738:EE_|DS0PR11MB7631:EE_
+X-MS-Office365-Filtering-Correlation-Id: d7f98fc2-3e81-4114-ba82-08dc051ffb7e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZcdicGrdDPfqXjM7c/pmLJ4/AWlr+SY9MdzYcfEVFhjmeCnD61zWz3lgJGrR6eJpJqAGJp3ZYUw8ZbekdrWI1TbX5oVPJN0dSseWmDE8AoxvIxX/QXmC7DkD9Rmh+ja6MBQiCb7xsdaOZ1vTJoC5El87XKFJLXiy+4LKyFB0qIASmGFLu8tGx/ljvt0rNEWfx4XS8Sc/dFwFRKtEf5NdnuT+zzkA5Pc0qWf7+VgYPEdIs17Z/YiTaoeaJKYFTGXBBFQ4OWmiBxu383TZ+/Dsp0g+Mcp58iIGnpolaQ8Oc7Ap57dwoScrkZDVgWQyUx1OTmSZiLTM+54H7+xa4MEyY0f9wr6dqPz9lryFCE3614dlzCV7XX83ZJKNNHBdK1zu8BdrLS4gQ1kMVYqIbehOmWVXSOYzHJsspQltjQwym8Egaqn2SmZx7lMdlsL8qymK6cjhewoYUhqHq6qVFyBLZqN5cW8ZEoBNSWHo8/wFgOhV8GbNaWjR3Y8URswQbVEgpltlChTc/RCmR+njX5hRypwdOvPLCcSKSHqLkKmC+nCLPdhxS/BVajckU7tJzICSqDDIsADZccf0HCYa2LaLzB0mAwWOo/NQLbq3Y0KbSbSdcnzrja+WgtCFky6hucBBo+T/gDThS74XwtokAFi9Ig==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB6738.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(396003)(376002)(39860400002)(366004)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(31686004)(66899024)(107886003)(26005)(6506007)(53546011)(6512007)(4326008)(8676002)(8936002)(478600001)(5660300002)(66946007)(66556008)(66476007)(2616005)(54906003)(110136005)(316002)(2906002)(6666004)(38100700002)(41300700001)(6486002)(966005)(44832011)(31696002)(83380400001)(36756003)(86362001)(82960400001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RjBETGErUTNna2x4b2tsUEx4M3V4Q0VneFVnZzJZaDMxYmZsRjlmWjNvdThi?=
+ =?utf-8?B?QUZ4Y3RTQS9nY0JmblE2d0xsRityNENla0xxaFduN2NPc3Jrdzl4dEVhdHpF?=
+ =?utf-8?B?Rm5aYklyN0FObDIwS0VvTzRac3BnK3dDNGdJUExKY21pbXZiRnpHOGpsZHJB?=
+ =?utf-8?B?MzkrZWcrZzBKWElrSEk5VTdrcDlNelBYVkVTRVJkbTkxRDc3QmNuYjVGQ3Vh?=
+ =?utf-8?B?aVpBOUlRVGtDRnlsOU5kWDNjREdIOTJQNjh5S0lrV243UUd6b29DSzRmemVQ?=
+ =?utf-8?B?U0Y0VVpSbzI3ZUU5dVVsZC80bExzWkh1eS91MTRiV3hDTEo4RCtBVGZnU3pz?=
+ =?utf-8?B?L2gxU0M0eTBhK3R2M0ZndUh3NkYvbmhwdzhxM0ZTVnZEU3p4ZUc2Tnk4NnVY?=
+ =?utf-8?B?YnZtY2lSSitWZlNGcGNPamJaYTJMWEdNYkphRUlJdGhzeGt4S2lJcVhsekVN?=
+ =?utf-8?B?UzB2NU9oN0N4ckFsWWtWbi9YRmpDbW1SUWFFNVIxT0xXdkxnVFRwZFVuMzVX?=
+ =?utf-8?B?T0FaRVhxb1Rkb3l0bWdvVnN5Znp0TWo1aEt1dDFZN2NYWSt1L3l6UzhGaWh6?=
+ =?utf-8?B?THBZTVE3eEQralYwQUhGQkhTTXp1ZTFzS1BWUFNLYkNrK2JuakxBZGIzek1z?=
+ =?utf-8?B?NzduWjVjZmtFeUJWb3VLNWFtTk5DZksybHJWeFFQZUh4T1BSbzN4YUNCT2ZN?=
+ =?utf-8?B?WE5sOUsxbk9HNmdKTHdEbHhZekZHUXl1N0dMSHpoRldXdnpXVml2ZXZid20r?=
+ =?utf-8?B?VGhiZnRLRUU1N2VVeWRKbEM1QUdXUEFVY1pUOTFyYWV0a2VGckFLWjdjSHhl?=
+ =?utf-8?B?cjNwMWpBdTU0U3RnQllzc2ZSZkpUbG1ZR2xwdTJ5b00xK2VlOExIQ0U5SHFH?=
+ =?utf-8?B?cUNYRngvcUFPQ0ZKQzZrZkdNMjVUTU1iL0JMbnVUZXRlNHpGeGhOaHE1bVNX?=
+ =?utf-8?B?RjBGSGszWjFzVkNpNCttRkZsS3JodmFMeUEvL2lSZUl6OXhMNFFCRmtlSUVn?=
+ =?utf-8?B?ZVovU3JrZVRrM2djNFI2aUtCa2pwUS9TaEVEQnRuc1ZhM3QrKytoU2tpL3pS?=
+ =?utf-8?B?YXhQVnVVQXBUUmdHeVNPTEdxcnlTWERqek9BUldxMDBLK01EYzdnZGkraVpP?=
+ =?utf-8?B?TVV6R2pHaVpxNlJDenoxekR6R0lmU00xdWk0U2swOFlkbFNWdHhYNHo1a0Jy?=
+ =?utf-8?B?MjAva3laN2p5aUd6RjVKMXBCUVYvQk9zZlZrQUV1TnVGRUcxdUE2MHBNTTcr?=
+ =?utf-8?B?Zzdpb2l0RUNub3pVSFRaZ0kvemtwd0c1VlRPWXRReUpFL1lZd0RsbHAyQzBI?=
+ =?utf-8?B?WWlJKzcxTjRobTNNYzR1SnNad2kvSkVhVTVZVGdDOHp4QUtSMnZtM2ZFZ2Vr?=
+ =?utf-8?B?alZGVlZQWUxFQ1JjYTc5UkZ3UGo2dWZjQ0ZZUFEvejZmQTFlanN5YUZpWlFz?=
+ =?utf-8?B?WU04U2ZIZlFrcUJ4UFNwdHRVNGNqYWszUnk1Y2Z1RU1EYmg3dWtodWZDWkl0?=
+ =?utf-8?B?L1NpTEVLR1hVVnBIV2xMaXExd0xrM1Y0b1pSS1VJRTFUcU1kTjlwSzlaZmJs?=
+ =?utf-8?B?YTByUWdEaFgxNmpCTjdOSk8wRW5ONjdHWTh4d0V1QnpyZFdLWVdSa2ZSNTU2?=
+ =?utf-8?B?VmVMbDBVbERyek5EaVVSZ3BpTEN5cjVJc20yc29aZkJVVlcwM1htcFpjU0tK?=
+ =?utf-8?B?N28zU3VzaCtMbm8wR05seFhDS2oxYkZVZXJYQWpKU0ZHYnIzTnBKTkZJelZC?=
+ =?utf-8?B?ajNPaGpCTC92YjNEbkhSUVRESTFVV016RE1NeG9EVTBjL01uc3V2SVZ6QmQw?=
+ =?utf-8?B?d0FoTEVZQWpkOFZRQjN5WGRBUlBTOEMvcStLWmhCRXhGMnB1ZEhwVXZHVFp4?=
+ =?utf-8?B?OHAzOXBjWWFWMXB3SFlUa0E2ZzltclJVeHZlZnZzc1dpc0xKUWM1c251VUZT?=
+ =?utf-8?B?Z1Zzbm9pWmVrd0ltc24rRWNaVnhFZitVUnBWNWU5RS83TDEwSzk1aWFKY3Jr?=
+ =?utf-8?B?MFlwVTdET1Z2U3JpVFp5Qkx3MmxNSmwweGZ4N0h5bnd6bGpQQ2krY0pnUUF4?=
+ =?utf-8?B?RW5NN0ZOdWlBcGpwZEJKSUh5S29QSU9haTJTUkFxNlNncFJnUkN2K3Y0cFlT?=
+ =?utf-8?B?T3V4NG04Z1pDaW43NWROQ2dQbzRuT1Y3Uk5JTHkvRGpEYVIxYklRUmhWRUdj?=
+ =?utf-8?B?RVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7f98fc2-3e81-4114-ba82-08dc051ffb7e
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB6738.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Dec 2023 08:03:30.4367
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zAmea7KnT3KOUwj1qie7YBLtFKXpXsHiJtGAIEhlXFmDt2Gdy4MS8Lf4EFVQ/ArJzO+//VHwi3g7IYKXZlkIUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7631
+X-OriginatorOrg: intel.com
 
-在 2023/12/22 11:30, Xuan Zhuo 写道:
-> The virtio-net device stats spec:
+On 25/12/2023 1:12, Heiner Kallweit wrote:
+> On 24.12.2023 17:30, Marc MERLIN wrote:
+>> On Fri, Dec 15, 2023 at 09:46:34AM -0800, Marc MERLIN wrote:
+>>> On Fri, Dec 15, 2023 at 02:42:01PM +0100, Heiner Kallweit wrote:
+>>>> Why don't you simply disable runtime pm for the affected device as a
+>>>> workaround? This can be done via sysfs.
+>>>
+>>> 1) because I didn't know what the exact bug was and how to work around it :)
+>>
+>> Mmmh, so I need to test an ubuntu kernel (6.5.0-14) because of sound
+>> issues in mainline TOT, and I can't boot the kernel to completion
+>> without hititng this hang bug. I'm not exactly sure which part of the
+>> boot triggers it.
+>>
+>> I can't patch that kernel easily. How exactly do I disable runtime PM
+>> from the kernel command line for "that device" which I'm not even sure
 > 
-> https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
-> 
-> This commit introduces the relative feature and structures.
+> Change <device>/power/control from "auto" to "on".
 
-Hi, Xuan
+Need to figure out your controller location in a file system via 
+lspci/lspci -t and then change to "on"
+For example: echo on > 
+/sys/devices/pci0000\:00/0000\:00\:1c.0/0000\:ae\:00.0/power/control
 
-After applying this patch series, withe ethtool version 6.5,
-I got the following NIC statistics. But I do not find the statistics 
-mentioned in this patch series.
-Do I miss something?
-
-"
-NIC statistics:
-      rx_packets: 3434812669
-      rx_bytes: 5168475253690
-      rx_drops: 0
-      rx_xdp_packets: 0
-      rx_xdp_tx: 0
-      rx_xdp_redirects: 0
-      rx_xdp_drops: 0
-      rx_kicks: 57179891
-      tx_packets: 187694230
-      tx_bytes: 12423799040
-      tx_xdp_tx: 0
-      tx_xdp_tx_drops: 0
-      tx_kicks: 187694230
-      tx_timeouts: 0
-      rx_queue_0_packets: 866027381
-      rx_queue_0_bytes: 1302726908150
-      rx_queue_0_drops: 0
-      rx_queue_0_xdp_packets: 0
-      rx_queue_0_xdp_tx: 0
-      rx_queue_0_xdp_redirects: 0
-      rx_queue_0_xdp_drops: 0
-      rx_queue_0_kicks: 14567691
-      rx_queue_1_packets: 856758801
-      rx_queue_1_bytes: 1289899049042
-      rx_queue_1_drops: 0
-      rx_queue_1_xdp_packets: 0
-      rx_queue_1_xdp_tx: 0
-      rx_queue_1_xdp_redirects: 0
-      rx_queue_1_xdp_drops: 0
-      rx_queue_1_kicks: 14265201
-      rx_queue_2_packets: 839291053
-      rx_queue_2_bytes: 1261620863886
-      rx_queue_2_drops: 0
-      rx_queue_2_xdp_packets: 0
-      rx_queue_2_xdp_tx: 0
-      rx_queue_2_xdp_redirects: 0
-      rx_queue_2_xdp_drops: 0
-      rx_queue_2_kicks: 13857653
-      rx_queue_3_packets: 872735434
-      rx_queue_3_bytes: 1314228432612
-      rx_queue_3_drops: 0
-      rx_queue_3_xdp_packets: 0
-      rx_queue_3_xdp_tx: 0
-      rx_queue_3_xdp_redirects: 0
-      rx_queue_3_xdp_drops: 0
-      rx_queue_3_kicks: 14489346
-      tx_queue_0_packets: 75723
-      tx_queue_0_bytes: 4999030
-      tx_queue_0_xdp_tx: 0
-      tx_queue_0_xdp_tx_drops: 0
-      tx_queue_0_kicks: 75723
-      tx_queue_0_timeouts: 0
-      tx_queue_1_packets: 62262921
-      tx_queue_1_bytes: 4134803914
-      tx_queue_1_xdp_tx: 0
-      tx_queue_1_xdp_tx_drops: 0
-      tx_queue_1_kicks: 62262921
-      tx_queue_1_timeouts: 0
-      tx_queue_2_packets: 83
-      tx_queue_2_bytes: 5478
-      tx_queue_2_xdp_tx: 0
-      tx_queue_2_xdp_tx_drops: 0
-      tx_queue_2_kicks: 83
-      tx_queue_2_timeouts: 0
-      tx_queue_3_packets: 125355503
-      tx_queue_3_bytes: 8283990618
-      tx_queue_3_xdp_tx: 0
-      tx_queue_3_xdp_tx_drops: 0
-      tx_queue_3_kicks: 125355503
-      tx_queue_3_timeouts: 0
-"
+We are starting to look at this problem, but I can't reproduce the 
+problem on my machines yet.
 
 > 
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->   include/uapi/linux/virtio_net.h | 137 ++++++++++++++++++++++++++++++++
->   1 file changed, 137 insertions(+)
+>> which one it is.  If it's the eth device, I already removed the igc
+>> module to prevent it from loading, and I also removed the ethtool
+>> binary, but I'm still getting the hang.
+>>
+>> On the plus side, with 6.6.8 and the old patch which I understand is not
+>> the ideal solution, I can confirm that I've been running problem free
+>> until now, so thanks again for that interim patch.
+>>
+>> Thanks,
+>> Marc
 > 
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index cc65ef0f3c3e..129e0871d28f 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -56,6 +56,7 @@
->   #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
->   					 * Steering */
->   #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> +#define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-level statistics. */
->   #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
->   #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
->   #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
-> @@ -406,4 +407,140 @@ struct  virtio_net_ctrl_coal_vq {
->   	struct virtio_net_ctrl_coal coal;
->   };
->   
-> +/*
-> + * Device Statistics
-> + */
-> +#define VIRTIO_NET_CTRL_STATS         8
-> +#define VIRTIO_NET_CTRL_STATS_QUERY   0
-> +#define VIRTIO_NET_CTRL_STATS_GET     1
-> +
-> +struct virtio_net_stats_capabilities {
-> +
-> +#define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
-> +
-> +#define VIRTIO_NET_STATS_TYPE_RX_BASIC  (1 << 0)
-> +#define VIRTIO_NET_STATS_TYPE_RX_CSUM   (1 << 1)
-> +#define VIRTIO_NET_STATS_TYPE_RX_GSO    (1 << 2)
-> +#define VIRTIO_NET_STATS_TYPE_RX_SPEED  (1 << 3)
-> +
-> +#define VIRTIO_NET_STATS_TYPE_TX_BASIC  (1 << 16)
-> +#define VIRTIO_NET_STATS_TYPE_TX_CSUM   (1 << 17)
-> +#define VIRTIO_NET_STATS_TYPE_TX_GSO    (1 << 18)
-> +#define VIRTIO_NET_STATS_TYPE_TX_SPEED  (1 << 19)
-> +
-> +	__le64 supported_stats_types[1];
-> +};
-> +
-> +struct virtio_net_ctrl_queue_stats {
-> +	struct {
-> +		__le16 vq_index;
-> +		__le16 reserved[3];
-> +		__le64 types_bitmap[1];
-> +	} stats[1];
-> +};
-> +
-> +struct virtio_net_stats_reply_hdr {
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_CVQ       32
-> +
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC  0
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM   1
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO    2
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED  3
-> +
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC  16
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM   17
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO    18
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED  19
-> +	u8 type;
-> +	u8 reserved;
-> +	__le16 vq_index;
-> +	__le16 reserved1;
-> +	__le16 size;
-> +};
-> +
-> +struct virtio_net_stats_cvq {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 command_num;
-> +	__le64 ok_num;
-> +};
-> +
-> +struct virtio_net_stats_rx_basic {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 rx_notifications;
-> +
-> +	__le64 rx_packets;
-> +	__le64 rx_bytes;
-> +
-> +	__le64 rx_interrupts;
-> +
-> +	__le64 rx_drops;
-> +	__le64 rx_drop_overruns;
-> +};
-> +
-> +struct virtio_net_stats_tx_basic {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 tx_notifications;
-> +
-> +	__le64 tx_packets;
-> +	__le64 tx_bytes;
-> +
-> +	__le64 tx_interrupts;
-> +
-> +	__le64 tx_drops;
-> +	__le64 tx_drop_malformed;
-> +};
-> +
-> +struct virtio_net_stats_rx_csum {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 rx_csum_valid;
-> +	__le64 rx_needs_csum;
-> +	__le64 rx_csum_none;
-> +	__le64 rx_csum_bad;
-> +};
-> +
-> +struct virtio_net_stats_tx_csum {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 tx_csum_none;
-> +	__le64 tx_needs_csum;
-> +};
-> +
-> +struct virtio_net_stats_rx_gso {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 rx_gso_packets;
-> +	__le64 rx_gso_bytes;
-> +	__le64 rx_gso_packets_coalesced;
-> +	__le64 rx_gso_bytes_coalesced;
-> +};
-> +
-> +struct virtio_net_stats_tx_gso {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 tx_gso_packets;
-> +	__le64 tx_gso_bytes;
-> +	__le64 tx_gso_segments;
-> +	__le64 tx_gso_segments_bytes;
-> +	__le64 tx_gso_packets_noseg;
-> +	__le64 tx_gso_bytes_noseg;
-> +};
-> +
-> +struct virtio_net_stats_rx_speed {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 rx_packets_allowance_exceeded;
-> +	__le64 rx_bytes_allowance_exceeded;
-> +};
-> +
-> +struct virtio_net_stats_tx_speed {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 tx_packets_allowance_exceeded;
-> +	__le64 tx_bytes_allowance_exceeded;
-> +};
-> +
->   #endif /* _UAPI_LINUX_VIRTIO_NET_H */
+> _______________________________________________
+> Intel-wired-lan mailing list
+> Intel-wired-lan@osuosl.org
+> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
 
 
