@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-60156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5EE481DE10
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 05:13:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A4E781DE12
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 05:15:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D180C1C20B30
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 04:13:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 253CB1F2122C
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 04:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9EAA51;
-	Mon, 25 Dec 2023 04:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C345ED1;
+	Mon, 25 Dec 2023 04:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M6ixUz8j"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOcll6ev"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C367489
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 04:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8B8EA6
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 04:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703477582;
+	s=mimecast20190719; t=1703477699;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vFoTY6b03xbq0VaHKBl1A88a4qKRBJ1TFj0E7CCdM8Y=;
-	b=M6ixUz8jkAkJboKmR1cwvqPfVlFw6GTKT3nW0XIKXTCYLQICoyzDe7pb83D/U8MabyUKrs
-	84f0MU4AKBnKf8tUg/twcFzwkGGxiepOUvh+H/zUT3lzkgbkwfDSZOpjXPr1E4TOBQVXDU
-	Lg5KeaS3fKWpXmRvY5AXwboJmhUA7T4=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=33FAc0WEwTbg2UMGsuBoi+7e1xe2LV80bB+5hU/sZPA=;
+	b=EOcll6ev63aHPhT8NOqAVNXT8dNZNPAoXdSTw3KGr42TXKmrKruaMZwTzyWXNXi+FH4tgr
+	EViZekyqS3Sn1uqTirJUnp84h1NGGvXRfnWDPfLcrJ0csk/mR9crM+nSvtYlqEzrjaKn/3
+	bPixaEzKP8BBoHeSJkJcUPIDMVGTGRo=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-77-_0rxLhjdO5SVPXrzAmGN2w-1; Sun, 24 Dec 2023 23:13:00 -0500
-X-MC-Unique: _0rxLhjdO5SVPXrzAmGN2w-1
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-20426695791so4481005fac.2
-        for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 20:13:00 -0800 (PST)
+ us-mta-324-8mlryjLAPTGwr_Vb-ghDEQ-1; Sun, 24 Dec 2023 23:14:58 -0500
+X-MC-Unique: 8mlryjLAPTGwr_Vb-ghDEQ-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5ce10b4cea9so570455a12.1
+        for <netdev@vger.kernel.org>; Sun, 24 Dec 2023 20:14:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703477580; x=1704082380;
+        d=1e100.net; s=20230601; t=1703477697; x=1704082497;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vFoTY6b03xbq0VaHKBl1A88a4qKRBJ1TFj0E7CCdM8Y=;
-        b=Y3LonSl71sTGu/HytLyKgL6byDuVPTKfSP4dr43Ss9qDJF40TcbPUSugBsDRXHNyK3
-         zkJff3aKd4qw6biLxevIUrAoHKfOveWXgKQMq428V7GuKdFbWyk621J5LJ9H1mx9zuRd
-         Zrn8G99AHfnT2kIRmKxy/2DiDzUk11RbvudKHBvDBDv8LjfImFPyCmZsA9U/xXvA6BMJ
-         1x23XD41hCO/N7o/8XrXWKbFRqykwb+lAPjkjqC+eu2PD72WLImMhjS7+kxBH4BdECXc
-         LzQP7xORjxhvhWfqkKeq5xdo+OhYlXjVPcuIk2PV0+NgJyK73RWbKCRv8YdLl3xhV0JB
-         tG5Q==
-X-Gm-Message-State: AOJu0YyMDa870B1+dwUAAiSOC1ghJO1MwE04mwfpD5kmKPXcEFYWom1k
-	P7M+LZo4drUbx9iG2hatkntBuaB2FuqMHeScI5pwkgnTyKwAbi4fI82SazNRUgOOBxDP+KkXGDR
-	HquO/LUs6eZiHX8SLqCK1avCwGFE/t71qp03Y6V5J
-X-Received: by 2002:a05:6870:a70a:b0:204:4160:6634 with SMTP id g10-20020a056870a70a00b0020441606634mr5612928oam.46.1703477580072;
-        Sun, 24 Dec 2023 20:13:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFEMNp5s++3ahd6zEyAbh/zOppG/O9KQ0VVCKhianOFO2YTK2NCpYDEVmZYR9tk8u33FMCCDHDZVl9vacTWGfk=
-X-Received: by 2002:a05:6870:a70a:b0:204:4160:6634 with SMTP id
- g10-20020a056870a70a00b0020441606634mr5612919oam.46.1703477579781; Sun, 24
- Dec 2023 20:12:59 -0800 (PST)
+        bh=33FAc0WEwTbg2UMGsuBoi+7e1xe2LV80bB+5hU/sZPA=;
+        b=WiOyFTSyLyW3Hi4A3gq4DAweYl6vcnzzEMTUFvIXW+4E7eptY2j0qX5FaoGgAHF/Zo
+         pKGGUypv8c4h/OKL7Ecrbsh2k2tb1sGTxYfpy8gsZrEToPHmmp6t+RS9iWLSGDA4Zbpw
+         zoIH616WLWr3UUtCR/gNFc83xsaSKKxlmVBsnt/nX9PMD0LWkOQ5fDw1VqXUtvBuYh1/
+         L8RUR7YAD3+iVbdbBpK93WtbA8nZBXUWrdqTb9H7g8J95ZenUHstRJxIAyOdhzA43fvX
+         p6ZrgNmo0gKbTZynXKZHOq3fPGSS5eUIoOgrw4PIlWiaW5rTgWiPWHKYmIccepoBFAHa
+         vN8w==
+X-Gm-Message-State: AOJu0Yz1duHgyObSvK8UyXrMbQHRGoqbDOuZtZ2j/PO8MAOK1AaLLwY3
+	ZFEtv1QAHMQmXh6GU0nRx8ds7ax9OEVUkO/xhPG1ObfTJlwA5GmZ8AxsUhNKYtn1VbcFacY9O0t
+	1nQUHayskCtxza1p57S7YgYg0a2bltqxNnpwjj0aN
+X-Received: by 2002:a05:6a20:109f:b0:195:fd1:104a with SMTP id w31-20020a056a20109f00b001950fd1104amr4326565pze.24.1703477697040;
+        Sun, 24 Dec 2023 20:14:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGHWZqen9JynZ2YTW9WAokGJQ4DxOKyRJ+nBVloh6rApg8yD3xhSDxgCCagmqs+lZu0swvTqExINEkW/NZqUUY=
+X-Received: by 2002:a05:6a20:109f:b0:195:fd1:104a with SMTP id
+ w31-20020a056a20109f00b001950fd1104amr4326557pze.24.1703477696748; Sun, 24
+ Dec 2023 20:14:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,25 +69,28 @@ MIME-Version: 1.0
 References: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
  <6582fe057cb9_1a34a429435@willemb.c.googlers.com.notmuch> <084142b9-7e0d-4eae-82d2-0736494953cd@linux.alibaba.com>
  <65845456cad2a_50168294ba@willemb.c.googlers.com.notmuch> <CACGkMEthxep1rvWvEmykeevLhOxiSTR1oog_PkYTRCaeavMGSA@mail.gmail.com>
- <20231222031024-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231222031024-mutt-send-email-mst@kernel.org>
+ <CAL+tcoDM+Kqu1=11m5gc58vY3uKVA6JiggBy_FyCghHY3Za0Qw@mail.gmail.com>
+In-Reply-To: <CAL+tcoDM+Kqu1=11m5gc58vY3uKVA6JiggBy_FyCghHY3Za0Qw@mail.gmail.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 25 Dec 2023 12:12:48 +0800
-Message-ID: <CACGkMEsZDYFuvxgw63U5naLTYH5XNwMTMNvsoz439AWonFE4Vg@mail.gmail.com>
+Date: Mon, 25 Dec 2023 12:14:45 +0800
+Message-ID: <CACGkMEsDFTPUVXfSj5FGTK_722F1QkKHJG3GNV3qvsaKATZV_w@mail.gmail.com>
 Subject: Re: [PATCH net-next] virtio-net: switch napi_tx without downing nic
-To: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Heng Qi <hengqi@linux.alibaba.com>, 
 	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 22, 2023 at 4:14=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
+On Mon, Dec 25, 2023 at 10:25=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
 >
-> On Fri, Dec 22, 2023 at 10:35:07AM +0800, Jason Wang wrote:
+> Hello Jason,
+> On Fri, Dec 22, 2023 at 10:36=E2=80=AFAM Jason Wang <jasowang@redhat.com>=
+ wrote:
+> >
 > > On Thu, Dec 21, 2023 at 11:06=E2=80=AFPM Willem de Bruijn
 > > <willemdebruijn.kernel@gmail.com> wrote:
 > > >
@@ -152,41 +155,31 @@ ing
 > >
 > > +1
 > >
+> [...]
 > > And instead of trying to do this, it would be much better to optimize
 > > the NAPI performance. Then we can drop the orphan mode.
 >
-> "To address your problem, optimize our code to the level which we
-> couldn't achieve in more than 10 years".
+> Do you mean when to call skb_orphan()? If yes, I just want to provide
+> more information that we also have some performance issues where the
+> flow control takes a bad effect, especially under some small
+> throughput in our production environment.
 
-Last time QE didn't report any issue for TCP. For others, the code
-might just need some optimization if it really matters, it's just
-because nobody has worked on this part in the past years.
+I think you need to describe it in detail.
 
-The ethtool trick is just for debugging purposes, I can hardly believe
-it is used by any management layer software.
+> What strikes me as odd is if I restart the network, then the issue
+> will go with the wind. I cannot reproduce it in my testing machine.
+> One more thing: if I force skb_orphan() the current skb in every
+> start_xmit(), it could also solve the issue but not in a proper way.
+> After all, it drops the flow control... :S
 
-> That's not a reasonable
-> requirement. Not getting an interrupt will always be better for some
-> workloads.
-
-So NAPI has been enabled by default for many years. And most of the
-NIC doesn't do orphans. Orphan has known issues like pktgen and
-others. Keeping two modes may result in tricky code and complicate the
-features like BQL [1]. We would have interrupt coalescing and dim
-soon. Admin can enable the heuristic or tweak it according to the
-workload which is much more user friendly than orphaning.
-
-I don't see a strong point to keep the orphan mode any more
-considering the advantages of NAPI.
+Yes, that's the known issue.
 
 Thanks
 
-[1] https://lore.kernel.org/lkml/20181205225323.12555-2-mst@redhat.com/
-
-
-
 >
->
+> Thanks,
+> Jason
+> >
 > > >
 > > > The napi_tx and non-napi code paths differ in how they handle at leas=
 t
@@ -227,6 +220,8 @@ s
 > > > message.
 > >
 > > Thanks
+> >
+> >
 >
 
 
