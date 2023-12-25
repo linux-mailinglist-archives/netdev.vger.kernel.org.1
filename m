@@ -1,104 +1,108 @@
-Return-Path: <netdev+bounces-60220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FEE381E2A0
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 23:52:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 010BB81E2EB
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 00:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AB4E1C20D65
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 22:52:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 199841C20E59
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 23:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A801E519;
-	Mon, 25 Dec 2023 22:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C321EA7D;
+	Mon, 25 Dec 2023 23:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mcgqU2T+"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="uSXQnpsO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501F753E15;
-	Mon, 25 Dec 2023 22:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40d2376db79so39804905e9.0;
-        Mon, 25 Dec 2023 14:52:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC661E51D
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 23:01:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dbd73ac40ecso2666564276.1
+        for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 15:01:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703544768; x=1704149568; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jqN9XpjV9cnb6hmKZsdbfaWdcO7AePtC2sRrkO7qsCk=;
-        b=mcgqU2T+pnSaCgLyKuhxSByCcJTOQI9P/HiaguQipwVmegwCz5xWVnDQIR+g/2W/8G
-         UYnzbpxhR0saSZqtz+qVuKeohBH8ZRhLEVrRywHywJ6qNJX2ovHu3DNTV2VCZN1VcSWB
-         pTOd/K7x84B8/RvetjlZ1ABSqhgWyzJ0RVqAgCJxCrpie3xlXEJU0XSG7IfoaGDcgaCu
-         pZESdZumxEA7LA8z7SKtZl6ORRf2MkGLj9+RLnhkD+AdBLoqnCYULrhSUCKuUgNIDDbj
-         KNfkGz+QStNAwei07BuN+1/kPn9ETeAYH9JSJlhvMChJHTDTut7YxNKfZyPcdYON4B7P
-         Lhlw==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703545286; x=1704150086; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M/El/7HqAwy3Au1NgzdnJaBiXnlBBReCoOu45FtGb20=;
+        b=uSXQnpsOevEyEDu8IxMVzupEc7DDAHyCzBIo3BLY2PZ3/LDny5ZxL5zNGy2/+gF03+
+         KyJFE8f3ZYymkBwf6CAnhTK6P4b1O2VYQ2ratvVvqfbEozzbi+EeUzuSVHZ6qasPsSOJ
+         PrWusydnV/fiZmhQWYCfUQAF4kbn3vMs8rEaoeuT8oQA96M/clv2kUNVI803B0B3Sf98
+         tJkTIyoiOjlZRDKC+6X7Jz8v9cHzXIdDMXA8I9JD4fKu2rgBw7YIA6NhWd0bgxM77Ms8
+         y9MaM8eLQaUBjpsm9CLvCKi1sTPhxP/BH88ls1Qmnzd0I03nqH3x4dBfmTAHk422idMD
+         NLFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703544768; x=1704149568;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jqN9XpjV9cnb6hmKZsdbfaWdcO7AePtC2sRrkO7qsCk=;
-        b=Jlzlt2VV1LjXfFYJ3W6zvz+Qz9B3gI7W8TpTF0zdXB3j/8lLxjn9IG+KxdIFmgRzuH
-         bGBdg3eSpSZnz662HtIByajRLevJtQ+8hDay81sA0MaFit0rRsK712uqwn2NUWtY7EaH
-         ayzI7jH6LpAiGDDWj0AmTXh/a2D9jHkSiSClWGNUFcmsmB4H+DSOVdfUQADBYua0jkLK
-         3DLLV5GmtyiLXue6n52sTqCpuc45/bIzoUEsFoX1+whsaccxksZprUe8o+4os3PPk2HZ
-         tiVVsYEs2c/Vp+CGmdQ2Aam6p80wjDE9XD6mLDnOjxrnQub6Sy1hIJ6l88Mjaj8rrees
-         QCQA==
-X-Gm-Message-State: AOJu0YyK7yk0M3a3zg2u/kEvH0PZ2UgWABT3kWj26Q2shPtlrvdzYMZE
-	alYKP2GY3oWeLV0aoglEFMZmezbjUJo5fA==
-X-Google-Smtp-Source: AGHT+IFU2AefuduuvCAuQSv9oEppGQFQeU/S0giQOx/Qv14gcLcMIaKWA1OvD/joeuFcz5fcd/o0ig==
-X-Received: by 2002:a05:600c:1387:b0:40d:492d:dc93 with SMTP id u7-20020a05600c138700b0040d492ddc93mr4231085wmf.64.1703544768332;
-        Mon, 25 Dec 2023 14:52:48 -0800 (PST)
-Received: from JWL.localdomain (217.97.70.170.ipv4.supernova.orange.pl. [217.97.70.170])
-        by smtp.gmail.com with ESMTPSA id wj24-20020a170907051800b00a26ac6d55dasm4535158ejb.46.2023.12.25.14.52.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Dec 2023 14:52:48 -0800 (PST)
-From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	linux@armlinux.org.uk,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>
-Subject: [PATCH] MAINTAINERS: Update mvpp2 driver email
-Date: Mon, 25 Dec 2023 23:52:45 +0100
-Message-Id: <20231225225245.1606-1-marcin.s.wojtas@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1703545286; x=1704150086;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M/El/7HqAwy3Au1NgzdnJaBiXnlBBReCoOu45FtGb20=;
+        b=JnMVBznqef4EABClwB24erl3DIB9f3OpVmHr1geDRJ+Dw4Zm1jfpeX/xl0uDBJnTTl
+         BcAhktWLsUbFdNFZfGc8hj1MwdjUDh4gwrjuttN6ruMSODxbR9JyxsVVZoZlkXIIbjJg
+         FM6QjZyBMIWV85DeoOJes6LRkgtLIsjBl44Bq/D4cPaMIthk9zODgidqmJ4KlD0QYY1u
+         OSpZEiFUO61YL7UrwK/ojLSh2VSYdnR4Ib+eXEWe8O4iuuIoUrIYsIVRqjLNVj+YwpAx
+         siAwdT7tokA1pch7IWGyirflER5TDDFWy6ZgNe4Uo/yCgD07BijWSKdEv4TC+Y+37DO0
+         gDBA==
+X-Gm-Message-State: AOJu0Yzod5udTm7KFnN8blXNUy0aRIFReCZMXfo+IZI7b3TWzcazTewH
+	zsms9cQfu3VUNb5jG80Pm3gsJuKkNaWWNJvEkmscPmi2gsybjes/t89t2Bt5kw==
+X-Google-Smtp-Source: AGHT+IFmPWNSHexWKfaq6BAe3aGb8NGrlLWTD2w8YM3t7dz/y8CpysotAliZ705s2zlxv9Oo4cR+jwnpWDJUsNHhqYQ=
+X-Received: by 2002:a25:d782:0:b0:dbd:6506:d8df with SMTP id
+ o124-20020a25d782000000b00dbd6506d8dfmr3151690ybg.74.1703545286574; Mon, 25
+ Dec 2023 15:01:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231222173758.13097-1-stephen@networkplumber.org>
+ <20231223123103.GA14803@breakpoint.cc> <20231224091118.2ffa84bb@hermes.local>
+In-Reply-To: <20231224091118.2ffa84bb@hermes.local>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 25 Dec 2023 18:01:15 -0500
+Message-ID: <CAM0EoMkqijrTv7SSrQf2sHEZWShgfwLKzcVtPT17HK3vR-gsrA@mail.gmail.com>
+Subject: Re: [RFC iproute2-next] remove support for iptables action
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Florian Westphal <fw@strlen.de>, Jamal Hadi Salim <hadi@mojatatu.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I no longer use mw@semihalf.com email. Update
-mvpp2 driver entry with my alternative address.
+On Sun, Dec 24, 2023 at 12:11=E2=80=AFPM Stephen Hemminger
+<stephen@networkplumber.org> wrote:
+>
+> On Sat, 23 Dec 2023 13:31:03 +0100
+> Florian Westphal <fw@strlen.de> wrote:
+>
+> > Stephen Hemminger <stephen@networkplumber.org> wrote:
+> > >  tc/em_ipset.c                        | 260 --------------
+> >
+> > Not sure if this is unused, also not related to the iptables/xt action.
+>
+> There is both the xtables and ematch options to TC.
+> Jamal do you want to remove both, or some subset?
+>
 
-Signed-off-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+just the m_ipt/xt (not the em_xxx) which maps to the kernel ipt action
+(not the em_ipt which is part of a much larger combination of
+matchers, do "ls net/sched/em*.c", of which matching on ipt is one
+small part).
+There are people still using ematch... (as Eyal just posted to).
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7cef2d2ef8d7..38d1e4a7efa0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12815,7 +12815,7 @@ S:	Maintained
- F:	drivers/net/ethernet/marvell/mvneta.*
- 
- MARVELL MVPP2 ETHERNET DRIVER
--M:	Marcin Wojtas <mw@semihalf.com>
-+M:	Marcin Wojtas <marcin.s.wojtas@gmail.com>
- M:	Russell King <linux@armlinux.org.uk>
- L:	netdev@vger.kernel.org
- S:	Maintained
--- 
-2.25.1
+> The problematic area for iproute2 seems to be the dependency on libiptabl=
+es
+> which is not very stable. On the kernel side it is one of the places
+> where lightly tested integration could lead to lots of syszbot errors.
 
+Note: the motivation for removing act_ipt was not syszbot, rather it
+being overtaken by events. AFAIK, there's never been a syszbot issue
+with either act_ipt or the ematcher.
+I do empathize with your comment on the challenges on the library.
+
+cheers,
+jamal
 
