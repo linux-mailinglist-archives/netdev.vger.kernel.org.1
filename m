@@ -1,119 +1,129 @@
-Return-Path: <netdev+bounces-60180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A46381DF91
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:47:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83E8081DF93
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:52:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB6CA1C217A3
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:47:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20E5D281790
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 325E615EBB;
-	Mon, 25 Dec 2023 09:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TxBqeFk9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A73168BA;
+	Mon, 25 Dec 2023 09:51:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07250171B4
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 09:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703497640; x=1735033640;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Rlpd3UlQEWJrxpTZBvVC4ryivn0KgIhOOqKJ7HEBPMM=;
-  b=TxBqeFk9PcqZJEv7jPRYzJCZDRLQEDm/QKmFPu/FxotvfuZHvV49T0KK
-   a40GD716QYw7aTyPSw0Qp73EmrolDudT5adVKUeKmRtwrGwzyo7tNNQD7
-   zAP34yKu/QGQBCVgaLCpbAPmoRmKJnA6QJVLsfe4RinMA1byoV4HQJFxR
-   x1rYeN2tSrsWJC5qycF8yppUIjZb1s98oi6p3t7FpEyrrKW0PiD20QKzo
-   OJKzDY4OUlqEauQwWfysjqgx9FIN6gHFn4RqeEwJ4w+gKEbp6hHZ7hijr
-   5TYfl714pUXuFAI4i/+6z2KSwwcpecJGtsz6HHTAm33+z09idxiuIvjIi
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="400101374"
-X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
-   d="scan'208";a="400101374"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 01:47:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="777693071"
-X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
-   d="scan'208";a="777693071"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.245.129.131]) ([10.245.129.131])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 01:47:16 -0800
-Message-ID: <c3f3e361-e875-41fb-929c-ea3f0773c8d3@linux.intel.com>
-Date: Mon, 25 Dec 2023 11:47:02 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FF5171D2
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 09:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-244-x8rLeWhFMJGStfkOYzIxSQ-1; Mon, 25 Dec 2023 09:51:52 +0000
+X-MC-Unique: x8rLeWhFMJGStfkOYzIxSQ-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 25 Dec
+ 2023 09:51:30 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 25 Dec 2023 09:51:30 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: "'netdev@vger.kernel.org'" <netdev@vger.kernel.org>, "'David S . Miller'"
+	<davem@davemloft.net>, "'kuba@kernel.org'" <kuba@kernel.org>
+CC: "'eric.dumazet@gmail.com'" <eric.dumazet@gmail.com>,
+	"'martin.lau@linux.dev'" <martin.lau@linux.dev>, 'Alexei Starovoitov'
+	<ast@kernel.org>, 'Stephen Hemminger' <stephen@networkplumber.org>, "'Jens
+ Axboe'" <axboe@kernel.dk>, 'Daniel Borkmann' <daniel@iogearbox.net>, "'Andrii
+ Nakryiko'" <andrii@kernel.org>
+Subject: [PATCH net-next 1/4] net: Use sockptr_is_kernel() instead of testing
+ is_kernel
+Thread-Topic: [PATCH net-next 1/4] net: Use sockptr_is_kernel() instead of
+ testing is_kernel
+Thread-Index: Ado3F/wSVSUpvrk/QWmUk3G1lq6geQ==
+Date: Mon, 25 Dec 2023 09:51:30 +0000
+Message-ID: <29578e9120b344b6b20f0efb107323b7@AcuMS.aculab.com>
+References: <199c9af56a5741feaf4b1768bf7356be@AcuMS.aculab.com>
+In-Reply-To: <199c9af56a5741feaf4b1768bf7356be@AcuMS.aculab.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2 1/2] igc: Report VLAN
- EtherType matching back to user
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-References: <20231201075043.7822-1-kurt@linutronix.de>
- <20231201075043.7822-2-kurt@linutronix.de>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20231201075043.7822-2-kurt@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 12/1/2023 09:50, Kurt Kanzenbach wrote:
-> Currently the driver allows to configure matching by VLAN EtherType.
-> However, the retrieval function does not report it back to the user. Add
-> it.
-> 
-> Before:
-> |root@host:~# ethtool -N enp3s0 flow-type ether vlan-etype 0x8100 action 0
-> |Added rule with ID 63
-> |root@host:~# ethtool --show-ntuple enp3s0
-> |4 RX rings available
-> |Total 1 rules
-> |
-> |Filter: 63
-> |        Flow Type: Raw Ethernet
-> |        Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-> |        Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-> |        Ethertype: 0x0 mask: 0xFFFF
-> |        Action: Direct to queue 0
-> 
-> After:
-> |root@host:~# ethtool -N enp3s0 flow-type ether vlan-etype 0x8100 action 0
-> |Added rule with ID 63
-> |root@host:~# ethtool --show-ntuple enp3s0
-> |4 RX rings available
-> |Total 1 rules
-> |
-> |Filter: 63
-> |        Flow Type: Raw Ethernet
-> |        Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-> |        Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-> |        Ethertype: 0x0 mask: 0xFFFF
-> |        VLAN EtherType: 0x8100 mask: 0x0
-> |        VLAN: 0x0 mask: 0xffff
-> |        User-defined: 0x0 mask: 0xffffffffffffffff
-> |        Action: Direct to queue 0
-> 
-> Fixes: 2b477d057e33 ("igc: Integrate flex filter into ethtool ops")
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_ethtool.c | 6 ++++++
->   1 file changed, 6 insertions(+)
+Some changes to option handling directly accesses optval.is_kernel.
+Use the sockptr_is_kernel() helper instead.
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+No functional change.
+
+Signed-off-by: David Laight <david.laight@aculab.com>
+---
+ net/ipv4/ip_sockglue.c   | 2 +-
+ net/ipv6/ipv6_sockglue.c | 2 +-
+ net/socket.c             | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index 2efc53526a38..94b2f8c095f5 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -1647,7 +1647,7 @@ int do_ip_getsockopt(struct sock *sk, int level, int =
+optname,
+ =09=09if (sk->sk_type !=3D SOCK_STREAM)
+ =09=09=09return -ENOPROTOOPT;
+=20
+-=09=09if (optval.is_kernel) {
++=09=09if (sockptr_is_kernel(optval)) {
+ =09=09=09msg.msg_control_is_user =3D false;
+ =09=09=09msg.msg_control =3D optval.kernel;
+ =09=09} else {
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index 7d661735cb9d..64fc52d928c1 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -1144,7 +1144,7 @@ int do_ipv6_getsockopt(struct sock *sk, int level, in=
+t optname,
+ =09=09if (sk->sk_type !=3D SOCK_STREAM)
+ =09=09=09return -ENOPROTOOPT;
+=20
+-=09=09if (optval.is_kernel) {
++=09=09if (sockptr_is_kernel(optval)) {
+ =09=09=09msg.msg_control_is_user =3D false;
+ =09=09=09msg.msg_control =3D optval.kernel;
+ =09=09} else {
+diff --git a/net/socket.c b/net/socket.c
+index 3379c64217a4..8821f083ab0a 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2366,7 +2366,7 @@ int do_sock_getsockopt(struct socket *sock, bool comp=
+at, int level,
+ =09} else if (unlikely(!ops->getsockopt)) {
+ =09=09err =3D -EOPNOTSUPP;
+ =09} else {
+-=09=09if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
++=09=09if (WARN_ONCE(sockptr_is_kernel(optval) || sockptr_is_kernel(optlen)=
+,
+ =09=09=09      "Invalid argument type"))
+ =09=09=09return -EOPNOTSUPP;
+=20
+--=20
+2.17.1
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
