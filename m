@@ -1,85 +1,244 @@
-Return-Path: <netdev+bounces-60206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 841C281E1B8
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 18:31:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C974E81E1C8
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 18:37:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 246B71F21E9D
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 17:31:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06C941C21010
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 17:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9116C51C36;
-	Mon, 25 Dec 2023 17:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16DD652F80;
+	Mon, 25 Dec 2023 17:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2YaEZ+/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4374152F6C
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 17:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35fe138e332so30197425ab.0
-        for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 09:31:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703525467; x=1704130267;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LFqI58q7VNYJmMslCgc+pTUxt4F8ra7+YSzIXJuw1CI=;
-        b=P0U2N2n4/RBgZXKRySo4VcH4C/20Sc+p6PQnSIbmbWJrRl/JE3dVFhJGDe3Jubg2Ks
-         yzg+j50VDORuqdmvfnUwtuadrC8gRleYD/5lUcD3sPUay8jRXKR3Lg7gifDqbV48Ltlb
-         zioPCj5vzte+1BxlToOCt1VaSormEphGQuBvLMRtL75NUsMqRcNz+vVaPL2KJRDA7ePU
-         mdfoeNoDAJrUMJtTt3ZEvFmEGjPBP4D07umOppFv3WaBmXCd7XFgdhNv1XdLQPlu1RMl
-         7um+onvw0pwkMOrGQqyXPapTU+PM3u+dEj7E9RZanMl2QBSd74L8td0Mnvnkfp48cyko
-         YInA==
-X-Gm-Message-State: AOJu0YyajfhztDWtJ9IaAAvu3fCa62BwAxn8099yJjw9qeY+WWdcX0fO
-	wN0y+Zpa/WZxt75NYe7S8djng2vMRVJU/Qx1qizp/ZdZqRS9
-X-Google-Smtp-Source: AGHT+IG150p2eMqab1PfIi2zECmHDFBS0UnssC+uKVBgIAlE5EIKxdwzS9Wj1PI8eSGg+CAuQ8PyuEKXFEI4yjrkYGt1uF1mvnCE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24E852F6C
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 17:37:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2E70C433C7;
+	Mon, 25 Dec 2023 17:37:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703525841;
+	bh=SuKfCw82FZtqhvV5Nmkeki0WU6Ek+Ag/mh7e+W5zbEY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q2YaEZ+/JKGhSPj87VigLxXeXU0LMj3CWNnR93RNg29vuKINkDhKJyo/1JbQAybVN
+	 uPnwKQgCkal+2ev17d4cjgIFOf9XrYwWSMYJm7Nms8wJ3R5DTn8g2tQkUSvAXmPZmC
+	 RmhA63f9f90UdA1JIJFqhkurejMc3PvlVGoIsfyjZFE0koJxce/H5daJ4V+W6yxeg0
+	 jtHUHrMgFaus4lnPhlBesVKBrFDU79xdG2KTphNYOYVdERCHNBcLhPfuiyC/IrNkiq
+	 zZ9tQx2r/pyrFWq4uqY2A/+jBrz+Cq313HHJA0Ztci3HCLLjIKyfErVSSu23vgz71T
+	 VZzwqi1t3l6Yw==
+Date: Mon, 25 Dec 2023 17:37:17 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com
+Subject: Re: [PATCH net-next v2 12/13] bnxt_en: Add support for ntuple
+ filters added from ethtool.
+Message-ID: <20231225173717.GK5962@kernel.org>
+References: <20231223042210.102485-1-michael.chan@broadcom.com>
+ <20231223042210.102485-13-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c243:0:b0:35f:e976:3283 with SMTP id
- k3-20020a92c243000000b0035fe9763283mr613348ilo.2.1703525467494; Mon, 25 Dec
- 2023 09:31:07 -0800 (PST)
-Date: Mon, 25 Dec 2023 09:31:07 -0800
-In-Reply-To: <000000000000e8099a060cee1003@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005b23dc060d58ee7a@google.com>
-Subject: Re: [syzbot] [perf?] WARNING in perf_event_open
-From: syzbot <syzbot+07144c543a5c002c7305@syzkaller.appspotmail.com>
-To: acme@kernel.org, adrian.hunter@intel.com, 
-	alexander.shishkin@linux.intel.com, irogers@google.com, jolsa@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	mark.rutland@arm.com, mingo@redhat.com, namhyung@kernel.org, 
-	netdev@vger.kernel.org, peterz@infradead.org, syzkaller-bugs@googlegroups.com, 
-	xrivendell7@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231223042210.102485-13-michael.chan@broadcom.com>
 
-syzbot has bisected this issue to:
+On Fri, Dec 22, 2023 at 08:22:09PM -0800, Michael Chan wrote:
+> Add support for adding user defined ntuple TCP/UDP filters.  These
+> filters are similar to aRFS filters except that they don't get aged.
+> Source IP, destination IP, source port, or destination port can be
+> unspecifed as wildcard.  At least one of these tuples must be specifed.
+> If a tuple is specified, the full mask must be specified.
+> 
+> All ntuple related ethtool functions are now no longer compiled only
+> for CONFIG_RFS_ACCEL.
+> 
+> Reviewed-by: Vasundhara Volam <vasundhara-v.volam@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 
-commit 382c27f4ed28f803b1f1473ac2d8db0afc795a1b
-Author: Peter Zijlstra <peterz@infradead.org>
-Date:   Wed Nov 29 14:24:52 2023 +0000
+...
 
-    perf: Fix perf_event_validate_size()
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=170e70cee80000
-start commit:   5abde6246522 bpf: Avoid unnecessary use of comma operator ..
-git tree:       bpf-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=148e70cee80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=108e70cee80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8f565e10f0b1e1fc
-dashboard link: https://syzkaller.appspot.com/bug?extid=07144c543a5c002c7305
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14857e81e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1126ac36e80000
+...
 
-Reported-by: syzbot+07144c543a5c002c7305@syzkaller.appspotmail.com
-Fixes: 382c27f4ed28 ("perf: Fix perf_event_validate_size()")
+> +static int bnxt_add_ntuple_cls_rule(struct bnxt *bp,
+> +				    struct ethtool_rx_flow_spec *fs)
+> +{
+> +	u8 vf = ethtool_get_flow_spec_ring_vf(fs->ring_cookie);
+> +	u32 ring = ethtool_get_flow_spec_ring(fs->ring_cookie);
+> +	struct bnxt_ntuple_filter *new_fltr, *fltr;
+> +	struct bnxt_l2_filter *l2_fltr;
+> +	u32 flow_type = fs->flow_type;
+> +	struct flow_keys *fkeys;
+> +	u32 idx;
+> +	int rc;
+> +
+> +	if (!bp->vnic_info)
+> +		return -EAGAIN;
+> +
+> +	if ((flow_type & (FLOW_MAC_EXT | FLOW_EXT)) || vf)
+> +		return -EOPNOTSUPP;
+> +
+> +	new_fltr = kzalloc(sizeof(*new_fltr), GFP_KERNEL);
+> +	if (!new_fltr)
+> +		return -ENOMEM;
+> +
+> +	l2_fltr = bp->vnic_info[0].l2_filters[0];
+> +	atomic_inc(&l2_fltr->refcnt);
+> +	new_fltr->l2_fltr = l2_fltr;
+> +	fkeys = &new_fltr->fkeys;
+> +
+> +	rc = -EOPNOTSUPP;
+> +	switch (flow_type) {
+> +	case TCP_V4_FLOW:
+> +	case UDP_V4_FLOW: {
+> +		struct ethtool_tcpip4_spec *ip_spec = &fs->h_u.tcp_ip4_spec;
+> +		struct ethtool_tcpip4_spec *ip_mask = &fs->m_u.tcp_ip4_spec;
+> +
+> +		fkeys->basic.ip_proto = IPPROTO_TCP;
+> +		if (flow_type == UDP_V4_FLOW)
+> +			fkeys->basic.ip_proto = IPPROTO_UDP;
+> +		fkeys->basic.n_proto = htons(ETH_P_IP);
+> +
+> +		if (ip_mask->ip4src == IPV4_ALL_MASK) {
+> +			fkeys->addrs.v4addrs.src = ip_spec->ip4src;
+> +			new_fltr->ntuple_flags |= BNXT_NTUPLE_MATCH_SRC_IP;
+> +		} else if (ip_mask->ip4src) {
+> +			goto ntuple_err;
+> +		}
+> +		if (ip_mask->ip4dst == IPV4_ALL_MASK) {
+> +			fkeys->addrs.v4addrs.dst = ip_spec->ip4dst;
+> +			new_fltr->ntuple_flags |= BNXT_NTUPLE_MATCH_DST_IP;
+> +		} else if (ip_mask->ip4dst) {
+> +			goto ntuple_err;
+> +		}
+> +
+> +		if (ip_mask->psrc == L4_PORT_ALL_MASK) {
+> +			fkeys->ports.src = ip_spec->psrc;
+> +			new_fltr->ntuple_flags |= BNXT_NTUPLE_MATCH_SRC_PORT;
+> +		} else if (ip_mask->psrc) {
+> +			goto ntuple_err;
+> +		}
+> +		if (ip_mask->pdst == L4_PORT_ALL_MASK) {
+> +			fkeys->ports.dst = ip_spec->pdst;
+> +			new_fltr->ntuple_flags |= BNXT_NTUPLE_MATCH_DST_PORT;
+> +		} else if (ip_mask->pdst) {
+> +			goto ntuple_err;
+> +		}
+> +		break;
+> +	}
+> +	case TCP_V6_FLOW:
+> +	case UDP_V6_FLOW: {
+> +		struct ethtool_tcpip6_spec *ip_spec = &fs->h_u.tcp_ip6_spec;
+> +		struct ethtool_tcpip6_spec *ip_mask = &fs->m_u.tcp_ip6_spec;
+> +
+> +		fkeys->basic.ip_proto = IPPROTO_TCP;
+> +		if (flow_type == UDP_V6_FLOW)
+> +			fkeys->basic.ip_proto = IPPROTO_UDP;
+> +		fkeys->basic.n_proto = htons(ETH_P_IPV6);
+> +
+> +		if (ipv6_mask_is_full(ip_mask->ip6src)) {
+> +			fkeys->addrs.v6addrs.src =
+> +				*(struct in6_addr *)&ip_spec->ip6src;
+> +			new_fltr->ntuple_flags |= BNXT_NTUPLE_MATCH_SRC_IP;
+> +		} else if (!ipv6_mask_is_zero(ip_mask->ip6src)) {
+> +			goto ntuple_err;
+> +		}
+> +		if (ipv6_mask_is_full(ip_mask->ip6dst)) {
+> +			fkeys->addrs.v6addrs.dst =
+> +				*(struct in6_addr *)&ip_spec->ip6dst;
+> +			new_fltr->ntuple_flags |= BNXT_NTUPLE_MATCH_DST_IP;
+> +		} else if (!ipv6_mask_is_zero(ip_mask->ip6dst)) {
+> +			goto ntuple_err;
+> +		}
+> +
+> +		if (ip_mask->psrc == L4_PORT_ALL_MASK) {
+> +			fkeys->ports.src = ip_spec->psrc;
+> +			new_fltr->ntuple_flags |= BNXT_NTUPLE_MATCH_SRC_PORT;
+> +		} else if (ip_mask->psrc) {
+> +			goto ntuple_err;
+> +		}
+> +		if (ip_mask->pdst == L4_PORT_ALL_MASK) {
+> +			fkeys->ports.dst = ip_spec->pdst;
+> +			new_fltr->ntuple_flags |= BNXT_NTUPLE_MATCH_DST_PORT;
+> +		} else if (ip_mask->pdst) {
+> +			goto ntuple_err;
+> +		}
+> +		break;
+> +	}
+> +	default:
+> +		rc = -EOPNOTSUPP;
+> +		goto ntuple_err;
+> +	}
+> +	if (!new_fltr->ntuple_flags)
+> +		goto ntuple_err;
+> +
+> +	idx = bnxt_get_ntp_filter_idx(bp, fkeys, NULL);
+> +	rcu_read_lock();
+> +	fltr = bnxt_lookup_ntp_filter_from_idx(bp, new_fltr, idx);
+> +	if (fltr) {
+> +		rcu_read_unlock();
+> +		rc = -EEXIST;
+> +		goto ntuple_err;
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	new_fltr->base.rxq = ring;
+> +	new_fltr->base.flags = BNXT_ACT_NO_AGING;
+> +	__set_bit(BNXT_FLTR_VALID, &new_fltr->base.state);
+> +	rc = bnxt_insert_ntp_filter(bp, new_fltr, idx);
+> +	if (!rc) {
+> +		rc = bnxt_hwrm_cfa_ntuple_filter_alloc(bp, new_fltr);
+> +		if (rc) {
+> +			bnxt_del_ntp_filter(bp, new_fltr);
+> +			return rc;
+> +		}
+> +		fs->location = new_fltr->base.sw_id;
+> +		return 0;
+> +	}
+> +
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Hi Michael.
+
+FWIIW, I think the following flow would be more idiomatic.
+Although the asymmetry of the bnxt_del_ntp_filter() call
+in one error path is still a bit awkward.
+
+(Completely untested!)
+
+	rc = bnxt_insert_ntp_filter(bp, new_fltr, idx);
+	if (rc)
+		goto ntuple_err;
+
+	rc = bnxt_hwrm_cfa_ntuple_filter_alloc(bp, new_fltr);
+	if (rc) {
+		bnxt_del_ntp_filter(bp, new_fltr);
+		return rc;
+	}
+
+	fs->location = new_fltr->base.sw_id;
+	return 0;
+
+unlock_err:
+	rcu_read_unlock();
+> +ntuple_err:
+> +	atomic_dec(&l2_fltr->refcnt);
+> +	kfree(new_fltr);
+> +	return rc;
+> +}
+
+...
 
