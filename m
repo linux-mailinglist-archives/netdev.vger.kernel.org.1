@@ -1,110 +1,101 @@
-Return-Path: <netdev+bounces-60189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441CC81E00B
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 12:22:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F4B381E010
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 12:29:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E36631F21066
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 11:22:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 824BE1C20A56
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 11:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5578951011;
-	Mon, 25 Dec 2023 11:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=merlins.org header.i=@merlins.org header.b="k2I1fD0n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E20D51018;
+	Mon, 25 Dec 2023 11:29:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.merlins.org (magic.merlins.org [209.81.13.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4F65100A
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 11:22:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=merlins.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=merlins.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=merlins.org
-	; s=key; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=sAXhjKtvlXBmxV1cQ2mDNbJiiLW+yCdjHevsOdWnhhk=; b=k2I1fD0nmtqAjc2dvQqcLA2Y4O
-	uQtSqz8/UVFRQpWasnfxfWdCidFVtz77jYM3pFA9sO9EpJE4ZvLj5UzFZoByjfELh5UdOWozc+uCR
-	5PFkMiF3iyCNKasLmDF1RfC/jJ4es6G6ZgMfOfmq+YpU1btu4nad7knUH9JYKptmZacKPoDp0e/Hn
-	R/u+kVkBNfjPPIXHL6n6kM5riQHqysUw+Fb/Xo5+DjVpjrZ7iMRzm9h8j4JG5vw2ODEjZMuSrb5fp
-	y6HtbHKyKYky4hvosEaiaCi7P1V8U6/bJX5eh72IQE6dIVd9NTJYXaeranyQfERZVe0Gh5dK3nZLi
-	ZU4p+rEw==;
-Received: from lfbn-idf3-1-20-89.w81-249.abo.wanadoo.fr ([81.249.147.89]:51810 helo=sauron.svh.merlins.org)
-	by mail1.merlins.org with esmtpsa 
-	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim 4.94.2 #2)
-	id 1rHj1w-00088B-5Z by authid <merlins.org> with srv_auth_plain; Mon, 25 Dec 2023 03:21:56 -0800
-Received: from merlin by sauron.svh.merlins.org with local (Exim 4.92)
-	(envelope-from <marc@merlins.org>)
-	id 1rHj1u-000egR-KY; Mon, 25 Dec 2023 03:21:54 -0800
-Date: Mon, 25 Dec 2023 03:21:54 -0800
-From: Marc MERLIN <marc@merlins.org>
-To: Sasha Neftin <sasha.neftin@intel.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH net v3] net: ethtool: do runtime PM
- outside RTNL
-Message-ID: <20231225112154.GA33012@merlins.org>
-References: <20231206084448.53b48c49@kernel.org>
- <e6f227ee701e1ee37e8f568b1310d240a2b8935a.camel@sipsolutions.net>
- <a44865f5-3a07-d60a-c333-59c012bfa2fb@intel.com>
- <20231207094021.1419b5d0@kernel.org>
- <20231211045200.GC24475@merlins.org>
- <83dc80d3-1c26-405d-a08d-2db4bc318ac8@gmail.com>
- <20231215174634.GA10053@merlins.org>
- <20231224163043.GA6759@merlins.org>
- <5ca7edbb-cf61-45b2-b9ba-888cb157ecbb@gmail.com>
- <79d4bf3e-fdc7-4273-aa1e-9b5e8194696b@intel.com>
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660585100A;
+	Mon, 25 Dec 2023 11:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from alexious$zju.edu.cn ( [10.190.64.80] ) by
+ ajax-webmail-mail-app3 (Coremail) ; Mon, 25 Dec 2023 19:28:44 +0800
+ (GMT+08:00)
+Date: Mon, 25 Dec 2023 19:28:44 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: alexious@zju.edu.cn
+To: "Simon Horman" <horms@kernel.org>
+Cc: "Edward Cree" <ecree.xilinx@gmail.com>, 
+	"Martin Habets" <habetsm.xilinx@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	"Eric Dumazet" <edumazet@google.com>, 
+	"Jakub Kicinski" <kuba@kernel.org>, 
+	"Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-net-drivers@amd.com, linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH net] [v2] sfc: fix a double-free bug in
+ efx_probe_filters
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
+ 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <20231224155138.GA228041@kernel.org>
+References: <20231222154952.3531636-1-alexious@zju.edu.cn>
+ <20231224155138.GA228041@kernel.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79d4bf3e-fdc7-4273-aa1e-9b5e8194696b@intel.com>
-X-Sysadmin: BOFH
-X-URL: http://marc.merlins.org/
-X-SA-Exim-Connect-IP: 81.249.147.89
-X-SA-Exim-Mail-From: marc@merlins.org
+Message-ID: <23192f19.5560e.18ca0bbfed6.Coremail.alexious@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cC_KCgC3IRhsZ4llh7lxAQ--.46726W
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/1tbiAgEPAGWCupcTBgAYsL
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Mon, Dec 25, 2023 at 10:03:23AM +0200, Sasha Neftin wrote:
-> > > I can't patch that kernel easily. How exactly do I disable runtime PM
-> > > from the kernel command line for "that device" which I'm not even sure
-> > 
-> > Change <device>/power/control from "auto" to "on".
-> 
-> Need to figure out your controller location in a file system via lspci/lspci
-> -t and then change to "on"
-> For example: echo on >
-> /sys/devices/pci0000\:00/0000\:00\:1c.0/0000\:ae\:00.0/power/control
-> 
-> We are starting to look at this problem, but I can't reproduce the problem
-> on my machines yet.
-
-Thanks. I realized it was going to be hard either way if the boot hangs
-before I get to a command prompt, which was what was happening
-yesterday.
-I had to boot ubuntu to debug a sound issue, and it was very tricky
-since most of the time it hung before I got to a command prompt, but I
-was finally able to get it to work long enough to debug the sound issue
-and go back to my self built kernel to port over the sound config I
-needed.
-
-I wish I could tell you exactly how to reproduct this in a more useful
-way, sorry about that.
-
-Marc
--- 
-"A mouse is a device used to point at the xterm you want to type in" - A.S.R.
- 
-Home page: http://marc.merlins.org/                       | PGP 7F55D5F27AAF9D08
+IAo+IE9uIEZyaSwgRGVjIDIyLCAyMDIzIGF0IDExOjQ5OjUyUE0gKzA4MDAsIFpoaXBlbmcgTHUg
+d3JvdGU6Cj4gPiBJbiBlZnhfcHJvYmVfZmlsdGVycywgdGhlIGNoYW5uZWwtPnJwc19mbG93X2lk
+IGlzIGZyZWVkIGluIGEKPiA+IGVmeF9mb3JfZWFjaF9jaGFubmVsIG1hcmNvICB3aGVuIHN1Y2Nl
+c3MgZXF1YWxzIHRvIDAuCj4gPiBIb3dldmVyLCBhZnRlciB0aGUgZm9sbG93aW5nIGNhbGwgY2hh
+aW46Cj4gPiAKPiA+IGVmMTAwX25ldF9vcGVuCj4gPiAgIHwtPiBlZnhfcHJvYmVfZmlsdGVycwo+
+ID4gICB8LT4gZWYxMDBfbmV0X3N0b3AKPiA+ICAgICAgICAgfC0+IGVmeF9yZW1vdmVfZmlsdGVy
+cwo+ID4gCj4gPiBUaGUgY2hhbm5lbC0+cnBzX2Zsb3dfaWQgaXMgZnJlZWQgYWdhaW4gaW4gdGhl
+IGVmeF9mb3JfZWFjaF9jaGFubmVsIG9mCj4gPiBlZnhfcmVtb3ZlX2ZpbHRlcnMsIHRyaWdnZXJp
+bmcgYSBkb3VibGUtZnJlZSBidWcuCj4gPiAtLS0KPiAKPiBFdmVyeXRoaW5nIGJlbG93IHRoZSBs
+aW5lIGFib3ZlICgtLS0pIHdpbGwgYmUgb21pdHRlZCBmcm9tIHRoZSBjb21taXQKPiBtZXNzYWdl
+IHdoZW4gdGhlIHBhdGNoIGlzIGFwcGxpZWQuCj4gCj4gPiBDaGFuZ2Vsb2c6Cj4gPiAKPiA+IHYy
+OiBDb3JyZWN0IHRoZSBjYWxsLWNoYWluIGRlc2NyaXB0aW9uIGluIGNvbW1pdCBtZXNzYWdlIGFu
+ZCBjaGFuZ2UKPiA+IHBhdGNoIHN1YmplY3QuCj4gPiAKPiA+IEZpeGVzOiBhOWRjM2Q1NjEyY2Ug
+KCJzZmNfZWYxMDA6IFJYIGZpbHRlciB0YWJsZSBtYW5hZ2VtZW50IGFuZCByZWxhdGVkIGd1YmJp
+bnMiKQo+ID4gU2lnbmVkLW9mZi1ieTogWmhpcGVuZyBMdSA8YWxleGlvdXNAemp1LmVkdS5jbj4K
+PiA+IFJldmlld2VkLWJ5OiBTaW1vbiBIb3JtYW4gPGhvcm1zQGtlcm5lbC5vcmc+Cj4gPiBSZXZp
+ZXdlZC1ieTogRWR3YXJkIENyZWUgPGVjcmVlLnhpbGlueEBnbWFpbC5jb20+Cj4gCj4gSGkgWmhp
+cGVuZyBMdSwKPiAKPiBJIHRoaW5rIHRoYXQgeW91ciBTaWduZWQtb2ZmLWJ5IHNob3VsZCBnbyBs
+YXN0IHdoZW4geW91IHBvc3QgYSBwYXRjaC4KPiAKPiBBbmQgdGhlIENoYW5nZWxvZyBzaG91bGQg
+Z28gYmVsb3cgdGhlIChmaXJzdCBzZXQgb2YpIHNjaXNzb3JzICgtLS0pLgo+IAo+ID4gLS0tCj4g
+PiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvc2ZjL3J4X2NvbW1vbi5jIHwgNCArKystCj4gPiAgMSBm
+aWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+IAo+IFdpdGggdGhl
+IGFib3ZlIGluIG1pbmQsIEkgdGhpbmsgeW91IHdhbnQgc29tZXRoaW5nIGxpa2U6Cj4gCj4gSW4g
+ZWZ4X3Byb2JlX2ZpbHRlcnMsIHRoZSBjaGFubmVsLT5ycHNfZmxvd19pZCBpcyBmcmVlZCBpbiBh
+Cj4gZWZ4X2Zvcl9lYWNoX2NoYW5uZWwgbWFyY28gIHdoZW4gc3VjY2VzcyBlcXVhbHMgdG8gMC4K
+PiBIb3dldmVyLCBhZnRlciB0aGUgZm9sbG93aW5nIGNhbGwgY2hhaW46Cj4gCj4gZWYxMDBfbmV0
+X29wZW4KPiAgIHwtPiBlZnhfcHJvYmVfZmlsdGVycwo+ICAgfC0+IGVmMTAwX25ldF9zdG9wCj4g
+ICAgICAgICB8LT4gZWZ4X3JlbW92ZV9maWx0ZXJzCj4gCj4gVGhlIGNoYW5uZWwtPnJwc19mbG93
+X2lkIGlzIGZyZWVkIGFnYWluIGluIHRoZSBlZnhfZm9yX2VhY2hfY2hhbm5lbCBvZgo+IGVmeF9y
+ZW1vdmVfZmlsdGVycywgdHJpZ2dlcmluZyBhIGRvdWJsZS1mcmVlIGJ1Zy4KPiAKPiBGaXhlczog
+YTlkYzNkNTYxMmNlICgic2ZjX2VmMTAwOiBSWCBmaWx0ZXIgdGFibGUgbWFuYWdlbWVudCBhbmQg
+cmVsYXRlZCBndWJiaW5zIikKPiBSZXZpZXdlZC1ieTogU2ltb24gSG9ybWFuIDxob3Jtc0BrZXJu
+ZWwub3JnPgo+IFJldmlld2VkLWJ5OiBFZHdhcmQgQ3JlZSA8ZWNyZWUueGlsaW54QGdtYWlsLmNv
+bT4KPiBTaWduZWQtb2ZmLWJ5OiBaaGlwZW5nIEx1IDxhbGV4aW91c0B6anUuZWR1LmNuPgo+IC0t
+LQo+IENoYW5nZWxvZzoKPiAKPiB2MjogQ29ycmVjdCB0aGUgY2FsbC1jaGFpbiBkZXNjcmlwdGlv
+biBpbiBjb21taXQgbWVzc2FnZSBhbmQgY2hhbmdlCj4gcGF0Y2ggc3ViamVjdC4KPiAtLS0KPiAg
+ZHJpdmVycy9uZXQvZXRoZXJuZXQvc2ZjL3J4X2NvbW1vbi5jIHwgNCArKystCj4gIDEgZmlsZSBj
+aGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPiAKPiAtLSAKPiBwdy1ib3Q6
+IGNoYW5nZXMtcmVxdWVzdGVkCgpUaGFuayB5b3UgZm9yIHlvdXIgZGV0YWlsZWQgcmV2aXNpb24g
+YW5kIGNvcnJlY3Rpb24hCkknbGwgc2VuZCB0aGlzIHBhdGNoIGFnYWluIHdpdGggeW91ciBjb3Jy
+ZWN0aW9uLg==
 
