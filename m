@@ -1,108 +1,132 @@
-Return-Path: <netdev+bounces-60221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 010BB81E2EB
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 00:01:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 644C081E2ED
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 00:04:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 199841C20E59
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 23:01:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A7C2280D67
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 23:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C321EA7D;
-	Mon, 25 Dec 2023 23:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4ADC38DD7;
+	Mon, 25 Dec 2023 23:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="uSXQnpsO"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="jG7OVV88"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC661E51D
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 23:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15631EB29
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 23:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dbd73ac40ecso2666564276.1
-        for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 15:01:27 -0800 (PST)
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-dbd4608121fso3061149276.0
+        for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 15:04:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703545286; x=1704150086; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703545466; x=1704150266; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M/El/7HqAwy3Au1NgzdnJaBiXnlBBReCoOu45FtGb20=;
-        b=uSXQnpsOevEyEDu8IxMVzupEc7DDAHyCzBIo3BLY2PZ3/LDny5ZxL5zNGy2/+gF03+
-         KyJFE8f3ZYymkBwf6CAnhTK6P4b1O2VYQ2ratvVvqfbEozzbi+EeUzuSVHZ6qasPsSOJ
-         PrWusydnV/fiZmhQWYCfUQAF4kbn3vMs8rEaoeuT8oQA96M/clv2kUNVI803B0B3Sf98
-         tJkTIyoiOjlZRDKC+6X7Jz8v9cHzXIdDMXA8I9JD4fKu2rgBw7YIA6NhWd0bgxM77Ms8
-         y9MaM8eLQaUBjpsm9CLvCKi1sTPhxP/BH88ls1Qmnzd0I03nqH3x4dBfmTAHk422idMD
-         NLFA==
+        bh=/SgsWbYJzU0bg8sCq7jflJ+MhyDFskXV4wMBcQPJnz0=;
+        b=jG7OVV883Ms6x3AedPFjn5CAnm+SU1oHkUtoalDJA7tdshpYApKV+tLaBkyMy0romm
+         an9bOd9c2dhnuUZyPha5rKaDLjj+zrGhBpDRw+5AiIZMKimTkU7qv/j+lK+ycGZfd/vS
+         rt31pMfaci/0jzEeoMWHrHWDwhsuyhlW9L0qhQ4EIilTmpyG+tzEGlE/8bbelqNyNiNR
+         0IiOLwk5xI30Ma9jUCD+N230+acxLXxj0KAM16n2WJzsnhdgZTqhwDSRciC1GJzQ57vw
+         Ugh+61F5Orb8JEFPPfnGIeGdHcl0n/cLFkORZ+V2qjAXmmqnd8jzOuDh2ZWmg5MAN7Zz
+         t7GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703545286; x=1704150086;
+        d=1e100.net; s=20230601; t=1703545466; x=1704150266;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M/El/7HqAwy3Au1NgzdnJaBiXnlBBReCoOu45FtGb20=;
-        b=JnMVBznqef4EABClwB24erl3DIB9f3OpVmHr1geDRJ+Dw4Zm1jfpeX/xl0uDBJnTTl
-         BcAhktWLsUbFdNFZfGc8hj1MwdjUDh4gwrjuttN6ruMSODxbR9JyxsVVZoZlkXIIbjJg
-         FM6QjZyBMIWV85DeoOJes6LRkgtLIsjBl44Bq/D4cPaMIthk9zODgidqmJ4KlD0QYY1u
-         OSpZEiFUO61YL7UrwK/ojLSh2VSYdnR4Ib+eXEWe8O4iuuIoUrIYsIVRqjLNVj+YwpAx
-         siAwdT7tokA1pch7IWGyirflER5TDDFWy6ZgNe4Uo/yCgD07BijWSKdEv4TC+Y+37DO0
-         gDBA==
-X-Gm-Message-State: AOJu0Yzod5udTm7KFnN8blXNUy0aRIFReCZMXfo+IZI7b3TWzcazTewH
-	zsms9cQfu3VUNb5jG80Pm3gsJuKkNaWWNJvEkmscPmi2gsybjes/t89t2Bt5kw==
-X-Google-Smtp-Source: AGHT+IFmPWNSHexWKfaq6BAe3aGb8NGrlLWTD2w8YM3t7dz/y8CpysotAliZ705s2zlxv9Oo4cR+jwnpWDJUsNHhqYQ=
-X-Received: by 2002:a25:d782:0:b0:dbd:6506:d8df with SMTP id
- o124-20020a25d782000000b00dbd6506d8dfmr3151690ybg.74.1703545286574; Mon, 25
- Dec 2023 15:01:26 -0800 (PST)
+        bh=/SgsWbYJzU0bg8sCq7jflJ+MhyDFskXV4wMBcQPJnz0=;
+        b=ELy2GOA+9EBUiYqlnf0H3i85RpoJLRJoV6mfLM+NCQ3crex9rB3IS/D33oyFk4MKS+
+         UwvcCRwDNNJxfoN0hf/wMjsVe1ntp8kVOKpk4lCLRxjn76ojj47Mdf8teIGMxZ8IpGan
+         8llBG+CauADZDIJJcGwByleygbFWyV4vDNKKM0v5mMi61K+ssgseL5nDE5YH9VdZT3Y8
+         JINMnSIN6NX6XL0iWdvF4wfj6q2KEOSq269hqxrPHpvey6pASB2XReeztowDW/V4mICx
+         EUAWLXZkRMJvsyzcPJO1GSwO2ZZFrD4JZDzIClZzkmAptxSXRAf1QANbUWYrnD8qOY1c
+         Z2uA==
+X-Gm-Message-State: AOJu0Ywa6+oJcPBf/srDKKcp116yzCEgBDtoD4dezBObFi8SPAfPJjch
+	lkG/vxym24m8bMS6siQ1aqSNmHa/ebnewCaob7VVd4lBC17g
+X-Google-Smtp-Source: AGHT+IHkgMadWpG2pFbQX6OW2/hvsLmzcv0W5eYi8Bz8c4S0MtIVWop5axHD8jAuetaOK/9LTGwjQEk9wdtEVecMQdw=
+X-Received: by 2002:a81:8641:0:b0:5d7:1941:aac with SMTP id
+ w62-20020a818641000000b005d719410aacmr3580928ywf.71.1703545465934; Mon, 25
+ Dec 2023 15:04:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231222173758.13097-1-stephen@networkplumber.org>
- <20231223123103.GA14803@breakpoint.cc> <20231224091118.2ffa84bb@hermes.local>
-In-Reply-To: <20231224091118.2ffa84bb@hermes.local>
+References: <20231224165413.831486-1-linma@zju.edu.cn>
+In-Reply-To: <20231224165413.831486-1-linma@zju.edu.cn>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 25 Dec 2023 18:01:15 -0500
-Message-ID: <CAM0EoMkqijrTv7SSrQf2sHEZWShgfwLKzcVtPT17HK3vR-gsrA@mail.gmail.com>
-Subject: Re: [RFC iproute2-next] remove support for iptables action
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Florian Westphal <fw@strlen.de>, Jamal Hadi Salim <hadi@mojatatu.com>, netdev@vger.kernel.org
+Date: Mon, 25 Dec 2023 18:04:14 -0500
+Message-ID: <CAM0EoMm8F3UE3N-PBZmJHQpYYjiV23JKf6jGsvzzWs0PBd+AWQ@mail.gmail.com>
+Subject: Re: [PATCH net v1] net/sched: cls_api: complement tcf_tfilter_dump_policy
+To: Lin Ma <linma@zju.edu.cn>
+Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 24, 2023 at 12:11=E2=80=AFPM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
+Hi,
+
+On Sun, Dec 24, 2023 at 11:54=E2=80=AFAM Lin Ma <linma@zju.edu.cn> wrote:
 >
-> On Sat, 23 Dec 2023 13:31:03 +0100
-> Florian Westphal <fw@strlen.de> wrote:
->
-> > Stephen Hemminger <stephen@networkplumber.org> wrote:
-> > >  tc/em_ipset.c                        | 260 --------------
-> >
-> > Not sure if this is unused, also not related to the iptables/xt action.
->
-> There is both the xtables and ematch options to TC.
-> Jamal do you want to remove both, or some subset?
+> In function `tc_dump_tfilter`, the attributes array is parsed via
+> tcf_tfilter_dump_policy which only describes TCA_DUMP_FLAGS. However,
+> the NLA TCA_CHAIN is also accessed with `nla_get_u32`. According to the
+> commit 5e2424708da7 ("xfrm: add forgotten nla_policy for
+> XFRMA_MTIMER_THRESH"), such a missing piece could lead to a potential
+> heap data leak.
 >
 
-just the m_ipt/xt (not the em_xxx) which maps to the kernel ipt action
-(not the em_ipt which is part of a much larger combination of
-matchers, do "ls net/sched/em*.c", of which matching on ipt is one
-small part).
-There are people still using ematch... (as Eyal just posted to).
-
-> The problematic area for iproute2 seems to be the dependency on libiptabl=
-es
-> which is not very stable. On the kernel side it is one of the places
-> where lightly tested integration could lead to lots of syszbot errors.
-
-Note: the motivation for removing act_ipt was not syszbot, rather it
-being overtaken by events. AFAIK, there's never been a syszbot issue
-with either act_ipt or the ematcher.
-I do empathize with your comment on the challenges on the library.
+Can you clarify what "heap data leak" you are referring to?
+As much as i can see any reference to NLA_TCA_CHAIN is checked for
+presence before being put to use. So far that reason I  dont see how
+this patch qualifies as "net". It looks like an enhancement to me
+which should target net-next, unless i am missing something obvious.
 
 cheers,
 jamal
+
+> The access to TCA_CHAIN is introduced in commit 5bc1701881e3 ("net:
+> sched: introduce multichain support for filters") and no nla_policy is
+> provided for parsing at that point. Later on, tcf_tfilter_dump_policy is
+> introduced in commit f8ab1807a9c9 ("net: sched: introduce terse dump
+> flag") while still ignoring the fact that TCA_CHAIN needs a check. This
+> patch does that by complementing the policy.
+>
+> Note that other functions that access TCA_CHAIN, like tc_new_tfilter,
+> are not vulnerable as they choose rtm_tca_policy as the parsing policy
+> which describes the TCA_CHAIN already.
+>
+> Fixes: 5bc1701881e3 ("net: sched: introduce multichain support for filter=
+s")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> ---
+>  net/sched/cls_api.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> index 1976bd163986..2b5b8eca2ee3 100644
+> --- a/net/sched/cls_api.c
+> +++ b/net/sched/cls_api.c
+> @@ -2732,6 +2732,7 @@ static bool tcf_chain_dump(struct tcf_chain *chain,=
+ struct Qdisc *q, u32 parent,
+>  }
+>
+>  static const struct nla_policy tcf_tfilter_dump_policy[TCA_MAX + 1] =3D =
+{
+> +       [TCA_CHAIN]      =3D { .type =3D NLA_U32 },
+>         [TCA_DUMP_FLAGS] =3D NLA_POLICY_BITFIELD32(TCA_DUMP_FLAGS_TERSE),
+>  };
+>
+> --
+> 2.17.1
+>
 
