@@ -1,88 +1,110 @@
-Return-Path: <netdev+bounces-60178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEDF781DF89
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:38:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E216B81DF90
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EC98B20E54
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:38:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 115BA1C2176D
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627C514268;
-	Mon, 25 Dec 2023 09:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/o8AXlm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2969E154BA;
+	Mon, 25 Dec 2023 09:46:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47965179BE
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 09:37:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90587C433C7;
-	Mon, 25 Dec 2023 09:37:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703497078;
-	bh=VT7eZE4fEAOESZo3WkZqdZMl9CF7e53SYWXugFW5nIk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n/o8AXlmnkWXelB/t/qll391r0Lb8ef13A895t4xlqLxNApu5PJNgk1k1XLjlwJrY
-	 +FQjdGoVfFZR38XAKXv4zlFU5ciTfNSvSNaIY2XtjaPGfqe4dRFadlg6EwcsbpXx9M
-	 uuFySpvSDIxt0/Mh8IYvK/kx1c/ea9U4hw0Bdadx1oBpEt4OPB4oy3Hm8xzq1aQ/TX
-	 2QUWS3KqioDISGvsrh0ALwDCKqrvUfRiJ+gvtQh+6clvIR1dIFvFXobnRllkoHACni
-	 adZNZh10Bo4kQXkLwzSdzF/eqjOrHvyjRDPLsC6WgMuXUiULt1SDm6mFTqZvfXhBjb
-	 skOQnqCUdYSzQ==
-Date: Mon, 25 Dec 2023 09:37:53 +0000
-From: Simon Horman <horms@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	aleksander.lobakin@intel.com, marcin.szycik@linux.intel.com
-Subject: Re: [PATCH iwl-next v2 14/15] ice: cleanup inconsistent code
-Message-ID: <20231225093753.GG5962@kernel.org>
-References: <20231206010114.2259388-1-jesse.brandeburg@intel.com>
- <20231206010114.2259388-15-jesse.brandeburg@intel.com>
- <CAH-L+nPi1yCP+18Z=UJj7E-jeV3W8aWnNXP49SDTVXWEErBqWg@mail.gmail.com>
- <d5cc134a-b8ed-4d4b-96fa-de096c41ada0@intel.com>
- <5a163d97-2989-e5f7-e6ba-6dd346ab4236@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FD12E401
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 09:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-208-Cs0Dl5VhNx-9eQZLK7BORg-1; Mon, 25 Dec 2023 09:46:46 +0000
+X-MC-Unique: Cs0Dl5VhNx-9eQZLK7BORg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 25 Dec
+ 2023 09:46:23 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 25 Dec 2023 09:46:23 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "David S . Miller"
+	<davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>
+CC: "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>, "martin.lau@linux.dev"
+	<martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>, "Stephen
+ Hemminger" <stephen@networkplumber.org>, Jens Axboe <axboe@kernel.dk>,
+	"Daniel Borkmann" <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>
+Subject: [PATCH net-next 0/4] sockptr: Change sockptr_t to be a struct
+Thread-Topic: [PATCH net-next 0/4] sockptr: Change sockptr_t to be a struct
+Thread-Index: Ado3FihDgm7OKd4BQLS3SCVxCLscZA==
+Date: Mon, 25 Dec 2023 09:46:23 +0000
+Message-ID: <199c9af56a5741feaf4b1768bf7356be@AcuMS.aculab.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5a163d97-2989-e5f7-e6ba-6dd346ab4236@intel.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 14, 2023 at 08:16:38AM +0100, Przemek Kitszel wrote:
-> On 12/13/23 19:27, Jesse Brandeburg wrote:
-> > Please don't use HTML email, your reply was likely dropped by most lists
-> > that filter HTML.
-> > 
-> > On 12/12/2023 8:06 PM, Kalesh Anakkur Purayil wrote:
-> > >      -       change_type = FIELD_GET(ICE_AQ_LLDP_MIB_TYPE_M,  mib->type);
-> > >      +       change_type = FIELD_GET(ICE_AQ_LLDP_MIB_TYPE_M, mib->type);
-> > > 
-> > > [Kalesh]: I did not get what exactly changed here? Is that you just
-> > > removed one extra space before mib->type?
-> > 
-> > Yes, there was a whitespace change missed in the GET series. I had
-> > caught it only here. If you feel I need to I can resend to add a comment
-> > to the commit message that this was added here.
-> > 
-> > 
-> 
-> I guess that NOT sending next revision is our only chance to fix this
-> particular white space error ;)
+The original commit for sockptr_t tried to use the pointer value
+to determine whether a pointer was user or kernel.
+This can't work on some architectures and was buggy on x86.
+So the is_kernel discriminator was added after the union of pointers.
 
-It would be nice if there was a mechanism to fix such problems.
+However this is still open to misuse and accidents.
+Replace the union with a struct and remove the is_kernel member.
+The user and kernel values are now in different places.
+The structure size doesn't change - it was always padded out to 'two pointe=
+rs'.
 
-Regardless of this side topic, this patch looks good to me,
-with or without the extra space removed.
+The only functional difference is that NULL pointers are always 'user'.
+So dereferencing will (usually) fault in copy_from_user() rather than
+panic if supplied as a kernel address.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Simple driver code that uses kernel sockets still works.
+I've not tested bpf - but that should work unless it is breaking
+the rules.
+
+The first three patches just change the code to use the helpers
+from sockptr.h.
+The functional change is in the fourth patch.
+
+
+David Laight (4):
+  Use sockptr_is_kernel() instead of testing is_kernel.
+  Use bpfptr_is_kernel() instead of checking the is_kernel member.
+  Use the sockptr_t helpers.
+  Change sockptr_t to be a struct of a kernel and user pointer.
+
+ include/linux/bpfptr.h   | 10 ++++------
+ include/linux/sockptr.h  | 15 +++++----------
+ kernel/bpf/bpf_iter.c    |  2 +-
+ kernel/bpf/btf.c         |  2 +-
+ kernel/bpf/syscall.c     | 12 ++++++------
+ kernel/bpf/verifier.c    | 10 +++++-----
+ net/ipv4/ip_sockglue.c   |  2 +-
+ net/ipv6/ipv6_sockglue.c |  2 +-
+ net/socket.c             |  2 +-
+ 9 files changed, 25 insertions(+), 32 deletions(-)
+
+--=20
+2.17.1
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
