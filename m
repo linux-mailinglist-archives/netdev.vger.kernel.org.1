@@ -1,138 +1,223 @@
-Return-Path: <netdev+bounces-60184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CE0981DF9A
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:59:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D870E81DFB7
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 11:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB1DA1C2176D
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:59:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0530B210A4
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889B4179BE;
-	Mon, 25 Dec 2023 09:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8332E401;
+	Mon, 25 Dec 2023 10:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="jVrouFQg"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic318-22.consmr.mail.gq1.yahoo.com (sonic318-22.consmr.mail.gq1.yahoo.com [98.137.70.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C1A179B1
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 09:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-405--17qtIQCNQ-VIvzLmd8C0A-1; Mon, 25 Dec 2023 09:58:53 +0000
-X-MC-Unique: -17qtIQCNQ-VIvzLmd8C0A-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 25 Dec
- 2023 09:58:30 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 25 Dec 2023 09:58:30 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: "'netdev@vger.kernel.org'" <netdev@vger.kernel.org>, "'David S . Miller'"
-	<davem@davemloft.net>, "'kuba@kernel.org'" <kuba@kernel.org>
-CC: "'eric.dumazet@gmail.com'" <eric.dumazet@gmail.com>,
-	"'martin.lau@linux.dev'" <martin.lau@linux.dev>, 'Alexei Starovoitov'
-	<ast@kernel.org>, 'Stephen Hemminger' <stephen@networkplumber.org>, "'Jens
- Axboe'" <axboe@kernel.dk>, 'Daniel Borkmann' <daniel@iogearbox.net>, "'Andrii
- Nakryiko'" <andrii@kernel.org>
-Subject: [PATCH net-next 4/4] sockptr: Change sockptr_t to be a struct of a
- kernel and user pointer.
-Thread-Topic: [PATCH net-next 4/4] sockptr: Change sockptr_t to be a struct of
- a kernel and user pointer.
-Thread-Index: Ado3GOykMznC7Y2GTLihcf026jh1OQ==
-Date: Mon, 25 Dec 2023 09:58:30 +0000
-Message-ID: <18fcf82093314112a569aa8327b52f1c@AcuMS.aculab.com>
-References: <199c9af56a5741feaf4b1768bf7356be@AcuMS.aculab.com>
-In-Reply-To: <199c9af56a5741feaf4b1768bf7356be@AcuMS.aculab.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F6635883
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 10:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1703499895; bh=aG3x/Gwjn4cN307RnrwhQb++OwappqX7kReZEfjgj5c=; h=Date:From:To:Cc:In-Reply-To:References:Subject:From:Subject:Reply-To; b=jVrouFQgsySEUWGUYXeA57nsyHQWkDGCn/dP9smlmwy+mWKsZ+tspD0/94KCmqrwbrg3vWTl5/pV0niDsMs97ygImvlOsjxy9wEuBgtxjq3Dq2RY41YZkJx0U0kP5q/8UvBieVGW5bVPVkVl+t3Q/IWYssMEBB6sgeRPc/X6UOiHPA/C6SKFoA84fWb2cLJUD8d0K53aQvL9pCK0cF0ziKyVZ9ijgRiqmr1DacIVdKEDNEdU/eFZvcpypOzXJkt10PaBgyPt5U5biLlZZAy+kyJpxphVjo79Z8DkdgMmsYrmM9BiFIZI1/1LVH4oXLKzPSt9TfdI5pZfZ+c3EjvYiQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1703499895; bh=3I+A1BGOEHxw7N2aHAggKOCR/+Zl54N2fMGMpZCnUyA=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=pXN0Dqtckzp0zcvA5VodjZzwC8jFQvhXYL4MF3+KcKGAaE6R3AYAs3pn/VdCj8/Y0GchcEOHhv72M6ix5TUGRcFH5gGQpFQxevioKuze6WsQojh80FkL0vMA7kOKHsDtyoYae7PxnD63jO2mK7cZBQzcI5FoGSyDEdU2eP2rhkWFrPqTazFYTL0D54povoQKfInQtFFHOGfLbWO2aiYli4GTzIZqehY8wkZg0HF642Jqvd/IBKIEi3pGF7XsBMGNDrdd6wqCOHTcUYK1p31GVvZN2pl4aZxezdJztWxbjXJIZUwlKTkT0/3d8XApCH3EFjse9LaQNvOgrjUexpuwSA==
+X-YMail-OSG: ma3XuzoVM1kp7oHntbDC7ULbgl_mNUnqWmmT2dfa1HIQTXZShKwT5OVkuvXlSua
+ 0bU6XyzGKjoG_Ni0aPOrdXJKxLoJQY87KOPs3oqhZuU1oZue.7vMKZIDROFpub6Md35lil2BtbGn
+ jHkKVgDd0kzO3y8.fNIoI2wobeQtqwhmGkSxsRXejNwDSPypio_lPJHi3ltky5ONAtNI9N_nPaiZ
+ yEmPxoz8J5JKSoEmkjoTOPRsAsXcd8IKuembJdAk0eDyLSiXyV_cntdLFumq02UAboxqYnVNEq7u
+ PXtKAUFbTF2kTrikyuF3PDaBiOfELNRpw6u8rRMtZhvs15EKP6vT2dLw2ExcsN7Iu2Vewi4bL.kt
+ GNM8zjXC0dFBL7U3s8QcJMxzfrAq7F12CFRfXXp8GZCbwAS4oGiweLUdSDrDOp2f_dSw4v7nE1iY
+ cHLnRFrEa5QrJT2fBNC4W1PDbfTmBlp8G.c2u4Pq6pZ2VYEkC9dRDnKTO.xk1.KJwDVqBgB4aG8M
+ TVLt2obpHHdy8SLj79T5VidVMh9.5Q2Ui9N7R2rclw5d6ZpqMt9Fubi04zKlYXnENilNFxRzqIaT
+ Oa8PMxusQkda63NTPii.eroJq8cxuz0jX3FsqZuoiv5DVDfo_aDiuWbxFwK4tsN6LOxpq45NBfFy
+ 7ww6jWY4jkW1gRl7elyc58jDGfJYej55v3fvVwQ_Vmvq8SqjzJ5lD8E75w4LQpEdQEhWt_fMV4N9
+ 5dpT3Ui7lOnSydQA3RUpO4AL.GGXYtjsp4CP0hSIdB8VUD5EmG9JkqaonOJUd7H2PTJokWGCjqin
+ 6PxTqkLHLFjH_luoqRJT4XcU_rsRfmr5ypLus9v..UmSrKnk2nKNNIP5oiqccdMrOBYaTEHXJVqq
+ OtupeWDlethxkgV2KtrsEABaByzqFAEsA0VnpEWPY3KIXlVZfz1eKLkAGBmRl4wZEiMLPi4EhKji
+ 7VNVeaWq8us4NN4ZYdaYC3NXX5_i3IOVZPwZrQl5MWI.iBtunf_kJ5qdvpavkQkMAY5NMTK7WWrm
+ 8n.9QAxGSYLawv8K1V5WTwhPg3bzGxTlF7rI7ehEL_WrK4IOnEKr7jNocYVU8vpr9cZKR49qSzyc
+ tjFeTVn8M44JLSE7yPg1.Qu6fZInzuvw4yTE2pyjuGJEla4DbP8FxriaETzG48pzKu4m6WGF2018
+ 6hVX._wv5R6wA7zKc_VoLytJR65lWogW.BBhlByzzeg1gUXxhQFQvSmnEtzJGk_Nucgz91TOnTCD
+ vVASxJ0la.7SHbdSXFZgGXjGpQ4SsUvnDcYSXFj6RQStMptBVbhUyhxwjon_yaf.poN9_K8H87so
+ airQraoakhcB8UyPkwzKOX9z77qSDkIVAcC56A5nZxYCfAbS6aCAsc4U9N5Ba21dtbjlmRpc3Y0I
+ f1BZAfOluGZCa31VQdII37_pD0l_gTLMk6b1Bykwk5QlzioknYy.pvkdZbfJ3nUFpKzM0ke8i.Lx
+ rrKEyFgVHFbq79yqZ96f_E0YZH2KhGbatill2ELqZMq92o_N_Y09Ncvi8OIo0L.6J0tP4Vq7lX7A
+ alo7_rIp3Zk6.kjhljvJOF6yzNTbnp8f0fbALi.Rt6JYEtXa5.omnbrBc2ha3JncNiIKRSgUuNR4
+ S0JCR9hCkTYSZqAE8LT0_nqYVrHPkzfoL1nCnqbZhelCQRS1PjjQAWd53qai3KwSjT_KxMlOIpKx
+ QQSKA.UVZvb3kAx85bQ9LILHB5od1y7Hs4Y7Dz6u42ThGBrK_rAbwmc_tcpn57GvmQltw0pPGfaf
+ hhEO9f3.A_XCFkp7qJzg6Wx8dCTAxKs4jqC0yX3uKpKfio9mmYAAlprqJX4dJEU7oKiGNt4y9hA4
+ 5ME0Y7iGtJq0D_abayrn6e2Fq44csmjHbtYlpkayNsBEsSVCOOckATb5yRLACmQcex2I2zcoRxH2
+ B4LBJkPYH4xEjPWnADSRXJiwV1hHlHQFlaxs6FDYQdK4i5q5IhlDHHSsnMwd2rmmSnQsABovpKxQ
+ aBiJZCMrZy.xtj62nlXDztqSV2o7lP69_L2guyMmfkkecAbA4K1kEh.fQDPkIp_fTKXgQX3lZD2V
+ ZfMkU87EDDztmfi3fzg5jcUMcnZKZP9EBSdzM_zcHcscDnkYbjFz09pzul.dRO7VltyUSGrWLGkF
+ vE1dEAVgLlIEY39FKgdPeIfC.npY07aqg7yTIP42xvjvgs79_aTSpHn.LItciy6cSUk_PMS228sE
+ Nr89L5EfR3rQrhOl_e0ER83vFU1JPBjTV_Q--
+X-Sonic-MF: <chaosesqueteam@yahoo.com>
+X-Sonic-ID: a9a50c8d-9fac-4aaf-8c30-4f44041f89dc
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic318.consmr.mail.gq1.yahoo.com with HTTP; Mon, 25 Dec 2023 10:24:55 +0000
+Date: Mon, 25 Dec 2023 10:24:51 +0000 (UTC)
+From: "chaosesqueteam@yahoo.com" <chaosesqueteam@yahoo.com>
+To: "polarian@polarian.dev" <polarian@polarian.dev>, 
+	"misc@openbsd.org" <misc@openbsd.org>, 
+	"tech@openbsd.org" <tech@openbsd.org>, Jan Stary <hans@stare.cz>, 
+	Rudy Zijlstra <rudy@grumpydevil.homelinux.org>
+Cc: Richard Stallman <rms@gnu.org>, Bruce Perens <bruce@perens.com>, 
+	Aditya Pakki <pakki001@umn.edu>, 
+	Anna Schumaker <anna.schumaker@netapp.com>, 
+	"ansgar@debian.org" <ansgar@debian.org>, 
+	"blukashev@sempervictus.com" <blukashev@sempervictus.com>, 
+	Chuck Lever <chuck.lever@oracle.com>, 
+	Dave Wysochanski <dwysocha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	"editor@lwn.net" <editor@lwn.net>, 
+	"esr@thyrsus.com" <esr@thyrsus.com>, 
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, 
+	"J. Bruce Fields" <bfields@fieldses.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Networking <netdev@vger.kernel.org>, 
+	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>, 
+	"moglen@columbia.edu" <moglen@columbia.edu>, 
+	"skraw.ml@ithnet.com" <skraw.ml@ithnet.com>, 
+	"tcallawa@redhat.com" <tcallawa@redhat.com>, 
+	"torvalds@linuxfoundation.org" <torvalds@linuxfoundation.org>, 
+	"torvalds@osdl.org" <torvalds@osdl.org>, 
+	Trond Myklebust <trond.myklebust@hammerspace.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, 
+	Julia Lawall <julia.lawall@inria.fr>, 
+	Paolo Abeni <pabeni@redhat.com>, 
+	"jon@elytron.openbsd.amsterdam" <jon@elytron.openbsd.amsterdam>, 
+	"netbsd-current-users@netbsd.org" <netbsd-current-users@netbsd.org>, 
+	"netbsd-users@netbsd.org" <netbsd-users@netbsd.org>
+Message-ID: <609690527.4210086.1703499891491@mail.yahoo.com>
+In-Reply-To: <e274b55d-9818-0919-fb90-bc6d0b522b0e@grumpydevil.homelinux.org>
+References: <549578214.4148875.1703446908152.ref@mail.yahoo.com> <549578214.4148875.1703446908152@mail.yahoo.com> <e274b55d-9818-0919-fb90-bc6d0b522b0e@grumpydevil.homelinux.org>
+Subject: Re: I can't get contributors for my C project. Can you help?
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.21952 YMailNorrin
 
-The original commit for sockptr_t tried to use the pointer value
-to determine whether a pointer was user or kernel.
-This can't work on some architecures and was buffy on x86.
-So the is_kernel descriminator was added after the union of pointers.
+Pathetic
 
-However this is still open to misuse and accidents.
-Replace the union with a struct and remove the is_kernel member.
-The user and kernel values are now in different places.
-The size doesn't change - it was always padded out to 'two pointers'.
 
-The only functional difference is that NULL pointers are always 'user'.
-So dereferncing will (usually) fault in copy_from_user() rather than
-panic if supplied as a kernel address.
 
-Simple driver code that uses kernel sockets still works.
-I've not tested bpf - but that should work unless it is breaking
-the rules.
 
-Signed-off-by: David Laight <david.laight@aculab.com>
----
- include/linux/sockptr.h | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
-index 307961b41541..7516c2ada6a8 100644
---- a/include/linux/sockptr.h
-+++ b/include/linux/sockptr.h
-@@ -12,21 +12,18 @@
- #include <linux/uaccess.h>
-=20
- typedef struct {
--=09union {
--=09=09void=09=09*kernel;
--=09=09void __user=09*user;
--=09};
--=09bool=09=09is_kernel : 1;
-+=09void=09=09*kernel;
-+=09void __user=09*user;
- } sockptr_t;
-=20
- static inline bool sockptr_is_kernel(sockptr_t sockptr)
- {
--=09return sockptr.is_kernel;
-+=09return !!sockptr.kernel;
- }
-=20
- static inline sockptr_t KERNEL_SOCKPTR(void *p)
- {
--=09return (sockptr_t) { .kernel =3D p, .is_kernel =3D true };
-+=09return (sockptr_t) { .kernel =3D p };
- }
-=20
- static inline sockptr_t USER_SOCKPTR(void __user *p)
-@@ -36,9 +33,7 @@ static inline sockptr_t USER_SOCKPTR(void __user *p)
-=20
- static inline bool sockptr_is_null(sockptr_t sockptr)
- {
--=09if (sockptr_is_kernel(sockptr))
--=09=09return !sockptr.kernel;
--=09return !sockptr.user;
-+=09return !sockptr.user && !sockptr.kernel;
- }
-=20
- static inline int copy_from_sockptr_offset(void *dst, sockptr_t src,
---=20
-2.17.1
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+On Sunday, December 24, 2023 at 03:25:55 PM EST, Rudy Zijlstra <rudy@grumpydevil.homelinux.org> wrote: 
 
+
+
+
+
+blacklisted. Long ago i needed to do that...
+
+On 24-12-2023 20:41, chaosesqueteam@yahoo.com wrote:
+> Note: This is about Unreal map support in this project: sf.net/p/chaosesqueanthology/tickets/2/
+> Which is an opensource project. White people will not help
+> me because, as Polaris here says, they are feminist scum.
+>
+>> Hello,
+>> In case this is not a troll,
+> It is not
+>> and is a stupid narcissistic teenager who
+> Also incorrect. 37 years old.
+>
+>> thinks the way open source functions is via extremism and horrific
+>> sexism, and promotion of terrorism, I will respond.
+> I've likely been an opensource/freesoftware programmer longer than you.
+> Maybe not; maybe so; but I'm not the neophyte you take me to be.
+>
+>> Congratulations, you will not find a single contributor, if you think
+>> that storming into a public mailing list spewing sexist comments, and
+> "All opensource C programmers are pro-women's right's dick-chopping faggots
+> as their new-testament demi-god tells them to be (matthew 19 greek)"
+>
+> I thought there was more religious plularity amongst them.
+> There used to be.
+>
+> Want a religious war? We can do that if that's what you're up for.
+> If you are all our enemies than we'll treat you as such.
+> Do you understand what I am saying: ? Do you?
+>
+>> then supporting terrorism is the way open source functions, then you
+> Why shouldn't one (morally) "support" those who slaughter feminists, and
+> in the alternative,
+> ensure men may marry female children, as YHWH's Law commands in
+> Devarim chapter 22 verse 28 (greek, hebrew, latin, not english (white fuck))
+> ?
+>
+> Tell me?
+> Should I "not support" the hellenistic greeks who put the Amazons to the sword?
+> And introduced an epoc of rape for young virgin child brides? (Zeus was a rapist)
+> (white faggot males seethe while clutching their New Testament "BETTER A MILLSTONE")
+> (english) ("CHOP OFF DICK FOR HEAVEN!!!" "NO MALE NORE FEEMALLE!!")
+>
+> In hebrew it's called "tahphas" btw. Also supported by the actual God you white scum
+> try to bury.
+>
+>> have the complete wrong idea.
+> When I started opensource/freesoftware programming it wasn't all woman
+> worshiping faggot white christian scum. Guess it is now. Regardless of
+> whether your pro-woman teachings are acknowleged from the New Testament
+> or not by you.
+> (hint: that's where they're from, uneducated trash)
+>
+>> Best choice of action would be to not speak any further, and at the
+> How would that get me contributors to assist in additional map format support?
+> It wouldn't.
+>> minimum apologise to Jan,
+> Jan is some cunt who opposes child brides and is mad that the taliban are
+> raping their little girl wives as we speak.
+> No I will not apologize to Jan.
+> Especially since you allready gave up the "secret" that no opensource programmers
+> will help anyone who isn't a woman worshiping faggot piece of shit.
+>
+> I'm so fucking glad your feminists have been killed in
+> 1) Central Asia
+> 2) Iran.
+>
+> Anyone opposed to men having young virgin girls as brides, deserves that fate.
+>> but I doubt anyone will take you seriously
+> I'm simply asking for some more map format compatability.
+> I did several myself.
+>
+>> moving forward now anyways.
+>> Best way to deal with people like this is simply to ignore. Note to the
+> Best way to deal with feminists is to kill them dead: like the Taliban did.
+> The only way men can get their rights back is to do what the Hellenistic Greeks
+> did in their history: that is to slaughter people like you who uphold women's
+> rights.
+>
+>> mailing list is I did offlist the user in response to their previous
+>> email, which was aimed to provide feedback on how to properly ask for
+>> help, and how openbsd is not a freelancing community for random C
+>> projects. I did not receive a response so they obviously aren't here
+>> for any decent reason, and are likely a troll.
+>> Please now get out my mailbox and go somewhere else, I rather read
+>> constructive emails instead of spiteful sh*t.
+> Want me to physically fuck you up dipshit?
+> How about you go talk to a wall.
+>
+> My emails are about Unreal Map support in an opensource engine.
+> Not you showing how much of a white faggot that you are.
+> Do you understand that?
+>
+> sf.net/p/chaosesqueanthology/tickets/2/
+>> Take care,
+>> --
+>> Polarian
+>> GPG signature: 0770E5312238C760
+>> Website: https://polarian.dev
+>> JID/XMPP: polarian@icebound.dev
 
