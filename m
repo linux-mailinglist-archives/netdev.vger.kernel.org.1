@@ -1,110 +1,119 @@
-Return-Path: <netdev+bounces-60179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E216B81DF90
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:46:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A46381DF91
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 10:47:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 115BA1C2176D
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:46:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB6CA1C217A3
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 09:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2969E154BA;
-	Mon, 25 Dec 2023 09:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 325E615EBB;
+	Mon, 25 Dec 2023 09:47:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TxBqeFk9"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FD12E401
-	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 09:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-208-Cs0Dl5VhNx-9eQZLK7BORg-1; Mon, 25 Dec 2023 09:46:46 +0000
-X-MC-Unique: Cs0Dl5VhNx-9eQZLK7BORg-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 25 Dec
- 2023 09:46:23 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 25 Dec 2023 09:46:23 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "David S . Miller"
-	<davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>
-CC: "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>, "martin.lau@linux.dev"
-	<martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>, "Stephen
- Hemminger" <stephen@networkplumber.org>, Jens Axboe <axboe@kernel.dk>,
-	"Daniel Borkmann" <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>
-Subject: [PATCH net-next 0/4] sockptr: Change sockptr_t to be a struct
-Thread-Topic: [PATCH net-next 0/4] sockptr: Change sockptr_t to be a struct
-Thread-Index: Ado3FihDgm7OKd4BQLS3SCVxCLscZA==
-Date: Mon, 25 Dec 2023 09:46:23 +0000
-Message-ID: <199c9af56a5741feaf4b1768bf7356be@AcuMS.aculab.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07250171B4
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 09:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703497640; x=1735033640;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Rlpd3UlQEWJrxpTZBvVC4ryivn0KgIhOOqKJ7HEBPMM=;
+  b=TxBqeFk9PcqZJEv7jPRYzJCZDRLQEDm/QKmFPu/FxotvfuZHvV49T0KK
+   a40GD716QYw7aTyPSw0Qp73EmrolDudT5adVKUeKmRtwrGwzyo7tNNQD7
+   zAP34yKu/QGQBCVgaLCpbAPmoRmKJnA6QJVLsfe4RinMA1byoV4HQJFxR
+   x1rYeN2tSrsWJC5qycF8yppUIjZb1s98oi6p3t7FpEyrrKW0PiD20QKzo
+   OJKzDY4OUlqEauQwWfysjqgx9FIN6gHFn4RqeEwJ4w+gKEbp6hHZ7hijr
+   5TYfl714pUXuFAI4i/+6z2KSwwcpecJGtsz6HHTAm33+z09idxiuIvjIi
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="400101374"
+X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
+   d="scan'208";a="400101374"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 01:47:19 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="777693071"
+X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
+   d="scan'208";a="777693071"
+Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.245.129.131]) ([10.245.129.131])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 01:47:16 -0800
+Message-ID: <c3f3e361-e875-41fb-929c-ea3f0773c8d3@linux.intel.com>
+Date: Mon, 25 Dec 2023 11:47:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2 1/2] igc: Report VLAN
+ EtherType matching back to user
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+To: Kurt Kanzenbach <kurt@linutronix.de>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+References: <20231201075043.7822-1-kurt@linutronix.de>
+ <20231201075043.7822-2-kurt@linutronix.de>
+From: "naamax.meir" <naamax.meir@linux.intel.com>
+In-Reply-To: <20231201075043.7822-2-kurt@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The original commit for sockptr_t tried to use the pointer value
-to determine whether a pointer was user or kernel.
-This can't work on some architectures and was buggy on x86.
-So the is_kernel discriminator was added after the union of pointers.
+On 12/1/2023 09:50, Kurt Kanzenbach wrote:
+> Currently the driver allows to configure matching by VLAN EtherType.
+> However, the retrieval function does not report it back to the user. Add
+> it.
+> 
+> Before:
+> |root@host:~# ethtool -N enp3s0 flow-type ether vlan-etype 0x8100 action 0
+> |Added rule with ID 63
+> |root@host:~# ethtool --show-ntuple enp3s0
+> |4 RX rings available
+> |Total 1 rules
+> |
+> |Filter: 63
+> |        Flow Type: Raw Ethernet
+> |        Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
+> |        Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
+> |        Ethertype: 0x0 mask: 0xFFFF
+> |        Action: Direct to queue 0
+> 
+> After:
+> |root@host:~# ethtool -N enp3s0 flow-type ether vlan-etype 0x8100 action 0
+> |Added rule with ID 63
+> |root@host:~# ethtool --show-ntuple enp3s0
+> |4 RX rings available
+> |Total 1 rules
+> |
+> |Filter: 63
+> |        Flow Type: Raw Ethernet
+> |        Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
+> |        Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
+> |        Ethertype: 0x0 mask: 0xFFFF
+> |        VLAN EtherType: 0x8100 mask: 0x0
+> |        VLAN: 0x0 mask: 0xffff
+> |        User-defined: 0x0 mask: 0xffffffffffffffff
+> |        Action: Direct to queue 0
+> 
+> Fixes: 2b477d057e33 ("igc: Integrate flex filter into ethtool ops")
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> ---
+>   drivers/net/ethernet/intel/igc/igc_ethtool.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
 
-However this is still open to misuse and accidents.
-Replace the union with a struct and remove the is_kernel member.
-The user and kernel values are now in different places.
-The structure size doesn't change - it was always padded out to 'two pointe=
-rs'.
-
-The only functional difference is that NULL pointers are always 'user'.
-So dereferencing will (usually) fault in copy_from_user() rather than
-panic if supplied as a kernel address.
-
-Simple driver code that uses kernel sockets still works.
-I've not tested bpf - but that should work unless it is breaking
-the rules.
-
-The first three patches just change the code to use the helpers
-from sockptr.h.
-The functional change is in the fourth patch.
-
-
-David Laight (4):
-  Use sockptr_is_kernel() instead of testing is_kernel.
-  Use bpfptr_is_kernel() instead of checking the is_kernel member.
-  Use the sockptr_t helpers.
-  Change sockptr_t to be a struct of a kernel and user pointer.
-
- include/linux/bpfptr.h   | 10 ++++------
- include/linux/sockptr.h  | 15 +++++----------
- kernel/bpf/bpf_iter.c    |  2 +-
- kernel/bpf/btf.c         |  2 +-
- kernel/bpf/syscall.c     | 12 ++++++------
- kernel/bpf/verifier.c    | 10 +++++-----
- net/ipv4/ip_sockglue.c   |  2 +-
- net/ipv6/ipv6_sockglue.c |  2 +-
- net/socket.c             |  2 +-
- 9 files changed, 25 insertions(+), 32 deletions(-)
-
---=20
-2.17.1
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
 
