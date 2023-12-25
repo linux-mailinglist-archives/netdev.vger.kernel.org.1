@@ -1,110 +1,83 @@
-Return-Path: <netdev+bounces-60193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17CD381E030
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 12:47:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F8081E02A
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 12:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDB5E28132B
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 11:47:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC63EB2100D
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 11:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9845102C;
-	Mon, 25 Dec 2023 11:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F3951028;
+	Mon, 25 Dec 2023 11:40:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D253051027;
-	Mon, 25 Dec 2023 11:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from luzhipeng.223.5.5.5 (unknown [125.120.146.113])
-	by mail-app3 (Coremail) with SMTP id cC_KCgCnHHC0a4llSthxAQ--.18589S2;
-	Mon, 25 Dec 2023 19:47:01 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: Simon Horman <horms@kernel.org>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Martin Habets <habetsm.xilinx@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-net-drivers@amd.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] [v2] sfc: fix a double-free bug in efx_probe_filters
-Date: Mon, 25 Dec 2023 19:29:14 +0800
-Message-Id: <20231225112915.3544581-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C636651027
+	for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 11:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35ff20816f7so17042975ab.1
+        for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 03:40:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703504404; x=1704109204;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=71kCgbM33utaKn5BMCDrTj5PJAG7kVfOyQV51IZQKBQ=;
+        b=e0ETo4xMUAPDHpGQNMcXXnTwkipfe93nC9mVrZYJK9/3iL4cBevs50gJZpFRg1AtDV
+         3IIAe1W1IYEtySffVakbe7BfiXI4FXKWa05mHjrEHtk3xjiNycSZLgJscltQpSHeTDMg
+         QJUlfUmkVI2rtlBsjjhqHRtyCEpEs+z/WtP0uFnAxM3jhx5IatGriJUhIiOsCC2dS0Rr
+         RmH/3g6alD8CRh+3cIp/5iQ9LQXpVr3dxuWs1Pc/C6gZ3CLK4QjxVfZFgCyZrBUefJ8C
+         9ihCAeKri1Mo8MDaguNJYi7yr7Pu+5kPRKtw2+uCICkQ8T4EABlYSaXVOQvTGk5BNChi
+         vubg==
+X-Gm-Message-State: AOJu0YxaQBP+UM78gizHdiXCb5w1ExHgcwIIftXcZ59TQ6VpWKtkTECm
+	Cmy/VDMLEm58mTxUS6SDFkxH5uqdBVWGHuu3N3F1LOhmZJRZ
+X-Google-Smtp-Source: AGHT+IFhxcJ9tk5FyfUnUpIIbakXuToDfa46uJd5K9yO2+cEAsusUl61NtfW50SDPW/cdQOaoTXt432KoUncWYcBxMOHU8A65NXf
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cC_KCgCnHHC0a4llSthxAQ--.18589S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFWDZF48ZrWfAFy8Kry8Xwb_yoW8GF4xpa
-	yYk342gr1rXF15W3WkJ34kZF98AayDXa47WFnIkw4fuw1qyrn8Cw1Sqaya9ryDArW3Aa1a
-	vwnYyr1UZ3ZxAFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
-	DUUUUU=
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
+X-Received: by 2002:a05:6e02:148d:b0:360:fa:2c2c with SMTP id
+ n13-20020a056e02148d00b0036000fa2c2cmr126623ilk.6.1703504404109; Mon, 25 Dec
+ 2023 03:40:04 -0800 (PST)
+Date: Mon, 25 Dec 2023 03:40:04 -0800
+In-Reply-To: <0000000000004c51dd0605109d19@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e16572060d5406f8@google.com>
+Subject: Re: [syzbot] [bluetooth?] general protection fault in lock_sock_nested
+From: syzbot <syzbot+d3ccfb78a0dc16ffebe3@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, hdanton@sina.com, 
+	johan.hedberg@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, pav@iki.fi, 
+	syzkaller-bugs@googlegroups.com, william.xuanziyang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-In efx_probe_filters, the channel->rps_flow_id is freed in a
-efx_for_each_channel marco  when success equals to 0.
-However, after the following call chain:
+syzbot suspects this issue was fixed by commit:
 
-ef100_net_open
-  |-> efx_probe_filters
-  |-> ef100_net_stop
-        |-> efx_remove_filters
+commit 181a42edddf51d5d9697ecdf365d72ebeab5afb0
+Author: Ziyang Xuan <william.xuanziyang@huawei.com>
+Date:   Wed Oct 11 09:57:31 2023 +0000
 
-The channel->rps_flow_id is freed again in the efx_for_each_channel of
-efx_remove_filters, triggering a double-free bug.
+    Bluetooth: Make handle of hci_conn be unique
 
-Fixes: a9dc3d5612ce ("sfc_ef100: RX filter table management and related gubbins")
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
----
-Changelog:
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15f7f6cee80000
+start commit:   ae074e2b2fd4 sfc: check for zero length in EF10 RX prefix
+git tree:       net
+kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
+dashboard link: https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13075977a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1012d447a80000
 
-v2: Correct the call-chain description in commit message and change
-patch subject.
----
- drivers/net/ethernet/sfc/rx_common.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+If the result looks correct, please mark the issue as fixed by replying with:
 
-diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
-index d2f35ee15eff..fac227d372db 100644
---- a/drivers/net/ethernet/sfc/rx_common.c
-+++ b/drivers/net/ethernet/sfc/rx_common.c
-@@ -823,8 +823,10 @@ int efx_probe_filters(struct efx_nic *efx)
- 		}
- 
- 		if (!success) {
--			efx_for_each_channel(channel, efx)
-+			efx_for_each_channel(channel, efx) {
- 				kfree(channel->rps_flow_id);
-+				channel->rps_flow_id = NULL;
-+			}
- 			efx->type->filter_table_remove(efx);
- 			rc = -ENOMEM;
- 			goto out_unlock;
--- 
-2.34.1
+#syz fix: Bluetooth: Make handle of hci_conn be unique
 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
