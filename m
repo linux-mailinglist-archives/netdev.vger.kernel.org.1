@@ -1,200 +1,116 @@
-Return-Path: <netdev+bounces-60214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B046D81E1EB
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 18:57:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F33FA81E233
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 20:56:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACCABB21766
-	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 17:56:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87D23B21791
+	for <lists+netdev@lfdr.de>; Mon, 25 Dec 2023 19:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC5752F9C;
-	Mon, 25 Dec 2023 17:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D863F53809;
+	Mon, 25 Dec 2023 19:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="imjIsMJH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NxYtli9Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857F952F89;
-	Mon, 25 Dec 2023 17:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703527010; x=1735063010;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=c5WnwSj/pGFg6EsfD20VqFkZJ5FQAgS830qZCY8nWrU=;
-  b=imjIsMJHj2LCpbqlwZZxZVKJLzTBuXNGsPs5w6pDuwVj5VET/5meLEw1
-   PSpIT0+xa4Exxh2jv8YlLkxo/uapHus7zAYIB24otDrAjF8keTg0RPZEk
-   adofO3WuLx4R4TrGgPW+h0Z5tadQgexuHqhQxvLP9foIE5gCHG3UZpff+
-   aow68B08abAaVKnoLHtXBZ7cAQeTRCn1DAA4/yuRMOzEQ1f+oC5toNiUN
-   J2v57s6rBjfU0pA1o1xDCZ5iLqpQ7an4CY3Ou3j8beo8hcOR0K7xAHS0i
-   Arg48wv5kH0i9Cj1q22ZCqtRaD04mA9RnU0h63ILZ4La+HhriYDimLqC1
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="393458090"
-X-IronPort-AV: E=Sophos;i="6.04,303,1695711600"; 
-   d="scan'208";a="393458090"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 09:56:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="781283964"
-X-IronPort-AV: E=Sophos;i="6.04,303,1695711600"; 
-   d="scan'208";a="781283964"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga007.fm.intel.com with ESMTP; 25 Dec 2023 09:56:45 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rHpB0-000DWp-2B;
-	Mon, 25 Dec 2023 17:56:17 +0000
-Date: Tue, 26 Dec 2023 01:53:13 +0800
-From: kernel test robot <lkp@intel.com>
-To: Zhipeng Lu <alexious@zju.edu.cn>
-Cc: oe-kbuild-all@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Simo Sorce <simo@redhat.com>, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] SUNRPC: fix some memleaks in gssx_dec_option_array
-Message-ID: <202312260138.JJkoofSt-lkp@intel.com>
-References: <20231224082424.3539726-1-alexious@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A9D537F1;
+	Mon, 25 Dec 2023 19:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-67f9fac086bso25831486d6.3;
+        Mon, 25 Dec 2023 11:55:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703534157; x=1704138957; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v+5mdzcIi0J0U/jyti3PngFAcX/L3/DjChGGJD4WjO0=;
+        b=NxYtli9ZFO+nMhFI9jJM7AmM0UEQP1AYBBIsOQxfutncfFzrXXCl15MO/db7qTycZK
+         E+BH/bT9aSglTtOFm3KR2+eZigo1JECteRjB+Lf6D4H+VUekocZzQOW9kNtiT6vNAEdu
+         eyULYF4OpMBf9aO1e3D6n6vle9kAczFQsb+PP3Gpcj0oNr7p6TzgdohHThbsm/UKZGkI
+         b7vElq1p6YB//aONShEDs/fdGYpRWY/CXq75zdr+SSC1pzI1Yeu71uwlTIlo01Fasmfd
+         zmN59m49OnC7ZyKAwFOtXPoIG+DlBtpEIU1qiuOKJ3GnObSqiIA8sdeJ/CFmjuNqHnfP
+         vTTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703534157; x=1704138957;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v+5mdzcIi0J0U/jyti3PngFAcX/L3/DjChGGJD4WjO0=;
+        b=MfRAV5ecmWVJGgpiky0hi3GmiB0RSj+818pzkavsUq3u4xlw+Whbpcbc4NR5ck1qNu
+         mzcma0jmC70uzLWUrPKdfEreDwKq/4KUHcuv50N6x93Ea0w6D5niLKf+VqYbmmktx+dR
+         p/wzOi9BfKKdLdt4VCrQiHo7gACGfG9umiT0lEHhZ5QJd1G1H52wPrcp25SfIZSe3LJu
+         qsrKc7seUPyYM3N5xNz4c1jHqGLQbBsDPt3yFtFm9t9Evr+B6lr0lA9cg6lXJbFBJxGZ
+         N7io5fHfSC5x1GBHnVGrxyrUjEKl7ebN4OVw9EPlUrU//1Fuw8ySkFOPhyunRP3aN9l5
+         Q0KQ==
+X-Gm-Message-State: AOJu0YzROFql4ZIsbY1+HX9/cPP1tbA3e8CECrK5NuBBHPpoHCInyVBG
+	ikQqfEgCpEjx2AuIkPwvZPFRqML9CAnc1JlNO8I=
+X-Google-Smtp-Source: AGHT+IGXQ1DzDW/z7mbnW1aKOma9kP1mZ08AqBa7wFFHcRRfcWmagU8jQFFGhrorFhUOmpGd2hGTlBhrmy9h8xA7nx4=
+X-Received: by 2002:ad4:5c49:0:b0:67f:6982:edb4 with SMTP id
+ a9-20020ad45c49000000b0067f6982edb4mr13149244qva.14.1703534157222; Mon, 25
+ Dec 2023 11:55:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231224082424.3539726-1-alexious@zju.edu.cn>
+References: <20231212-ep93xx-v6-0-c307b8ac9aa8@maquefel.me>
+ <ZXnxBtqbneUMbvwq@smile.fi.intel.com> <d6e898200b96e816ea8c8c9a847307088ec5821c.camel@maquefel.me>
+In-Reply-To: <d6e898200b96e816ea8c8c9a847307088ec5821c.camel@maquefel.me>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Mon, 25 Dec 2023 21:55:20 +0200
+Message-ID: <CAHp75Vcx8oviLiCu=cnzKcdXjEq9wG=PCiBuPTBYe6FFfUcz7Q@mail.gmail.com>
+Subject: Re: [PATCH v6 00/40] ep93xx device tree conversion
+To: Nikita Shubin <nikita.shubin@maquefel.me>
+Cc: Andy Shevchenko <andy@kernel.org>, Hartley Sweeten <hsweeten@visionengravers.com>, 
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Lukasz Majewski <lukma@denx.de>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Sebastian Reichel <sre@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>, 
+	Guenter Roeck <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
+	Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	Sergey Shtylyov <s.shtylyov@omp.ru>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-pm@vger.kernel.org, devicetree@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-watchdog@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-sound@vger.kernel.org, 
+	Arnd Bergmann <arnd@arndb.de>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Andrew Lunn <andrew@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Zhipeng,
+On Sat, Dec 23, 2023 at 11:13=E2=80=AFAM Nikita Shubin
+<nikita.shubin@maquefel.me> wrote:
+> On Wed, 2023-12-13 at 19:59 +0200, Andy Shevchenko wrote:
 
-kernel test robot noticed the following build errors:
+...
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.7-rc7 next-20231222]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> I haven't found any missing tags, that b4 didn't apply, the ones above
+> refer to a very old iteration and were given to cover letter and i
+> don't feel like they need to be included.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Zhipeng-Lu/SUNRPC-fix-some-memleaks-in-gssx_dec_option_array/20231225-152918
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20231224082424.3539726-1-alexious%40zju.edu.cn
-patch subject: [PATCH] SUNRPC: fix some memleaks in gssx_dec_option_array
-config: nios2-randconfig-r081-20231225 (https://download.01.org/0day-ci/archive/20231226/202312260138.JJkoofSt-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231226/202312260138.JJkoofSt-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312260138.JJkoofSt-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   net/sunrpc/auth_gss/gss_rpc_xdr.c: In function 'gssx_dec_option_array':
->> net/sunrpc/auth_gss/gss_rpc_xdr.c:270:25: error: expected ';' before 'goto'
-     270 |                         goto free_creds;
-         |                         ^~~~
-   net/sunrpc/auth_gss/gss_rpc_xdr.c:277:25: error: expected ';' before 'goto'
-     277 |                         goto free_creds;
-         |                         ^~~~
->> net/sunrpc/auth_gss/gss_rpc_xdr.c:301:1: warning: label 'err' defined but not used [-Wunused-label]
-     301 | err:
-         | ^~~
+When somebody gives you a tag against a cover letter, it means the
+entire series (if not spelled differently). `b4` even has a parameter
+-t for that IIRC.
 
 
-vim +270 net/sunrpc/auth_gss/gss_rpc_xdr.c
-
-   228	
-   229	static int gssx_dec_option_array(struct xdr_stream *xdr,
-   230					 struct gssx_option_array *oa)
-   231	{
-   232		struct svc_cred *creds;
-   233		u32 count, i;
-   234		__be32 *p;
-   235		int err;
-   236	
-   237		p = xdr_inline_decode(xdr, 4);
-   238		if (unlikely(p == NULL))
-   239			return -ENOSPC;
-   240		count = be32_to_cpup(p++);
-   241		if (!count)
-   242			return 0;
-   243	
-   244		/* we recognize only 1 currently: CREDS_VALUE */
-   245		oa->count = 1;
-   246	
-   247		oa->data = kmalloc(sizeof(struct gssx_option), GFP_KERNEL);
-   248		if (!oa->data)
-   249			return -ENOMEM;
-   250	
-   251		creds = kzalloc(sizeof(struct svc_cred), GFP_KERNEL);
-   252		if (!creds) {
-   253			err = -ENOMEM;
-   254			goto free_oa;
-   255		}
-   256	
-   257		oa->data[0].option.data = CREDS_VALUE;
-   258		oa->data[0].option.len = sizeof(CREDS_VALUE);
-   259		oa->data[0].value.data = (void *)creds;
-   260		oa->data[0].value.len = 0;
-   261	
-   262		for (i = 0; i < count; i++) {
-   263			gssx_buffer dummy = { 0, NULL };
-   264			u32 length;
-   265	
-   266			/* option buffer */
-   267			p = xdr_inline_decode(xdr, 4);
-   268			if (unlikely(p == NULL)) {
-   269				err = -ENOSPC
- > 270				goto free_creds;
-   271			}
-   272	
-   273			length = be32_to_cpup(p);
-   274			p = xdr_inline_decode(xdr, length);
-   275			if (unlikely(p == NULL)) {
-   276				err = -ENOSPC
-   277				goto free_creds;
-   278			}
-   279	
-   280			if (length == sizeof(CREDS_VALUE) &&
-   281			    memcmp(p, CREDS_VALUE, sizeof(CREDS_VALUE)) == 0) {
-   282				/* We have creds here. parse them */
-   283				err = gssx_dec_linux_creds(xdr, creds);
-   284				if (err)
-   285					goto free_creds;
-   286				oa->data[0].value.len = 1; /* presence */
-   287			} else {
-   288				/* consume uninteresting buffer */
-   289				err = gssx_dec_buffer(xdr, &dummy);
-   290				if (err)
-   291					goto free_creds;
-   292			}
-   293		}
-   294		return 0;
-   295	
-   296	free_creds:
-   297		kfree(creds);
-   298	free_oa:
-   299		kfree(oa->data);
-   300		oa->data = NULL;
- > 301	err:
-   302		return err;
-   303	}
-   304	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+With Best Regards,
+Andy Shevchenko
 
