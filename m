@@ -1,204 +1,120 @@
-Return-Path: <netdev+bounces-60265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 394F981E696
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:45:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDF6981E6BC
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ABFA1C2094A
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:45:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 786B72835FA
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ED6D4EB38;
-	Tue, 26 Dec 2023 09:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647CC4D5B6;
+	Tue, 26 Dec 2023 09:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="It3RE/TP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9933F4EB26
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 09:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VzHM.FN_1703583814;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VzHM.FN_1703583814)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Dec 2023 17:43:34 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: virtualization@lists.linux-foundation.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH v2] virtio_net: fix missing dma unmap for resize
-Date: Tue, 26 Dec 2023 17:43:33 +0800
-Message-Id: <20231226094333.47740-1-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0153F4D5A0
+	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 09:53:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a2370535060so945863566b.1
+        for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 01:53:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1703584385; x=1704189185; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FGcSKy9VLe5UH4WPuhkVUffKMD3KkfmFrJxOaiIXVDA=;
+        b=It3RE/TPxQ6sFBvGMgIGOLCpWWZkQJ3Gq/osIVT1YXuDO/LCG98zHEv9++8WvmJERz
+         b+NgFwV9s4RZrGhHALNeCnQzWBRaJQlTplexm+rClGAgXh6zGe5UTjOEUoks2IcjxhfK
+         qkid4/MItlgbN+s2Ay6DEn7F+RsbKv0Z0PDAt5rjXRTven3UzBleT+0RseNA6fBm9gqz
+         FyYyiYSrrWi4e5vVQqA8e5xoVCv2fx9+TIb0vsf5H0GVNo+zS1LYZqqtFJT8J30uvDr6
+         /IVJpteIXhRIMWQ0Zb1f/IaJnBkn2DpUqXhzBsjIfoPiRf3ighwFNk0VrAacy/zQZWIF
+         EWVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703584385; x=1704189185;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FGcSKy9VLe5UH4WPuhkVUffKMD3KkfmFrJxOaiIXVDA=;
+        b=gXkj9vSVRXGdfuFQRf1eMZYGbHmpQHyL92DZ3Eh5KxQkjpyRR+u0M8QTL4qFV13qRR
+         Cgqn6dUpHm71e22/au98cFh9YcLf7CyFhDFhyYNkLulUptnAgEDaQAJgn9OyB6DUnekN
+         PX5uzSImtyuGkSHFTT44qW1E0PLyApLYeD9VDOmdFCm1mTBr8txigmrGVXlkYIjwnWlU
+         epg3qqmE/r7p/B7lL+Zjy2eVT9gRL4OsaphkEIUgVLf22o7oVtemNuPnkHBv6lFp/hsL
+         6Wfcx8aB4gsX538ytjFWvW6uY3DZeKPK1v3iOWVpzrtyBU9A0l8xmxRc+BbFJVbzVlgZ
+         H8RA==
+X-Gm-Message-State: AOJu0YwSGSNP8juxxZYtf2GJ5/XISqpHQf2HSOUCkVu2gIZsuNyt2kZz
+	X/fvQKWBmuIT6zMt12gFlmaNXQ+sYGwRxA==
+X-Google-Smtp-Source: AGHT+IHfkRM7maTPnpWNurNP3VuGJUQU+a17hwG/pPR1gKXEUpEQHINoAyYIu6TPQ9EVT5AshPgxPA==
+X-Received: by 2002:a17:906:6047:b0:a26:aaa1:4ff1 with SMTP id p7-20020a170906604700b00a26aaa14ff1mr6672885ejj.13.1703584385194;
+        Tue, 26 Dec 2023 01:53:05 -0800 (PST)
+Received: from u94a (2001-b011-fa04-d3bc-b2dc-efff-fee8-7e7a.dynamic-ip6.hinet.net. [2001:b011:fa04:d3bc:b2dc:efff:fee8:7e7a])
+        by smtp.gmail.com with ESMTPSA id g24-20020a170902fe1800b001d0c41b1d03sm9636234plj.32.2023.12.26.01.52.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Dec 2023 01:53:04 -0800 (PST)
+Date: Tue, 26 Dec 2023 17:52:56 +0800
+From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+To: Maxim Mikityanskiy <maxtram95@gmail.com>
+Cc: Eduard Zingerman <eddyz87@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>
+Subject: Re: [PATCH bpf-next 01/15] selftests/bpf: Fix the
+ u64_offset_to_skb_data test
+Message-ID: <w7xg34uqlrnbb3o3rspng6y563astp3hkfxjtz3xp32rqr4a42@xgpeu7qevatg>
+References: <20231220214013.3327288-1-maxtram95@gmail.com>
+ <20231220214013.3327288-2-maxtram95@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 46e187200fab
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231220214013.3327288-2-maxtram95@gmail.com>
 
-For rq, we have three cases getting buffers from virtio core:
+On Wed, Dec 20, 2023 at 11:39:59PM +0200, Maxim Mikityanskiy wrote:
+> From: Maxim Mikityanskiy <maxim@isovalent.com>
+> 
+> The u64_offset_to_skb_data test is supposed to make a 64-bit fill, but
+> instead makes a 16-bit one. Fix the test according to its intention. The
+> 16-bit fill is covered by u16_offset_to_skb_data.
 
-1. virtqueue_get_buf{,_ctx}
-2. virtqueue_detach_unused_buf
-3. callback for virtqueue_resize
+Cover letter mentioned
 
-But in commit 295525e29a5b("virtio_net: merge dma operations when
-filling mergeable buffers"), I missed the dma unmap for the #3 case.
+  Patch 1 (Maxim): Fix for an existing test, it will matter later in the
+  series.
 
-That will leak some memory, because I did not release the pages referred
-by the unused buffers.
+However no subsequent patch touch upon u64_offset_to_skb_data(). Was the
+followup missing from this series?
 
-If we do such script, we will make the system OOM.
-
-    while true
-    do
-            ethtool -G ens4 rx 128
-            ethtool -G ens4 rx 256
-            free -m
-    done
-
-Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
-
-v2: rename to virtnet_rq_unmap_free_buf()
-
- drivers/net/virtio_net.c | 60 ++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index d16f592c2061..51b1868d2f22 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -334,7 +334,6 @@ struct virtio_net_common_hdr {
- 	};
- };
-
--static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
- static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf);
-
- static bool is_xdp_frame(void *ptr)
-@@ -408,6 +407,17 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
- 	return p;
- }
-
-+static void virtnet_rq_free_buf(struct virtnet_info *vi,
-+				struct receive_queue *rq, void *buf)
-+{
-+	if (vi->mergeable_rx_bufs)
-+		put_page(virt_to_head_page(buf));
-+	else if (vi->big_packets)
-+		give_pages(rq, buf);
-+	else
-+		put_page(virt_to_head_page(buf));
-+}
-+
- static void enable_delayed_refill(struct virtnet_info *vi)
- {
- 	spin_lock_bh(&vi->refill_lock);
-@@ -634,17 +644,6 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
- 	return buf;
- }
-
--static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
--{
--	void *buf;
--
--	buf = virtqueue_detach_unused_buf(rq->vq);
--	if (buf && rq->do_dma)
--		virtnet_rq_unmap(rq, buf, 0);
--
--	return buf;
--}
--
- static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
- {
- 	struct virtnet_rq_dma *dma;
-@@ -744,6 +743,20 @@ static void virtnet_rq_set_premapped(struct virtnet_info *vi)
- 	}
- }
-
-+static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
-+{
-+	struct virtnet_info *vi = vq->vdev->priv;
-+	struct receive_queue *rq;
-+	int i = vq2rxq(vq);
-+
-+	rq = &vi->rq[i];
-+
-+	if (rq->do_dma)
-+		virtnet_rq_unmap(rq, buf, 0);
-+
-+	virtnet_rq_free_buf(vi, rq, buf);
-+}
-+
- static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
- {
- 	unsigned int len;
-@@ -1764,7 +1777,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
- 	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
- 		pr_debug("%s: short packet %i\n", dev->name, len);
- 		DEV_STATS_INC(dev, rx_length_errors);
--		virtnet_rq_free_unused_buf(rq->vq, buf);
-+		virtnet_rq_free_buf(vi, rq, buf);
- 		return;
- 	}
-
-@@ -2392,7 +2405,7 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
- 	if (running)
- 		napi_disable(&rq->napi);
-
--	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unused_buf);
-+	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_unmap_free_buf);
- 	if (err)
- 		netdev_err(vi->dev, "resize rx fail: rx queue index: %d err: %d\n", qindex, err);
-
-@@ -4031,19 +4044,6 @@ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
- 		xdp_return_frame(ptr_to_xdp(buf));
- }
-
--static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
--{
--	struct virtnet_info *vi = vq->vdev->priv;
--	int i = vq2rxq(vq);
--
--	if (vi->mergeable_rx_bufs)
--		put_page(virt_to_head_page(buf));
--	else if (vi->big_packets)
--		give_pages(&vi->rq[i], buf);
--	else
--		put_page(virt_to_head_page(buf));
--}
--
- static void free_unused_bufs(struct virtnet_info *vi)
- {
- 	void *buf;
-@@ -4057,10 +4057,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
- 	}
-
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
--		struct receive_queue *rq = &vi->rq[i];
-+		struct virtqueue *vq = vi->rq[i].vq;
-
--		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
--			virtnet_rq_free_unused_buf(rq->vq, buf);
-+		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
-+			virtnet_rq_unmap_free_buf(vq, buf);
- 		cond_resched();
- 	}
- }
---
-2.32.0.3.g01195cf9f
-
+> Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
+> [...]
+>  SEC("tc")
+>  __description("Spill u32 const scalars.  Refill as u64.  Offset to skb->data")
+> -__failure __msg("invalid access to packet")
+> +__failure __msg("math between pkt pointer and register with unbounded min value is not allowed")
+>  __naked void u64_offset_to_skb_data(void)
+>  {
+>  	asm volatile ("					\
+> @@ -253,7 +253,7 @@ __naked void u64_offset_to_skb_data(void)
+>  	w7 = 20;					\
+>  	*(u32*)(r10 - 4) = r6;				\
+>  	*(u32*)(r10 - 8) = r7;				\
+> -	r4 = *(u16*)(r10 - 8);				\
+> +	r4 = *(u64*)(r10 - 8);				\
+>  	r0 = r2;					\
+>  	/* r0 += r4 R0=pkt R2=pkt R3=pkt_end R4=umax=65535 */\
+>  	r0 += r4;					\
 
