@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-60300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8749D81E78D
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 14:18:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9617E81E792
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 14:19:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13D8E1F2238C
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 13:18:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 030431F2289C
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 13:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA694EB48;
-	Tue, 26 Dec 2023 13:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986BC4EB40;
+	Tue, 26 Dec 2023 13:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="twAAaFgJ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jeRVujRn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9724F200
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 13:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA134EB3B
+	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 13:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55361b7f38eso5068859a12.0
-        for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 05:18:23 -0800 (PST)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-555104e21faso852402a12.2
+        for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 05:19:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703596702; x=1704201502; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1703596778; x=1704201578; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0hWC4ky6Oznmoj/OdV9qVAf2TSAyAo5GtDnUFoSENCY=;
-        b=twAAaFgJ7qsEF8aWf7yDFKdWyDZVYnakR1TW1WfyChSNCjecJORjDPx4OA4O8Cqaas
-         Ax8oPswfYglkGbAmtqYRBlOMEdXSRJKc9fWrXDuariYcRAiN5kr/N26+0YVCQI41RW0z
-         cWJALQ3uK/5AON2U1l128ydOe3ZMzq81XMn2LAoU69PHQvISA3t4q3vDUTYNKJ4+llOO
-         3iYpl8k5PZ/vxVdLcKKnu/NL3C+RLNr9oEAHvc2qYOR4puVMQHWYxHzlif4WZrjZxKSD
-         DDPHkWjmQ+SPvr2+0BeFZwTKN12o1wtKyfxeXhzsXvSvOgkspLYtb+6vV6142lfZ5Yp1
-         BvoQ==
+        bh=65H5yRn6ppDlyOF5SbMYBjLvbO45G2k1XGu1rV4uUQs=;
+        b=jeRVujRngHA/+TukEPB0Xn3CzfPorlvD7wiI8Q47xEDVgjQWzR1txiDHpGBRn74MUL
+         1jVgdshAzwd9lfU89F/+M7NbNbhaya03idvl/fBkwRPwbQiQhQKT+e0A40v5Gs8pod7K
+         mBcE5ofPKwsQJ3XHc68E/rpTIWFO/yVLuDNU6rr23hETetteefWHKpmR1YeYUISPGRov
+         ctsNHxinBMvJHFzaN12HF6AJHG2ELcvUD7JbeOmSWony98ONZin+Yu9QZaPd9MslPldd
+         VXtt1yi17WWhXnZ6Lj/YkK31OuP8SUg3us1slg/VnK6yzVvm93v2YeJfMdyu3PbEvGZM
+         /0XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703596702; x=1704201502;
+        d=1e100.net; s=20230601; t=1703596778; x=1704201578;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0hWC4ky6Oznmoj/OdV9qVAf2TSAyAo5GtDnUFoSENCY=;
-        b=rO/gemC8dNl+Z3iSN/L6GEydkikRGh6tVs1bHs5yJHZRtlRQqZ3aSZ34tbTMOW/NOO
-         TPXcTpOYEinCg/EXM4rnXAwowL+XDXV6ieejXh4B3GXCrM9Xr/G9sXauJJfeuFjx/qXD
-         lXyRJ7dwAnXpJMmNZYcNYaLArVoMB8ylwPvaWKOqfhEYOU01C8iTO4Bfnimy7ddKfvyY
-         ij+heRS1UJ9Aa3JJG+Q4xKq8i7XiVgWtqu498gFNP4swo50kSUJ+svWVt3RF2HUgk2q3
-         GZPBgYw5I8AROT8xXXJi4xSyoNpypuncBBZzTtnCvfrpi7Sj9u6xqnspqYBNNDG8a2Lq
-         4Kzw==
-X-Gm-Message-State: AOJu0Yxtftbrzw8vC/vMLhKAEksPr0UNBs9uOdHHBX2WIeFhlKqHwdkD
-	vMoK1AtN726N5GGST6PWgYEc8v7d7aSR7w==
-X-Google-Smtp-Source: AGHT+IF/GOTzszbFp2n8UNjcRVN+dZC++0Dbk6pOPGO5J9ruweDrWW8tFCcMYgC/iiT0GMjLUjVdlQ==
-X-Received: by 2002:a50:d507:0:b0:553:3b48:473a with SMTP id u7-20020a50d507000000b005533b48473amr3218243edi.109.1703596701646;
-        Tue, 26 Dec 2023 05:18:21 -0800 (PST)
+        bh=65H5yRn6ppDlyOF5SbMYBjLvbO45G2k1XGu1rV4uUQs=;
+        b=rZ4Fj27JEqMEKHUh2iqpyiu5fgqyJlQRBYomA3nziq/7uAM6uinpX1XMSvo9kAzSnj
+         XFgHb9eY3XZkZuFnIlpXfGuigACz6AMw3aAUReDTUzcHkm8eancqUhEIkg3TVXDQ4dT7
+         Kx49DJKwNpkA3PtAOJ2HWD2jixmXTT7+ZXYepIT9uVOOsRY9fPevnoa/7gRmqOPoseBG
+         LpzBuTkthoVM5P2/MikeNHg+SER+X6GF/AlovVv0DjuBA9Xo6C2G3c0OP8tcdsdhKxKS
+         4aizI7zGKWDW++zf5uTxJdZicB5q3D9J9WAbLUnaEzI0CYz0YCRSu6Eed2gSb9Xk+wbg
+         7/Yg==
+X-Gm-Message-State: AOJu0YxMGzfEIh72shsjhexug3XLk8Ik//ufiFzMoO5Hz9Xr8rPkWeyi
+	eowGghxJoVLC205LsyBORdECzUNTVkeGow==
+X-Google-Smtp-Source: AGHT+IEcU9Xo370hyXvB7QF8wvkNeSo1X3a5qALqBUIce4wMlDS7lRQTgnObjOK6ztJYAu53e5kzEA==
+X-Received: by 2002:a50:8753:0:b0:553:453e:5531 with SMTP id 19-20020a508753000000b00553453e5531mr3643124edv.106.1703596778171;
+        Tue, 26 Dec 2023 05:19:38 -0800 (PST)
 Received: from [192.168.0.22] ([78.10.206.178])
-        by smtp.gmail.com with ESMTPSA id el13-20020a056402360d00b00552d03a17acsm7331459edb.61.2023.12.26.05.18.20
+        by smtp.gmail.com with ESMTPSA id el13-20020a056402360d00b00552d03a17acsm7331459edb.61.2023.12.26.05.19.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Dec 2023 05:18:21 -0800 (PST)
-Message-ID: <28c8b31c-8dcb-4a19-9084-22c77a74b9a1@linaro.org>
-Date: Tue, 26 Dec 2023 14:18:19 +0100
+        Tue, 26 Dec 2023 05:19:37 -0800 (PST)
+Message-ID: <2e58c0f6-08c0-4042-84da-f9b7a6020506@linaro.org>
+Date: Tue, 26 Dec 2023 14:19:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,12 +69,13 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v4 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
  platform
 Content-Language: en-US
-To: Jie Luo <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
- konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+To: Jie Luo <quic_luoj@quicinc.com>, Conor Dooley <conor@kernel.org>
+Cc: agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, robert.marko@sartura.hr,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
  quic_srichara@quicinc.com
 References: <20231225084424.30986-1-quic_luoj@quicinc.com>
@@ -82,7 +83,8 @@ References: <20231225084424.30986-1-quic_luoj@quicinc.com>
  <dee72ce8-b24e-467a-b265-1b965588807f@linaro.org>
  <aeb364a3-6c05-4a1b-ba32-e687a89f20f8@quicinc.com>
  <58dde1a7-ed4a-442c-bb5c-c3f6d926fb7e@linaro.org>
- <06ddbae8-1502-41fb-8cf8-9a3390dad557@quicinc.com>
+ <20231226-twine-smolder-713cb81fa411@spud>
+ <7ad0a344-4f24-4319-8f60-ed2521c21815@quicinc.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -128,104 +130,46 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <06ddbae8-1502-41fb-8cf8-9a3390dad557@quicinc.com>
+In-Reply-To: <7ad0a344-4f24-4319-8f60-ed2521c21815@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 26/12/2023 14:06, Jie Luo wrote:
+On 26/12/2023 14:14, Jie Luo wrote:
 > 
->>
->>
->>>
+>>>>>
+>>>>> This does not resolve mine and Conor's concerns from previous version.
+>>>>> External clocks are defined as clock inputs.
 >>>>
->>>>> +      the platform IPQ50xx/IPQ5332.
->>>>
->>>> So these are valid for all platforms or not? Looks not, but nothing
->>>> narrows the list for other boards.
+>>>> No matter the external or internal reference clock, they are the clock
+>>>> source selection for CMN, there are only 48MHZ can be external or
+>>>> internal, other clocks have the different clock rate, so the internal
+>>>> 48MHZ reference clock can be implied when the
+>>>> "qcom,cmn-ref-clock-frequency" is not defined, which is suggested by
+>>>> Conor in the previous
+>>>> comments.
 >>>
->>> i add the limitation on the reg usage for the ipq5332 platform on the
->>> following part "if condition" of this patch, i will update the patch
->>> to narrow down for the other compatibles.
->>>
->>>>
->>>> Anyway, why do you add entries in the middle? LDO was the second, so it
->>>> cannot be now fifth.
->>>
->>> As Rob's suggestion, i move the cmn_blk to second location for
->>> simplifying the limitation description, i checked the upstream dts code,
->>> the LDO is not used currently, so we can move cmn_blk to the second
->>> location here.
+>>> I don't think he proposed it, but maybe I missed some message (care to
+>>> point me to his message where he agreed on usage of
+>>> qcom,cmn-ref-clock-frequency?). I am pretty sure we both stayed on the
+>>> same page, that the presence of clocks defines choice of internal clock.
+>>> This property should go away.
 >>
->> I cannot find his suggestion in the previous thread. Where did he
->> propose it?
+>> Exactly, I wanted this property to be removed. My suggestion was about
+>> defaulting to the internal clock when the "clocks" property did not
+>> contain the cmn ref clock.
 > 
-> Rob suggested this on the V2 as below.
-> "
-> Perhaps cmn_blk should come 2nd, so all the variants have the same entry
-> indices. Then you can move this to the top level and just say 'minItems:
-> 4' here.
+> There are two internal reference clock sources 48MHZ and 96MHZ.
 
-Wasn't this for new devices? What about all existing which have LDO as
-the second entry?
+On which devices? Paste entire picture, not half-baked descriptions.
 
->>>>> +  qcom,cmn-ref-clock-frequency:
->>>>> +    $ref: /schemas/types.yaml#/definitions/uint32
->>>>> +    enum:
->>>>> +      - 25000000
->>>>> +      - 31250000
->>>>> +      - 40000000
->>>>> +      - 48000000
->>>>> +      - 50000000
->>>>> +      - 96000000
->>>>> +    default: 48000000
->>>>> +    description: |
->>>>> +      The reference clock source of CMN PLL block is selectable, the
->>>>> +      reference clock source can be from wifi module or the external
->>>>> +      xtal, the reference clock frequency 48MHZ can be from internal
->>>>> +      wifi or the external xtal, if absent, the internal 48MHZ is used,
->>>>> +      if the 48MHZ is specified, which means the external 48Mhz is used.
->>>>
->>>> This does not resolve mine and Conor's concerns from previous version.
->>>> External clocks are defined as clock inputs.
->>>
->>> No matter the external or internal reference clock, they are the clock
->>> source selection for CMN, there are only 48MHZ can be external or
->>> internal, other clocks have the different clock rate, so the internal
->>> 48MHZ reference clock can be implied when the
->>> "qcom,cmn-ref-clock-frequency" is not defined, which is suggested by
->>> Conor in the previous
->>> comments.
->>
->> I don't think he proposed it, but maybe I missed some message (care to
->> point me to his message where he agreed on usage of
->> qcom,cmn-ref-clock-frequency?). I am pretty sure we both stayed on the
->> same page, that the presence of clocks defines choice of internal clock.
->> This property should go away.
-> 
-> Sorry for this confusion.
-> Rob said the internal reference source can be decided by the absence of
-> the property combined with compatible string, because i said the
+> The 96MHZ is used on ipq5018 currently as i said in the previous
+> message, but it is also possible to used on ipq9574 per double checked,
+> since the possible reference clock source should be kept as configurable
+> and the clock source should not be limited on the specific IPQ platform,
+> since the clock source is configurable, the different clock source maybe
+> required by the different board design.
 
-So all your three DT maintainers agree that lack of property for
-choosing clock, defines the usage of interrupt source.
-
-Now we had huge amount of arguments that you do not represent properly
-the clock relationships. Still.
-
-> internal 96MHZ is used on ipq5018 currently in the previous message.
-> 
-> per double checked the current IPQ platforms, the internal 96MHZ is also
-> possible on ipq9574, and the reference clock source should be kept as
-> configurable instead of limited by the compatible string, maybe the
-> different reference clock source is acquired in the future, even
-> currently it is not used on the special platform for now.
-> 
-> so i update the solution with a little bit of changes.
-
-You still do not want to implement our suggestions and I don't
-understand your arguments. Nothing in above paragraph explains me why
-you cannot use clock provider/consumer relationships.
-
+I don't see how this answers anything about our suggestions.
 
 Best regards,
 Krzysztof
