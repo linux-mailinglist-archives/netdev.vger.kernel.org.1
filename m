@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-60324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E513F81E9FB
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 21:30:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D2081E9FD
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 21:30:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0B5CB2148F
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 20:30:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70F3F1C22022
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 20:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFC17E6;
-	Tue, 26 Dec 2023 20:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70AE4443E;
+	Tue, 26 Dec 2023 20:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gb6bHdFg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="If10gHst"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA9F443E;
-	Tue, 26 Dec 2023 20:30:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 296C7C433C9;
-	Tue, 26 Dec 2023 20:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2D85684;
+	Tue, 26 Dec 2023 20:30:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B44D6C43391;
+	Tue, 26 Dec 2023 20:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703622625;
-	bh=ssgpZ49piN0RSEBeazSXVQruSiFrJuUegm8xutzokIk=;
+	s=k20201202; t=1703622628;
+	bh=ZBfFp/kOlQVvVXx7c1vaWsW1JqMtoH+X4lSKs07mt5I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gb6bHdFg3j+qOJCmNcmFhHoo3oOdiPrhN2oFlpU4sTAPdwVHrTMTZOcviZpheCrs4
-	 UNMxYBgG31/v0o2zpi5lfBkHBIFmUh8Jgd12zck4k8upAo3jCsMEVm4UDmL/3vFs+T
-	 RBNsiv0NCpgabk1KHA+192TZoSKP5WuPwF5k6cTlZ4tao2JEhqzHnVq6NmMxSq4zUk
-	 97fhDcZZuvsC1fYy9GxsHNMVtdcxUdflaE7C+dPE1r6Vzwid9R1ghFX53lt0v4m94w
-	 kkvueLZhpim1REVkcvzmJ/4ZN9edeA/Aj/s/0PKOUnwSafgXquib+yT4jceL0/7S/l
-	 WpeAk6Qzz2ocA==
+	b=If10gHstX2yhMq8WqYN72j+cgWwx54S29WvXmIQG75OKnRJkwYVi5WDBf34p1ia5Y
+	 z6DxpVZKF4DWH2mfKA1PG0bTCwQk1XDCKepp0YVp3zC8MVVVXDAkxAnalhuuUPKVAh
+	 UPrewjCDi25QrB/jnZb5kI9+IKf4dcvlaS2xPl1hWUc6uRbHSuGa/ai105On1A+LuT
+	 UJtNVf2rmNJu8QLLN593NK06RgO83N8kI9cCpZVh04mQ5ehEvI2fxGUO0ob7crzpaq
+	 A9xVX/7Ro/eioEW3xpT+yFqQAhFOwbC5yTWb9dh9h4Wat307QVNrCQl47t04OvwXq8
+	 81HPUCEzEJ9hg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1045EC4314C;
-	Tue, 26 Dec 2023 20:30:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A0959E333D7;
+	Tue, 26 Dec 2023 20:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,39 +43,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net PATCH v2] octeontx2-af: Fix marking couple of structure as
- __packed
+Subject: Re: [PATCH net-next v8 00/10] net/smc: implement SMCv2.1 virtual ISM
+ device support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170362262506.14680.13738555065707744949.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Dec 2023 20:30:25 +0000
-References: <20231219142633.321507-1-sumang@marvell.com>
-In-Reply-To: <20231219142633.321507-1-sumang@marvell.com>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, sgoutham@marvell.com, sbhatta@marvell.com,
- jerinj@marvell.com, gakula@marvell.com, hkelam@marvell.com,
- lcherian@marvell.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- jacob.e.keller@intel.com
+ <170362262865.14680.2644729580463835169.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Dec 2023 20:30:28 +0000
+References: <20231219142616.80697-1-guwen@linux.alibaba.com>
+In-Reply-To: <20231219142616.80697-1-guwen@linux.alibaba.com>
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ kgraul@linux.ibm.com, jaka@linux.ibm.com, borntraeger@linux.ibm.com,
+ svens@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ raspl@linux.ibm.com, schnelle@linux.ibm.com,
+ guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue, 19 Dec 2023 19:56:33 +0530 you wrote:
-> Couple of structures was not marked as __packed. This patch
-> fixes the same and mark them as __packed.
+On Tue, 19 Dec 2023 22:26:06 +0800 you wrote:
+> The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
+> SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
+> OS or hypervisor software, comparable to IBM ISM which is based on platform
+> firmware or hardware.
 > 
-> Fixes: 42006910b5ea ("octeontx2-af: cleanup KPU config data")
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> With the introduction of virtual ISM, SMCv2.1 makes some updates:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] octeontx2-af: Fix marking couple of structure as __packed
-    https://git.kernel.org/netdev/net/c/0ee2384a5a0f
+  - [net-next,v8,01/10] net/smc: rename some 'fce' to 'fce_v2x' for clarity
+    https://git.kernel.org/netdev/net-next/c/ac053a169c71
+  - [net-next,v8,02/10] net/smc: introduce sub-functions for smc_clc_send_confirm_accept()
+    https://git.kernel.org/netdev/net-next/c/5205ac4483b6
+  - [net-next,v8,03/10] net/smc: unify the structs of accept or confirm message for v1 and v2
+    https://git.kernel.org/netdev/net-next/c/9505450d55b0
+  - [net-next,v8,04/10] net/smc: support SMCv2.x supplemental features negotiation
+    https://git.kernel.org/netdev/net-next/c/ece60db3a4ce
+  - [net-next,v8,05/10] net/smc: introduce virtual ISM device support feature
+    https://git.kernel.org/netdev/net-next/c/00e006a25718
+  - [net-next,v8,06/10] net/smc: define a reserved CHID range for virtual ISM devices
+    https://git.kernel.org/netdev/net-next/c/8dd512df3c98
+  - [net-next,v8,07/10] net/smc: compatible with 128-bits extended GID of virtual ISM device
+    https://git.kernel.org/netdev/net-next/c/b40584d14570
+  - [net-next,v8,08/10] net/smc: support extended GID in SMC-D lgr netlink attribute
+    https://git.kernel.org/netdev/net-next/c/01fd1617dbc6
+  - [net-next,v8,09/10] net/smc: disable SEID on non-s390 archs where virtual ISM may be used
+    https://git.kernel.org/netdev/net-next/c/c6b8b8eb4990
+  - [net-next,v8,10/10] net/smc: manage system EID in SMC stack instead of ISM driver
+    https://git.kernel.org/netdev/net-next/c/b3bf76024f64
 
 You are awesome, thank you!
 -- 
