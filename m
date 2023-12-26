@@ -1,369 +1,200 @@
-Return-Path: <netdev+bounces-60306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BACA81E809
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 16:31:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3131A81E806
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 16:31:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 631621C21F06
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 15:31:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 561721C21F0B
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 15:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A8F4F1FB;
-	Tue, 26 Dec 2023 15:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568BC4F1FB;
+	Tue, 26 Dec 2023 15:31:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XbQm8AJ/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kpe5o5Lt"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308E14F5FB
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 15:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vul2NpilMsA2dgOpBZWVBsNkA6Jg+HP/CxsE/UaG9F21EWWTVCz/gbhm+v+naTYgDgMRc5WxOsglNIN4xvXSi6BmkKmQPoz/pu9SmfmiSfIrh87wIqJwF6EkHjTxF6n0kATTBtYBaMcoihcI2b5QtvH+qShxBFw/2yK+jsUmAPyo6wJZcBnoGD+TDovSpjDXknfPN53+8owaUy/69gN15y66sz9uTtbCbdXPPs8NlftZ++b2gAe/6+G9UyypkjeYwwpus2zNRydW9d05oL8CDMBBHswSiyuwcqukAZ4YM8EK0jReDeaRo5jtbmW8cty8abhvJ9KMqevr0EGf8TMd2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uUITKycOfPNhqT9LHlE5F/s9sasA3JCGDm7VpbOU4/M=;
- b=d9cwwbKKWCbJpjuif89ScItc86v7Vk0rTEMEYAU5JRdZh2GEdPjKu1zHwrM8xlo865+m0TlzcPDCrV6ZpzxtO3KQJW7MWrxHPJGrWaA3CjhdK91TRF2e4r/DpzSLy2OKvTF8hbTK6LvxJ7lkQ10JSuX5v1PzcUJwy5qTBWUgG61IdKpXiUu5LWWMEaMY38P5D9x6JT7XAjDU14HEHVRoLgVgscwHiZmV2WvM3h9c7Odrae1/YH+JGFmiKbK3kRrJVK8bxIiidJYsnTi+ZiNmlEnUZDR6p/hexU6UDs+YrAmyaFsx5IXECk+WFj8Cx5597FOixVm0Le3FgfIj5XMTvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uUITKycOfPNhqT9LHlE5F/s9sasA3JCGDm7VpbOU4/M=;
- b=XbQm8AJ/LI/V6KmoMk8VGzspfZFYTkbB8bMkudgtOSXUEEu+VNpf//9U9aS8R9k7edWXjXdn0oj1OuB7ttP9xoEoK/6rAzV8FMfIZrxJS0gOwiDFCxM1Y8/jgwIamiwJOFgvoxBsI8UhAWGWEWlpGFjp0X3YbsQEufTfelsu2IldKh6q+rw+QmXvQiN64VIoMzPMdiLqX9l/xRJO1KyP0cdIWqA+lrBYw9bOLlM1Z8Xk0DmCSNoMeKsHPoRjfq0BWxIIAsjejWcrh9385+4Sl262UWisdAHsevCuTQbbr8riICQCfj8iTsIGipfgXAk1e2kwFQjVTibZkQgmwwkusA==
-Received: from MN2PR06CA0006.namprd06.prod.outlook.com (2603:10b6:208:23d::11)
- by MW4PR12MB6707.namprd12.prod.outlook.com (2603:10b6:303:1ee::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.27; Tue, 26 Dec
- 2023 15:31:09 +0000
-Received: from BL02EPF0001A0FB.namprd03.prod.outlook.com
- (2603:10b6:208:23d:cafe::31) by MN2PR06CA0006.outlook.office365.com
- (2603:10b6:208:23d::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.27 via Frontend
- Transport; Tue, 26 Dec 2023 15:31:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL02EPF0001A0FB.mail.protection.outlook.com (10.167.242.102) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7135.14 via Frontend Transport; Tue, 26 Dec 2023 15:31:08 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 26 Dec
- 2023 07:30:53 -0800
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Tue, 26 Dec 2023 07:30:50 -0800
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <dsahern@gmail.com>, <stephen@networkplumber.org>, <razor@blackwall.org>,
-	<petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH iproute2-next] bridge: mdb: Add flush support
-Date: Tue, 26 Dec 2023 17:30:13 +0200
-Message-ID: <20231226153013.3262346-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4A64F5E3;
+	Tue, 26 Dec 2023 15:31:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5534abbc637so4694041a12.0;
+        Tue, 26 Dec 2023 07:31:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703604659; x=1704209459; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kgmuVd4P8obINlchnrnXm6SfRjG8GH/yAXA2zbhaFQw=;
+        b=Kpe5o5Ltn1lH8sQVykQbu6xTXnaaVZAyPSb+8Xo4L4A59efIs3W5uSHRnr+/m2qaVZ
+         QzpvUqT3Ck+HDFLAa/lT4APV6uveLbKLEGXQtBARgv9n5TmFQQTqPg3I3ydj7e9M3PE0
+         lgPy8219T/q9vj1SfzkBRvJvBkeEOh+APY8UrZrsPENXlWG95rvYdE7Ex7fWvDiWoXH4
+         SJ7RnvuGWOInzRJQqlKibbNmCzhaZub9MgAQ3gdrtUq6AKS8k8E6lHQQmsvf34LyFACw
+         rmaCLNNaNtH4cswjIwrnH54t0DXPDuPFk8dGbzFjDHOoKQwFfyXfCvD6sRovgXA2RYrb
+         cmiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703604659; x=1704209459;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kgmuVd4P8obINlchnrnXm6SfRjG8GH/yAXA2zbhaFQw=;
+        b=lBvy8VhJfaSlJBesE93TQcTb8XB3k16tahYqfJaQbNldgXNcKYvg3/ElgqoignbfqD
+         qmSyOtvY/1ajB60qClQTtjy5/cj3GJy/pvP3spVkjRp8scbK8uBZ8aoSpft8H/3pg9kV
+         E5ItGs/DuVfBtZqUg/m13H3w5NOmOIj/JnPypRLW5w6TG+2vfqoqYWsjAffZ0W1Q1G5C
+         Ag9piBt+/OViSKjZwgXtsTgTgKCMyPHjnDX7a5LYeSbxREDhQkwJko4jKN9Bbnfdks7t
+         7Pq6nmcLvGM0FHpQLqlj/+z6uqywa4j7MEWuAouHqQnxvfrUIOMD0S/W5UM2WlfCFEgi
+         nP3A==
+X-Gm-Message-State: AOJu0YxFHwe7RW84uKCLf3PYyEszn1fFcUcAArZbEP3wbzS8bAlH89BL
+	no1r1vzUkPWD6J5LY8xTz9M=
+X-Google-Smtp-Source: AGHT+IGu/L/UfxUnPtkSCsPtbENyLMAbgoicSL82gwBaTuTez/iMoCol0L3BFLDjpj61X2Y3paDECw==
+X-Received: by 2002:a17:906:1091:b0:a26:cab2:a5d3 with SMTP id u17-20020a170906109100b00a26cab2a5d3mr2517414eju.115.1703604658574;
+        Tue, 26 Dec 2023 07:30:58 -0800 (PST)
+Received: from skbuf ([188.25.255.53])
+        by smtp.gmail.com with ESMTPSA id fi8-20020a1709073ac800b00a272de16f52sm362556ejc.112.2023.12.26.07.30.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Dec 2023 07:30:58 -0800 (PST)
+Date: Tue, 26 Dec 2023 17:30:55 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jagan Teki <jagan@amarulasolutions.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"Andrew F. Davis" <afd@ti.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Michael Nazzareno Trimarchi <michael@amarulasolutions.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	Fabio Estevam <festevam@gmail.com>
+Subject: Re: PHY issue with SJA1105Q/DP84849I Design
+Message-ID: <20231226153055.4yihsmu6kiak6hkf@skbuf>
+References: <CAMty3ZCn+yGr2MG3WYg+i4DsZWk5b-xEw0SDvNbeGzs6pMwjfQ@mail.gmail.com>
+ <20231222145100.sfcuux7ayxtxgogo@skbuf>
+ <CAMty3ZBZNugYmKMjDdZnY0kFMeEb86uzSg2XL9Tn6Yb4t-TXKQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FB:EE_|MW4PR12MB6707:EE_
-X-MS-Office365-Filtering-Correlation-Id: e673527a-04c4-4657-7276-08dc0627aec0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	iwv0Y8nociw9UKhDMJ6dGVrJekqNaHg5Gouic1IjPa7q2jr4e6XYoJxS8TnbEmkgYa4o9wT+bS8ephS0ZklrIb5ZACqcdPmTmAC24Num6sklYOIhywHsGk5MabhMAcQ3LA6ePS5t+GWXv8tkerYDB75byJTtAKRHXECSZaAXpYf7IBbIxGBtN0bJSndhEcYkyNsfdNO4L1bktlo5/P9k/gMHo2DbVqVKosyUnEeYMPcQlsjwKcvddkl/zszz5BGt0/VIqXY/wK2qxyGs0BmERrOQVAwOxEgn5UwWN5TbIsV6IuJk3zObc5nUGmBIIKqucJIOBhSjLOhJEe8yH6qpshnenvOUu84bQTf46bTdXKV7Uj7m8Mgxa3nGWhwYWmU/sx9jxePypHO3hXJ2/NIDRMZlSVGE+1c6hPs4URsTBrtst7UL/sSpEFXrdN9qDH4qzSJ/1JLvQy10bPBS/SeG40UD/1QPZhk56r8hF7GiST8AdIGyxfSNidRnfdDJejh0hamXumL0eeOuZf1gcQECQhgRgCr+LKHEhtKMr/t/DQko1BB7sqS8x7CodHQeb27/+KfVnjnclIE9UwLbn04WHFNSLy/s7RF9dR6h3a9rP1xON4viz2hOyPaYa5sJ7Yd92M50XgeBqudxzkLk/vicg0rGex/KUYWSwYjkGqxJ8oM2E1BlwAkkyYCV72ckKRMFBwp2Og6DR9NyzjfGkS4osDdHo4QWrk/CV1HD2yy8C+GtTLyCIwGAeb3n4y3CRqnoxdOEqnu0OMZXmTPQwYmfAg==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(136003)(396003)(376002)(230922051799003)(230273577357003)(230173577357003)(82310400011)(186009)(64100799003)(1800799012)(451199024)(46966006)(36840700001)(40470700004)(40480700001)(2906002)(6916009)(70206006)(70586007)(5660300002)(40460700003)(4326008)(8676002)(8936002)(316002)(54906003)(41300700001)(47076005)(36756003)(478600001)(6666004)(2616005)(107886003)(26005)(86362001)(1076003)(336012)(426003)(83380400001)(16526019)(7636003)(36860700001)(82740400003)(356005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Dec 2023 15:31:08.3231
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e673527a-04c4-4657-7276-08dc0627aec0
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A0FB.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6707
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMty3ZBZNugYmKMjDdZnY0kFMeEb86uzSg2XL9Tn6Yb4t-TXKQ@mail.gmail.com>
 
-Implement MDB flush functionality, allowing user space to flush MDB
-entries from the kernel according to provided parameters.
+On Tue, Dec 26, 2023 at 01:11:08PM +0530, Jagan Teki wrote:
+> &fec {
+>           pinctrl-names = "default";
+>           pinctrl-0 = <&pinctrl_enet>;
+>           phy-mode = "mii";
+>           status = "okay";
 
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- bridge/mdb.c      | 137 +++++++++++++++++++++++++++++++++++++++++++++-
- man/man8/bridge.8 |  67 +++++++++++++++++++++++
- 2 files changed, 203 insertions(+), 1 deletion(-)
+tl;dr: I think what is missing is:
 
-diff --git a/bridge/mdb.c b/bridge/mdb.c
-index dc8007914a37..196363a5c829 100644
---- a/bridge/mdb.c
-+++ b/bridge/mdb.c
-@@ -37,7 +37,9 @@ static void usage(void)
- 		"              [ filter_mode { include | exclude } ] [ source_list SOURCE_LIST ] [ proto PROTO ] [ dst IPADDR ]\n"
- 		"              [ dst_port DST_PORT ] [ vni VNI ] [ src_vni SRC_VNI ] [ via DEV ]\n"
- 		"       bridge mdb {show} [ dev DEV ] [ vid VID ]\n"
--		"       bridge mdb get dev DEV grp GROUP [ src SOURCE ] [ vid VID ] [ src_vni SRC_VNI ]\n");
-+		"       bridge mdb get dev DEV grp GROUP [ src SOURCE ] [ vid VID ] [ src_vni SRC_VNI ]\n"
-+		"       bridge mdb flush dev DEV [ port PORT ] [ vid VID ] [ src_vni SRC_VNI ] [ proto PROTO ]\n"
-+		"              [ [no]permanent ] [ dst IPADDR ] [ dst_port DST_PORT ] [ vni VNI ]\n");
- 	exit(-1);
- }
- 
-@@ -943,6 +945,137 @@ static int mdb_get(int argc, char **argv)
- 	return ret;
- }
- 
-+static int mdb_flush(int argc, char **argv)
-+{
-+	struct {
-+		struct nlmsghdr	n;
-+		struct br_port_msg	bpm;
-+		char			buf[1024];
-+	} req = {
-+		.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct br_port_msg)),
-+		.n.nlmsg_flags = NLM_F_REQUEST | NLM_F_BULK,
-+		.n.nlmsg_type = RTM_DELMDB,
-+		.bpm.family = PF_BRIDGE,
-+	};
-+	char *d = NULL, *p = NULL, *src_vni = NULL, *proto = NULL, *dst = NULL;
-+	char *dst_port = NULL, *vni = NULL;
-+	struct br_mdb_entry entry = {};
-+	unsigned short state_mask = 0;
-+	bool set_attrs = false;
-+	short vid = 0;
-+
-+	while (argc > 0) {
-+		if (strcmp(*argv, "dev") == 0) {
-+			NEXT_ARG();
-+			d = *argv;
-+		} else if (strcmp(*argv, "port") == 0) {
-+			NEXT_ARG();
-+			p = *argv;
-+		} else if (strcmp(*argv, "vid") == 0) {
-+			NEXT_ARG();
-+			vid = atoi(*argv);
-+		} else if (strcmp(*argv, "src_vni") == 0) {
-+			NEXT_ARG();
-+			src_vni = *argv;
-+			set_attrs = true;
-+		} else if (strcmp(*argv, "proto") == 0) {
-+			NEXT_ARG();
-+			proto = *argv;
-+			set_attrs = true;
-+		} else if (strcmp(*argv, "permanent") == 0) {
-+			entry.state |= MDB_PERMANENT;
-+			state_mask |= MDB_PERMANENT;
-+			set_attrs = true;
-+		} else if (strcmp(*argv, "nopermanent") == 0) {
-+			entry.state &= ~MDB_PERMANENT;
-+			state_mask |= MDB_PERMANENT;
-+			set_attrs = true;
-+		} else if (strcmp(*argv, "dst") == 0) {
-+			NEXT_ARG();
-+			dst = *argv;
-+			set_attrs = true;
-+		} else if (strcmp(*argv, "dst_port") == 0) {
-+			NEXT_ARG();
-+			dst_port = *argv;
-+			set_attrs = true;
-+		} else if (strcmp(*argv, "vni") == 0) {
-+			NEXT_ARG();
-+			vni = *argv;
-+			set_attrs = true;
-+		} else {
-+			if (strcmp(*argv, "help") == 0)
-+				usage();
-+		}
-+		argc--; argv++;
-+	}
-+
-+	if (d == NULL) {
-+		fprintf(stderr, "Device is a required argument.\n");
-+		return -1;
-+	}
-+
-+	req.bpm.ifindex = ll_name_to_index(d);
-+	if (!req.bpm.ifindex)
-+		return nodev(d);
-+
-+	if (p) {
-+		entry.ifindex = ll_name_to_index(p);
-+		if (!entry.ifindex)
-+			return nodev(p);
-+	}
-+
-+	entry.vid = vid;
-+	addattr_l(&req.n, sizeof(req), MDBA_SET_ENTRY, &entry, sizeof(entry));
-+	if (set_attrs) {
-+		struct rtattr *nest = addattr_nest(&req.n, sizeof(req),
-+						   MDBA_SET_ENTRY_ATTRS);
-+
-+		nest->rta_type |= NLA_F_NESTED;
-+
-+		if (proto && mdb_parse_proto(&req.n, sizeof(req), proto)) {
-+			fprintf(stderr, "Invalid protocol value \"%s\"\n",
-+				proto);
-+			return -1;
-+		}
-+
-+		if (dst && mdb_parse_dst(&req.n, sizeof(req), dst)) {
-+			fprintf(stderr, "Invalid underlay destination address \"%s\"\n",
-+				dst);
-+			return -1;
-+		}
-+
-+		if (dst_port && mdb_parse_dst_port(&req.n, sizeof(req),
-+						   dst_port)) {
-+			fprintf(stderr, "Invalid destination port \"%s\"\n", dst_port);
-+			return -1;
-+		}
-+
-+		if (vni && mdb_parse_vni(&req.n, sizeof(req), vni,
-+					 MDBE_ATTR_VNI)) {
-+			fprintf(stderr, "Invalid destination VNI \"%s\"\n",
-+				vni);
-+			return -1;
-+		}
-+
-+		if (src_vni && mdb_parse_vni(&req.n, sizeof(req), src_vni,
-+					     MDBE_ATTR_SRC_VNI)) {
-+			fprintf(stderr, "Invalid source VNI \"%s\"\n", src_vni);
-+			return -1;
-+		}
-+
-+		if (state_mask)
-+			addattr8(&req.n, sizeof(req), MDBE_ATTR_STATE_MASK,
-+				 state_mask);
-+
-+		addattr_nest_end(&req.n, nest);
-+	}
-+
-+	if (rtnl_talk(&rth, &req.n, NULL) < 0)
-+		return -1;
-+
-+	return 0;
-+}
-+
- int do_mdb(int argc, char **argv)
- {
- 	ll_init_map(&rth);
-@@ -962,6 +1095,8 @@ int do_mdb(int argc, char **argv)
- 			return mdb_show(argc-1, argv+1);
- 		if (strcmp(*argv, "get") == 0)
- 			return mdb_get(argc-1, argv+1);
-+		if (strcmp(*argv, "flush") == 0)
-+			return mdb_flush(argc-1, argv+1);
- 		if (matches(*argv, "help") == 0)
- 			usage();
- 	} else
-diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
-index a60964bb614c..eeea407320cd 100644
---- a/man/man8/bridge.8
-+++ b/man/man8/bridge.8
-@@ -187,6 +187,25 @@ bridge \- show / manipulate bridge addresses and devices
- .RB "[ " src_vni
- .IR SRC_VNI " ]"
- 
-+.ti -8
-+.B "bridge mdb flush"
-+.BI dev " DEV "
-+.RB "[ " port
-+.IR PORT " ]"
-+.RB "[ " vid
-+.IR VID " ]"
-+.RB "[ " src_vni
-+.IR SRC_VNI " ]"
-+.RB "[ " proto
-+.IR PROTO " ]"
-+.RB "[ " [no]permanent " ]"
-+.RB "[ " dst
-+.IR IPADDR " ]"
-+.RB "[ " dst_port
-+.IR DST_PORT " ]"
-+.RB "[ " vni
-+.IR VNI " ]"
-+
- .ti -8
- .BR "bridge vlan" " { " add " | " del " } "
- .B dev
-@@ -1172,6 +1191,54 @@ the VLAN ID. Only relevant when the bridge is VLAN-aware.
- the source VNI Network Identifier. Only relevant when the VXLAN device is in
- external mode.
- 
-+.SS bridge mdb flush - flush multicast group database entries.
-+
-+This command flushes the matching multicast group database entries.
-+
-+.TP
-+.BI dev " DEV"
-+the interface where this group address is associated.
-+
-+.TP
-+.BI port " PORT"
-+the target port for the operation. If the bridge device is specified then only
-+entries pointing to the bridge itself will be deleted.
-+
-+.TP
-+.BI vid " VID"
-+the VLAN ID for the operation. Match entries only with the specified VLAN ID.
-+
-+.TP
-+.BI src_vni " SRC_VNI"
-+the source VNI Network Identifier for the operation. Match entries only with
-+the specified source VNI.
-+
-+.TP
-+.BI proto " PROTO"
-+the routing protocol identifier for the operation. Match entries only with the
-+specified routing protocol. Can be a number or a string from the file
-+/etc/iproute2/rt_protos.
-+
-+.TP
-+.B [no]permanent
-+if specified then only permanent entries will be deleted or respectively if
-+"no" is prepended then only non-permanent (temp) entries will be deleted.
-+
-+.TP
-+.BI dst " IPADDR"
-+the IP address of the destination VXLAN tunnel endpoint where the multicast
-+receivers reside. Match entries only with the specified destination IP.
-+
-+.TP
-+.BI dst_port " DST_PORT"
-+the UDP destination port number to use to connect to the remote VXLAN tunnel
-+endpoint. Match entries only with the specified destination port number.
-+
-+.TP
-+.BI vni " VNI"
-+the VXLAN VNI Network Identifier to use to connect to the remote VXLAN tunnel
-+endpoint. Match entries only with the specified destination VNI.
-+
- .SH bridge vlan - VLAN filter list
- 
- .B vlan
--- 
-2.40.1
+		fixed-link {
+			speed = <100>;
+			full-duplex;
+		};
 
+> 
+>           mdio {
+>              #address-cells = <1>;
+>              #size-cells = <0>;
+> 
+>             ethphy0: ethernet-phy@0 {
+>                       compatible = "ethernet-phy-ieee802.3-c22";
+>                       reg = <0>;
+>             };
+> 
+>             ethphy1: ethernet-phy@1 {
+>                     compatible = "ethernet-phy-ieee802.3-c22";
+>                     reg = <1>;
+>            };
+>         };
+> };
+> 
+> root@imx6solo:~# ip link set dev eth0 down
+> root@imx6solo:~# ip link set dev ethphy0 down
+> root@imx6solo:~# ip link set dev ethphy1 down
+> root@imx6solo:~# ip link set dev ethphy0 address 00:11:22:33:44:55
+> root@imx6solo:~# ip link set dev ethphy1 address 00:11:22:33:44:66
+> root@imx6solo:~# ip addr add dev ethphy0 192.168.1.1/16
+> root@imx6solo:~# ip addr add dev ethphy1 192.168.1.5/16
+> root@imx6solo:~# ip link set dev eth0 up
+> [  617.126753] dp83848_config_init: ret 0
+> [  617.130831] TI DP83849I 10/100 Mbps PHY 2188000.ethernet-1:00: attached PHY driver (mii_bus:phy_addr=2188000.ethernet-1:00, irq=POLL)
+> root@imx6solo:~# [  619.207519] fec 2188000.ethernet eth0: Link is Up - 100Mbps/Full - flow control rx/tx
+> [  619.215698] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+
+eth0 is the FEC port, right?
+
+> root@imx6solo:~# ip link set dev ethphy0 up
+> [  634.114608] sja1105 spi1.0 ethphy0: configuring for phy/mii link mode
+> [  634.126617] ------------[ cut here ]------------
+> [  634.131463] WARNING: CPU: 0 PID: 330 at drivers/net/phy/phy.c:1157 phy_start+0x58/0xb4
+> [  634.139627] called from state RUNNING
+> [  634.143310] Modules linked in: bnep tag_sja1105 sja1105 pcs_xpcs brcmfmac brcmutil imx_sdma coda_vpu v4l2_jpeg imx_vdoa evbug
+> [  634.154815] CPU: 0 PID: 330 Comm: ip Not tainted 6.1.58 #1
+> [  634.160321] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+> [  634.166866]  unwind_backtrace from show_stack+0x10/0x14
+> [  634.172125]  show_stack from dump_stack_lvl+0x58/0x70
+> [  634.177205]  dump_stack_lvl from __warn+0x70/0x1a4
+> [  634.182023]  __warn from warn_slowpath_fmt+0x1bc/0x270
+> [  634.187181]  warn_slowpath_fmt from phy_start+0x58/0xb4
+> [  634.192427]  phy_start from dsa_port_enable_rt+0x54/0x9c
+> [  634.197765]  dsa_port_enable_rt from dsa_slave_open+0xb8/0x17c
+> [  634.203624]  dsa_slave_open from __dev_open+0xec/0x1ac
+> [  634.208788]  __dev_open from __dev_change_flags+0x18c/0x224
+> [  634.214377]  __dev_change_flags from dev_change_flags+0x14/0x44
+> [  634.220313]  dev_change_flags from do_setlink+0x254/0xe4c
+> [  634.225737]  do_setlink from rtnl_newlink+0x598/0x80c
+> [  634.230811]  rtnl_newlink from rtnetlink_rcv_msg+0x168/0x574
+> [  634.236485]  rtnetlink_rcv_msg from netlink_rcv_skb+0xb8/0x11c
+> [  634.242337]  netlink_rcv_skb from netlink_unicast+0x1a8/0x2dc
+> [  634.248108]  netlink_unicast from netlink_sendmsg+0x1d8/0x450
+> [  634.253884]  netlink_sendmsg from ____sys_sendmsg+0x188/0x258
+> [  634.259656]  ____sys_sendmsg from ___sys_sendmsg+0x6c/0xa4
+> [  634.265164]  ___sys_sendmsg from sys_sendmsg+0x50/0x98
+> [  634.270324]  sys_sendmsg from ret_fast_syscall+0x0/0x1c
+> [  634.275569] Exception stack(0xf1071fa8 to 0xf1071ff0)
+> [  634.280637] 1fa0:                   00000000 00000001 00000003 bef4d710 00000000 00000000
+> [  634.288828] 1fc0: 00000000 00000001 b6f415a0 00000128 626ad475 00000000 00531cc0 00531cc0
+> [  634.297016] 1fe0: 00000128 bef4d6b0 b6e3f6d3 b6db1ae6
+> [  634.302150] irq event stamp: 3327
+> [  634.305485] hardirqs last  enabled at (3335): [<c0195dbc>] __up_console_sem+0x50/0x60
+> [  634.313404] hardirqs last disabled at (3344): [<c0195da8>] __up_console_sem+0x3c/0x60
+> [  634.321318] softirqs last  enabled at (3230): [<c01017d0>] __do_softirq+0x2c0/0x57c
+> [  634.329055] softirqs last disabled at (3187): [<c012f204>] __irq_exit_rcu+0x138/0x17c
+> [  634.336971] ---[ end trace 0000000000000000 ]---
+> root@imx6solo:~# ip link set dev ethphy1 up
+> [  644.613564] sja1105 spi1.0 ethphy1: configuring for phy/mii link mode
+> root@imx6solo:~# [  646.727549] sja1105 spi1.0 ethphy1: Link is Up -
+> 100Mbps/Full - flow control off
+> [  646.735033] IPv6: ADDRCONF(NETDEV_CHANGE): ethphy1: link becomes ready
+
+Ok. The WARN_ON() is saying that the DSA user port's phy_start() found
+the attached PHY already in the RUNNING state. As if there was already
+someone else driving it.
+
+That "someone else" seems to be the FEC driver from the log above, which
+for some reason has connected to the DP83849I by itself, and phylink/phylib
+hasn't denied the second attempt to connect to the same PHY for some
+reason.
+
+If you look at fec_enet_mii_probe(), I see it has 2 code paths, one for
+when fep->phy_node (defined as the "phy-handle" reference) is non-NULL,
+and one for when it is NULL. What you're missing is a fixed-link
+specifier in the device tree for FEC, otherwise it tries to call
+phy_connect() to some random MDIO address on the bus and that breaks
+things in some way which I don't understand.
+
+The code which should have prevented this from happening is in
+phy_attach_direct():
+
+	if (phydev->attached_dev) {
+		dev_err(&dev->dev, "PHY already attached\n");
+		err = -EBUSY;
+		goto error;
+	}
 
