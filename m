@@ -1,112 +1,104 @@
-Return-Path: <netdev+bounces-60337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F68681EAC7
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 00:35:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B27281EACD
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 00:54:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2873CB221AE
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 23:35:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D453F1F21BF0
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 23:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C06E56130;
-	Tue, 26 Dec 2023 23:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87815C9C;
+	Tue, 26 Dec 2023 23:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pig/ZVLX"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mNlcdX7Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C545684
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 23:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-42786a44837so1033961cf.1
-        for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 15:35:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703633724; x=1704238524; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eZ+VyiPmwTPUzp7gonixlKN6VYglweSWOvX0B9fYuA0=;
-        b=Pig/ZVLXD93Dxf0FQZVmWS4c3zfEJHp22y6aq3hJK6TJPCZpE3s5DIjYp1KMwVQWNA
-         mzJ1x8DSPQ0e3fh+Yqr26fOlFTA0L0zOrJRz+aTvyybKMtOf2hMbn6foBaeN2BgRvl+n
-         daQgvBS9hydoSM9+jxcY5SoKtMhQx5ShHkbVxKKQeKVUNKUKe2eH08G/RsdfWUDZos1u
-         98BZ9tiwy6fUEE20czQ/J1PCbQAv8Ebm0VlJ8aOTqe4O5EnpUry6Di5EsTty1wkaPVOx
-         Ar1hX961iQlPaGEmPUQCeIKCLRJ7v/ZPOkxBptOOl3nMNiP0xiJTurmsgf1/dT2fJgrn
-         7rLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703633724; x=1704238524;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eZ+VyiPmwTPUzp7gonixlKN6VYglweSWOvX0B9fYuA0=;
-        b=nUXzdrbtB68aEBzqY7kYotNVEXqOdOvo3lfKgkEwG/2zwV1IA/ssUQN86fOBCF9Grw
-         OUypfIcU/Y+b4qFMwAGUOq8fPfeBmSwT6udNI+oYXOQecJ9+XS03jTGqLILuiQunFbJt
-         gQhRxFQ1BgokojxTfZNEQGE9g+l0FuYO2oX4pQS++VX8kwNhxx/AxJwHpsjojDRfaOIB
-         eX/kXKO5qrBJ7dUbLm78SSoIjLB54wOZh/xEKpqiDwNUY2LTMCO+c/n8YBkwxjDimAj0
-         gVAdMlH/90AcdnH1FGqYy8GaVqmjbfKkZBp+3wFSUdQX+/woGeC2TQTeQ6EpqsMY6okx
-         AYRQ==
-X-Gm-Message-State: AOJu0YzH1/wjhE/j2Lt0eVkjI3o6JJZXeDp/TbG/tUDDSRPkrWtN4Pgu
-	1en5BNK5g/HPgXvcqQrDBNgq/0qR0CoWpndaji+J7rYuefIY
-X-Google-Smtp-Source: AGHT+IHp0BTJOrpLyzI3EpLd2wSYU26gECySIQJni1tDfXxziq3Dk+T6Cq/RADc9KqlY9GR3mzqHTegHxmUUC9HsKO4=
-X-Received: by 2002:ac8:590b:0:b0:427:e836:2549 with SMTP id
- 11-20020ac8590b000000b00427e8362549mr101794qty.29.1703633723983; Tue, 26 Dec
- 2023 15:35:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883F31078A;
+	Tue, 26 Dec 2023 23:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=HVJev5bn/SXmUllhi1fZYGckmmp1VVLDmEqAwl2Z208=; b=mNlcdX7YAzTroaH2aOGFi3ncxR
+	2pNVzBaD/QlHN+u5vcyz9kJsWseAFVvJP5qwfpYJojtLD66OSY2Hdxbv705YjapFqRt9x649dxUap
+	xmXLFccJ/U2UE3uG62d1IC6SlQSIu1tJuY9x19T9yNKI970Yt1H0l4mu4krvCTfg+Gr1Tz08eFp6t
+	ueFWeDf0saiU6NwIdKiYcLLBTGa6uGwZUvOLtTmBUJ0pxig+BimyaCGwZtR5W20M59Zkh6V4MUwsv
+	cr5PBKj3rAuFqFBJg7EQUi1SpzJFHMo/eGV0ZbkePXXw4/quDWjgFOd2XlTiIuqIk6lw3+2eL1nss
+	MQfvPDeg==;
+Received: from [50.53.46.231] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rIHFC-00DgKc-0t;
+	Tue, 26 Dec 2023 23:53:54 +0000
+Message-ID: <12958640-e6c0-43d3-a710-48ba7873c8f5@infradead.org>
+Date: Tue, 26 Dec 2023 15:53:53 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231226-verbs-v1-1-3a2cecf11afd@google.com> <fadeaa0b-e9d2-4467-97ad-63ba8f7d8646@infradead.org>
-In-Reply-To: <fadeaa0b-e9d2-4467-97ad-63ba8f7d8646@infradead.org>
-From: Tanzir Hasan <tanzirh@google.com>
-Date: Tue, 26 Dec 2023 15:35:11 -0800
-Message-ID: <CAE-cH4rc6gWNcsgm243i=dXQhaAQsC4gEz15GEWZO4HB7Vki3A@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] xprtrdma: removed unnecessary headers from verbs.c
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Tom Talpey <tom@talpey.com>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
-	Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Nick Desaulniers <nnn@google.com>, 
-	Al Viro <viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+To: Tanzir Hasan <tanzirh@google.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>,
+ Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+ Trond Myklebust <trond.myklebust@hammerspace.com>,
+ Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-nfs@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Nick Desaulniers <nnn@google.com>, Al Viro <viro@zeniv.linux.org.uk>
+References: <20231226-verbs-v1-1-3a2cecf11afd@google.com>
+ <fadeaa0b-e9d2-4467-97ad-63ba8f7d8646@infradead.org>
+ <CAE-cH4rc6gWNcsgm243i=dXQhaAQsC4gEz15GEWZO4HB7Vki3A@mail.gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <CAE-cH4rc6gWNcsgm243i=dXQhaAQsC4gEz15GEWZO4HB7Vki3A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 26, 2023 at 3:20=E2=80=AFPM Randy Dunlap <rdunlap@infradead.org=
-> wrote:
->
-> Hi,
->
-> On 12/26/23 13:23, Tanzir Hasan wrote:
-> > asm-generic/barrier.h and asm/bitops.h are already brought into the
-> > header and the file can still be built with their removal.
->
-> Brought into which header?
-Hi Randy,
+Hi Tanzir,
 
-Sorry for the poor explanation. I see that I left out the specific header.
-The inclusion of linux/sunrpc/svc_rdma.h brings in linux/sunrpc/rpc_rdma.h
-This brings in linux/bitops.h which is preferred over asm/bitops.h
+On 12/26/23 15:35, Tanzir Hasan wrote:
+> On Tue, Dec 26, 2023 at 3:20 PM Randy Dunlap <rdunlap@infradead.org> wrote:
+>>
+>> Hi,
+>>
+>> On 12/26/23 13:23, Tanzir Hasan wrote:
+>>> asm-generic/barrier.h and asm/bitops.h are already brought into the
+>>> header and the file can still be built with their removal.
+>>
+>> Brought into which header?
+> Hi Randy,
+> 
+> Sorry for the poor explanation. I see that I left out the specific header.
+> The inclusion of linux/sunrpc/svc_rdma.h brings in linux/sunrpc/rpc_rdma.h
+> This brings in linux/bitops.h which is preferred over asm/bitops.h
+> 
+>> Does this conflict with Rule #1 in Documentation/process/submit-checklist.rst ?
+> 
+> Yes, this conflicts with Rule #1. A better version of this patch would be to add
+> linux/bitops.h to this file directly. The main reason this patch
+> exists is to clear
+> out the asm-generic file since those are not preferred. I can do this by either
+> including just linux/bitops.h or including both linux/bitops.h and
+> asm/barrier.h.
+> Would the second approach conform better with Rule #1?
 
-> Does this conflict with Rule #1 in Documentation/process/submit-checklist=
-.rst ?
+Yes, it would IMO.
 
-Yes, this conflicts with Rule #1. A better version of this patch would be t=
-o add
-linux/bitops.h to this file directly. The main reason this patch
-exists is to clear
-out the asm-generic file since those are not preferred. I can do this by ei=
-ther
-including just linux/bitops.h or including both linux/bitops.h and
-asm/barrier.h.
-Would the second approach conform better with Rule #1?
+Where can I find your current working list of what/how to #include?
 
-Thanks,
-Tanzir
+Thanks.
+
+-- 
+#Randy
 
