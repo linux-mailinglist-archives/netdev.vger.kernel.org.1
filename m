@@ -1,238 +1,336 @@
-Return-Path: <netdev+bounces-60252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8946F81E613
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:00:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C423A81E61D
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:02:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F07891F223AF
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:00:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3709B21D5E
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C974C632;
-	Tue, 26 Dec 2023 09:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895D14CE11;
+	Tue, 26 Dec 2023 09:02:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E554CDF6
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 09:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466734CE12
+	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 09:02:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VzHF8qG_1703581201;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VzHF8qG_1703581201)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R811e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VzHBP8l_1703581317;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VzHBP8l_1703581317)
           by smtp.aliyun-inc.com;
-          Tue, 26 Dec 2023 17:00:02 +0800
-Message-ID: <1703581167.535505-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v1] virtio_net: fix missing dma unmap for resize
-Date: Tue, 26 Dec 2023 16:59:27 +0800
+          Tue, 26 Dec 2023 17:01:58 +0800
+Message-ID: <1703581225.0317998-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 1/6] virtio_net: introduce device stats feature and structures
+Date: Tue, 26 Dec 2023 17:00:25 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
+Cc: Zhu Yanjun <yanjun.zhu@linux.dev>,
  Jason Wang <jasowang@redhat.com>,
  "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux-foundation.org
-References: <20231212081141.39757-1-xuanzhuo@linux.alibaba.com>
- <20231212032514-mutt-send-email-mst@kernel.org>
- <1703570229.7040236-1-xuanzhuo@linux.alibaba.com>
- <20231226035336-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231226035336-mutt-send-email-mst@kernel.org>
+ virtualization@lists.linux.dev,
+ netdev@vger.kernel.org
+References: <20231222033021.20649-1-xuanzhuo@linux.alibaba.com>
+ <20231222033021.20649-2-xuanzhuo@linux.alibaba.com>
+ <f6cea3db-aef6-43a9-96a9-04fe42e6a1f3@linux.dev>
+ <1703571463.67622-2-xuanzhuo@linux.alibaba.com>
+ <20231226035811-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231226035811-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-On Tue, 26 Dec 2023 03:57:27 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Tue, Dec 26, 2023 at 01:57:09PM +0800, Xuan Zhuo wrote:
-> > On Tue, 12 Dec 2023 03:26:41 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Tue, Dec 12, 2023 at 04:11:41PM +0800, Xuan Zhuo wrote:
-> > > > For rq, we have three cases getting buffers from virtio core:
+On Tue, 26 Dec 2023 03:58:37 -0500, "Michael S. Tsirkin" <mst@redhat.com> w=
+rote:
+> On Tue, Dec 26, 2023 at 02:17:43PM +0800, Xuan Zhuo wrote:
+> > On Mon, 25 Dec 2023 16:01:39 +0800, Zhu Yanjun <yanjun.zhu@linux.dev> w=
+rote:
+> > > =E5=9C=A8 2023/12/22 11:30, Xuan Zhuo =E5=86=99=E9=81=93:
+> > > > The virtio-net device stats spec:
 > > > >
-> > > > 1. virtqueue_get_buf{,_ctx}
-> > > > 2. virtqueue_detach_unused_buf
-> > > > 3. callback for virtqueue_resize
+> > > > https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f=
+95bbbd243291ab0064f82
 > > > >
-> > > > But in commit 295525e29a5b("virtio_net: merge dma operations when
-> > > > filling mergeable buffers"), I missed the dma unmap for the #3 case.
-> > > >
-> > > > That will leak some memory, because I did not release the pages referred
-> > > > by the unused buffers.
-> > > >
-> > > > If we do such script, we will make the system OOM.
-> > > >
-> > > >     while true
-> > > >     do
-> > > >             ethtool -G ens4 rx 128
-> > > >             ethtool -G ens4 rx 256
-> > > >             free -m
-> > > >     done
-> > > >
-> > > > Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >
-> > > > v1: rename to virtnet_rq_free_buf_check_dma()
+> > > > This commit introduces the relative feature and structures.
 > > >
-> > > The fact that we check does not matter what matters is
-> > > that we unmap. I'd change the name to reflect that.
+> > > Hi, Xuan
+> > >
+> > > After applying this patch series, withe ethtool version 6.5,
+> > > I got the following NIC statistics. But I do not find the statistics
+> > > mentioned in this patch series.
+> > > Do I miss something?
 > >
-> >
-> > Hi Michael:
-> >
-> > I see one "[GIT PULL] virtio: bugfixes". But this is not in the list.
-> >
-> > So I hope this is your list.
+> > This needs the new virtio-net feature VIRTIO_NET_F_DEVICE_STATS.
+> > You need to update the hypervisor. But the qemu may not support this.
 > >
 > > Thanks.
 >
-> No - I'm still waiting for the comment to be addressed. sorry about
-> the back and forth. It does unmap then free. So maybe virtnet_rq_unmap_free_buf?
+> Why not? Can you add this to QEMU?
 
-OK.
 
-I will post v2 soon.
+Yes. It is in my list.
+
+But in my plan, I want the kernel to support this firstly.
 
 Thanks.
 
 
-
 >
 >
 > >
+> >
 > > >
+> > > "
+> > > NIC statistics:
+> > >       rx_packets: 3434812669
+> > >       rx_bytes: 5168475253690
+> > >       rx_drops: 0
+> > >       rx_xdp_packets: 0
+> > >       rx_xdp_tx: 0
+> > >       rx_xdp_redirects: 0
+> > >       rx_xdp_drops: 0
+> > >       rx_kicks: 57179891
+> > >       tx_packets: 187694230
+> > >       tx_bytes: 12423799040
+> > >       tx_xdp_tx: 0
+> > >       tx_xdp_tx_drops: 0
+> > >       tx_kicks: 187694230
+> > >       tx_timeouts: 0
+> > >       rx_queue_0_packets: 866027381
+> > >       rx_queue_0_bytes: 1302726908150
+> > >       rx_queue_0_drops: 0
+> > >       rx_queue_0_xdp_packets: 0
+> > >       rx_queue_0_xdp_tx: 0
+> > >       rx_queue_0_xdp_redirects: 0
+> > >       rx_queue_0_xdp_drops: 0
+> > >       rx_queue_0_kicks: 14567691
+> > >       rx_queue_1_packets: 856758801
+> > >       rx_queue_1_bytes: 1289899049042
+> > >       rx_queue_1_drops: 0
+> > >       rx_queue_1_xdp_packets: 0
+> > >       rx_queue_1_xdp_tx: 0
+> > >       rx_queue_1_xdp_redirects: 0
+> > >       rx_queue_1_xdp_drops: 0
+> > >       rx_queue_1_kicks: 14265201
+> > >       rx_queue_2_packets: 839291053
+> > >       rx_queue_2_bytes: 1261620863886
+> > >       rx_queue_2_drops: 0
+> > >       rx_queue_2_xdp_packets: 0
+> > >       rx_queue_2_xdp_tx: 0
+> > >       rx_queue_2_xdp_redirects: 0
+> > >       rx_queue_2_xdp_drops: 0
+> > >       rx_queue_2_kicks: 13857653
+> > >       rx_queue_3_packets: 872735434
+> > >       rx_queue_3_bytes: 1314228432612
+> > >       rx_queue_3_drops: 0
+> > >       rx_queue_3_xdp_packets: 0
+> > >       rx_queue_3_xdp_tx: 0
+> > >       rx_queue_3_xdp_redirects: 0
+> > >       rx_queue_3_xdp_drops: 0
+> > >       rx_queue_3_kicks: 14489346
+> > >       tx_queue_0_packets: 75723
+> > >       tx_queue_0_bytes: 4999030
+> > >       tx_queue_0_xdp_tx: 0
+> > >       tx_queue_0_xdp_tx_drops: 0
+> > >       tx_queue_0_kicks: 75723
+> > >       tx_queue_0_timeouts: 0
+> > >       tx_queue_1_packets: 62262921
+> > >       tx_queue_1_bytes: 4134803914
+> > >       tx_queue_1_xdp_tx: 0
+> > >       tx_queue_1_xdp_tx_drops: 0
+> > >       tx_queue_1_kicks: 62262921
+> > >       tx_queue_1_timeouts: 0
+> > >       tx_queue_2_packets: 83
+> > >       tx_queue_2_bytes: 5478
+> > >       tx_queue_2_xdp_tx: 0
+> > >       tx_queue_2_xdp_tx_drops: 0
+> > >       tx_queue_2_kicks: 83
+> > >       tx_queue_2_timeouts: 0
+> > >       tx_queue_3_packets: 125355503
+> > >       tx_queue_3_bytes: 8283990618
+> > >       tx_queue_3_xdp_tx: 0
+> > >       tx_queue_3_xdp_tx_drops: 0
+> > >       tx_queue_3_kicks: 125355503
+> > >       tx_queue_3_timeouts: 0
+> > > "
 > > >
 > > > >
-> > > >  drivers/net/virtio_net.c | 60 ++++++++++++++++++++--------------------
-> > > >  1 file changed, 30 insertions(+), 30 deletions(-)
+> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > ---
+> > > >   include/uapi/linux/virtio_net.h | 137 +++++++++++++++++++++++++++=
++++++
+> > > >   1 file changed, 137 insertions(+)
 > > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index d16f592c2061..58ebbffeb952 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -334,7 +334,6 @@ struct virtio_net_common_hdr {
-> > > >  	};
-> > > >  };
+> > > > diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/v=
+irtio_net.h
+> > > > index cc65ef0f3c3e..129e0871d28f 100644
+> > > > --- a/include/uapi/linux/virtio_net.h
+> > > > +++ b/include/uapi/linux/virtio_net.h
+> > > > @@ -56,6 +56,7 @@
+> > > >   #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
+> > > >   					 * Steering */
+> > > >   #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+> > > > +#define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-=
+level statistics. */
+> > > >   #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue=
+ notification coalescing */
+> > > >   #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notification=
+s coalescing */
+> > > >   #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. =
+*/
+> > > > @@ -406,4 +407,140 @@ struct  virtio_net_ctrl_coal_vq {
+> > > >   	struct virtio_net_ctrl_coal coal;
+> > > >   };
 > > > >
-> > > > -static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
-> > > >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf);
-> > > >
-> > > >  static bool is_xdp_frame(void *ptr)
-> > > > @@ -408,6 +407,17 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
-> > > >  	return p;
-> > > >  }
-> > > >
-> > > > +static void virtnet_rq_free_buf(struct virtnet_info *vi,
-> > > > +				struct receive_queue *rq, void *buf)
-> > > > +{
-> > > > +	if (vi->mergeable_rx_bufs)
-> > > > +		put_page(virt_to_head_page(buf));
-> > > > +	else if (vi->big_packets)
-> > > > +		give_pages(rq, buf);
-> > > > +	else
-> > > > +		put_page(virt_to_head_page(buf));
-> > > > +}
+> > > > +/*
+> > > > + * Device Statistics
+> > > > + */
+> > > > +#define VIRTIO_NET_CTRL_STATS         8
+> > > > +#define VIRTIO_NET_CTRL_STATS_QUERY   0
+> > > > +#define VIRTIO_NET_CTRL_STATS_GET     1
 > > > > +
-> > > >  static void enable_delayed_refill(struct virtnet_info *vi)
-> > > >  {
-> > > >  	spin_lock_bh(&vi->refill_lock);
-> > > > @@ -634,17 +644,6 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
-> > > >  	return buf;
-> > > >  }
-> > > >
-> > > > -static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
-> > > > -{
-> > > > -	void *buf;
-> > > > -
-> > > > -	buf = virtqueue_detach_unused_buf(rq->vq);
-> > > > -	if (buf && rq->do_dma)
-> > > > -		virtnet_rq_unmap(rq, buf, 0);
-> > > > -
-> > > > -	return buf;
-> > > > -}
-> > > > -
-> > > >  static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
-> > > >  {
-> > > >  	struct virtnet_rq_dma *dma;
-> > > > @@ -744,6 +743,20 @@ static void virtnet_rq_set_premapped(struct virtnet_info *vi)
-> > > >  	}
-> > > >  }
-> > > >
-> > > > +static void virtnet_rq_free_buf_check_dma(struct virtqueue *vq, void *buf)
-> > > > +{
-> > > > +	struct virtnet_info *vi = vq->vdev->priv;
-> > > > +	struct receive_queue *rq;
-> > > > +	int i = vq2rxq(vq);
+> > > > +struct virtio_net_stats_capabilities {
 > > > > +
-> > > > +	rq = &vi->rq[i];
+> > > > +#define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
 > > > > +
-> > > > +	if (rq->do_dma)
-> > > > +		virtnet_rq_unmap(rq, buf, 0);
+> > > > +#define VIRTIO_NET_STATS_TYPE_RX_BASIC  (1 << 0)
+> > > > +#define VIRTIO_NET_STATS_TYPE_RX_CSUM   (1 << 1)
+> > > > +#define VIRTIO_NET_STATS_TYPE_RX_GSO    (1 << 2)
+> > > > +#define VIRTIO_NET_STATS_TYPE_RX_SPEED  (1 << 3)
 > > > > +
-> > > > +	virtnet_rq_free_buf(vi, rq, buf);
-> > > > +}
+> > > > +#define VIRTIO_NET_STATS_TYPE_TX_BASIC  (1 << 16)
+> > > > +#define VIRTIO_NET_STATS_TYPE_TX_CSUM   (1 << 17)
+> > > > +#define VIRTIO_NET_STATS_TYPE_TX_GSO    (1 << 18)
+> > > > +#define VIRTIO_NET_STATS_TYPE_TX_SPEED  (1 << 19)
 > > > > +
-> > > >  static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
-> > > >  {
-> > > >  	unsigned int len;
-> > > > @@ -1764,7 +1777,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
-> > > >  	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
-> > > >  		pr_debug("%s: short packet %i\n", dev->name, len);
-> > > >  		DEV_STATS_INC(dev, rx_length_errors);
-> > > > -		virtnet_rq_free_unused_buf(rq->vq, buf);
-> > > > +		virtnet_rq_free_buf(vi, rq, buf);
-> > > >  		return;
-> > > >  	}
-> > > >
-> > > > @@ -2392,7 +2405,7 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
-> > > >  	if (running)
-> > > >  		napi_disable(&rq->napi);
-> > > >
-> > > > -	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unused_buf);
-> > > > +	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_buf_check_dma);
-> > > >  	if (err)
-> > > >  		netdev_err(vi->dev, "resize rx fail: rx queue index: %d err: %d\n", qindex, err);
-> > > >
-> > > > @@ -4031,19 +4044,6 @@ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
-> > > >  		xdp_return_frame(ptr_to_xdp(buf));
-> > > >  }
-> > > >
-> > > > -static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
-> > > > -{
-> > > > -	struct virtnet_info *vi = vq->vdev->priv;
-> > > > -	int i = vq2rxq(vq);
-> > > > -
-> > > > -	if (vi->mergeable_rx_bufs)
-> > > > -		put_page(virt_to_head_page(buf));
-> > > > -	else if (vi->big_packets)
-> > > > -		give_pages(&vi->rq[i], buf);
-> > > > -	else
-> > > > -		put_page(virt_to_head_page(buf));
-> > > > -}
-> > > > -
-> > > >  static void free_unused_bufs(struct virtnet_info *vi)
-> > > >  {
-> > > >  	void *buf;
-> > > > @@ -4057,10 +4057,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
-> > > >  	}
-> > > >
-> > > >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > > -		struct receive_queue *rq = &vi->rq[i];
-> > > > +		struct virtqueue *vq = vi->rq[i].vq;
-> > > >
-> > > > -		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
-> > > > -			virtnet_rq_free_unused_buf(rq->vq, buf);
-> > > > +		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
-> > > > +			virtnet_rq_free_buf_check_dma(vq, buf);
-> > > >  		cond_resched();
-> > > >  	}
-> > > >  }
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
+> > > > +	__le64 supported_stats_types[1];
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_ctrl_queue_stats {
+> > > > +	struct {
+> > > > +		__le16 vq_index;
+> > > > +		__le16 reserved[3];
+> > > > +		__le64 types_bitmap[1];
+> > > > +	} stats[1];
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_reply_hdr {
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_CVQ       32
+> > > > +
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC  0
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM   1
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO    2
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED  3
+> > > > +
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC  16
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM   17
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO    18
+> > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED  19
+> > > > +	u8 type;
+> > > > +	u8 reserved;
+> > > > +	__le16 vq_index;
+> > > > +	__le16 reserved1;
+> > > > +	__le16 size;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_cvq {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 command_num;
+> > > > +	__le64 ok_num;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_rx_basic {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 rx_notifications;
+> > > > +
+> > > > +	__le64 rx_packets;
+> > > > +	__le64 rx_bytes;
+> > > > +
+> > > > +	__le64 rx_interrupts;
+> > > > +
+> > > > +	__le64 rx_drops;
+> > > > +	__le64 rx_drop_overruns;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_tx_basic {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 tx_notifications;
+> > > > +
+> > > > +	__le64 tx_packets;
+> > > > +	__le64 tx_bytes;
+> > > > +
+> > > > +	__le64 tx_interrupts;
+> > > > +
+> > > > +	__le64 tx_drops;
+> > > > +	__le64 tx_drop_malformed;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_rx_csum {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 rx_csum_valid;
+> > > > +	__le64 rx_needs_csum;
+> > > > +	__le64 rx_csum_none;
+> > > > +	__le64 rx_csum_bad;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_tx_csum {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 tx_csum_none;
+> > > > +	__le64 tx_needs_csum;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_rx_gso {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 rx_gso_packets;
+> > > > +	__le64 rx_gso_bytes;
+> > > > +	__le64 rx_gso_packets_coalesced;
+> > > > +	__le64 rx_gso_bytes_coalesced;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_tx_gso {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 tx_gso_packets;
+> > > > +	__le64 tx_gso_bytes;
+> > > > +	__le64 tx_gso_segments;
+> > > > +	__le64 tx_gso_segments_bytes;
+> > > > +	__le64 tx_gso_packets_noseg;
+> > > > +	__le64 tx_gso_bytes_noseg;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_rx_speed {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 rx_packets_allowance_exceeded;
+> > > > +	__le64 rx_bytes_allowance_exceeded;
+> > > > +};
+> > > > +
+> > > > +struct virtio_net_stats_tx_speed {
+> > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > +
+> > > > +	__le64 tx_packets_allowance_exceeded;
+> > > > +	__le64 tx_bytes_allowance_exceeded;
+> > > > +};
+> > > > +
+> > > >   #endif /* _UAPI_LINUX_VIRTIO_NET_H */
 > > >
+>
 >
 
