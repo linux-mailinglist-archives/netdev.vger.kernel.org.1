@@ -1,231 +1,103 @@
-Return-Path: <netdev+bounces-60282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C0B581E716
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 12:26:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A8281E730
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 12:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6723E1C211B3
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 11:26:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FA851F224F8
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 11:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1C64E1CC;
-	Tue, 26 Dec 2023 11:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04EAB4E1D4;
+	Tue, 26 Dec 2023 11:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oStvdJ88"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B+G5KAMD"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0464E1BA
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 11:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a2102a2b-0863-4f0e-b70b-8a1460571b15@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1703589992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tmW+UU4R/GQl4t1JifZU8VoKdZXoi50g70i4shR/PeE=;
-	b=oStvdJ882sr/zQDWgATK0OaqOsuColfWSslc7AE53WFU0op9KCkERdWGqDR+UeRsNp58Np
-	4dyc6gcr7/jbi/eh1TxgbJumKLPgeZCgfI/yNLK2o4mzZV2hnry+v9qT96Y1obQYQr9m3W
-	fNYkjyp2M5K18tHrnSPAT8J+0jCKshc=
-Date: Tue, 26 Dec 2023 19:26:26 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6C44E1D0
+	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 11:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703591416; x=1735127416;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=v1xdHtRyvG94UP1kD9FPSjUs3Ibi0hmcmPueEEKvHFM=;
+  b=B+G5KAMD1VbPoVgTya+frdUG95vCAjoUGRfX807q/dFfgCSzvVlW9TpQ
+   K8zJ4I7FfBWaJe2eSJoRX+dkXlbgzx5wYvuDuru72NDpglbISA9WtlnLa
+   +eJrw6WARuSzzQL57dKwsFBWU29S8/0KME1hfWQMLpmnRs/1O4GZUk1Jd
+   zncerY+NXS6HnGOerHCdKZjEVAlKkkQLp5pWpO9nByF2er7DdVDn43OHe
+   GODanh06GNVYJXHyQNw9jMH21SdcbslKo6FtR5fqR24+hX5IHaZPx+hv7
+   o7nU3lAUyUG6Z7P/eT6IiGSZjxJJcCuhLY0oIHGDVuHFnzj4ez6ea3+4e
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="400162573"
+X-IronPort-AV: E=Sophos;i="6.04,306,1695711600"; 
+   d="scan'208";a="400162573"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Dec 2023 03:50:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="777935768"
+X-IronPort-AV: E=Sophos;i="6.04,306,1695711600"; 
+   d="scan'208";a="777935768"
+Received: from unknown (HELO intel-71.bj.intel.com) ([10.238.154.71])
+  by orsmga002.jf.intel.com with ESMTP; 26 Dec 2023 03:50:12 -0800
+From: Zhu Yanjun <yanjun.zhu@intel.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org
+Cc: Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: [PATCH 1/1] =?UTF-8?q?virtio=5Fnet:=20Fix=20"=E2=80=98%d=E2=80=99?= =?UTF-8?q?=20directive=20writing=20between=201=20and=2011=20bytes=20into?= =?UTF-8?q?=20a=20region=20of=20size=2010"=20warnings?=
+Date: Tue, 26 Dec 2023 19:45:07 +0800
+Message-Id: <20231226114507.2447118-1-yanjun.zhu@intel.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v1 1/6] virtio_net: introduce device stats
- feature and structures
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev
-References: <20231226073103.116153-1-xuanzhuo@linux.alibaba.com>
- <20231226073103.116153-2-xuanzhuo@linux.alibaba.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20231226073103.116153-2-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
 
-在 2023/12/26 15:30, Xuan Zhuo 写道:
-> The virtio-net device stats spec:
->
-> https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
->
-> This commit introduces the relative feature and structures.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->   include/uapi/linux/virtio_net.h | 137 ++++++++++++++++++++++++++++++++
->   1 file changed, 137 insertions(+)
->
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index cc65ef0f3c3e..8fca4d1b7635 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -56,6 +56,7 @@
->   #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
->   					 * Steering */
->   #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> +#define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-level statistics. */
->   #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
->   #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
->   #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
-> @@ -406,4 +407,140 @@ struct  virtio_net_ctrl_coal_vq {
->   	struct virtio_net_ctrl_coal coal;
->   };
->   
-> +/*
-> + * Device Statistics
-> + */
-> +#define VIRTIO_NET_CTRL_STATS         8
-> +#define VIRTIO_NET_CTRL_STATS_QUERY   0
-> +#define VIRTIO_NET_CTRL_STATS_GET     1
-> +
-> +struct virtio_net_stats_capabilities {
-> +
-> +#define VIRTIO_NET_STATS_TYPE_CVQ       (1ULL << 32)
-> +
-> +#define VIRTIO_NET_STATS_TYPE_RX_BASIC  (1ULL << 0)
-> +#define VIRTIO_NET_STATS_TYPE_RX_CSUM   (1ULL << 1)
-> +#define VIRTIO_NET_STATS_TYPE_RX_GSO    (1ULL << 2)
-> +#define VIRTIO_NET_STATS_TYPE_RX_SPEED  (1ULL << 3)
-> +
-> +#define VIRTIO_NET_STATS_TYPE_TX_BASIC  (1ULL << 16)
-> +#define VIRTIO_NET_STATS_TYPE_TX_CSUM   (1ULL << 17)
-> +#define VIRTIO_NET_STATS_TYPE_TX_GSO    (1ULL << 18)
-> +#define VIRTIO_NET_STATS_TYPE_TX_SPEED  (1ULL << 19)
-> +
-> +	__le64 supported_stats_types[1];
-> +};
-> +
-> +struct virtio_net_ctrl_queue_stats {
-> +	struct {
-> +		__le16 vq_index;
-> +		__le16 reserved[3];
-> +		__le64 types_bitmap[1];
-> +	} stats[1];
-> +};
-> +
-> +struct virtio_net_stats_reply_hdr {
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_CVQ       32
-> +
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC  0
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM   1
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO    2
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED  3
-> +
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC  16
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM   17
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO    18
-> +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED  19
-> +	__u8 type;
-> +	__u8 reserved;
+Fix a warning when building virtio_net driver.
 
-Thanks a lot. I have made tests. The mentioned errors are fixed in this 
-patch series.
+Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+---
+ drivers/net/virtio_net.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Zhu Yanjun
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 49625638ad43..cf57eddf768a 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -4508,10 +4508,11 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+ {
+ 	vq_callback_t **callbacks;
+ 	struct virtqueue **vqs;
+-	int ret = -ENOMEM;
+-	int i, total_vqs;
+ 	const char **names;
++	int ret = -ENOMEM;
++	int total_vqs;
+ 	bool *ctx;
++	u16 i;
+ 
+ 	/* We expect 1 RX virtqueue followed by 1 TX virtqueue, followed by
+ 	 * possible N-1 RX/TX queue pairs used in multiqueue mode, followed by
+-- 
+2.41.0
 
-> +	__le16 vq_index;
-> +	__le16 reserved1;
-> +	__le16 size;
-> +};
-> +
-> +struct virtio_net_stats_cvq {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 command_num;
-> +	__le64 ok_num;
-> +};
-> +
-> +struct virtio_net_stats_rx_basic {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 rx_notifications;
-> +
-> +	__le64 rx_packets;
-> +	__le64 rx_bytes;
-> +
-> +	__le64 rx_interrupts;
-> +
-> +	__le64 rx_drops;
-> +	__le64 rx_drop_overruns;
-> +};
-> +
-> +struct virtio_net_stats_tx_basic {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 tx_notifications;
-> +
-> +	__le64 tx_packets;
-> +	__le64 tx_bytes;
-> +
-> +	__le64 tx_interrupts;
-> +
-> +	__le64 tx_drops;
-> +	__le64 tx_drop_malformed;
-> +};
-> +
-> +struct virtio_net_stats_rx_csum {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 rx_csum_valid;
-> +	__le64 rx_needs_csum;
-> +	__le64 rx_csum_none;
-> +	__le64 rx_csum_bad;
-> +};
-> +
-> +struct virtio_net_stats_tx_csum {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 tx_csum_none;
-> +	__le64 tx_needs_csum;
-> +};
-> +
-> +struct virtio_net_stats_rx_gso {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 rx_gso_packets;
-> +	__le64 rx_gso_bytes;
-> +	__le64 rx_gso_packets_coalesced;
-> +	__le64 rx_gso_bytes_coalesced;
-> +};
-> +
-> +struct virtio_net_stats_tx_gso {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 tx_gso_packets;
-> +	__le64 tx_gso_bytes;
-> +	__le64 tx_gso_segments;
-> +	__le64 tx_gso_segments_bytes;
-> +	__le64 tx_gso_packets_noseg;
-> +	__le64 tx_gso_bytes_noseg;
-> +};
-> +
-> +struct virtio_net_stats_rx_speed {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 rx_packets_allowance_exceeded;
-> +	__le64 rx_bytes_allowance_exceeded;
-> +};
-> +
-> +struct virtio_net_stats_tx_speed {
-> +	struct virtio_net_stats_reply_hdr hdr;
-> +
-> +	__le64 tx_packets_allowance_exceeded;
-> +	__le64 tx_bytes_allowance_exceeded;
-> +};
-> +
->   #endif /* _UAPI_LINUX_VIRTIO_NET_H */
 
