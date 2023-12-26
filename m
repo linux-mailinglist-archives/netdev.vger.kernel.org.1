@@ -1,143 +1,132 @@
-Return-Path: <netdev+bounces-60289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B7B181E742
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 13:11:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A88C81E756
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 13:22:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E6801C20D6D
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 12:11:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6BA5B21608
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 12:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15E44E603;
-	Tue, 26 Dec 2023 12:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6F44E617;
+	Tue, 26 Dec 2023 12:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQuLPQYQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UiOe5otO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA85C4EB4C;
-	Tue, 26 Dec 2023 12:10:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3A2BC433C8;
-	Tue, 26 Dec 2023 12:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC634E60D;
+	Tue, 26 Dec 2023 12:22:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899D4C433C7;
+	Tue, 26 Dec 2023 12:21:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703592657;
-	bh=9K3RAxwtnbgt4T42ampHD1OD/JlH35Ygy2iCSPJlHoE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=nQuLPQYQj0rJddca9UNwEtVFa9Gfe3ZywepzqjizFZ9yBP8IN9wvcebRcVwB/OItz
-	 R6BLs3SKYwlhuqWP3ADKRy+rWNnUlLtezLThB0d3BWtpB5Kk8UP4DEHzII8yvdwgah
-	 KnJhjCJ8rK3YSxyyDOEm+Cx+H5GX8gRM28VyygQh8XdJPY343/+dHGimqMqH+kkv7w
-	 e9D3ZL7s1O49Ft3+xtyLQSLosGkD4BRgJ8SU+hMbggrgSYPOb0U5rEkWHrsrmLKKHe
-	 DgVmezxBKjstYXDeOJt+MAPIQ4zvHN/nf2lwci/6UeQd22e0uhvJ1ybXw2ivd0U+l2
-	 ITEQEVdSvvd8g==
-From: Matthieu Baerts <matttbe@kernel.org>
-Date: Tue, 26 Dec 2023 13:10:18 +0100
-Subject: [PATCH net 2/2] mptcp: prevent tcp diag from closing listener
- subflows
+	s=k20201202; t=1703593322;
+	bh=rK4HXQ1qO1d7lh9yVCYbnNYVfqLfj8dMaZYVCapbDEo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UiOe5otOvMvYx0koqhZ7MLdIUI+TtM2bnkF9reKlF/yKjx7HFT+uZ8zHAWIN3nO+O
+	 Hnn6hgvpqQMf0Iky4vsYOTxHzcyHMYu9uYHhav2Adqg2FFCrcVaz0mfjxXEo/CpOaP
+	 DzTypBpbKdeZAuiEM/hJvjYBIP07bqIxnvebrWIKaEX2b2N9mD3F4YMhHKKhtmJyOH
+	 JzFdBnz78Ey6TmWAh7KtcQNDALXYqYQu0Ye1Cj/o1c/ZwTOJfYYQhRTwQnXYLEfuYC
+	 A8+snHELHs/HflVecEvpQmXQQjhmWTCF9wo+8Oz7Sa+qaxF1NylX9E7exkOjM7wvYf
+	 D1uaUc10zYYQg==
+Date: Tue, 26 Dec 2023 12:21:56 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Jie Luo <quic_luoj@quicinc.com>, agross@kernel.org,
+	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, robert.marko@sartura.hr,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	quic_srichara@quicinc.com
+Subject: Re: [PATCH v4 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Message-ID: <20231226-twine-smolder-713cb81fa411@spud>
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <20231225084424.30986-6-quic_luoj@quicinc.com>
+ <dee72ce8-b24e-467a-b265-1b965588807f@linaro.org>
+ <aeb364a3-6c05-4a1b-ba32-e687a89f20f8@quicinc.com>
+ <58dde1a7-ed4a-442c-bb5c-c3f6d926fb7e@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231226-upstream-net-20231226-mptcp-prevent-warn-v1-2-1404dcc431ea@kernel.org>
-References: <20231226-upstream-net-20231226-mptcp-prevent-warn-v1-0-1404dcc431ea@kernel.org>
-In-Reply-To: <20231226-upstream-net-20231226-mptcp-prevent-warn-v1-0-1404dcc431ea@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang.tang@linux.dev>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Matthieu Baerts <matttbe@kernel.org>, stable@vger.kernel.org, 
- syzbot+5a01c3a666e726bc8752@syzkaller.appspotmail.com
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2384; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=HDp1Le2S0oz86KqWx/YgeMDwAfEXRM0g+e1uupHk7kU=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlisLJiW/jUMiX4knlvoEDr/Uu+rv4Yuf4zi62F
- gnxOCaCU0aJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZYrCyQAKCRD2t4JPQmmg
- cyKzD/9qtiKMJx5LbFlpxD6kdM8LYanxi9aYr7uyauIbafSh7dLy8U0aVLOAPMe1CKRp6hmD+HN
- B3xIhkOuFu0vqvNpir8m+GaxyQKXYRNNns3atZriKmGeBnZDPQj9UYNtDvMbrEopK9rpo5DpsNr
- voq4n45obKfYjkdeCyi0DIZbR2EIp5FgAscRZW0iXltYkE5NTVjzw1WfJ02wd9528MUEn+OsKIC
- OQf2QVLsUx0HpV8beQY9CgGnYmpKYh66Pkb6yfqpaWuygfmnVEZWYgn5dIX7hE5SlcsSK2jyThO
- XS0ydvNJEYTW9Ss5oCMRyzp3G5HkmL1oS9JZnKjeLKfMmWd4efecGRk0VO5aAAC62MDCjNK38pH
- vRmuFFDhsWu8sBZA+GTCzEDHhbt5vnntHIS1f48m6pZ/4QVsSrnawH0cMXAaoSmc7K7C8tgeln1
- lG8q5hXMD7Y95VT082MLzSWR297qqC3c1dd6t2mXLsGuxg/+GeKYGKP+sIh8T86FHTS+THOsf4Y
- gQshxwrO4hzkWof8yjXfO1eNUCHVWe8TjK3QGnhrr5y58WvAgOk6ScCVWAp5yjsZsrojhS9LTpr
- kIw3l2BKrB1DIqX6L9rbj6LXQt1cw9wAtnKjvuc0RnngRx03+P1nV8lvzQ8tpfeflnUdvbrXwkO
- mHsycIOs+16SUrQ==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="YKoQgfQHX/tQukT9"
+Content-Disposition: inline
+In-Reply-To: <58dde1a7-ed4a-442c-bb5c-c3f6d926fb7e@linaro.org>
 
-From: Paolo Abeni <pabeni@redhat.com>
 
-The MPTCP protocol does not expect that any other entity could change
-the first subflow status when such socket is listening.
-Unfortunately the TCP diag interface allows aborting any TCP socket,
-including MPTCP listeners subflows. As reported by syzbot, that trigger
-a WARN() and could lead to later bigger trouble.
+--YKoQgfQHX/tQukT9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The MPTCP protocol needs to do some MPTCP-level cleanup actions to
-properly shutdown the listener. To keep the fix simple, prevent
-entirely the diag interface from stopping such listeners.
+On Tue, Dec 26, 2023 at 10:28:09AM +0100, Krzysztof Kozlowski wrote:
+> On 26/12/2023 08:25, Jie Luo wrote:
 
-We could refine the diag callback in a later, larger patch targeting
-net-next.
+> >>> +  qcom,cmn-ref-clock-frequency:
+> >>> +    $ref: /schemas/types.yaml#/definitions/uint32
+> >>> +    enum:
+> >>> +      - 25000000
+> >>> +      - 31250000
+> >>> +      - 40000000
+> >>> +      - 48000000
+> >>> +      - 50000000
+> >>> +      - 96000000
+> >>> +    default: 48000000
+> >>> +    description: |
+> >>> +      The reference clock source of CMN PLL block is selectable, the
+> >>> +      reference clock source can be from wifi module or the external
+> >>> +      xtal, the reference clock frequency 48MHZ can be from internal
+> >>> +      wifi or the external xtal, if absent, the internal 48MHZ is us=
+ed,
+> >>> +      if the 48MHZ is specified, which means the external 48Mhz is u=
+sed.
+> >>
+> >> This does not resolve mine and Conor's concerns from previous version.
+> >> External clocks are defined as clock inputs.
+> >=20
+> > No matter the external or internal reference clock, they are the clock
+> > source selection for CMN, there are only 48MHZ can be external or=20
+> > internal, other clocks have the different clock rate, so the internal
+> > 48MHZ reference clock can be implied when the=20
+> > "qcom,cmn-ref-clock-frequency" is not defined, which is suggested by=20
+> > Conor in the previous
+> > comments.
+>=20
+> I don't think he proposed it, but maybe I missed some message (care to
+> point me to his message where he agreed on usage of
+> qcom,cmn-ref-clock-frequency?). I am pretty sure we both stayed on the
+> same page, that the presence of clocks defines choice of internal clock.
+> This property should go away.
 
-Fixes: 57fc0f1ceaa4 ("mptcp: ensure listener is unhashed before updating the sk status")
-Cc: stable@vger.kernel.org
-Reported-by: <syzbot+5a01c3a666e726bc8752@syzkaller.appspotmail.com>
-Closes: https://lore.kernel.org/netdev/0000000000004f4579060c68431b@google.com/
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts <matttbe@kernel.org>
----
- net/mptcp/subflow.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Exactly, I wanted this property to be removed. My suggestion was about
+defaulting to the internal clock when the "clocks" property did not
+contain the cmn ref clock.
 
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index 6d7684c35e93..852b3f4af000 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -1982,6 +1982,17 @@ static void tcp_release_cb_override(struct sock *ssk)
- 	tcp_release_cb(ssk);
- }
- 
-+static int tcp_abort_override(struct sock *ssk, int err)
-+{
-+	/* closing a listener subflow requires a great deal of care.
-+	 * keep it simple and just prevent such operation
-+	 */
-+	if (inet_sk_state_load(ssk) == TCP_LISTEN)
-+		return -EINVAL;
-+
-+	return tcp_abort(ssk, err);
-+}
-+
- static struct tcp_ulp_ops subflow_ulp_ops __read_mostly = {
- 	.name		= "mptcp",
- 	.owner		= THIS_MODULE,
-@@ -2026,6 +2037,7 @@ void __init mptcp_subflow_init(void)
- 
- 	tcp_prot_override = tcp_prot;
- 	tcp_prot_override.release_cb = tcp_release_cb_override;
-+	tcp_prot_override.diag_destroy = tcp_abort_override;
- 
- #if IS_ENABLED(CONFIG_MPTCP_IPV6)
- 	/* In struct mptcp_subflow_request_sock, we assume the TCP request sock
-@@ -2061,6 +2073,7 @@ void __init mptcp_subflow_init(void)
- 
- 	tcpv6_prot_override = tcpv6_prot;
- 	tcpv6_prot_override.release_cb = tcp_release_cb_override;
-+	tcpv6_prot_override.diag_destroy = tcp_abort_override;
- #endif
- 
- 	mptcp_diag_subflow_init(&subflow_ulp_ops);
+> It is tiring to keep discussing this.
 
--- 
-2.43.0
+Yup.
 
+
+--YKoQgfQHX/tQukT9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZYrFZAAKCRB4tDGHoIJi
+0tZUAQCG5wZXdhtGuFoHbSVtP0vu3felLI56vgP8Wu0OCd58qQEA2ambCadg33Gp
+9MKVnpm0Trug6Fr9/z7dkNXJhR7+4wk=
+=NGC5
+-----END PGP SIGNATURE-----
+
+--YKoQgfQHX/tQukT9--
 
