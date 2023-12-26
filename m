@@ -1,92 +1,106 @@
-Return-Path: <netdev+bounces-60335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8D681EA59
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 23:40:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83AF481EABE
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 00:21:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D5091C22026
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 22:40:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 121771F21B0C
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 23:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2B8538A;
-	Tue, 26 Dec 2023 22:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6BF5684;
+	Tue, 26 Dec 2023 23:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F8OOMrMZ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vtgjSBSr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A6A5250;
-	Tue, 26 Dec 2023 22:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E6948C433C9;
-	Tue, 26 Dec 2023 22:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703630424;
-	bh=t7Azjows6a4NudAwFasVutuu3ZSXugHqZpvg/vQupZc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=F8OOMrMZQGGkH81i5df0nHGftbOQDJVEAKb7h6LP/qJoTLvXbzKER+k1mHuX+YvGY
-	 fGVNCVAvEu1bpRVlgdpVZMR40XZBr06aQQ8F8EWjWRfojb5kcegjcX07jsH29G8JLb
-	 j5C3fHXQiS0kvCGuuYdG04eZUwXFXivizYewXR9ZNDY6SgNQlq9zAeqQRUxdOczrLC
-	 RA5FcUAW4Obt0yRFn5TwL+c7TayE8Kjze7Fl04+rkib6ommYoauqqbkmbit8hsbf3f
-	 Cp+sO4SDRN9MAagAPj0hqjWVk6otsm7FnHJD2WerJ0WHKU7nvbX20Q4anfmx1MAl4O
-	 hNEpVNxlaeNjg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC014E333D7;
-	Tue, 26 Dec 2023 22:40:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236055662;
+	Tue, 26 Dec 2023 23:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=3H/1RRd1XOIP8CyxnN2rk2DU6zvL5/M+2Ri29BKwNJ0=; b=vtgjSBSrCl8feTLHRbFNkyT1EF
+	Puh3gh/rf4win03QkjnardFOxjGgamazIIFpBK3NJzkq50duh99JBIajgECht70ldjotE+uEJbRNE
+	eQlnTF87dqgqolSc3gyrZsLFKY1s90LPz+oCt2Qah/7shB+21KRGfZw+IaqR1FN+CxIDVA1VOY4wl
+	v+uVvivSWA2B7DtumJUX5BPzjInOjW7/mJwYCf6VN3in3nGj4rN05gdHf2GBVmnHmTVVbuaKD8uox
+	shyvuGLV7iE5STpT0WHZOfOzxSH87AysV9EVkcOPXAUSzXxjGs/uP8M6qjs36fNyRmzZ0KP2Mestz
+	X5wE9nZA==;
+Received: from [50.53.46.231] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rIGjD-00DesX-1H;
+	Tue, 26 Dec 2023 23:20:51 +0000
+Message-ID: <fadeaa0b-e9d2-4467-97ad-63ba8f7d8646@infradead.org>
+Date: Tue, 26 Dec 2023 15:20:48 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4] mptcp: cleanup and support more ephemeral
- ports sockopts
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170363042382.9770.13227130852306828650.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Dec 2023 22:40:23 +0000
-References: <20231219-upstream-net-next-20231219-mptcp-sockopts-ephemeral-ports-v1-0-2b13bedfcaf8@kernel.org>
-In-Reply-To: <20231219-upstream-net-next-20231219-mptcp-sockopts-ephemeral-ports-v1-0-2b13bedfcaf8@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, dcaratti@redhat.com, max@internet.ru
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] xprtrdma: removed unnecessary headers from verbs.c
+Content-Language: en-US
+To: Tanzir Hasan <tanzirh@google.com>, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
+ Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>,
+ Trond Myklebust <trond.myklebust@hammerspace.com>,
+ Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Nick Desaulniers <nnn@google.com>,
+ Al Viro <viro@zeniv.linux.org.uk>
+References: <20231226-verbs-v1-1-3a2cecf11afd@google.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20231226-verbs-v1-1-3a2cecf11afd@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hi,
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+On 12/26/23 13:23, Tanzir Hasan wrote:
+> asm-generic/barrier.h and asm/bitops.h are already brought into the
+> header and the file can still be built with their removal.
 
-On Tue, 19 Dec 2023 22:31:03 +0100 you wrote:
-> Patch 1 is a cleanup one: mptcp_is_tcpsk() helper was modifying sock_ops
-> in some cases which is unexpected with that name.
+Brought into which header?
+
+Does this conflict with Rule #1 in Documentation/process/submit-checklist.rst ?
+
+> Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
+> Signed-off-by: Tanzir Hasan <tanzirh@google.com>
+> ---
+>  net/sunrpc/xprtrdma/verbs.c | 3 ---
+>  1 file changed, 3 deletions(-)
 > 
-> Patch 2 to 4 add support for two socket options: IP_LOCAL_PORT_RANGE and
-> IP_BIND_ADDRESS_NO_PORT. The first one is a preparation patch, the
-> second one adds the support while the last one modifies an existing
-> selftest to validate the new features.
+> diff --git a/net/sunrpc/xprtrdma/verbs.c b/net/sunrpc/xprtrdma/verbs.c
+> index 28c0771c4e8c..5436560dda85 100644
+> --- a/net/sunrpc/xprtrdma/verbs.c
+> +++ b/net/sunrpc/xprtrdma/verbs.c
+> @@ -55,9 +55,6 @@
+>  #include <linux/sunrpc/svc_rdma.h>
+>  #include <linux/log2.h>
+>  
+> -#include <asm-generic/barrier.h>
+> -#include <asm/bitops.h>
+> -
+>  #include <rdma/ib_cm.h>
+>  
+>  #include "xprt_rdma.h"
 > 
-> [...]
+> ---
+> base-commit: fbafc3e621c3f4ded43720fdb1d6ce1728ec664e
+> change-id: 20231226-verbs-30800631d3f1
+> 
+> Best regards,
 
-Here is the summary with links:
-  - [net-next,1/4] mptcp: don't overwrite sock_ops in mptcp_is_tcpsk()
-    https://git.kernel.org/netdev/net-next/c/8e2b8a9fa512
-  - [net-next,2/4] mptcp: rename mptcp_setsockopt_sol_ip_set_transparent()
-    https://git.kernel.org/netdev/net-next/c/57d3117ca80f
-  - [net-next,3/4] mptcp: sockopt: support IP_LOCAL_PORT_RANGE and IP_BIND_ADDRESS_NO_PORT
-    https://git.kernel.org/netdev/net-next/c/c85636a29264
-  - [net-next,4/4] selftests/net: add MPTCP coverage for IP_LOCAL_PORT_RANGE
-    https://git.kernel.org/netdev/net-next/c/122db5e3634b
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+#Randy
 
