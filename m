@@ -1,188 +1,203 @@
-Return-Path: <netdev+bounces-60229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5945E81E4A2
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 03:58:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D93A581E4B7
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 04:32:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E1EDB21B1B
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 02:58:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 457FF282BFB
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 03:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DAA107A2;
-	Tue, 26 Dec 2023 02:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757E4107B3;
+	Tue, 26 Dec 2023 03:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cq4p8Xff"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4J1fql2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6902F4EB;
-	Tue, 26 Dec 2023 02:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703559479; x=1735095479;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kPxH4mlVpKO8ProfOWoMD/kdu7a2S1nyI4WvfcycFWc=;
-  b=Cq4p8XffqJz3i8aterm2Q5vGykRKmXX68UtCWImLJMqxJDzLhG/82ibC
-   FfBFxtOb/KbR3Gt2uU5tW9TniABnf2FIQ1XXwSnVZZ5dRTnVjVPf6GVlP
-   8w8PbxeE1rlqzp0UUYRmirhJt3MtPqFg4wdTV3wlHxpX8e8Sr10FDo1EU
-   P5OWFAMww4ePi3AjJeHD0PJMALEkXiilF9PiUw9QfYw35mzKmDQIMpJ3C
-   QyKJesWpvMWk5AKdfoSAhhlDd+y0LmHrfjMwH4ty5ggHjci0xU0T0Ruml
-   7v62eYmH35niNcOpKLwPxxVf06rbEjZRo32/lVnw4OtFH9MP2FAtSf/UZ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="3398841"
-X-IronPort-AV: E=Sophos;i="6.04,304,1695711600"; 
-   d="scan'208";a="3398841"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 18:57:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="848321521"
-X-IronPort-AV: E=Sophos;i="6.04,304,1695711600"; 
-   d="scan'208";a="848321521"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 25 Dec 2023 18:57:54 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rHxdg-000Dw3-1L;
-	Tue, 26 Dec 2023 02:57:52 +0000
-Date: Tue, 26 Dec 2023 10:57:24 +0800
-From: kernel test robot <lkp@intel.com>
-To: Markus Elfring <Markus.Elfring@web.de>, virtualization@lists.linux.dev,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Gonglei <arei.gonglei@huawei.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
-Subject: Re: [PATCH] crypto: virtio - Less function calls in
- __virtio_crypto_akcipher_do_req() after error detection
-Message-ID: <202312261008.7ahERlAx-lkp@intel.com>
-References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A82C1078E
+	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 03:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703561559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ph9pqyH1SKt/ykslqZ05q7LYqXwWOYyL1VmFIBCy1cs=;
+	b=U4J1fql2wjqPXeNYpOrAh9qirGPZAUcqRCELVrm5hYFIHNtZzovJuwMwWCsC/iLGcb5aRl
+	xA8P8l0qhFO290RENJTfgPLKPmhFqxIl3gQc3LYY10FzHFAI6gAsL/xRpSAH05S0pwTfHA
+	TlsaK2NTGB2de9ugj048wDfggqWbYqA=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-cZtk6LyyMCyVVX_QGj6_lQ-1; Mon, 25 Dec 2023 22:32:37 -0500
+X-MC-Unique: cZtk6LyyMCyVVX_QGj6_lQ-1
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1d09a64eaebso39795295ad.3
+        for <netdev@vger.kernel.org>; Mon, 25 Dec 2023 19:32:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703561556; x=1704166356;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ph9pqyH1SKt/ykslqZ05q7LYqXwWOYyL1VmFIBCy1cs=;
+        b=vr38kAQAHZfysK3K7LNYtnLBjRYp4ixUdOc4u0AktrYdgb1ENdkOeo3aX70u9Ui+QD
+         waXm9zHOEmrcYZFV2KJQG2pub0KxZ8+3h/bL5XhGROrEEVxza9pRjGDDBTNmJwoMiO2s
+         mqmBjHt0Fx1NtXrT1rcVFbklpJpxrP9Mun42gJp2NdFgZ2DOHAslTGStBA3UOt22V7Ib
+         b+U0ZrCzkVcRTVrEli2HZera8cj+RkiKL6t42fRBj7YwMT4SOZ/tb3PsDw+5Yb0vQguI
+         bJWshHfUSO5cG3/lMS4geey1YsbmjYYG92b/kKFAylqFgpKk40tprjCVMJnqjsAqoTei
+         Cw/w==
+X-Gm-Message-State: AOJu0YxWCdeOifHbaFaGibvknmagTV36l7tfKPG4TSOXg6PmxJDbKpKI
+	YbWSQTdtwnfvyoK9l/Buld7LAXY2PlaPCIGnBsMVzL/63FRcrhq7iKJvjmKr2Ndx6xsJ7Oe+Z/c
+	mSjiB+v6E1sCpfSYHDXA8ghMviB5mfksNvcZZaRI1
+X-Received: by 2002:a17:903:124d:b0:1d4:69a5:edbb with SMTP id u13-20020a170903124d00b001d469a5edbbmr1426744plh.48.1703561556468;
+        Mon, 25 Dec 2023 19:32:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IERAn1+duEGCL81U434Oigr4BxdRwF+MbGMw6zhv+eHeSmA8fvL2MRrv0cQH7UGDE2MpsZdeQ0V7zpgkVbj1tg=
+X-Received: by 2002:a17:903:124d:b0:1d4:69a5:edbb with SMTP id
+ u13-20020a170903124d00b001d469a5edbbmr1426729plh.48.1703561556191; Mon, 25
+ Dec 2023 19:32:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
+References: <f9f7d28624f8084ef07842ee569c22b324ee4055.1703059341.git.hengqi@linux.alibaba.com>
+ <6582fe057cb9_1a34a429435@willemb.c.googlers.com.notmuch> <084142b9-7e0d-4eae-82d2-0736494953cd@linux.alibaba.com>
+ <65845456cad2a_50168294ba@willemb.c.googlers.com.notmuch> <CACGkMEthxep1rvWvEmykeevLhOxiSTR1oog_PkYTRCaeavMGSA@mail.gmail.com>
+ <20231222031024-mutt-send-email-mst@kernel.org> <CACGkMEsZDYFuvxgw63U5naLTYH5XNwMTMNvsoz439AWonFE4Vg@mail.gmail.com>
+ <20231225025936-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231225025936-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 26 Dec 2023 11:32:24 +0800
+Message-ID: <CACGkMEsJQv=KoU0UiPNM_CkaqHf=uLRONdDB36=y80=m_jwONA@mail.gmail.com>
+Subject: Re: [PATCH net-next] virtio-net: switch napi_tx without downing nic
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Heng Qi <hengqi@linux.alibaba.com>, 
+	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Markus,
+On Mon, Dec 25, 2023 at 4:03=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Mon, Dec 25, 2023 at 12:12:48PM +0800, Jason Wang wrote:
+> > On Fri, Dec 22, 2023 at 4:14=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com> wrote:
+> > >
+> > > On Fri, Dec 22, 2023 at 10:35:07AM +0800, Jason Wang wrote:
+> > > > On Thu, Dec 21, 2023 at 11:06=E2=80=AFPM Willem de Bruijn
+> > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > >
+> > > > > Heng Qi wrote:
+> > > > > >
+> > > > > >
+> > > > > > =E5=9C=A8 2023/12/20 =E4=B8=8B=E5=8D=8810:45, Willem de Bruijn =
+=E5=86=99=E9=81=93:
+> > > > > > > Heng Qi wrote:
+> > > > > > >> virtio-net has two ways to switch napi_tx: one is through th=
+e
+> > > > > > >> module parameter, and the other is through coalescing parame=
+ter
+> > > > > > >> settings (provided that the nic status is down).
+> > > > > > >>
+> > > > > > >> Sometimes we face performance regression caused by napi_tx,
+> > > > > > >> then we need to switch napi_tx when debugging. However, the
+> > > > > > >> existing methods are a bit troublesome, such as needing to
+> > > > > > >> reload the driver or turn off the network card.
+> > > >
+> > > > Why is this troublesome? We don't need to turn off the card, it's j=
+ust
+> > > > a toggling of the interface.
+> > > >
+> > > > This ends up with pretty simple code.
+> > > >
+> > > > > So try to make
+> > > > > > >> this update.
+> > > > > > >>
+> > > > > > >> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > > > > > >> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > The commit does not explain why it is safe to do so.
+> > > > > >
+> > > > > > virtnet_napi_tx_disable ensures that already scheduled tx napi =
+ends and
+> > > > > > no new tx napi will be scheduled.
+> > > > > >
+> > > > > > Afterwards, if the __netif_tx_lock_bh lock is held, the stack c=
+annot
+> > > > > > send the packet.
+> > > > > >
+> > > > > > Then we can safely toggle the weight to indicate where to clear=
+ the buffers.
+> > > > > >
+> > > > > > >
+> > > > > > > The tx-napi weights are not really weights: it is a boolean w=
+hether
+> > > > > > > napi is used for transmit cleaning, or whether packets are cl=
+eaned
+> > > > > > > in ndo_start_xmit.
+> > > > > >
+> > > > > > Right.
+> > > > > >
+> > > > > > >
+> > > > > > > There certainly are some subtle issues with regard to pausing=
+/waking
+> > > > > > > queues when switching between modes.
+> > > > > >
+> > > > > > What are "subtle issues" and if there are any, we find them.
+> > > > >
+> > > > > A single runtime test is not sufficient to exercise all edge case=
+s.
+> > > > >
+> > > > > Please don't leave it to reviewers to establish the correctness o=
+f a
+> > > > > patch.
+> > > >
+> > > > +1
+> > > >
+> > > > And instead of trying to do this, it would be much better to optimi=
+ze
+> > > > the NAPI performance. Then we can drop the orphan mode.
+> > >
+> > > "To address your problem, optimize our code to the level which we
+> > > couldn't achieve in more than 10 years".
+> >
+> > Last time QE didn't report any issue for TCP. For others, the code
+> > might just need some optimization if it really matters, it's just
+> > because nobody has worked on this part in the past years.
+>
+> You think nobody worked on performance of virtio net because nobody
+> could bother?
 
-kernel test robot noticed the following build errors:
+No, I just describe what I've seen from the list. No patches were
+posted for performance optimization in recent years.
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linus/master v6.7-rc7 next-20231222]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> I think it's just micro optimized to a level where
+> progress is difficult.
+>
+>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Markus-Elfring/crypto-virtio-Less-function-calls-in-__virtio_crypto_akcipher_do_req-after-error-detection/20231225-154431
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/2413f22f-f0c3-45e0-9f6b-a551bdf0f54c%40web.de
-patch subject: [PATCH] crypto: virtio - Less function calls in __virtio_crypto_akcipher_do_req() after error detection
-config: x86_64-rhel-8.3-bpf (https://download.01.org/0day-ci/archive/20231226/202312261008.7ahERlAx-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231226/202312261008.7ahERlAx-lkp@intel.com/reproduce)
+Maybe.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312261008.7ahERlAx-lkp@intel.com/
+Let me clarify what I meant.
 
-All errors (new ones prefixed by >>):
+If people can help to optimize the NAPI to be as fast as orphans or
+something like 80%-90% of orphans. It should be sufficient to remove
+the orphan path completely. This allows a lot of good features to be
+built easily on top.
 
-   drivers/crypto/virtio/virtio_crypto_akcipher_algs.c: In function '__virtio_crypto_akcipher_do_req':
->> drivers/crypto/virtio/virtio_crypto_akcipher_algs.c:281:1: error: 'free_src' undeclared (first use in this function)
-     281 | free_src;
-         | ^~~~~~~~
-   drivers/crypto/virtio/virtio_crypto_akcipher_algs.c:281:1: note: each undeclared identifier is reported only once for each function it appears in
->> drivers/crypto/virtio/virtio_crypto_akcipher_algs.c:257:25: error: label 'free_src' used but not defined
-     257 |                         goto free_src;
-         |                         ^~~~
+To me, it seems fine to remove it even now as it breaks socket
+accounting which is actually a bug and NAPI has been enabled for years
+but if you don't wish to do that, that's fine.  We can wait for the
+coalescing and dim to be used for a while and revisit this.
 
+Thanks
 
-vim +/free_src +281 drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-
-   218	
-   219	static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request *vc_akcipher_req,
-   220			struct akcipher_request *req, struct data_queue *data_vq)
-   221	{
-   222		struct virtio_crypto_akcipher_ctx *ctx = vc_akcipher_req->akcipher_ctx;
-   223		struct virtio_crypto_request *vc_req = &vc_akcipher_req->base;
-   224		struct virtio_crypto *vcrypto = ctx->vcrypto;
-   225		struct virtio_crypto_op_data_req *req_data = vc_req->req_data;
-   226		struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
-   227		void *src_buf, *dst_buf = NULL;
-   228		unsigned int num_out = 0, num_in = 0;
-   229		int node = dev_to_node(&vcrypto->vdev->dev);
-   230		unsigned long flags;
-   231		int ret;
-   232		bool verify = vc_akcipher_req->opcode == VIRTIO_CRYPTO_AKCIPHER_VERIFY;
-   233		unsigned int src_len = verify ? req->src_len + req->dst_len : req->src_len;
-   234	
-   235		/* out header */
-   236		sg_init_one(&outhdr_sg, req_data, sizeof(*req_data));
-   237		sgs[num_out++] = &outhdr_sg;
-   238	
-   239		/* src data */
-   240		src_buf = kcalloc_node(src_len, 1, GFP_KERNEL, node);
-   241		if (!src_buf)
-   242			return -ENOMEM;
-   243	
-   244		if (verify) {
-   245			/* for verify operation, both src and dst data work as OUT direction */
-   246			sg_copy_to_buffer(req->src, sg_nents(req->src), src_buf, src_len);
-   247			sg_init_one(&srcdata_sg, src_buf, src_len);
-   248			sgs[num_out++] = &srcdata_sg;
-   249		} else {
-   250			sg_copy_to_buffer(req->src, sg_nents(req->src), src_buf, src_len);
-   251			sg_init_one(&srcdata_sg, src_buf, src_len);
-   252			sgs[num_out++] = &srcdata_sg;
-   253	
-   254			/* dst data */
-   255			dst_buf = kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
-   256			if (!dst_buf)
- > 257				goto free_src;
-   258	
-   259			sg_init_one(&dstdata_sg, dst_buf, req->dst_len);
-   260			sgs[num_out + num_in++] = &dstdata_sg;
-   261		}
-   262	
-   263		vc_akcipher_req->src_buf = src_buf;
-   264		vc_akcipher_req->dst_buf = dst_buf;
-   265	
-   266		/* in header */
-   267		sg_init_one(&inhdr_sg, &vc_req->status, sizeof(vc_req->status));
-   268		sgs[num_out + num_in++] = &inhdr_sg;
-   269	
-   270		spin_lock_irqsave(&data_vq->lock, flags);
-   271		ret = virtqueue_add_sgs(data_vq->vq, sgs, num_out, num_in, vc_req, GFP_ATOMIC);
-   272		virtqueue_kick(data_vq->vq);
-   273		spin_unlock_irqrestore(&data_vq->lock, flags);
-   274		if (ret)
-   275			goto err;
-   276	
-   277		return 0;
-   278	
-   279	err:
-   280		kfree(dst_buf);
- > 281	free_src;
-   282		kfree(src_buf);
-   283		return -ENOMEM;
-   284	}
-   285	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
