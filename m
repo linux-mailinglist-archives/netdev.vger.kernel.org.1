@@ -1,118 +1,372 @@
-Return-Path: <netdev+bounces-60253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC20081E61A
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:02:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86CE181E62E
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79B30282F4F
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:02:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15C3D1F227C3
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126F14CDF9;
-	Tue, 26 Dec 2023 09:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39AB4CE0E;
+	Tue, 26 Dec 2023 09:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFKFVnS5"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6C84CB58;
-	Tue, 26 Dec 2023 09:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from alexious$zju.edu.cn ( [124.90.106.3] ) by
- ajax-webmail-mail-app3 (Coremail) ; Tue, 26 Dec 2023 17:01:05 +0800
- (GMT+08:00)
-Date: Tue, 26 Dec 2023 17:01:05 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: alexious@zju.edu.cn
-To: "Chuck Lever" <chuck.lever@oracle.com>
-Cc: "Trond Myklebust" <trond.myklebust@hammerspace.com>, 
-	"Anna Schumaker" <anna@kernel.org>, 
-	"Jeff Layton" <jlayton@kernel.org>, "Neil Brown" <neilb@suse.de>, 
-	"Olga Kornievskaia" <kolga@netapp.com>, 
-	"Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Paolo Abeni" <pabeni@redhat.com>, "Simo Sorce" <simo@redhat.com>, 
-	"Steve Dickson" <steved@redhat.com>, 
-	"Kevin Coffman" <kwc@citi.umich.edu>, linux-nfs@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] SUNRPC: fix a memleak in gss_import_v2_context
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <ZYhivG2MxmtePvo3@tissot.1015granger.net>
-References: <20231224082035.3538560-1-alexious@zju.edu.cn>
- <ZYhivG2MxmtePvo3@tissot.1015granger.net>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9D24CE01
+	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 09:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703581690;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u+g3Tef9DObl9jWXnICAK8GfzwK8Dm8RMjZu/rAS+ZQ=;
+	b=CFKFVnS5JLSuUKxgKIl8mCoNTaaFDHMW7L17cCXsXv2Y6lrecigKDoqiwFxdRPX9SNbI6Z
+	i1bKwSM5wA2SlaXG4jpPGWhfz2VR7rken1VHCdFocYadcMXLv3Y9IwEmBbflQh+K4DyVwA
+	ac89jApOWF5YFMH4r/uMDnYEWh2+t44=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-8B5K4UfAMFGh1n7S6BCU9A-1; Tue, 26 Dec 2023 04:08:09 -0500
+X-MC-Unique: 8B5K4UfAMFGh1n7S6BCU9A-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40d31116cffso34865655e9.2
+        for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 01:08:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703581686; x=1704186486;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u+g3Tef9DObl9jWXnICAK8GfzwK8Dm8RMjZu/rAS+ZQ=;
+        b=qjNDifUjhTRgU1Jgd3yc3QBSZrVcRl+PLi5lRcwOz743j28cEnJl3AYdep1rnVmh2E
+         QwOX6mc0a9/RUoBIQ36lGAhSh1ULQ/jbIBVoHwGFUlkXgjpMI+yjsGVfM6aHycAnPn0a
+         JvkCfY/cpJrsZLO7wCv1FQ5Cpr0ovFGf56AtjRxeNPfJzKhaFwyoy/xgUxQX5fZn+dMA
+         2Fa52Sj9H8K078Xn9fpYv2Z8ffHahYcoGP24bwre7MeEJgJgYS8LWvfV4ozLT4W0qUYO
+         sjd4hwRL8k2yxpqniSvBGjLdjQn1/1ymgL/CAzaMzVxJVjb7m7sdIN4l1AGHqzDN+4f/
+         ubcg==
+X-Gm-Message-State: AOJu0YzgJfsRhKIYVhDhEQE/NwkrQ68eeyPQ+NClZK4FMwn0ELDaRmw1
+	8PuTJ3UzVbEJkQX9W9ZO0F3WZ60C8fimTFb2EiLLJvQVq+SOfe27oC34VwD/KIPxPQUrICksNoI
+	dgHW01uZviGUix1FVEKphkeLw
+X-Received: by 2002:a05:600c:3548:b0:40d:5a48:5ef3 with SMTP id i8-20020a05600c354800b0040d5a485ef3mr407388wmq.8.1703581686361;
+        Tue, 26 Dec 2023 01:08:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEquoNV6/RbrEcvPtaChKbwo8IrTvLmRVIDo0e+H87V9OwfT/SCpIk6nwmsg9C+tk3vz0/oEg==
+X-Received: by 2002:a05:600c:3548:b0:40d:5a48:5ef3 with SMTP id i8-20020a05600c354800b0040d5a485ef3mr407373wmq.8.1703581685991;
+        Tue, 26 Dec 2023 01:08:05 -0800 (PST)
+Received: from redhat.com ([2.55.177.189])
+        by smtp.gmail.com with ESMTPSA id j18-20020a5d5652000000b00336ca349bdesm2893561wrw.47.2023.12.26.01.08.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Dec 2023 01:08:05 -0800 (PST)
+Date: Tue, 26 Dec 2023 04:08:01 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Zhu Yanjun <yanjun.zhu@linux.dev>, Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/6] virtio_net: introduce device stats feature
+ and structures
+Message-ID: <20231226040518-mutt-send-email-mst@kernel.org>
+References: <20231222033021.20649-1-xuanzhuo@linux.alibaba.com>
+ <20231222033021.20649-2-xuanzhuo@linux.alibaba.com>
+ <f6cea3db-aef6-43a9-96a9-04fe42e6a1f3@linux.dev>
+ <1703571463.67622-2-xuanzhuo@linux.alibaba.com>
+ <20231226035811-mutt-send-email-mst@kernel.org>
+ <1703581225.0317998-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <45874bb1.58022.18ca55b2eab.Coremail.alexious@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cC_KCgBnb3NSloplDFl9AQ--.44789W
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/1tbiAgIBAGWJUhg7uQAAsl
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1703581225.0317998-2-xuanzhuo@linux.alibaba.com>
 
-PiBPbiBTdW4sIERlYyAyNCwgMjAyMyBhdCAwNDoyMDozM1BNICswODAwLCBaaGlwZW5nIEx1IHdy
-b3RlOgo+ID4gVGhlIGN0eC0+bWVjaF91c2VkLmRhdGEgYWxsb2NhdGVkIGJ5IGttZW1kdXAgaXMg
-bm90IGZyZWVkIGluIG5laXRoZXIKPiA+IGdzc19pbXBvcnRfdjJfY29udGV4dCBub3IgaXQgb25s
-eSBjYWxsZXIgcmFkZW9uX2RyaXZlcl9vcGVuX2ttcy4KPiA+IFRodXMsIHRoaXMgcGF0Y2ggcmVm
-b3JtIHRoZSBsYXN0IGNhbGwgb2YgZ3NzX2ltcG9ydF92Ml9jb250ZXh0IHRvIHRoZQo+ID4gZ3Nz
-X2tyYjVfaW1wb3J0X2N0eF92MiwgcHJldmVudGluZyB0aGUgbWVtbGVhayB3aGlsZSBrZWVwcGlu
-ZyB0aGUgcmV0dXJuCj4gPiBmb3JtYXRpb24uCj4gPiAKPiA+IEZpeGVzOiA0N2Q4NDgwNzc2Mjkg
-KCJnc3Nfa3JiNTogaGFuZGxlIG5ldyBjb250ZXh0IGZvcm1hdCBmcm9tIGdzc2QiKQo+ID4gU2ln
-bmVkLW9mZi1ieTogWmhpcGVuZyBMdSA8YWxleGlvdXNAemp1LmVkdS5jbj4KPiA+IC0tLQo+ID4g
-IG5ldC9zdW5ycGMvYXV0aF9nc3MvZ3NzX2tyYjVfbWVjaC5jIHwgOSArKysrKysrKy0KPiA+ICAx
-IGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4gPiAKPiA+IGRp
-ZmYgLS1naXQgYS9uZXQvc3VucnBjL2F1dGhfZ3NzL2dzc19rcmI1X21lY2guYyBiL25ldC9zdW5y
-cGMvYXV0aF9nc3MvZ3NzX2tyYjVfbWVjaC5jCj4gPiBpbmRleCBlMzFjZmRmN2VhZGMuLjFlNTRi
-ZDYzZTNmMCAxMDA2NDQKPiA+IC0tLSBhL25ldC9zdW5ycGMvYXV0aF9nc3MvZ3NzX2tyYjVfbWVj
-aC5jCj4gPiArKysgYi9uZXQvc3VucnBjL2F1dGhfZ3NzL2dzc19rcmI1X21lY2guYwo+ID4gQEAg
-LTM5OCw2ICszOTgsNyBAQCBnc3NfaW1wb3J0X3YyX2NvbnRleHQoY29uc3Qgdm9pZCAqcCwgY29u
-c3Qgdm9pZCAqZW5kLCBzdHJ1Y3Qga3JiNV9jdHggKmN0eCwKPiA+ICAJdTY0IHNlcV9zZW5kNjQ7
-Cj4gPiAgCWludCBrZXlsZW47Cj4gPiAgCXUzMiB0aW1lMzI7Cj4gPiArCWludCByZXQ7Cj4gPiAg
-Cj4gPiAgCXAgPSBzaW1wbGVfZ2V0X2J5dGVzKHAsIGVuZCwgJmN0eC0+ZmxhZ3MsIHNpemVvZihj
-dHgtPmZsYWdzKSk7Cj4gPiAgCWlmIChJU19FUlIocCkpCj4gPiBAQCAtNDUwLDggKzQ1MSwxNCBA
-QCBnc3NfaW1wb3J0X3YyX2NvbnRleHQoY29uc3Qgdm9pZCAqcCwgY29uc3Qgdm9pZCAqZW5kLCBz
-dHJ1Y3Qga3JiNV9jdHggKmN0eCwKPiA+ICAJfQo+ID4gIAljdHgtPm1lY2hfdXNlZC5sZW4gPSBn
-c3Nfa2VyYmVyb3NfbWVjaC5nbV9vaWQubGVuOwo+ID4gIAo+ID4gLQlyZXR1cm4gZ3NzX2tyYjVf
-aW1wb3J0X2N0eF92MihjdHgsIGdmcF9tYXNrKTsKPiA+ICsJcmV0ID0gZ3NzX2tyYjVfaW1wb3J0
-X2N0eF92MihjdHgsIGdmcF9tYXNrKTsKPiA+ICsJaWYgKHJldCkgewo+ID4gKwkJcCA9IEVSUl9Q
-VFIocmV0KTsKPiA+ICsJCWdvdG8gb3V0X2ZyZWU7Cj4gPiArCX07Cj4gPiAgCj4gPiArb3V0X2Zy
-ZWU6Cj4gPiArCWtmcmVlKGN0eC0+bWVjaF91c2VkLmRhdGEpOwo+IAo+IElmIHRoZSBjYWxsZXIn
-cyBlcnJvciBmbG93IGRvZXMgbm90IGludm9rZQo+IGdzc19rcmI1X2RlbGV0ZV9zZWNfY29udGV4
-dCgpLCB0aGVuIEkgd291bGQgZXhwZWN0IG1vcmUgdGhhbiBqdXN0Cj4gbWVjaF91c2VkLmRhdGEg
-d291bGQgYmUgbGVha2VkLiBXaGF0IGlmLCBpbnN0ZWFkLCB5b3UgY2hhbmdlZAo+IGdzc19rcmI1
-X2ltcG9ydF9zZWNfY29udGV4dCgpIGxpa2UgdGhpcyAodW50ZXN0ZWQpOgo+IAo+IDQ3MSAgICAg
-ICAgIHJldCA9IGdzc19pbXBvcnRfdjJfY29udGV4dChwLCBlbmQsIGN0eCwgZ2ZwX21hc2spOwo+
-IDQ3MiAgICAgICAgIG1lbXplcm9fZXhwbGljaXQoJmN0eC0+S3Nlc3MsIHNpemVvZihjdHgtPktz
-ZXNzKSk7Cj4gNDczICAgICAgICAgaWYgKHJldCkgeyAgICAgIAo+ICAgIC0gICAgICAgICAgICAg
-ICAga2ZyZWUoY3R4KTsgICAgICAgICAgICAgICAgICAgICAgCj4gICAgKyAgICAgICAgICAgICAg
-ICBnc3Nfa3JiNV9kZWxldGVfc2VjX2NvbnRleHQoY3R4KTsKPiA0NzUgICAgICAgICAgICAgICAg
-IHJldHVybiByZXQ7Cj4gNDc2ICAgICAgICAgfSAgICAKPiAKPiBPYnZpb3VzbHkgeW91IHdvdWxk
-IG5lZWQgdG8gYWRkIGEgZm9yd2FyZCBkZWNsYXJhdGlvbiBvZgo+IGdzc19rcmI1X2ltcG9ydF9z
-ZWNfY29udGV4dCgpIHRvIG1ha2UgdGhpcyBjb21waWxlLiBUaGUgcXVlc3Rpb24KPiBpcyB3aGV0
-aGVyIGdzc19rcmI1X2RlbGV0ZV9zZWNfY29udGV4dCgpIHdpbGwgZGVhbCB3aXRoIGEgcGFydGlh
-bGx5LQo+IGluaXRpYWxpemVkIEBjdHguCgpTaW5jZSB0aGUgY3R4IGlzIGFsbG9jYXRlZCBqdXN0
-IGluIGdzc19rcmI1X2ltcG9ydF9zZWNfY29udGV4dCwgCnRvZ2V0aGVyIHdpdGggdGhhdCBhbGwg
-b2YgZ3NzX2tyYjVfaW1wb3J0X3NlY19jb250ZXh0LCBnc3NfaW1wb3J0X3YyX2NvbnRleHQod2l0
-aCB0aGlzIHBhdGNoKQphbmQgZ3NzX2tyYjVfaW1wb3J0X2N0eF92MiBhcmUgYWxsb2NhdGlvbi1m
-cmVlIGJhbGFuY2VkLiBJdCBzZWVtcyB0aGF0IHdlIGRvbid0IG5lZWQgdG8gCnJlbGVhc2UgYW55
-dGhpbmcgZWxzZSBieSBpbnZva2luZyBnc3Nfa3JiNV9kZWxldGVfc2VjX2NvbnRleHQuCgpJZiBJ
-IG1pc3Mgc29tZXRoaW5nIGxlYWtlZCwgcGxlYXNlIGxldCBtZSBrbm93LgoKCj4gCj4gSG93IGRp
-ZCB5b3UgZmluZCB0aGlzIGxlYWssIGFuZCB3aGF0IGtpbmQgb2YgdGVzdGluZyB3YXMgZG9uZSB0
-bwo+IGNvbmZpcm0gdGhlIGZpeCBpcyBzYWZlPwoKSSBmb3VuZCB0aGlzIG1lbWxlYWsgYnkgc3Rh
-dGljIGFuYWx5c2lzLiAKVGhlIHNhZmV0eSBpc3N1ZSBjYW4ndCBiZSBzb2x2ZWQgYnkgYXV0b21h
-dGljIHRvb2xzIGFzIGZhciBhcyBJIGtub3cuClNvIEkgY2hlY2sgcGF0Y2hlcyBtYW51ZWxseSBi
-ZWZvcmUgc2VuZGluZyBwYXRjaGVzLgoKPiA+ICBvdXRfZXJyOgo+ID4gIAlyZXR1cm4gUFRSX0VS
-UihwKTsKPiA+ICB9Cj4gPiAtLSAKPiA+IDIuMzQuMQo+ID4gCj4gCj4gLS0gCj4gQ2h1Y2sgTGV2
-ZXIK
+On Tue, Dec 26, 2023 at 05:00:25PM +0800, Xuan Zhuo wrote:
+> On Tue, 26 Dec 2023 03:58:37 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Tue, Dec 26, 2023 at 02:17:43PM +0800, Xuan Zhuo wrote:
+> > > On Mon, 25 Dec 2023 16:01:39 +0800, Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
+> > > > 在 2023/12/22 11:30, Xuan Zhuo 写道:
+> > > > > The virtio-net device stats spec:
+> > > > >
+> > > > > https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
+> > > > >
+> > > > > This commit introduces the relative feature and structures.
+> > > >
+> > > > Hi, Xuan
+> > > >
+> > > > After applying this patch series, withe ethtool version 6.5,
+> > > > I got the following NIC statistics. But I do not find the statistics
+> > > > mentioned in this patch series.
+> > > > Do I miss something?
+> > >
+> > > This needs the new virtio-net feature VIRTIO_NET_F_DEVICE_STATS.
+> > > You need to update the hypervisor. But the qemu may not support this.
+> > >
+> > > Thanks.
+> >
+> > Why not? Can you add this to QEMU?
+> 
+> 
+> Yes. It is in my list.
+> 
+> But in my plan, I want the kernel to support this firstly.
+> 
+> Thanks.
+
+QEMU support would mean it's much better tested.
+How did you test this one?
+
+> 
+> >
+> >
+> > >
+> > >
+> > > >
+> > > > "
+> > > > NIC statistics:
+> > > >       rx_packets: 3434812669
+> > > >       rx_bytes: 5168475253690
+> > > >       rx_drops: 0
+> > > >       rx_xdp_packets: 0
+> > > >       rx_xdp_tx: 0
+> > > >       rx_xdp_redirects: 0
+> > > >       rx_xdp_drops: 0
+> > > >       rx_kicks: 57179891
+> > > >       tx_packets: 187694230
+> > > >       tx_bytes: 12423799040
+> > > >       tx_xdp_tx: 0
+> > > >       tx_xdp_tx_drops: 0
+> > > >       tx_kicks: 187694230
+> > > >       tx_timeouts: 0
+> > > >       rx_queue_0_packets: 866027381
+> > > >       rx_queue_0_bytes: 1302726908150
+> > > >       rx_queue_0_drops: 0
+> > > >       rx_queue_0_xdp_packets: 0
+> > > >       rx_queue_0_xdp_tx: 0
+> > > >       rx_queue_0_xdp_redirects: 0
+> > > >       rx_queue_0_xdp_drops: 0
+> > > >       rx_queue_0_kicks: 14567691
+> > > >       rx_queue_1_packets: 856758801
+> > > >       rx_queue_1_bytes: 1289899049042
+> > > >       rx_queue_1_drops: 0
+> > > >       rx_queue_1_xdp_packets: 0
+> > > >       rx_queue_1_xdp_tx: 0
+> > > >       rx_queue_1_xdp_redirects: 0
+> > > >       rx_queue_1_xdp_drops: 0
+> > > >       rx_queue_1_kicks: 14265201
+> > > >       rx_queue_2_packets: 839291053
+> > > >       rx_queue_2_bytes: 1261620863886
+> > > >       rx_queue_2_drops: 0
+> > > >       rx_queue_2_xdp_packets: 0
+> > > >       rx_queue_2_xdp_tx: 0
+> > > >       rx_queue_2_xdp_redirects: 0
+> > > >       rx_queue_2_xdp_drops: 0
+> > > >       rx_queue_2_kicks: 13857653
+> > > >       rx_queue_3_packets: 872735434
+> > > >       rx_queue_3_bytes: 1314228432612
+> > > >       rx_queue_3_drops: 0
+> > > >       rx_queue_3_xdp_packets: 0
+> > > >       rx_queue_3_xdp_tx: 0
+> > > >       rx_queue_3_xdp_redirects: 0
+> > > >       rx_queue_3_xdp_drops: 0
+> > > >       rx_queue_3_kicks: 14489346
+> > > >       tx_queue_0_packets: 75723
+> > > >       tx_queue_0_bytes: 4999030
+> > > >       tx_queue_0_xdp_tx: 0
+> > > >       tx_queue_0_xdp_tx_drops: 0
+> > > >       tx_queue_0_kicks: 75723
+> > > >       tx_queue_0_timeouts: 0
+> > > >       tx_queue_1_packets: 62262921
+> > > >       tx_queue_1_bytes: 4134803914
+> > > >       tx_queue_1_xdp_tx: 0
+> > > >       tx_queue_1_xdp_tx_drops: 0
+> > > >       tx_queue_1_kicks: 62262921
+> > > >       tx_queue_1_timeouts: 0
+> > > >       tx_queue_2_packets: 83
+> > > >       tx_queue_2_bytes: 5478
+> > > >       tx_queue_2_xdp_tx: 0
+> > > >       tx_queue_2_xdp_tx_drops: 0
+> > > >       tx_queue_2_kicks: 83
+> > > >       tx_queue_2_timeouts: 0
+> > > >       tx_queue_3_packets: 125355503
+> > > >       tx_queue_3_bytes: 8283990618
+> > > >       tx_queue_3_xdp_tx: 0
+> > > >       tx_queue_3_xdp_tx_drops: 0
+> > > >       tx_queue_3_kicks: 125355503
+> > > >       tx_queue_3_timeouts: 0
+> > > > "
+> > > >
+> > > > >
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > ---
+> > > > >   include/uapi/linux/virtio_net.h | 137 ++++++++++++++++++++++++++++++++
+> > > > >   1 file changed, 137 insertions(+)
+> > > > >
+> > > > > diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+> > > > > index cc65ef0f3c3e..129e0871d28f 100644
+> > > > > --- a/include/uapi/linux/virtio_net.h
+> > > > > +++ b/include/uapi/linux/virtio_net.h
+> > > > > @@ -56,6 +56,7 @@
+> > > > >   #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
+> > > > >   					 * Steering */
+> > > > >   #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+> > > > > +#define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-level statistics. */
+> > > > >   #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
+> > > > >   #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
+> > > > >   #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
+> > > > > @@ -406,4 +407,140 @@ struct  virtio_net_ctrl_coal_vq {
+> > > > >   	struct virtio_net_ctrl_coal coal;
+> > > > >   };
+> > > > >
+> > > > > +/*
+> > > > > + * Device Statistics
+> > > > > + */
+> > > > > +#define VIRTIO_NET_CTRL_STATS         8
+> > > > > +#define VIRTIO_NET_CTRL_STATS_QUERY   0
+> > > > > +#define VIRTIO_NET_CTRL_STATS_GET     1
+> > > > > +
+> > > > > +struct virtio_net_stats_capabilities {
+> > > > > +
+> > > > > +#define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
+> > > > > +
+> > > > > +#define VIRTIO_NET_STATS_TYPE_RX_BASIC  (1 << 0)
+> > > > > +#define VIRTIO_NET_STATS_TYPE_RX_CSUM   (1 << 1)
+> > > > > +#define VIRTIO_NET_STATS_TYPE_RX_GSO    (1 << 2)
+> > > > > +#define VIRTIO_NET_STATS_TYPE_RX_SPEED  (1 << 3)
+> > > > > +
+> > > > > +#define VIRTIO_NET_STATS_TYPE_TX_BASIC  (1 << 16)
+> > > > > +#define VIRTIO_NET_STATS_TYPE_TX_CSUM   (1 << 17)
+> > > > > +#define VIRTIO_NET_STATS_TYPE_TX_GSO    (1 << 18)
+> > > > > +#define VIRTIO_NET_STATS_TYPE_TX_SPEED  (1 << 19)
+> > > > > +
+> > > > > +	__le64 supported_stats_types[1];
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_ctrl_queue_stats {
+> > > > > +	struct {
+> > > > > +		__le16 vq_index;
+> > > > > +		__le16 reserved[3];
+> > > > > +		__le64 types_bitmap[1];
+> > > > > +	} stats[1];
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_reply_hdr {
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_CVQ       32
+> > > > > +
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC  0
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM   1
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO    2
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED  3
+> > > > > +
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC  16
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM   17
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO    18
+> > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED  19
+> > > > > +	u8 type;
+> > > > > +	u8 reserved;
+> > > > > +	__le16 vq_index;
+> > > > > +	__le16 reserved1;
+> > > > > +	__le16 size;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_cvq {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 command_num;
+> > > > > +	__le64 ok_num;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_rx_basic {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 rx_notifications;
+> > > > > +
+> > > > > +	__le64 rx_packets;
+> > > > > +	__le64 rx_bytes;
+> > > > > +
+> > > > > +	__le64 rx_interrupts;
+> > > > > +
+> > > > > +	__le64 rx_drops;
+> > > > > +	__le64 rx_drop_overruns;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_tx_basic {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 tx_notifications;
+> > > > > +
+> > > > > +	__le64 tx_packets;
+> > > > > +	__le64 tx_bytes;
+> > > > > +
+> > > > > +	__le64 tx_interrupts;
+> > > > > +
+> > > > > +	__le64 tx_drops;
+> > > > > +	__le64 tx_drop_malformed;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_rx_csum {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 rx_csum_valid;
+> > > > > +	__le64 rx_needs_csum;
+> > > > > +	__le64 rx_csum_none;
+> > > > > +	__le64 rx_csum_bad;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_tx_csum {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 tx_csum_none;
+> > > > > +	__le64 tx_needs_csum;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_rx_gso {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 rx_gso_packets;
+> > > > > +	__le64 rx_gso_bytes;
+> > > > > +	__le64 rx_gso_packets_coalesced;
+> > > > > +	__le64 rx_gso_bytes_coalesced;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_tx_gso {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 tx_gso_packets;
+> > > > > +	__le64 tx_gso_bytes;
+> > > > > +	__le64 tx_gso_segments;
+> > > > > +	__le64 tx_gso_segments_bytes;
+> > > > > +	__le64 tx_gso_packets_noseg;
+> > > > > +	__le64 tx_gso_bytes_noseg;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_rx_speed {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 rx_packets_allowance_exceeded;
+> > > > > +	__le64 rx_bytes_allowance_exceeded;
+> > > > > +};
+> > > > > +
+> > > > > +struct virtio_net_stats_tx_speed {
+> > > > > +	struct virtio_net_stats_reply_hdr hdr;
+> > > > > +
+> > > > > +	__le64 tx_packets_allowance_exceeded;
+> > > > > +	__le64 tx_bytes_allowance_exceeded;
+> > > > > +};
+> > > > > +
+> > > > >   #endif /* _UAPI_LINUX_VIRTIO_NET_H */
+> > > >
+> >
+> >
+
 
