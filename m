@@ -1,120 +1,166 @@
-Return-Path: <netdev+bounces-60275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDF6981E6BC
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:53:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A669381E6DA
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 11:13:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 786B72835FA
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:53:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D92D31C20F5A
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647CC4D5B6;
-	Tue, 26 Dec 2023 09:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B579C4D59E;
+	Tue, 26 Dec 2023 10:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="It3RE/TP"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="qctTj9H1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0153F4D5A0
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 09:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a2370535060so945863566b.1
-        for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 01:53:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1703584385; x=1704189185; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FGcSKy9VLe5UH4WPuhkVUffKMD3KkfmFrJxOaiIXVDA=;
-        b=It3RE/TPxQ6sFBvGMgIGOLCpWWZkQJ3Gq/osIVT1YXuDO/LCG98zHEv9++8WvmJERz
-         b+NgFwV9s4RZrGhHALNeCnQzWBRaJQlTplexm+rClGAgXh6zGe5UTjOEUoks2IcjxhfK
-         qkid4/MItlgbN+s2Ay6DEn7F+RsbKv0Z0PDAt5rjXRTven3UzBleT+0RseNA6fBm9gqz
-         FyYyiYSrrWi4e5vVQqA8e5xoVCv2fx9+TIb0vsf5H0GVNo+zS1LYZqqtFJT8J30uvDr6
-         /IVJpteIXhRIMWQ0Zb1f/IaJnBkn2DpUqXhzBsjIfoPiRf3ighwFNk0VrAacy/zQZWIF
-         EWVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703584385; x=1704189185;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FGcSKy9VLe5UH4WPuhkVUffKMD3KkfmFrJxOaiIXVDA=;
-        b=gXkj9vSVRXGdfuFQRf1eMZYGbHmpQHyL92DZ3Eh5KxQkjpyRR+u0M8QTL4qFV13qRR
-         Cgqn6dUpHm71e22/au98cFh9YcLf7CyFhDFhyYNkLulUptnAgEDaQAJgn9OyB6DUnekN
-         PX5uzSImtyuGkSHFTT44qW1E0PLyApLYeD9VDOmdFCm1mTBr8txigmrGVXlkYIjwnWlU
-         epg3qqmE/r7p/B7lL+Zjy2eVT9gRL4OsaphkEIUgVLf22o7oVtemNuPnkHBv6lFp/hsL
-         6Wfcx8aB4gsX538ytjFWvW6uY3DZeKPK1v3iOWVpzrtyBU9A0l8xmxRc+BbFJVbzVlgZ
-         H8RA==
-X-Gm-Message-State: AOJu0YwSGSNP8juxxZYtf2GJ5/XISqpHQf2HSOUCkVu2gIZsuNyt2kZz
-	X/fvQKWBmuIT6zMt12gFlmaNXQ+sYGwRxA==
-X-Google-Smtp-Source: AGHT+IHfkRM7maTPnpWNurNP3VuGJUQU+a17hwG/pPR1gKXEUpEQHINoAyYIu6TPQ9EVT5AshPgxPA==
-X-Received: by 2002:a17:906:6047:b0:a26:aaa1:4ff1 with SMTP id p7-20020a170906604700b00a26aaa14ff1mr6672885ejj.13.1703584385194;
-        Tue, 26 Dec 2023 01:53:05 -0800 (PST)
-Received: from u94a (2001-b011-fa04-d3bc-b2dc-efff-fee8-7e7a.dynamic-ip6.hinet.net. [2001:b011:fa04:d3bc:b2dc:efff:fee8:7e7a])
-        by smtp.gmail.com with ESMTPSA id g24-20020a170902fe1800b001d0c41b1d03sm9636234plj.32.2023.12.26.01.52.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Dec 2023 01:53:04 -0800 (PST)
-Date: Tue, 26 Dec 2023 17:52:56 +0800
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: Maxim Mikityanskiy <maxtram95@gmail.com>
-Cc: Eduard Zingerman <eddyz87@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>
-Subject: Re: [PATCH bpf-next 01/15] selftests/bpf: Fix the
- u64_offset_to_skb_data test
-Message-ID: <w7xg34uqlrnbb3o3rspng6y563astp3hkfxjtz3xp32rqr4a42@xgpeu7qevatg>
-References: <20231220214013.3327288-1-maxtram95@gmail.com>
- <20231220214013.3327288-2-maxtram95@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0429E4E1A0;
+	Tue, 26 Dec 2023 10:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1703585548; x=1704190348; i=markus.elfring@web.de;
+	bh=dPv4vm2V0dtNM9i6ea9tTX3+xLFfWPWmI5QeWJPTnZk=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=qctTj9H1YVuIc3m8+kAdWWGMz52a5nerjKipKUSb6X8ybQ8HqLI6Fm7K+JOA1q/j
+	 chiHL60LtJaQG8B58YOM4rEr9Xx+MEj4DQLXr80xtHmwVA+t2Lzh4Juxb/xXQLn/8
+	 JUBotIqKsiDzTLSsPto/n+/GwCINXYPM13DmwzXE3nBTKZ+uqlOqTu4ESJcHDKrKB
+	 o/oPJWLn42XMytEJk9QA5fSpUPH3u+Ga9weIjWDsGTDlmxjN/45/L3ayhy8ZxKW7l
+	 NbMKFMb2jaAQxa7Z6K9Os2ldxslTommCScCEiAI7p6J++Oe1zU6KUu5yMo0Y+dwts
+	 Ih+seoMJWTukJthKvw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MgzaR-1qmKZd2f09-00h0gW; Tue, 26
+ Dec 2023 11:12:28 +0100
+Message-ID: <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
+Date: Tue, 26 Dec 2023 11:12:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231220214013.3327288-2-maxtram95@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH v2] crypto: virtio - Less function calls in
+ __virtio_crypto_akcipher_do_req() after error detection
+Content-Language: en-GB
+To: kernel test robot <lkp@intel.com>, virtualization@lists.linux.dev,
+ linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Gonglei <arei.gonglei@huawei.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+ netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
+References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
+ <202312260852.0ge5O8IL-lkp@intel.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <202312260852.0ge5O8IL-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:YN0MO2vfA1atqF0nbfqn3SUIOjqrjmmzVaCGbVBzhr1uK75lo+t
+ Z+XanIEq02qD07l7cGh0qCNmrpZhVE1z34Lyp8XzjJZz1NMCNGi0WvNA0YgL+CUCd3AkrUH
+ u4m7w4Ne71OdUv3nbMx76OomPu4ThXd6ZHN3zMk7meKGBNwTcpJaMKYb1ZhMM9nhYIGQd72
+ CDypDzv2I327qYKzDGLtg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:8nuqnBAmzpc=;fggNP23Hu6H5jAMVog3j6WuwsVy
+ SNSPoYpjKMwrNPMQKvNUF2W2BCNiSMXM6+szPZlgk5czdie42gPPZHtJ7lVD+Ve9gzqracOJ/
+ vJ5Nm0XtiPrhTYtne9KKJkgViiSJ9VRdwEOQg6qSSh0Mb6GF61My09Xu6t5blbdrTD8JCW+hi
+ ZTyonCXTwrNSC5ybEZGjj1n1oSG7o6W0ZyXTEGYjlWq1Uw0g/0LYWTSyw0Ul4AyVOp9mf5bar
+ LyyuaOfeY/6x8vmc4qN2V+wcRolHAdWvCkMblNmdfH5VNDTOO/6vgqOkQJ+4I+RmhODXe5aEk
+ zcSDuO/zOLanNfFuqFZDqVUBziTSeoqXMdbMmvR+VbZse1YRLch5Kgaddv1kU57k/LvAdCeV/
+ jITnam948vgtGL4CSq8sG+SNxwq7haNKwfXVlqMV0PvdcaZKULiS7OwcIu+JAjAExqHxn9VhC
+ sQxEIQsHz0Vros/asQqPXaV9By64fZ4xZV9YTcYW9kYUMzFbACzWecX2MxryUt7VZdNL0hAKD
+ h8b9hiub2b7uHr2lWE6sgLF0Lza1HRxLQE4P1gx/2/FK+TdMtwfi6fdlCUq0YAtkVAjhJ3Itc
+ 7IQDzC6bKhG423ry4K5JJNPQrTieQVnchifFCJs9ji2RXXV7XAHJXJVTFsCMbvMSzqAYgrCjE
+ ju2Lwc6iP4UF7ZT3PH1U5EkOjtkCUdjCEKcUxI9LG/RG9IQd4xrfJgOvxzxFRAa0hNFbco+mU
+ 3K0PdeaQhY/3yQPOjtIfTCJAM0mn9o5LiJ/TwzfQnF6fBQgzwjZPllvg7PJdAgRahw1GDP0AU
+ 4q0P9MY9OqRHgjCkBcqICAHF0Pb6L3gb166r70ry43nveXIZQuABdfP9ZVueBQ6dIV4gzclr9
+ T3QMf/bkPp2VN9TN5sd/4dEflY8gfYX/vQqODRKtrK+Izhm70lJna8tRR0QH1TcGjBgoTUfi3
+ VOtIf1J/PSAE+RJkUJCU2HoAB14=
 
-On Wed, Dec 20, 2023 at 11:39:59PM +0200, Maxim Mikityanskiy wrote:
-> From: Maxim Mikityanskiy <maxim@isovalent.com>
-> 
-> The u64_offset_to_skb_data test is supposed to make a 64-bit fill, but
-> instead makes a 16-bit one. Fix the test according to its intention. The
-> 16-bit fill is covered by u16_offset_to_skb_data.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Tue, 26 Dec 2023 11:00:20 +0100
 
-Cover letter mentioned
+The kfree() function was called in up to two cases by the
+__virtio_crypto_akcipher_do_req() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
-  Patch 1 (Maxim): Fix for an existing test, it will matter later in the
-  series.
+* Adjust jump targets.
 
-However no subsequent patch touch upon u64_offset_to_skb_data(). Was the
-followup missing from this series?
+* Delete two initialisations which became unnecessary
+  with this refactoring.
 
-> Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
-> [...]
->  SEC("tc")
->  __description("Spill u32 const scalars.  Refill as u64.  Offset to skb->data")
-> -__failure __msg("invalid access to packet")
-> +__failure __msg("math between pkt pointer and register with unbounded min value is not allowed")
->  __naked void u64_offset_to_skb_data(void)
->  {
->  	asm volatile ("					\
-> @@ -253,7 +253,7 @@ __naked void u64_offset_to_skb_data(void)
->  	w7 = 20;					\
->  	*(u32*)(r10 - 4) = r6;				\
->  	*(u32*)(r10 - 8) = r7;				\
-> -	r4 = *(u16*)(r10 - 8);				\
-> +	r4 = *(u64*)(r10 - 8);				\
->  	r0 = r2;					\
->  	/* r0 += r4 R0=pkt R2=pkt R3=pkt_end R4=umax=65535 */\
->  	r0 += r4;					\
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+
+v2:
+A typo was fixed for the delimiter of a label.
+
+ drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers=
+/crypto/virtio/virtio_crypto_akcipher_algs.c
+index 2621ff8a9376..057da5bd8d30 100644
+=2D-- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+@@ -224,11 +224,11 @@ static int __virtio_crypto_akcipher_do_req(struct vi=
+rtio_crypto_akcipher_request
+ 	struct virtio_crypto *vcrypto =3D ctx->vcrypto;
+ 	struct virtio_crypto_op_data_req *req_data =3D vc_req->req_data;
+ 	struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
+-	void *src_buf =3D NULL, *dst_buf =3D NULL;
++	void *src_buf, *dst_buf =3D NULL;
+ 	unsigned int num_out =3D 0, num_in =3D 0;
+ 	int node =3D dev_to_node(&vcrypto->vdev->dev);
+ 	unsigned long flags;
+-	int ret =3D -ENOMEM;
++	int ret;
+ 	bool verify =3D vc_akcipher_req->opcode =3D=3D VIRTIO_CRYPTO_AKCIPHER_VE=
+RIFY;
+ 	unsigned int src_len =3D verify ? req->src_len + req->dst_len : req->src=
+_len;
+
+@@ -239,7 +239,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 	/* src data */
+ 	src_buf =3D kcalloc_node(src_len, 1, GFP_KERNEL, node);
+ 	if (!src_buf)
+-		goto err;
++		return -ENOMEM;
+
+ 	if (verify) {
+ 		/* for verify operation, both src and dst data work as OUT direction */
+@@ -254,7 +254,7 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 		/* dst data */
+ 		dst_buf =3D kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
+ 		if (!dst_buf)
+-			goto err;
++			goto free_src;
+
+ 		sg_init_one(&dstdata_sg, dst_buf, req->dst_len);
+ 		sgs[num_out + num_in++] =3D &dstdata_sg;
+@@ -277,9 +277,9 @@ static int __virtio_crypto_akcipher_do_req(struct virt=
+io_crypto_akcipher_request
+ 	return 0;
+
+ err:
+-	kfree(src_buf);
+ 	kfree(dst_buf);
+-
++free_src:
++	kfree(src_buf);
+ 	return -ENOMEM;
+ }
+
+=2D-
+2.43.0
+
 
