@@ -1,372 +1,291 @@
-Return-Path: <netdev+bounces-60259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0BDE81E668
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:28:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B0A81E665
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 10:28:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 481A4B21787
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:28:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C0961F226C4
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 09:28:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E774D110;
-	Tue, 26 Dec 2023 09:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464904D11E;
+	Tue, 26 Dec 2023 09:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ki8jdkjH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350CD4CDFD
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 09:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R581e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VzHBbJg_1703582906;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VzHBbJg_1703582906)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Dec 2023 17:28:27 +0800
-Message-ID: <1703582648.6164327-4-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 1/6] virtio_net: introduce device stats feature and structures
-Date: Tue, 26 Dec 2023 17:24:08 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev,
- netdev@vger.kernel.org
-References: <20231222033021.20649-1-xuanzhuo@linux.alibaba.com>
- <20231222033021.20649-2-xuanzhuo@linux.alibaba.com>
- <f6cea3db-aef6-43a9-96a9-04fe42e6a1f3@linux.dev>
- <1703571463.67622-2-xuanzhuo@linux.alibaba.com>
- <20231226035811-mutt-send-email-mst@kernel.org>
- <1703581225.0317998-2-xuanzhuo@linux.alibaba.com>
- <20231226040518-mutt-send-email-mst@kernel.org>
- <1703581761.8691342-3-xuanzhuo@linux.alibaba.com>
- <20231226041848-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231226041848-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D304CE18
+	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 09:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a2356bb40e3so358140366b.1
+        for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 01:28:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1703582892; x=1704187692; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=guAVeD3Hak4vfCKKwioe7579n4+j6Wz5Tsd/laBd5QY=;
+        b=ki8jdkjHYxGPDu7g07I7mlMKbV9zVpGlowdEveZRxMqMH26sE+mGQdFivpt2o3+OJv
+         g7owFFnqCDWWp9B4XNRb0nIEBoQJDxwfRYIGSGbugIwq7jTv+zzxllnx0sYg0MvA6UyA
+         cFAe/D1F8/Idfbrww5L3oIJnx3HVJUvOAni9frtCpqN7Ql5dlUGl5xnddWkCQ0rR2JkN
+         4uZwn7t9M27cqTiwS5QFNVqX3j0gSyxeuFHq4zZBsEhgHTS2tkCf9vxwzwt2VK/rfWtV
+         7NSw+i2aEP0+xoE9NWinGtRW04SSaAmO/6ns0XxNcxzgt3hBGdlSSEYGdDHBlh39aIn1
+         UHPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703582892; x=1704187692;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=guAVeD3Hak4vfCKKwioe7579n4+j6Wz5Tsd/laBd5QY=;
+        b=dy3crhHyGDXcxtSzmMI7SI6VI9aNkDPnWt+1ZUh/riacpkMu+MfvCMytjC9nD79iJy
+         C26MDw/q7zH5HkD+IfExIZ4xPFC5k0JVmi6HpHMtYOXG7bumWnQInpyff/pzMzkEAAZY
+         ucmF7prZgphiSM7X3OjM7/YhrN652eBvb4jwcEdiqQjEFRIH+b33S5os2Cc55znYlqAU
+         3+nsW64fYOE5IJOGmIbgEDNCOni8sK0Bws6pDBjvB0BRfChRTuS34rVxqwm3XSBOP3E9
+         kIhkUeG9xe3/4Xi+gbLa+BQwI/SYfffEsOfMxlogv6cxuURuyxTGM+5eTPigKlQ+hgEq
+         +zfg==
+X-Gm-Message-State: AOJu0YyLtWTVu/DhwLpt/3QcznwAyP+qx86VZcS1NZpQDdLBsLnziQnd
+	CHLh9uLJix5ZEkbjuu8zQ9uBsnWidNjp3g==
+X-Google-Smtp-Source: AGHT+IETyCo7bY8dXFHo68ivE9hByYhBb8a99Pa2mkt2ICjxwpdCJ4CJZvXY273teIFxQu6m5CV3/g==
+X-Received: by 2002:a17:906:7fc6:b0:a23:5bfc:edf6 with SMTP id r6-20020a1709067fc600b00a235bfcedf6mr3235465ejs.73.1703582892028;
+        Tue, 26 Dec 2023 01:28:12 -0800 (PST)
+Received: from [192.168.0.22] ([78.10.206.178])
+        by smtp.gmail.com with ESMTPSA id zr16-20020a170907711000b00a26af4d96c6sm4636929ejb.4.2023.12.26.01.28.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Dec 2023 01:28:11 -0800 (PST)
+Message-ID: <58dde1a7-ed4a-442c-bb5c-c3f6d926fb7e@linaro.org>
+Date: Tue, 26 Dec 2023 10:28:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Content-Language: en-US
+To: Jie Luo <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
+ konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ quic_srichara@quicinc.com
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <20231225084424.30986-6-quic_luoj@quicinc.com>
+ <dee72ce8-b24e-467a-b265-1b965588807f@linaro.org>
+ <aeb364a3-6c05-4a1b-ba32-e687a89f20f8@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <aeb364a3-6c05-4a1b-ba32-e687a89f20f8@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Dec 2023 04:19:26 -0500, "Michael S. Tsirkin" <mst@redhat.com> w=
-rote:
-> On Tue, Dec 26, 2023 at 05:09:21PM +0800, Xuan Zhuo wrote:
-> > On Tue, 26 Dec 2023 04:08:01 -0500, "Michael S. Tsirkin" <mst@redhat.co=
-m> wrote:
-> > > On Tue, Dec 26, 2023 at 05:00:25PM +0800, Xuan Zhuo wrote:
-> > > > On Tue, 26 Dec 2023 03:58:37 -0500, "Michael S. Tsirkin" <mst@redha=
-t.com> wrote:
-> > > > > On Tue, Dec 26, 2023 at 02:17:43PM +0800, Xuan Zhuo wrote:
-> > > > > > On Mon, 25 Dec 2023 16:01:39 +0800, Zhu Yanjun <yanjun.zhu@linu=
-x.dev> wrote:
-> > > > > > > =E5=9C=A8 2023/12/22 11:30, Xuan Zhuo =E5=86=99=E9=81=93:
-> > > > > > > > The virtio-net device stats spec:
-> > > > > > > >
-> > > > > > > > https://github.com/oasis-tcs/virtio-spec/commit/42f38998982=
-3039724f95bbbd243291ab0064f82
-> > > > > > > >
-> > > > > > > > This commit introduces the relative feature and structures.
-> > > > > > >
-> > > > > > > Hi, Xuan
-> > > > > > >
-> > > > > > > After applying this patch series, withe ethtool version 6.5,
-> > > > > > > I got the following NIC statistics. But I do not find the sta=
-tistics
-> > > > > > > mentioned in this patch series.
-> > > > > > > Do I miss something?
-> > > > > >
-> > > > > > This needs the new virtio-net feature VIRTIO_NET_F_DEVICE_STATS.
-> > > > > > You need to update the hypervisor. But the qemu may not support=
- this.
-> > > > > >
-> > > > > > Thanks.
-> > > > >
-> > > > > Why not? Can you add this to QEMU?
-> > > >
-> > > >
-> > > > Yes. It is in my list.
-> > > >
-> > > > But in my plan, I want the kernel to support this firstly.
-> > > >
-> > > > Thanks.
-> > >
-> > > QEMU support would mean it's much better tested.
-> > > How did you test this one?
-> >
-> > With our DPU.
-> >
-> > Thanks.
-> >
->
-> Well if QEMU support is there then Zhu Yanjun here can test it.
+On 26/12/2023 08:25, Jie Luo wrote:
+>>> -    description:
+>>> -      the first Address and length of the register set for the MDIO controller.
+>>> -      the second Address and length of the register for ethernet LDO, this second
+>>> -      address range is only required by the platform IPQ50xx.
+>>> +    maxItems: 5
+>>> +    description: |
+>>> +      The first address and length of the register set for the MDIO controller,
+>>> +      the optional second address and length of the register is for CMN block,
+>>> +      the optional third, fourth and fifth address and length of the register
+>>> +      for Ethernet LDO, the optional Ethernet LDO address range is required by
+>>
+>> Wait, required? You said in in response to Rob these are not required!
+> 
+> As for the response to Rob, i was saying the uniphy ahb and sys clocks
+> are not needed on ipq9574.
+> The LDO are needed on ipq5332 and ipq5018 currently.
 
-Yes.
+Clocks as well but:
 
-But for me, the priority of the qemu implement is low.
-I must do this one by one.
+"A driver can function without knowing about all these new registers and
+..."
 
-Thanks.
+Anyway, this should be list ("items:") with descriptions, instead of one
+big description listing things.
 
 
->
->
-> > >
-> > > >
-> > > > >
-> > > > >
-> > > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > "
-> > > > > > > NIC statistics:
-> > > > > > >       rx_packets: 3434812669
-> > > > > > >       rx_bytes: 5168475253690
-> > > > > > >       rx_drops: 0
-> > > > > > >       rx_xdp_packets: 0
-> > > > > > >       rx_xdp_tx: 0
-> > > > > > >       rx_xdp_redirects: 0
-> > > > > > >       rx_xdp_drops: 0
-> > > > > > >       rx_kicks: 57179891
-> > > > > > >       tx_packets: 187694230
-> > > > > > >       tx_bytes: 12423799040
-> > > > > > >       tx_xdp_tx: 0
-> > > > > > >       tx_xdp_tx_drops: 0
-> > > > > > >       tx_kicks: 187694230
-> > > > > > >       tx_timeouts: 0
-> > > > > > >       rx_queue_0_packets: 866027381
-> > > > > > >       rx_queue_0_bytes: 1302726908150
-> > > > > > >       rx_queue_0_drops: 0
-> > > > > > >       rx_queue_0_xdp_packets: 0
-> > > > > > >       rx_queue_0_xdp_tx: 0
-> > > > > > >       rx_queue_0_xdp_redirects: 0
-> > > > > > >       rx_queue_0_xdp_drops: 0
-> > > > > > >       rx_queue_0_kicks: 14567691
-> > > > > > >       rx_queue_1_packets: 856758801
-> > > > > > >       rx_queue_1_bytes: 1289899049042
-> > > > > > >       rx_queue_1_drops: 0
-> > > > > > >       rx_queue_1_xdp_packets: 0
-> > > > > > >       rx_queue_1_xdp_tx: 0
-> > > > > > >       rx_queue_1_xdp_redirects: 0
-> > > > > > >       rx_queue_1_xdp_drops: 0
-> > > > > > >       rx_queue_1_kicks: 14265201
-> > > > > > >       rx_queue_2_packets: 839291053
-> > > > > > >       rx_queue_2_bytes: 1261620863886
-> > > > > > >       rx_queue_2_drops: 0
-> > > > > > >       rx_queue_2_xdp_packets: 0
-> > > > > > >       rx_queue_2_xdp_tx: 0
-> > > > > > >       rx_queue_2_xdp_redirects: 0
-> > > > > > >       rx_queue_2_xdp_drops: 0
-> > > > > > >       rx_queue_2_kicks: 13857653
-> > > > > > >       rx_queue_3_packets: 872735434
-> > > > > > >       rx_queue_3_bytes: 1314228432612
-> > > > > > >       rx_queue_3_drops: 0
-> > > > > > >       rx_queue_3_xdp_packets: 0
-> > > > > > >       rx_queue_3_xdp_tx: 0
-> > > > > > >       rx_queue_3_xdp_redirects: 0
-> > > > > > >       rx_queue_3_xdp_drops: 0
-> > > > > > >       rx_queue_3_kicks: 14489346
-> > > > > > >       tx_queue_0_packets: 75723
-> > > > > > >       tx_queue_0_bytes: 4999030
-> > > > > > >       tx_queue_0_xdp_tx: 0
-> > > > > > >       tx_queue_0_xdp_tx_drops: 0
-> > > > > > >       tx_queue_0_kicks: 75723
-> > > > > > >       tx_queue_0_timeouts: 0
-> > > > > > >       tx_queue_1_packets: 62262921
-> > > > > > >       tx_queue_1_bytes: 4134803914
-> > > > > > >       tx_queue_1_xdp_tx: 0
-> > > > > > >       tx_queue_1_xdp_tx_drops: 0
-> > > > > > >       tx_queue_1_kicks: 62262921
-> > > > > > >       tx_queue_1_timeouts: 0
-> > > > > > >       tx_queue_2_packets: 83
-> > > > > > >       tx_queue_2_bytes: 5478
-> > > > > > >       tx_queue_2_xdp_tx: 0
-> > > > > > >       tx_queue_2_xdp_tx_drops: 0
-> > > > > > >       tx_queue_2_kicks: 83
-> > > > > > >       tx_queue_2_timeouts: 0
-> > > > > > >       tx_queue_3_packets: 125355503
-> > > > > > >       tx_queue_3_bytes: 8283990618
-> > > > > > >       tx_queue_3_xdp_tx: 0
-> > > > > > >       tx_queue_3_xdp_tx_drops: 0
-> > > > > > >       tx_queue_3_kicks: 125355503
-> > > > > > >       tx_queue_3_timeouts: 0
-> > > > > > > "
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > > > ---
-> > > > > > > >   include/uapi/linux/virtio_net.h | 137 +++++++++++++++++++=
-+++++++++++++
-> > > > > > > >   1 file changed, 137 insertions(+)
-> > > > > > > >
-> > > > > > > > diff --git a/include/uapi/linux/virtio_net.h b/include/uapi=
-/linux/virtio_net.h
-> > > > > > > > index cc65ef0f3c3e..129e0871d28f 100644
-> > > > > > > > --- a/include/uapi/linux/virtio_net.h
-> > > > > > > > +++ b/include/uapi/linux/virtio_net.h
-> > > > > > > > @@ -56,6 +56,7 @@
-> > > > > > > >   #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
-> > > > > > > >   					 * Steering */
-> > > > > > > >   #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address =
-*/
-> > > > > > > > +#define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide=
- device-level statistics. */
-> > > > > > > >   #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports v=
-irtqueue notification coalescing */
-> > > > > > > >   #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports noti=
-fications coalescing */
-> > > > > > > >   #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle US=
-Ov4 in. */
-> > > > > > > > @@ -406,4 +407,140 @@ struct  virtio_net_ctrl_coal_vq {
-> > > > > > > >   	struct virtio_net_ctrl_coal coal;
-> > > > > > > >   };
-> > > > > > > >
-> > > > > > > > +/*
-> > > > > > > > + * Device Statistics
-> > > > > > > > + */
-> > > > > > > > +#define VIRTIO_NET_CTRL_STATS         8
-> > > > > > > > +#define VIRTIO_NET_CTRL_STATS_QUERY   0
-> > > > > > > > +#define VIRTIO_NET_CTRL_STATS_GET     1
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_capabilities {
-> > > > > > > > +
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_CVQ       (1L << 32)
-> > > > > > > > +
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_RX_BASIC  (1 << 0)
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_RX_CSUM   (1 << 1)
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_RX_GSO    (1 << 2)
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_RX_SPEED  (1 << 3)
-> > > > > > > > +
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_TX_BASIC  (1 << 16)
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_TX_CSUM   (1 << 17)
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_TX_GSO    (1 << 18)
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_TX_SPEED  (1 << 19)
-> > > > > > > > +
-> > > > > > > > +	__le64 supported_stats_types[1];
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_ctrl_queue_stats {
-> > > > > > > > +	struct {
-> > > > > > > > +		__le16 vq_index;
-> > > > > > > > +		__le16 reserved[3];
-> > > > > > > > +		__le64 types_bitmap[1];
-> > > > > > > > +	} stats[1];
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_reply_hdr {
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_CVQ       32
-> > > > > > > > +
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC  0
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM   1
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO    2
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED  3
-> > > > > > > > +
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC  16
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM   17
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO    18
-> > > > > > > > +#define VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED  19
-> > > > > > > > +	u8 type;
-> > > > > > > > +	u8 reserved;
-> > > > > > > > +	__le16 vq_index;
-> > > > > > > > +	__le16 reserved1;
-> > > > > > > > +	__le16 size;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_cvq {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 command_num;
-> > > > > > > > +	__le64 ok_num;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_rx_basic {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 rx_notifications;
-> > > > > > > > +
-> > > > > > > > +	__le64 rx_packets;
-> > > > > > > > +	__le64 rx_bytes;
-> > > > > > > > +
-> > > > > > > > +	__le64 rx_interrupts;
-> > > > > > > > +
-> > > > > > > > +	__le64 rx_drops;
-> > > > > > > > +	__le64 rx_drop_overruns;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_tx_basic {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 tx_notifications;
-> > > > > > > > +
-> > > > > > > > +	__le64 tx_packets;
-> > > > > > > > +	__le64 tx_bytes;
-> > > > > > > > +
-> > > > > > > > +	__le64 tx_interrupts;
-> > > > > > > > +
-> > > > > > > > +	__le64 tx_drops;
-> > > > > > > > +	__le64 tx_drop_malformed;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_rx_csum {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 rx_csum_valid;
-> > > > > > > > +	__le64 rx_needs_csum;
-> > > > > > > > +	__le64 rx_csum_none;
-> > > > > > > > +	__le64 rx_csum_bad;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_tx_csum {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 tx_csum_none;
-> > > > > > > > +	__le64 tx_needs_csum;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_rx_gso {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 rx_gso_packets;
-> > > > > > > > +	__le64 rx_gso_bytes;
-> > > > > > > > +	__le64 rx_gso_packets_coalesced;
-> > > > > > > > +	__le64 rx_gso_bytes_coalesced;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_tx_gso {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 tx_gso_packets;
-> > > > > > > > +	__le64 tx_gso_bytes;
-> > > > > > > > +	__le64 tx_gso_segments;
-> > > > > > > > +	__le64 tx_gso_segments_bytes;
-> > > > > > > > +	__le64 tx_gso_packets_noseg;
-> > > > > > > > +	__le64 tx_gso_bytes_noseg;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_rx_speed {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 rx_packets_allowance_exceeded;
-> > > > > > > > +	__le64 rx_bytes_allowance_exceeded;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > > +struct virtio_net_stats_tx_speed {
-> > > > > > > > +	struct virtio_net_stats_reply_hdr hdr;
-> > > > > > > > +
-> > > > > > > > +	__le64 tx_packets_allowance_exceeded;
-> > > > > > > > +	__le64 tx_bytes_allowance_exceeded;
-> > > > > > > > +};
-> > > > > > > > +
-> > > > > > > >   #endif /* _UAPI_LINUX_VIRTIO_NET_H */
-> > > > > > >
-> > > > >
-> > > > >
-> > >
->
+> 
+>>
+>>> +      the platform IPQ50xx/IPQ5332.
+>>
+>> So these are valid for all platforms or not? Looks not, but nothing
+>> narrows the list for other boards.
+> 
+> i add the limitation on the reg usage for the ipq5332 platform on the
+> following part "if condition" of this patch, i will update the patch
+> to narrow down for the other compatibles.
+> 
+>>
+>> Anyway, why do you add entries in the middle? LDO was the second, so it
+>> cannot be now fifth.
+> 
+> As Rob's suggestion, i move the cmn_blk to second location for
+> simplifying the limitation description, i checked the upstream dts code,
+> the LDO is not used currently, so we can move cmn_blk to the second
+> location here.
+
+I cannot find his suggestion in the previous thread. Where did he
+propose it?
+
+...
+
+>>> +  qcom,cmn-ref-clock-frequency:
+>>> +    $ref: /schemas/types.yaml#/definitions/uint32
+>>> +    enum:
+>>> +      - 25000000
+>>> +      - 31250000
+>>> +      - 40000000
+>>> +      - 48000000
+>>> +      - 50000000
+>>> +      - 96000000
+>>> +    default: 48000000
+>>> +    description: |
+>>> +      The reference clock source of CMN PLL block is selectable, the
+>>> +      reference clock source can be from wifi module or the external
+>>> +      xtal, the reference clock frequency 48MHZ can be from internal
+>>> +      wifi or the external xtal, if absent, the internal 48MHZ is used,
+>>> +      if the 48MHZ is specified, which means the external 48Mhz is used.
+>>
+>> This does not resolve mine and Conor's concerns from previous version.
+>> External clocks are defined as clock inputs.
+> 
+> No matter the external or internal reference clock, they are the clock
+> source selection for CMN, there are only 48MHZ can be external or 
+> internal, other clocks have the different clock rate, so the internal
+> 48MHZ reference clock can be implied when the 
+> "qcom,cmn-ref-clock-frequency" is not defined, which is suggested by 
+> Conor in the previous
+> comments.
+
+I don't think he proposed it, but maybe I missed some message (care to
+point me to his message where he agreed on usage of
+qcom,cmn-ref-clock-frequency?). I am pretty sure we both stayed on the
+same page, that the presence of clocks defines choice of internal clock.
+This property should go away.
+
+It is tiring to keep discussing this.
+
+> 
+>>
+>>> +
+>>> +  clock-frequency:
+>>> +    enum:
+>>> +      - 390625
+>>> +      - 781250
+>>> +      - 1562500
+>>> +      - 3125000
+>>> +      - 6250000
+>>> +      - 12500000
+>>> +    default: 390625
+>>> +    description: |
+>>> +      The MDIO bus clock that must be output by the MDIO bus hardware,
+>>> +      only the listed frequencies above can be supported, other frequency
+>>> +      will cause malfunction. If absent, the default hardware value 0xff
+>>> +      is used, which means the default MDIO clock frequency 390625HZ, The
+>>> +      MDIO clock frequency is MDIO_SYS_CLK/(MDIO_CLK_DIV + 1), the SoC
+>>> +      MDIO_SYS_CLK is fixed to 100MHZ, the MDIO_CLK_DIV is from MDIO control
+>>> +      register, there is higher clock frequency requirement on the normal
+>>> +      working case where the MDIO slave devices support high clock frequency.
+>>>   
+>>>   required:
+>>>     - compatible
+>>> @@ -59,8 +118,10 @@ allOf:
+>>>             contains:
+>>>               enum:
+>>>                 - qcom,ipq5018-mdio
+>>> +              - qcom,ipq5332-mdio
+>>>                 - qcom,ipq6018-mdio
+>>>                 - qcom,ipq8074-mdio
+>>> +              - qcom,ipq9574-mdio
+>>>       then:
+>>>         required:
+>>>           - clocks
+>>> @@ -70,6 +131,20 @@ allOf:
+>>>           clocks: false
+>>>           clock-names: false
+>>>   
+>>> +  - if:
+>>> +      properties:
+>>> +        compatible:
+>>> +          contains:
+>>> +            enum:
+>>> +              - qcom,ipq5332-mdio
+>>> +    then:
+>>> +      properties:
+>>> +        clocks:
+>>> +          minItems: 5
+>>> +          maxItems: 5
+>>> +        reg-names:
+>>> +          minItems: 4
+>>
+>> Why all other variants now have 5 clocks and 5 reg entries? Nothing of
+>> it is explained in the commit msg.
+> 
+>  From the condition above, only "qcom,ipq5332-mdio" has 5 clocks (mdio +
+> 4 uniphy clocks) and 4 regs (mdio + cmn_blk + 2 LDOs) as the cmn_blk is
+> moved to the second location.
+> 
+> how it can gives the 5 clocks and 5 regs for other variants here?
+
+How? Just read the beginning of your patch. It clearly says everyone has
+up to 5 reg entries and up to 5 clocks.
+
+
+
+Best regards,
+Krzysztof
+
 
