@@ -1,136 +1,293 @@
-Return-Path: <netdev+bounces-60296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B34481E77B
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 13:58:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410DC81E77D
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 14:07:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D11801F21D4E
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 12:58:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5334D2822B8
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 13:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3684EB24;
-	Tue, 26 Dec 2023 12:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3AA4EB24;
+	Tue, 26 Dec 2023 13:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AgU2RWsM"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XtAyQ1Po"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2076.outbound.protection.outlook.com [40.107.94.76])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693F44E60B
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 12:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PSV/qBLNJQEKhXs09AgS8KPu9B41vya1t28NoSZ8H/mfrvdWdcoJSMhl/JvHI1ZBxGgf3JCrqK7fp6z2GtZlneXWPf2u1LE7AHlVrUlvs9eFaxhteE8u6/jicnRvj/k0dftDHVtUZEhk7SxiIU70E82K0vsMSO1h5y2HgfF6WagEVQZqnGzvavPexZCjomCT/8ZpyqpJ349vmjPEM2Gn7jj9pS+LPV0D2UCnnTMEtO89PrxLGJxnsG9vohEdI8EXJ0TLVJ9YjVKhdQADBEIyNpdGz7TfZosDIt82djlrIRLXchflncuzflb3KShs+Iz3vmubtSe8CTA5jMBRdBI+wQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5IOAhfc9Iht6vG4YsCEHQZeJo3Rscdz+sfku0yfaaf8=;
- b=dPaz74SucYXqqItHp6bRajol+GKaFH7e/+/+Eb1UxYh6RhxWU+SBWMqgXfSdymvDYvDQ6ytMPEVB9KJ3+TrC/sxqZyoi1AnvcXNNI30J6Vbt0xeemUGHYPUJIwYRvua/IvmwyRNS1fvFGawafa1J9cSDQABjif3KRim5DCQJrG69612dUF/dSREsIKUJQt6BpTZQAhpG63QUbZGNjwIdNlVBb1zUBhirAUzvLjq8NfnaiNTw+pM7BDOUANLE2VCkm7wTW3GGULLajwv0pH09ZsKe6LTMjm7vFxSYDz+qjMUmmeDVQZF39jEQvRpZDh8GSLbd+o9vGHTmUpnLXx2vzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5IOAhfc9Iht6vG4YsCEHQZeJo3Rscdz+sfku0yfaaf8=;
- b=AgU2RWsMT5+jj4YasBuPTrg6EuGROGTibMcvZel/tcU0IEAHcfihK74XhTNczq/oq7pWkSCujSKipmQma05cV9owfwhNmLcKIyb4qd9lOLbGNmJGCbu24eFjO11vVE+stLYaZDtmFt0R4p/iQpP32GLa+H2RkNSstIJ2q455jpjfXbX5nKENcQrq3snWMbVdvt2zIEVtE2QN9c6JLmB+TCRd9JaxfBangrMC9rJNVToG3R5aPcIH9AMeobjdU8Ste2uQDrDogv89o0WAnVm6Lo+3JW8wdHNgvo5T2rf2da0jvNRTYqlSnUiHiyFM9X7MwQpT5Vgu56K7GmBLDR5RBw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
- by BL0PR12MB4850.namprd12.prod.outlook.com (2603:10b6:208:1c5::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.27; Tue, 26 Dec
- 2023 12:58:34 +0000
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::eb39:938e:7503:c21e]) by SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::eb39:938e:7503:c21e%3]) with mapi id 15.20.7113.026; Tue, 26 Dec 2023
- 12:58:34 +0000
-From: Aurelien Aptel <aaptel@nvidia.com>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
- sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
- aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
- ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
- galshalom@nvidia.com, mgurtovoy@nvidia.com
-Subject: Re: [PATCH v22 16/20] net/mlx5e: NVMEoTCP, queue init/teardown
-In-Reply-To: <20231223174845.GJ201037@kernel.org>
-References: <20231221213358.105704-1-aaptel@nvidia.com>
- <20231221213358.105704-17-aaptel@nvidia.com>
- <20231223174845.GJ201037@kernel.org>
-Date: Tue, 26 Dec 2023 14:58:30 +0200
-Message-ID: <25334vpi0i1.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: LO2P265CA0264.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:8a::36) To SJ1PR12MB6075.namprd12.prod.outlook.com
- (2603:10b6:a03:45e::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F534EB25;
+	Tue, 26 Dec 2023 13:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BQCcuH7029953;
+	Tue, 26 Dec 2023 13:07:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=K52oU9sdEHfHjpAJMbid1q1OXehqpGxCjomXi00WJx0=; b=Xt
+	AyQ1PopUYsfM98GICWQksi8BOHRdGEyJTMt6AB+kZT6VTX3+aUqmuXrz3p0RNUB7
+	rzT5SreoJDW/ZUhXRhMOgMDpOChmp72DY2LuPVo9Ymu1MxXVbcSyb5pajW0wNdxB
+	JgadBg772arysdjiE5oQVlP5NxcYdo4o6AUShc1bjsiGJ1V4u2SQlg9EkxGIO0D7
+	DeEhYgqZut+n9KfIG8e+xgTf4lg2sbpW3BXuYsB4rgZbKs1eArRp3QfYGC2pyEsh
+	cIu9y9bwmUQlcIjbB7yPcWbYrtTIfrph1M3YkMjjxnqY2b44FiDYOBR9tkb5/QcT
+	X/Ds4dQk8KNG/heq2SWg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v7s8u8txa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Dec 2023 13:07:10 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BQD6sdf025095
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Dec 2023 13:06:54 GMT
+Received: from [10.253.14.217] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 26 Dec
+ 2023 05:06:49 -0800
+Message-ID: <06ddbae8-1502-41fb-8cf8-9a3390dad557@quicinc.com>
+Date: Tue, 26 Dec 2023 21:06:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|BL0PR12MB4850:EE_
-X-MS-Office365-Filtering-Correlation-Id: 82917bca-4df4-45d2-4109-08dc06125e61
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	rDk69XpnLaxY9w8+VpDg5mGGVPiXhQENye2a9GfrfnSWgvm6JF5P6w5IachTMx+iqbWusZF2SZUhLM6lox3bL7Hi8b1/RpunR4C5p5rfZM/jz0l2ZmgI9o8VzUlw34yfH0LEJ9q4SmCR3DZoxLJFoICob6ILDwVrQaZUtNROxcrCM46ssHYbMoOyBCUPski8EmEP+1xgBef5eyneXE5Y+q48hWRuCcxX9PEyGc21mpkGD1RnFSlcF+zcvU94UcqOCvhTs1VLZpUDYVyKxzwWheLwioJoWcHB3pU17M6EgS79C+LLw0FvPJGbBOlRpAMvr6LzrD/FZUuc5BWz9ZVQxcw5cCfmB0kMGB5ITiq9nKDNs3YsmouCa4Zor3aeVcIFzPDJrj8ijUkupCfzhwqY4BT7o6SUiYWJAWqcLjhWYFuZckMtkzbyUe8JnzEWlddoMLsDo6PdIBg1WNqH/t//ADes5IXz6c27lHrynyyD00upmnAWDCJQCClt/KrefA4zaAmbdQcJ5/w3KPu8qSCn46ToiaVB6xMoMjbaPf1tV8Y4zYQUXL2GUnQ/jrIzALgH
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39850400004)(376002)(136003)(346002)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(5660300002)(7416002)(2906002)(478600001)(26005)(2616005)(107886003)(38100700002)(6486002)(41300700001)(86362001)(558084003)(36756003)(316002)(66476007)(66556008)(66946007)(6916009)(6512007)(6506007)(6666004)(8936002)(4326008)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?soW01WwfiFgY3419lwLk3YslhWLzVLgGeyjQhySFA282scLNzFGDPHlktY6p?=
- =?us-ascii?Q?r4jnvVHUp/qiRAkEzArhm+UV/OYwKlYsNBZCSg0ifSaZ8dF0AYq/UC2MWRkR?=
- =?us-ascii?Q?e1d45WdrXVc/6xtYrQzVNdJJFCcobDewAC0PAdxbUQC/DZ/1J/50lUUvgmTC?=
- =?us-ascii?Q?pLAtkRUuFFcQa+SRhoSkZ0xr+ZhQlQwMStIXL715bBFjMHu6gmEqyJBI+s6S?=
- =?us-ascii?Q?na3OOUSjTr7tDyIDzdkCGG8PpHaRNNTv3wEKvxohvAmpXsiNm9YaJFYQoAha?=
- =?us-ascii?Q?Sjixkvuv5aBOW6cHimkqvSkYduEDfAk+QtUXZtZmLFRoD8OVYaL9u/M4GzlT?=
- =?us-ascii?Q?dvTWLSuTzzx/NHYtOz6LvD3oB+yrlohimrmIDRWE5QdaSbRTSqzi2q0ovCH5?=
- =?us-ascii?Q?tA5BVn1gXew7D3336spzky1aex3Q330W91JMMuO9aYPekkAlm4IZ2cJlB6uJ?=
- =?us-ascii?Q?pBn/3vuNHd62uJ10LvukMMMW1TyWS0JKOPmGQHa6M1BRVYTnr+ipv6snCjYe?=
- =?us-ascii?Q?nBHVwVwqr+bnJMqir3HVzVHJT/5PUWTcNP09T+EStACapWUkCm8yXeQLmqeE?=
- =?us-ascii?Q?guVGaLKygDVOa4VIKdVdaa3M7669Q2MLABM8J6P3FE+uL0PyCue4wtj+61Ub?=
- =?us-ascii?Q?tIN+R0ckMFdNsjkqt7xoriS5I6qP+EXuBPxaYEzNEIsAOnXVao8xwCMhPSKj?=
- =?us-ascii?Q?nnszEP3PqZ3Dfroq709DnKw0FwPVKVkUVPBCq7H1CoOGwmS7xTiczfB8KAmH?=
- =?us-ascii?Q?gWJfoT8pppJvQUgMU5yrJ0tGTq07lnBQ+U7fXpUiBTD/MY1aXNC85+O4c28o?=
- =?us-ascii?Q?Jl+qOFInW1j8Re4HQe2X7+gn5u7QFSxm40VHyY8khOy0WxoPv0PLPWriA4WA?=
- =?us-ascii?Q?3alhBbBhSZIW9I5gkICfCOT5CVkgGQwHdijNpFDGHtHTwAnhwR/hTGDnQENK?=
- =?us-ascii?Q?9a3I0G3AReCgxcLfhvXVd4b6B0Tg5jc5jnbM4HoXgXfR9cKvQu+54umayi3q?=
- =?us-ascii?Q?i/vnSPZtgrEnHTwTvBQ4iIARevX3GypFEgnTMkCG4UpcmgFeHK+oe4zsxfaf?=
- =?us-ascii?Q?wkfDdTumgR3lCdTM6g4SghEkn5n661ZdOvEsACnlA+HguMsc8FrMSbZckXXW?=
- =?us-ascii?Q?ptkuW1KY73agNzCEBaLnMX7ti8zL+uU8jaU8YvThCJTpE0bags1wlCHO1BwT?=
- =?us-ascii?Q?pwdeXl58H/E3zqB/ECfENC60ObhXxw520wWdY+NM95mZcgi+J/0UWOEpOA1C?=
- =?us-ascii?Q?dzK5TK5H3UJNIUN+N3PWmRkX8uKiqM+rthyKWXJYSk2hmgVHOYMIMlAH1tsb?=
- =?us-ascii?Q?GUWFwlK0vjp3rIVCct6bo6RYrYxMy5huBAPJ4srcRj0Ynldm6aKelkXC51PO?=
- =?us-ascii?Q?cxdQOAb9SewDszGLliLJ2cV+Skf0Kk39ydKP+W2IbOIhgTjsK6gdGiKR0LFp?=
- =?us-ascii?Q?9YlLXscYmIrOpQ3yg51kwQhMOwkZFMdjEpyS5VSeJo281qH5rt6OkvVLQO9o?=
- =?us-ascii?Q?3jcbVvRQ6oWnplN7UQtb9qjD8E4cWkJ4LUWpItogJzIUNKPMG+XHmp3v4SWJ?=
- =?us-ascii?Q?BhmdY4yl100qXPlqYBMsTuOp63usQb82DOAyFpih?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82917bca-4df4-45d2-4109-08dc06125e61
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Dec 2023 12:58:34.4310
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Kv5phfsvyK133NsHwe1XQIa8MuN+/s9WiWsaaVcofMuaS5R3G9yXbjcm985gY4eo3dJSk3E4dChTL08harrAJQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4850
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
+        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_srichara@quicinc.com>
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <20231225084424.30986-6-quic_luoj@quicinc.com>
+ <dee72ce8-b24e-467a-b265-1b965588807f@linaro.org>
+ <aeb364a3-6c05-4a1b-ba32-e687a89f20f8@quicinc.com>
+ <58dde1a7-ed4a-442c-bb5c-c3f6d926fb7e@linaro.org>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <58dde1a7-ed4a-442c-bb5c-c3f6d926fb7e@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: r7Uiofwueh85XjMga1MdmQ9fu_9vsegz
+X-Proofpoint-ORIG-GUID: r7Uiofwueh85XjMga1MdmQ9fu_9vsegz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 mlxlogscore=999 impostorscore=0 adultscore=0
+ clxscore=1015 mlxscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0
+ suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2312260100
 
-Hi Simon,
 
-Simon Horman <horms@kernel.org> writes:
-> This doesn't seem to compile with gcc-13 with allmodconfig on x86_64:
 
-The latest pull of mlx5 changes in netdev broke our patches. We will
-rebase and resubmit in the next merge window.
+On 12/26/2023 5:28 PM, Krzysztof Kozlowski wrote:
+> On 26/12/2023 08:25, Jie Luo wrote:
+>>>> -    description:
+>>>> -      the first Address and length of the register set for the MDIO controller.
+>>>> -      the second Address and length of the register for ethernet LDO, this second
+>>>> -      address range is only required by the platform IPQ50xx.
+>>>> +    maxItems: 5
+>>>> +    description: |
+>>>> +      The first address and length of the register set for the MDIO controller,
+>>>> +      the optional second address and length of the register is for CMN block,
+>>>> +      the optional third, fourth and fifth address and length of the register
+>>>> +      for Ethernet LDO, the optional Ethernet LDO address range is required by
+>>>
+>>> Wait, required? You said in in response to Rob these are not required!
+>>
+>> As for the response to Rob, i was saying the uniphy ahb and sys clocks
+>> are not needed on ipq9574.
+>> The LDO are needed on ipq5332 and ipq5018 currently.
+> 
+> Clocks as well but:
+> 
+> "A driver can function without knowing about all these new registers and
+> ..."
 
-Thanks
+This comments are for compatible string in V2, the MDIO drive configures
+the hardware according to the DTS property defined or not for the new
+added IPQ platforms(ipq5332 and ipq9574) support.
+
+> 
+> Anyway, this should be list ("items:") with descriptions, instead of one
+> big description listing things.
+
+Ok, will update to use the list descriptions, thanks.
+
+> 
+> 
+>>
+>>>
+>>>> +      the platform IPQ50xx/IPQ5332.
+>>>
+>>> So these are valid for all platforms or not? Looks not, but nothing
+>>> narrows the list for other boards.
+>>
+>> i add the limitation on the reg usage for the ipq5332 platform on the
+>> following part "if condition" of this patch, i will update the patch
+>> to narrow down for the other compatibles.
+>>
+>>>
+>>> Anyway, why do you add entries in the middle? LDO was the second, so it
+>>> cannot be now fifth.
+>>
+>> As Rob's suggestion, i move the cmn_blk to second location for
+>> simplifying the limitation description, i checked the upstream dts code,
+>> the LDO is not used currently, so we can move cmn_blk to the second
+>> location here.
+> 
+> I cannot find his suggestion in the previous thread. Where did he
+> propose it?
+
+Rob suggested this on the V2 as below.
+"
+Perhaps cmn_blk should come 2nd, so all the variants have the same entry
+indices. Then you can move this to the top level and just say 'minItems:
+4' here.
+"
+
+> 
+> ...
+> 
+>>>> +  qcom,cmn-ref-clock-frequency:
+>>>> +    $ref: /schemas/types.yaml#/definitions/uint32
+>>>> +    enum:
+>>>> +      - 25000000
+>>>> +      - 31250000
+>>>> +      - 40000000
+>>>> +      - 48000000
+>>>> +      - 50000000
+>>>> +      - 96000000
+>>>> +    default: 48000000
+>>>> +    description: |
+>>>> +      The reference clock source of CMN PLL block is selectable, the
+>>>> +      reference clock source can be from wifi module or the external
+>>>> +      xtal, the reference clock frequency 48MHZ can be from internal
+>>>> +      wifi or the external xtal, if absent, the internal 48MHZ is used,
+>>>> +      if the 48MHZ is specified, which means the external 48Mhz is used.
+>>>
+>>> This does not resolve mine and Conor's concerns from previous version.
+>>> External clocks are defined as clock inputs.
+>>
+>> No matter the external or internal reference clock, they are the clock
+>> source selection for CMN, there are only 48MHZ can be external or
+>> internal, other clocks have the different clock rate, so the internal
+>> 48MHZ reference clock can be implied when the
+>> "qcom,cmn-ref-clock-frequency" is not defined, which is suggested by
+>> Conor in the previous
+>> comments.
+> 
+> I don't think he proposed it, but maybe I missed some message (care to
+> point me to his message where he agreed on usage of
+> qcom,cmn-ref-clock-frequency?). I am pretty sure we both stayed on the
+> same page, that the presence of clocks defines choice of internal clock.
+> This property should go away.
+
+Sorry for this confusion.
+Rob said the internal reference source can be decided by the absence of
+the property combined with compatible string, because i said the
+internal 96MHZ is used on ipq5018 currently in the previous message.
+
+per double checked the current IPQ platforms, the internal 96MHZ is also
+possible on ipq9574, and the reference clock source should be kept as
+configurable instead of limited by the compatible string, maybe the
+different reference clock source is acquired in the future, even
+currently it is not used on the special platform for now.
+
+so i update the solution with a little bit of changes.
+
+> 
+> It is tiring to keep discussing this.
+> 
+>>
+>>>
+>>>> +
+>>>> +  clock-frequency:
+>>>> +    enum:
+>>>> +      - 390625
+>>>> +      - 781250
+>>>> +      - 1562500
+>>>> +      - 3125000
+>>>> +      - 6250000
+>>>> +      - 12500000
+>>>> +    default: 390625
+>>>> +    description: |
+>>>> +      The MDIO bus clock that must be output by the MDIO bus hardware,
+>>>> +      only the listed frequencies above can be supported, other frequency
+>>>> +      will cause malfunction. If absent, the default hardware value 0xff
+>>>> +      is used, which means the default MDIO clock frequency 390625HZ, The
+>>>> +      MDIO clock frequency is MDIO_SYS_CLK/(MDIO_CLK_DIV + 1), the SoC
+>>>> +      MDIO_SYS_CLK is fixed to 100MHZ, the MDIO_CLK_DIV is from MDIO control
+>>>> +      register, there is higher clock frequency requirement on the normal
+>>>> +      working case where the MDIO slave devices support high clock frequency.
+>>>>    
+>>>>    required:
+>>>>      - compatible
+>>>> @@ -59,8 +118,10 @@ allOf:
+>>>>              contains:
+>>>>                enum:
+>>>>                  - qcom,ipq5018-mdio
+>>>> +              - qcom,ipq5332-mdio
+>>>>                  - qcom,ipq6018-mdio
+>>>>                  - qcom,ipq8074-mdio
+>>>> +              - qcom,ipq9574-mdio
+>>>>        then:
+>>>>          required:
+>>>>            - clocks
+>>>> @@ -70,6 +131,20 @@ allOf:
+>>>>            clocks: false
+>>>>            clock-names: false
+>>>>    
+>>>> +  - if:
+>>>> +      properties:
+>>>> +        compatible:
+>>>> +          contains:
+>>>> +            enum:
+>>>> +              - qcom,ipq5332-mdio
+>>>> +    then:
+>>>> +      properties:
+>>>> +        clocks:
+>>>> +          minItems: 5
+>>>> +          maxItems: 5
+>>>> +        reg-names:
+>>>> +          minItems: 4
+>>>
+>>> Why all other variants now have 5 clocks and 5 reg entries? Nothing of
+>>> it is explained in the commit msg.
+>>
+>>   From the condition above, only "qcom,ipq5332-mdio" has 5 clocks (mdio +
+>> 4 uniphy clocks) and 4 regs (mdio + cmn_blk + 2 LDOs) as the cmn_blk is
+>> moved to the second location.
+>>
+>> how it can gives the 5 clocks and 5 regs for other variants here?
+> 
+> How? Just read the beginning of your patch. It clearly says everyone has
+> up to 5 reg entries and up to 5 clocks.
+
+Sorry for missing the limitation of the new added regs and clocks for
+other platforms, will update the patch to add the limitation usage of
+the reg and clocks on the other platform.
+
+Thanks!
+> 
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
 
