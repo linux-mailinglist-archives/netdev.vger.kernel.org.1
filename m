@@ -1,189 +1,84 @@
-Return-Path: <netdev+bounces-60326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4C7381EA05
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 21:39:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 360FA81EA08
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 21:40:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C3B12828B1
-	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 20:39:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5CB92831E1
+	for <lists+netdev@lfdr.de>; Tue, 26 Dec 2023 20:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888D915D4;
-	Tue, 26 Dec 2023 20:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D165A47;
+	Tue, 26 Dec 2023 20:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="U/bXYRkq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MYveqINY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A2A7E6
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 20:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 9ECD93F745
-	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 20:38:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1703623128;
-	bh=Djn6TTGNbUaMLBQ5Tkld5fmUYHXzaNFYV9Ts29FavxY=;
-	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=U/bXYRkqvuPJ7jgH0SSqhByRXMJO+gO9bZ8EZSVfwp7FedxdosjlIbja4SfxTm+qW
-	 6GetwR0A6vPuBQiPiliOLvn+oLtJZRqtfFiSM7jlTjB0l6+0Ef914557ypR2n2IhLB
-	 ZrHPqS1K6Dkxv153a68SgRvENaqnLbW0dd4azW6BlpfTHiu/NbdNpo2aNbqlN3VCVf
-	 50ZB93OAT4edKdOr+SnnzpkjdyLUQlEEXmVp27j7i9MMUJdsFx4eqNygYAFDOx+2Jh
-	 +M/udGLhnZiszzv9+JpL9xvvlyLgR1WlzetLqQK9hQapQIfUyeUQXdWh4hL4pV8phv
-	 JyHcX1+cdZ+0w==
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-427b7b667d3so52815331cf.1
-        for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 12:38:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703623127; x=1704227927;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Djn6TTGNbUaMLBQ5Tkld5fmUYHXzaNFYV9Ts29FavxY=;
-        b=Gbkshj8h3bRWLz/tNFog5dBnQ6XazksB2/bycrcxZ3f01SkmP6qphisdNltlPNwYZD
-         GkWyMf0wejLIrRgngJy5GYMxwgEveyE9mUQ7CbMQHzrtNKxQ1h4IFvs481OGNARPcxbn
-         IB2PHF5UW7Ggb4JS7oIQN2p8NWcP66pErgR0rcB5OWM/zIZB4gbIqp8y/y+povf24Y91
-         YYF5V+Y/nTjyDf7ytcP4HAPyY5qzofxVEpL5gpvrLASjUQHdCVsvwPrhYZh5dnX9vuOq
-         6e80riUXifsHE3rc3JxYCv8XAKvHNRrP4342qOCk4fUZX5QCBRAES6DRUD1z7ntmLSsP
-         YB/g==
-X-Gm-Message-State: AOJu0YzraOzHkz/nAGsTahxEpXVfgi5oZBNKnE9oCnRb2xpfWafzQcxD
-	mrT5H4DwIfSyNRFJoIQr1d1+oa6ZHL9/cbdMvGD9bB3hFfZPpULMCaElXUQAOhzUx8QR1eT8VGj
-	bh0KwP3ywASZh2cadjeJCEJfFuW/KEdjGPF2wy4kqtK5+d4YS6F8JnlQR
-X-Received: by 2002:a05:622a:5c90:b0:423:78de:56ba with SMTP id ge16-20020a05622a5c9000b0042378de56bamr13275523qtb.5.1703623127609;
-        Tue, 26 Dec 2023 12:38:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFkBcNmOkhD6wJMv531GgQEeoR49FI/OpBlYQ9yMs4vysRZYNTjlEtgtQz6jWi5pNKjnUkxUpT1fJtjnJHAMQ0=
-X-Received: by 2002:a05:622a:5c90:b0:423:78de:56ba with SMTP id
- ge16-20020a05622a5c9000b0042378de56bamr13275506qtb.5.1703623127336; Tue, 26
- Dec 2023 12:38:47 -0800 (PST)
-Received: from 348282803490 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 26 Dec 2023 14:38:26 -0600
-From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-In-Reply-To: <20231220211743.2490518-1-cristian.ciocaltea@collabora.com>
-References: <20231220211743.2490518-1-cristian.ciocaltea@collabora.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431814C6F
+	for <netdev@vger.kernel.org>; Tue, 26 Dec 2023 20:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A3F36C433C9;
+	Tue, 26 Dec 2023 20:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703623223;
+	bh=5Bn1EFr1JpgDavuxfajSJrpSn3bbzKKoMhEMsw4X2bk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MYveqINYYVHmdOumPGyAnrZB7XpVHxx5OC40/Rw0pjf1DeWdprp9xYHY0prxG+SLQ
+	 ad+7vG9GTk6U8wQsXsQskUIOmJtXmEpXw0eejcJJgBbdqyjQAuBiwiuAxlpaFo/0HN
+	 VGt3AQRUS2VjbYFjl2qvHLUHQqOirFXgILRjlw/8c67DCpHb06PlO6jo/GdNQy7pAN
+	 VXRLSahHrTIa0gKxnXLu/Mw9FABlEC7/v6Bqr7KZrYc9rkZhFkG+nLBx6XBbuYwvMz
+	 SvaKY3xM2hx9mfloiD5H/Jxur0SuE63RtdFo+9abJAkaMHS1XoS2G/vhpnjaIrPq/D
+	 DHWxm1h/xjncg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8C3E6E333D7;
+	Tue, 26 Dec 2023 20:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Date: Tue, 26 Dec 2023 14:38:26 -0600
-Message-ID: <CAJM55Z9tKQ_hpxrGUq1Rx1kxzzs-dyd=4yT1z=8B7KQ=CZ4mjA@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] Enable networking support for StarFive JH7100 SoC
-To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>, 
-	Emil Renner Berthing <kernel@esmil.dk>, Conor Dooley <conor@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Richard Cochran <richardcochran@gmail.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Jacob Keller <jacob.e.keller@intel.com>
-Cc: linux-riscv@lists.infradead.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel@collabora.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 1/2] net: remove SOCK_DEBUG leftovers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170362322356.20350.10362308010333625690.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Dec 2023 20:40:23 +0000
+References: <20231219143820.9379-1-dkirjanov@suse.de>
+In-Reply-To: <20231219143820.9379-1-dkirjanov@suse.de>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, dkirjanov@suse.de
 
-Cristian Ciocaltea wrote:
-> This patch series adds ethernet support for the StarFive JH7100 SoC and
-> makes it available for the StarFive VisionFive V1 and BeagleV Starlight
-> boards, although I could only validate on the former SBC.  Thank you Emil
-> and Geert for helping with tests on BeagleV!
->
-> The work is heavily based on the reference implementation [1] and depends
-> on the SiFive Composable Cache controller and non-coherent DMA support
-> provided by Emil via [2] and [3].
->
-> *Update 1*: As of next-20231214, dependencies [2] & [3] have been merged.
->
-> *Update 2*: Since v5, the dwmac patches will be handled via [4], while the
->             clock patches subset via [5].
+Hello:
 
-I'm not sure my rb my sense when I'm listed as a co-developer, but this version
-looks good to me:
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+On Tue, 19 Dec 2023 17:38:19 +0300 you wrote:
+> SOCK_DEBUG comes from the old days. Let's
+> move logging to standard net core ratelimited logging functions
+> 
+> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> 
+> changes in v2:
+>  - remove SOCK_DEBUG macro altogether
+> 
+> [...]
 
->
-> [1] https://github.com/starfive-tech/linux/commits/visionfive
-> [2] https://lore.kernel.org/all/CAJM55Z_pdoGxRXbmBgJ5GbVWyeM1N6+LHihbNdT26Oo_qA5VYA@mail.gmail.com/
-> [3] https://lore.kernel.org/all/20231130151932.729708-1-emil.renner.berthing@canonical.com/
-> [4] https://lore.kernel.org/lkml/20231220002824.2462655-1-cristian.ciocaltea@collabora.com/
-> [5] https://lore.kernel.org/lkml/20231219232442.2460166-1-cristian.ciocaltea@collabora.com/
->
-> Changes in v6:
->  - Applied alphabetical ordering in PATCH 3 and 4 (Emil)
->
-> Changes in v5:
->  - Collected R-b tags from Jacob and Andrew
->  - Squashed PATCH 2 into PATCH 1 per Krzysztof's review
->  - Drop unsupported snps,no-pbl-x8 property from gmac DT node
->  - Split series into patch sets per subsystem, as described in "Update 2"
->    section above (per Andrew's review)
->  - v4:
->    https://lore.kernel.org/lkml/20231218214451.2345691-1-cristian.ciocaltea@collabora.com/
->
-> Changes in v4:
->  - Restricted double usage of 'ahb' reset name in PATCH 2 (Jessica, Samuel)
->  - Moved phy reference from PATCH 5 to both PATCH 6 & 7 where the node is
->    actually defined (Emil, Conor)
->  - Drop unnecessary gpio include in PATCH 6; also added a DTS comment
->    describing the rational behind RX internal delay adjustment (Andrew)
->  - v3:
->    https://lore.kernel.org/lkml/20231215204050.2296404-1-cristian.ciocaltea@collabora.com/
->
-> Changes in v3:
->  - Rebased series onto next-20231214 and dropped the ccache & DMA coherency
->    related patches (v2 06-08/12) handled by Emil via [3]
->  - Squashed PATCH v2 01/12 into PATCH v3 2/9, per Krzysztof's review
->  - Dropped incorrect PATCH v2 02/12
->  - Incorporated Emil's feedback; also added his Co-developed-by on all dts
->    patches
->  - Documented the need of adjusting RX internal delay in PATCH v3 8/9, per
->    Andrew's request
->  - Added clock fixes from Emil (PATCH v3 8-9/9) required to support
->    10/100Mb link speeds
->  - v2:
->    https://lore.kernel.org/lkml/20231029042712.520010-1-cristian.ciocaltea@collabora.com/
->
-> Changes in v2:
->  - Dropped ccache PATCH 01-05 reworked by Emil via [2]
->  - Dropped already applied PATCH 06/12
->  - Added PATCH v2 01 to prepare snps-dwmac binding for JH7100 support
->  - Added PATCH v2 02-03 to provide some jh7110-dwmac binding optimizations
->  - Handled JH7110 conflicting work in PATCH 07 via PATCH v2 04
->  - Reworked PATCH 8 via PATCH v2 05, adding JH7100 quirk and dropped
->    starfive,gtxclk-dlychain DT property; also fixed register naming
->  - Added PATCH v2 08 providing DMA coherency related DT changes
->  - Updated PATCH 9 commit msg:
->    s/OF_DMA_DEFAULT_COHERENT/ARCH_DMA_DEFAULT_COHERENT/
->  - Replaced 'uncached-offset' property with 'sifive,cache-ops' in PATCH
->    10/12 and dropped 'sideband' reg
->  - Add new patch providing coherent DMA memory pool (PATCH v2 10)
->  - Updated PATCH 11/12 according to the stmmac glue layer changes in
->    upstream
->  - Split PATCH 12/12 into PATCH v2 10-12 to handle individual gmac setup of
->    VisionFive v1 and BeagleV boards as they use different PHYs; also
->    switched phy-mode from "rgmii-tx" to "rgmii-id" (requires a reduction of
->    rx-internal-delay-ps by ~50%)
->  - Rebased series onto next-20231024
->  - v1:
->    https://lore.kernel.org/lkml/20230211031821.976408-1-cristian.ciocaltea@collabora.com/
->
-> Cristian Ciocaltea (4):
->   riscv: dts: starfive: jh7100: Add sysmain and gmac DT nodes
->   riscv: dts: starfive: jh7100-common: Setup pinmux and enable gmac
->   riscv: dts: starfive: visionfive-v1: Setup ethernet phy
->   riscv: dts: starfive: beaglev-starlight: Setup phy reset gpio
->
->  .../dts/starfive/jh7100-beaglev-starlight.dts | 11 +++
->  .../boot/dts/starfive/jh7100-common.dtsi      | 84 +++++++++++++++++++
->  .../jh7100-starfive-visionfive-v1.dts         | 22 ++++-
->  arch/riscv/boot/dts/starfive/jh7100.dtsi      | 36 ++++++++
->  4 files changed, 152 insertions(+), 1 deletion(-)
->
-> --
-> 2.43.0
->
+Here is the summary with links:
+  - [net-next,v2,1/2] net: remove SOCK_DEBUG leftovers
+    https://git.kernel.org/netdev/net-next/c/8e5443d2b866
+  - [net-next,v2,2/2] net: remove SOCK_DEBUG macro
+    https://git.kernel.org/netdev/net-next/c/b1dffcf0da22
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
