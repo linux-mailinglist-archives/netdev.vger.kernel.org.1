@@ -1,120 +1,157 @@
-Return-Path: <netdev+bounces-60405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B28FD81F12E
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 19:26:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 512C981F178
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 20:01:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6861D1F209B1
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 18:26:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06D9F1F23078
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 19:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7067147A4B;
-	Wed, 27 Dec 2023 18:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4A546546;
+	Wed, 27 Dec 2023 19:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oGq3AB0u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J1PxHi+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D5147768
-	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 18:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703701550; x=1735237550;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wxc88TMUc12znaxHrHFSu2rn46lyaAKXp0pEwzCpp9c=;
-  b=oGq3AB0u3eAjEswizB4eg3rGiNfXJRlBUPlH/VN9Ur8Pm73LvVG1MUtH
-   XpX/bBJ0wpN3Hev6GVnZBMxiYk8Nz/GydoC6jKsf7os0UdoF2vGsvOPjw
-   JyjQhEQMl9Bg5NfjPtIb+Z7YTMtF1t/byvJJr8rVF9dI1hP4R94qcCIqe
-   93qiTzFdyJuW3A5Oz94PBpyNGmdMh+KSL+i2vkaVC36DPzSEtL4OSaKQD
-   kVeXKKFAlPIYiH/qP6O077UdtKtVu6T3RMGWUTjJ+L2ugbA3sjFAvioGQ
-   FCt1be/ekL95lQAppZi+JqloG9DJ8Ac2I34hfwmEpTlZBjKK4dcBI4ufe
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="3312849"
-X-IronPort-AV: E=Sophos;i="6.04,310,1695711600"; 
-   d="scan'208";a="3312849"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 10:25:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="868921430"
-X-IronPort-AV: E=Sophos;i="6.04,310,1695711600"; 
-   d="scan'208";a="868921430"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by FMSMGA003.fm.intel.com with ESMTP; 27 Dec 2023 10:25:47 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Andrii Staikov <andrii.staikov@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Bharathi Sreenivas <bharathi.sreenivas@intel.com>
-Subject: [PATCH net 4/4] i40e: Fix filter input checks to prevent config with invalid values
-Date: Wed, 27 Dec 2023 10:25:33 -0800
-Message-ID: <20231227182541.3033124-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231227182541.3033124-1-anthony.l.nguyen@intel.com>
-References: <20231227182541.3033124-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DA420306;
+	Wed, 27 Dec 2023 19:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33677fb38a3so5587481f8f.0;
+        Wed, 27 Dec 2023 11:01:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703703661; x=1704308461; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ucqUcU3zyNkG6GcytVS0lrdLXAph5hA8OQMhhs/vvSA=;
+        b=J1PxHi+2PBPWjNO6+NKRLaOg6VYuLDHkCPLhaMKms5rxCVyGwsGUJDBElxsxAtlQ1m
+         ss5/oA2NkN4ktMw8u4SasZPcUlGtRbgz8kgCVMcSX4Qa/c+rO8hti8/HBEV8d5yk6hXT
+         tu7yk0efySuTods+EfWWzTn4AxRnIJOtB2dPnYE7uObwxQz8kP5hw2qIbbhRhsGLHBvh
+         4liSeJyfAE6NEvxz13b9zOoh50pfIEEFA67PEYIc0MNzF9ujZ+kj79Vj8Z/s1xVqfFCJ
+         YKpXYSJWbR+7WDEcOrFueJkZBiql2yIbG88rCBnkdXD5VxhJXZg0fd2MeeT3SrPTc/QS
+         IqLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703703661; x=1704308461;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ucqUcU3zyNkG6GcytVS0lrdLXAph5hA8OQMhhs/vvSA=;
+        b=Gbz0TGaC6UoiDs63vGDXrDsL8qI5bpzDeocEaN4Ul9nW5olIn58WI8//9h4zA/Wle0
+         sqFSqhv13OvCZjvemMAr/qxmB7N8P4jJ9R/iphN/cio+12V6IYTybOkQgrw/Xg0UHEAB
+         ZAGEjFck9Z66gL6ICb+DMfLEK+YYxAPbVX+jwZLDc48PKLvSFUKDGXlfix67RCHxYf+t
+         y/zOUir2ENFZYRBWM7k8iE/jlzLJBNaBZXmh8CcNQS5/pVFScPQ5ukWMA7jXTfTC3iU3
+         ggLdmi5z3a64zPcIpH59xL+m8zpOuEpS/bSB2xHdfS1PJMkUccIAUtXOzTHrFP3QV9G1
+         zaCg==
+X-Gm-Message-State: AOJu0YyLtGWMIkK0nmgFnivZRYuYyyQaEt42798cVNG41FyJSKsBLSPr
+	cdu56I/AAq+0Bol88OwEOUn1xmunMf+8Ms47/wc=
+X-Google-Smtp-Source: AGHT+IHOggBkRyaEe//vGD99Ke0t5serq4JbHTjRngBnmLcxHoOnOHk4W8zcf7JDq5LUBIW6gsSqPNOrLWLzzjsa0Yk=
+X-Received: by 2002:a5d:6d05:0:b0:336:b717:3b5a with SMTP id
+ e5-20020a5d6d05000000b00336b7173b5amr6193973wrq.77.1703703660869; Wed, 27 Dec
+ 2023 11:01:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1703081351-85579-1-git-send-email-alibuda@linux.alibaba.com>
+ <1703081351-85579-2-git-send-email-alibuda@linux.alibaba.com>
+ <CAADnVQK3Wk+pKbvc5_7jgaQ=qFq3y0ozgnn+dbW56DaHL2ExWQ@mail.gmail.com>
+ <1d3cb7fc-c1dc-a779-8952-cdbaaf696ce3@linux.alibaba.com> <CAADnVQJEUEo3g7knXtkD0CNjazTpQKcjrAaZLJ4utk962bjmvw@mail.gmail.com>
+ <d5879c57-634f-4973-b52d-4994d0929de6@linux.alibaba.com>
+In-Reply-To: <d5879c57-634f-4973-b52d-4994d0929de6@linux.alibaba.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 27 Dec 2023 11:00:49 -0800
+Message-ID: <CAADnVQJZsJujDH=YAoZ6ieQQ2pVo0wvc-ppwRC7y2X=ggibsEw@mail.gmail.com>
+Subject: Re: [RFC nf-next v3 1/2] netfilter: bpf: support prog update
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, coreteam@netfilter.org, 
+	netfilter-devel <netfilter-devel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+On Wed, Dec 27, 2023 at 12:20=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.co=
+m> wrote:
+>
+>
+> Hi Alexei,
+>
+>
+> IMMO, nf_unregister_net_hook does not wait for the completion of the
+> execution of the hook that is being removed,
+> instead, it allocates a new array without the very hook to replace the
+> old arrayvia rcu_assign_pointer() (in __nf_hook_entries_try_shrink),
+> then it use call_rcu() to release the old one.
+>
+> You can find more details in commit
+> 8c873e2199700c2de7dbd5eedb9d90d5f109462b.
+>
+> In other words, when nf_unregister_net_hook returns, there may still be
+> contexts executing hooks on the
+> old array, which means that the `link` may still be accessed after
+> nf_unregister_net_hook returns.
+>
+> And that's the reason why we use kfree_rcu() to release the `link`.
+> >>                                                        nf_hook_run_bpf
+> >>                                                        const struct
+> >> bpf_nf_link *nf_link =3D bpf_link;
+> >>
+> >> bpf_nf_link_release
+> >>       nf_unregister_net_hook(nf_link->net, &nf_link->hook_ops);
+> >>
+> >> bpf_nf_link_dealloc
+> >>       free(link)
+> >> bpf_prog_run(link->prog);
 
-Prevent VF from configuring filters with unsupported actions or use
-REDIRECT action with invalid tc number. Current checks could cause
-out of bounds access on PF side.
+Got it.
+Sounds like it's an existing bug. If so it should be an independent
+patch with Fixes tag.
 
-Fixes: e284fc280473 ("i40e: Add and delete cloud filter")
-Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
-Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Bharathi Sreenivas <bharathi.sreenivas@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Also please craft a test case to demonstrate UAF.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 3f99eb198245..031b15cceab9 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -3521,16 +3521,16 @@ static int i40e_validate_cloud_filter(struct i40e_vf *vf,
- 	bool found = false;
- 	int bkt;
- 
--	if (!tc_filter->action) {
-+	if (tc_filter->action != VIRTCHNL_ACTION_TC_REDIRECT) {
- 		dev_info(&pf->pdev->dev,
--			 "VF %d: Currently ADq doesn't support Drop Action\n",
--			 vf->vf_id);
-+			 "VF %d: ADQ doesn't support this action (%d)\n",
-+			 vf->vf_id, tc_filter->action);
- 		goto err;
- 	}
- 
- 	/* action_meta is TC number here to which the filter is applied */
- 	if (!tc_filter->action_meta ||
--	    tc_filter->action_meta > I40E_MAX_VF_VSI) {
-+	    tc_filter->action_meta > vf->num_tc) {
- 		dev_info(&pf->pdev->dev, "VF %d: Invalid TC number %u\n",
- 			 vf->vf_id, tc_filter->action_meta);
- 		goto err;
--- 
-2.41.0
+>
+> I must admit that it is indeed feasible if we eliminate the mutex and
+> use cmpxchg to swap the prog (we need to ensure that there is only one
+> bpf_prog_put() on the old prog).
+> However, when cmpxchg fails, it means that this context has not
+> outcompeted the other one, and we have to return a failure. Maybe
+> something like this:
+>
+> if (!cmpxchg(&link->prog, old_prog, new_prog)) {
+>      /* already replaced by another link_update */
+>      return -xxx;
+> }
+>
+> As a comparison, The version with the mutex wouldn't encounter this
+> error, every update would succeed. I think that it's too harsh for the
+> user to receive a failure
+> in that case since they haven't done anything wrong.
 
+Disagree. The mutex doesn't prevent this issue.
+There is always a race.
+It happens when link_update.old_prog_fd and BPF_F_REPLACE
+were specified.
+One user space passes an FD of the old prog and
+another user space doing the same. They both race and one of them
+gets
+if (old_prog && link->prog !=3D old_prog) {
+               err =3D -EPERM;
+
+it's no different with dropping the mutex and doing:
+if (old_prog) {
+    if (!cmpxchg(&link->prog, old_prog, new_prog))
+      -EPERM
+} else {
+   old_prog =3D xchg(&link->prog, new_prog);
+}
 
