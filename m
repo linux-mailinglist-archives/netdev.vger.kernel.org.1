@@ -1,117 +1,141 @@
-Return-Path: <netdev+bounces-60396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D8781F007
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 17:04:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BC3D81F0AB
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 18:03:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B267B21868
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 16:04:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 307D01C219B3
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 17:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5467145BEB;
-	Wed, 27 Dec 2023 16:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E110645C0B;
+	Wed, 27 Dec 2023 17:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Lc7DXIYX"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RbgWAKUF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFA145BE1;
-	Wed, 27 Dec 2023 16:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1703693048; x=1704297848; i=markus.elfring@web.de;
-	bh=pl0j2jlBOHpdYumEB//84LCnmc+A204WKvvK9JoNUAE=;
-	h=X-UI-Sender-Class:Date:Subject:From:To:Cc:References:
-	 In-Reply-To;
-	b=Lc7DXIYXmosy75uibtNwU2cS73VVZK/cSY03ClKiUfkc3xCBdEUSUhUXcM/eGCuf
-	 A1UIWN9B3ov2GXqI0XIudj3W5EBW9Z9gJ1fS2y6hMbedWD6vfQe4PkP/BHjGmUwrt
-	 BV8S1Sxtr2OMJd6m2ScU2zt6gfArVTew+s7tFcTz8VBc2coa4xv9YMSqaaYsRrXcQ
-	 zeHkfXjEb7GNuEyGITi/A/jgI7YZRRIweLFtE7qEyUUvAn2j4PSwxbIIJeR3JEhxO
-	 nXQY6uNdJYdjqGEIC2zDiFigS/klkNAI7h66Hj95lkG6bxYIc3v7wYp6HxffD+Lvn
-	 QLvkSkGoyf+g14M72Q==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MsaWF-1qzbcp0V5P-00tfcP; Wed, 27
- Dec 2023 17:04:08 +0100
-Message-ID: <fcc9f3ed-b8d0-4999-a06c-12a193a516d3@web.de>
-Date: Wed, 27 Dec 2023 17:04:07 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4168945BE5
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 17:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dbd029beef4so4843362276.0
+        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 09:03:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703696581; x=1704301381; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LGGpmDyCOAVTfPuNyeaql2/nHGZzSIk1f0fzagp9sTE=;
+        b=RbgWAKUFmDHOkoAFKurx+OYuL0dcskN7eTAQZ2pfoH15mz2grBFy81e791IqdWOi/d
+         XA/mkaDbeMBoPXPywbESXtPvra4p0NGG7istnFBZgHR0zp/+t56Uhhvbf2GwIvH+cx+K
+         Hsyq8TqJG9qgWdvVkaOl69OkDIL8SG0GQVSdK3XjUe4mG4lG4ZQLSaj+EcGwi3W1tA7d
+         puNNWrFNQD0NUHE7vKFNkdmPgN/8BRxSZHgxn4uhrLtPiesz/iCgi223Q3ngTqCQ2yHz
+         yCocBvHbJ5jR8tr2dzxdHwIJ9JKN/N6LUdYz0SmCtrIbyw/ZZnqbCS4fQkINOeQT2PqN
+         7u8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703696581; x=1704301381;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LGGpmDyCOAVTfPuNyeaql2/nHGZzSIk1f0fzagp9sTE=;
+        b=UNwsdiOR155t3hJyG1ziMHy1rq8SK1aa9KG4rwx4arHTop5X5X+x9nx1qsKryuvEXx
+         t34GRAVKnitcjv6P3YWhCTxT2WCdSe5EI1XX6Emoir7AC5F6znhC7Tz0i/JC0R0AdFHA
+         aKRAz1OQW7Sx4rNoGYjSzIgjhleR4PvP3QOSbibKB7w5ggW/C2ukmPkwaKS7ZCN/U/AK
+         HxwirO3DFYyeuk0lHrD+isqYwbiuqBRfEroPSyIkuzN1e92GC7DrgEacEn6qIpZwBQOQ
+         8YfBv9vrvf07Cs84bhO8SLFccTB+wPUPFOYlHPmag228noBYBdGpfYGrcE3tCDWLotWh
+         Tnww==
+X-Gm-Message-State: AOJu0Yy96YHBaYTuxv932RlKe88iI475U4uv/YHBig97P5vS8oacXtyJ
+	KjR0HDopQY4w9N7cHyKreqlJMezQUP2phSCjknrYC30RQo5h
+X-Google-Smtp-Source: AGHT+IHTvTD/jP8fxBI/SM3MB9o4zJ5KrqIwobuhiEM5CRa1hOMcDWlEB3sCgezF8eB8Yh4CNzmFkxw8iFwFY/KK4e4=
+X-Received: by 2002:a5b:9d1:0:b0:db7:daec:ec5a with SMTP id
+ y17-20020a5b09d1000000b00db7daecec5amr6380156ybq.33.1703696581102; Wed, 27
+ Dec 2023 09:03:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH 2/2] nfc: mei_phy: Use common code in mei_nfc_connect()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-To: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
-References: <9a683f73-c5a2-4b80-af1b-01540834a3dd@web.de>
-In-Reply-To: <9a683f73-c5a2-4b80-af1b-01540834a3dd@web.de>
-Content-Type: text/plain; charset=UTF-8
+References: <20231224165413.831486-1-linma@zju.edu.cn> <CAM0EoMm8F3UE3N-PBZmJHQpYYjiV23JKf6jGsvzzWs0PBd+AWQ@mail.gmail.com>
+ <6aab36aa.56337.18ca3c6af7a.Coremail.linma@zju.edu.cn>
+In-Reply-To: <6aab36aa.56337.18ca3c6af7a.Coremail.linma@zju.edu.cn>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 27 Dec 2023 12:02:49 -0500
+Message-ID: <CAM0EoMmBp6SWDGhPkusnx0jh4y=1k9ggS+5UpV+0MtEccDgyXw@mail.gmail.com>
+Subject: Re: [PATCH net v1] net/sched: cls_api: complement tcf_tfilter_dump_policy
+To: Lin Ma <linma@zju.edu.cn>
+Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:LZLFy8584bM7nNvphHPs21dMyK0NX/xpt7a2sjgekqHU4DF+tEL
- WjRYzV4ttYUlRj83D4tFBpGhcOM+pyUOdHz/+n+XxOJR9XwmI7NIjO0jcbRPnq2irlBhPI1
- k5lrKOh4gkYiiVMVFys6gf/EnPWuWSSD4VYet/9cD1aRbzIDHxqWH8wPNQho9BZeYQmoeyz
- sI6ttaVBn4EQG3K3p56TA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:CSPkLoRkgos=;ca8zaDvllZcwLBz4r7X8tu5athr
- 2swnmbXxg5vxZkB9gKnLlviRogKVGDF9nzhbue8EZb4Q+BZU/DTtLKc6h88hpx2K2OECRMgbU
- dbzQIp+MWaBHtLEs9+BfDfFK7qvcJofZba7MESK82h52cTvvebloPxGO+Y63Ale2OTiGiWxcW
- YQPCuqOhhSKeZcTSudoCje9/Uhv0HZgSm6WIzM/A/DbmNjTgpm23Zcr+5Pz6oyvfif9Xp0tex
- BfGmJIEHjUnruhlX2YcaRWFPfUlmcRgw5fvidF+ZElxHySRInhMvhZh2za85Q4JRL1TC7lQOQ
- fO9Qkfag6b8moUMWqqLVC0a+TvloxQIHL+/Ev4clZRlRu0fxCve096umXkb60T0zuVe1VQ1e3
- WiutHjb/l/ByZG23vYJSY3gMizKk2l/v4xYBUS97KIsBAtZF51PuxVtUMXnkBzWyIO4LG8IoB
- o2uMk+khs3zM8Zxpbi7OPceEhO1kO4feu8cdULHTeF47pzm0pxuykc8RRpcnEtRJ88GBBkuik
- EwulqbHTlCz2xBmSe5GO+7V+s8mF3T+E5S0LwU5WFiAreyiH2y4DpJG9bW2PN8bMUTjBcoD75
- 74tSywDeRvIOK5aFVkQZoOf7M7yoEJO/of2WreZHJeoSswGFpUfsVKU1NigxW0+PSd0VtHloW
- 1fKcVONAIFPQFiIjuW5A9OsUWaILggTjAbUFHH6m5+jg2KMbuo1ySyCroRAuRA8eU3iRV6Ozk
- 1Z19v4Fgq3boKVUyJGci/As68vXOL/5mxf3+JjBzLh5WllGWRQKMEgtnIGa+YGcv23QT7fPDN
- lVMp2+pW0Vy9UVXKym1ueqEdf3gTvRvDDMlGC6FQRwXtW+UBqXS9w4CFOhTWpafvhCA+Y5kkG
- mqzltRDgxuhznRqYjNunl9qvC0l60YJyCdhl4l7TgMg2LbHD2fwP9kZ73br6Vo/JsTHeVi7Ka
- 3pO1DrocWNovKtms3CXZv7rnWu0=
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 27 Dec 2023 16:45:39 +0100
+On Mon, Dec 25, 2023 at 8:39=E2=80=AFPM Lin Ma <linma@zju.edu.cn> wrote:
+>
+> Hello Jamal,
+>
+> >
+> > Can you clarify what "heap data leak" you are referring to?
+> > As much as i can see any reference to NLA_TCA_CHAIN is checked for
+> > presence before being put to use. So far that reason I  dont see how
+> > this patch qualifies as "net". It looks like an enhancement to me
+> > which should target net-next, unless i am missing something obvious.
+> >
+>
+> Sure, thanks for your reply, (and merry Christmas :D).
+> I didn't mention the detail as I consider the commit message in
+> `5e2424708da7` could make a point. In short, the code
+>
+> ```
+> if (tca[TCA_CHAIN] && nla_get_u32(tca[TCA_CHAIN])
+> ```
+>
+> only checks if the attribute TCA_CHAIN exists but never checks about
+> the attribute length because that attribute is parsed by the function
+> nlmsg_parse_deprecated which will parse an attribute even not described
+> in the given policy (here, the tcf_tfilter_dump_policy).
+>
+> Moreover, the netlink message is allocated via netlink_alloc_large_skb
+> (see net/netlink/af_netlink.c) that does not clear out the heap buffer.
+> Hence a malicious user could send a malicious TCA_CHAIN attribute here
+> without putting any payload and the above `nla_get_u32` could dereference
+> a dirty data that is sprayed by the user.
+>
+> Other place gets TCA_CHAIN with provide policy rtm_tca_policy that has a
+> description.
+>
+> ```
+> [TCA_CHAIN]             =3D { .type =3D NLA_U32 },
+> ```
+>
+> and this patch aims to do so.
+>
+> Unfortunately, I have not opened the exploit for CVE-2023-3773
+> (https://access.redhat.com/security/cve/cve-2023-3773) yet but the idea
+> is similar and you can take it as an example.
+>
 
-Use another label so that a kfree() call can be better reused
-at the end of this function.
+Sorry, still trying to follow your reasoning that this is a "net issue":
+As you point out, the skb will have enough space to carry the 32 bit
+value. Worst case is we read garbage. And the dump, using this garbage
+chain index,  will not find the chain or will find some unintended
+chain. Am i missing something?
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/nfc/mei_phy.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Can you send me a repro (privately) that actually causes the "heap
+data leak" if you have one?
 
-diff --git a/drivers/nfc/mei_phy.c b/drivers/nfc/mei_phy.c
-index 937f229f4646..9272564012b3 100644
-=2D-- a/drivers/nfc/mei_phy.c
-+++ b/drivers/nfc/mei_phy.c
-@@ -157,8 +157,8 @@ static int mei_nfc_connect(struct nfc_mei_phy *phy)
+cheers,
+jamal
 
- 	reply =3D kzalloc(connect_resp_length, GFP_KERNEL);
- 	if (!reply) {
--		kfree(cmd);
--		return -ENOMEM;
-+		r =3D -ENOMEM;
-+		goto free_cmd;
- 	}
 
- 	connect_resp =3D (struct mei_nfc_connect_resp *)reply->data;
-@@ -197,6 +197,7 @@ static int mei_nfc_connect(struct nfc_mei_phy *phy)
-
- err:
- 	kfree(reply);
-+free_cmd:
- 	kfree(cmd);
-
- 	return r;
-=2D-
-2.43.0
-
+> > cheers,
+> > jamal
+> >
+>
+> Regards
+> Lin
 
