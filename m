@@ -1,142 +1,85 @@
-Return-Path: <netdev+bounces-60386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD1881EF6D
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 15:32:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E45781EF7C
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 15:40:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F302BB21C51
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 14:32:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF1F41C216BB
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 14:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1362B9C2;
-	Wed, 27 Dec 2023 14:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146A14502C;
+	Wed, 27 Dec 2023 14:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GbHngUdW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oboqmo+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAA04502A
-	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 14:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703687518; x=1735223518;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xwMfHKbkQwNKPl4uucOthAGFoZAxX0bATL04XKuEVJo=;
-  b=GbHngUdW0jmVYO1IORbn4tLfB5agKFokcPzaUWK0jvxFFKu4UxWvCE6g
-   XhdpROYXY59I5Kx5MF8Z6LTFengl0VYvaH1vaZXPuHIXz+I1jHlNfMtFm
-   MylA9/54g3okXfubaSkk3yJYxV2LEVYkH/HWzkZUIbgOrjQ5sNezmVpc6
-   aY+3h/rY9aeTs9LOymDBmU4ubUBkGV/ot+dYcLkESXwJHog1+1GU0dk0e
-   bji0k80j3jKzT4Dptr4vIfhUMmvWtz2hcfiKa9U5y190UZRdZN0mu+gXU
-   zM+v55ZcAJyRyBQdnoJdOfxU0WKL4xKCO8FIjJ7SWLZFPWqlycn4/b5TD
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="18008896"
-X-IronPort-AV: E=Sophos;i="6.04,309,1695711600"; 
-   d="scan'208";a="18008896"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 06:31:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="781749890"
-X-IronPort-AV: E=Sophos;i="6.04,309,1695711600"; 
-   d="scan'208";a="781749890"
-Received: from unknown (HELO intel-71.bj.intel.com) ([10.238.154.71])
-  by fmsmga007.fm.intel.com with ESMTP; 27 Dec 2023 06:31:46 -0800
-From: Zhu Yanjun <yanjun.zhu@intel.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: [PATCH v2 1/1] =?UTF-8?q?virtio=5Fnet:=20Fix=20"=E2=80=98%d?= =?UTF-8?q?=E2=80=99=20directive=20writing=20between=201=20and=2011=20byte?= =?UTF-8?q?s=20into=20a=20region=20of=20size=2010"=20warnings?=
-Date: Wed, 27 Dec 2023 22:26:37 +0800
-Message-Id: <20231227142637.2479149-1-yanjun.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE8F45947
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 14:40:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 442ABC433C9;
+	Wed, 27 Dec 2023 14:40:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703688022;
+	bh=JmUOK66tVH4tMIHUIvGTsfsQEGsY+FkwMryVcR9+hnI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Oboqmo+Aoha6CWyCFwqcdY0P6BrOCj6iU3850LniJbxbmhouFYmPdfFIRnIlpgizs
+	 qiqzfK6Peso6YNGwkgsitMnrj9niTnpVN0KyJYj/LWad7jbVTdRBwtiVrI3Fsx4KdZ
+	 5i4Gnc2tO7m7mtHVxS+7ddp9c060HW5t934tIFXbW/ufOWOlUigcjM/DWuBS6LF84o
+	 6R/ShSW+5ANUfD6BDV4NoaY2ii99Ir8n0Tf0mEthDXdbQvAhtHE//txxlzWlZW+u2B
+	 mK0ear5NQ2OdZ/LNjDHLTddY4LTGUg1fMqGdHLjSyRvykUpPHQuCLf5k+6ii5oYf7A
+	 24cTTvLDQgPMA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2B1BAE333D4;
+	Wed, 27 Dec 2023 14:40:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next] net: pktgen: Use wait_event_freezable_timeout()
+ for freezable kthread
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170368802217.12538.6939830762538253852.git-patchwork-notify@kernel.org>
+Date: Wed, 27 Dec 2023 14:40:22 +0000
+References: <20231219233757.693106-1-haokexin@gmail.com>
+In-Reply-To: <20231219233757.693106-1-haokexin@gmail.com>
+To: Kevin Hao <haokexin@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, rafael@kernel.org, pavel@ucw.cz
 
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
+Hello:
 
-Fix the warnings when building virtio_net driver.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-"
-drivers/net/virtio_net.c: In function ‘init_vqs’:
-drivers/net/virtio_net.c:4551:48: warning: ‘%d’ directive writing between 1 and 11 bytes into a region of size 10 [-Wformat-overflow=]
- 4551 |                 sprintf(vi->rq[i].name, "input.%d", i);
-      |                                                ^~
-In function ‘virtnet_find_vqs’,
-    inlined from ‘init_vqs’ at drivers/net/virtio_net.c:4645:8:
-drivers/net/virtio_net.c:4551:41: note: directive argument in the range [-2147483643, 65534]
- 4551 |                 sprintf(vi->rq[i].name, "input.%d", i);
-      |                                         ^~~~~~~~~~
-drivers/net/virtio_net.c:4551:17: note: ‘sprintf’ output between 8 and 18 bytes into a destination of size 16
- 4551 |                 sprintf(vi->rq[i].name, "input.%d", i);
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/virtio_net.c: In function ‘init_vqs’:
-drivers/net/virtio_net.c:4552:49: warning: ‘%d’ directive writing between 1 and 11 bytes into a region of size 9 [-Wformat-overflow=]
- 4552 |                 sprintf(vi->sq[i].name, "output.%d", i);
-      |                                                 ^~
-In function ‘virtnet_find_vqs’,
-    inlined from ‘init_vqs’ at drivers/net/virtio_net.c:4645:8:
-drivers/net/virtio_net.c:4552:41: note: directive argument in the range [-2147483643, 65534]
- 4552 |                 sprintf(vi->sq[i].name, "output.%d", i);
-      |                                         ^~~~~~~~~~~
-drivers/net/virtio_net.c:4552:17: note: ‘sprintf’ output between 9 and 19 bytes into a destination of size 16
- 4552 |                 sprintf(vi->sq[i].name, "output.%d", i);
+On Wed, 20 Dec 2023 07:37:57 +0800 you wrote:
+> A freezable kernel thread can enter frozen state during freezing by
+> either calling try_to_freeze() or using wait_event_freezable() and its
+> variants. So for the following snippet of code in a kernel thread loop:
+>   wait_event_interruptible_timeout();
+>   try_to_freeze();
+> 
+> We can change it to a simple wait_event_freezable_timeout() and then
+> eliminate a function call.
+> 
+> [...]
 
-"
+Here is the summary with links:
+  - [v2,net-next] net: pktgen: Use wait_event_freezable_timeout() for freezable kthread
+    https://git.kernel.org/netdev/net-next/c/3fb65f6bc7dc
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
----
- drivers/net/virtio_net.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index d16f592c2061..89a15cc81396 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4096,10 +4096,11 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- {
- 	vq_callback_t **callbacks;
- 	struct virtqueue **vqs;
--	int ret = -ENOMEM;
--	int i, total_vqs;
- 	const char **names;
-+	int ret = -ENOMEM;
-+	int total_vqs;
- 	bool *ctx;
-+	u16 i;
- 
- 	/* We expect 1 RX virtqueue followed by 1 TX virtqueue, followed by
- 	 * possible N-1 RX/TX queue pairs used in multiqueue mode, followed by
-@@ -4136,8 +4137,8 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
- 		callbacks[rxq2vq(i)] = skb_recv_done;
- 		callbacks[txq2vq(i)] = skb_xmit_done;
--		sprintf(vi->rq[i].name, "input.%d", i);
--		sprintf(vi->sq[i].name, "output.%d", i);
-+		sprintf(vi->rq[i].name, "input.%u", i);
-+		sprintf(vi->sq[i].name, "output.%u", i);
- 		names[rxq2vq(i)] = vi->rq[i].name;
- 		names[txq2vq(i)] = vi->sq[i].name;
- 		if (ctx)
+You are awesome, thank you!
 -- 
-2.27.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
