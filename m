@@ -1,141 +1,89 @@
-Return-Path: <netdev+bounces-60418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17FA481F20B
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 22:01:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1202C81F20E
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 22:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78819B2271A
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 21:01:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0244FB22767
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 21:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF9B481BA;
-	Wed, 27 Dec 2023 21:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="er6UAdYn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB190481A3;
+	Wed, 27 Dec 2023 21:01:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBC0481A5
-	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 21:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703710854; x=1735246854;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KkOVBtiHHSFV5B+PzTkEmmm0ZUgXWMJLdMkWHudIaxo=;
-  b=er6UAdYnm0Stq5PRmNHpIpXD0yMekANfnRc2CKonkN8Owo8lGMIR0P7q
-   9D5+mkmbn6pYKxabnvgdGaLgtYBCHUe19w61Dn3r+j+ESSGmZhX5rXXGt
-   yOP16NVJ235+bvmknTGN+FLg78JNQG+LbIHEiL+GUoPCrouqcaFgZsIWr
-   t/qa33o3Fpc+91w6bcq7LB1x+5YRMb0GWFPjgiskgkEDsYsh6r1qTWOR2
-   ItQAatU1kmYmdICDfXPytYj3Q2eB2Mc6bwXnJEhx8QH43NKMmaPEoo403
-   ESdZygV/E1oOuescIVLcPyVut2PcK4CKk4/KZbR1XpSD5yeisxRujd9wT
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="427655629"
-X-IronPort-AV: E=Sophos;i="6.04,310,1695711600"; 
-   d="scan'208";a="427655629"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 13:00:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="844258791"
-X-IronPort-AV: E=Sophos;i="6.04,310,1695711600"; 
-   d="scan'208";a="844258791"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga008.fm.intel.com with ESMTP; 27 Dec 2023 13:00:50 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
-	anthony.l.nguyen@intel.com,
-	bigeasy@linutronix.de,
-	sasha.neftin@intel.com,
-	Suman Ghosh <sumang@marvell.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net 3/3] igc: Check VLAN EtherType mask
-Date: Wed, 27 Dec 2023 13:00:40 -0800
-Message-ID: <20231227210041.3035055-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231227210041.3035055-1-anthony.l.nguyen@intel.com>
-References: <20231227210041.3035055-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEA047F79
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 21:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7baec2c5f30so238285339f.0
+        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 13:01:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703710883; x=1704315683;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=E5bXcrdTRGBHTnAVKY/8JHx3T14Y1r2rGbAf1hLUoWo=;
+        b=R//H3h/rqAK7AMPlP6jl1+mJu/EwWa+yqnkhiZakuh6piy2EqOKwP5xNnhDe8GEIYQ
+         MERk/rWNWgQdpzWXG+zc08OaHQxg6ZJabDUGiJ7Hke2wNRuUbrVfsR6zPsztwlKW4m5E
+         IV75U+2wnWCuUmKdJlqXuzocMockmfEI/nv1z+/vawupWMe5jnZB7qPsELEjTPMHbVPQ
+         woxxi2rbmh7cZEPetZdvMpzrjtXvh5aznQE3lp6l/DOzCU+gnXXGv8Yi4QJL3nbG2h37
+         BTA3Gru4aeZC/qf/dC08epoE2A9Xc2lhZe2UOHfyKc5cIeyAnwSPrBuRrJPKsYFabF4e
+         GUPw==
+X-Gm-Message-State: AOJu0YxSlS/ghxLDFY3f9D4bKeaDbXMDqOHCCpiDqkgAWx3YdB8IBBrE
+	kaei/9/M9XzYTUIfxflWpqBiAOlUzIQ5BwsTloF6LBbInoOC
+X-Google-Smtp-Source: AGHT+IGnuWUirDlyOnKmghKiuaZPrq34UK7VI4CDnhIfIyRHy0gabEH5uqwieqEK5OQ2EAA6W9ePduabMy+5EVFKwdSLcfW2rIeN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a6b:e017:0:b0:7ba:e2f0:30b3 with SMTP id
+ z23-20020a6be017000000b007bae2f030b3mr180487iog.2.1703710883609; Wed, 27 Dec
+ 2023 13:01:23 -0800 (PST)
+Date: Wed, 27 Dec 2023 13:01:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000484c7060d841aa6@google.com>
+Subject: [syzbot] Monthly hams report (Dec 2023)
+From: syzbot <syzbot+list5955df82872bfdd5c1e1@syzkaller.appspotmail.com>
+To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Kurt Kanzenbach <kurt@linutronix.de>
+Hello hams maintainers/developers,
 
-Currently the driver accepts VLAN EtherType steering rules regardless of
-the configured mask. And things might fail silently or with confusing error
-messages to the user. The VLAN EtherType can only be matched by full
-mask. Therefore, add a check for that.
+This is a 31-day syzbot report for the hams subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/hams
 
-For instance the following rule is invalid, but the driver accepts it and
-ignores the user specified mask:
-|root@host:~# ethtool -N enp3s0 flow-type ether vlan-etype 0x8100 \
-|             m 0x00ff action 0
-|Added rule with ID 63
-|root@host:~# ethtool --show-ntuple enp3s0
-|4 RX rings available
-|Total 1 rules
-|
-|Filter: 63
-|        Flow Type: Raw Ethernet
-|        Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-|        Dest MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-|        Ethertype: 0x0 mask: 0xFFFF
-|        VLAN EtherType: 0x8100 mask: 0x0
-|        VLAN: 0x0 mask: 0xffff
-|        User-defined: 0x0 mask: 0xffffffffffffffff
-|        Action: Direct to queue 0
+During the period, 0 new issues were detected and 1 were fixed.
+In total, 3 issues are still open and 32 have been fixed so far.
 
-After:
-|root@host:~# ethtool -N enp3s0 flow-type ether vlan-etype 0x8100 \
-|             m 0x00ff action 0
-|rmgr: Cannot insert RX class rule: Operation not supported
+Some of the still happening issues:
 
-Fixes: 2b477d057e33 ("igc: Integrate flex filter into ethtool ops")
-Suggested-by: Suman Ghosh <sumang@marvell.com>
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Ref Crashes Repro Title
+<1> 92      Yes   memory leak in nr_rx_frame (2)
+                  https://syzkaller.appspot.com/bug?extid=0145ea560de205bc09f0
+<2> 26      No    general protection fault in rose_transmit_link (3)
+                  https://syzkaller.appspot.com/bug?extid=677921bcd8c3a67a3df3
+<3> 9       Yes   memory leak in nr_create (3)
+                  https://syzkaller.appspot.com/bug?extid=d327a1f3b12e1e206c16
+
 ---
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index b56b4f338bd3..859b2636f3d9 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1357,6 +1357,14 @@ static int igc_ethtool_add_nfc_rule(struct igc_adapter *adapter,
- 		return -EOPNOTSUPP;
- 	}
- 
-+	/* VLAN EtherType can only be matched by full mask. */
-+	if ((fsp->flow_type & FLOW_EXT) &&
-+	    fsp->m_ext.vlan_etype &&
-+	    fsp->m_ext.vlan_etype != ETHER_TYPE_FULL_MASK) {
-+		netdev_dbg(netdev, "VLAN EtherType mask not supported\n");
-+		return -EOPNOTSUPP;
-+	}
-+
- 	if (fsp->location >= IGC_MAX_RXNFC_RULES) {
- 		netdev_dbg(netdev, "Invalid location\n");
- 		return -EINVAL;
--- 
-2.41.0
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
