@@ -1,250 +1,93 @@
-Return-Path: <netdev+bounces-60392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 551AD81EFD3
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 16:43:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4AE681EFD6
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 16:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A6F328254D
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 15:43:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 446BB28261E
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 15:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E284D4596B;
-	Wed, 27 Dec 2023 15:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D9FF4596A;
+	Wed, 27 Dec 2023 15:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="foVj4Ffv"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="seFe0ogu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4916A45964;
-	Wed, 27 Dec 2023 15:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-78109a21144so454966185a.0;
-        Wed, 27 Dec 2023 07:43:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EE445023
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 15:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5554e43adc0so914772a12.0
+        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 07:45:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703691815; x=1704296615; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TBCXKxvUXWJQToqFmz1xAaXGNoJI0qbk9JjCq2X05Fg=;
-        b=foVj4FfvNwZUY9T6gprfxlcylO6MYYUZgE8E2WGycnH5KYEEoi3zkGJ2dAGQt6XxuA
-         eSbrxRmt4Kz/1uYPEPkDpok3tO/iWMW100agURyVGxvBXGCpxGUXc8wkAi5sm8jRsucW
-         AmXMRoD5x7CxlGf6/wjXTrpkSR5rAdxUd4GjUd7WR51d5hLizeShQPo3QNj4hdIwjhiC
-         9OzRJSPs7fbrWRRLSRZjcve34GJRsuZEX50x8aZe0y28HexiGEqR84++daxkNugNoFB6
-         PSysov/qPdJqLLPyH5CJH9QLrjdeb/Zvz2jwJj+N1pgXJi2ieac5DHvascZnrzM1OE14
-         N0sQ==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1703691904; x=1704296704; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZdjJv1uuqltdQ3TMTpUu/ZbNucAajnnY0rLtv/lCBKs=;
+        b=seFe0oguCUcZbheHM0CEzJAmE7gtrErwr2+KxBP9wqqoCeFv1/IvrOZkD+wnU+HSPh
+         5L065v+Y4NNnE0RW0dzyLrmO8NbtgviiF3FV7Fe3GEoSED+GVTzIyakOuTn+7dGEgbMX
+         4KJCRJo1IvocENmrtay5oyhPCq2A52dhquDhlI8SNJQw7/vfdhyDt93YcabXIM5sLFx6
+         WQEyVMhsMnVUz38lcIlG0l8p4hmuo/snNd8ql5QHA6oOOgr+R8kek+rYdtTm4YO0NAOj
+         X2t9O44yQmbnwzkdCOLl48Wb35MWrhaXJdokIzd+zGiw/wLhQdlLQgYiaKDZ2yvjJCJm
+         jacQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703691815; x=1704296615;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TBCXKxvUXWJQToqFmz1xAaXGNoJI0qbk9JjCq2X05Fg=;
-        b=hCJXSjcEsYNLv7B3sW883eI9aFJbZn0kFLcjXzNtGqgI/Mly247RcJHoycUQArShnB
-         8fnFO53Q3bkmbw6QYfTWB8lqggJk9ZwbwmP2yxFOsApWypl8OoWz2JforrN7ct+6G6EX
-         Y/BwFOZei2U0c4qVUzHOHAg8ONDbWpPHaP7g03DaxIPuQJZcjH/+eNauGLJ94tDwMMCI
-         0QrG9k5ce7kw65JuZO/Oj/xj1aLxn2UroA186JFm+gDtfoWpzYrSnqzPn4H15Bzb/zpj
-         1iO7WADBdyun0J3OlcsXF3PbTFd9P2MnmM7Aq4M9ZSg8/CA2QjBeD5i/pWPxmjSRLmyi
-         76vQ==
-X-Gm-Message-State: AOJu0YwzYCl/FiMWyT+G8jbpu88e8kbrasJ7tpLpQQdD0fy4Ap3sUihm
-	gMkLvW93rg/jfBpI2fdovv4=
-X-Google-Smtp-Source: AGHT+IG9tJpj8kWpbPMBMwXnggcWk7l+AJHgsEEDNt2oG3A0S9U97AQlK74BQGim4xwZyRHz6paKoA==
-X-Received: by 2002:a05:620a:f14:b0:781:65d9:ec8b with SMTP id v20-20020a05620a0f1400b0078165d9ec8bmr759485qkl.100.1703691815106;
-        Wed, 27 Dec 2023 07:43:35 -0800 (PST)
-Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
-        by smtp.gmail.com with ESMTPSA id h15-20020a05620a21cf00b007816608002asm227720qka.19.2023.12.27.07.43.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Dec 2023 07:43:34 -0800 (PST)
-Date: Wed, 27 Dec 2023 10:43:34 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Michal Kubiak <michal.kubiak@intel.com>, 
- Larysa Zaremba <larysa.zaremba@intel.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- intel-wired-lan@lists.osuosl.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <658c46269aa52_a33e629442@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20231223025554.2316836-2-aleksander.lobakin@intel.com>
-References: <20231223025554.2316836-1-aleksander.lobakin@intel.com>
- <20231223025554.2316836-2-aleksander.lobakin@intel.com>
-Subject: Re: [PATCH RFC net-next 01/34] idpf: reuse libie's definitions of
- parsed ptype structures
+        d=1e100.net; s=20230601; t=1703691904; x=1704296704;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZdjJv1uuqltdQ3TMTpUu/ZbNucAajnnY0rLtv/lCBKs=;
+        b=D/qHvMaS/jO5pgtDMZsaiwcUKKpRweKbEi3UtTyGbyN4tlVXM+zX+GeQ/bmQ9drRch
+         gEXfNamaQMHw5sPav3xy8rfg1zrZts65GXY/+PhLIIFxRPOHZMP0Mrj26y4/nFgrFwd8
+         0VGQtvo5q0xwK7TworFc5gwbZy5ooQy2B2UUUANewguDMsNfmBs167JlqLi9w/s0/xlt
+         oeK63eXcgmJcaqrlFJPOygTsBQJkrAvSg24gzpzE2nvRrHize0KdbOEO3B3ClNH6KTbS
+         SPi30TA3zBxvyIysje6OFHVTgf1lU8AasjpkCW7xX1WveQvljlh6shnViTjup7/qxfX0
+         dNgg==
+X-Gm-Message-State: AOJu0YxGt6Dynrphz3uRkW4wMSZWR/47KQWaq3aOb5gExcs397pqiKCJ
+	wwe002qr0HqUEFCyu2pBM6iLN+iLKvt6UQ==
+X-Google-Smtp-Source: AGHT+IGl3DcIk07cA7u/sbhKpP54AakxOf8FwMob6hgaz/DqOvKnBu/LWQxqw2GCWOStLHSZFRFtqw==
+X-Received: by 2002:a17:907:6d17:b0:a23:35e9:579 with SMTP id sa23-20020a1709076d1700b00a2335e90579mr5886105ejc.33.1703691904141;
+        Wed, 27 Dec 2023 07:45:04 -0800 (PST)
+Received: from [192.168.0.161] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id i19-20020a170906a29300b00a26988c8772sm6624161ejz.214.2023.12.27.07.45.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Dec 2023 07:45:03 -0800 (PST)
+Message-ID: <d7d084a9-16bf-41ef-8767-5291b15398bd@blackwall.org>
+Date: Wed, 27 Dec 2023 17:45:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next] bridge: mdb: Add flush support
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: dsahern@gmail.com, stephen@networkplumber.org, petrm@nvidia.com
+References: <20231226153013.3262346-1-idosch@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20231226153013.3262346-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Alexander Lobakin wrote:
-> idpf's in-kernel parsed ptype structure is almost identical to the one
-> used in the previous Intel drivers, which means it can be converted to
-> use libie's definitions and even helpers. The only difference is that
-> it doesn't use a constant table, rather than one obtained from the
-> device.
-> Remove the driver counterpart and use libie's helpers for hashes and
-> checksums. This slightly optimizes skb fields processing due to faster
-> checks.
+On 26/12/2023 17:30, Ido Schimmel wrote:
+> Implement MDB flush functionality, allowing user space to flush MDB
+> entries from the kernel according to provided parameters.
 > 
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 > ---
->  drivers/net/ethernet/intel/Kconfig            |   1 +
->  drivers/net/ethernet/intel/idpf/idpf.h        |   2 +-
->  drivers/net/ethernet/intel/idpf/idpf_main.c   |   1 +
->  .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  87 +++++++--------
->  drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 101 ++++++------------
->  drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  88 +--------------
->  .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  54 ++++++----
->  7 files changed, 110 insertions(+), 224 deletions(-)
+>  bridge/mdb.c      | 137 +++++++++++++++++++++++++++++++++++++++++++++-
+>  man/man8/bridge.8 |  67 +++++++++++++++++++++++
+>  2 files changed, 203 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-> index c7da7d05d93e..0db1aa36866e 100644
-> --- a/drivers/net/ethernet/intel/Kconfig
-> +++ b/drivers/net/ethernet/intel/Kconfig
-> @@ -378,6 +378,7 @@ config IDPF
->  	tristate "Intel(R) Infrastructure Data Path Function Support"
->  	depends on PCI_MSI
->  	select DIMLIB
-> +	select LIBIE
->  	select PAGE_POOL
->  	select PAGE_POOL_STATS
->  	help
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-> index 0acc125decb3..8342df0f4f3d 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf.h
-> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
-> @@ -385,7 +385,7 @@ struct idpf_vport {
->  	u16 num_rxq_grp;
->  	struct idpf_rxq_group *rxq_grps;
->  	u32 rxq_model;
-> -	struct idpf_rx_ptype_decoded rx_ptype_lkup[IDPF_RX_MAX_PTYPE];
-> +	struct libie_rx_ptype_parsed rx_ptype_lkup[IDPF_RX_MAX_PTYPE];
->  
->  	struct idpf_adapter *adapter;
->  	struct net_device *netdev;
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> index e1febc74cefd..6471158e6f6b 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> @@ -7,6 +7,7 @@
->  #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
->  
->  MODULE_DESCRIPTION(DRV_SUMMARY);
-> +MODULE_IMPORT_NS(LIBIE);
->  MODULE_LICENSE("GPL");
->  
->  /**
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> index 8122a0cc97de..e58e08c9997d 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> @@ -636,75 +636,64 @@ static bool idpf_rx_singleq_is_non_eop(struct idpf_queue *rxq,
->   * @rxq: Rx ring being processed
->   * @skb: skb currently being received and modified
->   * @csum_bits: checksum bits from descriptor
-> - * @ptype: the packet type decoded by hardware
-> + * @parsed: the packet type parsed by hardware
->   *
->   * skb->protocol must be set before this function is called
->   */
->  static void idpf_rx_singleq_csum(struct idpf_queue *rxq, struct sk_buff *skb,
-> -				 struct idpf_rx_csum_decoded *csum_bits,
-> -				 u16 ptype)
-> +				 struct idpf_rx_csum_decoded csum_bits,
-> +				 struct libie_rx_ptype_parsed parsed)
->  {
-> -	struct idpf_rx_ptype_decoded decoded;
->  	bool ipv4, ipv6;
->  
->  	/* check if Rx checksum is enabled */
-> -	if (unlikely(!(rxq->vport->netdev->features & NETIF_F_RXCSUM)))
-> +	if (!libie_has_rx_checksum(rxq->vport->netdev, parsed))
->  		return;
->  
->  	/* check if HW has decoded the packet and checksum */
-> -	if (unlikely(!(csum_bits->l3l4p)))
-> +	if (unlikely(!csum_bits.l3l4p))
->  		return;
->  
-> -	decoded = rxq->vport->rx_ptype_lkup[ptype];
-> -	if (unlikely(!(decoded.known && decoded.outer_ip)))
-> +	if (unlikely(parsed.outer_ip == LIBIE_RX_PTYPE_OUTER_L2))
->  		return;
->  
-> -	ipv4 = IDPF_RX_PTYPE_TO_IPV(&decoded, IDPF_RX_PTYPE_OUTER_IPV4);
-> -	ipv6 = IDPF_RX_PTYPE_TO_IPV(&decoded, IDPF_RX_PTYPE_OUTER_IPV6);
-> +	ipv4 = parsed.outer_ip == LIBIE_RX_PTYPE_OUTER_IPV4;
-> +	ipv6 = parsed.outer_ip == LIBIE_RX_PTYPE_OUTER_IPV6;
->  
->  	/* Check if there were any checksum errors */
-> -	if (unlikely(ipv4 && (csum_bits->ipe || csum_bits->eipe)))
-> +	if (unlikely(ipv4 && (csum_bits.ipe || csum_bits.eipe)))
->  		goto checksum_fail;
->  
->  	/* Device could not do any checksum offload for certain extension
->  	 * headers as indicated by setting IPV6EXADD bit
->  	 */
-> -	if (unlikely(ipv6 && csum_bits->ipv6exadd))
-> +	if (unlikely(ipv6 && csum_bits.ipv6exadd))
->  		return;
->  
->  	/* check for L4 errors and handle packets that were not able to be
->  	 * checksummed due to arrival speed
->  	 */
-> -	if (unlikely(csum_bits->l4e))
-> +	if (unlikely(csum_bits.l4e))
->  		goto checksum_fail;
->  
-> -	if (unlikely(csum_bits->nat && csum_bits->eudpe))
-> +	if (unlikely(csum_bits.nat && csum_bits.eudpe))
->  		goto checksum_fail;
->  
->  	/* Handle packets that were not able to be checksummed due to arrival
->  	 * speed, in this case the stack can compute the csum.
->  	 */
-> -	if (unlikely(csum_bits->pprs))
-> +	if (unlikely(csum_bits.pprs))
->  		return;
->  
->  	/* If there is an outer header present that might contain a checksum
->  	 * we need to bump the checksum level by 1 to reflect the fact that
->  	 * we are indicating we validated the inner checksum.
->  	 */
-> -	if (decoded.tunnel_type >= IDPF_RX_PTYPE_TUNNEL_IP_GRENAT)
-> +	if (parsed.tunnel_type >= LIBIE_RX_PTYPE_TUNNEL_IP_GRENAT)
->  		skb->csum_level = 1;
->  
-> -	/* Only report checksum unnecessary for ICMP, TCP, UDP, or SCTP */
-> -	switch (decoded.inner_prot) {
-> -	case IDPF_RX_PTYPE_INNER_PROT_ICMP:
-> -	case IDPF_RX_PTYPE_INNER_PROT_TCP:
-> -	case IDPF_RX_PTYPE_INNER_PROT_UDP:
-> -	case IDPF_RX_PTYPE_INNER_PROT_SCTP:
-> -		skb->ip_summed = CHECKSUM_UNNECESSARY;
-> -		return;
-> -	default:
-> -		return;
-> -	}
-> +	skb->ip_summed = CHECKSUM_UNNECESSARY;
-> +	return;
 
-Is it intentional to change from CHECKSUM_NONE to CHECKSUM_UNNECESSARY
-in the default case?
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-I suppose so, as idpf_rx_csum (the splitq equivalent) does the same
-(bar CHECKSUM_COMPLETE depending on descriptor bit).
+
 
