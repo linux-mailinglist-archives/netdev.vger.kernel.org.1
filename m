@@ -1,135 +1,95 @@
-Return-Path: <netdev+bounces-60356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36C0781EC2A
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 05:46:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57F9981ECBF
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 08:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE86CB2283C
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 04:46:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E12C2829C6
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 07:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9DC538D;
-	Wed, 27 Dec 2023 04:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="ES/9BjMk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5642524C;
+	Wed, 27 Dec 2023 07:03:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDF0EAFD;
-	Wed, 27 Dec 2023 04:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0DEED1C0007;
-	Wed, 27 Dec 2023 04:44:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1703652278;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YCZIbkTLfmiSszqRUWdE3uv72vBPQhPeE1uqn8XXA8k=;
-	b=ES/9BjMkXaCK3b66k00HkJeL+EOUGYJISv3f6Gom5VwI/njRkTwfwxfzNZVBwXM6ZtJ/hN
-	irPbSiSwIfVJumUkk0UtinwO04rq8ZUWhG1jd2lBYX0xNzzsz8Eu22Zia6wS0EbqmtFpct
-	AmEV9VPvFBvVdVxrD5VsjXy7XRMHQ/MbS4uA8msq7zglmY0ic4qCHYmaQhSzAVTlYQVAsm
-	8Gn1thUlWJATffyIJOC5ibSAG3PqK4LSp8UZHOr1nJdM3PioYdM+dJZVE8fxesTZMQLDh9
-	4QNSQTsr+QkwQXYn+Cs8U+mg2q1Mnc9YD63pDO7L+AVhTzdd1Qeodud3zuEWSw==
-From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
-To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
+Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2293C6105;
+	Wed, 27 Dec 2023 07:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from localhost.localdomain (unknown [10.190.69.69])
+	by mail-app3 (Coremail) with SMTP id cC_KCgDX3_IezItlmZCLAQ--.17434S4;
+	Wed, 27 Dec 2023 15:03:01 +0800 (CST)
+From: Dinghao Liu <dinghao.liu@zju.edu.cn>
+To: dinghao.liu@zju.edu.cn
+Cc: GR-Linux-NIC-Dev@marvell.com,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
+	Ron Mercer <ron.mercer@qlogic.com>,
+	Jeff Garzik <jeff@garzik.org>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v2 7/7] net: dsa: mt7530: do not run mt7530_setup_port5() if port 5 is disabled
-Date: Wed, 27 Dec 2023 07:43:47 +0300
-Message-Id: <20231227044347.107291-8-arinc.unal@arinc9.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231227044347.107291-1-arinc.unal@arinc9.com>
-References: <20231227044347.107291-1-arinc.unal@arinc9.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net/qla3xxx: fix potential memleak in ql_alloc_buffer_queues
+Date: Wed, 27 Dec 2023 15:02:27 +0800
+Message-Id: <20231227070227.10527-1-dinghao.liu@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cC_KCgDX3_IezItlmZCLAQ--.17434S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrKw4DAr1xKr15JF1UCrWfZrb_yoWkArcEgr
+	1fZryxWayDGFWYkrW7tr4UA34Yyrn8Z3WruF4fKFW3Xr4DXasIvryUXFykXay7Gw1fCrWD
+	t347WrWfCw1rtjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbskFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
+	wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
+	vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4UJVW0owA2z4x0Y4vEx4A2
+	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
+	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
+	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY
+	0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
+	IFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgwPBmWCupcTBwAdsE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
 
-There's no need to run all the code on mt7530_setup_port5() if port 5 is
-disabled. The only case for calling mt7530_setup_port5() from
-mt7530_setup() is when PHY muxing is enabled. That is because port 5 is not
-defined as a port on the devicetree, therefore, it cannot be controlled by
-phylink.
+When dma_alloc_coherent() fails, we should free qdev->lrg_buf
+to prevent potential memleak.
 
-Because of this, run mt7530_setup_port5() if priv->p5_intf_sel is
-P5_INTF_SEL_PHY_P0 or P5_INTF_SEL_PHY_P4. Remove the P5_DISABLED case from
-mt7530_setup_port5().
-
-Stop initialising the interface variable as the remaining cases will always
-call mt7530_setup_port5() with it initialised.
-
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Fixes: 1357bfcf7106 ("qla3xxx: Dynamically size the rx buffer queue based on the MTU.")
+Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
 ---
- drivers/net/dsa/mt7530.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/qlogic/qla3xxx.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 07c5f1c6d036..0c3b2b75f106 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -942,9 +942,6 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
- 		/* MT7530_P5_MODE_GMAC: P5 -> External phy or 2nd GMAC */
- 		val &= ~MHWTRAP_P5_DIS;
- 		break;
--	case P5_DISABLED:
--		interface = PHY_INTERFACE_MODE_NA;
--		break;
- 	default:
- 		dev_err(ds->dev, "Unsupported p5_intf_sel %d\n",
- 			priv->p5_intf_sel);
-@@ -2313,8 +2310,6 @@ mt7530_setup(struct dsa_switch *ds)
- 		 * Set priv->p5_intf_sel to the appropriate value if PHY muxing
- 		 * is detected.
- 		 */
--		interface = PHY_INTERFACE_MODE_NA;
--
- 		for_each_child_of_node(dn, mac_np) {
- 			if (!of_device_is_compatible(mac_np,
- 						     "mediatek,eth-mac"))
-@@ -2346,7 +2341,9 @@ mt7530_setup(struct dsa_switch *ds)
- 			break;
- 		}
+diff --git a/drivers/net/ethernet/qlogic/qla3xxx.c b/drivers/net/ethernet/qlogic/qla3xxx.c
+index 0d57ffcedf0c..fc78bc959ded 100644
+--- a/drivers/net/ethernet/qlogic/qla3xxx.c
++++ b/drivers/net/ethernet/qlogic/qla3xxx.c
+@@ -2591,6 +2591,7 @@ static int ql_alloc_buffer_queues(struct ql3_adapter *qdev)
  
--		mt7530_setup_port5(ds, interface);
-+		if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 ||
-+		    priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
-+			mt7530_setup_port5(ds, interface);
+ 	if (qdev->lrg_buf_q_alloc_virt_addr == NULL) {
+ 		netdev_err(qdev->ndev, "lBufQ failed\n");
++		kfree(qdev->lrg_buf);
+ 		return -ENOMEM;
+ 	}
+ 	qdev->lrg_buf_q_virt_addr = qdev->lrg_buf_q_alloc_virt_addr;
+@@ -2615,6 +2616,7 @@ static int ql_alloc_buffer_queues(struct ql3_adapter *qdev)
+ 				  qdev->lrg_buf_q_alloc_size,
+ 				  qdev->lrg_buf_q_alloc_virt_addr,
+ 				  qdev->lrg_buf_q_alloc_phy_addr);
++		kfree(qdev->lrg_buf);
+ 		return -ENOMEM;
  	}
  
- #ifdef CONFIG_GPIOLIB
 -- 
-2.40.1
+2.17.1
 
 
