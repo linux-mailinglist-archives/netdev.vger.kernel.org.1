@@ -1,68 +1,66 @@
-Return-Path: <netdev+bounces-60404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B0D281F12D
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 19:26:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28FD81F12E
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 19:26:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3041E282577
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 18:26:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6861D1F209B1
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 18:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF684778B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7067147A4B;
 	Wed, 27 Dec 2023 18:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bwKSiD3j"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oGq3AB0u"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F01F46B9F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D5147768
 	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 18:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703701549; x=1735237549;
+  t=1703701550; x=1735237550;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NoDJK90vBUT90LY5lV71c5KOTj1KS1nzQQWjDqiiCmM=;
-  b=bwKSiD3j3Pey/lXzPS7jSK37zVG2Mx7We6Xs5GT7ezknp+4A1gGuBNNQ
-   SWiFXQNO6eGhkfVlk3ArYUiJW5rkCoblZtFNsztB80BkU7W6opvK1geT3
-   aznzUtEIDQ3Iq4Jk11qXSjR+gfqnBXiWW3ns0PB3tFCqcrH19KkHpNQ2F
-   TaEjYmBDXcWdcci5L6GngsOMIOFJ3eJ70Mf4f8KRU5zoiPAyEP7KxiKPB
-   HgWc57Lh5axnTQ+CfLsyteH53/58RMm1LaeL3zUtLT0+aEUsYPJBbu9Mn
-   Wqlqol7mXswtr97HXdm8UiiIu98UmdbGVqD/5tuV69AOPtrcIIzoXGUO5
+  bh=wxc88TMUc12znaxHrHFSu2rn46lyaAKXp0pEwzCpp9c=;
+  b=oGq3AB0u3eAjEswizB4eg3rGiNfXJRlBUPlH/VN9Ur8Pm73LvVG1MUtH
+   XpX/bBJ0wpN3Hev6GVnZBMxiYk8Nz/GydoC6jKsf7os0UdoF2vGsvOPjw
+   JyjQhEQMl9Bg5NfjPtIb+Z7YTMtF1t/byvJJr8rVF9dI1hP4R94qcCIqe
+   93qiTzFdyJuW3A5Oz94PBpyNGmdMh+KSL+i2vkaVC36DPzSEtL4OSaKQD
+   kVeXKKFAlPIYiH/qP6O077UdtKtVu6T3RMGWUTjJ+L2ugbA3sjFAvioGQ
+   FCt1be/ekL95lQAppZi+JqloG9DJ8Ac2I34hfwmEpTlZBjKK4dcBI4ufe
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="3312835"
+X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="3312849"
 X-IronPort-AV: E=Sophos;i="6.04,310,1695711600"; 
-   d="scan'208";a="3312835"
+   d="scan'208";a="3312849"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 10:25:47 -0800
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 10:25:48 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="868921426"
+X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="868921430"
 X-IronPort-AV: E=Sophos;i="6.04,310,1695711600"; 
-   d="scan'208";a="868921426"
+   d="scan'208";a="868921430"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by FMSMGA003.fm.intel.com with ESMTP; 27 Dec 2023 10:25:46 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 27 Dec 2023 10:25:47 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+Cc: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>,
 	anthony.l.nguyen@intel.com,
-	vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
+	Andrii Staikov <andrii.staikov@intel.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net 3/4] ice: dpll: fix phase offset value
-Date: Wed, 27 Dec 2023 10:25:32 -0800
-Message-ID: <20231227182541.3033124-4-anthony.l.nguyen@intel.com>
+	Simon Horman <horms@kernel.org>,
+	Bharathi Sreenivas <bharathi.sreenivas@intel.com>
+Subject: [PATCH net 4/4] i40e: Fix filter input checks to prevent config with invalid values
+Date: Wed, 27 Dec 2023 10:25:33 -0800
+Message-ID: <20231227182541.3033124-5-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231227182541.3033124-1-anthony.l.nguyen@intel.com>
 References: <20231227182541.3033124-1-anthony.l.nguyen@intel.com>
@@ -74,103 +72,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
 
-Stop dividing the phase_offset value received from firmware. This fault
-is present since the initial implementation.
-The phase_offset value received from firmware is in 0.01ps resolution.
-Dpll subsystem is using the value in 0.001ps, raw value is adjusted
-before providing it to the user.
+Prevent VF from configuring filters with unsupported actions or use
+REDIRECT action with invalid tc number. Current checks could cause
+out of bounds access on PF side.
 
-The user can observe the value of phase offset with response to
-`pin-get` netlink message of dpll subsystem for an active pin:
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml \
-	--do pin-get --json '{"id":2}'
-
-Where example of correct response would be:
-{'board-label': 'C827_0-RCLKA',
- 'capabilities': 6,
- 'clock-id': 4658613174691613800,
- 'frequency': 1953125,
- 'id': 2,
- 'module-name': 'ice',
- 'parent-device': [{'direction': 'input',
-                    'parent-id': 6,
-                    'phase-offset': -216839550,
-                    'prio': 9,
-                    'state': 'connected'},
-                   {'direction': 'input',
-                    'parent-id': 7,
-                    'phase-offset': -42930,
-                    'prio': 8,
-                    'state': 'connected'}],
- 'phase-adjust': 0,
- 'phase-adjust-max': 16723,
- 'phase-adjust-min': -16723,
- 'type': 'mux'}
-
-Provided phase-offset value (-42930) shall be divided by the user with
-DPLL_PHASE_OFFSET_DIVIDER to get actual value of -42.930 ps.
-
-Before the fix, the response was not correct:
-{'board-label': 'C827_0-RCLKA',
- 'capabilities': 6,
- 'clock-id': 4658613174691613800,
- 'frequency': 1953125,
- 'id': 2,
- 'module-name': 'ice',
- 'parent-device': [{'direction': 'input',
-                    'parent-id': 6,
-                    'phase-offset': -216839,
-                    'prio': 9,
-                    'state': 'connected'},
-                   {'direction': 'input',
-                    'parent-id': 7,
-                    'phase-offset': -42,
-                    'prio': 8,
-                    'state': 'connected'}],
- 'phase-adjust': 0,
- 'phase-adjust-max': 16723,
- 'phase-adjust-min': -16723,
- 'type': 'mux'}
-
-Where phase-offset value (-42), after division
-(DPLL_PHASE_OFFSET_DIVIDER) would be: -0.042 ps.
-
-Fixes: 8a3a565ff210 ("ice: add admin commands to access cgu configuration")
-Fixes: 90e1c90750d7 ("ice: dpll: implement phase related callbacks")
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Fixes: e284fc280473 ("i40e: Add and delete cloud filter")
+Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
+Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Bharathi Sreenivas <bharathi.sreenivas@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 9a6c25f98632..edac34c796ce 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -5332,7 +5332,6 @@ ice_aq_get_cgu_dpll_status(struct ice_hw *hw, u8 dpll_num, u8 *ref_state,
- 			   u8 *eec_mode)
- {
- 	struct ice_aqc_get_cgu_dpll_status *cmd;
--	const s64 nsec_per_psec = 1000LL;
- 	struct ice_aq_desc desc;
- 	int status;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 3f99eb198245..031b15cceab9 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -3521,16 +3521,16 @@ static int i40e_validate_cloud_filter(struct i40e_vf *vf,
+ 	bool found = false;
+ 	int bkt;
  
-@@ -5348,8 +5347,7 @@ ice_aq_get_cgu_dpll_status(struct ice_hw *hw, u8 dpll_num, u8 *ref_state,
- 		*phase_offset = le32_to_cpu(cmd->phase_offset_h);
- 		*phase_offset <<= 32;
- 		*phase_offset += le32_to_cpu(cmd->phase_offset_l);
--		*phase_offset = div64_s64(sign_extend64(*phase_offset, 47),
--					  nsec_per_psec);
-+		*phase_offset = sign_extend64(*phase_offset, 47);
- 		*eec_mode = cmd->eec_mode;
+-	if (!tc_filter->action) {
++	if (tc_filter->action != VIRTCHNL_ACTION_TC_REDIRECT) {
+ 		dev_info(&pf->pdev->dev,
+-			 "VF %d: Currently ADq doesn't support Drop Action\n",
+-			 vf->vf_id);
++			 "VF %d: ADQ doesn't support this action (%d)\n",
++			 vf->vf_id, tc_filter->action);
+ 		goto err;
  	}
  
+ 	/* action_meta is TC number here to which the filter is applied */
+ 	if (!tc_filter->action_meta ||
+-	    tc_filter->action_meta > I40E_MAX_VF_VSI) {
++	    tc_filter->action_meta > vf->num_tc) {
+ 		dev_info(&pf->pdev->dev, "VF %d: Invalid TC number %u\n",
+ 			 vf->vf_id, tc_filter->action_meta);
+ 		goto err;
 -- 
 2.41.0
 
