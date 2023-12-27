@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-60374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBE2181EDCE
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 10:30:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECAA381EE13
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 11:11:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6350D1F2190E
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 09:30:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52AE2283834
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 10:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B0822F07;
-	Wed, 27 Dec 2023 09:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EFB2C852;
+	Wed, 27 Dec 2023 10:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FRlWiEsH"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="MtVjc219"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEFC224F5
-	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 09:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5e745891a69so37939087b3.2
-        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 01:30:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6E52C684
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 10:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40d604b4b30so705745e9.1
+        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 02:11:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1703669452; x=1704274252; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UqvA/i/ZR0qDIXOe36ZV6Eudi9+BbT0dIj51brxz3/E=;
-        b=FRlWiEsHUDAASnX0mdiRMN76Q6cRkm3eEk5U8mOdz+yo9BehV2gaiDCNtlSQy92vKR
-         D+P1n0HFPHrBCkrVLBwFfiHCVAkFRI9OXfUVPnSN8h4sKdPlycV+PHMtYRnE4YVHS9oR
-         cSmsYHS5MJGjz+bx+qG8BH42jpfvxKQqcN600=
+        d=tuxon.dev; s=google; t=1703671860; x=1704276660; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dha98cN4hU5+uMmPYYuzZJ8jEloyK7XIGhXo3p3U63s=;
+        b=MtVjc219LiAlI5G+Q/otQdQ2U+DF+QCZHTZjVTYTWlb6u5gdfRhLTetipE0a+fBffN
+         kWToJQuMnT2dVM+bdmF6Mhlmd/aS9YsxFDXNOjT9wRCq51NaQit1FuaRX80PBv/0QUA+
+         LRg15X5ZqaJ+s503OQBIn26hFlZmBncpWEy0IYXPds0BAt6EOtP8/0x59Z5/9MqvMrEZ
+         vEJEXOnYZwS/H6kJH1TKEH1CVCzDWMsQzxVWg5yMolst5R7IH6+6hFkpDi+MUCVf+fwS
+         eccEJ6eHQpWgCm49uqG7Z3MCAqVsBjD1mVbiz2utyJfVnlsY03cBo5aoGjzZTNvii4SQ
+         UVYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703669452; x=1704274252;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UqvA/i/ZR0qDIXOe36ZV6Eudi9+BbT0dIj51brxz3/E=;
-        b=W+031OOqYN1oygqopBCaLy2c31qPjvjuOEjRao8KjqSoT+KY+HML2F0Lz63FIYOMqR
-         2Es7g6KkcAYGmUo5l5UgI/JmhvdJmC25OuQQBoJ5npZZSzKwH2QNPW/jdBuam6bblEkD
-         eyn8bLtRoafNJSpuFpnDZvaodmkpWJyvQXXW1z7VLHutx8Gj54P5T9YrPXcNYJxNDMOx
-         TutfSJCZmTVCvu81LhgF0O3VAqAXZSKSY3/CtRC+VJdVrkqWdD8wDFR9g8QEg7FT58hW
-         B2UoMu+7IUgbHn7IBkSbZay/BjjbGJg9KF5NyA45FNO+iIrY0VVK0Cu5eAicssnJARdP
-         UINw==
-X-Gm-Message-State: AOJu0YxbouyjFJEnUfIq/DYprShdS+UJ1mSWo3jn30OR4ar2C5r/+v0P
-	OCVRG9EcTlUbPDWpOfsDdpTf12TjMAGr
-X-Google-Smtp-Source: AGHT+IHvWAfQEOsoyGUXCkSLnSAeQxZBC0ZiekqS8n21UIzcipDqGcaeKjURZc76iOBpvOV4EVDjLA==
-X-Received: by 2002:a0d:cb82:0:b0:5d7:1940:7d81 with SMTP id n124-20020a0dcb82000000b005d719407d81mr4569199ywd.88.1703669451645;
-        Wed, 27 Dec 2023 01:30:51 -0800 (PST)
-Received: from [192.168.159.133] ([37.175.106.7])
-        by smtp.gmail.com with ESMTPSA id ev3-20020a0562140a8300b0067f6a9a446esm5391347qvb.136.2023.12.27.01.30.50
+        d=1e100.net; s=20230601; t=1703671860; x=1704276660;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dha98cN4hU5+uMmPYYuzZJ8jEloyK7XIGhXo3p3U63s=;
+        b=iNJqzH0d0bGvEmirGAhxWiEyh7Lsxq3DjAXda7Xeo07jByFkVy/zrrHi9+6RxtLN7h
+         6Ww/IVgB0PDgXTkYyd3E/EnNNjcbIkePdGWGncbcXQwE1YPX8tidDJMzv74vW5vs6X07
+         r7LfyE/nz44GhbPJrKJB8jWFsnrNyz8XRAWCYuQaln/OTcba9mwv165G19U3jTy0hZU/
+         T3rvSJn08aPfgFSOfGza0cclN8uuoQ73YhohWh+q5F+YX/MQMFB1L0rei+0Pkx1fgtCT
+         Pt/ojdK/haNoE+eT4DA2fURCX1xFHY8KPYGYv6iyTQkXlT4Rg02tSt9KsjBvPqNBkw+M
+         RAlQ==
+X-Gm-Message-State: AOJu0Yz78ZnglhlkFv0My+G8TCneiOYV7p3aEU4h63f2D1u8UGqCSHnT
+	5OBPKKixeLnWc/fux+67ahX7Y+EIIR7jmA==
+X-Google-Smtp-Source: AGHT+IEkpDzCiZN53tEvFcVnsDqahBNhR0O/quhlOrBOasAmMVa28HrmBCeq+5Z4QN30IsXMEuI31Q==
+X-Received: by 2002:a05:600c:198f:b0:40d:5f64:748b with SMTP id t15-20020a05600c198f00b0040d5f64748bmr215086wmq.61.1703671859588;
+        Wed, 27 Dec 2023 02:10:59 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.140])
+        by smtp.gmail.com with ESMTPSA id fa18-20020a05600c519200b0040d5a39b694sm5092058wmb.48.2023.12.27.02.10.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Dec 2023 01:30:51 -0800 (PST)
-Message-ID: <55c522f9-503e-4adf-84cc-1ccc1fb45a9b@broadcom.com>
-Date: Wed, 27 Dec 2023 10:30:48 +0100
+        Wed, 27 Dec 2023 02:10:59 -0800 (PST)
+Message-ID: <d5448a91-a4d8-444d-9f96-083049b1e33e@tuxon.dev>
+Date: Wed, 27 Dec 2023 12:10:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,188 +66,150 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: bcmgenet: Fix FCS generation for fragmented skbuffs
-To: Adrian Cinal <adriancinal1@gmail.com>, netdev@vger.kernel.org
-Cc: opendmb@gmail.com, bcm-kernel-feedback-list@broadcom.com
-References: <20231226171907.651412-1-adriancinal1@gmail.com>
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- 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
-In-Reply-To: <20231226171907.651412-1-adriancinal1@gmail.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000080784e060d7a7476"
-
---00000000000080784e060d7a7476
+Subject: Re: [PATCH net v2 1/1] net: ravb: Wait for operation mode to be
+ applied
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ mitsuhiro.kimura.kc@renesas.com
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231222113552.2049088-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231222113552.2049088-2-claudiu.beznea.uj@bp.renesas.com>
+ <98efc508-c431-2509-5799-96decc124136@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <98efc508-c431-2509-5799-96decc124136@omp.ru>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hello,
 
-On 12/26/2023 6:19 PM, Adrian Cinal wrote:
-> The flag DMA_TX_APPEND_CRC was written to the first (instead of the last)
-> DMA descriptor in the TX path, with each descriptor corresponding to a
-> single skbuff fragment (or the skbuff head). This lead to packets with no
-> FCS appearing on the wire if the kernel allocated the packet in fragments,
-> which would always happen when using PACKET_MMAP/TPACKET
-> (cf. tpacket_fill_skb() in af_packet.c).
 
-s/lead/leads/
+On 23.12.2023 21:39, Sergey Shtylyov wrote:
+> On 12/22/23 2:35 PM, Claudiu wrote:
+> 
+>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>
+>> CSR.OPS bits specify the current operating mode and (according to
+>> documentation) they are updated by HW when the operating mode change
+>> request is processed. To comply with this check CSR.OPS before proceeding.
+>>
+>> Commit introduces ravb_set_opmode() that does all the necessities for
+>> setting the operating mode (set DMA.CCC and wait for CSR.OPS) and call it
+>> where needed. This should comply with all the HW manuals requirements as
+>> different manual variants specify that different modes need to be checked
+>> in CSR.OPS when setting DMA.CCC.
+>>
+>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> ---
+>>  drivers/net/ethernet/renesas/ravb_main.c | 52 ++++++++++++++----------
+>>  1 file changed, 31 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index 664eda4b5a11..ae99d035a3b6 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> @@ -66,14 +66,15 @@ int ravb_wait(struct net_device *ndev, enum ravb_reg reg, u32 mask, u32 value)
+>>  	return -ETIMEDOUT;
+>>  }
+>>  
+>> -static int ravb_config(struct net_device *ndev)
+>> +static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
+> 
+>    Since you pass the complete CCC register value below, you should
+> rather call the function ravb_set_ccc() and call the parameter opmode
+> ccc.
+
+This will be confusing. E.g., if renaming it ravb_set_ccc() one would
+expect to set any fields of CCC though this function but this is not true
+as ravb_modify() in this function masks only CCC_OPC. The call of:
+
+error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
+
+bellow is just to comply with datasheet requirements, previous code and at
+the same time re-use this function.
 
 > 
-> Signed-off-by: Adrian Cinal <adriancinal1@gmail.com>
-
-This looks like we could have a Fixes: tag for this change because it 
-does fix an actual bug:
-
-Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
-
-thanks Adrian!
-
-> ---
->   drivers/net/ethernet/broadcom/genet/bcmgenet.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
+>>  {
+>> +	u32 csr_opmode = 1UL << opmode;
 > 
-> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> index 1174684a7f23..df4b0e557c76 100644
-> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> @@ -2137,16 +2137,16 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
->   		len_stat = (size << DMA_BUFLENGTH_SHIFT) |
->   			   (priv->hw_params->qtag_mask << DMA_TX_QTAG_SHIFT);
->   
-> -		/* Note: if we ever change from DMA_TX_APPEND_CRC below we
-> -		 * will need to restore software padding of "runt" packets
-> -		 */
->   		if (!i) {
-> -			len_stat |= DMA_TX_APPEND_CRC | DMA_SOP;
-> +			len_stat |= DMA_SOP;
->   			if (skb->ip_summed == CHECKSUM_PARTIAL)
->   				len_stat |= DMA_TX_DO_CSUM;
->   		}
-> +		/* Note: if we ever change from DMA_TX_APPEND_CRC below we
-> +		 * will need to restore software padding of "runt" packets
-> +		 */
->   		if (i == nr_frags)
-> -			len_stat |= DMA_EOP;
-> +			len_stat |= DMA_TX_APPEND_CRC | DMA_EOP;
->   
->   		dmadesc_set(priv, tx_cb_ptr->bd_addr, mapping, len_stat);
->   	}
+>    Please use the correct expression, 1U << (ccc & CCC_OPC) instead.
 
--- 
-Florian
+Ok, good point.
 
---00000000000080784e060d7a7476
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPdho9e/uauNSsXP
-h3Zi9I+DAkTXmKXh1ASo46ydPX1eMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTIyNzA5MzA1MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBGTtR6oW7KYbAIm4Dr6fdUnrhUjnQk08Zc
-JXwVo2WJPUsLZdGf+OBlp+IVknNpwR4N620W2sdK1IZ7mCfmEG0DE4EAPGoins9/S9TCWux8St5z
-/Hi0jqTkQTXm4SIn9A0UHmzZJBNt2KCvFY58HAgOvn/f/BXba34DMhwlH4K+FfvrYgwzVDAvXIWU
-YYukma15tfviscskieNhBCmgR+CSur5Lm99grhhAjfmJBpThDqujY9GQ7LocW09XYKb0C8xB8sIX
-rPqG8toOmF6fKXXZW4EEokVeB+JSb+CZuaJRY/Q4Rk10hOYFWhxhDb9eb1Yi33AOJhE1iuTp+ZD7
-yNKk
---00000000000080784e060d7a7476--
+> And I'd suggest calling the variable csr_ops or just ops.
+
+ok
+
+> 
+>>  	int error;
+>>  
+>> -	/* Set config mode */
+>> -	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
+>> -	/* Check if the operating mode is changed to the config mode */
+>> -	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
+>> +	/* Set operating mode */
+>> +	ravb_modify(ndev, CCC, CCC_OPC, opmode);
+>> +	/* Check if the operating mode is changed to the requested one */
+>> +	error = ravb_wait(ndev, CSR, CSR_OPS, csr_opmode);
+>>  	if (error)
+>>  		netdev_err(ndev, "failed to switch device to config mode\n");
+> 
+>    s/config/requested/? Or just print out that mode...
+> 
+> [...]
+>> @@ -2560,21 +2559,23 @@ static int ravb_set_gti(struct net_device *ndev)
+>>  	return 0;
+>>  }
+>>  
+>> -static void ravb_set_config_mode(struct net_device *ndev)
+>> +static int ravb_set_config_mode(struct net_device *ndev)
+>>  {
+>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>  	const struct ravb_hw_info *info = priv->info;
+>> +	int error;
+>>  
+>>  	if (info->gptp) {
+>> -		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
+>> +		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
+> 
+>    Don't we need to return on error here?
+
+I kept it like this to have a single exit point from function. But probably
+setting CSEL when OPC setup failed may lead to failures. I'll adjust it,
+thanks.
+
+> 
+>>  		/* Set CSEL value */
+>>  		ravb_modify(ndev, CCC, CCC_CSEL, CCC_CSEL_HPB);
+>>  	} else if (info->ccc_gac) {
+>> -		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG |
+>> -			    CCC_GAC | CCC_CSEL_HPB);
+>> +		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
+> 
+>    See, you pass more than just CCC.OPC value here -- need to mask it out
+> above...
+
+Agree.
+
+> 
+> [...]
+>> @@ -2917,8 +2921,9 @@ static void ravb_remove(struct platform_device *pdev)
+>>  	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
+>>  			  priv->desc_bat_dma);
+>>  
+>> -	/* Set reset mode */
+>> -	ravb_write(ndev, CCC_OPC_RESET, CCC);
+>> +	error = ravb_set_opmode(ndev, CCC_OPC_RESET);
+>> +	if (error)
+>> +		netdev_err(ndev, "Failed to reset ndev\n");
+> 
+>    ravb_set_opmode() will have complained already at this point...
+> 
+> [...]
+> 
+> MBR, Sergey
 
