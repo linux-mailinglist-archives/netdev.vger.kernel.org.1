@@ -1,148 +1,131 @@
-Return-Path: <netdev+bounces-60414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F317E81F1C4
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 21:11:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D78581F1EA
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 21:39:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18D0D1C219F4
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 20:11:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E9201F21926
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 20:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C38A47F48;
-	Wed, 27 Dec 2023 20:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FC647F54;
+	Wed, 27 Dec 2023 20:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="kO31uYDQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i/Ft/MWv"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2074.outbound.protection.outlook.com [40.107.22.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496D147F46
-	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 20:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BVebIkU0wBrgHI7ORVu/fgp9TxXOuUXwykdW7iOMylhFZtAZqsdsYGcfn17Ir3R4X291bZxXMJmzS8zPde7f+UCvGDAEP8Pg5dRlRFPd4lmqR7W0xeP+as/sJtZpDqv6YOrzy6EjzjqgUAFdVyhkrFdapclbUiEI/PJ4hkWuHAArv3bo5aJ5LVs7Ic2XZYO17I6kF4FJWU0bukZ5Ur3HaLpq3NJG136MzMgJnpKyh5IJm228oTbNylxdUgZxEYkxbgERV7yfbeTR7wfsG/knAHv5I8xoaVU4CCoNfKkAeh6CZHzzv4gqUwBe8+zijxN1XPc4sCe1Y4zVHCVL2vnppw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G8MiWSmHpsutfPf0Z2plbxp5sBxApqLa6ngDk8CZvLM=;
- b=TivGAU2xKazQ+IUo2iRwiNl4DTxkkXxSN9bNXMZrB7XS5EHe+Epo73Z438NeOSZZAXFEgNO0Fb9VhNkpslYdfT0hGWLTucblCdo0M8GoYlDqrFK8ivdfGfZyAmS2ZyYbJ5tHL/x+vtLfYO0zqWItSuGzA21FskDAIAjbnyItajKv4j/c1zsnmsn4b9onfn4x7PyZaL65mvrHihm3mkhbX2iDmGnsaNIKJEaM+BHWRWOZQptLBb8q9GLR+wt0LT9Dst7XnShhl+YM+OcCCNyOg3Xz29CNgA5jkFARH5wfHUbxWBvAYpV9fSjZwjo2YspTr21OTvjLflPv16juhUnPBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G8MiWSmHpsutfPf0Z2plbxp5sBxApqLa6ngDk8CZvLM=;
- b=kO31uYDQCh9ejq4jZGzdTlgP92aBoxHN79MwIngce7aOQe4pN6aOA2n3t7tkYedd4O9hKqynaKyapE9q10d4lnhjDbeS7aoakjEYFy5NR9dyuHGHuxsvREzPwFNAKyxthRYD4V8WZi83iSycMbC0P19411mze0u9nS7aHO4VjpU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AS8PR04MB7493.eurprd04.prod.outlook.com (2603:10a6:20b:293::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.19; Wed, 27 Dec
- 2023 20:11:32 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7113.027; Wed, 27 Dec 2023
- 20:11:32 +0000
-Date: Wed, 27 Dec 2023 22:11:29 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Benjamin Poirier <bpoirier@nvidia.com>
-Cc: netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
-	Petr Machata <petrm@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>
-Subject: Re: [RFC PATCH net-next 10/10] selftests: dsa: Replace symlinks by
- wrapper script
-Message-ID: <20231227201129.rvux4i5pklo5v5ie@skbuf>
-References: <20231222135836.992841-1-bpoirier@nvidia.com>
- <20231222135836.992841-1-bpoirier@nvidia.com>
- <20231222135836.992841-11-bpoirier@nvidia.com>
- <20231222135836.992841-11-bpoirier@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231222135836.992841-11-bpoirier@nvidia.com>
- <20231222135836.992841-11-bpoirier@nvidia.com>
-X-ClientProxiedBy: VI1P189CA0010.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:802:2a::23) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB0C47F53
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 20:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6d9aa51571fso2491798b3a.3
+        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 12:39:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703709566; x=1704314366; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KcylBWxF6VNktpQzlFRNppQwL1uogEJMB+I++B99UlU=;
+        b=i/Ft/MWviAZ47ejx+t/nCGxX7W3RsQ9sGgE4yCFVqrVv/PBQ4FRgGTXsGezP5OY52Y
+         zCznxiXTkQsB5hxhzHPOOwGHpqpBGTm35X/5iRIcOgk2hYM+linoqSzV/5dEeOurgv8o
+         uPNIZTmqPiKgRwO2v/+RaARosbPmvX84T0ukiL084zoIaHBsp+PsIaXkOacVWUnODihk
+         vFRd/aeiJiI0ky3Bab3brfglFc2YMZCNLvp8NO3J1etxs9i1LM449OQ/yLKjIadfjHOD
+         BPuPIAT8LYy/9uW67Xg3hAPrVCV3bjbiK3Kiv7n03d3QmjXYab/Eq4t0T+07TJDrdslY
+         6Q4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703709566; x=1704314366;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KcylBWxF6VNktpQzlFRNppQwL1uogEJMB+I++B99UlU=;
+        b=rdBpyMEcNndLUHsf7iIsX6CLzLIeT8xUeH+WHaNm80eezTmieVksp4fl6qCEUSjmyj
+         fLEjD4QLlitdgetBIafs35tI6Y4OPZwbSnXS3Uwho2g6bqXm/XAIxmiwh5/AIoMUIc9z
+         EfXP7iMkL9gy7LTPsSFfeodifIpWcDkDtK/410hpAJj1Tv+wn8/NV1T7dE43wazc3RBO
+         grUm/sVxIMjNBYcnG26uo4lx9KZigfmLgpd7RlAax/OlHI3zmfiLNDvLhNLF3aZgsE+K
+         ltQw7tY8n0zUjqpwPXPx+aqa/3alX6GBhKkKjWbRyzLKtaBcc6vsoqc3PCnir7+JhIhJ
+         iLog==
+X-Gm-Message-State: AOJu0Yz09+/RZSNdhQ+BW7Lw7+vl7PBrd19kW45dfQWWPD1GMGvkpTr7
+	yMfMkGgIl5R6f1KVajOK3Xc=
+X-Google-Smtp-Source: AGHT+IGYEpv/pNua3H6V4s8DfCTPna3he0TPLcw10hlrEKb5VMEeuqzD8gtLk+nkdaM9Q39ZJtTlpw==
+X-Received: by 2002:a05:6a21:6d96:b0:196:3126:bc59 with SMTP id wl22-20020a056a216d9600b001963126bc59mr1051373pzb.15.1703709565820;
+        Wed, 27 Dec 2023 12:39:25 -0800 (PST)
+Received: from [10.69.66.162] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id w10-20020a63f50a000000b005b18c53d73csm11439133pgh.16.2023.12.27.12.39.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Dec 2023 12:39:25 -0800 (PST)
+Message-ID: <4b3d4c59-70d8-41b7-954e-8f7294026516@gmail.com>
+Date: Wed, 27 Dec 2023 12:39:21 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB7493:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1d6c85a3-196d-4ff9-240d-08dc071804d5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	uPuxFCncVAqkLPu1VhOTbvZubuf/TOCPsEfnyGJMG6DCIT5KFqr3p/hgfHYumpnwOegDpB0D9vCcvCrkvHLbqv7E41G2403zSHYx9WONSWJhOsjW7MiA3HqyL6yrNXcKj+QHqrtoCfVXxFlPpCeO9vf42Dx6eIyv7YtsomoUABEh7PBBTR7MnJoCwWIf0iSEb0LQ5zWmTtTbE5tdfNFC5AMDkBKIFXOL7Q4rXmpo7ZZXA0yEXgbC8F7k2P382DVBJuwyi26nRuWDRsNGux71rHVQc+50p5oGbdCg70gfQeR2oJQnYDUb9Ody05CJHih+aK+FffuCSCIPthR03XQHmJ3v20/Vz0PxLuQV/2TqIpY4LIz0bNlVozsx5yUxqwVtRztkZyNNYXSzL7jMSmAtTeLcznKpmvwX4IHUXIV6UAtiYlHw/65E6kSbpRz1IiY0KQ/EuY0kEn13P7L1so4ZTzPEAQuzkWdfnQfDzSvNjK0Io8Ywb5Seiq1nKUvkFhCjDO7TEu8op0U42kEQCe4S8NhaRfvW3ERoPBV/ok+IGG+EU3FQrJo8sgu5hxUx6QnJ
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(136003)(396003)(376002)(366004)(39860400002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(478600001)(6666004)(6506007)(9686003)(6512007)(66556008)(86362001)(6916009)(66476007)(66946007)(41300700001)(54906003)(316002)(6486002)(38100700002)(8936002)(8676002)(33716001)(2906002)(4326008)(44832011)(1076003)(5660300002)(4744005)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?lIhfa8IacwH1jN62RtPA9OafSFq+BFALxdy04Rf2Nq7qrpul6+gC5ERgMdsl?=
- =?us-ascii?Q?VnVLt4f9QfrfQSy6zK7OhHtfR1vm0naZ0oEs3nZFuIQcnWQeuBje6JR8T7CJ?=
- =?us-ascii?Q?9owuCH2piULz0FQLUVeXyN1jX65H6/MdKabAQEZKgKTa9I5PMIHW+0Ilif4H?=
- =?us-ascii?Q?W9XvfiemEX3GAATgVMJR2KDbx1mBkK6IqJeHJ8O8bkQVLWO8T8e3GPK2UFFa?=
- =?us-ascii?Q?eumsjjExikxRE9UCT/SJxCPgFT3HvqxLbLqfmT+flvLorqLC8No8mL6p9NQ9?=
- =?us-ascii?Q?dXkz6+IdLXyAl/8J5xRJDSl5dSkslCXVrxN198vRrbIZKBwDE+v+tKyHK2gw?=
- =?us-ascii?Q?i63E82ozimBpWXScLd+UnFcO8DUv9VNz/WdLZRYOhINS3gKTNuhpzaCkKLFR?=
- =?us-ascii?Q?N+jiul7Zh1m2xrEkjiGhcR8mgFlUccsnphCzuBYrzsMpZHfz+EfwCLVa12Kb?=
- =?us-ascii?Q?t9kyr9n/TuRoZ7swQl7MHKFdDwnaZZuMC2qNaiPCagNplwtKWco2IAl+nseZ?=
- =?us-ascii?Q?iyLrAPLiUw3quEv43c5qBLy54xYm6WNaEIsjXr+DhH9vm1zgzjCT63oXrIIa?=
- =?us-ascii?Q?/7Wj89/wtKoNJLgNcR9Clyc/IyIdKK1vQutQ8k01BwM+RB2JFXc2/1h2gD7s?=
- =?us-ascii?Q?Jbo9dn+e4gBXb7g+MTcEYRPH61btfCWJF5NwY+LoyEBIptKHd/UPHGheOcVN?=
- =?us-ascii?Q?tj9yonbc1S33TjaUraAeYg/45v1o6bnF7TiY9mbPl+Anoinz0L1hf1K72xqB?=
- =?us-ascii?Q?UqkNvk0X8uF03EBEDGsbXEYFSpqgvj0/amM4dU9zckBHdizZiwDQNNecuLi1?=
- =?us-ascii?Q?bN+28Z9hE5NspdvFNQ5ZWY3t3wzgU17vZaw+qP56NMQsCvcGAXdegDFmVAkb?=
- =?us-ascii?Q?s5VTWNWuyj/3kqWTrUNysh14BT8rL1Cpz60ByzXsSDqTHX7A8lYfrVN20Z1D?=
- =?us-ascii?Q?azXdLmN6ryC8D5QLYzS4dnRe2QJSvOTiotPkGgd/Me5oS0JHWD8ruA1CMXUi?=
- =?us-ascii?Q?KWmP3H/KfCcmNgIXFskbpXYIJ18TgRBLCYeZ5MLVXxZiksAimIllfk1VaI3/?=
- =?us-ascii?Q?yv+SW18ykS3H9C9BknfQCRuB2bZETnLioDmNHMHVU9Jmuy9aDAFtI7eEaaTV?=
- =?us-ascii?Q?ssvmC3cN1oWyxkcgtg96n7SjhIS4XF25Ey2biJOm9HRvL/Nmb2VYoFPiC5yf?=
- =?us-ascii?Q?s5h6AZoYU2MJZJz4y7uLA267Rn44VXcY9zjSSZQ7eikV/L0/07vFGpIbxZGy?=
- =?us-ascii?Q?RE70vagL5RHllpaFaLncnpX+MBTcIOjpLRRjb4ML78A7mUK0DtwToQzohcNY?=
- =?us-ascii?Q?tDZ98y0HO29vv8GwE6nitzmDSWS4FuXTL+tjuFvGCZCiEcTa39SAEuadbCNP?=
- =?us-ascii?Q?sPfx2XOiFSLLeo7f0AyQPwJeA3NEv6ULG2B00xnACyPqS+mjXkmpAnZB/BuP?=
- =?us-ascii?Q?t1W/xtdKf/tqURLSRB3s7Mu1eBK7v+6B8o4VgSJIzBR9otCiSHkkjhtuVY/m?=
- =?us-ascii?Q?Ps9UYMOwf74l9whh/Ua/M5XHPk4n64QWvm417Oy+Sp5FeqqLDXe1FwXqp0Dy?=
- =?us-ascii?Q?DcvSO4cWB2+MxHJUl6GErkyH0msXA+Wx9d1JHElV65iqo5zRjYhyr5kOCSDB?=
- =?us-ascii?Q?dQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d6c85a3-196d-4ff9-240d-08dc071804d5
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Dec 2023 20:11:32.3084
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UT1XU0wYibdz2xQcthoduWD+S/x3SJRvYJin4DefOzwlTvvgeGaoAPDpz+DayPKa1z/pJU+p2zjboi2icjiOoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7493
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: bcmgenet: Fix FCS generation for fragmented
+ skbuffs
+To: Adrian Cinal <adriancinal1@gmail.com>, netdev@vger.kernel.org
+Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com
+References: <55c522f9-503e-4adf-84cc-1ccc1fb45a9b@broadcom.com>
+ <20231227120601.735527-1-adriancinal1@gmail.com>
+Content-Language: en-US
+From: Doug Berger <opendmb@gmail.com>
+In-Reply-To: <20231227120601.735527-1-adriancinal1@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 22, 2023 at 08:58:36AM -0500, Benjamin Poirier wrote:
-> diff --git a/tools/testing/selftests/drivers/net/dsa/run_net_forwarding_test.sh b/tools/testing/selftests/drivers/net/dsa/run_net_forwarding_test.sh
-> new file mode 100755
-> index 000000000000..4106c0a102ea
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/dsa/run_net_forwarding_test.sh
-> @@ -0,0 +1,9 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +libdir=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
-> +testname=$(basename "${BASH_SOURCE[0]}")
-> +
-> +source "$libdir"/forwarding.config
-> +cd "$libdir"/../../../net/forwarding/ || exit 1
-> +source "./$testname" "$@"
+On 12/27/2023 4:04 AM, Adrian Cinal wrote:
+> The flag DMA_TX_APPEND_CRC was written to the first (instead of the last)
+> DMA descriptor in the TX path, with each descriptor corresponding to a
+> single skbuff fragment (or the skbuff head). This led to packets with no
+> FCS appearing on the wire if the kernel allocated the packet in fragments,
+> which would always happen when using PACKET_MMAP/TPACKET
+> (cf. tpacket_fill_skb() in af_packet.c).
+> 
+> Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
+> Signed-off-by: Adrian Cinal <adriancinal1@gmail.com>
+> ---
+>   drivers/net/ethernet/broadcom/genet/bcmgenet.c | 10 +++++-----
+>   1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> index 1174684a7f23..df4b0e557c76 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> @@ -2137,16 +2137,16 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
+>   		len_stat = (size << DMA_BUFLENGTH_SHIFT) |
+>   			   (priv->hw_params->qtag_mask << DMA_TX_QTAG_SHIFT);
+>   
+> -		/* Note: if we ever change from DMA_TX_APPEND_CRC below we
+> -		 * will need to restore software padding of "runt" packets
+> -		 */
+>   		if (!i) {
+> -			len_stat |= DMA_TX_APPEND_CRC | DMA_SOP;
+> +			len_stat |= DMA_SOP;
+>   			if (skb->ip_summed == CHECKSUM_PARTIAL)
+>   				len_stat |= DMA_TX_DO_CSUM;
+>   		}
+> +		/* Note: if we ever change from DMA_TX_APPEND_CRC below we
+> +		 * will need to restore software padding of "runt" packets
+> +		 */
+>   		if (i == nr_frags)
+> -			len_stat |= DMA_EOP;
+> +			len_stat |= DMA_TX_APPEND_CRC | DMA_EOP;
+>   
+>   		dmadesc_set(priv, tx_cb_ptr->bd_addr, mapping, len_stat);
+>   	}
+Hmm... this is a little surprising since the documentation is actually 
+pretty specific that the hardware signal derived from this flag be set 
+along with the SOP signal.
 
-Thanks for working on this. I don't dislike the solution. Just one
-question.  Can "run_net_forwarding_test.sh" be one day moved from
-tools/testing/selftests/drivers/net/dsa/ without duplicating it,
-should anyone else need the same setup?
+Based on that I think I would prefer the flag to be set for all 
+descriptors of a packet rather than just the last, but let me look into 
+this a little further.
+
+Thanks for bringing this to my attention,
+     Doug
 
