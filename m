@@ -1,34 +1,32 @@
-Return-Path: <netdev+bounces-60423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9168881F244
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 22:46:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07CE681F267
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 23:19:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 338D1B214DA
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 21:46:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 393FE1C211C0
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 22:19:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A05E2CCCA;
-	Wed, 27 Dec 2023 21:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99936481BB;
+	Wed, 27 Dec 2023 22:19:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mail.nic.cz (mail.nic.cz [217.31.204.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD84947F68
-	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 21:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [172.29.66.158] (93-34-6-18.ip47.fastwebnet.it [93.34.6.18])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4BB7861E5FE03;
-	Wed, 27 Dec 2023 22:45:13 +0100 (CET)
-Message-ID: <5ae1537b-73dc-45a1-94a7-669e63dc74db@molgen.mpg.de>
-Date: Wed, 27 Dec 2023 22:45:11 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1E547F72
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 22:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nic.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nic.cz
+Received: from [192.168.0.113] (unknown [185.251.120.166])
+	by mail.nic.cz (Postfix) with ESMTPSA id 221691C0347;
+	Wed, 27 Dec 2023 23:19:41 +0100 (CET)
+Authentication-Results: mail.nic.cz;
+	auth=pass smtp.auth=marek.mojik@nic.cz smtp.mailfrom=marek.mojik@nic.cz
+Message-ID: <5f6b5096-d172-4a70-874c-be6d5a457ac0@nic.cz>
+Date: Wed, 27 Dec 2023 23:19:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -36,63 +34,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: avoid compiler padding in
- virtchnl2_ptype struct
+Subject: Re: [PATCH v1 1/1] net: phy: micrel: Add workaround for incomplete
+ autonegotiation
 Content-Language: en-US
-To: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- przemyslaw.kitszel@intel.com
-References: <20231227173757.1743001-1-pavan.kumar.linga@intel.com>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20231227173757.1743001-1-pavan.kumar.linga@intel.com>
+To: Asmaa Mnebhi <asmaa@nvidia.com>, davem@davemloft.net,
+ linux@armlinux.org.uk, netdev@vger.kernel.org
+Cc: davthompson@nvidia.com
+References: <20231226141903.12040-1-asmaa@nvidia.com>
+From: =?UTF-8?Q?Marek_Moj=C3=ADk?= <marek.mojik@nic.cz>
+In-Reply-To: <20231226141903.12040-1-asmaa@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.10 at mail
+X-Virus-Status: Clean
+X-Rspamd-Queue-Id: 221691C0347
+X-Spamd-Result: default: False [3.01 / 20.00];
+	BAYES_SPAM(3.10)[100.00%];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:44234, ipnet:185.251.120.0/23, country:SK];
+	RCVD_COUNT_ZERO(0.00)[0];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Spamd-Bar: +++
+X-Rspamd-Server: mail
+X-Rspamd-Action: no action
 
-Dear Pavan,
 
 
-Thank you for yoru patch.
-
-Am 27.12.23 um 18:37 schrieb Pavan Kumar Linga:
-> Config option in arm random config file
-
-Sorry, I do not understand this part of the sentence. What Kconfig 
-option was selected exactly causing this behavior.
-
-> is causing the compiler
-> to add padding. Avoid it by using "__packed" structure attribute
-> for virtchnl2_ptype struct.
-
-Did the compiler emit a warning? If so, please paste it.
-
-> Fixes: 0d7502a9b4a7 ("virtchnl: add virtchnl version 2 ops")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202312220250.ufEm8doQ-lkp@intel.com
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> ---
->   drivers/net/ethernet/intel/idpf/virtchnl2.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+On 12/26/23 15:19, Asmaa Mnebhi wrote:
+> Very rarely, the KSZ9031 fails to complete autonegotiation although it was
+> initiated via phy_start(). As a result, the link stays down. Restarting
+> autonegotiation when in this state solves the issue.
 > 
-> diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> index 8dc83788972..dd750e6dcd0 100644
-> --- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> +++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> @@ -978,7 +978,7 @@ struct virtchnl2_ptype {
->   	u8 proto_id_count;
->   	__le16 pad;
->   	__le16 proto_id[];
-> -};
-> +} __packed;
->   VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
+> Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
+> ---
+>   drivers/net/phy/micrel.c | 17 +++++++++++++++++
+>   1 file changed, 17 insertions(+)
+> 
+> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> index 08e3915001c3..de8140c5907f 100644
+> --- a/drivers/net/phy/micrel.c
+> +++ b/drivers/net/phy/micrel.c
+> @@ -1475,6 +1475,7 @@ static int ksz9031_get_features(struct phy_device *phydev)
 >   
->   /**
+>   static int ksz9031_read_status(struct phy_device *phydev)
+>   {
+> +	u8 timeout = 10;
+>   	int err;
+>   	int regval;
+>   
+> @@ -1494,6 +1495,22 @@ static int ksz9031_read_status(struct phy_device *phydev)
+>   		return genphy_config_aneg(phydev);
+>   	}
+>   
+> +	/* KSZ9031's autonegotiation takes normally 4-5 seconds to complete.
+> +	 * Occasionally it fails to complete autonegotiation. The workaround is
+> +	 * to restart it.
+> +	 */
+> +        if (phydev->autoneg == AUTONEG_ENABLE) {
+> +		while (timeout) {
+> +			if (phy_aneg_done(phydev))
+> +				break;
+> +			mdelay(1000);
+> +			timeout--;
+> +		};
+> +
+> +		if (timeout == 0)
+> +			phy_restart_aneg(phydev);
+> +	}
+> +
+>   	return 0;
+>   }
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
+Hi Asmaa, mdelay is busy-wait, so you're unnecessarily blocking cpu core
+for 10 seconds, msleep should be used here as explained in the docs 
+https://kernel.org/doc/Documentation/timers/timers-howto.txt
 
-
-Kind regards,
-
-Paul
+Marek
 
