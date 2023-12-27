@@ -1,106 +1,139 @@
-Return-Path: <netdev+bounces-60361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C05C81ED58
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 09:33:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 246C881ED7E
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 10:03:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 277C8B20DD0
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 08:33:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571621C215AC
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 09:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEDC1860;
-	Wed, 27 Dec 2023 08:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592C0F9C6;
+	Wed, 27 Dec 2023 09:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BlLxrFF+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjyB78eV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE8863A8;
-	Wed, 27 Dec 2023 08:33:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ECB7C433C8;
-	Wed, 27 Dec 2023 08:33:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703666023;
-	bh=cdLrFbEkFzwUHDx8JwRAgteZpWcz5ddl4PjRSMGdkaA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BlLxrFF+MpsHDrjSaSBlzvKGrVzO6E272l2S63XZnkIwLNspj5YkMzNWDHGqtTDpn
-	 qzOhukca6aX21zGKipxolQBjw1QVAOt/TSAqYxMioDdzdIf9u8Vpzj7FAEGSG8XM0q
-	 mleAHjRyj2WjkSRvhZode/I2El75z62HiMBLU0E33z5hOXakQmSYfkdkLH+qCNn9aT
-	 n8lsV30BSUK3qV6xSorfWSU6bUfBOOeFz5P3HeuTQov9CRRmniXTN9g9yMfjwX2vb7
-	 QM8RGHW9TZnONnKeYRv1MUycfJADLId9M3bsMHkhfpq+9pfNdqhFnWHKpa62EIuAdE
-	 7iaGRJwvM2TEQ==
-Date: Wed, 27 Dec 2023 10:33:39 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Linux regressions mailing list <regressions@lists.linux.dev>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Shachar Kagan <skagan@nvidia.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	Jason Gunthorpe <jgg@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-	Ido Kalir <idok@nvidia.com>, Topaz Uliel <topazu@nvidia.com>,
-	Shirly Ohnona <shirlyo@nvidia.com>,
-	Ziyad Atiyyeh <ziyadat@nvidia.com>
-Subject: Re: Bug report connect to VM with Vagrant
-Message-ID: <20231227083339.GA6849@unreal>
-References: <MN2PR12MB44863139E562A59329E89DBEB982A@MN2PR12MB4486.namprd12.prod.outlook.com>
- <CANn89iKvG5cTNROyBF32958BzATfXysh4zLk5nRR6fgi08vumA@mail.gmail.com>
- <MN2PR12MB4486457FC77205D246FC834AB98BA@MN2PR12MB4486.namprd12.prod.outlook.com>
- <CANn89i+e2TcvSU1EgrVZRUoEmZ5NDauXd3=kEkjpsGjmaypHOw@mail.gmail.com>
- <cdf72778-a314-467d-8ac8-163d2007fd70@leemhuis.info>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA3C24B2A;
+	Wed, 27 Dec 2023 09:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40d514cbba3so36347925e9.1;
+        Wed, 27 Dec 2023 01:03:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703667784; x=1704272584; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z63r7pTq+SRGl9GETybyvgqCF34V04xy6H98jsuZPZI=;
+        b=WjyB78eVUW0jNKrhcEjddivwhRngwIyVYc6jwaxeW9rdgBgNBtB2dhrdDT9LSON4jX
+         xA58WHUVehWFkxBlmIcjm12vPKm81ZxgwjbchCxUlEn4LB+ygsnZV5qzia9RfQaJk38i
+         yA9zSQ5z1QOEup6HZrMwIxtU2Rf37nmTv34+vGn1UMiz0tByVi2/ILpHjzNwYRBGoq7l
+         IhnECBkjHSxMHu06AHRilRPYyeTwdoPvwReBbHn1VVzIk9h0NyXZrjwrMJ+8BURr+xIE
+         bsCffrak7AS3jbsU0qbrYqxTloC608ldgC/TccibaHMBaFhtkyUildxSn+T96UUXuc/v
+         +HdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703667784; x=1704272584;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z63r7pTq+SRGl9GETybyvgqCF34V04xy6H98jsuZPZI=;
+        b=dmP5TswD1PS5K/v10pC25DuQPMQtVfGjqdi2aO47a+ghcTaJ4Yw+5/uRPtz4r7rW16
+         E/M/j0wcsXX4hUPutxRnvXe7AqOq49kMw2ehPySZaV1CjRwp6qkD5ieA6WH4DeaFWWoM
+         UBbSUup1t4N1Gh8grcni0plQWlb0y8ETRXmLLqanBgBLdEHWmHsoJDWTLWLUnAKYzUeJ
+         2CTR2vOUME8AuMiBpx4VdJcVKUmX1Mhxgv96FtaJIeeBgroVX/GHLgf5BM2mCvnaej0A
+         2q43BtQyVXXijaWXISyeoeVPSi52B5Trync+0YuVg9YCmg+Ie4rYoZNkXY07GulhFMeq
+         LR/w==
+X-Gm-Message-State: AOJu0YwdVaS17cJ/2xsCEYRg4RqdBV4s1TQV7FyWqPPMAiJni4cuxLRq
+	4EKjNQGZNAaP4v4g8CNmhYo=
+X-Google-Smtp-Source: AGHT+IHnuyc35+3QB7TWpnYL1hpXdfnP14Z+QTgo+E3w6csqT773gDAld+ldCoxjApvJfhAQ2a0YiQ==
+X-Received: by 2002:a05:600c:538a:b0:40d:2cdb:c99d with SMTP id hg10-20020a05600c538a00b0040d2cdbc99dmr4595418wmb.46.1703667783651;
+        Wed, 27 Dec 2023 01:03:03 -0800 (PST)
+Received: from localhost.localdomain (host-95-250-248-68.retail.telecomitalia.it. [95.250.248.68])
+        by smtp.googlemail.com with ESMTPSA id c9-20020a056000104900b003368849129dsm13616525wrx.15.2023.12.27.01.03.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Dec 2023 01:03:03 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	William Zhang <william.zhang@broadcom.com>,
+	Anand Gore <anand.gore@broadcom.com>,
+	Kursad Oney <kursad.oney@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	=?UTF-8?q?Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>,
+	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-leds@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: [net-next PATCH v5 0/5] net: phy: generic polarity + LED support for qca808x
+Date: Wed, 27 Dec 2023 10:02:26 +0100
+Message-Id: <20231227090231.4246-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <cdf72778-a314-467d-8ac8-163d2007fd70@leemhuis.info>
 
-On Fri, Dec 15, 2023 at 10:55:05AM +0100, Linux regression tracking (Thorsten Leemhuis) wrote:
-> On 08.12.23 11:49, Eric Dumazet wrote:
-> > On Thu, Dec 7, 2023 at 2:03 PM Shachar Kagan <skagan@nvidia.com> wrote:
-> >>>> On Thu, Nov 30, 2023 at 2:55 PM Shachar Kagan <skagan@nvidia.com> wrote:
-> >>>>
-> >>>> I have an issue that bisection pointed at this patch:
-> >>>> commit 0a8de364ff7a14558e9676f424283148110384d6
-> >>>> tcp: no longer abort SYN_SENT when receiving some ICMP
-> >>>
-> >>> Please provide tcpdump/pcap captures.
-> >>>
-> >>>  It is hard to say what is going on just by looking at some application logs.
-> >>
-> >> I managed to capture the tcpdump of ‘Vagrant up’ step over old kernel and new kernel where this step fails. Both captures are attached.
-> >> The tcpdump is filtered by given IP of the nested VM.
-> > 
-> > I do not see any ICMP messages in these files, can you get them ?
-> > 
-> > Feel free to continue this exchange privately, no need to send MB
-> > email to various lists.
-> 
-> Here this thread died, so I assume this turned out to be not a
-> regression at all or something like that? If not please speak up!
+This small series add LEDs support for qca808x.
 
-No, it wasn't fixed and/or reverted. Right now, Vagrant is broken and
-all our regressions around nested VM functionality doesn't run.
+QCA808x apply on PHY reset a strange polarity settings and require
+some tweak to apply a more common configuration found on devices.
+On adding support for it, it was pointed out that a similar
+feature is also being implemented for a marvell PHY where
+LED polarity is set per LED (and not global) and also have
+a special mode where the LED is tristated.
 
-Eric, can you please revert the bisected patch while you are continuing
-your offline discussion with Shachar?
+The first 3 patch are to generalize this as we expect more PHY
+in the future to have a similar configuration.
 
-Thanks
+The implementation is extensible to support additional special
+mode in the future with minimal changes and don't create regression
+on already implemented PHY drivers.
 
-> 
-> #regzbot inconclusive: radio silence
-> 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
-> 
+(changelog present in single patch)
+
+Christian Marangi (5):
+  dt-bindings: net: phy: Make LED active-low property common
+  dt-bindings: net: phy: Document LED inactive high impedance mode
+  net: phy: add support for PHY LEDs polarity modes
+  dt-bindings: net: Document QCA808x PHYs
+  net: phy: at803x: add LED support for qca808x
+
+ .../devicetree/bindings/leds/common.yaml      |  12 +
+ .../bindings/leds/leds-bcm63138.yaml          |   4 -
+ .../bindings/leds/leds-bcm6328.yaml           |   4 -
+ .../devicetree/bindings/leds/leds-bcm6358.txt |   2 -
+ .../bindings/leds/leds-pwm-multicolor.yaml    |   4 -
+ .../devicetree/bindings/leds/leds-pwm.yaml    |   5 -
+ .../devicetree/bindings/net/qca,qca808x.yaml  |  54 +++
+ drivers/net/phy/at803x.c                      | 333 ++++++++++++++++++
+ drivers/net/phy/phy_device.c                  |  12 +
+ include/linux/phy.h                           |  22 ++
+ 10 files changed, 433 insertions(+), 19 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/qca,qca808x.yaml
+
+-- 
+2.40.1
+
 
