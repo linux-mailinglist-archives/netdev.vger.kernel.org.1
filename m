@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-60380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D7681EF1B
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 14:10:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D588081EF1C
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 14:10:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFAEA1F2216B
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 13:10:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13A6E1C225C6
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 13:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADBE44C7E;
-	Wed, 27 Dec 2023 13:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC9A4500F;
+	Wed, 27 Dec 2023 13:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gWuNE2hD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fY+uziUA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D51446C6;
-	Wed, 27 Dec 2023 13:10:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 69029C433C9;
-	Wed, 27 Dec 2023 13:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C41A446C6;
+	Wed, 27 Dec 2023 13:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A0F4C433C7;
+	Wed, 27 Dec 2023 13:10:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703682623;
-	bh=lW2vlwL5kbNeD89dDzyGv8dgNeqvg05mKbI50T2JKk8=;
+	s=k20201202; t=1703682625;
+	bh=/jsWEPfzeo0DxCOUj3q2rwi1CbPQUhzjHOz5xIFG8uY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gWuNE2hDIwOpXBt3f6Wx/9RdbI5okDGAEQci0xaY+jM47MSaUfMCD0gj6QWtnls3b
-	 C0Byj1VMLxI/VqnO3aBUHQwSJ6vN0h6ebouqlCa9BkusJ5SArylWOZjFFEhOBMucbK
-	 V35EwW3pcUJp1Q3hC0XPU118HCteMkGSul0VB9UqNObYDSjNe5spj+w5xqk9+kYhdn
-	 4zCCbQUBO1T2es+N+jReT1rZ2rvzri4Bkqx80/DDe53bIMaMh3Cyd5a/GjRPjZK1SD
-	 e0RTYNFaCdFvEc0dIrjLHQpsw20cJn4Xub816Bn5WQiag/jZ4+JJFP9bjRaRmxm82O
-	 wQ/CnmPbW+8/Q==
+	b=fY+uziUA8JOkaA3P+LSDCmuJMy4n5M6CSiVFeQ+2ojamq24ltnqdg8+T/u9hGug2n
+	 snhuNv/hVbA6w8tbeAjbcklbptVdwuZWkgnwm+4zkrWRvTXSuVMhiKmnv8vIYgywtd
+	 wNQ6LCJRJP4d1ZRsJH+gPfvxj3TNuBfQXgwIlaHp12B318o9a5Zbubv6l9fc6gJdGD
+	 OeDdRMZcmJ0E/ZkBmgf/vx6u0SfE86R3NJ7Gm0xm2+jBQMvpKpajFujVXSyQc4hc87
+	 d4p1KxRSyCj4f1peOZH4UPfTq5IATm6D3GCEK4G3R9nyR9TOXMc3lV+Tk/bvW4fH6M
+	 NKj3d332WxRfQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4E991E333D9;
-	Wed, 27 Dec 2023 13:10:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65DD6E333D9;
+	Wed, 27 Dec 2023 13:10:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,34 +43,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-2023-12-19
+Subject: Re: [PATCH net-next v9 0/9] Add MACsec support for TJA11XX C45 PHYs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170368262331.3726.8214220872504350917.git-patchwork-notify@kernel.org>
-Date: Wed, 27 Dec 2023 13:10:23 +0000
-References: <20231219223233.189152-3-johannes@sipsolutions.net>
-In-Reply-To: <20231219223233.189152-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+ <170368262541.3726.479057551410543516.git-patchwork-notify@kernel.org>
+Date: Wed, 27 Dec 2023 13:10:25 +0000
+References: <20231219145333.240323-1-radu-nicolae.pirea@oss.nxp.com>
+In-Reply-To: <20231219145333.240323-1-radu-nicolae.pirea@oss.nxp.com>
+To: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
+Cc: sd@queasysnail.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, richardcochran@gmail.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ sebastian.tobuschat@oss.nxp.com, andrei.botila@oss.nxp.com
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue, 19 Dec 2023 23:32:14 +0100 you wrote:
-> Hi,
+On Tue, 19 Dec 2023 16:53:24 +0200 you wrote:
+> This is the MACsec support for TJA11XX PHYs. The MACsec block encrypts
+> the ethernet frames on the fly and has no buffering. This operation will
+> grow the frames by 32 bytes. If the frames are sent back to back, the
+> MACsec block will not have enough room to insert the SecTAG and the ICV
+> and the frames will be dropped.
 > 
-> Here are a couple of more fixes, the most important
-> one really being the iwlwifi rfkill fix.
-> 
-> Please pull and let us know if there's any problem.
+> To mitigate this, the PHY can parse a specific ethertype with some
+> padding bytes and replace them with the SecTAG and ICV. These padding
+> bytes might be dummy or might contain information about TX SC that must
+> be used to encrypt the frame.
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: wireless-2023-12-19
-    https://git.kernel.org/netdev/net/c/49fcf34ac908
+  - [net-next,v9,1/9] net: rename dsa_realloc_skb to skb_ensure_writable_head_tail
+    https://git.kernel.org/netdev/net-next/c/90abde49ea85
+  - [net-next,v9,2/9] net: macsec: use skb_ensure_writable_head_tail to expand the skb
+    https://git.kernel.org/netdev/net-next/c/b34ab3527b96
+  - [net-next,v9,3/9] net: macsec: move sci_to_cpu to macsec header
+    https://git.kernel.org/netdev/net-next/c/b1c036e835b6
+  - [net-next,v9,4/9] net: macsec: documentation for macsec_context and macsec_ops
+    https://git.kernel.org/netdev/net-next/c/eb97b9bd38f9
+  - [net-next,v9,5/9] net: macsec: revert the MAC address if mdo_upd_secy fails
+    https://git.kernel.org/netdev/net-next/c/25a00d0cd691
+  - [net-next,v9,6/9] net: macsec: introduce mdo_insert_tx_tag
+    https://git.kernel.org/netdev/net-next/c/a73d8779d61a
+  - [net-next,v9,7/9] net: phy: nxp-c45-tja11xx: add MACsec support
+    https://git.kernel.org/netdev/net-next/c/a868b486cb88
+  - [net-next,v9,8/9] net: phy: nxp-c45-tja11xx: add MACsec statistics
+    https://git.kernel.org/netdev/net-next/c/31a99fc06b0b
+  - [net-next,v9,9/9] net: phy: nxp-c45-tja11xx: implement mdo_insert_tx_tag
+    https://git.kernel.org/netdev/net-next/c/dc1a00380aa6
 
 You are awesome, thank you!
 -- 
