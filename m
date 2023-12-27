@@ -1,95 +1,131 @@
-Return-Path: <netdev+bounces-60357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57F9981ECBF
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 08:03:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A77C281ECF7
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 08:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E12C2829C6
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 07:03:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D35BC1C222B8
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 07:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5642524C;
-	Wed, 27 Dec 2023 07:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EECB53BF;
+	Wed, 27 Dec 2023 07:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1rlpsnB"
 X-Original-To: netdev@vger.kernel.org
-Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2293C6105;
-	Wed, 27 Dec 2023 07:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from localhost.localdomain (unknown [10.190.69.69])
-	by mail-app3 (Coremail) with SMTP id cC_KCgDX3_IezItlmZCLAQ--.17434S4;
-	Wed, 27 Dec 2023 15:03:01 +0800 (CST)
-From: Dinghao Liu <dinghao.liu@zju.edu.cn>
-To: dinghao.liu@zju.edu.cn
-Cc: GR-Linux-NIC-Dev@marvell.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ron Mercer <ron.mercer@qlogic.com>,
-	Jeff Garzik <jeff@garzik.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net/qla3xxx: fix potential memleak in ql_alloc_buffer_queues
-Date: Wed, 27 Dec 2023 15:02:27 +0800
-Message-Id: <20231227070227.10527-1-dinghao.liu@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cC_KCgDX3_IezItlmZCLAQ--.17434S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrKw4DAr1xKr15JF1UCrWfZrb_yoWkArcEgr
-	1fZryxWayDGFWYkrW7tr4UA34Yyrn8Z3WruF4fKFW3Xr4DXasIvryUXFykXay7Gw1fCrWD
-	t347WrWfCw1rtjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbskFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
-	wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
-	vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4UJVW0owA2z4x0Y4vEx4A2
-	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
-	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
-	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY
-	0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
-	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
-	IFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgwPBmWCupcTBwAdsE
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E0053A2;
+	Wed, 27 Dec 2023 07:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a2335d81693so857181666b.0;
+        Tue, 26 Dec 2023 23:35:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703662526; x=1704267326; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1UYQSwvKxxRuI6wQnIJeD5vxy+cXOX0sulkh4qGv7iM=;
+        b=k1rlpsnByx+/yk8UblQ17Ypwr81rqCu9/NTLoIuDDqph20DADPCsTKldPSKhPDTegM
+         GHSzYVkVDjL1nkxfKz+h7LLMKK6YR6bl0B+oYgleLONLBDb8vBSyxOgTCBPpA8PHDpxb
+         AUuFvkdRzu38nAD65n02sHvghOMe3fuccA+9uOI4Eg6bveMedpfW8ZAywlrcfjNXjEf/
+         qTEYGKUwuPBKFNlzfHChsU7hYVkxC+Np49elu3tLOGtUXP82WQXzHfPrjosX/ZlWfMgv
+         c0sobX/kE5ZeZnoVMcUrIgffuylcbEayLHqK1EhkMm6NRePtyTGuK1O2mW7vbTQJay/y
+         X1SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703662526; x=1704267326;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1UYQSwvKxxRuI6wQnIJeD5vxy+cXOX0sulkh4qGv7iM=;
+        b=Dowh+sqGuoMPrEpaibKFaskFI97GWQZnQ94RBzkrr0W1qpJzY5X52dJHzLVNrT+BNY
+         SRxtor5nWK5qnbsQ7Q0N4bTnj6GSVlEnaxcskdErwhheCrARYHVYUhxgKErjSEFopkb1
+         E6v8NRu2lEeL3+m6oqBru36aSOl73evodmISpjBEfPWYElVuF2z9fDT+qoQ4Zgwdb4PR
+         iA/CX2ohi6AaUfHgBOPi3QeSGLWti5f0FyLTFHUHQezhzkZ9J+rO0Ty5Y/HFU9i+Zfxv
+         4g64LYpuci429ZmLaCmno7QuWjydDxHddcuqlKHumedIQyyS2ocMw2ARt8Z39DvKvciN
+         IMWQ==
+X-Gm-Message-State: AOJu0YwPab8Gnpt4KPhTK2EObhLNgrV1Fh3l+WwtR8+jTm5yT7jZgq3I
+	ahW+LBG6KrrY/yIXkEaxhNI=
+X-Google-Smtp-Source: AGHT+IEeObw8r7L0iOJ3qTIsb/nxDzbk6z9WgafKZ4nqQ8EIiOZAVsxilu3myX32DCk8MBpn/7UMfw==
+X-Received: by 2002:a17:906:115b:b0:a1b:7700:2c0b with SMTP id i27-20020a170906115b00b00a1b77002c0bmr7885891eja.19.1703662525510;
+        Tue, 26 Dec 2023 23:35:25 -0800 (PST)
+Received: from krava (37-188-147-249.red.o2.cz. [37.188.147.249])
+        by smtp.gmail.com with ESMTPSA id vl21-20020a17090730d500b00a235a62516asm6285729ejb.57.2023.12.26.23.35.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Dec 2023 23:35:25 -0800 (PST)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Wed, 27 Dec 2023 08:34:57 +0100
+To: Edward Adam Davis <eadavis@qq.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: syzbot+07144c543a5c002c7305@syzkaller.appspotmail.com, acme@kernel.org,
+	adrian.hunter@intel.com, alexander.shishkin@linux.intel.com,
+	irogers@google.com, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, mark.rutland@arm.com,
+	mingo@redhat.com, namhyung@kernel.org, netdev@vger.kernel.org,
+	peterz@infradead.org, syzkaller-bugs@googlegroups.com,
+	xrivendell7@gmail.com
+Subject: Re: [PATCH] perf: fix WARNING in perf_event_open
+Message-ID: <ZYvTC90lyZdwJ8bB@krava>
+References: <0000000000005b23dc060d58ee7a@google.com>
+ <tencent_7FC26D7C2FA56EF89584E89EEE52CD20790A@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_7FC26D7C2FA56EF89584E89EEE52CD20790A@qq.com>
 
-When dma_alloc_coherent() fails, we should free qdev->lrg_buf
-to prevent potential memleak.
+On Tue, Dec 26, 2023 at 03:25:15PM +0800, Edward Adam Davis wrote:
+> The new version of __perf_event_read_size() only has a read action and does not
+> require a mutex, so the mutex assertion in the original loop is removed.
+> 
+> Fixes: 382c27f4ed28 ("perf: Fix perf_event_validate_size()")
+> Reported-and-tested-by: syzbot+07144c543a5c002c7305@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 
-Fixes: 1357bfcf7106 ("qla3xxx: Dynamically size the rx buffer queue based on the MTU.")
-Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
----
- drivers/net/ethernet/qlogic/qla3xxx.c | 2 ++
- 1 file changed, 2 insertions(+)
+hi,
+Mark suggested another fix earlier [1], but I haven't seen the formal patch yet
 
-diff --git a/drivers/net/ethernet/qlogic/qla3xxx.c b/drivers/net/ethernet/qlogic/qla3xxx.c
-index 0d57ffcedf0c..fc78bc959ded 100644
---- a/drivers/net/ethernet/qlogic/qla3xxx.c
-+++ b/drivers/net/ethernet/qlogic/qla3xxx.c
-@@ -2591,6 +2591,7 @@ static int ql_alloc_buffer_queues(struct ql3_adapter *qdev)
- 
- 	if (qdev->lrg_buf_q_alloc_virt_addr == NULL) {
- 		netdev_err(qdev->ndev, "lBufQ failed\n");
-+		kfree(qdev->lrg_buf);
- 		return -ENOMEM;
- 	}
- 	qdev->lrg_buf_q_virt_addr = qdev->lrg_buf_q_alloc_virt_addr;
-@@ -2615,6 +2616,7 @@ static int ql_alloc_buffer_queues(struct ql3_adapter *qdev)
- 				  qdev->lrg_buf_q_alloc_size,
- 				  qdev->lrg_buf_q_alloc_virt_addr,
- 				  qdev->lrg_buf_q_alloc_phy_addr);
-+		kfree(qdev->lrg_buf);
- 		return -ENOMEM;
- 	}
- 
--- 
-2.17.1
+jirka
 
+
+[1] https://lore.kernel.org/linux-perf-users/ZXwubNIxKH9s7DWt@FVFF77S0Q05N/
+
+> ---
+>  kernel/events/core.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index 9efd0d7775e7..e71e61b46416 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -1924,6 +1924,10 @@ static void perf_event__id_header_size(struct perf_event *event)
+>  	event->id_header_size = size;
+>  }
+>  
+> +#define read_for_each_sibling_event(sibling, event)		\
+> +	if ((event)->group_leader == (event))			\
+> +		list_for_each_entry((sibling), &(event)->sibling_list, sibling_list)
+> +
+>  /*
+>   * Check that adding an event to the group does not result in anybody
+>   * overflowing the 64k event limit imposed by the output buffer.
+> @@ -1957,7 +1961,7 @@ static bool perf_event_validate_size(struct perf_event *event)
+>  	if (event == group_leader)
+>  		return true;
+>  
+> -	for_each_sibling_event(sibling, group_leader) {
+> +	read_for_each_sibling_event(sibling, group_leader) {
+>  		if (__perf_event_read_size(sibling->attr.read_format,
+>  					   group_leader->nr_siblings + 1) > 16*1024)
+>  			return false;
+> -- 
+> 2.43.0
+> 
 
