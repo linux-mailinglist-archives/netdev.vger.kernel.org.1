@@ -1,243 +1,199 @@
-Return-Path: <netdev+bounces-60384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E6281EF42
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 14:54:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C0C81EF63
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 15:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94CB2283623
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 13:54:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDB4F283926
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 14:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC93544C9D;
-	Wed, 27 Dec 2023 13:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3DB45023;
+	Wed, 27 Dec 2023 14:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aQpfajPp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D644500E
-	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 13:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7b7fb305084so562088839f.0
-        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 05:54:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703685258; x=1704290058;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OjFsV7ylngU8qwYy9JYFmprL6NBBIeRKiiwsTgEIsys=;
-        b=DDn4j7G6tOLfbu/ZYtjmAsANQj7ZmroKXhmW6+0/7aPdakexrdPtCEkbaw6FZylmUq
-         GWKwtj0iR0ufvaIbMfoAdVNXMhcNlIq0ZdfYLju515lRUKL3hkBMewqlflB2S/39UNYr
-         KDd5EuLB/lxSBrrX3gxDeY0PKo4jMbV6YHPExskMIhABhIUHQV7AehKGK4WFfvETraKI
-         fOIj/Yclc7QaatLOT33EVR8OSL3nt+Vjikx7d0BJTYHqGzMRnkjd5DeConoUhVP281EW
-         DYVS7zOHzVedCXB1xCCOhUaCohDW/rIavKz0IPT32BNR1rsMAHt5uFxUGNxrtJTkkhlt
-         GkAQ==
-X-Gm-Message-State: AOJu0YwMt++8w3Qxv2lIAW/4fmwBIK9WTuns75HAnOiv3Il+8bALI5OF
-	Ws4QT1SJKZb0GluG79ACHyfTQndd0/JdHhi0MHFF+8S7S8b1
-X-Google-Smtp-Source: AGHT+IGeW0v6iW6rqzh1GbjMVdMj1xo1HyDKf4ckt7i0a7zioi/qlkFz0z73iApFwdNYFQ1vKyw9XT/alHkr64wpdNMpQMe7yjnW
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169F247A48
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 14:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703686390; x=1735222390;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nvBGJUcJtr71cpFCLG59Xr1Xq8kzh3+99ef9ENvhXhE=;
+  b=aQpfajPpd3U66HTe6cPe6BNbKm3u9BSo3YVeTO7xMTdgYocLazo9cTm/
+   Kl3zrde5splsXlAk2xQoKVI8uc7NuPz+XAo7LLbGp9cTfenkBFRTCytX6
+   xNo5XeuzB/zUgeLLGl9iv3LA4Q8GdYNHgTsBRj7D+Yw/Gd5Yz8Q9tYYyD
+   MvqrqTx7w8HnlT86lHt/buGOSlXBTtI2heE3VDPDJ2pMeubLB4PU0liwV
+   Wmvro6YI99FYJXAzJyujSp5SPQrLy6tUI/fU1O5/N23Qcrb9h85psnU48
+   uGb00mGpxTluN3a40f0zZerpje8tjaWXHxDFyZqHj8CEskRhg4v3l9bhz
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="427619449"
+X-IronPort-AV: E=Sophos;i="6.04,309,1695711600"; 
+   d="scan'208";a="427619449"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2023 06:13:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,309,1695711600"; 
+   d="scan'208";a="20297518"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Dec 2023 06:13:08 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 27 Dec 2023 06:13:07 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 27 Dec 2023 06:13:07 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 27 Dec 2023 06:13:07 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 27 Dec 2023 06:13:07 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=I1PvxFnY+mDdLBiI57SgBCTJSBP6zAdqJ4Sj5b0SaS+cXCAs4DJm9Agnpb/A5fEANO4xYK4KVSfbFDvkGWXe9nsa6lu0KLJcwdRPAsrghX4+Xy9cYzzkgZvuXqeowq8T0NEbPGGnDydbaW8Nyssfn7Ys4tgcV3crzAGhsinTOB0U9QZbV1/8lFRw1hLUX0CC0NcDITx03cCUDWQKKSr70shwHvXvuqgkj4224yCzcR3xWh7RLxXbK934hSiMcIF7MAS5LaFJVfU0pp277R9Cri+Ftu2oarO31az9aZs628oPQuxPm6+T8G59EHvm6WRjuPNqREjqNusiNAVfueAVpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ClwIts4hVxJ0R9vLEWzQ4mv8cx1o6PXZ0GUZyqPwp/Y=;
+ b=gIaChxT8DxgkF2OV42UtR+TARjH8jTEFZvY0Xh+HmYSA4tvSeksOjZRGo2WBvIv5FIq8X7Ckbl6welDuc1qkhDhxvKOWHjLcKRVbq7usXPh41kIH8dYmbz5ZUhF1lFY2AF9BUi2awA8BSXCR/g6nOp7Spc37bvfH1KE3SAILVA4YV4dz9pEBA4twIB4sS1gtPS6jcIxWUxuRndXrrPiRMfbfGN3Uncm6g+ou/OY81HE8IGJWElNnXpUcC5NqfZHyVMMLclgZKuklYhls2kclhHsPaq0bAR/aReq9rNceO9eSdg7ZBM5o1xbXFTPm3GfItPWDC0MRceZySsw3B3PwUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by IA1PR11MB6146.namprd11.prod.outlook.com (2603:10b6:208:3ee::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.27; Wed, 27 Dec
+ 2023 14:13:05 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::954:6050:f988:740f]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::954:6050:f988:740f%4]) with mapi id 15.20.7113.026; Wed, 27 Dec 2023
+ 14:13:05 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: Simon Horman <horms@kernel.org>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "llvm@lists.linux.dev"
+	<llvm@lists.linux.dev>, Nick Desaulniers <ndesaulniers@google.com>, "Nathan
+ Chancellor" <nathan@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Bill
+ Wendling" <morbo@google.com>, Justin Stitt <justinstitt@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next] i40e: Avoid unnecessary use of
+ comma operator
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] i40e: Avoid unnecessary use
+ of comma operator
+Thread-Index: AQHaMM3TRLmxVQW9RkuRabcKuoy747C9O6uw
+Date: Wed, 27 Dec 2023 14:13:05 +0000
+Message-ID: <BL0PR11MB3122584DE882D5AD0C80AAF0BD9FA@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20231217-i40e-comma-v1-1-85c075eff237@kernel.org>
+In-Reply-To: <20231217-i40e-comma-v1-1-85c075eff237@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|IA1PR11MB6146:EE_
+x-ms-office365-filtering-correlation-id: 8440b259-0507-40dd-00b3-08dc06e5f1a4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: x9uBUIZst08c8hV4Ey68tsngTdOhvSayahSYK7oSEur14nokR3SHLVQtevrvaWj5EwlRPATa6JCyzghoNIE7ENcS63pSD7bmg81q8HJIcqQ9N//sStsEGGK9jODruB7HR8zdAkkvfI4+h5FCQDMz4xyf8MU51PCsrumFtsjMZCwOTaowhSUo45vMr1tLlReLF9lPLa86uZkhdqRYMQfmvt0MBgfEZvIcvSYj4w9iO+Gj1394a/81IpMVWc4bBCmyPpR0WgN4rqL0Q3a7cMrSlF3+S3wEJM6VfNq9uXEvtFYjrrGQeag5DcoJLuin0rdF9JED+Omj93UnTVC/CAM4DtU4aFuI5bPg9A8Kr1gYXn/55EOLWHiAJOqCuG7ccbD7uia0QEUxjoWkDU0OIGBWH1i42dKu5+XOq1oTj6TIWj6EQbwIqoUzXj+v0bPYyZSR+3LEtV7BwqwSxMd72578wApLED1B/V0Wgzrygu0cg2VLGE/8dUyvMGyqmyf5SxMj2VHsyvo/UxtmXl+M2zqprOKe0E+krG3kwK4+fhwSxsW9qGfBhmZG8fEsQ4MumK9hvDAA7NIIKic8543NtQ5vNQRJ02V8uqIHfdeklFk4Q5afCUnkNcD2sUlht6+dP32w
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(39860400002)(346002)(366004)(396003)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(26005)(6506007)(7696005)(9686003)(478600001)(83380400001)(71200400001)(7416002)(5660300002)(52536014)(4326008)(4744005)(41300700001)(53546011)(2906002)(8676002)(8936002)(76116006)(110136005)(316002)(66946007)(6636002)(54906003)(64756008)(66446008)(66476007)(66556008)(86362001)(82960400001)(122000001)(38100700002)(33656002)(38070700009)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?wRoy8QNhEPtvzWHqBHyVE2XU01gjWm/+6+Xnt4FvOY9bEiQ3h8ogxukX/MsE?=
+ =?us-ascii?Q?v/CtD1Ta/aQ8rLokf2OtzAaYdRdZU557Wvyt9zwUmwE/i9hVSG8YD90DqrmJ?=
+ =?us-ascii?Q?A5zQOjMeMCno1FuZEt80Gsjuhmu8YLXcCms46idrihx+Wp8avWyZ1CpFEEb1?=
+ =?us-ascii?Q?BGHCNDYlNdOweMgt47QNxCPwGeo/6YH60MdFbYCrERDfDlQWD5UqVcKuZ4Rr?=
+ =?us-ascii?Q?3gDHisWXJV1PkoJlsua0GTmfTcBDrTNqx4xd5di6dJFo63q+u7BnppVVkF2g?=
+ =?us-ascii?Q?ib+mlmZ4Btfu68Fajihod/eIJ0G1p7TRGe8RuzSzr68O6Crukd6n3R+eTAiV?=
+ =?us-ascii?Q?grY85Q0iJWYkinkn2wZ8Xi6CXl0JUqtVDbwVI7exHjaYVIxXOxtRw6ogHVEQ?=
+ =?us-ascii?Q?+8Oc2tbTI62lcTYpb99L2z9GhseUF5/IImFUeCk4p9h3g6czGOzwfyzue2A5?=
+ =?us-ascii?Q?qLzrUX/TBL0D6RwWgNNXdobefZvimmSR5Eckogw1VGcYNH0m66Yn8oxgpEUV?=
+ =?us-ascii?Q?43wWAykxn2FAziPVYiwcsFlreaVcojKmpbA2nH1lXaalLAoDUcOpYN+Zmmlr?=
+ =?us-ascii?Q?ZuhcVY5aSKR22/eTvgaa2a6bm4WDhkivxERw42v/Vhx8PEDtxniVWiQR9vdn?=
+ =?us-ascii?Q?T6SNphpA0ac05K746fMLxVG0IfaCB2dgA8X+JsQ2BVRDQ51SeCUJDmQcacg2?=
+ =?us-ascii?Q?M4pEdcUrd9mAPCXVwYJfyLT2e+BjhNA3TD/0ZDYlLHgZLqC4UkM0wBiXDEVv?=
+ =?us-ascii?Q?8vXF1g3cBR3cdv84mkVLKmpMwKJgdqTG5SsQpBxWL7fWV5G5Wd4/eAoB8e09?=
+ =?us-ascii?Q?aOn/Iwb/Ju2/d2wWDqgPJcMgqCZsrE1nU7tpyoGlYaF5UT3GICKEQhHAMhGH?=
+ =?us-ascii?Q?vVOxv02irIHruuAMaX4mLmFckGRvczoAoQcWGu65t0awILxqSFbqE8ZJDNm8?=
+ =?us-ascii?Q?o9b3s3ugyeFsFCta7Qt6OnP+bv2kzn+rA32ZVQ6KDePElVTM9UzYAsxiHDeK?=
+ =?us-ascii?Q?eX3wPmxuV6wJpijc3C3A5F0C8iVpw74oOgQCiac+PiVDRp8VBowQDor05bL5?=
+ =?us-ascii?Q?Eeey8pS7u666BzJh7RLLBFCDbEUufxOFp9/5g2OeVTVVUU7jzt3s1qxeqeFQ?=
+ =?us-ascii?Q?17+Ix4z6abB9PIv31ElvQsJYig0fhTy23/Li+9ICZuRU8byGFD8Jtww7KLzB?=
+ =?us-ascii?Q?P4LnJyMKcIcsCJVum65qU5kUkaCOLQriW0PU5w4lolEyve3KZ6rFUjz/i9Vn?=
+ =?us-ascii?Q?VKPLX22wcbVVFfFfPvNiPdPSNoUeFEW1jy3WUOXVM7pthtMhwgvjpJgx6AVS?=
+ =?us-ascii?Q?wRg+QcJEFy2iMRBqvCcPm/Zg+dvO6GFJWdRaLLWQaWUrEYYpoTxlL6hHkSSo?=
+ =?us-ascii?Q?fq+dOqdMOL53xizA6txoCxG/nzYT5asckbMxqbfyveZ5ogroePzAPKqutzxI?=
+ =?us-ascii?Q?28NuM5EnKFlYFCFHdc57XSZpw4wpaDlpP/hIVYHmW3zP6sSmqxIKuMUZqXjw?=
+ =?us-ascii?Q?KSwVnkU9V/EaW8ho0TOZIx4mqTRudmPsSMq7BjbBpAecdVgnLMMp0N+BjVSv?=
+ =?us-ascii?Q?EXhJFBMqv7VDRW5pLTQF3WWkRcuBp+r8f1XjhJ8cGfZ+jJPIJlP4tiiWTJHb?=
+ =?us-ascii?Q?ng=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3d06:b0:35f:e976:32b1 with SMTP id
- db6-20020a056e023d0600b0035fe97632b1mr860315ilb.0.1703685258414; Wed, 27 Dec
- 2023 05:54:18 -0800 (PST)
-Date: Wed, 27 Dec 2023 05:54:18 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a3123d060d7e22bd@google.com>
-Subject: [syzbot] [net?] INFO: rcu detected stall in fq_pie_timer (2)
-From: syzbot <syzbot+15c3ba3f7ca8ced0914d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, gautamramk@gmail.com, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, lesliemonis@gmail.com, 
-	linux-kernel@vger.kernel.org, mohitbhasi1998@gmail.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdp.sachin@gmail.com, 
-	syzkaller-bugs@googlegroups.com, tahiliani@nitk.edu.in, 
-	vsaicharan1998@gmail.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8440b259-0507-40dd-00b3-08dc06e5f1a4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Dec 2023 14:13:05.0986
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EWzW2NIuPsHqOC9gQywmBY0ujBNpoQCzno9pz82bTLxok/i3zLYFN6PlP5j/49P/8dYHf5Zis5w+biVPo4ppPP4hDTz5Wx1IwjdPDG92yGY6UU1E3WBrUpUzCc7Cl+G6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6146
+X-OriginatorOrg: intel.com
 
-Hello,
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of S=
+imon Horman
+> Sent: Sunday, December 17, 2023 3:15 PM
+> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <an=
+thony.l.nguyen@intel.com>
+> Cc: netdev@vger.kernel.org; llvm@lists.linux.dev; Nick Desaulniers <ndesa=
+ulniers@google.com>; Nathan Chancellor <nathan@kernel.org>; Eric Dumazet <e=
+dumazet@google.com>; intel-wired-lan@lists.osuosl.org; Bill Wendling <morbo=
+@google.com>; Justin Stitt <justinstitt@google.com>; Jakub Kicinski <kuba@k=
+ernel.org>; Paolo Abeni <pabeni@redhat.com>; David S. Miller <davem@davemlo=
+ft.net>
+> Subject: [Intel-wired-lan] [PATCH iwl-next] i40e: Avoid unnecessary use o=
+f comma operator
+>
+> Although it does not seem to have any untoward side-effects,
+> the use of ';' to separate to assignments seems more appropriate than ','=
+.
+>
+> Flagged by clang-17 -Wcomma
+>
+> No functional change intended.
+> Compile tested only.
+>
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
 
-syzbot found the following issue on:
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-HEAD commit:    7c5e046bdcb2 Merge tag 'net-6.7-rc7' of git://git.kernel.o..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=17a0abbee80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=314e9ad033a7d3a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=15c3ba3f7ca8ced0914d
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11232ecee80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1127e71ae80000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/52f67fb04584/disk-7c5e046b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b385b087cb3d/vmlinux-7c5e046b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c4cf3e554b44/bzImage-7c5e046b.xz
-
-The issue was bisected to:
-
-commit ec97ecf1ebe485a17cd8395a5f35e6b80b57665a
-Author: Mohit P. Tahiliani <tahiliani@nitk.edu.in>
-Date:   Wed Jan 22 18:22:33 2020 +0000
-
-    net: sched: add Flow Queue PIE packet scheduler
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=154a70cee80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=174a70cee80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=134a70cee80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+15c3ba3f7ca8ced0914d@syzkaller.appspotmail.com
-Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet scheduler")
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	(detected by 1, t=10502 jiffies, g=9389, q=958 ncpus=2)
-rcu: All QSes seen, last rcu_preempt kthread activity 10498 (4294962885-4294952387), jiffies_till_next_fqs=1, root ->qsmask 0x0
-rcu: rcu_preempt kthread starved for 10499 jiffies! g9389 f0x2 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:28752 pid:17    tgid:17    ppid:2      flags:0x00004008
-Call Trace:
- <IRQ>
- sched_show_task kernel/sched/core.c:9146 [inline]
- sched_show_task+0x42e/0x650 kernel/sched/core.c:9120
- rcu_check_gp_kthread_starvation+0x19f/0x450 kernel/rcu/tree_stall.h:548
- print_other_cpu_stall kernel/rcu/tree_stall.h:656 [inline]
- check_cpu_stall kernel/rcu/tree_stall.h:796 [inline]
- rcu_pending kernel/rcu/tree.c:3891 [inline]
- rcu_sched_clock_irq+0x2269/0x3150 kernel/rcu/tree.c:2259
- update_process_times+0x17b/0x220 kernel/time/timer.c:2071
- tick_sched_handle+0x8e/0x170 kernel/time/tick-sched.c:255
- tick_nohz_highres_handler+0xe9/0x110 kernel/time/tick-sched.c:1516
- __run_hrtimer kernel/time/hrtimer.c:1688 [inline]
- __hrtimer_run_queues+0x647/0xc20 kernel/time/hrtimer.c:1752
- hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1814
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1065 [inline]
- __sysvec_apic_timer_interrupt+0x105/0x400 arch/x86/kernel/apic/apic.c:1082
- sysvec_apic_timer_interrupt+0x43/0xb0 arch/x86/kernel/apic/apic.c:1076
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
-RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
-RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
-RIP: 0010:pie_calculate_probability+0x284/0x850 net/sched/sch_pie.c:345
-Code: 89 c5 48 89 6c 24 38 e8 fa 47 e6 f8 47 8d 24 a4 31 d2 4c 89 ff 43 8d 0c 24 49 c1 ee 02 48 b8 ff ff ff ff ff ff ff 00 48 f7 f1 <48> 89 c5 48 89 c6 48 c1 eb 02 49 89 cc e8 da 42 e6 f8 49 39 ef 73
-RSP: 0018:ffffc900001f0bb8 EFLAGS: 00000207
-RAX: 0000068db8bac710 RBX: 000000002af31dc4 RCX: 0000000000002710
-RDX: 0000000000001eff RSI: ffffffff88a129d6 RDI: 0000000000000000
-RBP: 00004189374bc6a7 R08: 0000000000000005 R09: 00000000000f4240
-R10: 00000000000003e8 R11: 0000000000000002 R12: 0000000000001388
-R13: 0000000000000004 R14: 000000000112e0be R15: 0000000000000000
- fq_pie_timer+0x215/0x5a0 net/sched/sch_fq_pie.c:391
- call_timer_fn+0x193/0x590 kernel/time/timer.c:1700
- expire_timers kernel/time/timer.c:1751 [inline]
- __run_timers+0x764/0xb20 kernel/time/timer.c:2022
- run_timer_softirq+0x58/0xd0 kernel/time/timer.c:2035
- __do_softirq+0x21a/0x8de kernel/softirq.c:553
- invoke_softirq kernel/softirq.c:427 [inline]
- __irq_exit_rcu kernel/softirq.c:632 [inline]
- irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
- sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1076
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
-RIP: 0010:finish_task_switch.isra.0+0x223/0xca0 kernel/sched/core.c:5250
-Code: 0a 00 00 44 8b 0d 35 8b be 0d 45 85 c9 0f 85 c0 01 00 00 48 89 df e8 cc f8 ff ff e8 57 47 33 00 fb 65 48 8b 1c 25 c0 bc 03 00 <48> 8d bb d8 15 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1
-RSP: 0018:ffffc90000167a08 EFLAGS: 00000206
-RAX: 000000000001e735 RBX: ffff888017e48000 RCX: 1ffffffff1e320a9
-RDX: 0000000000000000 RSI: ffffffff8accaec0 RDI: ffffffff8b2efba0
-RBP: ffffc90000167a50 R08: 0000000000000001 R09: 0000000000000001
-R10: ffffffff8f1937d7 R11: 0000000000000000 R12: ffff8880b993d478
-R13: ffff888026c53b80 R14: 0000000000000000 R15: ffff8880b993c700
- context_switch kernel/sched/core.c:5379 [inline]
- __schedule+0xee3/0x5af0 kernel/sched/core.c:6688
- __schedule_loop kernel/sched/core.c:6763 [inline]
- schedule+0xe9/0x270 kernel/sched/core.c:6778
- schedule_timeout+0x137/0x290 kernel/time/timer.c:2167
- rcu_gp_fqs_loop+0x1ec/0xb10 kernel/rcu/tree.c:1631
- rcu_gp_kthread+0x24b/0x380 kernel/rcu/tree.c:1830
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 1 PID: 17 Comm: rcu_preempt Not tainted 6.7.0-rc6-syzkaller-00157-g7c5e046bdcb2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
-RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
-RIP: 0010:pie_calculate_probability+0x284/0x850 net/sched/sch_pie.c:345
-Code: 89 c5 48 89 6c 24 38 e8 fa 47 e6 f8 47 8d 24 a4 31 d2 4c 89 ff 43 8d 0c 24 49 c1 ee 02 48 b8 ff ff ff ff ff ff ff 00 48 f7 f1 <48> 89 c5 48 89 c6 48 c1 eb 02 49 89 cc e8 da 42 e6 f8 49 39 ef 73
-RSP: 0018:ffffc900001f0bb8 EFLAGS: 00000207
-RAX: 0000068db8bac710 RBX: 000000002af31dc4 RCX: 0000000000002710
-RDX: 0000000000001eff RSI: ffffffff88a129d6 RDI: 0000000000000000
-RBP: 00004189374bc6a7 R08: 0000000000000005 R09: 00000000000f4240
-R10: 00000000000003e8 R11: 0000000000000002 R12: 0000000000001388
-R13: 0000000000000004 R14: 000000000112e0be R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555556c89ca8 CR3: 0000000078bae000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- fq_pie_timer+0x215/0x5a0 net/sched/sch_fq_pie.c:391
- call_timer_fn+0x193/0x590 kernel/time/timer.c:1700
- expire_timers kernel/time/timer.c:1751 [inline]
- __run_timers+0x764/0xb20 kernel/time/timer.c:2022
- run_timer_softirq+0x58/0xd0 kernel/time/timer.c:2035
- __do_softirq+0x21a/0x8de kernel/softirq.c:553
- invoke_softirq kernel/softirq.c:427 [inline]
- __irq_exit_rcu kernel/softirq.c:632 [inline]
- irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
- sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1076
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
-RIP: 0010:finish_task_switch.isra.0+0x223/0xca0 kernel/sched/core.c:5250
-Code: 0a 00 00 44 8b 0d 35 8b be 0d 45 85 c9 0f 85 c0 01 00 00 48 89 df e8 cc f8 ff ff e8 57 47 33 00 fb 65 48 8b 1c 25 c0 bc 03 00 <48> 8d bb d8 15 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1
-RSP: 0018:ffffc90000167a08 EFLAGS: 00000206
-RAX: 000000000001e735 RBX: ffff888017e48000 RCX: 1ffffffff1e320a9
-RDX: 0000000000000000 RSI: ffffffff8accaec0 RDI: ffffffff8b2efba0
-RBP: ffffc90000167a50 R08: 0000000000000001 R09: 0000000000000001
-R10: ffffffff8f1937d7 R11: 0000000000000000 R12: ffff8880b993d478
-R13: ffff888026c53b80 R14: 0000000000000000 R15: ffff8880b993c700
- context_switch kernel/sched/core.c:5379 [inline]
- __schedule+0xee3/0x5af0 kernel/sched/core.c:6688
- __schedule_loop kernel/sched/core.c:6763 [inline]
- schedule+0xe9/0x270 kernel/sched/core.c:6778
- schedule_timeout+0x137/0x290 kernel/time/timer.c:2167
- rcu_gp_fqs_loop+0x1ec/0xb10 kernel/rcu/tree.c:1631
- rcu_gp_kthread+0x24b/0x380 kernel/rcu/tree.c:1830
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
