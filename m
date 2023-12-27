@@ -1,157 +1,102 @@
-Return-Path: <netdev+bounces-60406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 512C981F178
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 20:01:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F92281F18C
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 20:12:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06D9F1F23078
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 19:01:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 219572817E8
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 19:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4A546546;
-	Wed, 27 Dec 2023 19:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D409846B91;
+	Wed, 27 Dec 2023 19:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J1PxHi+2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BroBp/Bk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DA420306;
-	Wed, 27 Dec 2023 19:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC2F46B87;
+	Wed, 27 Dec 2023 19:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33677fb38a3so5587481f8f.0;
-        Wed, 27 Dec 2023 11:01:02 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-336897b6bd6so5354887f8f.2;
+        Wed, 27 Dec 2023 11:11:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703703661; x=1704308461; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ucqUcU3zyNkG6GcytVS0lrdLXAph5hA8OQMhhs/vvSA=;
-        b=J1PxHi+2PBPWjNO6+NKRLaOg6VYuLDHkCPLhaMKms5rxCVyGwsGUJDBElxsxAtlQ1m
-         ss5/oA2NkN4ktMw8u4SasZPcUlGtRbgz8kgCVMcSX4Qa/c+rO8hti8/HBEV8d5yk6hXT
-         tu7yk0efySuTods+EfWWzTn4AxRnIJOtB2dPnYE7uObwxQz8kP5hw2qIbbhRhsGLHBvh
-         4liSeJyfAE6NEvxz13b9zOoh50pfIEEFA67PEYIc0MNzF9ujZ+kj79Vj8Z/s1xVqfFCJ
-         YKpXYSJWbR+7WDEcOrFueJkZBiql2yIbG88rCBnkdXD5VxhJXZg0fd2MeeT3SrPTc/QS
-         IqLg==
+        d=gmail.com; s=20230601; t=1703704317; x=1704309117; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xpjVZsNPX+sIY/4iKnMdXb+nJyZj3/QdyFQ3Fr0Lb3o=;
+        b=BroBp/Bkryn3R95ETZq5+E7OjwwfOZNMueU2GMiMw6E8M1OJNokwWzLWR057IsywBx
+         5e42TgXlFwA9tjLL7vubRpmaKNvu7FU8wNP+6R1pOv0al184a2C+f1Q71TDMsyTYouF0
+         DGvLo4V7GESxVYDyrRsr1FfaNK3M6kK7c1mheKRNPc40A2xyoh6wzUW3i2q6YIqE0pzn
+         72S52VfCtvZSN/QAJMTyjIQZmL/qWIZj/c2bmaC3euQ33VWHCUeXy9gEJfq7bFKu/ZN8
+         H7VBFJgThHPFGewVFyPPzNa4mk36ufdKh2y46x9r2bReDuYfyaBpPUdhysGoG1yGZ01E
+         6DAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703703661; x=1704308461;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ucqUcU3zyNkG6GcytVS0lrdLXAph5hA8OQMhhs/vvSA=;
-        b=Gbz0TGaC6UoiDs63vGDXrDsL8qI5bpzDeocEaN4Ul9nW5olIn58WI8//9h4zA/Wle0
-         sqFSqhv13OvCZjvemMAr/qxmB7N8P4jJ9R/iphN/cio+12V6IYTybOkQgrw/Xg0UHEAB
-         ZAGEjFck9Z66gL6ICb+DMfLEK+YYxAPbVX+jwZLDc48PKLvSFUKDGXlfix67RCHxYf+t
-         y/zOUir2ENFZYRBWM7k8iE/jlzLJBNaBZXmh8CcNQS5/pVFScPQ5ukWMA7jXTfTC3iU3
-         ggLdmi5z3a64zPcIpH59xL+m8zpOuEpS/bSB2xHdfS1PJMkUccIAUtXOzTHrFP3QV9G1
-         zaCg==
-X-Gm-Message-State: AOJu0YyLtGWMIkK0nmgFnivZRYuYyyQaEt42798cVNG41FyJSKsBLSPr
-	cdu56I/AAq+0Bol88OwEOUn1xmunMf+8Ms47/wc=
-X-Google-Smtp-Source: AGHT+IHOggBkRyaEe//vGD99Ke0t5serq4JbHTjRngBnmLcxHoOnOHk4W8zcf7JDq5LUBIW6gsSqPNOrLWLzzjsa0Yk=
-X-Received: by 2002:a5d:6d05:0:b0:336:b717:3b5a with SMTP id
- e5-20020a5d6d05000000b00336b7173b5amr6193973wrq.77.1703703660869; Wed, 27 Dec
- 2023 11:01:00 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703704317; x=1704309117;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xpjVZsNPX+sIY/4iKnMdXb+nJyZj3/QdyFQ3Fr0Lb3o=;
+        b=JIYLPyR8tSWUfMCdQ6LOzQtEjNO6E4LYR7u5SjnI0K2NOfAn+tD3nqr2Wxutli5zh2
+         VEQDsg7PgBddeB87LrJ+yLNaQwsgCkDnrBx4AEzSlDrTrH2Amu7TIS2FYxZcIv/HgLO3
+         xImbM3rQ2x5tljWpFRoEZ4RnTLZAQOhDSgDCsjWVN13g4RcS601Ey2uWB8tGagRNEMOG
+         VKgISi8jtvrOzWPxcICUfDwUNIXyJ2RY4/sWAI4E55xWP/TBZtynSkFihOyhCSXpw40R
+         xdvl0pqcYLVc2hPpFjN86lyW/vl0XRWW97F3aaJlVCEtw7hy8XTxqZuH2ZeVoeIHcLIY
+         aAGQ==
+X-Gm-Message-State: AOJu0Yxf6tH9xeBRLclhVS1S4pln3owyNj7tztX6LTFSbilCXmYKRD9/
+	esDwgg3cXuUzgHvLStGrhAI=
+X-Google-Smtp-Source: AGHT+IHvTbKNlF2hf7/6KQNTwjMRnya8Ovzc9i033ephLhJKTcFyZTtSNY6K4A36to6c3+dS8P8amQ==
+X-Received: by 2002:a5d:4a4e:0:b0:333:44e2:16b7 with SMTP id v14-20020a5d4a4e000000b0033344e216b7mr1701205wrs.49.1703704317311;
+        Wed, 27 Dec 2023 11:11:57 -0800 (PST)
+Received: from skbuf ([188.25.254.72])
+        by smtp.gmail.com with ESMTPSA id f7-20020a5d4dc7000000b00336ebf93416sm3452910wru.17.2023.12.27.11.11.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Dec 2023 11:11:57 -0800 (PST)
+Date: Wed, 27 Dec 2023 21:11:54 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	David Bauer <mail@david-bauer.net>, mithat.guner@xeront.com,
+	erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next] net: dsa: mt7530: register OF node for internal
+ MDIO bus
+Message-ID: <20231227191154.6jkqdlqdxciidpfw@skbuf>
+References: <20231220173539.59071-1-arinc.unal@arinc9.com>
+ <20231220173539.59071-1-arinc.unal@arinc9.com>
+ <20231221151607.ujobhh4aet4obxdz@skbuf>
+ <6600c6b1-2230-4963-940c-8b95a01750fd@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1703081351-85579-1-git-send-email-alibuda@linux.alibaba.com>
- <1703081351-85579-2-git-send-email-alibuda@linux.alibaba.com>
- <CAADnVQK3Wk+pKbvc5_7jgaQ=qFq3y0ozgnn+dbW56DaHL2ExWQ@mail.gmail.com>
- <1d3cb7fc-c1dc-a779-8952-cdbaaf696ce3@linux.alibaba.com> <CAADnVQJEUEo3g7knXtkD0CNjazTpQKcjrAaZLJ4utk962bjmvw@mail.gmail.com>
- <d5879c57-634f-4973-b52d-4994d0929de6@linux.alibaba.com>
-In-Reply-To: <d5879c57-634f-4973-b52d-4994d0929de6@linux.alibaba.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 27 Dec 2023 11:00:49 -0800
-Message-ID: <CAADnVQJZsJujDH=YAoZ6ieQQ2pVo0wvc-ppwRC7y2X=ggibsEw@mail.gmail.com>
-Subject: Re: [RFC nf-next v3 1/2] netfilter: bpf: support prog update
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, coreteam@netfilter.org, 
-	netfilter-devel <netfilter-devel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6600c6b1-2230-4963-940c-8b95a01750fd@arinc9.com>
 
-On Wed, Dec 27, 2023 at 12:20=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.co=
-m> wrote:
->
->
-> Hi Alexei,
->
->
-> IMMO, nf_unregister_net_hook does not wait for the completion of the
-> execution of the hook that is being removed,
-> instead, it allocates a new array without the very hook to replace the
-> old arrayvia rcu_assign_pointer() (in __nf_hook_entries_try_shrink),
-> then it use call_rcu() to release the old one.
->
-> You can find more details in commit
-> 8c873e2199700c2de7dbd5eedb9d90d5f109462b.
->
-> In other words, when nf_unregister_net_hook returns, there may still be
-> contexts executing hooks on the
-> old array, which means that the `link` may still be accessed after
-> nf_unregister_net_hook returns.
->
-> And that's the reason why we use kfree_rcu() to release the `link`.
-> >>                                                        nf_hook_run_bpf
-> >>                                                        const struct
-> >> bpf_nf_link *nf_link =3D bpf_link;
-> >>
-> >> bpf_nf_link_release
-> >>       nf_unregister_net_hook(nf_link->net, &nf_link->hook_ops);
-> >>
-> >> bpf_nf_link_dealloc
-> >>       free(link)
-> >> bpf_prog_run(link->prog);
+On Sun, Dec 24, 2023 at 10:37:12AM +0300, Arınç ÜNAL wrote:
+> If the MDIO bus of the switch is defined on the devicetree, the
+> (!ds->user_mii_bus && ds->ops->phy_read) check in dsa_switch_setup will be
+> true so the MDIO bus will be attempted to be registered again, resulting in
+> a kernel panic.
 
-Got it.
-Sounds like it's an existing bug. If so it should be an independent
-patch with Fixes tag.
-
-Also please craft a test case to demonstrate UAF.
-
->
-> I must admit that it is indeed feasible if we eliminate the mutex and
-> use cmpxchg to swap the prog (we need to ensure that there is only one
-> bpf_prog_put() on the old prog).
-> However, when cmpxchg fails, it means that this context has not
-> outcompeted the other one, and we have to return a failure. Maybe
-> something like this:
->
-> if (!cmpxchg(&link->prog, old_prog, new_prog)) {
->      /* already replaced by another link_update */
->      return -xxx;
-> }
->
-> As a comparison, The version with the mutex wouldn't encounter this
-> error, every update would succeed. I think that it's too harsh for the
-> user to receive a failure
-> in that case since they haven't done anything wrong.
-
-Disagree. The mutex doesn't prevent this issue.
-There is always a race.
-It happens when link_update.old_prog_fd and BPF_F_REPLACE
-were specified.
-One user space passes an FD of the old prog and
-another user space doing the same. They both race and one of them
-gets
-if (old_prog && link->prog !=3D old_prog) {
-               err =3D -EPERM;
-
-it's no different with dropping the mutex and doing:
-if (old_prog) {
-    if (!cmpxchg(&link->prog, old_prog, new_prog))
-      -EPERM
-} else {
-   old_prog =3D xchg(&link->prog, new_prog);
-}
+Where does mt7530 provide ds->ops->phy_read() in upstream?
 
