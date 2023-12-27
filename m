@@ -1,105 +1,99 @@
-Return-Path: <netdev+bounces-60381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D588081EF1C
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 14:10:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB13181EF2E
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 14:23:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13A6E1C225C6
-	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 13:10:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28D95B2144D
+	for <lists+netdev@lfdr.de>; Wed, 27 Dec 2023 13:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC9A4500F;
-	Wed, 27 Dec 2023 13:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B763F44C83;
+	Wed, 27 Dec 2023 13:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fY+uziUA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQqubKd3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C41A446C6;
-	Wed, 27 Dec 2023 13:10:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A0F4C433C7;
-	Wed, 27 Dec 2023 13:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703682625;
-	bh=/jsWEPfzeo0DxCOUj3q2rwi1CbPQUhzjHOz5xIFG8uY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fY+uziUA8JOkaA3P+LSDCmuJMy4n5M6CSiVFeQ+2ojamq24ltnqdg8+T/u9hGug2n
-	 snhuNv/hVbA6w8tbeAjbcklbptVdwuZWkgnwm+4zkrWRvTXSuVMhiKmnv8vIYgywtd
-	 wNQ6LCJRJP4d1ZRsJH+gPfvxj3TNuBfQXgwIlaHp12B318o9a5Zbubv6l9fc6gJdGD
-	 OeDdRMZcmJ0E/ZkBmgf/vx6u0SfE86R3NJ7Gm0xm2+jBQMvpKpajFujVXSyQc4hc87
-	 d4p1KxRSyCj4f1peOZH4UPfTq5IATm6D3GCEK4G3R9nyR9TOXMc3lV+Tk/bvW4fH6M
-	 NKj3d332WxRfQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65DD6E333D9;
-	Wed, 27 Dec 2023 13:10:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DCA45947
+	for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 13:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3bbc648bed4so424742b6e.3
+        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 05:23:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703683421; x=1704288221; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d3KiUyWQVZegOM1Bky0WUmul7VbRjuI0JPtLHWl7GeM=;
+        b=jQqubKd34yo+oKKFrXNrFbaZVHHNY5Vh8XBHkZ3c+2+i0AzHVC18xbezRlSl0ARrs9
+         CcNJtro1BGnU9jVsSc9Cv7EK8eTFGRURewm5R7/fN9M210mNU2qbSOe3UciXAb0f1o6f
+         rpZ/2mIGNAWvXes79woqUi28AKN5omNoMMe5M45TuyDsyiISMW5L+EmxSSQByXbmRA1O
+         nzAlIb8n1JuOYObiHV5ya3c1/oRQ2uuPkht2czDbnJWNo/g3Nj+X4o9psYy5j6ceYjXP
+         5njf1o0FA0rZ2DK+2J4VVF7d8tWabYQwAD9w47r0n30NB8PPGd0UIamf2q2DP1/OqYGn
+         wRiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703683421; x=1704288221;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d3KiUyWQVZegOM1Bky0WUmul7VbRjuI0JPtLHWl7GeM=;
+        b=hEGDdPPBPwAKrN8T3SwGcUIy9uXgDwqW2FJZee5a45dcSK606NSWkxkA7dSdNu3Cdv
+         0zVyLYJocXoCUmbDqo58PMxOqUQepK7+PPy08d9/vAMJ6nJ0pvg+4B18jrZaRG9BPBRE
+         tJKnCWqn+0VmE5fgbAzcIr9eVi7MrLm/eXxRQ2nFd+6Yn16KNELJXMm4rRtO+dDBaxqK
+         yNx0lRMWgcESfa6PvVJHPeceOzF+WCYZ/kXb2IxdJVBLi7dU6jtkeEhhq2JJ9caZJUgw
+         Qijs54Jg3SiwvPLvuvNWqcUB0MnIcuSdP5Lg+Nb7jABQLWDmRv6hVDed8JVXQu6/d2n4
+         TEbA==
+X-Gm-Message-State: AOJu0YyDIt3SCKBuUvfvUStdci6UlZWsILaF6l5XyEVG4IAPyWArGUM1
+	oVuLeI6D183z2h5OsnOMQHDU7zE3jI2RciRGvUvNt4z4cks=
+X-Google-Smtp-Source: AGHT+IGoxEspM/lnJh21MuFrVdqonIyFcy1MpU1ubUcyhtXWVlsHpNT19vm5ricGJW7e6/um8FqawHsQ5m170cdcbjo=
+X-Received: by 2002:a05:6808:e86:b0:3a8:432a:ea13 with SMTP id
+ k6-20020a0568080e8600b003a8432aea13mr9579205oil.46.1703683421148; Wed, 27 Dec
+ 2023 05:23:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v9 0/9] Add MACsec support for TJA11XX C45 PHYs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170368262541.3726.479057551410543516.git-patchwork-notify@kernel.org>
-Date: Wed, 27 Dec 2023 13:10:25 +0000
-References: <20231219145333.240323-1-radu-nicolae.pirea@oss.nxp.com>
-In-Reply-To: <20231219145333.240323-1-radu-nicolae.pirea@oss.nxp.com>
-To: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
-Cc: sd@queasysnail.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, richardcochran@gmail.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- sebastian.tobuschat@oss.nxp.com, andrei.botila@oss.nxp.com
+References: <CAK2bqVJPOE85VqfCEU07sjjE=530D_ac_AgcnFB6GdFKzN85AQ@mail.gmail.com>
+In-Reply-To: <CAK2bqVJPOE85VqfCEU07sjjE=530D_ac_AgcnFB6GdFKzN85AQ@mail.gmail.com>
+From: Chris Rankin <rankincj@gmail.com>
+Date: Wed, 27 Dec 2023 13:23:30 +0000
+Message-ID: <CAK2bqVLX9PTQoeWw7rOP4Z3z84bqT_k0mb-y8jORWMNx-v3LXQ@mail.gmail.com>
+Subject: Fwd: HID-BPF fails to initialise for Linux 6.6.8, claiming -EINVAL
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hi,
+I've stumbled across a BPF configuration issue and was wondering if
+anyone could help please?
+Thanks,
+Chris
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+---------- Forwarded message ---------
+From: Chris Rankin <rankincj@gmail.com>
+Date: Tue, 26 Dec 2023 at 11:06
+Subject: HID-BPF fails to initialise for Linux 6.6.8, claiming -EINVAL
+To: <bpf@vger.kernel.org>
 
-On Tue, 19 Dec 2023 16:53:24 +0200 you wrote:
-> This is the MACsec support for TJA11XX PHYs. The MACsec block encrypts
-> the ethernet frames on the fly and has no buffering. This operation will
-> grow the frames by 32 bytes. If the frames are sent back to back, the
-> MACsec block will not have enough room to insert the SecTAG and the ICV
-> and the frames will be dropped.
-> 
-> To mitigate this, the PHY can parse a specific ethertype with some
-> padding bytes and replace them with the SecTAG and ICV. These padding
-> bytes might be dummy or might contain information about TX SC that must
-> be used to encrypt the frame.
-> 
-> [...]
+Hi,
 
-Here is the summary with links:
-  - [net-next,v9,1/9] net: rename dsa_realloc_skb to skb_ensure_writable_head_tail
-    https://git.kernel.org/netdev/net-next/c/90abde49ea85
-  - [net-next,v9,2/9] net: macsec: use skb_ensure_writable_head_tail to expand the skb
-    https://git.kernel.org/netdev/net-next/c/b34ab3527b96
-  - [net-next,v9,3/9] net: macsec: move sci_to_cpu to macsec header
-    https://git.kernel.org/netdev/net-next/c/b1c036e835b6
-  - [net-next,v9,4/9] net: macsec: documentation for macsec_context and macsec_ops
-    https://git.kernel.org/netdev/net-next/c/eb97b9bd38f9
-  - [net-next,v9,5/9] net: macsec: revert the MAC address if mdo_upd_secy fails
-    https://git.kernel.org/netdev/net-next/c/25a00d0cd691
-  - [net-next,v9,6/9] net: macsec: introduce mdo_insert_tx_tag
-    https://git.kernel.org/netdev/net-next/c/a73d8779d61a
-  - [net-next,v9,7/9] net: phy: nxp-c45-tja11xx: add MACsec support
-    https://git.kernel.org/netdev/net-next/c/a868b486cb88
-  - [net-next,v9,8/9] net: phy: nxp-c45-tja11xx: add MACsec statistics
-    https://git.kernel.org/netdev/net-next/c/31a99fc06b0b
-  - [net-next,v9,9/9] net: phy: nxp-c45-tja11xx: implement mdo_insert_tx_tag
-    https://git.kernel.org/netdev/net-next/c/dc1a00380aa6
+I have tried to add BPF LSM support to my 6.6.8 kernel, but HID-BPF
+fails with this message:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[    3.210054] hid_bpf: error while preloading HID BPF dispatcher: -22
 
+At this point, I can only assume that the Kconfig rules are somehow
+incomplete and that there is a missing dependency somewhere.
 
+I have raised this issue as:
+https://bugzilla.kernel.org/show_bug.cgi?id=218320, where I have
+attached my kernel config. Can anyone see what I might be missing
+please?
+
+Thanks,
+Chris
 
