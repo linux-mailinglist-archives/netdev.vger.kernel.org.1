@@ -1,98 +1,129 @@
-Return-Path: <netdev+bounces-60484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5879981F7EC
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 12:47:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB11D81F7CB
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 12:40:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF331B20A2E
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 11:47:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECB4F1C20C65
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 11:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147216FCB;
-	Thu, 28 Dec 2023 11:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA866FC5;
+	Thu, 28 Dec 2023 11:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="aL0LjljP"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="M2ce4O+P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FAC6FBE;
-	Thu, 28 Dec 2023 11:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4T164805BbzMpr0x;
-	Thu, 28 Dec 2023 11:39:36 +0000 (UTC)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4T16472wZjzMppB5;
-	Thu, 28 Dec 2023 12:39:35 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1703763575;
-	bh=HFUa+gi6H03BBjcBoQQZYSYsAH4d4PrSY7gBDXIdSxw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=aL0LjljPs1ZmEelw3LKIuJ4a56TODbjHwEsslr1ax65dsQEyfy3Nj0ZePlhmm7f4h
-	 kYyEqYaFZpl0HYakOinZKl4eKlaWokxqT8f4+8dwve7gNEpFWSwHQDDkrxeR/yURiZ
-	 MRnX+Wpl4Iaf5B7pEoVJbTgj/3hgJTbpykm1GlLM=
-From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-To: Eric Paris <eparis@parisplace.org>,
-	Paul Moore <paul@paul-moore.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>
-Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	Alexey Kodanev <alexey.kodanev@oracle.com>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-security-module@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] selinux: Fix error priority for bind with AF_UNSPEC on AF_INET6 socket
-Date: Thu, 28 Dec 2023 12:39:17 +0100
-Message-ID: <20231228113917.62089-1-mic@digikod.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BB76FC7
+	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 11:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id C0EC55C010F;
+	Thu, 28 Dec 2023 06:40:53 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Thu, 28 Dec 2023 06:40:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1703763653; x=1703850053; bh=npFYJ8Qb2fRNhsmLYiDDRmbTpaap
+	KrLg2m2iRoxzT4M=; b=M2ce4O+Pcf/L7vsyFkL8mMNi8wqnx5P1EtQ+SAMJEN5f
+	IE9nTZhgPVNg9OfcRqVaPHK96WirKKfnKPIeRL98Lkv1U/B2gVCr0MlVeZJVYWNN
+	Z+8wc4sbrwxpgqFZJ101TnQ/9+V2O28Dt+OfrQuNB6WSu5AF81EuxtUpRmJoWCN2
+	Gg2kh1l5tkL09w63JacWLIOAvyiIPkUVcBuqnLJil2VFFxMGI3y2FlHrbacjdFPa
+	p8FAmcHikqWeXMwSbT471ZjtwYZ+biP+eAPXRxae2O/oYsuBfubBouVqgFYGv5y3
+	Vhea8hqbh7ClDOnfNkB0Xez7oarRhrB79Eiu4uD3nw==
+X-ME-Sender: <xms:xV6NZUuQx1UF96Li1zoia9NLGGQQiy4qfUkispsr__ySoa-AdU4VJQ>
+    <xme:xV6NZRfutSgrbYkOtJIBfZkWoqroy1pXGk3R65rqo4MI_iSzq14K_yuRd_75heLQ5
+    NNBL13KrC91ydo>
+X-ME-Received: <xmr:xV6NZfxh8y9JfRWNH_Rg9G0iyKH8lkZ6F3qtUdjiikMEifnBTm5mJ2l_ue50>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdefuddgfedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
+    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
+    guohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:xV6NZXOM3DW9LDKdKEVw4_8viW5LajZeCPAHvBJjM4duKI_QxZ8pwA>
+    <xmx:xV6NZU_jXoUrOswYJn9jnZKhsNg2RJmByAg7IuNw6tanZWvtf0XGtg>
+    <xmx:xV6NZfVeWpk5j8_QpUxYKpn1E-OblKP3iMRM85oLvg1Svkc6uKkKrg>
+    <xmx:xV6NZfUYSspzy5QiAJqqIL7p4zBrYP2eDzXShErKjO3t4Qans1qO0w>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 28 Dec 2023 06:40:52 -0500 (EST)
+Date: Thu, 28 Dec 2023 13:40:50 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: jhs@mojatatu.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
+	jiri@resnulli.us, mleitner@redhat.com, vladbu@nvidia.com,
+	paulb@nvidia.com, pctammela@mojatatu.com, netdev@vger.kernel.org,
+	kernel@mojatatu.com
+Subject: Re: [PATCH net-next v8 1/5] net/sched: Introduce tc block netdev
+ tracking infra
+Message-ID: <ZY1ewk_H4QWmKz_T@shredder>
+References: <20231219181623.3845083-1-victor@mojatatu.com>
+ <20231219181623.3845083-2-victor@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231219181623.3845083-2-victor@mojatatu.com>
 
-The IPv6 network stack first checks the sockaddr length (-EINVAL error)
-before checking the family (-EAFNOSUPPORT error).
+On Tue, Dec 19, 2023 at 03:16:19PM -0300, Victor Nogueira wrote:
+> +static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
+> +			       struct netlink_ext_ack *extack)
+> +{
+> +	const struct Qdisc_class_ops *cl_ops = sch->ops->cl_ops;
+> +	struct tcf_block *block;
+> +	int err;
+> +
+> +	block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> +	if (block) {
+> +		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+> +		if (err) {
+> +			NL_SET_ERR_MSG(extack,
+> +				       "ingress block dev insert failed");
+> +			return err;
+> +		}
+> +	}
+> +
+> +	block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+> +	if (block) {
+> +		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+> +		if (err) {
+> +			NL_SET_ERR_MSG(extack,
+> +				       "Egress block dev insert failed");
+> +			goto err_out;
+> +		}
+> +	}
 
-This was discovered thanks to commit a549d055a22e ("selftests/landlock:
-Add network tests").
+The following fails after this patch:
 
-Cc: Alexey Kodanev <alexey.kodanev@oracle.com>
-Cc: Eric Paris <eparis@parisplace.org>
-Cc: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Cc: Paul Moore <paul@paul-moore.com>
-Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
-Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Closes: https://lore.kernel.org/r/0584f91c-537c-4188-9e4f-04f192565667@collabora.com
-Fixes: 0f8db8cc73df ("selinux: add AF_UNSPEC and INADDR_ANY checks to selinux_socket_bind()")
-Signed-off-by: Mickaël Salaün <mic@digikod.net>
----
- security/selinux/hooks.c | 4 ++++
- 1 file changed, 4 insertions(+)
+# tc qdisc add dev swp1 ingress
+Error: Egress block dev insert failed.
 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index feda711c6b7b..9fc55973d765 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -4667,6 +4667,10 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
- 				return -EINVAL;
- 			addr4 = (struct sockaddr_in *)address;
- 			if (family_sa == AF_UNSPEC) {
-+				if (sock->sk->__sk_common.skc_family ==
-+					    AF_INET6 &&
-+				    addrlen < SIN6_LEN_RFC2133)
-+					return -EINVAL;
- 				/* see __inet_bind(), we only want to allow
- 				 * AF_UNSPEC if the address is INADDR_ANY
- 				 */
--- 
-2.43.0
+Probably because ingress_tcf_block() ignores the 'cl' argument.
 
+> +
+> +	return 0;
+> +
+> +err_out:
+> +	block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> +	if (block)
+> +		xa_erase(&block->ports, dev->ifindex);
+> +
+> +	return err;
+> +}
 
