@@ -1,134 +1,168 @@
-Return-Path: <netdev+bounces-60453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3910E81F64B
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 10:32:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 512CD81F66B
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 10:44:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D962E1F2268C
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:32:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 033A02824D2
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:44:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B84E63B6;
-	Thu, 28 Dec 2023 09:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254D363C5;
+	Thu, 28 Dec 2023 09:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="FBDmtFGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2161.outbound.protection.outlook.com [40.92.63.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B226863A8;
-	Thu, 28 Dec 2023 09:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tonylu@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VzO1T68_1703755955;
-Received: from localhost(mailfrom:tonylu@linux.alibaba.com fp:SMTPD_---0VzO1T68_1703755955)
-          by smtp.aliyun-inc.com;
-          Thu, 28 Dec 2023 17:32:36 +0800
-Date: Thu, 28 Dec 2023 17:32:34 +0800
-From: Tony Lu <tonylu@linux.alibaba.com>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alibuda@linux.alibaba.com, ubraun@linux.vnet.ibm.com,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net/smc: fix invalid link access in dumping SMC-R
- connections
-Message-ID: <ZY1AssRgaWjLVXuN@TONYMAC-ALIBABA.local>
-Reply-To: Tony Lu <tonylu@linux.alibaba.com>
-References: <1703662835-53416-1-git-send-email-guwen@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6121E63AB
+	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 09:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Kto5VLSJErrAkHZisKw3vCINbF+QMM69i0IHKJelcEjiiRoST9SP6VRyd0+cecj51otpA0VEElIwak9/udmlnLdNshlASRdu3oMMQib+J5bJ2TssUXHTEnBNFVcII3UjUFzOTFzwDIEh2jLt9UXLaM7t4TsSHEI3ue/6QEp74lhWdLGNSf1M4HLZiVucp5xMmMp51NWSveRPWuGAs1UEnIu/IXwZgJtdERoKqgnZ2qIe2QJ3E3iD6yo1CLt/A3X29p/VVwa8kL+uLo329yLbMlNzlIngaqFMqw3DqFGBBcj+L7l/O85xucKLijiCjc8l2uKArAEVDR5wNSksIs0CdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EK8UtmH2Cx1bsvmv1VxWrnGsgIv9PdLCwmvyzgGymvI=;
+ b=cV4ie0ob1LQ+97V4mPBfEMYJ+Su5/M/e5H2kBnrulvtWIP/vupnExF/9j/ODM96hPOyukamZ2qSB/n73iyM40y8qGMMhz8PK3T+YuRjtBcRCtHU4qs1NP1ZXBOUCU6UDPnCGPfAjBCt1thVt/93RzlIDDQvfwwM4BA4fuvFKZz/cpPj1SnWv3MIoffLFjQyZeERI+zKUMtq8cpX+QUciCp8TvTeNa9QeU4QVKxNLnxnzPpHAmZcSSgnKaXMEAZdbW1HdaK3lTWdkCP4lFryjYw7eGqyw0Dy0kmgWLukXUKHoKU4R4BRS1zJoMH6ijVNfzLsOOgomXRMeWWGd5hq5CA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EK8UtmH2Cx1bsvmv1VxWrnGsgIv9PdLCwmvyzgGymvI=;
+ b=FBDmtFGnfxpZru8vZLCeEvcDOh9hzjnq4CkjR+E5BUghhxvyzIu+zWmnVGgVXzozb12uQqNDQczo2iQ9qlUmWIamQDwrAWK2q6Yl1WjTVg7VIIL9C+9j/r9kU+j/W63Dd1hDlGIhHR5/LykSTRGP4Zyfp7HxThW7GAn76u1RJdEhvb6YmWlqvounSh2QPqsbbqeajHw4src92vdGOXC5OcYCskN2QH/Coj9rQ8Ri9m6gjDq3v6UDCqSaapAp69Vrzsr8dwGs7rOu0sun6w4isQ2zEfS5wshEVEE0kPH7skSRgwXmHGLA1E/vAIUn6gKgMPYGZGPU9JHP2pAlVkvR3w==
+Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
+ by SY4P282MB1497.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:c5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.27; Thu, 28 Dec
+ 2023 09:44:43 +0000
+Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::558b:ab0e:b8b1:8cbd]) by MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::558b:ab0e:b8b1:8cbd%4]) with mapi id 15.20.7135.019; Thu, 28 Dec 2023
+ 09:44:43 +0000
+From: Jinjian Song <songjinjian@hotmail.com>
+To: netdev@vger.kernel.org
+Cc: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.com,
+	vsankar@lenovo.com,
+	danielwinkler@google.com,
+	nmarupaka@google.com,
+	joey.zhao@fibocom.com,
+	liuqf@fibocom.com,
+	felix.yan@fibocom.com,
+	Jinjian Song <jinjian.song@fibocom.com>
+Subject: [net-next v3 0/3] net: wwan: t7xx: Add fastboot interface 
+Date: Thu, 28 Dec 2023 17:44:08 +0800
+Message-ID:
+ <MEYP282MB2697AB1903F289B38F25CC5ABB9EA@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [QJwIRoDbirCygRcLEZSIopXIJvAgggcC]
+X-ClientProxiedBy: TYCP301CA0040.JPNP301.PROD.OUTLOOK.COM
+ (2603:1096:400:380::12) To MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:220:14c::12)
+X-Microsoft-Original-Message-ID:
+ <20231228094411.13224-1-songjinjian@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1703662835-53416-1-git-send-email-guwen@linux.alibaba.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MEYP282MB2697:EE_|SY4P282MB1497:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3431c48b-7f7c-4c5e-6c71-08dc07899e38
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	q1Z0ZN1MTQochTxq05+AvZtUXCKY8mqxZtTu5qCoN4F8dAQnPEc4weAOAXtd2zS4J/Nm1ZuwpClf71EH/UyL9NSVwwJsBkKHVuujEwgFlebnRQAdZkZueYXyLrXXDEYumNK+tPj9pX1qsISaEn9bWz+HacxZJUm4PS7GQxWKUokjxXc0e7+4eISZ8gcygtJF6y9WOTZW5unMeA7dCFWKyoWXJSv6zWx6yooVYQQywVEpowwNvkqNnlxz7tMtnGx+/pvzxGhLu9UuBu/EmNeoq7zUfOJcLjuZk97hZU0lPaOZNZy0jVhl/MGSfIm/6mHBnPZL9NjrPT+/uBcp83a0HLWTtQn0AUsrVBJJ9BpQiWCewq2Im5SkfUq3SdcO1phDVpfu7iuY5DyMNUBz8gfvGgCmF6kVBCPJcEOZGyCVWKr/LB7986KTdSvISKnaHEwzIW0bDXW1ZVuO2i/8LTY2bX89H/tWB5A1HDkWvXQ+MbXqryqRFQCYSdHz51CYY/OJpauC8R0OxbBZjFGT1TKpYqKaeR4NELQebY3ZlTKPNKos6dLw2ADxJtt32pQOiyt2
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Gmf9pwZ4GjVRlxBLZBHLwYy7mvhJL2mX1a+oHv6Mlte3wmq/yNartX9iUmxf?=
+ =?us-ascii?Q?aG1Q3pLu1w23f+3sa2QwgOc5mBoPGe0VMIx2VDaPokYTE/9d8zmbev+TEsPz?=
+ =?us-ascii?Q?a54BfJ7qWtKy2HxLY0jE1mdhnqX4H9ao/gDd0BPQvVNIWGjwMXld/tz4TH+k?=
+ =?us-ascii?Q?H2oKvpiLLn232hriwyIIMcbhTRoC6u9Pw3zSGZORWNzEhBxUj1h1z1icOu5q?=
+ =?us-ascii?Q?uxWran+ukFRXS/70bzOgYNcLmpx9sAnUZCa/z+EcAn7uu1kAScTT1qrhLM/G?=
+ =?us-ascii?Q?K5Dmbdpfg4wTv96QGCcBfD+9DIWf2WN+TJ14lWyPOL5ZSr7+CcL8X9/01wbh?=
+ =?us-ascii?Q?uwYAXgC5wyZrSGXCHVlGlJXWQQw3gKE/0W0hdipzi/JYVGeuPTD0n+OrT0W2?=
+ =?us-ascii?Q?4yQgYPVa36u33Dllc0KlLPXxGlgTk06Cvb5XMAoxVvegkPoQyntC72SaNxJb?=
+ =?us-ascii?Q?vGFzn2O7NpSiTKS3HSFJtcCJLg7Z3krWem4RZGoQMmeHQ1QBfmPca2uhk0L5?=
+ =?us-ascii?Q?cCB+EvYOMFJznbYq20E/gf20uYHAQM9gycP6DFEbWaed11gtfhGXbjezv5OX?=
+ =?us-ascii?Q?lyjxYaRWSztLGwYC4LJDnSBze//JMW6TuReOGx4Ay0TXh4ICxUtVxj5yXFYv?=
+ =?us-ascii?Q?275ClBl7Ye/s4nBw4q0guAwQNvxnRP5ikU0CnV40JvabFw1hTMwmfT1zqNhX?=
+ =?us-ascii?Q?/gvq4SPyqM437nfEMxic/ffSZh9huHc8byuipVhO2bTvmVflG9iogjCmtu4P?=
+ =?us-ascii?Q?kX4QpJFQFbBTdJaIWEGOKjsVPSV7kq5nAsLenP26Gt3n4pR4Q0QBQvdEYb8Q?=
+ =?us-ascii?Q?aYXj42XHlw7qMhKy/ZGJX1bNBdD+PSysIKzw1iXodoGORM3S28q8AYz9p1Z8?=
+ =?us-ascii?Q?qlLE3sYgYUMP3/dXQ8wSiM7f2VQ5mLHyh2ccGh8eg2SASG6w5VujwWeELqYT?=
+ =?us-ascii?Q?qFkcwJ1V9Pgj0lFCBYIJPs2TuBFa55nL0ZOG2cQx3w955cY2xHojxHVEXaQB?=
+ =?us-ascii?Q?yXEcJthFnYjo6dI/ZHB61eRE+xd0EWWyQ52FsvAY99+CAzeGodCFMIlgE3mG?=
+ =?us-ascii?Q?2FqWY9U9QpQbMiBgbkwVatEAtrvwhEN3hsSXbjpcx+u99XadzOJSrSWUk9GL?=
+ =?us-ascii?Q?anjYMkWNQvn9sLeOJ29lkbQLXfLv96EUDfMrMXoZCy9kV1mgj+2Xzbub/sdt?=
+ =?us-ascii?Q?t30MLDPLRVvmQ17koFgsDRUunS5QzEMmFRjcnFK3zTRJC+dS1yzOSqfQmDg?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-746f3.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3431c48b-7f7c-4c5e-6c71-08dc07899e38
+X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2023 09:44:43.3034
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY4P282MB1497
 
-On Wed, Dec 27, 2023 at 03:40:35PM +0800, Wen Gu wrote:
-> A crash was found when dumping SMC-R connections. It can be reproduced
-> by following steps:
-> 
-> - environment: two RNICs on both sides.
-> - run SMC-R between two sides, now a SMC_LGR_SYMMETRIC type link group
->   will be created.
-> - set the first RNIC down on either side and link group will turn to
->   SMC_LGR_ASYMMETRIC_LOCAL then.
-> - run 'smcss -R' and the crash will be triggered.
-> 
->  BUG: kernel NULL pointer dereference, address: 0000000000000010
->  #PF: supervisor read access in kernel mode
->  #PF: error_code(0x0000) - not-present page
->  PGD 8000000101fdd067 P4D 8000000101fdd067 PUD 10ce46067 PMD 0
->  Oops: 0000 [#1] PREEMPT SMP PTI
->  CPU: 3 PID: 1810 Comm: smcss Kdump: loaded Tainted: G W   E      6.7.0-rc6+ #51
->  RIP: 0010:__smc_diag_dump.constprop.0+0x36e/0x620 [smc_diag]
->  Call Trace:
->   <TASK>
->   ? __die+0x24/0x70
->   ? page_fault_oops+0x66/0x150
->   ? exc_page_fault+0x69/0x140
->   ? asm_exc_page_fault+0x26/0x30
->   ? __smc_diag_dump.constprop.0+0x36e/0x620 [smc_diag]
->   smc_diag_dump_proto+0xd0/0xf0 [smc_diag]
->   smc_diag_dump+0x26/0x60 [smc_diag]
->   netlink_dump+0x19f/0x320
->   __netlink_dump_start+0x1dc/0x300
->   smc_diag_handler_dump+0x6a/0x80 [smc_diag]
->   ? __pfx_smc_diag_dump+0x10/0x10 [smc_diag]
->   sock_diag_rcv_msg+0x121/0x140
->   ? __pfx_sock_diag_rcv_msg+0x10/0x10
->   netlink_rcv_skb+0x5a/0x110
->   sock_diag_rcv+0x28/0x40
->   netlink_unicast+0x22a/0x330
->   netlink_sendmsg+0x240/0x4a0
->   __sock_sendmsg+0xb0/0xc0
->   ____sys_sendmsg+0x24e/0x300
->   ? copy_msghdr_from_user+0x62/0x80
->   ___sys_sendmsg+0x7c/0xd0
->   ? __do_fault+0x34/0x1a0
->   ? do_read_fault+0x5f/0x100
->   ? do_fault+0xb0/0x110
->   __sys_sendmsg+0x4d/0x80
->   do_syscall_64+0x45/0xf0
->   entry_SYSCALL_64_after_hwframe+0x6e/0x76
-> 
-> When the first RNIC is set down, the lgr->lnk[0] will be cleared and an
-> asymmetric link will be allocated in lgr->link[SMC_LINKS_PER_LGR_MAX - 1]
-> by smc_llc_alloc_alt_link(). Then when we try to dump SMC-R connections
-> in __smc_diag_dump(), the invalid lgr->lnk[0] will be accessed, resulting
-> in this issue. So fix it by accessing the right link.
-> 
-> Fixes: f16a7dd5cf27 ("smc: netlink interface for SMC sockets")
-> Reported-by: henaumars <henaumars@sina.com>
-> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=7616
+From: Jinjian Song <jinjian.song@fibocom.com>
 
-What about using Link: http... here?
+Add support for t7xx WWAN device firmware flashing & coredump collection
+using fastboot interface.
 
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Using fastboot protocol command through /dev/wwan0fastboot0 WWAN port to 
+support firmware flashing and coredump collection, userspace get device
+mode from /sys/bus/pci/devices/${bdf}/t7xx_mode.
 
-Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
+Jinjian Song (3):
+  wwan: core: Add WWAN fastboot port type
+  net: wwan: t7xx: Add sysfs attribute for device state machine
+  net: wwan: t7xx: Add fastboot WWAN port
 
-> ---
->  net/smc/smc_diag.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
-> index a584613aca12..5cc376834c57 100644
-> --- a/net/smc/smc_diag.c
-> +++ b/net/smc/smc_diag.c
-> @@ -153,8 +153,7 @@ static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
->  			.lnk[0].link_id = link->link_id,
->  		};
->  
-> -		memcpy(linfo.lnk[0].ibname,
-> -		       smc->conn.lgr->lnk[0].smcibdev->ibdev->name,
-> +		memcpy(linfo.lnk[0].ibname, link->smcibdev->ibdev->name,
->  		       sizeof(link->smcibdev->ibdev->name));
->  		smc_gid_be16_convert(linfo.lnk[0].gid, link->gid);
->  		smc_gid_be16_convert(linfo.lnk[0].peer_gid, link->peer_gid);
-> -- 
-> 2.43.0
+ drivers/net/wwan/t7xx/Makefile             |   1 +
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.c     |  47 +++++--
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.h     |  18 ++-
+ drivers/net/wwan/t7xx/t7xx_modem_ops.c     |   5 +-
+ drivers/net/wwan/t7xx/t7xx_pci.c           |  88 +++++++++++-
+ drivers/net/wwan/t7xx/t7xx_pci.h           |  11 ++
+ drivers/net/wwan/t7xx/t7xx_port.h          |   4 +
+ drivers/net/wwan/t7xx/t7xx_port_fastboot.c | 155 +++++++++++++++++++++
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c    |  89 ++++++++++--
+ drivers/net/wwan/t7xx/t7xx_port_proxy.h    |  12 ++
+ drivers/net/wwan/t7xx/t7xx_port_wwan.c     |   5 +-
+ drivers/net/wwan/t7xx/t7xx_reg.h           |  28 +++-
+ drivers/net/wwan/t7xx/t7xx_state_monitor.c | 125 ++++++++++++++---
+ drivers/net/wwan/t7xx/t7xx_state_monitor.h |   1 +
+ drivers/net/wwan/wwan_core.c               |   4 +
+ include/linux/wwan.h                       |   2 +
+ 16 files changed, 537 insertions(+), 58 deletions(-)
+ create mode 100644 drivers/net/wwan/t7xx/t7xx_port_fastboot.c
+
+-- 
+2.34.1
+
 
