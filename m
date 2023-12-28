@@ -1,474 +1,263 @@
-Return-Path: <netdev+bounces-60447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1938781F5EB
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:25:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1E781F5ED
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:26:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0888C1C21D29
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 08:25:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52DAA281F2E
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 08:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B85A5393;
-	Thu, 28 Dec 2023 08:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0530C5253;
+	Thu, 28 Dec 2023 08:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EZVvo6eC"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QqEYwy2p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260655244;
-	Thu, 28 Dec 2023 08:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703751893; x=1735287893;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=aQQL/E4WC93dU9lJwbfBkAH12tiADbFtXqIQs6HL9SY=;
-  b=EZVvo6eCDYX7wGFalYFRWTlLMpGX6ZUrykc1H2dta7zoU3gH7dZUf0xX
-   Fr8Qd5+XaehR3BdZaIYr1ZSwbOlcTCLiOl2+RWVP0oNvcLlhb3dsIOiBY
-   o73crIs3CmMQ7K7JF+RP1HezXzxy4+2ELRTVmt6aoNgorMf2Wa/mSsM5K
-   nD/5taC1qH3DXGAkmSgcR4xfxlVVz8LFnN4L2upVxguV/tU9q1YhDyuOw
-   bhDt+uhan4dXbGC5GSr71sqJyXu1TDOIiVsNa8WPN/2PaWi8++q8zmvj3
-   CG8wzCzuFKoxIaCuRunRFLB+kdecSzIppOtrNpPBnViYnZXfyf9OAJ+/R
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="395418161"
-X-IronPort-AV: E=Sophos;i="6.04,311,1695711600"; 
-   d="scan'208";a="395418161"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 00:24:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,311,1695711600"; 
-   d="scan'208";a="26801795"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Dec 2023 00:24:51 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 28 Dec 2023 00:24:50 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 28 Dec 2023 00:24:50 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 28 Dec 2023 00:24:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TxsvZpvb9IcKiTSbrcZmhfYZnUrvs2nQcSpRnkvnGvWCNBCugBCsWUy5htWQ3dg5JooaZ64vMoW/WLwe7A8FnXDIlxnMbArWwT+ahWDMGABWjyCChU98kicItEyw2AK87jpATZy5MtlmTu/w6kfutEjSQx5YyYSKF//BFSrrYWVgd13z9UYVg76ijzXYsXlyEp03asJDTsiqy4lQhVafa2S/7UvScCMj4taOqDeWMZ/9yhixiGS2TIGOsRsL3X+z1cFMjRUwUMZjYgKA5a+3oaPAo4bfCl0MXYEXFVICBv4qQqyMpLF0vqcQcSSVnU+/Zq4ngpzYYyf2BGEaARX3tQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b1TG1u4FB7ik/I9HjCYW5nF8W9rUzOkSlMiiqbuhEFE=;
- b=GI2zDiEZ1govYqqWxonDTmGo3mtwTR1nZP1fSr3GmSTMkxPgNcHPrWabif7c/uHeBN7kxDQTm1ZlNav67nGuBUlskzMNXZ11BCTVtm7deTqHNuI3rcICd13plk/wW3mb8STsdXOiYxDaL0+6HgJbNl8R1TKq7YI7rNu3g7DY1oXmkhYF8ZSlcuGcHW78X9zvtsdHEhkgCOdlMcf5TT0hqYE+4qOLmIa5hg6CCRcdYh0bwa8n43Dnz2GbqjopX9IKL42zNB5jDvL7Ovwbz3OD02t7vZBoVgo75MP2bq7llYJXwx/Sq+ugdEM6KzKMrLvZVXSrf7BeyKyWUzY3st6rDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by SA0PR11MB4750.namprd11.prod.outlook.com (2603:10b6:806:9d::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.20; Thu, 28 Dec
- 2023 08:24:48 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::ef7b:6435:f727:4d5c]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::ef7b:6435:f727:4d5c%3]) with mapi id 15.20.7113.026; Thu, 28 Dec 2023
- 08:24:48 +0000
-Message-ID: <95b7ee65-5661-6529-07d3-ce13968a3c25@intel.com>
-Date: Thu, 28 Dec 2023 09:24:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH net-next] net: phy: Cleanup struct mdio_driver_common
-To: Yajun Deng <yajun.deng@linux.dev>
-CC: <andrew@lunn.ch>, <olteanv@gmail.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <rmk+kernel@armlinux.org.uk>, <kabel@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-phy@lists.infradead.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-References: <20231228072350.1294425-1-yajun.deng@linux.dev>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20231228072350.1294425-1-yajun.deng@linux.dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0099.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a9::17) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587C353BD
+	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 08:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-67f7bd86cafso52553866d6.0
+        for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 00:25:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1703751957; x=1704356757; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bTf05sRtDD02rhQUM0cmhOWmh4bz9nrpLiv20yqLJwA=;
+        b=QqEYwy2pAu87/vBkOTdv48x+3kBtWNDR42I0xFnrZD0vb5qPHZVdxULatT2KqQO8FB
+         zAerrENd96GLUPn74v8D3Wf6fFQMG7rsp3aw4ael+Ey8yMJi30FVexbcXDrAtFlC5ALk
+         RXhJvNK1ZF1dFMwOkgzSzIkhv2vx51FfaW8Tw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703751957; x=1704356757;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bTf05sRtDD02rhQUM0cmhOWmh4bz9nrpLiv20yqLJwA=;
+        b=KlQnysZC8EEzEEWnfHS3HYi3CnmDGNEZEmaPfVI+N/giJpjxa8nB81cdbn5N8llpzT
+         0k9P8QLzvJWsMvEy3J326DAcZQhgsb830IAhsEtrsboW0+00h+xOR+29IRpm65/689DV
+         1FYdjHgqVOIscWJ8+3lhs1HFZo2mMKuuHEvrIZXPgWqCdxdsURB01wQmWoayEVRjnUun
+         AV44eI7qAttuD3KlfKkUW2HPvwwqxtkDR3ipV1V4jDhdp3tSsOAAxtXeM+LVytravYoU
+         tEw/oAsDnTuASkw5Wk7aQII0+IIoZKKOIvtGnVnZM6K1Z9Ry27MKUPTUd7EJjBnF6evD
+         j87Q==
+X-Gm-Message-State: AOJu0YzPZjjjsd3Zs2BjPkwLTSN1aPZEqkEeyMVhFjWeWMUrU1unFTlS
+	z83AIesxuUWtkc4kkpDZocV4ARb7LgSZ
+X-Google-Smtp-Source: AGHT+IHA3geIMQO4Hy6iHVm9WdGJTKLb+tNqWPjwatGqUGyUtXSRVORSWEWB9S7VR7N31KMfkEZRJg==
+X-Received: by 2002:a05:6214:268c:b0:67a:d7d5:9512 with SMTP id gm12-20020a056214268c00b0067ad7d59512mr15223175qvb.126.1703751957117;
+        Thu, 28 Dec 2023 00:25:57 -0800 (PST)
+Received: from [192.168.159.133] ([37.175.83.47])
+        by smtp.gmail.com with ESMTPSA id v16-20020a0ced50000000b0067f73198eb4sm6169982qvq.3.2023.12.28.00.25.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Dec 2023 00:25:56 -0800 (PST)
+Message-ID: <490c4671-608f-489b-963a-a42ca839c404@broadcom.com>
+Date: Thu, 28 Dec 2023 09:25:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SA0PR11MB4750:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d90a34a-ac0d-47bc-d31d-08dc077e745a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pYIVdfoRChmwGwoPr50zvu0QctUHWPKVUtOquJwTwgi/leInXT8Ys5VhXZMam4/LPOkYg0pjIIzB3kENI8zVIU87+L2pQF2YAOIkdTAUCaRnSRG+6bvX31h3JNL0KkDDIegrQYXVGHP7/F0PJeTCHrTSrnkDx04x7Gwa+3VHU062gfCv3Mnd9wCrg3nwj+nhrMrm5yU4uG/tQ+UlBXDqkXodMkg57QTDDAxrS2i7Dr0s82olC52zsHp/vPnhrRXoDXeJV2Bti/e0OIo0YpPUyAsvlPE3se7DqgUE/PgpZh3xRTGIXvPWhJ06k94zW4u9RJf10nq7qTGjsEExdHmxJux5Tkm3uCDsglY8oBKISvN0tbTOhObdJxQ3ht84RwaQtSPxugRozyi4ESLMovQzL+5Q1m0F21ZfxKigkr0Mh8LISZyp5XNZEUMAJD7R3EdlmgXRTtBeiMZITzMWXSMlfP8X6PgiWYtXPuz7WqTmdzgV9+0BS2GRZjcYfnEmxahP48OnEk/V4GtTyP+mOLcsdvTCuJXvOWQCJHvBCbcjVlVc7qDvqgo9VJ6k6wyjPpd2lmXA6cEzQJAx0u2yx1mbvY4cDpBXzpfa2bw2Be9nYUaVIr6M1nWGpwcccbaxLzfr
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(376002)(346002)(366004)(396003)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(36756003)(31686004)(82960400001)(41300700001)(83380400001)(38100700002)(66946007)(66476007)(8936002)(8676002)(6916009)(2616005)(66556008)(7416002)(5660300002)(30864003)(316002)(4326008)(6486002)(86362001)(31696002)(26005)(6512007)(6666004)(478600001)(6506007)(966005)(53546011)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NE9yQlQ4OG1zRTh3NVhsSEVWc0ZIZ2lveEJGL2V5Y3ROc2F3MjBra0ZQZFpy?=
- =?utf-8?B?WG9qMGJhaWNvd205ZjVWWkNGSlRJazVGR3MvQytrWmVGbVNacHNQR0ZQK2kw?=
- =?utf-8?B?VTVpUU10VnExMmtrUTlDSHdRM1QzZzMzQTFXdldlcE9aVVQzUWJaVDN5Slh2?=
- =?utf-8?B?ckFlME00Tnl0ZU9ZOWZ1cG9NZ2lCSG85K0JObEdqbHdMWkNPUks5M1lQN3Y4?=
- =?utf-8?B?T05lL0ZwODdzTi9SbEs3NEx1TFBueE5LeXNOUENRdW40a2FGMUdvQ2Z5NE9F?=
- =?utf-8?B?bmxSelNrZ1BXU0RaTytSVGR5bCtMSVpWWjBEQUNMd0hZQ1U3YlpzbFZsR1ZF?=
- =?utf-8?B?SFc2ak1ySC9ISlZXd0JBYVhIa1MrY1BRdDE4cWJPS015Q0ZCV2VkQ1o0ZVlt?=
- =?utf-8?B?MGpBbjRtQjRtVW1rUWpEQmE3cEZETngzblZ3QzVaNEdqanlsM2NtR2ozaXUx?=
- =?utf-8?B?OStaVmd6ZW1HQ2ErNWR1cjdFSnYzeTNjOGdyMWlKYmtEUnJweTRTT2xuaTVK?=
- =?utf-8?B?alB2UVloaUd6UjQvd0pRam1RdFJ4T1FGQmx1Zktub1ZOREt1R2VDNThuY21o?=
- =?utf-8?B?dDZvaHpkUUlHanZTbFBSVHNrMDlhS3NCRzltaHVCR09zbUJQRllza1JFV28x?=
- =?utf-8?B?MWx1NU9HcXU3cGJVaTFqV3B6VmFCOWoyTWF5TGNtc2FDQWlySkdZVm9oUSt6?=
- =?utf-8?B?a05vWFFPWjJ3YXV0ZDB6K3pjbUxLM2JzQkxyYSt0OFY4VUdpU3pFZG1QbjNS?=
- =?utf-8?B?Y2c3RkpWTXdZMVZNK2U1bkJkSmNkaUhpUDRoOVJxZ2h4NGJBK2lldWcwUjJn?=
- =?utf-8?B?cURBeTdSTVpHb0ZwRGQyb2pkWW1LWitXV3VNNE4vQkd6ZUtrRHdZNzZhZ1pZ?=
- =?utf-8?B?bm9sQys4c2c5eGVtWmpzdXV5NkdYTE54cEFRQ0pvV2F4T2czRTZDcGk4dFh4?=
- =?utf-8?B?R0dXVW1tT0xlNW9YYVljYVRWZzRjWjRLclZSdXZBYi9qa2oxZW04eHRTUUZl?=
- =?utf-8?B?ZzJaRWVhMTNndHN6NnM0eG8reDBFRjc1b0ZwaFJNWngydnZzNGF2cjhDOGZw?=
- =?utf-8?B?SGt3WkVVWHk5TmZOODlVRU9MbXVxMDRJdThZL1NaZFJnU3JueVViMnZzc1E4?=
- =?utf-8?B?Wk1PYkZLTWV4MUpIanVUL0dJMmZRblc1Y09rZnVBbVBuRlhRVHJ5T1hvSUJV?=
- =?utf-8?B?RzZOUGc3alBZc01FemRHUWk0ditkdFVLSk9MMVU2b1MrcmlSOHpqT1pOSXVu?=
- =?utf-8?B?Tmx4SGM3eE9SV0p4ZmwvZjF4KzZ2NkxOZGl5OEVjWlRQMUozeWVMVGp3endt?=
- =?utf-8?B?UkRYMjNUT05TeDdBTFpNWnlQWVAxKzhDcE54blV6TmZWUVgzQ28wRVBTL0Jh?=
- =?utf-8?B?dEJIaUNYTzFlNmdnelM1TVFIdHZFNm5UTy9vZkNtbkViRkJVRlJyRERDNXJX?=
- =?utf-8?B?aWJvNFlCTGx1REY2ZVZMdzZvUWRkYXZydGpwNlBPc0w5c3R6VDVhQjRmNWEw?=
- =?utf-8?B?Z0s1NElDc1NsU1prb0srWDhrSUF0K0FRT01icTNYaUlza0hXdG1mZ3Q1ajh6?=
- =?utf-8?B?UU5DakJMR0V2cGNnbjdWR29YUTZmYTVTZTNCZHNUaHdQVU5rcTd4NWdrQVlz?=
- =?utf-8?B?VFdKUnc1bi9zOFQ1aG11ZWlWS1Y0Qk4wZUlhQkJhSkl4TmlSbFdGeEk5dXlv?=
- =?utf-8?B?eUNSRTFmOXd5a0U0T1ZueHZXTytrU0FQdEVMUFhhS1BwWjR4dkt0RmFJeW1y?=
- =?utf-8?B?SFpWSGtqRlRiV2gzcGs4K1N5MytiNURHeENaODl1WVNLaG5iTkRPNm1VKzZm?=
- =?utf-8?B?bjZ1bk1ZTDZrQkU3MFJMMW9pNDlLd05GMjJZNkVwNi9PN2V3ekhReWw3V2FU?=
- =?utf-8?B?dHBOSXVmaVZFZy9FYkVRNi81ZGJoMUIrOExYQ01FN3E5UmVSUUFFdnBENjNP?=
- =?utf-8?B?QzFyS241K3A1TVV0cUdPa0tFeFQvQm1jTEhQcGFxRkMxazJIdG1NeStsRHFM?=
- =?utf-8?B?ejhOdnI2dHRpMkFhdGhkTlY4VHNvc09WYnJ3M3ZNZW1NckV5bExoQkJsUDUz?=
- =?utf-8?B?L3FVV3J1OEFSTnVBWmpUbS93Z1dJbDhYZGkwbGwzM2dXTmtjSnZEUlI0Sk00?=
- =?utf-8?B?cnRrTGdTcjNvMXZLTXZYdzVyUlBtWVdnRXhzZkhWZ252ZGt6OHF3VmVjekxV?=
- =?utf-8?B?b2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d90a34a-ac0d-47bc-d31d-08dc077e745a
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2023 08:24:48.0498
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ju5apRSJj1yiACQKvsds1YkvBCpDw/3FP7xis9hW7CwEaVQHkTyAp/7BG99FyqT6wpiGuVMjFCRpg9B1P3pdEzc1s1Rgblbb49BVXhKFmwc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4750
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: bcmgenet: Fix FCS generation for fragmented
+ skbuffs
+To: Adrian Cinal <adriancinal1@gmail.com>, Doug Berger <opendmb@gmail.com>
+Cc: netdev@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com
+References: <55c522f9-503e-4adf-84cc-1ccc1fb45a9b@broadcom.com>
+ <20231227120601.735527-1-adriancinal1@gmail.com>
+ <4b3d4c59-70d8-41b7-954e-8f7294026516@gmail.com>
+ <CAPxJ3Bd1hPpAMXs1-o3CQcQ2H3XTaH_Z4GEpfvAa-0XnZMS0Xg@mail.gmail.com>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ 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
+In-Reply-To: <CAPxJ3Bd1hPpAMXs1-o3CQcQ2H3XTaH_Z4GEpfvAa-0XnZMS0Xg@mail.gmail.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000355f35060d8daac1"
 
-On 12/28/23 08:23, Yajun Deng wrote:
-> The struct mdio_driver_common is a wrapper for driver-model structure,
-> it contains device_driver and flags. There are only struct phy_driver
-> and mdio_driver that use it. The flags is used to distinguish between
-> struct phy_driver and mdio_driver.
+--000000000000355f35060d8daac1
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+
+
+On 12/28/2023 9:10 AM, Adrian Cinal wrote:
+> On Wed, 27 Dec 2023 at 21:39, Doug Berger <opendmb@gmail.com> wrote:
+>>
+>> On 12/27/2023 4:04 AM, Adrian Cinal wrote:
+>>> The flag DMA_TX_APPEND_CRC was written to the first (instead of the last)
+>>> DMA descriptor in the TX path, with each descriptor corresponding to a
+>>> single skbuff fragment (or the skbuff head). This led to packets with no
+>>> FCS appearing on the wire if the kernel allocated the packet in fragments,
+>>> which would always happen when using PACKET_MMAP/TPACKET
+>>> (cf. tpacket_fill_skb() in af_packet.c).
+>>>
+>>> Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
+>>> Signed-off-by: Adrian Cinal <adriancinal1@gmail.com>
+>>> ---
+>>>    drivers/net/ethernet/broadcom/genet/bcmgenet.c | 10 +++++-----
+>>>    1 file changed, 5 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+>>> index 1174684a7f23..df4b0e557c76 100644
+>>> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+>>> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+>>> @@ -2137,16 +2137,16 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>                len_stat = (size << DMA_BUFLENGTH_SHIFT) |
+>>>                           (priv->hw_params->qtag_mask << DMA_TX_QTAG_SHIFT);
+>>>
+>>> -             /* Note: if we ever change from DMA_TX_APPEND_CRC below we
+>>> -              * will need to restore software padding of "runt" packets
+>>> -              */
+>>>                if (!i) {
+>>> -                     len_stat |= DMA_TX_APPEND_CRC | DMA_SOP;
+>>> +                     len_stat |= DMA_SOP;
+>>>                        if (skb->ip_summed == CHECKSUM_PARTIAL)
+>>>                                len_stat |= DMA_TX_DO_CSUM;
+>>>                }
+>>> +             /* Note: if we ever change from DMA_TX_APPEND_CRC below we
+>>> +              * will need to restore software padding of "runt" packets
+>>> +              */
+>>>                if (i == nr_frags)
+>>> -                     len_stat |= DMA_EOP;
+>>> +                     len_stat |= DMA_TX_APPEND_CRC | DMA_EOP;
+>>>
+>>>                dmadesc_set(priv, tx_cb_ptr->bd_addr, mapping, len_stat);
+>>>        }
+>> Hmm... this is a little surprising since the documentation is actually
+>> pretty specific that the hardware signal derived from this flag be set
+>> along with the SOP signal.
+>>
+>> Based on that I think I would prefer the flag to be set for all
+>> descriptors of a packet rather than just the last, but let me look into
+>> this a little further.
+>>
+>> Thanks for bringing this to my attention,
+>>       Doug
 > 
-> We can test that if probe of device_driver is equal to phy_probe. This
-> way, the struct mdio_driver_common is no longer needed, and struct
-> phy_driver and usb_mdio_driver will be consistent with other driver
-> structs.
+> Hello,
 > 
-> Cleanup struct mdio_driver_common and introduce is_phy_driver(). Use
-> is_phy_driver() test that if the driver is a phy or not.
-> 
-> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
-> ---
->   drivers/net/dsa/b53/b53_mdio.c          |  2 +-
->   drivers/net/dsa/dsa_loop.c              |  2 +-
->   drivers/net/dsa/lan9303_mdio.c          |  2 +-
->   drivers/net/dsa/microchip/ksz8863_smi.c |  2 +-
->   drivers/net/dsa/mt7530-mdio.c           |  2 +-
->   drivers/net/dsa/mv88e6060.c             |  2 +-
->   drivers/net/dsa/mv88e6xxx/chip.c        |  2 +-
->   drivers/net/dsa/qca/ar9331.c            |  2 +-
->   drivers/net/dsa/qca/qca8k-8xxx.c        |  2 +-
->   drivers/net/dsa/realtek/realtek-mdio.c  |  2 +-
->   drivers/net/dsa/xrs700x/xrs700x_mdio.c  |  2 +-
->   drivers/net/phy/mdio_bus.c              |  2 +-
->   drivers/net/phy/mdio_device.c           | 21 +++++++--------
->   drivers/net/phy/phy_device.c            | 35 ++++++++++++++-----------
->   drivers/net/phy/xilinx_gmii2rgmii.c     |  2 +-
->   drivers/phy/broadcom/phy-bcm-ns-usb3.c  |  8 +++---
->   drivers/phy/broadcom/phy-bcm-ns2-pcie.c |  8 +++---
->   include/linux/mdio.h                    | 16 ++---------
->   include/linux/phy.h                     |  9 +++----
->   19 files changed, 54 insertions(+), 69 deletions(-)
-> 
+> I confirm that it works just as well when the flag is set for all
+> descriptors rather than just the last. Tested on a BCM2711.
 
-some nitpicks from me,
-otherwise looks fine:
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Could you share how you triggered the problematic path? Thanks!
+-- 
+Florian
 
-BTW, please send v2 after winter break:
-https://patchwork.hopto.org/net-next.html
+--000000000000355f35060d8daac1
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-
-> diff --git a/drivers/net/dsa/b53/b53_mdio.c b/drivers/net/dsa/b53/b53_mdio.c
-> index 897e5e8b3d69..1ececa4d44e4 100644
-> --- a/drivers/net/dsa/b53/b53_mdio.c
-> +++ b/drivers/net/dsa/b53/b53_mdio.c
-> @@ -392,7 +392,7 @@ static struct mdio_driver b53_mdio_driver = {
->   	.probe	= b53_mdio_probe,
->   	.remove	= b53_mdio_remove,
->   	.shutdown = b53_mdio_shutdown,
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name = "bcm53xx",
->   		.of_match_table = b53_of_match,
->   	},
-> diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
-> index c70ed67cc188..3f885878be3a 100644
-> --- a/drivers/net/dsa/dsa_loop.c
-> +++ b/drivers/net/dsa/dsa_loop.c
-> @@ -375,7 +375,7 @@ static void dsa_loop_drv_shutdown(struct mdio_device *mdiodev)
->   }
->   
->   static struct mdio_driver dsa_loop_drv = {
-> -	.mdiodrv.driver	= {
-> +	.driver	= {
->   		.name	= "dsa-loop",
->   	},
->   	.probe	= dsa_loop_drv_probe,
-> diff --git a/drivers/net/dsa/lan9303_mdio.c b/drivers/net/dsa/lan9303_mdio.c
-> index 167a86f39f27..7cb7e2b1478a 100644
-> --- a/drivers/net/dsa/lan9303_mdio.c
-> +++ b/drivers/net/dsa/lan9303_mdio.c
-> @@ -162,7 +162,7 @@ static const struct of_device_id lan9303_mdio_of_match[] = {
->   MODULE_DEVICE_TABLE(of, lan9303_mdio_of_match);
->   
->   static struct mdio_driver lan9303_mdio_driver = {
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name = "LAN9303_MDIO",
->   		.of_match_table = lan9303_mdio_of_match,
->   	},
-> diff --git a/drivers/net/dsa/microchip/ksz8863_smi.c b/drivers/net/dsa/microchip/ksz8863_smi.c
-> index 5711a59e2ac9..c788cadd7595 100644
-> --- a/drivers/net/dsa/microchip/ksz8863_smi.c
-> +++ b/drivers/net/dsa/microchip/ksz8863_smi.c
-> @@ -213,7 +213,7 @@ static struct mdio_driver ksz8863_driver = {
->   	.probe	= ksz8863_smi_probe,
->   	.remove	= ksz8863_smi_remove,
->   	.shutdown = ksz8863_smi_shutdown,
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name	= "ksz8863-switch",
->   		.of_match_table = ksz8863_dt_ids,
->   	},
-> diff --git a/drivers/net/dsa/mt7530-mdio.c b/drivers/net/dsa/mt7530-mdio.c
-> index 088533663b83..7315654a6757 100644
-> --- a/drivers/net/dsa/mt7530-mdio.c
-> +++ b/drivers/net/dsa/mt7530-mdio.c
-> @@ -258,7 +258,7 @@ static struct mdio_driver mt7530_mdio_driver = {
->   	.probe  = mt7530_probe,
->   	.remove = mt7530_remove,
->   	.shutdown = mt7530_shutdown,
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name = "mt7530-mdio",
->   		.of_match_table = mt7530_of_match,
->   	},
-> diff --git a/drivers/net/dsa/mv88e6060.c b/drivers/net/dsa/mv88e6060.c
-> index 294312b58e4f..5925f23e7ab3 100644
-> --- a/drivers/net/dsa/mv88e6060.c
-> +++ b/drivers/net/dsa/mv88e6060.c
-> @@ -367,7 +367,7 @@ static struct mdio_driver mv88e6060_driver = {
->   	.probe	= mv88e6060_probe,
->   	.remove = mv88e6060_remove,
->   	.shutdown = mv88e6060_shutdown,
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name = "mv88e6060",
->   		.of_match_table = mv88e6060_of_match,
->   	},
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-> index 383b3c4d6f59..4f24699264d1 100644
-> --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> @@ -7258,7 +7258,7 @@ static struct mdio_driver mv88e6xxx_driver = {
->   	.probe	= mv88e6xxx_probe,
->   	.remove = mv88e6xxx_remove,
->   	.shutdown = mv88e6xxx_shutdown,
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name = "mv88e6085",
->   		.of_match_table = mv88e6xxx_of_match,
->   		.pm = &mv88e6xxx_pm_ops,
-> diff --git a/drivers/net/dsa/qca/ar9331.c b/drivers/net/dsa/qca/ar9331.c
-> index 8d9d271ac3af..da392d60c9e7 100644
-> --- a/drivers/net/dsa/qca/ar9331.c
-> +++ b/drivers/net/dsa/qca/ar9331.c
-> @@ -1122,7 +1122,7 @@ static struct mdio_driver ar9331_sw_mdio_driver = {
->   	.probe = ar9331_sw_probe,
->   	.remove = ar9331_sw_remove,
->   	.shutdown = ar9331_sw_shutdown,
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name = AR9331_SW_NAME,
->   		.of_match_table = ar9331_sw_of_match,
->   	},
-> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-> index ec57d9d52072..fe396397f405 100644
-> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
-> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-> @@ -2187,7 +2187,7 @@ static struct mdio_driver qca8kmdio_driver = {
->   	.probe  = qca8k_sw_probe,
->   	.remove = qca8k_sw_remove,
->   	.shutdown = qca8k_sw_shutdown,
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name = "qca8k",
->   		.of_match_table = qca8k_of_match,
->   		.pm = &qca8k_pm_ops,
-> diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
-> index 292e6d087e8b..8e6a951b391c 100644
-> --- a/drivers/net/dsa/realtek/realtek-mdio.c
-> +++ b/drivers/net/dsa/realtek/realtek-mdio.c
-> @@ -274,7 +274,7 @@ static const struct of_device_id realtek_mdio_of_match[] = {
->   MODULE_DEVICE_TABLE(of, realtek_mdio_of_match);
->   
->   static struct mdio_driver realtek_mdio_driver = {
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name = "realtek-mdio",
->   		.of_match_table = realtek_mdio_of_match,
->   	},
-> diff --git a/drivers/net/dsa/xrs700x/xrs700x_mdio.c b/drivers/net/dsa/xrs700x/xrs700x_mdio.c
-> index 5f7d344b5d73..1a76d9d49f13 100644
-> --- a/drivers/net/dsa/xrs700x/xrs700x_mdio.c
-> +++ b/drivers/net/dsa/xrs700x/xrs700x_mdio.c
-> @@ -164,7 +164,7 @@ static const struct of_device_id __maybe_unused xrs700x_mdio_dt_ids[] = {
->   MODULE_DEVICE_TABLE(of, xrs700x_mdio_dt_ids);
->   
->   static struct mdio_driver xrs700x_mdio_driver = {
-> -	.mdiodrv.driver = {
-> +	.driver = {
->   		.name	= "xrs700x-mdio",
->   		.of_match_table = of_match_ptr(xrs700x_mdio_dt_ids),
->   	},
-> diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-> index 6cf73c15635b..a1092c641d14 100644
-> --- a/drivers/net/phy/mdio_bus.c
-> +++ b/drivers/net/phy/mdio_bus.c
-> @@ -1342,7 +1342,7 @@ static int mdio_bus_match(struct device *dev, struct device_driver *drv)
->   	struct mdio_device *mdio = to_mdio_device(dev);
->   
->   	/* Both the driver and device must type-match */
-> -	if (!(mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY) !=
-> +	if (!(is_phy_driver(&mdiodrv->driver)) !=
->   	    !(mdio->flags & MDIO_DEVICE_FLAG_PHY))
-
-you could remove one pair of parens, and even change condition to:
-   if (is_phy_driver(&mdiodrv->driver) == !(mdio->flags &
-       MDIO_DEVICE_FLAG_PHY))
-
-
->   		return 0;
->   
-> diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
-> index 73f6539b9e50..16232e7a1255 100644
-> --- a/drivers/net/phy/mdio_device.c
-> +++ b/drivers/net/phy/mdio_device.c
-> @@ -40,7 +40,7 @@ int mdio_device_bus_match(struct device *dev, struct device_driver *drv)
->   	struct mdio_device *mdiodev = to_mdio_device(dev);
->   	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
->   
-> -	if (mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY)
-> +	if (is_phy_driver(&mdiodrv->driver))
->   		return 0;
->   
->   	return strcmp(mdiodev->modalias, drv->name) == 0;
-> @@ -203,20 +203,19 @@ static void mdio_shutdown(struct device *dev)
->    */
->   int mdio_driver_register(struct mdio_driver *drv)
->   {
-> -	struct mdio_driver_common *mdiodrv = &drv->mdiodrv;
->   	int retval;
->   
-> -	pr_debug("%s: %s\n", __func__, mdiodrv->driver.name);
-> +	pr_debug("%s: %s\n", __func__, drv->driver.name);
->   
-> -	mdiodrv->driver.bus = &mdio_bus_type;
-> -	mdiodrv->driver.probe = mdio_probe;
-> -	mdiodrv->driver.remove = mdio_remove;
-> -	mdiodrv->driver.shutdown = mdio_shutdown;
-> +	drv->driver.bus = &mdio_bus_type;
-> +	drv->driver.probe = mdio_probe;
-> +	drv->driver.remove = mdio_remove;
-> +	drv->driver.shutdown = mdio_shutdown;
->   
-> -	retval = driver_register(&mdiodrv->driver);
-> +	retval = driver_register(&drv->driver);
->   	if (retval) {
->   		pr_err("%s: Error %d in registering driver\n",
-> -		       mdiodrv->driver.name, retval);
-> +		       drv->driver.name, retval);
->   
->   		return retval;
->   	}
-> @@ -227,8 +226,6 @@ EXPORT_SYMBOL(mdio_driver_register);
->   
->   void mdio_driver_unregister(struct mdio_driver *drv)
->   {
-> -	struct mdio_driver_common *mdiodrv = &drv->mdiodrv;
-> -
-> -	driver_unregister(&mdiodrv->driver);
-> +	driver_unregister(&drv->driver);
->   }
->   EXPORT_SYMBOL(mdio_driver_unregister);
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> index 3611ea64875e..55494a345bd4 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
-> @@ -529,7 +529,7 @@ static int phy_bus_match(struct device *dev, struct device_driver *drv)
->   	const int num_ids = ARRAY_SIZE(phydev->c45_ids.device_ids);
->   	int i;
->   
-> -	if (!(phydrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY))
-> +	if (!(is_phy_driver(&phydrv->driver)))
-
-here parens are redundant too
-
->   		return 0;
->   
->   	if (phydrv->match_phy_device)
-> @@ -1456,9 +1456,9 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
->   	 */
->   	if (!d->driver) {
->   		if (phydev->is_c45)
-> -			d->driver = &genphy_c45_driver.mdiodrv.driver;
-> +			d->driver = &genphy_c45_driver.driver;
->   		else
-> -			d->driver = &genphy_driver.mdiodrv.driver;
-> +			d->driver = &genphy_driver.driver;
->   
->   		using_genphy = true;
->   	}
-> @@ -1638,14 +1638,14 @@ static bool phy_driver_is_genphy_kind(struct phy_device *phydev,
->   bool phy_driver_is_genphy(struct phy_device *phydev)
->   {
->   	return phy_driver_is_genphy_kind(phydev,
-> -					 &genphy_driver.mdiodrv.driver);
-> +					 &genphy_driver.driver);
->   }
->   EXPORT_SYMBOL_GPL(phy_driver_is_genphy);
->   
->   bool phy_driver_is_genphy_10g(struct phy_device *phydev)
->   {
->   	return phy_driver_is_genphy_kind(phydev,
-> -					 &genphy_c45_driver.mdiodrv.driver);
-> +					 &genphy_c45_driver.driver);
-
-now it fits into one line (same for phy_driver_is_genphy())
-
->   }
->   EXPORT_SYMBOL_GPL(phy_driver_is_genphy_10g);
-
-[snip]
-
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILpV5xj++sr/dIwt
+ZASibXqepmczoZUbAIrGtqmHTiQqMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTIyODA4MjU1N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDT6CNfNFdbdaMl11arzn5ejrJ4zxGQ1SNG
+8uY9NwLjMt5gaPgMg2zKvoV+DB3FjkH60Pvws8Vl2ew94kG4Xg+uIXc29zrHU7vHoYnqdDfM7dG2
+UHAoVmevteb/vCCI7AHtrBARmPv7nsmqCrJriVscpwLXJgtNAV+w2q2esUcSn9FgOHO3Hg9wtlX4
+gK9a+6grSB02hj6GVFlecE7KBBl3PhTwGwZ9C2Hk9BbF+HUMXsIKhOTc2CYgbMog4Kicfc5sjDul
+jhbstWkfjxVCNZO/TVIY2IlPHKN0J6vUVp13OZAvXArThwtNhpHbkRCK6HBmU6wv5uuLyUCNwWxG
+VBkF
+--000000000000355f35060d8daac1--
 
