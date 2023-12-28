@@ -1,133 +1,199 @@
-Return-Path: <netdev+bounces-60445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D29FF81F5D6
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:10:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EB6E81F5E3
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:16:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01A7D1C21CDE
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 08:10:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A730A283E6A
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 08:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 985C64411;
-	Thu, 28 Dec 2023 08:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33E0441B;
+	Thu, 28 Dec 2023 08:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJ8y2jdm"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="a+jdwGt+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021CB522B
-	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 08:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-554cffbad2fso3227952a12.1
-        for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 00:10:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703751035; x=1704355835; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZC/z8cldylp371oBNRFbQFI/QxYIEbRw9rFd4XSkacU=;
-        b=QJ8y2jdmUKZut7H1zyvHZpzFYUPkSznOnyDofxyio1FaSQ6jDlEvt61QSuxh+JtynK
-         n/6wklHxNF9gL2UCQm2EvT88Zbc1OVO5vhuBgzmY6lESlQIGTjMd7f1S5VRl9WhMZM8K
-         n6G2ETvHpm3hOdedDTumQg+tgFEwH4eg3ZMY5GxrasjYgKDC4PxmpK+dLKzFkqvabipQ
-         Ajm9xvIR05Zrq88UkYXoRLvplEw194eCMzWz6DjsH/GFl+TZPvkXVXOTffuYJeEJuhQl
-         heaJJM9sVjh0io/woFZSKPgNKddJ0JTvesDJpLQtl0Zdym/zRLFNtd3FQs5G8MvMAWaG
-         wxdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703751035; x=1704355835;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZC/z8cldylp371oBNRFbQFI/QxYIEbRw9rFd4XSkacU=;
-        b=bpKziVZJ9tp1EHWxrNS0P1iYnmdV2z0nhsXwBMpIdIrxTm7bpDbLXqhhqo+fGmH7PK
-         9rRWPiClpAq7MGACHj16hnc2t3TG2t9cDp0z12cu4KsDCeg1YXB1foRC/EW6zx14k3cT
-         iggGcC34EQaMwcU8Qu75oGJncfJnM4+mnA8cBsNP5vfm2Xk1VMrew8byCTwVhf5noXUB
-         jun/a4dP7gnqL8IeO20ALk5XdWGYUfIMHu+CS3F2YnJxf3vPEYlWrAwosGCJS7tnDoPT
-         RcKsM+r1pe+hjQiy9CwvD+KMpotVOHZPlu0mgFit7DIatrvHvW1/wBCPSpH8wySl0CQY
-         HQjg==
-X-Gm-Message-State: AOJu0YyOIikVE8peZJjvijiKg4kHViPNUAWsphTKHAM0cUfxIovhXAZQ
-	Hmuf+b2gmalHpBX6uXc67xQYTPoCcXn+o+xoZLo=
-X-Google-Smtp-Source: AGHT+IGlQcFSG/INAGbdv/l1oie6h0gkx3vWBv+rQdUcFs40egJyvkp4/rz41CJgeOoa6BXtx7/obE8fm9g7u69aYMQ=
-X-Received: by 2002:a17:906:281:b0:a26:e230:3b4f with SMTP id
- 1-20020a170906028100b00a26e2303b4fmr2207933ejf.181.1703751035081; Thu, 28 Dec
- 2023 00:10:35 -0800 (PST)
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 695335233
+	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 08:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=CBsCm
+	O0p2nUWsjS/fWaX2zG4/pPz20JZHUQkF7v0mEI=; b=a+jdwGt+6WiNuPt51qF7y
+	MzfgyA7iqmVCqfFCbri6ItayQzA4BNO7NVYKEvKKHLW9H0E3hyKnePTqKlUvob/i
+	TuAu6vBJRQHkVZ4f1aT5JCaJL993IFudrAg+VRziyE9KgQv3MT+vmX7iXFnxsy9g
+	RimEbLZHe3ZidIpmjkYrWA=
+Received: from localhost.localdomain (unknown [140.207.85.39])
+	by zwqz-smtp-mta-g2-2 (Coremail) with SMTP id _____wB3n2iXLo1lOjmKCg--.52797S2;
+	Thu, 28 Dec 2023 16:15:19 +0800 (CST)
+From: Tao Liu <taoliu828@163.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	vladbu@nvidia.com,
+	paulb@nvidia.com
+Cc: netdev@vger.kernel.org,
+	simon.horman@corigine.com,
+	xiyou.wangcong@gmail.com,
+	pablo@netfilter.org,
+	taoliu828@163.com
+Subject: [PATCH net] net/sched: act_ct: fix skb leak and crash on ooo frags
+Date: Thu, 28 Dec 2023 16:14:57 +0800
+Message-Id: <20231228081457.936732-1-taoliu828@163.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <55c522f9-503e-4adf-84cc-1ccc1fb45a9b@broadcom.com>
- <20231227120601.735527-1-adriancinal1@gmail.com> <4b3d4c59-70d8-41b7-954e-8f7294026516@gmail.com>
-In-Reply-To: <4b3d4c59-70d8-41b7-954e-8f7294026516@gmail.com>
-From: Adrian Cinal <adriancinal1@gmail.com>
-Date: Thu, 28 Dec 2023 09:10:25 +0100
-Message-ID: <CAPxJ3Bd1hPpAMXs1-o3CQcQ2H3XTaH_Z4GEpfvAa-0XnZMS0Xg@mail.gmail.com>
-Subject: Re: [PATCH v2] net: bcmgenet: Fix FCS generation for fragmented skbuffs
-To: Doug Berger <opendmb@gmail.com>
-Cc: netdev@vger.kernel.org, florian.fainelli@broadcom.com, 
-	bcm-kernel-feedback-list@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wB3n2iXLo1lOjmKCg--.52797S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxtw47XFyxCr4rtrWDXr1DJrb_yoWxGw1rpF
+	yftr45CF4vkr1DJr4UAF1UKr4fGrsrCF4qgrn3Jr18J3Z8G3WUtry7Kr4Ikr1UCrW8X34x
+	Jryqqw18tr1jyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pi_gA7UUUUU=
+X-CM-SenderInfo: xwdrzxbxysmqqrwthudrp/1tbiVwJUFGVOAtVxzwAAsX
 
-On Wed, 27 Dec 2023 at 21:39, Doug Berger <opendmb@gmail.com> wrote:
->
-> On 12/27/2023 4:04 AM, Adrian Cinal wrote:
-> > The flag DMA_TX_APPEND_CRC was written to the first (instead of the last)
-> > DMA descriptor in the TX path, with each descriptor corresponding to a
-> > single skbuff fragment (or the skbuff head). This led to packets with no
-> > FCS appearing on the wire if the kernel allocated the packet in fragments,
-> > which would always happen when using PACKET_MMAP/TPACKET
-> > (cf. tpacket_fill_skb() in af_packet.c).
-> >
-> > Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
-> > Signed-off-by: Adrian Cinal <adriancinal1@gmail.com>
-> > ---
-> >   drivers/net/ethernet/broadcom/genet/bcmgenet.c | 10 +++++-----
-> >   1 file changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> > index 1174684a7f23..df4b0e557c76 100644
-> > --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> > +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> > @@ -2137,16 +2137,16 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
-> >               len_stat = (size << DMA_BUFLENGTH_SHIFT) |
-> >                          (priv->hw_params->qtag_mask << DMA_TX_QTAG_SHIFT);
-> >
-> > -             /* Note: if we ever change from DMA_TX_APPEND_CRC below we
-> > -              * will need to restore software padding of "runt" packets
-> > -              */
-> >               if (!i) {
-> > -                     len_stat |= DMA_TX_APPEND_CRC | DMA_SOP;
-> > +                     len_stat |= DMA_SOP;
-> >                       if (skb->ip_summed == CHECKSUM_PARTIAL)
-> >                               len_stat |= DMA_TX_DO_CSUM;
-> >               }
-> > +             /* Note: if we ever change from DMA_TX_APPEND_CRC below we
-> > +              * will need to restore software padding of "runt" packets
-> > +              */
-> >               if (i == nr_frags)
-> > -                     len_stat |= DMA_EOP;
-> > +                     len_stat |= DMA_TX_APPEND_CRC | DMA_EOP;
-> >
-> >               dmadesc_set(priv, tx_cb_ptr->bd_addr, mapping, len_stat);
-> >       }
-> Hmm... this is a little surprising since the documentation is actually
-> pretty specific that the hardware signal derived from this flag be set
-> along with the SOP signal.
->
-> Based on that I think I would prefer the flag to be set for all
-> descriptors of a packet rather than just the last, but let me look into
-> this a little further.
->
-> Thanks for bringing this to my attention,
->      Doug
+act_ct adds skb->users before defragmentation. If frags arrive in order,
+the last frag's reference is reset in:
 
-Hello,
+  inet_frag_reasm_prepare
+    skb_morph
 
-I confirm that it works just as well when the flag is set for all
-descriptors rather than just the last. Tested on a BCM2711.
+which is not straightforward.
 
-Adrian
+However when frags arrive out of order, nobody unref the last frag, and
+all frags are leaked. The situation is even worse, as initiating packet
+capture can lead to a crash[0] when skb has been cloned and shared at the
+same time.
+
+Fix the issue by removing skb_get() before defragmentation. act_ct
+returns TC_ACT_CONSUMED when defrag failed or in progress.
+
+[0]:
+[  843.804823] ------------[ cut here ]------------
+[  843.809659] kernel BUG at net/core/skbuff.c:2091!
+[  843.814516] invalid opcode: 0000 [#1] PREEMPT SMP
+[  843.819296] CPU: 7 PID: 0 Comm: swapper/7 Kdump: loaded Tainted: G S 6.7.0-rc3 #2
+[  843.824107] Hardware name: XFUSION 1288H V6/BC13MBSBD, BIOS 1.29 11/25/2022
+[  843.828953] RIP: 0010:pskb_expand_head+0x2ac/0x300
+[  843.833805] Code: 8b 70 28 48 85 f6 74 82 48 83 c6 08 bf 01 00 00 00 e8 38 bd ff ff 8b 83 c0 00 00 00 48 03 83 c8 00 00 00 e9 62 ff ff ff 0f 0b <0f> 0b e8 8d d0 ff ff e9 b3 fd ff ff 81 7c 24 14 40 01 00 00 4c 89
+[  843.843698] RSP: 0018:ffffc9000cce07c0 EFLAGS: 00010202
+[  843.848524] RAX: 0000000000000002 RBX: ffff88811a211d00 RCX: 0000000000000820
+[  843.853299] RDX: 0000000000000640 RSI: 0000000000000000 RDI: ffff88811a211d00
+[  843.857974] RBP: ffff888127d39518 R08: 00000000bee97314 R09: 0000000000000000
+[  843.862584] R10: 0000000000000000 R11: ffff8881109f0000 R12: 0000000000000880
+[  843.867147] R13: ffff888127d39580 R14: 0000000000000640 R15: ffff888170f7b900
+[  843.871680] FS:  0000000000000000(0000) GS:ffff889ffffc0000(0000) knlGS:0000000000000000
+[  843.876242] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  843.880778] CR2: 00007fa42affcfb8 CR3: 000000011433a002 CR4: 0000000000770ef0
+[  843.885336] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[  843.889809] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[  843.894229] PKRU: 55555554
+[  843.898539] Call Trace:
+[  843.902772]  <IRQ>
+[  843.906922]  ? __die_body+0x1e/0x60
+[  843.911032]  ? die+0x3c/0x60
+[  843.915037]  ? do_trap+0xe2/0x110
+[  843.918911]  ? pskb_expand_head+0x2ac/0x300
+[  843.922687]  ? do_error_trap+0x65/0x80
+[  843.926342]  ? pskb_expand_head+0x2ac/0x300
+[  843.929905]  ? exc_invalid_op+0x50/0x60
+[  843.933398]  ? pskb_expand_head+0x2ac/0x300
+[  843.936835]  ? asm_exc_invalid_op+0x1a/0x20
+[  843.940226]  ? pskb_expand_head+0x2ac/0x300
+[  843.943580]  inet_frag_reasm_prepare+0xd1/0x240
+[  843.946904]  ip_defrag+0x5d4/0x870
+[  843.950132]  nf_ct_handle_fragments+0xec/0x130 [nf_conntrack]
+[  843.953334]  tcf_ct_act+0x252/0xd90 [act_ct]
+[  843.956473]  ? tcf_mirred_act+0x516/0x5a0 [act_mirred]
+[  843.959657]  tcf_action_exec+0xa1/0x160
+[  843.962823]  fl_classify+0x1db/0x1f0 [cls_flower]
+[  843.966010]  ? skb_clone+0x53/0xc0
+[  843.969173]  tcf_classify+0x24d/0x420
+[  843.972333]  tc_run+0x8f/0xf0
+[  843.975465]  __netif_receive_skb_core+0x67a/0x1080
+[  843.978634]  ? dev_gro_receive+0x249/0x730
+[  843.981759]  __netif_receive_skb_list_core+0x12d/0x260
+[  843.984869]  netif_receive_skb_list_internal+0x1cb/0x2f0
+[  843.987957]  ? mlx5e_handle_rx_cqe_mpwrq_rep+0xfa/0x1a0 [mlx5_core]
+[  843.991170]  napi_complete_done+0x72/0x1a0
+[  843.994305]  mlx5e_napi_poll+0x28c/0x6d0 [mlx5_core]
+[  843.997501]  __napi_poll+0x25/0x1b0
+[  844.000627]  net_rx_action+0x256/0x330
+[  844.003705]  __do_softirq+0xb3/0x29b
+[  844.006718]  irq_exit_rcu+0x9e/0xc0
+[  844.009672]  common_interrupt+0x86/0xa0
+[  844.012537]  </IRQ>
+[  844.015285]  <TASK>
+[  844.017937]  asm_common_interrupt+0x26/0x40
+[  844.020591] RIP: 0010:acpi_safe_halt+0x1b/0x20
+[  844.023247] Code: ff 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 65 48 8b 04 25 00 18 03 00 48 8b 00 a8 08 75 0c 66 90 0f 00 2d 81 d0 44 00 fb f4 <fa> c3 0f 1f 00 89 fa ec 48 8b 05 ee 88 ed 00 a9 00 00 00 80 75 11
+[  844.028900] RSP: 0018:ffffc90000533e70 EFLAGS: 00000246
+[  844.031725] RAX: 0000000000004000 RBX: 0000000000000001 RCX: 0000000000000000
+[  844.034553] RDX: ffff889ffffc0000 RSI: ffffffff828b7f20 RDI: ffff88a090f45c64
+[  844.037368] RBP: ffff88a0901a2800 R08: ffff88a090f45c00 R09: 00000000000317c0
+[  844.040155] R10: 00ec812281150475 R11: ffff889fffff0e04 R12: ffffffff828b7fa0
+[  844.042962] R13: ffffffff828b7f20 R14: 0000000000000001 R15: 0000000000000000
+[  844.045819]  acpi_idle_enter+0x7b/0xc0
+[  844.048621]  cpuidle_enter_state+0x7f/0x430
+[  844.051451]  cpuidle_enter+0x2d/0x40
+[  844.054279]  do_idle+0x1d4/0x240
+[  844.057096]  cpu_startup_entry+0x2a/0x30
+[  844.059934]  start_secondary+0x104/0x130
+[  844.062787]  secondary_startup_64_no_verify+0x16b/0x16b
+[  844.065674]  </TASK>
+
+Fixes: b57dc7c13ea9 ("net/sched: Introduce action ct")
+Signed-off-by: Tao Liu <taoliu828@163.com>
+---
+ net/sched/act_ct.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+index f69c47945175..3d50215985d5 100644
+--- a/net/sched/act_ct.c
++++ b/net/sched/act_ct.c
+@@ -850,7 +850,6 @@ static int tcf_ct_handle_fragments(struct net *net, struct sk_buff *skb,
+ 	if (err || !frag)
+ 		return err;
+ 
+-	skb_get(skb);
+ 	err = nf_ct_handle_fragments(net, skb, zone, family, &proto, &mru);
+ 	if (err)
+ 		return err;
+@@ -999,12 +998,8 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
+ 	nh_ofs = skb_network_offset(skb);
+ 	skb_pull_rcsum(skb, nh_ofs);
+ 	err = tcf_ct_handle_fragments(net, skb, family, p->zone, &defrag);
+-	if (err == -EINPROGRESS) {
+-		retval = TC_ACT_STOLEN;
+-		goto out_clear;
+-	}
+ 	if (err)
+-		goto drop;
++		goto out_frag;
+ 
+ 	err = nf_ct_skb_network_trim(skb, family);
+ 	if (err)
+@@ -1091,6 +1086,11 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
+ 		qdisc_skb_cb(skb)->pkt_len = skb->len;
+ 	return retval;
+ 
++out_frag:
++	if (err != -EINPROGRESS)
++		tcf_action_inc_drop_qstats(&c->common);
++	return TC_ACT_CONSUMED;
++
+ drop:
+ 	tcf_action_inc_drop_qstats(&c->common);
+ 	return TC_ACT_SHOT;
+-- 
+2.31.1
+
 
