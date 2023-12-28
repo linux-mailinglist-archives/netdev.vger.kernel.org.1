@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-60517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1563E81FB36
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 21:33:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A213481FB39
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 21:39:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FCD3284E3C
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 20:33:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F8CE28603E
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 20:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E2DC8E0;
-	Thu, 28 Dec 2023 20:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A690101EF;
+	Thu, 28 Dec 2023 20:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="TP37ypxy"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="T/hArb2i"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2054.outbound.protection.outlook.com [40.107.21.54])
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2077.outbound.protection.outlook.com [40.107.13.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57DDC10781
-	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 20:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDFB10794
+	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 20:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=liJCIxDIagTsAMgU/XuJ+7p8VuuJOb8TXe2b2AOjDHuX/YiFr5Ewslp9oeRlAwTsPnEoS0vL+glBGkpuhX3OSH1Qspv66Pb9GIn8Cp19RwwzNtgLgcSyWkzzpY+IRAWHTTDmIqJfMqpTFgP/qCXKRboLl6PM4HGTLf5wLyI9EbrZM56LbjOsELdjv6chulDOqjl4Z7UCaHF7oPxz/zulSXYq8jcuOLFeY7/GiC0u9K7KD5Kt06SEthLRA5i4LIHRsFzGLJNwmcl6lFswN4tthqFw9Q8+TrvRfWMDDj2TZgpUJQiVFWZUVAnnyTuYCi1o7Fwjui+rCZJUGfzBblYXMQ==
+ b=mNiCIK2MR/HPrhnfgm1R3kr51P10Ya0X2WhjAOta3I5hfi1wY9iloRfjxnSTFlsQ3vtPtNfH8lJHwn2vLhMSNkHgJWy472u+t10xsmtRn0PExka3rkETy26ng1ASmRnEozZqGgDK3BmODdNR/0HbPMVzca6mFiuS1wmeQDAdWgxhbGDAkXseJZh2GBX+NSWeBnMu9QUPUEa3uI13M5twylyPld/cmKSvjqfde4tRbO8rlBCtO/F+HPY0/eEOQt4kOWSz34sAtl169iZbMk6s31/HBXomYE4H50fUedDGYjnyreBKmnAbXeYhw9PbkzEfLi6ksKtYJaUOyK1VNmRF2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JW4m2rwI6K8tWvC8DpOs56htOMH9Pzo2p5zFe3wGcIw=;
- b=D70PSK9rl/Ato9JqKkmJc6cNGObJ4Glm7dScdRWy+/uSt/gV1QyMhRdGAAl3SCGSN9Y3UD94WsOGe7Zw2DG2uzD+bLtjbgClEciShh7Kug16YGAtOJtaKP+2KlZU6R1WVsLHVdAQqHbTP66n4YbZNUzV3S+XtaAhMf/JnILkGcie9hbLxQqMrwn1LQihClo9X7VSj/GdeigqfpueBqM9VYBuEtf+3CGG0dUgf1tw2JXkfVWI1dBO8+G/p0Z9804/Zor3C+3NKC/9fmVe1gHBImlO5ND5BCujKpiUlsMyKH0xso3Y7FdB/KaQgcc7KstAhaAEsv2iiN5AhovlbO+kJQ==
+ bh=vizxIwGyyoD7mYIGeetCAMOAXY5nDL8axUd/+c3qCgA=;
+ b=g2pjUVxckoUxPfsiOlKOxPPgfDQT5Wjcl/dJki0OKLnUqOrp/yx7/Jn38m8XopBkMH7NGI4nFre5NBgvQGQJ8H9y+OoQns6PTWK3o58gAA5Us5Wh/UqyZWJnAv6ASr7nyJSbJQxDCIKBveeEcm/GXAAOkz9p0coDgANa2/iq6a+W8BmoFU2pdt8h/FHBN7RY4O91V9TZXOXZh9n/saSzULm7076FJDziD7np608Rok6Yf8gLtKIi/2DeXuUvtoXswv2RHMDo/wP6Eqo3sh3wphYuXVYXgGeMqm4eqtmBQ+poXumfsNSNBJU2RuTLPiP9g2K7eBR17NL0zJhfnvZ5uw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JW4m2rwI6K8tWvC8DpOs56htOMH9Pzo2p5zFe3wGcIw=;
- b=TP37ypxyd68pcId5G2JzK7ByDJzVPpjUH7njBd2K8NZwJ7+nceS5Jq7O3B930vJBmN+Ct0JoIiy8AGHsYxJF/VVBVrnjTxs1bOKVAumA/vW1Dvzd5h64p8cdUYJxuMC/1Cjte9Uy5xGBMyqX/4TCZNUdrxORhv0mWQg/gGJHo4M=
+ bh=vizxIwGyyoD7mYIGeetCAMOAXY5nDL8axUd/+c3qCgA=;
+ b=T/hArb2iVyerF4lzVMjJVQZSGXH226KX4nfSwuzzXJZfydMqCViwzCCaI6X/iccHE2u3GE2JJ7hwFoK7bJh8J8AB21J2lG7bp1msf3hPZTXIAN7KoV5Cvzn1md5W2QgRY/2irJAxyMlknJqWecNLxV/Q+bBRXcFI8KoOQVSDxPI=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AS8PR04MB9046.eurprd04.prod.outlook.com (2603:10a6:20b:441::11) with
+ by AS8PR04MB8737.eurprd04.prod.outlook.com (2603:10a6:20b:42a::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.20; Thu, 28 Dec
- 2023 20:33:47 +0000
+ 2023 20:38:51 +0000
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7135.019; Thu, 28 Dec 2023
- 20:33:46 +0000
-Date: Thu, 28 Dec 2023 22:33:43 +0200
+ 20:38:51 +0000
+Date: Thu, 28 Dec 2023 22:38:48 +0200
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: Benjamin Poirier <bpoirier@nvidia.com>
 Cc: netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
 	Petr Machata <petrm@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>
-Subject: Re: [RFC PATCH net-next 10/10] selftests: dsa: Replace symlinks by
- wrapper script
-Message-ID: <20231228203343.qrrja6zxpl6ncrx2@skbuf>
+Subject: Re: [RFC PATCH net-next 05/10] selftests: Introduce Makefile
+ variable to list shared bash scripts
+Message-ID: <20231228203848.ypx5iomfk4u36wyc@skbuf>
 References: <20231222135836.992841-1-bpoirier@nvidia.com>
  <20231222135836.992841-1-bpoirier@nvidia.com>
- <20231222135836.992841-11-bpoirier@nvidia.com>
- <20231222135836.992841-11-bpoirier@nvidia.com>
- <20231227201129.rvux4i5pklo5v5ie@skbuf>
- <ZY3OWvnuzk59TU2K@d3>
+ <20231222135836.992841-6-bpoirier@nvidia.com>
+ <20231222135836.992841-6-bpoirier@nvidia.com>
+ <20231227194356.7g3aec3kujnk2qo2@skbuf>
+ <20231227194700.zqhod5nbn6bibub3@skbuf>
+ <ZY3MRl5Jtb08YotB@d3>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZY3OWvnuzk59TU2K@d3>
-X-ClientProxiedBy: FR3P281CA0031.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1c::9) To AM0PR04MB6452.eurprd04.prod.outlook.com
+In-Reply-To: <ZY3MRl5Jtb08YotB@d3>
+X-ClientProxiedBy: FR3P281CA0168.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a0::20) To AM0PR04MB6452.eurprd04.prod.outlook.com
  (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,86 +75,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB9046:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e4f24ef-2f91-430b-fa12-08dc07e44aa7
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB8737:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5233a6ed-194c-4aa2-9cf5-08dc07e50025
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	8lip0aexHj9N+xoT5Pp/2Ns89+/uj+qHxaXg4dqKM4EdR9YH4tFK069p2sw11UUTpJJyubkgfXxt+kg6TbfsEkvdt9o5LPiBD0CaMyH4ZRlUEpsRcMi4QK5YdToQVB3zrOKWIiX+dchava/itiyu/8SoFvAgzrolUvdrvJYa1+iu1OOsnIdlNutgaC6eFTwAO5ESZN8rEX10pkI/KM0dThqq1vaIiBApC97cccYpPSoNiZfChg3nHjMrYJJqpJ0Gq6tciYiZtVeJMOGRWAFR9vasCwBsixhJ5qdlz8weuGctHYjfeBl4XxbZgzWgAfVIW+z8KBtpuxMt3rs1bvH4oLOo9pmUmnsBsKK1nDCLKjcteqnxCHwGFhbRNdGTlHY3ax3gutbG4XMOCRB2k93yTw3YmFvBdNZdLYkr6JYKIAkDpLLVEF3nk6zcnuQUVv4mPR1iYP80a9cfLtzNhpN7CgNlfBdsH4c7u6SvM1qV+kdxi7Q3BW3Htnx/azQXkA4GxvNljUPFj36o7CugyHG9eS9/yTudDpqbaRKmI9h7Y+o4mQGigefwljphe+ehFAUV
+	lWrVcAx2toSTZlM1B5rtfBdCTIO6EwCc1n5lRUawwEPcOMNstmWOrG+uHbfmpZ9WgdpkyyBMmlPqd/DCTWd/cjJxEErkhCvvdPnCTZddeZmLa6E3xaTF+mEM4J99BRx1xpA6MKQGSQtckjmx+tA2vuaVx44j488/mXuj5mqmfqPOwS7QPZ2Jf+ZwDJflqtd6GUvpONTBTdA3e+6wOgSa9hOA9pqEHD1KKHdylFzuRnfM1DvuXBeoVP2pPbgnTf08qdL5adXjDLfzacEM9pzaXCOXMTOKHrPJ+Hy1ZO8/jQm87YjcK2ZVQnyGvlB5giTf7deZknnE+2iXrYCeN7jat0KHkntadcIqBDpFZJyLniaF/5UREhnWcBTHveZAWp69ZtxGRBSiJYbfnwJx8gMgdLX8KJnmZpsy375HKe5FZl+LhFhd07OutPfKKrrlfi6jl5XQt2oVA8u+tpPDibojYBSZrgxfiZjK+p038XsLhS4xjWsbglCa4xRBM7r0sIu+lk5jMt/RcnUFZ2IFogXT52YNMyrpsl1AKxyCBwUe31V5dW6gU+5ENON59JZg4EHo
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(39860400002)(136003)(376002)(366004)(396003)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(1076003)(478600001)(44832011)(5660300002)(8676002)(8936002)(4326008)(4001150100001)(2906002)(6486002)(26005)(66946007)(54906003)(66556008)(66476007)(9686003)(6666004)(6916009)(316002)(6512007)(53546011)(6506007)(86362001)(41300700001)(38100700002)(33716001);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(136003)(39860400002)(366004)(396003)(346002)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(38100700002)(86362001)(26005)(6506007)(6512007)(9686003)(54906003)(4326008)(6916009)(8936002)(8676002)(66476007)(6666004)(316002)(6486002)(478600001)(66946007)(66556008)(1076003)(33716001)(41300700001)(44832011)(2906002)(5660300002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?0/hpIoRBBpsjMNXGF68pR3+/ebb7t8UaLHsWnAMKNSAV/8BkgwwnJRzEH5RJ?=
- =?us-ascii?Q?5oJQiptGQJv7x0gllDEadWTSNSUis7Y+yN2DJy1YpkX8J/pb7dfHUSlxLUty?=
- =?us-ascii?Q?6Ft75IkrWFsNJz6RCoWxx2+yy0u4QHM7hUP9eiA0bzWvA3xu5nuLZqeVr9cz?=
- =?us-ascii?Q?POMjGFVHUp98eaZ0fn08ddbkxF2LAR9AZiL4JLZqMkd0oCS++qjjUT/SywUK?=
- =?us-ascii?Q?0H9dTYQVTdZUjRCSXT1CreILLOm/MRzXpxuIhMTqUisZUK+xIVploSSAXVYV?=
- =?us-ascii?Q?xZTofXC6b4GM3UcZEGIY+UQMuvcXlXjhuzGfEAtvo17vKwqezT6RRv9Q1T6v?=
- =?us-ascii?Q?mBOlKDPda6WPpnJPK86ZONCRXaXe9bEW3+3MfjNisd+dVIDPW1qi34F44TNq?=
- =?us-ascii?Q?ksGCOZcBNkY9L+DWtf4G3yxioBEt/r2SveuZ8M9v0ySkWDjE7dOktKrgu9SW?=
- =?us-ascii?Q?gJaIEdsn0vpmd7XCwgGO843ecqlQg5q8K/BxneGVcbNgUJ2r9lJhPxI+McxA?=
- =?us-ascii?Q?sZ31TxxZXaug0qEP7jYuFjTgcKAJnc0Q0AikeXuIoZN6GcF2JaMvysQW0GgC?=
- =?us-ascii?Q?D0G1l2bZu7tk2+0DN0jLQZjs1UxFM0GXVy38sCIaYKqq4oGX4VjhiLQW78Gp?=
- =?us-ascii?Q?wPuU4weGZjWT+z5u2ewAIoCcbE2Vi4uyofH9leDd0I9yFcrk6EYl9YUM0DxT?=
- =?us-ascii?Q?ASl8pjwDtQOp1a7uSbKdqIyVuj+9wIF9sXBDr0ovSb2xXikBbHFKg7R+Qw3F?=
- =?us-ascii?Q?UDKHIWm7NfssVSNm1eDEKPPAHlvtOFYEN+xK5fHFY+w1cshy3Y1nfXYzzdCO?=
- =?us-ascii?Q?TN1YM0It5CLSkVvFV04LvIKTD50/TLhMQJTtde349Bkwr1l3vUSxt2wFl4Em?=
- =?us-ascii?Q?l+IxnZ0D4mLZTtmtxIe5UZb0inCZcKOw4SmRqyFV0rnJsQSpDEqPwQ1g1VUn?=
- =?us-ascii?Q?daaoDhThBItPoJnK7f3eu+wvHbBYEzC+HSG1oKjJfGeqipLtA6JI9LabMx53?=
- =?us-ascii?Q?7QWXd5/F+aUt6vB2ujKWsGeU4rXA+/kCthww8TB/EAMWgwv8aXLz1D7UneUl?=
- =?us-ascii?Q?5rYyPvBHc4K1FKjUwsBVmf8UYuRbO7hqKO/bStXkxT+lASyKZ9PW6NJOlE9B?=
- =?us-ascii?Q?0S2Kg3y+jfQSATTk5469veAkeiBLjiKon2zxS7VOnkrAtEcqdB2zMyGKz7xK?=
- =?us-ascii?Q?3MciYe28JM9BUOzzAJ1USYedw1pi/ZNxRbAKsxJ1tz88rcOyoVGUgRWkqiU9?=
- =?us-ascii?Q?+l2LUUDbFue0INmeTrypkb998iSxyzyw4mxGPGMzYvCVIVw9kNOcm+JVKWJ0?=
- =?us-ascii?Q?CiVsJinQVZ5zSxWRhwjPJZm9QwB8KasDGb66P9arDiVOSxKDnx7iSCaEJ10O?=
- =?us-ascii?Q?I75BTXI3ZlSva0fAnWKQCD5FVRLU36okM0eOSNvR2WXI6sYHudGcVRHuJcD6?=
- =?us-ascii?Q?Flphs/RG+hmbe4UGpuJKV6L5G5kj9Vw5PBBOg+iffQwJoEJruRNF1Hu0q+P4?=
- =?us-ascii?Q?KTFJXJ2BZkIR+H5ckyI2TnGbobcBDf7DdV91S2jhjB58RWWJh4jbyKBrINbD?=
- =?us-ascii?Q?hY3CpWXKDsU3tpNFyq2EyHAm8mrLq8pz7aD66KwG55kYYcCohTy6BNfcgwMQ?=
- =?us-ascii?Q?XQ=3D=3D?=
+	=?us-ascii?Q?l/jkN0P1s1UZTSpjeQXxbXWBcvVIob6iBbZyA/kmNUvFxqoWZ83cEsv/WrnT?=
+ =?us-ascii?Q?6KqNtPOOfTb8xMa4Ro9hgL8Sk30lTlTQyg9ociMjdB4OWuHSAFubd+K7fP+q?=
+ =?us-ascii?Q?Ayb6eMXAsJQlgpryJwso32KyHamTloP/oiQqBopb5L5BXbMIW9K/LJlPv+k6?=
+ =?us-ascii?Q?P+xmDXFXTZArSnFRtcEZjZxnQ/F3X0+bu1QJM9qF+uuNNlLvXyo6NZ0fb6DS?=
+ =?us-ascii?Q?o28lvTAlY3K9TyKLKw8js9+Uuxnw/G5tCbs3tujPtJKwYeG9SjTekGQ6NfT2?=
+ =?us-ascii?Q?myb8OwY5OoddE2g2jf/xKTVJHnhzJBrfQIeWNc/WssSuTzJTwLw+tvF0vwia?=
+ =?us-ascii?Q?RSSe48LmcjGhhoe+x7wOogTzNxbsCA2IZNkiqmsddtEIReUsMxOEl6VcyoHs?=
+ =?us-ascii?Q?dJoI3rgy/ktJby/xR4dx/O1GRY0EihYn0KujgV28+KMXzVFK3xwWKR7f22Sl?=
+ =?us-ascii?Q?dp29SeEKnGGZm331xgROmmAUJjipUmzdc49UFPbvUoz2yx0e1z/e7WZ0sjaN?=
+ =?us-ascii?Q?ajbPS5oJX1BKmDf0aC6qioBlCzDysB3pzZ/iwPOQiHckMymqRiKsTrsxmr58?=
+ =?us-ascii?Q?FYUhuiD6fU0dgjfYpKiE/FffzcV6QY/+Vaez+SbooEWmhiIrt3tsmiRXMVoF?=
+ =?us-ascii?Q?OZpzYcZYgoCyvhFs2ENjneU2SdE70RrhJg9eZAKSnW9B2M926MlYViGNGm73?=
+ =?us-ascii?Q?JpkM/jVn4tCk2VmQfnhFxN3OLiDH1Wv3edVY0EgQ0k5xqQmsKK1lbMtj4trL?=
+ =?us-ascii?Q?Rv6zLiFI1DTkNUWXh0BEzO/W9KOhveKSNRi7S3MOXmIfodcsy3tFPlTfCQsG?=
+ =?us-ascii?Q?Ba02+Cz0fno2ssU6TInn+JKt5uU37VGop503OWMGlqPyL6CaPmYTRDuLJbSR?=
+ =?us-ascii?Q?dHHt4oAzi8haKeTyhXdHMrYyo1zoLOj/ZaXIQMivj3ixgWWmLct2jKQjPW2v?=
+ =?us-ascii?Q?wbINm4g4gacc+aHKLQ5CpWqSNqdviXEWdI5yvfeYkTbGGlqBOP5J6FOVEHee?=
+ =?us-ascii?Q?N39zB1ynOfw2HyUQnB7LRJdIzrOy5Vgm3HtD+IqcXfQAZ431mrtXEiLD2bPZ?=
+ =?us-ascii?Q?S1otVZhh8EY+8iPYxDiyLvT5gtck4xz68eHxOHAzSUFOM6oroQHKqBMxR93Q?=
+ =?us-ascii?Q?8/YPcMm640QOZ3+1UAv/KdpHTWc6B8iH84l23aDdFDSvpJ5wBYwWvxW6CRDP?=
+ =?us-ascii?Q?c+4csjqg4KB+EPOUEjHdYaqlIvZnv0Nj6HmQJu3KkEC/NQNKPIueN6P5481r?=
+ =?us-ascii?Q?BOheqVXkE4dP12Lzhl8dAIMFz0JHmrMNCCDsqEeDUSOeA1mL/OOnEWXBoNWZ?=
+ =?us-ascii?Q?t8I9LiVMWVteMB0d63CfJHeIg2Cfh/qoxFJpw7RkXWgHzpqlGI09ZS0+C+z6?=
+ =?us-ascii?Q?Z7Vh4tMsHw7E3fTFK8advYSUU9PZWVJIjQ4Uho13x73iS//+RwVIRtDlSnT/?=
+ =?us-ascii?Q?pNW9ETqp+KfrFBg3yF1cECRLTUype3N89umEYXwGNs0CB79Balx1PyqSRt9l?=
+ =?us-ascii?Q?CyyQ/4T6MTjJvlujQ3yI5FsWEsRjIDQavFFfm9y63n0U5OfMAqr7YCSziAev?=
+ =?us-ascii?Q?/LnFiusp6sh1jafCPBhqjrz2zM7JdRKcRaJgg6iXUXBUV29SXd1gFeAtPczt?=
+ =?us-ascii?Q?Zg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e4f24ef-2f91-430b-fa12-08dc07e44aa7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5233a6ed-194c-4aa2-9cf5-08dc07e50025
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2023 20:33:46.8449
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2023 20:38:51.2220
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yDq0vpEYzrKtPc4XVojtstVEInszEQHLtVRE4R9HUNvxVzSnoSbOt7nO3otopTVE1eSczecx4taL7Dnr1jJRCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9046
+X-MS-Exchange-CrossTenant-UserPrincipalName: p+klBM+iO7/bnbRU8IBVrXWfI0xr8Gs1l5DDgIgRHQcxG32R7RGyEGflApdgz6tyLCgNN/pZhN+Ww0QZKhxwog==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8737
 
-On Thu, Dec 28, 2023 at 02:36:58PM -0500, Benjamin Poirier wrote:
-> On 2023-12-27 22:11 +0200, Vladimir Oltean wrote:
-> > On Fri, Dec 22, 2023 at 08:58:36AM -0500, Benjamin Poirier wrote:
-> > > diff --git a/tools/testing/selftests/drivers/net/dsa/run_net_forwarding_test.sh b/tools/testing/selftests/drivers/net/dsa/run_net_forwarding_test.sh
-> > > new file mode 100755
-> > > index 000000000000..4106c0a102ea
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/drivers/net/dsa/run_net_forwarding_test.sh
-> > > @@ -0,0 +1,9 @@
-> > > +#!/bin/bash
-> > > +# SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +libdir=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
-> > > +testname=$(basename "${BASH_SOURCE[0]}")
-> > > +
-> > > +source "$libdir"/forwarding.config
-> > > +cd "$libdir"/../../../net/forwarding/ || exit 1
-> > > +source "./$testname" "$@"
+On Thu, Dec 28, 2023 at 02:28:06PM -0500, Benjamin Poirier wrote:
+> I agree with your point about consistency. I have changed TEST_INCLUDES
+> to take paths relative to PWD. The implementation is more complicated
+> since the paths have to be converted to the old values anyways for
+> `rsync -R` but it works. I pasted the overall diff below and it'll be
+> part of the next version of the series.
+> 
 > > 
-> > Thanks for working on this. I don't dislike the solution. Just one
-> > question.  Can "run_net_forwarding_test.sh" be one day moved from
-> > tools/testing/selftests/drivers/net/dsa/ without duplicating it,
-> > should anyone else need the same setup?
+> > To solve the inconsistency, can it be used like this everywhere?
+> > 
+> > TEST_INCLUDES := \
+> > 	$(SRC_PATH)/net/lib.sh
 > 
-> Yes, it's possible. I didn't think about it before but I tested the
-> approach below. It applies over the changes I just sent in my previous
-> mail about patch 5.
-> 
-> Thank you for your review and suggestions.
+> After the changes, it's possible to list files using SRC_PATH but I
+> didn't do it. Since the point is to make TEST_INCLUDES be more like
+> TEST_PROGS, TEST_FILES, ..., I used relative paths.
+> For example in net/forwarding/Makefile:
+> TEST_INCLUDES := \
+> 	../lib.sh
 
-Thanks. I tested it too and it works.
+I thought you wanted to avoid the cascade of ../../../ which is confusing,
+so I recommended $(SRC_PATH) as a way to avoid that by using absolute
+paths instead - which makes it easier to track down the include file
+being sourced.
+
+My inconsistency issue was with TEST_INCLUDES being relative to a
+different directory than the rest. With that being addressed,
+I don't think that using absolute paths for some files would be
+inconsistent in a similar way. But I don't mind too much either way.
+Feel free to keep the ../../../ scheme.
 
