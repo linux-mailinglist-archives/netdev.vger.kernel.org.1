@@ -1,64 +1,43 @@
-Return-Path: <netdev+bounces-60450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DAD381F60B
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:44:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8D781F613
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:46:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 801B81C2283C
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 08:44:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3EC41C210F8
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 08:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1D35671;
-	Thu, 28 Dec 2023 08:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72695235;
+	Thu, 28 Dec 2023 08:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dU6i4AvY"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=deller@gmx.de header.b="aNzKnepD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DB628E3;
-	Thu, 28 Dec 2023 08:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d430bac207so23078875ad.0;
-        Thu, 28 Dec 2023 00:44:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703753041; x=1704357841; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/LAA70zXm10DEMc6Kjg+/EIPKIlRgUHAWPVMkU39I30=;
-        b=dU6i4AvYcfB4XSUjzMpcGIAaWwkbiOsafjjRJ6gyactoKg2WhmJ9SwdThrruk+9H+S
-         LFblKOLrXyxbQLDc1spcGmh1VzFQO5mei8SExt6/dUH/vviZOrCXN1UvJJNOXqEKvR1d
-         3zVC29mmr36dTGijRDHgVRxY/KKu74TNTH+vcv4YEIYFLstbuR8byN3jFE4SRQjA+GTl
-         6cSnYg8a02LcQUVk2BQdfIuT1lr8FjrsM8eNWWubYR4OV39vXaCjSlBFxQ8aXaRK9dgT
-         HNXrPkorRw2nb01OuGuPC5qPeGkwAF6nv03gyv71NC13RZI/nKm2o5JVjV8M4l9O1B3F
-         4X4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703753041; x=1704357841;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/LAA70zXm10DEMc6Kjg+/EIPKIlRgUHAWPVMkU39I30=;
-        b=JsnIIW0h9IJN8RkZvw+1gKOA9olscoou4i7ndPulIeFg4WTYsKI/fpLy+8G3qPpBdc
-         gU98E2iwwpdUW8Cki3gdacJ9GTucgWm8aR/UTBn+pjiMoXwUpQrFQIJAt7oGUxT80lXc
-         fVuHrw61cprnbKDmJNr5vQTvr7V4TaDyq8pNtRC/hbAEiNmeIEmTQiF7T9gac0vSbFKs
-         7KOUYZCRtkgmWs6TuqWuoJLZbhsQ9kRBKaX5dF7Phatb5pDPq5/NoEqatNRSmMdWQtpJ
-         y+gk4tyY5+1DoOSFsQGuMmlo8DRSjfDnC3hBDuGaB413PltgCsR8XrNCTssdaDc1rkft
-         D3cQ==
-X-Gm-Message-State: AOJu0Yzk+hIapv6wecNbUJU4ZZBjy3CFWdK3PynuRSVwBQ5/sq7krIyR
-	Z2cZyr5xr6BD6KCONlKhhhU=
-X-Google-Smtp-Source: AGHT+IGO2itkv+MUyVX3a5ZejUz/uivujcyirm9UN9HTmneFRG8FpKHBqElJbkLkEoCD0Eecttr+8A==
-X-Received: by 2002:a17:902:c244:b0:1d3:d1ee:9bea with SMTP id 4-20020a170902c24400b001d3d1ee9beamr11013979plg.53.1703753040903;
-        Thu, 28 Dec 2023 00:44:00 -0800 (PST)
-Received: from [192.168.159.133] ([37.175.83.47])
-        by smtp.gmail.com with ESMTPSA id f15-20020a170902684f00b001d3eaab64a3sm13726772pln.219.2023.12.28.00.43.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Dec 2023 00:44:00 -0800 (PST)
-Message-ID: <0cdb0461-ece3-4bfb-b058-9bf75c1f6fd3@gmail.com>
-Date: Thu, 28 Dec 2023 09:43:53 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1A85671;
+	Thu, 28 Dec 2023 08:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
+	t=1703753163; x=1704357963; i=deller@gmx.de;
+	bh=fJqDTgVLl8Hra1HS/8kXEcwI5ggM5ehurfeNCFKVkRo=;
+	h=X-UI-Sender-Class:Date:Subject:To:References:From:In-Reply-To;
+	b=aNzKnepDp5ls3Dlaq4KAWwhDHXutRqzTKOnJ49xVn71GkXf3oc1jTB1ylj8kWuUa
+	 pAMErwiRW/SXyry7u3mA/FDpz0RhRcPDrl+Uogil24o1SO4Wv2xLKCGCL5Svd7MTv
+	 IDo/iWwVdYlEmwFUceYQdlyAbRtMYl3ZMMZAbJc3o6T0jjGegK8AJfYa6XXxjNgBm
+	 tvvSpCG48lQzgXMNg1QXQHJXoVzb9lntmvBslAlwCigbiYJYzEoRIER2QWyPcabHO
+	 W/Ofgytsh78I0miKscfc8ft6X1MTug4upeU9O3ZnuKwkSsRobHaI3bXESMx2vDrQG
+	 rVWOnEyPvJdgnu6OFA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.20.55] ([94.134.144.42]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Md6Qr-1qjzNA2EYV-00aEW9; Thu, 28
+ Dec 2023 09:46:03 +0100
+Message-ID: <5585dee0-452e-48e1-8fae-bab1eccc8e97@gmx.de>
+Date: Thu, 28 Dec 2023 09:46:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,62 +45,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] net: phy: micrel: Add workaround for incomplete
- autonegotiation
+Subject: Re: [RFC PATCH net-next v5 12/14] net: add SO_DEVMEM_DONTNEED
+ setsockopt to release RX frags
 Content-Language: en-US
-To: Asmaa Mnebhi <asmaa@nvidia.com>, davem@davemloft.net, marek.mojik@nic.cz,
- netdev@vger.kernel.org
-Cc: davthompson@nvidia.com, linux-kernel@vger.kernel.org
-References: <20231227231657.15152-1-asmaa@nvidia.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
- xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
- X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
- AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
- ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
- SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
- nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
- qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
- YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
- FgIDAQIeAQIXgAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2DvCVAJ4u4/bPF4P3jxb4qEY8I2gS
- 6hG0gACffNWlqJ2T4wSSn+3o7CCZNd7SLSDOw00ESM+4EhAQAL/o09boR9D3Vk1Tt7+gpYr3
- WQ6hgYVON905q2ndEoA2J0dQxJNRw3snabHDDzQBAcqOvdi7YidfBVdKi0wxHhSuRBfuOppu
- pdXkb7zxuPQuSveCLqqZWRQ+Cc2QgF7SBqgznbe6Ngout5qXY5Dcagk9LqFNGhJQzUGHAsIs
- hap1f0B1PoUyUNeEInV98D8Xd/edM3mhO9nRpUXRK9Bvt4iEZUXGuVtZLT52nK6Wv2EZ1TiT
- OiqZlf1P+vxYLBx9eKmabPdm3yjalhY8yr1S1vL0gSA/C6W1o/TowdieF1rWN/MYHlkpyj9c
- Rpc281gAO0AP3V1G00YzBEdYyi0gaJbCEQnq8Vz1vDXFxHzyhgGz7umBsVKmYwZgA8DrrB0M
- oaP35wuGR3RJcaG30AnJpEDkBYHznI2apxdcuTPOHZyEilIRrBGzDwGtAhldzlBoBwE3Z3MY
- 31TOpACu1ZpNOMysZ6xiE35pWkwc0KYm4hJA5GFfmWSN6DniimW3pmdDIiw4Ifcx8b3mFrRO
- BbDIW13E51j9RjbO/nAaK9ndZ5LRO1B/8Fwat7bLzmsCiEXOJY7NNpIEpkoNoEUfCcZwmLrU
- +eOTPzaF6drw6ayewEi5yzPg3TAT6FV3oBsNg3xlwU0gPK3v6gYPX5w9+ovPZ1/qqNfOrbsE
- FRuiSVsZQ5s3AAMFD/9XjlnnVDh9GX/r/6hjmr4U9tEsM+VQXaVXqZuHKaSmojOLUCP/YVQo
- 7IiYaNssCS4FCPe4yrL4FJJfJAsbeyDykMN7wAnBcOkbZ9BPJPNCbqU6dowLOiy8AuTYQ48m
- vIyQ4Ijnb6GTrtxIUDQeOBNuQC/gyyx3nbL/lVlHbxr4tb6YkhkO6shjXhQh7nQb33FjGO4P
- WU11Nr9i/qoV8QCo12MQEo244RRA6VMud06y/E449rWZFSTwGqb0FS0seTcYNvxt8PB2izX+
- HZA8SL54j479ubxhfuoTu5nXdtFYFj5Lj5x34LKPx7MpgAmj0H7SDhpFWF2FzcC1bjiW9mjW
- HaKaX23Awt97AqQZXegbfkJwX2Y53ufq8Np3e1542lh3/mpiGSilCsaTahEGrHK+lIusl6mz
- Joil+u3k01ofvJMK0ZdzGUZ/aPMZ16LofjFA+MNxWrZFrkYmiGdv+LG45zSlZyIvzSiG2lKy
- kuVag+IijCIom78P9jRtB1q1Q5lwZp2TLAJlz92DmFwBg1hyFzwDADjZ2nrDxKUiybXIgZp9
- aU2d++ptEGCVJOfEW4qpWCCLPbOT7XBr+g/4H3qWbs3j/cDDq7LuVYIe+wchy/iXEJaQVeTC
- y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
- X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231227231657.15152-1-asmaa@nvidia.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org
+References: <20231218024024.3516870-1-almasrymina@google.com>
+ <20231218024024.3516870-13-almasrymina@google.com>
+From: Helge Deller <deller@gmx.de>
+Autocrypt: addr=deller@gmx.de; keydata=
+ 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
+In-Reply-To: <20231218024024.3516870-13-almasrymina@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1CJx57+OhafBv9nyT31t7uQ69mk+ew1K2kNcH6rFX0c45RB+gGy
+ ufI14Cm8vmaThhO5jaxQvDyvLAWtFiQlfaHTcJS4nB8lOMjTcvgmDuzQaGlOkq7toMFGuct
+ zqbYviNagfmrU856z6PHOnBOrCw7DcXKPftPJzyBf4M7avOEBNEWpfWrIhkttSBq8A8JxQe
+ pFg22iUZNQcuQ678QWpIQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:HAEGlgqLqvw=;Yc26w74KRUPPguj5A2LYqQ7u48p
+ AIRjX4iaj5Zy5fGQdeKRRAXNq1BzQBE8eWh8LR17/DePFZYNObhlvCC2mj69r2eWwhQzanlAa
+ +HELes4lt6c5hBk9++z9KyTJ0D5caZtqAKEQqFVuHeDeVUFxpHo0xMHLWrbRyMUPJhK5vs4Ap
+ Tmy1e96VS6DceBVpyW7SAeAyvDm6u6bocgKNzq0MMpXIqJPzmrfXvvOWq5/lsYDZbmXtI4r/+
+ 2DG1q/szvVou+nH10738+CenehQy7MiK+5xGjN84awqsJeoNnS890LBBRCSnAvLAdRmjk8yHD
+ RYIYpFoWAfFMRQOW4NmyL3zLgyak9RpBRGRzJnvwY40RKKEw3YwbWQUgl5XnEk0JNk2TNRtH8
+ VekeA/M5ZClF++YakLgeUXDibg9geldaxLup0Y9x/1K6rsLEhwy9ieFn6CpX6mZBiKLy5uW74
+ H2Txk883FAJRtHZSXWEd3iHpPWqAoa4Su7qDq7vJvNAj4Tv7Awc9jDWBiuWVayJ64xH70qWZe
+ AqZrvflNzwT+4wXK73E6/+SE2T/DAVgQ7J9wJTZBBa6utPMm9HLRuU28cpJXiLzFNMIPBRfMe
+ 2FtEI8SYYcIABHoswAtAxAOSfiou83RHk063MZ5jL11uuWUjjDGKIRv+yZ1j3xCwRtyVFNsRG
+ Rd0COP10AReF2n7kdcP+N9/E3UqtFiSkagtHyagv5YQa38u6s7PVdnHVT4yhJ4rNNoG4RTWrX
+ 6JKDlwrRP6W9iLHIsA+Pe+BIAsTKuAnhEcUXzpvQ2RquJh7dcyxbgAn3OQ9ChWoRzbbqZTQb8
+ aijPpoTGHulP2ayJtISjOgekfa+2QVI+T3bgqBWVoBTVOmBLpUe8S3GJbU4gGRjwnZbnYQxC0
+ UkvP22uqsQwqKw04noJG/vDXKWa3eX269Mc0bbBF4RxlekL6pMAyd2PVTBzz7xERAhvsC5+gW
+ 1jjbhBMKEIBr2tQ0+ORZwiHN/nE=
+
+Hi Mina,
+
+On 12/18/23 03:40, Mina Almasry wrote:
+> Add an interface for the user to notify the kernel that it is done
+> reading the devmem dmabuf frags returned as cmsg. The kernel will
+> drop the reference on the frags to make them available for re-use.
+>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>
+> ---
+>
+> Changes in v1:
+> - devmemtoken -> dmabuf_token (David).
+> - Use napi_pp_put_page() for refcounting (Yunsheng).
+> - Fix build error with missing socket options on other asms.
+>
+> ---
+>   arch/alpha/include/uapi/asm/socket.h  |  8 ++++-
+>   arch/mips/include/uapi/asm/socket.h   |  6 ++++
+>   arch/parisc/include/uapi/asm/socket.h |  6 ++++
+>   arch/sparc/include/uapi/asm/socket.h  |  6 ++++
+>   include/uapi/asm-generic/socket.h     |  1 +
+>   include/uapi/linux/uio.h              |  4 +++
+>   net/core/sock.c                       | 45 +++++++++++++++++++++++++++
+>   7 files changed, 75 insertions(+), 1 deletion(-)
+>
+...
+> diff --git a/arch/parisc/include/uapi/asm/socket.h b/arch/parisc/include=
+/uapi/asm/socket.h
+> index be264c2b1a11..6b8674399363 100644
+> --- a/arch/parisc/include/uapi/asm/socket.h
+> +++ b/arch/parisc/include/uapi/asm/socket.h
+> @@ -132,6 +132,12 @@
+>   #define SO_PASSPIDFD		0x404A
+>   #define SO_PEERPIDFD		0x404B
+>
+> +#define SO_DEVMEM_DONTNEED	0x404C
+> +#define SO_DEVMEM_LINEAR	0x404D
+> +#define SCM_DEVMEM_LINEAR	SO_DEVMEM_LINEAR
+> +#define SO_DEVMEM_DMABUF	0x404E
+> +#define SCM_DEVMEM_DMABUF	SO_DEVMEM_DMABUF
 
 
+Could you please change this ^^ for parisc to use the same constants as
+the generic version below (97-99).
+Although 0x404c is the logical successor, I'd prefer to be in sync
+with other generic code if possible...
 
-On 12/28/2023 12:16 AM, Asmaa Mnebhi wrote:
-> Very rarely, the KSZ9031 fails to complete autonegotiation although it was
-> initiated via phy_start(). As a result, the link stays down. Restarting
-> autonegotiation when in this state solves the issue.
-> 
-> Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
+Thanks!
+Helge
 
-Is there a Micrel errata associated with this work around that could be 
-referenced here?
--- 
-Florian
+...
+
+> diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generi=
+c/socket.h
+> index 25a2f5255f52..1acb77780f10 100644
+> --- a/include/uapi/asm-generic/socket.h
+> +++ b/include/uapi/asm-generic/socket.h
+> @@ -135,6 +135,7 @@
+>   #define SO_PASSPIDFD		76
+>   #define SO_PEERPIDFD		77
+>
+> +#define SO_DEVMEM_DONTNEED	97
+>   #define SO_DEVMEM_LINEAR	98
+>   #define SCM_DEVMEM_LINEAR	SO_DEVMEM_LINEAR
+>   #define SO_DEVMEM_DMABUF	99
+
 
