@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-60495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD54681F8FF
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 15:10:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA0E781F901
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 15:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A4DF1F2276F
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 14:10:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AF32284672
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 14:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221898831;
-	Thu, 28 Dec 2023 14:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7563E8831;
+	Thu, 28 Dec 2023 14:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Katy/l3d"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="bJhOcTC8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 762178826;
-	Thu, 28 Dec 2023 14:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-50e49a0b5caso6751899e87.0;
-        Thu, 28 Dec 2023 06:10:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6C6881E
+	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 14:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-28c934be96fso788640a91.0
+        for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 06:13:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703772599; x=1704377399; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1703772788; x=1704377588; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=c1QLjL/t9dV5lzMG8MOwQMq25dYxUQYtyICViUBElqU=;
-        b=Katy/l3dvjT/PUHC6AJgtqupaV9OPc06Gs0+ZoscqZOZASn02m3V25+fuB+SdJYlu6
-         2txyPNAg7pTLp0sKYeaOdk4srCw4M3cbezWg0J3yCqEV5h/CpnfCod4oLlCtOVKG/O7k
-         B25SsUDkLDJoZ+wr/mlKphqHEXaaZVLX5kxdCwawln6Q2byYCh+Gn1Oqh/QAjhG6/Kzz
-         k7hwwk2K2akZDq4xYbMm+cC/R8rS7A0lV+vkpnIXlnXxAVKMMYqoqRQ5lOHyPg+wjdRo
-         aZ+cUVAoz9cHEx1Mbgxs/qE9R4VQo0BamPSGCJrZC35/EFYuHp/NH4je0364fIdECEE8
-         XLOA==
+        bh=anZ4HtPp1NShGWPtRHzX2zGO46dyP0CC9Jy6axlS18M=;
+        b=bJhOcTC8088ucDv17hwg3QkWwjEkM8mhXcH6JFxTUA8P31WhBna5EIKV9MHW/HYlhW
+         1benYJF9Y17zHPkxXsUf5KbkYuhUY9yDa7k8q0Oq5e3rSscn0r+7kX6o4nIvyPz50Ph7
+         9b0mea+67nq42hXX6dVUH4BBWaYbLn/hPhhubsPjfHhFG0gV3rW4Qy5rLoEDtm4Bu7wq
+         CpXxr+ooraIDOMSTSNdrwrc0zPSlTWyX9HUNFOfnARF3pb1VZkBZO+ha/WMHxeuOL0BZ
+         kC/QvHVspcWqsf2bBpSk8GPliNqRVe9s4mdN20azkphZ27zlcgf+Q/Wg1NIMirYgmX+/
+         m+dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703772599; x=1704377399;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1703772788; x=1704377588;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c1QLjL/t9dV5lzMG8MOwQMq25dYxUQYtyICViUBElqU=;
-        b=MqKGSvElAJBHElw43aPoLiQTCo4mSYifHJKp2HbPfxfe21nCpfQGzacFqtnUQcJzfA
-         r9Y1ZdeoliALPHPwZxPQJb9UsnU3oRPzRGyyQ6uemJzFiqf9PtpHw2KWC3Pf0NVfa6IZ
-         /nAiCxH5O10yDyO1ACOk7nBHzfH74xWUJzUVvZqzpGF1t0DzkT5G34trXyGUAKRokvEe
-         qrJOEjWGJIPcvU1ueqwii1xJswpWSzekdfVDHJN/stOjVt7Sy5j3WCUIEh1welGmxoOS
-         mPhwaTcrCBsNdeMZudBEwDaY05p5KEWh2lmFoQfYmHO6mpm7OGzCMZU1dVzGAtrNj4tZ
-         tyXw==
-X-Gm-Message-State: AOJu0YyF9M3IA6qda6ME6Sssydfy64nQjJMu6rlgWaZ0qgSprUxjpPw7
-	F+OdQZCFI87HAnUa2DsEUac=
-X-Google-Smtp-Source: AGHT+IEeVZDSTI4Sv/udWx44ul868ezI9P22d/R8+w0tgBIx8Z2Nz9DzLiiPH9JRUPTtPYUP2Ke4FQ==
-X-Received: by 2002:a05:6512:128b:b0:50e:7f88:e124 with SMTP id u11-20020a056512128b00b0050e7f88e124mr2632826lfs.63.1703772599108;
-        Thu, 28 Dec 2023 06:09:59 -0800 (PST)
-Received: from ?IPV6:2a01:c22:7631:d500:84f:c992:adf1:8a6d? (dynamic-2a01-0c22-7631-d500-084f-c992-adf1-8a6d.c22.pool.telefonica.de. [2a01:c22:7631:d500:84f:c992:adf1:8a6d])
-        by smtp.googlemail.com with ESMTPSA id vl23-20020a17090730d700b00a26f91a30e1sm3224776ejb.91.2023.12.28.06.09.58
+        bh=anZ4HtPp1NShGWPtRHzX2zGO46dyP0CC9Jy6axlS18M=;
+        b=nHbvyS6YC1Lc1iEgFc5b7eUtCf/ldEmm0Baq0La6vIhVCxIbxQgYsRKpNn95j7HCds
+         Rydg9AmGbwqtbqyieMHkI2Si1BSQaStP62pPGgMNTyhqEzy1dEAEms6/pb9nZQouQBUn
+         q+4ncoQF+EJI5GT779Qoy3Ljl37G8wWejVbIdsn1NM2h6TUS/aVnJ8Pn+vp3oRWO5wfD
+         Xdu1U2mZJ9XA2l19N8rRxYgQlrZJQ9PhgfN2iWZLqENbV7XUcqTsEf1g6/7IM37Vqt9y
+         LRqC8K6pwrlB4PmucbwfQMw0CuYR5utNXA4P34gPJs3mvI7mjZkVBNPJ5wGdM72Qpb9A
+         hazA==
+X-Gm-Message-State: AOJu0Yw4j7vs69kyjcbn8BhpQSGzpJY8zHksjsgYkiu/wYEfo4cmbm60
+	lHCWM7D37n+n8UWdvIUMTNI0y+lecm8/
+X-Google-Smtp-Source: AGHT+IG7kNMxxkYAmQn76IDeOC2mXIVt0z42H9aI/jBWISjQh9E7hRtfIlh+RVt0mQvtUqbZtXZ5tA==
+X-Received: by 2002:a17:90b:1e46:b0:28b:f18f:1bff with SMTP id pi6-20020a17090b1e4600b0028bf18f1bffmr2980634pjb.57.1703772788315;
+        Thu, 28 Dec 2023 06:13:08 -0800 (PST)
+Received: from ?IPV6:2804:7f1:e2c0:89e9:266f:d30e:b731:7f4f? ([2804:7f1:e2c0:89e9:266f:d30e:b731:7f4f])
+        by smtp.gmail.com with ESMTPSA id jh19-20020a170903329300b001d05fb4cf3csm14015544plb.62.2023.12.28.06.13.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Dec 2023 06:09:58 -0800 (PST)
-Message-ID: <2f1e9892-261d-4b5f-9fdd-b0f852e90ea6@gmail.com>
-Date: Thu, 28 Dec 2023 15:09:57 +0100
+        Thu, 28 Dec 2023 06:13:08 -0800 (PST)
+Message-ID: <bc188893-3d49-4d02-84ad-a85ea399cc92@mojatatu.com>
+Date: Thu, 28 Dec 2023 11:13:03 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,89 +66,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] net: phy: micrel: Add workaround for incomplete
- autonegotiation
+Subject: Re: [PATCH net-next v8 1/5] net/sched: Introduce tc block netdev
+ tracking infra
 Content-Language: en-US
-To: Asmaa Mnebhi <asmaa@nvidia.com>, Florian Fainelli <f.fainelli@gmail.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "marek.mojik@nic.cz" <marek.mojik@nic.cz>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: David Thompson <davthompson@nvidia.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20231227231657.15152-1-asmaa@nvidia.com>
- <0cdb0461-ece3-4bfb-b058-9bf75c1f6fd3@gmail.com>
- <CH2PR12MB38952DAF6D1BD4CE6831EED1D79EA@CH2PR12MB3895.namprd12.prod.outlook.com>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <CH2PR12MB38952DAF6D1BD4CE6831EED1D79EA@CH2PR12MB3895.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
+To: Jamal Hadi Salim <jhs@mojatatu.com>, Ido Schimmel <idosch@idosch.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
+ pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
+References: <20231219181623.3845083-1-victor@mojatatu.com>
+ <20231219181623.3845083-2-victor@mojatatu.com> <ZY1hBb8GFwycfgvd@shredder>
+ <CAM0EoMkx6JAUdUdxsMe1hRxBVOQX-R0T+CVT=a3jAdKAxEd7GA@mail.gmail.com>
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <CAM0EoMkx6JAUdUdxsMe1hRxBVOQX-R0T+CVT=a3jAdKAxEd7GA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 28.12.2023 14:37, Asmaa Mnebhi wrote:
->  > On 12/28/2023 12:16 AM, Asmaa Mnebhi wrote:
->>> Very rarely, the KSZ9031 fails to complete autonegotiation although it
->>> was initiated via phy_start(). As a result, the link stays down.
->>> Restarting autonegotiation when in this state solves the issue.
->>>
->>> Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
+On 28/12/2023 09:35, Jamal Hadi Salim wrote:
+> On Thu, Dec 28, 2023 at 6:50 AM Ido Schimmel <idosch@idosch.org> wrote:
 >>
->> Is there a Micrel errata associated with this work around that could be
->> referenced here?
+>> On Tue, Dec 19, 2023 at 03:16:19PM -0300, Victor Nogueira wrote:
+>>> +static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
+>>> +                            struct netlink_ext_ack *extack)
+>>> +{
+>>> +     const struct Qdisc_class_ops *cl_ops = sch->ops->cl_ops;
+>>> +     struct tcf_block *block;
+>>> +     int err;
+>>> +
+>>> +     block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+>>
+>> Another problem, shouldn't there be a check that these operations are
+>> actually implemented? The following now crashes with a NULL pointer
+>> dereference:
+>>
+>> # tc qdisc replace dev swp1 root handle 1: tbf rate 1Mbit burst 256k limit 1M
 > 
-> Hi Florian,
 > 
-> No there isn’t. This is based on observations and comparison with the behavior and testing of other PHYs. For example, we don’t see this issue with the Vitesse PHY.
-> 
-The Microchip KSZ9031 errata documentation lists few link-related errata.
-May any of these be relevant in your case? If not, please check with Microchip.
-KSZ9031 isn't new, and most likely we would have seen such reports before,
-if there's an actual issue.
-I'd like to avoid that we add code to work around an issue that is specific
-to your setup.
+> I think this broke from v7->v8. Thanks for catching this. We'll send a
+> fix shortly.
 
-> Thanks.
-> Asmaa
+Just sent a fix to net-next because the original patch hasn't been
+propagated to net yet.
+
+cheers,
+Victor
+
 
 
