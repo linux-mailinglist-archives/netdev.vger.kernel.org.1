@@ -1,114 +1,103 @@
-Return-Path: <netdev+bounces-60499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2089281F9CB
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 16:59:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C1681FA00
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 17:44:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C839D1C21BD6
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 15:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA73C285691
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 16:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37ED9F4FA;
-	Thu, 28 Dec 2023 15:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BE3D2E8;
+	Thu, 28 Dec 2023 16:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ppv5Kc72"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VQBU18W3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD91CF4E1;
-	Thu, 28 Dec 2023 15:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D161C101C2;
+	Thu, 28 Dec 2023 16:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5d05ff42db0so53085917b3.2;
-        Thu, 28 Dec 2023 07:59:33 -0800 (PST)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40d5bc68bb7so20759005e9.3;
+        Thu, 28 Dec 2023 08:44:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703779173; x=1704383973; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fVlq7DVtkYMFVcKQ9OTWr3F0Se96zgvlu8hOUc93pE0=;
-        b=Ppv5Kc72raExgjl4dWjiAMXrTKbo05mwvorlbWy3EUvWf71Rbh7uR/Xb/f+bDSLPz4
-         6DntvnFPmTXjbqPWC3ASphZv+rYyO/KAUoqL7yiy8dcbk4innNbx/jHt0xSfijgbn0gG
-         lhxxBiTQM/B/KyAy06+/WK5H8ywbB2cm/UsPX6+7jbKiNgLbmjxiz7vfaQuruEJn467k
-         G9Tq0X7UZK05P0GIMPYBQ/5ywpQhrG785vHYkcxdWfPOwKHpzTq5pSoM/pR111o+1K7X
-         vwrQkr46aqQchFSGwCkgSEEIKEO1A51y7it4DKPiZSzxai98U1+pzVrbXGp9AtT0VdAu
-         SJZA==
+        d=gmail.com; s=20230601; t=1703781844; x=1704386644; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cQvuZ3pxxVDvSCSqVoOdI+ZpejXE1rFk/CfCxYLqdrc=;
+        b=VQBU18W3fwL9oP/jx/O/jBx752C0Wuibd2HEqBt/7piScLjORMIXvXdIstQNTt5Gpd
+         PHmShx4YDW1bZ0XOzk2MI9oy5EbWVTu+i1jKkKBbQfBgFLWX/6MwugPTgBFsCZa4+JSa
+         XQJAolCC140O1d0FsH6NDwaiColtKksnJZv8/rUCcARfFRHzbjQHMIK7fzVgNn83Bmhp
+         eASj2f5RaUEDrI0KEVyqRs7bbPl1Ebl4WFWvJVbElYlGDqyri33DBax6z06zMSaAvdmS
+         t/VFKZ6lez8ZQvzKpNLWshlSqbSPrPdNtEdQwS9I+DQePtbzSCmAzdA+13FXObxKVlIM
+         MCzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703779173; x=1704383973;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fVlq7DVtkYMFVcKQ9OTWr3F0Se96zgvlu8hOUc93pE0=;
-        b=CaoFbpe0qW8Idn9DNfiu4xHXoosKJMTICU+a0emDlwMPoTbEGTGwS1RZqRkXq9mZbd
-         4yPoh9Bm6poJmXFxbsaejzz6qi45Bma7yIj6CRRhKw1C2F4IKM6jUAUkKvKw18bQs6Pr
-         BHm+NcVb/9PSjsa3EdDiqiik5RHmLxYpRrQFya6DPox61j0InbEkUa4HWRGaaHzsLZGf
-         Ta8nZvoHAcS0xAzA/W2CgZECAPe35ffxIHXWx5NndeQVvT/BxPLC+NdjvA5fi4t8AsTU
-         9aq7GZerZ6PHDVUDrwpnL/GylZ95bTZTa1RMqfrm58OTEHWeSHxuiEmoHsk6ahd43YeD
-         /Sdw==
-X-Gm-Message-State: AOJu0YxWodtQQwQsjmDeFyXVnJYX304i5sWhYyNJ9Ue+EJ2DEes0pXMY
-	Zq/ANbQEQeMl98s+/i18OcKoIZxrcJds92JHfLg=
-X-Google-Smtp-Source: AGHT+IE8n3oYZ5R2LDPhAOxhummRKsaEwA2M8Gn8AOHI0pVTdFih5TII33+bSs8PWE58xsJQY/7+ZN1T3Juaxa/x/sE=
-X-Received: by 2002:a0d:c983:0:b0:5d7:1941:2c33 with SMTP id
- l125-20020a0dc983000000b005d719412c33mr6505582ywd.96.1703779172672; Thu, 28
- Dec 2023 07:59:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703781844; x=1704386644;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cQvuZ3pxxVDvSCSqVoOdI+ZpejXE1rFk/CfCxYLqdrc=;
+        b=gNr8RngUXV/c1AvZpNuUNa4VfsataIlHJKpaakGcgSsAzGjmzkq85pS0Qyl9MuFUAJ
+         +GGWW3GhoAp6xmvDgFBmmGxOw6QWsvL0EHG2MUwEszXb4Uh5dHjNKp2PstgBlI3Qd3rO
+         fa+JePCzPhCPTf0c6AvADpSHF7twTr/t5IZOGKjbI022rzvhvZshpeY2bIfpH+BMdMNy
+         MsUH30fRO08l7C2Kgv/4E+ZEKutftJpudtp33FBo6OhbdHwvT5EOj5QZ++84vJdEbCPh
+         zlUWR3DopYTwzJQtvWRfPv/WllEUkhSK070+15nFhzvJh+hlThQjSW7i5k8xAko/05yL
+         vzwA==
+X-Gm-Message-State: AOJu0Yw39UcyXoxcEUas96fYNTVIW49i2JULy9tgNMDANEh9te3jqlMr
+	op2MZu4oF5+zZMqwGUsDSmnpTPixTG6vxw==
+X-Google-Smtp-Source: AGHT+IH6lkChSESFaJFgZvFEeQWJ+DqMdxzi3yk2fykL16SYgV0IoZws3CgXuJgOx9cSEN7UvkLGBQ==
+X-Received: by 2002:a05:600c:3d16:b0:40d:5c9c:187a with SMTP id bh22-20020a05600c3d1600b0040d5c9c187amr1841166wmb.108.1703781843711;
+        Thu, 28 Dec 2023 08:44:03 -0800 (PST)
+Received: from localhost.localdomain (bl17-216-113.dsl.telepac.pt. [188.82.216.113])
+        by smtp.googlemail.com with ESMTPSA id a5-20020a05600c348500b0040d597abf05sm10409936wmq.42.2023.12.28.08.44.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Dec 2023 08:44:03 -0800 (PST)
+From: Malkoot Khan <engr.mkhan1990@gmail.com>
+To: edumazet@google.com
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Malkoot Khan <engr.mkhan1990@gmail.com>
+Subject: [PATCH] tcp: fixed whitespace trailing error
+Date: Thu, 28 Dec 2023 16:42:50 +0000
+Message-Id: <20231228164250.106433-1-engr.mkhan1990@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223211306.GA215659@kernel.org> <20231224024725.80516-1-brad@faucet.nz>
-In-Reply-To: <20231224024725.80516-1-brad@faucet.nz>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 28 Dec 2023 10:59:21 -0500
-Message-ID: <CADvbK_dpD+rTPr4acbvmHu91OHtgynzJ4Ru3+d+rw7njmOPeww@mail.gmail.com>
-Subject: Re: [PATCH net] netfilter: nf_nat: fix action not being set for all
- ct states
-To: Brad Cowie <brad@faucet.nz>
-Cc: horms@kernel.org, aconole@redhat.com, coreteam@netfilter.org, 
-	davem@davemloft.net, dev@openvswitch.org, edumazet@google.com, fw@strlen.de, 
-	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Dec 23, 2023 at 9:48=E2=80=AFPM Brad Cowie <brad@faucet.nz> wrote:
->
-> On Sun, 24 Dec 2023 at 10:13, Simon Horman <horms@kernel.org> wrote:
-> > Thanks Brad,
-> >
-> > I agree with your analysis and that the problem appears to
-> > have been introduced by the cited commit.
->
-> Thanks for the review Simon.
->
-> > I am curious to know what use case triggers this /
-> > why it when unnoticed for a year.
->
-> We encountered this issue while upgrading some routers from
-> linux 5.15 to 6.2. The dataplane on these routers is provided
-> by an openvswitch bridge which is controlled via openflow by
-> faucet. These routers are also performing SNAT on all traffic
-> to/from the wan interface via openvswitch conntrack openflow
-> rules.
->
-> We noticed that after upgrading the linux kernel, traceroute/mtr
-> no longer worked when run from clients behind the router.
-> We eventually discovered the reason for this is that the
-> ICMP time exceeded messages elicited by traceroute were
-> matching openflow rules with the incorrect destination ip,
-> despite there being an openflow rule to undo the nat.
-> Other packets in the established or new state matched the
-> expected openflow rules.
->
-> A git bisect between 5.15 and 6.2 showed that this change in
-> behaviour was introduced by commit ebddb1404900. After the
-> above patch is applied our routers perform nat correctly
-> again for traceroute/mtr.
+Corrected whitespaces trailing error
 
-Acked-by: Xin Long <lucien.xin@gmail.com>
+Signed-off-by: Malkoot Khan <engr.mkhan1990@gmail.com>
+---
+ net/ipv4/tcp_timer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index 1f9f6c1c196b..b7d0f8aee7ff 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -542,7 +542,7 @@ void tcp_retransmit_timer(struct sock *sk)
+ 		struct inet_sock *inet = inet_sk(sk);
+ 		u32 rtx_delta;
+ 
+-		rtx_delta = tcp_time_stamp_ts(tp) - (tp->retrans_stamp ?: 
++		rtx_delta = tcp_time_stamp_ts(tp) - (tp->retrans_stamp ? :
+ 				tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb));
+ 		if (tp->tcp_usec_ts)
+ 			rtx_delta /= USEC_PER_MSEC;
+-- 
+2.34.1
+
 
