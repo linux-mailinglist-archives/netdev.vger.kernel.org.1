@@ -1,102 +1,134 @@
-Return-Path: <netdev+bounces-60452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5F881F642
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 10:24:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3910E81F64B
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 10:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E1B91C21B5F
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:24:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D962E1F2268C
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91AC5671;
-	Thu, 28 Dec 2023 09:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SPL99FjM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B84E63B6;
+	Thu, 28 Dec 2023 09:32:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C724163A8;
-	Thu, 28 Dec 2023 09:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703755469; x=1735291469;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0BnRPGjZ08Szibrn+c+3PaPkhu55oPawbz2u9zwgUAU=;
-  b=SPL99FjMfJSlEk42JVfx4MRHUILI78BFRQU7ki0D9mw2x+2n/i2TxNSo
-   gYkV/7oO5OgkNmUX2h9yBqEw9wSNnpK2lsjzVnjfJ1XVllRCcMs9pqJJH
-   F0vJtpDDS1+nAw3EpCoH+213eRcE83ObswjPkhtk4CVcj9e9k4bOvefZp
-   8BCMT8GTtU0SXoSq+N5C168KTxsbr3pJHwF+LNZcOJLSd1zs24JfMyfZr
-   1DJ9Qs7TJho7RTCMLLX3x8D/DHlvRTl8GmarR73U4Jekw1tILuohN8Mxi
-   WpWXIKAb+I1g3vbe9iIutwq2gFf5hGz4s2OqPN6m6ghO7GZ6Q1CuKVc/o
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="9924249"
-X-IronPort-AV: E=Sophos;i="6.04,311,1695711600"; 
-   d="scan'208";a="9924249"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 01:24:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="771675446"
-X-IronPort-AV: E=Sophos;i="6.04,311,1695711600"; 
-   d="scan'208";a="771675446"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.245.129.232]) ([10.245.129.232])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 01:24:23 -0800
-Message-ID: <02414651-df89-48cf-ac13-25f581f3e34f@linux.intel.com>
-Date: Thu, 28 Dec 2023 11:24:21 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B226863A8;
+	Thu, 28 Dec 2023 09:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tonylu@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VzO1T68_1703755955;
+Received: from localhost(mailfrom:tonylu@linux.alibaba.com fp:SMTPD_---0VzO1T68_1703755955)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Dec 2023 17:32:36 +0800
+Date: Thu, 28 Dec 2023 17:32:34 +0800
+From: Tony Lu <tonylu@linux.alibaba.com>
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alibuda@linux.alibaba.com, ubraun@linux.vnet.ibm.com,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net/smc: fix invalid link access in dumping SMC-R
+ connections
+Message-ID: <ZY1AssRgaWjLVXuN@TONYMAC-ALIBABA.local>
+Reply-To: Tony Lu <tonylu@linux.alibaba.com>
+References: <1703662835-53416-1-git-send-email-guwen@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] igc: Fix hicredit calculation
-To: rodrigo.cadore@l-acoustics.com,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Aravindhan Gunasekaran <aravindhan.gunasekaran@intel.com>,
- Mallikarjuna Chilakala <mallikarjuna.chilakala@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-References: <20231208-igc-fix-hicredit-calc-v1-1-7e505fbe249d@l-acoustics.com>
-Content-Language: en-US
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20231208-igc-fix-hicredit-calc-v1-1-7e505fbe249d@l-acoustics.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1703662835-53416-1-git-send-email-guwen@linux.alibaba.com>
 
-On 12/8/2023 16:58, Rodrigo Cataldo via B4 Relay wrote:
-> From: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
+On Wed, Dec 27, 2023 at 03:40:35PM +0800, Wen Gu wrote:
+> A crash was found when dumping SMC-R connections. It can be reproduced
+> by following steps:
 > 
-> According to the Intel Software Manual for I225, Section 7.5.2.7,
-> hicredit should be multiplied by the constant link-rate value, 0x7736.
+> - environment: two RNICs on both sides.
+> - run SMC-R between two sides, now a SMC_LGR_SYMMETRIC type link group
+>   will be created.
+> - set the first RNIC down on either side and link group will turn to
+>   SMC_LGR_ASYMMETRIC_LOCAL then.
+> - run 'smcss -R' and the crash will be triggered.
 > 
-> Currently, the old constant link-rate value, 0x7735, from the boards
-> supported on igb are being used, most likely due to a copy'n'paste, as
-> the rest of the logic is the same for both drivers.
+>  BUG: kernel NULL pointer dereference, address: 0000000000000010
+>  #PF: supervisor read access in kernel mode
+>  #PF: error_code(0x0000) - not-present page
+>  PGD 8000000101fdd067 P4D 8000000101fdd067 PUD 10ce46067 PMD 0
+>  Oops: 0000 [#1] PREEMPT SMP PTI
+>  CPU: 3 PID: 1810 Comm: smcss Kdump: loaded Tainted: G W   E      6.7.0-rc6+ #51
+>  RIP: 0010:__smc_diag_dump.constprop.0+0x36e/0x620 [smc_diag]
+>  Call Trace:
+>   <TASK>
+>   ? __die+0x24/0x70
+>   ? page_fault_oops+0x66/0x150
+>   ? exc_page_fault+0x69/0x140
+>   ? asm_exc_page_fault+0x26/0x30
+>   ? __smc_diag_dump.constprop.0+0x36e/0x620 [smc_diag]
+>   smc_diag_dump_proto+0xd0/0xf0 [smc_diag]
+>   smc_diag_dump+0x26/0x60 [smc_diag]
+>   netlink_dump+0x19f/0x320
+>   __netlink_dump_start+0x1dc/0x300
+>   smc_diag_handler_dump+0x6a/0x80 [smc_diag]
+>   ? __pfx_smc_diag_dump+0x10/0x10 [smc_diag]
+>   sock_diag_rcv_msg+0x121/0x140
+>   ? __pfx_sock_diag_rcv_msg+0x10/0x10
+>   netlink_rcv_skb+0x5a/0x110
+>   sock_diag_rcv+0x28/0x40
+>   netlink_unicast+0x22a/0x330
+>   netlink_sendmsg+0x240/0x4a0
+>   __sock_sendmsg+0xb0/0xc0
+>   ____sys_sendmsg+0x24e/0x300
+>   ? copy_msghdr_from_user+0x62/0x80
+>   ___sys_sendmsg+0x7c/0xd0
+>   ? __do_fault+0x34/0x1a0
+>   ? do_read_fault+0x5f/0x100
+>   ? do_fault+0xb0/0x110
+>   __sys_sendmsg+0x4d/0x80
+>   do_syscall_64+0x45/0xf0
+>   entry_SYSCALL_64_after_hwframe+0x6e/0x76
 > 
-> Update hicredit accordingly.
+> When the first RNIC is set down, the lgr->lnk[0] will be cleared and an
+> asymmetric link will be allocated in lgr->link[SMC_LINKS_PER_LGR_MAX - 1]
+> by smc_llc_alloc_alt_link(). Then when we try to dump SMC-R connections
+> in __smc_diag_dump(), the invalid lgr->lnk[0] will be accessed, resulting
+> in this issue. So fix it by accessing the right link.
 > 
-> Fixes: 1ab011b0bf07 ("igc: Add support for CBS offloading")
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Signed-off-by: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
-> ---
-> This is a simple fix for the credit calculation on igc devices
-> (i225/i226) to match the Intel software manual.
-> 
-> This is my first contribution to the Linux Kernel. Apologies for any
-> mistakes and let me know if I improve anything.
-> ---
->   drivers/net/ethernet/intel/igc/igc_tsn.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Fixes: f16a7dd5cf27 ("smc: netlink interface for SMC sockets")
+> Reported-by: henaumars <henaumars@sina.com>
+> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=7616
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+What about using Link: http... here?
+
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+
+Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
+
+> ---
+>  net/smc/smc_diag.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
+> index a584613aca12..5cc376834c57 100644
+> --- a/net/smc/smc_diag.c
+> +++ b/net/smc/smc_diag.c
+> @@ -153,8 +153,7 @@ static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
+>  			.lnk[0].link_id = link->link_id,
+>  		};
+>  
+> -		memcpy(linfo.lnk[0].ibname,
+> -		       smc->conn.lgr->lnk[0].smcibdev->ibdev->name,
+> +		memcpy(linfo.lnk[0].ibname, link->smcibdev->ibdev->name,
+>  		       sizeof(link->smcibdev->ibdev->name));
+>  		smc_gid_be16_convert(linfo.lnk[0].gid, link->gid);
+>  		smc_gid_be16_convert(linfo.lnk[0].peer_gid, link->peer_gid);
+> -- 
+> 2.43.0
 
