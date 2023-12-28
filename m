@@ -1,199 +1,474 @@
-Return-Path: <netdev+bounces-60446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB6E81F5E3
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:16:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1938781F5EB
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 09:25:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A730A283E6A
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 08:16:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0888C1C21D29
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 08:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33E0441B;
-	Thu, 28 Dec 2023 08:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B85A5393;
+	Thu, 28 Dec 2023 08:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="a+jdwGt+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EZVvo6eC"
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 695335233
-	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 08:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=CBsCm
-	O0p2nUWsjS/fWaX2zG4/pPz20JZHUQkF7v0mEI=; b=a+jdwGt+6WiNuPt51qF7y
-	MzfgyA7iqmVCqfFCbri6ItayQzA4BNO7NVYKEvKKHLW9H0E3hyKnePTqKlUvob/i
-	TuAu6vBJRQHkVZ4f1aT5JCaJL993IFudrAg+VRziyE9KgQv3MT+vmX7iXFnxsy9g
-	RimEbLZHe3ZidIpmjkYrWA=
-Received: from localhost.localdomain (unknown [140.207.85.39])
-	by zwqz-smtp-mta-g2-2 (Coremail) with SMTP id _____wB3n2iXLo1lOjmKCg--.52797S2;
-	Thu, 28 Dec 2023 16:15:19 +0800 (CST)
-From: Tao Liu <taoliu828@163.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	vladbu@nvidia.com,
-	paulb@nvidia.com
-Cc: netdev@vger.kernel.org,
-	simon.horman@corigine.com,
-	xiyou.wangcong@gmail.com,
-	pablo@netfilter.org,
-	taoliu828@163.com
-Subject: [PATCH net] net/sched: act_ct: fix skb leak and crash on ooo frags
-Date: Thu, 28 Dec 2023 16:14:57 +0800
-Message-Id: <20231228081457.936732-1-taoliu828@163.com>
-X-Mailer: git-send-email 2.31.1
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260655244;
+	Thu, 28 Dec 2023 08:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703751893; x=1735287893;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aQQL/E4WC93dU9lJwbfBkAH12tiADbFtXqIQs6HL9SY=;
+  b=EZVvo6eCDYX7wGFalYFRWTlLMpGX6ZUrykc1H2dta7zoU3gH7dZUf0xX
+   Fr8Qd5+XaehR3BdZaIYr1ZSwbOlcTCLiOl2+RWVP0oNvcLlhb3dsIOiBY
+   o73crIs3CmMQ7K7JF+RP1HezXzxy4+2ELRTVmt6aoNgorMf2Wa/mSsM5K
+   nD/5taC1qH3DXGAkmSgcR4xfxlVVz8LFnN4L2upVxguV/tU9q1YhDyuOw
+   bhDt+uhan4dXbGC5GSr71sqJyXu1TDOIiVsNa8WPN/2PaWi8++q8zmvj3
+   CG8wzCzuFKoxIaCuRunRFLB+kdecSzIppOtrNpPBnViYnZXfyf9OAJ+/R
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="395418161"
+X-IronPort-AV: E=Sophos;i="6.04,311,1695711600"; 
+   d="scan'208";a="395418161"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 00:24:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,311,1695711600"; 
+   d="scan'208";a="26801795"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Dec 2023 00:24:51 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 28 Dec 2023 00:24:50 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 28 Dec 2023 00:24:50 -0800
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 28 Dec 2023 00:24:50 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TxsvZpvb9IcKiTSbrcZmhfYZnUrvs2nQcSpRnkvnGvWCNBCugBCsWUy5htWQ3dg5JooaZ64vMoW/WLwe7A8FnXDIlxnMbArWwT+ahWDMGABWjyCChU98kicItEyw2AK87jpATZy5MtlmTu/w6kfutEjSQx5YyYSKF//BFSrrYWVgd13z9UYVg76ijzXYsXlyEp03asJDTsiqy4lQhVafa2S/7UvScCMj4taOqDeWMZ/9yhixiGS2TIGOsRsL3X+z1cFMjRUwUMZjYgKA5a+3oaPAo4bfCl0MXYEXFVICBv4qQqyMpLF0vqcQcSSVnU+/Zq4ngpzYYyf2BGEaARX3tQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b1TG1u4FB7ik/I9HjCYW5nF8W9rUzOkSlMiiqbuhEFE=;
+ b=GI2zDiEZ1govYqqWxonDTmGo3mtwTR1nZP1fSr3GmSTMkxPgNcHPrWabif7c/uHeBN7kxDQTm1ZlNav67nGuBUlskzMNXZ11BCTVtm7deTqHNuI3rcICd13plk/wW3mb8STsdXOiYxDaL0+6HgJbNl8R1TKq7YI7rNu3g7DY1oXmkhYF8ZSlcuGcHW78X9zvtsdHEhkgCOdlMcf5TT0hqYE+4qOLmIa5hg6CCRcdYh0bwa8n43Dnz2GbqjopX9IKL42zNB5jDvL7Ovwbz3OD02t7vZBoVgo75MP2bq7llYJXwx/Sq+ugdEM6KzKMrLvZVXSrf7BeyKyWUzY3st6rDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
+ by SA0PR11MB4750.namprd11.prod.outlook.com (2603:10b6:806:9d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.20; Thu, 28 Dec
+ 2023 08:24:48 +0000
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::ef7b:6435:f727:4d5c]) by BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::ef7b:6435:f727:4d5c%3]) with mapi id 15.20.7113.026; Thu, 28 Dec 2023
+ 08:24:48 +0000
+Message-ID: <95b7ee65-5661-6529-07d3-ce13968a3c25@intel.com>
+Date: Thu, 28 Dec 2023 09:24:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH net-next] net: phy: Cleanup struct mdio_driver_common
+To: Yajun Deng <yajun.deng@linux.dev>
+CC: <andrew@lunn.ch>, <olteanv@gmail.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <rmk+kernel@armlinux.org.uk>, <kabel@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-phy@lists.infradead.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+References: <20231228072350.1294425-1-yajun.deng@linux.dev>
+Content-Language: en-US
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20231228072350.1294425-1-yajun.deng@linux.dev>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0099.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a9::17) To BYAPR11MB3672.namprd11.prod.outlook.com
+ (2603:10b6:a03:fa::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wB3n2iXLo1lOjmKCg--.52797S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxtw47XFyxCr4rtrWDXr1DJrb_yoWxGw1rpF
-	yftr45CF4vkr1DJr4UAF1UKr4fGrsrCF4qgrn3Jr18J3Z8G3WUtry7Kr4Ikr1UCrW8X34x
-	Jryqqw18tr1jyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pi_gA7UUUUU=
-X-CM-SenderInfo: xwdrzxbxysmqqrwthudrp/1tbiVwJUFGVOAtVxzwAAsX
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SA0PR11MB4750:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d90a34a-ac0d-47bc-d31d-08dc077e745a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pYIVdfoRChmwGwoPr50zvu0QctUHWPKVUtOquJwTwgi/leInXT8Ys5VhXZMam4/LPOkYg0pjIIzB3kENI8zVIU87+L2pQF2YAOIkdTAUCaRnSRG+6bvX31h3JNL0KkDDIegrQYXVGHP7/F0PJeTCHrTSrnkDx04x7Gwa+3VHU062gfCv3Mnd9wCrg3nwj+nhrMrm5yU4uG/tQ+UlBXDqkXodMkg57QTDDAxrS2i7Dr0s82olC52zsHp/vPnhrRXoDXeJV2Bti/e0OIo0YpPUyAsvlPE3se7DqgUE/PgpZh3xRTGIXvPWhJ06k94zW4u9RJf10nq7qTGjsEExdHmxJux5Tkm3uCDsglY8oBKISvN0tbTOhObdJxQ3ht84RwaQtSPxugRozyi4ESLMovQzL+5Q1m0F21ZfxKigkr0Mh8LISZyp5XNZEUMAJD7R3EdlmgXRTtBeiMZITzMWXSMlfP8X6PgiWYtXPuz7WqTmdzgV9+0BS2GRZjcYfnEmxahP48OnEk/V4GtTyP+mOLcsdvTCuJXvOWQCJHvBCbcjVlVc7qDvqgo9VJ6k6wyjPpd2lmXA6cEzQJAx0u2yx1mbvY4cDpBXzpfa2bw2Be9nYUaVIr6M1nWGpwcccbaxLzfr
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(376002)(346002)(366004)(396003)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(36756003)(31686004)(82960400001)(41300700001)(83380400001)(38100700002)(66946007)(66476007)(8936002)(8676002)(6916009)(2616005)(66556008)(7416002)(5660300002)(30864003)(316002)(4326008)(6486002)(86362001)(31696002)(26005)(6512007)(6666004)(478600001)(6506007)(966005)(53546011)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NE9yQlQ4OG1zRTh3NVhsSEVWc0ZIZ2lveEJGL2V5Y3ROc2F3MjBra0ZQZFpy?=
+ =?utf-8?B?WG9qMGJhaWNvd205ZjVWWkNGSlRJazVGR3MvQytrWmVGbVNacHNQR0ZQK2kw?=
+ =?utf-8?B?VTVpUU10VnExMmtrUTlDSHdRM1QzZzMzQTFXdldlcE9aVVQzUWJaVDN5Slh2?=
+ =?utf-8?B?ckFlME00Tnl0ZU9ZOWZ1cG9NZ2lCSG85K0JObEdqbHdMWkNPUks5M1lQN3Y4?=
+ =?utf-8?B?T05lL0ZwODdzTi9SbEs3NEx1TFBueE5LeXNOUENRdW40a2FGMUdvQ2Z5NE9F?=
+ =?utf-8?B?bmxSelNrZ1BXU0RaTytSVGR5bCtMSVpWWjBEQUNMd0hZQ1U3YlpzbFZsR1ZF?=
+ =?utf-8?B?SFc2ak1ySC9ISlZXd0JBYVhIa1MrY1BRdDE4cWJPS015Q0ZCV2VkQ1o0ZVlt?=
+ =?utf-8?B?MGpBbjRtQjRtVW1rUWpEQmE3cEZETngzblZ3QzVaNEdqanlsM2NtR2ozaXUx?=
+ =?utf-8?B?OStaVmd6ZW1HQ2ErNWR1cjdFSnYzeTNjOGdyMWlKYmtEUnJweTRTT2xuaTVK?=
+ =?utf-8?B?alB2UVloaUd6UjQvd0pRam1RdFJ4T1FGQmx1Zktub1ZOREt1R2VDNThuY21o?=
+ =?utf-8?B?dDZvaHpkUUlHanZTbFBSVHNrMDlhS3NCRzltaHVCR09zbUJQRllza1JFV28x?=
+ =?utf-8?B?MWx1NU9HcXU3cGJVaTFqV3B6VmFCOWoyTWF5TGNtc2FDQWlySkdZVm9oUSt6?=
+ =?utf-8?B?a05vWFFPWjJ3YXV0ZDB6K3pjbUxLM2JzQkxyYSt0OFY4VUdpU3pFZG1QbjNS?=
+ =?utf-8?B?Y2c3RkpWTXdZMVZNK2U1bkJkSmNkaUhpUDRoOVJxZ2h4NGJBK2lldWcwUjJn?=
+ =?utf-8?B?cURBeTdSTVpHb0ZwRGQyb2pkWW1LWitXV3VNNE4vQkd6ZUtrRHdZNzZhZ1pZ?=
+ =?utf-8?B?bm9sQys4c2c5eGVtWmpzdXV5NkdYTE54cEFRQ0pvV2F4T2czRTZDcGk4dFh4?=
+ =?utf-8?B?R0dXVW1tT0xlNW9YYVljYVRWZzRjWjRLclZSdXZBYi9qa2oxZW04eHRTUUZl?=
+ =?utf-8?B?ZzJaRWVhMTNndHN6NnM0eG8reDBFRjc1b0ZwaFJNWngydnZzNGF2cjhDOGZw?=
+ =?utf-8?B?SGt3WkVVWHk5TmZOODlVRU9MbXVxMDRJdThZL1NaZFJnU3JueVViMnZzc1E4?=
+ =?utf-8?B?Wk1PYkZLTWV4MUpIanVUL0dJMmZRblc1Y09rZnVBbVBuRlhRVHJ5T1hvSUJV?=
+ =?utf-8?B?RzZOUGc3alBZc01FemRHUWk0ditkdFVLSk9MMVU2b1MrcmlSOHpqT1pOSXVu?=
+ =?utf-8?B?Tmx4SGM3eE9SV0p4ZmwvZjF4KzZ2NkxOZGl5OEVjWlRQMUozeWVMVGp3endt?=
+ =?utf-8?B?UkRYMjNUT05TeDdBTFpNWnlQWVAxKzhDcE54blV6TmZWUVgzQ28wRVBTL0Jh?=
+ =?utf-8?B?dEJIaUNYTzFlNmdnelM1TVFIdHZFNm5UTy9vZkNtbkViRkJVRlJyRERDNXJX?=
+ =?utf-8?B?aWJvNFlCTGx1REY2ZVZMdzZvUWRkYXZydGpwNlBPc0w5c3R6VDVhQjRmNWEw?=
+ =?utf-8?B?Z0s1NElDc1NsU1prb0srWDhrSUF0K0FRT01icTNYaUlza0hXdG1mZ3Q1ajh6?=
+ =?utf-8?B?UU5DakJMR0V2cGNnbjdWR29YUTZmYTVTZTNCZHNUaHdQVU5rcTd4NWdrQVlz?=
+ =?utf-8?B?VFdKUnc1bi9zOFQ1aG11ZWlWS1Y0Qk4wZUlhQkJhSkl4TmlSbFdGeEk5dXlv?=
+ =?utf-8?B?eUNSRTFmOXd5a0U0T1ZueHZXTytrU0FQdEVMUFhhS1BwWjR4dkt0RmFJeW1y?=
+ =?utf-8?B?SFpWSGtqRlRiV2gzcGs4K1N5MytiNURHeENaODl1WVNLaG5iTkRPNm1VKzZm?=
+ =?utf-8?B?bjZ1bk1ZTDZrQkU3MFJMMW9pNDlLd05GMjJZNkVwNi9PN2V3ekhReWw3V2FU?=
+ =?utf-8?B?dHBOSXVmaVZFZy9FYkVRNi81ZGJoMUIrOExYQ01FN3E5UmVSUUFFdnBENjNP?=
+ =?utf-8?B?QzFyS241K3A1TVV0cUdPa0tFeFQvQm1jTEhQcGFxRkMxazJIdG1NeStsRHFM?=
+ =?utf-8?B?ejhOdnI2dHRpMkFhdGhkTlY4VHNvc09WYnJ3M3ZNZW1NckV5bExoQkJsUDUz?=
+ =?utf-8?B?L3FVV3J1OEFSTnVBWmpUbS93Z1dJbDhYZGkwbGwzM2dXTmtjSnZEUlI0Sk00?=
+ =?utf-8?B?cnRrTGdTcjNvMXZLTXZYdzVyUlBtWVdnRXhzZkhWZ252ZGt6OHF3VmVjekxV?=
+ =?utf-8?B?b2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d90a34a-ac0d-47bc-d31d-08dc077e745a
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2023 08:24:48.0498
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ju5apRSJj1yiACQKvsds1YkvBCpDw/3FP7xis9hW7CwEaVQHkTyAp/7BG99FyqT6wpiGuVMjFCRpg9B1P3pdEzc1s1Rgblbb49BVXhKFmwc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4750
+X-OriginatorOrg: intel.com
 
-act_ct adds skb->users before defragmentation. If frags arrive in order,
-the last frag's reference is reset in:
+On 12/28/23 08:23, Yajun Deng wrote:
+> The struct mdio_driver_common is a wrapper for driver-model structure,
+> it contains device_driver and flags. There are only struct phy_driver
+> and mdio_driver that use it. The flags is used to distinguish between
+> struct phy_driver and mdio_driver.
+> 
+> We can test that if probe of device_driver is equal to phy_probe. This
+> way, the struct mdio_driver_common is no longer needed, and struct
+> phy_driver and usb_mdio_driver will be consistent with other driver
+> structs.
+> 
+> Cleanup struct mdio_driver_common and introduce is_phy_driver(). Use
+> is_phy_driver() test that if the driver is a phy or not.
+> 
+> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+> ---
+>   drivers/net/dsa/b53/b53_mdio.c          |  2 +-
+>   drivers/net/dsa/dsa_loop.c              |  2 +-
+>   drivers/net/dsa/lan9303_mdio.c          |  2 +-
+>   drivers/net/dsa/microchip/ksz8863_smi.c |  2 +-
+>   drivers/net/dsa/mt7530-mdio.c           |  2 +-
+>   drivers/net/dsa/mv88e6060.c             |  2 +-
+>   drivers/net/dsa/mv88e6xxx/chip.c        |  2 +-
+>   drivers/net/dsa/qca/ar9331.c            |  2 +-
+>   drivers/net/dsa/qca/qca8k-8xxx.c        |  2 +-
+>   drivers/net/dsa/realtek/realtek-mdio.c  |  2 +-
+>   drivers/net/dsa/xrs700x/xrs700x_mdio.c  |  2 +-
+>   drivers/net/phy/mdio_bus.c              |  2 +-
+>   drivers/net/phy/mdio_device.c           | 21 +++++++--------
+>   drivers/net/phy/phy_device.c            | 35 ++++++++++++++-----------
+>   drivers/net/phy/xilinx_gmii2rgmii.c     |  2 +-
+>   drivers/phy/broadcom/phy-bcm-ns-usb3.c  |  8 +++---
+>   drivers/phy/broadcom/phy-bcm-ns2-pcie.c |  8 +++---
+>   include/linux/mdio.h                    | 16 ++---------
+>   include/linux/phy.h                     |  9 +++----
+>   19 files changed, 54 insertions(+), 69 deletions(-)
+> 
 
-  inet_frag_reasm_prepare
-    skb_morph
+some nitpicks from me,
+otherwise looks fine:
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-which is not straightforward.
+BTW, please send v2 after winter break:
+https://patchwork.hopto.org/net-next.html
 
-However when frags arrive out of order, nobody unref the last frag, and
-all frags are leaked. The situation is even worse, as initiating packet
-capture can lead to a crash[0] when skb has been cloned and shared at the
-same time.
 
-Fix the issue by removing skb_get() before defragmentation. act_ct
-returns TC_ACT_CONSUMED when defrag failed or in progress.
+> diff --git a/drivers/net/dsa/b53/b53_mdio.c b/drivers/net/dsa/b53/b53_mdio.c
+> index 897e5e8b3d69..1ececa4d44e4 100644
+> --- a/drivers/net/dsa/b53/b53_mdio.c
+> +++ b/drivers/net/dsa/b53/b53_mdio.c
+> @@ -392,7 +392,7 @@ static struct mdio_driver b53_mdio_driver = {
+>   	.probe	= b53_mdio_probe,
+>   	.remove	= b53_mdio_remove,
+>   	.shutdown = b53_mdio_shutdown,
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name = "bcm53xx",
+>   		.of_match_table = b53_of_match,
+>   	},
+> diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
+> index c70ed67cc188..3f885878be3a 100644
+> --- a/drivers/net/dsa/dsa_loop.c
+> +++ b/drivers/net/dsa/dsa_loop.c
+> @@ -375,7 +375,7 @@ static void dsa_loop_drv_shutdown(struct mdio_device *mdiodev)
+>   }
+>   
+>   static struct mdio_driver dsa_loop_drv = {
+> -	.mdiodrv.driver	= {
+> +	.driver	= {
+>   		.name	= "dsa-loop",
+>   	},
+>   	.probe	= dsa_loop_drv_probe,
+> diff --git a/drivers/net/dsa/lan9303_mdio.c b/drivers/net/dsa/lan9303_mdio.c
+> index 167a86f39f27..7cb7e2b1478a 100644
+> --- a/drivers/net/dsa/lan9303_mdio.c
+> +++ b/drivers/net/dsa/lan9303_mdio.c
+> @@ -162,7 +162,7 @@ static const struct of_device_id lan9303_mdio_of_match[] = {
+>   MODULE_DEVICE_TABLE(of, lan9303_mdio_of_match);
+>   
+>   static struct mdio_driver lan9303_mdio_driver = {
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name = "LAN9303_MDIO",
+>   		.of_match_table = lan9303_mdio_of_match,
+>   	},
+> diff --git a/drivers/net/dsa/microchip/ksz8863_smi.c b/drivers/net/dsa/microchip/ksz8863_smi.c
+> index 5711a59e2ac9..c788cadd7595 100644
+> --- a/drivers/net/dsa/microchip/ksz8863_smi.c
+> +++ b/drivers/net/dsa/microchip/ksz8863_smi.c
+> @@ -213,7 +213,7 @@ static struct mdio_driver ksz8863_driver = {
+>   	.probe	= ksz8863_smi_probe,
+>   	.remove	= ksz8863_smi_remove,
+>   	.shutdown = ksz8863_smi_shutdown,
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name	= "ksz8863-switch",
+>   		.of_match_table = ksz8863_dt_ids,
+>   	},
+> diff --git a/drivers/net/dsa/mt7530-mdio.c b/drivers/net/dsa/mt7530-mdio.c
+> index 088533663b83..7315654a6757 100644
+> --- a/drivers/net/dsa/mt7530-mdio.c
+> +++ b/drivers/net/dsa/mt7530-mdio.c
+> @@ -258,7 +258,7 @@ static struct mdio_driver mt7530_mdio_driver = {
+>   	.probe  = mt7530_probe,
+>   	.remove = mt7530_remove,
+>   	.shutdown = mt7530_shutdown,
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name = "mt7530-mdio",
+>   		.of_match_table = mt7530_of_match,
+>   	},
+> diff --git a/drivers/net/dsa/mv88e6060.c b/drivers/net/dsa/mv88e6060.c
+> index 294312b58e4f..5925f23e7ab3 100644
+> --- a/drivers/net/dsa/mv88e6060.c
+> +++ b/drivers/net/dsa/mv88e6060.c
+> @@ -367,7 +367,7 @@ static struct mdio_driver mv88e6060_driver = {
+>   	.probe	= mv88e6060_probe,
+>   	.remove = mv88e6060_remove,
+>   	.shutdown = mv88e6060_shutdown,
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name = "mv88e6060",
+>   		.of_match_table = mv88e6060_of_match,
+>   	},
+> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+> index 383b3c4d6f59..4f24699264d1 100644
+> --- a/drivers/net/dsa/mv88e6xxx/chip.c
+> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
+> @@ -7258,7 +7258,7 @@ static struct mdio_driver mv88e6xxx_driver = {
+>   	.probe	= mv88e6xxx_probe,
+>   	.remove = mv88e6xxx_remove,
+>   	.shutdown = mv88e6xxx_shutdown,
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name = "mv88e6085",
+>   		.of_match_table = mv88e6xxx_of_match,
+>   		.pm = &mv88e6xxx_pm_ops,
+> diff --git a/drivers/net/dsa/qca/ar9331.c b/drivers/net/dsa/qca/ar9331.c
+> index 8d9d271ac3af..da392d60c9e7 100644
+> --- a/drivers/net/dsa/qca/ar9331.c
+> +++ b/drivers/net/dsa/qca/ar9331.c
+> @@ -1122,7 +1122,7 @@ static struct mdio_driver ar9331_sw_mdio_driver = {
+>   	.probe = ar9331_sw_probe,
+>   	.remove = ar9331_sw_remove,
+>   	.shutdown = ar9331_sw_shutdown,
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name = AR9331_SW_NAME,
+>   		.of_match_table = ar9331_sw_of_match,
+>   	},
+> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+> index ec57d9d52072..fe396397f405 100644
+> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
+> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+> @@ -2187,7 +2187,7 @@ static struct mdio_driver qca8kmdio_driver = {
+>   	.probe  = qca8k_sw_probe,
+>   	.remove = qca8k_sw_remove,
+>   	.shutdown = qca8k_sw_shutdown,
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name = "qca8k",
+>   		.of_match_table = qca8k_of_match,
+>   		.pm = &qca8k_pm_ops,
+> diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
+> index 292e6d087e8b..8e6a951b391c 100644
+> --- a/drivers/net/dsa/realtek/realtek-mdio.c
+> +++ b/drivers/net/dsa/realtek/realtek-mdio.c
+> @@ -274,7 +274,7 @@ static const struct of_device_id realtek_mdio_of_match[] = {
+>   MODULE_DEVICE_TABLE(of, realtek_mdio_of_match);
+>   
+>   static struct mdio_driver realtek_mdio_driver = {
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name = "realtek-mdio",
+>   		.of_match_table = realtek_mdio_of_match,
+>   	},
+> diff --git a/drivers/net/dsa/xrs700x/xrs700x_mdio.c b/drivers/net/dsa/xrs700x/xrs700x_mdio.c
+> index 5f7d344b5d73..1a76d9d49f13 100644
+> --- a/drivers/net/dsa/xrs700x/xrs700x_mdio.c
+> +++ b/drivers/net/dsa/xrs700x/xrs700x_mdio.c
+> @@ -164,7 +164,7 @@ static const struct of_device_id __maybe_unused xrs700x_mdio_dt_ids[] = {
+>   MODULE_DEVICE_TABLE(of, xrs700x_mdio_dt_ids);
+>   
+>   static struct mdio_driver xrs700x_mdio_driver = {
+> -	.mdiodrv.driver = {
+> +	.driver = {
+>   		.name	= "xrs700x-mdio",
+>   		.of_match_table = of_match_ptr(xrs700x_mdio_dt_ids),
+>   	},
+> diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+> index 6cf73c15635b..a1092c641d14 100644
+> --- a/drivers/net/phy/mdio_bus.c
+> +++ b/drivers/net/phy/mdio_bus.c
+> @@ -1342,7 +1342,7 @@ static int mdio_bus_match(struct device *dev, struct device_driver *drv)
+>   	struct mdio_device *mdio = to_mdio_device(dev);
+>   
+>   	/* Both the driver and device must type-match */
+> -	if (!(mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY) !=
+> +	if (!(is_phy_driver(&mdiodrv->driver)) !=
+>   	    !(mdio->flags & MDIO_DEVICE_FLAG_PHY))
 
-[0]:
-[  843.804823] ------------[ cut here ]------------
-[  843.809659] kernel BUG at net/core/skbuff.c:2091!
-[  843.814516] invalid opcode: 0000 [#1] PREEMPT SMP
-[  843.819296] CPU: 7 PID: 0 Comm: swapper/7 Kdump: loaded Tainted: G S 6.7.0-rc3 #2
-[  843.824107] Hardware name: XFUSION 1288H V6/BC13MBSBD, BIOS 1.29 11/25/2022
-[  843.828953] RIP: 0010:pskb_expand_head+0x2ac/0x300
-[  843.833805] Code: 8b 70 28 48 85 f6 74 82 48 83 c6 08 bf 01 00 00 00 e8 38 bd ff ff 8b 83 c0 00 00 00 48 03 83 c8 00 00 00 e9 62 ff ff ff 0f 0b <0f> 0b e8 8d d0 ff ff e9 b3 fd ff ff 81 7c 24 14 40 01 00 00 4c 89
-[  843.843698] RSP: 0018:ffffc9000cce07c0 EFLAGS: 00010202
-[  843.848524] RAX: 0000000000000002 RBX: ffff88811a211d00 RCX: 0000000000000820
-[  843.853299] RDX: 0000000000000640 RSI: 0000000000000000 RDI: ffff88811a211d00
-[  843.857974] RBP: ffff888127d39518 R08: 00000000bee97314 R09: 0000000000000000
-[  843.862584] R10: 0000000000000000 R11: ffff8881109f0000 R12: 0000000000000880
-[  843.867147] R13: ffff888127d39580 R14: 0000000000000640 R15: ffff888170f7b900
-[  843.871680] FS:  0000000000000000(0000) GS:ffff889ffffc0000(0000) knlGS:0000000000000000
-[  843.876242] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  843.880778] CR2: 00007fa42affcfb8 CR3: 000000011433a002 CR4: 0000000000770ef0
-[  843.885336] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  843.889809] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  843.894229] PKRU: 55555554
-[  843.898539] Call Trace:
-[  843.902772]  <IRQ>
-[  843.906922]  ? __die_body+0x1e/0x60
-[  843.911032]  ? die+0x3c/0x60
-[  843.915037]  ? do_trap+0xe2/0x110
-[  843.918911]  ? pskb_expand_head+0x2ac/0x300
-[  843.922687]  ? do_error_trap+0x65/0x80
-[  843.926342]  ? pskb_expand_head+0x2ac/0x300
-[  843.929905]  ? exc_invalid_op+0x50/0x60
-[  843.933398]  ? pskb_expand_head+0x2ac/0x300
-[  843.936835]  ? asm_exc_invalid_op+0x1a/0x20
-[  843.940226]  ? pskb_expand_head+0x2ac/0x300
-[  843.943580]  inet_frag_reasm_prepare+0xd1/0x240
-[  843.946904]  ip_defrag+0x5d4/0x870
-[  843.950132]  nf_ct_handle_fragments+0xec/0x130 [nf_conntrack]
-[  843.953334]  tcf_ct_act+0x252/0xd90 [act_ct]
-[  843.956473]  ? tcf_mirred_act+0x516/0x5a0 [act_mirred]
-[  843.959657]  tcf_action_exec+0xa1/0x160
-[  843.962823]  fl_classify+0x1db/0x1f0 [cls_flower]
-[  843.966010]  ? skb_clone+0x53/0xc0
-[  843.969173]  tcf_classify+0x24d/0x420
-[  843.972333]  tc_run+0x8f/0xf0
-[  843.975465]  __netif_receive_skb_core+0x67a/0x1080
-[  843.978634]  ? dev_gro_receive+0x249/0x730
-[  843.981759]  __netif_receive_skb_list_core+0x12d/0x260
-[  843.984869]  netif_receive_skb_list_internal+0x1cb/0x2f0
-[  843.987957]  ? mlx5e_handle_rx_cqe_mpwrq_rep+0xfa/0x1a0 [mlx5_core]
-[  843.991170]  napi_complete_done+0x72/0x1a0
-[  843.994305]  mlx5e_napi_poll+0x28c/0x6d0 [mlx5_core]
-[  843.997501]  __napi_poll+0x25/0x1b0
-[  844.000627]  net_rx_action+0x256/0x330
-[  844.003705]  __do_softirq+0xb3/0x29b
-[  844.006718]  irq_exit_rcu+0x9e/0xc0
-[  844.009672]  common_interrupt+0x86/0xa0
-[  844.012537]  </IRQ>
-[  844.015285]  <TASK>
-[  844.017937]  asm_common_interrupt+0x26/0x40
-[  844.020591] RIP: 0010:acpi_safe_halt+0x1b/0x20
-[  844.023247] Code: ff 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 65 48 8b 04 25 00 18 03 00 48 8b 00 a8 08 75 0c 66 90 0f 00 2d 81 d0 44 00 fb f4 <fa> c3 0f 1f 00 89 fa ec 48 8b 05 ee 88 ed 00 a9 00 00 00 80 75 11
-[  844.028900] RSP: 0018:ffffc90000533e70 EFLAGS: 00000246
-[  844.031725] RAX: 0000000000004000 RBX: 0000000000000001 RCX: 0000000000000000
-[  844.034553] RDX: ffff889ffffc0000 RSI: ffffffff828b7f20 RDI: ffff88a090f45c64
-[  844.037368] RBP: ffff88a0901a2800 R08: ffff88a090f45c00 R09: 00000000000317c0
-[  844.040155] R10: 00ec812281150475 R11: ffff889fffff0e04 R12: ffffffff828b7fa0
-[  844.042962] R13: ffffffff828b7f20 R14: 0000000000000001 R15: 0000000000000000
-[  844.045819]  acpi_idle_enter+0x7b/0xc0
-[  844.048621]  cpuidle_enter_state+0x7f/0x430
-[  844.051451]  cpuidle_enter+0x2d/0x40
-[  844.054279]  do_idle+0x1d4/0x240
-[  844.057096]  cpu_startup_entry+0x2a/0x30
-[  844.059934]  start_secondary+0x104/0x130
-[  844.062787]  secondary_startup_64_no_verify+0x16b/0x16b
-[  844.065674]  </TASK>
+you could remove one pair of parens, and even change condition to:
+   if (is_phy_driver(&mdiodrv->driver) == !(mdio->flags &
+       MDIO_DEVICE_FLAG_PHY))
 
-Fixes: b57dc7c13ea9 ("net/sched: Introduce action ct")
-Signed-off-by: Tao Liu <taoliu828@163.com>
----
- net/sched/act_ct.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index f69c47945175..3d50215985d5 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -850,7 +850,6 @@ static int tcf_ct_handle_fragments(struct net *net, struct sk_buff *skb,
- 	if (err || !frag)
- 		return err;
- 
--	skb_get(skb);
- 	err = nf_ct_handle_fragments(net, skb, zone, family, &proto, &mru);
- 	if (err)
- 		return err;
-@@ -999,12 +998,8 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
- 	nh_ofs = skb_network_offset(skb);
- 	skb_pull_rcsum(skb, nh_ofs);
- 	err = tcf_ct_handle_fragments(net, skb, family, p->zone, &defrag);
--	if (err == -EINPROGRESS) {
--		retval = TC_ACT_STOLEN;
--		goto out_clear;
--	}
- 	if (err)
--		goto drop;
-+		goto out_frag;
- 
- 	err = nf_ct_skb_network_trim(skb, family);
- 	if (err)
-@@ -1091,6 +1086,11 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
- 		qdisc_skb_cb(skb)->pkt_len = skb->len;
- 	return retval;
- 
-+out_frag:
-+	if (err != -EINPROGRESS)
-+		tcf_action_inc_drop_qstats(&c->common);
-+	return TC_ACT_CONSUMED;
-+
- drop:
- 	tcf_action_inc_drop_qstats(&c->common);
- 	return TC_ACT_SHOT;
--- 
-2.31.1
+>   		return 0;
+>   
+> diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+> index 73f6539b9e50..16232e7a1255 100644
+> --- a/drivers/net/phy/mdio_device.c
+> +++ b/drivers/net/phy/mdio_device.c
+> @@ -40,7 +40,7 @@ int mdio_device_bus_match(struct device *dev, struct device_driver *drv)
+>   	struct mdio_device *mdiodev = to_mdio_device(dev);
+>   	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
+>   
+> -	if (mdiodrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY)
+> +	if (is_phy_driver(&mdiodrv->driver))
+>   		return 0;
+>   
+>   	return strcmp(mdiodev->modalias, drv->name) == 0;
+> @@ -203,20 +203,19 @@ static void mdio_shutdown(struct device *dev)
+>    */
+>   int mdio_driver_register(struct mdio_driver *drv)
+>   {
+> -	struct mdio_driver_common *mdiodrv = &drv->mdiodrv;
+>   	int retval;
+>   
+> -	pr_debug("%s: %s\n", __func__, mdiodrv->driver.name);
+> +	pr_debug("%s: %s\n", __func__, drv->driver.name);
+>   
+> -	mdiodrv->driver.bus = &mdio_bus_type;
+> -	mdiodrv->driver.probe = mdio_probe;
+> -	mdiodrv->driver.remove = mdio_remove;
+> -	mdiodrv->driver.shutdown = mdio_shutdown;
+> +	drv->driver.bus = &mdio_bus_type;
+> +	drv->driver.probe = mdio_probe;
+> +	drv->driver.remove = mdio_remove;
+> +	drv->driver.shutdown = mdio_shutdown;
+>   
+> -	retval = driver_register(&mdiodrv->driver);
+> +	retval = driver_register(&drv->driver);
+>   	if (retval) {
+>   		pr_err("%s: Error %d in registering driver\n",
+> -		       mdiodrv->driver.name, retval);
+> +		       drv->driver.name, retval);
+>   
+>   		return retval;
+>   	}
+> @@ -227,8 +226,6 @@ EXPORT_SYMBOL(mdio_driver_register);
+>   
+>   void mdio_driver_unregister(struct mdio_driver *drv)
+>   {
+> -	struct mdio_driver_common *mdiodrv = &drv->mdiodrv;
+> -
+> -	driver_unregister(&mdiodrv->driver);
+> +	driver_unregister(&drv->driver);
+>   }
+>   EXPORT_SYMBOL(mdio_driver_unregister);
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 3611ea64875e..55494a345bd4 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -529,7 +529,7 @@ static int phy_bus_match(struct device *dev, struct device_driver *drv)
+>   	const int num_ids = ARRAY_SIZE(phydev->c45_ids.device_ids);
+>   	int i;
+>   
+> -	if (!(phydrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY))
+> +	if (!(is_phy_driver(&phydrv->driver)))
+
+here parens are redundant too
+
+>   		return 0;
+>   
+>   	if (phydrv->match_phy_device)
+> @@ -1456,9 +1456,9 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
+>   	 */
+>   	if (!d->driver) {
+>   		if (phydev->is_c45)
+> -			d->driver = &genphy_c45_driver.mdiodrv.driver;
+> +			d->driver = &genphy_c45_driver.driver;
+>   		else
+> -			d->driver = &genphy_driver.mdiodrv.driver;
+> +			d->driver = &genphy_driver.driver;
+>   
+>   		using_genphy = true;
+>   	}
+> @@ -1638,14 +1638,14 @@ static bool phy_driver_is_genphy_kind(struct phy_device *phydev,
+>   bool phy_driver_is_genphy(struct phy_device *phydev)
+>   {
+>   	return phy_driver_is_genphy_kind(phydev,
+> -					 &genphy_driver.mdiodrv.driver);
+> +					 &genphy_driver.driver);
+>   }
+>   EXPORT_SYMBOL_GPL(phy_driver_is_genphy);
+>   
+>   bool phy_driver_is_genphy_10g(struct phy_device *phydev)
+>   {
+>   	return phy_driver_is_genphy_kind(phydev,
+> -					 &genphy_c45_driver.mdiodrv.driver);
+> +					 &genphy_c45_driver.driver);
+
+now it fits into one line (same for phy_driver_is_genphy())
+
+>   }
+>   EXPORT_SYMBOL_GPL(phy_driver_is_genphy_10g);
+
+[snip]
 
 
