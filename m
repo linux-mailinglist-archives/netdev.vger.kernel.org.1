@@ -1,148 +1,98 @@
-Return-Path: <netdev+bounces-60482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5274281F791
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 12:06:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5879981F7EC
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 12:47:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 843571C21B2F
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 11:06:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF331B20A2E
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 11:47:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EEF6FBB;
-	Thu, 28 Dec 2023 11:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147216FCB;
+	Thu, 28 Dec 2023 11:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="aL0LjljP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5336AAC;
-	Thu, 28 Dec 2023 11:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R981e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VzOK8oQ_1703761600;
-Received: from 30.221.146.89(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VzOK8oQ_1703761600)
-          by smtp.aliyun-inc.com;
-          Thu, 28 Dec 2023 19:06:41 +0800
-Message-ID: <5f8ee6e1-8a3c-457c-bbda-5b003e726a7c@linux.alibaba.com>
-Date: Thu, 28 Dec 2023 19:06:39 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FAC6FBE;
+	Thu, 28 Dec 2023 11:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4T164805BbzMpr0x;
+	Thu, 28 Dec 2023 11:39:36 +0000 (UTC)
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4T16472wZjzMppB5;
+	Thu, 28 Dec 2023 12:39:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1703763575;
+	bh=HFUa+gi6H03BBjcBoQQZYSYsAH4d4PrSY7gBDXIdSxw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=aL0LjljPs1ZmEelw3LKIuJ4a56TODbjHwEsslr1ax65dsQEyfy3Nj0ZePlhmm7f4h
+	 kYyEqYaFZpl0HYakOinZKl4eKlaWokxqT8f4+8dwve7gNEpFWSwHQDDkrxeR/yURiZ
+	 MRnX+Wpl4Iaf5B7pEoVJbTgj/3hgJTbpykm1GlLM=
+From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+To: Eric Paris <eparis@parisplace.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>
+Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	Alexey Kodanev <alexey.kodanev@oracle.com>,
+	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
+	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>,
+	Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	linux-security-module@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] selinux: Fix error priority for bind with AF_UNSPEC on AF_INET6 socket
+Date: Thu, 28 Dec 2023 12:39:17 +0100
+Message-ID: <20231228113917.62089-1-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC nf-next v3 1/2] netfilter: bpf: support prog update
-Content-Language: en-US
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
- bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>, coreteam@netfilter.org,
- netfilter-devel <netfilter-devel@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>
-References: <1703081351-85579-1-git-send-email-alibuda@linux.alibaba.com>
- <1703081351-85579-2-git-send-email-alibuda@linux.alibaba.com>
- <CAADnVQK3Wk+pKbvc5_7jgaQ=qFq3y0ozgnn+dbW56DaHL2ExWQ@mail.gmail.com>
- <1d3cb7fc-c1dc-a779-8952-cdbaaf696ce3@linux.alibaba.com>
- <CAADnVQJEUEo3g7knXtkD0CNjazTpQKcjrAaZLJ4utk962bjmvw@mail.gmail.com>
- <d5879c57-634f-4973-b52d-4994d0929de6@linux.alibaba.com>
- <CAADnVQJZsJujDH=YAoZ6ieQQ2pVo0wvc-ppwRC7y2X=ggibsEw@mail.gmail.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <CAADnVQJZsJujDH=YAoZ6ieQQ2pVo0wvc-ppwRC7y2X=ggibsEw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
+The IPv6 network stack first checks the sockaddr length (-EINVAL error)
+before checking the family (-EAFNOSUPPORT error).
 
+This was discovered thanks to commit a549d055a22e ("selftests/landlock:
+Add network tests").
 
-On 12/28/23 3:00 AM, Alexei Starovoitov wrote:
-> On Wed, Dec 27, 2023 at 12:20 AM D. Wythe <alibuda@linux.alibaba.com> wrote:
->>
->> Hi Alexei,
->>
->>
->> IMMO, nf_unregister_net_hook does not wait for the completion of the
->> execution of the hook that is being removed,
->> instead, it allocates a new array without the very hook to replace the
->> old arrayvia rcu_assign_pointer() (in __nf_hook_entries_try_shrink),
->> then it use call_rcu() to release the old one.
->>
->> You can find more details in commit
->> 8c873e2199700c2de7dbd5eedb9d90d5f109462b.
->>
->> In other words, when nf_unregister_net_hook returns, there may still be
->> contexts executing hooks on the
->> old array, which means that the `link` may still be accessed after
->> nf_unregister_net_hook returns.
->>
->> And that's the reason why we use kfree_rcu() to release the `link`.
->>>>                                                         nf_hook_run_bpf
->>>>                                                         const struct
->>>> bpf_nf_link *nf_link = bpf_link;
->>>>
->>>> bpf_nf_link_release
->>>>        nf_unregister_net_hook(nf_link->net, &nf_link->hook_ops);
->>>>
->>>> bpf_nf_link_dealloc
->>>>        free(link)
->>>> bpf_prog_run(link->prog);
-> Got it.
-> Sounds like it's an existing bug. If so it should be an independent
-> patch with Fixes tag.
->
-> Also please craft a test case to demonstrate UAF.
->
+Cc: Alexey Kodanev <alexey.kodanev@oracle.com>
+Cc: Eric Paris <eparis@parisplace.org>
+Cc: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Cc: Paul Moore <paul@paul-moore.com>
+Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
+Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+Closes: https://lore.kernel.org/r/0584f91c-537c-4188-9e4f-04f192565667@collabora.com
+Fixes: 0f8db8cc73df ("selinux: add AF_UNSPEC and INADDR_ANY checks to selinux_socket_bind()")
+Signed-off-by: Mickaël Salaün <mic@digikod.net>
+---
+ security/selinux/hooks.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-It is not an existing bug... Accessing the link within the hook was 
-something I introduced here
-to support updates😉, as previously there was no access to the link 
-within the hook.
->> I must admit that it is indeed feasible if we eliminate the mutex and
->> use cmpxchg to swap the prog (we need to ensure that there is only one
->> bpf_prog_put() on the old prog).
->> However, when cmpxchg fails, it means that this context has not
->> outcompeted the other one, and we have to return a failure. Maybe
->> something like this:
->>
->> if (!cmpxchg(&link->prog, old_prog, new_prog)) {
->>       /* already replaced by another link_update */
->>       return -xxx;
->> }
->>
->> As a comparison, The version with the mutex wouldn't encounter this
->> error, every update would succeed. I think that it's too harsh for the
->> user to receive a failure
->> in that case since they haven't done anything wrong.
-> Disagree. The mutex doesn't prevent this issue.
-> There is always a race.
-> It happens when link_update.old_prog_fd and BPF_F_REPLACE
-> were specified.
-> One user space passes an FD of the old prog and
-> another user space doing the same. They both race and one of them
-> gets
-> if (old_prog && link->prog != old_prog) {
->                 err = -EPERM;
->
-> it's no different with dropping the mutex and doing:
-> if (old_prog) {
->      if (!cmpxchg(&link->prog, old_prog, new_prog))
->        -EPERM
-> } else {
->     old_prog = xchg(&link->prog, new_prog);
-> }
-
-Got it!  It's very helpful, Thanks very much! I will modify my patch 
-accordingly.
-
-
-Best wishes,
-D. Wythe
-
-
-
-
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index feda711c6b7b..9fc55973d765 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -4667,6 +4667,10 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
+ 				return -EINVAL;
+ 			addr4 = (struct sockaddr_in *)address;
+ 			if (family_sa == AF_UNSPEC) {
++				if (sock->sk->__sk_common.skc_family ==
++					    AF_INET6 &&
++				    addrlen < SIN6_LEN_RFC2133)
++					return -EINVAL;
+ 				/* see __inet_bind(), we only want to allow
+ 				 * AF_UNSPEC if the address is INADDR_ANY
+ 				 */
+-- 
+2.43.0
 
 
