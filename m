@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-60438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70DDD81F47E
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 04:54:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9202B81F47F
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 04:57:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E15D1C21B0A
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 03:54:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC2E11C21752
+	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 03:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73B81106;
-	Thu, 28 Dec 2023 03:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AEA31106;
+	Thu, 28 Dec 2023 03:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AliLY3+f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8AbI+cU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0BF3C0B
-	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 03:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08340136F
+	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 03:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6dc07ce2a30so472365a34.0
-        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 19:53:57 -0800 (PST)
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-2046dee3c14so1482543fac.1
+        for <netdev@vger.kernel.org>; Wed, 27 Dec 2023 19:57:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703735636; x=1704340436; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703735832; x=1704340632; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Vug8/uppdmBGpWeuyV2BxNNVwAX2ay5weQBiWbkRAiA=;
-        b=AliLY3+fUP2tn6beOYvPb/9o+kq2U5NInsoCCrF/QPqiFjcKMsGTFXUFeRg7MqohWw
-         dh7QMD9fw0SpRND2H5x+5BtW0N0HIgdg/u3iLEkWmE58Ch0f9WlSCPelcMjAzZrotwkx
-         qGuapd9G1YWz7F1SJptKOX/CHO48a9vj/P3XxmMuv59c0rF0JQhxd2Dp4bjoSl7rnEKF
-         M4VuVS4bNaALKnQetr7vJYZNlf0dkAgs/aV1ryncD7sKE5ggw0znzjmfYPQvLXOcYXPN
-         vxmFGw5Ex61TSNwddw4hesAjDMz4l/JNeGcg75+24sBFYorQ8YRmTqlJTvEnEpO0a3/o
-         m6kA==
+        bh=OnDgjcXXRrrUQ5Nuc9aEzX4ejqPoR3JYsbDDB3CztFc=;
+        b=f8AbI+cUB5QKriss0ztfvwY8kOeIGBxSjK+fOQrw1i/h6O6mBxkEJtkVnYhjVodXjY
+         b6YKUXR7ascCYoy3aN2E9LQ7mWTPHmhCYlRzXvBBGrf1pt4qnqI/v1nQcYGuA92QQ7Qm
+         KFlqBzzWWZQnwFvKY9w4+HWvynbWE+SDuAQLzhInofTNpoch8xXPTfDpTP0qIf0kcy0D
+         KPb0EB5JHr5Cquxv14ODu3zaFxLqfWfmvIOdBrWQKxIWMXpJ3RVvYiSOW5br7FfBywRT
+         AB6c3fU0b1Ydm1X5fxzHJoU1ELZYIWPLJaa8QSinG2I5WsOT1A3muOGyC/KGDYua4r9x
+         Ycpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703735636; x=1704340436;
+        d=1e100.net; s=20230601; t=1703735832; x=1704340632;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vug8/uppdmBGpWeuyV2BxNNVwAX2ay5weQBiWbkRAiA=;
-        b=wfkSXNsyziRO7unKnb56NdxnL10B8digYkANqk0pLtHnUV1eCadAKhnmZv8RULLHDn
-         HOApy3Zsp0Z37C8tOplgDM1KwOfdU9GvvTDbCDrgjzE2QSqWJUXXUNaHxCCfOHWEc5o/
-         UWNaaRkBeWDA3IkpxKRuQhCRaqlv33ztqByQaqmf+WCb8nyQxOyS66Mzfhjji/VJ3kwc
-         rvvsAMynsOWs6eCTM/xqVz87k401M1fVaQUOezhgBRzq+GSxyPMzlAsOoTQHHjd207KY
-         UJ37O2/R1xvN2THkVPWQl+87VCgQr2f9iju5Z4/UwU/6eStCawpTLwoZOVCG2VCzoDCQ
-         4USQ==
-X-Gm-Message-State: AOJu0Ywng+3MV4XYopunLuWINmyGuP0ELf3NRZxH/Sk1x2KEJWKhBsms
-	sWowMvrF7bFKq7JYELm9RArVREniMfk=
-X-Google-Smtp-Source: AGHT+IG+YotjpP9/ahTWlUYk9EUqcTk1Aqr+QUqzUtCnCoSr5AMQAzKcYnzfnIrv2ypgInhfDQIpGw==
-X-Received: by 2002:a05:6830:2b08:b0:6db:9d14:706a with SMTP id l8-20020a0568302b0800b006db9d14706amr6559753otv.63.1703735636420;
-        Wed, 27 Dec 2023 19:53:56 -0800 (PST)
+        bh=OnDgjcXXRrrUQ5Nuc9aEzX4ejqPoR3JYsbDDB3CztFc=;
+        b=tFU6R6kqoBHAyrniPYhOE0h3lSIPm/yKcUTJYx1WW9sJREWXOJqbUJwy5YnltgB+4k
+         1LjxQB0z/I8VsRvp3ooGT+JUy1aEM16aARcj1+pyE2ct0ECHvJEchiPvhzy+fJk3p8vf
+         ifMqOevFY7DO6GgdmiTIIhwDNucedmbrOwgHhEn5RmlHCtSwnpqw07VGPXeeFa8rWa64
+         3uRsvtKTI0tfTGty++GQkBoNhpNRH7lj0NZwy83eDyxsqyBAOsUYR3N/mk6lsz8RuPow
+         1OGwtIcTRUXDle11BuDTWxqU9DMVB0kRYQDPghKeKeoyCwY+fvJudSEpgcBq75s2d0tg
+         Zc0w==
+X-Gm-Message-State: AOJu0YykEjOPDB9dODXYyzIbfCvtXBqSZ1XOm6khojLBY/mELSrjCJ9z
+	JePJ5uOKaZtCp6QelaXWrWkpaAU+EvI=
+X-Google-Smtp-Source: AGHT+IE4XaW1FhUkr1AsU8HSKEphWZa/OaJCpZqrRJKsfABKv9OEOT7GFnPmVhr6WVB7t5ZSEjY3Uw==
+X-Received: by 2002:a05:6870:40c6:b0:204:42c5:8cb8 with SMTP id l6-20020a05687040c600b0020442c58cb8mr7734084oal.15.1703735831930;
+        Wed, 27 Dec 2023 19:57:11 -0800 (PST)
 Received: from [192.168.1.89] (108-200-163-197.lightspeed.bcvloh.sbcglobal.net. [108.200.163.197])
-        by smtp.gmail.com with ESMTPSA id l35-20020a0568302b2300b006d9a339773csm256352otv.27.2023.12.27.19.53.55
+        by smtp.gmail.com with ESMTPSA id w5-20020a9d70c5000000b006d7eaaa65a4sm2445449otj.71.2023.12.27.19.57.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Dec 2023 19:53:55 -0800 (PST)
-Message-ID: <bdb424b0-2d11-4f6d-994d-b2b959098faf@gmail.com>
-Date: Wed, 27 Dec 2023 22:53:54 -0500
+        Wed, 27 Dec 2023 19:57:11 -0800 (PST)
+Message-ID: <ac91d9f3-0651-4c66-9d38-c40281150ac5@gmail.com>
+Date: Wed, 27 Dec 2023 22:57:10 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,14 +66,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2 2/2] configure: use the portable printf to
- suppress newlines in messages
+Subject: Re: [PATCH iproute2 1/2] configure: avoid un-recommended command
+ substitution form
 Content-Language: en-US
 To: Stephen Hemminger <stephen@networkplumber.org>
 Cc: netdev@vger.kernel.org
 References: <20231218033056.629260-1-eschwartz93@gmail.com>
- <20231218033056.629260-2-eschwartz93@gmail.com>
- <20231227164645.765f7891@hermes.local>
+ <20231227164610.7cbc38fe@hermes.local>
 From: Eli Schwartz <eschwartz93@gmail.com>
 Autocrypt: addr=eschwartz93@gmail.com; keydata=
  xsFNBFcpfj0BEADkTcFAwHJmtXbR7WHu6qJ3c83ccZl4qjBsU//JEn9yTtfj8M2a3g+lpGAF
@@ -118,53 +117,35 @@ Autocrypt: addr=eschwartz93@gmail.com; keydata=
  b8PeDaL4sAH77fE6m+3jsMb1CFbN3+LcaUxGV7ysh7kVYVqwhiRqnmF0E3I9z3nyZ9HQgwHt
  1jmoa4lMiRDnkkOFdhoJ3vqmxHKW9XtxrUJlLQfTejUSooLFjNe6tvXgrTvrosGTpDZIIT0/
  8qKt4Nxg06u0jmnXMbbWwoPNWl9PfcPtNhjaycocCzfog5LI8N7HbRy+jHmArWAywaZVLrLe
-In-Reply-To: <20231227164645.765f7891@hermes.local>
+In-Reply-To: <20231227164610.7cbc38fe@hermes.local>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 12/27/23 7:46 PM, Stephen Hemminger wrote:
-> On Sun, 17 Dec 2023 22:30:53 -0500
+> On Sun, 17 Dec 2023 22:30:52 -0500
 > Eli Schwartz <eschwartz93@gmail.com> wrote:
 > 
->> Per https://pubs.opengroup.org/onlinepubs/9699919799/utilities/echo.html
->> the "echo" utility is un-recommended and its behavior is non-portable
->> and unpredictable. It *should* be marked as obsolescent, but was not,
->> due solely "because of its extremely widespread use in historical
->> applications".
+>> The use of backticks to surround commands instead of "$(cmd)" is a
+>> legacy of the oldest pre-POSIX shells. It is confusing, unreliable, and
+>> hard to read. Its use is not recommended in new programs.
 >>
->> POSIX doesn't require the -n option, and although its behavior is
->> reliable in `#!/bin/bash` scripts, this configure script uses
->> `#!/bin/sh` and cannot rely on echo -n.
->>
->> The use of printf even without newline suppression or backslash
->> character sequences is nicer for consistency, since there are a variety
->> of ways it can go wrong with echo including "echoing the value of a
->> shell or environment variable".
->>
->> See:
->> https://pubs.opengroup.org/onlinepubs/9699919799/utilities/echo.html
->> https://cfajohnson.com/shell/cus-faq.html#Q0b
+>> See: http://mywiki.wooledge.org/BashFAQ/082
 >> ---
 > 
 > This is needless churn, it works now, and bash is never going
-> to remove the echo command. The script only has to work on Linux.
+> to drop the syntax.
 
 
-I think you've misunderstood something. It does not work now, because of
-the reason stated in the patch message.
+Per the patch message, the reason to avoid the syntax is because it is
+confusing, unreliable, and hard to read.
 
-Whether bash does or does not remove the echo command is irrelevant.
-Bash is NOT the only linux /bin/sh shell, and "it only has to work on
-Linux" is NOT a valid reason to write code that is designed to work with
-/bin/bash, but uses a shebang of /bin/sh.
+It was deprecated for good reason, and those reasons are relevant to
+people writing shell scripts! Regardless of whether it is removed, it
+has several very sharp edges and the modern alternative was designed
+specifically because the legacy syntax is bad to use *even in bash*.
 
-Would you prefer to change the shebang to #!/bin/bash instead?
-
-
-> Plus, the patch is missing signed-off-by.
-
-
-I'm more than happy to send in an updated patch. :)
+(bash has nothing to do with it. But also, again, this is not about bash
+because the configure script shebang is *not* /bin/bash.)
 
 
 -- 
