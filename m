@@ -1,151 +1,145 @@
-Return-Path: <netdev+bounces-60592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0391E8200C1
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 18:19:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FCF58200C3
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 18:21:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63E86B20B28
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 17:19:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 242CA1F22610
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 17:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A66712B6B;
-	Fri, 29 Dec 2023 17:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B3B12B84;
+	Fri, 29 Dec 2023 17:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="fpJzBZ4P"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="oF9sd+cO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D4D12B6E
-	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 17:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4T1sYR3wnczMq4Bk;
-	Fri, 29 Dec 2023 17:19:07 +0000 (UTC)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4T1sYQ2kMNzMpnPd;
-	Fri, 29 Dec 2023 18:19:06 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1703870347;
-	bh=zsh5RBd+5ocwtQhp5r8hMUfLyFAA3fFN3M6U7VcgUKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fpJzBZ4PJSC1FEN29pjgIE2CYGNjldVQLx8vqcuKGnnabOqut0xRUGTv9esKHRvQc
-	 BZLYMRGdh83Bz+qQhUe4bBtulgxeYMNRpqsogw5YWtAKfFwzKtvhUddj6J00B9mLzL
-	 vikXUOKAngkVhgNqiKS3cCBeN7mA5We73K+W4hv0=
-Date: Fri, 29 Dec 2023 18:18:58 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Paul Moore <paul@paul-moore.com>
-Cc: Eric Paris <eparis@parisplace.org>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, Muhammad Usama Anjum <usama.anjum@collabora.com>, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] selinux: Fix error priority for bind with AF_UNSPEC on
- AF_INET6 socket
-Message-ID: <20231229.Phaengue0aib@digikod.net>
-References: <20231228113917.62089-1-mic@digikod.net>
- <CAHC9VhQMbHLYkhs-k9YEjeAFH7_JOk3RUKAa7jD7HP0NW1cBdA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8A812B7A
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 17:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d4a2526a7eso2467925ad.3
+        for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 09:21:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1703870491; x=1704475291; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xKoiaN5Ptx5nvAEn7znQLv6cCCZe9EwH3qBzMCtP9vs=;
+        b=oF9sd+cOWhWgo/1AyNvSFN0IstkRRWK6CfG3tx6IDMYboN1/FtisJfSvjg5xc7yIAl
+         UKge4w9wPr6wU4noa0KTC00O2UebsFqyN8TbtcVPlpCYevlH1N0c2cW1QKinN8QSt+X1
+         t9CeD+2R2noED0oQ8/dQGb/otV3ure9+G5mRqK0/DMlhC6tk7rQoYKLlj83FhdryKhHG
+         MynJ7WqZEbWC8UiDV91urQjJkvJvQPikMDlkd/Iq5rMz2/wZKc66wfDSNRbiEhg+9irO
+         lF9kwzlNPKMTSoc9exRozWyS4bOc43A/WUaWt4E2wXLf3aOTGb6YAkRE8ONRM83X1+Dp
+         6d6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703870491; x=1704475291;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xKoiaN5Ptx5nvAEn7znQLv6cCCZe9EwH3qBzMCtP9vs=;
+        b=heEBMgsg/fcEeDOLy5436OcDv5Lgvo/B0jKWfZa+hfw06O0QS7+2ll/nxb7kil+aNi
+         IunevK8HqlXVP/PhN/jQFFRia3JPLf+tckHxjFXrhZUQFYQgOMijomAFcsoI/snZQrPf
+         SfTFsxnPz9qcIqDHW4rq176PxxIcnf1CvRSRF/AkWydY+fr5WqbhpEdumWXrCmA4IdJ7
+         ShohAMeTHI3Q1FHiyms1lLVGTzKza6wCKHq26ulcg2uOtPUfB4GPrPHDdCoGk9mzRlUa
+         XKMCiyK7I4fqeYzFRij/A+4ONMK/HPxrMXI+phEm3hTAo5vtqlbNvd5nPj0TZtHsaNPi
+         X8fg==
+X-Gm-Message-State: AOJu0Yxx14jKOqzgb7jML8rLzX0iMfHzGfsu7NS69M1iNlMf9yNZ7Cck
+	Rsh8QJRghO5S52dk9Fg1LAJqEcioJOlDBQ==
+X-Google-Smtp-Source: AGHT+IFuPWC15y3Fys9+ve8/S52v3w4SMiq4MkFREGDbWNkns27R/AxG8CAHo6O41LZvW9O9A3IlZg==
+X-Received: by 2002:a17:903:2c9:b0:1d4:61da:1384 with SMTP id s9-20020a17090302c900b001d461da1384mr5475666plk.106.1703870491534;
+        Fri, 29 Dec 2023 09:21:31 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id j17-20020a170902c3d100b001d400970b6csm15877720plj.110.2023.12.29.09.21.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Dec 2023 09:21:31 -0800 (PST)
+Date: Fri, 29 Dec 2023 09:21:29 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Junxian Huang <huangjunxian6@hisilicon.com>
+Cc: <jgg@ziepe.ca>, <leon@kernel.org>, <dsahern@gmail.com>,
+ <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH iproute2-rc 1/2] rdma: Fix core dump when pretty is used
+Message-ID: <20231229092129.25a526c4@hermes.local>
+In-Reply-To: <20231229065241.554726-2-huangjunxian6@hisilicon.com>
+References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
+	<20231229065241.554726-2-huangjunxian6@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHC9VhQMbHLYkhs-k9YEjeAFH7_JOk3RUKAa7jD7HP0NW1cBdA@mail.gmail.com>
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-(Removing Alexey Kodanev because the related address is no longer
-valid.)
+On Fri, 29 Dec 2023 14:52:40 +0800
+Junxian Huang <huangjunxian6@hisilicon.com> wrote:
 
-On Thu, Dec 28, 2023 at 07:19:07PM -0500, Paul Moore wrote:
-> On Thu, Dec 28, 2023 at 6:39 AM Mickaël Salaün <mic@digikod.net> wrote:
-> >
-> > The IPv6 network stack first checks the sockaddr length (-EINVAL error)
-> > before checking the family (-EAFNOSUPPORT error).
-> >
-> > This was discovered thanks to commit a549d055a22e ("selftests/landlock:
-> > Add network tests").
-> >
-> > Cc: Alexey Kodanev <alexey.kodanev@oracle.com>
-> > Cc: Eric Paris <eparis@parisplace.org>
-> > Cc: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> > Cc: Paul Moore <paul@paul-moore.com>
-> > Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
-> > Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-> > Closes: https://lore.kernel.org/r/0584f91c-537c-4188-9e4f-04f192565667@collabora.com
-> > Fixes: 0f8db8cc73df ("selinux: add AF_UNSPEC and INADDR_ANY checks to selinux_socket_bind()")
-> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> > ---
-> >  security/selinux/hooks.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-> > index feda711c6b7b..9fc55973d765 100644
-> > --- a/security/selinux/hooks.c
-> > +++ b/security/selinux/hooks.c
-> > @@ -4667,6 +4667,10 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
-> >                                 return -EINVAL;
-> >                         addr4 = (struct sockaddr_in *)address;
-> >                         if (family_sa == AF_UNSPEC) {
-> > +                               if (sock->sk->__sk_common.skc_family ==
-> > +                                           AF_INET6 &&
-> > +                                   addrlen < SIN6_LEN_RFC2133)
-> > +                                       return -EINVAL;
+> From: Chengchang Tang <tangchengchang@huawei.com>
 > 
-> Please use sock->sk_family to simplify the conditional above, or
-> better yet, use the local variable @family as it is set to the sock's
-> address family near the top of selinux_socket_bind()
-
-Correct, I'll send a v2 with that.
-
-> ... although, as
-> I'm looking at the existing code, is this patch necessary?
+> There will be a core dump when pretty is used as the JSON object
+> hasn't been opened and closed properly.
 > 
-> At the top of the AF_UNSPEC/AF_INET case there is an address length check:
+> Before:
+> $ rdma res show qp -jp -dd
+> [ {
+>     "ifindex": 1,
+>     "ifname": "hns_1",
+>     "port": 1,
+>     "lqpn": 1,
+>     "type": "GSI",
+>     "state": "RTS",
+>     "sq-psn": 0,
+>     "comm": "ib_core"
+> },
+> "drv_sq_wqe_cnt": 128,
+> "drv_sq_max_gs": 2,
+> "drv_rq_wqe_cnt": 512,
+> "drv_rq_max_gs": 1,
+> rdma: json_writer.c:130: jsonw_end: Assertion `self->depth > 0' failed.
+> Aborted (core dumped)
 > 
->   if (addrlen < sizeof(struct sockaddr_in))
->     return -EINVAL;
-
-This code is correct but not enough in the case of an IPv6 socket.
-
+> After:
+> $ rdma res show qp -jp -dd
+> [ {
+>         "ifindex": 2,
+>         "ifname": "hns_2",
+>         "port": 1,
+>         "lqpn": 1,
+>         "type": "GSI",
+>         "state": "RTS",
+>         "sq-psn": 0,
+>         "comm": "ib_core",{
+>             "drv_sq_wqe_cnt": 128,
+>             "drv_sq_max_gs": 2,
+>             "drv_rq_wqe_cnt": 512,
+>             "drv_rq_max_gs": 1,
+>             "drv_ext_sge_sge_cnt": 256
+>         }
+>     } ]
 > 
-> ... which I believe should be performing the required sockaddr length
-> check (and it is checking for IPv4 address lengths not IPv6 as in the
-> patch).  I see that we have a similar check for AF_INET6, so we should
-> be covered there as well.
+> Fixes: 331152752a97 ("rdma: print driver resource attributes")
+> Signed-off-by: Chengchang Tang <tangchengchang@huawei.com>
+> Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
 
-The existing similar check (addrlen < SIN6_LEN_RFC2133) is when the
-af_family is AF_INET6, but this patch adds a check for AF_UNSPEC on an
-PF_INET6 socket. The IPv6 network stack first checks that the addrlen is
-valid for an IPv6 address even if the requested af_family is AF_UNSPEC,
-hence this patch.
+This code in rdma seems to be miking json and newline functionality
+which creates bug traps.
 
-> 
-> I'm probably still in a bit of a holiday fog, can you help me see what
-> I'm missing here?
+Also the json should have same effective output in pretty and non-pretty mode.
+It looks like since pretty mode add extra object layer, the nesting of {} would be
+different.
 
-The tricky part is that AF_UNSPEC can be checked against the PF_INET or
-the PF_INET6 socket implementations, and the return error code may not
-be the same according to addrlen, especially when
-sizeof(struct sockaddr_in) < addrlen < SIN6_LEN_RFC2133
+The conversion to json_print() was done but it isn't using same conventions
+as ip or tc.
 
-The (new) Landlock network tests check this kind of corner case to make
-sure the same error codes are return with and without a Landlock
-sandbox. Muhammad reported that some of these tests failed on KernelCI
-and I found that, when SELinux is enabled (which is the case with the
-defconfig), SElinux gets the request after Landlock and returns a wrong
-error code (before the network stack can do anything).
-See tools/testing/selftests/landlock/net_test.c +728
-which checks with and without a Landlock sandbox.
+The correct fix needs to go deeper and hit other things.
 
-I tested this patch with SELinux and Landlock enabled, and all the
-Landlock tests pass.
 
-I'm working on a more global approach to cover all LSMs, with more
-checks and Landlock tests, but this will be more complex and then will
-take more time to review.
+
+
 
