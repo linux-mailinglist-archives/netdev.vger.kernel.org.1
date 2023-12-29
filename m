@@ -1,103 +1,151 @@
-Return-Path: <netdev+bounces-60591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A65D820086
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 17:33:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0391E8200C1
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 18:19:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 138082847A7
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 16:33:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63E86B20B28
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 17:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF42125BD;
-	Fri, 29 Dec 2023 16:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A66712B6B;
+	Fri, 29 Dec 2023 17:19:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b="UeGlzbGQ"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="fpJzBZ4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mr85p00im-ztdg06021201.me.com (mr85p00im-ztdg06021201.me.com [17.58.23.189])
+Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B566512B68
-	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 16:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danm.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=danm.net; s=sig1;
-	t=1703867622; bh=mdHoqF4DBozjc5AZdCsy35qAGohL7+5V9GIyKGF0W98=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=UeGlzbGQ9DI+Z0AI49toYh8BED1yiu6kUd6XzJPfiynDICAgvJY1c65EJ9GhETVxx
-	 VXftzlAS/g3gz038LMlo/7PQhIiURZ0P07kLKCSIX/iWuxtJqNNuLoDFKd5KUr3R3c
-	 wrPQy7V/8K+3G1OcoRWmPoDNLHcOn9rr3XKWcLdYH1JNJiL71d3o2K21h5AIc2ZgWk
-	 DYr7oLAs4m9Jkqzch6NkEEibCD7tag2xrdBTw4zRHTovorWYYlHoDCevD1UOdvFUD9
-	 6Q7sadSRKZm6qJLswMQ2pXmci78/w/D/3Cs9yvYftj8qX9s7Pc2VnfWJpc6OugRlak
-	 afms62LOfOYSg==
-Received: from hitch.danm.net (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-ztdg06021201.me.com (Postfix) with ESMTPSA id 146253201A3;
-	Fri, 29 Dec 2023 16:33:40 +0000 (UTC)
-From: Dan Moulding <dan@danm.net>
-To: alexhenrie24@gmail.com
-Cc: bagasdotme@gmail.com,
-	dan@danm.net,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	regressions@lists.linux.dev
-Subject: Re: [REGRESSION] net/ipv6/addrconf: Temporary addresses with short lifetimes generating when they shouldn't, causing applications to fail
-Date: Fri, 29 Dec 2023 09:33:39 -0700
-Message-ID: <20231229163339.2716-1-dan@danm.net>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <CAMMLpeTCZDakqdkxm+jvQHxbRXhCYd4_PK+VVqMAmZHjSPuPRw@mail.gmail.com>
-References: <CAMMLpeTCZDakqdkxm+jvQHxbRXhCYd4_PK+VVqMAmZHjSPuPRw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D4D12B6E
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 17:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4T1sYR3wnczMq4Bk;
+	Fri, 29 Dec 2023 17:19:07 +0000 (UTC)
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4T1sYQ2kMNzMpnPd;
+	Fri, 29 Dec 2023 18:19:06 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1703870347;
+	bh=zsh5RBd+5ocwtQhp5r8hMUfLyFAA3fFN3M6U7VcgUKE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fpJzBZ4PJSC1FEN29pjgIE2CYGNjldVQLx8vqcuKGnnabOqut0xRUGTv9esKHRvQc
+	 BZLYMRGdh83Bz+qQhUe4bBtulgxeYMNRpqsogw5YWtAKfFwzKtvhUddj6J00B9mLzL
+	 vikXUOKAngkVhgNqiKS3cCBeN7mA5We73K+W4hv0=
+Date: Fri, 29 Dec 2023 18:18:58 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Paul Moore <paul@paul-moore.com>
+Cc: Eric Paris <eparis@parisplace.org>, 
+	Stephen Smalley <stephen.smalley.work@gmail.com>, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
+	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, Muhammad Usama Anjum <usama.anjum@collabora.com>, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] selinux: Fix error priority for bind with AF_UNSPEC on
+ AF_INET6 socket
+Message-ID: <20231229.Phaengue0aib@digikod.net>
+References: <20231228113917.62089-1-mic@digikod.net>
+ <CAHC9VhQMbHLYkhs-k9YEjeAFH7_JOk3RUKAa7jD7HP0NW1cBdA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: oFRRsbiheUkH9f2_QvM7LSR0PZXkau7h
-X-Proofpoint-ORIG-GUID: oFRRsbiheUkH9f2_QvM7LSR0PZXkau7h
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-29_06,2023-12-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1030 mlxlogscore=696
- spamscore=0 phishscore=0 adultscore=0 mlxscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2308100000 definitions=main-2312290132
+In-Reply-To: <CAHC9VhQMbHLYkhs-k9YEjeAFH7_JOk3RUKAa7jD7HP0NW1cBdA@mail.gmail.com>
+X-Infomaniak-Routing: alpha
 
-I think a maintainer will probably need to make a call here and decide
-how to proceed.
+(Removing Alexey Kodanev because the related address is no longer
+valid.)
 
-> TEMP_PREFERRED_LIFETIME is an administratively set variable: The user
-> can change it to whatever they want whenever they want, and the
-> operating system can adjust it automatically too.
+On Thu, Dec 28, 2023 at 07:19:07PM -0500, Paul Moore wrote:
+> On Thu, Dec 28, 2023 at 6:39 AM Mickaël Salaün <mic@digikod.net> wrote:
+> >
+> > The IPv6 network stack first checks the sockaddr length (-EINVAL error)
+> > before checking the family (-EAFNOSUPPORT error).
+> >
+> > This was discovered thanks to commit a549d055a22e ("selftests/landlock:
+> > Add network tests").
+> >
+> > Cc: Alexey Kodanev <alexey.kodanev@oracle.com>
+> > Cc: Eric Paris <eparis@parisplace.org>
+> > Cc: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> > Cc: Paul Moore <paul@paul-moore.com>
+> > Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
+> > Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> > Closes: https://lore.kernel.org/r/0584f91c-537c-4188-9e4f-04f192565667@collabora.com
+> > Fixes: 0f8db8cc73df ("selinux: add AF_UNSPEC and INADDR_ANY checks to selinux_socket_bind()")
+> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
+> > ---
+> >  security/selinux/hooks.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+> > index feda711c6b7b..9fc55973d765 100644
+> > --- a/security/selinux/hooks.c
+> > +++ b/security/selinux/hooks.c
+> > @@ -4667,6 +4667,10 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
+> >                                 return -EINVAL;
+> >                         addr4 = (struct sockaddr_in *)address;
+> >                         if (family_sa == AF_UNSPEC) {
+> > +                               if (sock->sk->__sk_common.skc_family ==
+> > +                                           AF_INET6 &&
+> > +                                   addrlen < SIN6_LEN_RFC2133)
+> > +                                       return -EINVAL;
+> 
+> Please use sock->sk_family to simplify the conditional above, or
+> better yet, use the local variable @family as it is set to the sock's
+> address family near the top of selinux_socket_bind()
 
-Agreed. And the behavior it seems you really want is to prevent the
-user from administratively setting it to a value that is lower than
-REGEN_ADVANCE, so that it won't stop generating new temporary
-addresses altogether.
+Correct, I'll send a v2 with that.
 
-But preventing the user from configuring it to a value that is too low
-is different from generating new temporary addresses with preferred
-lifetimes that are greater than the currently configured value of
-TEMP_PREFERRED_LIFETIME. I still believe it would be better, and would
-be in conformance with the RFC, to simply not allow the user to
-configure a too-short TEMP_PREFERRED_LIFETIME instead of tinkering
-with the lifetimes of generated temporary addresses.
+> ... although, as
+> I'm looking at the existing code, is this patch necessary?
+> 
+> At the top of the AF_UNSPEC/AF_INET case there is an address length check:
+> 
+>   if (addrlen < sizeof(struct sockaddr_in))
+>     return -EINVAL;
 
-> It's fine to revert the commit for version 6.7 (after all, I think
-> everyone wants a break for the holidays). Hopefully by version 6.8 we
-> can agree on a way to support users who want to randomize their IPv6
-> address as frequently as the network allows.
+This code is correct but not enough in the case of an IPv6 socket.
 
-FWIW, I think the desired effect you are seeking makes sense and is
-the right thing to do. I'm just not convinced this is the correct way
-to do it. But I'm not a maintainer and also not an expert in IPv6, so
-I'm definitely not the right person to make that call.
+> 
+> ... which I believe should be performing the required sockaddr length
+> check (and it is checking for IPv4 address lengths not IPv6 as in the
+> patch).  I see that we have a similar check for AF_INET6, so we should
+> be covered there as well.
 
--- Dan
+The existing similar check (addrlen < SIN6_LEN_RFC2133) is when the
+af_family is AF_INET6, but this patch adds a check for AF_UNSPEC on an
+PF_INET6 socket. The IPv6 network stack first checks that the addrlen is
+valid for an IPv6 address even if the requested af_family is AF_UNSPEC,
+hence this patch.
+
+> 
+> I'm probably still in a bit of a holiday fog, can you help me see what
+> I'm missing here?
+
+The tricky part is that AF_UNSPEC can be checked against the PF_INET or
+the PF_INET6 socket implementations, and the return error code may not
+be the same according to addrlen, especially when
+sizeof(struct sockaddr_in) < addrlen < SIN6_LEN_RFC2133
+
+The (new) Landlock network tests check this kind of corner case to make
+sure the same error codes are return with and without a Landlock
+sandbox. Muhammad reported that some of these tests failed on KernelCI
+and I found that, when SELinux is enabled (which is the case with the
+defconfig), SElinux gets the request after Landlock and returns a wrong
+error code (before the network stack can do anything).
+See tools/testing/selftests/landlock/net_test.c +728
+which checks with and without a Landlock sandbox.
+
+I tested this patch with SELinux and Landlock enabled, and all the
+Landlock tests pass.
+
+I'm working on a more global approach to cover all LSMs, with more
+checks and Landlock tests, but this will be more complex and then will
+take more time to review.
 
