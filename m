@@ -1,123 +1,145 @@
-Return-Path: <netdev+bounces-60520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF78E81FB6C
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 22:58:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67B8081FC2B
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 01:19:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10FFE285ED0
-	for <lists+netdev@lfdr.de>; Thu, 28 Dec 2023 21:58:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6D55B20BEC
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 00:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7253210947;
-	Thu, 28 Dec 2023 21:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028FE629;
+	Fri, 29 Dec 2023 00:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zo1er2nJ"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Yfi1kRUR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181E51095F
-	for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 21:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3b86f3cdca0so5361762b6e.3
-        for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 13:58:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABACB633
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 00:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dbd739853easo4317415276.0
+        for <netdev@vger.kernel.org>; Thu, 28 Dec 2023 16:19:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703800686; x=1704405486; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2g97ybtcH7+9iFAGgdOUxg1Yv+613C1GWdb1CfxJqDw=;
-        b=Zo1er2nJ/F7S0XFQPbIlWLKC+OTRrLaTPpp4hvcW80xNAwBRxm+VhAwXv/hB0sgZTL
-         mB0OGp4gAIrDwZxWT5y3elOMRRaAlbYhPRNLtTp7dB2R9RzueZrV0QleslPBLCNA84fb
-         hfplmIwp50KIjrsk6r67fKlPKp83/k8BSySDD1olAykPsuYOx9eXwPTVnHaUmlTupFk0
-         lQeWUNFxtiKi9VTbhGAe5AOYGVxRUtNiyn5uuv7v3lK0T+uDrPoHj8X9vLtqb5Bfel2s
-         1qi9yjusE8XiQt9zdY096c0OEuLpB0t32dhe1FLINhBplfI8M/pZ2HfU6AFS3pQpll+o
-         rwBA==
+        d=paul-moore.com; s=google; t=1703809158; x=1704413958; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0cEo2Ugvy631qhTrMS3RccK1Y17x2v86Km3ZLje/SNw=;
+        b=Yfi1kRURXi8ETveb77Eusm4amY8G/5PM0cWvryS80m9ym8IeTfqxT20nzo3NS+jvhB
+         0Va484Fs6Yx0XeY+cxAFVWBcT0wxAQ6yk4At6rveggdzNPvr5PlC9oTS+onpXjd/hdnT
+         rtlmkCFmgRJXWOfqUFVb/Qe5wtulXwYCdESGCk+uLAmLQi9YdcoV8RCqxIzoWnXVBmxe
+         MsTxS7N4eX7e5oTNo+/Ukv3PtjOu/19bcEN1cvLLCUNrTtjzM/3PNn5Ln+zHZDdMig7C
+         w+7/IVEvtw/73oVTMXGtbv5jYIbsWJBXimKaVHN4gsVu/m8gLmnhis0zRR/WqZ0btfhM
+         ApXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703800686; x=1704405486;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2g97ybtcH7+9iFAGgdOUxg1Yv+613C1GWdb1CfxJqDw=;
-        b=kqP+shN0Cy//zFvvmmrmk7DzA0IJOxNG1+gCeY++/M/yooaIrxkJ4eSpvSU4F3jlOM
-         kHChu1QB+INWnl6RSJIA9laSuMSX2Js3po+px2sdZ96saPCJt6cH5VRrlMYmHU5fSaCq
-         AVVBshtAp7BaHPfGgpxKhjNGnSuNUavIKA2GhaaM4+hPcCLmp7kQhVrwrhfzqhMCs4/U
-         wz47CsFENYR49IdJddzpTGF5Ic0ZodCHnC3468V2t+mXRtf7+xIlGSjJ7KiA8u1RggRM
-         4FBkGEVbAByKeW70LyDb1W47zPGEdk3Ub7F19v9QjtHh/HPWithKXNdtB6tbkPbDEI4D
-         kUWg==
-X-Gm-Message-State: AOJu0YzR+klUTa30OPwAL1T/9+B7Pd6ETEt5cXYUlqPnKmh7ClnqQyjq
-	42dn65P1XS0asSRVy8m9GaE=
-X-Google-Smtp-Source: AGHT+IH/joijPd1Ska1sRfDmzSI90vuIJJ5yk/3QbEk8FuzMNzYow0Rv4yeue8ClKsgrS1sfwOnUAg==
-X-Received: by 2002:a05:6808:1595:b0:3ba:cc:6c51 with SMTP id t21-20020a056808159500b003ba00cc6c51mr12921726oiw.52.1703800686013;
-        Thu, 28 Dec 2023 13:58:06 -0800 (PST)
-Received: from [192.168.12.218] ([172.56.184.122])
-        by smtp.gmail.com with ESMTPSA id d16-20020a05621416d000b0067f28a2f522sm6480853qvz.140.2023.12.28.13.58.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Dec 2023 13:58:05 -0800 (PST)
-Message-ID: <13587133-2a94-4ba2-9ea0-6fc8f7aa3f51@gmail.com>
-Date: Thu, 28 Dec 2023 13:58:02 -0800
+        d=1e100.net; s=20230601; t=1703809158; x=1704413958;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0cEo2Ugvy631qhTrMS3RccK1Y17x2v86Km3ZLje/SNw=;
+        b=apxmwS2duYhCBd+Ocq/0LCBzDChd+Lr1pnLVfHvVFTknx/2GLNFd4YUSOg433iUNBn
+         iVxNOKGj1CJP4LwPUlQ5KgIInTtrd09Chk9Sz5yAEqqMhUb2rvpYcH4UPGzUpmA29fS5
+         KEWg5I5Y4yAMbXoS6k3xxtkfTzssHNL6tVQIMOU1SAvcvxTXu9pqCadRWxsMMOnYhRHf
+         7CqOEwXnBIfBXJjEAqlO48yjX4iGCmwPvWezxlodt98vwd2GRUpoEpnLpiOUHSmxEsTA
+         mCYNvMArV/8v97HlYxg+QFANhfw+8V9bDmzgxQbVMH/uXWQH1/H/xo5V6L6ZKaOkbQcL
+         pbRQ==
+X-Gm-Message-State: AOJu0YwXYmhRijvt4GIxfUUEIMtrJuC7tf2XrbN+vAQUSjyq916U2Up1
+	mDemhB4UYlWVGEfbGt9pVMicDPF5NPIW/Nx2izGZIEeKI5QY
+X-Google-Smtp-Source: AGHT+IEp/1iCFuxTXErlQvBv5mX2X2yrx3CHtCqbu/F/FozWARWZG3sopFSp6JAiHGlzpZbIaWtLRfQYnp3EODGrMz0=
+X-Received: by 2002:a25:2d0a:0:b0:dbd:45b5:7037 with SMTP id
+ t10-20020a252d0a000000b00dbd45b57037mr5269538ybt.105.1703809158617; Thu, 28
+ Dec 2023 16:19:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] net: bcmgenet: Fix FCS generation for fragmented
- skbuffs
-To: Adrian Cinal <adriancinal1@gmail.com>, netdev@vger.kernel.org
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- Adrian Cinal <adriancinal@gmail.com>
-References: <CAPxJ3Bdo9jO_UuA2V1p7sTTdcObGC8VtufDu_ce3ecSF47JpHw@mail.gmail.com>
- <20231228135638.1339245-1-adriancinal1@gmail.com>
-Content-Language: en-US
-From: Doug Berger <opendmb@gmail.com>
-In-Reply-To: <20231228135638.1339245-1-adriancinal1@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231228113917.62089-1-mic@digikod.net>
+In-Reply-To: <20231228113917.62089-1-mic@digikod.net>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 28 Dec 2023 19:19:07 -0500
+Message-ID: <CAHC9VhQMbHLYkhs-k9YEjeAFH7_JOk3RUKAa7jD7HP0NW1cBdA@mail.gmail.com>
+Subject: Re: [PATCH] selinux: Fix error priority for bind with AF_UNSPEC on
+ AF_INET6 socket
+To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
+Cc: Eric Paris <eparis@parisplace.org>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Alexey Kodanev <alexey.kodanev@oracle.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/28/2023 5:56 AM, Adrian Cinal wrote:
-> From: Adrian Cinal <adriancinal@gmail.com>
-> 
-> The flag DMA_TX_APPEND_CRC was only written to the first DMA descriptor
-> in the TX path, where each descriptor corresponds to a single skbuff
-> fragment (or the skbuff head). This led to packets with no FCS appearing
-> on the wire if the kernel allocated the packet in fragments, which would
-> always happen when using PACKET_MMAP/TPACKET (cf. tpacket_fill_skb() in
-> net/af_packet.c).
-> 
-> Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
-> Signed-off-by: Adrian Cinal <adriancinal1@gmail.com>
+On Thu, Dec 28, 2023 at 6:39=E2=80=AFAM Micka=C3=ABl Sala=C3=BCn <mic@digik=
+od.net> wrote:
+>
+> The IPv6 network stack first checks the sockaddr length (-EINVAL error)
+> before checking the family (-EAFNOSUPPORT error).
+>
+> This was discovered thanks to commit a549d055a22e ("selftests/landlock:
+> Add network tests").
+>
+> Cc: Alexey Kodanev <alexey.kodanev@oracle.com>
+> Cc: Eric Paris <eparis@parisplace.org>
+> Cc: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> Cc: Paul Moore <paul@paul-moore.com>
+> Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
+> Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> Closes: https://lore.kernel.org/r/0584f91c-537c-4188-9e4f-04f192565667@co=
+llabora.com
+> Fixes: 0f8db8cc73df ("selinux: add AF_UNSPEC and INADDR_ANY checks to sel=
+inux_socket_bind()")
+> Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@digikod.net>
 > ---
-> Differs from v2 in that now the flag DMA_TX_APPEND_CRC is set for all
-> fragments (so as to be in line with the specification requiring the flag
-> be set alongside DMA_SOP).
-> 
->   drivers/net/ethernet/broadcom/genet/bcmgenet.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> index 1174684a7f23..d86e5da6e157 100644
-> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> @@ -2140,8 +2140,10 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
->   		/* Note: if we ever change from DMA_TX_APPEND_CRC below we
->   		 * will need to restore software padding of "runt" packets
->   		 */
-> +		len_stat |= DMA_TX_APPEND_CRC;
-> +
->   		if (!i) {
-> -			len_stat |= DMA_TX_APPEND_CRC | DMA_SOP;
-> +			len_stat |= DMA_SOP;
->   			if (skb->ip_summed == CHECKSUM_PARTIAL)
->   				len_stat |= DMA_TX_DO_CSUM;
->   		}
+>  security/selinux/hooks.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+> index feda711c6b7b..9fc55973d765 100644
+> --- a/security/selinux/hooks.c
+> +++ b/security/selinux/hooks.c
+> @@ -4667,6 +4667,10 @@ static int selinux_socket_bind(struct socket *sock=
+, struct sockaddr *address, in
+>                                 return -EINVAL;
+>                         addr4 =3D (struct sockaddr_in *)address;
+>                         if (family_sa =3D=3D AF_UNSPEC) {
+> +                               if (sock->sk->__sk_common.skc_family =3D=
+=3D
+> +                                           AF_INET6 &&
+> +                                   addrlen < SIN6_LEN_RFC2133)
+> +                                       return -EINVAL;
 
-Acked-by: Doug Berger <opendmb@gmail.com>
+Please use sock->sk_family to simplify the conditional above, or
+better yet, use the local variable @family as it is set to the sock's
+address family near the top of selinux_socket_bind() ... although, as
+I'm looking at the existing code, is this patch necessary?
 
-Thanks for your help!
-     Doug
+At the top of the AF_UNSPEC/AF_INET case there is an address length check:
+
+  if (addrlen < sizeof(struct sockaddr_in))
+    return -EINVAL;
+
+... which I believe should be performing the required sockaddr length
+check (and it is checking for IPv4 address lengths not IPv6 as in the
+patch).  I see that we have a similar check for AF_INET6, so we should
+be covered there as well.
+
+I'm probably still in a bit of a holiday fog, can you help me see what
+I'm missing here?
+
+>                                 /* see __inet_bind(), we only want to all=
+ow
+>                                  * AF_UNSPEC if the address is INADDR_ANY
+>                                  */
+> --
+> 2.43.0
+
+--=20
+paul-moore.com
 
