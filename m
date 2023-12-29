@@ -1,181 +1,196 @@
-Return-Path: <netdev+bounces-60584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DA2782001B
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 16:07:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EB3B820029
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 16:20:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F362846A1
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 15:07:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F20F81F228BC
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 15:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A0C11CB9;
-	Fri, 29 Dec 2023 15:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30192125AC;
+	Fri, 29 Dec 2023 15:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="DWmOWCwZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RXHeCZXK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54AB11CBB
-	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 15:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33677fb38a3so6982542f8f.0
-        for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 07:07:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1703862453; x=1704467253; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tfEUssq66775g5rv0X3EdttVr6Qz6vvAn3f8fmKq6k4=;
-        b=DWmOWCwZl7kLEnbKecRZcrppO65lE+zcGzUU3rdJjMbu9kMCo+dNg+niDXO6RoG9Ay
-         VnQIIr6+Fo90zgwzYlnm0oR9ZW5xNFu9ylaveW+QcnBYdjkSj7RqYMM0baptjfabO/w2
-         zBRMLDOkhohANxqT4U5fqdz3y3i3arcnInfRjlFu6UoTlhLBC7wOJ5tKcXIOxdMETbNu
-         RsaX5x1RCpu2Gf+k5jZpWEV28S/udRBh5zphgBZS1TlpdCGT7vrx6Ktk2j8S5fun3voi
-         9aW+7iR2XnknIF6VKixdrvVZxaFG8WxVACrRfsl7ME+Z2uAlBpuHcCku/+s5yrH6VLRu
-         X++A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703862453; x=1704467253;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tfEUssq66775g5rv0X3EdttVr6Qz6vvAn3f8fmKq6k4=;
-        b=OUxWqj0wtbOPFhSrwbvKi8ifKK8NeC+uMt12Qil9/jAvNClzwBnmfLlrX/uqvIF1y2
-         JW1b7X6KAJ80T4aJdm6RVHOrxOCAsKYhD/kRaOAt3DYQosKR7VhHPJaHYDoKNB1PjVDY
-         nc7wBDlZneVXufcox3qbD6k1W6KL/Jups69XyZ3Q041okZanrhOsjhFKsr4fyBrnoPEV
-         r2c8Vag0/IYZgrsopxZqlae62jOqWMqPr0RVuiOjJHQNawf2bt52KyQV7ZDJnlijudwu
-         qqs/7VVt991YsG16UroCOqYdrMAAVFXdq0SIVrIxiNTqkrbdtJZMeGOKcTkyE/XyBnFS
-         s6fw==
-X-Gm-Message-State: AOJu0Yz2xq6JgTPYVaNQuz2d72VJqvErNtoUe7KGWfnbDqoUbz3gKxdY
-	XKrnsJgMMAlkna0UJXYy120qy3cIPsCe3A==
-X-Google-Smtp-Source: AGHT+IFOhefH6uyfP+oL9e2jb6KzF0vgMPeDuZLKZilG2UW7+TBcW0F93pNTf9V3XDx5UAcbNn3DtA==
-X-Received: by 2002:a05:600c:354d:b0:40d:5a6d:edcb with SMTP id i13-20020a05600c354d00b0040d5a6dedcbmr2806177wmq.24.1703862452733;
-        Fri, 29 Dec 2023 07:07:32 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.5])
-        by smtp.gmail.com with ESMTPSA id j16-20020a05600c191000b0040c11fbe581sm31381314wmq.27.2023.12.29.07.07.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Dec 2023 07:07:32 -0800 (PST)
-Message-ID: <ca01da5f-0928-4a95-83f4-8d9056107f42@tuxon.dev>
-Date: Fri, 29 Dec 2023 17:07:30 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD7A125A5;
+	Fri, 29 Dec 2023 15:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703863192; x=1735399192;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=BUEddKaB0Xdk3qAFinHGXxP49al3e5WSi9oCKlU03yk=;
+  b=RXHeCZXKtaxk7oCH58gtxC5G8nSczO0qWm1qO2glnE+GjIf1OUCrjpXJ
+   wTizXHpEEh1brpdnV3YqPpDycavbn3oP9ltdukVbLd7b5j1NEA4qTJQm1
+   4257Y2EdzuKzWwXBPqiYfIvKLgdi/iDVXFOORMp4C4xE81VVFWwdwYLXt
+   FwvTs+pkEUgSuiTMpgIRRpcj4smu7GYFnbLkZaDMhyZiCH3NyAvsH6a2O
+   5u+Zt57gBwZp8IZp7NrsXMuQFnFyh9mqkoerHYifNezYLzdDaVAWSfn2j
+   3qaAdVoU2Mr6qWySHZ4O1g4xpD0HP1v73nqsVNTEGV1rPQd/+CQyNiqFN
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10938"; a="3955242"
+X-IronPort-AV: E=Sophos;i="6.04,315,1695711600"; 
+   d="scan'208";a="3955242"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2023 07:19:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10938"; a="897534824"
+X-IronPort-AV: E=Sophos;i="6.04,315,1695711600"; 
+   d="scan'208";a="897534824"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Dec 2023 07:19:50 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 29 Dec 2023 07:19:50 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 29 Dec 2023 07:19:50 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 29 Dec 2023 07:19:49 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kblq6qPKD4Ud9k72YbrjPULEzvdbFsX4vMH8z+K45RS6oAe/BvaknZK/lEzyprMn9eIUunyySaStg+k76KAvW3bVbJZXdgdUmiigWUQOUBYUNHh3oZXOQbt25EF6ARcEcZGGZ7plCMlXU+fCmI1Si5Id9VMONFg2fqkUnCyQo7Oir1YtLAeQuQffJsOtiWjx4qtGcpjco67u3byn2iq7zTEdfx6Sbrj41U56TdhHkSR8Feq11kxC5kwrdh0ao7iOgtYeAuPdWE6J8Sjsg77brdMkLUVbD60qMuUGOdHGTwiMMNbqka9KY764atMQBqQFlmcxfkUju7o1GfoxkrIQpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=36JCcfaCHWzRxn+g731Tt0+AP3k87SboeO0UEqVPDs8=;
+ b=nY8/nnRAzAcM+JZeNk+94pkKSYsswg93x4yPSjfV//Hz+alnmxE43wmfihaY10vR78LuyGHCIPfpci79R+gfEWPxSLO8jkQgYHRrpupVfZVzNNYTDduVOk5uN7tgM6emVK1Em+l1C5ejIfigKRnaZL2H9Sm8cPhPP6w4Yl+vPN4fNH2kaTJ668smi7tdjj0PfjpAUJxOakmJzmGOmPSuPhveV7KG8Rg6US9H5ETEP2dBtiHVnRG5m73TeoB5Y4EU59L+KblW/sJ61yCOmBa0ZVavE/ZVN29i0mRbPwIskAYLYUwIYkgwIip0yS9Zmz/U5u/HCs9UKpI6u8536K25LA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
+ by CH0PR11MB5564.namprd11.prod.outlook.com (2603:10b6:610:d7::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.21; Fri, 29 Dec
+ 2023 15:19:48 +0000
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::ef7b:6435:f727:4d5c]) by BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::ef7b:6435:f727:4d5c%3]) with mapi id 15.20.7135.019; Fri, 29 Dec 2023
+ 15:19:47 +0000
+Message-ID: <912e8ffa-364c-1ca2-6bb7-803902a3fd6e@intel.com>
+Date: Fri, 29 Dec 2023 16:19:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH v2 net-next] selftests/net: change shebang to bash to
+ support "source"
+Content-Language: en-US
+To: Yujie Liu <yujie.liu@intel.com>, <netdev@vger.kernel.org>, Hangbin Liu
+	<liuhangbin@gmail.com>
+CC: Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lkp@intel.com>, kernel test robot <oliver.sang@intel.com>
+References: <20231229131931.3961150-1-yujie.liu@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20231229131931.3961150-1-yujie.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0109.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a8::9) To BYAPR11MB3672.namprd11.prod.outlook.com
+ (2603:10b6:a03:fa::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/1] net: ravb: Wait for operation mode to be
- applied
-Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
- mitsuhiro.kimura.kc@renesas.com
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20231222113552.2049088-1-claudiu.beznea.uj@bp.renesas.com>
- <20231222113552.2049088-2-claudiu.beznea.uj@bp.renesas.com>
- <98efc508-c431-2509-5799-96decc124136@omp.ru>
- <d5448a91-a4d8-444d-9f96-083049b1e33e@tuxon.dev>
- <9ebf96fb-c07a-8269-e5cd-0e71110941dd@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <9ebf96fb-c07a-8269-e5cd-0e71110941dd@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|CH0PR11MB5564:EE_
+X-MS-Office365-Filtering-Correlation-Id: 69989f9d-9146-449f-7b25-08dc08819821
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XfAjbhxcDz4Alm66aA0f6Ggb8PL38Eg+865+vo6HjL5a7X9QSQ8mO/EjwMuhYofvCe0RV5ZEs7LAuqPfvx66Rh0XXv0tTVYIKwPWZQeAaXUFDanPrgEKiWiDSNztaloLj4Zxl60iSk5cXa+u2JSLjsj+j2A9Q7C8NfV5enu1FeSWg2cn9Q7JKsXme6weF5Kd/Wo75fIZl+qYQ5LMdmw5oxxWa/0Te08Oko4bxltreoGuSXRbvC3BmTB0zB1iM4p3in8oyVFhS24Y5sGrNucKP+liQicxvmT6OOdblXqlVtwXDS1EcudaisvO/rMkyEqK9JXiNrcOI6+VdX3ETnCiUDLoyOfHbs8HzCATkNVEA7qAqiNEcWJD16GBjZYrdzVFxOWpfltDcZBlVzsgS6UKRg9WvZNCn876hR8lEO+25yCGaVRF8ouUCtV3chpqXdqWq/08RxwAxIHxgulWVZBIzLgKbhWgyEMbyyFZnNlk262UBbys0tcvyufblsqsf1suYA0ZX/sZff0R83BVC2j2M/8U0D5v3qZmhoq9SruQeDzRrXn9VDMxpZIOLLGstTrxpkxQFVwH+wjSDUaFR4GSU9NZZ0pV8VH8l54m7RsSvC7QvoptAXbmyslve+ov2wtJy32Jin14ptAgoA9+rVmdTA70EUKhG3JKBYhcEqdbrknReDBHkZEs1W7I5nrOIrLc35S/D9L0HM9Xj6sIi9FPVDIqj1jstvWxPlRw4dxtmAA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(376002)(366004)(136003)(230173577357003)(230273577357003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(53546011)(6512007)(6506007)(478600001)(110136005)(54906003)(82960400001)(966005)(66556008)(66476007)(86362001)(107886003)(6486002)(36756003)(31686004)(26005)(6666004)(66946007)(316002)(31696002)(83380400001)(4326008)(8936002)(8676002)(5660300002)(2906002)(41300700001)(2616005)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?amJtak9aaTB2SU43TVFXc29KOXF6ZVNKVlJDZmN0TllzMWE3dmczNVM5QlUy?=
+ =?utf-8?B?VElsdWJKSml6RXc5TlRoV2hRQ3AzZVlLU1c3ckw3TzYyVkIrS3U2L21tNXV4?=
+ =?utf-8?B?SkJGRnZSemhIQjVGMWNHMWdWbzlJcVN5T3owRThMSmZrOUVzRTNKTm5xdGxN?=
+ =?utf-8?B?U2loc0ZWYTJveCt4SnlhR01NeDUvbXZtTEFWbVpZTVNHYmovNzVrNzFwcWRZ?=
+ =?utf-8?B?ZVlUMGJHcmM3NitKZzhQUUYxUFowUDk4dXNKK09UVzB0cUpLeWJHZVJLNXY0?=
+ =?utf-8?B?M1JmZVhPNzVMbUFZV2ZGbEF0TlRIZ2xnS2J6bnU3RHJLcGNRY0l0czVRZXM4?=
+ =?utf-8?B?Y0lFdXIvVnZCZVRKQUp1TC9wc1ZYSEloVTRZc1JuczdlenJER21QbFF5V01K?=
+ =?utf-8?B?SnBFQ2JHa1FSODkxUFJJdEk4N29NYlVkWU1kSStNa3ZIODZtUmdBNzcza1VM?=
+ =?utf-8?B?Y29sNExTQ1lMUE9vZ0MzSnBrbG1ZZ1E1OFJNOVlXRUI3SktRbWhSMmVid3FV?=
+ =?utf-8?B?bW9NUVk1TDlyQ0lUTXA2WFZDOXR0cDBKVEx1YWtWU29HLzl4T2JaUGR3SjAv?=
+ =?utf-8?B?UUFFTS9BVXY4UVovdC9SK3JrdnZhSXVEUlVLVFJqZG5yYVh3UnU3bVNNTXFr?=
+ =?utf-8?B?a2ZwQUxFUnJIM2liMk83NTdUWVVpYi8rZzg0OU5TMVVvNUZJcFIvM01MRjM4?=
+ =?utf-8?B?UzJydFQ1b3JhU3E1TURuNUs1YWpocmNVTytJRS8ySjFnZ3V3eThPMExvK3ZZ?=
+ =?utf-8?B?cjF3bkxwUE5xalhibStKbllKQUl2R2N4c3VmdS84a2FoMzhFOU8zQWhpSXBa?=
+ =?utf-8?B?QndpN3ZDR1d3bHhBSU8zZXVRT3BlRC83Sm9vbFRiTGpTQk1oZzc2cVNSWlBF?=
+ =?utf-8?B?RXNqemM1RzIvZEhVK050OGJWRjFWYVdhRDV6ejlrdGxUbHU0TW5IQ2xDWGdG?=
+ =?utf-8?B?aUF1M3pDSG94YTdvU0JOU2VwYnpjeGpUeU03S3BiMkZJQ0l3ZnV5amY0OXF2?=
+ =?utf-8?B?dE4wMzhzMTlZbkMxZlZXWWdHcmIzbTFiMkhHVW0wMHErQTlkT01JVGFkeGpH?=
+ =?utf-8?B?UmR5NTFxb2k5bzNtOVIvQU1sdXJzZmwrekFMdzRweFRLY2EzVlhKNERNdU84?=
+ =?utf-8?B?REZKWG4zRU56SHpnVjhMbTZsZ09qWXdqZGdrcTZlQWNNNWo1cUVZUTRta2xq?=
+ =?utf-8?B?ZHplRjZoVzVzZ1pCdURrRURaQ2hIdldIcUNsNXVHdUZYWVdrd0dMVWxUUDFt?=
+ =?utf-8?B?amZ6K01rK3prQmVBdnNsaHFueGxuSmxoODdMVG9URVVES1NibzFKaHdjNzF0?=
+ =?utf-8?B?dmtreXhMSy9Fbm1xaDRqM20remVrOThlLytrK2R4a3ZBb1VTMzBWb3IrRjFF?=
+ =?utf-8?B?SHRadUp6OVhLQXlsZldiRnVuMk8rVTFDbnlnaUw5bUh6bFdVcTlvYVR6OWpj?=
+ =?utf-8?B?MW9TSzd1UERRdmxsZE4vc1hUb0hEOWRpV3pnc1p4MjNlbytIVFdyanlzY2tS?=
+ =?utf-8?B?NWg4SkxiOEJDZlpwdlFoREcwbDdiUHJFZmN1aFVqUGQwOFRjSWRTcnZlSWRS?=
+ =?utf-8?B?cGhPdzgrUkcxUHBkZlJzMUxHRllBdjMreEJvOHBQQVdpV3NjNXI0NTlqZytY?=
+ =?utf-8?B?cklLOVptRWNlSFc1SW5mdkQwMjY5WDNYYjlrV0VDcFRKNjZrNWpzSFUyZXFz?=
+ =?utf-8?B?RkJGdUVHeDFUbGRaRWlVdDB5TG54aFZQaXFsS3o0cjkralFVS3hhdlo0aDZ5?=
+ =?utf-8?B?bWx4THZqZFZPQ3huNjhOeDc1bmNraGtEM0RWN014NzNJVEp1Wi8raTI2ZjBs?=
+ =?utf-8?B?b3FCS20zNjlQa05QYXJIdWVyQ0UrekZKYXFRdkF4MnpNazlpeDFGT0RpQ24v?=
+ =?utf-8?B?aTJNcFhxai9vOHNPTTBabm9DT3VyV2hhd1BidW40WGMvb2dPcnk0QXRGZWpZ?=
+ =?utf-8?B?aUZhSkRqTDF0aGhhbTNmQWhpSDhCOFdJVmtTNnpYVmZ3SkxWcHRad2g2UGFi?=
+ =?utf-8?B?a0czU01qd0QvNC9LQldkdEVVOE1XdXZoM0tHNm9COFB6RDh0WE5VcEpTbEVC?=
+ =?utf-8?B?dDZyV2tvYUF2b2RjZHB3TjQxK2F2dzdCWFZDQ1laTG00dUQvZGpiVldRcXhW?=
+ =?utf-8?B?VGY2MnZjeFpHZHdpcUNPWUhISGltMFFEZHdnMk0yMXJxaWt1aUJhVGlhTEcx?=
+ =?utf-8?B?Rmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69989f9d-9146-449f-7b25-08dc08819821
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2023 15:19:47.8688
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: J8kAa/ef40+FUWGyxO0PPQUnh2L8Xd9ys0LXs5ILF5UAM2ucj0b6E4EUk2CELcUg5Cms8A74RYIGu9KiQ8w014VZWiwls5yIicUy5ucG2p8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5564
+X-OriginatorOrg: intel.com
 
-
-
-On 28.12.2023 21:07, Sergey Shtylyov wrote:
-> On 12/27/23 1:10 PM, claudiu beznea wrote:
+On 12/29/23 14:19, Yujie Liu wrote:
+> The patch set [1] added a general lib.sh in net selftests, and converted
+> several test scripts to source the lib.sh.
 > 
-> [...]
+> unicast_extensions.sh (converted in [1]) and pmtu.sh (converted in [2])
+> have a /bin/sh shebang which may point to various shells in different
+> distributions, but "source" is only available in some of them. For
+> example, "source" is a built-it function in bash, but it cannot be
+> used in dash.
 > 
->>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>>
->>>> CSR.OPS bits specify the current operating mode and (according to
->>>> documentation) they are updated by HW when the operating mode change
->>>> request is processed. To comply with this check CSR.OPS before proceeding.
->>>>
->>>> Commit introduces ravb_set_opmode() that does all the necessities for
->>>> setting the operating mode (set DMA.CCC and wait for CSR.OPS) and call it
->>>> where needed. This should comply with all the HW manuals requirements as
->>>> different manual variants specify that different modes need to be checked
->>>> in CSR.OPS when setting DMA.CCC.
->>>>
->>>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
->>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>> ---
->>>>  drivers/net/ethernet/renesas/ravb_main.c | 52 ++++++++++++++----------
->>>>  1 file changed, 31 insertions(+), 21 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>>> index 664eda4b5a11..ae99d035a3b6 100644
->>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->>>> @@ -66,14 +66,15 @@ int ravb_wait(struct net_device *ndev, enum ravb_reg reg, u32 mask, u32 value)
->>>>  	return -ETIMEDOUT;
->>>>  }
->>>>  
->>>> -static int ravb_config(struct net_device *ndev)
->>>> +static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
->>>
->>>    Since you pass the complete CCC register value below, you should
->>> rather call the function ravb_set_ccc() and call the parameter opmode
->>> ccc.
->>
->> This will be confusing. E.g., if renaming it ravb_set_ccc() one would
->> expect to set any fields of CCC though this function but this is not true
->> as ravb_modify() in this function masks only CCC_OPC. The call of:
->>
->> error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
->>
->> bellow is just to comply with datasheet requirements, previous code and at
->> the same time re-use this function.
+> Refer to other scripts that were converted together, simply change the
+> shebang to bash to fix the following issues when the default /bin/sh
+> points to other shells.
 > 
->    How about the following then (ugly... but does the job):
-> 
-> 	/* Set operating mode */
-> 	if (opmode & ~CCC_OPC)
-> 		ravb_write(ndev, opmode, CCC);
-> 	else
-> 		ravb_modify(ndev, CCC, CCC_OPC, opmode);
-> 
->    Either that or just don't use ravb_set_opmode() when writing the whole
-> 32-bit value below...
 
-This looks uglier to me...
-
-We have this discussion because of ccc_gac. For ccc_gac platforms we need
-to set OPC, GAC, CSEL at the same time. This is how we can change the
-operating mode to configuration mode in case we also need to configure GAC
-(due to restrictions imposed by hardware).
-
-What I want to say is that setting GAC and CSEL along with CCC is part of
-changing the operating mode to configuration mode for platforms supporting
-GAC because of hardware limitations.
+(snip)
 
 > 
-> [...]
-> 
->>>> @@ -2560,21 +2559,23 @@ static int ravb_set_gti(struct net_device *ndev)
-> [...]
->>>
->>>>  		/* Set CSEL value */
->>>>  		ravb_modify(ndev, CCC, CCC_CSEL, CCC_CSEL_HPB);
->>>>  	} else if (info->ccc_gac) {
->>>> -		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG |
->>>> -			    CCC_GAC | CCC_CSEL_HPB);
->>>> +		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
-> 
->    ... like this?
-> 
-> 		ravb_write(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB, CCC);
-> 		error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
-> 
-> [...]
-> 
-> MBR, Sergey
+> Link: https://lore.kernel.org/all/20231202020110.362433-1-liuhangbin@gmail.com/ [1]
+> Link: https://lore.kernel.org/all/20231219094856.1740079-1-liuhangbin@gmail.com/ [2]
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Signed-off-by: Yujie Liu <yujie.liu@intel.com>
+
+I would recommend use of shellcheck in the future, it will catch this
+particular bug, with following warning:
+SC3046: In POSIX sh, 'source' in place of '.' is undefined.
+
+Being specific, and requiring bash looks fine for me.
+
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
