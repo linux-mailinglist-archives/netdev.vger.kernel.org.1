@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-60606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD3F82023C
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 23:52:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 789818202CA
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 00:17:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70A921C2112E
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 22:52:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 349412837DF
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 23:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0882514A9F;
-	Fri, 29 Dec 2023 22:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A9A14AA9;
+	Fri, 29 Dec 2023 23:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOCJwh5o"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H5MhU2b/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC1314A9E;
-	Fri, 29 Dec 2023 22:52:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19148C433C8;
-	Fri, 29 Dec 2023 22:52:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703890321;
-	bh=jA/D7U42zKQCqXGdQ5da1seauDiv5W9RuorKy8W1/so=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZOCJwh5o6HR+HCr+YuMGg+gS4qa45h71d12lE/zKoOAQN6ani7mwX25H+ngrUhRES
-	 EEja2TCvKHhvrpECJ62Fr7eJhIvord+LB82dP9ECjr6aDl4uRWZuyIVo3GuCpXxc1X
-	 tycmVD6oA3PMMfyRO6LJH4BZ71oybLoq59t432xjie7ZAIZcIZZ5Sc4StPAURDcp2l
-	 E+aty5vedrFBoSHDEes8+YMeX/XTvjouXKTZAjL+s6NKqKx1n/mfjjlba1zApRUItp
-	 xl1RMi/7YBvQOPYUw02tfudL9P1N5tRJH16YBwAOhmqMlTfA/Em943Gl+E3zpCOJzN
-	 KPy1VXnztYhHg==
-Message-ID: <d2f328c6-b5b4-46d0-b087-c70e2460d28a@kernel.org>
-Date: Fri, 29 Dec 2023 15:52:00 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6D514F61
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 23:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5efb0e180f0so12299927b3.1
+        for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 15:17:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1703891871; x=1704496671; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6wI8xKLQeBYqRSaxiLeTVqBBYWT5UTjG/lH+ggSmaBs=;
+        b=H5MhU2b/FHBA0iVFv3fGOeanPGxanlu9Pxn+2DGDbEGwcxQXnuRL9gQOwfp2W1Y8BG
+         g7FuK8NsGaW3kF+QJIoEiHONqRYY69xMFMfRRVpiIg2Np3OoNfNGT29m4jZQ2tcgCOJI
+         s3sgi/EoiX1npMhvFRdlAxHeXzwPnK2+QwJ07/S83qIfWizWvfiN0hxN5vdGuYjP0Fch
+         lmxg7DGu0kepkcTElyyKAB+Ed+JLicJEyAJoAGmcTwQBuRhSIcfd3gBQCx/XcIbM0xEi
+         BeJxO04hm5LadsUtTzLjbgRcGRlxyECFi1T/k/b+SZfKadWGbSXAooM6evsx7+RD+NXR
+         FAPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703891871; x=1704496671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6wI8xKLQeBYqRSaxiLeTVqBBYWT5UTjG/lH+ggSmaBs=;
+        b=CNm7FAPQLa2YpuZeo7wXENHJ3U5aXo8h6muDK5IELSLxwkR5YzEkLUBfqltbUKPve9
+         DA3SjIRJ5ddbnhuyd7P5IupsUhO9luMP77/UdXZpejewdbzz6cWT9pc+jg4BEw7v0ZMQ
+         4yHOEUZ9iFosg3uAVZZhICv/8aa2e5GdfmJmWjqIuReixigPBw7cA3NqoEHktafZczUh
+         MZf/Rw5Kaq0pE5NPdlLOrNMpRb/PMdooz/9gIWfLkJYMRH1BSoUb1jXB58+pv/Gy6Y1n
+         RBxSkkvF0I1brdR5o2sRXxmoIIMsmCDNTYuzCcCzLTM7Fka0gdTDVweTfrYARx2WIHBL
+         btKQ==
+X-Gm-Message-State: AOJu0YwZUi7wFHMEvDKnmSm8xi9R8mKhVIIkomRipkcH1z8poz0HY6r3
+	Bz4EOhP8mOE6bc/9tAS1d86Bd5AqiM+BhUU6BNrorq6vMoE3kw==
+X-Google-Smtp-Source: AGHT+IHT+vAqiejg1jfpcyWd+J5ZfmDZM5SjfAUvf8zQb8yoePYVuWk1v32t5NtdAfTOqfIyvaH73lZf6qvxCuTaLDY=
+X-Received: by 2002:a0d:ed82:0:b0:5e9:461:d191 with SMTP id
+ w124-20020a0ded82000000b005e90461d191mr9743279ywe.53.1703891871183; Fri, 29
+ Dec 2023 15:17:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] net/ipv6/addrconf: Temporary addresses with short
- lifetimes generating when they shouldn't, causing applications to fail
-Content-Language: en-US
-To: Dan Moulding <dan@danm.net>, alexhenrie24@gmail.com
-Cc: bagasdotme@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- pabeni@redhat.com, regressions@lists.linux.dev
-References: <CAMMLpeTCZDakqdkxm+jvQHxbRXhCYd4_PK+VVqMAmZHjSPuPRw@mail.gmail.com>
- <20231229163339.2716-1-dan@danm.net>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231229163339.2716-1-dan@danm.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231222-new-gemini-ethernet-regression-v4-0-a36e71b0f32b@linaro.org>
+In-Reply-To: <20231222-new-gemini-ethernet-regression-v4-0-a36e71b0f32b@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 30 Dec 2023 00:17:39 +0100
+Message-ID: <CACRpkdYQ-vm0cURfHGa=HbKMYc9tyEPBnzwkr9=Zx9MAeyMSKQ@mail.gmail.com>
+Subject: Re: [PATCH net v4 0/3] Fix a regression in the Gemini ethernet controller.
+To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, Household Cang <canghousehold@aol.com>
+Cc: netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/29/23 11:33 AM, Dan Moulding wrote:
-> I think a maintainer will probably need to make a call here and decide
-> how to proceed.
-> 
->> TEMP_PREFERRED_LIFETIME is an administratively set variable: The user
->> can change it to whatever they want whenever they want, and the
->> operating system can adjust it automatically too.
-> 
-> Agreed. And the behavior it seems you really want is to prevent the
-> user from administratively setting it to a value that is lower than
-> REGEN_ADVANCE, so that it won't stop generating new temporary
-> addresses altogether.
-> 
-> But preventing the user from configuring it to a value that is too low
-> is different from generating new temporary addresses with preferred
-> lifetimes that are greater than the currently configured value of
-> TEMP_PREFERRED_LIFETIME. I still believe it would be better, and would
-> be in conformance with the RFC, to simply not allow the user to
-> configure a too-short TEMP_PREFERRED_LIFETIME instead of tinkering
-> with the lifetimes of generated temporary addresses.
-> 
->> It's fine to revert the commit for version 6.7 (after all, I think
->> everyone wants a break for the holidays). Hopefully by version 6.8 we
->> can agree on a way to support users who want to randomize their IPv6
->> address as frequently as the network allows.
-> 
-> FWIW, I think the desired effect you are seeking makes sense and is
-> the right thing to do. I'm just not convinced this is the correct way
-> to do it. But I'm not a maintainer and also not an expert in IPv6, so
-> I'm definitely not the right person to make that call.
-> 
+On Fri, Dec 22, 2023 at 6:36=E2=80=AFPM Linus Walleij <linus.walleij@linaro=
+.org> wrote:
 
-Send a revert before 6.7 is released which will most likely be this
-weekend.
+> These fixes were developed on top of the earlier fixes.
+>
+> Finding the right solution is hard because the Gemini checksumming
+> engine is completely undocumented in the datasheets.
+>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+> Changes in v4:
 
+If no-one is actively against the v4 patch can we merge this?
+It's a regression.
+
+Yours,
+Linus Walleij
 
