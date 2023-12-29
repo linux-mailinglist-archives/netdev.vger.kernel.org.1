@@ -1,294 +1,593 @@
-Return-Path: <netdev+bounces-60577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1E7981FF3F
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 12:51:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A14F481FF46
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 13:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BABCB22556
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 11:51:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8227FB2190F
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 12:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1097811188;
-	Fri, 29 Dec 2023 11:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B361118E;
+	Fri, 29 Dec 2023 12:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d7GJJSWx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8h4uXkt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B489511185;
-	Fri, 29 Dec 2023 11:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703850671; x=1735386671;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=M9A2T8rtE8fPevl1X5IDWOUyfJK24mLNpkXd1HhG04Q=;
-  b=d7GJJSWxlG5GvICQJzZhn9S6ztZn9Jtp4vggnLIbIYwOJT2XqtdSeAV7
-   9BfVPjoQkag/j/U0lqt5rDr1FdQ09lXzDM0dqs1sR6W8ELCI9DEeHpIz9
-   0uQDDsZPveZnNhZ/R5r+CXXFS3f4fCCfhhWWaF1Yd04bCydTzdfGiw8e7
-   HHrrK75yyG9QsYL2tYMSuNZyrO7SkvsXcKwLVygGmqdsDmUuJUf4HXbUD
-   jwmeIIlKEtbkHaaccUJAG+UeKCXlEznu8WIqiQrVF4qwPI9npg+qPa8Wy
-   gTXPdOG8qKxI2ZFSbxX0xOxgkUAK12lUwCVDx0MeWZ9YqQ6Y9JdIwfQB1
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10937"; a="396369344"
-X-IronPort-AV: E=Sophos;i="6.04,314,1695711600"; 
-   d="scan'208";a="396369344"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2023 03:51:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10937"; a="728582783"
-X-IronPort-AV: E=Sophos;i="6.04,314,1695711600"; 
-   d="scan'208";a="728582783"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Dec 2023 03:51:10 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 29 Dec 2023 03:51:09 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 29 Dec 2023 03:51:09 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 29 Dec 2023 03:51:09 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JiskfCrNjYz9hwbUxtPQ48XHk8QOQ9lmCM/0HWDBtX3exb9Gr7WSyC7MzjEMgQ87e33t1y0506eFozSg7/8zg46NEMl5yeAK9eQ1pMr+M0AMSAxGL2uE1RiN9ChZTJTHNk5HeaUiI7Brny68ZvWutvpTBMJr4fzUgdrvN8BGG3NKzlcUQv2UUQBzarjMcUR1tKVFHZ42tyDPTzzTESjjNGEe5PdcrI0kvbmUFB+C+xl2DFebW/ftwk/lmuM+R49DCwnK2CJHs47he+URnVIcCsHHbz7L4yea7Ic0TJhqtJACGoQD6j/f5YjRPFey66RQYusgEjNh3wGcPVYlWjIyzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=spFPFJfru2UlhXsqdxf4z3VfqRAFTOQWrlbiOu7AHnQ=;
- b=AGINBkAY7Ddjc4tTKkf8zjW4qd2c+EO53VVpSKoP8a3NePEesHN8I63/MRuew+rEpePkqkOyvp9PQtqa6APmNWQ6QSCqH0M5BxpWixmz/n5KtLkRZSfR4a/fNU6sembsQJYCzHxksbAknlk22tqGlOkfyiNYPJiCQu/bb/LUVrZuMFdOVXKBm4wtf9soNeA6I3+rOTcOp3zG0lS47ztQlUWIKdB/faCEV6EoLphmTjxvWpORZUN2k35NRLvhyNzDbESqhiJtFhanugBml7heu98nH3zGrsQDLAQQPdUu81VjZxxbFwdRmDlFu9aSDj2Dymn/u5/gJx4acpwz34qMBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH0PR11MB5490.namprd11.prod.outlook.com (2603:10b6:610:d5::6)
- by SA2PR11MB4922.namprd11.prod.outlook.com (2603:10b6:806:111::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.21; Fri, 29 Dec
- 2023 11:51:07 +0000
-Received: from CH0PR11MB5490.namprd11.prod.outlook.com
- ([fe80::9afc:fa9d:5f42:8fd7]) by CH0PR11MB5490.namprd11.prod.outlook.com
- ([fe80::9afc:fa9d:5f42:8fd7%7]) with mapi id 15.20.7135.019; Fri, 29 Dec 2023
- 11:51:07 +0000
-From: "Swee, Leong Ching" <leong.ching.swee@intel.com>
-To: Serge Semin <fancer.lancer@gmail.com>
-CC: Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
-	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh+dt@kernel.org>, Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>
-Subject: RE: [PATCH net-next v1 4/4] net: stmmac: Use interrupt mode INTM=1
- for per channel irq
-Thread-Topic: [PATCH net-next v1 4/4] net: stmmac: Use interrupt mode INTM=1
- for per channel irq
-Thread-Index: AQHaNJo+8U9tJ0DEGUmu+Vd+sNpgu7C12k4AgApRhVA=
-Date: Fri, 29 Dec 2023 11:51:06 +0000
-Message-ID: <CH0PR11MB5490FBE567511E89C8F80BE5CF9DA@CH0PR11MB5490.namprd11.prod.outlook.com>
-References: <20231222054451.2683242-1-leong.ching.swee@intel.com>
- <20231222054451.2683242-5-leong.ching.swee@intel.com>
- <prjrrsznvpnbanseqttqgtu3s6kgillyyhs5hozwxwh4kt7eiv@zmups3rcbvby>
-In-Reply-To: <prjrrsznvpnbanseqttqgtu3s6kgillyyhs5hozwxwh4kt7eiv@zmups3rcbvby>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH0PR11MB5490:EE_|SA2PR11MB4922:EE_
-x-ms-office365-filtering-correlation-id: 2abcce0a-192f-4a88-9252-08dc086470ff
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Ls4klg80vkckhyfLFJc2Ms/FXyAjJ+prs3Urh4FyYhHn2cTPHShr8qitkfDCLL8uskizKinGgyxxvNGv7TMoGPRgNiacSiSpS+DjTrhQtzBqCneoXpApE/jpCh9VJqj6nSC3eF7hti2t9iz/4BA+k0nfjLuN/X33cq+DM3YaFwPqRXNR9sQ8PXwanbIgoViDE2iZYiSocZJpr0xn0alBdobtS8uqthNLszcou6WXcpNTohR9X40/UyfzNME/j9yknoQYFZHv6BBWlUmNJ+jDg3LBKHKRWlL7SBpqn2CWce40kAZ/cd+cqPJaXp31CSASQoIRIXcd3dKdTo7Io4HgDZ8rI5dYFXgmlnDCeWBJbufaYjBCmdGHxt7kmBY26X5R+YVcnbdxW05cf3HS0xGO6ajNXTugQxQSyEz8+wVJ9PA5ArvvaPh2oD2oDva+4+ddGMvBeH8o0iZXmT1HITN8FWeoFuIUgellZRDul/5Vt6rPhbcDxxUhqQU+fBBXgBAlTaa2ThcpVWFcwe3PQuDCrZTh5S2SF2KsCyZTDa49EPDla8HAv3wgdE2byb4IVj2cr5YWCNxxi+MbWgJHSqDw0N7YgNTCHyp2rr9aJpWTdVAR2jgCvNzld3hCSkh0JJ8c
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB5490.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(396003)(366004)(136003)(376002)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(122000001)(478600001)(55016003)(6916009)(86362001)(9686003)(54906003)(71200400001)(53546011)(316002)(6506007)(8936002)(83380400001)(8676002)(38070700009)(66556008)(5660300002)(66946007)(76116006)(7696005)(64756008)(66446008)(66476007)(52536014)(7416002)(4326008)(2906002)(33656002)(82960400001)(41300700001)(38100700002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?WN7iOskPt5Dj35PN0FKtEfSZCQo2wa4OYeBKPXCAPKI0TIOOuJ16HFXexoLy?=
- =?us-ascii?Q?p6dEoLFzJ1VOmejbZzeE56RpJl/Nzt30CpVORtfY7S+UoS1+i8r3dqMTc9wU?=
- =?us-ascii?Q?V9ZtUdTGkzaB+7xOeKEBHafs5l+i+V9hnZ1GCXeEAIDDvKM/I+OM0OMrFXyv?=
- =?us-ascii?Q?Qc0YTCf0TIpaC+WcgQxEkhxsdNFf4Z8+r6nSh37IdozdH/R9tIri8wOWwpSK?=
- =?us-ascii?Q?/EXHAVjUTNOrtUv+o7gbqkjNfOB4k3W6nE4REj9O4uTpysn8r2UozovuCyUf?=
- =?us-ascii?Q?OYcJWbfsK4rk8t8vAv+oncPkvP2TeO7gq8qOUq3oT3SWDv5RjiwzP8RRRCQJ?=
- =?us-ascii?Q?izfQMewtJbu9/VBBloFH3oDxhT/xQHLEIaZzjRMsGnv5Nzp0aIAX1xgGhel5?=
- =?us-ascii?Q?GJ4rTNUnvOVM6KmvnQEsQIZdXTmB6IjH0E5vatCzkZLof+zLZ1wKR3tyhyJc?=
- =?us-ascii?Q?1yyBDGlHnnQ0DfSOEAa+9vuVv5FLde3WpeuLD3cUefmfXxIEuL7F2240zAgc?=
- =?us-ascii?Q?wD5fCcK36s6kk0cttW/tag7OvOmQ2eKiz8oo8dUSkkNvENjdTgreB5wCvpYb?=
- =?us-ascii?Q?5/RaZJsFpo2LLU3Vq0SCKfFLcqaGhLiLMQPINaj5oNuRMjw/VfS+1QYQGglR?=
- =?us-ascii?Q?UZXzcjp1jrqQZ+5yB4Tz10yEx0NWO794NG2dFrg983bS9hL03NRegXpsT7Zk?=
- =?us-ascii?Q?yCW+lUSc7qFVj5lVXU8DHah6NLq5YpUFnURReMHf5r/xG26LAwcFmXjNU8E+?=
- =?us-ascii?Q?2FeJqZ341x8ZqlA3OsgyjgFuiHmzxoQ4j7NIHF3y1cdMcTegZCjotBb4CqKz?=
- =?us-ascii?Q?35r2E0FEJZsql0PQpmjY4TVVyf/IJTu/MkKXvNCHGWx5tciOqn+FxHeoyxd3?=
- =?us-ascii?Q?3dD+Ra/O928W0s7ZpV5hjh/R8f0oSeMuaB2wy6kK2CRIf4WcQRgdovs2wyhn?=
- =?us-ascii?Q?xFrD+eKwNvCRtV7remOyjY737KhaK8Mdb64PfVBDxiMBpXUJBGrT4vOV2fuB?=
- =?us-ascii?Q?CHJIRkPHUaGjoy8+SfhVMHHJ+/FKwNf5yjxikkTJUfdT5amd2n2k/I68pTR9?=
- =?us-ascii?Q?8f4x/P2YS9rcSKkDoKLJxCXn0QC1coedjb59Um/QUo2+hUr2cFwUL/aUVomE?=
- =?us-ascii?Q?95oEQ2NNAbLZVGm2Wc3vBtsgvBmIMssYdfE4jXMJ0++lFv+x01UztJMszqvi?=
- =?us-ascii?Q?U43KZ+r6tLwGE1j/97YaTJxvs+UlPMyubYqf6oI8RdaD2fr4paq76ektN0Tb?=
- =?us-ascii?Q?TeSE8+nMK0VWyvqeuGDWdXCxlVOqZuVzWNCtMRzculGUls7eyJSwx8F+58tZ?=
- =?us-ascii?Q?Zx2k/S26pJKJlxmmqJUnPL0DFwEZDy/U3Q/JtMRzkvgPVDU/wFvs08BsdXu4?=
- =?us-ascii?Q?plFhox5eEGLFzfez0y3GFgceK9JGRKNxoCmu4yQPWlWnvtO26M2RNxN0BEyL?=
- =?us-ascii?Q?wxw7OqNyBZ5DvqzeM9YWqFXyVNQnyIY+ZPt4mWiEzuIihI2YV8Eluie5zSxc?=
- =?us-ascii?Q?OOLHCLTXo2i/9cq5Rkf9NeKOD4JhDQ6P8AbelmhMJS24qVTia3hzdF6zcXz8?=
- =?us-ascii?Q?ffotK079wj5PmZSMhXc=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FD511187
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 12:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a2776ce12bcso110816766b.3
+        for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 04:00:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703851218; x=1704456018; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vUxYdm+ICQTUWj1mgfyxHWMeFMsMTaTLmbNLT+pIsBc=;
+        b=g8h4uXktfg8R//+wdiYkzutMfFb6Qo6K8/BVGH9o4QnPQm8k9LrWZyKZitCBVH9GRC
+         hZH3mo9Rdain3dl6ZDohS+cqirE+/xOq3WbgnJE9uVbuzAU85qsDtwY9/RwSBHy5ESri
+         OKTwxZIoCMz9bAC+u6llcNqupjHYheqdV9JNoGqpNUNqJJyq4gVq1HhwTEIbUrBD9jDE
+         5jMK0k/KuELuRDcoyzPd6YCfwUDPzOyhpiCc2VKzUQSaEECn1YlJtF9eQJd0miMEJYYC
+         d+EGaVk5oxSuBWDYFGIux7pERMKEituiibAkxRmjxApclDOLtdaWLWlpfXsPHl0Jh3GV
+         bI6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703851218; x=1704456018;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vUxYdm+ICQTUWj1mgfyxHWMeFMsMTaTLmbNLT+pIsBc=;
+        b=e6/NG1yjGrOy+37El9I+YcXOZm3Dp70u8hAqnKgJuvRQZbMAXu29Ze5kta/DehBtKn
+         6bw4AvCIgoumIs758CjBAZkXWW0yOYfIifya390Wr6VxxRcjTSCh6NpxLTVbYlpNn+J1
+         2dy0ZPcfA/S3tHQtisFOJdHDrPtoqtyYkp+msIXKnVCdGiug8tCRDeYdtROF88W3CEve
+         V7jdnnu4mOGTwPQNBbfYQqJXmpigCYO3Zyb/CdGl06YiVYWs3INiz0t3x5ZalUClCfSR
+         j6SMNr0hBkQX24LlzrwPc9i6xEEgL38JAH8uxjoQIOFmvPQ55e6bsDH0J2j+63NxUugV
+         hnyQ==
+X-Gm-Message-State: AOJu0YzyaiN3MqNSzHLoWavQkqUuKbqIJNjXcFwpJzQMgfQoxkwviBSt
+	iCdjHy+UC0KkR/oMFHlvl2k=
+X-Google-Smtp-Source: AGHT+IEiC5d0mAEYHXXlecqy6cwAlc/nOlq1YNQLfJm/aDe/OHhThKldCneSDu4txrOn144s5N2Rew==
+X-Received: by 2002:a17:906:386:b0:a27:4bbe:5ddc with SMTP id b6-20020a170906038600b00a274bbe5ddcmr1880003eja.19.1703851217654;
+        Fri, 29 Dec 2023 04:00:17 -0800 (PST)
+Received: from smtpclient.apple ([178.254.237.20])
+        by smtp.gmail.com with ESMTPSA id mf6-20020a1709071a4600b00a26aa8f3372sm7687678ejc.27.2023.12.29.04.00.16
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 29 Dec 2023 04:00:17 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB5490.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2abcce0a-192f-4a88-9252-08dc086470ff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Dec 2023 11:51:06.4884
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kHvfwaXR8dSylyBf19EIeo7HWyiHubywFXJ9rkrKXSqZwfRuS5PBmf3NssgH6b7g49WIcD6kgz7AsV250Kn7ScqbuaeL/wn4sUpMQ3MCMDI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4922
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.200.91.1.1\))
+Subject: Re: Urgent Bug Report Kernel crash 6.5.2
+From: Martin Zaharinov <micron10@gmail.com>
+In-Reply-To: <FBF0EB18-E2B6-4076-968A-5F2ABE0F27E4@gmail.com>
+Date: Fri, 29 Dec 2023 14:00:05 +0200
+Cc: peterz@infradead.org,
+ netdev <netdev@vger.kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ patchwork-bot+netdevbpf@kernel.org,
+ Jakub Kicinski <kuba@kernel.org>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ kuba+netdrv@kernel.org,
+ dsahern@gmail.com,
+ Eric Dumazet <edumazet@google.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7D08EC48-F22C-4CC8-839F-2A9677E93DF0@gmail.com>
+References: <64CCB695-BA43-48F5-912A-AFD5B9C103A7@gmail.com>
+ <CANn89iL9Twf+Rzm9v_dwsH_iG4YkW3fAc2Hnx2jypN_Qf9oojw@mail.gmail.com>
+ <D773F198-BCE3-4D43-9C27-2C2CA34062AC@gmail.com>
+ <8E92BAA8-0FC6-4D29-BB4D-B6B60047A1D2@gmail.com>
+ <5E63894D-913B-416C-B901-F628BB6C00E0@gmail.com> <87lea4qqun.ffs@tglx>
+ <2B5C19AE-C125-45A3-8C6F-CA6BBC01A6D9@gmail.com> <87r0jrp9qi.ffs@tglx>
+ <6D816814-1334-4F22-AFF8-B5E42254038E@gmail.com> <87v88ul14z.ffs@tglx>
+ <FBF0EB18-E2B6-4076-968A-5F2ABE0F27E4@gmail.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+X-Mailer: Apple Mail (2.3774.200.91.1.1)
 
-> -----Original Message-----
-> From: Serge Semin <fancer.lancer@gmail.com>
-> Sent: Saturday, December 23, 2023 5:57 AM
-> To: Swee, Leong Ching <leong.ching.swee@intel.com>
-> Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>; Alexandre Torgue
-> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
-> David S . Miller <davem@davemloft.net>; Eric Dumazet
-> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> <pabeni@redhat.com>; Rob Herring <robh+dt@kernel.org>; Krzysztof
-> Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Conor Dooley
-> <conor+dt@kernel.org>; Giuseppe Cavallaro <peppe.cavallaro@st.com>;
-> linux-stm32@st-md-mailman.stormreply.com; linux-arm-
-> kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
-> netdev@vger.kernel.org; devicetree@vger.kernel.org; Teoh Ji Sheng
-> <ji.sheng.teoh@intel.com>
-> Subject: Re: [PATCH net-next v1 4/4] net: stmmac: Use interrupt mode
-> INTM=3D1 for per channel irq
+Hi Thomas,
+
+One more report from second machine:
+
+[21299.954952] ------------[ cut here ]------------
+[21299.955047] WARNING: CPU: 15 PID: 0 at lib/rcuref.c:294 =
+rcuref_put_slowpath (lib/rcuref.c:294 (discriminator 1))
+[21299.955153] Modules linked in: nft_limit nft_ct nft_nat nft_chain_nat =
+nf_tables netconsole coretemp virtio_net net_failover failover =
+virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio =
+virtio_ring e1000e e1000 vmxnet3 i40e ixgbe mdio bnxt_en nf_nat_sip =
+nf_conntrack_sip nf_nat_pptp nf_conntrack_pptp nf_nat_tftp =
+nf_conntrack_tftp nf_nat_ftp nf_conntrack_ftp nf_nat nf_conntrack =
+nf_defrag_ipv6 nf_defrag_ipv4 rtc_cmos
+[21299.955378] CPU: 15 PID: 0 Comm: swapper/15 Tainted: G           O    =
+   6.6.8 #1
+[21299.955475] Hardware name: HPE ProLiant DL380 Gen10/ProLiant DL380 =
+Gen10, BIOS U30 02/09/2023
+[21299.955575] RIP: 0010:rcuref_put_slowpath (lib/rcuref.c:294 =
+(discriminator 1))
+[21299.955662] Code: 07 83 f8 ff 75 19 ba 00 00 00 e0 f0 0f b1 17 83 f8 =
+ff 74 04 31 c0 5b c3 b8 01 00 00 00 5b c3 3d ff ff ff bf 77 14 85 c0 78 =
+06 <0f> 0b 31 c0 eb e6 c7 07 00 00 00 a0 31 c0 eb dc 80 3d e2 4e e3 00
+All code
+=3D=3D=3D=3D=3D=3D=3D=3D
+   0:	07                   	(bad)
+   1:	83 f8 ff             	cmp    $0xffffffff,%eax
+   4:	75 19                	jne    0x1f
+   6:	ba 00 00 00 e0       	mov    $0xe0000000,%edx
+   b:	f0 0f b1 17          	lock cmpxchg %edx,(%rdi)
+   f:	83 f8 ff             	cmp    $0xffffffff,%eax
+  12:	74 04                	je     0x18
+  14:	31 c0                	xor    %eax,%eax
+  16:	5b                   	pop    %rbx
+  17:	c3                   	ret
+  18:	b8 01 00 00 00       	mov    $0x1,%eax
+  1d:	5b                   	pop    %rbx
+  1e:	c3                   	ret
+  1f:	3d ff ff ff bf       	cmp    $0xbfffffff,%eax
+  24:	77 14                	ja     0x3a
+  26:	85 c0                	test   %eax,%eax
+  28:	78 06                	js     0x30
+  2a:*	0f 0b                	ud2    		<-- trapping instruction
+  2c:	31 c0                	xor    %eax,%eax
+  2e:	eb e6                	jmp    0x16
+  30:	c7 07 00 00 00 a0    	movl   $0xa0000000,(%rdi)
+  36:	31 c0                	xor    %eax,%eax
+  38:	eb dc                	jmp    0x16
+  3a:	80                   	.byte 0x80
+  3b:	3d e2 4e e3 00       	cmp    $0xe34ee2,%eax
+
+Code starting with the faulting instruction
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+   0:	0f 0b                	ud2
+   2:	31 c0                	xor    %eax,%eax
+   4:	eb e6                	jmp    0xffffffffffffffec
+   6:	c7 07 00 00 00 a0    	movl   $0xa0000000,(%rdi)
+   c:	31 c0                	xor    %eax,%eax
+   e:	eb dc                	jmp    0xffffffffffffffec
+  10:	80                   	.byte 0x80
+  11:	3d e2 4e e3 00       	cmp    $0xe34ee2,%eax
+[21299.955793] RSP: 0018:ffff96a7c0578c30 EFLAGS: 00010246
+[21299.955879] RAX: 0000000000000000 RBX: ffff8b75d1e49a80 RCX: =
+ffff8b75c6667c80
+[21299.955974] RDX: ffff8b84bfbe4f08 RSI: 00000000fffffe01 RDI: =
+ffff8b75d1e49a80
+[21299.956070] RBP: ffff8b84bfbe4f08 R08: ffff8b84bfbe4f08 R09: =
+0000000000000001
+[21299.956167] R10: 0000000000028530 R11: 0000000000000001 R12: =
+ffff8b75d1e49a40
+[21299.956261] R13: ffff8b75d1e49aa8 R14: ffff8b84bfbe4f08 R15: =
+00000000c26ab667
+[21299.956358] FS:  0000000000000000(0000) GS:ffff8b84bfbc0000(0000) =
+knlGS:0000000000000000
+[21299.956457] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[21299.956540] CR2: 00007f2e185c73c8 CR3: 0000000950014003 CR4: =
+00000000003706e0
+[21299.956635] DR0: 0000000000000000 DR1: 0000000000000000 DR2: =
+0000000000000000
+[21299.956730] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: =
+0000000000000400
+[21299.956826] Call Trace:
+[21299.956905]  <IRQ>
+[21299.956983] ? __warn (kernel/panic.c:235 kernel/panic.c:673)
+[21299.957065] ? report_bug (lib/bug.c:180 lib/bug.c:219)
+[21299.957147] ? handle_bug (arch/x86/kernel/traps.c:237)
+[21299.957228] ? exc_invalid_op (arch/x86/kernel/traps.c:258 =
+(discriminator 1))
+[21299.957308] ? asm_exc_invalid_op =
+(./arch/x86/include/asm/idtentry.h:568)
+[21299.957393] ? rcuref_put_slowpath (lib/rcuref.c:294 (discriminator =
+1))
+[21299.957476] dst_release (net/core/dst.c:166 (discriminator 1))
+[21299.957559] rt_cache_route (net/ipv4/route.c:1499)
+[21299.957641] rt_set_nexthop.isra.0 (net/ipv4/route.c:1606 =
+(discriminator 1))
+[21299.957722] ip_route_input_slow (./include/net/lwtunnel.h:140 =
+net/ipv4/route.c:1875 net/ipv4/route.c:2154 net/ipv4/route.c:2337)
+[21299.957804] ? free_unref_page (./include/linux/list.h:150 =
+(discriminator 1) ./include/linux/list.h:169 (discriminator 1) =
+mm/page_alloc.c:2377 (discriminator 1) mm/page_alloc.c:2428 =
+(discriminator 1))
+[21299.957889] ip_route_input_noref (net/ipv4/route.c:2499)
+[21299.957972] ip_rcv_finish_core.isra.0 (net/ipv4/ip_input.c:367 =
+(discriminator 1))
+[21299.958058] ip_rcv (net/ipv4/ip_input.c:448 =
+./include/linux/netfilter.h:304 ./include/linux/netfilter.h:298 =
+net/ipv4/ip_input.c:569)
+[21299.958139] ? ip_rcv_core (net/ipv4/ip_input.c:436)
+[21299.958220] process_backlog (net/core/dev.c:5997)
+[21299.958302] __napi_poll (net/core/dev.c:6556)
+[21299.958384] net_rx_action (net/core/dev.c:6625 net/core/dev.c:6756)
+[21299.958466] __do_softirq (./arch/x86/include/asm/preempt.h:27 =
+kernel/softirq.c:564)
+[21299.958549] irq_exit_rcu (kernel/softirq.c:436 kernel/softirq.c:641 =
+kernel/softirq.c:653)
+[21299.958631] sysvec_call_function_single (arch/x86/kernel/smp.c:262 =
+(discriminator 47))
+[21299.958714]  </IRQ>
+[21299.958792]  <TASK>
+[21299.958869] asm_sysvec_call_function_single =
+(./arch/x86/include/asm/idtentry.h:656)
+[21299.958953] RIP: 0010:acpi_safe_halt =
+(./arch/x86/include/asm/irqflags.h:37 =
+./arch/x86/include/asm/irqflags.h:72 drivers/acpi/processor_idle.c:113)
+[21299.959038] Code: ed c3 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 65 48 =
+8b 04 25 40 32 02 00 48 8b 00 a8 08 75 0c eb 07 0f 00 2d 57 0f 2c 00 fb =
+f4 <fa> c3 0f 1f 00 0f b6 47 08 3c 01 74 0b 3c 02 74 05 8b 7f 04 eb 9f
+All code
+=3D=3D=3D=3D=3D=3D=3D=3D
+   0:	ed                   	in     (%dx),%eax
+   1:	c3                   	ret
+   2:	66 66 2e 0f 1f 84 00 	data16 cs nopw 0x0(%rax,%rax,1)
+   9:	00 00 00 00
+   d:	66 90                	xchg   %ax,%ax
+   f:	65 48 8b 04 25 40 32 	mov    %gs:0x23240,%rax
+  16:	02 00
+  18:	48 8b 00             	mov    (%rax),%rax
+  1b:	a8 08                	test   $0x8,%al
+  1d:	75 0c                	jne    0x2b
+  1f:	eb 07                	jmp    0x28
+  21:	0f 00 2d 57 0f 2c 00 	verw   0x2c0f57(%rip)        # 0x2c0f7f
+  28:	fb                   	sti
+  29:	f4                   	hlt
+  2a:*	fa                   	cli    		<-- trapping instruction
+  2b:	c3                   	ret
+  2c:	0f 1f 00             	nopl   (%rax)
+  2f:	0f b6 47 08          	movzbl 0x8(%rdi),%eax
+  33:	3c 01                	cmp    $0x1,%al
+  35:	74 0b                	je     0x42
+  37:	3c 02                	cmp    $0x2,%al
+  39:	74 05                	je     0x40
+  3b:	8b 7f 04             	mov    0x4(%rdi),%edi
+  3e:	eb 9f                	jmp    0xffffffffffffffdf
+
+Code starting with the faulting instruction
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+   0:	fa                   	cli
+   1:	c3                   	ret
+   2:	0f 1f 00             	nopl   (%rax)
+   5:	0f b6 47 08          	movzbl 0x8(%rdi),%eax
+   9:	3c 01                	cmp    $0x1,%al
+   b:	74 0b                	je     0x18
+   d:	3c 02                	cmp    $0x2,%al
+   f:	74 05                	je     0x16
+  11:	8b 7f 04             	mov    0x4(%rdi),%edi
+  14:	eb 9f                	jmp    0xffffffffffffffb5
+[21299.959162] RSP: 0018:ffff96a7c015be80 EFLAGS: 00000246
+[21299.959247] RAX: 0000000000004000 RBX: 0000000000000001 RCX: =
+000000000000001f
+[21299.959343] RDX: ffff8b84bfbc0000 RSI: ffff8b75c76ba000 RDI: =
+ffff8b75c76ba064
+[21299.959437] RBP: ffffffffae216ea0 R08: ffffffffae216ea0 R09: =
+0000000000000003
+[21299.959533] R10: 0000000000000002 R11: 0000000000000008 R12: =
+0000000000000001
+[21299.959630] R13: ffffffffae216f08 R14: ffffffffae216f20 R15: =
+0000000000000000
+[21299.959725] acpi_idle_enter (drivers/acpi/processor_idle.c:709)
+[21299.959807] cpuidle_enter_state (drivers/cpuidle/cpuidle.c:267)
+[21299.959890] cpuidle_enter (drivers/cpuidle/cpuidle.c:390 =
+(discriminator 2))
+[21299.959975] do_idle (kernel/sched/idle.c:134 kernel/sched/idle.c:215 =
+kernel/sched/idle.c:282)
+[21299.960058] cpu_startup_entry (kernel/sched/idle.c:379)
+[21299.960140] start_secondary (arch/x86/kernel/smpboot.c:326)
+[21299.960223] secondary_startup_64_no_verify =
+(arch/x86/kernel/head_64.S:433)
+[21299.960306]  </TASK>
+[21299.960384] ---[ end trace 0000000000000000 ]---
+
+> On 22 Dec 2023, at 19:26, Martin Zaharinov <micron10@gmail.com> wrote:
 >=20
-> On Fri, Dec 22, 2023 at 01:44:51PM +0800, Leong Ching Swee wrote:
-> > From: Swee Leong Ching <leong.ching.swee@intel.com>
-> >
-> > Enable per DMA channel interrupt that uses shared peripheral interrupt
-> > (SPI), so only per channel TX and RX intr (TI/RI) are handled by TX/RX
-> > ISR without calling common interrupt ISR.
-> >
-> > Signed-off-by: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-> > Signed-off-by: Swee Leong Ching <leong.ching.swee@intel.com>
-> > ---
-> >  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 ++
-> >  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 32 +++++++++++-------
-> -
-> >  2 files changed, 22 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > index 207ff1799f2c..04bf731cb7ea 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > @@ -346,6 +346,9 @@
-> >  /* DMA Registers */
-> >  #define XGMAC_DMA_MODE			0x00003000
-> >  #define XGMAC_SWR			BIT(0)
-> > +#define XGMAC_DMA_MODE_INTM_MASK	GENMASK(13, 12)
-> > +#define XGMAC_DMA_MODE_INTM_SHIFT	12
-> > +#define XGMAC_DMA_MODE_INTM_MODE1	0x1
-> >  #define XGMAC_DMA_SYSBUS_MODE		0x00003004
-> >  #define XGMAC_WR_OSR_LMT		GENMASK(29, 24)
-> >  #define XGMAC_WR_OSR_LMT_SHIFT		24
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > index 3cde695fec91..dcb9f094415d 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> > @@ -31,6 +31,13 @@ static void dwxgmac2_dma_init(void __iomem
-> *ioaddr,
-> >  		value |=3D XGMAC_EAME;
-> >
-> >  	writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
-> > +
-> > +	if (dma_cfg->multi_irq_en) {
-> > +		value =3D readl(ioaddr + XGMAC_DMA_MODE);
-> > +		value &=3D ~XGMAC_DMA_MODE_INTM_MASK;
-> > +		value |=3D (XGMAC_DMA_MODE_INTM_MODE1 <<
-> XGMAC_DMA_MODE_INTM_SHIFT);
-> > +		writel(value, ioaddr + XGMAC_DMA_MODE);
-> > +	}
-> >  }
-> >
-> >  static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv, @@
-> > -365,19 +372,18 @@ static int dwxgmac2_dma_interrupt(struct
-> stmmac_priv *priv,
-> >  	}
-> >
+> Hi Thomas,
 >=20
-> >  	/* TX/RX NORMAL interrupts */
-> > -	if (likely(intr_status & XGMAC_NIS)) {
-> > -		if (likely(intr_status & XGMAC_RI)) {
-> > -			u64_stats_update_begin(&rxq_stats->syncp);
-> > -			rxq_stats->rx_normal_irq_n++;
-> > -			u64_stats_update_end(&rxq_stats->syncp);
-> > -			ret |=3D handle_rx;
-> > -		}
-> > -		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
-> > -			u64_stats_update_begin(&txq_stats->syncp);
-> > -			txq_stats->tx_normal_irq_n++;
-> > -			u64_stats_update_end(&txq_stats->syncp);
-> > -			ret |=3D handle_tx;
-> > -		}
-> > +	if (likely(intr_status & XGMAC_RI)) {
-> > +		u64_stats_update_begin(&rxq_stats->syncp);
-> > +		rxq_stats->rx_normal_irq_n++;
-> > +		u64_stats_update_end(&rxq_stats->syncp);
-> > +		ret |=3D handle_rx;
-> > +	}
-> > +
-> > +	if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
-> > +		u64_stats_update_begin(&txq_stats->syncp);
-> > +		txq_stats->tx_normal_irq_n++;
-> > +		u64_stats_update_end(&txq_stats->syncp);
-> > +		ret |=3D handle_tx;
+> this is with applyed patch from you.
+> See logs
 >=20
-> Could you please clarify my comment to the original patch:
 >=20
-> On Fri, Aug 18, 2023 at 20:10:21PM +0300, Serge Semin wrote:
-> > Just curious. Is this change really necessary seeing NIS IRQ is
-> > unmasked and it is unmasked-OR of the RI/TI/TBU flags in the
-> > DMA_CHx_Status register? Moreover based on the HW manual,
-> > DMA_CHx_Status reflects raw IRQ flags status except NIS and AIS which
-> > are the masked OR of the respective flags. So AFAIU NIS will be set in
-> > anyway if you have RI/TI/TBU IRQs enabled.
+> [43040.198064] ------------[ cut here ]------------
+> [43040.198407] WARNING: CPU: 47 PID: 0 at lib/rcuref.c:294 =
+rcuref_put_slowpath+0x2f/0x70
+> [43040.198685] Modules linked in: pppoe pppox ppp_generic slhc =
+nft_limit nft_ct nft_nat nft_chain_nat nf_tables netconsole tg3 igb =
+i2c_algo_bit e1000e bnxt_en mlx5_core mlxfw mlx4_en mlx4_core i40e ixgbe =
+mdio nf_nat_sip nf_conntrack_sip nf_nat_pptp nf_conntrack_pptp =
+nf_nat_tftp nf_conntrack_tftp nf_nat_ftp nf_conntrack_ftp nf_nat =
+nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ipmi_devintf ipmi_msghandler =
+rtc_cmos
+> [43040.199478] CPU: 47 PID: 0 Comm: swapper/47 Tainted: G           O  =
+     6.6.8 #1
+> [43040.199660] Hardware name: VMware, Inc. VMware Virtual =
+Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+> [43040.199886] RIP: 0010:rcuref_put_slowpath+0x2f/0x70
+> [43040.200028] Code: 07 83 f8 ff 75 19 ba 00 00 00 e0 f0 0f b1 17 83 =
+f8 ff 74 04 31 c0 5b c3 b8 01 00 00 00 5b c3 3d ff ff ff bf 77 14 85 c0 =
+78 06 <0f> 0b 31 c0 eb e6 c7 07 00 00 00 a0 31 c0 eb dc 80 3d e2 4e e3 =
+00
+> [43040.200387] RSP: 0018:ffffa39d83e88c30 EFLAGS: 00010246
+> [43040.200528] RAX: 0000000000000000 RBX: ffff9c58e966b840 RCX: =
+ffff9c5bc4e35680
+> [43040.200700] RDX: ffff9c5fafde4f08 RSI: 00000000fffffe01 RDI: =
+ffff9c58e966b840
+> [43040.200871] RBP: ffff9c5fafde4f08 R08: ffff9c5fafde4f08 R09: =
+0000000000000001
+> [43040.201044] R10: 00000000000286e0 R11: 0000000000000001 R12: =
+ffff9c58e966b800
+> [43040.201255] R13: ffff9c58e966b868 R14: ffff9c5fafde4f08 R15: =
+000000008f5de42b
+> [43040.201439] FS:  0000000000000000(0000) GS:ffff9c5fafdc0000(0000) =
+knlGS:0000000000000000
+> [43040.201642] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [43040.201799] CR2: 00007f1401217714 CR3: 0000000464b94003 CR4: =
+00000000001706e0
+> [43040.201994] Call Trace:
+> [43040.202095]  <IRQ>
+> [43040.202187]  ? __warn+0x6c/0x130
+> [43040.202301]  ? report_bug+0x1b8/0x200
+> [43040.202418]  ? handle_bug+0x36/0x70
+> [43040.202534]  ? exc_invalid_op+0x17/0x1a0
+> [43040.202652]  ? asm_exc_invalid_op+0x16/0x20
+> [43040.202781]  ? rcuref_put_slowpath+0x2f/0x70
+> [43040.202909]  dst_release+0x1c/0x40
+> [43040.203026]  rt_cache_route+0xbd/0xf0
+> [43040.203143]  rt_set_nexthop.isra.0+0x1b6/0x450
+> [43040.203272]  ip_route_input_slow+0x5d9/0xcc0
+> [43040.203401]  ? nf_conntrack_udp_packet+0x17c/0x240 [nf_conntrack]
+> [43040.203581]  ip_route_input_noref+0xe0/0xf0
+> [43040.203704]  ip_rcv_finish_core.isra.0+0xbb/0x440
+> [43040.203855]  ip_rcv+0xd5/0x110
+> [43040.203962]  ? ip_rcv_core+0x360/0x360
+> [43040.204079]  process_backlog+0x107/0x210
+> [43040.204201]  __napi_poll+0x20/0x180
+> [43040.204315]  net_rx_action+0x29f/0x380
+> [43040.204432]  __do_softirq+0xd0/0x202
+> [43040.204549]  irq_exit_rcu+0x82/0xa0
+> [43040.204667]  common_interrupt+0x7a/0xa0
+> [43040.204786]  </IRQ>
+> [43040.204876]  <TASK>
+> [43040.204965]  asm_common_interrupt+0x22/0x40
+> [43040.205090] RIP: 0010:acpi_safe_halt+0x1b/0x20
+> [43040.205220] Code: ed c3 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 65 =
+48 8b 04 25 40 32 02 00 48 8b 00 a8 08 75 0c eb 07 0f 00 2d 57 0f 2c 00 =
+fb f4 <fa> c3 0f 1f 00 0f b6 47 08 3c 01 74 0b 3c 02 74 05 8b 7f 04 eb =
+9f
+> [43040.205578] RSP: 0018:ffffa39d8234fe80 EFLAGS: 00000246
+> [43040.205718] RAX: 0000000000004000 RBX: 0000000000000001 RCX: =
+000000000000001f
+> [43040.205890] RDX: ffff9c5fafdc0000 RSI: ffff9c5882e95800 RDI: =
+ffff9c5882e95864
+> [43040.206063] RBP: ffffffffa9216ea0 R08: ffffffffa9216ea0 R09: =
+0000000000000003
+> [43040.206246] R10: 0000000000000002 R11: 0000000000000008 R12: =
+0000000000000001
+> [43040.206419] R13: ffffffffa9216f08 R14: ffffffffa9216f20 R15: =
+0000000000000000
+> [43040.206593]  acpi_idle_enter+0x77/0xc0
+> [43040.206711]  cpuidle_enter_state+0x69/0x6a0
+> [43040.206835]  cpuidle_enter+0x24/0x40
+> [43040.206954]  do_idle+0x1a7/0x210
+> [43040.207066]  cpu_startup_entry+0x21/0x30
+> [43040.207188]  start_secondary+0xe1/0xf0
+> [43040.207310]  secondary_startup_64_no_verify+0x166/0x16b
+> [43040.207451]  </TASK>
+> [43040.207542] ---[ end trace 0000000000000000 ]---
 >=20
-> -Serge(y)
 >=20
-Thanks for your comment.=20
-From my test, NIS bit value is 0 once INTM is set, even with RI/TI flags va=
-lue is 1.=20
-This might be the reason why previous patch set had this change.
--Jim
-> >  	}
-> >
-> >  	/* Clear interrupts */
-> > --
-> > 2.34.1
-> >
-> >
+>=20
+> [43040.198064] ------------[ cut here ]------------
+> [43040.198407] WARNING: CPU: 47 PID: 0 at lib/rcuref.c:294 =
+rcuref_put_slowpath (lib/rcuref.c:294 (discriminator 1))
+> [43040.198685] Modules linked in: pppoe pppox ppp_generic slhc =
+nft_limit nft_ct nft_nat nft_chain_nat nf_tables netconsole tg3 igb =
+i2c_algo_bit e1000e bnxt_en mlx5_core mlxfw mlx4_en mlx4_core i40e ixgbe =
+mdio nf_nat_sip nf_conntrack_sip nf_nat_pptp nf_conntrack_pptp =
+nf_nat_tftp nf_conntrack_tftp nf_nat_ftp nf_conntrack_ftp nf_nat =
+nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ipmi_devintf ipmi_msghandler =
+rtc_cmos
+> [43040.199478] CPU: 47 PID: 0 Comm: swapper/47 Tainted: G           O  =
+     6.6.8 #1
+> [43040.199660] Hardware name: VMware, Inc. VMware Virtual =
+Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+> [43040.199886] RIP: 0010:rcuref_put_slowpath (lib/rcuref.c:294 =
+(discriminator 1))
+> [43040.200028] Code: 07 83 f8 ff 75 19 ba 00 00 00 e0 f0 0f b1 17 83 =
+f8 ff 74 04 31 c0 5b c3 b8 01 00 00 00 5b c3 3d ff ff ff bf 77 14 85 c0 =
+78 06 <0f> 0b 31 c0 eb e6 c7 07 00 00 00 a0 31 c0 eb dc 80 3d e2 4e e3 =
+00
+> All code
+> =3D=3D=3D=3D=3D=3D=3D=3D
+>   0: 07                    (bad)
+>   1: 83 f8 ff              cmp    $0xffffffff,%eax
+>   4: 75 19                 jne    0x1f
+>   6: ba 00 00 00 e0        mov    $0xe0000000,%edx
+>   b: f0 0f b1 17           lock cmpxchg %edx,(%rdi)
+>   f: 83 f8 ff              cmp    $0xffffffff,%eax
+>  12: 74 04                 je     0x18
+>  14: 31 c0                 xor    %eax,%eax
+>  16: 5b                    pop    %rbx
+>  17: c3                    ret
+>  18: b8 01 00 00 00        mov    $0x1,%eax
+>  1d: 5b                    pop    %rbx
+>  1e: c3                    ret
+>  1f: 3d ff ff ff bf        cmp    $0xbfffffff,%eax
+>  24: 77 14                 ja     0x3a
+>  26: 85 c0                 test   %eax,%eax
+>  28: 78 06                 js     0x30
+>  2a:* 0f 0b                 ud2     <-- trapping instruction
+>  2c: 31 c0                 xor    %eax,%eax
+>  2e: eb e6                 jmp    0x16
+>  30: c7 07 00 00 00 a0     movl   $0xa0000000,(%rdi)
+>  36: 31 c0                 xor    %eax,%eax
+>  38: eb dc                 jmp    0x16
+>  3a: 80                    .byte 0x80
+>  3b: 3d e2 4e e3 00        cmp    $0xe34ee2,%eax
+>=20
+> Code starting with the faulting instruction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>   0: 0f 0b                 ud2
+>   2: 31 c0                 xor    %eax,%eax
+>   4: eb e6                 jmp    0xffffffffffffffec
+>   6: c7 07 00 00 00 a0     movl   $0xa0000000,(%rdi)
+>   c: 31 c0                 xor    %eax,%eax
+>   e: eb dc                 jmp    0xffffffffffffffec
+>  10: 80                    .byte 0x80
+>  11: 3d e2 4e e3 00        cmp    $0xe34ee2,%eax
+> [43040.200387] RSP: 0018:ffffa39d83e88c30 EFLAGS: 00010246
+> [43040.200528] RAX: 0000000000000000 RBX: ffff9c58e966b840 RCX: =
+ffff9c5bc4e35680
+> [43040.200700] RDX: ffff9c5fafde4f08 RSI: 00000000fffffe01 RDI: =
+ffff9c58e966b840
+> [43040.200871] RBP: ffff9c5fafde4f08 R08: ffff9c5fafde4f08 R09: =
+0000000000000001
+> [43040.201044] R10: 00000000000286e0 R11: 0000000000000001 R12: =
+ffff9c58e966b800
+> [43040.201255] R13: ffff9c58e966b868 R14: ffff9c5fafde4f08 R15: =
+000000008f5de42b
+> [43040.201439] FS:  0000000000000000(0000) GS:ffff9c5fafdc0000(0000) =
+knlGS:0000000000000000
+> [43040.201642] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [43040.201799] CR2: 00007f1401217714 CR3: 0000000464b94003 CR4: =
+00000000001706e0
+> [43040.201994] Call Trace:
+> [43040.202095]  <IRQ>
+> [43040.202187] ? __warn (kernel/panic.c:235 kernel/panic.c:673)
+> [43040.202301] ? report_bug (lib/bug.c:180 lib/bug.c:219)
+> [43040.202418] ? handle_bug (arch/x86/kernel/traps.c:237)
+> [43040.202534] ? exc_invalid_op (arch/x86/kernel/traps.c:258 =
+(discriminator 1))
+> [43040.202652] ? asm_exc_invalid_op =
+(./arch/x86/include/asm/idtentry.h:568)
+> [43040.202781] ? rcuref_put_slowpath (lib/rcuref.c:294 (discriminator =
+1))
+> [43040.202909] dst_release (net/core/dst.c:166 (discriminator 1))
+> [43040.203026] rt_cache_route (net/ipv4/route.c:1499)
+> [43040.203143] rt_set_nexthop.isra.0 (net/ipv4/route.c:1606 =
+(discriminator 1))
+> [43040.203272] ip_route_input_slow (./include/net/lwtunnel.h:140 =
+net/ipv4/route.c:1875 net/ipv4/route.c:2154 net/ipv4/route.c:2337)
+> [43040.203401] ? nf_conntrack_udp_packet =
+(net/netfilter/nf_conntrack_proto_udp.c:124) nf_conntrack
+> [43040.203581] ip_route_input_noref (net/ipv4/route.c:2499)
+> [43040.203704] ip_rcv_finish_core.isra.0 (net/ipv4/ip_input.c:367 =
+(discriminator 1))
+> [43040.203855] ip_rcv (net/ipv4/ip_input.c:448 =
+./include/linux/netfilter.h:304 ./include/linux/netfilter.h:298 =
+net/ipv4/ip_input.c:569)
+> [43040.203962] ? ip_rcv_core (net/ipv4/ip_input.c:436)
+> [43040.204079] process_backlog (net/core/dev.c:5997)
+> [43040.204201] __napi_poll (net/core/dev.c:6556)
+> [43040.204315] net_rx_action (net/core/dev.c:6625 net/core/dev.c:6756)
+> [43040.204432] __do_softirq (./arch/x86/include/asm/preempt.h:27 =
+kernel/softirq.c:564)
+> [43040.204549] irq_exit_rcu (kernel/softirq.c:436 kernel/softirq.c:641 =
+kernel/softirq.c:653)
+> [43040.204667] common_interrupt (arch/x86/kernel/irq.c:247 =
+(discriminator 47))
+> [43040.204786]  </IRQ>
+> [43040.204876]  <TASK>
+> [43040.204965] asm_common_interrupt =
+(./arch/x86/include/asm/idtentry.h:640)
+> [43040.205090] RIP: 0010:acpi_safe_halt =
+(./arch/x86/include/asm/irqflags.h:37 =
+./arch/x86/include/asm/irqflags.h:72 drivers/acpi/processor_idle.c:113)
+> [43040.205220] Code: ed c3 66 66 2e 0f 1f 84 00 00 00 00 00 66 90 65 =
+48 8b 04 25 40 32 02 00 48 8b 00 a8 08 75 0c eb 07 0f 00 2d 57 0f 2c 00 =
+fb f4 <fa> c3 0f 1f 00 0f b6 47 08 3c 01 74 0b 3c 02 74 05 8b 7f 04 eb =
+9f
+> All code
+> =3D=3D=3D=3D=3D=3D=3D=3D
+>   0: ed                    in     (%dx),%eax
+>   1: c3                    ret
+>   2: 66 66 2e 0f 1f 84 00 data16 cs nopw 0x0(%rax,%rax,1)
+>   9: 00 00 00 00
+>   d: 66 90                 xchg   %ax,%ax
+>   f: 65 48 8b 04 25 40 32 mov    %gs:0x23240,%rax
+>  16: 02 00
+>  18: 48 8b 00              mov    (%rax),%rax
+>  1b: a8 08                 test   $0x8,%al
+>  1d: 75 0c                 jne    0x2b
+>  1f: eb 07                 jmp    0x28
+>  21: 0f 00 2d 57 0f 2c 00 verw   0x2c0f57(%rip)        # 0x2c0f7f
+>  28: fb                    sti
+>  29: f4                    hlt
+>  2a:* fa                    cli     <-- trapping instruction
+>  2b: c3                    ret
+>  2c: 0f 1f 00              nopl   (%rax)
+>  2f: 0f b6 47 08           movzbl 0x8(%rdi),%eax
+>  33: 3c 01                 cmp    $0x1,%al
+>  35: 74 0b                 je     0x42
+>  37: 3c 02                 cmp    $0x2,%al
+>  39: 74 05                 je     0x40
+>  3b: 8b 7f 04              mov    0x4(%rdi),%edi
+>  3e: eb 9f                 jmp    0xffffffffffffffdf
+>=20
+> Code starting with the faulting instruction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>   0: fa                    cli
+>   1: c3                    ret
+>   2: 0f 1f 00              nopl   (%rax)
+>   5: 0f b6 47 08           movzbl 0x8(%rdi),%eax
+>   9: 3c 01                 cmp    $0x1,%al
+>   b: 74 0b                 je     0x18
+>   d: 3c 02                 cmp    $0x2,%al
+>   f: 74 05                 je     0x16
+>  11: 8b 7f 04              mov    0x4(%rdi),%edi
+>  14: eb 9f                 jmp    0xffffffffffffffb5
+> [43040.205578] RSP: 0018:ffffa39d8234fe80 EFLAGS: 00000246
+> [43040.205718] RAX: 0000000000004000 RBX: 0000000000000001 RCX: =
+000000000000001f
+> [43040.205890] RDX: ffff9c5fafdc0000 RSI: ffff9c5882e95800 RDI: =
+ffff9c5882e95864
+> [43040.206063] RBP: ffffffffa9216ea0 R08: ffffffffa9216ea0 R09: =
+0000000000000003
+> [43040.206246] R10: 0000000000000002 R11: 0000000000000008 R12: =
+0000000000000001
+> [43040.206419] R13: ffffffffa9216f08 R14: ffffffffa9216f20 R15: =
+0000000000000000
+> [43040.206593] acpi_idle_enter (drivers/acpi/processor_idle.c:709)
+> [43040.206711] cpuidle_enter_state (drivers/cpuidle/cpuidle.c:267)
+> [43040.206835] cpuidle_enter (drivers/cpuidle/cpuidle.c:390 =
+(discriminator 2))
+> [43040.206954] do_idle (kernel/sched/idle.c:134 =
+kernel/sched/idle.c:215 kernel/sched/idle.c:282)
+> [43040.207066] cpu_startup_entry (kernel/sched/idle.c:379)
+> [43040.207188] start_secondary (arch/x86/kernel/smpboot.c:326)
+> [43040.207310] secondary_startup_64_no_verify =
+(arch/x86/kernel/head_64.S:433)
+> [43040.207451]  </TASK>
+> [43040.207542] ---[ end trace 0000000000000000 ]---
+>=20
+>> On 19 Dec 2023, at 16:26, Thomas Gleixner <tglx@linutronix.de> wrote:
+>>=20
+>> On Tue, Dec 19 2023 at 11:25, Martin Zaharinov wrote:
+>>>> On 12 Dec 2023, at 20:16, Thomas Gleixner <tglx@linutronix.de> =
+wrote:
+>>>> Btw, how easy is this to reproduce?
+>>>=20
+>>> Its not easy this report is generate on machine with 5-6k users , =
+with
+>>> traffic and one time is show on 1 day , other show after 4-5 days=E2=80=
+=A6
+>>=20
+>> I love those bugs ...
+>>=20
+>>> Apply this patch and will upload image on one machine as fast as
+>>> possible and when get any reports will send you.
+>>=20
+>> Let's see how that goes!
+>>=20
+>> Thanks,
+>>=20
+>>       tglx
+>=20
+
 
