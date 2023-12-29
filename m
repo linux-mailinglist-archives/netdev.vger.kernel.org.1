@@ -1,133 +1,103 @@
-Return-Path: <netdev+bounces-60590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD364820083
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 17:22:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A65D820086
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 17:33:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FCF1B215B0
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 16:22:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 138082847A7
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 16:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A474125CD;
-	Fri, 29 Dec 2023 16:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF42125BD;
+	Fri, 29 Dec 2023 16:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mzl0h77R"
+	dkim=pass (2048-bit key) header.d=danm.net header.i=@danm.net header.b="UeGlzbGQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+Received: from mr85p00im-ztdg06021201.me.com (mr85p00im-ztdg06021201.me.com [17.58.23.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6109125CB;
-	Fri, 29 Dec 2023 16:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from relay1-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::221])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id EF778C194F;
-	Fri, 29 Dec 2023 16:11:36 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BF78A240002;
-	Fri, 29 Dec 2023 16:11:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1703866288;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zqi8dmMeOU3XDtyNyrJLxgovOsvnL1n+HnUCWjiryzI=;
-	b=mzl0h77RyMj6S5QimPrixX8KNRjlHePNB2ZkUiW1I9hnJLejc/VQzGFm8nS326dqZfS/xl
-	bKxX9mx4sqb41UzWjA7WEILOygNJBiY3aF+fLvRNRIRx6piDkxSq6D6QjpfZWfHUaUXoBn
-	EGqUEC7N6KQLY+EEXZVaq4glUhZGUMhpeh2/L3dqd4kzSptktj4f0Xq+V/7sLwXJyw9yrw
-	8LbIR34NmLppvtiNnUyC1RlZoVp65QhK2CNsUmkWp6d8A1MGIWlQyrzRCrJ3lpFeChxtTS
-	uB/RNEHBgtTq2yrcgaWItC+6TVZK+2vqh7awbOTGv4iN1prJ8kR1js1/I9Mx5g==
-Date: Fri, 29 Dec 2023 17:11:48 +0100 (CET)
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-cc: Romain Gantois <romain.gantois@bootlin.com>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    Miquel Raynal <miquel.raynal@bootlin.com>, 
-    Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-    Sylvain Girard <sylvain.girard@se.com>, 
-    Pascal EBERHARD <pascal.eberhard@se.com>, 
-    Richard Tresidder <rtresidd@electromag.com.au>, netdev@vger.kernel.org, 
-    linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/1] net: stmmac: Prevent DSA tags from breaking
- COE
-In-Reply-To: <20231219122034.pg2djgrosa4irubh@skbuf>
-Message-ID: <3b53aa8a-73e9-9260-f05b-05dac80a4276@bootlin.com>
-References: <20231218162326.173127-1-romain.gantois@bootlin.com> <20231218162326.173127-2-romain.gantois@bootlin.com> <20231219122034.pg2djgrosa4irubh@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B566512B68
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 16:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=danm.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=danm.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=danm.net; s=sig1;
+	t=1703867622; bh=mdHoqF4DBozjc5AZdCsy35qAGohL7+5V9GIyKGF0W98=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=UeGlzbGQ9DI+Z0AI49toYh8BED1yiu6kUd6XzJPfiynDICAgvJY1c65EJ9GhETVxx
+	 VXftzlAS/g3gz038LMlo/7PQhIiURZ0P07kLKCSIX/iWuxtJqNNuLoDFKd5KUr3R3c
+	 wrPQy7V/8K+3G1OcoRWmPoDNLHcOn9rr3XKWcLdYH1JNJiL71d3o2K21h5AIc2ZgWk
+	 DYr7oLAs4m9Jkqzch6NkEEibCD7tag2xrdBTw4zRHTovorWYYlHoDCevD1UOdvFUD9
+	 6Q7sadSRKZm6qJLswMQ2pXmci78/w/D/3Cs9yvYftj8qX9s7Pc2VnfWJpc6OugRlak
+	 afms62LOfOYSg==
+Received: from hitch.danm.net (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+	by mr85p00im-ztdg06021201.me.com (Postfix) with ESMTPSA id 146253201A3;
+	Fri, 29 Dec 2023 16:33:40 +0000 (UTC)
+From: Dan Moulding <dan@danm.net>
+To: alexhenrie24@gmail.com
+Cc: bagasdotme@gmail.com,
+	dan@danm.net,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	regressions@lists.linux.dev
+Subject: Re: [REGRESSION] net/ipv6/addrconf: Temporary addresses with short lifetimes generating when they shouldn't, causing applications to fail
+Date: Fri, 29 Dec 2023 09:33:39 -0700
+Message-ID: <20231229163339.2716-1-dan@danm.net>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <CAMMLpeTCZDakqdkxm+jvQHxbRXhCYd4_PK+VVqMAmZHjSPuPRw@mail.gmail.com>
+References: <CAMMLpeTCZDakqdkxm+jvQHxbRXhCYd4_PK+VVqMAmZHjSPuPRw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: oFRRsbiheUkH9f2_QvM7LSR0PZXkau7h
+X-Proofpoint-ORIG-GUID: oFRRsbiheUkH9f2_QvM7LSR0PZXkau7h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-29_06,2023-12-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1030 mlxlogscore=696
+ spamscore=0 phishscore=0 adultscore=0 mlxscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2308100000 definitions=main-2312290132
 
+I think a maintainer will probably need to make a call here and decide
+how to proceed.
 
-On Tue, 19 Dec 2023, Vladimir Oltean wrote:
-> DSA_TAG_PROTO_LAN9303, DSA_TAG_PROTO_SJA1105 and DSA_TAG_PROTO_SJA1110
-> construct tags with ETH_P_8021Q as EtherType. Do you still think it
-> would be correct to say that all DSA tags break COE on the stmmac, as
-> this patch assumes?
-> 
-> The NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM convention is not about
-> statically checking whether the interface using DSA, but about looking
-> at each packet before deciding whether to use the offload engine or to
-> call skb_checksum_help().
-> 
-> You can experiment with any tagging protocol on the stmmac driver, and
-> thus with the controller's response to any kind of traffic, even if the
-> port is not attached to a hardware switch. You need to enable the
-Thanks for telling me about DSA_LOOP, I've tested several DSA tagging protocols 
-with the RZN1 GMAC1 hardware using this method. Here's what I found in a 
-nutshell:
+> TEMP_PREFERRED_LIFETIME is an administratively set variable: The user
+> can change it to whatever they want whenever they want, and the
+> operating system can adjust it automatically too.
 
-For tagging protocols that change the EtherType field in the MAC header (e.g. 
-DSA_TAG_PROTO_(DSA/EDSA/BRCM/MTK/RTL4C_A/SJA1105): On TX the tagged frames are 
-almost always ignored by the checksum offload engine and IP header checker of 
-the MAC device. I say "almost always" because there is an 
-unlikely but nasty corner case where a DSA tag can be identical to an IP 
-EtherType value. In these cases, the frame will likely fail IP header checks 
-and be dropped by the MAC.
+Agreed. And the behavior it seems you really want is to prevent the
+user from administratively setting it to a value that is lower than
+REGEN_ADVANCE, so that it won't stop generating new temporary
+addresses altogether.
 
-Ignoring these corner cases, the DSA frames will egress with a partial 
-checksum and be dropped by the recipient. On RX, these frames will, once again, 
-not be detected as IP frames by the MAC. So they will be transmitted to the CPU. 
-However, the stmmac driver will assume (wrongly in this case) that
-these frames' checksums have been verified by the MAC. So it will set 
-CHECKSUM_UNECESSARY:
+But preventing the user from configuring it to a value that is too low
+is different from generating new temporary addresses with preferred
+lifetimes that are greater than the currently configured value of
+TEMP_PREFERRED_LIFETIME. I still believe it would be better, and would
+be in conformance with the RFC, to simply not allow the user to
+configure a too-short TEMP_PREFERRED_LIFETIME instead of tinkering
+with the lifetimes of generated temporary addresses.
 
-https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L5493
- 
-And so the IP/TCP checksums will not be checked at all, 
-which is not ideal.
+> It's fine to revert the commit for version 6.7 (after all, I think
+> everyone wants a break for the holidays). Hopefully by version 6.8 we
+> can agree on a way to support users who want to randomize their IPv6
+> address as frequently as the network allows.
 
-There are other DSA tagging protocols which cause different issues. For example 
-DSA_TAG_PROTO_BRCM_PREPEND, which seems to offset the whole MAC header, and 
-DSA_TAG_PROTO_LAN9303 which sets ETH_P_8021Q as its EtherType. I haven't dug too 
-deeply on these issues yet, since I'd rather deal with the checksumming issue 
-before getting distracted by VLAN offloading and other stuff.
+FWIW, I think the desired effect you are seeking makes sense and is
+the right thing to do. I'm just not convinced this is the correct way
+to do it. But I'm not a maintainer and also not an expert in IPv6, so
+I'm definitely not the right person to make that call.
 
-Among the tagging protocols I tested, the only one that didn't cause any issues 
-was DSA_TAG_PROTO_TRAILER, which only appends stuff to the frame.
-
-TLDR: The simplest solution seems to be to modify the stmmac TX and RX paths to 
-disable checksum offloading for frames that have a non-IP ethertype in 
-their MAC header. This will fix the checksum situation for DSA tagging protocols 
-that set non-IP and non-8021Q EtherTypes. Some edge cases like 
-DSA_TAG_PROTO_BRCM_PREPEND and DSA_TAG_PROTO_LAN9303 will require a completely 
-different solution if we want these MAC devices to handle them properly.
-Please share any thoughts you might have on this suggestion.
-
-Best Regards,
-
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+-- Dan
 
