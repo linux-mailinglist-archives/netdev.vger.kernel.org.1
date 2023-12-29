@@ -1,70 +1,86 @@
-Return-Path: <netdev+bounces-60573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6023581FE4A
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 09:52:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 033B581FE3D
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 09:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 927CA1C22347
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 08:52:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B7631F21C77
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 08:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233DA749C;
-	Fri, 29 Dec 2023 08:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928527493;
+	Fri, 29 Dec 2023 08:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=risemoderngrowth.com header.i=@risemoderngrowth.com header.b="TLrQBdsV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jI2SBy2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.risemoderngrowth.com (mail.risemoderngrowth.com [89.40.118.110])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E1A7493
-	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 08:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=risemoderngrowth.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=risemoderngrowth.com
-Received: by mail.risemoderngrowth.com (Postfix, from userid 1001)
-	id 6D93082F8C; Fri, 29 Dec 2023 08:46:02 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=risemoderngrowth.com;
-	s=mail; t=1703839564;
-	bh=8/6+HKIxXFBEkdIxOYlDLDaXTCR61Qob+YtP7RsW8h4=;
-	h=Date:From:To:Subject:From;
-	b=TLrQBdsVw93E0+foEgKLBIPOnsMimgRKvATFvDjMmKYdbb+9RjQ4wK02EIhV5PeQT
-	 oxg2mkGd9ogGROIitqrq9fJjzH5Zkqi2mZdrS/zoeI8kSwKVLDqY0k2UsCgGMolqWk
-	 kL6POx2DcP0xe6Vz9U45XGendRJqJIlWbakRHlzoGU5OqFUFaoijtg4g7h+l3DnxA3
-	 cuV8P5IsyhCn0/e9twRkOmvNtfXIsuqIY6BMDX75KJGgiIRRzq9arp0Q56lHv7h/YK
-	 ivzccxjgnrqMgtAB9tw/G8/EWGeRh6cygwz7venFTqkFbRoB0sGhEpp9s7AecaaEue
-	 o3Kg9/S/pu9AA==
-Received: by mail.risemoderngrowth.com for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 08:45:59 GMT
-Message-ID: <20231229074500-0.1.7q.bxzz.0.pwjozdpdcc@risemoderngrowth.com>
-Date: Fri, 29 Dec 2023 08:45:59 GMT
-From: "Ramm Fenning" <ramm.fenning@risemoderngrowth.com>
-To: <netdev@vger.kernel.org>
-Subject: Delivery of mill parts
-X-Mailer: mail.risemoderngrowth.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70EFC748C;
+	Fri, 29 Dec 2023 08:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E1684C433C9;
+	Fri, 29 Dec 2023 08:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703839825;
+	bh=4ghh2Jjv3p7AV8U1XJ4fZ+jMCfHmDeSFHQIa+Z+i9uc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jI2SBy2mJqUhN5SOdC2lWVF2QnsNmbfYpsWv6U4A+HoaLD980MuM/H4+JY0AMa/Nu
+	 tZ2R82PjXl2cA0s3PJTs+JkIJFfLDNHgpN1yznDFBSXOi/SGMMXm86ksuUZbv83mN9
+	 VQw7Ffwcv+aB8pCNIfSNpCd20ZSHEkqtgJmqncyEBcKi7oIpl3JvgPNs4/MLfD78Bf
+	 1BlbXKYRyy3cd+wYPyfXHwk/Nyia279cqguy6TgC8K3COMIE3nlU5xBPty3zSAsoUK
+	 MZ9xMHSuLjDKlRa0jjBspPLrvDSll6IPCRs8rpGiRQJu6robHNCewTPHgPo5zfiCD9
+	 qgrO6BASo2yXw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC2ABE333D8;
+	Fri, 29 Dec 2023 08:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] genetlink: Use internal flags for multicast
+ groups
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170383982483.30428.11615295808750503074.git-patchwork-notify@kernel.org>
+Date: Fri, 29 Dec 2023 08:50:24 +0000
+References: <20231220154358.2063280-1-idosch@nvidia.com>
+In-Reply-To: <20231220154358.2063280-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ nhorman@tuxdriver.com, matttbe@kernel.org, martineau@kernel.org,
+ yotam.gi@gmail.com, jiri@resnulli.us, jacob.e.keller@intel.com,
+ johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com, fw@strlen.de
 
-Hello,
+Hello:
 
-We offer professional solutions for industrial grinding systems.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-We produce a wide range of high-quality parts for separator mills and rol=
-ler/pin mills, including separators, grinding discs, drives, grinding rin=
-gs, and pins.
+On Wed, 20 Dec 2023 17:43:58 +0200 you wrote:
+> As explained in commit e03781879a0d ("drop_monitor: Require
+> 'CAP_SYS_ADMIN' when joining "events" group"), the "flags" field in the
+> multicast group structure reuses uAPI flags despite the field not being
+> exposed to user space. This makes it impossible to extend its use
+> without adding new uAPI flags, which is inappropriate for internal
+> kernel checks.
+> 
+> [...]
 
-Our solutions are used in similar equipment employed in processes such as=
- grinding powder coatings, cocoa grinding, pharmaceutical grinding, and r=
-elated processes.
+Here is the summary with links:
+  - [net-next,v2] genetlink: Use internal flags for multicast groups
+    https://git.kernel.org/netdev/net-next/c/cd4d7263d58a
 
-Would you like to review our offer?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Best regards,
-Ramm Fenning
 
