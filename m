@@ -1,338 +1,154 @@
-Return-Path: <netdev+bounces-60596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDDC082015C
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 21:18:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DB9820180
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 22:03:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C6BE2823F4
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 20:18:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37D0A1F22F77
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 21:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59ADB13AFB;
-	Fri, 29 Dec 2023 20:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1686514291;
+	Fri, 29 Dec 2023 21:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="ej9A6HT4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bkm0a5h9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C5A13FE1
-	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 20:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amarulasolutions.com
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3b9f727d94cso2756268b6e.1
-        for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 12:18:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google; t=1703881130; x=1704485930; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LAm1Gv24m5eKtpM2VegsdBcgdCr09tg+CtjUEmyp3ww=;
-        b=ej9A6HT4WCDD7vus6ghbxyCT5RDWwJpbHlWW/6Xu3OoEEn1aECCe8SxnD9PnZ4C17d
-         iMzf4ET8heKXwuszEQOR60Tls9T59w9+07yhW1Zrz43OfnUdfspqg20XxK1dYgREyOBv
-         RBum4rraOlZWkPEn4KHopvPpl/bQIgLgcRrME=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703881130; x=1704485930;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LAm1Gv24m5eKtpM2VegsdBcgdCr09tg+CtjUEmyp3ww=;
-        b=j9fW2w2m/ULk6MVOirjiUv7gCxy32bdonWgoEG+KLL1ACWuEmNdmnALRA6ZUPjRptu
-         Zs2CfG//3KU3H9MopodwysGTFiNi3K3q/BvoDcOc99Z9uqv8eKX/7NDiGKNkX6Tm56vC
-         fdOXTJq+nbb7GJT/lniQSucqNlGO6oSmbWW9gpdbNYyHyz1i68KWp4yT1HR/S6JDSmDh
-         sKefr+t94bzPGYwGCDDWtGDnZnvCAF8uF5SPLHRMTEqFBL261lSuY89WKPwd0QM9Kqy4
-         OmJrt9p2XgVD9VtQHti6kMcKQc1EvQmYjaXY4OMag7LFvcvJRzJ6p8CYGtPE2sYLJGm8
-         HMTA==
-X-Gm-Message-State: AOJu0YywxPQlNYJJ5368WRPbejyT7mJ1gCfTsTsHiy1JXYBSOSaUY5G8
-	YPkLkN7+UjYM4wyOtPuo8x/j/wsnxTO93BiTHidtD3bHJuaJDQ==
-X-Google-Smtp-Source: AGHT+IE7yV4SqDHk31PXqJmrlb8c3/AFFiG74agsF08XEHRYgF02/GXCsCVBJdY9jTtqV+xjFpgrHQT8Q+HV4D3V5XU=
-X-Received: by 2002:a05:6808:1403:b0:3b6:a1f4:8066 with SMTP id
- w3-20020a056808140300b003b6a1f48066mr8540948oiv.37.1703881130651; Fri, 29 Dec
- 2023 12:18:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1571A1428A;
+	Fri, 29 Dec 2023 21:03:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703883831; x=1735419831;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+izWk5xu+lIGF06WtqPEf5Zuf5OC+evaUFTMbMp8EHQ=;
+  b=Bkm0a5h9IktP0vXDJ9hWky7llzF1o5W6LtTL+oLzFXjeXFusIShhSF0R
+   pSNMkJyx7fCaWkUtxSae+tUHeANoo+0uC0wjUau/lQuYg7oaPoC1cmZe4
+   3k7abOsJEfRZjCnvjWSqYK20nVPG2RKkpe7udSf9vjtjdo26zzqGaMnvJ
+   AFEGb+5JrASAcbDxEb7hY1jWV4rgcJO48jEE69lf17pHlqWShNj5vA25Y
+   S7KXGse/mtaoq2bnYqhe88KZ+UYTaAIXGIA0ju+aTk26HzeAw7yqJbB1v
+   qAftBUJ8CBDbeR8RU1mpam4dHWHi8BjdAbe5s3668ddAs8ZfOIZqfzIcv
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10938"; a="376154929"
+X-IronPort-AV: E=Sophos;i="6.04,316,1695711600"; 
+   d="scan'208";a="376154929"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2023 13:03:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10938"; a="1110251621"
+X-IronPort-AV: E=Sophos;i="6.04,316,1695711600"; 
+   d="scan'208";a="1110251621"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by fmsmga005.fm.intel.com with ESMTP; 29 Dec 2023 13:03:45 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rJK19-000Hof-2X;
+	Fri, 29 Dec 2023 21:03:43 +0000
+Date: Sat, 30 Dec 2023 05:03:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v3 23/27] virtio_net: xsk: rx: support recv
+ merge mode
+Message-ID: <202312300404.1R72Ssbh-lkp@intel.com>
+References: <20231229073108.57778-24-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMty3ZCn+yGr2MG3WYg+i4DsZWk5b-xEw0SDvNbeGzs6pMwjfQ@mail.gmail.com>
- <20231222145100.sfcuux7ayxtxgogo@skbuf> <CAMty3ZBZNugYmKMjDdZnY0kFMeEb86uzSg2XL9Tn6Yb4t-TXKQ@mail.gmail.com>
- <20231226153055.4yihsmu6kiak6hkf@skbuf> <CAMty3ZDnAFR9a1BM89mx3bmrQzGC7nvazt42_v4JF_QpwPkS4w@mail.gmail.com>
- <20231229152519.2jxrwaeltp4pxlms@skbuf>
-In-Reply-To: <20231229152519.2jxrwaeltp4pxlms@skbuf>
-From: Jagan Teki <jagan@amarulasolutions.com>
-Date: Sat, 30 Dec 2023 01:48:38 +0530
-Message-ID: <CAMty3ZAOM5+EMw9sLVOq-=CH_sP=1TLAGEMF9LYOZ4aFbNUtsg@mail.gmail.com>
-Subject: Re: PHY issue with SJA1105Q/DP84849I Design
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "Andrew F. Davis" <afd@ti.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev@vger.kernel.org, 
-	Michael Nazzareno Trimarchi <michael@amarulasolutions.com>, Ioana Ciornei <ioana.ciornei@nxp.com>, 
-	Shawn Guo <shawnguo@kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Fabio Estevam <festevam@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231229073108.57778-24-xuanzhuo@linux.alibaba.com>
 
-On Fri, Dec 29, 2023 at 8:55=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> On Fri, Dec 29, 2023 at 05:12:39PM +0530, Jagan Teki wrote:
-> > With fec0 fixed-link and 3 different switch port configurations, the
-> > result of the link seems to be up but the ping not working and even
-> > the packets are not transmitted via eth0.
-> >
-> > DT Combinations:
-> >
-> > - Port0 is ethphy0, Port1 is ethphy1, Port2 is disabled, Port3 is
-> > disabled, Port4 is FEC
-> > - Port0 is disabled, Port1 is ethphy0, Port2 is ethphy1, Port3 is
-> > disabled, Port4 is FEC
-> > - Port0 is disabled, Port1 is disabled, Port2 is ethphy0, Port3 is
-> > ethphy1, Port4 as FEC
->
-> Why all these combinations? You don't know which switch port is which?
+Hi Xuan,
 
-This is where I get confused in the first place. I didn't find proper
-information on binding about how the physical pin-out is to be
-configured in DT ports or maybe I didn't understand properly.
+kernel test robot noticed the following build warnings:
 
-As per schematics.
-Pin MII0_RXD0-D3/TXD0-D3 is connected to PROC_MII0_RXD0-D3/TXD0-D3
-this would be fec0.
-Pin MII1_RXD0-D3/TXD0-D3 is connected to PHY_MII1_RXD0-D3/TXD0-D3 this
-would be ethphy0.
-Pin MII2_RXD0-D3/TXD0-D3 is connected to PHY_MII2_RXD0-D3/TXD0-D3 this
-would be ethphy1.
-Pin MII3_RXD0-D3/TXD0-D3 is grounded
-Pin MII4_RXD0-D3/TXD0-D3 is grounded
+[auto build test WARNING on mst-vhost/linux-next]
+[cannot apply to net-next/main linus/master horms-ipvs/master v6.7-rc7 next-20231222]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-So, I did use the above 3 combinations and assumed fec0 is always a
-port4 based on existing DTS in the tree. Please let me know which
-configuration is proper as per schematic connections.
+url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_net-rename-free_old_xmit_skbs-to-free_old_xmit/20231229-155253
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20231229073108.57778-24-xuanzhuo%40linux.alibaba.com
+patch subject: [PATCH net-next v3 23/27] virtio_net: xsk: rx: support recv merge mode
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20231230/202312300404.1R72Ssbh-lkp@intel.com/config)
+compiler: ClangBuiltLinux clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231230/202312300404.1R72Ssbh-lkp@intel.com/reproduce)
 
->
-> > DT: (with Port0 is ethphy0, Port1 is ethphy1, Port2 is disabled, Port3
-> > is disabled, Port4 is FEC)
-> >
-> > &ecspi2 {
-> >     cs-gpios =3D <&gpio2 27 GPIO_ACTIVE_HIGH>;
-> >     pinctrl-names =3D "default";
-> >     pinctrl-0 =3D <&pinctrl_ecspi2>;
-> >     status =3D "okay";
-> >
-> >     switch@0 {
-> >         compatible =3D "nxp,sja1105q";
-> >         reg =3D <0>;
-> >         spi-max-frequency =3D <4000000>;
-> >         spi-rx-delay-us =3D <1>;
-> >         spi-tx-delay-us =3D <1>;
-> >         spi-cpha;
-> >
-> >        clocks =3D <&clk25m>;
-> >
-> >        pinctrl-0 =3D <&pinctrl_sja1105_rst>;
-> >        pinctrl-names =3D "default";
-> >        reset-gpios =3D <&gpio6 5 GPIO_ACTIVE_LOW>;
-> >
-> >        ports {
-> >               #address-cells =3D <1>;
-> >               #size-cells =3D <0>;
-> >
-> >              port@0 {
-> >                   reg =3D <0>;
-> >                   label =3D "ethphy0";
-> >                   phy-handle =3D <&ethphy0>;
-> >                   phy-mode =3D "mii";
-> >             };
-> >
-> >             port@1 {
-> >                  reg =3D <1>;
-> >                  label =3D "ethphy1";
-> >                  phy-handle =3D <&ethphy1>;
-> >                  phy-mode =3D "mii";
-> >            };
-> >
-> >            port@2 {
-> >                 reg =3D <2>;
-> >                 status =3D "disabled";
-> >            };
-> >
-> >             port@3 {
-> >                  reg =3D <3>;
-> >                  status =3D "disabled";
-> >            };
-> >
-> >            port@4 {
-> >                 reg =3D <4>;
-> >                 label =3D "cpu";
-> >                 ethernet =3D <&fec>;
-> >                 phy-mode =3D "mii";
-> >                 rx-internal-delay-ps =3D <2000>;
-> >                 tx-internal-delay-ps =3D <2000>;
->
-> This looks suspicious. "rx-internal-delay-ps" and "tx-internal-delay-ps"
-> are only relevant for the RGMII modes, but you specify phy-mode =3D "mii"=
-.
-> Does the board schematic confirm that MII is the physical connection
-> being used from the switch to the FEC?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312300404.1R72Ssbh-lkp@intel.com/
 
-Yes, the design uses MII.
+All warnings (new ones prefixed by >>):
 
->
-> If you are truly using MII, then you should remove the RGMII delay
-> properties, and since you are using a 6.1 kernel - hence after kernel
-> commit 5d645df99ac6 ("net: dsa: sja1105: determine PHY/MAC role from PHY
-> interface type") - you should be using phy-mode =3D "rev-mii" to put this
-> port in MII PHY ("RevMII") mode - to interoperate with the FEC in MII
-> MAC mode.
+>> drivers/net/virtio/xsk.c:216:17: warning: variable 'xdp' is uninitialized when used here [-Wuninitialized]
+     216 |                 xsk_buff_free(xdp);
+         |                               ^~~
+   drivers/net/virtio/xsk.c:210:22: note: initialize the variable 'xdp' to silence this warning
+     210 |         struct xdp_buff *xdp;
+         |                             ^
+         |                              = NULL
+   1 warning generated.
 
-Okay, I will remove RGMII delay. is phy-mode =3D "rev-mii" applicable to
-all ports or only for fec port4?
 
->
-> >
-> >                fixed-link {
-> >                    speed =3D <100>;
-> >                    full-duplex;
-> >                };
-> >             };
-> >           };
-> >      };
-> > };
-> >
-> > &fec {
-> >        pinctrl-names =3D "default";
-> >        pinctrl-0 =3D <&pinctrl_enet>;
-> >        phy-mode =3D "mii";
-> >        status =3D "okay";
-> >
-> >        fixed-link {
-> >           speed =3D <100>;
-> >           full-duplex;
-> >        };
-> >
-> >        mdio {
-> >             #address-cells =3D <1>;
-> >             #size-cells =3D <0>;
-> >
-> >             ethphy0: ethernet-phy@0 {
-> >                     compatible =3D "ethernet-phy-ieee802.3-c22";
-> >                     reg =3D <0>;
-> >             };
-> >
-> >            ethphy1: ethernet-phy@1 {
-> >                compatible =3D "ethernet-phy-ieee802.3-c22";
-> >                 reg =3D <1>;
-> >             };
-> >     };
-> > };
-> >
-> > root@ltts-imx6solo:~# bash /usr/phynew.sh
-> > =3D=3D=3D=3D=3D=3D=3D MDIO: PHY0 =3D=3D=3D=3D=3D=3D=3D=3D
-> > [  162.426515] mdio_netlink: loading out-of-tree module taints kernel.
->
-> Still, please refrain from involving out-of-tree modules when asking for
-> help upstream. Thanks.
+vim +/xdp +216 drivers/net/virtio/xsk.c
 
-Sorry, I didn't remove it during this log, but I did remove this
-module at runtime during my actual sanity tests.
+   202	
+   203	struct sk_buff *virtnet_receive_xsk_buf(struct virtnet_info *vi, struct virtnet_rq *rq,
+   204						void *buf, u32 len,
+   205						unsigned int *xdp_xmit,
+   206						struct virtnet_rq_stats *stats)
+   207	{
+   208		struct net_device *dev = vi->dev;
+   209		struct sk_buff *skb = NULL;
+   210		struct xdp_buff *xdp;
+   211	
+   212		if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+   213			pr_debug("%s: short packet %i\n", dev->name, len);
+   214			DEV_STATS_INC(dev, rx_length_errors);
+   215	
+ > 216			xsk_buff_free(xdp);
+   217			return NULL;
+   218		}
+   219	
+   220		len -= vi->hdr_len;
+   221	
+   222		u64_stats_add(&stats->bytes, len);
+   223	
+   224		xdp = buf_to_xdp(vi, rq, buf, len);
+   225		if (!xdp)
+   226			return NULL;
+   227	
+   228		if (vi->mergeable_rx_bufs)
+   229			skb = virtnet_receive_xsk_merge(dev, vi, rq, xdp, xdp_xmit, stats);
+   230	
+   231		return skb;
+   232	}
+   233	
 
->
-> > root@ltts-imx6solo:~# [  165.208656] sja1105 spi1.0 ethphy0: Link is
-> > Up - 100Mbps/Full - flow control off
-> > [  165.225788] sja1105 spi1.0 ethphy1: Link is Up - 100Mbps/Full -
-> > flow control off
-> > [  165.235925] IPv6: ADDRCONF(NETDEV_CHANGE): ethphy0: link becomes rea=
-dy
-> > [  165.255777] IPv6: ADDRCONF(NETDEV_CHANGE): ethphy1: link becomes rea=
-dy
-> >
-> > root@ltts-imx6solo:~# ifconfig
-> > eth0: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1504
-> >         inet6 fe80::68fb:8ff:fedf:d377  prefixlen 64  scopeid 0x20<link=
->
-> >         ether 6a:fb:08:df:d3:77  txqueuelen 1000  (Ethernet)
-> >         RX packets 0  bytes 0 (0.0 B)
-> >         RX errors 0  dropped 0  overruns 0  frame 0
-> >         TX packets 0  bytes 0 (0.0 B)
-> >         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-> >
-> > ethphy0: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-> >         inet 169.254.178.1  netmask 255.255.0.0  broadcast 0.0.0.0
-> >         inet6 fe80::211:22ff:fe33:4455  prefixlen 64  scopeid 0x20<link=
->
-> >         ether 00:11:22:33:44:55  txqueuelen 1000  (Ethernet)
-> >         RX packets 0  bytes 0 (0.0 B)
-> >         RX errors 0  dropped 0  overruns 0  frame 0
-> >         TX packets 30  bytes 4071 (3.9 KiB)
-> >         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-> >
-> > ethphy1: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-> >         inet 169.253.178.2  netmask 255.255.0.0  broadcast 0.0.0.0
-> >         inet6 fe80::211:22ff:fe33:4466  prefixlen 64  scopeid 0x20<link=
->
-> >         ether 00:11:22:33:44:66  txqueuelen 1000  (Ethernet)
-> >         RX packets 0  bytes 0 (0.0 B)
-> >         RX errors 0  dropped 0  overruns 0  frame 0
-> >         TX packets 30  bytes 4071 (3.9 KiB)
-> >         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-> >
-> > lo: flags=3D73<UP,LOOPBACK,RUNNING>  mtu 65536
-> >         inet 127.0.0.1  netmask 255.0.0.0
-> >         inet6 ::1  prefixlen 128  scopeid 0x10<host>
-> >         loop  txqueuelen 1000  (Local Loopback)
-> >         RX packets 89  bytes 7675 (7.4 KiB)
-> >         RX errors 0  dropped 0  overruns 0  frame 0
-> >         TX packets 89  bytes 7675 (7.4 KiB)
-> >         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
->
-> ifconfig reports statistics counters from the /proc/net/dev interface,
-> which the sja1105 does not report very well (they don't come from hardwar=
-e).
-> It's best to use "ethtool -S eth0 | grep -v ': 0'" for FEC and SJA1105
-> CPU port (named "p04_*") counters, and "ethtool -S ethphy0 | grep -v ': 0=
-'"
-> to get hardware counters from the switch user ports.
-
-Okay.
-
->
-> You can also use the RX counters to determine which switch port is which
-> (but the phy-handle of each port to each PHY needs to be correct).
-
-RX counters in ethtool you mean?
-
->
-> > mytsl02383@MYTSL02383:~$ ifconfig -a
-> > enp43s0: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-> >         inet 169.254.178.2  netmask 255.255.0.0  broadcast 169.254.255.=
-255
-> >         inet6 fe80::d71b:4bdd:27bd:2a1a  prefixlen 64  scopeid 0x20<lin=
-k>
-> >         ether 00:be:43:20:9a:26  txqueuelen 1000  (Ethernet)
-> >         RX packets 272356  bytes 27099064 (27.0 MB)
-> >         RX errors 0  dropped 19  overruns 0  frame 0
-> >         TX packets 862  bytes 300806 (300.8 KB)
-> >         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-> > mytsl02383@MYTSL02383:~$ ping 169.254.178.1
-> > PING 169.254.178.1 (169.254.178.1) 56(84) bytes of data.
-> > From 169.254.178.2 icmp_seq=3D1 Destination Host Unreachable
-> >
-> > Let me know if you need any more details.
->
-> I'm not convinced packets are routed through ethphy0 or ethphy1, since
-> all interfaces have IPv4 link-local addresses only. You can use
-> "ip route get 169.254.178.1" to confirm what interface gets chosen.
-> This is not indicative of a device-level problem, just a setup one.
-> Please set up some IPv4 static addresses which are not link-local on the
-> DSA user ports and try to ping a link partner which has an IP address in
-> the same subnet.
-
-Okay. I will update this test along with DT changes.
-
-Thanks,
-Jagan.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
