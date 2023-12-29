@@ -1,219 +1,95 @@
-Return-Path: <netdev+bounces-60587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFB04820038
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 16:27:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D50182005D
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 16:51:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F5271C22479
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 15:27:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F45E282FCE
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 15:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F759125B2;
-	Fri, 29 Dec 2023 15:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80BE125B7;
+	Fri, 29 Dec 2023 15:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="VJk4pzLZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HSB2MU1I"
+	dkim=pass (1024-bit key) header.d=ucw.cz header.i=@ucw.cz header.b="jxp6LpTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841C6125AD;
-	Fri, 29 Dec 2023 15:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id 9C1AB3200906;
-	Fri, 29 Dec 2023 10:27:08 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Fri, 29 Dec 2023 10:27:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm1; t=1703863628; x=1703950028; bh=a4DE6lOAy5
-	UJ7XbWIZJKIkOz1MpDU+Xi8bnPQlzva/A=; b=VJk4pzLZ3jsN5yrTVY9rB5MqEO
-	t63AaOm0BTOpekd7Yk9s0B23makvF6HrsB4oPnU8/WWXGGAMD0p5CIyhVm9k1U7t
-	HJl1Cj+4svu7FSbXuWjdoasn6RgjQtlQyetnuHffeKCOYSj6euS+Ya4YFSOm8FWS
-	gyHJ3kU0KM/WpQCA40aPPmqCO2sVR9BN2UOB4AOM4Vd7Q+JWo69W9J9XyBv8PPzA
-	EFG5EfJEluh2mmHqyUOlQ3G86j5AXK4JA3rL3cxx0MYvicCjCsMJEHOKCkBgv73K
-	rtjsl8vy3GVFwgUidTs14P+JKKZOFI4jpDAw1UK5vKlZRsQUeuCYirsuqg/Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1703863628; x=1703950028; bh=a4DE6lOAy5UJ7XbWIZJKIkOz1MpD
-	U+Xi8bnPQlzva/A=; b=HSB2MU1Ivw5qTw3eOQn25v23N3Fs3zRMA+fDYx66Q7Td
-	4+rSDlbfUNarkcSpiDlIy5VRZfu3JwxKZOn9KYWGg1JcvAGXSjAzyZ1DPIXloJ2p
-	d9h8ZtuPT9DHzjJyZ4UqEM8rioa75rCtVpXBrYkzkUqbPRXXktxzizocUkqwcPnO
-	iebyH6O3t2o3UNw/PMpq2FyiaUpcBTCN9SkfvNrgVZG5xLiotkfgGEuZh70INKP0
-	0DEPJGuqQbSLKWJs+zBXQxZ4aBiUeCaBPGTG38yXoIhyUZXwXxAE6KxwtVnVUQzm
-	DArXHKHQrcTgfcJFoOmevU1NDlFYK1m4dXQYFYUMGQ==
-X-ME-Sender: <xms:SuWOZTpWb9_0aUReToHlOMcJl5AzbVmlTSBsYBK74Qt02uYW2WbGiQ>
-    <xme:SuWOZdruTTvDd7wB24CFZ650mYjhVObddrZkUNGzhzKvakpuaZ9JWUWoLqxExFElR
-    TDiSvlDm3XN58ZBzJA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeffedgjeejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:SuWOZQPnHnkpSYg0-ssBQr-DVtIolpI9wCOPNYy4VUvzWZv-UPDLtg>
-    <xmx:SuWOZW56XCsfQRrmqjBFk2Llvuf9SwsRWwjK_9IvqWS2APbvgQMGlw>
-    <xmx:SuWOZS65Cgo2Qr-hgDn7YQJ_KgOYajCp-X94PZf3mCtCClnj0miJNw>
-    <xmx:TOWOZY6oVL3YAlf6hNZ3iwkZU2_bRgcXVAnINCIw8sexnwXb5GOIDg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id A40F6B6008F; Fri, 29 Dec 2023 10:27:06 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1364-ga51d5fd3b7-fm-20231219.001-ga51d5fd3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F44125A4;
+	Fri, 29 Dec 2023 15:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ucw.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucw.cz
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+	id 4717D1C0050; Fri, 29 Dec 2023 16:41:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
+	t=1703864497;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BxMs/kzpNymFcmFDEtEcM/zevTNnwByTQvgBKVE7D2M=;
+	b=jxp6LpTGOCf7KbPks0fFRUE4SxYKGccEBysv8LdiWscTakaMIDroi4NHwDf2w8FFI4yZSH
+	zMZxVMfNMo/K702IKJ7WATTW0SME1RU5olqaoY2WvQ5OKirPl4gsVbU7fLyT5U5uiJIyFZ
+	9IGs38AK0VzLZzsknjen+w7pz2a/+CU=
+Date: Fri, 29 Dec 2023 16:41:35 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Chris Rankin <rankincj@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+Subject: Re: Does Linux still support UP?
+Message-ID: <ZY7omD5OBLUg6pyx@duo.ucw.cz>
+References: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <f254c189-463e-43a3-bc09-9a8869ebf819@app.fastmail.com>
-In-Reply-To: <20231228122411.3189-1-maimon.sagi@gmail.com>
-References: <20231228122411.3189-1-maimon.sagi@gmail.com>
-Date: Fri, 29 Dec 2023 16:26:46 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Sagi Maimon" <maimon.sagi@gmail.com>,
- "Richard Cochran" <richardcochran@gmail.com>,
- "Andy Lutomirski" <luto@kernel.org>, datglx@linutronix.de,
- "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>,
- "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Peter Zijlstra" <peterz@infradead.org>,
- "Johannes Weiner" <hannes@cmpxchg.org>,
- "Sohil Mehta" <sohil.mehta@intel.com>,
- "Rick Edgecombe" <rick.p.edgecombe@intel.com>,
- "Nhat Pham" <nphamcs@gmail.com>, "Palmer Dabbelt" <palmer@sifive.com>,
- "Kees Cook" <keescook@chromium.org>, "Alexey Gladkov" <legion@kernel.org>,
- "Mark Rutland" <mark.rutland@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
- Linux-Arch <linux-arch@vger.kernel.org>, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3] posix-timers: add multi_clock_gettime system call
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="70EgRxlTRoKgOZlJ"
+Content-Disposition: inline
+In-Reply-To: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
 
-On Thu, Dec 28, 2023, at 13:24, Sagi Maimon wrote:
-> Some user space applications need to read some clocks.
-> Each read requires moving from user space to kernel space.
-> The syscall overhead causes unpredictable delay between N clocks reads
-> Removing this delay causes better synchronization between N clocks.
->
-> Introduce a new system call multi_clock_gettime, which can be used to measure
-> the offset between multiple clocks, from variety of types: PHC, virtual PHC
-> and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
-> The offset includes the total time that the driver needs to read the clock
-> timestamp.
->
-> New system call allows the reading of a list of clocks - up to PTP_MAX_CLOCKS.
-> Supported clocks IDs: PHC, virtual PHC and various system clocks.
-> Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
-> The system call returns n_clocks timestamps for each measurement:
-> - clock 0 timestamp
-> - ...
-> - clock n timestamp
->
-> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
 
-Hi Sagi,
+--70EgRxlTRoKgOZlJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Exposing an interface to read multiple clocks makes sense to me,
-but I wonder if the interface you use is too inflexible.
+Hi!
 
-> --- a/include/uapi/asm-generic/unistd.h
-> +++ b/include/uapi/asm-generic/unistd.h
-> @@ -828,9 +828,11 @@ __SYSCALL(__NR_futex_wake, sys_futex_wake)
->  __SYSCALL(__NR_futex_wait, sys_futex_wait)
->  #define __NR_futex_requeue 456
->  __SYSCALL(__NR_futex_requeue, sys_futex_requeue)
-> +#define __NR_multi_clock_gettime 457
-> +__SYSCALL(__NR_multi_clock_gettime, sys_multi_clock_gettime)
-> 
->  #undef __NR_syscalls
-> -#define __NR_syscalls 457
-> +#define __NR_syscalls 458
+> I have an ancient i586 UP machine that happily runs vanilla Linux
+> 6.4.16, but which locks up shortly after booting vanilla 6.5.0. The
+> kernel *seems* to run into trouble as soon as the networking layer
+> becomes busy. However, its SysRq-S/U/B sequence still seems to work as
+> expected and so obviously *something* is still responding somewhere.
+>=20
+> This problem still exists in vanilla 6.6.8.
+>=20
+> FWIW I have raised this bug in bugzilla:
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D218296
 
-Site note: hooking it up only here is sufficient for the
-code review but not for inclusion: once we have an agreement
-on the API, this should be added to all architectures at once.
+Yes, UP should still work. I'm using such machine and intend to
+continue with that. But it seems more testing would be welcome.
 
-> +#define MULTI_PTP_MAX_CLOCKS 5 /* Max number of clocks */
-> +#define MULTI_PTP_MAX_SAMPLES 10 /* Max allowed offset measurement samples. */
-> +
-> +struct __ptp_multi_clock_get {
-> +	unsigned int n_clocks; /* Desired number of clocks. */
-> +	unsigned int n_samples; /* Desired number of measurements per clock. */
-> +	clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
-> +	/*
-> +	 * Array of list of n_clocks clocks time samples n_samples times.
-> +	 */
-> +	struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
-> +};
+And yes, you'll likely need to bisect.
 
-The fixed size arrays here seem to be an unnecessary limitation,
-both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS are small
-enough that one can come up with scenarios where you would want
-a higher number, but at the same time the structure is already
-808 bytes long, which is more than you'd normally want to put
-on the kernel stack, and which may take a significant time to
-copy to and from userspace.
+Best regards,
+								Pavel
 
-Since n_clocks and n_samples are always inputs to the syscall,
-you can just pass them as register arguments and use a dynamically
-sized array instead.
+--=20
+People of Russia, stop Putin before his war on Ukraine escalates.
 
-It's not clear to me what you gain from having the n_samples
-argument over just calling the syscall repeatedly. Does
-this offer a benefit for accuracy or is this just meant to
-avoid syscall overhead.
-> +SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get 
-> __user *, ptp_multi_clk_get)
-> +{
-> +	const struct k_clock *kc;
-> +	struct timespec64 kernel_tp;
-> +	struct __ptp_multi_clock_get multi_clk_get;
-> +	unsigned int i, j;
-> +	int error;
-> +
-> +	if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, 
-> sizeof(multi_clk_get)))
-> +		return -EFAULT;
+--70EgRxlTRoKgOZlJ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Here you copy the entire structure from userspace, but
-I don't actually see the .ts[] array on the stack being
-accessed later as you just copy to the user pointer
-directly.
+-----BEGIN PGP SIGNATURE-----
 
-> +		for (i = 0; i < multi_clk_get.n_clocks; i++) {
-> +			kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
-> +			if (!kc)
-> +				return -EINVAL;
-> +			error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], 
-> &kernel_tp);
-> +			if (!error && put_timespec64(&kernel_tp, (struct __kernel_timespec 
-> __user *)
-> +						     &ptp_multi_clk_get->ts[j][i]))
-> +				error = -EFAULT;
-> +		}
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCZY7orwAKCRAw5/Bqldv6
+8todAKCibSurY7CjS6hkVxuB6tEcdKxdLACeLH+oqOiHZHCnHVi5lzu8QjNJUkA=
+=41qP
+-----END PGP SIGNATURE-----
 
-The put_timespec64() and possibly the clockid_to_kclock() have
-some overhead that may introduce jitter, so it may be better to
-pull that out of the loop and have a fixed-size array
-of timespec64 values on the stack and then copy them
-at the end.
-
-On the other hand, this will still give less accuracy than the
-getcrosststamp() callback with ioctl(PTP_SYS_OFFSET_PRECISE),
-so either the last bit of accuracy isn't all that important,
-or you need to refine the interface to actually be an
-improvement over the chardev.
-
-      Arnd
+--70EgRxlTRoKgOZlJ--
 
