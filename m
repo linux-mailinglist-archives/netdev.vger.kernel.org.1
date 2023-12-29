@@ -1,122 +1,181 @@
-Return-Path: <netdev+bounces-60583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7EE5820008
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 15:52:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DA2782001B
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 16:07:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EC671C21654
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 14:52:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F362846A1
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 15:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F098E11C8E;
-	Fri, 29 Dec 2023 14:52:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A0C11CB9;
+	Fri, 29 Dec 2023 15:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yv+1D9+x"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="DWmOWCwZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED1C11C8B;
-	Fri, 29 Dec 2023 14:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703861563; x=1735397563;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jcb3d1Eurdn7JoSDwWMgzToJsi8wV219/OcIstMM8H4=;
-  b=Yv+1D9+xExQnxR2A9GjWlNjNuXDTyNyqfWzLSnXpUsZbQHqjx6STDj7g
-   apjJpRzQCJPy/RY7cUvp9e6qej516P4nwh47rD6ZTovBDhcmgeW8Im+fD
-   1I9H5sppwU5nC8KinKGtrbHPwCP8d5diclmQJ4j6d78JUph3LnRYfJvBE
-   WADnk7gNzVRgToQFuxrkXDvd8hAGlnxObbYzVC6Ak0gEpzisQzvYt6fTF
-   V3B1HEw13lQMKc7e2L0lpCKcIzZfNSwEGDHH6fuKbCHfUWXW5oGYldwF/
-   xskcjIC1wkrT0pFKyTnd6TMUtmxO4GhV2zx5Fm+9vW0gEn1aIGj/QfDX2
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10938"; a="396379422"
-X-IronPort-AV: E=Sophos;i="6.04,315,1695711600"; 
-   d="scan'208";a="396379422"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2023 06:52:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,315,1695711600"; 
-   d="scan'208";a="20888995"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.246.48.133])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2023 06:52:39 -0800
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ray Jui <rjui@broadcom.com>,
-	Scott Branden <sbranden@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH 1/1] net: mdio: mux-bcm-iproc: Use alignment helpers and SZ_4K
-Date: Fri, 29 Dec 2023 16:52:32 +0200
-Message-Id: <20231229145232.6163-1-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54AB11CBB
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 15:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33677fb38a3so6982542f8f.0
+        for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 07:07:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1703862453; x=1704467253; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tfEUssq66775g5rv0X3EdttVr6Qz6vvAn3f8fmKq6k4=;
+        b=DWmOWCwZl7kLEnbKecRZcrppO65lE+zcGzUU3rdJjMbu9kMCo+dNg+niDXO6RoG9Ay
+         VnQIIr6+Fo90zgwzYlnm0oR9ZW5xNFu9ylaveW+QcnBYdjkSj7RqYMM0baptjfabO/w2
+         zBRMLDOkhohANxqT4U5fqdz3y3i3arcnInfRjlFu6UoTlhLBC7wOJ5tKcXIOxdMETbNu
+         RsaX5x1RCpu2Gf+k5jZpWEV28S/udRBh5zphgBZS1TlpdCGT7vrx6Ktk2j8S5fun3voi
+         9aW+7iR2XnknIF6VKixdrvVZxaFG8WxVACrRfsl7ME+Z2uAlBpuHcCku/+s5yrH6VLRu
+         X++A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703862453; x=1704467253;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tfEUssq66775g5rv0X3EdttVr6Qz6vvAn3f8fmKq6k4=;
+        b=OUxWqj0wtbOPFhSrwbvKi8ifKK8NeC+uMt12Qil9/jAvNClzwBnmfLlrX/uqvIF1y2
+         JW1b7X6KAJ80T4aJdm6RVHOrxOCAsKYhD/kRaOAt3DYQosKR7VhHPJaHYDoKNB1PjVDY
+         nc7wBDlZneVXufcox3qbD6k1W6KL/Jups69XyZ3Q041okZanrhOsjhFKsr4fyBrnoPEV
+         r2c8Vag0/IYZgrsopxZqlae62jOqWMqPr0RVuiOjJHQNawf2bt52KyQV7ZDJnlijudwu
+         qqs/7VVt991YsG16UroCOqYdrMAAVFXdq0SIVrIxiNTqkrbdtJZMeGOKcTkyE/XyBnFS
+         s6fw==
+X-Gm-Message-State: AOJu0Yz2xq6JgTPYVaNQuz2d72VJqvErNtoUe7KGWfnbDqoUbz3gKxdY
+	XKrnsJgMMAlkna0UJXYy120qy3cIPsCe3A==
+X-Google-Smtp-Source: AGHT+IFOhefH6uyfP+oL9e2jb6KzF0vgMPeDuZLKZilG2UW7+TBcW0F93pNTf9V3XDx5UAcbNn3DtA==
+X-Received: by 2002:a05:600c:354d:b0:40d:5a6d:edcb with SMTP id i13-20020a05600c354d00b0040d5a6dedcbmr2806177wmq.24.1703862452733;
+        Fri, 29 Dec 2023 07:07:32 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.5])
+        by smtp.gmail.com with ESMTPSA id j16-20020a05600c191000b0040c11fbe581sm31381314wmq.27.2023.12.29.07.07.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Dec 2023 07:07:32 -0800 (PST)
+Message-ID: <ca01da5f-0928-4a95-83f4-8d9056107f42@tuxon.dev>
+Date: Fri, 29 Dec 2023 17:07:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/1] net: ravb: Wait for operation mode to be
+ applied
+Content-Language: en-US
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ mitsuhiro.kimura.kc@renesas.com
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231222113552.2049088-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231222113552.2049088-2-claudiu.beznea.uj@bp.renesas.com>
+ <98efc508-c431-2509-5799-96decc124136@omp.ru>
+ <d5448a91-a4d8-444d-9f96-083049b1e33e@tuxon.dev>
+ <9ebf96fb-c07a-8269-e5cd-0e71110941dd@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <9ebf96fb-c07a-8269-e5cd-0e71110941dd@omp.ru>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Instead of open coding, use IS_ALIGNED() and ALIGN_DOWN() when dealing
-with alignment. Replace also literals with SZ_4K.
 
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
----
- drivers/net/mdio/mdio-mux-bcm-iproc.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/mdio/mdio-mux-bcm-iproc.c b/drivers/net/mdio/mdio-mux-bcm-iproc.c
-index a750bd4c77a0..1ce7d67ba72e 100644
---- a/drivers/net/mdio/mdio-mux-bcm-iproc.c
-+++ b/drivers/net/mdio/mdio-mux-bcm-iproc.c
-@@ -2,6 +2,7 @@
- /*
-  * Copyright 2016 Broadcom
-  */
-+#include <linux/align.h>
- #include <linux/clk.h>
- #include <linux/delay.h>
- #include <linux/device.h>
-@@ -11,6 +12,7 @@
- #include <linux/of_mdio.h>
- #include <linux/phy.h>
- #include <linux/platform_device.h>
-+#include <linux/sizes.h>
- 
- #define MDIO_RATE_ADJ_EXT_OFFSET	0x000
- #define MDIO_RATE_ADJ_INT_OFFSET	0x004
-@@ -220,12 +222,12 @@ static int mdio_mux_iproc_probe(struct platform_device *pdev)
- 	md->base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
- 	if (IS_ERR(md->base))
- 		return PTR_ERR(md->base);
--	if (res->start & 0xfff) {
-+	if (!IS_ALIGNED(res->start, SZ_4K)) {
- 		/* For backward compatibility in case the
- 		 * base address is specified with an offset.
- 		 */
- 		dev_info(&pdev->dev, "fix base address in dt-blob\n");
--		res->start &= ~0xfff;
-+		res->start = ALIGN_DOWN(res->start, SZ_4K);
- 		res->end = res->start + MDIO_REG_ADDR_SPACE_SIZE - 1;
- 	}
- 
--- 
-2.39.2
+On 28.12.2023 21:07, Sergey Shtylyov wrote:
+> On 12/27/23 1:10 PM, claudiu beznea wrote:
+> 
+> [...]
+> 
+>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>
+>>>> CSR.OPS bits specify the current operating mode and (according to
+>>>> documentation) they are updated by HW when the operating mode change
+>>>> request is processed. To comply with this check CSR.OPS before proceeding.
+>>>>
+>>>> Commit introduces ravb_set_opmode() that does all the necessities for
+>>>> setting the operating mode (set DMA.CCC and wait for CSR.OPS) and call it
+>>>> where needed. This should comply with all the HW manuals requirements as
+>>>> different manual variants specify that different modes need to be checked
+>>>> in CSR.OPS when setting DMA.CCC.
+>>>>
+>>>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+>>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>> ---
+>>>>  drivers/net/ethernet/renesas/ravb_main.c | 52 ++++++++++++++----------
+>>>>  1 file changed, 31 insertions(+), 21 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> index 664eda4b5a11..ae99d035a3b6 100644
+>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> @@ -66,14 +66,15 @@ int ravb_wait(struct net_device *ndev, enum ravb_reg reg, u32 mask, u32 value)
+>>>>  	return -ETIMEDOUT;
+>>>>  }
+>>>>  
+>>>> -static int ravb_config(struct net_device *ndev)
+>>>> +static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
+>>>
+>>>    Since you pass the complete CCC register value below, you should
+>>> rather call the function ravb_set_ccc() and call the parameter opmode
+>>> ccc.
+>>
+>> This will be confusing. E.g., if renaming it ravb_set_ccc() one would
+>> expect to set any fields of CCC though this function but this is not true
+>> as ravb_modify() in this function masks only CCC_OPC. The call of:
+>>
+>> error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
+>>
+>> bellow is just to comply with datasheet requirements, previous code and at
+>> the same time re-use this function.
+> 
+>    How about the following then (ugly... but does the job):
+> 
+> 	/* Set operating mode */
+> 	if (opmode & ~CCC_OPC)
+> 		ravb_write(ndev, opmode, CCC);
+> 	else
+> 		ravb_modify(ndev, CCC, CCC_OPC, opmode);
+> 
+>    Either that or just don't use ravb_set_opmode() when writing the whole
+> 32-bit value below...
 
+This looks uglier to me...
+
+We have this discussion because of ccc_gac. For ccc_gac platforms we need
+to set OPC, GAC, CSEL at the same time. This is how we can change the
+operating mode to configuration mode in case we also need to configure GAC
+(due to restrictions imposed by hardware).
+
+What I want to say is that setting GAC and CSEL along with CCC is part of
+changing the operating mode to configuration mode for platforms supporting
+GAC because of hardware limitations.
+
+> 
+> [...]
+> 
+>>>> @@ -2560,21 +2559,23 @@ static int ravb_set_gti(struct net_device *ndev)
+> [...]
+>>>
+>>>>  		/* Set CSEL value */
+>>>>  		ravb_modify(ndev, CCC, CCC_CSEL, CCC_CSEL_HPB);
+>>>>  	} else if (info->ccc_gac) {
+>>>> -		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG |
+>>>> -			    CCC_GAC | CCC_CSEL_HPB);
+>>>> +		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
+> 
+>    ... like this?
+> 
+> 		ravb_write(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB, CCC);
+> 		error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
+> 
+> [...]
+> 
+> MBR, Sergey
 
