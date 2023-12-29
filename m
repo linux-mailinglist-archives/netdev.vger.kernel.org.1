@@ -1,82 +1,70 @@
-Return-Path: <netdev+bounces-60570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7510381FE36
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 09:40:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6023581FE4A
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 09:52:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32BCD282CC1
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 08:40:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 927CA1C22347
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 08:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024EF6FC4;
-	Fri, 29 Dec 2023 08:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233DA749C;
+	Fri, 29 Dec 2023 08:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h8pciKes"
+	dkim=pass (2048-bit key) header.d=risemoderngrowth.com header.i=@risemoderngrowth.com header.b="TLrQBdsV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.risemoderngrowth.com (mail.risemoderngrowth.com [89.40.118.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EAD3210;
-	Fri, 29 Dec 2023 08:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 44BCFC433C9;
-	Fri, 29 Dec 2023 08:40:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703839224;
-	bh=IjpVg6hD33ym8R6MyYwMOCGULI57jUQt3uBN/v5NCCM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h8pciKest1dn6THeiPPg53E6vzeOg9BbQI8vSwL29LT9IbuL116T4h9HOVHxeD05I
-	 nS1pI4AIxzSoZhz8XTzFK4wk8STtnwmy8JDwvqfdzEqqs1MlzvAg2oJwUS+qge+WeC
-	 1Nptt7bvt45YFGnZSjXy7R3Okkn5DQ4so6Mt116YAcZZlDTcAOwY72M1fwEr7uik53
-	 LJDU+3nh/NC4Llb+cHME94qTwTta9MfwyRwW94Gs+RFgcBrc7THYAsxPO6nrlz7tUw
-	 eFxneZVLYHtLXNzEwU0myqFUQpncDtHxyu2L+Utqn1UiaiqqeOozW7RIFGns5B26TY
-	 YM3SLGEIeLFLA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 28956E333D8;
-	Fri, 29 Dec 2023 08:40:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E1A7493
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 08:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=risemoderngrowth.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=risemoderngrowth.com
+Received: by mail.risemoderngrowth.com (Postfix, from userid 1001)
+	id 6D93082F8C; Fri, 29 Dec 2023 08:46:02 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=risemoderngrowth.com;
+	s=mail; t=1703839564;
+	bh=8/6+HKIxXFBEkdIxOYlDLDaXTCR61Qob+YtP7RsW8h4=;
+	h=Date:From:To:Subject:From;
+	b=TLrQBdsVw93E0+foEgKLBIPOnsMimgRKvATFvDjMmKYdbb+9RjQ4wK02EIhV5PeQT
+	 oxg2mkGd9ogGROIitqrq9fJjzH5Zkqi2mZdrS/zoeI8kSwKVLDqY0k2UsCgGMolqWk
+	 kL6POx2DcP0xe6Vz9U45XGendRJqJIlWbakRHlzoGU5OqFUFaoijtg4g7h+l3DnxA3
+	 cuV8P5IsyhCn0/e9twRkOmvNtfXIsuqIY6BMDX75KJGgiIRRzq9arp0Q56lHv7h/YK
+	 ivzccxjgnrqMgtAB9tw/G8/EWGeRh6cygwz7venFTqkFbRoB0sGhEpp9s7AecaaEue
+	 o3Kg9/S/pu9AA==
+Received: by mail.risemoderngrowth.com for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 08:45:59 GMT
+Message-ID: <20231229074500-0.1.7q.bxzz.0.pwjozdpdcc@risemoderngrowth.com>
+Date: Fri, 29 Dec 2023 08:45:59 GMT
+From: "Ramm Fenning" <ramm.fenning@risemoderngrowth.com>
+To: <netdev@vger.kernel.org>
+Subject: Delivery of mill parts
+X-Mailer: mail.risemoderngrowth.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] ptp: ocp: fix bug in unregistering the DPLL subsystem
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170383922416.26195.6819591096123893310.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Dec 2023 08:40:24 +0000
-References: <20231220081914.16779-1-maimon.sagi@gmail.com>
-In-Reply-To: <20231220081914.16779-1-maimon.sagi@gmail.com>
-To: Sagi Maimon <maimon.sagi@gmail.com>
-Cc: richardcochran@gmail.com, jonathan.lemon@gmail.com, vadfed@fb.com,
- jiri@resnulli.us, arkadiusz.kubalewski@intel.com, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hello,
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+We offer professional solutions for industrial grinding systems.
 
-On Wed, 20 Dec 2023 10:19:14 +0200 you wrote:
-> When unregistering the DPLL subsystem the priv pointer is different then
-> the one used for registration which cause failure in unregistering.
-> 
-> Fixes: 09eeb3aecc6c ("ptp_ocp: implement DPLL ops")
-> ---
->  drivers/ptp/ptp_ocp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+We produce a wide range of high-quality parts for separator mills and rol=
+ler/pin mills, including separators, grinding discs, drives, grinding rin=
+gs, and pins.
 
-Here is the summary with links:
-  - [v1] ptp: ocp: fix bug in unregistering the DPLL subsystem
-    https://git.kernel.org/netdev/net/c/97417cd79ce1
+Our solutions are used in similar equipment employed in processes such as=
+ grinding powder coatings, cocoa grinding, pharmaceutical grinding, and r=
+elated processes.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Would you like to review our offer?
 
 
+Best regards,
+Ramm Fenning
 
