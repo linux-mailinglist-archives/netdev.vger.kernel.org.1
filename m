@@ -1,145 +1,94 @@
-Return-Path: <netdev+bounces-60593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FCF58200C3
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 18:21:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9461F8200D0
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 18:28:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 242CA1F22610
-	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 17:21:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A03C0B2192A
+	for <lists+netdev@lfdr.de>; Fri, 29 Dec 2023 17:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B3B12B84;
-	Fri, 29 Dec 2023 17:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5478512B90;
+	Fri, 29 Dec 2023 17:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="oF9sd+cO"
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="RAnE+3ZW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8A812B7A
-	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 17:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d4a2526a7eso2467925ad.3
-        for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 09:21:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1703870491; x=1704475291; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xKoiaN5Ptx5nvAEn7znQLv6cCCZe9EwH3qBzMCtP9vs=;
-        b=oF9sd+cOWhWgo/1AyNvSFN0IstkRRWK6CfG3tx6IDMYboN1/FtisJfSvjg5xc7yIAl
-         UKge4w9wPr6wU4noa0KTC00O2UebsFqyN8TbtcVPlpCYevlH1N0c2cW1QKinN8QSt+X1
-         t9CeD+2R2noED0oQ8/dQGb/otV3ure9+G5mRqK0/DMlhC6tk7rQoYKLlj83FhdryKhHG
-         MynJ7WqZEbWC8UiDV91urQjJkvJvQPikMDlkd/Iq5rMz2/wZKc66wfDSNRbiEhg+9irO
-         lF9kwzlNPKMTSoc9exRozWyS4bOc43A/WUaWt4E2wXLf3aOTGb6YAkRE8ONRM83X1+Dp
-         6d6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703870491; x=1704475291;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xKoiaN5Ptx5nvAEn7znQLv6cCCZe9EwH3qBzMCtP9vs=;
-        b=heEBMgsg/fcEeDOLy5436OcDv5Lgvo/B0jKWfZa+hfw06O0QS7+2ll/nxb7kil+aNi
-         IunevK8HqlXVP/PhN/jQFFRia3JPLf+tckHxjFXrhZUQFYQgOMijomAFcsoI/snZQrPf
-         SfTFsxnPz9qcIqDHW4rq176PxxIcnf1CvRSRF/AkWydY+fr5WqbhpEdumWXrCmA4IdJ7
-         ShohAMeTHI3Q1FHiyms1lLVGTzKza6wCKHq26ulcg2uOtPUfB4GPrPHDdCoGk9mzRlUa
-         XKMCiyK7I4fqeYzFRij/A+4ONMK/HPxrMXI+phEm3hTAo5vtqlbNvd5nPj0TZtHsaNPi
-         X8fg==
-X-Gm-Message-State: AOJu0Yxx14jKOqzgb7jML8rLzX0iMfHzGfsu7NS69M1iNlMf9yNZ7Cck
-	Rsh8QJRghO5S52dk9Fg1LAJqEcioJOlDBQ==
-X-Google-Smtp-Source: AGHT+IFuPWC15y3Fys9+ve8/S52v3w4SMiq4MkFREGDbWNkns27R/AxG8CAHo6O41LZvW9O9A3IlZg==
-X-Received: by 2002:a17:903:2c9:b0:1d4:61da:1384 with SMTP id s9-20020a17090302c900b001d461da1384mr5475666plk.106.1703870491534;
-        Fri, 29 Dec 2023 09:21:31 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id j17-20020a170902c3d100b001d400970b6csm15877720plj.110.2023.12.29.09.21.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Dec 2023 09:21:31 -0800 (PST)
-Date: Fri, 29 Dec 2023 09:21:29 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Junxian Huang <huangjunxian6@hisilicon.com>
-Cc: <jgg@ziepe.ca>, <leon@kernel.org>, <dsahern@gmail.com>,
- <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH iproute2-rc 1/2] rdma: Fix core dump when pretty is used
-Message-ID: <20231229092129.25a526c4@hermes.local>
-In-Reply-To: <20231229065241.554726-2-huangjunxian6@hisilicon.com>
-References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
-	<20231229065241.554726-2-huangjunxian6@hisilicon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EE812B7A
+	for <netdev@vger.kernel.org>; Fri, 29 Dec 2023 17:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+Received: from cwcc.thunk.org (c-73-8-226-230.hsd1.il.comcast.net [73.8.226.230])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 3BTHSOqx012217
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Dec 2023 12:28:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1703870906; bh=xvv1SmhHSED5xm7nKqzvvK3M85QMjvxo66YKgvrrHko=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=RAnE+3ZWlUsE5RvDQIqxABqqbfggN0D3qEsJmjAYT/C5rnL1Jg2NeHsjWrkf5ApVW
+	 NYL6tsyyS6WGFJ+qKpoSZ+lBLpAICkie7DI8kB4xwLxEuu+QuiacZks/wVG4kxZS9f
+	 3pgW3nL/YVfmYjv1U0TD6GapieJ8iCsByeQ7w7rSHpSHIaSEu1GTkdVFQ51OnGJ5WW
+	 2LP5ikXxad2pFnB2Ftk0oiZs6LHIg0CD3lF274O8DM4YAa55stBliD6HZ/o1DkuMAV
+	 ca0zh8T1PLdo92o3o3lfCGOUFxqI1iJxYDw8ZOUFyB3vvelalwJHk3bbPlg8AOoh7K
+	 PA3NFUOYhBliQ==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id B59F7340569; Fri, 29 Dec 2023 11:28:23 -0600 (CST)
+Date: Fri, 29 Dec 2023 11:28:23 -0600
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Chris Rankin <rankincj@gmail.com>
+Cc: Pavel Machek <pavel@ucw.cz>, LKML <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org
+Subject: Re: Does Linux still support UP?
+Message-ID: <20231229172823.GC148343@mit.edu>
+References: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
+ <ZY7omD5OBLUg6pyx@duo.ucw.cz>
+ <CAK2bqVLBZvU2fVfY4bkFrU=4X+W4O3f5pbTdeQjMW=W2sGWpeQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK2bqVLBZvU2fVfY4bkFrU=4X+W4O3f5pbTdeQjMW=W2sGWpeQ@mail.gmail.com>
 
-On Fri, 29 Dec 2023 14:52:40 +0800
-Junxian Huang <huangjunxian6@hisilicon.com> wrote:
-
-> From: Chengchang Tang <tangchengchang@huawei.com>
+On Fri, Dec 29, 2023 at 04:03:56PM +0000, Chris Rankin wrote:
 > 
-> There will be a core dump when pretty is used as the JSON object
-> hasn't been opened and closed properly.
-> 
-> Before:
-> $ rdma res show qp -jp -dd
-> [ {
->     "ifindex": 1,
->     "ifname": "hns_1",
->     "port": 1,
->     "lqpn": 1,
->     "type": "GSI",
->     "state": "RTS",
->     "sq-psn": 0,
->     "comm": "ib_core"
-> },
-> "drv_sq_wqe_cnt": 128,
-> "drv_sq_max_gs": 2,
-> "drv_rq_wqe_cnt": 512,
-> "drv_rq_max_gs": 1,
-> rdma: json_writer.c:130: jsonw_end: Assertion `self->depth > 0' failed.
-> Aborted (core dumped)
-> 
-> After:
-> $ rdma res show qp -jp -dd
-> [ {
->         "ifindex": 2,
->         "ifname": "hns_2",
->         "port": 1,
->         "lqpn": 1,
->         "type": "GSI",
->         "state": "RTS",
->         "sq-psn": 0,
->         "comm": "ib_core",{
->             "drv_sq_wqe_cnt": 128,
->             "drv_sq_max_gs": 2,
->             "drv_rq_wqe_cnt": 512,
->             "drv_rq_max_gs": 1,
->             "drv_ext_sge_sge_cnt": 256
->         }
->     } ]
-> 
-> Fixes: 331152752a97 ("rdma: print driver resource attributes")
-> Signed-off-by: Chengchang Tang <tangchengchang@huawei.com>
-> Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
+> I have already attached as much information as I am *ever* likely to
+> be able to extract about this problem to the Bugzilla ticket.
 
-This code in rdma seems to be miking json and newline functionality
-which creates bug traps.
+In addition to doing a bisection, something else you might want to
+try, since in the bugzilla you have hypothesized that it might be a
+bug in the e100 driver, is to try building a kernel without the driver
+configured, and see if that makes the kernel not hang.  If it does,
+then it's likely that the problem is either in the e100 driver, or
+maybe somewhere in the networking stack --- although in that case it's
+more likely someone else would have noticed.
 
-Also the json should have same effective output in pretty and non-pretty mode.
-It looks like since pretty mode add extra object layer, the nesting of {} would be
-different.
+Something else you might try is to connect up a serial console, so you
+can get the full output from sysrq output.  The other advantage of
+using a serial console is people are much more likely to scan a text
+file with the consoles, as opposed to downloading and trying to make
+sense of the screen snapshots.  (BTW, was the flash enabled on your
+cell phone?  The bright white spot in the middle of the screen makes
+it very hard to read.)
 
-The conversion to json_print() was done but it isn't using same conventions
-as ip or tc.
+I'd also try sysrq-l (show backtrace for all active CPU's), so you can
+see where the kernel is actually hanging.
 
-The correct fix needs to go deeper and hit other things.
+For better or for worse, support for old hardware is a volunteer
+effort, so owners of the said old hardware need to do a bunch of the
+leg work.  Or if you can have a paid support contract, maybe you can
+pay someone to gather the detail, but when you say "is feature X
+supported" in an open source project, that has a different meaning
+from a commercial software product.
 
-
-
-
+						- Ted
 
