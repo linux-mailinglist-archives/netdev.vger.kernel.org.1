@@ -1,143 +1,352 @@
-Return-Path: <netdev+bounces-60620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD9B9820491
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 12:28:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D9D8204F2
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 13:03:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68FDF281E34
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 11:28:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCA5028221B
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 12:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724336AA8;
-	Sat, 30 Dec 2023 11:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A7479EF;
+	Sat, 30 Dec 2023 12:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQAoPmrR"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ggH+ZJQj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA815881F;
-	Sat, 30 Dec 2023 11:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-555aa7fd668so1758017a12.0;
-        Sat, 30 Dec 2023 03:28:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703935689; x=1704540489; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=85O6LiWePPiFIF6JQGS3gBNdkvVwV11/X/ToIcvymM4=;
-        b=mQAoPmrREDvW+GE7hGXkVZr/LX7Jv15pjCmx9ijXqs0CFOsmtmCZlBYX7MFLPTMtKw
-         mOTwzLHYHGYwtXKqc4M/68NL2ROSIekRpCM7WdcsSM4nVE479n9PK1P5523SU4siBP6l
-         oCfThr56k/oQkDNXjpXIBsn4DRpXKPSroSLWBRQ1i68oqG0BPUgYBZtkxS6bv44nTYC7
-         ctGSz69l8DjjsvcfFDbOJbjzoZJRy3OqGuTCpkB84fQc0+dZ7DCMjXdhOZT2Q2UrmB3D
-         qSjHbiXAvaRITgFUgeGxcyzVTWAyu8oULnHhoD29FCOczL8gqdMeOJpG5nKdSNHW6aqf
-         FIVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703935689; x=1704540489;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=85O6LiWePPiFIF6JQGS3gBNdkvVwV11/X/ToIcvymM4=;
-        b=FgR+ewDFBwU4rC0SjwI8YHc1IohrzyVl8BVbSyREAyAX9oMZWcyE1EdZaaV320wzIx
-         +5AD2Hubn1Fn5d6bwLOvJEDkLxIOyQIzwU+qzgWXOTNVKDAnYQLUKbn/KVhikRPXD6DG
-         m26geBaax/8nvaw3TMcvB7Fi9HJIM1Tgv2vpBsNyFsuXLYq8VpPHBQGXWJ4nIF8+YOCy
-         mcEpn1pTt6N+kpAhi1FEid/jx2ebLGeaBkFB2kONtdHTeq/7YMYJOTnwKDV7nUl+2AKi
-         2ThABCoQCkAMWFaVNZvFuOXsNuDTXkZF4J+8vYou0OB5G5/ytvFm+mCITIrPf/C1AbH7
-         8TlQ==
-X-Gm-Message-State: AOJu0Yz9ggKgYCcykR2Z9iNjFMSe17Y11whyDTjI+f9wIhoL0y9zzPEs
-	zNaLYtZH4tZVlBtXWOP5UsM=
-X-Google-Smtp-Source: AGHT+IFi3jZefLQyBuY/C97S1WM5Q23ySnKKxkJYKJ45z2CeKWyZhnS607UPaBUb4CW+T8cmtvGXBw==
-X-Received: by 2002:a50:9f8c:0:b0:554:3afd:492c with SMTP id c12-20020a509f8c000000b005543afd492cmr7890236edf.17.1703935688964;
-        Sat, 30 Dec 2023 03:28:08 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id o20-20020aa7c7d4000000b0055537e76e94sm5218374eds.57.2023.12.30.03.28.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Dec 2023 03:28:08 -0800 (PST)
-Date: Sat, 30 Dec 2023 13:28:06 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jagan Teki <jagan@amarulasolutions.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"Andrew F. Davis" <afd@ti.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
-	Michael Nazzareno Trimarchi <michael@amarulasolutions.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-	Fabio Estevam <festevam@gmail.com>
-Subject: Re: PHY issue with SJA1105Q/DP84849I Design
-Message-ID: <20231230112806.o5ia43mu4mo64lea@skbuf>
-References: <CAMty3ZCn+yGr2MG3WYg+i4DsZWk5b-xEw0SDvNbeGzs6pMwjfQ@mail.gmail.com>
- <20231222145100.sfcuux7ayxtxgogo@skbuf>
- <CAMty3ZBZNugYmKMjDdZnY0kFMeEb86uzSg2XL9Tn6Yb4t-TXKQ@mail.gmail.com>
- <20231226153055.4yihsmu6kiak6hkf@skbuf>
- <CAMty3ZDnAFR9a1BM89mx3bmrQzGC7nvazt42_v4JF_QpwPkS4w@mail.gmail.com>
- <20231229152519.2jxrwaeltp4pxlms@skbuf>
- <CAMty3ZAOM5+EMw9sLVOq-=CH_sP=1TLAGEMF9LYOZ4aFbNUtsg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4374B8BE3;
+	Sat, 30 Dec 2023 12:03:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97619C433C7;
+	Sat, 30 Dec 2023 12:03:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1703937798;
+	bh=SX+LuJuh/8Ye7DXWWcx5Y+E1Gqt20VL5GVWCpCtFsHQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ggH+ZJQjgeGgSWqCntjnNQY5hTgDYqnRGqV1lApvHHSufNyIPggNErbg/0ijDurjG
+	 QRupwHtitzRYKwSTdIPO0ZhX2yPVEkYzB4Ppz1mPlPWnpIcISxthBEuBhjJgu9Wvtv
+	 DRWXds47EwJi2jTneeKaIih+EaMaK2/Ru9Hlw0OE=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Markus Suvanto <markus.suvanto@gmail.com>,
+	Wang Lei <wang840925@gmail.com>,
+	Jeff Layton <jlayton@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.6 067/156] keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry
+Date: Sat, 30 Dec 2023 11:58:41 +0000
+Message-ID: <20231230115814.539935693@linuxfoundation.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231230115812.333117904@linuxfoundation.org>
+References: <20231230115812.333117904@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMty3ZAOM5+EMw9sLVOq-=CH_sP=1TLAGEMF9LYOZ4aFbNUtsg@mail.gmail.com>
 
-On Sat, Dec 30, 2023 at 01:48:38AM +0530, Jagan Teki wrote:
-> On Fri, Dec 29, 2023 at 8:55 PM Vladimir Oltean <olteanv@gmail.com> wrote:
-> > Why all these combinations? You don't know which switch port is which?
-> 
-> This is where I get confused in the first place. I didn't find proper
-> information on binding about how the physical pin-out is to be
-> configured in DT ports or maybe I didn't understand properly.
-> 
-> As per schematics.
-> Pin MII0_RXD0-D3/TXD0-D3 is connected to PROC_MII0_RXD0-D3/TXD0-D3
-> this would be fec0.
-> Pin MII1_RXD0-D3/TXD0-D3 is connected to PHY_MII1_RXD0-D3/TXD0-D3 this
-> would be ethphy0.
-> Pin MII2_RXD0-D3/TXD0-D3 is connected to PHY_MII2_RXD0-D3/TXD0-D3 this
-> would be ethphy1.
-> Pin MII3_RXD0-D3/TXD0-D3 is grounded
-> Pin MII4_RXD0-D3/TXD0-D3 is grounded
-> 
-> So, I did use the above 3 combinations and assumed fec0 is always a
-> port4 based on existing DTS in the tree. Please let me know which
-> configuration is proper as per schematic connections.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
-With this switch, any port can be a CPU port. The CPU port selection
-from existing, unrelated upstream boards has no influence upon yours.
+------------------
 
-The pin naming in "MII0_RXD/TXD" follows the same numbering scheme as
-"port@0" etc. The SJA1105PQRS.pdf datasheet should tell you as much.
-So your CPU port should be the "port@0" node and not "port@4". The
-switch "port@3" and "port@4" sound like they should be the ones with
-status = "disabled".
+From: David Howells <dhowells@redhat.com>
 
-> > If you are truly using MII, then you should remove the RGMII delay
-> > properties, and since you are using a 6.1 kernel - hence after kernel
-> > commit 5d645df99ac6 ("net: dsa: sja1105: determine PHY/MAC role from PHY
-> > interface type") - you should be using phy-mode = "rev-mii" to put this
-> > port in MII PHY ("RevMII") mode - to interoperate with the FEC in MII
-> > MAC mode.
-> 
-> Okay, I will remove RGMII delay. is phy-mode = "rev-mii" applicable to
-> all ports or only for fec port4?
+[ Upstream commit 39299bdd2546688d92ed9db4948f6219ca1b9542 ]
 
-Use phy-mode = "rev-mii" for the switch port going to the FEC, and
-phy-mode = "mii" for the switch ports going to MII PHYs (and for the FEC
-itself).
+If a key has an expiration time, then when that time passes, the key is
+left around for a certain amount of time before being collected (5 mins by
+default) so that EKEYEXPIRED can be returned instead of ENOKEY.  This is a
+problem for DNS keys because we want to redo the DNS lookup immediately at
+that point.
 
-> > You can also use the RX counters to determine which switch port is which
-> > (but the phy-handle of each port to each PHY needs to be correct).
-> 
-> RX counters in ethtool you mean?
+Fix this by allowing key types to be marked such that keys of that type
+don't have this extra period, but are reclaimed as soon as they expire and
+turn this on for dns_resolver-type keys.  To make this easier to handle,
+key->expiry is changed to be permanent if TIME64_MAX rather than 0.
 
-Yes.
+Furthermore, give such new-style negative DNS results a 1s default expiry
+if no other expiry time is set rather than allowing it to stick around
+indefinitely.  This shouldn't be zero as ls will follow a failing stat call
+immediately with a second with AT_SYMLINK_NOFOLLOW added.
+
+Fixes: 1a4240f4764a ("DNS: Separate out CIFS DNS Resolver code")
+Signed-off-by: David Howells <dhowells@redhat.com>
+Tested-by: Markus Suvanto <markus.suvanto@gmail.com>
+cc: Wang Lei <wang840925@gmail.com>
+cc: Jeff Layton <jlayton@redhat.com>
+cc: Steve French <smfrench@gmail.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jarkko Sakkinen <jarkko@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-nfs@vger.kernel.org
+cc: ceph-devel@vger.kernel.org
+cc: keyrings@vger.kernel.org
+cc: netdev@vger.kernel.org
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/linux/key-type.h   |  1 +
+ net/dns_resolver/dns_key.c | 10 +++++++++-
+ security/keys/gc.c         | 31 +++++++++++++++++++++----------
+ security/keys/internal.h   | 11 ++++++++++-
+ security/keys/key.c        | 15 +++++----------
+ security/keys/proc.c       |  2 +-
+ 6 files changed, 47 insertions(+), 23 deletions(-)
+
+diff --git a/include/linux/key-type.h b/include/linux/key-type.h
+index 7d985a1dfe4af..5caf3ce823733 100644
+--- a/include/linux/key-type.h
++++ b/include/linux/key-type.h
+@@ -73,6 +73,7 @@ struct key_type {
+ 
+ 	unsigned int flags;
+ #define KEY_TYPE_NET_DOMAIN	0x00000001 /* Keys of this type have a net namespace domain */
++#define KEY_TYPE_INSTANT_REAP	0x00000002 /* Keys of this type don't have a delay after expiring */
+ 
+ 	/* vet a description */
+ 	int (*vet_description)(const char *description);
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index 01e54b46ae0b9..2a6d363763a2b 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -91,6 +91,7 @@ const struct cred *dns_resolver_cache;
+ static int
+ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ {
++	const struct dns_server_list_v1_header *v1;
+ 	const struct dns_payload_header *bin;
+ 	struct user_key_payload *upayload;
+ 	unsigned long derrno;
+@@ -122,6 +123,13 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ 			return -EINVAL;
+ 		}
+ 
++		v1 = (const struct dns_server_list_v1_header *)bin;
++		if ((v1->status != DNS_LOOKUP_GOOD &&
++		     v1->status != DNS_LOOKUP_GOOD_WITH_BAD)) {
++			if (prep->expiry == TIME64_MAX)
++				prep->expiry = ktime_get_real_seconds() + 1;
++		}
++
+ 		result_len = datalen;
+ 		goto store_result;
+ 	}
+@@ -314,7 +322,7 @@ static long dns_resolver_read(const struct key *key,
+ 
+ struct key_type key_type_dns_resolver = {
+ 	.name		= "dns_resolver",
+-	.flags		= KEY_TYPE_NET_DOMAIN,
++	.flags		= KEY_TYPE_NET_DOMAIN | KEY_TYPE_INSTANT_REAP,
+ 	.preparse	= dns_resolver_preparse,
+ 	.free_preparse	= dns_resolver_free_preparse,
+ 	.instantiate	= generic_key_instantiate,
+diff --git a/security/keys/gc.c b/security/keys/gc.c
+index 3c90807476eb0..eaddaceda14ea 100644
+--- a/security/keys/gc.c
++++ b/security/keys/gc.c
+@@ -66,6 +66,19 @@ void key_schedule_gc(time64_t gc_at)
+ 	}
+ }
+ 
++/*
++ * Set the expiration time on a key.
++ */
++void key_set_expiry(struct key *key, time64_t expiry)
++{
++	key->expiry = expiry;
++	if (expiry != TIME64_MAX) {
++		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++			expiry += key_gc_delay;
++		key_schedule_gc(expiry);
++	}
++}
++
+ /*
+  * Schedule a dead links collection run.
+  */
+@@ -176,7 +189,6 @@ static void key_garbage_collector(struct work_struct *work)
+ 	static u8 gc_state;		/* Internal persistent state */
+ #define KEY_GC_REAP_AGAIN	0x01	/* - Need another cycle */
+ #define KEY_GC_REAPING_LINKS	0x02	/* - We need to reap links */
+-#define KEY_GC_SET_TIMER	0x04	/* - We need to restart the timer */
+ #define KEY_GC_REAPING_DEAD_1	0x10	/* - We need to mark dead keys */
+ #define KEY_GC_REAPING_DEAD_2	0x20	/* - We need to reap dead key links */
+ #define KEY_GC_REAPING_DEAD_3	0x40	/* - We need to reap dead keys */
+@@ -184,21 +196,17 @@ static void key_garbage_collector(struct work_struct *work)
+ 
+ 	struct rb_node *cursor;
+ 	struct key *key;
+-	time64_t new_timer, limit;
++	time64_t new_timer, limit, expiry;
+ 
+ 	kenter("[%lx,%x]", key_gc_flags, gc_state);
+ 
+ 	limit = ktime_get_real_seconds();
+-	if (limit > key_gc_delay)
+-		limit -= key_gc_delay;
+-	else
+-		limit = key_gc_delay;
+ 
+ 	/* Work out what we're going to be doing in this pass */
+ 	gc_state &= KEY_GC_REAPING_DEAD_1 | KEY_GC_REAPING_DEAD_2;
+ 	gc_state <<= 1;
+ 	if (test_and_clear_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags))
+-		gc_state |= KEY_GC_REAPING_LINKS | KEY_GC_SET_TIMER;
++		gc_state |= KEY_GC_REAPING_LINKS;
+ 
+ 	if (test_and_clear_bit(KEY_GC_REAP_KEYTYPE, &key_gc_flags))
+ 		gc_state |= KEY_GC_REAPING_DEAD_1;
+@@ -233,8 +241,11 @@ static void key_garbage_collector(struct work_struct *work)
+ 			}
+ 		}
+ 
+-		if (gc_state & KEY_GC_SET_TIMER) {
+-			if (key->expiry > limit && key->expiry < new_timer) {
++		expiry = key->expiry;
++		if (expiry != TIME64_MAX) {
++			if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++				expiry += key_gc_delay;
++			if (expiry > limit && expiry < new_timer) {
+ 				kdebug("will expire %x in %lld",
+ 				       key_serial(key), key->expiry - limit);
+ 				new_timer = key->expiry;
+@@ -276,7 +287,7 @@ static void key_garbage_collector(struct work_struct *work)
+ 	 */
+ 	kdebug("pass complete");
+ 
+-	if (gc_state & KEY_GC_SET_TIMER && new_timer != (time64_t)TIME64_MAX) {
++	if (new_timer != TIME64_MAX) {
+ 		new_timer += key_gc_delay;
+ 		key_schedule_gc(new_timer);
+ 	}
+diff --git a/security/keys/internal.h b/security/keys/internal.h
+index 3c1e7122076b9..ec2ec335b6133 100644
+--- a/security/keys/internal.h
++++ b/security/keys/internal.h
+@@ -174,6 +174,7 @@ extern unsigned key_gc_delay;
+ extern void keyring_gc(struct key *keyring, time64_t limit);
+ extern void keyring_restriction_gc(struct key *keyring,
+ 				   struct key_type *dead_type);
++void key_set_expiry(struct key *key, time64_t expiry);
+ extern void key_schedule_gc(time64_t gc_at);
+ extern void key_schedule_gc_links(void);
+ extern void key_gc_keytype(struct key_type *ktype);
+@@ -222,10 +223,18 @@ extern struct key *key_get_instantiation_authkey(key_serial_t target_id);
+  */
+ static inline bool key_is_dead(const struct key *key, time64_t limit)
+ {
++	time64_t expiry = key->expiry;
++
++	if (expiry != TIME64_MAX) {
++		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++			expiry += key_gc_delay;
++		if (expiry <= limit)
++			return true;
++	}
++
+ 	return
+ 		key->flags & ((1 << KEY_FLAG_DEAD) |
+ 			      (1 << KEY_FLAG_INVALIDATED)) ||
+-		(key->expiry > 0 && key->expiry <= limit) ||
+ 		key->domain_tag->removed;
+ }
+ 
+diff --git a/security/keys/key.c b/security/keys/key.c
+index 5c0c7df833f8a..5f103b2713c64 100644
+--- a/security/keys/key.c
++++ b/security/keys/key.c
+@@ -294,6 +294,7 @@ struct key *key_alloc(struct key_type *type, const char *desc,
+ 	key->uid = uid;
+ 	key->gid = gid;
+ 	key->perm = perm;
++	key->expiry = TIME64_MAX;
+ 	key->restrict_link = restrict_link;
+ 	key->last_used_at = ktime_get_real_seconds();
+ 
+@@ -463,10 +464,7 @@ static int __key_instantiate_and_link(struct key *key,
+ 			if (authkey)
+ 				key_invalidate(authkey);
+ 
+-			if (prep->expiry != TIME64_MAX) {
+-				key->expiry = prep->expiry;
+-				key_schedule_gc(prep->expiry + key_gc_delay);
+-			}
++			key_set_expiry(key, prep->expiry);
+ 		}
+ 	}
+ 
+@@ -606,8 +604,7 @@ int key_reject_and_link(struct key *key,
+ 		atomic_inc(&key->user->nikeys);
+ 		mark_key_instantiated(key, -error);
+ 		notify_key(key, NOTIFY_KEY_INSTANTIATED, -error);
+-		key->expiry = ktime_get_real_seconds() + timeout;
+-		key_schedule_gc(key->expiry + key_gc_delay);
++		key_set_expiry(key, ktime_get_real_seconds() + timeout);
+ 
+ 		if (test_and_clear_bit(KEY_FLAG_USER_CONSTRUCT, &key->flags))
+ 			awaken = 1;
+@@ -722,16 +719,14 @@ struct key_type *key_type_lookup(const char *type)
+ 
+ void key_set_timeout(struct key *key, unsigned timeout)
+ {
+-	time64_t expiry = 0;
++	time64_t expiry = TIME64_MAX;
+ 
+ 	/* make the changes with the locks held to prevent races */
+ 	down_write(&key->sem);
+ 
+ 	if (timeout > 0)
+ 		expiry = ktime_get_real_seconds() + timeout;
+-
+-	key->expiry = expiry;
+-	key_schedule_gc(key->expiry + key_gc_delay);
++	key_set_expiry(key, expiry);
+ 
+ 	up_write(&key->sem);
+ }
+diff --git a/security/keys/proc.c b/security/keys/proc.c
+index d0cde6685627f..4f4e2c1824f18 100644
+--- a/security/keys/proc.c
++++ b/security/keys/proc.c
+@@ -198,7 +198,7 @@ static int proc_keys_show(struct seq_file *m, void *v)
+ 
+ 	/* come up with a suitable timeout value */
+ 	expiry = READ_ONCE(key->expiry);
+-	if (expiry == 0) {
++	if (expiry == TIME64_MAX) {
+ 		memcpy(xbuf, "perm", 5);
+ 	} else if (now >= expiry) {
+ 		memcpy(xbuf, "expd", 5);
+-- 
+2.43.0
+
+
+
 
