@@ -1,115 +1,205 @@
-Return-Path: <netdev+bounces-60626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FE5D8206B4
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 15:14:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5796A8206BB
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 15:18:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C40ECB20DCE
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 14:14:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D69E31F21806
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 14:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FFE8BED;
-	Sat, 30 Dec 2023 14:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C008BF6;
+	Sat, 30 Dec 2023 14:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4V9C77n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8mrjQsG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC0DB642;
-	Sat, 30 Dec 2023 14:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212308F44;
+	Sat, 30 Dec 2023 14:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-67fa018c116so44140686d6.3;
-        Sat, 30 Dec 2023 06:14:32 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40d5b89e2bfso35423645e9.0;
+        Sat, 30 Dec 2023 06:18:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703945671; x=1704550471; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mcI8rtnO2DHiVZkR5J3yMIc49aRf9YUpVyZK2ry/OBk=;
-        b=m4V9C77nHpH0l3dG47aOuvtAkZT8mkVOg6M742vIP4BrTumaat/dHJycWm0JqTWaO2
-         163i/dEnQaZPxYYaAeIoqpf34poZP4JeG7suRsKummK1YrFbUeH9C9ANSkIzcGPyQAPg
-         rGzDW4lWF8zW24QBSToFudMydG8kwLbB9a82dEJ1NwPBfv+f+lTx1gNTUWbBlVdAY9FE
-         avsJFboQXFjtD8/dhlZe4Zj+MdMdUH4IRnmiWFNQkNIb25XlOjJW+WXvpYWEDc/ht1tQ
-         T7saUrTFlY/TaJPCAGWmWl+4xedxxxNA7sXPGT8Ctt8Bcx1VJkW2cfsZkS0slUTwokSC
-         1k/A==
+        d=gmail.com; s=20230601; t=1703945880; x=1704550680; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+R7KcpxGcAae88uSpjAc6ssjrL8q0BN+mmyQ7vBRz9g=;
+        b=h8mrjQsGPyYMl0cgNE5J7F7fysHKLk0NIij17zQhT1m84uMwhvmu8gXnAwoq28sCFZ
+         yHWks60XYFgDH4SIuOSbbLpKmT7WLgOfPIPBqCrXF/2Bi72GXlzuETenBzfweRv/O+MF
+         bsk5li3cMt+dCxKX1MQ0zN7wbwQ6anuGaTKnhCDjhDESJwxjWJio975sIRYqZnAkhMUv
+         rtMjpunG0qvl1bSKSBJNK50NuMvsqOWwW3oZfiPhhfgTKmne524krqDnSV8AaKCJ/cWN
+         J01Eoo4HUSKLYfQ+HQ2Q99UOtovUjjVt7HPCZVmJtaw4GZzKDZcKadvNW4RTlse7Dq58
+         FLzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703945671; x=1704550471;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mcI8rtnO2DHiVZkR5J3yMIc49aRf9YUpVyZK2ry/OBk=;
-        b=xDbZEzvR4nzm+K/t5c9OHE0SVRCKaS0fk4zV1721xU0KieXB6Vl2dDSOs5Hc1RsXBN
-         MIDQEY8n4oZS+efrwWMZKD67tfxGVFnQH995FSbB2Tx70D7WSlSbmMMZlEC6xPuDPIS/
-         7YhPLgQ5WKeddeN/g/67wyCSuWabHSPvEWkjZlX4oumT0W1qOMee0pRiXDqu6omjaSjT
-         9IkOKIK9wJSkelShmq8dGURSGE/LkMN/vVEb5l4pTJsMBfcNn3qp0kgZu+dK9XxI4B4G
-         q/gBJlgNeT20OkQaUkwMhhF1RJ7MWoEI+3j8fggB15OjDSJxyLIhfc3RcazdqWbxaHU4
-         X+WA==
-X-Gm-Message-State: AOJu0Yx3o4UcTGkdeioQLDR8lKeAZOB5+TWeFDF93qjhj5117/OoxL4n
-	qrAH9p+blLRU9ZCVpWykkzer9fZ+q+p7BPsaJcYPl66MiWU=
-X-Google-Smtp-Source: AGHT+IGvH4Zqw0uOFIcVVR+Te/cPb4vC9coHRn2BESa8IgsVLKG+Ltm3pAUsRomrOrcVISwi+eT0Ps4MHDjKGlMrVE0=
-X-Received: by 2002:a05:6214:4b84:b0:680:5f49:6912 with SMTP id
- qf4-20020a0562144b8400b006805f496912mr5223461qvb.118.1703945671025; Sat, 30
- Dec 2023 06:14:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703945880; x=1704550680;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+R7KcpxGcAae88uSpjAc6ssjrL8q0BN+mmyQ7vBRz9g=;
+        b=F6BJQ/+QSeaJb+d/p3HB3ihCxd0OzNn1jU+jLgOTGe600uGDyKQkKDOjWzLdajUvAL
+         hTwrAiLC01C1WKO913ANLeTTlB8SP3aOp4LgZ4hUWw4ih13LzF89LMCps7p5+7ixME2c
+         /LJHR/91dKCGGmRoYKt+rdLmq4MZvqVY7DYK05xwTOTr9MQ/Qk33Vh6tKCSbKv4y2h+y
+         u2tABUJnOxZIRxnRQDhem+tI68fYf9WJPDllO89AxBSPebbYmDArPUvBw4UnFBbeHK71
+         ARuYifI/LZoDoBD4QhIJbPQ/vEUgLhY5eUh7T7Hy20+1lTEUsvh+oVIs//+HpNzzBcdz
+         a/kQ==
+X-Gm-Message-State: AOJu0YyVrO2p1Wtqj5JmSEAsU1ExUBadfEyw80iQDkLqzZWqUX0z2xCC
+	m1XjpRc22O42i34GffWXa4M=
+X-Google-Smtp-Source: AGHT+IF38+ihYGwQE2jKo23+QfWOtlZ4bwiC5hfRHRKW7Fyl+Q7HblyNWNrqoYgvjxB6zQ8/dJ+5Ng==
+X-Received: by 2002:a05:600c:3581:b0:40d:5cd2:fce2 with SMTP id p1-20020a05600c358100b0040d5cd2fce2mr3059562wmq.23.1703945879967;
+        Sat, 30 Dec 2023 06:17:59 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id h15-20020a05600c314f00b0040d5f466deesm12179997wmo.38.2023.12.30.06.17.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Dec 2023 06:17:59 -0800 (PST)
+Date: Sat, 30 Dec 2023 16:17:57 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Sylvain Girard <sylvain.girard@se.com>,
+	Pascal EBERHARD <pascal.eberhard@se.com>,
+	Richard Tresidder <rtresidd@electromag.com.au>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Subject: Re: [PATCH net 1/1] net: stmmac: Prevent DSA tags from breaking COE
+Message-ID: <20231230141757.vof2lle75vusahgf@skbuf>
+References: <20231218162326.173127-1-romain.gantois@bootlin.com>
+ <20231218162326.173127-2-romain.gantois@bootlin.com>
+ <20231219122034.pg2djgrosa4irubh@skbuf>
+ <3b53aa8a-73e9-9260-f05b-05dac80a4276@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
- <ZY7omD5OBLUg6pyx@duo.ucw.cz> <CAK2bqVLBZvU2fVfY4bkFrU=4X+W4O3f5pbTdeQjMW=W2sGWpeQ@mail.gmail.com>
- <20231229172823.GC148343@mit.edu>
-In-Reply-To: <20231229172823.GC148343@mit.edu>
-From: Chris Rankin <rankincj@gmail.com>
-Date: Sat, 30 Dec 2023 14:14:20 +0000
-Message-ID: <CAK2bqVJ-odOQP6jHQJr6Xuyiw26C3RLzuFJt0NbANDY=0sO3qA@mail.gmail.com>
-Subject: Re: Does Linux still support UP?
-To: netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3b53aa8a-73e9-9260-f05b-05dac80a4276@bootlin.com>
 
-Yes, the bright spots are my phone's flash. But I did check the images
-to ensure that their information was still legible before posting
-them.
+On Fri, Dec 29, 2023 at 05:11:48PM +0100, Romain Gantois wrote:
+> Thanks for telling me about DSA_LOOP, I've tested several DSA tagging protocols 
+> with the RZN1 GMAC1 hardware using this method. Here's what I found in a 
+> nutshell:
 
-Image resolution is 4128x2322, which should be more than adequate for
-zooming in.
+Good job exploring the complexity of the problem in depth.
 
-On Fri, 29 Dec 2023 at 17:28, Theodore Ts'o <tytso@mit.edu> wrote:
->
-> On Fri, Dec 29, 2023 at 04:03:56PM +0000, Chris Rankin wrote:
-> >
-> > I have already attached as much information as I am *ever* likely to
-> > be able to extract about this problem to the Bugzilla ticket.
->
-> In addition to doing a bisection, something else you might want to
-> try, since in the bugzilla you have hypothesized that it might be a
-> bug in the e100 driver, is to try building a kernel without the driver
-> configured, and see if that makes the kernel not hang.  If it does,
-> then it's likely that the problem is either in the e100 driver, or
-> maybe somewhere in the networking stack --- although in that case it's
-> more likely someone else would have noticed.
->
-> Something else you might try is to connect up a serial console, so you
-> can get the full output from sysrq output.  The other advantage of
-> using a serial console is people are much more likely to scan a text
-> file with the consoles, as opposed to downloading and trying to make
-> sense of the screen snapshots.  (BTW, was the flash enabled on your
-> cell phone?  The bright white spot in the middle of the screen makes
-> it very hard to read.)
->
-> I'd also try sysrq-l (show backtrace for all active CPU's), so you can
-> see where the kernel is actually hanging.
->
-> For better or for worse, support for old hardware is a volunteer
-> effort, so owners of the said old hardware need to do a bunch of the
-> leg work.  Or if you can have a paid support contract, maybe you can
-> pay someone to gather the detail, but when you say "is feature X
-> supported" in an open source project, that has a different meaning
-> from a commercial software product.
->
->                                                 - Ted
+> For tagging protocols that change the EtherType field in the MAC header (e.g. 
+> DSA_TAG_PROTO_(DSA/EDSA/BRCM/MTK/RTL4C_A/SJA1105): On TX the tagged frames are 
+> almost always ignored by the checksum offload engine and IP header checker of 
+> the MAC device. I say "almost always" because there is an 
+> unlikely but nasty corner case where a DSA tag can be identical to an IP 
+> EtherType value. In these cases, the frame will likely fail IP header checks 
+> and be dropped by the MAC.
+
+Yes, there are a few poorly designed DSA tagging formats where arbitrary
+fields overlap with what the conduit interface sees as the EtherType field.
+We don't design the tagging formats, as they are proprietary (except for those
+derived from tag_8021q), we just support them. In some cases where the
+switch has permitted that, we have implemented dynamic changing of
+tagging protocols (like 'echo edsa > /sys/class/net/eth0/dsa/tagging')
+in order to increase the compatibility between a particular switch and
+its conduit interface. And where the compatibility with the default
+tagging protocol was beyond broken, we accepted an alternative one
+through the 'dsa-tag-protocol' device tree property.
+
+> Ignoring these corner cases, the DSA frames will egress with a partial 
+> checksum and be dropped by the recipient. On RX, these frames will, once again, 
+> not be detected as IP frames by the MAC. So they will be transmitted to the CPU. 
+> However, the stmmac driver will assume (wrongly in this case) that
+> these frames' checksums have been verified by the MAC. So it will set 
+> CHECKSUM_UNECESSARY:
+> 
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L5493
+>  
+> And so the IP/TCP checksums will not be checked at all, which is not
+> ideal.
+
+Yup, this all stems from the fact that DSA inherits the checksum offload
+features of the conduit (stmmac) from its vlan_features. People think
+that vlan_features are inherited only by VLAN upper interfaces, but that
+is not the case. Confusingly, in some cases, offloading NETIF_F_IP_CSUM |
+NETIF_F_IPV6_CSUM really does work (Broadcom conduit + Broadcom switch,
+Marvell conduit + Marvell switch, etc), so we can't remove this mechanism.
+But it uncovers lack of API compliance in drivers such as the stmmac,
+which is why it is a fragile mechanism.
+
+> There are other DSA tagging protocols which cause different issues. For example 
+> DSA_TAG_PROTO_BRCM_PREPEND, which seems to offset the whole MAC header, and 
+> DSA_TAG_PROTO_LAN9303 which sets ETH_P_8021Q as its EtherType. I haven't dug too 
+> deeply on these issues yet, since I'd rather deal with the checksumming issue 
+> before getting distracted by VLAN offloading and other stuff.
+
+I agree that what brcm-prepend does - shifting the entire frame to the
+right by 4 octets - sounds problematic in general (making the conduit
+see the EtherType as octets [3:2] of the original MAC SA). But you also
+need to take a look at where those protocols are used, and if that is
+relevant in any way to the stmmac.
+
+	/* Broadcom BCM58xx chips have a flow accelerator on Port 8
+	 * which requires us to use the prepended Broadcom tag type
+	 */
+	if (dev->chip_id == BCM58XX_DEVICE_ID && port == B53_CPU_PORT) {
+		dev->tag_protocol = DSA_TAG_PROTO_BRCM_PREPEND;
+		goto out;
+	}
+
+From what I understand, DSA_TAG_PROTO_BRCM_PREPEND is only used
+internally within Broadcom SoCs, so it seems likely that it's not
+designed with generic compatibility in mind.
+
+As for DSA_TAG_PROTO_LAN9303, let me guess what the problem was. TX was
+fine, but on RX, the packets got dropped in hardware before they even
+reached the stmmac driver, because it declares NETIF_F_HW_VLAN_CTAG_FILTER |
+NETIF_F_HW_VLAN_STAG_FILTER as features, and the DSA tags effectively
+look like unregistered VLAN traffic.
+
+That is certainly an area where the lan9303 support can be improved.
+Other VLAN-based taggers like tag_8021q perform vlan_vid_add() calls on
+the conduit interface so that it won't drop the traffic even when it
+uses hardware VLAN filtering.
+
+> Among the tagging protocols I tested, the only one that didn't cause any issues 
+> was DSA_TAG_PROTO_TRAILER, which only appends stuff to the frame.
+
+It's very curious that you say this. Tail taggers are notoriously
+problematic, because while the conduit will perform the checksum offload
+function on the packets, the checksum calculation goes until the very end
+of the frame. Thus, that checksum will be wrong after the switch consumes
+the tail tag (and does not update the L4 checksum).
+
+There is no way to overcome that except to not inherit any checksum
+offload features for tail taggers. But that would break some other thing,
+so we opted for having this line in the xmit procedure of tail taggers:
+
+	if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))
+		return NULL;
+
+But apparently we have been inconsistent in applying this to trailer_xmit()
+as well. So DSA_TAG_PROTO_TRAILER should actually be a case of "checksum
+is computed, but is incorrect after tag stripping", but you say that it
+was the only one that worked fine.
+
+> TLDR: The simplest solution seems to be to modify the stmmac TX and RX paths to 
+> disable checksum offloading for frames that have a non-IP ethertype in 
+> their MAC header. This will fix the checksum situation for DSA tagging protocols 
+> that set non-IP and non-8021Q EtherTypes. Some edge cases like 
+> DSA_TAG_PROTO_BRCM_PREPEND and DSA_TAG_PROTO_LAN9303 will require a completely 
+> different solution if we want these MAC devices to handle them properly.
+> Please share any thoughts you might have on this suggestion.
+
+I think the overall idea is correct, with the small mentions of "let's
+ignore brcm-prepend" and "lan9303 should work, maybe it's just a case of
+disabling the VLAN filtering features through ethtool and testing again?".
 
