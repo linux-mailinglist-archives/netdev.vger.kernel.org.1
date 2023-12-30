@@ -1,221 +1,145 @@
-Return-Path: <netdev+bounces-60612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA7E820377
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 04:16:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD2A82038B
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 05:13:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CE37B21A85
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 03:15:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CF7B1F21971
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 04:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043DE4420;
-	Sat, 30 Dec 2023 03:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9F61115;
+	Sat, 30 Dec 2023 04:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oKxfJHLV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lBhBP9UI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB124416;
-	Sat, 30 Dec 2023 03:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3BU3DREf006099;
-	Sat, 30 Dec 2023 03:15:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=8c0GH8dqUCpd9jsZDZf2CgJ01L5NHGOI5uNMKuoPtrs=; b=oK
-	xfJHLVSGmAr819OJMj2iXNSnaDhkOCMplbjA9+B95s070mQTFKTvE+m/Bcc86Ngz
-	Fke3JoarvRBBpfn+ySI3Ef46EkTkMZgg/gXRZ46puMmYKtwwTHUWIPgLCJJrNC+M
-	KUgR5+V9L2mh8WYXLy+HgLeRTD2M/upmmGOzuXQAv27ti7JiV/4um0FRrYzUGDod
-	Bw1Ou8tQp0CTVXKc882eAFSg+9M47SM2qexDp4dbV31xe9pGJc9BLEhdg2IFTpos
-	lng64Qf8vwOYkoUX506E6UxTrqiOfRMxCK4IjcooNcaSLAL9yp9ql5/Mn0DiPZN5
-	DTstNnw4wkbG5zww62Qg==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3v9655bxtm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 30 Dec 2023 03:15:16 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3BU3FFjd029089
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 30 Dec 2023 03:15:15 GMT
-Received: from [10.253.33.123] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 29 Dec
- 2023 19:15:11 -0800
-Message-ID: <f15dee29-662b-4f8f-ad88-87b1548658d7@quicinc.com>
-Date: Sat, 30 Dec 2023 11:15:08 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C5E1367;
+	Sat, 30 Dec 2023 04:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-594e9135d82so1306151eaf.2;
+        Fri, 29 Dec 2023 20:12:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703909577; x=1704514377; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ejfueo89WFs/oFJaApIa/W2r85V6qCPW0jGnmXIzsAU=;
+        b=lBhBP9UIuq8HjwWExl9FDGTANls96UOzuzVN0Lgc0MY9UiYtXxuSc8j+57ET31kq0B
+         xg9PVHmQCIa9vsuDqcKgnsaBkD7A4Wg67UGBrTvBb6TJA07wm+wc//1DjIYDTS7tJKNK
+         4G4mZ8k42/66U0iPtASc/thjfjsmFlWyq1Lv3TwSV7NebNyJpnPUlbC0Ho7+O6t3Hr+9
+         G1Wq/wDNnjzZMEOzMqIKjNyFyXkR98jawiME+owq42ckeQArto3EBfIl86grtYlJG1sj
+         S+vZGoWqh412Yu5GMkiTXKLCfhWeL3kkNi1pYyah6ctint061Th+h/rTw/iL1Z8YID2b
+         cXbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703909577; x=1704514377;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ejfueo89WFs/oFJaApIa/W2r85V6qCPW0jGnmXIzsAU=;
+        b=N/2X80cE6zshVEBcZwWenxJHca/lBiDEs4UVk7SWw6C7amWVpIYcjJSPlAXk7oCww5
+         vvbBMrCLAYrhls7rvCJYGg2x+HZHdeWFujMgQvAYKTOqJfEnPEEcSsLrC1Y8tyBni+km
+         eeMJ0siX/hJQ9L+u+gohpdGD8+/vOM51B1bfbIwXb4hjrZBSnMBHfAXHxc1z4HwmWV4J
+         KjUd/xijKvzZmDERZ1yt4XaxcNo84FJsg9k1QBpML1P+9sbPAOc/hCvZyrg+eBErf8Lu
+         DWsjzpH39jPGYypO15LFeh3i1A9ymFwK6vdrhb17smiFvzkOGlWjMlhJeG6YN8fNCm3f
+         qpAg==
+X-Gm-Message-State: AOJu0Yx9BYN7iW+NJ3hhoRqiV84FccyqOkx+zJAF5SWK6yBoEH5/Nl9/
+	joyjfZJgZxXtvhoiURD59B66mMUEwU5mR8MZYTjDoxT+
+X-Google-Smtp-Source: AGHT+IGs/93N6pvlZGycPQsHoufKzGa1iXlpHFU278prPiJa7vjr78QNNTc2J+L53QPoGAmP3vVaNU+gjcPX/5H9hMY=
+X-Received: by 2002:a05:6820:2221:b0:591:a34c:f064 with SMTP id
+ cj33-20020a056820222100b00591a34cf064mr7898267oob.6.1703909577411; Fri, 29
+ Dec 2023 20:12:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/5] net: mdio: ipq4019: move eth_ldo_rdy before MDIO
- bus register
-Content-Language: en-US
-To: Konrad Dybcio <konrad.dybcio@linaro.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_srichara@quicinc.com>
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
- <20231225084424.30986-2-quic_luoj@quicinc.com>
- <aa495827-4d20-4b66-8496-eef378d8f7c1@linaro.org>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <aa495827-4d20-4b66-8496-eef378d8f7c1@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: rvtaT6WZ0fHTvQlQchC6aH1RXiY0VpFH
-X-Proofpoint-ORIG-GUID: rvtaT6WZ0fHTvQlQchC6aH1RXiY0VpFH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=999 spamscore=0 phishscore=0 mlxscore=0 adultscore=0
- malwarescore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2311290000 definitions=main-2312300025
+References: <CAMMLpeTCZDakqdkxm+jvQHxbRXhCYd4_PK+VVqMAmZHjSPuPRw@mail.gmail.com>
+ <20231229163339.2716-1-dan@danm.net>
+In-Reply-To: <20231229163339.2716-1-dan@danm.net>
+From: Alex Henrie <alexhenrie24@gmail.com>
+Date: Fri, 29 Dec 2023 21:12:21 -0700
+Message-ID: <CAMMLpeTdYhd=7hhPi2Y7pwdPCgnnW5JYh-bu3hSc7im39uxnEA@mail.gmail.com>
+Subject: Re: [REGRESSION] net/ipv6/addrconf: Temporary addresses with short
+ lifetimes generating when they shouldn't, causing applications to fail
+To: Dan Moulding <dan@danm.net>
+Cc: bagasdotme@gmail.com, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, regressions@lists.linux.dev, 
+	Jiri Kosina <jikos@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Dec 29, 2023 at 9:33=E2=80=AFAM Dan Moulding <dan@danm.net> wrote:
+>
+> I think a maintainer will probably need to make a call here and decide
+> how to proceed.
+>
+> > TEMP_PREFERRED_LIFETIME is an administratively set variable: The user
+> > can change it to whatever they want whenever they want, and the
+> > operating system can adjust it automatically too.
+>
+> Agreed. And the behavior it seems you really want is to prevent the
+> user from administratively setting it to a value that is lower than
+> REGEN_ADVANCE, so that it won't stop generating new temporary
+> addresses altogether.
+>
+> But preventing the user from configuring it to a value that is too low
+> is different from generating new temporary addresses with preferred
+> lifetimes that are greater than the currently configured value of
+> TEMP_PREFERRED_LIFETIME. I still believe it would be better, and would
+> be in conformance with the RFC, to simply not allow the user to
+> configure a too-short TEMP_PREFERRED_LIFETIME instead of tinkering
+> with the lifetimes of generated temporary addresses.
 
+In RFC 4941, REGEN_ADVANCE is a constant value of 5 seconds.[1]
+However, Linux uses a variable regen_advance that depends on the
+Retrans Timer value in the router advertisement.[2][3][4] Let's
+imagine that when the user tries to set
+/proc/sys/net/ipv6/conf/*/temp_prefered_lft to 3 seconds, they get an
+error message that says "Sorry, the network requires at least 4
+seconds." After a few minutes, network conditions change, and now 5
+seconds is the minimum. Should the kernel just give up on using
+private addresses? Or, the minimum might drop to 3 seconds, which is
+what the user really wanted. Should the operating system tell the user
+to change the value?
 
-On 12/28/2023 5:49 PM, Konrad Dybcio wrote:
-> On 25.12.2023 09:44, Luo Jie wrote:
->> The ethernet LDO provides the clock for the ethernet PHY that
->> is connected with PCS, each LDO enables the clock output to
->> each PCS, after the clock output enablement, the PHY GPIO reset
->> can take effect.
->>
->> For the PHY taking the MDIO bus level GPIO reset, the ethernet
->> LDO should be enabled before the MDIO bus register.
->>
->> For example, the qca8084 PHY takes the MDIO bus level GPIO
->> reset for quad PHYs, there is another reason for qca8084 PHY
->> using MDIO bus level GPIO reset instead of PHY level GPIO
->> reset as below.
->>
->> The work sequence of qca8084:
->> 1. enable ethernet LDO.
->> 2. GPIO reset on quad PHYs.
->> 3. register clock provider based on MDIO device of qca8084.
->> 4. PHY probe function called for initializing common clocks.
->> 5. PHY capabilities acquirement.
->>
->> If qca8084 takes PHY level GPIO reset in the step 4, the clock
->> provider of qca8084 can't be registered correctly, since the
->> clock parent(reading the current qca8084 hardware registers in
->> step 3) of the registered clocks is deserted after GPIO reset.
->>
->> There are two PCS(UNIPHY) supported in SOC side on ipq5332,
->> and three PCS(UNIPHY) supported on ipq9574.
->>
->> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
->> ---
->>   drivers/net/mdio/mdio-ipq4019.c | 51 +++++++++++++++++++++------------
->>   1 file changed, 32 insertions(+), 19 deletions(-)
->>
->> diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
->> index abd8b508ec16..5273864fabb3 100644
->> --- a/drivers/net/mdio/mdio-ipq4019.c
->> +++ b/drivers/net/mdio/mdio-ipq4019.c
->> @@ -37,9 +37,12 @@
->>   
->>   #define IPQ_PHY_SET_DELAY_US	100000
->>   
->> +/* Maximum SOC PCS(uniphy) number on IPQ platform */
->> +#define ETH_LDO_RDY_CNT				3
->> +
->>   struct ipq4019_mdio_data {
->> -	void __iomem	*membase;
->> -	void __iomem *eth_ldo_rdy;
->> +	void __iomem *membase;
->> +	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
->>   	struct clk *mdio_clk;
->>   };
->>   
->> @@ -206,19 +209,8 @@ static int ipq4019_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
->>   static int ipq_mdio_reset(struct mii_bus *bus)
->>   {
->>   	struct ipq4019_mdio_data *priv = bus->priv;
->> -	u32 val;
->>   	int ret;
->>   
->> -	/* To indicate CMN_PLL that ethernet_ldo has been ready if platform resource 1
->> -	 * is specified in the device tree.
->> -	 */
->> -	if (priv->eth_ldo_rdy) {
->> -		val = readl(priv->eth_ldo_rdy);
->> -		val |= BIT(0);
->> -		writel(val, priv->eth_ldo_rdy);
->> -		fsleep(IPQ_PHY_SET_DELAY_US);
->> -	}
->> -
->>   	/* Configure MDIO clock source frequency if clock is specified in the device tree */
->>   	ret = clk_set_rate(priv->mdio_clk, IPQ_MDIO_CLK_RATE);
->>   	if (ret)
->> @@ -236,7 +228,7 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
->>   	struct ipq4019_mdio_data *priv;
->>   	struct mii_bus *bus;
->>   	struct resource *res;
->> -	int ret;
->> +	int ret, index;
->>   
->>   	bus = devm_mdiobus_alloc_size(&pdev->dev, sizeof(*priv));
->>   	if (!bus)
->> @@ -252,11 +244,32 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
->>   	if (IS_ERR(priv->mdio_clk))
->>   		return PTR_ERR(priv->mdio_clk);
->>   
->> -	/* The platform resource is provided on the chipset IPQ5018 */
->> -	/* This resource is optional */
->> -	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
->> -	if (res)
->> -		priv->eth_ldo_rdy = devm_ioremap_resource(&pdev->dev, res);
->> +	/* These platform resources are provided on the chipset IPQ5018 or
->> +	 * IPQ5332.
->> +	 */
->> +	/* This resource are optional */
->> +	for (index = 0; index < ETH_LDO_RDY_CNT; index++) {
->> +		res = platform_get_resource(pdev, IORESOURCE_MEM, index + 1);
->> +		if (res) {
-> if (!res)
-> 	break
+What I think you're getting at is that Linux might be violating the
+spec by allowing TEMP_PREFERRED_LIFETIME to be less than 5 seconds.
+The RFC says: [5]
 
-will update this.
+> When processing a Router Advertisement with a Prefix
+> Information option carrying a global scope prefix for the purposes of
+> address autoconfiguration (i.e., the A bit is set), the node MUST
+> perform the following steps:
 
-> 
->> +			priv->eth_ldo_rdy[index] = devm_ioremap(&pdev->dev,
->> +								res->start,
->> +								resource_size(res));
->> +
->> +			/* The ethernet LDO enable is necessary to reset PHY
->> +			 * by GPIO, some PHY(such as qca8084) GPIO reset uses
->> +			 * the MDIO level reset, so this function should be
->> +			 * called before the MDIO bus register.
->> +			 */
->> +			if (priv->eth_ldo_rdy[index]) {
->> +				u32 val;
->> +
->> +				val = readl(priv->eth_ldo_rdy[index]);
->> +				val |= BIT(0);
->> +				writel(val, priv->eth_ldo_rdy[index]);
->> +				fsleep(IPQ_PHY_SET_DELAY_US);
-> fsleep should only be used when the argument is variable
-> 
-> Konrad
+> 5.  A temporary address is created only if this calculated Preferred
+>     Lifetime is greater than REGEN_ADVANCE time units.
 
-Ok, will update to use usleep_range, Thanks.
+The right solution might be to make Linux use a constant value for
+REGEN_ADVANCE instead of a variable. I think that's how it used to
+work before commit 76506a986dc3 (IPv6: fix DESYNC_FACTOR,
+2016-10-13).[6] If regen_advance can't change depending on network
+conditions then it can't cause private address generation to randomly
+stop working. I don't understand why the protocol would require
+REGEN_ADVANCE to be a constant, but interpreting the RFC literally, it
+would seem that Linux is technically non-compliant.
+
+-Alex
+
+[1] https://datatracker.ietf.org/doc/html/rfc4941#section-5
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/net/ipv6/addrconf.c?h=3Dv6.7-rc7#n1377
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/net/ipv6/ndisc.c?h=3Dv6.7-rc7#n1438
+[4] https://datatracker.ietf.org/doc/html/rfc4861#section-4.2
+[5] https://datatracker.ietf.org/doc/html/rfc4941#section-3.3
+[6] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D76506a986dc31394fd1f2741db037d29c7e57843
 
