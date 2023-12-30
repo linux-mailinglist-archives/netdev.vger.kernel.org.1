@@ -1,132 +1,115 @@
-Return-Path: <netdev+bounces-60625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18CC58205E7
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 13:29:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE5D8206B4
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 15:14:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86047282021
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 12:29:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C40ECB20DCE
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 14:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8C279EF;
-	Sat, 30 Dec 2023 12:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FFE8BED;
+	Sat, 30 Dec 2023 14:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aTe2xLIg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4V9C77n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54038F45
-	for <netdev@vger.kernel.org>; Sat, 30 Dec 2023 12:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5efb0e180f0so13986817b3.1
-        for <netdev@vger.kernel.org>; Sat, 30 Dec 2023 04:29:07 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC0DB642;
+	Sat, 30 Dec 2023 14:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-67fa018c116so44140686d6.3;
+        Sat, 30 Dec 2023 06:14:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703939347; x=1704544147; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xi9JGb5m/P41q0mbnGu3AJyPrO2SRA6tp9e9eIe+k6U=;
-        b=aTe2xLIgFvVLdijVNg36ZdmsjWmtTxWFm22rR5pJ1FVweg1ezARmcwnVN1e4BN0VAZ
-         NIrRpOkKtdMJ7QxckiAqly/8Npu8oVi/fsKHUM4qYcIzPAZKVtCDp+yVjPVU/mpqLOz7
-         i8xDnh+NOGjeRYR4qeGZN7bPM0RZHFo+SNnBd5sOMnegKPZThCtz39g9dIbtmUOOCF+8
-         SqlNfuYLCjyrtB1TG7BwHx7OzotnAXDUZeAdJ5xewUKVYipMvfHRohQJEiNm5ENjxANW
-         wvaNJ+00E4svGQOyrHH3AiDUER8RXMTRE/SKkcqWeAnsov3JPoCsq/hLcg9RvEdsISOn
-         MaVQ==
+        d=gmail.com; s=20230601; t=1703945671; x=1704550471; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mcI8rtnO2DHiVZkR5J3yMIc49aRf9YUpVyZK2ry/OBk=;
+        b=m4V9C77nHpH0l3dG47aOuvtAkZT8mkVOg6M742vIP4BrTumaat/dHJycWm0JqTWaO2
+         163i/dEnQaZPxYYaAeIoqpf34poZP4JeG7suRsKummK1YrFbUeH9C9ANSkIzcGPyQAPg
+         rGzDW4lWF8zW24QBSToFudMydG8kwLbB9a82dEJ1NwPBfv+f+lTx1gNTUWbBlVdAY9FE
+         avsJFboQXFjtD8/dhlZe4Zj+MdMdUH4IRnmiWFNQkNIb25XlOjJW+WXvpYWEDc/ht1tQ
+         T7saUrTFlY/TaJPCAGWmWl+4xedxxxNA7sXPGT8Ctt8Bcx1VJkW2cfsZkS0slUTwokSC
+         1k/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703939347; x=1704544147;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xi9JGb5m/P41q0mbnGu3AJyPrO2SRA6tp9e9eIe+k6U=;
-        b=QuT82igYcmGgEREk5aE1zQ0WvAkPAHQ6mHbLOmBirG1t3mziIMM6Iu6OlBCQAa/y+S
-         bJeQ4Gx5HHKKPwduB0St3ErLctU3yvoXPJUQ5Ukers8ZrJmZClhZOW+yREwkvKRnxdi6
-         XrW1Fu9eo0ePcwbNtzJZ0Hz0RcdxdivEURwVlkD6JjNeTheCWuvbBsXn9cLbLLFeW8ZB
-         vD/t90kUVA8tROrgf+D2e0u4W2od9V+82/yVoORU2JOnH58HfeZBIzFhQ0bUNdIIvDQe
-         2dR/ShPkFLKFK0K/6LnziXkj4HS6LYKDNxDlGsHuDuGTMn+t612XeghyTGRxgOjWi7ca
-         CU4g==
-X-Gm-Message-State: AOJu0YzqEjX+fLzwSATab3N1ovftOfeTxMbJknRls5k8iyOZ1wY4TxHn
-	shKNfU/xzBWye0uLXHwVKUKML9ySxE345zwnSTSsQp/ueUTEiA==
-X-Google-Smtp-Source: AGHT+IFfrvzH9/iGLgpKmPh41MR5pwawKxrdLCjllXDkv3P1+Zj26CtfQfMdkxm8SoP/n2aXquXlDe2uJhXqR8pjIFg=
-X-Received: by 2002:a81:9987:0:b0:5ed:d4c8:df55 with SMTP id
- q129-20020a819987000000b005edd4c8df55mr4148754ywg.2.1703939346587; Sat, 30
- Dec 2023 04:29:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703945671; x=1704550471;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mcI8rtnO2DHiVZkR5J3yMIc49aRf9YUpVyZK2ry/OBk=;
+        b=xDbZEzvR4nzm+K/t5c9OHE0SVRCKaS0fk4zV1721xU0KieXB6Vl2dDSOs5Hc1RsXBN
+         MIDQEY8n4oZS+efrwWMZKD67tfxGVFnQH995FSbB2Tx70D7WSlSbmMMZlEC6xPuDPIS/
+         7YhPLgQ5WKeddeN/g/67wyCSuWabHSPvEWkjZlX4oumT0W1qOMee0pRiXDqu6omjaSjT
+         9IkOKIK9wJSkelShmq8dGURSGE/LkMN/vVEb5l4pTJsMBfcNn3qp0kgZu+dK9XxI4B4G
+         q/gBJlgNeT20OkQaUkwMhhF1RJ7MWoEI+3j8fggB15OjDSJxyLIhfc3RcazdqWbxaHU4
+         X+WA==
+X-Gm-Message-State: AOJu0Yx3o4UcTGkdeioQLDR8lKeAZOB5+TWeFDF93qjhj5117/OoxL4n
+	qrAH9p+blLRU9ZCVpWykkzer9fZ+q+p7BPsaJcYPl66MiWU=
+X-Google-Smtp-Source: AGHT+IGvH4Zqw0uOFIcVVR+Te/cPb4vC9coHRn2BESa8IgsVLKG+Ltm3pAUsRomrOrcVISwi+eT0Ps4MHDjKGlMrVE0=
+X-Received: by 2002:a05:6214:4b84:b0:680:5f49:6912 with SMTP id
+ qf4-20020a0562144b8400b006805f496912mr5223461qvb.118.1703945671025; Sat, 30
+ Dec 2023 06:14:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
- <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
- <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
- <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
- <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com>
- <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
- <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com> <CAJq09z4YSGyU6QuZL1uEB9vH39-WbR2dZhy7MiD=5yZb0Urz1Q@mail.gmail.com>
-In-Reply-To: <CAJq09z4YSGyU6QuZL1uEB9vH39-WbR2dZhy7MiD=5yZb0Urz1Q@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 30 Dec 2023 13:28:54 +0100
-Message-ID: <CACRpkdZOKz-DdZgwwxj9FsJZ+GNMCXUjTDLo5wVgjw5OrfOZQA@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, Ansuel Smith <ansuelsmth@gmail.com>, 
-	Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <CAK2bqVKCdaD6-PZi6gXhf=9CiKGhxQM_UHyKV_onzDPnhbAmvw@mail.gmail.com>
+ <ZY7omD5OBLUg6pyx@duo.ucw.cz> <CAK2bqVLBZvU2fVfY4bkFrU=4X+W4O3f5pbTdeQjMW=W2sGWpeQ@mail.gmail.com>
+ <20231229172823.GC148343@mit.edu>
+In-Reply-To: <20231229172823.GC148343@mit.edu>
+From: Chris Rankin <rankincj@gmail.com>
+Date: Sat, 30 Dec 2023 14:14:20 +0000
+Message-ID: <CAK2bqVJ-odOQP6jHQJr6Xuyiw26C3RLzuFJt0NbANDY=0sO3qA@mail.gmail.com>
+Subject: Re: Does Linux still support UP?
+To: netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Dec 30, 2023 at 6:19=E2=80=AFAM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
+Yes, the bright spots are my phone's flash. But I did check the images
+to ensure that their information was still legible before posting
+them.
 
-> I took a look at the LED code. It looks like you got it a little bit wron=
-g.
+Image resolution is 4128x2322, which should be more than adequate for
+zooming in.
 
-You are right...
-
-> If LEDs are not disabled, it will use the RTL8366RB_LED_FORCE for all
-> 4 LED groups. That RTL8366RB_LED_FORCE keeps the LEDs on. I would use
-> RTL8366RB_LED_LINK_ACT by default to make it blink on link activity
-> (or make it configurable as the comment suggests) but it is not wrong.
-> I cannot evaluate the RTL8366RB_INTERRUPT_CONTROL_REG usage when you
-> disable the LEDs but it seems to be odd.
-
-The problem is that since I don't have a device with LEDs connected
-to tHE RTL8366RB it is all just dry coding.
-
-I would suggest if you can test it just make a basic patch that will
-at least turn on the LEDs to some default setting that works for
-you?
-
-> I though that maybe we could setup a LED driver to expose the LEDs
-> status in sysfs. However, I'm not sure it is worth it. If you change a
-> LED behavior, it would break the HW triggering rule for all the group.
-> I'm not sure the LED API is ready to expose LEDs with related fate. It
-> would, indeed, be useful as a readonly source or just to
-> enable/disable a LED.
-
-The LED subsystem supports hardware triggering etc thanks to the
-elaborate work by Christian (ansuel). You can see an example of how
-this is done in:
-drivers/net/dsa/qca/qca8k-leds.c
-
-Christian also extended the LEDs subsystem with the necessary
-callbacks to support HW-backed LED control.
-
-This can be used already to achieve HW triggers for the LEDs
-from sysfs. (See callbacks .hw_control_is_supported,
-.hw_control_set etc etc).
-
-I was working to implement this for the Marvell switches but Andrew
-wanted to do some more structured approach with a LED library
-for DSA switches.
-
-Yours,
-Linus Walleij
+On Fri, 29 Dec 2023 at 17:28, Theodore Ts'o <tytso@mit.edu> wrote:
+>
+> On Fri, Dec 29, 2023 at 04:03:56PM +0000, Chris Rankin wrote:
+> >
+> > I have already attached as much information as I am *ever* likely to
+> > be able to extract about this problem to the Bugzilla ticket.
+>
+> In addition to doing a bisection, something else you might want to
+> try, since in the bugzilla you have hypothesized that it might be a
+> bug in the e100 driver, is to try building a kernel without the driver
+> configured, and see if that makes the kernel not hang.  If it does,
+> then it's likely that the problem is either in the e100 driver, or
+> maybe somewhere in the networking stack --- although in that case it's
+> more likely someone else would have noticed.
+>
+> Something else you might try is to connect up a serial console, so you
+> can get the full output from sysrq output.  The other advantage of
+> using a serial console is people are much more likely to scan a text
+> file with the consoles, as opposed to downloading and trying to make
+> sense of the screen snapshots.  (BTW, was the flash enabled on your
+> cell phone?  The bright white spot in the middle of the screen makes
+> it very hard to read.)
+>
+> I'd also try sysrq-l (show backtrace for all active CPU's), so you can
+> see where the kernel is actually hanging.
+>
+> For better or for worse, support for old hardware is a volunteer
+> effort, so owners of the said old hardware need to do a bunch of the
+> leg work.  Or if you can have a paid support contract, maybe you can
+> pay someone to gather the detail, but when you say "is feature X
+> supported" in an open source project, that has a different meaning
+> from a commercial software product.
+>
+>                                                 - Ted
 
