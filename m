@@ -1,237 +1,178 @@
-Return-Path: <netdev+bounces-60615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E088203AB
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 06:19:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358FF8203C3
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 07:20:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF5D71C20818
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 05:19:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2583B215D7
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 06:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FC815BF;
-	Sat, 30 Dec 2023 05:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2C76D6C6;
+	Sat, 30 Dec 2023 06:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="APKe3h12"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G8tQRX16"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D868615AE;
-	Sat, 30 Dec 2023 05:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036D41FAF;
+	Sat, 30 Dec 2023 06:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ccc7d7e399so42871041fa.0;
-        Fri, 29 Dec 2023 21:19:49 -0800 (PST)
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-204301f2934so5387604fac.1;
+        Fri, 29 Dec 2023 22:20:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703913588; x=1704518388; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nv7UO7csjNz160y529e4P/Xh16i9o3WZFxaja/0pQ64=;
-        b=APKe3h12xzqb12SvSjlD2GGi3b16H1OCJ+XFqAddAxqhKlyZasKdJcj89ME5hDGrER
-         P0UR36Bvw3Jm7B/IR7Vn6c42ctNAdeyxExkek/IoL2Wbqo1i9Ha48jtuklUSb5fZ9smw
-         idpRvKm+Yryd5aGNuJ2CUbOY9IVfi9+FC9TvxgchOEys3u00fhyKxXLQ03UrO89atguE
-         By43NWc9onxLlBN1IS9bl6WBIUCW/LK7y664a2KWgupdxUw84cbpgOvY4nzVBbOeSF8b
-         dpvRBzFyrwBlw0957/JEJZ7vfePc6GumOcor9UnXVDs2Vlzc75ckJWMI4+GSLNHWsCYf
-         bQHA==
+        d=gmail.com; s=20230601; t=1703917213; x=1704522013; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zD0gbNM/UIbn0G76bHrolSGtyxKet6ZoZHv6TMp/l8A=;
+        b=G8tQRX16KBSB6lj88K91hyVSs86myy1va1Ti/8F1JjYKROOO9xzkjGb5G4ljpL0I4E
+         tqRd3gcWywwbZdl/N88XFPHjZiSYItoAvBOh/+dXXAhK+dQa/mDkhEGLknIl0lmRKWVn
+         ju3TYXgFGjla4yZ+h4IIxEPknZw6zT7i0qcrpS2MBd75CgWnNKXVGEc4IplwRObKmZn1
+         /p0l8zkNdd/+afNKp+CkOJtMG/EIO/VcXBTHoGzc2WiQ2YDC5+UCf6qCuwuSElrteKOA
+         E+eR8agxaVsKGvlGsizF1GRV4C/6Y6uNMabnd/Rah0sgh2i9A6KqrAFTG51LhWqfFdhR
+         174g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703913588; x=1704518388;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Nv7UO7csjNz160y529e4P/Xh16i9o3WZFxaja/0pQ64=;
-        b=kKYDXps5ykUfXqhESU/La3WxyX0Vs07TKwcHzvqEuEzHjlAwlOos2Z4MgbWQh/V7cE
-         fUh4KyUaYKaPqXOcHzIfrgHKPvVcGMPBxfc2EE0syK6XLp4SDjKWqG18nSpO+BBmMUXk
-         hRrxZMkCgFzngT4oKIsbqJ3rzG8eIRB967QS+mNEFBlznnDpQbOmmGYjwJJlDCi1fqvj
-         AQBDypClG1/6ZQ+Do5Twgz//4wlq1Av4eRUI671cI2hols59jW9LysFfwtVHwlT6on0/
-         vAfGN1cGd1XvwOq5wxL5zu5Z6r1T1rux8Z3cBmqh7xNZIReEHTvAElGg6fdnu7z0z1/8
-         5XgQ==
-X-Gm-Message-State: AOJu0YwVmOR3DFmeryZ2HjOHlgDGOUWFDX96jBMMZ/LzWmz51upok4Jp
-	ljcxCvFsndgdCVaYziWw4BJtWxESGxufULLTCzc=
-X-Google-Smtp-Source: AGHT+IEpz5a/cYri9HwuK0EiUNxDNfgNaTnYWMZgWHmhW8Xhf6o2WH8E9j6ZHlBpg9IbZrqeRr21tELP6o1njKx2v5I=
-X-Received: by 2002:a05:651c:10a3:b0:2cc:a51c:32ed with SMTP id
- k3-20020a05651c10a300b002cca51c32edmr4723621ljn.22.1703913587293; Fri, 29 Dec
- 2023 21:19:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703917213; x=1704522013;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zD0gbNM/UIbn0G76bHrolSGtyxKet6ZoZHv6TMp/l8A=;
+        b=G4BAwRGBnbjz9F23JdWPurO2TuxC+mmrTAZ01LdmHfJcefQBwaP5uKaQ1nB2R+UgMI
+         GrzYGI5Kxs4cVGYYdl6Ok7aVmjUxKVOK/TsJu0HJCNE+Rnsih9pAI41ikiliq79XY2Jj
+         wRON7OY+Ruwn4R4U7R1LcJxwRR5333r6MdvxR3KcByTEVsnL8h0TWjRxAkVaXwZM75Qd
+         UF6XkDBwYQ/E6ptTdGA7I/5V+BpY6DSyo4qB09ImMRdfeBRphJ1c1P2waN69lQFiTo+Q
+         IcjqDowCzfjbUIdO1OgtLumxW3ASwghRiOXsaHX8l4oCk0rLsGYNXnRzKcmr9GW5hMsY
+         cuHg==
+X-Gm-Message-State: AOJu0YyTaxDQWdxkYIyHk3MdvNk4BEa1n+sYBeeeqJBQO3rJ35TQ/Olf
+	4gWOReTSJlIH7lx9c6EIkRc=
+X-Google-Smtp-Source: AGHT+IGavIK/6vyvX/lLQaJRpYsnZcYYQzg+ku/2dTUvTSSkb7NoOscrrN0INxKZBsg24ioBg/kgfg==
+X-Received: by 2002:a05:6870:6106:b0:204:14ac:afff with SMTP id s6-20020a056870610600b0020414acafffmr16079953oae.63.1703917212899;
+        Fri, 29 Dec 2023 22:20:12 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id px9-20020a17090b270900b0028c952fd855sm5788464pjb.52.2023.12.29.22.20.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Dec 2023 22:20:11 -0800 (PST)
+Date: Sat, 30 Dec 2023 14:20:07 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Yujie Liu <yujie.liu@intel.com>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lkp@intel.com,
+	kernel test robot <oliver.sang@intel.com>
+Subject: Re: [PATCH v2 net-next] selftests/net: change shebang to bash to
+ support "source"
+Message-ID: <ZY-2lxptTmZqLfvb@Laptop-X1>
+References: <20231229131931.3961150-1-yujie.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
- <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
- <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
- <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
- <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com>
- <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com> <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
-In-Reply-To: <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sat, 30 Dec 2023 02:19:35 -0300
-Message-ID: <CAJq09z4YSGyU6QuZL1uEB9vH39-WbR2dZhy7MiD=5yZb0Urz1Q@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231229131931.3961150-1-yujie.liu@intel.com>
 
-> > [    3.976779] realtek-smi switch: missing child interrupt-controller node
-> > [    3.983455] realtek-smi switch: no interrupt support
-> > [    4.158891] realtek-smi switch: no LED for port 5
->
-> Are the LEDs working? My device has no LEDs so I have never
-> tested it, despite I coded it. (Also these days we can actually
-> support each LED individually configured from device tree using
-> the LED API, but that would be quite a bit of code, so only some
-> fun for the aspiring developer...)
+On Fri, Dec 29, 2023 at 09:19:31PM +0800, Yujie Liu wrote:
+> The patch set [1] added a general lib.sh in net selftests, and converted
+> several test scripts to source the lib.sh.
+> 
+> unicast_extensions.sh (converted in [1]) and pmtu.sh (converted in [2])
+> have a /bin/sh shebang which may point to various shells in different
+> distributions, but "source" is only available in some of them. For
+> example, "source" is a built-it function in bash, but it cannot be
+> used in dash.
+> 
+> Refer to other scripts that were converted together, simply change the
+> shebang to bash to fix the following issues when the default /bin/sh
+> points to other shells.
+> 
+> # selftests: net: unicast_extensions.sh
+> # ./unicast_extensions.sh: 31: source: not found
+> # ###########################################################################
+> # Unicast address extensions tests (behavior of reserved IPv4 addresses)
+> # ###########################################################################
+> # TEST: assign and ping within 240/4 (1 of 2) (is allowed)            [FAIL]
+> # TEST: assign and ping within 240/4 (2 of 2) (is allowed)            [FAIL]
+> # TEST: assign and ping within 0/8 (1 of 2) (is allowed)              [FAIL]
+> # TEST: assign and ping within 0/8 (2 of 2) (is allowed)              [FAIL]
+> # TEST: assign and ping inside 255.255/16 (is allowed)                [FAIL]
+> # TEST: assign and ping inside 255.255.255/24 (is allowed)            [FAIL]
+> # TEST: route between 240.5.6/24 and 255.1.2/24 (is allowed)          [FAIL]
+> # TEST: route between 0.200/16 and 245.99/16 (is allowed)             [FAIL]
+> # TEST: assign and ping lowest address (/24)                          [FAIL]
+> # TEST: assign and ping lowest address (/26)                          [FAIL]
+> # TEST: routing using lowest address                                  [FAIL]
+> # TEST: assigning 0.0.0.0 (is forbidden)                              [ OK ]
+> # TEST: assigning 255.255.255.255 (is forbidden)                      [ OK ]
+> # TEST: assign and ping inside 127/8 (is forbidden)                   [ OK ]
+> # TEST: assign and ping class D address (is forbidden)                [ OK ]
+> # TEST: routing using class D (is forbidden)                          [ OK ]
+> # TEST: routing using 127/8 (is forbidden)                            [ OK ]
+> not ok 51 selftests: net: unicast_extensions.sh # exit=1
+> 
+> v1 -> v2:
+>   - Fix pmtu.sh which has the same issue as unicast_extensions.sh,
+>     suggested by Hangbin
+>   - Change the style of the "source" line to be consistent with other
+>     tests, suggested by Hangbin
+> 
+> Link: https://lore.kernel.org/all/20231202020110.362433-1-liuhangbin@gmail.com/ [1]
+> Link: https://lore.kernel.org/all/20231219094856.1740079-1-liuhangbin@gmail.com/ [2]
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Signed-off-by: Yujie Liu <yujie.liu@intel.com>
+> ---
+>  tools/testing/selftests/net/pmtu.sh               | 4 ++--
+>  tools/testing/selftests/net/unicast_extensions.sh | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
+> index 175d3d1d773b..f10879788f61 100755
+> --- a/tools/testing/selftests/net/pmtu.sh
+> +++ b/tools/testing/selftests/net/pmtu.sh
+> @@ -1,4 +1,4 @@
+> -#!/bin/sh
+> +#!/bin/bash
+>  # SPDX-License-Identifier: GPL-2.0
+>  #
+>  # Check that route PMTU values match expectations, and that initial device MTU
+> @@ -198,7 +198,7 @@
+>  # - pmtu_ipv6_route_change
+>  #	Same as above but with IPv6
+>  
+> -source ./lib.sh
+> +source lib.sh
+>  
+>  PAUSE_ON_FAIL=no
+>  VERBOSE=0
+> diff --git a/tools/testing/selftests/net/unicast_extensions.sh b/tools/testing/selftests/net/unicast_extensions.sh
+> index b7a2cb9e7477..f52aa5f7da52 100755
+> --- a/tools/testing/selftests/net/unicast_extensions.sh
+> +++ b/tools/testing/selftests/net/unicast_extensions.sh
+> @@ -1,4 +1,4 @@
+> -#!/bin/sh
+> +#!/bin/bash
+>  # SPDX-License-Identifier: GPL-2.0
+>  #
+>  # By Seth Schoen (c) 2021, for the IPv4 Unicast Extensions Project
+> @@ -28,7 +28,7 @@
+>  # These tests provide an easy way to flip the expected result of any
+>  # of these behaviors for testing kernel patches that change them.
+>  
+> -source ./lib.sh
+> +source lib.sh
+>  
+>  # nettest can be run from PATH or from same directory as this selftest
+>  if ! which nettest >/dev/null; then
+> 
+> base-commit: cd4d7263d58ab98fd4dee876776e4da6c328faa3
+> -- 
+> 2.34.1
+> 
 
-Hi Linus,
-
-I took a look at the LED code. It looks like you got it a little bit wrong.
-
-        /* Set blinking, TODO: make this configurable */
-       ret = regmap_update_bits(priv->map, RTL8366RB_LED_BLINKRATE_REG,
-                                RTL8366RB_LED_BLINKRATE_MASK,
-                                RTL8366RB_LED_BLINKRATE_56MS);
-       if (ret)
-               return ret;
-
-       /* Set up LED activity:
-        * Each port has 4 LEDs, we configure all ports to the same
-        * behaviour (no individual config) but we can set up each
-        * LED separately.
-        */
-       if (priv->leds_disabled) {
-               /* Turn everything off */
-               regmap_update_bits(priv->map,
-                                  RTL8366RB_LED_0_1_CTRL_REG,
-                                  0x0FFF, 0);
-               regmap_update_bits(priv->map,
-                                  RTL8366RB_LED_2_3_CTRL_REG,
-                                  0x0FFF, 0);
-               regmap_update_bits(priv->map,
-                                  RTL8366RB_INTERRUPT_CONTROL_REG,
-                                  RTL8366RB_P4_RGMII_LED,
-                                  0);
-               val = RTL8366RB_LED_OFF;
-       } else {
-               /* TODO: make this configurable per LED */
-               val = RTL8366RB_LED_FORCE;
-       }
-       for (i = 0; i < 4; i++) {
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_CTRL_REG,
-                                        0xf << (i * 4),
-                                        val << (i * 4));
-               if (ret)
-                       return ret;
-       }
-
-If LEDs are not disabled, it will use the RTL8366RB_LED_FORCE for all
-4 LED groups. That RTL8366RB_LED_FORCE keeps the LEDs on. I would use
-RTL8366RB_LED_LINK_ACT by default to make it blink on link activity
-(or make it configurable as the comment suggests) but it is not wrong.
-I cannot evaluate the RTL8366RB_INTERRUPT_CONTROL_REG usage when you
-disable the LEDs but it seems to be odd.
-
-We also have:
-
-static void rb8366rb_set_port_led(struct realtek_priv *priv,
-                                 int port, bool enable)
-{
-       u16 val = enable ? 0x3f : 0;
-       int ret;
-
-       if (priv->leds_disabled)
-               return;
-
-       switch (port) {
-       case 0:
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_0_1_CTRL_REG,
-                                        0x3F, val);
-               break;
-       case 1:
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_0_1_CTRL_REG,
-                                        0x3F << RTL8366RB_LED_1_OFFSET,
-                                        val << RTL8366RB_LED_1_OFFSET);
-               break;
-       case 2:
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_2_3_CTRL_REG,
-                                        0x3F, val);
-               break;
-       case 3:
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_2_3_CTRL_REG,
-                                        0x3F << RTL8366RB_LED_3_OFFSET,
-                                        val << RTL8366RB_LED_3_OFFSET);
-               break;
-       case 4:
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_INTERRUPT_CONTROL_REG,
-                                        RTL8366RB_P4_RGMII_LED,
-                                        enable ? RTL8366RB_P4_RGMII_LED : 0);
-               break;
-       default:
-               dev_err(priv->dev, "no LED for port %d\n", port);
-               return;
-       }
-       if (ret)
-               dev_err(priv->dev, "error updating LED on port %d\n", port);
-}
-
-Here things gets strange. The code assumes that
-RTL8366RB_LED_0_1_CTRL_REG is related to ports 0 and 1. However, it is
-actually LED group 0 and 1. I don't have the docs but the register
-seem to enable/disable a port in a group. The first LED pins for all
-ports form the group 0 (and so on). My device only use the group 0 for
-its 5 ports, limiting my tests. Anyway, to make all ports blink on
-link act, I need, at least:
-
-RTL8366RB_LED_CTRL_REG(0x0431) = 0x0002 / 0x000f (set led group 0 to
-RTL8366RB_LED_LINK_ACT or 0x2)
-RTL8366RB_LED_0_1_CTRL_REG(0x0432) = 0x001f / 0x003f (enable ports
-0..5 in LED group 0. I don't really know the mask but the probe code
-indicates it is 6 bits per group).
-
-If you really want to disable port 0 LEDs in all groups, you should
-unset the first bit for each group. If the mask is really 0x3f, it
-would be:
-
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_0_1_CTRL_REG,
-                                        port,
-                                        enable);
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_0_1_CTRL_REG,
-                                        port << RTL8366RB_LED_1_OFFSET,
-                                        enable);
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_2_3_CTRL_REG,
-                                        port,
-                                        enable);
-               ret = regmap_update_bits(priv->map,
-                                        RTL8366RB_LED_2_3_CTRL_REG,
-                                        port << RTL8366RB_LED_3_OFFSET,
-                                        enable);
-
-This message, in fact, does not make sense:
-
-> > [    4.158891] realtek-smi switch: no LED for port 5
-
-I though that maybe we could setup a LED driver to expose the LEDs
-status in sysfs. However, I'm not sure it is worth it. If you change a
-LED behavior, it would break the HW triggering rule for all the group.
-I'm not sure the LED API is ready to expose LEDs with related fate. It
-would, indeed, be useful as a readonly source or just to
-enable/disable a LED.
-
-Regards,
-
-Luiz
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
