@@ -1,297 +1,132 @@
-Return-Path: <netdev+bounces-60624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EDE48205C2
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 13:11:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18CC58205E7
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 13:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7309FB207C4
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 12:11:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86047282021
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 12:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A9F79EE;
-	Sat, 30 Dec 2023 12:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8C279EF;
+	Sat, 30 Dec 2023 12:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="GsTvMPgp"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aTe2xLIg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5672B8487;
-	Sat, 30 Dec 2023 12:11:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB916C433C8;
-	Sat, 30 Dec 2023 12:11:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1703938303;
-	bh=1AFj07lSnVlJsgQpzKxKHFdm3No23o4xa/beZqgt2jI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GsTvMPgpu1FpHeI1gWn3pYyRC2IgL36up9zwJYEJeYpY5Z+miDbdKnqCMgRhtl5PU
-	 FueLvukvGmnw8P6XDHiKD/zqj4Vesigla7JsEYolQ50H+jGJtQyrq4zby1vMNN5zc6
-	 Snxtqp3aEBZY5FO91BLzj4S+mw8hUvh/W1NCn52g=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ben Dooks <ben.dooks@codethink.co.uk>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	netdev@vger.kernel.org,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH 6.1 080/112] net: ks8851: Fix TX stall caused by TX buffer overrun
-Date: Sat, 30 Dec 2023 11:59:53 +0000
-Message-ID: <20231230115809.331474176@linuxfoundation.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231230115806.714618407@linuxfoundation.org>
-References: <20231230115806.714618407@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54038F45
+	for <netdev@vger.kernel.org>; Sat, 30 Dec 2023 12:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5efb0e180f0so13986817b3.1
+        for <netdev@vger.kernel.org>; Sat, 30 Dec 2023 04:29:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1703939347; x=1704544147; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xi9JGb5m/P41q0mbnGu3AJyPrO2SRA6tp9e9eIe+k6U=;
+        b=aTe2xLIgFvVLdijVNg36ZdmsjWmtTxWFm22rR5pJ1FVweg1ezARmcwnVN1e4BN0VAZ
+         NIrRpOkKtdMJ7QxckiAqly/8Npu8oVi/fsKHUM4qYcIzPAZKVtCDp+yVjPVU/mpqLOz7
+         i8xDnh+NOGjeRYR4qeGZN7bPM0RZHFo+SNnBd5sOMnegKPZThCtz39g9dIbtmUOOCF+8
+         SqlNfuYLCjyrtB1TG7BwHx7OzotnAXDUZeAdJ5xewUKVYipMvfHRohQJEiNm5ENjxANW
+         wvaNJ+00E4svGQOyrHH3AiDUER8RXMTRE/SKkcqWeAnsov3JPoCsq/hLcg9RvEdsISOn
+         MaVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703939347; x=1704544147;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Xi9JGb5m/P41q0mbnGu3AJyPrO2SRA6tp9e9eIe+k6U=;
+        b=QuT82igYcmGgEREk5aE1zQ0WvAkPAHQ6mHbLOmBirG1t3mziIMM6Iu6OlBCQAa/y+S
+         bJeQ4Gx5HHKKPwduB0St3ErLctU3yvoXPJUQ5Ukers8ZrJmZClhZOW+yREwkvKRnxdi6
+         XrW1Fu9eo0ePcwbNtzJZ0Hz0RcdxdivEURwVlkD6JjNeTheCWuvbBsXn9cLbLLFeW8ZB
+         vD/t90kUVA8tROrgf+D2e0u4W2od9V+82/yVoORU2JOnH58HfeZBIzFhQ0bUNdIIvDQe
+         2dR/ShPkFLKFK0K/6LnziXkj4HS6LYKDNxDlGsHuDuGTMn+t612XeghyTGRxgOjWi7ca
+         CU4g==
+X-Gm-Message-State: AOJu0YzqEjX+fLzwSATab3N1ovftOfeTxMbJknRls5k8iyOZ1wY4TxHn
+	shKNfU/xzBWye0uLXHwVKUKML9ySxE345zwnSTSsQp/ueUTEiA==
+X-Google-Smtp-Source: AGHT+IFfrvzH9/iGLgpKmPh41MR5pwawKxrdLCjllXDkv3P1+Zj26CtfQfMdkxm8SoP/n2aXquXlDe2uJhXqR8pjIFg=
+X-Received: by 2002:a81:9987:0:b0:5ed:d4c8:df55 with SMTP id
+ q129-20020a819987000000b005edd4c8df55mr4148754ywg.2.1703939346587; Sat, 30
+ Dec 2023 04:29:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+ <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
+ <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
+ <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
+ <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
+ <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com>
+ <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
+ <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com> <CAJq09z4YSGyU6QuZL1uEB9vH39-WbR2dZhy7MiD=5yZb0Urz1Q@mail.gmail.com>
+In-Reply-To: <CAJq09z4YSGyU6QuZL1uEB9vH39-WbR2dZhy7MiD=5yZb0Urz1Q@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 30 Dec 2023 13:28:54 +0100
+Message-ID: <CACRpkdZOKz-DdZgwwxj9FsJZ+GNMCXUjTDLo5wVgjw5OrfOZQA@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, Ansuel Smith <ansuelsmth@gmail.com>, 
+	Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+On Sat, Dec 30, 2023 at 6:19=E2=80=AFAM Luiz Angelo Daros de Luca
+<luizluca@gmail.com> wrote:
 
-------------------
+> I took a look at the LED code. It looks like you got it a little bit wron=
+g.
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+You are right...
 
-commit 3dc5d44545453de1de9c53cc529cc960a85933da upstream.
+> If LEDs are not disabled, it will use the RTL8366RB_LED_FORCE for all
+> 4 LED groups. That RTL8366RB_LED_FORCE keeps the LEDs on. I would use
+> RTL8366RB_LED_LINK_ACT by default to make it blink on link activity
+> (or make it configurable as the comment suggests) but it is not wrong.
+> I cannot evaluate the RTL8366RB_INTERRUPT_CONTROL_REG usage when you
+> disable the LEDs but it seems to be odd.
 
-There is a bug in the ks8851 Ethernet driver that more data is written
-to the hardware TX buffer than actually available. This is caused by
-wrong accounting of the free TX buffer space.
+The problem is that since I don't have a device with LEDs connected
+to tHE RTL8366RB it is all just dry coding.
 
-The driver maintains a tx_space variable that represents the TX buffer
-space that is deemed to be free. The ks8851_start_xmit_spi() function
-adds an SKB to a queue if tx_space is large enough and reduces tx_space
-by the amount of buffer space it will later need in the TX buffer and
-then schedules a work item. If there is not enough space then the TX
-queue is stopped.
+I would suggest if you can test it just make a basic patch that will
+at least turn on the LEDs to some default setting that works for
+you?
 
-The worker function ks8851_tx_work() dequeues all the SKBs and writes
-the data into the hardware TX buffer. The last packet will trigger an
-interrupt after it was send. Here it is assumed that all data fits into
-the TX buffer.
+> I though that maybe we could setup a LED driver to expose the LEDs
+> status in sysfs. However, I'm not sure it is worth it. If you change a
+> LED behavior, it would break the HW triggering rule for all the group.
+> I'm not sure the LED API is ready to expose LEDs with related fate. It
+> would, indeed, be useful as a readonly source or just to
+> enable/disable a LED.
 
-In the interrupt routine (which runs asynchronously because it is a
-threaded interrupt) tx_space is updated with the current value from the
-hardware. Also the TX queue is woken up again.
+The LED subsystem supports hardware triggering etc thanks to the
+elaborate work by Christian (ansuel). You can see an example of how
+this is done in:
+drivers/net/dsa/qca/qca8k-leds.c
 
-Now it could happen that after data was sent to the hardware and before
-handling the TX interrupt new data is queued in ks8851_start_xmit_spi()
-when the TX buffer space had still some space left. When the interrupt
-is actually handled tx_space is updated from the hardware but now we
-already have new SKBs queued that have not been written to the hardware
-TX buffer yet. Since tx_space has been overwritten by the value from the
-hardware the space is not accounted for.
+Christian also extended the LEDs subsystem with the necessary
+callbacks to support HW-backed LED control.
 
-Now we have more data queued then buffer space available in the hardware
-and ks8851_tx_work() will potentially overrun the hardware TX buffer. In
-many cases it will still work because often the buffer is written out
-fast enough so that no overrun occurs but for example if the peer
-throttles us via flow control then an overrun may happen.
+This can be used already to achieve HW triggers for the LEDs
+from sysfs. (See callbacks .hw_control_is_supported,
+.hw_control_set etc etc).
 
-This can be fixed in different ways. The most simple way would be to set
-tx_space to 0 before writing data to the hardware TX buffer preventing
-the queuing of more SKBs until the TX interrupt has been handled. I have
-chosen a slightly more efficient (and still rather simple) way and
-track the amount of data that is already queued and not yet written to
-the hardware. When new SKBs are to be queued the already queued amount
-of data is honoured when checking free TX buffer space.
+I was working to implement this for the Marvell switches but Andrew
+wanted to do some more structured approach with a LED library
+for DSA switches.
 
-I tested this with a setup of two linked KS8851 running iperf3 between
-the two in bidirectional mode. Before the fix I got a stall after some
-minutes. With the fix I saw now issues anymore after hours.
-
-Fixes: 3ba81f3ece3c ("net: Micrel KS8851 SPI network driver")
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Ben Dooks <ben.dooks@codethink.co.uk>
-Cc: Tristram Ha <Tristram.Ha@microchip.com>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://lore.kernel.org/r/20231214181112.76052-1-rwahl@gmx.de
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/net/ethernet/micrel/ks8851.h        |    3 ++
- drivers/net/ethernet/micrel/ks8851_common.c |   20 ++++++-------
- drivers/net/ethernet/micrel/ks8851_spi.c    |   42 ++++++++++++++++++----------
- 3 files changed, 40 insertions(+), 25 deletions(-)
-
---- a/drivers/net/ethernet/micrel/ks8851.h
-+++ b/drivers/net/ethernet/micrel/ks8851.h
-@@ -350,6 +350,8 @@ union ks8851_tx_hdr {
-  * @rxd: Space for receiving SPI data, in DMA-able space.
-  * @txd: Space for transmitting SPI data, in DMA-able space.
-  * @msg_enable: The message flags controlling driver output (see ethtool).
-+ * @tx_space: Free space in the hardware TX buffer (cached copy of KS_TXMIR).
-+ * @queued_len: Space required in hardware TX buffer for queued packets in txq.
-  * @fid: Incrementing frame id tag.
-  * @rc_ier: Cached copy of KS_IER.
-  * @rc_ccr: Cached copy of KS_CCR.
-@@ -399,6 +401,7 @@ struct ks8851_net {
- 	struct work_struct	rxctrl_work;
- 
- 	struct sk_buff_head	txq;
-+	unsigned int		queued_len;
- 
- 	struct eeprom_93cx6	eeprom;
- 	struct regulator	*vdd_reg;
---- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -362,16 +362,18 @@ static irqreturn_t ks8851_irq(int irq, v
- 		handled |= IRQ_RXPSI;
- 
- 	if (status & IRQ_TXI) {
--		handled |= IRQ_TXI;
-+		unsigned short tx_space = ks8851_rdreg16(ks, KS_TXMIR);
- 
--		/* no lock here, tx queue should have been stopped */
-+		netif_dbg(ks, intr, ks->netdev,
-+			  "%s: txspace %d\n", __func__, tx_space);
- 
--		/* update our idea of how much tx space is available to the
--		 * system */
--		ks->tx_space = ks8851_rdreg16(ks, KS_TXMIR);
-+		spin_lock(&ks->statelock);
-+		ks->tx_space = tx_space;
-+		if (netif_queue_stopped(ks->netdev))
-+			netif_wake_queue(ks->netdev);
-+		spin_unlock(&ks->statelock);
- 
--		netif_dbg(ks, intr, ks->netdev,
--			  "%s: txspace %d\n", __func__, ks->tx_space);
-+		handled |= IRQ_TXI;
- 	}
- 
- 	if (status & IRQ_RXI)
-@@ -414,9 +416,6 @@ static irqreturn_t ks8851_irq(int irq, v
- 	if (status & IRQ_LCI)
- 		mii_check_link(&ks->mii);
- 
--	if (status & IRQ_TXI)
--		netif_wake_queue(ks->netdev);
--
- 	return IRQ_HANDLED;
- }
- 
-@@ -500,6 +499,7 @@ static int ks8851_net_open(struct net_de
- 	ks8851_wrreg16(ks, KS_ISR, ks->rc_ier);
- 	ks8851_wrreg16(ks, KS_IER, ks->rc_ier);
- 
-+	ks->queued_len = 0;
- 	netif_start_queue(ks->netdev);
- 
- 	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
---- a/drivers/net/ethernet/micrel/ks8851_spi.c
-+++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -287,6 +287,18 @@ static void ks8851_wrfifo_spi(struct ks8
- }
- 
- /**
-+ * calc_txlen - calculate size of message to send packet
-+ * @len: Length of data
-+ *
-+ * Returns the size of the TXFIFO message needed to send
-+ * this packet.
-+ */
-+static unsigned int calc_txlen(unsigned int len)
-+{
-+	return ALIGN(len + 4, 4);
-+}
-+
-+/**
-  * ks8851_rx_skb_spi - receive skbuff
-  * @ks: The device state
-  * @skb: The skbuff
-@@ -305,7 +317,9 @@ static void ks8851_rx_skb_spi(struct ks8
-  */
- static void ks8851_tx_work(struct work_struct *work)
- {
-+	unsigned int dequeued_len = 0;
- 	struct ks8851_net_spi *kss;
-+	unsigned short tx_space;
- 	struct ks8851_net *ks;
- 	unsigned long flags;
- 	struct sk_buff *txb;
-@@ -322,6 +336,8 @@ static void ks8851_tx_work(struct work_s
- 		last = skb_queue_empty(&ks->txq);
- 
- 		if (txb) {
-+			dequeued_len += calc_txlen(txb->len);
-+
- 			ks8851_wrreg16_spi(ks, KS_RXQCR,
- 					   ks->rc_rxqcr | RXQCR_SDA);
- 			ks8851_wrfifo_spi(ks, txb, last);
-@@ -332,6 +348,13 @@ static void ks8851_tx_work(struct work_s
- 		}
- 	}
- 
-+	tx_space = ks8851_rdreg16_spi(ks, KS_TXMIR);
-+
-+	spin_lock(&ks->statelock);
-+	ks->queued_len -= dequeued_len;
-+	ks->tx_space = tx_space;
-+	spin_unlock(&ks->statelock);
-+
- 	ks8851_unlock_spi(ks, &flags);
- }
- 
-@@ -347,18 +370,6 @@ static void ks8851_flush_tx_work_spi(str
- }
- 
- /**
-- * calc_txlen - calculate size of message to send packet
-- * @len: Length of data
-- *
-- * Returns the size of the TXFIFO message needed to send
-- * this packet.
-- */
--static unsigned int calc_txlen(unsigned int len)
--{
--	return ALIGN(len + 4, 4);
--}
--
--/**
-  * ks8851_start_xmit_spi - transmit packet using SPI
-  * @skb: The buffer to transmit
-  * @dev: The device used to transmit the packet.
-@@ -386,16 +397,17 @@ static netdev_tx_t ks8851_start_xmit_spi
- 
- 	spin_lock(&ks->statelock);
- 
--	if (needed > ks->tx_space) {
-+	if (ks->queued_len + needed > ks->tx_space) {
- 		netif_stop_queue(dev);
- 		ret = NETDEV_TX_BUSY;
- 	} else {
--		ks->tx_space -= needed;
-+		ks->queued_len += needed;
- 		skb_queue_tail(&ks->txq, skb);
- 	}
- 
- 	spin_unlock(&ks->statelock);
--	schedule_work(&kss->tx_work);
-+	if (ret == NETDEV_TX_OK)
-+		schedule_work(&kss->tx_work);
- 
- 	return ret;
- }
-
-
+Yours,
+Linus Walleij
 
