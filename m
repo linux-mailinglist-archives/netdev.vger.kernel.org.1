@@ -1,43 +1,64 @@
-Return-Path: <netdev+bounces-60629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 453D482070B
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 16:57:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D11B4820756
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 17:29:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B541E281F04
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 15:57:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1032B281C6A
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 16:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171D38F71;
-	Sat, 30 Dec 2023 15:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3589479;
+	Sat, 30 Dec 2023 16:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="Syy4KysW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLZ2fcMQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FD89461
-	for <netdev@vger.kernel.org>; Sat, 30 Dec 2023 15:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D52D9C0004;
-	Sat, 30 Dec 2023 15:56:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1703951814;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5tQIsanVDq6tiMKLaUiWGbKy0amt9tYKA1Sa2MeFlqA=;
-	b=Syy4KysWCLndejplhk19USnnX/vmqCEtDsiqXSuZRBmJRetDaC9HDspX3lx9HDVSzLs7j+
-	Ad/PtAQIYwXdpwlb2QPAzEKzaBhU4ZMjbSb6tKfypMY0VjFiJieSIsDVEeYN/hFVgOslXS
-	njOzFU0ByhJZa4aREUWNWC4HUa2U6PrvNldXrW8ljXtGCBoOVcLHutr+gxSlWkyTsHdpiC
-	0DUTjQEY5bso1cUU72TFvNTl5T3VUmf+fTwGtTACYIZizRUuMeY81Gx00db7n8018RtR3m
-	9a7FfS9CkGX0iy40XiuibPeVl+Im66VEVUNhP7hj3XPlwEZd/irp3dewRNH+cg==
-Message-ID: <7385ca39-182e-42c1-80bf-fd2d0c0aabdd@arinc9.com>
-Date: Sat, 30 Dec 2023 18:56:49 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505F2156E8;
+	Sat, 30 Dec 2023 16:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40d5b159350so36243575e9.2;
+        Sat, 30 Dec 2023 08:27:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703953641; x=1704558441; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Jcc7THfOf7mG9cp0BPwPix9VTXZppS8GBKJCQR6RBvY=;
+        b=DLZ2fcMQgv1uxxH1dARaSvfinbj2EZaUa3PfvXL7Oo3d+AqjWNl2F+IFVfvvVdyD7i
+         wkwUBiLJOmzz3lQbikm+rr8pq1UXuC5b+UoDULHg4DM7Q6LbbJV6ZCjAjNV0z5HLVifD
+         DPu+7eg8H4aZWptO3in9j8F7ysgVGgQZ9Lxr1+LslIiUB3gPTEcJpbb03IOLzu8B9MWI
+         nnkxTcsMdo918WWniIDOjU7wDcz2P/p8IW5kXb1OfIItjgxzk6JQQ8B5tzUQiN7Z3DHr
+         BWknioa4InH1ozIMybudShAnfM0BVJnIqSzhv/FIuyVlIu2g9SYlpjCTxK6FAfAACmd9
+         Ja6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703953641; x=1704558441;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jcc7THfOf7mG9cp0BPwPix9VTXZppS8GBKJCQR6RBvY=;
+        b=ldO7/YhBa4E7eQ/BxE5z0z2Jj5Ecaojy/fch21/a4k8vZyGk+ktzDQPtRLozR/dHpo
+         z/qEXpVLYj95IzJuRvAZVR/xQlImLPC3c6JWnLdiJ3BaP55uNEtAHkTokSUJtYSyxt6w
+         /pfHurEiEILA2WiT9eB2/TVTZlFeMJWxG3Gy6xt0LOZLnHPpW0I9HLmU+OPhwOeUFOEr
+         it3L5N8wagJkG5XPKSXbzrjl/18eP+V7o3VLTCa2i8xveI0mnVws3nO/NOqMmQIVM6MX
+         FXd0e8V36RPXOU2xTgiRJvNFTFFRf+XOYHmF6coIcjzTNaTZXSBAZBZwJIwOi7fdmkDp
+         CR9w==
+X-Gm-Message-State: AOJu0Yywhrilm5u0+fylDObXtLhCIF3yv3Wl78egnCyVyPKyEYPlH9vG
+	iP62gtNp1etxA2RGyhNQgYg=
+X-Google-Smtp-Source: AGHT+IFXc6aQcDWDa96p1h54CQ4o1qkepjqD9vEqVSRUDFijeiDf0QWDbfv3ljmvkWkatzEWREXBHQ==
+X-Received: by 2002:a05:600c:4fd3:b0:40d:5e74:89e8 with SMTP id o19-20020a05600c4fd300b0040d5e7489e8mr2766998wmq.55.1703953641269;
+        Sat, 30 Dec 2023 08:27:21 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.133.126])
+        by smtp.gmail.com with ESMTPSA id p2-20020a05600c1d8200b0040596352951sm43557299wms.5.2023.12.30.08.27.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 30 Dec 2023 08:27:20 -0800 (PST)
+Message-ID: <11e7232f-88ed-4330-8320-b3504ffccd48@gmail.com>
+Date: Sat, 30 Dec 2023 16:25:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,129 +66,128 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 8/8] Revert "net: dsa: OF-ware slave_mii_bus"
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org
-Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-References: <20231223005253.17891-1-luizluca@gmail.com>
- <20231223005253.17891-9-luizluca@gmail.com>
- <a638d0de-bfb3-4937-969e-13d494b6a2c3@arinc9.com>
+Subject: Re: [RFC PATCH v3 07/20] io_uring: add interface queue
 Content-Language: en-US
-In-Reply-To: <a638d0de-bfb3-4937-969e-13d494b6a2c3@arinc9.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>, magnus.karlsson@intel.com,
+ bjorn@kernel.org
+References: <20231219210357.4029713-1-dw@davidwei.uk>
+ <20231219210357.4029713-8-dw@davidwei.uk>
+ <65847c8f83f71_82de329487@willemb.c.googlers.com.notmuch>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <65847c8f83f71_82de329487@willemb.c.googlers.com.notmuch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Transfer-Encoding: 7bit
 
-On 30.12.2023 10:18, Arınç ÜNAL wrote:
-> On 23.12.2023 03:46, Luiz Angelo Daros de Luca wrote:
->> This reverts commit fe7324b932222574a0721b80e72c6c5fe57960d1.
+On 12/21/23 17:57, Willem de Bruijn wrote:
+> David Wei wrote:
+>> From: David Wei <davidhwei@meta.com>
 >>
->> The use of user_mii_bus is inappropriate when the hardware is described
->> with a device-tree [1].
+>> This patch introduces a new object in io_uring called an interface queue
+>> (ifq) which contains:
 >>
->> Since all drivers currently implementing ds_switch_ops.phy_{read,write}
->> were not updated to utilize the MDIO information from OF with the
->> generic "dsa user mii", they might not be affected by this change.
+>> * A pool region allocated by userspace and registered w/ io_uring where
+>>    Rx data is written to.
+>> * A net device and one specific Rx queue in it that will be configured
+>>    for ZC Rx.
+>> * A pair of shared ringbuffers w/ userspace, dubbed registered buf
+>>    (rbuf) rings. Each entry contains a pool region id and an offset + len
+>>    within that region. The kernel writes entries into the completion ring
+>>    to tell userspace where RX data is relative to the start of a region.
+>>    Userspace writes entries into the refill ring to tell the kernel when
+>>    it is done with the data.
 >>
->> [1] https://lkml.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/T/#u
+>> For now, each io_uring instance has a single ifq, and each ifq has a
+>> single pool region associated with one Rx queue.
+>>
+>> Add a new opcode to io_uring_register that sets up an ifq. Size and
+>> offsets of shared ringbuffers are returned to userspace for it to mmap.
+>> The implementation will be added in a later patch.
+>>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
 > 
-> This doesn't make sense to me: "The use of user_mii_bus is inappropriate
-> when the hardware is described with a device-tree." I think this is the
-> correct statement: "The use of user_mii_bus is inappropriate when the MDIO
-> bus of the switch is described on the device-tree."
-> 
-> The patch log is also not clear on why this leads to the removal of
-> OF-based registration from the DSA core driver.
-> 
-> I would change the patch log here to something like this:
-> 
-> net: dsa: do not populate user_mii_bus when switch MDIO bus is described
-> 
-> The use of ds->user_mii_bus is inappropriate when the MDIO bus of the
-> switch is described on the device-tree [1].
-> 
-> To keep things simple, make [all subdrivers that control a switch [with
-> MDIO bus] probed on OF] register the bus on the subdriver.
-> 
-> The subdrivers that control switches [with MDIO bus] probed on OF must
-> follow this logic to support all cases properly:
-> 
-> No switch MDIO bus defined: Populate ds->user_mii_bus, register the MDIO
-> bus, set the interrupts for PHYs if "interrupt-controller" is defined at
-> the switch node.
-> 
-> Switch MDIO bus defined: Don't populate ds->user_mii_bus, register the MDIO
-> bus, set the interrupts for PHYs if ["interrupt-controller" is defined at
-> the switch node and "interrupts" is defined at the PHY nodes under the
-> switch MDIO bus node].
-> 
-> There can be a case where ds->user_mii_bus is not populated, but
-> ds_switch_ops.phy_{read,write} is. That would mean the subdriver controls a
-> switch probed on OF, and it lets the DSA core driver to populate
-> ds->user_mii_bus and register the bus. We don't want this to happen.
-> Therefore, ds_switch_ops.phy_{read,write} should be only used on the
-> subdrivers that control switches probed on platform_data.
-> 
-> With that, the "!ds->user_mii_bus && ds->ops->phy_read" check under
-> dsa_switch_setup() remains in use only for switches probed on
-> platform_data. Therefore, remove OF-based registration as it's useless now.
-> 
-> ---
-> 
-> I think we should do all this in a single patch. I've done it on the MT7530
-> DSA subdriver which I maintain.
+> This is quite similar to AF_XDP, of course. Is it at all possible to
+> reuse all or some of that? If not, why not?
 
-Actually, there's no need to drag this patch further by including the
-improvement of handling the MDIO bus on all relevant subdrivers.
+Let me rather ask what do you have in mind for reuse? I'm not too
+intimately familiar with xdp, but I don't see what we can take.
 
-That said, I'd like to submit this patch myself, if it is OK by everyone
-here.
+Queue formats will be different, there won't be a separate CQ
+for zc all they will lend in the main io_uring CQ in next revisions.
+io_uring also supports multiple sockets per zc ifq and other quirks
+reflected in the uapi.
 
-Here's the patch log I've prepared:
+Receive has to work with generic sockets and skbs if we want
+to be able to reuse the protocol stack. Queue allocation and
+mapping is similar but that one thing that should be bound to
+the API (i.e. io_uring vs af xdp) together with locking and
+synchronisation. Wakeups are different as well.
 
-net: dsa: do not populate user_mii_bus when switch MDIO bus is described
+And IIUC AF_XDP is still operates with raw packets quite early
+in the stack, while io_uring completes from a syscall, that
+would definitely make sync diverging a lot.
 
-The use of ds->user_mii_bus is inappropriate when the MDIO bus of the
-switch is described on the device-tree [1].
+I don't see many opportunities here.
 
-To keep things simple, make [all subdrivers that control switches [with
-MDIO bus] probed on OF] register the bus on the subdriver. This is already
-the case on all of these subdrivers.
+> As a side effect, unification would also show a path of moving AF_XDP
+> from its custom allocator to the page_pool infra.
 
-There can be a case where ds->user_mii_bus is not populated, but
-ds_switch_ops.phy_{read,write} is. That would mean the subdriver controls
-switches probed on OF, and it lets the DSA core driver to populate
-ds->user_mii_bus and register the bus. We don't want this to happen.
-Therefore, ds_switch_ops.phy_{read,write} should be only used on the
-subdrivers that control switches probed on platform_data.
+I assume it's about xsk_buff_alloc() and likes of it. I'm lacking
+here, I it's much better to ask XDP guys what they think about
+moving to pp, whether it's needed, etc. And if so, it'd likely
+be easier to base it on raw page pool providers api than the io_uring
+provider implementation, probably having some common helpers if
+things come to that.
 
-With that, the "!ds->user_mii_bus && ds->ops->phy_read" check under
-dsa_switch_setup() remains in use only for switches probed on
-platform_data. Therefore, remove OF-based registration as it's useless now.
+> Related: what is the story wrt the process crashing while user memory
+> is posted to the NIC or present in the kernel stack.
 
-Currently, none of the subdrivers that control switches [with MDIO bus]
-probed on OF implements ds_switch_ops.phy_{read,write} so no subdriver will
-be affected by this patch.
+Buffers are pinned by io_uring. If the process crashes closing the
+ring, io_uring will release the pp provider and wait for all buffer
+to come back before unpinning pages and freeing the rest. I.e.
+it's not going to unpin before pp's ->destroy is called.
 
-The subdrivers that control switches [with MDIO bus] probed on OF must
-follow this logic to support all cases properly:
+> SO_DEVMEM already demonstrates zerocopy into user buffers using usdma.
+> To a certain extent that and asyncronous I/O with iouring are two
+> independent goals. SO_DEVMEM imposes limitations on the stack because
+> it might hold opaque device mem. That is too strong for this case.
 
-No switch MDIO bus defined: Populate ds->user_mii_bus, register the MDIO
-bus, set the interrupts for PHYs if "interrupt-controller" is defined at
-the switch node. This case should only be covered for the switches which
-their dt-bindings documentation didn't document the MDIO bus from the
-start. This is to keep supporting the device trees that do not describe the
-MDIO bus on the device tree but the MDIO bus is being used nonetheless.
+Basing it onto ppiov simplifies refcounting a lot, with that we
+don't need any dirty hacks nor adding any extra changes in the stack,
+and I think it's aligned with the net stack goals. What I think
+we can do on top is allowing ppiov's to optionally have pages
+(via a callback ->get_page), and use it it in those rare cases
+when someone has to peek at the payload.
 
-Switch MDIO bus defined: Don't populate ds->user_mii_bus, register the MDIO
-bus, set the interrupts for PHYs if ["interrupt-controller" is defined at
-the switch node and "interrupts" is defined at the PHY nodes under the
-switch MDIO bus node].
+> But for this iouring provider, is there anything ioring specific about
+> it beyond being user memory? If not, maybe just call it a umem
+> provider, and anticipate it being usable for AF_XDP in the future too?
 
-Let's leave the improvement of handling the MDIO bus on relevant subdrivers
-to future patches.
+Queue formats with a set of features, synchronisation, mostly
+answered above, but I also think it should as easy to just have
+a separate provider and reuse some code later if there is anything
+to reuse.
 
-Arınç
+> Besides delivery up to the intended socket, packets may also end up
+> in other code paths, such as packet sockets or forwarding. All of
+> this is simpler with userspace backed buffers than with device mem.
+> But good to call out explicitly how this is handled. MSG_ZEROCOPY
+> makes a deep packet copy in unexpected code paths, for instance. To
+> avoid indefinite latency to buffer reclaim.
+
+Yeah, that's concerning, I intend to add something for the sockets
+we used, but there is nothing for truly unexpected paths. How devmem
+handles it?
+
+It's probably not a huge worry for now, I expect killing the
+task/sockets should resolve dependencies, but would be great to find
+such scenarios. I'd appreciate any pointers if you have some in mind.
+
+-- 
+Pavel Begunkov
 
