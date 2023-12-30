@@ -1,64 +1,43 @@
-Return-Path: <netdev+bounces-60630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11B4820756
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 17:29:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C87820854
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 21:04:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1032B281C6A
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 16:29:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D0B283C18
+	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 20:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3589479;
-	Sat, 30 Dec 2023 16:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7433BE7F;
+	Sat, 30 Dec 2023 20:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLZ2fcMQ"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="napURkiY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505F2156E8;
-	Sat, 30 Dec 2023 16:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40d5b159350so36243575e9.2;
-        Sat, 30 Dec 2023 08:27:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703953641; x=1704558441; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Jcc7THfOf7mG9cp0BPwPix9VTXZppS8GBKJCQR6RBvY=;
-        b=DLZ2fcMQgv1uxxH1dARaSvfinbj2EZaUa3PfvXL7Oo3d+AqjWNl2F+IFVfvvVdyD7i
-         wkwUBiLJOmzz3lQbikm+rr8pq1UXuC5b+UoDULHg4DM7Q6LbbJV6ZCjAjNV0z5HLVifD
-         DPu+7eg8H4aZWptO3in9j8F7ysgVGgQZ9Lxr1+LslIiUB3gPTEcJpbb03IOLzu8B9MWI
-         nnkxTcsMdo918WWniIDOjU7wDcz2P/p8IW5kXb1OfIItjgxzk6JQQ8B5tzUQiN7Z3DHr
-         BWknioa4InH1ozIMybudShAnfM0BVJnIqSzhv/FIuyVlIu2g9SYlpjCTxK6FAfAACmd9
-         Ja6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703953641; x=1704558441;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jcc7THfOf7mG9cp0BPwPix9VTXZppS8GBKJCQR6RBvY=;
-        b=ldO7/YhBa4E7eQ/BxE5z0z2Jj5Ecaojy/fch21/a4k8vZyGk+ktzDQPtRLozR/dHpo
-         z/qEXpVLYj95IzJuRvAZVR/xQlImLPC3c6JWnLdiJ3BaP55uNEtAHkTokSUJtYSyxt6w
-         /pfHurEiEILA2WiT9eB2/TVTZlFeMJWxG3Gy6xt0LOZLnHPpW0I9HLmU+OPhwOeUFOEr
-         it3L5N8wagJkG5XPKSXbzrjl/18eP+V7o3VLTCa2i8xveI0mnVws3nO/NOqMmQIVM6MX
-         FXd0e8V36RPXOU2xTgiRJvNFTFFRf+XOYHmF6coIcjzTNaTZXSBAZBZwJIwOi7fdmkDp
-         CR9w==
-X-Gm-Message-State: AOJu0Yywhrilm5u0+fylDObXtLhCIF3yv3Wl78egnCyVyPKyEYPlH9vG
-	iP62gtNp1etxA2RGyhNQgYg=
-X-Google-Smtp-Source: AGHT+IFXc6aQcDWDa96p1h54CQ4o1qkepjqD9vEqVSRUDFijeiDf0QWDbfv3ljmvkWkatzEWREXBHQ==
-X-Received: by 2002:a05:600c:4fd3:b0:40d:5e74:89e8 with SMTP id o19-20020a05600c4fd300b0040d5e7489e8mr2766998wmq.55.1703953641269;
-        Sat, 30 Dec 2023 08:27:21 -0800 (PST)
-Received: from [192.168.8.100] ([148.252.133.126])
-        by smtp.gmail.com with ESMTPSA id p2-20020a05600c1d8200b0040596352951sm43557299wms.5.2023.12.30.08.27.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Dec 2023 08:27:20 -0800 (PST)
-Message-ID: <11e7232f-88ed-4330-8320-b3504ffccd48@gmail.com>
-Date: Sat, 30 Dec 2023 16:25:43 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D928ABE65;
+	Sat, 30 Dec 2023 20:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1703966668; x=1704571468; i=markus.elfring@web.de;
+	bh=FTeilRubP1fYfFWtCGepG3ruP3CzQnUY5rMrToXpVwE=;
+	h=X-UI-Sender-Class:Date:To:From:Subject:Cc;
+	b=napURkiYn207oOUROWDpZ1IYYasjASvR9bi+HcfbwPL6dfzyVbB0eHlfKeaOppuV
+	 JK8NqVRCv4utfSfNnLkut6KVhfkzvXdbkNM+IycuHbTNtF/EpBRPGVb4DyPs8nVgn
+	 UuWv+1Z3+c3WC0c6DLrw0+kXywQe3/wRN5z1h1/dFTbY77/Div+gtXC3sJALQletZ
+	 ri2qnEd32vxCXX+GQ3NFYoOmTeaBSVItp7vByuejIgZ48s2f0Mg2vy42XId+O37d5
+	 uy/R0p8GEymttG3oF0LlctHkV9NIIlkO/45fBJvWpw5ulWlGr7PYYYmtQqzR+JQOT
+	 ynTW/VI9gC3SeZ1WlA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.87.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mvbik-1r3mXt3IRC-00sj8F; Sat, 30
+ Dec 2023 21:04:27 +0100
+Message-ID: <7011cdcc-4287-4e63-8bfa-f08710f670b1@web.de>
+Date: Sat, 30 Dec 2023 21:04:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,128 +45,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 07/20] io_uring: add interface queue
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>, magnus.karlsson@intel.com,
- bjorn@kernel.org
-References: <20231219210357.4029713-1-dw@davidwei.uk>
- <20231219210357.4029713-8-dw@davidwei.uk>
- <65847c8f83f71_82de329487@willemb.c.googlers.com.notmuch>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <65847c8f83f71_82de329487@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Yonghong Song <yonghong.song@linux.dev>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH 0/5] bpf: Adjustments for four function implementations
+Cc: LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:PryWHXlk/8JgTLBtJ4HVbwJ4e1P1AxGV7fML3Rs43AQwS7D9Ar0
+ iotNBKkVvSym+9pGdXNIYQDcdBb1D3h4c+YhMp+lm9Z3AUyiIZ5uSNSG5nnXPxgb0JjdcKt
+ fgdeWlcxgRIPYOcADNSHYXk0VqoTHwY/UP17m6+XfM6lmB/n1vV0hw9P0GdkD5HnCwbhB+l
+ HQQAGHOVzHpktYBox+NZQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:e8rEjivcjJs=;QWyO0KQhoBajvmQgDgsosZOQ/Jb
+ TAn+rL7NRQHPC2grVNz2U8iiMIy3nqteflmRxcLP6EBkA1IM4pj9a+i9wnQUwjE+haimfkzAO
+ Z8h+g7+tMhyLu05/YaMS6X/9SiBYOkhStTRAnlEAi8jwnvRviKq8N7u0ddN/StrDMvxV7c3kF
+ 5gOQPeMg5N2MCrNIyWBt5NW9jiqY1hWDxEkhWgE+qhMHU+Be9Baa19YnAXU6+HKaIgw6XoCoY
+ cuah2wn3ZnRWJgRRQOU1ZZwxLmHdTx/h8it30kQAxb2A3kz7kmu+/iQVOagK0EQsOrEyVb9TO
+ kwJgrSRZC9F5reLQ7XPPUkdvlUzhvNZjL2CIStCtPZ2pt5G2YMeLP3AgFPRC4FDlFT7DN9Rhk
+ JaoGt1NgQHRj2NAz4j2TAwnlXA+YVJSd6yUtGWWWxT7UX2IW41hcfer7GNorEVaMl2ODy3d/b
+ HLE6zgO6tmF+sWfr9kCGminNHk+7f4EP+zmzMbItGQXEuN0avlG88LaqDfJgSjRwr87pom++g
+ 2/6KXjCJAn7AW+liuK9CRUYvJXN7LFGO/k4UAPwaGcrnwvuQZmcMK4TI7BjDGr2knEGWdx8rm
+ yobMd1xN6L7fejE9Na+4kDmzcmQv7RxRpLW/cSdSgJbrqmSFut9aXRq9/RlW63IQSggiBCR6h
+ CoSFNgb/isMAkxtIgAS4MTIdWLvrhYlfN7tSziYu2xxVWfO5/C7A9v79Kg9qNucdFFqwOcz1o
+ OEGk0dM2UKEJGu9e+WWr8J6v1/vw+69Rveb4moaSoamgT9sd3prKRU53z4U7NGnvDWNtIW2h0
+ SLP8C7vJyCpjD3/WXWhzn/q/w/b7s8z3EhMFcRFp6Q18QWy6Ih7efEP32EJNluP3BQSiAuUrY
+ X7xbi6fkkphQ6DDtBZqzINgu4CiJOjdYochUea2PP8XWOlJmOaOdXHuATUGg2ErZZ37mi0gm0
+ /xJ3qw==
 
-On 12/21/23 17:57, Willem de Bruijn wrote:
-> David Wei wrote:
->> From: David Wei <davidhwei@meta.com>
->>
->> This patch introduces a new object in io_uring called an interface queue
->> (ifq) which contains:
->>
->> * A pool region allocated by userspace and registered w/ io_uring where
->>    Rx data is written to.
->> * A net device and one specific Rx queue in it that will be configured
->>    for ZC Rx.
->> * A pair of shared ringbuffers w/ userspace, dubbed registered buf
->>    (rbuf) rings. Each entry contains a pool region id and an offset + len
->>    within that region. The kernel writes entries into the completion ring
->>    to tell userspace where RX data is relative to the start of a region.
->>    Userspace writes entries into the refill ring to tell the kernel when
->>    it is done with the data.
->>
->> For now, each io_uring instance has a single ifq, and each ifq has a
->> single pool region associated with one Rx queue.
->>
->> Add a new opcode to io_uring_register that sets up an ifq. Size and
->> offsets of shared ringbuffers are returned to userspace for it to mmap.
->> The implementation will be added in a later patch.
->>
->> Signed-off-by: David Wei <dw@davidwei.uk>
-> 
-> This is quite similar to AF_XDP, of course. Is it at all possible to
-> reuse all or some of that? If not, why not?
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sat, 30 Dec 2023 20:51:23 +0100
 
-Let me rather ask what do you have in mind for reuse? I'm not too
-intimately familiar with xdp, but I don't see what we can take.
+A few update suggestions were taken into account
+from static source code analysis.
 
-Queue formats will be different, there won't be a separate CQ
-for zc all they will lend in the main io_uring CQ in next revisions.
-io_uring also supports multiple sockets per zc ifq and other quirks
-reflected in the uapi.
+Markus Elfring (5):
+  Improve exception handling in bpf_struct_ops_link_create()
+  Move an assignment for the variable =E2=80=9Cst_map=E2=80=9D
+    in bpf_struct_ops_link_create()
+  Improve exception handling in bpf_core_apply()
+  Return directly after a failed bpf_map_kmalloc_node()
+    in bpf_cgroup_storage_alloc()
+  Improve exception handling in trie_update_elem()
 
-Receive has to work with generic sockets and skbs if we want
-to be able to reuse the protocol stack. Queue allocation and
-mapping is similar but that one thing that should be bound to
-the API (i.e. io_uring vs af xdp) together with locking and
-synchronisation. Wakeups are different as well.
+ kernel/bpf/bpf_struct_ops.c | 12 ++++++------
+ kernel/bpf/btf.c            |  8 +++++---
+ kernel/bpf/local_storage.c  |  2 +-
+ kernel/bpf/lpm_trie.c       | 24 +++++++++++-------------
+ 4 files changed, 23 insertions(+), 23 deletions(-)
 
-And IIUC AF_XDP is still operates with raw packets quite early
-in the stack, while io_uring completes from a syscall, that
-would definitely make sync diverging a lot.
+=2D-
+2.43.0
 
-I don't see many opportunities here.
-
-> As a side effect, unification would also show a path of moving AF_XDP
-> from its custom allocator to the page_pool infra.
-
-I assume it's about xsk_buff_alloc() and likes of it. I'm lacking
-here, I it's much better to ask XDP guys what they think about
-moving to pp, whether it's needed, etc. And if so, it'd likely
-be easier to base it on raw page pool providers api than the io_uring
-provider implementation, probably having some common helpers if
-things come to that.
-
-> Related: what is the story wrt the process crashing while user memory
-> is posted to the NIC or present in the kernel stack.
-
-Buffers are pinned by io_uring. If the process crashes closing the
-ring, io_uring will release the pp provider and wait for all buffer
-to come back before unpinning pages and freeing the rest. I.e.
-it's not going to unpin before pp's ->destroy is called.
-
-> SO_DEVMEM already demonstrates zerocopy into user buffers using usdma.
-> To a certain extent that and asyncronous I/O with iouring are two
-> independent goals. SO_DEVMEM imposes limitations on the stack because
-> it might hold opaque device mem. That is too strong for this case.
-
-Basing it onto ppiov simplifies refcounting a lot, with that we
-don't need any dirty hacks nor adding any extra changes in the stack,
-and I think it's aligned with the net stack goals. What I think
-we can do on top is allowing ppiov's to optionally have pages
-(via a callback ->get_page), and use it it in those rare cases
-when someone has to peek at the payload.
-
-> But for this iouring provider, is there anything ioring specific about
-> it beyond being user memory? If not, maybe just call it a umem
-> provider, and anticipate it being usable for AF_XDP in the future too?
-
-Queue formats with a set of features, synchronisation, mostly
-answered above, but I also think it should as easy to just have
-a separate provider and reuse some code later if there is anything
-to reuse.
-
-> Besides delivery up to the intended socket, packets may also end up
-> in other code paths, such as packet sockets or forwarding. All of
-> this is simpler with userspace backed buffers than with device mem.
-> But good to call out explicitly how this is handled. MSG_ZEROCOPY
-> makes a deep packet copy in unexpected code paths, for instance. To
-> avoid indefinite latency to buffer reclaim.
-
-Yeah, that's concerning, I intend to add something for the sockets
-we used, but there is nothing for truly unexpected paths. How devmem
-handles it?
-
-It's probably not a huge worry for now, I expect killing the
-task/sockets should resolve dependencies, but would be great to find
-such scenarios. I'd appreciate any pointers if you have some in mind.
-
--- 
-Pavel Begunkov
 
