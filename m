@@ -1,207 +1,142 @@
-Return-Path: <netdev+bounces-60643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9A5820B2B
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 12:04:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F26F820B47
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 12:31:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31194B2127D
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 11:04:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8F2D282632
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 11:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6603C13;
-	Sun, 31 Dec 2023 11:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FE633EE;
+	Sun, 31 Dec 2023 11:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="WvLW7K1U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC62433DD
-	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 11:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7b7fdde8b58so1158771939f.1
-        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 03:04:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704020666; x=1704625466;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qLE1C8Gnyay/58EMKQf3mRANF7ZKO9ZaeKljhyCAUHw=;
-        b=o2CoRQeEN2seIBbluduZLkFshtK1MlGmx0HmjNGBTbCTsxLVf8VQ9QJihdKTiFgIq/
-         iSeEb9DvFupaNnwrCp3001206QHKal6auP+/kzVMvT/vLYMxwXhaqmk2q5at+gEsGi9V
-         fR03gHxey1CJkHQ4B07hcefs0JYUrcsG0Tz2O8UTEagIhZ7cD6NTUR7C+CMrIUsihisY
-         k2EpQaZZ8+WX7YQbTXVPRYndVSTtc9RcdMv0y9fOGUaUP8Yr9/rOV6kmQDeyRen3Y/FX
-         RH4qazUcGAHAV/zer8GqbWLxruVp1uUPyLWDc2t1obCqNR4ALwaP5hWazQSth/qKaC9f
-         /mgQ==
-X-Gm-Message-State: AOJu0YwbzPR9raSSYqigZsp0SKEu8M7kvGAL+eDlzhYOtSRRpJfzIBR0
-	FC/WRgfIhtgZXgvHAr/q9FWucTk8GXyN/DECkhgqszRCrQlP
-X-Google-Smtp-Source: AGHT+IGyDKDdu7u5iZJp4qvJvbdN6saFWeu21xb1p5GQZklkpQhmfDhrUusUyOH8lB7HeBm14Lhb1TWgztrOAAAE3vXa+1+KQXDy
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD32D33D3;
+	Sun, 31 Dec 2023 11:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1704022236; x=1704627036; i=markus.elfring@web.de;
+	bh=nbY6QmFmNQ+E2mdJ5exz4FGfT6XhL01ROUuaUkZePiA=;
+	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
+	b=WvLW7K1U+fUm7eSlkrEmXhbDm/eJLthpAbQRMwoFBOJuc0vLSyoYpO4gB8xvsPB3
+	 84e4rm8eQxm8zX0hFTPtumwO5ACPIEFF/i8yzslprqard+YCfFB+UsO1q2/0p5/9w
+	 zZlJwDJJWnwFmHaEM8/tJAi9O/jZcqUOd++pRILvSRPDAaVDGG+PrpBuz0OnV0+l6
+	 DqtopD2D25ESuNS5gzvbLLd19NijKL9ymKb07ycedhP0/ALMCLpPxnpUd+TiMAhKA
+	 mnRjrsCk2rHd9+SI7NWev3sCfQOlRGo7Yp5pfWPl7EQ5Gzeuat22eol1N917bMsEF
+	 h0TMW4dvvVz7Zp5YyQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MIyeU-1reC1u2Ozq-00KrK4; Sun, 31
+ Dec 2023 12:30:36 +0100
+Message-ID: <b9646b4a-61a2-41fb-8fea-ba63e08996f3@web.de>
+Date: Sun, 31 Dec 2023 12:30:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:218a:b0:35f:ebc7:6065 with SMTP id
- j10-20020a056e02218a00b0035febc76065mr2284648ila.1.1704020666201; Sun, 31 Dec
- 2023 03:04:26 -0800 (PST)
-Date: Sun, 31 Dec 2023 03:04:26 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007fbc8c060dcc3a5c@google.com>
-Subject: [syzbot] [net?] general protection fault in hfsc_tcf_block
-From: syzbot <syzbot+0039110f932d438130f9@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, pctammela@mojatatu.com, 
-	syzkaller-bugs@googlegroups.com, victor@mojatatu.com, 
-	xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: tipc-discussion@lists.sourceforge.net, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jon Maloy <jmaloy@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ Ying Xue <ying.xue@windriver.com>
+Content-Language: en-GB
+Cc: LKML <linux-kernel@vger.kernel.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] tipc: Improve exception handling in tipc_bcast_init()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:7eSsDxH83otSo60n2ilX+f33/N7QzAImV6PhRy6CnGPK57balpY
+ 3FgRNv746DviRyDa7CFwrqNhMjriXC8sVt57C/+aa7UEuatXbF2+CDvtO9Wl6KfXvgLLskQ
+ 5t55KLC/WozCe/xxS+ZqUFJYVXTNvLBpfet4LgoT/CpP0Lf1p6vsmrX/mriT0TgytPEyExg
+ MMhhSXRfA7wPIbnOSifTw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:YTPF1jvdTGs=;zJ3xJemRZiorgjWTtMXD5gJdx2g
+ oT8ysAYylDZ4b5aGJymiTYpVJpus0zE6vTVAE/hPhx45M1uJcczl71C8o+PXAMg+ECxOJa78S
+ lnIS08Bw+6lSF2wap4PJeOIH2LqZGd0u/vcF2glXDtuzhKIG+EWUc8apkUMb8HPMouRV7q3/O
+ oIOhtM7M9NmsZP8FihiJIWF2bTyy6tnmdHpZ0xA2ZWHuDyIbBPGAYf76EP6TiGbM+ZDpym6jL
+ moIC2Zpa8LeOhiQ9pkutaD68l1RsfmxYFGosSE5IXaHQepnFozk4qt8RdW7aV9iALQSM3L/y0
+ ou3D/PYEbY02TFXweCR2cnJRUs6QK9AIjWfKWCpAcqJnq3LHTZ1lGQOgxTE5/B4OiTsQHUhUV
+ +cQByw9piIm0a5lELAuIv8Cdj8j7zAZhRrD/e4eOWEtvKV6yuQsFky9CbxLRk5c++PQBC3pzc
+ 4jJ9wzn86OB8Xeabc/0nIgVuH1x5k9uZb6Rn52hjkfyqedeq7nLGyEeWc5B9ZnGNJPEs95lKO
+ SKHagYEn8/SUz9GS3cUVkMjeEpfbkX7RKEVo106UcaX0qlhOZdw6YokZIsbNQoFVHucm5YLHS
+ rjhrnHeQ5hNV5etRAchpLtaFmz0Lx46s9Myx/C2nOxh9xOyxDzZj49KdQf42yyuQiNhkfPH0l
+ bdEWGL3cDwsQv84lyKEAZgIqHi5Pq3xGha5lUCk+y88P92Mx8HGyTfMebPsacLqi3Lw/+yvmE
+ boU0Jl4qLK8lOr7vW6mZlVrtaL5DeWJgsoUz5SCjAZdgCLkWQE6cPKKlZwgXfe+HGql9F1HB2
+ wSyG0SLjCEa2T5SZPtmfNi6JmffL3z9JpFDNX8bZZdy0jMKcC8JhuJB1+lZ4l9Xd7o+vaniZz
+ XTqblTdfi68eqDKitvoh1JRolfH6HBgNKTwFvkM3LSPJLaa4lf0XdLFgOh3TuWXMyDBhBDwkc
+ 0G/M2A==
 
-Hello,
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sun, 31 Dec 2023 12:20:06 +0100
 
-syzbot found the following issue on:
+The kfree() function was called in two cases by
+the tipc_bcast_init() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
-HEAD commit:    c2b2ee36250d bridge: cfm: fix enum typo in br_cc_ccm_tx_pa..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=125321a1e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4e9ca8e3c104d2a
-dashboard link: https://syzkaller.appspot.com/bug?extid=0039110f932d438130f9
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=123c0065e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17a8c0f6e80000
+* Thus return directly after a call of the function =E2=80=9Ckzalloc=E2=80=
+=9D failed
+  at the beginning.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7344dc892eab/disk-c2b2ee36.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b5d04995c162/vmlinux-c2b2ee36.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9558856ab7f4/bzImage-c2b2ee36.xz
+* Move one assignment for the variable =E2=80=9Ctn=E2=80=9D closer to the =
+place
+  where this pointer is used.
 
-The issue was bisected to:
+* Delete a redundant kfree() call.
 
-commit 913b47d3424e7d99eaf34b798c47dfa840c64a08
-Author: Victor Nogueira <victor@mojatatu.com>
-Date:   Tue Dec 19 18:16:19 2023 +0000
+* Omit initialisations (for the local variables)
+  which became unnecessary with this refactoring.
 
-    net/sched: Introduce tc block netdev tracking infra
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ net/tipc/bcast.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1235de8de80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1135de8de80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1635de8de80000
+diff --git a/net/tipc/bcast.c b/net/tipc/bcast.c
+index 593846d25214..631aef2dde45 100644
+=2D-- a/net/tipc/bcast.c
++++ b/net/tipc/bcast.c
+@@ -688,13 +688,15 @@ int tipc_nl_bc_link_set(struct net *net, struct nlat=
+tr *attrs[])
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
-Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra")
+ int tipc_bcast_init(struct net *net)
+ {
+-	struct tipc_net *tn =3D tipc_net(net);
+-	struct tipc_bc_base *bb =3D NULL;
+-	struct tipc_link *l =3D NULL;
++	struct tipc_net *tn;
++	struct tipc_bc_base *bb;
++	struct tipc_link *l;
 
-general protection fault, probably for non-canonical address 0xdffffc0000002009: 0000 [#1] PREEMPT SMP KASAN
-KASAN: probably user-memory-access in range [0x0000000000010048-0x000000000001004f]
-CPU: 1 PID: 5066 Comm: syz-executor151 Not tainted 6.7.0-rc6-syzkaller-01658-gc2b2ee36250d #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:hfsc_tcf_block+0x3f/0x70 net/sched/sch_hfsc.c:1265
-Code: de e8 a5 2b f0 f8 48 85 db 74 2c e8 0b 30 f0 f8 e8 06 30 f0 f8 48 8d 7b 58 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 15 48 8b 43 58 5b 5d c3 e8 df 2f f0 f8 48 8d 9d d0
-RSP: 0018:ffffc90003bcf408 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: 000000000000fff2 RCX: ffffffff8897515b
-RDX: 0000000000002009 RSI: ffffffff8897516a RDI: 000000000001004a
-RBP: ffff88801675f000 R08: 0000000000000007 R09: 0000000000000000
-R10: 000000000000fff2 R11: 0000000000000001 R12: ffff888023d04000
-R13: ffffffff8bed5000 R14: 0000000000000001 R15: ffffffff8f19aa60
-FS:  0000555555ea1380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045ad50 CR3: 000000007ae44000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- qdisc_block_add_dev net/sched/sch_api.c:1190 [inline]
- qdisc_create+0x6b6/0x1430 net/sched/sch_api.c:1390
- tc_modify_qdisc+0x4d5/0x1c30 net/sched/sch_api.c:1788
- rtnetlink_rcv_msg+0x3c7/0xe00 net/core/rtnetlink.c:6615
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2543
- netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
- netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
- netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1908
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0xd5/0x180 net/socket.c:745
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f6a6284c7f9
-Code: 48 83 c4 28 c3 e8 27 18 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff964096d8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f6a6284c7f9
-RDX: 0000000000000000 RSI: 0000000020000240 RDI: 0000000000000003
-RBP: 00007fff964096f0 R08: 00007fff96409750 R09: 00007fff96409750
-R10: 00007fff96409750 R11: 0000000000000246 R12: 00007f6a628bf5f0
-R13: 00007fff964098d8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:hfsc_tcf_block+0x3f/0x70 net/sched/sch_hfsc.c:1265
-Code: de e8 a5 2b f0 f8 48 85 db 74 2c e8 0b 30 f0 f8 e8 06 30 f0 f8 48 8d 7b 58 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 15 48 8b 43 58 5b 5d c3 e8 df 2f f0 f8 48 8d 9d d0
-RSP: 0018:ffffc90003bcf408 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: 000000000000fff2 RCX: ffffffff8897515b
-RDX: 0000000000002009 RSI: ffffffff8897516a RDI: 000000000001004a
-RBP: ffff88801675f000 R08: 0000000000000007 R09: 0000000000000000
-R10: 000000000000fff2 R11: 0000000000000001 R12: ffff888023d04000
-R13: ffffffff8bed5000 R14: 0000000000000001 R15: ffffffff8f19aa60
-FS:  0000555555ea1380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055dcfb61a758 CR3: 000000007ae44000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	de e8                	fsubrp %st,%st(0)
-   2:	a5                   	movsl  %ds:(%rsi),%es:(%rdi)
-   3:	2b f0                	sub    %eax,%esi
-   5:	f8                   	clc
-   6:	48 85 db             	test   %rbx,%rbx
-   9:	74 2c                	je     0x37
-   b:	e8 0b 30 f0 f8       	call   0xf8f0301b
-  10:	e8 06 30 f0 f8       	call   0xf8f0301b
-  15:	48 8d 7b 58          	lea    0x58(%rbx),%rdi
-  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  20:	fc ff df
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	75 15                	jne    0x45
-  30:	48 8b 43 58          	mov    0x58(%rbx),%rax
-  34:	5b                   	pop    %rbx
-  35:	5d                   	pop    %rbp
-  36:	c3                   	ret
-  37:	e8 df 2f f0 f8       	call   0xf8f0301b
-  3c:	48                   	rex.W
-  3d:	8d                   	.byte 0x8d
-  3e:	9d                   	popf
-  3f:	d0                   	.byte 0xd0
+ 	bb =3D kzalloc(sizeof(*bb), GFP_KERNEL);
+ 	if (!bb)
+-		goto enomem;
++		return -ENOMEM;
++
++	tn =3D tipc_net(net);
+ 	tn->bcbase =3D bb;
+ 	spin_lock_init(&tipc_net(net)->bclock);
 
+@@ -715,7 +717,6 @@ int tipc_bcast_init(struct net *net)
+ 	return 0;
+ enomem:
+ 	kfree(bb);
+-	kfree(l);
+ 	return -ENOMEM;
+ }
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+=2D-
+2.43.0
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
