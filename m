@@ -1,43 +1,65 @@
-Return-Path: <netdev+bounces-60648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5082820B74
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 14:56:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB6CC820B7C
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 15:10:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91F4D281C07
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 13:56:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E098B1C20DFF
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 14:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F0E4699;
-	Sun, 31 Dec 2023 13:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BB546A8;
+	Sun, 31 Dec 2023 14:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ZGSSycWL"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="GdPi/rcN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5124763A4;
-	Sun, 31 Dec 2023 13:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1704030977; x=1704635777; i=markus.elfring@web.de;
-	bh=nEsttUe5CEeUqngGIn4dzPSKvNy9/cvmNlkaVhhQ/RI=;
-	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
-	b=ZGSSycWLpylunPskg+Jfpa5BqMEB6fl2Fmr86fzW43GthcPpO+0bGH2uuOd8E5V0
-	 o7NHzJjTIoGxkimBoFgLVhQw7sSaG4dfn9/5kXZyFXw9QTupEK0+ta7e7u8qWSmrD
-	 b8PqqjRzFFfDNUinGbokp7s9Orqr6Pn5hkWxqjfJsoLBsvXfQlPW3IlEKfliYnuZ/
-	 omg2wgpUfwmVXOnINBJSEPY2CoS4Sqsq+hVtvX6OcKlbhjw99GzALOV7b1uZPb2bT
-	 AkThayunimX4O0HvN9PcJlQDHzAhMdtWn9VaizZgFj1uEULUyl4q9bY6l+lyfKzbw
-	 +Tir+rZTsvhlvGAjfg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mv3US-1r2PTt1ebo-00rCuf; Sun, 31
- Dec 2023 14:56:17 +0100
-Message-ID: <9561c78e-49a2-430c-a611-52806c0cdf25@web.de>
-Date: Sun, 31 Dec 2023 14:56:11 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465CA610A
+	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 14:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso2225281a12.3
+        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 06:10:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704031827; x=1704636627; darn=vger.kernel.org;
+        h=in-reply-to:from:references:to:content-language:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l2P8UJoxBQv0z0II8XtzeG8pYJ+EsqqcSqS8meWeRzI=;
+        b=GdPi/rcNlhTL3UcRTd39Fa6R1fNdiPcYQUPIRBVcpE2rXyvcRv5fm4TCzYK7htVUh5
+         yqZZRG8Qd0WJfx9Lzm/+p3b5U3WNkpw6oeCpgmM4SI0HZ6SmKxFLUEUIkrqELXudgTU8
+         F68s0DM6KMAY6hGjbszgexdFCmsp8d3ycju4VASN09a37T3UmB3bkgmWdOrvas7R2Hwq
+         ocpL2/6bw7Tk6a8/ukCp8TsYuMrr2NbXOdKSLf9i/A5Y/O/Qq2n2jUvNpjzBis4Cg80n
+         jjB0cpurShtw+gUn02qpZs04x7+JHwI/VuRBhLvbyjCmGiPsthHCjaNS+47TmEOUEaXo
+         Au2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704031827; x=1704636627;
+        h=in-reply-to:from:references:to:content-language:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=l2P8UJoxBQv0z0II8XtzeG8pYJ+EsqqcSqS8meWeRzI=;
+        b=jU6S9a/JNP5nBoBxnA4U/TtK05pngiWX4mEXnfxagKFdLwJgKmGSBpWQlapnOHVU8N
+         MzQcmOjwc+NZJPBc48gyvqJpW82VBg5IrOcK4bdhv23rvZiJ5rN0b2zW+JY/3as2G9Sf
+         cjQdWpHDPB9RSDsybpf3fD/voc0X0l/ZZOR31PY3M16U4Pvh1gh3BixzBfSoLc/wphdQ
+         ng4akqAB4PgoxepGytewTlzaaZTUCCkFRrIo9sihabpvqaxB6hCJHfSBsMdBmMqWv0KD
+         d/aymttfNrZhOPhh/M8D9+gr8wGGb8jZIKjUt6kukw9V1KtgTbnzKRzNFFfmBsrRDaJM
+         rxNw==
+X-Gm-Message-State: AOJu0YwAuIvbsm3hNAXk0xnxW/QaIYN6Xnkhz1CXz0MxMK+OWw6KcJZh
+	NprrvWCfRCmqDEUhhMHTw5vKsgGaJGc3
+X-Google-Smtp-Source: AGHT+IGmciecIxAsDwnBp+IrNvVwJ9Q+rs9NQPKL6Ki0bd6gGqUQvaO1ndNkfJdgnjXsycNjg0gilg==
+X-Received: by 2002:a05:6a00:3a05:b0:6da:73b4:1c20 with SMTP id fj5-20020a056a003a0500b006da73b41c20mr384121pfb.29.1704031827521;
+        Sun, 31 Dec 2023 06:10:27 -0800 (PST)
+Received: from ?IPV6:2804:7f1:e2c0:aba3:7663:8830:3d6b:aa9f? ([2804:7f1:e2c0:aba3:7663:8830:3d6b:aa9f])
+        by smtp.gmail.com with ESMTPSA id a1-20020a624d01000000b006d974d47a8csm18485013pfb.115.2023.12.31.06.10.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 31 Dec 2023 06:10:27 -0800 (PST)
+Content-Type: multipart/mixed; boundary="------------uW7Kf7C5l765pwsBWEPcP16I"
+Message-ID: <675e418f-ef2f-4bb7-9fde-337171aea92e@mojatatu.com>
+Date: Sun, 31 Dec 2023 11:10:23 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,83 +67,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, Anna Schumaker <anna@kernel.org>,
- Ard Biesheuvel <ardb@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Dai Ngo <Dai.Ngo@oracle.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Jakub Kicinski <kuba@kernel.org>,
- Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <kolga@netapp.com>, Paolo Abeni <pabeni@redhat.com>,
- Simo Sorce <simo@redhat.com>, Tom Talpey <tom@talpey.com>,
- Trond Myklebust <trond.myklebust@hammerspace.com>
-Content-Language: en-GB
-Cc: LKML <linux-kernel@vger.kernel.org>
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] sunrpc: Improve exception handling in krb5_etm_checksum()
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:o+3oZXM5aXP/oMmDGvXATTeotOUUcg2HhBC82RxxTCVtwusv7eB
- eshDx6Ds/r1WrT4BxuV7iTY4+ztBXSrVSWl/npez0TvP14HaKWEYqJfsCNC9+l55IIk7SQo
- mohd9UUyH+SiSKlfDAG4iCNw37UT9/bL+xedA9g5wC5XYMN4ZobjN0qJW4iW7U3xbQK0b6/
- F4wmIoQJZl1rzSElX2uRg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:JhErPCm2gD8=;niu1kNu3Lld8W+IjwHnupI/88oo
- TljVn9uu+ZniZOxStJvZucN2ftjtVSru+w19o9A1jkY6reneqHYApyyBZE84AhsRZ3WaJQPuv
- z9UNN70vfNwKk4J6gxpDiMr/nRUoQqghPeM8QL25Wpi31Nk/ARkKzl7Ds9EpgDeJDYoFvpi+K
- dXpWrmqja/Y2VQTqeM1tC1NRTlBlrdH7O+m60xkSZCJDOeq0Er3G9fbV5QVg+H7zVuAMLMaTI
- lgnFuheBryWGXQDpQU8bA7SYbhoWR4dswhg7ln1I0wF2mGu5RAi6sHX6M9BX68M1XiRxZ0F4h
- tu0nqJJolvEYG2JALwp7z6oM6AX63gpWnNVMLxRmNDQk8kETV3Gw6hEF2JHFY9OFTzpuMtMIn
- uLOBipgLMJmfZcc7mKJHHerYk4c6e44RTKTu6OVgfn1oYO+xBhbzHDdt9rASuvlT6ohtcinVf
- QsYdcKTcJ3U0bDw88hnAsUS6xOzfcajdnjvYm+pxfITL63zrSwAC8VrrFq+F/CKHndmTGknxV
- b17NSyq6efTIKcCEYF9vbqBUEMb+xWSfsjs5evUwcjRu7kn/OsAO848sxbU+Xf21myLOpOCQ2
- a7Pbqqyg8Aq6g1BplUrLLvhu2KVBvjOPCz6y5il921tUl02+iCaNIQ8K+GLPFQaonTyuhwfNf
- 1ImIOa2d40U59iYTqB+3GxwIG4Y6x2lIFhGb+qJNWBJsTZo+hdxg3+vl6tfdKvmtFEK76qqNL
- QoWag+rYgDUKOUri45VnrZ6na0wDH0uAQeT9GLDYNO8lyYWSXoodcRkU1+nngZeCR2B/uPw5m
- SLwjXY1mwsLjOxJ9l87fTLKc5vsswWbBHSUk7tmxe0IJGFAhSYnDxkYOxGFnjjDysPa+7oHWw
- 9FmBlj3SFAZNrsFZO01Hht+GbAkr5Bx1T7rY2MkAXz3dQ8Eydv9ihHDy5YEVBlW9Ks8YIOBcW
- o4RNEQ==
+Subject: Re: [syzbot] [net?] general protection fault in qdisc_create
+Content-Language: en-US
+To: syzbot <syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com>,
+ davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com,
+ jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, pctammela@mojatatu.com,
+ syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+References: <0000000000007c85f5060dcc3a28@google.com>
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <0000000000007c85f5060dcc3a28@google.com>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sun, 31 Dec 2023 14:43:05 +0100
+This is a multi-part message in MIME format.
+--------------uW7Kf7C5l765pwsBWEPcP16I
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The kfree() function was called in one case by
-the krb5_etm_checksum() function during error handling
-even if the passed variable contained a null pointer.
-This issue was detected by using the Coccinelle software.
+On 31/12/2023 08:04, syzbot wrote:
+> HEAD commit:    c2b2ee36250d bridge: cfm: fix enum typo in br_cc_ccm_tx_pa..
+> git tree:       net-next
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15fed8f6e80000
 
-Thus use another label.
+#syz test
+--------------uW7Kf7C5l765pwsBWEPcP16I
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-net-sched-We-should-only-add-appropriate-qdiscs-bloc.patch"
+Content-Disposition: attachment;
+ filename*0="0001-net-sched-We-should-only-add-appropriate-qdiscs-bloc.pa";
+ filename*1="tch"
+Content-Transfer-Encoding: base64
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- net/sunrpc/auth_gss/gss_krb5_crypto.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+RnJvbSBlNjMzNDA3MDdjZTg1Zjg2MDhlM2MzYWUzY2VjMTM0MGVmMTdlZWRlIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBWaWN0b3IgTm9ndWVpcmEgPHZpY3RvckBtb2phdGF0
+dS5jb20+CkRhdGU6IFRodSwgMjggRGVjIDIwMjMgMTM6MTg6NDkgKzAwMDAKU3ViamVjdDog
+W1BBVENIIG5ldC1uZXh0IDEvMV0gbmV0L3NjaGVkOiBXZSBzaG91bGQgb25seSBhZGQgYXBw
+cm9wcmlhdGUgcWRpc2NzCiBibG9ja3MgdG8gcG9ydHMnIHhhcnJheQoKV2Ugc2hvdWxkIG9u
+bHkgYWRkIHFkaXNjcyB0byB0aGUgYmxvY2tzIHBvcnRzJyB4YXJyYXkgaW4gaW5ncmVzcyB0
+aGF0CnN1cHBvcnQgaW5ncmVzc19ibG9ja19zZXQvZ2V0IG9yIGluIGVncmVzcyB0aGF0IHN1
+cHBvcnQKZWdyZXNzX2Jsb2NrX3NldC9nZXQuCgpGaXhlczogOTEzYjQ3ZDM0MjRlICgibmV0
+L3NjaGVkOiBJbnRyb2R1Y2UgdGMgYmxvY2sgbmV0ZGV2IHRyYWNraW5nIGluZnJhIikKClNp
+Z25lZC1vZmYtYnk6IFZpY3RvciBOb2d1ZWlyYSA8dmljdG9yQG1vamF0YXR1LmNvbT4KUmV2
+aWV3ZWQtYnk6IEphbWFsIEhhZGkgU2FsaW0gPGpoc0Btb2phdGF0dS5jb20+Ci0tLQogbmV0
+L3NjaGVkL3NjaF9hcGkuYyB8IDM0ICsrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
+LS0KIDEgZmlsZSBjaGFuZ2VkLCAyMCBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkK
+CmRpZmYgLS1naXQgYS9uZXQvc2NoZWQvc2NoX2FwaS5jIGIvbmV0L3NjaGVkL3NjaF9hcGku
+YwppbmRleCAyOTkwODZiYjYyMDUuLjQyNmJlODEyNzZmMSAxMDA2NDQKLS0tIGEvbmV0L3Nj
+aGVkL3NjaF9hcGkuYworKysgYi9uZXQvc2NoZWQvc2NoX2FwaS5jCkBAIC0xMTg3LDIzICsx
+MTg3LDI5IEBAIHN0YXRpYyBpbnQgcWRpc2NfYmxvY2tfYWRkX2RldihzdHJ1Y3QgUWRpc2Mg
+KnNjaCwgc3RydWN0IG5ldF9kZXZpY2UgKmRldiwKIAlzdHJ1Y3QgdGNmX2Jsb2NrICpibG9j
+azsKIAlpbnQgZXJyOwogCi0JYmxvY2sgPSBjbF9vcHMtPnRjZl9ibG9jayhzY2gsIFRDX0hf
+TUlOX0lOR1JFU1MsIE5VTEwpOwotCWlmIChibG9jaykgewotCQllcnIgPSB4YV9pbnNlcnQo
+JmJsb2NrLT5wb3J0cywgZGV2LT5pZmluZGV4LCBkZXYsIEdGUF9LRVJORUwpOwotCQlpZiAo
+ZXJyKSB7Ci0JCQlOTF9TRVRfRVJSX01TRyhleHRhY2ssCi0JCQkJICAgICAgICJpbmdyZXNz
+IGJsb2NrIGRldiBpbnNlcnQgZmFpbGVkIik7Ci0JCQlyZXR1cm4gZXJyOworCWlmIChzY2gt
+Pm9wcy0+aW5ncmVzc19ibG9ja19nZXQpIHsKKwkJYmxvY2sgPSBjbF9vcHMtPnRjZl9ibG9j
+ayhzY2gsIFRDX0hfTUlOX0lOR1JFU1MsIE5VTEwpOworCQlpZiAoYmxvY2spIHsKKwkJCWVy
+ciA9IHhhX2luc2VydCgmYmxvY2stPnBvcnRzLCBkZXYtPmlmaW5kZXgsIGRldiwKKwkJCQkJ
+R0ZQX0tFUk5FTCk7CisJCQlpZiAoZXJyKSB7CisJCQkJTkxfU0VUX0VSUl9NU0coZXh0YWNr
+LAorCQkJCQkgICAgICAgImluZ3Jlc3MgYmxvY2sgZGV2IGluc2VydCBmYWlsZWQiKTsKKwkJ
+CQlyZXR1cm4gZXJyOworCQkJfQogCQl9CiAJfQogCi0JYmxvY2sgPSBjbF9vcHMtPnRjZl9i
+bG9jayhzY2gsIFRDX0hfTUlOX0VHUkVTUywgTlVMTCk7Ci0JaWYgKGJsb2NrKSB7Ci0JCWVy
+ciA9IHhhX2luc2VydCgmYmxvY2stPnBvcnRzLCBkZXYtPmlmaW5kZXgsIGRldiwgR0ZQX0tF
+Uk5FTCk7Ci0JCWlmIChlcnIpIHsKLQkJCU5MX1NFVF9FUlJfTVNHKGV4dGFjaywKLQkJCQkg
+ICAgICAgIkVncmVzcyBibG9jayBkZXYgaW5zZXJ0IGZhaWxlZCIpOwotCQkJZ290byBlcnJf
+b3V0OworCWlmIChzY2gtPm9wcy0+ZWdyZXNzX2Jsb2NrX2dldCkgeworCQlibG9jayA9IGNs
+X29wcy0+dGNmX2Jsb2NrKHNjaCwgVENfSF9NSU5fRUdSRVNTLCBOVUxMKTsKKwkJaWYgKGJs
+b2NrKSB7CisJCQllcnIgPSB4YV9pbnNlcnQoJmJsb2NrLT5wb3J0cywgZGV2LT5pZmluZGV4
+LCBkZXYsCisJCQkJCUdGUF9LRVJORUwpOworCQkJaWYgKGVycikgeworCQkJCU5MX1NFVF9F
+UlJfTVNHKGV4dGFjaywKKwkJCQkJICAgICAgICJFZ3Jlc3MgYmxvY2sgZGV2IGluc2VydCBm
+YWlsZWQiKTsKKwkJCQlnb3RvIGVycl9vdXQ7CisJCQl9CiAJCX0KIAl9CiAKLS0gCjIuMjUu
+MQoK
 
-diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/g=
-ss_krb5_crypto.c
-index d2b02710ab07..5e2dc3eb8545 100644
-=2D-- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-@@ -942,7 +942,7 @@ u32 krb5_etm_checksum(struct crypto_sync_skcipher *cip=
-her,
- 	/* For RPCSEC, the "initial cipher state" is always all zeroes. */
- 	iv =3D kzalloc(ivsize, GFP_KERNEL);
- 	if (!iv)
--		goto out_free_mem;
-+		goto out_free_checksum;
-
- 	req =3D ahash_request_alloc(tfm, GFP_KERNEL);
- 	if (!req)
-@@ -972,6 +972,7 @@ u32 krb5_etm_checksum(struct crypto_sync_skcipher *cip=
-her,
- 	ahash_request_free(req);
- out_free_mem:
- 	kfree(iv);
-+out_free_checksum:
- 	kfree_sensitive(checksumdata);
- 	return err ? GSS_S_FAILURE : GSS_S_COMPLETE;
- }
-=2D-
-2.43.0
-
+--------------uW7Kf7C5l765pwsBWEPcP16I--
 
