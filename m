@@ -1,65 +1,43 @@
-Return-Path: <netdev+bounces-60652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF859820B8A
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 15:41:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE0B6820BAB
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 16:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B950281C86
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 14:41:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 029C71C20AE8
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 15:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A578C1F;
-	Sun, 31 Dec 2023 14:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5376E5665;
+	Sun, 31 Dec 2023 15:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="soTq0bXs"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="cwr6EcAq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C518BFB
-	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 14:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-28b82dc11e6so3178307a91.1
-        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 06:41:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704033694; x=1704638494; darn=vger.kernel.org;
-        h=in-reply-to:from:references:to:content-language:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qR7AisN034tfmeU3hSsmuMRULlU7xZ0vyPrtC2ltO3U=;
-        b=soTq0bXsLkR6reIsO5ipiDfL6LK5+0kdh95RZDrUaHZ4GOB1Rqd8vieDP+xh2FTMbp
-         Oc3DnUK7XIHsbiXpDBE4eDTRKXEWbG91zHNH7H6LeHYBXNLTbw/vrMB1plWCwpO3IEgN
-         JBBKZT716irQvCqQ/vKW1HeDDJm/InJkz9W3T+uj114lNJCVsxvz3pDdZalw7iARCTQi
-         mOyk8teKIdgZaIeErLpvvO2dhshiebViDRzyig07C5iEKh4tef9m/4G+FldAU6IRs5AF
-         6zdyzmQRu2KAt/dW5EAMZZNoaPgMYzI2LoKqzCW6N32r2AWSI3QAOfQ7OcqbAVPmwj7m
-         oklw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704033694; x=1704638494;
-        h=in-reply-to:from:references:to:content-language:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qR7AisN034tfmeU3hSsmuMRULlU7xZ0vyPrtC2ltO3U=;
-        b=J1VaC6sYmUMeOriRKe+L5X9+YVi1Tv1V/q/NBY0IGOf0fm/L8Jbff3yAXxN1/VKqFB
-         KX7iJy+NYg9CWdyIiXdkMLZTNRWrDqLfh3+1+6F35YvQMPiQHNGRtCNGJEEPXZJGPqTH
-         CPJd0/KPGIHxKzqwfntcbSxVXrTU5e1G8j63QQCHHPVm0+fsPOpml2onG5zvUooGP91X
-         GKMVFpgKiAGmLxTdJ9fYRE9An9OqzLM1wEkX8C7GaaR13jQIPMhWyGOEWKy0CkdS+8Iq
-         Q/MUzTQ3qrwJThob70hO0qfNwGNLeA2IjCUxIGG+rob7mRTNQ/hCU/C5j7i3FnUnR464
-         KnZw==
-X-Gm-Message-State: AOJu0YwfUz8dums9qOqaYQ/HErdfkDCLTOQG0OcdD8cSc+U8me9c3IfC
-	ijD6mT6g+jquEDjuRKAXIAQ8dYVST7s7
-X-Google-Smtp-Source: AGHT+IF9fCo869OPerxGiV4aR4UhHkT+IVuzo9JZhyWTyq1IwddqMeNHMqAwNLfqk6RA6DEYZyYtzw==
-X-Received: by 2002:a05:6a20:7819:b0:194:9dff:4458 with SMTP id a25-20020a056a20781900b001949dff4458mr5500319pzg.3.1704033693912;
-        Sun, 31 Dec 2023 06:41:33 -0800 (PST)
-Received: from ?IPV6:2804:7f1:e2c0:aba3:7663:8830:3d6b:aa9f? ([2804:7f1:e2c0:aba3:7663:8830:3d6b:aa9f])
-        by smtp.gmail.com with ESMTPSA id d5-20020a170902854500b001d49f61cb64sm4310348plo.262.2023.12.31.06.41.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 31 Dec 2023 06:41:33 -0800 (PST)
-Content-Type: multipart/mixed; boundary="------------09loKEO8TzhvggEzUJHk0On0"
-Message-ID: <360d5a75-b06a-4b52-ba6c-e24a0bffa530@mojatatu.com>
-Date: Sun, 31 Dec 2023 11:41:29 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6814C8F48;
+	Sun, 31 Dec 2023 15:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1704034522; x=1704639322; i=markus.elfring@web.de;
+	bh=sPbGqZwafLmtEVIaH8Z0WnNMA+uOieKky2NsYhgEBh0=;
+	h=X-UI-Sender-Class:Date:To:From:Subject;
+	b=cwr6EcAqvvbLEgTJSCXhxgnhD6vJ3RUoLFFClVCYcn6vPZYrcD99r7om7I9JkfWp
+	 gMrG2w2qyZJgj9mnIGzlNFX/zWPzNc2T58oz7yXm9BeA7skKbGm+INo2UlleT3Ebc
+	 yk0ztsK32Ocgjc6lcjTM+6Zz8AEeozL6nKxULQuYjDf2DiWOB0s+YbF4JDmA2JCJv
+	 yjtmxv2HNpCrjhlHrfNxt2vbtHW3W2IU4oircNaQ8fyZy/izmol7usaEgvhLKMZRa
+	 7P5GXKBj8yW/XzJhGkFzts14YX23IKxWZin+9XAeOHQUINDsjCu8OAgcmiuXw3tyK
+	 WPb4pFaPtgZdMn9mBg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MECGX-1rTcPH3FjR-00A8yI; Sun, 31
+ Dec 2023 15:55:22 +0100
+Message-ID: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
+Date: Sun, 31 Dec 2023 15:55:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,76 +45,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] general protection fault in hfsc_tcf_block
-Content-Language: en-US
-To: syzbot <syzbot+0039110f932d438130f9@syzkaller.appspotmail.com>,
- davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com,
- jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, pctammela@mojatatu.com,
- syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-References: <0000000000007fbc8c060dcc3a5c@google.com>
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <0000000000007fbc8c060dcc3a5c@google.com>
+To: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
+ Paolo Abeni <pabeni@redhat.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ Wen Gu <guwen@linux.alibaba.com>, Wenjia Zhang <wenjia@linux.ibm.com>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH 0/2] net/smc: Adjustments for two function implementations
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:fMt6aL0td+jOUlHgZcHRKvPvhNP4ynrk9DKe8/vJO8JS/KSguym
+ 6TSeU5vmD19bWtL9VmfNaKA1betfa4Bg58SwJWaDfdkpIcqGG7OxvH5IbzgY8bBs7fJbfK+
+ KJZymviWlFgRVJfnRRBJjnrXeSOgNF+3ue0/FkUpkgRJnG/OwsbIKk4fvIgFH/+zJ/iQl7b
+ bOuYR9PNRxaWB/ROPcN0Q==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:1PMvN/iqWjE=;s/6PrCzXY3EPFFVTSdcrWeBOscN
+ CuC69C1DSZwbuqkBSCPyQq3G6gWp1oB4BnJF07e19TKtVdqoUT7JgUQtmBrZXGNFs80CdGW+2
+ OBBVE/YYLzYlcagERj/5R/JsW8zaE+Z2rROHkfaLW7mX5aRx8VqiQO7GpSvqzp1+lnsQ37LG+
+ yTuApcsLyYeRxKUIfyGJtp19Od0bCyD+XnhhwamR5BlJif+r2mO/Dhd3GJh/afcfwpHPchuEs
+ 9Zw+6ug8qV1WcIJ5TVEM3Is0896mr7hv1yd6NDbqbXTXc6y5YH4PTKyqEIMNjS1AXHdXSWcbd
+ sh4ndH1DBdr55VCkgVpyREKtsakhLLRotCttmo4l9ZNM6rbAAqEyv3uCYu+yBAhNoQMaENifE
+ ostOhqHAWlRfoiISU9X5m7LvgBltcxpld220PDY9l8n9EJO3kSahE+RFnuv12eNoHWOLyOm/Q
+ Qq/ENtmvn4M+rxOf8bIo8LU73i2hSdpvFHUg5X8DNQqGvqlh9fVYDKYJ7i3oGHOGtIUY8UsVc
+ 6DZ5xE0nHZhcUNHW6FzP4LIlHigVCNcy6dv3zC2eqFGnxgZYVnsnrRpngTK1bASMeC3KPUz+f
+ hAipBB9+34c0sigPVbc++a1WRLhheVWVY4IjEgrPEubwzPK61+43g9oEL4TXDxA/2leojlEIS
+ wD5RRqG5PgmBUe1qouie9AQc5ZylADqosVIq9ykt1Q5DL8yCr2RhwKu2AOowzidPPAI07/+iZ
+ 1geYmKzVIFCccsxw8Od64qgW98LwLz4kDBHYhKtVdWP4N5AjTa/ErRlaHl+GXgOcsHN9Fc3ql
+ Q3wbLJcresGU1Zmb5nIBkWUkOBJFewr3zrDpUjp/oyEl73iHOPLCaDAMjP30XX8uEr3ywkSs3
+ 1q/wC/iPaS0G2uhVQEjLHjbXoC7U/hN/8khP/ZTwNz59j1Hw8bgt2mu7iZ2rtppi/Nc2cl6IM
+ gfn9ZXdJp2aj8XI8ctId8endSuU=
 
-This is a multi-part message in MIME format.
---------------09loKEO8TzhvggEzUJHk0On0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sun, 31 Dec 2023 15:48:45 +0100
 
-On 31/12/2023 08:04, syzbot wrote:
-> HEAD commit:    c2b2ee36250d bridge: cfm: fix enum typo in br_cc_ccm_tx_pa..
-> git tree:       net-next
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17a8c0f6e80000
+A few update suggestions were taken into account
+from static source code analysis.
 
-#syz test
---------------09loKEO8TzhvggEzUJHk0On0
-Content-Type: text/x-patch; charset=UTF-8;
- name="0001-net-sched-We-should-only-add-appropriate-qdiscs-bloc.patch"
-Content-Disposition: attachment;
- filename*0="0001-net-sched-We-should-only-add-appropriate-qdiscs-bloc.pa";
- filename*1="tch"
-Content-Transfer-Encoding: base64
+Markus Elfring (2):
+  Return directly after a failed kzalloc() in smc_fill_gid_list()
+  Improve exception handling in smc_llc_cli_add_link_invite()
 
-RnJvbSBlNjMzNDA3MDdjZTg1Zjg2MDhlM2MzYWUzY2VjMTM0MGVmMTdlZWRlIE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBWaWN0b3IgTm9ndWVpcmEgPHZpY3RvckBtb2phdGF0
-dS5jb20+CkRhdGU6IFRodSwgMjggRGVjIDIwMjMgMTM6MTg6NDkgKzAwMDAKU3ViamVjdDog
-W1BBVENIIG5ldC1uZXh0IDEvMV0gbmV0L3NjaGVkOiBXZSBzaG91bGQgb25seSBhZGQgYXBw
-cm9wcmlhdGUgcWRpc2NzCiBibG9ja3MgdG8gcG9ydHMnIHhhcnJheQoKV2Ugc2hvdWxkIG9u
-bHkgYWRkIHFkaXNjcyB0byB0aGUgYmxvY2tzIHBvcnRzJyB4YXJyYXkgaW4gaW5ncmVzcyB0
-aGF0CnN1cHBvcnQgaW5ncmVzc19ibG9ja19zZXQvZ2V0IG9yIGluIGVncmVzcyB0aGF0IHN1
-cHBvcnQKZWdyZXNzX2Jsb2NrX3NldC9nZXQuCgpGaXhlczogOTEzYjQ3ZDM0MjRlICgibmV0
-L3NjaGVkOiBJbnRyb2R1Y2UgdGMgYmxvY2sgbmV0ZGV2IHRyYWNraW5nIGluZnJhIikKClNp
-Z25lZC1vZmYtYnk6IFZpY3RvciBOb2d1ZWlyYSA8dmljdG9yQG1vamF0YXR1LmNvbT4KUmV2
-aWV3ZWQtYnk6IEphbWFsIEhhZGkgU2FsaW0gPGpoc0Btb2phdGF0dS5jb20+Ci0tLQogbmV0
-L3NjaGVkL3NjaF9hcGkuYyB8IDM0ICsrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
-LS0KIDEgZmlsZSBjaGFuZ2VkLCAyMCBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9uZXQvc2NoZWQvc2NoX2FwaS5jIGIvbmV0L3NjaGVkL3NjaF9hcGku
-YwppbmRleCAyOTkwODZiYjYyMDUuLjQyNmJlODEyNzZmMSAxMDA2NDQKLS0tIGEvbmV0L3Nj
-aGVkL3NjaF9hcGkuYworKysgYi9uZXQvc2NoZWQvc2NoX2FwaS5jCkBAIC0xMTg3LDIzICsx
-MTg3LDI5IEBAIHN0YXRpYyBpbnQgcWRpc2NfYmxvY2tfYWRkX2RldihzdHJ1Y3QgUWRpc2Mg
-KnNjaCwgc3RydWN0IG5ldF9kZXZpY2UgKmRldiwKIAlzdHJ1Y3QgdGNmX2Jsb2NrICpibG9j
-azsKIAlpbnQgZXJyOwogCi0JYmxvY2sgPSBjbF9vcHMtPnRjZl9ibG9jayhzY2gsIFRDX0hf
-TUlOX0lOR1JFU1MsIE5VTEwpOwotCWlmIChibG9jaykgewotCQllcnIgPSB4YV9pbnNlcnQo
-JmJsb2NrLT5wb3J0cywgZGV2LT5pZmluZGV4LCBkZXYsIEdGUF9LRVJORUwpOwotCQlpZiAo
-ZXJyKSB7Ci0JCQlOTF9TRVRfRVJSX01TRyhleHRhY2ssCi0JCQkJICAgICAgICJpbmdyZXNz
-IGJsb2NrIGRldiBpbnNlcnQgZmFpbGVkIik7Ci0JCQlyZXR1cm4gZXJyOworCWlmIChzY2gt
-Pm9wcy0+aW5ncmVzc19ibG9ja19nZXQpIHsKKwkJYmxvY2sgPSBjbF9vcHMtPnRjZl9ibG9j
-ayhzY2gsIFRDX0hfTUlOX0lOR1JFU1MsIE5VTEwpOworCQlpZiAoYmxvY2spIHsKKwkJCWVy
-ciA9IHhhX2luc2VydCgmYmxvY2stPnBvcnRzLCBkZXYtPmlmaW5kZXgsIGRldiwKKwkJCQkJ
-R0ZQX0tFUk5FTCk7CisJCQlpZiAoZXJyKSB7CisJCQkJTkxfU0VUX0VSUl9NU0coZXh0YWNr
-LAorCQkJCQkgICAgICAgImluZ3Jlc3MgYmxvY2sgZGV2IGluc2VydCBmYWlsZWQiKTsKKwkJ
-CQlyZXR1cm4gZXJyOworCQkJfQogCQl9CiAJfQogCi0JYmxvY2sgPSBjbF9vcHMtPnRjZl9i
-bG9jayhzY2gsIFRDX0hfTUlOX0VHUkVTUywgTlVMTCk7Ci0JaWYgKGJsb2NrKSB7Ci0JCWVy
-ciA9IHhhX2luc2VydCgmYmxvY2stPnBvcnRzLCBkZXYtPmlmaW5kZXgsIGRldiwgR0ZQX0tF
-Uk5FTCk7Ci0JCWlmIChlcnIpIHsKLQkJCU5MX1NFVF9FUlJfTVNHKGV4dGFjaywKLQkJCQkg
-ICAgICAgIkVncmVzcyBibG9jayBkZXYgaW5zZXJ0IGZhaWxlZCIpOwotCQkJZ290byBlcnJf
-b3V0OworCWlmIChzY2gtPm9wcy0+ZWdyZXNzX2Jsb2NrX2dldCkgeworCQlibG9jayA9IGNs
-X29wcy0+dGNmX2Jsb2NrKHNjaCwgVENfSF9NSU5fRUdSRVNTLCBOVUxMKTsKKwkJaWYgKGJs
-b2NrKSB7CisJCQllcnIgPSB4YV9pbnNlcnQoJmJsb2NrLT5wb3J0cywgZGV2LT5pZmluZGV4
-LCBkZXYsCisJCQkJCUdGUF9LRVJORUwpOworCQkJaWYgKGVycikgeworCQkJCU5MX1NFVF9F
-UlJfTVNHKGV4dGFjaywKKwkJCQkJICAgICAgICJFZ3Jlc3MgYmxvY2sgZGV2IGluc2VydCBm
-YWlsZWQiKTsKKwkJCQlnb3RvIGVycl9vdXQ7CisJCQl9CiAJCX0KIAl9CiAKLS0gCjIuMjUu
-MQoK
+ net/smc/af_smc.c  |  2 +-
+ net/smc/smc_llc.c | 15 +++++++--------
+ 2 files changed, 8 insertions(+), 9 deletions(-)
 
---------------09loKEO8TzhvggEzUJHk0On0--
+=2D-
+2.43.0
+
 
