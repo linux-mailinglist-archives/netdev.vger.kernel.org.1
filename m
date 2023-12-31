@@ -1,123 +1,200 @@
-Return-Path: <netdev+bounces-60641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0C83820B0E
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 11:33:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AECAB820B2A
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 12:04:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90A351F218A7
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 10:33:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A9261F21515
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 11:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E2528F1;
-	Sun, 31 Dec 2023 10:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="jtKpTd1m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1A42906;
+	Sun, 31 Dec 2023 11:04:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9736A8F48;
-	Sun, 31 Dec 2023 10:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1704018801; x=1704623601; i=markus.elfring@web.de;
-	bh=I0Xu6K601Nm32B7uvcWfNE+QosXgVl3IjaU3K1o4CgM=;
-	h=X-UI-Sender-Class:Date:To:From:Subject:Cc;
-	b=jtKpTd1mVE8EfPH3AgRi3bsjnjZu0bbyDmAl1LXrxczjagkwrkM70hTSTBrYmLMr
-	 evo6ZnUhBhJs+Pg7ugM5f06Vx/GgIRluk3HkhK4dYW7Avop9nGg1upOsNKKCEprY4
-	 HR2/i0T7ndOsd0BSVzX8MXktTkYF5MBvDylQRieOI3PXW+BeNrk6UYUVLPV6KrMYW
-	 fn5DNdN7f2hYnj8vZNLZo49YDt05nXKxEQzZPP6wJSDqtGYCtl4VkuZ5DHI1jC712
-	 LbYgb1MJv1d4auXv/P87flrKrfOouewzAix/58REJaJAJkrA4gmnvCn6/pUM+NQMh
-	 8+917lu1L/wZBimnFA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N6sG3-1rAOUA1RyJ-017uVs; Sun, 31
- Dec 2023 11:33:21 +0100
-Message-ID: <873097b9-5a0b-495b-83ae-f2247fbb512b@web.de>
-Date: Sun, 31 Dec 2023 11:33:19 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5CC33CF
+	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 11:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35ffefe1f5cso61976095ab.1
+        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 03:04:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704020666; x=1704625466;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kYkYEvGx30RFSFP8frLy+6pEGVc4qdRv1fh1EKzCoMI=;
+        b=Szo804kID4+EAm9kMjqpKOA+XRV9zCWk1h88uCoQDjdR0sUA95va+OYVUXXUv8yk0c
+         18UhKPobUbSVTWO9OH46IdN37qVoOumcVa/NmyKfdzWhNHb3OYcV50D8cRe3NZkpLeOw
+         vmWo9jB9prrfgLDUlAWe1UE/CvXBUMnjTjIZcKIoM7VoYimikEGdYjTZOBul1oKDg4Id
+         1XCc26KoO0Jw1gQjThn649hjZW4sgXuyTHliIsKKDIM4cpe/giDTPkoOV41BuytWnZ35
+         /bOXJ5sc8fiF86L3E+GCnY+kwP2HGblWNSkmc+AdZfPjdo7JgkRoignGJdQKXyMZMcQU
+         NL8A==
+X-Gm-Message-State: AOJu0YzAYUCxH/0mN+1U56oFZGEwbG02bCWAu/xpGEo29HxttykCUN0X
+	+pqpgn6qAHvuPL6K3ReAA6swloWLRgwGCEMQwwOs3lvb/K9T
+X-Google-Smtp-Source: AGHT+IEErd/mvxZp1rrwLsHHgwbeVX4N8+uuwxQurJM3VoTmteoCpNnk37Z1MZQm/KXvYp6Pyq6yZWHD2m+8uQOCL1gCDOroG7SB
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Johannes Berg <johannes@sipsolutions.net>, Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] wifi: cfg80211: Replace a label in
- cfg80211_parse_ml_sta_data()
-Cc: LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:iM1BOGtdeD8AtCAAfFlwSOiytaVaoci3r6z1EsCpcglGg4EL/hA
- IXcu2yRVlCN53tgjzSijw6VgV7AsMO5XQQ8aTJLtR00XmbtkBSg9KF3fJdaoLbYfthPZd9m
- vzO0lXKJsuNYJlw6UBcP1P14+EAvlO9UDD5OvpwbEVbz1MMlz3u/3G4Um5kXIvKuBL30qrb
- qdONys6dZdda+oG21cszg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:0+UXqzkwbU8=;mZ1uV5g6EcraQSB7q7DMh40Rgha
- mdyfTu67DW1VQCUIFbjKQs6MVWe8n1uG1O0VR74tK7mCcIEJ5x7Rh2ZQHecIoAY+UnfLEJtVf
- RpTix2ykctPyxxTDEQhbrRDdqxSv2O9DMJBU4RaS2i9tB+/VryJlOZmlhlrggSbm64OYxHzAv
- O2H36Eg+lX4ZdOl96OZG90eZ7Ksar9tK0UkxplhDuNqIr9ciMCWa6w4T7qHRYC/REawypR6ZM
- LUQ9SZ9KSk1BQfgGrIjMvF49YLiV+d2M6KyRg+lIg8t8x8CQgH7tTulKMfOvslkQ0sAVN7/dd
- ckNBF6Xj+KvyATOeLy6R/8+UgWnrA122VvkIfNmlTm7DSdo65jBWceO36GRUvFZZyfuD7BBvc
- 3h9AEaYSIzkvf0rqJUrioBNnubES5gCVYeMOfGR3ANgIEXPdgnOuwwSLSaMZmq/V3B+qGAwn1
- 09fS6gT6w+8ByfNq1h0FoDb2AK20mp0gU+zncpWY8F1DNdkp4x8HfvpSF28w+nLAY7RF2Nu+j
- l5WROVg44dhML8c6wjMJkAWFw3L1Gc/3cI/ARsGkUUL05CCjAVt2Ch3QAKrA4hLtFAb9/PrLF
- dqL5RLfVhApN5yXlJOJWL58q6QTQmWD9m9yVOwezXDao6jSgQwljx26lDqOM1qVv1Kwi+b+WZ
- 38LeByva4HDq2AiLiyrk/UFIDEMuYZishuYy4T2TeibsgqFB+4SZNWy+0VVE7B0TOrY4JP96y
- 6nVfAn7v8TB0WRK61etRq0Gnke+rug4uOUcEanAbpdM91YPCsH+tT+bpYYDaNfKhCl1jTo5l1
- +V/vK34eCgRt5/HSN5G9wQIIxtQisHKpLx7Fnu0LAdSm6CY88V2mpCyFyxPb9TsyEXbSgQLO0
- dgEoBR6WHAYXhnwZ2RownoeOufKaQB0TtHMxbAImFEUpokcjiNEt2ibBB5AgrZRKaNPBrq8YG
- tcL/Rg==
+X-Received: by 2002:a05:6e02:2182:b0:35f:eceb:fc42 with SMTP id
+ j2-20020a056e02218200b0035fecebfc42mr1791894ila.3.1704020665990; Sun, 31 Dec
+ 2023 03:04:25 -0800 (PST)
+Date: Sun, 31 Dec 2023 03:04:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007c85f5060dcc3a28@google.com>
+Subject: [syzbot] [net?] general protection fault in qdisc_create
+From: syzbot <syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, pctammela@mojatatu.com, 
+	syzkaller-bugs@googlegroups.com, victor@mojatatu.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sun, 31 Dec 2023 11:22:42 +0100
+Hello,
 
-The kfree() function was called in one case by
-the cfg80211_parse_ml_sta_data() function during error handling
-even if the passed variable contained a null pointer.
-This issue was detected by using the Coccinelle software.
+syzbot found the following issue on:
 
-Thus use an other label.
+HEAD commit:    c2b2ee36250d bridge: cfm: fix enum typo in br_cc_ccm_tx_pa..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=15812036e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a4e9ca8e3c104d2a
+dashboard link: https://syzkaller.appspot.com/bug?extid=84339b9e7330daae4d66
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13535445e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15fed8f6e80000
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- net/wireless/scan.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7344dc892eab/disk-c2b2ee36.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b5d04995c162/vmlinux-c2b2ee36.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9558856ab7f4/bzImage-c2b2ee36.xz
 
-diff --git a/net/wireless/scan.c b/net/wireless/scan.c
-index cf2131671eb6..492e30138418 100644
-=2D-- a/net/wireless/scan.c
-+++ b/net/wireless/scan.c
-@@ -2693,7 +2693,7 @@ static void cfg80211_parse_ml_sta_data(struct wiphy =
-*wiphy,
+The issue was bisected to:
 
- 	new_ie =3D kmalloc(IEEE80211_MAX_DATA_LEN, gfp);
- 	if (!new_ie)
--		goto out;
-+		goto free_mle;
+commit 913b47d3424e7d99eaf34b798c47dfa840c64a08
+Author: Victor Nogueira <victor@mojatatu.com>
+Date:   Tue Dec 19 18:16:19 2023 +0000
 
- 	for (i =3D 0; i < ARRAY_SIZE(mle->sta_prof) && mle->sta_prof[i]; i++) {
- 		const struct ieee80211_neighbor_ap_info *ap_info;
-@@ -2812,8 +2812,8 @@ static void cfg80211_parse_ml_sta_data(struct wiphy =
-*wiphy,
- 		cfg80211_put_bss(wiphy, bss);
- 	}
+    net/sched: Introduce tc block netdev tracking infra
 
--out:
- 	kfree(new_ie);
-+free_mle:
- 	kfree(mle);
- }
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11992409e80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13992409e80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15992409e80000
 
-=2D-
-2.43.0
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com
+Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra")
 
+general protection fault, probably for non-canonical address 0xdffffc0000000009: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000048-0x000000000000004f]
+CPU: 1 PID: 5061 Comm: syz-executor323 Not tainted 6.7.0-rc6-syzkaller-01658-gc2b2ee36250d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:qdisc_block_add_dev net/sched/sch_api.c:1190 [inline]
+RIP: 0010:qdisc_create+0x69e/0x1430 net/sched/sch_api.c:1390
+Code: ea 03 80 3c 02 00 0f 85 50 0c 00 00 4c 8b 6d 08 49 8d 45 48 48 89 c2 48 89 44 24 18 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 0f 0c 00 00 31 d2 be f2 ff 00 00 48 89 df 41 ff
+RSP: 0018:ffffc9000398f420 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: ffff88802688c800 RCX: ffffffff888dbd56
+RDX: 0000000000000009 RSI: ffffffff888db6fe RDI: ffffffff8f19bde8
+RBP: ffffffff8f19bde0 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffff88804fd64000
+R13: 0000000000000000 R14: 0000000000000001 R15: ffffffff8f19bde0
+FS:  0000555556ef3380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020001248 CR3: 0000000027f71000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ tc_modify_qdisc+0x4d5/0x1c30 net/sched/sch_api.c:1788
+ rtnetlink_rcv_msg+0x3c7/0xe00 net/core/rtnetlink.c:6615
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2543
+ netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+ netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
+ netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1908
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f9733a8a8b9
+Code: 48 83 c4 28 c3 e8 27 18 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd50d7c048 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f9733a8a8b9
+RDX: 0000000000000000 RSI: 0000000020005840 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 00007ffd50d7c0c0
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffd50d7c248 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:qdisc_block_add_dev net/sched/sch_api.c:1190 [inline]
+RIP: 0010:qdisc_create+0x69e/0x1430 net/sched/sch_api.c:1390
+Code: ea 03 80 3c 02 00 0f 85 50 0c 00 00 4c 8b 6d 08 49 8d 45 48 48 89 c2 48 89 44 24 18 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 0f 0c 00 00 31 d2 be f2 ff 00 00 48 89 df 41 ff
+RSP: 0018:ffffc9000398f420 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: ffff88802688c800 RCX: ffffffff888dbd56
+RDX: 0000000000000009 RSI: ffffffff888db6fe RDI: ffffffff8f19bde8
+RBP: ffffffff8f19bde0 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffff88804fd64000
+R13: 0000000000000000 R14: 0000000000000001 R15: ffffffff8f19bde0
+FS:  0000555556ef3380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020001248 CR3: 0000000027f71000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	03 80 3c 02 00 0f    	add    0xf00023c(%rax),%eax
+   6:	85 50 0c             	test   %edx,0xc(%rax)
+   9:	00 00                	add    %al,(%rax)
+   b:	4c 8b 6d 08          	mov    0x8(%rbp),%r13
+   f:	49 8d 45 48          	lea    0x48(%r13),%rax
+  13:	48 89 c2             	mov    %rax,%rdx
+  16:	48 89 44 24 18       	mov    %rax,0x18(%rsp)
+  1b:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  22:	fc ff df
+  25:	48 c1 ea 03          	shr    $0x3,%rdx
+* 29:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2d:	0f 85 0f 0c 00 00    	jne    0xc42
+  33:	31 d2                	xor    %edx,%edx
+  35:	be f2 ff 00 00       	mov    $0xfff2,%esi
+  3a:	48 89 df             	mov    %rbx,%rdi
+  3d:	41                   	rex.B
+  3e:	ff                   	.byte 0xff
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
