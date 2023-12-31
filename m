@@ -1,105 +1,127 @@
-Return-Path: <netdev+bounces-60647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03FF2820B65
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 13:21:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5082820B74
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 14:56:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99A6BB2154E
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 12:21:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91F4D281C07
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 13:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40BF3C13;
-	Sun, 31 Dec 2023 12:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F0E4699;
+	Sun, 31 Dec 2023 13:56:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="no09Tun9"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ZGSSycWL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6602963A4;
-	Sun, 31 Dec 2023 12:20:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-55644a67e3fso89877a12.2;
-        Sun, 31 Dec 2023 04:20:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704025254; x=1704630054; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OyEBlc5ZSs1I+XcM4fg18hFXs7fYBFAo20uTCN54lOQ=;
-        b=no09Tun9Tkgo8pfv03rE/nqqRsEt8KYxW64/RfLIZ+XC/CKZ8daU2y3FnbtSesdWk4
-         XjxUhCYihm0zmzhrpeIoR8dY+vfylOFFzR2TfBm0kF1YZ3W+N3tMNbhWq2IJl1wYMEcF
-         itMMWoHEye9o1RWj2pu6drCZQZ3Z1ijCnpSrAyqUvsjJvEG9RXQ6D86eOi4o/wqO4Bsk
-         ptU6G3SleXCdPXHooUFMzKlpcFMixhVxGmXVYWimN7Fp83WZ87Sgb9tRvIByr7qJfRRK
-         Cp8YPTycRWG7IdTnASOW+nhfr3tXG3OeaWKB9OJoTSyQoaL9H8ynDev76+fRg1Cjc4wh
-         HRog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704025254; x=1704630054;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OyEBlc5ZSs1I+XcM4fg18hFXs7fYBFAo20uTCN54lOQ=;
-        b=wbOLT78w1kOJq0tVY4T6woQpcSuddMOatGKjxkOb7jqVX1CtccCuYJpu1r8F6todLG
-         j4K3Sieh6cuIOAk8vq1aV6h5KlSJfU2NaEuC8eG/GbIzStoS4exQAAYe+0Qz5QNPBQi/
-         X8QkRqA6jIx8zHP1PvkwgX5rUjsN4p2MmjlQRt7wjCgQQW5Pcx/4R9p988LXXH4qMoBd
-         X2TxGhGlXKzAFJ1TjgSZjP85WRvd3bJz6W3wPCLr1Nhmswwjw2ho55C7RFxz+AP/mGAT
-         94qdrETvzXropIaz1ZrYhhaDCQxuRLgWRoIeiHMM8AZVvjwDG5cYMc36MAVGzwXWtm45
-         V/kA==
-X-Gm-Message-State: AOJu0YzFghmGVpiCTmC5KeeBA5eXLt1GWMYZbQ8fkcTFl5Q+QeEMbjlr
-	p09JL5cDnVHldmZp69inso8YsOwdZMEGQQ==
-X-Google-Smtp-Source: AGHT+IGTRdnO5P/1q9UtcvGDV1MKuRQC7nmSu5QQtVH0zQWAEm5mzxmWH8NoF9St5kLyyHGjhZGVrg==
-X-Received: by 2002:a50:f60d:0:b0:555:dc5f:101d with SMTP id c13-20020a50f60d000000b00555dc5f101dmr1102831edn.8.1704025254464;
-        Sun, 31 Dec 2023 04:20:54 -0800 (PST)
-Received: from mwserver.home (83.22.156.127.ipv4.supernova.orange.pl. [83.22.156.127])
-        by smtp.gmail.com with ESMTPSA id n6-20020a05640204c600b00555ec66a440sm2201856edw.59.2023.12.31.04.20.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Dec 2023 04:20:54 -0800 (PST)
-From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: andriy.shevchenko@linux.intel.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux@armlinux.org.uk,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>
-Subject: [net-next: PATCH] net: mvpp2: initialize port fwnode pointer
-Date: Sun, 31 Dec 2023 12:20:19 +0000
-Message-Id: <20231231122019.123344-1-marcin.s.wojtas@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5124763A4;
+	Sun, 31 Dec 2023 13:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1704030977; x=1704635777; i=markus.elfring@web.de;
+	bh=nEsttUe5CEeUqngGIn4dzPSKvNy9/cvmNlkaVhhQ/RI=;
+	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
+	b=ZGSSycWLpylunPskg+Jfpa5BqMEB6fl2Fmr86fzW43GthcPpO+0bGH2uuOd8E5V0
+	 o7NHzJjTIoGxkimBoFgLVhQw7sSaG4dfn9/5kXZyFXw9QTupEK0+ta7e7u8qWSmrD
+	 b8PqqjRzFFfDNUinGbokp7s9Orqr6Pn5hkWxqjfJsoLBsvXfQlPW3IlEKfliYnuZ/
+	 omg2wgpUfwmVXOnINBJSEPY2CoS4Sqsq+hVtvX6OcKlbhjw99GzALOV7b1uZPb2bT
+	 AkThayunimX4O0HvN9PcJlQDHzAhMdtWn9VaizZgFj1uEULUyl4q9bY6l+lyfKzbw
+	 +Tir+rZTsvhlvGAjfg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mv3US-1r2PTt1ebo-00rCuf; Sun, 31
+ Dec 2023 14:56:17 +0100
+Message-ID: <9561c78e-49a2-430c-a611-52806c0cdf25@web.de>
+Date: Sun, 31 Dec 2023 14:56:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, Anna Schumaker <anna@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+ Dai Ngo <Dai.Ngo@oracle.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Jakub Kicinski <kuba@kernel.org>,
+ Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
+ Olga Kornievskaia <kolga@netapp.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simo Sorce <simo@redhat.com>, Tom Talpey <tom@talpey.com>,
+ Trond Myklebust <trond.myklebust@hammerspace.com>
+Content-Language: en-GB
+Cc: LKML <linux-kernel@vger.kernel.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] sunrpc: Improve exception handling in krb5_etm_checksum()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:o+3oZXM5aXP/oMmDGvXATTeotOUUcg2HhBC82RxxTCVtwusv7eB
+ eshDx6Ds/r1WrT4BxuV7iTY4+ztBXSrVSWl/npez0TvP14HaKWEYqJfsCNC9+l55IIk7SQo
+ mohd9UUyH+SiSKlfDAG4iCNw37UT9/bL+xedA9g5wC5XYMN4ZobjN0qJW4iW7U3xbQK0b6/
+ F4wmIoQJZl1rzSElX2uRg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:JhErPCm2gD8=;niu1kNu3Lld8W+IjwHnupI/88oo
+ TljVn9uu+ZniZOxStJvZucN2ftjtVSru+w19o9A1jkY6reneqHYApyyBZE84AhsRZ3WaJQPuv
+ z9UNN70vfNwKk4J6gxpDiMr/nRUoQqghPeM8QL25Wpi31Nk/ARkKzl7Ds9EpgDeJDYoFvpi+K
+ dXpWrmqja/Y2VQTqeM1tC1NRTlBlrdH7O+m60xkSZCJDOeq0Er3G9fbV5QVg+H7zVuAMLMaTI
+ lgnFuheBryWGXQDpQU8bA7SYbhoWR4dswhg7ln1I0wF2mGu5RAi6sHX6M9BX68M1XiRxZ0F4h
+ tu0nqJJolvEYG2JALwp7z6oM6AX63gpWnNVMLxRmNDQk8kETV3Gw6hEF2JHFY9OFTzpuMtMIn
+ uLOBipgLMJmfZcc7mKJHHerYk4c6e44RTKTu6OVgfn1oYO+xBhbzHDdt9rASuvlT6ohtcinVf
+ QsYdcKTcJ3U0bDw88hnAsUS6xOzfcajdnjvYm+pxfITL63zrSwAC8VrrFq+F/CKHndmTGknxV
+ b17NSyq6efTIKcCEYF9vbqBUEMb+xWSfsjs5evUwcjRu7kn/OsAO848sxbU+Xf21myLOpOCQ2
+ a7Pbqqyg8Aq6g1BplUrLLvhu2KVBvjOPCz6y5il921tUl02+iCaNIQ8K+GLPFQaonTyuhwfNf
+ 1ImIOa2d40U59iYTqB+3GxwIG4Y6x2lIFhGb+qJNWBJsTZo+hdxg3+vl6tfdKvmtFEK76qqNL
+ QoWag+rYgDUKOUri45VnrZ6na0wDH0uAQeT9GLDYNO8lyYWSXoodcRkU1+nngZeCR2B/uPw5m
+ SLwjXY1mwsLjOxJ9l87fTLKc5vsswWbBHSUk7tmxe0IJGFAhSYnDxkYOxGFnjjDysPa+7oHWw
+ 9FmBlj3SFAZNrsFZO01Hht+GbAkr5Bx1T7rY2MkAXz3dQ8Eydv9ihHDy5YEVBlW9Ks8YIOBcW
+ o4RNEQ==
 
-Update the port's device structure also with its fwnode pointer
-with a recommended device_set_node() helper routine.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sun, 31 Dec 2023 14:43:05 +0100
 
-Signed-off-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
----
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The kfree() function was called in one case by
+the krb5_etm_checksum() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 1ca273f17d29..820b1fabe297 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -6877,7 +6877,7 @@ static int mvpp2_port_probe(struct platform_device *pdev,
- 	dev->min_mtu = ETH_MIN_MTU;
- 	/* 9704 == 9728 - 20 and rounding to 8 */
- 	dev->max_mtu = MVPP2_BM_JUMBO_PKT_SIZE;
--	dev->dev.of_node = port_node;
-+	device_set_node(&dev->dev, port_fwnode);
- 
- 	port->pcs_gmac.ops = &mvpp2_phylink_gmac_pcs_ops;
- 	port->pcs_gmac.neg_mode = true;
--- 
-2.34.1
+Thus use another label.
+
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ net/sunrpc/auth_gss/gss_krb5_crypto.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/g=
+ss_krb5_crypto.c
+index d2b02710ab07..5e2dc3eb8545 100644
+=2D-- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
++++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+@@ -942,7 +942,7 @@ u32 krb5_etm_checksum(struct crypto_sync_skcipher *cip=
+her,
+ 	/* For RPCSEC, the "initial cipher state" is always all zeroes. */
+ 	iv =3D kzalloc(ivsize, GFP_KERNEL);
+ 	if (!iv)
+-		goto out_free_mem;
++		goto out_free_checksum;
+
+ 	req =3D ahash_request_alloc(tfm, GFP_KERNEL);
+ 	if (!req)
+@@ -972,6 +972,7 @@ u32 krb5_etm_checksum(struct crypto_sync_skcipher *cip=
+her,
+ 	ahash_request_free(req);
+ out_free_mem:
+ 	kfree(iv);
++out_free_checksum:
+ 	kfree_sensitive(checksumdata);
+ 	return err ? GSS_S_FAILURE : GSS_S_COMPLETE;
+ }
+=2D-
+2.43.0
 
 
