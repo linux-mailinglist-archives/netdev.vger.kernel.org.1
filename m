@@ -1,254 +1,251 @@
-Return-Path: <netdev+bounces-60671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83942820CA1
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 20:02:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25C36820CCA
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 20:35:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7F811F21A6C
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 19:02:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A0361C21741
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 19:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2465B64C;
-	Sun, 31 Dec 2023 19:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="EhDbum30"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C172BA2B;
+	Sun, 31 Dec 2023 19:35:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118B9B65C
-	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 19:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-dbe344a6cf4so2336757276.0
-        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 11:02:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704049320; x=1704654120; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vlxFCLwXfW7moMuBw1zEKg8lQ+kWu+GGdaARXpqUCSQ=;
-        b=EhDbum306iXCU4dw+GQ+v34Dckm/uosxNymit7ER/B/v9hfEDhaf/Y2aNhEjxcsckK
-         b04wFc/98w3TGWX8yYiZcVOscbMtxT5iBjBEIurL6zWddTpDLANQccLCKCMC9kl2x/L/
-         n/k5fGUJxFfNAvLxL9s2J+T7WKxXik4qYi7O9C7O6RZXjAYLCKgLA07R98t/Yqkm2h6G
-         LKZuB5s6gHs1dykpKtqAHcGxykwZDGwtoufRbuYARD3+QJhpSPcQFwh59Y4x5kfRenc8
-         cy9fAYOLQ78pQDmJ6nljMVqH1k1c8OouO9foDr4aqRlt2HMWDbxIdy6HhIxLOFApgzGP
-         xUpQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC73B675
+	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 19:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35fe9fa7f4fso77797485ab.2
+        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 11:35:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704049320; x=1704654120;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vlxFCLwXfW7moMuBw1zEKg8lQ+kWu+GGdaARXpqUCSQ=;
-        b=xNUdnRvrCj2k2R6OYyErtdZ5h/0+o8Kd9z5vPw9zjEoZeqMVaSmdggjaOCFhDQJIGV
-         2xar8pRTurWxriqSYlfnkXRGA44wJFyoEe7Ye1BPlxMzS3N3CaID9ae8GuTNsVsrSS4O
-         us3h1sv1L6kPQ3k9yWQlZNpiwIPZj11B1dNtDMYeL5b8DuN/4vxqcKrlF/kXUK5OJiWm
-         thLZT3waILQSepaHQrsrkmESOHJfVc4jv8tLEvJtxTWlw/vc2nj7eVGs9ay66Ddvo82a
-         YfbI4qTi91vkjPeZKch9ziAxhgEcJjrA0BnkUMYNGRCQtOxPPiB2WwQhN8yGJB5Vo86j
-         lHiw==
-X-Gm-Message-State: AOJu0Yx63FZuCbfoG3wlDaUrGaYrFOirHnCtra0BNnj7PX5/cf2Y3NC9
-	6LMRqvR8yO+pgN2Yk9UBojrrSRRMSevv/L4kgiojYznB5ZR8+FEH+KXfCbs=
-X-Google-Smtp-Source: AGHT+IG2QjTmZr7O+LNjD5jUwus6WJV/D7FCTA0SgZAjzg7wd8lcpiAVyxf0K+CQCH0MEsjlWHkjwkyHukegHQ8sFFY=
-X-Received: by 2002:a5b:d48:0:b0:dbd:be6a:e5eb with SMTP id
- f8-20020a5b0d48000000b00dbdbe6ae5ebmr7020804ybr.118.1704049319830; Sun, 31
- Dec 2023 11:01:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704051319; x=1704656119;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qYw7/ldIJh1p9SJY6IYq282r1KDte2/58Sd0APbI3wA=;
+        b=D2wgp40WvVOy3z2y2iYuMzq/5/vAfXTt0ZdsGZIFpmVduphrk/G4yk34LiIVlXPOo4
+         YX3KOfHFu3kFvXZTpfTV8ofptzCHHwBP5VvvFciqsOYerjmQaKsK6Ja8/EKPUkUUzSY8
+         Vp1mAHlecqA9lWERpfqCnNsIgX56/iaB41i7OGoOy/WooiwQpbo+XFZa+PlXsi/xVyDR
+         9/kwQ9ks3YIuVvikMYuRvsC0S4Y1+TcImt5sJtY/h8OhRcgUdsY0c/57V2eVCL69erbK
+         h8LkbzpUqL05o4vIPTJO0Tu10ZJfH6omKON6KFjijE+pYnVIWKk9Sy4UMYHqIphTWun+
+         b2nA==
+X-Gm-Message-State: AOJu0YwimTOXl4az0ILmMgz59JkXOBdDdfhfuOFnOaGc9BNBOHQ6Kg/o
+	nMCj0Lel40uLkQSHCRvpCWaFzk3jxrJsa9TbY58INL/GFyFq
+X-Google-Smtp-Source: AGHT+IFy+BPQ/2TwVjisSdAZVotswJyjkMEYZwuMmMafYbXL+pfw00p9SZH2e7l4QJ7dTnDsZgqo0bXro+wxHJ9KeUD1sjvc0njM
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231229132642.1489088-1-pctammela@mojatatu.com> <20231229132642.1489088-2-pctammela@mojatatu.com>
-In-Reply-To: <20231229132642.1489088-2-pctammela@mojatatu.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 31 Dec 2023 14:01:48 -0500
-Message-ID: <CAM0EoMmRj9NmztK1fTRrEm05M0hGP_0FpWjeQsKt7CCM2kHZQA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/sched: sch_api: conditional netlink notifications
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us
+X-Received: by 2002:a05:6e02:b4c:b0:35f:f683:fa1c with SMTP id
+ f12-20020a056e020b4c00b0035ff683fa1cmr1562835ilu.5.1704051318927; Sun, 31 Dec
+ 2023 11:35:18 -0800 (PST)
+Date: Sun, 31 Dec 2023 11:35:18 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008b3bfa060dd35d57@google.com>
+Subject: [syzbot] [mm?] INFO: rcu detected stall in dput (8)
+From: syzbot <syzbot+eb9f416500ff134ab699@syzkaller.appspotmail.com>
+To: brauner@kernel.org, davem@davemloft.net, jack@suse.cz, jhs@mojatatu.com, 
+	jiri@resnulli.us, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
+	vinicius.gomes@intel.com, viro@zeniv.linux.org.uk, xiyou.wangcong@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 29, 2023 at 8:27=E2=80=AFAM Pedro Tammela <pctammela@mojatatu.c=
-om> wrote:
->
-> Implement conditional netlink notifications for Qdiscs and classes,
-> which were missing in the initial patches that targeted tc filters and
-> actions. Notifications will only be built after passing a check for
-> 'rtnl_notify_needed()'.
->
-> For both Qdiscs and classes 'get' operations now call a dedicated
-> notification function as it was not possible to distinguish between
-> 'create' and 'get' before. This distinction is necessary because 'get'
-> always send a notification.
->
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+Hello,
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+syzbot found the following issue on:
 
-cheers,
-jamal
+HEAD commit:    39676dfe5233 Add linux-next specific files for 20231222
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1586fd31e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f3761490b734dc96
+dashboard link: https://syzkaller.appspot.com/bug?extid=eb9f416500ff134ab699
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15449dcee80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e2787ee80000
 
-> ---
->  net/sched/sch_api.c | 79 ++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 68 insertions(+), 11 deletions(-)
->
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index 299086bb6205..2a2a48838eb9 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -1003,6 +1003,32 @@ static bool tc_qdisc_dump_ignore(struct Qdisc *q, =
-bool dump_invisible)
->         return false;
->  }
->
-> +static int qdisc_get_notify(struct net *net, struct sk_buff *oskb,
-> +                           struct nlmsghdr *n, u32 clid, struct Qdisc *q=
-,
-> +                           struct netlink_ext_ack *extack)
-> +{
-> +       struct sk_buff *skb;
-> +       u32 portid =3D oskb ? NETLINK_CB(oskb).portid : 0;
-> +
-> +       skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
-> +       if (!skb)
-> +               return -ENOBUFS;
-> +
-> +       if (!tc_qdisc_dump_ignore(q, false)) {
-> +               if (tc_fill_qdisc(skb, q, clid, portid, n->nlmsg_seq, 0,
-> +                                 RTM_NEWQDISC, extack) < 0)
-> +                       goto err_out;
-> +       }
-> +
-> +       if (skb->len)
-> +               return rtnetlink_send(skb, net, portid, RTNLGRP_TC,
-> +                                     n->nlmsg_flags & NLM_F_ECHO);
-> +
-> +err_out:
-> +       kfree_skb(skb);
-> +       return -EINVAL;
-> +}
-> +
->  static int qdisc_notify(struct net *net, struct sk_buff *oskb,
->                         struct nlmsghdr *n, u32 clid,
->                         struct Qdisc *old, struct Qdisc *new,
-> @@ -1011,6 +1037,9 @@ static int qdisc_notify(struct net *net, struct sk_=
-buff *oskb,
->         struct sk_buff *skb;
->         u32 portid =3D oskb ? NETLINK_CB(oskb).portid : 0;
->
-> +       if (!rtnl_notify_needed(net, n->nlmsg_flags, RTNLGRP_TC))
-> +               return 0;
-> +
->         skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
->         if (!skb)
->                 return -ENOBUFS;
-> @@ -1583,7 +1612,7 @@ static int tc_get_qdisc(struct sk_buff *skb, struct=
- nlmsghdr *n,
->                 if (err !=3D 0)
->                         return err;
->         } else {
-> -               qdisc_notify(net, skb, n, clid, NULL, q, NULL);
-> +               qdisc_get_notify(net, skb, n, clid, q, NULL);
->         }
->         return 0;
->  }
-> @@ -1977,6 +2006,9 @@ static int tclass_notify(struct net *net, struct sk=
-_buff *oskb,
->         struct sk_buff *skb;
->         u32 portid =3D oskb ? NETLINK_CB(oskb).portid : 0;
->
-> +       if (!rtnl_notify_needed(net, n->nlmsg_flags, RTNLGRP_TC))
-> +               return 0;
-> +
->         skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
->         if (!skb)
->                 return -ENOBUFS;
-> @@ -1990,6 +2022,27 @@ static int tclass_notify(struct net *net, struct s=
-k_buff *oskb,
->                               n->nlmsg_flags & NLM_F_ECHO);
->  }
->
-> +static int tclass_get_notify(struct net *net, struct sk_buff *oskb,
-> +                            struct nlmsghdr *n, struct Qdisc *q,
-> +                            unsigned long cl, struct netlink_ext_ack *ex=
-tack)
-> +{
-> +       struct sk_buff *skb;
-> +       u32 portid =3D oskb ? NETLINK_CB(oskb).portid : 0;
-> +
-> +       skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
-> +       if (!skb)
-> +               return -ENOBUFS;
-> +
-> +       if (tc_fill_tclass(skb, q, cl, portid, n->nlmsg_seq, 0, RTM_NEWTC=
-LASS,
-> +                          extack) < 0) {
-> +               kfree_skb(skb);
-> +               return -EINVAL;
-> +       }
-> +
-> +       return rtnetlink_send(skb, net, portid, RTNLGRP_TC,
-> +                             n->nlmsg_flags & NLM_F_ECHO);
-> +}
-> +
->  static int tclass_del_notify(struct net *net,
->                              const struct Qdisc_class_ops *cops,
->                              struct sk_buff *oskb, struct nlmsghdr *n,
-> @@ -2003,14 +2056,18 @@ static int tclass_del_notify(struct net *net,
->         if (!cops->delete)
->                 return -EOPNOTSUPP;
->
-> -       skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
-> -       if (!skb)
-> -               return -ENOBUFS;
-> +       if (rtnl_notify_needed(net, n->nlmsg_flags, RTNLGRP_TC)) {
-> +               skb =3D alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
-> +               if (!skb)
-> +                       return -ENOBUFS;
->
-> -       if (tc_fill_tclass(skb, q, cl, portid, n->nlmsg_seq, 0,
-> -                          RTM_DELTCLASS, extack) < 0) {
-> -               kfree_skb(skb);
-> -               return -EINVAL;
-> +               if (tc_fill_tclass(skb, q, cl, portid, n->nlmsg_seq, 0,
-> +                                  RTM_DELTCLASS, extack) < 0) {
-> +                       kfree_skb(skb);
-> +                       return -EINVAL;
-> +               }
-> +       } else {
-> +               skb =3D NULL;
->         }
->
->         err =3D cops->delete(q, cl, extack);
-> @@ -2019,8 +2076,8 @@ static int tclass_del_notify(struct net *net,
->                 return err;
->         }
->
-> -       err =3D rtnetlink_send(skb, net, portid, RTNLGRP_TC,
-> -                            n->nlmsg_flags & NLM_F_ECHO);
-> +       err =3D rtnetlink_maybe_send(skb, net, portid, RTNLGRP_TC,
-> +                                  n->nlmsg_flags & NLM_F_ECHO);
->         return err;
->  }
->
-> @@ -2215,7 +2272,7 @@ static int tc_ctl_tclass(struct sk_buff *skb, struc=
-t nlmsghdr *n,
->                         tc_bind_tclass(q, portid, clid, 0);
->                         goto out;
->                 case RTM_GETTCLASS:
-> -                       err =3D tclass_notify(net, skb, n, q, cl, RTM_NEW=
-TCLASS, extack);
-> +                       err =3D tclass_get_notify(net, skb, n, q, cl, ext=
-ack);
->                         goto out;
->                 default:
->                         err =3D -EINVAL;
-> --
-> 2.40.1
->
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/360542c2ca67/disk-39676dfe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/900dfb21ca8a/vmlinux-39676dfe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c94a2a3ea0e0/bzImage-39676dfe.xz
+
+The issue was bisected to:
+
+commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
+Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Date:   Sat Sep 29 00:59:43 2018 +0000
+
+    tc: Add support for configuring the taprio scheduler
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=104c379ee80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=144c379ee80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+eb9f416500ff134ab699@syzkaller.appspotmail.com
+Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
+
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	1-...!: (1 GPs behind) idle=754c/1/0x4000000000000000 softirq=6521/6522 fqs=5
+rcu: 	(detected by 0, t=10502 jiffies, g=6645, q=124 ncpus=2)
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 PID: 5081 Comm: syz-executor262 Not tainted 6.7.0-rc6-next-20231222-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:check_preemption_disabled+0x1d/0xe0 lib/smp_processor_id.c:56
+Code: 04 90 0f 0b 90 e9 83 fc ff ff 0f 1f 00 41 54 55 53 48 83 ec 08 65 8b 1d 4d 2e 77 75 65 8b 05 42 2e 77 75 a9 ff ff ff 7f 74 0b <48> 83 c4 08 89 d8 5b 5d 41 5c c3 9c 58 f6 c4 02 74 ee 65 48 8b 05
+RSP: 0018:ffffc900001f0d10 EFLAGS: 00000002
+RAX: 0000000000010002 RBX: 0000000000000001 RCX: ffffffff81686719
+RDX: fffffbfff1e74b63 RSI: ffffffff8b2f95c0 RDI: ffffffff8b2f9600
+RBP: 1ffff9200003e1ac R08: 0000000000000000 R09: fffffbfff1e74b62
+R10: ffffffff8f3a5b17 R11: ffffffff8acf3060 R12: ffff8880b992bad8
+R13: ffff888022d1b340 R14: 000000000003c2cc R15: ffffffff88ad04f0
+FS:  00005555574c3380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020001d88 CR3: 0000000029bb6000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <IRQ>
+ rcu_dynticks_curr_cpu_in_eqs include/linux/context_tracking.h:122 [inline]
+ rcu_is_watching+0x12/0xb0 kernel/rcu/tree.c:700
+ trace_lock_release include/trace/events/lock.h:69 [inline]
+ lock_release+0x4c8/0x6a0 kernel/locking/lockdep.c:5765
+ __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:149 [inline]
+ _raw_spin_unlock_irqrestore+0x1a/0x70 kernel/locking/spinlock.c:194
+ __run_hrtimer kernel/time/hrtimer.c:1684 [inline]
+ __hrtimer_run_queues+0x5a4/0xc20 kernel/time/hrtimer.c:1752
+ hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1814
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1065 [inline]
+ __sysvec_apic_timer_interrupt+0x10c/0x410 arch/x86/kernel/apic/apic.c:1082
+ sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1076
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
+RIP: 0010:destroy_inode+0x44/0x1b0 fs/inode.c:305
+Code: 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 4c 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b 6b 28 48 8d 7d 30 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 1f 01 00 00 4c 8d a3 b8 01 00 00 48 8b 6d 30 48
+RSP: 0018:ffffc90003b0fd70 EFLAGS: 00000a06
+RAX: dffffc0000000000 RBX: ffff88807daf9ec0 RCX: 0000000000000000
+RDX: 1ffff11002e59806 RSI: ffffffff81f6c6fc RDI: ffff8880172cc030
+RBP: ffff8880172cc000 R08: 0000000000000000 R09: ffffed100fb5f3e9
+R10: ffff88807daf9f4b R11: ffffffff8ace32a0 R12: 0000000000000001
+R13: 0000000000000020 R14: ffffffff8be8e660 R15: ffff88807daf9f98
+ iput_final fs/inode.c:1739 [inline]
+ iput.part.0+0x570/0x7c0 fs/inode.c:1765
+ iput+0x5c/0x80 fs/inode.c:1755
+ dentry_unlink_inode+0x292/0x430 fs/dcache.c:400
+ __dentry_kill+0x1ca/0x5f0 fs/dcache.c:603
+ dput.part.0+0x4ac/0x9a0 fs/dcache.c:845
+ dput+0x1f/0x30 fs/dcache.c:835
+ __fput+0x3b9/0xb70 fs/file_table.c:384
+ __fput_sync+0x47/0x50 fs/file_table.c:461
+ __do_sys_close fs/open.c:1592 [inline]
+ __se_sys_close fs/open.c:1577 [inline]
+ __x64_sys_close+0x86/0xf0 fs/open.c:1577
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x62/0x6a
+RIP: 0033:0x7f79c2db61c0
+Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d e1 de 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+RSP: 002b:00007fff0221e5b8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f79c2db61c0
+RDX: 00007f79c2db6f29 RSI: 0000000020000040 RDI: 0000000000000004
+RBP: 00000000000f4240 R08: 0000000100000000 R09: 0000000100000000
+R10: 0000000000000000 R11: 0000000000000202 R12: 00007fff0221e610
+R13: 0000000000000001 R14: 00007fff0221e610 R15: 0000000000000003
+ </TASK>
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.569 msecs
+rcu: rcu_preempt kthread starved for 10492 jiffies! g6645 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
+rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+rcu: RCU grace-period kthread stack dump:
+task:rcu_preempt     state:R  running task     stack:28256 pid:17    tgid:17    ppid:2      flags:0x00004000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0xf15/0x5c80 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0xe7/0x270 kernel/sched/core.c:6817
+ schedule_timeout+0x136/0x290 kernel/time/timer.c:2183
+ rcu_gp_fqs_loop+0x1eb/0xb00 kernel/rcu/tree.c:1631
+ rcu_gp_kthread+0x271/0x380 kernel/rcu/tree.c:1830
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+rcu: Stack dump where RCU GP kthread last ran:
+CPU: 0 PID: 1043 Comm: kworker/u4:7 Not tainted 6.7.0-rc6-next-20231222-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Workqueue: events_unbound toggle_allocation_gate
+RIP: 0010:csd_lock_wait kernel/smp.c:311 [inline]
+RIP: 0010:smp_call_function_many_cond+0x4e4/0x1570 kernel/smp.c:855
+Code: 0b 00 85 ed 74 4d 48 b8 00 00 00 00 00 fc ff df 4d 89 f4 4c 89 f5 49 c1 ec 03 83 e5 07 49 01 c4 83 c5 03 e8 7e c5 0b 00 f3 90 <41> 0f b6 04 24 40 38 c5 7c 08 84 c0 0f 85 44 0e 00 00 8b 43 08 31
+RSP: 0018:ffffc90004eaf920 EFLAGS: 00000293
+RAX: 0000000000000000 RBX: ffff8880b9942060 RCX: ffffffff817c4e68
+RDX: ffff8880201b3b80 RSI: ffffffff817c4e42 RDI: 0000000000000005
+RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: ffffed101732840d
+R13: 0000000000000001 R14: ffff8880b9942068 R15: ffff8880b983dec0
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005623e60a17e8 CR3: 000000000cf78000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ </IRQ>
+ <TASK>
+ on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1023
+ on_each_cpu include/linux/smp.h:71 [inline]
+ text_poke_sync arch/x86/kernel/alternative.c:2086 [inline]
+ text_poke_bp_batch+0x22b/0x750 arch/x86/kernel/alternative.c:2296
+ text_poke_flush arch/x86/kernel/alternative.c:2487 [inline]
+ text_poke_flush arch/x86/kernel/alternative.c:2484 [inline]
+ text_poke_finish+0x30/0x40 arch/x86/kernel/alternative.c:2494
+ arch_jump_label_transform_apply+0x1c/0x30 arch/x86/kernel/jump_label.c:146
+ jump_label_update+0x1d7/0x400 kernel/jump_label.c:829
+ static_key_enable_cpuslocked+0x1b7/0x270 kernel/jump_label.c:205
+ static_key_enable+0x1a/0x20 kernel/jump_label.c:218
+ toggle_allocation_gate mm/kfence/core.c:826 [inline]
+ toggle_allocation_gate+0xf4/0x250 mm/kfence/core.c:818
+ process_one_work+0x8a4/0x15f0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x8b6/0x1290 kernel/workqueue.c:2787
+ kthread+0x2c1/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
