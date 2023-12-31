@@ -1,152 +1,79 @@
-Return-Path: <netdev+bounces-60655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68DB8820BAD
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 16:00:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8FFF820BB3
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 16:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 001D21F21BF7
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 15:00:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CE421F211E5
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 15:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE45612E;
-	Sun, 31 Dec 2023 15:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="lAjUuHKK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16EA567E;
+	Sun, 31 Dec 2023 15:04:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BCC8F49;
-	Sun, 31 Dec 2023 15:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1704034824; x=1704639624; i=markus.elfring@web.de;
-	bh=/EkgIbiDfFiW79s9a4Ba4KIcoGQRr5fomhIzMuL4pkQ=;
-	h=X-UI-Sender-Class:Date:Subject:From:To:References:Cc:
-	 In-Reply-To;
-	b=lAjUuHKKLLMTacaMrIMsZ/OOnph36OFk831BnfBHFvGXMU6lzBhtImXYS3zv606E
-	 c8NGymPNhvF51C0QZkIpcN0a5BfUPz5m/2kF9n1yIc3pDj2+HgYt/OZUl044Gc22t
-	 9V/Q+VVFcz76aP7wn7ZttOaOHEvrgSqQC1e3CiDP3paFIIizR2PecBv5iOks3sAw6
-	 awakye2XLnopEWguxPSGEkpDETMIWsOpT+LRRO73RMuPtXgx65mj+hkKKRVywEmAI
-	 nyE57tCLrAi204EQagySrf+hJ4fu3xxaXhPbQRFHYj2V9QZro4RuDEiERQGC/680K
-	 699MZbZnBVYLTEh+Fg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MwA1A-1r3OQ81xBs-00sG9F; Sun, 31
- Dec 2023 16:00:24 +0100
-Message-ID: <5253e660-6b66-4775-ae2f-06f5a1d40be5@web.de>
-Date: Sun, 31 Dec 2023 16:00:22 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4356111
+	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 15:04:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35ff23275b8so69130405ab.2
+        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 07:04:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704035046; x=1704639846;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UY15SVoeT9C0Gyi7HV4n11Zmu0rvNwQzqwZr/tN/qMg=;
+        b=Lezcv8s7eXLvfP0PDPhbb48C7HnOk4RR5eMY9bQEd5WCYNhG6EEauZfezwWlWKmEy5
+         vkz7IZByvzWGSOco87bel+N1R+ADdDiSslNWCmsi2UFi8HIKCVG/5c+rE3uHlMREMVuQ
+         oKEfK8fK0f+Av8pSTZdmgoMydBMK7d1fByNQ9BIUmQ/XNxnEV/RdLwkjknAEE1aIPZCa
+         8TZYqqeJjgAvLYXzvmoy3323DObrFIMcF+4TeKub/nO+toiP7HLmaRIZRduQEaZyIaz5
+         FlXmjYCJ8bHwdfBVcJzKHYpX/N4HCc3TZ/nM8dCDagUY8HLZccUhnsWdPhSILakjeR+7
+         pRdw==
+X-Gm-Message-State: AOJu0Yw6Iv/aQBv1lwv9IpI/6iIQqVNRTvy0cbrTzJll8brGSyvrODi1
+	mcpoyomAB41wDGMAA8FVZRYxiHsEMeODXvYp8Sb53Q/nJOvQ
+X-Google-Smtp-Source: AGHT+IGDW5FLMnCDtQkBvTtGcd8WyZLeLEsoek8j3QhvLQTOnvgyeYMg+JJdrrxFvbpkW9NCspiU0nbrcm2HeBga5n9pci9QEeKF
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH 2/2] net/smc: Improve exception handling in
- smc_llc_cli_add_link_invite()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-To: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- "D. Wythe" <alibuda@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
- Paolo Abeni <pabeni@redhat.com>, Tony Lu <tonylu@linux.alibaba.com>,
- Wen Gu <guwen@linux.alibaba.com>, Wenjia Zhang <wenjia@linux.ibm.com>
-References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
-Cc: LKML <linux-kernel@vger.kernel.org>
-In-Reply-To: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:oG3OmE7p+Zndch/Dj/BnQFbZ4YKWANLuDuOJVlDnyB2QnqSTIfO
- FN4K3UkD8+tYea+OsaPrlTrg2oWgGiEcCvW11H69MqsCeSl7thehurwIksrf1kwil0QGIDw
- ufE7jsBAHe0kQLj0of+zeF/MIm/8bxPktR6HnHU5qMM6gz2p/WIF3q7arKIq2QB6FVjKZHe
- oNKjkRrfxbvdfzZcUSciA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:6M1bFLtV6zc=;k7xX0Go5mPnhUg1AtvOiS4tVGyu
- sES+x3UIFXs/aJtn6JOx64gVuddsXky1mfoDSyu1RGPsHVSaUK5cHvPypQzcxp3Q0TooNHPWt
- 7Gfk8dPEHSEk4Nb+055lRygnhv+Wo5qa0TeG8fvp+YuXPnrj8Pyz0aSQGC92NUV0QdDKLF1Dp
- qSiRVjsUL/30IXQQn5TQC+VJq2SgYtZJVQ53DecR0EBGJlT09c4Z1BsNQmH8c0VJVfL8Oq0gA
- /sD9kamMNuOAUhRONYRMxnzz6jOBKF7P8tvR8liB5pUHftM29nCxnpA1tsD5fq58OofoD4DI1
- gYo/PXdvoGvtW3BQVrIfJo7/Tn8JYA4Nu9/Y5c2tCtASy1b296nO17gAQJEgoeinyQuHLBg6a
- bOO31at2WB6IJ7Z4JOqE/MKW6zsNDTGabnpFQwHxKyLf9boybLk7WRBV7jF2UdG9iyNjiby3g
- k2RdesvHAdzxKnLVyKAudjVkDqtc320aXXL6x2YdDQ0RbBBONQY740+Md1Q9evT50IAP/gn8h
- 41NKKrF+hDKHqIH8yNZ2U9vWPACVE3M2g2DrkjHCysWxApje9nugAgcqViFF410qNfa2gzEDz
- gKM9vCJ3bGP02sQZy6vuOClXKQL+2VoJCggqyLlUdmhN4oRgjn8i3iP75bTF3uOrgqWS+3Rw1
- qoXn/TC3Erf0hqJl0l0uCHoP8gT6lqTFgIWKzwKfQgZ7mT3sT3LIWjU1keydEt0ukfK/gJznK
- 5q4QLYxq9qUN4xgBU+FBLCnCweA3trW13AjRSP+cD/XSlI+OWMPGEmh8TyGZaN1XKANeab43f
- yj3Ieb18vyXBf1QDY47mXGDlt6TNm4DpsE+hnAlsfjyqt2tE+0amYXV8WY36zew6vnsfndb6X
- 9FSVQPPSNKPx6PzJu4aTUggy+B8/8WQfPD+b5ZmW6Que1IHm8LVKKFkpNxCau6Vp0imQX+Cup
- rgELGg==
+X-Received: by 2002:a05:6e02:1a07:b0:35f:eb20:3599 with SMTP id
+ s7-20020a056e021a0700b0035feb203599mr1477959ild.2.1704035046306; Sun, 31 Dec
+ 2023 07:04:06 -0800 (PST)
+Date: Sun, 31 Dec 2023 07:04:06 -0800
+In-Reply-To: <1882b96d-0625-4702-b496-161b387d089f@mojatatu.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009ebae1060dcf93f1@google.com>
+Subject: Re: [syzbot] [net?] general protection fault in htb_tcf_block
+From: syzbot <syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, pctammela@mojatatu.com, 
+	syzkaller-bugs@googlegroups.com, victor@mojatatu.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sun, 31 Dec 2023 15:42:07 +0100
+Hello,
 
-The kfree() function was called in some cases by
-the smc_llc_cli_add_link_invite() function during error handling
-even if the passed variable contained a null pointer.
-This issue was detected by using the Coccinelle software.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-* Thus use another label.
+Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com
 
-* Merge two if statements.
+Tested on:
 
-* Omit an initialisation (for the variable =E2=80=9Cini=E2=80=9D)
-  which became unnecessary with this refactoring.
+commit:         92de776d Merge tag 'mlx5-updates-2023-12-20' of git://..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=141ab32de80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a4e9ca8e3c104d2a
+dashboard link: https://syzkaller.appspot.com/bug?extid=806b0572c8d06b66b234
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=14e64091e80000
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- net/smc/smc_llc.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/net/smc/smc_llc.c b/net/smc/smc_llc.c
-index 018ce8133b02..2ff24a7feb26 100644
-=2D-- a/net/smc/smc_llc.c
-+++ b/net/smc/smc_llc.c
-@@ -1163,23 +1163,21 @@ static void smc_llc_cli_add_link_invite(struct smc=
-_link *link,
- 					struct smc_llc_qentry *qentry)
- {
- 	struct smc_link_group *lgr =3D smc_get_lgr(link);
--	struct smc_init_info *ini =3D NULL;
-+	struct smc_init_info *ini;
-
- 	if (lgr->smc_version =3D=3D SMC_V2) {
- 		smc_llc_send_request_add_link(link);
--		goto out;
-+		goto free_qentry;
- 	}
-
- 	if (lgr->type =3D=3D SMC_LGR_SYMMETRIC ||
--	    lgr->type =3D=3D SMC_LGR_ASYMMETRIC_PEER)
--		goto out;
--
--	if (lgr->type =3D=3D SMC_LGR_SINGLE && lgr->max_links <=3D 1)
--		goto out;
-+	    lgr->type =3D=3D SMC_LGR_ASYMMETRIC_PEER ||
-+	    lgr->type =3D=3D SMC_LGR_SINGLE && lgr->max_links <=3D 1)
-+		goto free_qentry;
-
- 	ini =3D kzalloc(sizeof(*ini), GFP_KERNEL);
- 	if (!ini)
--		goto out;
-+		goto free_qentry;
-
- 	ini->vlan_id =3D lgr->vlan_id;
- 	smc_pnet_find_alt_roce(lgr, ini, link->smcibdev);
-@@ -1190,6 +1188,7 @@ static void smc_llc_cli_add_link_invite(struct smc_l=
-ink *link,
- 			      ini->ib_gid, NULL, SMC_LLC_REQ);
- out:
- 	kfree(ini);
-+free_qentry:
- 	kfree(qentry);
- }
-
-=2D-
-2.43.0
-
+Note: testing is done by a robot and is best-effort only.
 
