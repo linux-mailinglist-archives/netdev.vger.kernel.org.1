@@ -1,146 +1,123 @@
-Return-Path: <netdev+bounces-60640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6010E820928
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 00:56:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C83820B0E
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 11:33:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EC731C20A70
-	for <lists+netdev@lfdr.de>; Sat, 30 Dec 2023 23:56:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90A351F218A7
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 10:33:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0741DDC9;
-	Sat, 30 Dec 2023 23:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E2528F1;
+	Sun, 31 Dec 2023 10:33:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWUDlUd5"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="jtKpTd1m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1256BDDC6;
-	Sat, 30 Dec 2023 23:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ccf55bed13so8744111fa.1;
-        Sat, 30 Dec 2023 15:56:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703980582; x=1704585382; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=L5zAmrcU0rDyTMldnWGuhFtbY40ZcOd+zmFip/yI9K8=;
-        b=CWUDlUd5LI4yyn4puZcvTu7vvKyts2XBTGeRqf6tcftAfXMNByNWlhvWZgKtbJBhxW
-         AtPPoB20dwnIsf2iw0D2a98S0j1RK1PXU16TOuJK7Y/zLzmdtHqM7gkLDTatDmATEWZ0
-         Ac9b+o0vjGzF1Rt3Llm+jXTm5spOW43gYFxTyvSXsfXiQ5KcDoAgM98QU7JbIHjhZJ9U
-         Mnn4+IgMSL64upk+S3A1DGYwOi7xlCCEmBzR4QhDfBpbx0bQFMpifaSt+1nqTHPNQ1tr
-         8T5pg0rdiPbrLiVt3YsNt4NmC44QprTGfHPbXsmHsPkhXj9v7f4OQkaIKJkGeCEoSVKh
-         voAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703980582; x=1704585382;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L5zAmrcU0rDyTMldnWGuhFtbY40ZcOd+zmFip/yI9K8=;
-        b=qc09aUfp2Dr4M+du2i2qPFJFqbkpwW4LSJwRjAkyxkixe5mMm9dF0u7AKE98PVlml6
-         yDQj0PZBOrsdM8L2jvgn1lwAgmsRM87fo2XxDbycJWb99YhU0ac+c/AvCoNdT7NwaCPg
-         aJHQ9lPxUOXuxTxXMXsDnDwLwZ8DTt1JEEiuYhPEQiLr/7J5djqa3cBpSM7S/Uj/9OsH
-         +mynZoc9maIZrGI+q6HBU/Ja/IF35T1dHjusc/0G4H1b/TEPKfQSuHY0/gKKPJDj8sVW
-         xbBvlfnkXR4poGQopC6cCbcW60lOz79ZZQQp7o2B8okE5ahhIXHh1KQsMvDzRKqLBdwD
-         hV0A==
-X-Gm-Message-State: AOJu0YztGJnGQMtLZy471qO9/NK6sndEwKtv3OTkSTl2YUyG0JXw+EFz
-	pqBDsRMMtthcwButRKfc3rervPORynmQG5E81JRgtoWVEPOnX7pI
-X-Google-Smtp-Source: AGHT+IF2Wg676gczAtvkd20vpFPvT40Dbhl8a/yw1mt/kUXSYbEgd067fvLk6YybmgGC6T+VAhzbNZwwi2bmj+f4KL4=
-X-Received: by 2002:a2e:9686:0:b0:2cc:7db2:acb9 with SMTP id
- q6-20020a2e9686000000b002cc7db2acb9mr6007446lji.24.1703980581641; Sat, 30 Dec
- 2023 15:56:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9736A8F48;
+	Sun, 31 Dec 2023 10:33:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1704018801; x=1704623601; i=markus.elfring@web.de;
+	bh=I0Xu6K601Nm32B7uvcWfNE+QosXgVl3IjaU3K1o4CgM=;
+	h=X-UI-Sender-Class:Date:To:From:Subject:Cc;
+	b=jtKpTd1mVE8EfPH3AgRi3bsjnjZu0bbyDmAl1LXrxczjagkwrkM70hTSTBrYmLMr
+	 evo6ZnUhBhJs+Pg7ugM5f06Vx/GgIRluk3HkhK4dYW7Avop9nGg1upOsNKKCEprY4
+	 HR2/i0T7ndOsd0BSVzX8MXktTkYF5MBvDylQRieOI3PXW+BeNrk6UYUVLPV6KrMYW
+	 fn5DNdN7f2hYnj8vZNLZo49YDt05nXKxEQzZPP6wJSDqtGYCtl4VkuZ5DHI1jC712
+	 LbYgb1MJv1d4auXv/P87flrKrfOouewzAix/58REJaJAJkrA4gmnvCn6/pUM+NQMh
+	 8+917lu1L/wZBimnFA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N6sG3-1rAOUA1RyJ-017uVs; Sun, 31
+ Dec 2023 11:33:21 +0100
+Message-ID: <873097b9-5a0b-495b-83ae-f2247fbb512b@web.de>
+Date: Sun, 31 Dec 2023 11:33:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
- <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
- <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
- <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
- <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com>
- <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
- <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
- <CAJq09z4YSGyU6QuZL1uEB9vH39-WbR2dZhy7MiD=5yZb0Urz1Q@mail.gmail.com> <CACRpkdZOKz-DdZgwwxj9FsJZ+GNMCXUjTDLo5wVgjw5OrfOZQA@mail.gmail.com>
-In-Reply-To: <CACRpkdZOKz-DdZgwwxj9FsJZ+GNMCXUjTDLo5wVgjw5OrfOZQA@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sat, 30 Dec 2023 20:56:10 -0300
-Message-ID: <CAJq09z6xA7roZJYuQFn6B1ivOUOyhrE4-wf4Kj3o6az8hArNqg@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Ansuel Smith <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Johannes Berg <johannes@sipsolutions.net>, Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] wifi: cfg80211: Replace a label in
+ cfg80211_parse_ml_sta_data()
+Cc: LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:iM1BOGtdeD8AtCAAfFlwSOiytaVaoci3r6z1EsCpcglGg4EL/hA
+ IXcu2yRVlCN53tgjzSijw6VgV7AsMO5XQQ8aTJLtR00XmbtkBSg9KF3fJdaoLbYfthPZd9m
+ vzO0lXKJsuNYJlw6UBcP1P14+EAvlO9UDD5OvpwbEVbz1MMlz3u/3G4Um5kXIvKuBL30qrb
+ qdONys6dZdda+oG21cszg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:0+UXqzkwbU8=;mZ1uV5g6EcraQSB7q7DMh40Rgha
+ mdyfTu67DW1VQCUIFbjKQs6MVWe8n1uG1O0VR74tK7mCcIEJ5x7Rh2ZQHecIoAY+UnfLEJtVf
+ RpTix2ykctPyxxTDEQhbrRDdqxSv2O9DMJBU4RaS2i9tB+/VryJlOZmlhlrggSbm64OYxHzAv
+ O2H36Eg+lX4ZdOl96OZG90eZ7Ksar9tK0UkxplhDuNqIr9ciMCWa6w4T7qHRYC/REawypR6ZM
+ LUQ9SZ9KSk1BQfgGrIjMvF49YLiV+d2M6KyRg+lIg8t8x8CQgH7tTulKMfOvslkQ0sAVN7/dd
+ ckNBF6Xj+KvyATOeLy6R/8+UgWnrA122VvkIfNmlTm7DSdo65jBWceO36GRUvFZZyfuD7BBvc
+ 3h9AEaYSIzkvf0rqJUrioBNnubES5gCVYeMOfGR3ANgIEXPdgnOuwwSLSaMZmq/V3B+qGAwn1
+ 09fS6gT6w+8ByfNq1h0FoDb2AK20mp0gU+zncpWY8F1DNdkp4x8HfvpSF28w+nLAY7RF2Nu+j
+ l5WROVg44dhML8c6wjMJkAWFw3L1Gc/3cI/ARsGkUUL05CCjAVt2Ch3QAKrA4hLtFAb9/PrLF
+ dqL5RLfVhApN5yXlJOJWL58q6QTQmWD9m9yVOwezXDao6jSgQwljx26lDqOM1qVv1Kwi+b+WZ
+ 38LeByva4HDq2AiLiyrk/UFIDEMuYZishuYy4T2TeibsgqFB+4SZNWy+0VVE7B0TOrY4JP96y
+ 6nVfAn7v8TB0WRK61etRq0Gnke+rug4uOUcEanAbpdM91YPCsH+tT+bpYYDaNfKhCl1jTo5l1
+ +V/vK34eCgRt5/HSN5G9wQIIxtQisHKpLx7Fnu0LAdSm6CY88V2mpCyFyxPb9TsyEXbSgQLO0
+ dgEoBR6WHAYXhnwZ2RownoeOufKaQB0TtHMxbAImFEUpokcjiNEt2ibBB5AgrZRKaNPBrq8YG
+ tcL/Rg==
 
-> > I took a look at the LED code. It looks like you got it a little bit wrong.
->
-> You are right...
->
-> > If LEDs are not disabled, it will use the RTL8366RB_LED_FORCE for all
-> > 4 LED groups. That RTL8366RB_LED_FORCE keeps the LEDs on. I would use
-> > RTL8366RB_LED_LINK_ACT by default to make it blink on link activity
-> > (or make it configurable as the comment suggests) but it is not wrong.
-> > I cannot evaluate the RTL8366RB_INTERRUPT_CONTROL_REG usage when you
-> > disable the LEDs but it seems to be odd.
->
-> The problem is that since I don't have a device with LEDs connected
-> to tHE RTL8366RB it is all just dry coding.
->
-> I would suggest if you can test it just make a basic patch that will
-> at least turn on the LEDs to some default setting that works for
-> you?
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sun, 31 Dec 2023 11:22:42 +0100
 
-Sure. I believe using link act will be much more useful than just
-turning all leds on, independently from the port state. It is an easy
-one-line fix.
-I can do that after the other series gets merged.
+The kfree() function was called in one case by
+the cfg80211_parse_ml_sta_data() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
-I think that we should also remove rb8366rb_set_port_led(). Even if I
-fix it, it will just turn the LED off when the port is
-administratively down. RTL8366RB_LED_0_1_CTRL_REG and
-RTL8366RB_LED_2_3_CTRL_REG are only used to control leds when you
-force them to be on (RTL8366RB_LED_FORCE). In that scenario, the OS
-might be in charge of triggering them, even for uses not related to
-the switch.
+Thus use an other label.
 
-> > I though that maybe we could setup a LED driver to expose the LEDs
-> > status in sysfs. However, I'm not sure it is worth it. If you change a
-> > LED behavior, it would break the HW triggering rule for all the group.
-> > I'm not sure the LED API is ready to expose LEDs with related fate. It
-> > would, indeed, be useful as a readonly source or just to
-> > enable/disable a LED.
->
-> The LED subsystem supports hardware triggering etc thanks to the
-> elaborate work by Christian (ansuel). You can see an example of how
-> this is done in:
-> drivers/net/dsa/qca/qca8k-leds.c
->
-> Christian also extended the LEDs subsystem with the necessary
-> callbacks to support HW-backed LED control.
->
-> This can be used already to achieve HW triggers for the LEDs
-> from sysfs. (See callbacks .hw_control_is_supported,
-> .hw_control_set etc etc).
->
-> I was working to implement this for the Marvell switches but Andrew
-> wanted to do some more structured approach with a LED library
-> for DSA switches.
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ net/wireless/scan.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Yes, I took a look at it. It would be my inspiration if I go down that
-road. I can use the HW offload only if all LEDs in the group share the
-same trigger and timer. Otherwise, I'll need to fall back to software
-control. I'll think about it if that is a viable solution.
+diff --git a/net/wireless/scan.c b/net/wireless/scan.c
+index cf2131671eb6..492e30138418 100644
+=2D-- a/net/wireless/scan.c
++++ b/net/wireless/scan.c
+@@ -2693,7 +2693,7 @@ static void cfg80211_parse_ml_sta_data(struct wiphy =
+*wiphy,
 
-Regards,
+ 	new_ie =3D kmalloc(IEEE80211_MAX_DATA_LEN, gfp);
+ 	if (!new_ie)
+-		goto out;
++		goto free_mle;
 
-Luiz
+ 	for (i =3D 0; i < ARRAY_SIZE(mle->sta_prof) && mle->sta_prof[i]; i++) {
+ 		const struct ieee80211_neighbor_ap_info *ap_info;
+@@ -2812,8 +2812,8 @@ static void cfg80211_parse_ml_sta_data(struct wiphy =
+*wiphy,
+ 		cfg80211_put_bss(wiphy, bss);
+ 	}
+
+-out:
+ 	kfree(new_ie);
++free_mle:
+ 	kfree(mle);
+ }
+
+=2D-
+2.43.0
+
 
