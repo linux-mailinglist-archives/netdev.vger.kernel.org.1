@@ -1,237 +1,138 @@
-Return-Path: <netdev+bounces-60659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1E3D820BE6
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 17:00:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC64E820BF4
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 17:27:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779751F21857
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 16:00:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2B561C215C8
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 16:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5F363C3;
-	Sun, 31 Dec 2023 16:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0877D8C0C;
+	Sun, 31 Dec 2023 16:27:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hznt+wRj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S/LJlL9G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BC263A7;
-	Sun, 31 Dec 2023 16:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5cece20f006so71244567b3.3;
-        Sun, 31 Dec 2023 08:00:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704038429; x=1704643229; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HMuvwD7eiLNXximEfDtwAGnJl1cUQtARzSFBpIb6hOQ=;
-        b=hznt+wRjBln7J+3oHZQSnqGMT2uRFyFQN4TSIXvY53aYIu9HEbNz2DnclJ4BOT9eIL
-         V6tGbjLMc5cgfiVAnxLGEfeW+u5wUaAnTV6MqNr0Epr5zYjkQvAeDdrd57ef9IB6Fy7U
-         dGkeKGE7DI8J3mJekdZHTxvQZyreXmCfbf46cZvy6WkZIal8jXoHdKwcdhPbU9MbeZJt
-         eO7DulzAJmcIIOCb5naH2KVvkS4uvBlaXU3eClvM7ruM0QyZYl8kYDuXmZeac2RbByY9
-         7GcvTsUscPUhnxUKlBKlVgAwkcsstaey7yTrsTsQeW4w8L90B5FMhUWPT1YWzb6VUX92
-         DZyg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054578F51
+	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 16:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704040030;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W9SZrZXQYhT7Sd91knQv7PNkQL8oY2rRS96yOdxg1Q0=;
+	b=S/LJlL9G3DfwM0H3JBNqcgPWmcb5rr/VVagu6SYe1czGI+GWzXbpvCSD5qxew6QgeYkJap
+	tULIuUP3WlRnZJErv7dZVISBpYXHDmzM6lykv5FlVZFcZVIMpmYbWWAyT9l6Cz/5vtNXYy
+	N7PTWnqZCXI+WSbjvmuKDGmNx5dW8xc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-652-TvlHsaIDPZGZH2wIyrv5iQ-1; Sun, 31 Dec 2023 11:27:08 -0500
+X-MC-Unique: TvlHsaIDPZGZH2wIyrv5iQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40d2a286757so49267565e9.1
+        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 08:27:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704038429; x=1704643229;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HMuvwD7eiLNXximEfDtwAGnJl1cUQtARzSFBpIb6hOQ=;
-        b=cLi8f4ZCJ3dQNMGRyP5+8StZjmk5S+KM+0O18wCSk0hYmic72uE5OBWFs1/MKAcVci
-         bfikOIIPScqH/QazzmA2Ho1gDHkv40qhHFmDz8xmzIIV1MTijtUz36QCSxxt6WtS9Tdu
-         YtyE1DjCVEge7J4tZJGcDnMsE8AvYytIDsvQnYUZpptSOMm+GzkhF9wo7Y59d/TdF/5X
-         XVmhjC44ipUYZmkd2rdkXmmD8Dl+hd6ISXbzy/fPPQ32L4F5jHnJNHXUpDehHd8s+UyR
-         xKgWhmyMg45QHcrpfTKZwDlM33t3JLRUSxwVsR9jJNgDjJLfNhUte/x7un7tDHEMe10s
-         1Pvw==
-X-Gm-Message-State: AOJu0Yx/BgM1QN1OJZyL+2Myo+ETxV3xtEIFF+1/mtIfFZ6cCg9BrHl8
-	ut4Y3H594bME3kS1bbA21vYBop3bMNdZRZL4A04=
-X-Google-Smtp-Source: AGHT+IFrWbbm+rynYKZoZFWyxavZmC2e3w8maDU/mRrBHbbvn+UloqCC/B9NjquC2jk1wcJVYqVoGau8iy9SdEyBBug=
-X-Received: by 2002:a0d:d5ca:0:b0:5e8:4e1d:2f03 with SMTP id
- x193-20020a0dd5ca000000b005e84e1d2f03mr9051612ywd.52.1704038428946; Sun, 31
- Dec 2023 08:00:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704040027; x=1704644827;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W9SZrZXQYhT7Sd91knQv7PNkQL8oY2rRS96yOdxg1Q0=;
+        b=XJJQSKJorVDl6kUHLSV9fnmmR6Z+5yekLaWT8QKBfPmKak2kDeUUpWAgvAED0ZO5ah
+         o+69PanqMrn6cr54yQG2oS65EAG+NAH2m6Wi3aowW1TSFAsmKsvFZBnhYKt4XQDp3pv1
+         uEa8bcLpYK6+JoLdam0jpKcCH4pEXSxZl7gYRwjL2/CkOQNWcpK8N4dCIqtqSdrDWcUv
+         G3VeC1AI8JZYA3IAA4lhwTlggtlB7vREQXBAJyRScSLF+jD4P6t70c3uBzkGOwwe+zAq
+         9n52IhSbb3/btIsyENBK0RMAt6CY3sx9AuZPy0uu21xeltZlamVz2OGIojFWrK4rv0pj
+         sVZg==
+X-Gm-Message-State: AOJu0YwF52s+dgKZQejG2gjuVhOe5RtR8WJ391cLJIS7ow8AG9TuDQjJ
+	PkCOqde2o8sbRk0pGyZNkk37cOJDCBpZHKj+vGuq/8BDkBmZe7NSZKMXuR4pQZqIUeNV6c7fnO7
+	UJAp8By3phWHa4tDev1/sp0r0
+X-Received: by 2002:a05:600c:1383:b0:40d:628a:1229 with SMTP id u3-20020a05600c138300b0040d628a1229mr2894703wmf.96.1704040027752;
+        Sun, 31 Dec 2023 08:27:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG9b93ScSUl7ZhuJmGttFNJHej7gGjBgYPQSNbx8GJYzHGFQpUOA9OuiE3Dj4nmpqxVpP6n0g==
+X-Received: by 2002:a05:600c:1383:b0:40d:628a:1229 with SMTP id u3-20020a05600c138300b0040d628a1229mr2894699wmf.96.1704040027489;
+        Sun, 31 Dec 2023 08:27:07 -0800 (PST)
+Received: from debian (2a01cb058918ce00b14e8593d3a1c390.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:b14e:8593:d3a1:c390])
+        by smtp.gmail.com with ESMTPSA id w5-20020a5d5445000000b0033660f75d08sm23926474wrv.116.2023.12.31.08.27.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Dec 2023 08:27:06 -0800 (PST)
+Date: Sun, 31 Dec 2023 17:27:05 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Yujie Liu <yujie.liu@intel.com>
+Cc: netdev@vger.kernel.org, Hangbin Liu <liuhangbin@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	lkp@intel.com, kernel test robot <oliver.sang@intel.com>
+Subject: Re: [PATCH v2 net-next] selftests/net: change shebang to bash to
+ support "source"
+Message-ID: <ZZGWWc9EuSUT52Z3@debian>
+References: <20231229131931.3961150-1-yujie.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231228122411.3189-1-maimon.sagi@gmail.com> <f254c189-463e-43a3-bc09-9a8869ebf819@app.fastmail.com>
-In-Reply-To: <f254c189-463e-43a3-bc09-9a8869ebf819@app.fastmail.com>
-From: Sagi Maimon <maimon.sagi@gmail.com>
-Date: Sun, 31 Dec 2023 18:00:17 +0200
-Message-ID: <CAMuE1bF0Hho4VwO6w3f+9z3j5TtscYzuAjj10MFt2mZXG2P8dQ@mail.gmail.com>
-Subject: Re: [PATCH v3] posix-timers: add multi_clock_gettime system call
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Richard Cochran <richardcochran@gmail.com>, Andy Lutomirski <luto@kernel.org>, datglx@linutronix.de, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Sohil Mehta <sohil.mehta@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Nhat Pham <nphamcs@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, Kees Cook <keescook@chromium.org>, 
-	Alexey Gladkov <legion@kernel.org>, Mark Rutland <mark.rutland@arm.com>, linux-kernel@vger.kernel.org, 
-	linux-api@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, 
-	Netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231229131931.3961150-1-yujie.liu@intel.com>
 
-On Fri, Dec 29, 2023 at 5:27=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
-:
->
-> On Thu, Dec 28, 2023, at 13:24, Sagi Maimon wrote:
-> > Some user space applications need to read some clocks.
-> > Each read requires moving from user space to kernel space.
-> > The syscall overhead causes unpredictable delay between N clocks reads
-> > Removing this delay causes better synchronization between N clocks.
-> >
-> > Introduce a new system call multi_clock_gettime, which can be used to m=
-easure
-> > the offset between multiple clocks, from variety of types: PHC, virtual=
- PHC
-> > and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
-> > The offset includes the total time that the driver needs to read the cl=
-ock
-> > timestamp.
-> >
-> > New system call allows the reading of a list of clocks - up to PTP_MAX_=
-CLOCKS.
-> > Supported clocks IDs: PHC, virtual PHC and various system clocks.
-> > Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
-> > The system call returns n_clocks timestamps for each measurement:
-> > - clock 0 timestamp
-> > - ...
-> > - clock n timestamp
-> >
-> > Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
->
-> Hi Sagi,
->
-> Exposing an interface to read multiple clocks makes sense to me,
-> but I wonder if the interface you use is too inflexible.
->
-Arnd - thanks alot for your notes.
-> > --- a/include/uapi/asm-generic/unistd.h
-> > +++ b/include/uapi/asm-generic/unistd.h
-> > @@ -828,9 +828,11 @@ __SYSCALL(__NR_futex_wake, sys_futex_wake)
-> >  __SYSCALL(__NR_futex_wait, sys_futex_wait)
-> >  #define __NR_futex_requeue 456
-> >  __SYSCALL(__NR_futex_requeue, sys_futex_requeue)
-> > +#define __NR_multi_clock_gettime 457
-> > +__SYSCALL(__NR_multi_clock_gettime, sys_multi_clock_gettime)
-> >
-> >  #undef __NR_syscalls
-> > -#define __NR_syscalls 457
-> > +#define __NR_syscalls 458
->
-> Site note: hooking it up only here is sufficient for the
-> code review but not for inclusion: once we have an agreement
-> on the API, this should be added to all architectures at once.
->
-> > +#define MULTI_PTP_MAX_CLOCKS 5 /* Max number of clocks */
-> > +#define MULTI_PTP_MAX_SAMPLES 10 /* Max allowed offset measurement sam=
-ples. */
-> > +
-> > +struct __ptp_multi_clock_get {
-> > +     unsigned int n_clocks; /* Desired number of clocks. */
-> > +     unsigned int n_samples; /* Desired number of measurements per clo=
-ck. */
-> > +     clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs *=
-/
-> > +     /*
-> > +      * Array of list of n_clocks clocks time samples n_samples times.
-> > +      */
-> > +     struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX=
-_CLOCKS];
-> > +};
->
-> The fixed size arrays here seem to be an unnecessary limitation,
-> both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS are small
-> enough that one can come up with scenarios where you would want
-> a higher number, but at the same time the structure is already
-> 808 bytes long, which is more than you'd normally want to put
-> on the kernel stack, and which may take a significant time to
-> copy to and from userspace.
->
-> Since n_clocks and n_samples are always inputs to the syscall,
-> you can just pass them as register arguments and use a dynamically
-> sized array instead.
->
-Both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS are enough of any
-usage we can think of,
-But I think you are right, it is better to use a dynamically sized
-array for future use, plus to use less stack memory.
-On patch v4 a dynamically sized array will be used .
-I leaving both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS but
-increasing their values, since there should be some limitation.
-> It's not clear to me what you gain from having the n_samples
-> argument over just calling the syscall repeatedly. Does
-> this offer a benefit for accuracy or is this just meant to
-> avoid syscall overhead.
-It is mainly to avoid syscall overhead which also slightly improve the accu=
-racy.
-> > +SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get
-> > __user *, ptp_multi_clk_get)
-> > +{
-> > +     const struct k_clock *kc;
-> > +     struct timespec64 kernel_tp;
-> > +     struct __ptp_multi_clock_get multi_clk_get;
-> > +     unsigned int i, j;
-> > +     int error;
-> > +
-> > +     if (copy_from_user(&multi_clk_get, ptp_multi_clk_get,
-> > sizeof(multi_clk_get)))
-> > +             return -EFAULT;
->
-> Here you copy the entire structure from userspace, but
-> I don't actually see the .ts[] array on the stack being
-> accessed later as you just copy to the user pointer
-> directly.
->
-you are right, will be fixed on patch v4.
-> > +             for (i =3D 0; i < multi_clk_get.n_clocks; i++) {
-> > +                     kc =3D clockid_to_kclock(multi_clk_get.clkid_arr[=
-i]);
-> > +                     if (!kc)
-> > +                             return -EINVAL;
-> > +                     error =3D kc->clock_get_timespec(multi_clk_get.cl=
-kid_arr[i],
-> > &kernel_tp);
-> > +                     if (!error && put_timespec64(&kernel_tp, (struct =
-__kernel_timespec
-> > __user *)
-> > +                                                  &ptp_multi_clk_get->=
-ts[j][i]))
-> > +                             error =3D -EFAULT;
-> > +             }
->
-> The put_timespec64() and possibly the clockid_to_kclock() have
-> some overhead that may introduce jitter, so it may be better to
-> pull that out of the loop and have a fixed-size array
-> of timespec64 values on the stack and then copy them
-> at the end.
->
-This overhead may introduce marginal jitter in my opinion,
-still I like your idea since it is better to remove any overhead.
-This will be fixed in patch v4.
-I don't intend to use "a fixed-size array of timespec64 values on the
-stack" since it will cause stack memory overflow,
-Instead I will use a dynamically sized array (according to your
-previews advice).
-> On the other hand, this will still give less accuracy than the
-> getcrosststamp() callback with ioctl(PTP_SYS_OFFSET_PRECISE),
-> so either the last bit of accuracy isn't all that important,
-> or you need to refine the interface to actually be an
-> improvement over the chardev.
->
-I don't understand this comment, please explain.
-The ioctl(PTP_SYS_OFFSET_PRECISE) is one specific case that can be
-done by multi_clock_gettime syscall (which cover many more cases)
-Plus the ioctl(PTP_SYS_OFFSET_PRECISE) works only on drivers that
-support this feature.
->       Arnd
+On Fri, Dec 29, 2023 at 09:19:31PM +0800, Yujie Liu wrote:
+> The patch set [1] added a general lib.sh in net selftests, and converted
+> several test scripts to source the lib.sh.
+> 
+> unicast_extensions.sh (converted in [1]) and pmtu.sh (converted in [2])
+> have a /bin/sh shebang which may point to various shells in different
+> distributions, but "source" is only available in some of them. For
+> example, "source" is a built-it function in bash, but it cannot be
+> used in dash.
+> 
+> Refer to other scripts that were converted together, simply change the
+> shebang to bash to fix the following issues when the default /bin/sh
+> points to other shells.
+> 
+> # selftests: net: unicast_extensions.sh
+> # ./unicast_extensions.sh: 31: source: not found
+> # ###########################################################################
+> # Unicast address extensions tests (behavior of reserved IPv4 addresses)
+> # ###########################################################################
+> # TEST: assign and ping within 240/4 (1 of 2) (is allowed)            [FAIL]
+> # TEST: assign and ping within 240/4 (2 of 2) (is allowed)            [FAIL]
+> # TEST: assign and ping within 0/8 (1 of 2) (is allowed)              [FAIL]
+> # TEST: assign and ping within 0/8 (2 of 2) (is allowed)              [FAIL]
+> # TEST: assign and ping inside 255.255/16 (is allowed)                [FAIL]
+> # TEST: assign and ping inside 255.255.255/24 (is allowed)            [FAIL]
+> # TEST: route between 240.5.6/24 and 255.1.2/24 (is allowed)          [FAIL]
+> # TEST: route between 0.200/16 and 245.99/16 (is allowed)             [FAIL]
+> # TEST: assign and ping lowest address (/24)                          [FAIL]
+> # TEST: assign and ping lowest address (/26)                          [FAIL]
+> # TEST: routing using lowest address                                  [FAIL]
+> # TEST: assigning 0.0.0.0 (is forbidden)                              [ OK ]
+> # TEST: assigning 255.255.255.255 (is forbidden)                      [ OK ]
+> # TEST: assign and ping inside 127/8 (is forbidden)                   [ OK ]
+> # TEST: assign and ping class D address (is forbidden)                [ OK ]
+> # TEST: routing using class D (is forbidden)                          [ OK ]
+> # TEST: routing using 127/8 (is forbidden)                            [ OK ]
+> not ok 51 selftests: net: unicast_extensions.sh # exit=1
+> 
+> v1 -> v2:
+>   - Fix pmtu.sh which has the same issue as unicast_extensions.sh,
+>     suggested by Hangbin
+>   - Change the style of the "source" line to be consistent with other
+>     tests, suggested by Hangbin
+> 
+> Link: https://lore.kernel.org/all/20231202020110.362433-1-liuhangbin@gmail.com/ [1]
+> Link: https://lore.kernel.org/all/20231219094856.1740079-1-liuhangbin@gmail.com/ [2]
+
+Also, please add the missing Fixes tags.
+
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Signed-off-by: Yujie Liu <yujie.liu@intel.com>
+
 
