@@ -1,90 +1,83 @@
-Return-Path: <netdev+bounces-60662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A083820C11
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 18:07:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB7A2820C28
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 18:23:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E40D2281BBA
-	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 17:07:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 868A9281A54
+	for <lists+netdev@lfdr.de>; Sun, 31 Dec 2023 17:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0FB8C14;
-	Sun, 31 Dec 2023 17:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8666E8C1F;
+	Sun, 31 Dec 2023 17:23:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9GQ4MeO"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zyva4fcy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169058F42;
-	Sun, 31 Dec 2023 17:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40d3ae326f6so90286095e9.3;
-        Sun, 31 Dec 2023 09:07:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0238F42
+	for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 17:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7ba9f24acf8so367877139f.2
+        for <netdev@vger.kernel.org>; Sun, 31 Dec 2023 09:23:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704042449; x=1704647249; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704043408; x=1704648208; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=n/M2QU8ovLnm7JVX+BLvVX+SFfKrCPAK+NLbXM2IK84=;
-        b=H9GQ4MeOg5g4W4sEkIoaGFpV93wpLhFJ1Fufn0unxwFhesUw++TFh8XW3hFvPd3mNF
-         N3J+u4xhzwEKjreEwTK3HACZMp8hrglm6DZOFE83Xo2kePC0etT7OmAlaCqxIIGBtzqc
-         eq7V8GoWiRumDXL3HIACvnacZRfmVNXHKqXc/W08z4s6g4l9xAjrFT8gmdcHyQpIsRoV
-         LobfTQ8bY8PSbs6bTqXdFe1tIaqzHEOhRz1anGP/94MvkO45K1G2LZLDyoBHqjeNVx8i
-         DkhTbcAm9HsfyJ35S25fZuITjovF2lrmiH/4LrzkXLUJzGfXXLRS685q9xTFhWZOgJpq
-         T0OQ==
+        bh=CReOJix5PZ47ly1mbNRIjvx2TMQhxSi+iuVIC1P27U4=;
+        b=zyva4fcy8s5q0VKMhFbU01xQ758TLaLM5DhI1or05P1jvrleIothPdHszAYIMvok5r
+         Uur0OLt3d2AoJhubNjzmvJGVt0YZ7QXhwejGf7duRjZJdPf5H12PIAowI4n7at7Auihp
+         M+48j5/pvGjR4hounDoX2Bi7wWdD+s102I/5F7MAJT1A+qPZOTr/s+ymKVxdAOxlJVf9
+         yaAZ+PnFBcUBiQT62IX3bVNB1zJImzRVPeSwgdH+EVj1hKYVfGtURoVLyjYmIOu0M3I7
+         BG2X/5UE+M/T/G1IeP/jYuHGUIj+ZuBnWTrJg6fwYwBL2Apet9vYP3KxjM/gEUeCoYmJ
+         tsYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704042449; x=1704647249;
+        d=1e100.net; s=20230601; t=1704043408; x=1704648208;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=n/M2QU8ovLnm7JVX+BLvVX+SFfKrCPAK+NLbXM2IK84=;
-        b=CHLT3sH+SXNxCqiC2O2la8HplvlKWLYwuNEAkZwRowZ2zgNRzca+3ey/lRqiDF5q04
-         /tFiCrEd+Eymf92Hz19wuOq1iXiMkI84SMjOTReE5Ttedd4DCVMDfpysmhw0nAtUDhKw
-         cW28pe0SV6i5MZRQdUDXe2ylz2JD+75Ulbg71/kGD//NlVPc0ota5g6fOdR38IhhV0Hd
-         7C18rFaB+QTa9iImjyHE7tachx0OqlotcfxrzTp6mzrcE/x6/MHaPMLhfJzWeu5yGWLT
-         Fk595quYf57ZmE1cUe50JnxtHVaKQHm2LDg88ri/Rqll8TVvAV/X5ygPiF06XxVfdl9Y
-         9a3A==
-X-Gm-Message-State: AOJu0YwwOtxG42wG9C7f5jGict95c5IBuuyCaFge/x8mpz4A4zRSiQDO
-	+Ny+cGUX5Ia4Tg7i31rgxKs=
-X-Google-Smtp-Source: AGHT+IFtOicv5vkf+f6WonETGdxwCmPsO6RSimYSRaQLXO6CGrieZ+R0CBgABoB2Sxk9EgVwZM1bfw==
-X-Received: by 2002:a05:600c:3d1a:b0:40d:887b:f510 with SMTP id bh26-20020a05600c3d1a00b0040d887bf510mr216811wmb.86.1704042448971;
-        Sun, 31 Dec 2023 09:07:28 -0800 (PST)
-Received: from ran.advaoptical.com ([82.166.23.19])
-        by smtp.gmail.com with ESMTPSA id u14-20020a05600c138e00b0040d62f97e3csm13452347wmf.10.2023.12.31.09.07.26
+        bh=CReOJix5PZ47ly1mbNRIjvx2TMQhxSi+iuVIC1P27U4=;
+        b=BhmZcewNHayaufJ9MvF+0qvTiLdJDGPVs6xrnc5Jp0/LYKje95ZkJnx80lXnwFULxO
+         Mxq2HRBVMMQUDlTESa2+w/4n5aGkOvXxeM+xjtbyo5C7qJhRP3woBGbmqUZCyghFeRpk
+         Wqfejxtlf660B2sVbuwh47wXfD6lvvjxQ4jYFytnFDp2RKwVUicybUjPH5nBw/GLo7i+
+         4wekBLNqGMwh3hRbKgXovT6slvc0kI+aI2Vt0J+9hJgyO+xs/K1cQ6TKlhiJDRGZEBT1
+         ObrVQ6k5xIWsDuU8piWu03/RrAGQKl5sKKqKoeCdX4m/ByOUaLc71PrDKFtGlRx2vaLV
+         XO5A==
+X-Gm-Message-State: AOJu0YwSZLOUywxBEmJrO+6nLS4LET5p/LpbwabX+TKn/1+tCkWZdwU8
+	uWBMLfMwSRSIhUSv6KP8wbfLN5XBWOqw
+X-Google-Smtp-Source: AGHT+IEwl4mvLLC9vLvWmX+FE4fovYD1G3S1NQq6emAIyQ+ZtUVIct9c8U2hWuC9PjMXGJe88jovuw==
+X-Received: by 2002:a6b:6114:0:b0:7b9:c344:6e77 with SMTP id v20-20020a6b6114000000b007b9c3446e77mr19426515iob.8.1704043408609;
+        Sun, 31 Dec 2023 09:23:28 -0800 (PST)
+Received: from localhost.localdomain ([2804:7f1:e2c0:aba3:7663:8830:3d6b:aa9f])
+        by smtp.gmail.com with ESMTPSA id g12-20020aa79dcc000000b006d9bf45436asm11389209pfq.48.2023.12.31.09.23.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Dec 2023 09:07:28 -0800 (PST)
-From: Sagi Maimon <maimon.sagi@gmail.com>
-To: richardcochran@gmail.com,
-	luto@kernel.org,
-	datglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	arnd@arndb.de,
-	geert@linux-m68k.org,
-	peterz@infradead.org,
-	hannes@cmpxchg.org,
-	sohil.mehta@intel.com,
-	rick.p.edgecombe@intel.com,
-	nphamcs@gmail.com,
-	palmer@sifive.com,
-	maimon.sagi@gmail.com,
-	keescook@chromium.org,
-	legion@kernel.org,
-	mark.rutland@arm.com
-Cc: linux-kernel@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v4] posix-timers: add multi_clock_gettime system call
-Date: Sun, 31 Dec 2023 19:07:21 +0200
-Message-Id: <20231231170721.3381-1-maimon.sagi@gmail.com>
-X-Mailer: git-send-email 2.26.3
+        Sun, 31 Dec 2023 09:23:28 -0800 (PST)
+From: Victor Nogueira <victor@mojatatu.com>
+To: jhs@mojatatu.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us
+Cc: idosch@idosch.org,
+	mleitner@redhat.com,
+	vladbu@nvidia.com,
+	paulb@nvidia.com,
+	pctammela@mojatatu.com,
+	netdev@vger.kernel.org,
+	kernel@mojatatu.com,
+	syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com,
+	syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com,
+	syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
+Subject: [PATCH net-next v2 1/1] net/sched: We should only add appropriate qdiscs blocks to ports' xarray
+Date: Sun, 31 Dec 2023 14:23:20 -0300
+Message-ID: <20231231172320.245375-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,192 +86,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some user space applications need to read some clocks.
-Each read requires moving from user space to kernel space.
-The syscall overhead causes unpredictable delay between N clocks reads
-Removing this delay causes better synchronization between N clocks.
+We should only add qdiscs to the blocks ports' xarray in ingress that
+support ingress_block_set/get or in egress that support
+egress_block_set/get.
 
-Introduce a new system call multi_clock_gettime, which can be used to measure
-the offset between multiple clocks, from variety of types: PHC, virtual PHC
-and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
-The offset includes the total time that the driver needs to read the clock
-timestamp.
-
-New system call allows the reading of a list of clocks - up to PTP_MAX_CLOCKS.
-Supported clocks IDs: PHC, virtual PHC and various system clocks.
-Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
-The system call returns n_clocks timestamps for each measurement:
-- clock 0 timestamp
-- ...
-- clock n timestamp
-
-Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra")
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Reported-by: Ido Schimmel <idosch@nvidia.com>
+Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
+Tested-by: Ido Schimmel <idosch@nvidia.com>
+Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google.com/
+Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google.com/
+Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google.com/
 ---
+v1 -> v2:
 
- Addressed comments from:
- - Arnd Bergmann : https://www.spinics.net/lists/netdev/msg962019.html
-          
- Changes since version 3:
- - Replacing the clkid fixed size arrays with a dynamically sized array.
- - Coping only necessary data from user space.
- - Calling put_timespec64() only after all time samples taken in order to 
-   reduce the put_timespec64() overhead.
+- Remove newline between fixes tag and Signed-off-by tag
+- Add Ido's Reported-by and Tested-by tags
+- Add syzbot's Reported-and-tested-by tags
 
- arch/x86/entry/syscalls/syscall_64.tbl |  1 +
- include/linux/syscalls.h               |  2 +-
- include/uapi/asm-generic/unistd.h      |  4 +-
- include/uapi/linux/multi_clock.h       | 21 +++++++++
- kernel/time/posix-timers.c             | 59 ++++++++++++++++++++++++++
- 5 files changed, 85 insertions(+), 2 deletions(-)
- create mode 100644 include/uapi/linux/multi_clock.h
+ net/sched/sch_api.c | 34 ++++++++++++++++++++--------------
+ 1 file changed, 20 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
-index 8cb8bf68721c..9cdeb0bf49db 100644
---- a/arch/x86/entry/syscalls/syscall_64.tbl
-+++ b/arch/x86/entry/syscalls/syscall_64.tbl
-@@ -378,6 +378,7 @@
- 454	common	futex_wake		sys_futex_wake
- 455	common	futex_wait		sys_futex_wait
- 456	common	futex_requeue		sys_futex_requeue
-+457	common	multi_clock_gettime	sys_multi_clock_gettime
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index 299086bb6205..426be81276f1 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1187,23 +1187,29 @@ static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
+ 	struct tcf_block *block;
+ 	int err;
  
- #
- # Due to a historical design error, certain syscalls are numbered differently
-diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index fd9d12de7e92..b59fa776ab76 100644
---- a/include/linux/syscalls.h
-+++ b/include/linux/syscalls.h
-@@ -1161,7 +1161,7 @@ asmlinkage long sys_mmap_pgoff(unsigned long addr, unsigned long len,
- 			unsigned long prot, unsigned long flags,
- 			unsigned long fd, unsigned long pgoff);
- asmlinkage long sys_old_mmap(struct mmap_arg_struct __user *arg);
--
-+asmlinkage long sys_multi_clock_gettime(struct __ptp_multi_clock_get __user * ptp_multi_clk_get);
- 
- /*
-  * Not a real system call, but a placeholder for syscalls which are
-diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
-index 756b013fb832..beb3e0052d3c 100644
---- a/include/uapi/asm-generic/unistd.h
-+++ b/include/uapi/asm-generic/unistd.h
-@@ -828,9 +828,11 @@ __SYSCALL(__NR_futex_wake, sys_futex_wake)
- __SYSCALL(__NR_futex_wait, sys_futex_wait)
- #define __NR_futex_requeue 456
- __SYSCALL(__NR_futex_requeue, sys_futex_requeue)
-+#define __NR_multi_clock_gettime 457
-+__SYSCALL(__NR_multi_clock_gettime, sys_multi_clock_gettime)
- 
- #undef __NR_syscalls
--#define __NR_syscalls 457
-+#define __NR_syscalls 458
- 
- /*
-  * 32 bit systems traditionally used different
-diff --git a/include/uapi/linux/multi_clock.h b/include/uapi/linux/multi_clock.h
-new file mode 100644
-index 000000000000..5e78dac3a533
---- /dev/null
-+++ b/include/uapi/linux/multi_clock.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef _UAPI_MULTI_CLOCK_H
-+#define _UAPI_MULTI_CLOCK_H
-+
-+#include <linux/types.h>
-+#include <linux/time_types.h>
-+
-+#define MULTI_PTP_MAX_CLOCKS 32 /* Max number of clocks */
-+#define MULTI_PTP_MAX_SAMPLES 32 /* Max allowed offset measurement samples. */
-+
-+struct __ptp_multi_clock_get {
-+	unsigned int n_clocks; /* Desired number of clocks. */
-+	unsigned int n_samples; /* Desired number of measurements per clock. */
-+	clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
-+	/*
-+	 * Array of list of n_clocks clocks time samples n_samples times.
-+	 */
-+	struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
-+};
-+
-+#endif /* _UAPI_MULTI_CLOCK_H */
-diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
-index b924f0f096fa..1d321dc56a25 100644
---- a/kernel/time/posix-timers.c
-+++ b/kernel/time/posix-timers.c
-@@ -31,6 +31,8 @@
- #include <linux/compat.h>
- #include <linux/nospec.h>
- #include <linux/time_namespace.h>
-+#include <linux/multi_clock.h>
-+#include <linux/slab.h>
- 
- #include "timekeeping.h"
- #include "posix-timers.h"
-@@ -1426,6 +1428,63 @@ SYSCALL_DEFINE4(clock_nanosleep_time32, clockid_t, which_clock, int, flags,
- 
- #endif
- 
-+SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get __user *, ptp_multi_clk_get)
-+{
-+	const struct k_clock *kc;
-+	struct timespec64 *kernel_tp;
-+	struct timespec64 *kernel_tp_base;
-+	unsigned int n_clocks; /* Desired number of clocks. */
-+	unsigned int n_samples; /* Desired number of measurements per clock. */
-+	unsigned int i, j;
-+	clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
-+	int error = 0;
-+
-+	if (copy_from_user(&n_clocks, &ptp_multi_clk_get->n_clocks, sizeof(n_clocks)))
-+		return -EFAULT;
-+	if (copy_from_user(&n_samples, &ptp_multi_clk_get->n_samples, sizeof(n_samples)))
-+		return -EFAULT;
-+	if (n_samples > MULTI_PTP_MAX_SAMPLES)
-+		return -EINVAL;
-+	if (n_clocks > MULTI_PTP_MAX_CLOCKS)
-+		return -EINVAL;
-+	if (copy_from_user(clkid_arr, &ptp_multi_clk_get->clkid_arr,
-+			   sizeof(clockid_t) * n_clocks))
-+		return -EFAULT;
-+
-+	kernel_tp_base = kmalloc_array(n_clocks * n_samples,
-+				       sizeof(struct timespec64), GFP_KERNEL);
-+	if (!kernel_tp_base)
-+		return -ENOMEM;
-+
-+	kernel_tp = kernel_tp_base;
-+	for (j = 0; j < n_samples; j++) {
-+		for (i = 0; i < n_clocks; i++) {
-+			kc = clockid_to_kclock(clkid_arr[i]);
-+			if (!kc) {
-+				error = -EINVAL;
-+				goto out;
+-	block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+-	if (block) {
+-		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+-		if (err) {
+-			NL_SET_ERR_MSG(extack,
+-				       "ingress block dev insert failed");
+-			return err;
++	if (sch->ops->ingress_block_get) {
++		block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
++		if (block) {
++			err = xa_insert(&block->ports, dev->ifindex, dev,
++					GFP_KERNEL);
++			if (err) {
++				NL_SET_ERR_MSG(extack,
++					       "ingress block dev insert failed");
++				return err;
 +			}
-+			error = kc->clock_get_timespec(clkid_arr[i], kernel_tp++);
-+			if (error)
-+				goto out;
-+		}
-+	}
-+
-+	kernel_tp = kernel_tp_base;
-+	for (j = 0; j < n_samples; j++) {
-+		for (i = 0; i < n_clocks; i++) {
-+			if (put_timespec64(kernel_tp++, (struct __kernel_timespec __user *)
-+					&ptp_multi_clk_get->ts[j][i])) {
-+				error = -EFAULT;
-+				goto out;
+ 		}
+ 	}
+ 
+-	block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+-	if (block) {
+-		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+-		if (err) {
+-			NL_SET_ERR_MSG(extack,
+-				       "Egress block dev insert failed");
+-			goto err_out;
++	if (sch->ops->egress_block_get) {
++		block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
++		if (block) {
++			err = xa_insert(&block->ports, dev->ifindex, dev,
++					GFP_KERNEL);
++			if (err) {
++				NL_SET_ERR_MSG(extack,
++					       "Egress block dev insert failed");
++				goto err_out;
 +			}
-+		}
-+	}
-+out:
-+	kfree(kernel_tp_base);
-+	return error;
-+}
-+
- static const struct k_clock clock_realtime = {
- 	.clock_getres		= posix_get_hrtimer_res,
- 	.clock_get_timespec	= posix_get_realtime_timespec,
+ 		}
+ 	}
+ 
 -- 
-2.26.3
+2.25.1
 
 
