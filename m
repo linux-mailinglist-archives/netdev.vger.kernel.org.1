@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-60756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2214882156C
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 22:26:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6225D821571
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 22:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A84F72819FF
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 21:26:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC414B20EDD
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 21:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50409DF66;
-	Mon,  1 Jan 2024 21:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CD6DF6B;
+	Mon,  1 Jan 2024 21:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrqiiFVq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hCa0FwhA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1FDDF67
-	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 21:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92EFDF67
+	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 21:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a277339dcf4so307399666b.2
-        for <netdev@vger.kernel.org>; Mon, 01 Jan 2024 13:26:49 -0800 (PST)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3367601a301so8660531f8f.2
+        for <netdev@vger.kernel.org>; Mon, 01 Jan 2024 13:28:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704144408; x=1704749208; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704144531; x=1704749331; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZSGlwBuvtrMC+28h+C3evEt23+rLsKA1EKgBlxOw7gg=;
-        b=DrqiiFVq7t1tz4KDZMFSNQ1ovJJifKSLMTAbqIbpM9kOaL74kwbyvuktjfe++84zqU
-         cWlF1TNLg3Zh37At+xh+KVJXDbR3pYO7xFiR+iSvGAfvuluOkTamyKEiZovuzFxzEedu
-         iVdX0ZICo0eX52YknYnfYgSm+U1ZavuGA3NRQHvY2krY4Kv3zJwT28zBCpqiwWxRzqxz
-         Ncg661HDJVQUeQPjFma14v+82WLpuS9XGilHC6uyirOPyfySa7CjMqaKjtS5wc6RspBP
-         Zd2EJECPyzq482PB6XnTOKNQ3Uyi/MAemhTRr3KFhv98qEIuqH8lNGVNPHsYBJQSYLLb
-         o9aA==
+        bh=+bs5iw9ua7ugcupU/KFKirwYtrB9hC/jPn0yX/maV78=;
+        b=hCa0FwhAGZUhOdSPN0yND5Ckg76v0gvSZQZHmf8WfAmP+3SMcrFDAfHo7jv6WCe3uN
+         K+9ePMcvgy7pULq1b0+msOi+Jll6Rhd5x3IAU4klfbyNcJhUfYthDhr8pm7YPoMtRiic
+         lz8aQqGOjtIuIvakIQCMdXsHVV3K+LtOSsa3HTtfmq/rfD8De4OE2z92wak0ja7ZTFIK
+         RMzkIwbJY9v23h1Becbmwoj33XjDv+Ahgax1KxPJHYBTqVPV2T3JiksBy9DssJscmawn
+         t+tO5l2tw3Nldw3g4eWWnlgQ8O+YP5J4w2Zr5exVtwcvDd200TZ/Ri7fqpAIY0WalVp+
+         cq0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704144408; x=1704749208;
+        d=1e100.net; s=20230601; t=1704144531; x=1704749331;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZSGlwBuvtrMC+28h+C3evEt23+rLsKA1EKgBlxOw7gg=;
-        b=VK168eiraYZ+04SK8uvY86sOIrEJKMhIlDuAuOYllbJvc9pvELhuSJ1rP++6sg0mAj
-         AFTOK2E68IFqR7uHesuNkJyGT7Uu4z0kClW6JxMrDjd449qN7R+1b6pL0gxj040q1Yau
-         jKeGeQEIfGxY8xFskRlryDDptM4D9qZ/xVWcBIvS15MdMCHLOz5/mc8s8Gc6PvKI5SGY
-         JFOGv+hTk8DF9sXD894c0U6bDg6dBtQ+B9Mh7MU+n1Ch6RgimPQdITkHTbtNnYLWJV4W
-         c1KrqZX7ACESCyJFZAcO5rmpuPKMqH16hKiJd1mj6nh8TWQ5dfrt6XilTSDIjFDM8yuU
-         lfwA==
-X-Gm-Message-State: AOJu0Yy94um9pb6IRHifzXRylVT27T8XBGbPM0SW4OozGUMcvv27/wJm
-	ATmXQgykqHYNjegohYjTL/A=
-X-Google-Smtp-Source: AGHT+IHHi14nHLylYsoVrBmoaZ5Tfo8v3QEDJow93pjLf6tMs7en0YDyRAphweJaYE2TYZA3U/yNIw==
-X-Received: by 2002:a17:907:9055:b0:a27:a34e:bc9 with SMTP id az21-20020a170907905500b00a27a34e0bc9mr1104883ejc.30.1704144407654;
-        Mon, 01 Jan 2024 13:26:47 -0800 (PST)
+        bh=+bs5iw9ua7ugcupU/KFKirwYtrB9hC/jPn0yX/maV78=;
+        b=RLjVvIpQ88wl0b2zdEWsOuJqPN/V57dXyItZ9DZNtIsStjI3VaWg/WOZ56huCof5h+
+         kRp9+kUpCfaaloQzcJjoFua/Qi77W/FE3V0Kbkgj/gVcnWdKLthQcnXt8d8yS1pH+mL5
+         zG1oUqXq5ZS264V26o2YiZGumycUxh0M2CJsBS40LQSZ5jI2972PpacdhPktIuu43Lwk
+         YMu54MdgZJpG60eIoB6yz2pxD/2KtfBG3zkdy618CNCPukQSE1dlzoL3vbiUmYFga5Dj
+         ZIZVUGKcseV7Vn5x9C1hHOedGHPvfXfBVWJnnMfgoM7ZrxHtw6FywW+Jogm7n2NqXf9N
+         KBpw==
+X-Gm-Message-State: AOJu0YwIh/1QxX8BXlPzIwcdReKsgMe+kJiuhsQe4nvkIr2Yo/b16bbl
+	tTOcZc0/DSwDaqHRt3HHU8Y=
+X-Google-Smtp-Source: AGHT+IGFwLwDmV/9e+yFwEAozt/X7vVq9XfkJ0JRzNvgRmG8/n8lmrg8IkVd42QUjItTUo3nvf5sDA==
+X-Received: by 2002:adf:dd89:0:b0:336:7431:62b8 with SMTP id x9-20020adfdd89000000b00336743162b8mr5461371wrl.120.1704144530664;
+        Mon, 01 Jan 2024 13:28:50 -0800 (PST)
 Received: from ?IPV6:2a01:c22:6e6b:b000:65c3:c8c0:cae3:f9e1? (dynamic-2a01-0c22-6e6b-b000-65c3-c8c0-cae3-f9e1.c22.pool.telefonica.de. [2a01:c22:6e6b:b000:65c3:c8c0:cae3:f9e1])
-        by smtp.googlemail.com with ESMTPSA id fv14-20020a170907508e00b00a269f8e8869sm11159750ejc.128.2024.01.01.13.26.46
+        by smtp.googlemail.com with ESMTPSA id k3-20020aa7c043000000b00552eb1b1ed7sm15012188edo.16.2024.01.01.13.28.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jan 2024 13:26:47 -0800 (PST)
-Message-ID: <ccd1dc6a-5dc8-46de-a881-ebd2eda6dcee@gmail.com>
-Date: Mon, 1 Jan 2024 22:26:47 +0100
+        Mon, 01 Jan 2024 13:28:50 -0800 (PST)
+Message-ID: <e7b66d99-e51b-4c8f-83da-99184e5f41ec@gmail.com>
+Date: Mon, 1 Jan 2024 22:28:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 4/5] net: phy: c45: prepare
- genphy_c45_ethtool_set_eee for follow-up extension
+Subject: [PATCH net-next 5/5] net: phy: c45: extend
+ genphy_c45_ethtool_[set|get]_eee
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>,
@@ -123,71 +123,66 @@ In-Reply-To: <783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This prepares genphy_c45_ethtool_set_eee() for functional changes in a
-follow-up patch. No functional change intended.
+Extend both functions to use the linkmode bitmap extension if available.
+
+Note: The linkmode extension for now is supported only if ethtool uses
+netlink. It's not supported for ioctl.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/phy-c45.c | 41 +++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ drivers/net/phy/phy-c45.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index 747d14bf1..9d8b2b5eb 100644
+index 9d8b2b5eb..e276dba19 100644
 --- a/drivers/net/phy/phy-c45.c
 +++ b/drivers/net/phy/phy-c45.c
-@@ -1492,32 +1492,31 @@ EXPORT_SYMBOL(genphy_c45_ethtool_get_eee);
- int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
- 			       struct ethtool_eee *data)
- {
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(adv);
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp);
-+	bool unsupported;
+@@ -1454,6 +1454,7 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(adv) = {};
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(lp) = {};
+ 	bool overflow = false, is_enabled;
++	struct ethtool_keee *keee;
  	int ret;
  
--	if (data->eee_enabled) {
--		if (data->advertised) {
--			__ETHTOOL_DECLARE_LINK_MODE_MASK(adv);
--
--			ethtool_convert_legacy_u32_to_link_mode(adv,
--								data->advertised);
--			linkmode_andnot(adv, adv, phydev->supported_eee);
--			if (!linkmode_empty(adv)) {
--				phydev_warn(phydev, "At least some EEE link modes are not supported.\n");
--				return -EINVAL;
--			}
--
--			ethtool_convert_legacy_u32_to_link_mode(phydev->advertising_eee,
--								data->advertised);
--		} else {
--			linkmode_copy(phydev->advertising_eee,
--				      phydev->supported_eee);
--		}
-+	phydev->eee_enabled = data->eee_enabled;
-+	if (!data->eee_enabled)
-+		goto eee_aneg;
+ 	ret = genphy_c45_eee_is_active(phydev, adv, lp, &is_enabled);
+@@ -1463,6 +1464,16 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
+ 	data->eee_enabled = is_enabled;
+ 	data->eee_active = ret;
  
--		phydev->eee_enabled = true;
--	} else {
--		phydev->eee_enabled = false;
-+	ethtool_convert_legacy_u32_to_link_mode(adv, data->advertised);
-+
-+	if (linkmode_empty(adv)) {
-+		linkmode_copy(phydev->advertising_eee, phydev->supported_eee);
-+		goto eee_aneg;
- 	}
- 
-+	unsupported = linkmode_andnot(tmp, adv, phydev->supported_eee);
-+	if (unsupported) {
-+		phydev_warn(phydev, "At least some EEE link modes are not supported.\n");
-+		return -EINVAL;
++	keee = ethtool_eee2keee(data);
++	if (keee) {
++		linkmode_copy(keee->link_modes.supported,
++			      phydev->supported_eee);
++		linkmode_copy(keee->link_modes.advertising, adv);
++		linkmode_copy(keee->link_modes.lp_advertising, lp);
++		keee->use_link_modes = 1;
++		return 0;
 +	}
 +
-+	linkmode_copy(phydev->advertising_eee, adv);
-+
-+eee_aneg:
- 	ret = genphy_c45_an_config_eee_aneg(phydev);
- 	if (ret < 0)
- 		return ret;
+ 	if (!ethtool_convert_link_mode_to_legacy_u32(&data->supported,
+ 						     phydev->supported_eee))
+ 		overflow = true;
+@@ -1494,6 +1505,7 @@ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
+ {
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(adv);
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp);
++	struct ethtool_keee *keee;
+ 	bool unsupported;
+ 	int ret;
+ 
+@@ -1501,7 +1513,11 @@ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
+ 	if (!data->eee_enabled)
+ 		goto eee_aneg;
+ 
+-	ethtool_convert_legacy_u32_to_link_mode(adv, data->advertised);
++	keee = ethtool_eee2keee(data);
++	if (keee && keee->use_link_modes)
++		linkmode_copy(adv, keee->link_modes.advertising);
++	else
++		ethtool_convert_legacy_u32_to_link_mode(adv, data->advertised);
+ 
+ 	if (linkmode_empty(adv)) {
+ 		linkmode_copy(phydev->advertising_eee, phydev->supported_eee);
 -- 
 2.43.0
 
