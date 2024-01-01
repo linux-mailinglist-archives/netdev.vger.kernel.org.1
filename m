@@ -1,144 +1,102 @@
-Return-Path: <netdev+bounces-60688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBBEF821351
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 09:45:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FB1C821360
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 10:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7348E28142F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 08:45:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66D631C21079
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 09:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF9817C8;
-	Mon,  1 Jan 2024 08:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B73F17F0;
+	Mon,  1 Jan 2024 09:10:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P13B6y0L"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="KBTKypbx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80A76107;
-	Mon,  1 Jan 2024 08:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-67f911e9ac4so71978356d6.3;
-        Mon, 01 Jan 2024 00:45:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704098706; x=1704703506; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zMd3337IrmQ0bZURCWuZgY7ObmtziyKnBbbsdShesQA=;
-        b=P13B6y0L/VLM+WrzGnbvTTHsbtYiNQbkOZp9Qmd50bvisyBta/mdpID43uJL60f7O1
-         UwsKhBl30I5DkPE3Z4liNcbHYLKeEYB5jdun3naPYQPi0e9lUOKGGWM1RLbUITJ7j/6G
-         X5uyf6yEA9JFqfWSdr/OU5B6Ck2COtkska5RVd/nYyNY5oaDCVwdWcqWsb5bivJ/rUlH
-         4slAIRo47yNLUy1mpu1JmCs6YeNON0N3yncLoNI7MK2W+kG9rlWIxaWAabJwUHVrNjB3
-         +elCjSxp0wVaDEHkAlaWOVzPACnon22dATDrh7tcV6ReGHB+bESRzheo+zSzsdnrFMgi
-         t8iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704098706; x=1704703506;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zMd3337IrmQ0bZURCWuZgY7ObmtziyKnBbbsdShesQA=;
-        b=OBu5zuLNfVN9LnAzHkqPC2dbm61GAmjRPWn/P9R4hnwFIuBn/y9fSKaRN61w3fVzwN
-         ilEbyarkrLqV7qDQgGZI+wCJLt2q2zBcmlZhXn2rLgkeqn8LYzS4RqEizPJcwWYuIfYS
-         JBllE2yD7VkunfhVomZr4YvazZtIUoUN+A+/F5QPQ9jutqd3VvXrAqyj5ry9scK0GoHn
-         rQz6JOUowo9PmIGZnMA0/lCQmEGDZOTM6UPgSb/b2hiofn3uom/JvL7DddmjZkQ2ivvI
-         /H7+YSc58LB9N1pMdpGtpRZNtrb+cnKdLtMYLPnC4JFwfpTH9PZzQvfnNoNJzHgFa8YB
-         P6Yw==
-X-Gm-Message-State: AOJu0Yyx3e9nhxIn/A8NTOuS2mqgb+MgwP5vTOvZvvTAUvMSDg+kxePM
-	cgw2jp3qyQpr7ff2f97aA2BHRd4VPF2JzZelMg0=
-X-Google-Smtp-Source: AGHT+IFuLXt2pu/sD00gZE5db/2DT8ryB8RwTB2TigDIieI5XuP6+gGgYA8QO8yQM+kQAlpRCRFRxvoEP+MVvlSKc5s=
-X-Received: by 2002:a0c:ec05:0:b0:67f:b9a4:80e4 with SMTP id
- y5-20020a0cec05000000b0067fb9a480e4mr16658116qvo.39.1704098706637; Mon, 01
- Jan 2024 00:45:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B9417C9;
+	Mon,  1 Jan 2024 09:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1704100211; x=1704705011; i=markus.elfring@web.de;
+	bh=HLXRLltHUfyafr70c4W+KbfbTYAxtORaeKRu1+nfa4s=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=KBTKypbxeRI11ODKaZc/WtjDaclzDqLRQlWMw1X6jts/rU+tL7fTFAqNX5a5UEX1
+	 k7TZWuDgrL7uVJMHaoweGYN5O+ajuIGSe28M/WcOg02Or/UqVsgi3LIlJJ31u+VEX
+	 928quQA37dZsHnITuMroVbIESKtoQdZpSKL7M0wuYsnEQY7Cs7SLPKZpyz79OuXfi
+	 4nvjn0w91a7ArbGPQjV1e4h7n5/BBTC+DIvF6UqBX6+wNjseltQ4VhCYWGkxoYjSf
+	 tMhHXDEDjWpkAzMcX69Y9YhqhCt0XCC2T6oAHXmVaM9KYpvLd6bdrsNTfP107hkt6
+	 5w6yEUvlLoVyWwJb0g==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.86.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Meler-1qmH0I22Mv-00aNBr; Mon, 01
+ Jan 2024 10:10:11 +0100
+Message-ID: <dc0a1c9d-ceca-473d-9ad5-89b59e6af2e7@web.de>
+Date: Mon, 1 Jan 2024 10:10:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231231170721.3381-1-maimon.sagi@gmail.com> <CALCETrUd=16gAYvx93EsyMaaSJ-6mLvSru8Gie48Y+_dXq5FGA@mail.gmail.com>
-In-Reply-To: <CALCETrUd=16gAYvx93EsyMaaSJ-6mLvSru8Gie48Y+_dXq5FGA@mail.gmail.com>
-From: Sagi Maimon <maimon.sagi@gmail.com>
-Date: Mon, 1 Jan 2024 10:44:55 +0200
-Message-ID: <CAMuE1bEuou1Bx-6c3es3+FuTguOCb+iqU=hickK5hP7wT=M6Pw@mail.gmail.com>
-Subject: Re: [PATCH v4] posix-timers: add multi_clock_gettime system call
-To: Andy Lutomirski <luto@kernel.org>
-Cc: richardcochran@gmail.com, datglx@linutronix.de, mingo@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	arnd@arndb.de, geert@linux-m68k.org, peterz@infradead.org, hannes@cmpxchg.org, 
-	sohil.mehta@intel.com, rick.p.edgecombe@intel.com, nphamcs@gmail.com, 
-	palmer@sifive.com, keescook@chromium.org, legion@kernel.org, 
-	mark.rutland@arm.com, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
-	linux-arch@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/5] bpf: Adjustments for four function implementations
+Content-Language: en-GB
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Yonghong Song <yonghong.song@linux.dev>, LKML <linux-kernel@vger.kernel.org>
+References: <7011cdcc-4287-4e63-8bfa-f08710f670b1@web.de>
+ <CAADnVQLq7RKV+RBJm02HwfXujaUwFXsD77BqJK6ZpLQ-BObCdA@mail.gmail.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <CAADnVQLq7RKV+RBJm02HwfXujaUwFXsD77BqJK6ZpLQ-BObCdA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:su+B1C5CGpMaob4ZRA6yo2u6yjKAcFN7lO1g2bOyxgWIWNdFFfL
+ WURRaUgW4wiLT7WqBpXMVpJW4hJ4ezzhBnRQJPKhuFGoKFQ/O4aq297ByxMASkNPRSXvNLQ
+ IwKpAQnA/CZQiPuw4FC0zJBtHvZlz65PJfRIAJiWdt2CwmFbana6q4T9BrSzgzQBpqCfn1X
+ RP9SR3sageKAEnqzvj00w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:ojwleqwWfQ4=;hBbTcOQ7Qnj/GwECcfGj226lcKA
+ qUJkD7N4+uGhRMPwGfSzxNk/HwqciJT6UO1i+HqQ2Bxh6qdn9/8RLdMNs7mrGhzAwA+0VP2h3
+ dUx6zdP4jVmsizV9mx3iTexwouRwe52/2nLxE7eET0sUTcqAccvPkWf5DpeFu63BzgX9LcD/p
+ /k1RbIVqrv7sEWMaE/jNKKw0/nIcGEEDWdhlr3n6Pw/Zk6l+APcSPzgMG1IO19T7vdul3qFMF
+ MVaoKJEhwCnakhPyE0hiDzlaDaFTIJ1Py/6Qfex09dobeF5YJY/4DVihzv5uFo5cJ4gEjXnAs
+ NuZyXfU56yaYLCcvPszCUHKPXiUp72BITuBl+irEvGfK9DLM2GAua08FvmKhvclFiChUUb8aS
+ qlaCXgYsKCAZEgkmR5dfo6WDeUzmSbLGTZkXaUrOJ1T7fqfohnMppYt95D3tDqEtC120eYlqA
+ koVtvAcU8wnR5s2sZ2gid2P7ZmbzTa8JcQ0sPFU6CIT++3PiaQG5V6rbE9CYpBPScvoqCiIWP
+ DFud369y8NYyQv3u46gBNegRiVQ1O2NRNEGcwLNW88PTsZjQM12rG2a0KF/Ccafv9J/4mdbK9
+ /34mStG1Oa5PCR+qDj1bhdQpbESOBh+bPuVn8b61jfi/kzrmeDxJXFP+ijz1QLBJ705zNeLgo
+ csIH+6+0zL2bbZA8v3919jUrm4iFNab0gxWkMoSZHJqwAjb1Qu4+yh8qH7KdEMpBFwZuOAzkJ
+ a+mK1yRHqdqi12x7I1ibNwVHdU0TzvpyQLrMHFbX0FuEPHn7XJ8XP59FpNTqlgAVOFRyhnJDz
+ 3d3nPVyF7wRfTgslXXnM7yHRAL2UXq2ec9KU6HDkVAwIhhb0By3PLcIgjqR0LH+cV7X1hqk7w
+ rqmpEEYdhi6Ga7x5VRIB6NIx2oFGuYrqc09JNcTfEOGc67CYzRZIeKBS/gxxaS7qoN6Xah6QI
+ HcgF/w==
 
-On Sun, Dec 31, 2023 at 11:10=E2=80=AFPM Andy Lutomirski <luto@kernel.org> =
-wrote:
+>> A few update suggestions were taken into account
+>> from static source code analysis.
 >
-> On Sun, Dec 31, 2023 at 9:07=E2=80=AFAM Sagi Maimon <maimon.sagi@gmail.co=
-m> wrote:
-> >
-> > Some user space applications need to read some clocks.
-> > Each read requires moving from user space to kernel space.
-> > The syscall overhead causes unpredictable delay between N clocks reads
-> > Removing this delay causes better synchronization between N clocks.
-> >
-> > Introduce a new system call multi_clock_gettime, which can be used to m=
-easure
-> > the offset between multiple clocks, from variety of types: PHC, virtual=
- PHC
-> > and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
-> > The offset includes the total time that the driver needs to read the cl=
-ock
-> > timestamp.
-Andy Thank you for your notes.
->
-> Knowing this offset sounds quite nice, but...
->
-> >
-> > New system call allows the reading of a list of clocks - up to PTP_MAX_=
-CLOCKS.
-> > Supported clocks IDs: PHC, virtual PHC and various system clocks.
-> > Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
-> > The system call returns n_clocks timestamps for each measurement:
-> > - clock 0 timestamp
-> > - ...
-> > - clock n timestamp
->
-> Could this instead be arranged to read the actual, exact offset?
->
-It can be done, but I prefer to leave it generic and consistent with
-other time system calls.
-In most cases the offset calculation is done in user space application
-> > +       kernel_tp =3D kernel_tp_base;
-> > +       for (j =3D 0; j < n_samples; j++) {
-> > +               for (i =3D 0; i < n_clocks; i++) {
-> > +                       if (put_timespec64(kernel_tp++, (struct __kerne=
-l_timespec __user *)
-> > +                                       &ptp_multi_clk_get->ts[j][i])) =
-{
-> > +                               error =3D -EFAULT;
-> > +                               goto out;
-> > +                       }
-> > +               }
-> > +       }
->
-> There are several pairs of clocks that tick at precisely same rate
-> (and use the same underlying hardware clock), and the offset could be
-> computed exactly instead of doing this noisy loop that is merely
-> somewhat less bad than what user code could do all by itself.
-You are correct, there are some PHCs on the same NIC (each per port)
-that share the same HW counter/clock.
-In that case it is slightly better to do the offset calculation in the
-NIC driver code,
-but that requires changes in each NIC driver's code.
-The main thing is that the multi_clock_gettime system call is a
-generic solution,
-it covers that case among other cases, for example sync between two
-PHCs on different NICs.
+> Auto Nack.
+> Pls don't send such patches. You were told multiple
+> times that such kfree usage is fine.
+
+Some implementation details are improvable.
+Can you find an update step (like the following) helpful?
+
+[PATCH 2/5] bpf: Move an assignment for the variable =E2=80=9Cst_map=E2=80=
+=9D in bpf_struct_ops_link_create()
+https://lore.kernel.org/bpf/ed2f5323-390f-4c9d-919d-df43ba1cad2b@web.de/
+
+Regards,
+Markus
 
