@@ -1,115 +1,99 @@
-Return-Path: <netdev+bounces-60725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C1508214FF
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 19:40:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 764B9821501
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 19:42:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA4C91F2126E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 18:40:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5305E1C20A4D
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 18:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB3233D4;
-	Mon,  1 Jan 2024 18:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C32863A7;
+	Mon,  1 Jan 2024 18:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pPJf6LEU"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="yYLT3OuM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA57D512;
-	Mon,  1 Jan 2024 18:40:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DE1BAC433C9;
-	Mon,  1 Jan 2024 18:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704134428;
-	bh=n1grVBOugGLgW0Nwjbv1plL2Z6PNPY9un0tRAe6UpoY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pPJf6LEUB3HCoVu3s9MwGE08XRtn7iqgX96OEHhqoJe9+0LIXec6240SwjKchyOfq
-	 mkC5ykf0fpy/Uuc51IiU9ZNPnrqVDErnblxTJDCBxFC6evizcr9taIlkbDui/eZYjd
-	 YYN4exSJq0dalP1Ay1Jq4F7qDQ4xdlHG2fT7nnim94Zy6S/WPOCvEYIaz/rgyz4ueS
-	 AyBVGIZKDg4JQ9qWUIzCdCPf65u14wYM+zxFTxePTHf0+d7IaWiI8lf7OMS5Au/J4c
-	 abGapLCoBaxrr4qCdxDozQgPcCUU6PlwKgBofxc0E+KDJp6Djsw2Vo12oBdo+Szwbw
-	 fl7EcAr5jef5w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C2271DCB6CE;
-	Mon,  1 Jan 2024 18:40:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17042D51E
+	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 18:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d427518d52so45297185ad.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jan 2024 10:42:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1704134545; x=1704739345; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KfokxdhSU4tLxSdVyPZZGBcng5PdbI1Z1I+Y2j7YQ4c=;
+        b=yYLT3OuMpxyC/QjKAL77A5YmmzHCyHPOXwIVvuw85scv/7v8ZCR7W+oG7EKAcz/mW7
+         WtkrZrJDRzaqmxwID4Hehb4uhNXKx5IS4YLfgONZ07HwzLQK3Ap/1o6nCyD/KRNED65j
+         U/2J45jnRPsvQrI+KspdRCdfKNzbtL9fLsgwuOcst3nKOsmPIqwZmtZG8pjE8HJxMXny
+         EWeUXpKkmQ3rCsk6zhJ33vKE904A545PxvgzsDdmWhB4Izzgy9GckZOuYz0a+dfGNIiR
+         Ore1GEgT5aSUH2d7oUWOxtLUPqLvgNzy59zwgPC3ktaG1w7ZHb/nmBVpovSinXQzWugW
+         w7GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704134545; x=1704739345;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KfokxdhSU4tLxSdVyPZZGBcng5PdbI1Z1I+Y2j7YQ4c=;
+        b=eMv3oJH4Q6KLBiBWNrf6BNZ1ADwIlIVRO+46QmNeuxdVsXvFiJARuX7W1iR50PKZc/
+         9oyVPFEit5UhSafg0DiF9O/fbxyAHBzVVu38ij92WMhLp+IQPpl9IpsLhlVJMK0XNa+L
+         o226/wKxzJcxP/0XIpGZeO3P9w+OVu/1NBJluENBrHsfOeoxGpfvInBAy6RnC+hLTeTG
+         XIiL3ufxfoM2yMxTO7pprcDGl0qb9h6MOHG6acP2U1UkkmP/sNinDmAhYpWBiyT0AmZy
+         zww45wMnIXmjHOBaLB+p13DTC/UWJpxletzZSsLwaMyTlcN5F08G60LOWqlwrp30xZOL
+         Ivsw==
+X-Gm-Message-State: AOJu0Yy8gtHj9ye2+PshWvxrXlcdi0OT/e0WEMNTsyianA1jvn253R1e
+	YaMfWDVjE8G9ItuAD95KqSbd5c0dteJ1gw==
+X-Google-Smtp-Source: AGHT+IErmgJv/Lk9O77zcBaYI+9tDns4C7D0gU3BnLHeBWPwqskMc9AH6WzdelWWRCzDZh6H4+yzgw==
+X-Received: by 2002:a17:902:aa47:b0:1d0:6ffd:6108 with SMTP id c7-20020a170902aa4700b001d06ffd6108mr16256592plr.42.1704134545353;
+        Mon, 01 Jan 2024 10:42:25 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id t6-20020a170902a5c600b001d3bfd30886sm19299248plq.37.2024.01.01.10.42.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jan 2024 10:42:25 -0800 (PST)
+Date: Mon, 1 Jan 2024 10:42:22 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, Anjali Kulkarni
+ <anjali.k.kulkarni@oracle.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 3/4] netlink: Delete an unnecessary variable
+ initialisation in __netlink_kernel_create()
+Message-ID: <20240101104222.00c6fff8@hermes.local>
+In-Reply-To: <57779d2f-0d39-4c2e-8718-3c9242177013@web.de>
+References: <90679f69-951c-47b3-b86f-75fd9fde3da3@web.de>
+	<57779d2f-0d39-4c2e-8718-3c9242177013@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 00/13] Introduce PHY listing and link_topology
- tracking
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170413442779.30948.3175948839165575294.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Jan 2024 18:40:27 +0000
-References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
-In-Reply-To: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, andrew@lunn.ch, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk,
- linux-arm-kernel@lists.infradead.org, christophe.leroy@csgroup.eu,
- herve.codina@bootlin.com, f.fainelli@gmail.com, hkallweit1@gmail.com,
- vladimir.oltean@nxp.com, kory.maincent@bootlin.com,
- jesse.brandeburg@intel.com, corbet@lwn.net, kabel@kernel.org,
- piergiorgio.beruto@gmail.com, o.rempel@pengutronix.de, nicveronese@gmail.com,
- horms@kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Sun, 31 Dec 2023 18:46:09 +0100
+Markus Elfring <Markus.Elfring@web.de> wrote:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Sun, 31 Dec 2023 17:45:00 +0100
+>=20
+> The variable =E2=80=9Clisteners=E2=80=9D will eventually be set to an app=
+ropriate pointer
+> a bit later. Thus omit the explicit initialisation at the beginning.
+>=20
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 
-On Thu, 21 Dec 2023 19:00:33 +0100 you wrote:
-> Hello everyone,
-> 
-> Here's a V5 of the multi-PHY support series.
-> 
-> At a glance, besides some minor fixes and R'd-by from Andrew, one of the
-> thing this series does is remove the ASSERT_RTNL() from the
-> topo_add_phy/del_phy operations.
-> 
-> [...]
+This looks OK, and the compiler would catch if it was a problem.
+Not really necessary though.
 
-Here is the summary with links:
-  - [net-next,v5,01/13] net: phy: Introduce ethernet link topology representation
-    https://git.kernel.org/netdev/net-next/c/02018c544ef1
-  - [net-next,v5,02/13] net: sfp: pass the phy_device when disconnecting an sfp module's PHY
-    https://git.kernel.org/netdev/net-next/c/9c5625f559ad
-  - [net-next,v5,03/13] net: phy: add helpers to handle sfp phy connect/disconnect
-    https://git.kernel.org/netdev/net-next/c/034fcc210349
-  - [net-next,v5,04/13] net: sfp: Add helper to return the SFP bus name
-    https://git.kernel.org/netdev/net-next/c/dedd702a3579
-  - [net-next,v5,05/13] net: ethtool: Allow passing a phy index for some commands
-    https://git.kernel.org/netdev/net-next/c/2ab0edb505fa
-  - [net-next,v5,06/13] netlink: specs: add phy-index as a header parameter
-    https://git.kernel.org/netdev/net-next/c/c29451aefcb4
-  - [net-next,v5,07/13] net: ethtool: Introduce a command to list PHYs on an interface
-    https://git.kernel.org/netdev/net-next/c/63d5eaf35ac3
-  - [net-next,v5,08/13] netlink: specs: add ethnl PHY_GET command set
-    https://git.kernel.org/netdev/net-next/c/95132a018f00
-  - [net-next,v5,09/13] net: ethtool: plca: Target the command to the requested PHY
-    https://git.kernel.org/netdev/net-next/c/7db69ec9cfb8
-  - [net-next,v5,10/13] net: ethtool: pse-pd: Target the command to the requested PHY
-    https://git.kernel.org/netdev/net-next/c/345237dbc1bd
-  - [net-next,v5,11/13] net: ethtool: cable-test: Target the command to the requested PHY
-    https://git.kernel.org/netdev/net-next/c/fcc4b105caa4
-  - [net-next,v5,12/13] net: ethtool: strset: Allow querying phy stats by index
-    https://git.kernel.org/netdev/net-next/c/d078d480639a
-  - [net-next,v5,13/13] Documentation: networking: document phy_link_topology
-    https://git.kernel.org/netdev/net-next/c/32bb4515e344
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Acked-by: Stephen Hemminger <stephen@networkplumber.org>
 
