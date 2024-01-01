@@ -1,137 +1,117 @@
-Return-Path: <netdev+bounces-60699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E68B8213DC
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 14:39:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20FC18213E6
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 15:07:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C103A281CAD
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 13:39:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6E4A1C20A36
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 14:07:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBBB3C28;
-	Mon,  1 Jan 2024 13:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE81D3C39;
+	Mon,  1 Jan 2024 14:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Oq65X8IU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AE33C37
-	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 13:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35fcbc79fd3so163441815ab.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jan 2024 05:39:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704116361; x=1704721161;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V8FnIEcMFrHn8eKbutFIX8/q+SDhk+mEBhpSpWYx9gw=;
-        b=ht1YPg1MvZDFw+S1FIbyEIsID9Y+1eNNLnGr87qyL3mGe1UPrIfY1d1IQeZoTBNQhD
-         ZPltnfXUaQWelj5KlA3kmet0eZyxGgqh7xWxMayv7WShub7HRyscECF/cDw81brsa1xG
-         NfrlMS7qHptP/kONgi0Tp3e1x88E/OMQlScYgsg85iFgjAv13+FIlz//whH0WQ3BhZ22
-         yQGMRIPh4mpRGAPxOVSSjrWIN3cyU0u7ubwbBvPiHc7aY87kdiWPu+XQJlD+4OV9xPMd
-         PY9SjtE6GZKccpiXexL+FtR0iy1bT7G69nEwA9fJNLuZ+AfqHF+IuRoCrX6X4dUorGZc
-         g98g==
-X-Gm-Message-State: AOJu0Yx2B7mY/i/xZgA8lQ0ACl033xCP7WW66+9W7TOTsWtCPAVk5z1W
-	XvmYNFGad7RSA7iWZ7Hay9h1mBre10ee7HAXqlBc0XFzECif
-X-Google-Smtp-Source: AGHT+IGdgmSCVgzhXzmmQgkPzliStRX/MaKevhdpX/Z7BmCjNXaRSO1ElDFLnjY6vyGrPExJjhstACMj+55SmDjxGtEAuIQYRdCP
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7465546AD
+	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 14:07:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1704118057; x=1735654057;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=D7cJ5v9awK/e8jSf3taXhspo1mpZLE7NFl2SHUsOAJ4=;
+  b=Oq65X8IUyZqdqBtxa3YKMNB9nNvzjuM0m0ulIsBW9ySeEc4seChRcmED
+   PHWu5ZhxipP0blo03o0zhj7AaDpdDRoB/En7liXeagIOoVBk+feaBVqfM
+   Fa+WZWcKZRxEFCmpNkkaN25Th9pLoZAl1Mrc5FYA8MoC3jpLg8s+hV/wH
+   M=;
+X-IronPort-AV: E=Sophos;i="6.04,322,1695686400"; 
+   d="scan'208";a="319661552"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jan 2024 14:07:31 +0000
+Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com (Postfix) with ESMTPS id 02E8980461;
+	Mon,  1 Jan 2024 14:07:29 +0000 (UTC)
+Received: from EX19MTAUEC001.ant.amazon.com [10.0.0.204:38284]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.57.126:2525] with esmtp (Farcaster)
+ id 7114b63c-a2d8-41e8-9b5b-69ed7ed49476; Mon, 1 Jan 2024 14:07:29 +0000 (UTC)
+X-Farcaster-Flow-ID: 7114b63c-a2d8-41e8-9b5b-69ed7ed49476
+Received: from EX19D008UEA003.ant.amazon.com (10.252.134.116) by
+ EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 1 Jan 2024 14:07:29 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19D008UEA003.ant.amazon.com (10.252.134.116) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 1 Jan 2024 14:07:28 +0000
+Received: from dev-dsk-darinzon-1c-05962a8d.eu-west-1.amazon.com
+ (172.19.80.187) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Server id 15.2.1118.40 via Frontend Transport; Mon, 1 Jan 2024 14:07:27 +0000
+From: <darinzon@amazon.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: David Arinzon <darinzon@amazon.com>, "Woodhouse, David" <dwmw@amazon.com>,
+	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
+	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+	<nafea@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali"
+	<alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>,
+	"Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>,
+	"Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny"
+	<evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>
+Subject: [PATCH v1 net-next 00/11] ENA driver XDP changes
+Date: Mon, 1 Jan 2024 14:07:13 +0000
+Message-ID: <20240101140724.26232-1-darinzon@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:174c:b0:35f:ce07:e18e with SMTP id
- y12-20020a056e02174c00b0035fce07e18emr2216306ill.4.1704116361308; Mon, 01 Jan
- 2024 05:39:21 -0800 (PST)
-Date: Mon, 01 Jan 2024 05:39:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005f31a3060de282e6@google.com>
-Subject: [syzbot] [net?] [nfc?] KMSAN: uninit-value in nci_ntf_packet
-From: syzbot <syzbot+29b5ca705d2e0f4a44d2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Precedence: Bulk
 
-Hello,
+From: David Arinzon <darinzon@amazon.com>
 
-syzbot found the following issue on:
+This patchset contains multiple XDP-related changes
+in the ENA driver, including moving the XDP code to
+dedicated files.
 
-HEAD commit:    3f82f1c3a036 Merge tag 'x86-urgent-2023-12-23' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=111a1579e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4a65fa9f077ead01
-dashboard link: https://syzkaller.appspot.com/bug?extid=29b5ca705d2e0f4a44d2
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+David Arinzon (11):
+  net: ena: Move XDP code to its new files
+  net: ena: Pass ena_adapter instead of net_device to ena_xmit_common()
+  net: ena: Put orthogonal fields in ena_tx_buffer in a union
+  net: ena: Introduce total_tx_size field in ena_tx_buffer struct
+  net: ena: Use tx_ring instead of xdp_ring for XDP channel TX
+  net: ena: Don't check if XDP program is loaded in ena_xdp_execute()
+  net: ena: Refactor napi functions
+  net: ena: Add more debug prints to XDP related function
+  net: ena: Always register RX queue info
+  net: ena: Make queue stats code cleaner by removing the if block
+  net: ena: Take xdp packets stats into account in ena_get_stats64()
 
-Unfortunately, I don't have any reproducer for this issue yet.
+ .../device_drivers/ethernet/amazon/ena.rst    |   1 +
+ drivers/net/ethernet/amazon/ena/Makefile      |   2 +-
+ drivers/net/ethernet/amazon/ena/ena_ethtool.c |  18 +-
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  | 689 ++----------------
+ drivers/net/ethernet/amazon/ena/ena_netdev.h  |  99 ++-
+ drivers/net/ethernet/amazon/ena/ena_xdp.c     | 468 ++++++++++++
+ drivers/net/ethernet/amazon/ena/ena_xdp.h     | 151 ++++
+ 7 files changed, 736 insertions(+), 692 deletions(-)
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_xdp.c
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_xdp.h
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6dcfebcfcfff/disk-3f82f1c3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/827b51868337/vmlinux-3f82f1c3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4571542e7260/bzImage-3f82f1c3.xz
+-- 
+2.40.1
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+29b5ca705d2e0f4a44d2@syzkaller.appspotmail.com
-
-nci: nci_add_new_protocol: the target found does not have the desired protocol
-=====================================================
-BUG: KMSAN: uninit-value in nci_rf_discover_ntf_packet net/nfc/nci/ntf.c:386 [inline]
-BUG: KMSAN: uninit-value in nci_ntf_packet+0x2ac8/0x39c0 net/nfc/nci/ntf.c:798
- nci_rf_discover_ntf_packet net/nfc/nci/ntf.c:386 [inline]
- nci_ntf_packet+0x2ac8/0x39c0 net/nfc/nci/ntf.c:798
- nci_rx_work+0x213/0x500 net/nfc/nci/core.c:1522
- process_one_work kernel/workqueue.c:2627 [inline]
- process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2700
- worker_thread+0xf45/0x1490 kernel/workqueue.c:2781
- kthread+0x3ed/0x540 kernel/kthread.c:388
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x318/0x740 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- virtual_ncidev_write+0x6d/0x280 drivers/nfc/virtual_ncidev.c:120
- vfs_write+0x561/0x1490 fs/read_write.c:582
- ksys_write+0x20f/0x4c0 fs/read_write.c:637
- __do_sys_write fs/read_write.c:649 [inline]
- __se_sys_write fs/read_write.c:646 [inline]
- __x64_sys_write+0x93/0xd0 fs/read_write.c:646
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 1 PID: 55 Comm: kworker/u4:3 Not tainted 6.7.0-rc6-syzkaller-00303-g3f82f1c3a036 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Workqueue: nfc2_nci_rx_wq nci_rx_work
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
