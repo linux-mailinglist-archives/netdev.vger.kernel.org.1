@@ -1,467 +1,144 @@
-Return-Path: <netdev+bounces-60687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53DFA821343
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 09:32:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBBEF821351
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 09:45:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DD18282D38
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 08:32:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7348E28142F
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 08:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D329A17C6;
-	Mon,  1 Jan 2024 08:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF9817C8;
+	Mon,  1 Jan 2024 08:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P13B6y0L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7320E17C8
-	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 08:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.110.252])
-	by gateway (Coremail) with SMTP id _____8CxLOt3eJJlOecAAA--.3771S3;
-	Mon, 01 Jan 2024 16:31:51 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.110.252])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxjb50eJJl2wgUAA--.55203S3;
-	Mon, 01 Jan 2024 16:31:50 +0800 (CST)
-Message-ID: <dc30d3f5-6ebe-4804-ae7d-2834bea22cc4@loongson.cn>
-Date: Mon, 1 Jan 2024 16:31:48 +0800
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80A76107;
+	Mon,  1 Jan 2024 08:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-67f911e9ac4so71978356d6.3;
+        Mon, 01 Jan 2024 00:45:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704098706; x=1704703506; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zMd3337IrmQ0bZURCWuZgY7ObmtziyKnBbbsdShesQA=;
+        b=P13B6y0L/VLM+WrzGnbvTTHsbtYiNQbkOZp9Qmd50bvisyBta/mdpID43uJL60f7O1
+         UwsKhBl30I5DkPE3Z4liNcbHYLKeEYB5jdun3naPYQPi0e9lUOKGGWM1RLbUITJ7j/6G
+         X5uyf6yEA9JFqfWSdr/OU5B6Ck2COtkska5RVd/nYyNY5oaDCVwdWcqWsb5bivJ/rUlH
+         4slAIRo47yNLUy1mpu1JmCs6YeNON0N3yncLoNI7MK2W+kG9rlWIxaWAabJwUHVrNjB3
+         +elCjSxp0wVaDEHkAlaWOVzPACnon22dATDrh7tcV6ReGHB+bESRzheo+zSzsdnrFMgi
+         t8iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704098706; x=1704703506;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zMd3337IrmQ0bZURCWuZgY7ObmtziyKnBbbsdShesQA=;
+        b=OBu5zuLNfVN9LnAzHkqPC2dbm61GAmjRPWn/P9R4hnwFIuBn/y9fSKaRN61w3fVzwN
+         ilEbyarkrLqV7qDQgGZI+wCJLt2q2zBcmlZhXn2rLgkeqn8LYzS4RqEizPJcwWYuIfYS
+         JBllE2yD7VkunfhVomZr4YvazZtIUoUN+A+/F5QPQ9jutqd3VvXrAqyj5ry9scK0GoHn
+         rQz6JOUowo9PmIGZnMA0/lCQmEGDZOTM6UPgSb/b2hiofn3uom/JvL7DddmjZkQ2ivvI
+         /H7+YSc58LB9N1pMdpGtpRZNtrb+cnKdLtMYLPnC4JFwfpTH9PZzQvfnNoNJzHgFa8YB
+         P6Yw==
+X-Gm-Message-State: AOJu0Yyx3e9nhxIn/A8NTOuS2mqgb+MgwP5vTOvZvvTAUvMSDg+kxePM
+	cgw2jp3qyQpr7ff2f97aA2BHRd4VPF2JzZelMg0=
+X-Google-Smtp-Source: AGHT+IFuLXt2pu/sD00gZE5db/2DT8ryB8RwTB2TigDIieI5XuP6+gGgYA8QO8yQM+kQAlpRCRFRxvoEP+MVvlSKc5s=
+X-Received: by 2002:a0c:ec05:0:b0:67f:b9a4:80e4 with SMTP id
+ y5-20020a0cec05000000b0067fb9a480e4mr16658116qvo.39.1704098706637; Mon, 01
+ Jan 2024 00:45:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 5/9] net: stmmac: Add Loongson-specific
- register definitions
-Content-Language: en-US
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-References: <cover.1702990507.git.siyanteng@loongson.cn>
- <bbc826f622b501bc490e838644c9c502185a78df.1702990507.git.siyanteng@loongson.cn>
- <t25ka7blbx2d2d654s5swbtvecip73yd5wpdqiy3xijjmswvni@bxf4dh56x4zl>
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <t25ka7blbx2d2d654s5swbtvecip73yd5wpdqiy3xijjmswvni@bxf4dh56x4zl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Dxjb50eJJl2wgUAA--.55203S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9fXoW3Aw43XrWDWFyxCF4DKFWkZrc_yoW8AFyruo
-	Z8GF9aqayrKw18Cr4kGw1kXry3Xrn5Zw43AFZ7GrykZ39a93Z8Way5J3yfZFW3try8KF98
-	C34ftFyDJFW2qrn5l-sFpf9Il3svdjkaLaAFLSUrUUUU0b8apTn2vfkv8UJUUUU8wcxFpf
-	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-	UjIYCTnIWjp_UUUYp7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
-	Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
-	CY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8
-	JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14
-	v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY
-	67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2
-	IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jFApnUUUUU=
+References: <20231231170721.3381-1-maimon.sagi@gmail.com> <CALCETrUd=16gAYvx93EsyMaaSJ-6mLvSru8Gie48Y+_dXq5FGA@mail.gmail.com>
+In-Reply-To: <CALCETrUd=16gAYvx93EsyMaaSJ-6mLvSru8Gie48Y+_dXq5FGA@mail.gmail.com>
+From: Sagi Maimon <maimon.sagi@gmail.com>
+Date: Mon, 1 Jan 2024 10:44:55 +0200
+Message-ID: <CAMuE1bEuou1Bx-6c3es3+FuTguOCb+iqU=hickK5hP7wT=M6Pw@mail.gmail.com>
+Subject: Re: [PATCH v4] posix-timers: add multi_clock_gettime system call
+To: Andy Lutomirski <luto@kernel.org>
+Cc: richardcochran@gmail.com, datglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	arnd@arndb.de, geert@linux-m68k.org, peterz@infradead.org, hannes@cmpxchg.org, 
+	sohil.mehta@intel.com, rick.p.edgecombe@intel.com, nphamcs@gmail.com, 
+	palmer@sifive.com, keescook@chromium.org, legion@kernel.org, 
+	mark.rutland@arm.com, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
+	linux-arch@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-在 2023/12/21 10:14, Serge Semin 写道:
-> On Tue, Dec 19, 2023 at 10:26:45PM +0800, Yanteng Si wrote:
->> There are two types of Loongson DWGMAC. The first type shares the same
->> register definitions and has similar logic as dwmac1000. The second type
->> uses several different register definitions, we think it is necessary to
->> distinguish rx and tx, so we split these bits into two.
->>
->> Simply put, we split some single bit fields into double bits fileds:
->>
->>       Name              Tx          Rx
->>
->> DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
->> DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
->> DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
->> DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
->> DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
->>
->> Therefore, when using, TX and RX must be set at the same time.
-> Thanks for the updated patch. It looks much clearer now. Thanks to
-> that I came up with a better and less invasive solution. See my last
-> comment for details.
+On Sun, Dec 31, 2023 at 11:10=E2=80=AFPM Andy Lutomirski <luto@kernel.org> =
+wrote:
 >
->> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
->> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
->> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->> ---
->>   drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
->>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  |  2 ++
->>   .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 10 ++++--
->>   .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 35 +++++++++++++++++++
->>   .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 35 +++++++++++++++----
->>   drivers/net/ethernet/stmicro/stmmac/hwif.c    |  3 +-
->>   .../net/ethernet/stmicro/stmmac/stmmac_main.c |  1 +
->>   include/linux/stmmac.h                        |  1 +
->>   8 files changed, 78 insertions(+), 10 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
->> index 721c1f8e892f..48ab21243b26 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
->> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
->> @@ -34,6 +34,7 @@
->>   #define DWMAC_CORE_5_00		0x50
->>   #define DWMAC_CORE_5_10		0x51
->>   #define DWMAC_CORE_5_20		0x52
->> +#define DWLGMAC_CORE_1_00	0x10
-> This doesn't look correct because these IDs have been defined for the
-> Synopsys IP-core enumerations. Loongson GNET is definitely based on
-> some DW GMAC v3.x IP-core, but instead of updating the USERVER field
-> vendor just overwrote the GMAC_VERSION.SNPSVER field. From that
-> perspective the correct solution would be to override the
-> priv->synopsys_id field with a correct IP-core version (0x37?). See my
-> last comment for details of how to do that.
-See my last reply.
+> On Sun, Dec 31, 2023 at 9:07=E2=80=AFAM Sagi Maimon <maimon.sagi@gmail.co=
+m> wrote:
+> >
+> > Some user space applications need to read some clocks.
+> > Each read requires moving from user space to kernel space.
+> > The syscall overhead causes unpredictable delay between N clocks reads
+> > Removing this delay causes better synchronization between N clocks.
+> >
+> > Introduce a new system call multi_clock_gettime, which can be used to m=
+easure
+> > the offset between multiple clocks, from variety of types: PHC, virtual=
+ PHC
+> > and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
+> > The offset includes the total time that the driver needs to read the cl=
+ock
+> > timestamp.
+Andy Thank you for your notes.
 >
->>   #define DWXGMAC_CORE_2_10	0x21
->>   #define DWXGMAC_CORE_2_20	0x22
->>   #define DWXLGMAC_CORE_2_00	0x20
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->> index 0d79104d7fd3..fb7506bbc21b 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->> @@ -101,6 +101,8 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
->>   		plat->mdio_bus_data->needs_reset = true;
->>   	}
->>   
->> +	plat->flags |= STMMAC_FLAG_HAS_LGMAC;
->> +
-> If what I suggest in the last comment is implemented this will be
-> unnecessary.
+> Knowing this offset sounds quite nice, but...
 >
->>   	/* Enable pci device */
->>   	ret = pci_enable_device(pdev);
->>   	if (ret) {
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
->> index 0fb48e683970..a01fe6b7540a 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> None of the generic parts (dwmac1000_dma.c, dwmac_dma.h, dwmac_lib.c)
-> will need to be modified if you implement what I suggest in the last
-> comment.
+> >
+> > New system call allows the reading of a list of clocks - up to PTP_MAX_=
+CLOCKS.
+> > Supported clocks IDs: PHC, virtual PHC and various system clocks.
+> > Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
+> > The system call returns n_clocks timestamps for each measurement:
+> > - clock 0 timestamp
+> > - ...
+> > - clock n timestamp
 >
->> @@ -118,7 +118,10 @@ static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
-> See my comment to patch 4/9. This method can be fully dropped in favor
-> of having the dwmac1000_dma_init_channel() function implemented.
+> Could this instead be arranged to read the actual, exact offset?
 >
->>   	u32 dma_intr_mask;
->>   
->>   	/* Mask interrupts by writing to CSR7 */
->> -	dma_intr_mask = DMA_INTR_DEFAULT_MASK;
->> +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC)
->> +		dma_intr_mask = DMA_INTR_DEFAULT_MASK_LOONGSON;
->> +	else
->> +		dma_intr_mask = DMA_INTR_DEFAULT_MASK;
->>   
->>   	dma_config(ioaddr + DMA_BUS_MODE, ioaddr + DMA_INTR_ENA,
->>   			  dma_cfg, dma_intr_mask, atds);
->> @@ -130,7 +133,10 @@ static void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *i
->>   	u32 dma_intr_mask;
->>   
->>   	/* Mask interrupts by writing to CSR7 */
->> -	dma_intr_mask = DMA_INTR_DEFAULT_MASK;
->> +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC)
->> +		dma_intr_mask = DMA_INTR_DEFAULT_MASK_LOONGSON;
->> +	else
->> +		dma_intr_mask = DMA_INTR_DEFAULT_MASK;
->>   
->>   	if (dma_cfg->multi_msi_en)
->>   		dma_config(ioaddr + DMA_CHAN_BUS_MODE(chan),
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
->> index 395d5e4c3922..7d33798c0e72 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
->> @@ -70,16 +70,23 @@
->>   #define DMA_CONTROL_SR		0x00000002	/* Start/Stop Receive */
->>   
->>   /* DMA Normal interrupt */
->> +#define DMA_INTR_ENA_NIE_TX_LOONGSON 0x00040000	/* Normal Loongson Tx Summary */
->> +#define DMA_INTR_ENA_NIE_RX_LOONGSON 0x00020000	/* Normal Loongson Rx Summary */
->>   #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
->>   #define DMA_INTR_ENA_TIE 0x00000001	/* Transmit Interrupt */
->>   #define DMA_INTR_ENA_TUE 0x00000004	/* Transmit Buffer Unavailable */
->>   #define DMA_INTR_ENA_RIE 0x00000040	/* Receive Interrupt */
->>   #define DMA_INTR_ENA_ERE 0x00004000	/* Early Receive */
->>   
->> +#define DMA_INTR_NORMAL_LOONGSON	(DMA_INTR_ENA_NIE_TX_LOONGSON | \
->> +			 DMA_INTR_ENA_NIE_RX_LOONGSON | DMA_INTR_ENA_RIE | \
->> +			 DMA_INTR_ENA_TIE)
->>   #define DMA_INTR_NORMAL	(DMA_INTR_ENA_NIE | DMA_INTR_ENA_RIE | \
->>   			DMA_INTR_ENA_TIE)
->>   
->>   /* DMA Abnormal interrupt */
->> +#define DMA_INTR_ENA_AIE_TX_LOONGSON 0x00010000	/* Abnormal Loongson Tx Summary */
->> +#define DMA_INTR_ENA_AIE_RX_LOONGSON 0x00008000	/* Abnormal Loongson Rx Summary */
->>   #define DMA_INTR_ENA_AIE 0x00008000	/* Abnormal Summary */
->>   #define DMA_INTR_ENA_FBE 0x00002000	/* Fatal Bus Error */
->>   #define DMA_INTR_ENA_ETE 0x00000400	/* Early Transmit */
->> @@ -91,10 +98,14 @@
->>   #define DMA_INTR_ENA_TJE 0x00000008	/* Transmit Jabber */
->>   #define DMA_INTR_ENA_TSE 0x00000002	/* Transmit Stopped */
->>   
->> +#define DMA_INTR_ABNORMAL_LOONGSON	(DMA_INTR_ENA_AIE_TX_LOONGSON | \
->> +				DMA_INTR_ENA_AIE_RX_LOONGSON | DMA_INTR_ENA_FBE | \
->> +				DMA_INTR_ENA_UNE)
->>   #define DMA_INTR_ABNORMAL	(DMA_INTR_ENA_AIE | DMA_INTR_ENA_FBE | \
->>   				DMA_INTR_ENA_UNE)
->>   
->>   /* DMA default interrupt mask */
->> +#define DMA_INTR_DEFAULT_MASK_LOONGSON	(DMA_INTR_NORMAL_LOONGSON | DMA_INTR_ABNORMAL_LOONGSON)
->>   #define DMA_INTR_DEFAULT_MASK	(DMA_INTR_NORMAL | DMA_INTR_ABNORMAL)
->>   #define DMA_INTR_DEFAULT_RX	(DMA_INTR_ENA_RIE)
->>   #define DMA_INTR_DEFAULT_TX	(DMA_INTR_ENA_TIE)
->> @@ -111,9 +122,15 @@
->>   #define DMA_STATUS_TS_SHIFT	20
->>   #define DMA_STATUS_RS_MASK	0x000e0000	/* Receive Process State */
->>   #define DMA_STATUS_RS_SHIFT	17
->> +#define DMA_STATUS_NIS_TX_LOONGSON	0x00040000	/* Normal Loongson Tx Interrupt Summary */
->> +#define DMA_STATUS_NIS_RX_LOONGSON	0x00020000	/* Normal Loongson Rx Interrupt Summary */
->>   #define DMA_STATUS_NIS	0x00010000	/* Normal Interrupt Summary */
->> +#define DMA_STATUS_AIS_TX_LOONGSON	0x00010000	/* Abnormal Loongson Tx Interrupt Summary */
->> +#define DMA_STATUS_AIS_RX_LOONGSON	0x00008000	/* Abnormal Loongson Rx Interrupt Summary */
->>   #define DMA_STATUS_AIS	0x00008000	/* Abnormal Interrupt Summary */
->>   #define DMA_STATUS_ERI	0x00004000	/* Early Receive Interrupt */
->> +#define DMA_STATUS_FBI_TX_LOONGSON	0x00002000	/* Fatal Loongson Tx Bus Error Interrupt */
->> +#define DMA_STATUS_FBI_RX_LOONGSON	0x00001000	/* Fatal Loongson Rx Bus Error Interrupt */
->>   #define DMA_STATUS_FBI	0x00002000	/* Fatal Bus Error Interrupt */
->>   #define DMA_STATUS_ETI	0x00000400	/* Early Transmit Interrupt */
->>   #define DMA_STATUS_RWT	0x00000200	/* Receive Watchdog Timeout */
->> @@ -128,10 +145,21 @@
->>   #define DMA_STATUS_TI	0x00000001	/* Transmit Interrupt */
->>   #define DMA_CONTROL_FTF		0x00100000	/* Flush transmit FIFO */
->>   
->> +#define DMA_STATUS_MSK_COMMON_LOONGSON		(DMA_STATUS_NIS_TX_LOONGSON | \
->> +					 DMA_STATUS_NIS_RX_LOONGSON | DMA_STATUS_AIS_TX_LOONGSON | \
->> +					 DMA_STATUS_AIS_RX_LOONGSON | DMA_STATUS_FBI_TX_LOONGSON | \
->> +					 DMA_STATUS_FBI_RX_LOONGSON)
->>   #define DMA_STATUS_MSK_COMMON		(DMA_STATUS_NIS | \
->>   					 DMA_STATUS_AIS | \
->>   					 DMA_STATUS_FBI)
->>   
->> +#define DMA_STATUS_MSK_RX_LOONGSON		(DMA_STATUS_ERI | \
->> +					 DMA_STATUS_RWT | \
->> +					 DMA_STATUS_RPS | \
->> +					 DMA_STATUS_RU | \
->> +					 DMA_STATUS_RI | \
->> +					 DMA_STATUS_OVF | \
->> +					 DMA_STATUS_MSK_COMMON_LOONGSON)
->>   #define DMA_STATUS_MSK_RX		(DMA_STATUS_ERI | \
->>   					 DMA_STATUS_RWT | \
->>   					 DMA_STATUS_RPS | \
->> @@ -140,6 +168,13 @@
->>   					 DMA_STATUS_OVF | \
->>   					 DMA_STATUS_MSK_COMMON)
->>   
->> +#define DMA_STATUS_MSK_TX_LOONGSON		(DMA_STATUS_ETI | \
->> +					 DMA_STATUS_UNF | \
->> +					 DMA_STATUS_TJT | \
->> +					 DMA_STATUS_TU | \
->> +					 DMA_STATUS_TPS | \
->> +					 DMA_STATUS_TI | \
->> +					 DMA_STATUS_MSK_COMMON_LOONGSON)
->>   #define DMA_STATUS_MSK_TX		(DMA_STATUS_ETI | \
->>   					 DMA_STATUS_UNF | \
->>   					 DMA_STATUS_TJT | \
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
->> index 968801c694e9..a6e2ab4d0f4a 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
->> @@ -167,6 +167,9 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
->>   	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
->>   	int ret = 0;
->>   	/* read the status register (CSR5) */
->> +	u32 nor_intr_status;
->> +	u32 abnor_intr_status;
->> +	u32 fb_intr_status;
->>   	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
->>   
->>   #ifdef DWMAC_DMA_DEBUG
->> @@ -176,13 +179,31 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
->>   	show_rx_process_state(intr_status);
->>   #endif
->>   
->> -	if (dir == DMA_DIR_RX)
->> -		intr_status &= DMA_STATUS_MSK_RX;
->> -	else if (dir == DMA_DIR_TX)
->> -		intr_status &= DMA_STATUS_MSK_TX;
->> +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC) {
->> +		if (dir == DMA_DIR_RX)
->> +			intr_status &= DMA_STATUS_MSK_RX_LOONGSON;
->> +		else if (dir == DMA_DIR_TX)
->> +			intr_status &= DMA_STATUS_MSK_TX_LOONGSON;
->> +
->> +		nor_intr_status = intr_status & \
->> +			(DMA_STATUS_NIS_TX_LOONGSON | DMA_STATUS_NIS_RX_LOONGSON);
->> +		abnor_intr_status = intr_status & \
->> +			(DMA_STATUS_AIS_TX_LOONGSON | DMA_STATUS_AIS_RX_LOONGSON);
->> +		fb_intr_status = intr_status & \
->> +			(DMA_STATUS_FBI_TX_LOONGSON | DMA_STATUS_FBI_RX_LOONGSON);
->> +	} else {
->> +		if (dir == DMA_DIR_RX)
->> +			intr_status &= DMA_STATUS_MSK_RX;
->> +		else if (dir == DMA_DIR_TX)
->> +			intr_status &= DMA_STATUS_MSK_TX;
->> +
->> +		nor_intr_status = intr_status & DMA_STATUS_NIS;
->> +		abnor_intr_status = intr_status & DMA_STATUS_AIS;
->> +		fb_intr_status = intr_status & DMA_STATUS_FBI;
->> +	}
->>   
->>   	/* ABNORMAL interrupts */
->> -	if (unlikely(intr_status & DMA_STATUS_AIS)) {
->> +	if (unlikely(abnor_intr_status)) {
->>   		if (unlikely(intr_status & DMA_STATUS_UNF)) {
->>   			ret = tx_hard_error_bump_tc;
->>   			x->tx_undeflow_irq++;
->> @@ -205,13 +226,13 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
->>   			x->tx_process_stopped_irq++;
->>   			ret = tx_hard_error;
->>   		}
->> -		if (unlikely(intr_status & DMA_STATUS_FBI)) {
->> +		if (unlikely(intr_status & fb_intr_status)) {
->>   			x->fatal_bus_error_irq++;
->>   			ret = tx_hard_error;
->>   		}
->>   	}
->>   	/* TX/RX NORMAL interrupts */
->> -	if (likely(intr_status & DMA_STATUS_NIS)) {
->> +	if (likely(nor_intr_status)) {
->>   		if (likely(intr_status & DMA_STATUS_RI)) {
->>   			u32 value = readl(ioaddr + DMA_INTR_ENA);
->>   			/* to schedule NAPI on real RIE event. */
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
->> index 1bd34b2a47e8..3724cf698de6 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
->> @@ -59,7 +59,8 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
->>   		dev_info(priv->device, "Enhanced/Alternate descriptors\n");
->>   
->>   		/* GMAC older than 3.50 has no extended descriptors */
->> -		if (priv->synopsys_id >= DWMAC_CORE_3_50) {
->> +		if (priv->synopsys_id >= DWMAC_CORE_3_50 ||
->> +		    priv->synopsys_id == DWLGMAC_CORE_1_00) {
-> This could be left as is if the priv->synopsys_id field is overwritten
-> with a correct value (see my last comment).
+It can be done, but I prefer to leave it generic and consistent with
+other time system calls.
+In most cases the offset calculation is done in user space application
+> > +       kernel_tp =3D kernel_tp_base;
+> > +       for (j =3D 0; j < n_samples; j++) {
+> > +               for (i =3D 0; i < n_clocks; i++) {
+> > +                       if (put_timespec64(kernel_tp++, (struct __kerne=
+l_timespec __user *)
+> > +                                       &ptp_multi_clk_get->ts[j][i])) =
+{
+> > +                               error =3D -EFAULT;
+> > +                               goto out;
+> > +                       }
+> > +               }
+> > +       }
 >
->>   			dev_info(priv->device, "Enabled extended descriptors\n");
->>   			priv->extend_desc = 1;
->>   		} else {
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> index d868eb8dafc5..9764d2ab7e46 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> @@ -7218,6 +7218,7 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
->>   	 * riwt_off field from the platform.
->>   	 */
->>   	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
->> +		(priv->synopsys_id == DWLGMAC_CORE_1_00) ||
-> the same comment here.
->
->>   	    (priv->plat->has_xgmac)) && (!priv->plat->riwt_off)) {
->>   		priv->use_riwt = 1;
->>   		dev_info(priv->device,
->> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
->> index dee5ad6e48c5..f07f79d50b06 100644
->> --- a/include/linux/stmmac.h
->> +++ b/include/linux/stmmac.h
->> @@ -221,6 +221,7 @@ struct dwmac4_addrs {
->>   #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
->>   #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
->>   #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
->> +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
-> Seeing the patch in the current state would overcomplicate the generic
-> code and the only functions you need to update are
-> dwmac_dma_interrupt()
-> dwmac1000_dma_init_channel()
-> you can have these methods re-defined with all the Loongson GNET
-> specifics in the low-level platform driver (dwmac-loongson.c). After
-> that you can just override the mac_device_info.dma pointer with a
-> fixed stmmac_dma_ops descriptor. Here is what should be done for that:
->
-> 1. Keep the Patch 4/9 with my comments fixed. First it will be partly
-> useful for your GNET device. Second in general it's a correct
-> implementation of the normal DW GMAC v3.x multi-channels feature and
-> will be useful for the DW GMACs with that feature enabled.
-OK.
->
-> 2. Create the Loongson GNET-specific
-> stmmac_dma_ops.dma_interrupt()
-> stmmac_dma_ops.init_chan()
-> methods in the dwmac-loongson.c driver. Don't forget to move all the
-> Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
-It's easy.
->
-> 3. Create a Loongson GNET-specific platform setup method with the next
-> semantics:
->     + allocate stmmac_dma_ops instance and initialize it with
->       dwmac1000_dma_ops.
-
-Do this in dwmac1000-dma.c? Because this seems impossible to achieve in 
-dwmac-loongson.c：
-
-
-drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:606:47: error: 
-initializer element is not constant
-   606 | const struct stmmac_dma_ops dwlgmac_dma_ops = dwmac1000_dma_ops;
->     + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
->       the pointers to the methods defined in 2.
-
-Likewise, where should I do this?
-
-Sorry. I seem to have misinterpreted your meaning again.
-
-
-
->     + allocate mac_device_info instance and initialize the
->       mac_device_info.dma field with a pointer to the new
->       stmmac_dma_ops instance.
->     + call dwmac1000_setup() or initialize mac_device_info in a way
->       it's done in dwmac1000_setup() (the later might be better so you
->       wouldn't need to export the dwmac1000_setup() function).
->     + override stmmac_priv.synopsys_id with a correct value.
->
-> 4. Initialize plat_stmmacenet_data.setup() with the pointer to the
-> method created in 3.
->
-> If I didn't miss something stmmac_hwif_init() will call the
-> platform-specific setup method right after fetching the SNPSVER field
-> value. Your setup method will allocate mac_device_info structure then,
-> will pre-initialize the GNET-specific DMA ops field and fix the
-> Synopsys ID with a proper value (as described in 3 above). The rest of
-> the ops descriptors will be initialized in the loop afterwards based
-> on the specified device ID.
-
-This doesn't seem to work because our device looks something like this:
-
-device     pci id   reversion    core version
-LS7A        0x13       0x00       0x35/0x37
-LS7A        0x13       0x01       0x35/0x37
-LS2K        0x13       0x00       0x10
-LS2K        0x13       0x01       0x10
-
-
-Thanks,
-
-Yanteng
-
->
-> -Serge(y)
->
->>   
->>   struct plat_stmmacenet_data {
->>   	int bus_id;
->> -- 
->> 2.31.4
->>
-
+> There are several pairs of clocks that tick at precisely same rate
+> (and use the same underlying hardware clock), and the offset could be
+> computed exactly instead of doing this noisy loop that is merely
+> somewhat less bad than what user code could do all by itself.
+You are correct, there are some PHCs on the same NIC (each per port)
+that share the same HW counter/clock.
+In that case it is slightly better to do the offset calculation in the
+NIC driver code,
+but that requires changes in each NIC driver's code.
+The main thing is that the multi_clock_gettime system call is a
+generic solution,
+it covers that case among other cases, for example sync between two
+PHCs on different NICs.
 
