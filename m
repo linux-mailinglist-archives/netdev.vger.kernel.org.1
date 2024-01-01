@@ -1,211 +1,253 @@
-Return-Path: <netdev+bounces-60682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E818A821287
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 01:54:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B1DE8212D3
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 03:19:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45C31B219E0
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 00:54:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D2DC1C21D65
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 02:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C06803;
-	Mon,  1 Jan 2024 00:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40F580D;
+	Mon,  1 Jan 2024 02:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eu/oa86J"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EGZ+SOk/";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="nLLJZqwD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8687F9;
-	Mon,  1 Jan 2024 00:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704070472; x=1735606472;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=bq5FZFx3Ptya3CmiaIHeqnx7z0srP/JD06vcWqWmOB0=;
-  b=Eu/oa86JrGTgl3RxOPFXfovB025Ii62YJWnKuC2o6HnwXl6quJVUWFdB
-   4UiPG/WV40m+p3ILRzn5TLu4BPTYCcB3L/4jpFaD3mgjsZUofAXbLy4bK
-   nntvEdY5jFKTqR5x4r3mzOvYpAxfrW3nn02GY/L4WAQHutqKDWNzYUMZV
-   Gy5qCOXGKegnsK2TFqugnlmMH1QRlwsrlQjSEk/Cnn0IqsVqOzS8iZXVo
-   fto3J45jWWWP4yXwUU4dakCuu9K9nwOcF6S2jbO2/mZyvbHJHceB6wi9j
-   lgB1GkoBfGqQEX7nGBOClmJ4nv2KlzikEqe+P+h8bCHPEzOrDjJKAq8gA
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10940"; a="463176669"
-X-IronPort-AV: E=Sophos;i="6.04,321,1695711600"; 
-   d="scan'208";a="463176669"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2023 16:54:31 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10940"; a="772469584"
-X-IronPort-AV: E=Sophos;i="6.04,321,1695711600"; 
-   d="scan'208";a="772469584"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 31 Dec 2023 16:54:27 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rK6ZU-000Jsa-24;
-	Mon, 01 Jan 2024 00:54:24 +0000
-Date: Mon, 1 Jan 2024 08:54:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Markus Elfring <Markus.Elfring@web.de>, netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Anjali Kulkarni <anjali.k.kulkarni@oracle.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/4] netlink: Move =?utf-8?Q?an?=
- =?utf-8?Q?_assignment_for_the_variable_=E2=80=9Csk?= =?utf-8?B?4oCd?= in
- __netlink_kernel_create()
-Message-ID: <202401010855.4iU6im1B-lkp@intel.com>
-References: <223a61e9-f826-4f37-b514-ca6ed53b1269@web.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D275B7EE;
+	Mon,  1 Jan 2024 02:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4011E07H003693;
+	Mon, 1 Jan 2024 02:19:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2023-11-20;
+ bh=63GfOjrgkR45+Yt+NSMvZ7waQhX9jRa9h2JQ9rzAcSc=;
+ b=EGZ+SOk/2GQBZDpqM/tQDyrCTsBN7yvzjkhPHh9giN2UH3P7vzV4EmB3z1w68ZZXgb4R
+ SP3lPuN5pcuq1avoYStPqfv1yiPIH4yunwW5Yat79GQmNwkIs2Ev6NmJledqT9GiJVxH
+ BSgToDZR7wnHtaBDWRT0mXarYrWO2heGqMUnH0KjtccSIurYgb6NxwEu+71ASmlaabci
+ DccPpWi6BP6mO2Y0a8HrvDG04rz1cnCPUYXy4iUnUMpy16WI1Sz3Je/2u0cLRwXmtNjl
+ q8ZrHDYPdsW1shYlqHNj81ehXrXFUFaNE/J3aNtP61vvI04CPmBQMtQd5ar7YNxKCQiy wg== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vaa03sdxm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 01 Jan 2024 02:19:04 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 4010Tlh5036025;
+	Mon, 1 Jan 2024 02:19:03 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3va9n59qn1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 01 Jan 2024 02:19:03 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iy+OMLBgPr+ptoQfFyGKLKRS9Xja3G/ho9yPHl/IO79XXPr3QDiCGIP5Ya9ccBGdPmXWShXDg6pw+FeykwS8Ig76moAnzcDryKxZhABNH5rO+7gPpEdANyWepCbAAsLPHIIWSPQsvnkE5mpoHllbvQelr1LXX9HMxCH1OwGG1U5c7OrdVvi6+9GTah5tdZrhdqZVLKbiDLUv0hRc2hPUJZkWuSjrR0TaoETm+HWdftkJ9fcmJILW1+Q4tU7EoARwA8eD54XELBabLscSTAS0Um3Ke/6lnEHzsdlCGgq+rU1SATRgBEr/DaUT2NpbocKKJPZiaDgAx9zIC1CnxB71XA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=63GfOjrgkR45+Yt+NSMvZ7waQhX9jRa9h2JQ9rzAcSc=;
+ b=fkBNF3cXwXq2k26UO0fe8ZSgMzJO/wBi5ZplJChePxscg6p4+3sy0aG0kFSaQEv2QGh7pgH6ZrwQmDd2bojDzVdo+EovQr6gefmZ0M6lJs9XbW/zZHWoxrAWxTeBvv6M50AieUrTyZ0SsmXr+F/Pf+SaHcq5axxw6P+RqWITjLfQLOxP+N5/yHY4mcP8++MTXhJrGJpQWX1T2VrwZSs639kFz8ycZyP839oQ8vIpa3izlOXvCaf4nik6IVIta/4I9dJLZ7n0aVkKsEWLBTfF814UBFufQl/JWUMU7KtAZVuF9tA6sgZdNy24PePnqK05OkeW/+LvrLuhA2Sh8yHiEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=63GfOjrgkR45+Yt+NSMvZ7waQhX9jRa9h2JQ9rzAcSc=;
+ b=nLLJZqwDnlAtZ63qtUdtG627A3yMAU/v7jFwwJIoZCooPOaru63/H0RCHifzd3r98VYlfm2MH73yuskGjIDTs7NIFoGQsnkY/1M90Sr0wtop/lYGWf99rF730IHiVMv7wzHj1EoN1MPnnoDyA5TReYCNaPZlcGRTSUmOE7u81yc=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by BN0PR10MB5317.namprd10.prod.outlook.com (2603:10b6:408:127::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.24; Mon, 1 Jan
+ 2024 02:19:00 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::360b:b3c0:c5a9:3b3c]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::360b:b3c0:c5a9:3b3c%4]) with mapi id 15.20.7135.023; Mon, 1 Jan 2024
+ 02:19:00 +0000
+Date: Sun, 31 Dec 2023 21:18:56 -0500
+From: Chuck Lever <chuck.lever@oracle.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, Anna Schumaker <anna@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Dai Ngo <Dai.Ngo@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jakub Kicinski <kuba@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+        Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>,
+        Paolo Abeni <pabeni@redhat.com>, Simo Sorce <simo@redhat.com>,
+        Tom Talpey <tom@talpey.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] sunrpc: Improve exception handling in krb5_etm_checksum()
+Message-ID: <ZZIhEJK68Sapos2t@tissot.1015granger.net>
+References: <9561c78e-49a2-430c-a611-52806c0cdf25@web.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9561c78e-49a2-430c-a611-52806c0cdf25@web.de>
+X-ClientProxiedBy: CH5PR05CA0007.namprd05.prod.outlook.com
+ (2603:10b6:610:1f0::12) To BN0PR10MB5128.namprd10.prod.outlook.com
+ (2603:10b6:408:117::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <223a61e9-f826-4f37-b514-ca6ed53b1269@web.de>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|BN0PR10MB5317:EE_
+X-MS-Office365-Filtering-Correlation-Id: 500ca21d-e7de-42d1-88b1-08dc0a7003cc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	v356WPMbyhXXUBZ6f1PJIhfQBhj4SBftrrClWPNtQaBrm+9mifsllkv9YDr+kiXasYMWZkptG2HBotMPwibwNerF6H0ukW1pG+o0j2QxOsRCWmB257/3+iZPDPHNxxbz50o00/ao7KOpLsDmZazullvuG67xppU3no3RbinUW4ZNyeKrifGlITKs9T7y+F0ZYeNOuSASyCQ5yih7gqmLtVdguq8nw/5LPXMaS3IhjtjUSVWsUeripDL09GzUJssmiA/W37LgmSmPdNugexI4P4/gqtxEp0wZoXG7PzTVvmRhkmdtyqMkd0HFa2x4QkP7Ita+nIh/9KSsEhGoSRDnhxx2JziVSHgtsAoh+YuPIZLZY+HVBJ1Hf+ZY4pTo67877oMRezk9hpEIZIdOXgdRQ8ztTMFli5S94thP8TdqJbBQ6W8Y2fFrAngXAqspOfBa23eNtN1742GUdOWANeR8CLmx/ozHeF1RtaHqoTFf+3zz3yvtm63SHF9F+hVGvWRpC4olga0qaJNY4B7rxfXobCLMOBjpF5gpo9FAuny+/JnNr0m2+gjVX8ocn4oVfA0g
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(136003)(376002)(366004)(39860400002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(26005)(83380400001)(86362001)(38100700002)(4326008)(44832011)(5660300002)(7416002)(9686003)(6512007)(6506007)(6666004)(54906003)(8936002)(8676002)(66946007)(316002)(66556008)(66476007)(6916009)(2906002)(41300700001)(478600001)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?us-ascii?Q?0uBi6HuLbWF4BQiEMZsw5DwT5gC1+NXlnWCYr0BPH+Fp4bzH2T/AxQE8jrPq?=
+ =?us-ascii?Q?oISFJtmtF4//3gbkSQMbjhDfz+uVYOz6rVnWEDIHx4tjuTj6+WJQ0nJUdWZp?=
+ =?us-ascii?Q?9amQJvWIM2fXDLjt405Z1nhdmpBB4Z2nkF0PjvnCJcFpXKTlT6JWAez03zJb?=
+ =?us-ascii?Q?Pyhak6S16WNmOxwS8gy/75Dr07PyZla0quzfIRJGIcSBJPiHUgbTy4TeToG1?=
+ =?us-ascii?Q?fMTcwF6NBz3Oa4tfr84VC8BvjU6H5fuQd0UX3BlCWQzaSdCFN3MZvq/ckPY7?=
+ =?us-ascii?Q?73XuSdNyZBApVMkpsPr+lu72S6sm3AfY0n40ITlYrAvcBCF/CfbQ5vMN/vEk?=
+ =?us-ascii?Q?kKLWko5N2OzRJUq0HOyq8Z9Bu/fyBmL93Ib1A2BwloOxNUi4eKGuyJ9iiv5P?=
+ =?us-ascii?Q?r4kAGa53G831xmGNoTSxLDLmMIdjLUN/rAh9ayheggbUNccQK2FnUoYeLTSl?=
+ =?us-ascii?Q?ywRl/8JJam+gc7moXUTOpF4Dyd0wdXfXuPU5ruiw4Qw4qYvbAwh80rJ8kAf1?=
+ =?us-ascii?Q?0p8i8zIG5lJzN9zr8KYyxPjIx435XV2p8Xhn7S+ALr/sYd9syeT++cWtPIoz?=
+ =?us-ascii?Q?1fbq9b9AhnHSNN8iCmEoqbF6Glx2ZMaCwcYIdzU5CVNf6m5ESOdORGf6vaYM?=
+ =?us-ascii?Q?kdTzw+ygl7NPk7HvRduf5FEz2+pLlSW5wELMYWi/F+kC/4yGmpQ2yylWr0xp?=
+ =?us-ascii?Q?OxF1/OGOM2QMRzylDzOLAMmSjTWeJcgqZbHHiwtE1wiCFEQJzXNTpug1HtzK?=
+ =?us-ascii?Q?rz+Yh2zVBAn44NlEdomQSmBdbCD6VZ7AoW1Oc0E5RAHq++qzF6g5n/VRXioo?=
+ =?us-ascii?Q?NdOc+KH1WhbmqM2iVgNk0b5gbTLwfalZ7UapVcJO6DU0/HZl3DJ2iTJPQcvN?=
+ =?us-ascii?Q?3iDCg37xFpdIoYhmzF7BjhOLkHSC+zsKdoMvJspCnhtdSR1uzwI71Ibb8pOJ?=
+ =?us-ascii?Q?LDKak6izhqWAM+MXk8SAs21k1P3n0KvGbGTfUQSW+UJ2MdPwippDQXsBo9cx?=
+ =?us-ascii?Q?Bbb7Ph2DSFVIT30XoT0JHBXc2odDLFzQWabGsYQapc0Y449eijo8hT9ESbUx?=
+ =?us-ascii?Q?RD6hb6K0oGlU7pJxV9iF3bVle3v0sisbGNtzJQFTgpBjGuH2wcgWIuyoqHM7?=
+ =?us-ascii?Q?aGc3Ol0hqjW6H+/ClaU98IlOl6qauHKALKAL6v5dv3ZVQNOQGBS0YogrZcXz?=
+ =?us-ascii?Q?tWpZ684hDZTRU1d4n/f6townn7MZquUHBAXzmMj4k8acEjjQpbgaTjxAq1mx?=
+ =?us-ascii?Q?tGuLOLyapucRKcjFoz0mZ8o+qILz44uL4UEgjjUypwDHQwCIaESwT3QUWYjh?=
+ =?us-ascii?Q?bg0nhbkXLLtQ7joywK73mRaaWTkapepGknzAqEbTbeCvXNo604ZMLPlb0oRt?=
+ =?us-ascii?Q?0Fj1pfex1FanG1nXA+OWNXuBLLia11ryqyJVuNQN86+VsjIyUXq2t4Jdp0BR?=
+ =?us-ascii?Q?nRel7ax1b4hDVbHS+iWKEzhF2q+AUe0+WWYPN0pCT/1aMYzeD8NWuRQ4d0+B?=
+ =?us-ascii?Q?TkgFiGBaEuzeqz+eFmFBgjotU+38XcHbHMlcIi/M7Fucy5cX3F9C3R1xjMSn?=
+ =?us-ascii?Q?c5jafQ0qvL+7GE9+dQAEG3/Gsbk547SQ36X0VFE/RCBj1xysvXGsbgjQTkj3?=
+ =?us-ascii?Q?ag=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	lfHumtJihjp6Oft8qzcNIbK/jtQHlP1H7iGPDads6s1+GiCO0/8hJU+MezPPhlte2GGFmslHcoWCAVgsdFcluI5A2g/kJ4QJv0+h7U8lcYGOk329s5HPF0meYuPf7CtlED+wG5UI+OUvSMdUkaOzr/Kz896pRO21MIJl5JO89b9imVqJuUfSSqiEpu+U3jNos7v18CP6fwiptxIB8icufZK+yF/UnehPJT1k2S3uBMQhSys8QQiRqgvA0ks6owhvyXgqE+PSQ6KT5qToD+H+kri8A2YjBNC45xLMgRTINgyL/8swEbFvlMN6M8JYOHrAeubiUGch4/4cQvB0LwzxUPjsWeJcdODOELoApxzIu3tcFMJN0EQwydaojN9p0QXOEnFLI677BIDHLbsMKz5RQc24VBrOM2PFte3vVrj7Hysf6TYnY1TvvMtUEAuZKS18r4DmxoM1zIbeI4OzZtKBIvxoiCZohIc5stWrMrU2eUOz8A+zvwuPlKuuuQmtYpFfSCpFxOHb3ZguTSsfqIFE05i10vWxDpk9d1GplGASJxq/IzeRFTb1O5UErAg1nSbofgbb4LLA539GQLgg3FP+8tZm0uFTjfY8kEKCl/UaZtc=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 500ca21d-e7de-42d1-88b1-08dc0a7003cc
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jan 2024 02:19:00.0390
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: M3j4ha1GnebQNKlbIj8Gkym0+eS1OsmxkO10QOkAeANDWiQ16mRan+XfEQRfuBcK73vn+B2X8rP4MlaEf/ITfg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR10MB5317
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-31_14,2023-12-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0 bulkscore=0
+ spamscore=0 adultscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401010017
+X-Proofpoint-ORIG-GUID: 8QGyZk5fQ0DJwFryjpquKcnx_SP2HgoN
+X-Proofpoint-GUID: 8QGyZk5fQ0DJwFryjpquKcnx_SP2HgoN
 
-Hi Markus,
+On Sun, Dec 31, 2023 at 02:56:11PM +0100, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Sun, 31 Dec 2023 14:43:05 +0100
+> 
+> The kfree() function was called in one case by
+> the krb5_etm_checksum() function during error handling
+> even if the passed variable contained a null pointer.
+> This issue was detected by using the Coccinelle software.
+> 
+> Thus use another label.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  net/sunrpc/auth_gss/gss_krb5_crypto.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+> index d2b02710ab07..5e2dc3eb8545 100644
+> --- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
+> +++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+> @@ -942,7 +942,7 @@ u32 krb5_etm_checksum(struct crypto_sync_skcipher *cipher,
+>  	/* For RPCSEC, the "initial cipher state" is always all zeroes. */
+>  	iv = kzalloc(ivsize, GFP_KERNEL);
+>  	if (!iv)
+> -		goto out_free_mem;
+> +		goto out_free_checksum;
+> 
+>  	req = ahash_request_alloc(tfm, GFP_KERNEL);
+>  	if (!req)
+> @@ -972,6 +972,7 @@ u32 krb5_etm_checksum(struct crypto_sync_skcipher *cipher,
+>  	ahash_request_free(req);
+>  out_free_mem:
+>  	kfree(iv);
+> +out_free_checksum:
+>  	kfree_sensitive(checksumdata);
+>  	return err ? GSS_S_FAILURE : GSS_S_COMPLETE;
+>  }
+> --
+> 2.43.0
+> 
 
-kernel test robot noticed the following build warnings:
+As has undoubtedly been pointed out in other forums, calling kfree()
+with a NULL argument is perfectly valid. Since this small GFP_KERNEL
+allocation almost never fails, it's unlikely this change is going to
+make any difference except for readability.
 
-[auto build test WARNING on net/main]
-[also build test WARNING on net-next/main linus/master horms-ipvs/master v6.7-rc8 next-20231222]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Now if we want to clean up the error flows in here to look more
+idiomatic, how about this:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Markus-Elfring/netlink-Improve-exception-handling-in-__netlink_kernel_create/20240101-015025
-base:   net/main
-patch link:    https://lore.kernel.org/r/223a61e9-f826-4f37-b514-ca6ed53b1269%40web.de
-patch subject: [PATCH 2/4] netlink: Move an assignment for the variable “sk” in __netlink_kernel_create()
-config: arm-randconfig-001-20240101 (https://download.01.org/0day-ci/archive/20240101/202401010855.4iU6im1B-lkp@intel.com/config)
-compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project 8a4266a626914765c0c69839e8a51be383013c1a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240101/202401010855.4iU6im1B-lkp@intel.com/reproduce)
+diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+index d2b02710ab07..6f3d3b3f7413 100644
+--- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
++++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+@@ -942,11 +942,11 @@ u32 krb5_etm_checksum(struct crypto_sync_skcipher *cipher,
+ 	/* For RPCSEC, the "initial cipher state" is always all zeroes. */
+ 	iv = kzalloc(ivsize, GFP_KERNEL);
+ 	if (!iv)
+-		goto out_free_mem;
++		goto out_free_cksumdata;
+ 
+ 	req = ahash_request_alloc(tfm, GFP_KERNEL);
+ 	if (!req)
+-		goto out_free_mem;
++		goto out_free_iv;
+ 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+ 	err = crypto_ahash_init(req);
+ 	if (err)
+@@ -970,8 +970,9 @@ u32 krb5_etm_checksum(struct crypto_sync_skcipher *cipher,
+ 
+ out_free_ahash:
+ 	ahash_request_free(req);
+-out_free_mem:
++out_free_iv:
+ 	kfree(iv);
++out_free_cksumdata:
+ 	kfree_sensitive(checksumdata);
+ 	return err ? GSS_S_FAILURE : GSS_S_COMPLETE;
+ }
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401010855.4iU6im1B-lkp@intel.com/
+Although, if we could guarantee the maximum size of the iv across
+all encryption types, then a static constant array could be used
+instead, I think.
 
-All warnings (new ones prefixed by >>):
-
->> net/netlink/af_netlink.c:2044:6: warning: variable 'sk' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-    2044 |         if (!listeners)
-         |             ^~~~~~~~~~
-   net/netlink/af_netlink.c:2081:25: note: uninitialized use occurs here
-    2081 |         netlink_kernel_release(sk);
-         |                                ^~
-   net/netlink/af_netlink.c:2044:2: note: remove the 'if' if its condition is always false
-    2044 |         if (!listeners)
-         |         ^~~~~~~~~~~~~~~
-    2045 |                 goto out_netlink_release_sock;
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/netlink/af_netlink.c:2021:17: note: initialize the variable 'sk' to silence this warning
-    2021 |         struct sock *sk;
-         |                        ^
-         |                         = NULL
-   1 warning generated.
-
-
-vim +2044 net/netlink/af_netlink.c
-
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2009  
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2010  /*
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2011   *	We export these functions to other modules. They provide a
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2012   *	complete set of kernel non-blocking support for message
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2013   *	queueing.
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2014   */
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2015  
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2016  struct sock *
-9f00d9776bc5be Pablo Neira Ayuso 2012-09-08  2017  __netlink_kernel_create(struct net *net, int unit, struct module *module,
-a31f2d17b331db Pablo Neira Ayuso 2012-06-29  2018  			struct netlink_kernel_cfg *cfg)
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2019  {
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2020  	struct socket *sock;
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2021  	struct sock *sk;
-77247bbb309424 Patrick McHardy   2005-08-14  2022  	struct netlink_sock *nlk;
-5c398dc8f5a58b Eric Dumazet      2010-10-24  2023  	struct listeners *listeners = NULL;
-a31f2d17b331db Pablo Neira Ayuso 2012-06-29  2024  	struct mutex *cb_mutex = cfg ? cfg->cb_mutex : NULL;
-a31f2d17b331db Pablo Neira Ayuso 2012-06-29  2025  	unsigned int groups;
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2026  
-fab2caf62ed03d Akinobu Mita      2006-08-29  2027  	BUG_ON(!nl_table);
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2028  
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2029  	if (unit < 0 || unit >= MAX_LINKS)
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2030  		return NULL;
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2031  
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2032  	if (sock_create_lite(PF_NETLINK, SOCK_DGRAM, unit, &sock))
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2033  		return NULL;
-13d3078e22f565 Eric W. Biederman 2015-05-08  2034  
-13d3078e22f565 Eric W. Biederman 2015-05-08  2035  	if (__netlink_create(net, sock, cb_mutex, unit, 1) < 0)
-23fe18669e7fda Pavel Emelyanov   2008-01-30  2036  		goto out_sock_release_nosk;
-23fe18669e7fda Pavel Emelyanov   2008-01-30  2037  
-a31f2d17b331db Pablo Neira Ayuso 2012-06-29  2038  	if (!cfg || cfg->groups < 32)
-4277a083ecd2c8 Patrick McHardy   2006-03-20  2039  		groups = 32;
-a31f2d17b331db Pablo Neira Ayuso 2012-06-29  2040  	else
-a31f2d17b331db Pablo Neira Ayuso 2012-06-29  2041  		groups = cfg->groups;
-4277a083ecd2c8 Patrick McHardy   2006-03-20  2042  
-5c398dc8f5a58b Eric Dumazet      2010-10-24  2043  	listeners = kzalloc(sizeof(*listeners) + NLGRPSZ(groups), GFP_KERNEL);
-4277a083ecd2c8 Patrick McHardy   2006-03-20 @2044  	if (!listeners)
-90ae404765d263 Markus Elfring    2023-12-31  2045  		goto out_netlink_release_sock;
-4277a083ecd2c8 Patrick McHardy   2006-03-20  2046  
-e547df909ec09d Markus Elfring    2023-12-31  2047  	sk = sock->sk;
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2048  	sk->sk_data_ready = netlink_data_ready;
-a31f2d17b331db Pablo Neira Ayuso 2012-06-29  2049  	if (cfg && cfg->input)
-a31f2d17b331db Pablo Neira Ayuso 2012-06-29  2050  		nlk_sk(sk)->netlink_rcv = cfg->input;
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2051  
-8ea65f4a2dfaaf Herbert Xu        2015-01-26  2052  	if (netlink_insert(sk, 0))
-77247bbb309424 Patrick McHardy   2005-08-14  2053  		goto out_sock_release;
-4fdb3bb723db46 Harald Welte      2005-08-09  2054  
-77247bbb309424 Patrick McHardy   2005-08-14  2055  	nlk = nlk_sk(sk);
-8fe08d70a2b61b Eric Dumazet      2023-08-11  2056  	set_bit(NETLINK_F_KERNEL_SOCKET, &nlk->flags);
-4fdb3bb723db46 Harald Welte      2005-08-09  2057  
-4fdb3bb723db46 Harald Welte      2005-08-09  2058  	netlink_table_grab();
-b4b510290b056b Eric W. Biederman 2007-09-12  2059  	if (!nl_table[unit].registered) {
-4277a083ecd2c8 Patrick McHardy   2006-03-20  2060  		nl_table[unit].groups = groups;
-5c398dc8f5a58b Eric Dumazet      2010-10-24  2061  		rcu_assign_pointer(nl_table[unit].listeners, listeners);
-af65bdfce98d79 Patrick McHardy   2007-04-20  2062  		nl_table[unit].cb_mutex = cb_mutex;
-77247bbb309424 Patrick McHardy   2005-08-14  2063  		nl_table[unit].module = module;
-9785e10aedfa0f Pablo Neira Ayuso 2012-09-08  2064  		if (cfg) {
-9785e10aedfa0f Pablo Neira Ayuso 2012-09-08  2065  			nl_table[unit].bind = cfg->bind;
-6251edd932ce3f Hiroaki SHIMODA   2014-11-13  2066  			nl_table[unit].unbind = cfg->unbind;
-a4c9a56e6a2cde Anjali Kulkarni   2023-07-19  2067  			nl_table[unit].release = cfg->release;
-9785e10aedfa0f Pablo Neira Ayuso 2012-09-08  2068  			nl_table[unit].flags = cfg->flags;
-9785e10aedfa0f Pablo Neira Ayuso 2012-09-08  2069  		}
-ab33a1711cf60b Patrick McHardy   2005-08-14  2070  		nl_table[unit].registered = 1;
-f937f1f46b6d2f Jesper Juhl       2007-10-15  2071  	} else {
-f937f1f46b6d2f Jesper Juhl       2007-10-15  2072  		kfree(listeners);
-869e58f87094b1 Denis V. Lunev    2008-01-18  2073  		nl_table[unit].registered++;
-b4b510290b056b Eric W. Biederman 2007-09-12  2074  	}
-4fdb3bb723db46 Harald Welte      2005-08-09  2075  	netlink_table_ungrab();
-77247bbb309424 Patrick McHardy   2005-08-14  2076  	return sk;
-77247bbb309424 Patrick McHardy   2005-08-14  2077  
-4fdb3bb723db46 Harald Welte      2005-08-09  2078  out_sock_release:
-4277a083ecd2c8 Patrick McHardy   2006-03-20  2079  	kfree(listeners);
-90ae404765d263 Markus Elfring    2023-12-31  2080  out_netlink_release_sock:
-9dfbec1fb2bedf Denis V. Lunev    2008-02-29  2081  	netlink_kernel_release(sk);
-23fe18669e7fda Pavel Emelyanov   2008-01-30  2082  	return NULL;
-23fe18669e7fda Pavel Emelyanov   2008-01-30  2083  
-23fe18669e7fda Pavel Emelyanov   2008-01-30  2084  out_sock_release_nosk:
-4fdb3bb723db46 Harald Welte      2005-08-09  2085  	sock_release(sock);
-77247bbb309424 Patrick McHardy   2005-08-14  2086  	return NULL;
-^1da177e4c3f41 Linus Torvalds    2005-04-16  2087  }
-9f00d9776bc5be Pablo Neira Ayuso 2012-09-08  2088  EXPORT_SYMBOL(__netlink_kernel_create);
-b7c6ba6eb1234e Denis V. Lunev    2008-01-28  2089  
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Chuck Lever
 
