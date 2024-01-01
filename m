@@ -1,44 +1,64 @@
-Return-Path: <netdev+bounces-60751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCE9D82155F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 22:01:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5414E821568
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 22:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 651F8281DEE
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 21:01:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A742A1F212CB
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 21:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CCADF56;
-	Mon,  1 Jan 2024 21:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EAEDF5E;
+	Mon,  1 Jan 2024 21:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="KGkfDBAa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dopPkdYx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A792FBF2;
-	Mon,  1 Jan 2024 21:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1704142817; x=1704747617; i=markus.elfring@web.de;
-	bh=soggXHKwlX5H4i278ffY+sla9st1cZwXGpXQmiuTWMQ=;
-	h=X-UI-Sender-Class:Date:Subject:From:To:Cc:References:
-	 In-Reply-To;
-	b=KGkfDBAaAr7ik0/EV0cN7LvvDwwKPJ7GJ1RSfcV1LPp0ejo+ogtGEnl4CPieSlEU
-	 cpNjl9tMVwoGHreF6BQZ28ptv8uWHcOWyajQe9IyqBXIfThzW6k6rv/4Xw1hh0Is2
-	 HLRwaGFrI6L9PuQLZGPWMYNMYBtpXPhS6tppItX1AhtCcEjl7bOZczxD+vqlSn6cq
-	 QaQ6+GGfBYhoFv1MC18BZgl4n0u1Cx9DU4TNfRRQfMcXpYSXixDUEEqc/q9mAVKXv
-	 a4Qo3dMyhI6Z+S2lwWfnYN7qr6LMIAFC69QGQzIB1e9ezcbBCf8uMvfsvVToVMa1w
-	 /nKLHO49ieakCVWSGQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.86.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MHEbq-1rOn6f0GC8-00DgW5; Mon, 01
- Jan 2024 22:00:17 +0100
-Message-ID: <d4b65eeb-0ded-4a04-a58e-496a7609edb3@web.de>
-Date: Mon, 1 Jan 2024 22:00:16 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3526DDF59
+	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 21:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a26fa294e56so535634966b.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jan 2024 13:22:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704144130; x=1704748930; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BBfU2+KdiyogKISkv8RVTGS16K995kYkY1g05Qt3vAo=;
+        b=dopPkdYxeXwz/3dNG0O0GKZFwjGcuhcl1rLf6geleocKIAxBSyMH61KgcstP+QM8sS
+         qAC1QNVnbAkX0r06KpyAcH6+nMg167FilfU9AT+wV+hKo+NtoI7R9F2qGOlesB2cGy/p
+         JtLUMvx2KufC49EzF6Vco94Fc/MU4mOtdyHOmHFkK93U5jubgHZn5Vfa7Q6hMIy1Mtjv
+         QGDZoBJMHc4zXkXopI/o8bTpiEbaPAy4c/pgQtM+D14+fAmyP8te68FWkSwBIXCO6MFJ
+         X7LD0YPjp29T4GV+kb4epNDU4VjYqNBCiuuAwd89DILFxSe4/5hoK1ls4FWIwjfzvUR1
+         3fSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704144130; x=1704748930;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BBfU2+KdiyogKISkv8RVTGS16K995kYkY1g05Qt3vAo=;
+        b=IaVZlIqkt6Yxs3W191aLnJ5i62ygCxMPgKCQfbcufPyLX/aNmHLU3QGZ6uzcvBCL/a
+         GRs/qyZ5jZyfFWK2mFKVfPMo1ctAbg8putb/tRAJ+VSOewrdjwdwOSrMQl842fbZDGoZ
+         QJzyyBg1sWWEaUIc7647qdsfjkXyc6Z9/cNDA9qWJWLG/f+yTWji2GsiZxj3YXkYhmYb
+         yK122XO6r4agegzzP5ak+yg3itfESZZ0rQtQ4NXEz+xVF3+jEt7oJ6ofa5Lc7yvqU1ML
+         EHo8//SWwghloHXP+DlCkmOu9M0UQdHPCcbrCayJx9IU35UNoiLxex4teypmNhIAMc0T
+         nZnQ==
+X-Gm-Message-State: AOJu0Yx5aSXtzKCGUwZ12x93Vftz2gQOYJCcvfbaIsH+OUDkIFUZ93kf
+	HCCkCQPbnWYVkYWbGp3QUeg=
+X-Google-Smtp-Source: AGHT+IE0v/AeMhA389WTCU8HvdcPJSjKadKkIaY3r+LD023yXp0qP9KqXvesdYAwB8dFttU7gAm2Ug==
+X-Received: by 2002:a17:906:3188:b0:a27:b598:c62d with SMTP id 8-20020a170906318800b00a27b598c62dmr1269864ejy.150.1704144130023;
+        Mon, 01 Jan 2024 13:22:10 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6e6b:b000:65c3:c8c0:cae3:f9e1? (dynamic-2a01-0c22-6e6b-b000-65c3-c8c0-cae3-f9e1.c22.pool.telefonica.de. [2a01:c22:6e6b:b000:65c3:c8c0:cae3:f9e1])
+        by smtp.googlemail.com with ESMTPSA id fv14-20020a170907508e00b00a269f8e8869sm11159750ejc.128.2024.01.01.13.22.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Jan 2024 13:22:09 -0800 (PST)
+Message-ID: <783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com>
+Date: Mon, 1 Jan 2024 22:22:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,88 +66,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH 2/2] net/iucv: Improve error handling in iucv_enable()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-To: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <cde82080-c715-473c-97ac-6ef66bba6d64@web.de>
-In-Reply-To: <cde82080-c715-473c-97ac-6ef66bba6d64@web.de>
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next 0/5] ethtool: add support for EEE linkmodes beyond
+ bit 32
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:3sLFUxO0MRy26dd/7tWyoDkY1R9BrJbPkUg+db930Ay14GrrrhG
- AMYI8XZD3UfWYRnl4l8ozmGKCgJyllAecW77Ts5AIxVPtW9WbhpEXrs2+tolQGvpR1OAFfO
- 52POuTCOBqOKo/+uesr5uOG3c71HTnhF97Yo9ar0CVYuIPlXg2RYrYcIl3YpyeBg7fswIYv
- IyIXgwrW3XkB7WeD8PMXA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:u5JaqyafKKw=;Yfgd+RdWhfCOMl/7gO9DZVrO0X1
- mRZq2XL+r7fweRFANlHZxbVSUILJrff9u/NEGrzEBVLmYv+5qo+FDlIEtvK+fuVT611eqRNB0
- wxSBMp2X8vVcV1fWRycf/2B3kjJUd7K+L0gGb2snu3Klpb3l6VWXYyI7gzDUV7G6rrDhaj5hg
- Os3HGDWVunkUFgJ1EVCdrkPUlcqKRwupBE5hgZizYjRSNO84gc8+CtVRBHV49Qd9/5qO//k2R
- 7Yf1SmQD3B1NBUL0oGy/hdH44Cu/K25pwKA69lrt2VqZPpUiwsasHwkOSXgbJas5z68Xy/YuG
- dnjWKZvhZ+yGd0BSaeL91K9PGwTnQPYg4a3NlvdbMvJyAdZe+0dYkqwPMsVZc+Fac4CJ2/Y/m
- XpcVAgWBAjonKSXAOzctntIjzZdE/C5LLrS4bC3/cx8Y3KNQSuwoScJ5BNlUWqZTTmnaFZ7ST
- ikOIgk+VuEvml1itpJoz/il5BwiGlH4gPUmzF78zzrjW4oNKKHdoxhxzPLBQhYjnf4n4O5D6s
- wT/0opadKEuZl3sr/PpTCKNApk2SAWQJ9i9dlxrmeL410Pmbr21UuiLaRaDgLmGbzQE6rlBey
- 9GwwKLvC1gxcY8iJgSSwJmqbvB/v8QrGAbN7IuH+GEfALxN4pib7PEC1n5iOLo9SMktd2UJ4O
- wzeOW7Te5V9CAlh7S6uOUCIbn4jV3imHtl6ShXU7iTtphJSRT7JGJHsAQxBJny1semAElTK6N
- 3d77+BZJHbvhlPjvhtHQLhFBA/tQAoJgars5pbEKg0OpUWs/mgwJdDnGcDGZI8rMwhuwHDvNY
- gSoo38wBbVU+LGJnKudvMBQeYfDtDfqz1sNZ5TJYm0iT/TJQd0QG2qUe8aNBqEZYXZkbdHMeq
- ul6yvzvU9DWguFXgcS51+UkxbfJenfQ2Ce6UoFo9gKpcCrubD1se9nCQUMi0L9Gxqi1GRqKoK
- zaH8Kw==
+Content-Transfer-Encoding: 7bit
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Mon, 1 Jan 2024 21:44:46 +0100
+So far only 32bit legacy bitmaps are passed to userspace. This makes
+it impossible to manage EEE linkmodes beyond bit 32, e.g. manage EEE
+for 2500BaseT and 5000BaseT. This series adds support for passing
+full linkmode bitmaps between kernel and userspace.
 
-The kfree() function was called in one case during error handling
-even if the passed variable contained a null pointer.
-This issue was detected by using the Coccinelle software.
+Fortunately the netlink-based part of ethtool is quite smart and no
+changes are needed in ethtool. However this applies to the netlink
+interface only, the ioctl interface for now remains restricted to
+legacy bitmaps.
 
-* Thus achieve an unlock operation by using the corresponding label.
+Next step will be adding support for the c45 EEE2 standard registers
+(3.21, 7.62, 7.63) to the genphy_c45 functions dealing with EEE.
+I have a follow-up series for this ready to be submitted.
 
-* Move two error code assignments to other places.
+Heiner Kallweit (5):
+  ethtool: add struct ethtool_keee and extend struct ethtool_eee
+  ethtool: add basic handling of struct ethtool_keee
+  ethtool: send EEE linkmode bitmaps to userspace
+  net: phy: c45: prepare genphy_c45_ethtool_set_eee for follow-up
+    extension
+  net: phy: c45: extend genphy_c45_ethtool_[set|get]_eee
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- net/iucv/iucv.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ drivers/net/phy/phy-c45.c    | 57 +++++++++++++++++----------
+ include/linux/ethtool.h      | 18 +++++++++
+ include/uapi/linux/ethtool.h |  4 +-
+ net/ethtool/eee.c            | 75 +++++++++++++++++++++++++-----------
+ 4 files changed, 109 insertions(+), 45 deletions(-)
 
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index 71ba309e05ee..09e78a57bab8 100644
-=2D-- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -543,13 +543,14 @@ static int iucv_enable(void)
- 	int cpu, rc;
-
- 	cpus_read_lock();
--	rc =3D -ENOMEM;
- 	alloc_size =3D iucv_max_pathid * sizeof(struct iucv_path);
- 	iucv_path_table =3D kzalloc(alloc_size, GFP_KERNEL);
--	if (!iucv_path_table)
--		goto out;
-+	if (!iucv_path_table) {
-+		rc =3D -ENOMEM;
-+		goto unlock;
-+	}
-+
- 	/* Declare per cpu buffers. */
--	rc =3D -EIO;
- 	for_each_online_cpu(cpu)
- 		smp_call_function_single(cpu, iucv_declare_cpu, NULL, 1);
- 	if (cpumask_empty(&iucv_buffer_cpumask))
-@@ -564,6 +565,7 @@ static int iucv_enable(void)
- out:
- 	kfree(iucv_path_table);
- 	iucv_path_table =3D NULL;
-+	rc =3D -EIO;
- 	goto unlock;
- }
-
-=2D-
+-- 
 2.43.0
 
 
