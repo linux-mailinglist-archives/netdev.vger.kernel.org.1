@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-60713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D67582141E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 15:50:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC59682141D
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 15:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89A931C20852
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 14:50:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42EAA1F2152C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 14:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9EE53A6;
-	Mon,  1 Jan 2024 14:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79E43D60;
+	Mon,  1 Jan 2024 14:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YnsUsB2R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRU4HqS/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F013A46A2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B67610B;
 	Mon,  1 Jan 2024 14:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 434E5C433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 39470C433C9;
 	Mon,  1 Jan 2024 14:50:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704120624;
-	bh=sMHSpifdInmPi4iD65LAeTh1jLi0FspVM/9ti5byvGI=;
+	bh=84zVv7Gqf5j87UUvjryQ5sM5uo0HSoFjURrt5TZBUPY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YnsUsB2R2ooT2B9cFSiSulL4y1IkhgRSiBeRqLbbSvI7Qvq+0J/9xin6z4ZyGUJnm
-	 bE9phFQRJMyAQjzvQCTYpvyApbYRpu0TuT6mzVQhaNBHk/uzxzzHghYWxRZ3pZ+2Ge
-	 wfdxU62JxpyZwVEHk43C+cT0iDjpE4DA7AQTJJzrOi3ankzvUZCMt8zz4xuhje6ze8
-	 AfdiDQzpFr6wWhRGzj3iAM+ZZo9jSp7sdfspIMB9sANvckPwPr+/tH3KFGzgRg/Iue
-	 n76nTuWlozkFO5w+xvy1Ivgp2jO6YHCy63ApVtGD5WrWTKQg/jDwrHrnx/gy3s4Sh/
-	 vCeJ3uATFOJBw==
+	b=KRU4HqS/leMTRc1TNTj8zOUSMEil6RRky/UPJ+vB/Zea6PKc1nD+OfCtaPwurLCC2
+	 5kWnZq859eZ+5Lq1uWdyBm0vxD2Jufc4eV5bOsgDkzxdrg/cxxp/0ZBafkdmqZZKTM
+	 uuRFNxJYWbIu8eD0O4AfuF1MvlY3ZmDv+mum+1soP9iXf2uxZbsCnreyvTDfZuEvVB
+	 iPkrMi6M5TZMOl8+/oWzP4EtfMwDV78tCbE3BKcIxnCkQ6pP+GwF7OxH3vMfkqgoc4
+	 5TpYdSqAIQ8Xt0cCGwDVlDk5vvfijbcnEO3sLpnWVZL6b6fmy5S5coJJZrjTx6E3I1
+	 Wpiq55BW907hw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 28EAAC4314C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 204E1DCB6CE;
 	Mon,  1 Jan 2024 14:50:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,16 +43,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] r8169: Fix PCI error on system resume
+Subject: Re: [PATCH] net/tcp_sigpool: Use kref_get_unless_zero()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170412062416.26004.12010057503783659969.git-patchwork-notify@kernel.org>
+ <170412062412.26004.3396143166150821142.git-patchwork-notify@kernel.org>
 Date: Mon, 01 Jan 2024 14:50:24 +0000
-References: <20231222043410.464730-1-kai.heng.feng@canonical.com>
-In-Reply-To: <20231222043410.464730-1-kai.heng.feng@canonical.com>
-To: Kai-Heng Feng <kai.heng.feng@canonical.com>
-Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+References: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
+In-Reply-To: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, 0x7f454c46@gmail.com,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
@@ -60,19 +60,22 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 22 Dec 2023 12:34:09 +0800 you wrote:
-> Some r8168 NICs stop working upon system resume:
+On Fri, 22 Dec 2023 01:13:59 +0000 you wrote:
+> The freeing and re-allocation of algorithm are protected by cpool_mutex,
+> so it doesn't fix an actual use-after-free, but avoids a deserved
+> refcount_warn_saturate() warning.
 > 
-> [  688.051096] r8169 0000:02:00.1 enp2s0f1: rtl_ep_ocp_read_cond == 0 (loop: 10, delay: 10000).
-> [  688.175131] r8169 0000:02:00.1 enp2s0f1: Link is Down
-> ...
-> [  691.534611] r8169 0000:02:00.1 enp2s0f1: PCI error (cmd = 0x0407, status_errs = 0x0000)
+> A trivial fix for the racy behavior.
+> 
+> Fixes: 8c73b26315aa ("net/tcp: Prepare tcp_md5sig_pool for TCP-AO")
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] r8169: Fix PCI error on system resume
-    https://git.kernel.org/netdev/net/c/9c476269bff2
+  - net/tcp_sigpool: Use kref_get_unless_zero()
+    https://git.kernel.org/netdev/net/c/b901a4e27694
 
 You are awesome, thank you!
 -- 
