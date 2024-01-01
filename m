@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-60712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC59682141D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 15:50:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2C1821421
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 15:51:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42EAA1F2152C
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 14:50:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 586E91F21422
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 14:51:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79E43D60;
-	Mon,  1 Jan 2024 14:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DC953AA;
+	Mon,  1 Jan 2024 14:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRU4HqS/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDvg1PPz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B67610B;
-	Mon,  1 Jan 2024 14:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 39470C433C9;
-	Mon,  1 Jan 2024 14:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08945BA32;
+	Mon,  1 Jan 2024 14:50:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 793DEC433C9;
+	Mon,  1 Jan 2024 14:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704120624;
-	bh=84zVv7Gqf5j87UUvjryQ5sM5uo0HSoFjURrt5TZBUPY=;
+	s=k20201202; t=1704120628;
+	bh=HbcxGgcXlMXuyxE+v86hhSd89k+aAiBh13RG/nYNOJA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KRU4HqS/leMTRc1TNTj8zOUSMEil6RRky/UPJ+vB/Zea6PKc1nD+OfCtaPwurLCC2
-	 5kWnZq859eZ+5Lq1uWdyBm0vxD2Jufc4eV5bOsgDkzxdrg/cxxp/0ZBafkdmqZZKTM
-	 uuRFNxJYWbIu8eD0O4AfuF1MvlY3ZmDv+mum+1soP9iXf2uxZbsCnreyvTDfZuEvVB
-	 iPkrMi6M5TZMOl8+/oWzP4EtfMwDV78tCbE3BKcIxnCkQ6pP+GwF7OxH3vMfkqgoc4
-	 5TpYdSqAIQ8Xt0cCGwDVlDk5vvfijbcnEO3sLpnWVZL6b6fmy5S5coJJZrjTx6E3I1
-	 Wpiq55BW907hw==
+	b=fDvg1PPzrFBFDkQG1t6bVUqawEdQyoQ6f7wWwixCFGr58/xQj9qsh1BMVhoE4O/Np
+	 xFa20YXyc4KAhX3ogYmwF0pcFXe9CLD4AnyYyi8+gR/nD8lY2Y/VRGZmv24V4WhnNg
+	 o9igBO8tfb0IthMHYSXa5xjNQZnTnF3cXZUV3TT2v8Txz2WYHS9jwxwqyk1k+jLThn
+	 gnT3wQoJ7kXji+tKZFHfheq36NacYgUTPDBg5QnDBHECi6ihNXwzqM7pidmzTYPJZP
+	 IIJNIHsQ5umSm57NpiCwDOOKedK4kuCvvzwCTi5NG0+/g3SvTRCiUj7/MjT2J05noc
+	 ydtsIvIyBv++Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 204E1DCB6CE;
-	Mon,  1 Jan 2024 14:50:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6824DDCB6CE;
+	Mon,  1 Jan 2024 14:50:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,39 +43,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/tcp_sigpool: Use kref_get_unless_zero()
+Subject: Re: pull-request: bpf-next 2023-12-22
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170412062412.26004.3396143166150821142.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Jan 2024 14:50:24 +0000
-References: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
-In-Reply-To: <20231222-tcp-ao-kref_get_unless_zero-v1-1-551c2edd0136@arista.com>
-To: Dmitry Safonov <dima@arista.com>
-Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
- kuba@kernel.org, pabeni@redhat.com, 0x7f454c46@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <170412062842.26004.12319099416295349301.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Jan 2024 14:50:28 +0000
+References: <20231222085416.5438-1-daniel@iogearbox.net>
+In-Reply-To: <20231222085416.5438-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 22 Dec 2023 01:13:59 +0000 you wrote:
-> The freeing and re-allocation of algorithm are protected by cpool_mutex,
-> so it doesn't fix an actual use-after-free, but avoids a deserved
-> refcount_warn_saturate() warning.
+On Fri, 22 Dec 2023 09:54:16 +0100 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> A trivial fix for the racy behavior.
+> The following pull-request contains BPF updates for your *net-next* tree.
 > 
-> Fixes: 8c73b26315aa ("net/tcp: Prepare tcp_md5sig_pool for TCP-AO")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> We've added 22 non-merge commits during the last 3 day(s) which contain
+> a total of 23 files changed, 652 insertions(+), 431 deletions(-).
 > 
 > [...]
 
 Here is the summary with links:
-  - net/tcp_sigpool: Use kref_get_unless_zero()
-    https://git.kernel.org/netdev/net/c/b901a4e27694
+  - pull-request: bpf-next 2023-12-22
+    https://git.kernel.org/netdev/net-next/c/240436c06ce9
 
 You are awesome, thank you!
 -- 
