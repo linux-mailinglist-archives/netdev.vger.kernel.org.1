@@ -1,83 +1,124 @@
-Return-Path: <netdev+bounces-60718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C79382144D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 17:10:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCE27821475
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 17:34:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA90F2819B2
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 16:10:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AF371F21702
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 16:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB4D63A0;
-	Mon,  1 Jan 2024 16:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Acp1N/4y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319E7613D;
+	Mon,  1 Jan 2024 16:34:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92296123;
-	Mon,  1 Jan 2024 16:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 25C9EC433C9;
-	Mon,  1 Jan 2024 16:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704125424;
-	bh=ic+w3LPlgjH3sWSog/mFAUeMZjqxZrc7Qv7sWaA0DuA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Acp1N/4ycD89S20jllMY/sy9qM7GxBdYBY0YOlHZFG6ne3LyATFYLRqlMKpRdvl3T
-	 E/BLJDa9usF4x4y7QsMo6fbuoaUkkswl7uRfHU4TcfI8j2mEKvpOI++c1YIDQK9qLq
-	 GepjyxaA+OQSeeYSedL6UuMKbHtFftQ/4PvpmPNev3m4tvlf+B207Z9RTOyvW9H7zu
-	 1GJCuCEzbvCfEAnZ00aKEyVrO7aVMJoYuho0gL9DejI0gWWfCQ3vFX5uSfTb2amjSu
-	 IBXQJdeemrXF49duH4OxrKYh1DlIagzGvTYaAVYXII1wWKDewaAPzFonPbhOTS9eO/
-	 EZyN6ETV2kq7g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 069B4C4314C;
-	Mon,  1 Jan 2024 16:10:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6627F8BEC
+	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 16:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-203-kjforqtyMaePgnFYa79FrA-1; Mon, 01 Jan 2024 16:33:58 +0000
+X-MC-Unique: kjforqtyMaePgnFYa79FrA-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 1 Jan
+ 2024 16:33:34 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 1 Jan 2024 16:33:34 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>, Markus Elfring
+	<Markus.Elfring@web.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Stephen
+ Hemminger" <stephen@networkplumber.org>
+CC: LKML <linux-kernel@vger.kernel.org>
+Subject: RE: packet: Improve exception handling in fanout_add()
+Thread-Topic: packet: Improve exception handling in fanout_add()
+Thread-Index: AQHaPMdEXQvPcsiVWUu1iBz3bxTbObDFHIww
+Date: Mon, 1 Jan 2024 16:33:34 +0000
+Message-ID: <25b3322081b64bd2a610f76f71de30f7@AcuMS.aculab.com>
+References: <828bb442-29d0-4bb8-b90d-f200bdd4faf6@web.de>
+ <6591e0fcb089f_21410c2946c@willemb.c.googlers.com.notmuch>
+ <a69fce11-68c2-446c-9da8-b959bb3ba70f@web.de>
+ <6592da5178589_238b0d2943a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6592da5178589_238b0d2943a@willemb.c.googlers.com.notmuch>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] MAINTAINERS: step down as TJA11XX C45 maintainer
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170412542402.28310.1781055624628353422.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Jan 2024 16:10:24 +0000
-References: <20231221154419.141374-1-radu-nicolae.pirea@oss.nxp.com>
-In-Reply-To: <20231221154419.141374-1-radu-nicolae.pirea@oss.nxp.com>
-To: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- andrei.botila@oss.nxp.com, sebastian.tobuschat@oss.nxp.com,
- pirea.radu@gmail.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 21 Dec 2023 17:44:19 +0200 you wrote:
-> I am stepping down as TJA11XX C45 maintainer.
-> Andrei Botila will take the responsibility to maintain and improve the
-> support for TJA11XX C45 PHYs.
-> 
-> Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Here is the summary with links:
-  - MAINTAINERS: step down as TJA11XX C45 maintainer
-    https://git.kernel.org/netdev/net/c/82585d5e2af1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+RnJvbTogV2lsbGVtIGRlIEJydWlqbg0KPiBTZW50OiAwMSBKYW51YXJ5IDIwMjQgMTU6MjkNCj4g
+DQo+IE1hcmt1cyBFbGZyaW5nIHdyb3RlOg0KPiA+ID4gSXQgaXMgZmluZSB0byBjYWxsIGtmcmVl
+IHdpdGggYSBwb3NzaWJsZSBOVUxMIHBvaW50ZXI6DQo+ID4g4oCmDQo+ID4gPiAJICogSWYgQG9i
+amVjdCBpcyBOVUxMLCBubyBvcGVyYXRpb24gaXMgcGVyZm9ybWVkLg0KPiA+ID4gCSAqLw0KPiA+
+ID4gCXZvaWQga2ZyZWUoY29uc3Qgdm9pZCAqb2JqZWN0KQ0KPiA+DQo+ID4gU3VjaCBhIGZ1bmN0
+aW9uIGNhbGwgdHJpZ2dlcnMgYW4gaW5wdXQgcGFyYW1ldGVyIHZhbGlkYXRpb24NCj4gPiB3aXRo
+IGEgY29ycmVzcG9uZGluZyBpbW1lZGlhdGUgcmV0dXJuLCBkb2Vzbid0IGl0Pw0KPiA+IERvIHlv
+dSBmaW5kIHN1Y2ggZGF0YSBwcm9jZXNzaW5nIHJlYWxseSBoZWxwZnVsIGZvciB0aGUgZGVzaXJl
+ZCBlcnJvci9leGNlcHRpb24gaGFuZGxpbmc/DQo+IA0KPiBJdCdzIG5vdCBqdXN0IHBlcnNvbmFs
+IHByZWZlcmVuY2UuIEl0IGlzIGFuIGVzdGFibGlzaGVkIHBhdHRlcm4gdG8NCj4gYXZvaWQgZXh0
+cmEgTlVMTCB0ZXN0cyBhcm91bmQga2ZyZWUuDQo+IA0KPiBBIHF1aWNrIGdpdCBsb2cgdG8gc2hv
+dyBhIGZldyByZWNlbnQgZXhhbXBsZXMgb2YgcGF0Y2hlcyB0aGF0IGV4cHJlc3NseQ0KPiByZW1v
+dmUgc3VjaCBicmFuY2hlcywgZS5nLiwNCj4gDQo+IGNvbW1pdCBkMDExMDQ0M2NmNGEgKCJhbWQv
+cGRzX2NvcmU6IGNvcmU6IE5vIG5lZWQgZm9yIE51bGwgcG9pbnRlciBjaGVjayBiZWZvcmUga2Zy
+ZWUiKQ0KPiBjb21taXQgZWZkOWQwNjVkZTY3ICgiZHJtL3JhZGVvbjogUmVtb3ZlIHVubmVjZXNz
+YXJ5IE5VTEwgdGVzdCBiZWZvcmUga2ZyZWUgaW4NCj4gJ3JhZGVvbl9jb25uZWN0b3JfZnJlZV9l
+ZGlkJyIpDQo+IA0KPiBBbiBpbnRlcmVzdGluZyBvbGRlciB0aHJlYWQgb24gdGhlIHRvcGljOg0K
+PiANCj4gaHR0cHM6Ly9saW51eC1rZXJuZWwudmdlci5rZXJuZWwubmFya2l2ZS5jb20vS1ZqbERz
+VG8va2ZyZWUtbnVsbA0KDQpUaGF0IGFjdHVhbGx5IGZhaWxzIHRvIG5vdGUgdGhhdCBpZiB0aGUg
+Y2FsbCBzaXRlIGNvbnRhaW5zIHRoZQ0KY29uZGl0aW9uYWwgKGV4cGxpY2l0bHkgb3IgZnJvbSBh
+ICNkZWZpbmUvc3RhdGljIGlubGluZSkgdGhlbiBnY2MNCndpbGwgb3B0aW1pc2UgdGhlIHRlc3Qg
+YXdheSBpZiBpdCBjYW4gZGV0ZXJtaW5lIHRoYXQgdGhlIHBvaW50ZXINCmlzIE5VTEwgKGZyb20g
+YW4gZWFybGllciB0ZXN0KSBvciBub24tTlVMTCAoaGFzIGJlZW4gZGVyZWZlcmVuY2VkKS4NClBv
+c3NpYmx5IGJlY2F1c2UgZ2NjIGRpZG4ndCBkbyB0aGF0IDE4IHllYXJzIGFnby4NCg0KPiBNeSBz
+dW1tYXJ5LCB0aGUgbWFueSBicmFuY2hlcyBzY2F0dGVyZWQgdGhyb3VnaG91dCB0aGUga2VybmVs
+IGxpa2VseQ0KPiBhcmUgbW9yZSBleHBlbnNpdmUgdGhhbiB0aGUgb2NjYXNpb25hbCBzYXZlIGZy
+b20gc2VlaW5nIHRoZSByYXJlIE5VTEwNCj4gcG9pbnRlci4NCg0KRXNwZWNpYWxseSBpbiBlcnJv
+ciBwYXRocyBvciB3aGVyZSB0aGUgbm9ybWFsIGNhc2UgaXMgdGhhdCB0aGUgcG9pbnRlcg0KaXMg
+YWxsb2NhdGVkLg0KDQpBYm91dCB0aGUgb25seSBwbGFjZSB3aGVyZSBhIGNoZWNrIGluIHRoZSBj
+YWxsZXIgbWF5IG1ha2Ugc2Vuc2UgaXMNCmZvciBmcmVxdWVudGx5IHVzZWQgY29kZSBwYXRocyB3
+aGVyZSB0aGUgcG9pbnRlciBpcyBub3JtYWxseSBOVUxMLg0KT25lIGV4YW1wbGUgd291bGQgYmUg
+dGhlIGNvZGUgdGhhdCByZWFkcyBhbiBpb3ZlY1tdIGZyb20gdXNlciBzcGFjZS4NCkFuIG9uLXN0
+YWNrIGFycmF5IGlzIHVzZWQgZm9yIHNtYWxsIChzYW5lKSBmcmFnbWVudCBjb3VudHMgd2l0aA0K
+a21hbGxvYygpIGJlaW5nIGNhbGxlZCBmb3IgbGFyZ2UgY291bnRzLg0KSW4gdGhhdCBjYXNlIGhh
+dmluZyAnaWYgKHVubGlrZWx5KHB0cikpIGtmcmVlKHB0cik7JyB3aWxsIHByb2JhYmx5DQpnZW5l
+cmF0ZSBjb2RlIHRoYXQgaXMgbWVhc3VyYWJseSBmYXN0ZXIuDQooRXNwZWNpYWxseSBpZiB0aGVy
+ZSBhcmUgbWl0aWdhdGlvbnMgZm9yICdyZXQnLikNCg0KSSBhbHNvIGJlbGlldmUgdGhhdCBsaWtl
+bHkvdW5saWtlbHkgaGF2ZSBhbG1vc3Qgbm8gZWZmZWN0IG9uIG1vZGVybiB4ODYuDQood2FzIGl0
+IHRoZSBQLVBybyB0aGF0IHVzZWQgcHJlZml4IGZvciBzdGF0aWMgcHJlZGljdGlvbj8pDQpJSVJD
+IHRoZXJlIGlzIG5vICdzdGF0aWMgcHJlZGljdGlvbicgLSBwcmVkaWN0aW9uIGlzIGJhc2VkIG9u
+IHdoYXRldmVyDQonc2V0IG9mIGJyYW5jaGVzJyB0aGUgY3VycmVudCBicmFuY2ggYWxhc2VzIHRv
+Lg0KVGhlIG9ubHkgc2xpZ2h0IGdhaW4gaXMgdGhhdCB0aGUgJ2ZhbGwgdGhyb3VnaCcgcGF0aCBp
+cyBsZXNzIGxpa2VseQ0KdG8gc3RhbGwgZHVlIHRvIGEgY2FjaGUgbWlzcy4gQnV0IGV2ZW4gdGhh
+dCBjYW4gYmUgZmFyIGVub3VnaCBhaGVhZA0Kb2YgdGhlIG5vbi1zcGVjdWxhdGl2ZSBleGVjdXRp
+b24gcG9pbnQgdGhhdCB0aGUgYWN0dWFsIHN0YWxsIGlzIHNtYWxsLg0KDQpPZiBjb3Vyc2Ugb3Ro
+ZXIgc2ltcGxlciBjcHUgZG8gaGF2ZSBzdGF0aWMgcHJlZGljdGlvbiBydWxlcy4NCkNvbW1vbiB3
+b3VsZCBiZSB0byBwcmVkaWN0IGJhY2t3YXJkcyBicmFuY2hlcyB0YWtlbiAoZWcgbG9vcHMpDQph
+bmQgZm9yd2FyZHMgb25lcyBub3QtdGFrZW4uDQpJZiB5b3UgcmVhbGx5IGRvIGNhcmUgKGVzcGVj
+aWFsbHkgaWYgeW91J3ZlIGRpc2FibGVkIGFueSBkeW5hbWljIHByZWRpY3Rpb24NCmluIG9yZGVy
+IHRvIGdldCBtZWFzdXJhYmxlIGV4ZWN1dGlvbiB0aW1lcykgdGhlbiB5b3UgY2FuIG5lZWQgdG8g
+YWRkDQooZWcpIGFzbSBjb21tZW50cyB0byBmb3JjZSBhIHByZWRpY3RlZCBub3QtdGFrZW4gZm9y
+d2FyZHMgYnJhbmNoIHRvDQphbiB1bmNvbmRpdGlvbmFsIGJhY2t3YXJkcyBicmFuY2ggdG8gYXZv
+aWQgYSAncHJlZGljdGVkIHRha2VuJyBiYWNrd2FyZA0KYnJhbmNoLg0KDQoJRGF2aWQNCg0KLQ0K
+UmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1p
+bHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVz
+KQ0K
 
 
