@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-60754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8560A82156A
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 22:24:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCD582156B
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 22:25:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A1D41C20D16
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 21:24:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FE981F212CB
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 21:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F50DF5E;
-	Mon,  1 Jan 2024 21:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76113DF64;
+	Mon,  1 Jan 2024 21:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cAMrSMP5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MaODmZt9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7620DF60
-	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 21:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9F7DF66
+	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 21:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a26ed1e05c7so648814666b.2
-        for <netdev@vger.kernel.org>; Mon, 01 Jan 2024 13:24:38 -0800 (PST)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a1915034144so997325066b.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jan 2024 13:25:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704144277; x=1704749077; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704144322; x=1704749122; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iHSgEkLdYBW2aYRpBaZXyH/qFOleDjrda0bZqZExYcg=;
-        b=cAMrSMP5LroIrZ1YBmkYYz/dFmUQOcCzcezUc4IDnpbwqIY/iuuoPtf99L7m+/sh/G
-         /gEd4YSsXH3IWdj3/CJXRxW3k9lb6sKOJ0PPU3IrZHNldYSSQ7mvqQLg/ZyILBtHcs88
-         H/oONiDc1zzwonLNPXQ6bXVSDn8kzJ2V0yD08o6HAWoKZb7qx1Exd/G/lE9fA1z1J7JL
-         orRMNi0DH7GWXPwTMyP0M+lBBm1jfWN4GViQZaE9OZdLf/PIDdKAwwmxdrsex/1DLHjC
-         ZS3mRktwXxjTaVVTOTI56Z3sofL9f+7ztwwUqLNbtN+OeZNPFfexTJKnIpOKHo3rE08S
-         jiDQ==
+        bh=QYHIobGk7BDvDTxbrppXHW8idoNQohLK2Dv5uSxy+rk=;
+        b=MaODmZt9lK8LCv/Pr60cBe8nmlJmTGhFMRnujwKtFm+Xk4yHGj1F+hZEmDZXOlrLcG
+         WOUGVBeItrPexCiW0RQ2iYm0G1HJQ16r6VM6MTYJZu1t+cuLUk7oj0VM0r7JAlZ/N/ye
+         kS8WAu4bJTREmid7DkLhVuu4/BE8aeconfT27LS2yh+dB5OrOWjMuCFL6Z9mUlbA4BpK
+         r1ygbGJMDosgK0zDDeqbza6eZX2VpZfsfAT0GVjaNiPq8Xkj6+J+45V0cuvXhGwRMqWi
+         oSZu3OwtzTVRNZo80rr8g5eTECKxrDeR9hu/93yW8av3heBWIei+QcOMXLQe+b+SygxT
+         zbEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704144277; x=1704749077;
+        d=1e100.net; s=20230601; t=1704144322; x=1704749122;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=iHSgEkLdYBW2aYRpBaZXyH/qFOleDjrda0bZqZExYcg=;
-        b=dOCPovMPynD4xOF/AVypvxGVxtB/vXsvLDiWRbZ4IAPTtquS8NfEsXr9G731NpTaWF
-         /awKWhM/OWftqT5hjLt7yd9HwZvSvKhK5hDIoTViBkXb+iq7Fd07rhrtf6XrlK0WDqV8
-         MjPmvwzYA2m9x/0oeRsfQGMBLiCn4MmAlRbBSJv2RtBglymfnsKFaqctB5K25dcWQHEN
-         yT4RCGaCWyitq+WCQS6nZC0GbW00sX/GImKZnxqnFmtVu7V8NgrvzJ3560nF0u4GC5jM
-         MaGuO0h597tLaGz7qgrloxiynfAkdsv57vG65+qOg14xWKMK9e2bmCnFaybp1Ajbhyzr
-         XesQ==
-X-Gm-Message-State: AOJu0Ywi/DJtY0wlqoxg2vEEtdqFYYBaJUwzLjU7FBlVGGcCzCiLMBe6
-	bquRpi5EOGtsqV1mCIJ0apk=
-X-Google-Smtp-Source: AGHT+IHk0Z/Nx+80eqvm04MN6pgG+OcxUjHEkPw5KJicgdY/YR/lfNZONLQ0egWa/4inGC48oEdeQg==
-X-Received: by 2002:a17:906:2807:b0:a26:9876:ae88 with SMTP id r7-20020a170906280700b00a269876ae88mr4435893ejc.73.1704144276767;
-        Mon, 01 Jan 2024 13:24:36 -0800 (PST)
+        bh=QYHIobGk7BDvDTxbrppXHW8idoNQohLK2Dv5uSxy+rk=;
+        b=dRBdK3BinuPd+Z1P6t9X1HdycwoQ9/oaxBRiP8WyYQvccJijevtQAieVJalHfrLqrj
+         zsarR8cDk6GFcEL6S2s+i2ctDXlzvQOCk1wolEi1j0TOC6Sa7CzsF8m5SnemIRljMzx4
+         vrjKnh+tq4JHoAipHVi+8cpUGBes6wfWJuoJrmKqqocxouy6WMDBQLJ8o1+IMK2g2kDG
+         63BI+P7H2wkxWA3U13bLa8MuiVnRVMmo9WdBJ7+TQ49vEaW78nXoB63oR8EmPDJCIX3i
+         Y1nno4JDJ+xoyK8RFqONxQaQ0gqG8E3+4cHe7396FEsaD+LwOBdzzgdRnj5JokE7PG5/
+         1nzw==
+X-Gm-Message-State: AOJu0YzoOBxiqxTki8byAxajVpiUXv4ZXopcL7UMQqRTcp3PPR+ENJ5B
+	G13GkrQnv78Y8a40dBjpbf0=
+X-Google-Smtp-Source: AGHT+IHvlftXjHsO1p0UhByzwZzvQAO8P7evROOYI0YkzQscfXAzp/gPIJSm6CU4sL7HFmi/dBjyGw==
+X-Received: by 2002:a17:906:1318:b0:a27:d936:f5ef with SMTP id w24-20020a170906131800b00a27d936f5efmr1238422ejb.62.1704144322055;
+        Mon, 01 Jan 2024 13:25:22 -0800 (PST)
 Received: from ?IPV6:2a01:c22:6e6b:b000:65c3:c8c0:cae3:f9e1? (dynamic-2a01-0c22-6e6b-b000-65c3-c8c0-cae3-f9e1.c22.pool.telefonica.de. [2a01:c22:6e6b:b000:65c3:c8c0:cae3:f9e1])
-        by smtp.googlemail.com with ESMTPSA id fv14-20020a170907508e00b00a269f8e8869sm11159750ejc.128.2024.01.01.13.24.36
+        by smtp.googlemail.com with ESMTPSA id fv14-20020a170907508e00b00a269f8e8869sm11159750ejc.128.2024.01.01.13.25.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jan 2024 13:24:36 -0800 (PST)
-Message-ID: <c2a3aa5c-0c12-4aaf-8a44-05f015e718bd@gmail.com>
-Date: Mon, 1 Jan 2024 22:24:36 +0100
+        Mon, 01 Jan 2024 13:25:21 -0800 (PST)
+Message-ID: <d30cfde6-de90-4a64-b8e3-ebb142e08371@gmail.com>
+Date: Mon, 1 Jan 2024 22:25:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/5] ethtool: add basic handling of struct
- ethtool_keee
+Subject: [PATCH net-next 3/5] ethtool: send EEE linkmode bitmaps to userspace
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>,
@@ -123,104 +122,103 @@ In-Reply-To: <783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is in preparation of follow-up functional changes, and it adds
-basic handling of struct ethtool_keee. No functional change intended.
+Fortunately, for sending EEE linkmode bitmaps to userspace, no changes
+to the netlink attributes are needed. We just increase the size of the
+sent bitmaps. For backward compatibility, if keee->use_link_modes is
+false, copy the legacy bitmaps to keee->link_modes before sending
+the linkmode bitmaps to userspace.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- net/ethtool/eee.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+ net/ethtool/eee.c | 48 ++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 35 insertions(+), 13 deletions(-)
 
 diff --git a/net/ethtool/eee.c b/net/ethtool/eee.c
-index 2853394d0..9b34d3310 100644
+index 9b34d3310..38b151146 100644
 --- a/net/ethtool/eee.c
 +++ b/net/ethtool/eee.c
-@@ -13,7 +13,7 @@ struct eee_req_info {
- 
- struct eee_reply_data {
- 	struct ethnl_reply_data		base;
--	struct ethtool_eee		eee;
-+	struct ethtool_keee		keee;
- };
- 
- #define EEE_REPDATA(__reply_base) \
-@@ -30,14 +30,17 @@ static int eee_prepare_data(const struct ethnl_req_info *req_base,
- {
- 	struct eee_reply_data *data = EEE_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-+	struct ethtool_keee *keee = &data->keee;
-+	struct ethtool_eee *eee = &keee->eee;
- 	int ret;
- 
-+	eee->is_member_of_keee = 1;
- 	if (!dev->ethtool_ops->get_eee)
- 		return -EOPNOTSUPP;
- 	ret = ethnl_ops_begin(dev);
- 	if (ret < 0)
- 		return ret;
--	ret = dev->ethtool_ops->get_eee(dev, &data->eee);
-+	ret = dev->ethtool_ops->get_eee(dev, eee);
+@@ -43,6 +43,15 @@ static int eee_prepare_data(const struct ethnl_req_info *req_base,
+ 	ret = dev->ethtool_ops->get_eee(dev, eee);
  	ethnl_ops_complete(dev);
  
++	if (!ret && !keee->use_link_modes) {
++		ethtool_convert_legacy_u32_to_link_mode(keee->link_modes.supported,
++							eee->supported);
++		ethtool_convert_legacy_u32_to_link_mode(keee->link_modes.advertising,
++							eee->advertised);
++		ethtool_convert_legacy_u32_to_link_mode(keee->link_modes.lp_advertising,
++							eee->lp_advertised);
++	}
++
  	return ret;
-@@ -48,7 +51,8 @@ static int eee_reply_size(const struct ethnl_req_info *req_base,
- {
- 	bool compact = req_base->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
- 	const struct eee_reply_data *data = EEE_REPDATA(reply_base);
--	const struct ethtool_eee *eee = &data->eee;
-+	const struct ethtool_keee *keee = &data->keee;
-+	const struct ethtool_eee *eee = &keee->eee;
- 	int len = 0;
- 	int ret;
- 
-@@ -84,7 +88,8 @@ static int eee_fill_reply(struct sk_buff *skb,
- {
- 	bool compact = req_base->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
- 	const struct eee_reply_data *data = EEE_REPDATA(reply_base);
--	const struct ethtool_eee *eee = &data->eee;
-+	const struct ethtool_keee *keee = &data->keee;
-+	const struct ethtool_eee *eee = &keee->eee;
- 	int ret;
- 
- 	ret = ethnl_put_bitset32(skb, ETHTOOL_A_EEE_MODES_OURS,
-@@ -132,28 +137,30 @@ ethnl_set_eee(struct ethnl_req_info *req_info, struct genl_info *info)
- {
- 	struct net_device *dev = req_info->dev;
- 	struct nlattr **tb = info->attrs;
--	struct ethtool_eee eee = {};
-+	struct ethtool_keee keee = {};
-+	struct ethtool_eee *eee = &keee.eee;
- 	bool mod = false;
- 	int ret;
- 
--	ret = dev->ethtool_ops->get_eee(dev, &eee);
-+	eee->is_member_of_keee = 1;
-+	ret = dev->ethtool_ops->get_eee(dev, eee);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = ethnl_update_bitset32(&eee.advertised, EEE_MODES_COUNT,
-+	ret = ethnl_update_bitset32(&eee->advertised, EEE_MODES_COUNT,
- 				    tb[ETHTOOL_A_EEE_MODES_OURS],
- 				    link_mode_names, info->extack, &mod);
- 	if (ret < 0)
- 		return ret;
--	ethnl_update_bool32(&eee.eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
--	ethnl_update_bool32(&eee.tx_lpi_enabled,
-+	ethnl_update_bool32(&eee->eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
-+	ethnl_update_bool32(&eee->tx_lpi_enabled,
- 			    tb[ETHTOOL_A_EEE_TX_LPI_ENABLED], &mod);
--	ethnl_update_u32(&eee.tx_lpi_timer, tb[ETHTOOL_A_EEE_TX_LPI_TIMER],
-+	ethnl_update_u32(&eee->tx_lpi_timer, tb[ETHTOOL_A_EEE_TX_LPI_TIMER],
- 			 &mod);
- 	if (!mod)
- 		return 0;
- 
--	ret = dev->ethtool_ops->set_eee(dev, &eee);
-+	ret = dev->ethtool_ops->set_eee(dev, eee);
- 	return ret < 0 ? ret : 1;
  }
  
+@@ -62,14 +71,17 @@ static int eee_reply_size(const struct ethnl_req_info *req_base,
+ 		     EEE_MODES_COUNT);
+ 
+ 	/* MODES_OURS */
+-	ret = ethnl_bitset32_size(&eee->advertised, &eee->supported,
+-				  EEE_MODES_COUNT, link_mode_names, compact);
++	ret = ethnl_bitset_size(keee->link_modes.advertising,
++				keee->link_modes.supported,
++				__ETHTOOL_LINK_MODE_MASK_NBITS,
++				link_mode_names, compact);
+ 	if (ret < 0)
+ 		return ret;
+ 	len += ret;
+ 	/* MODES_PEERS */
+-	ret = ethnl_bitset32_size(&eee->lp_advertised, NULL,
+-				  EEE_MODES_COUNT, link_mode_names, compact);
++	ret = ethnl_bitset_size(keee->link_modes.lp_advertising, NULL,
++				__ETHTOOL_LINK_MODE_MASK_NBITS,
++				link_mode_names, compact);
+ 	if (ret < 0)
+ 		return ret;
+ 	len += ret;
+@@ -92,14 +104,17 @@ static int eee_fill_reply(struct sk_buff *skb,
+ 	const struct ethtool_eee *eee = &keee->eee;
+ 	int ret;
+ 
+-	ret = ethnl_put_bitset32(skb, ETHTOOL_A_EEE_MODES_OURS,
+-				 &eee->advertised, &eee->supported,
+-				 EEE_MODES_COUNT, link_mode_names, compact);
++	ret = ethnl_put_bitset(skb, ETHTOOL_A_EEE_MODES_OURS,
++			       keee->link_modes.advertising,
++			       keee->link_modes.supported,
++			       __ETHTOOL_LINK_MODE_MASK_NBITS,
++			       link_mode_names, compact);
+ 	if (ret < 0)
+ 		return ret;
+-	ret = ethnl_put_bitset32(skb, ETHTOOL_A_EEE_MODES_PEER,
+-				 &eee->lp_advertised, NULL, EEE_MODES_COUNT,
+-				 link_mode_names, compact);
++	ret = ethnl_put_bitset(skb, ETHTOOL_A_EEE_MODES_PEER,
++			       keee->link_modes.lp_advertising, NULL,
++			       __ETHTOOL_LINK_MODE_MASK_NBITS,
++			       link_mode_names, compact);
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -147,9 +162,16 @@ ethnl_set_eee(struct ethnl_req_info *req_info, struct genl_info *info)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	ret = ethnl_update_bitset32(&eee->advertised, EEE_MODES_COUNT,
+-				    tb[ETHTOOL_A_EEE_MODES_OURS],
+-				    link_mode_names, info->extack, &mod);
++	if (keee.use_link_modes) {
++		ret = ethnl_update_bitset(keee.link_modes.advertising,
++					  __ETHTOOL_LINK_MODE_MASK_NBITS,
++					  tb[ETHTOOL_A_EEE_MODES_OURS],
++					  link_mode_names, info->extack, &mod);
++	} else {
++		ret = ethnl_update_bitset32(&eee->advertised, EEE_MODES_COUNT,
++					    tb[ETHTOOL_A_EEE_MODES_OURS],
++					    link_mode_names, info->extack, &mod);
++	}
+ 	if (ret < 0)
+ 		return ret;
+ 	ethnl_update_bool32(&eee->eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
 -- 
 2.43.0
 
