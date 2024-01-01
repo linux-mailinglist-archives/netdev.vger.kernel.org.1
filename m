@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-60742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B252821525
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 20:10:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0716821524
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 20:09:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ED1D1C20C8E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 19:10:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C1541F21369
+	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 19:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD879D53B;
-	Mon,  1 Jan 2024 19:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC114D536;
+	Mon,  1 Jan 2024 19:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LoSwZfGD"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="oTgG1wbc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596E7DDA5
-	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 19:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8EED53B
+	for <netdev@vger.kernel.org>; Mon,  1 Jan 2024 19:09:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1704136196; x=1735672196;
+  t=1704136195; x=1735672195;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SyKQVq9q/BR2vhGd8rEv8IPKFho0NFUEAZcaS76Qp1E=;
-  b=LoSwZfGD1zp5ANBxAgJa421UQwqQz9a5O8FDRlB1vyomvT6ZviyESlCl
-   5fU5xXheyaQJ1/GVTGrfYbHPCeD6A+ij2CLYIq7PFHPx/3KILS6tUSI0S
-   x2/JVozhK1oNkHP+34jMsmAvZPvqlF4KRZI8IIqSL7VitcynTVy4NNMXt
-   M=;
+  bh=HHgHU0gPLlD9f3cMWo1rD8AAnY/5mOYfVdgcEdxUFPw=;
+  b=oTgG1wbcWcrOzVddgat7doxeCjvYOXdfqzf/2OKu/5zoU5tuke9VNoWJ
+   akFKbE0n2xfkOtdBenxcXd7syoWwMbuhQbLtcopHTwLrOR+9ee/qTRg54
+   H/GpXjww98tEi7gfP7e36MMlyLTAyFzzKqlzHeEqutt/4cnMUeNHr21h7
+   4=;
 X-IronPort-AV: E=Sophos;i="6.04,322,1695686400"; 
-   d="scan'208";a="694277460"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jan 2024 19:09:50 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com (Postfix) with ESMTPS id 94B7C40E52;
-	Mon,  1 Jan 2024 19:09:50 +0000 (UTC)
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:62594]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.87:2525] with esmtp (Farcaster)
- id 274c729c-ed31-4ec6-bcda-bce94d0a0696; Mon, 1 Jan 2024 19:09:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 274c729c-ed31-4ec6-bcda-bce94d0a0696
-Received: from EX19D002UWA001.ant.amazon.com (10.13.138.247) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+   d="scan'208";a="625075897"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jan 2024 19:09:52 +0000
+Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com (Postfix) with ESMTPS id 236AFA4C5C;
+	Mon,  1 Jan 2024 19:09:51 +0000 (UTC)
+Received: from EX19MTAUEA001.ant.amazon.com [10.0.29.78:8871]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.16.156:2525] with esmtp (Farcaster)
+ id 39a94a3f-7488-4977-86b2-eeecbd4f179f; Mon, 1 Jan 2024 19:09:50 +0000 (UTC)
+X-Farcaster-Flow-ID: 39a94a3f-7488-4977-86b2-eeecbd4f179f
+Received: from EX19D008UEA001.ant.amazon.com (10.252.134.62) by
+ EX19MTAUEA001.ant.amazon.com (10.252.134.203) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 1 Jan 2024 19:09:43 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
- EX19D002UWA001.ant.amazon.com (10.13.138.247) with Microsoft SMTP Server
+ 15.2.1118.40; Mon, 1 Jan 2024 19:09:47 +0000
+Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
+ EX19D008UEA001.ant.amazon.com (10.252.134.62) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 1 Jan 2024 19:09:42 +0000
+ 15.2.1118.40; Mon, 1 Jan 2024 19:09:47 +0000
 Received: from dev-dsk-darinzon-1c-05962a8d.eu-west-1.amazon.com
- (172.19.80.187) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
- Server id 15.2.1118.40 via Frontend Transport; Mon, 1 Jan 2024 19:09:40 +0000
+ (172.19.80.187) by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP
+ Server id 15.2.1118.40 via Frontend Transport; Mon, 1 Jan 2024 19:09:45 +0000
 From: <darinzon@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<netdev@vger.kernel.org>
@@ -67,9 +67,9 @@ CC: David Arinzon <darinzon@amazon.com>, "Woodhouse, David" <dwmw@amazon.com>,
 	"Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>,
 	"Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny"
 	<evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>
-Subject: [PATCH v2 net-next 07/11] net: ena: Refactor napi functions
-Date: Mon, 1 Jan 2024 19:08:51 +0000
-Message-ID: <20240101190855.18739-8-darinzon@amazon.com>
+Subject: [PATCH v2 net-next 08/11] net: ena: Add more debug prints to XDP related function
+Date: Mon, 1 Jan 2024 19:08:52 +0000
+Message-ID: <20240101190855.18739-9-darinzon@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240101190855.18739-1-darinzon@amazon.com>
 References: <20240101190855.18739-1-darinzon@amazon.com>
@@ -85,146 +85,37 @@ Precedence: Bulk
 
 From: David Arinzon <darinzon@amazon.com>
 
-This patch focuses on changes to the XDP part of the napi
-polling routine.
+Used for better readability and debugging of XDP
+flow.
 
-1. Update the `napi_comp` stat only when napi is actually
-   complete.
-2. Simplify the code by using a function pointer to the right
-   napi routine (XDP vs non-XDP path)
-3. Remove unnecessary local variables.
-4. Adjust a debug print to show the processed XDP frame index
-   rather than the pointer.
-
+Signed-off-by: Shay Agroskin <shayagr@amazon.com>
 Signed-off-by: David Arinzon <darinzon@amazon.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 18 +++++++---
- drivers/net/ethernet/amazon/ena/ena_xdp.c    | 35 +++++++++-----------
- 2 files changed, 30 insertions(+), 23 deletions(-)
+ drivers/net/ethernet/amazon/ena/ena_xdp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 6ababac..d65ee64 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -1754,18 +1754,28 @@ static void ena_del_napi_in_range(struct ena_adapter *adapter,
- static void ena_init_napi_in_range(struct ena_adapter *adapter,
- 				   int first_index, int count)
- {
-+	int (*napi_handler)(struct napi_struct *napi, int budget);
- 	int i;
- 
- 	for (i = first_index; i < first_index + count; i++) {
- 		struct ena_napi *napi = &adapter->ena_napi[i];
-+		struct ena_ring *rx_ring, *tx_ring;
- 
--		netif_napi_add(adapter->netdev, &napi->napi,
--			       ENA_IS_XDP_INDEX(adapter, i) ? ena_xdp_io_poll : ena_io_poll);
-+		memset(napi, 0, sizeof(*napi));
-+
-+		rx_ring = &adapter->rx_ring[i];
-+		tx_ring = &adapter->tx_ring[i];
-+
-+		napi_handler = ena_io_poll;
-+		if (ENA_IS_XDP_INDEX(adapter, i))
-+			napi_handler = ena_xdp_io_poll;
-+
-+		netif_napi_add(adapter->netdev, &napi->napi, napi_handler);
- 
- 		if (!ENA_IS_XDP_INDEX(adapter, i))
--			napi->rx_ring = &adapter->rx_ring[i];
-+			napi->rx_ring = rx_ring;
- 
--		napi->tx_ring = &adapter->tx_ring[i];
-+		napi->tx_ring = tx_ring;
- 		napi->qid = i;
- 	}
- }
 diff --git a/drivers/net/ethernet/amazon/ena/ena_xdp.c b/drivers/net/ethernet/amazon/ena/ena_xdp.c
-index 363e361..dd01b41 100644
+index dd01b41..c9992ce 100644
 --- a/drivers/net/ethernet/amazon/ena/ena_xdp.c
 +++ b/drivers/net/ethernet/amazon/ena/ena_xdp.c
-@@ -385,23 +385,22 @@ static int ena_clean_xdp_irq(struct ena_ring *tx_ring, u32 budget)
- 			break;
+@@ -301,6 +301,8 @@ static int ena_xdp_set(struct net_device *netdev, struct netdev_bpf *bpf)
+ 			}
+ 			ena_xdp_exchange_program(adapter, prog);
  
- 		tx_info = &tx_ring->tx_buffer_info[req_id];
--		xdpf = tx_info->xdpf;
- 
--		tx_info->xdpf = NULL;
- 		tx_info->last_jiffies = 0;
--		ena_unmap_tx_buff(tx_ring, tx_info);
- 
--		netif_dbg(tx_ring->adapter, tx_done, tx_ring->netdev,
--			  "tx_poll: q %d skb %p completed\n", tx_ring->qid,
--			  xdpf);
-+		xdpf = tx_info->xdpf;
-+		tx_info->xdpf = NULL;
-+		ena_unmap_tx_buff(tx_ring, tx_info);
-+		xdp_return_frame(xdpf);
- 
- 		tx_pkts++;
- 		total_done += tx_info->tx_descs;
--
--		xdp_return_frame(xdpf);
- 		tx_ring->free_ids[next_to_clean] = req_id;
- 		next_to_clean = ENA_TX_RING_IDX_NEXT(next_to_clean,
- 						     tx_ring->ring_size);
++			netif_dbg(adapter, drv, adapter->netdev, "Set a new XDP program\n");
 +
-+		netif_dbg(tx_ring->adapter, tx_done, tx_ring->netdev,
-+			  "tx_poll: q %d pkt #%d req_id %d\n", tx_ring->qid, tx_pkts, req_id);
- 	}
- 
- 	tx_ring->next_to_clean = next_to_clean;
-@@ -421,22 +420,19 @@ static int ena_clean_xdp_irq(struct ena_ring *tx_ring, u32 budget)
- int ena_xdp_io_poll(struct napi_struct *napi, int budget)
- {
- 	struct ena_napi *ena_napi = container_of(napi, struct ena_napi, napi);
--	u32 xdp_work_done, xdp_budget;
- 	struct ena_ring *tx_ring;
--	int napi_comp_call = 0;
-+	u32 work_done;
- 	int ret;
- 
- 	tx_ring = ena_napi->tx_ring;
- 
--	xdp_budget = budget;
--
- 	if (!test_bit(ENA_FLAG_DEV_UP, &tx_ring->adapter->flags) ||
- 	    test_bit(ENA_FLAG_TRIGGER_RESET, &tx_ring->adapter->flags)) {
- 		napi_complete_done(napi, 0);
- 		return 0;
- 	}
- 
--	xdp_work_done = ena_clean_xdp_irq(tx_ring, xdp_budget);
-+	work_done = ena_clean_xdp_irq(tx_ring, budget);
- 
- 	/* If the device is about to reset or down, avoid unmask
- 	 * the interrupt and return 0 so NAPI won't reschedule
-@@ -444,18 +440,19 @@ int ena_xdp_io_poll(struct napi_struct *napi, int budget)
- 	if (unlikely(!test_bit(ENA_FLAG_DEV_UP, &tx_ring->adapter->flags))) {
- 		napi_complete_done(napi, 0);
- 		ret = 0;
--	} else if (xdp_budget > xdp_work_done) {
--		napi_comp_call = 1;
--		if (napi_complete_done(napi, xdp_work_done))
-+	} else if (budget > work_done) {
-+		ena_increase_stat(&tx_ring->tx_stats.napi_comp, 1,
-+				  &tx_ring->syncp);
-+		if (napi_complete_done(napi, work_done))
- 			ena_unmask_interrupt(tx_ring, NULL);
+ 			if (is_up && !old_bpf_prog) {
+ 				rc = ena_up(adapter);
+ 				if (rc)
+@@ -309,6 +311,8 @@ static int ena_xdp_set(struct net_device *netdev, struct netdev_bpf *bpf)
+ 			xdp_features_set_redirect_target(netdev, false);
+ 		} else if (old_bpf_prog) {
+ 			xdp_features_clear_redirect_target(netdev);
++			netif_dbg(adapter, drv, adapter->netdev, "Removing XDP program\n");
 +
- 		ena_update_ring_numa_node(tx_ring, NULL);
--		ret = xdp_work_done;
-+		ret = work_done;
- 	} else {
--		ret = xdp_budget;
-+		ret = budget;
- 	}
- 
- 	u64_stats_update_begin(&tx_ring->syncp);
--	tx_ring->tx_stats.napi_comp += napi_comp_call;
- 	tx_ring->tx_stats.tx_poll++;
- 	u64_stats_update_end(&tx_ring->syncp);
- 	tx_ring->tx_stats.last_napi_jiffies = jiffies;
+ 			rc = ena_destroy_and_free_all_xdp_queues(adapter);
+ 			if (rc)
+ 				return rc;
 -- 
 2.40.1
 
