@@ -1,119 +1,174 @@
-Return-Path: <netdev+bounces-60923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9DB0821DC8
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:37:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF35821DCA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:38:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B20A1C22292
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:37:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B12A1F22A7F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC1811194;
-	Tue,  2 Jan 2024 14:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0567F111A5;
+	Tue,  2 Jan 2024 14:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lfgaEX2s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UVX4Zr9n"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5EE11718;
-	Tue,  2 Jan 2024 14:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=48D5ez891FudRMbUkCpyIcvWPCkUK4OLFoyn+5uchAY=; b=lfgaEX2seQe9mVXAoSTI4GKqlq
-	MRrU9EAevBhXJQpQoP7OaiygAKM0NvD9dpIY843iS9DOMA3cu5eYpt7DRJp6E2c2LUnB240Gnsq4F
-	JR0bJB8PqfeiUzHohSMhoWgK2x46EdK9TRKAWSZLAXmnHeRYg/9vg+9DDvtG/5BZg0XM7S5etDhuv
-	TCDqERzbmrNv70uHW63W2wuxMN3zxskRF499ZgPC0sfEjWskKdAf6DsQVAR3JDVsZxUXRMNR2AVDE
-	pztgBmJtZv7Eke3AapFRbq5ZfpTrIlk2M9kUqLMFyq4OMQAteDbOMeeoXMb+dxwiP6eRSVqM4s1oQ
-	d3tSNxzQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46986)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKftK-0006co-0x;
-	Tue, 02 Jan 2024 14:37:14 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKftL-0005NH-O5; Tue, 02 Jan 2024 14:37:15 +0000
-Date: Tue, 2 Jan 2024 14:37:15 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Jie Luo <quic_luoj@quicinc.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, andrew@lunn.ch,
-	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] net: phy: at803x: add QCA8084 ethernet phy support
-Message-ID: <ZZQfm98HrjRdXJEq@shell.armlinux.org.uk>
-References: <20231109101618.009efb45@fedora>
- <0898312d-4796-c142-6401-c9d802d19ff4@quicinc.com>
- <46d61a29-96bf-868b-22b9-a31e48576803@quicinc.com>
- <20231110103328.0bc3d28f@fedora>
- <3dd470a9-257e-e2c7-c71a-0c216cf7db88@quicinc.com>
- <20231111225441.vpcosrowzcudb5jg@skbuf>
- <39a8341f-04df-4eba-9cc2-433e9e6a798e@quicinc.com>
- <20231112235852.k36lpxw66nt7wh2e@skbuf>
- <ZVInvOqh6QAvNJtw@shell.armlinux.org.uk>
- <20231113195120.44k6hhth7y53df53@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1E511718
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 14:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-555bd21f9fdso3479635a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 06:38:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704206286; x=1704811086; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AaCf1bVys3JfzwCvSEkXX/9JBhqyL9AY3m8awYnU7BM=;
+        b=UVX4Zr9nl3UlN0DGihg/ZTF3N2bNpW6A63OPH6CvoPBwOc7MMFQytr0Yr2HYFdSO76
+         R7nb6uOUfI0P8Pooythghr5KwA2+hkoONFlvDJsdRz+htG6oy3Dy5JVwonj5V/uWpofE
+         IV8/74Sf4qof5hDOsYLPktFPbzmPgn9qwcOUkHjGwZyATkHsFg4ldktwKpd+DSUs4/dg
+         /mM+/zB/Z8z+Qbh2wFxYkdGXdSme6eGmsvfwjjShVBUdzW3l6e1NRGenXtWy3y+8nwFx
+         wExrvwhxAiYpoIwcsIOjOB0MiHekiUvByof1ZNINxaYbDKYaRgmp3R2U1C5NlMFgrrfR
+         WnVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704206286; x=1704811086;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AaCf1bVys3JfzwCvSEkXX/9JBhqyL9AY3m8awYnU7BM=;
+        b=XjEeIhMC5IyBeKuV7BhpBME/eGmce2zS20pc4+dvrFQjN4Msm3ijJWM2q0XLONSquE
+         7A/NKKZNbk06mUo/7EASEv2/B+rIaPVVZ55hx1R23LtgW8wWM27o55ut7ngiit3pp270
+         ZmzN8PqYiBQn5jXUG/divYWTEOwfvn6vLG1xAS7KGQFaiI6xirQrgzOPFfgTDI7rEFZH
+         KzTCbw/q3KWjwChUqVhMisQVteBFvgd4J5l63z47AD6VqKsKnINuIOu7zdGornY9jXxL
+         ApEvmzjBKXZ65FYKhh+bcw4QCqbmhjS+QSPo5bbHrI6UWNdvFePaZg/o8VSvOGlXh/0L
+         dyZQ==
+X-Gm-Message-State: AOJu0YynX7EIZbRmyAhZXy/fC0PKuFJCt/QzlmFG2VMKR74+p7tpLbXR
+	/0uhccxq3huDSJn7yJu2vg8=
+X-Google-Smtp-Source: AGHT+IGLzphuqTAK2h3K8mjAK5qGTdnm3GmJ8v6kSj+kqiL74n30moOM7PMsQOSg4abypu4J1MRlBA==
+X-Received: by 2002:a17:906:2bd9:b0:a27:5f87:4d5d with SMTP id n25-20020a1709062bd900b00a275f874d5dmr3695743ejg.103.1704206285587;
+        Tue, 02 Jan 2024 06:38:05 -0800 (PST)
+Received: from ?IPV6:2a01:c23:c1df:9400:2dfa:6a98:a1f2:c23c? (dynamic-2a01-0c23-c1df-9400-2dfa-6a98-a1f2-c23c.c23.pool.telefonica.de. [2a01:c23:c1df:9400:2dfa:6a98:a1f2:c23c])
+        by smtp.googlemail.com with ESMTPSA id kk25-20020a170907767900b00a278953ea71sm4253570ejc.91.2024.01.02.06.38.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jan 2024 06:38:05 -0800 (PST)
+Message-ID: <c379276f-2276-4c15-b483-7379b16031f7@gmail.com>
+Date: Tue, 2 Jan 2024 15:38:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231113195120.44k6hhth7y53df53@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Russell King <rmk+kernel@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH RFC] net: mdio_bus: make check in mdiobus_prevent_c45_scan
+ more granular
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 13, 2023 at 09:51:20PM +0200, Vladimir Oltean wrote:
-> On Mon, Nov 13, 2023 at 01:42:20PM +0000, Russell King (Oracle) wrote:
-> > On Mon, Nov 13, 2023 at 01:58:52AM +0200, Vladimir Oltean wrote:
-> > > From 17fd68123d78f39a971f800de6da66522f71dc71 Mon Sep 17 00:00:00 2001
-> > > From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > > Date: Tue, 3 Oct 2023 22:16:25 +0300
-> > > Subject: [PATCH 1/2] net: phylink: move phylink_pcs_neg_mode() to phylink.c
-> > > 
-> > > Russell points out that there is no user of phylink_pcs_neg_mode()
-> > > outside of phylink.c, nor is there planned to be any, so we can just
-> > > move it there.
-> > 
-> > Looks familiar...
-> > 
-> > http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?h=net-queue&id=c2aa9d3846c218d28a8a3457b0447998b0d84c5d
-> 
-> Well, yeah, I did mention that the patch was written at your suggestion,
-> and there aren't that many options in which that patch can be written.
-> I didn't look at your trees, and I made that change as part of a much
-> larger effort which involves phylink, which I will email you separately
-> about.
-> 
-> I will gladly drop my ownership on the first patch and ask Luo Jie to
-> pick your version instead, if this is what you're implying from the 2
-> word reply.
+Matching on OUI level is a quite big hammer. So let's make matching
+more granular.
 
-The reason that I hadn't submitted it was because I didn't want to move
-the function out of the header file until the next LTS was released.
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+This is what I'm thinking of. Maybe the problem of misbehaving
+on c45 access affects certain groups of PHY's only.
+Then we don't have to blacklist all PHY's from this vendor.
+What do you think?
+---
+ drivers/net/phy/mdio_bus.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-It seems 6.6 was announced as a LTS on the 17th November, so I'm happier
-to now proceed with moving this into phylink.c.
-
-as phylink_pcs_neg_mode() was merged in 6.5-rc1, it will have had three
-kernel cycles - including one each side of the LTS release which I think
-is reasonable.
-
-I will send my patch hopefully sometime this week so it's in 6.8
-depending on pressures.
-
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index 6cf73c156..848d5d2d6 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -621,19 +621,27 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
+  */
+ static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
+ {
+-	int i;
++	const struct {
++		u32 phy_id;
++		u32 phy_id_mask;
++	} id_list[] = {
++		{ MICREL_OUI << 10, GENMASK(31, 10) },
++	};
++	int i, j;
+ 
+ 	for (i = 0; i < PHY_MAX_ADDR; i++) {
+ 		struct phy_device *phydev;
+-		u32 oui;
+ 
+ 		phydev = mdiobus_get_phy(bus, i);
+ 		if (!phydev)
+ 			continue;
+-		oui = phydev->phy_id >> 10;
+ 
+-		if (oui == MICREL_OUI)
+-			return true;
++		for (j = 0; j < ARRAY_SIZE(id_list); j++) {
++			u32 mask = id_list[j].phy_id_mask;
++
++			if ((phydev->phy_id & mask) == (id_list[j].phy_id & mask))
++				return true;
++		}
+ 	}
+ 	return false;
+ }
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
