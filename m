@@ -1,457 +1,243 @@
-Return-Path: <netdev+bounces-60925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D693B821E12
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:51:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A104821E1B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:52:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C34C2838B2
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:50:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A0021C221BA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C2012B95;
-	Tue,  2 Jan 2024 14:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DF311C85;
+	Tue,  2 Jan 2024 14:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XjR67zPA"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="KXVHCBUt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0D612E5A;
-	Tue,  2 Jan 2024 14:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704207042; x=1735743042;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=hN1CwoPtfBRUluNxA/QRtbAkzFGBllkbFdxbPxtm2F4=;
-  b=XjR67zPAu8vlzzStYuKHn7XIaePE/FUN/1gMzGX++Ur7/5o/fmdo6Ikb
-   GxQ7SDFlj29kEWD0zbyq9EsL5e+MgU92IyELcMTTpgAbU/lFeF8eEUC53
-   wUwlzOyoIIN2+ppNVSO6Vo27G81Va53swaksrgckBrbUvBzFA4/hz+COt
-   rfOSe0tKo6/1oTG9JIL5Mu+KX4GEhhN4djFVYssUP9rDr3cZv7oJcmEEG
-   zpn6CfOrUqM8kh36c5AxhuU9qq5MrcPGPJAIygm+crxS/2P0RBNt7oeAB
-   vD4Nw0k+DfoF6+eLgLKbtBBSQwHnZPKoI0VIWYaDx+vxn58ULimhzwXGA
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="4222451"
-X-IronPort-AV: E=Sophos;i="6.04,325,1695711600"; 
-   d="scan'208";a="4222451"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 06:50:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="898552448"
-X-IronPort-AV: E=Sophos;i="6.04,325,1695711600"; 
-   d="scan'208";a="898552448"
-Received: from yuyang-mobl2.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.129.41])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 06:50:34 -0800
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>, Florian
- Bezdeka <florian.bezdeka@siemens.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- xdp-hints@xdp-project.net
-Subject: Re: [PATCH iwl-next,v1 1/1] igc: Add Tx hardware timestamp request
- for AF_XDP zero-copy packet
-In-Reply-To: <20231215162158.951925-1-yoong.siang.song@intel.com>
-References: <20231215162158.951925-1-yoong.siang.song@intel.com>
-Date: Tue, 02 Jan 2024 11:50:32 -0300
-Message-ID: <87il4b6b7r.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A9D14267
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 14:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5ec7a5a4b34so54701137b3.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 06:52:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704207133; x=1704811933; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/j/tpFFEL8fY47ZhPkW1ogVKL0JcwptmB+119/adcuQ=;
+        b=KXVHCBUtPwc5W7o2ux+4o+ChhMHjxAzlnutimHD4MhZ1y9vxkIX5lcCU7xK2nm1WEs
+         XxfwBhhGaDUq1SnK+yqAopY8K1sTcSq6QFniebm3ywJpWo7ktwsJbBm/UaJACXdDNgN9
+         kpt2P8tkIeWnJDCdVm6crrOY8AdM8DAitKXMOKem9vS/6WWZxplgzRR3m/vZQpXMSg7C
+         wF+1feVRTUZmPH2Q+bgW0Wk3JWeeJtoWL6GkPdu5iertVT2bzXd8TxUahrPKyNERQ76x
+         /ee6wGlk+/o7/T0oZAT91CI711O4vLca69cbKaLPj+ra/trx/KAGBkxBJn1iD9svz8B6
+         dVvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704207133; x=1704811933;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/j/tpFFEL8fY47ZhPkW1ogVKL0JcwptmB+119/adcuQ=;
+        b=WmNHap753gvDJd0Nt4x1Ed5V0Wxed9CWySOhwGIdD4ORfH228U0tt+zUgsQVnji6bK
+         jMiM+4340wo3OsF26arPB+m50hgqYNCSQud8ydD6sxejsG9N2aeS6x6CNk66xrmFb3Td
+         nYpKGo9DSG4YyrbvNUstYV1QMZk53F95jpaCVIvlQ/byxfXAeIPGE5AUTpcGI/kFRFhI
+         Djz1Y9eGHPMBysPaM8VH4Tt8CwRJWYYdF+oO7dnAST7swiJsSfUVvDE5mLKcorRgrwQn
+         +lCX4LK71dI9POGKMO52Dkppo4QG0FStBu40TDx+wSlKk+NJw1yAI3vxjHyDHxJXn6ZD
+         QhtA==
+X-Gm-Message-State: AOJu0YzWlYJPMHZVUdgFv4oBuig02F9k/uCPRmIQJWHwGBXiuz4pMpV4
+	Ocax/CadFTFjxT1wpRuj+bBSY4OX18zSEUznYZ6mKiupjhf7
+X-Google-Smtp-Source: AGHT+IGxXtMBrjImye1KOtOry0zZ9YWnJnzgRwLDeGv7SJAyYzrSz2acqPlgZtjZM/ZvRHK7uAw+vtJTvbzTVav/St8=
+X-Received: by 2002:a81:5b8a:0:b0:5d7:1940:f3e9 with SMTP id
+ p132-20020a815b8a000000b005d71940f3e9mr11915188ywb.81.1704207133031; Tue, 02
+ Jan 2024 06:52:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20231231172320.245375-1-victor@mojatatu.com> <ZZPekLXICu2AUxlX@nanopsycho>
+ <CAM0EoMkKmF3mhnHLt6gE2bmpuRGV7=OpzrMrOwtk3TJcDFW2JA@mail.gmail.com> <ZZQd470J2Q4UEMHv@nanopsycho>
+In-Reply-To: <ZZQd470J2Q4UEMHv@nanopsycho>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 2 Jan 2024 09:52:01 -0500
+Message-ID: <CAM0EoMkUQzxtiaB9r=Tz5Wc3KfEDCfyy5ENSeb8M+iK9fs_HVQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/1] net/sched: We should only add appropriate
+ qdiscs blocks to ports' xarray
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
+	idosch@idosch.org, mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com, 
+	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
+	syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com, 
+	syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com, 
+	syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Song Yoong Siang <yoong.siang.song@intel.com> writes:
-
-> This patch adds support to per-packet Tx hardware timestamp request to
-> AF_XDP zero-copy packet via XDP Tx metadata framework. Please note that
-> user needs to enable Tx HW timestamp capability via igc_ioctl() with
-> SIOCSHWTSTAMP cmd before sending xsk Tx timestamp request.
+On Tue, Jan 2, 2024 at 9:29=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote:
 >
-> Same as implementation in RX timestamp XDP hints kfunc metadata, Timer 0
-> (adjustable clock) is used in xsk Tx hardware timestamp. i225/i226 have
-> four sets of timestamping registers. A pointer named "xsk_pending_ts"
-> is introduced to indicate the timestamping register is already occupied.
-> Furthermore, the mentioned pointer also being used to hold the transmit
-> completion until the tx hardware timestamp is ready. This is because for
-> i225/i226, the timestamp notification comes some time after the transmit
-> completion event. The driver will retrigger hardware irq to clean the
-> packet after retrieve the tx hardware timestamp.
+> Tue, Jan 02, 2024 at 03:06:28PM CET, jhs@mojatatu.com wrote:
+> >On Tue, Jan 2, 2024 at 4:59=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wro=
+te:
+> >>
+> >> The patch subject should briefly describe the nature of the change. No=
+t
+> >> what "we" should or should not do.
+> >>
+> >>
+> >> Sun, Dec 31, 2023 at 06:23:20PM CET, victor@mojatatu.com wrote:
+> >> >We should only add qdiscs to the blocks ports' xarray in ingress that
+> >> >support ingress_block_set/get or in egress that support
+> >> >egress_block_set/get.
+> >>
+> >> Tell the codebase what to do, be imperative. Please read again:
+> >> https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#d=
+escribe-your-changes
+> >>
+> >
+> >We need another rule in the doc on nit-picking which states that we
+> >need to make progress at some point. We made many changes to this
+> >patchset based on your suggestions for no other reason other that we
+> >can progress the discussion. This is a patch that fixes a bug of which
+> >there are multiple syzbot reports and consumers of the API(last one
+> >just reported from the MTCP people). There's some sense of urgency to
+> >apply this patch before the original goes into net. More importantly:
+> >This patch fixes the issue and follows the same common check which was
+> >already being done in the committed patchset to check if the qdisc
+> >supports the block set/get operations.
+> >
+> >There are about 3 ways to do this check, you objected to the original,
+> >we picked something that works fine,  and now you are picking a
+> >different way with tcf_block. I dont see how tcf_block check would
+> >help or solve this problem at all given this is a qdisc issue not a
+> >class issue. What am I missing?
 >
-> Besides, a pointer named "xsk_meta" is added into igc_tx_timestamp_request
-> structure as a hook to the metadata location of the transmit packet. When
-> a Tx timestamp interrupt happens, the interrupt handler will copy the
-> value of Tx timestamp into metadata via xsk_tx_metadata_complete().
->
-> This patch is tested with tools/testing/selftests/bpf/xdp_hw_metadata
-> on Intel ADL-S platform. Below are the test steps and results.
->
-> Command on DUT:
-> sudo ./xdp_hw_metadata <interface name>
-> sudo hwstamp_ctl -i <interface name> -t 1 -r 1
-> sudo ./testptp -d /dev/ptp0 -s
->
-> Command on Link Partner:
-> echo -n xdp | nc -u -q1 <destination IPv4 addr> 9091
->
-> Result:
-> xsk_ring_cons__peek: 1
-> 0x555b112ae958: rx_desc[6]->addr=86110 addr=86110 comp_addr=86110 EoP
-> rx_hash: 0xBFDEC36E with RSS type:0x1
-> HW RX-time:   1677762429190040955 (sec:1677762429.1900) delta to User RX-time sec:0.0001 (100.124 usec)
-> XDP RX-time:   1677762429190123163 (sec:1677762429.1901) delta to User RX-time sec:0.0000 (17.916 usec)
-> 0x555b112ae958: ping-pong with csum=404e (want c59e) csum_start=34 csum_offset=6
-> 0x555b112ae958: complete tx idx=6 addr=6010
-> HW TX-complete-time:   1677762429190173323 (sec:1677762429.1902) delta to User TX-complete-time sec:0.0100 (10035.884 usec)
-> XDP RX-time:   1677762429190123163 (sec:1677762429.1901) delta to User TX-complete-time sec:0.0101 (10086.044 usec)
-> HW RX-time:   1677762429190040955 (sec:1677762429.1900) delta to HW TX-complete-time sec:0.0001 (132.368 usec)
-> 0x555b112ae958: complete rx idx=134 addr=86110
->
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-> ---
->  drivers/net/ethernet/intel/igc/igc.h      | 15 ++++
->  drivers/net/ethernet/intel/igc/igc_main.c | 88 ++++++++++++++++++++++-
->  drivers/net/ethernet/intel/igc/igc_ptp.c  | 42 ++++++++---
->  3 files changed, 134 insertions(+), 11 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-> index ac7c861e83a0..c831dde01662 100644
-> --- a/drivers/net/ethernet/intel/igc/igc.h
-> +++ b/drivers/net/ethernet/intel/igc/igc.h
-> @@ -79,6 +79,9 @@ struct igc_tx_timestamp_request {
->  	u32 regl;              /* which TXSTMPL_{X} register should be used */
->  	u32 regh;              /* which TXSTMPH_{X} register should be used */
->  	u32 flags;             /* flags that should be added to the tx_buffer */
-> +	u8 xsk_queue_index;    /* Tx queue which requesting timestamp */
-> +	bool *xsk_pending_ts;  /* ref to tx ring for waiting timestamp event */
-
-I think that this indirection level to xsk_pending_ts in the tx_buffer is a
-bit too hard to follow. What I am thinking is keeping a pointer to
-tx_buffer here in igc_tx_timestamp_request, perhaps even in a union with
-the skb, and use a similar logic, if that pointer is valid the timestamp
-request is in use.
-
-Do you think it could work?
-
-(Perhaps we would need to also store the buffer type in the request, but
-I don't think that would be too weird)
-
-> +	struct xsk_tx_metadata_compl xsk_meta;	/* ref to xsk Tx metadata */
->  };
->  
->  struct igc_inline_rx_tstamps {
-> @@ -319,6 +322,9 @@ void igc_disable_tx_ring(struct igc_ring *ring);
->  void igc_enable_tx_ring(struct igc_ring *ring);
->  int igc_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags);
->  
-> +/* AF_XDP TX metadata operations */
-> +extern const struct xsk_tx_metadata_ops igc_xsk_tx_metadata_ops;
-> +
->  /* igc_dump declarations */
->  void igc_rings_dump(struct igc_adapter *adapter);
->  void igc_regs_dump(struct igc_adapter *adapter);
-> @@ -528,6 +534,7 @@ struct igc_tx_buffer {
->  	DEFINE_DMA_UNMAP_ADDR(dma);
->  	DEFINE_DMA_UNMAP_LEN(len);
->  	u32 tx_flags;
-> +	bool xsk_pending_ts;
->  };
->  
->  struct igc_rx_buffer {
-> @@ -553,6 +560,14 @@ struct igc_xdp_buff {
->  	struct igc_inline_rx_tstamps *rx_ts; /* data indication bit IGC_RXDADV_STAT_TSIP */
->  };
->  
-> +struct igc_metadata_request {
-> +	struct xsk_tx_metadata *meta;
-> +	struct igc_adapter *adapter;
-
-If you have access to the tx_ring, you have access to the adapter, no
-need to have it here.
-
-> +	struct igc_ring *tx_ring;
-> +	bool *xsk_pending_ts;
-> +	u32 *cmd_type;
-
-I think this also would be clearer if here you had a pointer to the
-tx_buffer instead of only 'xsk_pending_ts'.
-
-I guess for cmd_type, no need for it to be a pointer, we can affort the
-extra copy.
-
-> +};
-> +
->  struct igc_q_vector {
->  	struct igc_adapter *adapter;    /* backlink */
->  	void __iomem *itr_register;
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 61db1d3bfa0b..311c85f2d82d 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -1553,7 +1553,7 @@ static bool igc_request_tx_tstamp(struct igc_adapter *adapter, struct sk_buff *s
->  	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
->  		struct igc_tx_timestamp_request *tstamp = &adapter->tx_tstamp[i];
->  
-> -		if (tstamp->skb)
-> +		if (tstamp->skb || tstamp->xsk_pending_ts)
->  			continue;
->  
->  		tstamp->skb = skb_get(skb);
-> @@ -2878,6 +2878,71 @@ static void igc_update_tx_stats(struct igc_q_vector *q_vector,
->  	q_vector->tx.total_packets += packets;
->  }
->  
-> +static void igc_xsk_request_timestamp(void *_priv)
-> +{
-> +	struct igc_metadata_request *meta_req = _priv;
-> +	struct igc_ring *tx_ring = meta_req->tx_ring;
-> +	struct igc_tx_timestamp_request *tstamp;
-> +	u32 *cmd_type = meta_req->cmd_type;
-> +	u32 tx_flags = IGC_TX_FLAGS_TSTAMP;
-> +	struct igc_adapter *adapter;
-> +	unsigned long lock_flags;
-> +	bool found = 0;
-> +	int i;
-> +
-> +	if (test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags)) {
-> +		adapter = meta_req->adapter;
-> +
-> +		spin_lock_irqsave(&adapter->ptp_tx_lock, lock_flags);
-> +
-> +		for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
-> +			tstamp = &adapter->tx_tstamp[i];
-> +
-> +			if (tstamp->skb || tstamp->xsk_pending_ts)
-> +				continue;
-> +
-> +			found = 1;
-
-nitpick: found is a bool, 'true' would read better.
-
-> +			break;
-> +		}
-> +
-> +		if (!found) {
-> +			adapter->tx_hwtstamp_skipped++;
-
-I think this is one those cases, that an early return or a goto would
-make the code easier to understand.
-
-> +		} else {
-> +			tstamp->start = jiffies;
-> +			tstamp->xsk_queue_index = tx_ring->queue_index;
-> +
-> +			tstamp->xsk_pending_ts = meta_req->xsk_pending_ts;
-> +			*tstamp->xsk_pending_ts = true;
-> +
-> +			xsk_tx_metadata_to_compl(meta_req->meta,
-> +						 &tstamp->xsk_meta);
-> +
-> +			/* set timestamp bit based on the _TSTAMP(_X) bit. */
-> +			tx_flags |= tstamp->flags;
-> +			*cmd_type |= IGC_SET_FLAG(tx_flags, IGC_TX_FLAGS_TSTAMP,
-> +						  (IGC_ADVTXD_MAC_TSTAMP));
-> +			*cmd_type |= IGC_SET_FLAG(tx_flags, IGC_TX_FLAGS_TSTAMP_1,
-> +						  (IGC_ADVTXD_TSTAMP_REG_1));
-> +			*cmd_type |= IGC_SET_FLAG(tx_flags, IGC_TX_FLAGS_TSTAMP_2,
-> +						  (IGC_ADVTXD_TSTAMP_REG_2));
-> +			*cmd_type |= IGC_SET_FLAG(tx_flags, IGC_TX_FLAGS_TSTAMP_3,
-> +						  (IGC_ADVTXD_TSTAMP_REG_3));
-> +		}
-> +
-> +		spin_unlock_irqrestore(&adapter->ptp_tx_lock, lock_flags);
-> +	}
-> +}
-> +
-> +static u64 igc_xsk_fill_timestamp(void *_priv)
-> +{
-> +	return *(u64 *)_priv;
-> +}
-> +
-> +const struct xsk_tx_metadata_ops igc_xsk_tx_metadata_ops = {
-> +	.tmo_request_timestamp		= igc_xsk_request_timestamp,
-> +	.tmo_fill_timestamp		= igc_xsk_fill_timestamp,
-> +};
-> +
->  static void igc_xdp_xmit_zc(struct igc_ring *ring)
->  {
->  	struct xsk_buff_pool *pool = ring->xsk_pool;
-> @@ -2899,6 +2964,8 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
->  	budget = igc_desc_unused(ring);
->  
->  	while (xsk_tx_peek_desc(pool, &xdp_desc) && budget--) {
-> +		struct igc_metadata_request meta_req;
-> +		struct xsk_tx_metadata *meta = NULL;
->  		u32 cmd_type, olinfo_status;
->  		struct igc_tx_buffer *bi;
->  		dma_addr_t dma;
-> @@ -2909,14 +2976,23 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
->  		olinfo_status = xdp_desc.len << IGC_ADVTXD_PAYLEN_SHIFT;
->  
->  		dma = xsk_buff_raw_get_dma(pool, xdp_desc.addr);
-> +		meta = xsk_buff_get_metadata(pool, xdp_desc.addr);
->  		xsk_buff_raw_dma_sync_for_device(pool, dma, xdp_desc.len);
-> +		bi = &ring->tx_buffer_info[ntu];
-> +
-> +		meta_req.adapter = netdev_priv(ring->netdev);
-> +		meta_req.tx_ring = ring;
-> +		meta_req.meta = meta;
-> +		meta_req.cmd_type = &cmd_type;
-> +		meta_req.xsk_pending_ts = &bi->xsk_pending_ts;
-> +		xsk_tx_metadata_request(meta, &igc_xsk_tx_metadata_ops,
-> +					&meta_req);
->  
->  		tx_desc = IGC_TX_DESC(ring, ntu);
->  		tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
->  		tx_desc->read.olinfo_status = cpu_to_le32(olinfo_status);
->  		tx_desc->read.buffer_addr = cpu_to_le64(dma);
->  
-> -		bi = &ring->tx_buffer_info[ntu];
->  		bi->type = IGC_TX_BUFFER_TYPE_XSK;
->  		bi->protocol = 0;
->  		bi->bytecount = xdp_desc.len;
-> @@ -2979,6 +3055,13 @@ static bool igc_clean_tx_irq(struct igc_q_vector *q_vector, int napi_budget)
->  		if (!(eop_desc->wb.status & cpu_to_le32(IGC_TXD_STAT_DD)))
->  			break;
->  
-> +		/* Hold the completions while there's a pending tx hardware
-> +		 * timestamp request from XDP Tx metadata.
-> +		 */
-> +		if (tx_buffer->type == IGC_TX_BUFFER_TYPE_XSK &&
-> +		    tx_buffer->xsk_pending_ts)
-> +			break;
-> +
-
-One scenario that I am worried about the completion part is when tstamp
-and non-tstamp packets are mixed in the same queue.
-
-For example, when the user sends a 1 tstamp packet followed by 1
-non-tstamp packet. Some other ratios might be interesting to test as
-well, 1:10 for example. I guess a simple bandwith test would be enough,
-comparing "non-tstamp only" with mixed traffic.
-
-Perhaps are some bad recollections from the past, but I remember that
-the hardware takes a bit of time when generating the timestamp
-interrupts, and so those types of mixed traffic would have wasted
-bandwidth.
-
->  		/* clear next_to_watch to prevent false hangs */
->  		tx_buffer->next_to_watch = NULL;
->  
-> @@ -6819,6 +6902,7 @@ static int igc_probe(struct pci_dev *pdev,
->  
->  	netdev->netdev_ops = &igc_netdev_ops;
->  	netdev->xdp_metadata_ops = &igc_xdp_metadata_ops;
-> +	netdev->xsk_tx_metadata_ops = &igc_xsk_tx_metadata_ops;
->  	igc_ethtool_set_ops(netdev);
->  	netdev->watchdog_timeo = 5 * HZ;
->  
-> diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-> index 885faaa7b9de..b722bca40309 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-> @@ -11,6 +11,7 @@
->  #include <linux/ktime.h>
->  #include <linux/delay.h>
->  #include <linux/iopoll.h>
-> +#include <net/xdp_sock.h>
->  
->  #define INCVALUE_MASK		0x7fffffff
->  #define ISGN			0x80000000
-> @@ -555,8 +556,15 @@ static void igc_ptp_clear_tx_tstamp(struct igc_adapter *adapter)
->  	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
->  		struct igc_tx_timestamp_request *tstamp = &adapter->tx_tstamp[i];
->  
-> -		dev_kfree_skb_any(tstamp->skb);
-> -		tstamp->skb = NULL;
-> +		if (tstamp->skb) {
-> +			dev_kfree_skb_any(tstamp->skb);
-> +			tstamp->skb = NULL;
-> +		} else if (tstamp->xsk_pending_ts) {
-> +			*tstamp->xsk_pending_ts = false;
-> +			tstamp->xsk_pending_ts = NULL;
-> +			igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index,
-> +				       0);
-> +		}
->  	}
->  
->  	spin_unlock_irqrestore(&adapter->ptp_tx_lock, flags);
-> @@ -657,8 +665,15 @@ static int igc_ptp_set_timestamp_mode(struct igc_adapter *adapter,
->  static void igc_ptp_tx_timeout(struct igc_adapter *adapter,
->  			       struct igc_tx_timestamp_request *tstamp)
->  {
-> -	dev_kfree_skb_any(tstamp->skb);
-> -	tstamp->skb = NULL;
-> +	if (tstamp->skb) {
-> +		dev_kfree_skb_any(tstamp->skb);
-> +		tstamp->skb = NULL;
-> +	} else if (tstamp->xsk_pending_ts) {
-> +		*tstamp->xsk_pending_ts = false;
-> +		tstamp->xsk_pending_ts = NULL;
-> +		igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index, 0);
-> +	}
-> +
->  	adapter->tx_hwtstamp_timeouts++;
->  
->  	netdev_warn(adapter->netdev, "Tx timestamp timeout\n");
-> @@ -677,7 +692,7 @@ void igc_ptp_tx_hang(struct igc_adapter *adapter)
->  	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
->  		tstamp = &adapter->tx_tstamp[i];
->  
-> -		if (!tstamp->skb)
-> +		if (!tstamp->skb && !tstamp->xsk_pending_ts)
->  			continue;
->  
->  		if (time_is_after_jiffies(tstamp->start + IGC_PTP_TX_TIMEOUT))
-> @@ -705,7 +720,7 @@ static void igc_ptp_tx_reg_to_stamp(struct igc_adapter *adapter,
->  	int adjust = 0;
->  
->  	skb = tstamp->skb;
-> -	if (!skb)
-> +	if (!skb && !tstamp->xsk_pending_ts)
->  		return;
->  
->  	if (igc_ptp_systim_to_hwtstamp(adapter, &shhwtstamps, regval))
-> @@ -729,10 +744,19 @@ static void igc_ptp_tx_reg_to_stamp(struct igc_adapter *adapter,
->  	shhwtstamps.hwtstamp =
->  		ktime_add_ns(shhwtstamps.hwtstamp, adjust);
->  
-> -	tstamp->skb = NULL;
-> +	if (skb) {
-> +		tstamp->skb = NULL;
-> +		skb_tstamp_tx(skb, &shhwtstamps);
-> +		dev_kfree_skb_any(skb);
-> +	} else {
-> +		xsk_tx_metadata_complete(&tstamp->xsk_meta,
-> +					 &igc_xsk_tx_metadata_ops,
-> +					 &shhwtstamps.hwtstamp);
->  
-> -	skb_tstamp_tx(skb, &shhwtstamps);
-> -	dev_kfree_skb_any(skb);
-> +		*tstamp->xsk_pending_ts = false;
-> +		tstamp->xsk_pending_ts = NULL;
-> +		igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index, 0);
-> +	}
->  }
->  
->  /**
-> -- 
-> 2.34.1
+> Perhaps I got something wrong, but I thought that the issue is
+> cl_ops->tcf_block being null for some qdiscs, isn't it?
 >
 
--- 
-Vinicius
+We attach these ports/netdevs only on capable qdiscs i.e ones that
+have  in/egress_block_set/get() - which happen to be ingress and
+clsact only.
+The problem was we were blindly assuming that presence of
+cl->tcf_block() implies presence of in/egress_block_set/get(). The
+earlier patches surrounded this code with attribute checks and so it
+worked there.
+
+BTW: Do you have an example of a test case where we can test the class
+grafting (eg using htb with tcf_block)? It doesnt have any impact on
+this patcheset here but we want to add it as a regression checker on
+tdc in the future if someone makes a change.
+
+cheers,
+jamal
+
+> >
+> >cheers,
+> >jamal
+> >
+> >> >
+> >> >Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking i=
+nfra")
+> >> >Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> >> >Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> >> >Reported-by: Ido Schimmel <idosch@nvidia.com>
+> >> >Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
+> >> >Tested-by: Ido Schimmel <idosch@nvidia.com>
+> >> >Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspot=
+mail.com
+> >> >Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@goog=
+le.com/
+> >> >Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspot=
+mail.com
+> >> >Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@goog=
+le.com/
+> >> >Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspot=
+mail.com
+> >> >Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@goog=
+le.com/
+> >> >---
+> >> >v1 -> v2:
+> >> >
+> >> >- Remove newline between fixes tag and Signed-off-by tag
+> >> >- Add Ido's Reported-by and Tested-by tags
+> >> >- Add syzbot's Reported-and-tested-by tags
+> >> >
+> >> > net/sched/sch_api.c | 34 ++++++++++++++++++++--------------
+> >> > 1 file changed, 20 insertions(+), 14 deletions(-)
+> >> >
+> >> >diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> >> >index 299086bb6205..426be81276f1 100644
+> >> >--- a/net/sched/sch_api.c
+> >> >+++ b/net/sched/sch_api.c
+> >> >@@ -1187,23 +1187,29 @@ static int qdisc_block_add_dev(struct Qdisc *=
+sch, struct net_device *dev,
+> >> >       struct tcf_block *block;
+> >> >       int err;
+> >> >
+> >>
+> >> Why don't you just check cl_ops->tcf_block ?
+> >> In fact, there could be a helper to do it for you either call the op o=
+r
+> >> return NULL in case it is not defined.
+> >>
+> >>
+> >> >-      block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> >> >-      if (block) {
+> >> >-              err =3D xa_insert(&block->ports, dev->ifindex, dev, GF=
+P_KERNEL);
+> >> >-              if (err) {
+> >> >-                      NL_SET_ERR_MSG(extack,
+> >> >-                                     "ingress block dev insert faile=
+d");
+> >> >-                      return err;
+> >> >+      if (sch->ops->ingress_block_get) {
+> >> >+              block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NUL=
+L);
+> >> >+              if (block) {
+> >> >+                      err =3D xa_insert(&block->ports, dev->ifindex,=
+ dev,
+> >> >+                                      GFP_KERNEL);
+> >> >+                      if (err) {
+> >> >+                              NL_SET_ERR_MSG(extack,
+> >> >+                                             "ingress block dev inse=
+rt failed");
+> >> >+                              return err;
+> >> >+                      }
+> >> >               }
+> >> >       }
+> >> >
+> >> >-      block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+> >> >-      if (block) {
+> >> >-              err =3D xa_insert(&block->ports, dev->ifindex, dev, GF=
+P_KERNEL);
+> >> >-              if (err) {
+> >> >-                      NL_SET_ERR_MSG(extack,
+> >> >-                                     "Egress block dev insert failed=
+");
+> >> >-                      goto err_out;
+> >> >+      if (sch->ops->egress_block_get) {
+> >> >+              block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL=
+);
+> >> >+              if (block) {
+> >> >+                      err =3D xa_insert(&block->ports, dev->ifindex,=
+ dev,
+> >> >+                                      GFP_KERNEL);
+> >> >+                      if (err) {
+> >> >+                              NL_SET_ERR_MSG(extack,
+> >> >+                                             "Egress block dev inser=
+t failed");
+> >> >+                              goto err_out;
+> >> >+                      }
+> >> >               }
+> >> >       }
+> >> >
+> >> >--
+> >> >2.25.1
+> >> >
 
