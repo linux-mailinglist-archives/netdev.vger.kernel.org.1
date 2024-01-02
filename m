@@ -1,174 +1,457 @@
-Return-Path: <netdev+bounces-60924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFF35821DCA
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:38:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D693B821E12
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B12A1F22A7F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:38:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C34C2838B2
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0567F111A5;
-	Tue,  2 Jan 2024 14:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C2012B95;
+	Tue,  2 Jan 2024 14:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UVX4Zr9n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XjR67zPA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1E511718
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 14:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-555bd21f9fdso3479635a12.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 06:38:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704206286; x=1704811086; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AaCf1bVys3JfzwCvSEkXX/9JBhqyL9AY3m8awYnU7BM=;
-        b=UVX4Zr9nl3UlN0DGihg/ZTF3N2bNpW6A63OPH6CvoPBwOc7MMFQytr0Yr2HYFdSO76
-         R7nb6uOUfI0P8Pooythghr5KwA2+hkoONFlvDJsdRz+htG6oy3Dy5JVwonj5V/uWpofE
-         IV8/74Sf4qof5hDOsYLPktFPbzmPgn9qwcOUkHjGwZyATkHsFg4ldktwKpd+DSUs4/dg
-         /mM+/zB/Z8z+Qbh2wFxYkdGXdSme6eGmsvfwjjShVBUdzW3l6e1NRGenXtWy3y+8nwFx
-         wExrvwhxAiYpoIwcsIOjOB0MiHekiUvByof1ZNINxaYbDKYaRgmp3R2U1C5NlMFgrrfR
-         WnVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704206286; x=1704811086;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AaCf1bVys3JfzwCvSEkXX/9JBhqyL9AY3m8awYnU7BM=;
-        b=XjEeIhMC5IyBeKuV7BhpBME/eGmce2zS20pc4+dvrFQjN4Msm3ijJWM2q0XLONSquE
-         7A/NKKZNbk06mUo/7EASEv2/B+rIaPVVZ55hx1R23LtgW8wWM27o55ut7ngiit3pp270
-         ZmzN8PqYiBQn5jXUG/divYWTEOwfvn6vLG1xAS7KGQFaiI6xirQrgzOPFfgTDI7rEFZH
-         KzTCbw/q3KWjwChUqVhMisQVteBFvgd4J5l63z47AD6VqKsKnINuIOu7zdGornY9jXxL
-         ApEvmzjBKXZ65FYKhh+bcw4QCqbmhjS+QSPo5bbHrI6UWNdvFePaZg/o8VSvOGlXh/0L
-         dyZQ==
-X-Gm-Message-State: AOJu0YynX7EIZbRmyAhZXy/fC0PKuFJCt/QzlmFG2VMKR74+p7tpLbXR
-	/0uhccxq3huDSJn7yJu2vg8=
-X-Google-Smtp-Source: AGHT+IGLzphuqTAK2h3K8mjAK5qGTdnm3GmJ8v6kSj+kqiL74n30moOM7PMsQOSg4abypu4J1MRlBA==
-X-Received: by 2002:a17:906:2bd9:b0:a27:5f87:4d5d with SMTP id n25-20020a1709062bd900b00a275f874d5dmr3695743ejg.103.1704206285587;
-        Tue, 02 Jan 2024 06:38:05 -0800 (PST)
-Received: from ?IPV6:2a01:c23:c1df:9400:2dfa:6a98:a1f2:c23c? (dynamic-2a01-0c23-c1df-9400-2dfa-6a98-a1f2-c23c.c23.pool.telefonica.de. [2a01:c23:c1df:9400:2dfa:6a98:a1f2:c23c])
-        by smtp.googlemail.com with ESMTPSA id kk25-20020a170907767900b00a278953ea71sm4253570ejc.91.2024.01.02.06.38.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 06:38:05 -0800 (PST)
-Message-ID: <c379276f-2276-4c15-b483-7379b16031f7@gmail.com>
-Date: Tue, 2 Jan 2024 15:38:05 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0D612E5A;
+	Tue,  2 Jan 2024 14:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704207042; x=1735743042;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=hN1CwoPtfBRUluNxA/QRtbAkzFGBllkbFdxbPxtm2F4=;
+  b=XjR67zPAu8vlzzStYuKHn7XIaePE/FUN/1gMzGX++Ur7/5o/fmdo6Ikb
+   GxQ7SDFlj29kEWD0zbyq9EsL5e+MgU92IyELcMTTpgAbU/lFeF8eEUC53
+   wUwlzOyoIIN2+ppNVSO6Vo27G81Va53swaksrgckBrbUvBzFA4/hz+COt
+   rfOSe0tKo6/1oTG9JIL5Mu+KX4GEhhN4djFVYssUP9rDr3cZv7oJcmEEG
+   zpn6CfOrUqM8kh36c5AxhuU9qq5MrcPGPJAIygm+crxS/2P0RBNt7oeAB
+   vD4Nw0k+DfoF6+eLgLKbtBBSQwHnZPKoI0VIWYaDx+vxn58ULimhzwXGA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="4222451"
+X-IronPort-AV: E=Sophos;i="6.04,325,1695711600"; 
+   d="scan'208";a="4222451"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 06:50:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="898552448"
+X-IronPort-AV: E=Sophos;i="6.04,325,1695711600"; 
+   d="scan'208";a="898552448"
+Received: from yuyang-mobl2.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.129.41])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 06:50:34 -0800
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Song Yoong Siang <yoong.siang.song@intel.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>, Florian
+ Bezdeka <florian.bezdeka@siemens.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ xdp-hints@xdp-project.net
+Subject: Re: [PATCH iwl-next,v1 1/1] igc: Add Tx hardware timestamp request
+ for AF_XDP zero-copy packet
+In-Reply-To: <20231215162158.951925-1-yoong.siang.song@intel.com>
+References: <20231215162158.951925-1-yoong.siang.song@intel.com>
+Date: Tue, 02 Jan 2024 11:50:32 -0300
+Message-ID: <87il4b6b7r.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Russell King <rmk+kernel@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH RFC] net: mdio_bus: make check in mdiobus_prevent_c45_scan
- more granular
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Matching on OUI level is a quite big hammer. So let's make matching
-more granular.
+Song Yoong Siang <yoong.siang.song@intel.com> writes:
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
-This is what I'm thinking of. Maybe the problem of misbehaving
-on c45 access affects certain groups of PHY's only.
-Then we don't have to blacklist all PHY's from this vendor.
-What do you think?
----
- drivers/net/phy/mdio_bus.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+> This patch adds support to per-packet Tx hardware timestamp request to
+> AF_XDP zero-copy packet via XDP Tx metadata framework. Please note that
+> user needs to enable Tx HW timestamp capability via igc_ioctl() with
+> SIOCSHWTSTAMP cmd before sending xsk Tx timestamp request.
+>
+> Same as implementation in RX timestamp XDP hints kfunc metadata, Timer 0
+> (adjustable clock) is used in xsk Tx hardware timestamp. i225/i226 have
+> four sets of timestamping registers. A pointer named "xsk_pending_ts"
+> is introduced to indicate the timestamping register is already occupied.
+> Furthermore, the mentioned pointer also being used to hold the transmit
+> completion until the tx hardware timestamp is ready. This is because for
+> i225/i226, the timestamp notification comes some time after the transmit
+> completion event. The driver will retrigger hardware irq to clean the
+> packet after retrieve the tx hardware timestamp.
+>
+> Besides, a pointer named "xsk_meta" is added into igc_tx_timestamp_request
+> structure as a hook to the metadata location of the transmit packet. When
+> a Tx timestamp interrupt happens, the interrupt handler will copy the
+> value of Tx timestamp into metadata via xsk_tx_metadata_complete().
+>
+> This patch is tested with tools/testing/selftests/bpf/xdp_hw_metadata
+> on Intel ADL-S platform. Below are the test steps and results.
+>
+> Command on DUT:
+> sudo ./xdp_hw_metadata <interface name>
+> sudo hwstamp_ctl -i <interface name> -t 1 -r 1
+> sudo ./testptp -d /dev/ptp0 -s
+>
+> Command on Link Partner:
+> echo -n xdp | nc -u -q1 <destination IPv4 addr> 9091
+>
+> Result:
+> xsk_ring_cons__peek: 1
+> 0x555b112ae958: rx_desc[6]->addr=86110 addr=86110 comp_addr=86110 EoP
+> rx_hash: 0xBFDEC36E with RSS type:0x1
+> HW RX-time:   1677762429190040955 (sec:1677762429.1900) delta to User RX-time sec:0.0001 (100.124 usec)
+> XDP RX-time:   1677762429190123163 (sec:1677762429.1901) delta to User RX-time sec:0.0000 (17.916 usec)
+> 0x555b112ae958: ping-pong with csum=404e (want c59e) csum_start=34 csum_offset=6
+> 0x555b112ae958: complete tx idx=6 addr=6010
+> HW TX-complete-time:   1677762429190173323 (sec:1677762429.1902) delta to User TX-complete-time sec:0.0100 (10035.884 usec)
+> XDP RX-time:   1677762429190123163 (sec:1677762429.1901) delta to User TX-complete-time sec:0.0101 (10086.044 usec)
+> HW RX-time:   1677762429190040955 (sec:1677762429.1900) delta to HW TX-complete-time sec:0.0001 (132.368 usec)
+> 0x555b112ae958: complete rx idx=134 addr=86110
+>
+> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+> ---
+>  drivers/net/ethernet/intel/igc/igc.h      | 15 ++++
+>  drivers/net/ethernet/intel/igc/igc_main.c | 88 ++++++++++++++++++++++-
+>  drivers/net/ethernet/intel/igc/igc_ptp.c  | 42 ++++++++---
+>  3 files changed, 134 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+> index ac7c861e83a0..c831dde01662 100644
+> --- a/drivers/net/ethernet/intel/igc/igc.h
+> +++ b/drivers/net/ethernet/intel/igc/igc.h
+> @@ -79,6 +79,9 @@ struct igc_tx_timestamp_request {
+>  	u32 regl;              /* which TXSTMPL_{X} register should be used */
+>  	u32 regh;              /* which TXSTMPH_{X} register should be used */
+>  	u32 flags;             /* flags that should be added to the tx_buffer */
+> +	u8 xsk_queue_index;    /* Tx queue which requesting timestamp */
+> +	bool *xsk_pending_ts;  /* ref to tx ring for waiting timestamp event */
 
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index 6cf73c156..848d5d2d6 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -621,19 +621,27 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
-  */
- static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
- {
--	int i;
-+	const struct {
-+		u32 phy_id;
-+		u32 phy_id_mask;
-+	} id_list[] = {
-+		{ MICREL_OUI << 10, GENMASK(31, 10) },
-+	};
-+	int i, j;
- 
- 	for (i = 0; i < PHY_MAX_ADDR; i++) {
- 		struct phy_device *phydev;
--		u32 oui;
- 
- 		phydev = mdiobus_get_phy(bus, i);
- 		if (!phydev)
- 			continue;
--		oui = phydev->phy_id >> 10;
- 
--		if (oui == MICREL_OUI)
--			return true;
-+		for (j = 0; j < ARRAY_SIZE(id_list); j++) {
-+			u32 mask = id_list[j].phy_id_mask;
-+
-+			if ((phydev->phy_id & mask) == (id_list[j].phy_id & mask))
-+				return true;
-+		}
- 	}
- 	return false;
- }
+I think that this indirection level to xsk_pending_ts in the tx_buffer is a
+bit too hard to follow. What I am thinking is keeping a pointer to
+tx_buffer here in igc_tx_timestamp_request, perhaps even in a union with
+the skb, and use a similar logic, if that pointer is valid the timestamp
+request is in use.
+
+Do you think it could work?
+
+(Perhaps we would need to also store the buffer type in the request, but
+I don't think that would be too weird)
+
+> +	struct xsk_tx_metadata_compl xsk_meta;	/* ref to xsk Tx metadata */
+>  };
+>  
+>  struct igc_inline_rx_tstamps {
+> @@ -319,6 +322,9 @@ void igc_disable_tx_ring(struct igc_ring *ring);
+>  void igc_enable_tx_ring(struct igc_ring *ring);
+>  int igc_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags);
+>  
+> +/* AF_XDP TX metadata operations */
+> +extern const struct xsk_tx_metadata_ops igc_xsk_tx_metadata_ops;
+> +
+>  /* igc_dump declarations */
+>  void igc_rings_dump(struct igc_adapter *adapter);
+>  void igc_regs_dump(struct igc_adapter *adapter);
+> @@ -528,6 +534,7 @@ struct igc_tx_buffer {
+>  	DEFINE_DMA_UNMAP_ADDR(dma);
+>  	DEFINE_DMA_UNMAP_LEN(len);
+>  	u32 tx_flags;
+> +	bool xsk_pending_ts;
+>  };
+>  
+>  struct igc_rx_buffer {
+> @@ -553,6 +560,14 @@ struct igc_xdp_buff {
+>  	struct igc_inline_rx_tstamps *rx_ts; /* data indication bit IGC_RXDADV_STAT_TSIP */
+>  };
+>  
+> +struct igc_metadata_request {
+> +	struct xsk_tx_metadata *meta;
+> +	struct igc_adapter *adapter;
+
+If you have access to the tx_ring, you have access to the adapter, no
+need to have it here.
+
+> +	struct igc_ring *tx_ring;
+> +	bool *xsk_pending_ts;
+> +	u32 *cmd_type;
+
+I think this also would be clearer if here you had a pointer to the
+tx_buffer instead of only 'xsk_pending_ts'.
+
+I guess for cmd_type, no need for it to be a pointer, we can affort the
+extra copy.
+
+> +};
+> +
+>  struct igc_q_vector {
+>  	struct igc_adapter *adapter;    /* backlink */
+>  	void __iomem *itr_register;
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> index 61db1d3bfa0b..311c85f2d82d 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -1553,7 +1553,7 @@ static bool igc_request_tx_tstamp(struct igc_adapter *adapter, struct sk_buff *s
+>  	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
+>  		struct igc_tx_timestamp_request *tstamp = &adapter->tx_tstamp[i];
+>  
+> -		if (tstamp->skb)
+> +		if (tstamp->skb || tstamp->xsk_pending_ts)
+>  			continue;
+>  
+>  		tstamp->skb = skb_get(skb);
+> @@ -2878,6 +2878,71 @@ static void igc_update_tx_stats(struct igc_q_vector *q_vector,
+>  	q_vector->tx.total_packets += packets;
+>  }
+>  
+> +static void igc_xsk_request_timestamp(void *_priv)
+> +{
+> +	struct igc_metadata_request *meta_req = _priv;
+> +	struct igc_ring *tx_ring = meta_req->tx_ring;
+> +	struct igc_tx_timestamp_request *tstamp;
+> +	u32 *cmd_type = meta_req->cmd_type;
+> +	u32 tx_flags = IGC_TX_FLAGS_TSTAMP;
+> +	struct igc_adapter *adapter;
+> +	unsigned long lock_flags;
+> +	bool found = 0;
+> +	int i;
+> +
+> +	if (test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags)) {
+> +		adapter = meta_req->adapter;
+> +
+> +		spin_lock_irqsave(&adapter->ptp_tx_lock, lock_flags);
+> +
+> +		for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
+> +			tstamp = &adapter->tx_tstamp[i];
+> +
+> +			if (tstamp->skb || tstamp->xsk_pending_ts)
+> +				continue;
+> +
+> +			found = 1;
+
+nitpick: found is a bool, 'true' would read better.
+
+> +			break;
+> +		}
+> +
+> +		if (!found) {
+> +			adapter->tx_hwtstamp_skipped++;
+
+I think this is one those cases, that an early return or a goto would
+make the code easier to understand.
+
+> +		} else {
+> +			tstamp->start = jiffies;
+> +			tstamp->xsk_queue_index = tx_ring->queue_index;
+> +
+> +			tstamp->xsk_pending_ts = meta_req->xsk_pending_ts;
+> +			*tstamp->xsk_pending_ts = true;
+> +
+> +			xsk_tx_metadata_to_compl(meta_req->meta,
+> +						 &tstamp->xsk_meta);
+> +
+> +			/* set timestamp bit based on the _TSTAMP(_X) bit. */
+> +			tx_flags |= tstamp->flags;
+> +			*cmd_type |= IGC_SET_FLAG(tx_flags, IGC_TX_FLAGS_TSTAMP,
+> +						  (IGC_ADVTXD_MAC_TSTAMP));
+> +			*cmd_type |= IGC_SET_FLAG(tx_flags, IGC_TX_FLAGS_TSTAMP_1,
+> +						  (IGC_ADVTXD_TSTAMP_REG_1));
+> +			*cmd_type |= IGC_SET_FLAG(tx_flags, IGC_TX_FLAGS_TSTAMP_2,
+> +						  (IGC_ADVTXD_TSTAMP_REG_2));
+> +			*cmd_type |= IGC_SET_FLAG(tx_flags, IGC_TX_FLAGS_TSTAMP_3,
+> +						  (IGC_ADVTXD_TSTAMP_REG_3));
+> +		}
+> +
+> +		spin_unlock_irqrestore(&adapter->ptp_tx_lock, lock_flags);
+> +	}
+> +}
+> +
+> +static u64 igc_xsk_fill_timestamp(void *_priv)
+> +{
+> +	return *(u64 *)_priv;
+> +}
+> +
+> +const struct xsk_tx_metadata_ops igc_xsk_tx_metadata_ops = {
+> +	.tmo_request_timestamp		= igc_xsk_request_timestamp,
+> +	.tmo_fill_timestamp		= igc_xsk_fill_timestamp,
+> +};
+> +
+>  static void igc_xdp_xmit_zc(struct igc_ring *ring)
+>  {
+>  	struct xsk_buff_pool *pool = ring->xsk_pool;
+> @@ -2899,6 +2964,8 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
+>  	budget = igc_desc_unused(ring);
+>  
+>  	while (xsk_tx_peek_desc(pool, &xdp_desc) && budget--) {
+> +		struct igc_metadata_request meta_req;
+> +		struct xsk_tx_metadata *meta = NULL;
+>  		u32 cmd_type, olinfo_status;
+>  		struct igc_tx_buffer *bi;
+>  		dma_addr_t dma;
+> @@ -2909,14 +2976,23 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
+>  		olinfo_status = xdp_desc.len << IGC_ADVTXD_PAYLEN_SHIFT;
+>  
+>  		dma = xsk_buff_raw_get_dma(pool, xdp_desc.addr);
+> +		meta = xsk_buff_get_metadata(pool, xdp_desc.addr);
+>  		xsk_buff_raw_dma_sync_for_device(pool, dma, xdp_desc.len);
+> +		bi = &ring->tx_buffer_info[ntu];
+> +
+> +		meta_req.adapter = netdev_priv(ring->netdev);
+> +		meta_req.tx_ring = ring;
+> +		meta_req.meta = meta;
+> +		meta_req.cmd_type = &cmd_type;
+> +		meta_req.xsk_pending_ts = &bi->xsk_pending_ts;
+> +		xsk_tx_metadata_request(meta, &igc_xsk_tx_metadata_ops,
+> +					&meta_req);
+>  
+>  		tx_desc = IGC_TX_DESC(ring, ntu);
+>  		tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
+>  		tx_desc->read.olinfo_status = cpu_to_le32(olinfo_status);
+>  		tx_desc->read.buffer_addr = cpu_to_le64(dma);
+>  
+> -		bi = &ring->tx_buffer_info[ntu];
+>  		bi->type = IGC_TX_BUFFER_TYPE_XSK;
+>  		bi->protocol = 0;
+>  		bi->bytecount = xdp_desc.len;
+> @@ -2979,6 +3055,13 @@ static bool igc_clean_tx_irq(struct igc_q_vector *q_vector, int napi_budget)
+>  		if (!(eop_desc->wb.status & cpu_to_le32(IGC_TXD_STAT_DD)))
+>  			break;
+>  
+> +		/* Hold the completions while there's a pending tx hardware
+> +		 * timestamp request from XDP Tx metadata.
+> +		 */
+> +		if (tx_buffer->type == IGC_TX_BUFFER_TYPE_XSK &&
+> +		    tx_buffer->xsk_pending_ts)
+> +			break;
+> +
+
+One scenario that I am worried about the completion part is when tstamp
+and non-tstamp packets are mixed in the same queue.
+
+For example, when the user sends a 1 tstamp packet followed by 1
+non-tstamp packet. Some other ratios might be interesting to test as
+well, 1:10 for example. I guess a simple bandwith test would be enough,
+comparing "non-tstamp only" with mixed traffic.
+
+Perhaps are some bad recollections from the past, but I remember that
+the hardware takes a bit of time when generating the timestamp
+interrupts, and so those types of mixed traffic would have wasted
+bandwidth.
+
+>  		/* clear next_to_watch to prevent false hangs */
+>  		tx_buffer->next_to_watch = NULL;
+>  
+> @@ -6819,6 +6902,7 @@ static int igc_probe(struct pci_dev *pdev,
+>  
+>  	netdev->netdev_ops = &igc_netdev_ops;
+>  	netdev->xdp_metadata_ops = &igc_xdp_metadata_ops;
+> +	netdev->xsk_tx_metadata_ops = &igc_xsk_tx_metadata_ops;
+>  	igc_ethtool_set_ops(netdev);
+>  	netdev->watchdog_timeo = 5 * HZ;
+>  
+> diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
+> index 885faaa7b9de..b722bca40309 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_ptp.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/ktime.h>
+>  #include <linux/delay.h>
+>  #include <linux/iopoll.h>
+> +#include <net/xdp_sock.h>
+>  
+>  #define INCVALUE_MASK		0x7fffffff
+>  #define ISGN			0x80000000
+> @@ -555,8 +556,15 @@ static void igc_ptp_clear_tx_tstamp(struct igc_adapter *adapter)
+>  	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
+>  		struct igc_tx_timestamp_request *tstamp = &adapter->tx_tstamp[i];
+>  
+> -		dev_kfree_skb_any(tstamp->skb);
+> -		tstamp->skb = NULL;
+> +		if (tstamp->skb) {
+> +			dev_kfree_skb_any(tstamp->skb);
+> +			tstamp->skb = NULL;
+> +		} else if (tstamp->xsk_pending_ts) {
+> +			*tstamp->xsk_pending_ts = false;
+> +			tstamp->xsk_pending_ts = NULL;
+> +			igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index,
+> +				       0);
+> +		}
+>  	}
+>  
+>  	spin_unlock_irqrestore(&adapter->ptp_tx_lock, flags);
+> @@ -657,8 +665,15 @@ static int igc_ptp_set_timestamp_mode(struct igc_adapter *adapter,
+>  static void igc_ptp_tx_timeout(struct igc_adapter *adapter,
+>  			       struct igc_tx_timestamp_request *tstamp)
+>  {
+> -	dev_kfree_skb_any(tstamp->skb);
+> -	tstamp->skb = NULL;
+> +	if (tstamp->skb) {
+> +		dev_kfree_skb_any(tstamp->skb);
+> +		tstamp->skb = NULL;
+> +	} else if (tstamp->xsk_pending_ts) {
+> +		*tstamp->xsk_pending_ts = false;
+> +		tstamp->xsk_pending_ts = NULL;
+> +		igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index, 0);
+> +	}
+> +
+>  	adapter->tx_hwtstamp_timeouts++;
+>  
+>  	netdev_warn(adapter->netdev, "Tx timestamp timeout\n");
+> @@ -677,7 +692,7 @@ void igc_ptp_tx_hang(struct igc_adapter *adapter)
+>  	for (i = 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
+>  		tstamp = &adapter->tx_tstamp[i];
+>  
+> -		if (!tstamp->skb)
+> +		if (!tstamp->skb && !tstamp->xsk_pending_ts)
+>  			continue;
+>  
+>  		if (time_is_after_jiffies(tstamp->start + IGC_PTP_TX_TIMEOUT))
+> @@ -705,7 +720,7 @@ static void igc_ptp_tx_reg_to_stamp(struct igc_adapter *adapter,
+>  	int adjust = 0;
+>  
+>  	skb = tstamp->skb;
+> -	if (!skb)
+> +	if (!skb && !tstamp->xsk_pending_ts)
+>  		return;
+>  
+>  	if (igc_ptp_systim_to_hwtstamp(adapter, &shhwtstamps, regval))
+> @@ -729,10 +744,19 @@ static void igc_ptp_tx_reg_to_stamp(struct igc_adapter *adapter,
+>  	shhwtstamps.hwtstamp =
+>  		ktime_add_ns(shhwtstamps.hwtstamp, adjust);
+>  
+> -	tstamp->skb = NULL;
+> +	if (skb) {
+> +		tstamp->skb = NULL;
+> +		skb_tstamp_tx(skb, &shhwtstamps);
+> +		dev_kfree_skb_any(skb);
+> +	} else {
+> +		xsk_tx_metadata_complete(&tstamp->xsk_meta,
+> +					 &igc_xsk_tx_metadata_ops,
+> +					 &shhwtstamps.hwtstamp);
+>  
+> -	skb_tstamp_tx(skb, &shhwtstamps);
+> -	dev_kfree_skb_any(skb);
+> +		*tstamp->xsk_pending_ts = false;
+> +		tstamp->xsk_pending_ts = NULL;
+> +		igc_xsk_wakeup(adapter->netdev, tstamp->xsk_queue_index, 0);
+> +	}
+>  }
+>  
+>  /**
+> -- 
+> 2.34.1
+>
+
 -- 
-2.43.0
-
+Vinicius
 
