@@ -1,205 +1,216 @@
-Return-Path: <netdev+bounces-60824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E64821975
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:11:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E6A821977
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:12:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E3FF282E5C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:11:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C3FAB20EE3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2104CA7D;
-	Tue,  2 Jan 2024 10:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598F3CA7F;
+	Tue,  2 Jan 2024 10:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="WJCX10Cy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kE2vkBlQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02C7D268;
-	Tue,  2 Jan 2024 10:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 402AAxYq057964;
-	Tue, 2 Jan 2024 04:10:59 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1704190259;
-	bh=wjNblscvzjBJWi7IEaB+NGGPDDjrbOs7ytEZtICb098=;
-	h=Date:CC:Subject:To:References:From:In-Reply-To;
-	b=WJCX10Cygb9zsVzPIPCfW9C287lID3P858kTqxeOgNLjM1kJwkbhsQAtCTv0fwNS6
-	 Nwo056D6KzYy6+kLX2KH2Ew2jH9C4nrxKM3S1bGOQie91tZo48OUQ/Gb1H/PKpGw9S
-	 623Fv7LU2sXvuLXzgNHvR8702BDTJOqvluY7YHtU=
-Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 402AAxSW071229
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 2 Jan 2024 04:10:59 -0600
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE106.ent.ti.com
- (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 2
- Jan 2024 04:10:59 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 2 Jan 2024 04:10:59 -0600
-Received: from [10.249.131.186] ([10.249.131.186])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 402AAuxr002273;
-	Tue, 2 Jan 2024 04:10:56 -0600
-Message-ID: <e0337cfa-9744-7451-1fef-7f43f3b6cbe0@ti.com>
-Date: Tue, 2 Jan 2024 15:40:55 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB2CD26A
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 10:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso96895a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 02:12:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704190329; x=1704795129; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=adfFbKWEYub2oIsxBc06RRpotskmDpfu15gSAWSV6Ss=;
+        b=kE2vkBlQiq6OFgjW549bGyIKg+Y1aAiaX1nfmpkxgewuACBI+9Mt14O80tk51Hn72w
+         b1308Ou+mw+6TGgW2fZTOw8Gd3guze3CMXg1iMKlhXp2TZwwDPSAbJ4q8lohDzHY1RBy
+         bVK2gPo5SL0+WXJiC7WojfZ/5+1i0SSHbvilCv5g/Opeg4RuOnQTh1vUuO8qeLpGOsBh
+         3tAGVtqot+vrAzJ4par65hjt4lSv8vusrRS3qyRRxscB6GpUeutJiyPRHd1GOlOcBxbR
+         UW8jxnJvvkaXdcEmAN6yeIxjJCl1wxRQATHvdJXSm12FijBpNi9isaNvB1sX8s8S9zCB
+         BDQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704190329; x=1704795129;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=adfFbKWEYub2oIsxBc06RRpotskmDpfu15gSAWSV6Ss=;
+        b=b3STgrW821U6vCL7h5DOikUvieQu7JyIj/nbK6pG3Wrqaq5HjivNqPmTbMlMrHwa6M
+         22LnCguvPRPYpdQxF63m0HMFCNTlonvMNDznylyJM+jiRb2+0ZdlcIzqR5+XUU5N+dtQ
+         3EutJ5EX7suY92QoKMvwkEZYVCVvSwbr7V9V8R5ArT64iGArTCgSj/4xIGfTf6f4Ughm
+         RUskm6asSOixwaa/PIlCTg3/AxPLCyBitco9ybJR14Xf4JTYK3rG2+uw8jI4w9Sn6jGL
+         YfcNrYmAGsX5jdM94cErIDx3L9QEJtG8aghw/CsbW3QjS5mu7bNwySHi8oBNAuIUtOaG
+         +1MA==
+X-Gm-Message-State: AOJu0YxsZe230plUHPcGr3nRYFGglalo7l4F0FwSMCn3a2KQ5P9HqNrJ
+	HaurZnEBbisaGquJXom3abL8AFDqgUN/X2jzHcjqBieS5KtuercAYjTTizYsZ4iy
+X-Google-Smtp-Source: AGHT+IFzaknXrDGkhXAV0rWqm5K9wz520QfVV4cnfCIsyZt86hJvt/oj49dizFpVvYTM1Gf5dfMMOdSInecy4jbVyFw=
+X-Received: by 2002:a05:6402:5249:b0:554:98aa:f75c with SMTP id
+ t9-20020a056402524900b0055498aaf75cmr770762edd.5.1704190328723; Tue, 02 Jan
+ 2024 02:12:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        <s-vadapalli@ti.com>
-Subject: Re: [PATCH 2/3] net: ethernet: ti: am65-cpsw: Introduce rx_packet_max
- member
-Content-Language: en-US
-To: =?UTF-8?B?U2FuanXDoW4gR2FyY8OtYSwgSm9yZ2U=?=
-	<Jorge.SanjuanGarcia@duagon.com>
-References: <20240102081825.14635-1-jorge.sanjuangarcia@duagon.com>
- <c025f2f9-ca2c-4fdb-adb1-803745fded0c.a613f387-0b3b-49fd-9401-3a0ed0c1f80e.92d487ae-01e3-421b-a953-2e66fd9b9d60@emailsignatures365.codetwo.com>
- <20240102081825.14635-3-jorge.sanjuangarcia@duagon.com>
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-In-Reply-To: <20240102081825.14635-3-jorge.sanjuangarcia@duagon.com>
+References: <14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com>
+ <CANn89iLVg3H-GuZ6=_-Rc5Jk14T59pZcx1DF-3HApvsPuSpNXg@mail.gmail.com>
+ <20240102095835.GF6361@unreal> <CANn89iLd6EeC3b8DTXBP=cDw8ri+k_uGiCrAS6BOoG3FMuAxmg@mail.gmail.com>
+In-Reply-To: <CANn89iLd6EeC3b8DTXBP=cDw8ri+k_uGiCrAS6BOoG3FMuAxmg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Jan 2024 11:11:55 +0100
+Message-ID: <CANn89i+ad_7nisbJ8Z6Xcpv1jUjUvhfZLmpmGZ-2tJJNyN4v3A@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: Revert no longer abort SYN_SENT when
+ receiving some ICMP
+To: Leon Romanovsky <leon@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shachar Kagan <skagan@nvidia.com>, 
+	netdev@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>, 
+	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, Jan 2, 2024 at 11:03=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Jan 2, 2024 at 10:58=E2=80=AFAM Leon Romanovsky <leon@kernel.org>=
+ wrote:
+> >
+> > On Tue, Jan 02, 2024 at 10:46:13AM +0100, Eric Dumazet wrote:
+> > > On Tue, Jan 2, 2024 at 10:01=E2=80=AFAM Leon Romanovsky <leon@kernel.=
+org> wrote:
+> > > >
+> > > > From: Shachar Kagan <skagan@nvidia.com>
+> > > >
+> > > > This reverts commit 0a8de364ff7a14558e9676f424283148110384d6.
+> > > >
+> > > > Shachar reported that Vagrant (https://www.vagrantup.com/), which i=
+s
+> > > > very popular tool to manage fleet of VMs stopped to work after comm=
+it
+> > > > citied in Fixes line.
+> > > >
+> > > > The issue appears while using Vagrant to manage nested VMs.
+> > > > The steps are:
+> > > > * create vagrant file
+> > > > * vagrant up
+> > > > * vagrant halt (VM is created but shut down)
+> > > > * vagrant up - fail
+> > > >
+> > >
+> > > I would rather have an explanation, instead of reverting a valid patc=
+h.
+> > >
+> > > I have been on vacation for some time. I may have missed a detailed
+> > > explanation, please repost if needed.
+> >
+> > Our detailed explanation that revert worked. You provided the patch tha=
+t
+> > broke, so please let's not require from users to debug it.
+> >
+> > If you need a help to reproduce and/or test some hypothesis, Shachar
+> > will be happy to help you, just ask.
+>
+> I have asked already, and received files that showed no ICMP relevant
+> interactions.
+>
+> Can someone from your team help Shachar to get  a packet capture of
+> both TCP _and_ ICMP packets ?
+>
+> Otherwise there is little I can do. I can not blindly trust someone
+> that a valid patch broke something, just because 'something broke'
 
-On 02-01-2024 13:49, Sanjuán García, Jorge wrote:
-> The value written to the register AM65_CPSW_PORT_REG_RX_MAXLEN
-> is currently fixed to what AM65_CPSW_MAX_PACKET_SIZE defines. This
-> patch prepares the driver so that the maximum received frame length
-> can be configured in future updates.
-> 
-> Signed-off-by: Jorge Sanjuan Garcia <jorge.sanjuangarcia@duagon.com>
-> ---
+Alternative to a packet capture would be  a packetdrill test.
 
-For patches which add new features, please use the subject prefix
-[PATCH net-next].
+Following test passes with the new kernel, and breaks with the old ones.
 
->   drivers/net/ethernet/ti/am65-cpsw-nuss.c | 13 ++++++++-----
->   drivers/net/ethernet/ti/am65-cpsw-nuss.h |  2 ++
->   2 files changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c 
-> b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index 378d69b8cb14..a920146d7a60 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -151,9 +151,11 @@ static void am65_cpsw_port_set_sl_mac(struct am65_cpsw_port 
-> *slave,
-> 
->   static void am65_cpsw_sl_ctl_reset(struct am65_cpsw_port *port)
->   {
-> +       struct am65_cpsw_common *common = port->common;
-> +
->           cpsw_sl_reset(port->slave.mac_sl, 100);
->           /* Max length register has to be restored after MAC SL reset */
-> -       writel(AM65_CPSW_MAX_PACKET_SIZE,
-> +       writel(common->rx_packet_max,
->                  port->port_base + AM65_CPSW_PORT_REG_RX_MAXLEN);
 
-Prior to this patch, since the RX Packet size was hard-coded, it was
-being set to the same value across all ports. However, please note that
-there are per-port registers:
-port->port_base + AM65_CPSW_PORT_REG_RX_MAXLEN
-So, wouldn't it be better to define the "rx_packet_max" member within
-"struct am65_cpsw_port", rather than "struct am65_cpsw_common"?
-The same question applies to the following sections as well.
 
-I went through patch 3/3 of this series and the device-tree property:
-max-frame-size
-is being used to fetch the value for "rx_packet_max". But, isn't
-max-frame-size a port specific parameter? Shouldn't it then be stored as
-a member of "struct am65_cpsw_port".
+// Set up config.
+`../common/defaults.sh
+ ../common/set_sysctls.py /proc/sys/net/ipv4/tcp_syn_retries=3D12 \
+    /proc/sys/net/ipv4/tcp_syn_linear_timeouts=3D4
+`
 
->   }
-> 
-> @@ -455,7 +457,7 @@ static int am65_cpsw_nuss_common_open(struct 
-> am65_cpsw_common *common)
->                  AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD,
->                  common->cpsw_base + AM65_CPSW_REG_CTL);
->           /* Max length register */
-> -       writel(AM65_CPSW_MAX_PACKET_SIZE,
-> +       writel(common->rx_packet_max,
->                  host_p->port_base + AM65_CPSW_PORT_REG_RX_MAXLEN);
->           /* set base flow_id */
->           writel(common->rx_flow_id_base,
-> @@ -507,7 +509,7 @@ static int am65_cpsw_nuss_common_open(struct 
-> am65_cpsw_common *common)
-> 
->           for (i = 0; i < common->rx_chns.descs_num; i++) {
->                   skb = __netdev_alloc_skb_ip_align(NULL,
-> -                                                 AM65_CPSW_MAX_PACKET_SIZE,
-> +                                                 common->rx_packet_max,
->                                                     GFP_KERNEL);
->                   if (!skb) {
->                           ret = -ENOMEM;
-> @@ -848,7 +850,7 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_common 
-> *common,
-> 
->           k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
-> 
-> -       new_skb = netdev_alloc_skb_ip_align(ndev, AM65_CPSW_MAX_PACKET_SIZE);
-> +       new_skb = netdev_alloc_skb_ip_align(ndev, common->rx_packet_max);
->           if (new_skb) {
->                   ndev_priv = netdev_priv(ndev);
->                   am65_cpsw_nuss_set_offload_fwd_mark(skb, 
-> ndev_priv->offload_fwd_mark);
-> @@ -2196,7 +2198,7 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common 
-> *common, u32 port_idx)
->           eth_hw_addr_set(port->ndev, port->slave.mac_addr);
-> 
->           port->ndev->min_mtu = AM65_CPSW_MIN_PACKET_SIZE;
-> -       port->ndev->max_mtu = AM65_CPSW_MAX_PACKET_SIZE -
-> +       port->ndev->max_mtu = common->rx_packet_max -
->                                 (VLAN_ETH_HLEN + ETH_FCS_LEN);
->           port->ndev->hw_features = NETIF_F_SG |
->                                     NETIF_F_RXCSUM |
-> @@ -2926,6 +2928,7 @@ static int am65_cpsw_nuss_probe(struct platform_device *pdev)
->                   return -ENOENT;
-> 
->           common->rx_flow_id_base = -1;
-> +       common->rx_packet_max = AM65_CPSW_MAX_PACKET_SIZE;
->           init_completion(&common->tdown_complete);
->           common->tx_ch_num = AM65_CPSW_DEFAULT_TX_CHNS;
->           common->pf_p0_rx_ptype_rrobin = false;
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h 
-> b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-> index f3dad2ab9828..141160223d73 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-> @@ -130,6 +130,8 @@ struct am65_cpsw_common {
->           u32                     tx_ch_rate_msk;
->           u32                     rx_flow_id_base;
-> 
-> +       int                     rx_packet_max;
-> +
->           struct am65_cpsw_tx_chn tx_chns[AM65_CPSW_MAX_TX_QUEUES];
->           struct completion       tdown_complete;
->           atomic_t                tdown_cnt;
+// Establish a connection.
+    0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
+   +0 fcntl(3, F_SETFL, O_RDWR|O_NONBLOCK) =3D 0
+   +0 connect(3, ..., ...) =3D -1 EINPROGRESS (Operation now in progress)
 
-...
+  +0 > S 0:0(0) win 65535 <mss 1460,sackOK,TS val 80 ecr 0,nop,wscale 8>
 
--- 
-Regards,
-Siddharth.
+  +1 > S 0:0(0) win 65535 <...>
++0 %{ assert tcpi_backoff =3D=3D 0, tcpi_backoff}%
++0 %{ assert tcpi_total_rto =3D=3D 1, tcpi_total_rto}%
+
+   +1 > S 0:0(0) win 65535 <...>
++0 %{ assert tcpi_backoff =3D=3D 0, tcpi_backoff}%
++0 %{ assert tcpi_total_rto =3D=3D 2, tcpi_total_rto}%
+
+   +1 > S 0:0(0) win 65535 <...>
++0 %{ assert tcpi_backoff =3D=3D 0, tcpi_backoff}%
++0 %{ assert tcpi_total_rto =3D=3D 3, tcpi_total_rto}%
+
+// RFC 6069 : this ICMP message is ignored while in linear timeout mode
++.5 < icmp unreachable host_unreachable [0:0(0)]
+
++0.5 > S 0:0(0) win 65535 <...>
++0 %{ assert tcpi_backoff =3D=3D 0, tcpi_backoff}%
++0 %{ assert tcpi_total_rto =3D=3D 4, tcpi_total_rto}%
+
+   +1 > S 0:0(0) win 65535 <...>
++0 %{ assert tcpi_backoff =3D=3D 1, tcpi_backoff}%
++0 %{ assert tcpi_total_rto =3D=3D 5, tcpi_total_rto}%
+
+   +2 > S 0:0(0) win 65535 <...>
++0 %{ assert tcpi_backoff =3D=3D 2, tcpi_backoff}%
++0 %{ assert tcpi_total_rto =3D=3D 6, tcpi_total_rto}%
+
+   +4 > S 0:0(0) win 65535 <...>
++0 %{ assert tcpi_backoff =3D=3D 3, tcpi_backoff}%
++0 %{ assert tcpi_total_rto =3D=3D 7, tcpi_total_rto}%
+
+// RFC 6069 : this ICMP message should undo one retransmission timer backof=
+f
++.5 < icmp unreachable host_unreachable [0:0(0)]
++0 %{ assert tcpi_backoff =3D=3D 2, tcpi_backoff }%
+// RFC 6069 : this ICMP message should undo one retransmission timer backof=
+f
+ +.4 < icmp unreachable host_unreachable [0:0(0)]
++0 %{ assert tcpi_backoff =3D=3D 1, tcpi_backoff }%
+// RFC 6069 : this ICMP message should undo one retransmission timer backof=
+f
+ +0 < icmp unreachable host_unreachable [0:0(0)]
++0 %{ assert tcpi_backoff =3D=3D 0, tcpi_backoff }%
+
++.1 > S 0:0(0) win 65535 <...>
+
++0 %{ assert tcpi_backoff =3D=3D 1, tcpi_backoff }%
+
+// RFC 6069 : this ICMP message should undo one retransmission timer backof=
+f
++.6 < icmp unreachable net_unreachable [0:0(0)]
+
++0 %{ assert tcpi_backoff =3D=3D 0, tcpi_backoff }%
+
++.4 > S 0:0(0) win 65535 <...>
+
++0 %{ assert tcpi_backoff =3D=3D 1, tcpi_backoff }%
+
+//RFC 6069 : other ICMP messages should not undo one timer backoff
++0 < icmp unreachable source_route_failed [1:1(0)]
++0 < icmp unreachable net_unreachable_for_tos [1:1(0)]
++0 < icmp unreachable host_unreachable_for_tos [1:1(0)]
+
++0 %{ assert tcpi_backoff =3D=3D 1, tcpi_backoff }%
++2 > S 0:0(0) win 65535 <...>
++0 %{ assert tcpi_backoff =3D=3D 2, tcpi_backoff }%
 
