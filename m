@@ -1,204 +1,138 @@
-Return-Path: <netdev+bounces-60944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC6A1821F4B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:14:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DBD5821F64
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:22:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 848E82811B0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:14:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1617B1F22D9F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AC814F69;
-	Tue,  2 Jan 2024 16:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A940B14F6C;
+	Tue,  2 Jan 2024 16:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nsYpGk6k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cPf7usSN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E656C14F62
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 16:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB7614F65
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 16:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-555144cd330so7022963a12.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 08:14:31 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e73e6a17d5so172712417b3.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 08:22:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704212070; x=1704816870; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hd2aplMCet1ULWImTVMnDRzK7TL9hZ+ZX0uPlm9Tbpc=;
-        b=nsYpGk6kupUKR1Qxd4pt+MtzmA3B1XsadgguFFYG5Nk6G6jsf/0sK0dla4la28IPYe
-         J68Sc+IIkxrem44lkKnwnmdNtv54oCHSz3aOaOydM9a6va5CTA1yQyUoOR0fP4coORcf
-         9wCr9dU92Is4MmJNTvkRhNwRAWNCmcwWkBoOfYczAQjx6GnmxK4xwW779G0DNVwAj+++
-         IaZVzjDcjTxPfmhZJtPS1LmbdfgCD+CQoRrALapZcFfl4wTyO+QnAgdVdlUatSejh6zU
-         In+nuSkIJBwFiSS9NYQ4k0BHLGW7PJzWhuqalMZw0OgsP9yxxJmX1z5hoNzdOMB1LI8L
-         RLUA==
+        d=google.com; s=20230601; t=1704212542; x=1704817342; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=W1qqWwI3nJ9JHj6KQAZOfa3AzJkGoktZ1DTfqQ6WGWc=;
+        b=cPf7usSNFxuWHWuz8ubq3F0kHanDzeGgo42vtJXtsm47Jf6Ey/f9aU3ZmnWB1YVuZX
+         BJV2O3VkSw4SymyRFBolpVS5dBT80RiWRkKIyRh8MO0CK3CRvZ+/dov1zYaJUFJ5yCDC
+         gWoHVjhhztUaMfxJUFZMybyGr55j/FrZC9JaLuqFFPG2VtqIZ0LpMk/N09pQPPyqc/Kz
+         6Nwxb9/xY8lqKKsFuf7KWCMtllA0ucCNP0tS2mrQkgWV5nTYbrZq+bIINz6njU/yQVVk
+         vD2e1vqez5+m3McLvI+ozh4M0CRTYjAnvh6d/HAPzaj1bkcifC5heSNcJ9oYFnGz2p0o
+         8lbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704212070; x=1704816870;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hd2aplMCet1ULWImTVMnDRzK7TL9hZ+ZX0uPlm9Tbpc=;
-        b=npJQGSFWdLzYKk3ba8TsEdpBW/dAvUsq5HSYV5GPmaK1SsCjg/oXQwfaSjsM9Wt+2V
-         lRoRS5C5ntMWlZiuX452iExVptGAfMT2MITtRWxDWsYEv1USCjo9vcJuJt1Kjq0NjjHo
-         h3F1s3zWs6jwZv+uiJiyqqEtHL2bd998EJf3hxZFtMqCg5CeAbli7tDi4gd8gemqcQwO
-         reb8C4AudxLtF1PWfgeXY4R6vgS8wgp0r8mq15WiY76qhNSGb6MkZsFbAOS3cQeDtVJw
-         2jHylNoddn7z/5DnVhh9R965ygqAb6XATwb/Iuhp3ji8qfn/OxvQTkAamHdt/GmwGqY3
-         4fJg==
-X-Gm-Message-State: AOJu0YwLTapn5+HMtYUjjdNHzlmKaJMQNuaIJi5hYUjH2Gncmfypx9WU
-	YLSC0EZJOlXQIROB+vlQCjahnMYRUdjXDzV1WfublMFk6a0z
-X-Google-Smtp-Source: AGHT+IFJ3xiAnAAHviNNi+mEA9xiSIWfCXxzkbkl9TWLLiupNuy3YZ8o9IKmk26LnKZQwIZ/I/z3OiIAFQuWEIa3Vgs=
-X-Received: by 2002:a17:906:6a18:b0:a27:4725:6e4f with SMTP id
- qw24-20020a1709066a1800b00a2747256e4fmr6049949ejc.144.1704212069959; Tue, 02
- Jan 2024 08:14:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704212542; x=1704817342;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W1qqWwI3nJ9JHj6KQAZOfa3AzJkGoktZ1DTfqQ6WGWc=;
+        b=ju7ixWFUW/gjvs0EQcqXl3LVQ/ROmAESWHCXrltjpLEtnCKp7DCbOa3maXfsHaseB0
+         i9CPwh82U6VYThQ5cl8klmCIoFJecHExyRTeV+0qxI57rU1xSzhcbowAOjagrs9ap+oD
+         UfUDDhUmK8oi4dZ0ea5ZlwjDTlfLnmd8m+GqBAQATRZIXYOTRh+qbMLWbp7yRgtOYJdB
+         1fNmSmxe4AnNrtv5NBBexb3QEgf3cyflu1Xt4xSgJ33u6DcVg+Dn2ECJPRalc5hSMXD/
+         v0gmBFqgjopAXM+GNVhB9G+wRVA25vV+uExUFgcvWnzm6tBbVuAb05qnp99h+qCAcupa
+         Krhg==
+X-Gm-Message-State: AOJu0YzelcQjooC20P29inXPV+uo9UyEZ+N5X6rPnSpQbswMl7HVVJtK
+	dQtb84sNXiDLHx0ImdjKZmEsj4iHHTKo/1GAhaLY
+X-Google-Smtp-Source: AGHT+IHQXLX17wyTXyVjzQeptJxpGwB+H4AyuieT+HuVMs+LpEqMDf8iYjlz48LTj6uH3VdswKsTXhN8/vQ9MA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:690c:3510:b0:5d8:4274:bae2 with SMTP
+ id fq16-20020a05690c351000b005d84274bae2mr9201389ywb.6.1704212542158; Tue, 02
+ Jan 2024 08:22:22 -0800 (PST)
+Date: Tue,  2 Jan 2024 16:22:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com> <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
- <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
- <20231215021114.ipvdx2bwtxckrfdg@google.com> <20231215190126.1040fa12@kernel.org>
- <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
- <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
- <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
- <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com> <CAHS8izP63wXGH+Q3y1H=ycT=AHYnhGveBnuyF_rYioAjZ=Hn=g@mail.gmail.com>
- <7c6d35e3-165f-5883-1c1b-fce82c976028@huawei.com>
-In-Reply-To: <7c6d35e3-165f-5883-1c1b-fce82c976028@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 2 Jan 2024 08:14:17 -0800
-Message-ID: <CAHS8izNqeiK1tq=48LMbbqq5B4d2mhgbuKRvnFtiBngf73jXZg@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Shakeel Butt <shakeelb@google.com>, Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
-	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
-	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
-	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
-	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
-	Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20240102162220.750823-1-edumazet@google.com>
+Subject: [PATCH net-next] net-device: move xdp_prog to net_device_read_rx
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Coco Li <lixiaoyan@google.com>, 
+	Simon Horman <horms@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 21, 2023 at 10:42=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.c=
-om> wrote:
->
-> On 2023/12/22 5:22, Mina Almasry wrote:
-> > On Thu, Dec 21, 2023 at 3:32=E2=80=AFAM Yunsheng Lin <linyunsheng@huawe=
-i.com> wrote:
-> >>
-> >> On 2023/12/20 11:01, Mina Almasry wrote:
-> >>
-> >> ...
-> >>
-> >>>>>> Perhaps we should aim to not export netmem_to_page(),
-> >>>>>> prevent modules from accessing it directly.
-> >>>>>
-> >>>>> +1.
-> >>>>
-> >>>
-> >>> I looked into this, but it turns out it's a slightly bigger change
-> >>> that needs some refactoring to make it work. There are few places
-> >>> where I believe I need to add netmem_to_page() that are exposed to th=
-e
-> >>> drivers via inline helpers, these are:
-> >>>
-> >>> - skb_frag_page(), which returns NULL if the netmem is not a page, bu=
-t
-> >>> needs to do a netmem_to_page() to return the page otherwise.
-> >>
-> >> Is it possible to introduce something like skb_frag_netmem() for
-> >> netmem? so that we can keep most existing users of skb_frag_page()
-> >> unchanged and avoid adding additional checking overhead for existing
-> >> users.
-> >>
-> >
-> > In my experience most current skb_frag_page() users need specifically
-> > the struct page*. Example is illegal_highdma() which
-> > PageHighMem(skb_frag_page())
->
-> For illegal_highdma() case, is it possible to use something like
-> skb_readabe_frag() checking to avoid calling skb_frag_page() for netmem?
->
+xdp_prog is used in receive path, both from XDP enabled drivers
+and from netif_elide_gro().
 
-Not teh skb_readable_frag() check I think, because illegal_highdma()
-is not trying to read the SKB per se.
+This patch also removes two 4-bytes holes.
 
-But I agree with your general point, and that should be handled
-correctly in this patch which adds devmem support:
+Fixes: 43a71cd66b9c ("net-device: reorganize net_device fast path variables")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Coco Li <lixiaoyan@google.com>
+Cc: Simon Horman <horms@kernel.org>
+---
+ Documentation/networking/net_cachelines/net_device.rst | 2 +-
+ include/linux/netdevice.h                              | 2 +-
+ net/core/dev.c                                         | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.3516870=
--10-almasrymina@google.com/
+diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
+index 2dd8d8f20da2558fddcc341f3a8a27da3c4a1796..e75a53593bb9606f1c0595d8f7227881ec932b9c 100644
+--- a/Documentation/networking/net_cachelines/net_device.rst
++++ b/Documentation/networking/net_cachelines/net_device.rst
+@@ -96,7 +96,7 @@ unsigned_char*                      dev_addr
+ struct_netdev_queue*                _rx                     read_mostly         -                   netdev_get_rx_queue(rx)
+ unsigned_int                        num_rx_queues                                                   
+ unsigned_int                        real_num_rx_queues      -                   read_mostly         get_rps_cpu
+-struct_bpf_prog*                    xdp_prog                                                        
++struct_bpf_prog*                    xdp_prog                -                   read_mostly         netif_elide_gro()
+ unsigned_long                       gro_flush_timeout       -                   read_mostly         napi_complete_done
+ int                                 napi_defer_hard_irqs    -                   read_mostly         napi_complete_done
+ unsigned_int                        gro_max_size            -                   read_mostly         skb_gro_receive
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index d59db9adcc96e72272d4e981253fd4ee6e4e356a..e265aa1f21699ad567fe3af8e748be51cb7be7d6 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2150,6 +2150,7 @@ struct net_device {
+ 
+ 	/* RX read-mostly hotpath */
+ 	__cacheline_group_begin(net_device_read_rx);
++	struct bpf_prog __rcu	*xdp_prog;
+ 	struct list_head	ptype_specific;
+ 	int			ifindex;
+ 	unsigned int		real_num_rx_queues;
+@@ -2325,7 +2326,6 @@ struct net_device {
+ 	const unsigned char	*dev_addr;
+ 
+ 	unsigned int		num_rx_queues;
+-	struct bpf_prog __rcu	*xdp_prog;
+ #define GRO_LEGACY_MAX_SIZE	65536u
+ /* TCP minimal MSS is 8 (TCP_MIN_GSO_SIZE),
+  * and shinfo->gso_segs is a 16bit field.
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 31588a50b7573c7f71ddf64b7b25ea5033bb5c97..bc4ac49d4643a557d034ec7cad7194e152a4b9c5 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11670,7 +11670,7 @@ static void __init net_dev_struct_check(void)
+ #ifdef CONFIG_NET_XGRESS
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, tcx_ingress);
+ #endif
+-	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 96);
++	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 104);
+ }
+ 
+ /*
+-- 
+2.43.0.472.g3155946c3a-goog
 
-The idea being that skb_frag_page() can return NULL if the frag is not
-paged, and the relevant callers are modified to handle that.
-
-> >
-> > But RFC v5 adds skb_frag_netmem() for callsites that want a netmem and
-> > don't care about specifically a page:
-> >
-> > https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.351=
-6870-10-almasrymina@google.com/
-> >
-> >>> - The helpers inside skb_add_rx_frag(), which needs to do a
-> >>> netmem_to_page() to set skb->pfmemalloc.
-> >>
-> >> Similar as above, perhaps introduce something like skb_add_rx_netmem_f=
-rag()?
-> >>
-> >
-> > Yes, v3 of this series adds skb_add_rx_frag_netmem():
-> >
-> > https://patchwork.kernel.org/project/netdevbpf/patch/20231220214505.230=
-3297-4-almasrymina@google.com/
-
-
-
---=20
-Thanks,
-Mina
 
