@@ -1,286 +1,123 @@
-Return-Path: <netdev+bounces-60803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A0888218D5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:19:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FF698218ED
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C782C1F20CCB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:19:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A05BEB20E65
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F6B63D0;
-	Tue,  2 Jan 2024 09:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999236AA7;
+	Tue,  2 Jan 2024 09:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dXm5gASL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nb3iBOSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2053.outbound.protection.outlook.com [40.107.237.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FBB6AAB;
-	Tue,  2 Jan 2024 09:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40d87df95ddso14343815e9.0;
-        Tue, 02 Jan 2024 01:19:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704187142; x=1704791942; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cJtkm4EXw3sNC6xVwUMHZ+TIthpOJy/4hNIkSK0zIGE=;
-        b=dXm5gASLRjCFsIXcf8UP52iXmlY5jAsGYfEWwrjllkigjSkWEhR1L9fSxXUJlk7bEG
-         ytDOfqirPEpGZhR56lPww0Oq5qk99O2YQOnlz70zZ0QYEbqO60C1AgEQ96cAFgs+NxG5
-         QDrMXPQ0bsqWRLs6LQBlf1d09JYDNPdXGcifugyN0bTl4bVS59g1LRDzsOT5b5h7upb1
-         DJyTq7Ts7nCO8L1q+8MpQlu2GFfv42wp6DSImOZ7KBDrX03Xe2k/4VeER41u++r70J2T
-         ViQLCM9w3gPZs/8roPsef8KY+N7Ov9p4Z8D0dWAHkPfK/7lq+Kb0/eB7psBe2Xw150zC
-         voQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704187142; x=1704791942;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cJtkm4EXw3sNC6xVwUMHZ+TIthpOJy/4hNIkSK0zIGE=;
-        b=qlUs33vr5y4DP4Byx0FHwEbNjhhQJOVU2nC6DqbfXeema8OocXiCiS103NC/aBtnd4
-         +xdNIKEAodS+LhztjQv4lULDpYpV9VgzwGIvXIfwtg0Wq8YP/YyEm/xQrp5fPVefovUm
-         7S5CRqfiFDXv8RZcL62jK56Z2rZSQY1DPSseddFri88P9yZ1zSHflFIYZe30yowknmlc
-         Pd4GGAUqlEp9Sda6HCpTqpYkWeMNTn4Nm1erEuDT/V2VEv1R0UioOcFj8nxStaaF+a9+
-         G6KMw4j5NjF/iyOXVQAKG1oK1dC5vrhldRvlTIlyyyyP5qlpYF46SdcuFE+P17czvtpc
-         iJ6w==
-X-Gm-Message-State: AOJu0YzKVUPFrTrsA7G15P2FYYjP87XYwDcreR6uUNOUfPTUGM86T+B/
-	TYLOFMmZ6sEwfPjNaSB8pbk=
-X-Google-Smtp-Source: AGHT+IH5pC1w3L/Msv/w4SqF5tDEWT/1ehbAn+768EIBJqFn5JQqYha9fIPeZiFTlGdv9N8FH1uo3w==
-X-Received: by 2002:a05:600c:4393:b0:40d:3cdb:5dca with SMTP id e19-20020a05600c439300b0040d3cdb5dcamr5316702wmn.316.1704187142276;
-        Tue, 02 Jan 2024 01:19:02 -0800 (PST)
-Received: from ran.advaoptical.com ([82.166.23.19])
-        by smtp.gmail.com with ESMTPSA id l17-20020a05600c4f1100b0040d85a304desm9284313wmq.35.2024.01.02.01.18.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 01:19:01 -0800 (PST)
-From: Sagi Maimon <maimon.sagi@gmail.com>
-To: richardcochran@gmail.com,
-	luto@kernel.org,
-	datglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	arnd@arndb.de,
-	geert@linux-m68k.org,
-	peterz@infradead.org,
-	hannes@cmpxchg.org,
-	sohil.mehta@intel.com,
-	rick.p.edgecombe@intel.com,
-	nphamcs@gmail.com,
-	palmer@sifive.com,
-	maimon.sagi@gmail.com,
-	keescook@chromium.org,
-	legion@kernel.org,
-	mark.rutland@arm.com
-Cc: linux-kernel@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v5] posix-timers: add multi_clock_gettime system call
-Date: Tue,  2 Jan 2024 11:18:55 +0200
-Message-Id: <20240102091855.70418-1-maimon.sagi@gmail.com>
-X-Mailer: git-send-email 2.26.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F91D268
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 09:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E0y5F/82SJcDOhgJAY8AT5zTokSxvx790nbKcpzpmHKk/nPS+4iG5VcQBZuM3ObsSnjjxJ96f9ruVqyKQcwGLyOU8msEEOZq8DXo3Y94eRPlfCKmCsPBfbbRmLZR/UCodoiX9t9vfqzAKvHy59Te550pvEwGOukhXJdQHr1BQ4cuDIXTUA7/D7gndqD751mEyt7J0/Xef8WuKLw/imYRWfE1TQ5M7PSTc0Bpf7YsiqcOomC0l2UfwRLwfA8L4AdEXRQ2dBkNrcXLUHKn0ofHUtPTza2w0zpkrx99usfkW8tgILa2AhYGwms3RRryI+ol6pQDmeQMziT592a9eeFDQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=weGqt6P05URj17SgMd5iwtET5GtBywtar0w1PudRvqM=;
+ b=QWHriQB+ii5NQrpq05KD18qKEp7cPHFjxWHB/r3O8B7YtIX2ODmBn9QsOucO99j+7j9f0B0HQS1sjJQsHjVHl3hg8IaX/KSKwzaEsrR/fJKpVuHk5s0oFi9D9llSPqPHxBxDp4LyD27nSHmq1RQR7UGOJVpeJfRaN9r7XJiws962G9Jz1TXehE0Tr0+qkrDdUlRWNfTiesjziJsB0e3vl0t2zZNcB7HMKUGfOwUXwKZUpjsXD/6TFb8+MmJmiVUkKeUi76EnEqxJSQgsKhpQDigA+uNLlKk43FSDsxgVqe5O5Guv21rED4Z+XYu18ENp1kOKygQx8TfUtWQWg+dZvg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=weGqt6P05URj17SgMd5iwtET5GtBywtar0w1PudRvqM=;
+ b=nb3iBOSMaF2IMgFlZh9ZdCp8sO8mgYRJV0B+z6OcAVAWqO8ltmcGs2FZlrUl8qIcIT6cAVgE2xPQwIj96+0gAAj2TUUM8cY6WwTZD4n6NQN8CZy9rmkN90+Eysh/9jjqF3MxqmDvaZ+LIYd6xLW3h1c2EL1okMPQfBmG+U2e7EG70KbL+4+rzEUf7URaNqqoZ6eh3jxUSWH6oRNfkJfiEj59/FDwPzGQYGwd7kwdvSk/ISN/TuRei4rxPyCFBg9N4T0H5ms9ee5Y4Zas7XuTuuPZcyrhuuRcgJw4kaA5aLLIUl2m+pcW2uA1zofgHXlOn0FpL7lwnCqYOOMq/K01sw==
+Received: from CY5PR15CA0070.namprd15.prod.outlook.com (2603:10b6:930:18::6)
+ by PH0PR12MB8032.namprd12.prod.outlook.com (2603:10b6:510:26f::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Tue, 2 Jan
+ 2024 09:31:15 +0000
+Received: from CY4PEPF0000EE31.namprd05.prod.outlook.com
+ (2603:10b6:930:18:cafe::69) by CY5PR15CA0070.outlook.office365.com
+ (2603:10b6:930:18::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25 via Frontend
+ Transport; Tue, 2 Jan 2024 09:31:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000EE31.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7159.9 via Frontend Transport; Tue, 2 Jan 2024 09:31:15 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 2 Jan 2024
+ 01:31:02 -0800
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 2 Jan 2024
+ 01:31:00 -0800
+References: <20231211140732.11475-1-bpoirier@nvidia.com>
+ <20231220201017.0edeb8ea@hermes.local>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+CC: Benjamin Poirier <bpoirier@nvidia.com>, <netdev@vger.kernel.org>, "Petr
+ Machata" <petrm@nvidia.com>, Roopa Prabhu <roopa@nvidia.com>
+Subject: Re: [PATCH iproute2-next 00/20] bridge: vni: UI fixes
+Date: Tue, 2 Jan 2024 10:19:27 +0100
+In-Reply-To: <20231220201017.0edeb8ea@hermes.local>
+Message-ID: <87wmss9j59.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE31:EE_|PH0PR12MB8032:EE_
+X-MS-Office365-Filtering-Correlation-Id: a8cce122-f296-4ff2-6556-08dc0b759107
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	mAaW/3ouHHicvZNxpr2uX7Mnej7qeQ73pBxnxAhVNzIe8ECKGGO4+X05rm7OsOPIH3UJgbvEhkmSV4Rb3J/r18bVhBt9L55SYAHgcN5YKeoFBg0TPHeS9WFIEX4fMYkf8GKkmJdR4rQwZqCK9ncbkCkR9BStldgy+FSYRUTQ7OmU2mCFReBsIZP/QEvRpqKlO9ues5QUhCxBT17+RHM1cnvfOifkcFzsV/3C5CQOxGnYrXCQVcRUEwNT7nuD429TMo0tZVxTajb4kJiFaKn1X8knRk4e+O8GMX4+0S4PFKRdImabt/Vr2klQFr2XTxjPyJVs1plifHkWteH2qIZ2B86hgdE4Md0ef09QpHxxRcfGA1vEe9LGYXpdHiH2fMKR+nLO8BoBtfsQ69En7b5hS7iMKhrHCoNK4WdkRtkoUVfAuO15wY2+KTWgyIF7D2gkagQ6pWLnPQNAmZ9WpyynkMbpF8Y7QXO0HI7oLZT+4b9BdalViVcmc/iEsQO8dbR+U13cfJ6ji3GdL+Twz6e4fRfB5i7OiDfHRhv5zCow7v5mBYHaLWuLoGalI5gSH+2RmTxzzHwsdu1sqeuUI1i5HofvDrGwHoEK6BHen4xbnoPfTAix5ytzOaIoe+TAdQxyE0InvuHSEpy1lxeli4NRQqmm1IGofjcUxGwcYP0+zAPmMfPf1oPivjGfxsNGtQd69B1OGsunnkTw8HdomvUMxya85spQFNw4+PTOa3WW8pQ4n4eZZ4tcNMZjeLdocySD
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(396003)(346002)(136003)(230922051799003)(82310400011)(186009)(1800799012)(64100799003)(451199024)(46966006)(40470700004)(36840700001)(36756003)(83380400001)(478600001)(426003)(5660300002)(107886003)(4744005)(47076005)(41300700001)(82740400003)(40460700003)(6666004)(2906002)(4326008)(2616005)(40480700001)(7636003)(70586007)(70206006)(316002)(54906003)(6916009)(36860700001)(16526019)(8676002)(26005)(336012)(8936002)(86362001)(356005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2024 09:31:15.0621
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8cce122-f296-4ff2-6556-08dc0b759107
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE31.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8032
 
-Some user space applications need to read some clocks.
-Each read requires moving from user space to kernel space.
-The syscall overhead causes unpredictable delay between N clocks reads
-Removing this delay causes better synchronization between N clocks.
 
-Introduce a new system call multi_clock_gettime, which can be used to measure
-the offset between multiple clocks, from variety of types: PHC, virtual PHC
-and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
-The offset includes the total time that the driver needs to read the clock
-timestamp.
+Stephen Hemminger <stephen@networkplumber.org> writes:
 
-New system call allows the reading of a list of clocks - up to PTP_MAX_CLOCKS.
-Supported clocks IDs: PHC, virtual PHC and various system clocks.
-Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
-The system call returns n_clocks timestamps for each measurement:
-- clock 0 timestamp
-- ...
-- clock n timestamp
+> consider consolidating some of the patches.
+> Better to have 10 patches than 20.
 
-Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
----
- Changes since version 4:
- - fix error  : 'struct __ptp_multi_clock_get' declared inside parameter list 
-   will not be visible outside of this definition or declaration
-
- arch/x86/entry/syscalls/syscall_64.tbl |  1 +
- include/linux/syscalls.h               |  3 +-
- include/uapi/asm-generic/unistd.h      |  4 +-
- include/uapi/linux/multi_clock.h       | 21 +++++++++
- kernel/time/posix-timers.c             | 59 ++++++++++++++++++++++++++
- 5 files changed, 86 insertions(+), 2 deletions(-)
- create mode 100644 include/uapi/linux/multi_clock.h
-
-diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
-index 8cb8bf68721c..9cdeb0bf49db 100644
---- a/arch/x86/entry/syscalls/syscall_64.tbl
-+++ b/arch/x86/entry/syscalls/syscall_64.tbl
-@@ -378,6 +378,7 @@
- 454	common	futex_wake		sys_futex_wake
- 455	common	futex_wait		sys_futex_wait
- 456	common	futex_requeue		sys_futex_requeue
-+457	common	multi_clock_gettime	sys_multi_clock_gettime
- 
- #
- # Due to a historical design error, certain syscalls are numbered differently
-diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index fd9d12de7e92..bde7dec493fd 100644
---- a/include/linux/syscalls.h
-+++ b/include/linux/syscalls.h
-@@ -74,6 +74,7 @@ struct landlock_ruleset_attr;
- enum landlock_rule_type;
- struct cachestat_range;
- struct cachestat;
-+struct __ptp_multi_clock_get;
- 
- #include <linux/types.h>
- #include <linux/aio_abi.h>
-@@ -1161,7 +1162,7 @@ asmlinkage long sys_mmap_pgoff(unsigned long addr, unsigned long len,
- 			unsigned long prot, unsigned long flags,
- 			unsigned long fd, unsigned long pgoff);
- asmlinkage long sys_old_mmap(struct mmap_arg_struct __user *arg);
--
-+asmlinkage long sys_multi_clock_gettime(struct __ptp_multi_clock_get __user * ptp_multi_clk_get);
- 
- /*
-  * Not a real system call, but a placeholder for syscalls which are
-diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
-index 756b013fb832..beb3e0052d3c 100644
---- a/include/uapi/asm-generic/unistd.h
-+++ b/include/uapi/asm-generic/unistd.h
-@@ -828,9 +828,11 @@ __SYSCALL(__NR_futex_wake, sys_futex_wake)
- __SYSCALL(__NR_futex_wait, sys_futex_wait)
- #define __NR_futex_requeue 456
- __SYSCALL(__NR_futex_requeue, sys_futex_requeue)
-+#define __NR_multi_clock_gettime 457
-+__SYSCALL(__NR_multi_clock_gettime, sys_multi_clock_gettime)
- 
- #undef __NR_syscalls
--#define __NR_syscalls 457
-+#define __NR_syscalls 458
- 
- /*
-  * 32 bit systems traditionally used different
-diff --git a/include/uapi/linux/multi_clock.h b/include/uapi/linux/multi_clock.h
-new file mode 100644
-index 000000000000..5e78dac3a533
---- /dev/null
-+++ b/include/uapi/linux/multi_clock.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef _UAPI_MULTI_CLOCK_H
-+#define _UAPI_MULTI_CLOCK_H
-+
-+#include <linux/types.h>
-+#include <linux/time_types.h>
-+
-+#define MULTI_PTP_MAX_CLOCKS 32 /* Max number of clocks */
-+#define MULTI_PTP_MAX_SAMPLES 32 /* Max allowed offset measurement samples. */
-+
-+struct __ptp_multi_clock_get {
-+	unsigned int n_clocks; /* Desired number of clocks. */
-+	unsigned int n_samples; /* Desired number of measurements per clock. */
-+	clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
-+	/*
-+	 * Array of list of n_clocks clocks time samples n_samples times.
-+	 */
-+	struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
-+};
-+
-+#endif /* _UAPI_MULTI_CLOCK_H */
-diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
-index b924f0f096fa..1d321dc56a25 100644
---- a/kernel/time/posix-timers.c
-+++ b/kernel/time/posix-timers.c
-@@ -31,6 +31,8 @@
- #include <linux/compat.h>
- #include <linux/nospec.h>
- #include <linux/time_namespace.h>
-+#include <linux/multi_clock.h>
-+#include <linux/slab.h>
- 
- #include "timekeeping.h"
- #include "posix-timers.h"
-@@ -1426,6 +1428,63 @@ SYSCALL_DEFINE4(clock_nanosleep_time32, clockid_t, which_clock, int, flags,
- 
- #endif
- 
-+SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get __user *, ptp_multi_clk_get)
-+{
-+	const struct k_clock *kc;
-+	struct timespec64 *kernel_tp;
-+	struct timespec64 *kernel_tp_base;
-+	unsigned int n_clocks; /* Desired number of clocks. */
-+	unsigned int n_samples; /* Desired number of measurements per clock. */
-+	unsigned int i, j;
-+	clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
-+	int error = 0;
-+
-+	if (copy_from_user(&n_clocks, &ptp_multi_clk_get->n_clocks, sizeof(n_clocks)))
-+		return -EFAULT;
-+	if (copy_from_user(&n_samples, &ptp_multi_clk_get->n_samples, sizeof(n_samples)))
-+		return -EFAULT;
-+	if (n_samples > MULTI_PTP_MAX_SAMPLES)
-+		return -EINVAL;
-+	if (n_clocks > MULTI_PTP_MAX_CLOCKS)
-+		return -EINVAL;
-+	if (copy_from_user(clkid_arr, &ptp_multi_clk_get->clkid_arr,
-+			   sizeof(clockid_t) * n_clocks))
-+		return -EFAULT;
-+
-+	kernel_tp_base = kmalloc_array(n_clocks * n_samples,
-+				       sizeof(struct timespec64), GFP_KERNEL);
-+	if (!kernel_tp_base)
-+		return -ENOMEM;
-+
-+	kernel_tp = kernel_tp_base;
-+	for (j = 0; j < n_samples; j++) {
-+		for (i = 0; i < n_clocks; i++) {
-+			kc = clockid_to_kclock(clkid_arr[i]);
-+			if (!kc) {
-+				error = -EINVAL;
-+				goto out;
-+			}
-+			error = kc->clock_get_timespec(clkid_arr[i], kernel_tp++);
-+			if (error)
-+				goto out;
-+		}
-+	}
-+
-+	kernel_tp = kernel_tp_base;
-+	for (j = 0; j < n_samples; j++) {
-+		for (i = 0; i < n_clocks; i++) {
-+			if (put_timespec64(kernel_tp++, (struct __kernel_timespec __user *)
-+					&ptp_multi_clk_get->ts[j][i])) {
-+				error = -EFAULT;
-+				goto out;
-+			}
-+		}
-+	}
-+out:
-+	kfree(kernel_tp_base);
-+	return error;
-+}
-+
- static const struct k_clock clock_realtime = {
- 	.clock_getres		= posix_get_hrtimer_res,
- 	.clock_get_timespec	= posix_get_realtime_timespec,
--- 
-2.26.3
-
+The original that I reviewed internally was 7 patches. I asked Benjamin
+to split some of it more, because it was tricky to figure out that all
+the changes in an individual patch cancel out exactly right to deliver
+what the commit message promised. But yeah, I bet there's a middle
+ground.
 
