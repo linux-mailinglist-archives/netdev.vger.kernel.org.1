@@ -1,41 +1,76 @@
-Return-Path: <netdev+bounces-60902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50AF5821D2F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:00:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10D12821D3F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:03:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4D1EB21C42
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:00:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C70FB1C220D1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDB6FC08;
-	Tue,  2 Jan 2024 14:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14603FC1A;
+	Tue,  2 Jan 2024 14:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUtRdRLP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ccp6Nxdq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F1D101C4
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 14:00:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 97523C433C8;
-	Tue,  2 Jan 2024 14:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704204028;
-	bh=sGn04kJ7m2ltUKVLSiThy6PoLEsMXeg+nb2hqpFiMvo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kUtRdRLPYHkxtudzeQQvSrZ1FxMxaYyMneaHd2L6I89ZFyVORVPnSyNNQ7a+xcCzL
-	 yys1npW6U8go4I9t3lTPxREGFKfP7TdphM1uLEH2Cw7Kc8kdIH5iQTALG4at0uLIXZ
-	 /61tWsmOdUDh9OipAZ4J20E7LziY2vu43oeXP/Mvz2krJ9z0XLIUDoHW1lgoxok25e
-	 /4I5coj5g6xDig5pthw8uG1Mjh6Lup0qJ0l3QzlpZIY42bN3hpUYfKrvJlEdtyytjF
-	 2Zp7nFOXmW4uP7zFSCE0LVT+O2Rt2GP9976lmA1tUR6xebE3z9lZW8t+LgFcXbnMFp
-	 VJN839WD+T4BA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7E5E1DCB6D1;
-	Tue,  2 Jan 2024 14:00:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A3510949;
+	Tue,  2 Jan 2024 14:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40d8991f1acso14235845e9.1;
+        Tue, 02 Jan 2024 06:03:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704204215; x=1704809015; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=awobl8VjBDg7kap3xLk73wds/lfIaStSTrwk13gNoso=;
+        b=Ccp6NxdqzqoU044Z4brWeaSeMCTEWOdtuHHv23hb46t50JH2t6gqZ/gLW+1qsdTWtz
+         nQa7hNQXGlGZO8gkCCEKMIV0NmsIqAipsaaNHnVbvBz7RZa5JDF+bVT8sVqVH7sugoMI
+         nClLU3+liVLMCCB5GZj2WVyQqM1EpQiT3iJ1x5sBVQFJ6/z//z0V9FyoZbw3Uti9BFV8
+         /JMUKxpjv/Y6qK+ikkrSewXPsVVDWju05tYTa5BslPECDIFrYzTZbyPjvuJ/D/0hXxR+
+         ZMkDr4gHdmCfCa2HWMCD4yTmxcRw9OtwmLDOBsFWZBsfMYV6FAgs05uCOv//gjYydf1L
+         MvOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704204215; x=1704809015;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=awobl8VjBDg7kap3xLk73wds/lfIaStSTrwk13gNoso=;
+        b=oBSzLztntB2RNhZEbzHfkAODDtcP3stw/ben0HcirsJiWr4elOYFbf1PCM/QeVN0Rs
+         Glmr96h8CpjGUobluI/TTucLFpQ6DMNpN3UBXnAp4USwJ/wOqhmd13zDTAyl3Df4/b4g
+         K9NFW+vviOvi1beE8dES4lMuGt4rDBTtqKwyiyzX4EpTTHf/6I1B7nJX32C+Ti5PvFd1
+         0NdEwMB7UT4RMUApAr21NKN8jqFSF9/LwaYi7d9iOuO7mQYeh3CY36gRlO0qFm08J70S
+         3v6LykeF1jKUHlVz6nxem7/6WncuGgWPee34NShC/51UjOVqXqAS+gFJBwpGtqmNVFFe
+         gkFQ==
+X-Gm-Message-State: AOJu0YwAUZDtJT2MRlCaiuEgPUIZBFA+iwI8IWPlvA/CU8Bby3EfjU5O
+	O7FkrVZC055Sf8K2DyYYVS4=
+X-Google-Smtp-Source: AGHT+IGjWPQMT5ktYvyAz36LOlc7pBfpxvgWtK7kq7Rbteikwx2+6+aTk/sjJOMxVp1y2vtgh0vFAQ==
+X-Received: by 2002:a05:600c:2d84:b0:40b:5e59:ccb3 with SMTP id i4-20020a05600c2d8400b0040b5e59ccb3mr8822636wmg.148.1704204215352;
+        Tue, 02 Jan 2024 06:03:35 -0800 (PST)
+Received: from localhost.localdomain (host-87-10-250-100.retail.telecomitalia.it. [87.10.250.100])
+        by smtp.googlemail.com with ESMTPSA id e17-20020a5d5311000000b0033672cfca96sm28427527wrv.89.2024.01.02.06.03.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 06:03:34 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH v2 0/4] net: phy: at803x: even more generalization
+Date: Tue,  2 Jan 2024 15:03:24 +0100
+Message-ID: <20240102140330.7371-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,68 +78,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/13] bnxt_en: Add basic ntuple filter support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170420402851.2320.10719178135275424943.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jan 2024 14:00:28 +0000
-References: <20231223042210.102485-1-michael.chan@broadcom.com>
-In-Reply-To: <20231223042210.102485-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com
 
-Hello:
+This is part 3 of at803x required patches to split the PHY driver
+in more specific PHY Family driver.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+While adding support for a new PHY Family qca807x it was notice lots
+of similarities with the qca808x cdt function. Hence this series
+is done to make things easier in the future when qca807x PHY will be
+submitted.
 
-On Fri, 22 Dec 2023 20:21:57 -0800 you wrote:
-> The current driver only supports ntuple filters added by aRFS.  This
-> patch series adds basic support for user defined TCP/UDP ntuple filters
-> added by the user using ethtool.  Many of the patches are refactoring
-> patches to make the existing code more general to support both aRFS
-> and user defined filters.  aRFS filters always have the Toeplitz hash
-> value from the NIC.  A Toepliz hash function is added in patch 5 to
-> get the same hash value for user defined filters.  The hash is used
-> to store all ntuple filters in the table and all filters must be
-> hashed identically using the same function and key.
-> 
-> [...]
+Changes v2:
+- Address request from Russell in a previous series on cdt get
+  status improvement
 
-Here is the summary with links:
-  - [net-next,v2,01/13] bnxt_en: Refactor bnxt_ntuple_filter structure.
-    https://git.kernel.org/netdev/net-next/c/992d38d2b988
-  - [net-next,v2,02/13] bnxt_en: Add bnxt_l2_filter hash table.
-    https://git.kernel.org/netdev/net-next/c/1f6e77cb9b32
-  - [net-next,v2,03/13] bnxt_en: Re-structure the bnxt_ntuple_filter structure.
-    https://git.kernel.org/netdev/net-next/c/bfeabf7e4615
-  - [net-next,v2,04/13] bnxt_en: Refactor L2 filter alloc/free firmware commands.
-    https://git.kernel.org/netdev/net-next/c/96c9bedc755e
-  - [net-next,v2,05/13] bnxt_en: Add function to calculate Toeplitz hash
-    https://git.kernel.org/netdev/net-next/c/d3c982851c15
-  - [net-next,v2,06/13] bnxt_en: Add bnxt_lookup_ntp_filter_from_idx() function
-    https://git.kernel.org/netdev/net-next/c/cb5bdd292dc0
-  - [net-next,v2,07/13] bnxt_en: Add new BNXT_FLTR_INSERTED flag to bnxt_filter_base struct.
-    https://git.kernel.org/netdev/net-next/c/ee908d05dd2a
-  - [net-next,v2,08/13] bnxt_en: Refactor filter insertion logic in bnxt_rx_flow_steer().
-    https://git.kernel.org/netdev/net-next/c/59cde76f33fa
-  - [net-next,v2,09/13] bnxt_en: Refactor the hash table logic for ntuple filters.
-    https://git.kernel.org/netdev/net-next/c/80cfde29ce1f
-  - [net-next,v2,10/13] bnxt_en: Refactor ntuple filter removal logic in bnxt_cfg_ntp_filters().
-    https://git.kernel.org/netdev/net-next/c/4faeadfd7ed6
-  - [net-next,v2,11/13] bnxt_en: Add ntuple matching flags to the bnxt_ntuple_filter structure.
-    https://git.kernel.org/netdev/net-next/c/300c19180098
-  - [net-next,v2,12/13] bnxt_en: Add support for ntuple filters added from ethtool.
-    https://git.kernel.org/netdev/net-next/c/c029bc30b9f6
-  - [net-next,v2,13/13] bnxt_en: Add support for ntuple filter deletion by ethtool.
-    https://git.kernel.org/netdev/net-next/c/8d7ba028aa9a
+Christian Marangi (4):
+  net: phy: at803x: generalize cdt fault length function
+  net: phy: at803x: refactor qca808x cable test get status function
+  net: phy: at803x: add support for cdt cross short test for qca808x
+  net: phy: at803x: make read_status more generic
 
-You are awesome, thank you!
+ drivers/net/phy/at803x.c | 171 ++++++++++++++++++++++++++-------------
+ 1 file changed, 116 insertions(+), 55 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
