@@ -1,120 +1,83 @@
-Return-Path: <netdev+bounces-60900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66F7821D17
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:51:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FAA8821D0F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6876BB21F1E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:51:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877D3282609
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E1911733;
-	Tue,  2 Jan 2024 13:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73876FC02;
+	Tue,  2 Jan 2024 13:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+LnktMn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446E2125C7
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-35ff20816f7so85756625ab.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 05:50:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704203430; x=1704808230;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LhJ89AkZ2mQ4piGsbTa90hp+hsirbmIqRZBxh3Kialc=;
-        b=iDE04BaHbmAmjKHQy+/kOZTFPKx4TwHwNLPY+OdbQS4YiwhgFnNKdvzArIUaryX4ox
-         RHv2XdxBVh3N/AU8VHSSF5WCT3maY8oahutVTqh1TS2SAE1lLl8A9z1Zb1drICzSWmw8
-         JcF69R7k4IpVbw7irZ0cVzJgWTcgV/EOYUli4GJAVsYdC0hnHX+uiBtYFnCol3D9cGpI
-         JX3HMZSzZK7p1oPwTzrG554RglZaeU7A2jLIRZLnr/nbn20ljDf1E2pcA01p0kl1EWu/
-         e9VvHPbgnBFzWHA1u/J/oFNZKeGDLPG5ll9n4tHNtvpkWBxwDtxj8T2s3pnanc+cmE5A
-         htew==
-X-Gm-Message-State: AOJu0YxuINFM7V2xOuTH9vBl/r8N2cx/95PaeCgnZIYALESqmeR1gRNq
-	HLh5zXhydXuXsCZ5SXORKwI+4hAlE3O2fuuWyiaNl54Pen4t
-X-Google-Smtp-Source: AGHT+IHxsCT3t3osXnl1PfZRW9uRbIBaHneHi1+uMWzCQkknaeN03l1sz3/Xic3uQ3oU3aTaPbeNa4aiQVm4z9mH+qkEvoIKD3Bp
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565C5125D5;
+	Tue,  2 Jan 2024 13:50:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB85EC433D9;
+	Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704203431;
+	bh=6IqGUwbS5Nj/uWqmnYGoibvQ3Ou6BAF8Helju32xKJE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Q+LnktMnTeoTuuIWDLDAHotGPVU3pCZSwVKS0/wR/qgt/dN3Ux6GY59oQ6q+I/C8X
+	 aW1jg8kNoJv4ZFAXlwxA8so3uzxpVABmZ6F9Y0nhZtcm05gtmLdxbZgo6N3jiQm6hq
+	 qEWkq3p49LhfsrJ8M9p27nTr1gOfa1wHrp6tkp9ZIXEmRDF24FQ0jr+lE96FKX62xH
+	 goBR2XsrVZSBdp9hB1N0EXu15H+3+lEYZQcA+8ksdjW13+IszwuvQFCHgfxKvKMmX5
+	 xv9Rbfx0eNSftRz10fm51I7s14t8GfP83oarrpB8KdStiz580545cXUw0Yoepdqf3T
+	 ZGHq5XFucbWgA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CD406DCB6D0;
+	Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:388a:b0:35f:f683:f76a with SMTP id
- cn10-20020a056e02388a00b0035ff683f76amr1598987ilb.3.1704203429980; Tue, 02
- Jan 2024 05:50:29 -0800 (PST)
-Date: Tue, 02 Jan 2024 05:50:29 -0800
-In-Reply-To: <0000000000005f31a3060de282e6@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000011afb4060df6c8d4@google.com>
-Subject: Re: [syzbot] [nfc?] [net?] KMSAN: uninit-value in nci_ntf_packet
-From: syzbot <syzbot+29b5ca705d2e0f4a44d2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull request: bluetooth-next 2023-12-22
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170420343083.29739.6967311595901529200.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jan 2024 13:50:30 +0000
+References: <20231222184625.2813676-1-luiz.dentz@gmail.com>
+In-Reply-To: <20231222184625.2813676-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+Hello:
 
-HEAD commit:    610a9b8f49fb Linux 6.7-rc8
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=15d58055e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e51fe20c3e51ba7f
-dashboard link: https://syzkaller.appspot.com/bug?extid=29b5ca705d2e0f4a44d2
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1119f31ae80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15649d81e80000
+This pull request was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/28ecdd56de1e/disk-610a9b8f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3c5afc17c174/vmlinux-610a9b8f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/96ff79b2992d/bzImage-610a9b8f.xz
+On Fri, 22 Dec 2023 13:46:24 -0500 you wrote:
+> The following changes since commit 27c346a22f816b1d02e9303c572b4b8e31b75f98:
+> 
+>   octeontx2-af: Fix a double free issue (2023-12-22 13:31:54 +0000)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-12-22
+> 
+> [...]
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+29b5ca705d2e0f4a44d2@syzkaller.appspotmail.com
+Here is the summary with links:
+  - pull request: bluetooth-next 2023-12-22
+    https://git.kernel.org/netdev/net-next/c/8a48a2dc24f8
 
-nci: nci_rf_discover_ntf_packet: unsupported rf_tech_and_mode 0xff
-=====================================================
-BUG: KMSAN: uninit-value in nci_rf_discover_ntf_packet net/nfc/nci/ntf.c:386 [inline]
-BUG: KMSAN: uninit-value in nci_ntf_packet+0x2ac8/0x39c0 net/nfc/nci/ntf.c:798
- nci_rf_discover_ntf_packet net/nfc/nci/ntf.c:386 [inline]
- nci_ntf_packet+0x2ac8/0x39c0 net/nfc/nci/ntf.c:798
- nci_rx_work+0x213/0x500 net/nfc/nci/core.c:1522
- process_one_work kernel/workqueue.c:2627 [inline]
- process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2700
- worker_thread+0xf45/0x1490 kernel/workqueue.c:2781
- kthread+0x3ed/0x540 kernel/kthread.c:388
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x318/0x740 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- virtual_ncidev_write+0x6d/0x280 drivers/nfc/virtual_ncidev.c:120
- vfs_write+0x561/0x1490 fs/read_write.c:582
- ksys_write+0x20f/0x4c0 fs/read_write.c:637
- __do_sys_write fs/read_write.c:649 [inline]
- __se_sys_write fs/read_write.c:646 [inline]
- __x64_sys_write+0x93/0xd0 fs/read_write.c:646
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 1 PID: 4386 Comm: kworker/u4:31 Not tainted 6.7.0-rc8-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Workqueue: nfc2_nci_rx_wq nci_rx_work
-=====================================================
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
