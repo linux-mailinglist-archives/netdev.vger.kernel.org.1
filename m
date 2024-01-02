@@ -1,108 +1,155 @@
-Return-Path: <netdev+bounces-61018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21F01822335
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:22:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C09782233F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:27:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96B40284380
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 21:22:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4143D281B77
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 21:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738FD1643E;
-	Tue,  2 Jan 2024 21:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70777168A8;
+	Tue,  2 Jan 2024 21:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="FQzzBiLq";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QbIJ6/Qo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QTq0Bdpo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F73168A2;
-	Tue,  2 Jan 2024 21:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 37DF85C0545;
-	Tue,  2 Jan 2024 16:21:54 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Tue, 02 Jan 2024 16:21:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm1; t=1704230514; x=1704316914; bh=f48AgWcFEp
-	gF/0dIz78P2eBfvCrK498VxBEFdpVW/rM=; b=FQzzBiLq5QUbTq1IZJ0HkCziBk
-	JsoKK0Jr4k1HUdqKWl9KoDqL4KG09C6julFyTt+kVrdMqdqKiW9HuB3aKQcB1Dni
-	RM7N9eQofxupW5FLjmtoWpCNmcN/mcdcs8ZP4Tnpj4nia3szOI1JLoSg6Jgrqt0p
-	2pLJhFeH74QgrDqvRtYIMCKjOW8I1Bi3NovwmJEtyjWdPg3XXOpg36twEtQogO0U
-	tsatLo1KDyZObUqq0Tpa03mc8O8fR35RID1xz6spujZ+Ps5zaPbIL+aCY+/YmOSm
-	QCFMUry4U1Do4yoz5gVw+NWNDOeCY4POEyKTXnCfOr0QIu8iteE8oRTxffVg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1704230514; x=1704316914; bh=f48AgWcFEpgF/0dIz78P2eBfvCrK
-	498VxBEFdpVW/rM=; b=QbIJ6/QoXywQtwSe+5dh10lXAJ83JBHqoG4WF59ypa1T
-	/22VVdNsWpPPKRSL+TnF7CSidnW3ONE7odkNkMtWdXc97jdRlNfAX+66Mm0THCxH
-	KG9fNZKBX50WiGT8Yo/MEAN/riJIx97j8j63bWhy71BkPlzGw3GQvjNCrU8gXYBC
-	CxGoJllZmf62dkf5ad4WqZPHrZP/Xqu3RsJN4rZZEEBNCyEz0asR+xWyzHHWDhRl
-	KBFtzoirvB/zxSDj/o9TfNNGM8JM7Bm1fBrNsBPFxeVQa5xAJ33r5202HZ3CfzbQ
-	VuTt0zIvMEUYwy68SS8YldC9p1go2yur3uExhtGMtA==
-X-ME-Sender: <xms:cn6UZZudzgM_xiTPPs5s7-WKrTF8113mXEQ1abPKk9VTMS3z3aWhsA>
-    <xme:cn6UZSd5bD2ds1yu4kq5KTnV5A0S1CdobdV0m3yQipfmA1K9T_xDzusWta3E_F6qH
-    7hl_tVB69Hu8DqaS-A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdegfedgjeelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepvefhffeltdegheeffffhtdegvdehjedtgfekueevgfduffettedtkeekueef
-    hedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:cn6UZcz3XBVK1YSXLXIzypeVFTsiJHbub1dnyoCOIZbHxVy2W4tHVA>
-    <xmx:cn6UZQM2KjwdiioUTigneXkBZtxjL8ekB0uqfXNSO_PnLI2Pr7mhvA>
-    <xmx:cn6UZZ91hyuFntkw5wnrFiLrKYTubwn79lQDZoCICLexKsBEn3tW-Q>
-    <xmx:cn6UZSObkumm59_nmBy5_qbBhHepVu_bC-zmWiWfrcvnEZKoHt_GrA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id EEC21B6008D; Tue,  2 Jan 2024 16:21:53 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1364-ga51d5fd3b7-fm-20231219.001-ga51d5fd3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF047168A6
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 21:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbdb5c2b1beso12636533276.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 13:27:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704230839; x=1704835639; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b9mb89vCm3BKTU0DU+/TGy4Hk6L4CQ4i3DlNwc7INoo=;
+        b=QTq0Bdpo60Ekqq2oYrLPhrRJXYQNZ4E2Yt6/noM/M+HB+sNtRh7ignNo9Cy3hIlekX
+         mIWrMX9TIu+lqVnTmg2Ar22FQs/81LYhG5wd3I12E1oGKPsAOg9B3RaNoyj6dZBV2xNR
+         cQbm94zUt6LPqNquQWih+umpryX8HK1QvDZ84f/pvZAMSc9ieZAoIJV5g2vEwfQ1fMu1
+         Rtcuw6Z0fdR2Vyp7B+yxYkSmNetKobhTvewX+uqHyAs8Y4Vaij4LMnQHi5GDrRidkOBX
+         GYkERIWBo6qnB8Lzxqz3qU7Req5wRfw3hhhfTTYDc/n6emJWdCrFXAMm0PR/rDhVX9Lw
+         /kUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704230839; x=1704835639;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b9mb89vCm3BKTU0DU+/TGy4Hk6L4CQ4i3DlNwc7INoo=;
+        b=wY8ZI/oAJ3M4owsD/Qd2Tx3j9FCP9OlBtHoEYCcWnk6feSlX2lJXa87zmmjlHqcnb6
+         fcXzQT5WRo8MQexZP+MmQnkQ2yHTmzPRm2hb8AYt9C4ND2HjBK0WdD/Mhy0fuFaK9xar
+         u1mzWNtUgo3yes7IZrCAc5i/3wek04p2o9apZ9Nhq/nmsxv2CLZ1PMDqsYNhlTL+8AcS
+         h7Ej9D3oK8j2P1zr/vhD+XZCYgsyTBecla7BhyfF/+vQIHCcKQsPM19KZtoOZ9ofcQ0O
+         TbGgGs2xttKR94Mgxsp4VtKbC1CTqrrto+dm9p7j67aeIOsgkNR8RqZ2KhxGu5pAkPgF
+         i9Rg==
+X-Gm-Message-State: AOJu0YyG4CJKX3mVNEFw3GqzakuSz9/e4pHJmB+sUJGvPG+1QuE6nVan
+	tkfyE4d9fue2a31K6z6HOw74S0NmhPlrXZ94W4/C+wwh
+X-Google-Smtp-Source: AGHT+IHi1x1vNvCy7nh5qrPZXCz13gCpMzojuxdWNRARprBd5bnr1TBEGPjAqihkEYX2n51UbHfc4n0C/Tpy/M+g4g==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:9a04:c262:c978:d762])
+ (user=almasrymina job=sendgmr) by 2002:a25:8181:0:b0:dbd:2c5a:6c53 with SMTP
+ id p1-20020a258181000000b00dbd2c5a6c53mr21581ybk.6.1704230838915; Tue, 02 Jan
+ 2024 13:27:18 -0800 (PST)
+Date: Tue,  2 Jan 2024 13:27:13 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-Id: <fb69e804-6a9d-4052-a96e-40f8a20c189a@app.fastmail.com>
-In-Reply-To: <d1ce6aba-1b10-471c-ba60-10effa1dac10@corelatus.se>
-References: <d1ce6aba-1b10-471c-ba60-10effa1dac10@corelatus.se>
-Date: Tue, 02 Jan 2024 22:21:33 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Thomas Lange" <thomas@corelatus.se>, Netdev <netdev@vger.kernel.org>,
- linux-kernel@vger.kernel.org
-Cc: "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
- =?UTF-8?Q?J=C3=B6rn-Thorben_Hinz?= <jthinz@mailbox.tu-berlin.de>,
- "Deepa Dinamani" <deepa.kernel@gmail.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: Implement missing SO_TIMESTAMPING_NEW cmsg support
-Content-Type: text/plain
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20240102212716.810731-1-almasrymina@google.com>
+Subject: [RFC PATCH net-next v4 0/2] Abstract page from net stack
+From: Mina Almasry <almasrymina@google.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, 
+	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 2, 2024, at 22:13, Thomas Lange wrote:
-> Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
-> socket option SO_TIMESTAMPING_NEW. However, it was never implemented in
-> __sock_cmsg_send thus breaking SO_TIMESTAMPING cmsg for platforms using
-> SO_TIMESTAMPING_NEW.
->
-> Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
-> Link: 
-> https://lore.kernel.org/netdev/6a7281bf-bc4a-4f75-bb88-7011908ae471@app.fastmail.com/
-> Signed-off-by: Thomas Lange <thomas@corelatus.se>
+Changes in v4:
+- Forked off the trivial fixes to skb_frag_t field access to their own
+  patches and changed this to RFC that depends on these fixes:
 
-Cc: stable@vger.kernel.org
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+https://lore.kernel.org/netdev/20240102205905.793738-1-almasrymina@google.c=
+om/T/#u
+https://lore.kernel.org/netdev/20240102205959.794513-1-almasrymina@google.c=
+om/T/#u
+
+- Use an empty struct for netmem instead of void* __bitwise as that's
+  not a correct use of __bitwise.
+
+-----------
+
+Changes in v3:
+
+- Replaced the struct netmem union with an opaque netmem_ref type.
+- Added func docs to the netmem helpers and type.
+- Renamed the skb_frag_t fields since it's no longer a bio_vec
+
+-----------
+
+Changes in v2:
+- Reverted changes to the page_pool. The page pool now retains the same
+  API, so that we don't have to touch many existing drivers. The devmem
+  TCP series will include the changes to the page pool.
+
+- Addressed comments.
+
+This series is a prerequisite to the devmem TCP series. For a full
+snapshot of the code which includes these changes, feel free to check:
+
+https://github.com/mina/linux/commits/tcpdevmem-rfcv5/
+
+-----------
+
+Currently these components in the net stack use the struct page
+directly:
+
+1. Drivers.
+2. Page pool.
+3. skb_frag_t.
+
+To add support for new (non struct page) memory types to the net stack, we
+must first abstract the current memory type.
+
+Originally the plan was to reuse struct page* for the new memory types,
+and to set the LSB on the page* to indicate it's not really a page.
+However, for safe compiler type checking we need to introduce a new type.
+
+struct netmem is introduced to abstract the underlying memory type.
+Currently it's a no-op abstraction that is always a struct page underneath.
+In parallel there is an undergoing effort to add support for devmem to the
+net stack:
+
+https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@google.=
+com/
+
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christian K=C3=B6nig <christian.koenig@amd.com>
+Cc: Shakeel Butt <shakeelb@google.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+
+Mina Almasry (2):
+  net: introduce abstraction for network memory
+  net: add netmem to skb_frag_t
+
+ include/linux/skbuff.h | 92 +++++++++++++++++++++++++++++-------------
+ include/net/netmem.h   | 41 +++++++++++++++++++
+ net/core/skbuff.c      | 22 +++++++---
+ net/kcm/kcmsock.c      |  9 ++++-
+ 4 files changed, 129 insertions(+), 35 deletions(-)
+ create mode 100644 include/net/netmem.h
+
+--=20
+2.43.0.472.g3155946c3a-goog
+
 
