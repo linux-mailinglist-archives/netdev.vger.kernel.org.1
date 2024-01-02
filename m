@@ -1,317 +1,265 @@
-Return-Path: <netdev+bounces-60764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E70821618
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 02:09:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D598E821620
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 02:22:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B7B5281086
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 01:09:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 525B81F2127A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 01:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3708839C;
-	Tue,  2 Jan 2024 01:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97863384;
+	Tue,  2 Jan 2024 01:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTaV9EUY"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A87238F;
-	Tue,  2 Jan 2024 01:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4T3vrG2VwjzsV2R;
-	Tue,  2 Jan 2024 09:09:02 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id D747914011A;
-	Tue,  2 Jan 2024 09:09:35 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Jan 2024 09:09:35 +0800
-Message-ID: <fee3ec1c-5af6-aad2-c0d0-843de59494a7@huawei.com>
-Date: Tue, 2 Jan 2024 09:09:34 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A5620F8
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 01:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2cc7d2c1ff0so95192131fa.3
+        for <netdev@vger.kernel.org>; Mon, 01 Jan 2024 17:22:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704158535; x=1704763335; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WG7QBgQ+7JtmBHpWqUNHAv3ljnzfWa1IQRWQBC637Zs=;
+        b=JTaV9EUY7YaiKtaVL9w6UP3DHAtvgljzorzskjmf12sV0zfepHy+KGciDvqWz12j5B
+         D1qtT6qaqFHCcW6XD0tgCEZTofpz1BGZjLiK7XgCxisAx09TbFb7k6u0NPyiBl7XBk19
+         BhRO822jV6vT9cRtB1q0QV43wYd/DvDtOn5/AEcLsax4EpFgvNEoQf7n8Xb3eYf4Egyt
+         VkwhzvAY8aKwJAn1w28jvSDOPmXiYae8OttGhr1a5HSkcWt2LGmWHZYGYUw7x/FdO/Sk
+         Il4ldZCIvbh/X+RjFzMO6yl0RqeOVPyk7KIS7VhzcboRxDT3vViQAsPkhrqmfBvmAgjb
+         jP2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704158535; x=1704763335;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WG7QBgQ+7JtmBHpWqUNHAv3ljnzfWa1IQRWQBC637Zs=;
+        b=gFfPLu7d7JGaFcuRtTlHf0uGwvQkuxmaVx83r1RcCIaTwYlhqesy/1jk7Hg4p1Y8yh
+         eLaLDrspFNCHKqEAMthD6wSfedpWOckoZq3UoNxliWjks0WEOD5ERZxmECZOa+d3N2LU
+         JDGOay60lmF3jS8vX0ZAGIwrGhI01Tt/pEnAZnm1Xmpf+DJOufIH6SQO4cXQy7bX/C2u
+         GsGInuQg2IshfyQK2mVqBm6ARSx3v5EchN1WSvCcMUuueeOYOg005e5F/5KnQK6brgZk
+         J5G+ZJmP8DErA54dyefl2j6x/z2hzRd6h39F5hxcSdaS5Xju1gEnKlPK3STnYrk5QQuC
+         ZWng==
+X-Gm-Message-State: AOJu0YzxBDzx3v5lmefdlKjHUDHpLTzTuxTl4fClFGlNuEhJqaxLUEyC
+	PJiRLwXxXv/toBWz/JIyYt4=
+X-Google-Smtp-Source: AGHT+IEzwt3OtrltuzFORfQyaupBsxmrMWvS7RKHykOpbj9rW+UaOPuinfjNry5Pem7j6jMJV8JIZQ==
+X-Received: by 2002:a2e:381a:0:b0:2ca:30f5:7e02 with SMTP id f26-20020a2e381a000000b002ca30f57e02mr7619023lja.78.1704158534480;
+        Mon, 01 Jan 2024 17:22:14 -0800 (PST)
+Received: from mobilestation ([95.79.203.166])
+        by smtp.gmail.com with ESMTPSA id h2-20020a2ebc82000000b002cd03623ce5sm771663ljf.64.2024.01.01.17.22.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jan 2024 17:22:14 -0800 (PST)
+Date: Tue, 2 Jan 2024 04:22:12 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v7 7/9] net: stmmac: dwmac-loongson: Add GNET
+ support
+Message-ID: <y6pomse5ekphiysbfoabd35bxi6zs3hmoezfbjiv5nh7ogpxg5@23fnkt2vbkgb>
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <caf9e822c2f628f09e02760cfa81a1bd4af0b8d6.1702990507.git.siyanteng@loongson.cn>
+ <pbju43fy4upk32xcgrerkafnwjvs55p5x4kdaavhia4z7wjoqm@mk55pgs7eczz>
+ <ac7cc7fc-60fa-4624-b546-bb31cd5136cb@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH v2] ipc/mqueue: fix potential sleeping issue in
- mqueue_flush_file
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <brauner@kernel.org>, <dchinner@redhat.com>,
-	<jlayton@kernel.org>, <jack@suse.cz>, <riel@surriel.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
-References: <20231220021208.2634523-1-shaozhengchao@huawei.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <20231220021208.2634523-1-shaozhengchao@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ac7cc7fc-60fa-4624-b546-bb31cd5136cb@loongson.cn>
 
-+ping
+On Mon, Jan 01, 2024 at 03:27:07PM +0800, Yanteng Si wrote:
+> 
+> 在 2023/12/21 10:34, Serge Semin 写道:
+> > On Tue, Dec 19, 2023 at 10:26:47PM +0800, Yanteng Si wrote:
+> > > Add Loongson GNET (GMAC with PHY) support. Current GNET does not support
+> > > half duplex mode, and GNET on LS7A only supports ANE when speed is set to
+> > > 1000M.
+> > > 
+> > > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> > > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> > > ---
+> > >   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 79 +++++++++++++++++++
+> > >   .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  6 ++
+> > >   include/linux/stmmac.h                        |  2 +
+> > >   3 files changed, 87 insertions(+)
+> > > 
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > index 2c08d5495214..9e4953c7e4e0 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > @@ -168,6 +168,83 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
+> > >   	.config = loongson_gmac_config,
+> > >   };
+> > > +static void loongson_gnet_fix_speed(void *priv, unsigned int speed, unsigned int mode)
+> > > +{
+> > > +	struct net_device *ndev = dev_get_drvdata(priv);
+> > > +	struct stmmac_priv *ptr = netdev_priv(ndev);
+> > > +
+> > > +	/* The controller and PHY don't work well together.
+> > > +	 * We need to use the PS bit to check if the controller's status
+> > > +	 * is correct and reset PHY if necessary.
+> > > +	 */
+> > > +	if (speed == SPEED_1000)
+> > > +		if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS */)
+> > > +			phy_restart_aneg(ndev->phydev);
+> > {} around the outer if please.
+> OK.
+> > 
+> > > +}
+> > > +
+> > > +static int loongson_gnet_data(struct pci_dev *pdev,
+> > > +			      struct plat_stmmacenet_data *plat)
+> > > +{
+> > > +	loongson_default_data(pdev, plat);
+> > > +
+> > > +	plat->multicast_filter_bins = 256;
+> > > +
+> > > +	plat->mdio_bus_data->phy_mask = 0xfffffffb;
+> > ~BIT(2)?
+> I still need to confirm, please allow me to get back to you later.
+> > 
+> > > +
+> > > +	plat->phy_addr = 2;
+> > > +	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
+> > > +
+> > > +	plat->bsp_priv = &pdev->dev;
+> > > +	plat->fix_mac_speed = loongson_gnet_fix_speed;
+> > > +
+> > > +	plat->dma_cfg->pbl = 32;
+> > > +	plat->dma_cfg->pblx8 = true;
+> > > +
+> > > +	plat->clk_ref_rate = 125000000;
+> > > +	plat->clk_ptp_rate = 125000000;
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static int loongson_gnet_config(struct pci_dev *pdev,
+> > > +				struct plat_stmmacenet_data *plat,
+> > > +				struct stmmac_resources *res,
+> > > +				struct device_node *np)
+> > > +{
+> > > +	int ret;
+> > > +	u32 version = readl(res->addr + GMAC_VERSION);
+> > > +
+> > > +	switch (version & 0xff) {
+> > > +	case DWLGMAC_CORE_1_00:
+> > > +		ret = loongson_dwmac_config_multi_msi(pdev, plat, res, np, 8);
+> > > +		break;
+> > > +	default:
+> > > +		ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
 
-Does anyone have ideas with this patch?
+> > Hm, do you have two versions of Loongson GNET? What does the second
+> Yes.
+> > one contain in the GMAC_VERSION register then? Can't you distinguish
+> > them by the PCI IDs (device, subsystem, revision)?
+> 
+> I'm afraid that's not possible.
+> 
+> Because they have the same pci id and revision.
 
-On 2023/12/20 10:12, Zhengchao Shao wrote:
-> I analyze the potential sleeping issue of the following processes:
-> Thread A                                Thread B
-> ...                                     netlink_create  //ref = 1
-> do_mq_notify                            ...
->    sock = netlink_getsockbyfilp          ...     //ref = 2
->    info->notify_sock = sock;             ...
-> ...                                     netlink_sendmsg
-> ...                                       skb = netlink_alloc_large_skb  //skb->head is vmalloced
-> ...                                       netlink_unicast
-> ...                                         sk = netlink_getsockbyportid //ref = 3
-> ...                                         netlink_sendskb
-> ...                                           __netlink_sendskb
-> ...                                             skb_queue_tail //put skb to sk_receive_queue
-> ...                                         sock_put //ref = 2
-> ...                                     ...
-> ...                                     netlink_release
-> ...                                       deferred_put_nlk_sk //ref = 1
-> mqueue_flush_file
->    spin_lock
->    remove_notification
->      netlink_sendskb
->        sock_put  //ref = 0
->          sk_free
->            ...
->            __sk_destruct
->              netlink_sock_destruct
->                skb_queue_purge  //get skb from sk_receive_queue
->                  ...
->                  __skb_queue_purge_reason
->                    kfree_skb_reason
->                      __kfree_skb
->                      ...
->                      skb_release_all
->                        skb_release_head_state
->                          netlink_skb_destructor
->                            vfree(skb->head)  //sleeping while holding spinlock
+Please provide more details about what platform/devices support you
+are adding and what PCI IDs and DW GMAC IP-core version they have.
+
 > 
-> In netlink_sendmsg, if the memory pointed to by skb->head is allocated by
-> vmalloc, and is put to sk_receive_queue queue, also the skb is not freed.
-> When the mqueue executes flush, the sleeping bug will occur. Use mutex
-> lock instead of spin lock in mqueue_flush_file.
 > 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
-> v2: CCed some networking maintainer & netdev list
-> ---
->   ipc/mqueue.c | 48 ++++++++++++++++++++++++------------------------
->   1 file changed, 24 insertions(+), 24 deletions(-)
+> Thanks,
 > 
-> diff --git a/ipc/mqueue.c b/ipc/mqueue.c
-> index 5eea4dc0509e..f6f92e3f82e4 100644
-> --- a/ipc/mqueue.c
-> +++ b/ipc/mqueue.c
-> @@ -118,9 +118,9 @@ struct posix_msg_tree_node {
->    * Solution: use _release and _acquire barriers.
->    *
->    * 3) There is intentionally no barrier when setting current->state
-> - *    to TASK_INTERRUPTIBLE: spin_unlock(&info->lock) provides the
-> + *    to TASK_INTERRUPTIBLE: mutex_unlock(&info->lock) provides the
->    *    release memory barrier, and the wakeup is triggered when holding
-> - *    info->lock, i.e. spin_lock(&info->lock) provided a pairing
-> + *    info->lock, i.e. mutex_lock(&info->lock) provided a pairing
->    *    acquire memory barrier.
->    */
->   
-> @@ -132,7 +132,7 @@ struct ext_wait_queue {		/* queue of sleeping tasks */
->   };
->   
->   struct mqueue_inode_info {
-> -	spinlock_t lock;
-> +	struct mutex lock;
->   	struct inode vfs_inode;
->   	wait_queue_head_t wait_q;
->   
-> @@ -312,7 +312,7 @@ static struct inode *mqueue_get_inode(struct super_block *sb,
->   		inode->i_size = FILENT_SIZE;
->   		/* mqueue specific info */
->   		info = MQUEUE_I(inode);
-> -		spin_lock_init(&info->lock);
-> +		mutex_init(&info->lock);
->   		init_waitqueue_head(&info->wait_q);
->   		INIT_LIST_HEAD(&info->e_wait_q[0].list);
->   		INIT_LIST_HEAD(&info->e_wait_q[1].list);
-> @@ -523,11 +523,11 @@ static void mqueue_evict_inode(struct inode *inode)
->   
->   	ipc_ns = get_ns_from_inode(inode);
->   	info = MQUEUE_I(inode);
-> -	spin_lock(&info->lock);
-> +	mutex_lock(&info->lock);
->   	while ((msg = msg_get(info)) != NULL)
->   		list_add_tail(&msg->m_list, &tmp_msg);
->   	kfree(info->node_cache);
-> -	spin_unlock(&info->lock);
-> +	mutex_unlock(&info->lock);
->   
->   	list_for_each_entry_safe(msg, nmsg, &tmp_msg, m_list) {
->   		list_del(&msg->m_list);
-> @@ -640,7 +640,7 @@ static ssize_t mqueue_read_file(struct file *filp, char __user *u_data,
->   	char buffer[FILENT_SIZE];
->   	ssize_t ret;
->   
-> -	spin_lock(&info->lock);
-> +	mutex_lock(&info->lock);
->   	snprintf(buffer, sizeof(buffer),
->   			"QSIZE:%-10lu NOTIFY:%-5d SIGNO:%-5d NOTIFY_PID:%-6d\n",
->   			info->qsize,
-> @@ -649,7 +649,7 @@ static ssize_t mqueue_read_file(struct file *filp, char __user *u_data,
->   			 info->notify.sigev_notify == SIGEV_SIGNAL) ?
->   				info->notify.sigev_signo : 0,
->   			pid_vnr(info->notify_owner));
-> -	spin_unlock(&info->lock);
-> +	mutex_unlock(&info->lock);
->   	buffer[sizeof(buffer)-1] = '\0';
->   
->   	ret = simple_read_from_buffer(u_data, count, off, buffer,
-> @@ -665,11 +665,11 @@ static int mqueue_flush_file(struct file *filp, fl_owner_t id)
->   {
->   	struct mqueue_inode_info *info = MQUEUE_I(file_inode(filp));
->   
-> -	spin_lock(&info->lock);
-> +	mutex_lock(&info->lock);
->   	if (task_tgid(current) == info->notify_owner)
->   		remove_notification(info);
->   
-> -	spin_unlock(&info->lock);
-> +	mutex_unlock(&info->lock);
->   	return 0;
->   }
->   
-> @@ -680,13 +680,13 @@ static __poll_t mqueue_poll_file(struct file *filp, struct poll_table_struct *po
->   
->   	poll_wait(filp, &info->wait_q, poll_tab);
->   
-> -	spin_lock(&info->lock);
-> +	mutex_lock(&info->lock);
->   	if (info->attr.mq_curmsgs)
->   		retval = EPOLLIN | EPOLLRDNORM;
->   
->   	if (info->attr.mq_curmsgs < info->attr.mq_maxmsg)
->   		retval |= EPOLLOUT | EPOLLWRNORM;
-> -	spin_unlock(&info->lock);
-> +	mutex_unlock(&info->lock);
->   
->   	return retval;
->   }
-> @@ -724,7 +724,7 @@ static int wq_sleep(struct mqueue_inode_info *info, int sr,
->   		/* memory barrier not required, we hold info->lock */
->   		__set_current_state(TASK_INTERRUPTIBLE);
->   
-> -		spin_unlock(&info->lock);
-> +		mutex_unlock(&info->lock);
->   		time = schedule_hrtimeout_range_clock(timeout, 0,
->   			HRTIMER_MODE_ABS, CLOCK_REALTIME);
->   
-> @@ -734,7 +734,7 @@ static int wq_sleep(struct mqueue_inode_info *info, int sr,
->   			retval = 0;
->   			goto out;
->   		}
-> -		spin_lock(&info->lock);
-> +		mutex_lock(&info->lock);
->   
->   		/* we hold info->lock, so no memory barrier required */
->   		if (READ_ONCE(ewp->state) == STATE_READY) {
-> @@ -752,7 +752,7 @@ static int wq_sleep(struct mqueue_inode_info *info, int sr,
->   	}
->   	list_del(&ewp->list);
->   out_unlock:
-> -	spin_unlock(&info->lock);
-> +	mutex_unlock(&info->lock);
->   out:
->   	return retval;
->   }
-> @@ -1125,7 +1125,7 @@ static int do_mq_timedsend(mqd_t mqdes, const char __user *u_msg_ptr,
->   	if (!info->node_cache)
->   		new_leaf = kmalloc(sizeof(*new_leaf), GFP_KERNEL);
->   
-> -	spin_lock(&info->lock);
-> +	mutex_lock(&info->lock);
->   
->   	if (!info->node_cache && new_leaf) {
->   		/* Save our speculative allocation into the cache */
-> @@ -1166,7 +1166,7 @@ static int do_mq_timedsend(mqd_t mqdes, const char __user *u_msg_ptr,
->   		simple_inode_init_ts(inode);
->   	}
->   out_unlock:
-> -	spin_unlock(&info->lock);
-> +	mutex_unlock(&info->lock);
->   	wake_up_q(&wake_q);
->   out_free:
->   	if (ret)
-> @@ -1230,7 +1230,7 @@ static int do_mq_timedreceive(mqd_t mqdes, char __user *u_msg_ptr,
->   	if (!info->node_cache)
->   		new_leaf = kmalloc(sizeof(*new_leaf), GFP_KERNEL);
->   
-> -	spin_lock(&info->lock);
-> +	mutex_lock(&info->lock);
->   
->   	if (!info->node_cache && new_leaf) {
->   		/* Save our speculative allocation into the cache */
-> @@ -1242,7 +1242,7 @@ static int do_mq_timedreceive(mqd_t mqdes, char __user *u_msg_ptr,
->   
->   	if (info->attr.mq_curmsgs == 0) {
->   		if (f.file->f_flags & O_NONBLOCK) {
-> -			spin_unlock(&info->lock);
-> +			mutex_unlock(&info->lock);
->   			ret = -EAGAIN;
->   		} else {
->   			wait.task = current;
-> @@ -1261,7 +1261,7 @@ static int do_mq_timedreceive(mqd_t mqdes, char __user *u_msg_ptr,
->   
->   		/* There is now free space in queue. */
->   		pipelined_receive(&wake_q, info);
-> -		spin_unlock(&info->lock);
-> +		mutex_unlock(&info->lock);
->   		wake_up_q(&wake_q);
->   		ret = 0;
->   	}
-> @@ -1391,7 +1391,7 @@ static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
->   	info = MQUEUE_I(inode);
->   
->   	ret = 0;
-> -	spin_lock(&info->lock);
-> +	mutex_lock(&info->lock);
->   	if (notification == NULL) {
->   		if (info->notify_owner == task_tgid(current)) {
->   			remove_notification(info);
-> @@ -1424,7 +1424,7 @@ static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
->   		info->notify_user_ns = get_user_ns(current_user_ns());
->   		inode_set_atime_to_ts(inode, inode_set_ctime_current(inode));
->   	}
-> -	spin_unlock(&info->lock);
-> +	mutex_unlock(&info->lock);
->   out_fput:
->   	fdput(f);
->   out:
-> @@ -1470,7 +1470,7 @@ static int do_mq_getsetattr(int mqdes, struct mq_attr *new, struct mq_attr *old)
->   	inode = file_inode(f.file);
->   	info = MQUEUE_I(inode);
->   
-> -	spin_lock(&info->lock);
-> +	mutex_lock(&info->lock);
->   
->   	if (old) {
->   		*old = info->attr;
-> @@ -1488,7 +1488,7 @@ static int do_mq_getsetattr(int mqdes, struct mq_attr *new, struct mq_attr *old)
->   		inode_set_atime_to_ts(inode, inode_set_ctime_current(inode));
->   	}
->   
-> -	spin_unlock(&info->lock);
-> +	mutex_unlock(&info->lock);
->   	fdput(f);
->   	return 0;
->   }
+> Yanteng
+> 
+> > 
+> > -Serge(y)
+> > 
+> > > +		break;
+> > > +	}
+> > > +
+> > > +	switch (pdev->revision) {
+> > > +	case 0x00:
+> > > +		plat->flags |=
+> > > +			FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1) |
+> > > +			FIELD_PREP(STMMAC_FLAG_DISABLE_FORCE_1000, 1);
+> > > +		break;
+> > > +	case 0x01:
+> > > +		plat->flags |=
+> > > +			FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1);
+> > > +		break;
+> > > +	default:
+> > > +		break;
+> > > +	}
+> > > +
+> > > +	return ret;
+> > > +}
+> > > +
+> > > +static struct stmmac_pci_info loongson_gnet_pci_info = {
+> > > +	.setup = loongson_gnet_data,
+> > > +	.config = loongson_gnet_config,
+> > > +};
+> > > +
+> > >   static int loongson_dwmac_probe(struct pci_dev *pdev,
+> > >   				const struct pci_device_id *id)
+> > >   {
+> > > @@ -318,9 +395,11 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+> > >   			 loongson_dwmac_resume);
+> > >   #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+> > > +#define PCI_DEVICE_ID_LOONGSON_GNET	0x7a13
+> > >   static const struct pci_device_id loongson_dwmac_id_table[] = {
+> > >   	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> > > +	{ PCI_DEVICE_DATA(LOONGSON, GNET, &loongson_gnet_pci_info) },
+> > >   	{}
+> > >   };
+> > >   MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > index 8105ce47c6ad..d6939eb9a0d8 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > @@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
+> > >   		return 0;
+> > >   	}
+> > > +	if (FIELD_GET(STMMAC_FLAG_DISABLE_FORCE_1000, priv->plat->flags)) {
+> > > +		if (cmd->base.speed == SPEED_1000 &&
+> > > +		    cmd->base.autoneg != AUTONEG_ENABLE)
+> > > +			return -EOPNOTSUPP;
+> > > +	}
+> > > +
+> > >   	return phylink_ethtool_ksettings_set(priv->phylink, cmd);
+> > >   }
+> > > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> > > index f07f79d50b06..067030cdb60f 100644
+> > > --- a/include/linux/stmmac.h
+> > > +++ b/include/linux/stmmac.h
+> > > @@ -222,6 +222,8 @@ struct dwmac4_addrs {
+> > >   #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
+> > >   #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
+> > >   #define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+
+> > > +#define STMMAC_FLAG_DISABLE_HALF_DUPLEX	BIT(14)
+
+Just noticed. I do not see this flag affecting any part of the code.
+Drop it if no actual action is implied by it.
+
+-Serge(y)
+
+> > > +#define STMMAC_FLAG_DISABLE_FORCE_1000	BIT(15)
+> > >   struct plat_stmmacenet_data {
+> > >   	int bus_id;
+> > > -- 
+> > > 2.31.4
+> > > 
+> 
 
