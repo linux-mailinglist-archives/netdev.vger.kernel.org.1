@@ -1,82 +1,120 @@
-Return-Path: <netdev+bounces-60797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AF53821883
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:45:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0820E8218A4
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:59:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 150C32815B1
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:45:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A0041C20FDB
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3CB4C8F;
-	Tue,  2 Jan 2024 08:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB5F53AF;
+	Tue,  2 Jan 2024 08:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=walle.cc header.i=@walle.cc header.b="OMPg8DPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from mail.3ffe.de (0001.3ffe.de [159.69.201.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3F479DB;
-	Tue,  2 Jan 2024 08:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tonylu@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VzpAqHk_1704185086;
-Received: from localhost(mailfrom:tonylu@linux.alibaba.com fp:SMTPD_---0VzpAqHk_1704185086)
-          by smtp.aliyun-inc.com;
-          Tue, 02 Jan 2024 16:44:46 +0800
-Date: Tue, 2 Jan 2024 16:44:45 +0800
-From: Tony Lu <tonylu@linux.alibaba.com>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: Markus Elfring <Markus.Elfring@web.de>, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>
-Subject: Re: [PATCH 0/2] net/smc: Adjustments for two function implementations
-Message-ID: <ZZPM_bOQrRt0gaMa@TONYMAC-ALIBABA.local>
-Reply-To: Tony Lu <tonylu@linux.alibaba.com>
-References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
- <93033352-4b9c-bf52-1920-6ccf07926a21@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEFECA62
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 08:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=walle.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=walle.cc
+Received: from 3ffe.de (0001.3ffe.de [IPv6:2a01:4f8:c0c:9d57::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.3ffe.de (Postfix) with ESMTPSA id EB3092BA;
+	Tue,  2 Jan 2024 09:50:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2022082101;
+	t=1704185440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3EWnLNmP8ycXFfGgtGCw8tql8p6JL0N060m1DGShhIw=;
+	b=OMPg8DPPsUBolYr92Civ/uaxHoTe+8kbM/vWBXZrIORIDPgzuUyvqOWEFaL6ILqIicTdTV
+	bK2rv31d71njMmE43aVjMxQrO3jtPlf9meCS3LAebUeM948eky3Lr+aTvS08FMQ6XkjsVg
+	0n2TTSjtJH+acq4RDauWHSyr+PTWU0NFJ0qQeVYMzoFWVTg6amvEMKr5XdFua6cZyFZAfp
+	UO4zzYM42cE9Oq+VmVm0fgTmn0luSSPGRw0D4rgZpNxeUsqm4rjQi1vXwTlwszfhI6IxRQ
+	hNISum+LRo/vahJdvPqGhqcBo7JhQ7JiovVT6DvZT+qssYlRdM1Ei7Ro6rWvhQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <93033352-4b9c-bf52-1920-6ccf07926a21@linux.alibaba.com>
+Date: Tue, 02 Jan 2024 09:50:39 +0100
+From: Michael Walle <michael@walle.cc>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: ezra@synergy-village.org, Andrew Lunn <andrew@lunn.ch>, Russell King
+ <linux@armlinux.org.uk>, Tristram Ha <Tristram.Ha@microchip.com>, Jesse
+ Brandeburg <jesse.brandeburg@intel.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
+In-Reply-To: <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
+References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
+ <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
+Message-ID: <cf86ad14e88362952c9f746dfb04cff4@walle.cc>
+X-Sender: michael@walle.cc
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 02, 2024 at 04:13:09PM +0800, Wen Gu wrote:
-> 
-> 
-> On 2023/12/31 22:55, Markus Elfring wrote:
-> > From: Markus Elfring <elfring@users.sourceforge.net>
-> > Date: Sun, 31 Dec 2023 15:48:45 +0100
-> > 
-> > A few update suggestions were taken into account
-> > from static source code analysis.
-> > 
-> > Markus Elfring (2):
-> >    Return directly after a failed kzalloc() in smc_fill_gid_list()
-> >    Improve exception handling in smc_llc_cli_add_link_invite()
-> > 
-> >   net/smc/af_smc.c  |  2 +-
-> >   net/smc/smc_llc.c | 15 +++++++--------
-> >   2 files changed, 8 insertions(+), 9 deletions(-)
-> > 
-> > --
-> > 2.43.0
-> 
-> Hi Markus. I see you want to fix the kfree(NULL) issues in these two patches.
-> 
-> But I am wondering if this is necessary, since kfree() can handle NULL correctly.
+Hi,
 
-I think the key point is that there are no necessary to call kfree() if
-we can avoid this in normal logic.
+>> Since commit 1a136ca2e089 ("net: mdio: scan bus based on bus
+>> capabilities for C22 and C45") our AT91SAM9G25-based GARDENA smart
+>> Gateway will no longer boot.
+>> 
+>> Prior to the mentioned change, probe_capabilities would be set to
+>> MDIOBUS_NO_CAP (0) and therefore, no Clause 45 scan was performed.
+>> Running a Clause 45 scan on an SMSC/Microchip LAN8720A PHY will (at
+>> least with our setup) considerably slow down kernel startup and
+>> ultimately result in a board reset.
+>> 
+>> AFAICT all SMSC/Microchip PHYs are Clause 22 devices. Some have a
+>> "Clause 45 protection" feature (e.g. LAN8830) and others like the
+>> LAN8804 will explicitly state the following in the datasheet:
+>> 
+>>     This device may respond to Clause 45 accesses and so must not be
+>>     mixed with Clause 45 devices on the same MDIO bus.
 
-Tony Lu
+If implemented correctly, c22 phys should never respond to c45
+accesses. Correct? So the "Clause 45 protection" sounds like the
+normal behavior here and the "may respond to c45 accesses" looks
+like it's broken.
+
+> I'm not convinced that some heuristic based on vendors is a
+> sustainable approach. Also I'd like to avoid (as far as possible)
+> that core code includes vendor driver headers. Maybe we could use
+> a new PHY driver flag. Approaches I could think of:
+> 
+> Approach 1:
+> Add a PHY driver flag to state: PHY is not c45-access-safe
+> Then c45 scanning would be omitted if at least one c22 PHY
+> with this flag was found.
+> 
+> Approach 2:
+> Add a PHY driver flag to state: PHY is c45-access-safe
+> Then c45 scanning would only be done if all found c22 devices
+> 
+> Not sure which options have been discussed before. Any feedback
+> welcome.
+
+I had a similar idea and IIRC Andrew said this would be a layering
+violation. But I can't find the thread anymore.
+
+> Related: How common are setups where c22 and c45 devices are attached
+> to a single MDIO bus?
+
+At least we have boards which has c22 and c45 PHYs on one bus. And
+on one board, we even have a Micrel/Microchip PHY on this bus, which
+forces us to use c22-over-c45 for the c45 PHY. I really need to repost 
+my
+c45-over-c22 series, although there was no consensus there 
+unfortunately.
+
+-michael
 
