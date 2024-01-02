@@ -1,123 +1,149 @@
-Return-Path: <netdev+bounces-60850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE58821AD0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:21:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69061821AE6
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:28:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5FB01F21F2C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:21:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73A521C21DC0
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3D9DF58;
-	Tue,  2 Jan 2024 11:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D309DF61;
+	Tue,  2 Jan 2024 11:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BLRDXcrB"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="Ma1AcYdF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30B0DF46
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 11:21:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so94700a12.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 03:21:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704194460; x=1704799260; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gi6BMc54YIIslZNdIZM70wAXFmR2UViyvD/iVOGtUtY=;
-        b=BLRDXcrB6oM2aTuTfYy2xHHBPbiUq0lD+q3gZ8/JVaCflrAHIKMWB5JzcdcnKaHL0h
-         AiW7m0oaAFJ4fyRhqSYOCArrvgYLU0jLvT/pyGhvmd2bJsgQcv33vZ3sCH2YmhVnhlI4
-         Y8AFmdwyTDQGUVkAhlH+YXxy3A4Ryvj1poBEiQMUZzw9ynzKZKWVWNzHRqr9id5lCnk1
-         ANfQZ3XMGzAzEtJSu7ZF2SC2fbhPHYpK0a4p0LtaSLHD1606vIWwP3Bf8GqOrdiKxr+B
-         FaFzZPLVVI5fzAjOsW8qEo7TB+dUFaD5pInyhL8/vgrGx7E+jJ/P8JuzjOhRFcMGt/2X
-         ndLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704194460; x=1704799260;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gi6BMc54YIIslZNdIZM70wAXFmR2UViyvD/iVOGtUtY=;
-        b=dULG9dYFXumS7gDfHCdkf4aHOa9kuTFUc3GJljq1hTjR4JTv0J9dqBDI2KQGfxtWK2
-         DvTSSifuNlETXfHRuBlnBOMZpnoV1/mmLjJ9EHopCHNbkcKOlF6artjxg5+J40gTJrue
-         Ys74hQ7fI5CMuJqgWn9T2szjGhnkimzbAG3lsgld+3UDM3aF82KvnhCep3lkZ4jnv1V/
-         /8Vg8bdl8UmRMmCjjWIGwfJQFXz7eHJWipg2Tps5ivElVmv9VuBqTlVscK4oUsQ/z0Rh
-         oLsLfrKCfD13n2zs0F4Nwwn1LMXsJJD4rozqW8mRHI7M8tDaJp7VX321mHMHCFuFtddL
-         i/qQ==
-X-Gm-Message-State: AOJu0YwkwctcK6tSXgmxABCikaZDfE+g3uJMOs82da+4yjTuMPDf4Tuv
-	5Jm/0guUsS9Fh9xueAKTXwjQoOe9g22RIK7I3/ep3XIvv5bK
-X-Google-Smtp-Source: AGHT+IEd0fV62W0G/uaqSAj5Ru8kUDF23LUCIgPep6D3xJt2H0NhkYcYKuXH6ypcKbis/gdhRjy7mMeiOYaYg5aWH3g=
-X-Received: by 2002:a50:cd8a:0:b0:553:ee95:2b4f with SMTP id
- p10-20020a50cd8a000000b00553ee952b4fmr1078054edi.3.1704194459646; Tue, 02 Jan
- 2024 03:20:59 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B39DF6A;
+	Tue,  2 Jan 2024 11:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1704194540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IKJCpy+cXuzjprgjg+Of6HIRqe2chRqAQCoAEdEUmLc=;
+	b=Ma1AcYdF6RGml4NMC2wYnGW8Vy7bjxkIzK37EUrf2SOtuanqn/FetHnrbA82SaaooQe92G
+	Mhnjmwbsq85AfOHyz7iQ0XHuHmEeytkzWWUp4MladgBss0XUVBDLqt6+JL42CIWfs/dW8/
+	/64eblXjavruLl8t+a/CvRTjviKw6ao=
+From: Sven Eckelmann <sven@narfation.org>
+To: b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, Antonio Quartulli <a@unstable.cc>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Marek Lindner <mareklindner@neomailbox.ch>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Wunderlich <sw@simonwunderlich.de>,
+ Markus Elfring <Markus.Elfring@web.de>
+Cc: LKML <linux-kernel@vger.kernel.org>
+Subject:
+ Re: [PATCH 1/2] batman-adv: Return directly after a failed
+ batadv_dat_select_candidates() in batadv_dat_forward_data()
+Date: Tue, 02 Jan 2024 12:22:16 +0100
+Message-ID: <12355496.O9o76ZdvQC@sven-l14>
+In-Reply-To: <54dc53f8-5f08-4f1d-938a-c845c8ec0d44@web.de>
+References:
+ <8588cafe-3c61-40a6-b071-0877632a2a1e@web.de>
+ <54dc53f8-5f08-4f1d-938a-c845c8ec0d44@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231228014633.3256862-1-dw@davidwei.uk> <20231228014633.3256862-4-dw@davidwei.uk>
-In-Reply-To: <20231228014633.3256862-4-dw@davidwei.uk>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Jan 2024 12:20:46 +0100
-Message-ID: <CANn89iKB4odj7Taw_C-m48BGYmir-fjR-fFbmQj6DbkD+RacXg@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 3/5] netdevsim: forward skbs from one
- connected port to another
-To: David Wei <dw@davidwei.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="nextPart5744289.DvuYhMxLoT";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
+
+--nextPart5744289.DvuYhMxLoT
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>
+Date: Tue, 02 Jan 2024 12:22:16 +0100
+Message-ID: <12355496.O9o76ZdvQC@sven-l14>
+In-Reply-To: <54dc53f8-5f08-4f1d-938a-c845c8ec0d44@web.de>
+MIME-Version: 1.0
 
-On Thu, Dec 28, 2023 at 2:46=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
->
-> Forward skbs sent from one netdevsim port to its connected netdevsim
-> port using dev_forward_skb, in a spirit similar to veth.
->
-> Add a tx_dropped variable to struct netdevsim, tracking the number of
-> skbs that could not be forwarded using dev_forward_skb().
->
-> The xmit() function accessing the peer ptr is protected by an RCU read
-> critical section. The rcu_read_lock() is functionally redundant as since
-> v5.0 all softirqs are implicitly RCU read critical sections; but it is
-> useful for human readers.
->
-> If another CPU is concurrently in nsim_destroy(), then it will first set
-> the peer ptr to NULL. This does not affect any existing readers that
-> dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
-> a synchronize_rcu() before the netdev is actually unregistered and
-> freed. This ensures that any readers i.e. xmit() that got a non-NULL
-> peer will complete before the netdev is freed.
->
-> Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
-> will dereference NULL, making it safe.
->
-> The codepath to nsim_destroy() and nsim_create() takes both the newly
-> added nsim_dev_list_lock and rtnl_lock. This makes it safe with
-> concurrent calls to linking two netdevsims together.
->
-> Signed-off-by: David Wei <dw@davidwei.uk>
+On Tuesday, 2 January 2024 08:11:47 CET Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Tue, 2 Jan 2024 07:27:45 +0100
+>=20
+> The kfree() function was called in one case by
+> the batadv_dat_forward_data() function during error handling
+> even if the passed variable contained a null pointer.
+> This issue was detected by using the Coccinelle software.
+>=20
+> * Thus return directly after a batadv_dat_select_candidates() call failed
+>   at the beginning.
+>=20
+> * Delete the label =E2=80=9Cout=E2=80=9D which became unnecessary with th=
+is refactoring.
+>=20
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+
+Acked-by: Sven Eckelmann <sven@narfation.org>
+
 > ---
->  drivers/net/netdevsim/netdev.c    | 21 ++++++++++++++++++---
->  drivers/net/netdevsim/netdevsim.h |  1 +
->  2 files changed, 19 insertions(+), 3 deletions(-)
->
+>  net/batman-adv/distributed-arp-table.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/net/batman-adv/distributed-arp-table.c b/net/batman-adv/dist=
+ributed-arp-table.c
+> index 28a939d56090..4c7e85534324 100644
+> --- a/net/batman-adv/distributed-arp-table.c
+> +++ b/net/batman-adv/distributed-arp-table.c
+> @@ -684,7 +684,7 @@ static bool batadv_dat_forward_data(struct batadv_pri=
+v *bat_priv,
+>=20
+>  	cand =3D batadv_dat_select_candidates(bat_priv, ip, vid);
+>  	if (!cand)
+> -		goto out;
+> +		return ret;
+>=20
+>  	batadv_dbg(BATADV_DBG_DAT, bat_priv, "DHT_SEND for %pI4\n", &ip);
+>=20
+> @@ -728,7 +728,6 @@ static bool batadv_dat_forward_data(struct batadv_pri=
+v *bat_priv,
+>  		batadv_orig_node_put(cand[i].orig_node);
+>  	}
+>=20
+> -out:
+>  	kfree(cand);
+>  	return ret;
+>  }
+> --
+> 2.43.0
+>=20
+>=20
 
 
-> @@ -302,7 +318,6 @@ static void nsim_setup(struct net_device *dev)
->         eth_hw_addr_random(dev);
->
->         dev->tx_queue_len =3D 0;
-> -       dev->flags |=3D IFF_NOARP;
+--nextPart5744289.DvuYhMxLoT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
 
-This part seems to be unrelated to this patch ?
+-----BEGIN PGP SIGNATURE-----
 
->         dev->flags &=3D ~IFF_MULTICAST;
->         dev->priv_flags |=3D IFF_LIVE_ADDR_CHANGE |
->                            IFF_NO_QUEUE;
+iQIzBAABCgAdFiEEF10rh2Elc9zjMuACXYcKB8Eme0YFAmWT8ekACgkQXYcKB8Em
+e0Zezg/+P9PfejkVp+OoIyYjl/JOvoFqwplYaSBqhuTzvIVSx8fGZmzS0eBHploL
+kIPHLR9UoxD4ghhd0JX1Vu/e2bWMQUFJGmzX92xFcXxMrx/FJ3DfMRM9rPSkd/FX
+Z4QFQp5BkQuqWk1tICiOSP+GeGtiXY9UZnrYFEKmJG601RaziFMGXC8va/zmaBBD
+7+YTYyJwPxO5jF+KLIEMJjCT1b4+o9fneoGdwpoyvk0JyC9FbYbiOPeeB+37PczD
+X1YGGNnAmF8cPFU89J/8XXplraK8HAOaivzAsTDPnBOu4SP/spQKWefX/LgqkFWx
+5c0l02CzZapL6szJEk1ZbqTfXrRbDjnqFxxIV7HBbtnx6hkSbPvNcubB+B1k56AA
+l+2EY9gPnIUe/a5C11LUYc4zfNF5Z+k8ZgtrRiTiR+CstKtjBdiGytyRN4Lj/7ax
+YmhnVkAKY/Dr79Frc76jP+sGNnCzHna9AhHUyHBtHRdr6/vx8ggEPtylrxjsVll0
+VCZuKAM23pJ8fKdEiexVon9pX5UXq+nqIBc/iZvU0+i/QE8GK/DAd1lWVoDpFDvA
+25O42/MbEUefcd4VHksZdNLOqxKwyFJunUZmS5piyt7VO2RhRUQQVCeWDvETpZ+/
+oyV9q09FlZRIYbRioLqmv2jNV7WoUSw3DWOrh7GUe1vsWzYhzmM=
+=QSP4
+-----END PGP SIGNATURE-----
+
+--nextPart5744289.DvuYhMxLoT--
+
+
+
 
