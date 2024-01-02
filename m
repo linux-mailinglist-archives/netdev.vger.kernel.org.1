@@ -1,82 +1,160 @@
-Return-Path: <netdev+bounces-60942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55CB8821F0D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:58:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A1A8821F47
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:12:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A6911C22328
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:58:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B952E281013
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C432D14AAC;
-	Tue,  2 Jan 2024 15:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0559714293;
+	Tue,  2 Jan 2024 16:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjRyV52s"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xdvm8H+X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD8C14A9A;
-	Tue,  2 Jan 2024 15:58:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59CF8C433C7;
-	Tue,  2 Jan 2024 15:58:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704211089;
-	bh=gsBgM/SJ5swumfn/cuVueJtKXK9nInmvCfn1DD55G2Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hjRyV52srkWcrFMd9p6aHkxAvUkzcYMa2RWZPQEwAxmGtHyGaxQfbs/v+npGYXCIT
-	 6nX2lufBMDX4XoQhsQIv3YMo83DPc7XTW6iQxSMAtrHgte2dIP9cs8JqwUgLlfs3GI
-	 jWftuUfNohpebYe4v9tCOTdbHFT68XR6Py2mOIOe4nvsGeCrnBy0LNTaZkYHuSOxR4
-	 6m+BzIMKiNgZjYj5yIR2bhYJEiPR4TAFyxM4iCtkctS/vsmGAHD9Y3UujEG4K9Xe7g
-	 XKAc+BDP9yNbZSWpiaiCX4tyELCk89f/wvAvpjyazjxFg0jj+n1BaftTt/JPatw0pn
-	 kte5fS0oDAw2g==
-Date: Tue, 2 Jan 2024 07:58:07 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: fuyao <fuyao@sjterm.com>
-Cc: Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Chen-Yu Tsai
- <wens@csie.org>, Samuel Holland <samuel@sholland.org>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-stm32@st-md-mailman.stormreply.com, linux-kernel@vger.kernel.org,
- =?UTF-8?B?6bqm5YGl5bu6?= <maijianzhang@allwinnertech.com>
-Subject: Re: [PATCH] gmac: sun8i: r40: add gmac tx_delay support
-Message-ID: <20240102075807.1a4cac92@kernel.org>
-In-Reply-To: <ZYPmZj8l01eQsDS5@debian.cyg>
-References: <ZYKvCQBD-SY9uVLF@debian.cyg>
-	<2370947.NG923GbCHz@jernej-laptop>
-	<ZYPmZj8l01eQsDS5@debian.cyg>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F2B14F63
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 16:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5555f9061b9so5823018a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 08:12:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704211923; x=1704816723; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KqAcAJvK0gwNUTbSW3CjQlsOCezKK1PboNYWGcW3ipU=;
+        b=Xdvm8H+XyNWjNzpsH+AOgVJh4DxLOjAoK3dSfV8EE4a1vzEvYwhWHtWgDjKAxMaWnQ
+         TEJ6YYuu2MEAFWAkN0HJ7JTlezqG11N2nrF2DPmiyy6w2DBuB0JRP3VKKtOuYSBHbUUi
+         A0hlRWfzlnHlzligrwXU7R/7JoU8QE2fRMU8NJvBTGEzv71lqdUG5n6YAwh32aLxWVS5
+         h76Ps3aVrXxcOl33GvIedSuW2pdI8BErfCPB/7AYdyczHQqng+XhE/x/GUjZX4TS0GQA
+         3IPAkHLshgPotmxG5JDIsGTuUM2NVw8prVR2AazP5kYQDrShJfjBnFhKzqOI5uIu537F
+         vSYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704211923; x=1704816723;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KqAcAJvK0gwNUTbSW3CjQlsOCezKK1PboNYWGcW3ipU=;
+        b=r4H7WZVfgXRgVdU2nsagLAojFNHmGRzL/g+MkyUz+SwilOboz8Zmq6h+J6tasLuYd1
+         Zx1/E2O5dsU4Ij88xOcXX0ClAoUd5zfXYzS+ktyeQgxNDiwBn5rfE1yQcZPb5cA4Lur9
+         lfeUmCRjSjxZGfopWN71aRgy7JtJ50NczcWJ73EC/9QLN6hMcqKLQIuS+lt47E8JZt8P
+         QMpfPtpTdO4ioelpIK4wBAlN6xoybn310svca1PUwTNeeWLyXi5ke9sXk49V/zslUDcv
+         unRtY34lw0Nw0yqopxmWBTnjNASJZGAP7p+mxjbKr3Vlgd9xZDVYXEO3XlXAt4w8Tn3h
+         CUPA==
+X-Gm-Message-State: AOJu0Yw0Bv6bo4CiMyX2iLsbL48HfUXOeEfN3jZv12GmdB/MHnsvOr94
+	QEaZX7Dl18Mi9rU0dKGgl/nsDFzZ/vp8zasq1Shq2QQrxf86zV8tOsQl0GKsRQ==
+X-Google-Smtp-Source: AGHT+IFbbQOUZHyvkck+bNRUtx0jkbQqzf8vcbORHAFjDKfpv3QV1eUvusHb9ga4pwHFdRSMqc35X18gsM0N3h9jp7w=
+X-Received: by 2002:a17:906:7490:b0:a27:7cd5:7e9b with SMTP id
+ e16-20020a170906749000b00a277cd57e9bmr3103321ejl.141.1704211923473; Tue, 02
+ Jan 2024 08:12:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20231219210357.4029713-1-dw@davidwei.uk> <20231219210357.4029713-3-dw@davidwei.uk>
+ <CAHS8izO0ADnYqKczEkfNts2VLDfiYEkQ=AzJ-xzb+Kh2ZpFjbg@mail.gmail.com> <9f5ea0cb-215a-4b43-92dc-d306015c8c7a@gmail.com>
+In-Reply-To: <9f5ea0cb-215a-4b43-92dc-d306015c8c7a@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 2 Jan 2024 08:11:49 -0800
+Message-ID: <CAHS8izN49uEcfajKMHrOHAkZJ8jpWieyudHocQ6bzT7N5-yNsg@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 02/20] tcp: don't allow non-devmem originated ppiov
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 21 Dec 2023 15:16:54 +0800 fuyao wrote:
-> I don't see it in the user manual also.
-> 
-> it works fine in 100M, but it doesn't work good in 1G without tx_delay
-> in my board.
-> 
-> Read the sdk from allwinner I found in:
-> 
-> https://sourcegraph.com/github.com/tinalinux/linux-3.10/-/blob/arch/arm/boot/dts/sun8iw11p1.dtsi?L1826
-> https://sourcegraph.com/github.com/tinalinux/linux-3.10@r40-v1.y/-/blob/drivers/net/ethernet/allwinner/sunxi-gmac.c?L877
-> 
-> And I add it to my board, it works fine.
-> 
-> So, I think it may be exist register but not documented.
+On Tue, Dec 19, 2023 at 5:34=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> On 12/19/23 23:24, Mina Almasry wrote:
+> > On Tue, Dec 19, 2023 at 1:04=E2=80=AFPM David Wei <dw@davidwei.uk> wrot=
+e:
+> >>
+> >> From: Pavel Begunkov <asml.silence@gmail.com>
+> >>
+> >> NOT FOR UPSTREAM
+> >>
+> >> There will be more users of struct page_pool_iov, and ppiovs from one
+> >> subsystem must not be used by another. That should never happen for an=
+y
+> >> sane application, but we need to enforce it in case of bufs and/or
+> >> malicious users.
+> >>
+> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> >> Signed-off-by: David Wei <dw@davidwei.uk>
+> >> ---
+> >>   net/ipv4/tcp.c | 7 +++++++
+> >>   1 file changed, 7 insertions(+)
+> >>
+> >> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> >> index 33a8bb63fbf5..9c6b18eebb5b 100644
+> >> --- a/net/ipv4/tcp.c
+> >> +++ b/net/ipv4/tcp.c
+> >> @@ -2384,6 +2384,13 @@ static int tcp_recvmsg_devmem(const struct sock=
+ *sk, const struct sk_buff *skb,
+> >>                          }
+> >>
+> >>                          ppiov =3D skb_frag_page_pool_iov(frag);
+> >> +
+> >> +                       /* Disallow non devmem owned buffers */
+> >> +                       if (ppiov->pp->p.memory_provider !=3D PP_MP_DM=
+ABUF_DEVMEM) {
+> >> +                               err =3D -ENODEV;
+> >> +                               goto out;
+> >> +                       }
+> >> +
+> >
+> > Instead of this, I maybe recommend modifying the skb->dmabuf flag? My
+> > mental model is that flag means all the frags in the skb are
+>
+> That's a good point, we need to separate them, and I have it in my
+> todo list.
+>
+> > specifically dmabuf, not general ppiovs or net_iovs. Is it possible to
+> > add skb->io_uring or something?
+>
+> ->io_uring flag is not feasible, converting ->devmem into a type
+> {page,devmem,iouring} is better but not great either.
+>
+> > If that bloats the skb headers, then maybe we need another place to
+> > put this flag. Maybe the [page_pool|net]_iov should declare whether
+> > it's dmabuf or otherwise, and we can check frag[0] and assume all
+>
+> ppiov->pp should be enough, either not mixing buffers from different
+> pools or comparing pp->ops or some pp->type.
+>
+> > frags are the same as frag0.
+>
+> I think I like this one the most. I think David Ahern mentioned
+> before, but would be nice having it on per frag basis and kill
+> ->devmem flag. That would still stop collapsing if frags are
+> from different pools or so.
+>
 
-Unless Allwinner can chime in we should at least document the situation
-clearly in the commit message (incl. what HW+config was tested, exactly)
-and add a comment in the code?
--- 
-pw-bot: cr
+This sounds reasonable to me. I'll look into applying this change to
+my next devmem TCP RFC, thanks.
+
+> > But IMO the page pool internals should not leak into the
+> > implementation of generic tcp stack functions.
+>
+> --
+> Pavel Begunkov
+
+
+
+--=20
+Thanks,
+Mina
 
