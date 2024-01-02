@@ -1,106 +1,131 @@
-Return-Path: <netdev+bounces-61036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EAF782249C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:14:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52BFA8224AA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:22:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E21D71F2373C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:14:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 728121C22B6D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C3C3171C3;
-	Tue,  2 Jan 2024 22:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2622C171A6;
+	Tue,  2 Jan 2024 22:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SaP6DsUn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S+um1whB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD68F171BF;
-	Tue,  2 Jan 2024 22:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-555aa7fd668so4189942a12.0;
-        Tue, 02 Jan 2024 14:14:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC5417984
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 22:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tanzirh.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d45d23910aso25355755ad.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 14:22:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704233639; x=1704838439; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
+        d=google.com; s=20230601; t=1704234141; x=1704838941; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=nNtKRKHLT7GbRif0IHQKXzEMZSVRXKy9jF4fRiR/VhE=;
-        b=SaP6DsUnX1LOjT0yIHrbFmUGha0kBq/ZHP+ACS9ItNsrH8C7bxiLkM7vho1nFO3BtV
-         lStjvErkAXMco3DvgKz+BhBjq5vWeYOK8c7XtH5UcOE6J79HLx7oNepHR9w45TP4rfwH
-         cjCDgydCG3+oSuKzX+hq4Yw9mXF7kRwCoQOxMxVKu8jFzt49gxdSpS33xvg+JIEokbwO
-         yEev1IyUTxn4lFs3irQLPVUl3v32b8UbX6sICQJbaRnZuRUmSImwvTmaEs4EUA1GvNJY
-         7NAFjGQt3DKam9tMREkWA00ArsqHykIglbibVUboe+/t1m97BWmaGhyiIAM3MLpNo7nX
-         dRMQ==
+        bh=VoYBcyeMcOUsOKM5LbFmoG1rNiNhP0xj5K+Ym6ZJNQw=;
+        b=S+um1whBxsvYBaRtrLrkkjesCTD6femhXZ7TnwNeyZXKB1jfxu0Dqa2J+TcMNsBNix
+         SWkzea6fbYrmKR50AkZ7OlLdxIi4RdAGPT51h6GNjjjrIOLZb6vANqeluB9IGhPvVcBU
+         8Vwv3/5KI8m4Fai2r0SXe3L6xR3Gv4isG6R9WvJKUa6fgybiDyY+iePo6CIvcRy8IvbL
+         Pap+VBdukbO69AGl6ERtgjn+US/80wc4M9AOUoOdyEB2wwIngPayf3+uCIf5USGtorNC
+         AB39NRKV/gYrpGjprcxBmpSuaxEuQ73cX8J01eSNprwDHqdBZWX1JL+TGVFhG1AVmBSj
+         0iqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704233639; x=1704838439;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1704234141; x=1704838941;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nNtKRKHLT7GbRif0IHQKXzEMZSVRXKy9jF4fRiR/VhE=;
-        b=nWwuyCJpC3C+sQAxBBTG0yG/eTKw3oD7c0v/485dOW9Bsp0jRdex/2QABGQs/EUgma
-         bWlYFWcdrfZroDXRRSnf7+VmtiZQu5s49eDctOzEejnZlR8Rsv1CU/Y2ws8lKqPN2ZvY
-         9hd0DWz52Y11cWWlKaQYDFRzashaq201vyKL4IoxvGHcXvB1UTv0tw9e0YEqCG0QJD6a
-         H0bixnvkcpas7lG88qu3IRU6BQINeVME3bmcNGyogc6McbqauN7foRIOtwEXIw0IOoPT
-         Rq8JrH6VNx97ZkE5LJE7305VgTM6MXMBkAWZLMUyarAI+V5LleVhB1LvBwp38RxtX6yw
-         mupw==
-X-Gm-Message-State: AOJu0YzQF/aY+bYKHHyX3iDiZqD7SyyERFlOpn8YfXq2ScGevBn55oZM
-	2ZGzT7MJl/M4izk/44NKEcM=
-X-Google-Smtp-Source: AGHT+IEt2lfwKc8ud/gUjAY0071TQZcjd/zfGADvdh0gXWS/csgwq/BmpisH8laLc0/X9noGpGIzpg==
-X-Received: by 2002:a17:906:74d3:b0:a27:ec73:7a89 with SMTP id z19-20020a17090674d300b00a27ec737a89mr1604424ejl.68.1704233638915;
-        Tue, 02 Jan 2024 14:13:58 -0800 (PST)
-Received: from [127.0.0.1] ([89.205.132.224])
-        by smtp.gmail.com with ESMTPSA id l1-20020a170907914100b00a27741ca951sm4950747ejs.108.2024.01.02.14.13.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 14:13:58 -0800 (PST)
-Date: Tue, 02 Jan 2024 23:13:58 +0100
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>
-CC: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Alexander Couzens <lynxis@fe80.eu>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_RFC_net-next=5D_net=3A_pcs=3A_pcs-mtk-lyn?= =?US-ASCII?Q?xi_fix_mtk=5Fpcs=5Flynxi=5Fget=5Fstate=28=29_for_2500base-x?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <ZZRrk85SCDmo76NJ@pidgin.makrotopia.org>
-References: <20240102074408.1049203-1-ericwouds@gmail.com> <ZZP9GR15ufDbjGAJ@shell.armlinux.org.uk> <92190426-3614-4774-9E9F-18F121622788@gmail.com> <74223164-ab50-4d6d-a4f4-561b0a70d396@gmail.com> <ZZRrk85SCDmo76NJ@pidgin.makrotopia.org>
-Message-ID: <6666EB36-984E-4898-A41A-2D9713DE4DB0@gmail.com>
+        bh=VoYBcyeMcOUsOKM5LbFmoG1rNiNhP0xj5K+Ym6ZJNQw=;
+        b=plUKjvx3x2gPTfEmz+USvuh3t5E38tONGtjDXIWKb9gyxw3+INUhWtztQgmAX9wIa+
+         fFa1P7hnwFnngQoSXVWPyPiI7VBAJvqOFGnXSmco5oeyfS4N+W4TGIacRfK5FO1NRGgU
+         FXuv3DJ85ZBkMq8jbUVQfB0gE9nUUiAvtrpj7CCv80o0/+mRnIzaVWfeMX7bpOVYELyN
+         UCQPiJES9Hk69lPjGLCF5DutaROsDxEUaWEDIdC8Wwr6WxEeiAAduZZBpwNznTL83fXi
+         yQ3h9C0pvkkC2ZvHMhsm66Iv+c3cG09QZnvyvtrYl6ZBJV9A/XiD8l8TPzUQNNmsPFJe
+         oS1w==
+X-Gm-Message-State: AOJu0Yxvk8TrYWQk+aoxfYVLoWOLVBUG6inKChXD45Lt8FGvJ2aldLLw
+	mQUt2AxonG02jlcFBxCwQvHvNU85wVmVhDy9DU0=
+X-Google-Smtp-Source: AGHT+IGibMrtSNs0B7J5A+QWM85xhUBg0GKDxizl0OkdWX1k1ttpJocQ5P4XooSKRH4vL9aHfM71x73t1FOt
+X-Received: from tanz.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:c4a])
+ (user=tanzirh job=sendgmr) by 2002:a17:903:120f:b0:1d3:f056:bd5e with SMTP id
+ l15-20020a170903120f00b001d3f056bd5emr622882plh.8.1704234141148; Tue, 02 Jan
+ 2024 14:22:21 -0800 (PST)
+Date: Tue, 02 Jan 2024 22:22:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAJqMlGUC/13MQQrCMBCF4auUWRvJTKCIK+8hXcRkkg5oI4kEp
+ eTuTbt0+T8e3wqFs3CB67BC5ipF0tKDTgO42S6RlfjeQJoMEo2qcn4UZfRF69GgNwGhf9+Zg3w P5z71nqV8Uv4dbMV9/RcqKlTGkmMXEG3wt5hSfPLZpRdMrbUNIDPSdJsAAAA=
+X-Developer-Key: i=tanzirh@google.com; a=ed25519; pk=UeRjcUcv5W9AeLGEbAe2+0LptQpcY+o1Zg0LHHo7VN4=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1704234139; l=1390;
+ i=tanzirh@google.com; s=20231204; h=from:subject:message-id;
+ bh=DUB/ZV2zVOe/Hx7a/jPXLV+v75gZ6+Z01V5aE00rj50=; b=qe5pL7e035Zo4B16XWqHVxTumHn9sOyTDK/Y5RdiNEozypVYZV9EWUD5PpPY5hk9hItu8K1yE
+ Xte40bFcZT6CVwbEGb5iSw5YFR6ub90ZUa+g5JlAcdt91FJWgTgeqh8
+X-Mailer: b4 0.12.4
+Message-ID: <20240102-verbs-v2-1-710de1867c77@google.com>
+Subject: [PATCH v2] xprtrdma: removed asm-generic headers from verbs.c
+From: Tanzir Hasan <tanzirh@google.com>
+To: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+	Tom Talpey <tom@talpey.com>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
+	Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Nick Desaulniers <nnn@google.com>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Tanzir Hasan <tanzirh@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-I believe the general idea is that phylink should be aware wether to use in=
-band or outband negotiation in order to setup the hardware correctly=2E Spe=
-aking of a situation where there is a PHY attached=2E
+asm-generic/barrier.h and asm/bitops.h are already brought into the
+file through the header linux/sunrpc/svc_rdma.h and the file can
+still be built with their removal. They have been replaced with the
+preferred linux/bitops.h and asm/barrier.h to remove the need for the
+asm-generic header.
 
-On January 2, 2024 9:01:23 PM GMT+01:00, Daniel Golle <daniel@makrotopia=
-=2Eorg> wrote:
->On Tue, Jan 02, 2024 at 08:33:32PM +0100, Eric Woudstra wrote:
->> [=2E=2E=2E]
->>=20
->> So if phylink_mii_c22_pcs_decode_state() should not set the speed, then=
- it is not correctly set somewhere else=2E
->
->Yes, but the fix should go to pcs-mtk-lynxi=2Ec and you don't need to
->change phylink for it to work=2E
->This should be enough:
->https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/091e466912f1333b=
-b76d23e95dc6019c9b71645f=2E1699565880=2Egit=2Edaniel@makrotopia=2Eorg/
->
+Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
+Signed-off-by: Tanzir Hasan <tanzirh@google.com>
+---
+Changes in v2:
+- Added asm/barrier.h and linux/bitops.h to not conflict with rule 1 of
+  submit-checklist
+- Link to v1: https://lore.kernel.org/r/20231226-verbs-v1-1-3a2cecf11afd@google.com
+---
+ net/sunrpc/xprtrdma/verbs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/sunrpc/xprtrdma/verbs.c b/net/sunrpc/xprtrdma/verbs.c
+index 28c0771c4e8c..b4c1d874fc7e 100644
+--- a/net/sunrpc/xprtrdma/verbs.c
++++ b/net/sunrpc/xprtrdma/verbs.c
+@@ -49,14 +49,14 @@
+  *  o buffer memory
+  */
+ 
++#include <linux/bitops.h>
+ #include <linux/interrupt.h>
+ #include <linux/slab.h>
+ #include <linux/sunrpc/addr.h>
+ #include <linux/sunrpc/svc_rdma.h>
+ #include <linux/log2.h>
+ 
+-#include <asm-generic/barrier.h>
+-#include <asm/bitops.h>
++#include <asm/barrier.h>
+ 
+ #include <rdma/ib_cm.h>
+ 
+
+---
+base-commit: fbafc3e621c3f4ded43720fdb1d6ce1728ec664e
+change-id: 20231226-verbs-30800631d3f1
+
+Best regards,
+-- 
+Tanzir Hasan <tanzirh@google.com>
+
 
