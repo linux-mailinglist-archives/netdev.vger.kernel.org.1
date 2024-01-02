@@ -1,124 +1,153 @@
-Return-Path: <netdev+bounces-60770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD27821669
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 03:20:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 001D882177A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 06:44:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A470281F28
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 02:19:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97198B21395
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 05:44:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC48A44;
-	Tue,  2 Jan 2024 02:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FC52591;
+	Tue,  2 Jan 2024 05:44:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFD4A38;
-	Tue,  2 Jan 2024 02:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=tonylu@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vzj5iao_1704161982;
-Received: from localhost(mailfrom:tonylu@linux.alibaba.com fp:SMTPD_---0Vzj5iao_1704161982)
-          by smtp.aliyun-inc.com;
-          Tue, 02 Jan 2024 10:19:43 +0800
-Date: Tue, 2 Jan 2024 10:19:41 +0800
-From: Tony Lu <tonylu@linux.alibaba.com>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7532583;
+	Tue,  2 Jan 2024 05:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from luzhipeng.223.5.5.5 (unknown [115.200.224.203])
+	by mail-app4 (Coremail) with SMTP id cS_KCgCXn58bopNlTqUlAA--.40716S2;
+	Tue, 02 Jan 2024 13:41:48 +0800 (CST)
+From: Zhipeng Lu <alexious@zju.edu.cn>
+To: alexious@zju.edu.cn
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
-	Paolo Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] net/smc: Improve exception handling in
- smc_llc_cli_add_link_invite()
-Message-ID: <ZZNyvTdnTz2Usd4j@TONYMAC-ALIBABA.local>
-Reply-To: Tony Lu <tonylu@linux.alibaba.com>
-References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
- <5253e660-6b66-4775-ae2f-06f5a1d40be5@web.de>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	Simo Sorce <simo@redhat.com>,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] [v3] SUNRPC: fix some memleaks in gssx_dec_option_array
+Date: Tue,  2 Jan 2024 13:38:13 +0800
+Message-Id: <20240102053815.3611872-1-alexious@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5253e660-6b66-4775-ae2f-06f5a1d40be5@web.de>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cS_KCgCXn58bopNlTqUlAA--.40716S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ar48AFWkWw48uw43Aw15CFg_yoW8ZF13pF
+	Z3Kr9xAF10qr1xXF1ayw4Fvw1YyFs5trW7Wry2ka13Zw1fJr1F9w40kryj9Fy2yrZ3Ww1U
+	ZF1j9ry8u3Z0y3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
+	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY02Avz4vE14v_GrWl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
+	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+	17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
+	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
+	73UjIFyTuYvjfUYDGYDUUUU
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
-On Sun, Dec 31, 2023 at 04:00:22PM +0100, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Sun, 31 Dec 2023 15:42:07 +0100
-> 
-> The kfree() function was called in some cases by
-> the smc_llc_cli_add_link_invite() function during error handling
-> even if the passed variable contained a null pointer.
-> This issue was detected by using the Coccinelle software.
-> 
-> * Thus use another label.
-> 
-> * Merge two if statements.
-> 
-> * Omit an initialisation (for the variable "ini")
->   which became unnecessary with this refactoring.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+The creds and oa->data need to be freed in the error-handling paths after
+there allocation. So this patch add these deallocations in the
+corresponding paths.
 
-Thank you, LGTM. Also net and Fixes tags are needed.
+Fixes: 1d658336b05f ("SUNRPC: Add RPC based upcall mechanism for RPCGSS auth")
+Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
+---
+Changelog:
 
-Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
-> ---
->  net/smc/smc_llc.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/smc/smc_llc.c b/net/smc/smc_llc.c
-> index 018ce8133b02..2ff24a7feb26 100644
-> --- a/net/smc/smc_llc.c
-> +++ b/net/smc/smc_llc.c
-> @@ -1163,23 +1163,21 @@ static void smc_llc_cli_add_link_invite(struct smc_link *link,
->  					struct smc_llc_qentry *qentry)
->  {
->  	struct smc_link_group *lgr = smc_get_lgr(link);
-> -	struct smc_init_info *ini = NULL;
-> +	struct smc_init_info *ini;
-> 
->  	if (lgr->smc_version == SMC_V2) {
->  		smc_llc_send_request_add_link(link);
-> -		goto out;
-> +		goto free_qentry;
->  	}
-> 
->  	if (lgr->type == SMC_LGR_SYMMETRIC ||
-> -	    lgr->type == SMC_LGR_ASYMMETRIC_PEER)
-> -		goto out;
-> -
-> -	if (lgr->type == SMC_LGR_SINGLE && lgr->max_links <= 1)
-> -		goto out;
-> +	    lgr->type == SMC_LGR_ASYMMETRIC_PEER ||
-> +	    lgr->type == SMC_LGR_SINGLE && lgr->max_links <= 1)
-> +		goto free_qentry;
-> 
->  	ini = kzalloc(sizeof(*ini), GFP_KERNEL);
->  	if (!ini)
-> -		goto out;
-> +		goto free_qentry;
-> 
->  	ini->vlan_id = lgr->vlan_id;
->  	smc_pnet_find_alt_roce(lgr, ini, link->smcibdev);
-> @@ -1190,6 +1188,7 @@ static void smc_llc_cli_add_link_invite(struct smc_link *link,
->  			      ini->ib_gid, NULL, SMC_LLC_REQ);
->  out:
->  	kfree(ini);
-> +free_qentry:
->  	kfree(qentry);
->  }
-> 
-> --
-> 2.43.0
+v2: correct some syntactic problems.
+v3: delete unused label err.
+---
+ net/sunrpc/auth_gss/gss_rpc_xdr.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/net/sunrpc/auth_gss/gss_rpc_xdr.c b/net/sunrpc/auth_gss/gss_rpc_xdr.c
+index d79f12c2550a..cb32ab9a8395 100644
+--- a/net/sunrpc/auth_gss/gss_rpc_xdr.c
++++ b/net/sunrpc/auth_gss/gss_rpc_xdr.c
+@@ -250,8 +250,8 @@ static int gssx_dec_option_array(struct xdr_stream *xdr,
+ 
+ 	creds = kzalloc(sizeof(struct svc_cred), GFP_KERNEL);
+ 	if (!creds) {
+-		kfree(oa->data);
+-		return -ENOMEM;
++		err = -ENOMEM;
++		goto free_oa;
+ 	}
+ 
+ 	oa->data[0].option.data = CREDS_VALUE;
+@@ -265,29 +265,40 @@ static int gssx_dec_option_array(struct xdr_stream *xdr,
+ 
+ 		/* option buffer */
+ 		p = xdr_inline_decode(xdr, 4);
+-		if (unlikely(p == NULL))
+-			return -ENOSPC;
++		if (unlikely(p == NULL)) {
++			err = -ENOSPC;
++			goto free_creds;
++		}
+ 
+ 		length = be32_to_cpup(p);
+ 		p = xdr_inline_decode(xdr, length);
+-		if (unlikely(p == NULL))
+-			return -ENOSPC;
++		if (unlikely(p == NULL)) {
++			err = -ENOSPC;
++			goto free_creds;
++		}
+ 
+ 		if (length == sizeof(CREDS_VALUE) &&
+ 		    memcmp(p, CREDS_VALUE, sizeof(CREDS_VALUE)) == 0) {
+ 			/* We have creds here. parse them */
+ 			err = gssx_dec_linux_creds(xdr, creds);
+ 			if (err)
+-				return err;
++				goto free_creds;
+ 			oa->data[0].value.len = 1; /* presence */
+ 		} else {
+ 			/* consume uninteresting buffer */
+ 			err = gssx_dec_buffer(xdr, &dummy);
+ 			if (err)
+-				return err;
++				goto free_creds;
+ 		}
+ 	}
+ 	return 0;
++
++free_creds:
++	kfree(creds);
++free_oa:
++	kfree(oa->data);
++	oa->data = NULL;
++	return err;
+ }
+ 
+ static int gssx_dec_status(struct xdr_stream *xdr,
+-- 
+2.34.1
+
 
