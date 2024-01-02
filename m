@@ -1,188 +1,182 @@
-Return-Path: <netdev+bounces-60974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86F0B822112
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:32:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CDB6822115
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:33:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39A9D1F2334E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:32:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CE0C2842D4
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:33:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D0F154B6;
-	Tue,  2 Jan 2024 18:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2551B14F9D;
+	Tue,  2 Jan 2024 18:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2KEs8x0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yIutmAYk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCCD156EA;
-	Tue,  2 Jan 2024 18:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ccae380df2so81798011fa.1;
-        Tue, 02 Jan 2024 10:32:09 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4E615AC2
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 18:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso1202a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 10:33:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704220328; x=1704825128; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1704220417; x=1704825217; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=meV8SzFKE9ByJNsnfBulTLpQ7dcVBr4I/UuViUtYF6s=;
-        b=F2KEs8x0NepTVaVopEtrTMTw9qETrF2sNGmOgNRBQS8sSgWY4kMgkXsyeWGW2nJWoC
-         o+JqXVtSULXtPWA06IfPZGe8YSycPo1e6AbQJyzx7zsA0uJSzWlJizwLgV+NqoCl3oQN
-         br9vhEsgijKWQoffVahIYJMliDEU0KpoUHHRL+QkeYPwpF+CjIkk7uJLGjtTfI+Eo2DM
-         S0Fw1PipEBRoEineI0C1PFgBEFk/Bcxzft6wfNiv6Dm0eaaK35hmBrEOeIYYBGOLMP3Z
-         vj6SPiupsVsJw/x5EvUNcNgkeOv1PEkHIEBcML/rEdSgR19HWCNDxWTo/fYNUjQ9AqFN
-         A0ew==
+        bh=YcAbBzTZy/cwBJVkLr8s6Y3WY23Q0YFRyyWOj4s6ib8=;
+        b=yIutmAYkKyJZkO+vficrBTfxMhkIcORQAEtwZrGRB1vXT+SFW4JaZwp0+YK2XwE+Ii
+         gxkiprMxmp/WAwH1RPuhLhKA4HqeUziCNw3+PKC1AkoTxArwKRGpXYfLvKTsBOHzseBD
+         6E9O/gvrdkPh4Tft/ielPsGrxzPlHmdkx70AigNxZ86FLxbopnKtEZmHf5z70bp/KdcY
+         E2g+mcPBGP3A/9ibYliezte3CMqsY83WPshDjFvzxlh8lkL0SSiaxmkHZzEP5o8rWd2S
+         C07s+MwmYGxSYs42ZEfc+KcRy5jdNO2XluS/SQbYNu7RiIfEjbhwSwEoRMItIuphQPJS
+         Uudg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704220328; x=1704825128;
+        d=1e100.net; s=20230601; t=1704220417; x=1704825217;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=meV8SzFKE9ByJNsnfBulTLpQ7dcVBr4I/UuViUtYF6s=;
-        b=c9P5TuJ4/HD+b1yuMXdGYl6s4xtm2Utut28zta03fvbtzEk4rTnWWYYfC/+DWatPe7
-         q3sVYZpnGoI78fsQIjNVRMXHgRJZNZGBln61KBLc/j+lBuOnD0G3VZUzmPXPaMXIRCtt
-         Hm8DEUqDGsXpA3fFF0LDpqK0Dq7zhWaxPXyHxG6nVjtrfqrJfgn7hb8NG9TKtwoMzR39
-         h09zc2ZokTENkhi+RU5VDzAxBzjBxVTYYQBDwbAxPSCEM013O63RcV3jh6TRx4rt0Nq5
-         pECyCK6+20qXMTsfGFXZevNDcfWlHQ+XEVXT/8uISgjw+5FH8RH/fSayVplLflJe1Xao
-         76aA==
-X-Gm-Message-State: AOJu0YzBoUgswhWOuWstLQd1B6TICC8cGaNnrbba5K2TKXvBx9yFpfra
-	8Z1kQsY1eQp3wwKv0O200myHY+TwRS9GwWHNorSkGZMLnFk=
-X-Google-Smtp-Source: AGHT+IH0qHC6wDOX3mtYQS9oQ3DnnXzvTNQhF+EeEK75UmAg65xMQhJEfRmiKwCMFnLOnG9ZyOOjvlZZ6ldGpcw3Z5o=
-X-Received: by 2002:a05:651c:210a:b0:2cc:bfdb:f089 with SMTP id
- a10-20020a05651c210a00b002ccbfdbf089mr7052613ljq.61.1704220327737; Tue, 02
- Jan 2024 10:32:07 -0800 (PST)
+        bh=YcAbBzTZy/cwBJVkLr8s6Y3WY23Q0YFRyyWOj4s6ib8=;
+        b=hcog7fuexf6lT1GGz+vn33z4f+quLYh5Ojrzo3iUS/0Mzxiv+7jNaDGYSlqb+xzy00
+         VqQp8YynYwm50r3Zn5CkhK/43CiZMb/cUjxgHM/SWRbYOrELVLIRt70tNWqiTZdkXcF2
+         8PaO9yuv3nGNg5zydSgM3VUGMf6ndgBm54XDEV0x+i+WCwrAEUQy3YHs8/W+tl1b7OQq
+         CI7qEZIkV9z5jnprQ51wsXSh0UGgXpRxWfJeAJh9VRYkh2ykQCPd+9KmqAs6jWBeMUPG
+         gQiDdXGNqjcbrjQrU1wZnXkQ8FxhmPDYwFiC46hKjU+TWBUtV4Fq6Ue0TQvrrpUoXVFH
+         z/iA==
+X-Gm-Message-State: AOJu0YyqhS5D9AIwJLkFY9K3jQd97kpgEbJZbvJy5VogtZIf+2WbM/E1
+	ZwTrKzXDFoPMriKVxT/3Nokm/lD0mLb+b/qGjYG64CwN9mvU
+X-Google-Smtp-Source: AGHT+IFMMYAsrpycRKvYiz7NGfwtOm4xfv+ygiRUtgU9ZHZEYciNvmx/YcgXdNvTEzSAR3HGIFR/XAiYI5JWeO1ZbbU=
+X-Received: by 2002:a50:9b51:0:b0:554:1b1c:72c4 with SMTP id
+ a17-20020a509b51000000b005541b1c72c4mr715805edj.1.1704220416498; Tue, 02 Jan
+ 2024 10:33:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240102181946.57288-1-verdre@v0yd.nl> <20240102181946.57288-5-verdre@v0yd.nl>
-In-Reply-To: <20240102181946.57288-5-verdre@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 2 Jan 2024 13:31:55 -0500
-Message-ID: <CABBYNZ+uy50g2CSJ37DL63ycSJc96Xegdjcr6N2weJfCiGO_Aw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] Bluetooth: Queue a HCI power-off command before
- rfkilling adapters
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
+References: <14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com>
+ <CANn89iLVg3H-GuZ6=_-Rc5Jk14T59pZcx1DF-3HApvsPuSpNXg@mail.gmail.com>
+ <20240102095835.GF6361@unreal> <CANn89iLd6EeC3b8DTXBP=cDw8ri+k_uGiCrAS6BOoG3FMuAxmg@mail.gmail.com>
+ <20240102114147.GG6361@unreal> <CANn89iJzBzcU=-ybbvOjNeNBqx2ap=uoS1dbYJEY59oWsSTUtg@mail.gmail.com>
+ <20240102180102.GA5160@unreal>
+In-Reply-To: <20240102180102.GA5160@unreal>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Jan 2024 19:33:23 +0100
+Message-ID: <CANn89iKcStXqo9rxpO_Dq3HQ0Sj8Ce_5YmjaKx7n9EF+9GjTmA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: Revert no longer abort SYN_SENT when
+ receiving some ICMP
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Gal Pressman <gal@nvidia.com>, David Ahern <dsahern@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Shachar Kagan <skagan@nvidia.com>, netdev@vger.kernel.org, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, 
+	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jonas,
-
-On Tue, Jan 2, 2024 at 1:19=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
+On Tue, Jan 2, 2024 at 7:01=E2=80=AFPM Leon Romanovsky <leon@kernel.org> wr=
+ote:
 >
-> On a lot of platforms (at least the MS Surface devices, M1 macbooks, and
-> a few ThinkPads) firmware doesn't do its job when rfkilling a device
-> and the bluetooth adapter is not actually shut down on rfkill. This leads
-> to connected devices remaining in connected state and the bluetooth
-> connection eventually timing out after rfkilling an adapter.
+> On Tue, Jan 02, 2024 at 04:31:15PM +0100, Eric Dumazet wrote:
+> > On Tue, Jan 2, 2024 at 12:41=E2=80=AFPM Leon Romanovsky <leon@kernel.or=
+g> wrote:
+> > >
+> > > On Tue, Jan 02, 2024 at 11:03:55AM +0100, Eric Dumazet wrote:
+> > > > On Tue, Jan 2, 2024 at 10:58=E2=80=AFAM Leon Romanovsky <leon@kerne=
+l.org> wrote:
+> > > > >
+> > > > > On Tue, Jan 02, 2024 at 10:46:13AM +0100, Eric Dumazet wrote:
+> > > > > > On Tue, Jan 2, 2024 at 10:01=E2=80=AFAM Leon Romanovsky <leon@k=
+ernel.org> wrote:
+> > > > > > >
+> > > > > > > From: Shachar Kagan <skagan@nvidia.com>
+> > > > > > >
+> > > > > > > This reverts commit 0a8de364ff7a14558e9676f424283148110384d6.
+> > > > > > >
+> > > > > > > Shachar reported that Vagrant (https://www.vagrantup.com/), w=
+hich is
+> > > > > > > very popular tool to manage fleet of VMs stopped to work afte=
+r commit
+> > > > > > > citied in Fixes line.
+> > > > > > >
+> > > > > > > The issue appears while using Vagrant to manage nested VMs.
+> > > > > > > The steps are:
+> > > > > > > * create vagrant file
+> > > > > > > * vagrant up
+> > > > > > > * vagrant halt (VM is created but shut down)
+> > > > > > > * vagrant up - fail
+> > > > > > >
+> > > > > >
+> > > > > > I would rather have an explanation, instead of reverting a vali=
+d patch.
+> > > > > >
+> > > > > > I have been on vacation for some time. I may have missed a deta=
+iled
+> > > > > > explanation, please repost if needed.
+> > > > >
+> > > > > Our detailed explanation that revert worked. You provided the pat=
+ch that
+> > > > > broke, so please let's not require from users to debug it.
+> > > > >
+> > > > > If you need a help to reproduce and/or test some hypothesis, Shac=
+har
+> > > > > will be happy to help you, just ask.
+> > > >
+> > > > I have asked already, and received files that showed no ICMP releva=
+nt
+> > > > interactions.
+> > > >
+> > > > Can someone from your team help Shachar to get  a packet capture of
+> > > > both TCP _and_ ICMP packets ?
+> > >
+> > > I or Gal will help her, but for now let's revert it, before we will s=
+ee
+> > > this breakage in merge window and later in all other branches which w=
+ill
+> > > be based on -rc1.
+> >
+> > Patch is in net-next, we have at least four weeks to find the root caus=
+e.
 >
-> Use the rfkill hook in the HCI driver to actually power the device off
-> before rfkilling it.
+> I saw more than once claims that netdev is fast to take patches but also
+> fast in reverts. There is no need to keep patch with known regression,
+> while we are in -rc8.
+
+This patch is not in rc8, unless I am mistaken ?
+
 >
-> Note that the wifi subsystem is doing something similar by calling
-> cfg80211_shutdown_all_interfaces()
-> in it's rfkill set_block callback (see cfg80211_rfkill_set_block).
-
-So the rfkill is supposed to be wait for cleanup, not a forceful
-shutdown of RF traffic? I assume it would be the later since to do a
-proper cleanup that could cause more RF traffic while the current
-assumption was to stop all traffic and then call hdev->shutdown to
-ensure the driver does shutdown the RF traffic, perhaps this
-assumption has changed over time since interrupting the RF traffic may
-cause what you just described because the remote end will have to rely
-on link-loss logic to detect the connection has been terminated.
-
-> Signed-off-by: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
-> ---
->  net/bluetooth/hci_core.c | 33 ++++++++++++++++++++++++++++++---
->  1 file changed, 30 insertions(+), 3 deletions(-)
+> >
+> > I am a TCP maintainer, I will ask you to respect my choice, we have
+> > tests and reverting the patch is breaking one of them.
 >
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 1ec83985f..1c91d02f7 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -543,6 +543,23 @@ int hci_dev_open(__u16 dev)
->         return err;
->  }
+> At least for ipv6, you changed code from 2016 and the patch which I'm ask=
+ing
+> to revert is not even marked as a fix. So I don't understand the urgency =
+to keep
+> the patch.
+
+Do you have an issue with IPv4 code or IPv6 ?
+
+It would help to have details.
 >
-> +static int set_powered_off_sync(struct hci_dev *hdev, void *data)
-> +{
-> +       return hci_set_powered_sync(hdev, false);
-> +}
-> +
-> +static void set_powered_off_sync_complete(struct hci_dev *hdev, void *da=
-ta, int err)
-> +{
-> +       if (err)
-> +               bt_dev_err(hdev, "Powering HCI device off before rfkillin=
-g failed (%d)", err);
-> +}
-> +
-> +static int hci_dev_do_poweroff(struct hci_dev *hdev)
-> +{
-> +       return hci_cmd_sync_queue(hdev, set_powered_off_sync,
-> +                                 NULL, set_powered_off_sync_complete);
-> +}
-> +
->  int hci_dev_do_close(struct hci_dev *hdev)
->  {
->         int err;
-> @@ -943,17 +960,27 @@ int hci_get_dev_info(void __user *arg)
->  static int hci_rfkill_set_block(void *data, bool blocked)
->  {
->         struct hci_dev *hdev =3D data;
-> +       int err;
+> There are two things to consider:
+> 1. Linux rule number one is "do not break userspace".
+
+No released kernel contains the issue yet. Nothing broke yet.
+
+net-next is for developers.
+
+> 2. Linux is a community project and people can have different opinions,
+> which can be different from your/mine.
 >
->         BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
->
->         if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
->                 return -EBUSY;
->
-> +       if (blocked =3D=3D hci_dev_test_flag(hdev, HCI_RFKILLED))
-> +               return 0;
-> +
->         if (blocked) {
-> -               hci_dev_set_flag(hdev, HCI_RFKILLED);
->                 if (!hci_dev_test_flag(hdev, HCI_SETUP) &&
-> -                   !hci_dev_test_flag(hdev, HCI_CONFIG))
-> -                       hci_dev_do_close(hdev);
-> +                   !hci_dev_test_flag(hdev, HCI_CONFIG)) {
-> +                       err =3D hci_dev_do_poweroff(hdev);
-> +                       if (err) {
-> +                               bt_dev_err(hdev, "Powering off device bef=
-ore rfkilling failed (%d)",
-> +                                          err);
-> +                       }
+> Thanks
 
-You already have the error printed on set_powered_off_sync_complete
-not sure why you have it here as well.
-
-> +               }
-> +
-> +               hci_dev_set_flag(hdev, HCI_RFKILLED);
-
-Before we used to set the HCI_RFKILLED beforehand, is this change
-really intended or not? I think we should keep doing it ahead of power
-off sequence since we can probably use it to ignore if there are any
-errors on the cleanup, etc.
-
->         } else {
->                 hci_dev_clear_flag(hdev, HCI_RFKILLED);
->         }
-> --
-> 2.43.0
->
-
-
---=20
-Luiz Augusto von Dentz
+I think we have time, and getting this patch with potential users on
+it will help to debug the issue.
 
