@@ -1,151 +1,123 @@
-Return-Path: <netdev+bounces-60930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 381FB821E6E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:12:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB349821E92
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:18:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD5DB1F21117
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:12:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B3811F21963
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F91D12E69;
-	Tue,  2 Jan 2024 15:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B6F134DD;
+	Tue,  2 Jan 2024 15:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BRUG+UZl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RhqWzeST"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9026315ADB
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 15:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704208221;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZHtqiuFv0NX2cWrksYXkoFkjpAn1pYFyXkkX4b7K2+g=;
-	b=BRUG+UZlyrySoJsT2BsCvHBbHchyVI+mYDad+/R7NtFBrxDJXKXFXPlblpEcuhQyNIOMt1
-	0XyEwA33TjRwr/h4GxCrDaGa6Ums8BOj4KfBfLnCNVZ6C7qBL6qnp7Rju58doTEFPcyi7B
-	g6nUA9rrDYHqw7B+oO0Wo3OAwucgPOc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-310-ZI4YbdCQOISs_CZvDVPhjg-1; Tue, 02 Jan 2024 10:10:18 -0500
-X-MC-Unique: ZI4YbdCQOISs_CZvDVPhjg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F839832EDA;
-	Tue,  2 Jan 2024 15:10:17 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.16.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B97BF492BC6;
-	Tue,  2 Jan 2024 15:10:15 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Brad Cowie <brad@faucet.nz>,  netdev@vger.kernel.org,
-  dev@openvswitch.org,  fw@strlen.de,  linux-kernel@vger.kernel.org,
-  kadlec@netfilter.org,  edumazet@google.com,
-  netfilter-devel@vger.kernel.org,  kuba@kernel.org,  pabeni@redhat.com,
-  davem@davemloft.net,  pablo@netfilter.org,  Xin Long
- <lucien.xin@gmail.com>,  coreteam@netfilter.org
-Subject: Re: [PATCH net] netfilter: nf_nat: fix action not being set for all
- ct states
-References: <20231221224311.130319-1-brad@faucet.nz>
-	<20231223211306.GA215659@kernel.org>
-Date: Tue, 02 Jan 2024 10:10:15 -0500
-In-Reply-To: <20231223211306.GA215659@kernel.org> (Simon Horman's message of
-	"Sat, 23 Dec 2023 21:13:06 +0000")
-Message-ID: <f7tle97eppk.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3E414007
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 15:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kpgEbbnV64L4OrY798Otsio5dBe8NpkV0AHt8BZku6w=; b=RhqWzeSTp5NjyKXNpJfs7QGsN2
+	2SY7XMa3TZr4pmF8n3W3rqZRIrExFmJ1vUwkRMFPodjKMLmwHijqy/2zDi4/l0u0GhMjp+qnDPnB4
+	ZbHe/cJmjleAiYQFcgsRgfu/NlLH5l5VXICDXa4bicH0oe3fRWHj5ZEllMDApP8Mx6a0/KE564tP0
+	dZEZpWR4u1dRSePcUARe/WZ1bkqzONn9LAs6QQKSosgiuiFyCeKdHng7qI+O22hfaAJzf+Cz9Od9g
+	iO3Bm2Sjot0f/8JlDEeExZ2rcOp0OdG+hsWQ/xE05eKp2Lh759rVoljWl1oRCnMUh+5BfuXVev4Xw
+	XaiPAlyQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40392)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKgWn-0006fD-1a;
+	Tue, 02 Jan 2024 15:18:01 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKgWq-0005PQ-0j; Tue, 02 Jan 2024 15:18:04 +0000
+Date: Tue, 2 Jan 2024 15:18:03 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH RFC] net: mdio_bus: make check in
+ mdiobus_prevent_c45_scan more granular
+Message-ID: <ZZQpK9Uw72qhxA6l@shell.armlinux.org.uk>
+References: <c379276f-2276-4c15-b483-7379b16031f7@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c379276f-2276-4c15-b483-7379b16031f7@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Simon Horman <horms@kernel.org> writes:
+On Tue, Jan 02, 2024 at 03:38:05PM +0100, Heiner Kallweit wrote:
+> Matching on OUI level is a quite big hammer. So let's make matching
+> more granular.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+> This is what I'm thinking of. Maybe the problem of misbehaving
+> on c45 access affects certain groups of PHY's only.
+> Then we don't have to blacklist all PHY's from this vendor.
+> What do you think?
+> ---
+>  drivers/net/phy/mdio_bus.c | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+> index 6cf73c156..848d5d2d6 100644
+> --- a/drivers/net/phy/mdio_bus.c
+> +++ b/drivers/net/phy/mdio_bus.c
+> @@ -621,19 +621,27 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
+>   */
+>  static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
+>  {
+> -	int i;
+> +	const struct {
+> +		u32 phy_id;
+> +		u32 phy_id_mask;
+> +	} id_list[] = {
+> +		{ MICREL_OUI << 10, GENMASK(31, 10) },
+> +	};
 
-> + Xin Long <lucien.xin@gmail.com>
->   Aaron Conole <aconole@redhat.com>
->   coreteam@netfilter.org
->
-> On Fri, Dec 22, 2023 at 11:43:11AM +1300, Brad Cowie wrote:
->> This fixes openvswitch's handling of nat packets in the related state.
->> 
->> In nf_ct_nat_execute(), which is called from nf_ct_nat(), ICMP/ICMPv6
->> packets in the IP_CT_RELATED or IP_CT_RELATED_REPLY state, which have
->> not been dropped, will follow the goto, however the placement of the
->> goto label means that updating the action bit field will be bypassed.
->> 
->> This causes ovs_nat_update_key() to not be called from ovs_ct_nat()
->> which means the openvswitch match key for the ICMP/ICMPv6 packet is not
->> updated and the pre-nat value will be retained for the key, which will
->> result in the wrong openflow rule being matched for that packet.
->> 
->> Move the goto label above where the action bit field is being set so
->> that it is updated in all cases where the packet is accepted.
->> 
->> Fixes: ebddb1404900 ("net: move the nat function to nf_nat_ovs for ovs and tc")
->> Signed-off-by: Brad Cowie <brad@faucet.nz>
->
-> Thanks Brad,
->
-> I agree with your analysis and that the problem appears to
-> have been introduced by the cited commit.
->
-> I am curious to know what use case triggers this /
-> why it when unnoticed for a year.
->
-> But in any case, this fix looks good to me.
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
->> ---
+Do we need a new structure? Would struct mdio_device_id do (which
+actually has exactly the same members with exactly the same names in
+exactly the same order.)
 
-LGTM.  I guess we should try to codify the specific flows that were used
-to flag this into the ovs selftest - we clearly have a missing case
-after NAT lookup.
+Also, as this is not static, the compiler will need to generate code
+to initialise the structure, possibly storing a copy of it in the
+.data segment and memcpy()ing it onto the kernel stack. I suggest
+marking it static to avoid that unnecessary hidden code complexity.
 
-I'll add it to my (ever growing) list.
+> +		for (j = 0; j < ARRAY_SIZE(id_list); j++) {
+> +			u32 mask = id_list[j].phy_id_mask;
+> +
+> +			if ((phydev->phy_id & mask) == (id_list[j].phy_id & mask))
 
-Meanwhile,
+			if (phy_id_compare(phydev->phy_id, id_list[j].phy_id,
+					   id_list[j].phy_id_mask))
 
-Acked-by: Aaron Conole <aconole@redhat.com>
+Or it could be:
 
->>  net/netfilter/nf_nat_ovs.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->> 
->> diff --git a/net/netfilter/nf_nat_ovs.c b/net/netfilter/nf_nat_ovs.c
->> index 551abd2da614..0f9a559f6207 100644
->> --- a/net/netfilter/nf_nat_ovs.c
->> +++ b/net/netfilter/nf_nat_ovs.c
->> @@ -75,9 +75,10 @@ static int nf_ct_nat_execute(struct sk_buff *skb, struct nf_conn *ct,
->>  	}
->>  
->>  	err = nf_nat_packet(ct, ctinfo, hooknum, skb);
->> +out:
->>  	if (err == NF_ACCEPT)
->>  		*action |= BIT(maniptype);
->> -out:
->> +
->>  	return err;
->>  }
->>  
->> -- 
->> 2.34.1
->> 
->> _______________________________________________
->> dev mailing list
->> dev@openvswitch.org
->> https://mail.openvswitch.org/mailman/listinfo/ovs-dev
->> 
+			const struct mdio_device_id *id = id_list + j;
 
+			if (phy_id_compare(phydev->phy_id, id->phy_id,
+					   id->phy_id_mask))
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
