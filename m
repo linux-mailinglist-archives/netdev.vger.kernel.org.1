@@ -1,98 +1,241 @@
-Return-Path: <netdev+bounces-60951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9637B821F8C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:31:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD4E0821F94
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:31:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAA951C224AC
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:31:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5D541C2251F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC6914F8D;
-	Tue,  2 Jan 2024 16:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F01EADC;
+	Tue,  2 Jan 2024 16:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="OjvbQM1D"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IFLucAC6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5AB14F7C
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 16:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-28bf1410e37so7589240a91.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 08:30:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1704213056; x=1704817856; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9KkUQDV4v54E95UdJBzXyZy84b0c1XJbZTZp7leh2wE=;
-        b=OjvbQM1D0wXRHBQzv6zp6qECA29sLpOKGnJ/+ZnyoMaqvVzPL1hvi3LMUdADKR0lhz
-         DNwbkqDSR9dxRvxC/uLFKkUdJlew223ANNBB2mKyJJwFNHhkkUQJ9nvZ+tggZGsYwjry
-         JiBComD0iLvk/IghZUZ/QcRL6s62rDSeZu83vec7SS23699CKJWcx9+61xts+/zB+u1p
-         gjkkgxNmj7j0WA1JAfP5tJ+SwvxP1h9FXenHcDWDOG7NGVUNzyklti+WMRS6KJ/5mt77
-         K+qh572pSwmYh3yCbpIJfD1imAVCC+Nt9WEqs32kavcUqd8aVnaypI1dbBGQ1N/illZu
-         4Qjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704213056; x=1704817856;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9KkUQDV4v54E95UdJBzXyZy84b0c1XJbZTZp7leh2wE=;
-        b=xHXozqvVU/wp1sve8yAOWmKjmC9IZRcn/xrd8dF7dAxO+x96CnG/YmImF5g0/9dZ8y
-         OEBG4k6Qfvns7KIuqEkwRFVnqzQOF0W3slmw5zYEAURXaWITSBlO5fW+X7OJxy8V/bXf
-         Ds5kxa8AoM6wvDuCzq4maB5nEsklzjVCNmLGWoedMkeFqZllinQZPy0Xg+32eIr/sETy
-         ZDtAKnUXVpZl3CzKtNI2eY45qrFPlFoqIm1acMoNdBJwrbtanax/eCfMwH/jP+RH2Hgo
-         EkEJlWaKGWq8gYzflRie8FRsNn57EEEe6agUmjmCr1R1bukYUBnAO5bqu/YXrt5yMg19
-         oHSw==
-X-Gm-Message-State: AOJu0Yw5A3thJmSpv7eXl4wuCTaEan6jHPtaZUh+GqYQ0s0U0duEpd9+
-	szOvjJnw6D9ddJDeEKtOc3r3mDRQWpEakw==
-X-Google-Smtp-Source: AGHT+IF3r26omkcxVtQHwd2LEZ1N2oumCWEltJUNfhV1+PjxwJfGcY3aGiQQqi4c9WHNalHUZ3ehZA==
-X-Received: by 2002:a17:90a:d3d0:b0:28b:12f5:eb59 with SMTP id d16-20020a17090ad3d000b0028b12f5eb59mr8626353pjw.44.1704213056012;
-        Tue, 02 Jan 2024 08:30:56 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id nc13-20020a17090b37cd00b0028098225450sm27288207pjb.1.2024.01.02.08.30.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 08:30:55 -0800 (PST)
-Date: Tue, 2 Jan 2024 08:30:51 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>, LKML
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] packet: Improve exception handling in fanout_add()
-Message-ID: <20240102083051.26f3aa80@hermes.local>
-In-Reply-To: <828bb442-29d0-4bb8-b90d-f200bdd4faf6@web.de>
-References: <828bb442-29d0-4bb8-b90d-f200bdd4faf6@web.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1686615485
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 16:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Za856okNnBke2Rh4gqW0cgAZfHmaqFbAQjPxlws5dt0=; b=IFLucAC6OGrlvMeH3AP9lVUjX8
+	+IMhglUxIPVe8WhcfTXO/xTB0e1V+j2O+8I4ws+JxSq7Rd/RLWBL0BYdJPtxJM3cYbGrwjMWkobBy
+	qs5v6dW3R+pL01C3gMoLcliPVnMt/viJ5KRe/kflArwaydKJ6f2dcGyKKU3y04kvTi7u7oGSisagd
+	eVxyhPoz8B8FNHuBur3fKTUUXdnbMVvfL5thzcTb+BrRIB4rEkV63SGt70oiejsPuYrN9qgdpz7mp
+	vm52XPzQUDqcyPr44NUCj/34promdRatKxHXs4PL/Q2v/XA5JZOQiKrWGbuOXhpOr7cG64XweZeLV
+	AsKuQS+A==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58906 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1rKhfz-0006j5-0K;
+	Tue, 02 Jan 2024 16:31:35 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1rKhg1-00EnlX-NI; Tue, 02 Jan 2024 16:31:37 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] net: phylink: move phylink_pcs_neg_mode() into
+ phylink.c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1rKhg1-00EnlX-NI@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Tue, 02 Jan 2024 16:31:37 +0000
 
-On Sun, 31 Dec 2023 16:39:02 +0100
-Markus Elfring <Markus.Elfring@web.de> wrote:
+Move phylink_pcs_neg_mode() from the header file into the .c file since
+nothing should be using it.
 
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Sun, 31 Dec 2023 16:30:51 +0100
-> 
-> The kfree() function was called in some cases by the fanout_add() function
-> even if the passed variable contained a null pointer.
-> This issue was detected by using the Coccinelle software.
-> 
-> Thus use another label.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+While it is true that there have been no users of this outside phylink.c
+since shortly after it was merged, leaving it in phylink.h provides a
+way to migrate code in e.g. OpenWRT. Since 6.6 was a LTS, let's now move
+the function for 6.8.
+---
+ drivers/net/phy/phylink.c | 67 +++++++++++++++++++++++++++++++++++++++
+ include/linux/phylink.h   | 66 --------------------------------------
+ 2 files changed, 67 insertions(+), 66 deletions(-)
 
-Since you are seem to not listen to feedback from others,
-I hope this patch is just ignored.
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 3d25a4a6212b..5a64e762b873 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1074,6 +1074,73 @@ static void phylink_pcs_an_restart(struct phylink *pl)
+ 		pl->pcs->ops->pcs_an_restart(pl->pcs);
+ }
+ 
++/**
++ * phylink_pcs_neg_mode() - helper to determine PCS inband mode
++ * @mode: one of %MLO_AN_FIXED, %MLO_AN_PHY, %MLO_AN_INBAND.
++ * @interface: interface mode to be used
++ * @advertising: adertisement ethtool link mode mask
++ *
++ * Determines the negotiation mode to be used by the PCS, and returns
++ * one of:
++ *
++ * - %PHYLINK_PCS_NEG_NONE: interface mode does not support inband
++ * - %PHYLINK_PCS_NEG_OUTBAND: an out of band mode (e.g. reading the PHY)
++ *   will be used.
++ * - %PHYLINK_PCS_NEG_INBAND_DISABLED: inband mode selected but autoneg
++ *   disabled
++ * - %PHYLINK_PCS_NEG_INBAND_ENABLED: inband mode selected and autoneg enabled
++ *
++ * Note: this is for cases where the PCS itself is involved in negotiation
++ * (e.g. Clause 37, SGMII and similar) not Clause 73.
++ */
++static unsigned int phylink_pcs_neg_mode(unsigned int mode,
++					 phy_interface_t interface,
++					 const unsigned long *advertising)
++{
++	unsigned int neg_mode;
++
++	switch (interface) {
++	case PHY_INTERFACE_MODE_SGMII:
++	case PHY_INTERFACE_MODE_QSGMII:
++	case PHY_INTERFACE_MODE_QUSGMII:
++	case PHY_INTERFACE_MODE_USXGMII:
++		/* These protocols are designed for use with a PHY which
++		 * communicates its negotiation result back to the MAC via
++		 * inband communication. Note: there exist PHYs that run
++		 * with SGMII but do not send the inband data.
++		 */
++		if (!phylink_autoneg_inband(mode))
++			neg_mode = PHYLINK_PCS_NEG_OUTBAND;
++		else
++			neg_mode = PHYLINK_PCS_NEG_INBAND_ENABLED;
++		break;
++
++	case PHY_INTERFACE_MODE_1000BASEX:
++	case PHY_INTERFACE_MODE_2500BASEX:
++		/* 1000base-X is designed for use media-side for Fibre
++		 * connections, and thus the Autoneg bit needs to be
++		 * taken into account. We also do this for 2500base-X
++		 * as well, but drivers may not support this, so may
++		 * need to override this.
++		 */
++		if (!phylink_autoneg_inband(mode))
++			neg_mode = PHYLINK_PCS_NEG_OUTBAND;
++		else if (linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
++					   advertising))
++			neg_mode = PHYLINK_PCS_NEG_INBAND_ENABLED;
++		else
++			neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED;
++		break;
++
++	default:
++		neg_mode = PHYLINK_PCS_NEG_NONE;
++		break;
++	}
++
++	return neg_mode;
++}
++
++
+ static void phylink_major_config(struct phylink *pl, bool restart,
+ 				  const struct phylink_link_state *state)
+ {
+diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+index 875439ab45de..d589f89c612c 100644
+--- a/include/linux/phylink.h
++++ b/include/linux/phylink.h
+@@ -98,72 +98,6 @@ static inline bool phylink_autoneg_inband(unsigned int mode)
+ 	return mode == MLO_AN_INBAND;
+ }
+ 
+-/**
+- * phylink_pcs_neg_mode() - helper to determine PCS inband mode
+- * @mode: one of %MLO_AN_FIXED, %MLO_AN_PHY, %MLO_AN_INBAND.
+- * @interface: interface mode to be used
+- * @advertising: adertisement ethtool link mode mask
+- *
+- * Determines the negotiation mode to be used by the PCS, and returns
+- * one of:
+- *
+- * - %PHYLINK_PCS_NEG_NONE: interface mode does not support inband
+- * - %PHYLINK_PCS_NEG_OUTBAND: an out of band mode (e.g. reading the PHY)
+- *   will be used.
+- * - %PHYLINK_PCS_NEG_INBAND_DISABLED: inband mode selected but autoneg
+- *   disabled
+- * - %PHYLINK_PCS_NEG_INBAND_ENABLED: inband mode selected and autoneg enabled
+- *
+- * Note: this is for cases where the PCS itself is involved in negotiation
+- * (e.g. Clause 37, SGMII and similar) not Clause 73.
+- */
+-static inline unsigned int phylink_pcs_neg_mode(unsigned int mode,
+-						phy_interface_t interface,
+-						const unsigned long *advertising)
+-{
+-	unsigned int neg_mode;
+-
+-	switch (interface) {
+-	case PHY_INTERFACE_MODE_SGMII:
+-	case PHY_INTERFACE_MODE_QSGMII:
+-	case PHY_INTERFACE_MODE_QUSGMII:
+-	case PHY_INTERFACE_MODE_USXGMII:
+-		/* These protocols are designed for use with a PHY which
+-		 * communicates its negotiation result back to the MAC via
+-		 * inband communication. Note: there exist PHYs that run
+-		 * with SGMII but do not send the inband data.
+-		 */
+-		if (!phylink_autoneg_inband(mode))
+-			neg_mode = PHYLINK_PCS_NEG_OUTBAND;
+-		else
+-			neg_mode = PHYLINK_PCS_NEG_INBAND_ENABLED;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_1000BASEX:
+-	case PHY_INTERFACE_MODE_2500BASEX:
+-		/* 1000base-X is designed for use media-side for Fibre
+-		 * connections, and thus the Autoneg bit needs to be
+-		 * taken into account. We also do this for 2500base-X
+-		 * as well, but drivers may not support this, so may
+-		 * need to override this.
+-		 */
+-		if (!phylink_autoneg_inband(mode))
+-			neg_mode = PHYLINK_PCS_NEG_OUTBAND;
+-		else if (linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+-					   advertising))
+-			neg_mode = PHYLINK_PCS_NEG_INBAND_ENABLED;
+-		else
+-			neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED;
+-		break;
+-
+-	default:
+-		neg_mode = PHYLINK_PCS_NEG_NONE;
+-		break;
+-	}
+-
+-	return neg_mode;
+-}
+-
+ /**
+  * struct phylink_link_state - link state structure
+  * @advertising: ethtool bitmask containing advertised link modes
+-- 
+2.30.2
+
 
