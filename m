@@ -1,99 +1,94 @@
-Return-Path: <netdev+bounces-60767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 392AD82162E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 02:55:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5886D821660
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 03:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B21E5B2114D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 01:55:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5317FB211FD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 02:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F615624;
-	Tue,  2 Jan 2024 01:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EFB81C;
+	Tue,  2 Jan 2024 02:13:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D4AA3C;
-	Tue,  2 Jan 2024 01:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 1aea85f17682422dac81e619213c3012-20240102
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:590e7556-0f26-42e5-8799-18154acd262f,IP:15,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:10
-X-CID-INFO: VERSION:1.1.35,REQID:590e7556-0f26-42e5-8799-18154acd262f,IP:15,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:10
-X-CID-META: VersionHash:5d391d7,CLOUDID:0a5dc88d-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:240102095434KIT3K19G,BulkQuantity:0,Recheck:0,SF:66|24|72|19|44|102,
-	TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0
-	,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 1aea85f17682422dac81e619213c3012-20240102
-Received: from node4.com.cn [(39.156.73.12)] by mailgw
-	(envelope-from <tanzheng@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 589800547; Tue, 02 Jan 2024 09:54:31 +0800
-Received: from node4.com.cn (localhost [127.0.0.1])
-	by node4.com.cn (NSMail) with SMTP id 9885F16001CD7;
-	Tue,  2 Jan 2024 09:54:30 +0800 (CST)
-X-ns-mid: postfix-65936CD6-418672167
-Received: from localhost.localdomain (unknown [172.20.40.222])
-	by node4.com.cn (NSMail) with ESMTPA id CA2BF16001CD7;
-	Tue,  2 Jan 2024 01:54:24 +0000 (UTC)
-From: zheng tan <tanzheng@kylinos.cn>
-To: johannes@sipsolutions.net
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zheng tan <tanzheng@kylinos.cn>,
-	k2ci <kernel-bot@kylinos.cn>
-Subject: [PATCH 3/5] net: mac80211: fix spelling typo in comment
-Date: Tue,  2 Jan 2024 09:54:18 +0800
-Message-Id: <20240102015418.3673858-1-tanzheng@kylinos.cn>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5C015C2;
+	Tue,  2 Jan 2024 02:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=tonylu@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VziwJm._1704161598;
+Received: from localhost(mailfrom:tonylu@linux.alibaba.com fp:SMTPD_---0VziwJm._1704161598)
+          by smtp.aliyun-inc.com;
+          Tue, 02 Jan 2024 10:13:19 +0800
+Date: Tue, 2 Jan 2024 10:13:17 +0800
+From: Tony Lu <tonylu@linux.alibaba.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
+	Paolo Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] net/smc: Return directly after a failed kzalloc() in
+ smc_fill_gid_list()
+Message-ID: <ZZNxPadDoJ6gxRmb@TONYMAC-ALIBABA.local>
+Reply-To: Tony Lu <tonylu@linux.alibaba.com>
+References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
+ <f02303c3-5968-48c3-990b-be0be8a66521@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f02303c3-5968-48c3-990b-be0be8a66521@web.de>
 
-From: Zheng tan <tanzheng@kylinos.cn>
+On Sun, Dec 31, 2023 at 03:58:15PM +0100, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Sun, 31 Dec 2023 15:15:19 +0100
+> 
+> The kfree() function was called in one case by
+> the smc_fill_gid_list() function during error handling
+> even if the passed variable contained a null pointer.
+> This issue was detected by using the Coccinelle software.
+> 
+> Thus return directly after a call of the function "kzalloc" failed
+> at the beginning.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 
-fix spelling typo in comment.
+LGTM, thank you.
 
-Reported-by: k2ci <kernel-bot@kylinos.cn>
-Signed-off-by: Zheng tan <tanzheng@kylinos.cn>
----
- net/mac80211/debugfs_sta.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Also please add net tag in subject and fixes tag in commit body.
 
-diff --git a/net/mac80211/debugfs_sta.c b/net/mac80211/debugfs_sta.c
-index 5bf507ebb096..1e9389c49a57 100644
---- a/net/mac80211/debugfs_sta.c
-+++ b/net/mac80211/debugfs_sta.c
-@@ -16,7 +16,7 @@
- #include "sta_info.h"
- #include "driver-ops.h"
-=20
--/* sta attributtes */
-+/* sta attributes */
-=20
- #define STA_READ(name, field, format_string)				\
- static ssize_t sta_ ##name## _read(struct file *file,			\
---=20
-2.34.1
+Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
 
+> ---
+>  net/smc/af_smc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 7fc2f3c6d248..a396a9977ba9 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -1180,7 +1180,7 @@ void smc_fill_gid_list(struct smc_link_group *lgr,
+> 
+>  	alt_ini = kzalloc(sizeof(*alt_ini), GFP_KERNEL);
+>  	if (!alt_ini)
+> -		goto out;
+> +		return;
+> 
+>  	alt_ini->vlan_id = lgr->vlan_id;
+>  	alt_ini->check_smcrv2 = true;
+> --
+> 2.43.0
 
