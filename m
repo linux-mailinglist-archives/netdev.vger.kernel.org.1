@@ -1,113 +1,152 @@
-Return-Path: <netdev+bounces-61023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3661582245E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:03:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD72822462
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:03:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 494871C22AA0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:03:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FCD0B2392B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D216168CC;
-	Tue,  2 Jan 2024 21:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB989168D9;
+	Tue,  2 Jan 2024 21:57:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ink1npCd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ERCXYkmD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3009168D6
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 21:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d3ea8d0f9dso12365ad.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 13:54:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DA81802D;
+	Tue,  2 Jan 2024 21:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ccec119587so39886251fa.0;
+        Tue, 02 Jan 2024 13:57:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704232469; x=1704837269; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=naHyzOGLH6on2mA2NF2XfZpujt6bFyS08XuJbB6W+nU=;
-        b=ink1npCdsmV0JlUEA2MKvBtYYazz+sQVmh39qcNpANr4XT4Mqn7Yaw+SbiHDbjkx5x
-         UbneNWCtpzVWwzc/kEF8mw5msgcOHGNjsERxWyKfTix4u07GZPIB0NhVUjyYUpnU9M5T
-         fseY+G+pURKXOVzR2osp80JfuaxfOHmkqT5EX3sMf1dIunG1qqMyM4l8FIl10ZZSnAwW
-         nHePYRb3zvylbzflZ9E74oaNJ3y8jhUOVNGsjNg3Fbr0T31vmzIgVS02ngAxk2/DJWyq
-         yjV6MdIpd/6XrLbRYdj/8uvxPaJZ194g6lveCxoygZ05WkXhFhD2XC0ssTHSJ9uF2uFY
-         je8g==
+        d=gmail.com; s=20230601; t=1704232669; x=1704837469; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZrAMhCdZp/DH6n9t5/40nGjHO+BryyqAdvgXAu3yxZg=;
+        b=ERCXYkmD0SYi/uUaACZWyOsk163y6DC0yQsSzONhZelq8wu5oOtPOfr+n12vBnWjiP
+         w3mJ6qC5PAGao6C+8cEgG4zz0e9bRjpYzG9RCacT8R+IjZYxR52gJmhV3X8T0cWKM/b/
+         KPf23vrHbBtGJbVoVGl9DYZSznt9kjYKHPu6YhDx34wrnq4Z+9v762zeM3S8N1LngSf0
+         e0bxDG8qtm5rESA76khYforZC5VtqfmLASL/h3Kme/mNh9PuMgjOHP0e0YpVc5CBDB2/
+         KMbiJft/H6K0VFy5OGvagLGc49tU9j7pn+K/kWXV4a5aG0cPKEFDowbRaH12YGFfkkue
+         p+VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704232469; x=1704837269;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=naHyzOGLH6on2mA2NF2XfZpujt6bFyS08XuJbB6W+nU=;
-        b=loASkfMe+Ln0eRISyKgjCztO/VDJgzZmXmbRYrJxNZQFeAS6xyshZ5Tnh9RYy4vJBf
-         DntcwA0UMZy68yMjJdl2WGU+nXeDnfc7UB5SAMXTzjNsTWSQv8igzTlisx7Xv8e8qB7S
-         KIk3TWlh9PJc7A4tsoXf9VC4dvZskMLeQ+Z2sUg8/zq7LmfKaxUw1m2zusrcLkPMvhTc
-         tZymwDlo7vhMX/7jtz+fWL7yGmwlMBxg79ZcAUxqR9SwY5kce9SuwfbgwxhrE25ZW2aR
-         2azquzxcNDBIzwbCj2LvZCMqZKVWXdkMqvillMzUXNQVhSm0p4lACf/0ztu1GKZoovUO
-         cygw==
-X-Gm-Message-State: AOJu0YyTddtlX3UN8yCkF6Pt8lsRuBtqP3RoC+HPHxlxckPA8nCO1B6f
-	7y5E6XKo6hULyAKjnlK5UQ3EX23eHktGMu91vg517bo6f626
-X-Google-Smtp-Source: AGHT+IHkQBhw77JEsp5z2FkDtZxVR/uFp5PLGzvREFfOFuN0eSkSHjU/8rnVNW/sqbY5wQ+2jwDOYqUcqXNyIYwEMbE=
-X-Received: by 2002:a17:902:fac5:b0:1d3:ce75:a696 with SMTP id
- ld5-20020a170902fac500b001d3ce75a696mr863plb.5.1704232468929; Tue, 02 Jan
- 2024 13:54:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704232669; x=1704837469;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZrAMhCdZp/DH6n9t5/40nGjHO+BryyqAdvgXAu3yxZg=;
+        b=MQrKBgmk1eXok/pqVET80cxO39Q+z+FtIdbiwlDkrcy77Kk+odzr8UrhZFhGpQH3G1
+         5clNYviXt/QV9tvGPJc8ctVYHyw3IdSq6N+znaVPK9ChRoyI+E2WV2CTi6uGBIpt7sIq
+         VUZeH19rvcMclfvGQOwRIR8QzecwhdzQUgAa/4wYYZFUH5M2sJVGTquBvZnDBv6ElvUd
+         VIw6OrqIsLhTAwTjWNFvoyRx3+j9v72qsDSNSsh5Tw4zqEHA6WRCWVXsV/I15VXPnc9x
+         whmUC+6CVVC6I2UXeHEjznx71306V4yByp+yJ2NjWY9EWLU5s8SFud4QwQ7jZxGjQ8mI
+         fqow==
+X-Gm-Message-State: AOJu0YyDIYE/Kh92FwxQ5gbkyCE/vI2ZHhivcUX6s1Y3nsZ61ai1Fmjn
+	6nD+G4dWINcuEP89uTh4D6t4xHbb1dvPQJ3+c1Q=
+X-Google-Smtp-Source: AGHT+IHzUSZtz+OUNX8UQoqMyVVgg5FAvazfZuxlzjRw+s9gJSPpVl5k2CigK3FMR7t54xPqnkPKcDa140v/KOzYRe0=
+X-Received: by 2002:a2e:8902:0:b0:2cc:5780:6915 with SMTP id
+ d2-20020a2e8902000000b002cc57806915mr8428433lji.10.1704232668610; Tue, 02 Jan
+ 2024 13:57:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240102212716.810731-1-almasrymina@google.com> <20240102212716.810731-2-almasrymina@google.com>
-In-Reply-To: <20240102212716.810731-2-almasrymina@google.com>
-From: Shakeel Butt <shakeelb@google.com>
-Date: Tue, 2 Jan 2024 13:54:17 -0800
-Message-ID: <CALvZod43P7r1Ak=Og2ssXN1Jg1A25AYKDTP4j+qJj1z4DxucRw@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v4 1/2] net: introduce abstraction for
- network memory
-To: Mina Almasry <almasrymina@google.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20231220045228.27079-2-luizluca@gmail.com> <ZZPtUIRerqTI2/yh@shell.armlinux.org.uk>
+In-Reply-To: <ZZPtUIRerqTI2/yh@shell.armlinux.org.uk>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Tue, 2 Jan 2024 18:57:35 -0300
+Message-ID: <CAJq09z61JRNOBy6zLJ+D2pOVP-FCkofLjNghHSOkFJ=5q=6utQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: mdio: get/put device node during (un)registration
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 2, 2024 at 1:27=E2=80=AFPM Mina Almasry <almasrymina@google.com=
-> wrote:
+> On Wed, Dec 20, 2023 at 01:52:29AM -0300, Luiz Angelo Daros de Luca wrote:
+> > The __of_mdiobus_register() function was storing the device node in
+> > dev.of_node without increasing its reference count. It implicitly relied
+> > on the caller to maintain the allocated node until the mdiobus was
+> > unregistered.
+> >
+> > Now, __of_mdiobus_register() will acquire the node before assigning it,
+> > and of_mdiobus_unregister_callback() will be called at the end of
+> > mdio_unregister().
+> >
+> > Drivers can now release the node immediately after MDIO registration.
+> > Some of them are already doing that even before this patch.
+> >
+> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 >
-> Add the netmem_ref type, an abstraction for network memory.
->
-> To add support for new memory types to the net stack, we must first
-> abstract the current memory type. Currently parts of the net stack
-> use struct page directly:
->
-> - page_pool
-> - drivers
-> - skb_frag_t
->
-> Originally the plan was to reuse struct page* for the new memory types,
-> and to set the LSB on the page* to indicate it's not really a page.
-> However, for compiler type checking we need to introduce a new type.
->
-> netmem_ref is introduced to abstract the underlying memory type. Currentl=
-y
-> it's a no-op abstraction that is always a struct page underneath. In
-> parallel there is an undergoing effort to add support for devmem to the
-> net stack:
->
-> https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@googl=
-e.com/
->
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
->
+> I don't like this, certainly not the use of a method prefixed by a
+> double-underscore, and neither the conditional nature of "putting"
+> this. That alone seems to point to there being more issues.
 
-I think you forgot to update the commit message to replace netmem_ref
-with netmem. Also you can mention that you took the approach similar
-to 'struct encoded_page'. Otherwise LGTM.
+Thanks Russel.
 
-Reviewed-by: Shakeel Butt <shakeelb@google.com>
+At least one driver (bcm_sf2_mdio_register) is writing directly to the
+mii_bus->dev.of_node and not using of_mdiobus_register(). We should
+not put a node in the MDIO bus if the bus didn't get it before. That's
+the reason for the conditional putting the node.
+
+I wasn't sure about the names. What would be an appropriate name? The
+same without the prefix? In order to put the node only when the bus
+was registered by __of_mdiobus_register, I opted for a callback but it
+might be a better approach.
+
+> I also notice that netdev have applied this without *any* review from
+> phylib maintainers. Grr.
+
+Some reviews are required. Should we revert it?
+
+> Indeed there are more issues with the refcounting here. If one looks at
+> drivers/net/phy/mdio_bus.c::of_mdiobus_link_mdiodev(), we find this:
+>
+>                 if (addr == mdiodev->addr) {
+>                         device_set_node(dev, of_fwnode_handle(child));
+>                         /* The refcount on "child" is passed to the mdio
+>                          * device. Do _not_ use of_node_put(child) here.
+>                          */
+>                         return;
+>
+> but there is nowhere that this refcount is dropped.
+
+The same file where we have the get should also contain the put,
+ideally in a reverse function like register/unregister. It is too easy
+to miss a put that should happen in a different context.
+fixed_phy_unregister seems to be one case where it put that node after
+phy_device_remove() but I didn't investigate it further if that was
+related to a different of_node_get. mdiobus_unregister_device might be
+a nice place to fit that put but I'm not an expert in MDIO API.
+
+> Really, the patch should be addressing the problem rather than putting
+> a sticky-plaster over just one instance of it.
+
+I'm trying to address an issue I ran into while modifying a DSA
+driver. We have drivers putting the node passed to of_mdiobus_register
+just after it returns. In my option, it feels more natural and this
+patch fixes that scenario.
+Other drivers keep that reference until the driver is removed, which
+might still be too soon without this patch. I guess putting the node
+should happen between mdiobus_unregister and mdiobus_free. If the
+driver uses devm variants, it does not control the code between those
+two methods and it should just hope that it is enough to put the node
+as its last step.
+
+I issue that the child node you pointed to should also be addressed.
+However, I think they are two different but related issues. Any place
+we see a device_set_node(), we should see a of_node_get before and a
+of_node_put when the device is gone.
+
+Regards,
+
+Luiz
 
