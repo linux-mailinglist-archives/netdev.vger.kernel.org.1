@@ -1,120 +1,88 @@
-Return-Path: <netdev+bounces-60800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0820E8218A4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:59:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE5D821890
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:51:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A0041C20FDB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:59:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3EE81F2208B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB5F53AF;
-	Tue,  2 Jan 2024 08:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4225382;
+	Tue,  2 Jan 2024 08:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=walle.cc header.i=@walle.cc header.b="OMPg8DPP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBJzMRbe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.3ffe.de (0001.3ffe.de [159.69.201.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEFECA62
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 08:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=walle.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=walle.cc
-Received: from 3ffe.de (0001.3ffe.de [IPv6:2a01:4f8:c0c:9d57::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.3ffe.de (Postfix) with ESMTPSA id EB3092BA;
-	Tue,  2 Jan 2024 09:50:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2022082101;
-	t=1704185440;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3EWnLNmP8ycXFfGgtGCw8tql8p6JL0N060m1DGShhIw=;
-	b=OMPg8DPPsUBolYr92Civ/uaxHoTe+8kbM/vWBXZrIORIDPgzuUyvqOWEFaL6ILqIicTdTV
-	bK2rv31d71njMmE43aVjMxQrO3jtPlf9meCS3LAebUeM948eky3Lr+aTvS08FMQ6XkjsVg
-	0n2TTSjtJH+acq4RDauWHSyr+PTWU0NFJ0qQeVYMzoFWVTg6amvEMKr5XdFua6cZyFZAfp
-	UO4zzYM42cE9Oq+VmVm0fgTmn0luSSPGRw0D4rgZpNxeUsqm4rjQi1vXwTlwszfhI6IxRQ
-	hNISum+LRo/vahJdvPqGhqcBo7JhQ7JiovVT6DvZT+qssYlRdM1Ei7Ro6rWvhQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4277E746B
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 08:51:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FA93C433C8;
+	Tue,  2 Jan 2024 08:51:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704185472;
+	bh=AgMf0xXAqW6cRjyxRVHkwzC+qiwAbIJfo1EWkAWNThk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZBJzMRbehIvvUZiBHGELdUDl16Za42ItDKnYHN5dbORqGXleV1u4O0q+MzAK1e2xy
+	 KFE7sWQEp96G/B2HqRtQIIPB6Zmb0zkT+BD9M1EZyF5PwwA3IWblhT5Xvub+TT+WhI
+	 BcL7UX73osfDwQExmXl7AW4NHulkSufsap451RIA2yLmZNTeATGUtCzreqibJQZx70
+	 BYnjsBoVASwvmgr4cj6TQOkFmoqKCr1ds4N5TAobcL5mgE65C9JCCGAMxgX+wVWehY
+	 3RwMqpa7/dqwjPE2TFIEohaR/l53Ypu6M5Bsa5RgZD/uteYojp+h+MgJtfkE1K0YQV
+	 g4JhLFte4ehUA==
+Date: Tue, 2 Jan 2024 10:51:08 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: patchwork-bot+netdevbpf@kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
+	idok@mellanox.com
+Subject: Re: [PATCH iproute2] rdma: use print_XXX instead of COLOR_NONE
+Message-ID: <20240102085108.GC6361@unreal>
+References: <20240101185028.30229-1-stephen@networkplumber.org>
+ <170413622454.12705.16311353183841924815.git-patchwork-notify@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 02 Jan 2024 09:50:39 +0100
-From: Michael Walle <michael@walle.cc>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: ezra@synergy-village.org, Andrew Lunn <andrew@lunn.ch>, Russell King
- <linux@armlinux.org.uk>, Tristram Ha <Tristram.Ha@microchip.com>, Jesse
- Brandeburg <jesse.brandeburg@intel.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
-In-Reply-To: <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
-References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
- <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
-Message-ID: <cf86ad14e88362952c9f746dfb04cff4@walle.cc>
-X-Sender: michael@walle.cc
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <170413622454.12705.16311353183841924815.git-patchwork-notify@kernel.org>
 
-Hi,
-
->> Since commit 1a136ca2e089 ("net: mdio: scan bus based on bus
->> capabilities for C22 and C45") our AT91SAM9G25-based GARDENA smart
->> Gateway will no longer boot.
->> 
->> Prior to the mentioned change, probe_capabilities would be set to
->> MDIOBUS_NO_CAP (0) and therefore, no Clause 45 scan was performed.
->> Running a Clause 45 scan on an SMSC/Microchip LAN8720A PHY will (at
->> least with our setup) considerably slow down kernel startup and
->> ultimately result in a board reset.
->> 
->> AFAICT all SMSC/Microchip PHYs are Clause 22 devices. Some have a
->> "Clause 45 protection" feature (e.g. LAN8830) and others like the
->> LAN8804 will explicitly state the following in the datasheet:
->> 
->>     This device may respond to Clause 45 accesses and so must not be
->>     mixed with Clause 45 devices on the same MDIO bus.
-
-If implemented correctly, c22 phys should never respond to c45
-accesses. Correct? So the "Clause 45 protection" sounds like the
-normal behavior here and the "may respond to c45 accesses" looks
-like it's broken.
-
-> I'm not convinced that some heuristic based on vendors is a
-> sustainable approach. Also I'd like to avoid (as far as possible)
-> that core code includes vendor driver headers. Maybe we could use
-> a new PHY driver flag. Approaches I could think of:
+On Mon, Jan 01, 2024 at 07:10:24PM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
 > 
-> Approach 1:
-> Add a PHY driver flag to state: PHY is not c45-access-safe
-> Then c45 scanning would be omitted if at least one c22 PHY
-> with this flag was found.
+> This patch was applied to iproute2/iproute2.git (main)
+> by Stephen Hemminger <stephen@networkplumber.org>:
 > 
-> Approach 2:
-> Add a PHY driver flag to state: PHY is c45-access-safe
-> Then c45 scanning would only be done if all found c22 devices
+> On Mon,  1 Jan 2024 10:50:00 -0800 you wrote:
+> > The rdma utility should be using same code pattern as rest of
+> > iproute2. When printing, color should only be requested when
+> > desired; if no color wanted, use the simpler print_XXX instead.
+> > 
+> > Fixes: b0a688a542cd ("rdma: Rewrite custom JSON and prints logic to use common API")
+> > 
+
+Extra line, should be removed.
+
+> > Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> > 
+> > [...]
 > 
-> Not sure which options have been discussed before. Any feedback
-> welcome.
+> Here is the summary with links:
+>   - [iproute2] rdma: use print_XXX instead of COLOR_NONE
+>     https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=9b578bbaded6
 
-I had a similar idea and IIRC Andrew said this would be a layering
-violation. But I can't find the thread anymore.
+It was fast.
 
-> Related: How common are setups where c22 and c45 devices are attached
-> to a single MDIO bus?
-
-At least we have boards which has c22 and c45 PHYs on one bus. And
-on one board, we even have a Micrel/Microchip PHY on this bus, which
-forces us to use c22-over-c45 for the c45 PHY. I really need to repost 
-my
-c45-over-c22 series, although there was no consensus there 
-unfortunately.
-
--michael
+> 
+> You are awesome, thank you!
+> -- 
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
+> 
+> 
+> 
 
