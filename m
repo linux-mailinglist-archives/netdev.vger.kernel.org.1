@@ -1,89 +1,144 @@
-Return-Path: <netdev+bounces-60958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14E4182204D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:18:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E80B822057
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:25:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD3651F21000
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:18:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 841161C2265A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9208C154A4;
-	Tue,  2 Jan 2024 17:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EB7154AB;
+	Tue,  2 Jan 2024 17:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N1oS3OB2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JnALshJ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0109915494
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 17:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so100040a12.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 09:17:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704215874; x=1704820674; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QgtWc4bjvDKktlLz4D30hy1CsKyGq7mUpxpjxQf3kwk=;
-        b=N1oS3OB2zJT2WzfIWhxW6toOJHs/6S9T4ujZtAAbQQisEGWdGhYA0jf/4X6zvFsWf3
-         0JmqssxOCZ/ZZq8FL4a7LoSZQRPBAz+8I+Gs8QCPZBV9qewqrK7+AzH3XWiJr9o5AF8K
-         dnIqNHY07E23EAMw5sOG5WyjRWemDyJJ+gcBnmy5YxGUTC7nYFuHz9xvMvED+WirM/4J
-         5d09gKVyHZAnJWJZwYNxKfKw9P3xIpxA4bnWUO34nO/XjooI5Nzm83hkbf4BgR2EW8Ty
-         TVWv1smzk8sJhAmSH7eqpVr+K1zSBH1Buf6JSV1672KN33iC+L7OHkV2YEuGPPzVfI4z
-         tAfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704215874; x=1704820674;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QgtWc4bjvDKktlLz4D30hy1CsKyGq7mUpxpjxQf3kwk=;
-        b=VP/fvhYXUz0j7lo+Ge3jFpcFGjcMSIOHWBdR8rWTXSB+NTDNm+oNnHqEvUJVDl8zUr
-         2+Wa3nEUi8qmCY5K1yroUtMQypVzzrTIvSnA2MzebPTMqdCcNbl197gL6bTWr0mDDM2Z
-         IID+KOLPU6xHy4iSUJKD4WD+4/saHbCdOI+kYg6CtNFsHh4CXs/myONHp9UVS73G/S39
-         4/Yp2SNXsML9C9FB20L1UQQjWwFCGclLojg4JhORGjooHaHQ7zVa7yYL0UtDmEgFUbNT
-         dOAW6l33FXTQr2VLJbja+pkhDZs0seZOjCc7LBTE3bezurYtzP+RAaD92VgbIPhRJDuT
-         tHZg==
-X-Gm-Message-State: AOJu0Yw2tzJq0G6yyfDFL4byz7hQYTDRTuecUCm5WB9Vyxaqn8Q4CkEm
-	+Lx1/+kj135RNBF7XqD+cqKbCzbB7+SJnVyOy39kX5MGMY5Z
-X-Google-Smtp-Source: AGHT+IFSQFJ6y37Me8JP7cpY4ttMgqnrVMI3iBeMC4VfQ7jrTarAphtUeYinjK8DA/bPta+atVQa3JVJ64wjvRhTgKc=
-X-Received: by 2002:a05:6402:5249:b0:554:98aa:f75c with SMTP id
- t9-20020a056402524900b0055498aaf75cmr827598edd.5.1704215874148; Tue, 02 Jan
- 2024 09:17:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC651549F;
+	Tue,  2 Jan 2024 17:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=v7p+4wOjxD8iHSF+Ol2HJc13gpqMfMW5a3rOFwDOZ54=; b=JnALshJ1N5mzIsZfJSk3TrJlRy
+	GfefA8sf1ABLyd8U0jL5FmbvBIrWqj3dFwDKYnM/S10+/4yYbL1WIU2crYGvyxJA9BA47EQWUYlY1
+	vG8x2vf58SKHy7CQuj8cGRupddca6cjHklaoDAdgG6enWtnVIb4PvqTUDPOdX/a1klbX/+BFjHG2X
+	/CdzaIkn0TwUcjqS1Y9o7JsKJZbenrMOybNo27ebRJc9k7KGQmxBDds+PZ+mBYQgil/5xskZOlXhY
+	ixT4eZiQCDtYck1lwzpAV55O2iN4HC7T7m/ORjg39DbxSl7iftGbuz7B5YQz9hAG5zMBg7LCVn7p6
+	GU0zZQ8A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46248)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKiVR-0006l9-1E;
+	Tue, 02 Jan 2024 17:24:45 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKiVR-0005V0-N4; Tue, 02 Jan 2024 17:24:45 +0000
+Date: Tue, 2 Jan 2024 17:24:45 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	andrew@lunn.ch, hkallweit1@gmail.com, robert.marko@sartura.hr,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	quic_srichara@quicinc.com
+Subject: Re: [PATCH v4 1/5] net: mdio: ipq4019: move eth_ldo_rdy before MDIO
+ bus register
+Message-ID: <ZZRG3eZJM5QouR9+@shell.armlinux.org.uk>
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <20231225084424.30986-2-quic_luoj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <127b8199-1cd4-42d7-9b2b-875abaad93fe@gmail.com> <27d4cc21-1ce5-4417-bd0c-6dd43a92e4aa@gmail.com>
-In-Reply-To: <27d4cc21-1ce5-4417-bd0c-6dd43a92e4aa@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Jan 2024 18:17:40 +0100
-Message-ID: <CANn89iL9Q16gKhupno-7GVC3D=-A4L8eWXhwkNsGrB8GsoFzAg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/3] net: gso: add HBH extension header
- offload support
-To: Richard Gobert <richardbgobert@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231225084424.30986-2-quic_luoj@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Jan 2, 2024 at 2:21=E2=80=AFPM Richard Gobert <richardbgobert@gmail=
-.com> wrote:
->
-> This commit adds net_offload to IPv6 Hop-by-Hop extension headers (as it
-> is done for routing and dstopts) since it is supported in GSO and GRO.
-> This allows to remove specific HBH conditionals in GSO and GRO when
-> pulling and parsing an incoming packet.
->
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+On Mon, Dec 25, 2023 at 04:44:20PM +0800, Luo Jie wrote:
+> +/* Maximum SOC PCS(uniphy) number on IPQ platform */
+> +#define ETH_LDO_RDY_CNT				3
+> +
+>  struct ipq4019_mdio_data {
+> -	void __iomem	*membase;
+> -	void __iomem *eth_ldo_rdy;
+> +	void __iomem *membase;
+> +	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Do you have any plans to make use of eth_ldo_rdy other than by code that
+you touch in this patch? If you don't, what is the point of storing
+these points in struct ipq4019_mdio_data ? You're using devm_ioremap()
+which will already store the pointer internally to be able to free the
+resource at the appropriate moment, so if your only use is shortly after
+devm_ioremap(), you can use a local variable for this... meaning this
+becomes (in addition to the other suggestion):
+
+> +	/* This resource are optional */
+> +	for (index = 0; index < ETH_LDO_RDY_CNT; index++) {
+> +		res = platform_get_resource(pdev, IORESOURCE_MEM, index + 1);
+> +		if (res) {
+> +			priv->eth_ldo_rdy[index] = devm_ioremap(&pdev->dev,
+> +								res->start,
+> +								resource_size(res));
+> +
+> +			/* The ethernet LDO enable is necessary to reset PHY
+> +			 * by GPIO, some PHY(such as qca8084) GPIO reset uses
+> +			 * the MDIO level reset, so this function should be
+> +			 * called before the MDIO bus register.
+> +			 */
+> +			if (priv->eth_ldo_rdy[index]) {
+> +				u32 val;
+> +
+> +				val = readl(priv->eth_ldo_rdy[index]);
+> +				val |= BIT(0);
+> +				writel(val, priv->eth_ldo_rdy[index]);
+> +				fsleep(IPQ_PHY_SET_DELAY_US);
+> +			}
+> +		}
+
+		void __iomem *eth_ldo_rdy;
+		u32 val;
+
+		res = platform_get_resource(pdev, IORESOURCE_MEM, index + 1);
+		if (!res)
+			break;
+
+		eth_ldo_rdy = devm_ioremap(&pdev->dev, res->start,
+					   resource_size(res));
+		if (!eth_ldo_rdy)
+			continue;
+
+		val = readl(eth_ldo_rdy) | BIT(0);
+		writel(val, eth_ldo_rdy);
+		... whatever sleep is deemed required ...
+
+Other issues:
+
+1. if devm_ioremap() fails (returns NULL) is it right that we should
+   just ignore that resource?
+
+2. Do you need to sleep after each write, or will sleeping after
+   writing all of these do? It may be more efficient to detect when
+   we have at least one eth_ldo_rdy and then sleep once.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
