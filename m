@@ -1,203 +1,89 @@
-Return-Path: <netdev+bounces-60957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F7B282202A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:12:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14E4182204D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:18:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05329B22CDC
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:12:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD3651F21000
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0119154B1;
-	Tue,  2 Jan 2024 17:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9208C154A4;
+	Tue,  2 Jan 2024 17:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="II1lMn6f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N1oS3OB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F3D156D6
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 17:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704215485;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q4UcCxfloG77cC/pfD32WuEtxWkG2YAQtUa4GDcGdRQ=;
-	b=II1lMn6fgblkUH422/o6fTi7F8vN4v27ZOeW3NY5wsYlRt/k6YUjnDmQxO0eXyFSALMbzs
-	Ss9OEdlZVxti0OtJeCmgNA/A7pT0qNkporl+B/JA6f0C0MOHBoo4RnRWXJvFePdZ2aW+FT
-	b+jHDTSUI37bdU6IdVUqkOpBmtRd+lA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-536-DPwMbcfePQyaxNssfUs5vA-1; Tue, 02 Jan 2024 12:11:21 -0500
-X-MC-Unique: DPwMbcfePQyaxNssfUs5vA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9AA2085CBA2;
-	Tue,  2 Jan 2024 17:11:20 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B6A1940C6EBA;
-	Tue,  2 Jan 2024 17:11:17 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <750e8251-ba30-4f53-a17b-73c79e3739ce@linux.alibaba.com>
-References: <750e8251-ba30-4f53-a17b-73c79e3739ce@linux.alibaba.com> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-34-dhowells@redhat.com>
-To: Gao Xiang <hsiangkao@linux.alibaba.com>
-Cc: dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>,
-    Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH v5 33/40] netfs, cachefiles: Pass upper bound length to allow expansion
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0109915494
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 17:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so100040a12.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 09:17:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704215874; x=1704820674; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QgtWc4bjvDKktlLz4D30hy1CsKyGq7mUpxpjxQf3kwk=;
+        b=N1oS3OB2zJT2WzfIWhxW6toOJHs/6S9T4ujZtAAbQQisEGWdGhYA0jf/4X6zvFsWf3
+         0JmqssxOCZ/ZZq8FL4a7LoSZQRPBAz+8I+Gs8QCPZBV9qewqrK7+AzH3XWiJr9o5AF8K
+         dnIqNHY07E23EAMw5sOG5WyjRWemDyJJ+gcBnmy5YxGUTC7nYFuHz9xvMvED+WirM/4J
+         5d09gKVyHZAnJWJZwYNxKfKw9P3xIpxA4bnWUO34nO/XjooI5Nzm83hkbf4BgR2EW8Ty
+         TVWv1smzk8sJhAmSH7eqpVr+K1zSBH1Buf6JSV1672KN33iC+L7OHkV2YEuGPPzVfI4z
+         tAfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704215874; x=1704820674;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QgtWc4bjvDKktlLz4D30hy1CsKyGq7mUpxpjxQf3kwk=;
+        b=VP/fvhYXUz0j7lo+Ge3jFpcFGjcMSIOHWBdR8rWTXSB+NTDNm+oNnHqEvUJVDl8zUr
+         2+Wa3nEUi8qmCY5K1yroUtMQypVzzrTIvSnA2MzebPTMqdCcNbl197gL6bTWr0mDDM2Z
+         IID+KOLPU6xHy4iSUJKD4WD+4/saHbCdOI+kYg6CtNFsHh4CXs/myONHp9UVS73G/S39
+         4/Yp2SNXsML9C9FB20L1UQQjWwFCGclLojg4JhORGjooHaHQ7zVa7yYL0UtDmEgFUbNT
+         dOAW6l33FXTQr2VLJbja+pkhDZs0seZOjCc7LBTE3bezurYtzP+RAaD92VgbIPhRJDuT
+         tHZg==
+X-Gm-Message-State: AOJu0Yw2tzJq0G6yyfDFL4byz7hQYTDRTuecUCm5WB9Vyxaqn8Q4CkEm
+	+Lx1/+kj135RNBF7XqD+cqKbCzbB7+SJnVyOy39kX5MGMY5Z
+X-Google-Smtp-Source: AGHT+IFSQFJ6y37Me8JP7cpY4ttMgqnrVMI3iBeMC4VfQ7jrTarAphtUeYinjK8DA/bPta+atVQa3JVJ64wjvRhTgKc=
+X-Received: by 2002:a05:6402:5249:b0:554:98aa:f75c with SMTP id
+ t9-20020a056402524900b0055498aaf75cmr827598edd.5.1704215874148; Tue, 02 Jan
+ 2024 09:17:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <198743.1704215477.1@warthog.procyon.org.uk>
+References: <127b8199-1cd4-42d7-9b2b-875abaad93fe@gmail.com> <27d4cc21-1ce5-4417-bd0c-6dd43a92e4aa@gmail.com>
+In-Reply-To: <27d4cc21-1ce5-4417-bd0c-6dd43a92e4aa@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Jan 2024 18:17:40 +0100
+Message-ID: <CANn89iL9Q16gKhupno-7GVC3D=-A4L8eWXhwkNsGrB8GsoFzAg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] net: gso: add HBH extension header
+ offload support
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jan 2024 17:11:17 +0000
-Message-ID: <198744.1704215477@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Gao Xiang <hsiangkao@linux.alibaba.com> wrote:
+On Tue, Jan 2, 2024 at 2:21=E2=80=AFPM Richard Gobert <richardbgobert@gmail=
+.com> wrote:
+>
+> This commit adds net_offload to IPv6 Hop-by-Hop extension headers (as it
+> is done for routing and dstopts) since it is supported in GSO and GRO.
+> This allows to remove specific HBH conditionals in GSO and GRO when
+> pulling and parsing an incoming packet.
+>
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-> >   	down =3D start - round_down(start, PAGE_SIZE);
-> >   	*_start =3D start - down;
-> >   	*_len =3D round_up(down + len, PAGE_SIZE);
-> > +	if (down < start || *_len > upper_len)
-> > +		return -ENOBUFS;
-> =
-
-> Sorry for bothering. We just found some strange when testing
-> today-next EROFS over fscache.
-> =
-
-> I'm not sure the meaning of
->     if (down < start
-> =
-
-> For example, if start is page-aligned, down =3D=3D 0.
-> =
-
-> so as long as start > 0 and page-aligned, it will return
-> -ENOBUFS.  Does it an intended behavior?
-
-Yeah, I think that's wrong.
-
-Does the attached help?
-
-David
----
-
-diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
-index bffffedce4a9..7529b40bc95a 100644
---- a/fs/cachefiles/io.c
-+++ b/fs/cachefiles/io.c
-@@ -522,16 +522,22 @@ int __cachefiles_prepare_write(struct cachefiles_obj=
-ect *object,
- 			       bool no_space_allocated_yet)
- {
- 	struct cachefiles_cache *cache =3D object->volume->cache;
--	loff_t start =3D *_start, pos;
--	size_t len =3D *_len, down;
-+	unsigned long long start =3D *_start, pos;
-+	size_t len =3D *_len;
- 	int ret;
- =
-
- 	/* Round to DIO size */
--	down =3D start - round_down(start, PAGE_SIZE);
--	*_start =3D start - down;
--	*_len =3D round_up(down + len, PAGE_SIZE);
--	if (down < start || *_len > upper_len)
-+	start =3D round_down(*_start, PAGE_SIZE);
-+	if (start !=3D *_start) {
-+		kleave(" =3D -ENOBUFS [down]");
-+		return -ENOBUFS;
-+	}
-+	if (*_len > upper_len) {
-+		kleave(" =3D -ENOBUFS [up]");
- 		return -ENOBUFS;
-+	}
-+
-+	*_len =3D round_up(len, PAGE_SIZE);
- =
-
- 	/* We need to work out whether there's sufficient disk space to perform
- 	 * the write - but we can skip that check if we have space already
-@@ -542,7 +548,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
-t *object,
- =
-
- 	pos =3D cachefiles_inject_read_error();
- 	if (pos =3D=3D 0)
--		pos =3D vfs_llseek(file, *_start, SEEK_DATA);
-+		pos =3D vfs_llseek(file, start, SEEK_DATA);
- 	if (pos < 0 && pos >=3D (loff_t)-MAX_ERRNO) {
- 		if (pos =3D=3D -ENXIO)
- 			goto check_space; /* Unallocated tail */
-@@ -550,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
-t *object,
- 					  cachefiles_trace_seek_error);
- 		return pos;
- 	}
--	if ((u64)pos >=3D (u64)*_start + *_len)
-+	if (pos >=3D start + *_len)
- 		goto check_space; /* Unallocated region */
- =
-
- 	/* We have a block that's at least partially filled - if we're low on
-@@ -563,13 +569,13 @@ int __cachefiles_prepare_write(struct cachefiles_obj=
-ect *object,
- =
-
- 	pos =3D cachefiles_inject_read_error();
- 	if (pos =3D=3D 0)
--		pos =3D vfs_llseek(file, *_start, SEEK_HOLE);
-+		pos =3D vfs_llseek(file, start, SEEK_HOLE);
- 	if (pos < 0 && pos >=3D (loff_t)-MAX_ERRNO) {
- 		trace_cachefiles_io_error(object, file_inode(file), pos,
- 					  cachefiles_trace_seek_error);
- 		return pos;
- 	}
--	if ((u64)pos >=3D (u64)*_start + *_len)
-+	if (pos >=3D start + *_len)
- 		return 0; /* Fully allocated */
- =
-
- 	/* Partially allocated, but insufficient space: cull. */
-@@ -577,7 +583,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
-t *object,
- 	ret =3D cachefiles_inject_remove_error();
- 	if (ret =3D=3D 0)
- 		ret =3D vfs_fallocate(file, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
--				    *_start, *_len);
-+				    start, *_len);
- 	if (ret < 0) {
- 		trace_cachefiles_io_error(object, file_inode(file), ret,
- 					  cachefiles_trace_fallocate_error);
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
