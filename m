@@ -1,130 +1,65 @@
-Return-Path: <netdev+bounces-61059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C543E8225B3
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 00:49:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 024F38225B7
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 00:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A6B128483C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:49:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29C931C21B43
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AEA1798C;
-	Tue,  2 Jan 2024 23:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13BEB17988;
+	Tue,  2 Jan 2024 23:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXohY6k4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8Cmierg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0FC17984;
-	Tue,  2 Jan 2024 23:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-203fe0e3fefso5234539fac.2;
-        Tue, 02 Jan 2024 15:49:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704239358; x=1704844158; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HtFes5HAvMdaJ6n//9Br1YRErPp3U5BQyMtnxEhHE+4=;
-        b=EXohY6k4gLY0aZa5ImR+kcJLUc5plt4CiCpYocSA+PATq2Uc1ee16+C/T6TwfTeuWc
-         UUAeqpG/omTo34p293UiC87yg77yqRFzUKGUdDXifUzZB3JkFbn5lrGiIko2pfSTl2CU
-         Rj8o+3fc67nXclbdtePeLuZ+Xmt1kBp4bvnnNJVBWM662A4mRKZr8+kjg67gt/6UCiyd
-         X/VIWM9OWT1mpwzKokPWkXPABVTEB+EwqXT46QGYpRbAHDu2VLL8Ujmhyt5AXIgk/mVM
-         FNLL67rtlhKPqz4ywvTWzjti8hZJfGceFiq635lnIa08mYvDlDFZh4to4yUZ/C0Euqeh
-         tu/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704239358; x=1704844158;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HtFes5HAvMdaJ6n//9Br1YRErPp3U5BQyMtnxEhHE+4=;
-        b=M1+gg1qR0tw6zhHFepSKX6AH7qKVwtkreO9pAZac5aPOAKTiiXAQiy8NCFn0OVinTz
-         SlRYmMF2LmNeW6Sj9gimhnI+tZYNUdSP7fML3V9b4EtRtEMgf344a9VIVxOeX89oa5c5
-         Uq9XC9iEyXReE+ZnqrXAPB0RezLTQLJ4g/PL2bcsYceR4IP0OmFtVIxRWNbhZsIKTBer
-         6+CJHzgbgKoxiYjMFMNiMpu6jOwBYNhkc0bBrcGEIuhng6bzpYoS6/Nw7h0dE1bHUh21
-         HI995sQESmSTqBpg+ZDuZzFtBwrtESe3xPmrz6Lb9nd/Dq+/ioxgYYdY4tMTDuGh0pNw
-         eN1w==
-X-Gm-Message-State: AOJu0YyaGKCDtMvGA2KzFb2GS/6gZIINkIR/mDn4UeBryYimI46plkhs
-	NdJzZfYnoJbJi/n/WaSIIFA=
-X-Google-Smtp-Source: AGHT+IF8usf/RRhsvY273ldoB6IOYFkvLihPJ2DOiZrbb7qU+MpgVmIKqjlHe90Y5LoYPVELGuEuEQ==
-X-Received: by 2002:a05:6871:713:b0:204:23fc:8a73 with SMTP id f19-20020a056871071300b0020423fc8a73mr15697181oap.21.1704239357983;
-        Tue, 02 Jan 2024 15:49:17 -0800 (PST)
-Received: from localhost ([98.97.37.198])
-        by smtp.gmail.com with ESMTPSA id s16-20020a63f050000000b005b7dd356f75sm21407203pgj.32.2024.01.02.15.49.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 15:49:17 -0800 (PST)
-Date: Tue, 02 Jan 2024 15:49:16 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, 
- John Fastabend <john.fastabend@gmail.com>
-Cc: rivendell7@gmail.com, 
- kuniyu@amazon.com, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org
-Message-ID: <6594a0fc51d1d_11e86208c3@john.notmuch>
-In-Reply-To: <87v88bvk0a.fsf@cloudflare.com>
-References: <20231221232327.43678-1-john.fastabend@gmail.com>
- <87v88bvk0a.fsf@cloudflare.com>
-Subject: Re: [PATCH bpf 0/5] fix sockmap + stream  af_unix memleak
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF7F17984
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 23:50:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29B9DC433C7;
+	Tue,  2 Jan 2024 23:50:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704239415;
+	bh=RuGeG/C6MmKlTpW4SNCmLPxjBBw93qwjuWM/Fo35tC8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=A8CmiergwiIWq9QMf+vmlA6JTHnQhu+NGQHtPtM/MYdNe6SHupBwHruomV5Ef6Lxj
+	 8BTX7mItICuFcVjBhzPFIHTgQE7n6EB2Pe3pyBgY6AnqrUPS/qEB3BLxI45PC4asKr
+	 lfQcM++CGm7+VXX3NHsO4CHYVZmayA0WEL9NMXb/2oQuTJfvYaru8RkyjqE2TCoM6B
+	 6uTMGnqna1yV1XI7XfzP1ih8zv+3YHO4HbKmXFNmoK7QFmFNC7hNwa1/waO+xamsal
+	 DrTjydJdbbNdZ0dwYTM9mIcaYSH6pgS2izyRDNsgN8eJpaWy3TrwXvRsV/ETcpWHG7
+	 D3HRoaNu1pNqg==
+Date: Tue, 2 Jan 2024 15:50:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: phy: extend
+ genphy_c45_read_eee_abilities() to read capability 2 register
+Message-ID: <20240102155014.7e1ccc4d@kernel.org>
+In-Reply-To: <20231220161258.17541-1-kabel@kernel.org>
+References: <20231220161258.17541-1-kabel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Sitnicki wrote:
-> On Thu, Dec 21, 2023 at 03:23 PM -08, John Fastabend wrote:
-> > There was a memleak when streaming af_unix sockets were inserted into
-> > multiple sockmap slots and/or maps. This is because each insert would
-> > call a proto update operatino and these must be allowed to be called
-> > multiple times. The streaming af_unix implementation recently added
-> > a refcnt to handle a use after free issue, however it introduced a
-> > memleak when inserted into multiple maps.
-> >
-> > This series fixes the memleak, adds a note in the code so we remember
-> > that proto updates need to support this. And then we add three tests
-> > for each of the slightly different iterations of adding sockets into
-> > multiple maps. I kept them as 3 independent test cases here. I have
-> > some slight preference for this they could however be a single test,
-> > but then you don't get to run them independently which was sort of
-> > useful while debugging.
-> >
-> > John Fastabend (5):
-> >   bpf: sockmap, fix proto update hook to avoid dup calls
-> >   bpf: sockmap, added comments describing update proto rules
-> >   bpf: sockmap, add tests for proto updates many to single map
-> >   bpf: sockmap, add tests for proto updates single socket to many map
-> >   bpf: sockmap, add tests for proto updates replace socket
-> >
-> >  include/linux/skmsg.h                         |   5 +
-> >  net/unix/unix_bpf.c                           |  21 +-
-> >  .../selftests/bpf/prog_tests/sockmap_basic.c  | 199 +++++++++++++++++-
-> >  3 files changed, 221 insertions(+), 4 deletions(-)
-> 
-> Sorry for the delay. I was out.
+On Wed, 20 Dec 2023 17:12:58 +0100 Marek Beh=C3=BAn wrote:
+> Extend the generic clause 45 PHY function reading EEE abilities to also
+> read the IEEE 802.3-2018 45.2.3.11 "EEE control and capability 2"
+> register.
+>=20
+> The new helpers mii_eee_cap2_mod_linkmode_t() and
+> linkmode_to_mii_eee_cap2_t() only parse the 2500baseT and 5000baseT
+> EEE bits. The standard also defines bits for 400000baseR, 200000baseR
+> and 25000baseT, but we don't have ethtool link bits for those now.
 
-Thanks for the review.
-
-> 
-> This LGTM with some room for improvement in tests.
-> You repeat the code to create different kind of sockets in each test.
-> That could be refactored to use some kind of a factory helper.
-
-Yeah, my first attempt was uglier than the repeated setup in my
-opinion. So figured I would get this out and think a bit more
-about it. Lets see if BPF maintainers want me to fix the typo
-on Reported-by or if it can be fixed on merged.
-
-> 
-> Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
-
-
+Andrew, Russell? Looks good?
 
