@@ -1,92 +1,104 @@
-Return-Path: <netdev+bounces-60898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AAA7821D10
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:50:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D17D6821D2E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:00:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8EDE1F22A7B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:50:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F25EF1C21FF4
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76923FC0A;
-	Tue,  2 Jan 2024 13:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116CFFC0D;
+	Tue,  2 Jan 2024 14:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OY7wRbpb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XzjsHMuA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56598125D2;
-	Tue,  2 Jan 2024 13:50:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E3072C433C9;
-	Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704203431;
-	bh=yF43n7Egk9nubHF5BP9kxh8uwESoIhtJ3XsgoBQXxGE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OY7wRbpbc1JR79jpDs2h/nQEeutsw7qx7BDsppMZxXCwp7t6RKfi2rAzTMXmMxGXZ
-	 B4Q3seqY6aXJQQanu0Ej2119/ftGD/ksx34oUNebkXdcVhdHVlKYUyehj593XTkwIQ
-	 tSOv9LxZqjVbahfsv9Ev6HGq9mogHiwrk2dl6Ge2DbLct9ZkrOe5ZZ15qZlRNh0fGV
-	 uIfi7oX9W047p3AhDktYqPyaPmkdveIMbMC7sr1mhJn4+HPtCsco7WE2Xn4CZ+GKhZ
-	 rD3wrFkCPAykVXPyhttTs+Dzylq5qGoke9n5l/+BGJWfqgqixC6n0WOYV1zjSfuLHH
-	 GgS/qRW2mI+ag==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C2A75C395C5;
-	Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250ECFC08
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 14:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=J/6smZfOWkoR8/mi+p0Q4BCS59q/UR+Sakmr9kFJ1Y4=; b=XzjsHMuAiIh+T98w0ba2uPkKsI
+	7ny/tIcRgS0lxcbgCnDNg/6+r41ogTyc3V8FjoXKG4GTPhddfioWkgIBqJwbWICd0ge3levwsU6wQ
+	sVxKshRvTw7WnD1Bm8EHGCNzkCd+56FhZC3Yh/eC3w779f3PZjgeioZAd4PVHl1zf0EWuIQ1K8D5Q
+	Z4IzBzTeKlVkWF8XZixKDAK+fNFyPk27APabiUsSvw3djedFCIXCrCrQ8xV9bNI89vNKVPhSj7fHA
+	Mdto/JPlH4gTjmAoXfhBDyDE3HFqlOE11R6nKLkblFlLzDu0/QDwTk6632HZWlDpHKrDcyS+0kDyc
+	0dASkbLA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51626)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKfJK-0006ab-0m;
+	Tue, 02 Jan 2024 14:00:02 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKfJL-0005Ll-OC; Tue, 02 Jan 2024 14:00:03 +0000
+Date: Tue, 2 Jan 2024 14:00:03 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, ezra@synergy-village.org,
+	Tristram Ha <Tristram.Ha@microchip.com>,
+	Michael Walle <michael@walle.cc>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
+Message-ID: <ZZQW40bXteaiWDOZ@shell.armlinux.org.uk>
+References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
+ <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
+ <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4] mptcp: add CurrEstab MIB counter
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170420343079.29739.4868758916667609941.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jan 2024 13:50:30 +0000
-References: <20231222-upstream-net-next-20231221-mptcp-currestab-v1-0-c1eb73d6b2b2@kernel.org>
-In-Reply-To: <20231222-upstream-net-next-20231221-mptcp-currestab-v1-0-c1eb73d6b2b2@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
- geliang.tang@linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 22 Dec 2023 13:47:21 +0100 you wrote:
-> This MIB counter is similar to the one of TCP -- CurrEstab -- available
-> in /proc/net/snmp. This is useful to quickly list the number of MPTCP
-> connections without having to iterate over all of them.
+On Tue, Jan 02, 2024 at 02:42:17PM +0100, Andrew Lunn wrote:
+> On Mon, Jan 01, 2024 at 11:44:38PM +0100, Heiner Kallweit wrote:
+> > On 01.01.2024 22:31, Ezra Buehler wrote:
+> > > Since commit 1a136ca2e089 ("net: mdio: scan bus based on bus
+> > > capabilities for C22 and C45") our AT91SAM9G25-based GARDENA smart
+> > > Gateway will no longer boot.
+> > > 
+> > > Prior to the mentioned change, probe_capabilities would be set to
+> > > MDIOBUS_NO_CAP (0) and therefore, no Clause 45 scan was performed.
+> > > Running a Clause 45 scan on an SMSC/Microchip LAN8720A PHY will (at
+> > > least with our setup) considerably slow down kernel startup and
+> > > ultimately result in a board reset.
+> > > 
+> > > AFAICT all SMSC/Microchip PHYs are Clause 22 devices. Some have a
+> > > "Clause 45 protection" feature (e.g. LAN8830) and others like the
+> > > LAN8804 will explicitly state the following in the datasheet:
+> > > 
+> > >     This device may respond to Clause 45 accesses and so must not be
+> > >     mixed with Clause 45 devices on the same MDIO bus.
+> > > 
+> > 
+> > I'm not convinced that some heuristic based on vendors is a
+> > sustainable approach. Also I'd like to avoid (as far as possible)
+> > that core code includes vendor driver headers. Maybe we could use
+> > a new PHY driver flag. Approaches I could think of:
 > 
-> Patch 1 prepares its support by adding new helper functions:
-> 
->  - MPTCP_DEC_STATS(): similar to MPTCP_INC_STATS(), but this time to
->    decrement a counter.
-> 
-> [...]
+> We already have a core hack for these broken PHYs:
 
-Here is the summary with links:
-  - [net-next,1/4] mptcp: add CurrEstab MIB counter support
-    https://git.kernel.org/netdev/net-next/c/d9cd27b8cd19
-  - [net-next,2/4] mptcp: use mptcp_set_state
-    (no matching commit)
-  - [net-next,3/4] selftests: mptcp: join: check CURRESTAB counters
-    https://git.kernel.org/netdev/net-next/c/0bd962dd86b2
-  - [net-next,4/4] selftests: mptcp: diag: check CURRESTAB counters
-    https://git.kernel.org/netdev/net-next/c/81ab772819da
+Yes, and it is this very function that the patch at the start of this
+thread is changing!
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
