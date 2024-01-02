@@ -1,284 +1,96 @@
-Return-Path: <netdev+bounces-60856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91F2E821B02
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:33:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65C4A821B04
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE48F1F22820
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:33:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03BAB1F22805
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3E8EAE5;
-	Tue,  2 Jan 2024 11:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hviXlqqP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8F1E56B;
+	Tue,  2 Jan 2024 11:33:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD24E576
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 11:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704195185;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XWxHimkeFDNjn6YSxYvmBLIqeHTwIpJqYoBnohM5/0g=;
-	b=hviXlqqPFq26zp7j+Vr7344tPWaIcSZaw0tU0EDJrMSn5fcMjgH8rxAu+txwVqXZpSt9h8
-	hzL7cOBUOJb/ViwU12Og0izlYKHdTc8M3Xvce1/UKryHyuBdCvJNE4mZBzzAYzZgJ9SrhK
-	0GWnIIfpk/xYE3CwgYtr/M7AqtROT9w=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-567-VtY-jW9UO3KJW7WjkkJnEg-1; Tue, 02 Jan 2024 06:33:02 -0500
-X-MC-Unique: VtY-jW9UO3KJW7WjkkJnEg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40d45be1ce2so44171995e9.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 03:33:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704195181; x=1704799981;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XWxHimkeFDNjn6YSxYvmBLIqeHTwIpJqYoBnohM5/0g=;
-        b=vhal88qwtGzJ6CfdyhYYGk8TmncI4KtTkjayYtCOYXl6TQ1AssCBsTdT4sYarvNhCp
-         DoPsw02txmg0l1PXbePRbSyHdGFAXY2cKCbcHvsqvys0QPocMkvht9bAsltecjaFS3Td
-         XJH40ykAOsEZDMH8lQrDts8nxGnXcifn4oYCUOiCityaRnlQ8JrXiBJNt1TONquAeTj9
-         FMNdFRKBJ6qjOeW62QCH5/cq0PbcwlTKHmQnuZtLyVRbkMmxDFENAkQySY4+IRZZn7pU
-         OznwwYhCc3DEVgiIUgq8g1V4lLcwojNBp66W12K7fune1SUWKOlwiomxFCyVkEzXF1DM
-         3olA==
-X-Gm-Message-State: AOJu0YxDglslRfNqx9N+F7/+xAWE6psM9mkaKpqEuTO9tfqUqZMnTQ4I
-	ScNJ3rEgP81+9+UpMsYU/HEocIShPqSV3yra4Vitqo025KR0j8yenDMl3+d624c5i/M4+Y1zx1e
-	E3IdUuX5OiRc9W4mu14oJAkWg
-X-Received: by 2002:a05:600c:2255:b0:40d:80a1:867 with SMTP id a21-20020a05600c225500b0040d80a10867mr2701903wmm.146.1704195180972;
-        Tue, 02 Jan 2024 03:33:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEmH97otICNik6jF5g8bpqPEue2LDedjKabzLVwMIouA4GG3UCE1rYraye49W7NVZJ+THP9GQ==
-X-Received: by 2002:a05:600c:2255:b0:40d:80a1:867 with SMTP id a21-20020a05600c225500b0040d80a10867mr2701899wmm.146.1704195180607;
-        Tue, 02 Jan 2024 03:33:00 -0800 (PST)
-Received: from debian (2a01cb058918ce008532542fb9fcf433.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:8532:542f:b9fc:f433])
-        by smtp.gmail.com with ESMTPSA id t18-20020a5d49d2000000b00336751cd4ebsm28311844wrs.72.2024.01.02.03.32.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 03:33:00 -0800 (PST)
-Date: Tue, 2 Jan 2024 12:32:58 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Yujie Liu <yujie.liu@intel.com>
-Cc: netdev@vger.kernel.org, Hangbin Liu <liuhangbin@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lkp@intel.com, kernel test robot <oliver.sang@intel.com>
-Subject: Re: [PATCH v2 net-next] selftests/net: change shebang to bash to
- support "source"
-Message-ID: <ZZP0akFff+nzFhc0@debian>
-References: <20231229131931.3961150-1-yujie.liu@intel.com>
- <ZZFbxyQeHgf3UQrN@debian>
- <ZZPHQF6wL95oSGzK@yujie-X299>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25332F510;
+	Tue,  2 Jan 2024 11:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VzqYx19_1704195199;
+Received: from 30.221.130.246(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VzqYx19_1704195199)
+          by smtp.aliyun-inc.com;
+          Tue, 02 Jan 2024 19:33:20 +0800
+Message-ID: <b2ee4680-72e9-56a1-e0dd-9cbbe64a7dac@linux.alibaba.com>
+Date: Tue, 2 Jan 2024 19:33:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZPHQF6wL95oSGzK@yujie-X299>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [0/2] net/smc: Adjustments for two function implementations
+To: Markus Elfring <Markus.Elfring@web.de>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, "D. Wythe"
+ <alibuda@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
+ Paolo Abeni <pabeni@redhat.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
+References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
+ <93033352-4b9c-bf52-1920-6ccf07926a21@linux.alibaba.com>
+ <46fe66f7-dc3b-4863-96e8-7a855316e8bd@web.de>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <46fe66f7-dc3b-4863-96e8-7a855316e8bd@web.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 02, 2024 at 04:20:16PM +0800, Yujie Liu wrote:
-> On Sun, Dec 31, 2023 at 01:17:11PM +0100, Guillaume Nault wrote:
-> > On Fri, Dec 29, 2023 at 09:19:31PM +0800, Yujie Liu wrote:
-> > > The patch set [1] added a general lib.sh in net selftests, and converted
-> > > several test scripts to source the lib.sh.
-> > > 
-> > > unicast_extensions.sh (converted in [1]) and pmtu.sh (converted in [2])
-> > > have a /bin/sh shebang which may point to various shells in different
-> > > distributions, but "source" is only available in some of them. For
-> > > example, "source" is a built-it function in bash, but it cannot be
-> > > used in dash.
-> > > 
-> > > Refer to other scripts that were converted together, simply change the
-> > > shebang to bash to fix the following issues when the default /bin/sh
-> > > points to other shells.
-> > 
-> > Looks like it'd be simpler to just replace the "source" commands with
-> > "." and leave the shebang as is (unless there are other bash-specific
-> > constructs in these scripts of course).
-> > 
-> > Generally speaking, I think we should avoid madating a specific shell,
-> > unless that really simplifies the test script (which is not the case
-> > here).
+
+
+On 2024/1/2 16:51, Markus Elfring wrote:
+> …
+>>> A few update suggestions were taken into account
+>>> from static source code analysis.
+> …
+>>>     Return directly after a failed kzalloc() in smc_fill_gid_list()
+>>>     Improve exception handling in smc_llc_cli_add_link_invite()
+>>>
+>>>    net/smc/af_smc.c  |  2 +-
+>>>    net/smc/smc_llc.c | 15 +++++++--------
+>>>    2 files changed, 8 insertions(+), 9 deletions(-)
+> …
+>> I see you want to fix the kfree(NULL) issues in these two patches.
 > 
-> Hi Guillaume,
+> I propose to avoid redundant function calls at various source code places.
 > 
-> Thanks for the comments. Actually I also considered replacing "source"
-> with "." at first, but finally decided to change the shebang in
-> consideration of being consistent with other scripts. We can see that
-> there are 140+ scripts in net selftests that have "source lib.sh" and
-> "bash" shebang, but none of the selftests has ". lib.sh". If we replace
-> "source" with "." and keep the "sh" shebang specifically for
-> unicast_extensions.sh and pmtu.sh, we will get only 2 scripts using
-> "sh and ." while most other scripts using "bash and source". Maybe it
-> would be nice to keep the consistency by changing the shebang as well?
-> What do you think? :)
-
-The use of "source" instead of "." is clearly an overlook. Consistency
-is desirable only when it brings better quality code.
-
-And it should be easy enough to convert the remaining "source lib.sh"
-in a followup patch to make the other shell scripts consistent.
-
-
-> linux/tools/testing/selftests/net$ grep -rl "source lib.sh" . | xargs grep -F '#!/bin/'
-> ./test_vxlan_under_vrf.sh:#!/bin/bash
-> ./test_vxlan_nolocalbypass.sh:#!/bin/bash
-> ./xfrm_policy.sh:#!/bin/bash
-> ./test_vxlan_mdb.sh:#!/bin/bash
-> ./test_bridge_backup_port.sh:#!/bin/bash
-> ./vrf_route_leaking.sh:#!/bin/bash
-> ./l2tp.sh:#!/bin/bash
-> ./netns-name.sh:#!/bin/bash
-> ./rtnetlink.sh:#!/bin/bash
-> ./ioam6.sh:#!/bin/bash
-> ./drop_monitor_tests.sh:#!/bin/bash
-> ./test_vxlan_vnifiltering.sh:#!/bin/bash
-> ./icmp.sh:#!/bin/bash
-> ./gre_gso.sh:#!/bin/bash
-> ./fib_nexthop_multiprefix.sh:#!/bin/bash
-> ./icmp_redirect.sh:#!/bin/bash
-> ./vrf-xfrm-tests.sh:#!/bin/bash
-> ./vrf_strict_mode_test.sh:#!/bin/bash
-> ./fcnal-test.sh:#!/bin/bash
-> ./stress_reuseport_listen.sh:#!/bin/bash
-> ./srv6_end_dt4_l3vpn_test.sh:#!/bin/bash
-> ./test_bridge_neigh_suppress.sh:#!/bin/bash
-> ./cmsg_ipv6.sh:#!/bin/bash
-> ./arp_ndisc_evict_nocarrier.sh:#!/bin/bash
-> ./fib_rule_tests.sh:#!/bin/bash
-> ./srv6_end_dt6_l3vpn_test.sh:#!/bin/bash
-> ./forwarding/custom_multipath_hash.sh:#!/bin/bash
-> ./forwarding/gre_inner_v4_multipath.sh:#!/bin/bash
-> ./forwarding/tc_tunnel_key.sh:#!/bin/bash
-> ./forwarding/tc_shblocks.sh:#!/bin/bash
-> ./forwarding/router_nh.sh:#!/bin/bash
-> ./forwarding/skbedit_priority.sh:#!/bin/bash
-> ./forwarding/tc_mpls_l2vpn.sh:#!/bin/bash
-> ./forwarding/gre_inner_v6_multipath.sh:#!/bin/bash
-> ./forwarding/vxlan_symmetric.sh:#!/bin/bash
-> ./forwarding/bridge_mdb.sh:#!/bin/bash
-> ./forwarding/no_forwarding.sh:#!/bin/bash
-> ./forwarding/router_bridge_1d.sh:#!/bin/bash
-> ./forwarding/tc_flower_port_range.sh:#!/bin/bash
-> ./forwarding/router_multicast.sh:#!/bin/bash
-> ./forwarding/bridge_locked_port.sh:#!/bin/bash
-> ./forwarding/vxlan_asymmetric_ipv6.sh:#!/bin/bash
-> ./forwarding/dual_vxlan_bridge.sh:#!/bin/bash
-> ./forwarding/bridge_port_isolation.sh:#!/bin/bash
-> ./forwarding/local_termination.sh:#!/bin/bash
-> ./forwarding/ipip_flat_gre_keys.sh:#!/bin/bash
-> ./forwarding/gre_multipath_nh_res.sh:#!/bin/bash
-> ./forwarding/gre_multipath.sh:#!/bin/bash
-> ./forwarding/vxlan_bridge_1d_ipv6.sh:#!/bin/bash
-> ./forwarding/ip6gre_flat_keys.sh:#!/bin/bash
-> ./forwarding/gre_multipath_nh.sh:#!/bin/bash
-> ./forwarding/bridge_mld.sh:#!/bin/bash
-> ./forwarding/ip6gre_inner_v6_multipath.sh:#!/bin/bash
-> ./forwarding/ip6gre_flat_key.sh:#!/bin/bash
-> ./forwarding/vxlan_asymmetric.sh:#!/bin/bash
-> ./forwarding/tc_flower_router.sh:#!/bin/bash
-> ./forwarding/router_bridge_vlan_upper_pvid.sh:#!/bin/bash
-> ./forwarding/mirror_gre_vlan_bridge_1q.sh:#!/bin/bash
-> ./forwarding/q_in_vni_ipv6.sh:#!/bin/bash
-> ./forwarding/mirror_gre_lag_lacp.sh:#!/bin/bash
-> ./forwarding/ip6gre_custom_multipath_hash.sh:#!/bin/bash
-> ./forwarding/vxlan_bridge_1d.sh:#!/bin/bash
-> ./forwarding/ip6gre_hier_key.sh:#!/bin/bash
-> ./forwarding/gre_custom_multipath_hash.sh:#!/bin/bash
-> ./forwarding/ipip_flat_gre_key.sh:#!/bin/bash
-> ./forwarding/mirror_gre_flower.sh:#!/bin/bash
-> ./forwarding/router_bridge.sh:#!/bin/bash
-> ./forwarding/vxlan_symmetric_ipv6.sh:#!/bin/bash
-> ./forwarding/mirror_gre_bridge_1q.sh:#!/bin/bash
-> ./forwarding/router_multipath.sh:#!/bin/bash
-> ./forwarding/tc_vlan_modify.sh:#!/bin/bash
-> ./forwarding/vxlan_bridge_1q.sh:#!/bin/bash
-> ./forwarding/bridge_mdb_port_down.sh:#!/bin/bash
-> ./forwarding/tc_flower.sh:#!/bin/bash
-> ./forwarding/tc_flower_cfm.sh:#!/bin/bash
-> ./forwarding/mirror_gre_neigh.sh:#!/bin/bash
-> ./forwarding/ethtool_rmon.sh:#!/bin/bash
-> ./forwarding/hw_stats_l3_gre.sh:#!/bin/bash
-> ./forwarding/router.sh:#!/bin/bash
-> ./forwarding/ipip_hier_gre_key.sh:#!/bin/bash
-> ./forwarding/tc_police.sh:#!/bin/bash
-> ./forwarding/pedit_ip.sh:#!/bin/bash
-> ./forwarding/ip6_forward_instats_vrf.sh:#!/bin/bash
-> ./forwarding/router_mpath_nh_res.sh:#!/bin/bash
-> ./forwarding/mirror_gre_changes.sh:#!/bin/bash
-> ./forwarding/hw_stats_l3.sh:#!/bin/bash
-> ./forwarding/ipip_hier_gre.sh:#!/bin/bash
-> ./forwarding/q_in_vni.sh:#!/bin/bash
-> ./forwarding/ip6gre_flat.sh:#!/bin/bash
-> ./forwarding/router_bridge_vlan_upper.sh:#!/bin/bash
-> ./forwarding/bridge_igmp.sh:#!/bin/bash
-> ./forwarding/mirror_gre_nh.sh:#!/bin/bash
-> ./forwarding/bridge_mdb_host.sh:#!/bin/bash
-> ./forwarding/ipip_hier_gre_keys.sh:#!/bin/bash
-> ./forwarding/pedit_dsfield.sh:#!/bin/bash
-> ./forwarding/bridge_vlan_mcast.sh:#!/bin/bash
-> ./forwarding/mirror_gre_bridge_1d_vlan.sh:#!/bin/bash
-> ./forwarding/router_bridge_1d_lag.sh:#!/bin/bash
-> ./forwarding/router_bridge_pvid_vlan_upper.sh:#!/bin/bash
-> ./forwarding/mirror_gre_bound.sh:#!/bin/bash
-> ./forwarding/ip6gre_hier.sh:#!/bin/bash
-> ./forwarding/ip6gre_hier_keys.sh:#!/bin/bash
-> ./forwarding/ethtool_extended_state.sh:#!/bin/bash
-> ./forwarding/router_mpath_nh.sh:#!/bin/bash
-> ./forwarding/tc_flower_l2_miss.sh:#!/bin/bash
-> ./forwarding/bridge_vlan_unaware.sh:#!/bin/bash
-> ./forwarding/router_broadcast.sh:#!/bin/bash
-> ./forwarding/bridge_fdb_learning_limit.sh:#!/bin/bash
-> ./forwarding/ipip_lib.sh:#!/bin/bash
-> ./forwarding/ip6gre_inner_v4_multipath.sh:#!/bin/bash
-> ./forwarding/router_vid_1.sh:#!/bin/bash
-> ./forwarding/mirror_gre.sh:#!/bin/bash
-> ./forwarding/router_bridge_vlan.sh:#!/bin/bash
-> ./forwarding/bridge_vlan_aware.sh:#!/bin/bash
-> ./forwarding/ethtool.sh:#!/bin/bash
-> ./forwarding/loopback.sh:#!/bin/bash
-> ./forwarding/bridge_sticky_fdb.sh:#!/bin/bash
-> ./forwarding/bridge_mdb_max.sh:#!/bin/bash
-> ./forwarding/pedit_l4port.sh:#!/bin/bash
-> ./forwarding/tc_actions.sh:#!/bin/bash
-> ./forwarding/mirror_vlan.sh:#!/bin/bash
-> ./forwarding/sch_red.sh:#!/bin/bash
-> ./forwarding/ipip_flat_gre.sh:#!/bin/bash
-> ./forwarding/mirror_gre_bridge_1d.sh:#!/bin/bash
-> ./forwarding/lib.sh:#!/bin/bash
-> ./forwarding/mirror_gre_vlan.sh:#!/bin/bash
-> ./forwarding/mirror_gre_bridge_1q_lag.sh:#!/bin/bash
-> ./forwarding/ethtool_mm.sh:#!/bin/bash
-> ./forwarding/vxlan_bridge_1q_ipv6.sh:#!/bin/bash
-> ./forwarding/tc_chains.sh:#!/bin/bash
-> ./forwarding/ip6gre_lib.sh:#!/bin/bash
-> ./fib_nexthop_nongw.sh:#!/bin/bash
-> ./srv6_end_dt46_l3vpn_test.sh:#!/bin/bash
-> ./cmsg_so_mark.sh:#!/bin/bash
-> ./sctp_vrf.sh:#!/bin/bash
-> ./fdb_flush.sh:#!/bin/bash
-> ./ndisc_unsolicited_na_test.sh:#!/bin/bash
-> ./traceroute.sh:#!/bin/bash
-> ./fib-onlink-tests.sh:#!/bin/bash
-> ./fib_tests.sh:#!/bin/bash
-> ./cmsg_time.sh:#!/bin/bash
-> ./arp_ndisc_untracked_subnets.sh:#!/bin/bash
-> ./fib_nexthops.sh:#!/bin/bash
 > 
-> linux/tools/testing/selftests/net$ grep -rF ". lib.sh"
-> <-- nothing
+>> But I am wondering if this is necessary, since kfree() can handle NULL correctly.
 > 
-> Thanks,
-> Yujie
+> Would you prefer only required data processing in affected function implementations?
 > 
 
+Thank you Markus. I understood that you want to avoid redundant function calls.
+
+But it is not very attractive to me since the calls occur on low-frequency paths
+or unlikely condition, resulting in limited performance loss and the current
+kfree() usage is fine and common. So what is the benfit?
+
+I noticed that some other discussions are on-going. It seems like you are trying
+to change other similiar places. Let's collect more opinions.
+
+https://lore.kernel.org/netdev/828bb442-29d0-4bb8-b90d-f200bdd4faf6@web.de/
+https://lore.kernel.org/netdev/90679f69-951c-47b3-b86f-75fd9fde3da3@web.de/
+https://lore.kernel.org/netdev/dc0a1c9d-ceca-473d-9ad5-89b59e6af2e7@web.de/
+https://lore.kernel.org/netdev/cde82080-c715-473c-97ac-6ef66bba6d64@web.de/
+
+Thanks.
+
+> Regards,
+> Markus
 
