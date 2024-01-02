@@ -1,102 +1,136 @@
-Return-Path: <netdev+bounces-60870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85828821B6C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:10:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 847FD821B74
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:14:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 233B7282854
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:10:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93B8A1C21EA5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C04EAFA;
-	Tue,  2 Jan 2024 12:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B57EAFA;
+	Tue,  2 Jan 2024 12:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="A+4Q2ju+"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="fImfiL01"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EF8EAE5;
-	Tue,  2 Jan 2024 12:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=su1M2ye5o0dILxMk9cyElIFBQ93oGry7ZL5GdcqEe5c=; b=A+4Q2ju+LRwnACQadXkh3mRDOd
-	F4GjSEr48wc7/6dH+TGpdTTVy+yOEJMzKGAvhnKZ2WqDHdz9Yfil/pofBF9pG85v5bIxSor/ksZsw
-	ddZ//ZQ5wpf3NIRoFjM40NZhQtTpM4xOu79dYkqpqxLp8Pr2+0QtDdOsOtXgPizonvaqIz69URts9
-	xqAbqIzfjmCZM5bz2WMNDgi2ID8bVdj9kANgTkCzUzAcRqED1QIkl/AlAbg3erSCwYGSGfsh2HVEv
-	T/QMUxFge9AJYEWnWJpHHRqApfDINJyCSZ0H2yU3nJjZLoaMSQyaaddYENww1KgSnn4H3pkebA0yO
-	A7nW7RyQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46174)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKdas-0006Wk-01;
-	Tue, 02 Jan 2024 12:10:02 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKdar-0005Hg-2n; Tue, 02 Jan 2024 12:10:01 +0000
-Date: Tue, 2 Jan 2024 12:10:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Alexander Couzens <lynxis@fe80.eu>,
-	Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC net-next] net: pcs: pcs-mtk-lynxi fix
- mtk_pcs_lynxi_get_state() for 2500base-x
-Message-ID: <ZZP9GR15ufDbjGAJ@shell.armlinux.org.uk>
-References: <20240102074408.1049203-1-ericwouds@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DEEF9C3
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 12:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-336990fb8fbso7289994f8f.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 04:14:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1704197663; x=1704802463; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:to:subject:reply-to:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hSLIIdVObXyVwnR590fH1wylxU49PILdHE+HMzdEH/4=;
+        b=fImfiL010+lY2K2Fxa0kQcE5pWYIgrX6ALYOMgV5c6rpsaOoeMrRBocHmGJUowzE91
+         xccN5/uOpaKHYDFY9hVigiTvLIrD2UyaxfejCM234iYzmnrmuv2zmSrf/21EDyL9knXv
+         lPSMgFouEZzQ3F6WshMFCb3PNi8gXrziEK68yuTNxBHJrJedUJbtGHqgYj2a1bNh5RTz
+         iP5m7dxt3XPyVjO7NRmdqbEjenzxO9kFz3hx1U3qlyC4r9ESbCYcnyx3INbXUaxbdGup
+         cOnbH18W46FhuWX16AoksWemdhh54k36cryjxuCVBt+G46WnbnwVwBwSvwB7jBORX/SZ
+         2cFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704197663; x=1704802463;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:to:subject:reply-to:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hSLIIdVObXyVwnR590fH1wylxU49PILdHE+HMzdEH/4=;
+        b=JgkXLIqj19NbtncQAIpgfe1pam9amVEMacp8RoiTnOufymt6LD2JhhflmC7BOcyri8
+         wDLGXzlqkS4FXZ1MCwUfB/1qb/lB4evOs2r6YrQpp72E934Oaf00rm6pYjCHhhuU26fb
+         p7l+Kbtv00po2mq4PtBCyIHS2PFrxyAm5UIzyO3nxY7dc0kjl4u0Kmr79DNSSwoDrMhv
+         10CiSmtYADa2QV++q0X307HxJZMExMkKVokRPYKQASVgIt3KVj8AQjr6bSoxyn2cnWEh
+         ClH3+Ze4tlPh0/NNn+37xZh4GjjXzjkrs70NcKCLdL3rhSBzIYyQfHzUL8Z39Z8gdWcR
+         bgHQ==
+X-Gm-Message-State: AOJu0YxaFCoagc3gHHmNJic93TPAHrRE2ASiivIg2+SWz2LiIsCXRUL1
+	7yia+aWB6XpC4iwxj3PADcwANpoFJjmM6Q==
+X-Google-Smtp-Source: AGHT+IGd0wZvlbAugiY9MsTbS6QyHp89fdVRt/H5p6o1N9yplwlOmpKCy46WyxWgLWNpq0Nl3bwvEA==
+X-Received: by 2002:a5d:46c2:0:b0:333:2f23:8708 with SMTP id g2-20020a5d46c2000000b003332f238708mr8115037wrs.29.1704197663128;
+        Tue, 02 Jan 2024 04:14:23 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:2900:c6f1:e9ae:67a6? ([2a01:e0a:b41:c160:2900:c6f1:e9ae:67a6])
+        by smtp.gmail.com with ESMTPSA id cg13-20020a5d5ccd000000b00336e6014263sm16874405wrb.98.2024.01.02.04.14.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jan 2024 04:14:22 -0800 (PST)
+Message-ID: <a5282f4c-21e5-4c1e-b0bb-10f222453099@6wind.com>
+Date: Tue, 2 Jan 2024 13:14:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240102074408.1049203-1-ericwouds@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net] rtnetlink: allow to set iface down before enslaving
+ it
+To: Phil Sutter <phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org, stable@vger.kernel.org
+References: <20231229100835.3996906-1-nicolas.dichtel@6wind.com>
+ <ZZM4Pa3KuD0uaTkx@orbyte.nwl.cc>
+Content-Language: en-US
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <ZZM4Pa3KuD0uaTkx@orbyte.nwl.cc>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 02, 2024 at 08:44:08AM +0100, Eric Woudstra wrote:
-> From: Daniel Golle <daniel@makrotopia.org>
+Le 01/01/2024 à 23:10, Phil Sutter a écrit :
+> On Fri, Dec 29, 2023 at 11:08:35AM +0100, Nicolas Dichtel wrote:
+>> The below commit adds support for:
+>>> ip link set dummy0 down
+>>> ip link set dummy0 master bond0 up
+>>
+>> but breaks the opposite:
+>>> ip link set dummy0 up
+>>> ip link set dummy0 master bond0 down
+>>
+>> Let's add a workaround to have both commands working.
+>>
+>> Cc: stable@vger.kernel.org
+>> Fixes: a4abfa627c38 ("net: rtnetlink: Enslave device before bringing it up")
+>> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+>> ---
+>>  net/core/rtnetlink.c | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+>> index e8431c6c8490..dd79693c2d91 100644
+>> --- a/net/core/rtnetlink.c
+>> +++ b/net/core/rtnetlink.c
+>> @@ -2905,6 +2905,14 @@ static int do_setlink(const struct sk_buff *skb,
+>>  		call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
+>>  	}
+>>  
+>> +	/* Backward compat: enable to set interface down before enslaving it */
+>> +	if (!(ifm->ifi_flags & IFF_UP) && ifm->ifi_change & IFF_UP) {
+>> +		err = dev_change_flags(dev, rtnl_dev_combine_flags(dev, ifm),
+>> +				       extack);
+>> +		if (err < 0)
+>> +			goto errout;
+>> +	}
+>> +
+>>  	if (tb[IFLA_MASTER]) {
+>>  		err = do_set_master(dev, nla_get_u32(tb[IFLA_MASTER]), extack);
+>>  		if (err)
 > 
-> Need to fix mtk_pcs_lynxi_get_state() in order for the pcs to function
-> correctly when the interface is set to 2500base-x, even when
-> PHYLINK_PCS_NEG_INBAND_DISABLED is set.
+> Doesn't this merely revert to the old behaviour of setting the interface
+> up before enslaving if both IFF_UP and IFLA_MASTER are present? Did you
+> test this with a bond-type master?
+Yes, both command sequences (cf commit log) work after the patch.
+dev_change_flags() is called before do_set_master() only if the user asks to
+remove the flag IFF_UP.
 
-Please describe your setup more fully. What is the link partner on this
-2500base-X link?
 
-In PHYLINK_PCS_NEG_INBAND_DISABLED mode, this means that phylink is
-operating in inband mode, but Autoneg is clear in the advertisement
-mask, meaning Autoneg is disabled and we are using a "fixed" setting.
-state->speed and state->duplex should already be initialised.
-
-> When the pcs is set to 2500base-x, the register values are not compatible
-> with phylink_mii_c22_pcs_decode_state(). It results in parameters such as
-> speed unknown and such. Then the mac/pcs are setup incorrectly and do not
-> function.
-
-Since Autoneg is clear, phylink_mii_c22_pcs_decode_state() won't
-change state->speed and state->duplex, which should already be
-correctly set.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Regards,
+Nicolas
 
