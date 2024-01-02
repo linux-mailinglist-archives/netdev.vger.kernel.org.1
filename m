@@ -1,127 +1,128 @@
-Return-Path: <netdev+bounces-60874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57FDB821BA7
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:31:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B11BB821BB2
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:37:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D122B2818F0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:31:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AA46B21C46
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89679F4E2;
-	Tue,  2 Jan 2024 12:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A944EAFA;
+	Tue,  2 Jan 2024 12:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DvdeHMIc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="S0UnOMij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08692FBEB;
-	Tue,  2 Jan 2024 12:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55569b59f81so5038530a12.1;
-        Tue, 02 Jan 2024 04:31:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704198681; x=1704803481; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IHPc3b2HWDj64ive1dxruS27O95C6egAy0HbP5aoRrw=;
-        b=DvdeHMIc4wrZkr7gWFy6/OQkuTGVtI9nKIAPbNdbqCKp4MD1ENgmy4rMd9oxonKkxt
-         tUxTbZ87Gj45sYV2VGKi+4zkAQjxgk+VkPLgS53/xqGh4ihtPnPO9y2MWiW22dlL55xo
-         Ad+CKttGp4qygdpqHk+uFwtz0puizCMXHfDz9NKFYOP8g6W4u/P3nGaIW4cfj1xZNNTI
-         mfu8Nr+HDpyfo26MI9bmakYBmm9UOx0EKVsIV06SIbtEn5xsfFfkJPOtoSYXCFP1Oak3
-         rEmCc3IKm8FOqtsUpQzmuXcaGIwEtwDD4MDTaRmsJwSYhjrh+K7gbyNUzEchmmxT++en
-         IrOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704198681; x=1704803481;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IHPc3b2HWDj64ive1dxruS27O95C6egAy0HbP5aoRrw=;
-        b=aCnmdQEk28vtb8Y9oPd9SwfWDOw2VFRlA7XoUuzlmApKD9EiMM2Uu990cqizoYpjxj
-         nKSDfLUdczSOmoSDyDlKa96BOCKiyhGg/yQ545GExsMaVT3aeY7cwe6E7ks76pbX5A0T
-         GyGkJNIBK7ya1fMNYugTp6L95LOcy9xOJfW1j4tHI5EkJ1cCHHkBNkDHwL0X1YdRuxbJ
-         n7SgOHTIarkpgVf56Ys37ImS3NNRIC6cAMyyysy2We26pp5z03NPnjUc03K21f0eDc8L
-         7DvFP8ZZSb+Gkfg+qJ3ULWdEs0HHqZzCIko92LbdoGcGUWXyg8jWqSWhuquy1FXa/2d5
-         OkBQ==
-X-Gm-Message-State: AOJu0YyWHRxdWOS2ei1zde9YwvHxP/bxdIuUoc9FkNToBcTQxS1iEV6j
-	aSEFc7+ZwCeE3qSsd79dS7Y=
-X-Google-Smtp-Source: AGHT+IE5nNxiH4N4H3XYyngTXfeHYH+ZvpvSr+ySRPH/c+vEoh8xCXMubbqgN3AcbmawlQeXuAC8Xg==
-X-Received: by 2002:a50:d01a:0:b0:555:485:4e32 with SMTP id j26-20020a50d01a000000b0055504854e32mr7006623edf.10.1704198681288;
-        Tue, 02 Jan 2024 04:31:21 -0800 (PST)
-Received: from [127.0.0.1] ([89.205.132.224])
-        by smtp.gmail.com with ESMTPSA id dg24-20020a0564021d1800b00552cf686df3sm16033923edb.52.2024.01.02.04.31.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 04:31:20 -0800 (PST)
-Date: Tue, 02 Jan 2024 13:31:21 +0100
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>
-CC: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_RFC_net-next=5D_ne?= =?US-ASCII?Q?t=3A_phylink=3A_add_quirk_for_d?= =?US-ASCII?Q?isabling_in-band-status_for_mediatek_pcs_at_2500base-x?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <ZZPq8iMAv3eR9Gfk@pidgin.makrotopia.org>
-References: <20240102074326.1049179-1-ericwouds@gmail.com> <ZZPq8iMAv3eR9Gfk@pidgin.makrotopia.org>
-Message-ID: <D80A9D3C-6A86-4004-B575-46A980D8BA3B@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6DFF4F4;
+	Tue,  2 Jan 2024 12:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EKt6waYkREQSl8TOEPwS+m4Ybyc4+NtjQUDV5bNbQWs=; b=S0UnOMijCUX3JsRUr+wAE4YgUf
+	eE9RQMlrBh1t9kmigzTWvhMhi71gOETUnZhO+58XxWphtoXyw3uthVlbhWzEuqXTEH/jKgMnD9XJl
+	lmE+XNhJUHF4E+87DAc3z6ASZSw1QTFP9k1pURiHfE7GXVyX6QCvE5yYzFQFA03Pl1dvr00fH2EKx
+	nBHnIgIodzNv0e3nV/Ki3wMSXzEzYEgkbAW2gSB0cLcZblTqgz3Tv1j2/V/gJBR6BYrQEw/n9ow2V
+	vaC8ZxRUMlczXMv27GBH+Q9orgljB4nUEdNR/Og6ySj5CmdbIGo1dWgr4RNBOe0t3c2yxxdiiNp1p
+	eywa18Ig==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34188)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKe0f-0006Xv-27;
+	Tue, 02 Jan 2024 12:36:41 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKe0h-0005IC-OE; Tue, 02 Jan 2024 12:36:43 +0000
+Date: Tue, 2 Jan 2024 12:36:43 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH RFC net-next] net: phylink: add quirk for disabling
+ in-band-status for mediatek pcs at 2500base-x
+Message-ID: <ZZQDWzYlxAKl0JxI@shell.armlinux.org.uk>
+References: <20240102074326.1049179-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240102074326.1049179-1-ericwouds@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Sorry,  I'm on Android for now and have trouble find a suitable cli=C3=ABnt=
-=2E This should have no http=2E
+On Tue, Jan 02, 2024 at 08:43:26AM +0100, Eric Woudstra wrote:
+> In follow up to: net: pcs: pcs-mtk-lynxi: use 2500Base-X without AN
+> 
+> MediaTek LynxI PCS, 2500Base-X will only work without inband status due to
+> hardware limitation.
 
+Yes, we need better support for 2500base-X connected to a PHY.
+Currently, we treat both base-X interface modes as _media_ side modes
+by looking at the Autoneg bit. However, given that 2500base-X has been
+around for ages in vendor-specific forms, we need to do better. The
+introduction of the PHYLINK_PCS_NEG_* enum and phylink_pcs_neg_mode()
+is a step towards resolving this (as well as ensuring consistency of
+implementation so we _can_ start to address it in phylink rather than
+having different PCS drivers doing weird stuff.)
 
-Anyway, I see now, I had another version which I should have send:
+I am _not_ of the opinion that we should be dealing with this based on
+compatibles or anything like that.
 
+As 6.6 was declared LTS, I think we can now move phylink_pcs_neg_mode()
+into phylink.c, and thus think about what we should do with:
 
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (phylink_major_no_inband(pl, state->interfa=
-ce) && (!!pl->phydev)) {
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (pl->cur_link_a=
-n_mode =3D=3D MLO_AN_INBAND)
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0pl->cur_link_an_mode =3D MLO_AN_PHY;
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0}
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0else
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* restore mode if it wa=
-s changed before */
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pl->cur_link_an_mode =3D=
- pl->cfg_link_an_mode;
++               /* 1000base-X is designed for use media-side for Fibre
++                * connections, and thus the Autoneg bit needs to be
++                * taken into account. We also do this for 2500base-X
++                * as well, but drivers may not support this, so may
++                * need to override this.
++                */
++               if (!phylink_autoneg_inband(mode))
++                       neg_mode = PHYLINK_PCS_NEG_OUTBAND;
++               else if (linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
++                                          advertising))
++                       neg_mode = PHYLINK_PCS_NEG_INBAND_ENABLED;
++               else
++                       neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED;
++               break;
 
+Specifically, the linkmode_test_bit() bit. When there is a PHY present,
+the link between the PCS and PHY should _not_ depend on Autoneg as that
+is indicates what we want for the _media_ side, and in the case of a
+PCS-to-PHY link, that is not the media.
 
+The next issue is the one that you refer to, and there's several issues:
 
-To prevent it from toggling all the time=2E So I do need to spend some mor=
-e
-attention to this part, cause this also may not be 100% ok, if changing=C2=
-=A0
-phylink core would be done=2E
+1. some implementations of 2500base-X do not support inband
+2. some implementations of 2500base-X appear to require inband
+   (e.g. mvneta, mvpp2)
 
+I have some thoughts on this, but I don't have the time to express them
+in email at the moment (too much to get through post-Christmas post-
+Covid.)
 
-
-
-The reason I do it in phylink, because of changing to MLO_AN_PHY when
-there is a PHY attached=2E mtk_eth_soc would not=2E Be aware of PHY attach=
-ed=2E
-
-So that's why I've opened the rfc=2E
-
-See which way to go with this in an acceptable way, preferably using MLO_A=
-N_PHY=2E
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
