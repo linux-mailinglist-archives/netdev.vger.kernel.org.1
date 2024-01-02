@@ -1,60 +1,66 @@
-Return-Path: <netdev+bounces-60863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFAE821B35
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:51:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15D92821B43
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:57:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29675282DD6
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:51:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92DBA2812AC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6666EADE;
-	Tue,  2 Jan 2024 11:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBDAEAE2;
+	Tue,  2 Jan 2024 11:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="a788ZYE1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED49EAC5;
-	Tue,  2 Jan 2024 11:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-556ab8b85e3so150395a12.1;
-        Tue, 02 Jan 2024 03:51:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704196298; x=1704801098;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=adTWx/k62Y91HsuyX07Wlly10Dmf3/XSYSsNAhC+0/U=;
-        b=qacc61Gl+1cFvsIYzdEqprrfDBi0h3ahy+HVaa68fUvyJpuJOa4YEmY6kV9jzVh4Ij
-         Qpcvoq5iS6/PIUaKoebZzSv9SbfiZtbr+4i6VnLItrnu8qZF93warpcgGxbRzDiWa9Df
-         8gxmGIM0ZrwTHOTCDZPWIh7hAIv0quJ6Cps4Qgtgc40HP7v7HGTJYYh85xyOp6y+uXXY
-         OvYg4K5q9IF1sZ8+tyJ5SFUaNYtEh0F4Z2ZmILx/+P3RB8hAsZp5DM8BXAyiqKwnzXGF
-         eAD55MZGhEakSBZ69/7BJg+n7pdgk/359f3np2cIgNvfzujvdfSI+p6G6dIhEGTLTnPS
-         fnVw==
-X-Gm-Message-State: AOJu0YxDo0+QZLEPVb2el76IqClyaZdiUW+o0VTjmlLhy3uaAho1sL7J
-	9TG0gCOy6Tc/qwSbcj2PwS8=
-X-Google-Smtp-Source: AGHT+IFiHnZQw5f9kufoiu227wpzclOWRnjx7lrgamOWqUaVv2Z7fhZNctIWtYPNIEARRU0kbFocpw==
-X-Received: by 2002:a50:c042:0:b0:555:9bd7:a4f0 with SMTP id u2-20020a50c042000000b005559bd7a4f0mr7800834edd.36.1704196298081;
-        Tue, 02 Jan 2024 03:51:38 -0800 (PST)
-Received: from gmail.com (fwdproxy-cln-002.fbsv.net. [2a03:2880:31ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id u18-20020aa7db92000000b00554d6b46a3dsm11058289edt.46.2024.01.02.03.51.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 03:51:37 -0800 (PST)
-Date: Tue, 2 Jan 2024 03:51:35 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>, vegard.nossum@oracle.com
-Cc: Vegard Nossum <vegard.nossum@oracle.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next] Documentation: add pyyaml to requirements.txt
-Message-ID: <ZZP4x7oSbLdugeDL@gmail.com>
-References: <20231222133628.3010641-1-vegard.nossum@oracle.com>
- <20231224164620.GB228041@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FA3EAD9;
+	Tue,  2 Jan 2024 11:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eeKppkhwEPcnfGdqVxZAbh5Q3M2m8dKLX0VvnuSyMmk=; b=a788ZYE1O9RrCtktaWCekXqQJV
+	9xl1vLCqmREErnQUWr7GXojR0YkEur/u+DnbVtPgKu5AYJgmmD7jkpFPZadn9uC0j6TQLXGXQVemz
+	8yDISUSXlFJq1yyDG5puGa4FSS3s77ztKs69WkTSJ4Bn+b1P/Z33AHtaiBmZWQZPl/u6B2WYEqbFs
+	bbcfgzIGPfdO77WJ221MOJiFSdP5/MsBo1JTXEtykHb4M23h5RSk+G6lzx+5bobCw1ISbJg1DlT9a
+	PnUekrOKYwEAEf1gbGVw1YygwiVW+5cyQ5qc0kSEkRyhTx7LDwWJSAvdu4SYKgt8Kgv++Y4+zFCLI
+	9PS2CNjQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53214)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKdOP-0006VF-1T;
+	Tue, 02 Jan 2024 11:57:09 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKdOP-0005GT-Rl; Tue, 02 Jan 2024 11:57:09 +0000
+Date: Tue, 2 Jan 2024 11:57:09 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: patchwork-bot+netdevbpf@kernel.org
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, andrew@lunn.ch, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org, christophe.leroy@csgroup.eu,
+	herve.codina@bootlin.com, f.fainelli@gmail.com,
+	hkallweit1@gmail.com, vladimir.oltean@nxp.com,
+	kory.maincent@bootlin.com, jesse.brandeburg@intel.com,
+	corbet@lwn.net, kabel@kernel.org, piergiorgio.beruto@gmail.com,
+	o.rempel@pengutronix.de, nicveronese@gmail.com, horms@kernel.org
+Subject: Re: [PATCH net-next v5 00/13] Introduce PHY listing and
+ link_topology tracking
+Message-ID: <ZZP6FV5sXEf+xd58@shell.armlinux.org.uk>
+References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
+ <170413442779.30948.3175948839165575294.git-patchwork-notify@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,32 +69,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231224164620.GB228041@kernel.org>
+In-Reply-To: <170413442779.30948.3175948839165575294.git-patchwork-notify@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello Vegard,
+... and I haven't reviewed this yet. I guess it's now pointless to
+review.
 
-On Fri, Dec 22, 2023 at 02:36:28PM +0100, Vegard Nossum wrote:
-> Commit f061c9f7d058 ("Documentation: Document each netlink family") added
-> a new Python script that is invoked during 'make htmldocs' and which reads
-> the netlink YAML spec files.
+On Mon, Jan 01, 2024 at 06:40:27PM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
 > 
-> Using the virtualenv from scripts/sphinx-pre-install, we get this new
-> error wen running 'make htmldocs':
+> This series was applied to netdev/net-next.git (main)
+> by David S. Miller <davem@davemloft.net>:
+> 
+> On Thu, 21 Dec 2023 19:00:33 +0100 you wrote:
+> > Hello everyone,
+> > 
+> > Here's a V5 of the multi-PHY support series.
+> > 
+> > At a glance, besides some minor fixes and R'd-by from Andrew, one of the
+> > thing this series does is remove the ASSERT_RTNL() from the
+> > topo_add_phy/del_phy operations.
+> > 
+> > [...]
+> 
+> Here is the summary with links:
+>   - [net-next,v5,01/13] net: phy: Introduce ethernet link topology representation
+>     https://git.kernel.org/netdev/net-next/c/02018c544ef1
+>   - [net-next,v5,02/13] net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+>     https://git.kernel.org/netdev/net-next/c/9c5625f559ad
+>   - [net-next,v5,03/13] net: phy: add helpers to handle sfp phy connect/disconnect
+>     https://git.kernel.org/netdev/net-next/c/034fcc210349
+>   - [net-next,v5,04/13] net: sfp: Add helper to return the SFP bus name
+>     https://git.kernel.org/netdev/net-next/c/dedd702a3579
+>   - [net-next,v5,05/13] net: ethtool: Allow passing a phy index for some commands
+>     https://git.kernel.org/netdev/net-next/c/2ab0edb505fa
+>   - [net-next,v5,06/13] netlink: specs: add phy-index as a header parameter
+>     https://git.kernel.org/netdev/net-next/c/c29451aefcb4
+>   - [net-next,v5,07/13] net: ethtool: Introduce a command to list PHYs on an interface
+>     https://git.kernel.org/netdev/net-next/c/63d5eaf35ac3
+>   - [net-next,v5,08/13] netlink: specs: add ethnl PHY_GET command set
+>     https://git.kernel.org/netdev/net-next/c/95132a018f00
+>   - [net-next,v5,09/13] net: ethtool: plca: Target the command to the requested PHY
+>     https://git.kernel.org/netdev/net-next/c/7db69ec9cfb8
+>   - [net-next,v5,10/13] net: ethtool: pse-pd: Target the command to the requested PHY
+>     https://git.kernel.org/netdev/net-next/c/345237dbc1bd
+>   - [net-next,v5,11/13] net: ethtool: cable-test: Target the command to the requested PHY
+>     https://git.kernel.org/netdev/net-next/c/fcc4b105caa4
+>   - [net-next,v5,12/13] net: ethtool: strset: Allow querying phy stats by index
+>     https://git.kernel.org/netdev/net-next/c/d078d480639a
+>   - [net-next,v5,13/13] Documentation: networking: document phy_link_topology
+>     https://git.kernel.org/netdev/net-next/c/32bb4515e344
+> 
+> You are awesome, thank you!
+> -- 
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
+> 
+> 
+> 
 
-The commit doesn't depend on sphinx. This is a standalone script now.
-The requirements file is at tools/net/ynl/requirements.txt not in sphinx
-
-> Note: This was somehow present in the original patch submission:
-> <https://lore.kernel.org/all/20231103135622.250314-1-leitao@debian.org/>
-> I'm not sure why the pyyaml requirement disappeared in the meantime.
-
-It disapperared because the original patch version was a sphinx module,
-thus, pyaml was not at sphinx dependency.
-
-In the commit final form, the script is a standalone script inside
-'tools/net/ynl', and PyYAML is already tracked in
-`tools/net/ynl/requirements.txt`.
-
-That said, can you try to install `tools/net/ynl/requirements.txt` and
-see if you are able to reproduce the problem?
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
