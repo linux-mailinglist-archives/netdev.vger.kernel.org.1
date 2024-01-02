@@ -1,182 +1,127 @@
-Return-Path: <netdev+bounces-60873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961A0821B88
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:21:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57FDB821BA7
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:31:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCACB1C21DD4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:21:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D122B2818F0
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BE6EECC;
-	Tue,  2 Jan 2024 12:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89679F4E2;
+	Tue,  2 Jan 2024 12:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o6Pnu8tb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DvdeHMIc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D920F4F2;
-	Tue,  2 Jan 2024 12:21:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68BC3C433C7;
-	Tue,  2 Jan 2024 12:21:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704198070;
-	bh=vQv1f+Php0cWB9KLjYNv0YlDWbsApg3u1Zg0uonTTP8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o6Pnu8tb/b6BkKvwKRyZg03sI23WqFc3OabZZrlcKFYmy7eowWjZf4pkHCYLNmFK8
-	 iyEIA6jhFe0psI7nS4kKWu7AlfnuDPRSQovwijopXhWJvkD9VkyRtoLSvcLnIc5e9S
-	 5hZsijjvmaaNQIKD15srPDWy0ME3pyZQYiucWemNobjCEP6ueQ6QFpE21r84x8xySg
-	 t2h71fVfTROjRjCMnUJ10FWqQPWZu/AqdEAzWWScYodSy9PNNDl3o+5N8jCYt69ud8
-	 imJG/P6ZffgeI7aOWMc/lmKM4kMoRaV6HFR5KaHW4T04aDyIxaIv7QDFY96jIcmkLX
-	 4/kBUb32514KA==
-Date: Tue, 2 Jan 2024 14:21:06 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Chengchang Tang <tangchengchang@huawei.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Junxian Huang <huangjunxian6@hisilicon.com>, jgg@ziepe.ca,
-	dsahern@gmail.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linuxarm@huawei.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iproute2-rc 1/2] rdma: Fix core dump when pretty is used
-Message-ID: <20240102122106.GI6361@unreal>
-References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
- <20231229065241.554726-2-huangjunxian6@hisilicon.com>
- <20231229092129.25a526c4@hermes.local>
- <30d8c237-953a-8794-9baa-e21b31d4d88c@huawei.com>
- <20240102083257.GB6361@unreal>
- <29146463-6d0e-21c5-af42-217cee760b3f@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08692FBEB;
+	Tue,  2 Jan 2024 12:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55569b59f81so5038530a12.1;
+        Tue, 02 Jan 2024 04:31:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704198681; x=1704803481; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IHPc3b2HWDj64ive1dxruS27O95C6egAy0HbP5aoRrw=;
+        b=DvdeHMIc4wrZkr7gWFy6/OQkuTGVtI9nKIAPbNdbqCKp4MD1ENgmy4rMd9oxonKkxt
+         tUxTbZ87Gj45sYV2VGKi+4zkAQjxgk+VkPLgS53/xqGh4ihtPnPO9y2MWiW22dlL55xo
+         Ad+CKttGp4qygdpqHk+uFwtz0puizCMXHfDz9NKFYOP8g6W4u/P3nGaIW4cfj1xZNNTI
+         mfu8Nr+HDpyfo26MI9bmakYBmm9UOx0EKVsIV06SIbtEn5xsfFfkJPOtoSYXCFP1Oak3
+         rEmCc3IKm8FOqtsUpQzmuXcaGIwEtwDD4MDTaRmsJwSYhjrh+K7gbyNUzEchmmxT++en
+         IrOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704198681; x=1704803481;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IHPc3b2HWDj64ive1dxruS27O95C6egAy0HbP5aoRrw=;
+        b=aCnmdQEk28vtb8Y9oPd9SwfWDOw2VFRlA7XoUuzlmApKD9EiMM2Uu990cqizoYpjxj
+         nKSDfLUdczSOmoSDyDlKa96BOCKiyhGg/yQ545GExsMaVT3aeY7cwe6E7ks76pbX5A0T
+         GyGkJNIBK7ya1fMNYugTp6L95LOcy9xOJfW1j4tHI5EkJ1cCHHkBNkDHwL0X1YdRuxbJ
+         n7SgOHTIarkpgVf56Ys37ImS3NNRIC6cAMyyysy2We26pp5z03NPnjUc03K21f0eDc8L
+         7DvFP8ZZSb+Gkfg+qJ3ULWdEs0HHqZzCIko92LbdoGcGUWXyg8jWqSWhuquy1FXa/2d5
+         OkBQ==
+X-Gm-Message-State: AOJu0YyWHRxdWOS2ei1zde9YwvHxP/bxdIuUoc9FkNToBcTQxS1iEV6j
+	aSEFc7+ZwCeE3qSsd79dS7Y=
+X-Google-Smtp-Source: AGHT+IE5nNxiH4N4H3XYyngTXfeHYH+ZvpvSr+ySRPH/c+vEoh8xCXMubbqgN3AcbmawlQeXuAC8Xg==
+X-Received: by 2002:a50:d01a:0:b0:555:485:4e32 with SMTP id j26-20020a50d01a000000b0055504854e32mr7006623edf.10.1704198681288;
+        Tue, 02 Jan 2024 04:31:21 -0800 (PST)
+Received: from [127.0.0.1] ([89.205.132.224])
+        by smtp.gmail.com with ESMTPSA id dg24-20020a0564021d1800b00552cf686df3sm16033923edb.52.2024.01.02.04.31.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jan 2024 04:31:20 -0800 (PST)
+Date: Tue, 02 Jan 2024 13:31:21 +0100
+From: Eric Woudstra <ericwouds@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+CC: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_RFC_net-next=5D_ne?= =?US-ASCII?Q?t=3A_phylink=3A_add_quirk_for_d?= =?US-ASCII?Q?isabling_in-band-status_for_mediatek_pcs_at_2500base-x?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <ZZPq8iMAv3eR9Gfk@pidgin.makrotopia.org>
+References: <20240102074326.1049179-1-ericwouds@gmail.com> <ZZPq8iMAv3eR9Gfk@pidgin.makrotopia.org>
+Message-ID: <D80A9D3C-6A86-4004-B575-46A980D8BA3B@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29146463-6d0e-21c5-af42-217cee760b3f@huawei.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 02, 2024 at 08:06:19PM +0800, Chengchang Tang wrote:
-> 
-> 
-> On 2024/1/2 16:32, Leon Romanovsky wrote:
-> > On Tue, Jan 02, 2024 at 03:44:29PM +0800, Chengchang Tang wrote:
-> > > 
-> > > On 2023/12/30 1:21, Stephen Hemminger wrote:
-> > > > On Fri, 29 Dec 2023 14:52:40 +0800
-> > > > Junxian Huang <huangjunxian6@hisilicon.com> wrote:
-> > > > 
-> > > > > From: Chengchang Tang <tangchengchang@huawei.com>
-> > > > > 
-> > > > > There will be a core dump when pretty is used as the JSON object
-> > > > > hasn't been opened and closed properly.
-> > > > > 
-> > > > > Before:
-> > > > > $ rdma res show qp -jp -dd
-> > > > > [ {
-> > > > >       "ifindex": 1,
-> > > > >       "ifname": "hns_1",
-> > > > >       "port": 1,
-> > > > >       "lqpn": 1,
-> > > > >       "type": "GSI",
-> > > > >       "state": "RTS",
-> > > > >       "sq-psn": 0,
-> > > > >       "comm": "ib_core"
-> > > > > },
-> > > > > "drv_sq_wqe_cnt": 128,
-> > > > > "drv_sq_max_gs": 2,
-> > > > > "drv_rq_wqe_cnt": 512,
-> > > > > "drv_rq_max_gs": 1,
-> > > > > rdma: json_writer.c:130: jsonw_end: Assertion `self->depth > 0' failed.
-> > > > > Aborted (core dumped)
-> > > > > 
-> > > > > After:
-> > > > > $ rdma res show qp -jp -dd
-> > > > > [ {
-> > > > >           "ifindex": 2,
-> > > > >           "ifname": "hns_2",
-> > > > >           "port": 1,
-> > > > >           "lqpn": 1,
-> > > > >           "type": "GSI",
-> > > > >           "state": "RTS",
-> > > > >           "sq-psn": 0,
-> > > > >           "comm": "ib_core",{
-> > > > >               "drv_sq_wqe_cnt": 128,
-> > > > >               "drv_sq_max_gs": 2,
-> > > > >               "drv_rq_wqe_cnt": 512,
-> > > > >               "drv_rq_max_gs": 1,
-> > > > >               "drv_ext_sge_sge_cnt": 256
-> > > > >           }
-> > > > >       } ]
-> > > > > 
-> > > > > Fixes: 331152752a97 ("rdma: print driver resource attributes")
-> > > > > Signed-off-by: Chengchang Tang <tangchengchang@huawei.com>
-> > > > > Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
-> > > > This code in rdma seems to be miking json and newline functionality
-> > > > which creates bug traps.
-> > > > 
-> > > > Also the json should have same effective output in pretty and non-pretty mode.
-> > > > It looks like since pretty mode add extra object layer, the nesting of {} would be
-> > > > different.
-> > > > 
-> > > > The conversion to json_print() was done but it isn't using same conventions
-> > > > as ip or tc.
-> > > > 
-> > > > The correct fix needs to go deeper and hit other things.
-> > > > 
-> > > Hi, Stephen,
-> > > 
-> > > The root cause of this issue is that close_json_object() is being called in
-> > > newline_indent(), resulting in a mismatch
-> > > of {}.
-> > > 
-> > > When fixing this problem, I was unsure why a newline() is needed in pretty
-> > > mode, so I simply kept this logic and
-> > > solved the issue of open_json_object() and close_json_object() not matching.
-> > > However, If the output of pretty mode
-> > > and not-pretty mode should be the same, then this problem can be resolved by
-> > > deleting this newline_indent().
-> > Stephen didn't say that output of pretty and not-pretty should be the
-> > same, but he said that JSON logic should be the same.
-> > 
-> > Thanks
-> 
-> Hi, Leon,
-> 
-> Thank you for your reply. But I'm not sure what you mean by JSON logic? I
-> understand that
-> pretty and not-pretty JSON should have the same content, but just difference
-> display effects.
-> Do you mean that they only need to have the same structure?
-> 
-> Or, let's get back to this question. In the JSON format output, the
-> newline() here seems
-> unnecessary, because json_print() can solve the line break problems during
-> printing.
-> So I think the newline() here can be removed at least when outputting in
-> JSON format.
+Sorry,  I'm on Android for now and have trouble find a suitable cli=C3=ABnt=
+=2E This should have no http=2E
 
-I think that your original patch is correct way to fix the mismatch as
-it is not related to pretty/non-pretty.
 
-Thanks
+Anyway, I see now, I had another version which I should have send:
 
-> 
-> Thanks,
-> Chengchang Tang
-> > 
-> > > I believe the original developer may not have realized that
-> > > close_json_object() is being called in newline(), which leads
-> > > to this problem. To improve the code's readability, I would try to strip out
-> > > close_json_obejct() from newline().
-> > > 
-> > > Thanks,
-> > > Chengchang Tang
-> > > 
-> > .
-> > 
-> 
-> 
+
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (phylink_major_no_inband(pl, state->interfa=
+ce) && (!!pl->phydev)) {
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (pl->cur_link_a=
+n_mode =3D=3D MLO_AN_INBAND)
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0pl->cur_link_an_mode =3D MLO_AN_PHY;
++=C2=A0 =C2=A0 =C2=A0 =C2=A0}
++=C2=A0 =C2=A0 =C2=A0 =C2=A0else
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* restore mode if it wa=
+s changed before */
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pl->cur_link_an_mode =3D=
+ pl->cfg_link_an_mode;
+
+
+
+To prevent it from toggling all the time=2E So I do need to spend some mor=
+e
+attention to this part, cause this also may not be 100% ok, if changing=C2=
+=A0
+phylink core would be done=2E
+
+
+
+
+The reason I do it in phylink, because of changing to MLO_AN_PHY when
+there is a PHY attached=2E mtk_eth_soc would not=2E Be aware of PHY attach=
+ed=2E
+
+So that's why I've opened the rfc=2E
+
+See which way to go with this in an acceptable way, preferably using MLO_A=
+N_PHY=2E
+
 
