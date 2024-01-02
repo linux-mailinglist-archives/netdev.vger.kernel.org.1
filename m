@@ -1,74 +1,120 @@
-Return-Path: <netdev+bounces-60927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2D2821E32
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:58:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07D08821E57
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:09:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BDBB1C22311
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:58:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E5051C221DA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FCF12E5F;
-	Tue,  2 Jan 2024 14:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BCA12E7A;
+	Tue,  2 Jan 2024 15:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vN8/GGbM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBGP0+KB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88F812E55;
-	Tue,  2 Jan 2024 14:58:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 209A9C433C8;
-	Tue,  2 Jan 2024 14:58:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704207503;
-	bh=3SCIZSGuvJnKQUWYQeR797zI+BSkErd0iIpBmXhHmsk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vN8/GGbMF1EVN6HIsYvbmi0duX3oMosmxPcRvjpotGu12UoPuayXSJ4apUpy9Y8WB
-	 vm7G1CoMhVoics8CmNOs4F2CA34omaBrkiLsPBa92QxMzXfg44TvSCLtet/oee5UC/
-	 b1dmEukQvXqtKik3kqa6kcFbxmgoOadK+1zaVO/uBq2ihLOjUHP0Y2tLCwNaRaS80v
-	 n9eFC8DdwiwqE5VgApsAs8AYKN46mYEaOBvTDTEQv+4UYbVwxO8W5fZBbZtm+AEBK8
-	 zGd+IRv9eA1WEAfggHkyrgorVRHbMX3Z+WUzCHEXeitfa8wkZdtounRF1JDhk3p864
-	 55MU4SB+6gi6Q==
-Date: Tue, 2 Jan 2024 06:58:22 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Stefan Wahren <wahrenst@gmx.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo Abeni"
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Re: [PATCH V2 12/12 net-next] qca_7k: Replace old mail address
-Message-ID: <20240102065822.319389ec@kernel.org>
-In-Reply-To: <18c39111-1cee-429d-a9ff-ff98e1ed27dc@intel.com>
-References: <20231218232639.33327-1-wahrenst@gmx.net>
-	<20231218232639.33327-13-wahrenst@gmx.net>
-	<18c39111-1cee-429d-a9ff-ff98e1ed27dc@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2163212E6B;
+	Tue,  2 Jan 2024 15:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-67f9fac086bso72766526d6.3;
+        Tue, 02 Jan 2024 07:09:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704208150; x=1704812950; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FMS55Vzekx4T3pQgk1uVM7+XggMIpgc3xmmxIF8jTeY=;
+        b=mBGP0+KBZZ5RVjbTox05T7TLZeWMS5Mah6/1rkZVpVHcgaTbl5HrzlL/9aKUOAadXx
+         MzpiIKsw9nBqTf80bjtnMTP7qR02WbxaCxyvFbf4GFiQcid7r1MvpCcpluQ1hUKV+XrG
+         S8S0FWWQifdnKIx8y/vNQ/66FwP316x7GRO/i5998wEsB0Tbg2BfC/brUIL8lR5h9qxm
+         f2zUbJb43Uc4CM/vMnPB4GAZfSV0K45Ro499Zn1s9GJuwQVQOduhDg9HS6Wofz1r4c3s
+         n4aMY+37TKhYnw2K/eG7xSlwu1/v7l8Gxcv35iEm8wEYZMaKAsgEQ8kr2L1DwSRUBgLU
+         OeRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704208150; x=1704812950;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FMS55Vzekx4T3pQgk1uVM7+XggMIpgc3xmmxIF8jTeY=;
+        b=kT5Hic3wDvIZMnaka5cjIxpfJZefBBQQ/cDy2c8/DpfJzmeMo7iVzLEFXpcx4Z3svh
+         MuTBqO3XQYKit7SQGJavOyNTZwFEJbBUypmnBCIlV8H2lDzeNmy2atrjfOTpt9MffiFu
+         dhI6JYA1Bibu+X804/qi6HEAwpoE85FBSnW0mk7dSnosSkIU8LKGT8rN7AdMrYxe2XUj
+         frrfuX2+FnrTrSgztqOhN08/FxoGz7Vz4srfSIsDfTcz0rcLJIRJTxArCrL3TCS6FomE
+         W7U/3+8+/1ZKOi3McR54IoaMHM5inEJZRa4yk3IIShbjwxzd0mPkpj8WfJ4F5C4MWz3J
+         bXqA==
+X-Gm-Message-State: AOJu0YxvhlSMjIuS0XC0EInWGnGV5x8cE1py/lI9Fvh2Qrby0ZQ9ZZH2
+	T53yR7wMkp2Z8YDaDhh8fbs=
+X-Google-Smtp-Source: AGHT+IGWbSLusYM73Mvn3tf3GQ41JzvUWrvoogxoINH6YdIWkyWIMUa/huqymo1ygkFfvYp485HL0A==
+X-Received: by 2002:a05:6214:e8c:b0:67f:8dfb:b6b1 with SMTP id hf12-20020a0562140e8c00b0067f8dfbb6b1mr28230780qvb.5.1704208149845;
+        Tue, 02 Jan 2024 07:09:09 -0800 (PST)
+Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
+        by smtp.gmail.com with ESMTPSA id n5-20020a0ce945000000b0067fa1179b57sm8875424qvo.131.2024.01.02.07.09.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 07:09:09 -0800 (PST)
+Date: Tue, 02 Jan 2024 10:09:09 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ davem@davemloft.net, 
+ dsahern@kernel.org, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ lixiaoyan@google.com
+Message-ID: <659427152812e_2907a12946f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <5bd9a1c7-63e8-4f5e-a749-c7eeeaed3c42@gmail.com>
+References: <127b8199-1cd4-42d7-9b2b-875abaad93fe@gmail.com>
+ <5bd9a1c7-63e8-4f5e-a749-c7eeeaed3c42@gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] selftests/net: fix GRO coalesce test and
+ add ext header coalesce tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 20 Dec 2023 15:04:51 -0800 Jacob Keller wrote:
-> On 12/18/2023 3:26 PM, Stefan Wahren wrote:
-> > From: Stefan Wahren <stefan.wahren@i2se.com>
-> > 
-> > The company I2SE has been acquired a long time ago. Switch to
-> > my private mail address before the I2SE account is deactivated.
-> > 
-> > Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
-> > Signed-off-by: Stefan Wahren <wahrenst@gmx.net>  
+Richard Gobert wrote:
+> Currently there is no test which checks that IPv6 extension header packets
+> successfully coalesce. This commit adds a test, which verifies two IPv6
+> packets with HBH extension headers do coalesce, and another test which
+> checks that packets with different extension header data do not coalesce
+> in GRO.
 > 
-> You might also consider adding this to the .mailmap so that
-> contributions from your old i2se.com address would show up to the
-> gmx.net address and people might be less likely to try and cc the dead
-> address.
+> I changed the receive socket filter to accept a packet with one extension
+> header. This change exposed a bug in the fragment test -- the old BPF did
+> not accept the fragment packet. I updated correct_num_packets in the
+> fragment test accordingly.
+> 
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 
-Agreed, also - this driver seems to have no MAINTAINERS entry.
-Please consider adding yourself as the maintainer :)
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+
+Thanks for adding the second test.
+
+> +static void add_ipv6_exthdr(void *buf, void *optpkt, __u8 exthdr_type, char *ext_payload)
+> +{
+> +	struct ipv6_opt_hdr *exthdr = (struct ipv6_opt_hdr *)(optpkt + tcp_offset);
+> +	struct ipv6hdr *iph = (struct ipv6hdr *)(optpkt + ETH_HLEN);
+> +	char *exthdr_payload_start = (char *)(exthdr + 1);
+> +
+> +	exthdr->hdrlen = 0;
+> +	exthdr->nexthdr = IPPROTO_TCP;
+> +
+> +	if (ext_payload)
+> +		memcpy(exthdr_payload_start, ext_payload, MIN_EXTHDR_SIZE - sizeof(*exthdr));
+
+minor nit, in case this gets respun: ext_payload is always true.
 
