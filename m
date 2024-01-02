@@ -1,73 +1,126 @@
-Return-Path: <netdev+bounces-61026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4842582247C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:08:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C93282247D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ACDA1C22B6D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:08:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF87D1F23718
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80609171B7;
-	Tue,  2 Jan 2024 22:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F26168CC;
+	Tue,  2 Jan 2024 22:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FryaLKuk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="Y/R2foUS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63ED21A734
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 22:02:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2630AC433C8;
-	Tue,  2 Jan 2024 22:02:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704232954;
-	bh=EbY85eJKonMkWrOzkVQ2y8+vEbfHIAu/nyHcd2U0JRY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FryaLKukFnVbvH9IPMCsQeLqI1JszQ77PNBhLol2J4mmXly9+ZUf0tVsP1A4IbWGX
-	 jIo9xkOxfG3FEvwIkznI4bdcpElOnsRQEgoeqjwivkh7+RobvNXy4g9WppnvwiZOfn
-	 RW083IR+0jVL2lKzGZdxos+y/4PL/LBvd+2cpqI1q66r23Pg7jO+h57LVzkvjgCeaL
-	 njTGsisPowZCMjJWS4dMVI1VfIbc0cIA46YYIJmzcTu9vKYS0LtZpS0X2Oaavrv5Bl
-	 MBn0UmIGDB3IS/LLZsqvoheo4DyET1VTK/7zGd568dVDGzph54Rz7kCf04WjS3B61M
-	 EbcgRKGlMYayg==
-Date: Tue, 2 Jan 2024 14:02:32 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Shachar Kagan <skagan@nvidia.com>, netdev@vger.kernel.org, Bagas Sanjaya
- <bagasdotme@gmail.com>, "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Subject: Re: [PATCH net-next] tcp: Revert no longer abort SYN_SENT when
- receiving some ICMP
-Message-ID: <20240102140232.77915fc3@kernel.org>
-In-Reply-To: <CANn89iLVg3H-GuZ6=_-Rc5Jk14T59pZcx1DF-3HApvsPuSpNXg@mail.gmail.com>
-References: <14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com>
-	<CANn89iLVg3H-GuZ6=_-Rc5Jk14T59pZcx1DF-3HApvsPuSpNXg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38900171C1;
+	Tue,  2 Jan 2024 22:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=1PgZFrMBASg1AS22jMwhLvG35lZ6LMB42bW4jc0bFuI=; b=Y/R2foUSDf9jPhP+OFiswdELaW
+	7ch2N5BKZWnEipbEVLWOqtrEdp7ZyH1YtOvX9ZlVBHYoICqdHOld/0jrKLJsJ14Spcsr4oSqPMS+r
+	JzjpXKoH4VqXQZOZgY4U6Oj4JNvELhjVN6zsY7Zsz1TmJEOe84uTurvyIQPwAHYp7PhzPPzGLo3KE
+	FEpwZwKfBrhbFrq98U85c1upXTsJTZS3C0IBv9bSgiKihReqKj5Pu9xL03gSvwUx2ODqublSQrzyf
+	9ttjowmk/RrgKhehZY/7hYjYH3AzmRw0MWQAB97gvJwJCtZI9X2g+9RKATsMAOeqWvlz3K9iqSxVz
+	Kq4pqZTg==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97)
+	(envelope-from <phil@nwl.cc>)
+	id 1rKmqm-000000001Af-3vqt;
+	Tue, 02 Jan 2024 23:03:04 +0100
+Date: Tue, 2 Jan 2024 23:03:04 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] rtnetlink: allow to set iface down before enslaving
+ it
+Message-ID: <ZZSIGBWSaK2-sqoI@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	stable@vger.kernel.org
+References: <20231229100835.3996906-1-nicolas.dichtel@6wind.com>
+ <ZZM4Pa3KuD0uaTkx@orbyte.nwl.cc>
+ <a5282f4c-21e5-4c1e-b0bb-10f222453099@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a5282f4c-21e5-4c1e-b0bb-10f222453099@6wind.com>
 
-On Tue, 2 Jan 2024 10:46:13 +0100 Eric Dumazet wrote:
-> > The issue appears while using Vagrant to manage nested VMs.
-> > The steps are:
-> > * create vagrant file
-> > * vagrant up
-> > * vagrant halt (VM is created but shut down)
-> > * vagrant up - fail
-> 
-> I would rather have an explanation, instead of reverting a valid patch.
+On Tue, Jan 02, 2024 at 01:14:21PM +0100, Nicolas Dichtel wrote:
+> Le 01/01/2024 à 23:10, Phil Sutter a écrit :
+> > On Fri, Dec 29, 2023 at 11:08:35AM +0100, Nicolas Dichtel wrote:
+> >> The below commit adds support for:
+> >>> ip link set dummy0 down
+> >>> ip link set dummy0 master bond0 up
+> >>
+> >> but breaks the opposite:
+> >>> ip link set dummy0 up
+> >>> ip link set dummy0 master bond0 down
+> >>
+> >> Let's add a workaround to have both commands working.
+> >>
+> >> Cc: stable@vger.kernel.org
+> >> Fixes: a4abfa627c38 ("net: rtnetlink: Enslave device before bringing it up")
+> >> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> >> ---
+> >>  net/core/rtnetlink.c | 8 ++++++++
+> >>  1 file changed, 8 insertions(+)
+> >>
+> >> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> >> index e8431c6c8490..dd79693c2d91 100644
+> >> --- a/net/core/rtnetlink.c
+> >> +++ b/net/core/rtnetlink.c
+> >> @@ -2905,6 +2905,14 @@ static int do_setlink(const struct sk_buff *skb,
+> >>  		call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
+> >>  	}
+> >>  
+> >> +	/* Backward compat: enable to set interface down before enslaving it */
+> >> +	if (!(ifm->ifi_flags & IFF_UP) && ifm->ifi_change & IFF_UP) {
+> >> +		err = dev_change_flags(dev, rtnl_dev_combine_flags(dev, ifm),
+> >> +				       extack);
+> >> +		if (err < 0)
+> >> +			goto errout;
+> >> +	}
+> >> +
+> >>  	if (tb[IFLA_MASTER]) {
+> >>  		err = do_set_master(dev, nla_get_u32(tb[IFLA_MASTER]), extack);
+> >>  		if (err)
+> > 
+> > Doesn't this merely revert to the old behaviour of setting the interface
+> > up before enslaving if both IFF_UP and IFLA_MASTER are present? Did you
+> > test this with a bond-type master?
+> Yes, both command sequences (cf commit log) work after the patch.
+> dev_change_flags() is called before do_set_master() only if the user asks to
+> remove the flag IFF_UP.
 
-+1 obviously. Your refusal to debug this any further does not put 
-nVidia's TCP / NVMe offload in a good light. On one hand you
-claim to have TCP experts in house and are pushing TCP offloads and
-on the other you can't debug a TCP issue for which you reportedly 
-have an easy repro? Does not add up.
+Ah, indeed! I should have looked at rtnl_dev_combine_flags() before
+commenting. When submitting v2, feel free to add my:
+
+Acked-by: Phil Sutter <phil@nwl.cc>
+
+Thanks, Phil
 
