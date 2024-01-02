@@ -1,198 +1,140 @@
-Return-Path: <netdev+bounces-61002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA0382220C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:33:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A09382223B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:44:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 813D31F20FD8
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:33:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04C12284378
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E3F15AFB;
-	Tue,  2 Jan 2024 19:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D288315E96;
+	Tue,  2 Jan 2024 19:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgHGZVTi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IycDA4TU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160F916403;
-	Tue,  2 Jan 2024 19:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EDA16401
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 19:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-50e766937ddso7714349e87.3;
-        Tue, 02 Jan 2024 11:33:37 -0800 (PST)
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-67f9ace0006so44741966d6.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 11:44:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704224016; x=1704828816; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oGWoUo2kZlWi4+ZRV37RZOEE77veWDQM4/zk4+0W71I=;
-        b=XgHGZVTiZtlNYQFlxxLkkPyoze8QrYQ34IwRUbpBuhOL+9GOiyPH7PXJ7zFZ7C36lS
-         NXF4JCg4Y3YRg4nLAuZgfnPTgjWLd5VZDsuHJhmT4GgkuiyFBKMMbmVZaxocL9/rroc/
-         ay9kg3+T5bnhdFKpvMF/KUEBuZ5/SlxZ4mQAp3mqbeey+BheClppP8aen6Eyi2ERG+bN
-         DoK64GvweLaAQqgBwB5Z6nbJTI5XxCdBTaDT+phImpP036QISHLpscFZik/EPaWnT1o1
-         +B2jRbGHW2hBJYHZujDAQP8SDq3mcQlh64hvIqKh5EsWulIpPh0J5bK0bAalN38gF1W6
-         162w==
+        d=gmail.com; s=20230601; t=1704224657; x=1704829457; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I8Jr197UFni9OLk3WuKNRk1S2zxszc2gQDbkeldNxlI=;
+        b=IycDA4TUNpmbJ+/4UkNHxfbnw/Ys4zFx8sh2ZIc3Mt9ip6drHd7dNK7XQXm/+V7B10
+         D/iQvS/sGJPWuxlP+N6rI3ePf8Dk7zXxDR2lNLVlgFe+pPdMmExeWw4uwwhzjCDclQxn
+         Q8qgbAPQmFdTOEVQv8fagl5rYnlE+x7ztP52KXNG2S3s6dpfON17YN7WgcutAJJXMix+
+         dmsG13FiDC7i7CJHFIPRugNet3MqsGvtQZo33hlLZKMWmWt8ynqHqbGbyHsv8gmjzG1i
+         S9lQlZqXk9WoMkmfo0HIlDzmsmD4GcgMvwVSQkF7fQzjEWUi9k/PVhqhMtd6kuLVqkGC
+         Jw/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704224016; x=1704828816;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oGWoUo2kZlWi4+ZRV37RZOEE77veWDQM4/zk4+0W71I=;
-        b=kvaC8/iN2gGMTMfzn33trfGYBsSoYO9CSxj4/e341lesGrrevHI29KAp/3jlt56lfV
-         YuIcQvkTWqHPjfHLZpc00YTxXoKu+kAkIMsIG28BmJArNihFpqEV5jFfe2kgX0DWMEsl
-         4j/7Y4ThOw0usAaG/kJGHjHN3ggCnj/nbGQ+kC9QlbES+ZcRrMSh/gQ23F+KHUaJbc5M
-         JzrPuze1nPYXgIcdWVacv/U129RAtsNGC2cQa5keLvlC9fHxCkZIgcbWbbwx8s0JOBlt
-         MY2r1fxS5qap7cyURSfvpXt7DFwLNkINYd7JLZW2vzLzGis7tK0JJZOpVhVoRKjJFHIz
-         z+YQ==
-X-Gm-Message-State: AOJu0Yy0HCMSyLs1Ah7tZpjL8tHJLxFB5mM7uzFj8VU+kiiIf83u66wh
-	TID3GJlOveBqfwNavX3+FPo=
-X-Google-Smtp-Source: AGHT+IHAMCc2uUTYdMnHH6EZ3MG+3mPuQY5aw/m25i+1vyPNfiDcSX8Fpt45zOIL54FWe3//85BuDQ==
-X-Received: by 2002:a19:5e56:0:b0:50e:80d2:4dd2 with SMTP id z22-20020a195e56000000b0050e80d24dd2mr4459004lfi.103.1704224015732;
-        Tue, 02 Jan 2024 11:33:35 -0800 (PST)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id x14-20020a19e00e000000b0050e7433d7d7sm3205889lfg.52.2024.01.02.11.33.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 11:33:35 -0800 (PST)
-Message-ID: <74223164-ab50-4d6d-a4f4-561b0a70d396@gmail.com>
-Date: Tue, 2 Jan 2024 20:33:32 +0100
+        d=1e100.net; s=20230601; t=1704224657; x=1704829457;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I8Jr197UFni9OLk3WuKNRk1S2zxszc2gQDbkeldNxlI=;
+        b=RQ8m2Dwmk7k1q2CBsH3YtaCeN4+ggCauV//Wyo8D0a0CXIBoDkZI/029HQ0H9k3+x9
+         wSsnf4aUpb0qQBgu9535qh26PTi1hvPWm7hGuRFKIh7zPfX6BkBokFnG6Ude4GBl8At2
+         UTLX45MgnzC8sKAQCKU/guFvT0ihZFnmsTL6w2B42QfWkak5ucH0/uohZ7mDtDPtrfpk
+         UnnbO+4EFwlsLOAtGomHSK1UYPOSnKgGa658oQn8yEaaE2YqWjuw6rF34YQfP6/gdxLR
+         kuJ6q1Ku3hBW92ABgzaEPVW6QVXvz3Cui7AQAdhb67PdM4CtZr9eXTeK4cWDlg1xdkpu
+         fhLQ==
+X-Gm-Message-State: AOJu0Yz/MPiMQkLuTiH2VXVIAyDFqC5GCvuaO7gSvtXMAGaxMHJVDXad
+	4DrnXKXaDJhD8ml6deAh2FQ=
+X-Google-Smtp-Source: AGHT+IEBjf0uka7qcdC3aRtzOw0huGvP79gnOILp3EmxiXe4aBzpT2iL8tn6S6ImyGbOFzu2Sdaxhg==
+X-Received: by 2002:ad4:53ab:0:b0:680:79f1:7905 with SMTP id j11-20020ad453ab000000b0068079f17905mr6441815qvv.97.1704224657087;
+        Tue, 02 Jan 2024 11:44:17 -0800 (PST)
+Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
+        by smtp.gmail.com with ESMTPSA id n2-20020a0cdc82000000b0067f49eef3b1sm10304580qvk.114.2024.01.02.11.44.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 11:44:16 -0800 (PST)
+Date: Tue, 02 Jan 2024 14:44:16 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Thomas Lange <thomas@corelatus.se>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org, 
+ jthinz@mailbox.tu-berlin.de, 
+ arnd@arndb.de, 
+ deepa.kernel@gmail.com
+Message-ID: <6594679091ed9_29c0c629495@willemb.c.googlers.com.notmuch>
+In-Reply-To: <dc642c69-8500-457a-a53e-6a3916ef6dab@corelatus.se>
+References: <a9090be2-ca7c-494c-89cb-49b1db2438ba@corelatus.se>
+ <65942b4270a60_291ae6294cd@willemb.c.googlers.com.notmuch>
+ <dc642c69-8500-457a-a53e-6a3916ef6dab@corelatus.se>
+Subject: Re: net/core/sock.c lacks some SO_TIMESTAMPING_NEW support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next] net: pcs: pcs-mtk-lynxi fix
- mtk_pcs_lynxi_get_state() for 2500base-x
-From: Eric Woudstra <ericwouds@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alexander Couzens <lynxis@fe80.eu>, Daniel Golle <daniel@makrotopia.org>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240102074408.1049203-1-ericwouds@gmail.com>
- <ZZP9GR15ufDbjGAJ@shell.armlinux.org.uk>
- <92190426-3614-4774-9E9F-18F121622788@gmail.com>
-Content-Language: en-US
-In-Reply-To: <92190426-3614-4774-9E9F-18F121622788@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-
-With some extra info:
-
-echo "file drivers/net/phy/* +p" > /sys/kernel/debug/dynamic_debug/control
-
-The log looks like this when sfp inserted:
-
-With the path (on original net-next, no further modifications), Traffic OK:
-
-[   71.212634] sfp sfp-1: mod-def0 0 -> 1
-[   71.216403] sfp sfp-1: tx-fault 1 -> 0
-[   71.220140] sfp sfp-1: SM: enter empty:up:down event insert
-[   71.225716] sfp sfp-1: SM: exit probe:up:down
-[   71.230059] sfp sfp-1: SM: enter probe:up:down event tx_clear
-[   71.235803] sfp sfp-1: SM: exit probe:up:down
-[   71.240195] sfp sfp-1: tx-fault 0 -> 1
-[   71.243939] sfp sfp-1: SM: enter probe:up:down event tx_fault
-[   71.249688] sfp sfp-1: SM: exit probe:up:down
-[   71.254052] sfp sfp-1: tx-fault 1 -> 0
-[   71.257810] sfp sfp-1: SM: enter probe:up:down event tx_clear
-[   71.263542] sfp sfp-1: SM: exit probe:up:down
-[   71.534808] sfp sfp-1: SM: enter probe:up:down event timeout
-[   71.570662] sfp sfp-1: module OEM              SFP-2.5G-T       rev 1.0  sn SK2301110007     dc 230110  
-[   71.580153] mtk_soc_eth 15100000.ethernet eth1: optical SFP: interfaces=[mac=2-4,22-23, sfp=23]
-[   71.588848] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 10,13-14,47
-[   71.598941] mtk_soc_eth 15100000.ethernet eth1: optical SFP: chosen 2500base-x interface
-[   71.607605] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 00,00000000,00008000,00006400
-[   71.619321] sfp sfp-1: tx disable 1 -> 0
-[   71.623287] sfp sfp-1: SM: exit present:up:wait
-[   71.636489] hwmon hwmon0: temp1_input not attached to any thermal zone
-[   71.684749] sfp sfp-1: SM: enter present:up:wait event timeout
-[   71.690587] sfp sfp-1: SM: exit present:up:wait_los
-[   74.704872] sfp sfp-1: los 1 -> 0
-[   74.708199] sfp sfp-1: SM: enter present:up:wait_los event los_low
-[   74.714389] sfp sfp-1: SM: exit present:up:link_up
-[   74.714422] mtk_soc_eth 15100000.ethernet eth1: Link is Up - 2.5Gbps/Full - flow control off
-
-Without the patch, No traffic possible:
-
-[  261.515414] sfp sfp-1: los 1 -> 0
-[  261.518740] sfp sfp-1: SM: enter empty:up:down event los_low
-[  261.524418] sfp sfp-1: SM: exit empty:up:down
-[  261.528799] sfp sfp-1: mod-def0 0 -> 1
-[  261.532541] sfp sfp-1: los 0 -> 1
-[  261.535843] sfp sfp-1: SM: enter empty:up:down event insert
-[  261.541406] sfp sfp-1: SM: exit probe:up:down
-[  261.545748] sfp sfp-1: SM: enter probe:up:down event los_high
-[  261.551481] sfp sfp-1: SM: exit probe:up:down
-[  261.555859] sfp sfp-1: tx-fault 1 -> 0
-[  261.559595] sfp sfp-1: SM: enter probe:up:down event tx_clear
-[  261.565330] sfp sfp-1: SM: exit probe:up:down
-[  261.859940] sfp sfp-1: SM: enter probe:up:down event timeout
-[  261.895690] sfp sfp-1: module OEM              SFP-2.5G-T       rev 1.0  sn SK2301110007     dc 230110  
-[  261.905218] mtk_soc_eth 15100000.ethernet eth1: optical SFP: interfaces=[mac=2-4,22-23, sfp=23]
-[  261.913929] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 10,13-14,47
-[  261.924104] mtk_soc_eth 15100000.ethernet eth1: optical SFP: chosen 2500base-x interface
-[  261.932199] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 00,00000000,00008000,00006400
-[  261.945449] sfp sfp-1: tx disable 1 -> 0
-[  261.950886] sfp sfp-1: SM: exit present:up:wait
-[  261.973346] hwmon hwmon0: temp1_input not attached to any thermal zone
-[  262.009896] sfp sfp-1: SM: enter present:up:wait event timeout
-[  262.015771] sfp sfp-1: SM: exit present:up:wait_los
-[  264.842218] sfp sfp-1: los 1 -> 0
-[  264.845544] sfp sfp-1: SM: enter present:up:wait_los event los_low
-[  264.851770] sfp sfp-1: SM: exit present:up:link_up
-[  264.851801] mtk_soc_eth 15100000.ethernet eth1: Link is Up - Unknown/Unknown - flow control off
-
-
-So if phylink_mii_c22_pcs_decode_state() should not set the speed, then it is not correctly set somewhere else.
-
-On 1/2/24 13:55, Eric Woudstra wrote:
->> Please describe your setup more fully. What is the link partner on this
->> 2500base-X link?
+Thomas Lange wrote:
 > 
-> I use a BananaPi R3, with the oem-sfp2.5g-t module. It has the SFP quirk that disables autoneg. I was trying Marek's rtl8221b patchset, but found that even with unmodified code,  original net-next unmodified, I could get link up, but no traffic is going through.
+> On 2024-01-02 16:26, Willem de Bruijn wrote:
+> > Thomas Lange wrote:
+> >> It seems that net/core/sock.c is missing support for SO_TIMESTAMPING_NEW in
+> >> some paths.
+> >>
+> >> I cross compile for a 32bit ARM system using Yocto 4.3.1, which seems to have
+> >> 64bit time by default. This maps SO_TIMESTAMPING to SO_TIMESTAMPING_NEW which
+> >> is expected AFAIK.
+> >>
+> >> However, this breaks my application (Chrony) that sends SO_TIMESTAMPING as
+> >> a cmsg:
+> >>
+> >> sendmsg(4, {msg_name={sa_family=AF_INET, sin_port=htons(123), sin_addr=inet_addr("172.16.11.22")}, msg_namelen=16, msg_iov=[{iov_base="#\0\6 \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., iov_len=48}], msg_iovlen=1, msg_control=[{cmsg_len=16, cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_NEW, cmsg_data=???}], msg_controllen=16, msg_flags=0}, 0) = -1 EINVAL (Invalid argument)
+> >>
+> >> This is because __sock_cmsg_send() does not support SO_TIMESTAMPING_NEW as-is.
+> >>
+> >> This patch seems to fix things and the packet is transmitted:
+> >>
+> >> diff --git a/net/core/sock.c b/net/core/sock.c
+> >> index 16584e2dd648..a56ec1d492c9 100644
+> >> --- a/net/core/sock.c
+> >> +++ b/net/core/sock.c
+> >> @@ -2821,6 +2821,7 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+> >>                   sockc->mark = *(u32 *)CMSG_DATA(cmsg);
+> >>                   break;
+> >>           case SO_TIMESTAMPING_OLD:
+> >> +       case SO_TIMESTAMPING_NEW:
+> >>                   if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+> >>                           return -EINVAL;
+> >>
+> >> However, looking through the module, it seems that sk_getsockopt() has no
+> >> support for SO_TIMESTAMPING_NEW either, but sk_setsockopt() has.
+> >> Testing seems to confirm this:
+> >>
+> >> setsockopt(4, SOL_SOCKET, SO_TIMESTAMPING_NEW, [1048], 4) = 0
+> >> getsockopt(4, SOL_SOCKET, SO_TIMESTAMPING_NEW, 0x7ed5db20, [4]) = -1 ENOPROTOOPT (Protocol not available)
+> >>
+> >> Patching sk_getsockopt() is not as obvious to me though.
+> >>
+> >> I used a custom 6.6 kernel for my tests.
+> >> The relevant code seems unchanged in net-next.git though.
+> >>
+> >> /Thomas
+> > 
+> > The fix to getsockopt is now merged:
+> > 
+> > https://lore.kernel.org/netdev/20231221231901.67003-1-jthinz@mailbox.tu-berlin.de/T/
+> > 
+> > Do you want to send the above fix to __sock_cmsg_send? 
 > 
-> On the other side is a.rock5b with rtl8125b.
-> 
-> Only after applying this patch, it works and eth1 reports link up with 2.5Gbps instead of unknown speed.
-> 
-> If you need more debugging info, I can supply it at a later time.
-> 
-> 
-> On January 2, 2024 1:10:01 PM GMT+01:00, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
->> On Tue, Jan 02, 2024 at 08:44:08AM +0100, Eric Woudstra wrote:
->>> From: Daniel Golle <daniel@makrotopia.org>
->>>
->>> Need to fix mtk_pcs_lynxi_get_state() in order for the pcs to function
->>> correctly when the interface is set to 2500base-x, even when
->>> PHYLINK_PCS_NEG_INBAND_DISABLED is set.
->>
->> Please describe your setup more fully. What is the link partner on this
->> 2500base-X link?
->>
->> In PHYLINK_PCS_NEG_INBAND_DISABLED mode, this means that phylink is
->> operating in inband mode, but Autoneg is clear in the advertisement
->> mask, meaning Autoneg is disabled and we are using a "fixed" setting.
->> state->speed and state->duplex should already be initialised.
->>
->>> When the pcs is set to 2500base-x, the register values are not compatible
->>> with phylink_mii_c22_pcs_decode_state(). It results in parameters such as
->>> speed unknown and such. Then the mac/pcs are setup incorrectly and do not
->>> function.
->>
->> Since Autoneg is clear, phylink_mii_c22_pcs_decode_state() won't
->> change state->speed and state->duplex, which should already be
->> correctly set.
->>
+> Sure, I can do that. Do you want it sent to [net]?
+
+Yes please. Same destination as the other patch, and same Fixes tag.
+
 
