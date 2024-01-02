@@ -1,89 +1,132 @@
-Return-Path: <netdev+bounces-60878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6A3821C0A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:50:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDEB2821C17
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:55:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1E561C21E88
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:50:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AAD01F229D9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B90BF517;
-	Tue,  2 Jan 2024 12:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29395F512;
+	Tue,  2 Jan 2024 12:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FfjRdeyy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SFT2wqWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803F6F4F7
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 12:50:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EDC81C433C9;
-	Tue,  2 Jan 2024 12:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704199832;
-	bh=Wj0hy3o1jNtlYIFLOvWrpYkfAWFywFNRUU3e+vCKads=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FfjRdeyyOpvkGLZv+w9XTYZp5wSzK7wxfZTSfmbcRBpUB0dsdAif0oGut51amVhpA
-	 IvXe1vVlKgN90Tq/kaK+hzZHVN+yBdxKxiugQoxvLcjhEVFgrrqq77CHaz7vfdN2oh
-	 pGFCOEB1Bx7P6x3SdsYZwAOvcqzKafQvwBO3Vz4Al42o2XITAof5OSRPKr5mSHuTVd
-	 0xmWatIqeEZ9BH+2lq3sSYB6NJ83u/7xmAI7tsfxJQLMYHVxzdv+v2BoIR6Ymv8bXe
-	 5I+FlspHDjDZhDGJZiE5dXbYFs5GT6dQa74iQOKTncZcJPINRC8EzhDbC8yO0fWf1L
-	 xdRUe9cQlTfZw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CFAEFC395F8;
-	Tue,  2 Jan 2024 12:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9332F9C3;
+	Tue,  2 Jan 2024 12:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6d9b5c4f332so1788848b3a.3;
+        Tue, 02 Jan 2024 04:55:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704200135; x=1704804935; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+6zV12XTifi7kUx3OOAHC6KwNMFaqKkolPFrVGczEkk=;
+        b=SFT2wqWOkraaELTMR/aEthoiDuaxnHaZeK/zkcrRzQCRM1YsR7ErUW0IeR9fFQm3b/
+         CW4jjOUNih9Rdi8NAF1688rmziCOxwhHJsvkazWZ+yJWEPN37p2aQT0CxJZM2z4NC0zx
+         qHXeGIOSuhYjpzxUzF7qKK9Q/trsP6JzQ9tmAxVBcy9MZix5MfdvIKZyQU1ooza3mzeJ
+         L+q5LE0pY/z52we7ucvcaQBv8xqouzmpGhkrr7IRwM5X8yKKj1XBuy69YxcrBD0JMrSr
+         g+w/0DgRbSRfsaR0cE6YKDsQHDdABXYfXQ23BBJQZAJ07SGUVnYElyqpjctHj1jtfIxw
+         3bxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704200135; x=1704804935;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+6zV12XTifi7kUx3OOAHC6KwNMFaqKkolPFrVGczEkk=;
+        b=JnVSXNvxJAOw9RwSzhSCsD3hCe2wxixizzbxDac+/VLgYvCC0Z4x46IhSRQT9sBVP5
+         p1+Y27uK7GnNNdFIsiA+zIp0YL5i4D+c9/+eWlGVXvG4ehrhLsJQvr5VVQkblF5E6HvG
+         belykfbi+LJwyGPtDCUeBTvLZOyB9J1ZNbiM2I1m4X237GyKRIg2NbHLewyfiouZt7vN
+         QnWAUqI1YluSAwpUPZO+/uZvGfJe03pI6WkzWyAV3TVVjCyhGx8XkJ76qo+SL83mf4Tf
+         isyPYzjdyFZeB4yUMpymmrRuHyPVxRhIkYrXXRx4TZYALxuGjpaCdN0bzhY1VJs3mq02
+         qTrQ==
+X-Gm-Message-State: AOJu0YxHqwTbCSzagS486jNMB81Anl1Ge/WWQp3eYTlnj1pimdi42Q1D
+	R6d67j69A++oe9JTRkVkI4k=
+X-Google-Smtp-Source: AGHT+IFRCZojliga3N9ozWGn5Eayce7SFrQ/owylc0cKJuk3qq2nb7v1hWLetkyhKqOrD4ap5xRY6A==
+X-Received: by 2002:a05:6a00:4505:b0:6d9:a0da:4fbc with SMTP id cw5-20020a056a00450500b006d9a0da4fbcmr7360079pfb.36.1704200134866;
+        Tue, 02 Jan 2024 04:55:34 -0800 (PST)
+Received: from [127.0.0.1] ([89.205.132.224])
+        by smtp.gmail.com with ESMTPSA id w37-20020a631625000000b005cd8bf50c13sm20655512pgl.58.2024.01.02.04.55.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jan 2024 04:55:34 -0800 (PST)
+Date: Tue, 02 Jan 2024 13:55:33 +0100
+From: Eric Woudstra <ericwouds@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Alexander Couzens <lynxis@fe80.eu>, Daniel Golle <daniel@makrotopia.org>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_RFC_net-next=5D_net=3A_pcs=3A_pcs-mtk-lyn?= =?US-ASCII?Q?xi_fix_mtk=5Fpcs=5Flynxi=5Fget=5Fstate=28=29_for_2500base-x?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <ZZP9GR15ufDbjGAJ@shell.armlinux.org.uk>
+References: <20240102074408.1049203-1-ericwouds@gmail.com> <ZZP9GR15ufDbjGAJ@shell.armlinux.org.uk>
+Message-ID: <92190426-3614-4774-9E9F-18F121622788@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] net/sched: retire tc ipt action
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170419983184.27874.10299234443783061890.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jan 2024 12:50:31 +0000
-References: <20231221213105.476630-1-jhs@mojatatu.com>
-In-Reply-To: <20231221213105.476630-1-jhs@mojatatu.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, jiri@resnulli.us,
- xiyou.wangcong@gmail.com, stephen@networkplumber.org, dsahern@gmail.com,
- fw@strlen.de, pctammela@mojatatu.com, victor@mojatatu.com
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+>Please describe your setup more fully=2E What is the link partner on this
+>2500base-X link?
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+I use a BananaPi R3, with the oem-sfp2=2E5g-t module=2E It has the SFP qui=
+rk that disables autoneg=2E I was trying Marek's rtl8221b patchset, but fou=
+nd that even with unmodified code,  original net-next unmodified, I could g=
+et link up, but no traffic is going through=2E
 
-On Thu, 21 Dec 2023 16:31:02 -0500 you wrote:
-> In keeping up with my status as a hero who removes code: another one bites the
-> dust.
-> The tc ipt action was intended to run all netfilter/iptables target.
-> Unfortunately it has not benefitted over the years from proper updates when
-> netfilter changes, and for that reason it has remained rudimentary.
-> Pinging a bunch of people that i was aware were using this indicates that
-> removing it wont affect them.
-> Retire it to reduce maintenance efforts.
-> So Long, ipt, and Thanks for all the Fish.
-> 
-> [...]
+On the other side is a=2Erock5b with rtl8125b=2E
 
-Here is the summary with links:
-  - [net-next,1/2] net/sched: Retire ipt action
-    https://git.kernel.org/netdev/net-next/c/ba24ea129126
-  - [net-next,2/2] net/sched: Remove CONFIG_NET_ACT_IPT from default configs
-    https://git.kernel.org/netdev/net-next/c/6d6d80e4f6bc
+Only after applying this patch, it works and eth1 reports link up with 2=
+=2E5Gbps instead of unknown speed=2E
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+If you need more debugging info, I can supply it at a later time=2E
 
 
+On January 2, 2024 1:10:01 PM GMT+01:00, "Russell King (Oracle)" <linux@ar=
+mlinux=2Eorg=2Euk> wrote:
+>On Tue, Jan 02, 2024 at 08:44:08AM +0100, Eric Woudstra wrote:
+>> From: Daniel Golle <daniel@makrotopia=2Eorg>
+>>=20
+>> Need to fix mtk_pcs_lynxi_get_state() in order for the pcs to function
+>> correctly when the interface is set to 2500base-x, even when
+>> PHYLINK_PCS_NEG_INBAND_DISABLED is set=2E
+>
+>Please describe your setup more fully=2E What is the link partner on this
+>2500base-X link?
+>
+>In PHYLINK_PCS_NEG_INBAND_DISABLED mode, this means that phylink is
+>operating in inband mode, but Autoneg is clear in the advertisement
+>mask, meaning Autoneg is disabled and we are using a "fixed" setting=2E
+>state->speed and state->duplex should already be initialised=2E
+>
+>> When the pcs is set to 2500base-x, the register values are not compatib=
+le
+>> with phylink_mii_c22_pcs_decode_state()=2E It results in parameters suc=
+h as
+>> speed unknown and such=2E Then the mac/pcs are setup incorrectly and do=
+ not
+>> function=2E
+>
+>Since Autoneg is clear, phylink_mii_c22_pcs_decode_state() won't
+>change state->speed and state->duplex, which should already be
+>correctly set=2E
+>
 
