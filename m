@@ -1,74 +1,72 @@
-Return-Path: <netdev+bounces-60893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E16A4821CF1
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:42:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D66F7821D17
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:51:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 802351F22969
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:42:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6876BB21F1E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A74FC00;
-	Tue,  2 Jan 2024 13:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E1911733;
+	Tue,  2 Jan 2024 13:50:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C32DFBF6
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 13:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446E2125C7
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 13:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7ba97338185so1172643739f.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 05:42:30 -0800 (PST)
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-35ff20816f7so85756625ab.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 05:50:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704202949; x=1704807749;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aQf4vuacvd9yifzeZtNC0Acc2lFbtoxn1Tig8dfG3Tk=;
-        b=B3uqOgBH3MqamzSF05aFuGbPYKzBoZGjMo8B2TcerJTpCLhKebkSS/30i7Hgh3vcDH
-         vhJg0+ae/JWKj07dM/dwNPFJi0AMsRraDvghYAi0qMPdoPQQ0id6owLUiGVpR7Fc6VLV
-         AlzA8Le0XAS1wVVD2FYpjZIsoJ7EGPJA0dlzC5B9wX2LV+Kf2Kyri+X0H0OHGPcl0Pn8
-         cQU/aDOLn6OyVytbyLkm16CtYi3cs452VBN8dXB/cOAlekzUZM4TBz2T7CbedU2dFsNs
-         MgzNtR5kNbf0HuEYBRC5NQTfCyv1/1N2xSBujjIzQQQ6e/Ck4SdkazyrAsAar5kavO4Y
-         4i2Q==
-X-Gm-Message-State: AOJu0Ywvk3s5RY/NiQOZ8LTpaSxVmLi4gWcPGYhSOIt2utAzTz9u0PrY
-	elci9YfMxwA5Hig0pUUSIUBJSVJT2KP/yOW3ZjYeGhrPuSg1
-X-Google-Smtp-Source: AGHT+IHpfgO/iWwluzNRvkbtKAz3sm6zOo2s0906NPXXxwsLSCVxGF4/psRoxMHpL/alH0Ub82OEO1hlRj0GXbobHpiK0jqEZ/fH
+        d=1e100.net; s=20230601; t=1704203430; x=1704808230;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LhJ89AkZ2mQ4piGsbTa90hp+hsirbmIqRZBxh3Kialc=;
+        b=iDE04BaHbmAmjKHQy+/kOZTFPKx4TwHwNLPY+OdbQS4YiwhgFnNKdvzArIUaryX4ox
+         RHv2XdxBVh3N/AU8VHSSF5WCT3maY8oahutVTqh1TS2SAE1lLl8A9z1Zb1drICzSWmw8
+         JcF69R7k4IpVbw7irZ0cVzJgWTcgV/EOYUli4GJAVsYdC0hnHX+uiBtYFnCol3D9cGpI
+         JX3HMZSzZK7p1oPwTzrG554RglZaeU7A2jLIRZLnr/nbn20ljDf1E2pcA01p0kl1EWu/
+         e9VvHPbgnBFzWHA1u/J/oFNZKeGDLPG5ll9n4tHNtvpkWBxwDtxj8T2s3pnanc+cmE5A
+         htew==
+X-Gm-Message-State: AOJu0YxuINFM7V2xOuTH9vBl/r8N2cx/95PaeCgnZIYALESqmeR1gRNq
+	HLh5zXhydXuXsCZ5SXORKwI+4hAlE3O2fuuWyiaNl54Pen4t
+X-Google-Smtp-Source: AGHT+IHxsCT3t3osXnl1PfZRW9uRbIBaHneHi1+uMWzCQkknaeN03l1sz3/Xic3uQ3oU3aTaPbeNa4aiQVm4z9mH+qkEvoIKD3Bp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b24:b0:35f:f01e:bb1d with SMTP id
- e4-20020a056e020b2400b0035ff01ebb1dmr1816322ilu.5.1704202949655; Tue, 02 Jan
- 2024 05:42:29 -0800 (PST)
-Date: Tue, 02 Jan 2024 05:42:29 -0800
+X-Received: by 2002:a05:6e02:388a:b0:35f:f683:f76a with SMTP id
+ cn10-20020a056e02388a00b0035ff683f76amr1598987ilb.3.1704203429980; Tue, 02
+ Jan 2024 05:50:29 -0800 (PST)
+Date: Tue, 02 Jan 2024 05:50:29 -0800
+In-Reply-To: <0000000000005f31a3060de282e6@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000708723060df6ab96@google.com>
-Subject: [syzbot] [wpan?] KMSAN: uninit-value in ieee802154_hdr_push (2)
-From: syzbot <syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, 
-	miquel.raynal@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Message-ID: <00000000000011afb4060df6c8d4@google.com>
+Subject: Re: [syzbot] [nfc?] [net?] KMSAN: uninit-value in nci_ntf_packet
+From: syzbot <syzbot+29b5ca705d2e0f4a44d2@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
-
-syzbot found the following issue on:
+syzbot has found a reproducer for the following issue on:
 
 HEAD commit:    610a9b8f49fb Linux 6.7-rc8
 git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1419f31ae80000
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=15d58055e80000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=e51fe20c3e51ba7f
-dashboard link: https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+dashboard link: https://syzkaller.appspot.com/bug?extid=29b5ca705d2e0f4a44d2
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12551029e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12595b95e80000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1119f31ae80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15649d81e80000
 
 Downloadable assets:
 disk image: https://storage.googleapis.com/syzbot-assets/28ecdd56de1e/disk-610a9b8f.raw.xz
@@ -76,61 +74,47 @@ vmlinux: https://storage.googleapis.com/syzbot-assets/3c5afc17c174/vmlinux-610a9
 kernel image: https://storage.googleapis.com/syzbot-assets/96ff79b2992d/bzImage-610a9b8f.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com
+Reported-by: syzbot+29b5ca705d2e0f4a44d2@syzkaller.appspotmail.com
 
+nci: nci_rf_discover_ntf_packet: unsupported rf_tech_and_mode 0xff
 =====================================================
-BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
-BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
- ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
- ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
- ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
- wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
- dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
- ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+BUG: KMSAN: uninit-value in nci_rf_discover_ntf_packet net/nfc/nci/ntf.c:386 [inline]
+BUG: KMSAN: uninit-value in nci_ntf_packet+0x2ac8/0x39c0 net/nfc/nci/ntf.c:798
+ nci_rf_discover_ntf_packet net/nfc/nci/ntf.c:386 [inline]
+ nci_ntf_packet+0x2ac8/0x39c0 net/nfc/nci/ntf.c:798
+ nci_rx_work+0x213/0x500 net/nfc/nci/core.c:1522
+ process_one_work kernel/workqueue.c:2627 [inline]
+ process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2700
+ worker_thread+0xf45/0x1490 kernel/workqueue.c:2781
+ kthread+0x3ed/0x540 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+Uninit was created at:
+ slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ virtual_ncidev_write+0x6d/0x280 drivers/nfc/virtual_ncidev.c:120
+ vfs_write+0x561/0x1490 fs/read_write.c:582
+ ksys_write+0x20f/0x4c0 fs/read_write.c:637
+ __do_sys_write fs/read_write.c:649 [inline]
+ __se_sys_write fs/read_write.c:646 [inline]
+ __x64_sys_write+0x93/0xd0 fs/read_write.c:646
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-Local variable hdr created at:
- ieee802154_header_create+0x4e/0xc00 net/mac802154/iface.c:360
- wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
- dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
-
-CPU: 1 PID: 5009 Comm: syz-executor271 Not tainted 6.7.0-rc8-syzkaller #0
+CPU: 1 PID: 4386 Comm: kworker/u4:31 Not tainted 6.7.0-rc8-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Workqueue: nfc2_nci_rx_wq nci_rx_work
 =====================================================
 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
 If you want syzbot to run the reproducer, reply with:
 #syz test: git://repo/address.git branch-or-commit-hash
 If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
