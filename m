@@ -1,100 +1,69 @@
-Return-Path: <netdev+bounces-61054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F55822568
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 00:13:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21EF782257D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 00:29:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C6C51F22B15
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:13:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF8EA1F2299F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0B517732;
-	Tue,  2 Jan 2024 23:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C01A1774A;
+	Tue,  2 Jan 2024 23:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJjsmtaa"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8C81772C;
-	Tue,  2 Jan 2024 23:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rKnx0-0001EK-1z;
-	Tue, 02 Jan 2024 23:13:35 +0000
-Date: Wed, 3 Jan 2024 00:10:54 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Alexander Couzens <lynxis@fe80.eu>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC net-next] net: pcs: pcs-mtk-lynxi fix
- mtk_pcs_lynxi_get_state() for 2500base-x
-Message-ID: <ZZSX_oNUIQr6R9FU@pidgin.makrotopia.org>
-References: <20240102074408.1049203-1-ericwouds@gmail.com>
- <ZZP9GR15ufDbjGAJ@shell.armlinux.org.uk>
- <92190426-3614-4774-9E9F-18F121622788@gmail.com>
- <74223164-ab50-4d6d-a4f4-561b0a70d396@gmail.com>
- <ZZRrk85SCDmo76NJ@pidgin.makrotopia.org>
- <6666EB36-984E-4898-A41A-2D9713DE4DB0@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8318E17740
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 23:29:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B526FC433C7;
+	Tue,  2 Jan 2024 23:29:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704238153;
+	bh=u0MjpuL2LRbgaDrM37UMSAtafXNWxtSoQQhVY08Yqrk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hJjsmtaa3EBld9Y9xI2z0GttBIxlNNqDb66juv0tn+6OgE74P9k4YWzaY3ja6cxbU
+	 94dtGz9BKCKxsIdyBfCvHgEytxrGq20wMwimGTvMq6S9EFu6BDQw2xh1QlAUJn1nqL
+	 iGzJea5A1MmJnLLd8JmBT7Qw0/yyeIT7cFk6Dsmw9Lf4JCKelQIlntZPvzOnCHf1ty
+	 1XSSRdlheQMx9jNw8Q9cC0eq+X1xmeJ9HluMrlBivnqed6hC5KWk0QNwfKtj//F/Y7
+	 Sso11HODxpkedqMAZAlXmSfjwz+1zsIWsKxzqREFhXb1uTv12sEAzuAq3F3ZyyolRo
+	 /QV4aUCxBazsw==
+Date: Tue, 2 Jan 2024 15:29:11 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ivan Babrou
+ <ivan@cloudflare.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH v4 net-next 0/4] af_unix: Random improvements for GC.
+Message-ID: <20240102152911.20171dee@kernel.org>
+In-Reply-To: <20231219030102.27509-1-kuniyu@amazon.com>
+References: <20231219030102.27509-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6666EB36-984E-4898-A41A-2D9713DE4DB0@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 02, 2024 at 11:13:58PM +0100, Eric Woudstra wrote:
-> I believe the general idea is that phylink should be aware wether to use inband or outband negotiation in order to setup the hardware correctly. Speaking of a situation where there is a PHY attached.
-
-Well, SGMII speed/duplex AN is not defined for 2500Base-X by any
-standard and not supported by the hardware (unlike e.g. RealTek
-which came up with their own proprietary extension called HiSGMII).
-
-So we should simply never set the SGMII_SPEED_DUPLEX_AN bit if using
-2500Base-X on MediaTek LynxI PCS -- in-band link status will still work,
-and as 2500Base-X anyway only supports 2500M speed at full duplex it is
-not a problem that speed and duplex are hard-coded in the driver in this
-case imho. And that works fine for SFPs with and without
-present/discoverable/accessible PHY.
-
-Surely, having phylink take care whether SGMII_SPEED_DUPLEX_AN should be
-set would be even nicer.
-
-I believe that source of confusion here is simply that
-
-in-band-status != SGMII_SPEED_DUPLEX_AN
-
-We *do* have in-band-status even without having SGMII_SPEED_DUPLEX_AN set
-with 2500Base-X link mode (as in: link being up or down and link, duplex
-and speed is fixed anyway for 2500Base-X).
-
-
+On Tue, 19 Dec 2023 12:00:58 +0900 Kuniyuki Iwashima wrote:
+> If more than 16000 inflight AF_UNIX sockets exist on a host, each
+> sendmsg() will be forced to wait for unix_gc() even if a process
+> is not sending any FD.
 > 
-> On January 2, 2024 9:01:23 PM GMT+01:00, Daniel Golle <daniel@makrotopia.org> wrote:
-> >On Tue, Jan 02, 2024 at 08:33:32PM +0100, Eric Woudstra wrote:
-> >> [...]
-> >> 
-> >> So if phylink_mii_c22_pcs_decode_state() should not set the speed, then it is not correctly set somewhere else.
-> >
-> >Yes, but the fix should go to pcs-mtk-lynxi.c and you don't need to
-> >change phylink for it to work.
-> >This should be enough:
-> >https://patchwork.kernel.org/project/netdevbpf/patch/091e466912f1333bb76d23e95dc6019c9b71645f.1699565880.git.daniel@makrotopia.org/
-> >
+> This series tries not to impose such a penalty on sane users who
+> do not send AF_UNIX FDs or do not have inflight sockets more than
+> SCM_MAX_FD * 8.
+> 
+> Cleanup patches for commit 69db702c8387 ("io_uring/af_unix: disable
+> sending io_uring over sockets") will be posted later as noted in [0].
+
+Could you repost? I tried to revive it in patchwork but I think 
+it keeps getting Archived because it's more than 2 weeks old :(
 
