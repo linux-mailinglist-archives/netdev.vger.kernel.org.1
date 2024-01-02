@@ -1,97 +1,83 @@
-Return-Path: <netdev+bounces-60962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60191822075
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:35:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5242782207E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:41:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAD8C1F230EA
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:35:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 068631F2309F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453431549F;
-	Tue,  2 Jan 2024 17:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E51D154BD;
+	Tue,  2 Jan 2024 17:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lX8vRVOl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ct11qgvk"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87478156C8;
-	Tue,  2 Jan 2024 17:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=88r7GWZg9xFdEciPBDZ+JiD1krfoRUPpwddSStVgxfI=; b=lX8vRVOlpuM7hDdD6K2fvkbOZd
-	VPP1QhUFJ4aS6XuiyBU0+LaB5nF8+uXuDtdGI6avGTcWrZ/BL8p7az1o7FPvyNdZipjGK2ah5ynfz
-	TG2AteKgS+BoCTpBZmmMTQhzrrZ9b8WMT3dpxn+sl2zLSyjzteRW/mgRNvCOCwBK8WZ2SgB0XUEkm
-	DSPk6qJSzoeTwUKbcGMN1b2pv7lC1HKOqCx5vtRrmjZagAwnDWZXQZCQ9MvJynlJcC9C0lTjOQ0YW
-	llhPsiBz3W6zNEhp9vCe6BDndWXdRk+ey1c1ieFBY8koLAz80NK8Aql1GaYPRKFlcNgOzTIxKjdEo
-	3JHPgw8g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58516)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKiey-0006lm-0p;
-	Tue, 02 Jan 2024 17:34:36 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKif0-0005VF-Bu; Tue, 02 Jan 2024 17:34:38 +0000
-Date: Tue, 2 Jan 2024 17:34:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew@lunn.ch, olteanv@gmail.com,
-	hkallweit1@gmail.com, kabel@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org
-Subject: Re: [PATCH net-next] net: phy: Cleanup struct mdio_driver_common
-Message-ID: <ZZRJLg6U0G5CNRQ0@shell.armlinux.org.uk>
-References: <20231228072350.1294425-1-yajun.deng@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EA5154B1;
+	Tue,  2 Jan 2024 17:40:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 85997C433C9;
+	Tue,  2 Jan 2024 17:40:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704217253;
+	bh=p6ZDM8xETWz/WD37I2S+OM5z0ce2aPFxnW9wU1Avuzs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ct11qgvkbDRYSPlD1JBzMJYclKiypSF4iJGv+edh1xbd7HzVY89f+1T8PsZmFzfAk
+	 HhVFrk7/zgdMWc1uakD+yhzdaJyvvcQhUNWOon4KkIgRy+OWPTfaY2pQBfRi6sg9iT
+	 44V2iAvFSYpxFeQ1Q8FuB4GbNljHL9mF8C7uzEsvUs5HN/30qW6nm+B+tAcr3z+eMg
+	 fvsclFmYBnmin7H6BrSO5XqTrw0ll6WJSLicNtHjZwIpntxylAusWDdy/9vw4wTZ0C
+	 ZcBTrH1izTHlhmr+KgP7LGrQNI1c5sWK8h9faOb/VCYL+JTTUrdCu+tCPh557jM8Zq
+	 uglkQ62JhnZMw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 63908C395C5;
+	Tue,  2 Jan 2024 17:40:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231228072350.1294425-1-yajun.deng@linux.dev>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull request: bluetooth-next 2023-12-22
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170421725340.27590.4291986758945353702.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jan 2024 17:40:53 +0000
+References: <20231222184625.2813676-1-luiz.dentz@gmail.com>
+In-Reply-To: <20231222184625.2813676-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-On Thu, Dec 28, 2023 at 03:23:50PM +0800, Yajun Deng wrote:
-> The struct mdio_driver_common is a wrapper for driver-model structure,
-> it contains device_driver and flags. There are only struct phy_driver
-> and mdio_driver that use it. The flags is used to distinguish between
-> struct phy_driver and mdio_driver.
+Hello:
+
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri, 22 Dec 2023 13:46:24 -0500 you wrote:
+> The following changes since commit 27c346a22f816b1d02e9303c572b4b8e31b75f98:
 > 
-> We can test that if probe of device_driver is equal to phy_probe. This
-> way, the struct mdio_driver_common is no longer needed, and struct
-> phy_driver and usb_mdio_driver will be consistent with other driver
-> structs.
+>   octeontx2-af: Fix a double free issue (2023-12-22 13:31:54 +0000)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-12-22
+> 
+> [...]
 
-usb_mdio_driver?
+Here is the summary with links:
+  - pull request: bluetooth-next 2023-12-22
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8a48a2dc24f8
 
-I'm not sure why this consistency is even desired, the commit message
-doesn't properly say _why_ this change is being proposed.
-
-> +bool is_phy_driver(struct device_driver *driver)
-> +{
-> +	return driver->probe == phy_probe;
-> +}
-> +EXPORT_SYMBOL_GPL(is_phy_driver);
-
-Do we really need this exported? It doesn't seem like something anything
-other than core MDIO/phylib code should know about, and all that becomes
-a single module when building it in a modular way - phylib can't be a
-separate module from mdio stuff.
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
