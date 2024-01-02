@@ -1,156 +1,195 @@
-Return-Path: <netdev+bounces-60829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0DDF8219D5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:32:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C02988219E3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:33:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50159B21B6C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:32:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B445B219D6
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2FED28D;
-	Tue,  2 Jan 2024 10:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFD0D26A;
+	Tue,  2 Jan 2024 10:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="UvbnHLHE"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="SYn1pykk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.14])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB6FDDAD;
-	Tue,  2 Jan 2024 10:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1704191496; x=1704796296; i=markus.elfring@web.de;
-	bh=byLjICH9kZFXAhhR7l1uz0KXqLkgIwDGVOFiUikXwjw=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=UvbnHLHE18UZfNoQinmJ5WClJpEmsnAxcznti26bUEb4k/E/6paOYmFB8aSKz/xG
-	 GIcohZH93ewA8ql7aafpXZG+/Q9As8dU558NPrg+Nj5Ub/Pv/EfQxF7rM43r1+pmp
-	 CaVX7o18hFfmmtuugXiXfUE8hNzYfc+pUOo5uFRmtlADn3JVqlU26PLVDuCYrb95U
-	 vDaHh2gjjc0U76o70y2YRE0Fynd6B8eFwtQMB+rCVXuW3JF1Mg2Mj1Z12aWrF6Lis
-	 +a0gyJ3xkxoKj4e7nTuln7FyT4lyLFzVApgfGhWMhzT0rRiu4ZRIcrGieY0h50IkL
-	 D/GkH1p1YzwEULNr4w==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N3ouq-1rBZdI2IAy-00zyNb; Tue, 02
- Jan 2024 11:31:36 +0100
-Message-ID: <d2e5c263-c0aa-4297-b446-f013af7eb80f@web.de>
-Date: Tue, 2 Jan 2024 11:31:35 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4072BEACE;
+	Tue,  2 Jan 2024 10:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 402AXGpr062512;
+	Tue, 2 Jan 2024 04:33:16 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1704191596;
+	bh=BxYuu9G3Hpb/Bs5A+un9uQi+qqPTeusWxKQoqmwv1vk=;
+	h=Date:CC:Subject:To:References:From:In-Reply-To;
+	b=SYn1pykkwzhGWSGWpw6AbAOWRWX0h1Rs6+HwHanHThwzKhu2VZ32qDq0Tj0r5RcRm
+	 Nw8HYVth98SnG7xEQ1tb4CmbLTeeLcZ2h0fQjuRQ7mT0gMLAKRD0Fh4jMswRjN/nNs
+	 R4l9fIG8ZR366xUEFNGCkgva0CXihIt/LOAO8lz0=
+Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 402AXGjM106382
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 2 Jan 2024 04:33:16 -0600
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 2
+ Jan 2024 04:33:15 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 2 Jan 2024 04:33:15 -0600
+Received: from [10.249.131.186] ([10.249.131.186])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 402AXCks027081;
+	Tue, 2 Jan 2024 04:33:13 -0600
+Message-ID: <162e12c7-c7c1-3bf9-48ec-05ee3c30e784@ti.com>
+Date: Tue, 2 Jan 2024 16:03:11 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] net/iucv: Improve unlocking in iucv_enable()
-Content-Language: en-GB
-To: Alexandra Winter <wintera@linux.ibm.com>, Suman Ghosh
- <sumang@marvell.com>, "linux-s390@vger.kernel.org"
- <linux-s390@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>,
- "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <cde82080-c715-473c-97ac-6ef66bba6d64@web.de>
- <81f7db31-a258-4dc8-b6e1-c1ef1844a9d2@web.de>
- <SJ0PR18MB5216C27127E46490951A1E5DDB61A@SJ0PR18MB5216.namprd18.prod.outlook.com>
- <8123a895-c7dd-4a75-94bc-6f61639621eb@web.de>
- <SJ0PR18MB52168AC4B874C0B99BD37039DB61A@SJ0PR18MB5216.namprd18.prod.outlook.com>
- <2bf1b0cb-86af-4e00-a0aa-23e3944617a2@linux.ibm.com>
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <2bf1b0cb-86af-4e00-a0aa-23e3944617a2@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:vwvz92Bt8HT7eNV3Wmw65q6wPiFzhtMoY5oZu8ovAx9ruR5aR/u
- +tP5/8TYnDV6TukFkGVK5FHlNA22DelulzoEZ4HDvAoIbdgX2BdHUXHnILdX1b5ZXqgqglj
- 2752rA2H4yNc8SQFEC8O7e6onYHBLEmIgsIptaG8+Vx2PzcLuv3KyBsmJPeRPDYWH5FIRAd
- 9TnVWIvwtsxF7m2J4alNw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:N+sZX2iAzmM=;yViQHahgU4NVsBOTP6sDp3nZcfO
- 5oYUrWBM77Aet6jAwMVrgn81lJyL1DXbUrttOuRcVw359powYsbjEk8O1jZ+c8sfi961W2PZ8
- x9xQ+iaYA3KjEPYrvbdGmUnz1X5ffXGFVY1p9NptMTtwfCFg4Qsfmhvr1DSYLpgxXsv+jQQnz
- 2Wqi3TLx+ZszNN37nuK7ChIPOpUDYpiTUn2/j3lEifMBKjygFkCQRMde6vY6+8tdzaijEY6OR
- zcbAQYOi8YEQNUNvJEr9G5kdtoQv+3tAA3enqPjdQebe3RunU3nGwWT3slutmeI0+nQAHNIdi
- oropFxKVTPI38zpaQdofHwTFa2wtsE3nXIElxTcyZl7Lv/ZCC1vrc31lHTdmyAPNG2Gjq7cOe
- 3rj7sUQDGE9pUYc5mSczL81A2jCmI5hxeGAPqKk16aTZBCviJX1bKqQeXXKCvbLTZSNuD8GTA
- EyRwcn9GI0Z0v1PqcdMB5ZuAt+3FABNMIfhfrw/qvVqG0a4D90b2zXEhJ8k6ExtgLV80IDFUx
- vGIvEfaBSWilCrXirD+PT9kjn+J12MrSqpsVvppW93oGcw0E3ZtLQfhJPhvH5VDYSp+B5hYWi
- F9oKQ4spKIuiRKEejNNWUxEtp+e9TQXRvE5WrGa7tUOZA/7JcM9TPRVEVTviB1XB2zT1upa6Z
- jLHQlrJlzwXQH3RlFyiqpGkA06aKeYGNp0DPJK7h6ipbQl+HQjPDnDHT2uXgD2E600tS6DljB
- wDrpHoJ2p9uA1vs62VGjP0qJ3PIKl0uyytsNLNxtPnkmdoi2PhfGz3T1EOg45QIbFe8BcowOg
- KP5SEtlRrrQZKbycwwiHbGAenCBfiowz7LgFx57cBOeAceeTrJEDIXlV+G1H/icMMwMmnkXSg
- JArFpi8UAIeCs/Vtab7nAJObPhw16zi3467zLOB1/aLen15nyZpXdGqxqgf6rzrGm64bSoTUj
- ITVFcw==
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        <s-vadapalli@ti.com>
+Subject: Re: [PATCH 3/3] net: ethernet: ti: am65-cpsw: Add device tree
+ property to set max MTU
+Content-Language: en-US
+To: =?UTF-8?B?U2FuanXDoW4gR2FyY8OtYSwgSm9yZ2U=?=
+	<Jorge.SanjuanGarcia@duagon.com>
+References: <20240102081825.14635-1-jorge.sanjuangarcia@duagon.com>
+ <c025f2f9-ca2c-4fdb-adb1-803745fded0c.a613f387-0b3b-49fd-9401-3a0ed0c1f80e.20d242d9-3999-48e2-8a9e-cd0f9ba3351c@emailsignatures365.codetwo.com>
+ <20240102081825.14635-4-jorge.sanjuangarcia@duagon.com>
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+In-Reply-To: <20240102081825.14635-4-jorge.sanjuangarcia@duagon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-> I share Suman's concern that jumping backwards goto is confusing.
-> But I think the Coccinelle finding of freeing a null-pointer should be a=
-ddressed (see patch 2/2)
-> Thank you Markus for reporting it.
->
-> The allocation does require holding the cpus_read_lock.
+Hello,
 
-How does this information fit to your following suggestion to adjust the l=
-ock scope?
+On 02-01-2024 13:49, Sanjuán García, Jorge wrote:
+> The switch supports ethernet frame sizes between 64 and 2024 bytes
+> (including VLAN) as stated in the technical reference manual.
 
+Could you please share the source for the "2024 bytes" mentioned above?
+In J7200 SoC's TRM, I see support for up to 9604 bytes (including VLAN)
+in the "CPSW_PN_RX_MAXLEN_REG_k" register description for CPSW5G
+instance of CPSW.
 
-> For some reason Markus wants to reduce the number of cpus_read_unlock() =
-calls (why?),
+> 
+> This patch adds a new devicetree property so the switch ports can
+> be configured with an MTU higher than the standar 1500 bytes, making
 
-One cpus_read_unlock() call is required here.
-Would you like to benefit more from a smaller executable code size?
+nitpick: standar/standard.
 
+> the max frame length configured on the registers and the max_mtu
+> advertised on the network device consistent.
+> 
+> Signed-off-by: Jorge Sanjuan Garcia <jorge.sanjuangarcia@duagon.com>
+> ---
 
-> so what about something like this for both issues:
->
-> diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-> index 0ed6e34d6edd..1030403b826b 100644
-> --- a/net/iucv/iucv.c
-> +++ b/net/iucv/iucv.c
-> @@ -542,24 +542,22 @@ static int iucv_enable(void)
->         size_t alloc_size;
->         int cpu, rc;
->
-> -       cpus_read_lock();
-> -       rc =3D -ENOMEM;
->         alloc_size =3D iucv_max_pathid * sizeof(struct iucv_path);
->         iucv_path_table =3D kzalloc(alloc_size, GFP_KERNEL);
->         if (!iucv_path_table)
-> -               goto out;
-> +               return -ENOMEM;
->         /* Declare per cpu buffers. */
-> -       rc =3D -EIO;
-> +       cpus_read_lock();
->         for_each_online_cpu(cpu)
->                 smp_call_function_single(cpu, iucv_declare_cpu, NULL, 1)=
-;
-> -       if (cpumask_empty(&iucv_buffer_cpumask))
-> +       if (cpumask_empty(&iucv_buffer_cpumask)) {
->                 /* No cpu could declare an iucv buffer. */
-> -               goto out;
-> -       cpus_read_unlock();
-> -       return 0;
-> -out:
-> -       kfree(iucv_path_table);
-> -       iucv_path_table =3D NULL;
-> +               kfree(iucv_path_table);
-> +               iucv_path_table =3D NULL;
-> +               rc =3D -EIO;
-> +       } else {
-> +               rc =3D 0;
+For patches which add new features, please use the subject prefix
+[PATCH net-next].
+
+>   drivers/net/ethernet/ti/am65-cpsw-nuss.c | 18 ++++++++++++++----
+>   drivers/net/ethernet/ti/am65-cpsw-nuss.h |  1 +
+>   2 files changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c 
+> b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index a920146d7a60..6a5c8b6e03f4 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -56,7 +56,7 @@
+>   #define AM65_CPSW_MAX_PORTS     8
+> 
+>   #define AM65_CPSW_MIN_PACKET_SIZE       VLAN_ETH_ZLEN
+> -#define AM65_CPSW_MAX_PACKET_SIZE      (VLAN_ETH_FRAME_LEN + ETH_FCS_LEN)
+> +#define AM65_CPSW_MAX_PACKET_SIZE      2024
+> 
+>   #define AM65_CPSW_REG_CTL               0x004
+>   #define AM65_CPSW_REG_STAT_PORT_EN      0x014
+> @@ -2198,8 +2198,7 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common 
+> *common, u32 port_idx)
+>           eth_hw_addr_set(port->ndev, port->slave.mac_addr);
+> 
+>           port->ndev->min_mtu = AM65_CPSW_MIN_PACKET_SIZE;
+> -       port->ndev->max_mtu = common->rx_packet_max -
+> -                             (VLAN_ETH_HLEN + ETH_FCS_LEN);
+> +       port->ndev->max_mtu = common->max_mtu;
+
+This seems to be modifying what was added in just the previous patch.
+Isn't it better to merge these changes into a single patch?
+
+>           port->ndev->hw_features = NETIF_F_SG |
+>                                     NETIF_F_RXCSUM |
+>                                     NETIF_F_HW_CSUM |
+> @@ -2927,8 +2926,19 @@ static int am65_cpsw_nuss_probe(struct platform_device *pdev)
+>           if (common->port_num < 1 || common->port_num > AM65_CPSW_MAX_PORTS)
+>                   return -ENOENT;
+> 
+> +       common->max_mtu = VLAN_ETH_DATA_LEN;
+> +       of_property_read_u32(dev->of_node, "max-frame-size", &common->max_mtu);
+
+The device-tree property "max-frame-size" is a port-specific property.
+Therefore, it is wrong to expect the property to be present at the CPSW
+node level instead of being present within each port in the
+"ethernet-ports" node. This section should be moved into the function:
+am65_cpsw_nuss_init_slave_ports()
+which parses the device-tree nodes for each port. The "max-frame-size"
+property can be stored there on a per-port basis within a newly added
+member in "struct am65_cpsw_port" as mentioned in my previous mail for
+patch 2/3.
+
+> +
+> +       common->rx_packet_max = common->max_mtu + VLAN_ETH_HLEN + ETH_FCS_LEN;
+> +       if (common->rx_packet_max > AM65_CPSW_MAX_PACKET_SIZE) {
+> +               common->rx_packet_max = AM65_CPSW_MAX_PACKET_SIZE;
+> +               common->max_mtu = AM65_CPSW_MAX_PACKET_SIZE -
+> +                                 (VLAN_ETH_HLEN + ETH_FCS_LEN);
 > +       }
->         cpus_read_unlock();
->         return rc;
->  }
+> +
+> +       dev_info(common->dev, "Max RX packet size set to %d\n", 
+> common->rx_packet_max);
+> +
+>           common->rx_flow_id_base = -1;
+> -       common->rx_packet_max = AM65_CPSW_MAX_PACKET_SIZE;
+>           init_completion(&common->tdown_complete);
+>           common->tx_ch_num = AM65_CPSW_DEFAULT_TX_CHNS;
+>           common->pf_p0_rx_ptype_rrobin = false;
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h 
+> b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
+> index 141160223d73..3bb0ff94a46a 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
+> @@ -130,6 +130,7 @@ struct am65_cpsw_common {
+>           u32                     tx_ch_rate_msk;
+>           u32                     rx_flow_id_base;
+> 
+> +       int                     max_mtu;
+>           int                     rx_packet_max;
+> 
+>           struct am65_cpsw_tx_chn tx_chns[AM65_CPSW_MAX_TX_QUEUES];
 
+...
 
-I suggest to reconsider patch squashing a bit more.
-
+-- 
 Regards,
-Markus
+Siddharth.
 
