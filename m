@@ -1,149 +1,105 @@
-Return-Path: <netdev+bounces-60821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91FA3821965
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:06:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8742782196B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:08:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E9611F21F6B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:06:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38AA11F22186
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74807C8FF;
-	Tue,  2 Jan 2024 10:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544C4D27D;
+	Tue,  2 Jan 2024 10:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gPneWhKz"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ScwrrE9R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24A8CA78
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 10:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so93922a12.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 02:06:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE4ACA6B
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 10:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-50e766937ddso7164222e87.3
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 02:08:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704189977; x=1704794777; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gaBFQhgGMCNl0CKoyiieJpbOY1dp0lCjQtKd7lErKQk=;
-        b=gPneWhKze7bY55R1oklDs5SrtNt+7wCcxcxtFgJWFBrWwEx8Iqj26s3wgsQPVlfE1k
-         V0vmFyTCkBAd7j6a1xuLABS/PLwWpuFnK1OCJJ8oyN0+nujQSIIKBiaMNjBg2xrtmUEu
-         7I1OB9jnxo991DUfGt6xZL2Y95f1S4pSOd4i7gDaIfEJpxtvKAyuH4o+ulIJV1JsfV03
-         py6FQ9szDG5oMpSbaCZq2lEVC1K31vFwhaALm6KZqBcVSTR3KC3E9WyE4rGMEdnVxEVl
-         prEOqpyNV2R/4X+XKvji07Uo3daTf/CW9LOgxTJXsHug0JaWnMuBWBdXYVLeyyeX8DVh
-         ZPqg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704190101; x=1704794901; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eAtZ/cLbKc8KrW9U/GX6Jr7XKhavaISbuyhZEe+m+eE=;
+        b=ScwrrE9RawR3U0szKPvz4Cr6ti9gn3a4nHvZdQJYsnrU0nsGzrXpsvq48nqh/MshLp
+         Gzb93kF87+ADMnq4WA8n8WJ62GhCFOfhONKi+oyO0YqdvoItMqE6SKAtuSAUeDToFINz
+         4SVkPULw7K3r060t1hGrdOpX+xF27bTINB9Td8MRGV+Uyn7P53YsLKaX3WPUbPuxGALH
+         1bmGS7my0cca/Yvo/F1BBz1wmFRvk8sf61MyDYXvupEE592Wqyfqm7gKL9+MzRaLL+2J
+         8CxXepWBp+0q1y80XzhyweeJHBJwhzgJHWecLLQJ6LF64zys6iPqM+m826DB6NzkqR+3
+         X5ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704189977; x=1704794777;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gaBFQhgGMCNl0CKoyiieJpbOY1dp0lCjQtKd7lErKQk=;
-        b=YTv/AnvvfV1r43XBFcqgOJiN3U/a/zaJzPJc5Zb3T85J2r6r4vNaiJjnDWHY0te9bi
-         OBcK6rCOPwdlRNF54zTv31ug49ZdXywlF6a1QT+a0iVhDVcyuKDVA/qKfsTEbw+/0Jsg
-         aJoNUWUuLl3EkWrRIuGlgUk+RMa3nOxzueTBjXeXmpiZ5x3i5KKzdtqtT9HLH6B7LFFN
-         a3IudKsYREFhmzPAK8/oOLAubeH3zSbvlmpm7MYytoEeqXCgIbqOeKNAhzKAhJzxvkeO
-         VlC0hgecbX2QbT96y2N8uNHd+eGsfsyAOX3MoCKxAUNTH4veDzO3lA65m9I4UuI78pfq
-         9NVA==
-X-Gm-Message-State: AOJu0YwtNxWUcWWB9CGKnY75eNQnzoIztm/jNo5MUbkicvN96g9s7oRS
-	AlIrntNzOhaLUl0rMH3UPegqpofvg9aEqsz50JYQpSk849hp
-X-Google-Smtp-Source: AGHT+IHfeBarGiDK3r6PPvb6mDuBpyt7wTIW58KV3ZsWFRLsg712Ke/PyIEnebgkH0oDh8qG+p/cywKdVMPMcVyOMPo=
-X-Received: by 2002:a50:d705:0:b0:553:62b4:5063 with SMTP id
- t5-20020a50d705000000b0055362b45063mr1057944edi.4.1704189976931; Tue, 02 Jan
- 2024 02:06:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704190101; x=1704794901;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eAtZ/cLbKc8KrW9U/GX6Jr7XKhavaISbuyhZEe+m+eE=;
+        b=DUvsqazWa80kQm0I5a4WYQ5FqLPI5oWhVYTpcIlc5k9FhD0z5Qy2lxHRUOAi7AHlzd
+         e84JVe4IlA8h36EFQX1n9o6mMJYw5DwfX/0JC8cTlWGAmqq3gsS8w8zrl/2KA+MYphYv
+         rvhH8EbPD4hWjQ266AlM7QuEnRo9wo5JrbsaMCgTqZq3vTfX39qhFWEk9KNytnwBjLkx
+         Y4A1zn0bFDsFleIdQzNlpdOnLl27QYySTREriqMs8sAwtDGD/wwascffwFWZuYu2jR+r
+         XmIlcfWJTwMPnmVbEGJ0TkTmMYEwNNx8v+9v4QxOxrcx2zvIddNraCv8afyDxEjBaa6x
+         0gSw==
+X-Gm-Message-State: AOJu0YyPK5Fw6uSdMRlVggv+itpiWLpQrCluBH58oOdB22/qvEjDJQHe
+	gGPUepu7IoSNu/YJPJdEcwDfikANL9IPOw==
+X-Google-Smtp-Source: AGHT+IE2mR6lqs7hEq/27M1sc6LtwTkvrnGtnYSFSdGG+/HIgINj2ipR2TYu6xVLxoJFnjeDuHETsg==
+X-Received: by 2002:a05:6512:473:b0:50e:70b1:9544 with SMTP id x19-20020a056512047300b0050e70b19544mr5825234lfd.111.1704190100956;
+        Tue, 02 Jan 2024 02:08:20 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id d15-20020a056000114f00b00337464bf71bsm1770277wrx.39.2024.01.02.02.08.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 02:08:20 -0800 (PST)
+Date: Tue, 2 Jan 2024 11:08:19 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Aurelien Aptel <aaptel@nvidia.com>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+	sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+	chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
+	aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
+	ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+	galshalom@nvidia.com, mgurtovoy@nvidia.com, edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [PATCH v22 02/20] netlink: add new family to manage ULP_DDP
+ enablement and stats
+Message-ID: <ZZPgk3mrEkciwI_7@nanopsycho>
+References: <20231221213358.105704-1-aaptel@nvidia.com>
+ <20231221213358.105704-3-aaptel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <MN2PR12MB44863139E562A59329E89DBEB982A@MN2PR12MB4486.namprd12.prod.outlook.com>
- <CANn89iKvG5cTNROyBF32958BzATfXysh4zLk5nRR6fgi08vumA@mail.gmail.com>
- <MN2PR12MB4486457FC77205D246FC834AB98BA@MN2PR12MB4486.namprd12.prod.outlook.com>
- <CANn89i+e2TcvSU1EgrVZRUoEmZ5NDauXd3=kEkjpsGjmaypHOw@mail.gmail.com>
- <cdf72778-a314-467d-8ac8-163d2007fd70@leemhuis.info> <20231227083339.GA6849@unreal>
- <CANn89iK_Q38g1ieEb1MVvmVgiKQxmv9Hzngu_pCcXcwGs7cPLQ@mail.gmail.com> <20240102095529.GE6361@unreal>
-In-Reply-To: <20240102095529.GE6361@unreal>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Jan 2024 11:06:05 +0100
-Message-ID: <CANn89iLp_xeGScTWnQA50zGPo+eo7=GFcqGxCrSLRteYONtc8A@mail.gmail.com>
-Subject: Re: Bug report connect to VM with Vagrant
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>, Shachar Kagan <skagan@nvidia.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>, Ido Kalir <idok@nvidia.com>, 
-	Topaz Uliel <topazu@nvidia.com>, Shirly Ohnona <shirlyo@nvidia.com>, 
-	Ziyad Atiyyeh <ziyadat@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221213358.105704-3-aaptel@nvidia.com>
 
-On Tue, Jan 2, 2024 at 10:55=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
-rote:
+Thu, Dec 21, 2023 at 10:33:40PM CET, aaptel@nvidia.com wrote:
+>Add a new netlink family to get/set ULP DDP capabilities on a network
+>device and to retrieve statistics.
 >
-> On Tue, Jan 02, 2024 at 10:49:58AM +0100, Eric Dumazet wrote:
-> > On Wed, Dec 27, 2023 at 9:33=E2=80=AFAM Leon Romanovsky <leon@kernel.or=
-g> wrote:
-> > >
-> > > On Fri, Dec 15, 2023 at 10:55:05AM +0100, Linux regression tracking (=
-Thorsten Leemhuis) wrote:
-> > > > On 08.12.23 11:49, Eric Dumazet wrote:
-> > > > > On Thu, Dec 7, 2023 at 2:03=E2=80=AFPM Shachar Kagan <skagan@nvid=
-ia.com> wrote:
-> > > > >>>> On Thu, Nov 30, 2023 at 2:55=E2=80=AFPM Shachar Kagan <skagan@=
-nvidia.com> wrote:
-> > > > >>>>
-> > > > >>>> I have an issue that bisection pointed at this patch:
-> > > > >>>> commit 0a8de364ff7a14558e9676f424283148110384d6
-> > > > >>>> tcp: no longer abort SYN_SENT when receiving some ICMP
-> > > > >>>
-> > > > >>> Please provide tcpdump/pcap captures.
-> > > > >>>
-> > > > >>>  It is hard to say what is going on just by looking at some app=
-lication logs.
-> > > > >>
-> > > > >> I managed to capture the tcpdump of =E2=80=98Vagrant up=E2=80=99=
- step over old kernel and new kernel where this step fails. Both captures a=
-re attached.
-> > > > >> The tcpdump is filtered by given IP of the nested VM.
-> > > > >
-> > > > > I do not see any ICMP messages in these files, can you get them ?
-> > > > >
-> > > > > Feel free to continue this exchange privately, no need to send MB
-> > > > > email to various lists.
-> > > >
-> > > > Here this thread died, so I assume this turned out to be not a
-> > > > regression at all or something like that? If not please speak up!
-> > >
-> > > No, it wasn't fixed and/or reverted. Right now, Vagrant is broken and
-> > > all our regressions around nested VM functionality doesn't run.
-> > >
-> > > Eric, can you please revert the bisected patch while you are continui=
-ng
-> > > your offline discussion with Shachar?
-> > >
-> >
-> > This is not how things work.
-> >
-> > I have not received any evidence yet, only partial packet dumps with
-> > no ICMP messages that could be related to the 'Vagrant issue'
+>The messages use the genetlink infrastructure and are specified in a
+>YAML file which was used to generate some of the files in this commit:
 >
-> Revert of the original patch worked, so it is strong enough evidence to d=
-o
-> not break very popular orchestration software.
+>./tools/net/ynl/ynl-gen-c.py --mode kernel \
+>    --spec ./Documentation/netlink/specs/ulp_ddp.yaml --header \
+>    -o net/core/ulp_ddp_gen_nl.h
+>./tools/net/ynl/ynl-gen-c.py --mode kernel \
+>    --spec ./Documentation/netlink/specs/ulp_ddp.yaml --source \
+>    -o net/core/ulp_ddp_gen_nl.c
+>./tools/net/ynl/ynl-gen-c.py --mode uapi \
+>    --spec ./Documentation/netlink/specs/ulp_ddp.yaml --header \
+>    > include/uapi/linux/ulp_ddp.h
 >
-> >
-> > Patch is adhering to the RFC.
-> >
-> > If an application wants to have fast reaction to ICMP, it must use
-> > appropriate socket options instead of relying on a prior
-> > implementation detail.
->
-> Maybe yes, maybe not. Right now, Vagrant is broken.
+>Signed-off-by: Shai Malin <smalin@nvidia.com>
+>Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
 
-Maybe, but after one month, I still have not received any evidence of the i=
-ssue.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
