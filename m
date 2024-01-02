@@ -1,112 +1,198 @@
-Return-Path: <netdev+bounces-60784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEFCE821808
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:39:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D68BC821810
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:43:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8FF61C213D1
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 07:38:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 803832827AC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 07:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E681F1FD2;
-	Tue,  2 Jan 2024 07:38:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20F51C29;
+	Tue,  2 Jan 2024 07:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="DAo3I87Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mol/eurh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942FD20F8;
-	Tue,  2 Jan 2024 07:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1704181113; x=1704785913; i=markus.elfring@web.de;
-	bh=4njice7TZkWFEO2ORipwga62AkVl5tLjIIrG5yvHNOw=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=DAo3I87Qcp6nkZVpLswU4ZBX8RZfBSPwittpiQmcr8H9YN9aaF4VHZeIxP4i+uNh
-	 ky5xiIarNI62pcOpcDtGzO8vwRcYfNRvw1GUuSGEhPG9NpRv+obqCvt+cy7F4iVH/
-	 iJZ5D6beXX97Tr7zj8DClx5ZCDICq+7MQ6RPluj4wc+KF7a5f4ETaYS/a4NDiYoSN
-	 uB5PoDsrgod2U6DQuluudB0UvxmhTgk8x9MfmeO6P+ZPQsgQpie7cuJwEMcID6uxW
-	 Ds1Pe4WxzsJ/3Y1IWhxqjpBvSkevIplZsTQJuaH2H3lJrnYIBuqHeLu1SvlTuetnZ
-	 NJEqxBWiB0STyZkZGA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1M43KW-1rKZM83i1g-000R6n; Tue, 02
- Jan 2024 08:38:32 +0100
-Message-ID: <8123a895-c7dd-4a75-94bc-6f61639621eb@web.de>
-Date: Tue, 2 Jan 2024 08:38:28 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C70D53A5;
+	Tue,  2 Jan 2024 07:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-50e9a42582aso1279419e87.2;
+        Mon, 01 Jan 2024 23:43:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704181423; x=1704786223; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mM3PDqFdCZw+zdDJaYo5Q6NaL9KNCZtFGDckEZSKOng=;
+        b=Mol/eurhtbBpBsBEORadegz73+mEs7dwn3x4ZRDn7ShsTpmy4vkU43K+Huv4eAwTCH
+         if57tcTZUh5hPYoraZ9UOh0ucDoHvA/QO2juz/ZTjytlpBBxf9OGCSi1Y8vf4rmarU2n
+         rhoMUaU1Ns7y3dRyNzpWxlNyvgbEbSKa00jMBja34bG372GC0q6/3NzCWfCtjJNncrfq
+         tbfvn421EYjHUIGko1jTNke5cG9LxfXe3Bh+dRQwxcctia+Q6sYljaIPwnwtwguhlbGh
+         0XuKkMWDudelqll4AkXuCDCsHEp/hj03rSBHCCYTh/74Qct9/TyfNgmtwCM9GRGT8Yl6
+         x2rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704181423; x=1704786223;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mM3PDqFdCZw+zdDJaYo5Q6NaL9KNCZtFGDckEZSKOng=;
+        b=j1Of+7HZSFh3CedVyScwKpTwKsWpVdxbhlDVcQ6G8F5q7sRPlh7bKZJCk4dsU49Nzo
+         j9Yq3GK2fpJG6UBymmvj8CivweQar03nEaHo11zyUi4//UFFuAf50+cHNcee6FE7rSiO
+         7h/KQPUGJ1vgv04xX8vzFYxbmMAb1RUbYCNFJPIUzGFXvi20dlaQU2BO6Uefml1BcfiN
+         PKTTRoe7QA+w2gz2Mguyfbb212+ekw/pEVAKqvFX18Vr3lWJiEgLM5vLKp1awzIaAZ24
+         ozSAs1Y0dAxSt5C7MCom9DxhtQCObBBEg+Li15P95B1x3m3cLQuIJnX7U9XZWvFYTpQR
+         04wA==
+X-Gm-Message-State: AOJu0YwMsPoBED9T/pXSOuKFrb0LOLJ6zcf9ML/+xvJby2dB+GMD9Pry
+	AOgfySBuqmWKKgsit+oxp6Q=
+X-Google-Smtp-Source: AGHT+IFPtfc//kD/XoMFYOLGF/DLaFInPnIJKxvQEy0hvSCHjbtHIQ8SDlaKUR5cxnPPR9uEALzwig==
+X-Received: by 2002:a05:6512:3d9e:b0:50e:7042:468d with SMTP id k30-20020a0565123d9e00b0050e7042468dmr7464991lfv.36.1704181422779;
+        Mon, 01 Jan 2024 23:43:42 -0800 (PST)
+Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id u23-20020aa7d0d7000000b005533a9934b6sm15574325edo.54.2024.01.01.23.43.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jan 2024 23:43:42 -0800 (PST)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Frank Wunderlich <frank-w@public-files.de>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH RFC net-next] net: phylink: add quirk for disabling in-band-status for mediatek pcs at 2500base-x
+Date: Tue,  2 Jan 2024 08:43:26 +0100
+Message-ID: <20240102074326.1049179-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] net/iucv: Improve unlocking in iucv_enable()
-Content-Language: en-GB
-To: Suman Ghosh <sumang@marvell.com>,
- "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
- Alexandra Winter <wintera@linux.ibm.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <cde82080-c715-473c-97ac-6ef66bba6d64@web.de>
- <81f7db31-a258-4dc8-b6e1-c1ef1844a9d2@web.de>
- <SJ0PR18MB5216C27127E46490951A1E5DDB61A@SJ0PR18MB5216.namprd18.prod.outlook.com>
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <SJ0PR18MB5216C27127E46490951A1E5DDB61A@SJ0PR18MB5216.namprd18.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:cqHRG7UKZQaS0q8IliuDG48Y4tyhs8cnh4prGvo1r0odVrIpBGf
- O7yRr+9J/cgQIS9CL+gr2lonIkMhKzk7qoIcf395+5e4U1VedHkNmUIyfeJgKmD4Bcz46IC
- 1xU26WW3PBtELuZQ9sYN6eV1r7ovhNYn2Ctqgl3Ku1yPKaYe1OI0qDrNekJxYXZZcrEw2gk
- WcxJWadYNVpBeTgg2/YZA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:p3uLdUUnCn4=;QP+s2+l1t3HNNqicb2JuvNRmosA
- Pkj9/fzolJkqBMMHCsfnJk8JnOGt71C2ip8+RuUntITroyW8MCOZima5CfdbGToDrcBRImEs+
- G3cGpRyN6erza4HqN4VvhLRrSxGd8hMMEMZ3IX3UT4KEr3SyXTIBCOc4pmW/KVCS1SlOy+CiM
- AXzfzaeTR9TjkmQaCqZvG0XGX7hI2eMKlD4b7D1oDtGCYe14sQ8nN/EDwVGHGnprL+D/oblAP
- SUGCrjo3VBilR/0TYfWeVuq5HmysVi7V0RFG9qaqcPL1oZlCzGdB4+EaOgJHl8Ohlt6rmFcRw
- z0GOvYUJL7B2nA8cBl+9XuhnKhw+eik7xlzj1pYllwGeCiNCehA02oHTWUzzj8ttYiJ5obLQ0
- 8Vd3bnaedbhtKDcUzNrL8zzFuzaLWBb2lYh3lBAvqecJ58kEDDSvYtfZCJ75Nerh2mLuDZKzu
- WwbdNTMRHWr9bfPa3bIpyocyWYPLsyawIacZ2AeS5oIf1I03i+sEF0gXuy/YdFeOLKDvMf0xD
- PUyVtHhoke9gGQdQP5sNIbX+SsJy3oiG36MK5ydKzkLaTr7Y1HBtiLIDvdyeNVamyqlDTaQpc
- Xr1kWM8g0yhdl/ujzfD7AcRRyxSxhu+DbUyGQiLgfxZkuLLhQW4p3ZqcNs8Ro25F8bNMqOHdX
- XyLGf2o9ZEMy9yxuIOkjD42njHup6PAnBGu+ByzZs+xdhacsHqGXR+iJE9p247DD9fVNtNGlR
- AlLEkwh8P2Skphc/Wn3S3dkoOa0wbQQpm74xhuP5/HWIrdWiJBSmoy27XEC6lhH2BWLjTbI2m
- ytbfDvrydfB6ln7+wCBtQOhaagt9pqWsxnaZczjEsG7mbvLOcMoxzPhIpylx0+d/8OcKAvdYZ
- Fo8j+F81xtx1ogVZ28FjssyMeZJW1Yde4SQvlRTgbmku9lwqsPIKJiDui2EXXIOeg5inp6r7E
- LgczCg==
+Content-Transfer-Encoding: 8bit
 
-> @@ -555,13 +555,16 @@ static int iucv_enable(void)
->> 	if (cpumask_empty(&iucv_buffer_cpumask))
->> 		/* No cpu could declare an iucv buffer. */
->> 		goto out;
->> +
->> +	rc = 0;
->> +unlock:
->> 	cpus_read_unlock();
->> -	return 0;
->> +	return rc;
->> +
->> out:
->> 	kfree(iucv_path_table);
->> 	iucv_path_table = NULL;
->> -	cpus_read_unlock();
->> -	return rc;
->> +	goto unlock;
-> [Suman] This looks confusing. What is the issue with retaining the original change?
+In follow up to: net: pcs: pcs-mtk-lynxi: use 2500Base-X without AN
 
-I propose to reduce the number of cpus_read_unlock() calls
-(in the source code).
+MediaTek LynxI PCS, 2500Base-X will only work without inband status due to
+hardware limitation.
 
-Regards,
-Markus
+I understand this patch probably will not get approved as it is now, but
+perhaps with some pointers in the correct direction to follow, I can change
+it so it could be. It does however get the result that the rtl8221b on a
+sfp module functions correctly, with and without (as optical sfp) the phy
+attached and without using a quirk/ethtool to disable auto-negotiation.
+
+Introduce bool phylink_major_no_inband(pl,interface), a function similar to
+bool phylink_phy_no_inband(phy). An option could be to use a function like
+bool pcs->ops->supports_inband(interface), where if the function-pointer is
+null, it means it is supported for all. This instead of using
+of_device_is_compatible() inside the phylink_major_no_inband() function.
+
+Code added to phylink_major_config():
+
+When there is no PHY attached, pl->pcs_neg_mode is set to
+PHYLINK_PCS_NEG_INBAND_DISABLED.
+
+When there is a PHY attached, pl->cur_link_an_mode is set to MLO_AN_PHY.
+To have the pcs function correctly with the rtl8221b, we need to do the
+following to the in-band-status:
+
+We need to disable it when interface of the pcs is set to 2500base-x,
+but need it enable it when switched to sgmii.
+
+So we get:
+
+[...] mtk_soc_eth ... eth1: phy link up sgmii/1Gbps/Full/none/rx/tx
+[...] mtk_soc_eth ... eth1: phylink_mac_config: mode=inband/sgmii/none
+                                adv=00,00000000,00000000,00000000 pause=03
+
+[...] mtk_soc_eth ... eth1: phy link up 2500base-x/2.5Gbps/Full/none/rx/tx
+[...] mtk_soc_eth ... eth1: phylink_mac_config: mode=phy/2500base-x/none
+                                adv=00,00000000,00008000,0000606f pause=03
+
+Changes to be committed:
+	modified:   drivers/net/phy/phylink.c
+
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+---
+ drivers/net/phy/phylink.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 298dfd6982a5..6e443eb8ee46 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1074,6 +1074,22 @@ static void phylink_pcs_an_restart(struct phylink *pl)
+ 		pl->pcs->ops->pcs_an_restart(pl->pcs);
+ }
+ 
++static bool phylink_major_no_inband(struct phylink *pl, phy_interface_t interface)
++{
++	struct device_node *node = pl->config->dev->of_node;
++
++	if (!node)
++		return false;
++
++	if (!of_device_is_compatible(node, "mediatek,eth-mac"))
++		return false;
++
++	if (interface != PHY_INTERFACE_MODE_2500BASEX)
++		return false;
++
++	return true;
++}
++
+ static void phylink_major_config(struct phylink *pl, bool restart,
+ 				  const struct phylink_link_state *state)
+ {
+@@ -1085,10 +1101,22 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 
+ 	phylink_dbg(pl, "major config %s\n", phy_modes(state->interface));
+ 
++	if (phylink_major_no_inband(pl, state->interface) && (!!pl->phydev)) {
++		if (pl->cur_link_an_mode == MLO_AN_INBAND)
++			pl->cur_link_an_mode = MLO_AN_PHY;
++		else
++			/* restore mode if it was changed before */
++			pl->cur_link_an_mode = pl->cfg_link_an_mode;
++	}
++
+ 	pl->pcs_neg_mode = phylink_pcs_neg_mode(pl->cur_link_an_mode,
+ 						state->interface,
+ 						state->advertising);
+ 
++	if (phylink_major_no_inband(pl, state->interface) && !pl->phydev &&
++	    pl->pcs_neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
++		pl->pcs_neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED;
++
+ 	if (pl->using_mac_select_pcs) {
+ 		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+ 		if (IS_ERR(pcs)) {
+@@ -1218,6 +1246,9 @@ static void phylink_mac_pcs_get_state(struct phylink *pl,
+ 				      struct phylink_link_state *state)
+ {
+ 	linkmode_copy(state->advertising, pl->link_config.advertising);
++	if (pl->pcs_neg_mode == PHYLINK_PCS_NEG_INBAND_DISABLED)
++		linkmode_clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
++				   state->advertising);
+ 	linkmode_zero(state->lp_advertising);
+ 	state->interface = pl->link_config.interface;
+ 	state->rate_matching = pl->link_config.rate_matching;
+-- 
+2.42.1
+
 
