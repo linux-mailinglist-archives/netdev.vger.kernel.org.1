@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-61033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00CC2822484
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:08:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B4E822483
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:08:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDD29286B91
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:08:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47F3B1F23726
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB8F1775B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CE0171BF;
 	Tue,  2 Jan 2024 22:04:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jbzqzwef"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dxXeKNAD"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D62B17728
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 22:04:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E00171A7
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 22:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704233080; x=1735769080;
+  t=1704233081; x=1735769081;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=sK4OZj3OFnpsB7oD6iLfDMrtBZcUiMGVK9TjfpN+kC8=;
-  b=Jbzqzwef1kZJEYHWJyJzV9J20Et0J+i2VrxSyuTygNullW8158bcpxfl
-   3qO5TE6RfRXLgwOurCmlpDTOVbaGBxE7AkpzsnWYUinS7xOy4BPlFQH69
-   Wy6NoQuRyFSDtUiGAQW7gtlEYpPfp/o26ue2+M3QldI9VQD3CcxHgvpvK
-   ejTnYINdsrws50YcDZLoZZt4zSvvmBNT8yKgvkhZgbShsgqg7dCWqdnBt
-   Qb5ohEh20LTtSAaVXo3OMREQsfpY3iBbBaOCA/Z9OT8A2KjjcQKlaXljL
-   3mvRfazH+1a7mdHIh1MEB1WbZh91m/03Mz4kHycWHbqISdzSmWBYeVbBL
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="15567892"
+  bh=2okGMPnlWsjRz2l5q6+aQGt+NjTcjSoczrJpuoTLI5o=;
+  b=dxXeKNADy1XXYaEF9osH1B8jD2DAZnSjfQx5PW1ceCzPDaqrkHzfir89
+   fCMusnNiVHK6mCxF9BbDOALLvfdUaqhD8yssn78ozHdmOJdJFIJB96GaS
+   oJ/zSGsjpc1V/nFnV/xxlr6fScIWsrpo52O4BeBZ4RVeEGQpVAExuiLhF
+   ndL6w9U+iIQoy0Qxv+LZDaPyYEaASkFgupTKYqKtVQSkMy8eNBx2WB3mq
+   HLROUZuvXJlGyxdxCQQ2a7V81BMi93ibZ1esZ9fiBJYTcWWWT0LarA1ua
+   X7tUGSw6XXQRJb0wR3yjknYaaDKFAAcp02hCRDveqj+1KNo1nAj+EDiCV
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="15567898"
 X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
-   d="scan'208";a="15567892"
+   d="scan'208";a="15567898"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 14:04:37 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="808621409"
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="808621413"
 X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
-   d="scan'208";a="808621409"
+   d="scan'208";a="808621413"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orsmga008.jf.intel.com with ESMTP; 02 Jan 2024 14:04:36 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -52,14 +52,13 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
+Cc: Jan Sokolowski <jan.sokolowski@intel.com>,
 	anthony.l.nguyen@intel.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Petr Oros <poros@redhat.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 4/7] ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()
-Date: Tue,  2 Jan 2024 14:04:20 -0800
-Message-ID: <20240102220428.698969-5-anthony.l.nguyen@intel.com>
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: [PATCH net-next 5/7] ice: remove rx_len_errors statistic
+Date: Tue,  2 Jan 2024 14:04:21 -0800
+Message-ID: <20240102220428.698969-6-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240102220428.698969-1-anthony.l.nguyen@intel.com>
 References: <20240102220428.698969-1-anthony.l.nguyen@intel.com>
@@ -71,197 +70,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+From: Jan Sokolowski <jan.sokolowski@intel.com>
 
-The ice_vf_create_vsi() function and its VF ops helper introduced by commit
-a4c785e8162e ("ice: convert vf_ops .vsi_rebuild to .create_vsi") are used
-during an individual VF reset to re-create the VSI. This was done in order
-to ensure that the VSI gets properly reconfigured within the hardware.
+It was found that this statistic is incorrectly
+reported by HW and thus, useless.
 
-This is somewhat heavy handed as we completely release the VSI memory and
-structure, and then create a new VSI. This can also potentially force a
-change of the VSI index as we will re-use the first open slot in the VSI
-array which may not be the same.
+As RX length error statistics are shown to the
+end user when requested, the values reported
+are misleading.
 
-As part of implementing devlink reload, commit 6624e780a577 ("ice: split
-ice_vsi_setup into smaller functions") split VSI setup into smaller
-functions, introducing both ice_vsi_cfg() and ice_vsi_decfg() which can be
-used to configure or deconfigure an existing software VSI structure.
+Thus, that value is no longer reported and
+doesn't count anymore when adding all rx errors.
 
-Rather than completely removing the VSI and adding a new one using the
-.create_vsi() VF operation, simply use ice_vsi_decfg() to remove the
-current configuration. Save the VSI type and then call ice_vsi_cfg() to
-reconfigure the VSI as the same type that it was before.
-
-The existing reset logic assumes that all hardware filters will be removed,
-so also call ice_fltr_remove_all() before re-configuring the VSI.
-
-This new operation does not re-create the VSI, so rename it to
-ice_vf_reconfig_vsi().
-
-The new approach can safely share the exact same flow for both SR-IOV VFs
-as well as the Scalable IOV VFs being worked on. This uses less code and is
-a better abstraction over fully deleting the VSI and adding a new one.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Petr Oros <poros@redhat.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_sriov.c    | 24 ++-----------
- drivers/net/ethernet/intel/ice/ice_vf_lib.c   | 35 +++++++++++++------
- drivers/net/ethernet/intel/ice/ice_vf_lib.h   |  1 -
- .../ethernet/intel/ice/ice_vf_lib_private.h   |  1 +
- 4 files changed, 28 insertions(+), 33 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 -
+ drivers/net/ethernet/intel/ice/ice_main.c    | 5 -----
+ drivers/net/ethernet/intel/ice/ice_type.h    | 1 -
+ 3 files changed, 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 4ee349fe6409..a94a1c48c3de 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -761,24 +761,6 @@ static void ice_sriov_clear_reset_trigger(struct ice_vf *vf)
- 	ice_flush(hw);
- }
- 
--/**
-- * ice_sriov_create_vsi - Create a new VSI for a VF
-- * @vf: VF to create the VSI for
-- *
-- * This is called by ice_vf_recreate_vsi to create the new VSI after the old
-- * VSI has been released.
-- */
--static int ice_sriov_create_vsi(struct ice_vf *vf)
--{
--	struct ice_vsi *vsi;
--
--	vsi = ice_vf_vsi_setup(vf);
--	if (!vsi)
--		return -ENOMEM;
--
--	return 0;
--}
--
- /**
-  * ice_sriov_post_vsi_rebuild - tasks to do after the VF's VSI have been rebuilt
-  * @vf: VF to perform tasks on
-@@ -798,7 +780,6 @@ static const struct ice_vf_ops ice_sriov_vf_ops = {
- 	.poll_reset_status = ice_sriov_poll_reset_status,
- 	.clear_reset_trigger = ice_sriov_clear_reset_trigger,
- 	.irq_close = NULL,
--	.create_vsi = ice_sriov_create_vsi,
- 	.post_vsi_rebuild = ice_sriov_post_vsi_rebuild,
- };
- 
-@@ -1141,8 +1122,7 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
- 	if (vf->first_vector_idx < 0)
- 		goto unroll;
- 
--	ice_vf_vsi_release(vf);
--	if (vf->vf_ops->create_vsi(vf)) {
-+	if (ice_vf_reconfig_vsi(vf)) {
- 		/* Try to rebuild with previous values */
- 		needs_rebuild = true;
- 		goto unroll;
-@@ -1169,7 +1149,7 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
- 		return -EINVAL;
- 
- 	if (needs_rebuild)
--		vf->vf_ops->create_vsi(vf);
-+		ice_vf_reconfig_vsi(vf);
- 
- 	ice_ena_vf_mappings(vf);
- 	ice_put_vf(vf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index d6f74513b495..2ffdae9a82df 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -248,29 +248,44 @@ static void ice_vf_pre_vsi_rebuild(struct ice_vf *vf)
- }
- 
- /**
-- * ice_vf_recreate_vsi - Release and re-create the VF's VSI
-- * @vf: VF to recreate the VSI for
-+ * ice_vf_reconfig_vsi - Reconfigure a VF VSI with the device
-+ * @vf: VF to reconfigure the VSI for
-  *
-- * This is only called when a single VF is being reset (i.e. VVF, VFLR, host
-- * VF configuration change, etc)
-+ * This is called when a single VF is being reset (i.e. VVF, VFLR, host VF
-+ * configuration change, etc).
-  *
-- * It releases and then re-creates a new VSI.
-+ * It brings the VSI down and then reconfigures it with the hardware.
-  */
--static int ice_vf_recreate_vsi(struct ice_vf *vf)
-+int ice_vf_reconfig_vsi(struct ice_vf *vf)
- {
-+	struct ice_vsi *vsi = ice_get_vf_vsi(vf);
-+	struct ice_vsi_cfg_params params = {};
- 	struct ice_pf *pf = vf->pf;
- 	int err;
- 
--	ice_vf_vsi_release(vf);
-+	if (WARN_ON(!vsi))
-+		return -EINVAL;
-+
-+	params = ice_vsi_to_params(vsi);
-+	params.flags = ICE_VSI_FLAG_NO_INIT;
- 
--	err = vf->vf_ops->create_vsi(vf);
-+	ice_vsi_decfg(vsi);
-+	ice_fltr_remove_all(vsi);
-+
-+	err = ice_vsi_cfg(vsi, &params);
- 	if (err) {
- 		dev_err(ice_pf_to_dev(pf),
--			"Failed to recreate the VF%u's VSI, error %d\n",
-+			"Failed to reconfigure the VF%u's VSI, error %d\n",
- 			vf->vf_id, err);
- 		return err;
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index 2244d41fd933..a19b06f18e40 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -129,7 +129,6 @@ static const struct ice_stats ice_gstrings_pf_stats[] = {
+ 	ICE_PF_STAT("rx_oversize.nic", stats.rx_oversize),
+ 	ICE_PF_STAT("rx_jabber.nic", stats.rx_jabber),
+ 	ICE_PF_STAT("rx_csum_bad.nic", hw_csum_rx_error),
+-	ICE_PF_STAT("rx_length_errors.nic", stats.rx_len_errors),
+ 	ICE_PF_STAT("rx_dropped.nic", stats.eth.rx_discards),
+ 	ICE_PF_STAT("rx_crc_errors.nic", stats.crc_errors),
+ 	ICE_PF_STAT("illegal_bytes.nic", stats.illegal_bytes),
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 2fa46bacf5ba..63a5fb701ada 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -6834,13 +6834,11 @@ void ice_update_vsi_stats(struct ice_vsi *vsi)
+ 		cur_ns->rx_crc_errors = pf->stats.crc_errors;
+ 		cur_ns->rx_errors = pf->stats.crc_errors +
+ 				    pf->stats.illegal_bytes +
+-				    pf->stats.rx_len_errors +
+ 				    pf->stats.rx_undersize +
+ 				    pf->hw_csum_rx_error +
+ 				    pf->stats.rx_jabber +
+ 				    pf->stats.rx_fragments +
+ 				    pf->stats.rx_oversize;
+-		cur_ns->rx_length_errors = pf->stats.rx_len_errors;
+ 		/* record drops from the port level */
+ 		cur_ns->rx_missed_errors = pf->stats.eth.rx_discards;
  	}
+@@ -6980,9 +6978,6 @@ void ice_update_pf_stats(struct ice_pf *pf)
+ 			  &prev_ps->mac_remote_faults,
+ 			  &cur_ps->mac_remote_faults);
  
-+	/* Update the lan_vsi_num field since it might have been changed. The
-+	 * PF lan_vsi_idx number remains the same so we don't need to change
-+	 * that.
-+	 */
-+	vf->lan_vsi_num = vsi->vsi_num;
-+
- 	return 0;
- }
+-	ice_stat_update32(hw, GLPRT_RLEC(port), pf->stat_prev_loaded,
+-			  &prev_ps->rx_len_errors, &cur_ps->rx_len_errors);
+-
+ 	ice_stat_update32(hw, GLPRT_RUC(port), pf->stat_prev_loaded,
+ 			  &prev_ps->rx_undersize, &cur_ps->rx_undersize);
  
-@@ -928,7 +943,7 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 
- 	ice_vf_pre_vsi_rebuild(vf);
- 
--	if (ice_vf_recreate_vsi(vf)) {
-+	if (ice_vf_reconfig_vsi(vf)) {
- 		dev_err(dev, "Failed to release and setup the VF%u's VSI\n",
- 			vf->vf_id);
- 		err = -EFAULT;
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-index 35866553f288..0cc9034065c5 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-@@ -62,7 +62,6 @@ struct ice_vf_ops {
- 	bool (*poll_reset_status)(struct ice_vf *vf);
- 	void (*clear_reset_trigger)(struct ice_vf *vf);
- 	void (*irq_close)(struct ice_vf *vf);
--	int (*create_vsi)(struct ice_vf *vf);
- 	void (*post_vsi_rebuild)(struct ice_vf *vf);
- };
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib_private.h b/drivers/net/ethernet/intel/ice/ice_vf_lib_private.h
-index 0c7e77c0a09f..91ba7fe0eaee 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib_private.h
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib_private.h
-@@ -23,6 +23,7 @@
- #warning "Only include ice_vf_lib_private.h in CONFIG_PCI_IOV virtualization files"
- #endif
- 
-+int ice_vf_reconfig_vsi(struct ice_vf *vf);
- void ice_initialize_vf_entry(struct ice_vf *vf);
- void ice_dis_vf_qs(struct ice_vf *vf);
- int ice_check_vf_init(struct ice_vf *vf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index 5f04b1318c9e..41ab6d7bbd9e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -1003,7 +1003,6 @@ struct ice_hw_port_stats {
+ 	u64 error_bytes;		/* errbc */
+ 	u64 mac_local_faults;		/* mlfc */
+ 	u64 mac_remote_faults;		/* mrfc */
+-	u64 rx_len_errors;		/* rlec */
+ 	u64 link_xon_rx;		/* lxonrxc */
+ 	u64 link_xoff_rx;		/* lxoffrxc */
+ 	u64 link_xon_tx;		/* lxontxc */
 -- 
 2.41.0
 
