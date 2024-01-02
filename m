@@ -1,105 +1,73 @@
-Return-Path: <netdev+bounces-61025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CF4A822468
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:04:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4842582247C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:08:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57E661C22BED
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:04:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ACDA1C22B6D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A2118638;
-	Tue,  2 Jan 2024 22:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80609171B7;
+	Tue,  2 Jan 2024 22:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X/TvCjBQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FryaLKuk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019F218646;
-	Tue,  2 Jan 2024 22:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3bbbdf0b859so5291183b6e.3;
-        Tue, 02 Jan 2024 14:01:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704232894; x=1704837694; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mqI9o54z9qRSDIMHvl1bUrXAFI07BELIcpmN1oqYEIU=;
-        b=X/TvCjBQswBhArHn8iAvqZQn+LS4Umi5sN1okgyimPa06RfzVL5AI9SG/dHlXJwYtP
-         Oi4jPo+OMYgMqV/UCoFC4ievTPN1Y8p95t0tNQCopYzv1KqdRD/CFu0+JPO3Yzb0shUy
-         IXTdAiJmM0k0DD53xsNMOkLj+RcEGZ0YzmS8EGg89Ntxn8b6e7xGXSrcgZWeqHp+djTM
-         X5i5XPAAGFxpXRw/vX87UWAN5MycCYb7MJSXH60q3fRuWrkk/S8TRTc6cn3Tz+F7vrAU
-         AN/NWRq9f02keRl7rcG1B5sLAAwpZsYn83BHA4ZlVNqArO8kP63ycAtxIJ4fBggf+joW
-         k4Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704232894; x=1704837694;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mqI9o54z9qRSDIMHvl1bUrXAFI07BELIcpmN1oqYEIU=;
-        b=g08vc57XNX+hVEJSpdEtzlpcDpMy1JyWmjWQvoVok4epaLiV2RwiClHenp1Y1/SryN
-         UsIlA3s11E0l1BKeFJshfW5CWPRE/ZeoXT2mLggon5+6efWi2MBEto3SCfouOcn52a/7
-         mVeQJfZxkuMDVRiG+1XiF8V2jdkBfw8Ql1LWorLfB2VSbdJ4Tzm+xDtejZQlsoZlMv8l
-         BygJXm0Vc0dEG6oUEaUmJ+hboK923b/JDlQy7LeN4sdmhBiNjn/stb+G6Bb1VDfoQXLj
-         FBLYtFoxyKWGBE3xpHqCSaR3ZVoZ+QyxV/4yEBWQbzNA+VlWOd+Q1cQ+4biMYq0gSIyx
-         Pf0Q==
-X-Gm-Message-State: AOJu0Yz2Ae6AgnEJJj1reQBumN6oigjK1lyyHplLTSlC2xkhu87gaEKM
-	k7Ovaej0sewzbW79UCZqB/wbK/6SSTg=
-X-Google-Smtp-Source: AGHT+IHZJgB/+lNjtSFxLat8Tr18hFlaFdVfpMJks0gtk8aynOT14d4JPagPUed58Sicz/NncFP23Q==
-X-Received: by 2002:a05:6808:1708:b0:3b9:e2bf:c24e with SMTP id bc8-20020a056808170800b003b9e2bfc24emr24064815oib.15.1704232894093;
-        Tue, 02 Jan 2024 14:01:34 -0800 (PST)
-Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
-        by smtp.gmail.com with ESMTPSA id p13-20020a0cfacd000000b0067f678747ffsm9148761qvo.50.2024.01.02.14.01.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 14:01:33 -0800 (PST)
-Date: Tue, 02 Jan 2024 17:01:33 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Arnd Bergmann <arnd@arndb.de>, 
- Thomas Lange <thomas@corelatus.se>, 
- Netdev <netdev@vger.kernel.org>, 
- linux-kernel@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
- Deepa Dinamani <deepa.kernel@gmail.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Message-ID: <659487bd95ff6_2aa3c62948e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <fb69e804-6a9d-4052-a96e-40f8a20c189a@app.fastmail.com>
-References: <d1ce6aba-1b10-471c-ba60-10effa1dac10@corelatus.se>
- <fb69e804-6a9d-4052-a96e-40f8a20c189a@app.fastmail.com>
-Subject: Re: [PATCH net] net: Implement missing SO_TIMESTAMPING_NEW cmsg
- support
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63ED21A734
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 22:02:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2630AC433C8;
+	Tue,  2 Jan 2024 22:02:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704232954;
+	bh=EbY85eJKonMkWrOzkVQ2y8+vEbfHIAu/nyHcd2U0JRY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FryaLKukFnVbvH9IPMCsQeLqI1JszQ77PNBhLol2J4mmXly9+ZUf0tVsP1A4IbWGX
+	 jIo9xkOxfG3FEvwIkznI4bdcpElOnsRQEgoeqjwivkh7+RobvNXy4g9WppnvwiZOfn
+	 RW083IR+0jVL2lKzGZdxos+y/4PL/LBvd+2cpqI1q66r23Pg7jO+h57LVzkvjgCeaL
+	 njTGsisPowZCMjJWS4dMVI1VfIbc0cIA46YYIJmzcTu9vKYS0LtZpS0X2Oaavrv5Bl
+	 MBn0UmIGDB3IS/LLZsqvoheo4DyET1VTK/7zGd568dVDGzph54Rz7kCf04WjS3B61M
+	 EbcgRKGlMYayg==
+Date: Tue, 2 Jan 2024 14:02:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Shachar Kagan <skagan@nvidia.com>, netdev@vger.kernel.org, Bagas Sanjaya
+ <bagasdotme@gmail.com>, "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Subject: Re: [PATCH net-next] tcp: Revert no longer abort SYN_SENT when
+ receiving some ICMP
+Message-ID: <20240102140232.77915fc3@kernel.org>
+In-Reply-To: <CANn89iLVg3H-GuZ6=_-Rc5Jk14T59pZcx1DF-3HApvsPuSpNXg@mail.gmail.com>
+References: <14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com>
+	<CANn89iLVg3H-GuZ6=_-Rc5Jk14T59pZcx1DF-3HApvsPuSpNXg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Arnd Bergmann wrote:
-> On Tue, Jan 2, 2024, at 22:13, Thomas Lange wrote:
-> > Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
-> > socket option SO_TIMESTAMPING_NEW. However, it was never implemented in
-> > __sock_cmsg_send thus breaking SO_TIMESTAMPING cmsg for platforms using
-> > SO_TIMESTAMPING_NEW.
-> >
-> > Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
-> > Link: 
-> > https://lore.kernel.org/netdev/6a7281bf-bc4a-4f75-bb88-7011908ae471@app.fastmail.com/
-> > Signed-off-by: Thomas Lange <thomas@corelatus.se>
+On Tue, 2 Jan 2024 10:46:13 +0100 Eric Dumazet wrote:
+> > The issue appears while using Vagrant to manage nested VMs.
+> > The steps are:
+> > * create vagrant file
+> > * vagrant up
+> > * vagrant halt (VM is created but shut down)
+> > * vagrant up - fail
 > 
-> Cc: stable@vger.kernel.org
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> I would rather have an explanation, instead of reverting a valid patch.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
++1 obviously. Your refusal to debug this any further does not put 
+nVidia's TCP / NVMe offload in a good light. On one hand you
+claim to have TCP experts in house and are pushing TCP offloads and
+on the other you can't debug a TCP issue for which you reportedly 
+have an easy repro? Does not add up.
 
