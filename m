@@ -1,104 +1,110 @@
-Return-Path: <netdev+bounces-60901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D17D6821D2E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:00:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50AF5821D2F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F25EF1C21FF4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:00:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4D1EB21C42
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116CFFC0D;
-	Tue,  2 Jan 2024 14:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDB6FC08;
+	Tue,  2 Jan 2024 14:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XzjsHMuA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUtRdRLP"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250ECFC08
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 14:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=J/6smZfOWkoR8/mi+p0Q4BCS59q/UR+Sakmr9kFJ1Y4=; b=XzjsHMuAiIh+T98w0ba2uPkKsI
-	7ny/tIcRgS0lxcbgCnDNg/6+r41ogTyc3V8FjoXKG4GTPhddfioWkgIBqJwbWICd0ge3levwsU6wQ
-	sVxKshRvTw7WnD1Bm8EHGCNzkCd+56FhZC3Yh/eC3w779f3PZjgeioZAd4PVHl1zf0EWuIQ1K8D5Q
-	Z4IzBzTeKlVkWF8XZixKDAK+fNFyPk27APabiUsSvw3djedFCIXCrCrQ8xV9bNI89vNKVPhSj7fHA
-	Mdto/JPlH4gTjmAoXfhBDyDE3HFqlOE11R6nKLkblFlLzDu0/QDwTk6632HZWlDpHKrDcyS+0kDyc
-	0dASkbLA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51626)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKfJK-0006ab-0m;
-	Tue, 02 Jan 2024 14:00:02 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKfJL-0005Ll-OC; Tue, 02 Jan 2024 14:00:03 +0000
-Date: Tue, 2 Jan 2024 14:00:03 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, ezra@synergy-village.org,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Michael Walle <michael@walle.cc>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
-Message-ID: <ZZQW40bXteaiWDOZ@shell.armlinux.org.uk>
-References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
- <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
- <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F1D101C4
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 14:00:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 97523C433C8;
+	Tue,  2 Jan 2024 14:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704204028;
+	bh=sGn04kJ7m2ltUKVLSiThy6PoLEsMXeg+nb2hqpFiMvo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kUtRdRLPYHkxtudzeQQvSrZ1FxMxaYyMneaHd2L6I89ZFyVORVPnSyNNQ7a+xcCzL
+	 yys1npW6U8go4I9t3lTPxREGFKfP7TdphM1uLEH2Cw7Kc8kdIH5iQTALG4at0uLIXZ
+	 /61tWsmOdUDh9OipAZ4J20E7LziY2vu43oeXP/Mvz2krJ9z0XLIUDoHW1lgoxok25e
+	 /4I5coj5g6xDig5pthw8uG1Mjh6Lup0qJ0l3QzlpZIY42bN3hpUYfKrvJlEdtyytjF
+	 2Zp7nFOXmW4uP7zFSCE0LVT+O2Rt2GP9976lmA1tUR6xebE3z9lZW8t+LgFcXbnMFp
+	 VJN839WD+T4BA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7E5E1DCB6D1;
+	Tue,  2 Jan 2024 14:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 00/13] bnxt_en: Add basic ntuple filter support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170420402851.2320.10719178135275424943.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jan 2024 14:00:28 +0000
+References: <20231223042210.102485-1-michael.chan@broadcom.com>
+In-Reply-To: <20231223042210.102485-1-michael.chan@broadcom.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com
 
-On Tue, Jan 02, 2024 at 02:42:17PM +0100, Andrew Lunn wrote:
-> On Mon, Jan 01, 2024 at 11:44:38PM +0100, Heiner Kallweit wrote:
-> > On 01.01.2024 22:31, Ezra Buehler wrote:
-> > > Since commit 1a136ca2e089 ("net: mdio: scan bus based on bus
-> > > capabilities for C22 and C45") our AT91SAM9G25-based GARDENA smart
-> > > Gateway will no longer boot.
-> > > 
-> > > Prior to the mentioned change, probe_capabilities would be set to
-> > > MDIOBUS_NO_CAP (0) and therefore, no Clause 45 scan was performed.
-> > > Running a Clause 45 scan on an SMSC/Microchip LAN8720A PHY will (at
-> > > least with our setup) considerably slow down kernel startup and
-> > > ultimately result in a board reset.
-> > > 
-> > > AFAICT all SMSC/Microchip PHYs are Clause 22 devices. Some have a
-> > > "Clause 45 protection" feature (e.g. LAN8830) and others like the
-> > > LAN8804 will explicitly state the following in the datasheet:
-> > > 
-> > >     This device may respond to Clause 45 accesses and so must not be
-> > >     mixed with Clause 45 devices on the same MDIO bus.
-> > > 
-> > 
-> > I'm not convinced that some heuristic based on vendors is a
-> > sustainable approach. Also I'd like to avoid (as far as possible)
-> > that core code includes vendor driver headers. Maybe we could use
-> > a new PHY driver flag. Approaches I could think of:
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri, 22 Dec 2023 20:21:57 -0800 you wrote:
+> The current driver only supports ntuple filters added by aRFS.  This
+> patch series adds basic support for user defined TCP/UDP ntuple filters
+> added by the user using ethtool.  Many of the patches are refactoring
+> patches to make the existing code more general to support both aRFS
+> and user defined filters.  aRFS filters always have the Toeplitz hash
+> value from the NIC.  A Toepliz hash function is added in patch 5 to
+> get the same hash value for user defined filters.  The hash is used
+> to store all ntuple filters in the table and all filters must be
+> hashed identically using the same function and key.
 > 
-> We already have a core hack for these broken PHYs:
+> [...]
 
-Yes, and it is this very function that the patch at the start of this
-thread is changing!
+Here is the summary with links:
+  - [net-next,v2,01/13] bnxt_en: Refactor bnxt_ntuple_filter structure.
+    https://git.kernel.org/netdev/net-next/c/992d38d2b988
+  - [net-next,v2,02/13] bnxt_en: Add bnxt_l2_filter hash table.
+    https://git.kernel.org/netdev/net-next/c/1f6e77cb9b32
+  - [net-next,v2,03/13] bnxt_en: Re-structure the bnxt_ntuple_filter structure.
+    https://git.kernel.org/netdev/net-next/c/bfeabf7e4615
+  - [net-next,v2,04/13] bnxt_en: Refactor L2 filter alloc/free firmware commands.
+    https://git.kernel.org/netdev/net-next/c/96c9bedc755e
+  - [net-next,v2,05/13] bnxt_en: Add function to calculate Toeplitz hash
+    https://git.kernel.org/netdev/net-next/c/d3c982851c15
+  - [net-next,v2,06/13] bnxt_en: Add bnxt_lookup_ntp_filter_from_idx() function
+    https://git.kernel.org/netdev/net-next/c/cb5bdd292dc0
+  - [net-next,v2,07/13] bnxt_en: Add new BNXT_FLTR_INSERTED flag to bnxt_filter_base struct.
+    https://git.kernel.org/netdev/net-next/c/ee908d05dd2a
+  - [net-next,v2,08/13] bnxt_en: Refactor filter insertion logic in bnxt_rx_flow_steer().
+    https://git.kernel.org/netdev/net-next/c/59cde76f33fa
+  - [net-next,v2,09/13] bnxt_en: Refactor the hash table logic for ntuple filters.
+    https://git.kernel.org/netdev/net-next/c/80cfde29ce1f
+  - [net-next,v2,10/13] bnxt_en: Refactor ntuple filter removal logic in bnxt_cfg_ntp_filters().
+    https://git.kernel.org/netdev/net-next/c/4faeadfd7ed6
+  - [net-next,v2,11/13] bnxt_en: Add ntuple matching flags to the bnxt_ntuple_filter structure.
+    https://git.kernel.org/netdev/net-next/c/300c19180098
+  - [net-next,v2,12/13] bnxt_en: Add support for ntuple filters added from ethtool.
+    https://git.kernel.org/netdev/net-next/c/c029bc30b9f6
+  - [net-next,v2,13/13] bnxt_en: Add support for ntuple filter deletion by ethtool.
+    https://git.kernel.org/netdev/net-next/c/8d7ba028aa9a
 
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
