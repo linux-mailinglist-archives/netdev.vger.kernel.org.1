@@ -1,254 +1,216 @@
-Return-Path: <netdev+bounces-60837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA120821AA1
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:02:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F9E2821A9C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:01:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 651E91F226D0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:02:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8C881F223D1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45CDDDDD;
-	Tue,  2 Jan 2024 11:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B1FDDB8;
+	Tue,  2 Jan 2024 11:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="HiXTEiNk"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="wdp7xuMC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9908DDC1
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 11:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-336dcebcdb9so5379848f8f.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 03:02:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC58DDA8
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 11:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5537dd673e5so7284254a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 03:01:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1704193337; x=1704798137; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mbfHeUli9qVZSeK5qz1KYXw4fdMH2IEIwbM+g++TvkU=;
-        b=HiXTEiNkquiYiLHA9KyUjlEbhGqbsQ7fujrjKcE6FimO7MGej/7K3enaNf2tE7rPxv
-         YIDSmuSW83jfZhVufab1CoFt++RXE5BbmZAfD4VJ20d/otvpy6WoIyZJi1MUO1dzc01E
-         a1bE3kjvRyhFLyHaXPuHW+3xPMwzV55d6xFKRXSB4qZCpEmWyDZRWA2ZVjLQq6lB4K3U
-         BtrAqz+JJdGUB5JDsJ+p9ySmKkLsVcEbg5wIVu6J2V3NHsrd8XRNWOpt7cKlVcHvA6nq
-         TPKHA38Joe5JjfoJZ45XHYbvx4joucnhlGQUZU8UotaDuSZ+We/hs9+PVmhP7p+HPfGL
-         uVdg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704193295; x=1704798095; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RuV9dEqq4UOjbiMUScVPu5oCvMlxOvjWdiBVKhoing8=;
+        b=wdp7xuMCzHLyJleAnufJHlQRc5GoOjOR17wgY2GLJIMVdGWk8Yb3PWEaxcuMe5lRRP
+         Al/UhW3h21JPZi8Dq+JOvMeeZb2SHaeoXX6QvQiu0mQbEitYJMpcHfeMaJPGeihhgSYZ
+         3G34ifyfb2qwPusEM030Nw6lHuCvhEWtTJohxVA/IT12wHHRSu4eEDtZ6aLpBPq1dE5f
+         Vhy3m6SnDspd/SF9SwlYvHHDmxTp9LyGAdPmhjhjz3big5yqySFI/V4nhyIcKPd8a/VT
+         pckbLT07FTEMPQyPSKYAcuntZaqghoCsHzr9OToU552DivwhcBaii2Tp1jtbj2d3l2Nc
+         mlaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704193337; x=1704798137;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mbfHeUli9qVZSeK5qz1KYXw4fdMH2IEIwbM+g++TvkU=;
-        b=gD3BHy0FETmhgpcJIFaMP8Y8BDlFX89JlcMixYWA27EGbj2gVKojs6pv9zQ6oFk40X
-         UwklGPac5q1BMX/qetjRcYfufd2T92RIIHSJqgTKUtaUzlmmct82pcrLa5wCp/4qZ25M
-         atIpUprWVVD+ptLAi74jzqQnHvMIE5BqIhnvEJcQWBwCnWANUH4uDRyHfTdj4EHyaUWx
-         tvYhEKlL3yWi2Mk+srv+OTes/jEH5BdASTnh/FXYE8R6hYighz2bteXuIY2Fa+j702IM
-         VaGp8BvvA15QweuI1N/Kf1/RpXblmJyL4FW79Wbd67Vo8qU4VCdtYzwVbA4yamgtz/LT
-         ADQw==
-X-Gm-Message-State: AOJu0YzyAZqwK/mNlaMDI1055b7ztPLcnm/hcijmeGbpqJmFDSDf5ev4
-	CH22Sp78Xmu1kgAUOKWSHgS8AE279ByP5g==
-X-Google-Smtp-Source: AGHT+IHE9JEwHWy/m6dZV/qC47KHMcm/LgVBhlOY3XjCtL4OnH+q997HZPOe+b8yF824UFIACJ64+Q==
-X-Received: by 2002:a5d:5244:0:b0:336:7ff6:af9 with SMTP id k4-20020a5d5244000000b003367ff60af9mr4305358wrc.212.1704193337064;
-        Tue, 02 Jan 2024 03:02:17 -0800 (PST)
-Received: from claudiu-X670E-Pro-RS.. ([82.78.167.5])
-        by smtp.gmail.com with ESMTPSA id l4-20020a5d6744000000b00336710ddea0sm28174229wrw.59.2024.01.02.03.02.15
+        d=1e100.net; s=20230601; t=1704193295; x=1704798095;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RuV9dEqq4UOjbiMUScVPu5oCvMlxOvjWdiBVKhoing8=;
+        b=E+CmztEDMwZjSz3PQaF133Vxagd3d+opVUBNRqI706OYFCzAO/IYFnu4LyCbpUAqsN
+         S8ZJCtp9HMn3F9ehNAcrsMBstlG38w/k+P48F1O9dlahlxP43sq6/0b0ZWzOaNFyMLVd
+         bFuu33CMZtS4JIBDjWM2U3XR48NBFZ12Tdsrpwa2NioLJ1uVmX+K4slSuUUcJdFeU/32
+         Pi8LIvI6HVzxLx9UGObMKgJFBosleh0Yo+wqkBeuXSEN2Bre5w5YaeeT0dciAr/r4scR
+         9326W/pz5Whyzb9wB+m7gHOK2KpiMUvSRRe+GjhQhpe0cLu35XRhtqHrLSMXE0QKpUMD
+         NFkA==
+X-Gm-Message-State: AOJu0YxFaPFPenzX1mw89VF3D+Mbcxj1yuLAt5XRIGr0szEuwlQLX4MP
+	VvTvQDXy89Gy2piM+wMneht5IOR+hmNohUb/1qQGWcNrUBpjNw==
+X-Google-Smtp-Source: AGHT+IFh6GZL9LKYbRvwRR2fPPjBdxf3xgTEPvGsHQ1uZRp409Xf86hweTXSgYPdsnGP2Mke0RQ13A==
+X-Received: by 2002:a50:ccc4:0:b0:552:ad20:521d with SMTP id b4-20020a50ccc4000000b00552ad20521dmr11521386edj.40.1704193294767;
+        Tue, 02 Jan 2024 03:01:34 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id o20-20020aa7c7d4000000b0055537e76e94sm8806038eds.57.2024.01.02.03.01.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 03:02:16 -0800 (PST)
-From: Claudiu <claudiu.beznea@tuxon.dev>
-X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
-To: s.shtylyov@omp.ru,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: mitsuhiro.kimura.kc@renesas.com,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	claudiu.beznea@tuxon.dev,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH net v3 1/1] net: ravb: Wait for operating mode to be applied
-Date: Tue,  2 Jan 2024 13:01:16 +0200
-Message-Id: <20240102110116.4005187-2-claudiu.beznea.uj@bp.renesas.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240102110116.4005187-1-claudiu.beznea.uj@bp.renesas.com>
-References: <20240102110116.4005187-1-claudiu.beznea.uj@bp.renesas.com>
+        Tue, 02 Jan 2024 03:01:34 -0800 (PST)
+Date: Tue, 2 Jan 2024 12:01:33 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: David Wei <dw@davidwei.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 1/5] netdevsim: maintain a list of probed
+ netdevsims
+Message-ID: <ZZPtDSR0Sf5UsHv0@nanopsycho>
+References: <20231220014747.1508581-1-dw@davidwei.uk>
+ <20231220014747.1508581-2-dw@davidwei.uk>
+ <ZYKsZdjn-ZOp11L4@nanopsycho>
+ <b09032d1-c9f3-4f44-9815-9d1b2a65068d@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b09032d1-c9f3-4f44-9815-9d1b2a65068d@davidwei.uk>
 
-From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Fri, Dec 22, 2023 at 01:45:58AM CET, dw@davidwei.uk wrote:
+>On 2023-12-20 00:57, Jiri Pirko wrote:
+>> Wed, Dec 20, 2023 at 02:47:43AM CET, dw@davidwei.uk wrote:
+>>> This patch adds a linked list nsim_dev_list of probed netdevsims, added
+>>> during nsim_drv_probe() and removed during nsim_drv_remove(). A mutex
+>>> nsim_dev_list_lock protects the list.
+>> 
+>> In the commit message, you should use imperative mood, command
+>> the codebase what to do:
+>> https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
+>
+>Thanks, I didn't know about this. Will edit the commit messages.
+>
+>> 
+>> 
+>>>
+>>> Signed-off-by: David Wei <dw@davidwei.uk>
+>>> ---
+>>> drivers/net/netdevsim/dev.c       | 17 +++++++++++++++++
+>>> drivers/net/netdevsim/netdevsim.h |  1 +
+>>> 2 files changed, 18 insertions(+)
+>>>
+>>> diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+>>> index b4d3b9cde8bd..e30a12130e07 100644
+>>> --- a/drivers/net/netdevsim/dev.c
+>>> +++ b/drivers/net/netdevsim/dev.c
+>>> @@ -35,6 +35,9 @@
+>>>
+>>> #include "netdevsim.h"
+>>>
+>>> +static LIST_HEAD(nsim_dev_list);
+>>> +static DEFINE_MUTEX(nsim_dev_list_lock);
+>>> +
+>>> static unsigned int
+>>> nsim_dev_port_index(enum nsim_dev_port_type type, unsigned int port_index)
+>>> {
+>>> @@ -1531,6 +1534,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>> 				 nsim_bus_dev->initial_net, &nsim_bus_dev->dev);
+>>> 	if (!devlink)
+>>> 		return -ENOMEM;
+>>> +	mutex_lock(&nsim_dev_list_lock);
+>> 
+>> I don't follow. You claim you use this mutex to protect the list.
+>> a) why don't you use spin-lock?
+>
+>I'm using a mutex unless I know (or someone else who knows better point
+>out) that a spinlock is better. It is simple, there are fewer gotchas,
+>and I anticipate actual contention here to be near 0. The
+>nsim_bus_dev_list is also protected by a mutex.
+>
+>Is a spinlock better here and if so why?
+>
+>> b) why don't don't you take the lock just for list manipulation?
+>
+>Many code paths interact here, touching drivers and netdevs. There is an
+>ordering of locks being taken:
+>
+>1. nsim_bus_dev->dev.mutex
+>2. devlink->lock
+>3. rtnl_lock
+>
+>I was careful to avoid deadlocking by acquiring locks in the same order.
+>But looking at it again, I can reduce the critical section by acquiring
+>nsim_dev_list_lock after devlink->lock, thanks.
 
-CSR.OPS bits specify the current operating mode and (according to
-documentation) they are updated by HW when the operating mode change
-request is processed. To comply with this check CSR.OPS before proceeding.
+Again, what is the purpose of the lock? I was under impression, that you
+just need to maintain consistency of the list. Or do you need it for
+anything else?
 
-Commit introduces ravb_set_opmode() that does all the necessities for
-setting the operating mode (set CCC.OPC (and CCC.GAC, CCC.CSEL, if any) and
-wait for CSR.OPS) and call it where needed. This should comply with all the
-HW manuals requirements as different manual variants specify that different
-modes need to be checked in CSR.OPS when setting CCC.OPC.
 
-In case of platforms with GAC, if GAC needs to be enabled, the CCC.GAC and
-CCC.CSEL needs to be configured along with CCC.OPC. For this,
-ravb_set_opmode() allows passing GAC and CSEL as part of opmode and the
-function updates accordingly CCC register.
-
-Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
----
- drivers/net/ethernet/renesas/ravb_main.c | 61 +++++++++++++++---------
- 1 file changed, 38 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 664eda4b5a11..9835d18a7adf 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -66,16 +66,23 @@ int ravb_wait(struct net_device *ndev, enum ravb_reg reg, u32 mask, u32 value)
- 	return -ETIMEDOUT;
- }
- 
--static int ravb_config(struct net_device *ndev)
-+static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
- {
-+	u32 csr_ops = 1U << (opmode & CCC_OPC);
-+	u32 ccc_mask = CCC_OPC;
- 	int error;
- 
--	/* Set config mode */
--	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
--	/* Check if the operating mode is changed to the config mode */
--	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
--	if (error)
--		netdev_err(ndev, "failed to switch device to config mode\n");
-+	if (opmode & CCC_GAC)
-+		ccc_mask |= CCC_GAC | CCC_CSEL;
-+
-+	/* Set operating mode */
-+	ravb_modify(ndev, CCC, ccc_mask, opmode);
-+	/* Check if the operating mode is changed to the requested one */
-+	error = ravb_wait(ndev, CSR, CSR_OPS, csr_ops);
-+	if (error) {
-+		netdev_err(ndev, "failed to switch device to requested mode (%u)\n",
-+			   opmode & CCC_OPC);
-+	}
- 
- 	return error;
- }
-@@ -673,7 +680,7 @@ static int ravb_dmac_init(struct net_device *ndev)
- 	int error;
- 
- 	/* Set CONFIG mode */
--	error = ravb_config(ndev);
-+	error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- 	if (error)
- 		return error;
- 
-@@ -682,9 +689,7 @@ static int ravb_dmac_init(struct net_device *ndev)
- 		return error;
- 
- 	/* Setting the control will start the AVB-DMAC process. */
--	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_OPERATION);
--
--	return 0;
-+	return ravb_set_opmode(ndev, CCC_OPC_OPERATION);
- }
- 
- static void ravb_get_tx_tstamp(struct net_device *ndev)
-@@ -1046,7 +1051,7 @@ static int ravb_stop_dma(struct net_device *ndev)
- 		return error;
- 
- 	/* Stop AVB-DMAC process */
--	return ravb_config(ndev);
-+	return ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- }
- 
- /* E-MAC interrupt handler */
-@@ -2560,21 +2565,25 @@ static int ravb_set_gti(struct net_device *ndev)
- 	return 0;
- }
- 
--static void ravb_set_config_mode(struct net_device *ndev)
-+static int ravb_set_config_mode(struct net_device *ndev)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	const struct ravb_hw_info *info = priv->info;
-+	int error;
- 
- 	if (info->gptp) {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
-+		if (error)
-+			return error;
- 		/* Set CSEL value */
- 		ravb_modify(ndev, CCC, CCC_CSEL, CCC_CSEL_HPB);
- 	} else if (info->ccc_gac) {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG |
--			    CCC_GAC | CCC_CSEL_HPB);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
- 	} else {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- 	}
-+
-+	return error;
- }
- 
- /* Set tx and rx clock internal delay modes */
-@@ -2794,7 +2803,9 @@ static int ravb_probe(struct platform_device *pdev)
- 	ndev->ethtool_ops = &ravb_ethtool_ops;
- 
- 	/* Set AVB config mode */
--	ravb_set_config_mode(ndev);
-+	error = ravb_set_config_mode(ndev);
-+	if (error)
-+		goto out_disable_gptp_clk;
- 
- 	if (info->gptp || info->ccc_gac) {
- 		/* Set GTI value */
-@@ -2917,8 +2928,7 @@ static void ravb_remove(struct platform_device *pdev)
- 	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
- 			  priv->desc_bat_dma);
- 
--	/* Set reset mode */
--	ravb_write(ndev, CCC_OPC_RESET, CCC);
-+	ravb_set_opmode(ndev, CCC_OPC_RESET);
- 
- 	clk_disable_unprepare(priv->gptp_clk);
- 	clk_disable_unprepare(priv->refclk);
-@@ -3000,8 +3010,11 @@ static int __maybe_unused ravb_resume(struct device *dev)
- 	int ret = 0;
- 
- 	/* If WoL is enabled set reset mode to rearm the WoL logic */
--	if (priv->wol_enabled)
--		ravb_write(ndev, CCC_OPC_RESET, CCC);
-+	if (priv->wol_enabled) {
-+		ret = ravb_set_opmode(ndev, CCC_OPC_RESET);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	/* All register have been reset to default values.
- 	 * Restore all registers which where setup at probe time and
-@@ -3009,7 +3022,9 @@ static int __maybe_unused ravb_resume(struct device *dev)
- 	 */
- 
- 	/* Set AVB config mode */
--	ravb_set_config_mode(ndev);
-+	ret = ravb_set_config_mode(ndev);
-+	if (ret)
-+		return ret;
- 
- 	if (info->gptp || info->ccc_gac) {
- 		/* Set GTI value */
--- 
-2.39.2
-
+>
+>> 
+>> 
+>>> 	devl_lock(devlink);
+>>> 	nsim_dev = devlink_priv(devlink);
+>>> 	nsim_dev->nsim_bus_dev = nsim_bus_dev;
+>>> @@ -1544,6 +1548,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>> 	spin_lock_init(&nsim_dev->fa_cookie_lock);
+>>>
+>>> 	dev_set_drvdata(&nsim_bus_dev->dev, nsim_dev);
+>>> +	list_add(&nsim_dev->list, &nsim_dev_list);
+>>>
+>>> 	nsim_dev->vfconfigs = kcalloc(nsim_bus_dev->max_vfs,
+>>> 				      sizeof(struct nsim_vf_config),
+>>> @@ -1607,6 +1612,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>>
+>>> 	nsim_dev->esw_mode = DEVLINK_ESWITCH_MODE_LEGACY;
+>>> 	devl_unlock(devlink);
+>>> +	mutex_unlock(&nsim_dev_list_lock);
+>>> 	return 0;
+>>>
+>>> err_hwstats_exit:
+>>> @@ -1668,8 +1674,18 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
+>>> {
+>>> 	struct nsim_dev *nsim_dev = dev_get_drvdata(&nsim_bus_dev->dev);
+>>> 	struct devlink *devlink = priv_to_devlink(nsim_dev);
+>>> +	struct nsim_dev *pos, *tmp;
+>>>
+>>> +	mutex_lock(&nsim_dev_list_lock);
+>>> 	devl_lock(devlink);
+>>> +
+>>> +	list_for_each_entry_safe(pos, tmp, &nsim_dev_list, list) {
+>>> +		if (pos == nsim_dev) {
+>>> +			list_del(&nsim_dev->list);
+>>> +			break;
+>>> +		}
+>>> +	}
+>>> +
+>>> 	nsim_dev_reload_destroy(nsim_dev);
+>>>
+>>> 	nsim_bpf_dev_exit(nsim_dev);
+>>> @@ -1681,6 +1697,7 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
+>>> 	kfree(nsim_dev->vfconfigs);
+>>> 	kfree(nsim_dev->fa_cookie);
+>>> 	devl_unlock(devlink);
+>>> +	mutex_unlock(&nsim_dev_list_lock);
+>>> 	devlink_free(devlink);
+>>> 	dev_set_drvdata(&nsim_bus_dev->dev, NULL);
+>>> }
+>>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+>>> index 028c825b86db..babb61d7790b 100644
+>>> --- a/drivers/net/netdevsim/netdevsim.h
+>>> +++ b/drivers/net/netdevsim/netdevsim.h
+>>> @@ -277,6 +277,7 @@ struct nsim_vf_config {
+>>>
+>>> struct nsim_dev {
+>>> 	struct nsim_bus_dev *nsim_bus_dev;
+>>> +	struct list_head list;
+>>> 	struct nsim_fib_data *fib_data;
+>>> 	struct nsim_trap_data *trap_data;
+>>> 	struct dentry *ddir;
+>>> -- 
+>>> 2.39.3
+>>>
 
