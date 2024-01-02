@@ -1,121 +1,152 @@
-Return-Path: <netdev+bounces-60982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C83822134
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:40:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71E4582213D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:43:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04EA11F23560
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:40:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 238971F21F72
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF37015AC3;
-	Tue,  2 Jan 2024 18:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PlGORd3S"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EEE715ACC;
+	Tue,  2 Jan 2024 18:43:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC9915ACF;
-	Tue,  2 Jan 2024 18:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ccae380df2so81894541fa.1;
-        Tue, 02 Jan 2024 10:40:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704220811; x=1704825611; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hi/vkiq78X0yzEwfWzDqipOcXVRGcQevtOptU3VRDoU=;
-        b=PlGORd3SSRdQOinhtutvv1Bl6ZWkuxX7X+KItUPBBDHXCM3QrfQf2pTlK2+RpRgHw1
-         J5zCUXKCUHgLp9UJ2/iIT+DLCQodiCzXYK/nDHst7w6UV7x09siJ8i5wO5ktmMQc2ATP
-         Dq79SBNK7qCCfAzcXlySn4EBw4yuJCdKV7PzxvVIZsGk2i1N8hfQvmljgNfpYcGieJMm
-         TyJEcMd16bs+s9OfJtV8e3z5cTTeEdJg1gMdaXaBvJBww6Oisx9zuVty6ns7VcEmNYu5
-         d6r8kfaqLrhCIuD07DjwTTlns9TuZgnc6H4x2oWDZDPDPFLlJE0KrfL4GaCf8sdXsrjo
-         p7NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704220811; x=1704825611;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hi/vkiq78X0yzEwfWzDqipOcXVRGcQevtOptU3VRDoU=;
-        b=rnVShICkL7TDbOefUZ4UxUvTl0a5S0Fc/jocyd74vXosSx5VwdS2EK0Y8ujdiL7SLY
-         7XBu/QyueTucI18K2WoI3nOCFw1rbf/EgM13X1F07ZKuh6jtzLurA/eXRZlEUMD0BH2W
-         ZxuVag/DDJ5deGEuiJfvvaWLM8y5l2F1/kc2u2xnCYkTxZzA4rGdkVBqgqwxnH8FTPhr
-         lDofEZ/Q6KeS+z0dFkmbTw2Tq4erDNyLv000a/cZWdaNkTdcDp7zP9S2KKk6CfMVBTYE
-         yxegEt0Ktc4A2jgJ+WBwMqqxIdNLxR3m6Mm2pmoCOD4He/laOczLbWDlwGFgVF4xph1m
-         7/qw==
-X-Gm-Message-State: AOJu0Yzw+sTwLfPNmeTeTBk0uIbpg5SAJVaOG12g0/XY4tdAZzaF2cDy
-	WEQeMHuHi2JWv+SZOUWlv+oatEY1UBdyUrbhTEM=
-X-Google-Smtp-Source: AGHT+IEucWctf1n9df5Yb6yWXLi6BW+gSmfIgPxnXufEaYgrcM35uHM13oukW9MfN5nEiH6X3XJLisPQ5YnD8SB+11I=
-X-Received: by 2002:a2e:b791:0:b0:2cc:7a2e:28f4 with SMTP id
- n17-20020a2eb791000000b002cc7a2e28f4mr7346388ljo.88.1704220810795; Tue, 02
- Jan 2024 10:40:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F9A15AC3;
+	Tue,  2 Jan 2024 18:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (31.173.80.188) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 2 Jan
+ 2024 21:43:15 +0300
+Subject: Re: [PATCH net v3 1/1] net: ravb: Wait for operating mode to be
+ applied
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <mitsuhiro.kimura.kc@renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Claudiu
+ Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20240102110116.4005187-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240102110116.4005187-2-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <df73cd5f-4185-233d-eada-7b5598a070fc@omp.ru>
+Date: Tue, 2 Jan 2024 21:43:14 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240102181946.57288-1-verdre@v0yd.nl>
-In-Reply-To: <20240102181946.57288-1-verdre@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 2 Jan 2024 13:39:58 -0500
-Message-ID: <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] Power off HCI devices before rfkilling them
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240102110116.4005187-2-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/02/2024 18:31:01
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182449 [Jan 02 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.80.188 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.80.188 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.80.188
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/02/2024 18:35:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/2/2024 5:17:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi Jonas,
+On 1/2/24 2:01 PM, Claudiu wrote:
 
-On Tue, Jan 2, 2024 at 1:19=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
->
-> In theory the firmware is supposed to power off the bluetooth card
-> when we use rfkill to block it. This doesn't work on a lot of laptops
-> though, leading to weird issues after turning off bluetooth, like the
-> connection timing out on the peripherals which were connected, and
-> bluetooth not connecting properly when the adapter is turned on again
-> quickly after rfkilling.
->
-> This series hooks into the rfkill driver from the bluetooth subsystem
-> to send a HCI_POWER_OFF command to the adapter before actually submitting
-> the rfkill to the firmware and killing the HCI connection.
->
-> ---
->
-> v1 -> v2: Fixed commit message title to make CI happy
->
-> Jonas Dre=C3=9Fler (4):
->   Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
->   Bluetooth: mgmt: Remove leftover queuing of power_off work
->   Bluetooth: Add new state HCI_POWERING_DOWN
->   Bluetooth: Queue a HCI power-off command before rfkilling adapters
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> CSR.OPS bits specify the current operating mode and (according to
+> documentation) they are updated by HW when the operating mode change
+> request is processed. To comply with this check CSR.OPS before proceeding.
+> 
+> Commit introduces ravb_set_opmode() that does all the necessities for
+> setting the operating mode (set CCC.OPC (and CCC.GAC, CCC.CSEL, if any) and
+> wait for CSR.OPS) and call it where needed. This should comply with all the
+> HW manuals requirements as different manual variants specify that different
+> modes need to be checked in CSR.OPS when setting CCC.OPC.
+> 
+> In case of platforms with GAC, if GAC needs to be enabled, the CCC.GAC and
 
-Apart from the assumption of RFKILL actually killing the RF
-immediately or not, I'm fine with these changes, that said it would be
-great if we can have some proper way to test the behavior of rfkill,
-perhaps via mgmt-tester, since it should behave like the
-MGMT_OP_SET_POWERED.
+   Better to spell it out, I think: in case of platforms that support gPTP
+while in the config[uration] mode..
 
->  include/net/bluetooth/hci.h |  2 +-
->  net/bluetooth/hci_core.c    | 33 ++++++++++++++++++++++++++++++---
->  net/bluetooth/hci_sync.c    | 16 +++++++++++-----
->  net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
->  4 files changed, 56 insertions(+), 25 deletions(-)
->
-> --
-> 2.43.0
->
+> CCC.CSEL needs to be configured along with CCC.OPC. For this,
+> ravb_set_opmode() allows passing GAC and CSEL as part of opmode and the
+> function updates accordingly CCC register.
+> 
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
---=20
-Luiz Augusto von Dentz
+[...]
+
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c> index 664eda4b5a11..9835d18a7adf 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -66,16 +66,23 @@ int ravb_wait(struct net_device *ndev, enum ravb_reg reg, u32 mask, u32 value)
+>  	return -ETIMEDOUT;
+>  }
+>  
+> -static int ravb_config(struct net_device *ndev)
+> +static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
+>  {
+> +	u32 csr_ops = 1U << (opmode & CCC_OPC);
+> +	u32 ccc_mask = CCC_OPC;
+>  	int error;
+>  
+> -	/* Set config mode */
+> -	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
+> -	/* Check if the operating mode is changed to the config mode */
+> -	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
+> -	if (error)
+> -		netdev_err(ndev, "failed to switch device to config mode\n");
+> +	if (opmode & CCC_GAC)
+
+   Worth a comment?
+
+> +		ccc_mask |= CCC_GAC | CCC_CSEL;
+
+   Adding CCC.GAC to the mask not strictly necessary but OK...
+
+[...]
+
+MBR, Sergey
 
