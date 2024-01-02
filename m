@@ -1,218 +1,152 @@
-Return-Path: <netdev+bounces-60761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4F88215E0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 00:01:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B576821605
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 01:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EDF21F217AC
-	for <lists+netdev@lfdr.de>; Mon,  1 Jan 2024 23:01:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3D741F216CA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 00:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8321EE566;
-	Mon,  1 Jan 2024 23:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8497EA;
+	Tue,  2 Jan 2024 00:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DQqx/0UY"
+	dkim=pass (2048-bit key) header.d=dektech.com.au header.i=@dektech.com.au header.b="JJEnUKnu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2110.outbound.protection.outlook.com [40.107.104.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF537E558;
-	Mon,  1 Jan 2024 23:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d3ae326f6so97818675e9.3;
-        Mon, 01 Jan 2024 15:01:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704150074; x=1704754874; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QrKm7t1i2mlLowjRCmL7V9GHjwmfua61oDjbd7rip80=;
-        b=DQqx/0UYlfr55wa7cU1h6sxkEplK+2JAM51+/13rs+Y2jNd2BtkVOM6dtnMkTEqiaJ
-         fP4eLEIfQ/K+p82A/9q2MwkbAIA3QoDUjzs6KLftDfnEXG9dUds7lBIW5K0qFODQNZH1
-         P2Q2dOOO4oXVk9WPy16jJAv27F1erk+3779vAnAyeINalOnFkUZFa5Pu+oo9u7s4WcW9
-         uGLiWA6TsGwkXhtX7ECccbxp83OHhnF1UbGhZPI4DmMDNM/thp3QxFziDo9JKa4cbkhM
-         hrSicwWu6KPJ4yv3opvsGDPGP0ffKsDagMx5LNyZqOhq5L+UHdcWiYj0TNqP0wZE1DZE
-         QSUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704150074; x=1704754874;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QrKm7t1i2mlLowjRCmL7V9GHjwmfua61oDjbd7rip80=;
-        b=l/hugZU8bpTem5V+ZQaIRIwQ5UTqM36S4Drfrvv8rEW09WzLm1FqppkGaq56qwVGvO
-         yrQ5RaWjt54PJsbEhQtORDn4lQhBCOjIRn8HW1Sa9o7RT+pB8IlGg8DbrmLGEwsGl1/R
-         atUj9dxFKIdFFqal63dBr9LCDBkTqP7JaFaEQ6S9o8ARgdbywcrq+s0DFihOAJk5tWxC
-         /w1TbwO+ALuZqj7txGFwJOXXj/Ir1nNSFj+XDDa+uegI1YvuPihHGVJL9t8gR473GMn2
-         HUYsqxN2A6Fi8aOeCjCvOLSsDQwNBsqpp0BkYW97dO4GdWdGfyBG0mOkNsc8Bq+FTa2d
-         LdBw==
-X-Gm-Message-State: AOJu0YwtP9dsz0DFGpSw8D7KO1G8oI3YNMjOPVEIN9/wRBc+9byonijU
-	RcFF/8oqdt9FVDhhUsFGKE4=
-X-Google-Smtp-Source: AGHT+IHashEg1mfq0osZfh9zZXl0d0jKyXaC+vbsJAPRObsYzSorC2ceK8zjo3kxj3JmUhBzyo/H8w==
-X-Received: by 2002:a05:600c:5405:b0:40d:2dbe:b127 with SMTP id he5-20020a05600c540500b0040d2dbeb127mr9218413wmb.166.1704150073733;
-        Mon, 01 Jan 2024 15:01:13 -0800 (PST)
-Received: from [192.168.0.3] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id s21-20020a05600c45d500b0040c3953cda5sm50191307wmo.45.2024.01.01.15.01.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jan 2024 15:01:13 -0800 (PST)
-Message-ID: <a6a50fb6-871f-424c-a146-12b2628b8b64@gmail.com>
-Date: Tue, 2 Jan 2024 01:01:10 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86811650;
+	Tue,  2 Jan 2024 00:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=dektech.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dektech.com.au
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CKWM7NIskJeXtGFHw7XPoYmioJT7yzG1RVauNmKp0U9LS9sViNY7lUx5SzQjx7m9we76+3HURq5q9pqJtXpPs7I1tcyZVZQVMO3cxEhjfGQb+WPfIm3kfClmZaz+lvcWM6ybPaoYRAEdo+xDGcc6iqV5xFr0L/69mG6HFAhm6tLzJAR/EpMRWq2wndG0ErXb3qwpRHk286wSxrJC19EYkoD9/QCdZi/if0sguOmub43i9mNevNZdKcZqjCX6s+xuIYOSjGr9K6hZlvGnMrkHex4yJYOMwL93ZdaIFVU4H4rgd52TOUiDimrTwRWKew7H9oAPTQatCthAYm+JCfaNTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NhSQMTQ3nX3uKh5gVZiJIIPV8j3tjfhDGnS6lpmuj0M=;
+ b=MlINltLEd/0qQbZ6sPBEZHX3sj6T16WmBNQmxk35qbHzqJ3YGe5pnjtIp0Ibj4B/iGwnINa4wQCb90oLZltztnLikhVU2crvNxMgmECsfKsMHh/pUu+fUwJl8Kzcl7hEY7K7kA67DuuI250cWIbFhFooaN7h/q15VcgdNJPh0huNM3b0F0AAH+19CDk74QzJ+5qw6gAxz+eI0KkZZl/+uxKtrmHaaUq/zW29cshPke9fotUKTIa99WgntJ2VfYZftaVarbhTZSt5u5pJ0qNDljrnkTk/UGQkyC8WKoibFBt1OdEZTYh/CXxlu3tSZ3/+ZKfG8f3Bvphz/McHdSlEFA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=dektech.com.au; dmarc=pass action=none
+ header.from=dektech.com.au; dkim=pass header.d=dektech.com.au; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dektech.com.au;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NhSQMTQ3nX3uKh5gVZiJIIPV8j3tjfhDGnS6lpmuj0M=;
+ b=JJEnUKnuYxQEnJ0SgU2dG0PXKUlOPXQ5p5A4IgB2DG5w9UhEGTaiDIb+nLlZVD+8rNxAen628Od7mhKRDBLKcFRsExC21bpCkA9O5iSHyrj5RCBSldDTOLI5X6YDU3iZC5ZeKyvQngoYiUkg1Ce+bBHGJk16h22sWOTB/ZrloR6/YVxEsRPj6LMmOeOsaQ0Ykpkdh+Nee5Oq/O8rXiqjmlUQQ7gm9KTQ4W9CUF/RRQAgBlVeNnCpWxSnU9ueS1Lt5TWLh/309n7/0FTdnC7jB7GByYSQAvcwZsmN4ECKixtcT49pOsvPbMfLSrSUqFjcbeoxPUjtCRk1ZOyaYQkVuw==
+Received: from AS4PR05MB9647.eurprd05.prod.outlook.com (2603:10a6:20b:4ce::15)
+ by AM9PR05MB8648.eurprd05.prod.outlook.com (2603:10a6:20b:417::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Tue, 2 Jan
+ 2024 00:28:02 +0000
+Received: from AS4PR05MB9647.eurprd05.prod.outlook.com
+ ([fe80::2d3d:dc33:a72a:4965]) by AS4PR05MB9647.eurprd05.prod.outlook.com
+ ([fe80::2d3d:dc33:a72a:4965%4]) with mapi id 15.20.7135.023; Tue, 2 Jan 2024
+ 00:28:01 +0000
+From: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
+To: Markus Elfring <Markus.Elfring@web.de>,
+	"tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "kernel-janitors@vger.kernel.org"
+	<kernel-janitors@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jon
+ Maloy <jmaloy@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Ying Xue
+	<ying.xue@windriver.com>
+CC: LKML <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] tipc: Improve exception handling in tipc_bcast_init()
+Thread-Topic: [PATCH] tipc: Improve exception handling in tipc_bcast_init()
+Thread-Index: AQHaO9zk5SqfXgYu3ky6g/dZNAXxBbDFrD8Q
+Date: Tue, 2 Jan 2024 00:28:01 +0000
+Message-ID:
+ <AS4PR05MB9647A320CA0474724147F99C8861A@AS4PR05MB9647.eurprd05.prod.outlook.com>
+References: <b9646b4a-61a2-41fb-8fea-ba63e08996f3@web.de>
+In-Reply-To: <b9646b4a-61a2-41fb-8fea-ba63e08996f3@web.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=dektech.com.au;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS4PR05MB9647:EE_|AM9PR05MB8648:EE_
+x-ms-office365-filtering-correlation-id: ab3428cc-2dc7-4540-360e-08dc0b29add4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 613FPlqGl0XXBknAVL1RE8yOIhSuLmVGd4TPkzjriU33HTmpenUoHC/7XQkUv2xXvAIyjoHovGNw/T+6X9s0HXoUMaBcV2bU1k2OKlyWarGfYnTh5Jh5Nc5fXG5XHoutkpZXgzrNXF/ZyXCFijiW52FjTMSQR4d9Muohrrm0jrHoKvY5lQAzvwqXfeM610WYSOm/4sqZNvgLKiUiOwYPlHy60lZBBQnxumf8mYjSIWYDixdEv354rtSNbcGY8Mg/hkb9bgULFCxHSE4Nv8iFhHIBkCDJ/jj+FXoNGZQlCxeJNTPIxnvkLT2YiO2FCDnyeRVR8gWOLSi7IFbpI4f/PjsRpV4hqnpRHT6cbo5bZFQG61HPMyN4lUbdefqjWGrXMsnphMCiLkEhPtwYD3rwsd+xohKSbyQ5xMhmZPmyxXtEk3EaVU28RPYDifEgAH+f/4vAWcuZpySAp7LIMLtzwFSo16QovUmZPk/6ko2QoThjbv0ZlW+2iatrzcXWJ+fzBv03xnWd97hX8XpKEJtSmWALtsJBBxPQ/bAA7EwA7FbxpGDd47Hl/aKDDqM2SXlzSsHNP7Hki93r1VfEOVuK2UPKhlWJfzvzJ+RTzRnhTj8g2T/RkO3SmmqzBdd2iXHbOSvccJbz0nLh0S+1lyYGXQ==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR05MB9647.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(366004)(39840400004)(136003)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(76116006)(64756008)(66446008)(66476007)(66556008)(4326008)(52536014)(66946007)(316002)(110136005)(8936002)(8676002)(83380400001)(478600001)(71200400001)(9686003)(6506007)(7696005)(5660300002)(4744005)(7416002)(2906002)(41300700001)(33656002)(38070700009)(921011)(122000001)(38100700002)(86362001)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?aHZJS0VsME1xRkNPODJqdUVnUmJlNEIzZUxkdEVTa2Q4ZCtBUm5yYjVHeGRh?=
+ =?utf-8?B?N1ZXQkRJSVdkT280d3d3dTFjNVNxL0R5a2FNTzZsVUtxZzlGbStmcjh1NTVp?=
+ =?utf-8?B?Z1l1WEI2QWY5bXhYK0RUTUUrTXA5MlVyZkFkL0J1dWgrY2ZURkpxakZlV3ZV?=
+ =?utf-8?B?UVAzRHpUaTBSbHpZa3BhUEY4WXljZGpTbmZlUWhDdzc4ZXBFTVJ2clA5d1Ix?=
+ =?utf-8?B?VnZBT0lXUVhyT0tTU29LNDBvMmxCVmFrMk0zSUQwK0Jub3ZYdU1jZEhuTlRq?=
+ =?utf-8?B?TnZLeGc5Skh0bGdVY3ZlVDdTQ255ZWtLTU9aaDRxblFrTjVxMzhNa1oveElV?=
+ =?utf-8?B?eXR6bURwMm9GYmlEeXlXWVY2N2JHd3dLVmhFWk52bzdHRnlZRHNtZkhzSUE2?=
+ =?utf-8?B?Z05oZFVKaFhHZzF6QTVIcGVpck5hcnlRc09MMWgzS01YUXE4MDd5LzJqNS81?=
+ =?utf-8?B?ZzBJQWpad09ibjE0YUI3SVJsdFZzOGliOWFPZGF0K2xrVmpBTmJRYk5QSzNZ?=
+ =?utf-8?B?ZEVydVJvYjZKVmxYZDJLWkVPcERackJnNXQ2Ni8rOXNTWmpBYWpKVm1UZ2Ri?=
+ =?utf-8?B?Q1o1SGxiSjZjMGtWN0oxdEplQ0ZBN05IK0JaWUdiTE14K0ZXMFdXdVBOQ2Mr?=
+ =?utf-8?B?TnBZdllkZFJkZExqMTJQY05DRWZwMTBMZG1CQlpyZldwbm9PeVFpNHpFMmZR?=
+ =?utf-8?B?T0lCQ3dkLzNZUzZwSE95WlhXUTR1T1JtaEJYU3NtQjFTUkNGbDhpM2w4Ym1z?=
+ =?utf-8?B?TXQvbmEzdFRRNnVEK2dsT0xPV3JxWnFWRTZMQmNGOEU2eHFmTmVGeEhuelVY?=
+ =?utf-8?B?aVdEZmkyQnNJWUlpcnRITTZLc0tXb090dk5aSWcxUjV2UnhkOWNhRUZ4RDAw?=
+ =?utf-8?B?Y1hyUXhDL2FyN3dvTjNKbWYrZGxQc25ZbEoybDRqZVgzZjJnRkdMKys2ZjlR?=
+ =?utf-8?B?S0JiQWJWbWI3cHBpR0R5bkJYeXVVUm84amIyRXRhRUlnYUhiT0Z6YXJXTXRO?=
+ =?utf-8?B?ek1YbDU3VVo0RndYS3FNMFZ4K0dtZkduWjJteThhcmxtbEtFejE1UFlKMGRo?=
+ =?utf-8?B?aUppK0N6UDRtMHpaSklQT1lTeDRvRy9MdnpJSURNVHVBaDltMUNNTkdNZzNE?=
+ =?utf-8?B?ME9UdDhaZUZjL0h6TVVyME5lbUM1WkpMNldkdjNtQ0g5K1AyMWtIRi96YlB4?=
+ =?utf-8?B?REUyVmYyWkdLREVIMFBvUnM3MUE5OFVXM3VHRkk3Sy9qV1YzdHNuRkNFdDRw?=
+ =?utf-8?B?SUhJMXYzRlV5VlNYUWpZcGV6Y3l1YVZJSHA0Nlg4bHdPMC82QjF1RjBpc25D?=
+ =?utf-8?B?N21HL0lKNlVOVWZjZXMvbENGNTc1THNoR1FxMTJ4SVV1Nm16VWhTanFHZTZp?=
+ =?utf-8?B?cjJubnVKZUdoaUlKeCtNbExsa2FwU252TnZod2JTOGRLRXdIQUNnSlBoa3JJ?=
+ =?utf-8?B?dkU0aDc4aE1FQ3dyR2tUZUE2VHNjZEp1Zm0vcUZHMng2WkdHRmFaUEd5SFBq?=
+ =?utf-8?B?TlJaeTA4TExzZUFXKzNJVVM4M1IwQitOUS9zclMzbmY0UjltY2VuNkhjYXZW?=
+ =?utf-8?B?ZFZDaUMzZWpSbXVocFkyN0p6S29ONTBSRS91R3MxYk5sVFBUQ245Nnp3cUI5?=
+ =?utf-8?B?VVlEeTlUc2ltRUJIN3BXV0diWkhRNnNHaVg5VUJtVVcxZ1NHL3g1NnNpRTBR?=
+ =?utf-8?B?ODVsLyttTzRDcjdJak0wZWdUMWt5Z2VRWXdwVG9sTDR1Z2tHR0RMTk1SaHhp?=
+ =?utf-8?B?b2FNQUViTDdIeEtwSVIxeEpSM1dLUVc5WG10NlNsMmxXcVhHa2hRZ2ozcHlu?=
+ =?utf-8?B?aU11QVR5RVNLSlhJRVhrNnZKSGRWWC9ZUW9nNTJOUStxVmJzMUJRSmtpRUdh?=
+ =?utf-8?B?eHJGNWJ6dlVIVldObGJoeHJ1RDd6QjVHb1ZaMUFmc0dtaUgzVCttcXhxWXNI?=
+ =?utf-8?B?YUtaamRsRWRnbElLWUlYOEdIckNRVG9OWFViVVEzOEJjUjh4NlBoUHdWckJj?=
+ =?utf-8?B?ZW8wV2xaaWxrZ3RiV2FyZFhtUTZZWmhqMFBLNThCc1NtWFVaMVdCVG9Qd3pk?=
+ =?utf-8?B?M2x5SytOTUxHTWJ6NUpFNGt5RFkvelp6amlmMlVyU21wazVTOEZEbmw2dERk?=
+ =?utf-8?B?U3FvckpwR3RSdGR1eFp4UlpQcE9NU2dHS2dEZ0U3enRTS21mMy8yK2xsSGRo?=
+ =?utf-8?B?TFMzVndROHp3RmRHcm5Bbis3YUZvYmJyUkhpRHhOVS80YUFHeUNDR1hPU1hu?=
+ =?utf-8?B?UFhZbXUvalRkSkwrY2VyTmhtbHpRPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/5] support ipq5332 platform
-Content-Language: en-US
-To: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
- konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_srichara@quicinc.com
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20231225084424.30986-1-quic_luoj@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: dektech.com.au
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR05MB9647.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab3428cc-2dc7-4540-360e-08dc0b29add4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jan 2024 00:28:01.7526
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 1957ea50-0dd8-4360-8db0-c9530df996b2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: q0Lo3O0fZ1nyeFP7rzt4YAUGyZ5TDi5gy4zSrrdOnW+FbdFY598LFezYE/1WucjWdpx7UXTG/XGLNAI2GAmr4da5sfEu90yAv0jG9rQZ0Ok=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR05MB8648
 
-Hi Luo,
-
-I have a few questions regarding the high level design of 
-implementation. I hope that clarifying these topics will help us to find 
-a good model for the case and finally merge a supporting code. Please 
-find the questions below.
-
-On 25.12.2023 10:44, Luo Jie wrote:
-> For IPQ5332 platform, there are two MAC PCSs, and qca8084 is
-> connected with one of them.
-> 
-> 1. The Ethernet LDO needs to be enabled to make the PHY GPIO
->     reset taking effect, which uses the MDIO bus level reset.
-> 
-> 2. The SoC GCC uniphy AHB and SYS clocks need to be enabled
->     to make the ethernet PHY device accessible.
-> 
-> 3. To provide the clock to the ethernet, the CMN clock needs
->     to be initialized for selecting reference clock and enabling
->     the output clock.
-> 
-> 4. Support optional MDIO clock frequency config.
-> 
-> 5. Update dt-bindings doc for the new added properties.
-> 
-> Changes in v2:
-> 	* remove the PHY related features such as PHY address
-> 	  program and clock initialization.
-> 	* leverage the MDIO level GPIO reset for qca8084 PHY.
-> 
-> Changes in v3:
-> 	* fix the christmas-tree format issue.
-> 	* improve the dt-binding changes.
-> 
-> Changes in v4:
-> 	* improve the CMN PLL reference clock config.
-> 	* improve the dt-binding changes.
-> 
-> Luo Jie (5):
->    net: mdio: ipq4019: move eth_ldo_rdy before MDIO bus register
->    net: mdio: ipq4019: enable the SoC uniphy clocks for ipq5332 platform
->    net: mdio: ipq4019: configure CMN PLL clock for ipq5332
->    net: mdio: ipq4019: support MDIO clock frequency divider
->    dt-bindings: net: ipq4019-mdio: Document ipq5332 platform
-> 
->   .../bindings/net/qcom,ipq4019-mdio.yaml       | 141 ++++++++-
->   drivers/net/mdio/mdio-ipq4019.c               | 288 ++++++++++++++++--
->   2 files changed, 399 insertions(+), 30 deletions(-)
-
-I'm asking these questions because after checking the patches and 
-following the earlier discussion, the series is looks like an 
-overloading of the MDIO driver with somehow but not strictly related 
-functionality.
-
-
-First, let me summarize the case. Feel free to correct me if I took 
-something wrong. So, we have:
-- a reference design contains IPQ5332 SoC + QCA8084 switch/Phy;
-- QCA8084 requires a reference clock for normal functionality;
-- IPQ5332, as a chip, is able to provide a set of reference clocks for 
-external devices;
-- you want to configure IPQ5332 to provide the reference clock for QCA8084.
-
-
-So, the high level questions are:
-1. Is QCA8084 capable to consume the clock from some other generator? Is 
-it possible to clock QCA8084 from external XO/PLL/whatever?
-2. Is IPQ5332 capable to provide reference clock to another switch model?
-3. Is the reference clock generation subsystem part of the MDIO block of 
-IPQ5332?
-
-
-And there are some tiny questions to make sure that we are on the same page:
-a. What is the mentioned Ethernet LDO? AFAIK, LDO is some kind of gate 
-(or switch) that enables clock output through an IPQ5332 pin. Isn't it? 
-And if it's true, then can you clarify, what exactly clock is outputted?
-b. Is the Ethernet LDO part of the MDIO block of IPQ5332? According to 
-iomem addresses that was used in the example reg property, the Ethernet 
-LDO is not part of MDIO.
-c. Is the CMN PLL part of the MDIO block of IPQ5332? Again, according to 
-iomem address, the CMN PLL is not part of MDIO.
-d. Are GCC AHB & SYS clocks really consumed by MDIO itself? Or are they 
-need for the external reference clock generation?
-
-
-Please answer these questions one by one and we will have a good basis 
-to move forward.
-
-
-
-To speed up the discussion, let me share my user's view of the reference 
-clocks modeling. I would like to join the option that has already been 
-suggested by the maintainers. It is better to implement reference clocks 
-handling using the clocks API, and the clock subsystem will take care of 
-enabling and configuring them.
-
-And considering the expected answers to the above questions, I would 
-like to suggest to implement the clock handling using a dedicated clock 
-controlling driver. Or even using several of such tiny dedicated 
-drivers. So DTS will become like this:
-
-   ext_ref_clock: ext_ref_clock {
-     compatible = "fixed-clock";
-     clock-frequency = <48000000>;
-   };
-
-   eth_cmn_pll: clock-controller@9b000 {
-     compatible = "qcom,eth-cmn-pll-ipq5223";
-     reg = <0x9b000 0x800>;
-     clocks = <&ext_ref_clock>; /* use external 48MHz clock */
-   };
-
-   phy0_ext_clk: clock-controller@7a00610 {
-     compatible = "qcom,ipq-eth-ldo";
-     reg = <0x7a00610 0x4>;
-     clocks = <&eth_cmn_pll>;
-   };
-
-   mdio@90000 {
-     compatible = "qcom,ipq4019-mdio";
-     reg = <0x90000 0x64>;
-     clocks = <&gcc GCC_MDIO_AHB_CLK>;
-
-     ethernet-phy@1 {
-       compatible = "...";
-       reg = <1>;
-       clocks = <&phy0_ext_clk>;
-       reset-gpios = <&gcc ...>;
-     };
-   };
-
---
-Sergey
+PlN1YmplY3Q6IFtQQVRDSF0gdGlwYzogSW1wcm92ZSBleGNlcHRpb24gaGFuZGxpbmcgaW4gdGlw
+Y19iY2FzdF9pbml0KCkNCj4NCj5Gcm9tOiBNYXJrdXMgRWxmcmluZyA8ZWxmcmluZ0B1c2Vycy5z
+b3VyY2Vmb3JnZS5uZXQ+DQo+RGF0ZTogU3VuLCAzMSBEZWMgMjAyMyAxMjoyMDowNiArMDEwMA0K
+Pg0KPlRoZSBrZnJlZSgpIGZ1bmN0aW9uIHdhcyBjYWxsZWQgaW4gdHdvIGNhc2VzIGJ5IHRoZSB0
+aXBjX2JjYXN0X2luaXQoKSBmdW5jdGlvbiBkdXJpbmcgZXJyb3IgaGFuZGxpbmcgZXZlbiBpZiB0
+aGUgcGFzc2VkIHZhcmlhYmxlDQo+Y29udGFpbmVkIGEgbnVsbCBwb2ludGVyLg0KPlRoaXMgaXNz
+dWUgd2FzIGRldGVjdGVkIGJ5IHVzaW5nIHRoZSBDb2NjaW5lbGxlIHNvZnR3YXJlLg0Ka2ZyZWUo
+KSB2YWxpZGF0ZXMgdGhlIHBvaW50ZXIgYmVmb3JlIGRvaW5nIGFjdHVhbCBtZW1vcnkgZnJlZS4g
+WW91ciBwYXRjaCBpcyBub3QgbmVjZXNzYXJ5Lg0K
 
