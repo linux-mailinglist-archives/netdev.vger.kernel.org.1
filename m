@@ -1,136 +1,136 @@
-Return-Path: <netdev+bounces-61010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34283822289
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 21:27:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A4128222A1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 21:34:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5315284778
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:27:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A28C284799
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7708C16413;
-	Tue,  2 Jan 2024 20:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A79412B76;
+	Tue,  2 Jan 2024 20:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z969pk4A"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LMiTdhr0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03D916406
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 20:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F632168A2
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 20:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5e6c8b70766so82003837b3.3
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 12:27:32 -0800 (PST)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50e7e55c0f6so6569618e87.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 12:34:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704227252; x=1704832052; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=57elgdniwVdc3+g3xt51kmk/wTKPZc8YGaxaPGZRMwk=;
-        b=Z969pk4AdnIEpvflitk9KKfAimdqW9fThzt01sNA2EHuV2GYLAOWRbrlamfGhFAu+2
-         Ow4GyfXhZViwPmQKHgxnphWuvPZCy570DYP36rDAq1hVFu6xGn3dn3HYUOjpbd3JgeFN
-         UQq9RQhTFCyz3rPXwwmp5Wj1yYaHbKUiwFpsV2BJ2UtAQupe+ohqz6nkVrYzUwmvBIom
-         pO6hqermPO8c8BPR/nn9xvEAr68d9115/1kZ6ZH+uQNX/3Jke8YmXXOZA4Z6Y+9xpakl
-         KuXvNb3lSJU5Ti+da6rHZI4V4h+pcMzP1F5KnGX/nwyogF02Rj3pF3XMoNiPKYAjdfSF
-         nyCQ==
+        d=linaro.org; s=google; t=1704227673; x=1704832473; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ijoKC73TdFIBBVqv9dw+ePrN9BbIEqwbvqYBbLsAH54=;
+        b=LMiTdhr0UWKnSmqYwIC28ucWSwJWEvqYqx44iDEFM5PKDTZMLl0I3jANsKWKa1NDw4
+         7BnaLG66Y6sZQmVBciG8tQ5j9Sz6phr2N1QadgI/Ot+vLFH62GYYYr/kK5TvCqcLyq+P
+         Z6LDWQUe9QCgkVc5zJyOZDlQTuBHE51KokRAe/64tA6p5rkfG20GidFnjeknaPA6AhfQ
+         hCUJQ2J7ICim5Su7asrTu48uPaz3GMxRiO5zjSi2tjnuS2QgSNe/cVc0OO/L9Rs3D9Fi
+         Jhsu3tuDTWIfJCBB4UTmbMJiS/OzAOLhJKfwhH6LyxLsOWRqxy7R69ITAbzI4fvlCsD4
+         OHZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704227252; x=1704832052;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=57elgdniwVdc3+g3xt51kmk/wTKPZc8YGaxaPGZRMwk=;
-        b=mArVYgdGMBGkCqh2U9+EOR+AWspcS/Dk0piXWAOhzqdNpylxIpE+xHqp293XFEEQ+e
-         ZqPN0473u3PjeP+tzO10TFPepoEGUBzb0RTr8PT5+MP9Aj6Z/STHqAZ9N7wna4SggtfP
-         6UhWVnPBWvreZN6E+HuY2qOvXmUb6rbMo5Bp1FoYY07Qxvk1CR90v1Ik4heaZrGPxVIO
-         p9mU7lw95bximkTBwYBurOO3Q4EDuhq+tgqs1rb5aX0TgWDFRY9GkQnTM+dZsZaWx0hF
-         QPBGHerG/9VE7DKy7hu+m3OKAM6ccvhCbip0GPdbYI/IUNH4s33FY9fplUTox+oSuuPG
-         ZWVg==
-X-Gm-Message-State: AOJu0Yz6mwJAlYfMpJJkX1B2E0jF5cVGdwEWt6qjIb1SrdSEhQYwJcoN
-	S5nDFP48KiN1S2yd3A4FwQuI35O3yAZRdmLDe609gvooR3PmVw==
-X-Google-Smtp-Source: AGHT+IHp2RSa0VuvVG8Klk0YQDjmzxq+0RHbKjArLq+EvbeQ8IFgiQjcRQG4mPxnAXnuBN5nttuR970iOInU5esWrKM=
-X-Received: by 2002:a81:ae62:0:b0:5ea:5340:fb1d with SMTP id
- g34-20020a81ae62000000b005ea5340fb1dmr8848683ywk.53.1704227251901; Tue, 02
- Jan 2024 12:27:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704227673; x=1704832473;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ijoKC73TdFIBBVqv9dw+ePrN9BbIEqwbvqYBbLsAH54=;
+        b=s0UeNuomca5Kxgwn0gSaEGKjffznZJ9l+cN31FToRpS1RJq1Bqcp8Dk+BPSup4cgJL
+         Hqs0oByZonMFQ6K7mjDHtkop4k7PW/zRZ8XvF3eSO4N0UU5+QILUbDzPqv0ngGv2oO/S
+         c2S+0H8JQDctrh/0HX3SN5h5TzQ/77mg4c0YIfWFlgwKR3pYCP8PcZd3CtaCKgLtSZyw
+         ZOE7PuranDuXsePKp+QX1nZuHcrUmOOrG3/quEtO7RK6RR1/6Z/m52B5RbgoLUnfhy7w
+         S81zuo9cPkpYJ9TZ4tkhm8U1FbkAFah8bxyPCXns18j4wjpxaxXHAel7Ht3y0gqR8jYM
+         peoA==
+X-Gm-Message-State: AOJu0YydT4k3iP92aUdmXsrKw/GF9yswBnQxlBGOFPc5EhIqJJTp7G0u
+	edk2TR5n4TfmACTAzNlkk/Ygjp8SCh286w==
+X-Google-Smtp-Source: AGHT+IHGkoUEplTignncvs4gU+lmE2oE8dGFIYDLVPk62i6X25zNjCJjepMfBlKvCxtPnofRRK9H3g==
+X-Received: by 2002:ac2:5b5a:0:b0:50e:5afd:d585 with SMTP id i26-20020ac25b5a000000b0050e5afdd585mr3421860lfp.259.1704227673232;
+        Tue, 02 Jan 2024 12:34:33 -0800 (PST)
+Received: from [127.0.1.1] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id a19-20020ac25213000000b0050e7b52c735sm2668392lfl.145.2024.01.02.12.34.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 12:34:32 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH net v5 0/2] Fix a regression in the Gemini ethernet
+ controller.
+Date: Tue, 02 Jan 2024 21:34:24 +0100
+Message-Id: <20240102-new-gemini-ethernet-regression-v5-0-cf61ab3aa8cd@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240102162718.268271-1-romain.gantois@bootlin.com> <20240102162718.268271-2-romain.gantois@bootlin.com>
-In-Reply-To: <20240102162718.268271-2-romain.gantois@bootlin.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 2 Jan 2024 21:27:20 +0100
-Message-ID: <CACRpkdZjOBpD6HoobgMBA27dS+uz5pqb8otL+fGtMvsywYBTPA@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/1] net: stmmac: Prevent DSA tags from breaking
- COE on stmmac
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, Sylvain Girard <sylvain.girard@se.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Pascal EBERHARD <pascal.eberhard@se.com>, Richard Tresidder <rtresidd@electromag.com.au>, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFBzlGUC/4XNzU6FMBAF4Fe56dqadqYU68r3MC4oTGESLWZKU
+ HPDu9uLG8xdsDzz852rKiRMRT1frkpo5cJzrqF5uKh+6vJImoeaFRhACwZ1pi890gdn1rRMJJk
+ WLTQKldurxt63MFDo0xBURT6FEn/vBa+q3qq3Opy4LLP87KWr3Vd/vm3O/NVqowMaxMa5SIAv7
+ 5w7mR9nGXd7haPnTz2onnc9+OAsDqm78/DggT31sHpd8NFh62KipzvPHT049dzNQ0+tjSYhxH/
+ etm2/Q7X/FMIBAAA=
+To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, Household Cang <canghousehold@aol.com>, 
+ Romain Gantois <romain.gantois@bootlin.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.12.4
 
-Hi Romain,
+These fixes were developed on top of the earlier fixes.
 
-overall this patch makes sense.
+Finding the right solution is hard because the Gemini checksumming
+engine is completely undocumented in the datasheets.
 
-On Tue, Jan 2, 2024 at 5:27=E2=80=AFPM Romain Gantois
-<romain.gantois@bootlin.com> wrote:
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+Changes in v5:
+- Drop the patch re-implementing eth_header_parse_protocol()
+- Link to v4: https://lore.kernel.org/r/20231222-new-gemini-ethernet-regression-v4-0-a36e71b0f32b@linaro.org
 
-> Some DSA tagging protocols change the EtherType field in the MAC header
-> e.g.  DSA_TAG_PROTO_(DSA/EDSA/BRCM/MTK/RTL4C_A/SJA1105). On TX these tagg=
-ed
-> frames are ignored by the checksum offload engine and IP header checker o=
-f
-> some stmmac cores.
->
-> On RX, the stmmac driver wrongly assumes that checksums have been compute=
-d
-> for these tagged packets, and sets CHECKSUM_UNNECESSARY.
->
-> Add an additional check in the stmmac tx and rx hotpaths so that COE is
-> deactivated for packets with ethertypes that will not trigger the COE and
-> ip header checks.
->
-> Fixes: 6b2c6e4a938f ("net: stmmac: propagate feature flags to vlan")
-> Cc: stable@vger.kernel.org
-> Reported-by: Richard Tresidder <rtresidd@electromag.com.au>
-> Closes: https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617=
-c2@electromag.com.au/
-> Reported-by: Romain Gantois <romain.gantois@bootlin.com>
-> Closes: https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c544=
-95@bootlin.com/
-> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
-(...)
+Changes in v4:
+- Properly drop all MTU/TSO muckery in the TX function, the
+  whole approach is bogus.
+- Make the raw etherype retrieveal return __be16, it is the
+  callers job to deal with endianness (as per the pattern
+  from if_vlan.h)
+- Use __vlan_get_protocol() instead of vlan_get_protocol()
+- Only actively bypass the TSS if the frame is over a certain
+  size.
+- Drop comment that no longer applies.
+- Link to v3: https://lore.kernel.org/r/20231221-new-gemini-ethernet-regression-v3-0-a96b4374bfe8@linaro.org
 
-> +static inline bool stmmac_has_ip_ethertype(struct sk_buff *skb)
-> +{
-> +       __be16 proto =3D eth_header_parse_protocol(skb);
+Changes in v3:
+- Fix a whitespace bug in the first patch.
+- Add generic accessors to obtain the raw ethertype of an
+  ethernet frame. VLAN already have the right accessors.
+- Link to v2: https://lore.kernel.org/r/20231216-new-gemini-ethernet-regression-v2-0-64c269413dfa@linaro.org
 
-I made a new function for this in my patch
-https://lore.kernel.org/netdev/20231222-new-gemini-ethernet-regression-v4-2=
--a36e71b0f32b@linaro.org/
+Changes in v2:
+- Drop the TSO and length checks altogether, this was never
+  working properly.
+- Plan to make a proper TSO implementation in the next kernel
+  cycle.
+- Link to v1: https://lore.kernel.org/r/20231215-new-gemini-ethernet-regression-v1-0-93033544be23@linaro.org
 
-I was careful to add if (!pskb_may_pull(skb, ETH_HLEN)) because Eric
-was very specific about this, I suppose you could get fragment frames that
-are smaller than an ethernet header.
+---
+Linus Walleij (2):
+      net: ethernet: cortina: Drop software checksum and TSO
+      net: ethernet: cortina: Bypass checksumming engine of alien ethertypes
 
-I should use eth_header_parse_protocol() instead of reimplementing it
-though. :/
+ drivers/net/ethernet/cortina/gemini.c | 62 +++++++++++++++--------------------
+ 1 file changed, 26 insertions(+), 36 deletions(-)
+---
+base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
+change-id: 20231203-new-gemini-ethernet-regression-3c672de9cfd9
 
-Should we add an if (!pskb_may_pull(skb, ETH_HLEN)) to
-eth_header_parse_protocol()?
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
 
-Yours,
-Linus Walleij
 
