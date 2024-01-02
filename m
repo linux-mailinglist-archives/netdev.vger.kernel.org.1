@@ -1,165 +1,200 @@
-Return-Path: <netdev+bounces-60851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D18821ADD
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:24:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AB1A821AF5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:30:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29428B20E79
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:24:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 346FC283162
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA15DF5D;
-	Tue,  2 Jan 2024 11:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21477E574;
+	Tue,  2 Jan 2024 11:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="eGmXqasC"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="J0ZzP+oE";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kG2JZIXk"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B4BEAC0;
-	Tue,  2 Jan 2024 11:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1704194648;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RL4p8JTgWtUMp+LSFYGDq2LgzfnsXq2WPu5q9VKoeO4=;
-	b=eGmXqasCdYtT4c3TgAwsOFFN82HooJbJOEvq++G/iC28O2BLpcbK4C+wGyfC2Uje+tvntd
-	igtbeTIfHijeeGG1K3Uvr2hCEc582bPn5wk6RwrpaV27ttveqgQ8I4h1ScyWFnXRODeP9x
-	KHo/8w0IfIJoqNIIEkj1/w8h0E/tm5Y=
-From: Sven Eckelmann <sven@narfation.org>
-To: b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, Antonio Quartulli <a@unstable.cc>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Marek Lindner <mareklindner@neomailbox.ch>,
- Paolo Abeni <pabeni@redhat.com>, Simon Wunderlich <sw@simonwunderlich.de>,
- Markus Elfring <Markus.Elfring@web.de>
-Cc: LKML <linux-kernel@vger.kernel.org>
-Subject:
- Re: [PATCH 2/2] batman-adv: Improve exception handling in
- batadv_throw_uevent()
-Date: Tue, 02 Jan 2024 12:24:05 +0100
-Message-ID: <4889340.31r3eYUQgx@sven-l14>
-In-Reply-To: <d2ce9337-e1a4-4213-ad6f-926c085dc17f@web.de>
-References:
- <8588cafe-3c61-40a6-b071-0877632a2a1e@web.de>
- <d2ce9337-e1a4-4213-ad6f-926c085dc17f@web.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6A1E555;
+	Tue,  2 Jan 2024 11:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 890A93200AD5;
+	Tue,  2 Jan 2024 06:30:21 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 02 Jan 2024 06:30:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1704195021;
+	 x=1704281421; bh=h3JvgInG7Ve5RiimZ8l2qqQlcPTAgW2uluafkfImiMg=; b=
+	J0ZzP+oENC5diPXzLG51ke/34Q4eGEG/BZdJpS2ydH8WJEaBlzGtV/fF2DFmQcM1
+	zFeZLkK3EnU26TOYyIIrE1PcDocj1PX7tLakPL++r2nsa9YZK0CuMfPM05VZev5p
+	PwnHw3+SpjQkdLsx4kZnNesNS+xZ7MlJQeRrhxvXtv39q+Sgtxvrf4fc8B1YNh3H
+	9eXlnMj6CygiRY4Vpb105G1kDzQ2U2vPgUH4rt8iMzEbYCS67H+NguMLOexH80+y
+	Am/+o+vqC6whc99P6hC+lFBFK6/oglggTWUDxW17eRPtmLjmDf7OFhfYXIdNEiAs
+	Bi6OgB3KwcVWqEhXLLvH8g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1704195021; x=
+	1704281421; bh=h3JvgInG7Ve5RiimZ8l2qqQlcPTAgW2uluafkfImiMg=; b=k
+	G2JZIXkFwCe70RI3PcafnLr3j8GF7AFn3rI2Re525QhVWVQBhtTnh5+bq4BU1Rox
+	2yHZaPE7w+NO79R6NB9AV84egZjUFHEKbkCBErjw9Tv6+zql9ImL//LBu7GVHmFA
+	NtLGRyuqIcPYO6mq1iqHw3o+/SucXcsWcHi3snwlHJWpf1pRl68BeVUxWbNJAZqg
+	P4ZspZysFW/TCn3o9hMiS/Fd92IGdqiFa8SY6CgZHmHcm25DoOzH/5LmtAkCkImx
+	tK0ydany5PLkP+OQJvA+vUIQU+R74CZQVww2wKQrzz3vIV72/DtLyxGa5lHTOkaJ
+	QmPQlmfQcgtZSRCdoxJXw==
+X-ME-Sender: <xms:zPOTZYbia3SVWJYS8m8t0xhQQmG5qxhCQEDdePwlqRYd5rFgHBsptw>
+    <xme:zPOTZTbz8c5TJc26OjAIEaFEyPCVZfgXNOwthuivPvsdWvJgPi9Ds_2xU1RpTv0rZ
+    euBZu3VZ0n4EM-pjQs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdegvddgvdejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeegfeejhedvledvffeijeeijeeivddvhfeliedvleevheejleetgedukedt
+    gfejveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:zPOTZS9qr36iU_GgWLmZeUyApfi00Dkasyl-QBLvNglpt92w1P3Alg>
+    <xmx:zPOTZSrcTXTA2ebg43ik4TsfMMW6enuXHga81xYxylPIAlacJr2LcA>
+    <xmx:zPOTZTo-8BflwpnXhBimnXIcYwhytNx9IyvuHHlEN6NIElwzSscq4g>
+    <xmx:zfOTZfo2D2j50BQd46AH5fFoakLl1k_C8rOLiz15xgb-hy4X2BSlCg>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id F1587B6008D; Tue,  2 Jan 2024 06:30:19 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1364-ga51d5fd3b7-fm-20231219.001-ga51d5fd3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart4538693.LvFx2qVVIh";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+Message-Id: <84d8e9d7-09ce-4781-8dfa-a74bb0955ae8@app.fastmail.com>
+In-Reply-To: 
+ <CAMuE1bF0Hho4VwO6w3f+9z3j5TtscYzuAjj10MFt2mZXG2P8dQ@mail.gmail.com>
+References: <20231228122411.3189-1-maimon.sagi@gmail.com>
+ <f254c189-463e-43a3-bc09-9a8869ebf819@app.fastmail.com>
+ <CAMuE1bF0Hho4VwO6w3f+9z3j5TtscYzuAjj10MFt2mZXG2P8dQ@mail.gmail.com>
+Date: Tue, 02 Jan 2024 12:29:59 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Sagi Maimon" <maimon.sagi@gmail.com>
+Cc: "Richard Cochran" <richardcochran@gmail.com>,
+ "Andy Lutomirski" <luto@kernel.org>, datglx@linutronix.de,
+ "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Johannes Weiner" <hannes@cmpxchg.org>,
+ "Sohil Mehta" <sohil.mehta@intel.com>,
+ "Rick Edgecombe" <rick.p.edgecombe@intel.com>,
+ "Nhat Pham" <nphamcs@gmail.com>, "Palmer Dabbelt" <palmer@sifive.com>,
+ "Kees Cook" <keescook@chromium.org>, "Alexey Gladkov" <legion@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>, linux-kernel@vger.kernel.org,
+ linux-api@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3] posix-timers: add multi_clock_gettime system call
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---nextPart4538693.LvFx2qVVIh
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>
-Date: Tue, 02 Jan 2024 12:24:05 +0100
-Message-ID: <4889340.31r3eYUQgx@sven-l14>
-In-Reply-To: <d2ce9337-e1a4-4213-ad6f-926c085dc17f@web.de>
-MIME-Version: 1.0
+On Sun, Dec 31, 2023, at 17:00, Sagi Maimon wrote:
+> On Fri, Dec 29, 2023 at 5:27=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> =
+wrote:
 
-On Tuesday, 2 January 2024 08:12:56 CET Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Tue, 2 Jan 2024 07:52:21 +0100
-> 
-> The kfree() function was called in up to three cases by
-> the batadv_throw_uevent() function during error handling
-> even if the passed variable contained a null pointer.
-> This issue was detected by using the Coccinelle software.
-> 
-> * Thus adjust jump targets.
-> 
-> * Reorder kfree() calls at the end.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+>> > +struct __ptp_multi_clock_get {
+>> > +     unsigned int n_clocks; /* Desired number of clocks. */
+>> > +     unsigned int n_samples; /* Desired number of measurements per=
+ clock. */
+>> > +     clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock I=
+Ds */
+>> > +     /*
+>> > +      * Array of list of n_clocks clocks time samples n_samples ti=
+mes.
+>> > +      */
+>> > +     struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP=
+_MAX_CLOCKS];
+>> > +};
+>>
+>> The fixed size arrays here seem to be an unnecessary limitation,
+>> both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS are small
+>> enough that one can come up with scenarios where you would want
+>> a higher number, but at the same time the structure is already
+>> 808 bytes long, which is more than you'd normally want to put
+>> on the kernel stack, and which may take a significant time to
+>> copy to and from userspace.
+>>
+>> Since n_clocks and n_samples are always inputs to the syscall,
+>> you can just pass them as register arguments and use a dynamically
+>> sized array instead.
+>>
+> Both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS are enough of any
+> usage we can think of,
+> But I think you are right, it is better to use a dynamically sized
+> array for future use, plus to use less stack memory.
+> On patch v4 a dynamically sized array will be used .
+> I leaving both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS but
+> increasing their values, since there should be some limitation.
 
-Acked-by: Sven Eckelmann <sven@narfation.org>
+I think having an implementation specific limit in the kernel is
+fine, but it would be nice to hardcode that limit in the API.
 
-> ---
->  net/batman-adv/main.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-> index 5fc754b0b3f7..75119f1ffccc 100644
-> --- a/net/batman-adv/main.c
-> +++ b/net/batman-adv/main.c
-> @@ -691,29 +691,31 @@ int batadv_throw_uevent(struct batadv_priv *bat_priv, enum batadv_uev_type type,
->  				  "%s%s", BATADV_UEV_TYPE_VAR,
->  				  batadv_uev_type_str[type]);
->  	if (!uevent_env[0])
-> -		goto out;
-> +		goto report_error;
-> 
->  	uevent_env[1] = kasprintf(GFP_ATOMIC,
->  				  "%s%s", BATADV_UEV_ACTION_VAR,
->  				  batadv_uev_action_str[action]);
->  	if (!uevent_env[1])
-> -		goto out;
-> +		goto free_first_env;
-> 
->  	/* If the event is DEL, ignore the data field */
->  	if (action != BATADV_UEV_DEL) {
->  		uevent_env[2] = kasprintf(GFP_ATOMIC,
->  					  "%s%s", BATADV_UEV_DATA_VAR, data);
->  		if (!uevent_env[2])
-> -			goto out;
-> +			goto free_second_env;
->  	}
-> 
->  	ret = kobject_uevent_env(bat_kobj, KOBJ_CHANGE, uevent_env);
-> -out:
-> -	kfree(uevent_env[0]);
-> -	kfree(uevent_env[1]);
->  	kfree(uevent_env[2]);
-> +free_second_env:
-> +	kfree(uevent_env[1]);
-> +free_first_env:
-> +	kfree(uevent_env[0]);
-> 
->  	if (ret)
-> +report_error:
->  		batadv_dbg(BATADV_DBG_BATMAN, bat_priv,
->  			   "Impossible to send uevent for (%s,%s,%s) event (err: %d)\n",
->  			   batadv_uev_type_str[type],
-> --
-> 2.43.0
-> 
-> 
+If both clkidarr[] and ts[] are passed as pointer arguments
+in registers, they can be arbitrarily long in the API and
+still have a documented maximum that we can extend in the
+future without changing the interface.
 
+>> It's not clear to me what you gain from having the n_samples
+>> argument over just calling the syscall repeatedly. Does
+>> this offer a benefit for accuracy or is this just meant to
+>> avoid syscall overhead.
+> It is mainly to avoid syscall overhead which also slightly
+> improve the accuracy.
 
---nextPart4538693.LvFx2qVVIh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+This is not a big deal as far as I'm concerned, but it
+would be nice to back this up with some numbers if you
+think it's worthwhile, as my impression is that the effect
+is barely measurable: my guess would be that the syscall
+overhead is always much less than the cost for the hardware
+access.
 
------BEGIN PGP SIGNATURE-----
+>> On the other hand, this will still give less accuracy than the
+>> getcrosststamp() callback with ioctl(PTP_SYS_OFFSET_PRECISE),
+>> so either the last bit of accuracy isn't all that important,
+>> or you need to refine the interface to actually be an
+>> improvement over the chardev.
+>>
+> I don't understand this comment, please explain.
+> The ioctl(PTP_SYS_OFFSET_PRECISE) is one specific case that can be
+> done by multi_clock_gettime syscall (which cover many more cases)
+> Plus the ioctl(PTP_SYS_OFFSET_PRECISE) works only on drivers that
+> support this feature.
 
-iQIzBAABCgAdFiEEF10rh2Elc9zjMuACXYcKB8Eme0YFAmWT8lUACgkQXYcKB8Em
-e0ZtIA//eZtvK8xgUCk7KXnL6m/xB/Hnlsa817um4kK3xG+JO1hmlgxNsNJfu0HT
-VIP0Ca/QY7GRewIOz2fT60YCffgVQeht30bVdI3D7U6du5/nd6Q3JRzw8WaFuDxo
-MBIvVoqtNCK3YNBjKhYILq1X/lmxgvE+4J/1n94/QQWlJ9lgZthE2JWVwbMfDa+Q
-USyZI6ftogWsk9TKrt5cgWuQRrps3qtjnHUmgBNFXfWjwsRQUtjWzE960Y6au2tH
-fAqTrBW7M18RE+yDKQUjnmlpETnwBLCCcudS2cZBmx9EZL4TQEdJ4T+Ka8e9iPwV
-M37MJh/h+mwbxKIhv0vPnuvpBHZzQ+3opNCgIGTpS5YExATFMCIVXMeuN+kjVfC3
-X1iHjqRagGxcqpQtzaUcgYsZ4/elr5ODM4GH2VzH5phqb5iS0u64K+lmuWqO/Bsx
-hi7klW9+mKcrVgyeM5r83VcP9Ea+wS/3vhQBTPK4X3da71oqPq0X+2/qOYlzreBq
-LIpWu9BdpkKp5NHoAL7yyxOfm8hIjGCY1EXWUsKyb9Zs08Etqr4thHJtxxTNzhM1
-2ulCCmn8NNK/PzvguYQxIbXiJiK9U7bfzZoKbYSPRTEvd2xM2RxMrgZH94swmFYD
-SNNMTa3ccaynMy/E/KB0/uD2ktF1PHs6739YdB6ivv7VIZTKqRI=
-=sz9M
------END PGP SIGNATURE-----
+My point here is that on drivers that do support
+PTP_SYS_OFFSET_PRECISE, the extra accuracy should be maintained
+by the new interface, ideally in a way that does not have any
+other downsides.
 
---nextPart4538693.LvFx2qVVIh--
+I think Andy's suggestion of exposing time offsets instead
+of absolute times would actually achieve that: If the
+interface is changed to return the offset against
+CLOCK_MONOTONIC, CLOCK_MONOTONIC_RAW or CLOCK_BOOTTIME
+(not sure what is best here), then the new syscall can use
+getcrosststamp() where supported for the best results or
+fall back to gettimex64() or gettime64() otherwise to
+provide a consistent user interface.
 
+Returning an offset would also allow easily calculating an
+average over multiple calls in the kernel, instead of
+returning a two-dimensional array.
 
-
+    Arnd
 
