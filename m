@@ -1,178 +1,160 @@
-Return-Path: <netdev+bounces-60868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3592821B65
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:06:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F095E821B6A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:08:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18E53B21695
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:06:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 761D6282F9F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:08:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D77EADC;
-	Tue,  2 Jan 2024 12:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AFA5EAF6;
+	Tue,  2 Jan 2024 12:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uiji7T/0"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430C0F9CC;
-	Tue,  2 Jan 2024 12:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4T4BQk51JVz1vrQt;
-	Tue,  2 Jan 2024 20:06:22 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (unknown [7.185.36.219])
-	by mail.maildlp.com (Postfix) with ESMTPS id 510671A0195;
-	Tue,  2 Jan 2024 20:06:20 +0800 (CST)
-Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
- dggpemm500004.china.huawei.com (7.185.36.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Jan 2024 20:06:20 +0800
-Received: from [10.67.121.229] (10.67.121.229) by
- dggpemm500007.china.huawei.com (7.185.36.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 2 Jan 2024 20:06:19 +0800
-Subject: Re: [PATCH iproute2-rc 1/2] rdma: Fix core dump when pretty is used
-To: Leon Romanovsky <leon@kernel.org>
-References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
- <20231229065241.554726-2-huangjunxian6@hisilicon.com>
- <20231229092129.25a526c4@hermes.local>
- <30d8c237-953a-8794-9baa-e21b31d4d88c@huawei.com>
- <20240102083257.GB6361@unreal>
-CC: Stephen Hemminger <stephen@networkplumber.org>, Junxian Huang
-	<huangjunxian6@hisilicon.com>, <jgg@ziepe.ca>, <dsahern@gmail.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>
-From: Chengchang Tang <tangchengchang@huawei.com>
-Message-ID: <29146463-6d0e-21c5-af42-217cee760b3f@huawei.com>
-Date: Tue, 2 Jan 2024 20:06:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59D1EAE5;
+	Tue,  2 Jan 2024 12:08:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5172FC433C7;
+	Tue,  2 Jan 2024 12:08:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704197321;
+	bh=R6o9aFq/1eAraRvjOhvfwi4bZfBlxQ2kpClYSSZs+CU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Uiji7T/0OzS685kV62eXWDRIHs2d8lB3uInDNlFZxH0rqcp2JKULQJjsV7wilSets
+	 MXjQsh75rv3K2O4vZyKRfS2zO+z9PTtGEir2OrKIm0zQtUC0aybMoz8LJpWCjBaYf5
+	 sMYZ3s1DQsZC5rh66GH74Q33k5cXVEPl8+DiYk/Naebf7y/Sev8Vi5Otz7G2CzEIFh
+	 sf8ci0gvSNI/nfQV0T0spRhpvQP/Rh6Fz1aUMM1wW5P411okXOKkcsIS+eVy8N2tyb
+	 Kxu/3ZF0UBhTRJhdAybdGVULt/LrMWNfgnLE2JfaQEG/wrLwkNeWrFpUrve7rWF2Ba
+	 ky93mKhmq+Rzw==
+Message-ID: <8302ad43-96db-4ec3-a969-3aced7eb4750@kernel.org>
+Date: Tue, 2 Jan 2024 13:08:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240102083257.GB6361@unreal>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: selftests: net/mptcp: mptcp_connect.sh - Internal error: Oops:
+ qdisc_block_add_dev (net/sched/sch_api.c:1191)
+Content-Language: en-GB, fr-BE
+To: Naresh Kamboju <naresh.kamboju@linaro.org>,
+ open list <linux-kernel@vger.kernel.org>, Netdev <netdev@vger.kernel.org>,
+ MPTCP Upstream <mptcp@lists.linux.dev>,
+ Linux Regressions <regressions@lists.linux.dev>, lkft-triage@lists.linaro.org
+Cc: Victor Nogueira <victor@mojatatu.com>,
+ "David S. Miller" <davem@davemloft.net>, Hangyu Hua <hbh25y@gmail.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>
+References: <CA+G9fYvu_estw19VvZDXVXGmuXg87FZHk3x7ZNLM-KTGOmXRLQ@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CA+G9fYvu_estw19VvZDXVXGmuXg87FZHk3x7ZNLM-KTGOmXRLQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500007.china.huawei.com (7.185.36.183)
 
+Hi Naresh,
 
+On 02/01/2024 10:48, Naresh Kamboju wrote:
+> Following kernel oops noticed on qemu-arm64 while running
+> selftests: net/mptcp: mptcp_connect.sh test cases on Linux next-20240102
 
-On 2024/1/2 16:32, Leon Romanovsky wrote:
-> On Tue, Jan 02, 2024 at 03:44:29PM +0800, Chengchang Tang wrote:
->>
->> On 2023/12/30 1:21, Stephen Hemminger wrote:
->>> On Fri, 29 Dec 2023 14:52:40 +0800
->>> Junxian Huang <huangjunxian6@hisilicon.com> wrote:
->>>
->>>> From: Chengchang Tang <tangchengchang@huawei.com>
->>>>
->>>> There will be a core dump when pretty is used as the JSON object
->>>> hasn't been opened and closed properly.
->>>>
->>>> Before:
->>>> $ rdma res show qp -jp -dd
->>>> [ {
->>>>       "ifindex": 1,
->>>>       "ifname": "hns_1",
->>>>       "port": 1,
->>>>       "lqpn": 1,
->>>>       "type": "GSI",
->>>>       "state": "RTS",
->>>>       "sq-psn": 0,
->>>>       "comm": "ib_core"
->>>> },
->>>> "drv_sq_wqe_cnt": 128,
->>>> "drv_sq_max_gs": 2,
->>>> "drv_rq_wqe_cnt": 512,
->>>> "drv_rq_max_gs": 1,
->>>> rdma: json_writer.c:130: jsonw_end: Assertion `self->depth > 0' failed.
->>>> Aborted (core dumped)
->>>>
->>>> After:
->>>> $ rdma res show qp -jp -dd
->>>> [ {
->>>>           "ifindex": 2,
->>>>           "ifname": "hns_2",
->>>>           "port": 1,
->>>>           "lqpn": 1,
->>>>           "type": "GSI",
->>>>           "state": "RTS",
->>>>           "sq-psn": 0,
->>>>           "comm": "ib_core",{
->>>>               "drv_sq_wqe_cnt": 128,
->>>>               "drv_sq_max_gs": 2,
->>>>               "drv_rq_wqe_cnt": 512,
->>>>               "drv_rq_max_gs": 1,
->>>>               "drv_ext_sge_sge_cnt": 256
->>>>           }
->>>>       } ]
->>>>
->>>> Fixes: 331152752a97 ("rdma: print driver resource attributes")
->>>> Signed-off-by: Chengchang Tang <tangchengchang@huawei.com>
->>>> Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
->>> This code in rdma seems to be miking json and newline functionality
->>> which creates bug traps.
->>>
->>> Also the json should have same effective output in pretty and non-pretty mode.
->>> It looks like since pretty mode add extra object layer, the nesting of {} would be
->>> different.
->>>
->>> The conversion to json_print() was done but it isn't using same conventions
->>> as ip or tc.
->>>
->>> The correct fix needs to go deeper and hit other things.
->>>
->> Hi, Stephen,
->>
->> The root cause of this issue is that close_json_object() is being called in
->> newline_indent(), resulting in a mismatch
->> of {}.
->>
->> When fixing this problem, I was unsure why a newline() is needed in pretty
->> mode, so I simply kept this logic and
->> solved the issue of open_json_object() and close_json_object() not matching.
->> However, If the output of pretty mode
->> and not-pretty mode should be the same, then this problem can be resolved by
->> deleting this newline_indent().
-> Stephen didn't say that output of pretty and not-pretty should be the
-> same, but he said that JSON logic should be the same.
->
-> Thanks
+Thank you for having cc MPTCP list for this failure with an MPTCP selftest.
 
-Hi, Leon,
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> 
+> Test log:
+> ---
+> # selftests: net/mptcp: mptcp_connect.sh
+> # INFO: set ns3-6593b550-fBKovo dev ns3eth2: ethtool -K  gso off
+> # INFO: set ns4-6593b550-fBKovo dev ns4eth3: ethtool -K  gro off
+> # Created /tmp/tmp.vFrp4xubYR (size 219663 /tmp/tmp.vFrp4xubYR)
+> containing data sent by client
+> # Created /tmp/tmp.FrEUtOwsBN (size 5630063 /tmp/tmp.FrEUtOwsBN)
+> containing data sent by server
+> # New MPTCP socket can be blocked via sysctl [ OK ]
+> # INFO: validating network environment with pings
+> <6>[   32.891365] netem: version 1.3
+> <1>[   32.901072] Unable to handle kernel NULL pointer dereference at
+> virtual address 0000000000000000
+> <1>[   32.901926] Mem abort info:
+> <1>[   32.903342]   ESR = 0x0000000086000004
+> <1>[   32.903768]   EC = 0x21: IABT (current EL), IL = 32 bits
+> <1>[   32.904589]   SET = 0, FnV = 0
+> <1>[   32.905415]   EA = 0, S1PTW = 0
+> <1>[   32.905914]   FSC = 0x04: level 0 translation fault
+> <1>[   32.909254] user pgtable: 4k pages, 48-bit VAs, pgdp=0000000103097000
+> <1>[   32.909914] [0000000000000000] pgd=0000000000000000, p4d=0000000000000000
+> <0>[   32.913724] Internal error: Oops: 0000000086000004 [#1] PREEMPT SMP
+> <4>[   32.914739] Modules linked in: sch_netem crct10dif_ce sm3_ce sm3
+> sha3_ce sha512_ce sha512_arm64 fuse drm backlight dm_mod ip_tables
+> x_tables
+> <4>[   32.916764] CPU: 0 PID: 438 Comm: tc Not tainted
+> 6.7.0-rc8-next-20240102 #1
+> <4>[   32.917555] Hardware name: linux,dummy-virt (DT)
+> <4>[   32.918608] pstate: 63400809 (nZCv daif +PAN -UAO +TCO +DIT
+> -SSBS BTYPE=-c)
+> <4>[   32.919392] pc : 0x0
+> <4>[ 32.920396] lr : qdisc_block_add_dev (net/sched/sch_api.c:1191)
 
-Thank you for your reply. But I'm not sure what you mean by JSON logic? 
-I understand that
-pretty and not-pretty JSON should have the same content, but just 
-difference display effects.
-Do you mean that they only need to have the same structure?
+It doesn't look like to be an issue with MPTCP, but with TC (QDisc).
 
-Or, let's get back to this question. In the JSON format output, the 
-newline() here seems
-unnecessary, because json_print() can solve the line break problems 
-during printing.
-So I think the newline() here can be removed at least when outputting in 
-JSON format.
+It seems like the issue has already been reported. There is even a patch
+that has been proposed by Victor (but it looks like a new version is
+expected):
 
-Thanks,
-Chengchang Tang
->
->> I believe the original developer may not have realized that
->> close_json_object() is being called in newline(), which leads
->> to this problem. To improve the code's readability, I would try to strip out
->> close_json_obejct() from newline().
->>
->> Thanks,
->> Chengchang Tang
->>
-> .
->
+https://lore.kernel.org/netdev/20231231172320.245375-1-victor@mojatatu.com/
 
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
