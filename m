@@ -1,149 +1,172 @@
-Return-Path: <netdev+bounces-60996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2E978221B3
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:06:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9F78221D3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:13:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F11DC1C226EA
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:06:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07398B2215F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057CD15AD2;
-	Tue,  2 Jan 2024 19:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8466B15ADC;
+	Tue,  2 Jan 2024 19:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=corelatus.se header.i=@corelatus.se header.b="luJtMjoE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="z+DIMEfV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FnogE//S"
 X-Original-To: netdev@vger.kernel.org
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7359315E95
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 19:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corelatus.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corelatus.se
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 4920F5C010F;
-	Tue,  2 Jan 2024 14:06:12 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Tue, 02 Jan 2024 14:06:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=corelatus.se; h=
-	cc:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1704222372;
-	 x=1704308772; bh=TuKAXUl/X2uk7hHWIkbpgwu/c7RmjvxjmFC1QCR+lM8=; b=
-	luJtMjoEvCnPBp0KkFvCSxNUmz4Sfpc4tvkk463HWBEVB0miIQkjlOHoq1WgokpI
-	lZEv8a1QtP/UqLOVexJcIo5HPl8xgaenKM11iEw9AI4fuKJ+NJvwnjda7KR7FP20
-	7Lk2h3eNbCdlsNLZfN1I+GJyDdj4GpLAtL3V4t4ev4kvBsso3amxS0+qdIRWt+a9
-	CgiW5GY/aEkABphK14XomexNRogOdks+fsIsvYb2YdLk2W6D6RRAOOgRSLGNKWgZ
-	kURn4jK9ZxxbSomI6s3irXtXpeULKe7lIdukIe7MRAH9QtiLdbUrtNInvG1bCstM
-	JsPSIuQHKhR6owqjN54ACg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-transfer-encoding:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1704222372; x=
-	1704308772; bh=TuKAXUl/X2uk7hHWIkbpgwu/c7RmjvxjmFC1QCR+lM8=; b=z
-	+DIMEfVY6LY8NkjEny9KswWSUhQUd0V//FKIFDCq3gU+WQBRJWSiDfa2RhZX0Mef
-	F6OV5VQasj9cdRpAWKPwLxw5jm0toiH65VLQCjvnEbjZkR/71LHIJWxOKuj5oUxG
-	hvwik4nE+IBWcPUhDs7MCIy653dk0iPkPrQs8hUh1E21QWSElNlLzyGHQPmiqAbx
-	nBEBtxLl3mEx+crpl6usc+gEJOxJXZmapC5LCHqNSMrREfFIpPQNVPm+FvE5iZcU
-	Ne7i+QPkxFkIfJGIh7AtggSVUHpSSvtD6z7agItm13wZb+juxndsBLGQcb10IMhF
-	cc8N2GAaJzOa2Mjr1BNBg==
-X-ME-Sender: <xms:o16UZfgNprA7AJBe6vyPPtgCTGTn5sTzFuZ45K2DSNDBJ-6f2ZD7FQ>
-    <xme:o16UZcDe1p_oZeCJFgp-7-uuV7LEIt_tftG-FWudybwTtvMQDWOIFiJNfcRmvSpZ_
-    WQT5qDYf2Lm-6we1g>
-X-ME-Received: <xmr:o16UZfGv_epbld3TX_GrFyEn8tbl5qisDsfjWUx6pw6SonNvK0c92DfM0diEucRt>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdegfedghedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpefkffggfgfuvfhfhfgjtgfgsehtje
-    ertddtvdejnecuhfhrohhmpefvhhhomhgrshcunfgrnhhgvgcuoehthhhomhgrshestgho
-    rhgvlhgrthhushdrshgvqeenucggtffrrghtthgvrhhnpefguedvjeetvdelffeiheeige
-    eljeefjeehvdejuedtledtffetffdvteegffffieenucffohhmrghinhepkhgvrhhnvghl
-    rdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epthhhohhmrghssegtohhrvghlrghtuhhsrdhsvg
-X-ME-Proxy: <xmx:o16UZcTbJW8nsuLCNTUg4G1zFS9t30zh43fn1w57TeuUkLfA5L-5Lw>
-    <xmx:o16UZcxuhCMaYhKkFoX8eN9ETEi11hJglABU39_4-hbEdmvAVebGyg>
-    <xmx:o16UZS4R5af44yqGcOfxNlhEXQcI3Vgm8UsRKLNO1-54sgrn_zJkdw>
-    <xmx:pF6UZWvsPCbnSdhrc0cEpAQRMjV4uVCAQRBmBQUwqE1KZtdNVg_WIQ>
-Feedback-ID: ia69946ac:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 2 Jan 2024 14:06:10 -0500 (EST)
-Message-ID: <dc642c69-8500-457a-a53e-6a3916ef6dab@corelatus.se>
-Date: Tue, 2 Jan 2024 20:06:09 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B20115ACB
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 19:13:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11CC3C433C8;
+	Tue,  2 Jan 2024 19:13:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704222788;
+	bh=NCkb8tqkA8HY7gh6lvwbzF5A/ByZUw4XdXim4tR6Y7Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FnogE//SeQW/U4BrnHUYNqZnlLzSG9HiH+UJCu+sbwqLusp5TVi6kg1o8Zg0a5uH8
+	 JP+xGWrwbOf2swbpe+F5ndqpjvbFW2SkEMBq/DXU6Wxt0sRNNpf/jdyXq6v7rXdvu0
+	 VDlw/TYfNV2+n9fD54ys2VtV5FRiLiPoIMSqCH5NgKIWv65raq4H0L8ATL7KRTK35y
+	 kcBK3nJiQVSA7/7ztjiVBiItFDwcZmpFtbI1TIwBWWVLvy9gaM3ITout7jrtRpOf3P
+	 HpC9NuautlbCUeLuvbvQuJCQYcQ3dVDJ6CfnwwsksR1JW/Yc3WarSDy9yvFm+vZPxI
+	 VNsXlzTtXracg==
+Date: Tue, 2 Jan 2024 21:13:04 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Gal Pressman <gal@nvidia.com>, David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shachar Kagan <skagan@nvidia.com>, netdev@vger.kernel.org,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>
+Subject: Re: [PATCH net-next] tcp: Revert no longer abort SYN_SENT when
+ receiving some ICMP
+Message-ID: <20240102191304.GB5160@unreal>
+References: <14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com>
+ <CANn89iLVg3H-GuZ6=_-Rc5Jk14T59pZcx1DF-3HApvsPuSpNXg@mail.gmail.com>
+ <20240102095835.GF6361@unreal>
+ <CANn89iLd6EeC3b8DTXBP=cDw8ri+k_uGiCrAS6BOoG3FMuAxmg@mail.gmail.com>
+ <20240102114147.GG6361@unreal>
+ <CANn89iJzBzcU=-ybbvOjNeNBqx2ap=uoS1dbYJEY59oWsSTUtg@mail.gmail.com>
+ <20240102180102.GA5160@unreal>
+ <CANn89iKcStXqo9rxpO_Dq3HQ0Sj8Ce_5YmjaKx7n9EF+9GjTmA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: net/core/sock.c lacks some SO_TIMESTAMPING_NEW support
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, jthinz@mailbox.tu-berlin.de, arnd@arndb.de,
- deepa.kernel@gmail.com
-References: <a9090be2-ca7c-494c-89cb-49b1db2438ba@corelatus.se>
- <65942b4270a60_291ae6294cd@willemb.c.googlers.com.notmuch>
-From: Thomas Lange <thomas@corelatus.se>
-In-Reply-To: <65942b4270a60_291ae6294cd@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iKcStXqo9rxpO_Dq3HQ0Sj8Ce_5YmjaKx7n9EF+9GjTmA@mail.gmail.com>
 
-
-On 2024-01-02 16:26, Willem de Bruijn wrote:
-> Thomas Lange wrote:
->> It seems that net/core/sock.c is missing support for SO_TIMESTAMPING_NEW in
->> some paths.
->>
->> I cross compile for a 32bit ARM system using Yocto 4.3.1, which seems to have
->> 64bit time by default. This maps SO_TIMESTAMPING to SO_TIMESTAMPING_NEW which
->> is expected AFAIK.
->>
->> However, this breaks my application (Chrony) that sends SO_TIMESTAMPING as
->> a cmsg:
->>
->> sendmsg(4, {msg_name={sa_family=AF_INET, sin_port=htons(123), sin_addr=inet_addr("172.16.11.22")}, msg_namelen=16, msg_iov=[{iov_base="#\0\6 \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., iov_len=48}], msg_iovlen=1, msg_control=[{cmsg_len=16, cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_NEW, cmsg_data=???}], msg_controllen=16, msg_flags=0}, 0) = -1 EINVAL (Invalid argument)
->>
->> This is because __sock_cmsg_send() does not support SO_TIMESTAMPING_NEW as-is.
->>
->> This patch seems to fix things and the packet is transmitted:
->>
->> diff --git a/net/core/sock.c b/net/core/sock.c
->> index 16584e2dd648..a56ec1d492c9 100644
->> --- a/net/core/sock.c
->> +++ b/net/core/sock.c
->> @@ -2821,6 +2821,7 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
->>                   sockc->mark = *(u32 *)CMSG_DATA(cmsg);
->>                   break;
->>           case SO_TIMESTAMPING_OLD:
->> +       case SO_TIMESTAMPING_NEW:
->>                   if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
->>                           return -EINVAL;
->>
->> However, looking through the module, it seems that sk_getsockopt() has no
->> support for SO_TIMESTAMPING_NEW either, but sk_setsockopt() has.
->> Testing seems to confirm this:
->>
->> setsockopt(4, SOL_SOCKET, SO_TIMESTAMPING_NEW, [1048], 4) = 0
->> getsockopt(4, SOL_SOCKET, SO_TIMESTAMPING_NEW, 0x7ed5db20, [4]) = -1 ENOPROTOOPT (Protocol not available)
->>
->> Patching sk_getsockopt() is not as obvious to me though.
->>
->> I used a custom 6.6 kernel for my tests.
->> The relevant code seems unchanged in net-next.git though.
->>
->> /Thomas
+On Tue, Jan 02, 2024 at 07:33:23PM +0100, Eric Dumazet wrote:
+> On Tue, Jan 2, 2024 at 7:01 PM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > On Tue, Jan 02, 2024 at 04:31:15PM +0100, Eric Dumazet wrote:
+> > > On Tue, Jan 2, 2024 at 12:41 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > > >
+> > > > On Tue, Jan 02, 2024 at 11:03:55AM +0100, Eric Dumazet wrote:
+> > > > > On Tue, Jan 2, 2024 at 10:58 AM Leon Romanovsky <leon@kernel.org> wrote:
+> > > > > >
+> > > > > > On Tue, Jan 02, 2024 at 10:46:13AM +0100, Eric Dumazet wrote:
+> > > > > > > On Tue, Jan 2, 2024 at 10:01 AM Leon Romanovsky <leon@kernel.org> wrote:
+> > > > > > > >
+> > > > > > > > From: Shachar Kagan <skagan@nvidia.com>
+> > > > > > > >
+> > > > > > > > This reverts commit 0a8de364ff7a14558e9676f424283148110384d6.
+> > > > > > > >
+> > > > > > > > Shachar reported that Vagrant (https://www.vagrantup.com/), which is
+> > > > > > > > very popular tool to manage fleet of VMs stopped to work after commit
+> > > > > > > > citied in Fixes line.
+> > > > > > > >
+> > > > > > > > The issue appears while using Vagrant to manage nested VMs.
+> > > > > > > > The steps are:
+> > > > > > > > * create vagrant file
+> > > > > > > > * vagrant up
+> > > > > > > > * vagrant halt (VM is created but shut down)
+> > > > > > > > * vagrant up - fail
+> > > > > > > >
+> > > > > > >
+> > > > > > > I would rather have an explanation, instead of reverting a valid patch.
+> > > > > > >
+> > > > > > > I have been on vacation for some time. I may have missed a detailed
+> > > > > > > explanation, please repost if needed.
+> > > > > >
+> > > > > > Our detailed explanation that revert worked. You provided the patch that
+> > > > > > broke, so please let's not require from users to debug it.
+> > > > > >
+> > > > > > If you need a help to reproduce and/or test some hypothesis, Shachar
+> > > > > > will be happy to help you, just ask.
+> > > > >
+> > > > > I have asked already, and received files that showed no ICMP relevant
+> > > > > interactions.
+> > > > >
+> > > > > Can someone from your team help Shachar to get  a packet capture of
+> > > > > both TCP _and_ ICMP packets ?
+> > > >
+> > > > I or Gal will help her, but for now let's revert it, before we will see
+> > > > this breakage in merge window and later in all other branches which will
+> > > > be based on -rc1.
+> > >
+> > > Patch is in net-next, we have at least four weeks to find the root cause.
+> >
+> > I saw more than once claims that netdev is fast to take patches but also
+> > fast in reverts. There is no need to keep patch with known regression,
+> > while we are in -rc8.
 > 
-> The fix to getsockopt is now merged:
-> 
-> https://lore.kernel.org/netdev/20231221231901.67003-1-jthinz@mailbox.tu-berlin.de/T/
-> 
-> Do you want to send the above fix to __sock_cmsg_send? 
+> This patch is not in rc8, unless I am mistaken ?
 
-Sure, I can do that. Do you want it sent to [net]?
+Patch is not, but the timeline is. Right now, we are in -rc8 and in next
+week, the merge window will start.
 
-/Thomas
+> 
+> >
+> > >
+> > > I am a TCP maintainer, I will ask you to respect my choice, we have
+> > > tests and reverting the patch is breaking one of them.
+> >
+> > At least for ipv6, you changed code from 2016 and the patch which I'm asking
+> > to revert is not even marked as a fix. So I don't understand the urgency to keep
+> > the patch.
+> 
+> Do you have an issue with IPv4 code or IPv6 ?
+
+I think that IPv4, I looked on IPv6 dates just because it was easy to
+do. It looks like IPv4 code which you are changing existed in its
+current form even before git era.
+
+> 
+> It would help to have details.
+
+We prepared raw PCAP files and I'm uploading them. It takes time.
+
+> >
+> > There are two things to consider:
+> > 1. Linux rule number one is "do not break userspace".
+> 
+> No released kernel contains the issue yet. Nothing broke yet.
+
+After merge window, it will and I want to avoid it.
+
+> 
+> net-next is for developers.
+
+It is encouraged to test net-next, so we did it and reported.
+
+> 
+> > 2. Linux is a community project and people can have different opinions,
+> > which can be different from your/mine.
+> >
+> > Thanks
+> 
+> I think we have time, and getting this patch with potential users on
+> it will help to debug the issue.
+
+Like I said, Shachar can test any debug patches, just ask her.
+
+Thanks
 
