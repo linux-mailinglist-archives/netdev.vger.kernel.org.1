@@ -1,157 +1,156 @@
-Return-Path: <netdev+bounces-60828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42B218219C4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:30:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DDF8219D5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E64C91F2260B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:30:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50159B21B6C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BF4DF46;
-	Tue,  2 Jan 2024 10:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2FED28D;
+	Tue,  2 Jan 2024 10:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="GHZw89Z2"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="UvbnHLHE"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568FEDF51;
-	Tue,  2 Jan 2024 10:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 402ATpYu012619;
-	Tue, 2 Jan 2024 04:29:51 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1704191391;
-	bh=py4JJm+wTIiadC5aI9EnyBmLyFhvonKYqsl52ZyUjE8=;
-	h=From:To:CC:Subject:Date;
-	b=GHZw89Z26f/IbpjxHF70MbGJrqMHhvQI1nKCRMpx2yMfaNlgCvR9ZpF2xYnr85Lj1
-	 M/tjHyCgsMpBGISjVzOKK/nZKd2J7sKulzt3uq/4TBD3xNLcFsvQax2UyLQhHLs7gI
-	 PGJ++7P9xXYSs6eHcK1Q2wl6ISbZkff7ojxiFczQ=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 402ATpfN025970
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 2 Jan 2024 04:29:51 -0600
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 2
- Jan 2024 04:29:51 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 2 Jan 2024 04:29:50 -0600
-Received: from localhost ([10.249.131.155])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 402AToSq071024;
-	Tue, 2 Jan 2024 04:29:50 -0600
-From: Bhavya Kapoor <b-kapoor@ti.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <linux-can@vger.kernel.org>, <b-kapoor@ti.com>,
-        <mailhol.vincent@wanadoo.fr>, <rcsekar@samsung.com>,
-        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <mkl@pengutronix.de>, <wg@grandegger.com>,
-        <vigneshr@ti.com>, <u-kumar1@ti.com>
-Subject: [PATCH] net: can: Add support for aliases in CAN
-Date: Tue, 2 Jan 2024 15:59:49 +0530
-Message-ID: <20240102102949.138607-1-b-kapoor@ti.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB6FDDAD;
+	Tue,  2 Jan 2024 10:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1704191496; x=1704796296; i=markus.elfring@web.de;
+	bh=byLjICH9kZFXAhhR7l1uz0KXqLkgIwDGVOFiUikXwjw=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=UvbnHLHE18UZfNoQinmJ5WClJpEmsnAxcznti26bUEb4k/E/6paOYmFB8aSKz/xG
+	 GIcohZH93ewA8ql7aafpXZG+/Q9As8dU558NPrg+Nj5Ub/Pv/EfQxF7rM43r1+pmp
+	 CaVX7o18hFfmmtuugXiXfUE8hNzYfc+pUOo5uFRmtlADn3JVqlU26PLVDuCYrb95U
+	 vDaHh2gjjc0U76o70y2YRE0Fynd6B8eFwtQMB+rCVXuW3JF1Mg2Mj1Z12aWrF6Lis
+	 +a0gyJ3xkxoKj4e7nTuln7FyT4lyLFzVApgfGhWMhzT0rRiu4ZRIcrGieY0h50IkL
+	 D/GkH1p1YzwEULNr4w==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N3ouq-1rBZdI2IAy-00zyNb; Tue, 02
+ Jan 2024 11:31:36 +0100
+Message-ID: <d2e5c263-c0aa-4297-b446-f013af7eb80f@web.de>
+Date: Tue, 2 Jan 2024 11:31:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] net/iucv: Improve unlocking in iucv_enable()
+Content-Language: en-GB
+To: Alexandra Winter <wintera@linux.ibm.com>, Suman Ghosh
+ <sumang@marvell.com>, "linux-s390@vger.kernel.org"
+ <linux-s390@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>,
+ "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
+References: <cde82080-c715-473c-97ac-6ef66bba6d64@web.de>
+ <81f7db31-a258-4dc8-b6e1-c1ef1844a9d2@web.de>
+ <SJ0PR18MB5216C27127E46490951A1E5DDB61A@SJ0PR18MB5216.namprd18.prod.outlook.com>
+ <8123a895-c7dd-4a75-94bc-6f61639621eb@web.de>
+ <SJ0PR18MB52168AC4B874C0B99BD37039DB61A@SJ0PR18MB5216.namprd18.prod.outlook.com>
+ <2bf1b0cb-86af-4e00-a0aa-23e3944617a2@linux.ibm.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <2bf1b0cb-86af-4e00-a0aa-23e3944617a2@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:vwvz92Bt8HT7eNV3Wmw65q6wPiFzhtMoY5oZu8ovAx9ruR5aR/u
+ +tP5/8TYnDV6TukFkGVK5FHlNA22DelulzoEZ4HDvAoIbdgX2BdHUXHnILdX1b5ZXqgqglj
+ 2752rA2H4yNc8SQFEC8O7e6onYHBLEmIgsIptaG8+Vx2PzcLuv3KyBsmJPeRPDYWH5FIRAd
+ 9TnVWIvwtsxF7m2J4alNw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:N+sZX2iAzmM=;yViQHahgU4NVsBOTP6sDp3nZcfO
+ 5oYUrWBM77Aet6jAwMVrgn81lJyL1DXbUrttOuRcVw359powYsbjEk8O1jZ+c8sfi961W2PZ8
+ x9xQ+iaYA3KjEPYrvbdGmUnz1X5ffXGFVY1p9NptMTtwfCFg4Qsfmhvr1DSYLpgxXsv+jQQnz
+ 2Wqi3TLx+ZszNN37nuK7ChIPOpUDYpiTUn2/j3lEifMBKjygFkCQRMde6vY6+8tdzaijEY6OR
+ zcbAQYOi8YEQNUNvJEr9G5kdtoQv+3tAA3enqPjdQebe3RunU3nGwWT3slutmeI0+nQAHNIdi
+ oropFxKVTPI38zpaQdofHwTFa2wtsE3nXIElxTcyZl7Lv/ZCC1vrc31lHTdmyAPNG2Gjq7cOe
+ 3rj7sUQDGE9pUYc5mSczL81A2jCmI5hxeGAPqKk16aTZBCviJX1bKqQeXXKCvbLTZSNuD8GTA
+ EyRwcn9GI0Z0v1PqcdMB5ZuAt+3FABNMIfhfrw/qvVqG0a4D90b2zXEhJ8k6ExtgLV80IDFUx
+ vGIvEfaBSWilCrXirD+PT9kjn+J12MrSqpsVvppW93oGcw0E3ZtLQfhJPhvH5VDYSp+B5hYWi
+ F9oKQ4spKIuiRKEejNNWUxEtp+e9TQXRvE5WrGa7tUOZA/7JcM9TPRVEVTviB1XB2zT1upa6Z
+ jLHQlrJlzwXQH3RlFyiqpGkA06aKeYGNp0DPJK7h6ipbQl+HQjPDnDHT2uXgD2E600tS6DljB
+ wDrpHoJ2p9uA1vs62VGjP0qJ3PIKl0uyytsNLNxtPnkmdoi2PhfGz3T1EOg45QIbFe8BcowOg
+ KP5SEtlRrrQZKbycwwiHbGAenCBfiowz7LgFx57cBOeAceeTrJEDIXlV+G1H/icMMwMmnkXSg
+ JArFpi8UAIeCs/Vtab7nAJObPhw16zi3467zLOB1/aLen15nyZpXdGqxqgf6rzrGm64bSoTUj
+ ITVFcw==
 
-When multiple CAN's are present, then names that are getting assigned
-changes after every boot even after providing alias in the device tree.
-Thus, Add support for implementing CAN aliasing so that names or
-alias for CAN will now be provided from device tree.
+> I share Suman's concern that jumping backwards goto is confusing.
+> But I think the Coccinelle finding of freeing a null-pointer should be a=
+ddressed (see patch 2/2)
+> Thank you Markus for reporting it.
+>
+> The allocation does require holding the cpus_read_lock.
 
-Signed-off-by: Bhavya Kapoor <b-kapoor@ti.com>
----
- drivers/net/can/dev/dev.c     | 15 ++++++++++++---
- drivers/net/can/m_can/m_can.c |  2 +-
- include/linux/can/dev.h       |  8 +++++---
- 3 files changed, 18 insertions(+), 7 deletions(-)
+How does this information fit to your following suggestion to adjust the l=
+ock scope?
 
-diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
-index 3a3be5cdfc1f..ed483c23ec79 100644
---- a/drivers/net/can/dev/dev.c
-+++ b/drivers/net/can/dev/dev.c
-@@ -247,12 +247,14 @@ void can_setup(struct net_device *dev)
- 
- /* Allocate and setup space for the CAN network device */
- struct net_device *alloc_candev_mqs(int sizeof_priv, unsigned int echo_skb_max,
--				    unsigned int txqs, unsigned int rxqs)
-+					unsigned int txqs, unsigned int rxqs,
-+					struct device *candev)
- {
- 	struct can_ml_priv *can_ml;
- 	struct net_device *dev;
- 	struct can_priv *priv;
--	int size;
-+	int size, aliasid;
-+	char devname[6] = "can%d";
- 
- 	/* We put the driver's priv, the CAN mid layer priv and the
- 	 * echo skb into the netdevice's priv. The memory layout for
-@@ -273,7 +275,14 @@ struct net_device *alloc_candev_mqs(int sizeof_priv, unsigned int echo_skb_max,
- 		size = ALIGN(size, sizeof(struct sk_buff *)) +
- 			echo_skb_max * sizeof(struct sk_buff *);
- 
--	dev = alloc_netdev_mqs(size, "can%d", NET_NAME_UNKNOWN, can_setup,
-+	if (candev) {
-+		aliasid = of_alias_get_id(candev->of_node, "can");
-+		if (aliasid >= 0)
-+			snprintf(devname, sizeof(devname), "%s%d", "can", aliasid);
-+	}
-+	dev_dbg(candev, "Name of CAN assigned is : %s\n", devname);
-+
-+	dev = alloc_netdev_mqs(size, devname, NET_NAME_UNKNOWN, can_setup,
- 			       txqs, rxqs);
- 	if (!dev)
- 		return NULL;
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 16ecc11c7f62..c91a5c7b3ae5 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -2029,7 +2029,7 @@ struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
- 	tx_fifo_size = mram_config_vals[7];
- 
- 	/* allocate the m_can device */
--	net_dev = alloc_candev(sizeof_priv, tx_fifo_size);
-+	net_dev = alloc_candev_with_dev(sizeof_priv, tx_fifo_size, dev);
- 	if (!net_dev) {
- 		dev_err(dev, "Failed to allocate CAN device");
- 		goto out;
-diff --git a/include/linux/can/dev.h b/include/linux/can/dev.h
-index 1b92aed49363..b59142c16e59 100644
---- a/include/linux/can/dev.h
-+++ b/include/linux/can/dev.h
-@@ -171,11 +171,13 @@ static inline bool can_dev_dropped_skb(struct net_device *dev, struct sk_buff *s
- void can_setup(struct net_device *dev);
- 
- struct net_device *alloc_candev_mqs(int sizeof_priv, unsigned int echo_skb_max,
--				    unsigned int txqs, unsigned int rxqs);
-+					unsigned int txqs, unsigned int rxqs, struct device *dev);
- #define alloc_candev(sizeof_priv, echo_skb_max) \
--	alloc_candev_mqs(sizeof_priv, echo_skb_max, 1, 1)
-+	alloc_candev_mqs(sizeof_priv, echo_skb_max, 1, 1, NULL)
-+#define alloc_candev_with_dev(sizeof_priv, echo_skb_max, dev) \
-+	alloc_candev_mqs(sizeof_priv, echo_skb_max, 1, 1, dev)
- #define alloc_candev_mq(sizeof_priv, echo_skb_max, count) \
--	alloc_candev_mqs(sizeof_priv, echo_skb_max, count, count)
-+	alloc_candev_mqs(sizeof_priv, echo_skb_max, count, count, NULL)
- void free_candev(struct net_device *dev);
- 
- /* a candev safe wrapper around netdev_priv */
--- 
-2.40.1
 
+> For some reason Markus wants to reduce the number of cpus_read_unlock() =
+calls (why?),
+
+One cpus_read_unlock() call is required here.
+Would you like to benefit more from a smaller executable code size?
+
+
+> so what about something like this for both issues:
+>
+> diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
+> index 0ed6e34d6edd..1030403b826b 100644
+> --- a/net/iucv/iucv.c
+> +++ b/net/iucv/iucv.c
+> @@ -542,24 +542,22 @@ static int iucv_enable(void)
+>         size_t alloc_size;
+>         int cpu, rc;
+>
+> -       cpus_read_lock();
+> -       rc =3D -ENOMEM;
+>         alloc_size =3D iucv_max_pathid * sizeof(struct iucv_path);
+>         iucv_path_table =3D kzalloc(alloc_size, GFP_KERNEL);
+>         if (!iucv_path_table)
+> -               goto out;
+> +               return -ENOMEM;
+>         /* Declare per cpu buffers. */
+> -       rc =3D -EIO;
+> +       cpus_read_lock();
+>         for_each_online_cpu(cpu)
+>                 smp_call_function_single(cpu, iucv_declare_cpu, NULL, 1)=
+;
+> -       if (cpumask_empty(&iucv_buffer_cpumask))
+> +       if (cpumask_empty(&iucv_buffer_cpumask)) {
+>                 /* No cpu could declare an iucv buffer. */
+> -               goto out;
+> -       cpus_read_unlock();
+> -       return 0;
+> -out:
+> -       kfree(iucv_path_table);
+> -       iucv_path_table =3D NULL;
+> +               kfree(iucv_path_table);
+> +               iucv_path_table =3D NULL;
+> +               rc =3D -EIO;
+> +       } else {
+> +               rc =3D 0;
+> +       }
+>         cpus_read_unlock();
+>         return rc;
+>  }
+
+
+I suggest to reconsider patch squashing a bit more.
+
+Regards,
+Markus
 
