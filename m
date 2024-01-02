@@ -1,132 +1,119 @@
-Return-Path: <netdev+bounces-60811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA5A82192F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:54:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 255F5821933
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:55:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 426CE1C208F2
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:54:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B16251F218FC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE59747F;
-	Tue,  2 Jan 2024 09:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23222C8C4;
+	Tue,  2 Jan 2024 09:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="OGJCQe8X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QuX4xBfi"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA33C8C4;
-	Tue,  2 Jan 2024 09:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4029rfb8004461;
-	Tue, 2 Jan 2024 03:53:41 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1704189221;
-	bh=74sdqSkVGxGgwTNR2R1XLLsqkxdGTod/LNAm1GoA48s=;
-	h=Date:CC:Subject:To:References:From:In-Reply-To;
-	b=OGJCQe8XSEJCKH187sP5V1JSoPpmqXv5QSaqH0w+uL79w3Qn/pevMwAD2ima0ji7B
-	 YBxZ3RVnGnkp4JaNUgIxZHPpZLmr5YoDkyGQbxT2c78xiaoh/R4DqsDi9Rw73RL6nF
-	 Z0KTo0uq+KjfRnpsiyu0NxCEyzkqHVEB+TMPSwbg=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4029rfDx070659
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 2 Jan 2024 03:53:41 -0600
-Received: from DFLE110.ent.ti.com (10.64.6.31) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 2
- Jan 2024 03:53:41 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 2 Jan 2024 03:53:41 -0600
-Received: from [10.249.131.186] ([10.249.131.186])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4029rbpD033320;
-	Tue, 2 Jan 2024 03:53:38 -0600
-Message-ID: <ff6c57ba-ff35-d7b4-482e-99673d202790@ti.com>
-Date: Tue, 2 Jan 2024 15:23:37 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E8279F3;
+	Tue,  2 Jan 2024 09:55:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0E47C433C8;
+	Tue,  2 Jan 2024 09:55:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704189333;
+	bh=s0bfy0zMzuqlHQvLgQ1A1pV6d/4gZtKj+3zV9Q3CF14=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QuX4xBfi4ctJbX2dP9VR3MK79f9E62WHlb3lnQ57nlVgU+JxP2Ej95YvlUJXT5ER9
+	 5qhj9rBxTsvnsTgd/cXNyAJO0Wa5UIlFnl36trUozGNqoNmUFA+3x0izcWsYWa1jkS
+	 RMq00l8zxwCKuvyN4pc+R2OhHNngF8xi5pSpf7VXgTM8yqld2baDymsgyAasR55G0s
+	 zaLVXrcwOyO/WY87+v9Y7k7hcbW0jhFW+RfEU4wTXPt0hYQzXawX+tDxpXM012yQzK
+	 oZPJ/u5TF/+3rNWCzRB/2XtQWDILMYi9KouMIEb64NTitWBHrs/ORH+Wh3t/1jO3BM
+	 QY5vXvmTC5xTA==
+Date: Tue, 2 Jan 2024 11:55:29 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+	Shachar Kagan <skagan@nvidia.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Jason Gunthorpe <jgg@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+	Ido Kalir <idok@nvidia.com>, Topaz Uliel <topazu@nvidia.com>,
+	Shirly Ohnona <shirlyo@nvidia.com>,
+	Ziyad Atiyyeh <ziyadat@nvidia.com>
+Subject: Re: Bug report connect to VM with Vagrant
+Message-ID: <20240102095529.GE6361@unreal>
+References: <MN2PR12MB44863139E562A59329E89DBEB982A@MN2PR12MB4486.namprd12.prod.outlook.com>
+ <CANn89iKvG5cTNROyBF32958BzATfXysh4zLk5nRR6fgi08vumA@mail.gmail.com>
+ <MN2PR12MB4486457FC77205D246FC834AB98BA@MN2PR12MB4486.namprd12.prod.outlook.com>
+ <CANn89i+e2TcvSU1EgrVZRUoEmZ5NDauXd3=kEkjpsGjmaypHOw@mail.gmail.com>
+ <cdf72778-a314-467d-8ac8-163d2007fd70@leemhuis.info>
+ <20231227083339.GA6849@unreal>
+ <CANn89iK_Q38g1ieEb1MVvmVgiKQxmv9Hzngu_pCcXcwGs7cPLQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        <s-vadapalli@ti.com>
-Subject: Re: [PATCH 1/3] net: ethernet: ti: am65-cpsw: Fix max mtu to fit
- ethernet frames
-Content-Language: en-US
-To: =?UTF-8?B?U2FuanXDoW4gR2FyY8OtYSwgSm9yZ2U=?=
-	<Jorge.SanjuanGarcia@duagon.com>
-References: <20240102081825.14635-1-jorge.sanjuangarcia@duagon.com>
- <c025f2f9-ca2c-4fdb-adb1-803745fded0c.a613f387-0b3b-49fd-9401-3a0ed0c1f80e.61715cd4-eb1f-4175-83f7-1dd58ae46b17@emailsignatures365.codetwo.com>
- <20240102081825.14635-2-jorge.sanjuangarcia@duagon.com>
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-In-Reply-To: <20240102081825.14635-2-jorge.sanjuangarcia@duagon.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+In-Reply-To: <CANn89iK_Q38g1ieEb1MVvmVgiKQxmv9Hzngu_pCcXcwGs7cPLQ@mail.gmail.com>
 
-Hello,
-
-On 02-01-2024 13:49, Sanjuán García, Jorge wrote:
-> The value of AM65_CPSW_MAX_PACKET_SIZE represents the maximum length
-> of a received frame. This value is written to the register
-> AM65_CPSW_PORT_REG_RX_MAXLEN.
+On Tue, Jan 02, 2024 at 10:49:58AM +0100, Eric Dumazet wrote:
+> On Wed, Dec 27, 2023 at 9:33 AM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > On Fri, Dec 15, 2023 at 10:55:05AM +0100, Linux regression tracking (Thorsten Leemhuis) wrote:
+> > > On 08.12.23 11:49, Eric Dumazet wrote:
+> > > > On Thu, Dec 7, 2023 at 2:03 PM Shachar Kagan <skagan@nvidia.com> wrote:
+> > > >>>> On Thu, Nov 30, 2023 at 2:55 PM Shachar Kagan <skagan@nvidia.com> wrote:
+> > > >>>>
+> > > >>>> I have an issue that bisection pointed at this patch:
+> > > >>>> commit 0a8de364ff7a14558e9676f424283148110384d6
+> > > >>>> tcp: no longer abort SYN_SENT when receiving some ICMP
+> > > >>>
+> > > >>> Please provide tcpdump/pcap captures.
+> > > >>>
+> > > >>>  It is hard to say what is going on just by looking at some application logs.
+> > > >>
+> > > >> I managed to capture the tcpdump of ‘Vagrant up’ step over old kernel and new kernel where this step fails. Both captures are attached.
+> > > >> The tcpdump is filtered by given IP of the nested VM.
+> > > >
+> > > > I do not see any ICMP messages in these files, can you get them ?
+> > > >
+> > > > Feel free to continue this exchange privately, no need to send MB
+> > > > email to various lists.
+> > >
+> > > Here this thread died, so I assume this turned out to be not a
+> > > regression at all or something like that? If not please speak up!
+> >
+> > No, it wasn't fixed and/or reverted. Right now, Vagrant is broken and
+> > all our regressions around nested VM functionality doesn't run.
+> >
+> > Eric, can you please revert the bisected patch while you are continuing
+> > your offline discussion with Shachar?
+> >
 > 
-> The maximum MTU configured on the network device should then leave
-> some room for the ethernet headers and frame check. Otherwise, if
-> the network interface is configured to its maximum mtu possible,
-> the frames will be larger than AM65_CPSW_MAX_PACKET_SIZE and will
-> get dropped as oversized.
+> This is not how things work.
 > 
-> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth 
-> subsystem driver")
-> Signed-off-by: Jorge Sanjuan Garcia <jorge.sanjuangarcia@duagon.com>
+> I have not received any evidence yet, only partial packet dumps with
+> no ICMP messages that could be related to the 'Vagrant issue'
 
-Please use [PATCH net] as the subject prefix for patches which are
-posted as Bug Fixes. Apart from that, this patch looks good to me.
+Revert of the original patch worked, so it is strong enough evidence to do
+not break very popular orchestration software.
 
-Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-
-> ---
->   drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c 
-> b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index 7651f90f51f2..378d69b8cb14 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -2196,7 +2196,8 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common 
-> *common, u32 port_idx)
->           eth_hw_addr_set(port->ndev, port->slave.mac_addr);
+> Patch is adhering to the RFC.
 > 
->           port->ndev->min_mtu = AM65_CPSW_MIN_PACKET_SIZE;
-> -       port->ndev->max_mtu = AM65_CPSW_MAX_PACKET_SIZE;
-> +       port->ndev->max_mtu = AM65_CPSW_MAX_PACKET_SIZE -
-> +                             (VLAN_ETH_HLEN + ETH_FCS_LEN);
->           port->ndev->hw_features = NETIF_F_SG |
->                                     NETIF_F_RXCSUM |
->                                     NETIF_F_HW_CSUM |
+> If an application wants to have fast reaction to ICMP, it must use
+> appropriate socket options instead of relying on a prior
+> implementation detail.
 
-...
+Maybe yes, maybe not. Right now, Vagrant is broken.
 
--- 
-Regards,
-Siddharth.
+Thanks
 
