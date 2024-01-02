@@ -1,250 +1,167 @@
-Return-Path: <netdev+bounces-60940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD99F821F07
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:54:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28B91821F09
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 16:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA7351C22362
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:54:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40A9F1C22064
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 15:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB35414A92;
-	Tue,  2 Jan 2024 15:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372E212E7C;
+	Tue,  2 Jan 2024 15:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="O6bujbQj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WVEnZA4Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF77C14F69
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 15:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-555e07761acso2972111a12.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 07:54:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE9C14AAB
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 15:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-555f95cc2e4so2612563a12.3
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 07:54:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704210845; x=1704815645; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=V9qniKWaKPJf+lzEMdhqgVo3btu9BI0ygRsmsQ1RrMI=;
-        b=O6bujbQjZ+azCrEls2T9RA/Zxh4zcAXstyQgEjP9L3MoSVfdCZzZusnnqfoVmUHeHo
-         iF/MBu328YpQk/HBZ/owe6cdXZovf8/HX4FE/FkJeoaCDg03AX2//LXq17bibrAD7Cfp
-         2gC8LCkngUGILqg+o/qtv97IDkaitjdBkMFhlOM/2sIPFHhj4ybJ1hMfz3/SVSPoXAU5
-         pA5C4Np5LNyRXlZF23J5z2xQJal1N+czUOwlXseNMyse11Eg5nHpCB/d4qZOpsoOGkfI
-         Re4jJoCkFUCRE+tQ+TZpzMs92dxi3dORMYXeVANN2zNcenF8HfmEbKAo3cgZEi5pIj1S
-         TQWg==
+        d=gmail.com; s=20230601; t=1704210892; x=1704815692; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u78lrSfDo4oO6bqKJIJky2OEN/IPWRifDg6Ux8AnNko=;
+        b=WVEnZA4ZwSe23Czx2wb1oB1Reea2PvM6J6OZqMQoJ56pOllqjs4TxBM34n0MlsR+0E
+         Yd3xn7UFyxC3giu7XMPkEFLWwkL5Om2IxhgfQDWIBH0lGCBvVk+nbsFZfVKWA+V5diPK
+         uyiz1SM+F9AaPouJnX2HZJPTlbmjyiIbqgKmd72yt9qp2y0TU2S2Z7dpramP0DjVtHCb
+         Ze9WA6lYVT8dlAF1Fp1XShTo+CkZZ9lyNS/ncrbWEh0LGbWUnYzyu8qj8hSSF04/f2Ff
+         wUEN89/Ei5mNIP+z5qhN14apO11Kf+i7LZAcA+5ZYOEDHctI9HWjqKfRTUYMTJXoS1lu
+         B4ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704210845; x=1704815645;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1704210892; x=1704815692;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V9qniKWaKPJf+lzEMdhqgVo3btu9BI0ygRsmsQ1RrMI=;
-        b=lkCOiKd+GjxJLI5K9DL0mQ77iQ5KCWXPQhOtGggHpwd5jOHBBIB1Xw8BiC0sMC6c7r
-         PMR59Qbd5/5NEIGEKOpMh9+JOxIbPhfBH/q20egCFOrYR0tiefQGV7CCoJoJm7bGyQeG
-         b3DQpt+qU5Zz4vQz6dRCxOIlATecqkcsvLHNo6N18dhw/krETbiKB5JmWEVCHzQXuHF7
-         FdOKIVNnYjZOeFsqfQEuqm5xcHAtNBP9jSbSpF5pMYAZK4cBeEYkDPVJiU5+JRNVKJXI
-         7TAa90tRUJK29S8VtZ/6TPHv5gGEPsYqZkkExnMsIag5yCMDY8rea/h0RTR9VwnRxFzk
-         5HJA==
-X-Gm-Message-State: AOJu0Yy6zUHxHLd0AxOdKsHcJhii6xBVG/ukKcwdzsKBTQPtWuWTBSIU
-	T86fdSntz44EgDbPS0T/npgthz5niefa2w==
-X-Google-Smtp-Source: AGHT+IFHUNqjyxj/mgxtxnM8gRn492FkFYpOtZDoshUS95Ju4TbK7QAtPIbMUytpPzycTwJQ8BrWAA==
-X-Received: by 2002:a50:c010:0:b0:554:9bef:a1e4 with SMTP id r16-20020a50c010000000b005549befa1e4mr6726001edb.33.1704210844651;
-        Tue, 02 Jan 2024 07:54:04 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id m9-20020aa7c2c9000000b00552666f4745sm16011611edp.22.2024.01.02.07.54.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 07:54:04 -0800 (PST)
-Date: Tue, 2 Jan 2024 16:54:02 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	xiyou.wangcong@gmail.com, idosch@idosch.org, mleitner@redhat.com,
-	vladbu@nvidia.com, paulb@nvidia.com, pctammela@mojatatu.com,
-	netdev@vger.kernel.org, kernel@mojatatu.com,
-	syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com,
-	syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com,
-	syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
-Subject: Re: [PATCH net-next v2 1/1] net/sched: We should only add
- appropriate qdiscs blocks to ports' xarray
-Message-ID: <ZZQxmg3QOxzXcrW0@nanopsycho>
-References: <20231231172320.245375-1-victor@mojatatu.com>
- <ZZPekLXICu2AUxlX@nanopsycho>
- <CAM0EoMkKmF3mhnHLt6gE2bmpuRGV7=OpzrMrOwtk3TJcDFW2JA@mail.gmail.com>
- <ZZQd470J2Q4UEMHv@nanopsycho>
- <CAM0EoMkUQzxtiaB9r=Tz5Wc3KfEDCfyy5ENSeb8M+iK9fs_HVQ@mail.gmail.com>
+        bh=u78lrSfDo4oO6bqKJIJky2OEN/IPWRifDg6Ux8AnNko=;
+        b=Oe/thMMVNJy4hMpqYYMFty2z6fYQ9tsNSoODAxGBt2+7yA4Bc9d6h0xfbb6M4g8A1d
+         HisTM7oqRB+vf6tXBd67WLS8vv9Y/5r2dPTDD249ER+Ww0ILwSdAPPQ6YACVAu+uzEPr
+         6gfDHVuXqTmUkqXG+dj2Bel21GrCYmx3FTZrtgUwv3O4DHo1X4NGtPc546b2XGm3xZoe
+         Pg6gDelrT7AcrXYM6Td7r6t9GXHKUwlMSItbjjR0h2+Q3R8YkYUHt2+Ri+kTqNUhVn/k
+         pkNwMemeftM4kCp+K4/0E+IzwBUkAw+svg+vN75SkEKfQ20lz/GZnufZDNQZvKs8D1vl
+         DrVA==
+X-Gm-Message-State: AOJu0YyHz/znywGh3Bg0FoRDTQD2CuUz82PJUadq+p9YpPOYmHbhs219
+	Rq4JQzNs0/Q9CgJnF/IBRelXOFsCYhw=
+X-Google-Smtp-Source: AGHT+IGeTjd6KNAr2clYj8G+uUOE7r5s490tYc13D0MCL+1OEQFn+2bbJjiIiYdzOkFelaPnyM6ywQ==
+X-Received: by 2002:a50:d5cc:0:b0:54c:4837:81e0 with SMTP id g12-20020a50d5cc000000b0054c483781e0mr10571707edj.49.1704210891778;
+        Tue, 02 Jan 2024 07:54:51 -0800 (PST)
+Received: from ?IPV6:2a01:c23:c1df:9400:2dfa:6a98:a1f2:c23c? (dynamic-2a01-0c23-c1df-9400-2dfa-6a98-a1f2-c23c.c23.pool.telefonica.de. [2a01:c23:c1df:9400:2dfa:6a98:a1f2:c23c])
+        by smtp.googlemail.com with ESMTPSA id q24-20020a056402249800b0055668ccd9a3sm2014462eda.17.2024.01.02.07.54.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jan 2024 07:54:51 -0800 (PST)
+Message-ID: <42e0d1c5-fdd2-4347-874d-2dab736abbdc@gmail.com>
+Date: Tue, 2 Jan 2024 16:54:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMkUQzxtiaB9r=Tz5Wc3KfEDCfyy5ENSeb8M+iK9fs_HVQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Russell King <rmk+kernel@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: mdio_bus: make check in
+ mdiobus_prevent_c45_scan more granular
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
+ sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
+ MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
+ dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
+ /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
+ 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
+ J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
+ kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
+ cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
+ mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
+ bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
+ ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
+ AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
+ axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
+ wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
+ ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
+ TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
+ 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
+ dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
+ +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
+ 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
+ aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
+ kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
+ fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
+ 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
+ KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
+ ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
+ 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
+ ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
+ /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
+ gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
+ AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
+ GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
+ y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
+ nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
+ Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
+ rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
+ Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
+ q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
+ H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
+ lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
+ OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Tue, Jan 02, 2024 at 03:52:01PM CET, jhs@mojatatu.com wrote:
->On Tue, Jan 2, 2024 at 9:29 AM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Tue, Jan 02, 2024 at 03:06:28PM CET, jhs@mojatatu.com wrote:
->> >On Tue, Jan 2, 2024 at 4:59 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >>
->> >> The patch subject should briefly describe the nature of the change. Not
->> >> what "we" should or should not do.
->> >>
->> >>
->> >> Sun, Dec 31, 2023 at 06:23:20PM CET, victor@mojatatu.com wrote:
->> >> >We should only add qdiscs to the blocks ports' xarray in ingress that
->> >> >support ingress_block_set/get or in egress that support
->> >> >egress_block_set/get.
->> >>
->> >> Tell the codebase what to do, be imperative. Please read again:
->> >> https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
->> >>
->> >
->> >We need another rule in the doc on nit-picking which states that we
->> >need to make progress at some point. We made many changes to this
->> >patchset based on your suggestions for no other reason other that we
->> >can progress the discussion. This is a patch that fixes a bug of which
->> >there are multiple syzbot reports and consumers of the API(last one
->> >just reported from the MTCP people). There's some sense of urgency to
->> >apply this patch before the original goes into net. More importantly:
->> >This patch fixes the issue and follows the same common check which was
->> >already being done in the committed patchset to check if the qdisc
->> >supports the block set/get operations.
->> >
->> >There are about 3 ways to do this check, you objected to the original,
->> >we picked something that works fine,  and now you are picking a
->> >different way with tcf_block. I dont see how tcf_block check would
->> >help or solve this problem at all given this is a qdisc issue not a
->> >class issue. What am I missing?
->>
->> Perhaps I got something wrong, but I thought that the issue is
->> cl_ops->tcf_block being null for some qdiscs, isn't it?
->>
->
->We attach these ports/netdevs only on capable qdiscs i.e ones that
->have  in/egress_block_set/get() - which happen to be ingress and
->clsact only.
->The problem was we were blindly assuming that presence of
->cl->tcf_block() implies presence of in/egress_block_set/get(). The
->earlier patches surrounded this code with attribute checks and so it
->worked there.
+Matching on OUI level is a quite big hammer. So let's make matching
+more granular.
 
-Syskaller report says:
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/mdio_bus.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-KASAN: null-ptr-deref in range [0x0000000000000048-0x000000000000004f]
-CPU: 1 PID: 5061 Comm: syz-executor323 Not tainted 6.7.0-rc6-syzkaller-01658-gc2b2ee36250d #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:qdisc_block_add_dev net/sched/sch_api.c:1190 [inline]
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index 6cf73c156..fe4136649 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -621,19 +621,25 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
+  */
+ static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
+ {
+-	int i;
++	static const struct mdio_device_id id_list[] = {
++		{ MICREL_OUI << 10, GENMASK(31, 10) },
++	};
++	int i, j;
+ 
+ 	for (i = 0; i < PHY_MAX_ADDR; i++) {
+ 		struct phy_device *phydev;
+-		u32 oui;
+ 
+ 		phydev = mdiobus_get_phy(bus, i);
+ 		if (!phydev)
+ 			continue;
+-		oui = phydev->phy_id >> 10;
+ 
+-		if (oui == MICREL_OUI)
+-			return true;
++		for (j = 0; j < ARRAY_SIZE(id_list); j++) {
++			const struct mdio_device_id *id = id_list + j;
++
++			if (phy_id_compare(phydev->phy_id, id->phy_id,
++					   id->phy_id_mask))
++				return true;
++		}
+ 	}
+ 	return false;
+ }
+-- 
+2.43.0
 
-Line 1190 is:
-block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
-
-So the cl_ops->tcf_block == NULL
-
-Why can't you just check it? Why do you want to check in/egress_block_set/get()
-instead? I don't follow :/
-
-Btw, the checks in __qdisc_destroy() do also look wrong.
-
-
-
->
->BTW: Do you have an example of a test case where we can test the class
->grafting (eg using htb with tcf_block)? It doesnt have any impact on
->this patcheset here but we want to add it as a regression checker on
->tdc in the future if someone makes a change.
->
->cheers,
->jamal
->
->> >
->> >cheers,
->> >jamal
->> >
->> >> >
->> >> >Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra")
->> >> >Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->> >> >Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
->> >> >Reported-by: Ido Schimmel <idosch@nvidia.com>
->> >> >Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
->> >> >Tested-by: Ido Schimmel <idosch@nvidia.com>
->> >> >Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com
->> >> >Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google.com/
->> >> >Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com
->> >> >Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google.com/
->> >> >Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
->> >> >Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google.com/
->> >> >---
->> >> >v1 -> v2:
->> >> >
->> >> >- Remove newline between fixes tag and Signed-off-by tag
->> >> >- Add Ido's Reported-by and Tested-by tags
->> >> >- Add syzbot's Reported-and-tested-by tags
->> >> >
->> >> > net/sched/sch_api.c | 34 ++++++++++++++++++++--------------
->> >> > 1 file changed, 20 insertions(+), 14 deletions(-)
->> >> >
->> >> >diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
->> >> >index 299086bb6205..426be81276f1 100644
->> >> >--- a/net/sched/sch_api.c
->> >> >+++ b/net/sched/sch_api.c
->> >> >@@ -1187,23 +1187,29 @@ static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
->> >> >       struct tcf_block *block;
->> >> >       int err;
->> >> >
->> >>
->> >> Why don't you just check cl_ops->tcf_block ?
->> >> In fact, there could be a helper to do it for you either call the op or
->> >> return NULL in case it is not defined.
->> >>
->> >>
->> >> >-      block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->> >> >-      if (block) {
->> >> >-              err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
->> >> >-              if (err) {
->> >> >-                      NL_SET_ERR_MSG(extack,
->> >> >-                                     "ingress block dev insert failed");
->> >> >-                      return err;
->> >> >+      if (sch->ops->ingress_block_get) {
->> >> >+              block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->> >> >+              if (block) {
->> >> >+                      err = xa_insert(&block->ports, dev->ifindex, dev,
->> >> >+                                      GFP_KERNEL);
->> >> >+                      if (err) {
->> >> >+                              NL_SET_ERR_MSG(extack,
->> >> >+                                             "ingress block dev insert failed");
->> >> >+                              return err;
->> >> >+                      }
->> >> >               }
->> >> >       }
->> >> >
->> >> >-      block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
->> >> >-      if (block) {
->> >> >-              err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
->> >> >-              if (err) {
->> >> >-                      NL_SET_ERR_MSG(extack,
->> >> >-                                     "Egress block dev insert failed");
->> >> >-                      goto err_out;
->> >> >+      if (sch->ops->egress_block_get) {
->> >> >+              block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
->> >> >+              if (block) {
->> >> >+                      err = xa_insert(&block->ports, dev->ifindex, dev,
->> >> >+                                      GFP_KERNEL);
->> >> >+                      if (err) {
->> >> >+                              NL_SET_ERR_MSG(extack,
->> >> >+                                             "Egress block dev insert failed");
->> >> >+                              goto err_out;
->> >> >+                      }
->> >> >               }
->> >> >       }
->> >> >
->> >> >--
->> >> >2.25.1
->> >> >
 
