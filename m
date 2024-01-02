@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-60871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 847FD821B74
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:14:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F94821B75
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:14:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93B8A1C21EA5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:14:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 266061F2221B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B57EAFA;
-	Tue,  2 Jan 2024 12:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA85EEAED;
+	Tue,  2 Jan 2024 12:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="fImfiL01"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="WxwBsML1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DEEF9C3
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 12:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C633F4F7
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 12:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-336990fb8fbso7289994f8f.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 04:14:24 -0800 (PST)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3374117c79eso1215156f8f.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 04:14:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1704197663; x=1704802463; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hSLIIdVObXyVwnR590fH1wylxU49PILdHE+HMzdEH/4=;
-        b=fImfiL010+lY2K2Fxa0kQcE5pWYIgrX6ALYOMgV5c6rpsaOoeMrRBocHmGJUowzE91
-         xccN5/uOpaKHYDFY9hVigiTvLIrD2UyaxfejCM234iYzmnrmuv2zmSrf/21EDyL9knXv
-         lPSMgFouEZzQ3F6WshMFCb3PNi8gXrziEK68yuTNxBHJrJedUJbtGHqgYj2a1bNh5RTz
-         iP5m7dxt3XPyVjO7NRmdqbEjenzxO9kFz3hx1U3qlyC4r9ESbCYcnyx3INbXUaxbdGup
-         cOnbH18W46FhuWX16AoksWemdhh54k36cryjxuCVBt+G46WnbnwVwBwSvwB7jBORX/SZ
-         2cFw==
+        d=6wind.com; s=google; t=1704197684; x=1704802484; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zhh5vYdTZsQ1BaZTdDhHiFjJyttFCie1hf7tVLjKe4E=;
+        b=WxwBsML1xEmvYETHA+2azUPAb+bHBDmjJhXbGW3MuowA4Hr6NmzOJlwCWuaTIt4855
+         sQvZVkXHc8hf1m12hmwa0mWPu7Zr1Ieds/3Ix+VyI9nzYxyMyXZcop8PiHRD1h+SVlhu
+         0iUDrXRc3YVxA7+lgNEXsju6t8DX53gjFBptUTDl+HIypncD7I1G4at9MFNBCei4Yo05
+         /K+G/s8Kr6vei5NiZo44DbAW3pwk89URSYt5wb7TyEWKFZfAlX3b+cezIG3SlA4bRP+9
+         3HLsX/Pk6PfFNvby6cKT6dCAftsNTD5gIxIJCwC8YTxz9hk7nfrmZCfBaINNB/Xw3aTh
+         1OEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704197663; x=1704802463;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hSLIIdVObXyVwnR590fH1wylxU49PILdHE+HMzdEH/4=;
-        b=JgkXLIqj19NbtncQAIpgfe1pam9amVEMacp8RoiTnOufymt6LD2JhhflmC7BOcyri8
-         wDLGXzlqkS4FXZ1MCwUfB/1qb/lB4evOs2r6YrQpp72E934Oaf00rm6pYjCHhhuU26fb
-         p7l+Kbtv00po2mq4PtBCyIHS2PFrxyAm5UIzyO3nxY7dc0kjl4u0Kmr79DNSSwoDrMhv
-         10CiSmtYADa2QV++q0X307HxJZMExMkKVokRPYKQASVgIt3KVj8AQjr6bSoxyn2cnWEh
-         ClH3+Ze4tlPh0/NNn+37xZh4GjjXzjkrs70NcKCLdL3rhSBzIYyQfHzUL8Z39Z8gdWcR
-         bgHQ==
-X-Gm-Message-State: AOJu0YxaFCoagc3gHHmNJic93TPAHrRE2ASiivIg2+SWz2LiIsCXRUL1
-	7yia+aWB6XpC4iwxj3PADcwANpoFJjmM6Q==
-X-Google-Smtp-Source: AGHT+IGd0wZvlbAugiY9MsTbS6QyHp89fdVRt/H5p6o1N9yplwlOmpKCy46WyxWgLWNpq0Nl3bwvEA==
-X-Received: by 2002:a5d:46c2:0:b0:333:2f23:8708 with SMTP id g2-20020a5d46c2000000b003332f238708mr8115037wrs.29.1704197663128;
-        Tue, 02 Jan 2024 04:14:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704197684; x=1704802484;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zhh5vYdTZsQ1BaZTdDhHiFjJyttFCie1hf7tVLjKe4E=;
+        b=BwnDKSwYoheLXEMbAi0188u99AaX3IOX8wRfjsz7PlAv31vRSPmHqDT7Ci6Lgdpva+
+         XPCeDTByufr+2/mgkfHGottS/i5XFDLU3R7617D2ugLNlUrQc0JNfEspj5TU6sh7lGCD
+         TKPFPWPtggXUfu2oPS5/8bLvAcQrfEUKNX/TmvFZt4stfM7dnVoPvFAOSxr77VYqxdU9
+         qWruq0PY47tdJYFV+ZaO+6nlY2wjGVUb+mOSLBLeAJeYgNrBQ9zBdtnLpxwMJWZShaFq
+         hp34Ri4kuZacfF3+M2e/xmtu/ZAP0iWVcgjbnJXqhQj+6IcZA2VevRG8iceoIWSCEFR5
+         BzSw==
+X-Gm-Message-State: AOJu0YyVflfHe734D051dgQ1kW3Edd3i9qgR4YTC2fo1oTaqugjyQ/nt
+	YOw36SHo5dHcNOCjvBvKfrOcvDn3KKlJsw==
+X-Google-Smtp-Source: AGHT+IHKcvbQIsFBLDgIl79CiLExOpF73lYzXq3fNR05MEXO1/H2Asjz3awgiFru0mE28p5VPlXF3w==
+X-Received: by 2002:adf:fdc7:0:b0:333:37f6:ad33 with SMTP id i7-20020adffdc7000000b0033337f6ad33mr8723122wrs.102.1704197684568;
+        Tue, 02 Jan 2024 04:14:44 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:b41:c160:2900:c6f1:e9ae:67a6? ([2a01:e0a:b41:c160:2900:c6f1:e9ae:67a6])
-        by smtp.gmail.com with ESMTPSA id cg13-20020a5d5ccd000000b00336e6014263sm16874405wrb.98.2024.01.02.04.14.21
+        by smtp.gmail.com with ESMTPSA id cg13-20020a5d5ccd000000b00336e6014263sm16874405wrb.98.2024.01.02.04.14.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 04:14:22 -0800 (PST)
-Message-ID: <a5282f4c-21e5-4c1e-b0bb-10f222453099@6wind.com>
-Date: Tue, 2 Jan 2024 13:14:21 +0100
+        Tue, 02 Jan 2024 04:14:43 -0800 (PST)
+Message-ID: <a8b5e3fb-ff65-41c0-916c-58454cd0c810@6wind.com>
+Date: Tue, 2 Jan 2024 13:14:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,21 +70,22 @@ User-Agent: Mozilla Thunderbird
 Reply-To: nicolas.dichtel@6wind.com
 Subject: Re: [PATCH net] rtnetlink: allow to set iface down before enslaving
  it
-To: Phil Sutter <phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, stable@vger.kernel.org
-References: <20231229100835.3996906-1-nicolas.dichtel@6wind.com>
- <ZZM4Pa3KuD0uaTkx@orbyte.nwl.cc>
 Content-Language: en-US
+To: David Ahern <dsahern@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Phil Sutter <phil@nwl.cc>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org
+References: <20231229100835.3996906-1-nicolas.dichtel@6wind.com>
+ <42ad4a1e-3a48-48aa-acd1-47d44b2ad0ba@kernel.org>
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Organization: 6WIND
-In-Reply-To: <ZZM4Pa3KuD0uaTkx@orbyte.nwl.cc>
+In-Reply-To: <42ad4a1e-3a48-48aa-acd1-47d44b2ad0ba@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Le 01/01/2024 à 23:10, Phil Sutter a écrit :
-> On Fri, Dec 29, 2023 at 11:08:35AM +0100, Nicolas Dichtel wrote:
+Le 31/12/2023 à 17:36, David Ahern a écrit :
+> On 12/29/23 5:08 AM, Nicolas Dichtel wrote:
 >> The below commit adds support for:
 >>> ip link set dummy0 down
 >>> ip link set dummy0 master bond0 up
@@ -103,34 +103,12 @@ Le 01/01/2024 à 23:10, Phil Sutter a écrit :
 >>  net/core/rtnetlink.c | 8 ++++++++
 >>  1 file changed, 8 insertions(+)
 >>
->> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
->> index e8431c6c8490..dd79693c2d91 100644
->> --- a/net/core/rtnetlink.c
->> +++ b/net/core/rtnetlink.c
->> @@ -2905,6 +2905,14 @@ static int do_setlink(const struct sk_buff *skb,
->>  		call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
->>  	}
->>  
->> +	/* Backward compat: enable to set interface down before enslaving it */
->> +	if (!(ifm->ifi_flags & IFF_UP) && ifm->ifi_change & IFF_UP) {
->> +		err = dev_change_flags(dev, rtnl_dev_combine_flags(dev, ifm),
->> +				       extack);
->> +		if (err < 0)
->> +			goto errout;
->> +	}
->> +
->>  	if (tb[IFLA_MASTER]) {
->>  		err = do_set_master(dev, nla_get_u32(tb[IFLA_MASTER]), extack);
->>  		if (err)
 > 
-> Doesn't this merely revert to the old behaviour of setting the interface
-> up before enslaving if both IFF_UP and IFLA_MASTER are present? Did you
-> test this with a bond-type master?
-Yes, both command sequences (cf commit log) work after the patch.
-dev_change_flags() is called before do_set_master() only if the user asks to
-remove the flag IFF_UP.
+> add tests to tools/testing/selftests/net/rtnetlink.sh
+> 
+Will do.
 
 
-Regards,
+Thanks,
 Nicolas
 
