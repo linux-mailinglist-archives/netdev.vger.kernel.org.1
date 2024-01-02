@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-61005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B855C82224A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:53:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40AEC822255
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:56:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 466C9B21DAD
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:53:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9500FB2260A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F5015E9F;
-	Tue,  2 Jan 2024 19:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B8015EB7;
+	Tue,  2 Jan 2024 19:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cqqms3YL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hD49ufOu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8872215EAC
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 19:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8AC168A4;
+	Tue,  2 Jan 2024 19:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5534dcfdd61so16622261a12.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 11:53:16 -0800 (PST)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a279ce3aab9so356709066b.0;
+        Tue, 02 Jan 2024 11:56:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704225195; x=1704829995; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9JMWGGZN9JfukstGvotz8hLrV000kf8geQvXaNOgI1M=;
-        b=Cqqms3YLWHFWh+pE4M/lT04gu6vHorN7UPhGuVnpo2pJS8loP/0wacdeMEwo8lBiKP
-         6hWvkomrlZ4ly7hZAHHA/LUpqWNNyRK0lBTV35PIATMPaQeHLgFjaYcm9kqhJQP3vS7T
-         +J4x6XTHCiNeD6xnakWr8g8V/oFJxUV7kwxJrNAo2WxCJeyg0J6XV54cgxA3RqtMpM9p
-         EXiwxFTasztdAwL2pkPOf53Jg23jkMxgm4b9wnfsDHoHRNRyJ4Vt/2fDlaU8XJWs7K9M
-         rX9Y+l7i6MT/3RNTLgIF23/iX/WeFJxJCF01yjDRLfdAAHBcvIjhX15JONqY1LDTqkgO
-         2drw==
+        d=gmail.com; s=20230601; t=1704225381; x=1704830181; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aI7spMTV6CKlgvG4WBtP/EUsuNOkjp9RFAnmt60+P4g=;
+        b=hD49ufOuXoEL7Qy0xM/p8drlRVWPEnaDABJNeg9+ZgaD8jjl7zsRNy0hQU+F/Frr21
+         NvvrFRQ6CN8xAxnS/VZA2tESc+ss2WbnPFLAtKaSMP2zgWcT1op/Mvh7DgGDF4jk+V2z
+         HWUFNjheEZutkj9wvHKCLExVt6biYmX1tbN5FBbruxVcRMmYYUf0V99c4Gg9grv4oBK6
+         LNFM/FDKrZIWfCw5M3mwdnrROIsRsmQvn1LPbO1wPlqfNiBb/gYrSIL1rcN2/2nZRLeD
+         rXf6v8qECuZVHs0QY7I+RNImNMU58J5cc1fb+XYXeQTqQY3uL70iddhNHA67yEzzzlVV
+         Ro9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704225195; x=1704829995;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9JMWGGZN9JfukstGvotz8hLrV000kf8geQvXaNOgI1M=;
-        b=fVyzGc7oYDkHzD3hZx1sJSW8ilheFFjXEiQbQvp732K3a3O7V7pnGkqFLQ0+5pMAnF
-         P3RXc+ioTBR0Zz/nrb8l1yoymAtlk7LRbv0HNNaydmeRyjtVhynrp3RTrbEIpwdMTpT0
-         llwZOVcmPPW4VQ8FH0lXJdCSW5KulFXBZyISBe3nmFDhCzID2cR8nU8KDd5sHfb5lnSF
-         /a2srHBV8E5J3YWNAYwotxE4wNyv/DEgU+YIALqm6i1zyYhsn2PuGqg+m4yyybXHWpSp
-         vHjxutq3TsQS2Oyb+NHsuF8GVWMkq6N13wmaai7cWyhKf5/Fn8scD+KuVTmqcEUlB3sD
-         aLjw==
-X-Gm-Message-State: AOJu0YzvTlAAuzVecIfDqicMCxdc8qN9Yt1G+lyJntfblFHkY/jueKzc
-	ExFlyrzom1/HRxbxlzUF4tr2FRI96Do=
-X-Google-Smtp-Source: AGHT+IFMGp9r37Brpb4w5EfBCgFcDXvFWpMvudvs9CaFHQernQW/0B0T9B0k+O3DIkaBo3MLBdsF/w==
-X-Received: by 2002:a05:6402:3583:b0:554:a397:8e68 with SMTP id y3-20020a056402358300b00554a3978e68mr14248461edc.16.1704225194459;
-        Tue, 02 Jan 2024 11:53:14 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704225381; x=1704830181;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aI7spMTV6CKlgvG4WBtP/EUsuNOkjp9RFAnmt60+P4g=;
+        b=mlPXoZsbGCedjSyO8LHMx1BjHx/Fh8ya6EEcBId1eL0PgYZwMvT/qPI+PGG92hvzLP
+         8bTLiQg5uV2zJnnjWavbUm9Cifbk9fw5aHyCWrFbHtY4gCFtI1jw9n6woSg0rGGgBVQg
+         nVswMpTQ84Xdcexn5iUng1+pjtJn2ErV17obdMnxABmY7g3F29Hxn7ko1auqpmiUfaxA
+         T96LTYdQs3NRBhec8JS2UKpnjJotmSSNQhD9GSgvDZ6/c57VW6flEsRdc2zgcrK/uOjR
+         DXin+rzDh4tRrA6NPEL9rWOUWcLGgPxI/pgyW6Qn+WRG5SJXu/0H2j9d76+lw8g01xnj
+         y/Gw==
+X-Gm-Message-State: AOJu0YypXCNnhVa+KfnItM2fLLexHky3cTrJEu73hJDN5hDBSPnD5EAZ
+	t/B00CXDgU6qAsO/hxEk7go=
+X-Google-Smtp-Source: AGHT+IFtvZpVbiuj4pGgF1iExi9HBdS5n2jo7O3KbABu/XLr1aQneJT/WWv7ACIrbWDWtQn1uqSy9g==
+X-Received: by 2002:a17:906:88d:b0:a22:ebed:863 with SMTP id n13-20020a170906088d00b00a22ebed0863mr3400516eje.207.1704225380939;
+        Tue, 02 Jan 2024 11:56:20 -0800 (PST)
 Received: from ?IPV6:2a01:c23:c1df:9400:e9d7:fbcb:4065:ab66? (dynamic-2a01-0c23-c1df-9400-e9d7-fbcb-4065-ab66.c23.pool.telefonica.de. [2a01:c23:c1df:9400:e9d7:fbcb:4065:ab66])
-        by smtp.googlemail.com with ESMTPSA id cq8-20020a056402220800b0055507ee70a4sm10222662edb.23.2024.01.02.11.53.13
+        by smtp.googlemail.com with ESMTPSA id vz16-20020a17090704d000b00a2471bb0d11sm11982894ejb.31.2024.01.02.11.56.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 11:53:13 -0800 (PST)
-Message-ID: <3e99877a-6f85-4842-8418-584a8aaf03f7@gmail.com>
-Date: Tue, 2 Jan 2024 20:53:12 +0100
+        Tue, 02 Jan 2024 11:56:20 -0800 (PST)
+Message-ID: <d8fc6f4f-7458-4c67-a6e1-5a917ad95507@gmail.com>
+Date: Tue, 2 Jan 2024 20:56:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,13 +66,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: mdio_bus: make check in
- mdiobus_prevent_c45_scan more granular
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Russell King <rmk+kernel@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <42e0d1c5-fdd2-4347-874d-2dab736abbdc@gmail.com>
+Subject: Re: linux-next: Tree for Jan 2 (net/ethernet/realtek/r8169)
 Content-Language: en-US
+To: Randy Dunlap <rdunlap@infradead.org>,
+ Stephen Rothwell <sfr@canb.auug.org.au>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ nic_swsd@realtek.com, Network Development <netdev@vger.kernel.org>,
+ "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
+ Lee Jones <lee@kernel.org>, Pavel Machek <pavel@ucw.cz>
+References: <20240102165725.6d18cc50@canb.auug.org.au>
+ <a80c1568-7742-4938-a460-d8a5170ae24b@infradead.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -117,21 +121,39 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <42e0d1c5-fdd2-4347-874d-2dab736abbdc@gmail.com>
+In-Reply-To: <a80c1568-7742-4938-a460-d8a5170ae24b@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 02.01.2024 16:54, Heiner Kallweit wrote:
-> Matching on OUI level is a quite big hammer. So let's make matching
-> more granular.
+On 02.01.2024 18:02, Randy Dunlap wrote:
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/phy/mdio_bus.c | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
 > 
+> On 1/1/24 21:57, Stephen Rothwell wrote:
+>> Hi all,
+>>
+>> Changes since 20231222:
+>>
+> 
+> on ppc32:
+> 
+> when CONFIG_R8169=y and
+> CONFIG_LEDS_TRIGGER_NETDEV=m, this part of the
+> r8169 Makefile doesn't work as needed:
+> 
+> ifdef CONFIG_LEDS_TRIGGER_NETDEV
+> r8169-objs += r8169_leds.o
+> endif
+> 
+> causing
+> 
+> r8169_leds.c:(.text+0x97c): undefined reference to `devm_led_classdev_register_ext'
+> 
+> 
+> Full randconfig file is attached.
+> 
+Thanks for the report. The issue is known and a fix has been submitted.
+It's just not reviewed/applied yet.
 
-Shall we put this on hold until we better understand the root
-cause of the original issue?
+https://lore.kernel.org/linux-leds/0f6f432b-c650-4bb8-a1b5-fe3372804d52@gmail.com/T/#u
 
 
