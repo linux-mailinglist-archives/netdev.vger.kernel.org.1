@@ -1,182 +1,139 @@
-Return-Path: <netdev+bounces-60975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CDB6822115
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:33:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A5E282211D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CE0C2842D4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:33:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19A6E1C228B0
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2551B14F9D;
-	Tue,  2 Jan 2024 18:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A033A156F6;
+	Tue,  2 Jan 2024 18:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yIutmAYk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/diWnij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4E615AC2
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 18:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso1202a12.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 10:33:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F307156EF;
+	Tue,  2 Jan 2024 18:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40d2e56f3a6so55564005e9.1;
+        Tue, 02 Jan 2024 10:38:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704220417; x=1704825217; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YcAbBzTZy/cwBJVkLr8s6Y3WY23Q0YFRyyWOj4s6ib8=;
-        b=yIutmAYkKyJZkO+vficrBTfxMhkIcORQAEtwZrGRB1vXT+SFW4JaZwp0+YK2XwE+Ii
-         gxkiprMxmp/WAwH1RPuhLhKA4HqeUziCNw3+PKC1AkoTxArwKRGpXYfLvKTsBOHzseBD
-         6E9O/gvrdkPh4Tft/ielPsGrxzPlHmdkx70AigNxZ86FLxbopnKtEZmHf5z70bp/KdcY
-         E2g+mcPBGP3A/9ibYliezte3CMqsY83WPshDjFvzxlh8lkL0SSiaxmkHZzEP5o8rWd2S
-         C07s+MwmYGxSYs42ZEfc+KcRy5jdNO2XluS/SQbYNu7RiIfEjbhwSwEoRMItIuphQPJS
-         Uudg==
+        d=gmail.com; s=20230601; t=1704220729; x=1704825529; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TSbX98OpsIFhknrkPUlnLd/Gb/xC0302JuUUTWaUNQQ=;
+        b=F/diWnijXehkaytk6d6bz516XLsD6t29KKBQLoUd9wiI7FxEgYSe1HuQrXWq4SzNUf
+         uoZIjjBKFspPIjfTbaZIrSCmcQ4kbALgQoy1cE7/DHCZWEB29KmHt8zU+gzA36tolp21
+         vQVeQOYbpELVh4o63Qy4U2MEz/G8Ozg1j2d+gJwe68EElPcEmQV61hQ/Sro7VAGjFkkH
+         9lKUQ5v/UK9uNPtKwD4ITMP7GVkAG/t4S3xgezWauUvqg5lsgLpHEHEl9xA5KYMRIZzu
+         34QOo9BUNn4iJc3iFbCyzY9zmqcZr4k1kPTzBndTdX2IKwJ1XwJbk+l7OXPBr9gY6WdX
+         P00Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704220417; x=1704825217;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YcAbBzTZy/cwBJVkLr8s6Y3WY23Q0YFRyyWOj4s6ib8=;
-        b=hcog7fuexf6lT1GGz+vn33z4f+quLYh5Ojrzo3iUS/0Mzxiv+7jNaDGYSlqb+xzy00
-         VqQp8YynYwm50r3Zn5CkhK/43CiZMb/cUjxgHM/SWRbYOrELVLIRt70tNWqiTZdkXcF2
-         8PaO9yuv3nGNg5zydSgM3VUGMf6ndgBm54XDEV0x+i+WCwrAEUQy3YHs8/W+tl1b7OQq
-         CI7qEZIkV9z5jnprQ51wsXSh0UGgXpRxWfJeAJh9VRYkh2ykQCPd+9KmqAs6jWBeMUPG
-         gQiDdXGNqjcbrjQrU1wZnXkQ8FxhmPDYwFiC46hKjU+TWBUtV4Fq6Ue0TQvrrpUoXVFH
-         z/iA==
-X-Gm-Message-State: AOJu0YyqhS5D9AIwJLkFY9K3jQd97kpgEbJZbvJy5VogtZIf+2WbM/E1
-	ZwTrKzXDFoPMriKVxT/3Nokm/lD0mLb+b/qGjYG64CwN9mvU
-X-Google-Smtp-Source: AGHT+IFMMYAsrpycRKvYiz7NGfwtOm4xfv+ygiRUtgU9ZHZEYciNvmx/YcgXdNvTEzSAR3HGIFR/XAiYI5JWeO1ZbbU=
-X-Received: by 2002:a50:9b51:0:b0:554:1b1c:72c4 with SMTP id
- a17-20020a509b51000000b005541b1c72c4mr715805edj.1.1704220416498; Tue, 02 Jan
- 2024 10:33:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704220729; x=1704825529;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TSbX98OpsIFhknrkPUlnLd/Gb/xC0302JuUUTWaUNQQ=;
+        b=ARZkmpptTy0FjyZiZjYFwPoij8nfJanwf07BzVOa33IZDrUdLlerX4MoLq16fYPDaX
+         DA9ZQYb2krKk+NtUtXz2zpCIYF4ooO+fbikb4rkzxkTnDEefL3Moqv/w7QuoNYXufcyP
+         KJsPh8zRGNChmD7t/WNSJepukyqbdBdu9+Z0PWpQEWr6XNRxt76l6kvb2lfNJ9U6VV79
+         Tc78CxFUC3R3eNeLDDPelMTduZa3XQkMXp0IVh9k8IsJVUcnLOwfOHFe3fZ0JeWxP2+F
+         ya9lOz/W3fg4L0HWzCNIwsuE4NA0LXe5KmETMETYXG8y3PYInzjUqf5WR9N/aT+z1tOI
+         Rhsw==
+X-Gm-Message-State: AOJu0Yx/mJpbspeFnbM3dzr+Z8pLFFcel5q22zuTal+Z6v6Bdh9Hgn+z
+	J6hB7kJuH5t7e7V7l2okJv4=
+X-Google-Smtp-Source: AGHT+IHS1rXQmYTNGbOeFEUNy2APVbixEkLwy9K4cxhk/vuhAL2D1ayBVg6w75D32M9xrGQChzIoaw==
+X-Received: by 2002:a05:600c:3542:b0:40d:5a6f:fb72 with SMTP id i2-20020a05600c354200b0040d5a6ffb72mr5752891wmq.57.1704220728913;
+        Tue, 02 Jan 2024 10:38:48 -0800 (PST)
+Received: from localhost.localdomain (host-87-10-250-100.retail.telecomitalia.it. [87.10.250.100])
+        by smtp.googlemail.com with ESMTPSA id p15-20020a05600c468f00b0040d4e1393dcsm37963071wmo.20.2024.01.02.10.38.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 10:38:48 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	William Zhang <william.zhang@broadcom.com>,
+	Anand Gore <anand.gore@broadcom.com>,
+	Kursad Oney <kursad.oney@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	=?UTF-8?q?Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>,
+	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-leds@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: [net-next PATCH v6 0/5] net: phy: generic polarity + LED support for qca808x
+Date: Tue,  2 Jan 2024 19:38:29 +0100
+Message-ID: <20240102183835.5332-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com>
- <CANn89iLVg3H-GuZ6=_-Rc5Jk14T59pZcx1DF-3HApvsPuSpNXg@mail.gmail.com>
- <20240102095835.GF6361@unreal> <CANn89iLd6EeC3b8DTXBP=cDw8ri+k_uGiCrAS6BOoG3FMuAxmg@mail.gmail.com>
- <20240102114147.GG6361@unreal> <CANn89iJzBzcU=-ybbvOjNeNBqx2ap=uoS1dbYJEY59oWsSTUtg@mail.gmail.com>
- <20240102180102.GA5160@unreal>
-In-Reply-To: <20240102180102.GA5160@unreal>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Jan 2024 19:33:23 +0100
-Message-ID: <CANn89iKcStXqo9rxpO_Dq3HQ0Sj8Ce_5YmjaKx7n9EF+9GjTmA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: Revert no longer abort SYN_SENT when
- receiving some ICMP
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Gal Pressman <gal@nvidia.com>, David Ahern <dsahern@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shachar Kagan <skagan@nvidia.com>, netdev@vger.kernel.org, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, 
-	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 2, 2024 at 7:01=E2=80=AFPM Leon Romanovsky <leon@kernel.org> wr=
-ote:
->
-> On Tue, Jan 02, 2024 at 04:31:15PM +0100, Eric Dumazet wrote:
-> > On Tue, Jan 2, 2024 at 12:41=E2=80=AFPM Leon Romanovsky <leon@kernel.or=
-g> wrote:
-> > >
-> > > On Tue, Jan 02, 2024 at 11:03:55AM +0100, Eric Dumazet wrote:
-> > > > On Tue, Jan 2, 2024 at 10:58=E2=80=AFAM Leon Romanovsky <leon@kerne=
-l.org> wrote:
-> > > > >
-> > > > > On Tue, Jan 02, 2024 at 10:46:13AM +0100, Eric Dumazet wrote:
-> > > > > > On Tue, Jan 2, 2024 at 10:01=E2=80=AFAM Leon Romanovsky <leon@k=
-ernel.org> wrote:
-> > > > > > >
-> > > > > > > From: Shachar Kagan <skagan@nvidia.com>
-> > > > > > >
-> > > > > > > This reverts commit 0a8de364ff7a14558e9676f424283148110384d6.
-> > > > > > >
-> > > > > > > Shachar reported that Vagrant (https://www.vagrantup.com/), w=
-hich is
-> > > > > > > very popular tool to manage fleet of VMs stopped to work afte=
-r commit
-> > > > > > > citied in Fixes line.
-> > > > > > >
-> > > > > > > The issue appears while using Vagrant to manage nested VMs.
-> > > > > > > The steps are:
-> > > > > > > * create vagrant file
-> > > > > > > * vagrant up
-> > > > > > > * vagrant halt (VM is created but shut down)
-> > > > > > > * vagrant up - fail
-> > > > > > >
-> > > > > >
-> > > > > > I would rather have an explanation, instead of reverting a vali=
-d patch.
-> > > > > >
-> > > > > > I have been on vacation for some time. I may have missed a deta=
-iled
-> > > > > > explanation, please repost if needed.
-> > > > >
-> > > > > Our detailed explanation that revert worked. You provided the pat=
-ch that
-> > > > > broke, so please let's not require from users to debug it.
-> > > > >
-> > > > > If you need a help to reproduce and/or test some hypothesis, Shac=
-har
-> > > > > will be happy to help you, just ask.
-> > > >
-> > > > I have asked already, and received files that showed no ICMP releva=
-nt
-> > > > interactions.
-> > > >
-> > > > Can someone from your team help Shachar to get  a packet capture of
-> > > > both TCP _and_ ICMP packets ?
-> > >
-> > > I or Gal will help her, but for now let's revert it, before we will s=
-ee
-> > > this breakage in merge window and later in all other branches which w=
-ill
-> > > be based on -rc1.
-> >
-> > Patch is in net-next, we have at least four weeks to find the root caus=
-e.
->
-> I saw more than once claims that netdev is fast to take patches but also
-> fast in reverts. There is no need to keep patch with known regression,
-> while we are in -rc8.
+This small series add LEDs support for qca808x.
 
-This patch is not in rc8, unless I am mistaken ?
+QCA808x apply on PHY reset a strange polarity settings and require
+some tweak to apply a more common configuration found on devices.
+On adding support for it, it was pointed out that a similar
+feature is also being implemented for a marvell PHY where
+LED polarity is set per LED (and not global) and also have
+a special mode where the LED is tristated.
 
->
-> >
-> > I am a TCP maintainer, I will ask you to respect my choice, we have
-> > tests and reverting the patch is breaking one of them.
->
-> At least for ipv6, you changed code from 2016 and the patch which I'm ask=
-ing
-> to revert is not even marked as a fix. So I don't understand the urgency =
-to keep
-> the patch.
+The first 3 patch are to generalize this as we expect more PHY
+in the future to have a similar configuration.
 
-Do you have an issue with IPv4 code or IPv6 ?
+The implementation is extensible to support additional special
+mode in the future with minimal changes and don't create regression
+on already implemented PHY drivers.
 
-It would help to have details.
->
-> There are two things to consider:
-> 1. Linux rule number one is "do not break userspace".
+(changelog present in single patch)
 
-No released kernel contains the issue yet. Nothing broke yet.
+Christian Marangi (5):
+  dt-bindings: net: phy: Make LED active-low property common
+  dt-bindings: net: phy: Document LED inactive high impedance mode
+  net: phy: add support for PHY LEDs polarity modes
+  dt-bindings: net: Document QCA808x PHYs
+  net: phy: at803x: add LED support for qca808x
 
-net-next is for developers.
+ .../devicetree/bindings/leds/common.yaml      |  12 +
+ .../bindings/leds/leds-bcm63138.yaml          |   4 -
+ .../bindings/leds/leds-bcm6328.yaml           |   4 -
+ .../devicetree/bindings/leds/leds-bcm6358.txt |   2 -
+ .../bindings/leds/leds-pwm-multicolor.yaml    |   4 -
+ .../devicetree/bindings/leds/leds-pwm.yaml    |   5 -
+ .../devicetree/bindings/net/qca,qca808x.yaml  |  54 +++
+ drivers/net/phy/at803x.c                      | 333 ++++++++++++++++++
+ drivers/net/phy/phy_device.c                  |  12 +
+ include/linux/phy.h                           |  22 ++
+ 10 files changed, 433 insertions(+), 19 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/qca,qca808x.yaml
 
-> 2. Linux is a community project and people can have different opinions,
-> which can be different from your/mine.
->
-> Thanks
+-- 
+2.43.0
 
-I think we have time, and getting this patch with potential users on
-it will help to debug the issue.
 
