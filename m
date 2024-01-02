@@ -1,148 +1,171 @@
-Return-Path: <netdev+bounces-60782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E88C8217EF
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:13:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B418217E5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:04:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AB141F21278
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 07:13:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DB731C213D8
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 07:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1494E17E3;
-	Tue,  2 Jan 2024 07:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Y2CkeGTg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFA815D0;
+	Tue,  2 Jan 2024 07:04:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.14])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C94D20F9;
-	Tue,  2 Jan 2024 07:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1704179577; x=1704784377; i=markus.elfring@web.de;
-	bh=BzfHfM8ElsvZex/Uect+kFopl0XLqwkwH+F+arwONTs=;
-	h=X-UI-Sender-Class:Date:Subject:From:To:Cc:References:
-	 In-Reply-To;
-	b=Y2CkeGTgDSesaLttaMthQObZ1uW4skPAqChG/k58SisrwhJ/RnSaAcPeMc7wTmrL
-	 2Wwu7w6+jSTJJ/b5R32ky01lqPjtcnrUVXuGM4npTKjVIIrEV79eymRjXGkNBR7lO
-	 2tBeeuAqYG/vBbU4xDmBJOGRT/Eh5ynZu0uWqTwd5rrgzCikNFOzSxWgbklyp1zTB
-	 BTmDtQqM3rESmQDrsF21D7mUnTRM5OngLmNx1cjZGvA8tU7KVhYsiEd6OlnAb3kSJ
-	 A7WekoInu6+ic136epG3LhxdzLSW9A2T0ILFVXcuUSDR+y0gA9cxbwdQk7YP8Gj4F
-	 B0IFC6Bw79JJUN91Dg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MumJD-1r24Ec1OQV-00rRZw; Tue, 02
- Jan 2024 08:12:57 +0100
-Message-ID: <d2ce9337-e1a4-4213-ad6f-926c085dc17f@web.de>
-Date: Tue, 2 Jan 2024 08:12:56 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD2A20F5
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 07:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4T43k22LVSzsV8g;
+	Tue,  2 Jan 2024 15:04:10 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2BEFC140486;
+	Tue,  2 Jan 2024 15:04:44 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 2 Jan
+ 2024 15:04:43 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+	<shaozhengchao@huawei.com>
+Subject: [PATCH net-next] fib: remove unnecessary input parameters in fib_default_rule_add
+Date: Tue, 2 Jan 2024 15:15:19 +0800
+Message-ID: <20240102071519.3781384-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH 2/2] batman-adv: Improve exception handling in
- batadv_throw_uevent()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-To: b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, Antonio Quartulli <a@unstable.cc>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Marek Lindner
- <mareklindner@neomailbox.ch>, Paolo Abeni <pabeni@redhat.com>,
- Simon Wunderlich <sw@simonwunderlich.de>, Sven Eckelmann <sven@narfation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <8588cafe-3c61-40a6-b071-0877632a2a1e@web.de>
-In-Reply-To: <8588cafe-3c61-40a6-b071-0877632a2a1e@web.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:X8tI5V2tYneXOsAvm6L5iObE7FR3QlCz66qzzSaWxhd2o876S7p
- 8qtEp1ZdHpHXIUIl/sGZ7gk5ZChmppeDJ2SCctoTwAhiA/p/RGgAzWLQOUFo95dSBxDj5MM
- fwp/6Psyok7/zLxcCxvSFSKQHwhal0M5PRT+KHgeO1uGX5J1tao8rfEbdMy+ATuGV3Q96nq
- VnVOYEyfPH8Id8tdczjyQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:k1BY0oVzLbo=;Dvl3Si46wFYS3jSy7Kllf1tk0wQ
- Lg7A3i+fI2SSage3Fbl1/cQseWp/3tjxhcwh4Kptz69UwP0hnVrVHSEyXRcgbKvfrak0dXSbl
- iEx7cXE5+H9Izm+4gvFSzkkFj4FQ8ujDwRta6apTsKLM5bhs7zLXIh+Rze8wk9w/Uz9rwbsXH
- VJ2w0oDJ3TLC9qfHkQw+oVkRk+XT24xqtdp6z/QYRJ5GGhc7AG95AXmzugDcHAgt5FE7gvi8U
- +n+d+FJTwXRDKFru7KzGpoD3ZALgzoTodQACOtl0YrJHsIxR0ckFh7qUAuiq3UI+WiXsQMzC3
- dUZ+20rVwnp2RnlGkfAz5iVdcgTFTvweVInL+BVq8zrwZIzBhR9+C66a9Apz9afPImHW/I99R
- ouJ70dqvRkeI6yFw5sbWlnZMwdJR6BruTydV3lMlW29hVCSjjG1rQLUohlGt64/r93CLsVeSR
- KGUrnLLPEedbWG8C4tDA0r3eMj5lw6JzqpomgOvRwht4c4L4Zxuef+OQso3dHKIPwd7wlIfw0
- WCCEVqXgOdUqUV+pJLt5DeCLvxHxfY6fCHKUXs5u+gW/iI8GSnXP5mGomXC2FhJdiwkbkqDWA
- Uc2aUziM3b9TG1mhBbhSxHQ2r29G+5n5y1FMkSBJuCipylQmSvu2UeFhvSvZylqe4GY7M4BdH
- 7gN4OE6j6NKYBlIba/1N0rloGAJp5S6vAHSX3U/lHOhwxtot6OiSt1M6BZUIi5SJg27bu1n/m
- PAhY8EfKWH0txytOOar/ub/lN27IiiWckJAjsk9da+gM9uMZpJa+RYNS5gzFNhmYIgd4R8wts
- CP8lj3mqdUbe17ph+Oe7/dPhU60dGKA0Cz9QmJrRJ88OHn4n81OOu/siEigIBR6W0pyKomEuC
- +KA9nffLt6EW7RXFtPP9j3+TzcpdUsnGYwM6HOGBxzAh2GPBbLWVr48LF7dnkPqX4/YBweJdu
- g5bIpQ==
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Tue, 2 Jan 2024 07:52:21 +0100
+When fib_default_rule_add is invoked, the value of the input parameter
+'flags' is always 0. Rules uses kzalloc to allocate memory, so 'flags' has
+been initialized to 0. Therefore, remove the input parameter 'flags' in
+fib_default_rule_add.
 
-The kfree() function was called in up to three cases by
-the batadv_throw_uevent() function during error handling
-even if the passed variable contained a null pointer.
-This issue was detected by using the Coccinelle software.
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+---
+ include/net/fib_rules.h | 3 +--
+ net/core/fib_rules.c    | 3 +--
+ net/ipv4/fib_rules.c    | 6 +++---
+ net/ipv4/ipmr.c         | 2 +-
+ net/ipv6/fib6_rules.c   | 4 ++--
+ net/ipv6/ip6mr.c        | 2 +-
+ 6 files changed, 9 insertions(+), 11 deletions(-)
 
-* Thus adjust jump targets.
-
-* Reorder kfree() calls at the end.
-
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- net/batman-adv/main.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-index 5fc754b0b3f7..75119f1ffccc 100644
-=2D-- a/net/batman-adv/main.c
-+++ b/net/batman-adv/main.c
-@@ -691,29 +691,31 @@ int batadv_throw_uevent(struct batadv_priv *bat_priv=
-, enum batadv_uev_type type,
- 				  "%s%s", BATADV_UEV_TYPE_VAR,
- 				  batadv_uev_type_str[type]);
- 	if (!uevent_env[0])
--		goto out;
-+		goto report_error;
-
- 	uevent_env[1] =3D kasprintf(GFP_ATOMIC,
- 				  "%s%s", BATADV_UEV_ACTION_VAR,
- 				  batadv_uev_action_str[action]);
- 	if (!uevent_env[1])
--		goto out;
-+		goto free_first_env;
-
- 	/* If the event is DEL, ignore the data field */
- 	if (action !=3D BATADV_UEV_DEL) {
- 		uevent_env[2] =3D kasprintf(GFP_ATOMIC,
- 					  "%s%s", BATADV_UEV_DATA_VAR, data);
- 		if (!uevent_env[2])
--			goto out;
-+			goto free_second_env;
+diff --git a/include/net/fib_rules.h b/include/net/fib_rules.h
+index 82da359bca03..d17855c52ef9 100644
+--- a/include/net/fib_rules.h
++++ b/include/net/fib_rules.h
+@@ -172,8 +172,7 @@ void fib_rules_unregister(struct fib_rules_ops *);
+ 
+ int fib_rules_lookup(struct fib_rules_ops *, struct flowi *, int flags,
+ 		     struct fib_lookup_arg *);
+-int fib_default_rule_add(struct fib_rules_ops *, u32 pref, u32 table,
+-			 u32 flags);
++int fib_default_rule_add(struct fib_rules_ops *, u32 pref, u32 table);
+ bool fib_rule_matchall(const struct fib_rule *rule);
+ int fib_rules_dump(struct net *net, struct notifier_block *nb, int family,
+ 		   struct netlink_ext_ack *extack);
+diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
+index 75282222e0b4..96622bfb838a 100644
+--- a/net/core/fib_rules.c
++++ b/net/core/fib_rules.c
+@@ -53,7 +53,7 @@ bool fib_rule_matchall(const struct fib_rule *rule)
+ EXPORT_SYMBOL_GPL(fib_rule_matchall);
+ 
+ int fib_default_rule_add(struct fib_rules_ops *ops,
+-			 u32 pref, u32 table, u32 flags)
++			 u32 pref, u32 table)
+ {
+ 	struct fib_rule *r;
+ 
+@@ -65,7 +65,6 @@ int fib_default_rule_add(struct fib_rules_ops *ops,
+ 	r->action = FR_ACT_TO_TBL;
+ 	r->pref = pref;
+ 	r->table = table;
+-	r->flags = flags;
+ 	r->proto = RTPROT_KERNEL;
+ 	r->fr_net = ops->fro_net;
+ 	r->uid_range = fib_kuid_range_unset;
+diff --git a/net/ipv4/fib_rules.c b/net/ipv4/fib_rules.c
+index 513f475c6a53..5bdd1c016009 100644
+--- a/net/ipv4/fib_rules.c
++++ b/net/ipv4/fib_rules.c
+@@ -395,13 +395,13 @@ static int fib_default_rules_init(struct fib_rules_ops *ops)
+ {
+ 	int err;
+ 
+-	err = fib_default_rule_add(ops, 0, RT_TABLE_LOCAL, 0);
++	err = fib_default_rule_add(ops, 0, RT_TABLE_LOCAL);
+ 	if (err < 0)
+ 		return err;
+-	err = fib_default_rule_add(ops, 0x7FFE, RT_TABLE_MAIN, 0);
++	err = fib_default_rule_add(ops, 0x7FFE, RT_TABLE_MAIN);
+ 	if (err < 0)
+ 		return err;
+-	err = fib_default_rule_add(ops, 0x7FFF, RT_TABLE_DEFAULT, 0);
++	err = fib_default_rule_add(ops, 0x7FFF, RT_TABLE_DEFAULT);
+ 	if (err < 0)
+ 		return err;
+ 	return 0;
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 0063a237253b..9d6f59531b3a 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -253,7 +253,7 @@ static int __net_init ipmr_rules_init(struct net *net)
+ 		goto err1;
  	}
-
- 	ret =3D kobject_uevent_env(bat_kobj, KOBJ_CHANGE, uevent_env);
--out:
--	kfree(uevent_env[0]);
--	kfree(uevent_env[1]);
- 	kfree(uevent_env[2]);
-+free_second_env:
-+	kfree(uevent_env[1]);
-+free_first_env:
-+	kfree(uevent_env[0]);
-
- 	if (ret)
-+report_error:
- 		batadv_dbg(BATADV_DBG_BATMAN, bat_priv,
- 			   "Impossible to send uevent for (%s,%s,%s) event (err: %d)\n",
- 			   batadv_uev_type_str[type],
-=2D-
-2.43.0
+ 
+-	err = fib_default_rule_add(ops, 0x7fff, RT_TABLE_DEFAULT, 0);
++	err = fib_default_rule_add(ops, 0x7fff, RT_TABLE_DEFAULT);
+ 	if (err < 0)
+ 		goto err2;
+ 
+diff --git a/net/ipv6/fib6_rules.c b/net/ipv6/fib6_rules.c
+index 7c2003833010..7523c4baef35 100644
+--- a/net/ipv6/fib6_rules.c
++++ b/net/ipv6/fib6_rules.c
+@@ -475,11 +475,11 @@ static int __net_init fib6_rules_net_init(struct net *net)
+ 	if (IS_ERR(ops))
+ 		return PTR_ERR(ops);
+ 
+-	err = fib_default_rule_add(ops, 0, RT6_TABLE_LOCAL, 0);
++	err = fib_default_rule_add(ops, 0, RT6_TABLE_LOCAL);
+ 	if (err)
+ 		goto out_fib6_rules_ops;
+ 
+-	err = fib_default_rule_add(ops, 0x7FFE, RT6_TABLE_MAIN, 0);
++	err = fib_default_rule_add(ops, 0x7FFE, RT6_TABLE_MAIN);
+ 	if (err)
+ 		goto out_fib6_rules_ops;
+ 
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index 30ca064b76ef..9782c180fee6 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -242,7 +242,7 @@ static int __net_init ip6mr_rules_init(struct net *net)
+ 		goto err1;
+ 	}
+ 
+-	err = fib_default_rule_add(ops, 0x7fff, RT6_TABLE_DFLT, 0);
++	err = fib_default_rule_add(ops, 0x7fff, RT6_TABLE_DFLT);
+ 	if (err < 0)
+ 		goto err2;
+ 
+-- 
+2.34.1
 
 
