@@ -1,95 +1,219 @@
-Return-Path: <netdev+bounces-60960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAB2082205B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:25:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E104822070
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:34:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFE5E1C2263C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:25:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6B9B1F22F67
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C526E154AC;
-	Tue,  2 Jan 2024 17:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73945154B1;
+	Tue,  2 Jan 2024 17:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzoXn5+c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eIKxHN22"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E20515499;
-	Tue,  2 Jan 2024 17:25:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AE0DC433CC;
-	Tue,  2 Jan 2024 17:25:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704216338;
-	bh=Yk2WvWStKrh59dnz6K0iqdbE5KuKw/M+bXYxLDQ6XNA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=MzoXn5+czOwiwpIP4OmHi77HXaHlRjgNOzeyvMucJ8/29jK5+1Ylh64F4BqlVHSzE
-	 0ToF+JcH3nlS0UH4M8Cja0L264d3WmHtxLSp716tXdFaTK9+mriccMiy7ZfWCnsNG3
-	 lC0tG1kymlIXGHAVG09REvbrhwbNs1axKiNMcJ2jg+XISphn80bpqz03Htqblm2brN
-	 G8Js3Jv3DgJm5QoFq6fcr3ZWUAnM5FboGXuk8WTnwq3yAet/KIHYHBzCVLvoVM5nZn
-	 ItC+BWokeKYSGaY91jUiD5MrceBbydVgEgeW8VBTMju318sQQxr45mv+XvgUQajXz8
-	 2DjysgDc61CAQ==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2cce6c719caso44780761fa.2;
-        Tue, 02 Jan 2024 09:25:37 -0800 (PST)
-X-Gm-Message-State: AOJu0YzsP8jxtgTc+iMytXFDWdlRvPpv4tKHaO6fS6ZueY2zcYAR/s5/
-	nwuSpOIqKMA1ndE7PY3jcATPnNwzpM079U01fRU=
-X-Google-Smtp-Source: AGHT+IHfuPNVzd2ZDem2x58G2jeY3n6dgOHiGPMnVZyOqMge6oBAw/znigjup7FlcLmpGOW4aKT0WazvluZ3+xcqBh8=
-X-Received: by 2002:a05:6512:3d01:b0:50e:76e0:a51f with SMTP id
- d1-20020a0565123d0100b0050e76e0a51fmr8185878lfv.100.1704216336217; Tue, 02
- Jan 2024 09:25:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AC6154AB
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 17:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so79a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 09:34:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704216850; x=1704821650; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O4H4STx0XR17w8qdB0s8hsPN6AziBcrpsvvrusepEl8=;
+        b=eIKxHN22uF4ipZEbLfODcakewE4ub9/F+bb1dYH9tupsBPW2YIaKE4oiYgqJCz1ZBm
+         ijN0/H2iRO7BrSt2f1+40qumD5oTf4Or9wps8rQfOnBnxqHB6+wd873X3BkMRIO0Bn9r
+         6ug04rSW23EUlK3iDBodaERaDBEjyo8EY9/olsXcRuysdcAIMN3rKt7ARAQ57zryxuV3
+         NNdApwgtGobV9WKWympscfUXdcTlnFu3JG6gHFOWwkTU40Y7kkVUkXC5qXnUwgggk4LR
+         phEN/r8G6RuCG8veF9m6NKn7+E0a6OcBBehZ2OW9SqhwWTrJ2TmCoCGHvRElERarsJg7
+         xPsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704216850; x=1704821650;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O4H4STx0XR17w8qdB0s8hsPN6AziBcrpsvvrusepEl8=;
+        b=QEhzJx8mKOTtMN9pga6dCZUh/WGOK8PTIARGQSnJj88LyX5LQ6DnumVCDQMRNC7oDf
+         D6eOliN+FEwuujxHYrin6Wz1EaV1H33VArJSiujD2wY2f+0bVSdB4sSbdUMDvQlXJ9qR
+         ZIzQ/ha367TwfMOoZxO+/YTkA4H/I3frfHGf4QOUn1zeJCg3IvtGh9KofGj9VWr68gom
+         zEw8gun79c2sPdzX6ZnZTfmYnCyXO68Wshl9jSEY/ZMcwX0tqJglLx5y2FsFPo0di0oO
+         oRKcVUc21cVVSuShSbWYk/XZRAT7W9yJ8m0mXpNYmfKobFHXhtmLTIncOop6kQm4t/EA
+         lvqw==
+X-Gm-Message-State: AOJu0YxOluUcg2QUhGyCzfBZ3I3uRnAE8oAOp/BdQwUjx6YqkQtoCq/u
+	ciQ4zl0PHQPVkffEKobd2yN23lUiktr/bOMgVGwwHr+ymuOO
+X-Google-Smtp-Source: AGHT+IFvEcIrqZ9aUSnNEmLKXBrUPXMwi6f7bv82qceodEBrqeWWCV70ozR3PyflHs50XEz9U6Tm24vgKfbfCzlUAAY=
+X-Received: by 2002:a50:ba8e:0:b0:554:228f:4b8e with SMTP id
+ x14-20020a50ba8e000000b00554228f4b8emr1136022ede.2.1704216849665; Tue, 02 Jan
+ 2024 09:34:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7011cdcc-4287-4e63-8bfa-f08710f670b1@web.de> <CAADnVQLq7RKV+RBJm02HwfXujaUwFXsD77BqJK6ZpLQ-BObCdA@mail.gmail.com>
- <dc0a1c9d-ceca-473d-9ad5-89b59e6af2e7@web.de>
-In-Reply-To: <dc0a1c9d-ceca-473d-9ad5-89b59e6af2e7@web.de>
-From: Song Liu <song@kernel.org>
-Date: Tue, 2 Jan 2024 09:25:24 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW4J1+ZijLQ5d9+ZnNUHLCAG+0nwwcLkmGb9df-ioac7Nw@mail.gmail.com>
-Message-ID: <CAPhsuW4J1+ZijLQ5d9+ZnNUHLCAG+0nwwcLkmGb9df-ioac7Nw@mail.gmail.com>
-Subject: Re: [PATCH 0/5] bpf: Adjustments for four function implementations
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Stanislav Fomichev <sdf@google.com>, 
-	Yonghong Song <yonghong.song@linux.dev>, LKML <linux-kernel@vger.kernel.org>
+References: <127b8199-1cd4-42d7-9b2b-875abaad93fe@gmail.com> <90117449-1f4a-47d7-baf4-2ed6540bc436@gmail.com>
+In-Reply-To: <90117449-1f4a-47d7-baf4-2ed6540bc436@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Jan 2024 18:33:58 +0100
+Message-ID: <CANn89i+GJOgcDWK=C0+vmomt2ShotrOKyLiXzFkfT1W8vpJv1Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/3] net: gro: parse ipv6 ext headers without
+ frag0 invalidation
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 1, 2024 at 1:10=E2=80=AFAM Markus Elfring <Markus.Elfring@web.d=
-e> wrote:
+On Tue, Jan 2, 2024 at 2:25=E2=80=AFPM Richard Gobert <richardbgobert@gmail=
+.com> wrote:
 >
-> >> A few update suggestions were taken into account
-> >> from static source code analysis.
-> >
-> > Auto Nack.
-> > Pls don't send such patches. You were told multiple
-> > times that such kfree usage is fine.
+> The existing code always pulls the IPv6 header and sets the transport
+> offset initially. Then optionally again pulls any extension headers in
+> ipv6_gso_pull_exthdrs and sets the transport offset again on return from
+> that call. skb->data is set at the start of the first extension header
+> before calling ipv6_gso_pull_exthdrs, and must disable the frag0
+> optimization because that function uses pskb_may_pull/pskb_pull instead o=
+f
+> skb_gro_ helpers. It sets the GRO offset to the TCP header with
+> skb_gro_pull and sets the transport header. Then returns skb->data to its
+> position before this block.
 >
-> Some implementation details are improvable.
-> Can you find an update step (like the following) helpful?
+> This commit introduces a new helper function - ipv6_gro_pull_exthdrs -
+> which is used in ipv6_gro_receive to pull ipv6 ext headers instead of
+> ipv6_gso_pull_exthdrs. Thus, there is no modification of skb->data, all
+> operations use skb_gro_* helpers, and the frag0 fast path can be taken fo=
+r
+> IPv6 packets with ext headers.
 >
-> [PATCH 2/5] bpf: Move an assignment for the variable =E2=80=9Cst_map=E2=
-=80=9D in bpf_struct_ops_link_create()
-> https://lore.kernel.org/bpf/ed2f5323-390f-4c9d-919d-df43ba1cad2b@web.de/
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> ---
+>  include/net/ipv6.h     |  1 +
+>  net/ipv6/ip6_offload.c | 51 +++++++++++++++++++++++++++++++++---------
+>  2 files changed, 42 insertions(+), 10 deletions(-)
+>
+> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+> index 78d38dd88aba..217240efa182 100644
+> --- a/include/net/ipv6.h
+> +++ b/include/net/ipv6.h
+> @@ -26,6 +26,7 @@ struct ip_tunnel_info;
+>  #define SIN6_LEN_RFC2133       24
+>
+>  #define IPV6_MAXPLEN           65535
+> +#define IPV6_MIN_EXTHDR_LEN    8
 
-This change is not helpful at all. The use of "st_map" in current code as-i=
-s
-doesn't cause any confusion, i.e., it is always struct bpf_struct_ops_map *=
-.
-OTOH, this patch will make it harder for folks who use git-blame. Therefore=
-,
-it adds negative value to the code base.
+// Hmm see my following comment.
 
-Thanks,
-Song
+>
+>  /*
+>   *     NextHeader field of IPv6 header
+> diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+> index 0e0b5fed0995..c07111d8f56a 100644
+> --- a/net/ipv6/ip6_offload.c
+> +++ b/net/ipv6/ip6_offload.c
+> @@ -37,6 +37,40 @@
+>                 INDIRECT_CALL_L4(cb, f2, f1, head, skb);        \
+>  })
+>
+> +static int ipv6_gro_pull_exthdrs(struct sk_buff *skb, int off, int proto=
+)
+> +{
+> +       const struct net_offload *ops =3D NULL;
+> +       struct ipv6_opt_hdr *opth;
+> +
+> +       for (;;) {
+> +               int len;
+> +
+> +               ops =3D rcu_dereference(inet6_offloads[proto]);
+> +
+> +               if (unlikely(!ops))
+> +                       break;
+> +
+> +               if (!(ops->flags & INET6_PROTO_GSO_EXTHDR))
+> +                       break;
+> +
+> +               opth =3D skb_gro_header(skb, off + IPV6_MIN_EXTHDR_LEN, o=
+ff);
+
+I do not see a compelling reason for adding yet another constant here.
+
+I would stick to
+
+   opth =3D skb_gro_header(skb, off + sizeof(*opth), off);
+
+Consistency with similar helpers is desirable.
+
+> +               if (unlikely(!opth))
+> +                       break;
+> +
+> +               len =3D ipv6_optlen(opth);
+> +
+> +               opth =3D skb_gro_header(skb, off + len, off);
+
+Note this call will take care of precise pull.
+
+> +               if (unlikely(!opth))
+> +                       break;
+> +               proto =3D opth->nexthdr;
+> +
+> +               off +=3D len;
+> +       }
+> +
+> +       skb_gro_pull(skb, off - skb_network_offset(skb));
+> +       return proto;
+> +}
+> +
+>  static int ipv6_gso_pull_exthdrs(struct sk_buff *skb, int proto)
+>  {
+>         const struct net_offload *ops =3D NULL;
+> @@ -203,28 +237,25 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_re=
+ceive(struct list_head *head,
+>                 goto out;
+>
+>         skb_set_network_header(skb, off);
+> -       skb_gro_pull(skb, sizeof(*iph));
+> -       skb_set_transport_header(skb, skb_gro_offset(skb));
+>
+> -       flush +=3D ntohs(iph->payload_len) !=3D skb_gro_len(skb);
+> +       flush +=3D ntohs(iph->payload_len) !=3D skb->len - hlen;
+>
+>         proto =3D iph->nexthdr;
+>         ops =3D rcu_dereference(inet6_offloads[proto]);
+>         if (!ops || !ops->callbacks.gro_receive) {
+> -               pskb_pull(skb, skb_gro_offset(skb));
+> -               skb_gro_frag0_invalidate(skb);
+> -               proto =3D ipv6_gso_pull_exthdrs(skb, proto);
+> -               skb_gro_pull(skb, -skb_transport_offset(skb));
+> -               skb_reset_transport_header(skb);
+> -               __skb_push(skb, skb_gro_offset(skb));
+> +               proto =3D ipv6_gro_pull_exthdrs(skb, hlen, proto);
+>
+>                 ops =3D rcu_dereference(inet6_offloads[proto]);
+>                 if (!ops || !ops->callbacks.gro_receive)
+>                         goto out;
+>
+> -               iph =3D ipv6_hdr(skb);
+> +               iph =3D skb_gro_network_header(skb);
+> +       } else {
+> +               skb_gro_pull(skb, sizeof(*iph));
+>         }
+>
+> +       skb_set_transport_header(skb, skb_gro_offset(skb));
+> +
+>         NAPI_GRO_CB(skb)->proto =3D proto;
+>
+>         flush--;
+> --
+> 2.36.1
+>
 
