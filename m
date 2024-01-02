@@ -1,131 +1,119 @@
-Return-Path: <netdev+bounces-61037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BFA8224AA
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:22:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8B38224AE
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:24:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 728121C22B6D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:22:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0487B216C3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2622C171A6;
-	Tue,  2 Jan 2024 22:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AA3171BB;
+	Tue,  2 Jan 2024 22:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S+um1whB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F9kHWY50"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC5417984
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 22:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tanzirh.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d45d23910aso25355755ad.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 14:22:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704234141; x=1704838941; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VoYBcyeMcOUsOKM5LbFmoG1rNiNhP0xj5K+Ym6ZJNQw=;
-        b=S+um1whBxsvYBaRtrLrkkjesCTD6femhXZ7TnwNeyZXKB1jfxu0Dqa2J+TcMNsBNix
-         SWkzea6fbYrmKR50AkZ7OlLdxIi4RdAGPT51h6GNjjjrIOLZb6vANqeluB9IGhPvVcBU
-         8Vwv3/5KI8m4Fai2r0SXe3L6xR3Gv4isG6R9WvJKUa6fgybiDyY+iePo6CIvcRy8IvbL
-         Pap+VBdukbO69AGl6ERtgjn+US/80wc4M9AOUoOdyEB2wwIngPayf3+uCIf5USGtorNC
-         AB39NRKV/gYrpGjprcxBmpSuaxEuQ73cX8J01eSNprwDHqdBZWX1JL+TGVFhG1AVmBSj
-         0iqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704234141; x=1704838941;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VoYBcyeMcOUsOKM5LbFmoG1rNiNhP0xj5K+Ym6ZJNQw=;
-        b=plUKjvx3x2gPTfEmz+USvuh3t5E38tONGtjDXIWKb9gyxw3+INUhWtztQgmAX9wIa+
-         fFa1P7hnwFnngQoSXVWPyPiI7VBAJvqOFGnXSmco5oeyfS4N+W4TGIacRfK5FO1NRGgU
-         FXuv3DJ85ZBkMq8jbUVQfB0gE9nUUiAvtrpj7CCv80o0/+mRnIzaVWfeMX7bpOVYELyN
-         UCQPiJES9Hk69lPjGLCF5DutaROsDxEUaWEDIdC8Wwr6WxEeiAAduZZBpwNznTL83fXi
-         yQ3h9C0pvkkC2ZvHMhsm66Iv+c3cG09QZnvyvtrYl6ZBJV9A/XiD8l8TPzUQNNmsPFJe
-         oS1w==
-X-Gm-Message-State: AOJu0Yxvk8TrYWQk+aoxfYVLoWOLVBUG6inKChXD45Lt8FGvJ2aldLLw
-	mQUt2AxonG02jlcFBxCwQvHvNU85wVmVhDy9DU0=
-X-Google-Smtp-Source: AGHT+IGibMrtSNs0B7J5A+QWM85xhUBg0GKDxizl0OkdWX1k1ttpJocQ5P4XooSKRH4vL9aHfM71x73t1FOt
-X-Received: from tanz.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:c4a])
- (user=tanzirh job=sendgmr) by 2002:a17:903:120f:b0:1d3:f056:bd5e with SMTP id
- l15-20020a170903120f00b001d3f056bd5emr622882plh.8.1704234141148; Tue, 02 Jan
- 2024 14:22:21 -0800 (PST)
-Date: Tue, 02 Jan 2024 22:22:18 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0925A171BF
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 22:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704234278; x=1735770278;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jqBMoWCPGXlySX7dDUPNhC2e+bX+y6kBQwjld4zNoc4=;
+  b=F9kHWY50l8HWEEGZw2aUlueHaBc5S2uTswl2jiXPPJ4VIifVam7J5/gh
+   uejPv0iLXGpWalWD0z7n/zQAV/qnwdYl3ps5INWXGWKCoLpJWWZyoOWL0
+   HJZ60dB3VgyJUiVZpR0L7NTMmQVw9yLEg06CJzoxaIbuE0Olj8eHHdZru
+   Jy8Jh4a/sPs33I0dBRLatBvwYG4ATmBHAvNi/yakAIyTfGzyv38LNmm4K
+   gGMvZDcJKkxU8gIEJjj8fF2K96hRDNGaLbxjTryyPein6LWkhy10Sktec
+   FJ+W1F+Of+Hts7S0+qxR7o3t1KZjKUgTfytPFMDqhFPisSjFtuWQ0Jkop
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="3700398"
+X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
+   d="scan'208";a="3700398"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 14:24:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="772965449"
+X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
+   d="scan'208";a="772965449"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orsmga007.jf.intel.com with ESMTP; 02 Jan 2024 14:24:37 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/5][pull request] Intel Wired LAN Driver Updates 2024-01-02 (ixgbe, i40e)
+Date: Tue,  2 Jan 2024 14:24:18 -0800
+Message-ID: <20240102222429.699129-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJqMlGUC/13MQQrCMBCF4auUWRvJTKCIK+8hXcRkkg5oI4kEp
- eTuTbt0+T8e3wqFs3CB67BC5ipF0tKDTgO42S6RlfjeQJoMEo2qcn4UZfRF69GgNwGhf9+Zg3w P5z71nqV8Uv4dbMV9/RcqKlTGkmMXEG3wt5hSfPLZpRdMrbUNIDPSdJsAAAA=
-X-Developer-Key: i=tanzirh@google.com; a=ed25519; pk=UeRjcUcv5W9AeLGEbAe2+0LptQpcY+o1Zg0LHHo7VN4=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1704234139; l=1390;
- i=tanzirh@google.com; s=20231204; h=from:subject:message-id;
- bh=DUB/ZV2zVOe/Hx7a/jPXLV+v75gZ6+Z01V5aE00rj50=; b=qe5pL7e035Zo4B16XWqHVxTumHn9sOyTDK/Y5RdiNEozypVYZV9EWUD5PpPY5hk9hItu8K1yE
- Xte40bFcZT6CVwbEGb5iSw5YFR6ub90ZUa+g5JlAcdt91FJWgTgeqh8
-X-Mailer: b4 0.12.4
-Message-ID: <20240102-verbs-v2-1-710de1867c77@google.com>
-Subject: [PATCH v2] xprtrdma: removed asm-generic headers from verbs.c
-From: Tanzir Hasan <tanzirh@google.com>
-To: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Tom Talpey <tom@talpey.com>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
-	Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Nick Desaulniers <nnn@google.com>, 
-	Al Viro <viro@zeniv.linux.org.uk>, Tanzir Hasan <tanzirh@google.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-asm-generic/barrier.h and asm/bitops.h are already brought into the
-file through the header linux/sunrpc/svc_rdma.h and the file can
-still be built with their removal. They have been replaced with the
-preferred linux/bitops.h and asm/barrier.h to remove the need for the
-asm-generic header.
+This series contains updates to ixgbe and i40e drivers.
 
-Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: Tanzir Hasan <tanzirh@google.com>
----
-Changes in v2:
-- Added asm/barrier.h and linux/bitops.h to not conflict with rule 1 of
-  submit-checklist
-- Link to v1: https://lore.kernel.org/r/20231226-verbs-v1-1-3a2cecf11afd@google.com
----
- net/sunrpc/xprtrdma/verbs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Ovidiu Panait adds reporting of VF link state to ixgbe.
 
-diff --git a/net/sunrpc/xprtrdma/verbs.c b/net/sunrpc/xprtrdma/verbs.c
-index 28c0771c4e8c..b4c1d874fc7e 100644
---- a/net/sunrpc/xprtrdma/verbs.c
-+++ b/net/sunrpc/xprtrdma/verbs.c
-@@ -49,14 +49,14 @@
-  *  o buffer memory
-  */
- 
-+#include <linux/bitops.h>
- #include <linux/interrupt.h>
- #include <linux/slab.h>
- #include <linux/sunrpc/addr.h>
- #include <linux/sunrpc/svc_rdma.h>
- #include <linux/log2.h>
- 
--#include <asm-generic/barrier.h>
--#include <asm/bitops.h>
-+#include <asm/barrier.h>
- 
- #include <rdma/ib_cm.h>
- 
+Jedrzej removes uses of IXGBE_ERR* codes to instead use standard error
+codes.
 
----
-base-commit: fbafc3e621c3f4ded43720fdb1d6ce1728ec664e
-change-id: 20231226-verbs-30800631d3f1
+Andrii modifies behavior of VF disable to properly shut down queues on
+i40e.
 
-Best regards,
+Simon Horman removes, undesired, use of comma operator for i40e.
+
+The following are changes since commit 954fb2d2d49f46e1d9861c45731e26bdeb081695:
+  Merge branch 'remove-retired-tc-uapi'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 10GbE
+
+Andrii Staikov (1):
+  i40e: Fix VF disable behavior to block all traffic
+
+Jedrzej Jagielski (2):
+  ixgbe: Refactor overtemp event handling
+  ixgbe: Refactor returning internal error codes
+
+Ovidiu Panait (1):
+  ixgbe: report link state for VF devices
+
+Simon Horman (1):
+  i40e: Avoid unnecessary use of comma operator
+
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    |   2 +-
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  32 ++++
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |   1 +
+ .../net/ethernet/intel/ixgbe/ixgbe_82598.c    |  36 ++---
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |  61 ++++----
+ .../net/ethernet/intel/ixgbe/ixgbe_common.c   | 145 ++++++++---------
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |   2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  42 +++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c  |  34 ++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h  |   1 -
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  | 105 +++++++------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h  |   2 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |   3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  43 +----
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |  44 +++---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 148 +++++++++---------
+ 16 files changed, 342 insertions(+), 359 deletions(-)
+
 -- 
-Tanzir Hasan <tanzirh@google.com>
+2.41.0
 
 
