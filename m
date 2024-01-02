@@ -1,187 +1,113 @@
-Return-Path: <netdev+bounces-61022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 002F8822456
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:02:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3661582245E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:03:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93B281F21CFB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:02:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 494871C22AA0
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 22:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C4E171D9;
-	Tue,  2 Jan 2024 21:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D216168CC;
+	Tue,  2 Jan 2024 21:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aPIyzKh8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ink1npCd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B215171C4
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 21:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704232188;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NfIqhioGhHP/wJG1PyBueewTz4bWCmx/gOhAGW5jQdE=;
-	b=aPIyzKh8aGB5CD5Qt9EmNHcVDP0jODI5e5Hb2ZGVyDR7lsbYWLbdSNpIIkOGdxG1De0/aq
-	mvh/VU53n9z17OqLCAbJpQI3nh6fMHQ0maqLGDQGsF/BttnQ3oVzBtrBvvJNecm+l3lrhS
-	v5Mryyw+h5zxLAiHnBZce2Ayn8pANyg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-fjvlDl11PWuF-0vej4x9hg-1; Tue, 02 Jan 2024 16:49:43 -0500
-X-MC-Unique: fjvlDl11PWuF-0vej4x9hg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C03CB86D4D5;
-	Tue,  2 Jan 2024 21:49:42 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9617D492BE6;
-	Tue,  2 Jan 2024 21:49:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20231221132400.1601991-41-dhowells@redhat.com>
-References: <20231221132400.1601991-41-dhowells@redhat.com> <20231221132400.1601991-1-dhowells@redhat.com>
-To: Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Latchesar Ionkov <lucho@ionkov.net>
-Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-    Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: [PATCH] 9p: Fix initialisation of netfs_inode for 9p
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3009168D6
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 21:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d3ea8d0f9dso12365ad.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 13:54:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704232469; x=1704837269; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=naHyzOGLH6on2mA2NF2XfZpujt6bFyS08XuJbB6W+nU=;
+        b=ink1npCdsmV0JlUEA2MKvBtYYazz+sQVmh39qcNpANr4XT4Mqn7Yaw+SbiHDbjkx5x
+         UbneNWCtpzVWwzc/kEF8mw5msgcOHGNjsERxWyKfTix4u07GZPIB0NhVUjyYUpnU9M5T
+         fseY+G+pURKXOVzR2osp80JfuaxfOHmkqT5EX3sMf1dIunG1qqMyM4l8FIl10ZZSnAwW
+         nHePYRb3zvylbzflZ9E74oaNJ3y8jhUOVNGsjNg3Fbr0T31vmzIgVS02ngAxk2/DJWyq
+         yjV6MdIpd/6XrLbRYdj/8uvxPaJZ194g6lveCxoygZ05WkXhFhD2XC0ssTHSJ9uF2uFY
+         je8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704232469; x=1704837269;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=naHyzOGLH6on2mA2NF2XfZpujt6bFyS08XuJbB6W+nU=;
+        b=loASkfMe+Ln0eRISyKgjCztO/VDJgzZmXmbRYrJxNZQFeAS6xyshZ5Tnh9RYy4vJBf
+         DntcwA0UMZy68yMjJdl2WGU+nXeDnfc7UB5SAMXTzjNsTWSQv8igzTlisx7Xv8e8qB7S
+         KIk3TWlh9PJc7A4tsoXf9VC4dvZskMLeQ+Z2sUg8/zq7LmfKaxUw1m2zusrcLkPMvhTc
+         tZymwDlo7vhMX/7jtz+fWL7yGmwlMBxg79ZcAUxqR9SwY5kce9SuwfbgwxhrE25ZW2aR
+         2azquzxcNDBIzwbCj2LvZCMqZKVWXdkMqvillMzUXNQVhSm0p4lACf/0ztu1GKZoovUO
+         cygw==
+X-Gm-Message-State: AOJu0YyTddtlX3UN8yCkF6Pt8lsRuBtqP3RoC+HPHxlxckPA8nCO1B6f
+	7y5E6XKo6hULyAKjnlK5UQ3EX23eHktGMu91vg517bo6f626
+X-Google-Smtp-Source: AGHT+IHkQBhw77JEsp5z2FkDtZxVR/uFp5PLGzvREFfOFuN0eSkSHjU/8rnVNW/sqbY5wQ+2jwDOYqUcqXNyIYwEMbE=
+X-Received: by 2002:a17:902:fac5:b0:1d3:ce75:a696 with SMTP id
+ ld5-20020a170902fac500b001d3ce75a696mr863plb.5.1704232468929; Tue, 02 Jan
+ 2024 13:54:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <292836.1704232179.1@warthog.procyon.org.uk>
+References: <20240102212716.810731-1-almasrymina@google.com> <20240102212716.810731-2-almasrymina@google.com>
+In-Reply-To: <20240102212716.810731-2-almasrymina@google.com>
+From: Shakeel Butt <shakeelb@google.com>
+Date: Tue, 2 Jan 2024 13:54:17 -0800
+Message-ID: <CALvZod43P7r1Ak=Og2ssXN1Jg1A25AYKDTP4j+qJj1z4DxucRw@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v4 1/2] net: introduce abstraction for
+ network memory
+To: Mina Almasry <almasrymina@google.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jan 2024 21:49:39 +0000
-Message-ID: <292837.1704232179@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-This needs a fix that I would fold in.  Somehow it gets through xfstests
-without it, but it seems problems can be caused with executables.
+On Tue, Jan 2, 2024 at 1:27=E2=80=AFPM Mina Almasry <almasrymina@google.com=
+> wrote:
+>
+> Add the netmem_ref type, an abstraction for network memory.
+>
+> To add support for new memory types to the net stack, we must first
+> abstract the current memory type. Currently parts of the net stack
+> use struct page directly:
+>
+> - page_pool
+> - drivers
+> - skb_frag_t
+>
+> Originally the plan was to reuse struct page* for the new memory types,
+> and to set the LSB on the page* to indicate it's not really a page.
+> However, for compiler type checking we need to introduce a new type.
+>
+> netmem_ref is introduced to abstract the underlying memory type. Currentl=
+y
+> it's a no-op abstraction that is always a struct page underneath. In
+> parallel there is an undergoing effort to add support for devmem to the
+> net stack:
+>
+> https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@googl=
+e.com/
+>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>
 
-David
----
-9p: Fix initialisation of netfs_inode for 9p
+I think you forgot to update the commit message to replace netmem_ref
+with netmem. Also you can mention that you took the approach similar
+to 'struct encoded_page'. Otherwise LGTM.
 
-The 9p filesystem is calling netfs_inode_init() in v9fs_init_inode() -
-before the struct inode fields have been initialised from the obtained fil=
-e
-stats (ie. after v9fs_stat2inode*() has been called), but netfslib wants t=
-o
-set a couple of its fields from i_size.
-
-Reported-by: Marc Dionne <marc.dionne@auristor.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Tested-by: Marc Dionne <marc.dionne@auristor.com>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: v9fs@lists.linux.dev
-cc: linux-cachefs@redhat.com
-cc: linux-fsdevel@vger.kernel.org
----
- fs/9p/v9fs_vfs.h       |    1 +
- fs/9p/vfs_inode.c      |    6 +++---
- fs/9p/vfs_inode_dotl.c |    1 +
- 3 files changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/fs/9p/v9fs_vfs.h b/fs/9p/v9fs_vfs.h
-index 731e3d14b67d..0e8418066a48 100644
---- a/fs/9p/v9fs_vfs.h
-+++ b/fs/9p/v9fs_vfs.h
-@@ -42,6 +42,7 @@ struct inode *v9fs_alloc_inode(struct super_block *sb);
- void v9fs_free_inode(struct inode *inode);
- struct inode *v9fs_get_inode(struct super_block *sb, umode_t mode,
- 			     dev_t rdev);
-+void v9fs_set_netfs_context(struct inode *inode);
- int v9fs_init_inode(struct v9fs_session_info *v9ses,
- 		    struct inode *inode, umode_t mode, dev_t rdev);
- void v9fs_evict_inode(struct inode *inode);
-diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
-index b66466e97459..32572982f72e 100644
---- a/fs/9p/vfs_inode.c
-+++ b/fs/9p/vfs_inode.c
-@@ -246,7 +246,7 @@ void v9fs_free_inode(struct inode *inode)
- /*
-  * Set parameters for the netfs library
-  */
--static void v9fs_set_netfs_context(struct inode *inode)
-+void v9fs_set_netfs_context(struct inode *inode)
- {
- 	struct v9fs_inode *v9inode =3D V9FS_I(inode);
- 	netfs_inode_init(&v9inode->netfs, &v9fs_req_ops, true);
-@@ -326,8 +326,6 @@ int v9fs_init_inode(struct v9fs_session_info *v9ses,
- 		err =3D -EINVAL;
- 		goto error;
- 	}
--
--	v9fs_set_netfs_context(inode);
- error:
- 	return err;
- =
-
-@@ -359,6 +357,7 @@ struct inode *v9fs_get_inode(struct super_block *sb, u=
-mode_t mode, dev_t rdev)
- 		iput(inode);
- 		return ERR_PTR(err);
- 	}
-+	v9fs_set_netfs_context(inode);
- 	return inode;
- }
- =
-
-@@ -461,6 +460,7 @@ static struct inode *v9fs_qid_iget(struct super_block =
-*sb,
- 		goto error;
- =
-
- 	v9fs_stat2inode(st, inode, sb, 0);
-+	v9fs_set_netfs_context(inode);
- 	v9fs_cache_inode_get_cookie(inode);
- 	unlock_new_inode(inode);
- 	return inode;
-diff --git a/fs/9p/vfs_inode_dotl.c b/fs/9p/vfs_inode_dotl.c
-index e25fbc988f09..3505227e1704 100644
---- a/fs/9p/vfs_inode_dotl.c
-+++ b/fs/9p/vfs_inode_dotl.c
-@@ -128,6 +128,7 @@ static struct inode *v9fs_qid_iget_dotl(struct super_b=
-lock *sb,
- 		goto error;
- =
-
- 	v9fs_stat2inode_dotl(st, inode, 0);
-+	v9fs_set_netfs_context(inode);
- 	v9fs_cache_inode_get_cookie(inode);
- 	retval =3D v9fs_get_acl(inode, fid);
- 	if (retval)
-
+Reviewed-by: Shakeel Butt <shakeelb@google.com>
 
