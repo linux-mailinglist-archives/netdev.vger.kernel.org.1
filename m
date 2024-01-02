@@ -1,123 +1,112 @@
-Return-Path: <netdev+bounces-60880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA947821C40
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:09:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04A0821C6D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 14:16:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C73B1B20D6D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:09:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 927881F22A1B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 13:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00831F9E0;
-	Tue,  2 Jan 2024 13:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD3CF9F0;
+	Tue,  2 Jan 2024 13:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="QknIk8hT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nFbw9+uz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1879CF9CC
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 13:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50e72e3d435so6845912e87.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 05:09:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001D6F9E0;
+	Tue,  2 Jan 2024 13:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3367a304091so9172292f8f.3;
+        Tue, 02 Jan 2024 05:15:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1704200966; x=1704805766; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bmdjPvQYlxgRjMXDO0zIJCQ7Mz6/gzcusoHkQD7VboI=;
-        b=QknIk8hTINGO3EdbLxxThFlWfKHLcn0Ch2ZSo19WEAnjiv5o5Io3bD3/O1S76RDBF/
-         nBJx/WLCK5yI55fYpIC+Ceri/Pu3LeosjcT5rI/eHD6k3stSAtfwHVBnznuoTSDI99e5
-         rMCQecpnyTpQ6FQrAHrOR50Vy0jChk36VG1bndDeBAierXHMPAAQe5Lsc3W4KrqEB8tS
-         SemX3JoJIpwJ5ko+VzrsnVPcNouTbWkDCxAjVNp5DnRoDzBxbRPJDXtdCQTyI3nedoAt
-         jk2cjRUuDU5y0pGqN9JIO61lOUc3Iw+WVAdMHnzEj9IBht2XqqFCGYfBS3YvdwmSMaYX
-         H3MA==
+        d=gmail.com; s=20230601; t=1704201357; x=1704806157; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dqqX1JqpimAC6WihwYqyfae5QhT3NRDdGoohV28wxAI=;
+        b=nFbw9+uzOZxxYuLF5AEsqx83bjvpEB5bTrs65RjTSV8+E5MJ3+ioF5MTOFFRWRyk+J
+         qqHstuteQupFf/RJCbscuwPzp9DglpqGFlDsWmJtPdkz/sR6fjTh0K2GMHgGBUNCNmZm
+         0vf/sPwmp1FBiL3W+g9Uz2aqTTK+HrE0/OyhuF9D5KoHNuy+Ko53fy+g9LfwDiQ1zZYN
+         cT1PXrZIXTKzvoWZ5KKjB6XVZBs6sJ6xJvKQDXW/xEipt06KyjUAJq/QLi5IkgxE0776
+         jZEmYNKymZh2pG3UL1db2Rjb2tiNZk48+HcKzyzP0rw92pRoy0DlCol/1UDn8BIuNZjx
+         1/Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704200966; x=1704805766;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bmdjPvQYlxgRjMXDO0zIJCQ7Mz6/gzcusoHkQD7VboI=;
-        b=owIZElh7NvtloOCehur3V9mO3YiTvRFlYkupvbxK5c10MjQsh0HFPrCySrDnM8MoLL
-         71LsBFZGjrxbc2DXV6Sqw6oj/dm7D4S4/DoN4Fa9v49e0vnEL4AJU/WXtj8VNBN94RGu
-         eQ6q3C8VLryvJPtKUWX9iwlH01iinWEV/fPszsHOm8MdALJDR9uBUZScjaXcb9hDybQF
-         9cu4BrCO8L83n1T/adx5GKMfMbtnYnnyTFKHCvmJSfm93B8/JW8f8ihdurUobnUT5hsF
-         g3A9kiAxvcUzCBCfQRtpCa1DG9XpEEvCOOQ/vJWc1yCo1lR9/kZPeJ+53Ha9kr5t0nJr
-         ntlg==
-X-Gm-Message-State: AOJu0YzV42SJSVX+xDANvVJKm2TEB695W0rMtB6l/qnx3H/4A/9Ri0km
-	3cD8dk++h3FlHsDiBJx4zFg1vOiTtUc7tQ==
-X-Google-Smtp-Source: AGHT+IHq0oQwmywpS2rHoDI9JcvqWATtdhgao9sF2qx5m6UyJkAYWH7Ci8rC8teBF56CpgSQfOWFng==
-X-Received: by 2002:a19:8c49:0:b0:50e:3899:d465 with SMTP id i9-20020a198c49000000b0050e3899d465mr4965230lfj.109.1704200965868;
-        Tue, 02 Jan 2024 05:09:25 -0800 (PST)
-Received: from wkz-x13 (h-158-174-187-194.NA.cust.bahnhof.se. [158.174.187.194])
-        by smtp.gmail.com with ESMTPSA id w21-20020ac24435000000b0050e78fb41acsm2739923lfl.73.2024.01.02.05.09.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 05:09:25 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Marek =?utf-8?Q?Beh=C3=BAn?= <kabel@kernel.org>, davem@davemloft.net,
- kuba@kernel.org,
- andrew@lunn.ch, hkallweit1@gmail.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] net: phy: marvell10g: Support firmware
- loading on 88X3310
-In-Reply-To: <ZZPhiuyvEepIcbKm@shell.armlinux.org.uk>
-References: <20231214201442.660447-1-tobias@waldekranz.com>
- <20231214201442.660447-2-tobias@waldekranz.com>
- <20231219102200.2d07ff2f@dellmb> <87sf3y7b1u.fsf@waldekranz.com>
- <ZZPhiuyvEepIcbKm@shell.armlinux.org.uk>
-Date: Tue, 02 Jan 2024 14:09:24 +0100
-Message-ID: <87mstn7ugr.fsf@waldekranz.com>
+        d=1e100.net; s=20230601; t=1704201357; x=1704806157;
+        h=content-transfer-encoding:to:subject:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dqqX1JqpimAC6WihwYqyfae5QhT3NRDdGoohV28wxAI=;
+        b=UXBj8u64+x2vOsZYK+Xa/JBBCb0fLamYLdpsCMaeM96Jgr35ZPW4qd4VMzVFkvQU1M
+         a/n9ovIpcoJBQ/4Bv6DBCVe2hIPcPGHLWfTnMMEA5lW+a+LY2DrrH8W2Diug0o27zYxW
+         ELBgHQ5ofP3mvmERv9XGKbte1O2vP1JrLDUXJ4Z2dFn7jwvCI0LJ9Dfagyd1bPGnvrv/
+         5uLbD1DDh7ZGq0FHSM9t+1djjM6kYy1t4nTzD5Za0QBwJz/c8yfRqctQmv2gl3rRNNnx
+         KWpkBElNrRH0HMez5V9KjIx85Vg7B8Fh09NBXTyczmujLoRmeCmLLy3It4AXMLi+6mDu
+         kvBg==
+X-Gm-Message-State: AOJu0YzedBeFFYgVrW35tSP6ANdp2hdd68gbbQ5WFU/Jq7LPxqDqnUB6
+	wuBc0IR7Ziea6FdyFIZnWhs=
+X-Google-Smtp-Source: AGHT+IGcS7PgOg4I+exgCKVC94VRbmPUFjcbsafH6LxZaK3p42Hs+yK476OdyEYRPY987/x9j+YIAA==
+X-Received: by 2002:adf:e648:0:b0:337:4a10:ea9 with SMTP id b8-20020adfe648000000b003374a100ea9mr141492wrn.207.1704201356973;
+        Tue, 02 Jan 2024 05:15:56 -0800 (PST)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id dr15-20020a5d5f8f000000b003373ece28efsm5985602wrb.29.2024.01.02.05.15.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jan 2024 05:15:56 -0800 (PST)
+Message-ID: <127b8199-1cd4-42d7-9b2b-875abaad93fe@gmail.com>
+Date: Tue, 2 Jan 2024 14:15:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Richard Gobert <richardbgobert@gmail.com>
+Subject: [PATCH net-next v2 0/3] net: gro: reduce extension header parsing
+ overhead
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On tis, jan 02, 2024 at 10:12, "Russell King (Oracle)" <linux@armlinux.org.=
-uk> wrote:
-> On Tue, Dec 19, 2023 at 11:15:41AM +0100, Tobias Waldekranz wrote:
->> On tis, dec 19, 2023 at 10:22, Marek Beh=C3=BAn <kabel@kernel.org> wrote:
->> > On Thu, 14 Dec 2023 21:14:39 +0100
->> > Tobias Waldekranz <tobias@waldekranz.com> wrote:
->> >
->> >> +MODULE_FIRMWARE("mrvl/x3310fw.hdr");
->> >
->> > And do you have permission to publish this firmware into linux-firmwar=
-e?
->>=20
->> No, I do not.
->>=20
->> > Because when we tried this with Marvell, their lawyer guy said we can't
->> > do that...
->>=20
->> I don't even have good enough access to ask the question, much less get
->> rejected by Marvell :) I just used that path so that it would line up
->> with linux-firmware if Marvell was to publish it in the future.
->>=20
->> Should MODULE_FIRMWARE be avoided for things that are not in
->> linux-firmware?
->
-> Without the firmware being published, what use is having this code in
-> mainline kernels?
+This series attempts to reduce the parsing overhead of IPv6 extension
+headers in GRO and GSO, by removing extension header specific code and
+enabling the frag0 fast path.
+ 
+The following changes were made:
+ - Removed some unnecessary HBH conditionals by adding HBH offload
+   to inet6_offloads
+ - Added a utility function to support frag0 fast path in ipv6_gro_receive
+ - Added selftests for IPv6 packets with extension headers in GRO
 
-Personally, I primarily want this merged so that future contributions to
-the driver are easier to develop, since I'll be able test them on top of
-a clean net-next base.
+Richard
 
-More broadly, I suppose it will help others who are looking to support
-similar boards to run the latest kernel, without the need to juggle
-external patches which are likely to break as the driver evolves.
+v1 -> v2:
+ - Added a minimum IPv6 extension header length constant to make code self
+   documenting.
+ - Added new selftest which checks that packets with different extension
+   header payloads do not coalesce.
+ - Added more info in the second commit message regarding the code changes.
+ - v1:
+   https://lore.kernel.org/netdev/f4eff69d-3917-4c42-8c6b-d09597ac4437@gmail.com/
 
-Having a single, canonical, implementation of firmware loading, instead
-of multiple slightly-broken-in-different-ways ones floating around, also
-seems like a net positive.
+Richard Gobert (3):
+  net: gso: add HBH extension header offload support
+  net: gro: parse ipv6 ext headers without frag0 invalidation
+  selftests/net: fix GRO coalesce test and add ext header coalesce tests
+
+ include/net/ipv6.h                |  1 +
+ net/ipv6/exthdrs_offload.c        | 11 ++++
+ net/ipv6/ip6_offload.c            | 76 +++++++++++++++++--------
+ tools/testing/selftests/net/gro.c | 94 +++++++++++++++++++++++++++++--
+ 4 files changed, 152 insertions(+), 30 deletions(-)
+
+-- 
+2.36.1
+
 
