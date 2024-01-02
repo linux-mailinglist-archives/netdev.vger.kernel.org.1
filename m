@@ -1,187 +1,239 @@
-Return-Path: <netdev+bounces-60998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76BEB8221E1
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:17:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137C08221E3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 631432828C2
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:17:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93C5F1F2249B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5347F15ADE;
-	Tue,  2 Jan 2024 19:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD08415AE2;
+	Tue,  2 Jan 2024 19:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDtzNQg0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AQOhTFiI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D01115E95;
-	Tue,  2 Jan 2024 19:17:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 355BAC433C8;
-	Tue,  2 Jan 2024 19:17:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704223025;
-	bh=Jk/Wjw6hVbQ2lA3lct5hPUB5efjonhc5P9IQLikWlwk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NDtzNQg09PssYylDTe8XVEKIPUHr4S04K6voB3AKVcCLkTtVOFuSZ0dHYCzszil4N
-	 Bl++mc91mGzyfs6BZ/s2CX1Y51ymputeTqcFn2slSVgsi35EO6aUFL0ncl6j4y6zza
-	 IjivUG/3RX4Ehq8p2hT5MSfHIwzb6p6afPiw/Zajy6GmSIGj/rGYhtH5/eZDyl+t17
-	 WqxKGuk+AAaim63PzLn9ap6Sux43/CTGSS9I4yHS19gHmwoUiZMUsxGZtQBfvWLb91
-	 7OzCKKgkG5LxBvwMaYXqcyoE2GyjTrFxUg+yYOQHNHPfTCYmYKXP6bRPcjJ9MXBt6g
-	 TEPONhMU7oMyA==
-Date: Tue, 2 Jan 2024 21:17:01 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Chengchang Tang <tangchengchang@huawei.com>,
-	Junxian Huang <huangjunxian6@hisilicon.com>, jgg@ziepe.ca,
-	dsahern@gmail.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linuxarm@huawei.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iproute2-rc 1/2] rdma: Fix core dump when pretty is used
-Message-ID: <20240102191701.GC5160@unreal>
-References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
- <20231229065241.554726-2-huangjunxian6@hisilicon.com>
- <20231229092129.25a526c4@hermes.local>
- <30d8c237-953a-8794-9baa-e21b31d4d88c@huawei.com>
- <20240102083257.GB6361@unreal>
- <29146463-6d0e-21c5-af42-217cee760b3f@huawei.com>
- <20240102122106.GI6361@unreal>
- <20240102082746.651ff7cf@hermes.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D621640A
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 19:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9b251840-7cb8-4d17-bd23-1fc8071d8eef@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1704223044;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1SdutedFnreoGNDUPC4ZAuS3Gh3PaQ0uWPeGlh9hAjI=;
+	b=AQOhTFiI1LONDGbou1+C/srgvzVB7WnmluMtUAG8yZZp5OIm4VU8W4c+wVGv5W4WT/UiKf
+	qqHRFZm9EL+7PfeOTsDZ147TgHsccQ6AE9ZTaC5xTnDHAAm9JpqgdfasMsuFN+aje169SA
+	a6GxCuXBxC0qHkXLRbOj9bBveyNON6g=
+Date: Tue, 2 Jan 2024 11:17:19 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240102082746.651ff7cf@hermes.local>
+Subject: Re: [PATCH v7 bpf-next 6/6] selftest: bpf: Test
+ bpf_sk_assign_tcp_reqsk().
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20231221012806.37137-1-kuniyu@amazon.com>
+ <20231221012806.37137-7-kuniyu@amazon.com>
+ <bd21939e-c6c8-4fb2-a4b6-e085a2230c8e@linux.dev>
+Content-Language: en-GB
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <bd21939e-c6c8-4fb2-a4b6-e085a2230c8e@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 02, 2024 at 08:27:46AM -0800, Stephen Hemminger wrote:
-> On Tue, 2 Jan 2024 14:21:06 +0200
-> Leon Romanovsky <leon@kernel.org> wrote:
-> 
-> > On Tue, Jan 02, 2024 at 08:06:19PM +0800, Chengchang Tang wrote:
-> > > 
-> > > 
-> > > On 2024/1/2 16:32, Leon Romanovsky wrote:  
-> > > > On Tue, Jan 02, 2024 at 03:44:29PM +0800, Chengchang Tang wrote:  
-> > > > > 
-> > > > > On 2023/12/30 1:21, Stephen Hemminger wrote:  
-> > > > > > On Fri, 29 Dec 2023 14:52:40 +0800
-> > > > > > Junxian Huang <huangjunxian6@hisilicon.com> wrote:
-> > > > > >   
-> > > > > > > From: Chengchang Tang <tangchengchang@huawei.com>
-> > > > > > > 
-> > > > > > > There will be a core dump when pretty is used as the JSON object
-> > > > > > > hasn't been opened and closed properly.
-> > > > > > > 
-> > > > > > > Before:
-> > > > > > > $ rdma res show qp -jp -dd
-> > > > > > > [ {
-> > > > > > >       "ifindex": 1,
-> > > > > > >       "ifname": "hns_1",
-> > > > > > >       "port": 1,
-> > > > > > >       "lqpn": 1,
-> > > > > > >       "type": "GSI",
-> > > > > > >       "state": "RTS",
-> > > > > > >       "sq-psn": 0,
-> > > > > > >       "comm": "ib_core"
-> > > > > > > },
-> > > > > > > "drv_sq_wqe_cnt": 128,
-> > > > > > > "drv_sq_max_gs": 2,
-> > > > > > > "drv_rq_wqe_cnt": 512,
-> > > > > > > "drv_rq_max_gs": 1,
-> > > > > > > rdma: json_writer.c:130: jsonw_end: Assertion `self->depth > 0' failed.
-> > > > > > > Aborted (core dumped)
-> > > > > > > 
-> > > > > > > After:
-> > > > > > > $ rdma res show qp -jp -dd
-> > > > > > > [ {
-> > > > > > >           "ifindex": 2,
-> > > > > > >           "ifname": "hns_2",
-> > > > > > >           "port": 1,
-> > > > > > >           "lqpn": 1,
-> > > > > > >           "type": "GSI",
-> > > > > > >           "state": "RTS",
-> > > > > > >           "sq-psn": 0,
-> > > > > > >           "comm": "ib_core",{
-> > > > > > >               "drv_sq_wqe_cnt": 128,
-> > > > > > >               "drv_sq_max_gs": 2,
-> > > > > > >               "drv_rq_wqe_cnt": 512,
-> > > > > > >               "drv_rq_max_gs": 1,
-> > > > > > >               "drv_ext_sge_sge_cnt": 256
-> > > > > > >           }
-> > > > > > >       } ]
-> > > > > > > 
-> > > > > > > Fixes: 331152752a97 ("rdma: print driver resource attributes")
-> > > > > > > Signed-off-by: Chengchang Tang <tangchengchang@huawei.com>
-> > > > > > > Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>  
-> > > > > > This code in rdma seems to be miking json and newline functionality
-> > > > > > which creates bug traps.
-> > > > > > 
-> > > > > > Also the json should have same effective output in pretty and non-pretty mode.
-> > > > > > It looks like since pretty mode add extra object layer, the nesting of {} would be
-> > > > > > different.
-> > > > > > 
-> > > > > > The conversion to json_print() was done but it isn't using same conventions
-> > > > > > as ip or tc.
-> > > > > > 
-> > > > > > The correct fix needs to go deeper and hit other things.
-> > > > > >   
-> > > > > Hi, Stephen,
-> > > > > 
-> > > > > The root cause of this issue is that close_json_object() is being called in
-> > > > > newline_indent(), resulting in a mismatch
-> > > > > of {}.
-> > > > > 
-> > > > > When fixing this problem, I was unsure why a newline() is needed in pretty
-> > > > > mode, so I simply kept this logic and
-> > > > > solved the issue of open_json_object() and close_json_object() not matching.
-> > > > > However, If the output of pretty mode
-> > > > > and not-pretty mode should be the same, then this problem can be resolved by
-> > > > > deleting this newline_indent().  
-> > > > Stephen didn't say that output of pretty and not-pretty should be the
-> > > > same, but he said that JSON logic should be the same.
-> > > > 
-> > > > Thanks  
-> > > 
-> > > Hi, Leon,
-> > > 
-> > > Thank you for your reply. But I'm not sure what you mean by JSON logic? I
-> > > understand that
-> > > pretty and not-pretty JSON should have the same content, but just difference
-> > > display effects.
-> > > Do you mean that they only need to have the same structure?
-> > > 
-> > > Or, let's get back to this question. In the JSON format output, the
-> > > newline() here seems
-> > > unnecessary, because json_print() can solve the line break problems during
-> > > printing.
-> > > So I think the newline() here can be removed at least when outputting in
-> > > JSON format.  
-> > 
-> > I think that your original patch is correct way to fix the mismatch as
-> > it is not related to pretty/non-pretty.
-> > 
-> > Thanks
-> 
-> Part of the problem is the meaning of pretty mode is different in rdma
-> than all of the other commands. The meaning of the flags should be the
-> same across ip, devlink, tc, and rdma; therefore pretty should mean
-> nothing unless json is enabled.
 
-I was very inspired by devlink when wrote rdmatool. It is supposed to
-behave the same. :)
+On 12/20/23 10:35 PM, Martin KaFai Lau wrote:
+> On 12/20/23 5:28 PM, Kuniyuki Iwashima wrote:
+>> +static int tcp_validate_header(struct tcp_syncookie *ctx)
+>> +{
+>> +    s64 csum;
+>> +
+>> +    if (tcp_reload_headers(ctx))
+>> +        goto err;
+>> +
+>> +    csum = bpf_csum_diff(0, 0, (void *)ctx->tcp, ctx->tcp->doff * 4, 
+>> 0);
+>> +    if (csum < 0)
+>> +        goto err;
+>> +
+>> +    if (ctx->ipv4) {
+>> +        /* check tcp_v4_csum(csum) is 0 if not on lo. */
+>> +
+>> +        csum = bpf_csum_diff(0, 0, (void *)ctx->ipv4, ctx->ipv4->ihl 
+>> * 4, 0);
+>> +        if (csum < 0)
+>> +            goto err;
+>> +
+>> +        if (csum_fold(csum) != 0)
+>> +            goto err;
+>> +    } else if (ctx->ipv6) {
+>> +        /* check tcp_v6_csum(csum) is 0 if not on lo. */
+>> +    }
+>> +
+>> +    return 0;
+>> +err:
+>> +    return -1;
+>> +}
+>> +
+>> +static int tcp_parse_option(__u32 index, struct tcp_syncookie *ctx)
+>> +{
+>> +    char opcode, opsize;
+>> +
+>> +    if (ctx->ptr + 1 > ctx->data_end)
+>> +        goto stop;
+>> +
+>> +    opcode = *ctx->ptr++;
+>> +
+>> +    if (opcode == TCPOPT_EOL)
+>> +        goto stop;
+>> +
+>> +    if (opcode == TCPOPT_NOP)
+>> +        goto next;
+>> +
+>> +    if (ctx->ptr + 1 > ctx->data_end)
+>> +        goto stop;
+>> +
+>> +    opsize = *ctx->ptr++;
+>> +
+>> +    if (opsize < 2)
+>> +        goto stop;
+>> +
+>> +    switch (opcode) {
+>> +    case TCPOPT_MSS:
+>> +        if (opsize == TCPOLEN_MSS && ctx->tcp->syn &&
+>> +            ctx->ptr + (TCPOLEN_MSS - 2) < ctx->data_end)
+>> +            ctx->attrs.mss = get_unaligned_be16(ctx->ptr);
+>> +        break;
+>> +    case TCPOPT_WINDOW:
+>> +        if (opsize == TCPOLEN_WINDOW && ctx->tcp->syn &&
+>> +            ctx->ptr + (TCPOLEN_WINDOW - 2) < ctx->data_end) {
+>> +            ctx->attrs.wscale_ok = 1;
+>> +            ctx->attrs.snd_wscale = *ctx->ptr;
+>> +        }
+>> +        break;
+>> +    case TCPOPT_TIMESTAMP:
+>> +        if (opsize == TCPOLEN_TIMESTAMP &&
+>> +            ctx->ptr + (TCPOLEN_TIMESTAMP - 2) < ctx->data_end) {
+>> +            ctx->attrs.rcv_tsval = get_unaligned_be32(ctx->ptr);
+>> +            ctx->attrs.rcv_tsecr = get_unaligned_be32(ctx->ptr + 4);
+>> +
+>> +            if (ctx->tcp->syn && ctx->attrs.rcv_tsecr)
+>> +                ctx->attrs.tstamp_ok = 0;
+>> +            else
+>> +                ctx->attrs.tstamp_ok = 1;
+>> +        }
+>> +        break;
+>> +    case TCPOPT_SACK_PERM:
+>> +        if (opsize == TCPOLEN_SACK_PERM && ctx->tcp->syn &&
+>> +            ctx->ptr + (TCPOLEN_SACK_PERM - 2) < ctx->data_end)
+>> +            ctx->attrs.sack_ok = 1;
+>> +        break;
+>> +    }
+>> +
+>> +    ctx->ptr += opsize - 2;
+>> +next:
+>> +    return 0;
+>> +stop:
+>> +    return 1;
+>> +}
+>> +
+>> +static void tcp_parse_options(struct tcp_syncookie *ctx)
+>> +{
+>> +    ctx->ptr = (char *)(ctx->tcp + 1);
+>> +
+>> +    bpf_loop(40, tcp_parse_option, ctx, 0);
+>> +}
+>> +
+>> +static int tcp_validate_sysctl(struct tcp_syncookie *ctx)
+>> +{
+>> +    if ((ctx->ipv4 && ctx->attrs.mss != MSS_LOCAL_IPV4) ||
+>> +        (ctx->ipv6 && ctx->attrs.mss != MSS_LOCAL_IPV6))
+>> +        goto err;
+>> +
+>> +    if (!ctx->attrs.wscale_ok || ctx->attrs.snd_wscale != 7)
+>> +        goto err;
+>> +
+>> +    if (!ctx->attrs.tstamp_ok)
+>
+> The bpf-ci reported error in cpuv4. The email from 
+> bot+bpf-ci@kernel.org has the link.
+>
+> I tried the following:
+>
+>     if (!ctx->attrs.tstamp_ok) {
+>         bpf_printk("ctx->attrs.tstamp_ok %u",
+>             ctx->attrs.tstamp_ok);
+>         goto err;
+>     }
+>
+>
+> The above prints tstamp_ok as 1 while there is a "if 
+> (!ctx->attrs.tstamp_ok)" test before it.
+>
+> Yonghong and I debugged it quite a bit. verifier concluded the 
+> ctx->attrs.tstamp_ok is 0. We knew some red herring like cpuv4 has 
+> fewer register spilling but not able to root cause it yet.
+>
+> In the mean time, there are existing selftests parsing the tcp header. 
+> For example, the test_parse_tcp_hdr_opt[_dynptr].c. Not as complete as 
+> your tcp_parse_option() but should be pretty close. It does not use 
+> bpf_loop. It uses a bounded loop + a subprog (the parse_hdr_opt in the 
+> selftests) instead. You can consider a similar construct to see if it 
+> works around the cpuv4 CI issue for the time being.
 
-> 
-> I can do some of the rework here, but don't have any rdma hardware
-> to test on.
+I did some investigation and found some issues in verifier. I need to dig more into details.
+On the other hand, with the following patch
+   https://lore.kernel.org/bpf/20240102190726.2017424-1-yonghong.song@linux.dev/
+the selftest can run successfully with cpuv2/v3/v4.
 
-We will test it for you.
-
-Thanks
+>
+> pw-bot: cr
+>
+>> +        goto err;
+>> +
+>> +    if (!ctx->attrs.sack_ok)
+>> +        goto err;
+>> +
+>> +    if (!ctx->tcp->ece || !ctx->tcp->cwr)
+>> +        goto err;
+>> +
+>> +    return 0;
+>> +err:
+>> +    return -1;
+>> +}
+>> +
+>
+> [ ... ]
+>
+>> +static int tcp_handle_syn(struct tcp_syncookie *ctx)
+>> +{
+>> +    s64 csum;
+>> +
+>> +    if (tcp_validate_header(ctx))
+>> +        goto err;
+>> +
+>> +    tcp_parse_options(ctx);
+>> +
+>> +    if (tcp_validate_sysctl(ctx))
+>> +        goto err;
+>> +
+>
 
