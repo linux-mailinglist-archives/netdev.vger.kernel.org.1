@@ -1,298 +1,203 @@
-Return-Path: <netdev+bounces-60956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6BD2821FED
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:06:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7B282202A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:12:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F1EC283C1E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:06:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05329B22CDC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 17:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5297B14F98;
-	Tue,  2 Jan 2024 17:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0119154B1;
+	Tue,  2 Jan 2024 17:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="1b+xOHcS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="II1lMn6f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590711548D
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 17:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-35ffb15244dso60379625ab.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 09:06:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704215171; x=1704819971; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cOMGYWhKyJxWgBs07axr/N8DJNLimdynHRjwSFQxzN0=;
-        b=1b+xOHcSg504eVOrjruk50Vgu1h4fyuD016YW5vtrBtU8yhvSeONlttQYZMqv3UsP2
-         pyWM/nOOXng1jlxXGjYW1NBSC/otN5QECBtwBFiGHeSP7tKqmibMIDRiEPShEbIrC35j
-         fqDuN8w7rBUG8ZuvnJVoKeCF7exGnz76PGnue9j39lfW2Hiy896pBrTEjIr8vkWt6Erp
-         BdTOzeIP5QBuExsT36iIrxVu4W06Ih+6cw0LPeyV0d/814Y8cGbPeNfy+l0JphX2IVwT
-         zv1y8xABgKd09kgthaudYU1KrpOiwJL9/IbpJoWzel5WR79yTyh1K/my1vbf9b05qzeJ
-         3Kxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704215171; x=1704819971;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cOMGYWhKyJxWgBs07axr/N8DJNLimdynHRjwSFQxzN0=;
-        b=cVThpjHM5E3WKlm/1O1JeNYM8ZcVoNjRLub7xtDvlLN5hjqquD4qA/cHnZgUI4K4Ub
-         BONJDE8xlvZWbIXUSNHSkSKvmL7PpxTdAQRhgGotV2bn7OCEc728oa92Kb8BOAU5QN0S
-         8zSvX7lYB3vwdUUG739/T3V3Vg6jFjRuC3ZtNQtFN59o7BtFQIgHDoaZhfswbouYOC5C
-         m0hQGRCB2o/8aTzAf//t3OjOgac8+p3sOx2R+mST1H6wCC5E+C/j8d6rKvAb43Rzhci8
-         TFMlJFb2L5kckkQZI0mgo7jdqKgix5r6/80Byb7asq3vP6/EObnM+B1+CKc7SpaVPzLK
-         /jrA==
-X-Gm-Message-State: AOJu0YxUxCypz0q9OwFkYEl+V9A2Oiu0X2RvtuNXBiG2qAb+5bGgmWbU
-	6cbyev+l9rrHsVhxb9m4RML15oDBYPbE7mCbBUn5xTXSaBqE
-X-Google-Smtp-Source: AGHT+IEpOQf30/n7e0+nGMKIRyliNycm1ntPEIY3D6hnOXNwfoXzpAZv1ZF0Wzl4atC6QdcHJe5vZEs3pQSugUu+E24=
-X-Received: by 2002:a05:6e02:1baf:b0:35f:f11a:4655 with SMTP id
- n15-20020a056e021baf00b0035ff11a4655mr28061482ili.71.1704215171502; Tue, 02
- Jan 2024 09:06:11 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F3D156D6
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 17:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704215485;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q4UcCxfloG77cC/pfD32WuEtxWkG2YAQtUa4GDcGdRQ=;
+	b=II1lMn6fgblkUH422/o6fTi7F8vN4v27ZOeW3NY5wsYlRt/k6YUjnDmQxO0eXyFSALMbzs
+	Ss9OEdlZVxti0OtJeCmgNA/A7pT0qNkporl+B/JA6f0C0MOHBoo4RnRWXJvFePdZ2aW+FT
+	b+jHDTSUI37bdU6IdVUqkOpBmtRd+lA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-536-DPwMbcfePQyaxNssfUs5vA-1; Tue, 02 Jan 2024 12:11:21 -0500
+X-MC-Unique: DPwMbcfePQyaxNssfUs5vA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9AA2085CBA2;
+	Tue,  2 Jan 2024 17:11:20 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B6A1940C6EBA;
+	Tue,  2 Jan 2024 17:11:17 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <750e8251-ba30-4f53-a17b-73c79e3739ce@linux.alibaba.com>
+References: <750e8251-ba30-4f53-a17b-73c79e3739ce@linux.alibaba.com> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-34-dhowells@redhat.com>
+To: Gao Xiang <hsiangkao@linux.alibaba.com>
+Cc: dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>,
+    Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH v5 33/40] netfs, cachefiles: Pass upper bound length to allow expansion
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231231172320.245375-1-victor@mojatatu.com> <ZZPekLXICu2AUxlX@nanopsycho>
- <CAM0EoMkKmF3mhnHLt6gE2bmpuRGV7=OpzrMrOwtk3TJcDFW2JA@mail.gmail.com>
- <ZZQd470J2Q4UEMHv@nanopsycho> <CAM0EoMkUQzxtiaB9r=Tz5Wc3KfEDCfyy5ENSeb8M+iK9fs_HVQ@mail.gmail.com>
- <ZZQxmg3QOxzXcrW0@nanopsycho>
-In-Reply-To: <ZZQxmg3QOxzXcrW0@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 2 Jan 2024 12:06:00 -0500
-Message-ID: <CAM0EoMkAx0bWO7NirsoaKHEHso_GjYL1Kedxsbgfr4cstbwmxw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/1] net/sched: We should only add appropriate
- qdiscs blocks to ports' xarray
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
-	idosch@idosch.org, mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com, 
-	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
-	syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com, 
-	syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com, 
-	syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <198743.1704215477.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 02 Jan 2024 17:11:17 +0000
+Message-ID: <198744.1704215477@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On Tue, Jan 2, 2024 at 10:54=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Tue, Jan 02, 2024 at 03:52:01PM CET, jhs@mojatatu.com wrote:
-> >On Tue, Jan 2, 2024 at 9:29=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wro=
-te:
-> >>
-> >> Tue, Jan 02, 2024 at 03:06:28PM CET, jhs@mojatatu.com wrote:
-> >> >On Tue, Jan 2, 2024 at 4:59=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> =
-wrote:
-> >> >>
-> >> >> The patch subject should briefly describe the nature of the change.=
- Not
-> >> >> what "we" should or should not do.
-> >> >>
-> >> >>
-> >> >> Sun, Dec 31, 2023 at 06:23:20PM CET, victor@mojatatu.com wrote:
-> >> >> >We should only add qdiscs to the blocks ports' xarray in ingress t=
-hat
-> >> >> >support ingress_block_set/get or in egress that support
-> >> >> >egress_block_set/get.
-> >> >>
-> >> >> Tell the codebase what to do, be imperative. Please read again:
-> >> >> https://www.kernel.org/doc/html/v6.6/process/submitting-patches.htm=
-l#describe-your-changes
-> >> >>
-> >> >
-> >> >We need another rule in the doc on nit-picking which states that we
-> >> >need to make progress at some point. We made many changes to this
-> >> >patchset based on your suggestions for no other reason other that we
-> >> >can progress the discussion. This is a patch that fixes a bug of whic=
-h
-> >> >there are multiple syzbot reports and consumers of the API(last one
-> >> >just reported from the MTCP people). There's some sense of urgency to
-> >> >apply this patch before the original goes into net. More importantly:
-> >> >This patch fixes the issue and follows the same common check which wa=
-s
-> >> >already being done in the committed patchset to check if the qdisc
-> >> >supports the block set/get operations.
-> >> >
-> >> >There are about 3 ways to do this check, you objected to the original=
-,
-> >> >we picked something that works fine,  and now you are picking a
-> >> >different way with tcf_block. I dont see how tcf_block check would
-> >> >help or solve this problem at all given this is a qdisc issue not a
-> >> >class issue. What am I missing?
-> >>
-> >> Perhaps I got something wrong, but I thought that the issue is
-> >> cl_ops->tcf_block being null for some qdiscs, isn't it?
-> >>
-> >
-> >We attach these ports/netdevs only on capable qdiscs i.e ones that
-> >have  in/egress_block_set/get() - which happen to be ingress and
-> >clsact only.
-> >The problem was we were blindly assuming that presence of
-> >cl->tcf_block() implies presence of in/egress_block_set/get(). The
-> >earlier patches surrounded this code with attribute checks and so it
-> >worked there.
->
-> Syskaller report says:
->
-> KASAN: null-ptr-deref in range [0x0000000000000048-0x000000000000004f]
-> CPU: 1 PID: 5061 Comm: syz-executor323 Not tainted 6.7.0-rc6-syzkaller-01=
-658-gc2b2ee36250d #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 11/17/2023
-> RIP: 0010:qdisc_block_add_dev net/sched/sch_api.c:1190 [inline]
->
-> Line 1190 is:
-> block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->
-> So the cl_ops->tcf_block =3D=3D NULL
->
-> Why can't you just check it? Why do you want to check in/egress_block_set=
-/get()
-> instead? I don't follow :/
->
+Gao Xiang <hsiangkao@linux.alibaba.com> wrote:
 
-Does it make sense to add to the port xarray just because we have
-cl_ops->tcf_block()? There are many qdiscs which have
-cl_ops->tcf_block() (example htb) but cant be used in the block add
-syntax (see question further below on tdc test).
---
-$sudo tc qdisc add dev lo egress_block 21 handle 1: root htb
-Error: Egress block sharing is not supported.
+> >   	down =3D start - round_down(start, PAGE_SIZE);
+> >   	*_start =3D start - down;
+> >   	*_len =3D round_up(down + len, PAGE_SIZE);
+> > +	if (down < start || *_len > upper_len)
+> > +		return -ENOBUFS;
+> =
+
+> Sorry for bothering. We just found some strange when testing
+> today-next EROFS over fscache.
+> =
+
+> I'm not sure the meaning of
+>     if (down < start
+> =
+
+> For example, if start is page-aligned, down =3D=3D 0.
+> =
+
+> so as long as start > 0 and page-aligned, it will return
+> -ENOBUFS.  Does it an intended behavior?
+
+Yeah, I think that's wrong.
+
+Does the attached help?
+
+David
 ---
 
-Did you look at the other syzbot reports?
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index bffffedce4a9..7529b40bc95a 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -522,16 +522,22 @@ int __cachefiles_prepare_write(struct cachefiles_obj=
+ect *object,
+ 			       bool no_space_allocated_yet)
+ {
+ 	struct cachefiles_cache *cache =3D object->volume->cache;
+-	loff_t start =3D *_start, pos;
+-	size_t len =3D *_len, down;
++	unsigned long long start =3D *_start, pos;
++	size_t len =3D *_len;
+ 	int ret;
+ =
 
-> Btw, the checks in __qdisc_destroy() do also look wrong.
+ 	/* Round to DIO size */
+-	down =3D start - round_down(start, PAGE_SIZE);
+-	*_start =3D start - down;
+-	*_len =3D round_up(down + len, PAGE_SIZE);
+-	if (down < start || *_len > upper_len)
++	start =3D round_down(*_start, PAGE_SIZE);
++	if (start !=3D *_start) {
++		kleave(" =3D -ENOBUFS [down]");
++		return -ENOBUFS;
++	}
++	if (*_len > upper_len) {
++		kleave(" =3D -ENOBUFS [up]");
+ 		return -ENOBUFS;
++	}
++
++	*_len =3D round_up(len, PAGE_SIZE);
+ =
 
-Now I am not following, please explain. The same code structure check
-is used in fill_qdisc
-(https://elixir.bootlin.com/linux/v6.7-rc8/source/net/sched/sch_api.c#L940)
-for example to pull the block info, is that wrong?
+ 	/* We need to work out whether there's sufficient disk space to perform
+ 	 * the write - but we can skip that check if we have space already
+@@ -542,7 +548,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ =
 
-> >
-> >BTW: Do you have an example of a test case where we can test the class
-> >grafting (eg using htb with tcf_block)? It doesnt have any impact on
-> >this patcheset here but we want to add it as a regression checker on
-> >tdc in the future if someone makes a change.
+ 	pos =3D cachefiles_inject_read_error();
+ 	if (pos =3D=3D 0)
+-		pos =3D vfs_llseek(file, *_start, SEEK_DATA);
++		pos =3D vfs_llseek(file, start, SEEK_DATA);
+ 	if (pos < 0 && pos >=3D (loff_t)-MAX_ERRNO) {
+ 		if (pos =3D=3D -ENXIO)
+ 			goto check_space; /* Unallocated tail */
+@@ -550,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ 					  cachefiles_trace_seek_error);
+ 		return pos;
+ 	}
+-	if ((u64)pos >=3D (u64)*_start + *_len)
++	if (pos >=3D start + *_len)
+ 		goto check_space; /* Unallocated region */
+ =
 
-An answer to this will help.
+ 	/* We have a block that's at least partially filled - if we're low on
+@@ -563,13 +569,13 @@ int __cachefiles_prepare_write(struct cachefiles_obj=
+ect *object,
+ =
 
-cheers,
-jamal
+ 	pos =3D cachefiles_inject_read_error();
+ 	if (pos =3D=3D 0)
+-		pos =3D vfs_llseek(file, *_start, SEEK_HOLE);
++		pos =3D vfs_llseek(file, start, SEEK_HOLE);
+ 	if (pos < 0 && pos >=3D (loff_t)-MAX_ERRNO) {
+ 		trace_cachefiles_io_error(object, file_inode(file), pos,
+ 					  cachefiles_trace_seek_error);
+ 		return pos;
+ 	}
+-	if ((u64)pos >=3D (u64)*_start + *_len)
++	if (pos >=3D start + *_len)
+ 		return 0; /* Fully allocated */
+ =
 
+ 	/* Partially allocated, but insufficient space: cull. */
+@@ -577,7 +583,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ 	ret =3D cachefiles_inject_remove_error();
+ 	if (ret =3D=3D 0)
+ 		ret =3D vfs_fallocate(file, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+-				    *_start, *_len);
++				    start, *_len);
+ 	if (ret < 0) {
+ 		trace_cachefiles_io_error(object, file_inode(file), ret,
+ 					  cachefiles_trace_fallocate_error);
 
-> >cheers,
-> >jamal
-> >
-> >> >
-> >> >cheers,
-> >> >jamal
-> >> >
-> >> >> >
-> >> >> >Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev trackin=
-g infra")
-> >> >> >Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> >> >> >Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> >> >> >Reported-by: Ido Schimmel <idosch@nvidia.com>
-> >> >> >Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
-> >> >> >Tested-by: Ido Schimmel <idosch@nvidia.com>
-> >> >> >Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.apps=
-potmail.com
-> >> >> >Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@g=
-oogle.com/
-> >> >> >Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.apps=
-potmail.com
-> >> >> >Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@g=
-oogle.com/
-> >> >> >Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.apps=
-potmail.com
-> >> >> >Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@g=
-oogle.com/
-> >> >> >---
-> >> >> >v1 -> v2:
-> >> >> >
-> >> >> >- Remove newline between fixes tag and Signed-off-by tag
-> >> >> >- Add Ido's Reported-by and Tested-by tags
-> >> >> >- Add syzbot's Reported-and-tested-by tags
-> >> >> >
-> >> >> > net/sched/sch_api.c | 34 ++++++++++++++++++++--------------
-> >> >> > 1 file changed, 20 insertions(+), 14 deletions(-)
-> >> >> >
-> >> >> >diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> >> >> >index 299086bb6205..426be81276f1 100644
-> >> >> >--- a/net/sched/sch_api.c
-> >> >> >+++ b/net/sched/sch_api.c
-> >> >> >@@ -1187,23 +1187,29 @@ static int qdisc_block_add_dev(struct Qdis=
-c *sch, struct net_device *dev,
-> >> >> >       struct tcf_block *block;
-> >> >> >       int err;
-> >> >> >
-> >> >>
-> >> >> Why don't you just check cl_ops->tcf_block ?
-> >> >> In fact, there could be a helper to do it for you either call the o=
-p or
-> >> >> return NULL in case it is not defined.
-> >> >>
-> >> >>
-> >> >> >-      block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
-> >> >> >-      if (block) {
-> >> >> >-              err =3D xa_insert(&block->ports, dev->ifindex, dev,=
- GFP_KERNEL);
-> >> >> >-              if (err) {
-> >> >> >-                      NL_SET_ERR_MSG(extack,
-> >> >> >-                                     "ingress block dev insert fa=
-iled");
-> >> >> >-                      return err;
-> >> >> >+      if (sch->ops->ingress_block_get) {
-> >> >> >+              block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, =
-NULL);
-> >> >> >+              if (block) {
-> >> >> >+                      err =3D xa_insert(&block->ports, dev->ifind=
-ex, dev,
-> >> >> >+                                      GFP_KERNEL);
-> >> >> >+                      if (err) {
-> >> >> >+                              NL_SET_ERR_MSG(extack,
-> >> >> >+                                             "ingress block dev i=
-nsert failed");
-> >> >> >+                              return err;
-> >> >> >+                      }
-> >> >> >               }
-> >> >> >       }
-> >> >> >
-> >> >> >-      block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
-> >> >> >-      if (block) {
-> >> >> >-              err =3D xa_insert(&block->ports, dev->ifindex, dev,=
- GFP_KERNEL);
-> >> >> >-              if (err) {
-> >> >> >-                      NL_SET_ERR_MSG(extack,
-> >> >> >-                                     "Egress block dev insert fai=
-led");
-> >> >> >-                      goto err_out;
-> >> >> >+      if (sch->ops->egress_block_get) {
-> >> >> >+              block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, N=
-ULL);
-> >> >> >+              if (block) {
-> >> >> >+                      err =3D xa_insert(&block->ports, dev->ifind=
-ex, dev,
-> >> >> >+                                      GFP_KERNEL);
-> >> >> >+                      if (err) {
-> >> >> >+                              NL_SET_ERR_MSG(extack,
-> >> >> >+                                             "Egress block dev in=
-sert failed");
-> >> >> >+                              goto err_out;
-> >> >> >+                      }
-> >> >> >               }
-> >> >> >       }
-> >> >> >
-> >> >> >--
-> >> >> >2.25.1
-> >> >> >
 
