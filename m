@@ -1,96 +1,91 @@
-Return-Path: <netdev+bounces-60857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C4A821B04
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:33:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70271821B10
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:37:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03BAB1F22805
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:33:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FB7FB20C33
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8F1E56B;
-	Tue,  2 Jan 2024 11:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24CD0E56B;
+	Tue,  2 Jan 2024 11:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Nyt5iZ81"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25332F510;
-	Tue,  2 Jan 2024 11:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VzqYx19_1704195199;
-Received: from 30.221.130.246(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VzqYx19_1704195199)
-          by smtp.aliyun-inc.com;
-          Tue, 02 Jan 2024 19:33:20 +0800
-Message-ID: <b2ee4680-72e9-56a1-e0dd-9cbbe64a7dac@linux.alibaba.com>
-Date: Tue, 2 Jan 2024 19:33:18 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8A1EAC0;
+	Tue,  2 Jan 2024 11:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=0zuMAw5hy4EWFGm1n9NKAOVIvTy+R2ps+YCTy6ULtmI=; b=Nyt5iZ81xR1esYL/XWDhQdufVm
+	St+PtX31GbwLgODgDQyUaTDhGzIHZl+ZnWl+MXC8de9F315zJcjH5is1I/ESXbSIayGWLewny0Qj8
+	EbneUncfP6AyTxeO7raA6d6kBVLcrU6JDrHTW2MVdfRdWBr76nJ+sfZzRTizfHH0xxo5IViSiTLB9
+	MWXYgeGiD0zomDMrNjQalDmMTgjscMBPvI/OqfDHZD1OD92fxbHcteDDZSHGWdAyzgxUnhm1FvQls
+	FSNDgPMLNPyKm+Ln8nSCAv8UpMJsF/zg2tAoZmm8qoh2sTPT2mA85PiOoGkf2o/CqeCAlEFbzUAqz
+	LJfO3z6A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54808)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKd4e-0006Tt-2U;
+	Tue, 02 Jan 2024 11:36:44 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKd4h-0005Ez-6w; Tue, 02 Jan 2024 11:36:47 +0000
+Date: Tue, 2 Jan 2024 11:36:47 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Dimitri Fedrau <dima.fedrau@gmail.com>,
+	Stefan Eichenberger <eichest@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/4] net: phy: marvell-88q2xxx: add driver for the
+ Marvell 88Q2220 PHY
+Message-ID: <ZZP1T7gJPAsEzeas@shell.armlinux.org.uk>
+References: <20231219093554.GA6393@debian>
+ <20231221072853.107678-1-dima.fedrau@gmail.com>
+ <20231221072853.107678-5-dima.fedrau@gmail.com>
+ <ZYRCDTWgHbM2qAom@eichest-laptop>
+ <20231221141636.GA122124@debian>
+ <59fed161-6c08-4537-b02d-19e67e342dd8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [0/2] net/smc: Adjustments for two function implementations
-To: Markus Elfring <Markus.Elfring@web.de>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, "D. Wythe"
- <alibuda@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
- Paolo Abeni <pabeni@redhat.com>, Tony Lu <tonylu@linux.alibaba.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
- <93033352-4b9c-bf52-1920-6ccf07926a21@linux.alibaba.com>
- <46fe66f7-dc3b-4863-96e8-7a855316e8bd@web.de>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <46fe66f7-dc3b-4863-96e8-7a855316e8bd@web.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59fed161-6c08-4537-b02d-19e67e342dd8@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 2024/1/2 16:51, Markus Elfring wrote:
-> …
->>> A few update suggestions were taken into account
->>> from static source code analysis.
-> …
->>>     Return directly after a failed kzalloc() in smc_fill_gid_list()
->>>     Improve exception handling in smc_llc_cli_add_link_invite()
->>>
->>>    net/smc/af_smc.c  |  2 +-
->>>    net/smc/smc_llc.c | 15 +++++++--------
->>>    2 files changed, 8 insertions(+), 9 deletions(-)
-> …
->> I see you want to fix the kfree(NULL) issues in these two patches.
+On Thu, Dec 21, 2023 at 03:25:56PM +0100, Andrew Lunn wrote:
+> > Without setting the master-slave option it didn't work. I think its
+> > mandatory.
 > 
-> I propose to avoid redundant function calls at various source code places.
-> 
-> 
->> But I am wondering if this is necessary, since kfree() can handle NULL correctly.
-> 
-> Would you prefer only required data processing in affected function implementations?
-> 
+> I don't think it is. The PHY should have a default setting for
+> master-slave. Often its based on the typical use case. If its
+> typically inside a switch, then it should default to prefer-master. If
+> its typically in an end system, then it should be prefer-slave.
 
-Thank you Markus. I understood that you want to avoid redundant function calls.
+However, master/slave needs autoneg, and if autoneg is disabled, then
+that may not be resolvable, and it may need manual configuration.
 
-But it is not very attractive to me since the calls occur on low-frequency paths
-or unlikely condition, resulting in limited performance loss and the current
-kfree() usage is fine and common. So what is the benfit?
-
-I noticed that some other discussions are on-going. It seems like you are trying
-to change other similiar places. Let's collect more opinions.
-
-https://lore.kernel.org/netdev/828bb442-29d0-4bb8-b90d-f200bdd4faf6@web.de/
-https://lore.kernel.org/netdev/90679f69-951c-47b3-b86f-75fd9fde3da3@web.de/
-https://lore.kernel.org/netdev/dc0a1c9d-ceca-473d-9ad5-89b59e6af2e7@web.de/
-https://lore.kernel.org/netdev/cde82080-c715-473c-97ac-6ef66bba6d64@web.de/
-
-Thanks.
-
-> Regards,
-> Markus
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
