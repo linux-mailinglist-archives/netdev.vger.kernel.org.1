@@ -1,60 +1,74 @@
-Return-Path: <netdev+bounces-60833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D13C821A81
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:53:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A69AE821A90
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08932282B94
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:53:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 305041F22438
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BBBFD313;
-	Tue,  2 Jan 2024 10:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4294D52C;
+	Tue,  2 Jan 2024 10:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Py2XMqE5"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="n4JJFhXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7A7DDA7;
-	Tue,  2 Jan 2024 10:53:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=P7Jb3mDo49MLacBnG7AhGIaZNuCuPSYfPQElZXHcOe0=; b=Py2XMqE5fjChLA604/A9Yo5eia
-	YtalWfuwqCLpnFPfAzizPcxQ0u644zIM9Amhtnf4f9E3xu/MAtqMKlR5altz5yJXHjvYW1XQ4SWHz
-	T+TeuKNzCNdytlJSP6fUVyMgG4xEilF8CruX68mHGG3zXKRanBXI94KIB0xZL/Gl5AhR8okC0oU/1
-	LHgxJDcQGYD8n/6p9HXtcVt2J/0uLQaEsKYEFwqzMritPeWnY0gXFhu91P3YhrDsfoDhZ7CZv0vgU
-	/Fhu9w8WmyQIu+K/BXX9gM0LoXNJnz1CVTXP4KwZPF/p9+QWTc4bhaNpAbLAweNzXcUDaaQ9WsDu0
-	9LOUnvqw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44170)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKcOs-0006Pl-1d;
-	Tue, 02 Jan 2024 10:53:34 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKcOu-0005Ci-4w; Tue, 02 Jan 2024 10:53:36 +0000
-Date: Tue, 2 Jan 2024 10:53:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2] net: phy: at803x: better align function
- varibles to open parenthesis
-Message-ID: <ZZPrMKZU8IlluZIU@shell.armlinux.org.uk>
-References: <20231219202124.30013-1-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57866E545
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 10:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40d76923ec4so31673295e9.3
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 02:55:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704192926; x=1704797726; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HLMR5wS3IoGGRf8c5X8kccEUSYURU+NmbvlUckN/Og0=;
+        b=n4JJFhXyJthROQHzDZ7zRmQ0xY2VwrjCwLRePL9Fc5tGRmpSb9J00mo3JZdRUrqPhl
+         oko+O8JIWRaYh60FolxIlOTy2OT1JllA0dZPYNeTlj/sce8nVlhNqnPQQQ4K5ETBjGOw
+         qoJ5u9mc5gQWFyukt+OLxrTIoEDWAJ2HnZden0a2SqrkRPkCsC4BrIqhxFePzpY5WsIk
+         k+RkSY0ahs/NC/4gObiOpm+SpBXtcDsD0Vm9alFGvOdEJsOav13EHXLw44wwNQv78So6
+         kGX6ry2FglKcyNo/6E8qDgEEP2ZZbDabvMVcEm9Sr6VXxgX4aOo7KWK2Qr0f3Vq6qf1Q
+         7wgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704192926; x=1704797726;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HLMR5wS3IoGGRf8c5X8kccEUSYURU+NmbvlUckN/Og0=;
+        b=UDJMKriUShOa9Kg0BbwUQdsVPTtpJ9hRsppbyUfeiEr0lyRDgEdc61LsmluuWpyVOA
+         SnKhkZNJHHyUOv1sHZqH1ijaR6vX3W1n5k4MMueCzwS9/+xSknnbo2UGVom9y/vHqeoQ
+         Ml/FKotouf5SPw8wHRch971VhLsa1oy6SyO0wAQCIF2ASdX+oixXTMnV9u+EBySrLwRk
+         ffZli9pU9zEIaf9mfK54C/+XUtO4p9kV2sJO/zZqZB0uPSBYu3EPxmkMsHZVBK/RMxeG
+         DAvQca7PMLMASN7LP253kMLBbH+uJJo/0/T8/64VLoa5IKrMTOoigqz0vUYtkpsBB8Au
+         mJ+Q==
+X-Gm-Message-State: AOJu0YzTt+psfhQjuw8kdHG0cqc0y6h6WLXtnPnKmfutCwXHA/oOSw6t
+	H0uTCRpLLwXiHYTcYSIBWmxHDlOSVk2qKesM0mvB1f/VgzyvIw==
+X-Google-Smtp-Source: AGHT+IE6TMSgbO7zSF5/xAwH/oQkJFXpm6ZbKbiezqtRtsdlBaNfuja7rLWvY1vk5teAPk8pg71e+A==
+X-Received: by 2002:a05:600c:19cc:b0:40d:5f8a:5b13 with SMTP id u12-20020a05600c19cc00b0040d5f8a5b13mr4787536wmq.65.1704192926242;
+        Tue, 02 Jan 2024 02:55:26 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id je22-20020a05600c1f9600b0040d7d6280c2sm14464985wmb.7.2024.01.02.02.55.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 02:55:25 -0800 (PST)
+Date: Tue, 2 Jan 2024 11:55:24 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: David Wei <dw@davidwei.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 1/5] netdevsim: maintain a list of probed
+ netdevsims
+Message-ID: <ZZPrnC8MYKnXqIS_@nanopsycho>
+References: <20231220014747.1508581-1-dw@davidwei.uk>
+ <20231220014747.1508581-2-dw@davidwei.uk>
+ <ZYKsZdjn-ZOp11L4@nanopsycho>
+ <b09032d1-c9f3-4f44-9815-9d1b2a65068d@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,24 +77,139 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231219202124.30013-1-ansuelsmth@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <b09032d1-c9f3-4f44-9815-9d1b2a65068d@davidwei.uk>
 
-On Tue, Dec 19, 2023 at 09:21:24PM +0100, Christian Marangi wrote:
-> Better align function variables to open parenthesis as suggested by
-> checkpatch script for qca808x function to make code cleaner.
-> 
-> For cable_test_get_status function some additional rework was needed to
-> handle too long functions.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
-> Changes v2:
-> - Add an additional fixup for qca808x_is_prefer_master
+Fri, Dec 22, 2023 at 01:45:58AM CET, dw@davidwei.uk wrote:
+>On 2023-12-20 00:57, Jiri Pirko wrote:
+>> Wed, Dec 20, 2023 at 02:47:43AM CET, dw@davidwei.uk wrote:
+>>> This patch adds a linked list nsim_dev_list of probed netdevsims, added
+>>> during nsim_drv_probe() and removed during nsim_drv_remove(). A mutex
+>>> nsim_dev_list_lock protects the list.
+>> 
+>> In the commit message, you should use imperative mood, command
+>> the codebase what to do:
+>> https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
+>
+>Thanks, I didn't know about this. Will edit the commit messages.
+>
+>> 
+>> 
+>>>
+>>> Signed-off-by: David Wei <dw@davidwei.uk>
+>>> ---
+>>> drivers/net/netdevsim/dev.c       | 17 +++++++++++++++++
+>>> drivers/net/netdevsim/netdevsim.h |  1 +
+>>> 2 files changed, 18 insertions(+)
+>>>
+>>> diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+>>> index b4d3b9cde8bd..e30a12130e07 100644
+>>> --- a/drivers/net/netdevsim/dev.c
+>>> +++ b/drivers/net/netdevsim/dev.c
+>>> @@ -35,6 +35,9 @@
+>>>
+>>> #include "netdevsim.h"
+>>>
+>>> +static LIST_HEAD(nsim_dev_list);
+>>> +static DEFINE_MUTEX(nsim_dev_list_lock);
+>>> +
+>>> static unsigned int
+>>> nsim_dev_port_index(enum nsim_dev_port_type type, unsigned int port_index)
+>>> {
+>>> @@ -1531,6 +1534,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>> 				 nsim_bus_dev->initial_net, &nsim_bus_dev->dev);
+>>> 	if (!devlink)
+>>> 		return -ENOMEM;
+>>> +	mutex_lock(&nsim_dev_list_lock);
+>> 
+>> I don't follow. You claim you use this mutex to protect the list.
+>> a) why don't you use spin-lock?
+>
+>I'm using a mutex unless I know (or someone else who knows better point
+>out) that a spinlock is better. It is simple, there are fewer gotchas,
+>and I anticipate actual contention here to be near 0. The
+>nsim_bus_dev_list is also protected by a mutex.
+>
+>Is a spinlock better here and if so why?
 
-Just found v2... see my comments on v1.
+spinlock has lower overhead. If you don't need to sleep with the lock,
+spinlock is probably better for you.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+>
+>> b) why don't don't you take the lock just for list manipulation?
+>
+>Many code paths interact here, touching drivers and netdevs. There is an
+>ordering of locks being taken:
+>
+>1. nsim_bus_dev->dev.mutex
+>2. devlink->lock
+>3. rtnl_lock
+>
+>I was careful to avoid deadlocking by acquiring locks in the same order.
+>But looking at it again, I can reduce the critical section by acquiring
+>nsim_dev_list_lock after devlink->lock, thanks.
+>
+>> 
+>> 
+>>> 	devl_lock(devlink);
+>>> 	nsim_dev = devlink_priv(devlink);
+>>> 	nsim_dev->nsim_bus_dev = nsim_bus_dev;
+>>> @@ -1544,6 +1548,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>> 	spin_lock_init(&nsim_dev->fa_cookie_lock);
+>>>
+>>> 	dev_set_drvdata(&nsim_bus_dev->dev, nsim_dev);
+>>> +	list_add(&nsim_dev->list, &nsim_dev_list);
+>>>
+>>> 	nsim_dev->vfconfigs = kcalloc(nsim_bus_dev->max_vfs,
+>>> 				      sizeof(struct nsim_vf_config),
+>>> @@ -1607,6 +1612,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>>>
+>>> 	nsim_dev->esw_mode = DEVLINK_ESWITCH_MODE_LEGACY;
+>>> 	devl_unlock(devlink);
+>>> +	mutex_unlock(&nsim_dev_list_lock);
+>>> 	return 0;
+>>>
+>>> err_hwstats_exit:
+>>> @@ -1668,8 +1674,18 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
+>>> {
+>>> 	struct nsim_dev *nsim_dev = dev_get_drvdata(&nsim_bus_dev->dev);
+>>> 	struct devlink *devlink = priv_to_devlink(nsim_dev);
+>>> +	struct nsim_dev *pos, *tmp;
+>>>
+>>> +	mutex_lock(&nsim_dev_list_lock);
+>>> 	devl_lock(devlink);
+>>> +
+>>> +	list_for_each_entry_safe(pos, tmp, &nsim_dev_list, list) {
+>>> +		if (pos == nsim_dev) {
+>>> +			list_del(&nsim_dev->list);
+>>> +			break;
+>>> +		}
+>>> +	}
+>>> +
+>>> 	nsim_dev_reload_destroy(nsim_dev);
+>>>
+>>> 	nsim_bpf_dev_exit(nsim_dev);
+>>> @@ -1681,6 +1697,7 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
+>>> 	kfree(nsim_dev->vfconfigs);
+>>> 	kfree(nsim_dev->fa_cookie);
+>>> 	devl_unlock(devlink);
+>>> +	mutex_unlock(&nsim_dev_list_lock);
+>>> 	devlink_free(devlink);
+>>> 	dev_set_drvdata(&nsim_bus_dev->dev, NULL);
+>>> }
+>>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+>>> index 028c825b86db..babb61d7790b 100644
+>>> --- a/drivers/net/netdevsim/netdevsim.h
+>>> +++ b/drivers/net/netdevsim/netdevsim.h
+>>> @@ -277,6 +277,7 @@ struct nsim_vf_config {
+>>>
+>>> struct nsim_dev {
+>>> 	struct nsim_bus_dev *nsim_bus_dev;
+>>> +	struct list_head list;
+>>> 	struct nsim_fib_data *fib_data;
+>>> 	struct nsim_trap_data *trap_data;
+>>> 	struct dentry *ddir;
+>>> -- 
+>>> 2.39.3
+>>>
 
