@@ -1,293 +1,343 @@
-Return-Path: <netdev+bounces-60791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76155821843
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:20:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B249282184C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 09:25:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E53D0281748
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:20:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 196471F20EF3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 08:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E88A4429;
-	Tue,  2 Jan 2024 08:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E00469F;
+	Tue,  2 Jan 2024 08:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=duagon.com header.i=@duagon.com header.b="Ig1Mumdq";
-	dkim=pass (1024-bit key) header.d=duagon.com header.i=@duagon.com header.b="Ig1Mumdq";
-	dkim=pass (1024-bit key) header.d=duagon.com header.i=@duagon.com header.b="Ig1Mumdq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Is64eW6F"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHE01-GV0-obe.outbound.protection.outlook.com (mail-gv0che01on2119.outbound.protection.outlook.com [40.107.23.119])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7EA6AD9;
-	Tue,  2 Jan 2024 08:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=duagon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=duagon.com
-ARC-Seal: i=3; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
- b=BsFr+sDBetaaC9lcNyVjfxgyO7bBdRXH3Xcw7y/hzv2Uco+/kn1Jdn3ftYcXVO+MD4jX32QVSzYRwLxEx0XwXpitRFoXNdBUXPe5KmrHoEivLXdnEWZwicR7CQflKb24LSO5F9Ngccmsjuinohilyt+ZKjDuh4iBc/R/ZjqwcuehrcmqwY8adnA4+k612eWsj+z7DYAoiUCstsom8zc8Z/PU0Qn+fRKZ9mT+po7ywjd325bnJnkB8PxtA3DYkpdXfuaivbxDEsj/s4abx+Z8HH5UZ0VhCtI8Mdrc/6I7EgyoXEeHEpjQ5ivcyPbVcZA6B0JqQQDpYF9eDHbpfc5b2A==
-ARC-Message-Signature: i=3; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xP4dHIWdOEmE5evqKrJM8FYFy1LVkR2ZXXkPK3uM7w0=;
- b=eJIjktevNHxm5kVAF+X+nO2hj41f+BXNdBX8jlCNwJKJTdIvWa888qQF7//XQSVbjrrGA49UDxUsVFcrtVTon5LwBq6jU058zhTOtQE+YJkedlAc3eVD6YGWyJdAyrGtpgkFIQTYoM3NSxwMT8QMVkPGFdpGjl5v9Y/Jtv1NVyuDd12ekYsE7BomRSeAvLrkPDxIGDaSQfftcQ8gPzZwidHWfFFq53uhiQj9hlotmPSLZvtii5eggSGivBs5OWYxI2Y7qYYw1dfprJDodIBy/MrZw1Ze3IaJP/RgKbmtFlCZR3dWUqTSwrjYGoguJL3QCGmMFfWQ+/9t+5kZvEY2GA==
-ARC-Authentication-Results: i=3; mx.microsoft.com 1; spf=pass (sender ip is
- 194.38.86.34) smtp.rcpttodomain=davemloft.net smtp.mailfrom=duagon.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=duagon.com;
- dkim=pass (signature was verified) header.d=duagon.com; dkim=pass (signature
- was verified) header.d=duagon.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,2,smtp.mailfrom=duagon.com] dkim=[1,2,header.d=duagon.com]
- dmarc=[1,2,header.from=duagon.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=duagon.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xP4dHIWdOEmE5evqKrJM8FYFy1LVkR2ZXXkPK3uM7w0=;
- b=Ig1Mumdqg5EPQAdB5V/ire2qhhBP4PFWx8rr1qA7tJ54RePM0EfPKFmiYxWy9F7aTgCbIeAxXH1yO0BsEisXV9ukwcK156oTUeARl1vwuU34wcnSw3wjd6kBjBNK1KOmSs4seNaTpFDr0XgNNKPmogRYZhJCPFQNf/q7BIRBBqc=
-Received: from DB9PR02CA0029.eurprd02.prod.outlook.com (2603:10a6:10:1d9::34)
- by GV0P278MB0097.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:1c::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Tue, 2 Jan
- 2024 08:19:25 +0000
-Received: from DB5PEPF00014B8D.eurprd02.prod.outlook.com
- (2603:10a6:10:1d9:cafe::b3) by DB9PR02CA0029.outlook.office365.com
- (2603:10a6:10:1d9::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25 via Frontend
- Transport; Tue, 2 Jan 2024 08:19:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 194.38.86.34)
- smtp.mailfrom=duagon.com; dkim=pass (signature was verified)
- header.d=duagon.com;dmarc=pass action=none header.from=duagon.com;
-Received-SPF: Pass (protection.outlook.com: domain of duagon.com designates
- 194.38.86.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=194.38.86.34; helo=securemail.duagon.com; pr=C
-Received: from securemail.duagon.com (194.38.86.34) by
- DB5PEPF00014B8D.mail.protection.outlook.com (10.167.8.201) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7159.9 via Frontend Transport; Tue, 2 Jan 2024 08:19:24 +0000
-Received: from securemail (localhost [127.0.0.1])
-	by securemail.duagon.com (Postfix) with SMTP id 4T45Nr0VP6zxpD;
-	Tue,  2 Jan 2024 09:19:24 +0100 (CET)
-Received: from CHE01-GV0-obe.outbound.protection.outlook.com (mail-gv0che01lp2040.outbound.protection.outlook.com [104.47.22.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by securemail.duagon.com (Postfix) with ESMTPS;
-	Tue,  2 Jan 2024 09:19:23 +0100 (CET)
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
- b=CXy2h3+zviz0WH7pwCArVgnx3AWp+1siCVgcKNBZYtW/pszLpz4JitXxP3YHE/CRFGdpMTx7YO8ems41UGqgB0bP4kvtCrnZygAUkB7PoAgoUgs7zdNTmXJPn/Ezp7CGWghpPHyYUfY8hh7vfZxME7k7dCNGCbT9f50o/HamDzvNxclJ4/OrSxGqZ3SSE8ZJCMr3Xpm0ZGxlYbMrRqckVk13A2/jkeMSOBZ3hvqa6eBQOdRiWvPr72GyRoYa6SOEZf4Sbp5kSQALpS1V9xsE7CDKlU1PXtxZU2xgFJZvGoPdjtb9sOO7eAM0XDc3RPQzJrULkaba69yY8L5bPqdwIQ==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xP4dHIWdOEmE5evqKrJM8FYFy1LVkR2ZXXkPK3uM7w0=;
- b=UgUjQx7oF7daJ1LqRykw6T3MpI3khAlKPdL3h73a3KN3OtN7JqeGmZFSvh4NIRRbg+jr/5hCrgUhNj/VDQBDxSOxkSTad6CUtH9O3Poj3mlPWS/L0WeIFTd+ZFPbZGIUjRvVT4TgD868zCnHlOtXoGnEyVyJ6TabGtliSZvu9Evr8jMWD83YIXMdLapU/e8msClzht0jAnvlHFVdxTyfGWA1gPctkAsMNIeYf+x33uQ8w9UpiEbTumBGWBPpegQqKg28EWMkAnVdvnA1ZhIQu9VdEbP9L8M+zNZKSbiBOY9fYdkLxYP9mMAvvdEClqCB51wRGaBNuXVuDc3U2T2Svg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 20.79.222.204) smtp.rcpttodomain=davemloft.net smtp.mailfrom=duagon.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=duagon.com;
- dkim=pass (signature was verified) header.d=duagon.com; arc=pass (0 oda=1
- ltdi=1 spf=[1,1,smtp.mailfrom=duagon.com] dkim=[1,1,header.d=duagon.com]
- dmarc=[1,1,header.from=duagon.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=duagon.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xP4dHIWdOEmE5evqKrJM8FYFy1LVkR2ZXXkPK3uM7w0=;
- b=Ig1Mumdqg5EPQAdB5V/ire2qhhBP4PFWx8rr1qA7tJ54RePM0EfPKFmiYxWy9F7aTgCbIeAxXH1yO0BsEisXV9ukwcK156oTUeARl1vwuU34wcnSw3wjd6kBjBNK1KOmSs4seNaTpFDr0XgNNKPmogRYZhJCPFQNf/q7BIRBBqc=
-Received: from DU2PR04CA0085.eurprd04.prod.outlook.com (2603:10a6:10:232::30)
- by ZRAP278MB0898.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:49::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Tue, 2 Jan
- 2024 08:19:20 +0000
-Received: from DB1PEPF00039232.eurprd03.prod.outlook.com
- (2603:10a6:10:232:cafe::e8) by DU2PR04CA0085.outlook.office365.com
- (2603:10a6:10:232::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25 via Frontend
- Transport; Tue, 2 Jan 2024 08:19:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 20.79.222.204)
- smtp.mailfrom=duagon.com; dkim=pass (signature was verified)
- header.d=duagon.com;dmarc=pass action=none header.from=duagon.com;
-Received-SPF: Pass (protection.outlook.com: domain of duagon.com designates
- 20.79.222.204 as permitted sender) receiver=protection.outlook.com;
- client-ip=20.79.222.204; helo=de2-emailsignatures-cloud.codetwo.com; pr=C
-Received: from de2-emailsignatures-cloud.codetwo.com (20.79.222.204) by
- DB1PEPF00039232.mail.protection.outlook.com (10.167.8.105) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7159.9 via Frontend Transport; Tue, 2 Jan 2024 08:19:19 +0000
-Received: from CHE01-GV0-obe.outbound.protection.outlook.com (104.47.22.41) by de2-emailsignatures-cloud.codetwo.com with CodeTwo SMTP Server (TLS12) via SMTP; Tue, 02 Jan 2024 08:19:16 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAAD3C05;
+	Tue,  2 Jan 2024 08:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704183893; x=1735719893;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=YwsW0ptpJXN/4ntz4A2tKIqUo7cZS5qmgc7FBnOTG24=;
+  b=Is64eW6FiX4j6UzQJ/wu9H2N0g1drTw7X5+tqYBIwTzct5iXuQdNuCia
+   M4fmzfrEalWSWLOCuTNfSmlN5E4VPNmq8BrH9l1/vPMyK+XyVuwsO5pPp
+   gplH9JDh8efsnVLD4nM8Lwql87suwJQCb+7M7NsPs03/BBqw6V2lVOiqF
+   aYNKcxxmuhqApQ+XITFVrzEoaNRvmHvyzbYbrtrjXPWEN8E3DtVhV5XYI
+   8lzUXdybIcCT5oiFDdeyz+EzNFBtH28/svxB+FVQFwN/y9yrunwTBHU37
+   HoKFZChQowumIhv7IpDgw+FrXTU4eqHAYknX2XgjWSzcrAYQMqMPRvcnh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10940"; a="396582559"
+X-IronPort-AV: E=Sophos;i="6.04,324,1695711600"; 
+   d="scan'208";a="396582559"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 00:24:52 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,324,1695711600"; 
+   d="scan'208";a="28013280"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Jan 2024 00:24:53 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Jan 2024 00:24:52 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 2 Jan 2024 00:24:46 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 2 Jan 2024 00:24:46 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 2 Jan 2024 00:24:45 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dCamOJACuNZKffC/lQNmIPhAB9YiiYL9taCpKkgwrR/PiIEGlI1dtE3bv8IT5coJYAv0g4fdHEVNnTpCSwJ7X2B6tyA0GkC0zZm5eDga42mVaLnpNdioJu2PSc4tWC/4r2BUw97Buv7BloE4fTjFJywTIdPn9Maq+XjTOQfuwwmAamUkF17kfxy3lyrHGm01LblBXngE6ruLLbFysNBv0hEoQ3AmYrdBC6R7OzKcC0Tajki4FTPq5MSisumC5DsXznvKgO/EkerVnTxWOKf8DpL4SeGC0Z1t5cirKxeZzmZ5XNXs0JOseyzmp8+PjKsCYtSvwKPEztAXJhfvNHj0mA==
+ b=fsa2dxcLUki44rmHlHnuq+Od/jZdTYnAKOljnqE0FRlz2w5XUWmiiPrL5MyftcaX8fq0CDKTPVAGTtfEvKKjTAIAq3BXphPHcjlg2L5Kv7FUilGAwcgXR9KZtimVfE83Zvh4xq5fxrHXAa++WWcN7JRUX/v+Hba8hcaI00boBWc7iyv3hCaqFGIyYwpMd1+s1mZa2p8Comr3vV6w/O5ZRnLyq56R6HSC0vXz1GB0CtBrHoLlYgoZRA8pVl17SsjwRmai535RmtZ2U1gKWRR4CI8GlzODM8EoTofaOq1gg8x2QIqQyUerb2UosAOsRkKnk/rUxZ0gzqnnBQlAL3dNVg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xP4dHIWdOEmE5evqKrJM8FYFy1LVkR2ZXXkPK3uM7w0=;
- b=YIBPPhZTrtk+Gxg9htTcSttx7pR+GgcxXU4m6IyL8vmHpW4PIEijmGNwaPA7BNA8gA/jXFbQSCM6ovvuVqs8KmLw4KVNPZ+lZqPcOMKPUKR1eYGfJVO+o/mZlhnfxS7BIRmmumnEJ3QE38N20OjQvGEng5tzlhFRvi5g2pl/9byEoDjaxbPNOSmUG+uHFbkzuWGiWqFffukElf4As3vU6azYlIK/AojoGUabiEjAovhEJ4VFQ0OLyaVBMj8zZgEDKjUQFzeVrDsixl3W16iUz+FssVE3Z+EkdGy9/TGCN7sANlasGX4ifvl1RX2+fCvQw0mwvd4gKNmgatlOKp0u+g==
+ bh=TF2k3ay7RA4spQ0lyPGGorqiV2QeQXUgGmlt+ZENSOM=;
+ b=E+kukVLcymIm99KtVufwA5/uBMZBiXf122Wn7Uj2EkMoic2rNVEA1HMzr6yEqZKvVQ88WSteFVXt/fp01EEwNBDdz2IxWyrdFQiqzly3zvqldbLbPmwW3vnpsQe0uNk8QW0MOz6LdYmW1DLZCa2vy6LiqfArfG1nKXGqqJJoYK2E3Jb9TQNzOUdJuM4KhSPyvX0jZxvyvo8DkwQvXAIgkNJc99zbdKyqKLlVifCpjqadGnIe+KEHMinJPm0XtYyMRDMPCZOHxFU8kFMLErn0yx6yk0thVl3QUlsE8U82tXflPg+XWITL3QosfH2qiRL3s5IqI+Nti2UBIZXSI0XI9g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=duagon.com; dmarc=pass action=none header.from=duagon.com;
- dkim=pass header.d=duagon.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=duagon.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xP4dHIWdOEmE5evqKrJM8FYFy1LVkR2ZXXkPK3uM7w0=;
- b=Ig1Mumdqg5EPQAdB5V/ire2qhhBP4PFWx8rr1qA7tJ54RePM0EfPKFmiYxWy9F7aTgCbIeAxXH1yO0BsEisXV9ukwcK156oTUeARl1vwuU34wcnSw3wjd6kBjBNK1KOmSs4seNaTpFDr0XgNNKPmogRYZhJCPFQNf/q7BIRBBqc=
-Received: from GV0P278MB0516.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:2e::11)
- by GV0P278MB1093.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:4d::5) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6392.namprd11.prod.outlook.com (2603:10b6:930:37::15)
+ by PH0PR11MB5580.namprd11.prod.outlook.com (2603:10b6:510:e5::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Tue, 2 Jan
- 2024 08:19:15 +0000
-Received: from GV0P278MB0516.CHEP278.PROD.OUTLOOK.COM
- ([fe80::1865:51c9:a91e:c02a]) by GV0P278MB0516.CHEP278.PROD.OUTLOOK.COM
- ([fe80::1865:51c9:a91e:c02a%5]) with mapi id 15.20.7135.023; Tue, 2 Jan 2024
- 08:19:15 +0000
-From: =?iso-8859-1?Q?Sanju=E1n_Garc=EDa=2C_Jorge?=
-	<Jorge.SanjuanGarcia@duagon.com>
-To: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-CC: "s-vadapalli@ti.com" <s-vadapalli@ti.com>, "grygorii.strashko@ti.com"
-	<grygorii.strashko@ti.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, =?iso-8859-1?Q?Sanju=E1n_Garc=EDa=2C_Jorge?=
-	<Jorge.SanjuanGarcia@duagon.com>
-Subject: [PATCH 3/3] net: ethernet: ti: am65-cpsw: Add device tree property to
- set max MTU
-Thread-Topic: [PATCH 3/3] net: ethernet: ti: am65-cpsw: Add device tree
- property to set max MTU
-Thread-Index: AQHaPVRfDFA6sE4cakC8kOOs98f50Q==
-Date: Tue, 2 Jan 2024 08:19:15 +0000
-Message-ID: <20240102081825.14635-4-jorge.sanjuangarcia@duagon.com>
-References: <20240102081825.14635-1-jorge.sanjuangarcia@duagon.com>
-In-Reply-To: <20240102081825.14635-1-jorge.sanjuangarcia@duagon.com>
-Accept-Language: es-ES, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=duagon.com;
-x-ms-traffictypediagnostic:
-	GV0P278MB0516:EE_|GV0P278MB1093:EE_|DB1PEPF00039232:EE_|ZRAP278MB0898:EE_|DB5PEPF00014B8D:EE_|GV0P278MB0097:EE_
-X-MS-Office365-Filtering-Correlation-Id: b1bfb0d2-4e06-4a7d-e77f-08dc0b6b87cb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- nyZgIbOFpvSVFcMGSTpWJZ+H9NrudwzI+KWZuxnTQeQi1sZqgKIIISkXiPESb0SS7S7aXoOtw15Wk7tXqjY3JK4VLwuwOHkrf3yZSrXwDhgBq/5HjabNgnnBwrE7REnle1WGkcpvJI99YN7b5LkWaoEmDL8Zc9aThWD4aMCCacAiAHiTCACxIDnXkTP3FAtjU1mZjfFzk0ATp4+Lzuyb+p7ssWLd/bZoA3hGLO8M99YK6e5Ca2bRL/i76I5ZwR6SjcN6eMqH47l3UypVe5USa46D8OEjb6Es9Xltic9warjXOU4yHL+GMu8LgU9G6oAj0I74ntWug9+7RJ8UBha/e9P/kpIxYhfnc0oX8pHjvX5j3fUhBpT9P1/jE/oJMl+J0U8K3Z7qwaM4tnxze/EH2gV5TtIkSpXL0LUHbiFDQwSxeCagd0DNL1V9Qtyn1+S5qWyzQJIu7RnK76rnGZZojdAOtI2yxT+xSTGHPEQb8SbhwyapftAXw6i0MET2ydWbws3IAy1LmHqqGtTkJcpAHlNukdKKlsU1AYFb5PUbxG6tgh81DHSNmQPbX9SvNVGv/DapqeJMIgz71yjfHBumPTfUS7N19jcm37ep9WbBRSOClIky0rQGXMAA3Vz/op82
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV0P278MB0516.CHEP278.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(136003)(39840400004)(366004)(376002)(396003)(346002)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(2616005)(83380400001)(107886003)(26005)(1076003)(38100700002)(122000001)(41300700001)(8936002)(8676002)(54906003)(316002)(110136005)(4326008)(5660300002)(2906002)(478600001)(71200400001)(6506007)(6512007)(66446008)(76116006)(66556008)(66946007)(64756008)(91956017)(6486002)(66476007)(38070700009)(86362001)(36756003);DIR:OUT;SFP:1102;
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ 2024 08:24:39 +0000
+Received: from CY5PR11MB6392.namprd11.prod.outlook.com
+ ([fe80::b99c:f603:f176:aca]) by CY5PR11MB6392.namprd11.prod.outlook.com
+ ([fe80::b99c:f603:f176:aca%4]) with mapi id 15.20.7135.023; Tue, 2 Jan 2024
+ 08:24:38 +0000
+Date: Tue, 2 Jan 2024 16:20:16 +0800
+From: Yujie Liu <yujie.liu@intel.com>
+To: Guillaume Nault <gnault@redhat.com>
+CC: <netdev@vger.kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lkp@intel.com>, kernel test robot <oliver.sang@intel.com>
+Subject: Re: [PATCH v2 net-next] selftests/net: change shebang to bash to
+ support "source"
+Message-ID: <ZZPHQF6wL95oSGzK@yujie-X299>
+References: <20231229131931.3961150-1-yujie.liu@intel.com>
+ <ZZFbxyQeHgf3UQrN@debian>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZZFbxyQeHgf3UQrN@debian>
+X-ClientProxiedBy: SI2PR02CA0005.apcprd02.prod.outlook.com
+ (2603:1096:4:194::6) To CY5PR11MB6392.namprd11.prod.outlook.com
+ (2603:10b6:930:37::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV0P278MB1093
-X-CodeTwo-MessageID: 5bbcd7bd-05a3-4071-9796-27d1bf5247d1.20240102081916@de2-emailsignatures-cloud.codetwo.com
-X-CodeTwoProcessed: true
-X-EOPAttributedMessage: 1
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF00039232.eurprd03.prod.outlook.com
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
- e4ad888a-992a-4210-5f68-08dc0b6b8259
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- 4FkMc066gMlzJzGQQeW3+1L7R+FsVHODGcgrboYM805mbNYd9V3KsWqVd2wJF1MFUHfSzH0Mj3PjSYzq+/1ABe5Ye2V4pB6+ka0gmaVuXP+p8tum6kaUKZX9BmVfqr/sYj2rf7SqW/sbkn2jBSmYNf4uLjvjBMShTdzB8isODBQfA/ji6Xd3tXB600YdcRf3gpYccLdoNKE24tWG5lUwcRyu/J8+w56LFJ3icITtDlpnJwlvJGs64/F+yaf3x35gD0kHxcGVIUUTHjfih5dvN66Wv/9IYvWvvKq+SaK3cUSqrjmoa/lTUzjAYWqLp03MYPVovSStJ/qdFDcDwfnJDAhQ7oZFBaeVkEl1rLWNGc6lyZftJ2YuLTQQ8o41w8fz8f42z6Es4Bi8hiB626sng0ZCqnDMDdvaCLJTZlGwIPPm4nNzY+MkLvwLPzC2niLJqDPM8VjBwLV5SZU+30NGnF8P7qaLZ2zwKwmiRCZaBk0JrQSVSJIFCCUXXGVi9RFwSkKpV2smoN0NMnzxWZLHem0kQ0eLPS2mNQ8xvQuAGfrpfxNiNOR8HGr4ybFy7W+GHBq4Q6XKFuNw5xfCk9kikAqqgx3AqZSgWqnWRUgI+R+anslaYf9fKNCi5ZjDIdSZ0E5pvCo9ttZ4f9DpZfVdQ3OjSYMgOKY24x25Kzvd5J7x0rc7iY3+jL593+fViYktOKQv0VZLN9UlqN3SAp/DVw==
-X-Forefront-Antispam-Report-Untrusted:
- CIP:20.79.222.204;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:de2-emailsignatures-cloud.codetwo.com;PTR:de2-emailsignatures-cloud.codetwo.com;CAT:NONE;SFS:(13230031)(136003)(396003)(39840400004)(376002)(346002)(230922051799003)(451199024)(64100799003)(186009)(82310400011)(1800799012)(36840700001)(46966006)(1076003)(83380400001)(2616005)(336012)(26005)(107886003)(6506007)(6512007)(36860700001)(47076005)(5660300002)(70586007)(4326008)(41300700001)(478600001)(6486002)(2906002)(70206006)(316002)(8676002)(8936002)(54906003)(110136005)(86362001)(36756003)(7636003)(356005)(7596003)(40480700001);DIR:OUT;SFP:1102;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZRAP278MB0898
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB5PEPF00014B8D.eurprd02.prod.outlook.com
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	961a7f14-9fab-4b56-86d0-08dc0b6b8507
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6392:EE_|PH0PR11MB5580:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38cf2d3b-a602-4fb3-9639-08dc0b6c42d3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	4BWjoYhGFntC0SZSBc1Cj0PvhXKxi9fhLZlH8PSsGjmVmjnDa/GG9V94pgZWI9MVulYqhQXgcJQQQabrmVgZMQAEtzMGamFtg6fh8PisQbhqkU5ujgWswDMt2k0BIagPt13Xq5k+uOBaNuY6mGiXZ0tiikDpn9NQxxw8s8ImMF8XiSvm8eA12TZ11WX1u61K4K7TzW3rEhjEEUh5NAC7c6s5XNzDzLt3CtDMtmkN7y7938mRPLbgN95DL1ImvCGThzYssPLcJ70uI3wtiBspBS2TuvXIuD98RUy5d2sn8dZ1G0rMF4nDljVhm6sjuq+E1ykWEe/5eUx1HjUWtZMr9OXyXbesXShnD2/jNCCkVSUQlw0Kq83RNHxs/nnZsG48a32zPmsBFrg2Q3PXJzcak0U/O5UtiV+Eljp0MkCgqV3ImT7d1AnJ4jOrXiAEMCBeFZBIsPmngN80XgoN17E/Dbi5A459XT6MeCxLgAFI9rpSS3az6yOfC+bZWVq2v4IU1UM8FK2DrHfk3bW4NM4NPHK/MENQ7vN+3ENAT3XnzZ7wOg6KFsEvvTkL8vzhGePvMHdnpaw+H08i65A2MR5S0LoctscK59vW3jnfVox8bO87170JCSVixNEHWSK4Wahbz/BBwIYm+t7I1gs1JKWauEe5mZ9KigQyw3nzmbG3cbJcIrFOHpkFTpumLV4qjV7EXs0QlEwdh4x/E4o2daKNA7AKpOz0e3kAGkmY8mWppiSDkx9dG0w7Crt2OxNZdms1
-X-Forefront-Antispam-Report:
-	CIP:194.38.86.34;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:securemail.duagon.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(136003)(39840400004)(376002)(396003)(346002)(230922051799003)(82310400011)(451199024)(1800799012)(64100799003)(186009)(46966006)(36840700001)(2616005)(83380400001)(47076005)(107886003)(26005)(1076003)(336012)(81166007)(41300700001)(8936002)(8676002)(54906003)(316002)(110136005)(4326008)(5660300002)(2906002)(36860700001)(478600001)(6506007)(6512007)(70206006)(70586007)(6486002)(86362001)(36756003)(40480700001)(36900700001);DIR:OUT;SFP:1102;
-X-OriginatorOrg: duagon.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2024 08:19:24.4492
+X-Microsoft-Antispam-Message-Info: 9qmicTl9Wx3pQiYtU/dnjNceeMaX7YdNVKQgoV/xODsP+CEpLr/mTyhrP4j/HQCQ1Vf7r0xn6A7HygwSSFhWNNpw8eDIuM/SSNF9bPFmfKTPYsp3XZsfsjQZQs21lspp+7cLrOomjWsTFp4pb05SufO0eu7trSFw65hOCUJ0QoxpkzIdGQVSmYHRU3e2llbzlcNz0dFRBmjd3XccnRDmqTe1Y6xwjXziTffGRnhX+edGVh8cFucD9DNyc+n7WYVY+iiTr5e+Pban0IoExArnD6r+oXtTlB1Ar/3LqfI4NVy1Zr5tHuiBNx137k3UWIF7iGfwCbcYlVEUbPg14uCd2pGEu0rrjdDNMYOj1aN9iyqruwwOArxsl8FyN9mUK1w8s1HdLVLo6OzN+S+T0IPR+6ZHf/pjU0JYZpiUIFsYeQhLiSAJYjOsmdy02+XtvpY11zE01tPy+LJmuFLowbEmN+EdPP4LbQkeUFxd73vAnufvfmb+JLMsVKHtQ3w5i4Refd42z8dhVqk1cq2Ca6kcYtwAQzpo+ig0wjhZN7Uw3kIfXTuDCztw0Rh+E4LEafrk
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6392.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(366004)(396003)(376002)(346002)(136003)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(38100700002)(82960400001)(86362001)(107886003)(26005)(9686003)(6512007)(6506007)(66574015)(6666004)(54906003)(4326008)(6486002)(478600001)(316002)(8936002)(8676002)(83380400001)(6916009)(66556008)(66476007)(66946007)(33716001)(41300700001)(5660300002)(44832011)(2906002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OT7jquSx/v2wDsiD4ycYhGj2jWvOwcS4XnUDnt5MhVlS/lFnJe8XWEkI42XF?=
+ =?us-ascii?Q?/U6D8NVZCdPb7RJNanJZ6fDbQZCZT8qZAJXlr4/HYZxomRxw+ZCsktR1uOOT?=
+ =?us-ascii?Q?w0X+9UXEXO17nAQaZVkJe9aQFmXAzAOzRmi30ZtNbIVt8qKtXwTAbLoS38Db?=
+ =?us-ascii?Q?DUcnrNRJ84Im5KhpMH0XP39VFLDgJLzDh31fMEjmRQadyuFohxFkcsF1229R?=
+ =?us-ascii?Q?Q47p6YjcEXF7OfXg3U45HJDR0qYZVE01DhDna8zCjyBJQCqQXvaOqQyc7+7w?=
+ =?us-ascii?Q?BDT2HBqhTRE19+NpGq4MTFAPYxWVhMrrwvpfR/tI1sI5Fu1AVzNxymx/wXW5?=
+ =?us-ascii?Q?1XPfdxr2xJ+o839F20zL4Jra29xuO8O3RJNU85jipJ7yfuAxwbkaOP1TECZ/?=
+ =?us-ascii?Q?kOdUyrTU1eRKUwbYPY1xeh22iaeNE52bPvInpljz/3MK03Hb+T7P8q6DY9SJ?=
+ =?us-ascii?Q?vE4ws/4RUzdmyzQp0JmWnz2h2J/junv68BADN1jYsApUgCSTE3QdvFm4PdkK?=
+ =?us-ascii?Q?Lq0Nfb0RfFOC5oppnbfBhewWoS2jHvxIIKR6ai4a6Gq9DkWn5m8sIFMI+as5?=
+ =?us-ascii?Q?kgAqZnZ0fa9MvPoMxJRl/gFFsIcggiTLyndeQsCpcA8MjH4JSgZM1aKkcMfl?=
+ =?us-ascii?Q?YSJ+E01EYaPZWaix0RuYB0Y8b3HVqhZq03jvD9TIhv9ejf84XioEsu30OYWy?=
+ =?us-ascii?Q?NuNiN6D/4xs8HFtWua7+CnsxB+dtS02mhZ+tUJ2H96ODp7EwbcUiDO+Igvax?=
+ =?us-ascii?Q?BX+2w/0WvR1+JQENtsR/Ju6aTHo3Ap4Ln6d1OOUjZKcXSrYEzrzXflHgREDk?=
+ =?us-ascii?Q?nMS7txtSJQ9qs7/CgNyR0kj9n4eLdcNZYhgr4F62JP1Wwiv4Dh+fyzgxbdVO?=
+ =?us-ascii?Q?oTphOj2DhxhSM8blGq2eKjzSeoZQs68qA0Y4VEvLFY3OhQ4TDbGExRN4vbbJ?=
+ =?us-ascii?Q?7ZpfeBobsRADbZhC/74WmeZm04+5cllHSdWJBg2Vw4giqyHH+sropkC0OMys?=
+ =?us-ascii?Q?YMSzjQQdD/BybOEV9GWe0CwTqdGACbodoH94YZ/lfX7GEnZWVr64A9FKtMMK?=
+ =?us-ascii?Q?oYg3J8qrTZtSqAE5XLp6Dh14Gzbilh3isoMYaxV0cnX0sixc1foKV0ZbcEfk?=
+ =?us-ascii?Q?qu4yRWVe/w+qXVBiAFARbqeDHMVrcbT5QvtWnSMEagDGSJW0DY7X6ekkm2D+?=
+ =?us-ascii?Q?p5PGK3fHe7p7hoTUsianYzpXo7ArTsz23MVj7Fbsxofizgy1VRKzxxGdBrbk?=
+ =?us-ascii?Q?C1+Yu6zxBzm80Z/DJ4e7EgvFAB5jVGahmnbKKugjgB7rUkFJ+dGrKvJiQk1K?=
+ =?us-ascii?Q?sGfjdvL29X0oa8GdGOgq2PcLQt2oCiPNUoJ/0nGgpPJ7CYTvfqUuKo0NBAzl?=
+ =?us-ascii?Q?QeojfEt5KtsJGYWnZ46MVeI3gbfI8AJWgjV6UKGjCGzCuNIgO10/4uBPX23/?=
+ =?us-ascii?Q?XsgSzsvNG8hG/DwcMXiWvS9csCDm/jVc8FpA3AMwJLN/IBgBCsDQrUQE1qAJ?=
+ =?us-ascii?Q?1icLU0hlSvjBRuuNLNuO/ryoQaoHOxicgdFVpRfFPbQG8Bj+9cR/Pj/1AjHt?=
+ =?us-ascii?Q?bPdwPx8gYf9uFUYpaMkpygO+JnXaEb63bjxkU0xa?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38cf2d3b-a602-4fb3-9639-08dc0b6c42d3
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6392.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2024 08:24:38.8173
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1bfb0d2-4e06-4a7d-e77f-08dc0b6b87cb
-X-MS-Exchange-CrossTenant-Id: e5e7e96e-8a28-45d6-9093-a40dd5b51a57
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5e7e96e-8a28-45d6-9093-a40dd5b51a57;Ip=[194.38.86.34];Helo=[securemail.duagon.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB5PEPF00014B8D.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV0P278MB0097
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sH3Q+x2kXVFajhzEoE4AhaaAz8bP7PuQUXHwDS5/IxiCmMXCqOpQzNA/c7Uf6W8CapTtgxtwp/aCPGND2lMwGA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5580
+X-OriginatorOrg: intel.com
 
-The switch supports ethernet frame sizes between 64 and 2024 bytes
-(including VLAN) as stated in the technical reference manual.
+On Sun, Dec 31, 2023 at 01:17:11PM +0100, Guillaume Nault wrote:
+> On Fri, Dec 29, 2023 at 09:19:31PM +0800, Yujie Liu wrote:
+> > The patch set [1] added a general lib.sh in net selftests, and converted
+> > several test scripts to source the lib.sh.
+> > 
+> > unicast_extensions.sh (converted in [1]) and pmtu.sh (converted in [2])
+> > have a /bin/sh shebang which may point to various shells in different
+> > distributions, but "source" is only available in some of them. For
+> > example, "source" is a built-it function in bash, but it cannot be
+> > used in dash.
+> > 
+> > Refer to other scripts that were converted together, simply change the
+> > shebang to bash to fix the following issues when the default /bin/sh
+> > points to other shells.
+> 
+> Looks like it'd be simpler to just replace the "source" commands with
+> "." and leave the shebang as is (unless there are other bash-specific
+> constructs in these scripts of course).
+> 
+> Generally speaking, I think we should avoid madating a specific shell,
+> unless that really simplifies the test script (which is not the case
+> here).
 
-This patch adds a new devicetree property so the switch ports can
-be configured with an MTU higher than the standar 1500 bytes, making
-the max frame length configured on the registers and the max_mtu
-advertised on the network device consistent.
+Hi Guillaume,
 
-Signed-off-by: Jorge Sanjuan Garcia <jorge.sanjuangarcia@duagon.com>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 18 ++++++++++++++----
- drivers/net/ethernet/ti/am65-cpsw-nuss.h |  1 +
- 2 files changed, 15 insertions(+), 4 deletions(-)
+Thanks for the comments. Actually I also considered replacing "source"
+with "." at first, but finally decided to change the shebang in
+consideration of being consistent with other scripts. We can see that
+there are 140+ scripts in net selftests that have "source lib.sh" and
+"bash" shebang, but none of the selftests has ". lib.sh". If we replace
+"source" with "." and keep the "sh" shebang specifically for
+unicast_extensions.sh and pmtu.sh, we will get only 2 scripts using
+"sh and ." while most other scripts using "bash and source". Maybe it
+would be nice to keep the consistency by changing the shebang as well?
+What do you think? :)
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/etherne=
-t/ti/am65-cpsw-nuss.c
-index a920146d7a60..6a5c8b6e03f4 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -56,7 +56,7 @@
- #define AM65_CPSW_MAX_PORTS	8
-=20
- #define AM65_CPSW_MIN_PACKET_SIZE	VLAN_ETH_ZLEN
--#define AM65_CPSW_MAX_PACKET_SIZE	(VLAN_ETH_FRAME_LEN + ETH_FCS_LEN)
-+#define AM65_CPSW_MAX_PACKET_SIZE	2024
-=20
- #define AM65_CPSW_REG_CTL		0x004
- #define AM65_CPSW_REG_STAT_PORT_EN	0x014
-@@ -2198,8 +2198,7 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common=
- *common, u32 port_idx)
- 	eth_hw_addr_set(port->ndev, port->slave.mac_addr);
-=20
- 	port->ndev->min_mtu =3D AM65_CPSW_MIN_PACKET_SIZE;
--	port->ndev->max_mtu =3D common->rx_packet_max -
--			      (VLAN_ETH_HLEN + ETH_FCS_LEN);
-+	port->ndev->max_mtu =3D common->max_mtu;
- 	port->ndev->hw_features =3D NETIF_F_SG |
- 				  NETIF_F_RXCSUM |
- 				  NETIF_F_HW_CSUM |
-@@ -2927,8 +2926,19 @@ static int am65_cpsw_nuss_probe(struct platform_devi=
-ce *pdev)
- 	if (common->port_num < 1 || common->port_num > AM65_CPSW_MAX_PORTS)
- 		return -ENOENT;
-=20
-+	common->max_mtu =3D VLAN_ETH_DATA_LEN;
-+	of_property_read_u32(dev->of_node, "max-frame-size", &common->max_mtu);
-+
-+	common->rx_packet_max =3D common->max_mtu + VLAN_ETH_HLEN + ETH_FCS_LEN;
-+	if (common->rx_packet_max > AM65_CPSW_MAX_PACKET_SIZE) {
-+		common->rx_packet_max =3D AM65_CPSW_MAX_PACKET_SIZE;
-+		common->max_mtu =3D AM65_CPSW_MAX_PACKET_SIZE -
-+				  (VLAN_ETH_HLEN + ETH_FCS_LEN);
-+	}
-+
-+	dev_info(common->dev, "Max RX packet size set to %d\n", common->rx_packet=
-_max);
-+
- 	common->rx_flow_id_base =3D -1;
--	common->rx_packet_max =3D AM65_CPSW_MAX_PACKET_SIZE;
- 	init_completion(&common->tdown_complete);
- 	common->tx_ch_num =3D AM65_CPSW_DEFAULT_TX_CHNS;
- 	common->pf_p0_rx_ptype_rrobin =3D false;
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h b/drivers/net/etherne=
-t/ti/am65-cpsw-nuss.h
-index 141160223d73..3bb0ff94a46a 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-@@ -130,6 +130,7 @@ struct am65_cpsw_common {
- 	u32			tx_ch_rate_msk;
- 	u32			rx_flow_id_base;
-=20
-+	int			max_mtu;
- 	int			rx_packet_max;
-=20
- 	struct am65_cpsw_tx_chn	tx_chns[AM65_CPSW_MAX_TX_QUEUES];
---=20
-2.34.1
+linux/tools/testing/selftests/net$ grep -rl "source lib.sh" . | xargs grep -F '#!/bin/'
+./test_vxlan_under_vrf.sh:#!/bin/bash
+./test_vxlan_nolocalbypass.sh:#!/bin/bash
+./xfrm_policy.sh:#!/bin/bash
+./test_vxlan_mdb.sh:#!/bin/bash
+./test_bridge_backup_port.sh:#!/bin/bash
+./vrf_route_leaking.sh:#!/bin/bash
+./l2tp.sh:#!/bin/bash
+./netns-name.sh:#!/bin/bash
+./rtnetlink.sh:#!/bin/bash
+./ioam6.sh:#!/bin/bash
+./drop_monitor_tests.sh:#!/bin/bash
+./test_vxlan_vnifiltering.sh:#!/bin/bash
+./icmp.sh:#!/bin/bash
+./gre_gso.sh:#!/bin/bash
+./fib_nexthop_multiprefix.sh:#!/bin/bash
+./icmp_redirect.sh:#!/bin/bash
+./vrf-xfrm-tests.sh:#!/bin/bash
+./vrf_strict_mode_test.sh:#!/bin/bash
+./fcnal-test.sh:#!/bin/bash
+./stress_reuseport_listen.sh:#!/bin/bash
+./srv6_end_dt4_l3vpn_test.sh:#!/bin/bash
+./test_bridge_neigh_suppress.sh:#!/bin/bash
+./cmsg_ipv6.sh:#!/bin/bash
+./arp_ndisc_evict_nocarrier.sh:#!/bin/bash
+./fib_rule_tests.sh:#!/bin/bash
+./srv6_end_dt6_l3vpn_test.sh:#!/bin/bash
+./forwarding/custom_multipath_hash.sh:#!/bin/bash
+./forwarding/gre_inner_v4_multipath.sh:#!/bin/bash
+./forwarding/tc_tunnel_key.sh:#!/bin/bash
+./forwarding/tc_shblocks.sh:#!/bin/bash
+./forwarding/router_nh.sh:#!/bin/bash
+./forwarding/skbedit_priority.sh:#!/bin/bash
+./forwarding/tc_mpls_l2vpn.sh:#!/bin/bash
+./forwarding/gre_inner_v6_multipath.sh:#!/bin/bash
+./forwarding/vxlan_symmetric.sh:#!/bin/bash
+./forwarding/bridge_mdb.sh:#!/bin/bash
+./forwarding/no_forwarding.sh:#!/bin/bash
+./forwarding/router_bridge_1d.sh:#!/bin/bash
+./forwarding/tc_flower_port_range.sh:#!/bin/bash
+./forwarding/router_multicast.sh:#!/bin/bash
+./forwarding/bridge_locked_port.sh:#!/bin/bash
+./forwarding/vxlan_asymmetric_ipv6.sh:#!/bin/bash
+./forwarding/dual_vxlan_bridge.sh:#!/bin/bash
+./forwarding/bridge_port_isolation.sh:#!/bin/bash
+./forwarding/local_termination.sh:#!/bin/bash
+./forwarding/ipip_flat_gre_keys.sh:#!/bin/bash
+./forwarding/gre_multipath_nh_res.sh:#!/bin/bash
+./forwarding/gre_multipath.sh:#!/bin/bash
+./forwarding/vxlan_bridge_1d_ipv6.sh:#!/bin/bash
+./forwarding/ip6gre_flat_keys.sh:#!/bin/bash
+./forwarding/gre_multipath_nh.sh:#!/bin/bash
+./forwarding/bridge_mld.sh:#!/bin/bash
+./forwarding/ip6gre_inner_v6_multipath.sh:#!/bin/bash
+./forwarding/ip6gre_flat_key.sh:#!/bin/bash
+./forwarding/vxlan_asymmetric.sh:#!/bin/bash
+./forwarding/tc_flower_router.sh:#!/bin/bash
+./forwarding/router_bridge_vlan_upper_pvid.sh:#!/bin/bash
+./forwarding/mirror_gre_vlan_bridge_1q.sh:#!/bin/bash
+./forwarding/q_in_vni_ipv6.sh:#!/bin/bash
+./forwarding/mirror_gre_lag_lacp.sh:#!/bin/bash
+./forwarding/ip6gre_custom_multipath_hash.sh:#!/bin/bash
+./forwarding/vxlan_bridge_1d.sh:#!/bin/bash
+./forwarding/ip6gre_hier_key.sh:#!/bin/bash
+./forwarding/gre_custom_multipath_hash.sh:#!/bin/bash
+./forwarding/ipip_flat_gre_key.sh:#!/bin/bash
+./forwarding/mirror_gre_flower.sh:#!/bin/bash
+./forwarding/router_bridge.sh:#!/bin/bash
+./forwarding/vxlan_symmetric_ipv6.sh:#!/bin/bash
+./forwarding/mirror_gre_bridge_1q.sh:#!/bin/bash
+./forwarding/router_multipath.sh:#!/bin/bash
+./forwarding/tc_vlan_modify.sh:#!/bin/bash
+./forwarding/vxlan_bridge_1q.sh:#!/bin/bash
+./forwarding/bridge_mdb_port_down.sh:#!/bin/bash
+./forwarding/tc_flower.sh:#!/bin/bash
+./forwarding/tc_flower_cfm.sh:#!/bin/bash
+./forwarding/mirror_gre_neigh.sh:#!/bin/bash
+./forwarding/ethtool_rmon.sh:#!/bin/bash
+./forwarding/hw_stats_l3_gre.sh:#!/bin/bash
+./forwarding/router.sh:#!/bin/bash
+./forwarding/ipip_hier_gre_key.sh:#!/bin/bash
+./forwarding/tc_police.sh:#!/bin/bash
+./forwarding/pedit_ip.sh:#!/bin/bash
+./forwarding/ip6_forward_instats_vrf.sh:#!/bin/bash
+./forwarding/router_mpath_nh_res.sh:#!/bin/bash
+./forwarding/mirror_gre_changes.sh:#!/bin/bash
+./forwarding/hw_stats_l3.sh:#!/bin/bash
+./forwarding/ipip_hier_gre.sh:#!/bin/bash
+./forwarding/q_in_vni.sh:#!/bin/bash
+./forwarding/ip6gre_flat.sh:#!/bin/bash
+./forwarding/router_bridge_vlan_upper.sh:#!/bin/bash
+./forwarding/bridge_igmp.sh:#!/bin/bash
+./forwarding/mirror_gre_nh.sh:#!/bin/bash
+./forwarding/bridge_mdb_host.sh:#!/bin/bash
+./forwarding/ipip_hier_gre_keys.sh:#!/bin/bash
+./forwarding/pedit_dsfield.sh:#!/bin/bash
+./forwarding/bridge_vlan_mcast.sh:#!/bin/bash
+./forwarding/mirror_gre_bridge_1d_vlan.sh:#!/bin/bash
+./forwarding/router_bridge_1d_lag.sh:#!/bin/bash
+./forwarding/router_bridge_pvid_vlan_upper.sh:#!/bin/bash
+./forwarding/mirror_gre_bound.sh:#!/bin/bash
+./forwarding/ip6gre_hier.sh:#!/bin/bash
+./forwarding/ip6gre_hier_keys.sh:#!/bin/bash
+./forwarding/ethtool_extended_state.sh:#!/bin/bash
+./forwarding/router_mpath_nh.sh:#!/bin/bash
+./forwarding/tc_flower_l2_miss.sh:#!/bin/bash
+./forwarding/bridge_vlan_unaware.sh:#!/bin/bash
+./forwarding/router_broadcast.sh:#!/bin/bash
+./forwarding/bridge_fdb_learning_limit.sh:#!/bin/bash
+./forwarding/ipip_lib.sh:#!/bin/bash
+./forwarding/ip6gre_inner_v4_multipath.sh:#!/bin/bash
+./forwarding/router_vid_1.sh:#!/bin/bash
+./forwarding/mirror_gre.sh:#!/bin/bash
+./forwarding/router_bridge_vlan.sh:#!/bin/bash
+./forwarding/bridge_vlan_aware.sh:#!/bin/bash
+./forwarding/ethtool.sh:#!/bin/bash
+./forwarding/loopback.sh:#!/bin/bash
+./forwarding/bridge_sticky_fdb.sh:#!/bin/bash
+./forwarding/bridge_mdb_max.sh:#!/bin/bash
+./forwarding/pedit_l4port.sh:#!/bin/bash
+./forwarding/tc_actions.sh:#!/bin/bash
+./forwarding/mirror_vlan.sh:#!/bin/bash
+./forwarding/sch_red.sh:#!/bin/bash
+./forwarding/ipip_flat_gre.sh:#!/bin/bash
+./forwarding/mirror_gre_bridge_1d.sh:#!/bin/bash
+./forwarding/lib.sh:#!/bin/bash
+./forwarding/mirror_gre_vlan.sh:#!/bin/bash
+./forwarding/mirror_gre_bridge_1q_lag.sh:#!/bin/bash
+./forwarding/ethtool_mm.sh:#!/bin/bash
+./forwarding/vxlan_bridge_1q_ipv6.sh:#!/bin/bash
+./forwarding/tc_chains.sh:#!/bin/bash
+./forwarding/ip6gre_lib.sh:#!/bin/bash
+./fib_nexthop_nongw.sh:#!/bin/bash
+./srv6_end_dt46_l3vpn_test.sh:#!/bin/bash
+./cmsg_so_mark.sh:#!/bin/bash
+./sctp_vrf.sh:#!/bin/bash
+./fdb_flush.sh:#!/bin/bash
+./ndisc_unsolicited_na_test.sh:#!/bin/bash
+./traceroute.sh:#!/bin/bash
+./fib-onlink-tests.sh:#!/bin/bash
+./fib_tests.sh:#!/bin/bash
+./cmsg_time.sh:#!/bin/bash
+./arp_ndisc_untracked_subnets.sh:#!/bin/bash
+./fib_nexthops.sh:#!/bin/bash
+
+linux/tools/testing/selftests/net$ grep -rF ". lib.sh"
+<-- nothing
+
+Thanks,
+Yujie
 
