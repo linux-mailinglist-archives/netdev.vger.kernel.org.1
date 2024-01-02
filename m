@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-61001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF5C8221FF
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:30:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA0382220C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:33:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7084828424C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:30:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 813D31F20FD8
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599EC15AFC;
-	Tue,  2 Jan 2024 19:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E3F15AFB;
+	Tue,  2 Jan 2024 19:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eSQFzGzb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgHGZVTi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D2915AF6;
-	Tue,  2 Jan 2024 19:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160F916403;
+	Tue,  2 Jan 2024 19:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-35fd902c6b5so82044345ab.3;
-        Tue, 02 Jan 2024 11:30:00 -0800 (PST)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-50e766937ddso7714349e87.3;
+        Tue, 02 Jan 2024 11:33:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704223800; x=1704828600; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3dLzJTPxirZd6kW8WXj95cv8++GN7i41+6PgBQongBc=;
-        b=eSQFzGzbZg6tROrl+Qcqzu9qjGwH5tA4deBoyWW6GmyJEyQBR34tW2m2Snli5Fyiw1
-         th4IR22f1xitbeiNQ9oCXhOmqva+ykEfmp2yR0Fq+Za1tKsp4rSkH8iBZEIGyy6uM7Hs
-         1BsKoN8ZRGqarr3PzI68qdnpKG0SZ4/D6P4iB7u1HidftP8LqN9IgXSHc0f5YSUHpQmU
-         fbeCJI1mkV3cafYoY2y5zv0St+zYRfY3CmVe1caZ2NRVpNRTtixKa972iY7f2fEk7Ijv
-         zRB2HEwOeDANCiPs+CAVLRIhU0gxQVXR+wlzRkGyulZ/wyxWRdOEHFuEESOMl9BtWF6p
-         WiwQ==
+        d=gmail.com; s=20230601; t=1704224016; x=1704828816; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oGWoUo2kZlWi4+ZRV37RZOEE77veWDQM4/zk4+0W71I=;
+        b=XgHGZVTiZtlNYQFlxxLkkPyoze8QrYQ34IwRUbpBuhOL+9GOiyPH7PXJ7zFZ7C36lS
+         NXF4JCg4Y3YRg4nLAuZgfnPTgjWLd5VZDsuHJhmT4GgkuiyFBKMMbmVZaxocL9/rroc/
+         ay9kg3+T5bnhdFKpvMF/KUEBuZ5/SlxZ4mQAp3mqbeey+BheClppP8aen6Eyi2ERG+bN
+         DoK64GvweLaAQqgBwB5Z6nbJTI5XxCdBTaDT+phImpP036QISHLpscFZik/EPaWnT1o1
+         +B2jRbGHW2hBJYHZujDAQP8SDq3mcQlh64hvIqKh5EsWulIpPh0J5bK0bAalN38gF1W6
+         162w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704223800; x=1704828600;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1704224016; x=1704828816;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3dLzJTPxirZd6kW8WXj95cv8++GN7i41+6PgBQongBc=;
-        b=jfPGIRvEq2a7L8y3kSp01sTUol0ib8Kc3D3Ex6Fne8Fx79iUW7xs2fFjAp/Q1KJ7gx
-         OGiKuCpGxfv5T3Hary2FhliDkL7qyxaBmfxOo1A7HtqYH/Mxt7jn4+qdw/kOdgrjXm2P
-         PAlNKGjuuIgqp3QqtXTlnGOL4AEt7Rbqqj7+7ZPsD7XWtNxO0z5Me9OJQxorIsFj5q52
-         23gpvZSb5NhaLotoJu2QwVaL4GYeG2AksIIv9WaPw/kJYs4pLK59ktTsh7X82zHNTRH+
-         ht5H2uMKj0h6BHnWDVnSZSLLM9f+LJKV2CQkdXh8+RRXeJHWeUcK0c9EPkbt2bLRyjSi
-         4apg==
-X-Gm-Message-State: AOJu0Yz6KrRy3a9EO773vIkQMpApO8tX956a7W3S0dzAombIAip4jF+I
-	m9LKBWUEmg3rpQY9BjrE9f0=
-X-Google-Smtp-Source: AGHT+IHZfduyvxdowlAgFeALh+0JD54971ApQGhLj0NNcRFVRfJq3vCoS/FL3GlTSK7oZkhyaqnWew==
-X-Received: by 2002:a05:6e02:1521:b0:360:fe1:8abb with SMTP id i1-20020a056e02152100b003600fe18abbmr17508304ilu.119.1704223800080;
-        Tue, 02 Jan 2024 11:30:00 -0800 (PST)
-Received: from ?IPV6:2601:282:1e82:2350:5017:6182:740b:2f80? ([2601:282:1e82:2350:5017:6182:740b:2f80])
-        by smtp.googlemail.com with ESMTPSA id bf12-20020a056e02308c00b0035fec699584sm6772857ilb.13.2024.01.02.11.29.59
+        bh=oGWoUo2kZlWi4+ZRV37RZOEE77veWDQM4/zk4+0W71I=;
+        b=kvaC8/iN2gGMTMfzn33trfGYBsSoYO9CSxj4/e341lesGrrevHI29KAp/3jlt56lfV
+         YuIcQvkTWqHPjfHLZpc00YTxXoKu+kAkIMsIG28BmJArNihFpqEV5jFfe2kgX0DWMEsl
+         4j/7Y4ThOw0usAaG/kJGHjHN3ggCnj/nbGQ+kC9QlbES+ZcRrMSh/gQ23F+KHUaJbc5M
+         JzrPuze1nPYXgIcdWVacv/U129RAtsNGC2cQa5keLvlC9fHxCkZIgcbWbbwx8s0JOBlt
+         MY2r1fxS5qap7cyURSfvpXt7DFwLNkINYd7JLZW2vzLzGis7tK0JJZOpVhVoRKjJFHIz
+         z+YQ==
+X-Gm-Message-State: AOJu0Yy0HCMSyLs1Ah7tZpjL8tHJLxFB5mM7uzFj8VU+kiiIf83u66wh
+	TID3GJlOveBqfwNavX3+FPo=
+X-Google-Smtp-Source: AGHT+IHAMCc2uUTYdMnHH6EZ3MG+3mPuQY5aw/m25i+1vyPNfiDcSX8Fpt45zOIL54FWe3//85BuDQ==
+X-Received: by 2002:a19:5e56:0:b0:50e:80d2:4dd2 with SMTP id z22-20020a195e56000000b0050e80d24dd2mr4459004lfi.103.1704224015732;
+        Tue, 02 Jan 2024 11:33:35 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id x14-20020a19e00e000000b0050e7433d7d7sm3205889lfg.52.2024.01.02.11.33.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jan 2024 11:29:59 -0800 (PST)
-Message-ID: <17a2c694-2c48-46dc-b028-68793a31a984@gmail.com>
-Date: Tue, 2 Jan 2024 12:29:58 -0700
+        Tue, 02 Jan 2024 11:33:35 -0800 (PST)
+Message-ID: <74223164-ab50-4d6d-a4f4-561b0a70d396@gmail.com>
+Date: Tue, 2 Jan 2024 20:33:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,39 +66,133 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-rc 1/2] rdma: Fix core dump when pretty is used
+Subject: Re: [PATCH RFC net-next] net: pcs: pcs-mtk-lynxi fix
+ mtk_pcs_lynxi_get_state() for 2500base-x
+From: Eric Woudstra <ericwouds@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexander Couzens <lynxis@fe80.eu>, Daniel Golle <daniel@makrotopia.org>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240102074408.1049203-1-ericwouds@gmail.com>
+ <ZZP9GR15ufDbjGAJ@shell.armlinux.org.uk>
+ <92190426-3614-4774-9E9F-18F121622788@gmail.com>
 Content-Language: en-US
-To: Leon Romanovsky <leon@kernel.org>,
- Stephen Hemminger <stephen@networkplumber.org>
-Cc: Chengchang Tang <tangchengchang@huawei.com>,
- Junxian Huang <huangjunxian6@hisilicon.com>, jgg@ziepe.ca,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, linuxarm@huawei.com,
- linux-kernel@vger.kernel.org
-References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
- <20231229065241.554726-2-huangjunxian6@hisilicon.com>
- <20231229092129.25a526c4@hermes.local>
- <30d8c237-953a-8794-9baa-e21b31d4d88c@huawei.com>
- <20240102083257.GB6361@unreal>
- <29146463-6d0e-21c5-af42-217cee760b3f@huawei.com>
- <20240102122106.GI6361@unreal> <20240102082746.651ff7cf@hermes.local>
- <20240102191701.GC5160@unreal>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20240102191701.GC5160@unreal>
+In-Reply-To: <92190426-3614-4774-9E9F-18F121622788@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/2/24 12:17 PM, Leon Romanovsky wrote:
->>
->> Part of the problem is the meaning of pretty mode is different in rdma
->> than all of the other commands. The meaning of the flags should be the
->> same across ip, devlink, tc, and rdma; therefore pretty should mean
->> nothing unless json is enabled.
+
+With some extra info:
+
+echo "file drivers/net/phy/* +p" > /sys/kernel/debug/dynamic_debug/control
+
+The log looks like this when sfp inserted:
+
+With the path (on original net-next, no further modifications), Traffic OK:
+
+[   71.212634] sfp sfp-1: mod-def0 0 -> 1
+[   71.216403] sfp sfp-1: tx-fault 1 -> 0
+[   71.220140] sfp sfp-1: SM: enter empty:up:down event insert
+[   71.225716] sfp sfp-1: SM: exit probe:up:down
+[   71.230059] sfp sfp-1: SM: enter probe:up:down event tx_clear
+[   71.235803] sfp sfp-1: SM: exit probe:up:down
+[   71.240195] sfp sfp-1: tx-fault 0 -> 1
+[   71.243939] sfp sfp-1: SM: enter probe:up:down event tx_fault
+[   71.249688] sfp sfp-1: SM: exit probe:up:down
+[   71.254052] sfp sfp-1: tx-fault 1 -> 0
+[   71.257810] sfp sfp-1: SM: enter probe:up:down event tx_clear
+[   71.263542] sfp sfp-1: SM: exit probe:up:down
+[   71.534808] sfp sfp-1: SM: enter probe:up:down event timeout
+[   71.570662] sfp sfp-1: module OEM              SFP-2.5G-T       rev 1.0  sn SK2301110007     dc 230110  
+[   71.580153] mtk_soc_eth 15100000.ethernet eth1: optical SFP: interfaces=[mac=2-4,22-23, sfp=23]
+[   71.588848] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 10,13-14,47
+[   71.598941] mtk_soc_eth 15100000.ethernet eth1: optical SFP: chosen 2500base-x interface
+[   71.607605] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 00,00000000,00008000,00006400
+[   71.619321] sfp sfp-1: tx disable 1 -> 0
+[   71.623287] sfp sfp-1: SM: exit present:up:wait
+[   71.636489] hwmon hwmon0: temp1_input not attached to any thermal zone
+[   71.684749] sfp sfp-1: SM: enter present:up:wait event timeout
+[   71.690587] sfp sfp-1: SM: exit present:up:wait_los
+[   74.704872] sfp sfp-1: los 1 -> 0
+[   74.708199] sfp sfp-1: SM: enter present:up:wait_los event los_low
+[   74.714389] sfp sfp-1: SM: exit present:up:link_up
+[   74.714422] mtk_soc_eth 15100000.ethernet eth1: Link is Up - 2.5Gbps/Full - flow control off
+
+Without the patch, No traffic possible:
+
+[  261.515414] sfp sfp-1: los 1 -> 0
+[  261.518740] sfp sfp-1: SM: enter empty:up:down event los_low
+[  261.524418] sfp sfp-1: SM: exit empty:up:down
+[  261.528799] sfp sfp-1: mod-def0 0 -> 1
+[  261.532541] sfp sfp-1: los 0 -> 1
+[  261.535843] sfp sfp-1: SM: enter empty:up:down event insert
+[  261.541406] sfp sfp-1: SM: exit probe:up:down
+[  261.545748] sfp sfp-1: SM: enter probe:up:down event los_high
+[  261.551481] sfp sfp-1: SM: exit probe:up:down
+[  261.555859] sfp sfp-1: tx-fault 1 -> 0
+[  261.559595] sfp sfp-1: SM: enter probe:up:down event tx_clear
+[  261.565330] sfp sfp-1: SM: exit probe:up:down
+[  261.859940] sfp sfp-1: SM: enter probe:up:down event timeout
+[  261.895690] sfp sfp-1: module OEM              SFP-2.5G-T       rev 1.0  sn SK2301110007     dc 230110  
+[  261.905218] mtk_soc_eth 15100000.ethernet eth1: optical SFP: interfaces=[mac=2-4,22-23, sfp=23]
+[  261.913929] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 10,13-14,47
+[  261.924104] mtk_soc_eth 15100000.ethernet eth1: optical SFP: chosen 2500base-x interface
+[  261.932199] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 00,00000000,00008000,00006400
+[  261.945449] sfp sfp-1: tx disable 1 -> 0
+[  261.950886] sfp sfp-1: SM: exit present:up:wait
+[  261.973346] hwmon hwmon0: temp1_input not attached to any thermal zone
+[  262.009896] sfp sfp-1: SM: enter present:up:wait event timeout
+[  262.015771] sfp sfp-1: SM: exit present:up:wait_los
+[  264.842218] sfp sfp-1: los 1 -> 0
+[  264.845544] sfp sfp-1: SM: enter present:up:wait_los event los_low
+[  264.851770] sfp sfp-1: SM: exit present:up:link_up
+[  264.851801] mtk_soc_eth 15100000.ethernet eth1: Link is Up - Unknown/Unknown - flow control off
+
+
+So if phylink_mii_c22_pcs_decode_state() should not set the speed, then it is not correctly set somewhere else.
+
+On 1/2/24 13:55, Eric Woudstra wrote:
+>> Please describe your setup more fully. What is the link partner on this
+>> 2500base-X link?
 > 
-> I was very inspired by devlink when wrote rdmatool. It is supposed to
-> behave the same. :)
-
-You need better inspirations :-)
-
-It was a mistake to merge devlink source code into iproute2 without a
-commitment to bring it inline with other iproute2 commands.
+> I use a BananaPi R3, with the oem-sfp2.5g-t module. It has the SFP quirk that disables autoneg. I was trying Marek's rtl8221b patchset, but found that even with unmodified code,  original net-next unmodified, I could get link up, but no traffic is going through.
+> 
+> On the other side is a.rock5b with rtl8125b.
+> 
+> Only after applying this patch, it works and eth1 reports link up with 2.5Gbps instead of unknown speed.
+> 
+> If you need more debugging info, I can supply it at a later time.
+> 
+> 
+> On January 2, 2024 1:10:01 PM GMT+01:00, "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+>> On Tue, Jan 02, 2024 at 08:44:08AM +0100, Eric Woudstra wrote:
+>>> From: Daniel Golle <daniel@makrotopia.org>
+>>>
+>>> Need to fix mtk_pcs_lynxi_get_state() in order for the pcs to function
+>>> correctly when the interface is set to 2500base-x, even when
+>>> PHYLINK_PCS_NEG_INBAND_DISABLED is set.
+>>
+>> Please describe your setup more fully. What is the link partner on this
+>> 2500base-X link?
+>>
+>> In PHYLINK_PCS_NEG_INBAND_DISABLED mode, this means that phylink is
+>> operating in inband mode, but Autoneg is clear in the advertisement
+>> mask, meaning Autoneg is disabled and we are using a "fixed" setting.
+>> state->speed and state->duplex should already be initialised.
+>>
+>>> When the pcs is set to 2500base-x, the register values are not compatible
+>>> with phylink_mii_c22_pcs_decode_state(). It results in parameters such as
+>>> speed unknown and such. Then the mac/pcs are setup incorrectly and do not
+>>> function.
+>>
+>> Since Autoneg is clear, phylink_mii_c22_pcs_decode_state() won't
+>> change state->speed and state->duplex, which should already be
+>> correctly set.
+>>
 
