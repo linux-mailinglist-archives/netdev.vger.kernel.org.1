@@ -1,61 +1,48 @@
-Return-Path: <netdev+bounces-60832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 751DF821A1D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:40:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADF9D821AE1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 12:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23302282F8A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 10:40:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 559601F2279F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 11:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14ED2D313;
-	Tue,  2 Jan 2024 10:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PmkeEPzZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB11DF61;
+	Tue,  2 Jan 2024 11:25:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA713D2F1
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 10:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Iv8crqgMiAZjXHdAoXgKE0yfYLjRGHZYS1MYR3F1KSQ=; b=PmkeEPzZTbPBo+tOWdrIgCElpb
-	UljhQGbTR2Iuake2aKEjY1anwPFnnG86MtQ/1KgnuYYTJwbiybldsGlLxWbZqufGXelclayVIlndo
-	MKXpat1Lkmw7b+2JRb8gcPPJcmmnf0UdAk7+0SC6Lel/jOuhhlXCkFiAWeJ4VegXQgUWcrjBZ2AzC
-	uUXBj/n+phydOYdQbshPW382/jufP0LGJl1l4llR8yHDu+cAOqKos0dv1I0hItO2EzkbWHNYle78F
-	0fSNXE7j5aak0ggDf/tsB5hFQBvTxfafdH8jVSFbHfoEV2XRoFKjrCb5JPLwmpFHXQI947YkVe5iF
-	4Azml0xw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48364)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKcCO-0006P7-2Z;
-	Tue, 02 Jan 2024 10:40:40 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKcCP-0005CL-MA; Tue, 02 Jan 2024 10:40:41 +0000
-Date: Tue, 2 Jan 2024 10:40:41 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
-	chenhuacai@loongson.cn, guyinggang@loongson.cn,
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v7 3/9] net: stmmac: dwmac-loongson: Add full
- PCI support
-Message-ID: <ZZPoKceXELZQU8cq@shell.armlinux.org.uk>
-References: <cover.1702990507.git.siyanteng@loongson.cn>
- <b43293919f4ddb869a795e41266f7c3107f79faf.1702990507.git.siyanteng@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807F0DF5D;
+	Tue,  2 Jan 2024 11:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rKcQJ-0006IK-2M;
+	Tue, 02 Jan 2024 10:55:04 +0000
+Date: Tue, 2 Jan 2024 11:52:34 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH RFC net-next] net: phylink: add quirk for disabling
+ in-band-status for mediatek pcs at 2500base-x
+Message-ID: <ZZPq8iMAv3eR9Gfk@pidgin.makrotopia.org>
+References: <20240102074326.1049179-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,45 +51,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b43293919f4ddb869a795e41266f7c3107f79faf.1702990507.git.siyanteng@loongson.cn>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20240102074326.1049179-1-ericwouds@gmail.com>
 
-On Tue, Dec 19, 2023 at 10:17:06PM +0800, Yanteng Si wrote:
-> @@ -125,42 +126,48 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
->  	if (ret)
->  		goto err_disable_device;
->  
-> -	bus_id = of_alias_get_id(np, "ethernet");
-> -	if (bus_id >= 0)
-> -		plat->bus_id = bus_id;
-> +	if (np) {
-> +		bus_id = of_alias_get_id(np, "ethernet");
-> +		if (bus_id >= 0)
-> +			plat->bus_id = bus_id;
->  
-> -	phy_mode = device_get_phy_mode(&pdev->dev);
-> -	if (phy_mode < 0) {
-> -		dev_err(&pdev->dev, "phy_mode not found\n");
-> -		ret = phy_mode;
-> -		goto err_disable_device;
-> +		phy_mode = device_get_phy_mode(&pdev->dev);
-> +		if (phy_mode < 0) {
-> +			dev_err(&pdev->dev, "phy_mode not found\n");
-> +			ret = phy_mode;
-> +			goto err_disable_device;
-> +		}
-> +		plat->phy_interface = phy_mode;
->  	}
->  
-> -	plat->phy_interface = phy_mode;
-> -
+On Tue, Jan 02, 2024 at 08:43:26AM +0100, Eric Woudstra wrote:
+> In follow up to: net: pcs: pcs-mtk-lynxi: use 2500Base-X without AN
+> 
+> MediaTek LynxI PCS, 2500Base-X will only work without inband status due to
+> hardware limitation.
+> 
+> I understand this patch probably will not get approved as it is now, but
+> perhaps with some pointers in the correct direction to follow, I can change
+> it so it could be. It does however get the result that the rtl8221b on a
+> sfp module functions correctly, with and without (as optical sfp) the phy
+> attached and without using a quirk/ethtool to disable auto-negotiation.
+> 
+> Introduce bool phylink_major_no_inband(pl,interface), a function similar to
+> bool phylink_phy_no_inband(phy). An option could be to use a function like
+> bool pcs->ops->supports_inband(interface), where if the function-pointer is
+> null, it means it is supported for all. This instead of using
+> of_device_is_compatible() inside the phylink_major_no_inband() function.
+> 
+> Code added to phylink_major_config():
+> 
+> When there is no PHY attached, pl->pcs_neg_mode is set to
+> PHYLINK_PCS_NEG_INBAND_DISABLED.
+> 
+> When there is a PHY attached, pl->cur_link_an_mode is set to MLO_AN_PHY.
+> To have the pcs function correctly with the rtl8221b, we need to do the
+> following to the in-band-status:
+> 
+> We need to disable it when interface of the pcs is set to 2500base-x,
+> but need it enable it when switched to sgmii.
+> 
+> So we get:
+> 
+> [...] mtk_soc_eth ... eth1: phy link up sgmii/1Gbps/Full/none/rx/tx
+> [...] mtk_soc_eth ... eth1: phylink_mac_config: mode=inband/sgmii/none
+>                                 adv=00,00000000,00000000,00000000 pause=03
+> 
+> [...] mtk_soc_eth ... eth1: phy link up 2500base-x/2.5Gbps/Full/none/rx/tx
+> [...] mtk_soc_eth ... eth1: phylink_mac_config: mode=phy/2500base-x/none
+>                                 adv=00,00000000,00008000,0000606f pause=03
+> 
+> Changes to be committed:
+> 	modified:   drivers/net/phy/phylink.c
+> 
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+>  drivers/net/phy/phylink.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
 
-So this is why phy_interface changes in patch 2. It would have been good
-to make a forward reference to this change to explain in patch 2 why the
-"default" value has been set there. Or maybe move the setting of that
-default value into this patch?
+Your changes should go into mtk_eth_soc.c, you sould not need to modify
+phylink for this and as the link being up or down is still reported
+correctly by the hardware, it is also ok to have phylink believe that
+in-band-status is being used and just not set the SGMII_AN bit in the
+MediaTek LynxI hardware.
+(ie. only auto-negotiation of speed and duplex doesn't work in
+2500Base-X mode)
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 298dfd6982a5..6e443eb8ee46 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -1074,6 +1074,22 @@ static void phylink_pcs_an_restart(struct phylink *pl)
+>  		pl->pcs->ops->pcs_an_restart(pl->pcs);
+>  }
+>  
+> +static bool phylink_major_no_inband(struct phylink *pl, phy_interface_t interface)
+> +{
+> +	struct device_node *node = pl->config->dev->of_node;
+> +
+> +	if (!node)
+> +		return false;
+> +
+> +	if (!of_device_is_compatible(node, "mediatek,eth-mac"))
+> +		return false;
+> +
+> +	if (interface != PHY_INTERFACE_MODE_2500BASEX)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  static void phylink_major_config(struct phylink *pl, bool restart,
+>  				  const struct phylink_link_state *state)
+>  {
+> @@ -1085,10 +1101,22 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+>  
+>  	phylink_dbg(pl, "major config %s\n", phy_modes(state->interface));
+>  
+> +	if (phylink_major_no_inband(pl, state->interface) && (!!pl->phydev)) {
+> +		if (pl->cur_link_an_mode == MLO_AN_INBAND)
+> +			pl->cur_link_an_mode = MLO_AN_PHY;
+> +		else
+> +			/* restore mode if it was changed before */
+> +			pl->cur_link_an_mode = pl->cfg_link_an_mode;
+> +	}
+> +
+>  	pl->pcs_neg_mode = phylink_pcs_neg_mode(pl->cur_link_an_mode,
+>  						state->interface,
+>  						state->advertising);
+>  
+> +	if (phylink_major_no_inband(pl, state->interface) && !pl->phydev &&
+> +	    pl->pcs_neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
+> +		pl->pcs_neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED;
+> +
+>  	if (pl->using_mac_select_pcs) {
+>  		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+>  		if (IS_ERR(pcs)) {
+> @@ -1218,6 +1246,9 @@ static void phylink_mac_pcs_get_state(struct phylink *pl,
+>  				      struct phylink_link_state *state)
+>  {
+>  	linkmode_copy(state->advertising, pl->link_config.advertising);
+> +	if (pl->pcs_neg_mode == PHYLINK_PCS_NEG_INBAND_DISABLED)
+> +		linkmode_clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+> +				   state->advertising);
+>  	linkmode_zero(state->lp_advertising);
+>  	state->interface = pl->link_config.interface;
+>  	state->rate_matching = pl->link_config.rate_matching;
+> -- 
+> 2.42.1
+> 
 
