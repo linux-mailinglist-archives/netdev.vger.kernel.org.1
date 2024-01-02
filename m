@@ -1,129 +1,76 @@
-Return-Path: <netdev+bounces-60989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-60990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22DF4822186
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:58:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD5E8822189
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19EC11C204DB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:58:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41254B21698
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 18:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CCA15ACB;
-	Tue,  2 Jan 2024 18:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jigvRpLJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C43AE15ADB;
+	Tue,  2 Jan 2024 18:59:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3319315E94
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 18:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=mmVmQhZwktm1Hw+NZEEcN7EjqEI6Ht/JmaP7qk2BUmA=; b=jigvRpLJp6J1NXQLLq6neI68Jk
-	qan3/55f9OsuZoKOksGycQovEIUXPeMTN9GiLx6UOtm2bCo0Cq6Qs0f/0QdxTE//L183ozpfAsIZj
-	iDhIwAosAPW7fnte8lsahFEPVceUjWti+afNMzYv6oP62gOHe6DgATE+OJGHW/ltBjIltv6FsCOuB
-	8lVqDQzvCs+B0GLjp9knwmZPZ9mE/IGy3zPQmmx+TsLOUVaBhvnAhoJZr6CvW/wHimcXmVOAba3T5
-	aZQO4oecmPPxOwlk3HKHNA4QH+5yvSZuHmGAi/OxLAvLSxzCkUUhyD2TZHASO7XcawMtGiGBgFTfz
-	rT1KmDXw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45758)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKjxe-0006pC-1K;
-	Tue, 02 Jan 2024 18:57:58 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKjxf-0005Yb-UJ; Tue, 02 Jan 2024 18:57:59 +0000
-Date: Tue, 2 Jan 2024 18:57:59 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Ezra Buehler <ezra@easyb.ch>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Michael Walle <michael@walle.cc>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F0D15AC7;
+	Tue,  2 Jan 2024 18:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4T4MbW62Cxz9smm;
+	Tue,  2 Jan 2024 19:59:35 +0100 (CET)
+From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
-Message-ID: <ZZRct1o21NIKbYX1@shell.armlinux.org.uk>
-References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
- <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
- <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
- <8eb06ee9-d02d-4113-ba1e-e8ee99acc2fd@gmail.com>
- <2013fa64-06a1-4b61-90dc-c5bd68d8efed@lunn.ch>
- <CAM1KZSn0+k4YKc2qy6DEafkL840ybjaun7FbD4OFwOwNZw_LEg@mail.gmail.com>
+Subject: [PATCH 0/5] Bluetooth: Improve retrying of connection attempts
+Date: Tue,  2 Jan 2024 19:59:27 +0100
+Message-ID: <20240102185933.64179-1-verdre@v0yd.nl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM1KZSn0+k4YKc2qy6DEafkL840ybjaun7FbD4OFwOwNZw_LEg@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Rspamd-Queue-Id: 4T4MbW62Cxz9smm
 
-On Tue, Jan 02, 2024 at 07:08:32PM +0100, Ezra Buehler wrote:
-> Hi Andrew,
-> 
-> On Tue, Jan 2, 2024 at 4:50 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > I do however disagree with this statement in the original patch:
-> >
-> > > AFAICT all SMSC/Microchip PHYs are Clause 22 devices.
-> 
-> Excuse my ignorance, I am by no means an expert here. I guess what I
-> wanted to say was:
-> 
-> By skimming over some datasheets for similar SMSC/Microchip PHYs, I
-> could not find any evidence that they support Clause 45 scanning
-> (other than not responding).
-> 
-> > drivers/net/phy/smsc.c has a number of phy_write_mmd()/phy_read_mmd()
-> > in it. But that device has a different OUI.
-> 
-> I guess I am confused here, AFAICT all PHYs in smsc.c have the same OUI
-> (phy_id >> 10).
-> 
-> > However, the commit message says:
-> >
-> > > Running a Clause 45 scan on an SMSC/Microchip LAN8720A PHY will (at
-> > > least with our setup) considerably slow down kernel startup and
-> > > ultimately result in a board reset.
-> >
-> > So we need to clarify the real issue here. Does the C45 scan work
-> > correctly, but the board watchdog timer is too short and fires? We
-> > should not be extended this workaround when its a bad watchdog
-> > configuration issue...
-> 
-> Changing the watchdog configuration is not an option here. We are
-> talking about a slowdown of several seconds here, that is not acceptable
-> on its own.
+Since commit 4c67bc74f016b0d360b8573e18969c0ff7926974, the kernel supports
+trying to connect again in case the bluetooth card is busy and fails
+to connect.
 
-Any ideas why the scan is taking so long?
+The logic that should handle this became a bit spotty over time, and also
+cards these days appear to fail with more errors than just "Command
+Disallowed".
 
-For each PHY address (of which there are 32) we scan each MMD between
-1 and 31 inclusive. We attempt to read the devices-in-package
-registers. That means 32 * 32 * 2 calls to the mdiobus_c45_read(),
-which is 2048 calls. Each is two MDIO transactions on the bus, so
-that's 4096. Each is 64 bits long including preamble, and at 2.5MHz
-(the "old" maximum) it should take about 100ms to scan the each
-MMD on each PHY address to determine whether a device is present.
+This series tries to improve the logic for retrying "HCI Create
+Connection" and adds support for two more errors that can indicate the
+hardware being busy.
 
-I'm guessing the MDIO driver you are using is probably using a software
-timeout which is extending the latency of each bus frame considerably.
-Maybe that is where one should be looking if the timing is not
-acceptable?
+Jonas Dreßler (5):
+  Bluetooth: Remove superfluous call to hci_conn_check_pending()
+  Bluetooth: hci_event: Use HCI error defines instead of magic values
+  Bluetooth: hci_event: Remove limit of 2 reconnection attempts
+  Bluetooth: hci_event: Do sanity checks before retrying to connect
+  Bluetooth: hci_event: Try reconnecting on more kinds of errors
+
+ include/net/bluetooth/hci.h |  3 ++
+ net/bluetooth/hci_event.c   | 57 +++++++++++++++++++++++++++++++------
+ 2 files changed, 51 insertions(+), 9 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
