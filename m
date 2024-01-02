@@ -1,111 +1,137 @@
-Return-Path: <netdev+bounces-61004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C723E822245
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:49:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B855C82224A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 20:53:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0563FB20F9F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:49:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 466C9B21DAD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 19:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6780815E9F;
-	Tue,  2 Jan 2024 19:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F5015E9F;
+	Tue,  2 Jan 2024 19:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ucM9RwU4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cqqms3YL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEAB15E97
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 19:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GK7ohoY1pbrtZO07doSQp+gcs5kdn4HCPhJRWxtyZ6c=; b=ucM9RwU4tzkMgnuK76O734u22s
-	39TU+Y3zEbSIjPgZSuOhXgSWojOY02HcevkLl7o03ov9pbeMCFHFkob4PcEuE5MGy6KHde5Cer+6I
-	uHLO3jRudzJZk/QF6hPIFlx6dAgIkq9DYbcqD08QxrCzmi9BzWOOPVmFCB7hYk0FnQJY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rKklH-004CJL-7t; Tue, 02 Jan 2024 20:49:15 +0100
-Date: Tue, 2 Jan 2024 20:49:15 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ezra Buehler <ezra@easyb.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Michael Walle <michael@walle.cc>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
-Message-ID: <7e0d6081-f777-4f40-b0be-a12171f772f4@lunn.ch>
-References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
- <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
- <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
- <8eb06ee9-d02d-4113-ba1e-e8ee99acc2fd@gmail.com>
- <2013fa64-06a1-4b61-90dc-c5bd68d8efed@lunn.ch>
- <CAM1KZSn0+k4YKc2qy6DEafkL840ybjaun7FbD4OFwOwNZw_LEg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8872215EAC
+	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 19:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5534dcfdd61so16622261a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jan 2024 11:53:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704225195; x=1704829995; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9JMWGGZN9JfukstGvotz8hLrV000kf8geQvXaNOgI1M=;
+        b=Cqqms3YLWHFWh+pE4M/lT04gu6vHorN7UPhGuVnpo2pJS8loP/0wacdeMEwo8lBiKP
+         6hWvkomrlZ4ly7hZAHHA/LUpqWNNyRK0lBTV35PIATMPaQeHLgFjaYcm9kqhJQP3vS7T
+         +J4x6XTHCiNeD6xnakWr8g8V/oFJxUV7kwxJrNAo2WxCJeyg0J6XV54cgxA3RqtMpM9p
+         EXiwxFTasztdAwL2pkPOf53Jg23jkMxgm4b9wnfsDHoHRNRyJ4Vt/2fDlaU8XJWs7K9M
+         rX9Y+l7i6MT/3RNTLgIF23/iX/WeFJxJCF01yjDRLfdAAHBcvIjhX15JONqY1LDTqkgO
+         2drw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704225195; x=1704829995;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9JMWGGZN9JfukstGvotz8hLrV000kf8geQvXaNOgI1M=;
+        b=fVyzGc7oYDkHzD3hZx1sJSW8ilheFFjXEiQbQvp732K3a3O7V7pnGkqFLQ0+5pMAnF
+         P3RXc+ioTBR0Zz/nrb8l1yoymAtlk7LRbv0HNNaydmeRyjtVhynrp3RTrbEIpwdMTpT0
+         llwZOVcmPPW4VQ8FH0lXJdCSW5KulFXBZyISBe3nmFDhCzID2cR8nU8KDd5sHfb5lnSF
+         /a2srHBV8E5J3YWNAYwotxE4wNyv/DEgU+YIALqm6i1zyYhsn2PuGqg+m4yyybXHWpSp
+         vHjxutq3TsQS2Oyb+NHsuF8GVWMkq6N13wmaai7cWyhKf5/Fn8scD+KuVTmqcEUlB3sD
+         aLjw==
+X-Gm-Message-State: AOJu0YzvTlAAuzVecIfDqicMCxdc8qN9Yt1G+lyJntfblFHkY/jueKzc
+	ExFlyrzom1/HRxbxlzUF4tr2FRI96Do=
+X-Google-Smtp-Source: AGHT+IFMGp9r37Brpb4w5EfBCgFcDXvFWpMvudvs9CaFHQernQW/0B0T9B0k+O3DIkaBo3MLBdsF/w==
+X-Received: by 2002:a05:6402:3583:b0:554:a397:8e68 with SMTP id y3-20020a056402358300b00554a3978e68mr14248461edc.16.1704225194459;
+        Tue, 02 Jan 2024 11:53:14 -0800 (PST)
+Received: from ?IPV6:2a01:c23:c1df:9400:e9d7:fbcb:4065:ab66? (dynamic-2a01-0c23-c1df-9400-e9d7-fbcb-4065-ab66.c23.pool.telefonica.de. [2a01:c23:c1df:9400:e9d7:fbcb:4065:ab66])
+        by smtp.googlemail.com with ESMTPSA id cq8-20020a056402220800b0055507ee70a4sm10222662edb.23.2024.01.02.11.53.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jan 2024 11:53:13 -0800 (PST)
+Message-ID: <3e99877a-6f85-4842-8418-584a8aaf03f7@gmail.com>
+Date: Tue, 2 Jan 2024 20:53:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAM1KZSn0+k4YKc2qy6DEafkL840ybjaun7FbD4OFwOwNZw_LEg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: mdio_bus: make check in
+ mdiobus_prevent_c45_scan more granular
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: Russell King <rmk+kernel@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <42e0d1c5-fdd2-4347-874d-2dab736abbdc@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <42e0d1c5-fdd2-4347-874d-2dab736abbdc@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> By skimming over some datasheets for similar SMSC/Microchip PHYs, I
-> could not find any evidence that they support Clause 45 scanning
-> (other than not responding).
-
-Do you find any reference to Clause 22 scanning being supported in the
-datasheets?
-
-What we expect is that C22 registers 2 and 3 contain ID values. If
-there is no device at the address on the bus, nothing should respond,
-and the pull up on the bus should result in a read of 0xffff. If we
-get a value other than 0xffff, we know there is a device there. The
-same is basically true for C45, but because each address has 32 MMD
-spaces, its a bit more complex. But still, if there is no device
-there, it should return 0xffff when reading an ID register. This is
-all part of IEEE 802.3, so there is no real need to specific this in
-the datasheet, other than to say its conformance to 802.3, or list
-where it does not conform.
-
+On 02.01.2024 16:54, Heiner Kallweit wrote:
+> Matching on OUI level is a quite big hammer. So let's make matching
+> more granular.
 > 
-> > drivers/net/phy/smsc.c has a number of phy_write_mmd()/phy_read_mmd()
-> > in it. But that device has a different OUI.
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/phy/mdio_bus.c | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
 > 
-> I guess I am confused here, AFAICT all PHYs in smsc.c have the same OUI
-> (phy_id >> 10).
 
-My error. I forgot about the odd shift. So smsc.c does use the 01f0
-OUI.
-
-> > However, the commit message says:
-> >
-> > > Running a Clause 45 scan on an SMSC/Microchip LAN8720A PHY will (at
-> > > least with our setup) considerably slow down kernel startup and
-> > > ultimately result in a board reset.
-> >
-> > So we need to clarify the real issue here. Does the C45 scan work
-> > correctly, but the board watchdog timer is too short and fires? We
-> > should not be extended this workaround when its a bad watchdog
-> > configuration issue...
-> 
-> Changing the watchdog configuration is not an option here. We are
-> talking about a slowdown of several seconds here, that is not acceptable
-> on its own.
-
-I'm with Russell here, we should understand why its so slow. And by
-fixing that, you might find access in general gets better.
-
-       Andrew
+Shall we put this on hold until we better understand the root
+cause of the original issue?
 
 
