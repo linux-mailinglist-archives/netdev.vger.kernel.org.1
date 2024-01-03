@@ -1,89 +1,114 @@
-Return-Path: <netdev+bounces-61150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F8F8822B50
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:27:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15EED822B67
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29FE61F2405B
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:27:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AFE11C22E77
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753C218E36;
-	Wed,  3 Jan 2024 10:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8554F18B0D;
+	Wed,  3 Jan 2024 10:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b/2JdAg8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J2xzDKFW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A38518B08;
-	Wed,  3 Jan 2024 10:26:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20162C433C9;
-	Wed,  3 Jan 2024 10:26:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704277595;
-	bh=BjFdMMXze1pGXCEQZ4TAZ3lfzx5oNEM9IyQG06g4aNw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=b/2JdAg8WqBQCQQ1oDn7RhkRMmyVpfhAx2bFcr1Bfeuefz4ZzDCRM8po+DTRwygkp
-	 rxd5RXNr0oG3LVFOUR5rG4j5a7qEciNHy/qJPQ3c0sX8iTMeSaEaUYM5wmrFf4OfeJ
-	 UdK5NirPoG9Ysf9fp/gfEytjZXQQWK1UfFmQoIfkXJ029i6eJ57LPbS5HqYMhvirK5
-	 wCzpRH+c9JSUnZnq4I88LgEmQB+8eYFZtwd+5MWmsTCTjPiEZOzhokghS4uZwHiOtF
-	 p4I7oG9vDjbDb2RsualTWHAihakHc2h3Yb2BAM6knyxE9nFCTQXaufS97GgDI/yXsx
-	 Pw8EIVYrSEWBA==
-From: Arnd Bergmann <arnd@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] r8169: fix building with CONFIG_LEDS_CLASS=m
-Date: Wed,  3 Jan 2024 11:26:25 +0100
-Message-Id: <20240103102630.3770242-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DEC918AF1
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 10:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=S5O56tcQC4vWMrlcAyZtSd/U+zZMlsONGKHie5BZf20=; b=J2xzDKFWkvTvWI8ipd05EdFPt5
+	7y4wF7vZCd0UF01oFDAiCCOMbOKtYEX5X3iksH/SROK9+Dr4pm6UpMnTAJwUbDSAoAdAbWhix28AC
+	GomTcvcN0Lg4Eg6OQkAi9dQbrzs41krcKBF4clbr6LTiZuBjrYzUORuQn2lJ6wqhD4cr86UxV4seE
+	rlWW2e/u21kFnPqnHcOqjAyL6d4ZNE3oI1cL4Zd1k2A8NjR+4tOpGCIgiB5CxCsM1vYm8aWF+CVRv
+	LHVqISkx+avUXHvA9qvhTeFgA1ITXx7x63nENki8Xh2FZf5HDj7mSVMUYr+i779yMBb2W70gEmSdM
+	gIKfwbig==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45214)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKyVT-0007L2-32;
+	Wed, 03 Jan 2024 10:29:51 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKyVW-0006HT-IG; Wed, 03 Jan 2024 10:29:54 +0000
+Date: Wed, 3 Jan 2024 10:29:54 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: phy: extend
+ genphy_c45_read_eee_abilities() to read capability 2 register
+Message-ID: <ZZU3Ijo2TCIHJvJh@shell.armlinux.org.uk>
+References: <20231220161258.17541-1-kabel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231220161258.17541-1-kabel@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Dec 20, 2023 at 05:12:58PM +0100, Marek Behún wrote:
+> +/**
+> + * genphy_c45_read_eee_cap2 - read supported EEE link modes from register 3.21
+> + * @phydev: target phy_device struct
+> + */
+> +static int genphy_c45_read_eee_cap2(struct phy_device *phydev)
+> +{
+> +	int val;
+> +
+> +	/* IEEE 802.3-2018 45.2.3.11 EEE control and capability 2
+> +	 * (Register 3.21)
+> +	 */
+> +	val = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_EEE_ABLE2);
+> +	if (val < 0)
+> +		return val;
+> +
+> +	/* The 802.3 2018 standard says the top 6 bits are reserved and should
+> +	 * read as 0.
+> +	 * If MDIO_PCS_EEE_ABLE2 is 0xffff assume EEE is not supported.
+> +	 */
+> +	if (val == 0xffff)
+> +		return 0;
 
-When r8169 is built-in but the LED support is a loadable module, the
-new code to drive the LED now causes a link failure:
+802.3 also says that unimplemented registers should read as zeros.
+Reserved bits should read as 0, but reserved typically means (as we've
+seen several times) that bits get used in the future. Do you have a
+good reason why this check is necessary?
 
-ld: drivers/net/ethernet/realtek/r8169_leds.o: in function `rtl8168_init_leds':
-r8169_leds.c:(.text+0x36c): undefined reference to `devm_led_classdev_register_ext'
+> +
+> +	mii_eee_cap2_mod_linkmode_t(phydev->supported_eee, val);
+> +
+> +	/* Some buggy devices may indicate EEE link modes in MDIO_PCS_EEE_ABLE2
+> +	 * which they don't support as indicated by BMSR, ESTATUS etc.
+> +	 */
+> +	linkmode_and(phydev->supported_eee, phydev->supported_eee,
+> +		     phydev->supported);
 
-Add a Kconfig dependency to prevent the broken configuration but still
-allow having the network code built-in as long as CONFIG_LEDS_TRIGGER_NETDEV
-is disabled, regardless of CONFIG_LEDS_CLASS.
+I wonder whether we should just do that as a general thing after
+reading all the abilities in phy_probe() rather than burying it in
+various capability reading functions?
 
-Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/net/ethernet/realtek/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Apart from those two, I don't see any other issues with the patch.
 
-diff --git a/drivers/net/ethernet/realtek/Kconfig b/drivers/net/ethernet/realtek/Kconfig
-index 93d9df55b361..fd3f18b328de 100644
---- a/drivers/net/ethernet/realtek/Kconfig
-+++ b/drivers/net/ethernet/realtek/Kconfig
-@@ -98,6 +98,7 @@ config 8139_OLD_RX_RESET
- config R8169
- 	tristate "Realtek 8169/8168/8101/8125 ethernet support"
- 	depends on PCI
-+	depends on LEDS_CLASS || !LEDS_TRIGGER_NETDEV
- 	select FW_LOADER
- 	select CRC32
- 	select PHYLIB
 -- 
-2.39.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
