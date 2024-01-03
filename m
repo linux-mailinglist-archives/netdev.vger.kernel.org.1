@@ -1,108 +1,174 @@
-Return-Path: <netdev+bounces-61204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE19822DEA
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:00:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE2A7822DFA
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:06:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8685BB22DD9
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:00:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2B581C21772
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD261944C;
-	Wed,  3 Jan 2024 13:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC03E19469;
+	Wed,  3 Jan 2024 13:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AmodyKMx"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="o1HORcO6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8536F199A7
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 13:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-28c0536806fso7636638a91.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 05:00:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704286813; x=1704891613; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NqXgQKmWJL+0Y56Ym1J0ReDHakNaewTonypkfLP84og=;
-        b=AmodyKMxTCN8R5L70KKaJVBJ8PuoSTkEYc/TEr67YI85fw2seKk/JnDDmA6msRfEMx
-         KnaRc62ZqWVUCuoinN16W5kuFzNV5IAO+yDc24peE/vBmx4s0HFUeq64r5YcJ6O/2p4G
-         s3oyGQ46vbHqBFKwBOtrtt3SCTbMG5pgP/twsKxG6IngZwz9FxxOF1+N6ZnP0Wzfl3wO
-         UlF7wzSy9/KAebcbgxyN/y3SOWI/JsdZZs+cOyV+wx1q0AerOTOkcpA66fsyVB1s7KNV
-         ScpciE/Tw/iAxvRg1mmLboXWuB4fhRI6b7CCDk15r+7u7wTcq3gwxIPkVyVpPFs1th7q
-         vp1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704286813; x=1704891613;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NqXgQKmWJL+0Y56Ym1J0ReDHakNaewTonypkfLP84og=;
-        b=iKgR6KRdM1XrWNgmHY9LBxsQe3O0UhILNhWRlcLbU2w5Cy2u99gRnpE7Sms4Dlf5ng
-         jcS30348EOY4hFbr+53AWgMMiZ1r10ZXTE0Jqg+C3uYqROOEP9MplDV2lKVy5K7zwvaR
-         B3nLziHT19H+PbL8DLd6eVN10v60oVXaWGJqZf+KcvdSUYn9dJMCV8n8DqBgd8iteI0H
-         I0fxe1waqQV34q9KjxZp/2F320jZXUl7ipZEGBLrkwXcSt8d+qh4FRQIjrmjsEj+ivIt
-         N2TXlGFLWx528R9ibGRhGbZlFlhEw9gjrdBfAa1bBLKR/SnMIwmIe6UEjtbSECH4RU2l
-         vPyw==
-X-Gm-Message-State: AOJu0YxFnUTi8CvtcY16mFCR/VG88+YzLdcUym2m2qFER55r5f4AT1x0
-	vJxAbVQhYuf3f0Y/VNNXziM=
-X-Google-Smtp-Source: AGHT+IECvia1M5IRaUWoX/pwg44a8izsc2woZZKpZfaLsLxYKrBLXPZl9Q+gBDN0CAjMCtLQoFV06Q==
-X-Received: by 2002:a17:90a:7a86:b0:28c:4b8c:9729 with SMTP id q6-20020a17090a7a8600b0028c4b8c9729mr7974246pjf.2.1704286812851;
-        Wed, 03 Jan 2024 05:00:12 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id so2-20020a17090b1f8200b0028c940cdad8sm1631045pjb.5.2024.01.03.05.00.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 05:00:11 -0800 (PST)
-Date: Wed, 3 Jan 2024 21:00:06 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface
- in a bond
-Message-ID: <ZZVaVloICZPf8jiK@Laptop-X1>
-References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
- <20240103094846.2397083-3-nicolas.dichtel@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2743C1945E;
+	Wed,  3 Jan 2024 13:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 403CICU4030794;
+	Wed, 3 Jan 2024 13:06:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=6AihegcrHuKOKVAT22QfdIlNLXan2cC61758qMqmqts=; b=o1
+	HORcO66e7KRXO79u2YP06PNJvhOWBc8QJui8Vd6ufOk4RNIY117WyGj/IZkwCaOC
+	WHtxgIKdnq0CKl7zNTpNimaajPO49ZlbWZ6CoKLglZ/SiHCt1GvHrmbA8QClWQZe
+	MfIvm/QQNmY08T+DImeXjYMJIT+3yRoKZoXKHJ8+JT2xCHdbGcv8FGfFrvtXsj6o
+	rjOuSEOQnCYyxO22pKEiYO/5XMi6bhWBQwt48D1ep+NFP+u8iL4BBOsE5W4rsDr4
+	r8+cZ1rzvSDBnMoGUxqoWN5z3qEQnrnX0yEZou0jhP88MG9HSsOPy9siBkE8wy0r
+	RnJTNgmmauFLh6c0MIvA==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vcg41ba7j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Jan 2024 13:06:19 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 403D6IZw032623
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 3 Jan 2024 13:06:18 GMT
+Received: from [10.253.72.77] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 3 Jan
+ 2024 05:06:13 -0800
+Message-ID: <365d76a4-db05-40ac-a453-fb7e8b6db423@quicinc.com>
+Date: Wed, 3 Jan 2024 21:06:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240103094846.2397083-3-nicolas.dichtel@6wind.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/5] net: mdio: ipq4019: configure CMN PLL clock for
+ ipq5332
+Content-Language: en-US
+To: Bryan O'Donoghue <bryan.odonoghue@linaro.org>, <agross@kernel.org>,
+        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_srichara@quicinc.com>
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <20231225084424.30986-4-quic_luoj@quicinc.com>
+ <1d7ef6cc-5c25-4a59-ad7f-38870ac132c4@linaro.org>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <1d7ef6cc-5c25-4a59-ad7f-38870ac132c4@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: TdYOiUNuml-WWw9-fiDVZ4SKAWquoQeD
+X-Proofpoint-ORIG-GUID: TdYOiUNuml-WWw9-fiDVZ4SKAWquoQeD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ phishscore=0 spamscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ impostorscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401030107
 
-On Wed, Jan 03, 2024 at 10:48:46AM +0100, Nicolas Dichtel wrote:
-> +kci_test_enslave_bonding()
-> +{
-> +	local testns="testns"
-> +	local bond="bond123"
-> +	local dummy="dummy123"
-> +	local ret=0
-> +
-> +	run_cmd ip netns add "$testns"
-> +	if [ $? -ne 0 ]; then
-> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
-> +		return $ksft_skip
-> +	fi
-> +
-> +	# test native tunnel
-> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
 
-Hi Nicolas,
 
-The net-next added new function setup_ns in lib.sh and converted all hard code
-netns setup. I think It may be good to post this patch set to net-next
-to reduce future merge conflicts.
+On 1/3/2024 5:50 PM, Bryan O'Donoghue wrote:
+> On 25/12/2023 08:44, Luo Jie wrote:
+>> The reference clock of CMN PLL block is selectable, the internal
+>> 48MHZ is used by default.
+>>
+>> The output clock of CMN PLL block is for providing the clock
+>> source of ethernet device(such as qca8084), there are 1 * 25MHZ
+>> and 3 * 50MHZ output clocks available for the ethernet devices.
+>>
+>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> ---
+>>   drivers/net/mdio/mdio-ipq4019.c | 129 +++++++++++++++++++++++++++++++-
+>>   1 file changed, 128 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/mdio/mdio-ipq4019.c 
+>> b/drivers/net/mdio/mdio-ipq4019.c
+>> index e24b0e688b10..e4862ac02026 100644
+>> --- a/drivers/net/mdio/mdio-ipq4019.c
+>> +++ b/drivers/net/mdio/mdio-ipq4019.c
+>> @@ -44,6 +44,17 @@
+>>   /* Maximum SOC PCS(uniphy) number on IPQ platform */
+>>   #define ETH_LDO_RDY_CNT                3
+>> +#define CMN_PLL_REFERENCE_SOURCE_SEL        0x28
+>> +#define CMN_PLL_REFCLK_SOURCE_DIV        GENMASK(9, 8)
+>> +
+>> +#define CMN_PLL_REFERENCE_CLOCK            0x784
+>> +#define CMN_PLL_REFCLK_EXTERNAL            BIT(9)
+>> +#define CMN_PLL_REFCLK_DIV            GENMASK(8, 4)
+>> +#define CMN_PLL_REFCLK_INDEX            GENMASK(3, 0)
+>> +
+>> +#define CMN_PLL_POWER_ON_AND_RESET        0x780
+>> +#define CMN_ANA_EN_SW_RSTN            BIT(6)
+>> +
+>>   enum mdio_clk_id {
+>>       MDIO_CLK_MDIO_AHB,
+>>       MDIO_CLK_UNIPHY0_AHB,
+>> @@ -55,6 +66,7 @@ enum mdio_clk_id {
+>>   struct ipq4019_mdio_data {
+>>       void __iomem *membase;
+>> +    void __iomem *cmn_membase;
+>>       void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
+>>       struct clk *clk[MDIO_CLK_CNT];
+>>   };
+>> @@ -227,12 +239,116 @@ static int ipq4019_mdio_write_c22(struct 
+>> mii_bus *bus, int mii_id, int regnum,
+>>       return 0;
+>>   }
+>> +/* For the CMN PLL block, the reference clock can be configured 
+>> according to
+>> + * the device tree property "qcom,cmn-ref-clock-frequency", the 
+>> internal 48MHZ
+>> + * is used by default.
+>> + *
+>> + * The output clock of CMN PLL block is provided to the ethernet 
+>> devices,
+>> + * threre are 4 CMN PLL output clocks (1*25MHZ + 3*50MHZ) enabled by 
+>> default.
+>> + *
+>> + * Such as the output 50M clock for the qca8084 ethernet PHY.
+>> + */
+>> +static int ipq_cmn_clock_config(struct mii_bus *bus)
+>> +{
+>> +    struct ipq4019_mdio_data *priv;
+>> +    u32 reg_val, src_sel, ref_clk;
+>> +    int ret;
+>> +
+>> +    priv = bus->priv;
+>> +    if (priv->cmn_membase) {
+> 
+> if (!priv->cnm_membase)
+>      return 0;
+> 
+> then move the indentation here one tab left.
+> 
+Ok, will update this, Thanks.
 
-Jakub, Paolo, please correct me if we can't post fixes to net-next.
-
-Thanks
-Hangbin
+> ---
+> bod
 
