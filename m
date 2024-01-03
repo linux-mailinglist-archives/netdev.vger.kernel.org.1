@@ -1,101 +1,126 @@
-Return-Path: <netdev+bounces-61240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C23822F68
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:27:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9782C822F70
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:28:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D468286B24
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:27:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93AB71C235F7
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A121A587;
-	Wed,  3 Jan 2024 14:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391EA1A59C;
+	Wed,  3 Jan 2024 14:28:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="RHp4qIku"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iH1S52sn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5E61A702
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 14:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50e7ddd999bso7562122e87.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 06:27:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1704292046; x=1704896846; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pxC9+WOvmtgTFNxfsUnHcQ7SgJaLo5O3yKhPltwGLqk=;
-        b=RHp4qIkuW/ha+EwN5rris47bHZXhV/w92IWVbhb4/L/nm7S8AmfRiJmWlJ+ezaaIJG
-         bEYUH7jjOI4orPPmeZsGIwGP7g1cSS4Bw6klxP0om8l1UrnBWKQxIUFmvY+7/wIr71WB
-         V/8xBdRcNNw6b+5xRjmpLb0Hcd2TmnPysCIc3totC7pP1QHu5Z5SiMrB8edVtlFCRI0F
-         pWxCnzZvmNPMNgY/Aqvua5ZToUfX/0HhQKrOM6b1V5o4xMomTq32YxY878zszJ7JfFiZ
-         4DFw7U1lF18grKGliTwk1iK6HZPGCfo/5wlQ1lWqm+WqghkCDMJHJg/BC80szXDKfucv
-         8kaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704292046; x=1704896846;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pxC9+WOvmtgTFNxfsUnHcQ7SgJaLo5O3yKhPltwGLqk=;
-        b=lTAZDDXXsDhssqOwlbJmiZVozIPHRudB+VwRT5RSjmm4wN+c82N1XlJurByIxi3nZ0
-         eJbh6z3/LabtaZK7GHRJfV1IsspxyetNGVeabOHTNsIq0aljrEpqGDnBIfQDaZaJ6RTV
-         VMFnbmRvYM22UI4wO+qGyxbc5ln9pB/GocS570m46YMNOJpuJ0jOmwHGxhQpXJdCd/z6
-         Y7sNuKT7NfAAdbJNxqIQkDWBl5LMSTCEOTWYGqKbTwthllnpHCO2HD7JCgUH0+I/DniI
-         3QTh7qVeprIVlYsY7MSO0rbB+oaER0sLYcwn2amqVj/TwZWSAWyEi+PkhCa7tBqzuikB
-         uMhg==
-X-Gm-Message-State: AOJu0YwcOdPWLXFHUVLwT5GiKSRkMY4vZNHlHSMZH5OnYpDOy6lbZwXb
-	/lr5wh9NhUwFpeijTvKaI+YfNUnSIYtfp7zHjdgi/MfTcIs=
-X-Google-Smtp-Source: AGHT+IEEOd1yjo0FpFXkd1FQ8GaN3ytXrZa7jQigXXn91m2TbYNfog+LaDaSU9nzyXnZofxYAknwmw==
-X-Received: by 2002:a19:5e53:0:b0:50b:e724:62a8 with SMTP id z19-20020a195e53000000b0050be72462a8mr8686599lfi.92.1704292045723;
-        Wed, 03 Jan 2024 06:27:25 -0800 (PST)
-Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id y28-20020ac255bc000000b0050e7fe17591sm2497185lfg.137.2024.01.03.06.27.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 06:27:25 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, kuba@kernel.org, f.fainelli@gmail.com,
- olteanv@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: dsa: mv88e6xxx: Add LED infrastructure
-In-Reply-To: <8f9b8a8f-6741-4676-900a-e5832eb31fba@lunn.ch>
-References: <20240103103351.1188835-1-tobias@waldekranz.com>
- <20240103103351.1188835-2-tobias@waldekranz.com>
- <8f9b8a8f-6741-4676-900a-e5832eb31fba@lunn.ch>
-Date: Wed, 03 Jan 2024 15:27:24 +0100
-Message-ID: <87jzoq7ar7.fsf@waldekranz.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B911A593;
+	Wed,  3 Jan 2024 14:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9118B6000B;
+	Wed,  3 Jan 2024 14:28:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1704292097;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hvLf6X7arkWKrAg0bOzGbRODnsEc8AoO5SrOQLUmCf4=;
+	b=iH1S52snSfEZ8ml8P1b6j/7LdhT8pQ4yFVgPdBFGFWBQ2CEfqVxVcI9qX82CN7wdJbWys+
+	9fextKtPZWIJ9eRET2/uL5T47EZuVCfHwP4smCagk/uHkIJVSorlVMc9r4LKGY3TH2tfMB
+	oagykw1YUdSiWi4HCl8/KVPuPe/m2X7eRR72ZBDxhwP02t5buiI+m9iO/LxBUvBV5GXC/L
+	ysfNfo2lMHw1sawjjJd6adu0rBVs1o8SFC5Fmu65LmEp4cm4zdBEIVnWAe4OBOCOANDtdM
+	C6cnLSWLMyZoxzqZA4upZm6u4MATGnawmjHMpLbqnTnMmu9G3/zZuQcBocJ1Sw==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
+	Marek Vasut <marex@denx.de>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Sylvain Girard <sylvain.girard@se.com>,
+	Pascal EBERHARD <pascal.eberhard@se.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: [PATCH net 0/5] Fix missing PHY-to-MAC RX clock
+Date: Wed,  3 Jan 2024 15:28:20 +0100
+Message-ID: <20240103142827.168321-1-romain.gantois@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: romain.gantois@bootlin.com
 
-On ons, jan 03, 2024 at 15:09, Andrew Lunn <andrew@lunn.ch> wrote:
-> On Wed, Jan 03, 2024 at 11:33:50AM +0100, Tobias Waldekranz wrote:
->> Parse LEDs from DT and register them with the kernel, for chips that
->> support it. No actual implementations exist yet, they will be added in
->> upcoming commits.
->
-> Hi Tobias
->
-> There are three of us now working on this. Linus, you and me. We all
-> have different implementations.
+Hello everyone,
 
-Oh, sorry about that. I should have done the proper research before
-posting :)
+There is an issue with some stmmac/PHY combinations that has been reported
+some time ago in a couple of different series:
 
-> What i don't like about this is that is has code which is going to be
-> repeated in all DSA drivers, and even in all MAC drivers. I've already
-> posted one patch series which added generic DSA support for LEDs, and
-> some basic mv88e6xxx code. It got NACKed by Vladimir. So i'm slowly
-> working on making it more generic, so it can be used by any MAC
-> driver.
->
-> I will try to post it in the next couple of days.
+Clark Wang's report: https://lore.kernel.org/all/20230202081559.3553637-1-xiaoning.wang@nxp.com/
+Clément Léger's report: https://lore.kernel.org/linux-arm-kernel/20230116103926.276869-4-clement.leger@bootlin.com/
 
-Interesting! I'll keep an eye out for it.
+Stmmac controllers require an RX clock signal from the MII bus to perform
+their hardware initialization successfully. This causes issues with some
+PHY/PCS devices. If these devices do not bring the clock signal up before
+the MAC driver initializes its hardware, then said initialization will
+fail. This can happen at probe time or when the system wakes up from a
+suspended state.
+
+This series introduces new flags for phy_device and phylink_pcs. These
+flags allow MAC drivers to signal to PHY/PCS drivers that the RX clock
+signal should be enabled as soon as possible, and that it should always
+stay enabled.
+
+I have included specific uses of these flags that fix the RZN1 GMAC1 stmmac
+driver that I am currently working on and that is not yet upstream. I have
+also included changes to the at803x PHY driver that should fix the issue
+that Clark Wang was having.
+
+Clark, could you please confirm that this series fixes your issue with the
+at803x PHY?
+
+Best Regards,
+
+Romain
+
+Romain Gantois (2):
+  net: phy: add rxc_always_on flag to phylink_pcs
+  net: pcs: rzn1-miic: Init RX clock early if MAC requires it
+
+Russell King (3):
+  net: phy: add PHY_F_RXC_ALWAYS_ON to PHY dev flags
+  net: stmmac: Signal to PHY/PCS drivers to keep RX clock on
+  net: phy: at803x: Avoid hibernating if MAC requires RX clock
+
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c  |  5 +++++
+ drivers/net/pcs/pcs-rzn1-miic.c                | 18 +++++++++++++-----
+ drivers/net/phy/at803x.c                       |  3 ++-
+ drivers/net/phy/phylink.c                      | 13 ++++++++++++-
+ include/linux/phy.h                            |  1 +
+ include/linux/phylink.h                        |  9 +++++++++
+ 6 files changed, 42 insertions(+), 7 deletions(-)
+
+-- 
+2.43.0
+
 
