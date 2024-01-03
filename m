@@ -1,44 +1,71 @@
-Return-Path: <netdev+bounces-61192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3DF822CD7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:19:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C69AA822CFC
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:26:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58F9F1C232EF
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:19:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D92341C2342A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30E618EC0;
-	Wed,  3 Jan 2024 12:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A3119468;
+	Wed,  3 Jan 2024 12:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kc5T1kXk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UDMfLmqr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1B918EBD
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 12:19:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5CB6C433C8;
-	Wed,  3 Jan 2024 12:19:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704284387;
-	bh=YxUmT5IqDQWAZV/7luNRQjE+6ko1bQl0j63ohnhnN9Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kc5T1kXkP5e8qEm32sOzgUNhsG0jLRQfyqI+5f3bbi3fJ15d4nhBqBMoH8EiuTDbQ
-	 tfU194rIQmhGBmeALE5ARpJikc35KbRvrR3Z4yqkEhoYUhWtekNc0+pL2x5MEjWW3k
-	 czcnDJGNYEoEVyqFzECV9uGAH+tWGniuHQx/lhkGNe2296M/j75POzhXvOuqOU/p30
-	 R6Ii2O6vDNzf6fLgKHxPX42WGJ4wrAgJf8y0vUo4HyoScG4saSFJ8x8JARQfBjJdL3
-	 yw2Hi7T0OiniS8FFSyCgdF4ePVUgMoPqsY+U+3y3BDBcnhmAU1RCwzKmPkyUbSBhZP
-	 QB0T9xkjKsj+w==
-Date: Wed, 3 Jan 2024 14:19:42 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [RFC iproute2 0/8] rdma: print related patches
-Message-ID: <20240103121942.GD10748@unreal>
-References: <20240103003558.20615-1-stephen@networkplumber.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A486619458;
+	Wed,  3 Jan 2024 12:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704284749; x=1735820749;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7NZPFuLqIaZYxF8kzjwORU+cPOyFb8rBNMttLqHxoyI=;
+  b=UDMfLmqrSvJ7f4Xfhg+a6pdId2N+iIJ76n+VkfdQVd2LdvWHWTNLpXu1
+   Z+T08AoSiE7mwNTeznB4hWiJpfBCFn4aHGbPV0iWLX1iWwg2aF6vbegFu
+   VG2GP2BQRYCkc7IMp2N+7V9NO9bGAllSK7tRDxn5McW1wdcewW7N/pW+/
+   WIEZvyxkwTGvDuVuetvklHiAkBUx7dNLwehTFs18429srWHdL+XWLQeul
+   joSWkPZwcUxeowXu9jpLdziPJLeOwv3YNVlvUsrNMTOdMX5Z42jXR7t1K
+   HEj55mVknwVEg9em94cqojKy7POQrnPqakvSdKe3xpdsp8VUlSPxpceCR
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="4085305"
+X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
+   d="scan'208";a="4085305"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 04:25:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="783498077"
+X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
+   d="scan'208";a="783498077"
+Received: from sharadav-mobl.amr.corp.intel.com (HELO box.shutemov.name) ([10.249.36.97])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 04:25:42 -0800
+Received: by box.shutemov.name (Postfix, from userid 1000)
+	id C10E610A567; Wed,  3 Jan 2024 15:25:39 +0300 (+03)
+Date: Wed, 3 Jan 2024 15:25:39 +0300
+From: kirill.shutemov@linux.intel.com
+To: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+	mingo@redhat.com, tglx@linutronix.de, x86@kernel.org,
+	netdev@vger.kernel.org, richardcochran@gmail.com,
+	linux-input@vger.kernel.org, dmitry.torokhov@gmail.com,
+	zackr@vmware.com, linux-graphics-maintainer@vmware.com,
+	pv-drivers@vmware.com, namit@vmware.com, timothym@vmware.com,
+	akaher@vmware.com, jsipek@vmware.com,
+	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+	tzimmermann@suse.de, mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com, horms@kernel.org
+Subject: Re: [PATCH v4 6/6] x86/vmware: Add TDX hypercall support
+Message-ID: <20240103122539.agoq7647bzwcgjep@box.shutemov.name>
+References: <20231228192421.29894-1-alexey.makhalov@broadcom.com>
+ <20231228192421.29894-7-alexey.makhalov@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,26 +74,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240103003558.20615-1-stephen@networkplumber.org>
+In-Reply-To: <20231228192421.29894-7-alexey.makhalov@broadcom.com>
 
-On Tue, Jan 02, 2024 at 04:34:25PM -0800, Stephen Hemminger wrote:
-> This set of patches makes rdma comman behave more like the
-> other commands in iproute2 around printing flags.
-> There are some other things found while looking at that code.
+On Thu, Dec 28, 2023 at 11:24:21AM -0800, Alexey Makhalov wrote:
+> From: Alexey Makhalov <amakhalov@vmware.com>
 > 
-> Stephen Hemminger (8):
->   rdma: shorten print_ lines
->   rdma: use standard flag for json
->   rdma: make pretty behave like other commands
->   rdma: make supress_errors a bit
->   rdma: add oneline flag
->   rdma: do not mix newline and json object
->   rdma: remove duplicate forward declaration
->   rdma: remove unused rd argument
+> VMware hypercalls use I/O port, VMCALL or VMMCALL instructions.
+> Add __tdx_hypercall path to support TDX guests.
 > 
+> No change in high bandwidth hypercalls, as only low bandwidth
+> ones are supported for TDX guests.
+> 
+> Co-developed-by: Tim Merrifield <timothym@vmware.com>
+> Signed-off-by: Tim Merrifield <timothym@vmware.com>
+> Signed-off-by: Alexey Makhalov <amakhalov@vmware.com>
+> Reviewed-by: Nadav Amit <namit@vmware.com>
 
-In addition to Chengchang comments.
+Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
-LGTM,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
