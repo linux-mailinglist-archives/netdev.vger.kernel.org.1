@@ -1,97 +1,121 @@
-Return-Path: <netdev+bounces-61289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4B482315A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:36:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2013823169
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:42:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6D491F232FB
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:36:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A5C91F244FB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F96418C1A;
-	Wed,  3 Jan 2024 16:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A931BDE6;
+	Wed,  3 Jan 2024 16:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e/yDUxZB"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="avZqKUSp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373C41BDCE
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 16:36:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CAE5C433C7;
-	Wed,  3 Jan 2024 16:36:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704299767;
-	bh=2JvocjoafpLAZMtUkb0lZ2Ycd46t524yDdLDrLMComs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=e/yDUxZB22IMtyp8gmuNQUkEl/Ia+Wb2q9fWKeXDgrUddy5Oc1m2TYuWgUJYU/BHU
-	 jytcL6Wgy3zbwq3/yWqP1HQ3R0eTniY6S7MpEB9RN/6GDKdN4ewVsJ8VCxVM+41XR/
-	 HD6KcKR23FAQTSuJHr9dO842Wfvf+CrxqU/CvastjMnMDXn7gVVa1zHKiq9PL00yCR
-	 OPTmeOT1cVYk+nQX/2r/QvZOUZFdcKkBbBZvLkFU9/3YoC167yq1iMIrM2ZRPVMdOu
-	 a6ar9yai5naj1kzP9O3C+w3Qr+nKrZW6CjF5pLbOMUfM3XdMswA0Cy1FdgO9VAhmzV
-	 adf7C6+fYKXeQ==
-Message-ID: <3e9e4f3a-8968-4009-9e93-fe0bc8121392@kernel.org>
-Date: Wed, 3 Jan 2024 09:36:06 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436831BDCD
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 16:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5f254d1a6daso22540717b3.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 08:42:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704300150; x=1704904950; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kqB6CGz4FhyOFOssBdp4zvBdwCCulsiEvCo2tFN0c8g=;
+        b=avZqKUSpV40gCfPgU1zk33tqmxI2LVpaTcIGXW/cL2e7x5yxQNm4LA7g21KvhlCNOS
+         gsxsIGr26yy/a3hopEkFN8U6Mf87AfphaPVE/D2rvA/lDZcrUqkgxyuVDyGTuoKlm12b
+         +oceCDbOoIPLg7xSEsELCng/F+3fRkxalKo9UerlRAwWSEjLRV5NCO4iCKLwsgVorAwE
+         o7GjYZVAivc8K1RLu54R2BZy72AvefcyUAEMbTk1Pm6dMol2nVlFSmYCoCo5Cd3TYMeo
+         QeKbgfEG8abBNsJZRHUTD4HtHM7jns2JoTpFm6xnwLY3zGU4lC4rGMxV6tJj2TOctiY2
+         gy7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704300150; x=1704904950;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kqB6CGz4FhyOFOssBdp4zvBdwCCulsiEvCo2tFN0c8g=;
+        b=VdIUZNnOopVKyZdVQhuKGdWgFoFu23jnjPtdeDfFEbu0qMlYAo4r8xRVH5jB7/5VUg
+         ZfOXWLhZ3Wckc/BGj+SxGqqlVCZTUj8IK/TX481pXf1AtykpD2DlGCV2R6niSRr5I5KR
+         22YfIK5J+L94QlcnoAWfIRBLPrc/lqF6FZOled4EtY8YY2557doXQ2fsUhM6fg+7u3o/
+         Jnv6kBSYPC+C8qPLSr4MZQo+HFlUCpAcQH8mtcby/eM7x1RsqLXeCHcHcgAEC58N7+la
+         CA/khjaiwZpubx5P0TSqgBAWw360C+e85QbwHQ0OSgEWbCtOXtPDPUtxsp3yPswD+C60
+         riOg==
+X-Gm-Message-State: AOJu0YxGi8Jgz5yBTDgA9wiAbmezd50HiNXFJKR10lhFxJ4xKBe4GScP
+	+jm6ag4wZxYzYgaNDjTdH6rGPUotXj7NDvTaLBErnq/Bge9Fig==
+X-Google-Smtp-Source: AGHT+IHG+3CJMzix7RqUcr1RTs3drNiVmJl0PBwHoasrhFF9x4L1y3cMk/tajLBq5aD9vYZ+fjVlbqGseYGu5CnZocY=
+X-Received: by 2002:a05:690c:2848:b0:5ec:91e:9d68 with SMTP id
+ ed8-20020a05690c284800b005ec091e9d68mr7280168ywb.18.1704300149634; Wed, 03
+ Jan 2024 08:42:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface in
- a bond
-Content-Language: en-US
-To: nicolas.dichtel@6wind.com, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>
-Cc: netdev@vger.kernel.org
-References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
- <20240103094846.2397083-3-nicolas.dichtel@6wind.com>
- <2b3084da-ab85-412d-a0e8-3e50903937df@kernel.org>
- <0cc0cfc3-14d3-43d9-8fa8-b2b76b1ca14e@6wind.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <0cc0cfc3-14d3-43d9-8fa8-b2b76b1ca14e@6wind.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240102162718.268271-1-romain.gantois@bootlin.com>
+ <20240102162718.268271-2-romain.gantois@bootlin.com> <CACRpkdZjOBpD6HoobgMBA27dS+uz5pqb8otL+fGtMvsywYBTPA@mail.gmail.com>
+ <d3d73e26-10a9-bd2b-ff44-cbdc72e1f6ee@bootlin.com>
+In-Reply-To: <d3d73e26-10a9-bd2b-ff44-cbdc72e1f6ee@bootlin.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 3 Jan 2024 17:42:18 +0100
+Message-ID: <CACRpkdbbPg0f0LSPrAhZ4cEajEx0W-FjkSjfZnJ_Lam-QQ=E2Q@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/1] net: stmmac: Prevent DSA tags from breaking
+ COE on stmmac
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Sylvain Girard <sylvain.girard@se.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Pascal EBERHARD <pascal.eberhard@se.com>, Richard Tresidder <rtresidd@electromag.com.au>, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/3/24 9:17 AM, Nicolas Dichtel wrote:
-> Le 03/01/2024 à 16:42, David Ahern a écrit :
->> On 1/3/24 2:48 AM, Nicolas Dichtel wrote:
->>> @@ -1239,6 +1240,44 @@ kci_test_address_proto()
->>>  	return $ret
->>>  }
->>>  
->>> +kci_test_enslave_bonding()
->>> +{
->>> +	local testns="testns"
->>> +	local bond="bond123"
->>> +	local dummy="dummy123"
->>> +	local ret=0
->>> +
->>> +	run_cmd ip netns add "$testns"
->>> +	if [ $? -ne 0 ]; then
->>> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
->>> +		return $ksft_skip
->>> +	fi
->>> +
->>> +	# test native tunnel
->>> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
->>> +	run_cmd ip -netns $testns link add dev $dummy type dummy
->>> +	run_cmd ip -netns $testns link set dev $dummy up
->>> +	run_cmd ip -netns $testns link set dev $dummy master $bond down
->>> +	if [ $ret -ne 0 ]; then
->>> +		end_test "FAIL: enslave an up interface in a bonding"
->>
->> interface is up, being put as a port on a bond and taken down at the
->> same time. That does not match this error message.
-> The idea was "the command used to enslave an up interface fails".
-> What about: "FAIL: set down and enslave an up interface in a bonding"
+On Wed, Jan 3, 2024 at 10:11=E2=80=AFAM Romain Gantois
+<romain.gantois@bootlin.com> wrote:
+> On Tue, 2 Jan 2024, Linus Walleij wrote:
+> ...
+> > > +static inline bool stmmac_has_ip_ethertype(struct sk_buff *skb)
+> > > +{
+> > > +       __be16 proto =3D eth_header_parse_protocol(skb);
+> >
+> > I made a new function for this in my patch
+> > https://lore.kernel.org/netdev/20231222-new-gemini-ethernet-regression-=
+v4-2-a36e71b0f32b@linaro.org/
+> >
+> > I was careful to add if (!pskb_may_pull(skb, ETH_HLEN)) because Eric
+> > was very specific about this, I suppose you could get fragment frames t=
+hat
+> > are smaller than an ethernet header.
+>
+> Okay nice, then I'll rewrite this series to use the new function once you=
+r
+> changes make it in.
 
-The 'set down' is part of the adding to the bond command. how about:
+I just rewrote my patch to use eth_header_parse_protocol() instead.
+I should not invent a new version of something that already exist.
 
-FAIL: Initially up interface added to a bond and set down.
+> > Should we add an if (!pskb_may_pull(skb, ETH_HLEN)) to
+> > eth_header_parse_protocol()?
+>
+> That does sound logical to me but I couldn't tell you what the impact on =
+current
+> callers would be. The net maintainers will probably have a better idea of=
+ this.
 
+I can propose a separate patch for this with RFC.
+
+Yours,
+Linus Walleij
 
