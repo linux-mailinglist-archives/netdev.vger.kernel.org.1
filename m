@@ -1,71 +1,76 @@
-Return-Path: <netdev+bounces-61270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A8882302B
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:02:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CA02823031
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:06:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAC2B286528
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:02:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 031D4B22E73
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A501A726;
-	Wed,  3 Jan 2024 15:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94251A708;
+	Wed,  3 Jan 2024 15:06:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vRPIlCaf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRtSDLfN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51A91A702;
-	Wed,  3 Jan 2024 15:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=g8K4Wbg5JDQXx3q/iM3cUgJD+tm3dXGYqWadi7wsaLo=; b=vRPIlCafJtPTrLDLkNkZyvUl24
-	xXTcQv22UTsNwmoIsCywmF04xqy6lyWQK7KYruZXaUaDViF1OsvA9njVSvWZhVAjorCzROmbXDnZ5
-	HBNIdw52sG47eqZTfY1LV4xew4V0KVKtwyDSxrE+W45fbgni3Tk4ETlr8k5x8nxUvDd/eOn415kIZ
-	Z3NrN5jVaJ0ePDyNWY1jLcUbVzZbDVrQ9TxJt6ajP33+fn5inC0g2cnbaW1NXLNnGiLtyOrKnzW6y
-	NHn5jw87eNqwA+y0t2l9AkfpVAStCcudTUtAWpz9YWgt7jXCL/t8sJTKfWH6T7db6AbezzbiTJWR5
-	b42yMw4w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48018)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rL2k2-0007cb-1L;
-	Wed, 03 Jan 2024 15:01:10 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rL2jz-0006Sx-I0; Wed, 03 Jan 2024 15:01:07 +0000
-Date: Wed, 3 Jan 2024 15:01:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Marek Vasut <marex@denx.de>, Clark Wang <xiaoning.wang@nxp.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Sylvain Girard <sylvain.girard@se.com>,
-	Pascal EBERHARD <pascal.eberhard@se.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net 5/5] net: pcs: rzn1-miic: Init RX clock early if MAC
- requires it
-Message-ID: <ZZV2s/TGKanl76TI@shell.armlinux.org.uk>
-References: <20240103142827.168321-1-romain.gantois@bootlin.com>
- <20240103142827.168321-6-romain.gantois@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BF61A704
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 15:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704294398;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=wEHakIYqdfU8FEDiDv2kbLLbw2wVp310Y7yIEyIyaLU=;
+	b=dRtSDLfN+zbZi1qlyaERYgLCRjwpV+RJyoYvFHdozqoqavXZZ1gWVyyBpDV52TdKhA2tBj
+	Zjdk8RQJPlxdCOGQFyVV8gVphydln2fIXFpn3wv0Vvmi7kuwDGz1If1oOF8zjKWVs/xksS
+	SVd+7tKVoDztXkKfGyQZl/+hDDswaaQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-563-7ERukYGZPyOu8qoJI1KOtA-1; Wed, 03 Jan 2024 10:06:36 -0500
+X-MC-Unique: 7ERukYGZPyOu8qoJI1KOtA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40d76064581so27429005e9.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 07:06:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704294395; x=1704899195;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wEHakIYqdfU8FEDiDv2kbLLbw2wVp310Y7yIEyIyaLU=;
+        b=pSi6yYtjBTL8QnVVsRNCqy/FippLpQcBtnFU0z6RkJKrBmM5OSdoE0fj+G+GfqiXbC
+         oWmjCNziXfxTgwed8q+pasr9SjwsJraMmGQvPd6wZvjNoq93H4DzsPDdZ4oaJkNDQI5t
+         aMDIZ1V/XrXxK7MhuZm+IEDhV9tZqixQNGPfdWfVAeRVgNJKsr62FkYBnolEOh0vjtY+
+         pTiY1EwvAvT8qkjjPXfSzhXrluTLwx0VkdTO5g8yW0VbXRsfp9eok2bHSUJbzLYeQVEj
+         fdpzkh0rfpXItLzjd9ByZN/la8/lsLgGRmWkrfOkgP7rUna7de4DJTJQ64jvEFkc0wdH
+         rDRw==
+X-Gm-Message-State: AOJu0YxhiyXKuQf5dRxnmof4biXsg87H3IG7kw2CuHMuF21+ag17rPE0
+	vgqd9jnx7kxGUrxOthcc2eGwXxNRldaCZMz1ASVSf5MbhMEU+zF7r6jdWv2ttnQtxh4ZQxJOhwo
+	Z7n35TWek8c+nsMaUYavwPmMg
+X-Received: by 2002:adf:f505:0:b0:336:7b50:1f31 with SMTP id q5-20020adff505000000b003367b501f31mr10736881wro.109.1704294395590;
+        Wed, 03 Jan 2024 07:06:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH+Oo7EUzGD/CvnFLd9O44zNnPLXt7KFUgk8azlxRsPAoYBqpIIPl9yapWYvXDL1efHwilQTw==
+X-Received: by 2002:adf:f505:0:b0:336:7b50:1f31 with SMTP id q5-20020adff505000000b003367b501f31mr10736869wro.109.1704294395257;
+        Wed, 03 Jan 2024 07:06:35 -0800 (PST)
+Received: from debian (2a01cb058918ce001c33ce3a2d76e909.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:1c33:ce3a:2d76:e909])
+        by smtp.gmail.com with ESMTPSA id p17-20020a5d48d1000000b00336e15fbc85sm19911082wrs.82.2024.01.03.07.06.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 07:06:34 -0800 (PST)
+Date: Wed, 3 Jan 2024 16:06:32 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+	Simon Horman <horms@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH net] xfrm: Clear low order bits of ->flowi4_tos in
+ decode_session4().
+Message-ID: <73ad04e0f34b17b02d1eca263e4008440cf3b8e4.1704294322.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,40 +79,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240103142827.168321-6-romain.gantois@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Jan 03, 2024 at 03:28:25PM +0100, Romain Gantois wrote:
-> The GMAC1 controller in the RZN1 IP requires the RX MII clock signal to be
-> started before it initializes its own hardware, thus before it calls
-> phylink_start.
-> 
-> Check the rxc_always_on pcs flag and enable the clock signal during the
-> link validation phase.
+Commit 23e7b1bfed61 ("xfrm: Don't accidentally set RTO_ONLINK in
+decode_session4()") fixed a problem where decode_session4() could
+erroneously set the RTO_ONLINK flag for IPv4 route lookups. This
+problem was reintroduced when decode_session4() was modified to
+use the flow dissector.
 
-However, validation is *not* supposed to change the configuration of
-the hardware. Validation may fail. The "interface" that gets passed
-to validation may never ever be selected. This change feels like
-nothing more than a hack.
+Fix this by clearing again the two low order bits of ->flowi4_tos.
+Found by code inspection, compile tested only.
 
-Since the MAC driver has to itself provide the PCS to phylink via the
-mac_select_pcs() method, the MAC driver already has knowledge of which
-PCS it is going to be using. Therefore, I think it may make sense
-to do something like this:
+Fixes: 7a0207094f1b ("xfrm: policy: replace session decode with flow dissector")
+Signed-off-by: Guillaume Nault <gnault@redhat.com>
+---
+ net/xfrm/xfrm_policy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-int phylink_pcs_preconfig(struct phylink *pl, struct phylink_pcs *pcs)
-{
-	if (pl->config->mac_requires_rxc)
-		pcs->rxc_always_on = true;
-
-	if (pcs->ops->preconfig)
-		pcs->ops->pcs_preconfig(pcs);
-}
-
-and have stmmac call phylink_pcs_preconfig() for each PCS that it will
-be using during initialisation / resume paths?
-
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index c13dc3ef7910..e69d588caa0c 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -3416,7 +3416,7 @@ decode_session4(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reve
+ 	}
+ 
+ 	fl4->flowi4_proto = flkeys->basic.ip_proto;
+-	fl4->flowi4_tos = flkeys->ip.tos;
++	fl4->flowi4_tos = flkeys->ip.tos & ~INET_ECN_MASK;
+ }
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
 
