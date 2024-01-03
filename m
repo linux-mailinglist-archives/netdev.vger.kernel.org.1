@@ -1,162 +1,159 @@
-Return-Path: <netdev+bounces-61132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1CA5822A80
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:49:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F786822A8B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:50:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80DB51F23FAF
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:49:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF380281673
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A2A18650;
-	Wed,  3 Jan 2024 09:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AAAA18646;
+	Wed,  3 Jan 2024 09:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="B8A0G8rD"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZNLoKv7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f100.google.com (mail-wr1-f100.google.com [209.85.221.100])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D0C18B10
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 09:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f100.google.com with SMTP id ffacd0b85a97d-336746c7b6dso9247185f8f.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 01:48:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A73C71863F
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 09:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40b5155e154so134217635e9.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 01:50:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1704275331; x=1704880131; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yIa4kG4qt5bUO3xzFheVS/ahZwWAiFJ8Wb4M2t36nOE=;
-        b=B8A0G8rDZCmLnLddzYBVAiJHS/Hn5aQ+UO69ZBGYx0/qtDE3m4tlmGtZtJuyrri0ID
-         rIx1Udc7sNwjdDe3+62xht/VSL8QWeOteIs92LjY5SZfb19SlrNpdNzjgV/1aiS6DL2l
-         EWinqJYPB8I+s0qio/lTmpxZhsKtqtYhTwPfZ6GlAz4U3N4fyqwgMv1LiyFvp9em+xCx
-         f1z0BGtCvZjgQC0CLcVw8N/+XrqeOn7v9QMD1Om5RYqHBbix26VKhv2rud9qWtPxQeOH
-         F+I1JnG3nhDLCeRxvPHZ7E7PeyQIMjXpipMrQVFfEuv33U3EFDpY87EbWrChi6KJkBHH
-         S8gA==
+        d=linaro.org; s=google; t=1704275403; x=1704880203; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WmKejKBf2avgLbRYliTmm8WeIicCE14MUoUVoAfYgWw=;
+        b=ZNLoKv7+EMoT5DtRHcfU+yQquPIA9y09xz7yaIroERNXk2RUCOBpu6hY8faJ8oGlJm
+         rFiRnWb3g49W4BiUQuxf936AQSLDrutkqnkwEqGXOnjiT9HFJcxMOTs99aqH+mzGt7e+
+         Wz4EtV3Zh99qL0vHCCBkcSMN6fDyNWuGL/4pzpcbB7nrQWE2/IrFOyZhFz8fAZGIxZp7
+         mzJyODs2JE8LqRSl4MJnHko15VYtO19TrwV6cehEFZrizT/xm3pmicDKNsYKZHnGDfFT
+         +u+dpYl8lxz/TsPVhnlbGJ6aYNoHt7fhqn6Ata2wxaby8XC8hiU6tPuKBF5F+vHBE1HI
+         Skwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704275331; x=1704880131;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yIa4kG4qt5bUO3xzFheVS/ahZwWAiFJ8Wb4M2t36nOE=;
-        b=s5TumiatCeU6rhVqPqGYth8ejL/oTTjRv3f7qXsUT9VRFx04t/ZocinE1eRbei3GUn
-         30vEr9956oyriAI+vauJcjh/yPgILln/TFHrENnuYDwhW3BLK0KEwhqStkKWvL1Yi9X/
-         N/fSUFUPRxQ71JqRORRt3b+ia8NarKyVREXAIkJd+EMLtyiiiWhO9nx36CyJUNhvh96i
-         h1OmEZBypowY6uUUQJGqvA7NT8vz7F5W6yWbpZMP3wDNtsrojyQR6QSxNgNxiM1vxijR
-         g0pTvJjqAsEEMiUR/tqEGlHus9tMO+16WdkM4fWrqL6Y2WylewUqqxAY2h967cjEUEp1
-         Xk1Q==
-X-Gm-Message-State: AOJu0YwoM58IKvWTQjDnwztoXljQd6krEzNIlcwMHFlRNtBK+26R8Soa
-	pnUQPSp1r2QP35oA6D9gW23RQKcC/rIR9UxxV06gN4pduWg7w8P7kdTHaQ==
-X-Google-Smtp-Source: AGHT+IGdmnr6+p7hz/i8bGMCyMOVBhrXO1BjPKxOznQkdXBw0GXW8hPNnc/h3KYMKaqEwyVLMePlaUJcqj2B
-X-Received: by 2002:a05:6000:1b03:b0:336:80c1:f6a8 with SMTP id f3-20020a0560001b0300b0033680c1f6a8mr10565041wrz.88.1704275331296;
-        Wed, 03 Jan 2024 01:48:51 -0800 (PST)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id bs24-20020a056000071800b003374c867a26sm21924wrb.48.2024.01.03.01.48.51;
-        Wed, 03 Jan 2024 01:48:51 -0800 (PST)
-X-Relaying-Domain: 6wind.com
-Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 09A6A6045F;
-	Wed,  3 Jan 2024 10:48:51 +0100 (CET)
-Received: from dichtel by bretzel with local (Exim 4.94.2)
-	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1rKxrm-00A3cs-MJ; Wed, 03 Jan 2024 10:48:50 +0100
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface in a bond
-Date: Wed,  3 Jan 2024 10:48:46 +0100
-Message-Id: <20240103094846.2397083-3-nicolas.dichtel@6wind.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
-References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
+        d=1e100.net; s=20230601; t=1704275403; x=1704880203;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WmKejKBf2avgLbRYliTmm8WeIicCE14MUoUVoAfYgWw=;
+        b=t7ZNZ4tIH3tGKS/JH+3snlCUvD//QLfQZChPSUrPhBExQPrtqUCgYQ4sRi5+l5dUGU
+         JH3uVgKJqd0bCFE+Q9B9dof+AGk75DVsKinC59Cz8fkFIOlgfRmvwbBZITEBR2idTFC9
+         4YpWmnDfUjy2HNLaa9bETSexyrKuot9G7KV1ad0nWkinYGZkTeAfQ82LqlozfaFpnKhi
+         y+QJcnQPQaRVeZmUWPmQY8clemkSqLwPJ86xQdIsDwH1djRyQ+VmX/EjMwf3Yq9Me1jq
+         cPM0y5Azz/bx66hz5STRCNlwgOUQr6SP6DUi3ER9bFFS0QiUSa/Z+6Wsafq2FLF+g1ng
+         lMfQ==
+X-Gm-Message-State: AOJu0YwV6XpgSISqjU/4QdzHnPFpyoazAyz23P/nflJ4ngbpAmhbK59g
+	tC0+9RzP6St4zawyPyqrq6w4OlDMJfoHfw==
+X-Google-Smtp-Source: AGHT+IFaqwY1UVrdPQleZW7aCPSSqLl/+7BGbnsllxdUXEuCWX011Cu7HlnTvacGgRCavuek48oo5Q==
+X-Received: by 2002:a05:600c:3c86:b0:40d:6611:aefe with SMTP id bg6-20020a05600c3c8600b0040d6611aefemr4147210wmb.168.1704275402921;
+        Wed, 03 Jan 2024 01:50:02 -0800 (PST)
+Received: from [192.168.100.86] ([37.228.218.3])
+        by smtp.gmail.com with ESMTPSA id n7-20020a05600c500700b0040d8eca092esm1775176wmr.47.2024.01.03.01.50.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jan 2024 01:50:02 -0800 (PST)
+Message-ID: <1d7ef6cc-5c25-4a59-ad7f-38870ac132c4@linaro.org>
+Date: Wed, 3 Jan 2024 09:50:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/5] net: mdio: ipq4019: configure CMN PLL clock for
+ ipq5332
+Content-Language: en-US
+To: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
+ konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ quic_srichara@quicinc.com
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <20231225084424.30986-4-quic_luoj@quicinc.com>
+From: Bryan O'Donoghue <bryan.odonoghue@linaro.org>
+In-Reply-To: <20231225084424.30986-4-quic_luoj@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The goal is to check the following two sequences:
-> ip link set dummy0 down
-> ip link set dummy0 master bond0 up
+On 25/12/2023 08:44, Luo Jie wrote:
+> The reference clock of CMN PLL block is selectable, the internal
+> 48MHZ is used by default.
+> 
+> The output clock of CMN PLL block is for providing the clock
+> source of ethernet device(such as qca8084), there are 1 * 25MHZ
+> and 3 * 50MHZ output clocks available for the ethernet devices.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>   drivers/net/mdio/mdio-ipq4019.c | 129 +++++++++++++++++++++++++++++++-
+>   1 file changed, 128 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
+> index e24b0e688b10..e4862ac02026 100644
+> --- a/drivers/net/mdio/mdio-ipq4019.c
+> +++ b/drivers/net/mdio/mdio-ipq4019.c
+> @@ -44,6 +44,17 @@
+>   /* Maximum SOC PCS(uniphy) number on IPQ platform */
+>   #define ETH_LDO_RDY_CNT				3
+>   
+> +#define CMN_PLL_REFERENCE_SOURCE_SEL		0x28
+> +#define CMN_PLL_REFCLK_SOURCE_DIV		GENMASK(9, 8)
+> +
+> +#define CMN_PLL_REFERENCE_CLOCK			0x784
+> +#define CMN_PLL_REFCLK_EXTERNAL			BIT(9)
+> +#define CMN_PLL_REFCLK_DIV			GENMASK(8, 4)
+> +#define CMN_PLL_REFCLK_INDEX			GENMASK(3, 0)
+> +
+> +#define CMN_PLL_POWER_ON_AND_RESET		0x780
+> +#define CMN_ANA_EN_SW_RSTN			BIT(6)
+> +
+>   enum mdio_clk_id {
+>   	MDIO_CLK_MDIO_AHB,
+>   	MDIO_CLK_UNIPHY0_AHB,
+> @@ -55,6 +66,7 @@ enum mdio_clk_id {
+>   
+>   struct ipq4019_mdio_data {
+>   	void __iomem *membase;
+> +	void __iomem *cmn_membase;
+>   	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
+>   	struct clk *clk[MDIO_CLK_CNT];
+>   };
+> @@ -227,12 +239,116 @@ static int ipq4019_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
+>   	return 0;
+>   }
+>   
+> +/* For the CMN PLL block, the reference clock can be configured according to
+> + * the device tree property "qcom,cmn-ref-clock-frequency", the internal 48MHZ
+> + * is used by default.
+> + *
+> + * The output clock of CMN PLL block is provided to the ethernet devices,
+> + * threre are 4 CMN PLL output clocks (1*25MHZ + 3*50MHZ) enabled by default.
+> + *
+> + * Such as the output 50M clock for the qca8084 ethernet PHY.
+> + */
+> +static int ipq_cmn_clock_config(struct mii_bus *bus)
+> +{
+> +	struct ipq4019_mdio_data *priv;
+> +	u32 reg_val, src_sel, ref_clk;
+> +	int ret;
+> +
+> +	priv = bus->priv;
+> +	if (priv->cmn_membase) {
 
-and
-> ip link set dummy0 up
-> ip link set dummy0 master bond0 down
+if (!priv->cnm_membase)
+	return 0;
 
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+then move the indentation here one tab left.
+
 ---
- tools/testing/selftests/net/rtnetlink.sh | 39 ++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
-
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index 26827ea4e3e5..130be7de76af 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -28,6 +28,7 @@ ALL_TESTS="
- 	kci_test_neigh_get
- 	kci_test_bridge_parent_id
- 	kci_test_address_proto
-+	kci_test_enslave_bonding
- "
- 
- devdummy="test-dummy0"
-@@ -1239,6 +1240,44 @@ kci_test_address_proto()
- 	return $ret
- }
- 
-+kci_test_enslave_bonding()
-+{
-+	local testns="testns"
-+	local bond="bond123"
-+	local dummy="dummy123"
-+	local ret=0
-+
-+	run_cmd ip netns add "$testns"
-+	if [ $? -ne 0 ]; then
-+		end_test "SKIP bonding tests: cannot add net namespace $testns"
-+		return $ksft_skip
-+	fi
-+
-+	# test native tunnel
-+	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
-+	run_cmd ip -netns $testns link add dev $dummy type dummy
-+	run_cmd ip -netns $testns link set dev $dummy up
-+	run_cmd ip -netns $testns link set dev $dummy master $bond down
-+	if [ $ret -ne 0 ]; then
-+		end_test "FAIL: enslave an up interface in a bonding"
-+		ip netns del "$testns"
-+		return 1
-+	fi
-+
-+	run_cmd ip -netns $testns link del dev $dummy
-+	run_cmd ip -netns $testns link add dev $dummy type dummy
-+	run_cmd ip -netns $testns link set dev $dummy down
-+	run_cmd ip -netns $testns link set dev $dummy master $bond up
-+	if [ $ret -ne 0 ]; then
-+		end_test "FAIL: enslave an down interface in a bonding and set it up"
-+		ip netns del "$testns"
-+		return 1
-+	fi
-+
-+	end_test "PASS: enslave iface in a bonding"
-+	ip netns del "$testns"
-+}
-+
- kci_test_rtnl()
- {
- 	local current_test
--- 
-2.39.2
-
+bod
 
