@@ -1,259 +1,108 @@
-Return-Path: <netdev+bounces-61120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A256C822961
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:14:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BA0682296F
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21254284F5C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 08:14:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEEE2B2207A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 08:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 824BC182DB;
-	Wed,  3 Jan 2024 08:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30AB018053;
+	Wed,  3 Jan 2024 08:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="MSd03c94"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FDRUBsCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31D1182A2
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 08:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5537dd673e5so7943215a12.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 00:14:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1704269650; x=1704874450; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O3Ym4A7BbOoEfvsp/Jf7JMIgBawRWmRnv6gC4m6vgIE=;
-        b=MSd03c94cSB0j2Ml+LDjc0lrkaunqkHakBZ8nHDcTlrSdj9gaTdqxIGNsQ4Uxjvr+b
-         J+eSoLk1cJLp4iX9Uw/qt3thDMyFHHrXzQzNE3PtA+JKlevqmA4d8JW/WpwsesczOc6r
-         23obIejFuiWUKp/FscVgwq8gF/Ln5g5x7GSwDuluFIQoKBuTLjHRpT+7Owjs/ekDOGKb
-         P98MCew5E5N7SdlkROhush75W+PEpmbL/8lquMH0LuWOSwDFTBmfrvaZPcnUcj/yQKI4
-         x/PQ0lGKff+/ZDGlM4cwnEmvJtObRlKz4uX6FMJFYmaGXQz+3BFtNLKK6vcwzlRuvztx
-         eOrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704269650; x=1704874450;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O3Ym4A7BbOoEfvsp/Jf7JMIgBawRWmRnv6gC4m6vgIE=;
-        b=h5TdlgOGPW0n3qwQz5zBYiqO7GTirjDl7kTXAW4CCZNTH8u7whP0XGQ4T/HJgK55Wy
-         ah8i6o6Qlvxru6ZCcMT6oi595LZpzdbkPqRPJM/Ukk/rcKbZXAXi2vP8lkdjewtW7v5p
-         Bv1U5BZSRokJYsY9JdIzF+HCJ2/dVdy7b4UPSrHKQvpUk16hPKYPa/YynYPHmGSQGM0v
-         ilkpRhlVcuJMp42EEbBMzpBTnwu+YARHaRBKHIzrwo+EEokrXotQMyP4LZpnx9Zzb4/n
-         18KhJXngW2lkziRK/4Mo8gat53mI/CQoIUQVLI40p4CE8unUVueXuCtFh4sWM4yh9SUq
-         1SYg==
-X-Gm-Message-State: AOJu0YzEWy0VC4yXVQzpV2xYtLvshIqUKVfc5yc9+qdoS0QAE1IYHsFN
-	sol+ueOvTqkzH7rNgUErKGdl2eDKpcj6kg==
-X-Google-Smtp-Source: AGHT+IFHoJNjn4t10m0M3DuDGFBwatp7Fw+n3FDWpeiLND7uz5GFZTVIQZsyO78e0k+de0LYcsoTAw==
-X-Received: by 2002:a50:aad2:0:b0:553:b4d8:737 with SMTP id r18-20020a50aad2000000b00553b4d80737mr12543096edc.0.1704269650109;
-        Wed, 03 Jan 2024 00:14:10 -0800 (PST)
-Received: from claudiu-X670E-Pro-RS.. ([82.78.167.5])
-        by smtp.gmail.com with ESMTPSA id cn13-20020a0564020cad00b00554b089f1dcsm13104196edb.38.2024.01.03.00.14.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 00:14:09 -0800 (PST)
-From: Claudiu <claudiu.beznea@tuxon.dev>
-X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
-To: s.shtylyov@omp.ru,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: mitsuhiro.kimura.kc@renesas.com,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	claudiu.beznea@tuxon.dev,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH v4 1/1] net: ravb: Wait for operating mode to be applied
-Date: Wed,  3 Jan 2024 10:13:53 +0200
-Message-Id: <20240103081353.4165445-2-claudiu.beznea.uj@bp.renesas.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240103081353.4165445-1-claudiu.beznea.uj@bp.renesas.com>
-References: <20240103081353.4165445-1-claudiu.beznea.uj@bp.renesas.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5350182A3
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 08:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704270028; x=1735806028;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0Ul4OlGMi2BplcTsZp5Kk6kGh3sCmw9tmO1+Lmr7FJM=;
+  b=FDRUBsCKhDMTybReWXmttXSqdzqlfeUwscNBw9dOgizvQoZSPp34Akag
+   hiQyaEiYQvOvc5GYTqqQ5NK0omuai2U9bFGRrdHWz+MvCMrav13iijf24
+   1vq1lu/2kRRwE0KmaHzyvdYq7DkPj5hLa387qswA6u8e1cccP6YdVzlTP
+   BRYJDK4h6UNiMPHzLiUe5YNFcuMJzCj//WUiaGXt+Jt7LiTnZiY29PdnH
+   ee+tIujiOh6wHNCvJVrqbccmh7qzh/hHxCUwWJRdT/rjOAPnt1ygLOKBs
+   bqKT1Sjhg53m3DQBBcI+5v0654ZpoC5D+Gi1CsnTnKmfX11ad6QoP5YhF
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="400789293"
+X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
+   d="scan'208";a="400789293"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 00:20:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="779928866"
+X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
+   d="scan'208";a="779928866"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.51.153])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 00:20:25 -0800
+Date: Wed, 3 Jan 2024 09:20:23 +0100
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	netdev@vger.kernel.org, Marc MERLIN <marc@merlins.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [RFC PATCH] net: ethtool: do runtime PM outside RTNL
+Message-ID: <ZZUYx9hhdVD+wAnG@linux.intel.com>
+References: <20231204200710.40c291e60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <d0fc7d04-e3c9-47c0-487e-666cb2a4e3bc@intel.com>
+ <709eff7500f2da223df9905ce49c026a881cb0e0.camel@sipsolutions.net>
+ <3e7ae1f5-77e3-a561-2d6b-377026b1fd26@intel.com>
+ <c1189a1982630f71dd106c3963e0fa71fa6c8a76.camel@sipsolutions.net>
+ <64684afc-3dbb-453e-9c90-bf2a86e70c50@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64684afc-3dbb-453e-9c90-bf2a86e70c50@gmail.com>
 
-From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On Wed, Dec 06, 2023 at 12:59:09PM +0100, Heiner Kallweit wrote:
+> On 06.12.2023 10:37, Johannes Berg wrote:
+> > On Wed, 2023-12-06 at 09:46 +0100, Przemek Kitszel wrote:
+> >>
+> >> That sounds right too; one could argue if your fix is orthogonal to that
+> >> or not. I would say that your fix makes core net code more robust
+> >> against drivers from past millennia. :)
+> >> igc folks are notified, no idea how much time it would take to propose
+> >> a fix.
+> > 
+> > Maybe it should be on whoever added runtime pm to ethtool ;-)
+> > 
+> > Heiner, the igc driver was already doing this when you added
+> > pm_runtime_get_sync() ops, was there a discussion at the time, or just
+> > missed?
+> > 
+> I think it went unnoticed at that time that igc is acquiring RTNL
+> in runtime-resume. I'm just astonished that this pops up only now,
+> considering that the change was done more than 2 yrs ago.
 
-CSR.OPS bits specify the current operating mode and (according to
-documentation) they are updated by HW when the operating mode change
-request is processed. To comply with this check CSR.OPS before proceeding.
+PM runtime is disabled by default for igc (driver do not call
+pm_runtime_allow()). It has to be enabled explicitly by user write
+to pci sysfs power/control file. And after that link up/down or
+ethtool has to be used to trigger this deadlock, so quite unlikely
+scenario.
 
-Commit introduces ravb_set_opmode() that does all the necessities for
-setting the operating mode (set CCC.OPC (and CCC.GAC, CCC.CSEL, if any) and
-wait for CSR.OPS) and call it where needed. This should comply with all the
-HW manuals requirements as different manual variants specify that different
-modes need to be checked in CSR.OPS when setting CCC.OPC.
+Is possible though, that some power saving daemon start enabling
+pm runtime for devices, so that why issue become visible.
 
-If gPTP active in config mode is supported and it needs to be enabled, the
-CCC.GAC and CCC.CSEL needs to be configured along with CCC.OPC in the same
-write access. For this, ravb_set_opmode() allows passing GAC and CSEL as
-part of opmode and the function updates accordingly CCC register.
-
-Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
----
- drivers/net/ethernet/renesas/ravb_main.c | 65 +++++++++++++++---------
- 1 file changed, 42 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 664eda4b5a11..8649b3e90edb 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -66,16 +66,27 @@ int ravb_wait(struct net_device *ndev, enum ravb_reg reg, u32 mask, u32 value)
- 	return -ETIMEDOUT;
- }
- 
--static int ravb_config(struct net_device *ndev)
-+static int ravb_set_opmode(struct net_device *ndev, u32 opmode)
- {
-+	u32 csr_ops = 1U << (opmode & CCC_OPC);
-+	u32 ccc_mask = CCC_OPC;
- 	int error;
- 
--	/* Set config mode */
--	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
--	/* Check if the operating mode is changed to the config mode */
--	error = ravb_wait(ndev, CSR, CSR_OPS, CSR_OPS_CONFIG);
--	if (error)
--		netdev_err(ndev, "failed to switch device to config mode\n");
-+	/* If gPTP active in config mode is supported it needs to be configured
-+	 * along with CSEL and operating mode in the same access. This is a
-+	 * hardware limitation.
-+	 */
-+	if (opmode & CCC_GAC)
-+		ccc_mask |= CCC_GAC | CCC_CSEL;
-+
-+	/* Set operating mode */
-+	ravb_modify(ndev, CCC, ccc_mask, opmode);
-+	/* Check if the operating mode is changed to the requested one */
-+	error = ravb_wait(ndev, CSR, CSR_OPS, csr_ops);
-+	if (error) {
-+		netdev_err(ndev, "failed to switch device to requested mode (%u)\n",
-+			   opmode & CCC_OPC);
-+	}
- 
- 	return error;
- }
-@@ -673,7 +684,7 @@ static int ravb_dmac_init(struct net_device *ndev)
- 	int error;
- 
- 	/* Set CONFIG mode */
--	error = ravb_config(ndev);
-+	error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- 	if (error)
- 		return error;
- 
-@@ -682,9 +693,7 @@ static int ravb_dmac_init(struct net_device *ndev)
- 		return error;
- 
- 	/* Setting the control will start the AVB-DMAC process. */
--	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_OPERATION);
--
--	return 0;
-+	return ravb_set_opmode(ndev, CCC_OPC_OPERATION);
- }
- 
- static void ravb_get_tx_tstamp(struct net_device *ndev)
-@@ -1046,7 +1055,7 @@ static int ravb_stop_dma(struct net_device *ndev)
- 		return error;
- 
- 	/* Stop AVB-DMAC process */
--	return ravb_config(ndev);
-+	return ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- }
- 
- /* E-MAC interrupt handler */
-@@ -2560,21 +2569,25 @@ static int ravb_set_gti(struct net_device *ndev)
- 	return 0;
- }
- 
--static void ravb_set_config_mode(struct net_device *ndev)
-+static int ravb_set_config_mode(struct net_device *ndev)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	const struct ravb_hw_info *info = priv->info;
-+	int error;
- 
- 	if (info->gptp) {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
-+		if (error)
-+			return error;
- 		/* Set CSEL value */
- 		ravb_modify(ndev, CCC, CCC_CSEL, CCC_CSEL_HPB);
- 	} else if (info->ccc_gac) {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG |
--			    CCC_GAC | CCC_CSEL_HPB);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG | CCC_GAC | CCC_CSEL_HPB);
- 	} else {
--		ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_CONFIG);
-+		error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
- 	}
-+
-+	return error;
- }
- 
- /* Set tx and rx clock internal delay modes */
-@@ -2794,7 +2807,9 @@ static int ravb_probe(struct platform_device *pdev)
- 	ndev->ethtool_ops = &ravb_ethtool_ops;
- 
- 	/* Set AVB config mode */
--	ravb_set_config_mode(ndev);
-+	error = ravb_set_config_mode(ndev);
-+	if (error)
-+		goto out_disable_gptp_clk;
- 
- 	if (info->gptp || info->ccc_gac) {
- 		/* Set GTI value */
-@@ -2917,8 +2932,7 @@ static void ravb_remove(struct platform_device *pdev)
- 	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
- 			  priv->desc_bat_dma);
- 
--	/* Set reset mode */
--	ravb_write(ndev, CCC_OPC_RESET, CCC);
-+	ravb_set_opmode(ndev, CCC_OPC_RESET);
- 
- 	clk_disable_unprepare(priv->gptp_clk);
- 	clk_disable_unprepare(priv->refclk);
-@@ -3000,8 +3014,11 @@ static int __maybe_unused ravb_resume(struct device *dev)
- 	int ret = 0;
- 
- 	/* If WoL is enabled set reset mode to rearm the WoL logic */
--	if (priv->wol_enabled)
--		ravb_write(ndev, CCC_OPC_RESET, CCC);
-+	if (priv->wol_enabled) {
-+		ret = ravb_set_opmode(ndev, CCC_OPC_RESET);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	/* All register have been reset to default values.
- 	 * Restore all registers which where setup at probe time and
-@@ -3009,7 +3026,9 @@ static int __maybe_unused ravb_resume(struct device *dev)
- 	 */
- 
- 	/* Set AVB config mode */
--	ravb_set_config_mode(ndev);
-+	ret = ravb_set_config_mode(ndev);
-+	if (ret)
-+		return ret;
- 
- 	if (info->gptp || info->ccc_gac) {
- 		/* Set GTI value */
--- 
-2.39.2
-
+Regards
+Stanislaw
 
