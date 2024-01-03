@@ -1,76 +1,92 @@
-Return-Path: <netdev+bounces-61106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D986C82278E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 04:24:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0423822795
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 04:35:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 768BD1F2394C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 03:24:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B31741C21D6A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 03:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998244A2A;
-	Wed,  3 Jan 2024 03:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D654A3B;
+	Wed,  3 Jan 2024 03:35:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp87.cstnet.cn [159.226.251.87])
+Received: from cstnet.cn (unknown [159.226.251.84])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD394A26;
-	Wed,  3 Jan 2024 03:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
-Received: from mengjingzi$iie.ac.cn ( [121.195.114.118] ) by
- ajax-webmail-APP-17 (Coremail) ; Wed, 3 Jan 2024 11:24:19 +0800 (GMT+08:00)
-Date: Wed, 3 Jan 2024 11:24:19 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5a2f5pWs5ae/?= <mengjingzi@iie.ac.cn>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Suggestion for Capability Check Refinement in too_many_unix_fds()
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.15 build 20230921(8ad33efc)
- Copyright (c) 2002-2024 www.mailtech.cn cnic.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D634A26;
+	Wed,  3 Jan 2024 03:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-05 (Coremail) with SMTP id zQCowAAH6Azo1ZRltG4VAw--.33879S2;
+	Wed, 03 Jan 2024 11:35:05 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	christian.riesch@omicron.at,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH] asix: Add check for usbnet_get_endpoints
+Date: Wed,  3 Jan 2024 03:35:34 +0000
+Message-Id: <20240103033534.2764386-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <490cec47.ca8f.18ccd59bda2.Coremail.mengjingzi@iie.ac.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:qgCowABHEulk05RlfhgDAA--.31854W
-X-CM-SenderInfo: pphqwyxlqj6xo6llvhldfou0/1tbiDAcFE2WUwEQ9hAABsQ
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAAH6Azo1ZRltG4VAw--.33879S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrtw1kCr17Cw1DCF4fAF4fKrg_yoW3tFg_u3
+	y8W3Z8Jr1UKr4Fgw1DWF4avFWYyF1kXr1xZF48ta4aqa4qq3W3Arn2v3srJ3W7WFWYvwnr
+	Cw1IyFyfJry7KjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbc8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc2xSY4AK67AK6r48
+	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
+	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
+	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
+	W8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
+	cVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUYnYwUUUUU
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-SGkhCgpXZSBpZGVudGlmaWVkIGEgcG90ZW50aWFsIHJlZmluZW1lbnQgaW4gdGhlIHRvb19tYW55
-X3VuaXhfZmRzKCkgZnVuY3Rpb24uIEN1cnJlbnRseSBDQVBfU1lTX0FETUlOIGFuZCBDQVBfU1lT
-X1JFU09VUkNFIGFyZSBjaGVja2VkIHdoZW4gdGhlIG51bWJlciBvZiBvcGVuIGZpbGVzIGluIGEg
-c29ja2V0IGV4Y2VlZHMgdGhlIHVwcGVyIGxpbWl0LCBoYXZpbmcgZWl0aGVyIG9uZSBjb3VsZCBw
-YXNzIHRoZSBjaGVjay4gV2UgcmVjb21tZW5kIHJldmlzaXRpbmcgdGhlIGNhcGFiaWxpdHkgY2hl
-Y2tzIGFuZCBjb25zaWRlcmluZyB0byB1dGlsaXplIENBUF9TWVNfUkVTT1VSQ0UgZXhjbHVzaXZl
-bHkuIEhlcmUncyBvdXIgcmF0aW9uYWxlIGZvciB0aGlzIHN1Z2dlc3Rpb246CgooMSkgRGVmaW5l
-ZCBDYXBhYmlsaXR5IGZvciBSZXNvdXJjZSBMaW1pdHM6IEFjY29yZGluZyB0byB0aGUgY2FwYWJp
-bGl0eSBtYW51YWwgcGFnZVsxXSwgdGhlIGNhcGFiaWxpdHkgZXhwbGljaXRseSBkZXNpZ25lZCBm
-b3IgYnlwYXNzaW5nIHN5c3RlbSByZXNvdXJjZSBsaW1pdHMgaXMgQ0FQX1NZU19SRVNPVVJDRShD
-QVBfU1lTX1JFU09VUkNFOiBhbGxvdyB0aGUgUkxJTUlUX05PRklMRSByZXNvdXJjZSBsaW1pdCBv
-biB0aGUgbnVtYmVyIG9mICJpbi1mbGlnaHQiIGZpbGUgZGVzY3JpcHRvcnMgdG8gYmUgYnlwYXNz
-ZWQpLgoKKDIpIFByZXNlcnZpbmcgTGVhc3QgUHJpdmlsZWdlIFByaW5jaXBsZTogQ0FQX1NZU19B
-RE1JTiBjaGVjayBpbiB0aGlzIGNvbnRleHQgbWF5IGxlYWQgdG8gb3Zlci1wcml2aWxlZ2luZy4g
-SXQgaXMgYWxyZWFkeSBvdmVybG9hZGVkIGFuZCBrbm93biBhcyB0aGUgbmV3ICJyb290IlsyXS4g
-QWNjb3JkaW5nIHRvIHRoZSBtYW51YWwgcGFnZVsxXSDigJxEb24ndCBjaG9vc2UgQ0FQX1NZU19B
-RE1JTiBpZiB5b3UgY2FuIHBvc3NpYmx5IGF2b2lkIGl0IeKAnSwgaXQncyBiZW5lZmljaWFsIHRv
-IHVzZSB0aGUgbW9zdCBzcGVjaWZpYyBjYXBhYmlsaXR5IHJlcXVpcmVkIGZvciBhIGdpdmVuIHRh
-c2suCgpUaGlzIGlzc3VlIGV4aXN0cyBpbiBzZXZlcmFsIGtlcm5lbCB2ZXJzaW9ucyBhbmQgd2Ug
-aGF2ZSBjaGVja2VkIGl0IG9uIHRoZSBsYXRlc3Qgc3RhYmxlIHJlbGVhc2UoTGludXggNi42Ljkp
-LiAKCllvdXIgZmVlZGJhY2sgYW5kIGluc2lnaHRzIG9uIHRoaXMgcHJvcG9zZWQgbW9kaWZpY2F0
-aW9uIHdvdWxkIGJlIGdyZWF0bHkgYXBwcmVjaWF0ZWQuIFRoYW5rIHlvdSBmb3IgeW91ciB0aW1l
-IGFuZCBjb25zaWRlcmF0aW9uLgoKQmVzdCByZWdhcmRzLApKaW5nemkKCnJlZmVyZW5jZToKWzFd
-IGh0dHBzOi8vd3d3Lm1hbjcub3JnL2xpbnV4L21hbi1wYWdlcy9tYW43L2NhcGFiaWxpdGllcy43
-Lmh0bWwKWzJdIGh0dHBzOi8vbHduLm5ldC9BcnRpY2xlcy80ODYzMDYv
+Add check for usbnet_get_endpoints() and return the error if it fails
+in order to transfer the error.
+
+Fixes: 16626b0cc3d5 ("asix: Add a new driver for the AX88172A")
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+---
+ drivers/net/usb/ax88172a.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/ax88172a.c b/drivers/net/usb/ax88172a.c
+index 3777c7e2e6fc..e47bb125048d 100644
+--- a/drivers/net/usb/ax88172a.c
++++ b/drivers/net/usb/ax88172a.c
+@@ -161,7 +161,9 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	u8 buf[ETH_ALEN];
+ 	struct ax88172a_private *priv;
+ 
+-	usbnet_get_endpoints(dev, intf);
++	ret = usbnet_get_endpoints(dev, intf);
++	if (ret)
++		return ret;
+ 
+ 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+-- 
+2.25.1
+
 
