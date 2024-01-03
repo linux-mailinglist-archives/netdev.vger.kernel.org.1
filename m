@@ -1,138 +1,113 @@
-Return-Path: <netdev+bounces-61269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35F6823026
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:02:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43A8882302B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:02:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F107286400
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:02:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAC2B286528
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12BE1CFAC;
-	Wed,  3 Jan 2024 15:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A501A726;
+	Wed,  3 Jan 2024 15:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LLja+DKc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vRPIlCaf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463C71B28E
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 15:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704294018;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7QMJZ+3lHeykV3WPSbajID2T4bzMyvXitF+gI+XPTjU=;
-	b=LLja+DKciyAEXLaleL1Abq/wVr7srd5B4cCPc2IjaT0xnsgSRieOKaNyZMdLl20qiFxgKy
-	kmq9PXCpIGOqvjFJL6W7ymOedlRGevHDYwVWXRZaD6vneC10WZgftXhwiQyFUE/i4/iEzY
-	ZF41tbrUrb/oMkvOk2nRFOwMfzvByew=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-aceTF6bhNCidJMmyrfkt8A-1; Wed,
- 03 Jan 2024 10:00:12 -0500
-X-MC-Unique: aceTF6bhNCidJMmyrfkt8A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4AA321E441CA;
-	Wed,  3 Jan 2024 15:00:10 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1A2D21121306;
-	Wed,  3 Jan 2024 15:00:06 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: [PATCH 5/5] 9p: Use length of data written to the server in preference to error
-Date: Wed,  3 Jan 2024 14:59:29 +0000
-Message-ID: <20240103145935.384404-6-dhowells@redhat.com>
-In-Reply-To: <20240103145935.384404-1-dhowells@redhat.com>
-References: <20240103145935.384404-1-dhowells@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51A91A702;
+	Wed,  3 Jan 2024 15:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=g8K4Wbg5JDQXx3q/iM3cUgJD+tm3dXGYqWadi7wsaLo=; b=vRPIlCafJtPTrLDLkNkZyvUl24
+	xXTcQv22UTsNwmoIsCywmF04xqy6lyWQK7KYruZXaUaDViF1OsvA9njVSvWZhVAjorCzROmbXDnZ5
+	HBNIdw52sG47eqZTfY1LV4xew4V0KVKtwyDSxrE+W45fbgni3Tk4ETlr8k5x8nxUvDd/eOn415kIZ
+	Z3NrN5jVaJ0ePDyNWY1jLcUbVzZbDVrQ9TxJt6ajP33+fn5inC0g2cnbaW1NXLNnGiLtyOrKnzW6y
+	NHn5jw87eNqwA+y0t2l9AkfpVAStCcudTUtAWpz9YWgt7jXCL/t8sJTKfWH6T7db6AbezzbiTJWR5
+	b42yMw4w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48018)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rL2k2-0007cb-1L;
+	Wed, 03 Jan 2024 15:01:10 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rL2jz-0006Sx-I0; Wed, 03 Jan 2024 15:01:07 +0000
+Date: Wed, 3 Jan 2024 15:01:07 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Marek Vasut <marex@denx.de>, Clark Wang <xiaoning.wang@nxp.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Sylvain Girard <sylvain.girard@se.com>,
+	Pascal EBERHARD <pascal.eberhard@se.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net 5/5] net: pcs: rzn1-miic: Init RX clock early if MAC
+ requires it
+Message-ID: <ZZV2s/TGKanl76TI@shell.armlinux.org.uk>
+References: <20240103142827.168321-1-romain.gantois@bootlin.com>
+ <20240103142827.168321-6-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240103142827.168321-6-romain.gantois@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-In v9fs_upload_to_server(), we pass the error to netfslib to terminate the
-subreq rather than the amount of data written - even if we did actually
-write something.
+On Wed, Jan 03, 2024 at 03:28:25PM +0100, Romain Gantois wrote:
+> The GMAC1 controller in the RZN1 IP requires the RX MII clock signal to be
+> started before it initializes its own hardware, thus before it calls
+> phylink_start.
+> 
+> Check the rxc_always_on pcs flag and enable the clock signal during the
+> link validation phase.
 
-Further, we assume that the write is always entirely done if successful -
-but it might have been partially complete - as returned by
-p9_client_write(), but we ignore that.
+However, validation is *not* supposed to change the configuration of
+the hardware. Validation may fail. The "interface" that gets passed
+to validation may never ever be selected. This change feels like
+nothing more than a hack.
 
-Fix this by indicating the amount written by preference and only returning
-the error if we didn't write anything.
+Since the MAC driver has to itself provide the PCS to phylink via the
+mac_select_pcs() method, the MAC driver already has knowledge of which
+PCS it is going to be using. Therefore, I think it may make sense
+to do something like this:
 
-(We might want to return both in future if both are available as this
-might be useful as to whether we retry or not.)
+int phylink_pcs_preconfig(struct phylink *pl, struct phylink_pcs *pcs)
+{
+	if (pl->config->mac_requires_rxc)
+		pcs->rxc_always_on = true;
 
-Suggested-by: Dominique Martinet <asmadeus@codewreck.org>
-Link: https://lore.kernel.org/r/ZZULNQAZ0n0WQv7p@codewreck.org/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: v9fs@lists.linux.dev
-cc: linux-cachefs@redhat.com
-cc: linux-fsdevel@vger.kernel.org
----
- fs/9p/vfs_addr.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+	if (pcs->ops->preconfig)
+		pcs->ops->pcs_preconfig(pcs);
+}
 
-diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
-index f7f83eec3bcc..047855033d32 100644
---- a/fs/9p/vfs_addr.c
-+++ b/fs/9p/vfs_addr.c
-@@ -29,12 +29,11 @@
- static void v9fs_upload_to_server(struct netfs_io_subrequest *subreq)
- {
- 	struct p9_fid *fid = subreq->rreq->netfs_priv;
--	int err;
-+	int err, len;
- 
- 	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
--	p9_client_write(fid, subreq->start, &subreq->io_iter, &err);
--	netfs_write_subrequest_terminated(subreq, err < 0 ? err : subreq->len,
--					  false);
-+	len = p9_client_write(fid, subreq->start, &subreq->io_iter, &err);
-+	netfs_write_subrequest_terminated(subreq, len ?: err, false);
- }
- 
- static void v9fs_upload_to_server_worker(struct work_struct *work)
+and have stmmac call phylink_pcs_preconfig() for each PCS that it will
+be using during initialisation / resume paths?
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
