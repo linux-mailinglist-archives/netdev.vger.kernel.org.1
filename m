@@ -1,114 +1,73 @@
-Return-Path: <netdev+bounces-61185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350A6822C8D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:01:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58317822C7F
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:59:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C60A1C2285F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:01:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBB821F232BC
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE96818EDD;
-	Wed,  3 Jan 2024 11:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6165318EBD;
+	Wed,  3 Jan 2024 11:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F7UGDIyH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8A016ia"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683F71C282;
-	Wed,  3 Jan 2024 11:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704283044; x=1735819044;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ckkiO416SQGEhwV4zzqsvcHUPsFG/LHSPvD8m5tHmkY=;
-  b=F7UGDIyHnBXnU/CluuIQbooWBXxWzeaYzgPWTafJRJfo9OT6cdT9NnRp
-   sDSLBJYI3ADiwdcXaB3+UKVtME0CAUxLJq6hkA8woBJi3fNkd6niuhple
-   xTaqnvtE8+wtwwq5zAn5Y7oEVheqxKu+h++bnQop/iI/qaCU//RZ9zkM6
-   SN1RUhPyyN/BQWIM/SVzmAA9bPxJxuvp3LMg2S1/YjqOJlxW+QZTbEdGG
-   TeiLnOAbfz/+SzuWC4kJ1VuaRMDnZ9AbScMOMumA44fCiIzZ0zRFA4rhE
-   qGIN8RvRGOwEfjvK/dK3Q+E3wSJ/RaJa9liIjozbmBRynJFYlYpbjNuNh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="428169638"
-X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
-   d="scan'208";a="428169638"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 03:57:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="1111348156"
-X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
-   d="scan'208";a="1111348156"
-Received: from inlubt0316.iind.intel.com ([10.191.20.213])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Jan 2024 03:57:14 -0800
-From: lakshmi.sowjanya.d@intel.com
-To: tglx@linutronix.de,
-	jstultz@google.com,
-	giometti@enneenne.com,
-	corbet@lwn.net,
-	linux-kernel@vger.kernel.org
-Cc: x86@kernel.org,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	andriy.shevchenko@linux.intel.com,
-	eddie.dong@intel.com,
-	christopher.s.hall@intel.com,
-	jesse.brandeburg@intel.com,
-	davem@davemloft.net,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	mcoquelin.stm32@gmail.com,
-	perex@perex.cz,
-	linux-sound@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	pandith.n@intel.com,
-	mallikarjunappa.sangannavar@intel.com,
-	thejesh.reddy.t.r@intel.com,
-	lakshmi.sowjanya.d@intel.com
-Subject: [RFC PATCH v3 11/11] ABI: pps: Add ABI documentation for Intel TIO
-Date: Wed,  3 Jan 2024 17:26:02 +0530
-Message-Id: <20240103115602.19044-12-lakshmi.sowjanya.d@intel.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20240103115602.19044-1-lakshmi.sowjanya.d@intel.com>
-References: <20240103115602.19044-1-lakshmi.sowjanya.d@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F661A710
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 11:56:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 434BFC433C7;
+	Wed,  3 Jan 2024 11:56:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704283013;
+	bh=vJ5jyGBw1lO0kwYBWY53912OTBGP2INGrhz5BagMxiI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R8A016ia/ba7fHAmbI7hljeAouDs4TNUaI1BZKoHlUvWdr9iU/brK+xo/k90Asl0K
+	 gDmeb3IELBONZfezK+NQaJMCJyRxnXq7zzoGtPwosjbMS4RgK9JRNXx4q4asgr+bP+
+	 OVt7rl4/mhQLN6PjLhDIHkt1o1zEAAn6wZqx5trxZNvprVHb+OfGiGuqbcRkBiKkFK
+	 7Q0DMkEvMM2gar9w5KrBMAB5kVnsfQenJA9gXKfX79tu94uAW6PvKax2H5MnxE6ip2
+	 2uThi4GwRfYee2K0UTquO3Gqy9mssm7qOH628i6jfaOp1X7Kn5qNKBGy/v4a7A20jn
+	 X00L+i5u3Uetg==
+Date: Wed, 3 Jan 2024 13:56:49 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2] rdma: shorten print_ lines
+Message-ID: <20240103115649.GC10748@unreal>
+References: <20240102164538.7527-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240102164538.7527-1-stephen@networkplumber.org>
 
-From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+On Tue, Jan 02, 2024 at 08:45:24AM -0800, Stephen Hemminger wrote:
+> With the shorter form of print_ function some of the lines can
+> now be shortened. Max line length in iproute2 should be 100 characters
+> or less.
+> 
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+>  rdma/dev.c     |  6 ++----
+>  rdma/link.c    | 16 ++++++----------
+>  rdma/res-cq.c  |  3 +--
+>  rdma/res-qp.c  |  9 +++------
+>  rdma/res-srq.c |  3 +--
+>  rdma/res.c     | 11 ++++-------
+>  rdma/stat.c    | 20 +++++++-------------
+>  rdma/sys.c     | 10 +++-------
+>  rdma/utils.c   | 15 +++++----------
+>  9 files changed, 32 insertions(+), 61 deletions(-)
+> 
 
-Document sysfs interface for Intel Timed I/O PPS driver
-
-Signed-off-by: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
----
- Documentation/ABI/testing/sysfs-platform-pps-tio | 7 +++++++
- 1 file changed, 7 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-platform-pps-tio
-
-diff --git a/Documentation/ABI/testing/sysfs-platform-pps-tio b/Documentation/ABI/testing/sysfs-platform-pps-tio
-new file mode 100644
-index 000000000000..24a2eb591a05
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-platform-pps-tio
-@@ -0,0 +1,7 @@
-+What:		/sys/devices/platform/INTCxxxx/enable
-+Date:		March 2024
-+KernelVersion	6.9
-+Contact:	Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-+Description:
-+		(RW) Enable or disable PPS TIO generator output, read to
-+		see the status of hardware(Enabled/Disabled).
--- 
-2.35.3
-
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
