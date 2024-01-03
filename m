@@ -1,127 +1,79 @@
-Return-Path: <netdev+bounces-61306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0178B8233AE
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:45:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA6558233E0
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:52:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98A27B233C7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:45:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58056286B68
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BBD1C295;
-	Wed,  3 Jan 2024 17:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8266D1C2BC;
+	Wed,  3 Jan 2024 17:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Veires6m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ss1HqxdB"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD841CA82;
-	Wed,  3 Jan 2024 17:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 56C29240005;
-	Wed,  3 Jan 2024 17:45:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1704303906;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cs8g0KhAOJTfgaQgA8pB+LP2E2avXgkG+OV/pjDzLaE=;
-	b=Veires6mA8qVJybyozb4tqAFhj632S+ab3KXk7HxxGI9kA0HcSZwNRQeznIVcH7lC/RUj8
-	S3d2kl+IsJMw9EFA1kgKLwWgDtlbdKAqBCCBCdzV00V3CGuUej0cZ0awnvoYu3yOh91W+k
-	9M5GLLfk2Zo2KO0UP8I+wwV+lVYnnGdJjRQ49aMKIHIosn93STnefnlQfRA+CQtSXaGn+3
-	NxPbpzQVlef9KBUClTVID4YiZL88f3eqPyoOh9DzeCWTDhSvDaz3s9LRn52B6nUKoeVlwx
-	vIA+KHaC3FyGopwvR4ayIFzmEagbfKym2TpjaTkAGICVPBLtCbYNmoIgiLCnMQ==
-Date: Wed, 3 Jan 2024 18:45:01 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH net-next v5 02/13] net: sfp: pass the phy_device when
- disconnecting an sfp module's PHY
-Message-ID: <20240103184501.00be82c2@device-28.home>
-In-Reply-To: <ZZV7OerAJWGkSL1I@shell.armlinux.org.uk>
-References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
-	<20231221180047.1924733-3-maxime.chevallier@bootlin.com>
-	<ZZV7OerAJWGkSL1I@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6A11C2A6;
+	Wed,  3 Jan 2024 17:52:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49F28C433C7;
+	Wed,  3 Jan 2024 17:52:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704304368;
+	bh=v4FnOT3+qS+6Q7aq9Kz0FybsYzgazhhzJUuxOz3LL5o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ss1HqxdB559XH1OG9QLVj/IntPizmprsqe5d39xYMFi3kgKSf8ikKu+PU1OoAdEbC
+	 09ROyfaV0IBSVIVRh+zPpMSXn9cSHMCnaDKERo4QQ5yGB7g7vDeILdN54UdpTlZvEz
+	 IS83nvKlHKuda0I02T2FC4ivDUptwZKcGwN9fI6TaRoSWZcIjQWUd+yLUXp1HVh6Lp
+	 S0zDHARvH4ADrFs0GeusmL1Iy7vnOcUbdy4mayvsouv6SUeSEH3R2RpE4a6FdKoEGr
+	 Azy0x16uqMnaLhH/KscabZPnNybpqKdr9l0QDPQlILyGaeTpTOy5VsIOcmH0yrA/vo
+	 KQwWeXS7ZcKtQ==
+Date: Wed, 3 Jan 2024 17:52:42 +0000
+From: Simon Horman <horms@kernel.org>
+To: Sneh Shah <quic_snehshah@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>
+Subject: Re: [PATCH net v2] net: stmmac: Fix ethool link settings ops for
+ integrated PCS
+Message-ID: <20240103175242.GC31813@kernel.org>
+References: <20231226083432.24920-1-quic_snehshah@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231226083432.24920-1-quic_snehshah@quicinc.com>
 
-Hi Russell,
-
-On Wed, 3 Jan 2024 15:20:25 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-
-> On Thu, Dec 21, 2023 at 07:00:35PM +0100, Maxime Chevallier wrote:
-> > Pass the phy_device as a parameter to the sfp upstream .disconnect_phy
-> > operation. This is preparatory work to help track phy devices across
-> > a net_device's link.
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > ---
-> > V5: No changes
-> > V4: No changes
-> > V3: No changes
-> > 
-> >  drivers/net/phy/phy_device.c | 8 ++++++++
-> >  drivers/net/phy/phylink.c    | 3 ++-
-> >  drivers/net/phy/sfp-bus.c    | 4 ++--
-> >  include/linux/sfp.h          | 2 +-
-> >  4 files changed, 13 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> > index d7c0812bd107..aad78e3f7894 100644
-> > --- a/drivers/net/phy/phy_device.c
-> > +++ b/drivers/net/phy/phy_device.c
-> > @@ -266,6 +266,14 @@ static void phy_mdio_device_remove(struct mdio_device *mdiodev)
-> >  
-> >  static struct phy_driver genphy_driver;
-> >  
-> > +static struct phy_link_topology *phy_get_link_topology(struct phy_device *phydev)
-> > +{
-> > +	if (phydev->attached_dev)
-> > +		return &phydev->attached_dev->link_topo;
-> > +
-> > +	return NULL;
-> > +}
-> > +
-> >  static LIST_HEAD(phy_fixup_list);
-> >  static DEFINE_MUTEX(phy_fixup_lock);
-> >    
+On Tue, Dec 26, 2023 at 02:04:32PM +0530, Sneh Shah wrote:
+> Currently get/set_link_ksettings ethtool ops are dependent on PCS.
+> When  PCS is integrated, it will not have separate link config.
+> Bypass configuring and checking PCS for integrated PCS.
 > 
-> This should be in a different patch, it seems unrelated to the remainder
-> of this patch, and as it's static and no other changes to this file,
-> this would cause a build warning.
+> Fixes: ("aa571b6275fb net: stmmac: add new switch to struct plat_stmmacenet_data")
 
-Arg looks like I squashed that bit here to the wrong commit while
-rebasing, it should have been part of commit 03/13 indeed... Sorry for
-the hiccup.
+Nit: a correct format for the line above is:
 
-Maxime 
+Fixes: aa571b6275fb ("net: stmmac: add new switch to struct plat_stmmacenet_data")
 
+> Tested-by: Andrew Halaney <ahalaney@redhat.com> # sa8775p-ride
+> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+
+...
 
