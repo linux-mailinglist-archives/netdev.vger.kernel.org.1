@@ -1,46 +1,48 @@
-Return-Path: <netdev+bounces-61334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9D42823730
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:37:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E910823733
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:39:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 517E11F25E4D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:37:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A08A528257D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD9E1D69E;
-	Wed,  3 Jan 2024 21:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD96F1DA21;
+	Wed,  3 Jan 2024 21:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESFIez2p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LfRFEyAl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D0C1DA21;
-	Wed,  3 Jan 2024 21:37:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49CB3C433C8;
-	Wed,  3 Jan 2024 21:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B891D6BE
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 21:39:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F18C433B9;
+	Wed,  3 Jan 2024 21:39:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704317856;
-	bh=73LREQTxsSnXIYw93DHSfO0naLDfX2w7eQgpbIiIwPU=;
+	s=k20201202; t=1704317982;
+	bh=0HrVSl54jYmE5eYqRcFCiH2DRtCFbci+W2VMEK50M4s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ESFIez2p7wZP/2gn7ruqrQK4nV2PxBtzP80+gqQmMjvqExlf6CLoORLaPyuOpxUe9
-	 Lr4jAMtdCEdFDdFylvURuXxue/x9Ht/HrfGnwD3p5hRmDsggoy3fQJDtKxgUy91sYy
-	 a9B5CXPflVNv39YMuPSuXgizcx8JzTc4G/l7DX3yAMOGN4VFkb+MDR6xo/K4rP98Fx
-	 fYbu9XYMrEZP0QRrLrdCZvqMBUJG4WBY9B3GE8ZeTgejxKfxGe5lTtbS1M/gk8Ib7a
-	 b7DNgYZg4kUmg0fsOSd/NaPhwhYh90XRUoIfxBy6xb7cURgis237dcR76cLAQS+O/r
-	 MgAr2YvQdvVSQ==
-Date: Wed, 3 Jan 2024 13:37:35 -0800
+	b=LfRFEyAlxQcs4smvuod9XfOQE0cBmex+P8iayJO+//3NHFYmzWCudnoNrMQx3lRGR
+	 ntNt5u81eeocHX4KPbEVl1F0ME19piaAOOoRxDKKKWLxYA6+11rWw65xGZFyt4YXjn
+	 cJHATLsgFFEFQIPpTqamOUGD4IK4v6RIie3KTDWTy+6oBTDylU1RN+o6E5svr3Qvsn
+	 q2rXmMeiPRWlBsrvwQynPU8OOq+a0XmweM37H41TZ90HI1S7ZIXorU0fSyZQI80at+
+	 CNI2hxLSQqCdrFcemd5WiNOUpgQstXRMjBLlDx4u9yLypLzeWcZGf6wOyoe8W6ZdPx
+	 0n+w2AeT6TAVQ==
+Date: Wed, 3 Jan 2024 13:39:40 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCH net] MAINTAINERS: I don't want to review Renesas
- Ethernet Switch driver
-Message-ID: <20240103133735.7bd660b9@kernel.org>
-In-Reply-To: <6498e2dd-7960-daeb-acce-a8d2207f3404@omp.ru>
-References: <6498e2dd-7960-daeb-acce-a8d2207f3404@omp.ru>
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, <netdev@vger.kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ahmed Zaki
+ <ahmed.zaki@intel.com>
+Subject: Re: [PATCH net-next] net: ethtool: Fix set RXNFC call on drivers
+ with no RXFH support
+Message-ID: <20240103133940.73888714@kernel.org>
+In-Reply-To: <20240103191620.747837-1-gal@nvidia.com>
+References: <20240103191620.747837-1-gal@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,30 +52,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 3 Jan 2024 23:56:15 +0300 Sergey Shtylyov wrote:
-> I don't know this hardware, I don't have the manuals for it, so I can't
-> provide a good review.  Let's exclude the Ethernet Switch related files.
+On Wed, 3 Jan 2024 21:16:20 +0200 Gal Pressman wrote:
+> Some interfaces support get/set_rxnfc but not get/set_rxfh (mlx5 IPoIB
+> for example).
+> Instead of failing the RXNFC command, do the symmetric xor sanity check
+> for interfaces that support get_rxfh only.
 > 
-> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Fixes: dcd8dbf9e734 ("net: ethtool: get rid of get/set_rxfh_context functions")
+> Cc: Ahmed Zaki <ahmed.zaki@intel.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
 
-> Index: net/MAINTAINERS
-> ===================================================================
-> --- net.orig/MAINTAINERS
-> +++ net/MAINTAINERS
-> @@ -18358,6 +18358,9 @@ L:	linux-renesas-soc@vger.kernel.org
->  F:	Documentation/devicetree/bindings/net/renesas,*.yaml
->  F:	drivers/net/ethernet/renesas/
->  F:	include/linux/sh_eth.h
-> +X:	Documentation/devicetree/bindings/net/renesas,*ether-switch.yaml
-> +X:	drivers/net/ethernet/renesas/rcar_gen4_ptp.*
-> +X:	drivers/net/ethernet/renesas/rswitch.*
-
-First off, very nice to see a refinement of MAINTAINERS to narrow
-down the scope and make it more precise. Thanks for doing that.
-
-The solution itself is not very idiomatic, however :(
-IIUC you want to support SuperH and the AVB implementation.
-It'd be more usual to make the entry cover only the relevant files.
-And for bonus points perhaps add an entry covering the switch files,
-mark that entry as Orphan?
+Thanks, we got a similar patch from Gerhard, applied yesterday:
+501869fecfbc ("net: ethtool: Fix symmetric-xor RSS RX flow hash check")
+-- 
+pw-bot: nap
 
