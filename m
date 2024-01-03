@@ -1,178 +1,98 @@
-Return-Path: <netdev+bounces-61129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419B9822A75
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:48:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 475E5822A7D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:49:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1A13284767
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:48:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D8E81C23241
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6681863F;
-	Wed,  3 Jan 2024 09:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8637A18626;
+	Wed,  3 Jan 2024 09:48:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DKURrIJW"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="iJKvm4Il"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wm1-f100.google.com (mail-wm1-f100.google.com [209.85.128.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239D618634
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 09:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-336f2c88361so5695471f8f.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 01:48:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042AD18B08
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 09:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f100.google.com with SMTP id 5b1f17b1804b1-40d4a222818so1483245e9.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 01:48:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704275297; x=1704880097; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9ygiQ5GZ7AaDONBWvS2tDIrOeQ15Rvo3O1ywNhmUg6E=;
-        b=DKURrIJWUdAW9g81u035uyQjPPYqxC3IHf5y4D4x5F8/0+SupR0ZqLxRH9INT9swMz
-         QjuATZjny7Qb/fZ+VfKUhm8vn8jLTz1DGrtS+2qrcZFaHliPgBDCKtOlv0nMn534Yltz
-         nyl3fqupsaG+BnycDn65a3Ff/oWhfOC3129AjlJYHbKy5qB0gHED6NSCwg+MltvCRqvV
-         /jOaYutSu4MzBlr3GoJgC245W2BJVY1DePS2sDHH3CQGoAuC4Si22qtnMCzbGkzTXTCD
-         BCP6RVnpYKayfcjeL9zvqwekBQXNi4b1O2TBTb2cjGN08fk9JdBF4HtXtGnlDXufeO7d
-         Y6RQ==
+        d=6wind.com; s=google; t=1704275331; x=1704880131; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mWYozj8NoaaSVO5dzw8uHWhq3syxqXeQNBskChBBlHY=;
+        b=iJKvm4Iln4tKJF4JcnpilBnLIUnkNugTI02T+aJ9bHmWaO1Sq3EBMteoWhehNrfKCX
+         xHOrCoVA78vKZoWMvI55F5yjPZKpqGJhBClVZMDvHnDEn1tcL+gRIML4zACctjkOgg0b
+         eZT6ZnLpmx432tOvsMzckUEir3tKg3L6R2pMQj6aTlcsTvX11Y+khoW15lVdtwQzAGhJ
+         7G0RPMYKTDET55c0tXobkL2lFjnAS0wLAxvCpho76jysWTkomCqmt5W1U0NaXiLrPoWm
+         Xk3hixmFkIQzo7mD58L8EItPj3EfWzmupWq3dXMGa+vuat9if3muxDwiYR9r1Ut2wyWM
+         7zsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704275297; x=1704880097;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ygiQ5GZ7AaDONBWvS2tDIrOeQ15Rvo3O1ywNhmUg6E=;
-        b=d4HZDlZWKe1EF1Hw389FfgGqt/zxM7ZX4ScDmywKk4TqO9dlb98UrKmH16473yz/i8
-         zdoU7FcfTO/rZwgQPmHAnHiT/DFezpXgKjedH+4m2aqxtH1zg49xx6B24pnBcHFzlUw0
-         6hX9XMEUN1qeZ7xDuKagaZde7qfqP0oD0ee6PIlenyclqiWMpgkaZETpnOTXzOPjbfwd
-         60NSh//5FGRFLA5Ao9aBjam0JoVy64JGthjzHcXjTWibH6lsN7l8n97t5LYHNgSvqv5r
-         RPdSo7hBdDllXcL5GIdyZxTuzMG1tAjJ/HdE5D/PseAI7Z5zSujRPq/OvcpLGOln9hsx
-         l1gA==
-X-Gm-Message-State: AOJu0YwslMxhLkRa72fG7Ho8Kh0uCunoYaj1dbs0IV6GoSGGpqFjimpb
-	ToD0j8jDRbTFP0LrBCgIE0GoMg/w91KXpQ==
-X-Google-Smtp-Source: AGHT+IHSLGf/w+/4nLJY24qGtbeXFaHszE9j+MVClx84jKy+oClHc3nv8SAWdrAvyz8Wu3CyLWhQYQ==
-X-Received: by 2002:a05:6000:368:b0:337:2aa3:ac80 with SMTP id f8-20020a056000036800b003372aa3ac80mr3811982wrf.68.1704275297315;
-        Wed, 03 Jan 2024 01:48:17 -0800 (PST)
-Received: from [192.168.100.86] ([37.228.218.3])
-        by smtp.gmail.com with ESMTPSA id z13-20020adfe54d000000b00333359b522dsm30539123wrm.77.2024.01.03.01.48.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jan 2024 01:48:16 -0800 (PST)
-Message-ID: <e0926d70-09d1-40ab-939a-7e110d718448@linaro.org>
-Date: Wed, 3 Jan 2024 09:48:15 +0000
+        d=1e100.net; s=20230601; t=1704275331; x=1704880131;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mWYozj8NoaaSVO5dzw8uHWhq3syxqXeQNBskChBBlHY=;
+        b=EAjSv40Zhygm+nYdO5ZMaJplZiyTCKQrJB/k+7DkO5WbIb2WM1jVuTE62S97y+2w5m
+         CgTfB2RUNQZBQncI+EWOYFAoi0WCO2UFjm4PvDui4tEBRmB3r3pQHjFbJBv84+T5cl26
+         o9BhDoupkWjIW5Um/LJZzhgHRT/185oTWUFX/QTFHe/pDB8FNfrXiw8V66ZYyLxkQS+d
+         QB6yA63+bJRetjHzJXHsA1/gov1tu9Wf9BPvC/whZJvi+gjwaeWI/J67yyMGRYZdDUSs
+         tYquSfLBHRM9feJpB9jZYru8diC1aB9qL2ChbHz552Id20KW2V9vfMsElaKEJl3ZPMBO
+         +haQ==
+X-Gm-Message-State: AOJu0YzifBwdcxw8W+rwucXR3bzD+ZGnGk6bx06AAe0KY84+G5+zsMvF
+	/mZtAOaLGsxoweeWuSeagFgHz1m0QsQo0irxk9Ge1CIlj239XY09wNoAZQ==
+X-Google-Smtp-Source: AGHT+IE1U/AjWaTY3O3iefru3+yX8WgG/W3v+vJ6Igb7BY9qELw2MX7QRKCHf8tJh9wT9GPxcQ7nk4tmPyb4
+X-Received: by 2002:a05:600c:4444:b0:40d:888e:34bb with SMTP id v4-20020a05600c444400b0040d888e34bbmr380394wmn.10.1704275331201;
+        Wed, 03 Jan 2024 01:48:51 -0800 (PST)
+Received: from smtpservice.6wind.com ([185.13.181.2])
+        by smtp-relay.gmail.com with ESMTP id r7-20020a05600c458700b0040d83df3189sm35360wmo.40.2024.01.03.01.48.51;
+        Wed, 03 Jan 2024 01:48:51 -0800 (PST)
+X-Relaying-Domain: 6wind.com
+Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
+	by smtpservice.6wind.com (Postfix) with ESMTPS id E8458602FD;
+	Wed,  3 Jan 2024 10:48:50 +0100 (CET)
+Received: from dichtel by bretzel with local (Exim 4.94.2)
+	(envelope-from <nicolas.dichtel@6wind.com>)
+	id 1rKxrm-00A3cn-LA; Wed, 03 Jan 2024 10:48:50 +0100
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Phil Sutter <phil@nwl.cc>,
+	David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: [PATCH net v2 0/2] rtnetlink: allow to enslave with one msg an up interface
+Date: Wed,  3 Jan 2024 10:48:44 +0100
+Message-Id: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/5] net: mdio: ipq4019: enable the SoC uniphy clocks
- for ipq5332 platform
-Content-Language: en-US
-To: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
- konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_srichara@quicinc.com
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
- <20231225084424.30986-3-quic_luoj@quicinc.com>
-From: Bryan O'Donoghue <bryan.odonoghue@linaro.org>
-In-Reply-To: <20231225084424.30986-3-quic_luoj@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 25/12/2023 08:44, Luo Jie wrote:
-> On the platform ipq5332, the related SoC uniphy GCC clocks need
-> to be enabled for making the MDIO slave devices accessible.
-> 
-> These UNIPHY clocks are from the SoC platform GCC clock provider,
-> which are enabled for the connected PHY devices working.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> ---
->   drivers/net/mdio/mdio-ipq4019.c | 75 ++++++++++++++++++++++++++++-----
->   1 file changed, 64 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
-> index 5273864fabb3..e24b0e688b10 100644
-> --- a/drivers/net/mdio/mdio-ipq4019.c
-> +++ b/drivers/net/mdio/mdio-ipq4019.c
-> @@ -35,15 +35,36 @@
->   /* MDIO clock source frequency is fixed to 100M */
->   #define IPQ_MDIO_CLK_RATE	100000000
->   
-> +/* SoC UNIPHY fixed clock */
-> +#define IPQ_UNIPHY_AHB_CLK_RATE	100000000
-> +#define IPQ_UNIPHY_SYS_CLK_RATE	24000000
-> +
->   #define IPQ_PHY_SET_DELAY_US	100000
->   
->   /* Maximum SOC PCS(uniphy) number on IPQ platform */
->   #define ETH_LDO_RDY_CNT				3
->   
-> +enum mdio_clk_id {
-> +	MDIO_CLK_MDIO_AHB,
-> +	MDIO_CLK_UNIPHY0_AHB,
-> +	MDIO_CLK_UNIPHY0_SYS,
-> +	MDIO_CLK_UNIPHY1_AHB,
-> +	MDIO_CLK_UNIPHY1_SYS,
-> +	MDIO_CLK_CNT
-> +};
-> +
->   struct ipq4019_mdio_data {
->   	void __iomem *membase;
->   	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
-> -	struct clk *mdio_clk;
-> +	struct clk *clk[MDIO_CLK_CNT];
-> +};
-> +
-> +static const char *const mdio_clk_name[] = {
-> +	"gcc_mdio_ahb_clk",
-> +	"uniphy0_ahb",
-> +	"uniphy0_sys",
-> +	"uniphy1_ahb",
-> +	"uniphy1_sys"
->   };
->   
->   static int ipq4019_mdio_wait_busy(struct mii_bus *bus)
-> @@ -209,14 +230,43 @@ static int ipq4019_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
->   static int ipq_mdio_reset(struct mii_bus *bus)
->   {
->   	struct ipq4019_mdio_data *priv = bus->priv;
-> -	int ret;
-> +	unsigned long rate;
-> +	int ret, index;
->   
-> -	/* Configure MDIO clock source frequency if clock is specified in the device tree */
-> -	ret = clk_set_rate(priv->mdio_clk, IPQ_MDIO_CLK_RATE);
-> -	if (ret)
-> -		return ret;
-> +	/* For the platform ipq5332, there are two SoC uniphies available
-> +	 * for connecting with ethernet PHY, the SoC uniphy gcc clock
-> +	 * should be enabled for resetting the connected device such
-> +	 * as qca8386 switch, qca8081 PHY or other PHYs effectively.
-> +	 *
-> +	 * Configure MDIO/UNIPHY clock source frequency if clock instance
-> +	 * is specified in the device tree.
-> +	 */
-> +	for (index = MDIO_CLK_MDIO_AHB; index < MDIO_CLK_CNT; index++) {
+The first patch fixes a regression introduced in linux v6.1. The second
+patch adds some tests to verify this API.
 
-you could do a
+v1 -> v2:
+ - add the #2 patch
 
-if (!priv->clk[index])
-	continue;
+ net/core/rtnetlink.c                     |  8 +++++++
+ tools/testing/selftests/net/rtnetlink.sh | 39 ++++++++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
 
-here and save a few cycles executing code for absent clocks. ipq6018 has 
-just 1/5 of the clocks you are checking for here.
+Regards,
+Nicolas
 
-Better still capture the number of clocks you find in probe() in a 
-variable priv->num_clocks and only step through the array
-
-for (i = 0; i < priv->num_clocks; i++) {}
-
----
-bod
 
