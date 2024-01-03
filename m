@@ -1,159 +1,186 @@
-Return-Path: <netdev+bounces-61164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D31F822C07
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:23:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56CCE822C09
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73CE11F22037
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:23:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FAB51C21B6D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A587718E20;
-	Wed,  3 Jan 2024 11:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D0A18E1B;
+	Wed,  3 Jan 2024 11:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IPFMgp3o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TL7WoSlG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC46E18E16
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 11:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50e72e3d435so7780969e87.2
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 03:23:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3774318E16
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 11:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-336788cb261so9295486f8f.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 03:24:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704281002; x=1704885802; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZJRFm+aJFXgkxWtqPNaVAM12RXPKxO0DGGq8KgLaeE0=;
-        b=IPFMgp3o+/ebLmnN7/Xto97/ZnuiFEXQBBYpFbhQ7G1pFsTEMX496etf7bXQ99U5H6
-         JwRcvQHHbVWTPuh0s1qsQUQruH+mO6O2PpxZBRKANrpgeC185Jh3rFUAxG6ThPIHEwu4
-         ibfA0yWtKAw1TS28IP/Q3NiH4C6gdY8RmuBFfKEsUeVGaIBPFkoIU7OGfxuybldayqGN
-         t3PWexb38xiMV3tq+zz12EPEmqY9I6ijkqrIce3xE+5b6TKeTitHyYbSK2hxAOSPKgSq
-         0dBuKt6/vcQaDkVg3FWjCyKW4ttCTPCMOwiyv8XhQdmsRYPmENuiQnoySSREjk03ALJ9
-         SliA==
+        d=gmail.com; s=20230601; t=1704281058; x=1704885858; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ngSthQfVpWAykZk4bbBea413rZ+ZbV9IT5gC7/2Z+ss=;
+        b=TL7WoSlGDiU+Dsr82IAxTU29DNv9qGCEqMhFUkU3i2BSSsH7PfwzhFNh4i2irDP6At
+         Vj5EhU8ztHyaTC9mis6bSkXURsk8CAcuEam7D6tQOQrZmOsgrm1K8AlBe7Mv+FJCD7LP
+         i/LQ3YqdxZBhFkPXAYmIgi/6A5xAkwXZFNZAL3ZG7S8/20Bd/RjJBiPc8PNffBtXAzJG
+         29o/Pg+oXn1I2sj/FAO4+Fwo7vb1bHeP/msVeYC4yxDNxC4NWftcWMnis44KjpzbPclJ
+         xl7/R5L5xEm2r6rdILoTvcxCZIuszVnTTXO4FB/9DqfN9M11SJnSiwVkriqfAD7i3+uM
+         uFhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704281002; x=1704885802;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZJRFm+aJFXgkxWtqPNaVAM12RXPKxO0DGGq8KgLaeE0=;
-        b=qwiz/vDk/Ka5ErmAi6tiMnn04bMRm5SsFN+7uy/YgTJjkFQG4mSfNzdT+1JEDg2RmW
-         38Z/+dSUKNzPLbEahgsjXcl7CFWpGpCCFFHat3PZqx0pF9dFvMkz9oX2BcQRydokqQXd
-         qmidCYGRZPHJjgBq481EugdtKlt0Cryi4a5uOa35OtRjYnv3esIKCg16bSqtXfpfP0Vj
-         mRtpx3EMJPy6CX/WSZ2wzMAcz63De8D4BKMH4eBQTJLAjWToIvuKGaOtWKzLdXX7F5mY
-         sGxCk2ekZ08Up/IYnoHobDjWZH1qMceNF+wAM7pjFghP95CKWOvX1T7dVhCeVQDsZh1G
-         KUew==
-X-Gm-Message-State: AOJu0Yz8xuvYRCIYJue+bjyTo+bKHiH4Nxyh2Rxq0ZvnaJ5Nzkxs+Gkj
-	KWa0pQ2AY6RQQitozvqZM9Ng4SfpeTbyrw==
-X-Google-Smtp-Source: AGHT+IFJVTLwzRGF1DuQP3vjPisYKxiWF+5uAzI0kdZJOWOmMPRP4sLXPJuiATG9UCHDYViYbvZ6Qg==
-X-Received: by 2002:a05:6512:ad0:b0:50e:6b38:9e0b with SMTP id n16-20020a0565120ad000b0050e6b389e0bmr6715682lfu.73.1704281001941;
-        Wed, 03 Jan 2024 03:23:21 -0800 (PST)
-Received: from localhost ([102.140.209.237])
-        by smtp.gmail.com with ESMTPSA id p2-20020a056402044200b005553a8bb61dsm10309013edw.87.2024.01.03.03.23.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 03:23:21 -0800 (PST)
-Date: Wed, 3 Jan 2024 14:23:18 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, deepakx.nagaraju@intel.com,
-	joyce.ooi@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	Nagaraju DeepakX <deepakx.nagaraju@intel.com>,
-	Andy Schevchenko <andriy.schevchenko@linux.intel.com>
-Subject: Re: [PATCH 5/5] net: ethernet: altera: rename functions and their
- prototypes
-Message-ID: <ca5c5be7-9270-412b-a868-d5e28116f983@moroto.mountain>
+        d=1e100.net; s=20230601; t=1704281058; x=1704885858;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ngSthQfVpWAykZk4bbBea413rZ+ZbV9IT5gC7/2Z+ss=;
+        b=ds5dcEEoxxKs0ni9ghVGzE8E9n6TInlft3AY77owbtWORB9YDFZsLD7ojKOYDR5zVv
+         u63pPKf9wlox2CRRfmBrOsjRWiGmkalPApdiLF5EeUlqtaUfUq0eJ4g1O1N6m9k+I08J
+         MpiNIAuh+6RyUXmEkbv0mzHIZfiFqzGgS1hKITwS5Leb6znaxTwzqV7AQ2nukqjzuh2T
+         D8UhwZGf51/Kkqp9XrTyNhfbd5QVM54COXsniQ0EBpu1Vt0KI+/evjX8RChQ/Q9VJljX
+         yHAhTcwIiDdSB3ZvZbxzj3cXe4OavEq1HGHc5StezsWMCInyhoIVnzVCb/64XRL9YEUy
+         eCeQ==
+X-Gm-Message-State: AOJu0YzyKrBrg4vrMvyoBn4pzJgcmHz8gtMr14NkPLlh0z6MIaYnwTmS
+	1JgHt9i9aP4S9wgkCmQEjwk=
+X-Google-Smtp-Source: AGHT+IH1Qbrow1QXHxOtiW8M8b0aKXY6MijQ/pZ9D21ZDkKzvFHuj56+JAVj/YzVaJSF42zt8U5kwQ==
+X-Received: by 2002:a05:6000:1a45:b0:337:39db:2fd7 with SMTP id t5-20020a0560001a4500b0033739db2fd7mr2804192wry.96.1704281058150;
+        Wed, 03 Jan 2024 03:24:18 -0800 (PST)
+Received: from ?IPV6:2a01:c22:7399:5700:b8cf:27e9:e910:c205? (dynamic-2a01-0c22-7399-5700-b8cf-27e9-e910-c205.c22.pool.telefonica.de. [2a01:c22:7399:5700:b8cf:27e9:e910:c205])
+        by smtp.googlemail.com with ESMTPSA id w11-20020adfcd0b000000b003367e35abd4sm30651812wrm.71.2024.01.03.03.24.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jan 2024 03:24:17 -0800 (PST)
+Message-ID: <615c97e9-0a43-4ae6-ae61-172fd64971ec@gmail.com>
+Date: Wed, 3 Jan 2024 12:24:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231213071112.18242-6-deepakx.nagaraju@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
+To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+ Johannes Berg <johannes.berg@intel.com>, Marc MERLIN <marc@merlins.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231206084448.53b48c49@kernel.org> <ZZU3OaybyLfrAa/0@linux.intel.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <ZZU3OaybyLfrAa/0@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 03.01.2024 11:30, Stanislaw Gruszka wrote:
+> On Wed, Dec 06, 2023 at 08:44:48AM -0800, Jakub Kicinski wrote:
+>> On Wed,  6 Dec 2023 11:39:32 +0100 Johannes Berg wrote:
+>>> As reported by Marc MERLIN, at least one driver (igc) wants or
+>>> needs to acquire the RTNL inside suspend/resume ops, which can
+>>> be called from here in ethtool if runtime PM is enabled.
+>>>
+>>> Allow this by doing runtime PM transitions without the RTNL
+>>> held. For the ioctl to have the same operations order, this
+>>> required reworking the code to separately check validity and
+>>> do the operation. For the netlink code, this now has to do
+>>> the runtime_pm_put a bit later.
+>>
+>> I was really, really hoping that this would serve as a motivation
+>> for Intel to sort out the igb/igc implementation. The flow AFAICT
+>> is ndo_open() starts the NIC, the calls pm_sus, which shuts the NIC
+>> back down immediately (!?) then it schedules a link check from a work
+> 
+> It's not like that. pm_runtime_put() in igc_open() does not disable device.
+> It calls runtime_idle callback which check if there is link and if is
+> not, schedule device suspend in 5 second, otherwise device stays running.
+> 
+> Work watchdog_task runs periodically and also check for link changes.
+> 
+>> queue, which opens it again (!?). It's a source of never ending bugs.
+> 
+> Maybe there are issues there and igc pm runtime implementation needs
+> improvements, with lockings or otherwise. Some folks are looking at this. 
+> But I think for this particular deadlock problem reverting of below commits
+> should be considered:
+> 
+> bd869245a3dc net: core: try to runtime-resume detached device in __dev_open
+> f32a21376573 ethtool: runtime-resume netdev parent before ethtool ioctl ops
+> Reverting bd869245a3dc would break existing stuff.
 
-kernel test robot noticed the following build warnings:
+> First, the deadlock should be addressed also in older kernels and
+> refactoring is not really backportable fix.
+> 
+You could simply disable igc runtime pm on older kernel versions
+if backporting a proper fix would be too cumbersome.
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> Second, I don't think network stack should do any calls to pm_runtime* .
 
-url:    https://github.com/intel-lab-lkp/linux/commits/deepakx-nagaraju-intel-com/net-ethernet-altera-remove-unneeded-assignments/20231213-151600
-base:   net/main
-patch link:    https://lore.kernel.org/r/20231213071112.18242-6-deepakx.nagaraju%40intel.com
-patch subject: [PATCH 5/5] net: ethernet: altera: rename functions and their prototypes
-config: m68k-randconfig-r081-20231218 (https://download.01.org/0day-ci/archive/20231220/202312200739.79WGCuyb-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 13.2.0
+It's not unusual that subsystem core code deals with runtime pm.
+E.g. see all the runtime pm calls in drivers/pci/pci.c
+IMO it's exactly the purpose of the RPM API to encapsulate the
+device-specific (r)pm features.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202312200739.79WGCuyb-lkp@intel.com/
-
-New smatch warnings:
-drivers/net/ethernet/altera/altera_tse_main.c:266 alloc_init_skbufs() warn: double check that we're allocating correct size: 24 vs 164
-
-Old smatch warnings:
-drivers/net/ethernet/altera/altera_tse_main.c:271 alloc_init_skbufs() warn: double check that we're allocating correct size: 24 vs 164
-drivers/net/ethernet/altera/altera_tse_main.c:988 tse_open() warn: 'priv->tx_irq' from request_irq() not released on lines: 988.
-
-vim +266 drivers/net/ethernet/altera/altera_tse_main.c
-
-bbd2190ce96d8f Vince Bridgers   2014-03-17  257  static int alloc_init_skbufs(struct altera_tse_private *priv)
-bbd2190ce96d8f Vince Bridgers   2014-03-17  258  {
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  259  	struct altera_dma_private *dma = &priv->dma_priv;
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  260  	unsigned int rx_descs = dma->rx_ring_size;
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  261  	unsigned int tx_descs = dma->tx_ring_size;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  262  	int ret = -ENOMEM;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  263  	int i;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  264  
-bbd2190ce96d8f Vince Bridgers   2014-03-17  265  	/* Create Rx ring buffer */
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13 @266  	dma->rx_ring = kcalloc(rx_descs, sizeof(struct altera_dma_private), GFP_KERNEL);
-
-There is a mismatch here.  dma->rx_ring was changed to altera_dma_buffer
-but the sizeof was changed to altera_dma_private.
-
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  267  	if (!dma->rx_ring)
-bbd2190ce96d8f Vince Bridgers   2014-03-17  268  		goto err_rx_ring;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  269  
-bbd2190ce96d8f Vince Bridgers   2014-03-17  270  	/* Create Tx ring buffer */
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  271  	dma->tx_ring = kcalloc(tx_descs, sizeof(struct altera_dma_private), GFP_KERNEL);
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  272  	if (!dma->tx_ring)
-bbd2190ce96d8f Vince Bridgers   2014-03-17  273  		goto err_tx_ring;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  274  
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  275  	dma->tx_cons = 0;
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  276  	dma->tx_prod = 0;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  277  
-bbd2190ce96d8f Vince Bridgers   2014-03-17  278  	/* Init Rx ring */
-bbd2190ce96d8f Vince Bridgers   2014-03-17  279  	for (i = 0; i < rx_descs; i++) {
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  280  		ret = tse_init_rx_buffer(priv, &priv->dma_priv.rx_ring[i], dma->rx_dma_buf_sz);
-bbd2190ce96d8f Vince Bridgers   2014-03-17  281  		if (ret)
-bbd2190ce96d8f Vince Bridgers   2014-03-17  282  			goto err_init_rx_buffers;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  283  	}
-bbd2190ce96d8f Vince Bridgers   2014-03-17  284  
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  285  	dma->rx_cons = 0;
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  286  	dma->rx_prod = 0;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  287  
-bbd2190ce96d8f Vince Bridgers   2014-03-17  288  	return 0;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  289  err_init_rx_buffers:
-bbd2190ce96d8f Vince Bridgers   2014-03-17  290  	while (--i >= 0)
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  291  		tse_free_rx_buffer(priv, &priv->dma_priv.rx_ring[i]);
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  292  	kfree(dma->tx_ring);
-bbd2190ce96d8f Vince Bridgers   2014-03-17  293  err_tx_ring:
-ad6f888f174e6a Nagaraju DeepakX 2023-12-13  294  	kfree(dma->rx_ring);
-bbd2190ce96d8f Vince Bridgers   2014-03-17  295  err_rx_ring:
-bbd2190ce96d8f Vince Bridgers   2014-03-17  296  	return ret;
-bbd2190ce96d8f Vince Bridgers   2014-03-17  297  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> This should be fully device driver specific, as this depends on device
+> driver implementation of power saving. IMHO if it's desirable to 
+> resume disabled device on requests from user space, then
+> netif_device_detach() should not be used in runtime suspend.
+> 
+> Thoughts ?
+> 
+> Regards
+> Stanislaw 
+> 
 
 
