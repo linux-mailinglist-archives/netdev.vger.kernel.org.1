@@ -1,293 +1,198 @@
-Return-Path: <netdev+bounces-61202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E02C822DE5
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:00:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE0E7822DE8
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:00:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 253271C21DB8
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:00:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D69DD1C213DF
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD681945E;
-	Wed,  3 Jan 2024 12:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 962441946B;
+	Wed,  3 Jan 2024 13:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="S6zvPSqt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JRN0qJR0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BAB21944F
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 12:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-336979a566aso8703733f8f.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 04:59:16 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A5D1944F;
+	Wed,  3 Jan 2024 13:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5e734d6cbe4so81648257b3.3;
+        Wed, 03 Jan 2024 05:00:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704286754; x=1704891554; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7iwp8HPUKvyx2NxEfz066slOT2j6Pp73iIMTkm3auA0=;
-        b=S6zvPSqt02w+uac2Nrj8kzJtXW4BkbEcKHixB+Xz7amgORMGSKVcd95Ep3c7869r+P
-         sAsObgr3Sm3ckxZaDWaps7vsVxAqN+nG7oXofc76GHEifrVBLUP/RzB4faQeEX0FxtfH
-         KDz3onC5b9fAc+4Cgp7TivgDqnfMPJyu26IcS2HIRBEI5ZUy+YiRS81poMuEDIDhLZ6V
-         CZQSJyhHdsHaYrJ4c6LtxSlxDdTOrxYqnbGIUVmH7WTzdP+PrG4z0VnpkCrugLUrzOue
-         V+FCs06+G/ucF6XxYAuDhDK4G8GMfu1hODlQaIMZxUW4QJOP3em0R8vhunXRKrvhMR9k
-         CL5Q==
+        d=gmail.com; s=20230601; t=1704286805; x=1704891605; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T7i+8MOEKjuPGnNZAwLyrfk1/htpJtDKIJboRJ8BNRw=;
+        b=JRN0qJR0+he2iO4E+cmj2irMEFVUzfJE+ux7EcxfrlRZCKGfQT71A+uEONYui22I7/
+         tlMjZNWG2+VLDPOnPQTHokhyT4mURZ9aZsA0UXj6KKhz5e2b3klYF0g3nRRDgWoIFjIy
+         8wCl21rMEGZ9KXkQcbDuid+u0lt+vRvka6bqIVtxIBCYbnqwBa58ZvHzGlStHvy5606c
+         LFLLqk2xqFjbZNkrLKAliK3m3XkJTtAk29eg4jr8VuvnC+GTQTWqKP8XEoQjMn2Euh1g
+         ovtyjOVNPR5oCpQwBC/v+UR9sFq0LBHO6NIvPPiDvlXJsUHdKxGeZqWMuOWz6jgzoc4D
+         iSwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704286754; x=1704891554;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7iwp8HPUKvyx2NxEfz066slOT2j6Pp73iIMTkm3auA0=;
-        b=ExsdzoL1c33Q3uzv5UvZRRm+WSlMSoqT0q20HybzNAxauQj8IfR79x8Jp1Tv+JUKlu
-         ccyd5NrASqC9wecwkSiHc7F5fvdIpDsGUpYgabbppNUBNbDps7RCd7Qj2EPkj96lKufP
-         SyTID6xV5J7Y+DEeO1Jz/LWa013jHe15YP8QDr1csN7DnIbUZ4TuQOt1E5SfV08QPoUZ
-         uQD/14iaQOETNXMARSwQa/wORaCSmkSYbD77hIG+peFgWHbry/Iefe3TzfdKJY3Nt/og
-         AauzEMFk6XEbf+1e76aGtnvptNPiZojhGby025ibJl6q/n6y0+h9yAAYZxc5t/fzzCmn
-         yg6A==
-X-Gm-Message-State: AOJu0Yz5A0vClw9xqXoORoFvjVlhH9B3EnbjyI97xGIt5AFzTVd6lb6i
-	umGnIk8TsvFGMSm4ntoEhtur1nhBPx65lJPDVe38oOx9GfuEBQ==
-X-Google-Smtp-Source: AGHT+IHqza+2ASqJ8DoNcuymLVjeq3dI3mAUkx2l6PHcVW2sy3LidCvnvOlAYfkpC/iKEfEclBWD9Q==
-X-Received: by 2002:a05:6000:1a4e:b0:337:2aa3:ac83 with SMTP id t14-20020a0560001a4e00b003372aa3ac83mr3621046wry.61.1704286754481;
-        Wed, 03 Jan 2024 04:59:14 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id s5-20020adfe005000000b0033743c2d17dsm5547718wrh.28.2024.01.03.04.59.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 04:59:13 -0800 (PST)
-Date: Wed, 3 Jan 2024 13:59:12 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	xiyou.wangcong@gmail.com, idosch@idosch.org, mleitner@redhat.com,
-	vladbu@nvidia.com, paulb@nvidia.com, pctammela@mojatatu.com,
-	netdev@vger.kernel.org, kernel@mojatatu.com,
-	syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com,
-	syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com,
-	syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
-Subject: Re: [PATCH net-next v2 1/1] net/sched: We should only add
- appropriate qdiscs blocks to ports' xarray
-Message-ID: <ZZVaIOay_IqSDabg@nanopsycho>
-References: <20231231172320.245375-1-victor@mojatatu.com>
- <ZZPekLXICu2AUxlX@nanopsycho>
- <CAM0EoMkKmF3mhnHLt6gE2bmpuRGV7=OpzrMrOwtk3TJcDFW2JA@mail.gmail.com>
- <ZZQd470J2Q4UEMHv@nanopsycho>
- <CAM0EoMkUQzxtiaB9r=Tz5Wc3KfEDCfyy5ENSeb8M+iK9fs_HVQ@mail.gmail.com>
- <ZZQxmg3QOxzXcrW0@nanopsycho>
- <CAM0EoMkAx0bWO7NirsoaKHEHso_GjYL1Kedxsbgfr4cstbwmxw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1704286805; x=1704891605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T7i+8MOEKjuPGnNZAwLyrfk1/htpJtDKIJboRJ8BNRw=;
+        b=Pq09Fxv09Qntl8yyZMc9LE/mGlXz5wqvRfQpXU+bpS/1dRLREi7jxb065f4Zu906Vn
+         GIfgK5vyjs1k6c1X9NshVLQrv2I8zS2rO8lsagt0ZrfgZ42FdA5yafvjvLlc1RHQlQJS
+         4A4+m5jLfR2I3DMPYa08NxhBaagj//OqhrG6uBkNEEKMZNrr7oT//PZQrejaX2XIXqf4
+         9UrcNGuh49GuctnEZpV4gCzahjK1Awui+wNQbe9QaraHxRn98mIpu2grx+y1hqcejIZT
+         pDbV2EkebWYlpbUeG9k6YawpAehHuEdi3qyA0yuNL+kZfKUPpUicELja3J+IhMOYH07i
+         hEKA==
+X-Gm-Message-State: AOJu0YwHyKKDsOvgXyTKHuZSuLXUsM6MewgL4Aob2gExmo1HBXwN+0n4
+	OzVi4p6p02LWKFDtx/DRYOvO/F2+UII46IIvKdk=
+X-Google-Smtp-Source: AGHT+IGJmHL5mhcQjzvp8qz99imIe8rGleTfl85avDtM7nLrtho2mwL2xBJcVqPaQr7D9agYfqaHXi7cXkm96p1JIxo=
+X-Received: by 2002:a81:84ce:0:b0:5de:a99e:17af with SMTP id
+ u197-20020a8184ce000000b005dea99e17afmr11538761ywf.3.1704286804769; Wed, 03
+ Jan 2024 05:00:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMkAx0bWO7NirsoaKHEHso_GjYL1Kedxsbgfr4cstbwmxw@mail.gmail.com>
+References: <20240102091855.70418-1-maimon.sagi@gmail.com> <86fcb951-67e0-4f1d-a441-f3b4bcce8210@app.fastmail.com>
+In-Reply-To: <86fcb951-67e0-4f1d-a441-f3b4bcce8210@app.fastmail.com>
+From: Sagi Maimon <maimon.sagi@gmail.com>
+Date: Wed, 3 Jan 2024 14:59:53 +0200
+Message-ID: <CAMuE1bEN61aFL7dMDqF-v1Htt0K37w7OVwmYNQuPt5QSWUphXQ@mail.gmail.com>
+Subject: Re: [PATCH v5] posix-timers: add multi_clock_gettime system call
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Richard Cochran <richardcochran@gmail.com>, Andy Lutomirski <luto@kernel.org>, datglx@linutronix.de, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Sohil Mehta <sohil.mehta@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Nhat Pham <nphamcs@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, Kees Cook <keescook@chromium.org>, 
+	Alexey Gladkov <legion@kernel.org>, Mark Rutland <mark.rutland@arm.com>, linux-kernel@vger.kernel.org, 
+	linux-api@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, 
+	Netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tue, Jan 02, 2024 at 06:06:00PM CET, jhs@mojatatu.com wrote:
->On Tue, Jan 2, 2024 at 10:54 AM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Tue, Jan 02, 2024 at 03:52:01PM CET, jhs@mojatatu.com wrote:
->> >On Tue, Jan 2, 2024 at 9:29 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >>
->> >> Tue, Jan 02, 2024 at 03:06:28PM CET, jhs@mojatatu.com wrote:
->> >> >On Tue, Jan 2, 2024 at 4:59 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >> >>
->> >> >> The patch subject should briefly describe the nature of the change. Not
->> >> >> what "we" should or should not do.
->> >> >>
->> >> >>
->> >> >> Sun, Dec 31, 2023 at 06:23:20PM CET, victor@mojatatu.com wrote:
->> >> >> >We should only add qdiscs to the blocks ports' xarray in ingress that
->> >> >> >support ingress_block_set/get or in egress that support
->> >> >> >egress_block_set/get.
->> >> >>
->> >> >> Tell the codebase what to do, be imperative. Please read again:
->> >> >> https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
->> >> >>
->> >> >
->> >> >We need another rule in the doc on nit-picking which states that we
->> >> >need to make progress at some point. We made many changes to this
->> >> >patchset based on your suggestions for no other reason other that we
->> >> >can progress the discussion. This is a patch that fixes a bug of which
->> >> >there are multiple syzbot reports and consumers of the API(last one
->> >> >just reported from the MTCP people). There's some sense of urgency to
->> >> >apply this patch before the original goes into net. More importantly:
->> >> >This patch fixes the issue and follows the same common check which was
->> >> >already being done in the committed patchset to check if the qdisc
->> >> >supports the block set/get operations.
->> >> >
->> >> >There are about 3 ways to do this check, you objected to the original,
->> >> >we picked something that works fine,  and now you are picking a
->> >> >different way with tcf_block. I dont see how tcf_block check would
->> >> >help or solve this problem at all given this is a qdisc issue not a
->> >> >class issue. What am I missing?
->> >>
->> >> Perhaps I got something wrong, but I thought that the issue is
->> >> cl_ops->tcf_block being null for some qdiscs, isn't it?
->> >>
->> >
->> >We attach these ports/netdevs only on capable qdiscs i.e ones that
->> >have  in/egress_block_set/get() - which happen to be ingress and
->> >clsact only.
->> >The problem was we were blindly assuming that presence of
->> >cl->tcf_block() implies presence of in/egress_block_set/get(). The
->> >earlier patches surrounded this code with attribute checks and so it
->> >worked there.
->>
->> Syskaller report says:
->>
->> KASAN: null-ptr-deref in range [0x0000000000000048-0x000000000000004f]
->> CPU: 1 PID: 5061 Comm: syz-executor323 Not tainted 6.7.0-rc6-syzkaller-01658-gc2b2ee36250d #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
->> RIP: 0010:qdisc_block_add_dev net/sched/sch_api.c:1190 [inline]
->>
->> Line 1190 is:
->> block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->>
->> So the cl_ops->tcf_block == NULL
->>
->> Why can't you just check it? Why do you want to check in/egress_block_set/get()
->> instead? I don't follow :/
->>
+On Tue, Jan 2, 2024 at 12:22=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
+:
 >
->Does it make sense to add to the port xarray just because we have
->cl_ops->tcf_block()? There are many qdiscs which have
->cl_ops->tcf_block() (example htb) but cant be used in the block add
->syntax (see question further below on tdc test).
-
-The whole block usage in qdiscs other than ingress and clsact seems odd
-to me to be honest. What's the reason for that?.
-
-
->--
->$sudo tc qdisc add dev lo egress_block 21 handle 1: root htb
->Error: Egress block sharing is not supported.
->---
+> On Tue, Jan 2, 2024, at 10:18, Sagi Maimon wrote:
+> > Some user space applications need to read some clocks.
+> > Each read requires moving from user space to kernel space.
+> > The syscall overhead causes unpredictable delay between N clocks reads
+> > Removing this delay causes better synchronization between N clocks.
+> >
+> > Introduce a new system call multi_clock_gettime, which can be used to m=
+easure
+> > the offset between multiple clocks, from variety of types: PHC, virtual=
+ PHC
+> > and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
+> > The offset includes the total time that the driver needs to read the cl=
+ock
+> > timestamp.
+> >
+> > New system call allows the reading of a list of clocks - up to PTP_MAX_=
+CLOCKS.
+> > Supported clocks IDs: PHC, virtual PHC and various system clocks.
+> > Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
+> > The system call returns n_clocks timestamps for each measurement:
+> > - clock 0 timestamp
+> > - ...
+> > - clock n timestamp
+> >
+> > Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> > ---
+> >  Changes since version 4:
+> >  - fix error  : 'struct __ptp_multi_clock_get' declared inside paramete=
+r list
+> >    will not be visible outside of this definition or declaration
 >
->Did you look at the other syzbot reports?
-
-Yeah. The block usage in other qdiscs looks very odd.
-
-
+> I usually put all the changes for previous versions in a
+> list here, it helps reviewers.
 >
->> Btw, the checks in __qdisc_destroy() do also look wrong.
+Will be done on patch V6.
+> The changes you made for previous versions all look good
+> to me, but I think there is still a few things worth
+> considering. I'll also follow up on the earlier threads.
 >
->Now I am not following, please explain. The same code structure check
->is used in fill_qdisc
->(https://elixir.bootlin.com/linux/v6.7-rc8/source/net/sched/sch_api.c#L940)
->for example to pull the block info, is that wrong?
-
-There, you don't call tcf_block() at all, so how is that relevant?
-
-
-
+> > +#define MULTI_PTP_MAX_CLOCKS 32 /* Max number of clocks */
+> > +#define MULTI_PTP_MAX_SAMPLES 32 /* Max allowed offset measurement sam=
+ples. */
+> > +
+> > +struct __ptp_multi_clock_get {
+> > +     unsigned int n_clocks; /* Desired number of clocks. */
+> > +     unsigned int n_samples; /* Desired number of measurements per clo=
+ck. */
+> > +     clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs *=
+/
+> > +     /*
+> > +      * Array of list of n_clocks clocks time samples n_samples times.
+> > +      */
+> > +     struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX=
+_CLOCKS];
+> > +};
 >
->> >
->> >BTW: Do you have an example of a test case where we can test the class
->> >grafting (eg using htb with tcf_block)? It doesnt have any impact on
->> >this patcheset here but we want to add it as a regression checker on
->> >tdc in the future if someone makes a change.
+> Since you now access each member individually, I think it
+> makes more sense here to just pass these as four
+> register arguments. It helps with argument introspection,
+> avoids a couple of get_user(), and lets you remove the fixed
+> array dimensions.
 >
->An answer to this will help.
-
-Answer is "no".
-
+I prefer the use of  get_user(), I will use it to remove  the fixed
+array dimensions.
+which will be done on patch V6.
+> > +SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get
+> > __user *, ptp_multi_clk_get)
+> > +{
+> > +     const struct k_clock *kc;
+> > +     struct timespec64 *kernel_tp;
+> > +     struct timespec64 *kernel_tp_base;
+> > +     unsigned int n_clocks; /* Desired number of clocks. */
+> > +     unsigned int n_samples; /* Desired number of measurements per clo=
+ck.
+> > */
+> > +     unsigned int i, j;
+> > +     clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs *=
+/
+> > +     int error =3D 0;
+> > +
+> > +     if (copy_from_user(&n_clocks, &ptp_multi_clk_get->n_clocks,
+> > sizeof(n_clocks)))
+> > +             return -EFAULT;
+> > +     if (copy_from_user(&n_samples, &ptp_multi_clk_get->n_samples,
+> > sizeof(n_samples)))
 >
->cheers,
->jamal
+> If these remain as struct members rather than register arguments,
+> you should use get_user() instead of copy_from_user().
 >
+Will be done on patch V6
+> > +     kernel_tp_base =3D kmalloc_array(n_clocks * n_samples,
+> > +                                    sizeof(struct timespec64), GFP_KER=
+NEL);
+> > +     if (!kernel_tp_base)
+> > +             return -ENOMEM;
 >
->> >cheers,
->> >jamal
->> >
->> >> >
->> >> >cheers,
->> >> >jamal
->> >> >
->> >> >> >
->> >> >> >Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra")
->> >> >> >Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->> >> >> >Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
->> >> >> >Reported-by: Ido Schimmel <idosch@nvidia.com>
->> >> >> >Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
->> >> >> >Tested-by: Ido Schimmel <idosch@nvidia.com>
->> >> >> >Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com
->> >> >> >Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google.com/
->> >> >> >Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com
->> >> >> >Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google.com/
->> >> >> >Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
->> >> >> >Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google.com/
->> >> >> >---
->> >> >> >v1 -> v2:
->> >> >> >
->> >> >> >- Remove newline between fixes tag and Signed-off-by tag
->> >> >> >- Add Ido's Reported-by and Tested-by tags
->> >> >> >- Add syzbot's Reported-and-tested-by tags
->> >> >> >
->> >> >> > net/sched/sch_api.c | 34 ++++++++++++++++++++--------------
->> >> >> > 1 file changed, 20 insertions(+), 14 deletions(-)
->> >> >> >
->> >> >> >diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
->> >> >> >index 299086bb6205..426be81276f1 100644
->> >> >> >--- a/net/sched/sch_api.c
->> >> >> >+++ b/net/sched/sch_api.c
->> >> >> >@@ -1187,23 +1187,29 @@ static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
->> >> >> >       struct tcf_block *block;
->> >> >> >       int err;
->> >> >> >
->> >> >>
->> >> >> Why don't you just check cl_ops->tcf_block ?
->> >> >> In fact, there could be a helper to do it for you either call the op or
->> >> >> return NULL in case it is not defined.
->> >> >>
->> >> >>
->> >> >> >-      block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->> >> >> >-      if (block) {
->> >> >> >-              err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
->> >> >> >-              if (err) {
->> >> >> >-                      NL_SET_ERR_MSG(extack,
->> >> >> >-                                     "ingress block dev insert failed");
->> >> >> >-                      return err;
->> >> >> >+      if (sch->ops->ingress_block_get) {
->> >> >> >+              block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->> >> >> >+              if (block) {
->> >> >> >+                      err = xa_insert(&block->ports, dev->ifindex, dev,
->> >> >> >+                                      GFP_KERNEL);
->> >> >> >+                      if (err) {
->> >> >> >+                              NL_SET_ERR_MSG(extack,
->> >> >> >+                                             "ingress block dev insert failed");
->> >> >> >+                              return err;
->> >> >> >+                      }
->> >> >> >               }
->> >> >> >       }
->> >> >> >
->> >> >> >-      block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
->> >> >> >-      if (block) {
->> >> >> >-              err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
->> >> >> >-              if (err) {
->> >> >> >-                      NL_SET_ERR_MSG(extack,
->> >> >> >-                                     "Egress block dev insert failed");
->> >> >> >-                      goto err_out;
->> >> >> >+      if (sch->ops->egress_block_get) {
->> >> >> >+              block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
->> >> >> >+              if (block) {
->> >> >> >+                      err = xa_insert(&block->ports, dev->ifindex, dev,
->> >> >> >+                                      GFP_KERNEL);
->> >> >> >+                      if (err) {
->> >> >> >+                              NL_SET_ERR_MSG(extack,
->> >> >> >+                                             "Egress block dev insert failed");
->> >> >> >+                              goto err_out;
->> >> >> >+                      }
->> >> >> >               }
->> >> >> >       }
->> >> >> >
->> >> >> >--
->> >> >> >2.25.1
->> >> >> >
+> To be on the safe side regarding possible data leak, maybe use
+> kcalloc() instead of kmalloc_array() here.
+>
+Will be done on patch V6.
+> > +     kernel_tp =3D kernel_tp_base;
+> > +     for (j =3D 0; j < n_samples; j++) {
+> > +             for (i =3D 0; i < n_clocks; i++) {
+> > +                     if (put_timespec64(kernel_tp++, (struct __kernel_=
+timespec __user *)
+> > +                                     &ptp_multi_clk_get->ts[j][i])) {
+>
+> I think the typecast here can be removed.
+>
+You are right, will be fixed on patch V6.
+>       Arnd
+Thanks for your Notes.
 
