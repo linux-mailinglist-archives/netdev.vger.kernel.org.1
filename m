@@ -1,481 +1,292 @@
-Return-Path: <netdev+bounces-61308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E49D882340F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 19:02:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61E92823436
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 19:18:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9F481C23B79
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:02:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAEC4286C29
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FCA01C2A6;
-	Wed,  3 Jan 2024 18:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4C31C69D;
+	Wed,  3 Jan 2024 18:18:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AjTn2DS7"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QpnTB60c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19621C687
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 18:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40d3352b525so116932015e9.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 10:02:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301261C68E
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 18:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-203fbbff863so285983fac.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 10:17:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704304957; x=1704909757; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yHPu6J4DcDsZAVblB5vcDCOMwzt7PgbwtAeU7tZFTGo=;
-        b=AjTn2DS7Gba8XFSzH6vpQ333wtZRm9QghbgUt4EqEWoed2uOrzs6dQwuhzpR18V5pm
-         aHKHoIb++jT8WoTNLDwsvqyyhkPAKkywetTKrcS5oAG6JLywW9IVtIv8be5ooWYl+tJm
-         fToPHNa1Ezder8g2ZKBi08pkDNBW2nX80ku/f6G3+P+JrWH6r7A17Xv7g11zCZ2UlPSs
-         kW8uVDJNWLPS6mMp0GkS6/bR02JlgxsreFIbMsrvzM0jOl66C35Ed6kd50ZxrUAb5djz
-         gd3ddyU7r1B6CvgPe3bdOQwYrD5VoIW9wLE5ZLq1s2q0SZK0oIgGkt8WDJxQ9sUSW+v1
-         jckg==
+        d=broadcom.com; s=google; t=1704305877; x=1704910677; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SchACSbuteZixwR1uOXkLWv18sw5pAdA1bSWovDVXE4=;
+        b=QpnTB60cQkRFbx+J4ZO1DcQYiku+2BwhfRL9YKVqiTgliplDk779GSMysC6vnm7aFg
+         9VmsJr/Z7ssbarX5nTJQ9FaDa8oGGjCGhuQUsWAz2Yu74IRM0SOfe5HAAB/HzAOBR6TS
+         Z72WTWIHaazLq/jZQPEztoqaWW/c5xS8P6Uek=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704304957; x=1704909757;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yHPu6J4DcDsZAVblB5vcDCOMwzt7PgbwtAeU7tZFTGo=;
-        b=dKezxmZz1EPv6DHa+ovK6rPMq8ib3xUxUhkYc74N/Am1jSCDNqygSEox1p1WxTpHCD
-         DNNd5Oi1ACIXaDCRiCQCLkSusNfcBd5lpG3kV0vzczBunZv+wrOR/wEJp9pwe7osSHRm
-         LZR2YBn/3fPjiWKqm/KBEMdSR/efLOBvq5hQVp26iky4dZiuRKNJxEfdFM9K8+Fk2p55
-         6pi6Aln0cUFN0cMIEsJ3E5PHm8w8cdmxjXa9OXK2JIf6agF8OkRkMuLDFofDALp0IEjX
-         iai7m+bhOSEeVic/sjR2w1fy5KA9mQcHK2fBdUnGtEUdwvvuxQ5msXp7Bas2Q6QRoKcq
-         qojw==
-X-Gm-Message-State: AOJu0Yzd3p/Fi+tZGj8aluAVZzD6TzUR7/rAAngyho7EbcoUPANh3MmI
-	i4C5YUV1aX26SAjX0DKXafAm801JdiE/rA==
-X-Google-Smtp-Source: AGHT+IELMLsdM7/E1prU2g9rGcYtJRRWYZQ62PsZfKu5ULLNmQpRmiwJSPggJrCqv27142a54ButQA==
-X-Received: by 2002:a05:600c:520c:b0:40d:8a04:a134 with SMTP id fb12-20020a05600c520c00b0040d8a04a134mr1768793wmb.79.1704304957478;
-        Wed, 03 Jan 2024 10:02:37 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id n4-20020a7bc5c4000000b0040d376ac369sm2945222wmk.40.2024.01.03.10.02.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 10:02:36 -0800 (PST)
-Date: Wed, 3 Jan 2024 19:02:35 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	xiyou.wangcong@gmail.com, idosch@idosch.org, mleitner@redhat.com,
-	vladbu@nvidia.com, paulb@nvidia.com, pctammela@mojatatu.com,
-	netdev@vger.kernel.org, kernel@mojatatu.com,
-	syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com,
-	syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com,
-	syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
-Subject: Re: [PATCH net-next v2 1/1] net/sched: We should only add
- appropriate qdiscs blocks to ports' xarray
-Message-ID: <ZZWhO01F43-D8DxN@nanopsycho>
-References: <ZZQd470J2Q4UEMHv@nanopsycho>
- <CAM0EoMkUQzxtiaB9r=Tz5Wc3KfEDCfyy5ENSeb8M+iK9fs_HVQ@mail.gmail.com>
- <ZZQxmg3QOxzXcrW0@nanopsycho>
- <CAM0EoMkAx0bWO7NirsoaKHEHso_GjYL1Kedxsbgfr4cstbwmxw@mail.gmail.com>
- <ZZVaIOay_IqSDabg@nanopsycho>
- <CAM0EoMm2Jp6faTOnFxzZi6_bMVZn2dkrkRHNEGpqQvJnWLN8-Q@mail.gmail.com>
- <ZZVuh0N_DVqFG_z3@nanopsycho>
- <CAM0EoMm9MQC_hbzhkVu7+B_VEJpLOeZ-uPNrJJsaNs9YA7gj_g@mail.gmail.com>
- <ZZWGvcizQbK7IRez@nanopsycho>
- <CAM0EoMkwQ+KN5RXTrT=4oH5Zod_8XpQeg0dF5_A5098QGW20iw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1704305877; x=1704910677;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SchACSbuteZixwR1uOXkLWv18sw5pAdA1bSWovDVXE4=;
+        b=ZwXbD5YWtzgwKn/s1TbGQa6i+o40b1Tv2NeO5T7VPEw/lUHHnFpp2aNa/VCwthXIjO
+         by7ojepIlBhQ8IF4hMyUgbzGF11eAyCxbmoMU1QscTRUGNZJ+LNqTPCWax9QRxYoRLs7
+         q1hmx1zCOTiRJPNK2wfGEs4+KYdqzWy7mfRuupj3UF9Ky8A6BfUOR9UifI5EZe2OJn0N
+         qgZMjDBlabxL7G0mhyd51hVOZylMDw+zlivxVoB63PXWrXDxqqcUp5zmF3hxB1TGtaKk
+         bH+D2AKSRfWFF7As4Dt/xjupCmeIV1jyljx24K0dl5BNlUXCyXJQxB4so/KyyQOKfClT
+         nMWA==
+X-Gm-Message-State: AOJu0YzYsA4v38lILjAjzD9rUGppxNwNSootNVaUtRUuIWh/LGGD4UvS
+	ZMilXk4kWDMqqQJXeir8nvZXV8LOgm36k91yN/IsQtEg88j8
+X-Google-Smtp-Source: AGHT+IFOe9hxXvX0ghoyBjoTJNLQIqDMaI9Xs1rmLcqDIXd8o72p/PKtSB9ivgl0jGDuy4Zxh+buv5SJJrWtn1PxGUk=
+X-Received: by 2002:a05:6870:7b52:b0:204:347a:8175 with SMTP id
+ ji18-20020a0568707b5200b00204347a8175mr581796oab.46.1704305877112; Wed, 03
+ Jan 2024 10:17:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMkwQ+KN5RXTrT=4oH5Zod_8XpQeg0dF5_A5098QGW20iw@mail.gmail.com>
+References: <20231229145232.6163-1-ilpo.jarvinen@linux.intel.com>
+In-Reply-To: <20231229145232.6163-1-ilpo.jarvinen@linux.intel.com>
+From: Ray Jui <ray.jui@broadcom.com>
+Date: Wed, 3 Jan 2024 10:17:45 -0800
+Message-ID: <CAJ8Y1dRSOdYesQ5cG1JTDc2W-mdz-OvcJBBTYz3X-EiUQPS8=g@mail.gmail.com>
+Subject: Re: [PATCH 1/1] net: mdio: mux-bcm-iproc: Use alignment helpers and SZ_4K
+To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000069a604060e0ea2be"
 
-Wed, Jan 03, 2024 at 06:08:09PM CET, jhs@mojatatu.com wrote:
->On Wed, Jan 3, 2024 at 11:09 AM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Wed, Jan 03, 2024 at 03:43:00PM CET, jhs@mojatatu.com wrote:
->> >On Wed, Jan 3, 2024 at 9:26 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >>
->> >> Wed, Jan 03, 2024 at 03:09:14PM CET, jhs@mojatatu.com wrote:
->> >> >On Wed, Jan 3, 2024 at 7:59 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >> >>
->> >> >> Tue, Jan 02, 2024 at 06:06:00PM CET, jhs@mojatatu.com wrote:
->> >> >> >On Tue, Jan 2, 2024 at 10:54 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >> >> >>
->> >> >> >> Tue, Jan 02, 2024 at 03:52:01PM CET, jhs@mojatatu.com wrote:
->> >> >> >> >On Tue, Jan 2, 2024 at 9:29 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >> >> >> >>
->> >> >> >> >> Tue, Jan 02, 2024 at 03:06:28PM CET, jhs@mojatatu.com wrote:
->> >> >> >> >> >On Tue, Jan 2, 2024 at 4:59 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >> >> >> >> >>
->> >> >> >> >> >> The patch subject should briefly describe the nature of the change. Not
->> >> >> >> >> >> what "we" should or should not do.
->> >> >> >> >> >>
->> >> >> >> >> >>
->> >> >> >> >> >> Sun, Dec 31, 2023 at 06:23:20PM CET, victor@mojatatu.com wrote:
->> >> >> >> >> >> >We should only add qdiscs to the blocks ports' xarray in ingress that
->> >> >> >> >> >> >support ingress_block_set/get or in egress that support
->> >> >> >> >> >> >egress_block_set/get.
->> >> >> >> >> >>
->> >> >> >> >> >> Tell the codebase what to do, be imperative. Please read again:
->> >> >> >> >> >> https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
->> >> >> >> >> >>
->> >> >> >> >> >
->> >> >> >> >> >We need another rule in the doc on nit-picking which states that we
->> >> >> >> >> >need to make progress at some point. We made many changes to this
->> >> >> >> >> >patchset based on your suggestions for no other reason other that we
->> >> >> >> >> >can progress the discussion. This is a patch that fixes a bug of which
->> >> >> >> >> >there are multiple syzbot reports and consumers of the API(last one
->> >> >> >> >> >just reported from the MTCP people). There's some sense of urgency to
->> >> >> >> >> >apply this patch before the original goes into net. More importantly:
->> >> >> >> >> >This patch fixes the issue and follows the same common check which was
->> >> >> >> >> >already being done in the committed patchset to check if the qdisc
->> >> >> >> >> >supports the block set/get operations.
->> >> >> >> >> >
->> >> >> >> >> >There are about 3 ways to do this check, you objected to the original,
->> >> >> >> >> >we picked something that works fine,  and now you are picking a
->> >> >> >> >> >different way with tcf_block. I dont see how tcf_block check would
->> >> >> >> >> >help or solve this problem at all given this is a qdisc issue not a
->> >> >> >> >> >class issue. What am I missing?
->> >> >> >> >>
->> >> >> >> >> Perhaps I got something wrong, but I thought that the issue is
->> >> >> >> >> cl_ops->tcf_block being null for some qdiscs, isn't it?
->> >> >> >> >>
->> >> >> >> >
->> >> >> >> >We attach these ports/netdevs only on capable qdiscs i.e ones that
->> >> >> >> >have  in/egress_block_set/get() - which happen to be ingress and
->> >> >> >> >clsact only.
->> >> >> >> >The problem was we were blindly assuming that presence of
->> >> >> >> >cl->tcf_block() implies presence of in/egress_block_set/get(). The
->> >> >> >> >earlier patches surrounded this code with attribute checks and so it
->> >> >> >> >worked there.
->> >> >> >>
->> >> >> >> Syskaller report says:
->> >> >> >>
->> >> >> >> KASAN: null-ptr-deref in range [0x0000000000000048-0x000000000000004f]
->> >> >> >> CPU: 1 PID: 5061 Comm: syz-executor323 Not tainted 6.7.0-rc6-syzkaller-01658-gc2b2ee36250d #0
->> >> >> >> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
->> >> >> >> RIP: 0010:qdisc_block_add_dev net/sched/sch_api.c:1190 [inline]
->> >> >> >>
->> >> >> >> Line 1190 is:
->> >> >> >> block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->> >> >> >>
->> >> >> >> So the cl_ops->tcf_block == NULL
->> >> >> >>
->> >> >> >> Why can't you just check it? Why do you want to check in/egress_block_set/get()
->> >> >> >> instead? I don't follow :/
->> >> >> >>
->> >> >> >
->> >> >> >Does it make sense to add to the port xarray just because we have
->> >> >> >cl_ops->tcf_block()? There are many qdiscs which have
->> >> >> >cl_ops->tcf_block() (example htb) but cant be used in the block add
->> >> >> >syntax (see question further below on tdc test).
->> >> >>
->> >> >> The whole block usage in qdiscs other than ingress and clsact seems odd
->> >> >> to me to be honest. What's the reason for that?.
->> >> >
->> >> >Well, you added that code so you tell me. Was the original idea to
->> >>
->> >> Well, I added it only for clsact and ingress. The rest is unrelated to
->> >> me.
->> >>
->> >
->> >Well git is blaming you..
->>
->> Yeah, too long ago to remember I guess. It's no functional change,
->> just included new code into existing qdiscs, converting tcf_chain()
->> to tcf_block().
->>
->>
->> >
->> >> >allow grafting other qdiscs on a hierarchy? This is why i was asking
->> >> >for a sample use case to add to tdc.
->> >> >This was why our check is for "if (sch_ops->in/egress_block_get)"
->> >> >because the check for cl_ops->tcf_block() you suggested is not correct
->> >> >(it will match htb just fine for example) whereas this check will only
->> >> >catch cls_act and ingress.
->> >>
->> >> This code went off rails :/
->> >> The point is, mixing sch_ops->in/egress_block_get existence and cl_ops->tcf_block
->> >> looks awfully odd and inviting another bugs in the future.
->> >>
->> >
->> >What bugs? Be explicit so we can add tdc tests.
->> >
->> >> >> >--
->> >> >> >$sudo tc qdisc add dev lo egress_block 21 handle 1: root htb
->> >> >> >Error: Egress block sharing is not supported.
->> >> >> >---
->> >> >> >
->> >> >> >Did you look at the other syzbot reports?
->> >> >>
->> >> >> Yeah. The block usage in other qdiscs looks very odd.
->> >> >>
->> >> >
->> >> >And we have checks to catch it as you see.
->> >> >TBH, the idea of having cls_ops->tcf_block for a qdisc like htb is
->> >> >puzzling to me. It seems you are always creating a non-shared block
->> >> >for some but not all qdiscs regardless. What is that used for?
->> >>
->> >> No clue.
->> >>
->> >
->> >Well, if you cant remember a few years later then we'll look at
->> >removing it - it will require a lot more testing like i said.
->>
->> It's actualy part of the conversion to introduce block processing. For
->> the existing other qdiscs, not functional change.
->>
+--00000000000069a604060e0ea2be
+Content-Type: multipart/alternative; boundary="00000000000064fb11060e0ea270"
+
+--00000000000064fb11060e0ea270
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Dec 29, 2023 at 6:53=E2=80=AFAM Ilpo J=C3=A4rvinen <ilpo.jarvinen@l=
+inux.intel.com>
+wrote:
+
+> Instead of open coding, use IS_ALIGNED() and ALIGN_DOWN() when dealing
+> with alignment. Replace also literals with SZ_4K.
 >
->Ok, does that mean we should look at removing it then or you think
->it's functionally needed?
-
-It's needed. Feel free to make it nicer though.
-
-
+> Signed-off-by: Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com>
+> ---
+>  drivers/net/mdio/mdio-mux-bcm-iproc.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 >
->>
->> >
->> >> >
->> >> >>
->> >> >> >
->> >> >> >> Btw, the checks in __qdisc_destroy() do also look wrong.
->> >> >> >
->> >> >> >Now I am not following, please explain. The same code structure check
->> >> >> >is used in fill_qdisc
->> >> >> >(https://elixir.bootlin.com/linux/v6.7-rc8/source/net/sched/sch_api.c#L940)
->> >> >> >for example to pull the block info, is that wrong?
->> >> >>
->> >> >> There, you don't call tcf_block() at all, so how is that relevant?
->> >> >>
->> >> >
->> >> >Why do we need to call it? We just need it to retrieve the block id.
->> >>
->> >> Uff, that is my point. In the code you are pointing at, you don't use
->> >> tcf_block() at all, therefore it is not related to our discussion, is
->> >> it?
->> >>
->> >
->> >Huh? We are trying to check if it is legit to add a netdev to the
->> >xarray. The only way it is legit is if we have ingress or clsact.
->> >Those are the only two qdiscs with the set/get ops for blocks and the
->> >only potential ones which we can have valid shared blocks attached. It
->> >is related to the discussion.
->> >
->> >> >
->> >> >>
->> >> >>
->> >> >> >
->> >> >> >> >
->> >> >> >> >BTW: Do you have an example of a test case where we can test the class
->> >> >> >> >grafting (eg using htb with tcf_block)? It doesnt have any impact on
->> >> >> >> >this patcheset here but we want to add it as a regression checker on
->> >> >> >> >tdc in the future if someone makes a change.
->> >> >> >
->> >> >> >An answer to this will help.
->> >> >>
->> >> >> Answer is "no".
->> >> >
->> >> >Ok, so we cant test this or this is internal use only?
->> >> >
->> >> >I am going to repeat again here: you are holding back a bug fix (with
->> >> >many reports) with this discussion. We can have the discussion
->> >> >separately but let's make quick progress. If need be we can send fixes
->> >> >after.
->> >>
->> >> I don't mind. Code is a mess as it is already. One more crap won't
->> >> hurt...
->> >>
->> >
->> >Ok, so your code that you added a few years ago is crap then by that
->>
->> True that.
->>
->>
->> >metric. You can't even remember why you added it.
->> >You have provided no legit argument for the approach you are
->> >suggesting and i see nothing wrong with what we did. Let's agree to
->> >disagree in order to make progress and get the bug resolved.
->> >Please ACK the patch and we can discuss if we need to remove the class
->> >ops separately.
->>
->> I looked a bit deeper into the code, looks like the xarray insertion and
->> removal is done in inconvenient place, causing this bug. Moving it into
->> tcf_block_get/put_ext() seems much more suiting. See following untested
->> patch. It should:
->> 1) fix the bug
->> 2) make things nicer and easier to read
+> diff --git a/drivers/net/mdio/mdio-mux-bcm-iproc.c
+> b/drivers/net/mdio/mdio-mux-bcm-iproc.c
+> index a750bd4c77a0..1ce7d67ba72e 100644
+> --- a/drivers/net/mdio/mdio-mux-bcm-iproc.c
+> +++ b/drivers/net/mdio/mdio-mux-bcm-iproc.c
+> @@ -2,6 +2,7 @@
+>  /*
+>   * Copyright 2016 Broadcom
+>   */
+> +#include <linux/align.h>
+>  #include <linux/clk.h>
+>  #include <linux/delay.h>
+>  #include <linux/device.h>
+> @@ -11,6 +12,7 @@
+>  #include <linux/of_mdio.h>
+>  #include <linux/phy.h>
+>  #include <linux/platform_device.h>
+> +#include <linux/sizes.h>
 >
->Sigh. Your stubbornness is overwhelming. Sure, let's move forward -
->send an official patch but please make sure all tdc tests pass then
->we'll do the testing. Please dont see this as a sign that i think your
->patch is better - i am agreeing to move forward so we can make
->progress.
+>  #define MDIO_RATE_ADJ_EXT_OFFSET       0x000
+>  #define MDIO_RATE_ADJ_INT_OFFSET       0x004
+> @@ -220,12 +222,12 @@ static int mdio_mux_iproc_probe(struct
+> platform_device *pdev)
+>         md->base =3D devm_platform_get_and_ioremap_resource(pdev, 0, &res=
+);
+>         if (IS_ERR(md->base))
+>                 return PTR_ERR(md->base);
+> -       if (res->start & 0xfff) {
+> +       if (!IS_ALIGNED(res->start, SZ_4K)) {
+>                 /* For backward compatibility in case the
+>                  * base address is specified with an offset.
+>                  */
+>                 dev_info(&pdev->dev, "fix base address in dt-blob\n");
+> -               res->start &=3D ~0xfff;
+> +               res->start =3D ALIGN_DOWN(res->start, SZ_4K);
+>                 res->end =3D res->start + MDIO_REG_ADDR_SPACE_SIZE - 1;
+>         }
+>
+> --
+> 2.39.2
+>
 
-I'm not stubborn. I'm just trying to find out the best solution. That
-should be our common goal, I believe.
+Acked-by: Ray Jui <ray.jui@broadcom.com>
 
+Thanks.
 
->
->cheers,
->jamal
->
->
->> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
->> index adf5de1ff773..253b26f2eddd 100644
->> --- a/net/sched/cls_api.c
->> +++ b/net/sched/cls_api.c
->> @@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
->>                       struct tcf_block_ext_info *ei,
->>                       struct netlink_ext_ack *extack)
->>  {
->> +       struct net_device *dev = qdisc_dev(q);
->>         struct net *net = qdisc_net(q);
->>         struct tcf_block *block = NULL;
->>         int err;
->> @@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
->>         if (err)
->>                 goto err_block_offload_bind;
->>
->> +       if (tcf_block_shared(block)) {
->> +               err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
->> +               if (err) {
->> +                       NL_SET_ERR_MSG(extack, "block dev insert failed");
->> +                       goto err_dev_insert;
->> +               }
->> +       }
->> +
->>         *p_block = block;
->>         return 0;
->>
->> +err_dev_insert:
->>  err_block_offload_bind:
->>         tcf_chain0_head_change_cb_del(block, ei);
->>  err_chain0_head_change_cb_add:
->> @@ -1502,8 +1512,12 @@ EXPORT_SYMBOL(tcf_block_get);
->>  void tcf_block_put_ext(struct tcf_block *block, struct Qdisc *q,
->>                        struct tcf_block_ext_info *ei)
->>  {
->> +       struct net_device *dev = qdisc_dev(q);
->> +
->>         if (!block)
->>                 return;
->> +       if (tcf_block_shared(block))
->> +               xa_erase(&block->ports, dev->ifindex);
->>         tcf_chain0_head_change_cb_del(block, ei);
->>         tcf_block_owner_del(block, q, ei->binder_type);
->>
->> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
->> index 299086bb6205..e9eaf637220e 100644
->> --- a/net/sched/sch_api.c
->> +++ b/net/sched/sch_api.c
->> @@ -1180,43 +1180,6 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
->>         return 0;
->>  }
->>
->> -static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
->> -                              struct netlink_ext_ack *extack)
->> -{
->> -       const struct Qdisc_class_ops *cl_ops = sch->ops->cl_ops;
->> -       struct tcf_block *block;
->> -       int err;
->> -
->> -       block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->> -       if (block) {
->> -               err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
->> -               if (err) {
->> -                       NL_SET_ERR_MSG(extack,
->> -                                      "ingress block dev insert failed");
->> -                       return err;
->> -               }
->> -       }
->> -
->> -       block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
->> -       if (block) {
->> -               err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
->> -               if (err) {
->> -                       NL_SET_ERR_MSG(extack,
->> -                                      "Egress block dev insert failed");
->> -                       goto err_out;
->> -               }
->> -       }
->> -
->> -       return 0;
->> -
->> -err_out:
->> -       block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
->> -       if (block)
->> -               xa_erase(&block->ports, dev->ifindex);
->> -
->> -       return err;
->> -}
->> -
->>  static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr **tca,
->>                                    struct netlink_ext_ack *extack)
->>  {
->> @@ -1387,10 +1350,6 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
->>         qdisc_hash_add(sch, false);
->>         trace_qdisc_create(ops, dev, parent);
->>
->> -       err = qdisc_block_add_dev(sch, dev, extack);
->> -       if (err)
->> -               goto err_out4;
->> -
->>         return sch;
->>
->>  err_out4:
->> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
->> index e33568df97a5..9b3e9262040b 100644
->> --- a/net/sched/sch_generic.c
->> +++ b/net/sched/sch_generic.c
->> @@ -1052,8 +1052,6 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
->>  {
->>         const struct Qdisc_ops  *ops = qdisc->ops;
->>         struct net_device *dev = qdisc_dev(qdisc);
->> -       const struct Qdisc_class_ops *cops;
->> -       struct tcf_block *block;
->>
->>  #ifdef CONFIG_NET_SCHED
->>         qdisc_hash_del(qdisc);
->> @@ -1064,18 +1062,6 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
->>
->>         qdisc_reset(qdisc);
->>
->> -       cops = ops->cl_ops;
->> -       if (ops->ingress_block_get) {
->> -               block = cops->tcf_block(qdisc, TC_H_MIN_INGRESS, NULL);
->> -               if (block)
->> -                       xa_erase(&block->ports, dev->ifindex);
->> -       }
->> -
->> -       if (ops->egress_block_get) {
->> -               block = cops->tcf_block(qdisc, TC_H_MIN_EGRESS, NULL);
->> -               if (block)
->> -                       xa_erase(&block->ports, dev->ifindex);
->> -       }
->>
->>         if (ops->destroy)
->>                 ops->destroy(qdisc);
->> diff --git a/net/sched/sch_ingress.c b/net/sched/sch_ingress.c
->> index 5fa9eaa79bfc..1770083052cd 100644
->> --- a/net/sched/sch_ingress.c
->> +++ b/net/sched/sch_ingress.c
->> @@ -284,7 +284,8 @@ static int clsact_init(struct Qdisc *sch, struct nlattr *opt,
->>         q->egress_block_info.chain_head_change = clsact_chain_head_change;
->>         q->egress_block_info.chain_head_change_priv = &q->miniqp_egress;
->>
->> -       return tcf_block_get_ext(&q->egress_block, sch, &q->egress_block_info, extack);
->> +       return tcf_block_get_ext(&q->egress_block, sch, &q->egress_block_info,
->> +                                extack);
->>  }
->>
->>  static void clsact_destroy(struct Qdisc *sch)
->>
->>
->> If you don't mind, I would test this and send it instead of your fix. If
->> you can test it too, that would be awesome.
->>
->> Thanks!
+--00000000000064fb11060e0ea270
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Dec 29, 2023 at 6:53=E2=80=AF=
+AM Ilpo J=C3=A4rvinen &lt;<a href=3D"mailto:ilpo.jarvinen@linux.intel.com">=
+ilpo.jarvinen@linux.intel.com</a>&gt; wrote:<br></div><blockquote class=3D"=
+gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
+4,204,204);padding-left:1ex">Instead of open coding, use IS_ALIGNED() and A=
+LIGN_DOWN() when dealing<br>
+with alignment. Replace also literals with SZ_4K.<br>
+<br>
+Signed-off-by: Ilpo J=C3=A4rvinen &lt;<a href=3D"mailto:ilpo.jarvinen@linux=
+.intel.com" target=3D"_blank">ilpo.jarvinen@linux.intel.com</a>&gt;<br>
+---<br>
+=C2=A0drivers/net/mdio/mdio-mux-bcm-iproc.c | 6 ++++--<br>
+=C2=A01 file changed, 4 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/drivers/net/mdio/mdio-mux-bcm-iproc.c b/drivers/net/mdio/mdio-=
+mux-bcm-iproc.c<br>
+index a750bd4c77a0..1ce7d67ba72e 100644<br>
+--- a/drivers/net/mdio/mdio-mux-bcm-iproc.c<br>
++++ b/drivers/net/mdio/mdio-mux-bcm-iproc.c<br>
+@@ -2,6 +2,7 @@<br>
+=C2=A0/*<br>
+=C2=A0 * Copyright 2016 Broadcom<br>
+=C2=A0 */<br>
++#include &lt;linux/align.h&gt;<br>
+=C2=A0#include &lt;linux/clk.h&gt;<br>
+=C2=A0#include &lt;linux/delay.h&gt;<br>
+=C2=A0#include &lt;linux/device.h&gt;<br>
+@@ -11,6 +12,7 @@<br>
+=C2=A0#include &lt;linux/of_mdio.h&gt;<br>
+=C2=A0#include &lt;linux/phy.h&gt;<br>
+=C2=A0#include &lt;linux/platform_device.h&gt;<br>
++#include &lt;linux/sizes.h&gt;<br>
+<br>
+=C2=A0#define MDIO_RATE_ADJ_EXT_OFFSET=C2=A0 =C2=A0 =C2=A0 =C2=A00x000<br>
+=C2=A0#define MDIO_RATE_ADJ_INT_OFFSET=C2=A0 =C2=A0 =C2=A0 =C2=A00x004<br>
+@@ -220,12 +222,12 @@ static int mdio_mux_iproc_probe(struct platform_devic=
+e *pdev)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 md-&gt;base =3D devm_platform_get_and_ioremap_r=
+esource(pdev, 0, &amp;res);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (IS_ERR(md-&gt;base))<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return PTR_ERR(md-&=
+gt;base);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0if (res-&gt;start &amp; 0xfff) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (!IS_ALIGNED(res-&gt;start, SZ_4K)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* For backward com=
+patibility in case the<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* base addres=
+s is specified with an offset.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dev_info(&amp;pdev-=
+&gt;dev, &quot;fix base address in dt-blob\n&quot;);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0res-&gt;start &amp;=
+=3D ~0xfff;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0res-&gt;start =3D A=
+LIGN_DOWN(res-&gt;start, SZ_4K);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 res-&gt;end =3D res=
+-&gt;start + MDIO_REG_ADDR_SPACE_SIZE - 1;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+<br>
+-- <br>
+2.39.2<br></blockquote><div><br></div><div>Acked-by: Ray Jui &lt;<a href=3D=
+"mailto:ray.jui@broadcom.com">ray.jui@broadcom.com</a>&gt;</div><div><br></=
+div><div>Thanks.=C2=A0</div></div></div>
+
+--00000000000064fb11060e0ea270--
+
+--00000000000069a604060e0ea2be
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+YVhHgdTTB3aAzFyz4UFRLwxCzIG7d7GIiB9MoLImssS08R5WQ5EJCd1fAF6iefLupAn/plPmn2w0
+GF8bLF/FhwOn8jObLW5pQiKhjQSv3QIDAQABo4IB1TCCAdEwDgYDVR0PAQH/BAQDAgWgMIGjBggr
+BgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9j
+YWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8v
+b2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBE
+MEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20v
+cmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2Jh
+bHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAfBgNVHREEGDAWgRRyYXku
+anVpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdb
+NHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIScG7uNJuCYBQieQC+eonQS9tdkwDQYJKoZIhvcNAQEL
+BQADggEBAGLwq/sDtwLmkAa5/UpIG4o5HA9EH7SaYi05EUlzrDdIeZsJnXDkxmG9144wNZBbndHx
+nKXRnpJjCX4jhZeNQFyY4m5c9c8bMytO4zb8XUJIxCjqkhtukJtqHieEogwGsmZlpOxt6Ucc2JXg
+6oTTbyITD4Bvn7cFb7EI2FBcT7K8bf8AvwtNLl/dKYtUA/nEvVhjqp0wsDL3t//Q3GTwGWZB41gf
+LC04V6gD9TVFl7i/N48Gu8PzTt4Kt0SZvBr7kQ9PKi7DVyXe23Ou89QVflaja3bPjt2UZCyq0JxJ
+Nu5SjFDWjKlBCzbLDGkCBlM4DpjAb0y4MyKOsiVv7vIxNlYxggJtMIICaQIBATBrMFsxCzAJBgNV
+BAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdD
+QyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwcAgHcg4j27cIp1UUwDQYJYIZIAWUDBAIBBQCg
+gdQwLwYJKoZIhvcNAQkEMSIEIDVWaf0hk8S52ocVcem9wkzBWnSalpzWOQS3/iNK52QRMBgGCSqG
+SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEwMzE4MTc1N1owaQYJKoZI
+hvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG
+9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEF
+AASCAQAWkmSSDeKk3nJIyXhm+qyfdnRAv3UZD69R2idzY3AR10gdvww42LixK2y6iqFn5z2XPqOc
+tyLwXTLaJcD6bB0DwE/A/ZGo0wgIKUCFBB2yFEVMXmMRHqZaNj/aKPztqCa0i5zK0aBI46qdyZL+
+gkQ5jaD7GTL+1LqAaCsJ3NZE2/3/yd2M86GaENNP5O7fMMGrMWKug0sxEe3of++vwfzFbioRrmum
+KMSEL1yNoTFi2K8zRko0bLV9wGB9w1PSIdDIG0PDKmoEcejOj0nqn0Nk5NHG8c8IFtYyQ0FPvIeF
+Id4QVIhzGX//uOXR1fn1l3YZv0LGU01GbwTmMg1tsHol
+--00000000000069a604060e0ea2be--
 
