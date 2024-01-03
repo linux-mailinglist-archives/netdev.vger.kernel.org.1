@@ -1,77 +1,75 @@
-Return-Path: <netdev+bounces-61331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A32182370B
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:21:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D9F82371C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0724E1F24795
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:21:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F90E1C248D7
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812771D697;
-	Wed,  3 Jan 2024 21:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007AA1D69D;
+	Wed,  3 Jan 2024 21:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNz1J5y6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecUTs7UI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6854C1D692
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 21:21:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F1C8C433C8;
-	Wed,  3 Jan 2024 21:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83E21DA22;
+	Wed,  3 Jan 2024 21:28:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B636CC433C7;
+	Wed,  3 Jan 2024 21:28:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704316881;
-	bh=j2GsGYKWsaSxhYuoTam9MNoYKfLDI3BcLk4yzdf4Ke8=;
+	s=k20201202; t=1704317292;
+	bh=lsIltowJTF2uPmkvluJHvqzbq5Y1CclQ0kHOdf4F8/U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WNz1J5y67YCxZwqC7tNYuL+uG+DCO+w0qNvDnM1CPf9IF3EQiBMtourds2xXyQ5Na
-	 +iTemWeg7Ikq+zXU1ojg7Syxw1VAu3v76faUA8ahoPc/Je6iAND+4OD6E42oeVfe+W
-	 0YhDxJlB6H6Y6UH4V1AXhyyhuHX14muudQfWilfr9E/oCyl5PC98PWHbxDBHGckaw+
-	 ml0oMrINUdTAtDloVEuRRoafGnwzekr+UcS6havFNrmY0d+L3eusQoKvKTxWWDtJ71
-	 LenP8/sDucfjjfIZisdpEyuLcsFGT5iJRKYvfAUp82llk+ITFX/GIliOcBKwIpg9Z1
-	 39CHvue1p0CHw==
-Date: Wed, 3 Jan 2024 13:21:20 -0800
+	b=ecUTs7UIgS6ZiKnr0JIwImr+ok5K/x+CfGqILIaRm4v52MUZeR78LgRqd+i4BpzfD
+	 BAAb7VMM+veGKEdWwJtVg8B/SwdrHUWN8/oPWfC26PrGtw2rvOCxkevmZF+SeRI4cJ
+	 CTHblMxY7P2sCczM1kL4dzzf4dzmDtLNIdZpoDj7S5FZ+H0crZBatAPk1FtFN4ZHgi
+	 261b/tBYjrre/HjHOZ+ZcwZ8MnLb9F71elJNoRc0czmCMVHouCFtUKsz868/rHfDZ8
+	 U+1DqSuAJ5GTjwnZANtDAb8HY8p9P0+X71imJyj/D3y84RylXDqKbX3Y2QxZI6X8FP
+	 VxykDzWZ86tbA==
+Date: Wed, 3 Jan 2024 13:28:10 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S . Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Phil Sutter <phil@nwl.cc>, David Ahern
- <dsahern@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface
- in a bond
-Message-ID: <20240103132120.2cace255@kernel.org>
-In-Reply-To: <0aa87eb2-b50d-4ae8-81ce-af7a52813e6a@6wind.com>
-References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
-	<20240103094846.2397083-3-nicolas.dichtel@6wind.com>
-	<ZZVaVloICZPf8jiK@Laptop-X1>
-	<0aa87eb2-b50d-4ae8-81ce-af7a52813e6a@6wind.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Russell King <linux@armlinux.org.uk>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Marek Vasut
+ <marex@denx.de>, Clark Wang <xiaoning.wang@nxp.com>, Miquel Raynal
+ <miquel.raynal@bootlin.com>, Sylvain Girard <sylvain.girard@se.com>, Pascal
+ EBERHARD <pascal.eberhard@se.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net 0/5] Fix missing PHY-to-MAC RX clock
+Message-ID: <20240103132810.1aae03e8@kernel.org>
+In-Reply-To: <20240103142827.168321-1-romain.gantois@bootlin.com>
+References: <20240103142827.168321-1-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 3 Jan 2024 15:15:33 +0100 Nicolas Dichtel wrote:
-> > The net-next added new function setup_ns in lib.sh and converted all hard code
-> > netns setup. I think It may be good to post this patch set to net-next
-> > to reduce future merge conflicts.  
-> 
-> The first patch is for net. I can post the second one to net-next if it eases
-> the merge.
-> 
-> > Jakub, Paolo, please correct me if we can't post fixes to net-next.  
->
-> Please, let me know if I should target net-next for the second patch.
+On Wed,  3 Jan 2024 15:28:20 +0100 Romain Gantois wrote:
+> There is an issue with some stmmac/PHY combinations that has been reported
+> some time ago in a couple of different series:
+>=20
+> Clark Wang's report: https://lore.kernel.org/all/20230202081559.3553637-1=
+-xiaoning.wang@nxp.com/
+> Cl=C3=A9ment L=C3=A9ger's report: https://lore.kernel.org/linux-arm-kerne=
+l/20230116103926.276869-4-clement.leger@bootlin.com/
 
-Looks like the patch applies to net-next, so hopefully there won't 
-be any actual conflicts. But it'd be good to follow up and refactor
-it in net-next once net gets merged in. As long as I'm not missing
-anything - up to you - I'm fine with either sending the test to
-net-next like Hangbin suggests, or following up in net-next to use
-setup_ns.
+If those stmmac/PHY combinations never worked upstream please tag=20
+as [PATCH net-next], we should consider this work to be a be a new
+feature / HW support. If they used to work - we'll need some Fixes
+tags.
 
