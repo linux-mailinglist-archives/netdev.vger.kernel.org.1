@@ -1,222 +1,423 @@
-Return-Path: <netdev+bounces-61257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 442AF822FBE
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:42:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3242822FC0
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:43:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AED8FB230E5
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:42:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB6A21C23724
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED6D1A5A9;
-	Wed,  3 Jan 2024 14:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BCD1A5A4;
+	Wed,  3 Jan 2024 14:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eDqzDo+r";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="enRsMgSy"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="yfp2rND3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF041A703;
-	Wed,  3 Jan 2024 14:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 403E6B9Q008066;
-	Wed, 3 Jan 2024 14:42:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2023-11-20;
- bh=ty31OxzFEIIXfu02ZAM494AIgjAh/oo9t4NUz5l5uJc=;
- b=eDqzDo+rChclGgMGLkyrkL6VPlu2bohX/lOqgc2fQBNsajqIF1tNqgQlSbFfuNfvBE03
- KEao9g6tqhFbI4zsmRnbFhj9nwR1kIERN+U0eFfPUAo5/xtjOhtknQswTj+VRVMIiMw6
- x+QznMHHoFuglLyXDCBck/UDVvH+ag6oHF+JteUsgI3Ps84mUU4mBqihbFbCba38Riy/
- 8N+zH2lfom1JlHhRwSflzewJsc4rm8cb7yjlMmUGZQBYtnvdIYBI3XDO+nGiO7WQtHiG
- grNMAEP/AAQttsgTufIG5q8gtB3dISraxkVXVAOXmIK1z/EaZsqStPzqzDrNlFjY3UfF eQ== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3va9t255yu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 03 Jan 2024 14:42:24 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 403EYUWJ012040;
-	Wed, 3 Jan 2024 14:42:23 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2041.outbound.protection.outlook.com [104.47.73.41])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3vd931tbj2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 03 Jan 2024 14:42:22 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n4a5CfJmY5LlZTe2/vNzZLBYCqwYIKELgoHG1fjzY9Qrg9WXPSDSYlYKSatE3btr3gyqe62eWfd0KIOFsHTflCFqVt8GZJSmbtQ3Id8MVNrSnDpvmAKPvNAchba2EXdveb3rBvxa8oPeKdCgADyCJljUXNXbBXTNV9HbaBs3H43xIyRNGsBq59nW1FKTfrPA+A1PMxwQI+1JrG+aXjKLLwf+vavF9fSwxLvl7rxFyFoXGZ7Ok4k0trPncNN63nE+OA5d1uhGeWgxNDATxb/6FCDjYubhwabivo8zjVKrwwXzJd8Mx1wr1ZaHCCyxwQ4pYJkowfHF1mu0nimziOOOaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ty31OxzFEIIXfu02ZAM494AIgjAh/oo9t4NUz5l5uJc=;
- b=g8J5bvofE3kAAHoQv7q7eUSot0dCstKYXK74Sk5ypDKJsW/8yfe7JuyFV2/W4Vj+mnqtXdV4R8pqlG2sG1k6y+xMNqFeecOexerNV2ZVpds+9mVszmi85tCqWGHv8v6/sOO2yKzLk9vO5cwyxcv9q5S5nYipw4XPDC1HXXT+6YIZVvOMbWiJuqLmJxUCRJn/FK+kK7n7CwUd58yXNzVDOmLUjVFs+9lPTDErPBjEw7XX/HGwTZjNDSe4uFAcA9EHn0DUDiSUjyNmQhefNeG4TWahNsHZx1EDyukVNx0WEM2HYsyfuEKIs3/XUziKsf1ie+rHzk0A3CB88q9flWiVGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21F71A705
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 14:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dbe78430946so2036320276.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 06:43:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ty31OxzFEIIXfu02ZAM494AIgjAh/oo9t4NUz5l5uJc=;
- b=enRsMgSyiCvx7EAKPusmkh81pMYNBgt90spCR4gT08Lki0oG9yr0jheTsTgMMs9B0sB5kFwWH7TnAVtc8DkGjqdbfrVlG/31B4wK1bY3o0gEQqDK2HNiM8dXEwkqrm5F0jHp793uA3E2eET2u+/X+rkVP2KneODqsQSMKtBKOdQ=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by DS0PR10MB7068.namprd10.prod.outlook.com (2603:10b6:8:144::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.13; Wed, 3 Jan
- 2024 14:42:20 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::360b:b3c0:c5a9:3b3c]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::360b:b3c0:c5a9:3b3c%4]) with mapi id 15.20.7159.013; Wed, 3 Jan 2024
- 14:42:20 +0000
-Date: Wed, 3 Jan 2024 09:42:16 -0500
-From: Chuck Lever <chuck.lever@oracle.com>
-To: Tanzir Hasan <tanzirh@google.com>
-Cc: Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
-        Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <dai.ngo@oracle.com>,
-        Tom Talpey <tom@talpey.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Nick Desaulniers <nnn@google.com>, Al Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v2] xprtrdma: removed asm-generic headers from verbs.c
-Message-ID: <ZZVySJF2rXI/qJQx@tissot.1015granger.net>
-References: <20240102-verbs-v2-1-710de1867c77@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240102-verbs-v2-1-710de1867c77@google.com>
-X-ClientProxiedBy: CH0P223CA0009.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:610:116::35) To BN0PR10MB5128.namprd10.prod.outlook.com
- (2603:10b6:408:117::24)
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704292992; x=1704897792; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9vcMASy38OPd2xwaul4EF2fI0d4xCLqt/shy1f7vRiI=;
+        b=yfp2rND3REknc30hp3R3eN6sxEsE/CDPkYBUeeyDwCw/MmZc1RIgvUZ79y/C2dR4gY
+         S6vAcYxXvoWhNT0jAzwC19JIt7LLPB5eYqWruFjSdUMCNdEQbsVWj01SDOoqlqA9E/r7
+         5FOBEvqLj+SZnjw06IyNdZxiOgZ0w/hlBar0F1dW6qy15NGRcUsHuB4AjscaNsj8Gp/5
+         yhpI6oONMgbVChEBkU7/hfhAon1mS5+PamoKcGEkGizycEe1IvHP/q9e56i1I0F9bOhB
+         gPFZIHao3cJFh8k8DbpfqGcHdLrYOjazVnQ2emojAXt5pNm31JtRy8QYHuuo9366CaFk
+         j8tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704292992; x=1704897792;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9vcMASy38OPd2xwaul4EF2fI0d4xCLqt/shy1f7vRiI=;
+        b=pLX1V4GMCYSoIWMgqAd06U49qF3vaZTnA8TjrdVbnSaY8TEZZJAqrVJXLg8o6jfAbE
+         tTxRRxhPcD8X2sOA6njVvc4nyEzZgOe8jsF38E9iZaAcKEjDZYC9PGliQMZ1/3g6eVD2
+         bFbr1/mLfGoFw4/poxVq5ZfSHc3TW4udcZciJ2JvbOYAaUgC3ILntvC5kuohijW7zcHD
+         ej+zHozgAmRjrsGQCQA7E5r3ckzjWVj8/4bsGkgg4MUXe2FzaVIMeXihaA5Q6ORmN1H6
+         0AVgspZxGloZlH7pMkS0y6mQ855rN2PX2IZvurHibfQN2yzBBOs6TJ5UZXateLl8huZ8
+         jsQw==
+X-Gm-Message-State: AOJu0YyLD1dM6Z5Wmq3ZFTW3A1dAI3oxvo3H6c+qZaMm88r/9Bdk2Ab9
+	mferNcS7IxqZtVJw3hk+YkCalmEs1H0vmUIxf+4THAHxyqjb
+X-Google-Smtp-Source: AGHT+IFj446GNZUUPwqMFLqi0awNKzzsGSFwko9lQ5XH+SJcQn1tCJh0LilLjPIMpMHcJf5/stRtrKdTXiiJhchsYwE=
+X-Received: by 2002:a25:83c4:0:b0:dbe:1ccb:751a with SMTP id
+ v4-20020a2583c4000000b00dbe1ccb751amr6380962ybm.31.1704292992340; Wed, 03 Jan
+ 2024 06:43:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|DS0PR10MB7068:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2ee37611-c914-41f3-314f-08dc0c6a30c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	X7yeAcQPDxaY3Rvu3to3cSsQxhTwDnyxpBYUE+JWq4hKWG76qsDYHzI3BtJorc2yWOAuqbd3NNHtfEQPax6XLj9GvMvJty1OlZqoG9GeW5Mi3mu6vgKkjL8Sq8Dz05bXFl4KI1w1auICeundQ9n7Mrtqj/eiSs2/L8ob6HXfI2ceTc2rjpXGHTrZCBZBJ4RP6KyIi4oYQMBkQ60jj+jz5eXA4Ybnp5j25RmfgKcCfUC18cUU8/iedBUq4CsKDhLH2EMVVOmPPVaqVjrzH/ZlJF8Tdm0WY4J/8cacMK+wHmSq47FqUr6JBEJeFqT2upJAypucCzknVN8WO+QEICSxl2zKwGVK/N4fRnrmK2w221tBOKXUuDdSrILq4AOVpK2o2V5HuX7CTFjkjOTNg5VJIunR4BJIDF4ZJTbc77LnG1hU0fCwLv3QpeQYO/qbgC5Nm1z5Ko2ysjdsNFrL4gdWMEulhOAbYLFbWYvoJS1iTKlpUSXoxGMxquJHyWDXJY7lf2C41N4kEcPqWQvkdHM3XZ+V3d4iMKx9HgPFfuE+gt651t8kHzToKpJlbmvsY4H53x/4vqFO0tzzfCwRtyh4bdHHzKjHc/IoSPXz5r5EHiU=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(39860400002)(136003)(366004)(376002)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(2906002)(7416002)(5660300002)(38100700002)(44832011)(26005)(6486002)(966005)(478600001)(6916009)(83380400001)(66946007)(66556008)(66476007)(6512007)(6506007)(9686003)(41300700001)(6666004)(8676002)(8936002)(86362001)(4326008)(316002)(54906003)(41533002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?l7+iNuyS/cBsrb7YBOE34f6rseslaRKBosHEbffUShKsppbq3bndXQOmTBx+?=
- =?us-ascii?Q?Vx3JExUMK7YRMBsi96RPYilmsA1Xvj9GInv+rQA6icSPog5bylHqUF2+BWqu?=
- =?us-ascii?Q?M5eV+X8TjI6MT1HNFaIcClms9lLTTPq8RMEJNzijQrQ16lRUYx5wyptK8YLf?=
- =?us-ascii?Q?sUy+oyFpmFLTCTN/bNQYsgEt3zlcWsUaI46XJNLUXRoFjGEsyHxg7UBTqw4L?=
- =?us-ascii?Q?X/RTr0VYOVjI6xVTwfZxVhThL6PV5BgXJw0VGQq3KUFjy0yFF8PYEHtsR5RI?=
- =?us-ascii?Q?GFm4lzXQ+rGtKSAX0XDWZ8D2tXtjY/JWsjNLiEwzYoVbw6hT96AUiO8NUo3k?=
- =?us-ascii?Q?x84pjXkQvPMPF+PBPavLw/0t1CnnZmDx6u4npOSSWsnfdtm1Q8RPFjpo8RAr?=
- =?us-ascii?Q?ZN89HDpIppRXmAthFfL2++7tW3z+U17PdGyKtlFcnu85XqfGIIrPzRY2kTEd?=
- =?us-ascii?Q?EehnQfxR6o8cVQkStsEG9+AgyDkepDzrlMsNmI2M9P1xzyLM+YmT18Ptba+8?=
- =?us-ascii?Q?qWFy/kLKACIpB9kaA6zBmbK7uJKFPF6gYrsK50w6SN0IIoqSSFF5SFSy3QF3?=
- =?us-ascii?Q?7/FDLRKzk+sKfz8P5PU/vWwvkW2tnD1NEYmLuB5k7OGOxAweczaxBCJlHq77?=
- =?us-ascii?Q?T1uvnby2ezFiDsoxMf/6SqA6nnx6WnuEeGVUVIqv/V8lrXMcdnP/rQalU881?=
- =?us-ascii?Q?g/JHHjZ4woX/MTh08N1qi47GCAPmp2zZP8jsevY0kmIETwjOy8iFG7Bz7V3M?=
- =?us-ascii?Q?YPz9LYqPazxh1TTugruIAA1Zp0A4Yuhj+iumDY9nV523D0kUt/GKr1jGZBs0?=
- =?us-ascii?Q?xuxoB8LBB2tDwW5mrc376eCLFx/O1Ae9MLBjdxO8XFA1W32M+GNvjOqBioQ3?=
- =?us-ascii?Q?XcCQfx9D9R61WzrgXsH7TIyN2I27eK00qzfSkzRjTt6qUlBowvhqRnObafhl?=
- =?us-ascii?Q?2zqcAlQzV0Le3naEQ0e8DZ3LntjWr+jgXTYGLZwWpvwLOVayRh5jyoTtxajc?=
- =?us-ascii?Q?o+QFxHoXEJOFplcrqLYeYQA2l9eMorXNu3/Yyv2D/ddyDgikeeXF/L/uUP6D?=
- =?us-ascii?Q?Hc1I+wNKY7Cjgd1TmhrXLakY4IcIAqaIrM4rytqV9ymJtfuHfq+wZGdvdWMO?=
- =?us-ascii?Q?oBhj3OxPq8rwhM2C+FZJ9F6Vb64fCuTapKCJzWM9MihVPUik7WC0tRrocejK?=
- =?us-ascii?Q?lun5lcsZ6XRlQGemuvlP0lKNoRvJ2aWUlviISjCB5XiVwAQx3kqzQ1MiFBE8?=
- =?us-ascii?Q?wWVkRzpO3RceufT6PGA0pXo/izk3t/4VrdHuED8SKkGC7PJyH7OwSaPUxOJu?=
- =?us-ascii?Q?OwmlHv9AxWcuam/ESL1UmE8IuZUJjlCaJ8JmvExmZjrcIm5V1p8FlS2lPo+x?=
- =?us-ascii?Q?ZjJqBzWXytf/0KjNfTb4lUlGhAIxP5LPfVJxpY5e+CeL6FzZzxWqKUnivWPt?=
- =?us-ascii?Q?om5aK3G9Vizaq9Y7y8NlJ7F2I2oLs6FPG9JII1fCMQ3VW77xdpsbzUeIU9P0?=
- =?us-ascii?Q?tndEPFb8dIojjMZaF4wWBMpZjJv2qWaKtvDnl8MXFCOtMsczUwgp9HNrZS8A?=
- =?us-ascii?Q?wBhp8Nw2ZfgDfKrZ67+VTPE22edbNNEeLYQBd0GQ8qvqutwQw8EjqDTSHqVy?=
- =?us-ascii?Q?HA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	kmt/fG3tzwAVEjWRQwgr7QLAmYI+sjM8C5jDUluOXK0DujDOvEJ2U0nLPBoj94MY3lawUH9rIIrOBCvwKZkdFkSqRUpVheR4vPDG4zMOHryaINiLjPh05pUjZkVQQhFq3k877omBY4u+3QK7PHw0W9CST2gvdaxB06EkAtW3NQBCrbq6HS4e3E8JP1aPLFWKECh88DZzzIR6aGCq/ezV4U8hVgVyA7iTOininCxVbch6lSNsY0Q6XoTG6ks/LFOXXTxYwqv2h9EeK9/Eil/EmydfuIKiMNqnATmLDOsOLI3nKnNp85CBcJXiWS4x3ifpJq2DfG0nSiWNOeqio/tUfzB0xiFeVy2PS7Y0/HX4auAPznqJhKaEMugCHdIMejRRYBRFDADsUeUx7KvmXLD6bojXQ0cSfp6gbCtEg88MR1RadVymBApDsZW1bFKO8ayFi0mYOtWRPYITtoVecBe4cGc8FsTQOv2GilB3ujjXdcqMgD7qJmNOgQzvJoJdAqcHt/eQyTYvNX1YfEu7soF3/O/iPIMYW4/YawS4+3KajjEJ2Tk4PRGYEibH4YpYxdmhNu64WLV1gmwkjYSJdOWg5fb0UJWunu3CufuQQKkPZ7o=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ee37611-c914-41f3-314f-08dc0c6a30c5
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2024 14:42:20.6778
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F6sw0Y/6GAsEWB5ksEsRXilhh87+cDayiI7UvDrmvW8oB2nIIc/KCso5btuuTVKt0mNIzPzljE2m4ryIWNWk3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7068
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-03_07,2024-01-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 suspectscore=0 adultscore=0
- bulkscore=0 malwarescore=0 mlxlogscore=999 phishscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2401030120
-X-Proofpoint-GUID: B5ZDvTmzExakSGF31s3aWSKP9_N2OrWf
-X-Proofpoint-ORIG-GUID: B5ZDvTmzExakSGF31s3aWSKP9_N2OrWf
+References: <20231231172320.245375-1-victor@mojatatu.com> <ZZPekLXICu2AUxlX@nanopsycho>
+ <CAM0EoMkKmF3mhnHLt6gE2bmpuRGV7=OpzrMrOwtk3TJcDFW2JA@mail.gmail.com>
+ <ZZQd470J2Q4UEMHv@nanopsycho> <CAM0EoMkUQzxtiaB9r=Tz5Wc3KfEDCfyy5ENSeb8M+iK9fs_HVQ@mail.gmail.com>
+ <ZZQxmg3QOxzXcrW0@nanopsycho> <CAM0EoMkAx0bWO7NirsoaKHEHso_GjYL1Kedxsbgfr4cstbwmxw@mail.gmail.com>
+ <ZZVaIOay_IqSDabg@nanopsycho> <CAM0EoMm2Jp6faTOnFxzZi6_bMVZn2dkrkRHNEGpqQvJnWLN8-Q@mail.gmail.com>
+ <ZZVuh0N_DVqFG_z3@nanopsycho>
+In-Reply-To: <ZZVuh0N_DVqFG_z3@nanopsycho>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 3 Jan 2024 09:43:00 -0500
+Message-ID: <CAM0EoMm9MQC_hbzhkVu7+B_VEJpLOeZ-uPNrJJsaNs9YA7gj_g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/1] net/sched: We should only add appropriate
+ qdiscs blocks to ports' xarray
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
+	idosch@idosch.org, mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com, 
+	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
+	syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com, 
+	syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com, 
+	syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 02, 2024 at 05:22:18PM -0500, Tanzir Hasan wrote:
-> asm-generic/barrier.h and asm/bitops.h are already brought into the
-> file through the header linux/sunrpc/svc_rdma.h and the file can
-> still be built with their removal. They have been replaced with the
-> preferred linux/bitops.h and asm/barrier.h to remove the need for the
-> asm-generic header.
-> 
-> Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
-> Signed-off-by: Tanzir Hasan <tanzirh@google.com>
+On Wed, Jan 3, 2024 at 9:26=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote:
+>
+> Wed, Jan 03, 2024 at 03:09:14PM CET, jhs@mojatatu.com wrote:
+> >On Wed, Jan 3, 2024 at 7:59=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wro=
+te:
+> >>
+> >> Tue, Jan 02, 2024 at 06:06:00PM CET, jhs@mojatatu.com wrote:
+> >> >On Tue, Jan 2, 2024 at 10:54=E2=80=AFAM Jiri Pirko <jiri@resnulli.us>=
+ wrote:
+> >> >>
+> >> >> Tue, Jan 02, 2024 at 03:52:01PM CET, jhs@mojatatu.com wrote:
+> >> >> >On Tue, Jan 2, 2024 at 9:29=E2=80=AFAM Jiri Pirko <jiri@resnulli.u=
+s> wrote:
+> >> >> >>
+> >> >> >> Tue, Jan 02, 2024 at 03:06:28PM CET, jhs@mojatatu.com wrote:
+> >> >> >> >On Tue, Jan 2, 2024 at 4:59=E2=80=AFAM Jiri Pirko <jiri@resnull=
+i.us> wrote:
+> >> >> >> >>
+> >> >> >> >> The patch subject should briefly describe the nature of the c=
+hange. Not
+> >> >> >> >> what "we" should or should not do.
+> >> >> >> >>
+> >> >> >> >>
+> >> >> >> >> Sun, Dec 31, 2023 at 06:23:20PM CET, victor@mojatatu.com wrot=
+e:
+> >> >> >> >> >We should only add qdiscs to the blocks ports' xarray in ing=
+ress that
+> >> >> >> >> >support ingress_block_set/get or in egress that support
+> >> >> >> >> >egress_block_set/get.
+> >> >> >> >>
+> >> >> >> >> Tell the codebase what to do, be imperative. Please read agai=
+n:
+> >> >> >> >> https://www.kernel.org/doc/html/v6.6/process/submitting-patch=
+es.html#describe-your-changes
+> >> >> >> >>
+> >> >> >> >
+> >> >> >> >We need another rule in the doc on nit-picking which states tha=
+t we
+> >> >> >> >need to make progress at some point. We made many changes to th=
+is
+> >> >> >> >patchset based on your suggestions for no other reason other th=
+at we
+> >> >> >> >can progress the discussion. This is a patch that fixes a bug o=
+f which
+> >> >> >> >there are multiple syzbot reports and consumers of the API(last=
+ one
+> >> >> >> >just reported from the MTCP people). There's some sense of urge=
+ncy to
+> >> >> >> >apply this patch before the original goes into net. More import=
+antly:
+> >> >> >> >This patch fixes the issue and follows the same common check wh=
+ich was
+> >> >> >> >already being done in the committed patchset to check if the qd=
+isc
+> >> >> >> >supports the block set/get operations.
+> >> >> >> >
+> >> >> >> >There are about 3 ways to do this check, you objected to the or=
+iginal,
+> >> >> >> >we picked something that works fine,  and now you are picking a
+> >> >> >> >different way with tcf_block. I dont see how tcf_block check wo=
+uld
+> >> >> >> >help or solve this problem at all given this is a qdisc issue n=
+ot a
+> >> >> >> >class issue. What am I missing?
+> >> >> >>
+> >> >> >> Perhaps I got something wrong, but I thought that the issue is
+> >> >> >> cl_ops->tcf_block being null for some qdiscs, isn't it?
+> >> >> >>
+> >> >> >
+> >> >> >We attach these ports/netdevs only on capable qdiscs i.e ones that
+> >> >> >have  in/egress_block_set/get() - which happen to be ingress and
+> >> >> >clsact only.
+> >> >> >The problem was we were blindly assuming that presence of
+> >> >> >cl->tcf_block() implies presence of in/egress_block_set/get(). The
+> >> >> >earlier patches surrounded this code with attribute checks and so =
+it
+> >> >> >worked there.
+> >> >>
+> >> >> Syskaller report says:
+> >> >>
+> >> >> KASAN: null-ptr-deref in range [0x0000000000000048-0x00000000000000=
+4f]
+> >> >> CPU: 1 PID: 5061 Comm: syz-executor323 Not tainted 6.7.0-rc6-syzkal=
+ler-01658-gc2b2ee36250d #0
+> >> >> Hardware name: Google Google Compute Engine/Google Compute Engine, =
+BIOS Google 11/17/2023
+> >> >> RIP: 0010:qdisc_block_add_dev net/sched/sch_api.c:1190 [inline]
+> >> >>
+> >> >> Line 1190 is:
+> >> >> block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> >> >>
+> >> >> So the cl_ops->tcf_block =3D=3D NULL
+> >> >>
+> >> >> Why can't you just check it? Why do you want to check in/egress_blo=
+ck_set/get()
+> >> >> instead? I don't follow :/
+> >> >>
+> >> >
+> >> >Does it make sense to add to the port xarray just because we have
+> >> >cl_ops->tcf_block()? There are many qdiscs which have
+> >> >cl_ops->tcf_block() (example htb) but cant be used in the block add
+> >> >syntax (see question further below on tdc test).
+> >>
+> >> The whole block usage in qdiscs other than ingress and clsact seems od=
+d
+> >> to me to be honest. What's the reason for that?.
+> >
+> >Well, you added that code so you tell me. Was the original idea to
+>
+> Well, I added it only for clsact and ingress. The rest is unrelated to
+> me.
+>
 
-Acked-by: Chuck Lever <chuck.lever@oracle.com>
+Well git is blaming you..
 
+> >allow grafting other qdiscs on a hierarchy? This is why i was asking
+> >for a sample use case to add to tdc.
+> >This was why our check is for "if (sch_ops->in/egress_block_get)"
+> >because the check for cl_ops->tcf_block() you suggested is not correct
+> >(it will match htb just fine for example) whereas this check will only
+> >catch cls_act and ingress.
+>
+> This code went off rails :/
+> The point is, mixing sch_ops->in/egress_block_get existence and cl_ops->t=
+cf_block
+> looks awfully odd and inviting another bugs in the future.
+>
 
-> ---
-> Changes in v2:
-> - Added asm/barrier.h and linux/bitops.h to not conflict with rule 1 of
->   submit-checklist
-> - Link to v1: https://lore.kernel.org/r/20231226-verbs-v1-1-3a2cecf11afd@google.com
-> ---
->  net/sunrpc/xprtrdma/verbs.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/sunrpc/xprtrdma/verbs.c b/net/sunrpc/xprtrdma/verbs.c
-> index 28c0771c4e8c..b4c1d874fc7e 100644
-> --- a/net/sunrpc/xprtrdma/verbs.c
-> +++ b/net/sunrpc/xprtrdma/verbs.c
-> @@ -49,14 +49,14 @@
->   *  o buffer memory
->   */
->  
-> +#include <linux/bitops.h>
->  #include <linux/interrupt.h>
->  #include <linux/slab.h>
->  #include <linux/sunrpc/addr.h>
->  #include <linux/sunrpc/svc_rdma.h>
->  #include <linux/log2.h>
->  
-> -#include <asm-generic/barrier.h>
-> -#include <asm/bitops.h>
-> +#include <asm/barrier.h>
->  
->  #include <rdma/ib_cm.h>
->  
-> 
-> ---
-> base-commit: fbafc3e621c3f4ded43720fdb1d6ce1728ec664e
-> change-id: 20231226-verbs-30800631d3f1
-> 
-> Best regards,
-> -- 
-> Tanzir Hasan <tanzirh@google.com>
-> 
+What bugs? Be explicit so we can add tdc tests.
 
--- 
-Chuck Lever
+> >> >--
+> >> >$sudo tc qdisc add dev lo egress_block 21 handle 1: root htb
+> >> >Error: Egress block sharing is not supported.
+> >> >---
+> >> >
+> >> >Did you look at the other syzbot reports?
+> >>
+> >> Yeah. The block usage in other qdiscs looks very odd.
+> >>
+> >
+> >And we have checks to catch it as you see.
+> >TBH, the idea of having cls_ops->tcf_block for a qdisc like htb is
+> >puzzling to me. It seems you are always creating a non-shared block
+> >for some but not all qdiscs regardless. What is that used for?
+>
+> No clue.
+>
+
+Well, if you cant remember a few years later then we'll look at
+removing it - it will require a lot more testing like i said.
+
+> >
+> >>
+> >> >
+> >> >> Btw, the checks in __qdisc_destroy() do also look wrong.
+> >> >
+> >> >Now I am not following, please explain. The same code structure check
+> >> >is used in fill_qdisc
+> >> >(https://elixir.bootlin.com/linux/v6.7-rc8/source/net/sched/sch_api.c=
+#L940)
+> >> >for example to pull the block info, is that wrong?
+> >>
+> >> There, you don't call tcf_block() at all, so how is that relevant?
+> >>
+> >
+> >Why do we need to call it? We just need it to retrieve the block id.
+>
+> Uff, that is my point. In the code you are pointing at, you don't use
+> tcf_block() at all, therefore it is not related to our discussion, is
+> it?
+>
+
+Huh? We are trying to check if it is legit to add a netdev to the
+xarray. The only way it is legit is if we have ingress or clsact.
+Those are the only two qdiscs with the set/get ops for blocks and the
+only potential ones which we can have valid shared blocks attached. It
+is related to the discussion.
+
+> >
+> >>
+> >>
+> >> >
+> >> >> >
+> >> >> >BTW: Do you have an example of a test case where we can test the c=
+lass
+> >> >> >grafting (eg using htb with tcf_block)? It doesnt have any impact =
+on
+> >> >> >this patcheset here but we want to add it as a regression checker =
+on
+> >> >> >tdc in the future if someone makes a change.
+> >> >
+> >> >An answer to this will help.
+> >>
+> >> Answer is "no".
+> >
+> >Ok, so we cant test this or this is internal use only?
+> >
+> >I am going to repeat again here: you are holding back a bug fix (with
+> >many reports) with this discussion. We can have the discussion
+> >separately but let's make quick progress. If need be we can send fixes
+> >after.
+>
+> I don't mind. Code is a mess as it is already. One more crap won't
+> hurt...
+>
+
+Ok, so your code that you added a few years ago is crap then by that
+metric. You can't even remember why you added it.
+You have provided no legit argument for the approach you are
+suggesting and i see nothing wrong with what we did. Let's agree to
+disagree in order to make progress and get the bug resolved.
+Please ACK the patch and we can discuss if we need to remove the class
+ops separately.
+
+cheers,
+jamal
+
+>
+> >
+> >cheers,
+> >jamal
+> >
+> >
+> >> >
+> >> >cheers,
+> >> >jamal
+> >> >
+> >> >
+> >> >> >cheers,
+> >> >> >jamal
+> >> >> >
+> >> >> >> >
+> >> >> >> >cheers,
+> >> >> >> >jamal
+> >> >> >> >
+> >> >> >> >> >
+> >> >> >> >> >Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev t=
+racking infra")
+> >> >> >> >> >Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> >> >> >> >> >Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> >> >> >> >> >Reported-by: Ido Schimmel <idosch@nvidia.com>
+> >> >> >> >> >Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredde=
+r/
+> >> >> >> >> >Tested-by: Ido Schimmel <idosch@nvidia.com>
+> >> >> >> >> >Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkalle=
+r.appspotmail.com
+> >> >> >> >> >Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc=
+3a28@google.com/
+> >> >> >> >> >Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkalle=
+r.appspotmail.com
+> >> >> >> >> >Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc=
+3a92@google.com/
+> >> >> >> >> >Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkalle=
+r.appspotmail.com
+> >> >> >> >> >Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc=
+3a5c@google.com/
+> >> >> >> >> >---
+> >> >> >> >> >v1 -> v2:
+> >> >> >> >> >
+> >> >> >> >> >- Remove newline between fixes tag and Signed-off-by tag
+> >> >> >> >> >- Add Ido's Reported-by and Tested-by tags
+> >> >> >> >> >- Add syzbot's Reported-and-tested-by tags
+> >> >> >> >> >
+> >> >> >> >> > net/sched/sch_api.c | 34 ++++++++++++++++++++--------------
+> >> >> >> >> > 1 file changed, 20 insertions(+), 14 deletions(-)
+> >> >> >> >> >
+> >> >> >> >> >diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> >> >> >> >> >index 299086bb6205..426be81276f1 100644
+> >> >> >> >> >--- a/net/sched/sch_api.c
+> >> >> >> >> >+++ b/net/sched/sch_api.c
+> >> >> >> >> >@@ -1187,23 +1187,29 @@ static int qdisc_block_add_dev(struc=
+t Qdisc *sch, struct net_device *dev,
+> >> >> >> >> >       struct tcf_block *block;
+> >> >> >> >> >       int err;
+> >> >> >> >> >
+> >> >> >> >>
+> >> >> >> >> Why don't you just check cl_ops->tcf_block ?
+> >> >> >> >> In fact, there could be a helper to do it for you either call=
+ the op or
+> >> >> >> >> return NULL in case it is not defined.
+> >> >> >> >>
+> >> >> >> >>
+> >> >> >> >> >-      block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NU=
+LL);
+> >> >> >> >> >-      if (block) {
+> >> >> >> >> >-              err =3D xa_insert(&block->ports, dev->ifindex=
+, dev, GFP_KERNEL);
+> >> >> >> >> >-              if (err) {
+> >> >> >> >> >-                      NL_SET_ERR_MSG(extack,
+> >> >> >> >> >-                                     "ingress block dev ins=
+ert failed");
+> >> >> >> >> >-                      return err;
+> >> >> >> >> >+      if (sch->ops->ingress_block_get) {
+> >> >> >> >> >+              block =3D cl_ops->tcf_block(sch, TC_H_MIN_ING=
+RESS, NULL);
+> >> >> >> >> >+              if (block) {
+> >> >> >> >> >+                      err =3D xa_insert(&block->ports, dev-=
+>ifindex, dev,
+> >> >> >> >> >+                                      GFP_KERNEL);
+> >> >> >> >> >+                      if (err) {
+> >> >> >> >> >+                              NL_SET_ERR_MSG(extack,
+> >> >> >> >> >+                                             "ingress block=
+ dev insert failed");
+> >> >> >> >> >+                              return err;
+> >> >> >> >> >+                      }
+> >> >> >> >> >               }
+> >> >> >> >> >       }
+> >> >> >> >> >
+> >> >> >> >> >-      block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NUL=
+L);
+> >> >> >> >> >-      if (block) {
+> >> >> >> >> >-              err =3D xa_insert(&block->ports, dev->ifindex=
+, dev, GFP_KERNEL);
+> >> >> >> >> >-              if (err) {
+> >> >> >> >> >-                      NL_SET_ERR_MSG(extack,
+> >> >> >> >> >-                                     "Egress block dev inse=
+rt failed");
+> >> >> >> >> >-                      goto err_out;
+> >> >> >> >> >+      if (sch->ops->egress_block_get) {
+> >> >> >> >> >+              block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGR=
+ESS, NULL);
+> >> >> >> >> >+              if (block) {
+> >> >> >> >> >+                      err =3D xa_insert(&block->ports, dev-=
+>ifindex, dev,
+> >> >> >> >> >+                                      GFP_KERNEL);
+> >> >> >> >> >+                      if (err) {
+> >> >> >> >> >+                              NL_SET_ERR_MSG(extack,
+> >> >> >> >> >+                                             "Egress block =
+dev insert failed");
+> >> >> >> >> >+                              goto err_out;
+> >> >> >> >> >+                      }
+> >> >> >> >> >               }
+> >> >> >> >> >       }
+> >> >> >> >> >
+> >> >> >> >> >--
+> >> >> >> >> >2.25.1
+> >> >> >> >> >
 
