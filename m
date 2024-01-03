@@ -1,244 +1,100 @@
-Return-Path: <netdev+bounces-61324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E8A8235EA
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 20:52:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A44258235ED
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 20:53:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AD781F25986
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 19:52:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34EF228749D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 19:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737611CFBF;
-	Wed,  3 Jan 2024 19:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D811CFAD;
+	Wed,  3 Jan 2024 19:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oklhQV8X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JUpU0ytY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5181D529
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 19:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9a431b3e-a494-4fae-8965-215da0856db3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1704311523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lyk7U3zTIgq98m5+oEGdsIlAJt9Nay1BbYBcDKn7rcQ=;
-	b=oklhQV8XNHZvs250V26H40jxa+q0wSO1Q1kiUjQjXChsV/fETnF0DatSC9ett1l6Z1BJNI
-	b2y8AH4rPpkiw7nn0cQVZ+sgwEVY4B+ftjrqqKW5T/p9axW6hI/o+ie8Cm6BCB4CYWWb++
-	2z82swkDh97cwvQUvVQ9y25hwO62l5o=
-Date: Wed, 3 Jan 2024 11:51:58 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6DB1CF91;
+	Wed,  3 Jan 2024 19:52:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C276C433C7;
+	Wed,  3 Jan 2024 19:52:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704311578;
+	bh=AGxGXJZa41oa0ZBFIkl3/sSNflvf5FcKlcCCl5qT46A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JUpU0ytYwAjqQ9Kmu6iuW4yOWPjAEv6QR2Bm0uQMeNdd/7EGUhaAe9asYTlUN7ub+
+	 o4cx/VBQ8P0kzZGCZ2AhPKrnIueuZPzE3UOQE7RqPsK/y3QQeIomvTSS4W7mdktl1T
+	 KsOaldTfqSsZVbHpi+jSNgHE3ufTJgjHzAXZ8WNWD6AVoVPJtsdDn769V7KEwS3/Fb
+	 8Em38nhwWOoz/WQ4LRIPYfErPlkuSsSJHvFYN+LNEN4cafX0e23octvhGxUkRVMlxs
+	 M8kAkhKgKb/1ICpZk+vpfF7yWUYvKwun430g3axWj6wKZxYgv6IFkEkx9XNe9jzQg0
+	 +6Ko/cnkkgb/Q==
+Date: Wed, 3 Jan 2024 13:52:53 -0600
+From: Eric Van Hensbergen <ericvh@kernel.org>
+To: Dominique Martinet <asmadeus@codewreck.org>
+Cc: David Howells <dhowells@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH v5 40/40] 9p: Use netfslib read/write_iter
+Message-ID: <ZZW7Fesoy4H2zic7@FV7GG9FTHL>
+References: <20231221132400.1601991-1-dhowells@redhat.com>
+ <20231221132400.1601991-41-dhowells@redhat.com>
+ <ZZULNQAZ0n0WQv7p@codewreck.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 2/2] ss: pretty-print BPF socket-local storage
-Content-Language: en-US
-To: Quentin Deslandes <qde@naccy.de>
-Cc: David Ahern <dsahern@gmail.com>, Martin KaFai Lau
- <martin.lau@kernel.org>, kernel-team@meta.com,
- Alan Maguire <alan.maguire@oracle.com>, netdev@vger.kernel.org
-References: <20231220132326.11246-1-qde@naccy.de>
- <20231220132326.11246-3-qde@naccy.de>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231220132326.11246-3-qde@naccy.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZULNQAZ0n0WQv7p@codewreck.org>
 
-On 12/20/23 5:23 AM, Quentin Deslandes wrote:
-> diff --git a/misc/ss.c b/misc/ss.c
-> index 689972d7..6e1ddfa5 100644
-> --- a/misc/ss.c
-> +++ b/misc/ss.c
-> @@ -51,8 +51,13 @@
->   #include <linux/tls.h>
->   #include <linux/mptcp.h>
->   
-> +#ifdef HAVE_LIBBPF
-> +#include <linux/btf.h>
+On Wed, Jan 03, 2024 at 04:22:29PM +0900, Dominique Martinet wrote:
+> David Howells wrote on Thu, Dec 21, 2023 at 01:23:35PM +0000:
+> 
+> I've noticed we don't cache xattrs are all, so with the default mount
+> options on a kernel built with 9P_FS_SECURITY we'll get a gazillion
+> lookups for security.capabilities... But that's another problem, and
+> this is still an improvement so no reason to hold back.
+>
 
-nit. Instead of adding another "#ifdef HAVE_LIBBPF", move this line to the same 
-"#ifdef HAVE_LIBBPF" below?
+This is a big problem and already on my backlog list since some things
+default to this even if the remote file system doesn't support
+xattrs.  The quick fix is to disable on a mount when we detect the
+host side isn't supporting them (of course this could be weird for
+exports that cross file system boundries) -- at the very least we
+could keep this info on an inode basis and not request as long as the
+inode info is cached.  Caching the actual properties is also a step,
+but given this is a security feature, I imagine we don't want to trust
+our cache and will always have to ask server unless we can come up with
+something clever to indicate xattr changes (haven't looked into that
+much yet).
+ 
+> 
+> (I'd still be extremly thanksful if Christian and/or Eric would have
+> time to check as well, but I won't push back to merging it this merge
+> window next week if they don't have time... I'll also keep trying to run
+> some more tests as time allows)
+>
 
-> +#endif
-> +
->   #ifdef HAVE_LIBBPF
->   #include <bpf/bpf.h>
-> +#include <bpf/btf.h>
->   #include <bpf/libbpf.h>
->   #endif
->   
+I'll try to run through my regression tests as well, but sure we
+can fix things up after the merge window if we miss things.
 
-[ ... ]
-
-> +static int bpf_maps_opts_load_btf(struct bpf_map_info *info, struct btf **btf)
-> +{
-> +	if (info->btf_value_type_id) {
-> +		*btf = btf__load_from_kernel_by_id(info->btf_id);
-> +		if (!*btf) {
-> +			fprintf(stderr, "ss: failed to load BTF for map ID %u\n",
-> +				info->id);
-> +			return -1;
-> +		}
-> +	} else {
-> +		*btf = NULL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   static int bpf_map_opts_add_all(void)
->   {
->   	unsigned int i;
-> @@ -3418,6 +3452,7 @@ static int bpf_map_opts_add_all(void)
->   	while (1) {
->   		struct bpf_map_info info = {};
->   		uint32_t len = sizeof(info);
-> +		struct btf *btf;
->   
->   		r = bpf_map_get_next_id(id, &id);
->   		if (r) {
-> @@ -3462,8 +3497,18 @@ static int bpf_map_opts_add_all(void)
->   			continue;
->   		}
->   
-> +		r = bpf_maps_opts_load_btf(&info, &btf);
-> +		if (r) {
-> +			fprintf(stderr, "ss: failed to get BTF data for BPF map ID: %u\n",
-> +				id);
-
-This will be a duplicated fprintf(stderr) with the bpf_maps_opts_load_btf() 
-above. Remove either one of them.
-
-The same goes for the bpf_map_opts_add_id().
-
-[ ... ]
-
-> +static void out_bpf_sk_storage(int map_id, const void *data, size_t len)
-> +{
-> +	uint32_t type_id;
-> +	const struct bpf_sk_storage_map_info *map_info;
-> +	struct btf_dump *dump;
-> +	struct btf_dump_type_data_opts opts = {
-> +		.sz = sizeof(struct btf_dump_type_data_opts),
-> +		.indent_str = SK_STORAGE_INDENT_STR,
-> +		.indent_level = 2,
-> +		.emit_zeroes = 1
-> +	};
-> +	struct btf_dump_opts dopts = {
-> +		.sz = sizeof(struct btf_dump_opts)
-> +	};
-> +	int r;
-> +
-> +	map_info = bpf_map_opts_get_info(map_id);
-> +	if (!map_info) {
-> +		fprintf(stderr, "map_id: %d: missing map info", map_id);
-
-With the 'total_size = RTA_LENGTH(0)' change during show_all == true case in 
-patch 1, this fprintf(stderr) should be removed. A new bpf_sk_storage_map has 
-just been created after the ss has started which is fine to skip. The next ss 
-run will be able to show it.
-
-In the future, it could be improved to give it another try here to get the btf 
-info of this new map on-demand.
-
-> +		return;
-> +	}
-> +
-> +	if (map_info->info.value_size != len) {
-> +		fprintf(stderr, "map_id: %d: invalid value size, expecting %u, got %lu\n",
-> +			map_id, map_info->info.value_size, len);
-> +		return;
-> +	}
-> +
-> +	type_id = map_info->info.btf_value_type_id;
-> +
-> +	dump = btf_dump__new(map_info->btf, out_bpf_sk_storage_print_fn, NULL, &dopts);
-
-nit. just noticed this one also. Instead of recreating the "dump" obj for each 
-printed sk, can it be created once and stored in "struct bpf_sk_storage_map_info 
-{ ... } maps[MAX_NR_BPF_MAP_ID_OPTS];"?
-
-> +	if (!dump) {
-> +		fprintf(stderr, "Failed to create btf_dump object\n");
-> +		return;
-> +	}
-> +
-> +	out(SK_STORAGE_INDENT_STR "map_id: %d [\n", map_id);
-> +	r = btf_dump__dump_type_data(dump, type_id, data, len, &opts);
-> +	if (r < 0)
-> +		out(SK_STORAGE_INDENT_STR SK_STORAGE_INDENT_STR "failed to dump data: %d", r);
-> +	out("\n" SK_STORAGE_INDENT_STR "]");
-> +
-> +	btf_dump__free(dump);
-> +}
-> +
->   static void show_sk_bpf_storages(struct rtattr *bpf_stgs)
->   {
->   	struct rtattr *tb[SK_DIAG_BPF_STORAGE_MAX + 1], *bpf_stg;
-> -	unsigned int rem;
-> +	unsigned int rem, map_id;
-> +	struct rtattr *value;
->   
->   	for (bpf_stg = RTA_DATA(bpf_stgs), rem = RTA_PAYLOAD(bpf_stgs);
->   		RTA_OK(bpf_stg, rem); bpf_stg = RTA_NEXT(bpf_stg, rem)) {
-> @@ -3605,8 +3731,13 @@ static void show_sk_bpf_storages(struct rtattr *bpf_stgs)
->   			(struct rtattr *)bpf_stg);
->   
->   		if (tb[SK_DIAG_BPF_STORAGE_MAP_ID]) {
-> -			out("map_id:%u",
-> -				rta_getattr_u32(tb[SK_DIAG_BPF_STORAGE_MAP_ID]));
-> +			out("\n");
-> +
-> +			map_id = rta_getattr_u32(tb[SK_DIAG_BPF_STORAGE_MAP_ID]);
-> +			value = tb[SK_DIAG_BPF_STORAGE_MAP_VALUE];
-> +
-> +			out_bpf_sk_storage(map_id, RTA_DATA(value),
-> +				RTA_PAYLOAD(value));
->   		}
->   	}
->   }
-> @@ -6004,6 +6135,11 @@ int main(int argc, char *argv[])
->   		}
->   	}
->   
-> +	if (oneline && (bpf_map_opts.nr_maps || bpf_map_opts.show_all)) {
-
-This will not compile if HAVE_LIBBPF is not set. Please test with the 
-HAVE_LIBBPF is false condition.
-
-May be revisit my earlier suggestion to create a few helper functions here when 
-HAVE_LIBBPF is not set instead of adding "#ifdef HAVE_LIBBPF" here. Something like:
-
-#ifdef HAVE_LIBBPF
-static bool bpf_map_opts_is_enabled(void)
-{
-         return bpf_map_opts.nr_maps;
-}
-#else
-static bool bpf_map_opts_is_enabled(void)
-{
-         return false;
-}
-#endif
-
-
-> +		fprintf(stderr, "ss: --oneline, --bpf-maps, and --bpf-map-id are incompatible\n");
-> +		exit(-1);
-> +	}
-> +
->   	if (show_processes || show_threads || show_proc_ctx || show_sock_ctx)
->   		user_ent_hash_build();
->   
+    -eric
 
 
