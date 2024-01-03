@@ -1,168 +1,132 @@
-Return-Path: <netdev+bounces-61127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23AA8822A51
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:33:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17B18822A6A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:47:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1D4D285364
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:33:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAD6E284802
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE989182BD;
-	Wed,  3 Jan 2024 09:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WIo7r1gT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA02182DD;
+	Wed,  3 Jan 2024 09:47:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7045118623;
-	Wed,  3 Jan 2024 09:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4038tSe4011438;
-	Wed, 3 Jan 2024 09:33:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=u7vbuh9S5hS2XPx/rfCPO3a+vWqn15NPQT6wBmi/7FQ=;
- b=WIo7r1gTRRIMFeD2rt75K88j+11PYNW4c46Cd7XOHPEgBoBTR5v7PceCxYVRiV6iQ5Qr
- nvVqYWTi/yBcdkVSj+I6UqJ01pKT5IGJrPGHbkzhttPtucPVMCZCrarX+kYL7LeePWL7
- npzunjYIUGsZ6LecCBqV01PBEQ2PXb1gBzrYZW7gOxUe0hcbig7Ykpw0SFybnTujFpsf
- tNilEaKlQsj0RJzX9PslsFOI3aoKvxa1WEU0VkNOAji5Nw0K4R4rl3my/IvSzo7L8JpI
- cVZjfwMrFeZVXlysNH5TFop7E7w2Fb8V7kM/4DZDeEgu5NKOfz5ZtyV06EvBcjBGONOk ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vd4821xdm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jan 2024 09:33:31 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4038tWmc011861;
-	Wed, 3 Jan 2024 09:33:31 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vd4821xce-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jan 2024 09:33:30 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4036xkKh019345;
-	Wed, 3 Jan 2024 09:33:29 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vc30sha9m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jan 2024 09:33:29 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4039XT9N31326524
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 3 Jan 2024 09:33:29 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0D0D45803F;
-	Wed,  3 Jan 2024 09:33:29 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8759A58060;
-	Wed,  3 Jan 2024 09:33:26 +0000 (GMT)
-Received: from [9.171.87.115] (unknown [9.171.87.115])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  3 Jan 2024 09:33:26 +0000 (GMT)
-Message-ID: <0a501939-3361-428e-97c4-6f041a9ec1f9@linux.ibm.com>
-Date: Wed, 3 Jan 2024 10:33:25 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: fix invalid link access in dumping SMC-R
- connections
-To: Wen Gu <guwen@linux.alibaba.com>, jaka@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        ubraun@linux.vnet.ibm.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1703662835-53416-1-git-send-email-guwen@linux.alibaba.com>
-Content-Language: en-GB
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <1703662835-53416-1-git-send-email-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: KJYL8MCvw3wW-NrXsAMilm66u5tPB0Tw
-X-Proofpoint-ORIG-GUID: fus5OwQNizTGTLMwpikTYmnAsFDHQrKn
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C48E18622;
+	Wed,  3 Jan 2024 09:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4T4lGD09rVz1g1sq;
+	Wed,  3 Jan 2024 17:45:56 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9345E180021;
+	Wed,  3 Jan 2024 17:47:21 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 3 Jan
+ 2024 17:47:20 +0800
+Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
+ of struct page in API
+To: Mina Almasry <almasrymina@google.com>
+CC: Shakeel Butt <shakeelb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<bpf@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
+	<hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Michael Chan
+	<michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst
+	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>, Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas
+	<mw@semihalf.com>, Russell King <linux@armlinux.org.uk>, Sunil Goutham
+	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau
+	<nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
+	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu
+ Vultur <horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, "K. Y.
+ Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei
+ Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
+	<jaswinder.singh@linaro.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi Gunasekaran
+	<r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, Jiawen Wu
+	<jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, Ronak
+ Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers
+	<pv-drivers@vmware.com>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
+	<shayne.chen@mediatek.com>, Kalle Valo <kvalo@kernel.org>, Juergen Gross
+	<jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Oleksandr
+ Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko
+	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
+	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi
+	<stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+	<justinstitt@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>
+References: <20231214020530.2267499-1-almasrymina@google.com>
+ <20231214020530.2267499-5-almasrymina@google.com>
+ <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
+ <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
+ <20231215021114.ipvdx2bwtxckrfdg@google.com>
+ <20231215190126.1040fa12@kernel.org>
+ <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
+ <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
+ <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
+ <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com>
+ <CAHS8izP63wXGH+Q3y1H=ycT=AHYnhGveBnuyF_rYioAjZ=Hn=g@mail.gmail.com>
+ <7c6d35e3-165f-5883-1c1b-fce82c976028@huawei.com>
+ <CAHS8izNqeiK1tq=48LMbbqq5B4d2mhgbuKRvnFtiBngf73jXZg@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <fda068d0-f7fb-90fc-cdd6-1f853a4a225f@huawei.com>
+Date: Wed, 3 Jan 2024 17:47:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-03_04,2024-01-02_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- lowpriorityscore=0 clxscore=1011 mlxlogscore=784 malwarescore=0
- bulkscore=0 priorityscore=1501 impostorscore=0 spamscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401030078
+In-Reply-To: <CAHS8izNqeiK1tq=48LMbbqq5B4d2mhgbuKRvnFtiBngf73jXZg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-
-
-On 27.12.23 08:40, Wen Gu wrote:
-> A crash was found when dumping SMC-R connections. It can be reproduced
-> by following steps:
+On 2024/1/3 0:14, Mina Almasry wrote:
 > 
-> - environment: two RNICs on both sides.
-> - run SMC-R between two sides, now a SMC_LGR_SYMMETRIC type link group
->    will be created.
-> - set the first RNIC down on either side and link group will turn to
->    SMC_LGR_ASYMMETRIC_LOCAL then.
-> - run 'smcss -R' and the crash will be triggered.
-> 
->   BUG: kernel NULL pointer dereference, address: 0000000000000010
->   #PF: supervisor read access in kernel mode
->   #PF: error_code(0x0000) - not-present page
->   PGD 8000000101fdd067 P4D 8000000101fdd067 PUD 10ce46067 PMD 0
->   Oops: 0000 [#1] PREEMPT SMP PTI
->   CPU: 3 PID: 1810 Comm: smcss Kdump: loaded Tainted: G W   E      6.7.0-rc6+ #51
->   RIP: 0010:__smc_diag_dump.constprop.0+0x36e/0x620 [smc_diag]
->   Call Trace:
->    <TASK>
->    ? __die+0x24/0x70
->    ? page_fault_oops+0x66/0x150
->    ? exc_page_fault+0x69/0x140
->    ? asm_exc_page_fault+0x26/0x30
->    ? __smc_diag_dump.constprop.0+0x36e/0x620 [smc_diag]
->    smc_diag_dump_proto+0xd0/0xf0 [smc_diag]
->    smc_diag_dump+0x26/0x60 [smc_diag]
->    netlink_dump+0x19f/0x320
->    __netlink_dump_start+0x1dc/0x300
->    smc_diag_handler_dump+0x6a/0x80 [smc_diag]
->    ? __pfx_smc_diag_dump+0x10/0x10 [smc_diag]
->    sock_diag_rcv_msg+0x121/0x140
->    ? __pfx_sock_diag_rcv_msg+0x10/0x10
->    netlink_rcv_skb+0x5a/0x110
->    sock_diag_rcv+0x28/0x40
->    netlink_unicast+0x22a/0x330
->    netlink_sendmsg+0x240/0x4a0
->    __sock_sendmsg+0xb0/0xc0
->    ____sys_sendmsg+0x24e/0x300
->    ? copy_msghdr_from_user+0x62/0x80
->    ___sys_sendmsg+0x7c/0xd0
->    ? __do_fault+0x34/0x1a0
->    ? do_read_fault+0x5f/0x100
->    ? do_fault+0xb0/0x110
->    __sys_sendmsg+0x4d/0x80
->    do_syscall_64+0x45/0xf0
->    entry_SYSCALL_64_after_hwframe+0x6e/0x76
-> 
-> When the first RNIC is set down, the lgr->lnk[0] will be cleared and an
-> asymmetric link will be allocated in lgr->link[SMC_LINKS_PER_LGR_MAX - 1]
-> by smc_llc_alloc_alt_link(). Then when we try to dump SMC-R connections
-> in __smc_diag_dump(), the invalid lgr->lnk[0] will be accessed, resulting
-> in this issue. So fix it by accessing the right link.
-> 
-> Fixes: f16a7dd5cf27 ("smc: netlink interface for SMC sockets")
-> Reported-by: henaumars <henaumars@sina.com>
-> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=7616
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> The idea being that skb_frag_page() can return NULL if the frag is not
+> paged, and the relevant callers are modified to handle that.
 
-That is really good catch and good description! Thank you, Wen Gu, for 
-fixing it!
+There are many existing drivers which are not expecting NULL returning for
+skb_frag_page() as those drivers are not supporting devmem, adding additionl
+checking overhead in skb_frag_page() for those drivers does not make much
+sense, IMHO, it may make more sense to introduce a new helper for the driver
+supporting devmem or networking core that needing dealing with both normal
+page and devmem.
 
-Reviewed-and-tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
+And we are also able to keep the old non-NULL returning semantic for
+skb_frag_page().
 
