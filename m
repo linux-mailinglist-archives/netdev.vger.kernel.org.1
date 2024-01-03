@@ -1,55 +1,58 @@
-Return-Path: <netdev+bounces-61147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA680822B35
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:23:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1235822B3A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:25:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44024B2291B
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:23:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21DE2285472
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CBD18AF6;
-	Wed,  3 Jan 2024 10:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA5518B02;
+	Wed,  3 Jan 2024 10:25:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XmIdK5rP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U4vF7p7q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D5818AF0;
-	Wed,  3 Jan 2024 10:23:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04FB1C433C8;
-	Wed,  3 Jan 2024 10:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAD318AF6;
+	Wed,  3 Jan 2024 10:25:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AD08C433C7;
+	Wed,  3 Jan 2024 10:25:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704277425;
-	bh=z0qY/gX0M8RB0LK5KbRuBi5q9cGMDpSG9tSCAaQIxfw=;
+	s=k20201202; t=1704277505;
+	bh=5Rcik7t02gBhfvqwKpMZbmbnkEm1DrJkNCgPCnScgEk=;
 	h=From:To:Cc:Subject:Date:From;
-	b=XmIdK5rPNDInU6AUMdojnCYK4XltdzDK2PAy+WwMqmO2Ow9WN1A4nLGeX53uW9Vmp
-	 +VSdfmqMquJZSS5SS1F3DqS6PbzIwI2F9inEiSZDUqLfgQBP3DIlTuE8sdxSjMKuAP
-	 gx+iMiwjsgmrVX46ouGskrTDRkxN1vFUuq+7v2JmlgJ0+NEzeVa0iv2F1rGkyydYgE
-	 VnBxPgVoizXiy3Uk1WLXJrod5GESjpxfyrOdVTwRUrV6jrbCGMPH5EQcdz7qXIQxrq
-	 U7HOAzMOYJJJtsSNZfW8o1JpqRwLNjvKCBh5NKmAYToxxwHl9MvWk5GsM0R1psTsMZ
-	 /rUzbv7/5VrCQ==
+	b=U4vF7p7qcZWkkoYObZ9qmo2ktv6FBoq5E+Xg7MNFl/frEzm3aIqjASJ43SafT9eKK
+	 5IpbXaxOjjl2lG+Id2vXcO69Qnn/0YAhjb84cjlPKoLCILW2XNFu2U1rcuOlq4dcoq
+	 w43AbxgDl5V+UczWqL6v4oxgftsQLFHgtEkPerbGCx8S1X/6YinQsr/yZNRC4IEyKP
+	 G0yuGTqTW1EMaW9hLA6taWKxbt8/XFwaRURbi2jLF1wbbmILn45J7uMQZtIl22ZHY6
+	 JY0gphYd0AggEXOrhAG6CljcM7VTkiKGh7focQO0U3x1GUyvy21GwKiAa+j8JWLNYm
+	 rMlwxDkzRsmkg==
 From: Arnd Bergmann <arnd@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>
 Cc: Arnd Bergmann <arnd@arndb.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Randy Schacher <stuart.schacher@broadcom.com>,
-	Vasundhara Volam <vasundhara-v.volam@broadcom.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Piotr Raczynski <piotr.raczynski@intel.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] bnxt: fix building without CONFIG_RFS_ACCEL
-Date: Wed,  3 Jan 2024 11:23:11 +0100
-Message-Id: <20240103102332.3642417-1-arnd@kernel.org>
+Subject: [PATCH] ice: fix building withouto XDP
+Date: Wed,  3 Jan 2024 11:24:45 +0100
+Message-Id: <20240103102458.3687963-1-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -61,49 +64,40 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-A recent patch series generalized the filter logic in bnxt to no
-longer just be used for RFS, but it now fails to build when RFS_ACCEL
-is disabled:
+The newly added function fails to build when struct xsk_cb_desc is
+not defined:
 
-drivers/net/ethernet/broadcom/bnxt/bnxt.c: In function 'bnxt_cfg_ntp_filters':
-drivers/net/ethernet/broadcom/bnxt/bnxt.c:14077:37: error: implicit declaration of function 'rps_may_expire_flow' [-Werror=implicit-function-declaration]
-14077 |                                 if (rps_may_expire_flow(bp->dev, fltr->base.rxq,
-      |                                     ^~~~~~~~~~~~~~~~~~~
+drivers/net/ethernet/intel/ice/ice_base.c: In function 'ice_xsk_pool_fill_cb':
+drivers/net/ethernet/intel/ice/ice_base.c:525:16: error: variable 'desc' has initializer but incomplete type
 
-Add back one #ifdef check around a call to the missing rps_may_expire_flow()
-function.
+Hide this part in the same #ifdef that controls the structure definition.
 
-Fixes: 59cde76f33fa ("bnxt_en: Refactor filter insertion logic in bnxt_rx_flow_steer().")
-Cc: Michael Chan <michael.chan@broadcom.com>
+Fixes: d68d707dcbbf ("ice: Support XDP hints in AF_XDP ZC mode")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-I don't know if this is a correct fix, only checked that it is plausible
-and that it does address the build failure. If a different fix is needed,
-please just treat this as a bug report.
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 ++
+ drivers/net/ethernet/intel/ice/ice_base.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 827821e89c40..83a97c65b728 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -14074,6 +14074,7 @@ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
- 			if (test_bit(BNXT_FLTR_VALID, &fltr->base.state)) {
- 				if (fltr->base.flags & BNXT_ACT_NO_AGING)
- 					continue;
-+#if IS_ENABLED(CONFIG_RFS_ACCEL)
- 				if (rps_may_expire_flow(bp->dev, fltr->base.rxq,
- 							fltr->flow_id,
- 							fltr->base.sw_id)) {
-@@ -14081,6 +14082,7 @@ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
- 									 fltr);
- 					del = true;
- 				}
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 6e3694145f59..0d1aeb7ca108 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -521,6 +521,7 @@ static int ice_setup_rx_ctx(struct ice_rx_ring *ring)
+ 
+ static void ice_xsk_pool_fill_cb(struct ice_rx_ring *ring)
+ {
++#ifdef CONFIG_XDP_SOCKETS
+ 	void *ctx_ptr = &ring->pkt_ctx;
+ 	struct xsk_cb_desc desc = {};
+ 
+@@ -530,6 +531,7 @@ static void ice_xsk_pool_fill_cb(struct ice_rx_ring *ring)
+ 		   sizeof(struct xdp_buff);
+ 	desc.bytes = sizeof(ctx_ptr);
+ 	xsk_pool_fill_cb(ring->xsk_pool, &desc);
 +#endif
- 			} else {
- 				rc = bnxt_hwrm_cfa_ntuple_filter_alloc(bp,
- 								       fltr);
+ }
+ 
+ /**
 -- 
 2.39.2
 
