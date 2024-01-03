@@ -1,105 +1,78 @@
-Return-Path: <netdev+bounces-61086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4283822695
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 02:39:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6527A82269D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 02:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EE60283E82
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 01:39:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 165071F22A8D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 01:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E3EED5;
-	Wed,  3 Jan 2024 01:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79606ED7;
+	Wed,  3 Jan 2024 01:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLvOEsXZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Fmys2pX3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F381108;
-	Wed,  3 Jan 2024 01:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-680b1a2c966so14930136d6.3;
-        Tue, 02 Jan 2024 17:38:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704245936; x=1704850736; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FC3YNpZQ824RvnO6l/cHjeHZ3qIOYGfCscSR0Xu4SHY=;
-        b=aLvOEsXZoBm6zsmKM6cYKA3UPQN6cc1g+G8aUxtPjaDaFs5Y+/WsUyzakZUUm+rPv5
-         g8Vcsjzpx6SDoyaVWWj5i0J4zxD4BK68MyE9ypMqLijEi36iDDpAVgzPPi0CxFMHj+3a
-         nNtJlVVfOTG9s6AlS8ULVc3I+zFfsEDIIdJg2n/cRcwQs42bJ+OaohM8l0UtBNw1CB6s
-         kbMyWCPBwLruX2J1mOsHpIkPLmumte3fpVZiepVHZv+rYODqrLe8BG9beupB5HNCTdPI
-         BpTsZyXWJ8EH4KbZd7utUtLhBb2KiJsu246BDgdO7Sq5AlbyPPQ+qHoNgj0/uxDuCFDt
-         N2XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704245936; x=1704850736;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FC3YNpZQ824RvnO6l/cHjeHZ3qIOYGfCscSR0Xu4SHY=;
-        b=vxvlK6JrjzeFODkhqfsUcog+nTTe1aR4zIx9I9k5TswQoCXr9AUb5X6JhPwFPJHitm
-         trvrmA9OvXq3VE9HNw0pzowYlSNcqAbIL7lx/18AIEnKhJLAbqohImMmPcXSgqA01MwB
-         gWd7jHcFsVScYhSWXBRp4SePykG3gfJyA1dt4jkHAJfYnTCuOGbDwYnw8wyoynKwDy1e
-         FZWSf3SDUVbvBEUuTu+GmcqTUPxasxUdploJEbMetCAVsQTza+mZhWazMVMT7WRXuqqF
-         kgAsfcXOQ6+v7QgGSDkPAELRNPDLK/ftAIsSwHagkfxiUDQt0rvut3KmzD9OVDiIB7NV
-         qGag==
-X-Gm-Message-State: AOJu0Yxai061RoCoHNqZydyJ/DQhN1MIz4pJeHkULb4Qe+TARuUrSH4p
-	hpDw74ouWEmP264owjAoG4jvZUKmG3U=
-X-Google-Smtp-Source: AGHT+IFDvPq3TzqkSgnyyR4hQaDcBezziHkJCMDuLOt7XAqrnqdfbHY28UPqj3s4Ta942mEH66MB5g==
-X-Received: by 2002:a05:6214:19e7:b0:67f:4f8b:e298 with SMTP id q7-20020a05621419e700b0067f4f8be298mr30598302qvc.0.1704245936508;
-        Tue, 02 Jan 2024 17:38:56 -0800 (PST)
-Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
-        by smtp.gmail.com with ESMTPSA id w6-20020a0cef86000000b0067f77ca8d18sm10555731qvr.96.2024.01.02.17.38.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 17:38:56 -0800 (PST)
-Date: Tue, 02 Jan 2024 20:38:56 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Marc Dionne <marc.dionne@auristor.com>, 
- netdev@vger.kernel.org, 
- Jordan Rife <jrife@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Eric Dumazet <edumazet@google.com>, 
- "David S. Miller" <davem@davemloft.net>
-Cc: Willem de Bruijn <willemb@google.com>, 
- Simon Horman <horms@kernel.org>, 
- linux-kernel@vger.kernel.org
-Message-ID: <6594bab0a524_2c093829412@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20231221131230.2025000-1-marc.dionne@auristor.com>
-References: <20231221131230.2025000-1-marc.dionne@auristor.com>
-Subject: Re: [PATCH] net: Save and restore msg_namelen in sock_sendmsg
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA8D1365;
+	Wed,  3 Jan 2024 01:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=brZ7JXAC7jui/xfNaqc5Z1H36T4Tr46rZP4DUHfhpL4=; b=Fm
+	ys2pX3ODCTgSErILCBvtJ0ESmOhSgbSCsnI+miReduAbuaFONtSEzr9i9yBWkf2QujV17XMfFR9vV
+	awLuTOOoIATq2UrVwTET47G9Zmubk01oydLu/nC3xvHO+YbDMl6y3S5XYyj0e0zqY0mRMsl5/YrZD
+	YvvfC3PY1mB9xCg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rKqGl-004Dcr-4N; Wed, 03 Jan 2024 02:42:07 +0100
+Date: Wed, 3 Jan 2024 02:42:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?B?U2FuanXhbiBHYXJj7WEs?= Jorge <Jorge.SanjuanGarcia@duagon.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"s-vadapalli@ti.com" <s-vadapalli@ti.com>,
+	"grygorii.strashko@ti.com" <grygorii.strashko@ti.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 3/3] net: ethernet: ti: am65-cpsw: Add device tree
+ property to set max MTU
+Message-ID: <285f6402-db06-462b-9ca5-8363027283e1@lunn.ch>
+References: <20240102081825.14635-1-jorge.sanjuangarcia@duagon.com>
+ <20240102081825.14635-4-jorge.sanjuangarcia@duagon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240102081825.14635-4-jorge.sanjuangarcia@duagon.com>
 
-Marc Dionne wrote:
-> Commit 86a7e0b69bd5 ("net: prevent rewrite of msg_name in
-> sock_sendmsg()") made sock_sendmsg save the incoming msg_name pointer
-> and restore it before returning, to insulate the caller against
-> msg_name being changed by the called code.  If the address length
-> was also changed however, we may return with an inconsistent structure
-> where the length doesn't match the address, and attempts to reuse it may
-> lead to lost packets.
+On Tue, Jan 02, 2024 at 08:19:15AM +0000, Sanjuán García, Jorge wrote:
+> The switch supports ethernet frame sizes between 64 and 2024 bytes
+> (including VLAN) as stated in the technical reference manual.
 > 
-> For example, a kernel that doesn't have commit 1c5950fc6fe9 ("udp6: fix
-> potential access to stale information") will replace a v4 mapped address
-> with its ipv4 equivalent, and shorten namelen accordingly from 28 to 16.
-> If the caller attempts to reuse the resulting msg structure, it will have
-> the original ipv6 (v4 mapped) address but an incorrect v4 length.
-> 
-> Fixes: 86a7e0b69bd5 ("net: prevent rewrite of msg_name in sock_sendmsg()")
-> Signed-off-by: Marc Dionne <marc.dionne@auristor.com>
+> This patch adds a new devicetree property so the switch ports can
+> be configured with an MTU higher than the standar 1500 bytes, making
+> the max frame length configured on the registers and the max_mtu
+> advertised on the network device consistent.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Why do you need a device tree property for this? How many other
+drivers have a device tree property like this? Why not set
+ndev->max_mtu to 2024 minus overheads?
+
+	Andrew
 
