@@ -1,70 +1,130 @@
-Return-Path: <netdev+bounces-61343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53AF882377E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:09:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB10882378D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:13:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3A121F25E76
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:09:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3AE1C21393
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE461DA38;
-	Wed,  3 Jan 2024 22:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2941DA40;
+	Wed,  3 Jan 2024 22:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5/I1PIp"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TQgtpQwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0028D1DA2B;
-	Wed,  3 Jan 2024 22:09:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0447AC433C8;
-	Wed,  3 Jan 2024 22:09:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704319775;
-	bh=6ljWwcMuOclalShz7xItPE1LxMgLaftfxHmnUv3zwQo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t5/I1PIpxUdoWV28a/IV0bFPmk4b+1rKFQAkinmjP+UyOCAV+Lz+FNEdLTCSHwAqO
-	 n2/RUdbmvRLe6ReURSNZIzMBShj61jEU3oHgCNItdjzYEEkc9upaVdE/J+xwPuYC4A
-	 hcrrN+bXntXeHf+Uh7m0ZPaMGrmXDkk7ghE29QMjx5wBRihoreUJPTfaL/1hneZJBm
-	 Vu5Xfpx1cua6A9glQCMgAqbu4RoEV3y9xb0j7PWJ+L1XF2TD5cYogb5K98Br+ukWlX
-	 wjo1irToxruuubn8dcFh5PRAQPLIbOnzzyAbvfTXRYZIE8p0GT/etMen98msZpfEA6
-	 EuAIcn1uQGygA==
-Date: Wed, 3 Jan 2024 14:09:34 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Thomas Lange <thomas@corelatus.se>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, jthinz@mailbox.tu-berlin.de,
- arnd@arndb.de, deepa.kernel@gmail.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com
-Subject: Re: [PATCH net] net: Implement missing SO_TIMESTAMPING_NEW cmsg
- support
-Message-ID: <20240103140934.2a6c6924@kernel.org>
-In-Reply-To: <d1ce6aba-1b10-471c-ba60-10effa1dac10@corelatus.se>
-References: <d1ce6aba-1b10-471c-ba60-10effa1dac10@corelatus.se>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247681DA3B;
+	Wed,  3 Jan 2024 22:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=fHwQ56i97OHIXttecD026MYSyAw2rlXnCq/U+o4NtQU=; b=TQgtpQwWC4q+uBbxLsGIu9TdMR
+	A1JMSyXBnIMP0z1jFR3+80MOnElOPNCfoV8Ar1xrBtaxE+GR50TysDT35s7Nv7qkGPpp554QbQ5ji
+	2Ce0EEGf8NBuN4a+FbV5WgaGxPPuCtDqVDreR2Cf0tR9okTRrwkB8mNrGeCA1UPV3EOS+vpiyLt/O
+	uJ+lMmAbXQgb1x6wPtzGmoInRuhGw1fEhoATgHtY3EGDH3cPt876igUx0ae0/BDzdBUkxk+Tv17vp
+	uioPCfzrK1NVkArGYtNJL5Fw7NSFc6bbEoU+p+UJuyVCmy3sjBhDyajVDQR7PchvBGVwEpBSBu2A6
+	9vTL2mOw==;
+Received: from [50.53.46.231] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rL9U9-00CEYx-2Y;
+	Wed, 03 Jan 2024 22:13:13 +0000
+Message-ID: <3466355c-dc30-4638-9bbe-a7433477340c@infradead.org>
+Date: Wed, 3 Jan 2024 14:13:12 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 10/11] Documentation: driver-api: pps: Add Intel
+ Timed I/O PPS generator
+Content-Language: en-US
+To: lakshmi.sowjanya.d@intel.com, tglx@linutronix.de, jstultz@google.com,
+ giometti@enneenne.com, corbet@lwn.net, linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
+ eddie.dong@intel.com, christopher.s.hall@intel.com,
+ jesse.brandeburg@intel.com, davem@davemloft.net,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
+ anthony.l.nguyen@intel.com, pandith.n@intel.com,
+ mallikarjunappa.sangannavar@intel.com, thejesh.reddy.t.r@intel.com
+References: <20240103115602.19044-1-lakshmi.sowjanya.d@intel.com>
+ <20240103115602.19044-11-lakshmi.sowjanya.d@intel.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240103115602.19044-11-lakshmi.sowjanya.d@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Tue, 2 Jan 2024 22:13:50 +0100 Thomas Lange wrote:
-> Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
-> socket option SO_TIMESTAMPING_NEW. However, it was never implemented in
-> __sock_cmsg_send thus breaking SO_TIMESTAMPING cmsg for platforms using
-> SO_TIMESTAMPING_NEW.
-> 
-> Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
-> Link: https://lore.kernel.org/netdev/6a7281bf-bc4a-4f75-bb88-7011908ae471@app.fastmail.com/
-> Signed-off-by: Thomas Lange <thomas@corelatus.se>
 
-patch looks mangled, could you resend with git send-email?
-There are multiple spaces at the start of the diff lines.
+
+On 1/3/24 03:56, lakshmi.sowjanya.d@intel.com wrote:
+> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+> 
+> Add Intel Timed I/O PPS usage instructions.
+> 
+> Co-developed-by: Pandith N <pandith.n@intel.com>
+> Signed-off-by: Pandith N <pandith.n@intel.com>
+> Signed-off-by: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  Documentation/driver-api/pps.rst | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/Documentation/driver-api/pps.rst b/Documentation/driver-api/pps.rst
+> index 78dded03e5d8..cb1e4d814d37 100644
+> --- a/Documentation/driver-api/pps.rst
+> +++ b/Documentation/driver-api/pps.rst
+> @@ -246,3 +246,25 @@ delay between assert and clear edge as small as possible to reduce system
+>  latencies. But if it is too small slave won't be able to capture clear edge
+>  transition. The default of 30us should be good enough in most situations.
+>  The delay can be selected using 'delay' pps_gen_parport module parameter.
+> +
+> +
+> +Intel Timed I/O PPS signal generator
+> +------------------------------------
+> +
+> +Intel Timed I/O is a high precision device, present on 2019 and newer Intel
+> +CPUs, that can generate PPS signal.
+
+              can generate a PPS signal.
+or
+              can generate PPS signals.
+
+> +
+> +Timed I/O and system time are both driven by same hardware clock, The signal
+
+                                                              clock. The signal is
+
+> +generated with a precision of ~20 nanoseconds. The generated PPS signal
+> +is used to synchronize an external device with system clock. For example,
+> +Share your clock with a device that receives PPS signal, generated by
+
+   share
+
+> +Timed I/O device. There are dedicated Timed I/O pins to deliver PPS signal
+
+maybe:                                                  to deliver the PPS signal
+
+> +to an external device.
+> +
+> +Usage of Intel Timed I/O as PPS generator:
+> +
+> +Start generating PPS signal::
+> +        $echo 1 > /sys/devices/platform/INTCxxxx\:00/enable
+> +
+> +Stop generating PPS signal::
+> +        $echo 0 > /sys/devices/platform/INTCxxxx\:00/enable
+
 -- 
-pw-bot: cr
+#Randy
 
