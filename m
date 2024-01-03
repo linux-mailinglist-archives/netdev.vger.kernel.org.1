@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-61060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 024F38225B7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 00:50:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D7B8225CF
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 01:05:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29C931C21B43
-	for <lists+netdev@lfdr.de>; Tue,  2 Jan 2024 23:50:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C587DB229BA
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 00:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13BEB17988;
-	Tue,  2 Jan 2024 23:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2702580;
+	Wed,  3 Jan 2024 00:05:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8Cmierg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZsSJz0WK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF7F17984
-	for <netdev@vger.kernel.org>; Tue,  2 Jan 2024 23:50:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29B9DC433C7;
-	Tue,  2 Jan 2024 23:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E5A257E
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 00:05:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6551CC433C7;
+	Wed,  3 Jan 2024 00:05:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704239415;
-	bh=RuGeG/C6MmKlTpW4SNCmLPxjBBw93qwjuWM/Fo35tC8=;
+	s=k20201202; t=1704240328;
+	bh=YHMoYUYF/CB03LXIl3XKRG/w1sBiHcrzCQwFRZ9nCXk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=A8CmiergwiIWq9QMf+vmlA6JTHnQhu+NGQHtPtM/MYdNe6SHupBwHruomV5Ef6Lxj
-	 8BTX7mItICuFcVjBhzPFIHTgQE7n6EB2Pe3pyBgY6AnqrUPS/qEB3BLxI45PC4asKr
-	 lfQcM++CGm7+VXX3NHsO4CHYVZmayA0WEL9NMXb/2oQuTJfvYaru8RkyjqE2TCoM6B
-	 6uTMGnqna1yV1XI7XfzP1ih8zv+3YHO4HbKmXFNmoK7QFmFNC7hNwa1/waO+xamsal
-	 DrTjydJdbbNdZ0dwYTM9mIcaYSH6pgS2izyRDNsgN8eJpaWy3TrwXvRsV/ETcpWHG7
-	 D3HRoaNu1pNqg==
-Date: Tue, 2 Jan 2024 15:50:14 -0800
+	b=ZsSJz0WKxU6M9DfRiT2CWOPv4x54frW7ACHEHvm5bHX7zJtMdnaPIPSF3NtlpoY8G
+	 6aS3LgqQVi0Wl52+Nkr9NIXPluFnRefUXf51BEigvab4as9cKNHCW5H37wfHK9nwYP
+	 QYjk6NkKxSiZoATWTPN9OhJMIYaJs2gbo5a+iX3ip3C8ibsQAar2HKJHYZEnmyTBuU
+	 sJmasVl9KKUu4Rbr2FKaWZ7Nw8EWzG/ElMPsx8Ck9GgUYW+s9ObFdtnfYlr1kHeUUu
+	 j2IVrN2An7/L1UT3x0DNT2XVEfFhCpO2ZFew8mBeZKxR+UslBLIlgC9SBzVGd+kfkw
+	 8YqHMwDHqlL+w==
+Date: Tue, 2 Jan 2024 16:05:26 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>
-Cc: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: phy: extend
- genphy_c45_read_eee_abilities() to read capability 2 register
-Message-ID: <20240102155014.7e1ccc4d@kernel.org>
-In-Reply-To: <20231220161258.17541-1-kabel@kernel.org>
-References: <20231220161258.17541-1-kabel@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: netdev@vger.kernel.org, corbet@lwn.net, jesse.brandeburg@intel.com,
+ anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, vladimir.oltean@nxp.com, andrew@lunn.ch,
+ horms@kernel.org, mkubecek@suse.cz, willemdebruijn.kernel@gmail.com,
+ gal@nvidia.com, alexander.duyck@gmail.com, ecree.xilinx@gmail.com, Jacob
+ Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next 2/2] net: ethtool: add a NO_CHANGE uAPI for new
+ RXFH's input_xfrm
+Message-ID: <20240102160526.6178fd04@kernel.org>
+In-Reply-To: <20231221184235.9192-3-ahmed.zaki@intel.com>
+References: <20231221184235.9192-1-ahmed.zaki@intel.com>
+	<20231221184235.9192-3-ahmed.zaki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 20 Dec 2023 17:12:58 +0100 Marek Beh=C3=BAn wrote:
-> Extend the generic clause 45 PHY function reading EEE abilities to also
-> read the IEEE 802.3-2018 45.2.3.11 "EEE control and capability 2"
-> register.
->=20
-> The new helpers mii_eee_cap2_mod_linkmode_t() and
-> linkmode_to_mii_eee_cap2_t() only parse the 2500baseT and 5000baseT
-> EEE bits. The standard also defines bits for 400000baseR, 200000baseR
-> and 25000baseT, but we don't have ethtool link bits for those now.
+On Thu, 21 Dec 2023 11:42:35 -0700 Ahmed Zaki wrote:
+> +	     rxfh.key_size == 0 && rxfh.hfunc == ETH_RSS_HASH_NO_CHANGE &&
+> +	     rxfh.input_xfrm == RXH_XFRM_NO_CHANGE))
 
-Andrew, Russell? Looks good?
+This looks fine, but we also need a check to make sure input_xfrm
+doesn't have bits other than RXH_XFRM_SYM_XOR set, right?
 
