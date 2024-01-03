@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-61163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583BE822C02
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:20:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D31F822C07
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:23:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB2A31F2419B
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:20:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73CE11F22037
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A420718EAA;
-	Wed,  3 Jan 2024 11:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A587718E20;
+	Wed,  3 Jan 2024 11:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1LwAzpg5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IPFMgp3o"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FED818E39;
-	Wed,  3 Jan 2024 11:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qP4o6WoadvxoWxPxLI1uV5qkWBeO6DZ9IGfpq4QrUwM=; b=1LwAzpg5o164Q7dDM9h0kCLQRX
-	ZhFvB8bNZsY3zVtUr7dvjrBjTSqUhd8wZ4s7pqfkeibfWzX3VFLCnCO8Ec4qwC66yYOro862n8TFs
-	TDL87PYZmwdXOdrqCcOSkCUVkD4UQf2xQ7/zZDbdOejlH6DwOg52wqHAJc7CPzqYMtbeTKFgQocgu
-	8Ocad2nSaAHjGXrShQiez8wRD3wGLAnEIZbayKMcr10ayRC47M29rxd8VJ4Qe+APZmx6jFAtAkFSH
-	mXFCi3bwVL1PxZvInDR8mwawQy2e4u+143EjF2aEQef1ElZX4W0d9MZQmzxO77hFOq8IyAh+LDXH3
-	YrfzIrEw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46830)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKzI6-0007NQ-0R;
-	Wed, 03 Jan 2024 11:20:06 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKzI6-0006Ji-05; Wed, 03 Jan 2024 11:20:06 +0000
-Date: Wed, 3 Jan 2024 11:20:05 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Eric Woudstra <ericwouds@gmail.com>, Alexander Couzens <lynxis@fe80.eu>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC net-next] net: pcs: pcs-mtk-lynxi fix
- mtk_pcs_lynxi_get_state() for 2500base-x
-Message-ID: <ZZVC5ThEmikwiVfM@shell.armlinux.org.uk>
-References: <20240102074408.1049203-1-ericwouds@gmail.com>
- <ZZP9GR15ufDbjGAJ@shell.armlinux.org.uk>
- <92190426-3614-4774-9E9F-18F121622788@gmail.com>
- <74223164-ab50-4d6d-a4f4-561b0a70d396@gmail.com>
- <ZZRrk85SCDmo76NJ@pidgin.makrotopia.org>
- <6666EB36-984E-4898-A41A-2D9713DE4DB0@gmail.com>
- <ZZSX_oNUIQr6R9FU@pidgin.makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC46E18E16
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 11:23:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50e72e3d435so7780969e87.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 03:23:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704281002; x=1704885802; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZJRFm+aJFXgkxWtqPNaVAM12RXPKxO0DGGq8KgLaeE0=;
+        b=IPFMgp3o+/ebLmnN7/Xto97/ZnuiFEXQBBYpFbhQ7G1pFsTEMX496etf7bXQ99U5H6
+         JwRcvQHHbVWTPuh0s1qsQUQruH+mO6O2PpxZBRKANrpgeC185Jh3rFUAxG6ThPIHEwu4
+         ibfA0yWtKAw1TS28IP/Q3NiH4C6gdY8RmuBFfKEsUeVGaIBPFkoIU7OGfxuybldayqGN
+         t3PWexb38xiMV3tq+zz12EPEmqY9I6ijkqrIce3xE+5b6TKeTitHyYbSK2hxAOSPKgSq
+         0dBuKt6/vcQaDkVg3FWjCyKW4ttCTPCMOwiyv8XhQdmsRYPmENuiQnoySSREjk03ALJ9
+         SliA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704281002; x=1704885802;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZJRFm+aJFXgkxWtqPNaVAM12RXPKxO0DGGq8KgLaeE0=;
+        b=qwiz/vDk/Ka5ErmAi6tiMnn04bMRm5SsFN+7uy/YgTJjkFQG4mSfNzdT+1JEDg2RmW
+         38Z/+dSUKNzPLbEahgsjXcl7CFWpGpCCFFHat3PZqx0pF9dFvMkz9oX2BcQRydokqQXd
+         qmidCYGRZPHJjgBq481EugdtKlt0Cryi4a5uOa35OtRjYnv3esIKCg16bSqtXfpfP0Vj
+         mRtpx3EMJPy6CX/WSZ2wzMAcz63De8D4BKMH4eBQTJLAjWToIvuKGaOtWKzLdXX7F5mY
+         sGxCk2ekZ08Up/IYnoHobDjWZH1qMceNF+wAM7pjFghP95CKWOvX1T7dVhCeVQDsZh1G
+         KUew==
+X-Gm-Message-State: AOJu0Yz8xuvYRCIYJue+bjyTo+bKHiH4Nxyh2Rxq0ZvnaJ5Nzkxs+Gkj
+	KWa0pQ2AY6RQQitozvqZM9Ng4SfpeTbyrw==
+X-Google-Smtp-Source: AGHT+IFJVTLwzRGF1DuQP3vjPisYKxiWF+5uAzI0kdZJOWOmMPRP4sLXPJuiATG9UCHDYViYbvZ6Qg==
+X-Received: by 2002:a05:6512:ad0:b0:50e:6b38:9e0b with SMTP id n16-20020a0565120ad000b0050e6b389e0bmr6715682lfu.73.1704281001941;
+        Wed, 03 Jan 2024 03:23:21 -0800 (PST)
+Received: from localhost ([102.140.209.237])
+        by smtp.gmail.com with ESMTPSA id p2-20020a056402044200b005553a8bb61dsm10309013edw.87.2024.01.03.03.23.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 03:23:21 -0800 (PST)
+Date: Wed, 3 Jan 2024 14:23:18 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, deepakx.nagaraju@intel.com,
+	joyce.ooi@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	Nagaraju DeepakX <deepakx.nagaraju@intel.com>,
+	Andy Schevchenko <andriy.schevchenko@linux.intel.com>
+Subject: Re: [PATCH 5/5] net: ethernet: altera: rename functions and their
+ prototypes
+Message-ID: <ca5c5be7-9270-412b-a868-d5e28116f983@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,46 +76,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZZSX_oNUIQr6R9FU@pidgin.makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20231213071112.18242-6-deepakx.nagaraju@intel.com>
 
-On Wed, Jan 03, 2024 at 12:10:54AM +0100, Daniel Golle wrote:
-> On Tue, Jan 02, 2024 at 11:13:58PM +0100, Eric Woudstra wrote:
-> > I believe the general idea is that phylink should be aware wether to use inband or outband negotiation in order to setup the hardware correctly. Speaking of a situation where there is a PHY attached.
-> 
-> Well, SGMII speed/duplex AN is not defined for 2500Base-X by any
-> standard and not supported by the hardware (unlike e.g. RealTek
-> which came up with their own proprietary extension called HiSGMII).
+Hi,
 
-I give up trying to work out whether people are abusing the SGMII term
-or not. SGMII *IS NOT ANY* BASE-X.
+kernel test robot noticed the following build warnings:
 
-SGMII is Cisco SGMII, defined to operate at 10, 100 and 1000M speeds
-over a single serdes lane operating at 1.25GBaud.
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-2500Base-X was many proprietary standards (called by many different
-names like HiSGMII, HS-SGMII, 2500base-X etc) that eventually got IEEE
-acceptance in one form as 2500base-X.
+url:    https://github.com/intel-lab-lkp/linux/commits/deepakx-nagaraju-intel-com/net-ethernet-altera-remove-unneeded-assignments/20231213-151600
+base:   net/main
+patch link:    https://lore.kernel.org/r/20231213071112.18242-6-deepakx.nagaraju%40intel.com
+patch subject: [PATCH 5/5] net: ethernet: altera: rename functions and their prototypes
+config: m68k-randconfig-r081-20231218 (https://download.01.org/0day-ci/archive/20231220/202312200739.79WGCuyb-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
 
-``PHY_INTERFACE_MODE_2500BASEX``
-    This defines a variant of 1000BASE-X which is clocked 2.5 times as fast
-    as the 802.3 standard, giving a fixed bit rate of 3.125Gbaud.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202312200739.79WGCuyb-lkp@intel.com/
 
-Note: not "SGMII upclocked by 2.5 times".
+New smatch warnings:
+drivers/net/ethernet/altera/altera_tse_main.c:266 alloc_init_skbufs() warn: double check that we're allocating correct size: 24 vs 164
 
-We do have devices that _do_ use 802.3z (NOT SGMII) negotiation over
-2500base-X - not for speed or duplex, but for the pause modes, and
-we have devices where it is specified that when operating in BASE-X
-mode, inband AN *must* be enabled - which means upclocking 1000base-X
-to 2500base-X requires inband AN for these devices.
+Old smatch warnings:
+drivers/net/ethernet/altera/altera_tse_main.c:271 alloc_init_skbufs() warn: double check that we're allocating correct size: 24 vs 164
+drivers/net/ethernet/altera/altera_tse_main.c:988 tse_open() warn: 'priv->tx_irq' from request_irq() not released on lines: 988.
 
-Simply hacking PCS to do whatever they care for 2500BASE-X is not
-acceptable. We need a *proper* solution to this, and we need to stop
-fart arsing about over this, and we need to stop fart arsing around
-calling things stuff that they are not, perpetuating the confusion
-in the wider industry.
+vim +266 drivers/net/ethernet/altera/altera_tse_main.c
+
+bbd2190ce96d8f Vince Bridgers   2014-03-17  257  static int alloc_init_skbufs(struct altera_tse_private *priv)
+bbd2190ce96d8f Vince Bridgers   2014-03-17  258  {
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  259  	struct altera_dma_private *dma = &priv->dma_priv;
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  260  	unsigned int rx_descs = dma->rx_ring_size;
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  261  	unsigned int tx_descs = dma->tx_ring_size;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  262  	int ret = -ENOMEM;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  263  	int i;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  264  
+bbd2190ce96d8f Vince Bridgers   2014-03-17  265  	/* Create Rx ring buffer */
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13 @266  	dma->rx_ring = kcalloc(rx_descs, sizeof(struct altera_dma_private), GFP_KERNEL);
+
+There is a mismatch here.  dma->rx_ring was changed to altera_dma_buffer
+but the sizeof was changed to altera_dma_private.
+
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  267  	if (!dma->rx_ring)
+bbd2190ce96d8f Vince Bridgers   2014-03-17  268  		goto err_rx_ring;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  269  
+bbd2190ce96d8f Vince Bridgers   2014-03-17  270  	/* Create Tx ring buffer */
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  271  	dma->tx_ring = kcalloc(tx_descs, sizeof(struct altera_dma_private), GFP_KERNEL);
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  272  	if (!dma->tx_ring)
+bbd2190ce96d8f Vince Bridgers   2014-03-17  273  		goto err_tx_ring;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  274  
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  275  	dma->tx_cons = 0;
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  276  	dma->tx_prod = 0;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  277  
+bbd2190ce96d8f Vince Bridgers   2014-03-17  278  	/* Init Rx ring */
+bbd2190ce96d8f Vince Bridgers   2014-03-17  279  	for (i = 0; i < rx_descs; i++) {
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  280  		ret = tse_init_rx_buffer(priv, &priv->dma_priv.rx_ring[i], dma->rx_dma_buf_sz);
+bbd2190ce96d8f Vince Bridgers   2014-03-17  281  		if (ret)
+bbd2190ce96d8f Vince Bridgers   2014-03-17  282  			goto err_init_rx_buffers;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  283  	}
+bbd2190ce96d8f Vince Bridgers   2014-03-17  284  
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  285  	dma->rx_cons = 0;
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  286  	dma->rx_prod = 0;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  287  
+bbd2190ce96d8f Vince Bridgers   2014-03-17  288  	return 0;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  289  err_init_rx_buffers:
+bbd2190ce96d8f Vince Bridgers   2014-03-17  290  	while (--i >= 0)
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  291  		tse_free_rx_buffer(priv, &priv->dma_priv.rx_ring[i]);
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  292  	kfree(dma->tx_ring);
+bbd2190ce96d8f Vince Bridgers   2014-03-17  293  err_tx_ring:
+ad6f888f174e6a Nagaraju DeepakX 2023-12-13  294  	kfree(dma->rx_ring);
+bbd2190ce96d8f Vince Bridgers   2014-03-17  295  err_rx_ring:
+bbd2190ce96d8f Vince Bridgers   2014-03-17  296  	return ret;
+bbd2190ce96d8f Vince Bridgers   2014-03-17  297  }
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
