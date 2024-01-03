@@ -1,107 +1,94 @@
-Return-Path: <netdev+bounces-61230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0362822F14
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:01:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A64FF822F23
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:04:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BDCE1F220BD
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:01:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A18E1F23C13
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE09C1A27E;
-	Wed,  3 Jan 2024 14:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6CB1A598;
+	Wed,  3 Jan 2024 14:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrvKS9JS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d1oF5TCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4438A1A27A;
-	Wed,  3 Jan 2024 14:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3368abe1093so9215207f8f.2;
-        Wed, 03 Jan 2024 06:01:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704290495; x=1704895295; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9BErBM0wPdwvSBc33sZfKMWNPmjAg4dmUERmQ8FyzhY=;
-        b=DrvKS9JS9cChm6u3o/0mBK1GiKFO187SNG2lfYMfO9+zOLXYmJlR0LFbaihn/pE0g2
-         KnxYI12xtbNumNf894YLjaOcSC1GCsH2a3Om6pbY7XOu4/wjFld1THXvctZK7FwPFDo8
-         hqYfmCk1aIq43fAdpTFdEHlnFsSr1sovzK8sIz2VAXjr3d7FLaJYNr7P0U+GAxFxC0e/
-         xLUmGzbuu8av7igwhJJqqzf9/dP4RPmg75XBlmjTTXybLhNgjKsESbPeNkLV64jR0tuE
-         PXdy26ZSo2G7B/q2ALKZa0XeB0UnOUbwRpFoImk01zJSEhsHSWvMvmiabVSkFqbV2f2k
-         KGrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704290495; x=1704895295;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9BErBM0wPdwvSBc33sZfKMWNPmjAg4dmUERmQ8FyzhY=;
-        b=uRrk1mnbbtPB1XI0xO1P2mlLVj8aKcrUEggGVpHvYbg7YrmYl9I5h6kIQDeUULbTiU
-         GSQ6QkXjD7RGsfFxjGoIBXaTfjgwxCRt0OVKsmhsSiRakGqI1iP0bHBkeUzYGNxm3M34
-         koX5RP2nDHsTSQ2hEZaB0LHBit48QvNhvA3U+StP0SYWgoqmCTorf1D2TdWcDtP2uwEJ
-         VbVqYXc5A6hwL2PQzD38uWavOSmm30wbXvqtYS75CJZHATB102w6Prw40Qaj0BxPXNYT
-         eaf1cEjG69FBEcjmLlmRWYe2mB49B338B9j3LK6vJHxMdjylZhdwH9LCmqT1IFUfdJQv
-         EzeA==
-X-Gm-Message-State: AOJu0YxeXirKHvyLeebeYhbl5+PnOp0q4cUoUeXu3fku52u/bwXkcr0t
-	jIBHnTJmGdJGpxLtkrqhE0o=
-X-Google-Smtp-Source: AGHT+IFdZ3buW4ywokrWfvLiSPOyxmG+Mp6bHvVAaY2H43y0Cs4nR/z1KL6Q4m42TETaPWuDqov5gQ==
-X-Received: by 2002:a05:6000:184d:b0:337:3de5:d70f with SMTP id c13-20020a056000184d00b003373de5d70fmr2772418wri.102.1704290495296;
-        Wed, 03 Jan 2024 06:01:35 -0800 (PST)
-Received: from debian ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id e29-20020a5d595d000000b003372b8ab19asm12025202wri.64.2024.01.03.06.01.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jan 2024 06:01:35 -0800 (PST)
-Message-ID: <50450c53-caa8-49bf-a718-5819a4263e9f@gmail.com>
-Date: Wed, 3 Jan 2024 15:01:15 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BA81A27A
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 14:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704290670;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dm5uQwn+49K96zJWxQsiqkazcQLayYKEShHZEQ+JYDg=;
+	b=d1oF5TCKj77QBWduueGBezNvH8XV/2ncicZizQivDByMTsS05ZISeuaP9QmSwpLJP8qV2T
+	3NO2oymSXe+6WpIK2eSdVRHsjrPVYQHaR2az8LnedNWCtOkN1JLF5QG3stHaBbNdToi+1M
+	4etKyS+hF3HfSEe0gZxMeNS6eXXzf5s=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-613-i-DxWH5nPu6c-fysuoabdA-1; Wed, 03 Jan 2024 09:04:26 -0500
+X-MC-Unique: i-DxWH5nPu6c-fysuoabdA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1041384AF84;
+	Wed,  3 Jan 2024 14:04:22 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 372852026D66;
+	Wed,  3 Jan 2024 14:04:18 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <ZZVctju5TEjS218p@codewreck.org>
+References: <ZZVctju5TEjS218p@codewreck.org> <20231221132400.1601991-41-dhowells@redhat.com> <20231221132400.1601991-1-dhowells@redhat.com> <292837.1704232179@warthog.procyon.org.uk>
+To: Dominique Martinet <asmadeus@codewreck.org>
+Cc: dhowells@redhat.com, Eric Van Hensbergen <ericvh@kernel.org>,
+    Latchesar Ionkov <lucho@ionkov.net>,
+    Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org,
+    Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH] 9p: Fix initialisation of netfs_inode for 9p
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 2/3] net: gro: parse ipv6 ext headers without
- frag0 invalidation
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <127b8199-1cd4-42d7-9b2b-875abaad93fe@gmail.com>
- <90117449-1f4a-47d7-baf4-2ed6540bc436@gmail.com>
- <CANn89i+GJOgcDWK=C0+vmomt2ShotrOKyLiXzFkfT1W8vpJv1Q@mail.gmail.com>
- <9419df03-a203-4b73-91a6-f008076c29b4@gmail.com>
- <CANn89iJdPRspWo2XzqdGdGe9_am7zNwbq9vm0AFLF-KRODzE7A@mail.gmail.com>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <CANn89iJdPRspWo2XzqdGdGe9_am7zNwbq9vm0AFLF-KRODzE7A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <368445.1704290657.1@warthog.procyon.org.uk>
+Date: Wed, 03 Jan 2024 14:04:17 +0000
+Message-ID: <368446.1704290657@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-Eric Dumazet wrote:
+Dominique Martinet <asmadeus@codewreck.org> wrote:
 
-> 
-> 
-> Hmm... I was looking at
-> 
-> skb_checksum_setup_ipv6() , it uses skb_maybe_pull_tail( ...
-> sizeof(struct ipv6_opt_hdr))
-> ipv6_skip_exthdr()  also uses sizeof(struct ipv6_opt_hdr)
-> ip6_tnl_parse_tlv_enc_lim also uses the same.
-> hbh_mt6(), ipv6header_mt6(),  .. same...
-> ip6_find_1stfragopt(), get_ipv6_ext_hdrs(), tcf_csum_ipv6(),
-> mip6_rthdr_offset() same
-> 
-> So it seems you found two helpers that went the other way.
-> 
-> If you think pulling 8 bytes first is a win, I would suggest a stand
-> alone patch, adding the magic constant
-> using it in all places, so that a casual reader can make sense of the
-> magical 8 value.
+> Would it make sense to just always update netfs's ctx->remote_i_size in
+> the various stat2inode calls instead?
 
-I guess pulling 8 bytes first is not such a big advantage.
-I will submit a v3 with sizeof(*opth) as you suggested.
+Btw, v9fs_i_size_write() should be redundant.  It should be sufficient to just
+use i_size_write() as long as you use i_size_read().
+
+David
+
 
