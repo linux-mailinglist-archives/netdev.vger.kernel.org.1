@@ -1,118 +1,105 @@
-Return-Path: <netdev+bounces-61152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E3FE822B68
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:30:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31517822B72
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:34:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E407CB21F7F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:30:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4E0FB212E0
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC84318B1C;
-	Wed,  3 Jan 2024 10:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD2518C07;
+	Wed,  3 Jan 2024 10:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tpyc2rho"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="U7wWs6zC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131F01805D
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 10:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704277823; x=1735813823;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PMvuKteFKvaXCE4IPrvC+0bug0A5A+UMk6iTqWSs050=;
-  b=Tpyc2rhoFvxa/KfoYFKOUN6peXxLScjk18ZA2OhsaaI+X3xNwA/8hFX6
-   2edUm2IfPGstUf7cT6KBEuHwjhOlRTlh1xin64zyXHCHfJQJw9deqAFDn
-   6E2hEAYI6gg/HULDvGzkdNY4HRgxwCXDsBGHsCBIJeTjRkbDqIV6itRVH
-   gU9bfj1LVwHmNqJw2xJTlD1tcvs6MfDG0XG98v9lUv4bOfhxE9Q3Z4qwM
-   I+BMajhVFuBLwqNyX6LEuYcvVM1cizEkrreKA4gfM06lwEqCpaR7pOlrN
-   1X3uk/mn+ICUywWDsIMF2RqWHguW5UQBRNqSWetzC6S2CPrQ59jTArtLd
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="3793799"
-X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
-   d="scan'208";a="3793799"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 02:30:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="773109698"
-X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
-   d="scan'208";a="773109698"
-Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.51.153])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 02:30:19 -0800
-Date: Wed, 3 Jan 2024 11:30:17 +0100
-From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Marc MERLIN <marc@merlins.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
-Message-ID: <ZZU3OaybyLfrAa/0@linux.intel.com>
-References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
- <20231206084448.53b48c49@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A333918B0D
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 10:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-50e78f1f41fso7099524e87.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 02:34:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1704278072; x=1704882872; darn=vger.kernel.org;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Yu/eTviUFcbo04DZ+MS3O/ASGANopqkpkpouiOn+0k=;
+        b=U7wWs6zCQqh7wwfLzp0ufyjt1BtLurrnJtZSL40UdaueXmLx4zhhnc815iiomAfXpF
+         2BPYELfV0RJmDXkW+T0aUOD86bCM4nUicGEc0D/oSXtXynqThjb6MJLlTCIJj6b09OhG
+         L5VvGCxga000Rwpoeo1HmqQntGnJai2J/613M3DVsMGgFbODid5oZFkicFLYQ1yCmFCt
+         +H6YPpXmt5IH3bnaXBXHrSOKvtIRGj/V2c0TzaayUOVwW4LU9msR7Yc8ETKH9vrXi0t6
+         AaqPWwYLINEjDfLHaju6JjYg50y/kSAQ6ctowcs4oS7h7kKHQ4ptJAdmvwybgz57KpB1
+         LHmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704278072; x=1704882872;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Yu/eTviUFcbo04DZ+MS3O/ASGANopqkpkpouiOn+0k=;
+        b=fEaJhCLR3uvjpOyaPMyn9lX9/LsZ/S5SzH4BlMebxR2Cq0JFARgziY/+zLPcFvxkX3
+         N7b9sCh9Gfi5yfXKotFQP/KcS1IQ9NW2wEi1N7ll28TlY4UsA1yIy1reSnzP6tW+/Y7j
+         3obj+lNV9P1yz9Doox3VO3E+lvSxxkoVNJywgQJeUCt+L0fqTJ+ntsSncToRJVlBlHIr
+         DWEETmr/e4hk5sxUKMx4F0Kvb8T188yCb5N6TjKgDKopPyWX+S0ZmeE4/dESdNm98ce8
+         m4KwL0joGwVTUG4RF7/vxmFMWXFOWZpedmp7eKRb8/YsvtLX5fE/LtR7MQMJaZCj8rUC
+         FJ9A==
+X-Gm-Message-State: AOJu0YyAiUVRovViEBpjJD7DTViD6CkBB/4FarcOO7sQJzEq+zl054TX
+	W15tBzcS2VXV1kWMf/1JN9byPSLo7of/1w==
+X-Google-Smtp-Source: AGHT+IH/wyPfTPbdM8cjBa7w2+DTa+3alT1ICJH3KagkRZHU/khaCqJJmgVLcKjcquOCGfUkY/8nUA==
+X-Received: by 2002:a05:6512:ba6:b0:50e:7be8:46f6 with SMTP id b38-20020a0565120ba600b0050e7be846f6mr8076222lfv.83.1704278072562;
+        Wed, 03 Jan 2024 02:34:32 -0800 (PST)
+Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
+        by smtp.gmail.com with ESMTPSA id p14-20020a05651238ce00b0050e5ae6243dsm3867924lft.295.2024.01.03.02.34.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 02:34:31 -0800 (PST)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 0/2] net: dsa: mv88e6xxx: Add LED support for 6393X
+Date: Wed,  3 Jan 2024 11:33:49 +0100
+Message-Id: <20240103103351.1188835-1-tobias@waldekranz.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206084448.53b48c49@kernel.org>
+Organization: Addiva Elektronik
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 06, 2023 at 08:44:48AM -0800, Jakub Kicinski wrote:
-> On Wed,  6 Dec 2023 11:39:32 +0100 Johannes Berg wrote:
-> > As reported by Marc MERLIN, at least one driver (igc) wants or
-> > needs to acquire the RTNL inside suspend/resume ops, which can
-> > be called from here in ethtool if runtime PM is enabled.
-> > 
-> > Allow this by doing runtime PM transitions without the RTNL
-> > held. For the ioctl to have the same operations order, this
-> > required reworking the code to separately check validity and
-> > do the operation. For the netlink code, this now has to do
-> > the runtime_pm_put a bit later.
-> 
-> I was really, really hoping that this would serve as a motivation
-> for Intel to sort out the igb/igc implementation. The flow AFAICT
-> is ndo_open() starts the NIC, the calls pm_sus, which shuts the NIC
-> back down immediately (!?) then it schedules a link check from a work
+This series adds support for the port LEDs on 6393X (Amethyst).
 
-It's not like that. pm_runtime_put() in igc_open() does not disable device.
-It calls runtime_idle callback which check if there is link and if is
-not, schedule device suspend in 5 second, otherwise device stays running.
+First, add the generic infrastructure needed by all chips. The idea is
+that adding support for more chips in the future will only require
+adding a new implementation of mv88e6xxx_led_ops.
 
-Work watchdog_task runs periodically and also check for link changes.
+Then, provide the first concrete implementation for 6393X.
 
-> queue, which opens it again (!?). It's a source of never ending bugs.
+Tobias Waldekranz (2):
+  net: dsa: mv88e6xxx: Add LED infrastructure
+  net: dsa: mv88e6xxx: Add LED support for 6393X
 
-Maybe there are issues there and igc pm runtime implementation needs
-improvements, with lockings or otherwise. Some folks are looking at this. 
-But I think for this particular deadlock problem reverting of below commits
-should be considered:
+ drivers/net/dsa/mv88e6xxx/Makefile |   1 +
+ drivers/net/dsa/mv88e6xxx/chip.c   |   6 +
+ drivers/net/dsa/mv88e6xxx/chip.h   |   4 +
+ drivers/net/dsa/mv88e6xxx/leds.c   | 422 +++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/leds.h   |  14 +
+ drivers/net/dsa/mv88e6xxx/port.c   |  33 +++
+ drivers/net/dsa/mv88e6xxx/port.h   |   7 +
+ 7 files changed, 487 insertions(+)
+ create mode 100644 drivers/net/dsa/mv88e6xxx/leds.c
+ create mode 100644 drivers/net/dsa/mv88e6xxx/leds.h
 
-bd869245a3dc net: core: try to runtime-resume detached device in __dev_open
-f32a21376573 ethtool: runtime-resume netdev parent before ethtool ioctl ops
-
-First, the deadlock should be addressed also in older kernels and
-refactoring is not really backportable fix.
-
-Second, I don't think network stack should do any calls to pm_runtime* .
-This should be fully device driver specific, as this depends on device
-driver implementation of power saving. IMHO if it's desirable to 
-resume disabled device on requests from user space, then
-netif_device_detach() should not be used in runtime suspend.
-
-Thoughts ?
-
-Regards
-Stanislaw 
+-- 
+2.34.1
 
 
