@@ -1,130 +1,88 @@
-Return-Path: <netdev+bounces-61344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB10882378D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:13:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACB39823799
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:17:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3AE1C21393
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:13:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C1E9B2138A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2941DA40;
-	Wed,  3 Jan 2024 22:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C788C1DA40;
+	Wed,  3 Jan 2024 22:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TQgtpQwW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="knI+w+SJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247681DA3B;
-	Wed,  3 Jan 2024 22:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=fHwQ56i97OHIXttecD026MYSyAw2rlXnCq/U+o4NtQU=; b=TQgtpQwWC4q+uBbxLsGIu9TdMR
-	A1JMSyXBnIMP0z1jFR3+80MOnElOPNCfoV8Ar1xrBtaxE+GR50TysDT35s7Nv7qkGPpp554QbQ5ji
-	2Ce0EEGf8NBuN4a+FbV5WgaGxPPuCtDqVDreR2Cf0tR9okTRrwkB8mNrGeCA1UPV3EOS+vpiyLt/O
-	uJ+lMmAbXQgb1x6wPtzGmoInRuhGw1fEhoATgHtY3EGDH3cPt876igUx0ae0/BDzdBUkxk+Tv17vp
-	uioPCfzrK1NVkArGYtNJL5Fw7NSFc6bbEoU+p+UJuyVCmy3sjBhDyajVDQR7PchvBGVwEpBSBu2A6
-	9vTL2mOw==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rL9U9-00CEYx-2Y;
-	Wed, 03 Jan 2024 22:13:13 +0000
-Message-ID: <3466355c-dc30-4638-9bbe-a7433477340c@infradead.org>
-Date: Wed, 3 Jan 2024 14:13:12 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5341DA3D
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 22:16:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2AACC433C7;
+	Wed,  3 Jan 2024 22:16:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704320216;
+	bh=4yG1RM6b8MssAz2wDMDWD1yEEfnNE+i4e2Et5B0292E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=knI+w+SJ5M+FXls7Fw4yHflTjBlKpFWqtOqE+bW2Wxlvdz2jODyRxxr1h+sAKf2y+
+	 srpGb5o26mJ053amnxUdDX9PWr/22gxORcd4Ep/NiXXA/gMDJlMFMHGDMLFgHWyeNq
+	 2IjoYxv8OC3mmzIDflAru2d/+eHfncwsFBjP72GJeraGwYgbTVTUlazwL/qTKqQRdh
+	 1fqeKl5Mhv7I+ib/wZRgLEr8DXhd6hGRJWR6MvdXbJqZGh1CmnCE0FtwKXjPZ739Ze
+	 OeK64Z76oomzKQX7vu8jc6vni3hzr12rHVTev9JyErj1xC/rfNjgAZO/+4EXpPeD/U
+	 O1HbDoL/X7/Hw==
+Date: Wed, 3 Jan 2024 14:16:54 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: <netdev@vger.kernel.org>, <corbet@lwn.net>,
+ <jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <vladimir.oltean@nxp.com>, <andrew@lunn.ch>, <horms@kernel.org>,
+ <mkubecek@suse.cz>, <willemdebruijn.kernel@gmail.com>, <gal@nvidia.com>,
+ <alexander.duyck@gmail.com>, <ecree.xilinx@gmail.com>, Jacob Keller
+ <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next 2/2] net: ethtool: add a NO_CHANGE uAPI for new
+ RXFH's input_xfrm
+Message-ID: <20240103141654.44ac19e9@kernel.org>
+In-Reply-To: <34b00cfb-d1d7-4468-948b-a44591dc5923@intel.com>
+References: <20231221184235.9192-1-ahmed.zaki@intel.com>
+	<20231221184235.9192-3-ahmed.zaki@intel.com>
+	<20240102160526.6178fd04@kernel.org>
+	<34b00cfb-d1d7-4468-948b-a44591dc5923@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 10/11] Documentation: driver-api: pps: Add Intel
- Timed I/O PPS generator
-Content-Language: en-US
-To: lakshmi.sowjanya.d@intel.com, tglx@linutronix.de, jstultz@google.com,
- giometti@enneenne.com, corbet@lwn.net, linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
- eddie.dong@intel.com, christopher.s.hall@intel.com,
- jesse.brandeburg@intel.com, davem@davemloft.net,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
- anthony.l.nguyen@intel.com, pandith.n@intel.com,
- mallikarjunappa.sangannavar@intel.com, thejesh.reddy.t.r@intel.com
-References: <20240103115602.19044-1-lakshmi.sowjanya.d@intel.com>
- <20240103115602.19044-11-lakshmi.sowjanya.d@intel.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240103115602.19044-11-lakshmi.sowjanya.d@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-
-
-On 1/3/24 03:56, lakshmi.sowjanya.d@intel.com wrote:
-> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+On Wed, 3 Jan 2024 08:40:47 -0700 Ahmed Zaki wrote:
+> On 2024-01-02 17:05, Jakub Kicinski wrote:
+> > On Thu, 21 Dec 2023 11:42:35 -0700 Ahmed Zaki wrote:  
+> >> +	     rxfh.key_size == 0 && rxfh.hfunc == ETH_RSS_HASH_NO_CHANGE &&
+> >> +	     rxfh.input_xfrm == RXH_XFRM_NO_CHANGE))  
+> > 
+> > This looks fine, but we also need a check to make sure input_xfrm
+> > doesn't have bits other than RXH_XFRM_SYM_XOR set, right?  
 > 
-> Add Intel Timed I/O PPS usage instructions.
-> 
-> Co-developed-by: Pandith N <pandith.n@intel.com>
-> Signed-off-by: Pandith N <pandith.n@intel.com>
-> Signed-off-by: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  Documentation/driver-api/pps.rst | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/Documentation/driver-api/pps.rst b/Documentation/driver-api/pps.rst
-> index 78dded03e5d8..cb1e4d814d37 100644
-> --- a/Documentation/driver-api/pps.rst
-> +++ b/Documentation/driver-api/pps.rst
-> @@ -246,3 +246,25 @@ delay between assert and clear edge as small as possible to reduce system
->  latencies. But if it is too small slave won't be able to capture clear edge
->  transition. The default of 30us should be good enough in most situations.
->  The delay can be selected using 'delay' pps_gen_parport module parameter.
-> +
-> +
-> +Intel Timed I/O PPS signal generator
-> +------------------------------------
-> +
-> +Intel Timed I/O is a high precision device, present on 2019 and newer Intel
-> +CPUs, that can generate PPS signal.
+> I wrote the xfrm as a  bitmap/flags assuming we can have multiple 
+> transformations set. Not sure what future transformations will look like 
+> (other than RSS-sort,... and discussed before).
 
-              can generate a PPS signal.
-or
-              can generate PPS signals.
+Ack, but right now the only valid inputs for the kernel are
+0 (disable all), RXH_XFRM_NO_CHANGE and RXH_XFRM_SYM_XOR.
+We need to reject all other inputs. If we accept random
+inputs without validation we won't be able to use them later.
+Refer to many LWN articles about how some syscall didn't check
+that unused flags are 0 and now they can't allocate bits.
+Because some user space was passing in garbage.
 
-> +
-> +Timed I/O and system time are both driven by same hardware clock, The signal
+> Else, we can do the check you mentioned or may be better to have it as 
+> enum (which would give us 256, not 8, allowable transformations).
 
-                                                              clock. The signal is
-
-> +generated with a precision of ~20 nanoseconds. The generated PPS signal
-> +is used to synchronize an external device with system clock. For example,
-> +Share your clock with a device that receives PPS signal, generated by
-
-   share
-
-> +Timed I/O device. There are dedicated Timed I/O pins to deliver PPS signal
-
-maybe:                                                  to deliver the PPS signal
-
-> +to an external device.
-> +
-> +Usage of Intel Timed I/O as PPS generator:
-> +
-> +Start generating PPS signal::
-> +        $echo 1 > /sys/devices/platform/INTCxxxx\:00/enable
-> +
-> +Stop generating PPS signal::
-> +        $echo 0 > /sys/devices/platform/INTCxxxx\:00/enable
-
--- 
-#Randy
+Given that RXH_XFRM_SYM_XOR is 1 we can change the exact semantics
+later. All that matters is that we reject unsupported for now.
 
