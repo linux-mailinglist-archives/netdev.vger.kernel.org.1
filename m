@@ -1,114 +1,215 @@
-Return-Path: <netdev+bounces-61271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CA02823031
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:06:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBC1C823046
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:15:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 031D4B22E73
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:06:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61FC7285B3E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:15:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94251A708;
-	Wed,  3 Jan 2024 15:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78E51A715;
+	Wed,  3 Jan 2024 15:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRtSDLfN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfINWVpP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BF61A704
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 15:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704294398;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=wEHakIYqdfU8FEDiDv2kbLLbw2wVp310Y7yIEyIyaLU=;
-	b=dRtSDLfN+zbZi1qlyaERYgLCRjwpV+RJyoYvFHdozqoqavXZZ1gWVyyBpDV52TdKhA2tBj
-	Zjdk8RQJPlxdCOGQFyVV8gVphydln2fIXFpn3wv0Vvmi7kuwDGz1If1oOF8zjKWVs/xksS
-	SVd+7tKVoDztXkKfGyQZl/+hDDswaaQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-7ERukYGZPyOu8qoJI1KOtA-1; Wed, 03 Jan 2024 10:06:36 -0500
-X-MC-Unique: 7ERukYGZPyOu8qoJI1KOtA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40d76064581so27429005e9.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 07:06:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF481A71F
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 15:14:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-5efb0e180f0so41833667b3.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 07:14:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704294898; x=1704899698; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H5cX21kqrmTOh5bQYIC33CTlTBLni2x8ztmRE58zXa0=;
+        b=LfINWVpPazjBlS2OjtcDLHygTDWGDVK9oX7CpQesKdpgfEX9Z3mOgugwWERNlCN9Bi
+         wRVdBtSzfoQGLzS0dlfvDRYTN08u6cRLuZdBOGVUuaDdzYDGHb4sK6zS3vFyjgp4qNus
+         tKwhvArr5I+ZcSKKG+n9dJEs5ZFIPKMlTVPTNdpDpJdjDNXFJp4vIYyOgIczORCSAGFo
+         AkiYysvIV3krYE5yvn/pgZlnkuR+BTehxRrVePmjFutLm+God7hBmdZ9b3k8NgcB522e
+         ceuxvnZxqkWETBoHybxMz52ho2/sIvtzDSWjLZaeFrF0bqe/W11kpELsZTDtzXNyFmHH
+         13rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704294395; x=1704899195;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wEHakIYqdfU8FEDiDv2kbLLbw2wVp310Y7yIEyIyaLU=;
-        b=pSi6yYtjBTL8QnVVsRNCqy/FippLpQcBtnFU0z6RkJKrBmM5OSdoE0fj+G+GfqiXbC
-         oWmjCNziXfxTgwed8q+pasr9SjwsJraMmGQvPd6wZvjNoq93H4DzsPDdZ4oaJkNDQI5t
-         aMDIZ1V/XrXxK7MhuZm+IEDhV9tZqixQNGPfdWfVAeRVgNJKsr62FkYBnolEOh0vjtY+
-         pTiY1EwvAvT8qkjjPXfSzhXrluTLwx0VkdTO5g8yW0VbXRsfp9eok2bHSUJbzLYeQVEj
-         fdpzkh0rfpXItLzjd9ByZN/la8/lsLgGRmWkrfOkgP7rUna7de4DJTJQ64jvEFkc0wdH
-         rDRw==
-X-Gm-Message-State: AOJu0YxhiyXKuQf5dRxnmof4biXsg87H3IG7kw2CuHMuF21+ag17rPE0
-	vgqd9jnx7kxGUrxOthcc2eGwXxNRldaCZMz1ASVSf5MbhMEU+zF7r6jdWv2ttnQtxh4ZQxJOhwo
-	Z7n35TWek8c+nsMaUYavwPmMg
-X-Received: by 2002:adf:f505:0:b0:336:7b50:1f31 with SMTP id q5-20020adff505000000b003367b501f31mr10736881wro.109.1704294395590;
-        Wed, 03 Jan 2024 07:06:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH+Oo7EUzGD/CvnFLd9O44zNnPLXt7KFUgk8azlxRsPAoYBqpIIPl9yapWYvXDL1efHwilQTw==
-X-Received: by 2002:adf:f505:0:b0:336:7b50:1f31 with SMTP id q5-20020adff505000000b003367b501f31mr10736869wro.109.1704294395257;
-        Wed, 03 Jan 2024 07:06:35 -0800 (PST)
-Received: from debian (2a01cb058918ce001c33ce3a2d76e909.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:1c33:ce3a:2d76:e909])
-        by smtp.gmail.com with ESMTPSA id p17-20020a5d48d1000000b00336e15fbc85sm19911082wrs.82.2024.01.03.07.06.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 07:06:34 -0800 (PST)
-Date: Wed, 3 Jan 2024 16:06:32 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	Simon Horman <horms@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH net] xfrm: Clear low order bits of ->flowi4_tos in
- decode_session4().
-Message-ID: <73ad04e0f34b17b02d1eca263e4008440cf3b8e4.1704294322.git.gnault@redhat.com>
+        d=1e100.net; s=20230601; t=1704294898; x=1704899698;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H5cX21kqrmTOh5bQYIC33CTlTBLni2x8ztmRE58zXa0=;
+        b=LbQYXKaKsGyYVvk8Mi3gO4zeg/vRlwoS78XBOqeNA2wN3LC1jhv0o9If1Ho1IKk8hD
+         tj9hUeMLfG6rF/HTWACuDV28sGEkVrklTB5/sc+WkTK4din3N5VNhxtys5G57xEjoQ+a
+         JlzKkYBMFxW9mURBpA8D0b+w5B2pzSWi2IhNp0EbVfrizgyi1dXRzdShGwhQCsgh9x56
+         Y0I7TfuwyatXAYlUh9yNloUUKokR98dq0Q1sNBuoSWZWI2sUbhvzmBZbsJtxT8GGbgob
+         r2/zthjG0lavcyUp68eOTp/f6e2KxKwT4W7s4QWVujmoznDW+ehlIlbOSLk/abOud07d
+         RUKQ==
+X-Gm-Message-State: AOJu0YxLIc3Dz/Sj3RmIDAolr6QlGNr1f9Za5zZVaKhDamYaZAAywPk4
+	DT+jG5aRUtCdytAtR8VJlh8MNPuAjEEDumYpo0M=
+X-Google-Smtp-Source: AGHT+IGqXpc1yXHFGyDETfZt6YHEXwyL5Urz581XvxlhUHNTIkgAnUrFkAy8LMpUeK+nGjjF/6eaT1OAEGDQ+Nq4awY=
+X-Received: by 2002:a0d:dd92:0:b0:5e2:62c0:f18b with SMTP id
+ g140-20020a0ddd92000000b005e262c0f18bmr13041397ywe.37.1704294897918; Wed, 03
+ Jan 2024 07:14:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20231219170017.73902-1-edumazet@google.com> <CADvbK_e+J2nut4Q5NE3oAdUqEDXAFZrecs4zY+CrLE9ob8AtZg@mail.gmail.com>
+ <CANn89iJjAPmuT3ynBcoADkTs3e4V3=AY9=D+WDHMntQZ+typUA@mail.gmail.com>
+ <CADvbK_c5UJsufA2WwXRrw-X7wf-RQLnpPOV3YcbGBCeiAur65Q@mail.gmail.com> <CANn89iKMQqC3u9SqfVP-Dq4Za+nQ331Z4w_KZaEUZrmpLG4UKQ@mail.gmail.com>
+In-Reply-To: <CANn89iKMQqC3u9SqfVP-Dq4Za+nQ331Z4w_KZaEUZrmpLG4UKQ@mail.gmail.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 3 Jan 2024 10:14:46 -0500
+Message-ID: <CADvbK_fT9-ufQZ1wAh+Zs-0eKJYY__9JhQX_qBo-Fxei5yXnFA@mail.gmail.com>
+Subject: Re: [PATCH net-next] sctp: fix busy polling
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Jacob Moroni <jmoroni@google.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit 23e7b1bfed61 ("xfrm: Don't accidentally set RTO_ONLINK in
-decode_session4()") fixed a problem where decode_session4() could
-erroneously set the RTO_ONLINK flag for IPv4 route lookups. This
-problem was reintroduced when decode_session4() was modified to
-use the flow dissector.
+On Wed, Jan 3, 2024 at 5:51=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Fri, Dec 22, 2023 at 7:34=E2=80=AFPM Xin Long <lucien.xin@gmail.com> w=
+rote:
+> >
+> > On Fri, Dec 22, 2023 at 12:05=E2=80=AFPM Eric Dumazet <edumazet@google.=
+com> wrote:
+> > >
+> > > On Fri, Dec 22, 2023 at 5:08=E2=80=AFPM Xin Long <lucien.xin@gmail.co=
+m> wrote:
+> > > >
+> > > > On Tue, Dec 19, 2023 at 12:00=E2=80=AFPM Eric Dumazet <edumazet@goo=
+gle.com> wrote:
+> > > > >
+> > > > > Busy polling while holding the socket lock makes litle sense,
+> > > > > because incoming packets wont reach our receive queue.
+> > > > >
+> > > > > Fixes: 8465a5fcd1ce ("sctp: add support for busy polling to sctp =
+protocol")
+> > > > > Reported-by: Jacob Moroni <jmoroni@google.com>
+> > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > > Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+> > > > > Cc: Xin Long <lucien.xin@gmail.com>
+> > > > > ---
+> > > > >  net/sctp/socket.c | 10 ++++------
+> > > > >  1 file changed, 4 insertions(+), 6 deletions(-)
+> > > > >
+> > > > > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> > > > > index 5fb02bbb4b349ef9ab9c2790cccb30fb4c4e897c..6b9fcdb0952a0fe59=
+9ae5d1d1cc6fa9557a3a3bc 100644
+> > > > > --- a/net/sctp/socket.c
+> > > > > +++ b/net/sctp/socket.c
+> > > > > @@ -2102,6 +2102,10 @@ static int sctp_recvmsg(struct sock *sk, s=
+truct msghdr *msg, size_t len,
+> > > > >         if (unlikely(flags & MSG_ERRQUEUE))
+> > > > >                 return inet_recv_error(sk, msg, len, addr_len);
+> > > > >
+> > > > > +       if (sk_can_busy_loop(sk) &&
+> > > > > +           skb_queue_empty_lockless(&sk->sk_receive_queue))
+> > > > > +               sk_busy_loop(sk, flags & MSG_DONTWAIT);
+> > > > > +
+> > > > Here is no any sk_state check, if the SCTP socket(TCP type) has bee=
+n
+> > > > already closed by peer, will sctp_recvmsg() block here?
+> > >
+> > > Busy polling is only polling the NIC queue, hoping to feed this socke=
+t
+> > > for incoming packets.
+> > OK, will it block if there's no incoming packets on the NIC queue?
+> >
+> > If yes, when sysctl net.core.busy_read=3D1, my concern is:
+> >
+> >      client                server
+> >      -------------------------------
+> >                            listen()
+> >      connect()
+> >                            accept()
+> >      close()
+> >                            recvmsg() <----
+> >
+> > recvmsg() is supposed to return right away as the connection is
+> > already close(). With this patch, will recvmsg() be able to do
+> > that if no more incoming packets in the NIC after close()?
+>
+>
+> Answer is yes for a variety of reasons :
+>
+> net.core.busy_read=3D1 means :
+>
+> Busy poll will happen for
+> 1) at most one usec, and
+I see, never used busy polling, but what if the value is set to a large val=
+ue,
+like minutes, I might be just overthinking and no one will do this?
 
-Fix this by clearing again the two low order bits of ->flowi4_tos.
-Found by code inspection, compile tested only.
+> 2) as long as there is no packet in sk->sk_receive_queue (see
+> sk_busy_loop_end())
+It's likely after being closed by peer, no packet at sk_receive_queue.
 
-Fixes: 7a0207094f1b ("xfrm: policy: replace session decode with flow dissector")
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
----
- net/xfrm/xfrm_policy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> But busy poll is only started on sockets that had established packets.
+I think it won't be told to break when the socket is closed by peer.
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index c13dc3ef7910..e69d588caa0c 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -3416,7 +3416,7 @@ decode_session4(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reve
- 	}
- 
- 	fl4->flowi4_proto = flkeys->basic.ip_proto;
--	fl4->flowi4_tos = flkeys->ip.tos;
-+	fl4->flowi4_tos = flkeys->ip.tos & ~INET_ECN_MASK;
- }
- 
- #if IS_ENABLED(CONFIG_IPV6)
--- 
-2.39.2
-
+>
+> A listener will not engage this because sk->sk_napi_id does not
+> contain a valid NAPI ID.
+>
+>
+>
+> >
+> > Thanks.
+> >
+> > >
+> > > Using more than a lockless read of sk->sk_receive_queue is not really=
+ necessary,
+> > > and racy anyway.
+> > >
+> > > Eliezer Tamir added a check against sk_state for no good reason in
+> > > TCP, my plan is to remove it.
+> > >
+> > > There are other states where it still makes sense to allow busy polli=
+ng.
+> > >
+> > >
+> > > >
+> > > > Maybe here it needs a `!(sk->sk_shutdown & RCV_SHUTDOWN)` check,
+> > > > which is set when it's closed by the peer.
+> > >
+> > > See above. Keep this as simple as possible...
+> > >
+> > >
+> > > >
+> > > > Thanks
+> > > >
+> > > > >         lock_sock(sk);
+> > > > >
+> > > > >         if (sctp_style(sk, TCP) && !sctp_sstate(sk, ESTABLISHED) =
+&&
+> > > > > @@ -9046,12 +9050,6 @@ struct sk_buff *sctp_skb_recv_datagram(str=
+uct sock *sk, int flags, int *err)
+> > > > >                 if (sk->sk_shutdown & RCV_SHUTDOWN)
+> > > > >                         break;
+> > > > >
+> > > > > -               if (sk_can_busy_loop(sk)) {
+> > > > > -                       sk_busy_loop(sk, flags & MSG_DONTWAIT);
+> > > > > -
+> > > > > -                       if (!skb_queue_empty_lockless(&sk->sk_rec=
+eive_queue))
+> > > > > -                               continue;
+> > > > > -               }
+> > > > >
+> > > > >                 /* User doesn't want to wait.  */
+> > > > >                 error =3D -EAGAIN;
+> > > > > --
+> > > > > 2.43.0.472.g3155946c3a-goog
+> > > > >
 
