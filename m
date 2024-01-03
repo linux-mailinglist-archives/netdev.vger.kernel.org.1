@@ -1,258 +1,182 @@
-Return-Path: <netdev+bounces-61195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1963A822D46
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:40:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D324822D67
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:46:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3139F1C233B1
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:40:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BFCCB21341
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:46:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBD9199A2;
-	Wed,  3 Jan 2024 12:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578A019440;
+	Wed,  3 Jan 2024 12:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cx4Vrxgv"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="37mFj8qz";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="M18QOB3l"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7071719455
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 12:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704285585;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rZR17Gbrs13ExF6OSOpjmM51Duz7iMNUsTARfX2CwGI=;
-	b=cx4Vrxgvss9DCt3MPWoz25SxgUyNkWqo9i0r1yEqCVvT33YYJYzK6s13ZaCH5u3NKmV33x
-	5gU0OxPAy4msW20P9ec2D1vlpa79cq41l1IO/awH1JzIB3ntvPM8lIvuLLtPGmN4BjmesP
-	jY609++47428mm8HRE+5hEF36v53paE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-124-cl6KkG5aMue3xdfdLO_cMA-1; Wed,
- 03 Jan 2024 07:39:39 -0500
-X-MC-Unique: cl6KkG5aMue3xdfdLO_cMA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C13F3813BD1;
-	Wed,  3 Jan 2024 12:39:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E3D15C15A0C;
-	Wed,  3 Jan 2024 12:39:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZZULNQAZ0n0WQv7p@codewreck.org>
-References: <ZZULNQAZ0n0WQv7p@codewreck.org> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-41-dhowells@redhat.com>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-    Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
-    Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: Re: [PATCH v5 40/40] 9p: Use netfslib read/write_iter
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1AF18EC7;
+	Wed,  3 Jan 2024 12:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 11E363200B01;
+	Wed,  3 Jan 2024 07:46:01 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 03 Jan 2024 07:46:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm1; t=1704285961; x=1704372361; bh=/YviPdGLiP
+	zVy+UBu96lnyvudyBzhXETVuOdEEmoVnY=; b=37mFj8qzThYf0OHLiNiNt6+Kzr
+	fs/DrSxWzwL3K5Zm55mjG5r1SlI4Kztn+D+/fVWNzAutasVCBUFt4HzZDArPtZpd
+	0mG5VkTZbcjkQE2TPIZ9FBIquoyGUs0B5IidqiQcp0nGqXA9EB9mE4BHmenkXhYW
+	L/Po8v1oDWV78D1R+r+3Uy+KlbBILYUYn2V3z44y//MesGLes8DdzbYeFalHjGLN
+	3QivW+N5kU72Na9yCGpL4ce0vjxThyiJVZmJmpflqQWyXYlTNDU3jk527nGhhL2b
+	kybcJxlhQzd6eBi1iRoD0lv7XlT9C3Wdy5yeIppeP1awCnJYg/tulms/Gg+Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1704285961; x=1704372361; bh=/YviPdGLiPzVy+UBu96lnyvudyBz
+	hXETVuOdEEmoVnY=; b=M18QOB3lpnuX7UIIPcUOnkESWrGWNpytFQtFOLTUo2xg
+	HyO/FJVU8jOrqsIRrddXqJYfmk+GwT9GiI6eJguV+z9gYljk+a8WLo43ZEH3NCGK
+	kXRAmjD/w4jLqqQNiJ/X0T8PpTOKNFhQ4BgfZOPwEjRJB+EoLManx8xe87gI4cFH
+	RYu/2eAok0flIb/9XrCAEDLtbNvKFIuPmWRsUypEZUh89jp6+oH8c8NwkXqsscbC
+	/QLj3SYi3y5mKMh9pfEEHD9BT9fMSd5vAHbmtTorj+XYObOfTCNIzIiH2M+abR2G
+	sozfLm3n4X7QEzU5f3MIxDHDcORsdT9J5/9yOVRcZQ==
+X-ME-Sender: <xms:CVeVZfGYMXBBwbIMGbb5vRoqJ8lWfmXo9MRAm0wDNA529q8Dd_ZoTA>
+    <xme:CVeVZcXAqJiANhx0xZbvWHPCcrPQEQNANrfdGNDOK11Hko4Np40ncrOrw0_kVdUDA
+    bJeZ8VlKXoyhrdaylY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeghedggeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepvefhffeltdegheeffffhtdegvdehjedtgfekueevgfduffettedtkeekueef
+    hedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:CVeVZRJqByB2XxDf71DssllxMxQiBDWsn1vpCIGKZmUhP4wqPlUOhA>
+    <xmx:CVeVZdHB7_XE_La-qJ0L-7eUQemP9mvO2zXkxt36QwUvQ2aoCVsHBQ>
+    <xmx:CVeVZVUQJ0bb_XCOl5c_84SfC1uJl7RRLkQZNBStE6h689DH06BaXA>
+    <xmx:CVeVZUEGCEBjlTkjGs_BECuaU81YWSXgTL0YzbZiYxHWNEaUDuq7Aw>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 397AAB6008D; Wed,  3 Jan 2024 07:46:01 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1364-ga51d5fd3b7-fm-20231219.001-ga51d5fd3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <355429.1704285574.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 03 Jan 2024 12:39:34 +0000
-Message-ID: <355430.1704285574@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Message-Id: <b310230b-f20b-489a-97ed-908df193a942@app.fastmail.com>
+In-Reply-To: <5b0a6150-8043-4de7-980f-54020a3e7981@gmail.com>
+References: <20240103102630.3770242-1-arnd@kernel.org>
+ <5b0a6150-8043-4de7-980f-54020a3e7981@gmail.com>
+Date: Wed, 03 Jan 2024 13:45:40 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Heiner Kallweit" <hkallweit1@gmail.com>,
+ "Arnd Bergmann" <arnd@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>
+Cc: Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
+ "Lee Jones" <lee@kernel.org>
+Subject: Re: [PATCH] r8169: fix building with CONFIG_LEDS_CLASS=m
+Content-Type: text/plain
 
-Dominique Martinet <asmadeus@codewreck.org> wrote:
+On Wed, Jan 3, 2024, at 12:33, Heiner Kallweit wrote:
+> On 03.01.2024 11:26, Arnd Bergmann wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>> 
+>> When r8169 is built-in but the LED support is a loadable module, the
+>> new code to drive the LED now causes a link failure:
+>> 
+>> ld: drivers/net/ethernet/realtek/r8169_leds.o: in function `rtl8168_init_leds':
+>> r8169_leds.c:(.text+0x36c): undefined reference to `devm_led_classdev_register_ext'
+>> 
+>> Add a Kconfig dependency to prevent the broken configuration but still
+>> allow having the network code built-in as long as CONFIG_LEDS_TRIGGER_NETDEV
+>> is disabled, regardless of CONFIG_LEDS_CLASS.
+>> 
+> The proposed change is more of a workaround IMO. A proper fix (in LED 
+> subsystem)
+> has been submitted, but it's not reviewed/applied yet. And I don't 
+> think building
+> r8169 should depend on support for an optional feature.
+> This fix would also allow to remove Kconfig dependencies similar to the 
+> one
+> proposed here from other drivers. Link to submitted fix:
+>
+> https://lore.kernel.org/linux-leds/0f6f432b-c650-4bb8-a1b5-fe3372804d52@gmail.com/T/#u
 
-> > +static void v9fs_upload_to_server(struct netfs_io_subrequest *subreq)
-> > +{
-> > +	struct inode *inode =3D subreq->rreq->inode;
-> > +	struct v9fs_inode __maybe_unused *v9inode =3D V9FS_I(inode);
-> =
+I think that is a much worse workaround, as this just leads to
+a feature silently not working even when it is enabled (as loadable
+module), and hiding other dependency problems where drivers
+actually require the LED support to do something useful.
 
-> Any reason to have this variable assignment at all?
+IS_REACHABLE() is pretty much always a bad idea because of this.
 
-I'll just remove it.  The __maybe_unused suppressed the warning, otherwise=
- I'd
-have removed it already.
+If you want the LED support in r8169_leds to be optional, I would
+suggest adding a separate Kconfig symbol for that, either user
+visible or hidden, and have the correct Kconfig dependencies
+for the new symbol, something like the change below (untested).
 
-> p9_client_write return value should always be subreq->len, but I believe
-> we should use it unless err is set.
-> (It's also possible for partial writes to happen, e.g. p9_client_write
-> looped a few times and then failed, at which point the size returned
-> would be the amount that actually got through -- we probably should do
-> something with that?)
+     Arnd
 
-How about something like:
-
--	int err;
-+	int err, len;
- =
-
- 	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
--	p9_client_write(fid, subreq->start, &subreq->io_iter, &err);
--	netfs_write_subrequest_terminated(subreq, err < 0 ? err : subreq->len,
--					  false);
-+	len =3D p9_client_write(fid, subreq->start, &subreq->io_iter, &err);
-+	netfs_write_subrequest_terminated(subreq, len ?: err, false);
-
-> > +	total =3D p9_client_read(fid, subreq->start + subreq->transferred,
-> > +			       &subreq->io_iter, &err);
-> =
-
-> Just to clarify: subreq->io_iter didn't exist (or some conditions to use
-> it weren't cleared) before?
-
-Correct.  It's added in the netfs-lib patches.  I've provided a way to
-separate the user-side iterator from the I/O-side iterator to allow the us=
-e of
-a bounce buffer for the purpose of content crypto, compression or just hav=
-ing
-to deal with RMW cycles to a larger block size on the server.
-
-> > +	if (file) {
-> > +		fid =3D file->private_data;
-> > +		BUG_ON(!fid);
-> =
-
-> This probably should be WARN + return EINVAL like find by inode?
-> It's certainly a huge problem, but we should avoid BUG if possible...
-
-Sure.  The BUG_ON() was already there, but I can turn it into a WARN+error=
-.
-
-> nit: not sure what's cleaner?
-> Since there's a message that makes for a bit awkward if...
-> =
-
-> if (WARN_ONCE(!fid, "folio expected an open fid inode->i_private=3D%p\n"=
-,
-> 	      rreq->inode->i_private))
-> 	return -EINVAL;
-> =
-
-> (as a side note, I'm not sure what to make of this i_private pointer
-> here, but if that'll help you figure something out sure..)
-
-Um.  9p is using i_private.  But perhaps i_ino would be a better choice:
-
-	if (file) {
-		fid =3D file->private_data;
-		if (!fid)
-			goto no_fid;
-		p9_fid_get(fid);
-	} else {
-		fid =3D v9fs_fid_find_inode(rreq->inode, writing, INVALID_UID, true);
-		if (!fid)
-			goto no_fid;
-	}
-
-	...
-
-no_fid:
-	WARN_ONCE(1, "folio expected an open fid inode->i_ino=3D%lx\n",
-		  rreq->inode->i_ino);
-	return -EINVAL;
-
-> This is as follow on your netfs-lib branch:
-> -       WARN_ON(rreq->origin =3D=3D NETFS_READ_FOR_WRITE &&
-> -                       !(fid->mode & P9_ORDWR));
-> -
-> -       p9_fid_get(fid);
-> +       WARN_ON(rreq->origin =3D=3D NETFS_READ_FOR_WRITE && !(fid->mode =
-& P9_ORDWR));
-> =
-
-> So the WARN_ON has been reverted back with only indentation changed;
-> I guess there were patterns that were writing despite the fid not having
-> been open as RDWR?
-> Do you still have details about these?
-
-The condition in the WARN_ON() here got changed.  It was:
-
-	WARN_ON(writing && ...
-
-at one point, but that caused a bunch of incorrect warning to appear becau=
-se
-only NETFS_READ_FOR_WRITE requires read-access as well as write-access.  A=
-ll
-the others:
-
-	bool writing =3D (rreq->origin =3D=3D NETFS_READ_FOR_WRITE ||
-			rreq->origin =3D=3D NETFS_WRITEBACK ||
-			rreq->origin =3D=3D NETFS_WRITETHROUGH ||
-			rreq->origin =3D=3D NETFS_LAUNDER_WRITE ||
-			rreq->origin =3D=3D NETFS_UNBUFFERED_WRITE ||
-			rreq->origin =3D=3D NETFS_DIO_WRITE);
-
-only require write-access.
-
-There will be an additional one if we roll out content crypto to 9p as we =
-may
-need to do RMW cycles occasionally - but that's off to one side just for t=
-he
-moment.
-
-> If a file has been open without the write bit it might not go through,
-> and it's incredibly difficult to get such users back to userspace in
-> async cases (e.g. mmap flushes), so would like to understand that.
-
-The VFS/VM should prevent writing to files that aren't open O_WRONLY or
-O_RDWR, so I don't think we should be called in otherwise.
-
-Note that I'm intending to change the way fscache is driven when we fetch
-cacheable data from the server so that I can free up the PG_fscache bit an=
-d
-return it to the MM folks.  Instead of marking the page PG_fscache, I mark=
- it
-PG_dirty and set page->private with a special value to indicate it should =
-only
-be written to the cache - then the writepages sees that and just writes th=
-ese
-pages to the cache.  I have a patch to do this and it seems to work, but I
-need to make ceph and cifs use netfslib before I can apply it.
-
-> > +	p9_debug(P9_DEBUG_VFS, "(cached)\n");
-> =
-
-> (Not a new problem so no need to address here, but having just
-> "(cached)" on a split line is a bit weird.. We first compute cached or
-> not as a bool and make it %s + cached ? " (cached)" : "" or
-> something... I'll send a patch after this gets in to avoid conflicts)
-
-Okay.
-
-> > +	return netfs_page_mkwrite(vmf, NULL);
-> =
-
-> (I guess there's no helper that could be used directly in .page_mkwrite
-> op?)
-
-I could provide a helper that just supplies NULL as the second argument.  =
-I
-think only 9p will use it, but that's fine.
-
-David
-
+8<---
+diff --git a/drivers/net/ethernet/realtek/Kconfig b/drivers/net/ethernet/realtek/Kconfig
+index fd3f18b328de..b54aae30b3c1 100644
+--- a/drivers/net/ethernet/realtek/Kconfig
++++ b/drivers/net/ethernet/realtek/Kconfig
+@@ -114,4 +114,9 @@ config R8169
+          To compile this driver as a module, choose M here: the module
+          will be called r8169.  This is recommended.
+ 
++config R8169_LEDS
++       def_bool y
++       depends on LEDS_TRIGGER_NETDEV && R8169
++       depends on !(R8169=y && LEDS_CLASS=m)
++
+ endif # NET_VENDOR_REALTEK
+diff --git a/drivers/net/ethernet/realtek/Makefile b/drivers/net/ethernet/realtek/Makefile
+index adff9ebfbf2c..635491d8826e 100644
+--- a/drivers/net/ethernet/realtek/Makefile
++++ b/drivers/net/ethernet/realtek/Makefile
+@@ -6,8 +6,6 @@
+ obj-$(CONFIG_8139CP) += 8139cp.o
+ obj-$(CONFIG_8139TOO) += 8139too.o
+ obj-$(CONFIG_ATP) += atp.o
+-r8169-objs += r8169_main.o r8169_firmware.o r8169_phy_config.o
+-ifdef CONFIG_LEDS_TRIGGER_NETDEV
+-r8169-objs += r8169_leds.o
+-endif
++r8169-y += r8169_main.o r8169_firmware.o r8169_phy_config.o
++r8169-$(CONFIG_R8169_LEDS) += r8169_leds.o
+ obj-$(CONFIG_R8169) += r8169.o
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 05ba5f743af2..f3321299b2fa 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5356,11 +5356,10 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+        if (rc)
+                return rc;
+ 
+-#if IS_REACHABLE(CONFIG_LEDS_CLASS) && IS_ENABLED(CONFIG_LEDS_TRIGGER_NETDEV)
+-       if (tp->mac_version > RTL_GIGA_MAC_VER_06 &&
++       if (IS_ENABLED(CONFIG_R8169_LEDS) &&
++           tp->mac_version > RTL_GIGA_MAC_VER_06 &&
+            tp->mac_version < RTL_GIGA_MAC_VER_61)
+                rtl8168_init_leds(dev);
+-#endif
+ 
+        netdev_info(dev, "%s, %pM, XID %03x, IRQ %d\n",
+                    rtl_chip_infos[chipset].name, dev->dev_addr, xid, tp->irq);
 
