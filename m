@@ -1,202 +1,174 @@
-Return-Path: <netdev+bounces-61144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A7D8822B28
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:15:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA56E822B33
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:22:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 164DC1C2324E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:15:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68BF31F23ECB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD5D18B09;
-	Wed,  3 Jan 2024 10:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D41018AF0;
+	Wed,  3 Jan 2024 10:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="b/IH5pIU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GyMoxmXb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747BE18659
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 10:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d4c27cd502so8298055ad.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 02:15:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1704276918; x=1704881718; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r9kSoFv/7+pD3aWATl3d1Zz/zNpbqJdAmBC+qKH73H4=;
-        b=b/IH5pIUzffcArbA4NKho9QxpN6XCff2kves6QqQSkA+28J9lX4QXxmeZxJpBndmnL
-         29JvwxXvfzLBgn7eKfRPs3i0ckbK9rpmRYsYjXY64GrWZjEuOyGA4fPfHs4Por0Ku8jU
-         XNhco8bevs5HIpq2Zz99k3Y407lIkgH8ZOzSMNf9rgEJXp6pZefCO+Zmw5OrrhxaALQ8
-         EVW7cy0zdZ2+WbpN84B4m0R2HS8mLSd1/khQy/9xmPDooHFwjK2zJzA16FbKEi46xC2a
-         L/fAMdVi4A82kd/IdsdGf7iCkt6nic0irxA8creFtCzfBaGXTlqrB9mKOyMImsBW38Gw
-         MmYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704276918; x=1704881718;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=r9kSoFv/7+pD3aWATl3d1Zz/zNpbqJdAmBC+qKH73H4=;
-        b=TUncgGvP4QGecy84Md5x1HET4lmrVOlDlm6pstgbhECgolhKaSkIiS5fzVcSUGeQOf
-         LWx3Ols54PYDJxyuolOsqmBPq/F+kBV8HeYR0Y/OhmBRgutq5oWFMYCPAFNlIgyCM/dA
-         ZRA+PXukVGvvXGxkNLHVu9L86SUlQecTMcoh+myocdiq44bndCzLFB6nyRJXNuxHIEan
-         PuHzaf2mGwQmN/63PmuJn4kUbBuqVVH70LE13c4id2nTYziOI6m1p5roM//atpP35Xva
-         1C8C7Kw+8koP/TiWCa8k2c4nEdrxLwIk48oWiLQo3pYTtQdcr2cMryFhdUGhpWkhHJvh
-         TXvQ==
-X-Gm-Message-State: AOJu0YwsMNoRQ7+drjp6MQ6isRy0wxVZ9Md4sYvjAwKAOFlAibG37xSV
-	CuSstCosmr3xzLAKEcQK1Yv9u2A/MLT3UQ==
-X-Google-Smtp-Source: AGHT+IFb5s1kRhg4lbBcAXzAad/ZQWUpaLKwi6GbYgUI52nqs1wg58jl3FEdVQCfwyB+lzN5OaJ2qw==
-X-Received: by 2002:a17:903:11c3:b0:1d4:75c6:9560 with SMTP id q3-20020a17090311c300b001d475c69560mr6941145plh.59.1704276917712;
-        Wed, 03 Jan 2024 02:15:17 -0800 (PST)
-Received: from [10.3.158.72] ([61.213.176.6])
-        by smtp.gmail.com with ESMTPSA id bh10-20020a170902a98a00b001d4160c4f97sm21615997plb.188.2024.01.03.02.15.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jan 2024 02:15:17 -0800 (PST)
-Message-ID: <42dd77c4-8842-4f96-958a-0d9407362b9d@bytedance.com>
-Date: Wed, 3 Jan 2024 18:15:09 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2AC18AFA;
+	Wed,  3 Jan 2024 10:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eS1bFHrnk2KWQBXWffBjoZi4RGwbnIYkXxhSCL0bEkA=; b=GyMoxmXbyozBK6/NcYSLE8N81y
+	Xg/b9GHTx6JkxUeAnlSxR9SsDNW5S+gw+7I/gv0mFCz6gGFMZ+/h/UXC25yEk0RCuXNntZnjuqFyS
+	0SxwmWhwVlO6/1hwcBImW+DtT0acvOKK23AW7FBzoQN+dK0ml+VNueDMbLXIq8yCB3zgQq0FwAwy9
+	XtvAAT2G+AOGsnSYPcKuG1eKFIDtUUWkXEDgZXIJcT4fSuLSnZLYIUMQOCtjDULdAPNUSPMuMwgBV
+	a+NarzvSxBfTT5zOv9HjKp+JUTQDYYadmzctC+DHL2vUdr4+U+9gmHVcwDmIz0OtxGd1LORlBmm4T
+	ZeJrxemg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37916)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKyNq-0007Kl-20;
+	Wed, 03 Jan 2024 10:21:58 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKyNs-0006HI-NO; Wed, 03 Jan 2024 10:22:00 +0000
+Date: Wed, 3 Jan 2024 10:22:00 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, kuba@kernel.org
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: mdio: get/put device node during
+ (un)registration
+Message-ID: <ZZU1SJlKpeU38c9I@shell.armlinux.org.uk>
+References: <20231220045228.27079-2-luizluca@gmail.com>
+ <ZZPtUIRerqTI2/yh@shell.armlinux.org.uk>
+ <CAJq09z61JRNOBy6zLJ+D2pOVP-FCkofLjNghHSOkFJ=5q=6utQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Re: [PATCH v5 33/40] netfs, cachefiles: Pass upper bound length
- to allow expansion
-To: David Howells <dhowells@redhat.com>,
- Gao Xiang <hsiangkao@linux.alibaba.com>
-Cc: Matthew Wilcox <willy@infradead.org>,
- Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>,
- Steve French <smfrench@gmail.com>
-References: <750e8251-ba30-4f53-a17b-73c79e3739ce@linux.alibaba.com>
- <20231221132400.1601991-1-dhowells@redhat.com>
- <20231221132400.1601991-34-dhowells@redhat.com>
- <198744.1704215477@warthog.procyon.org.uk>
-From: Jia Zhu <zhujia.zj@bytedance.com>
-In-Reply-To: <198744.1704215477@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJq09z61JRNOBy6zLJ+D2pOVP-FCkofLjNghHSOkFJ=5q=6utQ@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Tue, Jan 02, 2024 at 06:57:35PM -0300, Luiz Angelo Daros de Luca wrote:
+> > On Wed, Dec 20, 2023 at 01:52:29AM -0300, Luiz Angelo Daros de Luca wrote:
+> > > The __of_mdiobus_register() function was storing the device node in
+> > > dev.of_node without increasing its reference count. It implicitly relied
+> > > on the caller to maintain the allocated node until the mdiobus was
+> > > unregistered.
+> > >
+> > > Now, __of_mdiobus_register() will acquire the node before assigning it,
+> > > and of_mdiobus_unregister_callback() will be called at the end of
+> > > mdio_unregister().
+> > >
+> > > Drivers can now release the node immediately after MDIO registration.
+> > > Some of them are already doing that even before this patch.
+> > >
+> > > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> >
+> > I don't like this, certainly not the use of a method prefixed by a
+> > double-underscore, and neither the conditional nature of "putting"
+> > this. That alone seems to point to there being more issues.
+> 
+> Thanks Russel.
 
+Hi Lewis,
 
-在 2024/1/3 01:11, David Howells 写道:
-> Gao Xiang <hsiangkao@linux.alibaba.com> wrote:
-> 
->>>    	down = start - round_down(start, PAGE_SIZE);
->>>    	*_start = start - down;
->>>    	*_len = round_up(down + len, PAGE_SIZE);
->>> +	if (down < start || *_len > upper_len)
->>> +		return -ENOBUFS;
->>
->> Sorry for bothering. We just found some strange when testing
->> today-next EROFS over fscache.
->>
->> I'm not sure the meaning of
->>      if (down < start
->>
->> For example, if start is page-aligned, down == 0.
->>
->> so as long as start > 0 and page-aligned, it will return
->> -ENOBUFS.  Does it an intended behavior?
-> 
-> Yeah, I think that's wrong.
-> 
-> Does the attached help?
-> 
-> David
-> ---
+> At least one driver (bcm_sf2_mdio_register) is writing directly to the
+> mii_bus->dev.of_node and not using of_mdiobus_register(). We should
+> not put a node in the MDIO bus if the bus didn't get it before. That's
+> the reason for the conditional putting the node.
 
-Tested-by: Jia Zhu <zhujia.zj@bytedance.com>
+I agree with the idea that a node placed in a bus needs to have it's
+reference count increased before hand, _unless_ the reference is being
+passed from the code registering.
 
+What I don't agree with is the conditional putting of the node. What
+I think should have happened is a review of all the code, and either
+a justification needed to be put forward (and considered *before*
+this patch was merged) about why to do this conditionally, _or_ all
+the places where the refcounting is not correct get fixed at the
+same time.
+
+Adding this conditional mechanism adds more complexity which makes
+the situation more difficult to analyse and fix later.
+
+> I wasn't sure about the names. What would be an appropriate name? The
+> same without the prefix? In order to put the node only when the bus
+> was registered by __of_mdiobus_register, I opted for a callback but it
+> might be a better approach.
+
+Normally, the callback is just named "release".
+
+> > I also notice that netdev have applied this without *any* review from
+> > phylib maintainers. Grr.
 > 
-> diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
-> index bffffedce4a9..7529b40bc95a 100644
-> --- a/fs/cachefiles/io.c
-> +++ b/fs/cachefiles/io.c
-> @@ -522,16 +522,22 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   			       bool no_space_allocated_yet)
->   {
->   	struct cachefiles_cache *cache = object->volume->cache;
-> -	loff_t start = *_start, pos;
-> -	size_t len = *_len, down;
-> +	unsigned long long start = *_start, pos;
-> +	size_t len = *_len;
->   	int ret;
->   
->   	/* Round to DIO size */
-> -	down = start - round_down(start, PAGE_SIZE);
-> -	*_start = start - down;
-> -	*_len = round_up(down + len, PAGE_SIZE);
-> -	if (down < start || *_len > upper_len)
-> +	start = round_down(*_start, PAGE_SIZE);
-> +	if (start != *_start) {
-> +		kleave(" = -ENOBUFS [down]");
-> +		return -ENOBUFS;
-> +	}
-> +	if (*_len > upper_len) {
-> +		kleave(" = -ENOBUFS [up]");
->   		return -ENOBUFS;
-> +	}
-> +
-> +	*_len = round_up(len, PAGE_SIZE);
->   
->   	/* We need to work out whether there's sufficient disk space to perform
->   	 * the write - but we can skip that check if we have space already
-> @@ -542,7 +548,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   
->   	pos = cachefiles_inject_read_error();
->   	if (pos == 0)
-> -		pos = vfs_llseek(file, *_start, SEEK_DATA);
-> +		pos = vfs_llseek(file, start, SEEK_DATA);
->   	if (pos < 0 && pos >= (loff_t)-MAX_ERRNO) {
->   		if (pos == -ENXIO)
->   			goto check_space; /* Unallocated tail */
-> @@ -550,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   					  cachefiles_trace_seek_error);
->   		return pos;
->   	}
-> -	if ((u64)pos >= (u64)*_start + *_len)
-> +	if (pos >= start + *_len)
->   		goto check_space; /* Unallocated region */
->   
->   	/* We have a block that's at least partially filled - if we're low on
-> @@ -563,13 +569,13 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   
->   	pos = cachefiles_inject_read_error();
->   	if (pos == 0)
-> -		pos = vfs_llseek(file, *_start, SEEK_HOLE);
-> +		pos = vfs_llseek(file, start, SEEK_HOLE);
->   	if (pos < 0 && pos >= (loff_t)-MAX_ERRNO) {
->   		trace_cachefiles_io_error(object, file_inode(file), pos,
->   					  cachefiles_trace_seek_error);
->   		return pos;
->   	}
-> -	if ((u64)pos >= (u64)*_start + *_len)
-> +	if (pos >= start + *_len)
->   		return 0; /* Fully allocated */
->   
->   	/* Partially allocated, but insufficient space: cull. */
-> @@ -577,7 +583,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   	ret = cachefiles_inject_remove_error();
->   	if (ret == 0)
->   		ret = vfs_fallocate(file, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> -				    *_start, *_len);
-> +				    start, *_len);
->   	if (ret < 0) {
->   		trace_cachefiles_io_error(object, file_inode(file), ret,
->   					  cachefiles_trace_fallocate_error);
+> Some reviews are required. Should we revert it?
+
+Clearly reviews are needed, even more so as there is indeed an issue
+with this patch. Looking at __of_mdiobus_register(), let's assume
+__mdiobus_register() succeeds. While scanning the PHYs, we hit an
+error that calls us to head to the unregister label.
+
+This calls mdiobus_unregister(), which calls your
+bus->__unregister_callback function, which puts the node. When that
+returns, we continue past the "put_node" label, which does *another*
+of_node_put() on the same node.
+
+So, this patch has traded a lack-of-get for a double-put bug. Given
+that it wasn't reviewed before being applied, and I think we can do
+much better, I am definitely in the mindset that it should be reverted.
+
+> > Indeed there are more issues with the refcounting here. If one looks at
+> > drivers/net/phy/mdio_bus.c::of_mdiobus_link_mdiodev(), we find this:
+> >
+> >                 if (addr == mdiodev->addr) {
+> >                         device_set_node(dev, of_fwnode_handle(child));
+> >                         /* The refcount on "child" is passed to the mdio
+> >                          * device. Do _not_ use of_node_put(child) here.
+> >                          */
+> >                         return;
+> >
+> > but there is nowhere that this refcount is dropped.
 > 
+> The same file where we have the get should also contain the put,
+> ideally in a reverse function like register/unregister.
+
+Not necessarily true. There are cases where we need the node to hang
+around until the device is actually released, so putting the node in
+the release callback for the device tends to be the best place. The
+rule for all devices of that class then becomes that the node must be
+"got" before assigning them to the device which then becomes easy to
+audit.
+
+> I'm trying to address an issue I ran into while modifying a DSA
+> driver. We have drivers putting the node passed to of_mdiobus_register
+> just after it returns. In my option, it feels more natural and this
+> patch fixes that scenario.
+
+I agree with that approach, but as you rightly point out, we need MDIO
+to behave correctly, and I don't think that patching just one bit of
+MDIO to fix this mess is the right approach.
+
+Jakub: please revert, if that's still possible.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
