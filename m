@@ -1,73 +1,103 @@
-Return-Path: <netdev+bounces-61100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E1CA82271A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 03:46:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F192B822736
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 03:54:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3DCC1C21DC4
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 02:46:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1D65284B38
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 02:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B559185A;
-	Wed,  3 Jan 2024 02:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30CB186B;
+	Wed,  3 Jan 2024 02:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IBcYPolr"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp87.cstnet.cn [159.226.251.87])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0390D469F;
-	Wed,  3 Jan 2024 02:45:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
-Received: from mengjingzi$iie.ac.cn ( [121.195.114.118] ) by
- ajax-webmail-APP-17 (Coremail) ; Wed, 3 Jan 2024 10:45:35 +0800 (GMT+08:00)
-Date: Wed, 3 Jan 2024 10:45:35 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5a2f5pWs5ae/?= <mengjingzi@iie.ac.cn>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, brauner@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org
-Subject: capability checks in sk_setsockopt() and __sock_cmsg_send()
- inconsistent with the documentation
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.15 build 20230921(8ad33efc)
- Copyright (c) 2002-2024 www.mailtech.cn cnic.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4BD4A14
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 02:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1704250440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jKg88EOc19Ldtm/CDT5Vvu/qnifyLXpVN7rl8hsod6M=;
+	b=IBcYPolrqPHkbUIAacMiHDSykXqfpBH/JtWC+mGENXrqYgL+J+GAviTeW33XVK+uKQ1aUS
+	ej/JQPXJgzMZ1yzFAgvVC05anwGGffEMZwtKkv0a2HHKQVnbVTS0baW3X1EC0h9bgW5f+f
+	OMbJajn+6efsgCyejh9OuK9uc6Zqufo=
+From: Yajun Deng <yajun.deng@linux.dev>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: andrew@lunn.ch,
+	olteanv@gmail.com,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	przemyslaw.kitszel@intel.com,
+	rmk+kernel@armlinux.org.uk,
+	kabel@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	Yajun Deng <yajun.deng@linux.dev>
+Subject: [PATCH net-next v2 0/2] net: phy: Use is_phy_driver() and is_phy_device()
+Date: Wed,  3 Jan 2024 10:53:32 +0800
+Message-Id: <20240103025334.541682-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <5f96b80d.c739.18ccd3646b8.Coremail.mengjingzi@iie.ac.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:qgCowADHKupPypRlsBMDAA--.32349W
-X-CM-SenderInfo: pphqwyxlqj6xo6llvhldfou0/1tbiDAcFE2WUwEQhAgABsK
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-SGkhIAoKV2UndmUgaWRlbnRpZmllZCByZWR1bmRhbnQgY2FwYWJpbGl0eSBjaGVja3Mgd2l0aGlu
-IHRoZSBza19zZXRzb2Nrb3B0KCkgYW5kIF9fc29ja19jbXNnX3NlbmQoKSBmdW5jdGlvbnMsIHNw
-ZWNpZmljYWxseSByZWxhdGVkIHRvIHRoZSBvcHRpb25zIFNPX01BUksgYW5kIFNPX1BSSU9SSVRZ
-LgoKQ3VycmVudGx5LCBib3RoIENBUF9ORVRfQURNSU4gYW5kIENBUF9ORVRfUkFXIGFyZSB1c2Vk
-IGZvciB0aGVzZSBjaGVja3MsIGFuZCB3ZSBwcm9wb3NlIHNpbXBsaWZ5aW5nIHRoaXMgYnkgZXhj
-bHVzaXZlbHkgdXNpbmcgQ0FQX05FVF9BRE1JTi4gT3VyIHJhdGlvbmFsZSBpcyBiYXNlZCBvbiB0
-aGUgZGVmaW5pdGlvbnMgcHJvdmlkZWQgaW4gdGhlIGNhcGFiaWxpdHkgbWFudWFsIHBhZ2UoaHR0
-cHM6Ly93d3cubWFuNy5vcmcvbGludXgvbWFuLXBhZ2VzL21hbjcvY2FwYWJpbGl0aWVzLjcuaHRt
-bCksIHdoaWNoIHNwZWNpZmllcyB0aGF0IG9ubHkgQ0FQX05FVF9BRE1JTiBpcyByZXF1aXJlZCBm
-b3IgdXNpbmcgc2V0c29ja29wdCgyKSB0byBzZXQgU09fUFJJT1JJVFksIFNPX0RFQlVHLCBhbmQg
-U09fTUFSSy4gQWRkaXRpb25hbGx5LCB3ZSd2ZSBvYnNlcnZlZCB0aGF0IFNPX0RFQlVHIGlzIGFs
-cmVhZHkgcHJvdGVjdGVkIHNvbGVseSBieSBDQVBfTkVUX0FETUlOLgoKU2ltcGxpZnlpbmcgdGhl
-IGNhcGFiaWxpdHkgY2hlY2tzIGluIHRoZXNlIGZ1bmN0aW9ucyB0byBvbmx5IHVzZSBDQVBfTkVU
-X0FETUlOIHdvdWxkIG5vdCBvbmx5IGFsaWduIHdpdGggdGhlIGNhcGFiaWxpdHkgbWFudWFsIHBh
-Z2UgYnV0IGFsc28gY29udHJpYnV0ZSB0byBhIG1vcmUgc3RyYWlnaHRmb3J3YXJkIGFuZCBjb25z
-aXN0ZW50IGNvZGViYXNlLgoKVGhpcyBpc3N1ZSBleGlzdHMgaW4gc2V2ZXJhbCBrZXJuZWwgdmVy
-c2lvbnMgYW5kIHdlIGhhdmUgY2hlY2tlZCBpdCBvbiB0aGUgbGF0ZXN0IHN0YWJsZSByZWxlYXNl
-KExpbnV4IDYuNi45KS4KCllvdXIgaW5zaWdodHMgYW5kIGZlZWRiYWNrIG9uIHRoaXMgcHJvcG9z
-ZWQgYWRqdXN0bWVudCB3b3VsZCBiZSBncmVhdGx5IGFwcHJlY2lhdGVkLiBUaGFuayB5b3UgZm9y
-IHlvdXIgdGltZSBhbmQgY29uc2lkZXJhdGlvbi4KCkJlc3QgcmVnYXJkcywKSmluZ3ppCg==
+There is only one flag that can be set in struct mdio_driver_common and
+mdio_device. We can compare the probe of the driver or the type of the
+device to implement it. Hence, these flags in struct mdio_driver_common
+and mdio_device can be removed.
+
+Introduce is_phy_driver() and is_phy_device(). Use them test the driver
+or device.
+
+v1 -> v2:
+remove redundant parens and the exported.
+
+Yajun Deng (2):
+  net: phy: Cleanup struct mdio_driver_common and introduce
+    is_phy_driver()
+  net: phy: Introduce is_phy_device()
+
+ drivers/net/dsa/b53/b53_mdio.c          |  2 +-
+ drivers/net/dsa/dsa_loop.c              |  2 +-
+ drivers/net/dsa/lan9303_mdio.c          |  2 +-
+ drivers/net/dsa/microchip/ksz8863_smi.c |  2 +-
+ drivers/net/dsa/mt7530-mdio.c           |  2 +-
+ drivers/net/dsa/mv88e6060.c             |  2 +-
+ drivers/net/dsa/mv88e6xxx/chip.c        |  2 +-
+ drivers/net/dsa/qca/ar9331.c            |  2 +-
+ drivers/net/dsa/qca/qca8k-8xxx.c        |  2 +-
+ drivers/net/dsa/realtek/realtek-mdio.c  |  2 +-
+ drivers/net/dsa/xrs700x/xrs700x_mdio.c  |  2 +-
+ drivers/net/phy/mdio_bus.c              |  7 ++--
+ drivers/net/phy/mdio_device.c           | 21 +++++-------
+ drivers/net/phy/phy_device.c            | 44 ++++++++++++++-----------
+ drivers/net/phy/xilinx_gmii2rgmii.c     |  2 +-
+ drivers/phy/broadcom/phy-bcm-ns-usb3.c  |  8 ++---
+ drivers/phy/broadcom/phy-bcm-ns2-pcie.c |  8 ++---
+ include/linux/mdio.h                    | 19 ++---------
+ include/linux/phy.h                     | 10 +++---
+ 19 files changed, 62 insertions(+), 79 deletions(-)
+
+-- 
+2.25.1
+
 
