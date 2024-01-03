@@ -1,132 +1,178 @@
-Return-Path: <netdev+bounces-61128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B18822A6A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:47:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 419B9822A75
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:48:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAD6E284802
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:47:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1A13284767
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 09:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA02182DD;
-	Wed,  3 Jan 2024 09:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6681863F;
+	Wed,  3 Jan 2024 09:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DKURrIJW"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C48E18622;
-	Wed,  3 Jan 2024 09:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4T4lGD09rVz1g1sq;
-	Wed,  3 Jan 2024 17:45:56 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9345E180021;
-	Wed,  3 Jan 2024 17:47:21 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 3 Jan
- 2024 17:47:20 +0800
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-To: Mina Almasry <almasrymina@google.com>
-CC: Shakeel Butt <shakeelb@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<bpf@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
-	<hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J.
- Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Michael Chan
-	<michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst
-	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>, Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas
-	<mw@semihalf.com>, Russell King <linux@armlinux.org.uk>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
- Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau
-	<nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu
- Vultur <horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei
- Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
-	<jaswinder.singh@linaro.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi Gunasekaran
-	<r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, Jiawen Wu
-	<jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, Ronak
- Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers
-	<pv-drivers@vmware.com>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
-	<shayne.chen@mediatek.com>, Kalle Valo <kvalo@kernel.org>, Juergen Gross
-	<jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Oleksandr
- Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
-	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
-	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi
-	<stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
-	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
-	<justinstitt@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com>
- <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
- <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
- <20231215021114.ipvdx2bwtxckrfdg@google.com>
- <20231215190126.1040fa12@kernel.org>
- <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
- <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
- <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
- <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com>
- <CAHS8izP63wXGH+Q3y1H=ycT=AHYnhGveBnuyF_rYioAjZ=Hn=g@mail.gmail.com>
- <7c6d35e3-165f-5883-1c1b-fce82c976028@huawei.com>
- <CAHS8izNqeiK1tq=48LMbbqq5B4d2mhgbuKRvnFtiBngf73jXZg@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <fda068d0-f7fb-90fc-cdd6-1f853a4a225f@huawei.com>
-Date: Wed, 3 Jan 2024 17:47:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239D618634
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 09:48:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-336f2c88361so5695471f8f.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 01:48:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704275297; x=1704880097; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9ygiQ5GZ7AaDONBWvS2tDIrOeQ15Rvo3O1ywNhmUg6E=;
+        b=DKURrIJWUdAW9g81u035uyQjPPYqxC3IHf5y4D4x5F8/0+SupR0ZqLxRH9INT9swMz
+         QjuATZjny7Qb/fZ+VfKUhm8vn8jLTz1DGrtS+2qrcZFaHliPgBDCKtOlv0nMn534Yltz
+         nyl3fqupsaG+BnycDn65a3Ff/oWhfOC3129AjlJYHbKy5qB0gHED6NSCwg+MltvCRqvV
+         /jOaYutSu4MzBlr3GoJgC245W2BJVY1DePS2sDHH3CQGoAuC4Si22qtnMCzbGkzTXTCD
+         BCP6RVnpYKayfcjeL9zvqwekBQXNi4b1O2TBTb2cjGN08fk9JdBF4HtXtGnlDXufeO7d
+         Y6RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704275297; x=1704880097;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9ygiQ5GZ7AaDONBWvS2tDIrOeQ15Rvo3O1ywNhmUg6E=;
+        b=d4HZDlZWKe1EF1Hw389FfgGqt/zxM7ZX4ScDmywKk4TqO9dlb98UrKmH16473yz/i8
+         zdoU7FcfTO/rZwgQPmHAnHiT/DFezpXgKjedH+4m2aqxtH1zg49xx6B24pnBcHFzlUw0
+         6hX9XMEUN1qeZ7xDuKagaZde7qfqP0oD0ee6PIlenyclqiWMpgkaZETpnOTXzOPjbfwd
+         60NSh//5FGRFLA5Ao9aBjam0JoVy64JGthjzHcXjTWibH6lsN7l8n97t5LYHNgSvqv5r
+         RPdSo7hBdDllXcL5GIdyZxTuzMG1tAjJ/HdE5D/PseAI7Z5zSujRPq/OvcpLGOln9hsx
+         l1gA==
+X-Gm-Message-State: AOJu0YwslMxhLkRa72fG7Ho8Kh0uCunoYaj1dbs0IV6GoSGGpqFjimpb
+	ToD0j8jDRbTFP0LrBCgIE0GoMg/w91KXpQ==
+X-Google-Smtp-Source: AGHT+IHSLGf/w+/4nLJY24qGtbeXFaHszE9j+MVClx84jKy+oClHc3nv8SAWdrAvyz8Wu3CyLWhQYQ==
+X-Received: by 2002:a05:6000:368:b0:337:2aa3:ac80 with SMTP id f8-20020a056000036800b003372aa3ac80mr3811982wrf.68.1704275297315;
+        Wed, 03 Jan 2024 01:48:17 -0800 (PST)
+Received: from [192.168.100.86] ([37.228.218.3])
+        by smtp.gmail.com with ESMTPSA id z13-20020adfe54d000000b00333359b522dsm30539123wrm.77.2024.01.03.01.48.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jan 2024 01:48:16 -0800 (PST)
+Message-ID: <e0926d70-09d1-40ab-939a-7e110d718448@linaro.org>
+Date: Wed, 3 Jan 2024 09:48:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHS8izNqeiK1tq=48LMbbqq5B4d2mhgbuKRvnFtiBngf73jXZg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/5] net: mdio: ipq4019: enable the SoC uniphy clocks
+ for ipq5332 platform
 Content-Language: en-US
+To: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
+ konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ quic_srichara@quicinc.com
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <20231225084424.30986-3-quic_luoj@quicinc.com>
+From: Bryan O'Donoghue <bryan.odonoghue@linaro.org>
+In-Reply-To: <20231225084424.30986-3-quic_luoj@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 2024/1/3 0:14, Mina Almasry wrote:
+On 25/12/2023 08:44, Luo Jie wrote:
+> On the platform ipq5332, the related SoC uniphy GCC clocks need
+> to be enabled for making the MDIO slave devices accessible.
 > 
-> The idea being that skb_frag_page() can return NULL if the frag is not
-> paged, and the relevant callers are modified to handle that.
+> These UNIPHY clocks are from the SoC platform GCC clock provider,
+> which are enabled for the connected PHY devices working.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>   drivers/net/mdio/mdio-ipq4019.c | 75 ++++++++++++++++++++++++++++-----
+>   1 file changed, 64 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
+> index 5273864fabb3..e24b0e688b10 100644
+> --- a/drivers/net/mdio/mdio-ipq4019.c
+> +++ b/drivers/net/mdio/mdio-ipq4019.c
+> @@ -35,15 +35,36 @@
+>   /* MDIO clock source frequency is fixed to 100M */
+>   #define IPQ_MDIO_CLK_RATE	100000000
+>   
+> +/* SoC UNIPHY fixed clock */
+> +#define IPQ_UNIPHY_AHB_CLK_RATE	100000000
+> +#define IPQ_UNIPHY_SYS_CLK_RATE	24000000
+> +
+>   #define IPQ_PHY_SET_DELAY_US	100000
+>   
+>   /* Maximum SOC PCS(uniphy) number on IPQ platform */
+>   #define ETH_LDO_RDY_CNT				3
+>   
+> +enum mdio_clk_id {
+> +	MDIO_CLK_MDIO_AHB,
+> +	MDIO_CLK_UNIPHY0_AHB,
+> +	MDIO_CLK_UNIPHY0_SYS,
+> +	MDIO_CLK_UNIPHY1_AHB,
+> +	MDIO_CLK_UNIPHY1_SYS,
+> +	MDIO_CLK_CNT
+> +};
+> +
+>   struct ipq4019_mdio_data {
+>   	void __iomem *membase;
+>   	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
+> -	struct clk *mdio_clk;
+> +	struct clk *clk[MDIO_CLK_CNT];
+> +};
+> +
+> +static const char *const mdio_clk_name[] = {
+> +	"gcc_mdio_ahb_clk",
+> +	"uniphy0_ahb",
+> +	"uniphy0_sys",
+> +	"uniphy1_ahb",
+> +	"uniphy1_sys"
+>   };
+>   
+>   static int ipq4019_mdio_wait_busy(struct mii_bus *bus)
+> @@ -209,14 +230,43 @@ static int ipq4019_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
+>   static int ipq_mdio_reset(struct mii_bus *bus)
+>   {
+>   	struct ipq4019_mdio_data *priv = bus->priv;
+> -	int ret;
+> +	unsigned long rate;
+> +	int ret, index;
+>   
+> -	/* Configure MDIO clock source frequency if clock is specified in the device tree */
+> -	ret = clk_set_rate(priv->mdio_clk, IPQ_MDIO_CLK_RATE);
+> -	if (ret)
+> -		return ret;
+> +	/* For the platform ipq5332, there are two SoC uniphies available
+> +	 * for connecting with ethernet PHY, the SoC uniphy gcc clock
+> +	 * should be enabled for resetting the connected device such
+> +	 * as qca8386 switch, qca8081 PHY or other PHYs effectively.
+> +	 *
+> +	 * Configure MDIO/UNIPHY clock source frequency if clock instance
+> +	 * is specified in the device tree.
+> +	 */
+> +	for (index = MDIO_CLK_MDIO_AHB; index < MDIO_CLK_CNT; index++) {
 
-There are many existing drivers which are not expecting NULL returning for
-skb_frag_page() as those drivers are not supporting devmem, adding additionl
-checking overhead in skb_frag_page() for those drivers does not make much
-sense, IMHO, it may make more sense to introduce a new helper for the driver
-supporting devmem or networking core that needing dealing with both normal
-page and devmem.
+you could do a
 
-And we are also able to keep the old non-NULL returning semantic for
-skb_frag_page().
+if (!priv->clk[index])
+	continue;
+
+here and save a few cycles executing code for absent clocks. ipq6018 has 
+just 1/5 of the clocks you are checking for here.
+
+Better still capture the number of clocks you find in probe() in a 
+variable priv->num_clocks and only step through the array
+
+for (i = 0; i < priv->num_clocks; i++) {}
+
+---
+bod
 
