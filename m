@@ -1,241 +1,173 @@
-Return-Path: <netdev+bounces-61313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B50823546
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 20:03:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B54082356F
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 20:16:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E422CB22E63
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 19:03:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2404A1C23CD5
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 19:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1691CA98;
-	Wed,  3 Jan 2024 19:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E6F1CA9F;
+	Wed,  3 Jan 2024 19:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OILfO9U1"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ELhE2SIJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2057.outbound.protection.outlook.com [40.107.93.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823BA1CA8F;
-	Wed,  3 Jan 2024 19:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a28aa47bd15so85309166b.2;
-        Wed, 03 Jan 2024 11:02:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704308570; x=1704913370; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/MJgpoiYX2ieK9G59Tpv6u4Pnf7MXXAZFvpISXd2cjQ=;
-        b=OILfO9U1Om6jnWZ9En6zZ81AMIXP1rk3zZKbXrTpmRKx+JaCJYBWhYzilNaMRggj8N
-         OkOqzLiRhogRvK7pE3C8UCZf7CNpFWO7gBKubRCYVbY3v7JIGxMkyOs6ONkFE/y58Pqs
-         /CZ9WHZqv30QGyj70+zdxkKwFKykVzvAke/GnNzz4wYaekebsymeCmE5uKykoCcq9E2j
-         hutHmp12bHTCOq3GGErZ0MeNEid/IMWUl/DmrEjVAvYCIeGnx2EK4iA+sZjEoQz8Ty90
-         t9K2iCL28lrdKn8WXtl0EnFpzzGMfgyfwMP9gqzgBhoOjeCt9n3C3GYztvrn//AlnU04
-         Ojuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704308570; x=1704913370;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/MJgpoiYX2ieK9G59Tpv6u4Pnf7MXXAZFvpISXd2cjQ=;
-        b=p3GGlJSl+cybRyxihlZuGtNebsr8FswZ30f6nN7Ko/gbsLvCBaNxbb6veC86OyIQGy
-         dp8h2Pb1hLT7lSd4yA0DAvhJmzOcqwrCaI0N4jkjb/mLPEekb11U2tjlicqJ5tR00JQS
-         99/PZc8cSDjkbuvUXVxO3/eT1eaTJyyewI4rBWHaoN924qmlhoy/C0oZ/CkFS9YdEVXd
-         PSkEkIi9vW/+griINncYHgVpe1DkQLLElM9UnBmvRiRWWafgNfR8ip5l7XVJtt8MCOl8
-         mZPasWqfKNda5dcaBw24VxwuAxlPA4Mil+f1uoUjE3JGEc/OV6gxCftqcxsNh8snp2md
-         U/cg==
-X-Gm-Message-State: AOJu0YxmlBamyQYUvW+fEimIOHjoxPL7IFurc6X/NdyFf/nAn7klKPw7
-	44kzGRbs+hY94dcqzMxw0/M=
-X-Google-Smtp-Source: AGHT+IGUH8UoqdtTD6HYFLZRnvMAdGqAM2Civpr13lPO+LrJfvwYUVRvVPe9b2Z+NgdZ2JAyrQq2qw==
-X-Received: by 2002:a17:906:a1c2:b0:a26:874f:4847 with SMTP id bx2-20020a170906a1c200b00a26874f4847mr7510133ejb.65.1704308569468;
-        Wed, 03 Jan 2024 11:02:49 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id kb6-20020a170907924600b00a27a32e6502sm4939779ejb.117.2024.01.03.11.02.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 11:02:49 -0800 (PST)
-Date: Wed, 3 Jan 2024 21:02:46 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Bauer <mail@david-bauer.net>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next] net: dsa: mt7530: register OF node for internal
- MDIO bus
-Message-ID: <20240103190246.ctyeehvfmhctpphf@skbuf>
-References: <20231220173539.59071-1-arinc.unal@arinc9.com>
- <20231220173539.59071-1-arinc.unal@arinc9.com>
- <20231221151607.ujobhh4aet4obxdz@skbuf>
- <6600c6b1-2230-4963-940c-8b95a01750fd@arinc9.com>
- <20231227191154.6jkqdlqdxciidpfw@skbuf>
- <bdbe24b2-30f6-48fa-b6eb-a1ae3afe9076@arinc9.com>
- <20231227200217.kdltxpmhvlp6z4cd@skbuf>
- <d2a7cc7e-bb27-472f-8921-5579a894c71d@arinc9.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29161CA9D
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 19:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fdSpfzx9CqlbQvH/hJ6HdJdmdKuKxQptWTuxXN1V7Do8lMj/IpvO/DuuBA/qTg0mMK7uq2YDNyPDTDAlUGK6x+abgN4HysMJklEscf0gkHWBHLWl7ltoCQMaea3gV+Tz6yoNBDi6v89qZeDYSkhQVa82IeOuV78H8uMdY3wr7tU8bRIq2QPn5376ozHGDglfdop+wxZCMklUvE1Ai2UnjElUYl6vGejMI4Z4DL1wvQBm1rzMjXtQagiWrZq3Fx8zMPqJMuGICY/QlrZg+74vB5s4N8BrTxImwzH8kVPEuwXbs8TWK5QjC+lKd/59/LOXp8rAsAaWvhl7Bcrz5TRrnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5FFwDm6Hv+5bwFeDmBl8x5bd9WOruXk1gj9HYr38IJc=;
+ b=ebY7378K8CqBsbjADL8VywlXFchEkre5hgp3rTubw53u5eQ65PbKshHl80jwEHx38IsIr8N5jmZIBW6S2a0GA+C+6rYb5TNS4SwHJjRX0WLEIy6fuc7LEgjGjhw6rqZ3NVlFA13/nu582p1HgGvclV47MJ5e4pKYQzS5YLljWbeuFsY+QdpEAvgeD2R4rDCK/xU2Hl9CCOSIBkB74DAeEiRXU/ACmYvqtk6E/NhV+gPWFMdo1TxLT2G8zf9RhKMAOBS6mCHmDsmm6uCi/wtZpnvpA/i927B7hmeZ9l/ve4sismKrzg8lycnrj2sOFhyDzj7OCxV5MuS1naJ+3i4+5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5FFwDm6Hv+5bwFeDmBl8x5bd9WOruXk1gj9HYr38IJc=;
+ b=ELhE2SIJYbaZh9EZDaKSO/AYOpWDQ0BQNrxoRGf7NtmIfcfWa0XJhtSwbiEbm+AmNyLuCy8oj+DK+9EP7Dtvvc2Z2pO5HFD9YSU7/K/XoCRxoxgiOydOOCZcJUIG4Uap5ymcmGh2i/jZnflA6dAYKxnPv9x6zNsj7QZfjoF0HW/qMPRFIOHAVojR0ZnCzzYGGuyVG9WGBmF1MnUdb0nAxmrw7Oh9uVbEj5yUm4CCrJyiGOdf7ZBRj+pewfZVblE/ukL51skWFBbLUshjIfVF7RAbc1DVi4Z0NxQ3CfitCdraBkA4u9iT23Y1/wYcLCyGGoYOGswc0t0iWqy9slKjhw==
+Received: from PH8PR07CA0019.namprd07.prod.outlook.com (2603:10b6:510:2cd::18)
+ by IA1PR12MB8334.namprd12.prod.outlook.com (2603:10b6:208:3ff::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.13; Wed, 3 Jan
+ 2024 19:16:41 +0000
+Received: from SN1PEPF000252A0.namprd05.prod.outlook.com
+ (2603:10b6:510:2cd:cafe::1a) by PH8PR07CA0019.outlook.office365.com
+ (2603:10b6:510:2cd::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.13 via Frontend
+ Transport; Wed, 3 Jan 2024 19:16:40 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SN1PEPF000252A0.mail.protection.outlook.com (10.167.242.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7159.9 via Frontend Transport; Wed, 3 Jan 2024 19:16:40 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 3 Jan 2024
+ 11:16:25 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 3 Jan 2024
+ 11:16:25 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.986.41 via Frontend Transport; Wed, 3 Jan
+ 2024 11:16:23 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Gal Pressman <gal@nvidia.com>, Ahmed Zaki
+	<ahmed.zaki@intel.com>
+Subject: [PATCH net-next] net: ethtool: Fix set RXNFC call on drivers with no RXFH support
+Date: Wed, 3 Jan 2024 21:16:20 +0200
+Message-ID: <20240103191620.747837-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d2a7cc7e-bb27-472f-8921-5579a894c71d@arinc9.com>
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000252A0:EE_|IA1PR12MB8334:EE_
+X-MS-Office365-Filtering-Correlation-Id: afea913a-7a98-4119-45d4-08dc0c9083b0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	H4A3HPW5pTkWfLNRn0yMbDx+LoSyICPjNm1FLwBiC+AMqgbYXFMPXpEh33X9mJlg0PXu7lWvrylve+voQ5Azz99VaUnj+eYflZKIYA2D2hrngdgQC4K6mwERp/ci1K5nqGnszKKweparWuC9xHKDV/Og8Fsh3VQpQAZ9iSrQZXU0/8TE20tQYgJ+ZnByU0b/yaxk4unPdFIiNiWBK+LoL8OzQ9v1kphov0xGW2G9eaMSwf2huqwtDTxIreIgJheZZSrKRmVjdCadmxCLtfMkTBscbcplS4TnPlKkFCCqe7BizNskmPunJXjT64lGqa/IJR/Gg92Tpcdc8wIU2QLf0ymxTwnFkJ6OiGe3ZFhInoYwelr3pz3EjpCbL/q4C3kqG0u2zlrrrTcxdYbf9bkC6MQ77v2hHhbAvGgiy/36AE+4MoI0tH6vUwoHDDB4JvPMZYUo7S2A1fKX1SepgT4EkrmAGZdGGwTRlb6q3q+r9TJAO6CLGdVLn8nkyiBbWTgzdo+bGbsdvUc2O3967c+PKKsC26aE635RSwZiq8xRskdnJ4Icof9oarSAGxFP32LFGNOK4wPTAoRmEA1f2WPlFuZOVbWEUnZvPga+09D/cp6temTekc3kbLut0u2pCHQ9dhB8a2hpPi0/mRKLwYMP3dtYZN43c8INNxYrRM/eQoJrcRRRxApXwn2e8jAg9HMIUjRHq6cw3xs1BJz+Nrs6cjLnB/OmrMx0q4VC5Xuzv1mJION5wlQs9PW83ysIB+8L
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(376002)(346002)(136003)(230922051799003)(64100799003)(82310400011)(451199024)(186009)(1800799012)(36840700001)(46966006)(40470700004)(478600001)(316002)(54906003)(110136005)(8936002)(8676002)(70206006)(70586007)(47076005)(4326008)(36860700001)(83380400001)(7696005)(426003)(1076003)(2616005)(41300700001)(2906002)(5660300002)(336012)(26005)(36756003)(356005)(7636003)(82740400003)(86362001)(40460700003)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2024 19:16:40.2396
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: afea913a-7a98-4119-45d4-08dc0c9083b0
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000252A0.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8334
 
-On Thu, Dec 28, 2023 at 07:58:13PM +0300, Arınç ÜNAL wrote:
-> As Daniel stated on a previous submission of this patch, being able to
-> reference the PHYs on the switch MDIO bus is mandatory on MT7988 as
-> calibration data from NVMEM for each PHY is required, so defining the MDIO
-> bus is required to support MT7988. Therefore, we should support interrupts
-> on device trees with the switch MDIO bus defined.
+Some interfaces support get/set_rxnfc but not get/set_rxfh (mlx5 IPoIB
+for example).
+Instead of failing the RXNFC command, do the symmetric xor sanity check
+for interfaces that support get_rxfh only.
 
-Understood and no objection there. I was just making sure that there is
-no existing case in upstream where the internal PHYs are described in OF,
-that we'd have to preserve IRQ functionality for.
+Fixes: dcd8dbf9e734 ("net: ethtool: get rid of get/set_rxfh_context functions")
+Cc: Ahmed Zaki <ahmed.zaki@intel.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+---
+ net/ethtool/ioctl.c | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
 
-> The implementation below follows this logic:
-> 
-> No switch MDIO bus defined: Register the MDIO bus, set the interrupts for
-> PHYs if "interrupt-controller" is defined at the switch node.
-> 
-> Switch MDIO bus defined: Register the MDIO bus, set the interrupts for PHYs
-> if ["interrupt-controller" is defined at the switch node and "interrupts"
-> is defined at the PHY nodes under the switch MDIO bus node].
-> 
-> I think this approach fits your description so I'd like to agree that this
-> should be the way for all DSA subdrivers. Please let me know what you
-> think.
-> 
-> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> index 391c4dbdff42..bbd230a73ead 100644
-> --- a/drivers/net/dsa/mt7530.c
-> +++ b/drivers/net/dsa/mt7530.c
-> @@ -2155,15 +2155,21 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
->  {
->  	struct dsa_switch *ds = priv->ds;
->  	struct device *dev = priv->dev;
-> +	struct device_node *np, *mnp;
->  	struct mii_bus *bus;
->  	static int idx;
->  	int ret;
-> +	np = priv->dev->of_node;
-> +	mnp = of_get_child_by_name(np, "mdio");
-> +
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index 86d47425038b..42d02cf3a4b3 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -978,27 +978,29 @@ static noinline_for_stack int ethtool_set_rxnfc(struct net_device *dev,
+ 	size_t info_size = sizeof(info);
+ 	int rc;
+ 
+-	if (!ops->set_rxnfc || !ops->get_rxfh)
++	if (!ops->set_rxnfc)
+ 		return -EOPNOTSUPP;
+ 
+ 	rc = ethtool_rxnfc_copy_struct(cmd, &info, &info_size, useraddr);
+ 	if (rc)
+ 		return rc;
+ 
+-	rc = ops->get_rxfh(dev, &rxfh);
+-	if (rc)
+-		return rc;
+-
+ 	/* Sanity check: if symmetric-xor is set, then:
+ 	 * 1 - no other fields besides IP src/dst and/or L4 src/dst
+ 	 * 2 - If src is set, dst must also be set
+ 	 */
+-	if ((rxfh.input_xfrm & RXH_XFRM_SYM_XOR) &&
+-	    ((info.data & ~(RXH_IP_SRC | RXH_IP_DST |
+-			    RXH_L4_B_0_1 | RXH_L4_B_2_3)) ||
+-	     (!!(info.data & RXH_IP_SRC) ^ !!(info.data & RXH_IP_DST)) ||
+-	     (!!(info.data & RXH_L4_B_0_1) ^ !!(info.data & RXH_L4_B_2_3))))
+-		return -EINVAL;
++	if (ops->get_rxfh) {
++		rc = ops->get_rxfh(dev, &rxfh);
++		if (rc)
++			return rc;
++
++		if ((rxfh.input_xfrm & RXH_XFRM_SYM_XOR) &&
++		    ((info.data & ~(RXH_IP_SRC | RXH_IP_DST |
++				    RXH_L4_B_0_1 | RXH_L4_B_2_3)) ||
++		     (!!(info.data & RXH_IP_SRC) ^ !!(info.data & RXH_IP_DST)) ||
++		     (!!(info.data & RXH_L4_B_0_1) ^ !!(info.data & RXH_L4_B_2_3))))
++			return -EINVAL;
++	}
+ 
+ 	rc = ops->set_rxnfc(dev, &info);
+ 	if (rc)
+-- 
+2.40.1
 
-Empty line between variable declarations and code. Or you can initialize
-them as part of their declaration, but you need to stick to the "longest
-line first" rule.
-
-Also, it would be good to also check of_device_is_available(mnp).
-
->  	bus = devm_mdiobus_alloc(dev);
->  	if (!bus)
->  		return -ENOMEM;
-> -	ds->user_mii_bus = bus;
-> +	if (mnp == NULL)
-
-!mnp
-
-> +		ds->user_mii_bus = bus;
-> +
->  	bus->priv = priv;
->  	bus->name = KBUILD_MODNAME "-mii";
->  	snprintf(bus->id, MII_BUS_ID_SIZE, KBUILD_MODNAME "-%d", idx++);
-> @@ -2174,10 +2180,11 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
->  	bus->parent = dev;
->  	bus->phy_mask = ~ds->phys_mii_mask;
-> -	if (priv->irq)
-> +	if (priv->irq && mnp == NULL)
->  		mt7530_setup_mdio_irq(priv);
-> -	ret = devm_mdiobus_register(dev, bus);
-> +	ret = devm_of_mdiobus_register(dev, bus, mnp);
-> +	of_node_put(mnp);
-
-This is going to be interesting. There isn't really a correct way to
-manage the reference to "mnp", as far as I can tell. Normally, it should
-have been possible to release the reference as you did. But you need
-something along the lines of what Luiz/Russell have been discussing
-here:
-
-https://lore.kernel.org/netdev/20231220045228.27079-2-luizluca@gmail.com/
-
-In any case, the devres variant of of_mdiobus_register() seems incompatible
-with the mt7530 driver owning the "mnp" node for any longer than this,
-because it has no hook to call of_node_put() once the MDIO bus is unregistered.
-
->  	if (ret) {
->  		dev_err(dev, "failed to register MDIO bus: %d\n", ret);
->  		if (priv->irq)
-> 
-> With this device tree:
-> 
-> switch {
-> 	interrupt-controller;
-> }
-> 
-> [    1.420534] mt7530-mdio mdio-bus:1f lan1 (uninitialized): PHY [mt7530-0:00] driver [MediaTek MT7530 PHY] (irq=17)
-> [    1.433224] mt7530-mdio mdio-bus:1f lan2 (uninitialized): PHY [mt7530-0:01] driver [MediaTek MT7530 PHY] (irq=18)
-> [    1.445338] mt7530-mdio mdio-bus:1f lan3 (uninitialized): PHY [mt7530-0:02] driver [MediaTek MT7530 PHY] (irq=19)
-> [    1.457472] mt7530-mdio mdio-bus:1f lan4 (uninitialized): PHY [mt7530-0:03] driver [MediaTek MT7530 PHY] (irq=20)
-> [    1.469587] mt7530-mdio mdio-bus:1f wan (uninitialized): PHY [mt7530-0:04] driver [MediaTek MT7530 PHY] (irq=21)
-> 
-> With this device tree:
-> 
-> switch {
-> 	interrupt-controller;
-> 
-> 	mdio {
-> 		phy {
-> 			reg = <0>;
-> 		}
-> 	}
-> }
-> 
-> [    1.413101] mt7530-mdio mdio-bus:1f lan1 (uninitialized): PHY [mt7530-0:00] driver [MediaTek MT7530 PHY] (irq=POLL)
-> [    1.429954] mt7530-mdio mdio-bus:1f lan2 (uninitialized): PHY [mt7530-0:01] driver [MediaTek MT7530 PHY] (irq=POLL)
-> [    1.443704] mt7530-mdio mdio-bus:1f lan3 (uninitialized): PHY [mt7530-0:02] driver [MediaTek MT7530 PHY] (irq=POLL)
-> [    1.455876] mt7530-mdio mdio-bus:1f lan4 (uninitialized): PHY [mt7530-0:03] driver [MediaTek MT7530 PHY] (irq=POLL)
-> [    1.468079] mt7530-mdio mdio-bus:1f wan (uninitialized): PHY [mt7530-0:04] driver [MediaTek MT7530 PHY] (irq=POLL)
-> 
-> With this device tree:
-> 
-> switch {
-> 	interrupt-controller;
-> 
-> 	mdio {
-> 		phy {
-> 			reg = <0>;
-> 			interrupts = <0>;
-> 		}
-> 	}
-> }
-> 
-> [    1.420534] mt7530-mdio mdio-bus:1f lan1 (uninitialized): PHY [mt7530-0:00] driver [MediaTek MT7530 PHY] (irq=17)
-> [    1.433224] mt7530-mdio mdio-bus:1f lan2 (uninitialized): PHY [mt7530-0:01] driver [MediaTek MT7530 PHY] (irq=18)
-> [    1.445338] mt7530-mdio mdio-bus:1f lan3 (uninitialized): PHY [mt7530-0:02] driver [MediaTek MT7530 PHY] (irq=19)
-> [    1.457472] mt7530-mdio mdio-bus:1f lan4 (uninitialized): PHY [mt7530-0:03] driver [MediaTek MT7530 PHY] (irq=20)
-> [    1.469587] mt7530-mdio mdio-bus:1f wan (uninitialized): PHY [mt7530-0:04] driver [MediaTek MT7530 PHY] (irq=21)
-
-Looks sane.
-
-FWIW, I found Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-where internal PHYs don't have an 'interrupts' property, yet they are
-probably still expected to use interrupts - according to ksz_irq_phy_setup().
-
-Anyway, what's done is done, but I still don't see the point of making
-the binding much more flexible than it needs to be.
 
