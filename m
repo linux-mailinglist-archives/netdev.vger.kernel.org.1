@@ -1,297 +1,178 @@
-Return-Path: <netdev+bounces-61301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8083A8232B8
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:10:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F4668231A6
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E99241F24D92
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:10:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BB521C20C6B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D23C1BDFE;
-	Wed,  3 Jan 2024 17:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1C41BDFA;
+	Wed,  3 Jan 2024 16:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="D0piIWsj"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IFI0pvsR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB741BDF4;
-	Wed,  3 Jan 2024 17:10:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ACDCC433C8;
-	Wed,  3 Jan 2024 17:10:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1704301843;
-	bh=lc2ROPNA7gqqcqPwx0beeLyb4qlqLE1coJ87y7HYXnI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D0piIWsjb3OgF0AhSJkRz7TUo6cwAyUI+/Pk/iWMy6hEkCGB0E1vWXEPNYD4/cxPA
-	 FbgneDQhriQ+eqCTAaLihG4+ofVJUYjXQHoBx52SLrYKoE8IOgeQZZpWRJWtdd3mGz
-	 8uOONLrpRjoRtShSrpBv8q/54w9m7tZ0ulr/DvRs=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ben Dooks <ben.dooks@codethink.co.uk>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	netdev@vger.kernel.org,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH 5.10 45/75] net: ks8851: Fix TX stall caused by TX buffer overrun
-Date: Wed,  3 Jan 2024 17:55:26 +0100
-Message-ID: <20240103164849.940037823@linuxfoundation.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240103164842.953224409@linuxfoundation.org>
-References: <20240103164842.953224409@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1704F1BDF4
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 16:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-556ab8b85e3so1176933a12.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 08:57:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1704301024; x=1704905824; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3VLTVNghyg+ofaulBMdKpUPHTS/CxFoEGVXeK8ZxBpc=;
+        b=IFI0pvsRNr6BhgpCI4v5hgKW7N4i39e/i2LhuH0cmH472yTAiS664EpYr/oF2zGthE
+         3hwiXjAUwqzjlX+OigwitTG4dF+4mdBPTkFhXtkp8qMHXMxVw0YA8JhUuy1024iNrn/S
+         9FgDrubv+M+YugpSQlHTm3vVJOxFK58To3RHo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704301024; x=1704905824;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3VLTVNghyg+ofaulBMdKpUPHTS/CxFoEGVXeK8ZxBpc=;
+        b=b5pniEW7luheEg1Hok2n9HVU8S9U+1nTsFAsqoFh+r5TtZZ1bT3XrHN4V2uruKS4ZH
+         zBH+zjOE9XlrD4mGi4uTlwEgxHNa3g8EWrd/iRMI/gQl8RSHLhfZpeFb3xeQWpJlsmV3
+         TOw6qG1z1oyqwMwFgeC/KcBP1n2DNIQ9KG2yVZtrKNHQmhCl/LyjysxfJWElq5OpQFze
+         yJnUvmObiztRlkNFTSh6mQHhWzoXUrfeogqrJY18IyqoTMXQSRztMYsZddZ1977OMefM
+         tGLydqhrmfSYm8OODEyuFZPNQY/RfC5+c3Dc3ftCGDm/eor2gUy+5NvMgslSrF12CO3u
+         ICRw==
+X-Gm-Message-State: AOJu0Yz2JJPEn1dqIWUih8VsSKKS3TEVs8YTneY+YlOOZhaULZWTnD1O
+	VgbvC5S0zsI71uxD4wlNT+WfFfBNosL8kODuBvZ4MoHt6vb/
+X-Google-Smtp-Source: AGHT+IFPeKx7jODK0kMzxV/DmpTGdk9maEceY+oHSFiLcS1z2xZaA2JXxbJ3TyoLQexNnKiKPydRhjj6DYIbSCCEljs=
+X-Received: by 2002:a05:6402:4306:b0:556:cd93:3acb with SMTP id
+ m6-20020a056402430600b00556cd933acbmr1096806edc.3.1704301024237; Wed, 03 Jan
+ 2024 08:57:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240103102332.3642417-1-arnd@kernel.org> <ZZWBS5EugvO2dBp0@C02YVCJELVCG.dhcp.broadcom.net>
+ <557cfaec-6721-4409-83c9-6a60742a5021@app.fastmail.com>
+In-Reply-To: <557cfaec-6721-4409-83c9-6a60742a5021@app.fastmail.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Wed, 3 Jan 2024 08:56:51 -0800
+Message-ID: <CACKFLikiU6WC3EfPaNBrPsf3wAQU=8XbabA2nhVUUOBihQ29FA@mail.gmail.com>
+Subject: Re: [PATCH] bnxt: fix building without CONFIG_RFS_ACCEL
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Arnd Bergmann <arnd@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>, 
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, 
+	Randy Schacher <stuart.schacher@broadcom.com>, 
+	Vasundhara Volam <vasundhara-v.volam@broadcom.com>, Netdev <netdev@vger.kernel.org>, 
+	linux-kernel@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000002a80db060e0d811e"
 
-5.10-stable review patch.  If anyone has any objections, please let me know.
+--0000000000002a80db060e0d811e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-------------------
+On Wed, Jan 3, 2024 at 8:01=E2=80=AFAM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Wed, Jan 3, 2024, at 16:46, Andy Gospodarek wrote:
+> > There is a good oppportunity to clean this up a little better.  When
+> > CONFIG_RFS_ACCEL is not set there is no reason to even have
+> > bnxt_cfg_ntp_filters included in the driver build.
+> >
+> > I'll talk to Michael and we will post a fix for this.
+>
+> Ok, thanks!
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+Yes, we can clean this up better.  User configured ntuple filters are
+directly added and don't go through bnxt_cfg_ntp_filters() by way of
+the workqueue.  I'll post the fix later today.  Thanks.
 
-commit 3dc5d44545453de1de9c53cc529cc960a85933da upstream.
+--0000000000002a80db060e0d811e
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-There is a bug in the ks8851 Ethernet driver that more data is written
-to the hardware TX buffer than actually available. This is caused by
-wrong accounting of the free TX buffer space.
-
-The driver maintains a tx_space variable that represents the TX buffer
-space that is deemed to be free. The ks8851_start_xmit_spi() function
-adds an SKB to a queue if tx_space is large enough and reduces tx_space
-by the amount of buffer space it will later need in the TX buffer and
-then schedules a work item. If there is not enough space then the TX
-queue is stopped.
-
-The worker function ks8851_tx_work() dequeues all the SKBs and writes
-the data into the hardware TX buffer. The last packet will trigger an
-interrupt after it was send. Here it is assumed that all data fits into
-the TX buffer.
-
-In the interrupt routine (which runs asynchronously because it is a
-threaded interrupt) tx_space is updated with the current value from the
-hardware. Also the TX queue is woken up again.
-
-Now it could happen that after data was sent to the hardware and before
-handling the TX interrupt new data is queued in ks8851_start_xmit_spi()
-when the TX buffer space had still some space left. When the interrupt
-is actually handled tx_space is updated from the hardware but now we
-already have new SKBs queued that have not been written to the hardware
-TX buffer yet. Since tx_space has been overwritten by the value from the
-hardware the space is not accounted for.
-
-Now we have more data queued then buffer space available in the hardware
-and ks8851_tx_work() will potentially overrun the hardware TX buffer. In
-many cases it will still work because often the buffer is written out
-fast enough so that no overrun occurs but for example if the peer
-throttles us via flow control then an overrun may happen.
-
-This can be fixed in different ways. The most simple way would be to set
-tx_space to 0 before writing data to the hardware TX buffer preventing
-the queuing of more SKBs until the TX interrupt has been handled. I have
-chosen a slightly more efficient (and still rather simple) way and
-track the amount of data that is already queued and not yet written to
-the hardware. When new SKBs are to be queued the already queued amount
-of data is honoured when checking free TX buffer space.
-
-I tested this with a setup of two linked KS8851 running iperf3 between
-the two in bidirectional mode. Before the fix I got a stall after some
-minutes. With the fix I saw now issues anymore after hours.
-
-Fixes: 3ba81f3ece3c ("net: Micrel KS8851 SPI network driver")
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Ben Dooks <ben.dooks@codethink.co.uk>
-Cc: Tristram Ha <Tristram.Ha@microchip.com>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://lore.kernel.org/r/20231214181112.76052-1-rwahl@gmx.de
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/net/ethernet/micrel/ks8851.h        |    3 ++
- drivers/net/ethernet/micrel/ks8851_common.c |   20 ++++++-------
- drivers/net/ethernet/micrel/ks8851_spi.c    |   42 ++++++++++++++++++----------
- 3 files changed, 40 insertions(+), 25 deletions(-)
-
---- a/drivers/net/ethernet/micrel/ks8851.h
-+++ b/drivers/net/ethernet/micrel/ks8851.h
-@@ -350,6 +350,8 @@ union ks8851_tx_hdr {
-  * @rxd: Space for receiving SPI data, in DMA-able space.
-  * @txd: Space for transmitting SPI data, in DMA-able space.
-  * @msg_enable: The message flags controlling driver output (see ethtool).
-+ * @tx_space: Free space in the hardware TX buffer (cached copy of KS_TXMIR).
-+ * @queued_len: Space required in hardware TX buffer for queued packets in txq.
-  * @fid: Incrementing frame id tag.
-  * @rc_ier: Cached copy of KS_IER.
-  * @rc_ccr: Cached copy of KS_CCR.
-@@ -398,6 +400,7 @@ struct ks8851_net {
- 	struct work_struct	rxctrl_work;
- 
- 	struct sk_buff_head	txq;
-+	unsigned int		queued_len;
- 
- 	struct eeprom_93cx6	eeprom;
- 	struct regulator	*vdd_reg;
---- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -363,16 +363,18 @@ static irqreturn_t ks8851_irq(int irq, v
- 		handled |= IRQ_RXPSI;
- 
- 	if (status & IRQ_TXI) {
--		handled |= IRQ_TXI;
-+		unsigned short tx_space = ks8851_rdreg16(ks, KS_TXMIR);
- 
--		/* no lock here, tx queue should have been stopped */
-+		netif_dbg(ks, intr, ks->netdev,
-+			  "%s: txspace %d\n", __func__, tx_space);
- 
--		/* update our idea of how much tx space is available to the
--		 * system */
--		ks->tx_space = ks8851_rdreg16(ks, KS_TXMIR);
-+		spin_lock(&ks->statelock);
-+		ks->tx_space = tx_space;
-+		if (netif_queue_stopped(ks->netdev))
-+			netif_wake_queue(ks->netdev);
-+		spin_unlock(&ks->statelock);
- 
--		netif_dbg(ks, intr, ks->netdev,
--			  "%s: txspace %d\n", __func__, ks->tx_space);
-+		handled |= IRQ_TXI;
- 	}
- 
- 	if (status & IRQ_RXI)
-@@ -415,9 +417,6 @@ static irqreturn_t ks8851_irq(int irq, v
- 	if (status & IRQ_LCI)
- 		mii_check_link(&ks->mii);
- 
--	if (status & IRQ_TXI)
--		netif_wake_queue(ks->netdev);
--
- 	return IRQ_HANDLED;
- }
- 
-@@ -501,6 +500,7 @@ static int ks8851_net_open(struct net_de
- 	ks8851_wrreg16(ks, KS_ISR, ks->rc_ier);
- 	ks8851_wrreg16(ks, KS_IER, ks->rc_ier);
- 
-+	ks->queued_len = 0;
- 	netif_start_queue(ks->netdev);
- 
- 	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
---- a/drivers/net/ethernet/micrel/ks8851_spi.c
-+++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -289,6 +289,18 @@ static void ks8851_wrfifo_spi(struct ks8
- }
- 
- /**
-+ * calc_txlen - calculate size of message to send packet
-+ * @len: Length of data
-+ *
-+ * Returns the size of the TXFIFO message needed to send
-+ * this packet.
-+ */
-+static unsigned int calc_txlen(unsigned int len)
-+{
-+	return ALIGN(len + 4, 4);
-+}
-+
-+/**
-  * ks8851_rx_skb_spi - receive skbuff
-  * @ks: The device state
-  * @skb: The skbuff
-@@ -307,7 +319,9 @@ static void ks8851_rx_skb_spi(struct ks8
-  */
- static void ks8851_tx_work(struct work_struct *work)
- {
-+	unsigned int dequeued_len = 0;
- 	struct ks8851_net_spi *kss;
-+	unsigned short tx_space;
- 	struct ks8851_net *ks;
- 	unsigned long flags;
- 	struct sk_buff *txb;
-@@ -324,6 +338,8 @@ static void ks8851_tx_work(struct work_s
- 		last = skb_queue_empty(&ks->txq);
- 
- 		if (txb) {
-+			dequeued_len += calc_txlen(txb->len);
-+
- 			ks8851_wrreg16_spi(ks, KS_RXQCR,
- 					   ks->rc_rxqcr | RXQCR_SDA);
- 			ks8851_wrfifo_spi(ks, txb, last);
-@@ -334,6 +350,13 @@ static void ks8851_tx_work(struct work_s
- 		}
- 	}
- 
-+	tx_space = ks8851_rdreg16_spi(ks, KS_TXMIR);
-+
-+	spin_lock(&ks->statelock);
-+	ks->queued_len -= dequeued_len;
-+	ks->tx_space = tx_space;
-+	spin_unlock(&ks->statelock);
-+
- 	ks8851_unlock_spi(ks, &flags);
- }
- 
-@@ -349,18 +372,6 @@ static void ks8851_flush_tx_work_spi(str
- }
- 
- /**
-- * calc_txlen - calculate size of message to send packet
-- * @len: Length of data
-- *
-- * Returns the size of the TXFIFO message needed to send
-- * this packet.
-- */
--static unsigned int calc_txlen(unsigned int len)
--{
--	return ALIGN(len + 4, 4);
--}
--
--/**
-  * ks8851_start_xmit_spi - transmit packet using SPI
-  * @skb: The buffer to transmit
-  * @dev: The device used to transmit the packet.
-@@ -388,16 +399,17 @@ static netdev_tx_t ks8851_start_xmit_spi
- 
- 	spin_lock(&ks->statelock);
- 
--	if (needed > ks->tx_space) {
-+	if (ks->queued_len + needed > ks->tx_space) {
- 		netif_stop_queue(dev);
- 		ret = NETDEV_TX_BUSY;
- 	} else {
--		ks->tx_space -= needed;
-+		ks->queued_len += needed;
- 		skb_queue_tail(&ks->txq, skb);
- 	}
- 
- 	spin_unlock(&ks->statelock);
--	schedule_work(&kss->tx_work);
-+	if (ret == NETDEV_TX_OK)
-+		schedule_work(&kss->tx_work);
- 
- 	return ret;
- }
-
-
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFd7DwdAFcI6QRZfTSaZUfZWW2k2+Hjm
+zBpA9MlGNixoMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEw
+MzE2NTcwNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAs2tBEKsO1cKmSF5Q/erwxjgYCQA09zhKiktsYDcxWijSqdKKR
+aHgnFFW1laeLz0BKnSZjh/xpBRA4icUOmLV1BuWqPQUcnT/aOC70hmJtAPYGAdgywEoemRoMoRSJ
+V1eubderhusyNW6FDAN/3JTviiqZtwcn++jBcM4utFem0mRPG9mBr4eNRR0w4W+Dzvs7nsX29i3A
+slKPLzkBd/7zPlvkPSDJXkyVRECbNSlWh1H6KlNxgs2xsyJHuk/sxhlk7g+1wAsk8SgZYJMvzehY
+1LH7rm8qvcLcLTEJwkGaUg8JXjzvtYk8PxfwN5ayb3ce9cEPiF46PBIWCKluUMJK
+--0000000000002a80db060e0d811e--
 
