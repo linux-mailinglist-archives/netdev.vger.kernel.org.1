@@ -1,92 +1,137 @@
-Return-Path: <netdev+bounces-61107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0423822795
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 04:35:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA4C382279B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 04:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B31741C21D6A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 03:35:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4169DB21D5F
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 03:41:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D654A3B;
-	Wed,  3 Jan 2024 03:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C054A33;
+	Wed,  3 Jan 2024 03:40:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (unknown [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D634A26;
-	Wed,  3 Jan 2024 03:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost (unknown [124.16.138.129])
-	by APP-05 (Coremail) with SMTP id zQCowAAH6Azo1ZRltG4VAw--.33879S2;
-	Wed, 03 Jan 2024 11:35:05 +0800 (CST)
-From: Chen Ni <nichen@iscas.ac.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	christian.riesch@omicron.at,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Chen Ni <nichen@iscas.ac.cn>
-Subject: [PATCH] asix: Add check for usbnet_get_endpoints
-Date: Wed,  3 Jan 2024 03:35:34 +0000
-Message-Id: <20240103033534.2764386-1-nichen@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6A3171C8
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 03:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4T4b7M2RJxz29jXC;
+	Wed,  3 Jan 2024 11:39:27 +0800 (CST)
+Received: from dggpemm500017.china.huawei.com (unknown [7.185.36.178])
+	by mail.maildlp.com (Postfix) with ESMTPS id E2EB11400D6;
+	Wed,  3 Jan 2024 11:40:52 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm500017.china.huawei.com (7.185.36.178) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 3 Jan 2024 11:40:52 +0800
+Received: from [10.67.121.229] (10.67.121.229) by
+ dggpemm500007.china.huawei.com (7.185.36.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 3 Jan 2024 11:40:52 +0800
+Subject: Re: [RFC iproute2 6/8] rdma: do not mix newline and json object
+To: Stephen Hemminger <stephen@networkplumber.org>, <leon@kernel.org>
+References: <20240103003558.20615-1-stephen@networkplumber.org>
+ <20240103003558.20615-7-stephen@networkplumber.org>
+CC: <netdev@vger.kernel.org>
+From: Chengchang Tang <tangchengchang@huawei.com>
+Message-ID: <99fbc115-c865-c4f8-31d6-9cd157646481@huawei.com>
+Date: Wed, 3 Jan 2024 11:40:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAAH6Azo1ZRltG4VAw--.33879S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrtw1kCr17Cw1DCF4fAF4fKrg_yoW3tFg_u3
-	y8W3Z8Jr1UKr4Fgw1DWF4avFWYyF1kXr1xZF48ta4aqa4qq3W3Arn2v3srJ3W7WFWYvwnr
-	Cw1IyFyfJry7KjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbc8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc2xSY4AK67AK6r48
-	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
-	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
-	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
-	W8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
-	cVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUYnYwUUUUU
-X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
+In-Reply-To: <20240103003558.20615-7-stephen@networkplumber.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
 
-Add check for usbnet_get_endpoints() and return the error if it fails
-in order to transfer the error.
 
-Fixes: 16626b0cc3d5 ("asix: Add a new driver for the AX88172A")
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
----
- drivers/net/usb/ax88172a.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/usb/ax88172a.c b/drivers/net/usb/ax88172a.c
-index 3777c7e2e6fc..e47bb125048d 100644
---- a/drivers/net/usb/ax88172a.c
-+++ b/drivers/net/usb/ax88172a.c
-@@ -161,7 +161,9 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
- 	u8 buf[ETH_ALEN];
- 	struct ax88172a_private *priv;
- 
--	usbnet_get_endpoints(dev, intf);
-+	ret = usbnet_get_endpoints(dev, intf);
-+	if (ret)
-+		return ret;
- 
- 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
--- 
-2.25.1
+On 2024/1/3 8:34, Stephen Hemminger wrote:
+> Mixing the semantics of ending lines with the json object
+> leads to several bugs where json object is closed twice, etc.
+> Replace by breaking the meaning of newline() function into
+> two parts.
+
+These codes fix the issue mentioned in:
+https://lore.kernel.org/netdev/20231229065241.554726-1-huangjunxian6@hisilicon.com/T/#m5476970400a2d6f2b9b8f3f369d8a26b9663d4b9
+
+Might it need a fixes ?
+
+Fixes: 331152752a97 ("rdma: print driver resource attributes")
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+>   rdma/dev.c      |  3 ++-
+>   rdma/link.c     |  4 +++-
+>   rdma/rdma.h     |  5 +++--
+>   rdma/res-cmid.c |  3 ++-
+>   rdma/res-cq.c   |  7 +++++--
+>   rdma/res-ctx.c  |  3 ++-
+>   rdma/res-mr.c   |  6 ++++--
+>   rdma/res-pd.c   |  4 ++--
+>   rdma/res-qp.c   |  6 ++++--
+>   rdma/res-srq.c  |  6 ++++--
+>   rdma/res.c      |  4 +++-
+>   rdma/stat-mr.c  |  3 ++-
+>   rdma/stat.c     | 17 ++++++++++-------
+>   rdma/utils.c    | 16 +++++-----------
+>   14 files changed, 51 insertions(+), 36 deletions(-)
+>
+> diff --git a/rdma/dev.c b/rdma/dev.c
+> index 31868c6fe43e..c8cb6d675c3b 100644
+>
+< ... >
+> index aeb627be7715..64f598c5aa8f 100644
+> --- a/rdma/utils.c
+> +++ b/rdma/utils.c
+> @@ -771,16 +771,10 @@ struct dev_map *dev_map_lookup(struct rd *rd, bool allow_port_index)
+>   
+>   #define nla_type(attr) ((attr)->nla_type & NLA_TYPE_MASK)
+>   
+> -void newline(struct rd *rd)
+> +void print_nl_indent(void)
+>   {
+> -	close_json_object();
+> -	print_nl();
+> -}
+> -
+> -void newline_indent(struct rd *rd)
+> -{
+> -	newline(rd);
+> -	print_string(PRINT_FP, NULL, "    ", NULL);
+> +	if (!is_json_context())
+> +		printf("%s    ", _SL_);
+>   }
+>   
+>   static int print_driver_string(struct rd *rd, const char *key_str,
+> @@ -920,7 +914,7 @@ void print_driver_table(struct rd *rd, struct nlattr *tb)
+>   	if (!rd->show_driver_details || !tb)
+>   		return;
+>   
+> -	newline_indent(rd);
+> +	print_nl_indent();
+>   
+>   	/*
+>   	 * Driver attrs are tuples of {key, [print-type], value}.
+> @@ -932,7 +926,7 @@ void print_driver_table(struct rd *rd, struct nlattr *tb)
+>   	mnl_attr_for_each_nested(tb_entry, tb) {
+>   
+>   		if (cc > MAX_LINE_LENGTH) {
+> -			newline_indent(rd);
+> +			print_nl_indent();
+>   			cc = 0;
+>   		}
+>   		if (rd_attr_check(tb_entry, &type) != MNL_CB_OK)
 
 
