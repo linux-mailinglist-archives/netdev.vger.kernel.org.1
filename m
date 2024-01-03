@@ -1,138 +1,86 @@
-Return-Path: <netdev+bounces-61092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9AED8226D0
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 03:16:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D748226CC
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 03:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D7171F225FD
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 02:16:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 381DA1F22640
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 02:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A30136B;
-	Wed,  3 Jan 2024 02:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B3F111B;
+	Wed,  3 Jan 2024 02:15:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.65.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp87.cstnet.cn [159.226.251.87])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3725A1FBA
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 02:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp63t1704248109t9y7w1lp
-Received: from wxdbg.localdomain.com ( [36.20.47.11])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 03 Jan 2024 10:15:08 +0800 (CST)
-X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: 2w1wQVt6itSJ4t4UkohjrXYhkjQUhRQXmtnBsK3PI7YB0ER74H2yIlBk7fMYE
-	7F1eXXQe1Lzihs99Gjeex1PvV5uJ+YiSxCzenjPVMMDvygyHKrABvz0KU72oIyoBOBRhME2
-	Z+zesllD5Ysst/GN6aZkl01OalLBAIRpkEuZocW3uBN5szEuaNVu4ZW4S2nMQouO94+ulAl
-	iA64oQUYrUhnaj9i4yJilmXG2lulebFLN3HQVT5PuzXRjGdzUyTncnwjB6OP8O5+KECf0KP
-	I5d5Bd3t20E2OnLl1hl2UV563vbknKsqQ2jrxg2Zfb6D2v9qt0PN09c4k5aGyoTd+rxj4Ur
-	4PShpDPTdEWSlO9QPz5e84pYAvQ2oXWROqGZ/n4bQXqEYZQ/SyX0+Minb0hBtBwvrqKlZMm
-	9TWbmodsyv4=
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 10640750423024535590
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v7 8/8] net: wangxun: add ethtool_ops for msglevel
-Date: Wed,  3 Jan 2024 10:08:54 +0800
-Message-Id: <20240103020854.1656604-9-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20240103020854.1656604-1-jiawenwu@trustnetic.com>
-References: <20240103020854.1656604-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F27E1846;
+	Wed,  3 Jan 2024 02:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
+Received: from mengjingzi$iie.ac.cn ( [121.195.114.118] ) by
+ ajax-webmail-APP-17 (Coremail) ; Wed, 3 Jan 2024 10:15:16 +0800 (GMT+08:00)
+Date: Wed, 3 Jan 2024 10:15:16 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5a2f5pWs5ae/?= <mengjingzi@iie.ac.cn>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: suggestions for capability checks in ldisc_open()
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.15 build 20230921(8ad33efc)
+ Copyright (c) 2002-2024 www.mailtech.cn cnic.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+Message-ID: <7483af43.c3b3.18ccd1a862a.Coremail.mengjingzi@iie.ac.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:qgCowAAHk+k1w5RlFA8DAA--.33811W
+X-CM-SenderInfo: pphqwyxlqj6xo6llvhldfou0/1tbiDAcFE2WUwEQKjgAAss
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-Add support to get and set msglevel for driver txgbe and ngbe.
-
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/ethernet/wangxun/libwx/wx_ethtool.c  | 16 ++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_ethtool.h  |  2 ++
- drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c |  2 ++
- .../net/ethernet/wangxun/txgbe/txgbe_ethtool.c   |  2 ++
- 4 files changed, 22 insertions(+)
-
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index 96f417aea8e4..cc3bec42ed8e 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -405,3 +405,19 @@ int wx_set_channels(struct net_device *dev,
- 	return 0;
- }
- EXPORT_SYMBOL(wx_set_channels);
-+
-+u32 wx_get_msglevel(struct net_device *netdev)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	return wx->msg_enable;
-+}
-+EXPORT_SYMBOL(wx_get_msglevel);
-+
-+void wx_set_msglevel(struct net_device *netdev, u32 data)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	wx->msg_enable = data;
-+}
-+EXPORT_SYMBOL(wx_set_msglevel);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-index ec4ad84c03b9..600c3b597d1a 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-@@ -38,4 +38,6 @@ void wx_get_channels(struct net_device *dev,
- 		     struct ethtool_channels *ch);
- int wx_set_channels(struct net_device *dev,
- 		    struct ethtool_channels *ch);
-+u32 wx_get_msglevel(struct net_device *netdev);
-+void wx_set_msglevel(struct net_device *netdev, u32 data);
- #endif /* _WX_ETHTOOL_H_ */
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index 348f3d8aca8b..786a652ae64f 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -128,6 +128,8 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
- 	.set_coalesce		= wx_set_coalesce,
- 	.get_channels		= wx_get_channels,
- 	.set_channels		= ngbe_set_channels,
-+	.get_msglevel		= wx_get_msglevel,
-+	.set_msglevel		= wx_set_msglevel,
- };
- 
- void ngbe_set_ethtool_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index 0f16c3fc0257..db675512ce4d 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -92,6 +92,8 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.set_coalesce		= wx_set_coalesce,
- 	.get_channels		= wx_get_channels,
- 	.set_channels		= txgbe_set_channels,
-+	.get_msglevel		= wx_get_msglevel,
-+	.set_msglevel		= wx_set_msglevel,
- };
- 
- void txgbe_set_ethtool_ops(struct net_device *netdev)
--- 
-2.27.0
-
+SGkhIAoKRHVyaW5nIG91ciBjb2RlIHJldmlldywgd2UgbWF5IGhhdmUgb2JzZXJ2ZWQgYW4gaW5h
+cHByb3ByaWF0ZSBjYXBhYmlsaXR5IGNoZWNrIGluIHRoZSBsZGlzY19vcGVuKCkgZnVuY3Rpb24u
+IEN1cnJlbnRseSwgYm90aCBDQVBfU1lTX0FETUlOIGFuZCBDQVBfU1lTX1RUWV9DT05GSUcgYXJl
+IGNoZWNrZWQgYXQgdGhlIGVudHJ5IHBvaW50LiBXZSBwcm9wb3NlIHJlY29uc2lkZXJpbmcgdXNp
+bmcgQ0FQX1NZU19UVFlfQ09ORklHIGFsb25lIGZvciB0dHktcmVsYXRlZCBvcGVyYXRpb25zIGFu
+ZCBhZGRpbmcgYSBDQVBfTkVUX0FETUlOIGNoZWNrIGZvciBuZXR3b3JrLXJlbGF0ZWQgb3BlcmF0
+aW9ucy4gSGVyZSdzIG91ciByYXRpb25hbGUgZm9yIHRoaXMgc3VnZ2VzdGlvbjoKCigxKSBGdW5j
+dGlvbmFsaXR5IFVuZGVyIFByb3RlY3Rpb246IFRoZSBwcml2aWxlZ2VkIGZ1bmN0aW9ucyBmb2xs
+b3dpbmcgdGhlIGNhcGFiaWxpdHkgY2hlY2tzIHByaW1hcmlseSBpbnZvbHZlIHR0eSBvcGVyYXRp
+b25zLCBhbmQgYWNjb3JkaW5nIHRvIHRoZSBjYXBhYmlsaXR5IG1hbnVhbCBwYWdlWzFdLCBDQVBf
+U1lTX1RUWV9DT05GSUcgaXMgYSBtb3JlIGZpdHRpbmcgY2FwYWJpbGl0eShDQVBfU1lTX1RUWV9D
+T05GSUc6IGVtcGxveSB2YXJpb3VzIHByaXZpbGVnZWQgb3BlcmF0aW9ucyBvbiB2aXJ0dWFsIHRl
+cm1pbmFscykuCiAKKDIpIENhdXRpb24gd2l0aCBDQVBfU1lTX0FETUlOOiBEZXZlbG9wZXJzIHRl
+bmQgdG8gYXNzdW1lIHRoYXQgQ0FQX1NZU19BRE1JTiBjb250YWlucyBvdGhlciBjYXBhYmlsaXRp
+ZXMsIHdoaWNoIG1heSBiZSB0aGUgcmVhc29uIGZvciB0aGUgdHdvIGNhcGFiaWxpdGllcyBleGFt
+aW5lZCBoZXJlLiBCdXQgYWNjb3JkaW5nIHRvIGNhcGFiaWxpdHkgbWFudWFsIHBhZ2VbMV0sIOKA
+nExpbnV4IGRpdmlkZXMgc3VwZXJ1c2VyIGludG8gZGlzdGluY3QgdW5pdHPigJ0sIGNhcGFiaWxp
+dGllcyBzaG91bGQgYmUgaW5kZXBlbmRlbnQgb2YgZWFjaCBvdGhlci4gQ0FQX1NZU19BU01JTiBp
+cyBhbHJlYWR5IG92ZXJsb2FkZWQgYW5kIGtub3duIGFzIHRoZSBuZXcgInJvb3QiWzJdLCB0aGUg
+bWFudWFsIHBhZ2VbMV0gYWxzbyBjbGVhcmx5IHN0YXRlcywg4oCcRG9uJ3QgY2hvb3NlIENBUF9T
+WVNfQURNSU4gaWYgeW91IGNhbiBwb3NzaWJseSBhdm9pZCBpdCHigJ0uIFVzaW5nIGEgbW9yZSBz
+cGVjaWZpYyBjYXBhYmlsaXR5IGhlbHBzIHRvIGFjaGlldmUgbGVhc3QgcHJpdmlsZWdlLgoKKDMp
+IE5ldHdvcmstUmVsYXRlZCBPcGVyYXRpb25zOiBsZGlzY19vcGVuKCkgYWxzbyBlbmdhZ2VzIGlu
+IG5ldHdvcmstcmVsYXRlZCBmdW5jdGlvbnMsIHN1Y2ggYXMgYWxsb2NfbmV0ZGV2KCksIG5ldGRl
+dl9wcml2KCksIGFuZCByZWdpc3Rlcl9uZXRkZXZpY2UoKS4gSW4gc2ltaWxhciBzY2VuYXJpb3Ms
+IHRoZXNlIG5ldHdvcmsgZnVuY3Rpb25zIGFyZSB0eXBpY2FsbHkgcHJvdGVjdGVkIGJ5IENBUF9O
+RVRfQURNSU4sIGZvciBleGFtcGxlIGluIG1raXNzX29wZW4oKS4gVGhpcyBjb25zaXN0ZW5jeSBh
+Y3Jvc3MgdGhlIGtlcm5lbCBjYW4gaGVscCBtYWludGFpbiBjbGFyaXR5IGFuZCBzdGFuZGFyZGl6
+YXRpb24uCgpUaGlzIGlzc3VlIGV4aXN0cyBpbiBzZXZlcmFsIGtlcm5lbCB2ZXJzaW9ucyBhbmQg
+d2UgaGF2ZSBjaGVja2VkIGl0IG9uIHRoZSBsYXRlc3Qgc3RhYmxlIHJlbGVhc2UoTGludXggNi42
+LjkpLiAKCllvdXIgaW5zaWdodHMgYW5kIGZlZWRiYWNrIG9uIHRoaXMgcHJvcG9zZWQgbW9kaWZp
+Y2F0aW9uIHdvdWxkIGJlIGhpZ2hseSB2YWx1YWJsZS4gVGhhbmsgeW91IGZvciB5b3VyIHRpbWUg
+YW5kIGNvbnNpZGVyYXRpb24uCgpCZXN0IHJlZ2FyZHMsCkppbmd6aQoKCnJlZmVyZW5jZToKWzFd
+IGh0dHBzOi8vd3d3Lm1hbjcub3JnL2xpbnV4L21hbi1wYWdlcy9tYW43L2NhcGFiaWxpdGllcy43
+Lmh0bWwKWzJdIGh0dHBzOi8vbHduLm5ldC9BcnRpY2xlcy80ODYzMDYv
 
