@@ -1,176 +1,119 @@
-Return-Path: <netdev+bounces-61336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25E6F823742
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:48:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F557823746
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A122D28794E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:48:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14FB31F25D66
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242921D6BC;
-	Wed,  3 Jan 2024 21:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1AE1DA26;
+	Wed,  3 Jan 2024 21:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="3f7b8KLQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bE7I7rp2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5231DA21
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 21:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-28bcc273833so8906005a91.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 13:48:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE521DA21;
+	Wed,  3 Jan 2024 21:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cce6bb9b48so57363931fa.1;
+        Wed, 03 Jan 2024 13:50:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1704318530; x=1704923330; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nJO/ReneTQmtZaxfoyQCQTUAhMBIeXTA4hnc2FghT+4=;
-        b=3f7b8KLQJg7hKDkODbb7hB5N+wlG0akuwiN2ba0dmcg61I/ONvLT4Ffy0n/QSqN4y5
-         ucN79qV17SaSx2oxSgctoF6x72oP9wUpPsb2Hyij8SQdCvAgwim4s5vxVrOffVvZqL/S
-         hf5uAug8yMpKlde9HjESY67y6XFT4wop6KS5ALG5Zy1fg9DPPq7WuHFUdlCmXVo/ATOH
-         lBbKMnIOKLtswC8gnoYU5xi7EnOGpOK889+oNd2WKjIHceUAWxm1uldwB9sSKS2s+Z6L
-         Q2fa8mpk/ixPY7coQyHBmnEYt5CmcB5PhbPegXOsAcFRbIkKbF5EJwTLYgQC/U79uFRr
-         4BpQ==
+        d=gmail.com; s=20230601; t=1704318618; x=1704923418; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=aUL3qmp8YyJgWnCTGwj76mcYbxOhNMbAwT7dZHuyZLE=;
+        b=bE7I7rp2ZHRU3CiKEqNmMClEw6oEJfJ8+g/soopZC78zongH3Otu/1nWacM0YJowDg
+         IdDdznCojwhdeyp2i8Ypbg98d62RcgExtvSm7VuA3kDeYfFQBfVDEdpvT99PnqemOpKe
+         drJD70+0OaSqhMg8OosDA60A26d0yUMKQVP2/v5nbgYtWDwK48hFledUx0ajuv0UtcRx
+         CB2hWHbTuTN4MnkFSJtlQ+nWYSpJxt38XUTzyRlHLCE7yg220bSJkaWkU3f30k7Rwz8r
+         Fn8TM/aqRYGEO98mh1b+8yUyVH2R9ifhvRaX69KR0VKMMuvD6XywT7glTMu6kn2SFgsn
+         QN3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704318530; x=1704923330;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nJO/ReneTQmtZaxfoyQCQTUAhMBIeXTA4hnc2FghT+4=;
-        b=nMJh1QC9/RbkmtwJ/HPK2GTwVW5Ot26ZOtLksQTPUGTz59J95jX8OHvLwMSEPa0cCD
-         Jsn/33rPU24/wu/K7RdTyd1/MPaxMdtxGb0ehwYPQBN1ba3nueu2NtLXZePDNr5jmrz/
-         96VsOw5Tt3aPs1ItDzETihMC0baRB2Q9kxgntIqfWVsy96m9SjBqpcR/vimfB90+Axiy
-         gv0r5WRrHvJBEEuu06uS2q7I/rW59k6xyQO2DcnCT0SwGpW9lRNCuNQ4N/fqkZvYZl1Q
-         o/FVNF6e49GOXE3pY7CPJQV+zQ1Rxo7u7u42fKONlcJBu9gTE26aXabow8coXKDqWJNx
-         vJBQ==
-X-Gm-Message-State: AOJu0YykywGAUy1XNGWSQy59XJ1iIfd9/HzT2oS77/CWaTPan8xQ5Y9N
-	UKAR1eINcGKJ85kLgfy0iITlEs+PzrdzCcFYq68vpca0NnLRTLRh
-X-Google-Smtp-Source: AGHT+IEIpJSWByDGJfx9lIYVu2OTwUiljtrgMkaLrQ/9kWA0AiGkov+EEZlC6hS9SpNKcl2hw74N4g==
-X-Received: by 2002:a17:90a:c68b:b0:28c:ab21:6a9 with SMTP id n11-20020a17090ac68b00b0028cab2106a9mr5109354pjt.1.1704318529808;
-        Wed, 03 Jan 2024 13:48:49 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1156:a:897:c73b:17c6:3432? ([2620:10d:c090:500::4:9b01])
-        by smtp.gmail.com with ESMTPSA id y2-20020a17090a134200b0028ae54d988esm2290373pjf.48.2024.01.03.13.48.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jan 2024 13:48:49 -0800 (PST)
-Message-ID: <5002405d-55ab-4f55-9558-d05e6e54117e@davidwei.uk>
-Date: Wed, 3 Jan 2024 13:48:47 -0800
+        d=1e100.net; s=20230601; t=1704318618; x=1704923418;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aUL3qmp8YyJgWnCTGwj76mcYbxOhNMbAwT7dZHuyZLE=;
+        b=q2VlWJYqKCAARPkq2gb9X5jcXrsDFTT0kTqg7OAFVJOxP2IKHNCOOij1LYnIJQPA6r
+         RkThbWsNwOX4JpyGoE4sadROUrbq8bPm9OHR+ureq04gUXO2WzOh10FvamihCEuQgZKP
+         4cxqE7jQ750A++x+ql4TonotDRdttE9z9kVS5H6Md6SV6apw3tS9RHKQ9B9yQw0GBLFn
+         P7QT/tM40O0g2FZCy0LwTcxDi9/YTFveH5kdqWkTQ+v4IcBIA049NwWC4e2CKJyarLVI
+         MBIZcfZbx7CrpFhVTwvM17tX3a+Z+eclrlN2o3Jy1Pe+llG8QqKFJS3aQNS6H+7m5vsJ
+         NpmQ==
+X-Gm-Message-State: AOJu0YwBOw6db9BQyB4g66kvH1KoDnBQ6+7XcBomZplj5y0ijKUaK+Ar
+	M46mTAy4KfkmSlE/ZTte/WtrJvUN8gs+Q3PqoH8=
+X-Google-Smtp-Source: AGHT+IHDPheYVtEU2gvbcDYItqdryUAsUg7Fw8MTJXuIYUjp1Z93npevJoMlhK+cRfgkblV86K8SbtYNNXfYeFatlxQ=
+X-Received: by 2002:a2e:9684:0:b0:2cc:1e7b:3612 with SMTP id
+ q4-20020a2e9684000000b002cc1e7b3612mr4209336lji.65.1704318617657; Wed, 03 Jan
+ 2024 13:50:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/5] netdevsim: maintain a list of probed
- netdevsims
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-References: <20231228014633.3256862-1-dw@davidwei.uk>
- <20231228014633.3256862-2-dw@davidwei.uk> <ZZPtsfyHfDyuqfxM@nanopsycho>
-Content-Language: en-GB
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <ZZPtsfyHfDyuqfxM@nanopsycho>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231220045228.27079-2-luizluca@gmail.com> <ZZPtUIRerqTI2/yh@shell.armlinux.org.uk>
+ <CAJq09z61JRNOBy6zLJ+D2pOVP-FCkofLjNghHSOkFJ=5q=6utQ@mail.gmail.com>
+ <ZZU1SJlKpeU38c9I@shell.armlinux.org.uk> <ZZVMiPCoDyv/NZXN@shell.armlinux.org.uk>
+In-Reply-To: <ZZVMiPCoDyv/NZXN@shell.armlinux.org.uk>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Wed, 3 Jan 2024 18:50:06 -0300
+Message-ID: <CAJq09z56GmDhbZUWR_s+thOfu0WB47o66X3_Ko3KyTk44inMCg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: mdio: get/put device node during (un)registration
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 2024-01-02 03:04, Jiri Pirko wrote:
-> Thu, Dec 28, 2023 at 02:46:29AM CET, dw@davidwei.uk wrote:
->> In this patch I added a linked list nsim_dev_list of probed nsim_devs,
->> added during nsim_drv_probe() and removed during nsim_drv_remove(). A
->> mutex nsim_dev_list_lock protects the list.
->>
->> Signed-off-by: David Wei <dw@davidwei.uk>
->> ---
->> drivers/net/netdevsim/dev.c       | 19 +++++++++++++++++++
->> drivers/net/netdevsim/netdevsim.h |  1 +
->> 2 files changed, 20 insertions(+)
->>
->> diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
->> index b4d3b9cde8bd..8d477aa99f94 100644
->> --- a/drivers/net/netdevsim/dev.c
->> +++ b/drivers/net/netdevsim/dev.c
->> @@ -35,6 +35,9 @@
->>
->> #include "netdevsim.h"
->>
->> +static LIST_HEAD(nsim_dev_list);
->> +static DEFINE_MUTEX(nsim_dev_list_lock);
->> +
->> static unsigned int
->> nsim_dev_port_index(enum nsim_dev_port_type type, unsigned int port_index)
->> {
->> @@ -1607,6 +1610,11 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
->>
->> 	nsim_dev->esw_mode = DEVLINK_ESWITCH_MODE_LEGACY;
->> 	devl_unlock(devlink);
->> +
->> +	mutex_lock(&nsim_dev_list_lock);
->> +	list_add(&nsim_dev->list, &nsim_dev_list);
->> +	mutex_unlock(&nsim_dev_list_lock);
->> +
->> 	return 0;
->>
->> err_hwstats_exit:
->> @@ -1668,8 +1676,19 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
->> {
->> 	struct nsim_dev *nsim_dev = dev_get_drvdata(&nsim_bus_dev->dev);
->> 	struct devlink *devlink = priv_to_devlink(nsim_dev);
->> +	struct nsim_dev *pos, *tmp;
->> +
->> +	mutex_lock(&nsim_dev_list_lock);
->> +	list_for_each_entry_safe(pos, tmp, &nsim_dev_list, list) {
->> +		if (pos == nsim_dev) {
->> +			list_del(&nsim_dev->list);
->> +			break;
->> +		}
->> +	}
->> +	mutex_unlock(&nsim_dev_list_lock);
-> 
-> This is just:
-> 	mutex_lock(&nsim_dev_list_lock);
-> 	list_del(&nsim_dev->list);
-> 	mutex_unlock(&nsim_dev_list_lock);
-> 
-> The loop is not good for anything.
+> Please test to check that this addresses your issue. Thanks.
+>
+> diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+> index 6cf73c15635b..afbad1ad8683 100644
+> --- a/drivers/net/phy/mdio_bus.c
+> +++ b/drivers/net/phy/mdio_bus.c
+> @@ -193,6 +193,10 @@ static void mdiobus_release(struct device *d)
+>              bus->state != MDIOBUS_ALLOCATED,
+>              "%s: not in RELEASED or ALLOCATED state\n",
+>              bus->id);
+> +
+> +       if (bus->state == MDIOBUS_RELEASED)
+> +               fwnode_handle_put(dev_fwnode(d));
+> +
+>         kfree(bus);
+>  }
+>
+> @@ -684,6 +688,15 @@ int __mdiobus_register(struct mii_bus *bus, struct module *owner)
+>         bus->dev.groups = NULL;
+>         dev_set_name(&bus->dev, "%s", bus->id);
+>
+> +       /* If the bus state is allocated, we're registering a fresh bus
+> +        * that may have a fwnode associated with it. Grab a reference
+> +        * to the fwnode. This will be dropped when the bus is released.
+> +        * If the bus was set to unregistered, it means that the bus was
+> +        * previously registered, and we've already grabbed a reference.
+> +        */
+> +       if (bus->state == MDIOBUS_ALLOCATED)
+> +               fwnode_handle_get(dev_fwnode(&bus->dev));
+> +
+>         /* We need to set state to MDIOBUS_UNREGISTERED to correctly release
+>          * the device in mdiobus_free()
+>          *
+> --
 
-Thanks, will fix this.
+Thanks Russel. It is much better than my approach. You simply get/put
+during registration/unregistration when a node is defined, no matter
+who defined it (of_mdiobus_register or anything else). Clean and
+simple.
 
-> 
-> 
-> 
->>
->> 	devl_lock(devlink);
->> +
-> 
-> Remove this leftover line addition.
+Regards,
 
-Ditto.
-
-> 
-> 
->> 	nsim_dev_reload_destroy(nsim_dev);
->>
->> 	nsim_bpf_dev_exit(nsim_dev);
->> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
->> index 028c825b86db..babb61d7790b 100644
->> --- a/drivers/net/netdevsim/netdevsim.h
->> +++ b/drivers/net/netdevsim/netdevsim.h
->> @@ -277,6 +277,7 @@ struct nsim_vf_config {
->>
->> struct nsim_dev {
->> 	struct nsim_bus_dev *nsim_bus_dev;
->> +	struct list_head list;
->> 	struct nsim_fib_data *fib_data;
->> 	struct nsim_trap_data *trap_data;
->> 	struct dentry *ddir;
->> -- 
->> 2.39.3
->>
+Luiz
 
