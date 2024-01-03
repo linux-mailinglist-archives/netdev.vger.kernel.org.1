@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-61063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652D08225D4
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 01:10:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA1868225E5
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 01:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1555D1F22835
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 00:10:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC00F1C21AE9
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 00:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181C563F;
-	Wed,  3 Jan 2024 00:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC74737E;
+	Wed,  3 Jan 2024 00:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8l4fP+f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5qKZiw/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB8C632
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 00:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AC1F4C433CC;
-	Wed,  3 Jan 2024 00:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAB6364;
+	Wed,  3 Jan 2024 00:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 05128C433C9;
+	Wed,  3 Jan 2024 00:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704240624;
-	bh=wXZiKTIkjpRj7GdxkuEQnqZIOijMUTjcofi9s6s6vBs=;
+	s=k20201202; t=1704241225;
+	bh=m/YtIRosK7AiMzo6ZLongGReudykuxF9y3ocqvW6R7w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g8l4fP+fHV8zFqChrJgAkyRfUBneQNUL+2KEZOtuAzrjTrWBsj1qIZiI0peh8efPW
-	 ulgiePDHvx4yTGVdpUzNsSNagi1Sr0ywRVSaE49sWNQIhN8Kw8660sSXXLDoHFNp1u
-	 1TUxAJWE+2pUrTY3gDVhl8hqPO7P/Kad2UhR6dnzmTnizJTFgAdJAey+NFCsUtjtHP
-	 L+vQhmWUiv7rlLjodp1PegT7TO09EckFDGMdu+wlTJJZfqdtK8LSpubwwtKlGBHSkx
-	 KYiD+DU+MeNVyzbqpON+/+/kKU7E3ea9UqQ2omKfRCFh0eERTNX4yt1n69eQ0f1QG7
-	 ljg3txkgOx/0g==
+	b=f5qKZiw/REbZx47AsPFOpYVfyQYr32QPrNhfBtyzcTaphRYlUbroehMv2hNScRNhP
+	 rxMsxFIwiSHP1yw/oMsB52n7JiwqO8s8fD7i/kYSaOPI3y+MoOEximvmH2327LC0tL
+	 RcT9II93mmm4tlh4g8bQ1oFk+Y6f9JPiN/X3iwdwexfDR6Uwdal3gOk0e9TzN4qZgk
+	 GlMi47EwYWPVAT/49vEYXz+L8avtnc3vJB2Iil7P8MlwxSjfovGFJ+fE3LOudxyqbB
+	 WH71HeARxawo+kOb8ek5gTMpf8N1kYkvKSZf1rZOJL5Kv9VXcKCrerdJ0cvixsmZ2o
+	 mn6YI6MADHfaQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 961D8DCB6D1;
-	Wed,  3 Jan 2024 00:10:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DC903DCB6D1;
+	Wed,  3 Jan 2024 00:20:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,41 +43,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] Bug fixes for RSS symmetric-xor 
+Subject: Re: [PATCH net 0/2] mptcp: new reviewer and prevent a warning
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170424062461.8088.3644871226519179265.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Jan 2024 00:10:24 +0000
-References: <20231221184235.9192-1-ahmed.zaki@intel.com>
-In-Reply-To: <20231221184235.9192-1-ahmed.zaki@intel.com>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, corbet@lwn.net, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, vladimir.oltean@nxp.com, andrew@lunn.ch,
- horms@kernel.org, mkubecek@suse.cz, willemdebruijn.kernel@gmail.com,
- gal@nvidia.com, alexander.duyck@gmail.com, ecree.xilinx@gmail.com
+ <170424122489.12524.14018674920048838370.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Jan 2024 00:20:24 +0000
+References: <20231226-upstream-net-20231226-mptcp-prevent-warn-v1-0-1404dcc431ea@kernel.org>
+In-Reply-To: <20231226-upstream-net-20231226-mptcp-prevent-warn-v1-0-1404dcc431ea@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang.tang@linux.dev,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org,
+ syzbot+5a01c3a666e726bc8752@syzkaller.appspotmail.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 21 Dec 2023 11:42:33 -0700 you wrote:
-> A couple of fixes for the symmetric-xor recently merged in net-next [1].
+On Tue, 26 Dec 2023 13:10:16 +0100 you wrote:
+> Patch 1 adds MPTCP long time contributor -- Geliang Tang -- as a new
+> reviewer for the project. Thanks!
 > 
-> The first patch copies the xfrm value back to user-space when ethtool is
-> built with --disable-netlink. The second allows ethtool to change other
-> RSS attributes while not changing the xfrm values.
-> 
-> Link: https://lore.kernel.org/netdev/20231213003321.605376-1-ahmed.zaki@intel.com/ [1]
+> Patch 2 prevents a warning when TCP Diag is used to close internal MPTCP
+> listener subflows. This is a correction for a patch introduced in v6.4
+> which was fixing an issue from v5.17.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net: ethtool: copy input_xfrm to user-space in ethtool_get_rxfh
-    https://git.kernel.org/netdev/net-next/c/7c402f77e8cb
-  - [net-next,2/2] net: ethtool: add a NO_CHANGE uAPI for new RXFH's input_xfrm
-    https://git.kernel.org/netdev/net-next/c/0dd415d15505
+  - [net,1/2] MAINTAINERS: add Geliang as reviewer for MPTCP
+    https://git.kernel.org/netdev/net/c/118ba479d02c
+  - [net,2/2] mptcp: prevent tcp diag from closing listener subflows
+    https://git.kernel.org/netdev/net/c/4c0288299fd0
 
 You are awesome, thank you!
 -- 
