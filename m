@@ -1,73 +1,90 @@
-Return-Path: <netdev+bounces-61180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58317822C7F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:59:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E5B822C94
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:02:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBB821F232BC
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:59:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0C01C22E5A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6165318EBD;
-	Wed,  3 Jan 2024 11:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3051F18EA9;
+	Wed,  3 Jan 2024 12:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8A016ia"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ao6Z6y1r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F661A710
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 11:56:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 434BFC433C7;
-	Wed,  3 Jan 2024 11:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160D219458;
+	Wed,  3 Jan 2024 12:00:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A9DBC433C8;
+	Wed,  3 Jan 2024 12:00:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704283013;
-	bh=vJ5jyGBw1lO0kwYBWY53912OTBGP2INGrhz5BagMxiI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R8A016ia/ba7fHAmbI7hljeAouDs4TNUaI1BZKoHlUvWdr9iU/brK+xo/k90Asl0K
-	 gDmeb3IELBONZfezK+NQaJMCJyRxnXq7zzoGtPwosjbMS4RgK9JRNXx4q4asgr+bP+
-	 OVt7rl4/mhQLN6PjLhDIHkt1o1zEAAn6wZqx5trxZNvprVHb+OfGiGuqbcRkBiKkFK
-	 7Q0DMkEvMM2gar9w5KrBMAB5kVnsfQenJA9gXKfX79tu94uAW6PvKax2H5MnxE6ip2
-	 2uThi4GwRfYee2K0UTquO3Gqy9mssm7qOH628i6jfaOp1X7Kn5qNKBGy/v4a7A20jn
-	 X00L+i5u3Uetg==
-Date: Wed, 3 Jan 2024 13:56:49 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2] rdma: shorten print_ lines
-Message-ID: <20240103115649.GC10748@unreal>
-References: <20240102164538.7527-1-stephen@networkplumber.org>
+	s=k20201202; t=1704283224;
+	bh=WPHbYr0OySUAical7UhRi7PEZSyrOoxFYTW714Fb9Jk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ao6Z6y1rSYB3mMyBe/6QOQW2Iwl6tftMTeATJfK8FBc2j2afTusSxQvrQFfi9N5Ri
+	 YqBKwXlARnF6fYRe2PpKSmUZ2luY+BDWE1sZfe6P2qZL7s0TU5LevZrLqOXqI5Dpv8
+	 mBPj5YPvnid2pC9/1BGf5KXD9caSpnXr9nenj7ttGScNLtAWZJeVMR24BA+UO8B0+3
+	 9hib9NhDCbiXzM3L2lw7/HOR0YWHlQsXKKjvEVYIA4hrsicWihpl5KFxU4B7JsuPfj
+	 uUaZfibWS6LAYOsuLJVKK6PjmJJVr2psw/cuACPThicVl8RRQQg6lqdDc0iXdflL1X
+	 qzZWXiEIRRT6Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 68355C00446;
+	Wed,  3 Jan 2024 12:00:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240102164538.7527-1-stephen@networkplumber.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net/sched: cls_api: complement
+ tcf_tfilter_dump_policy
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170428322442.1788.8455879320567617653.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Jan 2024 12:00:24 +0000
+References: <20231228064358.3042747-1-linma@zju.edu.cn>
+In-Reply-To: <20231228064358.3042747-1-linma@zju.edu.cn>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Jan 02, 2024 at 08:45:24AM -0800, Stephen Hemminger wrote:
-> With the shorter form of print_ function some of the lines can
-> now be shortened. Max line length in iproute2 should be 100 characters
-> or less.
-> 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> ---
->  rdma/dev.c     |  6 ++----
->  rdma/link.c    | 16 ++++++----------
->  rdma/res-cq.c  |  3 +--
->  rdma/res-qp.c  |  9 +++------
->  rdma/res-srq.c |  3 +--
->  rdma/res.c     | 11 ++++-------
->  rdma/stat.c    | 20 +++++++-------------
->  rdma/sys.c     | 10 +++-------
->  rdma/utils.c   | 15 +++++----------
->  9 files changed, 32 insertions(+), 61 deletions(-)
-> 
+Hello:
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 28 Dec 2023 14:43:58 +0800 you wrote:
+> In function `tc_dump_tfilter`, the attributes array is parsed via
+> tcf_tfilter_dump_policy which only describes TCA_DUMP_FLAGS. However,
+> the NLA TCA_CHAIN is also accessed with `nla_get_u32`.
+> 
+> The access to TCA_CHAIN is introduced in commit 5bc1701881e3 ("net:
+> sched: introduce multichain support for filters") and no nla_policy is
+> provided for parsing at that point. Later on, tcf_tfilter_dump_policy is
+> introduced in commit f8ab1807a9c9 ("net: sched: introduce terse dump
+> flag") while still ignoring the fact that TCA_CHAIN needs a check. This
+> patch does that by complementing the policy to allow the access
+> discussed here can be safe as other cases just choose rtm_tca_policy as
+> the parsing policy.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2] net/sched: cls_api: complement tcf_tfilter_dump_policy
+    https://git.kernel.org/netdev/net-next/c/2ab1efad60ad
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
