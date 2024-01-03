@@ -1,48 +1,46 @@
-Return-Path: <netdev+bounces-61340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A74782375E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:58:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB67C823765
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC583288ACB
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:58:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 020FE1C24126
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31541DA2E;
-	Wed,  3 Jan 2024 21:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315001D6BE;
+	Wed,  3 Jan 2024 22:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQwMt7hu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OL8mZ3z7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAE21DA28
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 21:58:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0904C433C7;
-	Wed,  3 Jan 2024 21:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114521DA2F;
+	Wed,  3 Jan 2024 22:00:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 374C9C433C8;
+	Wed,  3 Jan 2024 22:00:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704319084;
-	bh=7evY+Thk8UVxoNHyanWJrPDweTbRIRw+mgXt5AHtm8M=;
+	s=k20201202; t=1704319244;
+	bh=k5CUGvrfHkGy1Lx9icYwgm7BQoMqdETOkUMcv5h2qeQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZQwMt7huBv06cAhF2TyE8QHYuJa28TDZt4VUt15DgtGoN/DMoxf81uAVke5lOHp3V
-	 exjFz+Z8We6faTqI6yUkCGOEeb59NfZ9Ef1sMyPNEZMtwdBOBJz5Y8KolgrmCv5g/0
-	 ELErgWuebKOWO3Zl0pAyODYIcFXTmFdGWeyd5359eKMkU+mZSFqM+qrpn0FYzDoGNJ
-	 GbTGLGnSv4sGajvIwvjoGa8LMA1eVaPr3XU5Lqo2ec7kcVQ+/XJvUjUluet8LPj+Sn
-	 yVMBK4JluBkQ3u3vkLsaH4/2J7yCBQQB3J+6BeXY1cHXhERf/tZ2lBQ076UgB1DMqU
-	 y5+8BIS4qFqTw==
-Date: Wed, 3 Jan 2024 13:58:03 -0800
+	b=OL8mZ3z7zmPQUkuQWkDdkgBgCtn3j3s5osigBPmqq3EBCVCI2OgKnH/8NASp7sHH/
+	 fWiV6v31CTvyYw7vy5r21GVTHZzLJuYZhoU/nuZpniJ6tnYex/bmSbacXmJj5giYij
+	 Kstx2P3fwjD/HxdlTn3292Pum2OfJmFQYcPtcRP6b21nHyO1WRjDbQ93544OGWqhOk
+	 B3N9vsqCXuN1kf/UBFpeSDlZvmMwH/WEl+Buu+1zT2+7ptLVZd7wdeQv+PTvxrxXVv
+	 EqPUqsSSU4MtV3S9TttCbch25lUBQjW/8qKKlyMQtBSEc8NihTtLZEFB/QxZF/Z9mI
+	 88d8Y2PL2rQFA==
+Date: Wed, 3 Jan 2024 14:00:43 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- virtualization@lists.linux-foundation.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v2] virtio_net: fix missing dma unmap for resize
-Message-ID: <20240103135803.24dddfe9@kernel.org>
-In-Reply-To: <20231226094333.47740-1-xuanzhuo@linux.alibaba.com>
-References: <20231226094333.47740-1-xuanzhuo@linux.alibaba.com>
+To: Malkoot Khan <engr.mkhan1990@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] tcp: fixed whitespace trailing error
+Message-ID: <20240103140043.1b402839@kernel.org>
+In-Reply-To: <20231228164250.106433-1-engr.mkhan1990@gmail.com>
+References: <20231228164250.106433-1-engr.mkhan1990@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,30 +50,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Dec 2023 17:43:33 +0800 Xuan Zhuo wrote:
-> For rq, we have three cases getting buffers from virtio core:
-> 
-> 1. virtqueue_get_buf{,_ctx}
-> 2. virtqueue_detach_unused_buf
-> 3. callback for virtqueue_resize
-> 
-> But in commit 295525e29a5b("virtio_net: merge dma operations when
-> filling mergeable buffers"), I missed the dma unmap for the #3 case.
-> 
-> That will leak some memory, because I did not release the pages referred
-> by the unused buffers.
-> 
-> If we do such script, we will make the system OOM.
-> 
->     while true
->     do
->             ethtool -G ens4 rx 128
->             ethtool -G ens4 rx 256
->             free -m
->     done
-> 
-> Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+On Thu, 28 Dec 2023 16:42:50 +0000 Malkoot Khan wrote:
+> -		rtx_delta = tcp_time_stamp_ts(tp) - (tp->retrans_stamp ?: 
+> +		rtx_delta = tcp_time_stamp_ts(tp) - (tp->retrans_stamp ? :
 
-Michael, Jason, looks good? Worth pushing it to v6.7?
+Don't insert the space between the ? and :, tho, please.
+-- 
+pw-bot: cr
 
