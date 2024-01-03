@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-61221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65595822E6C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:33:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E3E8822E75
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:34:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9142B2340F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:33:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AB7D1F2456D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBB3199A2;
-	Wed,  3 Jan 2024 13:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1199E199BA;
+	Wed,  3 Jan 2024 13:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HQna5uzz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XOPE7FA/"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545481B280
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 13:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43513199BD
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 13:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -27,22 +27,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IEgas0JQm1hJblT1IpLnxc1qyOy27q9Fc71HcnAHZCM=; b=HQna5uzzNdhNROTPwc16RNsiSO
-	05AaNGlwGxL1dG7MwqiSWkCZZtCJINtn4W0e6vl3igaKFfFABsgwVkdWECWzInvnu9UfzQTbKx4Y3
-	nv7beYGtWL5W7+qP2UiaCNvEFECnezkSfBizP3xHQrf+Yvvj+r3CBNv4nLGHI6AZV4KE=;
+	bh=lSVHZCUyEx/vIJI0D/Su03VaOAn3/vd4dHR9T3vwN9I=; b=XOPE7FA/qulNtYWsoyNu178lTG
+	bx3Wz9QcHiScYU5xlVlOp0xUpw2vYPyOov53d2UWwY7aw/co/BUZIgig+Tm8fuuIOVtwEkqv9Mi+f
+	WweqPXov/OwRszbCrCRcIKOS/rMQ1/4C8EoFhKONlsoi6tmjrsiN6uqhCwdyh4D34RB4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rL1Ll-004Fz3-LX; Wed, 03 Jan 2024 14:32:01 +0100
-Date: Wed, 3 Jan 2024 14:32:01 +0100
+	id 1rL1Ng-004G0R-Dj; Wed, 03 Jan 2024 14:34:00 +0100
+Date: Wed, 3 Jan 2024 14:34:00 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King <rmk+kernel@armlinux.org.uk>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: mdio_bus: make check in
- mdiobus_prevent_c45_scan more granular
-Message-ID: <64fc51c9-760e-4ac2-aae0-5bd510a2d4c7@lunn.ch>
-References: <42e0d1c5-fdd2-4347-874d-2dab736abbdc@gmail.com>
- <3e99877a-6f85-4842-8418-584a8aaf03f7@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phylink: move phylink_pcs_neg_mode() into
+ phylink.c
+Message-ID: <dc8af2ad-24f7-4282-8aed-21d99cfc6d81@lunn.ch>
+References: <E1rKhg1-00EnlX-NI@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,23 +53,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3e99877a-6f85-4842-8418-584a8aaf03f7@gmail.com>
+In-Reply-To: <E1rKhg1-00EnlX-NI@rmk-PC.armlinux.org.uk>
 
-On Tue, Jan 02, 2024 at 08:53:12PM +0100, Heiner Kallweit wrote:
-> On 02.01.2024 16:54, Heiner Kallweit wrote:
-> > Matching on OUI level is a quite big hammer. So let's make matching
-> > more granular.
-> > 
-> > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> > ---
-> >  drivers/net/phy/mdio_bus.c | 16 +++++++++++-----
-> >  1 file changed, 11 insertions(+), 5 deletions(-)
-> > 
+On Tue, Jan 02, 2024 at 04:31:37PM +0000, Russell King (Oracle) wrote:
+> Move phylink_pcs_neg_mode() from the header file into the .c file since
+> nothing should be using it.
 > 
-> Shall we put this on hold until we better understand the root
-> cause of the original issue?
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Yes, lets wait for a while.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-     Andrew
+    Andrew
 
