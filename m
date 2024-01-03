@@ -1,65 +1,44 @@
-Return-Path: <netdev+bounces-61235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D61A6822F3C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:15:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE670822F44
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84A58283BCB
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:15:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 597CE284047
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9BE1A293;
-	Wed,  3 Jan 2024 14:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27CB61A29D;
+	Wed,  3 Jan 2024 14:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="LqsyvOKV"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Qe8NoxK+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB23F1A27E
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 14:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33678156e27so9617156f8f.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 06:15:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1704291335; x=1704896135; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zjreSabw8CzN94mx8h5dumFRh+tngguL/9HyCovmyjI=;
-        b=LqsyvOKVl/1aw680VuFR+JdCxzgEJZPPWI3j+JpgLAKgB4uuKu6V7NK6bPwh9BVXPb
-         mdgFdKdIEr4oTkUPNQMMez6B1AF4pKsH3/nhhJ4Sj6apOKjwoNuYpHUyLitZMKIUgEau
-         pm7WfPK4DoRYZ44JoIyyxnp9JHE15t/bmkIN3vl5lKE2drQVb3S7vN1389mPyAUwrGt/
-         JvUp5ioL3dIa1/Kq8hOES0Fu2Wm1W43mcqkxXugfBAW2qp0KiHrOxssasWunkD92KCTN
-         NYsqp51sdkjzXFlPusad3xigSBgLdROaZBe1X0kuU0GPIn1p1Qvp0zkI2ipTVtdVGFvi
-         0Yyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704291335; x=1704896135;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zjreSabw8CzN94mx8h5dumFRh+tngguL/9HyCovmyjI=;
-        b=WT4ZIeqlgNyzSbu9iP+REq9+O2l6NN/B87M4Hgs7sYjbU8rtdWyuCV3554qOsteSaD
-         2T+GStkoug73fwqsQ57Ck8paVc4Vf4iVxYpr4ZqISFKJ1bshJ1/e362SfOOKlkZs1W9J
-         aBpFs7HCUI9i4HwOyTJdNRPQyTS4DtKZ10ZHozhAzkzmPejYSlLIErHjlVUYnW7tq90a
-         RzfvXm4YcSenkRV7sqTB9Ar6NuEMgzgW3i4itMoRCTmAxVeHRgNa49foSJ9G//VlN1X7
-         V3wAl4slV8/vy8XPIZeiTFaS7XDxNecZN/xxnAFSUyHBowh+dQvA45qYjruJyIwcnqcH
-         wJzw==
-X-Gm-Message-State: AOJu0YxZC0nx5OL3rAtGC6YI5ChalqB7fdmjcvtgYHxTsH1vbELSzT32
-	BrIcyXIWRSYYeN2XldrCu4qiQmPcy0inRg==
-X-Google-Smtp-Source: AGHT+IHO8l3iNW9GGkm9CZvaxpxwPCczB3dfEde23okmnhOsNbhANqgiCdDia+nO7ZcoCnLELfLkxg==
-X-Received: by 2002:a5d:4e09:0:b0:337:39e3:47b5 with SMTP id p9-20020a5d4e09000000b0033739e347b5mr3263444wrt.14.1704291335062;
-        Wed, 03 Jan 2024 06:15:35 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:f3f1:7caf:cfec:10bf? ([2a01:e0a:b41:c160:f3f1:7caf:cfec:10bf])
-        by smtp.gmail.com with ESMTPSA id c6-20020adfe706000000b0033342338a24sm31013108wrm.6.2024.01.03.06.15.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jan 2024 06:15:34 -0800 (PST)
-Message-ID: <0aa87eb2-b50d-4ae8-81ce-af7a52813e6a@6wind.com>
-Date: Wed, 3 Jan 2024 15:15:33 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CFD1A72E;
+	Wed,  3 Jan 2024 14:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1704291373; x=1704896173; i=markus.elfring@web.de;
+	bh=Zn3zvLXLmFb7bnZCSQaHOVJmsR2R8N7zxi5Wct5XHCk=;
+	h=X-UI-Sender-Class:Date:Subject:To:References:Cc:From:
+	 In-Reply-To;
+	b=Qe8NoxK+zIec3T5OKtK+EAj8ioPDL9qEL31kzDY2OvD9eK1/drW5oG9TP3w4y7SA
+	 e6s4XY6d9ujpVDAx62rfjS/BmGJPh5HO3Bo6rGSnByLP1DqBTe0AN01rGVh5SXMm8
+	 8ZvqdChzQvdaHSJbq85TtfGoUhPBaoMGHGeE/gZN42joQV0adsiiRVv12GGRxjCty
+	 wqRyb1Fp986hOcjfHLEJ/KmMelSqvn3wbe5lMyWqmlXyIsF5m4F/CUGKp1jzdJub2
+	 eons6mKpRzR62fTbH0C38j5/+lXtiwkGLQ2EUFVO2/4A0EI931alKWYwfGmtJzcLz
+	 1O4vZMfoqZMQa9Q3Uw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.88.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N2BM4-1rDuGx0ggQ-013kOF; Wed, 03
+ Jan 2024 15:16:13 +0100
+Message-ID: <3d62b430-030a-4e85-9d4d-0468d237d371@web.de>
+Date: Wed, 3 Jan 2024 15:16:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,55 +46,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface in
- a bond
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
- <20240103094846.2397083-3-nicolas.dichtel@6wind.com>
- <ZZVaVloICZPf8jiK@Laptop-X1>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <ZZVaVloICZPf8jiK@Laptop-X1>
+Subject: Re: [0/2] net/smc: Adjustments for two function implementations
+Content-Language: en-GB
+To: Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, "D. Wythe"
+ <alibuda@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
+ Paolo Abeni <pabeni@redhat.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ Wen Gu <guwen@linux.alibaba.com>
+References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
+ <41536899-3ca2-4413-b483-3d27ffe0d7f4@linux.ibm.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <41536899-3ca2-4413-b483-3d27ffe0d7f4@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:qzcILoEqWzmESYCmwI5ev40sBfETqja0zwynn1iVHYwe9Lm8Tuc
+ LRezkZejbT771VWPc+nQ9Dl9LV8zYkcS70XEX9PeMs73aMszk9D7ULy+og/biWIZrWAEIol
+ 0YXp6icHLC6LD7nFOXi9Tpqt4in4MDl+L4oj9Egz6RzccB0wylG8CqdroYhKxUl8HsC59Fj
+ A4dzZkKFxru0LoN9+qZBw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:q/blSR/UhsE=;br9DybMm/k674NvLS5wxXx+po5+
+ aVwj+BcI4b0vFYlfB8FkrOPxJ7p1gxmI4O+pLWpKAbrCWF7MFso6QkUY/eLR1DZW4lwbCfvou
+ R6YVtuKq8UmT4RSvzhAnrQ0FPhcDAbwcMD5wgZNqV7Soc6TEsyOIPL+xnuDvdvyadvabb+f3m
+ +bzf6EycstiWdpnK2Aiz+8pzUH6tnUoaBCR1qpNwxneWPYg9T7C0HAa1bacU9Balnswch3loA
+ vZo/KzEweUvIw/XfILVRG/mnB53VYow1CNqk9T54u98NHYDVe114dlvAfWFCpZroZ+Ig/4wLA
+ wysBNjFnAcb4vLIUjYjfTiumiNjvbIfVLp6wc0gMB4DkfOM+vX/X59iLe/iD1J51yefC4WkRT
+ vAT25qjVzqLaBw98A/0ZWPxWUkEgC/Wt/7KPfOGfsbL7RJJYi71GtSqYtiJ3S2FiK2rO6brjj
+ tpb6u3Z7SVga+U2kpUjCnrO6Jp+M3R/XX2gRBsT1542aufOiPRNkbDxepv7GfGA6WQSQ8ULFT
+ SSsZqSQ4ailE60sd7A7Mtbd8PvXTbRYnB/2wdI9VICTk+9gT3rZ9pv9Zm7mJNDAcTvpxSDuKf
+ Y1/cbhcs4HC7S7yNPtJQdLtRVxI5Im4sAucTVQLhrsO/SsaFKZxUw5iG0g9fnkyt9sYzcA2JJ
+ R5XwRoB81ec+XkmlWbzjsDs+/2Ff3wnYTHUa25zow7QooJMLxItQoHd2Ic/xKZuDaHLVaSrCV
+ wvC/ggjmWbM4BewAHpNVZUSjxd9T1p6PFRF9h87YgmoOgJeniVSkgHAhcUmd1EN36CN+CkMIn
+ LuoEUnUCsww/9rsRO1ZjRtQKQDGh8vt6DjEXYZCrn5AocqQV7htUIyclGEw5NysX9/tEpkoWH
+ L3k1Y9r4dF45g/BAZ7isvCQU/SjRgsDh8e5QkY2o7aEFUm8gyjbqrBi4XfKdf61QGkD1ueAjE
+ JIa2/CLrJFzAWUTFXLceVatJKGQ=
 
-Le 03/01/2024 à 14:00, Hangbin Liu a écrit :
-> On Wed, Jan 03, 2024 at 10:48:46AM +0100, Nicolas Dichtel wrote:
->> +kci_test_enslave_bonding()
->> +{
->> +	local testns="testns"
->> +	local bond="bond123"
->> +	local dummy="dummy123"
->> +	local ret=0
->> +
->> +	run_cmd ip netns add "$testns"
->> +	if [ $? -ne 0 ]; then
->> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
->> +		return $ksft_skip
->> +	fi
->> +
->> +	# test native tunnel
->> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
-> 
-> Hi Nicolas,
-> 
-> The net-next added new function setup_ns in lib.sh and converted all hard code
-> netns setup. I think It may be good to post this patch set to net-next
-> to reduce future merge conflicts.
-The first patch is for net. I can post the second one to net-next if it eases
-the merge.
+=E2=80=A6
+>> =C2=A0=C2=A0 Return directly after a failed kzalloc() in smc_fill_gid_l=
+ist()
+>> =C2=A0=C2=A0 Improve exception handling in smc_llc_cli_add_link_invite(=
+)
+>>
+>> =C2=A0 net/smc/af_smc.c=C2=A0 |=C2=A0 2 +-
+>> =C2=A0 net/smc/smc_llc.c | 15 +++++++--------
+>> =C2=A0 2 files changed, 8 insertions(+), 9 deletions(-)
+=E2=80=A6
+> However, I'm on the same page with Wen Gu. I could not see the necessity=
+ of the patches.
+> BTW, if you want to send fix patches,
 
-> 
-> Jakub, Paolo, please correct me if we can't post fixes to net-next.
-Please, let me know if I should target net-next for the second patch.
+I obviously propose to adjust specific implementation details.
 
+
+> please provide the error messages you met,
+
+This development concern does not apply here.
+
+
+> the procedure of reproducing the issue and the correspoinding commit mes=
+sages.
+
+Would you like to extend the usage of source code analysis tools?
+
+
+> If you want to send feature patches, I'd like to see a well thought-out =
+patch or patch series.
+
+I presented some thoughts for special transformation patterns
+on several software components.
+
+
+> E.g. In our component, the kfree(NULL) issue doesn't only occur in the p=
+ositions where you mentioned in the patch series, also somewhere else.
+
+Does your feedback indicate that you would support the avoidance of such a=
+ special function call
+at more places?
+
+
+> I would be grateful if all of them would be cleaned up, not just some pi=
+eces.
+
+Do you find my patch series too small for the mentioned Linux module at th=
+e moment?
 
 Regards,
-Nicolas
+Markus
 
