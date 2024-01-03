@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-61342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 655A6823773
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:06:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53AF882377E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:09:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2AF21F25E5F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:06:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3A121F25E76
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21191DA34;
-	Wed,  3 Jan 2024 22:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE461DA38;
+	Wed,  3 Jan 2024 22:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzCV7gfY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5/I1PIp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A6E1DA2F
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 22:06:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0A5FC433C7;
-	Wed,  3 Jan 2024 22:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0028D1DA2B;
+	Wed,  3 Jan 2024 22:09:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0447AC433C8;
+	Wed,  3 Jan 2024 22:09:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704319604;
-	bh=fn1ZKyd2EbYPteASQzlt4fdLv2r9kuTIdCXksth20KY=;
+	s=k20201202; t=1704319775;
+	bh=6ljWwcMuOclalShz7xItPE1LxMgLaftfxHmnUv3zwQo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MzCV7gfYNvxpvpMJTYfq78CLMp0ba3Z7T84B9T44+lelL0BtYcGcFcSYKawA5Ap5V
-	 O4jYHvm6xM4UBMclS7RNk015TaC1fWLxYJ+twxjet1zyp+yKiz8UQcaV6GqCmFPlPO
-	 0zUlwNXHefLLY13Y/wd4z8EofcnYkNe3MrlwYaizTq9MapiaPcKhvI3vtFYVrBgVqN
-	 9WIUCVlb/QDbs8Oi/zCNhriOKz2VUkqbl5XyrjcPi6+9GrssGSiIqlbBI3H7PnTEb3
-	 qasUlOD82u4apaiHSeIrfmjNlKR24TSSMekAKD9/QchfZ1cJeqgoJYBBNmGEIPj7xh
-	 Ha3xs/4IrFntg==
-Date: Wed, 3 Jan 2024 14:06:42 -0800
+	b=t5/I1PIpxUdoWV28a/IV0bFPmk4b+1rKFQAkinmjP+UyOCAV+Lz+FNEdLTCSHwAqO
+	 n2/RUdbmvRLe6ReURSNZIzMBShj61jEU3oHgCNItdjzYEEkc9upaVdE/J+xwPuYC4A
+	 hcrrN+bXntXeHf+Uh7m0ZPaMGrmXDkk7ghE29QMjx5wBRihoreUJPTfaL/1hneZJBm
+	 Vu5Xfpx1cua6A9glQCMgAqbu4RoEV3y9xb0j7PWJ+L1XF2TD5cYogb5K98Br+ukWlX
+	 wjo1irToxruuubn8dcFh5PRAQPLIbOnzzyAbvfTXRYZIE8p0GT/etMen98msZpfEA6
+	 EuAIcn1uQGygA==
+Date: Wed, 3 Jan 2024 14:09:34 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phylink: move phylink_pcs_neg_mode() into
- phylink.c
-Message-ID: <20240103140642.575fe468@kernel.org>
-In-Reply-To: <E1rKhg1-00EnlX-NI@rmk-PC.armlinux.org.uk>
-References: <E1rKhg1-00EnlX-NI@rmk-PC.armlinux.org.uk>
+To: Thomas Lange <thomas@corelatus.se>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, jthinz@mailbox.tu-berlin.de,
+ arnd@arndb.de, deepa.kernel@gmail.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com
+Subject: Re: [PATCH net] net: Implement missing SO_TIMESTAMPING_NEW cmsg
+ support
+Message-ID: <20240103140934.2a6c6924@kernel.org>
+In-Reply-To: <d1ce6aba-1b10-471c-ba60-10effa1dac10@corelatus.se>
+References: <d1ce6aba-1b10-471c-ba60-10effa1dac10@corelatus.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,14 +53,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 02 Jan 2024 16:31:37 +0000 Russell King (Oracle) wrote:
-> +}
-> +
-> +
+On Tue, 2 Jan 2024 22:13:50 +0100 Thomas Lange wrote:
+> Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
+> socket option SO_TIMESTAMPING_NEW. However, it was never implemented in
+> __sock_cmsg_send thus breaking SO_TIMESTAMPING cmsg for platforms using
+> SO_TIMESTAMPING_NEW.
+> 
+> Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
+> Link: https://lore.kernel.org/netdev/6a7281bf-bc4a-4f75-bb88-7011908ae471@app.fastmail.com/
+> Signed-off-by: Thomas Lange <thomas@corelatus.se>
 
-checkpatch spots multiple blank lines
-
->  static void phylink_major_config(struct phylink *pl, bool restart,
+patch looks mangled, could you resend with git send-email?
+There are multiple spaces at the start of the diff lines.
 -- 
 pw-bot: cr
 
