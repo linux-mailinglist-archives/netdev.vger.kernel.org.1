@@ -1,46 +1,49 @@
-Return-Path: <netdev+bounces-61341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB67C823765
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:00:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 655A6823773
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:06:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 020FE1C24126
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:00:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2AF21F25E5F
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315001D6BE;
-	Wed,  3 Jan 2024 22:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21191DA34;
+	Wed,  3 Jan 2024 22:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OL8mZ3z7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzCV7gfY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114521DA2F;
-	Wed,  3 Jan 2024 22:00:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 374C9C433C8;
-	Wed,  3 Jan 2024 22:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A6E1DA2F
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 22:06:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0A5FC433C7;
+	Wed,  3 Jan 2024 22:06:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704319244;
-	bh=k5CUGvrfHkGy1Lx9icYwgm7BQoMqdETOkUMcv5h2qeQ=;
+	s=k20201202; t=1704319604;
+	bh=fn1ZKyd2EbYPteASQzlt4fdLv2r9kuTIdCXksth20KY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OL8mZ3z7zmPQUkuQWkDdkgBgCtn3j3s5osigBPmqq3EBCVCI2OgKnH/8NASp7sHH/
-	 fWiV6v31CTvyYw7vy5r21GVTHZzLJuYZhoU/nuZpniJ6tnYex/bmSbacXmJj5giYij
-	 Kstx2P3fwjD/HxdlTn3292Pum2OfJmFQYcPtcRP6b21nHyO1WRjDbQ93544OGWqhOk
-	 B3N9vsqCXuN1kf/UBFpeSDlZvmMwH/WEl+Buu+1zT2+7ptLVZd7wdeQv+PTvxrxXVv
-	 EqPUqsSSU4MtV3S9TttCbch25lUBQjW/8qKKlyMQtBSEc8NihTtLZEFB/QxZF/Z9mI
-	 88d8Y2PL2rQFA==
-Date: Wed, 3 Jan 2024 14:00:43 -0800
+	b=MzCV7gfYNvxpvpMJTYfq78CLMp0ba3Z7T84B9T44+lelL0BtYcGcFcSYKawA5Ap5V
+	 O4jYHvm6xM4UBMclS7RNk015TaC1fWLxYJ+twxjet1zyp+yKiz8UQcaV6GqCmFPlPO
+	 0zUlwNXHefLLY13Y/wd4z8EofcnYkNe3MrlwYaizTq9MapiaPcKhvI3vtFYVrBgVqN
+	 9WIUCVlb/QDbs8Oi/zCNhriOKz2VUkqbl5XyrjcPi6+9GrssGSiIqlbBI3H7PnTEb3
+	 qasUlOD82u4apaiHSeIrfmjNlKR24TSSMekAKD9/QchfZ1cJeqgoJYBBNmGEIPj7xh
+	 Ha3xs/4IrFntg==
+Date: Wed, 3 Jan 2024 14:06:42 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Malkoot Khan <engr.mkhan1990@gmail.com>
-Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] tcp: fixed whitespace trailing error
-Message-ID: <20240103140043.1b402839@kernel.org>
-In-Reply-To: <20231228164250.106433-1-engr.mkhan1990@gmail.com>
-References: <20231228164250.106433-1-engr.mkhan1990@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phylink: move phylink_pcs_neg_mode() into
+ phylink.c
+Message-ID: <20240103140642.575fe468@kernel.org>
+In-Reply-To: <E1rKhg1-00EnlX-NI@rmk-PC.armlinux.org.uk>
+References: <E1rKhg1-00EnlX-NI@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,11 +53,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 28 Dec 2023 16:42:50 +0000 Malkoot Khan wrote:
-> -		rtx_delta = tcp_time_stamp_ts(tp) - (tp->retrans_stamp ?: 
-> +		rtx_delta = tcp_time_stamp_ts(tp) - (tp->retrans_stamp ? :
+On Tue, 02 Jan 2024 16:31:37 +0000 Russell King (Oracle) wrote:
+> +}
+> +
+> +
 
-Don't insert the space between the ? and :, tho, please.
+checkpatch spots multiple blank lines
+
+>  static void phylink_major_config(struct phylink *pl, bool restart,
 -- 
 pw-bot: cr
 
