@@ -1,109 +1,97 @@
-Return-Path: <netdev+bounces-61288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B21DF823158
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:34:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4B482315A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:36:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C49BB1C2389E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:34:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6D491F232FB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 16:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388361945A;
-	Wed,  3 Jan 2024 16:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F96418C1A;
+	Wed,  3 Jan 2024 16:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="CqA9Wj2M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e/yDUxZB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc0e.mail.infomaniak.ch (smtp-bc0e.mail.infomaniak.ch [45.157.188.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C68018C1A
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 16:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4T4wKd71NvzMq5G2;
-	Wed,  3 Jan 2024 16:34:29 +0000 (UTC)
-Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4T4wKc6gBYzMpp3b;
-	Wed,  3 Jan 2024 17:34:28 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1704299669;
-	bh=EjKR+ktAGKzbgbl+7KSmOTO+aAwSZnEnzxyF/DB0Yf8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=CqA9Wj2M3KLn6rdmnOeY/v0/pX4SZdgRP4ItoN01aWulf4gYdzbz48tA63Ifp4jCi
-	 IwFPfHBj/1Tr/ARY35qP+sQsBHT8lyUFkHJKkFz2nkC5Eo9JQN+9YXO4wujRs3Fjmf
-	 G6QVDHpG38VinzMGdbEqeZeANe9l2tjWjG8LRgcg=
-From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-To: Eric Paris <eparis@parisplace.org>,
-	Paul Moore <paul@paul-moore.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>
-Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-security-module@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v3] selinux: Fix error priority for bind with AF_UNSPEC on PF_INET6 socket
-Date: Wed,  3 Jan 2024 17:34:15 +0100
-Message-ID: <20240103163415.304358-1-mic@digikod.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373C41BDCE
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 16:36:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CAE5C433C7;
+	Wed,  3 Jan 2024 16:36:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704299767;
+	bh=2JvocjoafpLAZMtUkb0lZ2Ycd46t524yDdLDrLMComs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=e/yDUxZB22IMtyp8gmuNQUkEl/Ia+Wb2q9fWKeXDgrUddy5Oc1m2TYuWgUJYU/BHU
+	 jytcL6Wgy3zbwq3/yWqP1HQ3R0eTniY6S7MpEB9RN/6GDKdN4ewVsJ8VCxVM+41XR/
+	 HD6KcKR23FAQTSuJHr9dO842Wfvf+CrxqU/CvastjMnMDXn7gVVa1zHKiq9PL00yCR
+	 OPTmeOT1cVYk+nQX/2r/QvZOUZFdcKkBbBZvLkFU9/3YoC167yq1iMIrM2ZRPVMdOu
+	 a6ar9yai5naj1kzP9O3C+w3Qr+nKrZW6CjF5pLbOMUfM3XdMswA0Cy1FdgO9VAhmzV
+	 adf7C6+fYKXeQ==
+Message-ID: <3e9e4f3a-8968-4009-9e93-fe0bc8121392@kernel.org>
+Date: Wed, 3 Jan 2024 09:36:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface in
+ a bond
+Content-Language: en-US
+To: nicolas.dichtel@6wind.com, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>
+Cc: netdev@vger.kernel.org
+References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
+ <20240103094846.2397083-3-nicolas.dichtel@6wind.com>
+ <2b3084da-ab85-412d-a0e8-3e50903937df@kernel.org>
+ <0cc0cfc3-14d3-43d9-8fa8-b2b76b1ca14e@6wind.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <0cc0cfc3-14d3-43d9-8fa8-b2b76b1ca14e@6wind.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
 
-The IPv6 network stack first checks the sockaddr length (-EINVAL error)
-before checking the family (-EAFNOSUPPORT error).
+On 1/3/24 9:17 AM, Nicolas Dichtel wrote:
+> Le 03/01/2024 à 16:42, David Ahern a écrit :
+>> On 1/3/24 2:48 AM, Nicolas Dichtel wrote:
+>>> @@ -1239,6 +1240,44 @@ kci_test_address_proto()
+>>>  	return $ret
+>>>  }
+>>>  
+>>> +kci_test_enslave_bonding()
+>>> +{
+>>> +	local testns="testns"
+>>> +	local bond="bond123"
+>>> +	local dummy="dummy123"
+>>> +	local ret=0
+>>> +
+>>> +	run_cmd ip netns add "$testns"
+>>> +	if [ $? -ne 0 ]; then
+>>> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
+>>> +		return $ksft_skip
+>>> +	fi
+>>> +
+>>> +	# test native tunnel
+>>> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
+>>> +	run_cmd ip -netns $testns link add dev $dummy type dummy
+>>> +	run_cmd ip -netns $testns link set dev $dummy up
+>>> +	run_cmd ip -netns $testns link set dev $dummy master $bond down
+>>> +	if [ $ret -ne 0 ]; then
+>>> +		end_test "FAIL: enslave an up interface in a bonding"
+>>
+>> interface is up, being put as a port on a bond and taken down at the
+>> same time. That does not match this error message.
+> The idea was "the command used to enslave an up interface fails".
+> What about: "FAIL: set down and enslave an up interface in a bonding"
 
-This was discovered thanks to commit a549d055a22e ("selftests/landlock:
-Add network tests").
+The 'set down' is part of the adding to the bond command. how about:
 
-Cc: Eric Paris <eparis@parisplace.org>
-Cc: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Cc: Paul Moore <paul@paul-moore.com>
-Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
-Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Closes: https://lore.kernel.org/r/0584f91c-537c-4188-9e4f-04f192565667@collabora.com
-Fixes: 0f8db8cc73df ("selinux: add AF_UNSPEC and INADDR_ANY checks to selinux_socket_bind()")
-Signed-off-by: Mickaël Salaün <mic@digikod.net>
----
-
-Changes since v2:
-https://lore.kernel.org/r/20231229171922.106190-1-mic@digikod.net
-* Add !PF_INET6 check and comments (suggested by Paul).
-* s/AF_INET/PF_INET/g (cosmetic change).
-
-Changes since v1:
-https://lore.kernel.org/r/20231228113917.62089-1-mic@digikod.net
-* Use the "family" variable (suggested by Paul).
----
- security/selinux/hooks.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index feda711c6b7b..8b1429eb2db5 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -4667,6 +4667,13 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
- 				return -EINVAL;
- 			addr4 = (struct sockaddr_in *)address;
- 			if (family_sa == AF_UNSPEC) {
-+				if (family == PF_INET6) {
-+					/* Length check from inet6_bind_sk() */
-+					if (addrlen < SIN6_LEN_RFC2133)
-+						return -EINVAL;
-+					/* Family check from __inet6_bind() */
-+					goto err_af;
-+				}
- 				/* see __inet_bind(), we only want to allow
- 				 * AF_UNSPEC if the address is INADDR_ANY
- 				 */
--- 
-2.43.0
+FAIL: Initially up interface added to a bond and set down.
 
 
