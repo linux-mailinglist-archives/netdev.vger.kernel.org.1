@@ -1,90 +1,119 @@
-Return-Path: <netdev+bounces-61186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E5B822C94
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:02:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC23822C98
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0C01C22E5A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:02:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5941F24161
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3051F18EA9;
-	Wed,  3 Jan 2024 12:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2F719463;
+	Wed,  3 Jan 2024 12:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ao6Z6y1r"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tONx/tDO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160D219458;
-	Wed,  3 Jan 2024 12:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A9DBC433C8;
-	Wed,  3 Jan 2024 12:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704283224;
-	bh=WPHbYr0OySUAical7UhRi7PEZSyrOoxFYTW714Fb9Jk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ao6Z6y1rSYB3mMyBe/6QOQW2Iwl6tftMTeATJfK8FBc2j2afTusSxQvrQFfi9N5Ri
-	 YqBKwXlARnF6fYRe2PpKSmUZ2luY+BDWE1sZfe6P2qZL7s0TU5LevZrLqOXqI5Dpv8
-	 mBPj5YPvnid2pC9/1BGf5KXD9caSpnXr9nenj7ttGScNLtAWZJeVMR24BA+UO8B0+3
-	 9hib9NhDCbiXzM3L2lw7/HOR0YWHlQsXKKjvEVYIA4hrsicWihpl5KFxU4B7JsuPfj
-	 uUaZfibWS6LAYOsuLJVKK6PjmJJVr2psw/cuACPThicVl8RRQQg6lqdDc0iXdflL1X
-	 qzZWXiEIRRT6Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 68355C00446;
-	Wed,  3 Jan 2024 12:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6778619BB1;
+	Wed,  3 Jan 2024 12:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=nsC4Et3I1Gf7WygCzSIdwNufdONd9F78NTeV2QKxMqc=; b=tONx/tDO28T27Y2nH3BzU1n1Tx
+	E4R6ocwk6+xW/RH5Cgva06EnXOZSaWJhSBLMLF49cwDbFEBziVCWivL+Dp02qjbKf6dNjz7oq+ey0
+	mdlY4kfdqfMIamvo+xGaEUykr3N3HIW2lw+lTzqe0hN2FB4Hp6zM9dpyVSNpMX3dGkFRxArWXBiSz
+	fksr6GZOmDJ56+L9OdGnlMfaC/666rZoFCvMh329MzZBY54SDfLqG3cwyWsO9uJHuUPv2a+IW6/z1
+	10V3Ltl5XgFTYQ5IliDuztXbTDBuCVDWOWucEx7poBakDTe7vsgA5JI7VlhxQqIKBZBFThIN68CFN
+	FKX1IwXw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49630)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rKzvr-0007Pn-03;
+	Wed, 03 Jan 2024 12:01:11 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rKzvs-0006LG-KZ; Wed, 03 Jan 2024 12:01:12 +0000
+Date: Wed, 3 Jan 2024 12:01:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, kuba@kernel.org
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: mdio: get/put device node during
+ (un)registration
+Message-ID: <ZZVMiPCoDyv/NZXN@shell.armlinux.org.uk>
+References: <20231220045228.27079-2-luizluca@gmail.com>
+ <ZZPtUIRerqTI2/yh@shell.armlinux.org.uk>
+ <CAJq09z61JRNOBy6zLJ+D2pOVP-FCkofLjNghHSOkFJ=5q=6utQ@mail.gmail.com>
+ <ZZU1SJlKpeU38c9I@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net/sched: cls_api: complement
- tcf_tfilter_dump_policy
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170428322442.1788.8455879320567617653.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Jan 2024 12:00:24 +0000
-References: <20231228064358.3042747-1-linma@zju.edu.cn>
-In-Reply-To: <20231228064358.3042747-1-linma@zju.edu.cn>
-To: Lin Ma <linma@zju.edu.cn>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZU1SJlKpeU38c9I@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
+On Wed, Jan 03, 2024 at 10:22:00AM +0000, Russell King (Oracle) wrote:
+> I agree with that approach, but as you rightly point out, we need MDIO
+> to behave correctly, and I don't think that patching just one bit of
+> MDIO to fix this mess is the right approach.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+This is probably a safer approach to ensuring that the firmware data
+reference count isn't dropped while the bus exists byensuring that we
+always take a reference at register time. It also likely fixes similar
+issues with ACPI and swnode based users as well.
 
-On Thu, 28 Dec 2023 14:43:58 +0800 you wrote:
-> In function `tc_dump_tfilter`, the attributes array is parsed via
-> tcf_tfilter_dump_policy which only describes TCA_DUMP_FLAGS. However,
-> the NLA TCA_CHAIN is also accessed with `nla_get_u32`.
-> 
-> The access to TCA_CHAIN is introduced in commit 5bc1701881e3 ("net:
-> sched: introduce multichain support for filters") and no nla_policy is
-> provided for parsing at that point. Later on, tcf_tfilter_dump_policy is
-> introduced in commit f8ab1807a9c9 ("net: sched: introduce terse dump
-> flag") while still ignoring the fact that TCA_CHAIN needs a check. This
-> patch does that by complementing the policy to allow the access
-> discussed here can be safe as other cases just choose rtm_tca_policy as
-> the parsing policy.
-> 
-> [...]
+It doesn't deal with the excess-refcount problem, as with this approach
+the two issues are entirely independent of each other.
 
-Here is the summary with links:
-  - [net-next,v2] net/sched: cls_api: complement tcf_tfilter_dump_policy
-    https://git.kernel.org/netdev/net-next/c/2ab1efad60ad
+Please test to check that this addresses your issue. Thanks.
 
-You are awesome, thank you!
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index 6cf73c15635b..afbad1ad8683 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -193,6 +193,10 @@ static void mdiobus_release(struct device *d)
+ 	     bus->state != MDIOBUS_ALLOCATED,
+ 	     "%s: not in RELEASED or ALLOCATED state\n",
+ 	     bus->id);
++
++	if (bus->state == MDIOBUS_RELEASED)
++		fwnode_handle_put(dev_fwnode(d));
++
+ 	kfree(bus);
+ }
+ 
+@@ -684,6 +688,15 @@ int __mdiobus_register(struct mii_bus *bus, struct module *owner)
+ 	bus->dev.groups = NULL;
+ 	dev_set_name(&bus->dev, "%s", bus->id);
+ 
++	/* If the bus state is allocated, we're registering a fresh bus
++	 * that may have a fwnode associated with it. Grab a reference
++	 * to the fwnode. This will be dropped when the bus is released.
++	 * If the bus was set to unregistered, it means that the bus was
++	 * previously registered, and we've already grabbed a reference.
++	 */
++	if (bus->state == MDIOBUS_ALLOCATED)
++		fwnode_handle_get(dev_fwnode(&bus->dev));
++
+ 	/* We need to set state to MDIOBUS_UNREGISTERED to correctly release
+ 	 * the device in mdiobus_free()
+ 	 *
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
