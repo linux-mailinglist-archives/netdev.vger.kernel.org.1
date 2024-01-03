@@ -1,167 +1,123 @@
-Return-Path: <netdev+bounces-61161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6557A822BCB
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:04:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA0F0822BFF
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:20:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6896B23501
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:04:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7796F1F23C20
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BFE18E06;
-	Wed,  3 Jan 2024 11:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1871018E16;
+	Wed,  3 Jan 2024 11:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="siv4dEvU";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="4skXX/n4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102EF18E08
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 11:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bbaec23e66so218938439f.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 03:04:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704279876; x=1704884676;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=R8KfXmtbwMJMKrl1dAJ+3T+XeGVJU5tYwWqQe05u00k=;
-        b=ty93F0ES0sQxV9DNFimMtK2Lhy60TLc7UO0wPKUbTHI0fsZ2zCgIOcFDF5mUIoWB9X
-         WAetZ0xXn3XxPDQw9tau5nB9BM+zkCC86FDsAGaFDuqkKoZJ86rY/hpeq1hiyE0YI0fc
-         7JgzFc1eo+SXSrKwJ1xXLsVHClUCo++qyHJ0KIEqER3lDJRte+9uqveWSgsfNlxwhD+C
-         X5AkILSlJyPMemhf/a6y50DhqxmHBe42LYsVHFibx+SbI396nSQN8N2NwxnZa+5hCcWp
-         fmmnqSTv/ETjNcR2wgNMUbqJxj4ujc+I96mLSR0tOAT/B60TbzF9CQmlhw/fORByEi+4
-         1Atw==
-X-Gm-Message-State: AOJu0YxjEguoH3sN3TSR+MMybDM21KUOUuFI/DE8rWoaKHiZ2q5BYKvw
-	2Eq3XPePJUW8glcDBfqvn12+H2wc6Ztc/VbFOlAPMo2fN0Mq
-X-Google-Smtp-Source: AGHT+IHlATu/d3FvAhv+dHu8yoftsb2wcqgtUVNfCH1GkqmOkEVQAREBnssNuGCDmzykc2peSnPvOXe8ezDdtnpksyZ0c7XusCRA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988F018E0C;
+	Wed,  3 Jan 2024 11:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id A52445C01B3;
+	Wed,  3 Jan 2024 06:20:11 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 03 Jan 2024 06:20:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm1; t=1704280811; x=1704367211; bh=pURSsn42YA
+	SyjShYaXFji90kv1W3zA6MqwSIHytkY6k=; b=siv4dEvUTdBa5tvrhjfr+0AqUz
+	MC+yLr0d/hie2ElJdhXE9U9i8FdAlYhNaIEZmQeU+lNJct2lmqOdDgG+nRXE5BsM
+	C5FklLlR8QJTIAZDb3dj/PPrWr5DVY4x/HhO6TtjYHj+QUOk2vZm0sh2Vj6WXydu
+	n4q3vm4M3wha7rsHEyNFxcGjCH3xc1Isk7KRS6HIXHsFAcOxb2k8hTFwneI5+15Z
+	gobIeGOZT+UymSBgtLf9wiN1FcAu8RUU59qpQwF8O66etIKmvILPllLQaTBdd40r
+	YNcgJOYfxWSWgPIIs6sOnKJ435C+gG/P6CaoTcRVXnHxJOCLVonBVe8QOKlA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1704280811; x=1704367211; bh=pURSsn42YASyjShYaXFji90kv1W3
+	zA6MqwSIHytkY6k=; b=4skXX/n4oIK9krhbABBIURU/f98yOhCL/oPYgI5oU5Z+
+	VkaXh/klpi0UAZRtaSn046r9uHggozA+xgWjGwjw8GyFFcnCJ4wFlvwTOfTy2Y9S
+	V/0QmRnrOXtt7YY682YRc/SkAfdtIpbnwMNv7zpU+966o8rzMfhHRB7qsNaod7VR
+	qMBTBB77FWBtf18fC1KSHS0ZDY9ylin/rdXIacfPPF57FrIZacSWv1LOkoSOCFwZ
+	fmIxT7vVeyni6WpHWrke4MvSnErl695+OZEsboiu7aJ7MV/RcWaarE7toqN0kOE1
+	hVJ9w+2aj2yhVB4HDNgCgc2+uIhDDb7p1RnCdIcJPw==
+X-ME-Sender: <xms:60KVZbdhEAWYmjrIFrdGSQ2sj_mVdqoTzTYah8F4j7_DlhX0ARREbQ>
+    <xme:60KVZRMhbu4YCMbfPMGTcIzliLDg4h_uMFSifraI9pZiSIkbkd03xGxJ6ymBmxt_I
+    rELdQD8QBMsF0dLQUk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeghedgvdejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepvefhffeltdegheeffffhtdegvdehjedtgfekueevgfduffettedtkeekueef
+    hedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:60KVZUh_f2VP4sA3WEv3PIk-btw0PRX6d4s0yc_sZc3KVTUIn6ZbwQ>
+    <xmx:60KVZc9N587-YLpnmIzzjrAna-6-dL4UlvVVw3W2gNkTzvgPHq7U-A>
+    <xmx:60KVZXvfe2FcwdAq1MI7aZDwQ_SesO7RkKTy29yA3_mc3f8X_aoXUA>
+    <xmx:60KVZXEplb9W-61xCi7E_hgXj8mIat1e_CooVTvFlmTxo-tCObMx8Q>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 0C00CB6008F; Wed,  3 Jan 2024 06:20:10 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1364-ga51d5fd3b7-fm-20231219.001-ga51d5fd3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c28:b0:35f:9ada:73a8 with SMTP id
- m8-20020a056e021c2800b0035f9ada73a8mr3068749ilh.2.1704279876280; Wed, 03 Jan
- 2024 03:04:36 -0800 (PST)
-Date: Wed, 03 Jan 2024 03:04:36 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009fa770060e089409@google.com>
-Subject: [syzbot] [wireless?] WARNING: suspicious RCU usage in __cfg80211_bss_update
-From: syzbot <syzbot+864a269c27ee06b58374@syzkaller.appspotmail.com>
-To: benjamin.berg@intel.com, davem@davemloft.net, edumazet@google.com, 
-	johannes.berg@intel.com, johannes@sipsolutions.net, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	miriam.rachel.korenblit@intel.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Message-Id: <c66dd905-3342-44ff-9aa7-ff2c7b9024c7@app.fastmail.com>
+In-Reply-To: <ZZU87SZcE/6i8lyo@boxer>
+References: <20240103102458.3687963-1-arnd@kernel.org>
+ <ZZU87SZcE/6i8lyo@boxer>
+Date: Wed, 03 Jan 2024 12:19:50 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Maciej Fijalkowski" <maciej.fijalkowski@intel.com>,
+ "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Jesse Brandeburg" <jesse.brandeburg@intel.com>,
+ "Anthony L Nguyen" <anthony.l.nguyen@intel.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Simon Horman" <horms@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Larysa Zaremba" <larysa.zaremba@intel.com>,
+ "Piotr Raczynski" <piotr.raczynski@intel.com>,
+ "Amritha Nambiar" <amritha.nambiar@intel.com>,
+ "Alexei Starovoitov" <ast@kernel.org>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ice: fix building withouto XDP
+Content-Type: text/plain
 
-Hello,
+On Wed, Jan 3, 2024, at 11:54, Maciej Fijalkowski wrote:
+> On Wed, Jan 03, 2024 at 11:24:45AM +0100, Arnd Bergmann wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>> 
+>> The newly added function fails to build when struct xsk_cb_desc is
+>> not defined:
+>> 
+>> drivers/net/ethernet/intel/ice/ice_base.c: In function 'ice_xsk_pool_fill_cb':
+>> drivers/net/ethernet/intel/ice/ice_base.c:525:16: error: variable 'desc' has initializer but incomplete type
+>> 
+>> Hide this part in the same #ifdef that controls the structure definition.
+>
+> Hey Arnd,
+>
+> this has been fixed by Vladimir:
+> https://lore.kernel.org/netdev/20231219110205.1289506-1-vladimir.oltean@nxp.com/
+>
+> in a way that we don't have to wrap driver code with ifdefs.
 
-syzbot found the following issue on:
+Ok, sounds good.
 
-HEAD commit:    954fb2d2d49f Merge branch 'remove-retired-tc-uapi'
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=16774b7ee80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4e9ca8e3c104d2a
-dashboard link: https://syzkaller.appspot.com/bug?extid=864a269c27ee06b58374
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15890ef9e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1764956ee80000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4bca0ab1d263/disk-954fb2d2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d2766905a2c7/vmlinux-954fb2d2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d12ee4a13afb/bzImage-954fb2d2.xz
-
-The issue was bisected to:
-
-commit 32af9a9e1069e55bc02741fb00ac9d0ca1a2eaef
-Author: Benjamin Berg <benjamin.berg@intel.com>
-Date:   Wed Dec 20 11:41:41 2023 +0000
-
-    wifi: cfg80211: free beacon_ies when overridden from hidden BSS
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1496b32de80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1696b32de80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1296b32de80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+864a269c27ee06b58374@syzkaller.appspotmail.com
-Fixes: 32af9a9e1069 ("wifi: cfg80211: free beacon_ies when overridden from hidden BSS")
-
-wlan0: Created IBSS using preconfigured BSSID 50:50:50:50:50:50
-wlan0: Creating new IBSS network, BSSID 50:50:50:50:50:50
-=============================
-WARNING: suspicious RCU usage
-6.7.0-rc6-syzkaller-01863-g954fb2d2d49f #0 Not tainted
------------------------------
-net/wireless/scan.c:1867 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-4 locks held by kworker/u4:2/35:
- #0: ffff888013071938 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x789/0x15d0 kernel/workqueue.c:2602
- #1: ffffc90000abfd80 ((work_completion)(&rdev->wiphy_work)){+.+.}-{0:0}, at: process_one_work+0x7eb/0x15d0 kernel/workqueue.c:2603
- #2: ffff88807b0f8768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock include/net/cfg80211.h:5928 [inline]
- #2: ffff88807b0f8768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: cfg80211_wiphy_work+0x2b/0x330 net/wireless/core.c:424
- #3: ffff88807b0f8168 (&rdev->bss_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
- #3: ffff88807b0f8168 (&rdev->bss_lock){+...}-{2:2}, at: cfg80211_inform_single_bss_frame_data+0x8e4/0x12c0 net/wireless/scan.c:3014
-
-stack backtrace:
-CPU: 0 PID: 35 Comm: kworker/u4:2 Not tainted 6.7.0-rc6-syzkaller-01863-g954fb2d2d49f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Workqueue: events_unbound cfg80211_wiphy_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x125/0x1b0 lib/dump_stack.c:106
- lockdep_rcu_suspicious+0x20c/0x3b0 kernel/locking/lockdep.c:6712
- __cfg80211_bss_update+0x17fb/0x25f0 net/wireless/scan.c:1867
- cfg80211_inform_single_bss_frame_data+0x91e/0x12c0 net/wireless/scan.c:3015
- cfg80211_inform_bss_frame_data+0x14c/0x340 net/wireless/scan.c:3050
- __ieee80211_sta_join_ibss+0xcf3/0x1880 net/mac80211/ibss.c:376
- ieee80211_sta_create_ibss+0x206/0x470 net/mac80211/ibss.c:1320
- ieee80211_sta_find_ibss net/mac80211/ibss.c:1449 [inline]
- ieee80211_ibss_work+0xbbb/0x14c0 net/mac80211/ibss.c:1666
- ieee80211_iface_work+0xbeb/0xda0 net/mac80211/iface.c:1665
- cfg80211_wiphy_work+0x24e/0x330 net/wireless/core.c:437
- process_one_work+0x886/0x15d0 kernel/workqueue.c:2627
- process_scheduled_works kernel/workqueue.c:2700 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2781
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+    Arnd
 
