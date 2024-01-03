@@ -1,446 +1,518 @@
-Return-Path: <netdev+bounces-61115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871FB8228BA
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 08:10:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E7968228F0
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 08:23:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDF74B21A04
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 07:10:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7C7D284ECF
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 07:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6207F179B8;
-	Wed,  3 Jan 2024 07:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D2618032;
+	Wed,  3 Jan 2024 07:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c+uyaWx8"
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="uqfYW5jk";
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="iB6f9a9X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nautica.notk.org (nautica.notk.org [91.121.71.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDD2179AA;
-	Wed,  3 Jan 2024 07:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40d87df95ddso23413915e9.0;
-        Tue, 02 Jan 2024 23:10:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704265843; x=1704870643; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=d1xSlSEpk9i2PdiPgvOpboLqVAXHUKk6uv67sMJ/h+8=;
-        b=c+uyaWx80SLwp1FX7o8zyX7QU3kGZvxVd9Qo0M0rVQs9I7WcEn2PdazjWPqMEJWeRU
-         cY7yrf0foa/Dq1+qteatmrXQ8Eb1/T8iHSao2hddhwCoCT+htJAOcq9uiM8qXkJREbtE
-         UhBi7UdUqCoJEZyP9VOeMkr5Cdxq6P6TuLFPARDAL6G/wqQr9BhthinJlQudMk+EwPrP
-         HGaIUk5b4eZuM4nrO619pyo6OINEkYwrxhsu2RWIj+Lc46dnH62xn8eUwy490YI2/3cK
-         CUsOqj4+QEVPsBg0qOBvYT2GjCjTx1YVMzcx4oSbSDAziuc6RVQjsKYFTKFUmm9emwk7
-         RBsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704265843; x=1704870643;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d1xSlSEpk9i2PdiPgvOpboLqVAXHUKk6uv67sMJ/h+8=;
-        b=EpIXDXF/FkT00/mekI+F6Hc9Gcdl2dEu5WlMpq0/lvIGDtaCIb1KSvGeHr6vzkwYvq
-         4IuTpHYLowWVHF5vVyX3EKUDb8r0x0efw2arBMgeQS7Jbkw3CZSpGGFhZGv+IbLTCD0c
-         wQzYZeqv53mVuITjUip8x/g2rcyw6qh05j89Fars+QO6l1dk8mDnfSXNtu94pIFew13A
-         kiO4QDIj9vUA7wDt7iarQ7x6H9T291Eyl1fzkLA1WMzgd7Hs580UrvOCGuztSZ6lq0n/
-         u4bZbJUSPpIh1qXje7l65eVBoWw94lBHBwkslB3gM/JojpD2Y4DwIwTzgLinZJA3pnex
-         pAag==
-X-Gm-Message-State: AOJu0YzAbI3MRmOK9ND++0QCnayuscJnxVVYLcsRfcKt/m2jKDetc1Zm
-	Qih01kQTKblb/kZWyGm/kbc=
-X-Google-Smtp-Source: AGHT+IH/LYVKGB9iS892w7jugK2mXCLiq/DlWErOwI2yiYJ/2hB7mth1xcCwV1vDYwHjtoVajCwZrA==
-X-Received: by 2002:a05:600c:3d0e:b0:40d:5c47:906c with SMTP id bh14-20020a05600c3d0e00b0040d5c47906cmr3430433wmb.294.1704265843394;
-        Tue, 02 Jan 2024 23:10:43 -0800 (PST)
-Received: from ran.advaoptical.com ([82.166.23.19])
-        by smtp.gmail.com with ESMTPSA id m4-20020a05600c4f4400b0040d3276ba19sm1342367wmq.25.2024.01.02.23.10.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 23:10:42 -0800 (PST)
-From: Sagi Maimon <maimon.sagi@gmail.com>
-To: richardcochran@gmail.com,
-	jonathan.lemon@gmail.com,
-	vadfed@fb.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	Sagi Maimon <maimon.sagi@gmail.com>
-Subject: [PATCH v3] ptp: ocp: add Adva timecard support
-Date: Wed,  3 Jan 2024 09:10:39 +0200
-Message-Id: <20240103071039.94132-1-maimon.sagi@gmail.com>
-X-Mailer: git-send-email 2.26.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B4A18027;
+	Wed,  3 Jan 2024 07:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+Received: by nautica.notk.org (Postfix, from userid 108)
+	id 949DBC024; Wed,  3 Jan 2024 08:22:58 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1704266578; bh=RTWy0dxEMBU7YHmS1XNmpVAiFlJnmT3Et4L/I5ab7Ow=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uqfYW5jksrvCQpt8LmJKFK1pymqZvr0fNs5ydgxd2w2N26tNteDguezFaw3LkQfED
+	 Od1VIvgXutsA2AVW1awCGx02d+AvSNb4MsEKSO1LNMXRmsHTE8D41hpRiY1Bq7VWkb
+	 G3fWDnF6wXkcat124kAGZSyc7CSlL+njN5wcHTn0LsJ0dyUwiu2DgCzx299JrJDPV3
+	 z5cdKETVKuLEDbcIHmo/e8w4ixRV/xmfMU3NxaoDk+OinUwFQLzwBpwjpg+vp/YDpT
+	 MsY3+X94WUWTIU6FQJF2s67pZbV3ILyoKWgqKSvXIUH9T2Ik2Dkmnm+ZW6sfusa3Z2
+	 rc6ojAzLEkhBw==
+X-Spam-Level: 
+Received: from gaia (localhost [127.0.0.1])
+	by nautica.notk.org (Postfix) with ESMTPS id E31CAC009;
+	Wed,  3 Jan 2024 08:22:47 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1704266574; bh=RTWy0dxEMBU7YHmS1XNmpVAiFlJnmT3Et4L/I5ab7Ow=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iB6f9a9XtKFd8Mc6VqzCmgyJhSyuMHEer6dsobANqz894EpDs8i0AQIcPKF+2fVvG
+	 jlyJVUQYmDp/W0iu/EQsl4XwbetIzk5mwbFBiXBlu/ggfUJcirHhYjssuvmdY4uE21
+	 LtD0O2UioQdUpg5rJrQgdUE8fbHLM4fPus8A4SubgvfihFttaA1h7XEtc/TQ+wxQdz
+	 U/2ehe2gJNG8zWaOv8jS1Qd5NdDwIFiasvGLB8n/7dwEmGytLmRvxs2ZklbFS59ZhZ
+	 Y+dXCw+KunEC0DBMhVJnfjSd2W011G0n6+S3zqpRvtMEq9lAzk5bULE4EZQi6D9Zz+
+	 osuS+JtBTxf5A==
+Received: from localhost (gaia [local])
+	by gaia (OpenSMTPD) with ESMTPA id f52185ec;
+	Wed, 3 Jan 2024 07:22:44 +0000 (UTC)
+Date: Wed, 3 Jan 2024 16:22:29 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH v5 40/40] 9p: Use netfslib read/write_iter
+Message-ID: <ZZULNQAZ0n0WQv7p@codewreck.org>
+References: <20231221132400.1601991-1-dhowells@redhat.com>
+ <20231221132400.1601991-41-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231221132400.1601991-41-dhowells@redhat.com>
 
-Adding support for the Adva timecard.
-The card uses different drivers to provide access to the
-firmware SPI flash (Altera based).
-Other parts of the code are the same and could be reused.
+David Howells wrote on Thu, Dec 21, 2023 at 01:23:35PM +0000:
+> Use netfslib's read and write iteration helpers, allowing netfslib to take
+> over the management of the page cache for 9p files and to manage local disk
+> caching.  In particular, this eliminates write_begin, write_end, writepage
+> and all mentions of struct page and struct folio from 9p.
+> 
+> Note that netfslib now offers the possibility of write-through caching if
+> that is desirable for 9p: just set the NETFS_ICTX_WRITETHROUGH flag in
+> v9inode->netfs.flags in v9fs_set_netfs_context().
+> 
+> Note also this is untested as I can't get ganesha.nfsd to correctly parse
+> the config to turn on 9p support.
 
-Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
----
+(that's appparently no longer true and might need updating)
 
- Addressed comments from:
- - Jakub Kicinski : https://www.spinics.net/lists/netdev/msg962419.html
-          
- Changes since version 2:
- - reformat the commit message to separate the subject from the body of the message.
- 
- 
- drivers/ptp/ptp_ocp.c | 247 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 238 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index 4021d3d325f9..96f2ab8a9d61 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -34,6 +34,9 @@
- #define PCI_VENDOR_ID_OROLIA			0x1ad7
- #define PCI_DEVICE_ID_OROLIA_ARTCARD		0xa000
- 
-+#define PCI_VENDOR_ID_ADVA			0xad5a
-+#define PCI_DEVICE_ID_ADVA_TIMECARD		0x0400
-+
- static struct class timecard_class = {
- 	.name		= "timecard",
- };
-@@ -63,6 +66,13 @@ struct ocp_reg {
- 	u32	status_drift;
- };
- 
-+struct ptp_ocp_servo_conf {
-+	u32	servo_offset_p;
-+	u32	servo_offset_i;
-+	u32	servo_drift_p;
-+	u32	servo_drift_i;
-+};
-+
- #define OCP_CTRL_ENABLE		BIT(0)
- #define OCP_CTRL_ADJUST_TIME	BIT(1)
- #define OCP_CTRL_ADJUST_OFFSET	BIT(2)
-@@ -397,10 +407,14 @@ static int ptp_ocp_sma_store(struct ptp_ocp *bp, const char *buf, int sma_nr);
- 
- static int ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
- 
-+static int ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
-+
- static const struct ocp_attr_group fb_timecard_groups[];
- 
- static const struct ocp_attr_group art_timecard_groups[];
- 
-+static const struct ocp_attr_group adva_timecard_groups[];
-+
- struct ptp_ocp_eeprom_map {
- 	u16	off;
- 	u16	len;
-@@ -700,6 +714,12 @@ static struct ocp_resource ocp_fb_resource[] = {
- 	},
- 	{
- 		.setup = ptp_ocp_fb_board_init,
-+		.extra = &(struct ptp_ocp_servo_conf) {
-+			.servo_offset_p = 0x2000,
-+			.servo_offset_i = 0x1000,
-+			.servo_drift_p = 0,
-+			.servo_drift_i = 0,
-+		},
- 	},
- 	{ }
- };
-@@ -831,6 +851,129 @@ static struct ocp_resource ocp_art_resource[] = {
- 	},
- 	{
- 		.setup = ptp_ocp_art_board_init,
-+		.extra = &(struct ptp_ocp_servo_conf) {
-+			.servo_offset_p = 0x2000,
-+			.servo_offset_i = 0x1000,
-+			.servo_drift_p = 0,
-+			.servo_drift_i = 0,
-+		},
-+	},
-+	{ }
-+};
-+
-+static struct ocp_resource ocp_adva_resource[] = {
-+	{
-+		OCP_MEM_RESOURCE(reg),
-+		.offset = 0x01000000, .size = 0x10000,
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts0),
-+		.offset = 0x01010000, .size = 0x10000, .irq_vec = 1,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 0,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts1),
-+		.offset = 0x01020000, .size = 0x10000, .irq_vec = 2,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 1,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(ts2),
-+		.offset = 0x01060000, .size = 0x10000, .irq_vec = 6,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 2,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	/* Timestamp for PHC and/or PPS generator */
-+	{
-+		OCP_EXT_RESOURCE(pps),
-+		.offset = 0x010C0000, .size = 0x10000, .irq_vec = 0,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 5,
-+			.irq_fcn = ptp_ocp_ts_irq,
-+			.enable = ptp_ocp_ts_enable,
-+		},
-+	},
-+	{
-+		OCP_EXT_RESOURCE(signal_out[0]),
-+		.offset = 0x010D0000, .size = 0x10000, .irq_vec = 11,
-+		.extra = &(struct ptp_ocp_ext_info) {
-+			.index = 1,
-+			.irq_fcn = ptp_ocp_signal_irq,
-+			.enable = ptp_ocp_signal_enable,
-+		},
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_to_ext),
-+		.offset = 0x01030000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_to_clk),
-+		.offset = 0x01040000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(tod),
-+		.offset = 0x01050000, .size = 0x10000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(image),
-+		.offset = 0x00020000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(pps_select),
-+		.offset = 0x00130000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(sma_map1),
-+		.offset = 0x00140000, .size = 0x1000,
-+	},
-+	{
-+		OCP_MEM_RESOURCE(sma_map2),
-+		.offset = 0x00220000, .size = 0x1000,
-+	},
-+	{
-+		OCP_SERIAL_RESOURCE(gnss_port),
-+		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
-+		.extra = &(struct ptp_ocp_serial_port) {
-+			.baud = 9600,
-+		},
-+	},
-+	{
-+			OCP_MEM_RESOURCE(freq_in[0]),
-+			.offset = 0x01200000, .size = 0x10000,
-+	},
-+	{
-+			OCP_SPI_RESOURCE(spi_flash),
-+			.offset = 0x00310400, .size = 0x10000, .irq_vec = 9,
-+			.extra = &(struct ptp_ocp_flash_info) {
-+				.name = "spi_altera", .pci_offset = 0,
-+				.data_size = sizeof(struct altera_spi_platform_data),
-+				.data = &(struct altera_spi_platform_data) {
-+					.num_chipselect = 1,
-+					.num_devices = 1,
-+					.devices = &(struct spi_board_info) {
-+						.modalias = "spi-nor",
-+					},
-+				},
-+			},
-+	},
-+	{
-+		.setup = ptp_ocp_adva_board_init,
-+		.extra = &(struct ptp_ocp_servo_conf) {
-+			.servo_offset_p = 0xc000,
-+			.servo_offset_i = 0x1000,
-+			.servo_drift_p = 0,
-+			.servo_drift_i = 0,
-+		},
- 	},
- 	{ }
- };
-@@ -839,6 +982,7 @@ static const struct pci_device_id ptp_ocp_pcidev_id[] = {
- 	{ PCI_DEVICE_DATA(FACEBOOK, TIMECARD, &ocp_fb_resource) },
- 	{ PCI_DEVICE_DATA(CELESTICA, TIMECARD, &ocp_fb_resource) },
- 	{ PCI_DEVICE_DATA(OROLIA, ARTCARD, &ocp_art_resource) },
-+	{ PCI_DEVICE_DATA(ADVA, TIMECARD, &ocp_adva_resource) },
- 	{ }
- };
- MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
-@@ -917,6 +1061,27 @@ static const struct ocp_selector ptp_ocp_art_sma_out[] = {
- 	{ }
- };
- 
-+static const struct ocp_selector ptp_ocp_adva_sma_in[] = {
-+	{ .name = "10Mhz",	.value = 0x0000,      .frequency = 10000000},
-+	{ .name = "PPS1",	.value = 0x0001,      .frequency = 1 },
-+	{ .name = "PPS2",	.value = 0x0002,      .frequency = 1 },
-+	{ .name = "TS1",	.value = 0x0004,      .frequency = 0 },
-+	{ .name = "TS2",	.value = 0x0008,      .frequency = 0 },
-+	{ .name = "FREQ1",	.value = 0x0100,      .frequency = 0 },
-+	{ .name = "None",	.value = SMA_DISABLE, .frequency = 0 },
-+	{ }
-+};
-+
-+static const struct ocp_selector ptp_ocp_adva_sma_out[] = {
-+	{ .name = "10Mhz",	.value = 0x0000,  .frequency = 10000000},
-+	{ .name = "PHC",	.value = 0x0001,  .frequency = 1 },
-+	{ .name = "GNSS1",	.value = 0x0004,  .frequency = 1 },
-+	{ .name = "GEN1",	.value = 0x0040 },
-+	{ .name = "GND",	.value = 0x2000 },
-+	{ .name = "VCC",	.value = 0x4000 },
-+	{ }
-+};
-+
- struct ocp_sma_op {
- 	const struct ocp_selector *tbl[2];
- 	void (*init)(struct ptp_ocp *bp);
-@@ -1363,7 +1528,7 @@ ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
- }
- 
- static int
--ptp_ocp_init_clock(struct ptp_ocp *bp)
-+ptp_ocp_init_clock(struct ptp_ocp *bp, struct ptp_ocp_servo_conf *servo_conf)
- {
- 	struct timespec64 ts;
- 	u32 ctrl;
-@@ -1371,12 +1536,11 @@ ptp_ocp_init_clock(struct ptp_ocp *bp)
- 	ctrl = OCP_CTRL_ENABLE;
- 	iowrite32(ctrl, &bp->reg->ctrl);
- 
--	/* NO DRIFT Correction */
--	/* offset_p:i 1/8, offset_i: 1/16, drift_p: 0, drift_i: 0 */
--	iowrite32(0x2000, &bp->reg->servo_offset_p);
--	iowrite32(0x1000, &bp->reg->servo_offset_i);
--	iowrite32(0,	  &bp->reg->servo_drift_p);
--	iowrite32(0,	  &bp->reg->servo_drift_i);
-+	/* servo configuration */
-+	iowrite32(servo_conf->servo_offset_p, &bp->reg->servo_offset_p);
-+	iowrite32(servo_conf->servo_offset_i, &bp->reg->servo_offset_i);
-+	iowrite32(servo_conf->servo_drift_p, &bp->reg->servo_drift_p);
-+	iowrite32(servo_conf->servo_drift_p, &bp->reg->servo_drift_i);
- 
- 	/* latch servo values */
- 	ctrl |= OCP_CTRL_ADJUST_SERVO;
-@@ -2362,6 +2526,14 @@ static const struct ocp_sma_op ocp_fb_sma_op = {
- 	.set_output	= ptp_ocp_sma_fb_set_output,
- };
- 
-+static const struct ocp_sma_op ocp_adva_sma_op = {
-+	.tbl		= { ptp_ocp_adva_sma_in, ptp_ocp_adva_sma_out },
-+	.init		= ptp_ocp_sma_fb_init,
-+	.get		= ptp_ocp_sma_fb_get,
-+	.set_inputs	= ptp_ocp_sma_fb_set_inputs,
-+	.set_output	= ptp_ocp_sma_fb_set_output,
-+};
-+
- static int
- ptp_ocp_set_pins(struct ptp_ocp *bp)
- {
-@@ -2441,7 +2613,7 @@ ptp_ocp_fb_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- 		return err;
- 	ptp_ocp_sma_init(bp);
- 
--	return ptp_ocp_init_clock(bp);
-+	return ptp_ocp_init_clock(bp, r->extra);
- }
- 
- static bool
-@@ -2603,7 +2775,35 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
- 	if (err)
- 		return err;
- 
--	return ptp_ocp_init_clock(bp);
-+	return ptp_ocp_init_clock(bp, r->extra);
-+}
-+
-+/* ADVA specific board initializers; last "resource" registered. */
-+static int
-+ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
-+{
-+	int err;
-+
-+	bp->flash_start = 0xA00000;
-+	bp->fw_version = ioread32(&bp->image->version);
-+	bp->sma_op = &ocp_adva_sma_op;
-+
-+	ptp_ocp_fb_set_version(bp);
-+
-+	ptp_ocp_tod_init(bp);
-+	ptp_ocp_nmea_out_init(bp);
-+	ptp_ocp_signal_init(bp);
-+
-+	err = ptp_ocp_attr_group_add(bp, adva_timecard_groups);
-+	if (err)
-+		return err;
-+
-+	err = ptp_ocp_set_pins(bp);
-+	if (err)
-+		return err;
-+	ptp_ocp_sma_init(bp);
-+
-+	return ptp_ocp_init_clock(bp, r->extra);
- }
- 
- static ssize_t
-@@ -3578,6 +3778,35 @@ static const struct ocp_attr_group art_timecard_groups[] = {
- 	{ },
- };
- 
-+static struct attribute *adva_timecard_attrs[] = {
-+	&dev_attr_serialnum.attr,
-+	&dev_attr_gnss_sync.attr,
-+	&dev_attr_clock_source.attr,
-+	&dev_attr_available_clock_sources.attr,
-+	&dev_attr_sma1.attr,
-+	&dev_attr_sma2.attr,
-+	&dev_attr_sma3.attr,
-+	&dev_attr_sma4.attr,
-+	&dev_attr_available_sma_inputs.attr,
-+	&dev_attr_available_sma_outputs.attr,
-+	&dev_attr_clock_status_drift.attr,
-+	&dev_attr_clock_status_offset.attr,
-+	&dev_attr_ts_window_adjust.attr,
-+	&dev_attr_tod_correction.attr,
-+	NULL,
-+};
-+
-+static const struct attribute_group adva_timecard_group = {
-+	.attrs = adva_timecard_attrs,
-+};
-+
-+static const struct ocp_attr_group adva_timecard_groups[] = {
-+	{ .cap = OCP_CAP_BASIC,	    .group = &adva_timecard_group },
-+	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
-+	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq0_group },
-+	{ },
-+};
-+
- static void
- gpio_input_map(char *buf, struct ptp_ocp *bp, u16 map[][2], u16 bit,
- 	       const char *def)
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: Jeff Layton <jlayton@kernel.org>
+> cc: Eric Van Hensbergen <ericvh@kernel.org>
+> cc: Latchesar Ionkov <lucho@ionkov.net>
+> cc: Dominique Martinet <asmadeus@codewreck.org>
+
+At quite high level, I've played with this a bit and see no obvious
+regression with the extra patch
+
+I've also manually confirmed one of the big improvements I'd been asking
+for (that writes in cached modes, which used to be chunked to 4k, and
+are now properly aggregated, so e.g 'dd bs=1M count=1' will properly
+issue a minimal number of TWRITE calls capped by msize) -- this is
+great!
+
+I've noticed we don't cache xattrs are all, so with the default mount
+options on a kernel built with 9P_FS_SECURITY we'll get a gazillion
+lookups for security.capabilities... But that's another problem, and
+this is still an improvement so no reason to hold back.
+
+I've got a couple of questions below, but:
+
+Tested-by: Dominique Martinet <asmadeus@codewreck.org>
+Acked-by: Dominique Martinet <asmadeus@codewreck.org>
+
+
+(I'd still be extremly thanksful if Christian and/or Eric would have
+time to check as well, but I won't push back to merging it this merge
+window next week if they don't have time... I'll also keep trying to run
+some more tests as time allows)
+
+> cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+> cc: v9fs@lists.linux.dev
+> cc: linux-cachefs@redhat.com
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+> 
+> Notes:
+>     Changes
+>     =======
+>     ver #5)
+>      - Added some missing remote_i_size setting.
+>      - Added missing writepages (else mmap write never written back).
+> 
+>  fs/9p/vfs_addr.c       | 293 ++++++++++-------------------------------
+>  fs/9p/vfs_file.c       |  89 ++-----------
+>  fs/9p/vfs_inode.c      |   5 +-
+>  fs/9p/vfs_inode_dotl.c |   7 +-
+>  4 files changed, 85 insertions(+), 309 deletions(-)
+> 
+> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+> index 055b672a247d..20f072c18ce9 100644
+> --- a/fs/9p/vfs_addr.c
+> +++ b/fs/9p/vfs_addr.c
+> @@ -19,12 +19,48 @@
+>  #include <linux/netfs.h>
+>  #include <net/9p/9p.h>
+>  #include <net/9p/client.h>
+> +#include <trace/events/netfs.h>
+>  
+>  #include "v9fs.h"
+>  #include "v9fs_vfs.h"
+>  #include "cache.h"
+>  #include "fid.h"
+>  
+> +static void v9fs_upload_to_server(struct netfs_io_subrequest *subreq)
+> +{
+> +	struct inode *inode = subreq->rreq->inode;
+> +	struct v9fs_inode __maybe_unused *v9inode = V9FS_I(inode);
+
+Any reason to have this variable assignment at all?
+(I assume it'll get optimized away, but it looks like that's not a maybe
+here so was a bit surprised -- I guess it's just been copy-pasted from
+the old code getting the fscache cookie?)
+
+> +	struct p9_fid *fid = subreq->rreq->netfs_priv;
+> +	int err;
+> +
+> +	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
+> +	p9_client_write(fid, subreq->start, &subreq->io_iter, &err);
+
+p9_client_write return value should always be subreq->len, but I believe
+we should use it unless err is set.
+(It's also possible for partial writes to happen, e.g. p9_client_write
+looped a few times and then failed, at which point the size returned
+would be the amount that actually got through -- we probably should do
+something with that?)
+
+> +	netfs_write_subrequest_terminated(subreq, err < 0 ? err : subreq->len,
+> +					  false);
+> +}
+> +
+> +static void v9fs_upload_to_server_worker(struct work_struct *work)
+> +{
+> +	struct netfs_io_subrequest *subreq =
+> +		container_of(work, struct netfs_io_subrequest, work);
+> +
+> +	v9fs_upload_to_server(subreq);
+> +}
+> +
+> +/*
+> + * Set up write requests for a writeback slice.  We need to add a write request
+> + * for each write we want to make.
+> + */
+> +static void v9fs_create_write_requests(struct netfs_io_request *wreq, loff_t start, size_t len)
+> +{
+> +	struct netfs_io_subrequest *subreq;
+> +
+> +	subreq = netfs_create_write_request(wreq, NETFS_UPLOAD_TO_SERVER,
+> +					    start, len, v9fs_upload_to_server_worker);
+> +	if (subreq)
+> +		netfs_queue_write_request(subreq);
+> +}
+> +
+>  /**
+>   * v9fs_issue_read - Issue a read from 9P
+>   * @subreq: The read to make
+> @@ -33,14 +69,10 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
+>  {
+>  	struct netfs_io_request *rreq = subreq->rreq;
+>  	struct p9_fid *fid = rreq->netfs_priv;
+> -	struct iov_iter to;
+> -	loff_t pos = subreq->start + subreq->transferred;
+> -	size_t len = subreq->len   - subreq->transferred;
+>  	int total, err;
+>  
+> -	iov_iter_xarray(&to, ITER_DEST, &rreq->mapping->i_pages, pos, len);
+> -
+> -	total = p9_client_read(fid, pos, &to, &err);
+> +	total = p9_client_read(fid, subreq->start + subreq->transferred,
+> +			       &subreq->io_iter, &err);
+
+Just to clarify: subreq->io_iter didn't exist (or some conditions to use
+it weren't cleared) before?
+
+>  
+>  	/* if we just extended the file size, any portion not in
+>  	 * cache won't be on server and is zeroes */
+> @@ -50,23 +82,37 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
+>  }
+>  
+>  /**
+> - * v9fs_init_request - Initialise a read request
+> + * v9fs_init_request - Initialise a request
+>   * @rreq: The read request
+>   * @file: The file being read from
+>   */
+>  static int v9fs_init_request(struct netfs_io_request *rreq, struct file *file)
+>  {
+> -	struct p9_fid *fid = file->private_data;
+> -
+> -	BUG_ON(!fid);
+> +	struct p9_fid *fid;
+> +	bool writing = (rreq->origin == NETFS_READ_FOR_WRITE ||
+> +			rreq->origin == NETFS_WRITEBACK ||
+> +			rreq->origin == NETFS_WRITETHROUGH ||
+> +			rreq->origin == NETFS_LAUNDER_WRITE ||
+> +			rreq->origin == NETFS_UNBUFFERED_WRITE ||
+> +			rreq->origin == NETFS_DIO_WRITE);
+> +
+> +	if (file) {
+> +		fid = file->private_data;
+> +		BUG_ON(!fid);
+
+This probably should be WARN + return EINVAL like find by inode?
+It's certainly a huge problem, but we should avoid BUG if possible...
+
+> +		p9_fid_get(fid);
+> +	} else {
+> +		fid = v9fs_fid_find_inode(rreq->inode, writing, INVALID_UID, true);
+> +		if (!fid) {
+> +			WARN_ONCE(1, "folio expected an open fid inode->i_private=%p\n",
+> +				  rreq->inode->i_private);
+
+nit: not sure what's cleaner?
+Since there's a message that makes for a bit awkward if...
+
+if (WARN_ONCE(!fid, "folio expected an open fid inode->i_private=%p\n",
+	      rreq->inode->i_private))
+	return -EINVAL;
+
+(as a side note, I'm not sure what to make of this i_private pointer
+here, but if that'll help you figure something out sure..)
+
+> +			return -EINVAL;
+> +		}
+> +	}
+>  
+>  	/* we might need to read from a fid that was opened write-only
+>  	 * for read-modify-write of page cache, use the writeback fid
+>  	 * for that */
+> -	WARN_ON(rreq->origin == NETFS_READ_FOR_WRITE &&
+> -			!(fid->mode & P9_ORDWR));
+> -
+> -	p9_fid_get(fid);
+> +	WARN_ON(writing && !(fid->mode & P9_ORDWR));
+
+This is as follow on your netfs-lib branch:
+-       WARN_ON(rreq->origin == NETFS_READ_FOR_WRITE &&
+-                       !(fid->mode & P9_ORDWR));
+-
+-       p9_fid_get(fid);
++       WARN_ON(rreq->origin == NETFS_READ_FOR_WRITE && !(fid->mode & P9_ORDWR));
+
+So the WARN_ON has been reverted back with only indentation changed;
+I guess there were patterns that were writing despite the fid not having
+been open as RDWR?
+Do you still have details about these?
+
+If a file has been open without the write bit it might not go through,
+and it's incredibly difficult to get such users back to userspace in
+async cases (e.g. mmap flushes), so would like to understand that.
+
+>  	rreq->netfs_priv = fid;
+>  	return 0;
+>  }
+> diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
+> index 11cd8d23f6f2..bae330c2f0cf 100644
+> --- a/fs/9p/vfs_file.c
+> +++ b/fs/9p/vfs_file.c
+> @@ -353,25 +353,15 @@ static ssize_t
+>  v9fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
+>  {
+>  	struct p9_fid *fid = iocb->ki_filp->private_data;
+> -	int ret, err = 0;
+>  
+>  	p9_debug(P9_DEBUG_VFS, "fid %d count %zu offset %lld\n",
+>  		 fid->fid, iov_iter_count(to), iocb->ki_pos);
+>  
+> -	if (!(fid->mode & P9L_DIRECT)) {
+> -		p9_debug(P9_DEBUG_VFS, "(cached)\n");
+> -		return generic_file_read_iter(iocb, to);
+> -	}
+> -
+> -	if (iocb->ki_filp->f_flags & O_NONBLOCK)
+> -		ret = p9_client_read_once(fid, iocb->ki_pos, to, &err);
+> -	else
+> -		ret = p9_client_read(fid, iocb->ki_pos, to, &err);
+> -	if (!ret)
+> -		return err;
+> +	if (fid->mode & P9L_DIRECT)
+> +		return netfs_unbuffered_read_iter(iocb, to);
+>  
+> -	iocb->ki_pos += ret;
+> -	return ret;
+> +	p9_debug(P9_DEBUG_VFS, "(cached)\n");
+
+(Not a new problem so no need to address here, but having just
+"(cached)" on a split line is a bit weird.. We first compute cached or
+not as a bool and make it %s + cached ? " (cached)" : "" or
+something... I'll send a patch after this gets in to avoid conflicts)
+
+> +	return netfs_file_read_iter(iocb, to);
+>  }
+>  
+>  /*
+> @@ -407,46 +397,14 @@ v9fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>  {
+>  	struct file *file = iocb->ki_filp;
+>  	struct p9_fid *fid = file->private_data;
+> -	ssize_t retval;
+> -	loff_t origin;
+> -	int err = 0;
+>  
+>  	p9_debug(P9_DEBUG_VFS, "fid %d\n", fid->fid);
+>  
+> -	if (!(fid->mode & (P9L_DIRECT | P9L_NOWRITECACHE))) {
+> -		p9_debug(P9_DEBUG_CACHE, "(cached)\n");
+> -		return generic_file_write_iter(iocb, from);
+> -	}
+> +	if (fid->mode & (P9L_DIRECT | P9L_NOWRITECACHE))
+> +		return netfs_unbuffered_write_iter(iocb, from);
+>  
+> -	retval = generic_write_checks(iocb, from);
+> -	if (retval <= 0)
+> -		return retval;
+> -
+> -	origin = iocb->ki_pos;
+> -	retval = p9_client_write(file->private_data, iocb->ki_pos, from, &err);
+> -	if (retval > 0) {
+> -		struct inode *inode = file_inode(file);
+> -		loff_t i_size;
+> -		unsigned long pg_start, pg_end;
+> -
+> -		pg_start = origin >> PAGE_SHIFT;
+> -		pg_end = (origin + retval - 1) >> PAGE_SHIFT;
+> -		if (inode->i_mapping && inode->i_mapping->nrpages)
+> -			invalidate_inode_pages2_range(inode->i_mapping,
+> -						      pg_start, pg_end);
+> -		iocb->ki_pos += retval;
+> -		i_size = i_size_read(inode);
+> -		if (iocb->ki_pos > i_size) {
+> -			inode_add_bytes(inode, iocb->ki_pos - i_size);
+> -			/*
+> -			 * Need to serialize against i_size_write() in
+> -			 * v9fs_stat2inode()
+> -			 */
+> -			v9fs_i_size_write(inode, iocb->ki_pos);
+> -		}
+> -		return retval;
+> -	}
+> -	return err;
+> +	p9_debug(P9_DEBUG_CACHE, "(cached)\n");
+> +	return netfs_file_write_iter(iocb, from);
+>  }
+>  
+>  static int v9fs_file_fsync(struct file *filp, loff_t start, loff_t end,
+> @@ -519,36 +477,7 @@ v9fs_file_mmap(struct file *filp, struct vm_area_struct *vma)
+>  static vm_fault_t
+>  v9fs_vm_page_mkwrite(struct vm_fault *vmf)
+>  {
+> -	struct folio *folio = page_folio(vmf->page);
+> -	struct file *filp = vmf->vma->vm_file;
+> -	struct inode *inode = file_inode(filp);
+> -
+> -
+> -	p9_debug(P9_DEBUG_VFS, "folio %p fid %lx\n",
+> -		 folio, (unsigned long)filp->private_data);
+> -
+> -	/* Wait for the page to be written to the cache before we allow it to
+> -	 * be modified.  We then assume the entire page will need writing back.
+> -	 */
+> -#ifdef CONFIG_9P_FSCACHE
+> -	if (folio_test_fscache(folio) &&
+> -	    folio_wait_fscache_killable(folio) < 0)
+> -		return VM_FAULT_NOPAGE;
+> -#endif
+> -
+> -	/* Update file times before taking page lock */
+> -	file_update_time(filp);
+> -
+> -	if (folio_lock_killable(folio) < 0)
+> -		return VM_FAULT_RETRY;
+> -	if (folio_mapping(folio) != inode->i_mapping)
+> -		goto out_unlock;
+> -	folio_wait_stable(folio);
+> -
+> -	return VM_FAULT_LOCKED;
+> -out_unlock:
+> -	folio_unlock(folio);
+> -	return VM_FAULT_NOPAGE;
+> +	return netfs_page_mkwrite(vmf, NULL);
+
+(I guess there's no helper that could be used directly in .page_mkwrite
+op?)
+
+>  }
+>  
+>  static void v9fs_mmap_vm_close(struct vm_area_struct *vma)
+> diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
+> index 74122540e00f..55345753ae8d 100644
+> --- a/fs/9p/vfs_inode.c
+> +++ b/fs/9p/vfs_inode.c
+> @@ -374,10 +374,8 @@ void v9fs_evict_inode(struct inode *inode)
+>  
+>  	truncate_inode_pages_final(&inode->i_data);
+>  
+> -#ifdef CONFIG_9P_FSCACHE
+>  	version = cpu_to_le32(v9inode->qid.version);
+>  	netfs_clear_inode_writeback(inode, &version);
+> -#endif
+>  
+>  	clear_inode(inode);
+>  	filemap_fdatawrite(&inode->i_data);
+> @@ -1112,7 +1110,7 @@ static int v9fs_vfs_setattr(struct mnt_idmap *idmap,
+>  	if ((iattr->ia_valid & ATTR_SIZE) &&
+>  		 iattr->ia_size != i_size_read(inode)) {
+>  		truncate_setsize(inode, iattr->ia_size);
+> -		truncate_pagecache(inode, iattr->ia_size);
+> +		netfs_resize_file(netfs_inode(inode), iattr->ia_size, true);
+>  
+>  #ifdef CONFIG_9P_FSCACHE
+>  		if (v9ses->cache & CACHE_FSCACHE) {
+> @@ -1180,6 +1178,7 @@ v9fs_stat2inode(struct p9_wstat *stat, struct inode *inode,
+>  	mode |= inode->i_mode & ~S_IALLUGO;
+>  	inode->i_mode = mode;
+>  
+> +	v9inode->netfs.remote_i_size = stat->length;
+>  	if (!(flags & V9FS_STAT2INODE_KEEP_ISIZE))
+>  		v9fs_i_size_write(inode, stat->length);
+>  	/* not real number of blocks, but 512 byte ones ... */
+> diff --git a/fs/9p/vfs_inode_dotl.c b/fs/9p/vfs_inode_dotl.c
+> index c7319af2f471..e25fbc988f09 100644
+> --- a/fs/9p/vfs_inode_dotl.c
+> +++ b/fs/9p/vfs_inode_dotl.c
+> @@ -598,7 +598,7 @@ int v9fs_vfs_setattr_dotl(struct mnt_idmap *idmap,
+>  	if ((iattr->ia_valid & ATTR_SIZE) && iattr->ia_size !=
+>  		 i_size_read(inode)) {
+>  		truncate_setsize(inode, iattr->ia_size);
+> -		truncate_pagecache(inode, iattr->ia_size);
+> +		netfs_resize_file(netfs_inode(inode), iattr->ia_size, true);
+>  
+>  #ifdef CONFIG_9P_FSCACHE
+>  		if (v9ses->cache & CACHE_FSCACHE)
+> @@ -655,6 +655,7 @@ v9fs_stat2inode_dotl(struct p9_stat_dotl *stat, struct inode *inode,
+>  		mode |= inode->i_mode & ~S_IALLUGO;
+>  		inode->i_mode = mode;
+>  
+> +		v9inode->netfs.remote_i_size = stat->st_size;
+>  		if (!(flags & V9FS_STAT2INODE_KEEP_ISIZE))
+>  			v9fs_i_size_write(inode, stat->st_size);
+>  		inode->i_blocks = stat->st_blocks;
+> @@ -683,8 +684,10 @@ v9fs_stat2inode_dotl(struct p9_stat_dotl *stat, struct inode *inode,
+>  			inode->i_mode = mode;
+>  		}
+>  		if (!(flags & V9FS_STAT2INODE_KEEP_ISIZE) &&
+> -		    stat->st_result_mask & P9_STATS_SIZE)
+> +		    stat->st_result_mask & P9_STATS_SIZE) {
+> +			v9inode->netfs.remote_i_size = stat->st_size;
+>  			v9fs_i_size_write(inode, stat->st_size);
+> +		}
+>  		if (stat->st_result_mask & P9_STATS_BLOCKS)
+>  			inode->i_blocks = stat->st_blocks;
+>  	}
+> 
+
 -- 
-2.26.3
-
+Dominique Martinet | Asmadeus
 
