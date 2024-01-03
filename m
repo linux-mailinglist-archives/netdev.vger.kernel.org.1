@@ -1,292 +1,104 @@
-Return-Path: <netdev+bounces-61309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61E92823436
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 19:18:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22B4E82346C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 19:26:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAEC4286C29
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:18:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 168DE1C23B48
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4C31C69D;
-	Wed,  3 Jan 2024 18:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34481CABC;
+	Wed,  3 Jan 2024 18:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QpnTB60c"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ao+ZXOop"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301261C68E
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 18:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-203fbbff863so285983fac.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 10:17:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1704305877; x=1704910677; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SchACSbuteZixwR1uOXkLWv18sw5pAdA1bSWovDVXE4=;
-        b=QpnTB60cQkRFbx+J4ZO1DcQYiku+2BwhfRL9YKVqiTgliplDk779GSMysC6vnm7aFg
-         9VmsJr/Z7ssbarX5nTJQ9FaDa8oGGjCGhuQUsWAz2Yu74IRM0SOfe5HAAB/HzAOBR6TS
-         Z72WTWIHaazLq/jZQPEztoqaWW/c5xS8P6Uek=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704305877; x=1704910677;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SchACSbuteZixwR1uOXkLWv18sw5pAdA1bSWovDVXE4=;
-        b=ZwXbD5YWtzgwKn/s1TbGQa6i+o40b1Tv2NeO5T7VPEw/lUHHnFpp2aNa/VCwthXIjO
-         by7ojepIlBhQ8IF4hMyUgbzGF11eAyCxbmoMU1QscTRUGNZJ+LNqTPCWax9QRxYoRLs7
-         q1hmx1zCOTiRJPNK2wfGEs4+KYdqzWy7mfRuupj3UF9Ky8A6BfUOR9UifI5EZe2OJn0N
-         qgZMjDBlabxL7G0mhyd51hVOZylMDw+zlivxVoB63PXWrXDxqqcUp5zmF3hxB1TGtaKk
-         bH+D2AKSRfWFF7As4Dt/xjupCmeIV1jyljx24K0dl5BNlUXCyXJQxB4so/KyyQOKfClT
-         nMWA==
-X-Gm-Message-State: AOJu0YzYsA4v38lILjAjzD9rUGppxNwNSootNVaUtRUuIWh/LGGD4UvS
-	ZMilXk4kWDMqqQJXeir8nvZXV8LOgm36k91yN/IsQtEg88j8
-X-Google-Smtp-Source: AGHT+IFOe9hxXvX0ghoyBjoTJNLQIqDMaI9Xs1rmLcqDIXd8o72p/PKtSB9ivgl0jGDuy4Zxh+buv5SJJrWtn1PxGUk=
-X-Received: by 2002:a05:6870:7b52:b0:204:347a:8175 with SMTP id
- ji18-20020a0568707b5200b00204347a8175mr581796oab.46.1704305877112; Wed, 03
- Jan 2024 10:17:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699401CA96;
+	Wed,  3 Jan 2024 18:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704306352; x=1735842352;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xTyozBGsJ68X6VYIDd0NVpbOWs1o6mrsQLngawoY/Og=;
+  b=ao+ZXOop3h0hZMUIXVwXt49hlkdcCVNcltHBIygOtMXngwcCt20DvzHZ
+   HKPNToHB3gCGUPbVdtOdxcxdx3Gdmh4ZfvmtaYjDbkq+t8cTjtQFwWi9m
+   nUbJKbTeegQuOJDtRQPumteAr3UZYYOZ11hp7ctJThbyu/0s7FbrWbzCo
+   NvHDh9fH4Ez2bTEkPwKalnCOXRbUO59z2hE8GurYvoXp4aQv36kEpI0VU
+   28FE51KcVKjuxqa4kTg9OkqpYKMefaBdCbljIbwKpfoUDFwTNRZH5QsXb
+   D4wV0A9nIYbA/Znk/UrT7Ywdu22o6BsqLr1qKgralkGM7xCHQPArhn3Vx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="10641291"
+X-IronPort-AV: E=Sophos;i="6.04,328,1695711600"; 
+   d="scan'208";a="10641291"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 10:25:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="773208655"
+X-IronPort-AV: E=Sophos;i="6.04,328,1695711600"; 
+   d="scan'208";a="773208655"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 03 Jan 2024 10:25:46 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rL5vz-000MQw-2u;
+	Wed, 03 Jan 2024 18:25:43 +0000
+Date: Thu, 4 Jan 2024 02:25:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yajun Deng <yajun.deng@linux.dev>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, andrew@lunn.ch, olteanv@gmail.com,
+	hkallweit1@gmail.com, linux@armlinux.org.uk,
+	rmk+kernel@armlinux.org.uk, kabel@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-phy@lists.infradead.org, Yajun Deng <yajun.deng@linux.dev>
+Subject: Re: [PATCH net-next] net: phy: Cleanup struct mdio_driver_common
+Message-ID: <202401040103.bTPaACUE-lkp@intel.com>
+References: <20231228072350.1294425-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231229145232.6163-1-ilpo.jarvinen@linux.intel.com>
-In-Reply-To: <20231229145232.6163-1-ilpo.jarvinen@linux.intel.com>
-From: Ray Jui <ray.jui@broadcom.com>
-Date: Wed, 3 Jan 2024 10:17:45 -0800
-Message-ID: <CAJ8Y1dRSOdYesQ5cG1JTDc2W-mdz-OvcJBBTYz3X-EiUQPS8=g@mail.gmail.com>
-Subject: Re: [PATCH 1/1] net: mdio: mux-bcm-iproc: Use alignment helpers and SZ_4K
-To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000069a604060e0ea2be"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231228072350.1294425-1-yajun.deng@linux.dev>
 
---00000000000069a604060e0ea2be
-Content-Type: multipart/alternative; boundary="00000000000064fb11060e0ea270"
+Hi Yajun,
 
---00000000000064fb11060e0ea270
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+kernel test robot noticed the following build errors:
 
-On Fri, Dec 29, 2023 at 6:53=E2=80=AFAM Ilpo J=C3=A4rvinen <ilpo.jarvinen@l=
-inux.intel.com>
-wrote:
+[auto build test ERROR on net-next/main]
 
-> Instead of open coding, use IS_ALIGNED() and ALIGN_DOWN() when dealing
-> with alignment. Replace also literals with SZ_4K.
->
-> Signed-off-by: Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com>
-> ---
->  drivers/net/mdio/mdio-mux-bcm-iproc.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/mdio/mdio-mux-bcm-iproc.c
-> b/drivers/net/mdio/mdio-mux-bcm-iproc.c
-> index a750bd4c77a0..1ce7d67ba72e 100644
-> --- a/drivers/net/mdio/mdio-mux-bcm-iproc.c
-> +++ b/drivers/net/mdio/mdio-mux-bcm-iproc.c
-> @@ -2,6 +2,7 @@
->  /*
->   * Copyright 2016 Broadcom
->   */
-> +#include <linux/align.h>
->  #include <linux/clk.h>
->  #include <linux/delay.h>
->  #include <linux/device.h>
-> @@ -11,6 +12,7 @@
->  #include <linux/of_mdio.h>
->  #include <linux/phy.h>
->  #include <linux/platform_device.h>
-> +#include <linux/sizes.h>
->
->  #define MDIO_RATE_ADJ_EXT_OFFSET       0x000
->  #define MDIO_RATE_ADJ_INT_OFFSET       0x004
-> @@ -220,12 +222,12 @@ static int mdio_mux_iproc_probe(struct
-> platform_device *pdev)
->         md->base =3D devm_platform_get_and_ioremap_resource(pdev, 0, &res=
-);
->         if (IS_ERR(md->base))
->                 return PTR_ERR(md->base);
-> -       if (res->start & 0xfff) {
-> +       if (!IS_ALIGNED(res->start, SZ_4K)) {
->                 /* For backward compatibility in case the
->                  * base address is specified with an offset.
->                  */
->                 dev_info(&pdev->dev, "fix base address in dt-blob\n");
-> -               res->start &=3D ~0xfff;
-> +               res->start =3D ALIGN_DOWN(res->start, SZ_4K);
->                 res->end =3D res->start + MDIO_REG_ADDR_SPACE_SIZE - 1;
->         }
->
-> --
-> 2.39.2
->
+url:    https://github.com/intel-lab-lkp/linux/commits/Yajun-Deng/net-phy-Cleanup-struct-mdio_driver_common/20231228-152806
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231228072350.1294425-1-yajun.deng%40linux.dev
+patch subject: [PATCH net-next] net: phy: Cleanup struct mdio_driver_common
+config: s390-randconfig-002-20240103 (https://download.01.org/0day-ci/archive/20240104/202401040103.bTPaACUE-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240104/202401040103.bTPaACUE-lkp@intel.com/reproduce)
 
-Acked-by: Ray Jui <ray.jui@broadcom.com>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401040103.bTPaACUE-lkp@intel.com/
 
-Thanks.
+All errors (new ones prefixed by >>):
 
---00000000000064fb11060e0ea270
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+   s390-linux-ld: drivers/net/phy/mdio_bus.o: in function `mdio_bus_match':
+>> mdio_bus.c:(.text+0xecc): undefined reference to `is_phy_driver'
+   s390-linux-ld: drivers/net/phy/mdio_device.o: in function `mdio_device_bus_match':
+>> mdio_device.c:(.text+0x934): undefined reference to `is_phy_driver'
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Dec 29, 2023 at 6:53=E2=80=AF=
-AM Ilpo J=C3=A4rvinen &lt;<a href=3D"mailto:ilpo.jarvinen@linux.intel.com">=
-ilpo.jarvinen@linux.intel.com</a>&gt; wrote:<br></div><blockquote class=3D"=
-gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
-4,204,204);padding-left:1ex">Instead of open coding, use IS_ALIGNED() and A=
-LIGN_DOWN() when dealing<br>
-with alignment. Replace also literals with SZ_4K.<br>
-<br>
-Signed-off-by: Ilpo J=C3=A4rvinen &lt;<a href=3D"mailto:ilpo.jarvinen@linux=
-.intel.com" target=3D"_blank">ilpo.jarvinen@linux.intel.com</a>&gt;<br>
----<br>
-=C2=A0drivers/net/mdio/mdio-mux-bcm-iproc.c | 6 ++++--<br>
-=C2=A01 file changed, 4 insertions(+), 2 deletions(-)<br>
-<br>
-diff --git a/drivers/net/mdio/mdio-mux-bcm-iproc.c b/drivers/net/mdio/mdio-=
-mux-bcm-iproc.c<br>
-index a750bd4c77a0..1ce7d67ba72e 100644<br>
---- a/drivers/net/mdio/mdio-mux-bcm-iproc.c<br>
-+++ b/drivers/net/mdio/mdio-mux-bcm-iproc.c<br>
-@@ -2,6 +2,7 @@<br>
-=C2=A0/*<br>
-=C2=A0 * Copyright 2016 Broadcom<br>
-=C2=A0 */<br>
-+#include &lt;linux/align.h&gt;<br>
-=C2=A0#include &lt;linux/clk.h&gt;<br>
-=C2=A0#include &lt;linux/delay.h&gt;<br>
-=C2=A0#include &lt;linux/device.h&gt;<br>
-@@ -11,6 +12,7 @@<br>
-=C2=A0#include &lt;linux/of_mdio.h&gt;<br>
-=C2=A0#include &lt;linux/phy.h&gt;<br>
-=C2=A0#include &lt;linux/platform_device.h&gt;<br>
-+#include &lt;linux/sizes.h&gt;<br>
-<br>
-=C2=A0#define MDIO_RATE_ADJ_EXT_OFFSET=C2=A0 =C2=A0 =C2=A0 =C2=A00x000<br>
-=C2=A0#define MDIO_RATE_ADJ_INT_OFFSET=C2=A0 =C2=A0 =C2=A0 =C2=A00x004<br>
-@@ -220,12 +222,12 @@ static int mdio_mux_iproc_probe(struct platform_devic=
-e *pdev)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 md-&gt;base =3D devm_platform_get_and_ioremap_r=
-esource(pdev, 0, &amp;res);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (IS_ERR(md-&gt;base))<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return PTR_ERR(md-&=
-gt;base);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0if (res-&gt;start &amp; 0xfff) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (!IS_ALIGNED(res-&gt;start, SZ_4K)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* For backward com=
-patibility in case the<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* base addres=
-s is specified with an offset.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dev_info(&amp;pdev-=
-&gt;dev, &quot;fix base address in dt-blob\n&quot;);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0res-&gt;start &amp;=
-=3D ~0xfff;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0res-&gt;start =3D A=
-LIGN_DOWN(res-&gt;start, SZ_4K);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 res-&gt;end =3D res=
--&gt;start + MDIO_REG_ADDR_SPACE_SIZE - 1;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-<br>
--- <br>
-2.39.2<br></blockquote><div><br></div><div>Acked-by: Ray Jui &lt;<a href=3D=
-"mailto:ray.jui@broadcom.com">ray.jui@broadcom.com</a>&gt;</div><div><br></=
-div><div>Thanks.=C2=A0</div></div></div>
-
---00000000000064fb11060e0ea270--
-
---00000000000069a604060e0ea2be
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-YVhHgdTTB3aAzFyz4UFRLwxCzIG7d7GIiB9MoLImssS08R5WQ5EJCd1fAF6iefLupAn/plPmn2w0
-GF8bLF/FhwOn8jObLW5pQiKhjQSv3QIDAQABo4IB1TCCAdEwDgYDVR0PAQH/BAQDAgWgMIGjBggr
-BgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9j
-YWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8v
-b2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBE
-MEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20v
-cmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2Jh
-bHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAfBgNVHREEGDAWgRRyYXku
-anVpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdb
-NHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIScG7uNJuCYBQieQC+eonQS9tdkwDQYJKoZIhvcNAQEL
-BQADggEBAGLwq/sDtwLmkAa5/UpIG4o5HA9EH7SaYi05EUlzrDdIeZsJnXDkxmG9144wNZBbndHx
-nKXRnpJjCX4jhZeNQFyY4m5c9c8bMytO4zb8XUJIxCjqkhtukJtqHieEogwGsmZlpOxt6Ucc2JXg
-6oTTbyITD4Bvn7cFb7EI2FBcT7K8bf8AvwtNLl/dKYtUA/nEvVhjqp0wsDL3t//Q3GTwGWZB41gf
-LC04V6gD9TVFl7i/N48Gu8PzTt4Kt0SZvBr7kQ9PKi7DVyXe23Ou89QVflaja3bPjt2UZCyq0JxJ
-Nu5SjFDWjKlBCzbLDGkCBlM4DpjAb0y4MyKOsiVv7vIxNlYxggJtMIICaQIBATBrMFsxCzAJBgNV
-BAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdD
-QyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwcAgHcg4j27cIp1UUwDQYJYIZIAWUDBAIBBQCg
-gdQwLwYJKoZIhvcNAQkEMSIEIDVWaf0hk8S52ocVcem9wkzBWnSalpzWOQS3/iNK52QRMBgGCSqG
-SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEwMzE4MTc1N1owaQYJKoZI
-hvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG
-9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEF
-AASCAQAWkmSSDeKk3nJIyXhm+qyfdnRAv3UZD69R2idzY3AR10gdvww42LixK2y6iqFn5z2XPqOc
-tyLwXTLaJcD6bB0DwE/A/ZGo0wgIKUCFBB2yFEVMXmMRHqZaNj/aKPztqCa0i5zK0aBI46qdyZL+
-gkQ5jaD7GTL+1LqAaCsJ3NZE2/3/yd2M86GaENNP5O7fMMGrMWKug0sxEe3of++vwfzFbioRrmum
-KMSEL1yNoTFi2K8zRko0bLV9wGB9w1PSIdDIG0PDKmoEcejOj0nqn0Nk5NHG8c8IFtYyQ0FPvIeF
-Id4QVIhzGX//uOXR1fn1l3YZv0LGU01GbwTmMg1tsHol
---00000000000069a604060e0ea2be--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
