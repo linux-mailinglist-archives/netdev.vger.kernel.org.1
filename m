@@ -1,174 +1,233 @@
-Return-Path: <netdev+bounces-61206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE2A7822DFA
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:06:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 583EA822DFD
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:08:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2B581C21772
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:06:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68A4E1C21772
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC03E19469;
-	Wed,  3 Jan 2024 13:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099E81946C;
+	Wed,  3 Jan 2024 13:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="o1HORcO6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Be4k8Y9h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2743C1945E;
-	Wed,  3 Jan 2024 13:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 403CICU4030794;
-	Wed, 3 Jan 2024 13:06:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=6AihegcrHuKOKVAT22QfdIlNLXan2cC61758qMqmqts=; b=o1
-	HORcO66e7KRXO79u2YP06PNJvhOWBc8QJui8Vd6ufOk4RNIY117WyGj/IZkwCaOC
-	WHtxgIKdnq0CKl7zNTpNimaajPO49ZlbWZ6CoKLglZ/SiHCt1GvHrmbA8QClWQZe
-	MfIvm/QQNmY08T+DImeXjYMJIT+3yRoKZoXKHJ8+JT2xCHdbGcv8FGfFrvtXsj6o
-	rjOuSEOQnCYyxO22pKEiYO/5XMi6bhWBQwt48D1ep+NFP+u8iL4BBOsE5W4rsDr4
-	r8+cZ1rzvSDBnMoGUxqoWN5z3qEQnrnX0yEZou0jhP88MG9HSsOPy9siBkE8wy0r
-	RnJTNgmmauFLh6c0MIvA==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vcg41ba7j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jan 2024 13:06:19 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 403D6IZw032623
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 3 Jan 2024 13:06:18 GMT
-Received: from [10.253.72.77] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 3 Jan
- 2024 05:06:13 -0800
-Message-ID: <365d76a4-db05-40ac-a453-fb7e8b6db423@quicinc.com>
-Date: Wed, 3 Jan 2024 21:06:10 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F1E1944C;
+	Wed,  3 Jan 2024 13:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-336c5b5c163so261471f8f.1;
+        Wed, 03 Jan 2024 05:08:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704287320; x=1704892120; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b+E6QcjAYA11vs3Rp1E6NcIULNumFumjIbOzut1MN1o=;
+        b=Be4k8Y9hL1XyEQWtAl01WCEgziEJX3YoJkLD7uATB+CwWuB8izu6MKQ2jCuuanBwS5
+         ObXUFDP+KrpGBkzu6MivCbPZwEq3u+Sb9nzbb2O2vn/WnvH9lp5fY70046iO3gjxhGei
+         CJy7Bog4i65XHSa2GmfY58eNopwErvAFFLIFQvH9Kipd9PB1rBBoZGsUeRR/QEwzcLKQ
+         GJhjABXKI19zuVMwmyAu2XFnUML4XrDec6v37/bFN56+mAQMwIwiNb3p2C11LpoHdtVz
+         mSaETr7fD9tdISfSHoXXMHu9+ODknjnOCja2TZcpKgqdfnhBYJLzWycX/UrLJs3Cd6Fm
+         Rbhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704287320; x=1704892120;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=b+E6QcjAYA11vs3Rp1E6NcIULNumFumjIbOzut1MN1o=;
+        b=U2k99ABmHrWQMXNfIdsPU0dzPonhR12EpAk0wstySdZSydA8Olq8RLt9rh39+9ogni
+         hCOW1BrxM5oAXiwTRIU00oV67UUzzMALep3c2S4H9l9jNHLpe4pADMv8k8eKCZRryUmh
+         gvM5rUMOmvPUYGhyVOflqICf0xzFMh4fezMGZOArVaiUatGB09mNqOI2IKCGjt5xrI1t
+         MOVAZgiQiNUbhyb0dVJM0b5BgyvoYpPDqp+Z/pbAHyU+BcVAvu1nsGwy96tUCe7wvCq4
+         Q/kyV2RruKP3NcsP3QO1UdPqdGIrFYVsFFYbo9baX4zhTNLb41CAeLdpYsImPnlQ+2PY
+         dUBA==
+X-Gm-Message-State: AOJu0YxzUQmacsxTEdZd0keeYxJ/Q9Nx/PcZAnmQKQfjmEcV0wqW0kIU
+	XzbrDt4vvqJfRaIzqHWsHkk=
+X-Google-Smtp-Source: AGHT+IEHNseMKZWGxt834g4VKrXkRrJsFyU57vwKh8E7gQkFokNFLyheQbhs3qvdOY74FLKZNx6PQw==
+X-Received: by 2002:a5d:4fd1:0:b0:337:4fa5:f378 with SMTP id h17-20020a5d4fd1000000b003374fa5f378mr125924wrw.52.1704287320213;
+        Wed, 03 Jan 2024 05:08:40 -0800 (PST)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id dr16-20020a5d5f90000000b003373ef060d5sm8091435wrb.113.2024.01.03.05.08.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jan 2024 05:08:39 -0800 (PST)
+Message-ID: <9419df03-a203-4b73-91a6-f008076c29b4@gmail.com>
+Date: Wed, 3 Jan 2024 14:08:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/5] net: mdio: ipq4019: configure CMN PLL clock for
- ipq5332
-Content-Language: en-US
-To: Bryan O'Donoghue <bryan.odonoghue@linaro.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_srichara@quicinc.com>
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
- <20231225084424.30986-4-quic_luoj@quicinc.com>
- <1d7ef6cc-5c25-4a59-ad7f-38870ac132c4@linaro.org>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <1d7ef6cc-5c25-4a59-ad7f-38870ac132c4@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net-next v2 2/3] net: gro: parse ipv6 ext headers without
+ frag0 invalidation
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <127b8199-1cd4-42d7-9b2b-875abaad93fe@gmail.com>
+ <90117449-1f4a-47d7-baf4-2ed6540bc436@gmail.com>
+ <CANn89i+GJOgcDWK=C0+vmomt2ShotrOKyLiXzFkfT1W8vpJv1Q@mail.gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <CANn89i+GJOgcDWK=C0+vmomt2ShotrOKyLiXzFkfT1W8vpJv1Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: TdYOiUNuml-WWw9-fiDVZ4SKAWquoQeD
-X-Proofpoint-ORIG-GUID: TdYOiUNuml-WWw9-fiDVZ4SKAWquoQeD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- phishscore=0 spamscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- impostorscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2401030107
 
 
 
-On 1/3/2024 5:50 PM, Bryan O'Donoghue wrote:
-> On 25/12/2023 08:44, Luo Jie wrote:
->> The reference clock of CMN PLL block is selectable, the internal
->> 48MHZ is used by default.
+Eric Dumazet wrote:
+> On Tue, Jan 2, 2024 at 2:25 PM Richard Gobert <richardbgobert@gmail.com> wrote:
 >>
->> The output clock of CMN PLL block is for providing the clock
->> source of ethernet device(such as qca8084), there are 1 * 25MHZ
->> and 3 * 50MHZ output clocks available for the ethernet devices.
+>> The existing code always pulls the IPv6 header and sets the transport
+>> offset initially. Then optionally again pulls any extension headers in
+>> ipv6_gso_pull_exthdrs and sets the transport offset again on return from
+>> that call. skb->data is set at the start of the first extension header
+>> before calling ipv6_gso_pull_exthdrs, and must disable the frag0
+>> optimization because that function uses pskb_may_pull/pskb_pull instead of
+>> skb_gro_ helpers. It sets the GRO offset to the TCP header with
+>> skb_gro_pull and sets the transport header. Then returns skb->data to its
+>> position before this block.
 >>
->> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> This commit introduces a new helper function - ipv6_gro_pull_exthdrs -
+>> which is used in ipv6_gro_receive to pull ipv6 ext headers instead of
+>> ipv6_gso_pull_exthdrs. Thus, there is no modification of skb->data, all
+>> operations use skb_gro_* helpers, and the frag0 fast path can be taken for
+>> IPv6 packets with ext headers.
+>>
+>> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+>> Reviewed-by: Willem de Bruijn <willemb@google.com>
 >> ---
->>   drivers/net/mdio/mdio-ipq4019.c | 129 +++++++++++++++++++++++++++++++-
->>   1 file changed, 128 insertions(+), 1 deletion(-)
+>>  include/net/ipv6.h     |  1 +
+>>  net/ipv6/ip6_offload.c | 51 +++++++++++++++++++++++++++++++++---------
+>>  2 files changed, 42 insertions(+), 10 deletions(-)
 >>
->> diff --git a/drivers/net/mdio/mdio-ipq4019.c 
->> b/drivers/net/mdio/mdio-ipq4019.c
->> index e24b0e688b10..e4862ac02026 100644
->> --- a/drivers/net/mdio/mdio-ipq4019.c
->> +++ b/drivers/net/mdio/mdio-ipq4019.c
->> @@ -44,6 +44,17 @@
->>   /* Maximum SOC PCS(uniphy) number on IPQ platform */
->>   #define ETH_LDO_RDY_CNT                3
->> +#define CMN_PLL_REFERENCE_SOURCE_SEL        0x28
->> +#define CMN_PLL_REFCLK_SOURCE_DIV        GENMASK(9, 8)
->> +
->> +#define CMN_PLL_REFERENCE_CLOCK            0x784
->> +#define CMN_PLL_REFCLK_EXTERNAL            BIT(9)
->> +#define CMN_PLL_REFCLK_DIV            GENMASK(8, 4)
->> +#define CMN_PLL_REFCLK_INDEX            GENMASK(3, 0)
->> +
->> +#define CMN_PLL_POWER_ON_AND_RESET        0x780
->> +#define CMN_ANA_EN_SW_RSTN            BIT(6)
->> +
->>   enum mdio_clk_id {
->>       MDIO_CLK_MDIO_AHB,
->>       MDIO_CLK_UNIPHY0_AHB,
->> @@ -55,6 +66,7 @@ enum mdio_clk_id {
->>   struct ipq4019_mdio_data {
->>       void __iomem *membase;
->> +    void __iomem *cmn_membase;
->>       void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
->>       struct clk *clk[MDIO_CLK_CNT];
->>   };
->> @@ -227,12 +239,116 @@ static int ipq4019_mdio_write_c22(struct 
->> mii_bus *bus, int mii_id, int regnum,
->>       return 0;
->>   }
->> +/* For the CMN PLL block, the reference clock can be configured 
->> according to
->> + * the device tree property "qcom,cmn-ref-clock-frequency", the 
->> internal 48MHZ
->> + * is used by default.
->> + *
->> + * The output clock of CMN PLL block is provided to the ethernet 
->> devices,
->> + * threre are 4 CMN PLL output clocks (1*25MHZ + 3*50MHZ) enabled by 
->> default.
->> + *
->> + * Such as the output 50M clock for the qca8084 ethernet PHY.
->> + */
->> +static int ipq_cmn_clock_config(struct mii_bus *bus)
+>> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+>> index 78d38dd88aba..217240efa182 100644
+>> --- a/include/net/ipv6.h
+>> +++ b/include/net/ipv6.h
+>> @@ -26,6 +26,7 @@ struct ip_tunnel_info;
+>>  #define SIN6_LEN_RFC2133       24
+>>
+>>  #define IPV6_MAXPLEN           65535
+>> +#define IPV6_MIN_EXTHDR_LEN    8
+> 
+> // Hmm see my following comment.
+> 
+>>
+>>  /*
+>>   *     NextHeader field of IPv6 header
+>> diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+>> index 0e0b5fed0995..c07111d8f56a 100644
+>> --- a/net/ipv6/ip6_offload.c
+>> +++ b/net/ipv6/ip6_offload.c
+>> @@ -37,6 +37,40 @@
+>>                 INDIRECT_CALL_L4(cb, f2, f1, head, skb);        \
+>>  })
+>>
+>> +static int ipv6_gro_pull_exthdrs(struct sk_buff *skb, int off, int proto)
 >> +{
->> +    struct ipq4019_mdio_data *priv;
->> +    u32 reg_val, src_sel, ref_clk;
->> +    int ret;
+>> +       const struct net_offload *ops = NULL;
+>> +       struct ipv6_opt_hdr *opth;
 >> +
->> +    priv = bus->priv;
->> +    if (priv->cmn_membase) {
+>> +       for (;;) {
+>> +               int len;
+>> +
+>> +               ops = rcu_dereference(inet6_offloads[proto]);
+>> +
+>> +               if (unlikely(!ops))
+>> +                       break;
+>> +
+>> +               if (!(ops->flags & INET6_PROTO_GSO_EXTHDR))
+>> +                       break;
+>> +
+>> +               opth = skb_gro_header(skb, off + IPV6_MIN_EXTHDR_LEN, off);
 > 
-> if (!priv->cnm_membase)
->      return 0;
+> I do not see a compelling reason for adding yet another constant here.
 > 
-> then move the indentation here one tab left.
+> I would stick to
 > 
-Ok, will update this, Thanks.
+>    opth = skb_gro_header(skb, off + sizeof(*opth), off);
+> 
+> Consistency with similar helpers is desirable.
+> 
 
-> ---
-> bod
+In terms of consistency - similar helper functions (ipv6_gso_pull_exthdrs,
+ipv6_parse_hopopts) also pull 8 bytes at the beginning of every IPv6
+extension header, because the minimum extension header length is 8 bytes.
+
+sizeof(*opth) = 2, so for an IPv6 packet with one extension header with a
+common length of 8 bytes, pskb_may_pull will be called twice: first with
+length = 2 and again with length = 8, which might not be ideal when parsing
+non-linear packets.
+
+Willem suggested adding a constant to make the code more self-documenting.
+
+>> +               if (unlikely(!opth))
+>> +                       break;
+>> +
+>> +               len = ipv6_optlen(opth);
+>> +
+>> +               opth = skb_gro_header(skb, off + len, off);
+> 
+> Note this call will take care of precise pull.
+> 
+>> +               if (unlikely(!opth))
+>> +                       break;
+>> +               proto = opth->nexthdr;
+>> +
+>> +               off += len;
+>> +       }
+>> +
+>> +       skb_gro_pull(skb, off - skb_network_offset(skb));
+>> +       return proto;
+>> +}
+>> +
+>>  static int ipv6_gso_pull_exthdrs(struct sk_buff *skb, int proto)
+>>  {
+>>         const struct net_offload *ops = NULL;
+>> @@ -203,28 +237,25 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
+>>                 goto out;
+>>
+>>         skb_set_network_header(skb, off);
+>> -       skb_gro_pull(skb, sizeof(*iph));
+>> -       skb_set_transport_header(skb, skb_gro_offset(skb));
+>>
+>> -       flush += ntohs(iph->payload_len) != skb_gro_len(skb);
+>> +       flush += ntohs(iph->payload_len) != skb->len - hlen;
+>>
+>>         proto = iph->nexthdr;
+>>         ops = rcu_dereference(inet6_offloads[proto]);
+>>         if (!ops || !ops->callbacks.gro_receive) {
+>> -               pskb_pull(skb, skb_gro_offset(skb));
+>> -               skb_gro_frag0_invalidate(skb);
+>> -               proto = ipv6_gso_pull_exthdrs(skb, proto);
+>> -               skb_gro_pull(skb, -skb_transport_offset(skb));
+>> -               skb_reset_transport_header(skb);
+>> -               __skb_push(skb, skb_gro_offset(skb));
+>> +               proto = ipv6_gro_pull_exthdrs(skb, hlen, proto);
+>>
+>>                 ops = rcu_dereference(inet6_offloads[proto]);
+>>                 if (!ops || !ops->callbacks.gro_receive)
+>>                         goto out;
+>>
+>> -               iph = ipv6_hdr(skb);
+>> +               iph = skb_gro_network_header(skb);
+>> +       } else {
+>> +               skb_gro_pull(skb, sizeof(*iph));
+>>         }
+>>
+>> +       skb_set_transport_header(skb, skb_gro_offset(skb));
+>> +
+>>         NAPI_GRO_CB(skb)->proto = proto;
+>>
+>>         flush--;
+>> --
+>> 2.36.1
+>>
 
