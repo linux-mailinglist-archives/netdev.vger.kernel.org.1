@@ -1,114 +1,118 @@
-Return-Path: <netdev+bounces-61151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15EED822B67
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:30:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3FE822B68
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AFE11C22E77
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:30:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E407CB21F7F
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8554F18B0D;
-	Wed,  3 Jan 2024 10:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC84318B1C;
+	Wed,  3 Jan 2024 10:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J2xzDKFW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tpyc2rho"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DEC918AF1
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 10:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=S5O56tcQC4vWMrlcAyZtSd/U+zZMlsONGKHie5BZf20=; b=J2xzDKFWkvTvWI8ipd05EdFPt5
-	7y4wF7vZCd0UF01oFDAiCCOMbOKtYEX5X3iksH/SROK9+Dr4pm6UpMnTAJwUbDSAoAdAbWhix28AC
-	GomTcvcN0Lg4Eg6OQkAi9dQbrzs41krcKBF4clbr6LTiZuBjrYzUORuQn2lJ6wqhD4cr86UxV4seE
-	rlWW2e/u21kFnPqnHcOqjAyL6d4ZNE3oI1cL4Zd1k2A8NjR+4tOpGCIgiB5CxCsM1vYm8aWF+CVRv
-	LHVqISkx+avUXHvA9qvhTeFgA1ITXx7x63nENki8Xh2FZf5HDj7mSVMUYr+i779yMBb2W70gEmSdM
-	gIKfwbig==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45214)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rKyVT-0007L2-32;
-	Wed, 03 Jan 2024 10:29:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rKyVW-0006HT-IG; Wed, 03 Jan 2024 10:29:54 +0000
-Date: Wed, 3 Jan 2024 10:29:54 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: phy: extend
- genphy_c45_read_eee_abilities() to read capability 2 register
-Message-ID: <ZZU3Ijo2TCIHJvJh@shell.armlinux.org.uk>
-References: <20231220161258.17541-1-kabel@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131F01805D
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 10:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704277823; x=1735813823;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PMvuKteFKvaXCE4IPrvC+0bug0A5A+UMk6iTqWSs050=;
+  b=Tpyc2rhoFvxa/KfoYFKOUN6peXxLScjk18ZA2OhsaaI+X3xNwA/8hFX6
+   2edUm2IfPGstUf7cT6KBEuHwjhOlRTlh1xin64zyXHCHfJQJw9deqAFDn
+   6E2hEAYI6gg/HULDvGzkdNY4HRgxwCXDsBGHsCBIJeTjRkbDqIV6itRVH
+   gU9bfj1LVwHmNqJw2xJTlD1tcvs6MfDG0XG98v9lUv4bOfhxE9Q3Z4qwM
+   I+BMajhVFuBLwqNyX6LEuYcvVM1cizEkrreKA4gfM06lwEqCpaR7pOlrN
+   1X3uk/mn+ICUywWDsIMF2RqWHguW5UQBRNqSWetzC6S2CPrQ59jTArtLd
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="3793799"
+X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
+   d="scan'208";a="3793799"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 02:30:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="773109698"
+X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
+   d="scan'208";a="773109698"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.51.153])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 02:30:19 -0800
+Date: Wed, 3 Jan 2024 11:30:17 +0100
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Marc MERLIN <marc@merlins.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
+Message-ID: <ZZU3OaybyLfrAa/0@linux.intel.com>
+References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231206084448.53b48c49@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231220161258.17541-1-kabel@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20231206084448.53b48c49@kernel.org>
 
-On Wed, Dec 20, 2023 at 05:12:58PM +0100, Marek Behún wrote:
-> +/**
-> + * genphy_c45_read_eee_cap2 - read supported EEE link modes from register 3.21
-> + * @phydev: target phy_device struct
-> + */
-> +static int genphy_c45_read_eee_cap2(struct phy_device *phydev)
-> +{
-> +	int val;
-> +
-> +	/* IEEE 802.3-2018 45.2.3.11 EEE control and capability 2
-> +	 * (Register 3.21)
-> +	 */
-> +	val = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_EEE_ABLE2);
-> +	if (val < 0)
-> +		return val;
-> +
-> +	/* The 802.3 2018 standard says the top 6 bits are reserved and should
-> +	 * read as 0.
-> +	 * If MDIO_PCS_EEE_ABLE2 is 0xffff assume EEE is not supported.
-> +	 */
-> +	if (val == 0xffff)
-> +		return 0;
+On Wed, Dec 06, 2023 at 08:44:48AM -0800, Jakub Kicinski wrote:
+> On Wed,  6 Dec 2023 11:39:32 +0100 Johannes Berg wrote:
+> > As reported by Marc MERLIN, at least one driver (igc) wants or
+> > needs to acquire the RTNL inside suspend/resume ops, which can
+> > be called from here in ethtool if runtime PM is enabled.
+> > 
+> > Allow this by doing runtime PM transitions without the RTNL
+> > held. For the ioctl to have the same operations order, this
+> > required reworking the code to separately check validity and
+> > do the operation. For the netlink code, this now has to do
+> > the runtime_pm_put a bit later.
+> 
+> I was really, really hoping that this would serve as a motivation
+> for Intel to sort out the igb/igc implementation. The flow AFAICT
+> is ndo_open() starts the NIC, the calls pm_sus, which shuts the NIC
+> back down immediately (!?) then it schedules a link check from a work
 
-802.3 also says that unimplemented registers should read as zeros.
-Reserved bits should read as 0, but reserved typically means (as we've
-seen several times) that bits get used in the future. Do you have a
-good reason why this check is necessary?
+It's not like that. pm_runtime_put() in igc_open() does not disable device.
+It calls runtime_idle callback which check if there is link and if is
+not, schedule device suspend in 5 second, otherwise device stays running.
 
-> +
-> +	mii_eee_cap2_mod_linkmode_t(phydev->supported_eee, val);
-> +
-> +	/* Some buggy devices may indicate EEE link modes in MDIO_PCS_EEE_ABLE2
-> +	 * which they don't support as indicated by BMSR, ESTATUS etc.
-> +	 */
-> +	linkmode_and(phydev->supported_eee, phydev->supported_eee,
-> +		     phydev->supported);
+Work watchdog_task runs periodically and also check for link changes.
 
-I wonder whether we should just do that as a general thing after
-reading all the abilities in phy_probe() rather than burying it in
-various capability reading functions?
+> queue, which opens it again (!?). It's a source of never ending bugs.
 
-Apart from those two, I don't see any other issues with the patch.
+Maybe there are issues there and igc pm runtime implementation needs
+improvements, with lockings or otherwise. Some folks are looking at this. 
+But I think for this particular deadlock problem reverting of below commits
+should be considered:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+bd869245a3dc net: core: try to runtime-resume detached device in __dev_open
+f32a21376573 ethtool: runtime-resume netdev parent before ethtool ioctl ops
+
+First, the deadlock should be addressed also in older kernels and
+refactoring is not really backportable fix.
+
+Second, I don't think network stack should do any calls to pm_runtime* .
+This should be fully device driver specific, as this depends on device
+driver implementation of power saving. IMHO if it's desirable to 
+resume disabled device on requests from user space, then
+netif_device_detach() should not be used in runtime suspend.
+
+Thoughts ?
+
+Regards
+Stanislaw 
+
 
