@@ -1,208 +1,111 @@
-Return-Path: <netdev+bounces-61378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC2E82382D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:29:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E058D823834
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:30:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F5B6B23D5D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:29:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EB0A1F27DA3
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276F92031B;
-	Wed,  3 Jan 2024 22:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F09208A8;
+	Wed,  3 Jan 2024 22:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aAUmbm2V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48D9200CC
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 22:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 403GiLf5027546
-	for <netdev@vger.kernel.org>; Wed, 3 Jan 2024 14:25:09 -0800
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3vcxn2pph9-10
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 14:25:09 -0800
-Received: from twshared24631.38.frc1.facebook.com (2620:10d:c085:108::8) by
- mail.thefacebook.com (2620:10d:c085:21d::8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 3 Jan 2024 14:24:36 -0800
-Received: by devbig019.vll3.facebook.com (Postfix, from userid 137359)
-	id 34A113DF9EC17; Wed,  3 Jan 2024 14:21:42 -0800 (PST)
-From: Andrii Nakryiko <andrii@kernel.org>
-To: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <paul@paul-moore.com>,
-        <brauner@kernel.org>, <torvalds@linuxfoundation.org>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-        <kernel-team@meta.com>
-Subject: [PATCH bpf-next 29/29] selftests/bpf: add tests for LIBBPF_BPF_TOKEN_PATH envvar
-Date: Wed, 3 Jan 2024 14:20:34 -0800
-Message-ID: <20240103222034.2582628-30-andrii@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240103222034.2582628-1-andrii@kernel.org>
-References: <20240103222034.2582628-1-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC391EB52
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 22:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dafe04717baso7096476276.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 14:25:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704320741; x=1704925541; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9kmcqsMX8fQ3sLYeMRmJosc8oLB5bZGg3REIDOYybdk=;
+        b=aAUmbm2Venzm7/HQlyvGH5EIujPQFP1YXVwI0YEJLeNM6YdTs4YXLsBnbvZqgZQmYB
+         KdWIcpH12E0/Bxu5i2Tu1P51FpuD9rCrXG/JFBozLQ6LiZvUnvKZPIufLfVK8uXpw4wc
+         p1YvD3BQpkngvXiioVQg3+/vKy2uXbgbTIxvgVdIl6UaT/tanNlT2XZ3L2ZhM0kacSBZ
+         V510xsFq4UbJuSjyj3OVUMRVcizZt1qoCke5hFkeINGfxgam5XQP5crTUelEX3hCFw+3
+         quo866jlGUy5vQF0pf7419TM787Bv4LljldvcLXTZakV+rndv0W+xUk2eA+BlLKHz3sb
+         2/VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704320741; x=1704925541;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9kmcqsMX8fQ3sLYeMRmJosc8oLB5bZGg3REIDOYybdk=;
+        b=qGJp66hb3yu64HHbrrewoQb63/mpk00MGXCEyacRSuhwxuWsE9eF7ujJFXzmfWzbux
+         tF95M0rSZVAU7wlEEHB3Y6d3wSsqG0PYDrMSjADuzIthNbow3NMd80so268vscGBfa8I
+         WMYyjPI7xlWG+LaXwnLHB23w53wZFvw9FVwgBZ/74ArBSg7fysn/gqJ99F6kPYy60tVe
+         hJzNwwcRaPC3h/HdkXiYC/lInRGlKf9vGqDpXNyFMeZOe5AknF/0/Rfu+0z9ExsOZ/vV
+         8SU62421F7kiG4ZIESdwADYbAL9oKyod7z2UmcedD07GkiwqOVrAXAoJYQRx8mvsK8kx
+         Yxgw==
+X-Gm-Message-State: AOJu0Ywwcau9rnCeOiJ9bUPlr00NdeCKjD8AUu2x8sTRer78iX1T2zx5
+	cImmWyElqKXczXiAOHo0Kt8GBlyoT7nKN1MWV4U3iJIUlMm2Jw==
+X-Google-Smtp-Source: AGHT+IH3lN5EReu2g0Mi+oxqq6LxDhkZAcXvUANpBIfR+d/23nY/29IleV2lLkmHHtEwUYWNJ3aNAjkw6NRWH1Vyk6A=
+X-Received: by 2002:a5b:ed0:0:b0:dbe:9fe3:9d24 with SMTP id
+ a16-20020a5b0ed0000000b00dbe9fe39d24mr1147230ybs.111.1704320740768; Wed, 03
+ Jan 2024 14:25:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240102162718.268271-1-romain.gantois@bootlin.com>
+ <20240102162718.268271-2-romain.gantois@bootlin.com> <20240103201021.2ixxndfqe622afnf@skbuf>
+In-Reply-To: <20240103201021.2ixxndfqe622afnf@skbuf>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 3 Jan 2024 23:25:29 +0100
+Message-ID: <CACRpkdYAOReqhoXVc_D6eeW-MvWym3eL2T3KTePqZSx3WWsGEQ@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/1] net: stmmac: Prevent DSA tags from breaking
+ COE on stmmac
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Romain Gantois <romain.gantois@bootlin.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Sylvain Girard <sylvain.girard@se.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Pascal EBERHARD <pascal.eberhard@se.com>, 
+	Richard Tresidder <rtresidd@electromag.com.au>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: XShy3wZOUM-F4NEUXs9AaRJ75HzcKCrD
-X-Proofpoint-GUID: XShy3wZOUM-F4NEUXs9AaRJ75HzcKCrD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-03_08,2024-01-03_01,2023-05-22_02
 
-Add new subtest validating LIBBPF_BPF_TOKEN_PATH envvar semantics.
-Extend existing test to validate that LIBBPF_BPF_TOKEN_PATH allows to
-disable implicit BPF token creation by setting envvar to empty string.
+On Wed, Jan 3, 2024 at 9:10=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com> =
+wrote:
+> On Tue, Jan 02, 2024 at 05:27:15PM +0100, Romain Gantois wrote:
+> > +/* Check if ethertype will trigger IP
+> > + * header checks/COE in hardware
+> > + */
+> > +static inline bool stmmac_has_ip_ethertype(struct sk_buff *skb)
+> > +{
+> > +     __be16 proto =3D eth_header_parse_protocol(skb);
+> > +
+> > +     return (proto =3D=3D htons(ETH_P_IP)) || (proto =3D=3D htons(ETH_=
+P_IPV6)) ||
+> > +             (proto =3D=3D htons(ETH_P_8021Q));
+>
+> proto =3D=3D htons(ETH_P_8021Q) means that the skb has an IP EtherType?
+> What if an IP header does not follow after the VLAN header?
 
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
----
- .../testing/selftests/bpf/prog_tests/token.c  | 98 +++++++++++++++++++
- 1 file changed, 98 insertions(+)
+It's probably best to do like I do here:
+https://lore.kernel.org/netdev/20240102-new-gemini-ethernet-regression-v5-2=
+-cf61ab3aa8cd@linaro.org/
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/token.c b/tools/testi=
-ng/selftests/bpf/prog_tests/token.c
-index 003f7c208f4c..1f6aa685e6f7 100644
---- a/tools/testing/selftests/bpf/prog_tests/token.c
-+++ b/tools/testing/selftests/bpf/prog_tests/token.c
-@@ -773,6 +773,9 @@ static int userns_obj_priv_btf_success(int mnt_fd)
- 	return validate_struct_ops_load(mnt_fd, true /* should succeed */);
- }
-=20
-+#define TOKEN_ENVVAR "LIBBPF_BPF_TOKEN_PATH"
-+#define TOKEN_BPFFS_CUSTOM "/bpf-token-fs"
-+
- static int userns_obj_priv_implicit_token(int mnt_fd)
- {
- 	LIBBPF_OPTS(bpf_object_open_opts, opts);
-@@ -795,6 +798,20 @@ static int userns_obj_priv_implicit_token(int mnt_fd=
-)
- 	if (!ASSERT_OK(err, "move_mount_bpffs"))
- 		return -EINVAL;
-=20
-+	/* disable implicit BPF token creation by setting
-+	 * LIBBPF_BPF_TOKEN_PATH envvar to empty value, load should fail
-+	 */
-+	err =3D setenv(TOKEN_ENVVAR, "", 1 /*overwrite*/);
-+	if (!ASSERT_OK(err, "setenv_token_path"))
-+		return -EINVAL;
-+	skel =3D dummy_st_ops_success__open_and_load();
-+	if (!ASSERT_ERR_PTR(skel, "obj_token_envvar_disabled_load")) {
-+		unsetenv(TOKEN_ENVVAR);
-+		dummy_st_ops_success__destroy(skel);
-+		return -EINVAL;
-+	}
-+	unsetenv(TOKEN_ENVVAR);
-+
- 	/* now the same struct_ops skeleton should succeed thanks to libppf
- 	 * creating BPF token from /sys/fs/bpf mount point
- 	 */
-@@ -818,6 +835,76 @@ static int userns_obj_priv_implicit_token(int mnt_fd=
-)
- 	return 0;
- }
-=20
-+static int userns_obj_priv_implicit_token_envvar(int mnt_fd)
-+{
-+	LIBBPF_OPTS(bpf_object_open_opts, opts);
-+	struct dummy_st_ops_success *skel;
-+	int err;
-+
-+	/* before we mount BPF FS with token delegation, struct_ops skeleton
-+	 * should fail to load
-+	 */
-+	skel =3D dummy_st_ops_success__open_and_load();
-+	if (!ASSERT_ERR_PTR(skel, "obj_tokenless_load")) {
-+		dummy_st_ops_success__destroy(skel);
-+		return -EINVAL;
-+	}
-+
-+	/* mount custom BPF FS over custom location, so libbpf can't create
-+	 * BPF token implicitly, unless pointed to it through
-+	 * LIBBPF_BPF_TOKEN_PATH envvar
-+	 */
-+	rmdir(TOKEN_BPFFS_CUSTOM);
-+	if (!ASSERT_OK(mkdir(TOKEN_BPFFS_CUSTOM, 0777), "mkdir_bpffs_custom"))
-+		goto err_out;
-+	err =3D sys_move_mount(mnt_fd, "", AT_FDCWD, TOKEN_BPFFS_CUSTOM, MOVE_M=
-OUNT_F_EMPTY_PATH);
-+	if (!ASSERT_OK(err, "move_mount_bpffs"))
-+		goto err_out;
-+
-+	/* even though we have BPF FS with delegation, it's not at default
-+	 * /sys/fs/bpf location, so we still fail to load until envvar is set u=
-p
-+	 */
-+	skel =3D dummy_st_ops_success__open_and_load();
-+	if (!ASSERT_ERR_PTR(skel, "obj_tokenless_load2")) {
-+		dummy_st_ops_success__destroy(skel);
-+		goto err_out;
-+	}
-+
-+	err =3D setenv(TOKEN_ENVVAR, TOKEN_BPFFS_CUSTOM, 1 /*overwrite*/);
-+	if (!ASSERT_OK(err, "setenv_token_path"))
-+		goto err_out;
-+
-+	/* now the same struct_ops skeleton should succeed thanks to libppf
-+	 * creating BPF token from custom mount point
-+	 */
-+	skel =3D dummy_st_ops_success__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "obj_implicit_token_load"))
-+		goto err_out;
-+
-+	dummy_st_ops_success__destroy(skel);
-+
-+	/* now disable implicit token through empty bpf_token_path, envvar
-+	 * will be ignored, should fail
-+	 */
-+	opts.bpf_token_path =3D "";
-+	skel =3D dummy_st_ops_success__open_opts(&opts);
-+	if (!ASSERT_OK_PTR(skel, "obj_empty_token_path_open"))
-+		goto err_out;
-+
-+	err =3D dummy_st_ops_success__load(skel);
-+	dummy_st_ops_success__destroy(skel);
-+	if (!ASSERT_ERR(err, "obj_empty_token_path_load"))
-+		goto err_out;
-+
-+	rmdir(TOKEN_BPFFS_CUSTOM);
-+	unsetenv(TOKEN_ENVVAR);
-+	return 0;
-+err_out:
-+	rmdir(TOKEN_BPFFS_CUSTOM);
-+	unsetenv(TOKEN_ENVVAR);
-+	return -EINVAL;
-+}
-+
- #define bit(n) (1ULL << (n))
-=20
- void test_token(void)
-@@ -896,4 +983,15 @@ void test_token(void)
-=20
- 		subtest_userns(&opts, userns_obj_priv_implicit_token);
- 	}
-+	if (test__start_subtest("obj_priv_implicit_token_envvar")) {
-+		struct bpffs_opts opts =3D {
-+			/* allow BTF loading */
-+			.cmds =3D bit(BPF_BTF_LOAD) | bit(BPF_MAP_CREATE) | bit(BPF_PROG_LOAD=
-),
-+			.maps =3D bit(BPF_MAP_TYPE_STRUCT_OPS),
-+			.progs =3D bit(BPF_PROG_TYPE_STRUCT_OPS),
-+			.attachs =3D ~0ULL,
-+		};
-+
-+		subtest_userns(&opts, userns_obj_priv_implicit_token_envvar);
-+	}
- }
---=20
-2.34.1
++ if (ethertype =3D=3D ETH_P_8021Q)
++   ethertype =3D ntohs(__vlan_get_protocol(skb, htons(ethertype), NULL));
 
+Yours,
+Linus Walleij
 
