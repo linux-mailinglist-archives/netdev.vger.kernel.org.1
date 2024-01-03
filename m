@@ -1,93 +1,97 @@
-Return-Path: <netdev+bounces-61228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21579822F09
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:59:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF406822F11
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:01:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 327F21C236D0
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:59:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FBAA1F23F01
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713CF1A29B;
-	Wed,  3 Jan 2024 13:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180081A28A;
+	Wed,  3 Jan 2024 14:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YZeKKqRB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Kofrjrnm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CEB19BCA
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 13:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704290367;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6dAWkrI8v4YS0rv7Bi/6xzx13i604x2fNTwwBvd0CnM=;
-	b=YZeKKqRBEqb6layg0gBMYIcaCb0cTimniGAzhjo1NtKtKOlcsecBLYW3GlbtdJzaA3ZaHg
-	dC9UozW6sBE7/aMVdjobd35RfDJyPcivZFXvarOXShnhBW1mqNeiHBH/wVnO8opK+81toE
-	px7PuU9J96L08ug0d/1b6m3JlBbWYD4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-387-faj2gZTSNqKsLFzR_ZyENA-1; Wed, 03 Jan 2024 08:59:23 -0500
-X-MC-Unique: faj2gZTSNqKsLFzR_ZyENA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EDA55845DC1;
-	Wed,  3 Jan 2024 13:59:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B5F0940C6EB9;
-	Wed,  3 Jan 2024 13:59:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZZVctju5TEjS218p@codewreck.org>
-References: <ZZVctju5TEjS218p@codewreck.org> <20231221132400.1601991-41-dhowells@redhat.com> <20231221132400.1601991-1-dhowells@redhat.com> <292837.1704232179@warthog.procyon.org.uk>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: dhowells@redhat.com, Eric Van Hensbergen <ericvh@kernel.org>,
-    Latchesar Ionkov <lucho@ionkov.net>,
-    Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: Re: [PATCH] 9p: Fix initialisation of netfs_inode for 9p
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F741A593;
+	Wed,  3 Jan 2024 14:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AsG33UPNYjYCjVVsF0qY80s0GE26xn+JI/RSCas0qdI=; b=Kofrjrnmvk2RLHNCJnjXC/iFyX
+	U+oxOjVpJ8MVWuF0Uv0DCO9lH8BHbvzcmEN2EqKeNReOvuPsXS0/zwyH7hr/bcZ2q1+2t/pCTatBM
+	Zzbo8ZEu5O1IK1wGpQPprU+rAhWg4IpzXMVFUno0xWaWJG8euRPpUNDkc7xlYTSa+T2tqEealWgWr
+	slVgv9J+H5JIJNkYp6OMlG21uNDUnsv3jPLSPZ3ssz2RpgePDWNtGB9XNxYPsOS0ypkurs2VLf/jX
+	VTp1udt8Oe9TPYTm+kz3CQHUthFrSZRtPe4qi4F0Js0+8SrZ0W+zCYOc15dMpmZMT2AwEQaaDk8CU
+	umBF3lLQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36860)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rL1nM-0007X5-2r;
+	Wed, 03 Jan 2024 14:00:32 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rL1nM-0006QC-I6; Wed, 03 Jan 2024 14:00:32 +0000
+Date: Wed, 3 Jan 2024 14:00:32 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew@lunn.ch, olteanv@gmail.com,
+	hkallweit1@gmail.com, przemyslaw.kitszel@intel.com,
+	kabel@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org
+Subject: Re: [PATCH net-next v2 0/2] net: phy: Use is_phy_driver() and
+ is_phy_device()
+Message-ID: <ZZVogCGYu9pIR620@shell.armlinux.org.uk>
+References: <20240103025334.541682-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <357812.1704290358.1@warthog.procyon.org.uk>
-Date: Wed, 03 Jan 2024 13:59:18 +0000
-Message-ID: <357813.1704290358@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240103025334.541682-1-yajun.deng@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Dominique Martinet <asmadeus@codewreck.org> wrote:
+On Wed, Jan 03, 2024 at 10:53:32AM +0800, Yajun Deng wrote:
+> There is only one flag that can be set in struct mdio_driver_common and
+> mdio_device. We can compare the probe of the driver or the type of the
+> device to implement it. Hence, these flags in struct mdio_driver_common
+> and mdio_device can be removed.
+> 
+> Introduce is_phy_driver() and is_phy_device(). Use them test the driver
+> or device.
 
-> Would it make sense to just always update netfs's ctx->remote_i_size in
-> the various stat2inode calls instead?
+It is not a good idea to post a new series while discussion of the first
+is still on-going, even if it has been 24 hours since you last posted a
+patch. If discussion is still going on, then we don't need the
+distraction of yet another series to duplicate the comments to.
 
-Yeah, that's probably a good idea.
+I remain completely unconvinced of the merit of these changes. IMHO,
+it is pure churn for churn's sake - there is no _real_ benefit. It
+doesn't fix a bug. It doesn't make the code easier to read. It only
+satisfies some ideological idea that all drivers should look the same.
 
-David
+Unless a very good justification can be found, I am not in favour of
+changing these drivers.
 
+There _may_ be good merit in is_phy_driver() and is_phy_device(), and
+as Andrew says, that should be done _first_.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
