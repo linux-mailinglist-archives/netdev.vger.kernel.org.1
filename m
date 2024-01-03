@@ -1,174 +1,201 @@
-Return-Path: <netdev+bounces-61217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4CE822E40
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:29:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B088F822E5E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:31:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31A3E1C23633
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:29:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6A0BB2388C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED4D19BD8;
-	Wed,  3 Jan 2024 13:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD602199DE;
+	Wed,  3 Jan 2024 13:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="IGyLn6u1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BHxFdWop"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EDA19BCE
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 13:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3364c9ff8e1so266516f8f.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 05:28:45 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C6C199D2
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 13:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so8987a12.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 05:30:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704288524; x=1704893324; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1704288614; x=1704893414; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6skAPmPoiy0Bq24LZbH7O+9zLEpGnX9a97LILppSPhk=;
-        b=IGyLn6u1lcFTbBTx9iBztuwwEgaYzNIBeqtOdFo1RiBGg/p880TpfOXbTIShOKO4l7
-         cwPonS855W+Kkq+mRAP1pIinF6+AjGx/9yl2KMpOoOj2k6/D2vgJ1iF3A2ZFhy43pVeS
-         0NPLKHnrmS2RR4HvLxssIVgSrFzz37EkgR1ACyywSgmowFs6GW3XeBTFXHB3+1k4uR5l
-         FJv7jgdgM5oXb7MADUEMKBtidiay4C4uwJKd7uZQL+rQx67QesOzU71sGYlXOhJfNicg
-         HobkJgYzoi0IXQnrMTSE1bO8OAAhizYFGlHr13nRo3SD+YHLuyl42WHFNBBwk8/qRnxa
-         eYwQ==
+        bh=EG1JPJoQXcnD8x9xPNrPoCvZ57tzKqywV3MMnL/ZCpM=;
+        b=BHxFdWopckJEP9NAvDTlmOGjEg4Fn01X5MUaUJAi10nyecZh+csJO5sA6oubWNGx6z
+         gMWWKTe6SqAaBxzHcoR8TgpNYXhfMknC/JSQ4XvBmKw7kz1WluQJEUVzy+Hfd6FjWM78
+         9hQ7kzWSDG62+wINIolrA4gfo/XvUDCCT1cr06ixSSWtSaHor/uzOYYImM4siHljv1Dz
+         eJgOGwqW3+dfMgJb384jM3BEQT8pmqYQcVcohRwP5Nk5IYDyE8+9z23qP/RXflEAgu9w
+         YklkOIK+sxUsGY0Dr4xW5S9yUfJxGcCLl4e4V+XTb9+uLbvcdkEMqdKI7YrsDveXWS/F
+         VWVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704288524; x=1704893324;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1704288614; x=1704893414;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6skAPmPoiy0Bq24LZbH7O+9zLEpGnX9a97LILppSPhk=;
-        b=bTrg92AvGnCkNIFfZHkKY9Uno6Ua1R7VHoo7PNkD0lKtefa0jLf4htB8To5uPsCmvF
-         PvfQyffwitZvrIfrkxFBztudYEYcD1wqZbZBK6VgGUY06VVEbpGzV8ou703fNi+BsWx9
-         +wESaBB4cwHZMRZZGwxNDqqMsWyEg1F89itmxCGrE9JUxOXYRmMtYLxpW83+q3Ttcnb3
-         h+oZ3X5kjC/MN1oSIWcYd7LBP6e66RD1fuNVN/2yGEbfZhydJC+n3vO4U2r9sgmTxbpE
-         Gjy8KgxpsUe5qKtSDxrUcqohTCNUPEuwR35uqWGboL1JH7L6ZGORuE0llz8qim5i+7wG
-         Kf1Q==
-X-Gm-Message-State: AOJu0Yyj4nK3+u9GLlQpDeO45RlyQEzlzIjv5iuEp2lOpOJwu78SOXxA
-	Bm2NF2jqwxZg2emA7qjjljd2+LqoEDl2jL9voeNcBVlgjyUhcA==
-X-Google-Smtp-Source: AGHT+IE7v19TeYZCXIBN1f4GmBvtPzx8TGa2YHhPAEcKB2rLM8iUDIuZksBQRqfTwHtvFG0uMpc7kA==
-X-Received: by 2002:adf:f303:0:b0:336:86af:ede5 with SMTP id i3-20020adff303000000b0033686afede5mr506262wro.46.1704288524181;
-        Wed, 03 Jan 2024 05:28:44 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id b2-20020a5d4b82000000b003367ff4aadasm30551035wrt.31.2024.01.03.05.28.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 05:28:43 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	michal.michalik@intel.com,
-	rrameshbabu@nvidia.com
-Subject: [patch net-next 3/3] net/mlx5: DPLL, Implement fractional frequency offset get pin op
-Date: Wed,  3 Jan 2024 14:28:38 +0100
-Message-ID: <20240103132838.1501801-4-jiri@resnulli.us>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240103132838.1501801-1-jiri@resnulli.us>
-References: <20240103132838.1501801-1-jiri@resnulli.us>
+        bh=EG1JPJoQXcnD8x9xPNrPoCvZ57tzKqywV3MMnL/ZCpM=;
+        b=NUm8BxmDVQvSjb7fc/Z7dcgfEb06h4axQqhmSJL2DDCmcYo4cAw74p4ZkDiz6GwyNS
+         sqMHTpas9Gh/8a83Q4UCUra+N3R7Ow++d766XuXq/8F8kbAUL7w5vCffyms7m7fJWyAw
+         tcrNdlvrKl5QA4NrCjkfdqz56r0lZhlVcmAb2XuTBGB5nWyn9OjAHL+sPZ+igpiC+FiG
+         T8YPIzeCoL5y6IdBmF4ki9eqimNdbf2gBDxOTFBlTBhNz30694McwvKbuuJsMKFPQ3y9
+         gJuunNA/7GsmFGUJBAKn5qDYkU1AWeL+AVShrw7JwlVi5aRbCNUGskN/jj1KVK8je/GU
+         c9rw==
+X-Gm-Message-State: AOJu0Yzb+Ljdjh43hREF0tuu1cG3IhnKGsGydk01sfvYFBSNvKRYYEJO
+	5G/+3TeNytDTScypT9EscWe3jPWAu1MEaiZUJEEHgz0NuzVdD+qi8xpN24blrPi4
+X-Google-Smtp-Source: AGHT+IGcpdkuovt9cj7pidLmE+5ecVJgA0Cy2xBQq+vDKoXa5lhX7c0GLa621Y2qcJM05Kn+NLFA71EX7DXzL6DkU0E=
+X-Received: by 2002:a50:9ece:0:b0:554:2501:cc8e with SMTP id
+ a72-20020a509ece000000b005542501cc8emr157394edf.6.1704288614143; Wed, 03 Jan
+ 2024 05:30:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <127b8199-1cd4-42d7-9b2b-875abaad93fe@gmail.com>
+ <90117449-1f4a-47d7-baf4-2ed6540bc436@gmail.com> <CANn89i+GJOgcDWK=C0+vmomt2ShotrOKyLiXzFkfT1W8vpJv1Q@mail.gmail.com>
+ <9419df03-a203-4b73-91a6-f008076c29b4@gmail.com>
+In-Reply-To: <9419df03-a203-4b73-91a6-f008076c29b4@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 3 Jan 2024 14:30:00 +0100
+Message-ID: <CANn89iJdPRspWo2XzqdGdGe9_am7zNwbq9vm0AFLF-KRODzE7A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/3] net: gro: parse ipv6 ext headers without
+ frag0 invalidation
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Wed, Jan 3, 2024 at 2:08=E2=80=AFPM Richard Gobert <richardbgobert@gmail=
+.com> wrote:
+>
+>
+>
+> Eric Dumazet wrote:
+> > On Tue, Jan 2, 2024 at 2:25=E2=80=AFPM Richard Gobert <richardbgobert@g=
+mail.com> wrote:
+> >>
+> >> The existing code always pulls the IPv6 header and sets the transport
+> >> offset initially. Then optionally again pulls any extension headers in
+> >> ipv6_gso_pull_exthdrs and sets the transport offset again on return fr=
+om
+> >> that call. skb->data is set at the start of the first extension header
+> >> before calling ipv6_gso_pull_exthdrs, and must disable the frag0
+> >> optimization because that function uses pskb_may_pull/pskb_pull instea=
+d of
+> >> skb_gro_ helpers. It sets the GRO offset to the TCP header with
+> >> skb_gro_pull and sets the transport header. Then returns skb->data to =
+its
+> >> position before this block.
+> >>
+> >> This commit introduces a new helper function - ipv6_gro_pull_exthdrs -
+> >> which is used in ipv6_gro_receive to pull ipv6 ext headers instead of
+> >> ipv6_gso_pull_exthdrs. Thus, there is no modification of skb->data, al=
+l
+> >> operations use skb_gro_* helpers, and the frag0 fast path can be taken=
+ for
+> >> IPv6 packets with ext headers.
+> >>
+> >> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> >> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> >> ---
+> >>  include/net/ipv6.h     |  1 +
+> >>  net/ipv6/ip6_offload.c | 51 +++++++++++++++++++++++++++++++++--------=
+-
+> >>  2 files changed, 42 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+> >> index 78d38dd88aba..217240efa182 100644
+> >> --- a/include/net/ipv6.h
+> >> +++ b/include/net/ipv6.h
+> >> @@ -26,6 +26,7 @@ struct ip_tunnel_info;
+> >>  #define SIN6_LEN_RFC2133       24
+> >>
+> >>  #define IPV6_MAXPLEN           65535
+> >> +#define IPV6_MIN_EXTHDR_LEN    8
+> >
+> > // Hmm see my following comment.
+> >
+> >>
+> >>  /*
+> >>   *     NextHeader field of IPv6 header
+> >> diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+> >> index 0e0b5fed0995..c07111d8f56a 100644
+> >> --- a/net/ipv6/ip6_offload.c
+> >> +++ b/net/ipv6/ip6_offload.c
+> >> @@ -37,6 +37,40 @@
+> >>                 INDIRECT_CALL_L4(cb, f2, f1, head, skb);        \
+> >>  })
+> >>
+> >> +static int ipv6_gro_pull_exthdrs(struct sk_buff *skb, int off, int pr=
+oto)
+> >> +{
+> >> +       const struct net_offload *ops =3D NULL;
+> >> +       struct ipv6_opt_hdr *opth;
+> >> +
+> >> +       for (;;) {
+> >> +               int len;
+> >> +
+> >> +               ops =3D rcu_dereference(inet6_offloads[proto]);
+> >> +
+> >> +               if (unlikely(!ops))
+> >> +                       break;
+> >> +
+> >> +               if (!(ops->flags & INET6_PROTO_GSO_EXTHDR))
+> >> +                       break;
+> >> +
+> >> +               opth =3D skb_gro_header(skb, off + IPV6_MIN_EXTHDR_LEN=
+, off);
+> >
+> > I do not see a compelling reason for adding yet another constant here.
+> >
+> > I would stick to
+> >
+> >    opth =3D skb_gro_header(skb, off + sizeof(*opth), off);
+> >
+> > Consistency with similar helpers is desirable.
+> >
+>
+> In terms of consistency - similar helper functions (ipv6_gso_pull_exthdrs=
+,
+> ipv6_parse_hopopts) also pull 8 bytes at the beginning of every IPv6
+> extension header, because the minimum extension header length is 8 bytes.
+>
+> sizeof(*opth) =3D 2, so for an IPv6 packet with one extension header with=
+ a
+> common length of 8 bytes, pskb_may_pull will be called twice: first with
+> length =3D 2 and again with length =3D 8, which might not be ideal when p=
+arsing
+> non-linear packets.
+>
+> Willem suggested adding a constant to make the code more self-documenting=
+.
 
-Implement ffo_get() pin op filling it up to MSEED.frequency_diff value.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/dpll.c    | 31 +++++++++++++++++++
- 1 file changed, 31 insertions(+)
+Hmm... I was looking at
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-index dbe09d2f2069..18fed2b34fb1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-@@ -40,6 +40,8 @@ struct mlx5_dpll_synce_status {
- 	enum mlx5_msees_admin_status admin_status;
- 	enum mlx5_msees_oper_status oper_status;
- 	bool ho_acq;
-+	bool oper_freq_measure;
-+	s32 frequency_diff;
- };
- 
- static int
-@@ -57,6 +59,8 @@ mlx5_dpll_synce_status_get(struct mlx5_core_dev *mdev,
- 	synce_status->admin_status = MLX5_GET(msees_reg, out, admin_status);
- 	synce_status->oper_status = MLX5_GET(msees_reg, out, oper_status);
- 	synce_status->ho_acq = MLX5_GET(msees_reg, out, ho_acq);
-+	synce_status->oper_freq_measure = MLX5_GET(msees_reg, out, oper_freq_measure);
-+	synce_status->frequency_diff = MLX5_GET(msees_reg, out, frequency_diff);
- 	return 0;
- }
- 
-@@ -69,8 +73,10 @@ mlx5_dpll_synce_status_set(struct mlx5_core_dev *mdev,
- 
- 	MLX5_SET(msees_reg, in, field_select,
- 		 MLX5_MSEES_FIELD_SELECT_ENABLE |
-+		 MLX5_MSEES_FIELD_SELECT_ADMIN_FREQ_MEASURE |
- 		 MLX5_MSEES_FIELD_SELECT_ADMIN_STATUS);
- 	MLX5_SET(msees_reg, in, admin_status, admin_status);
-+	MLX5_SET(msees_reg, in, admin_freq_measure, true);
- 	return mlx5_core_access_reg(mdev, in, sizeof(in), out, sizeof(out),
- 				    MLX5_REG_MSEES, 0, 1);
- }
-@@ -102,6 +108,16 @@ mlx5_dpll_pin_state_get(struct mlx5_dpll_synce_status *synce_status)
- 	       DPLL_PIN_STATE_CONNECTED : DPLL_PIN_STATE_DISCONNECTED;
- }
- 
-+static int
-+mlx5_dpll_pin_ffo_get(struct mlx5_dpll_synce_status *synce_status,
-+		      s64 *ffo)
-+{
-+	if (!synce_status->oper_freq_measure)
-+		return -ENODATA;
-+	*ffo = synce_status->frequency_diff;
-+	return 0;
-+}
-+
- static int mlx5_dpll_device_lock_status_get(const struct dpll_device *dpll,
- 					    void *priv,
- 					    enum dpll_lock_status *status,
-@@ -175,10 +191,25 @@ static int mlx5_dpll_state_on_dpll_set(const struct dpll_pin *pin,
- 					  MLX5_MSEES_ADMIN_STATUS_FREE_RUNNING);
- }
- 
-+static int mlx5_dpll_ffo_get(const struct dpll_pin *pin, void *pin_priv,
-+			     const struct dpll_device *dpll, void *dpll_priv,
-+			     s64 *ffo, struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_dpll_synce_status synce_status;
-+	struct mlx5_dpll *mdpll = pin_priv;
-+	int err;
-+
-+	err = mlx5_dpll_synce_status_get(mdpll->mdev, &synce_status);
-+	if (err)
-+		return err;
-+	return mlx5_dpll_pin_ffo_get(&synce_status, ffo);
-+}
-+
- static const struct dpll_pin_ops mlx5_dpll_pins_ops = {
- 	.direction_get = mlx5_dpll_pin_direction_get,
- 	.state_on_dpll_get = mlx5_dpll_state_on_dpll_get,
- 	.state_on_dpll_set = mlx5_dpll_state_on_dpll_set,
-+	.ffo_get = mlx5_dpll_ffo_get,
- };
- 
- static const struct dpll_pin_properties mlx5_dpll_pin_properties = {
--- 
-2.43.0
+skb_checksum_setup_ipv6() , it uses skb_maybe_pull_tail( ...
+sizeof(struct ipv6_opt_hdr))
+ipv6_skip_exthdr()  also uses sizeof(struct ipv6_opt_hdr)
+ip6_tnl_parse_tlv_enc_lim also uses the same.
+hbh_mt6(), ipv6header_mt6(),  .. same...
+ip6_find_1stfragopt(), get_ipv6_ext_hdrs(), tcf_csum_ipv6(),
+mip6_rthdr_offset() same
 
+So it seems you found two helpers that went the other way.
+
+If you think pulling 8 bytes first is a win, I would suggest a stand
+alone patch, adding the magic constant
+using it in all places, so that a casual reader can make sense of the
+magical 8 value.
 
