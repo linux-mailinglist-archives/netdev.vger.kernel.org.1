@@ -1,114 +1,103 @@
-Return-Path: <netdev+bounces-61189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D6D822CAA
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:08:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F64822CDB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 13:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BA6628525F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:08:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CF131F24215
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 12:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF74718EBB;
-	Wed,  3 Jan 2024 12:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EDA18EC1;
+	Wed,  3 Jan 2024 12:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AT5Td98Y"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="qbxQ2Y2l"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5136C18EAF
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 12:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704283706;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Xn3hPmKlXFLs1haHAodNqDYoLKo2JnMk0c6eSg9WYzE=;
-	b=AT5Td98YhH5DVj8AA3Q3H043oKTOVgfg9H/pF+8I4xez/VOFhMyh89g05oCHGmXYcSMoXL
-	XGgP+LO82USNCYaEfqt1jNIJ8SDQru5aBOc/+SaJYOBNR+nc44JQLjns5wYvB8Me1/ntRP
-	RrVVRrnjC/N3f3TzVis1LdDex9Dg/tk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-464-ipNzNXHGPhaBuxD3VhW4ZQ-1; Wed,
- 03 Jan 2024 07:08:23 -0500
-X-MC-Unique: ipNzNXHGPhaBuxD3VhW4ZQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0F9663C025B4;
-	Wed,  3 Jan 2024 12:08:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C516D492BE6;
-	Wed,  3 Jan 2024 12:08:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZZULNQAZ0n0WQv7p@codewreck.org>
-References: <ZZULNQAZ0n0WQv7p@codewreck.org> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-41-dhowells@redhat.com>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-    Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
-    Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: Re: [PATCH v5 40/40] 9p: Use netfslib read/write_iter
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD81618EDA
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 12:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1704284403; bh=hsWvIYTjGOuzkSHY0cRhuMQ9nYrh1dhhCxx/OjJphEE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=qbxQ2Y2lhOGoypAf9uKQgP++KGMBkeI77sdYGkNjhlS3CchcdjL6gk14cB1XXkcWc
+	 ACzLl1B0Qc/S+dZGU+6oosYryQ05vEVR9cArjTx54PHtKhaYiIiF6vWsffS7xnW2C7
+	 RH24AuSBBmFA9Ef9/8WlvhAwzsrOQYfZbdySB86Q=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.215])
+	by newxmesmtplogicsvrsza1-0.qq.com (NewEsmtp) with SMTP
+	id 3721BE1A; Wed, 03 Jan 2024 20:13:50 +0800
+X-QQ-mid: xmsmtpt1704284030t5lk8klny
+Message-ID: <tencent_BF8F0DF0258C8DBF124CDDE4DD8D992DCF07@qq.com>
+X-QQ-XMAILINFO: MQ+wLuVvI2LQx1ZWRYQcqrrru8adTGjx2DK1zZieGMM5Y/1cc8/R+Ey5dg6t3b
+	 gz93V4CrPQDU+BFuJzi3BlheLDoS5kXDJ51uNlcEUX5iGsPdruRlZwXhieqrjGDf6Gg/Dbnuv4OF
+	 vgihRqlzDkquI9+ef1p+WCDI12EF634TMfKkWQbw3nzkseFvplzB2uctkUTD0xnmCqrehHPIeG5k
+	 0JDJ/rS655z+U3JUZUEmzTfMDsdAa4tOwp8yLXO8Y4zqUNXwbrGFCPfoYrvuRxdllOf1tB/h7tBP
+	 vk1H05stOWsAFPMar1bLL1LZRuNZzu3eMORR8vzJsU/iCmz3ZSJr8YkLawH6cxZrI4EmLs7+xkgV
+	 IquvIwjLDyi7hKFpDXqBb1cCzNHzUNHNVPdxnmnVHf53S41t0I16aAXzVKL1bJovnUB4BD7t+QWA
+	 TOQ9K3OHVXDwsELv22PSv2Dov5IP9PHU9Uj9rsIikv34IqTAYl5Hg9lvdBTdAn+7CS/6Hf1UPq2K
+	 vayA+0WyzvOUySvq0QxsyIPxeZ1gUtOpSW8JXBYLzGqOYcOGj1mPmQ6Oua1EH8c4JSlc1M1+CiAO
+	 +V3u+W3E1vgv1o8kKG45HG46A1S4wu0JF4i4e8qUSGYaP4677BL3cZ1KANKiWJB076GUwog6c/fU
+	 WbqsZDuoebMfU/5iwuguhcW/ED+3d7BujXalYnJaMO2tnjEjqNtcXvjTd1+DGxSi2a7Rhx3Q/pwR
+	 wXNWnzboVOkELgL6oJCePZ8eajmYLwRVEtYkGPYQnVbfmxZYFuqMLMOO7QLnPd+FJqHsnICMQgAC
+	 mG70DP2IrSK1KdtMnWwa5zze18Wnt8R9UiG7864zddXfDEQsAXpM3l0+EjqHne7skv5HtJo+XFJt
+	 qUmAaBqfLXBn9WlAAwbcu6/gpOwErsnP1UaBqGnicQa+hyCXoM0tQqj9+R8eRse7ANkb/cuSa7
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+864a269c27ee06b58374@syzkaller.appspotmail.com
+Cc: benjamin.berg@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	johannes.berg@intel.com,
+	johannes@sipsolutions.net,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	miriam.rachel.korenblit@intel.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH net-next] wifi: fix warning in __cfg80211_bss_update
+Date: Wed,  3 Jan 2024 20:13:51 +0800
+X-OQ-MSGID: <20240103121350.2734479-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <0000000000009fa770060e089409@google.com>
+References: <0000000000009fa770060e089409@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <354049.1704283697.1@warthog.procyon.org.uk>
-Date: Wed, 03 Jan 2024 12:08:18 +0000
-Message-ID: <354050.1704283698@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Transfer-Encoding: 8bit
 
-Dominique Martinet <asmadeus@codewreck.org> wrote:
+Replace rcu_dereference() with rcu_access_pointer() to avoid warnings. 
 
-> I've also manually confirmed one of the big improvements I'd been asking
-> for (that writes in cached modes, which used to be chunked to 4k, and
-> are now properly aggregated, so e.g 'dd bs=1M count=1' will properly
-> issue a minimal number of TWRITE calls capped by msize) -- this is
-> great!
+Fixes: 32af9a9e1069 ("wifi: cfg80211: free beacon_ies when overridden from hidden BSS")
+Reported-and-tested-by: syzbot+864a269c27ee06b58374@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/wireless/scan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-After the merge window, we can look at enabling multipage folios for 9p.
-
-> I've noticed we don't cache xattrs are all,
-
-I haven't given this any particular thought.  We could attach them to the
-cachefile object as xattrs, but it means you have to do two xattr lookups in
-the event of a cache miss.
-
-At this point, I'm going to ask Christian to stack the extra patch on his
-branch rather than folding it down and retagging.
-
-> I've got a couple of questions below, but:
-
-I'll address those separately.
-
-> Tested-by: Dominique Martinet <asmadeus@codewreck.org>
-> Acked-by: Dominique Martinet <asmadeus@codewreck.org>
-
-Thanks!
-
-David
+diff --git a/net/wireless/scan.c b/net/wireless/scan.c
+index cf2131671..7cb8ae87c 100644
+--- a/net/wireless/scan.c
++++ b/net/wireless/scan.c
+@@ -1864,7 +1864,7 @@ __cfg80211_bss_update(struct cfg80211_registered_device *rdev,
+ 					 &hidden->hidden_list);
+ 				hidden->refcount++;
+ 
+-				ies = (void *)rcu_dereference(new->pub.beacon_ies);
++				ies = (void *)rcu_access_pointer(new->pub.beacon_ies);
+ 				rcu_assign_pointer(new->pub.beacon_ies,
+ 						   hidden->pub.beacon_ies);
+ 				if (ies)
+-- 
+2.43.0
 
 
