@@ -1,79 +1,92 @@
-Return-Path: <netdev+bounces-61156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A870A822B8F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:47:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2160E822B92
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 11:47:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 445CB1F228B7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:47:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C231F285429
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 10:47:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE72E18C19;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9E318C3B;
 	Wed,  3 Jan 2024 10:47:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5456B18E06
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998F018E14
 	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 10:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35fd902c677so113744565ab.3
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35ff8e2aa19so137774405ab.1
         for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 02:47:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704278840; x=1704883640;
+        d=1e100.net; s=20230601; t=1704278841; x=1704883641;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0v9D0U8zoD0RGhtvTYl+RE9AdMXmXMXGPURFx26hzEc=;
-        b=sYZTQaM4fc/1KsNetqUXPz0tgPP8v936JVcE1OSAFS93+yc9aQJaKgG3Y/rfb1rcbk
-         RIPl/FzmnIuPc7t8eDFJOwBKfGx5JZv4eyxrBXGt2vpJ5FsAF9EKFmVnM6k2WsAaNLRB
-         dbttFAGntHHG0cOXFzdbpeSaUGho8GKDqzvuQfCkVqlwbqAEelFSFhuwZLlxvqKavl+e
-         p/lCaJ+FjnfA+jCqXuQ+fBNcvVYQ6QYSFfRbjAQQmrOM76zqU/7rfhPbKTZzX9LZZWCj
-         EcFAlPW/X8XBEuLJOXO9QJu3bhcweX+L5DKxT+sfe7y4p2mFKHKzuGWNJHnXY5N7ZZSR
-         vLEw==
-X-Gm-Message-State: AOJu0Yzsr49tITos6/FYrAYNc1QDkM8OUSuGQBo4P0H2Ao7AXDxQa6Ie
-	4kTyZ40q6m2pd3ePSKhnN/9Flhnb1FNdOAyu9AQH8Sw3+6j+
-X-Google-Smtp-Source: AGHT+IHPMOHUuANNnM1elvc/yjK02zS6unpcxlMnJzKrWI5oJcqSTfD9XHwCw4aJDuQD+tdEErrea3dBmzyFR9+hk79RPGOseu0A
+        bh=V/q3fX7yfr4+OxT/fgvLyZ0FBGYrlGsDU4PTbrFMXMU=;
+        b=S/x6xfIhX7ok3QMv+WxvJMOh5isfFGph46h4rSkJnoebHk6HvZaxEWa4W68VBTWqdr
+         slrSHeI/TUnC1sVls6pd0Gew6UCo617dojL5ZL328katRUQqpm8KATQK9OQ1U9+pN+xk
+         PcPGVp9yL3nd/ZtKrRMRKYDJcNjaufhT8yF2y+zsN17LUaF38QJkmPQ2YmeYudVGAqEG
+         /WHTp14MoLrln2RY97ARaaSUAE3+EIVP/rIIVZHw8iLKkLJExy8OW1ucigI3jLXasEN4
+         Liv6oXdH0y/uI+dJUJ5uFsH7tXwlL4nD8oAW4tfmqttVp9J4seF5LkGZcMKy9nl4d9N9
+         UvOw==
+X-Gm-Message-State: AOJu0YwBEcpyVzdkPqAoMOEBZk0qro8NuEi+5FGk8GLQJejH3l2T5Flf
+	n1FA/AEY8Pqt3WrW6MybGeGCu9F+R9ldnW53rKvhvDQuNOzd
+X-Google-Smtp-Source: AGHT+IF+FHvBiFwTjzjx9Sl+fixAoS3nuebFzJcxhwO8WYaTRSv/XaTiDQiVzT4ZY+vs8TKQ/L+uZlA6cALEF5IwX/UhPcRY/XBS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d18:b0:35f:f01e:bb32 with SMTP id
- i24-20020a056e021d1800b0035ff01ebb32mr2389137ila.4.1704278840626; Wed, 03 Jan
+X-Received: by 2002:a05:6e02:1a2d:b0:35f:f683:f817 with SMTP id
+ g13-20020a056e021a2d00b0035ff683f817mr2185154ile.5.1704278840869; Wed, 03 Jan
  2024 02:47:20 -0800 (PST)
 Date: Wed, 03 Jan 2024 02:47:20 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e4d49f060e08565a@google.com>
-Subject: [syzbot] Monthly netfilter report (Jan 2024)
-From: syzbot <syzbot+listc06dd9c5e64ea358a383@syzkaller.appspotmail.com>
-To: fw@strlen.de, kadlec@netfilter.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
+Message-ID: <000000000000e8ad89060e0856f8@google.com>
+Subject: [syzbot] Monthly wireless report (Jan 2024)
+From: syzbot <syzbot+list2ced74a42cd2d7138cf6@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello netfilter maintainers/developers,
+Hello wireless maintainers/developers,
 
-This is a 31-day syzbot report for the netfilter subsystem.
+This is a 31-day syzbot report for the wireless subsystem.
 All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/netfilter
+https://syzkaller.appspot.com/upstream/s/wireless
 
 During the period, 0 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 157 have been fixed so far.
+In total, 30 issues are still open and 119 have been fixed so far.
 
 Some of the still happening issues:
 
-Ref Crashes Repro Title
-<1> 45      Yes   INFO: rcu detected stall in gc_worker (3)
-                  https://syzkaller.appspot.com/bug?extid=eec403943a2a2455adaa
-<2> 4       Yes   INFO: rcu detected stall in tcp_setsockopt
-                  https://syzkaller.appspot.com/bug?extid=1a11c39caf29450eac9f
-<3> 2       Yes   WARNING in __nf_unregister_net_hook (6)
-                  https://syzkaller.appspot.com/bug?extid=de4025c006ec68ac56fc
+Ref  Crashes Repro Title
+<1>  6261    Yes   WARNING in __ieee80211_beacon_get
+                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
+<2>  4378    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<3>  3715    Yes   WARNING in ieee80211_link_info_change_notify (2)
+                   https://syzkaller.appspot.com/bug?extid=de87c09cc7b964ea2e23
+<4>  2836    No    WARNING in ieee80211_ibss_csa_beacon (2)
+                   https://syzkaller.appspot.com/bug?extid=b10a54cb0355d83fd75c
+<5>  842     Yes   WARNING in ar5523_submit_rx_cmd/usb_submit_urb
+                   https://syzkaller.appspot.com/bug?extid=6101b0c732dea13ea55b
+<6>  744     Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<7>  507     Yes   WARNING in ieee80211_bss_info_change_notify (2)
+                   https://syzkaller.appspot.com/bug?extid=dd4779978217b1973180
+<8>  65      Yes   WARNING in ieee80211_free_ack_frame (2)
+                   https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
+<9>  46      Yes   WARNING in carl9170_usb_submit_cmd_urb/usb_submit_urb
+                   https://syzkaller.appspot.com/bug?extid=9468df99cb63a4a4c4e1
+<10> 38      Yes   WARNING in ar5523_cmd/usb_submit_urb
+                   https://syzkaller.appspot.com/bug?extid=1bc2c2afd44f820a669f
 
 ---
 This report is generated by a bot. It may contain errors.
