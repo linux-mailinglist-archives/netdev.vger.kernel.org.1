@@ -1,177 +1,110 @@
-Return-Path: <netdev+bounces-61329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4024A8236E3
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:03:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70838236FE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3DAC287689
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:03:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBE411C245A6
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B761D54F;
-	Wed,  3 Jan 2024 21:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902911D6A6;
+	Wed,  3 Jan 2024 21:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qhgA6zSG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QwDM5yw+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56721D696;
-	Wed,  3 Jan 2024 21:03:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B24FC433C8;
-	Wed,  3 Jan 2024 21:03:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704315806;
-	bh=QD5FzN6yb4XKKIWHNV4g4iP1F/YPzPhiGQBAapNVvtQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qhgA6zSGsOLSi2ieOTuDZQtB01KRNK73RK87gFiJodsEj78ZlGhP9kS3M9abrgRd2
-	 jVCPN4pupWLYo8ANtXAZICT5gcF6eO7iLMBJxjkNuLuYK4953S3XNQWoIzelzkxJXZ
-	 V1fr17cwDx2DmOB71zg2Af0KfW8f81tLSOnBZ7O92MMx5pAliQ2uvSzZjimBPHJhQw
-	 WUMDaDNCQb698zCY+N9UN5jcSmuEAKomy84bRq38VBJZy7Ggq5Zz4jrFOe6dQvseq6
-	 zdEY5SBz4w5PsunILjZ95aDj6b5kTZJM09Dtgkc5tAzIwYvSzRlf9J83SfZ7DL/Pos
-	 V7riDGoD8dtqA==
-Date: Wed, 3 Jan 2024 21:03:21 +0000
-From: Simon Horman <horms@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next 3/6] virtio_net: support device stats
-Message-ID: <20240103210321.GD31813@kernel.org>
-References: <20231222033021.20649-1-xuanzhuo@linux.alibaba.com>
- <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6CB1D692
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 21:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704316552;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Lz9BpuJT9ZqjBzLEQFTtycxe4tbIVPZFPrNygtaFHDI=;
+	b=QwDM5yw+VmJ8YBM7dt5dcbVZuatQF/CCRbqDR+Rz+xbvFT1Ljwn7yXQUnOu/scH2Wt5ffv
+	UCEUK76dhKR++7KEfzL6Cf5W9/zwOR+woc0U4EL1y+Zbxabqj+LHBQ4PCboTdghZtqGN69
+	uf/gdVeb+8T0VX24meMydBOKaytxi5Q=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-640-1v-GWHbRM9e1RxN52-Av-w-1; Wed,
+ 03 Jan 2024 16:15:48 -0500
+X-MC-Unique: 1v-GWHbRM9e1RxN52-Av-w-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5354F3806710;
+	Wed,  3 Jan 2024 21:15:47 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 576BF492BC6;
+	Wed,  3 Jan 2024 21:15:44 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240103145935.384404-1-dhowells@redhat.com>
+References: <20240103145935.384404-1-dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+    Jeff Layton <jlayton@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>
+Cc: dhowells@redhat.com, Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 7/5] netfs: Fix proc/fs/fscache symlink to point to "netfs" not "../netfs"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231222033021.20649-4-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <900276.1704316543.1@warthog.procyon.org.uk>
+Date: Wed, 03 Jan 2024 21:15:43 +0000
+Message-ID: <900277.1704316543@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Fri, Dec 22, 2023 at 11:30:18AM +0800, Xuan Zhuo wrote:
-> As the spec https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
-> 
-> Virtio-net supports to get the stats from the device by ethtool -S <eth0>.
-> 
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Fix the proc/fs/fscache symlink to point to "netfs" not "../netfs".
 
-Hi Xuan Zhuo,
+Reported-by: Marc Dionne <marc.dionne@auristor.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Christian Brauner <christian@brauner.io>
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-cachefs@redhat.com
+---
+ fs/netfs/fscache_proc.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-some minor feedback from my side relating to Sparse warnings.
+diff --git a/fs/netfs/fscache_proc.c b/fs/netfs/fscache_proc.c
+index ecd0d1edafaa..874d951bc390 100644
+--- a/fs/netfs/fscache_proc.c
++++ b/fs/netfs/fscache_proc.c
+@@ -16,7 +16,7 @@
+  */
+ int __init fscache_proc_init(void)
+ {
+-	if (!proc_symlink("fs/fscache", NULL, "../netfs"))
++	if (!proc_symlink("fs/fscache", NULL, "netfs"))
+ 		goto error_sym;
+ 
+ 	if (!proc_create_seq("fs/netfs/caches", S_IFREG | 0444, NULL,
 
-...
-
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-
-...
-
-> +static int virtnet_get_hw_stats(struct virtnet_info *vi,
-> +				struct virtnet_stats_ctx *ctx)
-> +{
-> +	struct virtio_net_ctrl_queue_stats *req;
-> +	struct virtio_net_stats_reply_hdr *hdr;
-> +	struct scatterlist sgs_in, sgs_out;
-> +	u32 num_rx, num_tx, num_cq, offset;
-> +	int qnum, i, j,  qid, res_size;
-> +	struct virtnet_stats_map *m;
-> +	void *reply, *p;
-> +	u64 bitmap;
-> +	int ok;
-> +	u64 *v;
-
-...
-
-> +	for (p = reply; p - reply < res_size; p += virtio16_to_cpu(vi->vdev, hdr->size)) {
-
-The type of the second parameter of _virtio16_to_cpu() is __virtio16.
-But the type of the size field of virtio_net_stats_reply_hdr is __le16.
-This does not seem correct.
-
-> +		hdr = p;
-> +
-> +		qid = virtio16_to_cpu(vi->vdev, hdr->vq_index);
-
-Similarly, the vq_index field of virtio_net_stats_reply_hdr is also __le16.
-
-...
-
-> +		for (i = 0; i < ARRAY_SIZE(virtio_net_stats_map); ++i) {
-> +			m = &virtio_net_stats_map[i];
-> +
-> +			if (m->flag & bitmap)
-> +				offset += m->num;
-> +
-> +			if (hdr->type != m->type)
-> +				continue;
-> +
-> +			for (j = 0; j < m->num; ++j) {
-> +				v = p + m->desc[j].offset;
-> +				ctx->data[offset + j] = virtio64_to_cpu(vi->vdev, *v);
-
-Here the type of the second parameter of virtio64_to_cpu() is __virtio64.
-But the type of *v is u64.
-
-> +			}
-> +
-> +			break;
-> +		}
-> +	}
-> +
-> +	kfree(reply);
-> +	return 0;
-> +}
-> +
-
-...
-
-> @@ -3183,11 +3497,35 @@ static void virtnet_get_strings(struct net_device *dev, u32 stringset, u8 *data)
->  static int virtnet_get_sset_count(struct net_device *dev, int sset)
->  {
->  	struct virtnet_info *vi = netdev_priv(dev);
-> +	struct virtnet_stats_ctx ctx = {0};
-> +	u32 pair_count;
->  
->  	switch (sset) {
->  	case ETH_SS_STATS:
-> -		return vi->curr_queue_pairs * (VIRTNET_RQ_STATS_LEN +
-> -					       VIRTNET_SQ_STATS_LEN);
-> +		if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_DEVICE_STATS) &&
-> +		    !vi->device_stats_cap) {
-> +			struct scatterlist sg;
-> +
-> +			sg_init_one(&sg, &vi->ctrl->stats_cap, sizeof(vi->ctrl->stats_cap));
-> +
-> +			if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_STATS,
-> +						  VIRTIO_NET_CTRL_STATS_QUERY,
-> +						  NULL, &sg)) {
-> +				dev_warn(&dev->dev, "Fail to get stats capability\n");
-> +			} else {
-> +				__le64 v;
-> +
-> +				v = vi->ctrl->stats_cap.supported_stats_types[0];
-> +				vi->device_stats_cap = virtio64_to_cpu(vi->vdev, v);
-
-Similarly, the type of v is __le64.
-
-> +			}
-> +		}
-> +
-> +		virtnet_stats_ctx_init(vi, &ctx, NULL);
-> +
-> +		pair_count = VIRTNET_RQ_STATS_LEN + VIRTNET_SQ_STATS_LEN;
-> +		pair_count += ctx.num_rx + ctx.num_tx;
-> +
-> +		return ctx.num_cq + vi->curr_queue_pairs * pair_count;
->  	default:
->  		return -EOPNOTSUPP;
->  	}
-
-...
 
