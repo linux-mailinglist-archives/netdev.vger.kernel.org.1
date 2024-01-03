@@ -1,214 +1,154 @@
-Return-Path: <netdev+bounces-61380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92A4C82383F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:36:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C09823895
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 23:53:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1FBC1F23908
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:36:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B40E1F252C0
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB5D1802B;
-	Wed,  3 Jan 2024 22:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BB61DA5E;
+	Wed,  3 Jan 2024 22:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="AEQi3zRo"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XjUhI/q/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524D51DA58
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 22:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d43df785c2so29594915ad.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 14:36:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1704321398; x=1704926198; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lVeZKB7qRvSymM0U0QuH/lrORE+skl2NPLppRlmAmOM=;
-        b=AEQi3zRou/YFsSTkKaQ0botg/TIjZp7wwf71EWxttf+TxG0TG9hitB9GPwBTTG7VUI
-         4HchwkcvZyI/bVeZvP/16yKKAlzQkUCqfdryGL/InbLzkDi3wxLtNTzieZJPFS0+GA5m
-         Ml6zx6eJD9UPMKJLMgRkpAjHms7hI4t/joCxObavCDR2/1G8RtnVUJryW4wbieUC89wY
-         zmcnxFff6fIuwjoUow6Fvh/fW23+Ti6UvJ9/JxFlFHkD0etT6To0ep44mWx3LL+evSCK
-         r6w0ldWTbRtxhgfYE878KJ2tGMfnkFe7SoUg7or9heV+necZC3emq6e2ZzRw3ZpkelL+
-         BEBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704321398; x=1704926198;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lVeZKB7qRvSymM0U0QuH/lrORE+skl2NPLppRlmAmOM=;
-        b=o3xKfEs6T342U9iocXD+jGoDVlYhA+jykMtQm/ZYX0hGQKRzX5Etvvr/AXdW+ubhxP
-         uIMwURMpJuCcNOnuHyt6JU3OYeNHeGQZvGSf15B0WG4DVR9HCcfVafWfIezxrjPsIYxi
-         jm43djYDoatx+rztAjSJFtyfCuoqbiIN9FdTQB469BXFpYYsT64+3CdmEpZ5lr6+1OiU
-         tvrKc/4R3yjcTzMlwZyWuhMikOsVwwxMOuc9YR9487d2vrJ9BFJVl2aUMPUH1bfz563h
-         PCz7wbrQxorKYM5EZN5kh9ie8uOJAHIZDktjWpWeHiPtSkx/BOsIXLpVcSd7DMzCMu0o
-         yxFw==
-X-Gm-Message-State: AOJu0YwRDsTgXAltaZxkqH+u9Ynz2TCgFgaj4MHW+kU9ZfH3cFLupTQe
-	Y1ipFltiSH8zFWTqO9Fig19AxcJeXNqFXA==
-X-Google-Smtp-Source: AGHT+IFUEF+GSjXVKrGLIt5esTtuHO8dG4JAznrejZHF084AWL685YFCZyEcQgjHRW6O6nrkFz8npQ==
-X-Received: by 2002:a17:902:f804:b0:1d4:a381:e933 with SMTP id ix4-20020a170902f80400b001d4a381e933mr3701176plb.130.1704321398574;
-        Wed, 03 Jan 2024 14:36:38 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1156:a:897:c73b:17c6:3432? ([2620:10d:c090:500::4:9b01])
-        by smtp.gmail.com with ESMTPSA id e1-20020a17090301c100b001d053a56fb4sm24401191plh.67.2024.01.03.14.36.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jan 2024 14:36:38 -0800 (PST)
-Message-ID: <bf4760df-a78f-431d-8c33-b7a2f7fb393d@davidwei.uk>
-Date: Wed, 3 Jan 2024 14:36:36 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D232E1DDE4
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 22:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7d2cd6c4-0d65-4a65-beb1-2dd995ac9b2f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1704322407;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Cz3W+QGbxOtKN2ZN3vU1nWmUAo8sjPozJY1qG8xxL2U=;
+	b=XjUhI/q/vDDNe7G1kobnrcgPqH8g2n8hOYQdQ/z1ujp0mKHlZYCtUfACkZTq/ZCad0veas
+	I41TFDVcFZgO0R0Qkumt66HDi6uyA95JTTnQIienGrXPEpONrjby5Eun9kXJyC+6B3SoY4
+	xgSCC+Wfxt0OSKURvhcCk4KlqgBmnfg=
+Date: Wed, 3 Jan 2024 14:53:20 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/5] netdevsim: forward skbs from one
- connected port to another
-Content-Language: en-GB
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-References: <20231228014633.3256862-1-dw@davidwei.uk>
- <20231228014633.3256862-4-dw@davidwei.uk> <ZZPv42K9VRTao735@nanopsycho>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <ZZPv42K9VRTao735@nanopsycho>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v3 bpf 2/4] xsk: fix usage of multi-buffer BPF helpers for
+ ZC XDP
+Content-Language: en-US
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
+ echaudro@redhat.com, lorenzo@kernel.org, tirthendu.sarkar@intel.com,
+ bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org
+References: <20231221132656.384606-1-maciej.fijalkowski@intel.com>
+ <20231221132656.384606-3-maciej.fijalkowski@intel.com>
+ <dadb229a-d811-4542-a53f-3a78e559e639@linux.dev> <ZZVNa6CN8Y1KUtNM@boxer>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <ZZVNa6CN8Y1KUtNM@boxer>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 2024-01-02 03:13, Jiri Pirko wrote:
-> Thu, Dec 28, 2023 at 02:46:31AM CET, dw@davidwei.uk wrote:
->> Forward skbs sent from one netdevsim port to its connected netdevsim
->> port using dev_forward_skb, in a spirit similar to veth.
+On 1/3/24 4:04 AM, Maciej Fijalkowski wrote:
+> On Tue, Jan 02, 2024 at 02:58:00PM -0800, Martin KaFai Lau wrote:
+>> On 12/21/23 5:26 AM, Maciej Fijalkowski wrote:
+>>> This comes from __xdp_return() call with xdp_buff argument passed as
+>>> NULL which is supposed to be consumed by xsk_buff_free() call.
+>>>
+>>> To address this properly, in ZC case, a node that represents the frag
+>>> being removed has to be pulled out of xskb_list. Introduce
+>>> appriopriate xsk helpers to do such node operation and use them
+>>> accordingly within bpf_xdp_adjust_tail().
 >>
->> Add a tx_dropped variable to struct netdevsim, tracking the number of
->> skbs that could not be forwarded using dev_forward_skb().
+>> [ ... ]
 >>
->> The xmit() function accessing the peer ptr is protected by an RCU read
->> critical section. The rcu_read_lock() is functionally redundant as since
->> v5.0 all softirqs are implicitly RCU read critical sections; but it is
->> useful for human readers.
+>>> +static inline struct xdp_buff *xsk_buff_get_tail(struct xdp_buff *first)
+>>> +{
+>>> +	struct xdp_buff_xsk *xskb = container_of(first, struct xdp_buff_xsk, xdp);
+>>> +	struct xdp_buff_xsk *frag;
+>>> +
+>>> +	frag = list_last_entry(&xskb->pool->xskb_list, struct xdp_buff_xsk,
+>>> +			       xskb_list_node);
+>>> +	return &frag->xdp;
+>>> +}
+>>> +
 >>
->> If another CPU is concurrently in nsim_destroy(), then it will first set
->> the peer ptr to NULL. This does not affect any existing readers that
->> dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
->> a synchronize_rcu() before the netdev is actually unregistered and
->> freed. This ensures that any readers i.e. xmit() that got a non-NULL
->> peer will complete before the netdev is freed.
+>> [ ... ]
 >>
->> Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
->> will dereference NULL, making it safe.
+>>> +static void __shrink_data(struct xdp_buff *xdp, struct xdp_mem_info *mem_info,
+>>> +			  skb_frag_t *frag, int shrink)
+>>> +{
+>>> +	if (mem_info->type == MEM_TYPE_XSK_BUFF_POOL) {
+>>> +		struct xdp_buff *tail = xsk_buff_get_tail(xdp);
+>>> +
+>>> +		if (tail)
+>>> +			tail->data_end -= shrink;
+>>> +	}
+>>> +	skb_frag_size_sub(frag, shrink);
+>>> +}
+>>> +
+>>> +static bool shrink_data(struct xdp_buff *xdp, skb_frag_t *frag, int shrink)
+>>> +{
+>>> +	struct xdp_mem_info *mem_info = &xdp->rxq->mem;
+>>> +
+>>> +	if (skb_frag_size(frag) == shrink) {
+>>> +		struct page *page = skb_frag_page(frag);
+>>> +		struct xdp_buff *zc_frag = NULL;
+>>> +
+>>> +		if (mem_info->type == MEM_TYPE_XSK_BUFF_POOL) {
+>>> +			zc_frag = xsk_buff_get_tail(xdp);
+>>> +
+>>> +			if (zc_frag) {
 >>
->> The codepath to nsim_destroy() and nsim_create() takes both the newly
->> added nsim_dev_list_lock and rtnl_lock. This makes it safe with
+>> Based on the xsk_buff_get_tail(), would zc_frag ever be NULL?
 > 
-> I don't see the rtnl_lock take in those functions.
-> 
-> 
-> Otherwise, this patch looks fine to me.
+> Hey Martin thanks for taking a look, I had to do this in order to satisfy
+> !CONFIG_XDP_SOCKETS builds :/
 
-For nsim_create(), rtnl_lock is taken in nsim_init_netdevsim(). For
-nsim_destroy(), rtnl_lock is taken directly in the function.
+There is compilation/checker warning if it does not check for NULL?
 
-What I mean here is, in the netdevsim device modification paths locks
-are taken in this order:
-
-devl_lock -> rtnl_lock
-
-nsim_dev_list_lock is taken outside (not nested) of these.
-
-In nsim_dev_peer_write() where two ports are linked, locks are taken in
-this order:
-
-nsim_dev_list_lock -> devl_lock -> rtnl_lock
-
-This will not cause deadlocks and ensures that two ports being linked
-are both valid.
+hmm... but it still should not reach here in the runtime and call 
+xsk_buff_get_tail() in the !CONFIG_XDP_SOCKETS build. Can the NULL test on the 
+get_tail() return value be removed? The above "mem_info->type == 
+MEM_TYPE_XSK_BUFF_POOL" should have avoided the get_tail() call for the 
+!CONFIG_XDP_SOCKETS build. Otherwise, it could be passing NULL to the 
+__xdp_return() and hit the same bug again. The NULL check here is pretty hard to 
+reason logically.
 
 > 
+>>
+>>> +				xdp_buff_clear_frags_flag(zc_frag);
+>>> +				xsk_buff_del_tail(zc_frag);
+>>> +			}
+>>> +		}
+>>> +
+>>> +		__xdp_return(page_address(page), mem_info, false, zc_frag);
+>>
+>> and iiuc, this patch is fixing a bug when zc_frag is NULL and
+>> MEM_TYPE_XSK_BUFF_POOL.
 > 
->> concurrent calls to linking two netdevsims together.
+> Generally I don't see the need for xdp_return_buff() (which calls in the
+> end __xdp_return() being discussed) to handle MEM_TYPE_XSK_BUFF_POOL, this
+> could be refactored later and then probably this fix would look different,
+> but this is out of the scope now.
+> 
 >>
->> Signed-off-by: David Wei <dw@davidwei.uk>
->> ---
->> drivers/net/netdevsim/netdev.c    | 21 ++++++++++++++++++---
->> drivers/net/netdevsim/netdevsim.h |  1 +
->> 2 files changed, 19 insertions(+), 3 deletions(-)
+>>> +		return true;
+>>> +	}
+>>> +	__shrink_data(xdp, mem_info, frag, shrink);
+>>> +	return false;
+>>> +}
+>>> +
 >>
->> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
->> index 434322f6a565..0009d0f1243f 100644
->> --- a/drivers/net/netdevsim/netdev.c
- +++ b/drivers/net/netdevsim/netdev.c
->> @@ -29,19 +29,34 @@
->> static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
->> {
->> 	struct netdevsim *ns = netdev_priv(dev);
->> +	struct netdevsim *peer_ns;
->> +	int ret = NETDEV_TX_OK;
 >>
->> 	if (!nsim_ipsec_tx(ns, skb))
->> 		goto out;
->>
->> +	rcu_read_lock();
->> +	peer_ns = rcu_dereference(ns->peer);
->> +	if (!peer_ns)
->> +		goto out_stats;
->> +
->> +	skb_tx_timestamp(skb);
->> +	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP))
->> +		ret = NET_XMIT_DROP;
->> +
->> +out_stats:
->> +	rcu_read_unlock();
->> 	u64_stats_update_begin(&ns->syncp);
->> 	ns->tx_packets++;
->> 	ns->tx_bytes += skb->len;
->> +	if (ret == NET_XMIT_DROP)
->> +		ns->tx_dropped++;
->> 	u64_stats_update_end(&ns->syncp);
->> +	return ret;
->>
->> out:
->> 	dev_kfree_skb(skb);
->> -
->> -	return NETDEV_TX_OK;
->> +	return ret;
->> }
->>
->> static void nsim_set_rx_mode(struct net_device *dev)
->> @@ -70,6 +85,7 @@ nsim_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
->> 		start = u64_stats_fetch_begin(&ns->syncp);
->> 		stats->tx_bytes = ns->tx_bytes;
->> 		stats->tx_packets = ns->tx_packets;
->> +		stats->tx_dropped = ns->tx_dropped;
->> 	} while (u64_stats_fetch_retry(&ns->syncp, start));
->> }
->>
->> @@ -302,7 +318,6 @@ static void nsim_setup(struct net_device *dev)
->> 	eth_hw_addr_random(dev);
->>
->> 	dev->tx_queue_len = 0;
->> -	dev->flags |= IFF_NOARP;
->> 	dev->flags &= ~IFF_MULTICAST;
->> 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
->> 			   IFF_NO_QUEUE;
->> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
->> index 24fc3fbda791..083b1ee7a1a2 100644
->> --- a/drivers/net/netdevsim/netdevsim.h
->> +++ b/drivers/net/netdevsim/netdevsim.h
->> @@ -98,6 +98,7 @@ struct netdevsim {
->>
->> 	u64 tx_packets;
->> 	u64 tx_bytes;
->> +	u64 tx_dropped;
->> 	struct u64_stats_sync syncp;
->>
->> 	struct nsim_bus_dev *nsim_bus_dev;
->> -- 
->> 2.39.3
->>
+> 
+
 
