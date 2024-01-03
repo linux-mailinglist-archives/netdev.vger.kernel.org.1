@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-61298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA272823254
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:05:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8083A8232B8
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 18:10:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09F0C1F24D2A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:05:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E99241F24D92
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 17:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9A81BDF4;
-	Wed,  3 Jan 2024 17:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D23C1BDFE;
+	Wed,  3 Jan 2024 17:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gNEhv7cn"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="D0piIWsj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B091BDDE;
-	Wed,  3 Jan 2024 17:05:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 356F4C433C8;
-	Wed,  3 Jan 2024 17:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB741BDF4;
+	Wed,  3 Jan 2024 17:10:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ACDCC433C8;
+	Wed,  3 Jan 2024 17:10:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1704301529;
-	bh=8UNdjnPDfgDtt8xh/WQC0uRYBwqpZ3J4jrMhm2ndXww=;
+	s=korg; t=1704301843;
+	bh=lc2ROPNA7gqqcqPwx0beeLyb4qlqLE1coJ87y7HYXnI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gNEhv7cncrFPzPaobncg/lgwLc7ELpBsxSMJ3vd8d2edQkHdOMNN9qAEEgkGi7UY0
-	 0ysL4r6E06AiGunkd8Z0mB+ecpxwTZ8jGjsBGnCXZKed/4YOv/Fj3fQUaIHHiqjRzz
-	 cLVDuzpTTwz8z3wc9RZdaMxigdzd4Kb/xdBL2l0E=
+	b=D0piIWsjb3OgF0AhSJkRz7TUo6cwAyUI+/Pk/iWMy6hEkCGB0E1vWXEPNYD4/cxPA
+	 FbgneDQhriQ+eqCTAaLihG4+ofVJUYjXQHoBx52SLrYKoE8IOgeQZZpWRJWtdd3mGz
+	 8uOONLrpRjoRtShSrpBv8q/54w9m7tZ0ulr/DvRs=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -42,12 +42,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	netdev@vger.kernel.org,
 	Ronald Wahl <ronald.wahl@raritan.com>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH 5.15 56/95] net: ks8851: Fix TX stall caused by TX buffer overrun
-Date: Wed,  3 Jan 2024 17:55:04 +0100
-Message-ID: <20240103164902.409977864@linuxfoundation.org>
+Subject: [PATCH 5.10 45/75] net: ks8851: Fix TX stall caused by TX buffer overrun
+Date: Wed,  3 Jan 2024 17:55:26 +0100
+Message-ID: <20240103164849.940037823@linuxfoundation.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240103164853.921194838@linuxfoundation.org>
-References: <20240103164853.921194838@linuxfoundation.org>
+In-Reply-To: <20240103164842.953224409@linuxfoundation.org>
+References: <20240103164842.953224409@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-5.15-stable review patch.  If anyone has any objections, please let me know.
+5.10-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -144,7 +144,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
   * @fid: Incrementing frame id tag.
   * @rc_ier: Cached copy of KS_IER.
   * @rc_ccr: Cached copy of KS_CCR.
-@@ -399,6 +401,7 @@ struct ks8851_net {
+@@ -398,6 +400,7 @@ struct ks8851_net {
  	struct work_struct	rxctrl_work;
  
  	struct sk_buff_head	txq;
@@ -154,7 +154,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	struct regulator	*vdd_reg;
 --- a/drivers/net/ethernet/micrel/ks8851_common.c
 +++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -361,16 +361,18 @@ static irqreturn_t ks8851_irq(int irq, v
+@@ -363,16 +363,18 @@ static irqreturn_t ks8851_irq(int irq, v
  		handled |= IRQ_RXPSI;
  
  	if (status & IRQ_TXI) {
@@ -180,7 +180,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	}
  
  	if (status & IRQ_RXI)
-@@ -413,9 +415,6 @@ static irqreturn_t ks8851_irq(int irq, v
+@@ -415,9 +417,6 @@ static irqreturn_t ks8851_irq(int irq, v
  	if (status & IRQ_LCI)
  		mii_check_link(&ks->mii);
  
@@ -190,7 +190,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	return IRQ_HANDLED;
  }
  
-@@ -499,6 +498,7 @@ static int ks8851_net_open(struct net_de
+@@ -501,6 +500,7 @@ static int ks8851_net_open(struct net_de
  	ks8851_wrreg16(ks, KS_ISR, ks->rc_ier);
  	ks8851_wrreg16(ks, KS_IER, ks->rc_ier);
  
@@ -200,7 +200,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
 --- a/drivers/net/ethernet/micrel/ks8851_spi.c
 +++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -287,6 +287,18 @@ static void ks8851_wrfifo_spi(struct ks8
+@@ -289,6 +289,18 @@ static void ks8851_wrfifo_spi(struct ks8
  }
  
  /**
@@ -219,7 +219,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
   * ks8851_rx_skb_spi - receive skbuff
   * @ks: The device state
   * @skb: The skbuff
-@@ -305,7 +317,9 @@ static void ks8851_rx_skb_spi(struct ks8
+@@ -307,7 +319,9 @@ static void ks8851_rx_skb_spi(struct ks8
   */
  static void ks8851_tx_work(struct work_struct *work)
  {
@@ -229,7 +229,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	struct ks8851_net *ks;
  	unsigned long flags;
  	struct sk_buff *txb;
-@@ -322,6 +336,8 @@ static void ks8851_tx_work(struct work_s
+@@ -324,6 +338,8 @@ static void ks8851_tx_work(struct work_s
  		last = skb_queue_empty(&ks->txq);
  
  		if (txb) {
@@ -238,7 +238,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  			ks8851_wrreg16_spi(ks, KS_RXQCR,
  					   ks->rc_rxqcr | RXQCR_SDA);
  			ks8851_wrfifo_spi(ks, txb, last);
-@@ -332,6 +348,13 @@ static void ks8851_tx_work(struct work_s
+@@ -334,6 +350,13 @@ static void ks8851_tx_work(struct work_s
  		}
  	}
  
@@ -252,7 +252,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	ks8851_unlock_spi(ks, &flags);
  }
  
-@@ -347,18 +370,6 @@ static void ks8851_flush_tx_work_spi(str
+@@ -349,18 +372,6 @@ static void ks8851_flush_tx_work_spi(str
  }
  
  /**
@@ -271,7 +271,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
   * ks8851_start_xmit_spi - transmit packet using SPI
   * @skb: The buffer to transmit
   * @dev: The device used to transmit the packet.
-@@ -386,16 +397,17 @@ static netdev_tx_t ks8851_start_xmit_spi
+@@ -388,16 +399,17 @@ static netdev_tx_t ks8851_start_xmit_spi
  
  	spin_lock(&ks->statelock);
  
