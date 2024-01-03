@@ -1,137 +1,196 @@
-Return-Path: <netdev+bounces-61236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE670822F44
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:17:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49328822F4B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 15:19:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 597CE284047
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:17:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2322283F7E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 14:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27CB61A29D;
-	Wed,  3 Jan 2024 14:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6B51A29F;
+	Wed,  3 Jan 2024 14:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Qe8NoxK+"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="AGkoGxtw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CFD1A72E;
-	Wed,  3 Jan 2024 14:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1704291373; x=1704896173; i=markus.elfring@web.de;
-	bh=Zn3zvLXLmFb7bnZCSQaHOVJmsR2R8N7zxi5Wct5XHCk=;
-	h=X-UI-Sender-Class:Date:Subject:To:References:Cc:From:
-	 In-Reply-To;
-	b=Qe8NoxK+zIec3T5OKtK+EAj8ioPDL9qEL31kzDY2OvD9eK1/drW5oG9TP3w4y7SA
-	 e6s4XY6d9ujpVDAx62rfjS/BmGJPh5HO3Bo6rGSnByLP1DqBTe0AN01rGVh5SXMm8
-	 8ZvqdChzQvdaHSJbq85TtfGoUhPBaoMGHGeE/gZN42joQV0adsiiRVv12GGRxjCty
-	 wqRyb1Fp986hOcjfHLEJ/KmMelSqvn3wbe5lMyWqmlXyIsF5m4F/CUGKp1jzdJub2
-	 eons6mKpRzR62fTbH0C38j5/+lXtiwkGLQ2EUFVO2/4A0EI931alKWYwfGmtJzcLz
-	 1O4vZMfoqZMQa9Q3Uw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.88.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N2BM4-1rDuGx0ggQ-013kOF; Wed, 03
- Jan 2024 15:16:13 +0100
-Message-ID: <3d62b430-030a-4e85-9d4d-0468d237d371@web.de>
-Date: Wed, 3 Jan 2024 15:16:11 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D82D1A58B
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 14:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-50ea226bda8so1394371e87.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 06:19:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1704291554; x=1704896354; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=zbVSOpqo56AA93/+ODXaNES/gCjGFmUJUy+xvUMVXJ4=;
+        b=AGkoGxtw/5bSpDfjxQHPWtZdAQ11KI8xusECMEycf9M7aAQqh2o9MmE/4gxa6jDjZp
+         qYKiMfmKo/LCcXAaK2RoT8xVbiEdl4XtftVmQX9eBKaMuDWiD2tvU3kgBSah3eNoebYo
+         UfAMT3iFZxMNKSZDg+hoc3dZl6ACGVmFCDazdctOz0jhpDKEtnIOVJlnbet5NZS/QQ94
+         Bz+/QiRNxItXObSxqe49r67kvoLkXCWze0cZgbM54HXTV0MUixVIBNYRfBmucCrWdNv1
+         BxLyA2XfCVbszXR+sCnnLRNlHdUXBKFi44yRds8HbgVnz0YiMgtsO8KzWU9sVluHcNUV
+         zC0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704291554; x=1704896354;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zbVSOpqo56AA93/+ODXaNES/gCjGFmUJUy+xvUMVXJ4=;
+        b=NGjA5bYKzIbeD6VqrGhEdTyH2o70spB3f/uLCGSfAbLv8eiRnEvSkFF5OqvMczk3eU
+         8+Dm/xwn3wlDTA4mfV0LgiYHpHFGmiQSTZ+dEn6YyASnOCbJ2qO3EZAu244D/S2YHhXU
+         SPEUKRdAGW1KAf5UhKJ49yI+4oyqlyYnPj27Cq5AYgVYCw2NPfzL9GQCkjLObEqbkm53
+         tab98j3OHEnZm/+FFDcBnItphFv5Bgx2FOJIQSmxcEGxFE0wBWHzsmpIlq6l9hQ/zoO6
+         uGBWiWPTLFnbA38u+wyHOfa0BdhWQucFVpgwvSBa6OWrfpfwjpsHpQ02KgFOzp1iiQsH
+         tRuQ==
+X-Gm-Message-State: AOJu0YxpbdJom9dwQWI2NbKP4XmGx6kOTHhDri2h+/XigMu66SYrJSit
+	nIfsksnAewpu+ijONoJ+/+WeLIZRM5sf5PTsHEVLwh+iSIg=
+X-Google-Smtp-Source: AGHT+IHb6cmnmva2/Uofvm9LWxKvVHCSTXfZdsxvrQc2UhZ0Y/LDkxlGrYFU5RdhCbcPg98kT4ixxw==
+X-Received: by 2002:a05:6512:2346:b0:50e:7dd2:4104 with SMTP id p6-20020a056512234600b0050e7dd24104mr7460365lfu.56.1704291554294;
+        Wed, 03 Jan 2024 06:19:14 -0800 (PST)
+Received: from cloudflare.com (79.191.62.110.ipv4.supernova.orange.pl. [79.191.62.110])
+        by smtp.gmail.com with ESMTPSA id vp23-20020a17090712d700b00a27e4d34455sm3375931ejb.183.2024.01.03.06.19.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 06:19:13 -0800 (PST)
+References: <20231214192939.1962891-1-edumazet@google.com>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, kernel-team@cloudflare.com
+Subject: Re: [PATCH net-next 0/2] tcp/dccp: refine source port selection
+Date: Wed, 03 Jan 2024 15:17:26 +0100
+In-reply-to: <20231214192939.1962891-1-edumazet@google.com>
+Message-ID: <87sf3e8ppa.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [0/2] net/smc: Adjustments for two function implementations
-Content-Language: en-GB
-To: Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, "D. Wythe"
- <alibuda@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
- Paolo Abeni <pabeni@redhat.com>, Tony Lu <tonylu@linux.alibaba.com>,
- Wen Gu <guwen@linux.alibaba.com>
-References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
- <41536899-3ca2-4413-b483-3d27ffe0d7f4@linux.ibm.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <41536899-3ca2-4413-b483-3d27ffe0d7f4@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:qzcILoEqWzmESYCmwI5ev40sBfETqja0zwynn1iVHYwe9Lm8Tuc
- LRezkZejbT771VWPc+nQ9Dl9LV8zYkcS70XEX9PeMs73aMszk9D7ULy+og/biWIZrWAEIol
- 0YXp6icHLC6LD7nFOXi9Tpqt4in4MDl+L4oj9Egz6RzccB0wylG8CqdroYhKxUl8HsC59Fj
- A4dzZkKFxru0LoN9+qZBw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:q/blSR/UhsE=;br9DybMm/k674NvLS5wxXx+po5+
- aVwj+BcI4b0vFYlfB8FkrOPxJ7p1gxmI4O+pLWpKAbrCWF7MFso6QkUY/eLR1DZW4lwbCfvou
- R6YVtuKq8UmT4RSvzhAnrQ0FPhcDAbwcMD5wgZNqV7Soc6TEsyOIPL+xnuDvdvyadvabb+f3m
- +bzf6EycstiWdpnK2Aiz+8pzUH6tnUoaBCR1qpNwxneWPYg9T7C0HAa1bacU9Balnswch3loA
- vZo/KzEweUvIw/XfILVRG/mnB53VYow1CNqk9T54u98NHYDVe114dlvAfWFCpZroZ+Ig/4wLA
- wysBNjFnAcb4vLIUjYjfTiumiNjvbIfVLp6wc0gMB4DkfOM+vX/X59iLe/iD1J51yefC4WkRT
- vAT25qjVzqLaBw98A/0ZWPxWUkEgC/Wt/7KPfOGfsbL7RJJYi71GtSqYtiJ3S2FiK2rO6brjj
- tpb6u3Z7SVga+U2kpUjCnrO6Jp+M3R/XX2gRBsT1542aufOiPRNkbDxepv7GfGA6WQSQ8ULFT
- SSsZqSQ4ailE60sd7A7Mtbd8PvXTbRYnB/2wdI9VICTk+9gT3rZ9pv9Zm7mJNDAcTvpxSDuKf
- Y1/cbhcs4HC7S7yNPtJQdLtRVxI5Im4sAucTVQLhrsO/SsaFKZxUw5iG0g9fnkyt9sYzcA2JJ
- R5XwRoB81ec+XkmlWbzjsDs+/2Ff3wnYTHUa25zow7QooJMLxItQoHd2Ic/xKZuDaHLVaSrCV
- wvC/ggjmWbM4BewAHpNVZUSjxd9T1p6PFRF9h87YgmoOgJeniVSkgHAhcUmd1EN36CN+CkMIn
- LuoEUnUCsww/9rsRO1ZjRtQKQDGh8vt6DjEXYZCrn5AocqQV7htUIyclGEw5NysX9/tEpkoWH
- L3k1Y9r4dF45g/BAZ7isvCQU/SjRgsDh8e5QkY2o7aEFUm8gyjbqrBi4XfKdf61QGkD1ueAjE
- JIa2/CLrJFzAWUTFXLceVatJKGQ=
+Content-Type: text/plain
 
-=E2=80=A6
->> =C2=A0=C2=A0 Return directly after a failed kzalloc() in smc_fill_gid_l=
-ist()
->> =C2=A0=C2=A0 Improve exception handling in smc_llc_cli_add_link_invite(=
-)
->>
->> =C2=A0 net/smc/af_smc.c=C2=A0 |=C2=A0 2 +-
->> =C2=A0 net/smc/smc_llc.c | 15 +++++++--------
->> =C2=A0 2 files changed, 8 insertions(+), 9 deletions(-)
-=E2=80=A6
-> However, I'm on the same page with Wen Gu. I could not see the necessity=
- of the patches.
-> BTW, if you want to send fix patches,
+On Thu, Dec 14, 2023 at 07:29 PM GMT, Eric Dumazet wrote:
+> This patch series leverages IP_LOCAL_PORT_RANGE option
+> to no longer favor even source port selection at connect() time.
+>
+> This should lower time taken by connect() for hosts having
+> many active connections to the same destination.
+>
+> Eric Dumazet (2):
+>   inet: returns a bool from inet_sk_get_local_port_range()
+>   tcp/dccp: change source port selection at connect() time
+>
+>  include/net/ip.h                |  2 +-
+>  net/ipv4/inet_connection_sock.c | 21 ++++++++++++++++-----
+>  net/ipv4/inet_hashtables.c      | 27 ++++++++++++++++-----------
+>  3 files changed, 33 insertions(+), 17 deletions(-)
 
-I obviously propose to adjust specific implementation details.
+This is great. Thank you.
 
+# sysctl net.ipv4.ip_local_port_range
+net.ipv4.ip_local_port_range = 32768    60999
+# { sleep 3; stress-ng --sockmany 1 --sockmany-ops 20000; } & \
+> /usr/share/bcc/tools/funclatency inet_hash_connect
+[1] 240
+Tracing 1 functions for "inet_hash_connect"... Hit Ctrl-C to end.
+stress-ng: info:  [243] defaulting to a 1 day, 0 secs run per stressor
+stress-ng: info:  [243] dispatching hogs: 1 sockmany
+stress-ng: info:  [243] skipped: 0
+stress-ng: info:  [243] passed: 1: sockmany (1)
+stress-ng: info:  [243] failed: 0
+stress-ng: info:  [243] metrics untrustworthy: 0
+stress-ng: info:  [243] successful run completed in 27.60 secs
+^C
+     nsecs               : count     distribution
+         0 -> 1          : 0        |                                        |
+         2 -> 3          : 0        |                                        |
+         4 -> 7          : 0        |                                        |
+         8 -> 15         : 0        |                                        |
+        16 -> 31         : 0        |                                        |
+        32 -> 63         : 0        |                                        |
+        64 -> 127        : 0        |                                        |
+       128 -> 255        : 0        |                                        |
+       256 -> 511        : 0        |                                        |
+       512 -> 1023       : 511      |**                                      |
+      1024 -> 2047       : 8698     |****************************************|
+      2048 -> 4095       : 2870     |*************                           |
+      4096 -> 8191       : 1471     |******                                  |
+      8192 -> 16383      : 389      |*                                       |
+     16384 -> 32767      : 114      |                                        |
+     32768 -> 65535      : 43       |                                        |
+     65536 -> 131071     : 15       |                                        |
+    131072 -> 262143     : 0        |                                        |
+    262144 -> 524287     : 1        |                                        |
+    524288 -> 1048575    : 1        |                                        |
+   1048576 -> 2097151    : 3        |                                        |
+   2097152 -> 4194303    : 1609     |*******                                 |
+   4194304 -> 8388607    : 4272     |*******************                     |
+   8388608 -> 16777215   : 4        |                                        |
 
-> please provide the error messages you met,
+avg = 1314821 nsecs, total: 26297744706 nsecs, count: 20001
 
-This development concern does not apply here.
+Detaching...
+[1]+  Done                    { sleep 3; stress-ng --sockmany 1 --sockmany-ops 20000; }
+# { sleep 3; LD_PRELOAD=./setsockopt_ip_local_port_range.so stress-ng --sockmany 1 --sockmany-ops 20000; } & \
+> /usr/share/bcc/tools/funclatency inet_hash_connect
+[1] 246
+Tracing 1 functions for "inet_hash_connect"... Hit Ctrl-C to end.
+stress-ng: info:  [249] defaulting to a 1 day, 0 secs run per stressor
+stress-ng: info:  [249] dispatching hogs: 1 sockmany
+stress-ng: info:  [249] skipped: 0
+stress-ng: info:  [249] passed: 1: sockmany (1)
+stress-ng: info:  [249] failed: 0
+stress-ng: info:  [249] metrics untrustworthy: 0
+stress-ng: info:  [249] successful run completed in 1.01 secs
+^C
+     nsecs               : count     distribution
+         0 -> 1          : 0        |                                        |
+         2 -> 3          : 0        |                                        |
+         4 -> 7          : 0        |                                        |
+         8 -> 15         : 0        |                                        |
+        16 -> 31         : 0        |                                        |
+        32 -> 63         : 0        |                                        |
+        64 -> 127        : 0        |                                        |
+       128 -> 255        : 0        |                                        |
+       256 -> 511        : 0        |                                        |
+       512 -> 1023       : 2085     |******                                  |
+      1024 -> 2047       : 13401    |****************************************|
+      2048 -> 4095       : 3877     |***********                             |
+      4096 -> 8191       : 561      |*                                       |
+      8192 -> 16383      : 60       |                                        |
+     16384 -> 32767      : 16       |                                        |
+     32768 -> 65535      : 2        |                                        |
 
+avg = 1768 nsecs, total: 35376609 nsecs, count: 20002
 
-> the procedure of reproducing the issue and the correspoinding commit mes=
-sages.
+Detaching...
+[1]+  Done                    { sleep 3; LD_PRELOAD=./setsockopt_ip_local_port_range.so stress-ng --sockmany 1 --sockmany-ops 20000; }
+# cat ./setsockopt_ip_local_port_range.c
+#include <dlfcn.h>
+#include <linux/in.h>
+#include <sys/socket.h>
 
-Would you like to extend the usage of source code analysis tools?
+int socket(int domain, int type, int protocol)
+{
+        int (*socket_fn)(int, int, int) = dlsym(RTLD_NEXT, "socket");
+        int fd;
 
+        fd = socket_fn(domain, type, protocol);
+        if (fd < 0)
+                return -1;
 
-> If you want to send feature patches, I'd like to see a well thought-out =
-patch or patch series.
+        if (domain == AF_INET || domain == AF_INET6) {
+                setsockopt(fd, IPPROTO_IP, IP_LOCAL_PORT_RANGE,
+                           &(__u32){ 0xffffU << 16 }, sizeof(__u32));
+        }
 
-I presented some thoughts for special transformation patterns
-on several software components.
-
-
-> E.g. In our component, the kfree(NULL) issue doesn't only occur in the p=
-ositions where you mentioned in the patch series, also somewhere else.
-
-Does your feedback indicate that you would support the avoidance of such a=
- special function call
-at more places?
-
-
-> I would be grateful if all of them would be cleaned up, not just some pi=
-eces.
-
-Do you find my patch series too small for the mentioned Linux module at th=
-e moment?
-
-Regards,
-Markus
+        return fd;
+}
+#
 
