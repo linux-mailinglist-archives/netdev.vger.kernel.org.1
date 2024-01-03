@@ -1,110 +1,77 @@
-Return-Path: <netdev+bounces-61330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B70838236FE
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:16:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A32182370B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 22:21:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBE411C245A6
-	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:15:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0724E1F24795
+	for <lists+netdev@lfdr.de>; Wed,  3 Jan 2024 21:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902911D6A6;
-	Wed,  3 Jan 2024 21:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812771D697;
+	Wed,  3 Jan 2024 21:21:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QwDM5yw+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNz1J5y6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6CB1D692
-	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 21:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704316552;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lz9BpuJT9ZqjBzLEQFTtycxe4tbIVPZFPrNygtaFHDI=;
-	b=QwDM5yw+VmJ8YBM7dt5dcbVZuatQF/CCRbqDR+Rz+xbvFT1Ljwn7yXQUnOu/scH2Wt5ffv
-	UCEUK76dhKR++7KEfzL6Cf5W9/zwOR+woc0U4EL1y+Zbxabqj+LHBQ4PCboTdghZtqGN69
-	uf/gdVeb+8T0VX24meMydBOKaytxi5Q=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-640-1v-GWHbRM9e1RxN52-Av-w-1; Wed,
- 03 Jan 2024 16:15:48 -0500
-X-MC-Unique: 1v-GWHbRM9e1RxN52-Av-w-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5354F3806710;
-	Wed,  3 Jan 2024 21:15:47 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 576BF492BC6;
-	Wed,  3 Jan 2024 21:15:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240103145935.384404-1-dhowells@redhat.com>
-References: <20240103145935.384404-1-dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-    Jeff Layton <jlayton@kernel.org>,
-    Marc Dionne <marc.dionne@auristor.com>
-Cc: dhowells@redhat.com, Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 7/5] netfs: Fix proc/fs/fscache symlink to point to "netfs" not "../netfs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6854C1D692
+	for <netdev@vger.kernel.org>; Wed,  3 Jan 2024 21:21:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F1C8C433C8;
+	Wed,  3 Jan 2024 21:21:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704316881;
+	bh=j2GsGYKWsaSxhYuoTam9MNoYKfLDI3BcLk4yzdf4Ke8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WNz1J5y67YCxZwqC7tNYuL+uG+DCO+w0qNvDnM1CPf9IF3EQiBMtourds2xXyQ5Na
+	 +iTemWeg7Ikq+zXU1ojg7Syxw1VAu3v76faUA8ahoPc/Je6iAND+4OD6E42oeVfe+W
+	 0YhDxJlB6H6Y6UH4V1AXhyyhuHX14muudQfWilfr9E/oCyl5PC98PWHbxDBHGckaw+
+	 ml0oMrINUdTAtDloVEuRRoafGnwzekr+UcS6havFNrmY0d+L3eusQoKvKTxWWDtJ71
+	 LenP8/sDucfjjfIZisdpEyuLcsFGT5iJRKYvfAUp82llk+ITFX/GIliOcBKwIpg9Z1
+	 39CHvue1p0CHw==
+Date: Wed, 3 Jan 2024 13:21:20 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S . Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Phil Sutter <phil@nwl.cc>, David Ahern
+ <dsahern@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface
+ in a bond
+Message-ID: <20240103132120.2cace255@kernel.org>
+In-Reply-To: <0aa87eb2-b50d-4ae8-81ce-af7a52813e6a@6wind.com>
+References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
+	<20240103094846.2397083-3-nicolas.dichtel@6wind.com>
+	<ZZVaVloICZPf8jiK@Laptop-X1>
+	<0aa87eb2-b50d-4ae8-81ce-af7a52813e6a@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <900276.1704316543.1@warthog.procyon.org.uk>
-Date: Wed, 03 Jan 2024 21:15:43 +0000
-Message-ID: <900277.1704316543@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Fix the proc/fs/fscache symlink to point to "netfs" not "../netfs".
+On Wed, 3 Jan 2024 15:15:33 +0100 Nicolas Dichtel wrote:
+> > The net-next added new function setup_ns in lib.sh and converted all hard code
+> > netns setup. I think It may be good to post this patch set to net-next
+> > to reduce future merge conflicts.  
+> 
+> The first patch is for net. I can post the second one to net-next if it eases
+> the merge.
+> 
+> > Jakub, Paolo, please correct me if we can't post fixes to net-next.  
+>
+> Please, let me know if I should target net-next for the second patch.
 
-Reported-by: Marc Dionne <marc.dionne@auristor.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Christian Brauner <christian@brauner.io>
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-cachefs@redhat.com
----
- fs/netfs/fscache_proc.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/netfs/fscache_proc.c b/fs/netfs/fscache_proc.c
-index ecd0d1edafaa..874d951bc390 100644
---- a/fs/netfs/fscache_proc.c
-+++ b/fs/netfs/fscache_proc.c
-@@ -16,7 +16,7 @@
-  */
- int __init fscache_proc_init(void)
- {
--	if (!proc_symlink("fs/fscache", NULL, "../netfs"))
-+	if (!proc_symlink("fs/fscache", NULL, "netfs"))
- 		goto error_sym;
- 
- 	if (!proc_create_seq("fs/netfs/caches", S_IFREG | 0444, NULL,
-
+Looks like the patch applies to net-next, so hopefully there won't 
+be any actual conflicts. But it'd be good to follow up and refactor
+it in net-next once net gets merged in. As long as I'm not missing
+anything - up to you - I'm fine with either sending the test to
+net-next like Hangbin suggests, or following up in net-next to use
+setup_ns.
 
