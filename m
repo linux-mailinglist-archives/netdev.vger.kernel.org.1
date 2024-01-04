@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-61447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C07823BA6
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 06:06:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5547823BA3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 06:06:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3979B2882AA
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 05:06:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BB3C1F25AA3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 05:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75889525E;
-	Thu,  4 Jan 2024 05:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 695BC12B79;
+	Thu,  4 Jan 2024 05:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b="u8I/paao"
+	dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b="bD8WH9+R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [167.172.40.54])
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5E91BDD6
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 05:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5181D68A
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 05:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.faucet.nz
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=faucet.nz;
  h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
  Message-Id: Date: Subject: Cc: To: From; q=dns/txt; s=fe-4ed8c67516;
- t=1704344724; bh=fgG3RR6ns0CBYeFcOflZPGhr9fVyxh18ERVWnEeDq2I=;
- b=u8I/paaoft9EGNrbPjc3Ez07Y3iBHJ7sVufz/iTTsrRIpa/18qgxdNdk1R4Ql1ZAZNs82jHh0
- fSMk5abCfOlV/VPPILdTzIVfdcXGttmn1h9RVaMzE9cJ+a2+DyYuu6KhQVjlx+jVgDlcizdthYt
- 1AmCShmi+73SGsLU+AEGhf4=
+ t=1704344723; bh=fgG3RR6ns0CBYeFcOflZPGhr9fVyxh18ERVWnEeDq2I=;
+ b=bD8WH9+RlN16hufHYZMF/07I1gDRj1hle6W3s03f4PUUs5TBcdZMWg77G81nW8IXnYW8zJrfp
+ qffgW/rBq5U7pmDVGhhjtmfDdMJzvwTSaJ+SfojoB3cKBohlCltfDhDbMKjCNEHCsricsYsCEA8
+ uf/zDa6ghvZxxOjsMcdnUbo=
 From: Brad Cowie <brad@faucet.nz>
 To: aconole@redhat.com
 Cc: brad@faucet.nz, coreteam@netfilter.org, davem@davemloft.net,
@@ -54,7 +54,7 @@ X-Report-Abuse: abuse@forwardemail.net
 X-Complaints-To: abuse@forwardemail.net
 X-ForwardEmail-Version: 0.4.40
 X-ForwardEmail-Sender: rfc822; brad@faucet.nz, smtp.forwardemail.net,
- 167.172.40.54
+ 149.28.215.223
 X-ForwardEmail-ID: 65963c921192512af6adefb7
 
 On Wed, 3 Jan 2024 at 04:10, Aaron Conole <aconole@redhat.com> wrote:
