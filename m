@@ -1,112 +1,107 @@
-Return-Path: <netdev+bounces-61601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D75B18245F9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:17:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB7A8245FB
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:17:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 759D61F2204A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:17:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE6B71F21EC5
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1EB249FF;
-	Thu,  4 Jan 2024 16:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF20D24A19;
+	Thu,  4 Jan 2024 16:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="shI27WCY"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TUgPjPe/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BFB24B20
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 16:16:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E995C433C8;
-	Thu,  4 Jan 2024 16:16:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704385017;
-	bh=tOCRlpR55/X9W67B4wtDevokleKO8oqoYwStXC9ATS0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=shI27WCY3zbJ5N0iBUxgdv8jKjNmw/VICY0QgWXxFRw3QcG/2/u7boUpWjXgiNx8Z
-	 y+MYPcKsinphOqd8vYWbpMlEraEGiZYI3cPrQKWrlIhLvUJ8s5ZUwZos6Lq7N2K82J
-	 g1J9Y2HNIh8PMkGLcradIdnZIs8swnyz79bD47ROja2cPbWww182NhkLJ2eWp84MYR
-	 skI7SJGK4YnuMKqEylONZ6t/E3pdc6KWPleD4dx5OMFZhMsk5hHlP8QTM8l0aAcOEk
-	 I3ELj4wtajdPW8r0giLmWW8/0rtHYNLML3anCwc5S7qcLNL90+8xMBiiVOMHlosZit
-	 EI1nVoSyZbrsQ==
-Date: Thu, 4 Jan 2024 08:16:56 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>, Johannes Berg
- <johannes@sipsolutions.net>, netdev@vger.kernel.org, Johannes Berg
- <johannes.berg@intel.com>, Marc MERLIN <marc@merlins.org>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
-Message-ID: <20240104081656.67c6030c@kernel.org>
-In-Reply-To: <9bcfb259-1249-4efc-b581-056fb0a1c144@gmail.com>
-References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
-	<20231206084448.53b48c49@kernel.org>
-	<ZZU3OaybyLfrAa/0@linux.intel.com>
-	<20240103153405.6b19492a@kernel.org>
-	<ZZZrbUPUCTtDcUFU@linux.intel.com>
-	<9bcfb259-1249-4efc-b581-056fb0a1c144@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C981624A1F
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 16:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9DB651C0007;
+	Thu,  4 Jan 2024 16:17:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1704385054;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0ERV5hCJhkGOZWkG0u85yucJJrRaa+wHuhSFCaFV8bw=;
+	b=TUgPjPe/GGxRtocpFjcFK86G4Dul95ASnlAun3AiS+34Dl8Q1QwOiaoYggd18uHfdUHemO
+	gJZzQkJx1FvG3yO3PVf007JEjcR0dzGdaOiASirrQw9vTJJU7pCZuI7Rh6x41FQbX+hbdb
+	w+VP5V3SLtV3EmOAvnfmwST48PRg05ceuI8Xn0uqnpEV8mjSLP71bZovyf7jVC3avL3kt8
+	ycPCmHsbvuLL7nVbrkOf713/wGrLEeSRRo+vmSTPCfLMptQJVDPduvCOrv3A28i4nBl7Ef
+	63+eDYvc8P8FtKcjGAqVcHtH5Kd+dsiiZYb4q7tAvm9hgMLsAaDpwrSGjMjCkw==
+Date: Thu, 4 Jan 2024 17:17:32 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+Cc: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org, Andrew Lunn
+ <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+ <hkallweit1@gmail.com>
+Subject: Re: ethtool ioctl ABI: preferred way to expand uapi structure
+ ethtool_eee for additional link modes?
+Message-ID: <20240104171732.5a3219b1@device-28.home>
+In-Reply-To: <20240104161416.05d02400@dellmb>
+References: <20240104161416.05d02400@dellmb>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Thu, 4 Jan 2024 10:05:12 +0100 Heiner Kallweit wrote:
-> > If device was not suspended, pm_runtime_get_sync() will increase
-> > dev->power.usage_count counter and cancel pending rpm suspend
-> > request if any. There is race condition though, more about that
-> > below.
-> > 
-> > If device was suspended, we could not get to igc_open() since it
-> > was marked as detached and fail netif_device_present() check in
-> > __dev_open(). That was the behaviour before bd869245a3dc.
+Hello Marek,
 
-__dev_open() tries to resume as well, and is also under rtnl_lock.
-So that resume call somehow must never happen or users would see
--ENODEV? Sorry for the basic questions, the flow is confusing :S
+On Thu, 4 Jan 2024 16:14:16 +0100
+Marek Beh=C3=BAn <kabel@kernel.org> wrote:
 
-> > There is small race window between with igc_open() and scheduled
-> > runtime suspend, if at the same time dev_open() is done and
-> > dev->power.suspend_timer expire:
-> > 
-> > open:					pm_suspend_timer_fh:
-> > 
-> > rtnl_lock()
-> > 					rpm_suspend()
-> > 					  igc_runtime_suspend()
-> > 					   __igc_shutdown()
-> > 					     rtnl_lock()
-> > 
-> > __igc_open()
-> >   pm_runtime_get_sync():
-> >     waits for rpm suspend callback done
-> > 
-> > This needs to be addressed, but it's not that this can happen
-> > all the time. To trigger this someone has to remove the
-> > cable and exactly after 5 seconds do ip link set up. 
+> Hello,
+>=20
+> the legacy ioctls ETHTOOL_GSET and ETHTOOL_SSET, which pass structure
+> ethtool_cmd, were superseded by ETHTOOL_GLINKSETTINGS and
+> ETHTOOL_SLINKSETTINGS.
+>=20
+> This was done because the original structure only contains 32-bit words
+> for supported, advertising and lp_advertising link modes. The new
+> structure ethtool_link_settings contains member
+>   s8 link_mode_masks_nwords;
+> and a flexible array
+>   __u32 link_mode_masks[];
+> in order to overcome this issue.
+>=20
+> But currently we still have only legacy structure ethtool_eee for EEE
+> settings:
+>   struct ethtool_eee {
+>     __u32 cmd;
+>     __u32 supported;
+>     __u32 advertised;
+>     __u32 lp_advertised;
+>     __u32 eee_active;
+>     __u32 eee_enabled;
+>     __u32 tx_lpi_enabled;
+>     __u32 tx_lpi_timer;
+>     __u32 reserved[2];
+>   };
+>=20
+> Thus ethtool is unable to get/set EEE configuration for example for
+> 2500base-T and 5000base-T link modes, which are now available in
+> several PHY drivers.
 
-Or tries to up exactly 5 sec after probe?
+If I am not mistake, I think this series from Heiner tries to address
+exactly that :
+https://lore.kernel.org/netdev/783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.c=
+om/
 
-> For me the main question is the following. In igc_resume() you have
-> 
-> 	rtnl_lock();
-> 	if (!err && netif_running(netdev))
-> 		err = __igc_open(netdev, true);
-> 
-> 	if (!err)
-> 		netif_device_attach(netdev);
-> 	rtnl_unlock();
-> 
-> Why is the global rtnl_lock() needed here? The netdev is in detached
-> state what protects from e.g. userspace activity, see all the
-> netif_device_present() checks in net core.
+Thanks,
 
-That'd assume there are no RPM calls outside networking in this driver.
-Perhaps there aren't but that also sounds wobbly.
+Maxime
 
