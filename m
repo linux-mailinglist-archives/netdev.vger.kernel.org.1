@@ -1,186 +1,127 @@
-Return-Path: <netdev+bounces-61458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD64823DD9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 09:48:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A4DD823E06
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 09:58:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 046301F24CFF
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 08:48:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C99C1F24EB9
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 08:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F901E52D;
-	Thu,  4 Jan 2024 08:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F6E1EA72;
+	Thu,  4 Jan 2024 08:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=corelatus.se header.i=@corelatus.se header.b="hfEuH+Ch";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="9bnB67Y/"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8893D1E528;
-	Thu,  4 Jan 2024 08:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4T5Kvk05cFz1g1dg;
-	Thu,  4 Jan 2024 16:46:58 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6981E1A0172;
-	Thu,  4 Jan 2024 16:48:24 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 4 Jan
- 2024 16:48:23 +0800
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-To: Mina Almasry <almasrymina@google.com>
-CC: Shakeel Butt <shakeelb@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<bpf@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
-	<hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J.
- Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Michael Chan
-	<michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst
-	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>, Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas
-	<mw@semihalf.com>, Russell King <linux@armlinux.org.uk>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
- Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau
-	<nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Horatiu
- Vultur <horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei
- Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Jassi Brar
-	<jaswinder.singh@linaro.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi Gunasekaran
-	<r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, Jiawen Wu
-	<jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, Ronak
- Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers
-	<pv-drivers@vmware.com>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
-	<shayne.chen@mediatek.com>, Kalle Valo <kvalo@kernel.org>, Juergen Gross
-	<jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Oleksandr
- Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
-	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
-	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Stefan Hajnoczi
-	<stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
-	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
-	<justinstitt@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com>
- <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
- <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
- <20231215021114.ipvdx2bwtxckrfdg@google.com>
- <20231215190126.1040fa12@kernel.org>
- <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
- <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
- <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
- <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com>
- <CAHS8izP63wXGH+Q3y1H=ycT=AHYnhGveBnuyF_rYioAjZ=Hn=g@mail.gmail.com>
- <7c6d35e3-165f-5883-1c1b-fce82c976028@huawei.com>
- <CAHS8izNqeiK1tq=48LMbbqq5B4d2mhgbuKRvnFtiBngf73jXZg@mail.gmail.com>
- <fda068d0-f7fb-90fc-cdd6-1f853a4a225f@huawei.com>
- <CAHS8izNAxB=DQzSBOGbm6SsiL1cLSijj9n=g3d3egSxnOcBibQ@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <99817ed2-8ba6-ef8f-3ccb-2a2ab284b4af@huawei.com>
-Date: Thu, 4 Jan 2024 16:48:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3EB18C31;
+	Thu,  4 Jan 2024 08:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corelatus.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corelatus.com
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 5B9343200B8F;
+	Thu,  4 Jan 2024 03:58:43 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Thu, 04 Jan 2024 03:58:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=corelatus.se; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1704358722; x=1704445122; bh=/Z5C3JxfHNpoAjvvAcHhD
+	mbyTXDu4B/UNHLYNTCyyOE=; b=hfEuH+ChLsjSk3N51fYhtm5AiDWaWOHk1jhKs
+	apM1OTUIwllA0t8K1DLKWosXVCQqhABWW29iNdc5E2c8HxbeZOsYUMkM2adsnmHL
+	etzHVzeE9aoUJ3z9zh5N2y/kvCgG70sFJQ5isZr1YOIQEJen9LDuAhF7pqs+Vaf1
+	YyV2kTjL3GRM7g54L68pQTVeyTgGLRLD73MhEP1IlrUYA8zWbJuZYgrk39HUecUT
+	LHJmR93xqNzI4GhAWO0CVTBYCA43RLnpsWMUaQCGxALoqVEh+dCqHRZ9YMlW7YLc
+	kbml8ee3Pwv3T29vUo5HlWXBCUCY4U8BwH5JAdzEZ6sb/G3MQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1704358722; x=1704445122; bh=/Z5C3JxfHNpoAjvvAcHhDmbyTXDu
+	4B/UNHLYNTCyyOE=; b=9bnB67Y/ea3yYp8QD6L1/UTUORth69DAuXyCvZo8Q9pn
+	JUNxbWHqv2Z4HIL0kT0FzgHX/n15N+sayRtvOz7E1sfeD4UefR0GXYb0rIAbXeKI
+	MoHyoM5IEDfnabehUgdGBTH0k4ycQFeiR/EqqwvqJyV4x5qxVwuErC3OGS2zesjF
+	D/+xpk3ZZ7QtIvTFGR9oKn4neCs5Y1KJeLpT6Nltug9tPJCS3WwuQcHOj5L1Wy1h
+	foNJvdodfziQQa9xX/kiVJvhu6vWXWGL8Na1oL7ukpnrznT+VfLjHdfqAmJY/DTe
+	H6fnHncZaeeGagEAgQsXLBd7ndpT4mJRNnAaRh4J4A==
+X-ME-Sender: <xms:QnOWZQ-NGvloWF7aXXi20FoD9qP9bNQLdTZrK_B21iq0cku-u_mbEA>
+    <xme:QnOWZYul0z7Np6GHLj5brJhvL2de5YyvOlKXn5K2WrhRLi5Opkn3xN6UZ2tmoYFaF
+    rJFHvkHqcUC5HKAYg>
+X-ME-Received: <xmr:QnOWZWC2XATOceOOiKbuRywiaghL549WTSHN4bVlu-OzgMkZA0hK77_nxZo3PICiINbD>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdegiedguddvgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecunecujfgurhephffvvefufffkofgggfestdekre
+    dtredttdenucfhrhhomhepvfhhohhmrghsucfnrghnghgvuceothhhohhmrghssegtohhr
+    vghlrghtuhhsrdhsvgeqnecuggftrfgrthhtvghrnhepjefgffdvgeekieehheefheekud
+    euvdelueeltdefjeekjeegueeugeelkeeijeeknecuffhomhgrihhnpehkvghrnhgvlhdr
+    ohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hthhhomhgrshestghorhgvlhgrthhushdrtghomh
+X-ME-Proxy: <xmx:QnOWZQdTt8yPkaTQ6_neK1tPS1ZMejeoMqjbJdN5QgqBzhoCVdhPXQ>
+    <xmx:QnOWZVNoXrdVmVNQAketPtuuE5xU-kt8k3g2JXvWv8oS_l48XgnZoQ>
+    <xmx:QnOWZamZV4xoFQMBlDjzTSd_H8K-hiFKZIXzaz4_uTGdweO4bIcnxw>
+    <xmx:QnOWZYpDc8Xvli5HnImNmUxRHUFaAXJihgAZhDk6eBIZNzPXk-2ghw>
+Feedback-ID: ia69946ac:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 4 Jan 2024 03:58:42 -0500 (EST)
+Received: from thomas by k2.corelatus.se with local (Exim 4.96)
+	(envelope-from <thomas@corelatus.com>)
+	id 1rLJYl-000Cnh-0e;
+	Thu, 04 Jan 2024 09:58:39 +0100
+From: Thomas Lange <thomas@corelatus.se>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	jthinz@mailbox.tu-berlin.de,
+	arnd@arndb.de,
+	deepa.kernel@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Thomas Lange <thomas@corelatus.se>
+Subject: [PATCH RESEND net] net: Implement missing SO_TIMESTAMPING_NEW cmsg support
+Date: Thu,  4 Jan 2024 09:57:44 +0100
+Message-Id: <20240104085744.49164-1-thomas@corelatus.se>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHS8izNAxB=DQzSBOGbm6SsiL1cLSijj9n=g3d3egSxnOcBibQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 2024/1/4 2:38, Mina Almasry wrote:
-> On Wed, Jan 3, 2024 at 1:47 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> On 2024/1/3 0:14, Mina Almasry wrote:
->>>
->>> The idea being that skb_frag_page() can return NULL if the frag is not
->>> paged, and the relevant callers are modified to handle that.
->>
->> There are many existing drivers which are not expecting NULL returning for
->> skb_frag_page() as those drivers are not supporting devmem, adding additionl
->> checking overhead in skb_frag_page() for those drivers does not make much
->> sense, IMHO, it may make more sense to introduce a new helper for the driver
->> supporting devmem or networking core that needing dealing with both normal
->> page and devmem.
->>
->> And we are also able to keep the old non-NULL returning semantic for
->> skb_frag_page().
-> 
-> I think I'm seeing agreement that the direction we're heading into
-> here is that most net stack & drivers should use the abstract netmem
+Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
+socket option SO_TIMESTAMPING_NEW. However, it was never implemented in
+__sock_cmsg_send thus breaking SO_TIMESTAMPING cmsg for platforms using
+SO_TIMESTAMPING_NEW.
 
-As far as I see, at least for the drivers, I don't think we have a clear
-agreement if we should have a unified driver facing struct or API for both
-normal page and devmem yet.
+Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
+Link: https://lore.kernel.org/netdev/6a7281bf-bc4a-4f75-bb88-7011908ae471@app.fastmail.com/
+Signed-off-by: Thomas Lange <thomas@corelatus.se>
+---
+ net/core/sock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> type, and only specific code that needs a page or devmem (like
-> tcp_receive_zerocopy or tcp_recvmsg_dmabuf) will be the ones that
-> unpack the netmem and get the underlying page or devmem, using
-> skb_frag_page() or something like skb_frag_dmabuf(), etc.
-> 
-> As Jason says repeatedly, I'm not allowed to blindly cast a netmem to
-> a page and assume netmem==page. Netmem can only be cast to a page
-> after checking the low bits and verifying the netmem is actually a
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 51d52859e942..d02534c77413 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2813,6 +2813,7 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+ 		sockc->mark = *(u32 *)CMSG_DATA(cmsg);
+ 		break;
+ 	case SO_TIMESTAMPING_OLD:
++	case SO_TIMESTAMPING_NEW:
+ 		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+ 			return -EINVAL;
+ 
+-- 
+2.39.2
 
-I thought it would be best to avoid casting a netmem or devmem to a
-page in the driver, I think the main argument is that it is hard
-to audit very single driver doing a checking before doing the casting
-in the future? and we can do better auditting if the casting is limited
-to a few core functions in the networking core.
-
-> page. I think any suggestions that blindly cast a netmem to page
-> without the checks will get nacked by Jason & Christian, so the
-> checking in the specific cases where the code needs to know the
-> underlying memory type seems necessary.
-> 
-> IMO I'm not sure the checking is expensive. With likely/unlikely &
-> static branches the checks should be very minimal or a straight no-op.
-> For example in RFC v2 where we were doing a lot of checks for devmem
-> (we don't do that anymore for RFCv5), I had run the page_pool perf
-> tests and proved there is little to no perf regression:
-
-For MAX_SKB_FRAGS being 17, it means we may have 17 additional checking
-overhead for the drivers not supporting devmem, not to mention we may
-have bigger value for MAX_SKB_FRAGS if BIG TCP is enable.
-
-Even there is no notiable performance degradation for a specific case,
-we should avoid the overhead as much as possible for the existing use
-case when supporting a new use case.
-
-> 
-> https://lore.kernel.org/netdev/CAHS8izM4w2UETAwfnV7w+ZzTMxLkz+FKO+xTgRdtYKzV8RzqXw@mail.gmail.com/
-
-The above test case does not even seems to be testing a code path calling
-skb_frag_page() as my understanding.
-
-> 
 
