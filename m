@@ -1,94 +1,173 @@
-Return-Path: <netdev+bounces-61506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1BCF824224
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:00:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 887BD82422D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:02:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 537241F24B48
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:00:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 044462879E4
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49D72230B;
-	Thu,  4 Jan 2024 13:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144E620DED;
+	Thu,  4 Jan 2024 13:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IIIPJc9Q"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="WK1xaleo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC312230A;
-	Thu,  4 Jan 2024 13:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=em8656SBmFHuCoSI6Hw7pHiwOvfMbL7DUtlbPOdcosg=; b=IIIPJc9QzwaijPod1f+lYfIUlU
-	AYiygKn9dmrcgfr6FR8efPlyPxk7oGMaN60icGgMu2P2bEcU69iCW1SSbkdk/5b7dVh1BiBOujbRP
-	WUxVzR6jyKZ7V5NdAC/HyYy+R13rrQ3o4w8K3QiHH7J3Wk3BZ+QN0meADrxgLU1N2zq0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rLNKd-004LX7-Ub; Thu, 04 Jan 2024 14:00:19 +0100
-Date: Thu, 4 Jan 2024 14:00:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Gan, Yi Fang" <yi.fang.gan@intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Javier Martinez Canillas <javierm@redhat.com>,
-	John Stultz <jstultz@google.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35493224DA
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 13:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-336dcebcdb9so419702f8f.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 05:02:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1704373322; x=1704978122; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=opVDF4AOHQah3OrT16oGMK2ccRRJHeIMJXkpc+aZwFs=;
+        b=WK1xaleoMk7IVXPllfXEUF4Xo7mTNqo5t2Eu1pESyW/Y+enVzlgw2jNS6NG0ix03uW
+         R3eEPFGjgzWgVBUx6oChjpFfyhCOFLNySVeIg9x/1AyeyCOnHphPJBYjCU11dCsbNd67
+         jD4Hsp6G8K54zNh+9zAbbMQJODkn84rl4B92p9Efk6QQ1cboEVYDHPFVdBH2wLBTzHyc
+         o33J/zut+6c66m+g+0Qjkogk7AG+SVphmFVCUlA04TUnXWHsucHF8yBrWPh9MbphLmYk
+         Xjo7Y2Xsk+yhKozFeEUyIquoRJwCHZylOWw21UfOv/pobf7YH8XTUf/8rvEGFVGuVWCy
+         ABaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704373322; x=1704978122;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=opVDF4AOHQah3OrT16oGMK2ccRRJHeIMJXkpc+aZwFs=;
+        b=cu/q2e14OUm9Qbjy/g9p3g3VOKjVzsGorZVQZrVkzek4FJwl6PxcboSCmcUOEoNFHo
+         tXUdMFr8rRdmaUHmsWtNg9L1TVSDUYiOquoZtuGgQVFnVc1F6m3NNfyXVm5Q0jPd62h/
+         X5yUCZCd4Iqb9unCjPZtyx6TlGqsLhsfjx5L2ctrRxisMG4ZFBuWgJ+hb2bYbEeIg3Hf
+         SgnkajTZ3OrB5Psw3dUf5AzCYqewomizZ8iLRG2Tk4eQwG1pLT3tLyh/M9HFVN2V29Rx
+         b7EKMpDioEFh47Fb1JGlIWKDyH2UkkIhdjYvy6svjM8XdCgbU910RZwS6JHveCuvsaiy
+         mh2g==
+X-Gm-Message-State: AOJu0YyXwF3zTjBwL7vAvEqtvmgM6wnMvtVVB6Mpghu6GgEHtCTcZ5Ab
+	8zUqDyuwmIMPvrKw+O2uh1PiSmMa74GNNQ==
+X-Google-Smtp-Source: AGHT+IFsoUaWFe3hNCg6/b09WcRv7wsIMJMlEiNm/lu4Y1OTN1yICGktvfbzMdrteuCPKZTBntbM6g==
+X-Received: by 2002:adf:cc86:0:b0:337:157:2d3e with SMTP id p6-20020adfcc86000000b0033701572d3emr161961wrj.222.1704373322145;
+        Thu, 04 Jan 2024 05:02:02 -0800 (PST)
+Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:5b69:3768:8459:8fee])
+        by smtp.gmail.com with ESMTPSA id w5-20020a5d5445000000b0033660f75d08sm32887387wrv.116.2024.01.04.05.02.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jan 2024 05:02:01 -0800 (PST)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Kalle Valo <kvalo@kernel.org>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Looi, Hong Aun" <hong.aun.looi@intel.com>,
-	"Voon, Weifeng" <weifeng.voon@intel.com>,
-	"Song, Yoong Siang" <yoong.siang.song@intel.com>,
-	"Lai, Peter Jun Ann" <peter.jun.ann.lai@intel.com>,
-	"Choong, Yong Liang" <yong.liang.choong@intel.com>
-Subject: Re: [PATCH net v2 2/2] net: phylink: Add module_exit_stub()
-Message-ID: <b1b962d1-403f-41b4-9ef8-f2cdb33795e7@lunn.ch>
-References: <20231221085109.2830794-1-yi.fang.gan@intel.com>
- <20231221085109.2830794-3-yi.fang.gan@intel.com>
- <0f85171e-cb9c-47dd-bb7d-f58537e24a54@lunn.ch>
- <MW6PR11MB8310E51E5EEDA8EE98BC37D4B967A@MW6PR11MB8310.namprd11.prod.outlook.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Chris Morgan <macromorgan@hotmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	=?UTF-8?q?N=C3=ADcolas=20F=20=2E=20R=20=2E=20A=20=2E=20Prado?= <nfraprado@collabora.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Peng Fan <peng.fan@nxp.com>,
+	Robert Richter <rrichter@amd.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Terry Bowman <terry.bowman@amd.com>,
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [RFC 0/9] PCI: introduce the concept of power sequencing of PCIe devices
+Date: Thu,  4 Jan 2024 14:01:14 +0100
+Message-Id: <20240104130123.37115-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MW6PR11MB8310E51E5EEDA8EE98BC37D4B967A@MW6PR11MB8310.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 04, 2024 at 09:45:47AM +0000, Gan, Yi Fang wrote:
-> Hi Andrew,
-> 
-> The function phylink_init() is introduced by others.
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-6.6.y&id=eca68a3c7d05b38b4e728cead0c49718f2bc1d5a 
-> The module_exit() is added by referring to
-> https://elixir.bootlin.com/linux/latest/source/kernel/module/main.c#L738.
-> Since the macro function is rejected, I will send a V3.
-> Let's see if Rusell King has any comment. Thanks.
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Please don't top post when using linux kernel mailing lists.
+During last year's Linux Plumbers we had several discussions centered
+around the need to power-on PCI devices before they can be detected on
+the bus.
 
-> > You are missing justification it is actually safe to remove phylink. Maybe Russell
-> > King deliberately did not implement
-> > module_exit() because it can explode in interesting ways if it was?
+The consensus during the conference was that we need to introduce a
+class of "PCI slot drivers" that would handle the power-sequencing.
 
-You still need to explain why it is safe to implement it.
+After some additional brain-storming with Manivannan and the realization
+that the DT maintainers won't like adding any "fake" nodes not
+representing actual devices, we decided to reuse the existing
+infrastructure provided by the PCIe port drivers.
 
-    Andrew
+The general idea is to instantiate platform devices for child nodes of
+the PCIe port DT node. For those nodes for which a power-sequencing
+driver exists, we bind it and let it probe. The driver then triggers a
+rescan of the PCI bus with the aim of detecting the now powered-on
+device. The device will consume the same DT node as the platform,
+power-sequencing device. We use device links to make the latter become
+the parent of the former.
+
+The main advantage of this approach is not modifying the existing DT in
+any way and especially not adding any "fake" platform devices.
+
+Bartosz Golaszewski (9):
+  arm64: dts: qcom: sm8250: describe the PCIe port
+  arm64: dts: qcom: qrb5165-rb5: describe the WLAN module of QCA6390
+  PCI/portdrv: create platform devices for child OF nodes
+  PCI: hold the rescan mutex when scanning for the first time
+  PCI/pwrseq: add pwrseq core code
+  dt-bindings: vendor-prefixes: add a PCI prefix for Qualcomm Atheros
+  dt-bindings: wireless: ath11k: describe QCA6390
+  PCI/pwrseq: add a pwrseq driver for QCA6390
+  arm64: defconfig: enable the PCIe power sequencing for QCA6390
+
+ .../net/wireless/qcom,ath11k-pci.yaml         |  14 ++
+ .../devicetree/bindings/vendor-prefixes.yaml  |   1 +
+ arch/arm64/boot/dts/qcom/qrb5165-rb5.dts      |  24 +++
+ arch/arm64/boot/dts/qcom/sm8250.dtsi          |  10 +
+ arch/arm64/configs/defconfig                  |   2 +
+ drivers/pci/pcie/Kconfig                      |   2 +
+ drivers/pci/pcie/Makefile                     |   2 +
+ drivers/pci/pcie/portdrv.c                    |   3 +-
+ drivers/pci/pcie/pwrseq/Kconfig               |  19 ++
+ drivers/pci/pcie/pwrseq/Makefile              |   4 +
+ drivers/pci/pcie/pwrseq/pcie-pwrseq-qca6390.c | 197 ++++++++++++++++++
+ drivers/pci/pcie/pwrseq/pwrseq.c              |  83 ++++++++
+ drivers/pci/probe.c                           |   2 +
+ include/linux/pcie-pwrseq.h                   |  24 +++
+ 14 files changed, 386 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/pci/pcie/pwrseq/Kconfig
+ create mode 100644 drivers/pci/pcie/pwrseq/Makefile
+ create mode 100644 drivers/pci/pcie/pwrseq/pcie-pwrseq-qca6390.c
+ create mode 100644 drivers/pci/pcie/pwrseq/pwrseq.c
+ create mode 100644 include/linux/pcie-pwrseq.h
+
+-- 
+2.40.1
+
 
