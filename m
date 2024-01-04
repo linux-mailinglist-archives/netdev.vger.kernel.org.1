@@ -1,113 +1,135 @@
-Return-Path: <netdev+bounces-61527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2F6E82431D
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:52:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1B3C82432B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684A71F25251
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:52:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F088B20E8F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8B9224FA;
-	Thu,  4 Jan 2024 13:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638AD2233E;
+	Thu,  4 Jan 2024 13:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Yuc/5jBY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FgLCAT7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CBE224E3
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 13:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3374d309eebso383201f8f.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 05:51:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1704376270; x=1704981070; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Hu9wd786rx12aT/oHaTbS5ETRw/tZeb3iQfhejwi4Q=;
-        b=Yuc/5jBYzSJiT8os/wiHV/ghhAyV8w+Dpj6vXefQahYnuvRF0AvIKHs6dT8NbkbSDq
-         Mkv8DewF/z2Yvbzvh/YUPa0Lawsc91Hzlo1AZoORBXDgjHntB/b9M2XrRHwgj2SAH54K
-         Kf0zJJnLvMwxArvvLJQZPyK3xpfUoM90S+mfcnwFQhpsaK6FruXOCHAN+9+nmqdyNK+i
-         ONq9heGnJGmA0LjLF2SioFWu7fyq9hR9IF5n7INhJw0aC2vj7EZPCqPXagC0k47OvvXN
-         rflawQ2SYHogsUE9jauascINFx0ZGA8K2l+ThgkOLDHyMBMHnUrECv/lOUn6UykV5FJ2
-         oX4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704376270; x=1704981070;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Hu9wd786rx12aT/oHaTbS5ETRw/tZeb3iQfhejwi4Q=;
-        b=tth9iJ0S10QZtFuak+PkzShrb510h4+UyQPRjkXFt4ALTkmrlQFVzw8ICfXF0MtbQT
-         NvFKuMLbJxisV3sYZWWTv9yc5h3Gh00FzA1iOMKrMx356sPAp9078YpHA/1maEyxFs7N
-         1gc1ka9yGb2O9HQt3hJo92xQcY8Mj4d98Wj9axEyhWNzAdLJ6Zo1R4TTKybBU9qw/y7c
-         Cdd4cXY4YCNwI7YC/WEupCw/QKCqzYoy+Xkyu9K+6V5DXkrUcD/N8RClFkE/k+CIMmTD
-         NSMYXuNB43c5kjd5pHTh8NnPdruQbzprYI5F9HSNXvfFrsbDgxFlsvqXmkCEnXe22tK1
-         kPiw==
-X-Gm-Message-State: AOJu0YzC3P+69yEKGIq7cE73tVaZRyDFggPuBbO1G2T+oxFeDU0qIvj1
-	8J5XIyWYfAgsBepg2v3E5mguNkE4sRVMXA==
-X-Google-Smtp-Source: AGHT+IE7e958b8FjvDSmG6a5JCgdMoo2Ay28rzJusdTZlXygfYyLernAqcK/0brIr8hiq8vW8bD9Cg==
-X-Received: by 2002:adf:e282:0:b0:337:9e8:f578 with SMTP id v2-20020adfe282000000b0033709e8f578mr342464wri.37.1704376269884;
-        Thu, 04 Jan 2024 05:51:09 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:1b61:be9c:86ee:5963? ([2a01:e0a:b41:c160:1b61:be9c:86ee:5963])
-        by smtp.gmail.com with ESMTPSA id e17-20020a5d5311000000b0033672cfca96sm32882289wrv.89.2024.01.04.05.51.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 05:51:09 -0800 (PST)
-Message-ID: <4e1d5b11-6fec-4ee2-a091-479e480476be@6wind.com>
-Date: Thu, 4 Jan 2024 14:51:08 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37F1224C1;
+	Thu,  4 Jan 2024 13:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=lwfKVVx7X4nlA2hPQXF4+V6T0p8TvsOTKoeOLz3fkv4=; b=FgLCAT7+PCX2erOAbptE1TsR3G
+	fBMJFNMH/TOX7AXKwZu3cpsOohCW7t3zRlStq+NNVkokdz6+V9OAaGOXE+QNOb7wklGKyQ77qgLGN
+	NwDsk4QIUIb0/xJGN3Oa9AtFJ4CITRID5ENOiLZ6D+8AclTwYT7VNfYLHFhrXazmUXT8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rLODb-004Lvc-37; Thu, 04 Jan 2024 14:57:07 +0100
+Date: Thu, 4 Jan 2024 14:57:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	hkallweit1@gmail.com, corbet@lwn.net, p.zabel@pengutronix.de,
+	f.fainelli@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
+ properties
+Message-ID: <50252a5a-e4fb-42d3-b838-9ef04faf4c5c@lunn.ch>
+References: <7c05b08a-bb6d-4fa1-8cee-c1051badc9d9@lunn.ch>
+ <ZX2rU5OFcZFyBmGl@shell.armlinux.org.uk>
+ <6abe5d6f-9d00-445f-8c81-9c89b9da3e0a@quicinc.com>
+ <ZX3LqN8DSdKXqsYc@shell.armlinux.org.uk>
+ <1bddd434-024c-45ff-9866-92951a3f555f@quicinc.com>
+ <ZZPeHJJU96y1kdlZ@shell.armlinux.org.uk>
+ <6593e0a3.050a0220.5c543.8e12@mx.google.com>
+ <cee9de2c-bfa4-4ca9-9001-725e2041bc25@quicinc.com>
+ <85590a5b-9d5a-40cb-8a0e-a3a3a1c3720a@lunn.ch>
+ <c5263daa-b5f4-4b9c-a216-73d68493a802@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface in
- a bond
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S . Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
- <20240103094846.2397083-3-nicolas.dichtel@6wind.com>
- <ZZVaVloICZPf8jiK@Laptop-X1> <0aa87eb2-b50d-4ae8-81ce-af7a52813e6a@6wind.com>
- <20240103132120.2cace255@kernel.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <20240103132120.2cace255@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c5263daa-b5f4-4b9c-a216-73d68493a802@quicinc.com>
 
-Le 03/01/2024 à 22:21, Jakub Kicinski a écrit :
-> On Wed, 3 Jan 2024 15:15:33 +0100 Nicolas Dichtel wrote:
->>> The net-next added new function setup_ns in lib.sh and converted all hard code
->>> netns setup. I think It may be good to post this patch set to net-next
->>> to reduce future merge conflicts.  
->>
->> The first patch is for net. I can post the second one to net-next if it eases
->> the merge.
->>
->>> Jakub, Paolo, please correct me if we can't post fixes to net-next.  
->>
->> Please, let me know if I should target net-next for the second patch.
+> 1. For IPQ SoC series, there are only ipq4019, ipq5018, ipq6018,
+> ipq8074 documented in the current dt-bindings doc qcom,ipq4019-mdio.yaml
+> and ipq9574, ipq5332 that are being added by the MDIO patch, and one
+> more ipq8064 whose MDIO driver is mdio-ipq8064.c, on more others.
 > 
-> Looks like the patch applies to net-next, so hopefully there won't 
-> be any actual conflicts. But it'd be good to follow up and refactor
-> it in net-next once net gets merged in. As long as I'm not missing
-> anything - up to you - I'm fine with either sending the test to
-> net-next like Hangbin suggests, or following up in net-next to use
-> setup_ns.
-I will send a follow-up once net gets merged in net-next.
+> 2. For qca8084(pure PHY chip), which is the quad-phy chip, which is just
+>    like qca8081 PHY(single port PHY), each port can be linked to maximum
+>    speed 2.5G.
+> 
+>    For qca8386(switch chip), which includes the same PHY CHIP as qca8084
+>    (4 physical ports and two CPU ports), qca8386 switch can work with
+>    the current qca8k.c DSA driver with the supplement patches.
 
+Is the qca8386 purely a switch plus integrated PHYs? There is no CPU
+on it? What is the management path? MDIO?
 
-Thank you,
-Nicolas
+> 
+>    Both qca8084 and qca8386 includes same network clock controller(let's
+>    call it NSSCC, since this clock controller is located in the
+>    Ethernet chip qca8084 and qca8386), they have the same clock initial
+>    configuration sequence to initialize the Ethernet chip.
+
+You said For "qca8084(pure PHY chip)". Here you just called it an
+Ethernet chip? To me, and Ethernet chip is a MAC, Intel e1000e etc.
+Do you now see how your explanations are confusing. Is it s pure PHY,
+or is it an Ethernet chip?
+
+O.K. Since we are getting nowhere at the moment, lets take just the
+pure PHY chip, and ignore the rest for the moment.
+
+For any pure PHY, there is generally one clock input, which might be a
+crystal, or an actual clock. If you look at other DT bindings for
+PHYs, it is only listed if the clock is expected to come from
+somewhere else, like a SoC, and it needs to be turned on before the
+PHY will work. And generally, a pure PHY has one defined clock
+frequency input. If that is true, there is no need to specify the
+clock. If multiple clock input frequencies are supported, then you do
+need to specify the clock, so its possible to work out what frequency
+it is using. How that clock input is then used internally in the PHY
+is not described in DT, but the driver can set any dividers, PLLs
+needed etc.
+
+So, for the pure PHY chip, what is the pinout? Is there one clock
+input? Or 4 clock inputs, one per PHY in the quad package? Typically,
+where does this/these clocks come from? Is the frequency fixed by the
+design, or are a number of input frequencies supported?
+
+>   The Ethernet chip qca8084 and qca8386 are only connected with IPQ SoC,
+>   Currently qca8084 is connected with IPQ SoC by 10G-QXGMII mode.
+>   the 4 PHYs of qca8386 are connected with the internal MAC of qca8386
+>   by GMII, the maximum speed is also 2.5G.
+>   The port4 of qca8084 or qca8386 is optionally be able to connected
+>   with IPQ SoC by sgmii.
+
+To some extent, this does not matter. The DT binding and the driver
+should not care what the pure PHY is connected to. It has standardised
+ports, so in theory it could be connected to any vendors MAC.
+
+Please be very careful with your wording. Because computers
+instructions should be unambiguous, it does what it is told, we also
+expect computer scientists to be unambiguous. Wording is very
+important.
+
+       Andrew
 
