@@ -1,100 +1,172 @@
-Return-Path: <netdev+bounces-61561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99AC7824438
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:55:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 392BC82443D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:57:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 452971F2476E
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:55:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEBC11C21533
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4D2224C6;
-	Thu,  4 Jan 2024 14:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924FE22EEE;
+	Thu,  4 Jan 2024 14:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VRhEHtDD"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lGSz2XKJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5135823760;
-	Thu,  4 Jan 2024 14:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dbdabb23e91so508849276.3;
-        Thu, 04 Jan 2024 06:55:20 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD9C23756
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 14:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55692ad81e3so695297a12.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 06:57:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704380119; x=1704984919; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yDsf78DtROBEHAyiMj330wxBlF+TDWhKu0EggZUYug8=;
-        b=VRhEHtDDjoEZXss88gwGWujQLXNO9X0nlYQnEELcCox0jYUGZ7VpEIY2RibTTBLhLw
-         b/nvj3vDC3UWGXT68xUtjpDxr8jrJs2Aidr23K0ISsdKwEcwIj6i6HdlQvDjfTR5KRX4
-         g2Cv9ZOdVVUG6Nza3FmJijIOZx5YrHAEP7X13pBMtL8cG7Pww0ILcXtCCrejbP+Y7LVE
-         jXUFDgJAnaIS8hVgTTpgnqg9hqOasoD8kPEXguO+lVPyKEu2rJto+/zB3Kdb2wN3yCfW
-         G2d0Y8bmJmC/ScrOdYJ/LCKk95n+6ItcaBAJ5egK8ToMqjaSeYYFxHRfXDsstIb+gpMm
-         SMEg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704380271; x=1704985071; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7ctPCmDJoqP8ty+hdgy8J3so/dz8h/iVv20WyeYY6U4=;
+        b=lGSz2XKJvbuQU38Q+ugX+51+6Mm4BlLz916GYpPWAXgyFkFCx5pNRABssVwoNkzhSq
+         QZs15zgHW+txFCtEjN0OSFYWcrOKCMrVIeFllPmiQauctSwVBRcol0YrdCOO0eiLPOkB
+         hkx/ip9Mz5Jy2PvkjlmqRFsPtsz3kfKf8qxA3AaoUoMrzxuOaXnW/D2qlDZE7g4mSbho
+         Iu36sjhcklTY5iqrzm2eFs2frDaU28a/ebajgkTprcCUPJ+LQVKWHlTt+MB4OzAbjALL
+         kqUK1fHwcjWaRQQooCW96qc/VLj9kPhlR5SAFnMtzA/CCbJpFNNkTDp+75YbF3dS7O7k
+         CDfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704380119; x=1704984919;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yDsf78DtROBEHAyiMj330wxBlF+TDWhKu0EggZUYug8=;
-        b=jhY0t1mui9zsow3lJ9GKHePpKIKXILjzD6O74N7lYXq4UlPONC7vtDYOVVm1Umq7Ec
-         pwweZWcCOf+tX2I7oP265QDEcH1zHP/b+MGz/M2OvmalQ8jsejA8SImz5Yc/uu6W83WZ
-         WaDJzyUns0RvwtlPMwmmiMB5+lWUu89MG2J+1J7CSy0veluJzOCE4/QFXrta+/4DLzPN
-         GXJ/gpQq12L4EvSD+YnEaYZKA8EKLnr8JL8napkOyX7fQLVA4I5WrLRhtmqJf1nTLqir
-         BRjENk/Mb9AxCvJXelJdYlev2vu4hyehWcCY4wBJYOlBdefGAAXmoespt1fJndUVdntJ
-         ao1g==
-X-Gm-Message-State: AOJu0Yy3dxEFfA3+Aldh4FAAaqDq3rORWFvcI3EQrcAGQ2hC804nUFSp
-	RXN53DGavxKXXWvminFPPPM=
-X-Google-Smtp-Source: AGHT+IHebGoU88KckLJdxG6uK35+/srp4Jh+P7cp1upkBgpdXpvRt1UCihQClBLc0+aGVcjpIbLYfQ==
-X-Received: by 2002:a25:abcd:0:b0:dbd:738a:1883 with SMTP id v71-20020a25abcd000000b00dbd738a1883mr630074ybi.78.1704380119351;
-        Thu, 04 Jan 2024 06:55:19 -0800 (PST)
-Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
-        by smtp.gmail.com with ESMTPSA id lg14-20020a056214548e00b00680c848f307sm1670484qvb.142.2024.01.04.06.55.19
+        d=1e100.net; s=20230601; t=1704380271; x=1704985071;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7ctPCmDJoqP8ty+hdgy8J3so/dz8h/iVv20WyeYY6U4=;
+        b=SBcwVhCnSNHBhgY4uroYyxDjo6eDj6doldHPV8VjSV8MSGm/5n3ES21iGCzvyUuHtm
+         S+ACGaMbXifEnrPGbp+S1IiePqizdb8NSkLfKiHL5Iu6YyiT39Do/chrg95nGvL6eoKc
+         MNHNSkVpryFip0QbAFDGKei7OGw4fXkbg1oW4fu+MiIRSKDFPHbV3h4qBqzAzP9W4+8u
+         fRYpJzFao5/4ksk/F0ar3lWIyBC3umQYSzrON9BfJbHieLhfi19wasKD1BUM924CS64Y
+         sqNvO9QFEe5j/93p3ZWIVAb6Ccj7oEOXkcbP2C1pE9WTZcK/HiWVmfD97G48PA1hgilH
+         I/ZA==
+X-Gm-Message-State: AOJu0YzuP1EC2Qbe19Hi5GSmuae3N1xyXrMr8VbPsAay/hAyShTVc+1t
+	tQbVi/RFL6YjfYeNiErs6Wd4vAlkPnEETQ==
+X-Google-Smtp-Source: AGHT+IE+6pxN6n8veLEzuUBfsZDbKRAdYT2aRS1bqEUIw+63lMefmsby9HzW3dmk219/1L9IHKTClA==
+X-Received: by 2002:a50:aa9a:0:b0:556:db12:af4b with SMTP id q26-20020a50aa9a000000b00556db12af4bmr417519edc.54.1704380271544;
+        Thu, 04 Jan 2024 06:57:51 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id y11-20020aa7c24b000000b00553754bd636sm18960244edo.35.2024.01.04.06.57.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 06:55:19 -0800 (PST)
-Date: Thu, 04 Jan 2024 09:55:18 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Thomas Lange <thomas@corelatus.se>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, 
- jthinz@mailbox.tu-berlin.de, 
- arnd@arndb.de, 
- deepa.kernel@gmail.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- Thomas Lange <thomas@corelatus.se>
-Message-ID: <6596c6d6d645d_4bb912941d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240104085744.49164-1-thomas@corelatus.se>
-References: <20240104085744.49164-1-thomas@corelatus.se>
-Subject: Re: [PATCH RESEND net] net: Implement missing SO_TIMESTAMPING_NEW
- cmsg support
+        Thu, 04 Jan 2024 06:57:51 -0800 (PST)
+Date: Thu, 4 Jan 2024 15:57:49 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com
+Subject: Re: [PATCH net-next] net/sched: simplify tc_action_load_ops
+ parameters
+Message-ID: <ZZbHbUsTVo7oJL2P@nanopsycho>
+References: <20240104141113.1995416-1-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240104141113.1995416-1-pctammela@mojatatu.com>
 
-Thomas Lange wrote:
-> Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
-> socket option SO_TIMESTAMPING_NEW. However, it was never implemented in
-> __sock_cmsg_send thus breaking SO_TIMESTAMPING cmsg for platforms using
-> SO_TIMESTAMPING_NEW.
+Thu, Jan 04, 2024 at 03:11:13PM CET, pctammela@mojatatu.com wrote:
+>Instead of using two bools derived from a flags passed as arguments to
+>the parent function of tc_action_load_ops, just pass the flags itself
+>to tc_action_load_ops to simplify its parameters.
+>
+>Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+>---
+> include/net/act_api.h | 3 +--
+> net/sched/act_api.c   | 9 ++++-----
+> net/sched/cls_api.c   | 5 ++---
+> 3 files changed, 7 insertions(+), 10 deletions(-)
+>
+>diff --git a/include/net/act_api.h b/include/net/act_api.h
+>index 447985a45ef6..e1e5e72b901e 100644
+>--- a/include/net/act_api.h
+>+++ b/include/net/act_api.h
+>@@ -208,8 +208,7 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
+> 		    struct nlattr *est,
+> 		    struct tc_action *actions[], int init_res[], size_t *attr_size,
+> 		    u32 flags, u32 fl_flags, struct netlink_ext_ack *extack);
+>-struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, bool police,
+>-					 bool rtnl_held,
+>+struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
+> 					 struct netlink_ext_ack *extack);
+> struct tc_action *tcf_action_init_1(struct net *net, struct tcf_proto *tp,
+> 				    struct nlattr *nla, struct nlattr *est,
+>diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+>index ef70d4771811..dd3b893802db 100644
+>--- a/net/sched/act_api.c
+>+++ b/net/sched/act_api.c
+>@@ -1324,10 +1324,10 @@ void tcf_idr_insert_many(struct tc_action *actions[], int init_res[])
+> 	}
+> }
 > 
-> Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
-> Link: https://lore.kernel.org/netdev/6a7281bf-bc4a-4f75-bb88-7011908ae471@app.fastmail.com/
-> Signed-off-by: Thomas Lange <thomas@corelatus.se>
+>-struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, bool police,
+>-					 bool rtnl_held,
+>+struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
+> 					 struct netlink_ext_ack *extack)
+> {
+>+	bool police = flags & TCA_ACT_FLAGS_POLICE;
+> 	struct nlattr *tb[TCA_ACT_MAX + 1];
+> 	struct tc_action_ops *a_o;
+> 	char act_name[IFNAMSIZ];
+>@@ -1359,6 +1359,7 @@ struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, bool police,
+> 	a_o = tc_lookup_action_n(act_name);
+> 	if (a_o == NULL) {
+> #ifdef CONFIG_MODULES
+>+		bool rtnl_held = !(flags & TCA_ACT_FLAGS_NO_RTNL);
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Empty line here please.
+
+Otherwise this looks fine to me.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+
+
+
+
+> 		if (rtnl_held)
+> 			rtnl_unlock();
+> 		request_module("act_%s", act_name);
+>@@ -1475,9 +1476,7 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
+> 	for (i = 1; i <= TCA_ACT_MAX_PRIO && tb[i]; i++) {
+> 		struct tc_action_ops *a_o;
+> 
+>-		a_o = tc_action_load_ops(tb[i], flags & TCA_ACT_FLAGS_POLICE,
+>-					 !(flags & TCA_ACT_FLAGS_NO_RTNL),
+>-					 extack);
+>+		a_o = tc_action_load_ops(tb[i], flags, extack);
+> 		if (IS_ERR(a_o)) {
+> 			err = PTR_ERR(a_o);
+> 			goto err_mod;
+>diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+>index 46c98367d205..8d25e6b561dd 100644
+>--- a/net/sched/cls_api.c
+>+++ b/net/sched/cls_api.c
+>@@ -3297,12 +3297,11 @@ int tcf_exts_validate_ex(struct net *net, struct tcf_proto *tp, struct nlattr **
+> 		if (exts->police && tb[exts->police]) {
+> 			struct tc_action_ops *a_o;
+> 
+>-			a_o = tc_action_load_ops(tb[exts->police], true,
+>-						 !(flags & TCA_ACT_FLAGS_NO_RTNL),
+>+			flags |= TCA_ACT_FLAGS_POLICE | TCA_ACT_FLAGS_BIND;
+>+			a_o = tc_action_load_ops(tb[exts->police], flags,
+> 						 extack);
+> 			if (IS_ERR(a_o))
+> 				return PTR_ERR(a_o);
+>-			flags |= TCA_ACT_FLAGS_POLICE | TCA_ACT_FLAGS_BIND;
+> 			act = tcf_action_init_1(net, tp, tb[exts->police],
+> 						rate_tlv, a_o, init_res, flags,
+> 						extack);
+>-- 
+>2.40.1
+>
 
