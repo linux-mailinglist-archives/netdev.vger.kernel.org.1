@@ -1,112 +1,68 @@
-Return-Path: <netdev+bounces-61494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D298B82406A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 12:17:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E5782407F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 12:21:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44CEF286465
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:17:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EECB1C209F8
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33B7210F3;
-	Thu,  4 Jan 2024 11:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002CA210F6;
+	Thu,  4 Jan 2024 11:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=pmachata.org header.i=@pmachata.org header.b="uSY795Yh"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BFC210F0;
-	Thu,  4 Jan 2024 11:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4T5PCs4GwMz1Q7XD;
-	Thu,  4 Jan 2024 19:16:09 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id A09711A0190;
-	Thu,  4 Jan 2024 19:17:36 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 4 Jan 2024 19:17:35 +0800
-Message-ID: <7f561916-a7ad-4189-b3a7-dfe43f9daeaa@huawei.com>
-Date: Thu, 4 Jan 2024 19:17:35 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58555210F4
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 11:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pmachata.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pmachata.org
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4T5PKP1l09z9sst;
+	Thu,  4 Jan 2024 12:20:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pmachata.org;
+	s=MBO0001; t=1704367257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FZaj0jedT1v9cFHpAbNpbe3b5/CJ+muFX9dJhL0Etgo=;
+	b=uSY795YhZeXL2eOpLv9j8s2YFbTsyauTGVav3/shoGEGg/8/aQaHnASs5I9nYZifmOHmkZ
+	3BbHXqp13IN8o1gK9CbHZ6n6TqR9ZRMVFbyPl0tSB8tSvdNyehpKzVXzHp6kb9LkEYM7rj
+	t94be+jcWzEfPrNfy7Zz3vXwFOl/KRibTeM8FG7dcmVlOTvgZhOeMeCO765ST2IPjjU01M
+	Kb3UX1X6V/r77jN2MuwtfS0AXDIK9ZrVQxoX8VK1DU3jSJMtTZjZH0ofUBiyY7HLoM6iIO
+	3Z+6UvqgYlDO0yJ4GCt2X/r1aoGfLrABZWDg4sO5O8nk2G6HNsLtUNbAcGpzPQ==
+References: <20240104003127.23877-2-stephen@networkplumber.org>
+From: Petr Machata <me@pmachata.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2] ip: merge duplicate if clauses
+Date: Thu, 04 Jan 2024 12:18:09 +0100
+In-reply-to: <20240104003127.23877-2-stephen@networkplumber.org>
+Message-ID: <87o7e173ag.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <lanhao@huawei.com>, <wangpeiyang1@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V4 net-next 0/4] There are some features for the HNS3
- ethernet driver
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>
-References: <20231219013513.2589845-1-shaojijie@huawei.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20231219013513.2589845-1-shaojijie@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain
+X-Rspamd-Queue-Id: 4T5PKP1l09z9sst
 
 
-on 2023/12/19 9:35, Jijie Shao wrote:
-> There are some features for the HNS3 ethernet driver
+Stephen Hemminger <stephen@networkplumber.org> writes:
+
+> The code that handles brief option had two exactly matching
+> if (filter == AF_PACKET) clauses; merge them
 >
-> ---
-> changeLog:
-> v3 -> v4:
->    - Adjuste the patches sequence in this patch set, suggested by Simon Horman
->    v3: https://lore.kernel.org/all/20231216070018.222798-1-shaojijie@huawei.com/
-> v2 -> v3:
->    - Fix the incorrect use of byte order in patch
->      "net: hns3: add command queue trace for hns3" suggested by Simon Horman
->    - Add a new patch to move constants from hclge_debugfs.h
->      to hclge_debugfs.c suggested by Simon Horman
->    v2: https://lore.kernel.org/all/20231214141135.613485-1-shaojijie@huawei.com/
-> v1 -> v2:
->    - Delete a patch for ethtool -S to dump page pool statistics, suggested by Jakub Kicinski
->    - Delete two patches about CMIS transceiver modules because
->      ethtool get_module_eeprom_by_page op is not implemented, suggested by Jakub Kicinski
->    v1: https://lore.kernel.org/all/20231211020816.69434-1-shaojijie@huawei.com/
-> ---
->
-> Hao Lan (1):
->    net: hns3: add command queue trace for hns3
->
-> Jijie Shao (2):
->    net: hns3: move constants from hclge_debugfs.h to hclge_debugfs.c
->    net: hns3: support dump pfc frame statistics in tx timeout log
->
-> Peiyang Wang (1):
->    net: hns3: dump more reg info based on ras mod
->
->   drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   6 +
->   .../hns3/hns3_common/hclge_comm_cmd.c         |  19 +
->   .../hns3/hns3_common/hclge_comm_cmd.h         |  16 +-
->   .../net/ethernet/hisilicon/hns3/hns3_enet.c   |   6 +-
->   .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 646 +++++++++++++++++-
->   .../hisilicon/hns3/hns3pf/hclge_debugfs.h     | 643 +----------------
->   .../hisilicon/hns3/hns3pf/hclge_err.c         | 434 +++++++++++-
->   .../hisilicon/hns3/hns3pf/hclge_err.h         |  36 +
->   .../hisilicon/hns3/hns3pf/hclge_main.c        |  47 ++
->   .../hisilicon/hns3/hns3pf/hclge_trace.h       |  94 +++
->   .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  40 ++
->   .../hisilicon/hns3/hns3vf/hclgevf_trace.h     |  50 ++
->   12 files changed, 1386 insertions(+), 651 deletions(-)
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 
-Hi,
-
-Excuse me, This series has not been applied for a long time.
-
-Is there any problem with this series?
-  
-   Jijie
-
+Reviewed-by: Petr Machata <me@pmachata.org>
 
