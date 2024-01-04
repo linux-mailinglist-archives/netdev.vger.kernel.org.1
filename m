@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-61693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0163F824A53
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:31:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95FD5824A55
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:31:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8ED81F23182
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 21:31:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A202EB22A0D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 21:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5342C6B6;
-	Thu,  4 Jan 2024 21:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D69542C85D;
+	Thu,  4 Jan 2024 21:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5zVyOu6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lU48WKG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84C52C6B0;
-	Thu,  4 Jan 2024 21:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455772C69C;
+	Thu,  4 Jan 2024 21:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40d5f40ce04so9314015e9.2;
-        Thu, 04 Jan 2024 13:31:06 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d60ad5f0bso10522015e9.0;
+        Thu, 04 Jan 2024 13:31:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704403865; x=1705008665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=el7QTA9pZD0fhoRA6AG1w+s9PIDJKYiV8SNI4Yuu+Vw=;
-        b=B5zVyOu67EZLD0sDvuhGEGtm6vJ2cAu3CnOk3M0snRGUD9Uvx8Q2Y1TglOML7bSLg+
-         dU9vnLXmUEWQx/Hj8wPsW3SN1Uo/TdQX1zinw7/sYLs/aNOtu3HSLavWSsZo0SxecIUq
-         6ub0XGGPmBxGdDUDO1l93DZNMbd55XaddfjPltH5aifnWUT5yG2Se38DKWUvIkjFfSE7
-         6auQqaCqeXBHSIvbDL5NH4f+92LUREBsj64b1TDHufQcdfz7EnMk7at1MaFgkZE8Q1CD
-         8roxW1hqDo9hFAm+QOJ86QKNuWpx0bs4LwdEkoTlv+IChqFpSBkvibi5tRUC3NkLqct1
-         J8eA==
+        d=gmail.com; s=20230601; t=1704403866; x=1705008666; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5FUG0RjbzXaQnEDKhMBI3aguQZ4xhkiJthc0BKthtiw=;
+        b=lU48WKG9tmhG8ib74GNaWRRkUIrcaXLKfKy8E3qLtBF3nEpmVROt7gbjG/nggozL5n
+         KQo6utlgo+56UxjD7j6taYbKxdZZuOZ4CS+oqS6Zsiup5VhuluFdDOTAQBJjyY8CIKAC
+         F/PC9s4B/HeI78geA/v4gfrg33X8EUX/LApRplMFF8cPx9AfqRYz7OYB2oyov2GlbGwD
+         Wy1ynu1F3aqcYWcBhg6KH+u0Sz+8yAq7f9NEjG9iD8KlOsRhaCo7/KFmIlcXFubFQhqf
+         L/0t4JE71HtPf5bXMPpxQRe7/Gn9Ws8AX+2Qbm6GTij6LbT4AY+rlJ+NbjmV4Tf4YKYE
+         L+tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704403865; x=1705008665;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=el7QTA9pZD0fhoRA6AG1w+s9PIDJKYiV8SNI4Yuu+Vw=;
-        b=qYs/SADA3WLXCRMVtwgE9c1GZwMTBu78Cr7osbmtNoXOoBcbQKndrVB0tFhmzFJnLq
-         OJbpjy6PDg6LweG6cD7rErsxny4NUhlKn9/MrF5KexHGt3KnWLZB0qV4t0Q9ysmVuKcp
-         9Au9ohTUhZbxTzG4manyW/Eae1sW9ffDJQ5q+fFSCpNXai9A6O5vPO9/IG1vbKVXBZUl
-         A/pMjgYnbhMUN1tWzK4vzlKYFzuR26BMw0l3HtvDFMQm0U0pxTHSrMsZeg6FFWlJ6zzQ
-         f9Vs2jBOdx+MqEqXQXtDFczQ6+2TMm9DF+GkUh7rqWKkfhJmD0Nja+2a+RxM+KWeMUEn
-         drsw==
-X-Gm-Message-State: AOJu0YxuVrEQSTzCroRa9f/4JEvu2RdER/ZWAuh0/kjn9bPthGgBN+4d
-	ra6LlHCBpxxCTMkiJGMYu7o=
-X-Google-Smtp-Source: AGHT+IGPgIVyL0fDlP/oZhbxiwUwceYPiuP4UPBAmGWmeSSpVZCs7VZYYCCBtOAwZZY+mhkm9w0Raw==
-X-Received: by 2002:a05:600c:3b14:b0:40d:5b7a:e31f with SMTP id m20-20020a05600c3b1400b0040d5b7ae31fmr717017wms.39.1704403864698;
-        Thu, 04 Jan 2024 13:31:04 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704403866; x=1705008666;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5FUG0RjbzXaQnEDKhMBI3aguQZ4xhkiJthc0BKthtiw=;
+        b=dU21GsIgGeolJeu+8EZ3w7+aYtauHQnteIpSPMZMQsIJp9KfonRXUDab4lMcVJLqnM
+         0KCQaUX7SqME1t0uNODXqXIIxjHmkh4+k9E2yvS8gXk7ARe53fztKIiXHMO0JVbb8OqK
+         JhJya8vmmNP+It4rYEg2dyCGBC1r6fkIl4RXtP9qnsII1uCcYfhE1zQlK/4PG6bcBJ8X
+         uniAxrpz61yNVEpzlGLb6SUUtRmHEwkd9qsVpGeQ+kryub9WG1H1rDjLQ2mqzJAlToRj
+         IEurBD/+HgPz/4TRIjcN1wbib4eiEy23QVtAvmAdXb/dp7TvZd/keTqwJCNM7LA/2/XK
+         aZgg==
+X-Gm-Message-State: AOJu0Yz5r/4grmjsCH8n33+oJF3SXEMg2pgRduu0kLUoJIB1A6bdfdm0
+	nPr24AEX4yZHaAGW4g3JiPo=
+X-Google-Smtp-Source: AGHT+IHdkLhGfVdMmD5nIOhDmg4/JTgNzYrwAegOCmLzY7Tc3NRUdfUXwSxAe48Evbz5vDSQgKHwDg==
+X-Received: by 2002:a05:600c:1c09:b0:40e:353c:8a1b with SMTP id j9-20020a05600c1c0900b0040e353c8a1bmr596255wms.91.1704403866102;
+        Thu, 04 Jan 2024 13:31:06 -0800 (PST)
 Received: from localhost.localdomain (host-80-116-159-187.pool80116.interbusiness.it. [80.116.159.187])
-        by smtp.googlemail.com with ESMTPSA id f14-20020a05600c4e8e00b0040d3dc78003sm407291wmq.17.2024.01.04.13.31.03
+        by smtp.googlemail.com with ESMTPSA id f14-20020a05600c4e8e00b0040d3dc78003sm407291wmq.17.2024.01.04.13.31.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 13:31:04 -0800 (PST)
+        Thu, 04 Jan 2024 13:31:05 -0800 (PST)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -66,11 +67,14 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v4 0/4] net: phy: at803x: even more generalization
-Date: Thu,  4 Jan 2024 22:30:37 +0100
-Message-ID: <20240104213044.4653-1-ansuelsmth@gmail.com>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [net-next PATCH v4 1/4] net: phy: at803x: generalize cdt fault length function
+Date: Thu,  4 Jan 2024 22:30:38 +0100
+Message-ID: <20240104213044.4653-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240104213044.4653-1-ansuelsmth@gmail.com>
+References: <20240104213044.4653-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,31 +83,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is part 3 of at803x required patches to split the PHY driver
-in more specific PHY Family driver.
+Generalize cable test fault length function since they all base on the
+same magic values (already reverse engineered to understand the meaning
+of it) to have consistenct values on every PHY.
 
-While adding support for a new PHY Family qca807x it was notice lots
-of similarities with the qca808x cdt function. Hence this series
-is done to make things easier in the future when qca807x PHY will be
-submitted.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/phy/at803x.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-Changes v4:
-- Fix Smatch warning
-Changes v3:
-- Rebase on top of net-next
-Changes v2:
-- Address request from Russell in a previous series on cdt get
-  status improvement
-
-Christian Marangi (4):
-  net: phy: at803x: generalize cdt fault length function
-  net: phy: at803x: refactor qca808x cable test get status function
-  net: phy: at803x: add support for cdt cross short test for qca808x
-  net: phy: at803x: make read_status more generic
-
- drivers/net/phy/at803x.c | 186 +++++++++++++++++++++++++++------------
- 1 file changed, 131 insertions(+), 55 deletions(-)
-
+diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+index aaf6c654aaed..acf483fa0887 100644
+--- a/drivers/net/phy/at803x.c
++++ b/drivers/net/phy/at803x.c
+@@ -1192,10 +1192,8 @@ static bool at803x_cdt_fault_length_valid(u16 status)
+ 	return false;
+ }
+ 
+-static int at803x_cdt_fault_length(u16 status)
++static int at803x_cdt_fault_length(int dt)
+ {
+-	int dt;
+-
+ 	/* According to the datasheet the distance to the fault is
+ 	 * DELTA_TIME * 0.824 meters.
+ 	 *
+@@ -1211,8 +1209,6 @@ static int at803x_cdt_fault_length(u16 status)
+ 	 * With a VF of 0.69 we get the factor 0.824 mentioned in the
+ 	 * datasheet.
+ 	 */
+-	dt = FIELD_GET(AT803X_CDT_STATUS_DELTA_TIME_MASK, status);
+-
+ 	return (dt * 824) / 10;
+ }
+ 
+@@ -1265,9 +1261,11 @@ static int at803x_cable_test_one_pair(struct phy_device *phydev, int pair)
+ 	ethnl_cable_test_result(phydev, ethtool_pair[pair],
+ 				at803x_cable_test_result_trans(val));
+ 
+-	if (at803x_cdt_fault_length_valid(val))
++	if (at803x_cdt_fault_length_valid(val)) {
++		val = FIELD_GET(AT803X_CDT_STATUS_DELTA_TIME_MASK, val);
+ 		ethnl_cable_test_fault_length(phydev, ethtool_pair[pair],
+ 					      at803x_cdt_fault_length(val));
++	}
+ 
+ 	return 1;
+ }
+@@ -1994,7 +1992,8 @@ static int qca808x_cdt_fault_length(struct phy_device *phydev, int pair)
+ 	if (val < 0)
+ 		return val;
+ 
+-	return (FIELD_GET(QCA808X_CDT_DIAG_LENGTH, val) * 824) / 10;
++	val = FIELD_GET(QCA808X_CDT_DIAG_LENGTH, val);
++	return at803x_cdt_fault_length(val);
+ }
+ 
+ static int qca808x_cable_test_start(struct phy_device *phydev)
 -- 
 2.43.0
 
