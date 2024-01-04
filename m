@@ -1,168 +1,139 @@
-Return-Path: <netdev+bounces-61564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 351DE824444
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:59:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A8A82442A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:53:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D91FB23AA7
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:59:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BA2C1F22C11
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CB623761;
-	Thu,  4 Jan 2024 14:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6EF62232C;
+	Thu,  4 Jan 2024 14:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="1U7QDAes"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="aT31711Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2069.outbound.protection.outlook.com [40.107.21.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C070523759;
-	Thu,  4 Jan 2024 14:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1704380342;
-	bh=KDp1KlxW4ztxSeOSFhN1rEoylXsyLJ5JvkhJpgJgJnc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=1U7QDAesD642Grt4u1zAfoqQt6hKMbSTMEJ88MrJmPD9TQmpuQLQgsmdPiKZ2WRLl
-	 ISAUdMUyuuarEOF0rXNiYySX4DaXGudcUkVSnKsS0vKtv/Y1q89i0WNrGjfRymA+4I
-	 OFvzMPYBhBLIKlXlMc00snMWVlF3h/FzUQi6O0kc4Odcm4W/ALnLDK89d2Ln523yN7
-	 JLLr0+3yO6rnvF0G9p9lcOJjH6dyjYL0xqV8yXdSmkTxrdzSVCENaMqL0V8niycSOM
-	 i1MUcBnVBUINqa5vsU/Ozp9P15YD2XngxAYpfvYQyhqubeEno1GgfOQQjaCwN06osR
-	 1rmCzbcfMMz3w==
-Received: from mercury (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: sre)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 79B0A378200D;
-	Thu,  4 Jan 2024 14:59:02 +0000 (UTC)
-Received: by mercury (Postfix, from userid 1000)
-	id 69A7D106062F; Thu,  4 Jan 2024 15:49:21 +0100 (CET)
-Date: Thu, 4 Jan 2024 15:49:21 +0100
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Kalle Valo <kvalo@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Heiko Stuebner <heiko@sntech.de>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
-	Chris Morgan <macromorgan@hotmail.com>, Linus Walleij <linus.walleij@linaro.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, 
-	=?utf-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4=?= Prado <nfraprado@collabora.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Terry Bowman <terry.bowman@amd.com>, 
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [RFC 6/9] dt-bindings: vendor-prefixes: add a PCI prefix for
- Qualcomm Atheros
-Message-ID: <rhs5bzjx3cljxa6xhlzlozmgi44tbohsqnznjhr3piz7ekv3ra@mi6yiljza5oe>
-References: <20240104130123.37115-1-brgl@bgdev.pl>
- <20240104130123.37115-7-brgl@bgdev.pl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC3C249EF;
+	Thu,  4 Jan 2024 14:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aWjqFFQPV3CVraJfuzEK2INKwVWpVshB9rjd1VQayIbqOSLX2jsVWBnxGyI+1iWgxvVE7MaQPPn7L2Z+iyqoAnApBlBLyNNPmjAnNgdxUlZzlOvmI57di+hgrfJZK+kRNQP768Rt6yPgkoJBfXRHE8CqnkBLEG+ViQaNnLI7qCv0rjF0oU7j0f7w9c+AXbPfhd0Pf5jHfSr+jqsLa76wIJvaRJ9Vcz3tP5UioQoatI1QkxLQEnsfZLjVEIRlseukG1HW/fC/LhNWJZQl9iGccnFxVmaQYO9mxgNIKh1dJd8aNSGwjjA+HNEIambOItkuTKLtByxkkUv6UF2quAyWUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k78EL1Fm+UbcSue1hU3ZSYVtPmdffcFvv9tRpRxOc6I=;
+ b=UCCeV/CoDShkRPgCvDFgWX1wQzCZ4FGQQ9isT1/gLYWn4TrMaiqgr0yOAot4aGDISS6EOECBHrQvo67IPPwY+HKu0tCFCStpM2tbc7cHJ2Uh3LP1ejDV3Our6RxP5UsAPXWxNFYAP5EBCqqIxPBtfxfD2fZUtAxyo5bV4Ecsp1lxNXoPtyJaoU/nZr6qVLbVoaqHYjXANShrVdZHFG0F2Im1pquk79FYV79KSfgdF7ng4aMqpZUBm+OfgXeXoF3rFSu4xQZtUE8xRLOwgKP4eWWom8HKBawMumsELq9ls4uR7hWE7lFAYwe3csUYq3EwFWNVbkXdGuOvez/8oKoEjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k78EL1Fm+UbcSue1hU3ZSYVtPmdffcFvv9tRpRxOc6I=;
+ b=aT31711QtBC68LO65n9TEBvNxuYC7EO+GzoLUKsXLwXQWgHZ/oUPjnFE2GPDci+Ut/sE+3LmaWQRDRfaiK/6flPmR87Vo5mPH0ddJRLZTgu5rB2SfQ4wFOy19E40jou/9fpDVrTD1hVRveU+9anWPNziEYV0HhLz8lQ/ONZaxUQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com (2603:10a6:800:1ac::11)
+ by DBAPR04MB7239.eurprd04.prod.outlook.com (2603:10a6:10:1a8::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.14; Thu, 4 Jan
+ 2024 14:53:11 +0000
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::901f:7d8d:f07c:e976]) by VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::901f:7d8d:f07c:e976%3]) with mapi id 15.20.7159.013; Thu, 4 Jan 2024
+ 14:53:11 +0000
+Date: Thu, 4 Jan 2024 16:53:08 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com,
+	hauke@hauke-m.de, kurt@linutronix.de, woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com, arinc.unal@arinc9.com,
+	daniel@makrotopia.org, Landen.Chao@mediatek.com, dqfext@gmail.com,
+	sean.wang@mediatek.com, matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com, claudiu.manoil@nxp.com,
+	alexandre.belloni@bootlin.com, clement.leger@bootlin.com,
+	george.mccollister@gmail.com, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for DSA tags
+Message-ID: <20240104145308.2nzbwusesz7vdslu@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240104143759.1318137-1-kuba@kernel.org>
+ <20240104143759.1318137-1-kuba@kernel.org>
+X-ClientProxiedBy: VI1PR0202CA0010.eurprd02.prod.outlook.com
+ (2603:10a6:803:14::23) To VE1PR04MB7374.eurprd04.prod.outlook.com
+ (2603:10a6:800:1ac::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="jsminobfkp6hba2d"
-Content-Disposition: inline
-In-Reply-To: <20240104130123.37115-7-brgl@bgdev.pl>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7374:EE_|DBAPR04MB7239:EE_
+X-MS-Office365-Filtering-Correlation-Id: f06a4854-14f7-49bd-31cd-08dc0d34df16
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	7LMLAGv1jkmYhgBYZdcwMdXRGxrCttjBJ9HrLGktsrXnmrl/r9LCRp9hJx+edH7MU3+s8RR0Qx65qoolYSvJErjxeHcCiqWnMOcHIr9p1l02wWW1QglIn8ZpRWCJbN+Xmc0hmxCoCeQbqIVKzOiyeeYyBTIu2i55x1UeqnDHuBBpZgloyMFRqCnqN4Mahk120BQ8EOgztlRUpkT73gLrW5CNe4g0PA3YoqxchrmRZ4g85puJ5ZsrTA+8GdmbHiLlZVDQ0kqP67NNuzAKV2teMjmaV4DH3bPqeUXKEiJq9jt2p5ePDvEgD3FZYA83gpRJM7do9NQ4DKJFX+gJhvuFIFc3q6fu9kc+dlzSCX73iRtrjkcbtlZNlLE8pwNrglmX/+a4MtMPjYi3zAXwB6rDq8ThNzJoZYLcn288Dz9ySzpAbNjZRnYeoJtzs3n9Ucjkvzf2oVRWgx++kPo9pkOzgPsZrxLF1aZZGFz86CcoimjHsYpY/n7H7qlb3yTKFU7z/QcatnDPs+lpLC0Okh+HT+QUldks7UFiSFzTVkggYnqbJTV4FvoA8HI6MkaNwszN
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7374.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(39860400002)(136003)(396003)(346002)(376002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(6506007)(66476007)(66946007)(478600001)(6512007)(66556008)(9686003)(6486002)(86362001)(41300700001)(38100700002)(33716001)(26005)(1076003)(7416002)(4744005)(4326008)(5660300002)(6666004)(6916009)(2906002)(8676002)(316002)(8936002)(44832011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?tHQ3xbJL1aS9zW84g3X960zHU+5qjKuaFKhfjoqqidJiZOutXYsh6TXrMk17?=
+ =?us-ascii?Q?G7rr05gWdSqM8PP3lJlEHGVKjhYXCNglXwiZAHPI8Cmzs/9VusX3w1gzaIZh?=
+ =?us-ascii?Q?1jOh/7VudZRBlJ3W++9ehd+EHs0F9p2s5eRmjjOsQk24NRnB4H+lP3zk9XW2?=
+ =?us-ascii?Q?HVoxpP5Y0kppaBNQhnmTCEVl6h6prPxlLZM8/xsQeViODQ2Bcu/TMtXii99L?=
+ =?us-ascii?Q?jeMA24+a94tzRoA6VNrNFOxkIU4pwPwJbjZ+AaOfiK5FnBTfvAQ5PGwvkqBe?=
+ =?us-ascii?Q?YA8HLC3QKY8xqo/oWwEZALEQvcjwsNz8CMDDlFaBHCbKeiYXqzYkFhvvkVJQ?=
+ =?us-ascii?Q?23SJLyRzgFc6sSTYEZ10ybTn2d4Rhnu+OY/fXmiEo9nj9mQWX/ZPjytKIea2?=
+ =?us-ascii?Q?2Tnqk6iw/Igq63F0HABdMXVTS8LsImI5iMdGFp3AvDdI8AZrSU8bd10CVXtG?=
+ =?us-ascii?Q?Sl8tF7PjQZWrBAxKmOVvnALm601PcKeFpznjle++o9gcdsIpj8QBXJTBQiEP?=
+ =?us-ascii?Q?qyLUmyZU149tZtha9nlqSfTLtu1Ki8g83n4laavzlIuLZdHEWmR3UyIfocc3?=
+ =?us-ascii?Q?w+WAnIYvEpe1GGBXao8UaWPU/ZnDj5Sfk7vja9NGX/96/RuAs1Zq7t06jt3K?=
+ =?us-ascii?Q?Byz1gsXrNWI9yQupzMsdNW9nFSQ+Tg6nR4B0XlBW5SoFA+r+ggpGGkgLkPnK?=
+ =?us-ascii?Q?sBAZcCIvAKsC6TUKf33qtm8c8P31jDFzdKb2Ka3YmmTN3jYm+bIU6orsC2zA?=
+ =?us-ascii?Q?YXlNR1RkO3TC+Lm7kUa3M43Pl9xZIE+HGUtIqhUQreAXSZPa9SJckT097bS8?=
+ =?us-ascii?Q?ODZpIzI/ZB7XSnth6/kBj99X5Lh0Z+Io0/PQBW1MUoVbM66irqZoO71F727i?=
+ =?us-ascii?Q?kjfExKFm45iUlt8ZP2b7uNSkbgpZJCyuCnRCuO1G/tvFYWncf8VzOmv3vny9?=
+ =?us-ascii?Q?G6a+xAhZhrQ96EiVMWdJuJTGUqTKemy7ArPkUOsT4h37WCdZN/zVac+pds08?=
+ =?us-ascii?Q?MOw48Ogzl9sfaI9zg4Q1LOQK1/B39MXdXvW2q3IXIZDMwWqf4YgWQbEXFTOs?=
+ =?us-ascii?Q?wP7kzTz0XYWOx/OPNv0IRy6MuBIvFXWkYtO1KRLIoXgoQByfJzys0Y+etEpa?=
+ =?us-ascii?Q?cZqKJjbJoIfq853uGbNHRMn1QY4Nit+Bh3AvESgB5oWKZny+HL3ZQGXdCabm?=
+ =?us-ascii?Q?3n2+Yl7985Qdi5taa2jmRgEPp0cuNCY0XEv/gaSdu3hmDjuUFweYW3+D/12N?=
+ =?us-ascii?Q?+U3fFvMdRwhIxDAwHxDBoguB0svNIQJLvb4tjc89udPcxd1d1Dbgrv4cWFAv?=
+ =?us-ascii?Q?I68d64tzeK4KCmnyxsBYWZG7fF66O3FIMuYM5O+bqthHQ/14GLd5lVF6SyFv?=
+ =?us-ascii?Q?2Xh3m92+HXGuGQSoAJmpcRkalwDwoYG98+t5daDIu/Hgr2GoTDNu7EJtowhB?=
+ =?us-ascii?Q?csqc94oDC9JIiP9kdIXvuVDGuRj5yqtYuiEMDKcQo+Z97Jcnsv/n07OP5/rp?=
+ =?us-ascii?Q?BS4uxdMalVI/AFZPu39rg8DL0gVVKbW2yADAvoIem78ailWUHtguu0oTNVnH?=
+ =?us-ascii?Q?jnPJ4EBDwCir7GMetFFnpxZmkOfrJmriKguudJDjM9l4PWluTDL1Qu6VjFdk?=
+ =?us-ascii?Q?oA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f06a4854-14f7-49bd-31cd-08dc0d34df16
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7374.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2024 14:53:11.6757
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: j589DBvSF+81voPoJNHJQaX9fIkCrz9oryHvrDj5biThBi9ACa+P/a6xfF1FLrshLcczNyMDAPzyNx8SWwNR8w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7239
 
-
---jsminobfkp6hba2d
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-On Thu, Jan 04, 2024 at 02:01:20PM +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->=20
-> Document the PCI vendor prefix for Qualcomm Atheros so that we can
-> define the QCA PCI devices on device tree.
->=20
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Thu, Jan 04, 2024 at 06:37:59AM -0800, Jakub Kicinski wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to all the DSA tag modules.
+> 
+> The descriptions are copy/pasted Kconfig names, with s/^Tag/DSA tag/.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  Documentation/devicetree/bindings/vendor-prefixes.yaml | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Doc=
-umentation/devicetree/bindings/vendor-prefixes.yaml
-> index 2dc098b39234..297d6037cd12 100644
-> --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
-> +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-> @@ -1128,6 +1128,7 @@ patternProperties:
->    "^purism,.*":
->      description: Purism, SPC
->    "^qca,.*":
-> +  "^pci17cb,.*":
 
-I don't think it's a good idea to list all the PCI vendor IDs
-in vendor-prefixes.yaml. To please the tooling, I suggest to
-have a generic entry instead. Something like this (untested):
-
-"^pci[0-9a-f][0-9a-f][0-9a-f][0-9a-f],.*":
-  description: PCI SIG Vendor ID
-
-Note, that we we already have a bunch of them:
-
-grep -ho 'pci[0-9a-f][0-9a-f][0-9a-f][0-9a-f],' **/*.dts* | sort | uniq -c
-     70 pci0014,
-      3 pci10b5,
-      1 pci10ee,
-      6 pci14e4,
-      1 pci16c3,
-      2 pci17a0,
-      1 pci17cb,
-      1 pci1b4b,
-     63 pci8086,
-
-Greetings,
-
--- Sebastian
-
->      description: Qualcomm Atheros, Inc.
->    "^qcom,.*":
->      description: Qualcomm Technologies, Inc
-> --=20
-> 2.40.1
->=20
->=20
-
---jsminobfkp6hba2d
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmWWxWEACgkQ2O7X88g7
-+pq9NBAAoxlfauETIkIrDgJNle3ZizR1pfBMZu2EGdroqNk8sONiP9ITABAB3GtY
-TeGTr1dYr+gq+Vj8n+BqThMbvUCJdrO8KXgUt/bFQm2IJvHkTUzskAv1gHybmS0Z
-/1qQWzRz2KDoy6I6Is3GDnhlrgSoUlHqfkSj9OP4fAyZ4rCg/RIS+l1BE3qrft6X
-DdkWV5BsmvG+tEAJ0e8FILIv1igb2DU2zdakioYpsftC4eDsOHYI90q1zuMjDWLY
-3HhOX3MvAZnyMYgzKn+i2EJMdUtIOdg1oAr2ZGRghiCQ5WZjzZjXPWPi+WOkY8t3
-g7/0jD8/4IxncHHxai+zhfOxwXhPPSRtiLMOEg6oDM5CQsfdeC14k3iznXZygr+X
-8wZ1GTuz0srs87MZ/n9wolg0ZdBvuwymoO5BU3jptSJ+wR2Xte4uERJgoxbZAlmB
-m9J7qI++us6b8zH2Az2wAce1Lb0j5FtPZ1oXW22+QNbMzyneQJGuB/5gFR6/iJBC
-th648oqH0zRgsWEIPgexNXCxBRZt3HDb2xD7//3c9TEwvJg2C0n3qr+KqQKuuC31
-NjcIt698FfE7izgbv9goadO9cmCMnxxam0YvQaPO2LRlB376Tv9gdbwybCL4pWvl
-G3MWmmmGzLDU55WxS9x3FD4yO69M0LHnXHfjLal9y+7oCMZC24w=
-=qTtZ
------END PGP SIGNATURE-----
-
---jsminobfkp6hba2d--
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
