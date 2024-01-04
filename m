@@ -1,182 +1,364 @@
-Return-Path: <netdev+bounces-61722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9526824BE0
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:37:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A34824BE3
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:38:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A397B1C21CAD
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:37:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DB86B20E84
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48FF2D051;
-	Thu,  4 Jan 2024 23:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF4F2D05E;
+	Thu,  4 Jan 2024 23:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="E2XANJw1"
+	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="Guyxy8wL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF572D05E
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 23:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-556ea884968so1218198a12.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 15:37:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD552D600
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 23:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5cd8667c59eso735345a12.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 15:38:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1704411437; x=1705016237; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=X7+kC2RPAdH+W9HwER7lp66K7rGudMPhBi0a5Xt7cmM=;
-        b=E2XANJw1GLzBf8IRVhyzJS/d0nfd4lZIu2Kb7A+K9j9c6JTy/SPojE4kKjQwHzELaI
-         sB+ZlL3zZjOELrTtgSzyeAm1/srd7O2yDXlSTvM72Gk6N+O2je5vO7ilLtoZbfJTSv1g
-         qsDy8vWHcjEJcskftdRFePf2aAJvKog423zV0=
+        d=isovalent.com; s=google; t=1704411518; x=1705016318; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T/g9uKrV3NamBwWIpq1xIqWU3SPxdT/PAwy/nydibQE=;
+        b=Guyxy8wLypmxecP1YDmYCM9zP+iyRbhRG2tHwD6WZZO8k2hcGydFNWg2wUKD6EqOuG
+         L1LDSjUIYWcwEuOXG29Yhm17cfq7bwFBPoLHplkjPxTo1ideI6YJPJB0HHdvI/QkNS4z
+         6cHLuwnUKI32hMbW/zm+jwoojkkgI5wvIk45vI64Fpvs85Ivf80NQzCUtIO9ep6KDiZD
+         qmCFhENff89ou39JYWBy9O0BSKI55eyf6glsNGLwVlNych7E7CP3RYNN7/qQEqnw/b1n
+         ajfNmxF5RA5WeNSIhj4fS//ROLirEUDhtvHo4xI2fxdmT45XmkU+c9xi74RGbcdqX2Vs
+         B6MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704411437; x=1705016237;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X7+kC2RPAdH+W9HwER7lp66K7rGudMPhBi0a5Xt7cmM=;
-        b=caw1v4Gxw2gt+R2LR9ORWjqqGOK/vUJx8ZBgwvZbFhTIwNQPzLwct7yde81zNTm5/p
-         FxWGdXGImHLpHw9F/+DabJ+DR+CwMBGi8afkEaNLz8KzKmHB7X4IptNQTQCDDhqzpICw
-         09p2R4J1erxxIAxsDuBS5nP5No3XrG44SUHnWqpycEZYsjLzcuNtXZsLnWEITcFiibFf
-         b6vxCbfWUTNwlB5msV3ugWF4zZTmSLzjPLEngiVOmPggPpY90xY9snhPpZxodysDzhZY
-         v5FgHHHfrfe826X2nAdvcKp/xu2xWsTBGbiMwe4JzyRPLCw6xlfosJsxxWc9q9LBNvoR
-         PWVw==
-X-Gm-Message-State: AOJu0YyWWjiConKrIEkJpa5JTxjVfwqfqMRsZbX6okjVLaD8GLMXkFT6
-	vV/H+611B+578uwPda8mcVwpaf9fyNcSIfgRg5V7+ll3xqD/
-X-Google-Smtp-Source: AGHT+IH59GANhxb1A6w05bpJt7NMGAvFNAcM8yPUxNcUyEGYxcEhSL1WPNVdHwoRHdVy+bNjVkxkievY/zbqkkOuvXs=
-X-Received: by 2002:a50:9fc8:0:b0:556:e635:e17a with SMTP id
- c66-20020a509fc8000000b00556e635e17amr674567edf.1.1704411436942; Thu, 04 Jan
- 2024 15:37:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704411518; x=1705016318;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T/g9uKrV3NamBwWIpq1xIqWU3SPxdT/PAwy/nydibQE=;
+        b=fiOa6tR4wI37txcgkOzpmJspaURKEUNEWn3zRhk+w86VCmSlqvpcedGzbOdiGZqkZ0
+         Fcj+PKMKHgtfFXu98Sf+LynNjonxRHorKhJAkhO3j642U/IcXNaTeRC6rsd9aT0XjC9h
+         1MlAzQ0GTmZ5aUYZaixyHlhZBMpoo18LivsotxOrv9xg9Bv+JbgoTyMxBsnRuO6/ya99
+         5IsN8tQ/9N66FK5Ql2B1+rsMqSXG5/uKeV8ZWcp9Zr75ng/OYhCSnjBIsnli9pj+78EI
+         q8MOPdHgiOg52tJdzhNd94IwZaxKcwfnVsG124K19gavtECj/7R6c9IvpgTUuhvSfnvb
+         MFiw==
+X-Gm-Message-State: AOJu0YyVfdOXvhzMXWThW94k5POVE/2iE8psIDjiGob7wDfAtzPk2qr8
+	FF7/NMYvQYF/4VxR8XyuDAJAWV81eaeNVg==
+X-Google-Smtp-Source: AGHT+IFdM0iipX8XUCMoUltbk3Shx4lJPdgmQF7HQbLxG1NKslQwzjnQqB3jUyINT6U3+Xw1svz1lg==
+X-Received: by 2002:a05:6a21:a588:b0:199:2178:ae48 with SMTP id gd8-20020a056a21a58800b001992178ae48mr1183959pzc.99.1704411518115;
+        Thu, 04 Jan 2024 15:38:38 -0800 (PST)
+Received: from ?IPv6:2601:647:4900:1fbb:5949:35a7:f1f4:a7bc? ([2601:647:4900:1fbb:5949:35a7:f1f4:a7bc])
+        by smtp.gmail.com with ESMTPSA id x185-20020a6263c2000000b006d996ce80a6sm228010pfb.0.2024.01.04.15.38.37
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Jan 2024 15:38:37 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231223042210.102485-1-michael.chan@broadcom.com>
- <20231223042210.102485-14-michael.chan@broadcom.com> <20240104145955.5a6df702@kernel.org>
-In-Reply-To: <20240104145955.5a6df702@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 4 Jan 2024 15:37:05 -0800
-Message-ID: <CACKFLikuHKysVwaJhjGAQ=6fEyqFov3yzavdCgJq3OiV3L=gfg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 13/13] bnxt_en: Add support for ntuple filter
- deletion by ethtool.
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000473637060e273636"
-
---000000000000473637060e273636
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.7\))
+Subject: Re: [PATCH bpf 1/2] bpf: Avoid iter->offset making backward progress
+ in bpf_iter_udp
+From: Aditi Ghag <aditi.ghag@isovalent.com>
+In-Reply-To: <41818988-af0e-4d61-8505-4a13782ad61c@linux.dev>
+Date: Thu, 4 Jan 2024 15:38:36 -0800
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>,
+ netdev@vger.kernel.org,
+ kernel-team@meta.com,
+ bpf@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <61BFE697-3A12-4D0E-A5B9-FA2677D988E2@isovalent.com>
+References: <20231219193259.3230692-1-martin.lau@linux.dev>
+ <8d15f3a7-b7bc-1a45-0bdf-a0ccc311f576@iogearbox.net>
+ <fc1b5650-72bb-4b09-bab4-f61b2186f673@linux.dev>
+ <9f3697c1-ed15-4a3d-9113-c4437f421bb3@linux.dev>
+ <8787f5c0-fed0-b8fa-997b-4d17d9966f13@iogearbox.net>
+ <639b1f3f-cb53-4058-8426-14bd50f2b78f@linux.dev>
+ <8AF6C653-61DB-4142-B2B3-5C6A7D966AF8@isovalent.com>
+ <41818988-af0e-4d61-8505-4a13782ad61c@linux.dev>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+X-Mailer: Apple Mail (2.3608.120.23.2.7)
 
-On Thu, Jan 4, 2024 at 2:59=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri, 22 Dec 2023 20:22:10 -0800 Michael Chan wrote:
-> > +     if (fltr_base) {
-> > +             struct bnxt_ntuple_filter *fltr;
-> > +
-> > +             fltr =3D container_of(fltr_base, struct bnxt_ntuple_filte=
-r, base);
-> > +             rcu_read_unlock();
-> > +             if (!(fltr->base.flags & BNXT_ACT_NO_AGING))
-> > +                     return -EINVAL;
->
-> This looks pretty suspicious, you drop the RCU lock before ever using
-> the object. I'm guessing the filter may be form aRFS and that's why
-> we need RCU? Shouldn't you hold the RCU lock when checking that
-> NO_AGING is set? If it's an aRFS flow it may disappear..
 
-I think you are right.  The RCU lock should be released after checking
-the flags.
 
-There is also another unused variable detected by the kernel test
-robot.  I will post the fixes in a day or two.  Thanks.
+> On Jan 4, 2024, at 2:27 PM, Martin KaFai Lau <martin.lau@linux.dev> =
+wrote:
+>=20
+> On 1/4/24 12:21 PM, Aditi Ghag wrote:
+>>> On Dec 21, 2023, at 6:58 AM, Martin KaFai Lau <martin.lau@linux.dev> =
+wrote:
+>>>=20
+>>> On 12/21/23 5:21 AM, Daniel Borkmann wrote:
+>>>> On 12/21/23 5:45 AM, Martin KaFai Lau wrote:
+>>>>> On 12/20/23 11:10 AM, Martin KaFai Lau wrote:
+>>>>>> Good catch. It will unnecessary skip in the following =
+batch/bucket if there is changes in the current batch/bucket.
+>>>>>>=20
+>>>>>>  =46rom looking at the loop again, I think it is better not to =
+change the iter->offset during the for loop. Only update iter->offset =
+after the for loop has concluded.
+>>>>>>=20
+>>>>>> The non-zero iter->offset is only useful for the first bucket, so =
+does a test on the first bucket (state->bucket =3D=3D bucket) before =
+skipping sockets. Something like this:
+>>>>>>=20
+>>>>>> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+>>>>>> index 89e5a806b82e..a993f364d6ae 100644
+>>>>>> --- a/net/ipv4/udp.c
+>>>>>> +++ b/net/ipv4/udp.c
+>>>>>> @@ -3139,6 +3139,7 @@ static struct sock =
+*bpf_iter_udp_batch(struct seq_file *seq)
+>>>>>>       struct net *net =3D seq_file_net(seq);
+>>>>>>       struct udp_table *udptable;
+>>>>>>       unsigned int batch_sks =3D 0;
+>>>>>> +    int bucket, bucket_offset;
+>>>>>>       bool resized =3D false;
+>>>>>>       struct sock *sk;
+>>>>>>=20
+>>>>>> @@ -3162,14 +3163,14 @@ static struct sock =
+*bpf_iter_udp_batch(struct seq_file *seq)
+>>>>>>       iter->end_sk =3D 0;
+>>>>>>       iter->st_bucket_done =3D false;
+>>>>>>       batch_sks =3D 0;
+>>>>>> +    bucket =3D state->bucket;
+>>>>>> +    bucket_offset =3D 0;
+>>>>>>=20
+>>>>>>       for (; state->bucket <=3D udptable->mask; state->bucket++) =
+{
+>>>>>>           struct udp_hslot *hslot2 =3D =
+&udptable->hash2[state->bucket];
+>>>>>>=20
+>>>>>> -        if (hlist_empty(&hslot2->head)) {
+>>>>>> -            iter->offset =3D 0;
+>>>>>> +        if (hlist_empty(&hslot2->head))
+>>>>>>               continue;
+>>>>>> -        }
+>>>>>>=20
+>>>>>>           spin_lock_bh(&hslot2->lock);
+>>>>>>           udp_portaddr_for_each_entry(sk, &hslot2->head) {
+>>>>>> @@ -3177,8 +3178,9 @@ static struct sock =
+*bpf_iter_udp_batch(struct seq_file *seq)
+>>>>>>                   /* Resume from the last iterated socket at the
+>>>>>>                    * offset in the bucket before iterator was =
+stopped.
+>>>>>>                    */
+>>>>>> -                if (iter->offset) {
+>>>>>> -                    --iter->offset;
+>>>>>> +                if (state->bucket =3D=3D bucket &&
+>>>>>> +                    bucket_offset < iter->offset) {
+>>>>>> +                    ++bucket_offset;
+>>>>>>                       continue;
+>>>>>>                   }
+>>>>>>                   if (iter->end_sk < iter->max_sk) {
+>>>>>> @@ -3192,10 +3194,10 @@ static struct sock =
+*bpf_iter_udp_batch(struct seq_file *seq)
+>>>>>>=20
+>>>>>>           if (iter->end_sk)
+>>>>>>               break;
+>>>>>> +    }
+>>>>>>=20
+>>>>>> -        /* Reset the current bucket's offset before moving to =
+the next bucket. */
+>>>>>> +    if (state->bucket !=3D bucket)
+>>>>>>           iter->offset =3D 0;
+>>>>>> -    }
+>>>>>>=20
+>>>>>>       /* All done: no batch made. */
+>>>>>>       if (!iter->end_sk)
+>>>>>=20
+>>>>> I think I found another bug in the current bpf_iter_udp_batch(). =
+The "state->bucket--;" at the end of the batch() function is wrong also. =
+It does not need to go back to the previous bucket. After realloc with a =
+larger batch array, it should retry on the "state->bucket" as is. I =
+tried to force the bind() to use bucket 0 and bind a larger so_reuseport =
+set (24 sockets). WARN_ON(state->bucket < 0) triggered.
 
---000000000000473637060e273636
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Good catch! This error case would be hit when a batch needs to be =
+resized for the very first bucket during iteration.
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICW5VaGcVZu/tMC31hzcu6UGqK9PrnAr
-F58+qgNIN3TKMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEw
-NDIzMzcxN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAIejVMhvLVW/PHISsTxCyXFWzhD6HSwnzpmDihgUHRwQlIEwlP
-EVnwmUXUKqsnlJpE6XNt5/i3z5oP1PkiVt1ucMpgmAi/Vo0KaeXQWQkIxCOJN04LV0JK9JBFQApU
-8S+y8nx+dstMckIuIUDZWwxqrmW+1XyXKwpoS4FDJLP9ROW6tvvTTa+xnhPz/59TcTC20XVCKfZV
-C86wzAySK3nnpTda5/7N/5cC914XiAP54ou3fLlDBL/xh0xMAConwMh8ziQxOHYYtBCESjfvETr0
-++8E3Jli11a+39ig1z4Uc7v12PD2oL6RgerOtG8fcztyMeAAvsjUpDMG+E0sj2T8
---000000000000473637060e273636--
+>>>>>=20
+>>>>> Going back to this bug (backward progress on --iter->offset), I =
+think it is a bit cleaner to always reset iter->offset to 0 and advance =
+iter->offset to the resume_offset only when needed. Something like this:
+>>>> Hm, my assumption was.. why not do something like the below, and =
+fully start over?
+>>>> I'm mostly puzzled about the side-effects here, in particular, if =
+for the rerun the sockets
+>>>> in the bucket could already have changed.. maybe I'm still missing =
+something - what do
+>>>> we need to deal with exactly worst case when we need to go and =
+retry everything, and what
+>>>> guarantees do we have?
+>>>> (only compile tested)
+>>>> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+>>>> index 89e5a806b82e..ca62a4bb7bec 100644
+>>>> --- a/net/ipv4/udp.c
+>>>> +++ b/net/ipv4/udp.c
+>>>> @@ -3138,7 +3138,8 @@ static struct sock *bpf_iter_udp_batch(struct =
+seq_file *seq)
+>>>>      struct udp_iter_state *state =3D &iter->state;
+>>>>      struct net *net =3D seq_file_net(seq);
+>>>>      struct udp_table *udptable;
+>>>> -    unsigned int batch_sks =3D 0;
+>>>> +    int orig_bucket, orig_offset;
+>>>> +    unsigned int i, batch_sks =3D 0;
+>>>>      bool resized =3D false;
+>>>>      struct sock *sk;
+>>>> @@ -3149,7 +3150,8 @@ static struct sock *bpf_iter_udp_batch(struct =
+seq_file *seq)
+>>>>      }
+>>>>      udptable =3D udp_get_table_seq(seq, net);
+>>>> -
+>>>> +    orig_bucket =3D state->bucket;
+>>>> +    orig_offset =3D iter->offset;
+>>>>  again:
+>>>>      /* New batch for the next bucket.
+>>>>       * Iterate over the hash table to find a bucket with sockets =
+matching
+>>>> @@ -3211,9 +3213,15 @@ static struct sock =
+*bpf_iter_udp_batch(struct seq_file *seq)
+>>>>      if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * =
+3 / 2)) {
+>>>>          resized =3D true;
+>>>>          /* After allocating a larger batch, retry one more time to =
+grab
+>>>> -         * the whole bucket.
+>>>> +         * the whole bucket. Drop the current refs since for the =
+next
+>>>> +         * attempt the composition could have changed, thus start =
+over.
+>>>>           */
+>>>> -        state->bucket--;
+>>>> +        for (i =3D 0; i < iter->end_sk; i++) {
+>>>> +            sock_put(iter->batch[i]);
+>>>> +            iter->batch[i] =3D NULL;
+>>>> +        }
+>>>> +        state->bucket =3D orig_bucket;
+>>>> +        iter->offset =3D orig_offset;
+>>>=20
+>>> It does not need to start over from the orig_bucket. Once it =
+advanced to the next bucket (state->bucket++), the orig_bucket is done. =
+Otherwise, it may need to make backward progress here on the =
+state->bucket. The batch size too small happens on the current =
+state->bucket, so it should retry with the same state->bucket after =
+realloc_batch(). If the state->bucket happens to be the orig_bucket =
+(mean it has not advanced), it will skip the same orig_offset.
+>> Thanks for the patch. I was on vacation, hence the delay in reviewing =
+the patch. The changes around iter->offset match with what I had locally =
+(the patch fell off my radar, sorry!).
+>=20
+> No problem. I am hitting it one and off in my local testing for some =
+time, so decided to post the fix and the test. I have added a few more =
+tests in patch 2. I will post v2 similar to the diff in my last reply of =
+this thread in the early next week.
+>=20
+>> I'm not sure about semantics of the resume operation for certain =
+corner cases like these:
+>> - The BPF UDP sockets iterator was stopped while iterating bucker #X, =
+and the offset was set to 2. bpf_iter_udp_seq_stop then released =
+references to the batched sockets, and marks the bucket X iterator state =
+(aka iter->st_bucket_done) as false.
+>> - Before the iterator is "resumed", the bucket #X was mutated such =
+that the previously iterated sockets were removed, and new sockets were =
+added.  With the current logic, the iterator will skip the first two =
+sockets in the bucket, which isn't right. This is slightly different =
+from the case where sockets were updated in the X -1 bucket *after* it =
+was fully iterated. Since the bucket and sock locks are released, we =
+don't have any guarantees that the underlying sockets table isn't =
+mutated while the userspace has a valid iterator.
+>> What do you think about such cases?
+> I believe it is something orthogonal to the bug fix here but we could =
+use this thread to discuss.
+
+Yes, indeed! But I piggy-backed on the same thread, as one potential =
+option could be to always start iterating from the beginning of a =
+bucket. (More details below.)
+>=20
+> This is not something specific to the bpf tcp/udp iter which uses the =
+offset as a best effort to resume (e.g. the inet_diag and the =
+/proc/net/{tcp[6],udp} are using similar strategy to resume). To improve =
+it, it will need to introduce some synchronization with the (potentially =
+fast path) writer side (e.g. bind, after 3WHS...etc). Not convinced it =
+is worth it to catch these cases.
+
+Right, synchronizing fast paths with the iterator logic seems like an =
+overkill.
+
+If we change the resume semantics, and make the iterator always start =
+from the beginning of a bucket, it could solve some of these corner =
+cases (and simplify the batching logic). The last I checked, the TCP =
+(BPF) iterator logic was tightly coupled with the file based iterator =
+(/proc/net/{tcp,udp}), so I'm not sure if it's an easy change if we were =
+to change the resume semantics for both TCP and UDP BFP iterators?
+Note that, this behavior would be similar to the lseek operation with =
+seq_file [1]. Here is a snippet -=20
+
+The stop() function closes a session; its job, of course, is to clean =
+up. If dynamic memory is allocated for the iterator, stop() is the place =
+to free it; if a lock was taken by start(), stop() must release that =
+lock. The value that *pos was set to by the last next() call before =
+stop() is remembered, and used for the first start() call of the next =
+session unless lseek() has been called on the file; in that case next =
+start() will be asked to start at position zero
+
+[1] https://docs.kernel.org/filesystems/seq_file.html
+
+>=20
+> For the cases described above, skipped the newer sockets is arguably =
+ok. These two new sockets will not be captured anyway even the batch was =
+not stop()-ed in the middle. I also don't see how it is different =
+semantically if the two new sockets are added to the X-1 bucket: the =
+sockets are added after the bpf-iter scanned it regardless they are =
+added to an earlier bucket or to an earlier location of the same bucket.
+>=20
+> That said, the bpf_iter_udp_seq_stop() should only happen if the =
+bpf_prog bpf_seq_printf() something AND hit the seq->buf (PAGE_SIZE) << =
+3) limit or the count in "read(iter_fd, buf, count)" limit.
+
+Thanks for sharing the additional context. Would you have a link for =
+these set of conditions where an iterator can be stopped? It'll be good =
+to document the API semantics so that users are aware of the =
+implications of setting the read size parameter too low.=20
+
+
+> For this case, bpf_iter.c may be improved to capture the whole batch's =
+seq_printf() to seq->buf first even the userspace's buf is full. It =
+would be a separate effort if it is indeed needed.
+
+Interesting proposal... Other option could be to invalidate the =
+userspace iterator if an entire bucket batch is not being captured, so =
+that userspace can retry with a bigger buffer.=20
+
+
+>=20
+> For the bpf_setsockopt and bpf_sock_destroy use case where it probably =
+does not need to seq_printf() anything, it should not need to worry =
+about it. The bpf_iter_udp_batch() should be able to grab the whole =
+bucket such that the bpf_prog will not miss a socket to do =
+bpf_setsockopt or bpf_sock_destroy.
+>=20
+
+Yup, agreed, the setsockeopt and sock_destroy cases are not affected.=20
+
+>>>=20
+>>> If the orig_bucket had changed (e.g. having more sockets than the =
+last time it was batched) after state->bucket++, it is arguably fine =
+because it was added after the orig_bucket was completely captured in a =
+batch before. The same goes for (orig_bucket-1) that could have changed =
+during the whole udp_table iteration.
+>>>=20
+>>>>          goto again;
+>>>>      }
+>>>>  done:
+
 
