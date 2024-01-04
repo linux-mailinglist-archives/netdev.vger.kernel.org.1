@@ -1,212 +1,100 @@
-Return-Path: <netdev+bounces-61455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10495823CEC
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 08:47:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DBA1823D1A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 09:00:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D1DA2854C4
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 07:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 112601C212A2
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 08:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8072D200A8;
-	Thu,  4 Jan 2024 07:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC85200C0;
+	Thu,  4 Jan 2024 08:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mkFEL6Hz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CbgyAwwY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36FF200AC
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 07:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5542a7f1f3cso264685a12.2
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 23:47:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704354434; x=1704959234; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oGF4/vmIJ8o7IJvlJQyYKaxW9KtTtwYjR9BBLu19fK4=;
-        b=mkFEL6HzI8xj4xcJEgGtfq2/GQfxmpYfCM6qKsp/DwjdhHavpkkdYUNWqZe4tZnbpj
-         nummQLXCZGmtl3W/LPaBOpVBxSLlENm/joY/SgTTfbouINsw8USktKevRISs8zFuewb+
-         olIiZzsqmf5C/b1WyvS/jRc5qi85L6TnOlQLeAkSk2IRBghZDeJDDm6ZiFjNfxK13lJW
-         syVCKMHEvRgKxAlpM1R6Q9agccCRPEosXITT7OS9ZEW71GKv6c3KdBCJXwrFS46CG6ML
-         J/uCEciNYweY5UKPtX5e562LGcpzjXKpA0HLXCRJ6TzEKHT0gMGgjksWdv726GiysYfN
-         YcGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704354434; x=1704959234;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oGF4/vmIJ8o7IJvlJQyYKaxW9KtTtwYjR9BBLu19fK4=;
-        b=Zt1vVEcEMDTuT5smVIXOHiXgXXf5d7SeT/1J9gRZko/jnB3BisYySuarXh22F/UqgM
-         zJZZZp3Z93tRbX8CWPb60rblONIPSLCSvrFeGxWG3C1PqMqyUVXvwaiw0BJDEYy9cukH
-         cfbV7O5d307RCh3MGlDq9Suz3MC298qfReD9Zp33/EVLrCmDeU1Z6LTJ7jwa7eMprE6H
-         qXHYxQwk1r8gv/GbWhejtKG7ma3Qsunp4ASHB6DWTXvfKmrRl5tI3JC0WHpf9svnguWn
-         C14UV9Eh86WPCE3DWjvdLjqd/aHENaO2A3fUwQUZXMz1G8ibz52daW6PkETV0MRViqO+
-         fTTA==
-X-Gm-Message-State: AOJu0YxGM+8DHgi3HJj5fLSJn+JxdddwjgtE/jP/9Omh9wDHp6dUS81t
-	A5g/jePsTCFUsWjZFjsf79FbPyHfiNUtog==
-X-Google-Smtp-Source: AGHT+IHD4M0r8yDP/YsO00ANonos/KjanteYCjmiTxyH/zJvMcNhKtTUPBA9N36eVzDrvVyTOgmzew==
-X-Received: by 2002:a50:9b4f:0:b0:555:ea2f:a97f with SMTP id a15-20020a509b4f000000b00555ea2fa97fmr98511edj.13.1704354434368;
-        Wed, 03 Jan 2024 23:47:14 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.218.27])
-        by smtp.gmail.com with ESMTPSA id p12-20020a05640243cc00b0055493aa8905sm14982937edc.63.2024.01.03.23.47.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jan 2024 23:47:13 -0800 (PST)
-Message-ID: <c4831e26-5ff0-40b1-98d4-addfdc1ee5a8@linaro.org>
-Date: Thu, 4 Jan 2024 08:47:12 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03615200AA;
+	Thu,  4 Jan 2024 08:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 419CBFF809;
+	Thu,  4 Jan 2024 08:00:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1704355251;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WE9QlQ4KlC5mveEewBeLNMj9oTityHpI66OG1EcBCwM=;
+	b=CbgyAwwYD8uWKnBEgnl/OqXn2LUAQHeNN/lWlX/vr/r6ucck2EZSDFljAqvkAwXTeRKdIw
+	f3S4uGvc23ZEKWpqLpAdLtS704Q4SvPW+4emTG94vUG9jeaRYdxYsTdy3Qyt4r9njWkHqD
+	241KrAuXnu9FzclO8hTw8m/mNyp1SrcXJ+Ml+ICZgUtXMbQb41Ty7d8AU269yFLHgwYqC4
+	DvDfTNAltJL5Zw6ilI7BkqBGKpvoUXsENg0ZLMT+qDKwHw8QMGs2/G8VdrzSPrF7VSc3OZ
+	llNrbvUWGkQ2mwgWJbmBqX5ewlV5/MDChwqCnkBAj1oyeiFPzWsEWuX/oLVfwA==
+Date: Thu, 4 Jan 2024 09:01:11 +0100 (CET)
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+cc: Romain Gantois <romain.gantois@bootlin.com>, 
+    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+    Jose Abreu <joabreu@synopsys.com>, Russell King <linux@armlinux.org.uk>, 
+    Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+    =?ISO-8859-15?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, 
+    Marek Vasut <marex@denx.de>, Clark Wang <xiaoning.wang@nxp.com>, 
+    Miquel Raynal <miquel.raynal@bootlin.com>, 
+    Sylvain Girard <sylvain.girard@se.com>, 
+    Pascal EBERHARD <pascal.eberhard@se.com>, netdev@vger.kernel.org, 
+    linux-stm32@st-md-mailman.stormreply.com, 
+    linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net 0/5] Fix missing PHY-to-MAC RX clock
+In-Reply-To: <20240103132810.1aae03e8@kernel.org>
+Message-ID: <a34046ef-b543-3f82-1562-5e7542f8529e@bootlin.com>
+References: <20240103142827.168321-1-romain.gantois@bootlin.com> <20240103132810.1aae03e8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
-Content-Language: en-US
-To: Jie Luo <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
- konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_srichara@quicinc.com
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
- <20231225084424.30986-6-quic_luoj@quicinc.com>
- <dee72ce8-b24e-467a-b265-1b965588807f@linaro.org>
- <aeb364a3-6c05-4a1b-ba32-e687a89f20f8@quicinc.com>
- <58dde1a7-ed4a-442c-bb5c-c3f6d926fb7e@linaro.org>
- <06ddbae8-1502-41fb-8cf8-9a3390dad557@quicinc.com>
- <28c8b31c-8dcb-4a19-9084-22c77a74b9a1@linaro.org>
- <d231b7e2-51f5-4676-8fc0-e4bc6154e2d7@quicinc.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <d231b7e2-51f5-4676-8fc0-e4bc6154e2d7@quicinc.com>
+Content-Type: multipart/mixed; boundary="-1463808768-824936069-1704355274=:2791"
+X-GND-Sasl: romain.gantois@bootlin.com
+
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+---1463808768-824936069-1704355274=:2791
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
 
-On 28/12/2023 08:38, Jie Luo wrote:
->>> Sorry for this confusion.
->>> Rob said the internal reference source can be decided by the absence of
->>> the property combined with compatible string, because i said the
->>
->> So all your three DT maintainers agree that lack of property for
->> choosing clock, defines the usage of interrupt source.
+Hello Jakub,
+
+On Wed, 3 Jan 2024, Jakub Kicinski wrote:
+
+> On Wed,  3 Jan 2024 15:28:20 +0100 Romain Gantois wrote:
+> > There is an issue with some stmmac/PHY combinations that has been reported
+> > some time ago in a couple of different series:
+> > 
+> > Clark Wang's report: https://lore.kernel.org/all/20230202081559.3553637-1-xiaoning.wang@nxp.com/
+> > Clément Léger's report: https://lore.kernel.org/linux-arm-kernel/20230116103926.276869-4-clement.leger@bootlin.com/
 > 
-> This is the reference clock source selection of CMN block, which
-> generates the clocks for the Ethernet devices.
-> 
->>
->> Now we had huge amount of arguments that you do not represent properly
->> the clock relationships. Still.
-> 
-> here is the clock topology.
-> reference clock sources ---> CMN PLL ---> various output clocks
+> If those stmmac/PHY combinations never worked upstream please tag 
+> as [PATCH net-next], we should consider this work to be a be a new
+> feature / HW support. If they used to work - we'll need some Fixes
+> tags.
 
-How do you guarantee that these clocks are enabled without proper
-relationships described in DT? In current and future designs?
+These never worked properly upstream so I'll send it to net-next.
 
-> 
-> the output clocks are provided to the Ethernet devices(such as the
-> qca808x PHY devices).
-> 
-> These information is also provided the commit message of the patch
-> <net: mdio: ipq4019: configure CMN PLL clock for ipq5332>.
-> 
->>
->>> internal 96MHZ is used on ipq5018 currently in the previous message.
->>>
->>> per double checked the current IPQ platforms, the internal 96MHZ is also
->>> possible on ipq9574, and the reference clock source should be kept as
->>> configurable instead of limited by the compatible string, maybe the
->>> different reference clock source is acquired in the future, even
->>> currently it is not used on the special platform for now.
->>>
->>> so i update the solution with a little bit of changes.
->>
->> You still do not want to implement our suggestions and I don't
->> understand your arguments. Nothing in above paragraph explains me why
->> you cannot use clock provider/consumer relationships.
-> 
-> Hi Krzysztof,
-> 
-> The reference clock source can be registered as the fix clock provider,
->  From the current fix clock provider, the clock rate is useful for the
-> clock consumer, the fix clock rate is used to generate the output clocks
-> by the divider or multiplier.
-> 
-> For the CMN block to select reference clock, which is configuring the
-> clock source, we don't know the formula to get the output clock value
-> based on the reference clock value.
+Best Regards,
 
-I don't understand what does it mean. You do not know how to program CMN
-block?
-
-> 
-> i also see there is an example in the upstream code, which is same as
-> the CMN block to select the reference clock source.
-
-Oh, the old argument. So if there is a bug in the code, you are going
-for example to implement it as well?
-
-> 
-> the property "ref-clock-frequency" is defined in the yaml file below.
-> Documentation/devicetree/bindings/net/wireless/ti,wlcore.yaml.
-
-And how does the hardware look like there? It's TI, so how do you even know?
-
-
-
-Best regards,
-Krzysztof
-
+-- 
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+---1463808768-824936069-1704355274=:2791--
 
