@@ -1,85 +1,124 @@
-Return-Path: <netdev+bounces-61473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C88823F71
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:30:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D99B7823F85
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:35:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 841CBB21600
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 10:30:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79E8AB24BA5
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 10:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2767320DD8;
-	Thu,  4 Jan 2024 10:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g1fihzQ2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1EC1EB48;
+	Thu,  4 Jan 2024 10:35:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069E920DD5
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 10:30:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 77472C433C9;
-	Thu,  4 Jan 2024 10:30:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704364226;
-	bh=Ubrxvdscr6NSU+tZOzdhbGK2e99/tQqxaGKzSUHKQK0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g1fihzQ2s1eIX0BUyoWJiHpTiVEhYuIQ6/qg+8/AJkctbKoQSo+wGLWi/JUqiB5UI
-	 blswNVYy/KpPn6k1s1X+wKSBvjUUhc2PWDMvdjsISJHVk4fAGu1GqPLElfmO3A4Uql
-	 44Ct+1NWj0BNH3bK8Fw4VHcGyO2qmBKSG0q0kAHgCEA2FCQYdGlKC/Hd70QVIZRoYh
-	 F7grzRxuf/l3llNEeqeftCUOBVgI0DPrUjsrGL1SMcdqVVOG+KRuh2VArvXUobYiDv
-	 lSlkjMDVQCJX255whSC/ohTmWiH75/nmmUJxt/vr9z8o3TNZhtOy/ZUAyf/3qHwymz
-	 U6tgjiA6FD8uQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5AC4CC3959F;
-	Thu,  4 Jan 2024 10:30:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145B920DC4
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 10:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 404AYx8J050578;
+	Thu, 4 Jan 2024 19:34:59 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
+ Thu, 04 Jan 2024 19:34:59 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
+Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 404AYxCk050573
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 4 Jan 2024 19:34:59 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <d314e471-0251-461e-988d-70add0c6ebf6@I-love.SAKURA.ne.jp>
+Date: Thu, 4 Jan 2024 19:34:59 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] sctp: fix busy polling
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170436422536.28338.15558044259425144269.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jan 2024 10:30:25 +0000
-References: <20231219170017.73902-1-edumazet@google.com>
-In-Reply-To: <20231219170017.73902-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, jmoroni@google.com,
- marcelo.leitner@gmail.com, lucien.xin@gmail.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [net?] [nfc?] INFO: task hung in nfc_targets_found
+Content-Language: en-US
+To: Hillf Danton <hdanton@sina.com>,
+        syzbot <syzbot+2b131f51bb4af224ab40@syzkaller.appspotmail.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Greg KH <gregkh@linuxfoundation.org>
+Cc: krzysztof.kozlowski@linaro.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+References: <00000000000026100c060e143e5a@google.com>
+ <20240104050501.2766-1-hdanton@sina.com>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20240104050501.2766-1-hdanton@sina.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 19 Dec 2023 17:00:17 +0000 you wrote:
-> Busy polling while holding the socket lock makes litle sense,
-> because incoming packets wont reach our receive queue.
+On 2024/01/04 14:05, Hillf Danton wrote:
+> On Wed, 03 Jan 2024 16:59:25 -0800
+>> HEAD commit:    453f5db0619e Merge tag 'trace-v6.7-rc7' of git://git.kerne..
+>> git tree:       upstream
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=141bc48de80000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=f8e72bae38c079e4
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=2b131f51bb4af224ab40
+>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>>
 > 
-> Fixes: 8465a5fcd1ce ("sctp: add support for busy polling to sctp protocol")
-> Reported-by: Jacob Moroni <jmoroni@google.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-> Cc: Xin Long <lucien.xin@gmail.com>
+> 	syz-executor.1:27827		kworker/u4:93/7607	kworker/0:1/11541
+> 	===				===			===
+> 	nci_close_device()		nci_rx_work()		nfc_urelease_event_work()
+> 	mutex_lock(&ndev->req_lock)				device_lock()
+> 	flush_workqueue(ndev->rx_wq)				mutex_lock(&ndev->req_lock)
+> 					device_lock()
 > 
-> [...]
+> Looks like lockdep failed to detect deadlock once more because of device_lock().
 
-Here is the summary with links:
-  - [net-next] sctp: fix busy polling
-    https://git.kernel.org/netdev/net-next/c/a562c0a2d651
+Yes, this is yet another circular locking dependency hidden by device_lock().
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Calling flush_workqueue(ndev->rx_wq) with ndev->req_lock has to be avoided,
+for nci_close_device() has ndev->req_lock => dev->dev dependency and
+nfc_urelease_event_work() has dev->dev => ndev->req_lock dependency.
 
+  nci_close_device() {
+    mutex_lock(&ndev->req_lock); // ffff88802bed4350
+    flush_workqueue(ndev->rx_wq); // wait for nci_rx_work() to complete
+    mutex_unlock(&ndev->req_lock); // ffff88802bed4350
+  }
+  
+  nci_rx_work() { // ndev->rx_work is on ndev->rx_wq
+    nci_ntf_packet() {
+      device_lock(&dev->dev); // ffff88802bed5100
+      device_unlock(&dev->dev); // ffff88802bed5100
+    }
+  }
+
+  nfc_urelease_event_work() {
+    mutex_lock(&nfc_devlist_mutex); // ffffffff8ee4d808
+    mutex_lock(&dev->genl_data.genl_data_mutex); // ffff88802bed5508
+    nfc_stop_poll() {
+      device_lock(&dev->dev); // ffff88802bed5100
+      nci_stop_poll() {
+        nci_request() {
+          mutex_lock(&ndev->req_lock); // ffff88802bed4350
+          mutex_unlock(&ndev->req_lock); // ffff88802bed4350
+        }
+      }
+      device_unlock(&dev->dev); // ffff88802bed5100
+    }
+    mutex_unlock(&dev->genl_data.genl_data_mutex); // ffff88802bed5508
+    mutex_unlock(&nfc_devlist_mutex); // ffffffff8ee4d808
+  }
+
+I consider that we need to enable lockdep validation on dev->dev mutex
+( https://lkml.kernel.org/r/c7fb01a9-3e12-77ed-5c4c-db7deb64dc73@I-love.SAKURA.ne.jp )
+but was some alternative to my proposal at
+https://lkml.kernel.org/r/1ad499bb-0c53-7529-ff00-e4328823f6fa@I-love.SAKURA.ne.jp
+proposed? Is it time to retry my proposal?
 
 
