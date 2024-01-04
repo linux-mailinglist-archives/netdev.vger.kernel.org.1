@@ -1,53 +1,48 @@
-Return-Path: <netdev+bounces-61709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85373824B1D
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:44:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36084824B28
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23DEA1F23450
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:44:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4667B1C20FB8
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857AC2C872;
-	Thu,  4 Jan 2024 22:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F172C864;
+	Thu,  4 Jan 2024 22:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOWIFu42"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OUlO/IEM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE532CCAD
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 22:44:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80A87C433C7;
-	Thu,  4 Jan 2024 22:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CBB2CCBA
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 22:47:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97ED1C433C7;
+	Thu,  4 Jan 2024 22:47:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704408287;
-	bh=Tk47gifsj5o+jI0agKvVoCHRnv2t9kEUZufLrpJZIu8=;
+	s=k20201202; t=1704408442;
+	bh=wIT658nvpGmP9lONvCML+5q9V6cZczsZ36fNSkEe+h8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oOWIFu42g+hrpFGDJ0CteoDJNRHjR86lfAoHzBX1Fh+B3+cEDqf/52bLr6z9AQ/4n
-	 WN7g+iljgShZ7Wf8cc6kYqcIX6OYgpIn6TjckBcNMRgooMgchnRPGIt96OxSpxj1LH
-	 ueOgeLJiQ4CsEvHBusDMhzfJS5FASXlt6AEYJixV7onOo/tmZs57j3ZfXzTC54sFCB
-	 AQxauzljdFm2Dv80pEENYbPCTA47/xAZOIuvkq5aHaeXTzUSWiq9pebO0h1otKD/pw
-	 cI8lq+EcnUvtpUrQOeIFojuSy7QnOsFc3pygb3RpO7j0n9uYLTfjb9Rlrh7+7925fr
-	 O+SWgsbIES2ow==
-Date: Thu, 4 Jan 2024 14:44:46 -0800
+	b=OUlO/IEM5npsae8jTIzw6tLTV0N1WLlg/Cwf3Abs0VypL3KBdR6wKHPLmiXu5/a6D
+	 EtR14XH2BPffd3772GsGOcKg3iHECZjoPOqSuquqBwurVSkQPFI+g1i9gs3CGL1EfY
+	 NQgpiYcgRxOvNNSV2tyLkuTteEiT/TLMaIwEWxgIvUpLxCSiX8wAJIZOys7sZld27e
+	 +Lzt0jjwQE11WgEylJwCDICLcSjyXXlZjPnUDMTBS2e2/whMyr2gnYDKSlJYPKX2xI
+	 XiZv9jpbjxhfT3CbeYzbWsoKOq/IkU3yHqcBF8MOxSeWM1x2eifrTr2n1YXvgZWrBt
+	 75nzwonHiUlJQ==
+Date: Thu, 4 Jan 2024 14:47:21 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Saeed Mahameed <saeed@kernel.org>
-Cc: "Nelson, Shannon" <shannon.nelson@amd.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>, Armen Ratner
- <armeng@nvidia.com>, Daniel Jurgens <danielj@nvidia.com>
-Subject: Re: [net-next 15/15] net/mlx5: Implement management PF Ethernet
- profile
-Message-ID: <20240104144446.1200b436@kernel.org>
-In-Reply-To: <ZYS7XdqqHi26toTN@x130>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
+ <tariqt@nvidia.com>
+Subject: Re: [pull request][net-next 00/15] mlx5 updates 2023-12-20
+Message-ID: <20240104144721.1eaff202@kernel.org>
+In-Reply-To: <20231221005721.186607-1-saeed@kernel.org>
 References: <20231221005721.186607-1-saeed@kernel.org>
-	<20231221005721.186607-16-saeed@kernel.org>
-	<dc44d1cc-0065-4852-8da6-20a4a719a1f3@amd.com>
-	<ZYS7XdqqHi26toTN@x130>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,12 +52,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 21 Dec 2023 14:25:33 -0800 Saeed Mahameed wrote:
-> Maybe we should have made it clear here as well, this management PF just
-> exposes a netdev on the embedded ARM that will be used to communicate
-> with the device onboard BMC via NC-SI, so it meant to be used
-> only by standard tools.
+On Wed, 20 Dec 2023 16:57:06 -0800 Saeed Mahameed wrote:
+> Support Socket-Direct multi-dev netdev
 
-How's that different to any other BMC via NC-SI setup?
-NC-SI is supposed to steal packets which were directed to the wire.
+There's no documentation for any of it?
+
+$ git grep -i 'socket.direct' -- Documentation/
+$
+
+it's a feature many people have talked about for ever.
+I'm pretty sure there are at least 2 vendors who have
+HW support to do the same thing. Without docs everyone
+will implement is slightly differently :(
 
