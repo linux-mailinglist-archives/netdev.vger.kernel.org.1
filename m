@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-61574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69FB38244DB
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:22:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE428244E3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:25:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFBB6B20DBD
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:22:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C4F11C21C08
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37AA2377F;
-	Thu,  4 Jan 2024 15:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2211F241E7;
+	Thu,  4 Jan 2024 15:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i3rTLPuc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G0KGMjql"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A71E241E2;
-	Thu,  4 Jan 2024 15:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907D7241E6;
+	Thu,  4 Jan 2024 15:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a28e31563ebso72357766b.2;
-        Thu, 04 Jan 2024 07:22:37 -0800 (PST)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-555aa7fd668so777268a12.0;
+        Thu, 04 Jan 2024 07:25:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704381756; x=1704986556; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704381912; x=1704986712; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=0yXAbaAJ66TkHbWq15zRnFaiYa65uZWNj5loVkRiAVs=;
-        b=i3rTLPucKvEuBHFtrVFdIoqTo/cgYJXVP9uYKsrgNgQl6a7k5T0ICjhbwGeQqNPhN4
-         XHlAvK8pubJEW4IZqQncOIItgcLqipkv7YqDKLFYpdpg+wmzW1CSNPC84eRJygkkWy+O
-         zKXxsdD77vnueM4k9Cy2MnbXdw4RRud0iOMDoJDcEWi/BltR60ra4sgVSpCl5s8o2xjA
-         0cO7MxeYoFZ/JPTdIiiElwRdubapFSkILEmJ4+EyvnbTlYN1ZAehTUlSEO8kckAp3Y5B
-         jfTz6i/16fvF0xwoL7jQug0CkDZJ9VKFkNJU8Zjs33phSpy2P/7h0Xl0BGI4BGiOK9F+
-         of1w==
+        bh=1NX3sCNOh0ED9p71133Qk1RKXP6AygCB/B6GJLxt724=;
+        b=G0KGMjqlDdRlvv9FLW70mj4aTTF1HgarpXvvrtDRBVOEygzUX4U0GirVgWN2qlR5dr
+         hReqLa2MlX+IhWI2x7p5oOJa+1JA0ktlGsO/fjmkidViHPO31o/A/QwblKgGGWDghW3A
+         oOmk9Vmnpdlqq9GAeFIENac3Pa6f36KW7jVLgX5voGIQpug/ljHLiWb4AUCM9tgOaus5
+         8rhvhC6rKaxmsAMtv0xAOUuqhXgewibTRF1Yxzc78qvGfdcfjF991wKkB9tTnfvTr63a
+         /HtlKQx/5jLO4I7Dlhm52PjfZXgwInxsNVr5+yAYdRt2jIJaAXEeWg+utPVX1OIr09u0
+         Ncpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704381756; x=1704986556;
+        d=1e100.net; s=20230601; t=1704381912; x=1704986712;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0yXAbaAJ66TkHbWq15zRnFaiYa65uZWNj5loVkRiAVs=;
-        b=B4KlV7f7cuEX+mwos+60My1jr2loYu9uZDrUzFD8Yh+JLklLdPzP5Hu8gL/Njf9LN5
-         yQHc5hrYYExtLQ1nugnaY0Dy+IBiVVPelS1xmHQB6ezCof/p3+k4qBPIckpMor3OMGv4
-         y9rfroFahslppRAdhy7TD/9RgDEZDtJP5uMwTqWXgqzam9pqZ8g5bl6MMMXxNcnek9+6
-         fVovl6hnFUWxTFHcfIeB7WGre7rvgvTWsf20W9tZGhHwp6FVph+pcSxCjonNxNt5qVnv
-         0vV19RcVxU8wLowoLA1h5b+DqSKmjRWXuunWb84YbWcxjWVSg7EzpZ3/YZRI0Y0u87Xv
-         v8/g==
-X-Gm-Message-State: AOJu0YykfKsFlYmQFk15s0ex180YqROrbQAkVBw7jW9qla64QG3Sojjc
-	dsnb4qOiol+JIyOLZYVS8HI=
-X-Google-Smtp-Source: AGHT+IFaig8SeExL8gpob99TbO9syJO8daKzzf6+NKnsgHhhIwb1pKTLpp4QHIDVqUCo5i59VpnL9w==
-X-Received: by 2002:a17:906:680b:b0:a27:43b7:ec7 with SMTP id k11-20020a170906680b00b00a2743b70ec7mr374799ejr.22.1704381755979;
-        Thu, 04 Jan 2024 07:22:35 -0800 (PST)
+        bh=1NX3sCNOh0ED9p71133Qk1RKXP6AygCB/B6GJLxt724=;
+        b=lH8Mx9LprMd3mLM3aULCGEKF22dx7BbDDSTpryNc+6L7yexETq+XYs7RhHf+tdngYu
+         7G2PgWiqTY7mfFKQvU5ZV1z4TTtJuG4GUcd1SLlQ5QdvY+Rm4PLshaNE8ByKtpKRBCPT
+         7vXa+UcF7xhEKNjhHw07kYJBmn1X83jqJ5Tbv9XnSYjBJMfTXdD7zbGJYAtB+FYJ0mkG
+         ey9yqR4bDT21Y34JxKxTFoIE2RdttO0zfkjwtVQwSDNtz6TgTtuKgeRYd9CPlgMebdkG
+         8VWSQZE5mrV0bIGtqgypS3Af/JFhy0nRsXa6XyzxYjkdXH49XH9dgkavTQ0/J+j+HONZ
+         LfcQ==
+X-Gm-Message-State: AOJu0YyXtDyEV+En8Ypc7chqWjAAaezQiuJpoYcj8LadMVcUYgZm/zAe
+	Up/Ma1q6oDgiv01HRA0Ef58=
+X-Google-Smtp-Source: AGHT+IF5LYbHLGyB9BUopyv0gdjS+WBokyR9trbGqCfXuxoIRLry/U7C9toUg2NmeG6KQ8XjELG+oQ==
+X-Received: by 2002:a17:906:4882:b0:a26:b88c:42c2 with SMTP id v2-20020a170906488200b00a26b88c42c2mr370974ejq.93.1704381911381;
+        Thu, 04 Jan 2024 07:25:11 -0800 (PST)
 Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id gg18-20020a170906e29200b00a28fa7838a1sm221054ejb.172.2024.01.04.07.22.34
+        by smtp.gmail.com with ESMTPSA id zh14-20020a170906880e00b00a28e5c875f8sm587686ejb.219.2024.01.04.07.25.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 07:22:35 -0800 (PST)
-Date: Thu, 4 Jan 2024 17:22:32 +0200
+        Thu, 04 Jan 2024 07:25:10 -0800 (PST)
+Date: Thu, 4 Jan 2024 17:25:08 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
 To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
 Cc: Daniel Golle <daniel@makrotopia.org>,
@@ -77,13 +77,13 @@ Cc: Daniel Golle <daniel@makrotopia.org>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 1/7] net: dsa: mt7530: always trap frames to
- active CPU port on MT7530
-Message-ID: <20240104152232.jkoqiuwk3rd24rpm@skbuf>
+Subject: Re: [PATCH net-next v2 4/7] net: dsa: mt7530: improve comments
+ regarding port 5 and 6
+Message-ID: <20240104152508.nde2nzw4pvcjlov7@skbuf>
 References: <20231227044347.107291-1-arinc.unal@arinc9.com>
  <20231227044347.107291-1-arinc.unal@arinc9.com>
- <20231227044347.107291-2-arinc.unal@arinc9.com>
- <20231227044347.107291-2-arinc.unal@arinc9.com>
+ <20231227044347.107291-5-arinc.unal@arinc9.com>
+ <20231227044347.107291-5-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,104 +93,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231227044347.107291-2-arinc.unal@arinc9.com>
- <20231227044347.107291-2-arinc.unal@arinc9.com>
+In-Reply-To: <20231227044347.107291-5-arinc.unal@arinc9.com>
+ <20231227044347.107291-5-arinc.unal@arinc9.com>
 
-On Wed, Dec 27, 2023 at 07:43:41AM +0300, Arınç ÜNAL wrote:
-> On the MT7530 switch, the CPU_PORT field indicates which CPU port to trap
-> frames to, regardless of the affinity of the inbound user port.
+On Wed, Dec 27, 2023 at 07:43:44AM +0300, Arınç ÜNAL wrote:
+> There's no logic to numerically order the CPU ports. State the port number
+> and its capability of being used as a CPU port instead.
 > 
-> When multiple CPU ports are in use, if the DSA conduit interface is down,
-> trapped frames won't be passed to the conduit interface.
+> Remove the irrelevant PHY muxing information from
+> mt7530_mac_port_get_caps(). Explain the supported MII modes instead.
 > 
-> To make trapping frames work including this case, implement
-> ds->ops->master_state_change() on this subdriver and set the CPU_PORT field
-
-conduit_state_change()
-
-> to the numerically smallest CPU port which the DSA conduit interface its
-> affine to is up. Introduce the active_cpu_ports field to store the
-> information of the active CPU ports. Correct the macros, CPU_PORT is bits 4
-> through 6 of the register.
+> Remove the out of place PHY muxing information from
+> mt753x_phylink_mac_config(). The function is for MT7530, MT7531, and the
+> switch on the MT7988 SoC but there's no PHY muxing on MT7531 or the switch
+> on the MT7988 SoC.
 > 
-> Add a comment to explain frame trapping for this switch.
+> These comments were gradually introduced with the commits below.
+> ca366d6c889b ("net: dsa: mt7530: Convert to PHYLINK API")
+> 38f790a80560 ("net: dsa: mt7530: Add support for port 5")
+> 88bdef8be9f6 ("net: dsa: mt7530: Extend device data ready for adding a new
+> hardware")
+> c288575f7810 ("net: dsa: mt7530: Add the support of MT7531 switch")
 > 
-> Currently, the driver doesn't support the use of multiple CPU ports so this
-> is not necessarily a bug fix.
-> 
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-> Suggested-by: Russell King (Oracle) <linux@armlinux.org.uk>
 > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> Acked-by: Daniel Golle <daniel@makrotopia.org>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 > ---
->  drivers/net/dsa/mt7530.c | 37 +++++++++++++++++++++++++++++++++----
->  drivers/net/dsa/mt7530.h |  6 ++++--
->  2 files changed, 37 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> index 391c4dbdff42..436d5c311be0 100644
-> --- a/drivers/net/dsa/mt7530.c
-> +++ b/drivers/net/dsa/mt7530.c
-> @@ -1035,10 +1035,6 @@ mt753x_cpu_port_enable(struct dsa_switch *ds, int port)
->  	mt7530_set(priv, MT7530_MFC, BC_FFP(BIT(port)) | UNM_FFP(BIT(port)) |
->  		   UNU_FFP(BIT(port)));
->  
-> -	/* Set CPU port number */
-> -	if (priv->id == ID_MT7530 || priv->id == ID_MT7621)
-> -		mt7530_rmw(priv, MT7530_MFC, CPU_MASK, CPU_EN | CPU_PORT(port));
-> -
->  	/* Add the CPU port to the CPU port bitmap for MT7531 and the switch on
->  	 * the MT7988 SoC. Trapped frames will be forwarded to the CPU port that
->  	 * is affine to the inbound user port.
-> @@ -3075,6 +3071,38 @@ static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
->  	return 0;
->  }
->  
-> +static void
-> +mt753x_conduit_state_change(struct dsa_switch *ds,
-> +			    const struct net_device *conduit,
-> +			    bool operational)
-> +{
-> +	struct dsa_port *cpu_dp = conduit->dsa_ptr;
-> +	struct mt7530_priv *priv = ds->priv;
-> +	u8 mask;
-> +	int val = 0;
 
-Longest line first.
-
-> +
-> +	/* Set the CPU port to trap frames to for MT7530. Trapped frames will be
-> +	 * forwarded to the numerically smallest CPU port which the DSA conduit
-> +	 * interface its affine to is up.
-
-"first CPU port whose conduit interface is up"
-
-> +	 */
-> +	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
-> +		return;
-> +
-> +	mask = BIT(cpu_dp->index);
-> +
-> +	if (operational)
-> +		priv->active_cpu_ports |= mask;
-> +	else
-> +		priv->active_cpu_ports &= ~mask;
-> +
-> +	if (priv->active_cpu_ports)
-> +		val =
-> +		    CPU_EN |
-> +		    CPU_PORT(__ffs((unsigned long)priv->active_cpu_ports));
-
-I don't think the type cast is necessary (implicit type promotion takes place).
-
-Also, it is customary to put {} for multi-line "if" blocks, even if they are
-made up of a single expression.
-
-But without the type cast, it could look like this.
-
-	if (priv->active_cpu_ports)
-		val = CPU_EN | CPU_PORT(__ffs(priv->active_cpu_ports));
-
-> +
-> +	mt7530_rmw(priv, MT7530_MFC, CPU_EN | CPU_PORT_MASK, val);
-> +}
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
