@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-61645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC40824778
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:30:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3403824780
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:32:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 715CD1C21C63
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:30:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E65D7B21614
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A642556C;
-	Thu,  4 Jan 2024 17:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21A025549;
+	Thu,  4 Jan 2024 17:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="gNH9KVOF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPkAexm8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601EB28DA5
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40d6b4e2945so7261015e9.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:30:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8098D286AD
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-35fd5a13285so2210635ab.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:32:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1704389433; x=1704994233; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704389554; x=1704994354; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=/jKy45tTpBF8VrWktAGws3wr3SZV/flltFYKBFtql78=;
-        b=gNH9KVOFQYQqrInrOaKGNkJ15tXEFl4iysSbaTO12M9giBPqZvCTz4jIfq+Zjufmne
-         BSJ+ULojJp4yZjfWUJ5oFnRaua0NDE338wYLGS6z4/Zu30+m65ECfYnRw0wrycNMXmoA
-         qcXl3b1s0WSCO31U4+Atj4zhqsy6jj2Sy5SshEZfzWz3kpk6M1eQQpcR0pZtDn1AT4Iz
-         BpLFrQduy9aliyLav3K6j+XLRJydchBnJJOqo/XJUCQugRW5EmdN4Y7CfrNHhYjd/1FU
-         fTflRV61mB0rxd+DqGC/zTtC4+tHft5/RFvOEgQbnugJ8sb+khjLIT8PNUcDhKmp0G8r
-         dW6w==
+        bh=+8CCnAXJ3pT9UCkGC4rsKDHp1Rey2mb91m19tTflMhs=;
+        b=QPkAexm8tCxbJuDqbPkKSoC3yM2p4oBBLNWhilGOfEU9lKbntiGCH99SOdf5/GrUqx
+         BweZO86Yfv8VhSbnJ9rc0rNr1IBrN5ArDl5BvBjWLkhetrTy6lvEhptYzEnWTvthkAVU
+         XH/Hlc9C35Kq8yw0pm3bQxJfLYwNnNwetiZnH6GzLmsQ2NXUMG2Wk7eVGQBUTHQJ7oK3
+         V2wUojCKD2+uBLrvm+d4K7ifi/4t/8S2gcwC4Rnx4fUGsjgs4s+46fYm+rsKpb+u4Bj4
+         tdUcgMW4wwBpndPyCs4rAYBaFxl1Jv1PfrpMV1u4E16Q6JAftbJ8mrwpbjQkgtvgwb10
+         48fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704389433; x=1704994233;
+        d=1e100.net; s=20230601; t=1704389554; x=1704994354;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/jKy45tTpBF8VrWktAGws3wr3SZV/flltFYKBFtql78=;
-        b=QVCbss/wQuFuP+QCqkNC9qit4aw8/LMuxoCwmBSZYyrNemH5BVDs27f7CJoWVDNG1X
-         bln/DCXcKT7fjFNevn4rBTo2Fv313SumiVkvjSFhV/bXdyitRDRutWZR3iopf+EVc0dv
-         hpzqsIwjwjXoMWJm82MhYiYsYMT3dSmCtZ2CpIFsl08WPVxyKWOj3NcO865xJ4MPKK3h
-         aRIq0jG/KJNxWT26Fb6mEjnazPabdzEuSe2BDf4gIkdtSlr+yjk8mI/0JIfWYNrGp8O+
-         mhjW3V2cmY2YKbHWa1DCXgKzBK+duqh2NZ5tGgFqR5JpIaV6jbKtu0D3pn8dy2oRS+PG
-         mWpQ==
-X-Gm-Message-State: AOJu0YxZkCTTVv5hWSqw9P1y73vppelUT8+zDn9BVuqepvWiY2dED5SJ
-	4A8maij3te05z0W/j3xRQ7mE7xGOQNX7
-X-Google-Smtp-Source: AGHT+IH7v02jmFcnm02BO4OEGoG7+3cWGMprgrMDThkM/ZaCFX321w7OUFlnQld0EGr5QLANcFjw8Q==
-X-Received: by 2002:a05:600c:45d4:b0:40d:1778:c839 with SMTP id s20-20020a05600c45d400b0040d1778c839mr374246wmo.141.1704389433542;
-        Thu, 04 Jan 2024 09:30:33 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id x4-20020a5d54c4000000b0033662c2820bsm33125502wrv.117.2024.01.04.09.30.32
+        bh=+8CCnAXJ3pT9UCkGC4rsKDHp1Rey2mb91m19tTflMhs=;
+        b=J8EK1DOu1grhsWwlW8XZA5h4VDE+7uRizQqZaKwAPcMj03i+Gcv2ZnMC/X1FPZpxDY
+         ymf6vSD9+1o8yCwl5vaRqWEtIlCq7gqPsxoYEgVMqbPz1m8ANi0/J/pTNkU6zegf4qmZ
+         3nu59HjkdZcMBaBCr7Eqx0KD6CF+FTszNjoZ9RYC3QPGq320pfY2xDDB7PkQ2zcgeq7a
+         GlGNFHFtn4wsRiRDEzoHPNN4S8cz0K2PHNzJDxxjwvbZaTMcgV9E7UTQtg5vts6m4tI9
+         BusrD5Xsn7Vvdc4q909araUAjYTS3TA3oQCQHANE/1p7tAMHTkA+r2Aw7eaUrTp9Tv27
+         FUlQ==
+X-Gm-Message-State: AOJu0YzjI5TPQ/M4+WQC5//BG0FpWUMLMdiubTo13dKqTTkgusP2qec5
+	+PAlIu5haSYo1i1SZEfelAo=
+X-Google-Smtp-Source: AGHT+IFYKOZwlge6ek5n+07e9t+/cCZ6JX6kE6XRfJkPA03PAAp2SF21FHJ6bClH0woFXkEV7ElFpg==
+X-Received: by 2002:a05:6e02:219a:b0:35f:b106:9091 with SMTP id j26-20020a056e02219a00b0035fb1069091mr1000806ila.38.1704389554337;
+        Thu, 04 Jan 2024 09:32:34 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id v5-20020a632f05000000b005c259cef481sm24489077pgv.59.2024.01.04.09.32.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 09:30:33 -0800 (PST)
-Message-ID: <dca62206-165e-40bc-b834-0df2941fad41@arista.com>
-Date: Thu, 4 Jan 2024 17:30:31 +0000
+        Thu, 04 Jan 2024 09:32:33 -0800 (PST)
+Message-ID: <0c2531fb-309d-4b22-8a2c-33b8b3b85bda@gmail.com>
+Date: Thu, 4 Jan 2024 09:32:32 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,69 +66,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/tcp: Only produce AO/MD5 logs if there are any keys
+Subject: Re: [PATCH net-next 09/10] net: dsa: bcm_sf2: stop assigning an OF
+ node to the ds->user_mii_bus
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Christian Kujau <lists@nerdbynature.de>,
- Salam Noureddine <noureddine@arista.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>
-References: <20240104-tcp_hash_fail-logs-v1-1-ff3e1f6f9e72@arista.com>
- <20240104075742.71e4399f@kernel.org>
- <335a2669-6902-4f57-bf48-5650cbf55406@arista.com>
- <20240104085855.4c5c5a1f@kernel.org>
- <CANn89iJ79ibHGu-4MCLpkG3w7dr7jqbc7CX1T7Cm+d6vwnwLGg@mail.gmail.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <CANn89iJ79ibHGu-4MCLpkG3w7dr7jqbc7CX1T7Cm+d6vwnwLGg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Hauke Mehrtens <hauke@hauke-m.de>, Christian Marangi <ansuelsmth@gmail.com>,
+ =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+References: <20240104140037.374166-1-vladimir.oltean@nxp.com>
+ <20240104140037.374166-10-vladimir.oltean@nxp.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240104140037.374166-10-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 1/4/24 16:59, Eric Dumazet wrote:
-> On Thu, Jan 4, 2024 at 5:59 PM Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> On Thu, 4 Jan 2024 16:42:05 +0000 Dmitry Safonov wrote:
->>>>> Keep silent and avoid logging when there aren't any keys in the system.
->>>>>
->>>>> Side-note: I also defined static_branch_tcp_*() helpers to avoid more
->>>>> ifdeffery, going to remove more ifdeffery further with their help.
->>>>
->>>> Wouldn't we be better off converting the prints to trace points.
->>>> The chances for hitting them due to malicious packets feels much
->>>> higher than dealing with a buggy implementation in the wild.
->>>
->>> Do you mean a proper stuff like in net/core/net-traces.c or just
->>> lowering the loglevel to net_dbg_ratelimited() [like Christian
->>> originally proposed], which in turns becomes runtime enabled/disabled?
->>
->> I mean proper tracepoints.
->>
->>> Both seem fine to me, albeit I was a bit reluctant to change it without
->>> a good reason as even pre- 2717b5adea9e TCP-MD5 messages were logged and
->>> some userspace may expect them. I guess we can try and see if anyone
->>> notices/complains over changes to these messages changes or not.
-
-[to add up context]
-I supposed it's only tests that grep for those messages, but I've looked
-up the code-base and it's wired up to daemon's code to monitor messages
-with a "filter" for rsyslogd. Certainly not an issue for arista as there
-are people maintaining that (and AFAIK, rasdaemon is already used for
-other traces), but I guess provides grounds for my concerns over other
-projects.
-
->> Hm. Perhaps we can do the conversion in net-next. Let me ping Eric :)
+On 1/4/24 06:00, Vladimir Oltean wrote:
+> The bcm_sf2 driver does something strange. Instead of calling
+> of_mdiobus_register() with an OF node argument, it manually assigns the
+> bus->dev->of_node and then calls the non-OF mdiobus_register(). This
+> circumvents some code from __of_mdiobus_register() from running, which
+> sets the auto-scan mask, parses some device tree properties, etc.
 > 
-> Sure, let's wait for the next release for a conversion, thanks !
+> I'm going to go out on a limb and say that the OF node isn't, in fact,
+> needed at all, and can be removed. The MDIO diversion as initially
+> implemented in commit 461cd1b03e32 ("net: dsa: bcm_sf2: Register our
+> slave MDIO bus") looked quite different than it is now, after commit
+> 771089c2a485 ("net: dsa: bcm_sf2: Ensure that MDIO diversion is used").
+> Initially, it made sense, as bcm_sf2 was registering another set of
+> driver ops for the "brcm,unimac-mdio" OF node. But now, it deletes all
+> phandles, which makes "phy-handle"s unable to find PHYs, which means
+> that it always goes through the OF-unaware dsa_user_phy_connect().
 > 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Thanks!
-
-I'll do the conversion for net-next if you don't mind :-)
-
-That will be pretty nice as it's going to be easy to exercise in tcp-ao
-selftests. Grepping dmesg can't be selftested as reliably/non-flaky.
-
-Thanks,
-            Dmitry
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Tested-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
 
