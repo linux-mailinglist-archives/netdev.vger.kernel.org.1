@@ -1,111 +1,122 @@
-Return-Path: <netdev+bounces-61700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0497F824A88
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:57:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B067824AA6
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:01:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9704F1F2496D
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 21:57:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A036A1C22A44
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA0E2C84E;
-	Thu,  4 Jan 2024 21:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B432C84F;
+	Thu,  4 Jan 2024 22:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="OJsT9ASm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hA9pEBl5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD4B2C84B
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 21:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-5edfcba97e3so10407027b3.2
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 13:57:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1704405442; x=1705010242; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nOJx/D9I9BlgipBiGrZNajpa/ePe9te5wdZDi1lFh90=;
-        b=OJsT9ASmpGirYEw4TGqMr+KVofWzbsOeL6SYKql9K46FsSa4+i/jyAP40vWeheVxdC
-         dDfHHtZ30kE6QpxrGxV08BOrPcp2eurL++weU93Du9J/IE0EHD/eNyyQfQFff0+5DsQj
-         3cvcPT9tAxpRUc76KM1jrdQ8XWazi5Lll2mvk23yHOEIc8yrNVI/NTHPfCiDigWqy43w
-         f+Od6mVQDAGTWVySaUAxR7UV5g1yS4U7t9sS8X/FhpI7nJwYzi6VCFrmytp+nJ8iF61W
-         GDddIpx7Q8AC/CW77JEBTcd1QIdlmixiyp3D+a2N7w7hnGCMYY3RjpbBfxsSTWpUa2f4
-         LETQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704405442; x=1705010242;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nOJx/D9I9BlgipBiGrZNajpa/ePe9te5wdZDi1lFh90=;
-        b=vdYGkpjWOSpj7vwr208cvkqRQfjE7Gr7YjJlhEZku5JTJiocRxPJvL7H+qjjKTi9Wn
-         xx1TBZM3JjGd/Lyi3J2AuJE+y5bcjOrZ/4wwOPMaICWY4REWXg/1AfLJOKfjk30qgGCY
-         ZAqSzPFGdSyZI9PV0x6H2jsWsB/vkbtMRk5pTiWOr/ZRJvfgwP+SuzUYsgzyCkuJM1ZP
-         hwVVGZmFU7CV62dEpNu2XmHslQkSLZUDIjm7IUeOA5TzzfhWIjZBteaLWTVB4BjlWl+g
-         f2j2jVV9S+dn5m4nFI1BM/BRIUzMxqy4RxOowW0fmdl9bHn7tiKK72sBi3ucvNAS50Ff
-         +6fQ==
-X-Gm-Message-State: AOJu0Yy0ygOTWVYl99nPuU+ILVfUJMC3Mzv12sGpIDwrqeKz4puFheTm
-	K81Lt5CoQLmwuanEsQHR+N5CR3Fw+9yO/S/LgJQGK6TyY0zRAkFxy37fyec=
-X-Google-Smtp-Source: AGHT+IFMqTHSuBBDvogO6c+qL9/Xs36u3YbBdlpQcFxg3Wk04M3wPGZW4zqxbNLq2zbL016aJ0gEnXkJYDvDC/8Ee54=
-X-Received: by 2002:a5b:f4b:0:b0:dbe:7c4c:3307 with SMTP id
- y11-20020a5b0f4b000000b00dbe7c4c3307mr1014785ybr.17.1704405442111; Thu, 04
- Jan 2024 13:57:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC7F2CCB3
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 22:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704405693; x=1735941693;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=93H6Vpc0MBiRTEHJHtgDGfDXmbGHCPaPX/Nlcjcqjws=;
+  b=hA9pEBl5T0C+hQdfueZ1gFPhLxJxi2rlU02fjkUO5kKMOFE8M4aiRg3Z
+   ocenNYIwLjLqF6+LGe3nObbXBtevD/U7M8+M4HvjXEScVWj26Cz/NqMEd
+   mHuD0Gdhm1rTkozqvc2mpB51lcalbU/ZLE/AUbdK3qTOuggAf8eA1Vo4F
+   XBy/83LikdcMujwy45vJQpP1IbV/IGRh3VW4SnnKYsL0ZvgozjF4FWaQh
+   tdcG7XnzRinpkXQAHNo2zmAmOp4L7dT8/3GVv16p2tfeuqEix/mZTDhPZ
+   dfr+dJEXuX1Fg4z9qcgR3HoOr62SlSLB+hNLkzlqnSwmd4qZtB7NYSwby
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="382351046"
+X-IronPort-AV: E=Sophos;i="6.04,331,1695711600"; 
+   d="scan'208";a="382351046"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2024 14:01:23 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="773660446"
+X-IronPort-AV: E=Sophos;i="6.04,331,1695711600"; 
+   d="scan'208";a="773660446"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 04 Jan 2024 14:01:21 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rLVmB-0000T0-0F;
+	Thu, 04 Jan 2024 22:01:19 +0000
+Date: Fri, 5 Jan 2024 06:01:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tobias Waldekranz <tobias@waldekranz.com>, davem@davemloft.net,
+	kuba@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, andrew@lunn.ch, f.fainelli@gmail.com,
+	olteanv@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: dsa: mv88e6xxx: Add LED support for
+ 6393X
+Message-ID: <202401050539.Y9LYQsgz-lkp@intel.com>
+References: <20240103103351.1188835-3-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103163415.304358-1-mic@digikod.net> <d4a31d87-0fa3-4ae7-a1be-37d3ad060603@collabora.com>
-In-Reply-To: <d4a31d87-0fa3-4ae7-a1be-37d3ad060603@collabora.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 4 Jan 2024 16:57:11 -0500
-Message-ID: <CAHC9VhSkg6=Y5OgUmdkBA2MBrkQT3idZ7NWG2msqdsFZL03TyA@mail.gmail.com>
-Subject: Re: [PATCH v3] selinux: Fix error priority for bind with AF_UNSPEC on
- PF_INET6 socket
-To: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Eric Paris <eparis@parisplace.org>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240103103351.1188835-3-tobias@waldekranz.com>
 
-On Thu, Jan 4, 2024 at 6:40=E2=80=AFAM Muhammad Usama Anjum
-<usama.anjum@collabora.com> wrote:
->
-> On 1/3/24 9:34 PM, Micka=C3=ABl Sala=C3=BCn wrote:
-> > The IPv6 network stack first checks the sockaddr length (-EINVAL error)
-> > before checking the family (-EAFNOSUPPORT error).
-> >
-> > This was discovered thanks to commit a549d055a22e ("selftests/landlock:
-> > Add network tests").
-> >
-> > Cc: Eric Paris <eparis@parisplace.org>
-> > Cc: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> > Cc: Paul Moore <paul@paul-moore.com>
-> > Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
-> > Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-> > Closes: https://lore.kernel.org/r/0584f91c-537c-4188-9e4f-04f192565667@=
-collabora.com
-> > Fixes: 0f8db8cc73df ("selinux: add AF_UNSPEC and INADDR_ANY checks to s=
-elinux_socket_bind()")
-> > Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@digikod.net>
-> Thank you Micka=C3=ABl for the patch. Tested patch on v6.7-rc8.
->
-> Tested-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+Hi Tobias,
 
-This looks good to me, and since it is rather trivial I'm going to go
-ahead and merge this into selinux/next so it should go up to Linus
-during the upcoming merge window.
+kernel test robot noticed the following build warnings:
 
-Thanks everyone!
+[auto build test WARNING on net-next/main]
 
---=20
-paul-moore.com
+url:    https://github.com/intel-lab-lkp/linux/commits/Tobias-Waldekranz/net-dsa-mv88e6xxx-Add-LED-infrastructure/20240103-183726
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240103103351.1188835-3-tobias%40waldekranz.com
+patch subject: [PATCH net-next 2/2] net: dsa: mv88e6xxx: Add LED support for 6393X
+config: loongarch-randconfig-r113-20240104 (https://download.01.org/0day-ci/archive/20240105/202401050539.Y9LYQsgz-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240105/202401050539.Y9LYQsgz-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401050539.Y9LYQsgz-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/dsa/mv88e6xxx/leds.c:77:21: sparse: sparse: symbol 'mv88e6393x_led_map' was not declared. Should it be static?
+
+vim +/mv88e6393x_led_map +77 drivers/net/dsa/mv88e6xxx/leds.c
+
+    76	
+  > 77	const unsigned long *mv88e6393x_led_map(struct mv88e6xxx_led *led)
+    78	{
+    79		switch (led->port) {
+    80		case 1:
+    81		case 2:
+    82		case 3:
+    83		case 4:
+    84		case 5:
+    85		case 6:
+    86		case 7:
+    87		case 8:
+    88			return mv88e6393x_led_map_p1_p8[led->index];
+    89		case 9:
+    90		case 10:
+    91			return mv88e6393x_led_map_p9_p10[led->index];
+    92		}
+    93	
+    94		return NULL;
+    95	}
+    96	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
