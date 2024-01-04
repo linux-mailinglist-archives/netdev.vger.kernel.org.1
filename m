@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-61651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1FD982478B
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:36:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B003F82478C
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:36:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B81F11C20E70
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:36:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5FC6B22AEF
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4AAC25549;
-	Thu,  4 Jan 2024 17:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722A42557F;
+	Thu,  4 Jan 2024 17:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gxNdNX6/"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VbanwZxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5F028688
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFCB288D5
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6dc025dd9a9so450593a34.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:36:30 -0800 (PST)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-42782601608so3472511cf.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:36:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1704389789; x=1704994589; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1704389799; x=1704994599; darn=vger.kernel.org;
         h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gkbYxyoYCyeHq7xGfAKK9rquTBg/PU9fKkf/oCm84/Q=;
-        b=gxNdNX6/bVdOiKVQLa8Uq/z5XRDWozZQhYqu9xCVN7A+seVvIxUUqzpPI6MgeTtBx1
-         /byNXSFwcemyPPo/vmKrcyxFcWxiCWu3TjBOu+fkSxROIzW0yPpKm2Rsq1gup6gIynT/
-         7E89nebzm1LJo1hTKwXwKmcJ4GVEF6pozUfo4=
+        bh=IsqlT61HUOA20CJJhCTwrzS/wO3bKWp6psbpBOFC9cQ=;
+        b=VbanwZxRbZCTCwGDSXHvx01X6TT/3yH8FDsIdVsN+PfAa7afTuAksF5WAK8nU9uzX2
+         gBS6PybwBa9RYXGouvlrcdUdDN6oIfOK9e/taOTJxohjEwYYWBGYNk+QKPTvf12qNOB0
+         0cVCzoYWc4yFRug0BR2VRHlT6VMDznU8M/0AY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704389789; x=1704994589;
+        d=1e100.net; s=20230601; t=1704389799; x=1704994599;
         h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=gkbYxyoYCyeHq7xGfAKK9rquTBg/PU9fKkf/oCm84/Q=;
-        b=RfzY9QPaliV+BpEipG7zavVU3JVUyJU7t3tvXP4fgsAKy4ASgPFMzbIeaQe59O2U4U
-         fqHL0fK/qutWA6mCNVR7JtT+lAvKE+5QQ3TLngy+UBMZRPt0O3JCNAPL9yRaKvdUSW39
-         pNRGcw/UNP0NIw+iWpmMVc1eSytrH+36dBqbfrCpn+47BUzxiePlyeV0qxl9AZCLfI5U
-         2TlW1zyGkk4QZvvt+WFgfB880D3k8VF8qcTw1Ckrr3N9InHFniKJyTuZ3WhC1o2IVBnr
-         uYYwcfvSdks6ixD95rBF1BdlpyC0S3fGwnxGfkt13DJNU2RZZzvfymjfScFyAVX/amjp
-         BO3Q==
-X-Gm-Message-State: AOJu0Yy5h2xkGditePUPG/ppCr2lv8IfrEXNQMKDBpB9svvau8XVHchI
-	yu1Uh3TWVnYmMy/AT8Q511TkLZOqV6f3
-X-Google-Smtp-Source: AGHT+IEasDoP5xps0suEHoZk1dFJZz90WV5MYipXR50V69H5XEgLwoyeOUSM3qtOjii9drDVMS24nQ==
-X-Received: by 2002:a05:6830:3b88:b0:6dc:2da9:9177 with SMTP id dm8-20020a0568303b8800b006dc2da99177mr1002602otb.28.1704389789424;
-        Thu, 04 Jan 2024 09:36:29 -0800 (PST)
+        bh=IsqlT61HUOA20CJJhCTwrzS/wO3bKWp6psbpBOFC9cQ=;
+        b=sQzA1Ixtcyy91jWyHON1y7Z4EmUuHPappzZPDQ4Hysept9pDs98BHtrwcRTKSEV9Ex
+         Kkr2kgtfr+eTAU4sTPGydnrRVSU6b9msBeFfoMmFHdnXj3pm+vWtcaz1cjGD7HzxiuF9
+         0DP73I1QK4OyPfKylipE09JSF/C4eJIvaWos+4byDwewH6il+VHm6x9FPqx0D2Tx89XE
+         cGSuJdEvW5+2FKNLOuHqM4548MQcTF9wPcoIHdx1c19GORoP2Plsb7T5NzAOvP/hB+TP
+         IyO2cAe7m3N/ZlIPqcYnqXN6HCjBC0oXyWjiSR6lJk0+IpWjoVbCzG+T+MLYYfhVfWFD
+         C4aQ==
+X-Gm-Message-State: AOJu0Yz+Q5F5ZhSiS/JkdMFvUgK8ijuCe2pH+DLad7XPoG2AUG2u//vJ
+	bRAXnt0NeZnJxMvqC7wgKy63Bq0e49cy
+X-Google-Smtp-Source: AGHT+IHHd3XY/tYljT85Oxjih9NzpNfT77QBsfKWW4RATvGFe1ZtcitmTFGKkUUMeop/+L1MD/yV9g==
+X-Received: by 2002:ac8:58c8:0:b0:428:3aa0:7764 with SMTP id u8-20020ac858c8000000b004283aa07764mr1001432qta.64.1704389798901;
+        Thu, 04 Jan 2024 09:36:38 -0800 (PST)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id do14-20020a05622a478e00b00423e8909bfesm15401417qtb.6.2024.01.04.09.36.27
+        by smtp.gmail.com with ESMTPSA id do14-20020a05622a478e00b00423e8909bfesm15401417qtb.6.2024.01.04.09.36.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 09:36:28 -0800 (PST)
-Message-ID: <781ec983-68f1-4012-8970-bd875d6e5ca1@broadcom.com>
-Date: Thu, 4 Jan 2024 09:36:27 -0800
+        Thu, 04 Jan 2024 09:36:38 -0800 (PST)
+Message-ID: <60ac194f-611f-4cca-ae86-2eb1c1caeb5a@broadcom.com>
+Date: Thu, 4 Jan 2024 09:36:36 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,8 +63,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 02/10] net: dsa: lantiq_gswip: use devres for
- internal MDIO bus, not ds->user_mii_bus
+Subject: Re: [PATCH net-next 03/10] net: dsa: lantiq_gswip: ignore MDIO buses
+ disabled in OF
 To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -76,7 +76,7 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  Christian Marangi <ansuelsmth@gmail.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
  <arinc.unal@arinc9.com>
 References: <20240104140037.374166-1-vladimir.oltean@nxp.com>
- <20240104140037.374166-3-vladimir.oltean@nxp.com>
+ <20240104140037.374166-4-vladimir.oltean@nxp.com>
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
@@ -110,42 +110,22 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20240104140037.374166-3-vladimir.oltean@nxp.com>
+In-Reply-To: <20240104140037.374166-4-vladimir.oltean@nxp.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000fb52eb060e222b42"
+	boundary="00000000000089d3e2060e222c07"
 
---000000000000fb52eb060e222b42
+--00000000000089d3e2060e222c07
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 1/4/24 06:00, Vladimir Oltean wrote:
-> This driver does not need any of the functionalities that make
-> ds->user_mii_bus special. Those use cases are listed here:
-> https://lore.kernel.org/netdev/20231221174746.hylsmr3f7g5byrsi@skbuf/
+> If the "lantiq,xrx200-mdio" child has status = "disabled", the MDIO bus
+> creation should be avoided. Use of_device_is_available() to check for
+> that, and take advantage of 2 facts:
 > 
-> It just makes use of ds->user_mii_bus only as storage for its own MDIO
-> bus, which otherwise has no connection to the framework. This is because:
-> 
-> - the gswip driver only probes on OF: it fails if of_device_get_match_data()
->    returns NULL
-> 
-> - when the child OF node of the MDIO bus is absent, no MDIO bus is
->    registered at all, not even by the DSA framework. In order for that to
->    have happened, the gswip driver would have needed to provide
->    ->phy_read() and ->phy_write() in struct dsa_switch_ops, which it does
->    not.
-> 
-> We can break the connection between the gswip driver and the DSA
-> framework and still preserve the same functionality.
-> 
-> Since commit 3b73a7b8ec38 ("net: mdio_bus: add refcounting for fwnodes
-> to mdiobus"), MDIO buses take ownership of the OF node handled to them,
-> and release it on their own. The gswip driver no longer needs to do
-> this.
-> 
-> Combine that with devres, and we no longer need to keep track of
-> anything for teardown purposes.
+> - of_device_is_available(NULL) returns false
+> - of_node_put(NULL) is a no-op
 > 
 > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
@@ -154,7 +134,7 @@ Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Florian
 
 
---000000000000fb52eb060e222b42
+--00000000000089d3e2060e222c07
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -225,15 +205,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJeqtAeijrxQnOe2
-aRmVcRTSpQUK7l7RcDlK30G1FcTfMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDEwNDE3MzYyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIb99oDLOk6ZA4GH
+GITcIeGgnDbgkhE6cZe5tT2oucAsMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDEwNDE3MzYzOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDEwhZ9zimfjpy+hgxA+/MLosG5O94pdePp
-FIX9Ld348SKB8jkCL1U5t30rvfriEepxLWW/72+1akUqMIeQIET7DSp7wA4gYbzrOhI/SRb5e2OU
-6ZZ1T1UqG38pnqa7j2hb36G9UOs9rPrNn+ZyMp4eZBxgAwtQj2lwkRM4/y+rQs27ZpoV6mifGnYj
-eWm7d1Nht8PsNKUJCK31OOitpu/BO3hjr0mR9TSImUKrkW3pc9ZYqaCiVUptX8qIsaXlBS2zeque
-ckhy5niZ4l95BXgy143lxJDastwdazj4uaZIcxZBwdBQM3UgBNLQpp1KHNVhwLHfaK1P8Qci0kK2
-VOR8
---000000000000fb52eb060e222b42--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCvqjz3IR7VQFClNV45yVi2P/eX9viVxKde
+1JzFcQ6nJtaC7JBPrfNR2GZQEcVDGirDSj048JKXtQ4WpYpQSlvqWwuX9lSOd4sB4tfa838V+jiJ
+AGe+QsC0D738lj5EGPiVrbSeTZ5dPjASMMRUxW4ElNCELzZeO98U0ZZGwuxdGSnNeGAVaGbHsd+q
+A0AYt76B8cztlzSUJxO8qQ8qWJ2EjbA25b47iD/am9xh/JqqzTpwjIzt0qXOjMiGhtIobA7YLE6l
+UyWvobS2Wyc0e5rAdq60S9LvFauw7jUoviPMKS5ssSkuazH70gN+23+8UXvDZM9mlDAOUbaw4IS5
+Sp+v
+--00000000000089d3e2060e222c07--
 
