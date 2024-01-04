@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-61642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D67A6824761
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:25:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24557824764
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78C83B24FDE
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:25:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A122CB25064
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F009428DB1;
-	Thu,  4 Jan 2024 17:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4583C25572;
+	Thu,  4 Jan 2024 17:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hr0VYVyf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ONCkK2Va"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4312C841;
-	Thu,  4 Jan 2024 17:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87952557B
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-59618e40717so326771eaf.2;
-        Thu, 04 Jan 2024 09:21:23 -0800 (PST)
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-dbdb124491cso542618276.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:24:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704388882; x=1704993682; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704389072; x=1704993872; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=8BI5SjNwqkh3S32CM/if70yfM5kVQSoN9Wnx0VvzVtw=;
-        b=Hr0VYVyf2fPf2aqTYoZ6C2quoT6fxiirRIUmE0vAHxKtOLNwUgTtM1tHMQzC5HjCTU
-         kybomCPXD3BMy6TI3yphGm9ytXdub5wOxxbBNF1bgnYsCNkMDnrGzvsroM20KvUSBkC1
-         niOaOGSOckm8kRSdYd3FKSK9h5cQQxwe/2k2e2wpVRxsE/E5CcptQAzYnReVnNX1dodI
-         ofQhzHdxz2O8lp/Frw9uYTyweXrqi33y7C9N2zOuH4Bp6V5fjvshFF93aPwOeprZY3Ef
-         efNGCfw7SWRt4ysG4E4gN6s2+6U+U8cV/53lPEvzTpokgOE8RTg8ylxJpuigoUn0coYK
-         enzg==
+        bh=cZATCJuCne5vU4JjCyQYXye/YLLWUyPQA304QZqyKIw=;
+        b=ONCkK2VaTjy7eSOyZ1ePTovzhkWkLc1GbUAx7Zy2j2LWXBbVSViPLJ4xOpHdSnJgXC
+         tgEuZjwFVDm7m9arvx/gyqt/eL9kCxrYGOvaFL9thMB8i9b5HSeRLUv4AW/6dHrZ38gN
+         p5NY6aBLnf+fFg6QQ2lu/e2sGtvUSA1KOsnI1f5cj/pbdsDxfbcLMdDA9y38u/ELpw0Y
+         mtR2h01cBlmL4zY6Z0Jiws0QG0n6wOpiWGjpTa1lMPsoNCvQz1WWTsCZ/bxrW4PkmWzL
+         lUWm3CBiD3X0qYCUamHxrDomM22ilEtDGH1MDFQ/AdQCbS+e7L9KRgc3Uu+S3ObMK8z7
+         IBoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704388882; x=1704993682;
+        d=1e100.net; s=20230601; t=1704389072; x=1704993872;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8BI5SjNwqkh3S32CM/if70yfM5kVQSoN9Wnx0VvzVtw=;
-        b=FgqKvnLYbybggqPHf67+M7E7HfxI06bufxa3dHNOYyEfo7PPuL2D7sGzh7XPkbOTaV
-         EgedzAuL3xJOse2ccJo9Y9lybsNZy8yWgryyZaLXsXcy+whEZtmhOTz2q9JHvH3zR+T7
-         5H6fv6X3jVKlEM7rtpJcJeUe5o/IpJ+In68/wv12Jp0q6MWNmYqrrz9u4I2RHX8R0wN8
-         2tjlPt/SPnZVfRqD4D2u61qgvEyYaxWrip4aF5ZKOCLud/m/CW+uxDlqwg39OOhynwxx
-         brJdhyKtKErjfHgTt0GkW9NkIZMDfOyB4M+WptieXwavpCCBlUgQz8iM60hH2cZ6PHHv
-         zLHg==
-X-Gm-Message-State: AOJu0Yxu/PFCd67h+9fTYUGNIjtPc2dY/aWwejLBk+R1OoeWV4o2zWkp
-	/QCdNb5Kr0X0VCUNL4mc10U=
-X-Google-Smtp-Source: AGHT+IFC7D5oNUCjmCa04GpXW6a45MRfPmA1wmmEL/GJJooUGqySzfUydAg0L9gU5jYNDrP+f1O0SQ==
-X-Received: by 2002:a05:6358:3423:b0:175:64c5:bfde with SMTP id h35-20020a056358342300b0017564c5bfdemr789304rwd.6.1704388882546;
-        Thu, 04 Jan 2024 09:21:22 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id fw11-20020a05622a4a8b00b00419801b1094sm8663942qtb.13.2024.01.04.09.21.18
+        bh=cZATCJuCne5vU4JjCyQYXye/YLLWUyPQA304QZqyKIw=;
+        b=PaBkIeQGIVTvdAc+DochmM/Ls0hI3YHysCYBn5GOJczJKJNw4XfdpXV3HHNjVsS66t
+         wHEnxUtsrUP2eXCio/qzrIgleVfc+SVm0x0wCjk9TSUAaMeyDJ0izss5DWCKpQDypiie
+         U8Y0FLnI2lTWz31ZHOQoslEqmTFgUT1kdnh0hV/huco18nwkyQVM6rRhnqq4+zjTon8b
+         XKXIpVBV8boNyn8O0vF8R/mgsW7osXJCMD45jH3uBzO59VAH5d7hQc7IDcqHhQgfWWqx
+         lnEfZKfNPuxb7BRP6Iiw5SV1RnpvRCSjF9/YjySG58DxCT36Ha1EwqXMCPzTJfKbE8BV
+         JjfA==
+X-Gm-Message-State: AOJu0Yw3vOaD1pPLXrRfh+HeI3dX+qF9wTLUAxrc48QObShnl61dj8Hv
+	4HmtLrFGHYdNrVNsuKVnsD4=
+X-Google-Smtp-Source: AGHT+IH3zIaNR83TuwNIboNm3WwQc0qv8rVw/JgZVENSrnKCwGAA3eFN2Zal1hRtvdvF681BGqC7Tw==
+X-Received: by 2002:a25:fe0d:0:b0:dbe:30f2:48c1 with SMTP id k13-20020a25fe0d000000b00dbe30f248c1mr609506ybe.1.1704389071582;
+        Thu, 04 Jan 2024 09:24:31 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:bc3f:8a99:d840:9c38? ([2600:1700:6cf8:1240:bc3f:8a99:d840:9c38])
+        by smtp.gmail.com with ESMTPSA id e81-20020a25d354000000b00db41482d349sm11774577ybf.57.2024.01.04.09.24.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 09:21:21 -0800 (PST)
-Message-ID: <310f0f2e-860f-4bda-8f2b-de0ede7b8133@gmail.com>
-Date: Thu, 4 Jan 2024 09:21:17 -0800
+        Thu, 04 Jan 2024 09:24:31 -0800 (PST)
+Message-ID: <19913177-e83a-4900-8404-b7aa61421173@gmail.com>
+Date: Thu, 4 Jan 2024 09:24:29 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,33 +66,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for DSA tags
+Subject: Re: net/sched - kernel crashes when replacing a qdisc node.
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew@lunn.ch, olteanv@gmail.com, hauke@hauke-m.de, kurt@linutronix.de,
- woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
- arinc.unal@arinc9.com, daniel@makrotopia.org, Landen.Chao@mediatek.com,
- dqfext@gmail.com, sean.wang@mediatek.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, claudiu.manoil@nxp.com,
- alexandre.belloni@bootlin.com, clement.leger@bootlin.com,
- george.mccollister@gmail.com, linux-renesas-soc@vger.kernel.org
-References: <20240104143759.1318137-1-kuba@kernel.org>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240104143759.1318137-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, victor@mojatatu.com, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, pctammela@mojatatu.com,
+ "David S. Miller" <davem@davemloft.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Kernel Team <kernel-team@meta.com>
+References: <ce8d3e55-b8bc-409c-ace9-5cf1c4f7c88e@gmail.com>
+ <20240103180426.2db116ea@kernel.org>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <20240103180426.2db116ea@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/4/24 06:37, Jakub Kicinski wrote:
-> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to all the DSA tag modules.
-> 
-> The descriptions are copy/pasted Kconfig names, with s/^Tag/DSA tag/.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
 
+On 1/3/24 18:04, Jakub Kicinski wrote:
+> On Wed, 3 Jan 2024 17:41:54 -0800 Kui-Feng Lee wrote:
+>> The kernel crashes when running selftests/bpf/prog_tests/lwt_reroute.c.
+>> We got the error message at end of this post.
+>>
+>> It happens when lwt_reroute.c running the shell command
+>>
+>>     tc qdisc replace dev tun0 root fq limit 5 flow_limit 5
+>>
+>> The kernel crashes at the line
+>>
+>>     block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> 
+> This is the same as
+> https://lore.kernel.org/all/20231231172320.245375-1-victor@mojatatu.com/#r
+> right?
+
+Yes, it is! Thanks for the information.
 
