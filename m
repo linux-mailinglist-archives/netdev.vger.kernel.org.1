@@ -1,47 +1,65 @@
-Return-Path: <netdev+bounces-61551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6806C8243F1
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:37:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F23E18243F2
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:38:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB642B23080
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:37:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9381C21E6F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF0C23747;
-	Thu,  4 Jan 2024 14:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136AB22F1B;
+	Thu,  4 Jan 2024 14:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIKiVkeS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3QGbaXP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9690C23743
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 14:37:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C96FFC433C7;
-	Thu,  4 Jan 2024 14:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E857A21A05;
+	Thu,  4 Jan 2024 14:38:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83763C433C8;
+	Thu,  4 Jan 2024 14:38:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704379061;
-	bh=4RDIDIhNrd8HmTe3ASSfj9FrHQAx1BtEwWISUoUjekw=;
+	s=k20201202; t=1704379086;
+	bh=WlYpjvT30jRf/dwAdbDN9Ba4Mz05UIfVBguP0C38l0I=;
 	h=From:To:Cc:Subject:Date:From;
-	b=MIKiVkeSD3/knKPPLMvrwXfBJ+9qy0h0hh8JV5xdIGdQ65TJvZsb67x2f/XtIKy1n
-	 iUxJiEwW9BFdJhRgGEgHiuEhzDxA1nori8L5WTdo6Nbm0EWLWlrqDZG4I8U27VgJHv
-	 FajUopc5OlT/T3IykMWjYrxCHZFDtQwOmP48MIGpH3SILpRj5XKEhySfv42l3nwQg7
-	 hgXzF6AsXuMV+U6N78b6O39zYW4vzrosHcYUCqSq96Xvsq/InzO2sGy18IjyePeOq1
-	 Pg8lhN/iJjhlsxRv3xXj3CLUeInleQNoZEAoyy7yP8OvwpgO8fwqZ0bI3ZnJPHLlRt
-	 UVNFakmvmgiOA==
+	b=U3QGbaXPz23/FfqcCyYNpwWKtUOty4SeVg2N67/f6xtv5yc9BTPgF5zREsqI7+jgc
+	 Smri44QOgbTIi+b0nAhuHiBdRu3UnRMbR1VPu2bxBtmVOas9fN1qoFm1uicVM8oljN
+	 kBVnu7Peznpp5sT3F95HAdxHnZ9dFyptHEiCVCZx0LpySI6QxIk1hHB5e+LCuDtO6I
+	 mHzamUwf5gtEWwpkeopzxi6q+D5DQVMqh/uSyeHCI8Ub+I28y/nww6p1GlcKL3nkMx
+	 vb0Lf3eJZREryzhm0s01UgP8LGBeHS6QVaZ/8hycfwQUxmbqdbscF7EZTinInWWogP
+	 y76adzMnsgGRg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	3chas3@gmail.com
-Subject: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for ATM
-Date: Thu,  4 Jan 2024 06:37:37 -0800
-Message-ID: <20240104143737.1317945-1-kuba@kernel.org>
+	andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	hauke@hauke-m.de,
+	kurt@linutronix.de,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	arinc.unal@arinc9.com,
+	daniel@makrotopia.org,
+	Landen.Chao@mediatek.com,
+	dqfext@gmail.com,
+	sean.wang@mediatek.com,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	claudiu.manoil@nxp.com,
+	alexandre.belloni@bootlin.com,
+	clement.leger@bootlin.com,
+	george.mccollister@gmail.com,
+	linux-renesas-soc@vger.kernel.org
+Subject: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for DSA tags
+Date: Thu,  4 Jan 2024 06:37:59 -0800
+Message-ID: <20240104143759.1318137-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,110 +70,253 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-Add descriptions to all the ATM modules and drivers.
+Add descriptions to all the DSA tag modules.
+
+The descriptions are copy/pasted Kconfig names, with s/^Tag/DSA tag/.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: 3chas3@gmail.com
+CC: andrew@lunn.ch
+CC: f.fainelli@gmail.com
+CC: olteanv@gmail.com
+CC: hauke@hauke-m.de
+CC: kurt@linutronix.de
+CC: woojung.huh@microchip.com
+CC: UNGLinuxDriver@microchip.com
+CC: arinc.unal@arinc9.com
+CC: daniel@makrotopia.org
+CC: Landen.Chao@mediatek.com
+CC: dqfext@gmail.com
+CC: sean.wang@mediatek.com
+CC: matthias.bgg@gmail.com
+CC: angelogioacchino.delregno@collabora.com
+CC: claudiu.manoil@nxp.com
+CC: alexandre.belloni@bootlin.com
+CC: clement.leger@bootlin.com
+CC: george.mccollister@gmail.com
+CC: linux-renesas-soc@vger.kernel.org
 ---
- drivers/atm/atmtcp.c   | 1 +
- drivers/atm/eni.c      | 1 +
- drivers/atm/idt77105.c | 1 +
- drivers/atm/iphase.c   | 1 +
- drivers/atm/nicstar.c  | 1 +
- drivers/atm/suni.c     | 1 +
- net/atm/common.c       | 1 +
- net/atm/lec.c          | 1 +
- 8 files changed, 8 insertions(+)
+ net/dsa/tag_ar9331.c       | 1 +
+ net/dsa/tag_brcm.c         | 1 +
+ net/dsa/tag_dsa.c          | 1 +
+ net/dsa/tag_gswip.c        | 1 +
+ net/dsa/tag_hellcreek.c    | 1 +
+ net/dsa/tag_ksz.c          | 1 +
+ net/dsa/tag_lan9303.c      | 1 +
+ net/dsa/tag_mtk.c          | 1 +
+ net/dsa/tag_none.c         | 1 +
+ net/dsa/tag_ocelot.c       | 1 +
+ net/dsa/tag_ocelot_8021q.c | 1 +
+ net/dsa/tag_qca.c          | 1 +
+ net/dsa/tag_rtl4_a.c       | 1 +
+ net/dsa/tag_rtl8_4.c       | 1 +
+ net/dsa/tag_rzn1_a5psw.c   | 1 +
+ net/dsa/tag_sja1105.c      | 1 +
+ net/dsa/tag_trailer.c      | 1 +
+ net/dsa/tag_xrs700x.c      | 1 +
+ 18 files changed, 18 insertions(+)
 
-diff --git a/drivers/atm/atmtcp.c b/drivers/atm/atmtcp.c
-index 96bea1ab1ecc..d4aa0f353b6c 100644
---- a/drivers/atm/atmtcp.c
-+++ b/drivers/atm/atmtcp.c
-@@ -494,6 +494,7 @@ static void __exit atmtcp_exit(void)
- 	deregister_atm_ioctl(&atmtcp_ioctl_ops);
- }
+diff --git a/net/dsa/tag_ar9331.c b/net/dsa/tag_ar9331.c
+index 92ce67b93a58..cbb588ca73aa 100644
+--- a/net/dsa/tag_ar9331.c
++++ b/net/dsa/tag_ar9331.c
+@@ -89,6 +89,7 @@ static const struct dsa_device_ops ar9331_netdev_ops = {
+ 	.needed_headroom = AR9331_HDR_LEN,
+ };
  
-+MODULE_DESCRIPTION("ATM over TCP");
++MODULE_DESCRIPTION("DSA tag driver for Atheros AR9331 SoC with built-in switch");
+ MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_AR9331, AR9331_NAME);
+ module_dsa_tag_driver(ar9331_netdev_ops);
+diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
+index 83d283a5d27e..8c3c068728e5 100644
+--- a/net/dsa/tag_brcm.c
++++ b/net/dsa/tag_brcm.c
+@@ -335,4 +335,5 @@ static struct dsa_tag_driver *dsa_tag_driver_array[] =	{
+ 
+ module_dsa_tag_drivers(dsa_tag_driver_array);
+ 
++MODULE_DESCRIPTION("DSA tag driver for Broadcom switches using in-frame headers");
  MODULE_LICENSE("GPL");
- module_init(atmtcp_init);
- module_exit(atmtcp_exit);
-diff --git a/drivers/atm/eni.c b/drivers/atm/eni.c
-index a31ffe16e626..3011cf1a84a9 100644
---- a/drivers/atm/eni.c
-+++ b/drivers/atm/eni.c
-@@ -2318,4 +2318,5 @@ static int __init eni_init(void)
- module_init(eni_init);
- /* @@@ since exit routine not defined, this module can not be unloaded */
+diff --git a/net/dsa/tag_dsa.c b/net/dsa/tag_dsa.c
+index 8ed52dd663ab..2a2c4fb61a65 100644
+--- a/net/dsa/tag_dsa.c
++++ b/net/dsa/tag_dsa.c
+@@ -406,4 +406,5 @@ static struct dsa_tag_driver *dsa_tag_drivers[] = {
  
-+MODULE_DESCRIPTION("Efficient Networks ENI155P ATM NIC driver");
+ module_dsa_tag_drivers(dsa_tag_drivers);
+ 
++MODULE_DESCRIPTION("DSA tag driver for Marvell switches using DSA headers");
  MODULE_LICENSE("GPL");
-diff --git a/drivers/atm/idt77105.c b/drivers/atm/idt77105.c
-index bfca7b8a6f31..fcd70e094a2e 100644
---- a/drivers/atm/idt77105.c
-+++ b/drivers/atm/idt77105.c
-@@ -372,4 +372,5 @@ static void __exit idt77105_exit(void)
+diff --git a/net/dsa/tag_gswip.c b/net/dsa/tag_gswip.c
+index 3539141b5350..51a1f46a567f 100644
+--- a/net/dsa/tag_gswip.c
++++ b/net/dsa/tag_gswip.c
+@@ -107,6 +107,7 @@ static const struct dsa_device_ops gswip_netdev_ops = {
+ 	.needed_headroom = GSWIP_RX_HEADER_LEN,
+ };
  
- module_exit(idt77105_exit);
- 
-+MODULE_DESCRIPTION("IDT77105 PHY driver");
++MODULE_DESCRIPTION("DSA tag driver for Lantiq / Intel GSWIP switches");
  MODULE_LICENSE("GPL");
-diff --git a/drivers/atm/iphase.c b/drivers/atm/iphase.c
-index 9bba8f280a4d..d213adcefe33 100644
---- a/drivers/atm/iphase.c
-+++ b/drivers/atm/iphase.c
-@@ -90,6 +90,7 @@ module_param(IA_RX_BUF, int, 0);
- module_param(IA_RX_BUF_SZ, int, 0);
- module_param(IADebugFlag, uint, 0644);
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_GSWIP, GSWIP_NAME);
  
-+MODULE_DESCRIPTION("Driver for Interphase ATM PCI NICs");
+diff --git a/net/dsa/tag_hellcreek.c b/net/dsa/tag_hellcreek.c
+index 6e233cd0aa38..663b25785d95 100644
+--- a/net/dsa/tag_hellcreek.c
++++ b/net/dsa/tag_hellcreek.c
+@@ -67,6 +67,7 @@ static const struct dsa_device_ops hellcreek_netdev_ops = {
+ 	.needed_tailroom = HELLCREEK_TAG_LEN,
+ };
+ 
++MODULE_DESCRIPTION("DSA tag driver for Hirschmann Hellcreek TSN switches");
+ MODULE_LICENSE("Dual MIT/GPL");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_HELLCREEK, HELLCREEK_NAME);
+ 
+diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
+index 9be341fa88f0..ee7b272ab715 100644
+--- a/net/dsa/tag_ksz.c
++++ b/net/dsa/tag_ksz.c
+@@ -459,4 +459,5 @@ static struct dsa_tag_driver *dsa_tag_driver_array[] = {
+ 
+ module_dsa_tag_drivers(dsa_tag_driver_array);
+ 
++MODULE_DESCRIPTION("DSA tag driver for Microchip 8795/937x/9477/9893 families of switches");
  MODULE_LICENSE("GPL");
+diff --git a/net/dsa/tag_lan9303.c b/net/dsa/tag_lan9303.c
+index 1ed8ee24855d..258e5d7dc5ef 100644
+--- a/net/dsa/tag_lan9303.c
++++ b/net/dsa/tag_lan9303.c
+@@ -119,6 +119,7 @@ static const struct dsa_device_ops lan9303_netdev_ops = {
+ 	.needed_headroom = LAN9303_TAG_LEN,
+ };
  
- /**************************** IA_LIB **********************************/
-diff --git a/drivers/atm/nicstar.c b/drivers/atm/nicstar.c
-index 1a50de39f5b5..27153d6bc781 100644
---- a/drivers/atm/nicstar.c
-+++ b/drivers/atm/nicstar.c
-@@ -171,6 +171,7 @@ static const struct atmdev_ops atm_ops = {
- static struct timer_list ns_timer;
- static char *mac[NS_MAX_CARDS];
- module_param_array(mac, charp, NULL, 0);
-+MODULE_DESCRIPTION("ATM NIC driver for IDT 77201/77211 \"NICStAR\" and Fore ForeRunnerLE.");
++MODULE_DESCRIPTION("DSA tag driver for SMSC/Microchip LAN9303 family of switches");
  MODULE_LICENSE("GPL");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_LAN9303, LAN9303_NAME);
  
- /* Functions */
-diff --git a/drivers/atm/suni.c b/drivers/atm/suni.c
-index 21e5acc766b8..32802ea9521c 100644
---- a/drivers/atm/suni.c
-+++ b/drivers/atm/suni.c
-@@ -387,4 +387,5 @@ int suni_init(struct atm_dev *dev)
+diff --git a/net/dsa/tag_mtk.c b/net/dsa/tag_mtk.c
+index 2483785f6ab1..b670e3c53e91 100644
+--- a/net/dsa/tag_mtk.c
++++ b/net/dsa/tag_mtk.c
+@@ -102,6 +102,7 @@ static const struct dsa_device_ops mtk_netdev_ops = {
+ 	.needed_headroom = MTK_HDR_LEN,
+ };
  
- EXPORT_SYMBOL(suni_init);
- 
-+MODULE_DESCRIPTION("S/UNI PHY driver");
++MODULE_DESCRIPTION("DSA tag driver for Mediatek switches");
  MODULE_LICENSE("GPL");
-diff --git a/net/atm/common.c b/net/atm/common.c
-index f7019df41c3e..2a1ec014e901 100644
---- a/net/atm/common.c
-+++ b/net/atm/common.c
-@@ -890,6 +890,7 @@ subsys_initcall(atm_init);
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_MTK, MTK_NAME);
  
- module_exit(atm_exit);
+diff --git a/net/dsa/tag_none.c b/net/dsa/tag_none.c
+index 9a473624db50..e9c9670a9c44 100644
+--- a/net/dsa/tag_none.c
++++ b/net/dsa/tag_none.c
+@@ -27,4 +27,5 @@ static const struct dsa_device_ops none_ops = {
  
-+MODULE_DESCRIPTION("Asynchronous Transfer Mode (ATM) networking core");
+ module_dsa_tag_driver(none_ops);
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_NONE, NONE_NAME);
++MODULE_DESCRIPTION("DSA no-op tag driver");
  MODULE_LICENSE("GPL");
- MODULE_ALIAS_NETPROTO(PF_ATMPVC);
- MODULE_ALIAS_NETPROTO(PF_ATMSVC);
-diff --git a/net/atm/lec.c b/net/atm/lec.c
-index 6257bf12e5a0..ffef658862db 100644
---- a/net/atm/lec.c
-+++ b/net/atm/lec.c
-@@ -2234,4 +2234,5 @@ lec_arp_check_empties(struct lec_priv *priv,
- 	spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
- }
+diff --git a/net/dsa/tag_ocelot.c b/net/dsa/tag_ocelot.c
+index ef2f8fffb2c7..e0e4300bfbd3 100644
+--- a/net/dsa/tag_ocelot.c
++++ b/net/dsa/tag_ocelot.c
+@@ -217,4 +217,5 @@ static struct dsa_tag_driver *ocelot_tag_driver_array[] = {
  
-+MODULE_DESCRIPTION("ATM LAN Emulation (LANE) support");
+ module_dsa_tag_drivers(ocelot_tag_driver_array);
+ 
++MODULE_DESCRIPTION("DSA tag driver for Ocelot family of switches, using NPI port");
+ MODULE_LICENSE("GPL v2");
+diff --git a/net/dsa/tag_ocelot_8021q.c b/net/dsa/tag_ocelot_8021q.c
+index 210039320888..b059381310fe 100644
+--- a/net/dsa/tag_ocelot_8021q.c
++++ b/net/dsa/tag_ocelot_8021q.c
+@@ -133,6 +133,7 @@ static const struct dsa_device_ops ocelot_8021q_netdev_ops = {
+ 	.promisc_on_conduit	= true,
+ };
+ 
++MODULE_DESCRIPTION("DSA tag driver for Ocelot family of switches, using VLAN");
+ MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_OCELOT_8021Q, OCELOT_8021Q_NAME);
+ 
+diff --git a/net/dsa/tag_qca.c b/net/dsa/tag_qca.c
+index 6514aa7993ce..0cf61286b426 100644
+--- a/net/dsa/tag_qca.c
++++ b/net/dsa/tag_qca.c
+@@ -119,6 +119,7 @@ static const struct dsa_device_ops qca_netdev_ops = {
+ 	.promisc_on_conduit = true,
+ };
+ 
++MODULE_DESCRIPTION("DSA tag driver for Qualcomm Atheros QCA8K switches");
  MODULE_LICENSE("GPL");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_QCA, QCA_NAME);
+ 
+diff --git a/net/dsa/tag_rtl4_a.c b/net/dsa/tag_rtl4_a.c
+index a019226ec6d2..feaefa0e179b 100644
+--- a/net/dsa/tag_rtl4_a.c
++++ b/net/dsa/tag_rtl4_a.c
+@@ -121,5 +121,6 @@ static const struct dsa_device_ops rtl4a_netdev_ops = {
+ };
+ module_dsa_tag_driver(rtl4a_netdev_ops);
+ 
++MODULE_DESCRIPTION("DSA tag driver for Realtek 4 byte protocol A tags");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_RTL4_A, RTL4_A_NAME);
+diff --git a/net/dsa/tag_rtl8_4.c b/net/dsa/tag_rtl8_4.c
+index 07e857debabf..15c2bae2b429 100644
+--- a/net/dsa/tag_rtl8_4.c
++++ b/net/dsa/tag_rtl8_4.c
+@@ -258,4 +258,5 @@ static struct dsa_tag_driver *dsa_tag_drivers[] = {
+ };
+ module_dsa_tag_drivers(dsa_tag_drivers);
+ 
++MODULE_DESCRIPTION("DSA tag driver for Realtek 8 byte protocol 4 tags");
+ MODULE_LICENSE("GPL");
+diff --git a/net/dsa/tag_rzn1_a5psw.c b/net/dsa/tag_rzn1_a5psw.c
+index 2ce866b45615..69d51221b1e5 100644
+--- a/net/dsa/tag_rzn1_a5psw.c
++++ b/net/dsa/tag_rzn1_a5psw.c
+@@ -110,6 +110,7 @@ static const struct dsa_device_ops a5psw_netdev_ops = {
+ 	.needed_headroom = A5PSW_TAG_LEN,
+ };
+ 
++MODULE_DESCRIPTION("DSA tag driver for Renesas RZ/N1 A5PSW switch");
+ MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_A5PSW, A5PSW_NAME);
+ module_dsa_tag_driver(a5psw_netdev_ops);
+diff --git a/net/dsa/tag_sja1105.c b/net/dsa/tag_sja1105.c
+index 1fffe8c2b589..2717e9d7b612 100644
+--- a/net/dsa/tag_sja1105.c
++++ b/net/dsa/tag_sja1105.c
+@@ -806,4 +806,5 @@ static struct dsa_tag_driver *sja1105_tag_driver_array[] = {
+ 
+ module_dsa_tag_drivers(sja1105_tag_driver_array);
+ 
++MODULE_DESCRIPTION("DSA tag driver for NXP SJA1105 switches");
+ MODULE_LICENSE("GPL v2");
+diff --git a/net/dsa/tag_trailer.c b/net/dsa/tag_trailer.c
+index 1ebb25a8b140..22742a53d6f4 100644
+--- a/net/dsa/tag_trailer.c
++++ b/net/dsa/tag_trailer.c
+@@ -59,6 +59,7 @@ static const struct dsa_device_ops trailer_netdev_ops = {
+ 	.needed_tailroom = 4,
+ };
+ 
++MODULE_DESCRIPTION("DSA tag driver for switches using a trailer tag");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_TRAILER, TRAILER_NAME);
+ 
+diff --git a/net/dsa/tag_xrs700x.c b/net/dsa/tag_xrs700x.c
+index c9c163598ef2..68d4633ddd5e 100644
+--- a/net/dsa/tag_xrs700x.c
++++ b/net/dsa/tag_xrs700x.c
+@@ -60,6 +60,7 @@ static const struct dsa_device_ops xrs700x_netdev_ops = {
+ 	.needed_tailroom = 1,
+ };
+ 
++MODULE_DESCRIPTION("DSA tag driver for XRS700x switches");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_XRS700X, XRS700X_NAME);
+ 
 -- 
 2.43.0
 
