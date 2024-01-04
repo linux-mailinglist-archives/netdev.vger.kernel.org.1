@@ -1,152 +1,106 @@
-Return-Path: <netdev+bounces-61664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65F5E8248DD
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 20:16:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8DE78248EE
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 20:23:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E49331F25846
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 19:16:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B69DF1C22445
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 19:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBB32C197;
-	Thu,  4 Jan 2024 19:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30DC2C19E;
+	Thu,  4 Jan 2024 19:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GfYUazh+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WDfn5vH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC2D2C18C;
-	Thu,  4 Jan 2024 19:16:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAF7AC433C7;
-	Thu,  4 Jan 2024 19:16:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704395807;
-	bh=9IYhiNNFGexpUZr6GXQKp38uLjqBlUuJ5KSb1AaVyDc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GfYUazh+5zgvF8w0BFNCESTr7TercBq61Bw7MIK1/0/8TFsMqp8ZW01IwFI7JcSSU
-	 fQQzsWi6ZMw5g/SzaZkI0W+OkLYAf8+SxCm2JQFMDcFGPZerKzCp1tpoJO9ajCHJm/
-	 +aeSLCW5oS5/aYCRjpvyqEW/O4SvJA18SBP248uz3o8jyTAXKgfZEEe4hXUetmiTAo
-	 BD92ABC04wS0w7HFAyzvsS0p7DQK3NdHu98sirisk9YbASvy2WIs1YQ+s1LpWKeKd9
-	 F/RA+T7UIULgDIg98DP+eeRe/YRCcm7iCg9oOe7s+/DKswCaenBCRClGCa7hNd8Bxg
-	 rmnob6mFT6NHA==
-Date: Thu, 4 Jan 2024 19:16:43 +0000
-From: Simon Horman <horms@kernel.org>
-To: Brett Creeley <brett.creeley@amd.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, shannon.nelson@amd.com
-Subject: Re: [PATCH net-next 4/8] pds_core: Prevent race issues involving the
- adminq
-Message-ID: <20240104191643.GL31813@kernel.org>
-References: <20240104171221.31399-1-brett.creeley@amd.com>
- <20240104171221.31399-5-brett.creeley@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464EF2C681;
+	Thu,  4 Jan 2024 19:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e766937ddso992942e87.3;
+        Thu, 04 Jan 2024 11:23:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704396222; x=1705001022; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PngtyanlhICbee0KDi7iQcNT635NIWO7h/ak7+PfeDI=;
+        b=WDfn5vH0dCPxT+yHZPZRDI8TeRvTVuB8Q8agL3+kLUfzwyaj+4KJYgQPbVbQa0PPTT
+         du0i4R9Pe4sIVEte5zDHJxPoxakjAy5WZ5cVk8MAKgg9SlFIANu+DIwSuOoQNm84wSQ+
+         t9CXQbVDrbCLqX7OZm0Zzb79uAunUwVCk1qtLCxGgYnQhvrBHqkVyRLiBgNQcSGfc82F
+         MsfL91I0rOYGJT33v7zOF7BIGk4u+VanQLt3Y/SDY80QypE9p9pZT2oUoeYzWCWe9WKH
+         gMLzDlrkVnvxgn5LORQGS41Wesln08/NgCD4XFnWptacThrSuQwi+a5knoVPG38wmkV7
+         GTPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704396222; x=1705001022;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PngtyanlhICbee0KDi7iQcNT635NIWO7h/ak7+PfeDI=;
+        b=UvpLNdN+fE1/lmQRxMm7fyZv2YZFPJ+Vby8JMhMmM6ShEnTTngX6HwmUZyJXquyJk3
+         1K1Uh5Fc5rmmH1zzeInbwjF1jLpefo9pb7bwd4GEwGnZWPPGLuP6dYJjqfBzhEuykgpH
+         ehLYpAuN2fssiURVwP7uEx9kCTgK+Zz7ykhgL/iP//FCF6I4Ovhvl6PsHbBatOk+Szl7
+         GmmeC4OTo5AgmOCLCoq/bnuexklhg/CzBmdCLpNKXWd38Z2u7AVxUdXv1zRKO9OHgWAN
+         VnyIwD1nXzr0fbEJ/H156kS524LkO36Pfv6pMQfLePgXgzUM3zgAGaB/sfbFDQYlFT2l
+         OWKQ==
+X-Gm-Message-State: AOJu0Yz3B8BOjTZAIIYB0NRuU7ACCN0AFakv9HDL7PaqJRRBEOt+32X1
+	8lEIXapsYN/kh9ph0dKFdVtjgqbdjP3rjrtaEOo=
+X-Google-Smtp-Source: AGHT+IG9T0FiiGPu67lzYqzONX+bAfLTPv2+2J1Ro6tvLQzWP52DQMpQdQrscwBC6Mh60CduZkVGLdcqkX7/FVHUKQo=
+X-Received: by 2002:a05:6512:14b:b0:50e:71d4:a37f with SMTP id
+ m11-20020a056512014b00b0050e71d4a37fmr556963lfo.55.1704396221935; Thu, 04 Jan
+ 2024 11:23:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104171221.31399-5-brett.creeley@amd.com>
+References: <20240103222034.2582628-1-andrii@kernel.org> <20240103222034.2582628-14-andrii@kernel.org>
+ <CAHk-=whDxm+nqu0=7TNJ9XJq=hNuO5QsV7+=PTYt+Ykvz51yQg@mail.gmail.com>
+In-Reply-To: <CAHk-=whDxm+nqu0=7TNJ9XJq=hNuO5QsV7+=PTYt+Ykvz51yQg@mail.gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Thu, 4 Jan 2024 11:23:30 -0800
+Message-ID: <CAEf4BzY6gx+kYmKju+EOtz2MgDa_Ryv+_DSmhtJQRoYvp=DtfA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 13/29] libbpf: add BPF token support to
+ bpf_map_create() API
+To: Linus Torvalds <torvalds@linuxfoundation.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	paul@paul-moore.com, brauner@kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 04, 2024 at 09:12:17AM -0800, Brett Creeley wrote:
-> There are multiple paths that can result in using the pdsc's
-> adminq.
-> 
-> [1] pdsc_adminq_isr and the resulting work from queue_work(),
->     i.e. pdsc_work_thread()->pdsc_process_adminq()
-> 
-> [2] pdsc_adminq_post()
-> 
-> When the device goes through reset via PCIe reset and/or
-> a fw_down/fw_up cycle due to bad PCIe state or bad device
-> state the adminq is destroyed and recreated.
-> 
-> A NULL pointer dereference can happen if [1] or [2] happens
-> after the adminq is already destroyed.
-> 
-> In order to fix this, add some further state checks and
-> implement reference counting for adminq uses. Reference
-> counting was used because multiple threads can attempt to
-> access the adminq at the same time via [1] or [2]. Additionally,
-> multiple clients (i.e. pds-vfio-pci) can be using [2]
-> at the same time.
-> 
-> The adminq_refcnt is initialized to 1 when the adminq has been
-> allocated and is ready to use. Users/clients of the adminq
-> (i.e. [1] and [2]) will increment the refcnt when they are using
-> the adminq. When the driver goes into a fw_down cycle it will
-> set the PDSC_S_FW_DEAD bit and then wait for the adminq_refcnt
-> to hit 1. Setting the PDSC_S_FW_DEAD before waiting will prevent
-> any further adminq_refcnt increments. Waiting for the
-> adminq_refcnt to hit 1 allows for any current users of the adminq
-> to finish before the driver frees the adminq. Once the
-> adminq_refcnt hits 1 the driver clears the refcnt to signify that
-> the adminq is deleted and cannot be used. On the fw_up cycle the
-> driver will once again initialize the adminq_refcnt to 1 allowing
-> the adminq to be used again.
-> 
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+On Thu, Jan 4, 2024 at 11:04=E2=80=AFAM Linus Torvalds
+<torvalds@linuxfoundation.org> wrote:
+>
+> On Wed, 3 Jan 2024 at 14:24, Andrii Nakryiko <andrii@kernel.org> wrote:
+> >
+> > Add ability to provide token_fd for BPF_MAP_CREATE command through
+> > bpf_map_create() API.
+>
+> I'll try to look through the series later, but this email was marked
+> as spam for me.
 
-...
+Great, thanks for taking a look!
 
-> diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-> index 0356e56a6e99..3b3e1541dd1c 100644
-> --- a/drivers/net/ethernet/amd/pds_core/core.c
-> +++ b/drivers/net/ethernet/amd/pds_core/core.c
-> @@ -450,6 +450,7 @@ int pdsc_setup(struct pdsc *pdsc, bool init)
->  		pdsc_debugfs_add_viftype(pdsc);
->  	}
->  
-> +	refcount_set(&pdsc->adminq_refcnt, 1);
->  	clear_bit(PDSC_S_FW_DEAD, &pdsc->state);
->  	return 0;
->  
-> @@ -514,6 +515,24 @@ void pdsc_stop(struct pdsc *pdsc)
->  					   PDS_CORE_INTR_MASK_SET);
->  }
->  
-> +void pdsc_adminq_wait_and_dec_once_unused(struct pdsc *pdsc)
+>
+> And it seems to be due to all your emails failing DMARC, even though
+> the others came through:
+>
+>        dmarc=3Dfail (p=3DNONE sp=3DNONE dis=3DNONE) header.from=3Dkernel.=
+org
+>
+> there's no DKIM signature at all, looks like you never went through
+> the kernel.org smtp servers.
 
-Hi Brett,
+Yep, thanks for flagging, I guess I'll need to go read Konstantin's
+instructions and adjust my git send-email workflow.
 
-a minor nit from my side: pdsc_adminq_wait_and_dec_once_unused is only used
-in this file so perhaps it should be static?
-
-> +{
-> +	/* The driver initializes the adminq_refcnt to 1 when the adminq is
-> +	 * allocated and ready for use. Other users/requesters will increment
-> +	 * the refcnt while in use. If the refcnt is down to 1 then the adminq
-> +	 * is not in use and the refcnt can be cleared and adminq freed. Before
-> +	 * calling this function the driver will set PDSC_S_FW_DEAD, which
-> +	 * prevent subsequent attempts to use the adminq and increment the
-> +	 * refcnt to fail. This guarantees that this function will eventually
-> +	 * exit.
-> +	 */
-> +	while (!refcount_dec_if_one(&pdsc->adminq_refcnt)) {
-> +		dev_dbg_ratelimited(pdsc->dev, "%s: adminq in use\n",
-> +				    __func__);
-> +		cpu_relax();
-> +	}
-> +}
-> +
->  void pdsc_fw_down(struct pdsc *pdsc)
->  {
->  	union pds_core_notifyq_comp reset_event = {
-> @@ -529,6 +548,8 @@ void pdsc_fw_down(struct pdsc *pdsc)
->  	if (pdsc->pdev->is_virtfn)
->  		return;
->  
-> +	pdsc_adminq_wait_and_dec_once_unused(pdsc);
-> +
->  	/* Notify clients of fw_down */
->  	if (pdsc->fw_reporter)
->  		devlink_health_report(pdsc->fw_reporter, "FW down reported", pdsc);
-
-...
+>
+>              Linus
 
