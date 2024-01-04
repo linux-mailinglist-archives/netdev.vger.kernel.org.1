@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-61650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81457824789
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:35:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1FD982478B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19692281311
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:35:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B81F11C20E70
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BF02557F;
-	Thu,  4 Jan 2024 17:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4AAC25549;
+	Thu,  4 Jan 2024 17:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KhWRYYL9"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gxNdNX6/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CD8286B4
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5F028688
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-427fcbcd6fbso3806901cf.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:35:11 -0800 (PST)
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6dc025dd9a9so450593a34.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:36:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1704389711; x=1704994511; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1704389789; x=1704994589; darn=vger.kernel.org;
         h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8QrzwCPp0rFXfRmbV6i6z9BfU39l1K8dVLG92GUXJ2E=;
-        b=KhWRYYL98N/spD5IAObpYFqMvAXKm+ZFd8ZacQA+/B73KHPf2t9ydXbK688oXTlNf3
-         oRrOs4+jBVHslGtRBIs7bX9WTOErrYNVkEQ1z62TsiY8BGwNYD9u9N4yExmf7a4O+vMw
-         3f6qBBipL7EgIHkNUtrUsUbIcrezE80JwVhEg=
+        bh=gkbYxyoYCyeHq7xGfAKK9rquTBg/PU9fKkf/oCm84/Q=;
+        b=gxNdNX6/bVdOiKVQLa8Uq/z5XRDWozZQhYqu9xCVN7A+seVvIxUUqzpPI6MgeTtBx1
+         /byNXSFwcemyPPo/vmKrcyxFcWxiCWu3TjBOu+fkSxROIzW0yPpKm2Rsq1gup6gIynT/
+         7E89nebzm1LJo1hTKwXwKmcJ4GVEF6pozUfo4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704389711; x=1704994511;
+        d=1e100.net; s=20230601; t=1704389789; x=1704994589;
         h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=8QrzwCPp0rFXfRmbV6i6z9BfU39l1K8dVLG92GUXJ2E=;
-        b=iRwURdAdRpFLqpDKgvhObDfgiVJt0AoFOWtLzuUFvSJIj2a5/BryCUGuagBgx1HrdP
-         YnDddmSpw9pRihEcsHcFwP5lbAZJxvfuGfztYv9p/0mfRACdyKl3/0ZkOmpn0t65IhxJ
-         gU05YgaBe3Nc4luBRuJsO/mmoBx+xHQDwRUCxjPDIxUCROH203/9v1Qng+Z0hlZDAA9Z
-         D53uHYRl4goImo5/uFDtUlqtsCWw/CozN7BPZKmM3LrFI4AG7qe1XFwdeQoQwYp7HuTN
-         /8+Z3NBoWpKYgWxuLKDSZEhR2jk3pHbY7Nu1wc8cDmdjqn0YErDg5Oo63SMLZ05VZx9A
-         HpTQ==
-X-Gm-Message-State: AOJu0YxwyJl39D6YHlm5XrJpRmJ557J/LOc0LYUf3OUwmaI9+hIuZrmA
-	Fo+VL5KSN867Ob6S+PgD+uepm5TzQPRW
-X-Google-Smtp-Source: AGHT+IG3u9YZDFBas9S1C9aoY7w+U/aLngp1NUD4KyLKvK1OzvXw2TmB9ZlAAt/Gw/uhHqrTiUfhTA==
-X-Received: by 2002:a05:622a:1819:b0:428:32ab:1e19 with SMTP id t25-20020a05622a181900b0042832ab1e19mr874478qtc.84.1704389710834;
-        Thu, 04 Jan 2024 09:35:10 -0800 (PST)
+        bh=gkbYxyoYCyeHq7xGfAKK9rquTBg/PU9fKkf/oCm84/Q=;
+        b=RfzY9QPaliV+BpEipG7zavVU3JVUyJU7t3tvXP4fgsAKy4ASgPFMzbIeaQe59O2U4U
+         fqHL0fK/qutWA6mCNVR7JtT+lAvKE+5QQ3TLngy+UBMZRPt0O3JCNAPL9yRaKvdUSW39
+         pNRGcw/UNP0NIw+iWpmMVc1eSytrH+36dBqbfrCpn+47BUzxiePlyeV0qxl9AZCLfI5U
+         2TlW1zyGkk4QZvvt+WFgfB880D3k8VF8qcTw1Ckrr3N9InHFniKJyTuZ3WhC1o2IVBnr
+         uYYwcfvSdks6ixD95rBF1BdlpyC0S3fGwnxGfkt13DJNU2RZZzvfymjfScFyAVX/amjp
+         BO3Q==
+X-Gm-Message-State: AOJu0Yy5h2xkGditePUPG/ppCr2lv8IfrEXNQMKDBpB9svvau8XVHchI
+	yu1Uh3TWVnYmMy/AT8Q511TkLZOqV6f3
+X-Google-Smtp-Source: AGHT+IEasDoP5xps0suEHoZk1dFJZz90WV5MYipXR50V69H5XEgLwoyeOUSM3qtOjii9drDVMS24nQ==
+X-Received: by 2002:a05:6830:3b88:b0:6dc:2da9:9177 with SMTP id dm8-20020a0568303b8800b006dc2da99177mr1002602otb.28.1704389789424;
+        Thu, 04 Jan 2024 09:36:29 -0800 (PST)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id do14-20020a05622a478e00b00423e8909bfesm15401417qtb.6.2024.01.04.09.35.08
+        by smtp.gmail.com with ESMTPSA id do14-20020a05622a478e00b00423e8909bfesm15401417qtb.6.2024.01.04.09.36.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 09:35:10 -0800 (PST)
-Message-ID: <e9e3e027-5465-4fe2-938e-38062a6a8bc1@broadcom.com>
-Date: Thu, 4 Jan 2024 09:35:08 -0800
+        Thu, 04 Jan 2024 09:36:28 -0800 (PST)
+Message-ID: <781ec983-68f1-4012-8970-bd875d6e5ca1@broadcom.com>
+Date: Thu, 4 Jan 2024 09:36:27 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,8 +63,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 06/10] net: dsa: qca8k: assign ds->user_mii_bus
- only for the non-OF case
+Subject: Re: [PATCH net-next 02/10] net: dsa: lantiq_gswip: use devres for
+ internal MDIO bus, not ds->user_mii_bus
 To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -76,7 +76,7 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  Christian Marangi <ansuelsmth@gmail.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
  <arinc.unal@arinc9.com>
 References: <20240104140037.374166-1-vladimir.oltean@nxp.com>
- <20240104140037.374166-7-vladimir.oltean@nxp.com>
+ <20240104140037.374166-3-vladimir.oltean@nxp.com>
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
@@ -110,37 +110,42 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20240104140037.374166-7-vladimir.oltean@nxp.com>
+In-Reply-To: <20240104140037.374166-3-vladimir.oltean@nxp.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000004a5e32060e2227d7"
+	boundary="000000000000fb52eb060e222b42"
 
---0000000000004a5e32060e2227d7
+--000000000000fb52eb060e222b42
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 1/4/24 06:00, Vladimir Oltean wrote:
-> To simplify reasoning about why the DSA framework provides the
-> ds->user_mii_bus functionality, drivers should only use it if they
-> need to. The qca8k driver appears to also use it simply as storage
-> for a pointer, which is not a good enough reason to make the core
-> much more difficult to follow.
+> This driver does not need any of the functionalities that make
+> ds->user_mii_bus special. Those use cases are listed here:
+> https://lore.kernel.org/netdev/20231221174746.hylsmr3f7g5byrsi@skbuf/
 > 
-> ds->user_mii_bus is useful for only 2 cases:
+> It just makes use of ds->user_mii_bus only as storage for its own MDIO
+> bus, which otherwise has no connection to the framework. This is because:
 > 
-> 1. The driver probes on platform_data (no OF)
-> 2. The driver probes on OF, but there is no OF node for the MDIO bus.
+> - the gswip driver only probes on OF: it fails if of_device_get_match_data()
+>    returns NULL
 > 
-> It is unclear if case (1) is supported with qca8k. It might not be:
-> the driver might crash when of_device_get_match_data() returns NULL
-> and then it dereferences priv->info without NULL checking.
+> - when the child OF node of the MDIO bus is absent, no MDIO bus is
+>    registered at all, not even by the DSA framework. In order for that to
+>    have happened, the gswip driver would have needed to provide
+>    ->phy_read() and ->phy_write() in struct dsa_switch_ops, which it does
+>    not.
 > 
-> Anyway, let us limit the ds->user_mii_bus usage only to the above cases,
-> and not assign it when an OF node is present.
+> We can break the connection between the gswip driver and the DSA
+> framework and still preserve the same functionality.
 > 
-> The bus->phy_mask assignment follows along with the movement, because
-> __of_mdiobus_register() overwrites this bus field anyway. The value set
-> by the driver only matters for the non-OF code path.
+> Since commit 3b73a7b8ec38 ("net: mdio_bus: add refcounting for fwnodes
+> to mdiobus"), MDIO buses take ownership of the OF node handled to them,
+> and release it on their own. The gswip driver no longer needs to do
+> this.
+> 
+> Combine that with devres, and we no longer need to keep track of
+> anything for teardown purposes.
 > 
 > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
@@ -149,7 +154,7 @@ Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Florian
 
 
---0000000000004a5e32060e2227d7
+--000000000000fb52eb060e222b42
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -220,15 +225,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEII2uFqLMAcDyig+e
-Tg/8hS9XPSof3xhtpjNy0dO1VFl3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDEwNDE3MzUxMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJeqtAeijrxQnOe2
+aRmVcRTSpQUK7l7RcDlK30G1FcTfMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDEwNDE3MzYyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCq+gXvHCLR3Mc6N1XqF/CJJcOcShifSGuY
-za59RzVnXCM13UK46wf76nY+ZYkZLxFi+5cKrkt4UTodWVsyaWBPvc3aHqsKiGRA/y9kkRrBGGdC
-8hdMbCTE8rY5k66fRCFb73YMepG4jFNruOEP9ONhm+XqX1YsogCrE9/4mxfPfiLb/PIVDHmzoYx4
-unA6ahQPOy9BJ9sSYPtbK4NCUZZsvr8L0uhp8cDiAh07QXVX2DFRbWAEkuSUgt/1a10tYgWyCOlx
-S8HqzYBh1auHh+pxOVgTKAevqmocum/2DWv3T/cEokdmBC/gePAMsLHtmFu4Ta2W5H8vPlg41BEf
-H2UN
---0000000000004a5e32060e2227d7--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDEwhZ9zimfjpy+hgxA+/MLosG5O94pdePp
+FIX9Ld348SKB8jkCL1U5t30rvfriEepxLWW/72+1akUqMIeQIET7DSp7wA4gYbzrOhI/SRb5e2OU
+6ZZ1T1UqG38pnqa7j2hb36G9UOs9rPrNn+ZyMp4eZBxgAwtQj2lwkRM4/y+rQs27ZpoV6mifGnYj
+eWm7d1Nht8PsNKUJCK31OOitpu/BO3hjr0mR9TSImUKrkW3pc9ZYqaCiVUptX8qIsaXlBS2zeque
+ckhy5niZ4l95BXgy143lxJDastwdazj4uaZIcxZBwdBQM3UgBNLQpp1KHNVhwLHfaK1P8Qci0kK2
+VOR8
+--000000000000fb52eb060e222b42--
 
