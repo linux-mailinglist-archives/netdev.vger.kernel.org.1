@@ -1,111 +1,137 @@
-Return-Path: <netdev+bounces-61678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF03F8249AD
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 21:40:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A23DD8249C7
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 21:47:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CBC1B245B9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 20:40:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41CCB1F22D17
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 20:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF61E1E516;
-	Thu,  4 Jan 2024 20:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="serrNK0u"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD601E516;
+	Thu,  4 Jan 2024 20:47:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65631E503;
-	Thu,  4 Jan 2024 20:40:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 068EAC433C7;
-	Thu,  4 Jan 2024 20:40:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704400838;
-	bh=wfKfnH7YLdSwjVnqaoKaRKpcS4tFflrKLF1bSoIVlwM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=serrNK0urNmROd5qJ+kO4+UwWgxa+6ka/RPhkgLxXQHzVriygEOQXFv9sbdvtk+fX
-	 rgNw2YV7FFrfwqtYZLOoMvdVWODN/LvnnZtnu2jZ7smKDicT02FhqMHxr/fmEeAZYv
-	 V5TBQacG6XFc1uDnzuY9g66djqTTOLwXoU7fpzT3ZzKP2bpmXWW04ba8bMTG5plsIM
-	 XBPoAdJVkr1VVR99DSpzkPLvK3V6ASHOze3gAgZpxoIArFYZyoGGDYCgEhrl9UdPLm
-	 jtXA38azvMaZaPJn8u9dSLq2K59Yv+OE+PLBS1lDl313YI9QFIG8Tbrkn92idNehYn
-	 hfUiryATznPNg==
-Date: Thu, 4 Jan 2024 20:40:32 +0000
-From: Simon Horman <horms@kernel.org>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: Markus Elfring <Markus.Elfring@web.de>, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jan Karcher <jaka@linux.ibm.com>,
-	Paolo Abeni <pabeni@redhat.com>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [0/2] net/smc: Adjustments for two function implementations
-Message-ID: <20240104204032.GN31813@kernel.org>
-References: <8ba404fd-7f41-44a9-9869-84f3af18fb46@web.de>
- <93033352-4b9c-bf52-1920-6ccf07926a21@linux.alibaba.com>
- <46fe66f7-dc3b-4863-96e8-7a855316e8bd@web.de>
- <b2ee4680-72e9-56a1-e0dd-9cbbe64a7dac@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165582C68F;
+	Thu,  4 Jan 2024 20:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (178.176.76.15) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 4 Jan
+ 2024 23:47:15 +0300
+Subject: Re: [PATCH net] MAINTAINERS: I don't want to review Renesas Ethernet
+ Switch driver
+To: Simon Horman <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>, Yoshihiro
+ Shimoda <yoshihiro.shimoda.uh@renesas.com>
+References: <6498e2dd-7960-daeb-acce-a8d2207f3404@omp.ru>
+ <20240103212822.GA48301@kernel.org>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <8f9b5376-647a-7b59-886c-142990b8c9e4@omp.ru>
+Date: Thu, 4 Jan 2024 23:47:15 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b2ee4680-72e9-56a1-e0dd-9cbbe64a7dac@linux.alibaba.com>
+In-Reply-To: <20240103212822.GA48301@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/04/2024 20:36:55
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182464 [Jan 04 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.76.15 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.76.15 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	178.176.76.15:7.4.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {cloud_iprep_silent}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.76.15
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/04/2024 20:41:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/4/2024 6:50:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Tue, Jan 02, 2024 at 07:33:18PM +0800, Wen Gu wrote:
+On 1/4/24 12:28 AM, Simon Horman wrote:
+[...]
+>> I don't know this hardware, I don't have the manuals for it, so I can't
+>> provide a good review.  Let's exclude the Ethernet Switch related files.
+>>
+>> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 > 
-> 
-> On 2024/1/2 16:51, Markus Elfring wrote:
-> > …
-> > > > A few update suggestions were taken into account
-> > > > from static source code analysis.
-> > …
-> > > >     Return directly after a failed kzalloc() in smc_fill_gid_list()
-> > > >     Improve exception handling in smc_llc_cli_add_link_invite()
-> > > > 
-> > > >    net/smc/af_smc.c  |  2 +-
-> > > >    net/smc/smc_llc.c | 15 +++++++--------
-> > > >    2 files changed, 8 insertions(+), 9 deletions(-)
-> > …
-> > > I see you want to fix the kfree(NULL) issues in these two patches.
-> > 
-> > I propose to avoid redundant function calls at various source code places.
-> > 
-> > 
-> > > But I am wondering if this is necessary, since kfree() can handle NULL correctly.
-> > 
-> > Would you prefer only required data processing in affected function implementations?
-> > 
-> 
-> Thank you Markus. I understood that you want to avoid redundant function calls.
-> 
-> But it is not very attractive to me since the calls occur on low-frequency paths
-> or unlikely condition, resulting in limited performance loss and the current
-> kfree() usage is fine and common. So what is the benfit?
-> 
-> I noticed that some other discussions are on-going. It seems like you are trying
-> to change other similiar places. Let's collect more opinions.
-> 
-> https://lore.kernel.org/netdev/828bb442-29d0-4bb8-b90d-f200bdd4faf6@web.de/
-> https://lore.kernel.org/netdev/90679f69-951c-47b3-b86f-75fd9fde3da3@web.de/
-> https://lore.kernel.org/netdev/dc0a1c9d-ceca-473d-9ad5-89b59e6af2e7@web.de/
-> https://lore.kernel.org/netdev/cde82080-c715-473c-97ac-6ef66bba6d64@web.de/
+> Hi Sergey,
 
-As as been explained to Markus many times recently,
-calling kfree(NULL) is not only perfectly fine,
-it is the preferred way of handling things.
+  Hi Simon, long time, no see... :-)
 
-Markus, please stop posting patches of this nature to Netdev.
+> I don't know the back story to this, if there is one.
 
--- 
-pw-bot: rejected
+   Not much of a history: I got a lot of the rswitch patches in my
+inbox and I mostly ignored them... but kept deferring this patch due
+to a high load with fixing Svace's reports at work...
+
+> But could I suggest that:
+> 
+> 1. The patch also updates the title MAINTAINERS section to cover the
+>    remaining two drivers.
+> 
+>    e.g.: RENESAS ETHERNET DRIVERS ->
+>          RENESAS ETHERNET AVB AND SUPERH ETHERNET DRIVERS
+> 
+>    Or alternatively, create separate sections for each driver.
+
+   Yeah, this 2nd option seems cleaner. Still not sure about Kconfig/
+Makefile though...
+
+>    n.b.: This may involve moving sections to maintain alphabetical order
+>          by section title
+> 
+> 2. Reaching out to Shimoda-san (CCed) or other relevant parties
+>    to see if an appropriate maintainer or maintainers for the
+>    Renesas Ethernet Switch driver can be found.
+> 
+>    n.b.: It may still be a holiday period in Japan for the rest of the week.
+
+   It's a holiday period here in Russia as well, till the 8th of Jaunary. :-)
+
+> 3. Rephrase the subject and patch description as splitting out maintenance of
+>    the Renesas Ethernet Switch driver .
+
+[...]
+
+MBR, Sergey
 
