@@ -1,219 +1,273 @@
-Return-Path: <netdev+bounces-61598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 861B28245C9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:07:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3E18245DC
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:11:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 631C71C21F4D
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:07:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D7AD287007
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D7424A0C;
-	Thu,  4 Jan 2024 16:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EAB23750;
+	Thu,  4 Jan 2024 16:11:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3zfecvj"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="a9Vf4gwi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B2E24B3D
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 16:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40d4a222818so9797785e9.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 08:06:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23A124A01
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 16:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5e7bb1e0db8so5853077b3.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 08:11:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704384416; x=1704989216; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FVxO3X+ccGWrdx8Ekh7/PXa9BRBTpuQW99Oblr58WQM=;
-        b=R3zfecvjYbzyFyMRDa8wokTcBtdRBDKZrTGnEAhlEMtfF4rM9i5iiKpv2oIRe689zv
-         D7243UNCZiCNz5ukw4UHAbFzLtu+GJQiD95N5Soloq4r7jZk64UWzKVSSRBkZmGaQp/w
-         bkKcBuAXZLFkI8ShBpFVjbsNx9JnMZ5ErjXDIB9xomrpXqmkNaSQagw5Dp3IIO5z6xpA
-         WAKpxKFhQZGDJ9J3fBQDJ85zUWJL/kp12d1ewgHM6rEj1LsItkLF25F5gBDh5eJRTMX9
-         70KoiYfSsO8acprjOVvRjdwRuddXmXPvOzkW+lsMNR1ltrpMKh2VKQcyYK38BOktZBzG
-         iddg==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704384670; x=1704989470; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qibsO5cShZMxXtS9+wVtzxmnZXgZucrE87rrjzzYyxc=;
+        b=a9Vf4gwiYVIjeulG52KDcTFmJ40GvjZbJruLAWapRJQryBPyM8sUl8mHqUmlAbmcnB
+         C4iIemmuE0mxNOgt2g7JoQDFEQBzcdQb6xJmKTDUJHRFaEdQT5/2GAq4iOvocNGTuJ6f
+         23tvdJwl//gGHtOhWUhKQp/QYhaIfeu+HxmgJi/x09qJSpeA2jenJhfWrBd1xL89poiW
+         0HBVckdXAWosPgR2aBa9UoH4B+8V0VncZbN1B9bzR1ftG48aazC0WpxuDfqzzcw9Jjmc
+         i2q7EDaDy7sFSqUic3fDTUm2cVI1JYHip4uvCcSPbVJp/rtLMrGm8NtJ/MyUzt2CuIAd
+         k6Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704384416; x=1704989216;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FVxO3X+ccGWrdx8Ekh7/PXa9BRBTpuQW99Oblr58WQM=;
-        b=iP9oy3cR1goBh+hdSI34ZzK9B/wH4PLAjjy6N6FYgOgF6IvzG5WFOJOuzARcFv7dZ1
-         UKl2FV3BB/d8+i+XXzaMxJfOhjtMrUMcGt+G+eM6zwGQxziuH3+x2eIPEngbVjYlqsC/
-         sUjii19E47mMXDecyNwK3+46F7xluvt9zeBZpBmeUFyMr4tv63rFLjjxWvIXqEyXLoxv
-         6957dVa4PXwfzMWUJNIDytkWXMZdW5Y33mE0oHRvK3jokXI/DVUthYTE7HoCEKPFx3Z6
-         t5j4gwGf5f9xxMpA2xcVZUDaeY6tfDFhFaBDSXMxkSb9FFvYrkMNy+3+vTOPs5C7uoKN
-         buag==
-X-Gm-Message-State: AOJu0YyjL6O0DasCOAIIieYUKlZMlybFFvxcsaR/1vhq35KJVBMSWcx2
-	RQsisMv+TsW5DSfGKf4eynU=
-X-Google-Smtp-Source: AGHT+IEhqV/poQROJWRT9i0lkVGrWFgMxgYiD46SIcozsE+xHk8sBPS5CHi9NF/LyOcmxhodIu4Blg==
-X-Received: by 2002:a05:600c:1da9:b0:40d:88ba:b1a4 with SMTP id p41-20020a05600c1da900b0040d88bab1a4mr456614wms.97.1704384415616;
-        Thu, 04 Jan 2024 08:06:55 -0800 (PST)
-Received: from ?IPV6:2a01:c22:6ffe:b000:1d0:e6df:b486:c903? (dynamic-2a01-0c22-6ffe-b000-01d0-e6df-b486-c903.c22.pool.telefonica.de. [2a01:c22:6ffe:b000:1d0:e6df:b486:c903])
-        by smtp.googlemail.com with ESMTPSA id c1-20020a05600c0a4100b0040d81c3343bsm6157415wmq.42.2024.01.04.08.06.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 08:06:55 -0800 (PST)
-Message-ID: <ceaee76d-d785-4931-ad4a-ddba06365308@gmail.com>
-Date: Thu, 4 Jan 2024 17:06:54 +0100
+        d=1e100.net; s=20230601; t=1704384670; x=1704989470;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qibsO5cShZMxXtS9+wVtzxmnZXgZucrE87rrjzzYyxc=;
+        b=xHO0MVBZ5mXDh7DIvU3mUQi8GfUla7P31JDDriFzfzSHORKY2rmD610WDaAqA5LS4K
+         XGM6v3FFCC9bGiNSqEJLBXAwQMQlljf8xNr+AQvwnZyEskRpdAyC5P7GRS8ppFuXfSUd
+         LMcThcoE9qxQriAtmkgKUsVCBIvGdqoCHoyHKnKhDZq43QvXG6InWE8z1w23j3oxN7KD
+         wNV2wiV3ZQjcyzzNWd12v2Y/GHRpm4b2KGK9x0VqWp1Fvdu+q6YYBciBpsZB8hJ6f86z
+         X/MjGwjKRnkXrmOL770ryhk+xBa9k34kpb3UxHJ6cq6PcCtZfmsPB4sEEPPHC2RmidgI
+         ehJA==
+X-Gm-Message-State: AOJu0Yz/NRDJi5PQBnYeB1LVUqA5HQDSHzWKhZGlXJfzpmi4AqnKQ37T
+	310t2W0qvQ/IMR+43vKUenrNQ2mMACNLLYpx15kTA6Kv7rAy
+X-Google-Smtp-Source: AGHT+IFNy2BF/iZwlEImnVnhMEawnouHXivAWtynndI3k/hjbxCHcApcoCEn2YTRuN+EVGRYS9N6yCtLoGqSkXmHVUA=
+X-Received: by 2002:a81:df08:0:b0:5e7:8eea:b7e2 with SMTP id
+ c8-20020a81df08000000b005e78eeab7e2mr696404ywn.101.1704384669889; Thu, 04 Jan
+ 2024 08:11:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ethtool ioctl ABI: preferred way to expand uapi structure
- ethtool_eee for additional link modes?
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>
-Cc: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>
-References: <20240104161416.05d02400@dellmb>
- <d3f3fca4-624c-4001-9218-6bf69ca911b3@lunn.ch>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <d3f3fca4-624c-4001-9218-6bf69ca911b3@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240104125844.1522062-1-jiri@resnulli.us>
+In-Reply-To: <20240104125844.1522062-1-jiri@resnulli.us>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 4 Jan 2024 11:10:58 -0500
+Message-ID: <CAM0EoMkDhnm0QPtZEQPbnQtkfW7tTjHdv3fQoXzRXARVdhbc0A@mail.gmail.com>
+Subject: Re: [patch net-next] net: sched: move block device tracking into tcf_block_get/put_ext()
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, xiyou.wangcong@gmail.com, 
+	victor@mojatatu.com, pctammela@mojatatu.com, idosch@idosch.org, 
+	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 04.01.2024 16:36, Andrew Lunn wrote:
-> On Thu, Jan 04, 2024 at 04:14:16PM +0100, Marek Behún wrote:
->> Hello,
->>
->> the legacy ioctls ETHTOOL_GSET and ETHTOOL_SSET, which pass structure
->> ethtool_cmd, were superseded by ETHTOOL_GLINKSETTINGS and
->> ETHTOOL_SLINKSETTINGS.
->>
->> This was done because the original structure only contains 32-bit words
->> for supported, advertising and lp_advertising link modes. The new
->> structure ethtool_link_settings contains member
->>   s8 link_mode_masks_nwords;
->> and a flexible array
->>   __u32 link_mode_masks[];
->> in order to overcome this issue.
->>
->> But currently we still have only legacy structure ethtool_eee for EEE
->> settings:
->>   struct ethtool_eee {
->>     __u32 cmd;
->>     __u32 supported;
->>     __u32 advertised;
->>     __u32 lp_advertised;
->>     __u32 eee_active;
->>     __u32 eee_enabled;
->>     __u32 tx_lpi_enabled;
->>     __u32 tx_lpi_timer;
->>     __u32 reserved[2];
->>   };
->>
->> Thus ethtool is unable to get/set EEE configuration for example for
->> 2500base-T and 5000base-T link modes, which are now available in
->> several PHY drivers.
->>
->> We can remedy this by either:
->>
->> - adding another ioctl for EEE settings, as was done with the GSET /
->>   SSET
->>
->> - using the original ioctl, but making the structure flexible (we can
->>   replace the reserved fields with information that the array is
->>   flexible), i.e.:
->>
->>   struct ethtool_eee {
->>     __u32 cmd;
->>     __u32 supported;
->>     __u32 advertised;
->>     __u32 lp_advertised;
->>     __u32 eee_active;
->>     __u32 eee_enabled;
->>     __u32 tx_lpi_enabled;
->>     __u32 tx_lpi_timer;
->>     s8 link_mode_masks_nwords; /* zero if legacy 32-bit link modes */
->>     __u8 reserved[7];
->>     __u32 link_mode_masks[];
->>     /* filled in if link_mode_masks_nwords > 0, with layout:
->>      * __u32 map_supported[link_mode_masks_nwords];
->>      * __u32 map_advertised[link_mode_masks_nwords];
->>      * __u32 map_lp_advertised[link_mode_masks_nwords];
->>      */
->>   };
->>
->>   this way we will be left with another 7 reserved bytes for future (is
->>   this enough?)
->>
->> What would you prefer?
-> 
-> There are two different parts here. The kAPI, and the internal API.
-> 
-> For the kAPI, i would not touch the IOCTL interface, since its
-> deprecated. The netlink API for EEE uses bitset32. However, i think
-> the message format for a bitset32 and a generic bitset is the same, so
-> i think you can just convert that without breaking userspace. But you
-> should check with Michal Kubecek to be sure.
-> 
-> For the internal API, i personally would assess the work needed to
-> change supported, advertised and lp_advertised into generic linkmode
-> bitmaps. Any MAC drivers using phylib/phylink probably don't touch
-> them, so you just need to change the phylib helpers. Its the MAC
-> drivers not using phylib which will need more work. But i've no idea
-> how much work that is. Ideally they all get changed, so we have a
-> uniform clean API.
-> 
-In case you missed it: Few days ago I posted a series that adds full
-EEE linkmode bitmap support to the ethtool netlink interface.
-The good news is that no changes to the userspace tool are needed.
+On Thu, Jan 4, 2024 at 7:58=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote:
+>
+> From: Jiri Pirko <jiri@nvidia.com>
+>
+> Inserting the device to block xarray in qdisc_create() is not suitable
+> place to do this. As it requires use of tcf_block() callback, it causes
+> multiple issues. It is called for all qdisc types, which is incorrect.
+>
+> So, instead, move it to more suitable place, which is tcf_block_get_ext()
+> and make sure it is only done for qdiscs that use block infrastructure
+> and also only for blocks which are shared.
+>
+> Symmetrically, alter the cleanup path, move the xarray entry removal
+> into tcf_block_put_ext().
+>
+> Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra=
+")
+> Reported-by: Ido Schimmel <idosch@nvidia.com>
+> Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
+> Reported-by: Kui-Feng Lee <sinquersw@gmail.com>
+> Closes: https://lore.kernel.org/all/ce8d3e55-b8bc-409c-ace9-5cf1c4f7c88e@=
+gmail.com/
+> Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotmail=
+.com
+> Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google.c=
+om/
+> Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotmail=
+.com
+> Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google.c=
+om/
+> Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotmail=
+.com
+> Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google.c=
+om/
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-https://lore.kernel.org/netdev/783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com/T/
+Did you get a chance to run the tdc tests?
 
->     Andrew
+cheers,
+jamal
 
-Heiner
-
+> ---
+>  net/sched/cls_api.c     | 14 ++++++++++++++
+>  net/sched/sch_api.c     | 41 -----------------------------------------
+>  net/sched/sch_generic.c | 14 --------------
+>  3 files changed, 14 insertions(+), 55 deletions(-)
+>
+> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> index adf5de1ff773..253b26f2eddd 100644
+> --- a/net/sched/cls_api.c
+> +++ b/net/sched/cls_api.c
+> @@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **p_block, s=
+truct Qdisc *q,
+>                       struct tcf_block_ext_info *ei,
+>                       struct netlink_ext_ack *extack)
+>  {
+> +       struct net_device *dev =3D qdisc_dev(q);
+>         struct net *net =3D qdisc_net(q);
+>         struct tcf_block *block =3D NULL;
+>         int err;
+> @@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block **p_block, =
+struct Qdisc *q,
+>         if (err)
+>                 goto err_block_offload_bind;
+>
+> +       if (tcf_block_shared(block)) {
+> +               err =3D xa_insert(&block->ports, dev->ifindex, dev, GFP_K=
+ERNEL);
+> +               if (err) {
+> +                       NL_SET_ERR_MSG(extack, "block dev insert failed")=
+;
+> +                       goto err_dev_insert;
+> +               }
+> +       }
+> +
+>         *p_block =3D block;
+>         return 0;
+>
+> +err_dev_insert:
+>  err_block_offload_bind:
+>         tcf_chain0_head_change_cb_del(block, ei);
+>  err_chain0_head_change_cb_add:
+> @@ -1502,8 +1512,12 @@ EXPORT_SYMBOL(tcf_block_get);
+>  void tcf_block_put_ext(struct tcf_block *block, struct Qdisc *q,
+>                        struct tcf_block_ext_info *ei)
+>  {
+> +       struct net_device *dev =3D qdisc_dev(q);
+> +
+>         if (!block)
+>                 return;
+> +       if (tcf_block_shared(block))
+> +               xa_erase(&block->ports, dev->ifindex);
+>         tcf_chain0_head_change_cb_del(block, ei);
+>         tcf_block_owner_del(block, q, ei->binder_type);
+>
+> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> index 2a2a48838eb9..36b025cc4fd2 100644
+> --- a/net/sched/sch_api.c
+> +++ b/net/sched/sch_api.c
+> @@ -1209,43 +1209,6 @@ static int qdisc_graft(struct net_device *dev, str=
+uct Qdisc *parent,
+>         return 0;
+>  }
+>
+> -static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev=
+,
+> -                              struct netlink_ext_ack *extack)
+> -{
+> -       const struct Qdisc_class_ops *cl_ops =3D sch->ops->cl_ops;
+> -       struct tcf_block *block;
+> -       int err;
+> -
+> -       block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> -       if (block) {
+> -               err =3D xa_insert(&block->ports, dev->ifindex, dev, GFP_K=
+ERNEL);
+> -               if (err) {
+> -                       NL_SET_ERR_MSG(extack,
+> -                                      "ingress block dev insert failed")=
+;
+> -                       return err;
+> -               }
+> -       }
+> -
+> -       block =3D cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+> -       if (block) {
+> -               err =3D xa_insert(&block->ports, dev->ifindex, dev, GFP_K=
+ERNEL);
+> -               if (err) {
+> -                       NL_SET_ERR_MSG(extack,
+> -                                      "Egress block dev insert failed");
+> -                       goto err_out;
+> -               }
+> -       }
+> -
+> -       return 0;
+> -
+> -err_out:
+> -       block =3D cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+> -       if (block)
+> -               xa_erase(&block->ports, dev->ifindex);
+> -
+> -       return err;
+> -}
+> -
+>  static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr **tc=
+a,
+>                                    struct netlink_ext_ack *extack)
+>  {
+> @@ -1416,10 +1379,6 @@ static struct Qdisc *qdisc_create(struct net_devic=
+e *dev,
+>         qdisc_hash_add(sch, false);
+>         trace_qdisc_create(ops, dev, parent);
+>
+> -       err =3D qdisc_block_add_dev(sch, dev, extack);
+> -       if (err)
+> -               goto err_out4;
+> -
+>         return sch;
+>
+>  err_out4:
+> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> index e33568df97a5..9b3e9262040b 100644
+> --- a/net/sched/sch_generic.c
+> +++ b/net/sched/sch_generic.c
+> @@ -1052,8 +1052,6 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
+>  {
+>         const struct Qdisc_ops  *ops =3D qdisc->ops;
+>         struct net_device *dev =3D qdisc_dev(qdisc);
+> -       const struct Qdisc_class_ops *cops;
+> -       struct tcf_block *block;
+>
+>  #ifdef CONFIG_NET_SCHED
+>         qdisc_hash_del(qdisc);
+> @@ -1064,18 +1062,6 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
+>
+>         qdisc_reset(qdisc);
+>
+> -       cops =3D ops->cl_ops;
+> -       if (ops->ingress_block_get) {
+> -               block =3D cops->tcf_block(qdisc, TC_H_MIN_INGRESS, NULL);
+> -               if (block)
+> -                       xa_erase(&block->ports, dev->ifindex);
+> -       }
+> -
+> -       if (ops->egress_block_get) {
+> -               block =3D cops->tcf_block(qdisc, TC_H_MIN_EGRESS, NULL);
+> -               if (block)
+> -                       xa_erase(&block->ports, dev->ifindex);
+> -       }
+>
+>         if (ops->destroy)
+>                 ops->destroy(qdisc);
+> --
+> 2.43.0
+>
 
