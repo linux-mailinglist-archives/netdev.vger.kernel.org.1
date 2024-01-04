@@ -1,112 +1,106 @@
-Return-Path: <netdev+bounces-61465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FC74823EAE
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 10:32:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3173823EE8
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 10:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30E141F250C9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 09:32:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFEA61C213FC
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 09:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28CB208B5;
-	Thu,  4 Jan 2024 09:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F0B4208CF;
+	Thu,  4 Jan 2024 09:49:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fCeF7Zbe"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="C2gfuXXM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E36208A3;
-	Thu,  4 Jan 2024 09:32:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96CEDC433C7;
-	Thu,  4 Jan 2024 09:32:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704360724;
-	bh=1EwMajLeaQURshMF2Uz3kgEaXtgo04uFO6ueod/AG4o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fCeF7Zbe982JybIbLj8gAUp3Tl8UoewEetIFfLl2ZH23XcGEFNZv0taXaNI2SduYL
-	 X2Pbz6FT/HwXeohsCe3mDgimmYfeoldFOHznt7qF2okIHOLR8xysLg8vAVxyPld1Jg
-	 CcQttF2W2whj1AOpRLJ/VswRGOxoZthm2kzy72DG5hip/kad8QE+MThl6Jnxofk7mV
-	 kBoqk1VJO0AtmL0+4rYmmiKZhchQSYkyVA+tavtbf/HMdi/rNF+jXZuXMxSewy9mkB
-	 rZatuNO/RkE3AGZdculHK97K+imKOSN8R1OP0QFY0bz/FALXPWAyCEHrN4f//Fi86d
-	 DQW92e+HRxD6g==
-Date: Thu, 4 Jan 2024 10:32:00 +0100
-From: Wolfram Sang <wsa@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net] MAINTAINERS: I don't want to review Renesas Ethernet
- Switch driver
-Message-ID: <ZZZ7ECMTRYOOpDlf@ninjato>
-Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-References: <6498e2dd-7960-daeb-acce-a8d2207f3404@omp.ru>
- <20240103133735.7bd660b9@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7283208CA
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 09:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id C7017206D0;
+	Thu,  4 Jan 2024 10:39:30 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 15UytR3iNogf; Thu,  4 Jan 2024 10:39:30 +0100 (CET)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 4D2D9200BC;
+	Thu,  4 Jan 2024 10:39:30 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 4D2D9200BC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1704361170;
+	bh=9omPjJdA/fSZno6oEhaLFBTk/dKoPGtL3FGkIcC9nZY=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=C2gfuXXMlr63mHi5m5rM7CqFVRJeLiNb7JHpF8n7JwLKsqinWTYInO1iyAFmRAvsd
+	 N5s9Fjlaf+9ep2izpXKJBzWQJjBRYN5oncvW7lpQKdz59W6f9RvMlUdnjDt0+ILury
+	 zGU5JrudoU/fug4z+hcyJRkXFSVUNjiELWhKueegWmA4GRBBY5cyvjosfVRa9bYTuo
+	 uk5s3xg3F4e/3XomoiIkWrzZo4D/zm7fg7Kh5eLVIy2QexMbXVmGBpFVxflRRV+304
+	 KOOlErzhERAnW6NNj7gXfLwGGZOKZX+1xZDsFv/xoqPHXEKqv6V6emvWd9mur5ebrC
+	 1GzAFFkdTHHEQ==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout2.secunet.com (Postfix) with ESMTP id 480A380004A;
+	Thu,  4 Jan 2024 10:39:30 +0100 (CET)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Jan 2024 10:39:30 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 4 Jan
+ 2024 10:39:29 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 8AA5A3182B9E; Thu,  4 Jan 2024 10:39:29 +0100 (CET)
+Date: Thu, 4 Jan 2024 10:39:29 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Antony Antony <antony.antony@secunet.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, <devel@linux-ipsec.org>, Jakub Kicinski
+	<kuba@kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v5 ipsec-next] xfrm: introduce forwarding of ICMP Error
+ messages
+Message-ID: <ZZZ80QrAwSyBxzxb@gauss3.secunet.de>
+References: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
+ <38d9daba2f601602ef115942f82b80e56b54c560.1703249432.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="0kCCt+reK79FwhTP"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20240103133735.7bd660b9@kernel.org>
+In-Reply-To: <38d9daba2f601602ef115942f82b80e56b54c560.1703249432.git.antony.antony@secunet.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
+On Fri, Dec 22, 2023 at 01:57:04PM +0100, Antony Antony wrote:
+> +
+>  int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
+>  			unsigned short family)
+>  {
+> @@ -3549,9 +3672,17 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
+> 
+>  		for (i = sp->len - 1; i >= 0; i--) {
+>  			struct xfrm_state *x = sp->xvec[i];
+> +			int ret = 0;
+> +
+>  			if (!xfrm_selector_match(&x->sel, &fl, family)) {
+> -				XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMISMATCH);
+> -				return 0;
+> +				ret = true;
+> +				if (x->props.flags & XFRM_STATE_ICMP &&
+> +				    xfrm_selector_inner_icmp_match(skb, family, &x->sel, &fl))
+> +					ret = false;
 
---0kCCt+reK79FwhTP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi,
-
-a quick two cents from my side.
-
-> First off, very nice to see a refinement of MAINTAINERS to narrow
-> down the scope and make it more precise. Thanks for doing that.
-
-Ack.
-
-> IIUC you want to support SuperH and the AVB implementation.
-> It'd be more usual to make the entry cover only the relevant files.
-
-Ack again.
-
-> And for bonus points perhaps add an entry covering the switch files,
-> mark that entry as Orphan?
-
-I think Shimoda-san will happily maintain the rswitch driver. He is
-likely away this week, though. So, my suggestion would be to wait with
-this discussion another week so he can take part in it?
-
-All the best,
-
-   Wolfram
-
-
---0kCCt+reK79FwhTP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmWWew8ACgkQFA3kzBSg
-KbZVExAAhBK00mzPEqr8toN3px0+LsvjYmr1D/8H50Z5AKcn5ucm+xQZWdks+/rf
-4i1eop8EcW8pXzccUR2NfYmmtVenptwFmOcoTzr/G/kK1piQDYhk4E3x5x7tSUHs
-W7dKFMkKvspszP51fE8x15tBvnybvcIyIGYtZiYimLYntSdgZHiP7BOo5DPqQFoc
-yfYAueHg4TSZlQ76e9en3QZLESOEvyyLv3bZtY7T1zAXom3hE4ouqd8B5xjejFcH
-aOGs5XHprvV6mhf6yLM7S1lCYy8k0GOPxzGrX94XeqCI757Zzh8Y0rFff9v7pLsY
-jhcWR7rK/vI0UgAFv5HlsjiuoFGXKbJFx6PaWimKTJaPJ4qb/2eM9yRvVb6PA6lV
-arZ5l+TNQVwzWERJ8pY2oO8V63CSNrKyCCyfOGJnL10qj06fWgI8RxPPXtV02FOw
-4bhWzp0fuVH0ckN/X/VJwde6FsK+PTcphZm3Hs/+Bn/TAb43ZKIm4JUVFEDrNHcK
-0JmlzJTxdlSqkROwr+mCHF8CXQVPd17DjqYzKmpWvcQDad8OCX5Zt3m9c6OeLCt/
-+WGqyoxk35fb8gW97aNBDAcwt3Rd7C3N4IhAap6nZSgfgTil41m4QpuFaDJf22k3
-HFVB2m37XSDxBDok+f4dupPS+hl7OI3ExHGJ0iiFfTOQ9sPODQc=
-=cfrf
------END PGP SIGNATURE-----
-
---0kCCt+reK79FwhTP--
+__xfrm_policy_check returns int, not bool. Please fix these
+return values.
 
