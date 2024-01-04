@@ -1,92 +1,87 @@
-Return-Path: <netdev+bounces-61608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCE96824650
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:37:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D769482463C
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:31:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 800DDB22655
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:37:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75DB41F21DEB
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FCC24B4A;
-	Thu,  4 Jan 2024 16:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4014B25565;
+	Thu,  4 Jan 2024 16:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nic.cz header.i=@nic.cz header.b="FTyUdv28"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="np/wq2zD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.nic.cz (mail.nic.cz [217.31.204.67])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF6025569
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 16:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nic.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nic.cz
-Received: from dellmb (unknown [IPv6:2001:1488:fffe:6:77e6:9a62:bbd6:737f])
-	by mail.nic.cz (Postfix) with ESMTPSA id DE9561C192C;
-	Thu,  4 Jan 2024 17:27:09 +0100 (CET)
-Authentication-Results: mail.nic.cz;
-	auth=pass smtp.auth=marek.behun@nic.cz smtp.mailfrom=marek.behun@nic.cz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nic.cz; s=default;
-	t=1704385630; bh=vGuC8fgzQXJqD3mm0d1shrJjIFAnRJitIuTfRNQneQo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From:Reply-To:
-	 Subject:To:Cc;
-	b=FTyUdv28LLcxp8uESmJ5BEXUHZf8Et8plKHxMkjL0GyBz2mY2ImPQ8DtAyyZNUsMk
-	 AoaAyUXCAXV/jQyO7ihsPmUEjxtOpk8TGGl3LuC29KMfFuR9PIEtBnEoJ5NSWlCOz1
-	 USHkg9DGuO3yzz39StrhOIKITF+HYJhR5mRvw7yk=
-Date: Thu, 4 Jan 2024 17:27:08 +0100
-From: Marek =?UTF-8?B?QmVow7pu?= <marek.behun@nic.cz>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/5] ethtool: add struct ethtool_keee and
- extend struct ethtool_eee
-Message-ID: <20240104172708.2db5ddaa@dellmb>
-In-Reply-To: <a044621e-07f3-4387-9573-015f255db895@gmail.com>
-References: <783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com>
-	<a044621e-07f3-4387-9573-015f255db895@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211DB250F2;
+	Thu,  4 Jan 2024 16:30:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 93D63C433CA;
+	Thu,  4 Jan 2024 16:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704385828;
+	bh=GT7a99x/z4Bg6ZWuMZ4pBmBqzfF43hjo1DiECkMYpmg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=np/wq2zDa2but9Uizayyf1+Y5dwhArdHpKNfACoIQdRYCyndlrryrS83I/WAKF6J3
+	 xfD21v64YuS6DD4vXCccFTVSKJkglktMARpRxE5TExAqozwrsOZAmPSRg1PI000/Te
+	 QHDwYAwmklFZnivcXqx3N9g/Equ2k8NsddUlVCNioB8ASWptQjFF2WcfhX8avYujRC
+	 oEPtkK4gha9Y7B5vekCi3fJfZxHZP74NVkP1hMknB1mGntAkWATAST4iQcKI0CmwWQ
+	 GYVZh2exFBzqdEa63jYQyyoEUhMlNtS2ds78xdofg19PX1fWdVhqobYotGaqww6Wei
+	 aS6Atp28FszQQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5E642C43168;
+	Thu,  4 Jan 2024 16:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.10 at mail
-X-Virus-Status: Clean
-X-Rspamd-Server: mail
-X-Rspamd-Queue-Id: DE9561C192C
-X-Spamd-Result: default: False [-0.10 / 20.00];
-	MIME_GOOD(-0.10)[text/plain];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	WHITELISTED_IP(0.00)[2001:1488:fffe:6:77e6:9a62:bbd6:737f];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ASN(0.00)[asn:25192, ipnet:2001:1488::/32, country:CZ];
-	FROM_EQ_ENVFROM(0.00)[];
-	ARC_NA(0.00)[];
-	TAGGED_RCPT(0.00)[kernel];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com]
-X-Rspamd-Pre-Result: action=no action;
-	module=multimap;
-	Matched map: WHITELISTED_IP
-X-Spamd-Bar: /
-X-Rspamd-Action: no action
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND net] net: Implement missing SO_TIMESTAMPING_NEW cmsg
+ support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170438582838.10335.14098796357832248818.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jan 2024 16:30:28 +0000
+References: <20240104085744.49164-1-thomas@corelatus.se>
+In-Reply-To: <20240104085744.49164-1-thomas@corelatus.se>
+To: Thomas Lange <thomas@corelatus.se>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ willemdebruijn.kernel@gmail.com, jthinz@mailbox.tu-berlin.de, arnd@arndb.de,
+ deepa.kernel@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
 
-On Mon, 1 Jan 2024 22:23:15 +0100
-Heiner Kallweit <hkallweit1@gmail.com> wrote:
+Hello:
 
-> + * @is_member_of_keee: struct is member of a struct ethtool_keee
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I don't like how the name of a field in a UAPI structure refers to
-kernel internals.
+On Thu,  4 Jan 2024 09:57:44 +0100 you wrote:
+> Commit 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW") added the new
+> socket option SO_TIMESTAMPING_NEW. However, it was never implemented in
+> __sock_cmsg_send thus breaking SO_TIMESTAMPING cmsg for platforms using
+> SO_TIMESTAMPING_NEW.
+> 
+> Fixes: 9718475e6908 ("socket: Add SO_TIMESTAMPING_NEW")
+> Link: https://lore.kernel.org/netdev/6a7281bf-bc4a-4f75-bb88-7011908ae471@app.fastmail.com/
+> Signed-off-by: Thomas Lange <thomas@corelatus.se>
+> 
+> [...]
 
-Can we rename it somehow?
+Here is the summary with links:
+  - [RESEND,net] net: Implement missing SO_TIMESTAMPING_NEW cmsg support
+    https://git.kernel.org/netdev/net/c/382a32018b74
 
-Marek
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
