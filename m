@@ -1,100 +1,125 @@
-Return-Path: <netdev+bounces-61456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DBA1823D1A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 09:00:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C405823D5F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 09:25:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 112601C212A2
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 08:00:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCDAC2864F7
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 08:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC85200C0;
-	Thu,  4 Jan 2024 08:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE99A20307;
+	Thu,  4 Jan 2024 08:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CbgyAwwY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XWOwIsdY"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03615200AA;
-	Thu,  4 Jan 2024 08:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 419CBFF809;
-	Thu,  4 Jan 2024 08:00:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1704355251;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WE9QlQ4KlC5mveEewBeLNMj9oTityHpI66OG1EcBCwM=;
-	b=CbgyAwwYD8uWKnBEgnl/OqXn2LUAQHeNN/lWlX/vr/r6ucck2EZSDFljAqvkAwXTeRKdIw
-	f3S4uGvc23ZEKWpqLpAdLtS704Q4SvPW+4emTG94vUG9jeaRYdxYsTdy3Qyt4r9njWkHqD
-	241KrAuXnu9FzclO8hTw8m/mNyp1SrcXJ+Ml+ICZgUtXMbQb41Ty7d8AU269yFLHgwYqC4
-	DvDfTNAltJL5Zw6ilI7BkqBGKpvoUXsENg0ZLMT+qDKwHw8QMGs2/G8VdrzSPrF7VSc3OZ
-	llNrbvUWGkQ2mwgWJbmBqX5ewlV5/MDChwqCnkBAj1oyeiFPzWsEWuX/oLVfwA==
-Date: Thu, 4 Jan 2024 09:01:11 +0100 (CET)
-From: Romain Gantois <romain.gantois@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318C8200CD
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 08:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704356722; x=1735892722;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AA/i/nVvhUEbDGfHDiH8TdEVLAaokLPd8OHXHJDwfSM=;
+  b=XWOwIsdYkSNvYzPdhJZ4mjUKFEPD8O/JSuNc3bAPMu1vFdU1zFGKZsOF
+   5N5WtUtvUFHieBWdykjCwfcPzbG/dQHoC7IJOMNw5OCD2DjfWRfSzxvf4
+   nk+JIKB/3dsu436E1etvEzRGgiDwZmBqHjoRJ+X+j/j3dt0OgG4aKLpka
+   FwMcQwmayXAH6tyCf0pN3EnT0HupUs8NWaW0iV3/X5qeecRcDMVJFKufk
+   yZdyEhkaHRtiFqFn6oEDWwh5nCDImsCgAvB1/0sDsGG9JQnF5pFagEDvb
+   Mk5OaiPl0Lg1OWJ6OxpC5+6N0/pbEFHItMgAg/EMgjhoOnQrKXkEhMJTb
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="382130684"
+X-IronPort-AV: E=Sophos;i="6.04,330,1695711600"; 
+   d="scan'208";a="382130684"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2024 00:25:21 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,330,1695711600"; 
+   d="scan'208";a="22395457"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.35.125])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2024 00:25:19 -0800
+Date: Thu, 4 Jan 2024 09:25:17 +0100
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
 To: Jakub Kicinski <kuba@kernel.org>
-cc: Romain Gantois <romain.gantois@bootlin.com>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jose Abreu <joabreu@synopsys.com>, Russell King <linux@armlinux.org.uk>, 
-    Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    =?ISO-8859-15?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, 
-    Marek Vasut <marex@denx.de>, Clark Wang <xiaoning.wang@nxp.com>, 
-    Miquel Raynal <miquel.raynal@bootlin.com>, 
-    Sylvain Girard <sylvain.girard@se.com>, 
-    Pascal EBERHARD <pascal.eberhard@se.com>, netdev@vger.kernel.org, 
-    linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net 0/5] Fix missing PHY-to-MAC RX clock
-In-Reply-To: <20240103132810.1aae03e8@kernel.org>
-Message-ID: <a34046ef-b543-3f82-1562-5e7542f8529e@bootlin.com>
-References: <20240103142827.168321-1-romain.gantois@bootlin.com> <20240103132810.1aae03e8@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Marc MERLIN <marc@merlins.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
+Message-ID: <ZZZrbUPUCTtDcUFU@linux.intel.com>
+References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231206084448.53b48c49@kernel.org>
+ <ZZU3OaybyLfrAa/0@linux.intel.com>
+ <20240103153405.6b19492a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463808768-824936069-1704355274=:2791"
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240103153405.6b19492a@kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
----1463808768-824936069-1704355274=:2791
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-
-Hello Jakub,
-
-On Wed, 3 Jan 2024, Jakub Kicinski wrote:
-
-> On Wed,  3 Jan 2024 15:28:20 +0100 Romain Gantois wrote:
-> > There is an issue with some stmmac/PHY combinations that has been reported
-> > some time ago in a couple of different series:
+On Wed, Jan 03, 2024 at 03:34:05PM -0800, Jakub Kicinski wrote:
+> On Wed, 3 Jan 2024 11:30:17 +0100 Stanislaw Gruszka wrote:
+> > > I was really, really hoping that this would serve as a motivation
+> > > for Intel to sort out the igb/igc implementation. The flow AFAICT
+> > > is ndo_open() starts the NIC, the calls pm_sus, which shuts the NIC
+> > > back down immediately (!?) then it schedules a link check from a work  
 > > 
-> > Clark Wang's report: https://lore.kernel.org/all/20230202081559.3553637-1-xiaoning.wang@nxp.com/
-> > Clément Léger's report: https://lore.kernel.org/linux-arm-kernel/20230116103926.276869-4-clement.leger@bootlin.com/
+> > It's not like that. pm_runtime_put() in igc_open() does not disable device.
+> > It calls runtime_idle callback which check if there is link and if is
+> > not, schedule device suspend in 5 second, otherwise device stays running.
 > 
-> If those stmmac/PHY combinations never worked upstream please tag 
-> as [PATCH net-next], we should consider this work to be a be a new
-> feature / HW support. If they used to work - we'll need some Fixes
-> tags.
+> Hm, I missed the 5 sec delay there. Next question for me is - how does
+> it not deadlock in the open?
+> 
+> igc_open()
+>   __igc_open(resuming=false)
+>     if (!resuming)
+>       pm_runtime_get_sync(&pdev->dev);
+> 
+> igc_resume()
+>   rtnl_lock()
 
-These never worked properly upstream so I'll send it to net-next.
+If device was not suspended, pm_runtime_get_sync() will increase
+dev->power.usage_count counter and cancel pending rpm suspend
+request if any. There is race condition though, more about that
+below.
 
-Best Regards,
+If device was suspended, we could not get to igc_open() since it
+was marked as detached and fail netif_device_present() check in
+__dev_open(). That was the behaviour before bd869245a3dc.
 
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
----1463808768-824936069-1704355274=:2791--
+There is small race window between with igc_open() and scheduled
+runtime suspend, if at the same time dev_open() is done and
+dev->power.suspend_timer expire:
+
+open:					pm_suspend_timer_fh:
+
+rtnl_lock()
+					rpm_suspend()
+					  igc_runtime_suspend()
+					   __igc_shutdown()
+					     rtnl_lock()
+
+__igc_open()
+  pm_runtime_get_sync():
+    waits for rpm suspend callback done
+
+This needs to be addressed, but it's not that this can happen
+all the time. To trigger this someone has to remove the
+cable and exactly after 5 seconds do ip link set up. 
+
+Regards
+Stanislaw
 
