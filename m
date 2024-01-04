@@ -1,111 +1,98 @@
-Return-Path: <netdev+bounces-61549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E9A18243D4
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:32:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE74D8243DA
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:33:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5FC3284DBA
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:32:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 119CC1C21C93
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A052C20B1A;
-	Thu,  4 Jan 2024 14:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D6622EE6;
+	Thu,  4 Jan 2024 14:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nhWXa02B"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHJ54JlZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAFB225D3
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 14:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.west.internal (Postfix) with ESMTP id 134AD3200B32;
-	Thu,  4 Jan 2024 09:32:19 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Thu, 04 Jan 2024 09:32:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1704378739; x=1704465139; bh=vGxhhuGJmBt8A36J1dEbOHdQszu5
-	76tOBWvPFflxn4E=; b=nhWXa02BJddmMMAqlOZjWcWVghkOF+8dbQMelrlgCCQB
-	YpXd6+bzWcz4opVJs5gzpOsFmRM2hPjkOVDYW9R0cnQ5XKSzQ9/FFh5tmW1fDHhV
-	SAv++yWbpJzNMVJyDzgxAXEZ64N8P/8ubkVppEGHxH2rd5cPqidGtbLEZymQPS0d
-	lHzLHWKfHG9KVDk3hBsa7BcVymC76HF/PHZzW4LdhYxSj7/ws3koSt5znMDiBssw
-	N9TEKlATVsJ2cv7jvn1WDhq20G/V+QuMaoAczjC7F9PHXdtYc7O27V9/BTjnWTFV
-	9huBzhOwbVEhdmYboO0CE8d2LBvunMwMybTVOLPDzw==
-X-ME-Sender: <xms:c8GWZRKduwc6785_D_AkVfOUUiRiORwMuyIemTSqngJQBLv3g8mZmQ>
-    <xme:c8GWZdIojopk3H246gqmdjUKtbRnZ_3zEKxeWY_Z50VBFNiKALREk1HsaRn3MnJ0w
-    HsX6-mNIX1FATA>
-X-ME-Received: <xmr:c8GWZZtlLGwKhOELhHLYIs1tPscT5BxF4q84uiTdjCmAAJv8CEzaVPafnrO6>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdegjedgieehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfh
-    jeeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:c8GWZSbx90sujkNmNmMAdArzNO3OJ46lxtK0FDD2d9CadsUOUcJBMg>
-    <xmx:c8GWZYaVhZrrLxyyMl_HIGsl7jWzEQdeqnHUFMdeNw-EHMfhBw_m6Q>
-    <xmx:c8GWZWCqpVsga5xnj7nVPkGrTDjY_HUBbGzAL0NJ4KXFUBCilESxaQ>
-    <xmx:c8GWZVSVNNgdnsSbKJmDnEhSzGtsBnZUYUN_pHzMmIly8gVm_IN4BA>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 4 Jan 2024 09:32:18 -0500 (EST)
-Date: Thu, 4 Jan 2024 16:32:15 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, victor@mojatatu.com,
-	pctammela@mojatatu.com, mleitner@redhat.com, vladbu@nvidia.com,
-	paulb@nvidia.com
-Subject: Re: [patch net-next] net: sched: move block device tracking into
- tcf_block_get/put_ext()
-Message-ID: <ZZbBb6-jhc2atf8e@shredder>
-References: <20240104125844.1522062-1-jiri@resnulli.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133F5225D0;
+	Thu,  4 Jan 2024 14:33:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05CFFC433C7;
+	Thu,  4 Jan 2024 14:33:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704378804;
+	bh=aZr4dV3GXhJqOdhebHaFoYyGkow84PQTHg9dzYarFFc=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=nHJ54JlZbk4BdUkdoP5hZ3kixKIu4DNvGIkcvZqvaXk/2k9hIGXJc4nC9RuELRxVS
+	 2yR7pVE4mTE8qeV55ItBYYLXHSSGYiXFP5Hk6UveY08SusZ2aQ2iWs6sfHFEvezEZ8
+	 7fUD56Wi8hYHfcMnLUbeBP8eRLOZMHbPtzL0g1anlWGpMOrH6KbrL4JVNqm6X1k3mH
+	 CIdjKc5cDwCsnJAL6nkjmy6s3g8lDxR+X50lYqWSP8uaXXzySxRK/gMmGhnLo1sP12
+	 /E6h79KFcqRmnzKMBiY7OC9I+/jQlH0hW4zWurvl5ADmehzvcRnEUuQiPEWnaXYWV9
+	 RMjUD3feAZY4g==
+Received: (nullmailer pid 175802 invoked by uid 1000);
+	Thu, 04 Jan 2024 14:33:20 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104125844.1522062-1-jiri@resnulli.us>
+From: Rob Herring <robh@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: =?utf-8?q?N=C3=ADcolas_F_=2E_R_=2E_A_=2E_Prado?= <nfraprado@collabora.com>, =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, Konrad Dybcio <konrad.dybcio@linaro.org>, Robert Richter <rrichter@amd.com>, Paolo Abeni <pabeni@redhat.com>, linux-wireless@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Linus Walleij <linus.walleij@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Peng Fan <peng.fan@nxp.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Bjorn Andersson <andersson@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Eric Dumazet <edumazet@google.com>, Huacai Chen <chenhuacai@kernel.org>, linux-pci@vger.kernel.org, Kalle Valo <kvalo@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@linaro.org>, linux-arm-msm@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>, Heiko Stuebner <heiko@sntech.de>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Dan Williams <dan.j.williams@i
+ ntel.com>, Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, Chris Morgan <macromorgan@hotmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, Terry Bowman <terry.bowman@amd.com>, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, Marek Szyprowski <m.szyprowski@samsung.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Rob Herring <robh+dt@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Bjorn Helgaas <bhelgaas@google.com>
+In-Reply-To: <20240104130123.37115-7-brgl@bgdev.pl>
+References: <20240104130123.37115-1-brgl@bgdev.pl>
+ <20240104130123.37115-7-brgl@bgdev.pl>
+Message-Id: <170437880007.175780.12569173368621506971.robh@kernel.org>
+Subject: Re: [RFC 6/9] dt-bindings: vendor-prefixes: add a PCI prefix for
+ Qualcomm Atheros
+Date: Thu, 04 Jan 2024 07:33:20 -0700
 
-On Thu, Jan 04, 2024 at 01:58:44PM +0100, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> Inserting the device to block xarray in qdisc_create() is not suitable
-> place to do this. As it requires use of tcf_block() callback, it causes
-> multiple issues. It is called for all qdisc types, which is incorrect.
-> 
-> So, instead, move it to more suitable place, which is tcf_block_get_ext()
-> and make sure it is only done for qdiscs that use block infrastructure
-> and also only for blocks which are shared.
-> 
-> Symmetrically, alter the cleanup path, move the xarray entry removal
-> into tcf_block_put_ext().
-> 
-> Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra")
-> Reported-by: Ido Schimmel <idosch@nvidia.com>
-> Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
-> Reported-by: Kui-Feng Lee <sinquersw@gmail.com>
-> Closes: https://lore.kernel.org/all/ce8d3e55-b8bc-409c-ace9-5cf1c4f7c88e@gmail.com/
-> Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google.com/
-> Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google.com/
-> Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google.com/
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-Tested-by: Ido Schimmel <idosch@nvidia.com>
+On Thu, 04 Jan 2024 14:01:20 +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Document the PCI vendor prefix for Qualcomm Atheros so that we can
+> define the QCA PCI devices on device tree.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/vendor-prefixes.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
+
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/vendor-prefixes.yaml:1116:13: [error] empty value in block mapping (empty-values)
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/vendor-prefixes.yaml: patternProperties:^qca,.*: None is not of type 'object', 'boolean'
+	from schema $id: http://json-schema.org/draft-07/schema#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/vendor-prefixes.yaml: ignoring, error in schema: patternProperties: ^qca,.*
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240104130123.37115-7-brgl@bgdev.pl
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
