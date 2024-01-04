@@ -1,162 +1,230 @@
-Return-Path: <netdev+bounces-61718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED1C9824BCE
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:26:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDD7A824BD1
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:28:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F8CF1C22386
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:26:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B861B23650
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A192D04D;
-	Thu,  4 Jan 2024 23:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9342D052;
+	Thu,  4 Jan 2024 23:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zNQDdKxl"
+	dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="ap2Ay0I6";
+	dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="RstD/2Z/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx6.ucr.edu (mx6.ucr.edu [138.23.62.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6911F2D057
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 23:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-680a13af19bso5016076d6.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 15:26:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8FB2D022
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 23:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ucr.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucr.edu
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
+  t=1704410877; x=1735946877;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3U6IBgqMPfYIU4Ebli3H3Dr97CK+nUXKQyDxoPdswBE=;
+  b=ap2Ay0I6NVs0OOJ6Ibewh6dSA4LRSM6QIba69kb/QXKaRZEW842adPTc
+   ESMv9sR9q5hNoX/iy+Pk2jfaGOQ4tBT4liSj40i1mgS9zFwDDntPspiId
+   +2nNqw6wREGWMnTnPl6MbGFjqNyuIpD19HMehka31XgLmt2ro8GotpT/h
+   qDVxvwXMcBfGRGHLR7JeG+QsNn+3RT1KZhNi42pjSnp5JRHsZopA0oa6r
+   0grQSV6pItMsl2uSiuhWvlWPRKUXjJRPSnnE5ULntA5AnDwq2TlNgpgcR
+   Kj291Dlq0DFZFu4FrsBZYnZ6kJRL9pmMMvDVj1RBmji/c3WYRsx0jdCR5
+   w==;
+X-CSE-ConnectionGUID: OF+upPTzTNWHqptAYUoBKg==
+X-CSE-MsgGUID: KsQJggg9RAGDDFikWgiQJw==
+Received: from mail-oo1-f70.google.com ([209.85.161.70])
+  by smtpmx6.ucr.edu with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jan 2024 15:26:51 -0800
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-594e1ef83d0so1051963eaf.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 15:26:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704410802; x=1705015602; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3DEyAQYhS53N6Au2tNMM9Q2eJCxKU8de5VRSSH8XLx0=;
-        b=zNQDdKxl08UucJ+2BtBJAsxGzS3m1nb8lReW1ACtn6AAfVlzIqoOiaA9M/lkKMPPjl
-         5KePCHmY4Xowoo1ajnXUEayEHTIFa1RMaRcPfPDUbvmqdVe2d5mmYC3xCwPtJ7vIqara
-         ohVwUje5rdCSEyBAmaAer+kyzOUQH6SVrSMn91uhJtB4LkxpeDl61AgDNOa+aON+jni7
-         faKa0DivoYKgeTHpg5y4YyMMr2KQNnCjtfHiUUeQkGqsRLlmOogs/ucCVJ4OZGw48dvJ
-         0cScZyBuKW5smLuXrYjD1VIHyirwJItBntzNEFwDABAABpSM6tQ2n6ypKXrYcGi2Br0n
-         dBGA==
+        d=ucr.edu; s=rmail; t=1704410809; x=1705015609; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=u4Dw0mTClgaFsB3U7t+HPsmZwI4wTqyqXn3PwWakYqU=;
+        b=RstD/2Z/w2hON0CUvAYeMaOEOBH9Drov3L2VSLyouZQekBwOMuBXbog9urxjSkZPx2
+         XIpCqMbsJ/FuqbMVMx/zfUZ+O6ZQiqmucLlHr49mck53To+Jl4qfQTRFJUgUd1HyikDE
+         pjfl/DCUawsGEwOUJViSzYl7TaSj58AYkHJOg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704410802; x=1705015602;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3DEyAQYhS53N6Au2tNMM9Q2eJCxKU8de5VRSSH8XLx0=;
-        b=MtoHBppwIb7t2xzIOnPx5zl/Mi8hfJR4dNYOjBhrs5e4u4viJLmwt75In3/XsMHZuy
-         cVWNQcJ+7fLlk+iPtya25eHo0oYP3FZ9smn65vWD05hFC4C+n/QloU/aC4qnDBc6uC6G
-         F3fei2pQY0XbZ/cSeyhyd7VprKFOU/PqpVsqCG7HMMz2DXimnKKKcoF4yStSMdb7GIr3
-         6eocPik0/rwZs1r8ZNLn+MZ0Hks9Iwkd1eHU36T8n+C8KDwFcN/0MCW+hyYjOPrNcKGw
-         nPrJY+AFQDp3YYw8WvPzjsMOMpr08JH9YqeeeU/HHaVytD8wDQciBvl1Ar32lySX9+N3
-         jaJQ==
-X-Gm-Message-State: AOJu0YwnUYS8BnjNJcA5f0ycIYVg7sNVfzvxHJVJVrOU8PrK71UwvkNx
-	UGw2nT4lc2PTpuA4xpKCFippCkAHZlM/3R0zH34pEJHScJWFMzTF+Mw8Z1ycWsCmV4c=
-X-Google-Smtp-Source: AGHT+IGCYxgHTM7Kk3IU/8To+mH/q1nStuap46wb5qXAdXBKpucrrO3HHEXPCQLMPLxUXwev0nmcdNjg2LNWykiWeN4=
-X-Received: by 2002:a05:6214:76a:b0:67f:470e:ed7c with SMTP id
- f10-20020a056214076a00b0067f470eed7cmr1542378qvz.25.1704410802175; Thu, 04
- Jan 2024 15:26:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704410809; x=1705015609;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u4Dw0mTClgaFsB3U7t+HPsmZwI4wTqyqXn3PwWakYqU=;
+        b=fWtZmRXBsMM4cvTAvSqecnueAP7y2Ipk3uYxlH9XX2cyhM3YcETXCURUcAKbowxujH
+         hoi+2fSXDOAkvw0Z5zTCsXDPItYi2Z2EVt12JTIE3IVKoAyv79CRyUfNPTaWa/R/CMoF
+         jjC9+8qBFUENE/4ShrNzu6r3umOJRS4dcocu2Q+nDpDx/s4EkGj+Nj5Am3SAENwnF7zA
+         6LIDFshHajPHA0ZzjNmUpn7I0iOgbzbNiuIBzAWGzfgNcbTVLKTHZe7QkJiIrY8NiZeQ
+         FkBEZGkCrXiIp1VpNwO0nRWLrWL1FT0uh6WSJbdEjKrwYZrrG9uMTVlHY46/UaRPZ2UG
+         qlvA==
+X-Gm-Message-State: AOJu0YzTXiSKiSN4C5z28zBY9bpO1w8zmVR0E57DN/Vy3J73Fs6PrCrj
+	QYicVOwuIPZWTGeWDYpGAWCXkeYj5nLUyhpX721DnlJ/mEeXnwVyC5Yv+HQlbadYwn8/bhctVtn
+	HVudH7xWZgLBJbDaAPHH8AKoI/g==
+X-Received: by 2002:a05:6358:60c4:b0:170:daa8:576e with SMTP id i4-20020a05635860c400b00170daa8576emr1148701rwi.47.1704410808991;
+        Thu, 04 Jan 2024 15:26:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGDMbmb56woVxFKjGUQ/hq719tA9RHlVqnPTXOSn9/x5agag9e0eThcPLTidjJSnU0iJw7oEw==
+X-Received: by 2002:a05:6358:60c4:b0:170:daa8:576e with SMTP id i4-20020a05635860c400b00170daa8576emr1148692rwi.47.1704410808599;
+        Thu, 04 Jan 2024 15:26:48 -0800 (PST)
+Received: from localhost (kq.cs.ucr.edu. [169.235.27.223])
+        by smtp.gmail.com with UTF8SMTPSA id a5-20020a636605000000b0059d34fb9ccasm224141pgc.2.2024.01.04.15.26.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jan 2024 15:26:48 -0800 (PST)
+From: Xiaochen Zou <xzou017@ucr.edu>
+To: davem@davemloft.net
+Cc: dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xiaochen Zou <xzou017@ucr.edu>
+Subject: [PATCH] net: gre: complete lockless access to dev->needed_headroom
+Date: Thu,  4 Jan 2024 15:27:14 -0800
+Message-Id: <20240104232714.619657-1-xzou017@ucr.edu>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231221023650.3208767-1-aahila@google.com> <20231221173531.GA1202958@kernel.org>
-In-Reply-To: <20231221173531.GA1202958@kernel.org>
-From: Aahil Awatramani <aahila@google.com>
-Date: Thu, 4 Jan 2024 15:26:30 -0800
-Message-ID: <CAGfWUPw2CMEB5+0DPhZME_pZ5EX3zqqEfZhLBqKAHRS1+ua10w@mail.gmail.com>
-Subject: Re: [PATCH next] bonding: Extending LACP MUX State Machine to include
- a Collecting State.
-To: Simon Horman <horms@kernel.org>
-Cc: Mahesh Bandewar <maheshb@google.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
-	Andy Gospodarek <andy@greyhouse.net>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Thanks for the feedback, I have made the changes you have suggested
-moving forward.
+According to 4b397c06cb9 (net: tunnels: annotate lockless
+accesses to dev->needed_headroom), we need to use lockless
+access to protect dev->needed_headroom from data racing.
+This patch complete the changes in ip(6)_gre.
 
-On Thu, Dec 21, 2023 at 9:35=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Thu, Dec 21, 2023 at 02:36:50AM +0000, Aahil Awatramani wrote:
-> > Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
-> > the LACP MUX state machine for separated handling of an initial
-> > Collecting state before the Collecting and Distributing state. This
-> > enables a port to be in a state where it can receive incoming packets
-> > while not still distributing. This is useful for reducing packet loss w=
-hen
-> > a port begins distributing before its partner is able to collect.
-> > Additionally this also brings the 802.3ad bonding driver's implementati=
-on
-> > closer to the LACP specification which already predefined this behaviou=
-r.
-> >
-> > With this change, 802.3ad mode will use new
-> > bond_set_slave_txrx_{enabled|disabled}_flags() set of functions only
-> > instead of the earlier one (bond_set_slave_{active|inactive}_flags).
-> > Additionally, it adds new functions such as
-> > bond_set_slave_tx_disabled_flags and bond_set_slave_rx_enabled_flags to
-> > precisely manage the port's collecting and distributing states.
-> > Previously, there was no dedicated method to disable TX while keeping R=
-X
-> > enabled, which this patch addresses.
-> >
-> > Note that the regular flow process in the kernel's bonding driver remai=
-ns
-> > unaffected by this patch. The extension requires explicit opt-in by the
-> > user (in order to ensure no disruptions for existing setups) via netlin=
-k
-> > or sysfs support using the new bonding parameter lacp_extended_mux. The
-> > default value for lacp_extended_mux is set to 0 so as to preserve exist=
-ing
-> > behaviour.
-> >
-> > Signed-off-by: Aahil Awatramani <aahila@google.com>
->
-> ...
->
-> > @@ -1906,6 +2005,46 @@ static void ad_initialize_port(struct port *port=
-, int lacp_fast)
-> >       }
-> >  }
-> >
-> > +/**
-> > + * ad_enable_collecting - enable a port's receive
-> > + * @port: the port we're looking at
-> > + * @update_slave_arr: Does slave array need update?
->
-> The line above documenting @update_slave_arr
-> should be removed as the parameter is not in
-> the function definition below.
->
-> > + *
-> > + * Enable @port if it's in an active aggregator
-> > + */
-> > +static void ad_enable_collecting(struct port *port)
-> > +{
-> > +     if (port->aggregator->is_active) {
-> > +             struct slave *slave =3D port->slave;
-> > +
-> > +             slave_dbg(slave->bond->dev, slave->dev,
-> > +                       "Enabling collecting on port %d (LAG %d)\n",
-> > +                       port->actor_port_number,
-> > +                       port->aggregator->aggregator_identifier);
-> > +             __enable_collecting_port(port);
-> > +     }
-> > +}
->
-> The above is a pretty minor problem, but the bots are likely
-> to complain about it, so please fix it in v2 after waiting
-> for feedback from others on this patch.
->
-> When posting v2 please target it at the net-next tree.
->
->         Subject: [PATCH net-next v2] ...
->
-> --
-> pw-bot: changes-requested
+More changes in other modules might be needed for completeness.
+
+Signed-off-by: Xiaochen Zou <xzou017@ucr.edu>
+---
+ net/ipv4/ip_gre.c  | 12 ++++++------
+ net/ipv6/ip6_gre.c | 12 ++++++------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index 5169c3c72cff..8c979c421d79 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -491,7 +491,7 @@ static void gre_fb_xmit(struct sk_buff *skb, struct net_device *dev,
+ 	key = &tun_info->key;
+ 	tunnel_hlen = gre_calc_hlen(key->tun_flags);
+ 
+-	if (skb_cow_head(skb, dev->needed_headroom))
++	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+ 		goto err_free_skb;
+ 
+ 	/* Push Tunnel header. */
+@@ -541,7 +541,7 @@ static void erspan_fb_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	version = md->version;
+ 	tunnel_hlen = 8 + erspan_hdr_len(version);
+ 
+-	if (skb_cow_head(skb, dev->needed_headroom))
++	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+ 		goto err_free_skb;
+ 
+ 	if (gre_handle_offloads(skb, false))
+@@ -653,7 +653,7 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
+ 		    skb_checksum_start(skb) < skb->data)
+ 			goto free_skb;
+ 	} else {
+-		if (skb_cow_head(skb, dev->needed_headroom))
++		if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+ 			goto free_skb;
+ 
+ 		tnl_params = &tunnel->parms.iph;
+@@ -689,7 +689,7 @@ static netdev_tx_t erspan_xmit(struct sk_buff *skb,
+ 	if (gre_handle_offloads(skb, false))
+ 		goto free_skb;
+ 
+-	if (skb_cow_head(skb, dev->needed_headroom))
++	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+ 		goto free_skb;
+ 
+ 	if (skb->len > dev->mtu + dev->hard_header_len) {
+@@ -742,7 +742,7 @@ static netdev_tx_t gre_tap_xmit(struct sk_buff *skb,
+ 	if (gre_handle_offloads(skb, !!(tunnel->parms.o_flags & TUNNEL_CSUM)))
+ 		goto free_skb;
+ 
+-	if (skb_cow_head(skb, dev->needed_headroom))
++	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+ 		goto free_skb;
+ 
+ 	__gre_xmit(skb, dev, &tunnel->parms.iph, htons(ETH_P_TEB));
+@@ -768,7 +768,7 @@ static void ipgre_link_update(struct net_device *dev, bool set_mtu)
+ 	if (dev->header_ops)
+ 		dev->hard_header_len += len;
+ 	else
+-		dev->needed_headroom += len;
++		WRITE_ONCE(dev->needed_headroom, dev->needed_headroom + len);
+ 
+ 	if (set_mtu)
+ 		dev->mtu = max_t(int, dev->mtu - len, 68);
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index 070d87abf7c0..8c060591641d 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -782,7 +782,7 @@ static netdev_tx_t __gre6_xmit(struct sk_buff *skb,
+ 			(TUNNEL_CSUM | TUNNEL_KEY | TUNNEL_SEQ);
+ 		tun_hlen = gre_calc_hlen(flags);
+ 
+-		if (skb_cow_head(skb, dev->needed_headroom ?: tun_hlen + tunnel->encap_hlen))
++		if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom) ?: tun_hlen + tunnel->encap_hlen))
+ 			return -ENOMEM;
+ 
+ 		gre_build_header(skb, tun_hlen,
+@@ -792,7 +792,7 @@ static netdev_tx_t __gre6_xmit(struct sk_buff *skb,
+ 						      : 0);
+ 
+ 	} else {
+-		if (skb_cow_head(skb, dev->needed_headroom ?: tunnel->hlen))
++		if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom) ?: tunnel->hlen))
+ 			return -ENOMEM;
+ 
+ 		flags = tunnel->parms.o_flags;
+@@ -976,7 +976,7 @@ static netdev_tx_t ip6erspan_tunnel_xmit(struct sk_buff *skb,
+ 			truncate = true;
+ 	}
+ 
+-	if (skb_cow_head(skb, dev->needed_headroom ?: t->hlen))
++	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom) ?: t->hlen))
+ 		goto tx_err;
+ 
+ 	t->parms.o_flags &= ~TUNNEL_KEY;
+@@ -1153,7 +1153,7 @@ static void ip6gre_tnl_link_config_route(struct ip6_tnl *t, int set_mtu,
+ 			if (t->dev->header_ops)
+ 				dev->hard_header_len = dst_len;
+ 			else
+-				dev->needed_headroom = dst_len;
++				WRITE_ONCE(dev->needed_headroom, dst_len);
+ 
+ 			if (set_mtu) {
+ 				int mtu = rt->dst.dev->mtu - t_hlen;
+@@ -1184,7 +1184,7 @@ static int ip6gre_calc_hlen(struct ip6_tnl *tunnel)
+ 	if (tunnel->dev->header_ops)
+ 		tunnel->dev->hard_header_len = LL_MAX_HEADER + t_hlen;
+ 	else
+-		tunnel->dev->needed_headroom = LL_MAX_HEADER + t_hlen;
++		WRITE_ONCE(tunnel->dev->needed_headroom, LL_MAX_HEADER + t_hlen);
+ 
+ 	return t_hlen;
+ }
+@@ -1864,7 +1864,7 @@ static int ip6erspan_calc_hlen(struct ip6_tnl *tunnel)
+ 		       erspan_hdr_len(tunnel->parms.erspan_ver);
+ 
+ 	t_hlen = tunnel->hlen + sizeof(struct ipv6hdr);
+-	tunnel->dev->needed_headroom = LL_MAX_HEADER + t_hlen;
++	WRITE_ONCE(tunnel->dev->needed_headroom, LL_MAX_HEADER + t_hlen);
+ 	return t_hlen;
+ }
+ 
+-- 
+2.25.1
+
 
