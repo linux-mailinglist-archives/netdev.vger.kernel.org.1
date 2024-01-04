@@ -1,41 +1,69 @@
-Return-Path: <netdev+bounces-61412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE5FD823A13
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:10:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD2A823A17
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:14:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A533B2481F
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:10:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B46421F25E78
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C06376;
-	Thu,  4 Jan 2024 01:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62643376;
+	Thu,  4 Jan 2024 01:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k2ldSHLn"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="LsK5Rd0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BADA2A
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 01:10:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6EC5EC433C8;
-	Thu,  4 Jan 2024 01:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704330625;
-	bh=Une7s4zuvc12YtkykhavKdDsl78p5wuZ30KaTvKWC9E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k2ldSHLn8lvUX4v0/4ZDNRH1OMc4ipK1DRZ7YqMxsmbseypkBrkm6usM6ShBLe3F7
-	 /2+2rMp3UjxTZYP25HQUBX+9sWo3dXbxuQebNa8MozYCkioWrOtCuH++Fmy2ETo4/F
-	 FsEehtF2dPDi4mprJIU6Z0T/HrgS/1fucYbmX2M0ssk7ddl28jmxmEPT+C/MxNnvW9
-	 HPlfNBlmUpcsvtfkV8SVB1JX2sFekYy10ExYelAkLF75kZ/T2Bp7EIyuD5gIWadoOX
-	 uYBr6/T6dDbVXV9fkcab2+CMhwSNKbNRQYUKblbXdT+CQzyzvheveBdmGzqXBN0gsJ
-	 nlL3kP48SfbpA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 54C15C43168;
-	Thu,  4 Jan 2024 01:10:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9815E1851
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 01:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-28bf1410e37so8772916a91.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 17:14:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1704330873; x=1704935673; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8m21qIBX8vbuJ/H7kcz1mHNetUJ1SqQygxP6CcGiOzA=;
+        b=LsK5Rd0nJWeRkmOhuJMUGBFxGmseQhlv//JkP6c9GmHe+7Tg3AFEgTFi4TvxJyYIf8
+         w4LibAoRm1gP0yZad6EoFZ30/FiRPrp4zD8+9/OpcbBY/Cep/P2e0Yd9no9qYkZutM6y
+         gLggLnLDdlMjpMgV7CbdgB+BUGWNXkds9zWGZkbjLNjWwcBCVjMazsWjJ0NEF9zCDTuf
+         28+2oXSk5A2A5AkJwmwFXYn/cjZSIfeOCK2/vHNadmLpRCcrK1FmRgIOiR8m3+qF90GZ
+         kJnICh3U72/LtvquQUKun1cJv/OLmXtA3GkV/OePlfy8dne74c588NesXhlhnHP66zBB
+         Hduw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704330873; x=1704935673;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8m21qIBX8vbuJ/H7kcz1mHNetUJ1SqQygxP6CcGiOzA=;
+        b=VEj3J1dZOxeJKbQMOJDVbX8SX9ZfqYskwHpxW+ayFcTIPDRVwBeqHYxoIfrfUjk/Ij
+         UfklsWpruPvpU/MqxdEBIa/tB1vJ9gFjNUloCPc6V2ux0PXtyDYNJBs+AokqgQ/8UDQF
+         ggNNado53/kZle5w/7YVmqwktOEWQfgcWBZ0ByLzrE7gGwzQAWKAXgrPGXLHqABdtaQi
+         8DIb+yiN0B1Dnn+/LyrXuXvHUXQGB6r3frtzo5OCxfXppA+A2i0ilZOH+xDx2Uholv2g
+         toUpzySkaM0ywAfP6Powe2H97AFbgLyrqT6EeJbehn01X9kqxuZers3KYkJeXBaBLlp+
+         98UQ==
+X-Gm-Message-State: AOJu0Yya9Tpe3FUKBjJYhmxv/smS97+r6Eu8ZurRGFZw2aqdwtNECMo/
+	I88AVtJSBbWkRXlRIDSqiSJC4iF9z7dKYiPCEcsHdivxCuo=
+X-Google-Smtp-Source: AGHT+IGis2EGj6FKPf8FQDwJvLpjXyWm58HtTJyLanjKtXCWRLPP4vx6164iKiCSQd8lNtz6QY5m1g==
+X-Received: by 2002:a17:90a:4961:b0:28b:e9e9:e0f with SMTP id c88-20020a17090a496100b0028be9e90e0fmr10653316pjh.17.1704330872758;
+        Wed, 03 Jan 2024 17:14:32 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id e4-20020a17090a7c4400b0028adcc0f2c4sm2510124pjl.18.2024.01.03.17.14.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 17:14:32 -0800 (PST)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: leon@kernel.org
+Cc: netdev@vger.kernel.org,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH v2 iproute2 0/6] rdma: print related patches
+Date: Wed,  3 Jan 2024 17:13:38 -0800
+Message-ID: <20240104011422.26736-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,48 +71,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates
- 2023-12-27 (ice, i40e)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170433062534.12007.1957974757794986044.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jan 2024 01:10:25 +0000
-References: <20231227182541.3033124-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20231227182541.3033124-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org
 
-Hello:
+This set of patches makes rdma comman behave more like the
+other commands in iproute2 around printing flags.
+There are some other things found while looking at that code.
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This version keeps similar function names to original
 
-On Wed, 27 Dec 2023 10:25:29 -0800 you wrote:
-> This series contains updates to ice and i40e drivers.
-> 
-> Katarzyna changes message to no longer be reported as error under
-> certain conditions as it can be expected on ice.
-> 
-> Ngai-Mint ensures VSI is always closed when stopping interface to
-> prevent NULL pointer dereference for ice.
-> 
-> [...]
+Stephen Hemminger (6):
+  rdma: shorten print_ lines
+  rdma: use standard flag for json
+  rdma: make pretty behave like other commands
+  rdma: make supress_errors a bit
+  rdma: add oneline flag
+  rdma: do not mix newline and json object
 
-Here is the summary with links:
-  - [net,1/4] ice: Fix link_down_on_close message
-    https://git.kernel.org/netdev/net/c/6a8d8bb55e70
-  - [net,2/4] ice: Shut down VSI with "link-down-on-close" enabled
-    https://git.kernel.org/netdev/net/c/6d05ff55ef4f
-  - [net,3/4] ice: dpll: fix phase offset value
-    https://git.kernel.org/netdev/net/c/8278a6a43d03
-  - [net,4/4] i40e: Fix filter input checks to prevent config with invalid values
-    https://git.kernel.org/netdev/net/c/3e48041d9820
+ man/man8/rdma.8 | 12 ++++++--
+ rdma/dev.c      | 42 +++++++++++++++-------------
+ rdma/link.c     | 52 +++++++++++++++++-----------------
+ rdma/rdma.c     | 21 +++++++++-----
+ rdma/rdma.h     | 11 ++++----
+ rdma/res-cmid.c | 37 ++++++++++++-------------
+ rdma/res-cq.c   | 34 +++++++++++------------
+ rdma/res-ctx.c  | 11 ++++----
+ rdma/res-mr.c   | 26 +++++++++--------
+ rdma/res-pd.c   | 21 +++++++-------
+ rdma/res-qp.c   | 50 ++++++++++++++++-----------------
+ rdma/res-srq.c  | 27 +++++++++---------
+ rdma/res.c      | 39 +++++++++++---------------
+ rdma/res.h      | 18 +++++-------
+ rdma/stat-mr.c  | 10 +++----
+ rdma/stat.c     | 70 +++++++++++++++++++++-------------------------
+ rdma/stat.h     |  4 +--
+ rdma/sys.c      | 11 +++-----
+ rdma/utils.c    | 74 +++++++++++++++++++++++--------------------------
+ 19 files changed, 277 insertions(+), 293 deletions(-)
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
