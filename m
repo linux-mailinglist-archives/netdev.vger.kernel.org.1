@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-61406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D50B8239FF
+	by mail.lfdr.de (Postfix) with ESMTPS id DD102823A00
 	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:00:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A0DF283561
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A7BA282891
 	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A664B3C2D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB623D7B;
 	Thu,  4 Jan 2024 01:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m8xuCopu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MrHci0Hk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838292103;
-	Thu,  4 Jan 2024 01:00:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1521AC433B6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3AC32586
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 01:00:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C1BDC433AD;
 	Thu,  4 Jan 2024 01:00:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704330035;
-	bh=dLPo4DMtLf+Mc+SXT44xTlOO43MfxyAbxaSAlmDx238=;
+	bh=sdCLNeOl18ihYv93jeXGNf9KIn5+pvpkhtswnZmcctw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=m8xuCopuY0JrWLanvKFWo5jwYmf247l/1pMYxFwp4Dl/0pAgxhsJYFtBGiTMegfS5
-	 py3kMvacrCntnVyY1LI/gpZI/GQfRTRrNCNy0nQwvPGoHYvQYeGf6Kw6Vlr4T2Huya
-	 Dv0m5rT+1wAfZFypVx19weYjZGxzQrN/8bkKKX6XEmO5lJzixClU630pT9YRa7r5SW
-	 29OlLBu6GFZQ7I1BltFlJihpfTaxDDKjuNqCjXS6QkP15Ske9CyIpfkCwrqt1PnKb3
-	 UXX1NrGR9zA0leCXdQAbGCrD/7XRO4UnNYQQtNqeh37GOhJooT2HUDNxsaRSc2iJ8S
-	 HHbbfGYU+qkjQ==
+	b=MrHci0Hkurw+wPXPS5C4XLNTXkRXOtOgegb5lZ2mx5BzSFcmpxM/kQ2dzr8m1Aizb
+	 NJpUwpkhGN39l+gkSK/9KSKdyQHfxLEDSQuY8M7kw0knw0Y1PLiumgdu99cjMBhpAh
+	 AAbTifvNHQSPFRnSu4EAYVONZqwpNgZQtqFhppKWla7jsDVwinqKla0vqblQ7/NutC
+	 yL/pTcMV80OnjTa9ddhtqF8UQ/NoOb0Vo6iIjdQTrz+wVSA7vlI7yhm81s/OrmEq0m
+	 SCPROW8Lhrk2XQnJ7OzOO3o/4u4hTbU2lC/euzj7wwEm0xIB46RamO7B1i3O7G/8y5
+	 nwdWvoT9fAa6g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F1D2DC00446;
-	Thu,  4 Jan 2024 01:00:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05D53C395C5;
+	Thu,  4 Jan 2024 01:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,36 +43,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/qla3xxx: fix potential memleak in ql_alloc_buffer_queues
+Subject: Re: [PATCH net 0/2][pull request] Intel Wired LAN Driver Updates
+ 2023-12-26 (idpf)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170433003498.5757.16525798721106023032.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jan 2024 01:00:34 +0000
-References: <20231227070227.10527-1-dinghao.liu@zju.edu.cn>
-In-Reply-To: <20231227070227.10527-1-dinghao.liu@zju.edu.cn>
-To: Dinghao Liu <dinghao.liu@zju.edu.cn>
-Cc: GR-Linux-NIC-Dev@marvell.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ron.mercer@qlogic.com, jeff@garzik.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <170433003501.5757.17195085391144718471.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jan 2024 01:00:35 +0000
+References: <20231226174125.2632875-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20231226174125.2632875-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Wed, 27 Dec 2023 15:02:27 +0800 you wrote:
-> When dma_alloc_coherent() fails, we should free qdev->lrg_buf
-> to prevent potential memleak.
+On Tue, 26 Dec 2023 09:41:22 -0800 you wrote:
+> This series contains updates to idpf driver only.
 > 
-> Fixes: 1357bfcf7106 ("qla3xxx: Dynamically size the rx buffer queue based on the MTU.")
-> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
-> ---
->  drivers/net/ethernet/qlogic/qla3xxx.c | 2 ++
->  1 file changed, 2 insertions(+)
+> Alexander resolves issues in singleq mode to prevent corrupted frames
+> and leaking skbs.
+> 
+> Pavan prevents extra padding on RSS struct causing load failure due to
+> unexpected size.
+> 
+> [...]
 
 Here is the summary with links:
-  - net/qla3xxx: fix potential memleak in ql_alloc_buffer_queues
-    https://git.kernel.org/netdev/net/c/89f45c30172c
+  - [net,1/2] idpf: fix corrupted frames and skb leaks in singleq mode
+    https://git.kernel.org/netdev/net/c/fea7b71b8751
+  - [net,2/2] idpf: avoid compiler introduced padding in virtchnl2_rss_key struct
+    https://git.kernel.org/netdev/net/c/a613fb464dc4
 
 You are awesome, thank you!
 -- 
