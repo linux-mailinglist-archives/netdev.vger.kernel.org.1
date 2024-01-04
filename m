@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-61453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51FC6823C73
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 08:05:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 959F6823CBD
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 08:27:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00C3D287CB9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 07:05:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 336971F2347B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 07:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7868D1D699;
-	Thu,  4 Jan 2024 07:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF921DFE9;
+	Thu,  4 Jan 2024 07:26:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B6F1DDE7;
-	Thu,  4 Jan 2024 07:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from linma$zju.edu.cn ( [42.120.103.48] ) by
- ajax-webmail-mail-app4 (Coremail) ; Thu, 4 Jan 2024 15:04:56 +0800
- (GMT+08:00)
-Date: Thu, 4 Jan 2024 15:04:56 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Jeremy Kerr" <jk@codeconstruct.com.au>
-Cc: "Jakub Kicinski" <kuba@kernel.org>, matt@codeconstruct.com.au, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v1] net: mctp: use deprecated parser in
- mctp_set_link_af
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2024 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <e5e0640094a4e594eda8c3f8a54eca6728e58510.camel@codeconstruct.com.au>
-References: <20231228070258.3052422-1-linma@zju.edu.cn>
- <20240103174719.2b2c1565@kernel.org>
- <7cbc3044.688a7.18cd32c5f14.Coremail.linma@zju.edu.cn>
- <e5e0640094a4e594eda8c3f8a54eca6728e58510.camel@codeconstruct.com.au>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282E91EB23
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 07:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5ae9b3.dynamic.kabel-deutschland.de [95.90.233.179])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 16D6D61E5FE01;
+	Thu,  4 Jan 2024 08:26:19 +0100 (CET)
+Message-ID: <7bfd7069-8222-4388-bc1f-d4e77093b503@molgen.mpg.de>
+Date: Thu, 4 Jan 2024 08:26:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <1ad2eb4b.68b90.18cd34a146c.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgAH2Z2ZWJZluXA8AA--.8668W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwIKEmWVL-wSTQACsn
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+User-Agent: Mozilla Thunderbird
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ixgbe: Convert ret val type
+ from s32 to int
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com
+References: <20240103101135.386891-1-jedrzej.jagielski@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240103101135.386891-1-jedrzej.jagielski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-SGVsbG8gSmVyZW15LAoKPiAKPiBIaSBMaW4sCj4gCj4gPiAoMSkgd2lsbCBnZXQgQUZfTUNUUCB3
-aXRoIG5sYV90eXBlKC4uLikgY2FsbCwgYW5kICgyKSB3aWxsIHRoZW4KPiA+IHBhc3NpbmcgYGFm
-YCB0byBgbWN0cF9zZXRfbGlua19hZmAsIHdoaWNoIHdpbGwgZXhwZWN0IHRoZQo+ID4gYE5MQV9G
-X05FU1RFRGAgZmxhZy4KPiAKPiBZb3UgY291bGQgc2V0IHRoYXQgZmxhZz8gSXQncyBub3QgZXhj
-bHVzaXZlIHdpdGggdGhlIGF0dHJpYnV0ZSB0eXBlLgo+IEZyb20gbmV0bGluay5oOgo+IAo+ICAg
-LyoKPiAgICAqIG5sYV90eXBlICgxNiBiaXRzKQo+ICAgICogKy0tLSstLS0rLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLSsKPiAgICAqIHwgTiB8IE8gfCBBdHRyaWJ1dGUgVHlwZSAgICAg
-ICAgICAgICAgICB8Cj4gICAgKiArLS0tKy0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tKwo+ICAgICogTiA6PSBDYXJyaWVzIG5lc3RlZCBhdHRyaWJ1dGVzCj4gICAgKiBPIDo9IFBh
-eWxvYWQgc3RvcmVkIGluIG5ldHdvcmsgYnl0ZSBvcmRlcgo+ICAgICoKPiAgICAqIE5vdGU6IFRo
-ZSBOIGFuZCBPIGZsYWcgYXJlIG11dHVhbGx5IGV4Y2x1c2l2ZS4KPiAgICAqLwo+IAo+IFdoaWNo
-IGlzIHdoYXQgd2UgZG8gd2l0aCBleGlzdGluZyB1c2Vyc3BhY2U6Cj4gCj4gICBodHRwczovL2dp
-dGh1Yi5jb20vQ29kZUNvbnN0cnVjdC9tY3RwL2Jsb2IvNmFhNGIwNTJkL3NyYy9tY3RwLmMjTDU2
-OUMxLUw1NjlDMQo+IAo+IENoZWVycywKCk9vcHMsIG15IGJhZC4gSnVzdCBrbm93IHRoYXQgdGhl
-IG5sYV90eXBlIHdpbGwgbWFzayB3aXRoIGBOTEFfVFlQRV9NQVNLYC4gCgpTb3JyeSBmb3IgdGhl
-IGJvdGhlci4gVF5UCgo+IAo+IAo+IEplcmVteQoKVGhhbmtzCkxpbg==
+[Re-sent with diff removed, so message size limit of 90 kB of list 
+Intel-wired-lan is met.]
+
+Dear Jedrzej,
+
+
+Thank you for your patch.
+
+Am 03.01.24 um 11:11 schrieb Jedrzej Jagielski:
+> Currently big amount of the functions returning standard
+> error codes are of type s32. Convert them to regular
+> ints.
+
+Please make use of the full allowed text width of 75 characters per line.
+
+Also please add the motivation. Why are regular ints better?
+
+[…]
+
+
+Kind regards,
+
+Paul
 
