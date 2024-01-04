@@ -1,129 +1,133 @@
-Return-Path: <netdev+bounces-61443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C265823B09
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 04:17:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E439B823B47
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 04:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2BF5287FDB
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 03:17:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 708DD1F262F8
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 03:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E265E5231;
-	Thu,  4 Jan 2024 03:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9AE1525E;
+	Thu,  4 Jan 2024 03:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bzfW1GzW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lAzHPJAz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728E7522A
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 03:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704338242; x=1735874242;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4t+8AGUkr5qIig1mL92sAc1AjdDSVehKzDxwpmnmh4Y=;
-  b=bzfW1GzW1npcsBoVghzICRnlxcGZQal4OHXcjrKh1OxbRvLeuxU2L7Zb
-   FVnxj6yo1o9pWNOQt1QYo8WDxzWTySFTlVjArYcrlwR92L0SJ6qb8j/Kr
-   hLr0K9po8Iwo+Zd4N4clWn9+A8ivgtr146ciGLpfyP6JG9gemKc4qGeOO
-   OevaWGYeWeGRXcn8V/r437WLhz/+8nrxQhLvSgl846KuSvRVloge+Zgdm
-   oVY7nY6CQjk7xBMbwoxa7Rpx7niE9WUrriQidzCsXvVgo0PlCLh5sf3FF
-   qWJ92/jKOdQiTmZrCiucWMt1Nbg29UgmxOQ64VE+YZL2MzIW182uiVAaE
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="463516644"
-X-IronPort-AV: E=Sophos;i="6.04,329,1695711600"; 
-   d="scan'208";a="463516644"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2024 19:17:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="814466507"
-X-IronPort-AV: E=Sophos;i="6.04,329,1695711600"; 
-   d="scan'208";a="814466507"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 03 Jan 2024 19:17:19 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rLEEP-000MqO-11;
-	Thu, 04 Jan 2024 03:17:17 +0000
-Date: Thu, 4 Jan 2024 11:16:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>, davem@davemloft.net,
-	kuba@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, andrew@lunn.ch, f.fainelli@gmail.com,
-	olteanv@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: dsa: mv88e6xxx: Add LED support for
- 6393X
-Message-ID: <202401041120.UXiohfGq-lkp@intel.com>
-References: <20240103103351.1188835-3-tobias@waldekranz.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F69B18647;
+	Thu,  4 Jan 2024 03:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d3dee5f534so7420845ad.1;
+        Wed, 03 Jan 2024 19:47:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704340074; x=1704944874; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cR7S9UreToinw669MkZiNniYRYkImV7KoyVOqWp7Fvg=;
+        b=lAzHPJAzm0AQltmJsqPZubeYcbkGykY7EA2eHK3AKU6HBg/huzYiUTHK++xAB+JlsK
+         QpAwCpEpbX5E1DnpazO3dC/3x9hlqOv6/1aaxmBvfUXZdIeTeanUK2dBDcE2s4ucdh6r
+         gv8QfKrPw3SJI8W3WB2zXm0KjIYiBr1iHy8q7uVL4cJypBLpRJDWNTdG1pscPGHs+Cux
+         JCKdLjH+DR5VK4/eIdEz0Hrr9YhIJ5w4tBL5vBY5Bh8RgeJwi4w3fCkeNVoXrcUHJUqB
+         lM2Nhy7COKm1Yi97m8R9mRMJmNCzeVpuwO9p8ad7QXBP06bMABx0QL4Q/wDatNo3IrHG
+         NHtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704340074; x=1704944874;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cR7S9UreToinw669MkZiNniYRYkImV7KoyVOqWp7Fvg=;
+        b=Sq0Sx1h/EReOVbrAEVOwAsqTNhIWTqyxCNL6Bw9K/RmtBkrOycGj9m8Kl7M7tWg26f
+         CbKvCWfCodIzshsmjM3f0SAmIx9hXk+bnGGnGzUKzTr1GGmGIj+dkDI1q9hdHlt9bTFo
+         tMQX5oW289Y+qpiJgC82rMIi3jShvEpi2/Cl2S4CV+J9GR3wMDDpIfFZeN9dIGO1MHnl
+         l/23+pMjIB3Mpo1ZxbsCXZMZO01GeTPu8Elk0ZGFL/njFvJmCjibH9X43ldJhcblmLXC
+         TiljLzYu7QVxGFFmm2HEehvm9uyQDlltaiqUgI/v49iwTfA43SpDlo2pnqNrc63Dm2IQ
+         GYwg==
+X-Gm-Message-State: AOJu0YwvOJdT8wnaAtkNNCl63Lx7OydP/NTWw7XpdO2hwZdP5JYQFvte
+	oOtWGYMBdGEsPpub5AJA1Fs=
+X-Google-Smtp-Source: AGHT+IE0IE2oBTjMy8aWXibgHKFOnrR9SfaJ6etfw0jKbJI+w2hT54Y7XGcwdI57lnbpDzoU2HlHXQ==
+X-Received: by 2002:a17:902:6ac3:b0:1cf:e9b5:90ee with SMTP id i3-20020a1709026ac300b001cfe9b590eemr18673plt.24.1704340073423;
+        Wed, 03 Jan 2024 19:47:53 -0800 (PST)
+Received: from localhost ([98.97.37.198])
+        by smtp.gmail.com with ESMTPSA id q20-20020a170902789400b001d47868c31fsm14756564pll.194.2024.01.03.19.47.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 19:47:52 -0800 (PST)
+Date: Wed, 03 Jan 2024 19:47:51 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: rivendell7@gmail.com, 
+ kuniyu@amazon.com, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org
+Message-ID: <65962a67329cc_2bb2020850@john.notmuch>
+In-Reply-To: <841935e8-f075-4fc4-9f1b-3451ad6e1f98@linux.dev>
+References: <20231221232327.43678-1-john.fastabend@gmail.com>
+ <20231221232327.43678-2-john.fastabend@gmail.com>
+ <87zfxoueqe.fsf@cloudflare.com>
+ <841935e8-f075-4fc4-9f1b-3451ad6e1f98@linux.dev>
+Subject: Re: [PATCH bpf 1/5] bpf: sockmap, fix proto update hook to avoid dup
+ calls
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240103103351.1188835-3-tobias@waldekranz.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Tobias,
+Martin KaFai Lau wrote:
+> On 1/2/24 4:00 AM, Jakub Sitnicki wrote:
+> > On Thu, Dec 21, 2023 at 03:23 PM -08, John Fastabend wrote:
+> >> When sockets are added to a sockmap or sockhash we allocate and init a
+> >> psock. Then update the proto ops with sock_map_init_proto the flow is
+> >>
+> >>    sock_hash_update_common
+> >>      sock_map_link
+> >>        psock = sock_map_psock_get_checked() <-returns existing psock
+> >>        sock_map_init_proto(sk, psock)       <- updates sk_proto
+> >>
+> >> If the socket is already in a map this results in the sock_map_init_proto
+> >> being called multiple times on the same socket. We do this because when
+> >> a socket is added to multiple maps this might result in a new set of BPF
+> >> programs being attached to the socket requiring an updated ops struct.
+> >>
+> >> This creates a rule where it must be safe to call psock_update_sk_prot
+> >> multiple times. When we added a fix for UAF through unix sockets in patch
+> >> 4dd9a38a753fc we broke this rule by adding a sock_hold in that path
+> >> to ensure the sock is not released. The result is if a af_unix stream sock
+> >> is placed in multiple maps it results in a memory leak because we call
+> >> sock_hold multiple times with only a single sock_put on it.
+> >>
+> >> Fixes: 4dd9a38a753fc ("bpf: sockmap, fix proto update hook to avoid dup calls")
+> 
+> The Fixes tag looks wrong ;)
+> 
+> I changed it to
+> 
+> Fixes: 8866730aed51 ("bpf, sockmap: af_unix stream sockets need to hold ref for 
+> pair sock")
+> 
+> >> Rebported-by: Xingwei Lee <xrivendell7@gmail.com>
+> > 
+> > Nit: Typo ^
+> 
+> yep. fixed.
+> 
+> Also added the missing "test_sockmap_pass_prog__destroy(skel)" to the 
+> sockmap_basic.c selftest.
 
-kernel test robot noticed the following build warnings:
+Thanks! Appreciate it Martin.
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Tobias-Waldekranz/net-dsa-mv88e6xxx-Add-LED-infrastructure/20240103-183726
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240103103351.1188835-3-tobias%40waldekranz.com
-patch subject: [PATCH net-next 2/2] net: dsa: mv88e6xxx: Add LED support for 6393X
-config: arm64-randconfig-001-20240104 (https://download.01.org/0day-ci/archive/20240104/202401041120.UXiohfGq-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240104/202401041120.UXiohfGq-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401041120.UXiohfGq-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/dsa/mv88e6xxx/leds.c:77:22: warning: no previous prototype for 'mv88e6393x_led_map' [-Wmissing-prototypes]
-      77 | const unsigned long *mv88e6393x_led_map(struct mv88e6xxx_led *led)
-         |                      ^~~~~~~~~~~~~~~~~~
-   drivers/net/dsa/mv88e6xxx/leds.c:398:5: warning: no previous prototype for 'mv88e6xxx_port_setup_leds' [-Wmissing-prototypes]
-     398 | int mv88e6xxx_port_setup_leds(struct dsa_switch *ds, int port)
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/mv88e6393x_led_map +77 drivers/net/dsa/mv88e6xxx/leds.c
-
-    76	
-  > 77	const unsigned long *mv88e6393x_led_map(struct mv88e6xxx_led *led)
-    78	{
-    79		switch (led->port) {
-    80		case 1:
-    81		case 2:
-    82		case 3:
-    83		case 4:
-    84		case 5:
-    85		case 6:
-    86		case 7:
-    87		case 8:
-    88			return mv88e6393x_led_map_p1_p8[led->index];
-    89		case 9:
-    90		case 10:
-    91			return mv88e6393x_led_map_p9_p10[led->index];
-    92		}
-    93	
-    94		return NULL;
-    95	}
-    96	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> Applied. Thanks for the fixes and the review.
+> 
 
