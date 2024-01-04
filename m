@@ -1,124 +1,121 @@
-Return-Path: <netdev+bounces-61474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D99B7823F85
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:35:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFBC8823F8A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:38:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79E8AB24BA5
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 10:35:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A486281CF0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 10:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1EC1EB48;
-	Thu,  4 Jan 2024 10:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACD820313;
+	Thu,  4 Jan 2024 10:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Ak1i0mOo"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145B920DC4
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 10:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 404AYx8J050578;
-	Thu, 4 Jan 2024 19:34:59 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
- Thu, 04 Jan 2024 19:34:59 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 404AYxCk050573
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 4 Jan 2024 19:34:59 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <d314e471-0251-461e-988d-70add0c6ebf6@I-love.SAKURA.ne.jp>
-Date: Thu, 4 Jan 2024 19:34:59 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E92720DCD
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 10:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qLPZ/UEJu+oa4eFKvb/KQ3lJnSrlG/VuW97qxRQS6VY=; b=Ak1i0mOoZaybzV2N6DUc+N9Vu+
+	pWWY/orjJVCmSDjX9rrXOfLLvDrzd/SEjwNyHEzUYuuOOGEsMYmaWolNdx7rO3Sclk/2keHdPLXeg
+	b3y3J4MtjuwRyHHGf/9bcNL/mrkeodL7nm0J0F5r8GhktPUfvmdTM98ERUx41QfnZ/mvdwgu/LOpC
+	UloLZ7AApe7/3BRThOtqeCf4hTr0Hka8D9Nihtx3FoXJCG2tUgn1FIlSy4QANVV0O2A3QbU32AF5u
+	mk3/FPCdHsd6tYR+/B+yWG1OeI4pgYwMu8coR7dnVv15FTXUbztXfZJCwyNHINWEU6CMa0gOTjBvX
+	S9sP8Qkw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54566 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1rLL6m-0008NF-2P;
+	Thu, 04 Jan 2024 10:37:52 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1rLL6p-00EvAd-Ej; Thu, 04 Jan 2024 10:37:55 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] net: mdio_bus: add refcounting for fwnodes to
+ mdiobus
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] [nfc?] INFO: task hung in nfc_targets_found
-Content-Language: en-US
-To: Hillf Danton <hdanton@sina.com>,
-        syzbot <syzbot+2b131f51bb4af224ab40@syzkaller.appspotmail.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc: krzysztof.kozlowski@linaro.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-References: <00000000000026100c060e143e5a@google.com>
- <20240104050501.2766-1-hdanton@sina.com>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20240104050501.2766-1-hdanton@sina.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1rLL6p-00EvAd-Ej@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Thu, 04 Jan 2024 10:37:55 +0000
 
-On 2024/01/04 14:05, Hillf Danton wrote:
-> On Wed, 03 Jan 2024 16:59:25 -0800
->> HEAD commit:    453f5db0619e Merge tag 'trace-v6.7-rc7' of git://git.kerne..
->> git tree:       upstream
->> console output: https://syzkaller.appspot.com/x/log.txt?x=141bc48de80000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=f8e72bae38c079e4
->> dashboard link: https://syzkaller.appspot.com/bug?extid=2b131f51bb4af224ab40
->> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->>
-> 
-> 	syz-executor.1:27827		kworker/u4:93/7607	kworker/0:1/11541
-> 	===				===			===
-> 	nci_close_device()		nci_rx_work()		nfc_urelease_event_work()
-> 	mutex_lock(&ndev->req_lock)				device_lock()
-> 	flush_workqueue(ndev->rx_wq)				mutex_lock(&ndev->req_lock)
-> 					device_lock()
-> 
-> Looks like lockdep failed to detect deadlock once more because of device_lock().
+Luiz Angelo Daros de Luca reports that the MDIO bus code maintains a
+reference to the DT node, but does not hold a refcount on the node.
 
-Yes, this is yet another circular locking dependency hidden by device_lock().
+The simple solution to this is to add the necessary refcounting into
+the MDIO bus code for all users, ensuring that on registration, the
+refcount is incremented, and only dropped when the MDIO bus is
+released.
 
-Calling flush_workqueue(ndev->rx_wq) with ndev->req_lock has to be avoided,
-for nci_close_device() has ndev->req_lock => dev->dev dependency and
-nfc_urelease_event_work() has dev->dev => ndev->req_lock dependency.
+Do this for fwnodes, so we not only fix this for DT, but also other
+types of firmware nodes as well.
 
-  nci_close_device() {
-    mutex_lock(&ndev->req_lock); // ffff88802bed4350
-    flush_workqueue(ndev->rx_wq); // wait for nci_rx_work() to complete
-    mutex_unlock(&ndev->req_lock); // ffff88802bed4350
-  }
-  
-  nci_rx_work() { // ndev->rx_work is on ndev->rx_wq
-    nci_ntf_packet() {
-      device_lock(&dev->dev); // ffff88802bed5100
-      device_unlock(&dev->dev); // ffff88802bed5100
-    }
-  }
+Reported-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/mdio_bus.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-  nfc_urelease_event_work() {
-    mutex_lock(&nfc_devlist_mutex); // ffffffff8ee4d808
-    mutex_lock(&dev->genl_data.genl_data_mutex); // ffff88802bed5508
-    nfc_stop_poll() {
-      device_lock(&dev->dev); // ffff88802bed5100
-      nci_stop_poll() {
-        nci_request() {
-          mutex_lock(&ndev->req_lock); // ffff88802bed4350
-          mutex_unlock(&ndev->req_lock); // ffff88802bed4350
-        }
-      }
-      device_unlock(&dev->dev); // ffff88802bed5100
-    }
-    mutex_unlock(&dev->genl_data.genl_data_mutex); // ffff88802bed5508
-    mutex_unlock(&nfc_devlist_mutex); // ffffffff8ee4d808
-  }
-
-I consider that we need to enable lockdep validation on dev->dev mutex
-( https://lkml.kernel.org/r/c7fb01a9-3e12-77ed-5c4c-db7deb64dc73@I-love.SAKURA.ne.jp )
-but was some alternative to my proposal at
-https://lkml.kernel.org/r/1ad499bb-0c53-7529-ff00-e4328823f6fa@I-love.SAKURA.ne.jp
-proposed? Is it time to retry my proposal?
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index 6cf73c15635b..afbad1ad8683 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -193,6 +193,10 @@ static void mdiobus_release(struct device *d)
+ 	     bus->state != MDIOBUS_ALLOCATED,
+ 	     "%s: not in RELEASED or ALLOCATED state\n",
+ 	     bus->id);
++
++	if (bus->state == MDIOBUS_RELEASED)
++		fwnode_handle_put(dev_fwnode(d));
++
+ 	kfree(bus);
+ }
+ 
+@@ -684,6 +688,15 @@ int __mdiobus_register(struct mii_bus *bus, struct module *owner)
+ 	bus->dev.groups = NULL;
+ 	dev_set_name(&bus->dev, "%s", bus->id);
+ 
++	/* If the bus state is allocated, we're registering a fresh bus
++	 * that may have a fwnode associated with it. Grab a reference
++	 * to the fwnode. This will be dropped when the bus is released.
++	 * If the bus was set to unregistered, it means that the bus was
++	 * previously registered, and we've already grabbed a reference.
++	 */
++	if (bus->state == MDIOBUS_ALLOCATED)
++		fwnode_handle_get(dev_fwnode(&bus->dev));
++
+ 	/* We need to set state to MDIOBUS_UNREGISTERED to correctly release
+ 	 * the device in mdiobus_free()
+ 	 *
+-- 
+2.30.2
 
 
