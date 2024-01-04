@@ -1,202 +1,117 @@
-Return-Path: <netdev+bounces-61707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6A31824AEA
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:35:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF907824AF0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48ACCB20EA7
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:35:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E7511F22F11
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2611E49F;
-	Thu,  4 Jan 2024 22:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17374286B0;
+	Thu,  4 Jan 2024 22:37:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNjrdFTI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fliKLtkR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08F42C6B7;
-	Thu,  4 Jan 2024 22:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60C02CCAD;
+	Thu,  4 Jan 2024 22:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6d9af1f12d5so722632b3a.3;
-        Thu, 04 Jan 2024 14:35:52 -0800 (PST)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5e76f7ca09cso1023667b3.0;
+        Thu, 04 Jan 2024 14:37:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704407752; x=1705012552; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bDHsAwed/XpRNyy0E5llCPUOO9YCKWu2OHs2Il7ljIE=;
-        b=mNjrdFTInfsw4P+1SFPMH18DCGzLbfYKimtDaNvBLlCU3UMPisiFca6wd1qa6+vZAU
-         DJbJoeBF3KN4/zbA6g4I9DfzEy7GNjvDLW2Hb/OvtchFetGFxgflJzAkMu4gFEAXHR7T
-         qq6PiFDZ4BGu9F1CSh1J8jzv3MDQxzJQfYQa5EkKUvdTpDFBAohwIZZrD3XeuBzI+CYh
-         m/9T5gMai0Jpno7Sn39TzInLluDo+AhUTddxZDdNFqud2fa5KG27X1o8Fod4gYgtS2Kn
-         J24n+GC0hu1FUwcZb+Qx7yz+fcfj446UvWPf5wGijAPpoAVSqFieBGjEDiizLf++I+bG
-         ZGnw==
+        d=gmail.com; s=20230601; t=1704407865; x=1705012665; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jfP13WYF364mOWLMsaSyApRyyJyIZ4hmplq28T3PTRw=;
+        b=fliKLtkRxSGdgiXdmoh/E8+F9SbsayvWfKEhq+DVOWu7DuJ4rUsEISofdBLLOd5jOS
+         L7miFeWcIMM35oSXHWyyMR+VRADha3IbFMVHUouPIHadUTpj8T9p2boxPeLrAmMF4Kze
+         QDJjAkX4h11Ywvowc1lxuMZsVQ2UfcECJ1XcUl2z9Fx7D/uthZcC95CixH7wYOnXie+k
+         jKVo+tpu83aIgsKqLie9oh20rPmJUxGhn8RK0O8s7MckqY+gdF/Geb7m15Vzdl/NRA3e
+         rAVsYYKAdWiLFSghvK3an/kbj5AXABq8ud+5J6ZZzGJz4HsXFzxNRLeuh5KuRl/EjEHj
+         /S3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704407752; x=1705012552;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bDHsAwed/XpRNyy0E5llCPUOO9YCKWu2OHs2Il7ljIE=;
-        b=W+NWtzQXUma79LbvITuRL3sV7bKHIdO0ScbL9D9UmPk3DNC3TsoUBUsCKL8+1TwApp
-         q4vMb3HIHIYhPN8IXyJu9UFPghuJCCD5jO7/DvuK5KlJtNATg8TEUoY93V8HlDUvbLrb
-         mPe7dSFYEGEs7I+dpigMP0CI5AqEyZ+yv+kuKqe7la4iJxRhCKo3fwb/x0FrIOEwtBvn
-         c28RughDBs8vVuXdsW9nKYsXJu7xHN2RhKdNkRqlBYPacHq7W2vp5T7il7MxDR86RNVt
-         +YJlYXbNMNZKlDY1SKRumAJl9D/h0CkOwRcEQCpxlJFNJdgiH1ShUoTFCTj7ruQonMjU
-         IntQ==
-X-Gm-Message-State: AOJu0YyHO2z7IyK8YWfreyyw38uM1E80wni84XnAhoc1K6qS9C45bIPY
-	pl7aCtOGepqfta8bxHRatI0=
-X-Google-Smtp-Source: AGHT+IG8LDbfaq3U7wAO5fPxPfaotSmtxf3M9TYq7XJjbRz64d8kUKnD5ECdl7O7hfmCpsfVRToQCA==
-X-Received: by 2002:aa7:8709:0:b0:6d5:73b1:3cd4 with SMTP id b9-20020aa78709000000b006d573b13cd4mr1127897pfo.64.1704407751864;
-        Thu, 04 Jan 2024 14:35:51 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id r12-20020aa78b8c000000b006d998f5b890sm152395pfd.192.2024.01.04.14.35.48
+        d=1e100.net; s=20230601; t=1704407865; x=1705012665;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jfP13WYF364mOWLMsaSyApRyyJyIZ4hmplq28T3PTRw=;
+        b=j5xytDYVN4HTev16A082SSnPM/WNNcjXzqlw3fIto3xGpngNMDxvYhirkIUzV+Fy1m
+         2Eic3xBTHMkZutHiF33GxyzHDP79JlTIBp3z4U6BgfmkA6xglYQ5nqgwfJCZMP+lymEY
+         60P1nIvUwdACh+ZbJq17sIXTvPBFS8TEo0RpDkvySDxT9b+DAA+rQQk7hSzShq+Ma1oj
+         2NvMmI4IDbhUCWayHx6XfaEBkPRdc6OR59T60GauzSOFY8QXgDhx5EL8LnxMcCjdIO+9
+         p7cPF5+kALQBRPtlTVfBgItPlKMAWRofbO00YxVJgWf91DNvlR4ubfrgXPYg6FMj9qgR
+         1dgQ==
+X-Gm-Message-State: AOJu0Ywy7DKkLBQyzrIKF0CgfeRiy56X9o7zDw1XRjLHpFpUyaoq7Fip
+	BpeiQpwjw4hCJNwBeJskvjw=
+X-Google-Smtp-Source: AGHT+IHq2RMkPMRo0ssm7elkHl7qRL3PSosWZ1lovYwdIkmFGQQYHTR7vHuoUPdorYGIje436U2mXQ==
+X-Received: by 2002:a0d:f3c4:0:b0:5ef:e5ff:ab82 with SMTP id c187-20020a0df3c4000000b005efe5ffab82mr2261109ywf.4.1704407865480;
+        Thu, 04 Jan 2024 14:37:45 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id h65-20020a815344000000b005f46cd4858asm148247ywb.72.2024.01.04.14.37.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 14:35:51 -0800 (PST)
-Date: Fri, 5 Jan 2024 06:35:45 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Benjamin Poirier <bpoirier@nvidia.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Tobias Waldekranz <tobias@waldekranz.com>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests: forwarding: Avoid failures to source
- net/lib.sh
-Message-ID: <ZZcywXyDs6rL03Ok@Laptop-X1>
-References: <20240104141109.100672-1-bpoirier@nvidia.com>
+        Thu, 04 Jan 2024 14:37:44 -0800 (PST)
+Date: Thu, 4 Jan 2024 14:37:42 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Mahesh Bandewar <maheshb@google.com>
+Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
+	Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>,
+	Mahesh Bandewar <mahesh@bandewar.net>,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCHv3 net-next 2/3] ptp: add ioctl interface for
+ ptp_gettimex64any()
+Message-ID: <ZZczNlXzM8lrZgH5@hoboy.vegasvil.org>
+References: <20240104212439.3276458-1-maheshb@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240104141109.100672-1-bpoirier@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240104212439.3276458-1-maheshb@google.com>
 
-On Thu, Jan 04, 2024 at 09:11:09AM -0500, Benjamin Poirier wrote:
-> The expression "source ../lib.sh" added to net/forwarding/lib.sh in commit
-> 25ae948b4478 ("selftests/net: add lib.sh") does not work for tests outside
-> net/forwarding which source net/forwarding/lib.sh (1). It also does not
-> work in some cases where only a subset of tests are exported (2).
-> 
-> Avoid the problems mentioned above by replacing the faulty expression with
-> a copy of the content from net/lib.sh which is used by files under
-> net/forwarding.
-> 
-> A more thorough solution which avoids duplicating content between
-> net/lib.sh and net/forwarding/lib.sh has been posted here:
-> https://lore.kernel.org/netdev/20231222135836.992841-1-bpoirier@nvidia.com/
-> 
-> The approach in the current patch is a stopgap solution to avoid submitting
-> large changes at the eleventh hour of this development cycle.
-> 
-> Example of problem 1)
-> 
-> tools/testing/selftests/drivers/net/bonding$ ./dev_addr_lists.sh
-> ./net_forwarding_lib.sh: line 41: ../lib.sh: No such file or directory
-> TEST: bonding cleanup mode active-backup                            [ OK ]
-> TEST: bonding cleanup mode 802.3ad                                  [ OK ]
-> TEST: bonding LACPDU multicast address to slave (from bond down)    [ OK ]
-> TEST: bonding LACPDU multicast address to slave (from bond up)      [ OK ]
-> 
-> An error message is printed but since the test does not use functions from
-> net/lib.sh, the test results are not affected.
-> 
-> Example of problem 2)
-> 
-> tools/testing/selftests$ make install TARGETS="net/forwarding"
-> tools/testing/selftests$ cd kselftest_install/net/forwarding/
-> tools/testing/selftests/kselftest_install/net/forwarding$ ./pedit_ip.sh veth{0..3}
-> lib.sh: line 41: ../lib.sh: No such file or directory
-> TEST: ping                                                          [ OK ]
-> TEST: ping6                                                         [ OK ]
-> ./pedit_ip.sh: line 135: busywait: command not found
-> TEST: dev veth1 ingress pedit ip src set 198.51.100.1               [FAIL]
->         Expected to get 10 packets, but got .
-> ./pedit_ip.sh: line 135: busywait: command not found
-> TEST: dev veth2 egress pedit ip src set 198.51.100.1                [FAIL]
->         Expected to get 10 packets, but got .
-> ./pedit_ip.sh: line 135: busywait: command not found
-> TEST: dev veth1 ingress pedit ip dst set 198.51.100.1               [FAIL]
->         Expected to get 10 packets, but got .
-> ./pedit_ip.sh: line 135: busywait: command not found
-> TEST: dev veth2 egress pedit ip dst set 198.51.100.1                [FAIL]
->         Expected to get 10 packets, but got .
-> ./pedit_ip.sh: line 135: busywait: command not found
-> TEST: dev veth1 ingress pedit ip6 src set 2001:db8:2::1             [FAIL]
->         Expected to get 10 packets, but got .
-> ./pedit_ip.sh: line 135: busywait: command not found
-> TEST: dev veth2 egress pedit ip6 src set 2001:db8:2::1              [FAIL]
->         Expected to get 10 packets, but got .
-> ./pedit_ip.sh: line 135: busywait: command not found
-> TEST: dev veth1 ingress pedit ip6 dst set 2001:db8:2::1             [FAIL]
->         Expected to get 10 packets, but got .
-> ./pedit_ip.sh: line 135: busywait: command not found
-> TEST: dev veth2 egress pedit ip6 dst set 2001:db8:2::1              [FAIL]
->         Expected to get 10 packets, but got .
-> 
-> In this case, the test results are affected.
-> 
-> Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
-> Suggested-by: Ido Schimmel <idosch@nvidia.com>
-> Suggested-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Tested-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
-> ---
->  tools/testing/selftests/net/forwarding/lib.sh | 27 ++++++++++++++++++-
->  1 file changed, 26 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index 69ef2a40df21..8a61464ab6eb 100755
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -38,7 +38,32 @@ if [[ -f $relative_path/forwarding.config ]]; then
->  	source "$relative_path/forwarding.config"
->  fi
->  
-> -source ../lib.sh
-> +# Kselftest framework requirement - SKIP code is 4.
-> +ksft_skip=4
-> +
-> +busywait()
-> +{
-> +	local timeout=$1; shift
-> +
-> +	local start_time="$(date -u +%s%3N)"
-> +	while true
-> +	do
-> +		local out
-> +		out=$("$@")
-> +		local ret=$?
-> +		if ((!ret)); then
-> +			echo -n "$out"
-> +			return 0
-> +		fi
-> +
-> +		local current_time="$(date -u +%s%3N)"
-> +		if ((current_time - start_time > timeout)); then
-> +			echo -n "$out"
-> +			return 1
-> +		fi
-> +	done
-> +}
-> +
->  ##############################################################################
->  # Sanity checks
->  
+On Thu, Jan 04, 2024 at 01:24:39PM -0800, Mahesh Bandewar wrote:
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+> @@ -226,6 +238,8 @@ struct ptp_pin_desc {
+>  	_IOWR(PTP_CLK_MAGIC, 18, struct ptp_sys_offset_extended)
+>  #define PTP_MASK_CLEAR_ALL  _IO(PTP_CLK_MAGIC, 19)
+>  #define PTP_MASK_EN_SINGLE  _IOW(PTP_CLK_MAGIC, 20, unsigned int)
+> +#define PTP_SYS_OFFSET_ANY \
+> +	_IOWR(PTP_CLK_MAGIC, 21, struct ptp_sys_offset_any)
 
-Thanks
-Hangbin
+As I said before, this functionality really ought to be a new system call.
+
+Did you see these patch series posted on the list?
+
+ 31.Dec'23 Sagi Maimon          [PATCH v4] posix-timers: add multi_clock_gettime system call
+ 31.Dec'23 Andy Lutomirski      ├─>
+ 01.Jan'24 Sagi Maimon          │ └─>
+ 01.Jan'24 kernel test rob      ├─>
+ 01.Jan'24 kernel test rob      └─>
+
+ 02.Jan'24 Sagi Maimon          [PATCH v5] posix-timers: add multi_clock_gettime system call
+ 02.Jan'24 Arnd Bergmann        ├─>
+ 03.Jan'24 Sagi Maimon          │ └─>
+ 04.Jan'24 kernel test rob      └─>
+
+I think this will be the way forward.
+
+Please review the multi_clock_gettime series and help refine it.
+
+Thanks,
+Richard
+
 
