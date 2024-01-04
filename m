@@ -1,139 +1,141 @@
-Return-Path: <netdev+bounces-61577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866C18244F6
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:29:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F406824515
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:37:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 272ACB21E38
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:29:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC69D2874EC
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820CA225CD;
-	Thu,  4 Jan 2024 15:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50146241E0;
+	Thu,  4 Jan 2024 15:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="njqD8Wzr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sNIqqdAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD60241F4;
-	Thu,  4 Jan 2024 15:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a26f73732c5so70208866b.3;
-        Thu, 04 Jan 2024 07:29:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704382163; x=1704986963; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=//61JkAFmR4ja1MQYPV50hTEwRUwt59eOyo8emTzwoc=;
-        b=njqD8Wzr3mpLOKT80ddBlDkDmOqd3j/NHYQXduJiJSymq/egFnRNXqytoPLFlepppB
-         qKvCt5c0bxL2APkPdWDpxvEM9DSZ3a4UcgJF9GhJUyXW2mD8JDYFdtqTH//X+C4wl6mK
-         yFAlG9h20gEh9TkwzetEFDmXwxKDokzuaGVr3TmfMR7RJYqY48AGL+pxto80dOZZEWpl
-         QxXnMYfEvEgtJ/WcioUQZGZuP1/97Tzt3G/8Y1rRl1oDvIvxYRfLaxI3YDH9QBSSvjF8
-         csBF6aLw9rQp3r786245JE8U4rThZrHb7+UQUvb4f245Z1efc61A5MZ9aPwSmNvIbo2u
-         RgXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704382163; x=1704986963;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=//61JkAFmR4ja1MQYPV50hTEwRUwt59eOyo8emTzwoc=;
-        b=wyhGDTwA7FrgEjudjvej5Bvi6j+gHSkk9UaoKLugcmNQ8JQdr8VHAGFyVyV936r/wJ
-         gnqYeKQrKfpRd1V+Qp+SqiqXhOJNAwIksnmekMs8Kvqef9nIDVjmdsmA8QYFaKXaFxxP
-         86DnYLTFXYYLBmzv4HxjRyemV5Elz5KgH7OwBzIzFo/Z0SVM2b0S7x2ZbWGEAUrhz/7i
-         zX6zSXm1++uPtZRjtNCbIg0MB7x3yydanPJFpTuKKSsHbPg8ZnEOm4b6bWgrc3ae2uvu
-         TdEU6LLeQuGQ3UMqZCrSK7Po69Nt6W3eW8B2Qt8Ll3kS/4c8eq0JWvqUAppVA0twcb6v
-         FRtQ==
-X-Gm-Message-State: AOJu0YyTpY16pX3zU1WHCr8I9Yt2SvsSZVJLZYL0NtQj3U8/Rw5nfCK5
-	fsxkksrCL3EJ8PD1hl2NVeI=
-X-Google-Smtp-Source: AGHT+IEFGh6wzkj5OLLtZKwtP7/o8aS6I+L0Q/lrIXojf++vN1QSj7YEGQahqkI2+h3JUmXLtyaL9w==
-X-Received: by 2002:a17:906:f247:b0:a27:2f12:94ab with SMTP id gy7-20020a170906f24700b00a272f1294abmr430597ejb.99.1704382162780;
-        Thu, 04 Jan 2024 07:29:22 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id zv13-20020a170907718d00b00a26aeb9e37csm13066662ejb.6.2024.01.04.07.29.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 07:29:22 -0800 (PST)
-Date: Thu, 4 Jan 2024 17:29:20 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9067D249E5
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 15:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Q5kl5TqYQBPlo0/mLGXwSKpCb7JYsVSVpTv1keIGScQ=; b=sN
+	IqqdALhELpbo1a1VWxb7jE9ZADAtfGwMdcPWJwc+StzGmaWWvZCUdUdKIFDNDzWudvgGIAiAo3ldg
+	jUEyoqYfgCe7iHFU2HhAoKVovwp9fid7saCXPTh088Vu208Z6FRcgCVxvziSJ68iNT5Hh7h2BWJKK
+	3w6B9ePmE9gRER8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rLPm8-004Mak-13; Thu, 04 Jan 2024 16:36:52 +0100
+Date: Thu, 4 Jan 2024 16:36:52 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Cc: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org,
 	Russell King <linux@armlinux.org.uk>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 5/7] net: dsa: mt7530: improve code path for
- setting up port 5
-Message-ID: <20240104152920.gxzpv2ljvcuhdzvf@skbuf>
-References: <20231227044347.107291-1-arinc.unal@arinc9.com>
- <20231227044347.107291-1-arinc.unal@arinc9.com>
- <20231227044347.107291-6-arinc.unal@arinc9.com>
- <20231227044347.107291-6-arinc.unal@arinc9.com>
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: ethtool ioctl ABI: preferred way to expand uapi structure
+ ethtool_eee for additional link modes?
+Message-ID: <d3f3fca4-624c-4001-9218-6bf69ca911b3@lunn.ch>
+References: <20240104161416.05d02400@dellmb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231227044347.107291-6-arinc.unal@arinc9.com>
- <20231227044347.107291-6-arinc.unal@arinc9.com>
+In-Reply-To: <20240104161416.05d02400@dellmb>
 
-On Wed, Dec 27, 2023 at 07:43:45AM +0300, Arınç ÜNAL wrote:
-> There're two code paths for setting up port 5:
+On Thu, Jan 04, 2024 at 04:14:16PM +0100, Marek Beh�n wrote:
+> Hello,
 > 
-> mt7530_setup()
-> -> mt7530_setup_port5()
+> the legacy ioctls ETHTOOL_GSET and ETHTOOL_SSET, which pass structure
+> ethtool_cmd, were superseded by ETHTOOL_GLINKSETTINGS and
+> ETHTOOL_SLINKSETTINGS.
 > 
-> mt753x_phylink_mac_config()
-> -> mt753x_mac_config()
->    -> mt7530_mac_config()
->       -> mt7530_setup_port5()
+> This was done because the original structure only contains 32-bit words
+> for supported, advertising and lp_advertising link modes. The new
+> structure ethtool_link_settings contains member
+>   s8 link_mode_masks_nwords;
+> and a flexible array
+>   __u32 link_mode_masks[];
+> in order to overcome this issue.
 > 
-> Currently mt7530_setup_port5() from mt7530_setup() always runs. If port 5
-> is used as a CPU, DSA, or user port, mt7530_setup_port5() from
-> mt753x_phylink_mac_config() won't run. That is because priv->p5_interface
-> set on mt7530_setup_port5() will match state->interface on
-> mt753x_phylink_mac_config() which will stop running mt7530_setup_port5()
-> again.
+> But currently we still have only legacy structure ethtool_eee for EEE
+> settings:
+>   struct ethtool_eee {
+>     __u32 cmd;
+>     __u32 supported;
+>     __u32 advertised;
+>     __u32 lp_advertised;
+>     __u32 eee_active;
+>     __u32 eee_enabled;
+>     __u32 tx_lpi_enabled;
+>     __u32 tx_lpi_timer;
+>     __u32 reserved[2];
+>   };
 > 
-> Therefore, mt7530_setup_port5() will never run from
-> mt753x_phylink_mac_config().
+> Thus ethtool is unable to get/set EEE configuration for example for
+> 2500base-T and 5000base-T link modes, which are now available in
+> several PHY drivers.
 > 
-> Address this by not running mt7530_setup_port5() from mt7530_setup() if
-> port 5 is used as a CPU, DSA, or user port. This driver isn't in the
-> dsa_switches_apply_workarounds[] array so phylink will always be present.
+> We can remedy this by either:
 > 
-> To keep the cases where port 5 isn't controlled by phylink working as
-> before, preserve the mt7530_setup_port5() call from mt7530_setup().
+> - adding another ioctl for EEE settings, as was done with the GSET /
+>   SSET
 > 
-> Do not set priv->p5_intf_sel to P5_DISABLED. It is already set to that when
-> "priv" is allocated.
+> - using the original ioctl, but making the structure flexible (we can
+>   replace the reserved fields with information that the array is
+>   flexible), i.e.:
 > 
-> Move setting the interface to a more specific location. It's supposed to be
-> overwritten if PHY muxing is detected.
+>   struct ethtool_eee {
+>     __u32 cmd;
+>     __u32 supported;
+>     __u32 advertised;
+>     __u32 lp_advertised;
+>     __u32 eee_active;
+>     __u32 eee_enabled;
+>     __u32 tx_lpi_enabled;
+>     __u32 tx_lpi_timer;
+>     s8 link_mode_masks_nwords; /* zero if legacy 32-bit link modes */
+>     __u8 reserved[7];
+>     __u32 link_mode_masks[];
+>     /* filled in if link_mode_masks_nwords > 0, with layout:
+>      * __u32 map_supported[link_mode_masks_nwords];
+>      * __u32 map_advertised[link_mode_masks_nwords];
+>      * __u32 map_lp_advertised[link_mode_masks_nwords];
+>      */
+>   };
 > 
-> Improve the comment which explains the process.
+>   this way we will be left with another 7 reserved bytes for future (is
+>   this enough?)
 > 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
+> What would you prefer?
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+There are two different parts here. The kAPI, and the internal API.
+
+For the kAPI, i would not touch the IOCTL interface, since its
+deprecated. The netlink API for EEE uses bitset32. However, i think
+the message format for a bitset32 and a generic bitset is the same, so
+i think you can just convert that without breaking userspace. But you
+should check with Michal Kubecek to be sure.
+
+For the internal API, i personally would assess the work needed to
+change supported, advertised and lp_advertised into generic linkmode
+bitmaps. Any MAC drivers using phylib/phylink probably don't touch
+them, so you just need to change the phylib helpers. Its the MAC
+drivers not using phylib which will need more work. But i've no idea
+how much work that is. Ideally they all get changed, so we have a
+uniform clean API.
+
+    Andrew
 
