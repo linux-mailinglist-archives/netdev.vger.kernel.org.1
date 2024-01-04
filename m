@@ -1,72 +1,196 @@
-Return-Path: <netdev+bounces-61573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7EDD8244D0
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:17:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69FB38244DB
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EA94B215F9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:17:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFBB6B20DBD
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:22:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F422376D;
-	Thu,  4 Jan 2024 15:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37AA2377F;
+	Thu,  4 Jan 2024 15:22:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X23vgeYE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i3rTLPuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F40241E6
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 15:17:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9412DC433C8;
-	Thu,  4 Jan 2024 15:17:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704381473;
-	bh=6v+D9kXpgVFJwSz7K89RHBUTg28fQWYfaBq93zHvydg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X23vgeYEngP+xHEjNWk6m6yI6NUVfbXJkw/z29CFiavdpp7Q0p2K75DI5z/ej4ZQo
-	 uL0OyAA3RvZxg34T2kc6JQPlf3RDvjmhKdWIhpB9/ccVPM0HdFBvSFy79sKvQWHXos
-	 e/hUv3BY/kPl9G0CUqINcmASQsOv/pSknnT8R5TnHB09n2azqBgjM0M9FZ85s5OkDU
-	 qVtZ4LfoxmIzqHbB+1NrFM8N2uKqhSisctmq4SZQnlmBCMXmATqBEc3QmAnw9IcUcp
-	 fpgWrFBL29cc+hmHkd48P+zhSDbEi96uMKSIvGsrdAkMAR4+oPyO6yZpPTlgxCRXA6
-	 oV0uel95zQs6Q==
-Date: Thu, 4 Jan 2024 07:17:52 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S . Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Phil Sutter <phil@nwl.cc>, David Ahern
- <dsahern@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface
- in a bond
-Message-ID: <20240104071752.433651ce@kernel.org>
-In-Reply-To: <4e1d5b11-6fec-4ee2-a091-479e480476be@6wind.com>
-References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
-	<20240103094846.2397083-3-nicolas.dichtel@6wind.com>
-	<ZZVaVloICZPf8jiK@Laptop-X1>
-	<0aa87eb2-b50d-4ae8-81ce-af7a52813e6a@6wind.com>
-	<20240103132120.2cace255@kernel.org>
-	<4e1d5b11-6fec-4ee2-a091-479e480476be@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A71E241E2;
+	Thu,  4 Jan 2024 15:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a28e31563ebso72357766b.2;
+        Thu, 04 Jan 2024 07:22:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704381756; x=1704986556; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0yXAbaAJ66TkHbWq15zRnFaiYa65uZWNj5loVkRiAVs=;
+        b=i3rTLPucKvEuBHFtrVFdIoqTo/cgYJXVP9uYKsrgNgQl6a7k5T0ICjhbwGeQqNPhN4
+         XHlAvK8pubJEW4IZqQncOIItgcLqipkv7YqDKLFYpdpg+wmzW1CSNPC84eRJygkkWy+O
+         zKXxsdD77vnueM4k9Cy2MnbXdw4RRud0iOMDoJDcEWi/BltR60ra4sgVSpCl5s8o2xjA
+         0cO7MxeYoFZ/JPTdIiiElwRdubapFSkILEmJ4+EyvnbTlYN1ZAehTUlSEO8kckAp3Y5B
+         jfTz6i/16fvF0xwoL7jQug0CkDZJ9VKFkNJU8Zjs33phSpy2P/7h0Xl0BGI4BGiOK9F+
+         of1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704381756; x=1704986556;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0yXAbaAJ66TkHbWq15zRnFaiYa65uZWNj5loVkRiAVs=;
+        b=B4KlV7f7cuEX+mwos+60My1jr2loYu9uZDrUzFD8Yh+JLklLdPzP5Hu8gL/Njf9LN5
+         yQHc5hrYYExtLQ1nugnaY0Dy+IBiVVPelS1xmHQB6ezCof/p3+k4qBPIckpMor3OMGv4
+         y9rfroFahslppRAdhy7TD/9RgDEZDtJP5uMwTqWXgqzam9pqZ8g5bl6MMMXxNcnek9+6
+         fVovl6hnFUWxTFHcfIeB7WGre7rvgvTWsf20W9tZGhHwp6FVph+pcSxCjonNxNt5qVnv
+         0vV19RcVxU8wLowoLA1h5b+DqSKmjRWXuunWb84YbWcxjWVSg7EzpZ3/YZRI0Y0u87Xv
+         v8/g==
+X-Gm-Message-State: AOJu0YykfKsFlYmQFk15s0ex180YqROrbQAkVBw7jW9qla64QG3Sojjc
+	dsnb4qOiol+JIyOLZYVS8HI=
+X-Google-Smtp-Source: AGHT+IFaig8SeExL8gpob99TbO9syJO8daKzzf6+NKnsgHhhIwb1pKTLpp4QHIDVqUCo5i59VpnL9w==
+X-Received: by 2002:a17:906:680b:b0:a27:43b7:ec7 with SMTP id k11-20020a170906680b00b00a2743b70ec7mr374799ejr.22.1704381755979;
+        Thu, 04 Jan 2024 07:22:35 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id gg18-20020a170906e29200b00a28fa7838a1sm221054ejb.172.2024.01.04.07.22.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jan 2024 07:22:35 -0800 (PST)
+Date: Thu, 4 Jan 2024 17:22:32 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 1/7] net: dsa: mt7530: always trap frames to
+ active CPU port on MT7530
+Message-ID: <20240104152232.jkoqiuwk3rd24rpm@skbuf>
+References: <20231227044347.107291-1-arinc.unal@arinc9.com>
+ <20231227044347.107291-1-arinc.unal@arinc9.com>
+ <20231227044347.107291-2-arinc.unal@arinc9.com>
+ <20231227044347.107291-2-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231227044347.107291-2-arinc.unal@arinc9.com>
+ <20231227044347.107291-2-arinc.unal@arinc9.com>
 
-On Thu, 4 Jan 2024 14:51:08 +0100 Nicolas Dichtel wrote:
-> > Looks like the patch applies to net-next, so hopefully there won't 
-> > be any actual conflicts. But it'd be good to follow up and refactor
-> > it in net-next once net gets merged in. As long as I'm not missing
-> > anything - up to you - I'm fine with either sending the test to
-> > net-next like Hangbin suggests, or following up in net-next to use
-> > setup_ns.  
-> I will send a follow-up once net gets merged in net-next.
+On Wed, Dec 27, 2023 at 07:43:41AM +0300, Arınç ÜNAL wrote:
+> On the MT7530 switch, the CPU_PORT field indicates which CPU port to trap
+> frames to, regardless of the affinity of the inbound user port.
+> 
+> When multiple CPU ports are in use, if the DSA conduit interface is down,
+> trapped frames won't be passed to the conduit interface.
+> 
+> To make trapping frames work including this case, implement
+> ds->ops->master_state_change() on this subdriver and set the CPU_PORT field
 
-Ack, there's still going to be a v3 to update the error message, 
-tho, right?
+conduit_state_change()
+
+> to the numerically smallest CPU port which the DSA conduit interface its
+> affine to is up. Introduce the active_cpu_ports field to store the
+> information of the active CPU ports. Correct the macros, CPU_PORT is bits 4
+> through 6 of the register.
+> 
+> Add a comment to explain frame trapping for this switch.
+> 
+> Currently, the driver doesn't support the use of multiple CPU ports so this
+> is not necessarily a bug fix.
+> 
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> Suggested-by: Russell King (Oracle) <linux@armlinux.org.uk>
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> ---
+>  drivers/net/dsa/mt7530.c | 37 +++++++++++++++++++++++++++++++++----
+>  drivers/net/dsa/mt7530.h |  6 ++++--
+>  2 files changed, 37 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> index 391c4dbdff42..436d5c311be0 100644
+> --- a/drivers/net/dsa/mt7530.c
+> +++ b/drivers/net/dsa/mt7530.c
+> @@ -1035,10 +1035,6 @@ mt753x_cpu_port_enable(struct dsa_switch *ds, int port)
+>  	mt7530_set(priv, MT7530_MFC, BC_FFP(BIT(port)) | UNM_FFP(BIT(port)) |
+>  		   UNU_FFP(BIT(port)));
+>  
+> -	/* Set CPU port number */
+> -	if (priv->id == ID_MT7530 || priv->id == ID_MT7621)
+> -		mt7530_rmw(priv, MT7530_MFC, CPU_MASK, CPU_EN | CPU_PORT(port));
+> -
+>  	/* Add the CPU port to the CPU port bitmap for MT7531 and the switch on
+>  	 * the MT7988 SoC. Trapped frames will be forwarded to the CPU port that
+>  	 * is affine to the inbound user port.
+> @@ -3075,6 +3071,38 @@ static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
+>  	return 0;
+>  }
+>  
+> +static void
+> +mt753x_conduit_state_change(struct dsa_switch *ds,
+> +			    const struct net_device *conduit,
+> +			    bool operational)
+> +{
+> +	struct dsa_port *cpu_dp = conduit->dsa_ptr;
+> +	struct mt7530_priv *priv = ds->priv;
+> +	u8 mask;
+> +	int val = 0;
+
+Longest line first.
+
+> +
+> +	/* Set the CPU port to trap frames to for MT7530. Trapped frames will be
+> +	 * forwarded to the numerically smallest CPU port which the DSA conduit
+> +	 * interface its affine to is up.
+
+"first CPU port whose conduit interface is up"
+
+> +	 */
+> +	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
+> +		return;
+> +
+> +	mask = BIT(cpu_dp->index);
+> +
+> +	if (operational)
+> +		priv->active_cpu_ports |= mask;
+> +	else
+> +		priv->active_cpu_ports &= ~mask;
+> +
+> +	if (priv->active_cpu_ports)
+> +		val =
+> +		    CPU_EN |
+> +		    CPU_PORT(__ffs((unsigned long)priv->active_cpu_ports));
+
+I don't think the type cast is necessary (implicit type promotion takes place).
+
+Also, it is customary to put {} for multi-line "if" blocks, even if they are
+made up of a single expression.
+
+But without the type cast, it could look like this.
+
+	if (priv->active_cpu_ports)
+		val = CPU_EN | CPU_PORT(__ffs(priv->active_cpu_ports));
+
+> +
+> +	mt7530_rmw(priv, MT7530_MFC, CPU_EN | CPU_PORT_MASK, val);
+> +}
 
