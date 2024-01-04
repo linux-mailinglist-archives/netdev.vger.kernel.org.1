@@ -1,159 +1,219 @@
-Return-Path: <netdev+bounces-61597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68EB98245C1
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:05:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861B28245C9
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:07:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18B071C22084
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:05:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 631C71C21F4D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A4C24217;
-	Thu,  4 Jan 2024 16:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D7424A0C;
+	Thu,  4 Jan 2024 16:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b="eWpmYjZu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3zfecvj"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2139.outbound.protection.outlook.com [40.107.104.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A58A22338
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 16:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bang-olufsen.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bang-olufsen.dk
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XVeQpJmwhq97xM1C7a2tYO306RTvdw4QHxbykbpWgzg3vtZzyQI0r/rAd8wSJjDZoB+vFiH4ZhrFUrrKjMzBjbPUE/rw9bUV23p1JSi/dTnNg9T63VTjP7/8WjDfJFV09ecyTH0HhIXNn+H8bB6/ZGpZG/GSg09YzTP7YKBqOyiaMnDfxnNbNH1j+SMNiXMKLiinivBY0Mun4O94OiAckslsEsLah5V3w8KEW3E2f18CaGfEA0Ti/UguUPCB9FyFsJu5+1z7W9nmd2EgAnLCVVU5n46O/T7vydY2PUhTUudKqxfXLJuI/4XPDfErbMGOlbsRNOS28e6YEestDw5aiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j2PtdfSLi4xUs0He9IzqvcLlEj6wGI7j2wkxhMg+Rig=;
- b=jYvzwP2/8s2LV//8MqW5zr1EWl/hEcvilyC7dWMwje4GYys2Vb15remRv0zb18VCvmDksz4rf8cy5WLjlqriu/AMqTAX+c7YGTD61a2nLIFxqs04DWqtdxXGHBXZ8IXmbXid0RQTHifQ7s8EA2sAfZpPecxTZ6VfMQnvEx2AlpzswVhcjzDhlRe9RORe+qfv6TOgrcQT/E2eo3HWDG6visVg+lA46WbXS9BEjvQ2fJyRhmSw8deGobP+oNdmo1GDsoCxkYIQFYx50ymZXlRf32cgi8g6JdBXyDnvnv9PuCNoFyoBhVjNjScz+nSoQQSdVLKN+golPMfZptzcoMq+vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bang-olufsen.dk; dmarc=pass action=none
- header.from=bang-olufsen.dk; dkim=pass header.d=bang-olufsen.dk; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bang-olufsen.dk;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j2PtdfSLi4xUs0He9IzqvcLlEj6wGI7j2wkxhMg+Rig=;
- b=eWpmYjZuPsrn6tx3eoVJ7EnJx6eD8O/QOa8vHihoHLfkeJqQ/7OBO2uI6gwPYJfnbtinH9ZrwqXxhlg5nSQFFKzNJqCS9HKxGysFG2wRNN+2dAUgNjwbn6ZKt64/oUiz5xfY/upon3XiDEnF4o24Lt+guB2rTU02u/WJ4c9fKuw=
-Received: from AS8PR03MB8805.eurprd03.prod.outlook.com (2603:10a6:20b:53e::20)
- by DB9PR03MB7243.eurprd03.prod.outlook.com (2603:10a6:10:220::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Thu, 4 Jan
- 2024 16:05:19 +0000
-Received: from AS8PR03MB8805.eurprd03.prod.outlook.com
- ([fe80::2293:b813:aa1a:a894]) by AS8PR03MB8805.eurprd03.prod.outlook.com
- ([fe80::2293:b813:aa1a:a894%4]) with mapi id 15.20.7135.023; Thu, 4 Jan 2024
- 16:05:19 +0000
-From: =?utf-8?B?QWx2aW4gxaBpcHJhZ2E=?= <ALSI@bang-olufsen.dk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
-	<andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Luiz Angelo Daros
- de Luca <luizluca@gmail.com>, Linus Walleij <linus.walleij@linaro.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>, Hauke Mehrtens
-	<hauke@hauke-m.de>, Christian Marangi <ansuelsmth@gmail.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Subject: Re: [PATCH net-next 05/10] net: dsa: qca8k: skip MDIO bus creation if
- its OF node has status = "disabled"
-Thread-Topic: [PATCH net-next 05/10] net: dsa: qca8k: skip MDIO bus creation
- if its OF node has status = "disabled"
-Thread-Index: AQHaPxZ+Wr/T9RNNP0Kzcp2ZFGcdbLDJ0XOA
-Date: Thu, 4 Jan 2024 16:05:19 +0000
-Message-ID: <q3f7salrzk3ppt4g3g5qsey3h44lmymrfullva5y53ku4tn2lf@wh67eeb67wsv>
-References: <20240104140037.374166-1-vladimir.oltean@nxp.com>
- <20240104140037.374166-6-vladimir.oltean@nxp.com>
-In-Reply-To: <20240104140037.374166-6-vladimir.oltean@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bang-olufsen.dk;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS8PR03MB8805:EE_|DB9PR03MB7243:EE_
-x-ms-office365-filtering-correlation-id: fa2016fc-0945-4ce3-54d2-08dc0d3ef330
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- Qat3wJ6pj15GqjTc5QtxQEvqS60gZTYS2Ii7+wCoZCYbjMXNmT6wSpUYRmpvE0s1FksKTxG1I3TtBNU5eGR4KNsDSW1rCa8Y8F3szPQsBhdHK7xFm1S62VU4cv7XHtS/bcnnkKlg57B7euOEysZ9atUdtc0v1dGEhKCvvG0TxyO/g8ClCuZbAOCraNOdziV33ytEXAysKC1gwd3AQDA4mzadTFePTZKcV2kx8Jmp7TuLfJYnJfI5spp8kzOA4RpaFIINDHvfwZasWr0H1rymjyoL2q5P7+n777ZrQiWeIlvxsidUt6Kh8w65aYIqCgwKAQDgCN41cF6qWa1kEm/5un4po6xiLyyuBEfVk/+ir1QwVBQxAELwNe9cz5rAVpKi6tD7k20wBypg4OewU/FdUho/CZYfxEvIO3c9vwvAVe4+KbWSVayrtJ3OinqkSgLWYO6WOFWUF5a4VfyMvCWCmtZde0FehkNHsn2oMTafdOVSBA0XeLceXjdoWNHQ1dFQQMrr6bKpHTz5yZakVVY+dZ3mcejWIurVy31q1eXvxgISegxJu3Gu6Pgx4kTqFytn8WCZ1/sRy5C6P8bLnzjVLvM8Vqwie5HB9H1QCAYqZlVNQvS3+71a7Kn7zwb14cnKLkWI79Y9tS5NPxQZewWCxQ==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR03MB8805.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(366004)(376002)(136003)(39850400004)(396003)(451199024)(1800799012)(64100799003)(186009)(66476007)(41300700001)(26005)(122000001)(66574015)(83380400001)(38100700002)(33716001)(5660300002)(54906003)(8676002)(7416002)(8936002)(316002)(478600001)(2906002)(4744005)(71200400001)(4326008)(91956017)(38070700009)(64756008)(6916009)(6486002)(76116006)(6506007)(6512007)(66556008)(9686003)(66946007)(86362001)(66446008)(85182001)(85202003)(32563001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?MnFnMzFxY1M5Y3JadnhtRGpEekhxS05qV3hCVlZmNzRIaGViY3BweVN2enUx?=
- =?utf-8?B?NmVnSjMyTG1ZaUIxendua0t4S2JWR3lZZmRHL3UvTjltZldCcENmUjlQS1pW?=
- =?utf-8?B?QlVwdDRObXRlMkFRWmRNL3JlN05sZzFyU1I0TXFUaXlod29EVTYrdVNtQytL?=
- =?utf-8?B?VWtHVUNZNjlJd1dzbk5paHhYNzhQclBKVGRRY2ZZdUxKOWNqWE8rOVBUcFFF?=
- =?utf-8?B?SUJ3ZGExRjFCQVhtVWNIQ25WQzhrNDNDNk52NWxtc2NPSGQ4aGFSWHJkQThu?=
- =?utf-8?B?RWp6UVBBSmpCV2ZIOWx4RjA1bDVZWHlFTHhUWnk0aTBWa0UzdGJZMzBUcWJv?=
- =?utf-8?B?NnNISXRRU0VaZHJQOVY0VjYvNFdGeUtGUHZhVWZmRm5zVWFIVk9JQXZEcnVQ?=
- =?utf-8?B?UVJ0QU53THZ5MkJIVWdJWTRWUHpyV2lFWmcxNURIZHlhNm1oMkU3ZlJ3VDc5?=
- =?utf-8?B?OXpqNjgzcHJLeFdXZlJSdHRIQkw3MmJ4MlNhVG1qVEZwSjlDWG5XMWRJZU9I?=
- =?utf-8?B?UVg5OVE1VkFSSUM1QnRQQlY3LzdPYnlCWHpoSEQ4dHhLWnFzakREeU42Mlpy?=
- =?utf-8?B?Y1FGYlpmUVFzY0FNaHZheE5mbTJRRENzNi9nQVhETnVieFBHZk41SFFBOVlF?=
- =?utf-8?B?MENRZTRPNCs3NzI2Q0ZHbHRCTDZHTFFJMjc1NVlUNzZQOUppcWFpN0V1dEpQ?=
- =?utf-8?B?TDR1Y3dmeEZodXhBQ3lMQ3l1aVIybWdsa29nTmhtVHNBMi9xY2F4UGhlYW83?=
- =?utf-8?B?ZjBnSHRHZU93ZVlvMGVNTUJORXNpTC9XUkQ2YVJidmU5MCsyYThkS21BVWNn?=
- =?utf-8?B?eFlGR1FIWnQzSWhSUUF4dHNUL0Z5UFVOMVNZbXA3SnhZaHl6Z0JnSThESGpl?=
- =?utf-8?B?SEg2WHRubWhNUWs1RlYvb0NsTHVOcktBMmMwV2lyV3RGS1dWOEVhYjRrRGxU?=
- =?utf-8?B?eXdiVnQ0d25DM3RPRVNBTTVvV1AvYVZYMzVKYTlxL0FVUnk3NkJMbGZKK1FE?=
- =?utf-8?B?RGZpVEJuOWlFOHBnY0FMVm5vd2tKU0pzSkh1dkcrVTVtYVZFVlQwWHN2NStG?=
- =?utf-8?B?OEZhcE9qR2kwc1lmN1hzNVpBS2NsQnVFWHhRalNBVUMwTk5VcGxla0hJemY1?=
- =?utf-8?B?RjFQbzdPeDNwNCtuZ3pOK3BKcG9VenU4YU53UlgyWFdXdllqZlVoZzZxS3JV?=
- =?utf-8?B?V2hQalNyVHI2NEVWSXNPZUZreC8wL2xrRUZTc1M0ZnhqaTRaaWxiWURXdXpE?=
- =?utf-8?B?aTdKYjErUzRUSUxLNmNNTXJhMTVNbGZGdCt5R0NkQzQ0RnhOaUViZnl6NzJl?=
- =?utf-8?B?OC92RUVPMm53R3FKbEQ0bG9aQVVTeDRRTmg1U2wyd3psYWR5WDByN0UwSkFP?=
- =?utf-8?B?c2Zsb3dyeFNoVCtabWRLZDFFaFJpZDZjVkxVMExLaGNLZ1ZYMWh0aEU1eW1H?=
- =?utf-8?B?dnRjdVdJa3p2TkZtM3FRL1JYeGVTMlZpd2VXWWRLdkkyWFNGUGJGeGR2ZnEr?=
- =?utf-8?B?MWVxMTFvd1NxUkV0MmJBRkFiMEtRR3B0eUc0TXNMUVI4aGI3VkF6YVBlenlw?=
- =?utf-8?B?MTU1TG94eEdLRFlBRGZlS1J2djFTenZxZ1BUdzkweHNkZEpWV1pzVE1VUDVl?=
- =?utf-8?B?UndaVVdtOTJLSEhXRGxGeitLaldvdGRmdTFFdDU5UGpqNmhvTG0yUHJuWnV0?=
- =?utf-8?B?SE05N3dnSS8xZGk0UHNYdUx3TWJuR3NxRHFSMWtTZmhBS2FSeVhIQzNOa1ZY?=
- =?utf-8?B?Tmd5Yzg2N0pFM1FmS2xHZEdQL0ZzT3l1Nlg1THpoTGFtSHlkYzJFQjVVOVJq?=
- =?utf-8?B?d2dTdTlDVnFvdXRnTVdLNko3QmNwcWJacVBhNHoxU3ZLejRRZkErWlVuOTlH?=
- =?utf-8?B?Ump0dk4waW0xeTlJUFp2eUlSTEZEZFFGYUVZYW1MMUlkbUNCa0ZhSGMrM2po?=
- =?utf-8?B?dldpeFpJcXBhMHg2emM5anQra1oyMUduZFlXS0JUOGFWeDNCY2pubEpxcUVZ?=
- =?utf-8?B?TWJHbGtHeWlMOEQ0L24xUHNzbjJtSzV3TkEyNDRxZnA5MjJvdS9LN0R4SWtm?=
- =?utf-8?B?QyticjZwd2E4WUtLUkxncDloblU4Tys1eTNaQXRhMmFXMm8rU3ZuRW8yNm1a?=
- =?utf-8?B?TDM2VlozYnZUT2NYT2FwTHIrZ0pRTURhb3ZQRjAxRFVmZDljZmQ4MzRkUERz?=
- =?utf-8?B?NGc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7430042D472F84449F2DBB0AD0F4B120@eurprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B2E24B3D
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 16:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40d4a222818so9797785e9.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 08:06:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704384416; x=1704989216; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FVxO3X+ccGWrdx8Ekh7/PXa9BRBTpuQW99Oblr58WQM=;
+        b=R3zfecvjYbzyFyMRDa8wokTcBtdRBDKZrTGnEAhlEMtfF4rM9i5iiKpv2oIRe689zv
+         D7243UNCZiCNz5ukw4UHAbFzLtu+GJQiD95N5Soloq4r7jZk64UWzKVSSRBkZmGaQp/w
+         bkKcBuAXZLFkI8ShBpFVjbsNx9JnMZ5ErjXDIB9xomrpXqmkNaSQagw5Dp3IIO5z6xpA
+         WAKpxKFhQZGDJ9J3fBQDJ85zUWJL/kp12d1ewgHM6rEj1LsItkLF25F5gBDh5eJRTMX9
+         70KoiYfSsO8acprjOVvRjdwRuddXmXPvOzkW+lsMNR1ltrpMKh2VKQcyYK38BOktZBzG
+         iddg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704384416; x=1704989216;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FVxO3X+ccGWrdx8Ekh7/PXa9BRBTpuQW99Oblr58WQM=;
+        b=iP9oy3cR1goBh+hdSI34ZzK9B/wH4PLAjjy6N6FYgOgF6IvzG5WFOJOuzARcFv7dZ1
+         UKl2FV3BB/d8+i+XXzaMxJfOhjtMrUMcGt+G+eM6zwGQxziuH3+x2eIPEngbVjYlqsC/
+         sUjii19E47mMXDecyNwK3+46F7xluvt9zeBZpBmeUFyMr4tv63rFLjjxWvIXqEyXLoxv
+         6957dVa4PXwfzMWUJNIDytkWXMZdW5Y33mE0oHRvK3jokXI/DVUthYTE7HoCEKPFx3Z6
+         t5j4gwGf5f9xxMpA2xcVZUDaeY6tfDFhFaBDSXMxkSb9FFvYrkMNy+3+vTOPs5C7uoKN
+         buag==
+X-Gm-Message-State: AOJu0YyjL6O0DasCOAIIieYUKlZMlybFFvxcsaR/1vhq35KJVBMSWcx2
+	RQsisMv+TsW5DSfGKf4eynU=
+X-Google-Smtp-Source: AGHT+IEhqV/poQROJWRT9i0lkVGrWFgMxgYiD46SIcozsE+xHk8sBPS5CHi9NF/LyOcmxhodIu4Blg==
+X-Received: by 2002:a05:600c:1da9:b0:40d:88ba:b1a4 with SMTP id p41-20020a05600c1da900b0040d88bab1a4mr456614wms.97.1704384415616;
+        Thu, 04 Jan 2024 08:06:55 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6ffe:b000:1d0:e6df:b486:c903? (dynamic-2a01-0c22-6ffe-b000-01d0-e6df-b486-c903.c22.pool.telefonica.de. [2a01:c22:6ffe:b000:1d0:e6df:b486:c903])
+        by smtp.googlemail.com with ESMTPSA id c1-20020a05600c0a4100b0040d81c3343bsm6157415wmq.42.2024.01.04.08.06.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jan 2024 08:06:55 -0800 (PST)
+Message-ID: <ceaee76d-d785-4931-ad4a-ddba06365308@gmail.com>
+Date: Thu, 4 Jan 2024 17:06:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bang-olufsen.dk
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR03MB8805.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa2016fc-0945-4ce3-54d2-08dc0d3ef330
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jan 2024 16:05:19.8331
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 210d08b8-83f7-470a-bc96-381193ca14a1
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PVDVHyn3PjodEM8O27LHe/ykwHEsOCv2YDlNSFeSXAQ0s8jc60g7dzfCStXBfdS+cJTwx/f98w5KkJ+QvPpDKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR03MB7243
+User-Agent: Mozilla Thunderbird
+Subject: Re: ethtool ioctl ABI: preferred way to expand uapi structure
+ ethtool_eee for additional link modes?
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>
+Cc: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>
+References: <20240104161416.05d02400@dellmb>
+ <d3f3fca4-624c-4001-9218-6bf69ca911b3@lunn.ch>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <d3f3fca4-624c-4001-9218-6bf69ca911b3@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-T24gVGh1LCBKYW4gMDQsIDIwMjQgYXQgMDQ6MDA6MzJQTSArMDIwMCwgVmxhZGltaXIgT2x0ZWFu
-IHdyb3RlOg0KPiBDdXJyZW50bHkgdGhlIGRyaXZlciBjYWxscyB0aGUgbm9uLU9GIGRldm1fbWRp
-b2J1c19yZWdpc3RlcigpIHJhdGhlcg0KPiB0aGFuIGRldm1fb2ZfbWRpb2J1c19yZWdpc3Rlcigp
-IGZvciB0aGlzIGNhc2UsIGJ1dCBpdCBzZWVtcyB0byByYXRoZXINCj4gYmUgYSBjb25mdXNpbmcg
-Y29pbmNpZGVuY2UsIGFuZCBub3QgYSByZWFsIHVzZSBjYXNlIHRoYXQgbmVlZHMgdG8gYmUNCj4g
-c3VwcG9ydGVkLg0KPiANCj4gSWYgdGhlIGRldmljZSB0cmVlIHNheXMgc3RhdHVzID0gImRpc2Fi
-bGVkIiBmb3IgdGhlIE1ESU8gYnVzLCB3ZQ0KPiBzaG91bGRuJ3QgbmVlZCBhbiBNRElPIGJ1cyBh
-dCBhbGwuIEluc3RlYWQsIGp1c3QgZXhpdCBhcyBlYXJseSBhcw0KPiBwb3NzaWJsZSBhbmQgZG8g
-bm90IGNhbGwgYW55IE1ESU8gQVBJLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgT2x0
-ZWFuIDx2bGFkaW1pci5vbHRlYW5AbnhwLmNvbT4NCg0KUmV2aWV3ZWQtYnk6IEFsdmluIMWgaXBy
-YWdhIDxhbHNpQGJhbmctb2x1ZnNlbi5kaz4NCg0KPiAtLS0NCj4gIGRyaXZlcnMvbmV0L2RzYS9x
-Y2EvcWNhOGstOHh4eC5jIHwgOCArKysrKy0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0
-aW9ucygrKSwgMyBkZWxldGlvbnMoLSk=
+On 04.01.2024 16:36, Andrew Lunn wrote:
+> On Thu, Jan 04, 2024 at 04:14:16PM +0100, Marek Behún wrote:
+>> Hello,
+>>
+>> the legacy ioctls ETHTOOL_GSET and ETHTOOL_SSET, which pass structure
+>> ethtool_cmd, were superseded by ETHTOOL_GLINKSETTINGS and
+>> ETHTOOL_SLINKSETTINGS.
+>>
+>> This was done because the original structure only contains 32-bit words
+>> for supported, advertising and lp_advertising link modes. The new
+>> structure ethtool_link_settings contains member
+>>   s8 link_mode_masks_nwords;
+>> and a flexible array
+>>   __u32 link_mode_masks[];
+>> in order to overcome this issue.
+>>
+>> But currently we still have only legacy structure ethtool_eee for EEE
+>> settings:
+>>   struct ethtool_eee {
+>>     __u32 cmd;
+>>     __u32 supported;
+>>     __u32 advertised;
+>>     __u32 lp_advertised;
+>>     __u32 eee_active;
+>>     __u32 eee_enabled;
+>>     __u32 tx_lpi_enabled;
+>>     __u32 tx_lpi_timer;
+>>     __u32 reserved[2];
+>>   };
+>>
+>> Thus ethtool is unable to get/set EEE configuration for example for
+>> 2500base-T and 5000base-T link modes, which are now available in
+>> several PHY drivers.
+>>
+>> We can remedy this by either:
+>>
+>> - adding another ioctl for EEE settings, as was done with the GSET /
+>>   SSET
+>>
+>> - using the original ioctl, but making the structure flexible (we can
+>>   replace the reserved fields with information that the array is
+>>   flexible), i.e.:
+>>
+>>   struct ethtool_eee {
+>>     __u32 cmd;
+>>     __u32 supported;
+>>     __u32 advertised;
+>>     __u32 lp_advertised;
+>>     __u32 eee_active;
+>>     __u32 eee_enabled;
+>>     __u32 tx_lpi_enabled;
+>>     __u32 tx_lpi_timer;
+>>     s8 link_mode_masks_nwords; /* zero if legacy 32-bit link modes */
+>>     __u8 reserved[7];
+>>     __u32 link_mode_masks[];
+>>     /* filled in if link_mode_masks_nwords > 0, with layout:
+>>      * __u32 map_supported[link_mode_masks_nwords];
+>>      * __u32 map_advertised[link_mode_masks_nwords];
+>>      * __u32 map_lp_advertised[link_mode_masks_nwords];
+>>      */
+>>   };
+>>
+>>   this way we will be left with another 7 reserved bytes for future (is
+>>   this enough?)
+>>
+>> What would you prefer?
+> 
+> There are two different parts here. The kAPI, and the internal API.
+> 
+> For the kAPI, i would not touch the IOCTL interface, since its
+> deprecated. The netlink API for EEE uses bitset32. However, i think
+> the message format for a bitset32 and a generic bitset is the same, so
+> i think you can just convert that without breaking userspace. But you
+> should check with Michal Kubecek to be sure.
+> 
+> For the internal API, i personally would assess the work needed to
+> change supported, advertised and lp_advertised into generic linkmode
+> bitmaps. Any MAC drivers using phylib/phylink probably don't touch
+> them, so you just need to change the phylib helpers. Its the MAC
+> drivers not using phylib which will need more work. But i've no idea
+> how much work that is. Ideally they all get changed, so we have a
+> uniform clean API.
+> 
+In case you missed it: Few days ago I posted a series that adds full
+EEE linkmode bitmap support to the ethtool netlink interface.
+The good news is that no changes to the userspace tool are needed.
+
+https://lore.kernel.org/netdev/783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com/T/
+
+>     Andrew
+
+Heiner
+
 
