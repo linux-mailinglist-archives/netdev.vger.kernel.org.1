@@ -1,230 +1,291 @@
-Return-Path: <netdev+bounces-61719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDD7A824BD1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:28:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A026F824BDA
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:34:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B861B23650
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:28:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29EC61F237AF
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9342D052;
-	Thu,  4 Jan 2024 23:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F362D05F;
+	Thu,  4 Jan 2024 23:34:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="ap2Ay0I6";
-	dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="RstD/2Z/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNCsURMM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx6.ucr.edu (mx6.ucr.edu [138.23.62.71])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8FB2D022
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 23:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ucr.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucr.edu
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
-  t=1704410877; x=1735946877;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3U6IBgqMPfYIU4Ebli3H3Dr97CK+nUXKQyDxoPdswBE=;
-  b=ap2Ay0I6NVs0OOJ6Ibewh6dSA4LRSM6QIba69kb/QXKaRZEW842adPTc
-   ESMv9sR9q5hNoX/iy+Pk2jfaGOQ4tBT4liSj40i1mgS9zFwDDntPspiId
-   +2nNqw6wREGWMnTnPl6MbGFjqNyuIpD19HMehka31XgLmt2ro8GotpT/h
-   qDVxvwXMcBfGRGHLR7JeG+QsNn+3RT1KZhNi42pjSnp5JRHsZopA0oa6r
-   0grQSV6pItMsl2uSiuhWvlWPRKUXjJRPSnnE5ULntA5AnDwq2TlNgpgcR
-   Kj291Dlq0DFZFu4FrsBZYnZ6kJRL9pmMMvDVj1RBmji/c3WYRsx0jdCR5
-   w==;
-X-CSE-ConnectionGUID: OF+upPTzTNWHqptAYUoBKg==
-X-CSE-MsgGUID: KsQJggg9RAGDDFikWgiQJw==
-Received: from mail-oo1-f70.google.com ([209.85.161.70])
-  by smtpmx6.ucr.edu with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jan 2024 15:26:51 -0800
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-594e1ef83d0so1051963eaf.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 15:26:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucr.edu; s=rmail; t=1704410809; x=1705015609; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=u4Dw0mTClgaFsB3U7t+HPsmZwI4wTqyqXn3PwWakYqU=;
-        b=RstD/2Z/w2hON0CUvAYeMaOEOBH9Drov3L2VSLyouZQekBwOMuBXbog9urxjSkZPx2
-         XIpCqMbsJ/FuqbMVMx/zfUZ+O6ZQiqmucLlHr49mck53To+Jl4qfQTRFJUgUd1HyikDE
-         pjfl/DCUawsGEwOUJViSzYl7TaSj58AYkHJOg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704410809; x=1705015609;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=u4Dw0mTClgaFsB3U7t+HPsmZwI4wTqyqXn3PwWakYqU=;
-        b=fWtZmRXBsMM4cvTAvSqecnueAP7y2Ipk3uYxlH9XX2cyhM3YcETXCURUcAKbowxujH
-         hoi+2fSXDOAkvw0Z5zTCsXDPItYi2Z2EVt12JTIE3IVKoAyv79CRyUfNPTaWa/R/CMoF
-         jjC9+8qBFUENE/4ShrNzu6r3umOJRS4dcocu2Q+nDpDx/s4EkGj+Nj5Am3SAENwnF7zA
-         6LIDFshHajPHA0ZzjNmUpn7I0iOgbzbNiuIBzAWGzfgNcbTVLKTHZe7QkJiIrY8NiZeQ
-         FkBEZGkCrXiIp1VpNwO0nRWLrWL1FT0uh6WSJbdEjKrwYZrrG9uMTVlHY46/UaRPZ2UG
-         qlvA==
-X-Gm-Message-State: AOJu0YzTXiSKiSN4C5z28zBY9bpO1w8zmVR0E57DN/Vy3J73Fs6PrCrj
-	QYicVOwuIPZWTGeWDYpGAWCXkeYj5nLUyhpX721DnlJ/mEeXnwVyC5Yv+HQlbadYwn8/bhctVtn
-	HVudH7xWZgLBJbDaAPHH8AKoI/g==
-X-Received: by 2002:a05:6358:60c4:b0:170:daa8:576e with SMTP id i4-20020a05635860c400b00170daa8576emr1148701rwi.47.1704410808991;
-        Thu, 04 Jan 2024 15:26:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGDMbmb56woVxFKjGUQ/hq719tA9RHlVqnPTXOSn9/x5agag9e0eThcPLTidjJSnU0iJw7oEw==
-X-Received: by 2002:a05:6358:60c4:b0:170:daa8:576e with SMTP id i4-20020a05635860c400b00170daa8576emr1148692rwi.47.1704410808599;
-        Thu, 04 Jan 2024 15:26:48 -0800 (PST)
-Received: from localhost (kq.cs.ucr.edu. [169.235.27.223])
-        by smtp.gmail.com with UTF8SMTPSA id a5-20020a636605000000b0059d34fb9ccasm224141pgc.2.2024.01.04.15.26.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 15:26:48 -0800 (PST)
-From: Xiaochen Zou <xzou017@ucr.edu>
-To: davem@davemloft.net
-Cc: dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Xiaochen Zou <xzou017@ucr.edu>
-Subject: [PATCH] net: gre: complete lockless access to dev->needed_headroom
-Date: Thu,  4 Jan 2024 15:27:14 -0800
-Message-Id: <20240104232714.619657-1-xzou017@ucr.edu>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DF52D051;
+	Thu,  4 Jan 2024 23:34:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4806FC433C8;
+	Thu,  4 Jan 2024 23:34:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704411243;
+	bh=gbY3raGSprk25DNxWli+kh8jpocIFdqypsvx82WgUEM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SNCsURMMk1K5/WdU5XxUz4qDQLQtlBxYUS00b14MiPQs9xQ9OvCH1uC6OJyvIPYP2
+	 ixKQJk5224ThEFVWOiZ0WCSy70MIIM0wNX28ZWm6/5gIH3fhRTnw0g0CfBHl+vHxse
+	 ekz8EljDuSEKsS0+1X9s0GBwSaCztJQPrS6CUBThMnlPqhKMufp8q08Eou2oV1esYi
+	 CFdyZHT4mj1RyJiSaMaIa7N49Xg6h9ZYCJ+TgaK3KBL7LMgV6sRi2xW9D2BnyjXwoz
+	 YwbBwBZzAECu1zPe9oPMC/QiWG0cJdSOrMTrOH6RrRRIQgY3HaSHtL8maTZEQv1/Nw
+	 TX69v9oLBKRPA==
+Date: Thu, 4 Jan 2024 15:34:01 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH net-next v5 07/13] net: ethtool: Introduce a command to
+ list PHYs on an interface
+Message-ID: <20240104153401.08ff9809@kernel.org>
+In-Reply-To: <20231221180047.1924733-8-maxime.chevallier@bootlin.com>
+References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
+	<20231221180047.1924733-8-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-According to 4b397c06cb9 (net: tunnels: annotate lockless
-accesses to dev->needed_headroom), we need to use lockless
-access to protect dev->needed_headroom from data racing.
-This patch complete the changes in ip(6)_gre.
+On Thu, 21 Dec 2023 19:00:40 +0100 Maxime Chevallier wrote:
+> As we have the ability to track the PHYs connected to a net_device
+> through the link_topology, we can expose this list to userspace. This
+> allows userspace to use these identifiers for phy-specific commands and
+> take the decision of which PHY to target by knowing the link topology.
+> 
+> Add PHY_GET and PHY_DUMP, which can be a filtered DUMP operation to list
+> devices on only one interface.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-More changes in other modules might be needed for completeness.
+> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+> index 3ca6c21e74af..97ff787a7dd8 100644
+> --- a/Documentation/networking/ethtool-netlink.rst
+> +++ b/Documentation/networking/ethtool-netlink.rst
+> @@ -2011,6 +2011,49 @@ The attributes are propagated to the driver through the following structure:
+>  .. kernel-doc:: include/linux/ethtool.h
+>      :identifiers: ethtool_mm_cfg
+>  
+> +PHY_GET
+> +=======
+> +
+> +Retrieve information about a given Ethernet PHY sitting on the link. As there
+> +can be more than one PHY, the DUMP operation can be used to list the PHYs
+> +present on a given interface, by passing an interface index or name in
+> +the dump request
+> +
+> +Request contents:
+> +
+> +  ====================================  ======  ==========================
+> +  ``ETHTOOL_A_PHY_HEADER``              nested  request header
+> +  ====================================  ======  ==========================
+> +
+> +Kernel response contents:
+> +
+> +  ===================================== ======  ==========================
+> +  ``ETHTOOL_A_PHY_HEADER``              nested  request header
+> +  ``ETHTOOL_A_PHY_INDEX``               u32     the phy's unique index, that can
 
-Signed-off-by: Xiaochen Zou <xzou017@ucr.edu>
----
- net/ipv4/ip_gre.c  | 12 ++++++------
- net/ipv6/ip6_gre.c | 12 ++++++------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+The fact that lines are longer than the ===== markings doesn't generate
+warnings in htmldoc?
 
-diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
-index 5169c3c72cff..8c979c421d79 100644
---- a/net/ipv4/ip_gre.c
-+++ b/net/ipv4/ip_gre.c
-@@ -491,7 +491,7 @@ static void gre_fb_xmit(struct sk_buff *skb, struct net_device *dev,
- 	key = &tun_info->key;
- 	tunnel_hlen = gre_calc_hlen(key->tun_flags);
- 
--	if (skb_cow_head(skb, dev->needed_headroom))
-+	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
- 		goto err_free_skb;
- 
- 	/* Push Tunnel header. */
-@@ -541,7 +541,7 @@ static void erspan_fb_xmit(struct sk_buff *skb, struct net_device *dev)
- 	version = md->version;
- 	tunnel_hlen = 8 + erspan_hdr_len(version);
- 
--	if (skb_cow_head(skb, dev->needed_headroom))
-+	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
- 		goto err_free_skb;
- 
- 	if (gre_handle_offloads(skb, false))
-@@ -653,7 +653,7 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
- 		    skb_checksum_start(skb) < skb->data)
- 			goto free_skb;
- 	} else {
--		if (skb_cow_head(skb, dev->needed_headroom))
-+		if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
- 			goto free_skb;
- 
- 		tnl_params = &tunnel->parms.iph;
-@@ -689,7 +689,7 @@ static netdev_tx_t erspan_xmit(struct sk_buff *skb,
- 	if (gre_handle_offloads(skb, false))
- 		goto free_skb;
- 
--	if (skb_cow_head(skb, dev->needed_headroom))
-+	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
- 		goto free_skb;
- 
- 	if (skb->len > dev->mtu + dev->hard_header_len) {
-@@ -742,7 +742,7 @@ static netdev_tx_t gre_tap_xmit(struct sk_buff *skb,
- 	if (gre_handle_offloads(skb, !!(tunnel->parms.o_flags & TUNNEL_CSUM)))
- 		goto free_skb;
- 
--	if (skb_cow_head(skb, dev->needed_headroom))
-+	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
- 		goto free_skb;
- 
- 	__gre_xmit(skb, dev, &tunnel->parms.iph, htons(ETH_P_TEB));
-@@ -768,7 +768,7 @@ static void ipgre_link_update(struct net_device *dev, bool set_mtu)
- 	if (dev->header_ops)
- 		dev->hard_header_len += len;
- 	else
--		dev->needed_headroom += len;
-+		WRITE_ONCE(dev->needed_headroom, dev->needed_headroom + len);
- 
- 	if (set_mtu)
- 		dev->mtu = max_t(int, dev->mtu - len, 68);
-diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-index 070d87abf7c0..8c060591641d 100644
---- a/net/ipv6/ip6_gre.c
-+++ b/net/ipv6/ip6_gre.c
-@@ -782,7 +782,7 @@ static netdev_tx_t __gre6_xmit(struct sk_buff *skb,
- 			(TUNNEL_CSUM | TUNNEL_KEY | TUNNEL_SEQ);
- 		tun_hlen = gre_calc_hlen(flags);
- 
--		if (skb_cow_head(skb, dev->needed_headroom ?: tun_hlen + tunnel->encap_hlen))
-+		if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom) ?: tun_hlen + tunnel->encap_hlen))
- 			return -ENOMEM;
- 
- 		gre_build_header(skb, tun_hlen,
-@@ -792,7 +792,7 @@ static netdev_tx_t __gre6_xmit(struct sk_buff *skb,
- 						      : 0);
- 
- 	} else {
--		if (skb_cow_head(skb, dev->needed_headroom ?: tunnel->hlen))
-+		if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom) ?: tunnel->hlen))
- 			return -ENOMEM;
- 
- 		flags = tunnel->parms.o_flags;
-@@ -976,7 +976,7 @@ static netdev_tx_t ip6erspan_tunnel_xmit(struct sk_buff *skb,
- 			truncate = true;
- 	}
- 
--	if (skb_cow_head(skb, dev->needed_headroom ?: t->hlen))
-+	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom) ?: t->hlen))
- 		goto tx_err;
- 
- 	t->parms.o_flags &= ~TUNNEL_KEY;
-@@ -1153,7 +1153,7 @@ static void ip6gre_tnl_link_config_route(struct ip6_tnl *t, int set_mtu,
- 			if (t->dev->header_ops)
- 				dev->hard_header_len = dst_len;
- 			else
--				dev->needed_headroom = dst_len;
-+				WRITE_ONCE(dev->needed_headroom, dst_len);
- 
- 			if (set_mtu) {
- 				int mtu = rt->dst.dev->mtu - t_hlen;
-@@ -1184,7 +1184,7 @@ static int ip6gre_calc_hlen(struct ip6_tnl *tunnel)
- 	if (tunnel->dev->header_ops)
- 		tunnel->dev->hard_header_len = LL_MAX_HEADER + t_hlen;
- 	else
--		tunnel->dev->needed_headroom = LL_MAX_HEADER + t_hlen;
-+		WRITE_ONCE(tunnel->dev->needed_headroom, LL_MAX_HEADER + t_hlen);
- 
- 	return t_hlen;
- }
-@@ -1864,7 +1864,7 @@ static int ip6erspan_calc_hlen(struct ip6_tnl *tunnel)
- 		       erspan_hdr_len(tunnel->parms.erspan_ver);
- 
- 	t_hlen = tunnel->hlen + sizeof(struct ipv6hdr);
--	tunnel->dev->needed_headroom = LL_MAX_HEADER + t_hlen;
-+	WRITE_ONCE(tunnel->dev->needed_headroom, LL_MAX_HEADER + t_hlen);
- 	return t_hlen;
- }
- 
--- 
-2.25.1
+> +                                                be used for phy-specific requests
+> +  ``ETHTOOL_A_PHY_DRVNAME``             string  the phy driver name
+> +  ``ETHTOOL_A_PHY_NAME``                string  the phy device name
+> +  ``ETHTOOL_A_PHY_UPSTREAM_TYPE``       u32     the type of device this phy is
+> +                                                connected to
+> +  ``ETHTOOL_A_PHY_UPSTREAM_PHY``        nested  if the phy is connected to another
+> +                                                phy, this nest contains info on
+> +                                                that connection
+> +  ``ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME`` string  if the phy controls an sfp bus,
+> +                                                the name of the sfp bus
+
+Is upstream / downstream clear to everyone / from the spec.
+I guess it's scoped to the netdev so upstream means "towards 
+the netdev MAC"?
+
+> +  ``ETHTOOL_A_PHY_ID``                  u32     the phy id if the phy is C22
+> +  ===================================== ======  ==========================
+> +
+> +When ``ETHTOOL_A_PHY_UPSTREAM_TYPE`` is PHY_UPSTREAM_PHY, the PHY's parent is
+> +another PHY. Information on the parent PHY will be set in the
+> +``ETHTOOL_A_PHY_UPSTREAM_PHY`` nest, which has the following structure :
+> +
+> +  =================================== ======  ==========================
+> +  ``ETHTOOL_A_PHY_UPSTREAM_INDEX``    u32     the PHY index of the upstream PHY
+> +  ``ETHTOOL_A_PHY_UPSTREAM_SFP_NAME`` string  if this PHY is connected to it's
+> +                                                parent PHY through an SFP bus, the
+> +                                                name of this sfp bus
+> +  =================================== ======  ==========================
+
+Why is this a nest?
+
+>  Request translation
+>  ===================
+
+> +enum {
+> +	ETHTOOL_A_PHY_UNSPEC,
+> +	ETHTOOL_A_PHY_HEADER,			/* nest - _A_HEADER_* */
+> +	ETHTOOL_A_PHY_INDEX,			/* u32 */
+> +	ETHTOOL_A_PHY_DRVNAME,			/* string */
+> +	ETHTOOL_A_PHY_NAME,			/* string */
+> +	ETHTOOL_A_PHY_UPSTREAM_TYPE,		/* u8 */
+
+The Documentation say it's a u32 as it should be, AFAICT.
+But code and some comments use u8.
+
+> +	ETHTOOL_A_PHY_UPSTREAM,			/* nest - _A_PHY_UPSTREAM_* */
+> +	ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME,	/* string */
+> +	ETHTOOL_A_PHY_ID,			/* u32 */
+> +
+> +	/* add new constants above here */
+> +	__ETHTOOL_A_PHY_CNT,
+> +	ETHTOOL_A_PHY_MAX = (__ETHTOOL_A_PHY_CNT - 1)
+> +};
+
+> +++ b/net/ethtool/phy.c
+> @@ -0,0 +1,306 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright 2023 Bootlin
+> + *
+> + */
+
+Do you really need 4 lines for the copyright? :)
+
+
+> +/* Caller holds rtnl */
+> +static ssize_t
+> +ethnl_phy_reply_size(const struct ethnl_req_info *req_base,
+> +		     struct netlink_ext_ack *extack)
+> +{
+> +	struct phy_link_topology *topo;
+> +	struct phy_device_node *pdn;
+> +	struct phy_device *phydev;
+> +	unsigned long index;
+> +	size_t size;
+> +
+> +	ASSERT_RTNL();
+> +
+> +	topo = &req_base->dev->link_topo;
+> +
+> +	size = nla_total_size(0);
+
+no comment on this one?
+
+> +
+> +	xa_for_each(&topo->phys, index, pdn) {
+
+Why count all the PHYs, you only output one on doit, right?
+
+> +		phydev = pdn->phy;
+> +
+> +		/* ETHTOOL_A_PHY_INDEX */
+> +		size += nla_total_size(sizeof(u32));
+> +
+> +		/* ETHTOOL_A_DRVNAME */
+> +		size += nla_total_size(strlen(phydev->drv->name) + 1);
+> +
+> +		/* ETHTOOL_A_NAME */
+> +		size += nla_total_size(strlen(dev_name(&phydev->mdio.dev)) + 1);
+> +
+> +		/* ETHTOOL_A_PHY_UPSTREAM_TYPE */
+> +		size += nla_total_size(sizeof(u8));
+> +
+> +		/* ETHTOOL_A_PHY_ID */
+> +		size += nla_total_size(sizeof(u32));
+> +
+> +		if (phy_on_sfp(phydev)) {
+> +			const char *upstream_sfp_name = sfp_get_name(pdn->parent_sfp_bus);
+> +
+> +			/* ETHTOOL_A_PHY_UPSTREAM_SFP_NAME */
+> +			if (upstream_sfp_name)
+> +				size += nla_total_size(strlen(upstream_sfp_name) + 1);
+> +
+> +			/* ETHTOOL_A_PHY_UPSTREAM_INDEX */
+> +			size += nla_total_size(sizeof(u32));
+> +		}
+> +
+> +		/* ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME */
+> +		if (phydev->sfp_bus) {
+> +			const char *sfp_name = sfp_get_name(phydev->sfp_bus);
+> +
+> +			if (sfp_name)
+> +				size += nla_total_size(strlen(sfp_name) + 1);
+> +		}
+> +	}
+> +
+> +	return size;
+> +}
+
+> +static int ethnl_phy_parse_request(struct ethnl_req_info *req_base,
+> +				   struct nlattr **tb)
+> +{
+> +	struct phy_link_topology *topo = &req_base->dev->link_topo;
+> +	struct phy_req_info *req_info = PHY_REQINFO(req_base);
+> +	struct phy_device_node *pdn;
+> +
+> +	if (!req_base->phydev)
+> +		return 0;
+
+The PHY INDEX should probably be a required attr, with 
+GENL_REQ_ATTR_CHECK()? Without phydev being specified
+what's the point?
+
+> +	pdn = xa_load(&topo->phys, req_base->phydev->phyindex);
+> +	memcpy(&req_info->pdn, pdn, sizeof(*pdn));
+> +
+> +	return 0;
+> +}
+
+> +int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+> +{
+> +	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
+> +	struct net *net = sock_net(skb->sk);
+> +	unsigned long ifindex = 1;
+
+This doesn't look right, if dump gets full you gotta pick up
+when previous call left off.
+
+> +	struct net_device *dev;
+> +	int ret = 0;
+> +
+> +	rtnl_lock();
+> +
+> +	if (ctx->phy_req_info->base.dev) {
+> +		ret = ethnl_phy_dump_one_dev(skb, ctx->phy_req_info->base.dev, cb);
+> +		ethnl_parse_header_dev_put(&ctx->phy_req_info->base);
+> +		ctx->phy_req_info->base.dev = NULL;
+> +	} else {
+> +		for_each_netdev_dump(net, dev, ifindex) {
+> +			ret = ethnl_phy_dump_one_dev(skb, dev, cb);
+> +			if (ret)
+> +				break;
+> +		}
+> +	}
+> +	rtnl_unlock();
+> +
+> +	if (ret == -EMSGSIZE && skb->len)
+> +		return skb->len;
+> +	return ret;
+> +}
+> +
 
 
