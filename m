@@ -1,64 +1,56 @@
-Return-Path: <netdev+bounces-61526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46689824314
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:50:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F064582431E
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D49D42825C2
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:50:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DFE1282A92
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC67225D7;
-	Thu,  4 Jan 2024 13:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB4A2233C;
+	Thu,  4 Jan 2024 13:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="Kfu5KJFE"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="vPkrYsx+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3352822EE3
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 13:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40d899205c7so4374845e9.2
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 05:49:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1704376147; x=1704980947; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1N0CJHq6htpDij9HAOUTJdfEEnbukPhsaVqFV2O6M58=;
-        b=Kfu5KJFEvaFn3dvgGo1N9pFqDDcZGpkSheTw6/hRxPyiU6lTy7rfDZ9XbK+C89S4v7
-         h5NBoUlKRLX4FLORzRcW9B1Juj7CDQ8l3aNgIAhcxWnknCfcY2w9PZRo5E6DPv6wllDX
-         +cr6V2ndSq3RAJFGHe5QYnREhD+zWOo2g/UDupubR7yeSNqNOLUj1sRWr5HZy9EiinJB
-         fLO13ZStiqn8puVb8aXh9owvWgX28UAqyW436Wgcx4VOeRGnFCD7sPNf5CdKuCL/1LIH
-         6DFn41Qk4TTBcZCY6Gre63rWVKSpznjbMQSVTKIRTLOGJ3qiLz1fw904hLKuc7ZQSg33
-         mv4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704376147; x=1704980947;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1N0CJHq6htpDij9HAOUTJdfEEnbukPhsaVqFV2O6M58=;
-        b=ATfWBNm8O0efdJ8IT5VoaoD51oyqnFsj8OvhxxYLfWd9cuGjDTELgYaNhGaZM/6SCU
-         TTb0E/EuD8jyK5EV7kWW4tnYc4zjEfBoZeiIHnvG8cXDkiuoDLyhvJrXBUh/kzfmb1cX
-         I0FeX160fjpOxzBHfNb4g82Noz5siYCUonXFHOdLO0q5n0inBVlKhusCeWaNAsqyljaD
-         BtYIl+kHxhrrrIrcGd15MNSckHI8C79h6Qc0rDeNEj88W9/odRC0tqZ/6wMaojZd3J5j
-         l8fHSSS3prf8ywSRwdYYKLgAPiLaedO1rZo4wqmKVosFAUu1x3L7cLdtA47JGDBFjUls
-         MSgA==
-X-Gm-Message-State: AOJu0YxVOe2fwCGJV4eWBO6WOgdBS3d9VQk3qBp4c0PQ9+pA39QtlvtJ
-	Fo8X24k6zy4wbNng9bShI8+68OwkdlaP
-X-Google-Smtp-Source: AGHT+IFCXmewWplzS9dS4w5yAqKZ0sUEiQjYEZExiJcpaFkmwIbLwp8oPLCtP/EDEXfUC4t2l0cR6A==
-X-Received: by 2002:a05:600c:84ce:b0:40c:2b01:e09e with SMTP id er14-20020a05600c84ce00b0040c2b01e09emr323603wmb.47.1704376147451;
-        Thu, 04 Jan 2024 05:49:07 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id az30-20020a05600c601e00b0040e35f28039sm168575wmb.18.2024.01.04.05.49.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 05:49:06 -0800 (PST)
-Message-ID: <fe1752a6-9866-45e6-b011-92a242304fce@arista.com>
-Date: Thu, 4 Jan 2024 13:49:05 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D042224D1;
+	Thu,  4 Jan 2024 13:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 404AXOvq022627;
+	Thu, 4 Jan 2024 14:51:11 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=au43nqK7nHZ8BJAhVEW3trO9826zxXlgdNutC4+DT1Y=; b=vP
+	krYsx+7jfA0/FQ9Acpp/VHNZUmXIRAhIVuHq3tDml8QxhOrG8l9OIBMYLgB2PJdE
+	4fzmztnfFVG17nwDJD0vmW7tm+LiegstY1zbKLffvs/v3b1gI952+7KM7fk2+JIa
+	MMp/PbftaUayc1uYuVwFxWlXGbTV9xvUFyluEmzLy5l13FOG2o6UAlqi9ynqneOv
+	J0UbYJtSrLp6GHBuQHCPcYsHq21/TGiGIVEfzIuav9t/cS/pnw83ngikvj2J/smZ
+	6yJA2NkH5UKLQuAMcRzR0DFAvQ4Wp0U2h5kTKfpQEoOBatPAP2T6xY32fmEo945+
+	vQvZDBNcgAuLCO829vDQ==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3vdjtu2nrr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Jan 2024 14:51:11 +0100 (CET)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 1E4DB10002A;
+	Thu,  4 Jan 2024 14:51:10 +0100 (CET)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 0D61322FA44;
+	Thu,  4 Jan 2024 14:51:10 +0100 (CET)
+Received: from [10.252.5.254] (10.252.5.254) by SHFDAG1NODE2.st.com
+ (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 4 Jan
+ 2024 14:51:08 +0100
+Message-ID: <29b3092f-4d4d-4b6d-9667-aa04eddd2956@foss.st.com>
+Date: Thu, 4 Jan 2024 14:51:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,57 +58,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: syslog spam: TCP segment has incorrect auth options set
+Subject: Re: [PATCH v2 3/4] drm/stm: dsi: expose DSI PHY internal clock
+To: Simon Horman <horms@kernel.org>
+CC: Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Yannick Fertre <yannick.fertre@foss.st.com>,
+        Philippe Cornu <philippe.cornu@foss.st.com>,
+        Maarten Lankhorst
+	<maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+        Richard Cochran <richardcochran@gmail.com>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>
+References: <20231204101113.276368-1-raphael.gallais-pou@foss.st.com>
+ <20231204101113.276368-4-raphael.gallais-pou@foss.st.com>
+ <20231208165855.GA8459@kernel.org>
 Content-Language: en-US
-To: Christian Kujau <lists@nerdbynature.de>
-Cc: netdev@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
- Francesco Ruggeri <fruggeri@arista.com>,
- Salam Noureddine <noureddine@arista.com>, David Ahern <dsahern@kernel.org>,
- linux-kernel@vger.kernel.org
-References: <f6b59324-1417-566f-a976-ff2402718a8d@nerdbynature.de>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <f6b59324-1417-566f-a976-ff2402718a8d@nerdbynature.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Raphael Gallais-Pou <raphael.gallais-pou@foss.st.com>
+In-Reply-To: <20231208165855.GA8459@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-04_07,2024-01-03_01,2023-05-22_02
 
-Hi Christian,
 
-Thanks for the report,
+On 12/8/23 17:58, Simon Horman wrote:
+> On Mon, Dec 04, 2023 at 11:11:12AM +0100, Raphael Gallais-Pou wrote:
+>
+> ...
+>
+>> @@ -514,18 +675,40 @@ static int dw_mipi_dsi_stm_probe(struct platform_device *pdev)
+>>  		dsi->lane_max_kbps *= 2;
+>>  	}
+>>  
+>> -	dw_mipi_dsi_stm_plat_data.base = dsi->base;
+>> -	dw_mipi_dsi_stm_plat_data.priv_data = dsi;
+>> +	dsi->pdata = *pdata;
+>> +	dsi->pdata.base = dsi->base;
+>> +	dsi->pdata.priv_data = dsi;
+>> +
+>> +	dsi->pdata.max_data_lanes = 2;
+>> +	dsi->pdata.phy_ops = &dw_mipi_dsi_stm_phy_ops;
+>>  
+>>  	platform_set_drvdata(pdev, dsi);
+>>  
+>> -	dsi->dsi = dw_mipi_dsi_probe(pdev, &dw_mipi_dsi_stm_plat_data);
+>> +	dsi->dsi = dw_mipi_dsi_probe(pdev, &dsi->pdata);
+>>  	if (IS_ERR(dsi->dsi)) {
+>>  		ret = PTR_ERR(dsi->dsi);
+>>  		dev_err_probe(dev, ret, "Failed to initialize mipi dsi host\n");
+>>  		goto err_dsi_probe;
+>>  	}
+>>  
+>> +	/*
+>> +	 * We need to wait for the generic bridge to probe before enabling and
+>> +	 * register the internal pixel clock.
+>> +	 */
+>> +	ret = clk_prepare_enable(dsi->pclk);
+>> +	if (ret) {
+>> +		DRM_ERROR("%s: Failed to enable peripheral clk\n", __func__);
+>> +		goto err_dsi_probe;
+>> +	}
+>> +
+>> +	ret = dw_mipi_dsi_clk_register(dsi, dev);
+>> +	if (ret) {
+>> +		DRM_ERROR("Failed to register DSI pixel clock: %d\n", ret);
+> Hi Raphael,
 
-On 1/4/24 10:55, Christian Kujau wrote:
-> Ever since commit 2717b5adea9e ("net/tcp: Add tcp_hash_fail() ratelimited 
-> logs") the following is printed, in waves of small floods, to syslog:
-> 
->  kernel: TCP: TCP segment has incorrect auth options set for XX.20.239.12.54681->XX.XX.90.103.80 [S]
-> 
-> This host is connected to the open internet and serves as a small HTTP and 
-> SSH login server, not much traffic is happening here. So I'd assume these 
-> messages to be the result of random internet scans and/or fingerprinting 
-> attempts or the like. While not really a concern, these messages are 
-> flooding the dmesg buffer over time :-(
-> 
-> Is there a way to adjust the severity of these messages?
-> 
-> * In include/net/tcp.h this gets logged with tcp_hash_fail(), which is
-> * defined in include/net/tcp_ao.h and calls net_info_ratelimited(), which
-> * is in turn defined in include/linux/net.h and calls pr_info().
-> 
-> Can e.g. net_dbg_ratelimited be used instead?
+Hi Simon,
 
-Yeah, I guess it's possible to down the severity of these logs, but may
-be unexpected by admins: TCP-MD5 messages existed for long time and
-there may be userspace that expects them (i.e. in arista there are tests
-that look for these specific messages - those would be easy to fix, but
-there may be others outside this company).
+You are right,  dsi->clk needs to be disabled in case the clock register fails
+before exiting the probe.
 
-While thinking on the origin of your issue, it seems that the logs
-produced by either TCP-MD5 or TCP-AO are desired by a user when they
-add/use the authentication. Could you try this and see if that solves
-the issue for you?
+I've sent a v3, which normally fixes it.
 
-https://lore.kernel.org/all/20240104-tcp_hash_fail-logs-v1-1-ff3e1f6f9e72@arista.com/
 
-Thanks,
-             Dmitry
+Regards,
 
+Raphaël
+
+>
+> Does clk_disable_unprepare(dsi->pclk) need to be added to this unwind
+> chain?
+>
+> Flagged by Smatch.
+>
+>> +		goto err_dsi_probe;
+>> +	}
+>> +
+>> +	clk_disable_unprepare(dsi->pclk);
+>> +
+>>  	return 0;
+>>  
+>>  err_dsi_probe:
+> ...
 
