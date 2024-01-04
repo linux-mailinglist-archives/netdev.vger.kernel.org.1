@@ -1,198 +1,317 @@
-Return-Path: <netdev+bounces-61402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D03CA8239F6
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:00:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 339958239F0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:59:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BBD4B25065
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:00:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED363B24305
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 00:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CC736C;
-	Thu,  4 Jan 2024 00:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gcBNRMh8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6558376;
+	Thu,  4 Jan 2024 00:59:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AAAA4C92
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 00:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5cd8667c59eso14091a12.2
-        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 16:59:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1704329979; x=1704934779; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=T6FIJx3lLDIiIawObHHm0348y41AleGw4w6oe1Cnk6c=;
-        b=gcBNRMh8AzOyVwQKzS+NseUNA0J5SEF2aYN+lnPm/HvvxjZ3U+RwM7aEb6y3vVYUBL
-         UydPKptcrdmyBbYAVMRPyRg8YLLTmh8JPuwDcndIQ+mhx4bVmWc4012hFx/OiG//wgnX
-         MRwFysttDALK4GhhQ9jJuinVLjuQ1Ala0YBls=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39535223
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 00:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35fed23b27eso93850905ab.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 16:59:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704329979; x=1704934779;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+        d=1e100.net; s=20230601; t=1704329965; x=1704934765;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=T6FIJx3lLDIiIawObHHm0348y41AleGw4w6oe1Cnk6c=;
-        b=hkTwJ9W4mYj5K0+HpZ97ylaMkiG7TRGaW2ZTxS6bhe/bliYxRdbdYTYRzu3FcD6yTC
-         rgsLlRQAiVifDgZZsH2LQpOg9sQ0QAkzZcsIFbkQBR+hd0HiFXMi2/B7jY2qjPRwBHJO
-         3m06w5MO+1vB6XncFX/JP8ZWjxmnB01a0uxZvBiKJD0Ge0Xz59vy9GGnwjOM85tm7H5U
-         RLfI2cTV62hzMA7oLlDMCQpszy6vV23fWvhZCS8gCDkM5cN5ZoSzOdnIJvQwyGf/YfSX
-         cm4nFSI8dsm14GmRo8tn30PDhOT00cn0Y0u/aF9PmO0yKGm/R4gsmPObFGva0PejYpG+
-         R8gg==
-X-Gm-Message-State: AOJu0YxxEfWNOgkiCg44mgK6H8cAUAlYO1ICrVc11WUVy2UR9jUGn3o3
-	WpJC35pB+//QyJqTgdeLbbq4fRT4ZfnQ
-X-Google-Smtp-Source: AGHT+IFiGJRnJjrZNhyj5jgm+uuxuvBMYLtUuP1w+nzjjLtSslpV/ABAw3xII4IPJpL90N4ADCCWLQ==
-X-Received: by 2002:a17:902:ce90:b0:1d4:43a5:a82a with SMTP id f16-20020a170902ce9000b001d443a5a82amr22762224plg.126.1704329978874;
-        Wed, 03 Jan 2024 16:59:38 -0800 (PST)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id s2-20020a170902b18200b001d46a313b42sm16290411plr.268.2024.01.03.16.59.37
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Jan 2024 16:59:38 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	arnd@kernel.org
-Subject: [PATCH net] bnxt_en: Remove mis-applied code from bnxt_cfg_ntp_filters()
-Date: Wed,  3 Jan 2024 16:59:24 -0800
-Message-Id: <20240104005924.40813-1-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.32.0
+        bh=yU8aTAho/la/2jmgxd/SKYnyY6RfB+tiAv63beqq4g4=;
+        b=Ow2qhU2RwkX4IPYZRHkrnFkeQhxDVxrpSHYMDhj7yTHcYEKMq2cBGz4DAlm6//gd4Y
+         ZpX5MlPoVJOdyu6o/aLjOPuSxZdJorlOnzViAgeg+2m/o7jrClJuywX0I0VLUpTtN/Fg
+         gHfAdW3/ZVJvN289baz8etpA5ttPEU+BLObVKJGMpbDlGWiDxzBtPkIPJYKtYtGjDXX+
+         mRlZE0Nby3caOUoJcHW9TaQnY881HYfB3hPmwVM2e/TaMQF3EsbHs3gljdEQq1uJ4ocZ
+         osSuvRGAbxJRNuvfYqQZaaniFa8dXboc0oxIZ8PtbuOhEbuT4xPjxtq/L9fmRGZPnwvr
+         N9FQ==
+X-Gm-Message-State: AOJu0YynL51A1CKz6wSUoErcK6jVPTOnkuCFaCapu6b/fJOE3E3t5pU7
+	tA9LfjjBA/B0UHLQmg4LscJrakVyjJ8P6o9lRxu9Hi/Rkx8K
+X-Google-Smtp-Source: AGHT+IG3RUKN9obvLX/6bwA1inpX7yvw1vUx04cVWl91wxmskmnbJMRicsPg+tCQvBhUozahYV9aP5hmVOSGHrwDZ/OlB4nV81nU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000000372b6060e143f09"
+X-Received: by 2002:a92:c249:0:b0:35f:d260:57b3 with SMTP id
+ k9-20020a92c249000000b0035fd26057b3mr2760751ilo.3.1704329965078; Wed, 03 Jan
+ 2024 16:59:25 -0800 (PST)
+Date: Wed, 03 Jan 2024 16:59:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000026100c060e143e5a@google.com>
+Subject: [syzbot] [net?] [nfc?] INFO: task hung in nfc_targets_found
+From: syzbot <syzbot+2b131f51bb4af224ab40@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---0000000000000372b6060e143f09
-Content-Transfer-Encoding: 8bit
+Hello,
 
-The 2 lines to check for the BNXT_HWRM_PF_UNLOAD_SP_EVENT bit was
-mis-applied to bnxt_cfg_ntp_filters() and should have been applied to
-bnxt_sp_task().
+syzbot found the following issue on:
 
-Fixes: 19241368443f ("bnxt_en: Send PF driver unload notification to all VFs.")
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+HEAD commit:    453f5db0619e Merge tag 'trace-v6.7-rc7' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=141bc48de80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f8e72bae38c079e4
+dashboard link: https://syzkaller.appspot.com/bug?extid=2b131f51bb4af224ab40
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6ed2cada0823/disk-453f5db0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1fa106f79073/vmlinux-453f5db0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c75ff5078c5c/bzImage-453f5db0.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2b131f51bb4af224ab40@syzkaller.appspotmail.com
+
+INFO: task kworker/u4:93:7607 blocked for more than 143 seconds.
+      Not tainted 6.7.0-rc7-syzkaller-00049-g453f5db0619e #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u4:93   state:D stack:20248 pid:7607  tgid:7607  ppid:2      flags:0x00004000
+Workqueue: nfc2_nci_rx_wq nci_rx_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5376 [inline]
+ __schedule+0x1961/0x4ab0 kernel/sched/core.c:6688
+ __schedule_loop kernel/sched/core.c:6763 [inline]
+ schedule+0x149/0x260 kernel/sched/core.c:6778
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6835
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x6a3/0xd60 kernel/locking/mutex.c:747
+ device_lock include/linux/device.h:992 [inline]
+ nfc_targets_found+0x26f/0x590 net/nfc/core.c:778
+ nci_ntf_packet+0x4431/0x4f40
+ nci_rx_work+0x14c/0x2b0 net/nfc/nci/core.c:1522
+ process_one_work kernel/workqueue.c:2627 [inline]
+ process_scheduled_works+0x90f/0x1420 kernel/workqueue.c:2700
+ worker_thread+0xa5f/0x1000 kernel/workqueue.c:2781
+ kthread+0x2d3/0x370 kernel/kthread.c:388
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+INFO: task kworker/0:1:11541 blocked for more than 143 seconds.
+      Not tainted 6.7.0-rc7-syzkaller-00049-g453f5db0619e #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/0:1     state:D stack:23280 pid:11541 tgid:11541 ppid:2      flags:0x00004000
+Workqueue: events nfc_urelease_event_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5376 [inline]
+ __schedule+0x1961/0x4ab0 kernel/sched/core.c:6688
+ __schedule_loop kernel/sched/core.c:6763 [inline]
+ schedule+0x149/0x260 kernel/sched/core.c:6778
+ schedule_preempt_disabled+0x13/0x20 kernel/sched/core.c:6835
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x6a3/0xd60 kernel/locking/mutex.c:747
+ nci_request net/nfc/nci/core.c:149 [inline]
+ nci_stop_poll+0x123/0x480 net/nfc/nci/core.c:873
+ nfc_stop_poll+0xea/0x220 net/nfc/core.c:259
+ nfc_urelease_event_work+0x160/0x2f0 net/nfc/netlink.c:1852
+ process_one_work kernel/workqueue.c:2627 [inline]
+ process_scheduled_works+0x90f/0x1420 kernel/workqueue.c:2700
+ worker_thread+0xa5f/0x1000 kernel/workqueue.c:2781
+ kthread+0x2d3/0x370 kernel/kthread.c:388
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+INFO: task syz-executor.1:27827 blocked for more than 143 seconds.
+      Not tainted 6.7.0-rc7-syzkaller-00049-g453f5db0619e #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.1  state:D stack:25392 pid:27827 tgid:27824 ppid:27038  flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5376 [inline]
+ __schedule+0x1961/0x4ab0 kernel/sched/core.c:6688
+ __schedule_loop kernel/sched/core.c:6763 [inline]
+ schedule+0x149/0x260 kernel/sched/core.c:6778
+ schedule_timeout+0xb0/0x300 kernel/time/timer.c:2143
+ do_wait_for_common kernel/sched/completion.c:95 [inline]
+ __wait_for_common kernel/sched/completion.c:116 [inline]
+ wait_for_common kernel/sched/completion.c:127 [inline]
+ wait_for_completion+0x354/0x620 kernel/sched/completion.c:148
+ __flush_workqueue+0x730/0x1630 kernel/workqueue.c:3192
+ nci_close_device+0x193/0x600 net/nfc/nci/core.c:579
+ nci_unregister_device+0x40/0x240 net/nfc/nci/core.c:1297
+ virtual_ncidev_close+0x59/0x90 drivers/nfc/virtual_ncidev.c:168
+ __fput+0x3cc/0x9e0 fs/file_table.c:394
+ task_work_run+0x24a/0x300 kernel/task_work.c:180
+ get_signal+0x166e/0x1840 kernel/signal.c:2680
+ arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:309
+ exit_to_user_mode_loop+0x6a/0x100 kernel/entry/common.c:168
+ exit_to_user_mode_prepare+0xb1/0x150 kernel/entry/common.c:204
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+ syscall_exit_to_user_mode+0x69/0x2a0 kernel/entry/common.c:296
+ do_syscall_64+0x52/0x110 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fab9d07cce9
+RSP: 002b:00007fab9ddde0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: fffffffffffffff2 RBX: 00007fab9d19bf80 RCX: 00007fab9d07cce9
+RDX: 0000000000000064 RSI: 0000000020000500 RDI: 0000000000000003
+RBP: 00007fab9d0c947a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fab9d19bf80 R15: 00007ffe08b6c548
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/29:
+ #0: ffffffff8d92dae0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:301 [inline]
+ #0: ffffffff8d92dae0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:747 [inline]
+ #0: ffffffff8d92dae0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6614
+2 locks held by getty/4825:
+ #0: ffff88802a6320a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6b4/0x1e10 drivers/tty/n_tty.c:2201
+3 locks held by kworker/u4:93/7607:
+ #0: ffff8880368b3938 ((wq_completion)nfc2_nci_rx_wq){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #0: ffff8880368b3938 ((wq_completion)nfc2_nci_rx_wq){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #1: ffffc900156b7d20 ((work_completion)(&ndev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #1: ffffc900156b7d20 ((work_completion)(&ndev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #2: ffff88802bed5100 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:992 [inline]
+ #2: ffff88802bed5100 (&dev->mutex){....}-{3:3}, at: nfc_targets_found+0x26f/0x590 net/nfc/core.c:778
+6 locks held by kworker/0:1/11541:
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #1: ffffc90004a6fd20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #1: ffffc90004a6fd20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #2: ffffffff8ee4d808 (nfc_devlist_mutex){+.+.}-{3:3}, at: nfc_urelease_event_work+0xa7/0x2f0 net/nfc/netlink.c:1843
+ #3: ffff88802bed5508 (&genl_data->genl_data_mutex){+.+.}-{3:3}, at: nfc_urelease_event_work+0x111/0x2f0 net/nfc/netlink.c:1849
+ #4: ffff88802bed5100 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:992 [inline]
+ #4: ffff88802bed5100 (&dev->mutex){....}-{3:3}, at: nfc_stop_poll+0x3c/0x220 net/nfc/core.c:247
+ #5: ffff88802bed4350 (&ndev->req_lock){+.+.}-{3:3}, at: nci_request net/nfc/nci/core.c:149 [inline]
+ #5: ffff88802bed4350 (&ndev->req_lock){+.+.}-{3:3}, at: nci_stop_poll+0x123/0x480 net/nfc/nci/core.c:873
+3 locks held by kworker/1:2/16113:
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #1: ffffc9000322fd20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #1: ffffc9000322fd20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #2: ffffffff8ee4d808 (nfc_devlist_mutex){+.+.}-{3:3}, at: nfc_urelease_event_work+0xa7/0x2f0 net/nfc/netlink.c:1843
+3 locks held by kworker/1:9/17613:
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #1: ffffc9000d927d20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #1: ffffc9000d927d20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #2: ffffffff8ee4d808 (nfc_devlist_mutex){+.+.}-{3:3}, at: nfc_urelease_event_work+0xa7/0x2f0 net/nfc/netlink.c:1843
+3 locks held by kworker/0:5/22239:
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #1: ffffc90014e57d20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #1: ffffc90014e57d20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #2: ffffffff8ee4d808 (nfc_devlist_mutex){+.+.}-{3:3}, at: nfc_urelease_event_work+0xa7/0x2f0 net/nfc/netlink.c:1843
+3 locks held by kworker/1:0/23072:
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #0: ffff888012c70d38 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #1: ffffc9000a5afd20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2602 [inline]
+ #1: ffffc9000a5afd20 ((work_completion)(&w->w)){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2700
+ #2: ffffffff8ee4d808 (nfc_devlist_mutex){+.+.}-{3:3}, at: nfc_urelease_event_work+0xa7/0x2f0 net/nfc/netlink.c:1843
+1 lock held by syz-executor.1/27827:
+ #0: ffff88802bed4350 (&ndev->req_lock){+.+.}-{3:3}, at: nci_close_device+0x10a/0x600 net/nfc/nci/core.c:561
+2 locks held by syz-executor.1/27953:
+ #0: ffffffff8e0dcb48 (misc_mtx){+.+.}-{3:3}, at: misc_open+0x5c/0x380 drivers/char/misc.c:129
+ #1: ffffffff8ee4d808 (nfc_devlist_mutex){+.+.}-{3:3}, at: nfc_register_device+0x3c/0x320 net/nfc/core.c:1116
+1 lock held by syz-executor.5/27976:
+ #0: ffffffff8e0dcb48 (misc_mtx){+.+.}-{3:3}, at: misc_open+0x5c/0x380 drivers/char/misc.c:129
+1 lock held by syz-executor.5/27979:
+ #0: ffffffff8e0dcb48 (misc_mtx){+.+.}-{3:3}, at: misc_open+0x5c/0x380 drivers/char/misc.c:129
+1 lock held by syz-executor.5/27981:
+ #0: ffffffff8e0dcb48 (misc_mtx){+.+.}-{3:3}, at: misc_open+0x5c/0x380 drivers/char/misc.c:129
+1 lock held by syz-executor.5/27984:
+ #0: ffffffff8e0dcb48 (misc_mtx){+.+.}-{3:3}, at: misc_open+0x5c/0x380 drivers/char/misc.c:129
+1 lock held by syz-executor.5/27986:
+ #0: ffffffff8e0dcb48 (misc_mtx){+.+.}-{3:3}, at: misc_open+0x5c/0x380 drivers/char/misc.c:129
+1 lock held by syz-executor.1/28013:
+ #0: ffffffff8e0dcb48 (misc_mtx){+.+.}-{3:3}, at: misc_open+0x5c/0x380 drivers/char/misc.c:129
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 PID: 29 Comm: khungtaskd Not tainted 6.7.0-rc7-syzkaller-00049-g453f5db0619e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
+ nmi_cpu_backtrace+0x498/0x4d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x198/0x310 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
+ watchdog+0xfaf/0xff0 kernel/hung_task.c:379
+ kthread+0x2d3/0x370 kernel/kthread.c:388
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 PID: 7038 Comm: kworker/u4:23 Not tainted 6.7.0-rc7-syzkaller-00049-g453f5db0619e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Workqueue: bat_events batadv_nc_worker
+RIP: 0010:bytes_is_nonzero mm/kasan/generic.c:84 [inline]
+RIP: 0010:memory_is_nonzero mm/kasan/generic.c:102 [inline]
+RIP: 0010:memory_is_poisoned_n mm/kasan/generic.c:127 [inline]
+RIP: 0010:memory_is_poisoned mm/kasan/generic.c:159 [inline]
+RIP: 0010:check_region_inline mm/kasan/generic.c:178 [inline]
+RIP: 0010:kasan_check_range+0x79/0x290 mm/kasan/generic.c:187
+Code: 4d 89 c1 49 c1 e9 03 49 be 01 00 00 00 00 fc ff df 4f 8d 3c 31 4c 89 fd 4c 29 dd 48 83 fd 10 7f 29 48 85 ed 0f 84 3e 01 00 00 <4c> 89 cd 48 f7 d5 48 01 dd 41 80 3b 00 0f 85 c5 01 00 00 49 ff c3
+RSP: 0018:ffffc9000d9379f0 EFLAGS: 00000202
+RAX: 0000000000000001 RBX: 1ffff1100f2ad320 RCX: ffffffff816e8191
+RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffff888079569900
+RBP: 0000000000000001 R08: ffff888079569903 R09: 1ffff1100f2ad320
+R10: dffffc0000000000 R11: ffffed100f2ad320 R12: ffff888079569900
+R13: 1ffff92001b26f50 R14: dffffc0000000001 R15: ffffed100f2ad321
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c00a3bd000 CR3: 000000000d731000 CR4: 00000000003506f0
+DR0: 000000000000d8dd DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+ atomic_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:1294 [inline]
+ queued_spin_lock include/asm-generic/qspinlock.h:111 [inline]
+ do_raw_spin_lock+0x141/0x370 kernel/locking/spinlock_debug.c:115
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ batadv_nc_purge_paths+0xe8/0x3a0 net/batman-adv/network-coding.c:442
+ batadv_nc_worker+0x328/0x610 net/batman-adv/network-coding.c:720
+ process_one_work kernel/workqueue.c:2627 [inline]
+ process_scheduled_works+0x90f/0x1420 kernel/workqueue.c:2700
+ worker_thread+0xa5f/0x1000 kernel/workqueue.c:2781
+ kthread+0x2d3/0x370 kernel/kthread.c:388
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 579eebb6fc56..e1f1e646cf48 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -12093,6 +12093,8 @@ static void bnxt_sp_task(struct work_struct *work)
- 		bnxt_cfg_ntp_filters(bp);
- 	if (test_and_clear_bit(BNXT_HWRM_EXEC_FWD_REQ_SP_EVENT, &bp->sp_event))
- 		bnxt_hwrm_exec_fwd_req(bp);
-+	if (test_and_clear_bit(BNXT_HWRM_PF_UNLOAD_SP_EVENT, &bp->sp_event))
-+		netdev_info(bp->dev, "Receive PF driver unload event!\n");
- 	if (test_and_clear_bit(BNXT_PERIODIC_STATS_SP_EVENT, &bp->sp_event)) {
- 		bnxt_hwrm_port_qstats(bp, 0);
- 		bnxt_hwrm_port_qstats_ext(bp, 0);
-@@ -13093,8 +13095,6 @@ static void bnxt_cfg_ntp_filters(struct bnxt *bp)
- 			}
- 		}
- 	}
--	if (test_and_clear_bit(BNXT_HWRM_PF_UNLOAD_SP_EVENT, &bp->sp_event))
--		netdev_info(bp->dev, "Receive PF driver unload event!\n");
- }
- 
- #else
--- 
-2.30.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
---0000000000000372b6060e143f09
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINigWNZ+Hsuc0fqFo7b5ABU2AZmfcu/5
-wI+BTpaaAHrPMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEw
-NDAwNTkzOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBRvVo7BCJrKhJa9s313h72OTpj4omGO7QrHDoD5K2pO7n4Erya
-pjE5S68KYbi3sJ+P026z5P+LJIUlQv1/7r/uYHSumsg++G/01XVEffMc4r5PESDmUkGweUN0cL0A
-rph7hjbi6Hiu18bdB4aJlaq86WVTeqj2zBXE5VA0nHbLjtPF9/dGmuoXT0JOxLnFnMKriAyqQ9hS
-nA6RXGjSvE7ZatbAR/pP0shp7zvYMxU6odTx18+Sjv9MMQk6uFra8w9s8Vy9MustkpGJZrh//UYH
-3MOpfY53aAIweXumCMIuVQyUrUvsXao2Q+vwOcHWWwPYXWrreheuzZkeBJ0GvXoC
---0000000000000372b6060e143f09--
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
