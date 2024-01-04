@@ -1,101 +1,181 @@
-Return-Path: <netdev+bounces-61569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF238244A9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:09:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA9AB8244B0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58A4B1F21879
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:09:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 308BCB21736
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:11:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED692375F;
-	Thu,  4 Jan 2024 15:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C15241E2;
+	Thu,  4 Jan 2024 15:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="HFEkFi/u"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="4ChAmfhZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B215923761
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 15:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3367601a301so484667f8f.2
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 07:09:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704380968; x=1704985768; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GQJXUUtLJYo9WVTRclMvA/3dFysmYSDjfTjj1Xlk1VY=;
-        b=HFEkFi/uDA2FRcL9XREw7PbSmppWKNfA2zFtwX8sKtgZTekGfEN27fC92trQdQslmF
-         TPYevMJKr+pv4FD8T5b1TGxFiP7kC905u78WhWsjgdGcq/7MOHfo9LAAK/BP/vWTRE96
-         MLOplRQDo6yiI/C7qJhuQCXnib/kODs3NHB67XZvXmLwocLYjbcs9uUGhNoBigsn2ZxV
-         TcgBKqysqXI/H9VOpDH6GTvlgaO0skO33PdywXCp0ieUv2BbOHuj8Qbu5gIRsHBL8L9s
-         7Jzv7ws5/B+ZUm7QZYR1VujUPUzmrkopDgb14BHg46zjAWpF8STe20ANqhUGpj+rYtsV
-         2hSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704380968; x=1704985768;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GQJXUUtLJYo9WVTRclMvA/3dFysmYSDjfTjj1Xlk1VY=;
-        b=rHnJ1qZWZ5Fm514JtcxqCyb/aPgkQ8QgH2gs08fakVIbK6ESZM7MjqBnUZe+AGTSdv
-         OZ67U8PA1B2UxjsGFM9oKhPzHxRsISLOwW4Tsx7wDzy5AYgRjo/VTf7m0I2oM+bklRtN
-         gcd4/ZR6KlMMaZZ84VAZwXJBu7Y47knGNCHskTNjJEhmmOG4O9Y/X5PL35MHrZJFAu09
-         hJKNRejaBZduCl6fj9Ab5y51nghC6kvrNF8FHBZjpdYS4dZjw/WTXg64xNsKNaTPfXaq
-         AtQrCeJa/KwCGVjyHF60VuYZ3vKc48ImSzefka1DLsfBUsiwK0McBU6GRFPsOeCJvDTo
-         jP8g==
-X-Gm-Message-State: AOJu0YxgwK5L0sSN1BRu89TY/pocypnFgUSkNxyKYavIi/xVJpMiWeGa
-	ljNXg2RK8PASeqGgsrkHPF0a9t3AkjSO1A==
-X-Google-Smtp-Source: AGHT+IEcpXKmWi+QiXXNIxKtxYy0paO5p6UYvh0bhu7RH+GGqH+aSe1IRgYka02fuHpvaJx4cBY5Lw==
-X-Received: by 2002:a5d:420c:0:b0:336:6dcc:88e8 with SMTP id n12-20020a5d420c000000b003366dcc88e8mr341571wrq.138.1704380968021;
-        Thu, 04 Jan 2024 07:09:28 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id j18-20020a5d5652000000b00336ca349bdesm23860298wrw.47.2024.01.04.07.09.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 07:09:27 -0800 (PST)
-Date: Thu, 4 Jan 2024 16:09:26 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
-	michal.michalik@intel.com, milena.olech@intel.com,
-	pabeni@redhat.com, kuba@kernel.org, Jan Glaza <jan.glaza@intel.com>
-Subject: Re: [PATCH net v2 4/4] dpll: hide "zombie" pins for userspace
-Message-ID: <ZZbKJjoNG7o8opKi@nanopsycho>
-References: <20240104111132.42730-1-arkadiusz.kubalewski@intel.com>
- <20240104111132.42730-5-arkadiusz.kubalewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0D223777;
+	Thu,  4 Jan 2024 15:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1704381071;
+	bh=xGey7Z1qQaWQnT1BT1OSgP8+WbNEdnTjqtNlvMAYTEc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=4ChAmfhZHGzmTHDk6ZhIvFJl79kIFmstiFicB1/eDtYeGIx3/Zyku422RNxzoscnw
+	 mUHMHLqiSDOZuuNdOq2ivfS2/AEjy63PRhlBp49i+/awtqVt7NnKRVR3dqsqDbLJUX
+	 BaGU/dDvtrNjPkeXW1nqJhbcqHZT8tdvKXFWDBjsCf/FBm3CabECr2ROE/nizIXXJO
+	 WYOz4TxONG4A3t/1r7yuwhU8dhr20SitlxiDOQ+LvgTQ281EKSqxI/U0G8AF81LkxS
+	 QsGTLwnkP+UWvg7sHK1thLiI5Zn20h/9W5S3cByXFxOSkq6+h3ceT957q4IByomHCO
+	 8WpwGMPLmjpRw==
+Received: from mercury (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: sre)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 7F9C2378200D;
+	Thu,  4 Jan 2024 15:11:11 +0000 (UTC)
+Received: by mercury (Postfix, from userid 1000)
+	id 1ADFC106062F; Thu,  4 Jan 2024 16:11:11 +0100 (CET)
+Date: Thu, 4 Jan 2024 16:11:11 +0100
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Kalle Valo <kvalo@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Heiko Stuebner <heiko@sntech.de>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Chris Morgan <macromorgan@hotmail.com>, Linus Walleij <linus.walleij@linaro.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?utf-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4=?= Prado <nfraprado@collabora.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>, 
+	Dan Williams <dan.j.williams@intel.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+	Terry Bowman <terry.bowman@amd.com>, 
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [RFC 0/9] PCI: introduce the concept of power sequencing of PCIe
+ devices
+Message-ID: <tfnmgogvqd6crvsv4gal5tndgcj5ee5il5fpfpipfb3zv2vmyr@c42zfar6nvar>
+References: <20240104130123.37115-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cy6uey62v4nbmwrk"
+Content-Disposition: inline
+In-Reply-To: <20240104130123.37115-1-brgl@bgdev.pl>
+
+
+--cy6uey62v4nbmwrk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240104111132.42730-5-arkadiusz.kubalewski@intel.com>
+Content-Transfer-Encoding: quoted-printable
 
-Thu, Jan 04, 2024 at 12:11:32PM CET, arkadiusz.kubalewski@intel.com wrote:
+Hi,
 
-[...]
+On Thu, Jan 04, 2024 at 02:01:14PM +0100, Bartosz Golaszewski wrote:
+> During last year's Linux Plumbers we had several discussions centered
+> around the need to power-on PCI devices before they can be detected on
+> the bus.
+>=20
+> The consensus during the conference was that we need to introduce a
+> class of "PCI slot drivers" that would handle the power-sequencing.
+>=20
+> After some additional brain-storming with Manivannan and the realization
+> that the DT maintainers won't like adding any "fake" nodes not
+> representing actual devices, we decided to reuse the existing
+> infrastructure provided by the PCIe port drivers.
+>=20
+> The general idea is to instantiate platform devices for child nodes of
+> the PCIe port DT node. For those nodes for which a power-sequencing
+> driver exists, we bind it and let it probe. The driver then triggers a
+> rescan of the PCI bus with the aim of detecting the now powered-on
+> device. The device will consume the same DT node as the platform,
+> power-sequencing device. We use device links to make the latter become
+> the parent of the former.
+>=20
+> The main advantage of this approach is not modifying the existing DT in
+> any way and especially not adding any "fake" platform devices.
 
->@@ -1179,6 +1195,10 @@ int dpll_nl_pin_set_doit(struct sk_buff *skb, struct genl_info *info)
-> {
-> 	struct dpll_pin *pin = info->user_ptr[0];
-> 
->+	if (!xa_empty(&pin->parent_refs) &&
->+	    !dpll_pin_parents_registered(pin))
->+		return -ENODEV;
->+
+I recently ran into this issue on a Rockchip platform using a PCIe
+based AP6275P WLAN device (broadcom based). As far as I can tell your
+proposal should also work for that one (obviously using a different
+pwrseq driver).
 
-Also make sure to prevent events from being send for this pin.
+-- Sebastian
 
+> Bartosz Golaszewski (9):
+>   arm64: dts: qcom: sm8250: describe the PCIe port
+>   arm64: dts: qcom: qrb5165-rb5: describe the WLAN module of QCA6390
+>   PCI/portdrv: create platform devices for child OF nodes
+>   PCI: hold the rescan mutex when scanning for the first time
+>   PCI/pwrseq: add pwrseq core code
+>   dt-bindings: vendor-prefixes: add a PCI prefix for Qualcomm Atheros
+>   dt-bindings: wireless: ath11k: describe QCA6390
+>   PCI/pwrseq: add a pwrseq driver for QCA6390
+>   arm64: defconfig: enable the PCIe power sequencing for QCA6390
+>=20
+>  .../net/wireless/qcom,ath11k-pci.yaml         |  14 ++
+>  .../devicetree/bindings/vendor-prefixes.yaml  |   1 +
+>  arch/arm64/boot/dts/qcom/qrb5165-rb5.dts      |  24 +++
+>  arch/arm64/boot/dts/qcom/sm8250.dtsi          |  10 +
+>  arch/arm64/configs/defconfig                  |   2 +
+>  drivers/pci/pcie/Kconfig                      |   2 +
+>  drivers/pci/pcie/Makefile                     |   2 +
+>  drivers/pci/pcie/portdrv.c                    |   3 +-
+>  drivers/pci/pcie/pwrseq/Kconfig               |  19 ++
+>  drivers/pci/pcie/pwrseq/Makefile              |   4 +
+>  drivers/pci/pcie/pwrseq/pcie-pwrseq-qca6390.c | 197 ++++++++++++++++++
+>  drivers/pci/pcie/pwrseq/pwrseq.c              |  83 ++++++++
+>  drivers/pci/probe.c                           |   2 +
+>  include/linux/pcie-pwrseq.h                   |  24 +++
+>  14 files changed, 386 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/pci/pcie/pwrseq/Kconfig
+>  create mode 100644 drivers/pci/pcie/pwrseq/Makefile
+>  create mode 100644 drivers/pci/pcie/pwrseq/pcie-pwrseq-qca6390.c
+>  create mode 100644 drivers/pci/pcie/pwrseq/pwrseq.c
+>  create mode 100644 include/linux/pcie-pwrseq.h
+>=20
+> --=20
+> 2.40.1
+>=20
+>=20
 
-> 	return dpll_pin_set_from_nlattr(pin, info);
-> }
-> 
->-- 
->2.38.1
->
+--cy6uey62v4nbmwrk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmWWyn8ACgkQ2O7X88g7
++pqYEA/7BHxRVVJzOzyU8+oTZ3jVVPdgfWWRB+8eVAxg6+O3OKc31B9UlAXlEVHU
+BLYObChFlR8wfoA88johSDUjE2GGCTNeC0oDA12GVCdP0RzosAdmnW24uv8IdJvH
+471Kw2n08jnMrzh32HnnehetOZIoF3vORkxkLpH26pZVayzGA8CCq8XI45S16Pfx
+IbiZ3nYuJM0LB7rxj1R9aR9uL3MzH+rCBBKqcbtKJTAvkLkvHhTrFWPhIIm4+Fwh
+anIwi8jhwxHeZ4cQKEuxJF0PzpnXQnUhAj1kUaoUSj6G5ffmJo6pyEgNSXqpoizU
+qAtWaa5zHClBwgEdqjJqMaaXZK7yDFkSekTsKciZeqZzZW476i3ZefIendZSitNT
+IcAVHwGvL+XuI2y2WpET9dtx+Ij+R1FSmk+6HIn24BFu3GV3KaG2+thgfF1J2l0y
+lV76WK3vQDSshWC+9p9f72Ug+h9Wi1UIWBXyLPuA17NjD/v+RG9YV4IntjaHHBZk
+5SjzHrrqyHjIn+s16JU0XH2Wt9oFl+gnPJlhLvx3HdHdNYCCVjR+37T55SERvMlH
+KHWcCk+9qWRJnTdDtkE97T1TWxd803PU6a/pzK/u/m4Hf7/CBnrZmbxQnP7jq/pF
+dm0V0duiFUCn/HckPL1VLuF8IUuSlGTKSj7ypDRR7O8On0KxghE=
+=kqNZ
+-----END PGP SIGNATURE-----
+
+--cy6uey62v4nbmwrk--
 
