@@ -1,183 +1,119 @@
-Return-Path: <netdev+bounces-61571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D8558244B9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:13:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28C608244BC
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:14:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07558283A9C
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:13:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC692283819
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09205241FC;
-	Thu,  4 Jan 2024 15:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E1B23755;
+	Thu,  4 Jan 2024 15:14:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="B2V/7Luf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GPz4XUuA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBB223761
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 15:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4b731a13d76so186078e0c.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 07:13:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1704381218; x=1704986018; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uo3GncCKNR0AkCV/1DPqjQ0hOppoX5B784xjEgiLIT0=;
-        b=B2V/7Lufa01ra+BQx/BCUI+1EvXD+HJntVatc7ihvYQb3uyRveLNHeTF++ZjMZgjOv
-         Qs5oTydMw9ifdMHzbvReE9Le8l+bbtchpxCxyYFrKiaJwJIb1sMUuVMU5bhBwdcjBROj
-         Ue0cRmcuSHRxq9X1TQ1nc50Nno34utaFim19ldizvhbLMdu1HmSRgpvHZ+3xigYGQf6J
-         C+r7UiHdsOcSxwk8f3EruqbT7NS+sEI94BEGEHztD3KvhYp02xS1hFlfLz2lh7diVcj0
-         0yw3pQPVepL0+qabCdNwTo9gONEADVQzQMNB033E+O3Dlb0VzapjBxXDOgC5Kz2Wa0To
-         Mo3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704381218; x=1704986018;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uo3GncCKNR0AkCV/1DPqjQ0hOppoX5B784xjEgiLIT0=;
-        b=kJejEQICvY4bmZoVou1bMAUn6ko+t/5Hv5UNEl5tngShs1J6MhoJbZeYTeIu6gjzbv
-         kK0hslysM4PuVRKvx/Geh4j/+/Uns8Ij1jdBnX3mlqMeypzEIq6jBX1Q3Si+nVjJVDuV
-         IwGLrB7EnFOo4vCBy4e9Tb6kPDsT/QA/4tKkTgwnG8MjxrUaEFQ34G8VDQr/kfc8D0Za
-         E/yoicqSmIoHT2FnBhdkqoYkmqCRhPKQS2x/0Mkv5P+VViBCQk8zSVCdk1Yhg9JwATmL
-         efSMtqq4rdq+CuAl2P17t3gEMHagEu19svT45xIj+h0mPGFx2ox6/n29RDN0qxjjszme
-         f6/A==
-X-Gm-Message-State: AOJu0YwH/sIoLZ3+8c81n3x5EGs+MRyWJVYJG2xrILSU1bTcDpEJ+a7m
-	EWGmad3fOZCbarV5FG53Wv3N6HjTPNTfvp32SZS+zo0auFiyAA==
-X-Google-Smtp-Source: AGHT+IGaU5XfoSCmXhPgB9dPZjVC5ipLctZH7E/xd+njpdt3eUTn/nDydi+QSdw8aSiqRs0d+1vMZ53MS8OTwZuJ5V8=
-X-Received: by 2002:ac5:c9ab:0:b0:4b7:295d:a048 with SMTP id
- f11-20020ac5c9ab000000b004b7295da048mr619470vkm.29.1704381218190; Thu, 04 Jan
- 2024 07:13:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505C1241E6
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 15:14:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF8ABC433C7;
+	Thu,  4 Jan 2024 15:14:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704381260;
+	bh=v6614NUQxxQFqdzDcCq3mOxpqrODShl6Y7sTIYidATA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=GPz4XUuAS+tdbWkBX5qY8SKG4QNFpIOirfMh+nDHV36+1neWWm+ZMZNz5r0LBRD5/
+	 too1+UymL8iWw955XwylzQxxoO7Q8D3O0sfnarpZbxZBCQDsIVktYWLtGpE2SlOKEB
+	 TqKCxK6d5wCHfMPfQ8cylFcDNyfetmE/e4h/j94aB+7cB8A6avN4DEYB6J6Ezbl2Gz
+	 JvVzmLtwTu/1ZrOn8X8TE97KYUCFNrV2zgqMBmAFncED7CRdumYZg6r+AJu3BNTgbU
+	 XtSs5DwN5nFhhL1X7nD23aAGiLtjxL81oT60Z/C9Z0tPTo+SxwPt9HZzgkX9w8zJaR
+	 0IpuA9PfTddRQ==
+Date: Thu, 4 Jan 2024 16:14:16 +0100
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Subject: ethtool ioctl ABI: preferred way to expand uapi structure
+ ethtool_eee for additional link modes?
+Message-ID: <20240104161416.05d02400@dellmb>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104130123.37115-1-brgl@bgdev.pl> <20240104130123.37115-3-brgl@bgdev.pl>
- <CAA8EJpqZ8zbNcK1BsJaaoK3Fje9KhrvFvJpgdBa-US3eMhOmOw@mail.gmail.com>
-In-Reply-To: <CAA8EJpqZ8zbNcK1BsJaaoK3Fje9KhrvFvJpgdBa-US3eMhOmOw@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 4 Jan 2024 16:13:27 +0100
-Message-ID: <CAMRc=McmhPMb9bykwKXmQ-1DL4sJW+7caXkxUq=8v16hT1k_oA@mail.gmail.com>
-Subject: Re: [RFC 2/9] arm64: dts: qcom: qrb5165-rb5: describe the WLAN module
- of QCA6390
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
-	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 4, 2024 at 2:44=E2=80=AFPM Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> wrote:
->
-> On Thu, 4 Jan 2024 at 15:03, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
-> >
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > Describe the ath11k WLAN on-board the QCA6390 module. Include the
-> > relevant regulators and the enable GPIO.
-> >
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> >  arch/arm64/boot/dts/qcom/qrb5165-rb5.dts | 24 ++++++++++++++++++++++++
-> >  1 file changed, 24 insertions(+)
-> >
-> > diff --git a/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts b/arch/arm64/boot=
-/dts/qcom/qrb5165-rb5.dts
-> > index cd0db4f31d4a..721f86af952b 100644
-> > --- a/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
-> > +++ b/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
-> > @@ -734,6 +734,22 @@ &pcie0_phy {
-> >         vdda-pll-supply =3D <&vreg_l9a_1p2>;
-> >  };
-> >
-> > +&pcieport0 {
-> > +       wifi@0 {
-> > +               compatible =3D "pci17cb,1101";
-> > +               reg =3D <0x10000 0x0 0x0 0x0 0x0>;
-> > +
-> > +               pinctrl-names =3D "default";
-> > +               pinctrl-0 =3D <&wlan_en_state>;
-> > +
-> > +               enable-gpios =3D <&tlmm 20 GPIO_ACTIVE_HIGH>;
-> > +
-> > +               vddpmu-supply =3D <&vreg_s2f_0p95>;
-> > +               vddpcie1-supply =3D <&vreg_s8c_1p3>;
-> > +               vddpcie2-supply =3D <&vreg_s5a_1p9>;
->
-> If I remember correctly, qca6390 has at least 8 power supplies AON,
-> PMU, 3xRFA, 2xPCIe and VDDIO.
->
-> Moreover, these bindings do not solve another problem: the PMU is
-> shared between WiFi and BT parts. For the next gen (WCN6855) this
-> becomes even more important, see the code in msm-5.10 which makes sure
-> that there is a proper time between one of the units going down and
-> another one being powered on.
->
+Hello,
 
-Unified, shared power sequencing for this type of loosely coupled MFD
-devices is something I have in mind and that will be orthogonal to
-this. It will come on top of the PCIe power sequencing driver. I
-wanted to address a simpler issue first.
+the legacy ioctls ETHTOOL_GSET and ETHTOOL_SSET, which pass structure
+ethtool_cmd, were superseded by ETHTOOL_GLINKSETTINGS and
+ETHTOOL_SLINKSETTINGS.
 
-Bartosz
+This was done because the original structure only contains 32-bit words
+for supported, advertising and lp_advertising link modes. The new
+structure ethtool_link_settings contains member
+  s8 link_mode_masks_nwords;
+and a flexible array
+  __u32 link_mode_masks[];
+in order to overcome this issue.
 
-> > +       };
-> > +};
-> > +
-> >  &pcie1 {
-> >         status =3D "okay";
-> >  };
-> > @@ -1303,6 +1319,14 @@ sdc2_card_det_n: sd-card-det-n-state {
-> >                 function =3D "gpio";
-> >                 bias-pull-up;
-> >         };
-> > +
-> > +       wlan_en_state: wlan-default-state {
-> > +               pins =3D "gpio20";
-> > +               function =3D "gpio";
-> > +               drive-strength =3D <16>;
-> > +               output-low;
-> > +               bias-pull-up;
-> > +       };
-> >  };
-> >
-> >  &uart6 {
-> > --
-> > 2.40.1
-> >
-> >
->
->
-> --
-> With best wishes
-> Dmitry
+But currently we still have only legacy structure ethtool_eee for EEE
+settings:
+  struct ethtool_eee {
+    __u32 cmd;
+    __u32 supported;
+    __u32 advertised;
+    __u32 lp_advertised;
+    __u32 eee_active;
+    __u32 eee_enabled;
+    __u32 tx_lpi_enabled;
+    __u32 tx_lpi_timer;
+    __u32 reserved[2];
+  };
+
+Thus ethtool is unable to get/set EEE configuration for example for
+2500base-T and 5000base-T link modes, which are now available in
+several PHY drivers.
+
+We can remedy this by either:
+
+- adding another ioctl for EEE settings, as was done with the GSET /
+  SSET
+
+- using the original ioctl, but making the structure flexible (we can
+  replace the reserved fields with information that the array is
+  flexible), i.e.:
+
+  struct ethtool_eee {
+    __u32 cmd;
+    __u32 supported;
+    __u32 advertised;
+    __u32 lp_advertised;
+    __u32 eee_active;
+    __u32 eee_enabled;
+    __u32 tx_lpi_enabled;
+    __u32 tx_lpi_timer;
+    s8 link_mode_masks_nwords; /* zero if legacy 32-bit link modes */
+    __u8 reserved[7];
+    __u32 link_mode_masks[];
+    /* filled in if link_mode_masks_nwords > 0, with layout:
+     * __u32 map_supported[link_mode_masks_nwords];
+     * __u32 map_advertised[link_mode_masks_nwords];
+     * __u32 map_lp_advertised[link_mode_masks_nwords];
+     */
+  };
+
+  this way we will be left with another 7 reserved bytes for future (is
+  this enough?)
+
+What would you prefer?
+
+Marek
 
