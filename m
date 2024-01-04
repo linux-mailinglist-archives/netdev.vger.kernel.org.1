@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-61425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F4D4823A53
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:47:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEAD823A58
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:49:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E77F28800B
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:47:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72A761F2613D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163FC15CB;
-	Thu,  4 Jan 2024 01:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4950A15D4;
+	Thu,  4 Jan 2024 01:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oohtoBmc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nrpF2S5I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2F91849;
-	Thu,  4 Jan 2024 01:47:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E99EC433C7;
-	Thu,  4 Jan 2024 01:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3098B4C60
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 01:49:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA3FC433C9;
+	Thu,  4 Jan 2024 01:49:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704332840;
-	bh=kQ9z3YizwfzmqcFN76TVfrBEZr7D/AzQOLXak1t8Y0o=;
+	s=k20201202; t=1704332972;
+	bh=1v9px0aeHFVj8v+28K+zorNVMhrw6ynuHLj/tsZsQgw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oohtoBmc4FNRxf8gicjq0J2lgUihr9zu3Nd4nQilcFpjFIUCdaX4fo4A7HI57zdir
-	 +cNAyJBuDW13TcW66roEWJ2xmCzWeXDYm7WaXMbmz1nlu7N4yHvDQQDlRBOW0Vejal
-	 lM3OseYO9O3NT6rpLzDoE4JbUPHIXavm7g53NiV9GsNCNG0p2l5YKGDqPcGtOD0Icu
-	 13LGimTP/eqzg81Uwjho3PrmkwhPr1bynIrBmt6W036w1QDvebHRwjG3KMQzrG7/LX
-	 MmWD7h2gRn9gBxshwBwg/lie3DJwrsEL5ZZoPxGs62e/9y0pKGkkRyambFDcMy9YKs
-	 wEofqy+SmRBIQ==
-Date: Wed, 3 Jan 2024 17:47:19 -0800
+	b=nrpF2S5IxJNmQjCON4OSAv/I5nAoTEFC5qNbny1PFvVeV7KgcgsyOydMR1gJe8It+
+	 FV6WB8lyHhduxk9E24+cmGdUulf6332rUKJOCX0mB5ga6/EahxQfZ0/DwIpHoVOWaB
+	 h7xz9KqGK1cWMJImEOsm0zdq2xn2FRBj1wmFfMINBf5TQdn4Yxv0czPkyzJ3OJjvmQ
+	 TLd7MQOJ9Frm6enisydZkfFM4rPHAqoWQppUdbUHZDcsxGLWB3qd8doAQUr69HFLIq
+	 3Km0dGOEeDkGbN8XCVZglZGYG2Ipj0s0YMq5YVjODn6RMnyuCG+FJF9PRqI3a8vgVM
+	 n8hxTzU+yBwVw==
+Date: Wed, 3 Jan 2024 17:49:31 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Lin Ma <linma@zju.edu.cn>
-Cc: jk@codeconstruct.com.au, matt@codeconstruct.com.au, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v1] net: mctp: use deprecated parser in
- mctp_set_link_af
-Message-ID: <20240103174719.2b2c1565@kernel.org>
-In-Reply-To: <20231228070258.3052422-1-linma@zju.edu.cn>
-References: <20231228070258.3052422-1-linma@zju.edu.cn>
+To: vladbu@nvidia.com, Xin Long <lucien.xin@gmail.com>
+Cc: Tao Liu <taoliu828@163.com>, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, paulb@nvidia.com, netdev@vger.kernel.org,
+ simon.horman@corigine.com, xiyou.wangcong@gmail.com, pablo@netfilter.org
+Subject: Re: [PATCH net] net/sched: act_ct: fix skb leak and crash on ooo
+ frags
+Message-ID: <20240103174931.15ea4dbd@kernel.org>
+In-Reply-To: <20231228081457.936732-1-taoliu828@163.com>
+References: <20231228081457.936732-1-taoliu828@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,35 +52,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 28 Dec 2023 15:02:58 +0800 Lin Ma wrote:
-> In mctp set_link_af implementation `mctp_set_link_af`, it uses strict
-> parser nla_parse_nested to parse the nested attribute. This is fine in
-> most cases but not here, as the rtnetlink uses *bad magic* in setlink
-> code, see code snippet in function `do_setlink`.
+On Thu, 28 Dec 2023 16:14:57 +0800 Tao Liu wrote:
+> act_ct adds skb->users before defragmentation. If frags arrive in order,
+> the last frag's reference is reset in:
 > 
->   nla_for_each_nested(af, tb[IFLA_AF_SPEC], rem) {
->     const struct rtnl_af_ops *af_ops;
->     BUG_ON(!(af_ops = rtnl_af_lookup(nla_type(af)))); <= (1)
->     err = af_ops->set_link_af(dev, af, extack);       <= (2)
+>   inet_frag_reasm_prepare
+>     skb_morph
 > 
-> That is, in line (1), the attribute type of af will used to look up the
-> af_ops, and for MCTP case will use AF_MCTP here to get mctp_af_ops.
-> Therefore, the attribute with type AF_MCTP will never survive in the
-> check within the nla_parse_nested.
+> which is not straightforward.
 > 
->   if (!(nla->nla_type & NLA_F_NESTED)) {  <= nla_type is AF_MCTP
->     NL_SET_ERR_MSG_ATTR(extack, nla, "NLA_F_NESTED is missing");
->     return -EINVAL;  <= always invalid
->   }
+> However when frags arrive out of order, nobody unref the last frag, and
+> all frags are leaked. The situation is even worse, as initiating packet
+> capture can lead to a crash[0] when skb has been cloned and shared at the
+> same time.
 > 
-> For other set_link_af users IPV4 and IPV6 both make a trick here by
-> using nla_parse_nested_deprecated, which will check the NLA_F_NESTED
-> then able to use this type field as family value. This patch simply port
-> the MCTP code also to deprecated parser to make it work.
+> Fix the issue by removing skb_get() before defragmentation. act_ct
+> returns TC_ACT_CONSUMED when defrag failed or in progress.
 
-Did you test this? It's a suspiciously detailed and yet seemingly
-incorrect explanation..
+Vlad, Xin Long, does this look good to you?
 -- 
-pv-bot: s
-pw-bot: cr
+pw-bot: needs-ack
 
