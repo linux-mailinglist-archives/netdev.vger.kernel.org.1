@@ -1,93 +1,77 @@
-Return-Path: <netdev+bounces-61521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83933824279
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:11:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3A0824294
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:16:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E38C1C216A4
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:11:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2D9FB23DB9
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D08E2231D;
-	Thu,  4 Jan 2024 13:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E90621343;
+	Thu,  4 Jan 2024 13:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b5v08M9Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NT6ajKdb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7472C2137A;
-	Thu,  4 Jan 2024 13:11:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADAD224C6;
+	Thu,  4 Jan 2024 13:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-336755f1688so416462f8f.0;
-        Thu, 04 Jan 2024 05:11:15 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3368b9bbeb4so425013f8f.2;
+        Thu, 04 Jan 2024 05:16:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704373874; x=1704978674; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704374160; x=1704978960; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mD0BtoavTOP3v/vUfEDahgNoFQu6hqlrFVAdzIefsBU=;
-        b=b5v08M9YYnBj6Qrzj+Dou/kwsZ2wz5ITrusa37x2RuzvRED09bH6q+7g8zOGVrRMKh
-         lY7cKVAvzj4Mf37PefxR0az2LtIfc/MXG+OAydP8ZF0Y63B8N5NmMm22mBABYGrBcfxI
-         cDRQlRmVjgBBKaJEKS8YzbQy4boDKNy1qndfrjdukhZRN1oCedIVqkyCjWtILgqPMmgx
-         xTGEjkxBcpBnSG7yEdX9gvQWf+gSF0WZT6oxkca03jQ2gdpYOxXGqLvuZFEa5QxocrYA
-         YjexV6aF1+TykL5NXoRJK9Eznsn86FFyvmMFdmNR63eKlHF+FAYWZSdG0J7/y6z2oVNl
-         o2Zw==
+        bh=kWojNCo1dQUH3XLkmW/tyezRJ83aZaGYWSmb6/rILt8=;
+        b=NT6ajKdbu2cF2Yte3+LOcNk5l53G690JVXx5xAgIYYtpvuCD7d5qBX8NKMV288fVWN
+         wHX6udtuQhieIFaZ3WgF0IvInsUP/nKTHTxGDZwkYHfPiyKvtfbaQckJsQjlMZ05ilk5
+         raEJva5h0tdHHf1UXpKKe/XzD3H4nILjcL27xRSkm2aGzbRj49H103wH8o6wto/KUj2b
+         Yh0fu8AC/n5cjmF+B5z6xj+8M9dY/n1IbCD3wJZ+xLSokJQs/7MMugwyrJMWE9ChXqkP
+         nFjsBtK1Uf6PNbe64LVUvcsO1ganwQTudk6VxnQ03aK6bxLQC6yySrAJovqYQ/4K7I8N
+         3imw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704373874; x=1704978674;
+        d=1e100.net; s=20230601; t=1704374160; x=1704978960;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mD0BtoavTOP3v/vUfEDahgNoFQu6hqlrFVAdzIefsBU=;
-        b=gJ/hnUQK23zNWaevDsip4cPapXMY3/4D8vPJJezMSg/yDyecaTlM9N+vw6fJ+2G+41
-         aWDR7NuFeWwWvtUxKT8eu7Kx2+zJQzDFlCCUZdVz5WBfLCy9kBXWSPZUwOaMSZs0KBCz
-         1DO+jjplVAxt+TMB4CbtVGu7qkvfKC9x1LLWEZ3cRoAp/kg9NxWvzc7lYWOrmH9S6Scw
-         yXiQmClByy9hhjLKfgkVxmnlf2BFpJVvQdpC9oeIDv4erxd3MYma3/1JzstXPryB6nNW
-         H/HwxF1zHLIRejJuIGes+DIF3YYubJmWvtP2IhhCBtEEsoE+YkdJBo7yr0hcoWwbVyf1
-         XEkg==
-X-Gm-Message-State: AOJu0YwW7y4CwL3osk8twZl9Ykim2C0DpDXQLRMD7UNfGo52blIh1oXh
-	xJsDNS47bqHingEB68SBbws=
-X-Google-Smtp-Source: AGHT+IG0LMhhU/gfhoVr7LAviwbZXPweDz/CGpAVxscjxDW2uQY6VEjT58wBpBcmJBrbK9LEtlPxUA==
-X-Received: by 2002:a5d:4004:0:b0:336:8664:54b4 with SMTP id n4-20020a5d4004000000b00336866454b4mr376338wrp.132.1704373873447;
-        Thu, 04 Jan 2024 05:11:13 -0800 (PST)
+        bh=kWojNCo1dQUH3XLkmW/tyezRJ83aZaGYWSmb6/rILt8=;
+        b=h7ZabqSmc0szsLJl5ofpynBbprmrLCN3Qq6nwQ8PUv7B4ybynvLGB+vvR5cm+QKnEg
+         KmJS2c/b4vtjTA7MsdY3LE4Nn6R/Z27D3cKhXHvEpqXX+aVsjYHBpERBtZQVFj0FIsMt
+         TXZxYpYn6qaYlnDf7xGdTsVaSJpJpAXjuCfVPN/a4rWA2DnYEacAzypl4vfiXYcto4HO
+         dxBf7txgQgTFlRmlb2Ibi2pmsKwji1Pim6uIv1Yad1X0gAUPQuO2sPjBd2Q9NFpsra59
+         xPATc04rqkmfm6aZNTLSY4B/9yA8SKGhO+hNGYAAiwYhnck13MeAXeZPYuxI4/0UMjXU
+         +kmg==
+X-Gm-Message-State: AOJu0YwGb5mkT8k3+7lGptNenm0dsA5JK98XcPtxQ+RseSxc+W1egwEo
+	+Jq7PH+uvaEU3uJb78Bak1Q=
+X-Google-Smtp-Source: AGHT+IE8jUkcYnOjmr3yAczvJ+m3RLkNe7orX41ZA9IfLh/6YX9haGUm5h3v+m8NVCC1iLbE7qmw3g==
+X-Received: by 2002:adf:f544:0:b0:336:e161:5a with SMTP id j4-20020adff544000000b00336e161005amr189251wrp.137.1704374159874;
+        Thu, 04 Jan 2024 05:15:59 -0800 (PST)
 Received: from Ansuel-xps. (host-80-116-159-187.retail.telecomitalia.it. [80.116.159.187])
-        by smtp.gmail.com with ESMTPSA id z13-20020adfe54d000000b00333359b522dsm33187913wrm.77.2024.01.04.05.11.11
+        by smtp.gmail.com with ESMTPSA id c18-20020a5d4152000000b0033609b71825sm32777460wrq.35.2024.01.04.05.15.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 05:11:13 -0800 (PST)
-Message-ID: <6596ae71.df0a0220.a153a.6407@mx.google.com>
-X-Google-Original-Message-ID: <ZZaubwO3TR6Emo8L@Ansuel-xps.>
-Date: Thu, 4 Jan 2024 14:11:11 +0100
+        Thu, 04 Jan 2024 05:15:59 -0800 (PST)
+Message-ID: <6596af8f.5d0a0220.1b372.4858@mx.google.com>
+X-Google-Original-Message-ID: <ZZavj5TnPo9RitdF@Ansuel-xps.>
+Date: Thu, 4 Jan 2024 14:15:59 +0100
 From: Christian Marangi <ansuelsmth@gmail.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	William Zhang <william.zhang@broadcom.com>,
-	Anand Gore <anand.gore@broadcom.com>,
-	Kursad Oney <kursad.oney@broadcom.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
-	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
-	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v8 5/5] net: phy: at803x: add LED support for
- qca808x
-References: <20240104110114.2020-1-ansuelsmth@gmail.com>
- <20240104110114.2020-6-ansuelsmth@gmail.com>
- <20240104124805.1b0ba142@device-28.home>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v3 2/4] net: phy: at803x: refactor qca808x cable
+ test get status function
+References: <20240103124637.3078-1-ansuelsmth@gmail.com>
+ <20240103124637.3078-3-ansuelsmth@gmail.com>
+ <20240104130337.GG31813@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,53 +80,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240104124805.1b0ba142@device-28.home>
+In-Reply-To: <20240104130337.GG31813@kernel.org>
 
-On Thu, Jan 04, 2024 at 12:48:05PM +0100, Maxime Chevallier wrote:
-> Hello Christian,
-> 
-> On Thu,  4 Jan 2024 12:01:12 +0100
-> Christian Marangi <ansuelsmth@gmail.com> wrote:
-> 
-> > Add LED support for QCA8081 PHY.
+On Thu, Jan 04, 2024 at 01:03:37PM +0000, Simon Horman wrote:
+> On Wed, Jan 03, 2024 at 01:46:33PM +0100, Christian Marangi wrote:
+> > Refactor qca808x cable test get status function to remove code
+> > duplication and clean things up.
 > > 
-> > Documentation for this LEDs PHY is very scarce even with NDA access
-> > to Documentation for OEMs. Only the blink pattern are documented and are
-> > very confusing most of the time. No documentation is present about
-> > forcing the LED on/off or to always blink.
+> > The same logic is applied to each pair hence it can be generalized and
+> > moved to a common function.
 > > 
-> > Those settings were reversed by poking the regs and trying to find the
-> > correct bits to trigger these modes. Some bits mode are not clear and
-> > maybe the documentation option are not 100% correct. For the sake of LED
-> > support the reversed option are enough to add support for current LED
-> > APIs.
-> 
-> I have one small comment below :
-> 
-> > +static int qca808x_led_blink_set(struct phy_device *phydev, u8 index,
-> > +				 unsigned long *delay_on,
-> > +				 unsigned long *delay_off)
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> >  drivers/net/phy/at803x.c | 65 +++++++++++++++++++++-------------------
+> >  1 file changed, 34 insertions(+), 31 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+> > index acf483fa0887..b87293ee736c 100644
+> > --- a/drivers/net/phy/at803x.c
+> > +++ b/drivers/net/phy/at803x.c
+> > @@ -2037,10 +2037,39 @@ static int qca808x_cable_test_start(struct phy_device *phydev)
+> >  	return 0;
+> >  }
+> >  
+> > +static void qca808x_cable_test_get_pair_status(struct phy_device *phydev, u8 pair,
+> > +					       u16 status)
 > > +{
-> > +	int ret;
-> > +	u16 reg;
+> > +	u16 pair_code;
+> > +	int length;
 > > +
-> > +	if (index > 2)
-> > +		return -EINVAL;
-> > +
-> > +	reg = QCA808X_MMD7_LED_FORCE_CTRL(index);
-> > +
-> > +	/* Set blink to 50% off, 50% on at 4Hz by default */
-> > +	ret = phy_modify_mmd(phydev, MDIO_MMD_AN, QCA808X_MMD7_LED_GLOBAL,
-> > +			     QCA808X_LED_BLINK_FREQ_MASK | QCA808X_LED_BLINK_DUTY_MASK,
-> > +			     QCA808X_LED_BLINK_FREQ_256HZ | QCA808X_LED_BLINK_DUTY_50_50);
+> > +	switch (pair) {
+> > +	case ETHTOOL_A_CABLE_PAIR_A:
+> > +		pair_code = FIELD_GET(QCA808X_CDT_CODE_PAIR_A, status);
+> > +		break;
+> > +	case ETHTOOL_A_CABLE_PAIR_B:
+> > +		pair_code = FIELD_GET(QCA808X_CDT_CODE_PAIR_B, status);
+> > +		break;
+> > +	case ETHTOOL_A_CABLE_PAIR_C:
+> > +		pair_code = FIELD_GET(QCA808X_CDT_CODE_PAIR_C, status);
+> > +		break;
+> > +	case ETHTOOL_A_CABLE_PAIR_D:
+> > +		pair_code = FIELD_GET(QCA808X_CDT_CODE_PAIR_D, status);
+> > +		break;
+> > +	}
 > 
-> The comment (4Hz) and the blink frequency (256Hz) don't match, is that
-> right ? because I see there exists a QCA808X_LED_BLINK_FREQ_4HZ
-> definition, shouldn't it be used ?
+> Hi Christian,
+> 
+> I don't think this can actually happen given current usage,
+> but if pair doesn't match one of the cases above,
+> then pair_code is used uninitialised below.
+> 
+> Flagged by Smatch.
 >
 
-Thanks for checking this, oversight by me! Will fix. (the blink
-frequency was discovered only lately)
+In theory it would trigger a warning for the switch case not handled?
+
+But yes I will add a default case.
+
+> > +
+> > +	ethnl_cable_test_result(phydev, pair,
+> > +				qca808x_cable_test_result_trans(pair_code));
+> > +
+> > +	if (qca808x_cdt_fault_length_valid(pair_code)) {
+> > +		length = qca808x_cdt_fault_length(phydev, pair);
+> > +		ethnl_cable_test_fault_length(phydev, pair, length);
+> > +	}
+> > +}
+> > +
+> >  static int qca808x_cable_test_get_status(struct phy_device *phydev, bool *finished)
+> >  {
+> >  	int ret, val;
+> > -	int pair_a, pair_b, pair_c, pair_d;
+> >  
+> >  	*finished = false;
+> >  
+> 
+> ...
 
 -- 
 	Ansuel
