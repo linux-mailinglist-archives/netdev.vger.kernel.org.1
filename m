@@ -1,220 +1,124 @@
-Return-Path: <netdev+bounces-61668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A434824907
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 20:29:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B36D82492A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 20:37:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28426282DC4
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 19:29:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4AAD284AD3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 19:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCCC2C1A7;
-	Thu,  4 Jan 2024 19:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6200C2C859;
+	Thu,  4 Jan 2024 19:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X21ajHt0"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="phGW+BPr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEE22C190
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 19:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704396546;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nzdpbLzRSybGTRpqXk8VlT+P/oN9oKWuUtZZc/JbNL8=;
-	b=X21ajHt0QLpTQUcUhD49RnmpfwQmT8mjV2jcXghw0yO8G25lN3OIVaNzMd34syUhKgpsAv
-	Yb5qKBOeMxPxUdYYZz4N4yXGyzW60jy4cUc2sPDXcJiGtD9tQuBLHA20i4nEy22zxlLro0
-	w1qBuR/l780Vl2i0vmpx0evQtV948Ec=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-262-M10ZW5KGNGCXAUKPe__AaQ-1; Thu, 04 Jan 2024 14:29:04 -0500
-X-MC-Unique: M10ZW5KGNGCXAUKPe__AaQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a22f129e5acso42065866b.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 11:29:04 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D342F2CCBD
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 19:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dbdb8e032f7so1467145276.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 11:36:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704396980; x=1705001780; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GEUinSrKMm+v8zfgDlMdzpma67gTTKJWypNCCmuEFE8=;
+        b=phGW+BPreJYZ9sbCSTdH2YZGbsAtXMufLpG7HC65lkx00v4BwtNyX3GPKtQ0tZ9oFy
+         YZwaj2EWRh8KmqPsecO3RvW8FhIbZ3lSiWgcEBu0Lg9JGIT1JaLPmt6Sit3C1n+9c753
+         uNbUw37An0PCOq6jH0KqjwGd//IY+QJBN176kRbMXVSeplE8e4Tgn2O/cRpPyNsIFS9+
+         HpJ34vjC4nt5AfTNNZ2EAFcyVMuB5NsBY5ewJ4Bw+g73yigKOys4wLSM8h9UDkKskc/a
+         +MzPanNbV1Hz2r6PFg8ozofQNZQ8+UwKlOf9KWdOltjbHwO1p+q5zxZVhOsHzHfa7hsA
+         qgaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704396544; x=1705001344;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1704396980; x=1705001780;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nzdpbLzRSybGTRpqXk8VlT+P/oN9oKWuUtZZc/JbNL8=;
-        b=lRI5GJ3ZT8fKFCJJxzg5E3VrkWGG+QX4CkY0RgNHYIoDyNlLpjsmqgLoQwFhgewHci
-         lcx633IeuR3GAIruZ1rObOMUJaNfIJ4mpteuA8TH885iCHZH4etKTQ3V5feNICq7EOsP
-         mMHz2sPX9xd1kzG8IEFavotjq8AUbr58ILXGroT/dEzmRgFHj7djX/knm4xmgpDIx5D1
-         pJr4MQzj1uue5pIP5uaNWN70iN2zRhHk4aRdjDdt99VEuLb40hrlp1XvOoQWcl3iGtYT
-         fbrmsB2I1Hnbc3U6UyzgWJmJozUw83Sqq8KbmGiMK0vjceK4/LG0cIecl25Kn4YnJL7M
-         qI3Q==
-X-Gm-Message-State: AOJu0YwSUcu7Y9kfX2G7VKlOFtVwb7YafwnUmfPBBAdRTS0kwMjw+XM6
-	/4mj5VP2NL9PzQ5+vZJ/axriJyUvoaRZQ8YDTlsnR0usaZxhma9MCq1mX6X+NVR9LxyxvVSPDI2
-	v/2FJ/Zf3jxe7IPvxwvNH+Deq
-X-Received: by 2002:a17:906:5593:b0:a28:c9d3:19e9 with SMTP id y19-20020a170906559300b00a28c9d319e9mr644135ejp.35.1704396543818;
-        Thu, 04 Jan 2024 11:29:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFfRPAvVjv1Ghy6b/wYmHHEScqTTPe8oRWrCF252uRvj2qDd419LelIZWekiGH82vbbNjuGWg==
-X-Received: by 2002:a17:906:5593:b0:a28:c9d3:19e9 with SMTP id y19-20020a170906559300b00a28c9d319e9mr644128ejp.35.1704396543502;
-        Thu, 04 Jan 2024 11:29:03 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id m13-20020a170906160d00b00a27051a9eb6sm9539572ejd.148.2024.01.04.11.29.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 11:29:03 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8CC92100FC3D; Thu,  4 Jan 2024 20:29:02 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, Network Development
- <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Boqun
- Feng <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Eric
- Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas
- Gleixner <tglx@linutronix.de>, Waiman Long <longman@redhat.com>, Will
- Deacon <will@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Andrii
- Nakryiko <andrii@kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Hao
- Luo <haoluo@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Jiri
- Pirko <jiri@resnulli.us>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Ronak
- Doshi <doshir@vmware.com>, Song Liu <song@kernel.org>, Stanislav Fomichev
- <sdf@google.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
- Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next 15/24] net: Use nested-BH locking for XDP
- redirect.
-In-Reply-To: <CAADnVQKJBpvfyvmgM29FLv+KpLwBBRggXWzwKzaCT9U-4bgxjA@mail.gmail.com>
-References: <20231215171020.687342-1-bigeasy@linutronix.de>
- <20231215171020.687342-16-bigeasy@linutronix.de>
- <CAADnVQKJBpvfyvmgM29FLv+KpLwBBRggXWzwKzaCT9U-4bgxjA@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 04 Jan 2024 20:29:02 +0100
-Message-ID: <87r0iw524h.fsf@toke.dk>
+        bh=GEUinSrKMm+v8zfgDlMdzpma67gTTKJWypNCCmuEFE8=;
+        b=F0rtOu9wD60CKqzSXh8Sa/aa9HmLiGnY/Yh4eDl4CnRTCGJ1Vi+yUQL35tRRTC8e3t
+         wTLvKEv1dvlA1mNW2vZe+m1XungTfRghVHstQfD1xP0W+nRQQy515CZIalvFdXfGlh8G
+         DPIqH5iWOm8y+gSErm85iiUPLkHru3OqPphhpg5VGZPJLfhO0glN932KOn+cYT7JmQy7
+         cCB/tM5LiHPeazgc5pt5A2I7MpKyTdtYMCN4qdE1i/DGNOuiRoCD1E2dTshy/yecMraD
+         dXFjFnFV1QKnCp2rueGC+z5yQjvq+eysDBCUvH3ATjpBxaIxV/ZwG6opbaUOI7eqLtTH
+         YdVA==
+X-Gm-Message-State: AOJu0YyTuI5/cgw412v83dZhAfgqf9JoHbHB7cwi6KGAfCP5nlGaRJ7s
+	3Zb5/jmfkCyBy56LK3Bdh3QkpmyWVeFHukKLPjcfFdBx5QPk1Hu8tVUYSyU=
+X-Google-Smtp-Source: AGHT+IGHDsvG+ZHHsoC5S6kvVYzCQ5ewFL/85hCxvLXroOuvNqrUGJ0jHS0bVF3jEGN6Rl/rb2on+FMa6YI+IoD7OwY=
+X-Received: by 2002:a25:b295:0:b0:dbc:bb00:5f91 with SMTP id
+ k21-20020a25b295000000b00dbcbb005f91mr833408ybj.23.1704396980731; Thu, 04 Jan
+ 2024 11:36:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240104125844.1522062-1-jiri@resnulli.us> <b0a7aa1c-9767-412e-8f79-8a703a9a05b5@mojatatu.com>
+In-Reply-To: <b0a7aa1c-9767-412e-8f79-8a703a9a05b5@mojatatu.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 4 Jan 2024 14:36:09 -0500
+Message-ID: <CAM0EoMkRu4-k90CbJbGWE+N0yy1M-NtzdN1vDohNfnK-TpMgig@mail.gmail.com>
+Subject: Re: [patch net-next] net: sched: move block device tracking into tcf_block_get/put_ext()
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, edumazet@google.com, 
+	xiyou.wangcong@gmail.com, pctammela@mojatatu.com, idosch@idosch.org, 
+	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
-
-> On Fri, Dec 15, 2023 at 9:10=E2=80=AFAM Sebastian Andrzej Siewior
-> <bigeasy@linutronix.de> wrote:
->> diff --git a/net/core/dev.c b/net/core/dev.c
->> index 5a0f6da7b3ae5..5ba7509e88752 100644
->> --- a/net/core/dev.c
->> +++ b/net/core/dev.c
->> @@ -3993,6 +3993,7 @@ sch_handle_ingress(struct sk_buff *skb, struct pac=
-ket_type **pt_prev, int *ret,
->>                 *pt_prev =3D NULL;
->>         }
->>
->> +       guard(local_lock_nested_bh)(&bpf_run_lock.redirect_lock);
->>         qdisc_skb_cb(skb)->pkt_len =3D skb->len;
->>         tcx_set_ingress(skb, true);
->>
->> @@ -4045,6 +4046,7 @@ sch_handle_egress(struct sk_buff *skb, int *ret, s=
-truct net_device *dev)
->>         if (!entry)
->>                 return skb;
->>
->> +       guard(local_lock_nested_bh)(&bpf_run_lock.redirect_lock);
->>         /* qdisc_skb_cb(skb)->pkt_len & tcx_set_ingress() was
->>          * already set by the caller.
->>          */
->> @@ -5008,6 +5010,7 @@ int do_xdp_generic(struct bpf_prog *xdp_prog, stru=
-ct sk_buff *skb)
->>                 u32 act;
->>                 int err;
->>
->> +               guard(local_lock_nested_bh)(&bpf_run_lock.redirect_lock);
->>                 act =3D netif_receive_generic_xdp(skb, &xdp, xdp_prog);
->>                 if (act !=3D XDP_PASS) {
->>                         switch (act) {
->> diff --git a/net/core/filter.c b/net/core/filter.c
->> index 7c9653734fb60..72a7812f933a1 100644
->> --- a/net/core/filter.c
->> +++ b/net/core/filter.c
->> @@ -4241,6 +4241,7 @@ static const struct bpf_func_proto bpf_xdp_adjust_=
-meta_proto =3D {
->>   */
->>  void xdp_do_flush(void)
->>  {
->> +       guard(local_lock_nested_bh)(&bpf_run_lock.redirect_lock);
->>         __dev_flush();
->>         __cpu_map_flush();
->>         __xsk_map_flush();
->> diff --git a/net/core/lwt_bpf.c b/net/core/lwt_bpf.c
->> index a94943681e5aa..74b88e897a7e3 100644
->> --- a/net/core/lwt_bpf.c
->> +++ b/net/core/lwt_bpf.c
->> @@ -44,6 +44,7 @@ static int run_lwt_bpf(struct sk_buff *skb, struct bpf=
-_lwt_prog *lwt,
->>          * BPF prog and skb_do_redirect().
->>          */
->>         local_bh_disable();
->> +       local_lock_nested_bh(&bpf_run_lock.redirect_lock);
->>         bpf_compute_data_pointers(skb);
->>         ret =3D bpf_prog_run_save_cb(lwt->prog, skb);
->>
->> @@ -76,6 +77,7 @@ static int run_lwt_bpf(struct sk_buff *skb, struct bpf=
-_lwt_prog *lwt,
->>                 break;
->>         }
->>
->> +       local_unlock_nested_bh(&bpf_run_lock.redirect_lock);
->>         local_bh_enable();
->>
->>         return ret;
->> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
->> index 1976bd1639863..da61b99bc558f 100644
->> --- a/net/sched/cls_api.c
->> +++ b/net/sched/cls_api.c
->> @@ -23,6 +23,7 @@
->>  #include <linux/jhash.h>
->>  #include <linux/rculist.h>
->>  #include <linux/rhashtable.h>
->> +#include <linux/bpf.h>
->>  #include <net/net_namespace.h>
->>  #include <net/sock.h>
->>  #include <net/netlink.h>
->> @@ -3925,6 +3926,7 @@ struct sk_buff *tcf_qevent_handle(struct tcf_qeven=
-t *qe, struct Qdisc *sch, stru
->>
->>         fl =3D rcu_dereference_bh(qe->filter_chain);
->>
->> +       guard(local_lock_nested_bh)(&bpf_run_lock.redirect_lock);
->>         switch (tcf_classify(skb, NULL, fl, &cl_res, false)) {
->>         case TC_ACT_SHOT:
->>                 qdisc_qstats_drop(sch);
+On Thu, Jan 4, 2024 at 2:27=E2=80=AFPM Victor Nogueira <victor@mojatatu.com=
+> wrote:
 >
-> Here and in all other places this patch adds locks that
-> will kill performance of XDP, tcx and everything else in networking.
+> On 04/01/2024 09:58, Jiri Pirko wrote:
+> > From: Jiri Pirko <jiri@nvidia.com>
+> >
+> > Inserting the device to block xarray in qdisc_create() is not suitable
+> > place to do this. As it requires use of tcf_block() callback, it causes
+> > multiple issues. It is called for all qdisc types, which is incorrect.
+> >
+> > So, instead, move it to more suitable place, which is tcf_block_get_ext=
+()
+> > and make sure it is only done for qdiscs that use block infrastructure
+> > and also only for blocks which are shared.
+> >
+> > Symmetrically, alter the cleanup path, move the xarray entry removal
+> > into tcf_block_put_ext().
+> >
+> > Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking inf=
+ra")
+> > Reported-by: Ido Schimmel <idosch@nvidia.com>
+> > Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
+> > Reported-by: Kui-Feng Lee <sinquersw@gmail.com>
+> > Closes: https://lore.kernel.org/all/ce8d3e55-b8bc-409c-ace9-5cf1c4f7c88=
+e@gmail.com/
+> > Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotma=
+il.com
+> > Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google=
+.com/
+> > Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotma=
+il.com
+> > Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google=
+.com/
+> > Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotma=
+il.com
+> > Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google=
+.com/
+> > Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 >
-> I'm surprised Jesper and other folks are not jumping in with nacks.
-> We measure performance in nanoseconds here.
-> Extra lock is no go.
-> Please find a different way without ruining performance.
+> Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+> Tested-by: Victor Nogueira <victor@mojatatu.com>
 
-I'll add that while all this compiles out as no-ops on !PREEMPT_RT, I do
-believe there are people who are using XDP on PREEMPT_RT kernels and
-still expect decent performance. And to achieve that it is absolutely
-imperative that we can amortise expensive operations (such as locking)
-over multiple packets.
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-I realise there's a fundamental trade-off between the amount of
-amortisation and the latency hit that we take from holding locks for
-longer, but tuning the batch size (while still keeping some amount of
-batching) may be a way forward? I suppose Jakub's suggestion in the
-other part of the thread, of putting the locks around napi->poll(), is a
-step towards something like this.
-
--Toke
-
+cheers,
+jamal
 
