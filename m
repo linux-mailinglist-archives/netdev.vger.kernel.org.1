@@ -1,56 +1,51 @@
-Return-Path: <netdev+bounces-61518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1201B82426E
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:07:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FCD1824272
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:08:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4BD8287A58
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:07:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01E621F25528
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2AE2230C;
-	Thu,  4 Jan 2024 13:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631CB22314;
+	Thu,  4 Jan 2024 13:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y8rRXlep"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uOpevqlP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7256121343;
-	Thu,  4 Jan 2024 13:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=y1A8fgZsiIjsazqh2xXbSQAE7toMo839MhQ2MSFa1Ik=; b=Y8rRXlepBxDcgCzTA7uGpVud/D
-	k6UiLHKLWjtAi60KxLwieZ5dGpeTkkKhx8hLP2gQ1a/2yP/23fNx52Ni9hMfIArOoaCiqHF649NrL
-	/UrUYIc+HmCWT7z4WLOR8hICBXldkNSVsH/VEYFjoL7dni5lc4IeWVVdAcWGLZ3GPxfk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rLNPd-004LdL-03; Thu, 04 Jan 2024 14:05:29 +0100
-Date: Thu, 4 Jan 2024 14:05:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Gan, Yi Fang" <yi.fang.gan@intel.com>
-Cc: Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CB922304;
+	Thu,  4 Jan 2024 13:07:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A011BC433C8;
+	Thu,  4 Jan 2024 13:07:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704373662;
+	bh=Tdc/scx6/keEynCGWsRwPQT00F7mWkXemkBEJ7rCt9I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uOpevqlPMTia6ASNeEc6Pfe/HsDQGFUsgWFGtCQgSTw7edzP1yOo7lCTCnD8lGqRc
+	 JEyoSweY/JPnBb8fiSO56iEdnU8FB0JvMZ0fE68YJ4UcCP3ZK5JVXLlEIG4+KJBt4L
+	 B5NkTT3/z3q4Q1Vo53px/DareE7uIMzkhF/T+tudssa8Li4X5fbe7iIruPeccRM9ot
+	 BXzWuJcFis38oU044r0+kGSqxssLwtXOreOkwfXpm19gNU8fjSCR/vtLzTfJUgKnrP
+	 KOehLw+yPnHIvu5DAq9gogdxyQ0Rbf/cnUAiDpSFD+nundS69abWVlNEhzCPYlnQBo
+	 6EKWKPPP9r73w==
+Date: Thu, 4 Jan 2024 13:07:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Looi Hong Aun <hong.aun.looi@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Choong Yong Liang <yong.liang.choong@intel.com>
-Subject: Re: [PATCH net v3 1/1] net: phylink: Add module_exit()
-Message-ID: <fb1cc3a4-8615-4cee-8fe7-29966c4cb7c7@lunn.ch>
-References: <20240104101255.3056090-1-yi.fang.gan@intel.com>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v3 1/4] net: phy: at803x: generalize cdt fault
+ length function
+Message-ID: <20240104130738.GH31813@kernel.org>
+References: <20240103124637.3078-1-ansuelsmth@gmail.com>
+ <20240103124637.3078-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,19 +54,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240104101255.3056090-1-yi.fang.gan@intel.com>
+In-Reply-To: <20240103124637.3078-2-ansuelsmth@gmail.com>
 
-On Thu, Jan 04, 2024 at 06:12:55PM +0800, Gan, Yi Fang wrote:
-65;7401;1c> In delete_module(), if mod->init callback is defined but mod->exit callback
-> is not defined, it will assume the module cannot be removed and return
-> EBUSY. The module_exit() is missing from current phylink module drive
-> causing failure while unloading it.
+On Wed, Jan 03, 2024 at 01:46:32PM +0100, Christian Marangi wrote:
+> Generalize cable test fault length function since they all base on the
+> same magic values (already reverse engineered to understand the meaning
+> of it) to have consistenct values on every PHY.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-This is still missing the explanation why this is safe.
-
-
-    Andrew
-
----
-pw-bot: cr
+Reviewed-by: Simon Horman <horms@kernel.org>
 
