@@ -1,231 +1,190 @@
-Return-Path: <netdev+bounces-61661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8BA7824820
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 19:24:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7649C82485F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 19:49:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00C28B23C27
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:24:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17D2828780A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDDA28E0D;
-	Thu,  4 Jan 2024 18:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C06A28E14;
+	Thu,  4 Jan 2024 18:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nxGHI1kG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cSDtw0kU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC8728DDA
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 18:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a26ed1e05c7so98029766b.2
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 10:24:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805B928E06
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 18:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dbdc7ff087fso692536276.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 10:49:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704392681; x=1704997481; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w906pRFrrBglgFN05sIbeh3rO+uVc2/5xWCV3xYhIB8=;
-        b=nxGHI1kGpJdyecUGvE6QDOGs3aN2TRKl0NThtScBMBlo9F3Y8IYqT2pfYzqvBtNxNV
-         oFn8YMnzMINKa6MeSpfn3DCzx2oUBHsBhv722hk2wCqAd+QglEhZbeZiPoyo87dxkIh4
-         qseus14cA1agPIE2PndGD7LxTD8gKHF6vFnl1h1QTrpTR65C1O6UZfYBmJ3wdTdtqmD2
-         M17gR2fLHa6nachcQ9vbg/cLWwsL224Dv+j41gAlS+hI3PoF0P4d8uJ+cdkVTkAcWDnD
-         EMiCjpqMfp6FggwYlSJtAupy3qFWiLtG0YP+B2fWoV9STRPnLUWmS6Dcxkkjx5xXmkhy
-         gzEA==
+        d=gmail.com; s=20230601; t=1704394173; x=1704998973; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HH71ZCH6KCHkVZ4H9nEdATbQJHB8stBPikG/c3vCsDg=;
+        b=cSDtw0kU3XixEHl3Q2J43wt9U1mImQuRmGLlcIOTXtgIcw/pzadPO6KhbiCeoX+gJv
+         YvQgxfLO+SS8ybpVDoQj/UO+iD5eT6nc1oQfI6E5d8t25+D+V1jIdOt1/lkX/5uR+DTA
+         xy/1Wgqd3uZtvllEApqNO7xu0ZLSWOu9nnEQL0Csjce7Mlwcd3ADpawXkAp/L9oZJAiA
+         iYZmMGyD88aWaMBVWAH9RkwYtnNkrVjSS+HflY16Q1eGj9d4+/WlJ64KRNfj6lDcE8RS
+         hLKhaZpBa/A77raK8AyqhzfR2Kj+Qsg/3CETXvYDks6IzmP4Uu5n+M3hO8g0h1pVKhiK
+         LJtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704392681; x=1704997481;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w906pRFrrBglgFN05sIbeh3rO+uVc2/5xWCV3xYhIB8=;
-        b=Q+KWpKZ6ohbBQbCBiG+LnjI0WZZv3EM2vp7xA9rIJLoafz6Pu6PXyaknVicpX0/Nut
-         QEZ/tdU7BxueXVkfXNROMQA24yGZvPLEXhbpu25Xo4a5+M0UhPSnPNsX+8r/WW1lq8mC
-         OpYttILekD86ctpnReY+9Tm35Yl6KJz2pyFwMpJ9ic9Do2h8HP+AMv0hMlKXOAUTTLXD
-         XAmJG6H87cU3bfAP//UmaC9n/VNfkfhbP+AairlG0zD8HUZ/9GuWwVkqLIpsyzWNRtpx
-         pa+9bxSV+OdYsOIgdFvR5vKv+rXZ/K79/CzvHHMrA/k60wieX3xu5enfxuNCT1naNkMA
-         9sXA==
-X-Gm-Message-State: AOJu0YyJfZu2q5OfXjlOcI3TgbJc3pz4mtIVt+dNTInwkR5wVUSqFDCH
-	Dm2ub83Jnj0wSGgd9p987JCip5mBifRsuwZMMAnfXW+Z/22ENOqwkUQ9XxqTer2zWiM=
-X-Google-Smtp-Source: AGHT+IFb3qidV0D4JPL/qRoMWhyg/IoIqwyNCMrXmuouehjW0ZVP9W8+Ops3eA7v/T4FpfjuuzycczrTtcVH8Tzq2Rw=
-X-Received: by 2002:a17:906:e0d8:b0:a27:6e73:a248 with SMTP id
- gl24-20020a170906e0d800b00a276e73a248mr344849ejb.68.1704392681125; Thu, 04
- Jan 2024 10:24:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704394173; x=1704998973;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HH71ZCH6KCHkVZ4H9nEdATbQJHB8stBPikG/c3vCsDg=;
+        b=TwfLOPtTuNULfptAhdWsdxD0WN33TrK/o//+CfIC0TC0Du7XJFpMuvXf60zeicx5EW
+         Bmh0fQsYM5t7R62P8j2XwdEFpe63AeF/eBJ3vrIuMX7Ua4f4Mj2fllSz/OAklDowhMkx
+         AKpYlvOGUnDXMx31pvSrWuAiv4XdDsHnBK0uTAFnuHaneE865pc8lL3F5alKwBbmSOWj
+         IYpBYfcJxUzBs4CBG9uEs10l1BKs1M/d+C8eiovJG3rIr2cdTxMey90Ge+ynnMVMLEOy
+         ohiMt/jldJNNB4/mpr7KxGfNcKtCK65bFAYegu8aeSSeox5tGcY0bqvM011QE5QroyFI
+         LNLg==
+X-Gm-Message-State: AOJu0YwAhbT0FieFrUuwS6Y5QxcrHZjm4BlFC0Ebk/jqYPVKu9clTX/o
+	3PVoVoT5ZYo+8RznELZgoKg=
+X-Google-Smtp-Source: AGHT+IE7E7wRoFRuyEozjXu6FqrBwzwHKjPRO0eYKpMffFT92G9pXmzTRqLjuJcTBbHD/rXKjo+MRg==
+X-Received: by 2002:a25:db45:0:b0:dbe:9f1f:4261 with SMTP id g66-20020a25db45000000b00dbe9f1f4261mr991157ybf.62.1704394173384;
+        Thu, 04 Jan 2024 10:49:33 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:bc3f:8a99:d840:9c38? ([2600:1700:6cf8:1240:bc3f:8a99:d840:9c38])
+        by smtp.gmail.com with ESMTPSA id m14-20020a5b040e000000b00d7745e2bb19sm5406086ybp.29.2024.01.04.10.49.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jan 2024 10:49:32 -0800 (PST)
+Message-ID: <c5b1da91-924f-43f8-8fba-6295d4a77d13@gmail.com>
+Date: Thu, 4 Jan 2024 10:49:31 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214020530.2267499-1-almasrymina@google.com>
- <20231214020530.2267499-5-almasrymina@google.com> <ddffff98-f3de-6a5d-eb26-636dacefe9aa@huawei.com>
- <CAHS8izO2nDHuxKau8iLcAmnho-1TYkzW09MBZ80+JzOo9YyVFA@mail.gmail.com>
- <20231215021114.ipvdx2bwtxckrfdg@google.com> <20231215190126.1040fa12@kernel.org>
- <CALvZod5myy2SvuCMNmqjjYeNONqSArV+8y8mrkfnNeog8WLjng@mail.gmail.com>
- <CAHS8izOLBtjHOqbTS_PiTNe+rTE=jboDWDM9zS108B57vVNcwA@mail.gmail.com>
- <CAHS8izMkCwv3jak9KUHeDUrkwBNNpdYk4voEX7Cbp7mTpNAQdA@mail.gmail.com>
- <54f226ef-df2d-9f32-fa3f-e846d6510758@huawei.com> <CAHS8izP63wXGH+Q3y1H=ycT=AHYnhGveBnuyF_rYioAjZ=Hn=g@mail.gmail.com>
- <7c6d35e3-165f-5883-1c1b-fce82c976028@huawei.com> <CAHS8izNqeiK1tq=48LMbbqq5B4d2mhgbuKRvnFtiBngf73jXZg@mail.gmail.com>
- <fda068d0-f7fb-90fc-cdd6-1f853a4a225f@huawei.com> <CAHS8izNAxB=DQzSBOGbm6SsiL1cLSijj9n=g3d3egSxnOcBibQ@mail.gmail.com>
- <99817ed2-8ba6-ef8f-3ccb-2a2ab284b4af@huawei.com>
-In-Reply-To: <99817ed2-8ba6-ef8f-3ccb-2a2ab284b4af@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 4 Jan 2024 10:24:29 -0800
-Message-ID: <CAHS8izMMdmWoUHetA=GceJWVBgrCNAutn+B4ErMZFG=gmF5rww@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v1 4/4] net: page_pool: use netmem_t instead
- of struct page in API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Shakeel Butt <shakeelb@google.com>, Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, 
-	Russell King <linux@armlinux.org.uk>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
-	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Jassi Brar <jaswinder.singh@linaro.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, 
-	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
-	Kalle Valo <kvalo@kernel.org>, Juergen Gross <jgross@suse.com>, 
-	Stefano Stabellini <sstabellini@kernel.org>, 
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jan 4, 2024 at 12:48=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2024/1/4 2:38, Mina Almasry wrote:
-> > On Wed, Jan 3, 2024 at 1:47=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei=
-.com> wrote:
-> >>
-> >> On 2024/1/3 0:14, Mina Almasry wrote:
-> >>>
-> >>> The idea being that skb_frag_page() can return NULL if the frag is no=
-t
-> >>> paged, and the relevant callers are modified to handle that.
-> >>
-> >> There are many existing drivers which are not expecting NULL returning=
- for
-> >> skb_frag_page() as those drivers are not supporting devmem, adding add=
-itionl
-> >> checking overhead in skb_frag_page() for those drivers does not make m=
-uch
-> >> sense, IMHO, it may make more sense to introduce a new helper for the =
-driver
-> >> supporting devmem or networking core that needing dealing with both no=
-rmal
-> >> page and devmem.
-> >>
-> >> And we are also able to keep the old non-NULL returning semantic for
-> >> skb_frag_page().
-> >
-> > I think I'm seeing agreement that the direction we're heading into
-> > here is that most net stack & drivers should use the abstract netmem
->
-> As far as I see, at least for the drivers, I don't think we have a clear
-> agreement if we should have a unified driver facing struct or API for bot=
-h
-> normal page and devmem yet.
->
-
-To be honest I definitely read that we have agreement that we should
-have a unified driver facing struct from the responses in this thread
-like this one:
-
-https://lore.kernel.org/netdev/20231215190126.1040fa12@kernel.org/
-
-But I'll let folks correct me if I'm wrong.
-
-> > type, and only specific code that needs a page or devmem (like
-> > tcp_receive_zerocopy or tcp_recvmsg_dmabuf) will be the ones that
-> > unpack the netmem and get the underlying page or devmem, using
-> > skb_frag_page() or something like skb_frag_dmabuf(), etc.
-> >
-> > As Jason says repeatedly, I'm not allowed to blindly cast a netmem to
-> > a page and assume netmem=3D=3Dpage. Netmem can only be cast to a page
-> > after checking the low bits and verifying the netmem is actually a
->
-> I thought it would be best to avoid casting a netmem or devmem to a
-> page in the driver, I think the main argument is that it is hard
-> to audit very single driver doing a checking before doing the casting
-> in the future? and we can do better auditting if the casting is limited
-> to a few core functions in the networking core.
->
-
-Correct, the drivers should never cast directly, but helpers like
-skb_frag_page() must check that the netmem is a page before doing a
-cast.
-
-> > page. I think any suggestions that blindly cast a netmem to page
-> > without the checks will get nacked by Jason & Christian, so the
-> > checking in the specific cases where the code needs to know the
-> > underlying memory type seems necessary.
-> >
-> > IMO I'm not sure the checking is expensive. With likely/unlikely &
-> > static branches the checks should be very minimal or a straight no-op.
-> > For example in RFC v2 where we were doing a lot of checks for devmem
-> > (we don't do that anymore for RFCv5), I had run the page_pool perf
-> > tests and proved there is little to no perf regression:
->
-> For MAX_SKB_FRAGS being 17, it means we may have 17 additional checking
-> overhead for the drivers not supporting devmem, not to mention we may
-> have bigger value for MAX_SKB_FRAGS if BIG TCP is enable.
->
-
-With static branch the checks should be complete no-ops unless the
-user's set up enabled devmem.
-
-> Even there is no notiable performance degradation for a specific case,
-> we should avoid the overhead as much as possible for the existing use
-> case when supporting a new use case.
->
-> >
-> > https://lore.kernel.org/netdev/CAHS8izM4w2UETAwfnV7w+ZzTMxLkz+FKO+xTgRd=
-tYKzV8RzqXw@mail.gmail.com/
->
-> The above test case does not even seems to be testing a code path calling
-> skb_frag_page() as my understanding.
->
-> >
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/1] net/sched: We should only add appropriate
+ qdiscs blocks to ports' xarray
+Content-Language: en-US
+From: Kui-Feng Lee <sinquersw@gmail.com>
+To: Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
+Cc: idosch@idosch.org, mleitner@redhat.com, vladbu@nvidia.com,
+ paulb@nvidia.com, pctammela@mojatatu.com, netdev@vger.kernel.org,
+ kernel@mojatatu.com, syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com,
+ syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com,
+ syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
+References: <20231231172320.245375-1-victor@mojatatu.com>
+ <eb4261f0-a5b7-4438-87f2-21207d86185d@gmail.com>
+In-Reply-To: <eb4261f0-a5b7-4438-87f2-21207d86185d@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
 
---=20
-Thanks,
-Mina
+On 1/4/24 10:06, Kui-Feng Lee wrote:
+> 
+> 
+> On 12/31/23 09:23, Victor Nogueira wrote:
+>> We should only add qdiscs to the blocks ports' xarray in ingress that
+>> support ingress_block_set/get or in egress that support
+>> egress_block_set/get.
+>>
+>> Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking 
+>> infra")
+>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+>> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>> Reported-by: Ido Schimmel <idosch@nvidia.com>
+>> Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
+>> Tested-by: Ido Schimmel <idosch@nvidia.com>
+>> Reported-and-tested-by: 
+>> syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com
+>> Closes: 
+>> https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google.com/
+>> Reported-and-tested-by: 
+>> syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com
+>> Closes: 
+>> https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google.com/
+>> Reported-and-tested-by: 
+>> syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
+>> Closes: 
+>> https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google.com/
+>> ---
+>> v1 -> v2:
+>>
+>> - Remove newline between fixes tag and Signed-off-by tag
+>> - Add Ido's Reported-by and Tested-by tags
+>> - Add syzbot's Reported-and-tested-by tags
+>>
+>>   net/sched/sch_api.c | 34 ++++++++++++++++++++--------------
+>>   1 file changed, 20 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+>> index 299086bb6205..426be81276f1 100644
+>> --- a/net/sched/sch_api.c
+>> +++ b/net/sched/sch_api.c
+>> @@ -1187,23 +1187,29 @@ static int qdisc_block_add_dev(struct Qdisc 
+>> *sch, struct net_device *dev,
+>>       struct tcf_block *block;
+>>       int err;
+>> -    block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+>> -    if (block) {
+>> -        err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+>> -        if (err) {
+>> -            NL_SET_ERR_MSG(extack,
+>> -                       "ingress block dev insert failed");
+>> -            return err;
+>> +    if (sch->ops->ingress_block_get) {
+>> +        block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+>> +        if (block) {
+>> +            err = xa_insert(&block->ports, dev->ifindex, dev,
+>> +                    GFP_KERNEL);
+>> +            if (err) {
+>> +                NL_SET_ERR_MSG(extack,
+>> +                           "ingress block dev insert failed");
+>> +                return err;
+>> +            }
+>>           }
+>>       }
+>> -    block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+>> -    if (block) {
+>> -        err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+>> -        if (err) {
+>> -            NL_SET_ERR_MSG(extack,
+>> -                       "Egress block dev insert failed");
+>> -            goto err_out;
+>> +    if (sch->ops->egress_block_get) {
+>> +        block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+>> +        if (block) {
+>> +            err = xa_insert(&block->ports, dev->ifindex, dev,
+>> +                    GFP_KERNEL);
+>> +            if (err) {
+>> +                NL_SET_ERR_MSG(extack,
+>> +                           "Egress block dev insert failed");
+>> +                goto err_out;
+>> +            }
+>>           }
+>>       }
+> 
+> Hi Vector,
+> 
+> Thank you for fixing this issue!
+> Could you also add a test case to avoid regression in future?
+> We have BPF test cases that fails for this issue. However,
+> not everyone run BPF selftest for netdev changes.
+> It would be better to have a test case for net as well.
+> 
+
+The following links are about the errors of bpf selftest. FYI!
+
+  - 
+https://github.com/kernel-patches/bpf/actions/runs/7401181881/job/20136944224
+  - 
+https://lore.kernel.org/netdev/ce8d3e55-b8bc-409c-ace9-5cf1c4f7c88e@gmail.com/
+
+
 
