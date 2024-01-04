@@ -1,98 +1,162 @@
-Return-Path: <netdev+bounces-61550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE74D8243DA
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:33:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6806C8243F1
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 119CC1C21C93
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:33:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB642B23080
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D6622EE6;
-	Thu,  4 Jan 2024 14:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF0C23747;
+	Thu,  4 Jan 2024 14:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHJ54JlZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIKiVkeS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133F5225D0;
-	Thu,  4 Jan 2024 14:33:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05CFFC433C7;
-	Thu,  4 Jan 2024 14:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9690C23743
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 14:37:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C96FFC433C7;
+	Thu,  4 Jan 2024 14:37:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704378804;
-	bh=aZr4dV3GXhJqOdhebHaFoYyGkow84PQTHg9dzYarFFc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=nHJ54JlZbk4BdUkdoP5hZ3kixKIu4DNvGIkcvZqvaXk/2k9hIGXJc4nC9RuELRxVS
-	 2yR7pVE4mTE8qeV55ItBYYLXHSSGYiXFP5Hk6UveY08SusZ2aQ2iWs6sfHFEvezEZ8
-	 7fUD56Wi8hYHfcMnLUbeBP8eRLOZMHbPtzL0g1anlWGpMOrH6KbrL4JVNqm6X1k3mH
-	 CIdjKc5cDwCsnJAL6nkjmy6s3g8lDxR+X50lYqWSP8uaXXzySxRK/gMmGhnLo1sP12
-	 /E6h79KFcqRmnzKMBiY7OC9I+/jQlH0hW4zWurvl5ADmehzvcRnEUuQiPEWnaXYWV9
-	 RMjUD3feAZY4g==
-Received: (nullmailer pid 175802 invoked by uid 1000);
-	Thu, 04 Jan 2024 14:33:20 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=k20201202; t=1704379061;
+	bh=4RDIDIhNrd8HmTe3ASSfj9FrHQAx1BtEwWISUoUjekw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MIKiVkeSD3/knKPPLMvrwXfBJ+9qy0h0hh8JV5xdIGdQ65TJvZsb67x2f/XtIKy1n
+	 iUxJiEwW9BFdJhRgGEgHiuEhzDxA1nori8L5WTdo6Nbm0EWLWlrqDZG4I8U27VgJHv
+	 FajUopc5OlT/T3IykMWjYrxCHZFDtQwOmP48MIGpH3SILpRj5XKEhySfv42l3nwQg7
+	 hgXzF6AsXuMV+U6N78b6O39zYW4vzrosHcYUCqSq96Xvsq/InzO2sGy18IjyePeOq1
+	 Pg8lhN/iJjhlsxRv3xXj3CLUeInleQNoZEAoyy7yP8OvwpgO8fwqZ0bI3ZnJPHLlRt
+	 UVNFakmvmgiOA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	3chas3@gmail.com
+Subject: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for ATM
+Date: Thu,  4 Jan 2024 06:37:37 -0800
+Message-ID: <20240104143737.1317945-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: =?utf-8?q?N=C3=ADcolas_F_=2E_R_=2E_A_=2E_Prado?= <nfraprado@collabora.com>, =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, Konrad Dybcio <konrad.dybcio@linaro.org>, Robert Richter <rrichter@amd.com>, Paolo Abeni <pabeni@redhat.com>, linux-wireless@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Linus Walleij <linus.walleij@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Peng Fan <peng.fan@nxp.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Bjorn Andersson <andersson@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Eric Dumazet <edumazet@google.com>, Huacai Chen <chenhuacai@kernel.org>, linux-pci@vger.kernel.org, Kalle Valo <kvalo@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@linaro.org>, linux-arm-msm@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>, Heiko Stuebner <heiko@sntech.de>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Dan Williams <dan.j.williams@i
- ntel.com>, Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, Chris Morgan <macromorgan@hotmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, Terry Bowman <terry.bowman@amd.com>, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, Marek Szyprowski <m.szyprowski@samsung.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Rob Herring <robh+dt@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Bjorn Helgaas <bhelgaas@google.com>
-In-Reply-To: <20240104130123.37115-7-brgl@bgdev.pl>
-References: <20240104130123.37115-1-brgl@bgdev.pl>
- <20240104130123.37115-7-brgl@bgdev.pl>
-Message-Id: <170437880007.175780.12569173368621506971.robh@kernel.org>
-Subject: Re: [RFC 6/9] dt-bindings: vendor-prefixes: add a PCI prefix for
- Qualcomm Atheros
-Date: Thu, 04 Jan 2024 07:33:20 -0700
+Content-Transfer-Encoding: 8bit
 
+W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+Add descriptions to all the ATM modules and drivers.
 
-On Thu, 04 Jan 2024 14:01:20 +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> Document the PCI vendor prefix for Qualcomm Atheros so that we can
-> define the QCA PCI devices on device tree.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  Documentation/devicetree/bindings/vendor-prefixes.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: 3chas3@gmail.com
+---
+ drivers/atm/atmtcp.c   | 1 +
+ drivers/atm/eni.c      | 1 +
+ drivers/atm/idt77105.c | 1 +
+ drivers/atm/iphase.c   | 1 +
+ drivers/atm/nicstar.c  | 1 +
+ drivers/atm/suni.c     | 1 +
+ net/atm/common.c       | 1 +
+ net/atm/lec.c          | 1 +
+ 8 files changed, 8 insertions(+)
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
-
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/vendor-prefixes.yaml:1116:13: [error] empty value in block mapping (empty-values)
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/vendor-prefixes.yaml: patternProperties:^qca,.*: None is not of type 'object', 'boolean'
-	from schema $id: http://json-schema.org/draft-07/schema#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/vendor-prefixes.yaml: ignoring, error in schema: patternProperties: ^qca,.*
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240104130123.37115-7-brgl@bgdev.pl
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+diff --git a/drivers/atm/atmtcp.c b/drivers/atm/atmtcp.c
+index 96bea1ab1ecc..d4aa0f353b6c 100644
+--- a/drivers/atm/atmtcp.c
++++ b/drivers/atm/atmtcp.c
+@@ -494,6 +494,7 @@ static void __exit atmtcp_exit(void)
+ 	deregister_atm_ioctl(&atmtcp_ioctl_ops);
+ }
+ 
++MODULE_DESCRIPTION("ATM over TCP");
+ MODULE_LICENSE("GPL");
+ module_init(atmtcp_init);
+ module_exit(atmtcp_exit);
+diff --git a/drivers/atm/eni.c b/drivers/atm/eni.c
+index a31ffe16e626..3011cf1a84a9 100644
+--- a/drivers/atm/eni.c
++++ b/drivers/atm/eni.c
+@@ -2318,4 +2318,5 @@ static int __init eni_init(void)
+ module_init(eni_init);
+ /* @@@ since exit routine not defined, this module can not be unloaded */
+ 
++MODULE_DESCRIPTION("Efficient Networks ENI155P ATM NIC driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/atm/idt77105.c b/drivers/atm/idt77105.c
+index bfca7b8a6f31..fcd70e094a2e 100644
+--- a/drivers/atm/idt77105.c
++++ b/drivers/atm/idt77105.c
+@@ -372,4 +372,5 @@ static void __exit idt77105_exit(void)
+ 
+ module_exit(idt77105_exit);
+ 
++MODULE_DESCRIPTION("IDT77105 PHY driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/atm/iphase.c b/drivers/atm/iphase.c
+index 9bba8f280a4d..d213adcefe33 100644
+--- a/drivers/atm/iphase.c
++++ b/drivers/atm/iphase.c
+@@ -90,6 +90,7 @@ module_param(IA_RX_BUF, int, 0);
+ module_param(IA_RX_BUF_SZ, int, 0);
+ module_param(IADebugFlag, uint, 0644);
+ 
++MODULE_DESCRIPTION("Driver for Interphase ATM PCI NICs");
+ MODULE_LICENSE("GPL");
+ 
+ /**************************** IA_LIB **********************************/
+diff --git a/drivers/atm/nicstar.c b/drivers/atm/nicstar.c
+index 1a50de39f5b5..27153d6bc781 100644
+--- a/drivers/atm/nicstar.c
++++ b/drivers/atm/nicstar.c
+@@ -171,6 +171,7 @@ static const struct atmdev_ops atm_ops = {
+ static struct timer_list ns_timer;
+ static char *mac[NS_MAX_CARDS];
+ module_param_array(mac, charp, NULL, 0);
++MODULE_DESCRIPTION("ATM NIC driver for IDT 77201/77211 \"NICStAR\" and Fore ForeRunnerLE.");
+ MODULE_LICENSE("GPL");
+ 
+ /* Functions */
+diff --git a/drivers/atm/suni.c b/drivers/atm/suni.c
+index 21e5acc766b8..32802ea9521c 100644
+--- a/drivers/atm/suni.c
++++ b/drivers/atm/suni.c
+@@ -387,4 +387,5 @@ int suni_init(struct atm_dev *dev)
+ 
+ EXPORT_SYMBOL(suni_init);
+ 
++MODULE_DESCRIPTION("S/UNI PHY driver");
+ MODULE_LICENSE("GPL");
+diff --git a/net/atm/common.c b/net/atm/common.c
+index f7019df41c3e..2a1ec014e901 100644
+--- a/net/atm/common.c
++++ b/net/atm/common.c
+@@ -890,6 +890,7 @@ subsys_initcall(atm_init);
+ 
+ module_exit(atm_exit);
+ 
++MODULE_DESCRIPTION("Asynchronous Transfer Mode (ATM) networking core");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_NETPROTO(PF_ATMPVC);
+ MODULE_ALIAS_NETPROTO(PF_ATMSVC);
+diff --git a/net/atm/lec.c b/net/atm/lec.c
+index 6257bf12e5a0..ffef658862db 100644
+--- a/net/atm/lec.c
++++ b/net/atm/lec.c
+@@ -2234,4 +2234,5 @@ lec_arp_check_empties(struct lec_priv *priv,
+ 	spin_unlock_irqrestore(&priv->lec_arp_lock, flags);
+ }
+ 
++MODULE_DESCRIPTION("ATM LAN Emulation (LANE) support");
+ MODULE_LICENSE("GPL");
+-- 
+2.43.0
 
 
