@@ -1,141 +1,127 @@
-Return-Path: <netdev+bounces-61516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBD44824265
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:06:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A97F82426B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:07:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7883F282F56
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:06:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F06201F2260D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A6124B4F;
-	Thu,  4 Jan 2024 13:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730B92231B;
+	Thu,  4 Jan 2024 13:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="UhqynyYG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkO1jlDh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14D025550
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 13:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3367a304091so380911f8f.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 05:02:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1704373336; x=1704978136; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3qJnh8AIcAKZQaw54XikqgZNFVCwv53vFvEp1sREEes=;
-        b=UhqynyYG1cNDNg/fEPcXwN+p9G5KyL12APCnP4H/JxuDZ5JsGtXDEhxvPzO2racoXy
-         MEdyfvrgHzBGxJtRrPpzthabhuxASCa/PbGQ32Ww8dTQAzuLNpb2Mk9WbHartKlEwGq2
-         EYRKFqkDj0FH1N632N3cZRGpqPDjomrr4J8kYPD1a5pV/f13Thz8DvH7VTgSdlsm66PB
-         fcv5QwxPc/QPehh7mkJnc9hn5R971W+eIYHeazoadTce4aRUP0lKaXfyHz5INW8//UcG
-         k8pbJh+F46ufTQ6Ij9/Us6M2qjmB3c+KlTTeIULks2gP89LK1Jlae96Z8/iiw+qLZVNj
-         5dFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704373336; x=1704978136;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3qJnh8AIcAKZQaw54XikqgZNFVCwv53vFvEp1sREEes=;
-        b=oHxqljur399UwA7pPjuX9/GasT7G6HZzV3yjdFBCPsUlO7AJI/HEL8bLSvIqkRuy+P
-         odD1M2s6MwZ8D2Dan0gQfqpUTJmr5acGcXYWybvwaAmpCyZcaKLj4LlV4CCbApGwry22
-         mBWYI5OiCwJ5SaThkkCYKeM4Jqs5HunMUnhM+eyxWZaMKfAKT4r7224Ag8dp6tMU5qT9
-         Ti+NwlVJQ6YWHeR4aNDXEvF1H4rk14+ttCyiFeZYLMM/X5b47lU8jAL1etq7vCGnslxz
-         fYWJOfa9Yd0DYO2wd0fwtiGhr8JDWYK0cMnKrEroHUtPiUS7L1MNNVWjfIpLLVtoxf1Y
-         OpWw==
-X-Gm-Message-State: AOJu0YxC31Oklb0MJc2jS94cYuM04+hM5oyb42zE3qbD4Am2lS2s41gS
-	8YAn6CZqgrQ4+EdFaVB0cQsR6HF2N7WJyW/I/NxM8D1nFiY=
-X-Google-Smtp-Source: AGHT+IEqja+u1Zepunc8yCe1PWCPYTJaRhSPQH3gTIMidcrQA/WboeRZVVunuvMn3vOkG/I8lK1Owg==
-X-Received: by 2002:adf:f6d1:0:b0:336:74aa:d78b with SMTP id y17-20020adff6d1000000b0033674aad78bmr238945wrp.145.1704373336434;
-        Thu, 04 Jan 2024 05:02:16 -0800 (PST)
-Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:5b69:3768:8459:8fee])
-        by smtp.gmail.com with ESMTPSA id w5-20020a5d5445000000b0033660f75d08sm32887387wrv.116.2024.01.04.05.02.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 05:02:16 -0800 (PST)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523352230C;
+	Thu,  4 Jan 2024 13:03:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98199C433C8;
+	Thu,  4 Jan 2024 13:03:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704373422;
+	bh=A8ZR/6SM/RSWKP/a/pFKacgU/Wu3j1mC0cFt4l1fwLE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DkO1jlDhPRzTF+k92oCyoaddI2+urxW1BcFNpiArmjdZ6gqzrUSONj/6gCTpqqj+s
+	 t4CTtzOS7wB8LLcoDlX6niyxoC6BhK42kmb9X/ke6IhnhdC3cgjE3hJYHeGKsgONW8
+	 awHfUErrPmsT1IyF7SdNRqz8mFwiaVzmjY2F+DDqb3uS2HbgRZSFeOcu+Z3HWdJPNU
+	 NFEruw1vhtyCcIDhc1snodZddb9kFHDobpmWp2KibokD/JHonBBUCFGtoImWRKSHFl
+	 8uxVkHvOQH0GFq+fKgBGb+fWcAfriAHzjpa3TSIC7ATNHhUREmaRUIK0nW3rMEz6Lx
+	 lmmzMqaTlvEkQ==
+Date: Thu, 4 Jan 2024 13:03:37 +0000
+From: Simon Horman <horms@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Chris Morgan <macromorgan@hotmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	=?UTF-8?q?N=C3=ADcolas=20F=20=2E=20R=20=2E=20A=20=2E=20Prado?= <nfraprado@collabora.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Peng Fan <peng.fan@nxp.com>,
-	Robert Richter <rrichter@amd.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Terry Bowman <terry.bowman@amd.com>,
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [RFC 9/9] arm64: defconfig: enable the PCIe power sequencing for QCA6390
-Date: Thu,  4 Jan 2024 14:01:23 +0100
-Message-Id: <20240104130123.37115-10-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240104130123.37115-1-brgl@bgdev.pl>
-References: <20240104130123.37115-1-brgl@bgdev.pl>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v3 2/4] net: phy: at803x: refactor qca808x cable
+ test get status function
+Message-ID: <20240104130337.GG31813@kernel.org>
+References: <20240103124637.3078-1-ansuelsmth@gmail.com>
+ <20240103124637.3078-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240103124637.3078-3-ansuelsmth@gmail.com>
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Wed, Jan 03, 2024 at 01:46:33PM +0100, Christian Marangi wrote:
+> Refactor qca808x cable test get status function to remove code
+> duplication and clean things up.
+> 
+> The same logic is applied to each pair hence it can be generalized and
+> moved to a common function.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  drivers/net/phy/at803x.c | 65 +++++++++++++++++++++-------------------
+>  1 file changed, 34 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+> index acf483fa0887..b87293ee736c 100644
+> --- a/drivers/net/phy/at803x.c
+> +++ b/drivers/net/phy/at803x.c
+> @@ -2037,10 +2037,39 @@ static int qca808x_cable_test_start(struct phy_device *phydev)
+>  	return 0;
+>  }
+>  
+> +static void qca808x_cable_test_get_pair_status(struct phy_device *phydev, u8 pair,
+> +					       u16 status)
+> +{
+> +	u16 pair_code;
+> +	int length;
+> +
+> +	switch (pair) {
+> +	case ETHTOOL_A_CABLE_PAIR_A:
+> +		pair_code = FIELD_GET(QCA808X_CDT_CODE_PAIR_A, status);
+> +		break;
+> +	case ETHTOOL_A_CABLE_PAIR_B:
+> +		pair_code = FIELD_GET(QCA808X_CDT_CODE_PAIR_B, status);
+> +		break;
+> +	case ETHTOOL_A_CABLE_PAIR_C:
+> +		pair_code = FIELD_GET(QCA808X_CDT_CODE_PAIR_C, status);
+> +		break;
+> +	case ETHTOOL_A_CABLE_PAIR_D:
+> +		pair_code = FIELD_GET(QCA808X_CDT_CODE_PAIR_D, status);
+> +		break;
+> +	}
 
-Build the QCA6390 PCIe power sequencing module by default.
+Hi Christian,
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
----
- arch/arm64/configs/defconfig | 2 ++
- 1 file changed, 2 insertions(+)
+I don't think this can actually happen given current usage,
+but if pair doesn't match one of the cases above,
+then pair_code is used uninitialised below.
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 361c31b5d064..7daa863f25e5 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -210,6 +210,8 @@ CONFIG_NFC_S3FWRN5_I2C=m
- CONFIG_PCI=y
- CONFIG_PCIEPORTBUS=y
- CONFIG_PCIEAER=y
-+CONFIG_PCIE_PWRSEQ=y
-+CONFIG_PCIE_PWRSEQ_QCA6390=m
- CONFIG_PCI_IOV=y
- CONFIG_PCI_PASID=y
- CONFIG_HOTPLUG_PCI=y
--- 
-2.40.1
+Flagged by Smatch.
 
+> +
+> +	ethnl_cable_test_result(phydev, pair,
+> +				qca808x_cable_test_result_trans(pair_code));
+> +
+> +	if (qca808x_cdt_fault_length_valid(pair_code)) {
+> +		length = qca808x_cdt_fault_length(phydev, pair);
+> +		ethnl_cable_test_fault_length(phydev, pair, length);
+> +	}
+> +}
+> +
+>  static int qca808x_cable_test_get_status(struct phy_device *phydev, bool *finished)
+>  {
+>  	int ret, val;
+> -	int pair_a, pair_b, pair_c, pair_d;
+>  
+>  	*finished = false;
+>  
+
+...
 
