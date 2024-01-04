@@ -1,108 +1,127 @@
-Return-Path: <netdev+bounces-61432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EB49823A85
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 03:10:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B09C823AB3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 03:36:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49B511C249AB
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:10:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8390288307
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F6871FB3;
-	Thu,  4 Jan 2024 02:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F42AA28;
+	Thu,  4 Jan 2024 02:36:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IC1iJk4x"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N48utm4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06274443E
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 02:10:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CC429C433C7;
-	Thu,  4 Jan 2024 02:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704334229;
-	bh=pAAWsW1q6RTZ31xrua2PV7HZpIAKS49xYIxXQwMJiq8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IC1iJk4xxVYVkTjA8gMSLpI/t/8uctAzc1/ybFdkabGDnnnmElt78DHASeykLNrxS
-	 mjV4DxqvwnBboel3rMaTrPDdSVFBPRvF/B3Xh3MFLNsAZ3tRuzcqFLUnWq2aafRTEo
-	 HD5/Z2X3b62AQIj0LQ/+WgDqyOVjVAMo6nEIlUFLjt0L1PoeXs64sSSBHuwVMpVxOF
-	 ejF0fTfgfv9ZcpBJX5I8NI5bvsrgrTUrjEeM0nWj6cGYMrsurLNE3bPWK+fV9rMMh2
-	 6K/dOog+Muuvm2uDSuDENGDBWnpC+DPgtb2caECpgEuBa/dTcmUvn/S44M9rIElK4y
-	 VcwrTZL+Fb1Cw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B7EB7DCB6FF;
-	Thu,  4 Jan 2024 02:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A9A5221
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 02:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704335764;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rf/5T2evTdbJccKyC3hgdo+xqOBYB4xVojuOWjkZbrU=;
+	b=N48utm4mPaWcMIIgvRTN1ag9q+7JPaxcmwOewiPjwFQXNR6IggOjce4s9TYs3VfiVVfpZQ
+	KB7srlBlY4LhPaNh7q7mxFo2IX45eyeiGklkYQ5eSsuKiJUQbfnxX3Y7HUSUsPagOUFCFA
+	Z1cLJZdQgTleXDGT+pxS7HsG+qSOLOs=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-JHSj-tIDMim7C6pqlneAsQ-1; Wed, 03 Jan 2024 21:36:03 -0500
+X-MC-Unique: JHSj-tIDMim7C6pqlneAsQ-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3bb9063283bso79094b6e.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jan 2024 18:36:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704335762; x=1704940562;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rf/5T2evTdbJccKyC3hgdo+xqOBYB4xVojuOWjkZbrU=;
+        b=REr3/lRH3rQvEqqwVAu6CYyb1OrmgGNK/WuXI/Qu3PLjEeAPCQKnMjZnU2JaPj/MuH
+         fVeeTJGy1HEa8SkUqTZPUT0IjcbI+KPjMDIhf+97L+xD88in6SiZEwdcZb38hlwm7+aD
+         VgwbKFKx3HBg4+E8QzbtuK4T/Jb8FQOxEuJwytjN5+pJxfOfnEfXYf+ithuTQKTT60os
+         4ZJCIsuynPZpNP+mCHbEUxjikj5o11hm2FaAnKOhe8sr8MPoPyuVHKnKffVmddyPgtP7
+         QcEjB9rtUoCyGiPiUCilnZ+QZaTGJNTTTgUgSviYERcMI7u+x3vqrFinoWeRuDXF6COx
+         l9CQ==
+X-Gm-Message-State: AOJu0YzyeMXLG6wVucqGQdIpvV8Cp5jGL9Y/FkBFPOdMzxKaBz02xFWe
+	oqPVjuegVxbnPvsvde1hjuhXBly5z77EJLMz2fy8tCGrNmg1pfUgtPQzauLaFT8DvV5u1ir8cdO
+	Yyz6OJ1F7f3Yj+POarENV4iou4z0/FlxXwZIvaqh+
+X-Received: by 2002:a05:6808:140b:b0:3bc:24f7:d17b with SMTP id w11-20020a056808140b00b003bc24f7d17bmr18434oiv.32.1704335762443;
+        Wed, 03 Jan 2024 18:36:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEsOm3tBKEdQghMXJb5vuIMFj3a5lz4AHsDr95eXR33C+UTugrKPoagZEv9Sy19ULon5rHPKAdPIkhXKAZSAw=
+X-Received: by 2002:a05:6808:140b:b0:3bc:24f7:d17b with SMTP id
+ w11-20020a056808140b00b003bc24f7d17bmr18433oiv.32.1704335762254; Wed, 03 Jan
+ 2024 18:36:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next 00/11] ENA driver XDP changes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170433422974.9915.18424626064538917734.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jan 2024 02:10:29 +0000
-References: <20240101190855.18739-1-darinzon@amazon.com>
-In-Reply-To: <20240101190855.18739-1-darinzon@amazon.com>
-To: Arinzon@codeaurora.org, David <darinzon@amazon.com>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
- dwmw@amazon.com, zorik@amazon.com, matua@amazon.com, saeedb@amazon.com,
- msw@amazon.com, aliguori@amazon.com, nafea@amazon.com, netanel@amazon.com,
- alisaidi@amazon.com, benh@amazon.com, akiyano@amazon.com, ndagan@amazon.com,
- shayagr@amazon.com, itzko@amazon.com, osamaabb@amazon.com,
- evostrov@amazon.com, ofirt@amazon.com
+References: <20231226094333.47740-1-xuanzhuo@linux.alibaba.com>
+ <20240103135803.24dddfe9@kernel.org> <20240103171814-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240103171814-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 4 Jan 2024 10:35:51 +0800
+Message-ID: <CACGkMEsoi9rxd88a3mQa4J3QvnYsb_AzYyL4h5wvESdQ9ojQiA@mail.gmail.com>
+Subject: Re: [PATCH v2] virtio_net: fix missing dma unmap for resize
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	virtualization@lists.linux-foundation.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Thu, Jan 4, 2024 at 6:18=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> On Wed, Jan 03, 2024 at 01:58:03PM -0800, Jakub Kicinski wrote:
+> > On Tue, 26 Dec 2023 17:43:33 +0800 Xuan Zhuo wrote:
+> > > For rq, we have three cases getting buffers from virtio core:
+> > >
+> > > 1. virtqueue_get_buf{,_ctx}
+> > > 2. virtqueue_detach_unused_buf
+> > > 3. callback for virtqueue_resize
+> > >
+> > > But in commit 295525e29a5b("virtio_net: merge dma operations when
+> > > filling mergeable buffers"), I missed the dma unmap for the #3 case.
+> > >
+> > > That will leak some memory, because I did not release the pages refer=
+red
+> > > by the unused buffers.
+> > >
+> > > If we do such script, we will make the system OOM.
+> > >
+> > >     while true
+> > >     do
+> > >             ethtool -G ens4 rx 128
+> > >             ethtool -G ens4 rx 256
+> > >             free -m
+> > >     done
+> > >
+> > > Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling m=
+ergeable buffers")
+> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> >
+> > Michael, Jason, looks good? Worth pushing it to v6.7?
+>
+> I'd say yes.
+>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-On Mon, 1 Jan 2024 19:08:44 +0000 you wrote:
-> From: David Arinzon <darinzon@amazon.com>
-> 
-> This patchset contains multiple XDP-related changes
-> in the ENA driver, including moving the XDP code to
-> dedicated files.
-> 
-> Changes in v2:
-> - Moved changes to right commits in order to avoid compilation errors
-> 
-> [...]
+Thanks
 
-Here is the summary with links:
-  - [v2,net-next,01/11] net: ena: Move XDP code to its new files
-    https://git.kernel.org/netdev/net-next/c/d000574d0287
-  - [v2,net-next,02/11] net: ena: Pass ena_adapter instead of net_device to ena_xmit_common()
-    https://git.kernel.org/netdev/net-next/c/39a044f4dcfe
-  - [v2,net-next,03/11] net: ena: Put orthogonal fields in ena_tx_buffer in a union
-    https://git.kernel.org/netdev/net-next/c/009b387659d3
-  - [v2,net-next,04/11] net: ena: Introduce total_tx_size field in ena_tx_buffer struct
-    https://git.kernel.org/netdev/net-next/c/23ec97498026
-  - [v2,net-next,05/11] net: ena: Use tx_ring instead of xdp_ring for XDP channel TX
-    https://git.kernel.org/netdev/net-next/c/911a8c960110
-  - [v2,net-next,06/11] net: ena: Don't check if XDP program is loaded in ena_xdp_execute()
-    https://git.kernel.org/netdev/net-next/c/436c79358595
-  - [v2,net-next,07/11] net: ena: Refactor napi functions
-    https://git.kernel.org/netdev/net-next/c/b626fd9627d4
-  - [v2,net-next,08/11] net: ena: Add more debug prints to XDP related function
-    https://git.kernel.org/netdev/net-next/c/2b02e332c151
-  - [v2,net-next,09/11] net: ena: Always register RX queue info
-    https://git.kernel.org/netdev/net-next/c/ea5c460023aa
-  - [v2,net-next,10/11] net: ena: Make queue stats code cleaner by removing the if block
-    https://git.kernel.org/netdev/net-next/c/4f28e789be76
-  - [v2,net-next,11/11] net: ena: Take xdp packets stats into account in ena_get_stats64()
-    https://git.kernel.org/netdev/net-next/c/782345d24874
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+>
 
 
