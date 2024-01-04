@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-61653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A638E82478D
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:37:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69B29824796
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:39:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 949FA1C20E70
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:37:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 700B81C2243F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:39:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315C4286B7;
-	Thu,  4 Jan 2024 17:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B967286B2;
+	Thu,  4 Jan 2024 17:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IJPuX+1c"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WiPwNng0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C2C286B4
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05AC28E16
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 17:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-42836658198so3517011cf.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:37:04 -0800 (PST)
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-7cc9da9995bso290321241.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 09:38:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1704389823; x=1704994623; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1704389925; x=1704994725; darn=vger.kernel.org;
         h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RYzQLXEN/zB3cUpUnrMPuq+5a2pDBHqXRNIkkEjMEJQ=;
-        b=IJPuX+1ciCNHKAci/HgU6vpsQ5U252wYGnZhViLZnxAV2PwAIo+G0Fz4lBbLcc+0WO
-         ZhemLJBmznrsEUVwHSPpegtpl/ZVoQIvzRA1kMqdFIyTYwXKCunPtqufjA6oH0JOplk2
-         pilqZQdzTtz2ZkiDDEPcegzYJgE8pgz7gbxLM=
+        bh=XkQgRjof2zCfClew1hEXTV1aivTcSBKibS6JNtn1rxw=;
+        b=WiPwNng0TtNorHdla5tkJ1d/y6PALSdPS6loTBaxskIrqSQAJ3aqyInZiyp/inDkjc
+         5XdqM+xYVgH/2Hg7/TdXs2tN0Di+aSuuYwZUpavOpxeaTTxZHs+FAaUWlkH+LlFyt9Ut
+         tnPWxL7AayiQKQtgQnjZmjcflv/SC6AhyjNlE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704389823; x=1704994623;
+        d=1e100.net; s=20230601; t=1704389925; x=1704994725;
         h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=RYzQLXEN/zB3cUpUnrMPuq+5a2pDBHqXRNIkkEjMEJQ=;
-        b=se4tjFNGsyfOjoKVddqn3fONgjdjODTsGMjXdXHIXXSXAeo/A2bU+idgIvLqtDN9jk
-         VYDh99h8ki6KqEd6h/5ZNVaz33TS1143J8t6vJsi+T8bYKvQanNBFxYWFSkB5PSXHT74
-         0fKzz8oNg2WfQOgn5dQiYS9AljXiLtyCTv3vN9N1ahQpztqgC9StaAAX5AdXvqlJhoky
-         xAGwxnZimIG4APqSLzCxZljzphpHSP9WbwTJTF4R9hhK38yymjFrQmVPiktOWZfZcAOS
-         bHXy0MV5xiaj4M3YT34KV3COM77KV69GEMrldglPzXQWGIFZzHa6JcjEww5o+7RhgIRp
-         eZ2g==
-X-Gm-Message-State: AOJu0YyPp0OMUn4/ZzxPF92Mpk24lMto7fWInhxxoDeofiNUzCROnwRZ
-	hfjPV/vAOOL2oSOnte4262YqhkhsYhteJbcgE+PbB/QI5Q==
-X-Google-Smtp-Source: AGHT+IEhmKjWwU77VVpzVUg9EoLpVkSn9JjDm8Sw7aJv51dNaylUreCIv03yXrz0iOmfe04dsl7wfA==
-X-Received: by 2002:a05:622a:15d4:b0:428:3cc5:e970 with SMTP id d20-20020a05622a15d400b004283cc5e970mr1070990qty.119.1704389823571;
-        Thu, 04 Jan 2024 09:37:03 -0800 (PST)
+        bh=XkQgRjof2zCfClew1hEXTV1aivTcSBKibS6JNtn1rxw=;
+        b=Yifa19pzTDukac17Mzw9RS/qS91JZbwUSoEtXF/2PCGobdj5nRyfGXMcOzO+AHNJDu
+         unSmNTaiCJk4Yg0mXdISZuOlOI44i2Us6l/ps0NnCyV4XEWNeLTbiA5dZdrow4mFoT2I
+         mpLuuuhlBRM1gKp6nFr9w2k8EH6UIakCgtXidTnBOZWKy4yOQ0nuXMElh10aVDuzedd9
+         ohk15XPXJVEijXEC2MxadI9XvsorKYqUhWCX7BBrV1heCGoH8ftuCLlaJ1vvVWT5JPNK
+         kBmZtcsNv4rgOJRA5N7w79H4lMqlVDwyWAX3ZEWf1jZG/AlWEE4aSCxCCqqTTNduJa6a
+         6+xw==
+X-Gm-Message-State: AOJu0Yx6Vapmg4+dOOSIfCpUQ10n8dpWl4A4W8EEILzlP2p9rykKJJie
+	G+HIsWDN4f3+TvRI+/GUTVpZbD35uMoW
+X-Google-Smtp-Source: AGHT+IFgIzq6KuEok8bhPPqBGTBrcDfnDdld2gKTmgJN/L9qHv2JJJTiuESuk5d9s8lmogw1hxM5Xw==
+X-Received: by 2002:a05:6102:3713:b0:467:29b:812 with SMTP id s19-20020a056102371300b00467029b0812mr863284vst.1.1704389925293;
+        Thu, 04 Jan 2024 09:38:45 -0800 (PST)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id do14-20020a05622a478e00b00423e8909bfesm15401417qtb.6.2024.01.04.09.37.01
+        by smtp.gmail.com with ESMTPSA id do14-20020a05622a478e00b00423e8909bfesm15401417qtb.6.2024.01.04.09.38.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 09:37:03 -0800 (PST)
-Message-ID: <54d751aa-e265-4e5a-9337-5c2d10a7583d@broadcom.com>
-Date: Thu, 4 Jan 2024 09:37:01 -0800
+        Thu, 04 Jan 2024 09:38:44 -0800 (PST)
+Message-ID: <0de4cc6f-82fe-4c02-996c-a7d4a96a8d62@broadcom.com>
+Date: Thu, 4 Jan 2024 09:38:43 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,20 +63,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 04/10] net: dsa: qca8k: put MDIO bus OF node on
- qca8k_mdio_register() failure
+Subject: Re: [PATCH net-next 05/10] net: dsa: qca8k: skip MDIO bus creation if
+ its OF node has status = "disabled"
 To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>,
  Luiz Angelo Daros de Luca <luizluca@gmail.com>,
  =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Linus Walleij <linus.walleij@linaro.org>, Hauke Mehrtens <hauke@hauke-m.de>,
- Christian Marangi <ansuelsmth@gmail.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
- <arinc.unal@arinc9.com>
+ Linus Walleij <linus.walleij@linaro.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Hauke Mehrtens <hauke@hauke-m.de>, Christian Marangi <ansuelsmth@gmail.com>,
+ =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
 References: <20240104140037.374166-1-vladimir.oltean@nxp.com>
- <20240104140037.374166-5-vladimir.oltean@nxp.com>
+ <20240104140037.374166-6-vladimir.oltean@nxp.com>
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
@@ -110,34 +110,24 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20240104140037.374166-5-vladimir.oltean@nxp.com>
+In-Reply-To: <20240104140037.374166-6-vladimir.oltean@nxp.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000002811b060e222e15"
+	boundary="000000000000129f5c060e22349a"
 
---00000000000002811b060e222e15
+--000000000000129f5c060e22349a
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 1/4/24 06:00, Vladimir Oltean wrote:
-> of_get_child_by_name() gives us an OF node with an elevated refcount,
-> which should be dropped when we're done with it. This is so that,
-> if (of_node_check_flag(node, OF_DYNAMIC)) is true, the node's memory can
-> eventually be freed.
+> Currently the driver calls the non-OF devm_mdiobus_register() rather
+> than devm_of_mdiobus_register() for this case, but it seems to rather
+> be a confusing coincidence, and not a real use case that needs to be
+> supported.
 > 
-> There are 2 distinct paths to be considered in qca8k_mdio_register():
-> 
-> - devm_of_mdiobus_register() succeeds: since commit 3b73a7b8ec38 ("net:
->    mdio_bus: add refcounting for fwnodes to mdiobus"), the MDIO core
->    treats this well.
-> 
-> - devm_of_mdiobus_register() or anything up to that point fails: it is
->    the duty of the qca8k driver to release the OF node.
-> 
-> This change addresses the second case by making sure that the OF node
-> reference is not leaked.
-> 
-> The "mdio" node may be NULL, but of_node_put(NULL) is safe.
+> If the device tree says status = "disabled" for the MDIO bus, we
+> shouldn't need an MDIO bus at all. Instead, just exit as early as
+> possible and do not call any MDIO API.
 > 
 > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
@@ -146,7 +136,7 @@ Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Florian
 
 
---00000000000002811b060e222e15
+--000000000000129f5c060e22349a
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -217,15 +207,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBH/zkpdYscLszKt
-btRw2sMnCqFvxqO1MQMf/6l/xZOeMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDEwNDE3MzcwM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKL7n2Cyso4ofEUQ
+ygQmi3xMSsHZ0erRcuwm3kpkD4qjMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDEwNDE3Mzg0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBtJJi9ipvlZYf5rZKrKcgW5AUbDH+SQgVl
-ynRbpp4Mo3CThO/ZtHUQs6Sw4Wv3nLkG+k2LdbJp+zq/0kT3DIPCsWkFqdLwlFVIpER8ZD7OLK4F
-9C6iNUplHyNob0JhQnHyGb4kwvHnPovwB4cd5o1MbrfHZeDQPVJVxalpgKfboGhRKRDPcaxeE7Iy
-iA03MYLNGRr7lOU9LzsZ6mHd59tMYw4Ps3RAlJEPYZcw5pGZ0Y67kZ0w579NozGJNmm7eS4q2lLp
-7sKsOnJhmDxrrxm9qkvmgRz3FQLberc8hMXqS1zZaFZY8sfQwtBEupM4R4ISlmjkuRx22aYijxGo
-7AH1
---00000000000002811b060e222e15--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBlvzNTbjduoLTJSRx1hFmUi4QHewu1wFBy
+Ruc3+SM+Qg9mz5zUsJBk2O9EzgPuuVis8pmE/WnX4MX0Ji/8XUnp/aKaF6irVfPq5ivM2bCpL7Zw
+/ztj8cwJQNRkDe58S97KGsPD+8SRD245Wtj26kvz+LIvwiyrTTp9yiFAjdWTcx8HuTzboM9TUcMw
+0usdVDK2J7yJuPP46JDTYn2HEFtVfIHyZKcHXsVGmZtR7IOJeLav7fRoaJDCi7h53JlApvJRaedO
+Y2CjGEus6MC/VEVhg3gPu+Khy8AK41jauTCph4n74vhY39DWj6QepWXSoBFYLguk83sOFoufo+d3
+q9CV
+--000000000000129f5c060e22349a--
 
