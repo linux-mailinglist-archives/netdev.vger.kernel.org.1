@@ -1,133 +1,333 @@
-Return-Path: <netdev+bounces-61660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 265A382481F
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 19:24:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40AC082481D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 19:23:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD233B241A3
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:23:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9944CB23F9E
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 18:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947DA28E24;
-	Thu,  4 Jan 2024 18:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6462528DDE;
+	Thu,  4 Jan 2024 18:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="oN98fxAD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NKVvv4uF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962782C6A6
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 18:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dbe02bb7801so705406276.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 10:23:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704392580; x=1704997380; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pNMLqvav7zGTiOoMm95LsW5xUXppJOdUUrzamQ5bRkI=;
-        b=oN98fxADs0gr41YT1y8I5chY+V82wdBVD8/PPxaHreepqcb7nkHckOjEhTDlH5XnhE
-         M4KW/vA0Cslm27imIhAC2d4P2E1ihyNbR0YwCn5+P3w82Q5Cwo33AB4bsmQCbNqbcUVz
-         kg2QBiy8Y+vJL0VT+h9HgncuacjsnKIWyBOvPstGhd+gOCiVykM6EtCEMQfmIqIHeNdx
-         PjgrNm3MNzJIo5EIKEGRIJhJJuyFWQ4PGahHu6pJIJgV2ygqK2Q+UfV1uTdlkL40Ze+J
-         /maP7s9n54zZYDfRQ054CGm/YvcZinFQD8SC0LdFsF+i1Sj7Ew0xzQI3cFoMf1FUpgtG
-         1Wlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704392580; x=1704997380;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pNMLqvav7zGTiOoMm95LsW5xUXppJOdUUrzamQ5bRkI=;
-        b=LxIjDWkfeST4yn4MvyaJs2J9wQ8iwA2H6GPBmVrUrP/mDmdwNVncUVAHlCKNOJsMwb
-         h4tr6GNNs9DFu2a//2pW8L4xiIkBO1hfcgRL0j2+6hd/9algwvJBCFhYjcihLVumwL5a
-         mrM5p9uikgYjU0TkQrrEgrE8Xqz77Qt8QtinW4+pQ/tXU4GN1O0zXaQh0E+YqmcSRgQJ
-         DCeaQcZibjc7rggPIa8QZrCQoYXQq2n2I1KVnZ6ds3FjSZlk0CTpa9m7m7N7aoFommKy
-         y3pcr/TMb9pS6oaUWREeteG8usqrkEljsfGpiS46q7ubxpfz+Ga+y7V0sioDhLVEeHbd
-         0tUw==
-X-Gm-Message-State: AOJu0YyX8X+CUHZGj9hWAIqF/LSqSeHRbS4FBKJ5n8BfN9yS9n4ATnY4
-	aD8LgpEbc6RMuTN2EGu7GoGKFav47e6NAalwrglT2gNqpsAL
-X-Google-Smtp-Source: AGHT+IEwymGOfakokySH5A+A/H+0w5luOtw10DHz4EBfgtxXjM0bFyN/f1OaYrWMYpmGY9IuPoWdEnIJ3+HKZwnBvUc=
-X-Received: by 2002:a25:bc86:0:b0:dbd:56f8:16f8 with SMTP id
- e6-20020a25bc86000000b00dbd56f816f8mr832742ybk.3.1704392580398; Thu, 04 Jan
- 2024 10:23:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8F628E25;
+	Thu,  4 Jan 2024 18:22:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E172C433CA;
+	Thu,  4 Jan 2024 18:22:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704392573;
+	bh=u3B6/+lm72/ITMFg7Rjba0K4aQIqSJxhOwedS+gphmo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NKVvv4uF3M787gPt2BtLPimo9aRGBW+9AXt/4O3vb+6vFtHPoMXC9Nu3WM/IP0hKI
+	 vQ/P6VHEpHdFIKDOIBsZBEdvvzx8Cid2QNRr4RlRKBe0Q6EXKPcvtl6DIb0LYqYZB3
+	 yhHxyJzkAo5T/oEtlhT2CIOTMc+IjudfRjlhNAveoUrQRllS0KQpYfJ43xrwUU1wiK
+	 VmUtlkBIVp1yT6IewnzueU6pBHDM5UV60Fn8oY+wxg4UX9Xoo1wWFGctEgAAHeu1vs
+	 zHzJhjfwWUssyn/zGpdk+IC8BsTXZVUgeVOPELuPEpChkl354kwNa7tqJHUmW7bo6N
+	 kkg1v2dDbjyLg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.7-rc9
+Date: Thu,  4 Jan 2024 10:22:52 -0800
+Message-ID: <20240104182252.1963951-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104125844.1522062-1-jiri@resnulli.us> <CAM0EoMkDhnm0QPtZEQPbnQtkfW7tTjHdv3fQoXzRXARVdhbc0A@mail.gmail.com>
- <ZZby7xSkQpWHwPOA@nanopsycho>
-In-Reply-To: <ZZby7xSkQpWHwPOA@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 4 Jan 2024 13:22:48 -0500
-Message-ID: <CAM0EoMmCn8DpMzPCt9GMW16C08n8mfM8N==pfPJy6c=XgEqMSw@mail.gmail.com>
-Subject: Re: [patch net-next] net: sched: move block device tracking into tcf_block_get/put_ext()
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, xiyou.wangcong@gmail.com, 
-	victor@mojatatu.com, pctammela@mojatatu.com, idosch@idosch.org, 
-	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 4, 2024 at 1:03=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote:
->
-> Thu, Jan 04, 2024 at 05:10:58PM CET, jhs@mojatatu.com wrote:
-> >On Thu, Jan 4, 2024 at 7:58=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wro=
-te:
-> >>
-> >> From: Jiri Pirko <jiri@nvidia.com>
-> >>
-> >> Inserting the device to block xarray in qdisc_create() is not suitable
-> >> place to do this. As it requires use of tcf_block() callback, it cause=
-s
-> >> multiple issues. It is called for all qdisc types, which is incorrect.
-> >>
-> >> So, instead, move it to more suitable place, which is tcf_block_get_ex=
-t()
-> >> and make sure it is only done for qdiscs that use block infrastructure
-> >> and also only for blocks which are shared.
-> >>
-> >> Symmetrically, alter the cleanup path, move the xarray entry removal
-> >> into tcf_block_put_ext().
-> >>
-> >> Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking in=
-fra")
-> >> Reported-by: Ido Schimmel <idosch@nvidia.com>
-> >> Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
-> >> Reported-by: Kui-Feng Lee <sinquersw@gmail.com>
-> >> Closes: https://lore.kernel.org/all/ce8d3e55-b8bc-409c-ace9-5cf1c4f7c8=
-8e@gmail.com/
-> >> Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotm=
-ail.com
-> >> Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@googl=
-e.com/
-> >> Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotm=
-ail.com
-> >> Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@googl=
-e.com/
-> >> Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotm=
-ail.com
-> >> Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@googl=
-e.com/
-> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> >
-> >Did you get a chance to run the tdc tests?
->
-> I ran the TC ones we have in the net/forwarding directory.
-> I didn't manage to run the tdc. Readme didn't help me much.
-> How do you run the suite?
+Hi Linus!
 
-For next time:
-make -C tools/testing/selftests TARGETS=3Dtc-testing run_tests
+We haven't accumulated much over the break. If it wasn't for
+the uninterrupted stream of fixes for Intel drivers this PR
+would be very slim. There was a handful of user reports, however,
+either they stood out because of the lower traffic or users
+have had more time to test over the break. The ones which are
+v6.7-relevant should be wrapped up.
 
-We'll let you off the hook this time. We'll do the rest of the testing.
+There is one problem in a driver which "the other Linus" is working on.
+The bug went into -rc1 as a fix, and made its way to stable already.
+The device documentation is lacking so it's taking a bit long to
+zero in on the exact solution. The device is old and not one of
+the very popular ones, plus we seem to be close to a fix which will
+satisfy all use cases, so IMHO no need to wait or rush it. But here's
+the latest posting if you'd like to take a look and judge it yourself:
+https://lore.kernel.org/all/20240102-new-gemini-ethernet-regression-v5-0-cf61ab3aa8cd@linaro.org/
 
-cheers,
-jamal
+The following changes since commit 7c5e046bdcb2513f9decb3765d8bf92d604279cf:
+
+  Merge tag 'net-6.7-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-12-21 09:15:37 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.7-rc9
+
+for you to fetch changes up to 4c8530dc7d7da4abe97d65e8e038ce9852491369:
+
+  net/tcp: Only produce AO/MD5 logs if there are any keys (2024-01-04 09:07:04 -0800)
+
+----------------------------------------------------------------
+Including fixes from wireless and netfilter.
+
+Current release - regressions:
+
+ - Revert "net: ipv6/addrconf: clamp preferred_lft to the minimum
+   required", it caused issues on networks where routers send prefixes
+   with preferred_lft=0
+
+ - wifi:
+   - iwlwifi: pcie: don't synchronize IRQs from IRQ, prevent deadlock
+   - mac80211: fix re-adding debugfs entries during reconfiguration
+
+Current release - new code bugs:
+
+ - tcp: print AO/MD5 messages only if there are any keys
+
+Previous releases - regressions:
+
+ - virtio_net: fix missing dma unmap for resize, prevent OOM
+
+Previous releases - always broken:
+
+ - mptcp: prevent tcp diag from closing listener subflows
+
+ - nf_tables:
+   - set transport header offset for egress hook, fix IPv4 mangling
+   - skip set commit for deleted/destroyed sets, avoid double deactivation
+
+ - nat: make sure action is set for all ct states, fix openvswitch
+   matching on ICMP packets in related state
+
+ - eth: mlxbf_gige: fix receive hang under heavy traffic
+
+ - eth: r8169: fix PCI error on system resume for RTL8168FP
+
+ - net: add missing getsockopt(SO_TIMESTAMPING_NEW) and cmsg handling
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Adrian Cinal (1):
+      net: bcmgenet: Fix FCS generation for fragmented skbuffs
+
+Alex Henrie (1):
+      Revert "net: ipv6/addrconf: clamp preferred_lft to the minimum required"
+
+Alexander Lobakin (1):
+      idpf: fix corrupted frames and skb leaks in singleq mode
+
+Andrii Staikov (1):
+      i40e: Restore VF MSI-X state during PCI reset
+
+Arkadiusz Kubalewski (1):
+      ice: dpll: fix phase offset value
+
+Benjamin Berg (2):
+      wifi: mac80211: do not re-add debugfs entries during resume
+      wifi: mac80211: add/remove driver debugfs entries as appropriate
+
+Brad Cowie (1):
+      netfilter: nf_nat: fix action not being set for all ct states
+
+Chen Ni (1):
+      asix: Add check for usbnet_get_endpoints
+
+Claudiu Beznea (1):
+      net: ravb: Wait for operating mode to be applied
+
+David S. Miller (3):
+      Merge branch 'nfc-refcounting'
+      Merge tag 'wireless-2023-12-19' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+      Merge tag 'nf-23-12-20' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+David Thompson (1):
+      mlxbf_gige: fix receive packet race condition
+
+Dinghao Liu (1):
+      net/qla3xxx: fix potential memleak in ql_alloc_buffer_queues
+
+Dmitry Safonov (2):
+      net/tcp_sigpool: Use kref_get_unless_zero()
+      net/tcp: Only produce AO/MD5 logs if there are any keys
+
+Hangbin Liu (1):
+      selftests: bonding: do not set port down when adding to bond
+
+Hangyu Hua (1):
+      net: sched: em_text: fix possible memory leak in em_text_destroy()
+
+Jakub Kicinski (6):
+      Merge branch 'mptcp-new-reviewer-and-prevent-a-warning'
+      Merge branch '200GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge branch '1GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge tag 'nf-24-01-03' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+
+Johannes Berg (1):
+      wifi: iwlwifi: pcie: don't synchronize IRQs from IRQ
+
+Jörn-Thorben Hinz (1):
+      net: Implement missing getsockopt(SO_TIMESTAMPING_NEW)
+
+Kai-Heng Feng (1):
+      r8169: Fix PCI error on system resume
+
+Katarzyna Wieczerzycka (1):
+      ice: Fix link_down_on_close message
+
+Ke Xiao (1):
+      i40e: fix use-after-free in i40e_aqc_add_filters()
+
+Kurt Kanzenbach (3):
+      igc: Report VLAN EtherType matching back to user
+      igc: Check VLAN TCI mask
+      igc: Check VLAN EtherType mask
+
+Lukas Bulwahn (1):
+      MAINTAINERS: wifi: brcm80211: remove non-existing SHA-cyfmac-dev-list@infineon.com
+
+Marc Dionne (1):
+      net: Save and restore msg_namelen in sock_sendmsg
+
+Marcin Wojtas (1):
+      MAINTAINERS: Update mvpp2 driver email
+
+Matthieu Baerts (1):
+      MAINTAINERS: add Geliang as reviewer for MPTCP
+
+Michael Chan (1):
+      bnxt_en: Remove mis-applied code from bnxt_cfg_ntp_filters()
+
+Naveen Mamindlapalli (2):
+      octeontx2-af: Always configure NIX TX link credits based on max frame size
+      octeontx2-af: Re-enable MAC TX in otx2_stop processing
+
+Ngai-Mint Kwan (1):
+      ice: Shut down VSI with "link-down-on-close" enabled
+
+Pablo Neira Ayuso (3):
+      netfilter: nf_tables: set transport offset from mac header for netdev/egress
+      netfilter: nf_tables: skip set commit for deleted/destroyed sets
+      netfilter: nft_immediate: drop chain reference counter on error
+
+Paolo Abeni (1):
+      mptcp: prevent tcp diag from closing listener subflows
+
+Paul Greenwalt (1):
+      ice: fix Get link status data length
+
+Pavan Kumar Linga (1):
+      idpf: avoid compiler introduced padding in virtchnl2_rss_key struct
+
+Radu Pirea (NXP OSS) (1):
+      MAINTAINERS: step down as TJA11XX C45 maintainer
+
+Randy Dunlap (1):
+      net: phy: linux/phy.h: fix Excess kernel-doc description warning
+
+Rodrigo Cataldo (1):
+      igc: Fix hicredit calculation
+
+Sagi Maimon (1):
+      ptp: ocp: fix bug in unregistering the DPLL subsystem
+
+Sarannya S (1):
+      net: qrtr: ns: Return 0 if server port is not present
+
+Siddh Raman Pant (2):
+      nfc: llcp_core: Hold a ref to llcp_local->dev when holding a ref to llcp_local
+      nfc: Do not send datagram if socket state isn't LLCP_BOUND
+
+Sudheer Mogilappagari (1):
+      i40e: Fix filter input checks to prevent config with invalid values
+
+Suman Ghosh (1):
+      octeontx2-af: Fix marking couple of structure as __packed
+
+Thomas Lange (1):
+      net: Implement missing SO_TIMESTAMPING_NEW cmsg support
+
+Wen Gu (1):
+      net/smc: fix invalid link access in dumping SMC-R connections
+
+Xuan Zhuo (1):
+      virtio_net: fix missing dma unmap for resize
+
+Zhipeng Lu (1):
+      sfc: fix a double-free bug in efx_probe_filters
+
+wangkeqi (1):
+      connector: Fix proc_event_num_listeners count not cleared
+
+ Documentation/networking/ip-sysctl.rst             |   2 +-
+ MAINTAINERS                                        |   6 +-
+ drivers/connector/cn_proc.c                        |   5 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |   4 +-
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c     |   4 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c        |  11 +-
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c |  34 +++++-
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h |   3 +
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h    |   3 +-
+ drivers/net/ethernet/intel/ice/ice_common.c        |   4 +-
+ drivers/net/ethernet/intel/ice/ice_main.c          |  12 ++-
+ .../net/ethernet/intel/idpf/idpf_singleq_txrx.c    |   1 -
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c        |   2 +-
+ drivers/net/ethernet/intel/idpf/virtchnl2.h        |   6 +-
+ drivers/net/ethernet/intel/igc/igc.h               |   1 +
+ drivers/net/ethernet/intel/igc/igc_ethtool.c       |  42 +++++++-
+ drivers/net/ethernet/intel/igc/igc_tsn.c           |   2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/npc.h    |   4 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |   1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_cgx.c    |  17 +++
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    | 118 ++-------------------
+ .../ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c   |   9 +-
+ drivers/net/ethernet/qlogic/qla3xxx.c              |   2 +
+ drivers/net/ethernet/realtek/r8169_main.c          |   2 +-
+ drivers/net/ethernet/renesas/ravb_main.c           |  65 ++++++++----
+ drivers/net/ethernet/sfc/rx_common.c               |   4 +-
+ drivers/net/usb/ax88172a.c                         |   4 +-
+ drivers/net/virtio_net.c                           |  60 +++++------
+ drivers/net/wireless/intel/iwlwifi/pcie/internal.h |   4 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/rx.c       |   8 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/trans.c    |  17 +--
+ drivers/ptp/ptp_ocp.c                              |   2 +-
+ include/linux/phy.h                                |   1 -
+ include/net/netfilter/nf_tables_ipv4.h             |   2 +-
+ include/net/tcp.h                                  |   2 -
+ include/net/tcp_ao.h                               |  26 ++++-
+ net/core/sock.c                                    |  12 ++-
+ net/ipv4/tcp_sigpool.c                             |   5 +-
+ net/ipv6/addrconf.c                                |  18 +---
+ net/mac80211/debugfs_netdev.c                      |   9 +-
+ net/mac80211/driver-ops.c                          |  14 ++-
+ net/mptcp/subflow.c                                |  13 +++
+ net/netfilter/nf_nat_ovs.c                         |   3 +-
+ net/netfilter/nf_tables_api.c                      |   2 +-
+ net/netfilter/nf_tables_core.c                     |   2 +-
+ net/netfilter/nft_immediate.c                      |   2 +-
+ net/nfc/llcp_core.c                                |  39 ++++++-
+ net/nfc/llcp_sock.c                                |   5 +
+ net/qrtr/ns.c                                      |   4 +-
+ net/sched/em_text.c                                |   4 +-
+ net/smc/smc_diag.c                                 |   3 +-
+ net/socket.c                                       |   2 +
+ .../net/bonding/bond-arp-interval-causes-panic.sh  |   6 +-
+ 53 files changed, 373 insertions(+), 260 deletions(-)
 
