@@ -1,73 +1,41 @@
-Return-Path: <netdev+bounces-61472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5BB0823F54
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:16:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43C88823F71
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:30:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E350286E60
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 10:16:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 841CBB21600
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 10:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180E720B12;
-	Thu,  4 Jan 2024 10:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2767320DD8;
+	Thu,  4 Jan 2024 10:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VOstGvTA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g1fihzQ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E95520B15;
-	Thu,  4 Jan 2024 10:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704363372; x=1735899372;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=HCrXfWmSxLvasPVqx5bvaAF0h2FNR5wLkTJHVmOM0RI=;
-  b=VOstGvTAOg1F3IHa4NSWlzhz4NelAc0PB8oU0LXSVB+rnYyms0oiX8w0
-   YGGOjw0zawEx963H1ZkAwTfGDhvDEkRL1/jAGcioQW1QSV9ZihlCSyO1M
-   Vi3L14XNZilImGD0V49DKbhcGHZr/OqQVV3P4Ci0CRcnOQs7wEs9+dYBa
-   urn/1dPCE3KzKI9BUTz0pShu5NZmuv0yBE9uWoY78IVYfKeizhOTlMo0q
-   zqsx+4zcENDHpB8nEHFBBXhyRJ7Kl7V8CPQuN4LubSOuKIinmCacjGcvm
-   2dsQ8S1dtrDwaTx5llb88HmHnBGxnN1lJgF1eA3VNMBSlThp1/jeBRWXG
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="15831368"
-X-IronPort-AV: E=Sophos;i="6.04,330,1695711600"; 
-   d="scan'208";a="15831368"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2024 02:16:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="903761717"
-X-IronPort-AV: E=Sophos;i="6.04,330,1695711600"; 
-   d="scan'208";a="903761717"
-Received: from ssid-ilbpg3-teeminta.png.intel.com (HELO localhost.localdomain) ([10.88.227.74])
-  by orsmga004.jf.intel.com with ESMTP; 04 Jan 2024 02:16:06 -0800
-From: "Gan, Yi Fang" <yi.fang.gan@intel.com>
-To: Russell King <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Looi Hong Aun <hong.aun.looi@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Choong Yong Liang <yong.liang.choong@intel.com>,
-	Gan Yi Fang <yi.fang.gan@intel.com>
-Subject: [PATCH net v3 1/1] net: phylink: Add module_exit()
-Date: Thu,  4 Jan 2024 18:12:55 +0800
-Message-Id: <20240104101255.3056090-1-yi.fang.gan@intel.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069E920DD5
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 10:30:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 77472C433C9;
+	Thu,  4 Jan 2024 10:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704364226;
+	bh=Ubrxvdscr6NSU+tZOzdhbGK2e99/tQqxaGKzSUHKQK0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=g1fihzQ2s1eIX0BUyoWJiHpTiVEhYuIQ6/qg+8/AJkctbKoQSo+wGLWi/JUqiB5UI
+	 blswNVYy/KpPn6k1s1X+wKSBvjUUhc2PWDMvdjsISJHVk4fAGu1GqPLElfmO3A4Uql
+	 44Ct+1NWj0BNH3bK8Fw4VHcGyO2qmBKSG0q0kAHgCEA2FCQYdGlKC/Hd70QVIZRoYh
+	 F7grzRxuf/l3llNEeqeftCUOBVgI0DPrUjsrGL1SMcdqVVOG+KRuh2VArvXUobYiDv
+	 lSlkjMDVQCJX255whSC/ohTmWiH75/nmmUJxt/vr9z8o3TNZhtOy/ZUAyf/3qHwymz
+	 U6tgjiA6FD8uQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5AC4CC3959F;
+	Thu,  4 Jan 2024 10:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,46 +43,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] sctp: fix busy polling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170436422536.28338.15558044259425144269.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jan 2024 10:30:25 +0000
+References: <20231219170017.73902-1-edumazet@google.com>
+In-Reply-To: <20231219170017.73902-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, jmoroni@google.com,
+ marcelo.leitner@gmail.com, lucien.xin@gmail.com
 
-In delete_module(), if mod->init callback is defined but mod->exit callback
-is not defined, it will assume the module cannot be removed and return
-EBUSY. The module_exit() is missing from current phylink module drive
-causing failure while unloading it.
+Hello:
 
-This patch introduces phylink_exit() for phylink module removal.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Fixes: eca68a3c7d05 ("net: phylink: pass supported host PHY interface modes to phylib for SFP's PHYs")
-Cc: <stable@vger.kernel.org> # 6.1+
-Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Signed-off-by: Gan, Yi Fang <yi.fang.gan@intel.com>
----
-v1 -> v2:
-Introduce a macro function to reduce the boilerplate
+On Tue, 19 Dec 2023 17:00:17 +0000 you wrote:
+> Busy polling while holding the socket lock makes litle sense,
+> because incoming packets wont reach our receive queue.
+> 
+> Fixes: 8465a5fcd1ce ("sctp: add support for busy polling to sctp protocol")
+> Reported-by: Jacob Moroni <jmoroni@google.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+> Cc: Xin Long <lucien.xin@gmail.com>
+> 
+> [...]
 
-v2 -> v3:
-Remove the macro function as it is rejected and fix the
-format issue suggested from v1
+Here is the summary with links:
+  - [net-next] sctp: fix busy polling
+    https://git.kernel.org/netdev/net-next/c/a562c0a2d651
 
- drivers/net/phy/phylink.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 25c19496a336..4a05cda74d42 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -3726,5 +3726,11 @@ static int __init phylink_init(void)
- 
- module_init(phylink_init);
- 
-+static void __exit phylink_exit(void)
-+{
-+}
-+
-+module_exit(phylink_exit);
-+
- MODULE_LICENSE("GPL v2");
- MODULE_DESCRIPTION("phylink models the MAC to optional PHY connection");
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
