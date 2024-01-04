@@ -1,55 +1,64 @@
-Return-Path: <netdev+bounces-61528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F064582431E
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:52:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F6E82431D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:52:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DFE1282A92
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:52:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684A71F25251
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB4A2233C;
-	Thu,  4 Jan 2024 13:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8B9224FA;
+	Thu,  4 Jan 2024 13:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="vPkrYsx+"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Yuc/5jBY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D042224D1;
-	Thu,  4 Jan 2024 13:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 404AXOvq022627;
-	Thu, 4 Jan 2024 14:51:11 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=au43nqK7nHZ8BJAhVEW3trO9826zxXlgdNutC4+DT1Y=; b=vP
-	krYsx+7jfA0/FQ9Acpp/VHNZUmXIRAhIVuHq3tDml8QxhOrG8l9OIBMYLgB2PJdE
-	4fzmztnfFVG17nwDJD0vmW7tm+LiegstY1zbKLffvs/v3b1gI952+7KM7fk2+JIa
-	MMp/PbftaUayc1uYuVwFxWlXGbTV9xvUFyluEmzLy5l13FOG2o6UAlqi9ynqneOv
-	J0UbYJtSrLp6GHBuQHCPcYsHq21/TGiGIVEfzIuav9t/cS/pnw83ngikvj2J/smZ
-	6yJA2NkH5UKLQuAMcRzR0DFAvQ4Wp0U2h5kTKfpQEoOBatPAP2T6xY32fmEo945+
-	vQvZDBNcgAuLCO829vDQ==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3vdjtu2nrr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Jan 2024 14:51:11 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 1E4DB10002A;
-	Thu,  4 Jan 2024 14:51:10 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 0D61322FA44;
-	Thu,  4 Jan 2024 14:51:10 +0100 (CET)
-Received: from [10.252.5.254] (10.252.5.254) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 4 Jan
- 2024 14:51:08 +0100
-Message-ID: <29b3092f-4d4d-4b6d-9667-aa04eddd2956@foss.st.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CBE224E3
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 13:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3374d309eebso383201f8f.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 05:51:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1704376270; x=1704981070; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Hu9wd786rx12aT/oHaTbS5ETRw/tZeb3iQfhejwi4Q=;
+        b=Yuc/5jBYzSJiT8os/wiHV/ghhAyV8w+Dpj6vXefQahYnuvRF0AvIKHs6dT8NbkbSDq
+         Mkv8DewF/z2Yvbzvh/YUPa0Lawsc91Hzlo1AZoORBXDgjHntB/b9M2XrRHwgj2SAH54K
+         Kf0zJJnLvMwxArvvLJQZPyK3xpfUoM90S+mfcnwFQhpsaK6FruXOCHAN+9+nmqdyNK+i
+         ONq9heGnJGmA0LjLF2SioFWu7fyq9hR9IF5n7INhJw0aC2vj7EZPCqPXagC0k47OvvXN
+         rflawQ2SYHogsUE9jauascINFx0ZGA8K2l+ThgkOLDHyMBMHnUrECv/lOUn6UykV5FJ2
+         oX4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704376270; x=1704981070;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Hu9wd786rx12aT/oHaTbS5ETRw/tZeb3iQfhejwi4Q=;
+        b=tth9iJ0S10QZtFuak+PkzShrb510h4+UyQPRjkXFt4ALTkmrlQFVzw8ICfXF0MtbQT
+         NvFKuMLbJxisV3sYZWWTv9yc5h3Gh00FzA1iOMKrMx356sPAp9078YpHA/1maEyxFs7N
+         1gc1ka9yGb2O9HQt3hJo92xQcY8Mj4d98Wj9axEyhWNzAdLJ6Zo1R4TTKybBU9qw/y7c
+         Cdd4cXY4YCNwI7YC/WEupCw/QKCqzYoy+Xkyu9K+6V5DXkrUcD/N8RClFkE/k+CIMmTD
+         NSMYXuNB43c5kjd5pHTh8NnPdruQbzprYI5F9HSNXvfFrsbDgxFlsvqXmkCEnXe22tK1
+         kPiw==
+X-Gm-Message-State: AOJu0YzC3P+69yEKGIq7cE73tVaZRyDFggPuBbO1G2T+oxFeDU0qIvj1
+	8J5XIyWYfAgsBepg2v3E5mguNkE4sRVMXA==
+X-Google-Smtp-Source: AGHT+IE7e958b8FjvDSmG6a5JCgdMoo2Ay28rzJusdTZlXygfYyLernAqcK/0brIr8hiq8vW8bD9Cg==
+X-Received: by 2002:adf:e282:0:b0:337:9e8:f578 with SMTP id v2-20020adfe282000000b0033709e8f578mr342464wri.37.1704376269884;
+        Thu, 04 Jan 2024 05:51:09 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:1b61:be9c:86ee:5963? ([2a01:e0a:b41:c160:1b61:be9c:86ee:5963])
+        by smtp.gmail.com with ESMTPSA id e17-20020a5d5311000000b0033672cfca96sm32882289wrv.89.2024.01.04.05.51.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jan 2024 05:51:09 -0800 (PST)
+Message-ID: <4e1d5b11-6fec-4ee2-a091-479e480476be@6wind.com>
 Date: Thu, 4 Jan 2024 14:51:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -58,110 +67,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] drm/stm: dsi: expose DSI PHY internal clock
-To: Simon Horman <horms@kernel.org>
-CC: Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Yannick Fertre <yannick.fertre@foss.st.com>,
-        Philippe Cornu <philippe.cornu@foss.st.com>,
-        Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-        Richard Cochran <richardcochran@gmail.com>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>
-References: <20231204101113.276368-1-raphael.gallais-pou@foss.st.com>
- <20231204101113.276368-4-raphael.gallais-pou@foss.st.com>
- <20231208165855.GA8459@kernel.org>
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net v2 2/2] selftests: rtnetlink: check enslaving iface in
+ a bond
 Content-Language: en-US
-From: Raphael Gallais-Pou <raphael.gallais-pou@foss.st.com>
-In-Reply-To: <20231208165855.GA8459@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S . Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+References: <20240103094846.2397083-1-nicolas.dichtel@6wind.com>
+ <20240103094846.2397083-3-nicolas.dichtel@6wind.com>
+ <ZZVaVloICZPf8jiK@Laptop-X1> <0aa87eb2-b50d-4ae8-81ce-af7a52813e6a@6wind.com>
+ <20240103132120.2cace255@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <20240103132120.2cace255@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-04_07,2024-01-03_01,2023-05-22_02
+
+Le 03/01/2024 à 22:21, Jakub Kicinski a écrit :
+> On Wed, 3 Jan 2024 15:15:33 +0100 Nicolas Dichtel wrote:
+>>> The net-next added new function setup_ns in lib.sh and converted all hard code
+>>> netns setup. I think It may be good to post this patch set to net-next
+>>> to reduce future merge conflicts.  
+>>
+>> The first patch is for net. I can post the second one to net-next if it eases
+>> the merge.
+>>
+>>> Jakub, Paolo, please correct me if we can't post fixes to net-next.  
+>>
+>> Please, let me know if I should target net-next for the second patch.
+> 
+> Looks like the patch applies to net-next, so hopefully there won't 
+> be any actual conflicts. But it'd be good to follow up and refactor
+> it in net-next once net gets merged in. As long as I'm not missing
+> anything - up to you - I'm fine with either sending the test to
+> net-next like Hangbin suggests, or following up in net-next to use
+> setup_ns.
+I will send a follow-up once net gets merged in net-next.
 
 
-On 12/8/23 17:58, Simon Horman wrote:
-> On Mon, Dec 04, 2023 at 11:11:12AM +0100, Raphael Gallais-Pou wrote:
->
-> ...
->
->> @@ -514,18 +675,40 @@ static int dw_mipi_dsi_stm_probe(struct platform_device *pdev)
->>  		dsi->lane_max_kbps *= 2;
->>  	}
->>  
->> -	dw_mipi_dsi_stm_plat_data.base = dsi->base;
->> -	dw_mipi_dsi_stm_plat_data.priv_data = dsi;
->> +	dsi->pdata = *pdata;
->> +	dsi->pdata.base = dsi->base;
->> +	dsi->pdata.priv_data = dsi;
->> +
->> +	dsi->pdata.max_data_lanes = 2;
->> +	dsi->pdata.phy_ops = &dw_mipi_dsi_stm_phy_ops;
->>  
->>  	platform_set_drvdata(pdev, dsi);
->>  
->> -	dsi->dsi = dw_mipi_dsi_probe(pdev, &dw_mipi_dsi_stm_plat_data);
->> +	dsi->dsi = dw_mipi_dsi_probe(pdev, &dsi->pdata);
->>  	if (IS_ERR(dsi->dsi)) {
->>  		ret = PTR_ERR(dsi->dsi);
->>  		dev_err_probe(dev, ret, "Failed to initialize mipi dsi host\n");
->>  		goto err_dsi_probe;
->>  	}
->>  
->> +	/*
->> +	 * We need to wait for the generic bridge to probe before enabling and
->> +	 * register the internal pixel clock.
->> +	 */
->> +	ret = clk_prepare_enable(dsi->pclk);
->> +	if (ret) {
->> +		DRM_ERROR("%s: Failed to enable peripheral clk\n", __func__);
->> +		goto err_dsi_probe;
->> +	}
->> +
->> +	ret = dw_mipi_dsi_clk_register(dsi, dev);
->> +	if (ret) {
->> +		DRM_ERROR("Failed to register DSI pixel clock: %d\n", ret);
-> Hi Raphael,
-
-Hi Simon,
-
-You are right,  dsi->clk needs to be disabled in case the clock register fails
-before exiting the probe.
-
-I've sent a v3, which normally fixes it.
-
-
-Regards,
-
-Raphaël
-
->
-> Does clk_disable_unprepare(dsi->pclk) need to be added to this unwind
-> chain?
->
-> Flagged by Smatch.
->
->> +		goto err_dsi_probe;
->> +	}
->> +
->> +	clk_disable_unprepare(dsi->pclk);
->> +
->>  	return 0;
->>  
->>  err_dsi_probe:
-> ...
+Thank you,
+Nicolas
 
