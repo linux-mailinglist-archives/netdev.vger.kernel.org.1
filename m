@@ -1,170 +1,85 @@
-Return-Path: <netdev+bounces-61703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39459824AC3
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:16:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D557C824ACD
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 23:20:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B63B284334
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:16:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6B4E1C21105
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9382C6B6;
-	Thu,  4 Jan 2024 22:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280E42C86E;
+	Thu,  4 Jan 2024 22:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OKRFvuxe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XA8pmP3M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76C62C851
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 22:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a28da6285c1so5953466b.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 14:16:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704406567; x=1705011367; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YmEwJraJ4e4jT15EacqQbPjlb9M9wODOsTgFHucU8Ww=;
-        b=OKRFvuxev/B8KH1SB0zFaMgZfxNpZdN83YqCV2JkSxdjxUbmr8443yl7d7lRNFvjSc
-         j0GrX/9tA7q74I/Ht5Ad/W8r/TXXxFYhdZ9FL0AVMTqs+owieKHrE2eG8YtU3DTzsjnA
-         wnfz+A/TMO5VCICM3HOH+iABixwj7hJxSRhSiodVAjqaqpZbdUOrAx/p6oLasfgTGKnt
-         cj7xb0nSmvrQ5624XeJLWBZ1wkLXXPPKXPMkvjYzxdmQ/l2PB6IBNYsyy0595+Y49h7R
-         iQXGMy5UAlWaztYy3svd4r3TLGGFkORiN6JZBL1X7mwVwWJjil1dJkPoPEjRKAMgMGdV
-         glCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704406567; x=1705011367;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YmEwJraJ4e4jT15EacqQbPjlb9M9wODOsTgFHucU8Ww=;
-        b=NokjIPActc1MvbsFRPUJkY5Z73plMI2Fvku/xv2S7eL7bjSbDJjVkiTCpZfo0ohD9W
-         nMDqk1FPtzepqo1raDgyFHr68mKupzmQ2JyRV3tyZAIjt9ncApZNVsJ5m94ELz9b+88T
-         ERwc2bhzBDj9Fi8Evd1l3Zkp4lqfUkPxfag8dCPDvtwvXyEBFuWh/zgon/00iJAf8g5+
-         AqYFRsHfQWy+Do8xP0L4ZW3SP8iEldqGOlfVxg8V5m7o03E8AW/llbAU8fqZc4W+3WWn
-         ERUdaz8kz1pBgheWcnpTs2fOlXQUU7icxmleN1zekyEeZEC95YsdUrP3UIoBFEHI9BpM
-         etvw==
-X-Gm-Message-State: AOJu0YzveB2okrS2V5M90N7IYOritHFTUqVkV1oCUlARn1NKPywh5Nnj
-	e7d+IUicBA9KX6KziSx2tFANRnEG+fUeslQPzJWe3wI4wzmC
-X-Google-Smtp-Source: AGHT+IFfrgRIWtZ9HrhyGAn143escpZpbafix8BFd16G8Qgpz+Ecbc714kdUSCPtt9+phrmGkm20SOlyqPkHmz1c25U=
-X-Received: by 2002:a17:906:d154:b0:a28:6621:5801 with SMTP id
- br20-20020a170906d15400b00a2866215801mr1226462ejb.19.1704406566797; Thu, 04
- Jan 2024 14:16:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073D32C860;
+	Thu,  4 Jan 2024 22:20:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 72BC7C433C7;
+	Thu,  4 Jan 2024 22:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704406826;
+	bh=MvmGZmrozcWMemmPoI+jhOSNBcJqFQjtCWqa4HzCbIQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XA8pmP3MF96yGkA92skcj+K/MM8N1ih/oM3Wg1HjTMOwR7lrrK7sM4QUegYvImeSS
+	 txG4Aq+N1Khq1iQ6RxiJqlLHDXY3rpzdiDo94YGs19GBOivGVp40T7OAfmT8x9Id8N
+	 1OD6cEo5a8RI7oVYt04yhRksNL1XgHCNE7BWeL78RFa/bkvTDMLao6PAujM6oGamfH
+	 7h50O06PDIfjJ6flUgf5wn5QwEwoO4q63m92KgchCdJjRqfEL9r7dovoe7BLlr5GuU
+	 Z8RuY8mVeKYTimZBEa9MNKf0V58VPwCKZdwFgg4yxRMYxOjbcU2Y6YoUVmXJi/mD4q
+	 BPtqsOCaPI7uA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 585F6C43168;
+	Thu,  4 Jan 2024 22:20:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231220214505.2303297-1-almasrymina@google.com>
- <20231220214505.2303297-3-almasrymina@google.com> <20231221232343.qogdsoavt7z45dfc@google.com>
- <CAHS8izOp_m9SyPjNth-iYBXH2qQQpc9PuZaHbpUL=H0W=CVHgQ@mail.gmail.com> <20240104134424.399fee0a@kernel.org>
-In-Reply-To: <20240104134424.399fee0a@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 4 Jan 2024 14:15:52 -0800
-Message-ID: <CAHS8izPMCNxnk7wnq6-T8e4GHmkgQbZTSEowU5Vw5fB+8y7amg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/3] net: introduce abstraction for network memory
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Shakeel Butt <shakeelb@google.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: hci_sync: Check the correct flag before starting a
+ scan
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170440682635.8457.5875385181619423548.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jan 2024 22:20:26 +0000
+References: <20240102180810.54515-1-verdre@v0yd.nl>
+In-Reply-To: <20240102180810.54515-1-verdre@v0yd.nl>
+To: =?utf-8?q?Jonas_Dre=C3=9Fler_=3Cverdre=40v0yd=2Enl=3E?=@codeaurora.org
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
 
-On Thu, Jan 4, 2024 at 1:44=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Thu, 21 Dec 2023 15:44:22 -0800 Mina Almasry wrote:
-> > The warning is like so:
-> >
-> > ./include/net/page_pool/helpers.h: In function =E2=80=98page_pool_alloc=
-=E2=80=99:
-> > ./include/linux/stddef.h:8:14: warning: returning =E2=80=98void *=E2=80=
-=99 from a
-> > function with return type =E2=80=98netmem_ref=E2=80=99 {aka =E2=80=98lo=
-ng unsigned int=E2=80=99} makes
-> > integer from pointer without a cast [-Wint-conversion]
-> >     8 | #define NULL ((void *)0)
-> >       |              ^
-> > ./include/net/page_pool/helpers.h:132:24: note: in expansion of macro
-> > =E2=80=98NULL=E2=80=99
-> >   132 |                 return NULL;
-> >       |                        ^~~~
-> >
-> > And happens in all the code where:
-> >
-> > netmem_ref func()
-> > {
-> >     return NULL;
-> > }
-> >
-> > It's fixable by changing the return to `return (netmem_ref NULL);` or
-> > `return 0;`, but I feel like netmem_ref should be some type which
-> > allows a cast from NULL implicitly.
->
-> Why do you think we should be able to cast NULL implicitly?
-> netmem_ref is a handle, it could possibly be some form of
-> an ID in the future, rather than a pointer. Or have more low
-> bits stolen for specific use cases.
->
-> unsigned long, and returning 0 as "no handle" makes perfect sense to me.
->
-> Note that 0 is a special case, bitwise types are allowed to convert
-> to 0/bool and 0 is implicitly allowed to become a bitwise type.
-> This will pass without a warning:
->
-> typedef unsigned long __bitwise netmem_ref;
->
-> netmem_ref some_code(netmem_ref ref)
-> {
->         // direct test is fine
->         if (!ref)
->                 // 0 "upgrades" without casts
->                 return 0;
->         // 1 does not, we need __force
->         return (__force netmem_ref)1 | ref;
-> }
->
-> The __bitwise annotation will make catching people trying
-> to cast to struct page * trivial.
->
-> You seem to be trying hard to make struct netmem a thing.
-> Perhaps you have a reason I'm not getting?
+Hello:
 
-There are a number of functions that return struct page* today that I
-convert to return struct netmem* later in the child devmem series, one
-example is something like:
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-struct page *page_pool_alloc(...); // returns NULL on failure.
+On Tue,  2 Jan 2024 19:08:08 +0100 you wrote:
+> There's a very confusing mistake in the code starting a HCI inquiry: We're
+> calling hci_dev_test_flag() to test for HCI_INQUIRY, but hci_dev_test_flag()
+> checks hdev->dev_flags instead of hdev->flags. HCI_INQUIRY is a bit that's
+> set on hdev->flags, not on hdev->dev_flags though.
+> 
+> HCI_INQUIRY equals the integer 7, and in hdev->dev_flags, 7 means
+> HCI_BONDABLE, so we were actually checking for HCI_BONDABLE here.
+> 
+> [...]
 
-becomes:
+Here is the summary with links:
+  - Bluetooth: hci_sync: Check the correct flag before starting a scan
+    https://git.kernel.org/bluetooth/bluetooth-next/c/626cef40faf0
 
-struct netmem *page_pool_alloc(...); // also returns NULL on failure.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-rather than,
 
-netmem_ref page_pool_alloc(...); // returns 0 on failure.
-
-I guess in my mind having NULL be castable to the new type makes it so
-that I can avoid the additional code churn of converting a bunch of
-`return NULL;` to `return 0;`, and maybe the transition from page
-pointers to netmem pointers can be more easily done if they're both
-compatible pointer types.
-
-But that is not any huge blocker or critical point in my mind, I just
-thought this approach is preferred. If conversion to unsigned long
-makes more sense to you, I'll respin this like that and do the `NULL
--> 0` conversion everywhere as needed.
-
---=20
-Thanks,
-Mina
 
