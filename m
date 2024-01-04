@@ -1,136 +1,112 @@
-Return-Path: <netdev+bounces-61493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34148824061
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 12:15:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D298B82406A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 12:17:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9E4A1F26539
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:15:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44CEF286465
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 11:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6378E21109;
-	Thu,  4 Jan 2024 11:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BuKRQccN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33B7210F3;
+	Thu,  4 Jan 2024 11:17:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020D9210F3
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 11:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704366908; x=1735902908;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=01oIGEc6Ohy6Rpabg8fxapMCJ78or9cM1DwlMsM2U/g=;
-  b=BuKRQccNk7etufrmfkdjFLUVbE7EYUzo4obRSmptJ17xdUu+Y1qmvecc
-   wDfB6RJ21a9AlD+/xTaVIdjoc5j14rqBinkgHpPLOd3FSqNgOg6++xaTc
-   PSQYc/85AbRUW6NFMlBtRB7yD61nSK+9tTi3Rk5f2vkPlL9ZzOP8D1JXI
-   wz2tLcejp7OLQRz6nThvBuXrsYSl0y2LuUFCnM8TLje/5TmP6MkT4fTWP
-   q9izbhvUhEX6zN2ddQtiktVzyufFUbT0jN5xr+7fRlhyKrerQOczNDV1c
-   XMucM3NxnzmePt9n+L3oXBPXc7othkMvoPiOZVvWY0s6jrOVBqgu7vWDm
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="382174463"
-X-IronPort-AV: E=Sophos;i="6.04,330,1695711600"; 
-   d="scan'208";a="382174463"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2024 03:15:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10942"; a="1027391611"
-X-IronPort-AV: E=Sophos;i="6.04,330,1695711600"; 
-   d="scan'208";a="1027391611"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by fmsmga006.fm.intel.com with ESMTP; 04 Jan 2024 03:15:06 -0800
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: netdev@vger.kernel.org
-Cc: vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	michal.michalik@intel.com,
-	milena.olech@intel.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jan Glaza <jan.glaza@intel.com>
-Subject: [PATCH net v2 4/4] dpll: hide "zombie" pins for userspace
-Date: Thu,  4 Jan 2024 12:11:32 +0100
-Message-Id: <20240104111132.42730-5-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240104111132.42730-1-arkadiusz.kubalewski@intel.com>
-References: <20240104111132.42730-1-arkadiusz.kubalewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BFC210F0;
+	Thu,  4 Jan 2024 11:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4T5PCs4GwMz1Q7XD;
+	Thu,  4 Jan 2024 19:16:09 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id A09711A0190;
+	Thu,  4 Jan 2024 19:17:36 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Jan 2024 19:17:35 +0800
+Message-ID: <7f561916-a7ad-4189-b3a7-dfe43f9daeaa@huawei.com>
+Date: Thu, 4 Jan 2024 19:17:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <lanhao@huawei.com>, <wangpeiyang1@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V4 net-next 0/4] There are some features for the HNS3
+ ethernet driver
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>
+References: <20231219013513.2589845-1-shaojijie@huawei.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20231219013513.2589845-1-shaojijie@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-If parent pin was unregistered but child pin was not, the userspace
-would see the "zombie" pins - the ones that were registered with
-parent pin (pins_pin_on_pin_register(..)).
-Technically those are not available - as there is no dpll device in the
-system. Do not dump those pins and prevent userspace from any
-interaction with them.
 
-Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
-Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
-Reviewed-by: Jan Glaza <jan.glaza@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
- drivers/dpll/dpll_netlink.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+on 2023/12/19 9:35, Jijie Shao wrote:
+> There are some features for the HNS3 ethernet driver
+>
+> ---
+> changeLog:
+> v3 -> v4:
+>    - Adjuste the patches sequence in this patch set, suggested by Simon Horman
+>    v3: https://lore.kernel.org/all/20231216070018.222798-1-shaojijie@huawei.com/
+> v2 -> v3:
+>    - Fix the incorrect use of byte order in patch
+>      "net: hns3: add command queue trace for hns3" suggested by Simon Horman
+>    - Add a new patch to move constants from hclge_debugfs.h
+>      to hclge_debugfs.c suggested by Simon Horman
+>    v2: https://lore.kernel.org/all/20231214141135.613485-1-shaojijie@huawei.com/
+> v1 -> v2:
+>    - Delete a patch for ethtool -S to dump page pool statistics, suggested by Jakub Kicinski
+>    - Delete two patches about CMIS transceiver modules because
+>      ethtool get_module_eeprom_by_page op is not implemented, suggested by Jakub Kicinski
+>    v1: https://lore.kernel.org/all/20231211020816.69434-1-shaojijie@huawei.com/
+> ---
+>
+> Hao Lan (1):
+>    net: hns3: add command queue trace for hns3
+>
+> Jijie Shao (2):
+>    net: hns3: move constants from hclge_debugfs.h to hclge_debugfs.c
+>    net: hns3: support dump pfc frame statistics in tx timeout log
+>
+> Peiyang Wang (1):
+>    net: hns3: dump more reg info based on ras mod
+>
+>   drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   6 +
+>   .../hns3/hns3_common/hclge_comm_cmd.c         |  19 +
+>   .../hns3/hns3_common/hclge_comm_cmd.h         |  16 +-
+>   .../net/ethernet/hisilicon/hns3/hns3_enet.c   |   6 +-
+>   .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 646 +++++++++++++++++-
+>   .../hisilicon/hns3/hns3pf/hclge_debugfs.h     | 643 +----------------
+>   .../hisilicon/hns3/hns3pf/hclge_err.c         | 434 +++++++++++-
+>   .../hisilicon/hns3/hns3pf/hclge_err.h         |  36 +
+>   .../hisilicon/hns3/hns3pf/hclge_main.c        |  47 ++
+>   .../hisilicon/hns3/hns3pf/hclge_trace.h       |  94 +++
+>   .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  40 ++
+>   .../hisilicon/hns3/hns3vf/hclgevf_trace.h     |  50 ++
+>   12 files changed, 1386 insertions(+), 651 deletions(-)
 
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index f266db8da2f0..495dfc43c0be 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -949,6 +949,19 @@ dpll_pin_parent_pin_set(struct dpll_pin *pin, struct nlattr *parent_nest,
- 	return 0;
- }
- 
-+static bool dpll_pin_parents_registered(struct dpll_pin *pin)
-+{
-+	struct dpll_pin_ref *par_ref;
-+	struct dpll_pin *p;
-+	unsigned long i, j;
-+
-+	xa_for_each(&pin->parent_refs, i, par_ref)
-+		xa_for_each_marked(&dpll_pin_xa, j, p, DPLL_REGISTERED)
-+			if (par_ref->pin == p)
-+				return true;
-+	return false;
-+}
-+
- static int
- dpll_pin_set_from_nlattr(struct dpll_pin *pin, struct genl_info *info)
- {
-@@ -1153,6 +1166,9 @@ int dpll_nl_pin_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 
- 	xa_for_each_marked_start(&dpll_pin_xa, i, pin, DPLL_REGISTERED,
- 				 ctx->idx) {
-+		if (!xa_empty(&pin->parent_refs) &&
-+		    !dpll_pin_parents_registered(pin))
-+			continue;
- 		hdr = genlmsg_put(skb, NETLINK_CB(cb->skb).portid,
- 				  cb->nlh->nlmsg_seq,
- 				  &dpll_nl_family, NLM_F_MULTI,
-@@ -1179,6 +1195,10 @@ int dpll_nl_pin_set_doit(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct dpll_pin *pin = info->user_ptr[0];
- 
-+	if (!xa_empty(&pin->parent_refs) &&
-+	    !dpll_pin_parents_registered(pin))
-+		return -ENODEV;
-+
- 	return dpll_pin_set_from_nlattr(pin, info);
- }
- 
--- 
-2.38.1
+Hi,
+
+Excuse me, This series has not been applied for a long time.
+
+Is there any problem with this series?
+  
+   Jijie
 
 
