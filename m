@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-61620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA5C3824686
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:43:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5E0824684
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 17:43:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C4371C24080
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:43:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 922C2B22B8F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 16:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F30225553;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C0824B5E;
 	Thu,  4 Jan 2024 16:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="HM/HuIjZ"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="WzOsoafM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f98.google.com (mail-lf1-f98.google.com [209.85.167.98])
+Received: from mail-wm1-f97.google.com (mail-wm1-f97.google.com [209.85.128.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1807250F7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E2F250EA
 	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 16:43:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lf1-f98.google.com with SMTP id 2adb3069b0e04-50e9e5c97e1so814498e87.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 08:43:05 -0800 (PST)
+Received: by mail-wm1-f97.google.com with SMTP id 5b1f17b1804b1-40d8e7a50c1so7371105e9.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 08:43:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1704386584; x=1704991384; darn=vger.kernel.org;
+        d=6wind.com; s=google; t=1704386583; x=1704991383; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MJSHKaFi6Wuik3SbRA8uZxLDJSaz0g6Q6tKnT5H2s7E=;
-        b=HM/HuIjZASxqHyW6Yg3Ur6xd+PgwpfFsaL7kg44eh8UP6XaE8mU7FIaZ7b+w7Q5tXq
-         WqAXGrfbfiRIFNdEbdo08Oaj50yi9f77jHupAKZ8hcWhvH1fCMA3nrhE4HmLszuzQ0QI
-         KM5l3jDU6Ov92QOv8dpHAPQ+SPC43+yrDBZuYsy8Vwf44XDsYziaFeavXU+PNYAozdQJ
-         pl1IllAwS+8Ugg0KYF6WbEZSOvvp+AW84Nc7kxfO/Cd2ex80CO7qrU7Cb1AIWKNbst+M
-         t1QB8Bf3x88ssfUOKwZYB6sPEONfIZIZnT0AF6aysMDr9KQhx5ylcSKFUy4JQ0GhlUwF
-         VHrg==
+        bh=Zy0yP1yJafP+MELjBEJ8WOyn3ovEgyUJvxintBHAgQA=;
+        b=WzOsoafMlPAxYFPtGoVRTIJRb+UCcD14bpdxL1AIKOvo5/wAQ2vkqrUyzpHyHM8qWY
+         yuUfAyY0sjAkAkGN4xHHyFQCDl4OVTDwSd+fcViM/ZxY4nvsUBCfy8qbdeYlu6b0lZ7u
+         u8To60dMsQJHov/VM3NWCd2zYL5Oo/cGTMUUwUGukY5ypkRkGVcbOtBNifYjfmSCcwnf
+         Y+SKcfkDrKvjABLerGcXzXeNOCGkM0zOsG4BmOUGnLApdSEn7aL6Q8FAOETrKBQfs/s8
+         4GGIei0kE+W7dwmVi7vmGi+6K2ZvA8opZoRDBx9CnIchd8rddZ8FeYQ9csWw/kMWM+eK
+         0/9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704386584; x=1704991384;
+        d=1e100.net; s=20230601; t=1704386583; x=1704991383;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MJSHKaFi6Wuik3SbRA8uZxLDJSaz0g6Q6tKnT5H2s7E=;
-        b=Lxg1hLgn24caFbFIqJCZrLjfra2/enZdh9iEZHwlUYTwDxCRzqcKThEKqI2WhYND7X
-         CSdBNBtt1s436R0a9A/a36Yaf+vOjGhoiMYjcnhVJBl/dRSij+9vKe8gn21yyV3/FsKr
-         bbYtJMf6XJhhtj0FstdDfcbT7sSjt3FQFc2mihcWFkkjmySVpTbPHOrOrp1rkpF/6bAf
-         5w8YwVMwsyOD1kUTkQxszI1ZeR2UstQP9aGfov00Z/kuax5jnkQCE05oE3bHGBMdDaJe
-         WQxB/xABt7mRoZ855fpjNDhwtVNkYO0chtAogAhAUwL/b2fAWAaWSVruq/royZNqRM13
-         +VwA==
-X-Gm-Message-State: AOJu0Yw6NsJrcpICLmUzq7/y/YQ2GyR6JOHtECci4sYTEuXw13/wM1sU
-	lNl020yiEq3xypY2Lu0MRYyiv36jnP5X9Ipd8tQfTjOdeCIb5yF7Wmr+Tw==
-X-Google-Smtp-Source: AGHT+IE3vzXX3LTLF4r66FdYhGqZZMGnrFFvC96R6K2fIR/U8LfG5ZawI83QJe8t4qb3k0WDFxoQofE3xrsJ
-X-Received: by 2002:a05:6512:e9f:b0:50e:85be:e03b with SMTP id bi31-20020a0565120e9f00b0050e85bee03bmr490417lfb.115.1704386583677;
+        bh=Zy0yP1yJafP+MELjBEJ8WOyn3ovEgyUJvxintBHAgQA=;
+        b=Ne7BQEo6YQ+FzI0cQSSBb/k39zCeM03hEymuFh9VB0rQRS+Bu14tS8vYw3U19oXJtm
+         g6HpmiSFsdBueOQq1oU49/ehGzJr3gFIMhkTS98B+B5M1xZfGabuEPujKOQ5a+jydUX5
+         XnjulHzbV5UPKxAL6oXBpTA2e3OALJKvW91YTyMWrh5TtqAB9q6y+7UIbzW061Kp0FUO
+         LdA4OoONebZk2fZZQ2pMrsK04h3Z28R8J2bGiwkzbHNOPPOR+51SiEPJ2pHIGJfLhivP
+         zuMQMxrq8A2NcLjYagr6wjaqVBJXicp6NpEiuP399wQO6+JUtZDxEwJ/hlQCOfUzMIHB
+         97iw==
+X-Gm-Message-State: AOJu0YzVFB3xZgi1ph1GKRj6evz4HZjC4qitrfcuL7GK2OgMVHaX5vid
+	ox9MZzRn9PyCugOVOKXIGu/27F5+tV6S1pMWCfXYA22Kn7nh12Y0lK1tQg==
+X-Google-Smtp-Source: AGHT+IFd8gRevlolG576Ep5f1feycWhNy2qQS4Mhw5R+iCQBkyy6ykcqKJXd0zHRTXWLaOXHOWv7hJKkEDw6
+X-Received: by 2002:a05:600c:35c4:b0:40c:5822:bca7 with SMTP id r4-20020a05600c35c400b0040c5822bca7mr471938wmq.215.1704386583429;
         Thu, 04 Jan 2024 08:43:03 -0800 (PST)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id y26-20020ac2421a000000b0050e7bf6fd89sm729485lfh.66.2024.01.04.08.43.03;
+        by smtp-relay.gmail.com with ESMTP id z21-20020a05600c0a1500b0040e315d6d58sm43634wmp.38.2024.01.04.08.43.03;
         Thu, 04 Jan 2024 08:43:03 -0800 (PST)
 X-Relaying-Domain: 6wind.com
 Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 21212601EF;
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 26E44601FE;
 	Thu,  4 Jan 2024 17:43:03 +0100 (CET)
 Received: from dichtel by bretzel with local (Exim 4.94.2)
 	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1rLQoA-00GEpg-QM; Thu, 04 Jan 2024 17:43:02 +0100
+	id 1rLQoA-00GEpj-Qx; Thu, 04 Jan 2024 17:43:02 +0100
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -71,11 +71,10 @@ To: "David S . Miller" <davem@davemloft.net>,
 	Phil Sutter <phil@nwl.cc>,
 	David Ahern <dsahern@kernel.org>
 Cc: netdev@vger.kernel.org,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v3 1/2] rtnetlink: allow to set iface down before enslaving it
-Date: Thu,  4 Jan 2024 17:42:59 +0100
-Message-Id: <20240104164300.3870209-2-nicolas.dichtel@6wind.com>
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH net v3 2/2] selftests: rtnetlink: check enslaving iface in a bond
+Date: Thu,  4 Jan 2024 17:43:00 +0100
+Message-Id: <20240104164300.3870209-3-nicolas.dichtel@6wind.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240104164300.3870209-1-nicolas.dichtel@6wind.com>
 References: <20240104164300.3870209-1-nicolas.dichtel@6wind.com>
@@ -87,44 +86,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The below commit adds support for:
+The goal is to check the following two sequences:
 > ip link set dummy0 down
 > ip link set dummy0 master bond0 up
 
-but breaks the opposite:
+and
 > ip link set dummy0 up
 > ip link set dummy0 master bond0 down
 
-Let's add a workaround to have both commands working.
-
-Cc: stable@vger.kernel.org
-Fixes: a4abfa627c38 ("net: rtnetlink: Enslave device before bringing it up")
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Acked-by: Phil Sutter <phil@nwl.cc>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
- net/core/rtnetlink.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/testing/selftests/net/rtnetlink.sh | 39 ++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index e8431c6c8490..dd79693c2d91 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2905,6 +2905,14 @@ static int do_setlink(const struct sk_buff *skb,
- 		call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
- 	}
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+index 26827ea4e3e5..181c689457e1 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -28,6 +28,7 @@ ALL_TESTS="
+ 	kci_test_neigh_get
+ 	kci_test_bridge_parent_id
+ 	kci_test_address_proto
++	kci_test_enslave_bonding
+ "
  
-+	/* Backward compat: enable to set interface down before enslaving it */
-+	if (!(ifm->ifi_flags & IFF_UP) && ifm->ifi_change & IFF_UP) {
-+		err = dev_change_flags(dev, rtnl_dev_combine_flags(dev, ifm),
-+				       extack);
-+		if (err < 0)
-+			goto errout;
-+	}
+ devdummy="test-dummy0"
+@@ -1239,6 +1240,44 @@ kci_test_address_proto()
+ 	return $ret
+ }
+ 
++kci_test_enslave_bonding()
++{
++	local testns="testns"
++	local bond="bond123"
++	local dummy="dummy123"
++	local ret=0
 +
- 	if (tb[IFLA_MASTER]) {
- 		err = do_set_master(dev, nla_get_u32(tb[IFLA_MASTER]), extack);
- 		if (err)
++	run_cmd ip netns add "$testns"
++	if [ $? -ne 0 ]; then
++		end_test "SKIP bonding tests: cannot add net namespace $testns"
++		return $ksft_skip
++	fi
++
++	# test native tunnel
++	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
++	run_cmd ip -netns $testns link add dev $dummy type dummy
++	run_cmd ip -netns $testns link set dev $dummy up
++	run_cmd ip -netns $testns link set dev $dummy master $bond down
++	if [ $ret -ne 0 ]; then
++		end_test "FAIL: initially up interface added to a bond and set down"
++		ip netns del "$testns"
++		return 1
++	fi
++
++	run_cmd ip -netns $testns link del dev $dummy
++	run_cmd ip -netns $testns link add dev $dummy type dummy
++	run_cmd ip -netns $testns link set dev $dummy down
++	run_cmd ip -netns $testns link set dev $dummy master $bond up
++	if [ $ret -ne 0 ]; then
++		end_test "FAIL: enslave a down interface in a bonding and set it up"
++		ip netns del "$testns"
++		return 1
++	fi
++
++	end_test "PASS: enslave iface in a bonding"
++	ip netns del "$testns"
++}
++
+ kci_test_rtnl()
+ {
+ 	local current_test
 -- 
 2.39.2
 
