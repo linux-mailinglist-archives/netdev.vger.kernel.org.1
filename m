@@ -1,74 +1,142 @@
-Return-Path: <netdev+bounces-61422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDE7823A37
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:31:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6423823A4A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 02:39:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DEC71C241C7
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:31:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53D20287EF4
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 01:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679D1A29;
-	Thu,  4 Jan 2024 01:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0582E136A;
+	Thu,  4 Jan 2024 01:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lKy7mIca"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlsPkO3V"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086B3A47
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 01:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2109a62d-ddd9-4da2-8f3c-71ac84dcaea1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1704331864;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IkOVP2zeJYrVsdbKJ6Gh7q3FRwVkgVJ/eI7VWqugeIo=;
-	b=lKy7mIcaqgFTAA7qJQYxWn3EUs6YVQIDnMILUdJwjnRek8RG7g6UyL3z41TX4rcO9nqOzz
-	WZ0EKMcDAX7v7bWxK1QVuprINFqvwEOfWeqIY1TufNA6Qa3ei3+1QwNkZcAZpuwHrYD08s
-	xYDoLiyvo0FTDZzrOOiBKsjbyOK80z8=
-Date: Thu, 4 Jan 2024 09:30:55 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BC9A5F
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 01:39:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E5EBC433C8;
+	Thu,  4 Jan 2024 01:39:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704332369;
+	bh=2hkBI0y3z9i8ntdp7UkkjyMXku2zmzMHERBePUkgSZg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KlsPkO3V2lZUm4m4Lx7GV9jePknVlyS6BNg5OoaPCAN69plqlWeUP2csbyrxCYmBV
+	 gao1cG0/AKnodUSE8u5Ho3tIViErSZILmu0Ybs7EEoQLW+dlT9ZdQ53yuDHLQxZXac
+	 4f8ZnQXhWpduqm/Ya71WM4gSf9rWzT+nm/+bH07iavPGMymCfutIuJ4j9S+QCc8SeX
+	 duj4OE+GNDyoYA+b5o9D+8jL6VByzPQCi6ZYIc35NyNVSlM1ILgUkijrKJAjpjRKNF
+	 /+pjbx1v9nytHnnL6a4vFPrHMTN4zOnj/kVjZCPalnKe/Ih5J04wchF6VfjNww/WCE
+	 SsfwRP69VdJCA==
+Date: Wed, 3 Jan 2024 17:39:28 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v5 2/5] netdevsim: allow two netdevsim ports to
+ be connected
+Message-ID: <20240103173928.76264ebe@kernel.org>
+In-Reply-To: <20231228014633.3256862-3-dw@davidwei.uk>
+References: <20231228014633.3256862-1-dw@davidwei.uk>
+	<20231228014633.3256862-3-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: =?UTF-8?B?UmU6IFtQQVRDSCB2MiAxLzFdIHZpcnRpb19uZXQ6IEZpeCAi4oCYJWQ=?=
- =?UTF-8?Q?=E2=80=99_directive_writing_between_1_and_11_bytes_into_a_region_?=
- =?UTF-8?Q?of_size_10=22_warnings?=
-To: Jakub Kicinski <kuba@kernel.org>, Zhu Yanjun <yanjun.zhu@intel.com>
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- virtualization@lists.linux.dev, netdev@vger.kernel.org
-References: <20231227142637.2479149-1-yanjun.zhu@intel.com>
- <20240103165531.12390f0e@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20240103165531.12390f0e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed, 27 Dec 2023 17:46:30 -0800 David Wei wrote:
+> +static ssize_t nsim_dev_peer_write(struct file *file,
+> +				   const char __user *data,
+> +				   size_t count, loff_t *ppos)
+> +{
+> +	struct nsim_dev_port *nsim_dev_port, *peer_dev_port;
+> +	struct nsim_dev *peer_dev;
+> +	unsigned int id, port;
+> +	char buf[22];
+> +	ssize_t ret;
+> +
+> +	if (count >= sizeof(buf))
+> +		return -ENOSPC;
+> +
+> +	ret = copy_from_user(buf, data, count);
+> +	if (ret)
+> +		return -EFAULT;
+> +	buf[count] = '\0';
+> +
+> +	ret = sscanf(buf, "%u %u", &id, &port);
+> +	if (ret != 2) {
+> +		pr_err("Format is peer netdevsim \"id port\" (uint uint)\n");
 
-在 2024/1/4 8:55, Jakub Kicinski 写道:
-> On Wed, 27 Dec 2023 22:26:37 +0800 Zhu Yanjun wrote:
->> From: Zhu Yanjun <yanjun.zhu@linux.dev>
->>
->> Fix the warnings when building virtio_net driver.
-> This got marked as Not Applicable in patchwork, not sure why.
-> Could you repost?
+netif_err() or dev_err() ? Granted the rest of the file seems to use
+pr_err(), but I'm not sure why...
 
-Got it. I will resend this commit very soon.
+> +		return -EINVAL;
+> +	}
 
-Best Regards,
+Could you put a sleep() here and test removing the device while some
+thread is stuck here? I don't recall exactly but I thought debugfs
+remove waits for concurrent reads and writes which could be problematic
+given we take all the locks under the sun here..
 
-Zhu Yanjun
+> +	ret = -EINVAL;
+> +	mutex_lock(&nsim_dev_list_lock);
+> +	peer_dev = nsim_dev_find_by_id(id);
+> +	if (!peer_dev) {
+> +		pr_err("Peer netdevsim %u does not exist\n", id);
+> +		goto out_mutex;
+> +	}
+> +
+> +	devl_lock(priv_to_devlink(peer_dev));
+> +	rtnl_lock();
+> +	nsim_dev_port = file->private_data;
+> +	peer_dev_port = __nsim_dev_port_lookup(peer_dev, NSIM_DEV_PORT_TYPE_PF,
+> +					       port);
+> +	if (!peer_dev_port) {
+> +		pr_err("Peer netdevsim %u port %u does not exist\n", id, port);
+> +		goto out_devl;
+> +	}
+> +
+> +	if (nsim_dev_port == peer_dev_port) {
+> +		pr_err("Cannot link netdevsim to itself\n");
+> +		goto out_devl;
+> +	}
+> +
+> +	rcu_assign_pointer(nsim_dev_port->ns->peer, peer_dev_port->ns);
+> +	rcu_assign_pointer(peer_dev_port->ns->peer, nsim_dev_port->ns);
+> +	ret = count;
+> +
+> +out_devl:
 
+out_unlock_rtnl
+
+> +	rtnl_unlock();
+> +	devl_unlock(priv_to_devlink(peer_dev));
+> +out_mutex:
+
+out_unlock_dev_list
+
+> +	mutex_unlock(&nsim_dev_list_lock);
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct file_operations nsim_dev_peer_fops = {
+> +	.open = simple_open,
+> +	.read = nsim_dev_peer_read,
+> +	.write = nsim_dev_peer_write,
+> +	.llseek = generic_file_llseek,
+
+You don't support seek, you want some form of no_seek here.
+
+> +	.owner = THIS_MODULE,
+> +};
 
