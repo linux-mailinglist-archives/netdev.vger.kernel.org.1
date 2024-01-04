@@ -1,72 +1,79 @@
-Return-Path: <netdev+bounces-61685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1742824A17
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:15:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A488824A1C
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 22:17:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EA1C1C22809
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 21:15:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B4461F21DF4
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 21:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2655A2C1AD;
-	Thu,  4 Jan 2024 21:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264E82C681;
+	Thu,  4 Jan 2024 21:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ELGaajLK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8xDrUH7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A932C197;
-	Thu,  4 Jan 2024 21:15:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E857C433C7;
-	Thu,  4 Jan 2024 21:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8BB2C1AD
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 21:17:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4507C433C8;
+	Thu,  4 Jan 2024 21:17:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704402947;
-	bh=Hop6+r5XKbN1rDwgG+qbZQBmGuqmnkpWYMbhXP1QkD8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ELGaajLK3aMQKLYY3R56E1ATyJwevf7zA2+E1v0z18wjZli/mcGsG/zGczRBzsS9C
-	 4kh58FsLXsxoDPdyFFbNQQaE3r5XVnotKEKo1cKqEcazP6pBqF1fFPsChX5H85XZw+
-	 /88S1WUU3xxeQukK0XZTpvp9quZUu6lMkHTdQ7gKFna9/MubzfDljSIHhgjlqoZf8p
-	 cQSI/6j1+eok+RtctJt7KiVuo/SdpVYzI/w8BOmOi40oUHQvMJIBKpBzFnp1kB5t53
-	 2dycVmQUPRWkv/dUAtuxa0m7Q0JRxd5iICbvz8k4zEuGAlYmOyV1vqRB5MI53jpAQw
-	 +pCtMp7WEqoZg==
-Date: Thu, 4 Jan 2024 13:15:46 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, Networking
- <netdev@vger.kernel.org>, Mathis Marion <mathis.marion@silabs.com>,
- Christian Marangi <ansuelsmth@gmail.com>, Robert Marko
- <robimarko@gmail.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the net-next tree
-Message-ID: <20240104131546.0dbe74c4@kernel.org>
-In-Reply-To: <20231221130946.7ed9a805@canb.auug.org.au>
-References: <20231221130946.7ed9a805@canb.auug.org.au>
+	s=k20201202; t=1704403026;
+	bh=znGFu4XDpHsOKdZPT43E7eV9iNDDsdhfOHHSu73cgB0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=t8xDrUH7G/HFGAg2fb+iuUfBha8yicIT63b+oTBwmlxiV6h0ku7UPybAHx54biSwI
+	 v2wfRyXDkn+FwzfpswAzyd9QQcp/UR6GQqy0/+0U6zIaAiR5sk8/PYmOwITaXFTzgD
+	 FXL0yeUCr9oPGOmFH5NUVoETUPj+K2yNu5d5rGMYhJ2E643POXbAUzaHZXBGqUXMPs
+	 nZNPs2vPVMbeeYaFaRll1tR6QOsH4iZkpqHBx7+xD574763E7s4o6AYAJ9/5g0b+Mg
+	 c+hxF5Un4w4nym1gc5BS0q+aCC9I0iNoNphEFY+DmbVAXsAvxXM4OMqUoH7+eBAr8z
+	 9BnuTw+JnGHzg==
+Date: Thu, 4 Jan 2024 21:17:02 +0000
+From: Simon Horman <horms@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH net-next] r8169: fix building with CONFIG_LEDS_CLASS=m
+Message-ID: <20240104211702.GP31813@kernel.org>
+References: <d055aeb5-fe5c-4ccf-987f-5af93a17537b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d055aeb5-fe5c-4ccf-987f-5af93a17537b@gmail.com>
 
-On Thu, 21 Dec 2023 13:09:46 +1100 Stephen Rothwell wrote:
-> From: Stephen Rothwell <sfr@canb.auug.org.au>
-> Date: Thu, 21 Dec 2023 12:49:11 +1100
-> Subject: [PATCH] fix up for "net: phy: aquantia: add firmware load support"
+On Wed, Jan 03, 2024 at 04:52:04PM +0100, Heiner Kallweit wrote:
+> When r8169 is built-in but LED support is a loadable module, the new
+> code to drive the LED causes a link failure:
 > 
-> interacting with commit
+> ld: drivers/net/ethernet/realtek/r8169_leds.o: in function `rtl8168_init_leds':
+> r8169_leds.c:(.text+0x36c): undefined reference to `devm_led_classdev_register_ext'
 > 
->   56ded2dd1a43 ("lib: crc_ccitt_false() is identical to crc_itu_t()")
+> LED support is an optional feature, so fix this issue by adding a Kconfig
+> symbol R8169_LEDS that is guaranteed to be false if r8169 is built-in
+> and LED core support is a module. As a positive side effect of this change
+> r8169_leds.o no longer is built under this configuration.
 > 
-> from the mm tree.
-> 
-> Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202312281159.9TPeXbNd-lkp@intel.com/
+> Suggested-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Applied to net-next with a massaged commit msg, thanks!
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Simon Horman <horms@kernel.org> # build-tested
+
+...
 
