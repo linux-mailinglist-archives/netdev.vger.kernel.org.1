@@ -1,104 +1,254 @@
-Return-Path: <netdev+bounces-61545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF92824372
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 15:17:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 744C482421E
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 13:59:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40AFC2878DC
-	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 14:17:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE14C2878A0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jan 2024 12:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D687A225D2;
-	Thu,  4 Jan 2024 14:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3174021A1B;
+	Thu,  4 Jan 2024 12:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pmachata.org header.i=@pmachata.org header.b="KKMnI48J"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ZYLleHS0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB5D224E3
-	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 14:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pmachata.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pmachata.org
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4T5TF30cKxz9sm9;
-	Thu,  4 Jan 2024 15:17:27 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pmachata.org;
-	s=MBO0001; t=1704377847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dmg9dI56GQYCLPGXZw+eZHGH4v5EBDUVbZ8c7bwKZyM=;
-	b=KKMnI48JG8pAh4rUQ+yVpoB9vEB+JIkE1epZuwJzl3Zp738YcgBBdYFcfZzb1zwTC/t0xP
-	9CtF8oevuWK2IsMDyNbi9fitpz/CNM+Y1shPBql77ilYoxAaIQ2sHXntVXppxPvKcqw4vp
-	sRAKHoAN1zwImwt1sPs+8XHkl3WH6EDvTR6xqk8sJRZj8HqR2IKV8cMycCv0x4Ia7GYkEn
-	o/9uLAvZDThUXLz1wUgqhE86M8pWg8DqEJCgHSL7Z0S+YuGBGKIAzxcsRhv9n3H3fSGyaW
-	vDPPPn2HnZ0Y9xY2v+P6Ly0SiwqnPd6H6FCC3opvQuMAKQnxbgr4OAehK/Uc5g==
-References: <20240104011422.26736-1-stephen@networkplumber.org>
- <20240104011422.26736-3-stephen@networkplumber.org>
-From: Petr Machata <me@pmachata.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: leon@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 iproute2 2/6] rdma: use standard flag for json
-Date: Thu, 04 Jan 2024 13:07:38 +0100
-In-reply-to: <20240104011422.26736-3-stephen@networkplumber.org>
-Message-ID: <874jft6v4b.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D258224D3
+	for <netdev@vger.kernel.org>; Thu,  4 Jan 2024 12:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-50eaabc36bcso532201e87.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 04:58:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704373126; x=1704977926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fSKvcZ+Stv5TP4wzZxQYWoq+h0yXL7GY+rxeSOMByBg=;
+        b=ZYLleHS0bbQWLiYNFFdPZrwCSG0ghYVHCw1TOmB13sXn2NKvEwCQCj96rFNwM1zMAV
+         wCaobPZYBaLrhPQaJCJ9zwEirNJ0Yr+cKbYisifQxGWSrO6aRQCnu02lid/RXplNvT8v
+         jqRaFLs3U1c97OFybhecPUvX3NkZgj3EkPiEwvdg1l+BcAgMRgRwKLsopD+fTPqjLDvI
+         Fpzq/ZGa7CV67PzIrkMhmsnOkmtIGzYe2vYjwwE0oId/FSU61srp4hgGLUJbYq4lHVXC
+         JosfX3jRuqdCXMtcRsj2RjfhsDBPp3scqI8/jDuTnoWvxOD3viH3aaoR+cPp0nK7cR7x
+         uC1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704373126; x=1704977926;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fSKvcZ+Stv5TP4wzZxQYWoq+h0yXL7GY+rxeSOMByBg=;
+        b=bAtbyibMEQpwK3jHlgq7qCJxOBH3HOy2rCCeAhfwZsTEdeNUqTSi+I2z+Cyxbl6VT1
+         VTqeiYceBzFdZ3U5+tMUueqbPullS6N6cSEdL6Wfa8l09qWi+H7rA05VU90ApjFvR/yd
+         PL7F+Mvvwb9uSfcApsBkfNPdVra/uIdoypg3kfFveIKjEreHgW2dEwv5YP3dWqClaPnL
+         9VvyAhRe3vguRXn5Jo6Wj1kRKz6rR/K2brccGQ3Ny1p8bakuEAGBrpM+8Zalb8hIrQZs
+         VS0cGmz3SDQeHINCiS6LoFSwqUJbyNhSVRptu/QDyVmfqeAMCfCCE5pYBv/wc0zowrK6
+         JpIQ==
+X-Gm-Message-State: AOJu0Yy9hcqvuiLVl/6NJoEj+7tyMhbauiktJrhMmWODPnfBgFGpc0kY
+	GQRuHhfyWBWFTSvc6Q0EuumfuqM7dQbMnUEDNlm8fH3QVsyAow==
+X-Google-Smtp-Source: AGHT+IHfPjgZMzfa/JIXMW0PLqCnTGdzoK7qLK6otqLy3cnjauHc/+Izhfu95eTDOt+IfpeRRlEEZg==
+X-Received: by 2002:a05:6512:3cc:b0:50e:7b37:d17f with SMTP id w12-20020a05651203cc00b0050e7b37d17fmr322042lfp.114.1704373126310;
+        Thu, 04 Jan 2024 04:58:46 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id n7-20020a05600c500700b0040d81ca11casm5736118wmr.28.2024.01.04.04.58.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jan 2024 04:58:45 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	victor@mojatatu.com,
+	pctammela@mojatatu.com,
+	idosch@idosch.org,
+	mleitner@redhat.com,
+	vladbu@nvidia.com,
+	paulb@nvidia.com
+Subject: [patch net-next] net: sched: move block device tracking into tcf_block_get/put_ext()
+Date: Thu,  4 Jan 2024 13:58:44 +0100
+Message-ID: <20240104125844.1522062-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
+From: Jiri Pirko <jiri@nvidia.com>
 
-Stephen Hemminger <stephen@networkplumber.org> writes:
+Inserting the device to block xarray in qdisc_create() is not suitable
+place to do this. As it requires use of tcf_block() callback, it causes
+multiple issues. It is called for all qdisc types, which is incorrect.
 
-> The other iproute2 utils use variable json as flag.
+So, instead, move it to more suitable place, which is tcf_block_get_ext()
+and make sure it is only done for qdiscs that use block infrastructure
+and also only for blocks which are shared.
 
-Some do, some don't. dcb, devlink, rdma do not, the rest do.
+Symmetrically, alter the cleanup path, move the xarray entry removal
+into tcf_block_put_ext().
 
-Personally I'm not a fan of global state, and consider this patch to be
-a step back in terms of best practices. I do realize this is how it's
-done in iproute2. To the point that utils.h actually carries external
-declarations for these variables. But to me those are inevitable warts,
-not something to embrace and extend.
+Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra")
+Reported-by: Ido Schimmel <idosch@nvidia.com>
+Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
+Reported-by: Kui-Feng Lee <sinquersw@gmail.com>
+Closes: https://lore.kernel.org/all/ce8d3e55-b8bc-409c-ace9-5cf1c4f7c88e@gmail.com/
+Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google.com/
+Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google.com/
+Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google.com/
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ net/sched/cls_api.c     | 14 ++++++++++++++
+ net/sched/sch_api.c     | 41 -----------------------------------------
+ net/sched/sch_generic.c | 14 --------------
+ 3 files changed, 14 insertions(+), 55 deletions(-)
 
-Objectively... whatever. There's only one instance of the context
-structure anyway. It's just the overtones of a quick hack that irk me.
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index adf5de1ff773..253b26f2eddd 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
+ 		      struct tcf_block_ext_info *ei,
+ 		      struct netlink_ext_ack *extack)
+ {
++	struct net_device *dev = qdisc_dev(q);
+ 	struct net *net = qdisc_net(q);
+ 	struct tcf_block *block = NULL;
+ 	int err;
+@@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
+ 	if (err)
+ 		goto err_block_offload_bind;
+ 
++	if (tcf_block_shared(block)) {
++		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
++		if (err) {
++			NL_SET_ERR_MSG(extack, "block dev insert failed");
++			goto err_dev_insert;
++		}
++	}
++
+ 	*p_block = block;
+ 	return 0;
+ 
++err_dev_insert:
+ err_block_offload_bind:
+ 	tcf_chain0_head_change_cb_del(block, ei);
+ err_chain0_head_change_cb_add:
+@@ -1502,8 +1512,12 @@ EXPORT_SYMBOL(tcf_block_get);
+ void tcf_block_put_ext(struct tcf_block *block, struct Qdisc *q,
+ 		       struct tcf_block_ext_info *ei)
+ {
++	struct net_device *dev = qdisc_dev(q);
++
+ 	if (!block)
+ 		return;
++	if (tcf_block_shared(block))
++		xa_erase(&block->ports, dev->ifindex);
+ 	tcf_chain0_head_change_cb_del(block, ei);
+ 	tcf_block_owner_del(block, q, ei->binder_type);
+ 
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index 2a2a48838eb9..36b025cc4fd2 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1209,43 +1209,6 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
+ 	return 0;
+ }
+ 
+-static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
+-			       struct netlink_ext_ack *extack)
+-{
+-	const struct Qdisc_class_ops *cl_ops = sch->ops->cl_ops;
+-	struct tcf_block *block;
+-	int err;
+-
+-	block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+-	if (block) {
+-		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+-		if (err) {
+-			NL_SET_ERR_MSG(extack,
+-				       "ingress block dev insert failed");
+-			return err;
+-		}
+-	}
+-
+-	block = cl_ops->tcf_block(sch, TC_H_MIN_EGRESS, NULL);
+-	if (block) {
+-		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+-		if (err) {
+-			NL_SET_ERR_MSG(extack,
+-				       "Egress block dev insert failed");
+-			goto err_out;
+-		}
+-	}
+-
+-	return 0;
+-
+-err_out:
+-	block = cl_ops->tcf_block(sch, TC_H_MIN_INGRESS, NULL);
+-	if (block)
+-		xa_erase(&block->ports, dev->ifindex);
+-
+-	return err;
+-}
+-
+ static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr **tca,
+ 				   struct netlink_ext_ack *extack)
+ {
+@@ -1416,10 +1379,6 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+ 	qdisc_hash_add(sch, false);
+ 	trace_qdisc_create(ops, dev, parent);
+ 
+-	err = qdisc_block_add_dev(sch, dev, extack);
+-	if (err)
+-		goto err_out4;
+-
+ 	return sch;
+ 
+ err_out4:
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index e33568df97a5..9b3e9262040b 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -1052,8 +1052,6 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
+ {
+ 	const struct Qdisc_ops  *ops = qdisc->ops;
+ 	struct net_device *dev = qdisc_dev(qdisc);
+-	const struct Qdisc_class_ops *cops;
+-	struct tcf_block *block;
+ 
+ #ifdef CONFIG_NET_SCHED
+ 	qdisc_hash_del(qdisc);
+@@ -1064,18 +1062,6 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
+ 
+ 	qdisc_reset(qdisc);
+ 
+-	cops = ops->cl_ops;
+-	if (ops->ingress_block_get) {
+-		block = cops->tcf_block(qdisc, TC_H_MIN_INGRESS, NULL);
+-		if (block)
+-			xa_erase(&block->ports, dev->ifindex);
+-	}
+-
+-	if (ops->egress_block_get) {
+-		block = cops->tcf_block(qdisc, TC_H_MIN_EGRESS, NULL);
+-		if (block)
+-			xa_erase(&block->ports, dev->ifindex);
+-	}
+ 
+ 	if (ops->destroy)
+ 		ops->destroy(qdisc);
+-- 
+2.43.0
 
-Anyway, the mechanical parts of the conversion look OK. But:
-
-> diff --git a/rdma/stat.c b/rdma/stat.c
-> index 28b1ad857219..6a3f8ca44892 100644
-> --- a/rdma/stat.c
-> +++ b/rdma/stat.c
-> @@ -208,7 +208,7 @@ int res_get_hwcounters(struct rd *rd, struct nlattr *hwc_table, bool print)
->  
->  		nm = mnl_attr_get_str(hw_line[RDMA_NLDEV_ATTR_STAT_HWCOUNTER_ENTRY_NAME]);
->  		v = mnl_attr_get_u64(hw_line[RDMA_NLDEV_ATTR_STAT_HWCOUNTER_ENTRY_VALUE]);
-> -		if (rd->pretty_output && !rd->json_output)
-> +		if (rd->pretty_output)
->  			newline_indent(rd);
-
-newline_indent() issues close_json_object(). Previously it wouldn't be
-invoked in JSON mode, now it will be. Doesn't this break JSON output?
-Same question for the hunk below.
-
->  		res_print_u64(rd, nm, v, hw_line[RDMA_NLDEV_ATTR_STAT_HWCOUNTER_ENTRY_NAME]);
->  	}
-> @@ -802,7 +802,7 @@ static int do_stat_mode_parse_cb(const struct nlmsghdr *nlh, void *data,
->  			} else {
->  				print_string(PRINT_FP, NULL, ",", NULL);
->  			}
-> -			if (rd->pretty_output && !rd->json_output)
-> +			if (rd->pretty_output)
->  				newline_indent(rd);
->  
->  			print_string(PRINT_ANY, NULL, "%s", name);
 
