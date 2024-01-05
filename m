@@ -1,207 +1,90 @@
-Return-Path: <netdev+bounces-62124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB7A0825C91
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 23:35:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AFC825D13
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 00:15:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69FF22830FC
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 22:35:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43713284F44
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 23:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1556625116;
-	Fri,  5 Jan 2024 22:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41047360BD;
+	Fri,  5 Jan 2024 23:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZBUkoN0l"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ULxoohPT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6921720B03
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 22:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-555f581aed9so36042a12.3
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 14:35:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704494129; x=1705098929; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NX2kFUVRe6YMqpWxrwa1zWXwqGvGjm0JEfZHvnQt5EQ=;
-        b=ZBUkoN0lpeB15u7jWW4ylraU2JE9aFa5hmRr1LSWeHZBOOu835RAIehYC/lzeDBQd6
-         69gkQIvCZW3ZtqqeSJNhmQwCle7aOQUIVne+tUuiiEeZ2JUKgrGwaE/FYpkhZuxZc9JL
-         urPqQs4jUjl0qRrlubgEJIBerl0R0ddJP71zlp2dVt5iq39AkED0185m8nIw5Z84DdZB
-         ICwkh75WDLCFePGD4+wgYqrtqwAehBKUoc3BX/SdE+SPxC6QSqueweXIce62gsSosD7w
-         mqsPaTH7pEMq3+bl3yk1BD/UsV/L5SqDAvmgEKMYc9qjZMhWB13XpLTS1JOzb+oi6QsS
-         sEPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704494129; x=1705098929;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NX2kFUVRe6YMqpWxrwa1zWXwqGvGjm0JEfZHvnQt5EQ=;
-        b=b1vJ0L5htGUGS2MR+IIfxpVwYjkyd9Eq9HnkGExSQbQcuRuvz3tETGnk5PmB1+wqQH
-         rjyD5oZHpCkYVWnmm9FjlhlxYXDo+xdnNgkaURzJecby2f7FEmYX2V8tbTd3Q9P31RhC
-         tmwc+6YHt+A9tyOOiwp2kWRNF1XiPlP5HfoyKuvzdYP4Qx5Cxn3EKa3s6Xag28m8lRaU
-         IjenG5EBLQuE3vSohyvQ2jSSCEwZ7eCnhzJBmaHLQBaASDjDpfni3TpONCUYp+cHxkQV
-         R3ULZq9ts+SnHUo52KLdD9ZZl3B1mHssqp7X1JMk2rXSrodo/jlgN0VsUR0qZh5slA3p
-         PiUg==
-X-Gm-Message-State: AOJu0YxB8iSyjVbKsGYY7Hfe2fzqwTX/4rBXRgPmOLJIG8+CkMP7SYiX
-	UPloFXaH1orxD5XlKOKJRmk=
-X-Google-Smtp-Source: AGHT+IEH0Q8a7wARl+BMIPamA52nQzhLlfnDZjSIdHw3Cm/jekpZnrcNOdEQ+1poTxNXz4y7uD3P2w==
-X-Received: by 2002:a50:9985:0:b0:557:4ea:bca1 with SMTP id m5-20020a509985000000b0055704eabca1mr52935edb.21.1704494129549;
-        Fri, 05 Jan 2024 14:35:29 -0800 (PST)
-Received: from ?IPV6:2a02:3100:9506:ff00:f963:33d2:2ad2:b61? (dynamic-2a02-3100-9506-ff00-f963-33d2-2ad2-0b61.310.pool.telefonica.de. [2a02:3100:9506:ff00:f963:33d2:2ad2:b61])
-        by smtp.googlemail.com with ESMTPSA id bt6-20020a0564020a4600b0055510f6527dsm1417435edb.26.2024.01.05.14.35.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jan 2024 14:35:29 -0800 (PST)
-Message-ID: <8bfd2b95-2c73-4372-bf63-0c6ab7cd03c8@gmail.com>
-Date: Fri, 5 Jan 2024 23:35:29 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A765360A4
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 23:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=EcfCznjjYinqcWS7LH1wVHQoYGs871InSj/P23AGb08=; b=ULxoohPT3vcXJQt/9UzlD79opR
+	yrNIKI/ADyjuaDfPUuUt1S2uhkmspGFrnuFWvPDQzbdy+21Wm438vJOJS31CUBmYgwO4Py/g1+FFr
+	0EfJwYEvO8BgL22hj1oqOh0KiqLPr//hwq/Moybdj2bfq90IIUJo8Lalnse0APrz5fsw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rLtPK-004Uhs-I7; Sat, 06 Jan 2024 00:15:18 +0100
+Date: Sat, 6 Jan 2024 00:15:18 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King <rmk+kernel@armlinux.org.uk>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/5] ethtool: add struct ethtool_keee and extend
+ struct ethtool_eee
+Message-ID: <53909c11-825a-489f-822a-dd4829dc8041@lunn.ch>
+References: <783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com>
+ <a044621e-07f3-4387-9573-015f255db895@gmail.com>
+ <f704864d-56bb-4ff4-933d-8771d0bb6c19@lunn.ch>
+ <8bfd2b95-2c73-4372-bf63-0c6ab7cd03c8@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/5] ethtool: add struct ethtool_keee and extend
- struct ethtool_eee
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Russell King <rmk+kernel@armlinux.org.uk>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com>
- <a044621e-07f3-4387-9573-015f255db895@gmail.com>
- <f704864d-56bb-4ff4-933d-8771d0bb6c19@lunn.ch>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <f704864d-56bb-4ff4-933d-8771d0bb6c19@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8bfd2b95-2c73-4372-bf63-0c6ab7cd03c8@gmail.com>
 
-On 04.01.2024 18:16, Andrew Lunn wrote:
-> On Mon, Jan 01, 2024 at 10:23:15PM +0100, Heiner Kallweit wrote:
->> In order to pass EEE link modes beyond bit 32 to userspace we have to
->> complement the 32 bit bitmaps in struct ethtool_eee with linkmode
->> bitmaps. Therefore, similar to ethtool_link_settings and
->> ethtool_link_kesettings, add a struct ethtool_keee. Use one byte of
->> the reserved fields in struct ethtool_eee as flag that an instance
->> of struct ethtool_eee is embedded in a struct ethtool_keee, thus the
->> linkmode bitmaps being accessible. Add ethtool_eee2keee() as accessor.
->>
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
->>  include/linux/ethtool.h      | 18 ++++++++++++++++++
->>  include/uapi/linux/ethtool.h |  4 +++-
->>  2 files changed, 21 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
->> index cfcd952a1..3b46405dd 100644
->> --- a/include/linux/ethtool.h
->> +++ b/include/linux/ethtool.h
->> @@ -163,6 +163,24 @@ static inline u32 ethtool_rxfh_indir_default(u32 index, u32 n_rx_rings)
->>  #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
->>  	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
->>  
->> +struct ethtool_keee {
->> +	struct ethtool_eee eee;
->> +	struct {
->> +		__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
->> +		__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
->> +		__ETHTOOL_DECLARE_LINK_MODE_MASK(lp_advertising);
->> +	} link_modes;
->> +	bool use_link_modes;
->> +};
+> Looking at the ethtool EEE ops implementation of the relevant 16 drivers i see
+> quite some fixing/refactoring need. Just look at igc_ethtool_get_eee():
 > 
-> I know its a lot more work, but its not how i would do it.
+>         edata->supported = SUPPORTED_Autoneg;
+>         edata->advertised = SUPPORTED_Autoneg;
+>         edata->lp_advertised = SUPPORTED_Autoneg;
 > 
-> 1) Add struct ethtool_keee which is a straight copy of ethtool_eee.
-> 
-> 2) Then modify every in kernel MAC driver using ethtool_eee to
-> actually take ethtool_keee. Since its identical, its just a function
-> prototype change.
-> 
-> 3) Then i would add some helpers to get and set eee bits. The initial
-> version would be limited to 32 bits, and expect to be passed a pointer
-> to a u32. Them modify all the MAC drivers which manipulate the
-> supported, advertising and lp_advertising to use these helpers.
-> 
-Looking at the ethtool EEE ops implementation of the relevant 16 drivers i see
-quite some fixing/refactoring need. Just look at igc_ethtool_get_eee():
+> This doesn't make sense at all, this function never worked and apparently
+> nobody ever noticed this. Maybe the author meant
+> edata->supported |= SUPPORTED_Autoneg, but even this wouldn't make sense
+> for an EEE mode bitmap.
 
-        edata->supported = SUPPORTED_Autoneg;
-        edata->advertised = SUPPORTED_Autoneg;
-        edata->lp_advertised = SUPPORTED_Autoneg;
+Yes, i noticed this as well. EEE is not too well defined, but this is
+wrong. Since it never worked, just deleting this is fine, and leave it
+to Intel engineers to set actual bitmaps.
 
-This doesn't make sense at all, this function never worked and apparently
-nobody ever noticed this. Maybe the author meant
-edata->supported |= SUPPORTED_Autoneg, but even this wouldn't make sense
-for an EEE mode bitmap.
-I'd prefer to separate the needed refactoring/fixing from the EEE linkmode
-bitmap extension, therefore omit step 3.
+> I'd prefer to separate the needed refactoring/fixing from the EEE linkmode
+> bitmap extension, therefore omit step 3.
+> 
+> Steps 1 and 2 are good, they allow to decouple struct ethtool_keee from
+> ethtool_eee, so we can simplify struct ethtool_keee and reduce it to what's
+> needed on kernel side.
 
-Steps 1 and 2 are good, they allow to decouple struct ethtool_keee from
-ethtool_eee, so we can simplify struct ethtool_keee and reduce it to what's
-needed on kernel side.
+I would not do too much refactoring. I have a big patchset which
+refactors most of the phylib driven drivers code for EEE, removing a
+lot of it and pushing it into phylib. Its been sat in my repo a while
+and i need to find the time/energy to post it and get it merged.
 
-> 4) Lastly, flip supported, advertising and lp_advertising to
-> ETHTOOL_DECLARE_LINK_MODE_MASK, modify the helpers, and fixup the
-> IOCTL API to convert to legacy u32 etc.
-> 
-> The first 2 steps are a patch each. Step 3 is a lot of patches, one
-> per MAC driver, but the changes should be simple and easy to
-> review. And then 4 is probably a single patch.
-> 
-> Doing it like this, we have a clean internal API.
-> 
->       Andrew
-> 
-> 
-
+    Andrew
 
