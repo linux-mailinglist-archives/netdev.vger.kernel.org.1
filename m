@@ -1,104 +1,156 @@
-Return-Path: <netdev+bounces-61864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F238251A9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:16:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C42428251C8
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F26391C22EAD
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:16:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61AE21F22A9D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0589424B48;
-	Fri,  5 Jan 2024 10:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E3124B4D;
+	Fri,  5 Jan 2024 10:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UVqyFBGd";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AIt7iYti"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3fbB6Tj"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BC624B47;
-	Fri,  5 Jan 2024 10:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1704449721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jO+VO3wXFRu66UkMcvjqElGeC5Sv8WT5wY6xOwIw/S4=;
-	b=UVqyFBGdRkvhbOLA+ppFaGAfNm0Vonvxuottzyh/4XWb7L+OG07Kg6jdcXmeVHoWlI7JLR
-	NKGJ7s5rZ8EwJgk99uiQrQAmz2zcbxx5qbAWIT3ywz/Qx0QS+l9keHU+RwHC9a1b81C+Uo
-	eYXwBmz7dQibvSINhYdtV/vMNzjokYrD4SrJBOxsz16TOwrT29tdeRsOTDcjq84QSJVhJe
-	g1/qxvYVgxjrHXiRLLDsHhoUeqP+FjfYw2ZlCysFpo/d+8xx51bgAPTt916UxE69UHp4PM
-	S4yy5te1FBYR8Dp/opZ5sszDj7MNcvTLPVrpox0TvMvIfCk1KoI2Dvs608hSig==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1704449721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jO+VO3wXFRu66UkMcvjqElGeC5Sv8WT5wY6xOwIw/S4=;
-	b=AIt7iYtiUvQDrEKJug3LyhX4SHG++vgGesong5Ppvswqs8G7nnWz5dyDPY0iX407QgSYib
-	fhToLweazCrkaWBQ==
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, Jakub
- Kicinski <kuba@kernel.org>, andrew@lunn.ch, f.fainelli@gmail.com,
- olteanv@gmail.com, hauke@hauke-m.de, woojung.huh@microchip.com,
- UNGLinuxDriver@microchip.com, arinc.unal@arinc9.com,
- daniel@makrotopia.org, Landen.Chao@mediatek.com, dqfext@gmail.com,
- sean.wang@mediatek.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, claudiu.manoil@nxp.com,
- alexandre.belloni@bootlin.com, clement.leger@bootlin.com,
- george.mccollister@gmail.com, linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for DSA tags
-In-Reply-To: <20240104143759.1318137-1-kuba@kernel.org>
-References: <20240104143759.1318137-1-kuba@kernel.org>
-Date: Fri, 05 Jan 2024 11:15:17 +0100
-Message-ID: <87plygqe6i.fsf@kurt>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3323224B48;
+	Fri,  5 Jan 2024 10:22:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D2CBC433C7;
+	Fri,  5 Jan 2024 10:22:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704450135;
+	bh=oQGOEMuZwhCeZ13+phWxoQu6BEy+A6aOg5LpzwI7iRs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i3fbB6TjVbslLJNPhjQfrDhvlyjSRyanKmCbk0YWFUz265z7ZAaranr1naJsVccNZ
+	 f/ZVvvsdyhOFCO78G8/QyIEvJIZmKAoPv/yqHkQVlmnJ/9b6wGU7/+5qmd860xWBaO
+	 JR28x4VLae9CE1nRfl/rBFB26xNuhXah1xm9t8DMXgqVtHB8dqi1ICS8Ch2sa0XIZW
+	 jZhEQ25nAA3no30MxSUawrAtdEZkZ6+yk5EVhrTxXNX/0cc8GEjiqxd36g1WPCeh4U
+	 /b+HqnAd1Wp7UbutG+4WD1O8h66w4kBNa1pFLVI+ZXll9fOXlPEw8kYzI+LI/53N80
+	 JZuY8oHjjnAog==
+Date: Fri, 5 Jan 2024 10:22:09 +0000
+From: Simon Horman <horms@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
+	vimleshk@marvell.com, sedara@marvell.com, egallen@redhat.com,
+	mschmidt@redhat.com, pabeni@redhat.com, kuba@kernel.org,
+	wizhao@redhat.com, kheib@redhat.com, konguyen@redhat.com,
+	Veerasenareddy Burru <vburru@marvell.com>,
+	Satananda Burla <sburla@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 2/8] octeon_ep_vf: add hardware configuration
+ APIs
+Message-ID: <20240105102209.GR31813@kernel.org>
+References: <20231223134000.2906144-1-srasheed@marvell.com>
+ <20231223134000.2906144-3-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231223134000.2906144-3-srasheed@marvell.com>
 
---=-=-=
-Content-Type: text/plain
+On Sat, Dec 23, 2023 at 05:39:54AM -0800, Shinas Rasheed wrote:
+> Implement hardware resource init and shutdown helper APIs, like
+> hardware Tx/Rx queue init/enable/disable/reset.
+> 
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 
-On Thu Jan 04 2024, Jakub Kicinski wrote:
-> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to all the DSA tag modules.
->
-> The descriptions are copy/pasted Kconfig names, with s/^Tag/DSA tag/.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Hi Shinas,
 
-Acked-by: Kurt Kanzenbach <kurt@linutronix.de>
+some minor feedback from my side.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+...
 
------BEGIN PGP SIGNATURE-----
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmWX1rUTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgk55D/9zqbT5fC7AXgLULEkx0VKj1404ulqK
-ZxXhPu2NW1/G+/+5iFZvce7q0JEJDNcRPG0IVYc0WxkbVN2pLZoFKFO4omzAi1OF
-lHzUaB9SjVp4kS3B1mJbj7q6+JPfU6Lt06d23cWp2GI8O1wp7C7Hu+fSW325k1dx
-ccw8/jfnFyuxKe1VhAPuQfSZ6erM79r6zi8sf1iwwU8l8hUr/WjFD4iREXKyL93j
-G0W6Gw10DwRp4lgwy8WPdydwjvE0sbeMKh7ijtnqCYwnD5j2DCSKZuevoglZXzSR
-fyrSIjUclxys7VbWfQtn3QYa3y6O+mJKMD6Q4DLoAm9X/dyran49xRCboJC3KrUI
-7exTGoXUPVA452Jy5wKZccG+RS+HpQi6AC3L7v1tPWg6mltmusQc/SHK5MVm1riz
-qNTMJP9uCojCUiP+UWbh20HpOt16yHP0+xGRiX3pUBl16RGmyWRtixJPb/4MQz8T
-xiN9HaGi+9jRF0v7I+/iUwWkmMEThaBY+mtl2e8rWInOPyLVC0Bddr/KwzxFJ6fK
-3dmsIztl8lvC47jH86xriXJDp8QXKkjo0bwq/TonB8w4g5OeR04bvZmo/A73M10k
-jn+4pSKyO9c1NHyS7nCs2dpO3Xlrdj9p1HZ2Uv8N1BbogRcU+v5KPeGoe7QYvcOz
-vd9YY2W+WapiiA==
-=U6fC
------END PGP SIGNATURE-----
---=-=-=--
+...
+
+> +/* Reset Hardware Tx queue */
+> +static int cn93_vf_reset_iq(struct octep_vf_device *oct, int q_no)
+> +{
+> +	u64 val = 0ULL;
+> +
+> +	dev_dbg(&oct->pdev->dev, "Reset VF IQ-%d\n", q_no);
+> +
+> +	/* Disable the Tx/Instruction Ring */
+> +	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_ENABLE(q_no), val);
+> +
+> +	/* clear the Instruction Ring packet/byte counts and doorbell CSRs */
+> +	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_INT_LEVELS(q_no), val);
+> +	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_PKT_CNT(q_no), val);
+> +	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_BYTE_CNT(q_no), val);
+> +	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_INSTR_BADDR(q_no), val);
+> +	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_INSTR_RSIZE(q_no), val);
+> +
+> +	val = 0xFFFFFFFF;
+> +	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_INSTR_DBELL(q_no), val);
+> +
+> +	val = octep_vf_read_csr64(oct, CN93_VF_SDP_R_IN_CNTS(q_no));
+> +	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_CNTS(q_no), val & 0xFFFFFFFF);
+
+This function uses values that appear to have special values:
+0, and 0xFFFFFFFF (as a value and a mask).
+
+I think it would be nice to name these using #defines
+In the case of masks, using GENMASK_ULL() and FILED_PREP()
+may be appropriate.
+
+Likewise elsewhere in this patch.
+Usage of BIT() and BIT_ULL() may also be appropriate.
+
+> +
+> +	return 0;
+> +}
+
+...
+
+>  /* Tx/Rx queue interrupt handler */
+>  static irqreturn_t octep_vf_ioq_intr_handler_cn93(void *data)
+>  {
+> +	struct octep_vf_ioq_vector *vector = (struct octep_vf_ioq_vector *)data;
+
+nit: there is no need to cast a void pointer.
+
+> +	struct octep_vf_oq *oq = vector->oq;
+> +	struct octep_vf_device *oct = vector->octep_vf_dev;
+> +	u64 reg_val = 0ULL;
+
+As it looks like there will be a v3 of this patchset,
+please consider arranging local variables in Networking code
+in reverse xmas tree order - longest line to shortest.
+
+	struct octep_vf_ioq_vector *vector = data;
+	struct octep_vf_device *oct;
+	struct octep_vf_oq *oq;
+	u64 reg_val = 0ULL;
+
+	oct = vector->octep_vf_dev;
+	oq = vector->oq;
+
+...
+
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
+
+...
+
+>  /* Tx/Rx queue interrupt handler */
+>  static irqreturn_t octep_vf_ioq_intr_handler_cnxk(void *data)
+>  {
+> +	struct octep_vf_ioq_vector *vector = (struct octep_vf_ioq_vector *)data;
+> +	struct octep_vf_oq *oq = vector->oq;
+> +	struct octep_vf_device *oct = vector->octep_vf_dev;
+> +	u64 reg_val = 0ULL;
+
+Likewise, here too.
+
+...
 
