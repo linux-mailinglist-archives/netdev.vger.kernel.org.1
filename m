@@ -1,92 +1,264 @@
-Return-Path: <netdev+bounces-61752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55857824CA5
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:49:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E891C824CB7
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 03:09:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E19DB281FAC
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:49:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 526751F22C33
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338D51FB2;
-	Fri,  5 Jan 2024 01:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXIscpV/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9081FB4;
+	Fri,  5 Jan 2024 02:09:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1301FA3;
-	Fri,  5 Jan 2024 01:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5f3a5b9e09cso2754237b3.0;
-        Thu, 04 Jan 2024 17:49:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704419387; x=1705024187; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EgeaXJc1BAQQwhIsnnUkEVIzKQJLyZHFHdN0kJVCdXo=;
-        b=KXIscpV/Sbu2T5DnfETKnP7EXhn14upnjGh3mSBTcNAM8Ud9PNwUWNIO/6rtjn8seG
-         Jnt9wvwwTj9uJcDOIrM7A9/81+PMX6dBxeAP5ihAIsNKh9hOhEI7CohECfXW6u4OTIyP
-         ET35n4BS9I2o6D552ShvGeUItOAqEpZecMZf9ON+eo5L6iq6beqZoqi+a85vCFK0R6zo
-         h0fpl9EdqUyQdJ3JYEb/VRG7RPSyhFqjUUPlH2KqE6EYB5yPzE9EwrxNuqwSUj2ahO5U
-         nKKxOIfBlNnqcZkBJC9SozbjL2inxQKvn9obfj8lX5x55a5kS/njvdEb9e0OyhgTziMc
-         9GgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704419387; x=1705024187;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EgeaXJc1BAQQwhIsnnUkEVIzKQJLyZHFHdN0kJVCdXo=;
-        b=NwWN1bbeyqJ911VlN3fyxng1MsNfG07zOvUfDjNIFvLdbbpKGM+kTOELM0MuzkemkW
-         +6g3rRrIVgZ1VX5kosdyVDfUSTCKrAYptB5Qn7qNbhkDrBGlDftysrb4nIFeo1iSK9CP
-         yoml7MeqP++vgXQ2531gHIDk/D8di2YIW41dKHuQOQSH55fzETSiN0zFwVMFQpd/15Qo
-         elPk0C0MbROHuJIMd3BV/9ZuB9mP0bhGxkXbkvaIA+Bx7f5TAMTUoSO5eML3OTaQFHMc
-         yNss3H2xRbEM4nCkUkarQ/3AxO3/kcWvH8QoloGV0nCDI0WTOEVwJD/VV9sMdAnKG/he
-         KdPA==
-X-Gm-Message-State: AOJu0YxvcTpkDdCo4qCbaLE3vLLQ5b/RfDYSMIiJAfrRLe2ybtlS62JZ
-	vpdZTHVdmbmjzGG3EbAey9w=
-X-Google-Smtp-Source: AGHT+IGziUfJwgFJObYRK8k1/dWNtcbmiI9iEoSrXnDyE8D1BhwChyjS/1WaeTOTK7Hy86bxYQ/2Iw==
-X-Received: by 2002:a25:80d2:0:b0:dbe:9db9:d113 with SMTP id c18-20020a2580d2000000b00dbe9db9d113mr2141097ybm.5.1704419387650;
-        Thu, 04 Jan 2024 17:49:47 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d2-20020a256802000000b00dbdaacb96bdsm164283ybc.12.2024.01.04.17.49.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 17:49:47 -0800 (PST)
-Date: Thu, 4 Jan 2024 17:49:45 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Min Li <lnimi@hotmail.com>
-Cc: lee@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Min Li <min.li.xe@renesas.com>
-Subject: Re: [PATCH net-next v6 1/2] ptp: introduce PTP_CLOCK_EXTOFF event
- for the measured external offset
-Message-ID: <ZZdgOUmn2fzHMZwC@hoboy.vegasvil.org>
-References: <PH7PR03MB7064CD80AD7DA745B3F6790FA0672@PH7PR03MB7064.namprd03.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3281FBF;
+	Fri,  5 Jan 2024 02:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4T5n0r5MPZz1Q7Vm;
+	Fri,  5 Jan 2024 10:07:56 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 59286140631;
+	Fri,  5 Jan 2024 10:09:24 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 5 Jan
+ 2024 10:09:24 +0800
+Subject: Re: [PATCH net-next 6/6] tools: virtio: introduce vhost_net_test
+To: Eugenio Perez Martin <eperezma@redhat.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, <virtualization@lists.linux.dev>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+ <20240103095650.25769-7-linyunsheng@huawei.com>
+ <CAJaqyWfHLDRL4z9ooNS2w_yGE_jnHfi2spdYPP_=F0jgSj3mJQ@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <4417b8ff-144d-374b-2188-38e30567a5ba@huawei.com>
+Date: Fri, 5 Jan 2024 10:09:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH7PR03MB7064CD80AD7DA745B3F6790FA0672@PH7PR03MB7064.namprd03.prod.outlook.com>
+In-Reply-To: <CAJaqyWfHLDRL4z9ooNS2w_yGE_jnHfi2spdYPP_=F0jgSj3mJQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On Thu, Jan 04, 2024 at 12:12:11PM -0500, Min Li wrote:
-> From: Min Li <min.li.xe@renesas.com>
-> 
-> This change is for the PHC devices that can measure the phase offset
-> between PHC signal and the external signal, such as the 1PPS signal of
-> GNSS. Reporting PTP_CLOCK_EXTOFF to user space will be piggy-backed to
-> the existing ptp_extts_event so that application such as ts2phc can
-> poll the external offset the same way as extts. Hence, ts2phc can use
-> the offset to achieve the alignment between PHC and the external signal
-> by the help of either SW or HW filters.
-> 
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
+On 2024/1/5 0:17, Eugenio Perez Martin wrote:
+> On Wed, Jan 3, 2024 at 11:00 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+...
+
+>> +
+>> +static void run_tx_test(struct vdev_info *dev, struct vq_info *vq,
+>> +                       bool delayed, int batch, int bufs)
+>> +{
+>> +       const bool random_batch = batch == RANDOM_BATCH;
+>> +       long long spurious = 0;
+>> +       struct scatterlist sl;
+>> +       unsigned int len;
+>> +       int r;
+>> +
+>> +       for (;;) {
+>> +               long started_before = vq->started;
+>> +               long completed_before = vq->completed;
+>> +
+>> +               virtqueue_disable_cb(vq->vq);
+>> +               do {
+>> +                       if (random_batch)
+>> +                               batch = (random() % vq->vring.num) + 1;
+>> +
+>> +                       while (vq->started < bufs &&
+>> +                              (vq->started - vq->completed) < batch) {
+>> +                               sg_init_one(&sl, dev->test_buf, HDR_LEN + TEST_BUF_LEN);
+>> +                               r = virtqueue_add_outbuf(vq->vq, &sl, 1,
+>> +                                                        dev->test_buf + vq->started,
+>> +                                                        GFP_ATOMIC);
+>> +                               if (unlikely(r != 0)) {
+>> +                                       if (r == -ENOSPC &&
+>> +                                           vq->started > started_before)
+>> +                                               r = 0;
+>> +                                       else
+>> +                                               r = -1;
+>> +                                       break;
+>> +                               }
+>> +
+>> +                               ++vq->started;
+>> +
+>> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
+>> +                                       r = -1;
+>> +                                       break;
+>> +                               }
+>> +                       }
+>> +
+>> +                       if (vq->started >= bufs)
+>> +                               r = -1;
+>> +
+>> +                       /* Flush out completed bufs if any */
+>> +                       while (virtqueue_get_buf(vq->vq, &len)) {
+>> +                               int n, i;
+>> +
+>> +                               n = recvfrom(dev->sock, dev->res_buf, TEST_BUF_LEN, 0, NULL, NULL);
+>> +                               assert(n == TEST_BUF_LEN);
+>> +
+>> +                               for (i = ETHER_HDR_LEN; i < n; i++)
+>> +                                       assert(dev->res_buf[i] == (char)i);
+>> +
+>> +                               ++vq->completed;
+>> +                               r = 0;
+>> +                       }
+>> +               } while (r == 0);
+>> +
+>> +               if (vq->completed == completed_before && vq->started == started_before)
+>> +                       ++spurious;
+>> +
+>> +               assert(vq->completed <= bufs);
+>> +               assert(vq->started <= bufs);
+>> +               if (vq->completed == bufs)
+>> +                       break;
+>> +
+>> +               if (delayed) {
+>> +                       if (virtqueue_enable_cb_delayed(vq->vq))
+>> +                               wait_for_interrupt(vq);
+>> +               } else {
+>> +                       if (virtqueue_enable_cb(vq->vq))
+>> +                               wait_for_interrupt(vq);
+>> +               }
+>> +       }
+>> +       printf("TX spurious wakeups: 0x%llx started=0x%lx completed=0x%lx\n",
+>> +              spurious, vq->started, vq->completed);
+>> +}
+>> +
+>> +static void run_rx_test(struct vdev_info *dev, struct vq_info *vq,
+>> +                       bool delayed, int batch, int bufs)
+>> +{
+>> +       const bool random_batch = batch == RANDOM_BATCH;
+>> +       long long spurious = 0;
+>> +       struct scatterlist sl;
+>> +       unsigned int len;
+>> +       int r;
+>> +
+>> +       for (;;) {
+>> +               long started_before = vq->started;
+>> +               long completed_before = vq->completed;
+>> +
+>> +               do {
+>> +                       if (random_batch)
+>> +                               batch = (random() % vq->vring.num) + 1;
+>> +
+>> +                       while (vq->started < bufs &&
+>> +                              (vq->started - vq->completed) < batch) {
+>> +                               sg_init_one(&sl, dev->res_buf, HDR_LEN + TEST_BUF_LEN);
+>> +
+>> +                               r = virtqueue_add_inbuf(vq->vq, &sl, 1,
+>> +                                                       dev->res_buf + vq->started,
+>> +                                                       GFP_ATOMIC);
+>> +                               if (unlikely(r != 0)) {
+>> +                                       if (r == -ENOSPC &&
+>> +                                           vq->started > started_before)
+>> +                                               r = 0;
+>> +                                       else
+>> +                                               r = -1;
+>> +                                       break;
+>> +                               }
+>> +
+>> +                               ++vq->started;
+>> +
+>> +                               vdev_send_packet(dev);
+>> +
+>> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
+>> +                                       r = -1;
+>> +                                       break;
+>> +                               }
+>> +                       }
+>> +
+>> +                       if (vq->started >= bufs)
+>> +                               r = -1;
+>> +
+>> +                       /* Flush out completed bufs if any */
+>> +                       while (virtqueue_get_buf(vq->vq, &len)) {
+>> +                               struct ether_header *eh;
+>> +                               int i;
+>> +
+>> +                               eh = (struct ether_header *)(dev->res_buf + HDR_LEN);
+>> +
+>> +                               /* tun netdev is up and running, ignore the
+>> +                                * non-TEST_PTYPE packet.
+>> +                                */
+>> +                               if (eh->ether_type != htons(TEST_PTYPE)) {
+>> +                                       ++vq->completed;
+>> +                                       r = 0;
+>> +                                       continue;
+>> +                               }
+>> +
+>> +                               assert(len == TEST_BUF_LEN + HDR_LEN);
+>> +
+>> +                               for (i = ETHER_HDR_LEN; i < TEST_BUF_LEN; i++)
+>> +                                       assert(dev->res_buf[i + HDR_LEN] == (char)i);
+>> +
+>> +                               ++vq->completed;
+>> +                               r = 0;
+>> +                       }
+>> +               } while (r == 0);
+>> +               if (vq->completed == completed_before && vq->started == started_before)
+>> +                       ++spurious;
+>> +
+>> +               assert(vq->completed <= bufs);
+>> +               assert(vq->started <= bufs);
+>> +               if (vq->completed == bufs)
+>> +                       break;
+>> +       }
+>> +
+>> +       printf("RX spurious wakeups: 0x%llx started=0x%lx completed=0x%lx\n",
+>> +              spurious, vq->started, vq->completed);
+>> +}
+> 
+> Hi!
+> 
+> I think the tests are great! Maybe both run_rx_test and run_tx_test
+> (and virtio_test.c:run_test) can be merged into a common function with
+> some callbacks? Not sure if it will complicate the code more.
+
+I looked at it more closely, it seems using callback just make the code
+more complicated without obvious benefit, as the main steps is different
+for tx and rx.
+
+For tx:
+1. Prepare a out buf
+2. Kick the vhost_net to do tx processing
+3. Do the receiving in the tun side
+4. verify the data received by tun is correct
+
+For rx:
+1. Prepare a in buf
+2. Do the sending in the tun side
+3. Kick the vhost_net to do rx processing
+4. verify the data received by vhost_net is correct
+
+I could refactor out a common function to do the data verifying for step 4
+of both tx and rx.
+
+For virtio_test.c:run_test, it does not seems to be using the vhost_net directly,
+it uses shim vhost_test.ko module, and it seems to only have step 1 & 3 of
+vhost_net_test' rx testing. The new vhost_net_test should be able to replace the
+virtio_test, I thought about deleting the virtio_test after adding the vhost_net_test,
+but I am not familiar enough with virtio to do the judgement yet.
+
+> 
+> Thanks!
+> 
+
 
