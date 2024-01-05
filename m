@@ -1,78 +1,87 @@
-Return-Path: <netdev+bounces-61737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47223824C44
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:56:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 282D4824C4A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7670BB22C4E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:56:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42B1D1C22444
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419971854;
-	Fri,  5 Jan 2024 00:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BC317CA;
+	Fri,  5 Jan 2024 01:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T867SE5D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JxtQVS02"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245191845;
-	Fri,  5 Jan 2024 00:56:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B12FFC433C7;
-	Fri,  5 Jan 2024 00:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C30D811
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 01:00:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D18E2C433C9;
+	Fri,  5 Jan 2024 01:00:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704416171;
-	bh=k4ElxgdIDUFZm/OwSjcJ4qnDgBAxFTnJp7f0bYL3MgE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T867SE5DK7RQwDO+NYYFo29zNkInS2SHh8vOLKK+grd7oZsSOj89NeSmGMIxEkuul
-	 k2J0esgBFt/WK+pyeUT36pFKB6pgGTjffaekg9hRX4v+k4QRHW8h5JOBvxzjRNpz6c
-	 vVpLB4ELYaNV+FwEamDuaTSyYZDsHpHF8IfjxOMD1wPHbJCiWjTXGLKc5MGyq8v54L
-	 n5kMqHlpdW//1TpB2pDu8SuC1pPJHwcbHkR3NG0qkT7H7qImx9fHFkWtM7Sm7rH6kf
-	 za4t0nFpGkjLSwVcU59DjJsrZimTySlTuaj0bYMWkE2Q+jId0hyXfT+pXPqy6BnspS
-	 m8ar15rSntOBw==
-Date: Thu, 4 Jan 2024 16:56:09 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, "Russell King
- (Oracle)" <linux@armlinux.org.uk>, patchwork-bot+netdevbpf@kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, andrew@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- christophe.leroy@csgroup.eu, herve.codina@bootlin.com,
- hkallweit1@gmail.com, vladimir.oltean@nxp.com, kory.maincent@bootlin.com,
- jesse.brandeburg@intel.com, corbet@lwn.net, kabel@kernel.org,
- piergiorgio.beruto@gmail.com, o.rempel@pengutronix.de,
- nicveronese@gmail.com, horms@kernel.org
-Subject: Re: [PATCH net-next v5 00/13] Introduce PHY listing and
- link_topology tracking
-Message-ID: <20240104165609.5a56cac1@kernel.org>
-In-Reply-To: <1447ce09-f90e-4ba2-a6f7-e5cb23bf724f@gmail.com>
-References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
-	<170413442779.30948.3175948839165575294.git-patchwork-notify@kernel.org>
-	<ZZP6FV5sXEf+xd58@shell.armlinux.org.uk>
-	<20240102105125.77751812@kernel.org>
-	<20240103153336.424dcfe3@device-28.home>
-	<20240104154721.192694a8@kernel.org>
-	<1447ce09-f90e-4ba2-a6f7-e5cb23bf724f@gmail.com>
+	s=k20201202; t=1704416425;
+	bh=zGVYzD8eXplw4gb3WGzPEZCfgehAUrh6gaKQTeECQdI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JxtQVS027fuKFbkBIqrrO1N4CAFibkt6D4QwJOVdNmN31P5C/YnEiuCcdbE6HP1EZ
+	 /65sgMg0jkE5wtxtsyWAiVvhRSE/0WB5gucJ5URtCXTqWqnhSsdpwqcP6rllu6/80+
+	 PqTVo3a+d5c0pZK7DIiQ9KvTkWHJ6Gv8023M5VihVF4Z9KGnjo1Ndq8k6aP5WQjNUq
+	 Gs5UMXBh6sY2X0XA4102UslJ5s+zV86SZt8bV8c4yU46sqU2Y9fo9YifFVs4SSNdBc
+	 ZEh0xdCplg0FDgwow8fHzMUVKVrsQo79mRoeGMIpuShbszuNmHZTt6rpRRP79S6xC7
+	 8oYcdpOuvvIPA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B5864C3959F;
+	Fri,  5 Jan 2024 01:00:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] r8169: fix building with CONFIG_LEDS_CLASS=m
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170441642573.24287.3221322138085351593.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Jan 2024 01:00:25 +0000
+References: <d055aeb5-fe5c-4ccf-987f-5af93a17537b@gmail.com>
+In-Reply-To: <d055aeb5-fe5c-4ccf-987f-5af93a17537b@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+ arnd@arndb.de
 
-On Thu, 4 Jan 2024 15:50:40 -0800 Florian Fainelli wrote:
-> > The netlink handling looks a bit wobbly to me.
-> > I commented best I could in the 20min I had to look at this code :(
-> > I think it'd be best to revert, if you don't mind, because reviewing
-> > incremental fixes will get even harder.  
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 3 Jan 2024 16:52:04 +0100 you wrote:
+> When r8169 is built-in but LED support is a loadable module, the new
+> code to drive the LED causes a link failure:
 > 
-> +1
+> ld: drivers/net/ethernet/realtek/r8169_leds.o: in function `rtl8168_init_leds':
+> r8169_leds.c:(.text+0x36c): undefined reference to `devm_led_classdev_register_ext'
+> 
+> LED support is an optional feature, so fix this issue by adding a Kconfig
+> symbol R8169_LEDS that is guaranteed to be false if r8169 is built-in
+> and LED core support is a module. As a positive side effect of this change
+> r8169_leds.o no longer is built under this configuration.
+> 
+> [...]
 
-Okay, let's say that the three of us - Florian, Russell
-and I are a quorum? :) Reverted.
+Here is the summary with links:
+  - [net-next] r8169: fix building with CONFIG_LEDS_CLASS=m
+    https://git.kernel.org/netdev/net-next/c/a2634a5ffcaf
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
