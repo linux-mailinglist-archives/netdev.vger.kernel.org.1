@@ -1,154 +1,113 @@
-Return-Path: <netdev+bounces-61958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6485A82556F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:36:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3712082556E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:36:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D910F284B26
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:36:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5F2F1F21CDA
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F7C2DF66;
-	Fri,  5 Jan 2024 14:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B2024204;
+	Fri,  5 Jan 2024 14:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4gM+XkMp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BJufwjuX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8969E2D7AB
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 14:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso12036a12.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 06:36:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704465400; x=1705070200; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L4dBXo/6IDVd/d8fbs0I4/6iMCv+/NJlhDw4IK52x6Y=;
-        b=4gM+XkMpfNZ/QnvtBvAQd6T6gbTmKELYjdGZH2GpGp50yAMBJa0BL/03vIJczxSVZa
-         ojJ3k6xGRfzaHfwXwMgvPK2UnaNvR5n+ChnQYTj44wDa+qldB3YQah8ZTkz9uONuXweU
-         KgRo9FunLYzaynzDGm5Xe5Sef9Vf4feQiT3jLSYTd50X7lwnMAhNkhl7DMpQiltuF/5J
-         vd8r4FBRUSZG77VaqNicDLOTFSTQlvYNHd1YpzhpN+03a/6iH6zp4oKbbzAOxEnxDWsu
-         DnYh9wmrY/4mN26ULejTwbJNz3T+X4CgE6hpTRD87gGomzGI798VO/++YP/KNWQ1+nHb
-         wRQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704465400; x=1705070200;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=L4dBXo/6IDVd/d8fbs0I4/6iMCv+/NJlhDw4IK52x6Y=;
-        b=hjWTBRMW5l/Jq46Km+f2zumOMyNz8zRtikYYVWJv48giizgReaRWSJ1R7WdsNtbQNt
-         Mwq09J5qcfYNZDIEqDotvd7JHwh2NJbKaURNu1HfYGSdONUwICPfuBk5U3gYCNTnztZN
-         OwmQ1pwk3Z3OVe1kK1zAw1GPriILTV8aYFsIPj40FlCeddvcaqiy3Yamc4OHz8VEsT3W
-         Mc57/d0JXs/UiRD+7KFq9J7dmi8yoTYanUSi9Ro3AjJvLDpq3vq/4w48l56biQOmYX84
-         Dv5dumU54oYleLRafvDq15KdAGpUUlPNOK+PjCgjrMKtNZVfBdaBbWcLFywid8trQ7NG
-         1wxg==
-X-Gm-Message-State: AOJu0YxrXQfaCaUR4XKrJbHJEUOjl26xLfW/GIHiZlMDhCRqFRJATzCf
-	A7HUVbpphyAc9K52QBf9ad6r5ehsAh2GpjmvGMJZnYW210dK
-X-Google-Smtp-Source: AGHT+IHT7QLwvw6kDusVQmBgHL0Oj17HpiYz2rEEwzJronaZDz8VOQrCUcW0pPb55GKHBS7klwih3qlQzE8+ch5I9AY=
-X-Received: by 2002:a50:c35e:0:b0:553:ee95:2b4f with SMTP id
- q30-20020a50c35e000000b00553ee952b4fmr134595edb.3.1704465399594; Fri, 05 Jan
- 2024 06:36:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D132D7B0;
+	Fri,  5 Jan 2024 14:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=izopWTWvdqzt1HzQ9a3B+UE3STlG/reta5QRNgEBykU=; b=BJufwjuXkd2K8Y6wocFOxdsPKC
+	csMjMCug1ybY6/Lmv51EdvEHQ1myeL+3dCo1ucFwPgtxsGkkN8TU1vmwtJX3nyTobXRVTNfNzSFDl
+	gtg6OMpPktlAJW4DUAdjbAX3Ru52VkA69gsBRTlc3pjWwAXbqya90BeEAg291X4/m3pc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rLlJF-004Seu-Dj; Fri, 05 Jan 2024 15:36:29 +0100
+Date: Fri, 5 Jan 2024 15:36:29 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Claudiu <claudiu.beznea@tuxon.dev>, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, yuiko.oshino@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Subject: Re: [PATCH net] net: phy: micrel: populate .soft_reset for KSZ9131
+Message-ID: <a2651f98-b598-4a05-9e05-d2912eeb55d2@lunn.ch>
+References: <20240105085242.1471050-1-claudiu.beznea.uj@bp.renesas.com>
+ <ZZfPOky2p/ZJMKCQ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240102-new-gemini-ethernet-regression-v5-0-cf61ab3aa8cd@linaro.org>
- <20240102-new-gemini-ethernet-regression-v5-1-cf61ab3aa8cd@linaro.org> <20240105113247.wml4ldq3abvizi2a@skbuf>
-In-Reply-To: <20240105113247.wml4ldq3abvizi2a@skbuf>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 5 Jan 2024 15:36:28 +0100
-Message-ID: <CANn89i+FSNSF5JgXZcq5h-h2o5QhzOmRDc3q6XT7dcxMG-S20w@mail.gmail.com>
-Subject: Re: [PATCH net v5 1/2] net: ethernet: cortina: Drop software checksum
- and TSO
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Household Cang <canghousehold@aol.com>, Romain Gantois <romain.gantois@bootlin.com>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZfPOky2p/ZJMKCQ@shell.armlinux.org.uk>
 
-On Fri, Jan 5, 2024 at 12:32=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> On Tue, Jan 02, 2024 at 09:34:25PM +0100, Linus Walleij wrote:
-> > @@ -1143,39 +1142,13 @@ static int gmac_map_tx_bufs(struct net_device *=
-netdev, struct sk_buff *skb,
-> >       struct gmac_txdesc *txd;
-> >       skb_frag_t *skb_frag;
-> >       dma_addr_t mapping;
-> > -     unsigned short mtu;
-> >       void *buffer;
-> > -     int ret;
-> > -
-> > -     mtu  =3D ETH_HLEN;
-> > -     mtu +=3D netdev->mtu;
-> > -     if (skb->protocol =3D=3D htons(ETH_P_8021Q))
-> > -             mtu +=3D VLAN_HLEN;
-> >
-> > +     /* TODO: implement proper TSO using MTU in word3 */
-> >       word1 =3D skb->len;
-> > -     word3 =3D SOF_BIT;
-> > -
-> > -     if (word1 > mtu) {
-> > -             word1 |=3D TSS_MTU_ENABLE_BIT;
-> > -             word3 |=3D mtu;
-> > -     }
-> > +     word3 =3D SOF_BIT | skb->len;
-> >
-> > -     if (skb->len >=3D ETH_FRAME_LEN) {
-> > -             /* Hardware offloaded checksumming isn't working on frame=
-s
-> > -              * bigger than 1514 bytes. A hypothesis about this is tha=
-t the
-> > -              * checksum buffer is only 1518 bytes, so when the frames=
- get
-> > -              * bigger they get truncated, or the last few bytes get
-> > -              * overwritten by the FCS.
-> > -              *
-> > -              * Just use software checksumming and bypass on bigger fr=
-ames.
-> > -              */
-> > -             if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
-> > -                     ret =3D skb_checksum_help(skb);
-> > -                     if (ret)
-> > -                             return ret;
-> > -             }
-> > -             word1 |=3D TSS_BYPASS_BIT;
-> > -     } else if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
->
-> So are you taking back the statement that "Hardware offloaded
-> checksumming isn't working on frames bigger than 1514 bytes"?
->
-> Have you increased the interface MTU beyond 1500, and tested with plain
-> TCP (no DSA) on top of it? Who will provide the TCP checksum for them now=
-?
->
-> I don't understand why you remove the skb_checksum_help() call.
-> It doesn't play nice with skb_is_gso() packets, agreed, but you removed
-> the TSO netdev feature.
+On Fri, Jan 05, 2024 at 09:43:22AM +0000, Russell King (Oracle) wrote:
+> On Fri, Jan 05, 2024 at 10:52:42AM +0200, Claudiu wrote:
+> > The order of PHY-related operations in ravb_open() is as follows:
+> > ravb_open() ->
+> >   ravb_phy_start() ->
+> >     ravb_phy_init() ->
+> >       of_phy_connect() ->
+> >         phy_connect_direct() ->
+> > 	  phy_attach_direct() ->
+> > 	    phy_init_hw() ->
+> > 	      phydev->drv->soft_reset()
+> > 	      phydev->drv->config_init()
+> > 	      phydev->drv->config_intr()
+> > 	    phy_resume()
+> > 	      kszphy_resume()
+> > 
+> > The order of PHY-related operations in ravb_close is as follows:
+> > ravb_close() ->
+> >   phy_stop() ->
+> >     phy_suspend() ->
+> >       kszphy_suspend() ->
+> >         genphy_suspend()
+> > 	  // set BMCR_PDOWN bit in MII_BMCR
+> 
+> Andrew,
+> 
+> This looks wrong to me - shouldn't we be resuming the PHY before
+> attempting to configure it?
 
-This TSO feature never possibly worked.
+Hummm. The opposite of phy_stop() is phy_start(). So it would be the
+logical order to perform the resume as the first action of
+phy_start(), not phy_attach_direct().
 
-This was probably hidden because TCP retransmits non TSO packets eventually=
-.
+In phy_connect_direct(), we don't need the PHY to be operational
+yet. That happens with phy_start().
 
-A TSO enabled driver must use/propagate skb_shinfo(skb)->gso_size
-value to the TSO engine on the NIC.
-Otherwise, this is absolutely broken.
+The standard says:
 
-Please look at my original suggestion. I think the plan is to try to
-add back TSO in next release, with proper testing (ie not rely on TCP
-resilience)
+  22.2.4.1.5 Power down
 
-https://lore.kernel.org/netdev/CANn89iJLfxng1sYL5Zk0mknXpyYQPCp83m3KgD2KJ2_=
-hKCpEUg@mail.gmail.com/
+  The PHY may be placed in a low-power consumption state by setting
+  bit 0.11 to a logic one. Clearing bit 0.11 to zero allows normal
+  operation. The specific behavior of a PHY in the power-down state is
+  implementation specific. While in the power-down state, the PHY
+  shall respond to management transactions.
+
+So i would say this PHY is broken, its not responding to all
+management transactions. So in that respect, Claudiu fix is correct.
+
+But i also somewhat agree with you, this looks wrong, but in a
+different way to how you see it. However, moving the phy_resume() to
+phy_start() seems a bit risky. So i'm not sure we should actually do
+that.
+
+	Andrew
 
