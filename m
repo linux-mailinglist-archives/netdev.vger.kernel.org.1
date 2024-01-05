@@ -1,116 +1,213 @@
-Return-Path: <netdev+bounces-62028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C104B825974
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:53:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74444825976
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:53:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5596F1F24416
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:53:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2E1B1F2421C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF0C321B8;
-	Fri,  5 Jan 2024 17:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="RwSGVtCH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FA234555;
+	Fri,  5 Jan 2024 17:53:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458BF328D1
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 17:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40e3712d259so11666305e9.3
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 09:53:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704477185; x=1705081985; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WMKUrW+SGHc5m8pr5MaYnDjxSxXA2LuB1vCwhgWO8Kg=;
-        b=RwSGVtCH3rQTsQntSARrYK69h30GhkeGYbTRRByesAv5nd4Ayjt4HqP9XHLTo3eoFW
-         gz4naL93dN5y8YUG+TbkFFyXMvjLNa2CEwcT3LlB4A4HVpZ1vD7eoVDCY4QKwxCLTaqo
-         4nd8qeLd2fiq7orFB6USWi/DCf/gDStZgfXrBKwrXs4CNbmCrZnE9p2skPFSPXxuhrT/
-         awuh4PiX8S5/ALsqqHYsq6zskgfSRqm3Dst8z6TvyKQrJJiKJfUxDbaRdqqHUKLWtaZg
-         vA1EV6bynL9OLD6bAQBnkBL+ZBUYwDPleo4jvJv1FMPDkVlbugFfvQi2iiJftRwrNUNK
-         KnPA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31939328D8
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 17:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7bb582f9d5eso230772439f.0
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 09:53:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704477185; x=1705081985;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WMKUrW+SGHc5m8pr5MaYnDjxSxXA2LuB1vCwhgWO8Kg=;
-        b=dgjBNFrAvHwqFAID+fy1sYinmVf1th/xr+jwA8+HulaVl7GFg6VQSYJHToIDi40UzY
-         Mmu53TD5cPip5V5oBh6kofJIamZ/Wst9OoLPGP/e/9Ap8nKjKft5wozvR3GO6siX4F6M
-         Q0sSO76BaL1ImoVokVEQxsJD6PX0yoDbiFwB5Xjb0KFJk8xLrYICEojKKVZ2lNDj+r3j
-         7/8VGeH4O/JThoEwdsfla2I55x0txbVVeib+gUbbJ/JoJOBQw/DqJ+cKZeglyYDwbspS
-         RhWbPWZsb2oy1iQqSXf39OEAox85omGQjz9oTxxtj6+t/E2MfFHvE0dlm4WxQfLVHiRY
-         9iag==
-X-Gm-Message-State: AOJu0YyN+G2y2/ZpH32okCpZM9059y96qCe2iGkqQ+8lMncfWfaMlU8i
-	saXBAA8UnJJKKamjUKO0ickvs0ZAdMfeIQ==
-X-Google-Smtp-Source: AGHT+IHhxmGhOS9RO3aRAOTAraXs4zoro6fOAFluwf2bf7i+NWpsrAahcb8Q3jZxiEx19UcwhH0jdA==
-X-Received: by 2002:a05:600c:2b10:b0:40d:85a5:8bce with SMTP id y16-20020a05600c2b1000b0040d85a58bcemr1010862wme.105.1704477185183;
-        Fri, 05 Jan 2024 09:53:05 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id v8-20020a05600c444800b0040d934f48d3sm2240864wmn.32.2024.01.05.09.53.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 09:53:04 -0800 (PST)
-Date: Fri, 5 Jan 2024 18:53:02 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com,
-	arkadiusz.kubalewski@intel.com, saeedm@nvidia.com, leon@kernel.org,
-	michal.michalik@intel.com, rrameshbabu@nvidia.com
-Subject: Re: [patch net-next 0/3] dpll: expose fractional frequency offset
- value to user
-Message-ID: <ZZhB_vWTb3VZGWBK@nanopsycho>
-References: <20240103132838.1501801-1-jiri@resnulli.us>
- <71ab339e-0d6e-4a9d-93fd-d9d291e5e3ae@linux.dev>
+        d=1e100.net; s=20230601; t=1704477201; x=1705082001;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0J45BElnGsnlb+hcSi7W72v1ypQ+RzOOzGvT7znb7Wo=;
+        b=rEV5T1VYxQEvF4mi54KF/kkx4v5e7HTttkT8c+KDP+8pKwPQoxe8wctqKzF9Kb0eTk
+         uZ+89Mi5W2sN3w+eOEThT6z2RIs1cRrMlWnxozJoqXbVKWgWHfiRKIHxNjTGEQQcQVgG
+         NqgbjZBPdoFrpmkQEWp672BH8cmyLb3VzEmT4qLpsv9Kxm/2KdMxivLfTJxr4tCBQHV5
+         BRSe4ICuk/Erb337F9eGClsSGQTBCbYphhO6Fjz55Jj23WZqazIXqFfDdhwT3lulWHUT
+         GTZ2iO7FJ6RD96JWOdz2oCzB7mtTMwz0uMbgKvWh8DRWJL0xwDqy6ZThJnPkGa73f89L
+         /11g==
+X-Gm-Message-State: AOJu0YylUY5Dx6GPXJc0xZhraVRfJ1vBu8H4KJCIQMQftJYeiOsGbpIY
+	n3azwqLdyAAbC6+wgUt6omazGHRwahMKotcbpMtfWwGICMS1
+X-Google-Smtp-Source: AGHT+IEcJoHiQ4KVpQYRGwAeaLcbhZAcCtrzbLyDBMA1yBJkW93EpqVYY7ybAmGIQT9VcceP9LrjiNgHBBGnCyiWkGCcYi5gAGYQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <71ab339e-0d6e-4a9d-93fd-d9d291e5e3ae@linux.dev>
+X-Received: by 2002:a05:6638:14cc:b0:46d:e373:e3aa with SMTP id
+ l12-20020a05663814cc00b0046de373e3aamr261769jak.4.1704477199981; Fri, 05 Jan
+ 2024 09:53:19 -0800 (PST)
+Date: Fri, 05 Jan 2024 09:53:19 -0800
+In-Reply-To: <000000000000a62351060e363bdc@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000008608c060e3686a6@google.com>
+Subject: Re: [syzbot] [net?] memory leak in ___neigh_create (2)
+From: syzbot <syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com>
+To: alexander.mikhalitsyn@virtuozzo.com, davem@davemloft.net, den@openvz.org, 
+	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	razor@blackwall.org, syzkaller-bugs@googlegroups.com, 
+	thomas.zeitlhofer+lkml@ze-it.at, thomas.zeitlhofer@ze-it.at, 
+	wangyuweihx@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Fri, Jan 05, 2024 at 12:44:23PM CET, vadim.fedorenko@linux.dev wrote:
->On 03/01/2024 13:28, Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Allow to expose pin fractional frequency offset value over new DPLL
->> generic netlink attribute. Add an op to get the value from the driver.
->> Implement this new op in mlx5 driver.
->> 
->> Jiri Pirko (3):
->>    dpll: expose fractional frequency offset value to user
->>    net/mlx5: DPLL, Use struct to get values from
->>      mlx5_dpll_synce_status_get()
->>    net/mlx5: DPLL, Implement fractional frequency offset get pin op
->> 
->>   Documentation/netlink/specs/dpll.yaml         | 11 +++
->>   drivers/dpll/dpll_netlink.c                   | 24 +++++
->>   .../net/ethernet/mellanox/mlx5/core/dpll.c    | 94 ++++++++++++-------
->>   include/linux/dpll.h                          |  3 +
->>   include/uapi/linux/dpll.h                     |  1 +
->>   5 files changed, 98 insertions(+), 35 deletions(-)
->> 
->
->Interesting attribute, it's good that hardware can expose this info.
->
->Did you think about building some monitoring/alerts based on it?
+syzbot has found a reproducer for the following issue on:
 
-The deamon we use internally just exposes this to user mainly for
-debugging purposes now. Not sure about another plans with this.
+HEAD commit:    2258c2dc850b Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16f67b44480000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a4fb7ad9185f1501
+dashboard link: https://syzkaller.appspot.com/bug?extid=42cfec52b6508887bbe8
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e23d44480000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0e65a45877eb/disk-2258c2dc.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7617adf885a8/vmlinux-2258c2dc.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/43fb89ea894a/bzImage-2258c2dc.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com
+
+BUG: memory leak
+unreferenced object 0xffff88810b8ea400 (size 512):
+  comm "kworker/0:3", pid 4440, jiffies 4294938594 (age 1132.680s)
+  hex dump (first 32 bytes):
+    00 9c f8 0a 81 88 ff ff 80 29 23 86 ff ff ff ff  .........)#.....
+    c0 79 79 44 81 88 ff ff 72 78 ff ff 00 00 00 00  .yyD....rx......
+  backtrace:
+    [<ffffffff814f9fe6>] __do_kmalloc_node mm/slab_common.c:967 [inline]
+    [<ffffffff814f9fe6>] __kmalloc+0x46/0x120 mm/slab_common.c:981
+    [<ffffffff83b5234f>] kmalloc include/linux/slab.h:584 [inline]
+    [<ffffffff83b5234f>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83b5234f>] neigh_alloc net/core/neighbour.c:476 [inline]
+    [<ffffffff83b5234f>] ___neigh_create+0xdf/0xd60 net/core/neighbour.c:661
+    [<ffffffff83f9f886>] ip6_finish_output2+0x776/0x9b0 net/ipv6/ip6_output.c:125
+    [<ffffffff83fa5530>] __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
+    [<ffffffff83fa5530>] ip6_finish_output+0x270/0x530 net/ipv6/ip6_output.c:206
+    [<ffffffff83fa5893>] NF_HOOK_COND include/linux/netfilter.h:291 [inline]
+    [<ffffffff83fa5893>] ip6_output+0xa3/0x1b0 net/ipv6/ip6_output.c:227
+    [<ffffffff83ff16d9>] dst_output include/net/dst.h:444 [inline]
+    [<ffffffff83ff16d9>] NF_HOOK include/linux/netfilter.h:302 [inline]
+    [<ffffffff83ff16d9>] NF_HOOK.constprop.0+0x49/0x110 include/linux/netfilter.h:296
+    [<ffffffff83ff19c4>] mld_sendpack+0x224/0x350 net/ipv6/mcast.c:1820
+    [<ffffffff83ff5403>] mld_send_cr net/ipv6/mcast.c:2121 [inline]
+    [<ffffffff83ff5403>] mld_ifc_work+0x2a3/0x750 net/ipv6/mcast.c:2653
+    [<ffffffff8129519a>] process_one_work+0x2ba/0x5f0 kernel/workqueue.c:2289
+    [<ffffffff81295ab9>] worker_thread+0x59/0x5b0 kernel/workqueue.c:2436
+    [<ffffffff8129fb05>] kthread+0x125/0x160 kernel/kthread.c:376
+    [<ffffffff8100224f>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+
+BUG: memory leak
+unreferenced object 0xffff888109a7fa00 (size 512):
+  comm "kworker/0:3", pid 4440, jiffies 4294938594 (age 1132.680s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 80 29 23 86 ff ff ff ff  .........)#.....
+    00 79 79 44 81 88 ff ff 72 78 ff ff 00 00 00 00  .yyD....rx......
+  backtrace:
+    [<ffffffff814f9fe6>] __do_kmalloc_node mm/slab_common.c:967 [inline]
+    [<ffffffff814f9fe6>] __kmalloc+0x46/0x120 mm/slab_common.c:981
+    [<ffffffff83b5234f>] kmalloc include/linux/slab.h:584 [inline]
+    [<ffffffff83b5234f>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83b5234f>] neigh_alloc net/core/neighbour.c:476 [inline]
+    [<ffffffff83b5234f>] ___neigh_create+0xdf/0xd60 net/core/neighbour.c:661
+    [<ffffffff83f9f886>] ip6_finish_output2+0x776/0x9b0 net/ipv6/ip6_output.c:125
+    [<ffffffff83fa5530>] __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
+    [<ffffffff83fa5530>] ip6_finish_output+0x270/0x530 net/ipv6/ip6_output.c:206
+    [<ffffffff83fa5893>] NF_HOOK_COND include/linux/netfilter.h:291 [inline]
+    [<ffffffff83fa5893>] ip6_output+0xa3/0x1b0 net/ipv6/ip6_output.c:227
+    [<ffffffff83ff16d9>] dst_output include/net/dst.h:444 [inline]
+    [<ffffffff83ff16d9>] NF_HOOK include/linux/netfilter.h:302 [inline]
+    [<ffffffff83ff16d9>] NF_HOOK.constprop.0+0x49/0x110 include/linux/netfilter.h:296
+    [<ffffffff83ff19c4>] mld_sendpack+0x224/0x350 net/ipv6/mcast.c:1820
+    [<ffffffff83ff5403>] mld_send_cr net/ipv6/mcast.c:2121 [inline]
+    [<ffffffff83ff5403>] mld_ifc_work+0x2a3/0x750 net/ipv6/mcast.c:2653
+    [<ffffffff8129519a>] process_one_work+0x2ba/0x5f0 kernel/workqueue.c:2289
+    [<ffffffff81295ab9>] worker_thread+0x59/0x5b0 kernel/workqueue.c:2436
+    [<ffffffff8129fb05>] kthread+0x125/0x160 kernel/kthread.c:376
+    [<ffffffff8100224f>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+
+BUG: memory leak
+unreferenced object 0xffff88810a9fb400 (size 512):
+  comm "dhcpcd", pid 4638, jiffies 4294938595 (age 1132.670s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 80 29 23 86 ff ff ff ff  .........)#.....
+    c0 76 79 44 81 88 ff ff 73 78 ff ff 00 00 00 00  .vyD....sx......
+  backtrace:
+    [<ffffffff814f9fe6>] __do_kmalloc_node mm/slab_common.c:967 [inline]
+    [<ffffffff814f9fe6>] __kmalloc+0x46/0x120 mm/slab_common.c:981
+    [<ffffffff83b5234f>] kmalloc include/linux/slab.h:584 [inline]
+    [<ffffffff83b5234f>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83b5234f>] neigh_alloc net/core/neighbour.c:476 [inline]
+    [<ffffffff83b5234f>] ___neigh_create+0xdf/0xd60 net/core/neighbour.c:661
+    [<ffffffff83f9f886>] ip6_finish_output2+0x776/0x9b0 net/ipv6/ip6_output.c:125
+    [<ffffffff83fa5530>] __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
+    [<ffffffff83fa5530>] ip6_finish_output+0x270/0x530 net/ipv6/ip6_output.c:206
+    [<ffffffff83fa5893>] NF_HOOK_COND include/linux/netfilter.h:291 [inline]
+    [<ffffffff83fa5893>] ip6_output+0xa3/0x1b0 net/ipv6/ip6_output.c:227
+    [<ffffffff84062411>] dst_output include/net/dst.h:444 [inline]
+    [<ffffffff84062411>] ip6_local_out+0x51/0x70 net/ipv6/output_core.c:155
+    [<ffffffff83fa6285>] ip6_send_skb+0x25/0xc0 net/ipv6/ip6_output.c:1971
+    [<ffffffff83fa6394>] ip6_push_pending_frames+0x74/0x90 net/ipv6/ip6_output.c:1991
+    [<ffffffff83fec08c>] rawv6_push_pending_frames net/ipv6/raw.c:579 [inline]
+    [<ffffffff83fec08c>] rawv6_sendmsg+0x16ac/0x1ba0 net/ipv6/raw.c:922
+    [<ffffffff83ebe965>] inet_sendmsg+0x45/0x70 net/ipv4/af_inet.c:827
+    [<ffffffff83af7116>] sock_sendmsg_nosec net/socket.c:714 [inline]
+    [<ffffffff83af7116>] sock_sendmsg+0x56/0x80 net/socket.c:734
+    [<ffffffff83af769d>] ____sys_sendmsg+0x38d/0x410 net/socket.c:2476
+    [<ffffffff83afbfe8>] ___sys_sendmsg+0xa8/0x110 net/socket.c:2530
+    [<ffffffff83afc178>] __sys_sendmsg+0x88/0x100 net/socket.c:2559
+    [<ffffffff848ed5b5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff848ed5b5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84a00087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff88810a9fba00 (size 512):
+  comm "dhcpcd", pid 4638, jiffies 4294938595 (age 1132.670s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 80 29 23 86 ff ff ff ff  .........)#.....
+    80 77 79 44 81 88 ff ff 73 78 ff ff 00 00 00 00  .wyD....sx......
+  backtrace:
+    [<ffffffff814f9fe6>] __do_kmalloc_node mm/slab_common.c:967 [inline]
+    [<ffffffff814f9fe6>] __kmalloc+0x46/0x120 mm/slab_common.c:981
+    [<ffffffff83b5234f>] kmalloc include/linux/slab.h:584 [inline]
+    [<ffffffff83b5234f>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83b5234f>] neigh_alloc net/core/neighbour.c:476 [inline]
+    [<ffffffff83b5234f>] ___neigh_create+0xdf/0xd60 net/core/neighbour.c:661
+    [<ffffffff83f9f886>] ip6_finish_output2+0x776/0x9b0 net/ipv6/ip6_output.c:125
+    [<ffffffff83fa5530>] __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
+    [<ffffffff83fa5530>] ip6_finish_output+0x270/0x530 net/ipv6/ip6_output.c:206
+    [<ffffffff83fa5893>] NF_HOOK_COND include/linux/netfilter.h:291 [inline]
+    [<ffffffff83fa5893>] ip6_output+0xa3/0x1b0 net/ipv6/ip6_output.c:227
+    [<ffffffff84062411>] dst_output include/net/dst.h:444 [inline]
+    [<ffffffff84062411>] ip6_local_out+0x51/0x70 net/ipv6/output_core.c:155
+    [<ffffffff83fa6285>] ip6_send_skb+0x25/0xc0 net/ipv6/ip6_output.c:1971
+    [<ffffffff83fa6394>] ip6_push_pending_frames+0x74/0x90 net/ipv6/ip6_output.c:1991
+    [<ffffffff83fec08c>] rawv6_push_pending_frames net/ipv6/raw.c:579 [inline]
+    [<ffffffff83fec08c>] rawv6_sendmsg+0x16ac/0x1ba0 net/ipv6/raw.c:922
+    [<ffffffff83ebe965>] inet_sendmsg+0x45/0x70 net/ipv4/af_inet.c:827
+    [<ffffffff83af7116>] sock_sendmsg_nosec net/socket.c:714 [inline]
+    [<ffffffff83af7116>] sock_sendmsg+0x56/0x80 net/socket.c:734
+    [<ffffffff83af769d>] ____sys_sendmsg+0x38d/0x410 net/socket.c:2476
+    [<ffffffff83afbfe8>] ___sys_sendmsg+0xa8/0x110 net/socket.c:2530
+    [<ffffffff83afc178>] __sys_sendmsg+0x88/0x100 net/socket.c:2559
+    [<ffffffff848ed5b5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff848ed5b5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84a00087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
 
->
->For the series (I'm not sure if it's enough for mlx5, but the
->refactoring looks nice):
->
->Acked-By: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
