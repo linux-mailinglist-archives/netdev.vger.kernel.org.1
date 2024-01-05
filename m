@@ -1,104 +1,186 @@
-Return-Path: <netdev+bounces-61916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EEED82532D
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:00:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66431825333
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:03:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1F501C227DF
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:00:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1E702853A3
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F272CCB8;
-	Fri,  5 Jan 2024 12:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0BB92CCBB;
+	Fri,  5 Jan 2024 12:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Puy2ML8h"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="TMpxx2RU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2668A2CCB2
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 12:00:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A5ADCC433C9;
-	Fri,  5 Jan 2024 12:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704456027;
-	bh=HABBMcf2qpEYNsmdi9LoyknRKlR0TJ1DyoY1ZcAavGY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Puy2ML8h3yb0mrAb50zwF9s06413aoblCqzdPm0ynEMy33o3JvJS79qanlSox3Eny
-	 e539hlVU1MHFSOfjig4kp/m5wa0DeZuUxCAD7eqXId74gykSThWjwKFxqwcr60+j0q
-	 zmEsx8xpnm5rW1lgHovMLm7PJfhU9cb3TD/eVDnaGxF/27CV8n452jQjnPz37HrYas
-	 mGK19j0o9P2a/R/ls3fqFxuZoqUapzEssekfS3lqFmMGOYaaj1TJFlEpCthCtAT4Dp
-	 gTIEI6oSZVvCfnfbWhH9EkltwgA4qLChPaqbV74O/iQUWULrpG280D2CTETjqf5yxp
-	 H0Rz/c683H1Xw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 834B3DCB6D8;
-	Fri,  5 Jan 2024 12:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A9E2D601;
+	Fri,  5 Jan 2024 12:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4054bI95004588;
+	Fri, 5 Jan 2024 04:02:54 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=6sU5GxlK76ndUKi2361U/O6LtYlGS3aaQIWSH2fN1ig=; b=TMp
+	xx2RUTpG/hU58asUNkoyajWsG/kYsnkEKwzXwi7d0tUsvV0nNPBiMnjJWHBKqJRz
+	Ucx51DqudNvCQYJbupawk94q2zZxv42t8MtCxCcAy9JKmQaaU/Ft4x5AHdtXEsEy
+	JrBln33aCVzfk6g3+4ii/bss4O2ZoZo8x+cDysyg1E8sfKyRWwPuIvDbob0Z/f1g
+	leidiNZt1pYr5OWRUh/DxyNs9pnUjh/dj1n/rPdkxMsoy83NoBNc6fmMrNQSM8Xm
+	aHBWUKE9MQWJ+dBOig/BOPRF0sW/67fUr8y9GfPVkPUo9Sl/1i/mnO7pYwi1R3Dj
+	L/PgOboyyxbwlJYXvfg==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3veaw014hx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Fri, 05 Jan 2024 04:02:53 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 5 Jan
+ 2024 04:02:51 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Fri, 5 Jan 2024 04:02:51 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 861A83F7091;
+	Fri,  5 Jan 2024 04:02:48 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net-next PATCH] octeontx2-pf: Add support for offload tc with skbedit mark action
+Date: Fri, 5 Jan 2024 17:32:47 +0530
+Message-ID: <20240105120247.14975-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/10] ds->user_mii_bus cleanup (part 1)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170445602753.29854.15404184789063719245.git-patchwork-notify@kernel.org>
-Date: Fri, 05 Jan 2024 12:00:27 +0000
-References: <20240104140037.374166-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20240104140037.374166-1-vladimir.oltean@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com,
- luizluca@gmail.com, alsi@bang-olufsen.dk, linus.walleij@linaro.org,
- florian.fainelli@broadcom.com, hauke@hauke-m.de, ansuelsmth@gmail.com,
- arinc.unal@arinc9.com
+Content-Type: text/plain
+X-Proofpoint-GUID: gXxI_aJTxv4kpC8oPZBqBj0QfnQQsdea
+X-Proofpoint-ORIG-GUID: gXxI_aJTxv4kpC8oPZBqBj0QfnQQsdea
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-Hello:
+Support offloading of skbedit mark action.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+For example, to mark with 0x0008, with dest ip 60.60.60.2 on eth2
+interface:
 
-On Thu,  4 Jan 2024 16:00:27 +0200 you wrote:
-> There are some drivers which assign ds->user_mii_bus when they
-> don't really need its specific functionality, aka non-OF based
-> dsa_user_phy_connect(). There was some confusion regarding the
-> fact that yes, this is why ds->user_mii_bus really exists, so
-> I've started a cleanup series which aims to eliminate the usage
-> of ds->user_mii_bus from drivers when there is nothing to gain
-> from it.
-> 
-> [...]
+ # tc qdisc add dev eth2 ingress
+ # tc filter add dev eth2 ingress protocol ip flower \
+      dst_ip 60.60.60.2 action skbedit mark 0x0008 skip_sw
 
-Here is the summary with links:
-  - [net-next,01/10] net: dsa: lantiq_gswip: delete irrelevant use of ds->phys_mii_mask
-    https://git.kernel.org/netdev/net-next/c/fc74b32b4032
-  - [net-next,02/10] net: dsa: lantiq_gswip: use devres for internal MDIO bus, not ds->user_mii_bus
-    https://git.kernel.org/netdev/net-next/c/cd4ba3ecced9
-  - [net-next,03/10] net: dsa: lantiq_gswip: ignore MDIO buses disabled in OF
-    https://git.kernel.org/netdev/net-next/c/7a898539391d
-  - [net-next,04/10] net: dsa: qca8k: put MDIO bus OF node on qca8k_mdio_register() failure
-    https://git.kernel.org/netdev/net-next/c/68e1010cda79
-  - [net-next,05/10] net: dsa: qca8k: skip MDIO bus creation if its OF node has status = "disabled"
-    https://git.kernel.org/netdev/net-next/c/e66bf63a7f67
-  - [net-next,06/10] net: dsa: qca8k: assign ds->user_mii_bus only for the non-OF case
-    https://git.kernel.org/netdev/net-next/c/525366b81f33
-  - [net-next,07/10] net: dsa: qca8k: consolidate calls to a single devm_of_mdiobus_register()
-    https://git.kernel.org/netdev/net-next/c/5c5d6b34b683
-  - [net-next,08/10] net: dsa: qca8k: use "dev" consistently within qca8k_mdio_register()
-    https://git.kernel.org/netdev/net-next/c/c4a1cefdf3bc
-  - [net-next,09/10] net: dsa: bcm_sf2: stop assigning an OF node to the ds->user_mii_bus
-    https://git.kernel.org/netdev/net-next/c/04a4bc9dddc7
-  - [net-next,10/10] net: dsa: bcm_sf2: drop priv->master_mii_dn
-    https://git.kernel.org/netdev/net-next/c/45f62ca5cc48
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c  |  2 ++
+ .../ethernet/marvell/octeontx2/nic/otx2_common.h    |  2 ++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c    | 13 +++++++++++++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c  |  3 +++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.h  |  3 +++
+ 5 files changed, 23 insertions(+)
 
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index c75669c8fde7..6188921e9a20 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -1183,6 +1183,8 @@ static int npc_update_rx_entry(struct rvu *rvu, struct rvu_pfvf *pfvf,
+ 			action.pf_func = target;
+ 			action.op = NIX_RX_ACTIONOP_UCAST;
+ 		}
++		if (req->match_id)
++			action.match_id = req->match_id;
+ 	}
+ 
+ 	entry->action = *(u64 *)&action;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 06910307085e..815ae13c371c 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -363,6 +363,7 @@ struct otx2_flow_config {
+ 	struct list_head	flow_list;
+ 	u32			dmacflt_max_flows;
+ 	u16                     max_flows;
++	u16			mark_flows;
+ 	struct list_head	flow_list_tc;
+ 	bool			ntuple;
+ };
+@@ -465,6 +466,7 @@ struct otx2_nic {
+ #define OTX2_FLAG_DMACFLTR_SUPPORT		BIT_ULL(14)
+ #define OTX2_FLAG_PTP_ONESTEP_SYNC		BIT_ULL(15)
+ #define OTX2_FLAG_ADPTV_INT_COAL_ENABLED BIT_ULL(16)
++#define OTX2_FLAG_TC_MARK_ENABLED		BIT_ULL(17)
+ 	u64			flags;
+ 	u64			*cq_op_addr;
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+index 4fd44b6eecea..fd1d78601811 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+@@ -511,7 +511,15 @@ static int otx2_tc_parse_actions(struct otx2_nic *nic,
+ 			nr_police++;
+ 			break;
+ 		case FLOW_ACTION_MARK:
++			if (act->mark & ~OTX2_RX_MATCH_ID_MASK) {
++				NL_SET_ERR_MSG_MOD(extack, "Bad flow mark, only 16 bit supported");
++				return -EOPNOTSUPP;
++			}
+ 			mark = act->mark;
++			req->match_id = mark & 0xFFFFULL;
++			req->op = NIX_RX_ACTION_DEFAULT;
++			nic->flags |= OTX2_FLAG_TC_MARK_ENABLED;
++			nic->flow_cfg->mark_flows++;
+ 			break;
+ 
+ 		case FLOW_ACTION_RX_QUEUE_MAPPING:
+@@ -1173,6 +1181,11 @@ static int otx2_tc_del_flow(struct otx2_nic *nic,
+ 		return -EINVAL;
+ 	}
+ 
++	/* Disable TC MARK flag if they are no rules with skbedit mark action */
++	if (flow_node->req.match_id)
++		if (!(--flow_cfg->mark_flows))
++			nic->flags &= ~OTX2_FLAG_TC_MARK_ENABLED;
++
+ 	if (flow_node->is_act_police) {
+ 		__clear_bit(flow_node->rq, &nic->rq_bmap);
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 4d519ea833b2..d3c9759c9f06 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -380,6 +380,9 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
+ 	if (pfvf->netdev->features & NETIF_F_RXCSUM)
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 
++	if (pfvf->flags & OTX2_FLAG_TC_MARK_ENABLED)
++		skb->mark = parse->match_id;
++
+ 	skb_mark_for_recycle(skb);
+ 
+ 	napi_gro_frags(napi);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+index a82ffca8ce1b..3f1d2655ff77 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+@@ -62,6 +62,9 @@
+ #define CQ_OP_STAT_OP_ERR       63
+ #define CQ_OP_STAT_CQ_ERR       46
+ 
++/* Packet mark mask */
++#define OTX2_RX_MATCH_ID_MASK 0x0000ffff
++
+ struct queue_stats {
+ 	u64	bytes;
+ 	u64	pkts;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
