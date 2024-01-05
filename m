@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-61990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4B778257EF
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:20:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFF538257F1
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:20:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAC022847C7
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:20:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A40151F215B8
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C352E829;
-	Fri,  5 Jan 2024 16:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E91331734;
+	Fri,  5 Jan 2024 16:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JKzJld71"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urC9BfQr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139A7569F
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 16:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6808CC433C7;
-	Fri,  5 Jan 2024 16:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186F22E85B;
+	Fri,  5 Jan 2024 16:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9447DC433D9;
+	Fri,  5 Jan 2024 16:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704471624;
-	bh=J2kT4hySqcltz6dCgHF2wMwz4TZBOMouFcTXJtI1ehI=;
+	s=k20201202; t=1704471625;
+	bh=yVeKmEcClyi5B8/xFJ+u1/QIebKfkfq7DhyuYiRjrFQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JKzJld71wwqKsb69pyH4l/OS4NzNl+CPKD+F0w+1Qco6HB/9JoY9N7L8pqvHt3/nX
-	 xJh1/h3mTNopKhUhZKpWjDOFRyH8Oaz3WqHFc8Kx9MLTRpgIB1ePicFTGiMBWSwK6g
-	 pRXN4vMBNNQu6325u/DP07bL9itfRe2ufx/K2kF0gnzfg4vZqZTQIE7ByxXTUdrCpd
-	 gPp8CdeGJwFQ8Mt62FtLqnxJ9NXkobg4U5qGWVKGf6tsvRApmDSEGI0JWI6ObgDuLj
-	 iWyavh4ug2JbqVW9pKAZ1cPXt5yVbSQGEYHjbkkTy+65tMT1KYG8bGCpgIdpPWIrDG
-	 Sn0J1J2Mfvcgg==
+	b=urC9BfQrFSeJInf4JacBUekwPYgA1d+coWqMWOD46hMO8oiI439sszRZhlG6NuSk8
+	 ROHU8i6u6WAEV4Phbk7XYGhjmweEB0lo8yTHBMbAyl1fzSeAVPUKWzKHc3UMIEDRBS
+	 497GfZA+acmlYL/nTYO3S/SWnl++eTU85GRdSPm6yJ29e9SU+5oBMZwiqugn5Npe/9
+	 Nsnh2xxAJbmbBmDDP8MlbU4T2FUUU4Ss+6a5a9R4HeVx2CUUC02BHIoiN4GlP0/edt
+	 yPNtEtagKys3+PDWd6Bynq9qfli1MOinGJLincUh3DCdRU9g1m0NSjzLjN2mVk4r2t
+	 jfyyg73sg5T7A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C093C4167E;
-	Fri,  5 Jan 2024 16:20:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F325DCB6D8;
+	Fri,  5 Jan 2024 16:20:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,38 +43,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/sched: act_ct: fix skb leak and crash on ooo frags
+Subject: Re: [PATCH net-next v3 0/3] net: gro: reduce extension header parsing
+ overhead
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170447162430.14252.14016343998496544271.git-patchwork-notify@kernel.org>
-Date: Fri, 05 Jan 2024 16:20:24 +0000
-References: <20231228081457.936732-1-taoliu828@163.com>
-In-Reply-To: <20231228081457.936732-1-taoliu828@163.com>
-To: Tao Liu <taoliu828@163.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
- netdev@vger.kernel.org, simon.horman@corigine.com, xiyou.wangcong@gmail.com,
- pablo@netfilter.org
+ <170447162551.14252.7658609133386405696.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Jan 2024 16:20:25 +0000
+References: <ac6fb684-c00e-449c-92c3-99358a927ade@gmail.com>
+In-Reply-To: <ac6fb684-c00e-449c-92c3-99358a927ade@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 28 Dec 2023 16:14:57 +0800 you wrote:
-> act_ct adds skb->users before defragmentation. If frags arrive in order,
-> the last frag's reference is reset in:
+On Wed, 3 Jan 2024 15:36:41 +0100 you wrote:
+> This series attempts to reduce the parsing overhead of IPv6 extension
+> headers in GRO and GSO, by removing extension header specific code and
+> enabling the frag0 fast path.
 > 
->   inet_frag_reasm_prepare
->     skb_morph
-> 
-> which is not straightforward.
+> The following changes were made:
+>  - Removed some unnecessary HBH conditionals by adding HBH offload
+>    to inet6_offloads
+>  - Added a utility function to support frag0 fast path in ipv6_gro_receive
+>  - Added selftests for IPv6 packets with extension headers in GRO
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net/sched: act_ct: fix skb leak and crash on ooo frags
-    https://git.kernel.org/netdev/net/c/3f14b377d01d
+  - [net-next,v3,1/3] net: gso: add HBH extension header offload support
+    https://git.kernel.org/netdev/net-next/c/f2e3fc2158e6
+  - [net-next,v3,2/3] net: gro: parse ipv6 ext headers without frag0 invalidation
+    https://git.kernel.org/netdev/net-next/c/dff0b0161ad5
+  - [net-next,v3,3/3] selftests/net: fix GRO coalesce test and add ext header coalesce tests
+    https://git.kernel.org/netdev/net-next/c/4e321d590cec
 
 You are awesome, thank you!
 -- 
