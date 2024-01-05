@@ -1,200 +1,293 @@
-Return-Path: <netdev+bounces-61959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 117D3825593
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:40:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66419825614
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:49:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78FDBB221F2
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:40:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6205B1C23252
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:49:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5072AE74;
-	Fri,  5 Jan 2024 14:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C352DF8E;
+	Fri,  5 Jan 2024 14:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0CS9W304"
+	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="TlsFY3EA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5A42DF66
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 14:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso12100a12.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 06:40:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704465613; x=1705070413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/jZtkdk7JJkshJv1ec+QQ3WWMundFT0jFhuRL4iB/oQ=;
-        b=0CS9W304QSFenN+4N53eDEg6hHvPj2Vi8WudytIKSrzaWLRXXzylVWFuYtuABtFxnG
-         hadpWt0VCecrZIMKp08GKTcwV+IIa+XaGkzKyFGYR24s8c1um5nICxQ2Diq+wdC5zS1A
-         5YjzF88eg5lSDn6ysTFWJOrBFN0k7uvHICCYb1mKEgQD6GIduoXIL5CPZTKzyTvanSTa
-         c8RiZx6k6tbg4TNy1ffzbhiwmlLY1hBgbjvgu1dabU3lpPVZjM+VRW2zvRxhjpxI8ZYj
-         bFot6tXSceFDdWbq9gVK7UzcjNpHGul22VJjQ2n6LOQ1CB6thtUTtzUuInMFeQhraSxL
-         xlCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704465613; x=1705070413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/jZtkdk7JJkshJv1ec+QQ3WWMundFT0jFhuRL4iB/oQ=;
-        b=r3TusOpeA4lX7Gt1EktmFDV8lpAM4U0QQzT0lqUXKcHtj1FxCGd4QPPv2DQXqx0mvy
-         6YmYiw1RiMMET7byLiP5k5CFMjWWudSWA5XZEBnqMRK5+KzY4chDdT/eXBTYRwHvJPxm
-         cIqbesufk6MU/6YNJsTW4+n5vX+W6RJdff46XowkYIKZYDGHMKLCf3E/XjhWI88kpvzL
-         su4jlty0iAP+lCLrpR64dQp6EaPI7Z0wjUrkYz03hQ+YTlQKtDsI1VOwzTV//vRCphQF
-         YAJwsEgvZN5ZmA+aYLMb/v4AkzJTOvpQcF8oE7qgWo0dhF1Rt1kkYfsW5xSOKKYCyDEe
-         8o6w==
-X-Gm-Message-State: AOJu0YzERXF/ThqNJogYYDEDToRbyGXtQusPl/KPxmNWM6Z8lqAaMaLI
-	h9JYYHbhtgNZEGvaGdjjApsMczswcwZiqsBoEC1Fa2UDYWPB
-X-Google-Smtp-Source: AGHT+IGjzNTb0wXowITaFjaRFpqnxEKsfroHyxU2BIh4GF0oOq5lrHeiWO5o0Wq0CiC5990KiUGxgbGVAR0UKfQEJcA=
-X-Received: by 2002:a50:d7d4:0:b0:553:b7c6:1e47 with SMTP id
- m20-20020a50d7d4000000b00553b7c61e47mr169651edj.2.1704465612572; Fri, 05 Jan
- 2024 06:40:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E0E2E3E8;
+	Fri,  5 Jan 2024 14:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tesarici.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tesarici.cz
+Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by bee.tesarici.cz (Postfix) with ESMTPSA id D6D7D1A80E5;
+	Fri,  5 Jan 2024 15:46:00 +0100 (CET)
+Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
+	t=1704465961; bh=jVPDDlHEkAJsKbkJAQA4OoaB0GVHg6A4zFDVTiaBIYg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TlsFY3EAgOksGz5dkQzISJo3LB919H/zGwZ7MnySbuCYPpPMO21Iw67Ky55BAD1JZ
+	 xCgs0giNLhESBRGjFnLNpHg+k7U+0/U2DwMA03QpJdKwirhUgSuxbnobEv2ivxOAHJ
+	 ryAxkmpPSm+Rc/8dYai77r6orb8sYK5E9NvQoJBZugf5HaQNdsraftGIjAwT6C8c/v
+	 17q07yE550pG6MIIHwsN48rUMyF5FCzEbsFGYlpbls2t3N+UZsdnF1Enw10AmaMxPg
+	 9OMcgobUy4mTBepjqSRQCd6epxIKSNg6cZba497zeV22EswhChOGheuJqsNgIeMGB7
+	 Zo3gzS1cZZH/A==
+Date: Fri, 5 Jan 2024 15:45:58 +0100
+From: Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>, Jernej
+ Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
+ "open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, "moderated
+ list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
+ "moderated list:ARM/STM32 ARCHITECTURE"
+ <linux-arm-kernel@lists.infradead.org>, open list
+ <linux-kernel@vger.kernel.org>, "open list:ARM/Allwinner sunXi SoC support"
+ <linux-sunxi@lists.linux.dev>, Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH] net: stmmac: protect statistics updates with a spinlock
+Message-ID: <20240105154558.2ca38aca@meshulam.tesarici.cz>
+In-Reply-To: <CANn89iKWSemsKmfsLjupwWBnyeKjtHH+mZjTzYiJT4G=xyUrNQ@mail.gmail.com>
+References: <20240105091556.15516-1-petr@tesarici.cz>
+	<CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
+	<20240105113402.0f5f1232@meshulam.tesarici.cz>
+	<CANn89iLEvW9ZS=+WPETPC=mKRyu9AKmueGCWZZOrz9oX3Xef=g@mail.gmail.com>
+	<20240105121447.11ae80d1@meshulam.tesarici.cz>
+	<20240105142732.1903bc70@meshulam.tesarici.cz>
+	<CANn89iLHLvGFX_JEYU-en0ZoCUpTvjXPBzFECxLFfa_Jhpcjmg@mail.gmail.com>
+	<CANn89iKWSemsKmfsLjupwWBnyeKjtHH+mZjTzYiJT4G=xyUrNQ@mail.gmail.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240102-new-gemini-ethernet-regression-v5-0-cf61ab3aa8cd@linaro.org>
- <20240102-new-gemini-ethernet-regression-v5-1-cf61ab3aa8cd@linaro.org>
-In-Reply-To: <20240102-new-gemini-ethernet-regression-v5-1-cf61ab3aa8cd@linaro.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 5 Jan 2024 15:40:01 +0100
-Message-ID: <CANn89iKPA7DdiZpGy95udBZcf58AxWO-ZUUgNAPaQPDTHSRr9A@mail.gmail.com>
-Subject: Re: [PATCH net v5 1/2] net: ethernet: cortina: Drop software checksum
- and TSO
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	Household Cang <canghousehold@aol.com>, Romain Gantois <romain.gantois@bootlin.com>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 2, 2024 at 9:34=E2=80=AFPM Linus Walleij <linus.walleij@linaro.=
-org> wrote:
->
-> The recent change to allow large frames without hardware checksumming
-> slotted in software checksumming in the driver if hardware could not
-> do it.
->
-> This will however upset TSO (TCP Segment Offloading). Typical
-> error dumps includes this:
->
-> skb len=3D2961 headroom=3D222 headlen=3D66 tailroom=3D0
-> (...)
-> WARNING: CPU: 0 PID: 956 at net/core/dev.c:3259 skb_warn_bad_offload+0x7c=
-/0x108
-> gemini-ethernet-port: caps=3D(0x0000010000154813, 0x00002007ffdd7889)
->
-> And the packets do not go through.
->
-> After investigating I drilled it down to the introduction of the
-> software checksumming in the driver.
->
-> Since the segmenting of packets will be done by the hardware this
-> makes a bit of sense since in that case the hardware also needs to
-> be keeping track of the checksumming.
->
-> That begs the question why large TCP or UDP packets also have to
-> bypass the checksumming (like e.g. ICMP does). If the hardware is
-> splitting it into smaller packets per-MTU setting, and checksumming
-> them, why is this happening then? I don't know. I know it is needed,
-> from tests: the OpenWrt webserver uhttpd starts sending big skb:s (up
-> to 2047 bytes, the max MTU) and above 1514 bytes it starts to fail
-> and hang unless the bypass bit is set: the frames are not getting
-> through.
->
-> Drop the size check and the offloading features for now: this
-> needs to be fixed up properly.
->
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Fixes: d4d0c5b4d279 ("net: ethernet: cortina: Handle large frames")
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  drivers/net/ethernet/cortina/gemini.c | 35 ++++-------------------------=
-------
->  1 file changed, 4 insertions(+), 31 deletions(-)
->
-> diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet=
-/cortina/gemini.c
-> index 78287cfcbf63..5e399c6e095b 100644
-> --- a/drivers/net/ethernet/cortina/gemini.c
-> +++ b/drivers/net/ethernet/cortina/gemini.c
-> @@ -79,8 +79,7 @@ MODULE_PARM_DESC(debug, "Debug level (0=3Dnone,...,16=
-=3Dall)");
->  #define GMAC0_IRQ4_8 (GMAC0_MIB_INT_BIT | GMAC0_RX_OVERRUN_INT_BIT)
->
->  #define GMAC_OFFLOAD_FEATURES (NETIF_F_SG | NETIF_F_IP_CSUM | \
-> -               NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM | \
-> -               NETIF_F_TSO | NETIF_F_TSO_ECN | NETIF_F_TSO6)
-> +                              NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM)
->
->  /**
->   * struct gmac_queue_page - page buffer per-page info
-> @@ -1143,39 +1142,13 @@ static int gmac_map_tx_bufs(struct net_device *ne=
-tdev, struct sk_buff *skb,
->         struct gmac_txdesc *txd;
->         skb_frag_t *skb_frag;
->         dma_addr_t mapping;
-> -       unsigned short mtu;
->         void *buffer;
-> -       int ret;
-> -
-> -       mtu  =3D ETH_HLEN;
-> -       mtu +=3D netdev->mtu;
-> -       if (skb->protocol =3D=3D htons(ETH_P_8021Q))
-> -               mtu +=3D VLAN_HLEN;
->
-> +       /* TODO: implement proper TSO using MTU in word3 */
+On Fri, 5 Jan 2024 15:28:41 +0100
+Eric Dumazet <edumazet@google.com> wrote:
 
-I would not use MTU in this comment, but gso_size (or flow MSS).
+> On Fri, Jan 5, 2024 at 3:26=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+> >
+> > On Fri, Jan 5, 2024 at 2:27=E2=80=AFPM Petr Tesa=C5=99=C3=ADk <petr@tes=
+arici.cz> wrote: =20
+> > >
+> > > Hi Eric,
+> > >
+> > > yeah, it's me again...
+> > >
+> > > On Fri, 5 Jan 2024 12:14:47 +0100
+> > > Petr Tesa=C5=99=C3=ADk <petr@tesarici.cz> wrote:
+> > > =20
+> > > > On Fri, 5 Jan 2024 11:48:19 +0100
+> > > > Eric Dumazet <edumazet@google.com> wrote:
+> > > > =20
+> > > > > On Fri, Jan 5, 2024 at 11:34=E2=80=AFAM Petr Tesa=C5=99=C3=ADk <p=
+etr@tesarici.cz> wrote: =20
+> > > > > >
+> > > > > > On Fri, 5 Jan 2024 10:58:42 +0100
+> > > > > > Eric Dumazet <edumazet@google.com> wrote:
+> > > > > > =20
+> > > > > > > On Fri, Jan 5, 2024 at 10:16=E2=80=AFAM Petr Tesarik <petr@te=
+sarici.cz> wrote: =20
+> > > > > > > >
+> > > > > > > > Add a spinlock to fix race conditions while updating Tx/Rx =
+statistics.
+> > > > > > > >
+> > > > > > > > As explained by a comment in <linux/u64_stats_sync.h>, writ=
+e side of struct
+> > > > > > > > u64_stats_sync must ensure mutual exclusion, or one seqcoun=
+t update could
+> > > > > > > > be lost on 32-bit platforms, thus blocking readers forever.
+> > > > > > > >
+> > > > > > > > Such lockups have been actually observed on 32-bit Arm afte=
+r stmmac_xmit()
+> > > > > > > > on one core raced with stmmac_napi_poll_tx() on another cor=
+e.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Petr Tesarik <petr@tesarici.cz> =20
+> > > > > > >
+> > > > > > > This is going to add more costs to 64bit platforms ? =20
+> > > > > >
+> > > > > > Yes, it adds a (hopefully not too contended) spinlock and in mo=
+st
+> > > > > > places an interrupt disable/enable pair.
+> > > > > >
+> > > > > > FWIW the race condition is also present on 64-bit platforms, re=
+sulting
+> > > > > > in inaccurate statistic counters. I can understand if you consi=
+der it a
+> > > > > > mild annoyance, not worth fixing.
+> > > > > > =20
+> > > > > > > It seems to me that the same syncp can be used from two diffe=
+rent
+> > > > > > > threads : hard irq and napi poller... =20
+> > > > > >
+> > > > > > Yes, that's exactly the scenario that locks up my system.
+> > > > > > =20
+> > > > > > > At this point, I do not see why you keep linux/u64_stats_sync=
+.h if you
+> > > > > > > decide to go for a spinlock... =20
+> > > > > >
+> > > > > > The spinlock does not havce to be taken on the reader side, so =
+the
+> > > > > > seqcounter still adds some value.
+> > > > > > =20
+> > > > > > > Alternative would use atomic64_t fields for the ones where th=
+ere is no
+> > > > > > > mutual exclusion.
+> > > > > > >
+> > > > > > > RX : napi poll is definitely safe (protected by an atomic bit)
+> > > > > > > TX : each TX queue is also safe (protected by an atomic exclu=
+sion for
+> > > > > > > non LLTX drivers)
+> > > > > > >
+> > > > > > > This leaves the fields updated from hardware interrupt contex=
+t ? =20
+> > > > > >
+> > > > > > I'm afraid I don't have enough network-stack-foo to follow here.
+> > > > > >
+> > > > > > My issue on 32 bit is that stmmac_xmit() may be called directly=
+ from
+> > > > > > process context while another core runs the TX napi on the same=
+ channel
+> > > > > > (in interrupt context). I didn't observe any race on the RX pat=
+h, but I
+> > > > > > believe it's possible with NAPI busy polling.
+> > > > > >
+> > > > > > In any case, I don't see the connection with LLTX. Maybe you wa=
+nt to
+> > > > > > say that the TX queue is safe for stmmac (because it is a non-L=
+LTX
+> > > > > > driver), but might not be safe for LLTX drivers? =20
+> > > > >
+> > > > > LLTX drivers (mostly virtual drivers like tunnels...) can have mu=
+ltiple cpus
+> > > > > running ndo_start_xmit() concurrently. So any use of a 'shared sy=
+ncp'
+> > > > > would be a bug.
+> > > > > These drivers usually use per-cpu stats, to avoid races and false
+> > > > > sharing anyway.
+> > > > >
+> > > > > I think you should split the structures into two separate groups,=
+ each
+> > > > > guarded with its own syncp.
+> > > > >
+> > > > > No extra spinlocks, no extra costs on 64bit arches...
+> > > > >
+> > > > > If TX completion can run in parallel with ndo_start_xmit(), then
+> > > > > clearly we have to split stmmac_txq_stats in two halves: =20
+> > > >
+> > > > Oh, now I get it. Yes, that's much better, indeed.
+> > > >
+> > > > I mean, the counters have never been consistent (due to the race on=
+ the
+> > > > writer side), and nobody is concerned. So, there is no value in tak=
+ing
+> > > > a consistent snapshot in stmmac_get_ethtool_stats().
+> > > >
+> > > > I'm going to rework and retest my patch. Thank you for pointing me =
+in
+> > > > the right direction!
+> > > >
+> > > > Petr T
+> > > > =20
+> > > > > Also please note the conversion from u64 to u64_stats_t =20
+> > > >
+> > > > Noted. IIUC this will in turn close the update race on 64-bit by us=
+ing
+> > > > an atomic type and on 32-bit by using a seqlock. Clever.
+> > > >
+> > > > Petr T
+> > > > =20
+> > > > > Very partial patch, only to show the split and new structure :
+> > > > >
+> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > > > > b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > > > > index e3f650e88f82f927f0dcf95748fbd10c14c30cbe..702bceea5dc8c875a=
+80f5e3a92b7bb058f373eda
+> > > > > 100644
+> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > > > > @@ -60,16 +60,22 @@
+> > > > >  /* #define FRAME_FILTER_DEBUG */
+> > > > >
+> > > > >  struct stmmac_txq_stats {
+> > > > > -       u64 tx_bytes;
+> > > > > -       u64 tx_packets;
+> > > > > -       u64 tx_pkt_n;
+> > > > > -       u64 tx_normal_irq_n;
+> > > > > -       u64 napi_poll;
+> > > > > -       u64 tx_clean;
+> > > > > -       u64 tx_set_ic_bit;
+> > > > > -       u64 tx_tso_frames;
+> > > > > -       u64 tx_tso_nfrags;
+> > > > > -       struct u64_stats_sync syncp;
+> > > > > +/* First part, updated from ndo_start_xmit(), protected by tx qu=
+eue lock */
+> > > > > +       struct u64_stats_sync syncp_tx;
+> > > > > +       u64_stats_t tx_bytes;
+> > > > > +       u64_stats_t tx_packets;
+> > > > > +       u64_stats_t tx_pkt_n;
+> > > > > +       u64_stats_t tx_tso_frames;
+> > > > > +       u64_stats_t tx_tso_nfrags;
+> > > > > +
+> > > > > +/* Second part, updated from TX completion (protected by NAPI po=
+ll logic) */
+> > > > > +       struct u64_stats_sync syncp_tx_completion;
+> > > > > +       u64_stats_t napi_poll;
+> > > > > +       u64_stats_t tx_clean;
+> > > > > +       u64_stats_t tx_set_ic_bit; =20
+> > >
+> > > Unfortunately, this field is also updated from ndo_start_xmit():
+> > >
+> > > 4572)     if (set_ic)
+> > > 4573)             txq_stats->tx_set_ic_bit++;
+> > >
+> > > I feel it would be a shame to introduce a spinlock just for this one
+> > > update. But I think the field could be converted to an atomic64_t.
+> > >
+> > > Which raises a question: Why aren't all stat counters simply atomic64=
+_t? There
+> > > is no guarantee that the reader side takes a consistent snapshot
+> > > (except on 32-bit). So, why do we even bother with u64_stats_sync? =20
+> >
+> > This infra was added to have no _lock_ overhead on 64bit arches.
+> >
+> > If a counter must be updated from multiple cpus (regardless of 32/64
+> > bit kernel), then use atomic64_t =20
+>=20
+> Or use two different u64_stats_t (each guarded by a different syncp),
+> then fold them at stats gathering time.
 
->         word1 =3D skb->len;
-> -       word3 =3D SOF_BIT;
-> -
-> -       if (word1 > mtu) {
-> -               word1 |=3D TSS_MTU_ENABLE_BIT;
-> -               word3 |=3D mtu;
-> -       }
-> +       word3 =3D SOF_BIT | skb->len;
+Oh, right, why didn't I think about it!
 
-Probably word3 could be left with SOF_BIT ?
-I am guessing the 'length' would only be used by the NIC if TSO is requeste=
-d.
+This only leaves an atomic_t in hard irq context. I have tried to find
+something that could relax the requirement, but AFAICS at least some
+setups use several interrupts that can be delivered to different CPUs
+simultaneously, and all of them will walk over all channels. So we're
+left with an atomic_t here.
 
->
-> -       if (skb->len >=3D ETH_FRAME_LEN) {
-> -               /* Hardware offloaded checksumming isn't working on frame=
-s
-> -                * bigger than 1514 bytes. A hypothesis about this is tha=
-t the
-> -                * checksum buffer is only 1518 bytes, so when the frames=
- get
-> -                * bigger they get truncated, or the last few bytes get
-> -                * overwritten by the FCS.
-> -                *
-> -                * Just use software checksumming and bypass on bigger fr=
-ames.
-> -                */
-> -               if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
-> -                       ret =3D skb_checksum_help(skb);
-> -                       if (ret)
-> -                               return ret;
-> -               }
-> -               word1 |=3D TSS_BYPASS_BIT;
-> -       } else if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
-> +       if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
->                 int tcp =3D 0;
->
->                 /* We do not switch off the checksumming on non TCP/UDP
->
-> --
-> 2.34.1
->
+> > > Is it merely because u64_stats_add() should be cheaper than
+> > > atomic64_add()? Or is there anything else I'm missing? If yes,
+> > > does it invalidate my proposal to convert tx_set_ic_bit to an
+> > > atomic64_t? =20
+> >
+> > atomic64_add() is expensive, especially in contexts where updates
+> > are already guarded by a spinlock or something. =20
+
+Yeah, I know atomics can be expensive. I've heard of cases where an Arm
+core was spinning on an atomic operation for several seconds...
+
+Petr T
 
