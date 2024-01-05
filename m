@@ -1,134 +1,70 @@
-Return-Path: <netdev+bounces-61853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B2382512C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:50:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E745A825106
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:43:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35E971F23747
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:50:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E534B1C22E24
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A99249E9;
-	Fri,  5 Jan 2024 09:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="k53S5+Ch";
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="F3veO7d3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755BF22EEB;
+	Fri,  5 Jan 2024 09:43:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D5B24B51;
-	Fri,  5 Jan 2024 09:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alu.unizg.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alu.unizg.hr
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id D6AE060173;
-	Fri,  5 Jan 2024 10:41:24 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1704447684; bh=qKJmrnjWkHPbpWrQi3wn/w/6aFlhApN2GLFP70rgZoA=;
-	h=Date:To:From:Cc:Subject:From;
-	b=k53S5+ChiDP5PKAJC0vZtf95BR6ZKhnVNVpPjw6eFHxIIr6u4N/qQ76C21AaRllgh
-	 PoMNi+pWbUfSDyaCLIV0GUiSQEvbHj4wFyBKq7x70X85BHbpLt8C4Rurb5pN1HJV6i
-	 hioUhumkj1oQnXswxLNO8viYPjuMuWpVHnhQ/6cMLrMfdqH5QFzFO5RcoGYBxDd5NN
-	 600QoY023ZgMIEBSA9mG0+iY7nn9AT54S0uAWQv5EqByY1gpti61T+bxrM5GD3nant
-	 nqap+35Taocv8kjgJgWCHp6fBYO9ZbDQiS44Cn5rWG6jaeyAAsvSj4oDP5BJDFGnAe
-	 AmnwypuhNAbxg==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id d_wiY3UvOH3p; Fri,  5 Jan 2024 10:41:22 +0100 (CET)
-Received: from [192.168.94.51] (unknown [212.15.178.51])
-	by domac.alu.hr (Postfix) with ESMTPSA id EF57360161;
-	Fri,  5 Jan 2024 10:41:21 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1704447682; bh=qKJmrnjWkHPbpWrQi3wn/w/6aFlhApN2GLFP70rgZoA=;
-	h=Date:To:From:Cc:Subject:From;
-	b=F3veO7d3mmYHG8MrgSjoykPb7YrG3/6gh5QlUSwBGSabwGRdKB+ETnbSoib7dDk2W
-	 QbaBSnS2KpMkkWb0sXangRnL9gUtqKoDRuznHNVjCV3vzCmG115CprzXSRkLoIdKIc
-	 1zNr2TFH6mcUol1Nu2dP9tYuJNvo2D1aPRdKWq4UmFNLbKXpOPXfyztZAwE8przJpv
-	 H5/L9caWaivDHTbqPg6PcOy1j3l9vLsu5my5jaIiKvmMH9bhzIZ9jK1XQVmL7UX2+z
-	 pQmco0PxPk/bCvVHW7nv+jG7CIqHgbWTXznrFK6D1r6Wjs71xYh1nztBKy8UY5R7NN
-	 wnGA15EVgrzsg==
-Message-ID: <0b9a2827-c9c5-41d6-a4f1-dbd91262c474@alu.unizg.hr>
-Date: Fri, 5 Jan 2024 10:41:20 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC2928E15;
+	Fri,  5 Jan 2024 09:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4T5z4Y44frzvTnS;
+	Fri,  5 Jan 2024 17:41:49 +0800 (CST)
+Received: from dggpemd500003.china.huawei.com (unknown [7.185.36.29])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3F512140134;
+	Fri,  5 Jan 2024 17:43:01 +0800 (CST)
+Received: from localhost.localdomain (10.175.101.6) by
+ dggpemd500003.china.huawei.com (7.185.36.29) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Fri, 5 Jan 2024 17:43:00 +0800
+From: gaoxingwang <gaoxingwang1@huawei.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>
+CC: <liaichun@huawei.com>, <yanan@huawei.com>
+Subject: [Discuss]iproute2: ipv6 route add fail
+Date: Fri, 5 Jan 2024 17:42:55 +0800
+Message-ID: <20240105094255.1498461-1-gaoxingwang1@huawei.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US, hr
-To: LKML <linux-kernel@vger.kernel.org>
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: selftest: net: fcnal-test.sh TIMEOUT
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemd500003.china.huawei.com (7.185.36.29)
 
-Hi, all,
+Hello everyone,
 
-The default timeout for tools/testing/selftest/net groups of tests is 1500s (25m).
+Here is a particular problem with routing.
+Sometimes users can run the ip -6 route command to add a route whose destination address is the same as the gateway address, and it can be successfully added. However, adding another route with the same gateway address will fail later.
 
-This is less than half of what is required to run the full fcnal-test.sh on my hardware
-(53m48s).
+Example:
+# ip -6 route add 2409:8080:5a0a:60c7::7/128 via 2409:8080:5a0a:60c7::7 dev eth2
+# ip -6 route add 2409:8080:5a0a:60c7::8/128 via 2409:8080:5a0a:60c7::7 dev eth2
+RTNETLINK answers: No route to host
 
-With the timeout adjusted, tests passed 914 of 914 OK.
+Does the kernel not support this application scenario?
+Or should the kernel not allow routes with the same destination address as the gateway address to be added so that other more meaningful routes can be added successfully?
+
+This question puzzles me, thank you very much if your can reply.
 
 Best regards,
-Mirsad Todorovac
-
-
-diff --git a/tools/testing/selftests/net/settings b/tools/testing/selftests/net/settings
-index dfc27cdc6c05..ed8418e8217a 100644
---- a/tools/testing/selftests/net/settings
-+++ b/tools/testing/selftests/net/settings
-@@ -1 +1 @@
--timeout=1500
-+timeout=3600
-
------------------------------------------------------------------
-
-[snip]
-#################################################################
-Ping LLA with multiple interfaces
-
-TEST: Pre cycle, ping out ns-B - multicast IP                                 [ OK ]
-TEST: Pre cycle, ping out ns-C - multicast IP                                 [ OK ]
-TEST: Post cycle ns-A eth1, ping out ns-B - multicast IP                      [ OK ]
-TEST: Post cycle ns-A eth1, ping out ns-C - multicast IP                      [ OK ]
-TEST: Post cycle ns-A eth2, ping out ns-B - multicast IP                      [ OK ]
-TEST: Post cycle ns-A eth2, ping out ns-C - multicast IP                      [ OK ]
-
-#################################################################
-SNAT on VRF
-
-TEST: IPv4 TCP connection over VRF with SNAT                                  [ OK ]
-TEST: IPv6 TCP connection over VRF with SNAT                                  [ OK ]
-
-Tests passed: 914
-Tests failed:   0
-
-real	53m48.460s
-user	0m32.885s
-sys	2m41.509s
-root@hostname:/
-
--- 
-Mirsad Goran Todorovac
-Sistem inženjer
-Grafički fakultet | Akademija likovnih umjetnosti
-Sveučilište u Zagrebu
- 
-System engineer
-Faculty of Graphic Arts | Academy of Fine Arts
-University of Zagreb, Republic of Croatia
-The European Union
-
-"I see something approaching fast ... Will it be friends with me?"
+Xingwang
 
