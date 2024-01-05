@@ -1,136 +1,100 @@
-Return-Path: <netdev+bounces-61854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DEC5825130
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:50:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5313D825134
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:51:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29DBD284AF8
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:50:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28F5D1C22E21
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79252421D;
-	Fri,  5 Jan 2024 09:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27333249F7;
+	Fri,  5 Jan 2024 09:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ZpN2ayZl"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xwOOP7fu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11958249F3
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 09:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40d41555f9dso13354875e9.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 01:50:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704448227; x=1705053027; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p/GBsthAoUq8i1Y3HRRU92fYw/cIt+pJASf0ZZAyuuY=;
-        b=ZpN2ayZlF7S1JfC7x3PiFh8WxWWv+DLQgdpCsMB7HFiGYwD0njsVE6BBt47vs/RakT
-         hy02epmd9dM4FlLhOTBX9FnUzyui9N8bBH/69VLriI9f21rzpB4KkRRp+/z5hOfh+CHM
-         Al5hlkEDC4/uVfhbqt6qWthmceR98qflxFvHLL7O7KGArNx4ApAmpXrMaErK/hR+0i/K
-         E1B9pNz0KIGi1Uw7RbmsxLhvEKpd0z447FMdfg23qeuldzNJAUsGBTjzbUQtaJzi+P5F
-         COSxOKRJFg0eBL59Ub1MzodR7jBVKNfMWmVUKU/tS19B4Xp4chiA/W0qCII4Dz+NkWgf
-         3NJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704448227; x=1705053027;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p/GBsthAoUq8i1Y3HRRU92fYw/cIt+pJASf0ZZAyuuY=;
-        b=BLhCNiVoxDAiWtY8z4exRBAlgzcCgFPqyqwALo2vkKaOJCsP6W6ZQItjGOiHmhDRm1
-         jp87P1Q8T3qrUarjBfuFO+ojign8Hgj6y8onieOMG9FtGrB3CWki2a/ga7SSbay7kmmw
-         Ajv7ft7SvOAESil2WVakjy747am/M32Y8VuMl6NCNhcchU8S0EJ466CdqVFF3SFTto0+
-         Mm2mE8EcjxCW8Qd7J4t6KJkgrpfgqcMVckzBCHzx/9ofDkzY8qUO8NVheNNEaVcB5FdA
-         POwr64fjCpiP3gW/YWYebc7n6toBUke+wYf5xLWndTqvNUuo6tX9IvePzSVZQPMCRavX
-         F5ag==
-X-Gm-Message-State: AOJu0YzU4zcimGqelDtQq33OowjMWVr7DA87vtSuLxBLTVNQq75dRsFq
-	nwCC8Vx2uDXuPZuFsPnzLuurGXAGff6qLw==
-X-Google-Smtp-Source: AGHT+IFR5XVx9IfVQlQgO4/UKbDLbi7Ifr7kL41tRUojLGAq+la9MJ/EP3VZQ4EhP6rQ3spD7tjPXg==
-X-Received: by 2002:a05:600c:4e88:b0:40d:2f89:2e02 with SMTP id f8-20020a05600c4e8800b0040d2f892e02mr929537wmq.58.1704448227257;
-        Fri, 05 Jan 2024 01:50:27 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id t11-20020a05600c450b00b0040d724896cbsm1032020wmo.18.2024.01.05.01.50.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 01:50:26 -0800 (PST)
-Date: Fri, 5 Jan 2024 10:50:25 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, lanhao@huawei.com, wangpeiyang1@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 net-next 0/4] There are some features for the HNS3
- ethernet driver
-Message-ID: <ZZfQ4XRlqde31qgN@nanopsycho>
-References: <20240105010119.2619873-1-shaojijie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92CB241F1;
+	Fri,  5 Jan 2024 09:51:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCECBC433C7;
+	Fri,  5 Jan 2024 09:51:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1704448313;
+	bh=zObzgg5xDJEKxicGf3Aen7ihBLVfTRp4ARHI1eYeTGw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=xwOOP7fuywfd1ANXwChAgafiVt6B0zrHR1/0aqaK1ovDh1Lkg+16fd1QnPwt+Ekjo
+	 VwYsj48E0GWH2S/Dd0Xadf0ObUYNutn2N41IwLEZDwGEK0/yflNVJbjQVsAx5ELjVP
+	 yWGogO+2utQetgOGuziLE8oCjcMl/bCYbI0tfZhg=
+Date: Fri, 5 Jan 2024 10:51:50 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jeffrey E Altman <jaltman@auristor.com>
+Cc: stable@vger.kernel.org, patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Markus Suvanto <markus.suvanto@gmail.com>,
+	Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	keyrings@vger.kernel.org, netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH 6.6 067/156] keys, dns: Allow key types (eg. DNS) to be
+ reclaimed immediately on expiry
+Message-ID: <2024010526-catalyst-flame-2e33@gregkh>
+References: <20231230115812.333117904@linuxfoundation.org>
+ <20231230115814.539935693@linuxfoundation.org>
+ <cd1d6f0d-a05b-412c-882a-e62ee9e67b85@auristor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240105010119.2619873-1-shaojijie@huawei.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cd1d6f0d-a05b-412c-882a-e62ee9e67b85@auristor.com>
 
-Fri, Jan 05, 2024 at 02:01:15AM CET, shaojijie@huawei.com wrote:
->There are some features for the HNS3 ethernet driver
+On Thu, Jan 04, 2024 at 09:13:34PM -0500, Jeffrey E Altman wrote:
+> On 12/30/2023 6:58 AM, Greg Kroah-Hartman wrote:
+> > 6.6-stable review patch.  If anyone has any objections, please let me know.
+> > 
+> > ------------------
+> > 
+> > From: David Howells <dhowells@redhat.com>
+> > 
+> > [ Upstream commit 39299bdd2546688d92ed9db4948f6219ca1b9542 ]
+> Greg,
+> 
+> Upstream commit 39299bdd2546688d92ed9db4948f6219ca1b9542 ("keys, dns: Allow
+> key types (eg. DNS) to be reclaimed immediately on expiry") was subsequently
+> fixed by
+> 
+>   commit 1997b3cb4217b09e49659b634c94da47f0340409
+>   Author: Edward Adam Davis <eadavis@qq.com>
+>   Date:   Sun Dec 24 00:02:49 2023 +0000
+> 
+>     keys, dns: Fix missing size check of V1 server-list header
+> 
+>   Fixes: b946001d3bb1 ("keys, dns: Allow key types (eg. DNS) to be reclaimed
+> immediately on expiry")
+> 
+> If it is not too late, would it be possible to apply 1997b3cb421 to the
+> branches b946001d3bb1 was cherry-picked to before release?
+> I believe the complete set of branches are
+> 
+>   linux-6.6.y, linux-6.1.y, linux-5.15.y, linux-5.10.y, linux-5.0.y
 
-This is quite odd patchset cover letter subject and description. You
-should try to be more specific in the subject and more descriptive
-here in the description.
+The stable trees were already released with this change in it, so I'll
+queue this up for the next round, thanks.
 
-
->
->---
->changeLog:
->v3 -> v4:
->  - Adjuste the patches sequence in this patch set, suggested by Simon Horman
->  v3: https://lore.kernel.org/all/20231216070018.222798-1-shaojijie@huawei.com/
->v2 -> v3:
->  - Fix the incorrect use of byte order in patch
->    "net: hns3: add command queue trace for hns3" suggested by Simon Horman
->  - Add a new patch to move constants from hclge_debugfs.h
->    to hclge_debugfs.c suggested by Simon Horman
->  v2: https://lore.kernel.org/all/20231214141135.613485-1-shaojijie@huawei.com/
->v1 -> v2:
->  - Delete a patch for ethtool -S to dump page pool statistics, suggested by Jakub Kicinski
->  - Delete two patches about CMIS transceiver modules because
->    ethtool get_module_eeprom_by_page op is not implemented, suggested by Jakub Kicinski
->  v1: https://lore.kernel.org/all/20231211020816.69434-1-shaojijie@huawei.com/
->---
->
->Hao Lan (1):
->  net: hns3: add command queue trace for hns3
->
->Jijie Shao (2):
->  net: hns3: move constants from hclge_debugfs.h to hclge_debugfs.c
->  net: hns3: support dump pfc frame statistics in tx timeout log
->
->Peiyang Wang (1):
->  net: hns3: dump more reg info based on ras mod
->
-> drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   6 +
-> .../hns3/hns3_common/hclge_comm_cmd.c         |  19 +
-> .../hns3/hns3_common/hclge_comm_cmd.h         |  16 +-
-> .../net/ethernet/hisilicon/hns3/hns3_enet.c   |   6 +-
-> .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 646 +++++++++++++++++-
-> .../hisilicon/hns3/hns3pf/hclge_debugfs.h     | 643 +----------------
-> .../hisilicon/hns3/hns3pf/hclge_err.c         | 434 +++++++++++-
-> .../hisilicon/hns3/hns3pf/hclge_err.h         |  36 +
-> .../hisilicon/hns3/hns3pf/hclge_main.c        |  47 ++
-> .../hisilicon/hns3/hns3pf/hclge_trace.h       |  94 +++
-> .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  40 ++
-> .../hisilicon/hns3/hns3vf/hclgevf_trace.h     |  50 ++
-> 12 files changed, 1386 insertions(+), 651 deletions(-)
->
->-- 
->2.30.0
->
->
+greg k-h
 
