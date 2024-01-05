@@ -1,142 +1,335 @@
-Return-Path: <netdev+bounces-61899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEBFF8252EE
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:33:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A13C8252EF
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:33:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B902B20D9F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:33:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F5281F2792F
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:33:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE4A2C1A9;
-	Fri,  5 Jan 2024 11:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kVv0r2CM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3D12C68C;
+	Fri,  5 Jan 2024 11:33:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614922D04E
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 11:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55569b59f81so1742384a12.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 03:32:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704454370; x=1705059170; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uLGtZhLw3cgxZbHAxZLx9WNkyjIpH4syuFZZ7gJkum8=;
-        b=kVv0r2CMbrESd2AyLB9/4bpFgpInXDpY7HzhmJoU3c+y78ermZRaBtaua5rj7drfWe
-         4qcnU8HzCKlO9UFnWxbVuSodS0g0veBMWMsGmrid6sWv+vSV+ln7rSw8r08aJp4lR5Dd
-         N8K8yYUJ76SoQ7HSw+AC8ckK8V68CNCSlvTxNPD5RqmAO/up1J8zpJy63u7yiKW9ajV4
-         5tdHJA27DSUDOt1/HWJuqVb32uxnszaP+N9w+BJ1Scfu5KXzUlAQ0TBH4eZ7u//aZd3l
-         e7zZ0oKDHOYq0pP98Dc/p6H5cdEsskgwaGj1nL3PkUPFc7mYt0XlXht3XdquVW59AOZV
-         q3wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704454370; x=1705059170;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uLGtZhLw3cgxZbHAxZLx9WNkyjIpH4syuFZZ7gJkum8=;
-        b=DJYzrVCrLYt/Rb3OxWuxCXltQWEVCdPp+0NbT2RZA8pZiGc8JOoKBD+5VpPc9m42Xa
-         JVCPL4RT0yfFa/VXSkICr+bD9VQkNNZN+HvFCiUfDE/KmvHnGaybm0zZgaAX3oyxlPuC
-         qz9QJKqgGO6jUFUwozganFkJHeWK1/NTweqFy1r5PENmT9WQROYRuOeW6iofYGvti6t9
-         nFswKuv3DIiE6yanksHTGYXJrnAa5Rota6rBnVneOS1XiHMzPyn/BKSGTEOdTK5BskbH
-         uniscxxM3c/y6mucEaB6scr5cHR1mZ3ttL5KuWxuJB5vgi7EzWTPg5K0l3Ilu3YyxvV0
-         W/GA==
-X-Gm-Message-State: AOJu0Yz4RkR0iypfg1tHk2xtC8gVJZ1ulSxJYH6skXKBLDdZBjninsEB
-	c6cnLX3qz8lxKM/PvRvDuK4Xnl4dOYZwpg==
-X-Google-Smtp-Source: AGHT+IFxIv4VXC9y+Q+SMOlBfZf4em5K4Yw7zqjtu8KkOHCSbpFtimVSIM8IWjW7/QhhWHPOQQZ14Q==
-X-Received: by 2002:a50:d4c3:0:b0:557:1d4a:ea64 with SMTP id e3-20020a50d4c3000000b005571d4aea64mr582210edj.8.1704454370326;
-        Fri, 05 Jan 2024 03:32:50 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id g8-20020aa7d1c8000000b0055703db2c9fsm876713edp.1.2024.01.05.03.32.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 03:32:50 -0800 (PST)
-Date: Fri, 5 Jan 2024 13:32:47 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Household Cang <canghousehold@aol.com>,
-	Romain Gantois <romain.gantois@bootlin.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net v5 1/2] net: ethernet: cortina: Drop software
- checksum and TSO
-Message-ID: <20240105113247.wml4ldq3abvizi2a@skbuf>
-References: <20240102-new-gemini-ethernet-regression-v5-0-cf61ab3aa8cd@linaro.org>
- <20240102-new-gemini-ethernet-regression-v5-1-cf61ab3aa8cd@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4379C2C1AE;
+	Fri,  5 Jan 2024 11:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 405BX5faC2341768, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 405BX5faC2341768
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 5 Jan 2024 19:33:05 +0800
+Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Fri, 5 Jan 2024 19:33:06 +0800
+Received: from RTDOMAIN (172.21.210.160) by RTEXDAG02.realtek.com.tw
+ (172.21.6.101) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Fri, 5 Jan 2024
+ 19:33:05 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew@lunn.ch>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
+        Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next v16 05/13] rtase: Implement hardware configuration function
+Date: Fri, 5 Jan 2024 19:32:49 +0800
+Message-ID: <20240105113257.381090-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240105112811.380952-1-justinlai0215@realtek.com>
+References: <20240105112811.380952-1-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240102-new-gemini-ethernet-regression-v5-1-cf61ab3aa8cd@linaro.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXDAG02.realtek.com.tw (172.21.6.101)
+X-KSE-ServerInfo: RTEXDAG02.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Tue, Jan 02, 2024 at 09:34:25PM +0100, Linus Walleij wrote:
-> @@ -1143,39 +1142,13 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
->  	struct gmac_txdesc *txd;
->  	skb_frag_t *skb_frag;
->  	dma_addr_t mapping;
-> -	unsigned short mtu;
->  	void *buffer;
-> -	int ret;
-> -
-> -	mtu  = ETH_HLEN;
-> -	mtu += netdev->mtu;
-> -	if (skb->protocol == htons(ETH_P_8021Q))
-> -		mtu += VLAN_HLEN;
->  
-> +	/* TODO: implement proper TSO using MTU in word3 */
->  	word1 = skb->len;
-> -	word3 = SOF_BIT;
-> -
-> -	if (word1 > mtu) {
-> -		word1 |= TSS_MTU_ENABLE_BIT;
-> -		word3 |= mtu;
-> -	}
-> +	word3 = SOF_BIT | skb->len;
->  
-> -	if (skb->len >= ETH_FRAME_LEN) {
-> -		/* Hardware offloaded checksumming isn't working on frames
-> -		 * bigger than 1514 bytes. A hypothesis about this is that the
-> -		 * checksum buffer is only 1518 bytes, so when the frames get
-> -		 * bigger they get truncated, or the last few bytes get
-> -		 * overwritten by the FCS.
-> -		 *
-> -		 * Just use software checksumming and bypass on bigger frames.
-> -		 */
-> -		if (skb->ip_summed == CHECKSUM_PARTIAL) {
-> -			ret = skb_checksum_help(skb);
-> -			if (ret)
-> -				return ret;
-> -		}
-> -		word1 |= TSS_BYPASS_BIT;
-> -	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
+Implement rtase_hw_config to set default hardware settings, including
+setting interrupt mitigation, tx/rx DMA burst, interframe gap time,
+rx packet filter, near fifo threshold and fill descriptor ring and
+tally counter address, and enable flow control. When filling the
+rx descriptor ring, the first group of queues needs to be processed
+separately because the positions of the first group of queues are not
+regular with other subsequent groups. The other queues are all newly
+added features, but we want to retain the original design. So they were
+not put together.
 
-So are you taking back the statement that "Hardware offloaded
-checksumming isn't working on frames bigger than 1514 bytes"?
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+---
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 228 ++++++++++++++++++
+ 1 file changed, 228 insertions(+)
 
-Have you increased the interface MTU beyond 1500, and tested with plain
-TCP (no DSA) on top of it? Who will provide the TCP checksum for them now?
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index 1bd4634a8bdb..2337c3cf3cd0 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -466,6 +466,23 @@ static int rtase_init_ring(const struct net_device *dev)
+ 	return -ENOMEM;
+ }
+ 
++static void rtase_interrupt_mitigation(const struct rtase_private *tp)
++{
++	u32 i;
++
++	for (i = 0; i < tp->func_tx_queue_num; i++)
++		rtase_w16(tp, RTASE_INT_MITI_TX + i * 2, tp->tx_int_mit);
++
++	for (i = 0; i < tp->func_rx_queue_num; i++)
++		rtase_w16(tp, RTASE_INT_MITI_RX + i * 2, tp->rx_int_mit);
++}
++
++static void rtase_tally_counter_addr_fill(const struct rtase_private *tp)
++{
++	rtase_w32(tp, RTASE_DTCCR4, upper_32_bits(tp->tally_paddr));
++	rtase_w32(tp, RTASE_DTCCR0, lower_32_bits(tp->tally_paddr));
++}
++
+ static void rtase_tally_counter_clear(const struct rtase_private *tp)
+ {
+ 	u32 cmd = lower_32_bits(tp->tally_paddr);
+@@ -474,6 +491,113 @@ static void rtase_tally_counter_clear(const struct rtase_private *tp)
+ 	rtase_w32(tp, RTASE_DTCCR0, cmd | COUNTER_RESET);
+ }
+ 
++static void rtase_desc_addr_fill(const struct rtase_private *tp)
++{
++	const struct rtase_ring *ring;
++	u16 i, cmd, val;
++	int err;
++
++	for (i = 0; i < tp->func_tx_queue_num; i++) {
++		ring = &tp->tx_ring[i];
++
++		rtase_w32(tp, RTASE_TX_DESC_ADDR0,
++			  lower_32_bits(ring->phy_addr));
++		rtase_w32(tp, RTASE_TX_DESC_ADDR4,
++			  upper_32_bits(ring->phy_addr));
++
++		cmd = i | TX_DESC_CMD_WE | TX_DESC_CMD_CS;
++		rtase_w16(tp, RTASE_TX_DESC_COMMAND, cmd);
++
++		err = read_poll_timeout(rtase_r16, val, !(val & TX_DESC_CMD_CS),
++					10, 1000, false, tp, RTASE_TX_DESC_COMMAND);
++
++		if (err == -ETIMEDOUT)
++			netdev_err(tp->dev, "error occurred in fill tx descriptor\n");
++	}
++
++	for (i = 0; i < tp->func_rx_queue_num; i++) {
++		ring = &tp->rx_ring[i];
++
++		if (i == 0) {
++			rtase_w32(tp, RTASE_Q0_RX_DESC_ADDR0,
++				  lower_32_bits(ring->phy_addr));
++			rtase_w32(tp, RTASE_Q0_RX_DESC_ADDR4,
++				  upper_32_bits(ring->phy_addr));
++		} else {
++			rtase_w32(tp, (RTASE_Q1_RX_DESC_ADDR0 + ((i - 1) * 8)),
++				  lower_32_bits(ring->phy_addr));
++			rtase_w32(tp, (RTASE_Q1_RX_DESC_ADDR4 + ((i - 1) * 8)),
++				  upper_32_bits(ring->phy_addr));
++		}
++	}
++}
++
++static void rtase_hw_set_features(const struct net_device *dev,
++				  netdev_features_t features)
++{
++	const struct rtase_private *tp = netdev_priv(dev);
++	u16 rx_config, val;
++
++	rx_config = rtase_r16(tp, RTASE_RX_CONFIG_0);
++	if (features & NETIF_F_RXALL)
++		rx_config |= (ACCEPT_ERR | ACCEPT_RUNT);
++	else
++		rx_config &= ~(ACCEPT_ERR | ACCEPT_RUNT);
++
++	rtase_w16(tp, RTASE_RX_CONFIG_0, rx_config);
++
++	val = rtase_r16(tp, RTASE_CPLUS_CMD);
++	if (features & NETIF_F_RXCSUM)
++		rtase_w16(tp, RTASE_CPLUS_CMD, val | RX_CHKSUM);
++	else
++		rtase_w16(tp, RTASE_CPLUS_CMD, val & ~RX_CHKSUM);
++
++	rx_config = rtase_r16(tp, RTASE_RX_CONFIG_1);
++	if (dev->features & NETIF_F_HW_VLAN_CTAG_RX)
++		rx_config |= (INNER_VLAN_DETAG_EN | OUTER_VLAN_DETAG_EN);
++	else
++		rx_config &= ~(INNER_VLAN_DETAG_EN | OUTER_VLAN_DETAG_EN);
++
++	rtase_w16(tp, RTASE_RX_CONFIG_1, rx_config);
++}
++
++static void rtase_hw_set_rx_packet_filter(struct net_device *dev)
++{
++	u32 mc_filter[2] = { 0xFFFFFFFF, 0xFFFFFFFF };
++	struct rtase_private *tp = netdev_priv(dev);
++	u16 rx_mode;
++
++	rx_mode = rtase_r16(tp, RTASE_RX_CONFIG_0) & ~ACCEPT_MASK;
++	rx_mode |= ACCEPT_BROADCAST | ACCEPT_MYPHYS;
++
++	if (dev->flags & IFF_PROMISC) {
++		rx_mode |= ACCEPT_MULTICAST | ACCEPT_ALLPHYS;
++	} else if (dev->flags & IFF_ALLMULTI) {
++		rx_mode |= ACCEPT_MULTICAST;
++	} else {
++		struct netdev_hw_addr *hw_addr;
++
++		mc_filter[0] = 0;
++		mc_filter[1] = 0;
++
++		netdev_for_each_mc_addr(hw_addr, dev) {
++			u32 bit_nr = eth_hw_addr_crc(hw_addr);
++			u32 idx = u32_get_bits(bit_nr, BIT(31));
++			u32 bit = u32_get_bits(bit_nr, MULTICAST_FILTER_MASK);
++
++			mc_filter[idx] |= BIT(bit);
++			rx_mode |= ACCEPT_MULTICAST;
++		}
++	}
++
++	if (dev->features & NETIF_F_RXALL)
++		rx_mode |= ACCEPT_ERR | ACCEPT_RUNT;
++
++	rtase_w32(tp, RTASE_MAR0, swab32(mc_filter[1]));
++	rtase_w32(tp, RTASE_MAR1, swab32(mc_filter[0]));
++	rtase_w16(tp, RTASE_RX_CONFIG_0, rx_mode);
++}
++
+ static void rtase_irq_dis_and_clear(const struct rtase_private *tp)
+ {
+ 	const struct rtase_int_vector *ivec = &tp->int_vector[0];
+@@ -545,6 +669,110 @@ static void rtase_hw_reset(const struct net_device *dev)
+ 	rtase_nic_reset(dev);
+ }
+ 
++static void rtase_set_rx_queue(const struct rtase_private *tp)
++{
++	u16 reg_data;
++
++	reg_data = rtase_r16(tp, RTASE_FCR);
++	switch (tp->func_rx_queue_num) {
++	case 1:
++		u16p_replace_bits(&reg_data, 0x1, FCR_RXQ_MASK);
++		break;
++	case 2:
++		u16p_replace_bits(&reg_data, 0x2, FCR_RXQ_MASK);
++		break;
++	case 4:
++		u16p_replace_bits(&reg_data, 0x3, FCR_RXQ_MASK);
++		break;
++	}
++	rtase_w16(tp, RTASE_FCR, reg_data);
++}
++
++static void rtase_set_tx_queue(const struct rtase_private *tp)
++{
++	u16 reg_data;
++
++	reg_data = rtase_r16(tp, RTASE_TX_CONFIG_1);
++	switch (tp->tx_queue_ctrl) {
++	case 1:
++		u16p_replace_bits(&reg_data, 0x0, TC_MODE_MASK);
++		break;
++	case 2:
++		u16p_replace_bits(&reg_data, 0x1, TC_MODE_MASK);
++		break;
++	case 3:
++	case 4:
++		u16p_replace_bits(&reg_data, 0x2, TC_MODE_MASK);
++		break;
++	default:
++		u16p_replace_bits(&reg_data, 0x3, TC_MODE_MASK);
++		break;
++	}
++	rtase_w16(tp, RTASE_TX_CONFIG_1, reg_data);
++}
++
++static void rtase_hw_config(struct net_device *dev)
++{
++	const struct rtase_private *tp = netdev_priv(dev);
++	u32 reg_data32;
++	u16 reg_data16;
++
++	rtase_hw_reset(dev);
++
++	/* set rx dma burst */
++	reg_data16 = rtase_r16(tp, RTASE_RX_CONFIG_0);
++	reg_data16 &= ~(RX_SINGLE_TAG | RX_SINGLE_FETCH);
++	u16p_replace_bits(&reg_data16, RX_DMA_BURST_256, RX_MX_DMA_MASK);
++	rtase_w16(tp, RTASE_RX_CONFIG_0, reg_data16);
++
++	/* new rx descritpor */
++	reg_data16 = rtase_r16(tp, RTASE_RX_CONFIG_1);
++	reg_data16 |= RX_NEW_DESC_FORMAT_EN | PCIE_NEW_FLOW;
++	u16p_replace_bits(&reg_data16, 0xF, RX_MAX_FETCH_DESC_MASK);
++	rtase_w16(tp, RTASE_RX_CONFIG_1, reg_data16);
++
++	rtase_set_rx_queue(tp);
++
++	rtase_interrupt_mitigation(tp);
++
++	/* set tx dma burst size and interframe gap time */
++	reg_data32 = rtase_r32(tp, RTASE_TX_CONFIG_0);
++	u32p_replace_bits(&reg_data32, TX_DMA_BURST_UNLIMITED, TX_DMA_MASK);
++	u32p_replace_bits(&reg_data32, INTERFRAMEGAP, TX_INTER_FRAME_GAP_MASK);
++	rtase_w32(tp, RTASE_TX_CONFIG_0, reg_data32);
++
++	/* new tx descriptor */
++	reg_data16 = rtase_r16(tp, RTASE_TFUN_CTRL);
++	rtase_w16(tp, RTASE_TFUN_CTRL, reg_data16 | TX_NEW_DESC_FORMAT_EN);
++
++	/* tx fetch desc number */
++	rtase_w8(tp, RTASE_TDFNR, 0x10);
++
++	/* tag num select */
++	reg_data16 = rtase_r16(tp, RTASE_MTPS);
++	u16p_replace_bits(&reg_data16, 0x4, TAG_NUM_SEL_MASK);
++	rtase_w16(tp, RTASE_MTPS, reg_data16);
++
++	rtase_set_tx_queue(tp);
++
++	rtase_w16(tp, RTASE_TOKSEL, 0x5555);
++
++	rtase_tally_counter_addr_fill(tp);
++	rtase_desc_addr_fill(tp);
++	rtase_hw_set_features(dev, dev->features);
++
++	/* enable flow control */
++	reg_data16 = rtase_r16(tp, RTASE_CPLUS_CMD);
++	reg_data16 |= (FORCE_TXFLOW_EN | FORCE_RXFLOW_EN);
++	rtase_w16(tp, RTASE_CPLUS_CMD, reg_data16);
++	/* set near fifo threshold - rx missed issue. */
++	rtase_w16(tp, RTASE_RFIFONFULL, 0x190);
++
++	rtase_w16(tp, RTASE_RMS, tp->rx_buf_sz);
++
++	rtase_hw_set_rx_packet_filter(dev);
++}
++
+ static void rtase_nic_enable(const struct net_device *dev)
+ {
+ 	const struct rtase_private *tp = netdev_priv(dev);
+-- 
+2.34.1
 
-I don't understand why you remove the skb_checksum_help() call.
-It doesn't play nice with skb_is_gso() packets, agreed, but you removed
-the TSO netdev feature.
-
-> +	if (skb->ip_summed == CHECKSUM_PARTIAL) {
->  		int tcp = 0;
->  
->  		/* We do not switch off the checksumming on non TCP/UDP
-> 
-> -- 
-> 2.34.1
-> 
 
