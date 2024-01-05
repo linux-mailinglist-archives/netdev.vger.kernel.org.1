@@ -1,186 +1,148 @@
-Return-Path: <netdev+bounces-61917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66431825333
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:03:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF2982533C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1E702853A3
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:03:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 633FCB22B78
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0BB92CCBB;
-	Fri,  5 Jan 2024 12:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD9428E3F;
+	Fri,  5 Jan 2024 12:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="TMpxx2RU"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="IoqUjHOj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A9E2D601;
-	Fri,  5 Jan 2024 12:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4054bI95004588;
-	Fri, 5 Jan 2024 04:02:54 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=6sU5GxlK76ndUKi2361U/O6LtYlGS3aaQIWSH2fN1ig=; b=TMp
-	xx2RUTpG/hU58asUNkoyajWsG/kYsnkEKwzXwi7d0tUsvV0nNPBiMnjJWHBKqJRz
-	Ucx51DqudNvCQYJbupawk94q2zZxv42t8MtCxCcAy9JKmQaaU/Ft4x5AHdtXEsEy
-	JrBln33aCVzfk6g3+4ii/bss4O2ZoZo8x+cDysyg1E8sfKyRWwPuIvDbob0Z/f1g
-	leidiNZt1pYr5OWRUh/DxyNs9pnUjh/dj1n/rPdkxMsoy83NoBNc6fmMrNQSM8Xm
-	aHBWUKE9MQWJ+dBOig/BOPRF0sW/67fUr8y9GfPVkPUo9Sl/1i/mnO7pYwi1R3Dj
-	L/PgOboyyxbwlJYXvfg==
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3veaw014hx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jan 2024 04:02:53 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 5 Jan
- 2024 04:02:51 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 5 Jan 2024 04:02:51 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 861A83F7091;
-	Fri,  5 Jan 2024 04:02:48 -0800 (PST)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH] octeontx2-pf: Add support for offload tc with skbedit mark action
-Date: Fri, 5 Jan 2024 17:32:47 +0530
-Message-ID: <20240105120247.14975-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F092D029
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 12:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d5ac76667so11282615e9.1
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 04:13:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704456779; x=1705061579; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9I1IUSxusyj2ZH9ePAaxlo1XldnDznjT14eCLUfzR94=;
+        b=IoqUjHOj4gCMvKFs0PLXa1muuAc4Hx50bCNxaUY+ZoRWbx5nOu50gD7M3tAd/6n8YC
+         F5/le41Bcezs7cp81+AlAao929pgNLI13tksvIBdIIUgsVdSIbUwmYPxQ6IOV9r44VYK
+         FBdqVssrKhkqi+vZXiTkTc/bYTXq/XtawrLU2T5VblKxLOqCbeDjyyOHGybB4EmU7JMJ
+         b8zq5vbuLD10kqh9X54o1rsbDRLx4vuTcz5hb8l5V+8w4G+TugPyeEfTpscg3M/WvU8r
+         bsdAa4S3wPJYmGtfao+ljE63T0xvzvo5IkXACMTXV6lYIc1D/e8sa1ae00oEiqGkq14R
+         nhZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704456779; x=1705061579;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9I1IUSxusyj2ZH9ePAaxlo1XldnDznjT14eCLUfzR94=;
+        b=rDrex6myHyDPMeFuM3+1IOe7UNxD3TzmY0oC7gMczcVq5wF9colxEYUkxhsQVtpY63
+         GGoj8ED1byLiUDYzcYvHlw7e+vYFjav83eQkAWeHBfQWnqZUe5JjRTz09dINX8fH4Sx5
+         ynYSlM21+1jcaDQ5XtAuad7lf5lTl3Nnp1sp8Cv4D3aDsCdht+qcjH//qC/5ZqT4JfmR
+         bx9/Dhr2Tuhbs1QbLVtqUInbYuvVC/9k/TwkdvR0nZpOcEGExudgD4GqmmFZVnU+IwPu
+         JB3vjPLTjpRQCAfkSzL0gk7Jeoei7tiCwkQ/J5OA2fPLbImwDiaPtkcu6VYIItAOym6W
+         h/mA==
+X-Gm-Message-State: AOJu0YzU8VImKbLTqKbcwTNyG6t3Qm2tWiuOKvsgEbufhluADau2mHzw
+	YcjNbr25iSQ2DpKUsTejHkvT87z6c5jdHA==
+X-Google-Smtp-Source: AGHT+IHVzmflQqpgaieXUcnJojqjT1bNBoHMGKD4B1gu9wMuTSY3UV3IY5kfvlEJINJ3AseGCW1Z0Q==
+X-Received: by 2002:adf:e387:0:b0:337:5557:e6ad with SMTP id e7-20020adfe387000000b003375557e6admr1056665wrm.126.1704456779020;
+        Fri, 05 Jan 2024 04:12:59 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id v12-20020a5d610c000000b003366da509ecsm1277475wrt.85.2024.01.05.04.12.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 04:12:58 -0800 (PST)
+Date: Fri, 5 Jan 2024 13:12:57 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [net-next 07/15] net/mlx5: SD, Add informative prints in kernel
+ log
+Message-ID: <ZZfySfG4VClzDKTr@nanopsycho>
+References: <20231221005721.186607-1-saeed@kernel.org>
+ <20231221005721.186607-8-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: gXxI_aJTxv4kpC8oPZBqBj0QfnQQsdea
-X-Proofpoint-ORIG-GUID: gXxI_aJTxv4kpC8oPZBqBj0QfnQQsdea
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231221005721.186607-8-saeed@kernel.org>
 
-Support offloading of skbedit mark action.
+Thu, Dec 21, 2023 at 01:57:13AM CET, saeed@kernel.org wrote:
+>From: Tariq Toukan <tariqt@nvidia.com>
+>
+>Print to kernel log when an SD group moves from/to ready state.
+>
+>Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+>Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+>---
+> .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 21 +++++++++++++++++++
+> 1 file changed, 21 insertions(+)
+>
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>index 3309f21d892e..f68942277c62 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>@@ -373,6 +373,21 @@ static void sd_cmd_unset_secondary(struct mlx5_core_dev *secondary)
+> 	mlx5_fs_cmd_set_l2table_entry_silent(secondary, 0);
+> }
+> 
+>+static void sd_print_group(struct mlx5_core_dev *primary)
+>+{
+>+	struct mlx5_sd *sd = mlx5_get_sd(primary);
+>+	struct mlx5_core_dev *pos;
+>+	int i;
+>+
+>+	sd_info(primary, "group id %#x, primary %s, vhca %u\n",
+>+		sd->group_id, pci_name(primary->pdev),
+>+		MLX5_CAP_GEN(primary, vhca_id));
+>+	mlx5_sd_for_each_secondary(i, primary, pos)
+>+		sd_info(primary, "group id %#x, secondary#%d %s, vhca %u\n",
+>+			sd->group_id, i - 1, pci_name(pos->pdev),
+>+			MLX5_CAP_GEN(pos, vhca_id));
+>+}
+>+
+> int mlx5_sd_init(struct mlx5_core_dev *dev)
+> {
+> 	struct mlx5_core_dev *primary, *pos, *to;
+>@@ -410,6 +425,10 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
+> 			goto err_unset_secondaries;
+> 	}
+> 
+>+	sd_info(primary, "group id %#x, size %d, combined\n",
+>+		sd->group_id, mlx5_devcom_comp_get_size(sd->devcom));
 
-For example, to mark with 0x0008, with dest ip 60.60.60.2 on eth2
-interface:
+Can't you rather expose this over sysfs or debugfs? I mean, dmesg print
+does not seem like a good idea.
 
- # tc qdisc add dev eth2 ingress
- # tc filter add dev eth2 ingress protocol ip flower \
-      dst_ip 60.60.60.2 action skbedit mark 0x0008 skip_sw
 
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
----
- .../net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c  |  2 ++
- .../ethernet/marvell/octeontx2/nic/otx2_common.h    |  2 ++
- .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c    | 13 +++++++++++++
- .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c  |  3 +++
- .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.h  |  3 +++
- 5 files changed, 23 insertions(+)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index c75669c8fde7..6188921e9a20 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -1183,6 +1183,8 @@ static int npc_update_rx_entry(struct rvu *rvu, struct rvu_pfvf *pfvf,
- 			action.pf_func = target;
- 			action.op = NIX_RX_ACTIONOP_UCAST;
- 		}
-+		if (req->match_id)
-+			action.match_id = req->match_id;
- 	}
- 
- 	entry->action = *(u64 *)&action;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 06910307085e..815ae13c371c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -363,6 +363,7 @@ struct otx2_flow_config {
- 	struct list_head	flow_list;
- 	u32			dmacflt_max_flows;
- 	u16                     max_flows;
-+	u16			mark_flows;
- 	struct list_head	flow_list_tc;
- 	bool			ntuple;
- };
-@@ -465,6 +466,7 @@ struct otx2_nic {
- #define OTX2_FLAG_DMACFLTR_SUPPORT		BIT_ULL(14)
- #define OTX2_FLAG_PTP_ONESTEP_SYNC		BIT_ULL(15)
- #define OTX2_FLAG_ADPTV_INT_COAL_ENABLED BIT_ULL(16)
-+#define OTX2_FLAG_TC_MARK_ENABLED		BIT_ULL(17)
- 	u64			flags;
- 	u64			*cq_op_addr;
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index 4fd44b6eecea..fd1d78601811 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -511,7 +511,15 @@ static int otx2_tc_parse_actions(struct otx2_nic *nic,
- 			nr_police++;
- 			break;
- 		case FLOW_ACTION_MARK:
-+			if (act->mark & ~OTX2_RX_MATCH_ID_MASK) {
-+				NL_SET_ERR_MSG_MOD(extack, "Bad flow mark, only 16 bit supported");
-+				return -EOPNOTSUPP;
-+			}
- 			mark = act->mark;
-+			req->match_id = mark & 0xFFFFULL;
-+			req->op = NIX_RX_ACTION_DEFAULT;
-+			nic->flags |= OTX2_FLAG_TC_MARK_ENABLED;
-+			nic->flow_cfg->mark_flows++;
- 			break;
- 
- 		case FLOW_ACTION_RX_QUEUE_MAPPING:
-@@ -1173,6 +1181,11 @@ static int otx2_tc_del_flow(struct otx2_nic *nic,
- 		return -EINVAL;
- 	}
- 
-+	/* Disable TC MARK flag if they are no rules with skbedit mark action */
-+	if (flow_node->req.match_id)
-+		if (!(--flow_cfg->mark_flows))
-+			nic->flags &= ~OTX2_FLAG_TC_MARK_ENABLED;
-+
- 	if (flow_node->is_act_police) {
- 		__clear_bit(flow_node->rq, &nic->rq_bmap);
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index 4d519ea833b2..d3c9759c9f06 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -380,6 +380,9 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
- 	if (pfvf->netdev->features & NETIF_F_RXCSUM)
- 		skb->ip_summed = CHECKSUM_UNNECESSARY;
- 
-+	if (pfvf->flags & OTX2_FLAG_TC_MARK_ENABLED)
-+		skb->mark = parse->match_id;
-+
- 	skb_mark_for_recycle(skb);
- 
- 	napi_gro_frags(napi);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-index a82ffca8ce1b..3f1d2655ff77 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-@@ -62,6 +62,9 @@
- #define CQ_OP_STAT_OP_ERR       63
- #define CQ_OP_STAT_CQ_ERR       46
- 
-+/* Packet mark mask */
-+#define OTX2_RX_MATCH_ID_MASK 0x0000ffff
-+
- struct queue_stats {
- 	u64	bytes;
- 	u64	pkts;
--- 
-2.25.1
-
+>+	sd_print_group(primary);
+>+
+> 	return 0;
+> 
+> err_unset_secondaries:
+>@@ -440,6 +459,8 @@ void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
+> 	mlx5_sd_for_each_secondary(i, primary, pos)
+> 		sd_cmd_unset_secondary(pos);
+> 	sd_cmd_unset_primary(primary);
+>+
+>+	sd_info(primary, "group id %#x, uncombined\n", sd->group_id);
+> out:
+> 	sd_unregister(dev);
+> 	sd_cleanup(dev);
+>-- 
+>2.43.0
+>
+>
 
