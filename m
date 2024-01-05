@@ -1,131 +1,118 @@
-Return-Path: <netdev+bounces-61869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C916F825224
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:36:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5C5825227
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:36:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 650351F20FA9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:36:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A376B25161
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6DE2C684;
-	Fri,  5 Jan 2024 10:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0281D286B9;
+	Fri,  5 Jan 2024 10:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="vsp/ed+p"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JljOLJUq"
 X-Original-To: netdev@vger.kernel.org
-Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1F32E405;
-	Fri,  5 Jan 2024 10:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tesarici.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tesarici.cz
-Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by bee.tesarici.cz (Postfix) with ESMTPSA id E3E231A6FC6;
-	Fri,  5 Jan 2024 11:34:03 +0100 (CET)
-Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
-	t=1704450844; bh=W5kCnIB42LtsWaPmFAcROMCgMQPTBbi21yBS1qwCu3o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vsp/ed+p/jez3C+wSexJ/WxUleoMdIAYBCau4oba3WHeINZOmT49XmZg71MHuOnXC
-	 /96L+GGHlVPtqeNDBNq11AiSrJXnMGlMOwIHre2Cs9YIOtPxWB0oTn5c3n26wDWLAh
-	 XTmGFjkHId1xkRB0mQUS0CFAAvu4i9/ysdrjmKlKx8d2sAbf0Z5mFL53xoDLcGxtmF
-	 7kd+II8C/wcovQkpRn9TiYf8wAFcOYR9CKESmQQIY46X1ZIQvMiR++rvuoDxXft82j
-	 KWS9v1/4/r+1FbDm0JxeCpDjxpLYMCfCnwZ81Xrq3rPEGV/IhKULwMtAJxA5p3yfvy
-	 fRD1Jv9G8xgsA==
-Date: Fri, 5 Jan 2024 11:34:02 +0100
-From: Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>, Jernej
- Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
- "open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, "moderated
- list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
- "moderated list:ARM/STM32 ARCHITECTURE"
- <linux-arm-kernel@lists.infradead.org>, open list
- <linux-kernel@vger.kernel.org>, "open list:ARM/Allwinner sunXi SoC support"
- <linux-sunxi@lists.linux.dev>
-Subject: Re: [PATCH] net: stmmac: protect statistics updates with a spinlock
-Message-ID: <20240105113402.0f5f1232@meshulam.tesarici.cz>
-In-Reply-To: <CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
-References: <20240105091556.15516-1-petr@tesarici.cz>
-	<CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-suse-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926DE2CCBA
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 10:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704450874; x=1735986874;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LLDtt76V232VapZ/fdm7XRRxre7XTEWqKTMjt5hWs8s=;
+  b=JljOLJUqaXoC0DQFAxxNmt6p/HM+HZsrXlUuc9hFly1SGtu09gejOMRC
+   5KjqTi7ejV4OwLdMR6q4MFMwcdDUAjpWoo1ZoOH1uKKZIsdRcajBnxRhS
+   YyYDZpPtoa0wFo9ZLcFnrT/reIY0LYb3UD963TtFp8/v7bJqXKS3Na/3u
+   NU9mMS/qaE/YkWLryOLsTQlJcTC1ZeQxMHgoWBDczRCqwcCV2TaULpNxP
+   ANHQkjdo9mpHWrjeRyXT9C/X+NBdZI+ftDeV32tBICKKFec5gBk8XWCMh
+   eQlQxtMm5BzOlbJkWUcZd6rmnKC6YQ8qFv11qJxKqvIzUlulCWCG5Ca/b
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="394654270"
+X-IronPort-AV: E=Sophos;i="6.04,333,1695711600"; 
+   d="scan'208";a="394654270"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 02:34:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="756908530"
+X-IronPort-AV: E=Sophos;i="6.04,333,1695711600"; 
+   d="scan'208";a="756908530"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.35.107])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 02:34:31 -0800
+Date: Fri, 5 Jan 2024 11:34:28 +0100
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
+	Johannes Berg <johannes.berg@intel.com>,
+	Marc MERLIN <marc@merlins.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
+Message-ID: <ZZfbNIuyEiS+m7Ih@linux.intel.com>
+References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231206084448.53b48c49@kernel.org>
+ <ZZU3OaybyLfrAa/0@linux.intel.com>
+ <20240103153405.6b19492a@kernel.org>
+ <ZZZrbUPUCTtDcUFU@linux.intel.com>
+ <9bcfb259-1249-4efc-b581-056fb0a1c144@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9bcfb259-1249-4efc-b581-056fb0a1c144@gmail.com>
 
-On Fri, 5 Jan 2024 10:58:42 +0100
-Eric Dumazet <edumazet@google.com> wrote:
+On Thu, Jan 04, 2024 at 10:05:12AM +0100, Heiner Kallweit wrote:
+> On 04.01.2024 09:25, Stanislaw Gruszka wrote:
+> For me the main question is the following. In igc_resume() you have
+> 
+> 	rtnl_lock();
+> 	if (!err && netif_running(netdev))
+> 		err = __igc_open(netdev, true);
+> 
+> 	if (!err)
+> 		netif_device_attach(netdev);
+> 	rtnl_unlock();
+> 
+> Why is the global rtnl_lock() needed here? The netdev is in detached
+> state what protects from e.g. userspace activity, see all the
+> netif_device_present() checks in net core.
 
-> On Fri, Jan 5, 2024 at 10:16=E2=80=AFAM Petr Tesarik <petr@tesarici.cz> w=
-rote:
-> >
-> > Add a spinlock to fix race conditions while updating Tx/Rx statistics.
-> >
-> > As explained by a comment in <linux/u64_stats_sync.h>, write side of st=
-ruct
-> > u64_stats_sync must ensure mutual exclusion, or one seqcount update cou=
-ld
-> > be lost on 32-bit platforms, thus blocking readers forever.
-> >
-> > Such lockups have been actually observed on 32-bit Arm after stmmac_xmi=
-t()
-> > on one core raced with stmmac_napi_poll_tx() on another core.
-> >
-> > Signed-off-by: Petr Tesarik <petr@tesarici.cz> =20
->=20
-> This is going to add more costs to 64bit platforms ?
+Good question. Initially I thought that the lock can be removed
+for the exact reason you wrote. I.e. the analogus change as you
+did for igb could de done ( ac8c58f5b535 ).
 
-Yes, it adds a (hopefully not too contended) spinlock and in most
-places an interrupt disable/enable pair.
+But after more detailed examination I can see the need for lock.
 
-FWIW the race condition is also present on 64-bit platforms, resulting
-in inaccurate statistic counters. I can understand if you consider it a
-mild annoyance, not worth fixing.
+__igc_open() calls at least one function that require rtnl_lock:
+netif_set_real_num_rx_queues().
 
-> It seems to me that the same syncp can be used from two different
-> threads : hard irq and napi poller...
+Despite using netif_device_attach() without the rtnl_lock at
+various places it's not safe. After:
 
-Yes, that's exactly the scenario that locks up my system.
+        if (!test_and_set_bit(__LINK_STATE_PRESENT, &dev->state) &&
+            netif_running(dev)) {
 
-> At this point, I do not see why you keep linux/u64_stats_sync.h if you
-> decide to go for a spinlock...
+the full link down can be performed without rtnl_lock, so we can do
 
-The spinlock does not havce to be taken on the reader side, so the
-seqcounter still adds some value.
+                netif_tx_wake_all_queues(dev);
+                __netdev_watchdog_up(dev);
 
-> Alternative would use atomic64_t fields for the ones where there is no
-> mutual exclusion.
->=20
-> RX : napi poll is definitely safe (protected by an atomic bit)
-> TX : each TX queue is also safe (protected by an atomic exclusion for
-> non LLTX drivers)
->=20
-> This leaves the fields updated from hardware interrupt context ?
+during closing or after device is closed.
 
-I'm afraid I don't have enough network-stack-foo to follow here.
+Just found those two. I think there could be more reasons.
 
-My issue on 32 bit is that stmmac_xmit() may be called directly from
-process context while another core runs the TX napi on the same channel
-(in interrupt context). I didn't observe any race on the RX path, but I
-believe it's possible with NAPI busy polling.
+Regards
+Stanislaw
 
-In any case, I don't see the connection with LLTX. Maybe you want to
-say that the TX queue is safe for stmmac (because it is a non-LLTX
-driver), but might not be safe for LLTX drivers?
-
-Petr T
 
