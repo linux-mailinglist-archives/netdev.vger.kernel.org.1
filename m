@@ -1,159 +1,105 @@
-Return-Path: <netdev+bounces-61975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BBA38256E1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:44:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B7B082570A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:48:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02DA82843D1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:44:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA757B22D1A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4968E2E640;
-	Fri,  5 Jan 2024 15:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D629A2E65C;
+	Fri,  5 Jan 2024 15:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FGlt87AR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XhU4Gg2P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7AE2E405;
-	Fri,  5 Jan 2024 15:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958D32E64B;
+	Fri,  5 Jan 2024 15:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40e36e29685so10177415e9.3;
-        Fri, 05 Jan 2024 07:43:56 -0800 (PST)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-28be024282bso1245762a91.3;
+        Fri, 05 Jan 2024 07:48:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704469435; x=1705074235; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7oFiBYSi0X0BqYWXmeQdyz8VDhVzA5CtmmB2oZD2HHs=;
-        b=FGlt87ARSoVwJiJLkeflBF4euPbRZxtJfLVfvL6mCW7yYBi11zhfiHr/LZUb5loA61
-         KwdcneUR5MwpqHLLEXb4fP83zWHl2lwUUYGS3HY8ytYq+ifP/X9oF5zf6K3FH6pn6aDM
-         t/Xw8UBiv4cbVMNHrhk5MbFUhePpapq2h3JuEz7s+m0KzLb3G8iIcWJ1HCubA2F+VmLM
-         vcpCp+/U5bqMTozRhLagOTNpFGTYXIs5Ai4dRki7WPykhltet3UP/bTAxzI/gdbBVIWA
-         0kgyQCPArjltY6us1F/46McL4/qUJW2T/ZkmudqZgfH4qmJhEYTTNAk0aV8a+JPPC6l+
-         Is8A==
+        d=gmail.com; s=20230601; t=1704469722; x=1705074522; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oHjuD7i+UA3Qw3m7etGOaevmlRCqaIA5WQMiwQTIlE8=;
+        b=XhU4Gg2PcmI7njWY5cFISo4UwEBpJMRQ0RsEl5xZipS4Te9VNzBI//n8OnUHFxdcj4
+         aap0nncn6bQYrgoMv8bCTAAiKUgRYOlGvReAoL2GIzBP3wHFiAEJU6qhP4A9p2zr1bkD
+         LtvHV2FeTmX+XMwypxncDQ6qXnR1cfommRLTgx4XcgDnFyX9ZUYBY2nTCjptAvXOQhGu
+         lNszmqNvqvgGsDVwWYZrFd0JZ5ikY+ny/0KcrBqdHnMjZhIKDp6HxugfdrgANAqmPCLp
+         y6VoaFLM6lZ78KetCW1uJrVRDHDIPvkFKiBKQnfGkzzaFD8C3cvea3naiidp8otiHkDa
+         JCRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704469435; x=1705074235;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7oFiBYSi0X0BqYWXmeQdyz8VDhVzA5CtmmB2oZD2HHs=;
-        b=vsr0deuUC2/iw2w6deYDBUz/nUXfn1HNZKTmkXIzMB8tdW7fkQa3LCpWm0Eg9df0Eg
-         soAiTWUQa1Qvpoch0xi/z1ASEz3Fl/EiEy1/ZRL8I0252H9Vg1m0/s3B/CunHEaGY96U
-         PnJ+u4ytW0wEA5zU1RCgiTZXNrES6xRHjiXnaHfLmcT1KtsSvAJTASnyNLnQhalYT2aS
-         ztBI8cnhGAd6zLbtX2Gd7BSUHwkfROaT05lkWkctj0CoDa5kqR7dI9kowt2M0zp/tqpN
-         zn7PwLUvU7rC5r/bcbNnvYfq1bYlterB3mxNC3TIqHB6CwNgJPbRLdBGfOHBWZ3rjlc/
-         jBSA==
-X-Gm-Message-State: AOJu0Ywi2FivlvVE2rdSh91LDUo0hkfJLFyUYp/JIQQ2vStzcDWu7q23
-	1htaCb10eDk6pBxTSxZahQc=
-X-Google-Smtp-Source: AGHT+IEXdlvvHmmHah/RvKx+ANf7Wxv5COH+nObouIhj0XDftZkX4qSq5d4J1OYQ9IC/gUoulYz2aA==
-X-Received: by 2002:a05:600c:2294:b0:40d:88ea:5c3a with SMTP id 20-20020a05600c229400b0040d88ea5c3amr1267563wmf.141.1704469434606;
-        Fri, 05 Jan 2024 07:43:54 -0800 (PST)
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id c11-20020a5d414b000000b00336aa190139sm1606474wrq.5.2024.01.05.07.43.53
+        d=1e100.net; s=20230601; t=1704469722; x=1705074522;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oHjuD7i+UA3Qw3m7etGOaevmlRCqaIA5WQMiwQTIlE8=;
+        b=ejEAG5MDjgP17fMHaeF2yxdkn6IFDJpps/oRRDOXs+PM/+WyqUK/XRfhdH5IaRr7D5
+         cDg4u1bGARBBHWtRnG3iwAQGUnetOsJwaOYl/6uiFwcUyR/HbiLCxlANdGbZKxj4w+pu
+         dLOVK0EU0D/W+fyAUk367yRL2UU4GXxFyo8RQJnijCh05Q0Bt8qS1NCYIwcQL0gUeB7T
+         8LsdyFejb7uoL6/6ixR6SrqX9DIVGsFsAgg1qPso52jcX4S4t/0Jtd7ZAXG4u2jn2+mP
+         V9HYtLkN/wZmr+B4z71U43gZk+Z9CWzIv5aFGnEEPFtJ52pDelsOmuMNOm3NS2c5fs6f
+         QcNw==
+X-Gm-Message-State: AOJu0YwuRfM2SQiyUzSMB27ku6mSrGkcy4urld7+yNcwmDexgKdXfJjG
+	D8zVcDcfKKGXEljCliiR1Ac=
+X-Google-Smtp-Source: AGHT+IG4JLyKQE+gM4c27FKh73op2FHqLSCwte9ikVSJ5ZEE7F/zmt6FTbncQktxxFKJuFQG75IOqA==
+X-Received: by 2002:a17:90a:5512:b0:28c:ef1a:db1a with SMTP id b18-20020a17090a551200b0028cef1adb1amr1858002pji.35.1704469721772;
+        Fri, 05 Jan 2024 07:48:41 -0800 (PST)
+Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id gj9-20020a17090b108900b0028be4f51d2dsm1420897pjb.5.2024.01.05.07.48.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 07:43:53 -0800 (PST)
-Date: Fri, 5 Jan 2024 16:43:51 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Stefan Eichenberger <eichest@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: marvell-88q2xxx: add driver for the Marvell
- 88Q2220 PHY
-Message-ID: <20240105154351.GA39937@debian>
-References: <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
- <20231217111538.GA3591@debian>
- <ZX78ucHcNyEatXLD@eichest-laptop>
- <20231218090932.GA4319@debian>
- <ZYAqxPZHICtZO15O@eichest-laptop>
- <20231219081117.GA3479@debian>
- <ZYFfzei3SJSts5E/@eichest-laptop>
- <5d545a9b-feda-4908-8f74-9218806451c1@lunn.ch>
- <20240105124221.GA30964@debian>
- <c7b1b220-4a76-4cc0-b68d-cec5977ebadb@lunn.ch>
+        Fri, 05 Jan 2024 07:48:41 -0800 (PST)
+Message-ID: <ec7f36ffdb2a76fe5cac7272da07242b3a6296f4.camel@gmail.com>
+Subject: Re: [PATCH net-next 5/6] net: introduce page_frag_cache_drain()
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Jason Wang
+ <jasowang@redhat.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
+ Kaligineedi <pkaligineedi@google.com>, Shailend Chand
+ <shailend@google.com>, Eric Dumazet <edumazet@google.com>, Felix Fietkau
+ <nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
+ <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
+ Busch <kbusch@kernel.org>,  Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
+ <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,  Chaitanya Kulkarni
+ <kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Morton
+ <akpm@linux-foundation.org>, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org
+Date: Fri, 05 Jan 2024 07:48:39 -0800
+In-Reply-To: <20240103095650.25769-6-linyunsheng@huawei.com>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+	 <20240103095650.25769-6-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c7b1b220-4a76-4cc0-b68d-cec5977ebadb@lunn.ch>
 
-Am Fri, Jan 05, 2024 at 03:00:58PM +0100 schrieb Andrew Lunn:
-> On Fri, Jan 05, 2024 at 01:42:21PM +0100, Dimitri Fedrau wrote:
-> > Am Tue, Dec 19, 2023 at 04:57:50PM +0100 schrieb Andrew Lunn:
-> > > > I am not sure that it will be accepted by the maintainers if you use a
-> > > > lot of registers that are not documented.
-> > > 
-> > > Sometimes there is no choice, there is no documentation except the
-> > > vendor crap driver which we try to clean up as much as possible, but
-> > > we still end up with lots of magic numbers.
-> > >
-> > 
-> > Hi Andrew, hi Stefan,
-> > 
-> > tried to reduce the init sequence. This worked for me:
-> > 
-> > static int mv88q222x_config_init(struct phy_device *phydev)
-> > {
-> > 	int ret;
-> > 
-> > 	/* send_s detection threshold, slave and master */
-> > 	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8032, 0x2020);
-> > 	if (ret < 0)
-> > 		return ret;
-> > 
-> > 	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0xa28);
-> > 	if (ret < 0)
-> > 		return ret;
-> > 
-> > 	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0xc28);
-> > 	if (ret < 0)
-> > 		return ret;
-> > 
-> > 	ret = phy_write_mmd(phydev, MDIO_MMD_PCS, 0xffe4, 0xc);
-> > 	if (ret < 0)
-> > 		return ret;
-> > 
-> > 	return mv88q2xxx_config_init(phydev);
-> > }
-> > 
-> > The four register writes were required to make the PHY work in 1000Mbit forced
-> > mode. When using autonegotiation or 100Mbit forced mode they weren't needed.
-> > It was enough to write them once in mv88q222x_config_init as you can
-> > see. Thanks Stefan for the hint with the first three register writes, it
-> > helped a lot.
-> 
-> Hi Dimitri
-> 
-Hi Andrew,
+On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
+> When draining a page_frag_cache, most user are doing
+> the similar steps, so introduce an API to avoid code
+> duplication.
+>=20
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
 
-> Do we need to reduce the init sequence? Since this is all undocumented
-> magic which nobody understands, it would be safer to just keep with
-> the Marvell vendor crap code dump. Unless we really do need to change
-> it.
->
-You are right, it would be safer to use the vendor code. But when
-looking at the vendor code, the init sequence changed a lot from rev. B0
-to rev. B1 of the PHY. There are some additional register writes, but
-mostly the order of the register writes changed. I don't know if this is
-going to be worse in the future. Maintaining different revisions will
-probably take some effort or at least result in bloated code. We probably
-don't need all of the init sequence. I'm not sure how to deal with it,
-keeping the init sequence at a minimum is probably a good idea.
+Looks good to me.
 
-> 	Andrew
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
 
-Best regards,
-Dimitri
 
