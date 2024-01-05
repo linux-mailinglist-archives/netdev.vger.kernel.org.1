@@ -1,93 +1,115 @@
-Return-Path: <netdev+bounces-61972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA66D8256D1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:39:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B66E08256DA
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:42:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A5DC283D48
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:39:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60CE42829B4
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2BD2E63C;
-	Fri,  5 Jan 2024 15:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F142E63C;
+	Fri,  5 Jan 2024 15:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jrhu6jAu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fECjWpxQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8902E63A;
-	Fri,  5 Jan 2024 15:39:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B461C433C8;
-	Fri,  5 Jan 2024 15:39:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704469185;
-	bh=Fd9R1t7XEMCEHJZB7WawIlb8aaIzMwLL0iD9yFevkzk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Jrhu6jAub+POaFLe7c9KTb6YFKz04dIwf3OvlE17GXqA9kPJawkiC4YX4hsIJMCR9
-	 STdE147ItVPDswOTs3fe1gi40PP2u/UAQNn179K9mJJ2FjJwnh0BeVn9sO8LiMCBts
-	 nY9DZKgqk9R9XHgnS4cXbWOnwwWTK6kncWmCPHReOOpdCYQ+zBRwORflga8MtpqcCM
-	 Kz3x85pQcxeqahhfPp1ML/f+QgoC7qz+bZhlDnVruA/nX4DZiLPJgrRtaHF/svyFgV
-	 H3h8UsDzQFGI6hmMvui3se514N7mmdMs/yfUvL5/FNmNVQXy804B0b+bVfK6UGJXC/
-	 Y5+P6fZefy1PQ==
-Date: Fri, 5 Jan 2024 07:39:43 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH net-next v5 07/13] net: ethtool: Introduce a command to
- list PHYs on an interface
-Message-ID: <20240105073943.43fc2720@kernel.org>
-In-Reply-To: <20240105104311.03a35622@device-28.home>
-References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
-	<20231221180047.1924733-8-maxime.chevallier@bootlin.com>
-	<20240104153401.08ff9809@kernel.org>
-	<20240105104311.03a35622@device-28.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74AC92E640;
+	Fri,  5 Jan 2024 15:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d40eec5e12so11988325ad.1;
+        Fri, 05 Jan 2024 07:42:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704469330; x=1705074130; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=M0tdftrGJbQA0lnpxqT4ZNVpdbS5d9YFAgX2xz2KRWA=;
+        b=fECjWpxQv12EI7w4N+VGl1gFJ9NQ9Kgp86nz2HPZdE3Md54aCBtwclpxqpSi9gKxzI
+         oydwlbImie8exWeaDmpZLnlL3wXO8rah90D9hJtiaJnYffybF+dSx5h34UFzp3YXy/MD
+         OqVMXOoD4MkEvT3GWa3wh9r5u4KT/H8/14PkZo0svi4XUPVlDYggFUbqiqt9TlKH8a9l
+         cR6Vw6hj7BtpCCvjJDhDAanWrl5O5P0AfX+umF04/DgOjHu0lID8a++T2K4gdyrl5s0E
+         /Yd3fHC3JlayjUodpBVvYQSFsXNZqVY3jvU1Gqcv7dvVzkWmplKnXk9RUUdlSaRKYz9d
+         LIxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704469330; x=1705074130;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=M0tdftrGJbQA0lnpxqT4ZNVpdbS5d9YFAgX2xz2KRWA=;
+        b=B0VmEE/x4Sf2P0RElFrbjNXxREjD+gCkUv/wtpmlrovWdJms6iiY218NaAvncZrvIW
+         hoqdtEnGFyvarv0o+viDDZzsLZePzN935/c/+ppatIJ2OByZqw18uhrSnjPsljtsyjoK
+         AKyMm4ZqtKvGQcw7uqQDcLrbx3zKV7DolPub/1yBK7UESKd/1/SegX4PgACzOPx+XFTU
+         mRo2rKhZtvFaQ7LytMjF7fjGLtW/huxRo1kvEJNuV+U+HF/iNQRSk6crMMtFjEgspnlN
+         BRr1KQheGpUnjp3ztp2ukYhDnoO4EHRNtYCdLpR3ct7lXVbmuu9yvJ70giaUHMpE3+kV
+         XSpg==
+X-Gm-Message-State: AOJu0Yy+uJRYFS2kBiiRvFgTAognDpGxvTGCDkghGODMxNzsWSi8R5hf
+	qE1IA1oSOinJlYA7UNMJZ/I=
+X-Google-Smtp-Source: AGHT+IF7HN0bTcfhahHnVhLxfa5wv0VPOrH2QarAcMVghgtzHLN1ZDN6Ogzg7D+86n/vXlxwTZFmaA==
+X-Received: by 2002:a17:902:e84a:b0:1d4:5b0d:7002 with SMTP id t10-20020a170902e84a00b001d45b0d7002mr2672794plg.112.1704469330643;
+        Fri, 05 Jan 2024 07:42:10 -0800 (PST)
+Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id c5-20020a170902d90500b001d3ec25614bsm1552423plz.24.2024.01.05.07.42.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 07:42:10 -0800 (PST)
+Message-ID: <f4abe71b3439b39d17a6fb2d410180f367cadf5c.camel@gmail.com>
+Subject: Re: [PATCH net-next 3/6] mm/page_alloc: use initial zero offset for
+ page_frag_alloc_align()
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
+	 <akpm@linux-foundation.org>, linux-mm@kvack.org
+Date: Fri, 05 Jan 2024 07:42:08 -0800
+In-Reply-To: <20240103095650.25769-4-linyunsheng@huawei.com>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+	 <20240103095650.25769-4-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Fri, 5 Jan 2024 10:43:11 +0100 Maxime Chevallier wrote:
-> > > +static int ethnl_phy_parse_request(struct ethnl_req_info *req_base,
-> > > +				   struct nlattr **tb)
-> > > +{
-> > > +	struct phy_link_topology *topo = &req_base->dev->link_topo;
-> > > +	struct phy_req_info *req_info = PHY_REQINFO(req_base);
-> > > +	struct phy_device_node *pdn;
-> > > +
-> > > +	if (!req_base->phydev)
-> > > +		return 0;    
-> > 
-> > The PHY INDEX should probably be a required attr, with 
-> > GENL_REQ_ATTR_CHECK()? Without phydev being specified
-> > what's the point?  
-> 
-> We can still have a phydev without passing a PHY INDEX, this would
-> report information on the netdev->phydev device, that can be helpful
-> for users to know which PHY is targeted by commands such as "ethtool
-> --cable-test eth0" when no PHY index is passed
+On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
+> The next patch is above to use page_frag_alloc_align() to
+> replace vhost_net_page_frag_refill(), the main difference
+> between those two frag page implementations is whether we
+> use a initial zero offset or not.
+>=20
+> It seems more nature to use a initial zero offset, as it
+> may enable more correct cache prefetching and skb frag
+> coalescing in the networking, so change it to use initial
+> zero offset.
+>=20
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
 
-But req_base->phydev will be netdev->phydev if user didn't specify 
-the index. Are you saying this is for commands which can operate
-on netdevs as well as on PHYs (e.g. "integrated NICs" which don't
-user phylib?)
+There are several advantages to running the offset as a countdown
+rather than count-up value.
+
+1. Specifically for the size of the chunks we are allocating doing it
+from the bottom up doesn't add any value as we are jumping in large
+enough amounts and are being used for DMA so being sequential doesn't
+add any value.
+
+2. By starting at the end and working toward zero we can use built in
+functionality of the CPU to only have to check and see if our result
+would be signed rather than having to load two registers with the
+values and then compare them which saves us a few cycles. In addition
+it saves us from having to read both the size and the offset for every
+page.
+
+Again this is another code cleanup at the cost of performance. I
+realize many of the items you are removing would be considered micro-
+optimizations but when we are dealing with millions of packets per
+second those optimizations add up.
 
