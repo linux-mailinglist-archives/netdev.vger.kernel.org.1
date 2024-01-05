@@ -1,50 +1,74 @@
-Return-Path: <netdev+bounces-61858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55620825142
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:54:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA14082514D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:56:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEFD9284DC7
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:54:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 895D128849A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BAF249FA;
-	Fri,  5 Jan 2024 09:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4ED824A05;
+	Fri,  5 Jan 2024 09:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jhxIVMs4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="u/po0y20"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616542377E;
-	Fri,  5 Jan 2024 09:54:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7A8DC433C8;
-	Fri,  5 Jan 2024 09:54:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704448449;
-	bh=Q3++BYkXZTDLMuoxfoR51GqwhiF3CPpgmZlQRvO2s3k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jhxIVMs4sbwEQmRjPAggVHXlGggOwyozFmukxqlcFA7UP6BCcJKevnKQMUQGh8ba7
-	 u3jfC63/75dQadsEZ3MPTJcmCP9Y8yg8CqkLMsviRCEQ7TWFtV4K0+L/1arNpPNtCi
-	 vetodr7e5SjmL+gCUYF8hJ1jOh75q22xDEuegv/GqemAWnjupVYzLBfTlMkeVa0AnN
-	 q0KAG74QOUOOc5ftl4Y1lpxceorZ1prCgvTRCWCuOCSF8f7oF31BEHhE9queVxCUjB
-	 5l3k7yF6Ctm2Qrgnaq29rPTC5Qk5DhxhMIG+9FFaKuriQmUddM8bhhK2L7Mft5eWHG
-	 6la1nqbf6av5w==
-Date: Fri, 5 Jan 2024 09:54:06 +0000
-From: Simon Horman <horms@kernel.org>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCH net] MAINTAINERS: I don't want to review Renesas Ethernet
- Switch driver
-Message-ID: <20240105095406.GQ31813@kernel.org>
-References: <6498e2dd-7960-daeb-acce-a8d2207f3404@omp.ru>
- <20240103212822.GA48301@kernel.org>
- <8f9b5376-647a-7b59-886c-142990b8c9e4@omp.ru>
- <TYBPR01MB5341F4C4340200CABBFF5C05D8662@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C49249F7
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 09:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d60c49ee7so14145925e9.0
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 01:55:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704448552; x=1705053352; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U/ztSBwbrYnc3C3ubnEB0gBjQMTcTGB+VnyHOm6Fxgw=;
+        b=u/po0y20Ppdcqz/apM4NiyNlP2nH7OLxQhmyl7oZbHE7Bi/XZUMMoC0Cu3TaaeTX8W
+         Y+p8Ohmp0JH5ZGDsd77NgmyINnCKMADjYzGqGV3nnZ8dtAkhVzYGwKWAFHlwJf4Vuqlu
+         pNNQRdiNLCZeObteCjlDNGpdi4hE2caHwinYUE1YZ59kJu877Da4jWEV66JuSYSufnHg
+         J0zTXZkzIkeDXevcIAraNjh+S1pvuF+/IQATvu/6uEPPKvVxrt/2AVr3FvQzHslvzHlM
+         chs8T3YWTTqhuW98s5kdelbJe9ltfgm7mNsgjSRsBCWX0yuWL5vxCquB3DQ+Ao/FHLuw
+         eZ0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704448552; x=1705053352;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U/ztSBwbrYnc3C3ubnEB0gBjQMTcTGB+VnyHOm6Fxgw=;
+        b=MXuye6eWmDg2wB7DTlpkVKACgkWhV0NBjRDekDo43D4zckGo1/Nc/0XuhK/RjVjxeJ
+         Fq1FELZ6V9NXkhk+4ARTl43ciPmIcMYQBh2WlG0dUXHxtF6yMhLBPrNAX6JB03az4RP/
+         Z1ktlcAhXuWeVsfvamjR0Vz5LfXzAmqOqF/2HzZsXI/ayA6va35PMiabyLSTXLrfDB/T
+         6v+ncElOlP1+crwturPbPmrO+Rhog/P0ZfIZAuHK8YM30wFE4uAb5qiuqihL+WNwdaNp
+         AkiyZeEdBslaEcJAeFkJX7e52h1wlWa50OMY9TwhwffhoUwRR+qHPAmqaIOGkhJlbleX
+         MRsg==
+X-Gm-Message-State: AOJu0Yzyer2DDl5MT86fpQOF64ED/mBn/AEtTljF+w+NVIfsaRtTSaHn
+	BDe7HwGjduqrxkxh1HRLMuwq8Ka5DRachkcIaK0MZPykMxo=
+X-Google-Smtp-Source: AGHT+IEWYAJHMPLNr2rJ6gQ20snX+nL3DblEgtUmaXHkW2wP5KU5r+DFb4z+WVlnJpD2rb/OtNnjqA==
+X-Received: by 2002:a05:600c:450a:b0:40d:8964:7eb4 with SMTP id t10-20020a05600c450a00b0040d89647eb4mr1070926wmo.35.1704448552303;
+        Fri, 05 Jan 2024 01:55:52 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id d12-20020a05600c34cc00b0040d2e37c06dsm1039339wmq.20.2024.01.05.01.55.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 01:55:51 -0800 (PST)
+Date: Fri, 5 Jan 2024 10:55:50 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, shenjian15@huawei.com, wangjie125@huawei.com,
+	liuyonglong@huawei.com, lanhao@huawei.com, wangpeiyang1@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V4 net-next 4/4] net: hns3: support dump pfc frame
+ statistics in tx timeout log
+Message-ID: <ZZfSJoEsoXceI_2q@nanopsycho>
+References: <20240105010119.2619873-1-shaojijie@huawei.com>
+ <20240105010119.2619873-5-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,97 +77,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <TYBPR01MB5341F4C4340200CABBFF5C05D8662@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+In-Reply-To: <20240105010119.2619873-5-shaojijie@huawei.com>
 
-On Fri, Jan 05, 2024 at 02:42:54AM +0000, Yoshihiro Shimoda wrote:
-> Hello,
+Fri, Jan 05, 2024 at 02:01:19AM CET, shaojijie@huawei.com wrote:
+>Continuous pfc frames may cause tx timeout.
+>Therefore, pfc frame statistics are added to logs.
+>
+>Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>Reviewed-by: Simon Horman <horms@kernel.org>
+>---
+> drivers/net/ethernet/hisilicon/hns3/hnae3.h             | 2 ++
+> drivers/net/ethernet/hisilicon/hns3/hns3_enet.c         | 6 ++++--
+> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 2 ++
+> 3 files changed, 8 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+>index ff475b0eac22..bf1e386617bc 100644
+>--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+>+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+>@@ -209,6 +209,8 @@ struct hnae3_queue {
+> struct hns3_mac_stats {
+> 	u64 tx_pause_cnt;
+> 	u64 rx_pause_cnt;
+>+	u64 tx_pfc_cnt;
+>+	u64 rx_pfc_cnt;
+> };
 > 
-> Thank you for adding CC to me.
-
-Likewise, thanks for your response.
-
-> > From: Sergey Shtylyov, Sent: Friday, January 5, 2024 5:47 AM
-> > 
-> > On 1/4/24 12:28 AM, Simon Horman wrote:
-> > [...]
-> > >> I don't know this hardware, I don't have the manuals for it, so I can't
-> > >> provide a good review.  Let's exclude the Ethernet Switch related files.
-> > >>
-> > >> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> > >
-> > > Hi Sergey,
-> > 
-> >   Hi Simon, long time, no see... :-)
-> > 
-> > > I don't know the back story to this, if there is one.
-> > 
-> >    Not much of a history: I got a lot of the rswitch patches in my
-> > inbox and I mostly ignored them... but kept deferring this patch due
-> > to a high load with fixing Svace's reports at work...
-> > 
-> > > But could I suggest that:
-> > >
-> > > 1. The patch also updates the title MAINTAINERS section to cover the
-> > >    remaining two drivers.
-> > >
-> > >    e.g.: RENESAS ETHERNET DRIVERS ->
-> > >          RENESAS ETHERNET AVB AND SUPERH ETHERNET DRIVERS
-> > >
-> > >    Or alternatively, create separate sections for each driver.
-> > 
-> >    Yeah, this 2nd option seems cleaner. Still not sure about Kconfig/
-> > Makefile though...
+> /* hnae3 loop mode */
+>diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>index b618797a7e8d..8e237f0f4fc9 100644
+>--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+>@@ -2871,8 +2871,10 @@ static bool hns3_get_tx_timeo_queue_info(struct net_device *ndev)
+> 		struct hns3_mac_stats mac_stats;
 > 
-> How about adding "COMMON PARTS" section?
+> 		h->ae_algo->ops->get_mac_stats(h, &mac_stats);
+>-		netdev_info(ndev, "tx_pause_cnt: %llu, rx_pause_cnt: %llu\n",
+>-			    mac_stats.tx_pause_cnt, mac_stats.rx_pause_cnt);
+>+		netdev_info(ndev,
+>+			    "tx_pause_cnt: %llu, rx_pause_cnt: %llu, tx_pfc_cnt: %llu, rx_pfc_cnt: %llu\n",
+>+			    mac_stats.tx_pause_cnt, mac_stats.rx_pause_cnt,
+>+			    mac_stats.tx_pfc_cnt, mac_stats.rx_pfc_cnt);
 
-I think that would be fine.
+Don't we have a better way to expose this? I mean, whenever there is a
+patch that extends the amount of text written in dmesg, it smells.
+We should rather reduce it.
 
-> - RENESAS ETHERNET AVB AND SUPERH ETHERNET DRIVERS : For ravb and sh_eth
 
-I think Sergey prefers two sections for the above.
-Perhaps:
-
-  - RENESAS ETHERNET AVB DRIVER
-  - RENESAS SUPERH ETHERNET DRIVER
-
-Whoever drafts the patch, please be sure to maintain
-alphabetical order by section title.
-
-> - RENESAS ETHERNET DRIVERS (COMMON PARTS) : For Kconfig/Makefile in drivers/net/ethernet/renesas
-> - RENESAS ETHERNET SWITCH DRIVER : For rswitch
+> 	}
 > 
-> > >    n.b.: This may involve moving sections to maintain alphabetical order
-> > >          by section title
-> > >
-> > > 2. Reaching out to Shimoda-san (CCed) or other relevant parties
-> > >    to see if an appropriate maintainer or maintainers for the
-> > >    Renesas Ethernet Switch driver can be found.
+> 	hns3_dump_queue_reg(ndev, tx_ring);
+>diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+>index cf85ef55a0f4..f70a1159de40 100644
+>--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+>+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+>@@ -775,6 +775,8 @@ static void hclge_get_mac_stat(struct hnae3_handle *handle,
 > 
-> I'm happy if I'm a maintainer for Renesas Ethernet Switch driver.
-> So, if my idea above is acceptable, perhaps the maintainers can be:
+> 	mac_stats->tx_pause_cnt = hdev->mac_stats.mac_tx_mac_pause_num;
+> 	mac_stats->rx_pause_cnt = hdev->mac_stats.mac_rx_mac_pause_num;
+>+	mac_stats->tx_pfc_cnt = hdev->mac_stats.mac_tx_pfc_pause_pkt_num;
+>+	mac_stats->rx_pfc_cnt = hdev->mac_stats.mac_rx_pfc_pause_pkt_num;
+> }
 > 
-> - RENESAS ETHERNET AVB AND SUPERH ETHERNET DRIVERS : Sergey
-> - RENESAS ETHERNET DRIVERS (COMMON PARTS) : Sergey and Shimoda
-> - RENESAS ETHERNET SWITCH DRIVER : Shimoda
-
-Modulo my comments above, this sounds reasonable to me.
-
-> > >    n.b.: It may still be a holiday period in Japan for the rest of the week.
-> > 
-> >    It's a holiday period here in Russia as well, till the 8th of Jaunary. :-)
-> 
-> I'm back from today, but next Monday (8th) is a holiday in Japan :)
-
-Enjoy.
-
-> 
-> Best regards,
-> Yoshihiro Shimoda
-> 
-> > > 3. Rephrase the subject and patch description as splitting out maintenance of
-> > >    the Renesas Ethernet Switch driver .
-> > 
-> > [...]
-> > 
-> > MBR, Sergey
+> static int hclge_parse_func_status(struct hclge_dev *hdev,
+>-- 
+>2.30.0
+>
+>
 
