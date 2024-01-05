@@ -1,213 +1,112 @@
-Return-Path: <netdev+bounces-62010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ED3582592B
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:38:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E94C6825932
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:39:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 971F21F222E2
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:38:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8343F1F228BD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6368F328B4;
-	Fri,  5 Jan 2024 17:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C952C328BD;
+	Fri,  5 Jan 2024 17:39:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AD72E822
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 17:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35ff54778ddso18204765ab.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 09:38:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3773328AD;
+	Fri,  5 Jan 2024 17:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-555144cd330so2313723a12.2;
+        Fri, 05 Jan 2024 09:39:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704476301; x=1705081101;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0J45BElnGsnlb+hcSi7W72v1ypQ+RzOOzGvT7znb7Wo=;
-        b=rwz3F+O6md6Y1GBrA6Nr/VxLZOuLlmDnuA4kVrWXFqJXnBn2WqZ75qSJzv6c9VQCh/
-         qM8H1VsEfwUzJvgxFnxkq4hHHNxPUyTmlPfqEGqvy6a1aZ73yxo/GEw+0WqD+LCLQJ2J
-         is/TOCOvWrfHA+aQveAG4QHNxPg+4f7fzsC2f8kWsvNx3tJjBSyJ1YDK3tuwW9bR0EGW
-         MD6CU7HeMCcubWCYXIWQEKEqTahwCt771dLa/Y/DQpMVjCnhYnxreIUSDIjcMButn86x
-         Ix1A5zTaDug/RNf2+PF8VMtHAF8bWb8n+oAuFdLXF4/cnxdDsgg1MmKoHuP5VOEMVnZQ
-         TzbQ==
-X-Gm-Message-State: AOJu0YxfoUK0pEz7dyG8TSMAThmfKB59n0NVeU2t1yoeu1qerYiose/9
-	4esXXOwpMpGZLL3byMckchU9Zfgl+HtaLbke/AXhzx5vjA4s
-X-Google-Smtp-Source: AGHT+IH3eeYzTnSsDonWstAfWWoR4AOmd3g8UJy8VaoYJixBEclMuQMo/q1bIEOiUG4Mo27b5yu5sUpt1Wko+9mGb4HY6bNABkk8
+        d=1e100.net; s=20230601; t=1704476365; x=1705081165;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RJ864dYz0Y/ieesbskVDxoJcEEeyC5EY2kKFTREupmw=;
+        b=vv5XuswkR3iqdG+N1cvCw2j5vcA3HcOak4oSa4Y/5rIdCllm2xM1of5aLMvWsgNGpw
+         JcfCFuUqUrKe9SLwWMfX3aG2UBkNLOVHEcv46BdCdSxv6pUeme3O0PXmYAAsQfY44ubS
+         eXR8s67fguMBYAdeCW+fXdczgWwNmayKZV0lyS17zia1/8ZdflMsjd52aI/SGFDVD0pE
+         lltakgRFhVcYRYsE3/iM+3zQnerOROQeFJaKNXHHYNZQnEtWvbK1XeeMTjcHSrVAG6Fq
+         C1fDchM19YPebBjwMW9B/N55z/31W0yLCDD0tzn7aUKy8A+c7gTFqDXBt1zKvUklrr2D
+         +PTg==
+X-Gm-Message-State: AOJu0YwK/qSlvdObNwrqKsEZqesAPaEjpcOv4ct0f/7ttx9fGZYOj19c
+	6U7VPWokmINwdyM2Wc36ZPQ=
+X-Google-Smtp-Source: AGHT+IGyQ5UPMpiPztaoNOSolUVO5SxStnGCTjj8mPdURwzEdikfftdAYvKOznarqWAM8jLdGt6i9g==
+X-Received: by 2002:a50:9e06:0:b0:553:6b20:b707 with SMTP id z6-20020a509e06000000b005536b20b707mr1633983ede.15.1704476364965;
+        Fri, 05 Jan 2024 09:39:24 -0800 (PST)
+Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id g1-20020a056402114100b0055534d5e75csm1186668edw.6.2024.01.05.09.39.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 09:39:24 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Cc: leit@meta.com,
+	netdev@vger.kernel.org (open list:NETWORKING [IPv4/IPv6]),
+	linux-kernel@vger.kernel.org (open list),
+	llvm@lists.linux.dev (open list:CLANG/LLVM BUILD SUPPORT:Keyword:\b(?i:clang|llvm)\b)
+Subject: [PATCH net-next] net/ipv6: resolve warning in ip6_fib.c
+Date: Fri,  5 Jan 2024 09:39:20 -0800
+Message-Id: <20240105173920.1041474-1-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c543:0:b0:35f:ce07:e18e with SMTP id
- a3-20020a92c543000000b0035fce07e18emr364557ilj.4.1704476301105; Fri, 05 Jan
- 2024 09:38:21 -0800 (PST)
-Date: Fri, 05 Jan 2024 09:38:21 -0800
-In-Reply-To: <000000000000a62351060e363bdc@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000074a10d060e3650f2@google.com>
-Subject: Re: [syzbot] [net?] memory leak in ___neigh_create (2)
-From: syzbot <syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com>
-To: alexander.mikhalitsyn@virtuozzo.com, davem@davemloft.net, den@openvz.org, 
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	razor@blackwall.org, syzkaller-bugs@googlegroups.com, 
-	thomas.zeitlhofer+lkml@ze-it.at, thomas.zeitlhofer@ze-it.at, 
-	wangyuweihx@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+In some configurations, the 'iter' variable in function
+fib6_repair_tree() is unused, resulting the following warning when
+compiled with W=1.
 
-HEAD commit:    2258c2dc850b Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16f67b44480000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4fb7ad9185f1501
-dashboard link: https://syzkaller.appspot.com/bug?extid=42cfec52b6508887bbe8
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e23d44480000
+	net/ipv6/ip6_fib.c:1781:6: warning: variable 'iter' set but not used [-Wunused-but-set-variable]
+	 1781 |         int iter = 0;
+	      |             ^
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0e65a45877eb/disk-2258c2dc.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7617adf885a8/vmlinux-2258c2dc.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/43fb89ea894a/bzImage-2258c2dc.xz
+Rewrite RT6_TRACE() macro to keep the variable in scope.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com
+Clang 18 removes the trace completely from the binary when the trace is
+disabled[1], so, no overhead is expected with this change.
 
-BUG: memory leak
-unreferenced object 0xffff88810b8ea400 (size 512):
-  comm "kworker/0:3", pid 4440, jiffies 4294938594 (age 1132.680s)
-  hex dump (first 32 bytes):
-    00 9c f8 0a 81 88 ff ff 80 29 23 86 ff ff ff ff  .........)#.....
-    c0 79 79 44 81 88 ff ff 72 78 ff ff 00 00 00 00  .yyD....rx......
-  backtrace:
-    [<ffffffff814f9fe6>] __do_kmalloc_node mm/slab_common.c:967 [inline]
-    [<ffffffff814f9fe6>] __kmalloc+0x46/0x120 mm/slab_common.c:981
-    [<ffffffff83b5234f>] kmalloc include/linux/slab.h:584 [inline]
-    [<ffffffff83b5234f>] kzalloc include/linux/slab.h:720 [inline]
-    [<ffffffff83b5234f>] neigh_alloc net/core/neighbour.c:476 [inline]
-    [<ffffffff83b5234f>] ___neigh_create+0xdf/0xd60 net/core/neighbour.c:661
-    [<ffffffff83f9f886>] ip6_finish_output2+0x776/0x9b0 net/ipv6/ip6_output.c:125
-    [<ffffffff83fa5530>] __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
-    [<ffffffff83fa5530>] ip6_finish_output+0x270/0x530 net/ipv6/ip6_output.c:206
-    [<ffffffff83fa5893>] NF_HOOK_COND include/linux/netfilter.h:291 [inline]
-    [<ffffffff83fa5893>] ip6_output+0xa3/0x1b0 net/ipv6/ip6_output.c:227
-    [<ffffffff83ff16d9>] dst_output include/net/dst.h:444 [inline]
-    [<ffffffff83ff16d9>] NF_HOOK include/linux/netfilter.h:302 [inline]
-    [<ffffffff83ff16d9>] NF_HOOK.constprop.0+0x49/0x110 include/linux/netfilter.h:296
-    [<ffffffff83ff19c4>] mld_sendpack+0x224/0x350 net/ipv6/mcast.c:1820
-    [<ffffffff83ff5403>] mld_send_cr net/ipv6/mcast.c:2121 [inline]
-    [<ffffffff83ff5403>] mld_ifc_work+0x2a3/0x750 net/ipv6/mcast.c:2653
-    [<ffffffff8129519a>] process_one_work+0x2ba/0x5f0 kernel/workqueue.c:2289
-    [<ffffffff81295ab9>] worker_thread+0x59/0x5b0 kernel/workqueue.c:2436
-    [<ffffffff8129fb05>] kthread+0x125/0x160 kernel/kthread.c:376
-    [<ffffffff8100224f>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+[1] Link: https://paste.debian.net/1303162/
 
-BUG: memory leak
-unreferenced object 0xffff888109a7fa00 (size 512):
-  comm "kworker/0:3", pid 4440, jiffies 4294938594 (age 1132.680s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 80 29 23 86 ff ff ff ff  .........)#.....
-    00 79 79 44 81 88 ff ff 72 78 ff ff 00 00 00 00  .yyD....rx......
-  backtrace:
-    [<ffffffff814f9fe6>] __do_kmalloc_node mm/slab_common.c:967 [inline]
-    [<ffffffff814f9fe6>] __kmalloc+0x46/0x120 mm/slab_common.c:981
-    [<ffffffff83b5234f>] kmalloc include/linux/slab.h:584 [inline]
-    [<ffffffff83b5234f>] kzalloc include/linux/slab.h:720 [inline]
-    [<ffffffff83b5234f>] neigh_alloc net/core/neighbour.c:476 [inline]
-    [<ffffffff83b5234f>] ___neigh_create+0xdf/0xd60 net/core/neighbour.c:661
-    [<ffffffff83f9f886>] ip6_finish_output2+0x776/0x9b0 net/ipv6/ip6_output.c:125
-    [<ffffffff83fa5530>] __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
-    [<ffffffff83fa5530>] ip6_finish_output+0x270/0x530 net/ipv6/ip6_output.c:206
-    [<ffffffff83fa5893>] NF_HOOK_COND include/linux/netfilter.h:291 [inline]
-    [<ffffffff83fa5893>] ip6_output+0xa3/0x1b0 net/ipv6/ip6_output.c:227
-    [<ffffffff83ff16d9>] dst_output include/net/dst.h:444 [inline]
-    [<ffffffff83ff16d9>] NF_HOOK include/linux/netfilter.h:302 [inline]
-    [<ffffffff83ff16d9>] NF_HOOK.constprop.0+0x49/0x110 include/linux/netfilter.h:296
-    [<ffffffff83ff19c4>] mld_sendpack+0x224/0x350 net/ipv6/mcast.c:1820
-    [<ffffffff83ff5403>] mld_send_cr net/ipv6/mcast.c:2121 [inline]
-    [<ffffffff83ff5403>] mld_ifc_work+0x2a3/0x750 net/ipv6/mcast.c:2653
-    [<ffffffff8129519a>] process_one_work+0x2ba/0x5f0 kernel/workqueue.c:2289
-    [<ffffffff81295ab9>] worker_thread+0x59/0x5b0 kernel/workqueue.c:2436
-    [<ffffffff8129fb05>] kthread+0x125/0x160 kernel/kthread.c:376
-    [<ffffffff8100224f>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
-
-BUG: memory leak
-unreferenced object 0xffff88810a9fb400 (size 512):
-  comm "dhcpcd", pid 4638, jiffies 4294938595 (age 1132.670s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 80 29 23 86 ff ff ff ff  .........)#.....
-    c0 76 79 44 81 88 ff ff 73 78 ff ff 00 00 00 00  .vyD....sx......
-  backtrace:
-    [<ffffffff814f9fe6>] __do_kmalloc_node mm/slab_common.c:967 [inline]
-    [<ffffffff814f9fe6>] __kmalloc+0x46/0x120 mm/slab_common.c:981
-    [<ffffffff83b5234f>] kmalloc include/linux/slab.h:584 [inline]
-    [<ffffffff83b5234f>] kzalloc include/linux/slab.h:720 [inline]
-    [<ffffffff83b5234f>] neigh_alloc net/core/neighbour.c:476 [inline]
-    [<ffffffff83b5234f>] ___neigh_create+0xdf/0xd60 net/core/neighbour.c:661
-    [<ffffffff83f9f886>] ip6_finish_output2+0x776/0x9b0 net/ipv6/ip6_output.c:125
-    [<ffffffff83fa5530>] __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
-    [<ffffffff83fa5530>] ip6_finish_output+0x270/0x530 net/ipv6/ip6_output.c:206
-    [<ffffffff83fa5893>] NF_HOOK_COND include/linux/netfilter.h:291 [inline]
-    [<ffffffff83fa5893>] ip6_output+0xa3/0x1b0 net/ipv6/ip6_output.c:227
-    [<ffffffff84062411>] dst_output include/net/dst.h:444 [inline]
-    [<ffffffff84062411>] ip6_local_out+0x51/0x70 net/ipv6/output_core.c:155
-    [<ffffffff83fa6285>] ip6_send_skb+0x25/0xc0 net/ipv6/ip6_output.c:1971
-    [<ffffffff83fa6394>] ip6_push_pending_frames+0x74/0x90 net/ipv6/ip6_output.c:1991
-    [<ffffffff83fec08c>] rawv6_push_pending_frames net/ipv6/raw.c:579 [inline]
-    [<ffffffff83fec08c>] rawv6_sendmsg+0x16ac/0x1ba0 net/ipv6/raw.c:922
-    [<ffffffff83ebe965>] inet_sendmsg+0x45/0x70 net/ipv4/af_inet.c:827
-    [<ffffffff83af7116>] sock_sendmsg_nosec net/socket.c:714 [inline]
-    [<ffffffff83af7116>] sock_sendmsg+0x56/0x80 net/socket.c:734
-    [<ffffffff83af769d>] ____sys_sendmsg+0x38d/0x410 net/socket.c:2476
-    [<ffffffff83afbfe8>] ___sys_sendmsg+0xa8/0x110 net/socket.c:2530
-    [<ffffffff83afc178>] __sys_sendmsg+0x88/0x100 net/socket.c:2559
-    [<ffffffff848ed5b5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-    [<ffffffff848ed5b5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-    [<ffffffff84a00087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-BUG: memory leak
-unreferenced object 0xffff88810a9fba00 (size 512):
-  comm "dhcpcd", pid 4638, jiffies 4294938595 (age 1132.670s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 80 29 23 86 ff ff ff ff  .........)#.....
-    80 77 79 44 81 88 ff ff 73 78 ff ff 00 00 00 00  .wyD....sx......
-  backtrace:
-    [<ffffffff814f9fe6>] __do_kmalloc_node mm/slab_common.c:967 [inline]
-    [<ffffffff814f9fe6>] __kmalloc+0x46/0x120 mm/slab_common.c:981
-    [<ffffffff83b5234f>] kmalloc include/linux/slab.h:584 [inline]
-    [<ffffffff83b5234f>] kzalloc include/linux/slab.h:720 [inline]
-    [<ffffffff83b5234f>] neigh_alloc net/core/neighbour.c:476 [inline]
-    [<ffffffff83b5234f>] ___neigh_create+0xdf/0xd60 net/core/neighbour.c:661
-    [<ffffffff83f9f886>] ip6_finish_output2+0x776/0x9b0 net/ipv6/ip6_output.c:125
-    [<ffffffff83fa5530>] __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
-    [<ffffffff83fa5530>] ip6_finish_output+0x270/0x530 net/ipv6/ip6_output.c:206
-    [<ffffffff83fa5893>] NF_HOOK_COND include/linux/netfilter.h:291 [inline]
-    [<ffffffff83fa5893>] ip6_output+0xa3/0x1b0 net/ipv6/ip6_output.c:227
-    [<ffffffff84062411>] dst_output include/net/dst.h:444 [inline]
-    [<ffffffff84062411>] ip6_local_out+0x51/0x70 net/ipv6/output_core.c:155
-    [<ffffffff83fa6285>] ip6_send_skb+0x25/0xc0 net/ipv6/ip6_output.c:1971
-    [<ffffffff83fa6394>] ip6_push_pending_frames+0x74/0x90 net/ipv6/ip6_output.c:1991
-    [<ffffffff83fec08c>] rawv6_push_pending_frames net/ipv6/raw.c:579 [inline]
-    [<ffffffff83fec08c>] rawv6_sendmsg+0x16ac/0x1ba0 net/ipv6/raw.c:922
-    [<ffffffff83ebe965>] inet_sendmsg+0x45/0x70 net/ipv4/af_inet.c:827
-    [<ffffffff83af7116>] sock_sendmsg_nosec net/socket.c:714 [inline]
-    [<ffffffff83af7116>] sock_sendmsg+0x56/0x80 net/socket.c:734
-    [<ffffffff83af769d>] ____sys_sendmsg+0x38d/0x410 net/socket.c:2476
-    [<ffffffff83afbfe8>] ___sys_sendmsg+0xa8/0x110 net/socket.c:2530
-    [<ffffffff83afc178>] __sys_sendmsg+0x88/0x100 net/socket.c:2559
-    [<ffffffff848ed5b5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-    [<ffffffff848ed5b5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-    [<ffffffff84a00087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-
-
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ include/net/ip6_fib.h | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 9ba6413fd2e3..d2ef60ebeb25 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -30,11 +30,7 @@
+ 
+ #define RT6_DEBUG 2
+ 
+-#if RT6_DEBUG >= 3
+-#define RT6_TRACE(x...) pr_debug(x)
+-#else
+-#define RT6_TRACE(x...) do { ; } while (0)
+-#endif
++#define RT6_TRACE(x...) do { if (RT6_DEBUG > 3) pr_debug(x); } while (0)
+ 
+ struct rt6_info;
+ struct fib6_info;
+-- 
+2.39.3
+
 
