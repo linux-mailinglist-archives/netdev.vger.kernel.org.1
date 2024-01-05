@@ -1,135 +1,144 @@
-Return-Path: <netdev+bounces-62094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C50825B6F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 21:14:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 536F9825B76
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 21:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50C83285FA5
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 20:14:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B2801C2276C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 20:16:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9691D3608B;
-	Fri,  5 Jan 2024 20:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC0535F1E;
+	Fri,  5 Jan 2024 20:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UKq2+axj"
+	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="Fcelzq8i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F343635F0E;
-	Fri,  5 Jan 2024 20:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40d5336986cso21630335e9.1;
-        Fri, 05 Jan 2024 12:14:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704485674; x=1705090474; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H5v4lJQ5FBDH9m0m4us0aR2gRwVokV9Ch1chBRNOEtk=;
-        b=UKq2+axjFBtD1DSjVqVbHlMCgZ7zdQMKV/XmZHPqhTVL4P3YeEQMkEvcDVMB9DXcr6
-         n4Z32Kb0SpBLZ8xpwOpuYWJ1oy3RWEsgkNpbdYjOc4qUu1Bq4sgSH5SG2WHis4LvoiL0
-         aT9EC1VKrIzMw+Hsl1BeYjqYRGmKHhXuGgCVAh18fRn30bljEsNzjo9wwqMU5tfw68ix
-         n44vpC30hlf4Z57hA2CCx2xsDvpulYaP16i4UIK7MFj9YoT2tXx26s0MRMU+pfkyfC2v
-         kkDNvyhxzMlMGPUWg0xgYwOhzyNpse6/jHCcj1BkjDNbTH2Heqx5m9XPPCn/pz8jYH6g
-         Ssew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704485674; x=1705090474;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H5v4lJQ5FBDH9m0m4us0aR2gRwVokV9Ch1chBRNOEtk=;
-        b=BVSnH6Qvkv9z7DIwoEy5Ve2M9as68/5l2b/N4E9DLdEcwwgscfcp3wU95yzDIsQmqg
-         gqQS8WCQ3Qu9fp4xrGad/ARfebsw5QZhZOHP1UXkHWVz9tfFDDIwDpHUXcOHMENQqa3i
-         AhsFi8lzyLTVKaPh8o+z8XgWwrE1Y+KgvKQyK5AyQGdnUUui6W4vmsmfICNnh0sBycEm
-         1xx33kolP1WSRrZWfJGGre76RoCH3h2oXMJYhc8fa7/8Xj96l24ZuZtyxxOOIZa/z37v
-         F2ZQSeifLTkdQRQpnA9H3BPMOCEXNpombe6Hr8FtUpa3G04mI+BE5IEpfKZy7/T7eCjy
-         8rfw==
-X-Gm-Message-State: AOJu0YwDVsp0Irt/ozKqdbWLg3J6nf0Rk9trYI7ZgdAltsckxK8jG2Te
-	VHwi1kr/qDMTfhUrwN3/8BE=
-X-Google-Smtp-Source: AGHT+IFze9sCHhyNc+zVvhduYpNez49M+qfUp0nS1bBjaYDBY+nfbVYc0kUsXXE5eZyWK9FZdIoybg==
-X-Received: by 2002:a05:600c:2284:b0:40e:3524:4a53 with SMTP id 4-20020a05600c228400b0040e35244a53mr28919wmf.76.1704485673912;
-        Fri, 05 Jan 2024 12:14:33 -0800 (PST)
-Received: from [192.168.0.3] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id h12-20020a05600c314c00b0040d5ac00dc6sm2554821wmo.8.2024.01.05.12.14.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jan 2024 12:14:33 -0800 (PST)
-Message-ID: <d639824c-74e2-45f4-bd8a-7e20fad8d61b@gmail.com>
-Date: Fri, 5 Jan 2024 22:14:31 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149E636084;
+	Fri,  5 Jan 2024 20:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tesarici.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tesarici.cz
+Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by bee.tesarici.cz (Postfix) with ESMTPSA id 5B37B1A7F5E;
+	Fri,  5 Jan 2024 21:16:49 +0100 (CET)
+Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
+	t=1704485809; bh=Rgie3y1MCVWz4iJXdc7cU/di9Mv+ALEzEsBSdqdhNZ0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Fcelzq8iCxuzuPQK2zfETAdbIYvpguj11nigdMnDb43//ZQ3LSntwKkp2WJJlVU8E
+	 2VBewJoE5nfMlabQYoEk0CCoHZgTdwuVhGzC4KKZBjGIck8XRhUxDGVCvn77NpCMF4
+	 fZpSLE/UQjaWWydS7PN0cnDr2QB7HZcE8IKKaiI8w4l46YBr4JPMI1zAxA5a+FCJm9
+	 7YFebuleq0hQCvv8/YCQxGw4Fq1lmevpJGqtbckxfagIbynmgqGeMZLzG5UCSi8xYj
+	 b5KUjuZ7nEtlYoMSOIILglPzeMBUU18af5teEJh180+wp9OhwZe6kUm9vVKc3hDZ0d
+	 WJc3SWuu84+Hg==
+From: Petr Tesarik <petr@tesarici.cz>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org (open list:STMMAC ETHERNET DRIVER),
+	linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 ARCHITECTURE),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 ARCHITECTURE),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Petr Tesarik <petr@tesarici.cz>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: stmmac: fix ethtool per-queue  statistics
+Date: Fri,  5 Jan 2024 21:16:42 +0100
+Message-ID: <20240105201642.30904-1-petr@tesarici.cz>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/5] support ipq5332 platform
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jie Luo <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
- konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_srichara@quicinc.com
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
- <a6a50fb6-871f-424c-a146-12b2628b8b64@gmail.com>
- <cfb04c82-3cc3-49f6-9a8a-1f6d1a22df40@quicinc.com>
- <dd05a599-247a-4516-8ad3-7550ceea99f7@gmail.com>
- <8ef607b9-1fc6-485b-a6fb-a8d468cc1954@lunn.ch>
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <8ef607b9-1fc6-485b-a6fb-a8d468cc1954@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+Fix per-queue statistics for devices with more than one queue.
 
-On 05.01.2024 15:52, Andrew Lunn wrote:
-> On Fri, Jan 05, 2024 at 04:48:31AM +0200, Sergey Ryazanov wrote:
->> Hi Luo,
->>
->> thank you for explaining the case in such details. I also have checked the
->> related DTSs in the Linaro repository to be more familiar with the I/O mem
->> layout. Specifically I checked these two, hope they are relevant to the
->> discussion:
->> https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/blob/NHSS.QSDK.12.4.r3/arch/arm64/boot/dts/qcom/ipq5332.dtsi
->> https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/blob/NHSS.QSDK.12.4.r3/arch/arm64/boot/dts/qcom/ipq9574.dtsi
->>
->> Please find my comments below.
-> 
-> Hi Sergey
-> 
-> There is a second thread going on, focused around the quad PHY. See:
-> 
-> https://lore.kernel.org/netdev/60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch/
+The output data pointer is currently reset in each loop iteration,
+effectively summing all queue statistics in the first four u64 values.
 
-Yeah. I had read your discussion yesterday before coming back to this 
-clock discussion. It is a monster chip and looks like you have a hard 
-time figuring out how it works and looking for a good code/DT model.
+The summary values are not even labeled correctly. For example, if eth0 has
+2 queues, ethtool -S eth0 shows:
 
-> Since it is very hard to get consistent information out of Luo, he has
-> annoyed nearly all the PHY maintainers and all the DT maintainers, i'm
-> going back to baby steps, focusing on just the quad pure PHY, and
-> trying to get that understood and correctly described in DT.
-> 
-> However, does Linaro have any interest in just taking over this work,
-> or mentoring Luo?
+     q0_tx_pkt_n: 374 (actually tx_pkt_n over all queues)
+     q0_tx_irq_n: 23  (actually tx_normal_irq_n over all queues)
+     q1_tx_pkt_n: 462 (actually rx_pkt_n over all queues)
+     q1_tx_irq_n: 446 (actually rx_normal_irq_n over all queues)
+     q0_rx_pkt_n: 0
+     q0_rx_irq_n: 0
+     q1_rx_pkt_n: 0
+     q1_rx_irq_n: 0
 
-I should clarify here a bit. I found this discussion while looking for a 
-way to port one open source firmware to my router based on previous IPQ 
-generation. And since I am a bit familiar with this chip family, I chose 
-to put my 2c to make implementation discussion more structured. Long 
-story short, I have no idea about Linaro's plans :)
+Fixes: 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics where necessary")
+Cc: stable@vger.kernel.org
+Signed-off-by: Petr Tesarik <petr@tesarici.cz>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-If I am allowed to speak, the chosen baby steps approach to focus on 
-pure PHY seems to be the only sane method in that case. Considering 
-Alex's promise, we can assume that the next release will support this PHY.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index f628411ae4ae..112a36a698f1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -543,15 +543,12 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
+ 	u32 rx_cnt = priv->plat->rx_queues_to_use;
+ 	unsigned int start;
+ 	int q, stat;
+-	u64 *pos;
+ 	char *p;
+ 
+-	pos = data;
+ 	for (q = 0; q < tx_cnt; q++) {
+ 		struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[q];
+ 		struct stmmac_txq_stats snapshot;
+ 
+-		data = pos;
+ 		do {
+ 			start = u64_stats_fetch_begin(&txq_stats->syncp);
+ 			snapshot = *txq_stats;
+@@ -559,17 +556,15 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
+ 
+ 		p = (char *)&snapshot + offsetof(struct stmmac_txq_stats, tx_pkt_n);
+ 		for (stat = 0; stat < STMMAC_TXQ_STATS; stat++) {
+-			*data++ += (*(u64 *)p);
++			*data++ = (*(u64 *)p);
+ 			p += sizeof(u64);
+ 		}
+ 	}
+ 
+-	pos = data;
+ 	for (q = 0; q < rx_cnt; q++) {
+ 		struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[q];
+ 		struct stmmac_rxq_stats snapshot;
+ 
+-		data = pos;
+ 		do {
+ 			start = u64_stats_fetch_begin(&rxq_stats->syncp);
+ 			snapshot = *rxq_stats;
+@@ -577,7 +572,7 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
+ 
+ 		p = (char *)&snapshot + offsetof(struct stmmac_rxq_stats, rx_pkt_n);
+ 		for (stat = 0; stat < STMMAC_RXQ_STATS; stat++) {
+-			*data++ += (*(u64 *)p);
++			*data++ = (*(u64 *)p);
+ 			p += sizeof(u64);
+ 		}
+ 	}
+-- 
+2.43.0
 
---
-Sergey
 
