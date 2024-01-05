@@ -1,114 +1,114 @@
-Return-Path: <netdev+bounces-61861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05FF825157
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:59:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7016B825177
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:07:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FD341C21525
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:58:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 958821C22DBE
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2ED24A1C;
-	Fri,  5 Jan 2024 09:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C37124B41;
+	Fri,  5 Jan 2024 10:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wgHgGLPF"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="sCPY23v5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D681249FA
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 09:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-55679552710so6454a12.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 01:58:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704448736; x=1705053536; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5s2WgUp2uwUQXzqO9cBgyU5Zr8leiFxlRGNJ1vYv0Dw=;
-        b=wgHgGLPF/4pmwqtpKGyRRzEUDBNVHsanWh+stIS1absDp5cjbmXjY6Geg0HjrdIl0E
-         9aeMtYtKAtx4ihKOhAfumLucu+I7rRr94TZT4D/5wZ54L9J3nxwX2CgXrR9Sg8nuiNtM
-         v0WzhRBM+z+OOptCIZ4CThp9GPnh1ij2cQubuOz0bxs8ieSW3SAnqEeOcf+B06sUgyUa
-         0+OIIAF2zZyTxlz+zYoEmga/9fpTFbj+z/vDOzhsMJ26/SKM1fpb44G8ATwQEMlJnQ5R
-         mVrBE6+T7Dcpp052gjtqvSlT9bWs+DVtOgpjv02EQIAwCFl+PVibdFXzUYDtAZheL2JS
-         0ekA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704448736; x=1705053536;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5s2WgUp2uwUQXzqO9cBgyU5Zr8leiFxlRGNJ1vYv0Dw=;
-        b=G3aIUNA2q0bF9lk7Trh8LQO2Fkee8C5IXFi6vgi8V+x1F6gW4CF/viliwjgtRjLphd
-         joVO/gMHN277chWcN+OPVunH6c5nE2n+DgtWFfCyEVCC9ATm8IUHJQqbSY3K2XKpodWi
-         eUjBEBdmJWnu5rOh72LbAM3sR4zqrBih7kaalgnJPNPo7dun1DZqCbUtjHYEKXveNvOr
-         G61a+bxvlXbBiYVSnTUpfoce/1gNEd8rnBmc7Xj2/MN4mvd7X72rR8aQQP99cmQBELBa
-         yPcQEy2b93Jxa0PIrzsMThFZnTHBPLzhdNjJuOU/FVgEOwmKlKVrOzcpXG8GXUsqoX7l
-         sljg==
-X-Gm-Message-State: AOJu0Yymy7DDZ1W/lkqwkCu3wfezC0FaUZvBYD6sCHYEBAXmM4NnN13c
-	I3UrXEqJheNRQ/WE8hK+MAzzYZUs1+9aAxc/SZAb7yqMotN0
-X-Google-Smtp-Source: AGHT+IGo7jibauBuN19b7YPIMXdE4o8bzKuR2Wyh4RI9gBM3m94poauJEZy+g8VlmFYxEhnFLZw28+1UZucXoNdFHv0=
-X-Received: by 2002:a05:6402:35d4:b0:557:3c8a:7242 with SMTP id
- z20-20020a05640235d400b005573c8a7242mr22196edc.3.1704448735539; Fri, 05 Jan
- 2024 01:58:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167B424B2F;
+	Fri,  5 Jan 2024 10:06:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CFEC433C8;
+	Fri,  5 Jan 2024 10:06:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1704449219;
+	bh=Exy/fCfgWx2532qZ1vXYkjfLM2k7/JjLhx9Pk8pooss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sCPY23v50V2ll1z90icCOZpj4qdgoNJ3e9JEJNMtB2grMqRnAVcKBIcRZC7C0/hFt
+	 rOGRJWf+vMQbIij+5Syis7i+svqiVMboeSNjz0eRDvEZfgbAM3792ROS3uIaj0YeND
+	 sit07u3Dx2XIo4EzK+VdNzjZGNAArCVciPyjOiEs=
+Date: Fri, 5 Jan 2024 11:06:57 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jeffrey E Altman <jaltman@auristor.com>
+Cc: stable@vger.kernel.org, patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Markus Suvanto <markus.suvanto@gmail.com>,
+	Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	keyrings@vger.kernel.org, netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH 6.6 067/156] keys, dns: Allow key types (eg. DNS) to be
+ reclaimed immediately on expiry
+Message-ID: <2024010556-tradition-reappoint-95a4@gregkh>
+References: <20231230115812.333117904@linuxfoundation.org>
+ <20231230115814.539935693@linuxfoundation.org>
+ <cd1d6f0d-a05b-412c-882a-e62ee9e67b85@auristor.com>
+ <2024010526-catalyst-flame-2e33@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240105091556.15516-1-petr@tesarici.cz>
-In-Reply-To: <20240105091556.15516-1-petr@tesarici.cz>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 5 Jan 2024 10:58:42 +0100
-Message-ID: <CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
-Subject: Re: [PATCH] net: stmmac: protect statistics updates with a spinlock
-To: Petr Tesarik <petr@tesarici.cz>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2024010526-catalyst-flame-2e33@gregkh>
 
-On Fri, Jan 5, 2024 at 10:16=E2=80=AFAM Petr Tesarik <petr@tesarici.cz> wro=
-te:
->
-> Add a spinlock to fix race conditions while updating Tx/Rx statistics.
->
-> As explained by a comment in <linux/u64_stats_sync.h>, write side of stru=
-ct
-> u64_stats_sync must ensure mutual exclusion, or one seqcount update could
-> be lost on 32-bit platforms, thus blocking readers forever.
->
-> Such lockups have been actually observed on 32-bit Arm after stmmac_xmit(=
-)
-> on one core raced with stmmac_napi_poll_tx() on another core.
->
-> Signed-off-by: Petr Tesarik <petr@tesarici.cz>
+On Fri, Jan 05, 2024 at 10:51:50AM +0100, Greg Kroah-Hartman wrote:
+> On Thu, Jan 04, 2024 at 09:13:34PM -0500, Jeffrey E Altman wrote:
+> > On 12/30/2023 6:58 AM, Greg Kroah-Hartman wrote:
+> > > 6.6-stable review patch.  If anyone has any objections, please let me know.
+> > > 
+> > > ------------------
+> > > 
+> > > From: David Howells <dhowells@redhat.com>
+> > > 
+> > > [ Upstream commit 39299bdd2546688d92ed9db4948f6219ca1b9542 ]
+> > Greg,
+> > 
+> > Upstream commit 39299bdd2546688d92ed9db4948f6219ca1b9542 ("keys, dns: Allow
+> > key types (eg. DNS) to be reclaimed immediately on expiry") was subsequently
+> > fixed by
+> > 
+> >   commit 1997b3cb4217b09e49659b634c94da47f0340409
+> >   Author: Edward Adam Davis <eadavis@qq.com>
+> >   Date:   Sun Dec 24 00:02:49 2023 +0000
+> > 
+> >     keys, dns: Fix missing size check of V1 server-list header
+> > 
+> >   Fixes: b946001d3bb1 ("keys, dns: Allow key types (eg. DNS) to be reclaimed
+> > immediately on expiry")
+> > 
+> > If it is not too late, would it be possible to apply 1997b3cb421 to the
+> > branches b946001d3bb1 was cherry-picked to before release?
+> > I believe the complete set of branches are
+> > 
+> >   linux-6.6.y, linux-6.1.y, linux-5.15.y, linux-5.10.y, linux-5.0.y
+> 
+> The stable trees were already released with this change in it, so I'll
+> queue this up for the next round, thanks.
 
-This is going to add more costs to 64bit platforms ?
+Ah, I see what happened, that line:
+	Fixes: b946001d3bb1 ("keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry")
+refers to a commit that is not in Linus's tree, and isn't the sha1 that
+you are pointing at here either.
 
-It seems to me that the same syncp can be used from two different
-threads : hard irq and napi poller...
+So I'll go add this manually, but this is why our checking scripts
+missed this, please be more careful about using the proper SHA1 values
+in commits.  Using invalid ones is almost worse than not using them at
+allm as it gives you the false sense that the markings are correct.
 
-At this point, I do not see why you keep linux/u64_stats_sync.h if you
-decide to go for a spinlock...
+thanks,
 
-Alternative would use atomic64_t fields for the ones where there is no
-mutual exclusion.
-
-RX : napi poll is definitely safe (protected by an atomic bit)
-TX : each TX queue is also safe (protected by an atomic exclusion for
-non LLTX drivers)
-
-This leaves the fields updated from hardware interrupt context ?
+greg k-h
 
