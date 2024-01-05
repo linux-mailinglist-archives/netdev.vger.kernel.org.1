@@ -1,150 +1,293 @@
-Return-Path: <netdev+bounces-61982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42AD8257AA
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:06:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131038257AC
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:07:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E02C28273B
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:06:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6595CB258D2
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:06:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0FC31725;
-	Fri,  5 Jan 2024 16:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FC92E832;
+	Fri,  5 Jan 2024 16:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XAiFbGWj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5xi20N7"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FF0328B3
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 16:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M9dnjL6bhYN9wO5+V1cks3zKlATept6g4pt28Vm1uvgaSaFtCO5EtkPB8XC3T6iZHrQtJC2zNFS/qVYYIQmsfraiZNasjOkVLRGI3yPxkpnsoqE3DAl5pt7cCMOIED60/Kw6BrtvD9TWtMjL1Pe8yXLOWHWKYuB9jjx7GiG9v7zHQVTbrEGbcAYGitpcLiWjSCSY2Yk4+IsYGwQs9zQTaH6EAsYPAXX5JCV+DtF5/iJ37OV+oURlAf9vXPrHk95Modx/YZByzaHEDu1k9gAcGjHzQlUGg39antLqg/piQfFJjEbtt4y50MIv4WXcIYkoIEsv+Rt8qHRZEuxF+6shpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bhQma6p8gN1iXykVu2WAqQuf2Q0+JUrioSWymQORfbs=;
- b=E+YaWnSk05MOqsylUJvRHiLlY2ydglFH777Orw8+eG5udBEvDPcrtmEOLeuKm8V/jnEU1sf4F6X3lVLZKwRPCDriRPwZY38VKOc9mAObjMJup1lXOPZjR2GgvuRrujN5ZitqD5vah+XBf52iScT8ZR8Prrj9jB1Hqalrafcsonnxs0wRp6SkBmgP2on/kk5M09n0P9MozpIi9zavl6r8VsaMosKtFiYkiwSz5DXfWPBJYzOxyDnf5sP0LOG3YtpQy+bEryb4TrM6rzYZPCZdO4Nu/HiINhL6eQWBabBagoqCP9XinOO8bSz290f85i4spnKtyUEAhlCxKlADVPdxrA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bhQma6p8gN1iXykVu2WAqQuf2Q0+JUrioSWymQORfbs=;
- b=XAiFbGWja2OaX7GFH68BXHBh3MZojXazV1L98cn6rfdd5pq8XLD7PMZYsBPNDH5AAjy3fxL1s8V1yYf38RcRvmPhbpGOmOjOwL8FGnPu7IMn556gLk1L2S8pd5qahNPDsKWUUygY0vbxlPUBx3c2LtMoiJrhXcnc+htWBv7wh+SlFqXTrzsTMyPT5RJPxIBT1xrF8SrVjy4SIt6zJd0NGhjsyIBy2drPd6KmvTRn3HlEK0LC1X/7uHSsIoxbYAnGUYM3kHETWMfYa4SEeZFNTUajT2F1m+WaJgDI7kJi6xA86f+5RO7x/v6geGCTwXZQyDFDidMDjwQRb7CkT0/VxQ==
-Received: from PH7PR12MB7282.namprd12.prod.outlook.com (2603:10b6:510:209::7)
- by SN7PR12MB8604.namprd12.prod.outlook.com (2603:10b6:806:273::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.17; Fri, 5 Jan
- 2024 16:05:47 +0000
-Received: from PH7PR12MB7282.namprd12.prod.outlook.com
- ([fe80::f245:9cfe:fe84:ae14]) by PH7PR12MB7282.namprd12.prod.outlook.com
- ([fe80::f245:9cfe:fe84:ae14%4]) with mapi id 15.20.7159.015; Fri, 5 Jan 2024
- 16:05:46 +0000
-From: Asmaa Mnebhi <asmaa@nvidia.com>
-To: Florian Fainelli <f.fainelli@gmail.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"olteanv@gmail.com" <olteanv@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, David Thompson
-	<davthompson@nvidia.com>
-Subject: RE: [PATCH v3 1/3] mlxbf_gige: Fix kernel panic at shutdown
-Thread-Topic: [PATCH v3 1/3] mlxbf_gige: Fix kernel panic at shutdown
-Thread-Index: AQHZ7XtbKQBMq7gXmU2r8HgR2iQihLAnHeiAgCDSUDCAhBZ1EA==
-Date: Fri, 5 Jan 2024 16:05:46 +0000
-Message-ID:
- <PH7PR12MB7282BB0D130E7A1E80B72ABBD7662@PH7PR12MB7282.namprd12.prod.outlook.com>
-References: <20230922173626.23790-1-asmaa@nvidia.com>
- <20230922173626.23790-2-asmaa@nvidia.com>
- <64a2b71c-f3ee-4a95-a2d4-79d2258a70e8@gmail.com>
- <CH2PR12MB3895A1CB1D3E148E6707BE2DD7D2A@CH2PR12MB3895.namprd12.prod.outlook.com>
-In-Reply-To:
- <CH2PR12MB3895A1CB1D3E148E6707BE2DD7D2A@CH2PR12MB3895.namprd12.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR12MB7282:EE_|SN7PR12MB8604:EE_
-x-ms-office365-filtering-correlation-id: d8593fd3-0c53-42db-f178-08dc0e082d77
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- gXyE5flZYwHtKUMc8x3Am5kw+3YvVfV4dtan9CT4PSdXs7B66VbgHkTeuKynUPVrxmQ3sEzMEJiT1z+sDNokzFfTTq+KhHDU7DW9M5BKLIYUbIvdSrW0WYtZIlJ6pygbobsRLRaNAwRnrXRx4FSXFgVeh6dSiZmS6H9nKsONFEND+LWhvX4hsepaSTAg3owo8xwMT4FTZAHUDdrP4hRs1eHCvA2SSKAwOnM6+q0G0an5AW6qn2ZLnMJj5gCSllMRyylYhfwOx5LYKtGJ882+plUt4/DV1x0G9xntz7qp9MXvvrqZb1xk5ACxAebyk1sAubdAaia0JxNBggFCP0iuoZyORErplU4ylesZ5j3m6f0oORQUvZ6ctrNhP1/MXt2b1WIJk/0JifUFa2X3uqDSIM/eej392zVG+viXyd86PVQWrG0Z5yikBwbnmSPB0+cVedq563l5oCdyXynH04EcflF0WtJ3c2dcCAKzx5UT+mYAiHOHEGfk2TUV1/BpdBCIZ5t8P072v90ciOxQP11O/Bu0FnRUGn5uPwhMvBJFADv14ZmFAHKbwjuS9Kf0whmZ+gwPf+++w4W2f8JQdudUDu4gVxFRIUK0ksx8BFOo5CxwhzMjg6Ft5ix1m3s+CHev
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB7282.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(376002)(136003)(39860400002)(396003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(55016003)(41300700001)(5660300002)(9686003)(478600001)(6506007)(7696005)(4744005)(2906002)(8676002)(4326008)(8936002)(52536014)(38070700009)(316002)(76116006)(66946007)(66556008)(122000001)(38100700002)(71200400001)(33656002)(107886003)(66446008)(66476007)(26005)(54906003)(64756008)(86362001)(110136005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?K01odks0SW8wL0tXMG8zRW15OW5kTFJLUzNXVVZRVzNycVB2QlNpaTA2ZVpi?=
- =?utf-8?B?TndjanViTytWTy9IUVpidG81RHN4TmJYNG5QZW5RQkt3bUpvekFmNFo0YXc2?=
- =?utf-8?B?eXV6Q2VHbGVUL2Y2eTVLWDA3OHJVRzVaa2R4RzJXYjk2dGFZS25DSjVzWXBV?=
- =?utf-8?B?QzJTalAxUklUSUtvajJSRjFmYzh5QSs2SkNIMEk2Q1J6R2cvYUFUZm5HYnUy?=
- =?utf-8?B?cDZuMDlCVStLVG10Rm1sTkVDUHpIQ0VWRUxBSGtQQ2JVNk8vZ3BxVmY0Zjcz?=
- =?utf-8?B?cExVejJIUHJ6c0ltSlhydk9ud2s3OUVEeElaa0VZZVlVTitWUHFXMWFiRVVU?=
- =?utf-8?B?SDlVWVRUMHBPMFkrdG5yUVNNRUwwNEZsODR3NE1YWDdsYXVTZElGZ1p2Nmhh?=
- =?utf-8?B?MEpOUmNPN25OSS9zNW5NY1VZNlN2SWVlN3VUQVdyUjI5bTdZekgxeWl3VXgr?=
- =?utf-8?B?Z1lsUGdYcFZDdzM3OVN3MWJkUmVkUitQb0xCQ2lBR3lEenBTVmk0bnhlUW1r?=
- =?utf-8?B?aW5KSDJuT3FhZHRBdFBPZWdNMTc5SlhMMXM5TTF2eTlIM29qZ3owLytWWkhV?=
- =?utf-8?B?aXJRZU5mUWV2QmtsMjJPTHNnZVhRUU95T0ExK2JibHI5MHRyM3J2OThZaDFZ?=
- =?utf-8?B?VWJCVmkzZXRKQjdwYzJmNHF1Q2d3anhNUXBRSzJ2Rk1MREhkdktwei9Idlhw?=
- =?utf-8?B?dHpnbm9wejhZSGtVdDhvcWpaYkZwNVdIcXBjTVJmYXRSNklkdWNibi9wM3Zy?=
- =?utf-8?B?VXhwY25yc0I5c2dGYWcrZzRrQWlid2VlbzJyZkRqeklmQzRLeFZvdXVNZkdE?=
- =?utf-8?B?VWthOHovMEVDT0pldnlvZGZ6end4R0RDWk82SndOVU9hVVJaYmRReUJWTVVR?=
- =?utf-8?B?RlFyU3V2WkxVaGZDUURJY1VzSG9sdkRYNG5iL3ZLbkYySmlicldNbEtCYito?=
- =?utf-8?B?SVBvUTNhUmhSbllWT2Q5YmwxOHNpT2dSZVlsK1FIN0YvdTUrdmRVOXZ5bmw0?=
- =?utf-8?B?bmxMRFZnZXRITFhpSXI4dGxnb1kzK1greWl6aVg2bkVJMmRxNllBNXd3ai9y?=
- =?utf-8?B?ZjlhSU9pMDR6U1pIRGQ4T2ZSeW0zV3hjTjFvaCtKLzJxZzBoOGZBelJuSTdz?=
- =?utf-8?B?VzdXK2hTdnJtWDJrWDNyVDBrTEFoTENVdGNPZlMva25taVovVFVLZkFFcEFO?=
- =?utf-8?B?S3U0eTlDTitKd01lY3U1MlJnclpQSm9CT3M5U0pMcyt3QmZWTWNSWklyNGhv?=
- =?utf-8?B?bnJlQm5LQWdqZUFKcVVTdUZoZC9Jc01FZWVpYkFGWkVaY0lZVWRqOWFHZ0FV?=
- =?utf-8?B?NDE4TzFlSEhDSVIwK210aXY0aGwrV1NYNHNScnpYaVFrWllxMkZnbmRwbThz?=
- =?utf-8?B?Z2V3OFBaeWYxSWl4OHZxN1RlRFoyWVNick5CT0s0NXRuK1piMXJGSG83djVq?=
- =?utf-8?B?N3dWb2dTMXZXbVY2V05XbEUwcG4rbGdZRDJPbTVRbFJVd3pQcm5RemI2Q3dr?=
- =?utf-8?B?ZHBYbkE3VkRuckxXMXhVYW5QSnVsamQ4WERqZzVYRHVrOCtUekdnVlozUWht?=
- =?utf-8?B?V2ZDRjUvd3FmQ21BS0N2V0xlaGVNSW9hczFaZVpoUEZnTVZRaS9YMVdieGcv?=
- =?utf-8?B?TWJ1OTYxcTZ2OEFhUWlwS21SWXp5ZkIva09saC94ZWRyaVpZaWREWFFOQjUv?=
- =?utf-8?B?NFdza3hlTEhjUXR0bXgrQjZub21tdU1KUE1uTzc5NWFkOGpQOFNLY0lVaW1P?=
- =?utf-8?B?RWk5VVQveHRrWkRtRVo3K0x5QWloZlFmUmc4cnlISHJCRXVuY29vcUd0Unp1?=
- =?utf-8?B?VzRVTFVoVGNWQ3ovditZeWIzY1lhZFcvNGdvMytxQ205Z1hBK0dXNmg1UVow?=
- =?utf-8?B?QWowUE9uNFF0NDJlUHhLS29BOXJpa3EvZjJDcGR2TURmcEhEd2N2bUllZCsz?=
- =?utf-8?B?VjRheTdVaThCbTZ3cUxCM1hQWkUzVC9vVVpjek00TVF6dTFRempoZjZtZG1Q?=
- =?utf-8?B?anBWWFZsdWpDKzY2VFZBQys0dEVlTXN4Y2FYaUgwY1RFRGdpbzArSlltcENv?=
- =?utf-8?B?T0l0bGZWRUg3aUNqNE9ocHRXbC95YW9QSVBZVWtNUVdmSDZSSjNPbDZrWCt2?=
- =?utf-8?Q?QhBo=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227622E828;
+	Fri,  5 Jan 2024 16:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d427518d52so5169715ad.0;
+        Fri, 05 Jan 2024 08:06:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704470793; x=1705075593; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=V4sL4eVhA4uzhcU12JGTBN6o5Vi9zu5IXlvUCuaFH2U=;
+        b=m5xi20N7pj+YgzEcNptlgxDwpHXPxIOTjEWIJ2zCJXV5yIjmlsYhxShxemknAc5O2F
+         RUXTcBqfCb6L110br0bqt1tUZIZoHm1cbrnBnPGzcOhEnDPoEzdLfP52xSfPyXs1Uakm
+         x/ONacywLxHqRhu7IhH4nm4gDI0rAtbgPX7ZpdYjB99+Tl/fj2eFkGAJNGWcK5M10bkk
+         sa03qHL9Id2C2HcHwB+DurbaLz5zuUhJAtCTPJ/fg6PNuCuebOcSupwj4I/52LI7SMDl
+         iI1bjhJrL6R/6TCCFEr4SgnBbLc/hOVJa3GliGwa8JEyUe30icQGEer+zLOUUvIL6xlU
+         jgEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704470793; x=1705075593;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V4sL4eVhA4uzhcU12JGTBN6o5Vi9zu5IXlvUCuaFH2U=;
+        b=j9QOU+XXDmzlazjt5aLZ6GJIshW4C8s+ZiRQrLYKWAMIvzHdOlq6e1HHRz3z/UQ8Vp
+         0RkcsWT4lcxg460Cq0Qu3EVi1UN2R5+UtH9Z29cOKguL0M7Un/VvRvdPrI/kSkAXgQ2+
+         ThQr+nqsBOYRPG3rv1oWUuyQNsyY5Cnw3Q+vaj8iWAN8ckOqsECkz0FFpAeNMxgT4FS0
+         qYO1BYvWdO+HW17B6k/KrAYTxpwbYj9EjfM+DJoT3YNZx20K3rvJc0gh9KVxBK+vwLfP
+         ZyHEkiBFkh0y3jpZTVfXT65/vBJKQMjEGUCzrkIbAXU3jSpclLMr96/oN2otsj6N+1m8
+         xJIA==
+X-Gm-Message-State: AOJu0YwwQm9CDyJR7ikPlG8s5yQvhUgsAgn7/p/06UfctBhw6KpIte8o
+	TN9hop9Q+htELwCBMS/8aZQ=
+X-Google-Smtp-Source: AGHT+IFId1NQA5s8Q24G3jnvjMhSA6FtovxGHk+nOJVjnxKKfOUra8OceLYKtNzdfMDhrRvyMbCuxg==
+X-Received: by 2002:a17:903:2347:b0:1d4:8ea3:8de3 with SMTP id c7-20020a170903234700b001d48ea38de3mr3378224plh.7.1704470793318;
+        Fri, 05 Jan 2024 08:06:33 -0800 (PST)
+Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id h3-20020a170902704300b001d3e9937d92sm1568337plt.51.2024.01.05.08.06.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 08:06:32 -0800 (PST)
+Message-ID: <1a66f99173de36e1ae639569582feaf76202361d.camel@gmail.com>
+Subject: Re: [PATCH net-next 4/6] vhost/net: remove
+ vhost_net_page_frag_refill()
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Jason Wang
+ <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>,  kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, bpf@vger.kernel.org
+Date: Fri, 05 Jan 2024 08:06:31 -0800
+In-Reply-To: <20240103095650.25769-5-linyunsheng@huawei.com>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+	 <20240103095650.25769-5-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB7282.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8593fd3-0c53-42db-f178-08dc0e082d77
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jan 2024 16:05:46.4608
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Q8HeDHaMPxlTy2sCOuxiRWQvgLvOGqLz3oueopxlSy8l64vuWPU9NlI6PWUo1XnJpGI5tm3kk++r1av/xhhSZA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8604
 
-PiA+ID4gICAJcHJpdiA9IGNvbnRhaW5lcl9vZihuYXBpLCBzdHJ1Y3QgbWx4YmZfZ2lnZSwgbmFw
-aSk7DQo+ID4gPg0KPiA+ID4gKwlpZiAoIXByaXYpDQo+ID4gPiArCQlyZXR1cm4gMDsNCj4gPg0K
-PiA+IERvIHlvdSBzdGlsbCBuZWVkIHRoaXMgdGVzdCBldmVuIGFmdGVyIHlvdSB1bnJlZ2lzdGVy
-ZWQgdGhlIG5ldHdvcmsNCj4gPiBkZXZpY2UgaW4geW91ciBzaHV0ZG93biByb3V0aW5lPw0KPiAN
-Cj4gYWx3YXlzIGdvb2QgdG8gY2hlY2sgdmFyaWFibGVzIGJ1dCBpZiB3YW50IG1lIHRvIHJlbW92
-ZSBpdCBJIGNhbi4NCg0KSSB3aWxsIHJlc3VibWl0IHRoaXMgcGF0Y2ggd2l0aCBhZGRyZXNzZWQg
-Y29tbWVudHMgYWZ0ZXIgb3VyIFFBIGhhcyBkb25lIG1vcmUgdGhvcm91Z2ggdGVzdGluZy4gDQoN
-ClRoYW5rIHlvdS4NCkFzbWFhDQo=
+On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
+> The page frag in vhost_net_page_frag_refill() uses the
+> 'struct page_frag' from skb_page_frag_refill(), but it's
+> implementation is similar to page_frag_alloc_align() now.
+>=20
+> This patch removes vhost_net_page_frag_refill() by using
+> 'struct page_frag_cache' instead of 'struct page_frag',
+> and allocating frag using page_frag_alloc_align().
+>=20
+> The added benefit is that not only unifying the page frag
+> implementation a little, but also having about 0.5% performance
+> boost testing by using the vhost_net_test introduced in the
+> last patch.
+>=20
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/vhost/net.c | 93 ++++++++++++++-------------------------------
+>  1 file changed, 29 insertions(+), 64 deletions(-)
+>=20
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index e574e21cc0ca..805e11d598e4 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -141,10 +141,8 @@ struct vhost_net {
+>  	unsigned tx_zcopy_err;
+>  	/* Flush in progress. Protected by tx vq lock. */
+>  	bool tx_flush;
+> -	/* Private page frag */
+> -	struct page_frag page_frag;
+> -	/* Refcount bias of page frag */
+> -	int refcnt_bias;
+> +	/* Private page frag cache */
+> +	struct page_frag_cache pf_cache;
+>  };
+> =20
+>  static unsigned vhost_net_zcopy_mask __read_mostly;
+> @@ -655,41 +653,6 @@ static bool tx_can_batch(struct vhost_virtqueue *vq,=
+ size_t total_len)
+>  	       !vhost_vq_avail_empty(vq->dev, vq);
+>  }
+> =20
+> -static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned i=
+nt sz,
+> -				       struct page_frag *pfrag, gfp_t gfp)
+> -{
+> -	if (pfrag->page) {
+> -		if (pfrag->offset + sz <=3D pfrag->size)
+> -			return true;
+> -		__page_frag_cache_drain(pfrag->page, net->refcnt_bias);
+> -	}
+> -
+> -	pfrag->offset =3D 0;
+> -	net->refcnt_bias =3D 0;
+> -	if (SKB_FRAG_PAGE_ORDER) {
+> -		/* Avoid direct reclaim but allow kswapd to wake */
+> -		pfrag->page =3D alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+> -					  __GFP_COMP | __GFP_NOWARN |
+> -					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+> -					  SKB_FRAG_PAGE_ORDER);
+> -		if (likely(pfrag->page)) {
+> -			pfrag->size =3D PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+> -			goto done;
+> -		}
+> -	}
+> -	pfrag->page =3D alloc_page(gfp);
+> -	if (likely(pfrag->page)) {
+> -		pfrag->size =3D PAGE_SIZE;
+> -		goto done;
+> -	}
+> -	return false;
+> -
+> -done:
+> -	net->refcnt_bias =3D USHRT_MAX;
+> -	page_ref_add(pfrag->page, USHRT_MAX - 1);
+> -	return true;
+> -}
+> -
+>  #define VHOST_NET_RX_PAD (NET_IP_ALIGN + NET_SKB_PAD)
+> =20
+>  static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+> @@ -699,7 +662,6 @@ static int vhost_net_build_xdp(struct vhost_net_virtq=
+ueue *nvq,
+>  	struct vhost_net *net =3D container_of(vq->dev, struct vhost_net,
+>  					     dev);
+>  	struct socket *sock =3D vhost_vq_get_backend(vq);
+> -	struct page_frag *alloc_frag =3D &net->page_frag;
+>  	struct virtio_net_hdr *gso;
+>  	struct xdp_buff *xdp =3D &nvq->xdp[nvq->batched_xdp];
+>  	struct tun_xdp_hdr *hdr;
+> @@ -710,6 +672,7 @@ static int vhost_net_build_xdp(struct vhost_net_virtq=
+ueue *nvq,
+>  	int sock_hlen =3D nvq->sock_hlen;
+>  	void *buf;
+>  	int copied;
+> +	int ret;
+> =20
+>  	if (unlikely(len < nvq->sock_hlen))
+>  		return -EFAULT;
+> @@ -719,18 +682,17 @@ static int vhost_net_build_xdp(struct vhost_net_vir=
+tqueue *nvq,
+>  		return -ENOSPC;
+> =20
+>  	buflen +=3D SKB_DATA_ALIGN(len + pad);
+> -	alloc_frag->offset =3D ALIGN((u64)alloc_frag->offset, SMP_CACHE_BYTES);
+> -	if (unlikely(!vhost_net_page_frag_refill(net, buflen,
+> -						 alloc_frag, GFP_KERNEL)))
+> +	buf =3D page_frag_alloc_align(&net->pf_cache, buflen, GFP_KERNEL,
+> +				    SMP_CACHE_BYTES);
+
+If your changes from patch 1 are just to make it fit into this layout
+might I suggest just splitting up page_frag_alloc_align into an inline
+that accepts the arguments you have here, and adding
+__page_frag_alloc_align which is passed the mask the original function
+expected. By doing that you should be able to maintain the same level
+of performance and still get most of the code cleanup.
+
+> +	if (unlikely(!buf))
+>  		return -ENOMEM;
+> =20
+> -	buf =3D (char *)page_address(alloc_frag->page) + alloc_frag->offset;
+> -	copied =3D copy_page_from_iter(alloc_frag->page,
+> -				     alloc_frag->offset +
+> -				     offsetof(struct tun_xdp_hdr, gso),
+> -				     sock_hlen, from);
+> -	if (copied !=3D sock_hlen)
+> -		return -EFAULT;
+> +	copied =3D copy_from_iter(buf + offsetof(struct tun_xdp_hdr, gso),
+> +				sock_hlen, from);
+> +	if (copied !=3D sock_hlen) {
+> +		ret =3D -EFAULT;
+> +		goto err;
+> +	}
+> =20
+>  	hdr =3D buf;
+>  	gso =3D &hdr->gso;
+> @@ -743,27 +705,30 @@ static int vhost_net_build_xdp(struct vhost_net_vir=
+tqueue *nvq,
+>  			       vhost16_to_cpu(vq, gso->csum_start) +
+>  			       vhost16_to_cpu(vq, gso->csum_offset) + 2);
+> =20
+> -		if (vhost16_to_cpu(vq, gso->hdr_len) > len)
+> -			return -EINVAL;
+> +		if (vhost16_to_cpu(vq, gso->hdr_len) > len) {
+> +			ret =3D -EINVAL;
+> +			goto err;
+> +		}
+>  	}
+> =20
+>  	len -=3D sock_hlen;
+> -	copied =3D copy_page_from_iter(alloc_frag->page,
+> -				     alloc_frag->offset + pad,
+> -				     len, from);
+> -	if (copied !=3D len)
+> -		return -EFAULT;
+> +	copied =3D copy_from_iter(buf + pad, len, from);
+> +	if (copied !=3D len) {
+> +		ret =3D -EFAULT;
+> +		goto err;
+> +	}
+> =20
+>  	xdp_init_buff(xdp, buflen, NULL);
+>  	xdp_prepare_buff(xdp, buf, pad, len, true);
+>  	hdr->buflen =3D buflen;
+> =20
+> -	--net->refcnt_bias;
+> -	alloc_frag->offset +=3D buflen;
+> -
+>  	++nvq->batched_xdp;
+> =20
+>  	return 0;
+> +
+> +err:
+> +	page_frag_free(buf);
+> +	return ret;
+>  }
+> =20
+>  static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+> @@ -1353,8 +1318,7 @@ static int vhost_net_open(struct inode *inode, stru=
+ct file *f)
+>  			vqs[VHOST_NET_VQ_RX]);
+> =20
+>  	f->private_data =3D n;
+> -	n->page_frag.page =3D NULL;
+> -	n->refcnt_bias =3D 0;
+> +	n->pf_cache.va =3D NULL;
+> =20
+>  	return 0;
+>  }
+> @@ -1422,8 +1386,9 @@ static int vhost_net_release(struct inode *inode, s=
+truct file *f)
+>  	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
+>  	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
+>  	kfree(n->dev.vqs);
+> -	if (n->page_frag.page)
+> -		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
+> +	if (n->pf_cache.va)
+> +		__page_frag_cache_drain(virt_to_head_page(n->pf_cache.va),
+> +					n->pf_cache.pagecnt_bias);
+>  	kvfree(n);
+>  	return 0;
+>  }
+
+I would recommend reordering this patch with patch 5. Then you could
+remove the block that is setting "n->pf_cache.va =3D NULL" above and just
+make use of page_frag_cache_drain in the lower block which would also
+return the va to NULL.
 
