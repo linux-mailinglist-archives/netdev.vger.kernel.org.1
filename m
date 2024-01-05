@@ -1,696 +1,465 @@
-Return-Path: <netdev+bounces-61890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E8328252B9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:24:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83D778252BD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:25:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07CA9B21A2A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:24:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FFC6285D0D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1283828DDD;
-	Fri,  5 Jan 2024 11:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A692C69A;
+	Fri,  5 Jan 2024 11:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fqUW4wB1"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ndrAdB69"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3602CCB4
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 11:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D745928E1A
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 11:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40d41555f9dso14167865e9.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 03:24:16 -0800 (PST)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3373a30af67so1157691f8f.0
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 03:25:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704453855; x=1705058655; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pHtS1d9QBmqdBAQnfXJibwcBv45HvLzy/lTJnq7N6K0=;
-        b=fqUW4wB1ZfKgImrtGxaO2Ufjdt1VHcUXGlcYh7rWi54k3LqIoWBLpyeuTyv6BtSEpz
-         l1L5Gv29GPIkbbSyva4o349t0wWYAD0Str93QpqFzOyEO4L6linKNndSXIrn6Ru53Ukv
-         1AXxRW72mrVEdbLOVTcSorOc3iW9dHPT35RbE565x+gRqYtNL1Y13LsP26LS+MJDCAHT
-         2wBY1AUc4yV0R5emejQdlcLT/nDLjVlHCiGsJyHdQ7mSBZf+noI7CKVi7x0oNsRE+71C
-         cEQHlG3mJadrMH1Hz9B2LfMeAoLRjXiuu76jWQPTtc849K1kSJR+id1XU4k8hnV5kwPi
-         HxDQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704453936; x=1705058736; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9uSeWtY0wnhX9keEMP05THAP/X9456BnCzirYEeQ0zA=;
+        b=ndrAdB69AKZ7pUoiKKW4q7o/udQUjErF8rFcq8oYeCRwnv4JBYnWkC3lspajIt8OTT
+         5ETO5/iScjket6PsFGGin2uAVp3IpL2DZ7Juii0vmLRQb/E2xu8ZheIi2YMA2Au5o2Ii
+         ZBBMAalEiES+dkTMKd/1I1pi5QDY3LEkcZEwBQpqt02Zi3ZxQKIVSfKucNJuN18rpx7/
+         Prnc+5ILP+3XdFVNR1PT2yAbxVl3x9G12kjm8AwS+QvCmNFxUwXf0lMMl0igzfPZ1ty6
+         JkR045OY0tEPKLpTIe1eI4tVvFxfccjW+vzjmdYhRJfON56pSuhvTSaEADgPzdPNcQeo
+         NPVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704453855; x=1705058655;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pHtS1d9QBmqdBAQnfXJibwcBv45HvLzy/lTJnq7N6K0=;
-        b=dukEoHeCfxyBrrCoEjwWXDV9mlfC7Gl4Yc+K7VcYpnZ+Y43ZbhseRTlRmPWYE60/Eg
-         1qjPrebSxcZEueBn/kaPX/niqaEkmrDB7n94MCAqpw7plQBgGy9vfEhDLti/6yr4Fz1U
-         3lgqWGtgstcQlYqNKS9MVGZzgIAwNKUN5aGqtN6o31Cic7PN40Xj+5cmf0XO9UGGmEN+
-         H8s0/WWajmPzpaGNBTtimyyBApGGg6akBuUFX5fUX0vhRfd4eqA/YFoaLFJpyuLPxYOm
-         1slLRGmW2q+3Oc/74cS9U3sX2Auek+2pCdGsEYf059CWQGV5C/aiW61HrzfjsqMCV/Ce
-         NT1w==
-X-Gm-Message-State: AOJu0Yx39ZWBgOb/aE3x31AOfgRxp8uJv42FpknIFWpTKnGLgTJXL9KT
-	uzly3M8MkR8F49vA+chHShatVGon74DdbQ==
-X-Google-Smtp-Source: AGHT+IFaklc2MPE9GioUJ0eWAJFCspeYWNDDBMmpDnmekiFXInVWgstnwxfQtJO+LZl/If6uO2mhtA==
-X-Received: by 2002:a05:600c:2193:b0:40d:5c82:ec91 with SMTP id e19-20020a05600c219300b0040d5c82ec91mr1055701wme.106.1704453854912;
-        Fri, 05 Jan 2024 03:24:14 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704453936; x=1705058736;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9uSeWtY0wnhX9keEMP05THAP/X9456BnCzirYEeQ0zA=;
+        b=nBXwP9TZFMDrdARLIUBvucXCQc/qBbTGbGtqgatXpEe14RxYj4hNYzCC80exZCIew8
+         shFfVcnvj1f04mkTBlDXtJp/WGq6pmxFNgq7JI6HT34xmZaKUZ20acsY4r3/SDHDnlei
+         +wqN5UiJTi8NR9C7nfAVLAiNJGTw8VcP4jtFeIRgZKlRlY/zE341U5+dlHSilvcL9rsR
+         0kfTJrjHQpmmgMqdLjPPW+FiTTZoRk0zBS8RA2+sFdBgfwurgKniu2ygY5izV5qJDBlF
+         JsRDT8rROx35jUN80lYojm/766P6OLNWaW6n1OcV8evHSyxgvh9OprIXw6QnoWZJVcUM
+         Ccbg==
+X-Gm-Message-State: AOJu0YxVMjlVHfoEsgLeL1fO4Y0b4z3w/HJGggRIVPoDMDvlRA0TBwex
+	Wb4tJAnDLvZa4ObNdVNj+94iVeeQPFOYpQ==
+X-Google-Smtp-Source: AGHT+IHLlmUmzXr2kluK9OzrH9ILjTDJueaA7yDG3ZJ/OUcOWH977e5F1fyfaY2i/If7FjD6BWg00A==
+X-Received: by 2002:a5d:4447:0:b0:337:1612:9938 with SMTP id x7-20020a5d4447000000b0033716129938mr791720wrr.107.1704453935818;
+        Fri, 05 Jan 2024 03:25:35 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id bi26-20020a05600c3d9a00b0040d53588d94sm1268558wmb.46.2024.01.05.03.24.13
+        by smtp.gmail.com with ESMTPSA id b1-20020a5d4d81000000b00337405c06a6sm1214823wru.48.2024.01.05.03.25.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 03:24:14 -0800 (PST)
-Date: Fri, 5 Jan 2024 12:24:13 +0100
+        Fri, 05 Jan 2024 03:25:35 -0800 (PST)
+Date: Fri, 5 Jan 2024 12:25:34 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, xiyou.wangcong@gmail.com,
-	victor@mojatatu.com, pctammela@mojatatu.com, idosch@idosch.org,
-	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com
-Subject: Re: [patch net-next] net: sched: move block device tracking into
- tcf_block_get/put_ext()
-Message-ID: <ZZfm3TbhyAfIMzDQ@nanopsycho>
-References: <20240104125844.1522062-1-jiri@resnulli.us>
- <CAM0EoMkDhnm0QPtZEQPbnQtkfW7tTjHdv3fQoXzRXARVdhbc0A@mail.gmail.com>
- <ZZby7xSkQpWHwPOA@nanopsycho>
- <CAM0EoMmCn8DpMzPCt9GMW16C08n8mfM8N==pfPJy6c=XgEqMSw@mail.gmail.com>
+To: Petr =?utf-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>,
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>
+Subject: Re: [PATCH] net: stmmac: protect statistics updates with a spinlock
+Message-ID: <ZZfnLqvm0TZstOLy@nanopsycho>
+References: <20240105091556.15516-1-petr@tesarici.cz>
+ <ZZfP0_WHWZ8LFqXX@nanopsycho>
+ <20240105112538.319cd522@meshulam.tesarici.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMmCn8DpMzPCt9GMW16C08n8mfM8N==pfPJy6c=XgEqMSw@mail.gmail.com>
+In-Reply-To: <20240105112538.319cd522@meshulam.tesarici.cz>
 
-Thu, Jan 04, 2024 at 07:22:48PM CET, jhs@mojatatu.com wrote:
->On Thu, Jan 4, 2024 at 1:03 PM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Thu, Jan 04, 2024 at 05:10:58PM CET, jhs@mojatatu.com wrote:
->> >On Thu, Jan 4, 2024 at 7:58 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >>
->> >> From: Jiri Pirko <jiri@nvidia.com>
->> >>
->> >> Inserting the device to block xarray in qdisc_create() is not suitable
->> >> place to do this. As it requires use of tcf_block() callback, it causes
->> >> multiple issues. It is called for all qdisc types, which is incorrect.
->> >>
->> >> So, instead, move it to more suitable place, which is tcf_block_get_ext()
->> >> and make sure it is only done for qdiscs that use block infrastructure
->> >> and also only for blocks which are shared.
->> >>
->> >> Symmetrically, alter the cleanup path, move the xarray entry removal
->> >> into tcf_block_put_ext().
->> >>
->> >> Fixes: 913b47d3424e ("net/sched: Introduce tc block netdev tracking infra")
->> >> Reported-by: Ido Schimmel <idosch@nvidia.com>
->> >> Closes: https://lore.kernel.org/all/ZY1hBb8GFwycfgvd@shredder/
->> >> Reported-by: Kui-Feng Lee <sinquersw@gmail.com>
->> >> Closes: https://lore.kernel.org/all/ce8d3e55-b8bc-409c-ace9-5cf1c4f7c88e@gmail.com/
->> >> Reported-and-tested-by: syzbot+84339b9e7330daae4d66@syzkaller.appspotmail.com
->> >> Closes: https://lore.kernel.org/all/0000000000007c85f5060dcc3a28@google.com/
->> >> Reported-and-tested-by: syzbot+806b0572c8d06b66b234@syzkaller.appspotmail.com
->> >> Closes: https://lore.kernel.org/all/00000000000082f2f2060dcc3a92@google.com/
->> >> Reported-and-tested-by: syzbot+0039110f932d438130f9@syzkaller.appspotmail.com
->> >> Closes: https://lore.kernel.org/all/0000000000007fbc8c060dcc3a5c@google.com/
->> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> >
->> >Did you get a chance to run the tdc tests?
->>
->> I ran the TC ones we have in the net/forwarding directory.
->> I didn't manage to run the tdc. Readme didn't help me much.
->> How do you run the suite?
+Fri, Jan 05, 2024 at 11:25:38AM CET, petr@tesarici.cz wrote:
+>On Fri, 5 Jan 2024 10:45:55 +0100
+>Jiri Pirko <jiri@resnulli.us> wrote:
 >
->For next time:
->make -C tools/testing/selftests TARGETS=tc-testing run_tests
+>> Fri, Jan 05, 2024 at 10:15:56AM CET, petr@tesarici.cz wrote:
+>> >Add a spinlock to fix race conditions while updating Tx/Rx statistics.
+>> >
+>> >As explained by a comment in <linux/u64_stats_sync.h>, write side of struct
+>> >u64_stats_sync must ensure mutual exclusion, or one seqcount update could
+>> >be lost on 32-bit platforms, thus blocking readers forever.
+>> >
+>> >Such lockups have been actually observed on 32-bit Arm after stmmac_xmit()
+>> >on one core raced with stmmac_napi_poll_tx() on another core.
+>> >
+>> >Signed-off-by: Petr Tesarik <petr@tesarici.cz>
+>> >---
+>> > drivers/net/ethernet/stmicro/stmmac/common.h  |  2 +
+>> > .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  4 +
+>> > .../net/ethernet/stmicro/stmmac/dwmac4_lib.c  |  4 +
+>> > .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  4 +
+>> > .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  4 +
+>> > .../net/ethernet/stmicro/stmmac/stmmac_main.c | 80 +++++++++++++------
+>> > 6 files changed, 72 insertions(+), 26 deletions(-)
+>> >
+>> >diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+>> >index e3f650e88f82..9a17dfc1055d 100644
+>> >--- a/drivers/net/ethernet/stmicro/stmmac/common.h
+>> >+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+>> >@@ -70,6 +70,7 @@ struct stmmac_txq_stats {
+>> > 	u64 tx_tso_frames;
+>> > 	u64 tx_tso_nfrags;
+>> > 	struct u64_stats_sync syncp;
+>> >+	spinlock_t lock;	/* mutual writer exclusion */
+>> > } ____cacheline_aligned_in_smp;
+>> > 
+>> > struct stmmac_rxq_stats {
+>> >@@ -79,6 +80,7 @@ struct stmmac_rxq_stats {
+>> > 	u64 rx_normal_irq_n;
+>> > 	u64 napi_poll;
+>> > 	struct u64_stats_sync syncp;
+>> >+	spinlock_t lock;	/* mutual writer exclusion */
+>> > } ____cacheline_aligned_in_smp;
+>> > 
+>> > /* Extra statistic and debug information exposed by ethtool */
+>> >diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+>> >index 137741b94122..9c568996321d 100644
+>> >--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+>> >+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+>> >@@ -455,9 +455,11 @@ static int sun8i_dwmac_dma_interrupt(struct stmmac_priv *priv,
+>> > 
+>> > 	if (v & EMAC_TX_INT) {
+>> > 		ret |= handle_tx;
+>> >+		spin_lock(&txq_stats->lock);
+>> > 		u64_stats_update_begin(&txq_stats->syncp);
+>> > 		txq_stats->tx_normal_irq_n++;
+>> > 		u64_stats_update_end(&txq_stats->syncp);
+>> >+		spin_unlock(&txq_stats->lock);
+>> > 	}
+>> > 
+>> > 	if (v & EMAC_TX_DMA_STOP_INT)
+>> >@@ -479,9 +481,11 @@ static int sun8i_dwmac_dma_interrupt(struct stmmac_priv *priv,
+>> > 
+>> > 	if (v & EMAC_RX_INT) {
+>> > 		ret |= handle_rx;
+>> >+		spin_lock(&rxq_stats->lock);
+>> > 		u64_stats_update_begin(&rxq_stats->syncp);
+>> > 		rxq_stats->rx_normal_irq_n++;
+>> > 		u64_stats_update_end(&rxq_stats->syncp);
+>> >+		spin_unlock(&rxq_stats->lock);
+>> > 	}
+>> > 
+>> > 	if (v & EMAC_RX_BUF_UA_INT)
+>> >diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
+>> >index 9470d3fd2ded..e50e8b07724b 100644
+>> >--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
+>> >+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
+>> >@@ -201,15 +201,19 @@ int dwmac4_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>> > 	}
+>> > 	/* TX/RX NORMAL interrupts */
+>> > 	if (likely(intr_status & DMA_CHAN_STATUS_RI)) {
+>> >+		spin_lock(&rxq_stats->lock);
+>> > 		u64_stats_update_begin(&rxq_stats->syncp);
+>> > 		rxq_stats->rx_normal_irq_n++;
+>> > 		u64_stats_update_end(&rxq_stats->syncp);
+>> >+		spin_unlock(&rxq_stats->lock);
+>> > 		ret |= handle_rx;
+>> > 	}
+>> > 	if (likely(intr_status & DMA_CHAN_STATUS_TI)) {
+>> >+		spin_lock(&txq_stats->lock);
+>> > 		u64_stats_update_begin(&txq_stats->syncp);
+>> > 		txq_stats->tx_normal_irq_n++;
+>> > 		u64_stats_update_end(&txq_stats->syncp);
+>> >+		spin_unlock(&txq_stats->lock);
+>> > 		ret |= handle_tx;
+>> > 	}
+>> > 
+>> >diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>> >index 7907d62d3437..a43396a7f852 100644
+>> >--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>> >+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+>> >@@ -215,16 +215,20 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+>> > 			u32 value = readl(ioaddr + DMA_INTR_ENA);
+>> > 			/* to schedule NAPI on real RIE event. */
+>> > 			if (likely(value & DMA_INTR_ENA_RIE)) {
+>> >+				spin_lock(&rxq_stats->lock);
+>> > 				u64_stats_update_begin(&rxq_stats->syncp);
+>> > 				rxq_stats->rx_normal_irq_n++;
+>> > 				u64_stats_update_end(&rxq_stats->syncp);
+>> >+				spin_unlock(&rxq_stats->lock);
+>> > 				ret |= handle_rx;
+>> > 			}
+>> > 		}
+>> > 		if (likely(intr_status & DMA_STATUS_TI)) {
+>> >+			spin_lock(&txq_stats->lock);
+>> > 			u64_stats_update_begin(&txq_stats->syncp);
+>> > 			txq_stats->tx_normal_irq_n++;
+>> > 			u64_stats_update_end(&txq_stats->syncp);
+>> >+			spin_unlock(&txq_stats->lock);
+>> > 			ret |= handle_tx;
+>> > 		}
+>> > 		if (unlikely(intr_status & DMA_STATUS_ERI))
+>> >diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+>> >index 3cde695fec91..f4e01436d4cc 100644
+>> >--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+>> >+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+>> >@@ -367,15 +367,19 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
+>> > 	/* TX/RX NORMAL interrupts */
+>> > 	if (likely(intr_status & XGMAC_NIS)) {
+>> > 		if (likely(intr_status & XGMAC_RI)) {
+>> >+			spin_lock(&rxq_stats->lock);
+>> > 			u64_stats_update_begin(&rxq_stats->syncp);
+>> > 			rxq_stats->rx_normal_irq_n++;
+>> > 			u64_stats_update_end(&rxq_stats->syncp);
+>> >+			spin_unlock(&rxq_stats->lock);
+>> > 			ret |= handle_rx;
+>> > 		}
+>> > 		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
+>> >+			spin_lock(&txq_stats->lock);
+>> > 			u64_stats_update_begin(&txq_stats->syncp);
+>> > 			txq_stats->tx_normal_irq_n++;
+>> > 			u64_stats_update_end(&txq_stats->syncp);
+>> >+			spin_unlock(&txq_stats->lock);
+>> > 			ret |= handle_tx;
+>> > 		}
+>> > 	}
+>> >diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> >index 37e64283f910..82d8db04d0d1 100644
+>> >--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> >+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> >@@ -2515,9 +2515,11 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+>> > 		tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma_conf.dma_tx_size);
+>> > 		entry = tx_q->cur_tx;
+>> > 	}
+>> >-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+>> >+	spin_lock_irqsave(&txq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&txq_stats->syncp);
+>> > 	txq_stats->tx_set_ic_bit += tx_set_ic_bit;
+>> >-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&txq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&txq_stats->lock, flags);
+>> > 
+>> > 	if (tx_desc) {
+>> > 		stmmac_flush_tx_descriptors(priv, queue);
+>> >@@ -2721,11 +2723,13 @@ static int stmmac_tx_clean(struct stmmac_priv *priv, int budget, u32 queue,
+>> > 	if (tx_q->dirty_tx != tx_q->cur_tx)
+>> > 		*pending_packets = true;
+>> > 
+>> >-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+>> >+	spin_lock_irqsave(&txq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&txq_stats->syncp);
+>> > 	txq_stats->tx_packets += tx_packets;
+>> > 	txq_stats->tx_pkt_n += tx_packets;
+>> > 	txq_stats->tx_clean++;
+>> >-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&txq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&txq_stats->lock, flags);
+>> > 
+>> > 	priv->xstats.tx_errors += tx_errors;
+>> > 
+>> >@@ -4311,13 +4315,15 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+>> > 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
+>> > 	}
+>> > 
+>> >-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+>> >+	spin_lock_irqsave(&txq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&txq_stats->syncp);
+>> > 	txq_stats->tx_bytes += skb->len;
+>> > 	txq_stats->tx_tso_frames++;
+>> > 	txq_stats->tx_tso_nfrags += nfrags;
+>> > 	if (set_ic)
+>> > 		txq_stats->tx_set_ic_bit++;
+>> >-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&txq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&txq_stats->lock, flags);
+>> > 
+>> > 	if (priv->sarc_type)
+>> > 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
+>> >@@ -4560,11 +4566,13 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+>> > 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
+>> > 	}
+>> > 
+>> >-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+>> >+	spin_lock_irqsave(&txq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&txq_stats->syncp);
+>> > 	txq_stats->tx_bytes += skb->len;
+>> > 	if (set_ic)
+>> > 		txq_stats->tx_set_ic_bit++;
+>> >-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&txq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&txq_stats->lock, flags);
+>> > 
+>> > 	if (priv->sarc_type)
+>> > 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
+>> >@@ -4831,9 +4839,11 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
+>> > 		unsigned long flags;
+>> > 		tx_q->tx_count_frames = 0;
+>> > 		stmmac_set_tx_ic(priv, tx_desc);
+>> >-		flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+>> >+		spin_lock_irqsave(&txq_stats->lock, flags);
+>> >+		u64_stats_update_begin(&txq_stats->syncp);
+>> > 		txq_stats->tx_set_ic_bit++;
+>> >-		u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+>> >+		u64_stats_update_end(&txq_stats->syncp);
+>> >+		spin_unlock_irqrestore(&txq_stats->lock, flags);
+>> > 	}
+>> > 
+>> > 	stmmac_enable_dma_transmission(priv, priv->ioaddr);
+>> >@@ -5008,10 +5018,12 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
+>> > 	skb_record_rx_queue(skb, queue);
+>> > 	napi_gro_receive(&ch->rxtx_napi, skb);
+>> > 
+>> >-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+>> >+	spin_lock_irqsave(&rxq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&rxq_stats->syncp);
+>> > 	rxq_stats->rx_pkt_n++;
+>> > 	rxq_stats->rx_bytes += len;
+>> >-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&rxq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&rxq_stats->lock, flags);
+>> > }
+>> > 
+>> > static bool stmmac_rx_refill_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+>> >@@ -5248,9 +5260,11 @@ static int stmmac_rx_zc(struct stmmac_priv *priv, int limit, u32 queue)
+>> > 
+>> > 	stmmac_finalize_xdp_rx(priv, xdp_status);
+>> > 
+>> >-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+>> >+	spin_lock_irqsave(&rxq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&rxq_stats->syncp);
+>> > 	rxq_stats->rx_pkt_n += count;
+>> >-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&rxq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&rxq_stats->lock, flags);
+>> > 
+>> > 	priv->xstats.rx_dropped += rx_dropped;
+>> > 	priv->xstats.rx_errors += rx_errors;
+>> >@@ -5541,11 +5555,13 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+>> > 
+>> > 	stmmac_rx_refill(priv, queue);
+>> > 
+>> >-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+>> >+	spin_lock_irqsave(&rxq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&rxq_stats->syncp);
+>> > 	rxq_stats->rx_packets += rx_packets;
+>> > 	rxq_stats->rx_bytes += rx_bytes;
+>> > 	rxq_stats->rx_pkt_n += count;
+>> >-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&rxq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&rxq_stats->lock, flags);
+>> > 
+>> > 	priv->xstats.rx_dropped += rx_dropped;
+>> > 	priv->xstats.rx_errors += rx_errors;
+>> >@@ -5564,9 +5580,11 @@ static int stmmac_napi_poll_rx(struct napi_struct *napi, int budget)
+>> > 	int work_done;
+>> > 
+>> > 	rxq_stats = &priv->xstats.rxq_stats[chan];
+>> >-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+>> >+	spin_lock_irqsave(&rxq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&rxq_stats->syncp);
+>> > 	rxq_stats->napi_poll++;
+>> >-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&rxq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&rxq_stats->lock, flags);
+>> > 
+>> > 	work_done = stmmac_rx(priv, budget, chan);
+>> > 	if (work_done < budget && napi_complete_done(napi, work_done)) {
+>> >@@ -5592,9 +5610,11 @@ static int stmmac_napi_poll_tx(struct napi_struct *napi, int budget)
+>> > 	int work_done;
+>> > 
+>> > 	txq_stats = &priv->xstats.txq_stats[chan];
+>> >-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+>> >+	spin_lock_irqsave(&txq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&txq_stats->syncp);
+>> > 	txq_stats->napi_poll++;
+>> >-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&txq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&txq_stats->lock, flags);
+>> > 
+>> > 	work_done = stmmac_tx_clean(priv, budget, chan, &pending_packets);
+>> > 	work_done = min(work_done, budget);
+>> >@@ -5627,14 +5647,18 @@ static int stmmac_napi_poll_rxtx(struct napi_struct *napi, int budget)
+>> > 	unsigned long flags;
+>> > 
+>> > 	rxq_stats = &priv->xstats.rxq_stats[chan];
+>> >-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+>> >+	spin_lock_irqsave(&rxq_stats->lock, flags);
+>> >+	u64_stats_update_begin(&rxq_stats->syncp);
+>> > 	rxq_stats->napi_poll++;
+>> >-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&rxq_stats->syncp);
+>> >+	spin_unlock(&rxq_stats->lock);  
+>> 
+>> Nitpick:
+>> I know that the original code does that, but any idea why
+>> u64_stats_update_end_irqrestore() is called here when
+>> u64_stats_update_begin_irqsave() is called 2 lines below?
+>> IIUC, this could be one critical section. Could you perhaps merge these
+>> while at it? Could be a follow-up patch.
+>
+>I have merged the interrupt disable/enable, but there are two separate
+>spinlocks for rxq_stats (added to struct stmmac_txq_stats) and for
+>txq_stats (added to struct stmmac_rxq_stats), so they cannot be merged.
 
-Unrelated to this patch.
+Ah, that's what I overlooked. Thanks.
 
-Running this, I'm getting lots of errors, some seem might be bugs in
-tests. Here's the output:
-
-make: Entering directory '/mnt/share156/jiri/net-next/tools/testing/selftests'
-make[1]: Entering directory '/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing'
-make[1]: Nothing to be done for 'all'.
-make[1]: Leaving directory '/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing'
-make[1]: Entering directory '/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing'
-TAP version 13
-1..1
-# timeout set to 900
-# selftests: tc-testing: tdc.sh
-# netdevsim
-# act_bpf
-# act_connmark
-# act_csum
-# act_ct
-# act_ctinfo
-# act_gact
-# act_gate
-# act_mirred
-# act_mpls
-# act_nat
-# act_pedit
-# act_police
-# act_sample
-# act_simple
-# act_skbedit
-# act_skbmod
-# act_tunnel_key
-# act_vlan
-# cls_basic
-# cls_bpf
-# cls_cgroup
-# cls_flow
-# cls_flower
-# cls_fw
-# cls_matchall
-# cls_route
-# cls_u32
-# Module em_canid not found... skipping.
-# em_cmp
-# em_ipset
-# em_ipt
-# em_meta
-# em_nbyte
-# em_text
-# em_u32
-# sch_cake
-# sch_cbs
-# sch_choke
-# sch_codel
-# sch_drr
-# sch_etf
-# sch_ets
-# sch_fq
-# sch_fq_codel
-# sch_fq_pie
-# sch_gred
-# sch_hfsc
-# sch_hhf
-# sch_htb
-# sch_teql
-# considering category actions
-# !!! Consider installing pyroute2 !!!
-#  -- ns/SubPlugin.__init__
-#  -- scapy/SubPlugin.__init__
-# Executing 528 tests in parallel and 15 in serial
-# Using 18 batches and 4 workers
-# 
-# -----> prepare stage *** Could not execute: "$TC actions add action pass index 1"
-# 
-# -----> prepare stage *** Error message: "setting the network namespace "tcut-3101919570" failed: Invalid argument
-# "
-# 
-# -----> prepare stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=19> *** stderr ***
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 420, in run_one_test
-#     prepare_env(tidx, args, pm, 'setup', "-----> prepare stage", tidx["setup"])
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 268, in prepare_env
-#     raise PluginMgrTestFail(
-# RTNETLINK answers: File exists
-# Command failed -:20
-# 
-# -----> teardown stage *** Could not execute: "$TC action flush action ctinfo"
-# 
-# -----> teardown stage *** Error message: "setting the network namespace "tcut-518092810" failed: Invalid argument
-# "
-# 
-# -----> teardown stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=21> *** stderr ***
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 465, in run_one_test
-#     prepare_env(tidx, args, pm, 'teardown', '-----> teardown stage', tidx['teardown'], procout)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 268, in prepare_env
-#     raise PluginMgrTestFail(
-# Error: argument "v0p0id8295idbf47" is wrong: "name" not a valid ifname
-# 
-# -----> prepare stage *** Could not execute: "$TC actions add action simple sdata "Rock""
-# 
-# -----> prepare stage *** Error message: "setting the network namespace "tcut-1996746596" failed: Invalid argument
-# "
-# 
-# -----> prepare stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=15> *** stderr ***
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 420, in run_one_test
-#     prepare_env(tidx, args, pm, 'setup', "-----> prepare stage", tidx["setup"])
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 268, in prepare_env
-#     raise PluginMgrTestFail(
-# ..RTNETLINK answers: File exists
-# Command failed -:425
-# Test 1c3a: Flush police actions
-# Test 7326: Add police action with control continue
-# Test 34fa: Add police action with control drop
-# Test 8dd5: Add police action with control ok
-# Test b9d1: Add police action with control reclassify
-# Test c534: Add police action with control pipe
-# Test b48b: Add police action with exceed goto chain control action
-# Test 689e: Replace police action with invalid goto chain control
-# Test cdd7: Add valid police action with packets per second rate limit
-# Test f5bc: Add invalid police action with both bps and pps
-# Test 7d64: Add police action with skip_hw option
-# Test 7d50: Add skbmod action to set destination mac
-# Test 9b29: Add skbmod action to set source mac
-# Test 1724: Add skbmod action with invalid mac
-# Test 3cf1: Add skbmod action with valid etype
-# Test a749: Add skbmod action with invalid etype
-# Test bfe6: Add skbmod action to swap mac
-# Test 839b: Add skbmod action with control pipe
-# Test c167: Add skbmod action with control reclassify
-# Test 0c2f: Add skbmod action with control drop
-# Test d113: Add skbmod action with control continue
-# Test 7242: Add skbmod action with control pass
-# Test 6046: Add skbmod action with control reclassify and cookie
-# Test 58cb: List skbmod actions
-# Test 9aa8: Get a single skbmod action from a list
-# Test e93a: Delete an skbmod action
-# Test 40c2: Flush skbmod actions
-# Test b651: Replace skbmod action with invalid goto_chain control
-# Test fe09: Add skbmod action to mark ECN bits
-# Test 696a: Add simple ct action
-# Test e38c: Add simple ct action with cookie
-# Test 9f20: Add ct clear action
-# Test 0bc1: Add ct clear action with cookie of max length
-# Test 5bea: Try ct with zone
-# Test d5d6: Try ct with zone, commit
-# Test 029f: Try ct with zone, commit, mark
-# Test a58d: Try ct with zone, commit, mark, nat
-# Test 901b: Try ct with full nat ipv4 range syntax
-# Test 072b: Try ct with full nat ipv6 syntax
-# Test 3420: Try ct with full nat ipv6 range syntax
-# Test 4470: Try ct with full nat ipv6 range syntax + force
-# Test 5d88: Try ct with label
-# Test 04d4: Try ct with label with mask
-# Test 9751: Try ct with mark + mask
-# Test 2faa: Try ct with mark + mask and cookie
-# Test 3991: Add simple ct action with no_percpu flag
-# Test 3992: Add ct action triggering DNAT tuple conflict
-# 
-# Sent 1 packets.
-# 
-# Sent 1 packets.
-# Test 2029: Add xt action with log-prefix
-# exception iproute2 exited with an error code in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test ac2a: List actions
-# Test 3edf: Flush gact actions
-# Test 63ec: Delete pass action
-# returncode 255; expected [0]
-# "-----> prepare stage" did not complete successfully
-# Exception <class '__main__.PluginMgrTestFail'> ('setup', None, '"-----> prepare stage" did not complete successfully') (caught in test_runner, running test 4 63ec Delete pass action stage setup)
-# ---------------
-# traceback
-# ---------------
-# ---------------
-# Test 68e2: Add tunnel_key unset action
-# exception iproute2 exited with an error code in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test fa1c: Add mpls dec_ttl action with ttl (invalid)
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test a5a7: Add pedit action with LAYERED_OP eth set src
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test 5a31: Add vlan modify action for protocol 802.1AD
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test 8eb5: Create valid ife encode action with tcindex and continue control
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test a874: Add invalid sample action without mandatory arguments
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test d959: Add cBPF action with valid bytecode
-# Test f84a: Add cBPF action with invalid bytecode
-# Test e939: Add eBPF action with valid object-file
-# Test 282d: Add eBPF action with invalid object-file
-# Test d819: Replace cBPF bytecode and action control
-# Test 6ae3: Delete cBPF action 
-# Test 3e0d: List cBPF actions
-# Test 55ce: Flush BPF actions
-# Test ccc3: Add cBPF action with duplicate index
-# Test 89c7: Add cBPF action with invalid index
-# Test 7ab9: Add cBPF action with cookie
-# Test b8a1: Replace bpf action with invalid goto_chain control
-# Test 2893: Add pedit action with RAW_OP offset u8 quad
-# Test 6795: Add pedit action with LAYERED_OP ip6 set payload_len, nexthdr, hoplimit
-# Test cfcc: Add pedit action with LAYERED_OP tcp flags set
-# Test b078: Add simple action
-# Test 4297: Add simple action with change command
-# Test 6d4c: Add simple action with duplicate index
-# Test 2542: List simple actions
-# returncode 255; expected [0]
-# "-----> prepare stage" did not complete successfully
-# Exception <class '__main__.PluginMgrTestFail'> ('setup', None, '"-----> prepare stage" did not complete successfully') (caught in test_runner, running test 5 2542 List simple actions stage setup)
-# ---------------
-# traceback
-# ---------------
-# ---------------
-# Test 5232: List ctinfo actions
-# Test 7702: Flush ctinfo actions
-# Test 3201: Add ctinfo action with duplicate index
-# Test 8295: Add ctinfo action with invalid index
-# returncode 255; expected [0]
-# "-----> teardown stage" did not complete successfully
-# Exception <class '__main__.PluginMgrTestFail'> ('teardown', 'setting the network namespace "tcut-518092810" failed: Invalid argument\n', '"-----> teardown stage" did not complete successfully') (caught in test_runner, running test 5 8295 Add ctinfo action with invalid index stage teardown)
-# ---------------
-# traceback
-# ---------------
-# accumulated output for this test:
-# setting the network namespace "tcut-518092810" failed: Invalid argument
-# 
-# ---------------
-# Test bf47: Add csum icmp action
-# exception iproute2 exited with an error code in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# multiprocessing.pool.RemoteTraceback: 
-# """
-# Traceback (most recent call last):
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 142, in call_pre_case
-#     pgn_inst.pre_case(caseinfo, test_skip)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 63, in pre_case
-#     self.prepare_test(test)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 45, in prepare_test
-#     self._proc_check()
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 219, in _proc_check
-#     raise RuntimeError("iproute2 exited with an error code")
-# RuntimeError: iproute2 exited with an error code
-# 
-# During handling of the above exception, another exception occurred:
-# 
-# Traceback (most recent call last):
-#   File "/usr/lib64/python3.11/multiprocessing/pool.py", line 125, in worker
-#     result = (True, func(*args, **kwds))
-#                     ^^^^^^^^^^^^^^^^^^^
-#   File "/usr/lib64/python3.11/multiprocessing/pool.py", line 48, in mapstar
-#     return list(map(*args))
-#            ^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 602, in __mp_runner
-#     (_, tsr) = test_runner(mp_pm, mp_args, tests)
-#                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 419, in run_one_test
-#     pm.call_pre_case(tidx)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 146, in call_pre_case
-#     print('test_ordinal is {}'.format(test_ordinal))
-#                                       ^^^^^^^^^^^^
-# NameError: name 'test_ordinal' is not defined
-# """
-# 
-# The above exception was the direct cause of the following exception:
-# 
-# Traceback (most recent call last):
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 1028, in <module>
-#     main()
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 1022, in main
-#     set_operation_mode(pm, parser, args, remaining)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 964, in set_operation_mode
-#     catresults = test_runner_mp(pm, args, alltests)
-#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 624, in test_runner_mp
-#     pres = p.map(__mp_runner, batches)
-#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/usr/lib64/python3.11/multiprocessing/pool.py", line 367, in map
-#     return self._map_async(func, iterable, mapstar, chunksize).get()
-#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/usr/lib64/python3.11/multiprocessing/pool.py", line 774, in get
-#     raise self._value
-# NameError: name 'test_ordinal' is not defined
-# WARNING: Interface v0p0id7326 does not exist!
-# WARNING: Interface v0p0id34fa does not exist!
-# WARNING: more Interface v0p0id8dd5 does not exist!
-# considering category qdisc
-# !!! Consider installing pyroute2 !!!
-#  -- ns/SubPlugin.__init__
-#  -- scapy/SubPlugin.__init__
-# Executing 294 tests in parallel and 33 in serial
-# Using 11 batches and 4 workers
-# 
-# -----> prepare stage *** Could not execute: "echo "1 1 8" > /sys/bus/netdevsim/new_device"
-# 
-# -----> prepare stage *** Error message: "setting the network namespace "tcut-2202500200" failed: Invalid argument
-# "
-# 
-# -----> prepare stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=15> *** stderr ***
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 420, in run_one_test
-#     prepare_env(tidx, args, pm, 'setup', "-----> prepare stage", tidx["setup"])
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 268, in prepare_env
-#     raise PluginMgrTestFail(
-# RTNETLINK answers: File exists
-# Command failed -:2
-# 
-# -----> teardown stage *** Could not execute: "$TC qdisc del dev $DUMMY handle 1: root"
-# 
-# -----> teardown stage *** Error message: "Error: Invalid handle.
-# "
-# 
-# -----> teardown stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=21> *** stderr ***
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 465, in run_one_test
-#     prepare_env(tidx, args, pm, 'teardown', '-----> teardown stage', tidx['teardown'], procout)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 268, in prepare_env
-#     raise PluginMgrTestFail(
-# 
-# -----> teardown stage *** Could not execute: "$TC qdisc del dev $DUMMY handle 1: root bfifo"
-# 
-# -----> teardown stage *** Error message: "Cannot find device "dummy1ida519"
-# "
-# 
-# -----> teardown stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=17> *** stderr ***
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 465, in run_one_test
-#     prepare_env(tidx, args, pm, 'teardown', '-----> teardown stage', tidx['teardown'], procout)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 268, in prepare_env
-#     raise PluginMgrTestFail(
-# Error: argument "v0p0id20baid2958" is wrong: "name" not a valid ifname
-# 
-# -----> teardown stage *** Could not execute: "$TC qdisc del dev $DUMMY handle 1: root"
-# 
-# -----> teardown stage *** Error message: "setting the network namespace "tcut-2202500200-3305288203" failed: Invalid argument
-# "
-# 
-# -----> teardown stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=15> *** stderr ***
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 465, in run_one_test
-#     prepare_env(tidx, args, pm, 'teardown', '-----> teardown stage', tidx['teardown'], procout)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 268, in prepare_env
-#     raise PluginMgrTestFail(
-# 
-# -----> prepare stage *** Could not execute: "$TC qdisc add dev $DUMMY handle 1: root choke limit 1000 bandwidth 10000"
-# 
-# -----> prepare stage *** Error message: "setting the network namespace "tcut-57801789-2243486144" failed: Invalid argument
-# "
-# 
-# -----> prepare stage *** Aborting test run.
-# 
-# 
-# <_io.BufferedReader name=6> *** stdout ***
-# 
-# 
-# <_io.BufferedReader name=21> *** stderr ***
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 420, in run_one_test
-#     prepare_env(tidx, args, pm, 'setup', "-----> prepare stage", tidx["setup"])
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 268, in prepare_env
-#     raise PluginMgrTestFail(
-# Error: argument "v0p0id30c4id0301" is wrong: "name" not a valid ifname
-# RTNETLINK answers: File exists
-# Command failed -:38
-# Test a519: Add bfifo qdisc with system default parameters on egress
-# exit: 1
-# exit: 0
-# Cannot find device "dummy1ida519"
-# 
-# returncode 1; expected [0]
-# "-----> teardown stage" did not complete successfully
-# Exception <class '__main__.PluginMgrTestFail'> ('teardown', 'Cannot find device "dummy1ida519"\n', '"-----> teardown stage" did not complete successfully') (caught in test_runner, running test 2 a519 Add bfifo qdisc with system default parameters on egress stage teardown)
-# ---------------
-# traceback
-# ---------------
-# accumulated output for this test:
-# Cannot find device "dummy1ida519"
-# 
-# ---------------
-# Test 2385: Create CAKE with besteffort flag
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test 0521: Show ingress class
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test b190: Create FQ_CODEL with noecn flag
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test 5439: Create NETEM with multiple slot setting
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test 30a9: Create SFB with increment setting
-# exception [Errno 32] Broken pipe in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test 20ba: Add multiq Qdisc to multi-queue device (8 queues)
-# returncode 255; expected [0]
-# "-----> prepare stage" did not complete successfully
-# Exception <class '__main__.PluginMgrTestFail'> ('setup', None, '"-----> prepare stage" did not complete successfully') (caught in test_runner, running test 2 20ba Add multiq Qdisc to multi-queue device (8 queues) stage setup)
-# ---------------
-# traceback
-# ---------------
-# ---------------
-# Test 2958: Show skbprio class
-# exit: 255
-# exit: 0
-# setting the network namespace "tcut-2202500200-3305288203" failed: Invalid argument
-# 
-# returncode 255; expected [0]
-# "-----> teardown stage" did not complete successfully
-# Exception <class '__main__.PluginMgrTestFail'> ('teardown', 'setting the network namespace "tcut-2202500200-3305288203" failed: Invalid argument\n', '"-----> teardown stage" did not complete successfully') (caught in test_runner, running test 2 2958 Show skbprio class stage teardown)
-# ---------------
-# traceback
-# ---------------
-# accumulated output for this test:
-# setting the network namespace "tcut-2202500200-3305288203" failed: Invalid argument
-# 
-# ---------------
-# Test fe0f: Add prio qdisc on egress with 4 bands and priomap exceeding TC_PRIO_MAX entries
-# Test 1f91: Add prio qdisc on egress with 4 bands and priomap's values exceeding bands number
-# exit: 255
-# exit: 1
-# setting the network namespace "tcut-3396639522" failed: Invalid argument
-# 
-# Test d248: Add prio qdisc on egress with invalid bands value (< 2)
-# exit: 1
-# exit: 2
-# Cannot find device "dummy1idd248"
-# 
-# Test 1d0e: Add prio qdisc on egress with invalid bands value exceeding TCQ_PRIO_BANDS
-# Test 1971: Replace default prio qdisc on egress with 8 bands and new priomap
-# exception iproute2 exited with an error code in call to pre_case for <class 'plugin-lib.nsPlugin.SubPlugin'> plugin
-# Test 30c4: Add ETS qdisc with quanta + priomap
-# exit: 1
-# exit: 0
-# Cannot find device "dummy1id30c4"
-# 
-# returncode 2; expected [0]
-# "-----> teardown stage" did not complete successfully
-# Exception <class '__main__.PluginMgrTestFail'> ('teardown', 'Cannot find device "dummy1id30c4"\n', '"-----> teardown stage" did not complete successfully') (caught in test_runner, running test 2 30c4 Add ETS qdisc with quanta + priomap stage teardown)
-# ---------------
-# traceback
-# ---------------
-# accumulated output for this test:
-# Cannot find device "dummy1id30c4"
-# 
-# ---------------
-# Test 0301: Change CHOKE with limit setting
-# returncode 255; expected [0]
-# "-----> prepare stage" did not complete successfully
-# Exception <class '__main__.PluginMgrTestFail'> ('setup', None, '"-----> prepare stage" did not complete successfully') (caught in test_runner, running test 2 0301 Change CHOKE with limit setting stage setup)
-# ---------------
-# traceback
-# ---------------
-# ---------------
-# multiprocessing.pool.RemoteTraceback: 
-# """
-# Traceback (most recent call last):
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 142, in call_pre_case
-#     pgn_inst.pre_case(caseinfo, test_skip)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 63, in pre_case
-#     self.prepare_test(test)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 38, in prepare_test
-#     self._ipr2_ns_create()
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 187, in _ipr2_ns_create
-#     self._exec_cmd_batched('pre', self._ipr2_ns_create_cmds())
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 242, in _exec_cmd_batched
-#     self._exec_cmd(stage, cmd)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 233, in _exec_cmd
-#     proc.stdin.flush()
-# BrokenPipeError: [Errno 32] Broken pipe
-# 
-# During handling of the above exception, another exception occurred:
-# 
-# Traceback (most recent call last):
-#   File "/usr/lib64/python3.11/multiprocessing/pool.py", line 125, in worker
-#     result = (True, func(*args, **kwds))
-#                     ^^^^^^^^^^^^^^^^^^^
-#   File "/usr/lib64/python3.11/multiprocessing/pool.py", line 48, in mapstar
-#     return list(map(*args))
-#            ^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 602, in __mp_runner
-#     (_, tsr) = test_runner(mp_pm, mp_args, tests)
-#                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 536, in test_runner
-#     res = run_one_test(pm, args, index, tidx)
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 419, in run_one_test
-#     pm.call_pre_case(tidx)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 146, in call_pre_case
-#     print('test_ordinal is {}'.format(test_ordinal))
-#                                       ^^^^^^^^^^^^
-# NameError: name 'test_ordinal' is not defined
-# """
-# 
-# The above exception was the direct cause of the following exception:
-# 
-# Traceback (most recent call last):
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 1028, in <module>
-#     main()
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 1022, in main
-#     set_operation_mode(pm, parser, args, remaining)
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 964, in set_operation_mode
-#     catresults = test_runner_mp(pm, args, alltests)
-#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing/./tdc.py", line 624, in test_runner_mp
-#     pres = p.map(__mp_runner, batches)
-#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/usr/lib64/python3.11/multiprocessing/pool.py", line 367, in map
-#     return self._map_async(func, iterable, mapstar, chunksize).get()
-#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/usr/lib64/python3.11/multiprocessing/pool.py", line 774, in get
-#     raise self._value
-# NameError: name 'test_ordinal' is not defined
-not ok 1 selftests: tc-testing: tdc.sh # exit=1
-make[1]: Leaving directory '/mnt/share156/jiri/net-next/tools/testing/selftests/tc-testing'
-make: Leaving directory '/mnt/share156/jiri/net-next/tools/testing/selftests'
+>
+>Alternatively, I could use the channel lock to protect stats updates,
+>but that could increase contention of that lock. I believe more
+>granularity is better, especially if it does not cost anything: There
+>is plenty of unused space in struct stmmac_txq_stats and struct
+>stmmac_rxq_stats (they are both cache-aligned).
+>
+>Petr T
+>
+>> 
+>> Rest of the patch looks fine to me.
+>> 
+>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> 
+>> > 
+>> > 	txq_stats = &priv->xstats.txq_stats[chan];
+>> >-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+>> >+	spin_lock(&txq_stats->lock);
+>> >+	u64_stats_update_begin(&txq_stats->syncp);
+>> > 	txq_stats->napi_poll++;
+>> >-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+>> >+	u64_stats_update_end(&txq_stats->syncp);
+>> >+	spin_unlock_irqrestore(&txq_stats->lock, flags);
+>> > 
+>> > 	tx_done = stmmac_tx_clean(priv, budget, chan, &tx_pending_packets);
+>> > 	tx_done = min(tx_done, budget);
+>> >@@ -7371,10 +7395,14 @@ int stmmac_dvr_probe(struct device *device,
+>> > 	priv->device = device;
+>> > 	priv->dev = ndev;
+>> > 
+>> >-	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
+>> >+	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
+>> > 		u64_stats_init(&priv->xstats.rxq_stats[i].syncp);
+>> >-	for (i = 0; i < MTL_MAX_TX_QUEUES; i++)
+>> >+		spin_lock_init(&priv->xstats.rxq_stats[i].lock);
+>> >+	}
+>> >+	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
+>> > 		u64_stats_init(&priv->xstats.txq_stats[i].syncp);
+>> >+		spin_lock_init(&priv->xstats.txq_stats[i].lock);
+>> >+	}
+>> > 
+>> > 	stmmac_set_ethtool_ops(ndev);
+>> > 	priv->pause = pause;
+>> >-- 
+>> >2.43.0
+>> >
+>> >  
+>
 
