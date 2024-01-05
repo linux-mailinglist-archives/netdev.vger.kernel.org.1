@@ -1,211 +1,211 @@
-Return-Path: <netdev+bounces-62090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1429825B31
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 20:46:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 021E2825B3A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 20:52:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B476AB230D9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 19:46:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E572D1C23997
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 19:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731B725740;
-	Fri,  5 Jan 2024 19:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKN5qVXU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566DA35F1D;
+	Fri,  5 Jan 2024 19:52:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AF235EF7
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 19:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-781706de787so125674685a.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 11:45:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704483956; x=1705088756; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z36cTENiE16T5F5xWC0S560wbZS1tL2/6K+MQP/dl1E=;
-        b=TKN5qVXUm9zpXLYv/9NYm6mPyaDku1sb/F2c3iZkxd+L8GMas+mcsItmZpiLMyyg4C
-         95E9IAGBwlj0ebYLArBV7iT4w4qCwe+LdmqlYY72Vs7D0WLYcYy4sIk07Vm7G39QrJwD
-         Nf5092jTqASZVzXISbJryzM1E6zq2zy9dhwE8Ycl3rRLOks6VuJorxBh6QzerwHqtgh8
-         26gGlHKyGIrhV4+qEkbRBNVmYW/V7yFuPP0iguz4el//+2c4ywWrShL++L+w/8JuDMYS
-         Dq/GeWhn18+pX1wNSeZkUFZ95O7AuRxSmWjD+9a6DlvH5gxB1EVyAfYwCeK58JzV25ny
-         O6Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704483956; x=1705088756;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Z36cTENiE16T5F5xWC0S560wbZS1tL2/6K+MQP/dl1E=;
-        b=W57Ix3xhvpnswoVy3ItkCL8pacl5KiOVjFUOWSQF8WE2eNn0EkMRS7OO5U10D35L/l
-         pmfUBoso/SqApZ/Ik3Wgsa/BKp61ZGo0gUphZgFbHYE0fNMIyj0l3C3gq3MTfDB1ENxC
-         2nH0ZZuv+SxtRuN6bLmvcxxI7Lj4kB+hCC9luLrlN/niyMkIDxibnLv3MdDUNSzY8YXJ
-         6Gtf+CBI4NqHHMewUBuBwat2iGV9xjIVt8KnlUloqcl0mebsPqHnryOj2spsVu4xJnWx
-         FDOmxxdMTc2/Rz/K6MsuIZklFBx5Onu29oEwaWeb9ZwmRraxTVhrDG/5tKzA8hFS0FxI
-         mHOg==
-X-Gm-Message-State: AOJu0YzR0LLfZcGZFcpJK62sNf1d2ZzVt4ETMIp50tJGFUVc5I2ES85b
-	7XoIvU6V/m5axL2ys3kSQks=
-X-Google-Smtp-Source: AGHT+IGtRLo/yCVVHqgmNKyxGNmHbsoQHuLRIzh/E5O1qJPexZFXgXhmWxrelOD8qxqI7BcF4RsmPA==
-X-Received: by 2002:a37:f51a:0:b0:781:9a96:4c77 with SMTP id l26-20020a37f51a000000b007819a964c77mr2919326qkk.30.1704483956664;
-        Fri, 05 Jan 2024 11:45:56 -0800 (PST)
-Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
-        by smtp.gmail.com with ESMTPSA id bs44-20020a05620a472c00b007815d11eab5sm815783qkb.26.2024.01.05.11.45.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 11:45:56 -0800 (PST)
-Date: Fri, 05 Jan 2024 14:45:55 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>, 
- syzbot <syzkaller@googlegroups.com>
-Message-ID: <65985c73ca5b9_122cbd29414@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240105170313.2946078-1-edumazet@google.com>
-References: <20240105170313.2946078-1-edumazet@google.com>
-Subject: Re: [PATCH net] ip6_tunnel: fix NEXTHDR_FRAGMENT handling in
- ip6_tnl_parse_tlv_enc_lim()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C71C35F00;
+	Fri,  5 Jan 2024 19:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (31.173.81.170) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 5 Jan
+ 2024 22:52:21 +0300
+Subject: Re: [PATCH net-next v3 07/19] net: ravb: Move reference clock
+ enable/disable on runtime PM APIs
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <geert+renesas@glider.be>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240105082339.1468817-8-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <80b7337b-5fc2-07bc-a05f-b583ccaac3da@omp.ru>
+Date: Fri, 5 Jan 2024 22:52:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+In-Reply-To: <20240105082339.1468817-8-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/05/2024 19:40:34
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182465 [Jan 05 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.81.170 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.81.170 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;31.173.81.170:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.81.170
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/05/2024 19:45:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/5/2024 3:23:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Eric Dumazet wrote:
-> syzbot pointed out [1] that NEXTHDR_FRAGMENT handling is broken.
-> 
-> Reading frag_off can only be done if we pulled enough bytes
-> to skb->head. Currently we might access garbage.
-> 
-> [1]
-> BUG: KMSAN: uninit-value in ip6_tnl_parse_tlv_enc_lim+0x94f/0xbb0
-> ip6_tnl_parse_tlv_enc_lim+0x94f/0xbb0
-> ipxip6_tnl_xmit net/ipv6/ip6_tunnel.c:1326 [inline]
-> ip6_tnl_start_xmit+0xab2/0x1a70 net/ipv6/ip6_tunnel.c:1432
-> __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
-> netdev_start_xmit include/linux/netdevice.h:4954 [inline]
-> xmit_one net/core/dev.c:3548 [inline]
-> dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
-> __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
-> dev_queue_xmit include/linux/netdevice.h:3134 [inline]
-> neigh_connected_output+0x569/0x660 net/core/neighbour.c:1592
-> neigh_output include/net/neighbour.h:542 [inline]
-> ip6_finish_output2+0x23a9/0x2b30 net/ipv6/ip6_output.c:137
-> ip6_finish_output+0x855/0x12b0 net/ipv6/ip6_output.c:222
-> NF_HOOK_COND include/linux/netfilter.h:303 [inline]
-> ip6_output+0x323/0x610 net/ipv6/ip6_output.c:243
-> dst_output include/net/dst.h:451 [inline]
-> ip6_local_out+0xe9/0x140 net/ipv6/output_core.c:155
-> ip6_send_skb net/ipv6/ip6_output.c:1952 [inline]
-> ip6_push_pending_frames+0x1f9/0x560 net/ipv6/ip6_output.c:1972
-> rawv6_push_pending_frames+0xbe8/0xdf0 net/ipv6/raw.c:582
-> rawv6_sendmsg+0x2b66/0x2e70 net/ipv6/raw.c:920
-> inet_sendmsg+0x105/0x190 net/ipv4/af_inet.c:847
-> sock_sendmsg_nosec net/socket.c:730 [inline]
-> __sock_sendmsg net/socket.c:745 [inline]
-> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
-> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
-> __sys_sendmsg net/socket.c:2667 [inline]
-> __do_sys_sendmsg net/socket.c:2676 [inline]
-> __se_sys_sendmsg net/socket.c:2674 [inline]
-> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
-> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
-> entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> 
-> Uninit was created at:
-> slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
-> slab_alloc_node mm/slub.c:3478 [inline]
-> __kmem_cache_alloc_node+0x5c9/0x970 mm/slub.c:3517
-> __do_kmalloc_node mm/slab_common.c:1006 [inline]
-> __kmalloc_node_track_caller+0x118/0x3c0 mm/slab_common.c:1027
-> kmalloc_reserve+0x249/0x4a0 net/core/skbuff.c:582
-> pskb_expand_head+0x226/0x1a00 net/core/skbuff.c:2098
-> __pskb_pull_tail+0x13b/0x2310 net/core/skbuff.c:2655
-> pskb_may_pull_reason include/linux/skbuff.h:2673 [inline]
-> pskb_may_pull include/linux/skbuff.h:2681 [inline]
-> ip6_tnl_parse_tlv_enc_lim+0x901/0xbb0 net/ipv6/ip6_tunnel.c:408
-> ipxip6_tnl_xmit net/ipv6/ip6_tunnel.c:1326 [inline]
-> ip6_tnl_start_xmit+0xab2/0x1a70 net/ipv6/ip6_tunnel.c:1432
-> __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
-> netdev_start_xmit include/linux/netdevice.h:4954 [inline]
-> xmit_one net/core/dev.c:3548 [inline]
-> dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
-> __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
-> dev_queue_xmit include/linux/netdevice.h:3134 [inline]
-> neigh_connected_output+0x569/0x660 net/core/neighbour.c:1592
-> neigh_output include/net/neighbour.h:542 [inline]
-> ip6_finish_output2+0x23a9/0x2b30 net/ipv6/ip6_output.c:137
-> ip6_finish_output+0x855/0x12b0 net/ipv6/ip6_output.c:222
-> NF_HOOK_COND include/linux/netfilter.h:303 [inline]
-> ip6_output+0x323/0x610 net/ipv6/ip6_output.c:243
-> dst_output include/net/dst.h:451 [inline]
-> ip6_local_out+0xe9/0x140 net/ipv6/output_core.c:155
-> ip6_send_skb net/ipv6/ip6_output.c:1952 [inline]
-> ip6_push_pending_frames+0x1f9/0x560 net/ipv6/ip6_output.c:1972
-> rawv6_push_pending_frames+0xbe8/0xdf0 net/ipv6/raw.c:582
-> rawv6_sendmsg+0x2b66/0x2e70 net/ipv6/raw.c:920
-> inet_sendmsg+0x105/0x190 net/ipv4/af_inet.c:847
-> sock_sendmsg_nosec net/socket.c:730 [inline]
-> __sock_sendmsg net/socket.c:745 [inline]
-> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
-> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
-> __sys_sendmsg net/socket.c:2667 [inline]
-> __do_sys_sendmsg net/socket.c:2676 [inline]
-> __se_sys_sendmsg net/socket.c:2674 [inline]
-> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
-> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
-> entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> 
-> CPU: 0 PID: 7345 Comm: syz-executor.3 Not tainted 6.7.0-rc8-syzkaller-00024-gac865f00af29 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-> 
-> Fixes: fbfa743a9d2a ("ipv6: fix ip6_tnl_parse_tlv_enc_lim()")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Willem de Bruijn <willemb@google.com>
+On 1/5/24 11:23 AM, Claudiu wrote:
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Reference clock could be or not part of the power domain. If it is part of
+> the power domain, the power domain takes care of propertly setting it. In
+> case it is not part of the power domain and full runtime PM support is
+> available in driver the clock will not be propertly disabled/enabled at
+> runtime. For this, keep the prepare/unprepare operations in the driver's
+> probe()/remove() functions and move the enable/disable in runtime PM
+> functions.
+> 
+> Along with it, the other clock request operations were moved close to
+> reference clock request and prepare to have all the clock requests
+> specific code grouped together.
+> 
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+   It's not that I reviewed the squashed version of this patch...
+
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 > ---
->  net/ipv6/ip6_tunnel.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
 > 
-> diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-> index 5e80e517f071013410349d1fd93afc00a394e284..46c19bd4899011d53b4feb84e25013c01ddce701 100644
-> --- a/net/ipv6/ip6_tunnel.c
-> +++ b/net/ipv6/ip6_tunnel.c
-> @@ -399,7 +399,7 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
->  	const struct ipv6hdr *ipv6h = (const struct ipv6hdr *)raw;
->  	unsigned int nhoff = raw - skb->data;
->  	unsigned int off = nhoff + sizeof(*ipv6h);
-> -	u8 next, nexthdr = ipv6h->nexthdr;
-> +	u8 nexthdr = ipv6h->nexthdr;
+> Changes in v3:
+> - squashed with patch 17/21 ("net: ravb: Keep clock request operations grouped
+>   together") from v2
+> - collected tags
+> 
+> Changes in v2:
+> - this patch is new and follows the recommendations proposed in the
+>   discussion of patch 08/13 ("net: ravb: Rely on PM domain to enable refclk")
+>   from v2
+> 
+>  drivers/net/ethernet/renesas/ravb_main.c | 110 ++++++++++++-----------
+>  1 file changed, 57 insertions(+), 53 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 844ac3306e93..4673cc2faec0 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+> @@ -2697,10 +2692,37 @@ static int ravb_probe(struct platform_device *pdev)
+>  		priv->num_rx_ring[RAVB_NC] = NC_RX_RING_SIZE;
+>  	}
 >  
->  	while (ipv6_ext_hdr(nexthdr) && nexthdr != NEXTHDR_NONE) {
->  		struct ipv6_opt_hdr *hdr;
-> @@ -410,25 +410,25 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
->  
->  		hdr = (struct ipv6_opt_hdr *)(skb->data + off);
->  		if (nexthdr == NEXTHDR_FRAGMENT) {
-> -			struct frag_hdr *frag_hdr = (struct frag_hdr *) hdr;
-> -			if (frag_hdr->frag_off)
-> -				break;
->  			optlen = 8;
+> +	priv->clk = devm_clk_get(&pdev->dev, NULL);
+> +	if (IS_ERR(priv->clk)) {
+> +		error = PTR_ERR(priv->clk);
+> +		goto out_reset_assert;
+> +	}
+> +
+> +	if (info->gptp_ref_clk) {
+> +		priv->gptp_clk = devm_clk_get(&pdev->dev, "gptp");
+> +		if (IS_ERR(priv->gptp_clk)) {
+> +			error = PTR_ERR(priv->gptp_clk);
+> +			goto out_reset_assert;
+> +		}
+> +	}
+> +
+> +	priv->refclk = devm_clk_get_optional(&pdev->dev, "refclk");
+> +	if (IS_ERR(priv->refclk)) {
+> +		error = PTR_ERR(priv->refclk);
+> +		goto out_reset_assert;
+> +	}
+> +	clk_prepare(priv->refclk);
+> +
+> +	platform_set_drvdata(pdev, ndev);
 
-Eventually this could be sizeof(struct frag_hdr). Not necessarily for
-this fix.
+   Why exactly you had to move this line?
+
+> +	pm_runtime_enable(&pdev->dev);
+> +	error = pm_runtime_resume_and_get(&pdev->dev);
+> +	if (error < 0)
+> +		goto out_rpm_disable;
+> +
+>  	priv->addr = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
+>  	if (IS_ERR(priv->addr)) {
+>  		error = PTR_ERR(priv->addr);
+> -		goto out_release;
+> +		goto out_rpm_put;
+>  	}
+>  
+>  	/* The Ether-specific entries in the device structure. */
+[...]
+> @@ -2871,8 +2872,6 @@ static int ravb_probe(struct platform_device *pdev)
+>  	netdev_info(ndev, "Base address at %#x, %pM, IRQ %d.\n",
+>  		    (u32)ndev->base_addr, ndev->dev_addr, ndev->irq);
+>  
+> -	platform_set_drvdata(pdev, ndev);
+
+   Hm, wasn't calling it here racy?
+
+> -
+>  	return 0;
+>  
+>  out_napi_del:
+[...]
+> @@ -3060,21 +3058,27 @@ static int ravb_resume(struct device *dev)
+>  	return ret;
+>  }
+>  
+> -static int ravb_runtime_nop(struct device *dev)
+> +static int ravb_runtime_suspend(struct device *dev)
+>  {
+> -	/* Runtime PM callback shared between ->runtime_suspend()
+> -	 * and ->runtime_resume(). Simply returns success.
+> -	 *
+> -	 * This driver re-initializes all registers after
+> -	 * pm_runtime_get_sync() anyway so there is no need
+> -	 * to save and restore registers here.
+> -	 */
+
+   Perhaps even worth a separate patch to completely remove this function
+which doesn't seem to make sense?
+
+[...]
+
+MBR, Sergey
 
