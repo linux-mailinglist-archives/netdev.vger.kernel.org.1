@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-61986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27E828257C3
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:10:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFE0E8257C7
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:10:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B71F1284714
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:10:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EC40B22CF0
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73CC2E833;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9542E844;
 	Fri,  5 Jan 2024 16:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITdxeccH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMQqlVPo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5A82E823
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B582E824
 	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 16:10:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 40AFBC433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5695BC433CC;
 	Fri,  5 Jan 2024 16:10:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704471027;
-	bh=Dm5M+dsJYQNq8D0lpCX+Bup+J3yVmYb/5268CVZ8w/0=;
+	bh=gqe9X0mxbX4L6qyyQo6ETQVGikIdxmIHsOV5d/MWTrs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ITdxeccHz7weJM1DAJy1qVrVTsXCwHxbOvHGMYiJrCjWDuN/0ZxeJ0o0jm9Cp5qYs
-	 XYHEZ38goR/TEfOVYpkUVl0YCRh7r56oyjlaDw4SHaeqPlsdYQCPyx8wC8BGEA8twV
-	 IXXFiBYHsv23VMr5iVVWjC/Ulp4RGNXBkf2Wv0XH1/1YWXR7qX9Z22FzjYIbaiIHcp
-	 W3BnSSiEXP5WC2rzC/Tl0y0sGoBWCBGozyDpwVgm/CZozW08hYMaGt3QIs3nAleZnL
-	 TBprVTr+krWge2uK/3XsesbS1d1cVoBMjF4EPtossEsfDrw4DSExmVvZSqZtrn88QE
-	 F/UwGFlBW/7FA==
+	b=kMQqlVPof/ftB18UFhECMtBHSx8el+Xn4cdtT/zQyV5Z9SnVFFrvTCMqKa2emLjkm
+	 gV2nuvlV3K2P4RDoWnTCm5gyc3rReX3WiKFQCb48m1TfjsYizrvvmsz+S23iVl3nDb
+	 3xSa2uaBKD3A3ZQrezJ2tkZWBhPOaKn7u0Pqm5JivcUmJ+i83Au3K3s9ICWwL+HBOT
+	 e3FxbfC8hV+bVVDt27AiaKro+gDJ7KppqEE684O03CRogIIxLnrNJORrQPuefO5raz
+	 8avZFNzeQvtOYy09wojaBTQ0Qxx89Uaqo7Xjoi1akEQXE/w1iGls0Uh8NhbxWsrhIY
+	 pb1laArg0HPrw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 26A00C4167E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3BB18DCB6F9;
 	Fri,  5 Jan 2024 16:10:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,47 +43,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [patch net-next 0/3] dpll: expose fractional frequency offset value
- to user
+Subject: Re: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for ATM
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170447102715.8824.5095352127275403572.git-patchwork-notify@kernel.org>
+ <170447102724.8824.4452172269888054496.git-patchwork-notify@kernel.org>
 Date: Fri, 05 Jan 2024 16:10:27 +0000
-References: <20240103132838.1501801-1-jiri@resnulli.us>
-In-Reply-To: <20240103132838.1501801-1-jiri@resnulli.us>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com, vadim.fedorenko@linux.dev,
- arkadiusz.kubalewski@intel.com, saeedm@nvidia.com, leon@kernel.org,
- michal.michalik@intel.com, rrameshbabu@nvidia.com
+References: <20240104143737.1317945-1-kuba@kernel.org>
+In-Reply-To: <20240104143737.1317945-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, 3chas3@gmail.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  3 Jan 2024 14:28:35 +0100 you wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+On Thu,  4 Jan 2024 06:37:37 -0800 you wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to all the ATM modules and drivers.
 > 
-> Allow to expose pin fractional frequency offset value over new DPLL
-> generic netlink attribute. Add an op to get the value from the driver.
-> Implement this new op in mlx5 driver.
-> 
-> Jiri Pirko (3):
->   dpll: expose fractional frequency offset value to user
->   net/mlx5: DPLL, Use struct to get values from
->     mlx5_dpll_synce_status_get()
->   net/mlx5: DPLL, Implement fractional frequency offset get pin op
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: 3chas3@gmail.com
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/3] dpll: expose fractional frequency offset value to user
-    https://git.kernel.org/netdev/net-next/c/8a6286c1804e
-  - [net-next,2/3] net/mlx5: DPLL, Use struct to get values from mlx5_dpll_synce_status_get()
-    https://git.kernel.org/netdev/net-next/c/e6d86938a40a
-  - [net-next,3/3] net/mlx5: DPLL, Implement fractional frequency offset get pin op
-    https://git.kernel.org/netdev/net-next/c/f035dca34ede
+  - [net-next] net: fill in MODULE_DESCRIPTION()s for ATM
+    https://git.kernel.org/netdev/net-next/c/fc0caed81bca
 
 You are awesome, thank you!
 -- 
