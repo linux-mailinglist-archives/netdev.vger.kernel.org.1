@@ -1,121 +1,80 @@
-Return-Path: <netdev+bounces-61944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7F988254C3
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:01:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBD18254DD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:09:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 514B91F225EF
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:01:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CE0CB2162B
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3482D63D;
-	Fri,  5 Jan 2024 14:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2662D7A7;
+	Fri,  5 Jan 2024 14:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ojvNlEJU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e8fuoYDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6208F2D7A5;
-	Fri,  5 Jan 2024 14:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rklPmY2oZQIe1/iyTtTeOXrMgE6gpCxUrRBRrMqDWCA=; b=ojvNlEJUAzcy09PNuju1puc+rZ
-	FDqIXr+mkS1hKfFa6t7/eyoSfhcV/N1OA8UMWFO9uCx5YB9ups0RC7gAu2qFM3Fl9yrRksuDsNbxm
-	i3cog/82lX+9LYC6dlbY+/Up2NkFPiqzYt+D7N4dKzESJt2TobqSdivVe4V6Q13jBpgY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rLkkt-004SRu-09; Fri, 05 Jan 2024 15:00:59 +0100
-Date: Fri, 5 Jan 2024 15:00:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Stefan Eichenberger <eichest@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: marvell-88q2xxx: add driver for the Marvell
- 88Q2220 PHY
-Message-ID: <c7b1b220-4a76-4cc0-b68d-cec5977ebadb@lunn.ch>
-References: <20231216221151.GA143483@debian>
- <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
- <20231217111538.GA3591@debian>
- <ZX78ucHcNyEatXLD@eichest-laptop>
- <20231218090932.GA4319@debian>
- <ZYAqxPZHICtZO15O@eichest-laptop>
- <20231219081117.GA3479@debian>
- <ZYFfzei3SJSts5E/@eichest-laptop>
- <5d545a9b-feda-4908-8f74-9218806451c1@lunn.ch>
- <20240105124221.GA30964@debian>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3372D78D
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 14:09:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4B37C433C9;
+	Fri,  5 Jan 2024 14:09:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704463788;
+	bh=YIZFlFTKuOSSkQeHzUs5u09JSVOu3c37OT5aarOCI7o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e8fuoYDuvMXv3jRsqn6yQ3J2qewNQhRChPSfeX+rCCnxQIridzjDqeKgQf4sAvBIi
+	 oogpO4TTN9KuhP408DfA2Zt/MstIfbBwQXbJsPwczPfFO69QAyQX+tVbbdETXAO2o/
+	 2vyRw9snrnr+NMuzW13aS9GUn9hMsEhYjVD+uzUKAWs8A2zciJzEhxmS/r/LxalZB8
+	 V0XnrjsVuU/YqZ6hK2jt88+Fo4UZTIzaFCnY1Wzy8OPrQuYpIXXnp+qZJIfsvz1Y/c
+	 Wj/6YBzT3xlBIsb/YKesROsSvOoBsAoiBVJ9kq24PSqRvUDQOI6wmM6VLZy+r+nuyP
+	 t+u4mP0YZ6XvQ==
+Date: Fri, 5 Jan 2024 06:09:46 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>, Eyal Birger <eyal.birger@gmail.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
+ Florian Westphal <fw@strlen.de>, victor@mojatatu.com
+Subject: Re: [PATCH iproute2-next v2] remove support for iptables action
+Message-ID: <20240105060946.221ca96f@kernel.org>
+In-Reply-To: <CAM0EoMnSVQHyQy37OoznsF15+M84o7L2c6UwtKL1Fcuwev4rHA@mail.gmail.com>
+References: <20231226182531.34717-1-stephen@networkplumber.org>
+	<CAM0EoMmH-5Afhe1DvhSJzMhsyx=y7AW+FnhR8p3YbveP3UigXA@mail.gmail.com>
+	<20240104072552.1de9338f@kernel.org>
+	<CAM0EoMkP18tbOuFyWgr=BaCODcRTJR=rU6hitcQSY_HD9gD87g@mail.gmail.com>
+	<CAHsH6Gsz7ANvWo0DcfE7DYZwVzkmXSGSKwKhJMtA=MtOi=QqqA@mail.gmail.com>
+	<CAM0EoMnSVQHyQy37OoznsF15+M84o7L2c6UwtKL1Fcuwev4rHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240105124221.GA30964@debian>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 05, 2024 at 01:42:21PM +0100, Dimitri Fedrau wrote:
-> Am Tue, Dec 19, 2023 at 04:57:50PM +0100 schrieb Andrew Lunn:
-> > > I am not sure that it will be accepted by the maintainers if you use a
-> > > lot of registers that are not documented.
-> > 
-> > Sometimes there is no choice, there is no documentation except the
-> > vendor crap driver which we try to clean up as much as possible, but
-> > we still end up with lots of magic numbers.
+On Fri, 5 Jan 2024 06:20:10 -0500 Jamal Hadi Salim wrote:
+> > I tested and it looks like the patch doesn't affect em_ipt, as expected.
+
+Thank you!
+
+> > I did however run into a related issue while testing - seems that
+> > using the old "ingress" qdisc - that em_ipt iproute2 code still uses -
+> > isn't working, i.e:
 > >
+> > $ tc qdisc add dev ipsec1 ingress
+> > Error: Egress block dev insert failed.
+> >
+> > This seems to originate from recent commit 913b47d3424e
+> > ("net/sched: Introduce tc block netdev tracking infra").
+> >
+> > When I disabled that code in my build I was able to use em_ipt
+> > as expected.  
 > 
-> Hi Andrew, hi Stefan,
-> 
-> tried to reduce the init sequence. This worked for me:
-> 
-> static int mv88q222x_config_init(struct phy_device *phydev)
-> {
-> 	int ret;
-> 
-> 	/* send_s detection threshold, slave and master */
-> 	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8032, 0x2020);
-> 	if (ret < 0)
-> 		return ret;
-> 
-> 	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0xa28);
-> 	if (ret < 0)
-> 		return ret;
-> 
-> 	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0xc28);
-> 	if (ret < 0)
-> 		return ret;
-> 
-> 	ret = phy_write_mmd(phydev, MDIO_MMD_PCS, 0xffe4, 0xc);
-> 	if (ret < 0)
-> 		return ret;
-> 
-> 	return mv88q2xxx_config_init(phydev);
-> }
-> 
-> The four register writes were required to make the PHY work in 1000Mbit forced
-> mode. When using autonegotiation or 100Mbit forced mode they weren't needed.
-> It was enough to write them once in mv88q222x_config_init as you can
-> see. Thanks Stefan for the hint with the first three register writes, it
-> helped a lot.
+> Resolved in: https://lore.kernel.org/netdev/20240104125844.1522062-1-jiri@resnulli.us/
+> Eyal, if you have cycles please give it a try. Jakub, can we get that applied?
 
-Hi Dimitri
-
-Do we need to reduce the init sequence? Since this is all undocumented
-magic which nobody understands, it would be safer to just keep with
-the Marvell vendor crap code dump. Unless we really do need to change
-it.
-
-	Andrew
+FTR it was applied by Dave soon after you asked.
 
