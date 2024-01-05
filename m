@@ -1,74 +1,84 @@
-Return-Path: <netdev+bounces-61919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BE1825340
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:15:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52DF3825369
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:42:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87EF81F22F65
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:15:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BA9F1C22F74
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071EF2CCB8;
-	Fri,  5 Jan 2024 12:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC7A2C6BE;
+	Fri,  5 Jan 2024 12:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EY/VURo9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jn0ez182"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986062D029
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 12:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d3c4bfe45so13228085e9.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 04:15:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B372D602;
+	Fri,  5 Jan 2024 12:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40d60c49ee7so15597475e9.0;
+        Fri, 05 Jan 2024 04:42:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704456905; x=1705061705; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704458544; x=1705063344; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NYYAS0wnVVbOb9FzCTZJ5vTUiIz8eibbc8XAt0OM4rU=;
-        b=EY/VURo9sdQXogOnLeQfiuD/oZNxGn9KHVvkoyGmWy5BP2boXEC1JMXu3Z0kRO4JUO
-         kdjbh4ChHUXG6CD6f+LRMYznr2QcQJ+zNyESOJOnaI0bXsnKV24QseWiJ7LYXBaVjKIb
-         npEpPheiBfD3Q9eVNA/mzP70N8GnWP67baAtsOxrr0ovfK6I5Bjcs5AX66Ka0BDwQPU4
-         T+uIzClhNWbRJik15vYhPkjQ3OJJ0fj2pz5zGLL3X60IxyPIkFu0Gdub5Ln1YEeszHco
-         CvnSeyntLJM8GHaD1ePinimacV/jlnG80akUcwynX32kvwakdP7MOU7S1TmqE6Hq4tws
-         H8dQ==
+        bh=DHfQJekuu4Rqw+ArKcUUY0Lwd5dJazKZX1eaX6xy6Tg=;
+        b=Jn0ez1828xfBqJDCJvgxfVOY2+Lp63vlUfILN9rI+Fb/qeCyUPzRdyS1CBoZ59UiFW
+         SGuzukJ/2m4tyktO8Vhs8w0dHJrWgMcUR2erixwl+5EfarIheOmZmsnIlWey1xCk2VIi
+         U3Kzrwl384HOJtVjUNwXjk9sS5zAzdyHy7yzm/AIs95L8lVxnbW4Ri/UEYjsO1qJmK5i
+         I2Fhdbu1ZYVaLLkPf1LL3FBqU09L0BfkQWN0OqyjWtCkj1vq/H3CY2bgVPtiKHTBdF8/
+         p2Nh1HWqatFF37glSkd+jfY7+bYVZGgJcEiGqYS0m0bym1JboHuF5M7fzhEFB8oB7oxz
+         P7UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704456905; x=1705061705;
+        d=1e100.net; s=20230601; t=1704458544; x=1705063344;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NYYAS0wnVVbOb9FzCTZJ5vTUiIz8eibbc8XAt0OM4rU=;
-        b=W9veYulPsYshHSMbah2n3Nt3/EpoeN0jZEOFRkVeAYzGIUjHDkmPZ9ahicbJy5kX1f
-         hPir4GgfENBOOhhL/duwwzVLURbmj52Q1HuxmjVeeezET11OJCcpvaO+l3uKQtyXvql9
-         7isuvPuMR6A5zVIuW6cLfxwdjVGf3oROmzq/C+PhTeCZJc4s/oWD8ynTn35e+1Eu9O+Z
-         hkGT8RD3yAAdj+5fSPrOOklR8aeVgP1e/PYzHgC2jDLUWAY4cFEfaqQZVwTn1UGjt3I5
-         /Unpy9AkfYC0fHzsBly9U0lqtSItTPEZlnTanXmtOgLhB7v+otJDqeFzmKFnV0SSmpJG
-         0elg==
-X-Gm-Message-State: AOJu0YzloTT3AnGOW16QdL6cJ/HlWlx08yPKIRiUwVEIudhjJnMUOQPC
-	TonFCSByqAkL+xnnLB1L6GQkB+LwmO3CaA==
-X-Google-Smtp-Source: AGHT+IEGV2BJ/YzDWJ4mXqzbE8ErdV5qgxFOdAewa7WXieQhQ0C8Vgv4zOoDqqLoHRFoQj/Me1mwZg==
-X-Received: by 2002:a05:600c:16ca:b0:40d:8882:685c with SMTP id l10-20020a05600c16ca00b0040d8882685cmr589127wmn.313.1704456904724;
-        Fri, 05 Jan 2024 04:15:04 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id iv14-20020a05600c548e00b0040e3733a32bsm1411373wmb.41.2024.01.05.04.15.03
+        bh=DHfQJekuu4Rqw+ArKcUUY0Lwd5dJazKZX1eaX6xy6Tg=;
+        b=HXekpbISl9dv3f6CNKEbeLhVzjp0KsbVi6Am79LBb9ABkc6jhGL8IsUCHjRuGBUrid
+         QfmM0yq66Zb1pXzbEk4b3wMPQct2DN1HnmawPLgAEQBHn2wymeMr/zDgKV70NISvWjPs
+         wYK0k8+X06iBwFVFH+7pFf5iJOyXiy1TqJBNwOwROoutPOa7W/IbdiLEssgEcNggcgId
+         54IlZycQ64179DVLO9X95RnXbQevjWIuo9VqpKXBUZIswpA5ixz7xAW10vkid1+fdvbA
+         PYHNEVC3RkSaOEKzz9NT3fSsIAaCaqxsG83FiowCt6LIBc6CgYoYecGsM6u6ZWEk3Ooj
+         Go8Q==
+X-Gm-Message-State: AOJu0YyhWyCn9iavfCCeRZFZ+YS53HgLfmwE2+fHDhT7sKw4+Ykc0jth
+	KQ8S+RjbsyaRLJuIoaDYSLM=
+X-Google-Smtp-Source: AGHT+IFV3hK9icrAOXuX/rCJ/JH14sy8qoCgjiZo+BhHk3LoaQ5nuPc9SKGOfXNgMA8wQVvV3GjLYw==
+X-Received: by 2002:a05:600c:2901:b0:40d:f4bf:f0cd with SMTP id i1-20020a05600c290100b0040df4bff0cdmr1019896wmd.174.1704458544116;
+        Fri, 05 Jan 2024 04:42:24 -0800 (PST)
+Received: from debian ([93.184.186.109])
+        by smtp.gmail.com with ESMTPSA id f13-20020a05600c4e8d00b0040d887fda00sm1470441wmq.26.2024.01.05.04.42.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 04:15:04 -0800 (PST)
-Date: Fri, 5 Jan 2024 13:15:03 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Fri, 05 Jan 2024 04:42:23 -0800 (PST)
+Date: Fri, 5 Jan 2024 13:42:21 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Stefan Eichenberger <eichest@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [net-next 04/15] net/mlx5: SD, Implement basic query and
- instantiation
-Message-ID: <ZZfyx2ZFEjELQ7ZD@nanopsycho>
-References: <20231221005721.186607-1-saeed@kernel.org>
- <20231221005721.186607-5-saeed@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: marvell-88q2xxx: add driver for the Marvell
+ 88Q2220 PHY
+Message-ID: <20240105124221.GA30964@debian>
+References: <74d4b8f9-700e-45bc-af59-95a40a777b00@lunn.ch>
+ <20231216221151.GA143483@debian>
+ <28cc73bf-ed6d-49d8-b80b-4fbf5fa0442f@lunn.ch>
+ <20231217111538.GA3591@debian>
+ <ZX78ucHcNyEatXLD@eichest-laptop>
+ <20231218090932.GA4319@debian>
+ <ZYAqxPZHICtZO15O@eichest-laptop>
+ <20231219081117.GA3479@debian>
+ <ZYFfzei3SJSts5E/@eichest-laptop>
+ <5d545a9b-feda-4908-8f74-9218806451c1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,19 +87,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231221005721.186607-5-saeed@kernel.org>
+In-Reply-To: <5d545a9b-feda-4908-8f74-9218806451c1@lunn.ch>
 
-Thu, Dec 21, 2023 at 01:57:10AM CET, saeed@kernel.org wrote:
->From: Tariq Toukan <tariqt@nvidia.com>
+Am Tue, Dec 19, 2023 at 04:57:50PM +0100 schrieb Andrew Lunn:
+> > I am not sure that it will be accepted by the maintainers if you use a
+> > lot of registers that are not documented.
+> 
+> Sometimes there is no choice, there is no documentation except the
+> vendor crap driver which we try to clean up as much as possible, but
+> we still end up with lots of magic numbers.
+>
 
-[...]
+Hi Andrew, hi Stefan,
 
->+static int sd_init(struct mlx5_core_dev *dev)
+tried to reduce the init sequence. This worked for me:
 
-Could you maintain "mlx5_" prefix here and in the rest of the patches?
+static int mv88q222x_config_init(struct phy_device *phydev)
+{
+	int ret;
 
+	/* send_s detection threshold, slave and master */
+	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8032, 0x2020);
+	if (ret < 0)
+		return ret;
 
->+{
+	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0xa28);
+	if (ret < 0)
+		return ret;
 
-[...]
+	ret = phy_write_mmd(phydev, MDIO_MMD_AN, 0x8031, 0xc28);
+	if (ret < 0)
+		return ret;
+
+	ret = phy_write_mmd(phydev, MDIO_MMD_PCS, 0xffe4, 0xc);
+	if (ret < 0)
+		return ret;
+
+	return mv88q2xxx_config_init(phydev);
+}
+
+The four register writes were required to make the PHY work in 1000Mbit forced
+mode. When using autonegotiation or 100Mbit forced mode they weren't needed.
+It was enough to write them once in mv88q222x_config_init as you can
+see. Thanks Stefan for the hint with the first three register writes, it
+helped a lot.
+
+> 	Andrew
+
+Best regards,
+Dimitri
 
