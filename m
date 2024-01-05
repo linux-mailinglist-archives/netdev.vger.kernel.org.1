@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-62075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62F11825A2C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 19:31:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC277825A2E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 19:32:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB8AF1F26383
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:31:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B77A1F2663C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0008C2D60C;
-	Fri,  5 Jan 2024 18:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73EF935891;
+	Fri,  5 Jan 2024 18:32:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF7B358B8
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 18:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CEE2DF9E
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 18:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-35ff5a2fb06so14887115ab.3
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 10:31:26 -0800 (PST)
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7baec2c5f30so152128539f.0
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 10:32:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704479485; x=1705084285;
+        d=1e100.net; s=20230601; t=1704479541; x=1705084341;
         h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=0J45BElnGsnlb+hcSi7W72v1ypQ+RzOOzGvT7znb7Wo=;
-        b=SNA3sJ1wbZg4hfuLsDK7moVDwqVrMDMnnlWyd84gPRCcfhtu1Nywhy8Ii1ZguBrjsV
-         pxBQygykdP2mg1lRwgRjan2rkX+7r1Gv6XEtEBxS1bBPPNfTidrPx0M9ZP0IfRy7qrOW
-         UXHuiLdINtD58x2wPLwcXw69K63H/FyKhwUh2iNYyCpfXVVAzJAOHTpc82w07FsE3zdc
-         qHGmbPB+pVtVND/WcIX2uWO3wrdekfQYBzUHUXPrTRJKZKrOZ0YLqkVRmz2S1Qiwui90
-         KXeCOu5q3epMd/gJfS+ZWgXF+XpAUR3KQuS4dyjqmrY4gzAPdvfGgO4fXq5s3C789s4M
-         1WDw==
-X-Gm-Message-State: AOJu0Yz6nvlOjwtanL8ArHjj4dVQSTnTrGylqjyFnLEEQmV8AKXnmcH3
-	GNOEuHEdVNjWI6Nyev+wDOxm/wUNA9Pk6geLVyteh0Lv1bsu
-X-Google-Smtp-Source: AGHT+IGx1UdX66asp04qDOoBMB4tTiSQTl7K/1UZAYiUJitXSYvPGqWt1uE4tQUD6f0DIAPsgjfLMoNEGCYXQidnQykavyZf6RUs
+        b=cHOeh7yUy5RGDkuTe8QZB2spXbSswE8NF+KN4N8dDRv6mmZvNIk1ULyV2mxT7VkX4Z
+         Hu0sG5KQAvy/yXnS0zkUYH5MOCXheuIqpEFPqnPKbX6XdDZU46Q8NFznbNttxB9VT6WS
+         gCJE7n+ok71L3Ta4Q5uLshPmBkxdWftSipJZCXxUDBQk2Hfz0hyk9E50o18Jd20SDCNQ
+         O2QKKJ0ePyZt/DLSoQ/KGUvurVwTIKtcUEKbG2TC5EWco8CIfslujjwfI8HyKEeqyL9f
+         ZbslmjfGm4glm60GSk7s91PiyWyKUw96RMO3iiD04Y0NGHpPqo8lvAD4yBxfBPVU3hnA
+         PYXA==
+X-Gm-Message-State: AOJu0YzVwJXdMbSx28dwBlfUMOL4oTtxWd7/I5XgTPOI22sCnENOic8z
+	IN8KQDdBPGOu7ql7CKloc9//K5lW+k24HLqdozEftFcFPveS
+X-Google-Smtp-Source: AGHT+IF3MDgd6qrvcOf9O7j3paqcJ9pvkQKtSQ8eZF1LxpvdmItR2QxAXp03Lf1BZQ0FU4gNVujp6N3TcZr9t+ozB90n/Bguy7Qe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d90:b0:360:29f:b7b2 with SMTP id
- h16-20020a056e021d9000b00360029fb7b2mr386701ila.1.1704479485558; Fri, 05 Jan
- 2024 10:31:25 -0800 (PST)
-Date: Fri, 05 Jan 2024 10:31:25 -0800
+X-Received: by 2002:a05:6e02:18cc:b0:35f:ff56:c0fe with SMTP id
+ s12-20020a056e0218cc00b0035fff56c0femr386306ilu.1.1704479541202; Fri, 05 Jan
+ 2024 10:32:21 -0800 (PST)
+Date: Fri, 05 Jan 2024 10:32:21 -0800
 In-Reply-To: <000000000000a62351060e363bdc@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004387a7060e370efd@google.com>
+Message-ID: <000000000000949803060e3711e3@google.com>
 Subject: Re: [syzbot] [net?] memory leak in ___neigh_create (2)
 From: syzbot <syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com>
 To: alexander.mikhalitsyn@virtuozzo.com, davem@davemloft.net, den@openvz.org, 
