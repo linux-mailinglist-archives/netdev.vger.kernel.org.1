@@ -1,70 +1,103 @@
-Return-Path: <netdev+bounces-61993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF892825823
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:29:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 245CC8258B7
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E15F21C228CE
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:29:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9329B227CB
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3A92F50A;
-	Fri,  5 Jan 2024 16:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E53B31A71;
+	Fri,  5 Jan 2024 16:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yk8NChvN"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="Acz4kIcq";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="K9BYb8iT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+Received: from wnew3-smtp.messagingengine.com (wnew3-smtp.messagingengine.com [64.147.123.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676802E855
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 16:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704472161; x=1736008161;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ap9ZiI0bbm23P7wDGvK1BQnDmWDGHwxY8dYZ6nV64KM=;
-  b=Yk8NChvN+RWgKzh/9ijCoQ4kS5T+kdPmBEUd2g8jxBy17zrf89rYG6tQ
-   xdBQ3aMKzKU8kPUJ2IrSwhheP1TbPPZ/ZHD51hwad43G9cXev6pA29kHP
-   lTRsiC62opv6WYXEr1nixAw7dMevCC4fnMnrcCPaC45H7n11MRZ6QjRkT
-   a+VtbFutmsU2G+5jbBz7o8Mf7xhfNMgmynUQVEJubLO5+qfVWZUdN2Gu4
-   y+TKCIMxI5PAWBPrGSmV4I6QoceOWj8Ac+l1W5idcZS8IKL9cYzF7YzDJ
-   V3e0+UwzHJnddsDAuNVssan8/9YjmH4AtltW6f+ofg1QVZWmT3SOizWdI
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="463930308"
-X-IronPort-AV: E=Sophos;i="6.04,334,1695711600"; 
-   d="scan'208";a="463930308"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 08:29:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="899679537"
-X-IronPort-AV: E=Sophos;i="6.04,334,1695711600"; 
-   d="scan'208";a="899679537"
-Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.35.107])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 08:29:18 -0800
-Date: Fri, 5 Jan 2024 17:29:16 +0100
-From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>,
-	Marc MERLIN <marc@merlins.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
-Message-ID: <ZZguXLO3DAX/2Y0/@linux.intel.com>
-References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
- <20231206084448.53b48c49@kernel.org>
- <ZZU3OaybyLfrAa/0@linux.intel.com>
- <20240103153405.6b19492a@kernel.org>
- <ZZZrbUPUCTtDcUFU@linux.intel.com>
- <9bcfb259-1249-4efc-b581-056fb0a1c144@gmail.com>
- <20240104081656.67c6030c@kernel.org>
- <ZZftxhXzQykx8j6b@linux.intel.com>
- <20240105073001.15f2f3cb@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E9A2E823;
+	Fri,  5 Jan 2024 16:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailnew.west.internal (Postfix) with ESMTP id 643F82B002FE;
+	Fri,  5 Jan 2024 11:55:50 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Fri, 05 Jan 2024 11:55:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm1; t=1704473749; x=1704480949; bh=QW7jt9Lu7f
+	ke8mG4lP5bYmPmDvOXPBpGzIUDBHIekTk=; b=Acz4kIcq6y/rMD3GdA7cQZFH/X
+	t+UCDk8kiRTwuEzv4ajq3EDfufkIZkO8rGAkbX3sbhxHt16W2NOVO6gW2gQHxnZr
+	G4znBN6j8ey0yPSzv+AlK6ZSJwteCnfW3d+5qDl/eg2aJTqU9Tgdw3YjZEKbWiiA
+	xDjCkNbH8TatuNfFUavrE+ffldAtLl1v9baWSzFGVpUeiYCRlCeZGSoqIOyzPHvn
+	QzvCgTBrCyaLUW/MlTUJL8Udfek55UMpp0KfgTZyqMYearp0x1HoJW30AG1RainQ
+	7jUdJb7RD7OtoMFP4EUhEya/MWTwpfUkkKqXxvWzEKPyF0P6ySZ4aWmCm73g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1704473749; x=1704480949; bh=QW7jt9Lu7fke8mG4lP5bYmPmDvOX
+	PBpGzIUDBHIekTk=; b=K9BYb8iThvNsRc3uDbU2A4HF+NqmpozLE145a0RZM6s+
+	HlSs93vsFRPOZ4j+D7yanP8AH1MORLgVIUDI/smsj0tgQHb1QcdzskIXumAkTdaI
+	aYWKtH9GM5E2idjjTXJdHaRlRm+zABDB8nY9iGIO+T3ni/GGWRr3B/rAtlNxTMAa
+	442AnTkTIKtZDG71QbRbhfRDzlUBII9A+3MGR239UuUry3gcSCza/5J8eBt8YfDp
+	qSaUg0ncHYhXvJ5JLZQ2x+uSxOHpqddfG6B+3/DQ4dtJ8Bvy8Eo4uJ9FwtXpOXbS
+	lAKesJFuhuTY1UEqKamWKqMwsebhP2LexY2pyWEAjQ==
+X-ME-Sender: <xms:kzSYZaaAy3dR9G7HtiXxWg4Zxmeum0A9kFX20liLaKbR07SHFcyxcg>
+    <xme:kzSYZdYGOayfCataHnEAMMKquFtux6p39JzrR3A07WSDo0A-s4okO5JaDREMOkZsI
+    mghom6qS61yd_6_bg>
+X-ME-Received: <xmr:kzSYZU-FFGlFxqtZW9JrU1DfOghSBraArHdWeqKl_bYBn4B9XbhJJcaTjNPSd7Gh34QiYd3oUUZRytJdmx23CPk7Jxq8EIEzMnNLQ-s>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdegledgleduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    gfrhhlucfvnfffucdljedtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddt
+    tddvnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
+    cuggftrfgrthhtvghrnhepvdefkeetuddufeeigedtheefffekuedukeehudffudfffffg
+    geeitdetgfdvhfdvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:kzSYZcooOdkX-X1KqvlBh60yFjwUF6ho3KRoF4sCW1I-TfmvCqZcQA>
+    <xmx:kzSYZVqed9r_UIcFbBgVtpyedquDrgSmBEtX74gK0NVzOv-CO9t0Wg>
+    <xmx:kzSYZaTkEQUWNf-X1GtvBv5FK6CVlonQJvKyRbPer6PmkJB9Vt_cTA>
+    <xmx:lTSYZXSsnZAjmPDbBJ3T6sdwqsgrrVfZBsEsu-lv1wIgRfR5oMP26phlS_0>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 5 Jan 2024 11:55:44 -0500 (EST)
+Date: Fri, 5 Jan 2024 09:55:43 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Jiri Olsa <olsajiri@gmail.com>
+Cc: alexandre.torgue@foss.st.com, benjamin.tissoires@redhat.com,
+ 	lizefan.x@bytedance.com, Herbert Xu <herbert@gondor.apana.org.au>,
+ dsahern@kernel.org, 	hannes@cmpxchg.org, rostedt@goodmis.org,
+ mcoquelin.stm32@gmail.com, 	pablo@netfilter.org, martin.lau@linux.dev,
+ edumazet@google.com, daniel@iogearbox.net, 	ebiggers@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, 	hawk@kernel.org,
+ steffen.klassert@secunet.com, jikos@kernel.org, kuba@kernel.org,
+ 	fw@strlen.de, ast@kernel.org, song@kernel.org, pabeni@redhat.com,
+ 	shuah@kernel.org, tytso@mit.edu, tj@kernel.org, kadlec@netfilter.org,
+ 	davem@davemloft.net, mhiramat@kernel.org, andrii@kernel.org,
+ 	alexei.starovoitov@gmail.com, quentin@isovalent.com,
+ alan.maguire@oracle.com, memxor@gmail.com, 	kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, 	mathieu.desnoyers@efficios.com,
+ mykolal@fb.com, linux-input@vger.kernel.org,
+ 	linux-kernel@vger.kernel.org, fsverity@lists.linux.dev,
+ bpf@vger.kernel.org, 	cgroups@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ 	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-kselftest@vger.kernel.org,
+ 	linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH bpf-next v2 3/3] bpf: treewide: Annotate BPF kfuncs in BTF
+Message-ID: <4tsn6x45gh3vgdst3ozzmxori5gzylvpx6btxue6sbsmx7siok@6wajzdgwxfpa>
+References: <cover.1704422454.git.dxu@dxuuu.xyz>
+ <a923e3809955bdfd2bc8d6a103c20e01f1636dbc.1704422454.git.dxu@dxuuu.xyz>
+ <ZZgcJTdwMZHglPtr@krava>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,68 +106,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240105073001.15f2f3cb@kernel.org>
+In-Reply-To: <ZZgcJTdwMZHglPtr@krava>
 
-On Fri, Jan 05, 2024 at 07:30:01AM -0800, Jakub Kicinski wrote:
-> On Fri, 5 Jan 2024 12:53:42 +0100 Stanislaw Gruszka wrote:
-> > On Thu, Jan 04, 2024 at 08:16:56AM -0800, Jakub Kicinski wrote:
-> > > __dev_open() tries to resume as well, and is also under rtnl_lock.  
-> > 
-> > This one is plain 100% deadlock for igc (and igb before ac8c58f5b535)
-> > I'm opting for remove those rpm calls from __dev_open() and ethtool.
+On Fri, Jan 05, 2024 at 04:11:33PM +0100, Jiri Olsa wrote:
+> On Thu, Jan 04, 2024 at 07:45:49PM -0700, Daniel Xu wrote:
 > 
-> I don't know what gets powered down, exactly, in this device,
-> so I can't give you a concrete example. But usually there's
-> at least one ndo / ethtool callback which needs to resume
-> the device (and already holds rtnl_lock). Taking rtnl_lock
-> on the resume path is fundamentally broken.
-
-I agree with that.
-
-> Removing the
-> rpm calls from the core is just going to lead to a whack-a-mole
-> of bugs in the drivers themselves.
->
-> IOW I look at the RPM calls in the core as a canary for people
-> doing the wrong thing :(
-
-Hmm, this one I don't understand, what other bugs could pop up
-after reverting bd869245a3dcc and others that added rpm calls
-for the net core?
-
-> > > So that resume call somehow must never happen or users would see
-> > > -ENODEV? Sorry for the basic questions, the flow is confusing :S  
-> > 
-> > If we talk about situation before rpm calls were added to net core
-> > (i.e. < 5.9) there was open/ethtool -ENODEV error when igc/igb
-> > was runtime suspend due to netif_device_present() check fail.
-> > 
-> > That was by design, what for open the device and loose
-> > energy if there is no cable and device can not be used anyway ?
+> SNIP
 > 
-> I think "link" means actual link up here, no? As opposed to no cable
-> plugged in. If I understand that right - the device would have to train
-> the link in DOWN state in order for the device to be opened?
-> That would be quite wasteful in terms of power.
+> > diff --git a/fs/verity/measure.c b/fs/verity/measure.c
+> > index bf7a5f4cccaf..3969d54158d1 100644
+> > --- a/fs/verity/measure.c
+> > +++ b/fs/verity/measure.c
+> > @@ -159,9 +159,9 @@ __bpf_kfunc int bpf_get_fsverity_digest(struct file *file, struct bpf_dynptr_ker
+> >  
+> >  __bpf_kfunc_end_defs();
+> >  
+> > -BTF_SET8_START(fsverity_set_ids)
+> > +BTF_KFUNCS_START(fsverity_set_ids)
+> >  BTF_ID_FLAGS(func, bpf_get_fsverity_digest, KF_TRUSTED_ARGS)
+> > -BTF_SET8_END(fsverity_set_ids)
+> > +BTF_KFUNCS_END(fsverity_set_ids)
+> >  
+> >  static int bpf_get_fsverity_digest_filter(const struct bpf_prog *prog, u32 kfunc_id)
+> >  {
+> > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> > index 51e8b4bee0c8..8cc718f37a9d 100644
+> > --- a/kernel/bpf/btf.c
+> > +++ b/kernel/bpf/btf.c
+> > @@ -7802,6 +7802,10 @@ int register_btf_kfunc_id_set(enum bpf_prog_type prog_type,
+> >  {
+> >  	enum btf_kfunc_hook hook;
+> >  
+> > +	/* All kfuncs need to be tagged as such in BTF */
+> > +	if (WARN_ON(!(kset->set->flags & BTF_SET8_KFUNCS)))
+> > +		return -EINVAL;
+> 
+> having the warning for module with wrong set8 flags seems wrong to me,
+> I think we should trigger the warn only for kernel calls.. by adding
+> kset->owner check in the condition above
 
-I ment no cable plugged. When igc device was runtime suspended, and
-user connected the cable, user has to power device up via on > power/control
-and then ip link set up.
+Just checking:
 
-> Regardless, returning -ENODEV is really not how netdevs should behave.
-> That's what carrier reporting is for! :(
+The reasoning is that =m and out-of-tree modules can and should check
+return code, right?
 
-Ok, I can agrre with that. But I think this should be achived by not using
-netif_device_detach() in rpm suspend, not by
+And =y modules or vmlinux-based registrations do not check return code,
+so WARN() is necessary?
 
-        if (!netif_device_present(dev)) {
-                /* may be detached because parent is runtime-suspended */
-                if (dev->dev.parent)
-                        pm_runtime_resume(dev->dev.parent);
-                if (!netif_device_present(dev))
-                        return -ENODEV;
-        }
+If so, I'd agree.
 
-Regards
-Stanislaw
+[..]
+
+Thanks,
+Daniel
 
