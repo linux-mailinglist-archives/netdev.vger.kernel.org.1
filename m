@@ -1,71 +1,151 @@
-Return-Path: <netdev+bounces-61735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE72824C36
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:43:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1BEE824C42
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:55:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 918A8B22384
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:43:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEAD61C21E0C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48470380;
-	Fri,  5 Jan 2024 00:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DC3810;
+	Fri,  5 Jan 2024 00:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwPc/S1V"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="lKJ0KuPo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B482119;
-	Fri,  5 Jan 2024 00:43:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EBEE4C433CA;
-	Fri,  5 Jan 2024 00:43:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704415407;
-	bh=0ALR9i5u4x8CEja2JA3sxpvqLGsyenbxpiX4V7hmgPs=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=gwPc/S1VL3sfYT46lahjXxp89FCPU3fVP53s+NoWmNyMlPVnRmkkHq+IlM/RzPOmQ
-	 3q43CNSWVzMdewu9kwDbuINVK6VfNzYQXVAcRFp0Tepp1T5KbZ2vB/Kj2OZDDoqJmm
-	 SUgphRTBU9NEIyV6dj4r8lk4gtOF872LMG8JazQYzynlYEcA+qnQA3t76sOwzPpE6v
-	 cZgwHI72m07f4JLeE0IhO6FpbeLZu6MdQYw+34IoD4jMxNLc4IOeFU36AHyxV4H0yh
-	 7T5HuZMpW4tziYCFymIoAAFEBNdLBffLs0N1wayuV1QYdaO2Q7pUD627FgU6IJqo6+
-	 O5BkO05g0DpYg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D8585C4166F;
-	Fri,  5 Jan 2024 00:43:26 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.7-rc9
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240104182252.1963951-1-kuba@kernel.org>
-References: <20240104182252.1963951-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240104182252.1963951-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.7-rc9
-X-PR-Tracked-Commit-Id: 4c8530dc7d7da4abe97d65e8e038ce9852491369
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1f874787ed9a2d78ed59cb21d0d90ac0178eceb0
-Message-Id: <170441540687.16491.16965051525476963960.pr-tracker-bot@kernel.org>
-Date: Fri, 05 Jan 2024 00:43:26 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150B523A6;
+	Fri,  5 Jan 2024 00:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1704416111;
+	bh=8TrWvylCAPZ2BiUDABrg29fW1pEG9DML2Obb3DxuN1o=;
+	h=Date:From:To:Cc:Subject:From;
+	b=lKJ0KuPoPuQMvyN0atkOY5V2TOfP4L2rdbKErPIs3elna1teRJC+PaCnV9J2wO8/P
+	 mTeZbY9Md4x8Ys0I9mcjeD0g3GmEGqOf4Ka2JK2I6xK1JG9emCt2GYErmaqh+PdaEz
+	 +Ex+fXTj/Mk8t8Vzs+ofSduKQ+F/aVNZ8ymNEtNGf83qBHLr0Gp+HFqY/w1PbXdJTV
+	 zsWfCULSdwL4qD0D03OsoNJQ89y/zwbb5W6IoQ9GbU2GldnFVveVP9mYdeuEfkQjxw
+	 l37fZLAFRhXhYi1GQqfGi+LxTl1sLF2U+SYMO8ovZb+G+7ne/YajNuhb2vDyg6zihM
+	 izscRmY0HpaMQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4T5lNt58sQz4x1x;
+	Fri,  5 Jan 2024 11:55:10 +1100 (AEDT)
+Date: Fri, 5 Jan 2024 11:55:09 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Michael Chan <michael.chan@broadcom.com>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20240105115509.225aa8a2@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/rt2RrppPJEEeCHLheu3xs91";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-The pull request you sent on Thu,  4 Jan 2024 10:22:52 -0800:
+--Sig_/rt2RrppPJEEeCHLheu3xs91
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.7-rc9
+Hi all,
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1f874787ed9a2d78ed59cb21d0d90ac0178eceb0
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Thank you!
+  drivers/net/ethernet/broadcom/bnxt/bnxt.c
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+between commit:
+
+  e009b2efb7a8 ("bnxt_en: Remove mis-applied code from bnxt_cfg_ntp_filters=
+()")
+
+from the net tree and commit:
+
+  0f2b21477988 ("bnxt_en: Fix compile error without CONFIG_RFS_ACCEL")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index e1f1e646cf48,8f10ab4d4a43..000000000000
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@@ -13081,30 -14088,18 +14090,16 @@@ static void bnxt_cfg_ntp_filters(struc
+  				if (rc)
+  					del =3D true;
+  				else
+- 					set_bit(BNXT_FLTR_VALID, &fltr->state);
++ 					set_bit(BNXT_FLTR_VALID, &fltr->base.state);
+  			}
+ =20
+- 			if (del) {
+- 				spin_lock_bh(&bp->ntp_fltr_lock);
+- 				hlist_del_rcu(&fltr->hash);
+- 				bp->ntp_fltr_count--;
+- 				spin_unlock_bh(&bp->ntp_fltr_lock);
+- 				synchronize_rcu();
+- 				clear_bit(fltr->sw_id, bp->ntp_fltr_bmap);
+- 				kfree(fltr);
+- 			}
++ 			if (del)
++ 				bnxt_del_ntp_filter(bp, fltr);
+  		}
+  	}
+ -	if (test_and_clear_bit(BNXT_HWRM_PF_UNLOAD_SP_EVENT, &bp->sp_event))
+ -		netdev_info(bp->dev, "Receive PF driver unload event!\n");
++ #endif
+  }
+ =20
+- #else
+-=20
+- static void bnxt_cfg_ntp_filters(struct bnxt *bp)
+- {
+- }
+-=20
+- #endif /* CONFIG_RFS_ACCEL */
+-=20
+  static int bnxt_udp_tunnel_set_port(struct net_device *netdev, unsigned i=
+nt table,
+  				    unsigned int entry, struct udp_tunnel_info *ti)
+  {
+
+--Sig_/rt2RrppPJEEeCHLheu3xs91
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmWXU20ACgkQAVBC80lX
+0Gwg/Qf9GX4MQ+uLcAc+deNFVMi7ZVCclDpzYzXt8kGQN10cSdXeLVRvozjzWIfT
+ZU+SULmostQaubrPXSlb/7tyAsU/+sRkvUe3+z1llmaWdPaaHuCzaoi6BBuuTWYh
+tq3s/osd+e/82/DG5tM54NBvuLH0sCsUttlyNNue7MsbGIcPyTljtTTp8yPltc23
+mOmBZKjjXIBhN33vUN5ZswsduE2P4Gj8elSm2UbD7cObPXi/5BhLLYxtQdo/9ug0
+e4K8HE4dXUY/kXvYhETE0q/ECn7ismKt4lQKme6L6oAY+cb7vMC2s5mde5QQxfSo
+a5tJVGGrgzxQQ/dFop1Ey2hVjcrvrA==
+=4a2U
+-----END PGP SIGNATURE-----
+
+--Sig_/rt2RrppPJEEeCHLheu3xs91--
 
