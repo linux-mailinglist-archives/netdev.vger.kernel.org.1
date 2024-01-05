@@ -1,137 +1,141 @@
-Return-Path: <netdev+bounces-61977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3021082572E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:53:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA8682573C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:55:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABC3CB23307
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:53:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A08C91F2195C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E741D2E651;
-	Fri,  5 Jan 2024 15:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EgTCbj7n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189DC2E65F;
+	Fri,  5 Jan 2024 15:55:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954232E634;
-	Fri,  5 Jan 2024 15:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8D2A61C0003;
-	Fri,  5 Jan 2024 15:53:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1704470006;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2g80y/5MAB47CRr2+a6WSVdW/+13sNXPjnzgr6k2OQw=;
-	b=EgTCbj7n3pDZeCmRS8rzp6gpHWce/IvZbRd5r6tCGGYSNrGwZBgsWkC3l/IreGV6fNhJmV
-	IpuLzJi0p8sITMce+O3dEE2lGSk1cwsr2nD3UDWjF6qp5EytRban2Mcn6EaWzGICTUyCo2
-	symVy7+qUi5+9SBBokGLwZY0OjX4e5A/9pDZHFBZnnIbZsjjvF2fqVE0vlXgLY306A7UI3
-	G5tfLwcvTgKrf6DETSwHokVmOqLOpjeuTJ1AngYaJiTQOvb2Nldowyk+/xLAxXFP8ARnRo
-	D4zQZavWUGGk59kbSvcoL6m6KcwVgGcAvPIDNSiio587SP6MMR3b31zQkhxeow==
-Date: Fri, 5 Jan 2024 16:53:23 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Claudiu
- <claudiu.beznea@tuxon.dev>, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- yuiko.oshino@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Claudiu Beznea
- <claudiu.beznea.uj@bp.renesas.com>
-Subject: Re: [PATCH net] net: phy: micrel: populate .soft_reset for KSZ9131
-Message-ID: <20240105165323.1105ecaf@device-28.home>
-In-Reply-To: <a2651f98-b598-4a05-9e05-d2912eeb55d2@lunn.ch>
-References: <20240105085242.1471050-1-claudiu.beznea.uj@bp.renesas.com>
-	<ZZfPOky2p/ZJMKCQ@shell.armlinux.org.uk>
-	<a2651f98-b598-4a05-9e05-d2912eeb55d2@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E252E652;
+	Fri,  5 Jan 2024 15:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4T67Lx2F0dz9sp4;
+	Fri,  5 Jan 2024 16:54:49 +0100 (CET)
+Message-ID: <7036c788-7d8c-4e36-8289-64f43a3f8610@v0yd.nl>
+Date: Fri, 5 Jan 2024 16:54:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Subject: Re: [PATCH 3/5] Bluetooth: hci_event: Remove limit of 2 reconnection
+ attempts
+Content-Language: en-US
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, verdre@v0yd.nl
+References: <20240102185933.64179-1-verdre@v0yd.nl>
+ <20240102185933.64179-4-verdre@v0yd.nl>
+ <CABBYNZLoivEW=yrDtTbu5SjGauESH0zHb7NXs0YaSKSKqre5GQ@mail.gmail.com>
+From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+In-Reply-To: <CABBYNZLoivEW=yrDtTbu5SjGauESH0zHb7NXs0YaSKSKqre5GQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4T67Lx2F0dz9sp4
 
-On Fri, 5 Jan 2024 15:36:29 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+Hi Luiz,
 
-> On Fri, Jan 05, 2024 at 09:43:22AM +0000, Russell King (Oracle) wrote:
-> > On Fri, Jan 05, 2024 at 10:52:42AM +0200, Claudiu wrote:  
-> > > The order of PHY-related operations in ravb_open() is as follows:
-> > > ravb_open() ->
-> > >   ravb_phy_start() ->
-> > >     ravb_phy_init() ->
-> > >       of_phy_connect() ->
-> > >         phy_connect_direct() ->
-> > > 	  phy_attach_direct() ->
-> > > 	    phy_init_hw() ->
-> > > 	      phydev->drv->soft_reset()
-> > > 	      phydev->drv->config_init()
-> > > 	      phydev->drv->config_intr()
-> > > 	    phy_resume()
-> > > 	      kszphy_resume()
-> > > 
-> > > The order of PHY-related operations in ravb_close is as follows:
-> > > ravb_close() ->
-> > >   phy_stop() ->
-> > >     phy_suspend() ->
-> > >       kszphy_suspend() ->
-> > >         genphy_suspend()
-> > > 	  // set BMCR_PDOWN bit in MII_BMCR  
-> > 
-> > Andrew,
-> > 
-> > This looks wrong to me - shouldn't we be resuming the PHY before
-> > attempting to configure it?  
+On 1/3/24 17:05, Luiz Augusto von Dentz wrote:
+> Hi Jonas,
 > 
-> Hummm. The opposite of phy_stop() is phy_start(). So it would be the
-> logical order to perform the resume as the first action of
-> phy_start(), not phy_attach_direct().
+> On Tue, Jan 2, 2024 at 1:59 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>
+>> Since commit 4c67bc74f016b0d360b8573e18969c0ff7926974, we retry connecting
+>> later when we get a "Command Disallowed" error returned by "Create
+>> Connection".
+>>
+>> In this commit the intention was to retry only once, and give up if we see
+>> "Command Disallowed" again on the second try.
+>>
+>> This made sense back then when the retry was initiated *only* from the
+>> "Connect Complete" event. If we received that event, we knew that now the
+>> card now must have a "free slot" for a new connection request again. These
+>> days we call hci_conn_check_pending() from a few more places though, and
+>> in these places we can't really be sure that there's a "free slot" on the
+>> card, so the second try to "Create Connection" might fail again.
+>>
+>> Deal with this by being less strict about these retries and try again
+>> every time we get "Command Disallowed" errors, removing the limitation to
+>> only two attempts.
+>>
+>> Since this can potentially cause us to enter an endless cycle of
+>> reconnection attempts, we'll add some guarding against that with the next
+>> commit.
 > 
-> In phy_connect_direct(), we don't need the PHY to be operational
-> yet. That happens with phy_start().
-> 
-> The standard says:
-> 
->   22.2.4.1.5 Power down
-> 
->   The PHY may be placed in a low-power consumption state by setting
->   bit 0.11 to a logic one. Clearing bit 0.11 to zero allows normal
->   operation. The specific behavior of a PHY in the power-down state is
->   implementation specific. While in the power-down state, the PHY
->   shall respond to management transactions.
-> 
-> So i would say this PHY is broken, its not responding to all
-> management transactions. So in that respect, Claudiu fix is correct.
-> 
-> But i also somewhat agree with you, this looks wrong, but in a
-> different way to how you see it. However, moving the phy_resume() to
-> phy_start() seems a bit risky. So i'm not sure we should actually do
-> that.
+> Don't see where you are doing such guarding, besides you seem to
+> assume HCI_ERROR_COMMAND_DISALLOWED would always means the controller
+> is busy, or something like that, but it could perform the connection
+> later, but that may not always be the case, thus why I think
+> reconnecting just a few number of times is better, if you really need
+> to keep retrying then this needs to be controlled by a policy in
+> userspace not hardcoded in the kernel, well I can even argument that
+> perhaps the initial number of reconnection shall be configurable so
+> one don't have to recompile the kernel if that needs changing.
 
-Looking at other PHYs similar to it like the 9031, the .soft_reset()
-was added to fix some similar issues :
+Yes, fair enough, the next commit assumes that COMMAND_DISALLOWED always 
+means busy. The guarding is that we stop retrying as soon as there's no 
+(competing) ongoing connection attempt nor an active inquiry, which 
+should eventually be the case no matter what, no?
 
-Issue :
-https://lore.kernel.org/netdev/a63ca542-db96-40ed-201d-59c609f565ce@gmail.com/
+I agree it's probably still better to not rely on this fairly complex 
+sanity check and keep the checking of attempts nonetheless.
 
-Fix :
-https://lore.kernel.org/netdev/6d3b1dce-7633-51a1-0556-97cd03304c2c@gmail.com/
+I think we could keep doing that if we check for 
+!hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT) && 
+!test_bit(HCI_INQUIRY, &hdev->flags) in hci_conn_check_pending() before 
+we actually retry, to make sure the retry counter doesn't get 
+incremented wrongly. I'll give that a try.
 
-We couldn't get a proper explanation back then. Could it be that they
-suffer from the same problem, but that it was more clearly documented
-for the 9131 ?
+> 
+>> Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
+>> ---
+>>   net/bluetooth/hci_event.c | 7 ++++---
+>>   1 file changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index e8b4a0126..e1f5b6f90 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -2323,12 +2323,13 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
+>>
+>>          if (status) {
+>>                  if (conn && conn->state == BT_CONNECT) {
+>> -                       if (status != HCI_ERROR_COMMAND_DISALLOWED || conn->attempt > 2) {
+>> +                       if (status == HCI_ERROR_COMMAND_DISALLOWED) {
+>> +                               conn->state = BT_CONNECT2;
+>> +                       } else {
+>>                                  conn->state = BT_CLOSED;
+>>                                  hci_connect_cfm(conn, status);
+>>                                  hci_conn_del(conn);
+>> -                       } else
+>> -                               conn->state = BT_CONNECT2;
+>> +                       }
+>>                  }
+>>          } else {
+>>                  if (!conn) {
+>> --
+>> 2.43.0
+>>
+> 
+> 
 
-Maxime
+Cheers,
+Jonas
 
