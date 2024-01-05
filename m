@@ -1,82 +1,74 @@
-Return-Path: <netdev+bounces-61745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B48CD824C61
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:10:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B710824C63
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:12:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7A571C21D97
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:10:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECA381F22E28
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF58E811;
-	Fri,  5 Jan 2024 01:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJMqLoeh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92985810;
+	Fri,  5 Jan 2024 01:12:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A0D1845;
-	Fri,  5 Jan 2024 01:10:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 087D6C433C8;
-	Fri,  5 Jan 2024 01:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704417026;
-	bh=X1uYVuZ7Fv1PsBspMsczLutj65fKRwv7ndeFJS0h+Ng=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DJMqLoehtf45VpXRDuO4gWaXzoyFEPZW2E+Q1k5CuYLUkFb9TDoSEzvDtmIAMCzcx
-	 eX4uvt2x5KzFYYCbaqm44Vw6r7V/pvg9PuWoOP5Lz7/FDlI5NTMUC+QAj+uncZi9Pw
-	 o1xWitG/BHUhVpB8m5L997itWit+hpwN8cCXjmCKB5tjRIisjC7t354jkkVeMjzIZ6
-	 dSTEzSzKROYor6A3QCDtBzA0Zs4D8QYbLkJ3mvy7sxb6hxw1i/TaYyTgS+NMi6LAzs
-	 WMjgNHLpTnKd3MT9ewPUsUsfZcD+QBVQpOQcGVhC/POH/O6F9nLJiDd69z3JWIvM3F
-	 DtnpbaxDvt2+w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDCA3C3959F;
-	Fri,  5 Jan 2024 01:10:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C642A1854;
+	Fri,  5 Jan 2024 01:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4T5llb6168zsVD1;
+	Fri,  5 Jan 2024 09:11:23 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 47DA718006F;
+	Fri,  5 Jan 2024 09:12:01 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 5 Jan 2024 09:12:00 +0800
+Message-ID: <6126f6ae-e4af-49ce-8536-8e2cd2cfc8b2@huawei.com>
+Date: Fri, 5 Jan 2024 09:11:59 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-next-2024-01-03
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170441702590.30208.11390813358912311218.git-patchwork-notify@kernel.org>
-Date: Fri, 05 Jan 2024 01:10:25 +0000
-References: <20240103144423.52269-3-johannes@sipsolutions.net>
-In-Reply-To: <20240103144423.52269-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <shenjian15@huawei.com>,
+	<wangjie125@huawei.com>, <liuyonglong@huawei.com>, <lanhao@huawei.com>,
+	<wangpeiyang1@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V4 net-next 0/4] There are some features for the HNS3
+ ethernet driver
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20231219013513.2589845-1-shaojijie@huawei.com>
+ <7f561916-a7ad-4189-b3a7-dfe43f9daeaa@huawei.com>
+ <20240104074843.29021784@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20240104074843.29021784@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-Hello:
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+on 2024/1/4 23:48, Jakub Kicinski wrote:
+> On Thu, 4 Jan 2024 19:17:35 +0800 Jijie Shao wrote:
+>> Excuse me, This series has not been applied for a long time.
+>>
+>> Is there any problem with this series?
+> It got marked as Changes Requested over the winter shutdown / break.
+> I'm not exactly sure why, to be honest. Please repost.
 
-On Wed,  3 Jan 2024 15:43:39 +0100 you wrote:
-> Hi,
-> 
-> So ... since we were discussing and wrapping up the kunit stuff,
-> I decided to put together another pull request with a few things,
-> notably the first kunit tests for wifi.
-> 
-> Please pull and let us know if there's any problem.
-> 
-> [...]
+Okay, I've reposted it.
 
-Here is the summary with links:
-  - pull-request: wireless-next-2024-01-03
-    https://git.kernel.org/netdev/net-next/c/a180b0b1a6c4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Thank you
 
 
