@@ -1,69 +1,73 @@
-Return-Path: <netdev+bounces-61758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBBFD824CE7
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 03:25:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F22824CE9
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 03:26:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D63341C21C65
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:25:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 927F91C21B93
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6891FD7;
-	Fri,  5 Jan 2024 02:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CE11FC4;
+	Fri,  5 Jan 2024 02:26:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o4GsTItl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HBd+5R8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CC31FBF;
-	Fri,  5 Jan 2024 02:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9Fm13D6HkTMzEZBlOarDnIVaiSDDHq61aKHqbRpbK1E=; b=o4GsTItlbg+grt7he924K/ku2I
-	5+z0tWqqFd2nbLjRcJ8orIs0aKlySKR+eL+k4wUwmoF4/O5x2EniSQ2Qga17JV0zNUmjgPDIaH1Ee
-	s0V1ZkV/FPJ+h0CtIu6Pel8NQDLjdCDPNaPuqRdEaDINZtPui0O9ZNztJI6M/ncFOrcE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rLZtq-004Pl0-14; Fri, 05 Jan 2024 03:25:30 +0100
-Date: Fri, 5 Jan 2024 03:25:30 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	William Zhang <william.zhang@broadcom.com>,
-	Anand Gore <anand.gore@broadcom.com>,
-	Kursad Oney <kursad.oney@broadcom.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF1A1FB4
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 02:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6dac8955af0so679004b3a.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 18:26:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704421577; x=1705026377; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=46tIkZqvPiG0RkOGTbp0WUT/21LC14aHSoIc/kyTXKc=;
+        b=HBd+5R8oXXz+M0PAFz0PfIHlx5tdlRc0EjG5Gb4bNwfoDyJyA6th2qOWzJ79xwPKUE
+         KQ/ovL84ERjHkwnEktX/oJkdIZG95eFG2Ut5Yc7ZpQrFuy9yGu0+u2aYCtqKpNvLLpH7
+         wqENgzJt9Lyh9gNTuwekMJ4mutEFoOm5Yj2frlRUetk1v6U/43YxQBU/1lXWxfYd9yYc
+         GDFk0mFaz+AzpencL+olxEyLH1N6Bc/mUHmYqvPjifKev8eET86bYErGjpblNeK51ohY
+         YXhA0WqTkm69367VrlFCQrcgDUFTMoPgSizCWlHDIxxc9Ud4OrnLtgtKGI2eePkqn6W+
+         dnXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704421577; x=1705026377;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=46tIkZqvPiG0RkOGTbp0WUT/21LC14aHSoIc/kyTXKc=;
+        b=dPJ/xH7c697fy+G7RVdsmen5lAI3XieyGCn/xrsddfVWAdJn6KmB3FBAwVhawdBSyk
+         +c0o3N4Zzkja8tB7rjxIfPpBDMQtFfjWXI4JsnQ5Fp9XGHLsUhqeOk/ahozWqBn4zp0X
+         JoiIfm61DMI32WNxKmZiEwFjYAsAM/fGE1T3xeVbtG94xT0MAq/RCUoWktDsmr9VDHNn
+         yBMe3hs6ba79t6YkbAsAY9ANtrN6snmpKSnoUi1+B0D7R7o+B24f29FC++bYbxyxW2+r
+         8zgqwONAXPxvO8m2VKsN7E8RdJLW8ftXSKs9g3oCh1qYt1TU+HuJUJ2ZCib08GGzN1Tg
+         CdSw==
+X-Gm-Message-State: AOJu0YyOI5SytKIesvPzD/TaKwJdwUmcxKJHyVEE7tLeMUs3P9QpQ4FA
+	PZiLdC8IM3QQFdyLC6DKInEtP4DqhDd1OCgdejY=
+X-Google-Smtp-Source: AGHT+IEkycrgFVn5RyLsdf/0PbylTHpx3lM0rNkPdPSYLJxqFDb5hbjTBOXhji5zusGPZAl0zzPbqQ==
+X-Received: by 2002:a05:6a00:4604:b0:6da:16e9:9b34 with SMTP id ko4-20020a056a00460400b006da16e99b34mr126523pfb.67.1704421576711;
+        Thu, 04 Jan 2024 18:26:16 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id w2-20020a626202000000b006daca8ecb85sm343782pfb.139.2024.01.04.18.26.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jan 2024 18:26:16 -0800 (PST)
+Date: Fri, 5 Jan 2024 10:26:11 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
-	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
-	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v8 3/5] net: phy: add support for PHY LEDs
- polarity modes
-Message-ID: <957df01b-bb92-4f8a-9f2b-aacd3de1208d@lunn.ch>
-References: <20240104110114.2020-1-ansuelsmth@gmail.com>
- <20240104110114.2020-4-ansuelsmth@gmail.com>
- <47f18def-d34f-4224-9de2-6e0ae7122a52@lunn.ch>
- <6597286c.050a0220.4684a.182e@mx.google.com>
+	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net v3 2/2] selftests: rtnetlink: check enslaving iface
+ in a bond
+Message-ID: <ZZdow05irUiN1c8x@Laptop-X1>
+References: <20240104164300.3870209-1-nicolas.dichtel@6wind.com>
+ <20240104164300.3870209-3-nicolas.dichtel@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,28 +76,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6597286c.050a0220.4684a.182e@mx.google.com>
+In-Reply-To: <20240104164300.3870209-3-nicolas.dichtel@6wind.com>
 
-> > > +	 * @dev: PHY device which has the LED
-> > > +	 * @index: Which LED of the PHY device or -1
-> > > +	 * @modes: bitmap of LED polarity modes
-> > > +	 *
-> > > +	 * Configure LED with all the required polarity modes in @modes
-> > > +	 * to make it correctly turn ON or OFF.
-> > 
-> > index == -1 should be explained.
-> >
-> 
-> If you are referring to the special way of setting the LED globally,
-> that is not a thing anymore. Rob pointed out that having the double
-> reference in DT is problematic and PHY driver should handle that
-> internally.
+On Thu, Jan 04, 2024 at 05:43:00PM +0100, Nicolas Dichtel wrote:
+> +kci_test_enslave_bonding()
+> +{
+> +	local testns="testns"
+> +	local bond="bond123"
+> +	local dummy="dummy123"
+> +	local ret=0
+> +
+> +	run_cmd ip netns add "$testns"
+> +	if [ $? -ne 0 ]; then
+> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
+> +		return $ksft_skip
+> +	fi
+> +
+> +	# test native tunnel
+> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
 
-So it sounds like you need to change
+Hi Nicolas,
 
-> > > +	 * @index: Which LED of the PHY device or -1
+If you are going to target the patch to net-next. Please update it in the
+subject. And use `setup_ns` when create new netns.
 
-to remove the 'or -1'
-
-   Andrew
+Thanks
+Hangbin
 
