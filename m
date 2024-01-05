@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-61799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FF40824FD6
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:27:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7565824FD9
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:28:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DC341F239DB
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 08:27:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA4071C22C48
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 08:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D781A225D6;
-	Fri,  5 Jan 2024 08:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8435921376;
+	Fri,  5 Jan 2024 08:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="ft9p0Rvq"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="PQOnPIiA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E7C2D78D
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 08:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A9F2DF67
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 08:24:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a28a6cef709so143954266b.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 00:24:54 -0800 (PST)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a2888d65f1fso154259566b.1
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 00:24:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1704443092; x=1705047892; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1704443097; x=1705047897; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dZFMoutT1OQ8HdoT2b40UgTdsfQKAEafv0v+pAiov+w=;
-        b=ft9p0RvqjmKcN6JGEvHRVPCsnrLAqZ83Kw73PCVBgcH/i75mE9WiN0jz4IHpGxEq3O
-         6OqcNxA78YeC6Tc/54Vfamyonx+TGcrKD7bgouwMCBAMRIRfeFswNFrz5kYkTOoKCx3s
-         y3rKXESVs1dmt5Gc3SJjxoWnxFYd12uEzuowtb/aAQgd7ssQ7sWGwrZHmHGlDSNk2tMw
-         nkVWkuO9kfqEB3yJgMbraU3fbOPXi8MuCVEXezodOaY9LhLpRlJPegT/FBcYZAf8YIOh
-         onnvDZK5Bnxm813DRJ3GPb5iFk8hGvJomsPuObFTLtCcWy85DRxVNU502YS7xgccd/+P
-         XFAw==
+        bh=5orQgwfDjSBIeq4ujM8DL6jz3CCIaE3k0jKXQPZpdUw=;
+        b=PQOnPIiAM+K/1FD5C+58uAbe9lf+6xzCMUQPaflCfyvfDvEwLX3wzuNMnPuZRfV4Co
+         V6W1Yhq13VBKOdirmUGMcX9Q2YMvsz3gHS3St4c3EDNk8XnZ8bjH9TyWWVm38gZcNo+U
+         IaRVmuAafsorcwt4BHD8WjS6kjcqMzPJcS9vbXzfvqDSpn5O+iJkXrFe4GFDahtChwL0
+         50KW7dYLeP5ArDVWvjbSCEfR/tKwzcNq+JUDRaWnw7YHCg9gtOpn1YrGGPHHrXW3tqfK
+         QFTEtWJFae0FVWREHd0+wyze6w4sUYVWfQVtq2+VaAgBTcsz24Y3uaUzkfAFmGQOFklg
+         P3EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704443092; x=1705047892;
+        d=1e100.net; s=20230601; t=1704443097; x=1705047897;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dZFMoutT1OQ8HdoT2b40UgTdsfQKAEafv0v+pAiov+w=;
-        b=SSejWYSuBoucE9m/jjiFE8K1SSCLem16od1RbFv39NpmrH703UwZo0727y6vYtNRy0
-         FslIqoK/2/uu62CHdBqArABAFnLNWrbDFN3Li8HFIVBMjDL8xiHhBoaEniY24GSMrrii
-         kwtYLl8XT1gWKncB2f6Rwf3zF8HQ/r6Hy6uButEgqo+msVysTi4gzPkwN45pP12PdERs
-         S4Y+FwWWELsCETCN40CtNApDeTEwMHuvHrBPuxW77NSDqKlAq9G4hb9A5dSqTwmgFgG8
-         D6opYXBhoqUw9cmLHZgWwfJy+c2HrxVM0Vj9VkP1TnLKJkwBnHTfdtWAtN5pjT5Gqwfe
-         WSpg==
-X-Gm-Message-State: AOJu0YxHRE36Pa3yKqBtqQNiteXxM+WTcO8zAeeTccLTpIAL8jK2UjIo
-	6OEKhk+glYG5R4Up3NHXOhkmHPojwWUBkQ==
-X-Google-Smtp-Source: AGHT+IGamykpfCXZTmwezBWlaPRnK9OkJ4Kb09yxSJO3CZqMdbV0HbCFEN5cxq06kIiNKZqFPjeFHg==
-X-Received: by 2002:a17:906:19c:b0:a28:f8d2:4648 with SMTP id 28-20020a170906019c00b00a28f8d24648mr601871ejb.83.1704443092762;
-        Fri, 05 Jan 2024 00:24:52 -0800 (PST)
+        bh=5orQgwfDjSBIeq4ujM8DL6jz3CCIaE3k0jKXQPZpdUw=;
+        b=ZG2RBUG9lCZsjKeMK4yf4ZAN+x+J2vuSBwtMmWKOyDHgKbwL9ydRP9d65Pnf3j+53R
+         C/+O/H9suNZw2Nz8VKCHOGZoPWNJCDXY4qKqEtWTYU5tiX3u3RW/wr5LODhJ/4DXl+88
+         +ZZ3b1acrGXGMNZVyfvIkRmS9AENKosIn4lggQsNPSAg0QfX6YBdswDoQ6IPPGeQjsy5
+         DcNQMVk8t5Eb+cL6zZnpHbT2VbpyCffCk4jzQ7zxfWVrXzvFdmlRfbCPL5qEYfLPLFYr
+         SS9PwbeClJDs6gjWvs4UuyCIpkHB1ctPQ0fagnwNI21YU/riyYcnjOvV0sg31fafzBis
+         gjuA==
+X-Gm-Message-State: AOJu0Yz1z2lWXJCubW2w5q9nWHRGhHnsfsRq7DB+N4696c8oLi2bnZ5q
+	tlc9MLL877ZK/G2FFOxTju9/ImP+3J9Wqw==
+X-Google-Smtp-Source: AGHT+IEkZc0Hptsn2sBcPNILgoHuJbFuO9ppIzOuuw34IWt/pWvdc1gkNwY4WHzQpAQy5J2Bx+4Bpg==
+X-Received: by 2002:a17:906:474e:b0:a27:32a0:b838 with SMTP id j14-20020a170906474e00b00a2732a0b838mr986323ejs.112.1704443097504;
+        Fri, 05 Jan 2024 00:24:57 -0800 (PST)
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.5])
-        by smtp.gmail.com with ESMTPSA id j15-20020a1709064b4f00b00a28e759a447sm596198ejv.213.2024.01.05.00.24.48
+        by smtp.gmail.com with ESMTPSA id j15-20020a1709064b4f00b00a28e759a447sm596198ejv.213.2024.01.05.00.24.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 00:24:52 -0800 (PST)
+        Fri, 05 Jan 2024 00:24:57 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -74,9 +74,9 @@ Cc: netdev@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	geert+renesas@glider.be,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH net-next v3 11/19] net: ravb: Move DBAT configuration to the driver's ndo_open API
-Date: Fri,  5 Jan 2024 10:23:31 +0200
-Message-Id: <20240105082339.1468817-12-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next v3 12/19] net: ravb: Move PTP initialization in the driver's ndo_open API for ccc_gac platorms
+Date: Fri,  5 Jan 2024 10:23:32 +0200
+Message-Id: <20240105082339.1468817-13-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
@@ -90,10 +90,16 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-DBAT setup was done in the driver's probe API. As some IP variants switch
-to reset mode (and thus registers content is lost) when setting clocks
-(due to module standby functionality) to be able to implement runtime PM
-move the DBAT configuration in the driver's ndo_open API.
+The initialization sequence for PTP is the same for platforms with ccc_gac
+and gptp (according to "Figure 50.71 Flow of gPTP Initialization (Normal,
+Common to All Modes)" of the R-Car Series, 3rd generation hardware
+manual and "Figure 37A.53 Flow of gPTP Initialization (Normal, Common to
+All Modes)" of the RZ/G Series hardware manual).
+
+As some IP variants switch to reset mode (and thus the registers content is
+lost) when setting clocks (due to module standby functionality) to be able
+to implement runtime PM, move the PTP initialization to the driver's
+ndo_open API.
 
 This commit prepares the code for the addition of runtime PM.
 
@@ -102,35 +108,79 @@ Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 ---
 
 Changes in v3:
+- fixed typos in patch description
 - collected tags
 
 Changes in v2:
 - none; this patch is new
 
-
- drivers/net/ethernet/renesas/ravb_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/renesas/ravb_main.c | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 946abd7606ca..dbc26c3e95ec 100644
+index dbc26c3e95ec..1cc1ecd8d6a8 100644
 --- a/drivers/net/ethernet/renesas/ravb_main.c
 +++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -1826,6 +1826,7 @@ static int ravb_open(struct net_device *ndev)
- 		napi_enable(&priv->napi[RAVB_NC]);
+@@ -1837,7 +1837,7 @@ static int ravb_open(struct net_device *ndev)
+ 	ravb_set_gti(ndev);
  
- 	ravb_set_delay_mode(ndev);
-+	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+ 	/* Initialise PTP Clock driver */
+-	if (info->gptp)
++	if (info->gptp || info->ccc_gac)
+ 		ravb_ptp_init(ndev, priv->pdev);
  
- 	/* Device init */
- 	error = ravb_dmac_init(ndev);
-@@ -2769,7 +2770,6 @@ static int ravb_probe(struct platform_device *pdev)
- 	}
- 	for (q = RAVB_BE; q < DBAT_ENTRY_NUM; q++)
- 		priv->desc_bat[q].die_dt = DT_EOS;
--	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+ 	/* PHY control start */
+@@ -1851,7 +1851,7 @@ static int ravb_open(struct net_device *ndev)
  
+ out_ptp_stop:
+ 	/* Stop PTP Clock driver */
+-	if (info->gptp)
++	if (info->gptp || info->ccc_gac)
+ 		ravb_ptp_stop(ndev);
+ 	ravb_stop_dma(ndev);
+ out_napi_off:
+@@ -2161,7 +2161,7 @@ static int ravb_close(struct net_device *ndev)
+ 	ravb_write(ndev, 0, TIC);
+ 
+ 	/* Stop PTP Clock driver */
+-	if (info->gptp)
++	if (info->gptp || info->ccc_gac)
+ 		ravb_ptp_stop(ndev);
+ 
+ 	/* Set the config mode to stop the AVB-DMAC's processes */
+@@ -2774,10 +2774,6 @@ static int ravb_probe(struct platform_device *pdev)
  	/* Initialise HW timestamp list */
  	INIT_LIST_HEAD(&priv->ts_skb_list);
+ 
+-	/* Initialise PTP Clock driver */
+-	if (info->ccc_gac)
+-		ravb_ptp_init(ndev, pdev);
+-
+ 	/* Debug message level */
+ 	priv->msg_enable = RAVB_DEF_MSG_ENABLE;
+ 
+@@ -2822,10 +2818,6 @@ static int ravb_probe(struct platform_device *pdev)
+ out_dma_free:
+ 	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
+ 			  priv->desc_bat_dma);
+-
+-	/* Stop PTP Clock driver */
+-	if (info->ccc_gac)
+-		ravb_ptp_stop(ndev);
+ out_rpm_put:
+ 	pm_runtime_put(&pdev->dev);
+ out_rpm_disable:
+@@ -2851,10 +2843,6 @@ static void ravb_remove(struct platform_device *pdev)
+ 
+ 	ravb_mdio_release(priv);
+ 
+-	/* Stop PTP Clock driver */
+-	if (info->ccc_gac)
+-		ravb_ptp_stop(ndev);
+-
+ 	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
+ 			  priv->desc_bat_dma);
+ 
 -- 
 2.39.2
 
