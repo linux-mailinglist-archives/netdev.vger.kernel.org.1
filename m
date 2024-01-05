@@ -1,109 +1,159 @@
-Return-Path: <netdev+bounces-61766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36218824D1A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 03:43:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96827824D27
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 03:46:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4D4D2853DA
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:43:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 371F5B22983
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A278B1874;
-	Fri,  5 Jan 2024 02:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76C320EE;
+	Fri,  5 Jan 2024 02:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="em7sWEsr"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="OcasozcO";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SwtNdc1w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F326E20EB
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 02:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2cd0f4f306fso13816601fa.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 18:43:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704422597; x=1705027397; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hmU35AXmXhWN9C2gau/EQ/cnVcTnt071JiUMazx9nyw=;
-        b=em7sWEsrjFM+N6UU2JSj6Dyns52EvQtMSrgC5RUXAC8nc6k7krfbms5AsJcBmVrY6y
-         e+Irgm11Q+7PnSnXKDG5HNxV7Ue/5rxySlDD1FQQ6CjsgmsPALS82fwVSDfSl5pxwm0h
-         03fJDdsp8HZJc9fFTNQXu2A3XCWo68/0AJUjf9c+cSSzRfA1rfrCA+2d/wNlq410fmDx
-         EoSkqw8iWpVAkyk/8+d7bfNO3vmRF3WyvUEM7I4+JGbJ7QOOly+lPIOiKnsuJaeY8tLr
-         CSHikdWyXQcUI3Gu+jbgxb0bYsLtM2rr3lSoeMnNTayv3yuO3DcJ6GYkQX29sNhsk6PN
-         sKOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704422597; x=1705027397;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hmU35AXmXhWN9C2gau/EQ/cnVcTnt071JiUMazx9nyw=;
-        b=eQ7ylYIMC7aRQ0rMHUcYjZ7JWMNBLNz66lzZKD/5i/YpJ7aTfhQfsBM92oIO+T1U+T
-         7FxYedMG5E+KPgr8x/F6lJmDe4PiqWAzLUG+cikPP4GCGA5y6uz47IxXENKs2+5SJL1K
-         ezgm8KyPCretC9FkkWBKWVIjF8CMvSLcL7aYEcS8zcBp41Ns83apr4LnK+JDE5iuLb3a
-         Xm40OiEcqZnxVbFuUAt8umfPyNAl85efSDcPzbG6gol1yH0NnunzX8NcyICUvPUmWiMj
-         Ck+6Tu4oGn79voQSC5gH1V2QZP2kiAB9YiLODZlAUTfajV4Wuwc5j+NaadvBN86EfsWg
-         sRMg==
-X-Gm-Message-State: AOJu0Yx5ICNEJRkpWhegimOSQSpM1a2XB38CQJVj9JhSkJ0NC1Sgcz8V
-	r4CdWMwoYerzgUSGOKCfGnFNtskvmG0wkXxEbZ0=
-X-Google-Smtp-Source: AGHT+IFIqKgypgn+gp0mlh/58TXufCzLhf/aLBZU9tcmolPAiewoUupgA9FBjcAmvHRi8ACXaSK2LUtHgn5ZGrbRMuI=
-X-Received: by 2002:a2e:9995:0:b0:2cc:5cd5:9664 with SMTP id
- w21-20020a2e9995000000b002cc5cd59664mr694304lji.95.1704422596886; Thu, 04 Jan
- 2024 18:43:16 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB5D5243;
+	Fri,  5 Jan 2024 02:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailout.west.internal (Postfix) with ESMTP id 141D23200AA6;
+	Thu,  4 Jan 2024 21:45:59 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Thu, 04 Jan 2024 21:46:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1704422759; x=1704509159; bh=shDcnJN57Ps6qaIAEkU8F
+	J/na3mfjDv3/Jaj5tSn7IU=; b=OcasozcOKOlLR63MynS4l0InDlMwrPX2ZWPYJ
+	sL9DX86SvCu8ClrOS4Ku1E/E8EBuEQzobGdM6lFoJ19nUzSTxgCKGITiBc0S39hY
+	Pcx8qrwaDAdbdjb3cAHv+N28eqVEvlxez12Q/kXRn7DB5NKNh84BW7htzFfSHUzP
+	t7C2OBWu+Z/fYToQmQ2HHxDFUG8sVPELu+y7Jy6YUqM9Rv3m1aZvoJ8b/eQ5Drd+
+	6nh0dDlRQo78k717S8gTcLU5Pf5PoTfbmjVex4vtJCyQgJBOdz2/w8L/k+1/2sNd
+	BqGTyLDGXN6qyiqRdThOXvXF8qsX5Gh5rCsPHobIjIAo0UgyQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:date:date:feedback-id:feedback-id:from:from:in-reply-to
+	:message-id:mime-version:reply-to:subject:subject:to:to
+	:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1704422759; x=1704509159; bh=shDcnJN57Ps6qaIAEkU8FJ/na3mf
+	jDv3/Jaj5tSn7IU=; b=SwtNdc1wjrGjwlkXJqmjjSKnRxeS8MdkZ363QWm36EgS
+	mddXCYLacsTRIpi8y8SxIS8ae0Ml5kEBEC9RtfifypPk8QrFoKAPVc/f2lKvwzxR
+	CHvnrpCZZmpkTsRWd75mn9PNlIAYzHMlITEX5pPs6j7V6ItrsrCJVjvsiRlugRKh
+	M6sgk1g2xnckIxYNsFXOGm/0tahh05CI1YQNnusQhdwraz/k9WzJbgFlwrdMhDCV
+	8R7vPIXZrlNYLrikmQG7eWU/6R6izLHa4rHmhyUB2v3ZJcbkDtfzXdPcQuL8hsIz
+	GDxEtPW9f0fy/KfK0Wgne8WAkp7BxV5N0jt4XhgV7Q==
+X-ME-Sender: <xms:Z22XZUIlEeMLUw4eZXushJMMPyaEa929ROSx9QpRmbZrWfO0_caOTQ>
+    <xme:Z22XZUJFlPKG4VNtTOgMa0zpKuAYzMTXAU-J0V1zsNBFwSW5XHBcs-HePrqD7iAX_
+    poZiYAzx0RGczuiGg>
+X-ME-Received: <xmr:Z22XZUshk4uFI3tnHE6aJz1Jhu3SsjSdkhPNxxT1-5m7exUBEYcOBmdhQ4ZIhigtXY7XchBFgVWAu11CirM-dVF-pxN1ELQeKp9TjYr5eRqJSQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdegkedgheduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlfeehmdenucfjughrpefhvf
+    fufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihu
+    segugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeffffegjeduheelgfdtudekie
+    ejgfegheehjefgieejveevteeiveeukefgheekjeenucffohhmrghinhepghhithhhuhgs
+    rdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:Z22XZRb7lZ0XC9c6tko6WdioGTT3Z0Bn3BKhgNG-jAkKoTcA1oNxrw>
+    <xmx:Z22XZbZw_aDZopiaWtoB7ZRtvFEw3EgGf4BGU8wK-vYEJR9L4_kfig>
+    <xmx:Z22XZdAd23temfr2TZAASMVEg7nMo52uH5UCybPO6ETdyKrEtPpncQ>
+    <xmx:Z22XZcLxJGdXT7eBJpfdLcdVP6mzmxdQhoOdVdsU5pMdrvTubM93TA>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 4 Jan 2024 21:45:58 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: bpf@vger.kernel.org,
+	fsverity@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-input@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	cgroups@vger.kernel.org,
+	netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	olsajiri@gmail.com,
+	quentin@isovalent.com,
+	alan.maguire@oracle.com,
+	memxor@gmail.com
+Subject: [PATCH bpf-next v2 0/3] Annotate kfuncs in .BTF_ids section
+Date: Thu,  4 Jan 2024 19:45:46 -0700
+Message-ID: <cover.1704422454.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104140037.374166-1-vladimir.oltean@nxp.com> <20240104140037.374166-3-vladimir.oltean@nxp.com>
-In-Reply-To: <20240104140037.374166-3-vladimir.oltean@nxp.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 4 Jan 2024 23:43:05 -0300
-Message-ID: <CAJq09z4NL3TzgsLO9beowLo0xjU+LQg+vSJ0GVenKXavxju07w@mail.gmail.com>
-Subject: Re: [PATCH net-next 02/10] net: dsa: lantiq_gswip: use devres for
- internal MDIO bus, not ds->user_mii_bus
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Linus Walleij <linus.walleij@linaro.org>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Hauke Mehrtens <hauke@hauke-m.de>, Christian Marangi <ansuelsmth@gmail.com>, 
-	=?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-> This driver does not need any of the functionalities that make
-> ds->user_mii_bus special. Those use cases are listed here:
-> https://lore.kernel.org/netdev/20231221174746.hylsmr3f7g5byrsi@skbuf/
->
-> It just makes use of ds->user_mii_bus only as storage for its own MDIO
-> bus, which otherwise has no connection to the framework. This is because:
->
-> - the gswip driver only probes on OF: it fails if of_device_get_match_data()
->   returns NULL
->
-> - when the child OF node of the MDIO bus is absent, no MDIO bus is
->   registered at all, not even by the DSA framework. In order for that to
->   have happened, the gswip driver would have needed to provide
->   ->phy_read() and ->phy_write() in struct dsa_switch_ops, which it does
->   not.
->
-> We can break the connection between the gswip driver and the DSA
-> framework and still preserve the same functionality.
->
-> Since commit 3b73a7b8ec38 ("net: mdio_bus: add refcounting for fwnodes
-> to mdiobus"), MDIO buses take ownership of the OF node handled to them,
-> and release it on their own. The gswip driver no longer needs to do
-> this.
->
-> Combine that with devres, and we no longer need to keep track of
-> anything for teardown purposes.
->
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+=== Description ===
 
-Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+This is a bpf-treewide change that annotates all kfuncs as such inside
+.BTF_ids. This annotation eventually allows us to automatically generate
+kfunc prototypes from bpftool.
+
+We store this metadata inside a yet-unused flags field inside struct
+btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
+
+More details about the full chain of events are available in commit 3's
+description.
+
+The accompanying pahole changes (still needs some cleanup) can be viewed
+here on this "frozen" branch [0].
+
+[0]: https://github.com/danobi/pahole/tree/kfunc_btf-mailed
+
+=== Changelog ===
+
+Changes from v1:
+* Move WARN_ON() up a call level
+* Also return error when kfunc set is not properly tagged
+* Use BTF_KFUNCS_START/END instead of flags
+* Rename BTF_SET8_KFUNC to BTF_SET8_KFUNCS
+
+Daniel Xu (3):
+  bpf: btf: Support flags for BTF_SET8 sets
+  bpf: btf: Add BTF_KFUNCS_START/END macro pair
+  bpf: treewide: Annotate BPF kfuncs in BTF
+
+ drivers/hid/bpf/hid_bpf_dispatch.c            |  8 +++----
+ fs/verity/measure.c                           |  4 ++--
+ include/linux/btf_ids.h                       | 21 +++++++++++++++----
+ kernel/bpf/btf.c                              |  4 ++++
+ kernel/bpf/cpumask.c                          |  4 ++--
+ kernel/bpf/helpers.c                          |  8 +++----
+ kernel/bpf/map_iter.c                         |  4 ++--
+ kernel/cgroup/rstat.c                         |  4 ++--
+ kernel/trace/bpf_trace.c                      |  8 +++----
+ net/bpf/test_run.c                            |  8 +++----
+ net/core/filter.c                             | 16 +++++++-------
+ net/core/xdp.c                                |  4 ++--
+ net/ipv4/bpf_tcp_ca.c                         |  4 ++--
+ net/ipv4/fou_bpf.c                            |  4 ++--
+ net/ipv4/tcp_bbr.c                            |  4 ++--
+ net/ipv4/tcp_cubic.c                          |  4 ++--
+ net/ipv4/tcp_dctcp.c                          |  4 ++--
+ net/netfilter/nf_conntrack_bpf.c              |  4 ++--
+ net/netfilter/nf_nat_bpf.c                    |  4 ++--
+ net/xfrm/xfrm_interface_bpf.c                 |  4 ++--
+ net/xfrm/xfrm_state_bpf.c                     |  4 ++--
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  8 +++----
+ 22 files changed, 77 insertions(+), 60 deletions(-)
+
+-- 
+2.42.1
+
 
