@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-61841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE2682508A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:05:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4947B82508E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:06:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D4BBB24573
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:05:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1A6281A2E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A629D22EE6;
-	Fri,  5 Jan 2024 09:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F2022F04;
+	Fri,  5 Jan 2024 09:05:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7E0249F7;
-	Fri,  5 Jan 2024 09:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D3822F00;
+	Fri,  5 Jan 2024 09:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 40594OF202290068, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 40594OF202290068
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 40595Y9o82290263, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 40595Y9o82290263
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Jan 2024 17:04:24 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Fri, 5 Jan 2024 17:04:25 +0800
+	Fri, 5 Jan 2024 17:05:34 +0800
 Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Fri, 5 Jan 2024 17:04:24 +0800
+ 15.1.2375.32; Fri, 5 Jan 2024 17:05:35 +0800
+Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+ RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Fri, 5 Jan 2024 17:05:34 +0800
 Received: from RTEXDAG02.realtek.com.tw ([fe80::5d58:7838:d352:d6b8]) by
  RTEXDAG02.realtek.com.tw ([fe80::5d58:7838:d352:d6b8%5]) with mapi id
- 15.01.2375.007; Fri, 5 Jan 2024 17:04:24 +0800
+ 15.01.2375.007; Fri, 5 Jan 2024 17:05:34 +0800
 From: Justin Lai <justinlai0215@realtek.com>
 To: "kuba@kernel.org" <kuba@kernel.org>
 CC: "davem@davemloft.net" <davem@davemloft.net>,
@@ -48,16 +48,17 @@ CC: "davem@davemloft.net" <davem@davemloft.net>,
 	<andrew@lunn.ch>, Ping-Ke Shih <pkshih@realtek.com>,
         Larry Chiu
 	<larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v15 00/13] Add Realtek automotive PCIe driver
-Thread-Topic: [PATCH net-next v15 00/13] Add Realtek automotive PCIe driver
-Thread-Index: AQHaP7WsVMnhWDE8rUecm1Fp4zn4I7DK7Oqg
-Date: Fri, 5 Jan 2024 09:04:24 +0000
-Message-ID: <989945faf17742a7a0ff858e88d3c472@realtek.com>
-References: <20240105090039.377561-1-justinlai0215@realtek.com>
-In-Reply-To: <20240105090039.377561-1-justinlai0215@realtek.com>
+Subject: RE: [PATCH net-next v15 05/13] rtase: Implement hardware configuration function
+Thread-Topic: [PATCH net-next v15 05/13] rtase: Implement hardware
+ configuration function
+Thread-Index: AQHaP7TzR1Pwa0RZA0mW//3lz45q0LDK7RgQ
+Date: Fri, 5 Jan 2024 09:05:34 +0000
+Message-ID: <f0265649af004c7a8a2ceb8451f3a650@realtek.com>
+References: <20240105085439.376802-1-justinlai0215@realtek.com>
+In-Reply-To: <20240105085439.376802-1-justinlai0215@realtek.com>
 Accept-Language: zh-TW, en-US
 Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
+x-kse-serverinfo: RTEXDAG02.realtek.com.tw, 9
 x-kse-antispam-interceptor-info: fallback
 x-kse-antivirus-interceptor-info: fallback
 Content-Type: text/plain; charset="us-ascii"
@@ -69,17 +70,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-> Subject: [PATCH net-next v15 00/13] Add Realtek automotive PCIe driver
+
+
+> -----Original Message-----
+> From: Justin Lai <justinlai0215@realtek.com>
+> Sent: Friday, January 5, 2024 4:55 PM
+> To: kuba@kernel.org
+> Cc: davem@davemloft.net; edumazet@google.com; pabeni@redhat.com;
+> linux-kernel@vger.kernel.org; netdev@vger.kernel.org; andrew@lunn.ch;
+> Ping-Ke Shih <pkshih@realtek.com>; Larry Chiu <larry.chiu@realtek.com>;
+> Justin Lai <justinlai0215@realtek.com>
+> Subject: [PATCH net-next v15 05/13] rtase: Implement hardware configurati=
+on
+> function
 >=20
-> This series includes adding realtek automotive ethernet driver and adding
-> rtase ethernet driver entry in MAINTAINERS file.
+> Implement rtase_hw_config to set default hardware settings, including set=
+ting
+> interrupt mitigation, tx/rx DMA burst, interframe gap time, rx packet fil=
+ter,
+> near fifo threshold and fill descriptor ring and tally counter address, a=
+nd
+> enable flow control. When filling the rx descriptor ring, the first group=
+ of
+> queues needs to be processed separately because the positions of the firs=
+t
+> group of queues are not regular with other subsequent groups. The other
+> queues are all newly added features, but we want to retain the original d=
+esign.
+> So they were not put together.
 >=20
-> This ethernet device driver for the PCIe interface of Realtek Automotive
-> Ethernet Switch,applicable to RTL9054, RTL9068, RTL9072, RTL9075, RTL9068=
-,
-> RTL9071.
+> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> ---
+>  .../net/ethernet/realtek/rtase/rtase_main.c   | 228 ++++++++++++++++++
+>  1 file changed, 228 insertions(+)
 >=20
+
 Sorry, this series of patches has not been sent completely, I will re-send =
 it again.
 
