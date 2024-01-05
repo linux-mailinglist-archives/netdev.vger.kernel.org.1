@@ -1,141 +1,200 @@
-Return-Path: <netdev+bounces-61978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA8682573C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:55:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8902082576E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:01:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A08C91F2195C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:55:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A13DD1C2316D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189DC2E65F;
-	Fri,  5 Jan 2024 15:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44672E65F;
+	Fri,  5 Jan 2024 16:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="itvsjfFf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2071.outbound.protection.outlook.com [40.107.100.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E252E652;
-	Fri,  5 Jan 2024 15:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4T67Lx2F0dz9sp4;
-	Fri,  5 Jan 2024 16:54:49 +0100 (CET)
-Message-ID: <7036c788-7d8c-4e36-8289-64f43a3f8610@v0yd.nl>
-Date: Fri, 5 Jan 2024 16:54:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124BE2E821;
+	Fri,  5 Jan 2024 16:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IBIIbcv4ihec6knCdJ5AG8ofTNwD36kS6h9WiDe4QKIdoE/wLt/RhPiahRK4+jIZD0EQ0VfxXhscdm9hSkPdNhRLBcx9N1ZpHIBxI6JUs2sYdipJBJFKfoug3qXEZ/sX0l7ofLRBAcQ7HlfwOFpIJRWwUGwMk51phq7KjKxvglFAoQo1ftgBIvteaI0J1T+sawTHvLmihiiKyOcStN7E+UOS2OPYwWSCAKjfTTVN2VInQW2HdLjq6kVpHYB9gb6BguEAg3cDx42aLoW0M/NlDmNcyrMyNK6vAkecOPaPP7PVivj6SsLvxs9U0MLmynbKQvb+UKtE6m1M3QYao8CrCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+XMpEgwyzWdp/e+b5mhwFJQ4OWGBvQypJUiKX2EKqlM=;
+ b=lZi1h/7Yy2WmaDbxtHz9S7jvBlvlbvOt0lZceCGJrqnITy2ikV/ronMbozrdmlWDNgGOTZLhtfrAiAsinztYYJlHV8nJw0fGFrzzGkEE4f/BQSRyl8N40/E9lHKbhNJj3NZgYCdkgKgVhn3FC5MTijDdhcEN0rQ/pDFbQrvO1STIhGsNseagasaWNPiQ9TQUpGtXqKf3unX1oEPzCjbi9FANKToIUzu5lLC4Fwvt2ox7ndb5B0c9jC0ACmgasNkNt3ZpQx4c0lPP8SJr2t3Y776opuX2lQicJmKMLCQnSb1t2fLgRE5RZ4300GIYAkYOxQ/JZCO0Y2UFE47Ah8rqyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+XMpEgwyzWdp/e+b5mhwFJQ4OWGBvQypJUiKX2EKqlM=;
+ b=itvsjfFfM0gdP8wyfn+O08U3iFc3ISJXy93ZVSyhMuNiZ4F38+o283ExtJiCqtv53uvkSTJcwWzxf0j97BFTFbm31IWrKoccTUiBWyjMLTr/aejQ3Jfn81UNc4t4L/+5M3xULUI/gya6HYG9ia4G9892eDlAYvgfH4TG9VWhOVoisNhIGn4e774l3ifJj1quolD9nXKOxxxsNLBBDHG8q+BonMDit+YG8xUUakssTnWIDstxNQOBCXCmCjKAiMIIyI6a6mDnG1cRIyZOR1dAlWcfgOyqeREjzGdtDhZF4CmDMBV7kJNqKsh95S7ZbIT/OXIxMKX9cVnfxoe7+0zNkg==
+Received: from DM6PR18CA0015.namprd18.prod.outlook.com (2603:10b6:5:15b::28)
+ by SA1PR12MB8966.namprd12.prod.outlook.com (2603:10b6:806:385::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.16; Fri, 5 Jan
+ 2024 16:00:04 +0000
+Received: from DS3PEPF000099D6.namprd04.prod.outlook.com
+ (2603:10b6:5:15b:cafe::1) by DM6PR18CA0015.outlook.office365.com
+ (2603:10b6:5:15b::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.24 via Frontend
+ Transport; Fri, 5 Jan 2024 16:00:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ DS3PEPF000099D6.mail.protection.outlook.com (10.167.17.7) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7159.9 via Frontend Transport; Fri, 5 Jan 2024 16:00:04 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 5 Jan 2024
+ 07:59:50 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Fri, 5 Jan 2024 07:59:50 -0800
+Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.986.41 via Frontend
+ Transport; Fri, 5 Jan 2024 07:59:48 -0800
+From: Asmaa Mnebhi <asmaa@nvidia.com>
+To: <davem@davemloft.net>, <f.fainelli@gmail.com>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <tbogendoerfer@suse.de>,
+	<horms@kernel.org>
+CC: Asmaa Mnebhi <asmaa@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <davthompson@nvidia.com>
+Subject: [PATCH net v4] mlxbf_gige: Fix intermittent no ip issue
+Date: Fri, 5 Jan 2024 10:59:46 -0500
+Message-ID: <20240105155946.23121-1-asmaa@nvidia.com>
+X-Mailer: git-send-email 2.30.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/5] Bluetooth: hci_event: Remove limit of 2 reconnection
- attempts
-Content-Language: en-US
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240102185933.64179-1-verdre@v0yd.nl>
- <20240102185933.64179-4-verdre@v0yd.nl>
- <CABBYNZLoivEW=yrDtTbu5SjGauESH0zHb7NXs0YaSKSKqre5GQ@mail.gmail.com>
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-In-Reply-To: <CABBYNZLoivEW=yrDtTbu5SjGauESH0zHb7NXs0YaSKSKqre5GQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4T67Lx2F0dz9sp4
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D6:EE_|SA1PR12MB8966:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ef02b20-c3da-4175-979e-08dc0e076166
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	pp1qD6b8QkFPAjqPzwHMqqfpMbVJP11d9rEPE/MEYS/7PB71dON9UAqYp/fBah4QNJpJUDnhkR5OlfDwhz0GWvo/QS7EQAaw2APhEOBSnyj/Pd0tB0+eE8ZmdmcWNrso2Wnm/0/6AH20HyXpU14BE9Q21Q0ZWAbH18clwwR5eYySRAgufuEw+dssIst3WQOdv/fmhYOyXzotdKKCYVvNhIoF0iB5+Ao5ggcs72GStsdPK0xZ94AanhxBksi8KfIvD576ZoInYZX42xWmiSXHYLlNeJUQ1l7SIn9Fy7GAK7eNg4v8vOkQGRWfm9SfdskZixi3b6LzlAQu7vUAYngq/qvFjLIOO9CwKi2lIELFh9Pq2QftyiJn4/1fTwyTDu6U7Rk1ok52IPgdgc9yKjYrFGu43IJjZQ/3CfFf6M+v2S8KVmz0L2t0pYx6tzd3ITtS5PpN6Xr4a9abXwDmDgzgkahNzuJB0pUh8bHlnOEP0VJrQGgoDMIkKhDBcfwpdFp0DEbi7DzrsQtxDXTrbBYHzkSj6lKv3jWHY3+aOYHuQNk9Iaxcrs/mf1FjiQuBdxIozzZdHHUismTYs24fwd4a+2j8js2mXb7ZUrTX1tCBUUJgd9anbdODsluFrxuVIBJ4ztyPp0l3O8WgTvx62RznnogjhJ+PHjCvNrJ/t4FyauYp6zk3xUhKXzL+YYSXzPro0T7RXud/wW/+Of5Wse7/9nSaK9YOqhFADok+Yy+LgCEPN6+eMFVP3H85Fz/Kj3VC
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(39860400002)(346002)(376002)(230922051799003)(451199024)(1800799012)(64100799003)(82310400011)(186009)(46966006)(36840700001)(40470700004)(82740400003)(36860700001)(47076005)(86362001)(356005)(7636003)(41300700001)(478600001)(2906002)(5660300002)(7696005)(336012)(83380400001)(426003)(110136005)(1076003)(2616005)(26005)(8936002)(54906003)(8676002)(316002)(4326008)(107886003)(70206006)(70586007)(36756003)(40460700003)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2024 16:00:04.0034
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ef02b20-c3da-4175-979e-08dc0e076166
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099D6.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8966
 
-Hi Luiz,
+Although the link is up, there is no ip assigned on setups with high background
+traffic. Nothing is transmitted nor received. The RX error count keeps on
+increasing. After several minutes, the RX error count stagnates and the
+GigE interface finally gets an ip.
 
-On 1/3/24 17:05, Luiz Augusto von Dentz wrote:
-> Hi Jonas,
-> 
-> On Tue, Jan 2, 2024 at 1:59 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
->>
->> Since commit 4c67bc74f016b0d360b8573e18969c0ff7926974, we retry connecting
->> later when we get a "Command Disallowed" error returned by "Create
->> Connection".
->>
->> In this commit the intention was to retry only once, and give up if we see
->> "Command Disallowed" again on the second try.
->>
->> This made sense back then when the retry was initiated *only* from the
->> "Connect Complete" event. If we received that event, we knew that now the
->> card now must have a "free slot" for a new connection request again. These
->> days we call hci_conn_check_pending() from a few more places though, and
->> in these places we can't really be sure that there's a "free slot" on the
->> card, so the second try to "Create Connection" might fail again.
->>
->> Deal with this by being less strict about these retries and try again
->> every time we get "Command Disallowed" errors, removing the limitation to
->> only two attempts.
->>
->> Since this can potentially cause us to enter an endless cycle of
->> reconnection attempts, we'll add some guarding against that with the next
->> commit.
-> 
-> Don't see where you are doing such guarding, besides you seem to
-> assume HCI_ERROR_COMMAND_DISALLOWED would always means the controller
-> is busy, or something like that, but it could perform the connection
-> later, but that may not always be the case, thus why I think
-> reconnecting just a few number of times is better, if you really need
-> to keep retrying then this needs to be controlled by a policy in
-> userspace not hardcoded in the kernel, well I can even argument that
-> perhaps the initial number of reconnection shall be configurable so
-> one don't have to recompile the kernel if that needs changing.
+The issue is that mlxbf_gige_rx_init() is called before phy_start().
+As soon as the RX DMA is enabled in mlxbf_gige_rx_init(), the RX CI reaches the max
+of 128, and becomes equal to RX PI. RX CI doesn't decrease since the code hasn't
+ran phy_start yet.
+Bring the PHY up before starting the RX.
 
-Yes, fair enough, the next commit assumes that COMMAND_DISALLOWED always 
-means busy. The guarding is that we stop retrying as soon as there's no 
-(competing) ongoing connection attempt nor an active inquiry, which 
-should eventually be the case no matter what, no?
+Fixes: f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
+Reviewed-by: David Thompson <davthompson@nvidia.com>
+Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
+---
+v3->v4:
+- rebase
+- Fork this patch from bundle of unrelated bug fixes.
+- update the subject format
 
-I agree it's probably still better to not rely on this fairly complex 
-sanity check and keep the checking of attempts nonetheless.
+ .../ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c | 14 +++++++-------
+ .../ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c   |  6 +++---
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-I think we could keep doing that if we check for 
-!hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT) && 
-!test_bit(HCI_INQUIRY, &hdev->flags) in hci_conn_check_pending() before 
-we actually retry, to make sure the retry counter doesn't get 
-incremented wrongly. I'll give that a try.
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+index b3adc491bdb9..3385cf1ef9ae 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+@@ -147,14 +147,14 @@ static int mlxbf_gige_open(struct net_device *netdev)
+ 	 */
+ 	priv->valid_polarity = 0;
+ 
+-	err = mlxbf_gige_rx_init(priv);
++	phy_start(phydev);
++
++	err = mlxbf_gige_tx_init(priv);
+ 	if (err)
+ 		goto free_irqs;
+-	err = mlxbf_gige_tx_init(priv);
++	err = mlxbf_gige_rx_init(priv);
+ 	if (err)
+-		goto rx_deinit;
+-
+-	phy_start(phydev);
++		goto tx_deinit;
+ 
+ 	netif_napi_add(netdev, &priv->napi, mlxbf_gige_poll);
+ 	napi_enable(&priv->napi);
+@@ -176,8 +176,8 @@ static int mlxbf_gige_open(struct net_device *netdev)
+ 
+ 	return 0;
+ 
+-rx_deinit:
+-	mlxbf_gige_rx_deinit(priv);
++tx_deinit:
++	mlxbf_gige_tx_deinit(priv);
+ 
+ free_irqs:
+ 	mlxbf_gige_free_irqs(priv);
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c
+index 0d5a41a2ae01..a65fe026e1e6 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_rx.c
+@@ -142,6 +142,9 @@ int mlxbf_gige_rx_init(struct mlxbf_gige *priv)
+ 	writeq(MLXBF_GIGE_RX_MAC_FILTER_COUNT_PASS_EN,
+ 	       priv->base + MLXBF_GIGE_RX_MAC_FILTER_COUNT_PASS);
+ 
++	writeq(ilog2(priv->rx_q_entries),
++	       priv->base + MLXBF_GIGE_RX_WQE_SIZE_LOG2);
++
+ 	/* Clear MLXBF_GIGE_INT_MASK 'receive pkt' bit to
+ 	 * indicate readiness to receive interrupts
+ 	 */
+@@ -154,9 +157,6 @@ int mlxbf_gige_rx_init(struct mlxbf_gige *priv)
+ 	data |= MLXBF_GIGE_RX_DMA_EN;
+ 	writeq(data, priv->base + MLXBF_GIGE_RX_DMA);
+ 
+-	writeq(ilog2(priv->rx_q_entries),
+-	       priv->base + MLXBF_GIGE_RX_WQE_SIZE_LOG2);
+-
+ 	return 0;
+ 
+ free_wqe_and_skb:
+-- 
+2.30.1
 
-> 
->> Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
->> ---
->>   net/bluetooth/hci_event.c | 7 ++++---
->>   1 file changed, 4 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index e8b4a0126..e1f5b6f90 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -2323,12 +2323,13 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
->>
->>          if (status) {
->>                  if (conn && conn->state == BT_CONNECT) {
->> -                       if (status != HCI_ERROR_COMMAND_DISALLOWED || conn->attempt > 2) {
->> +                       if (status == HCI_ERROR_COMMAND_DISALLOWED) {
->> +                               conn->state = BT_CONNECT2;
->> +                       } else {
->>                                  conn->state = BT_CLOSED;
->>                                  hci_connect_cfm(conn, status);
->>                                  hci_conn_del(conn);
->> -                       } else
->> -                               conn->state = BT_CONNECT2;
->> +                       }
->>                  }
->>          } else {
->>                  if (!conn) {
->> --
->> 2.43.0
->>
-> 
-> 
-
-Cheers,
-Jonas
 
