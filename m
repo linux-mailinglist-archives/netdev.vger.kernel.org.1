@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-61911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C93E082530F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:44:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC0B825318
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:48:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B4062824E0
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:44:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 576DA2834AD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803A52C868;
-	Fri,  5 Jan 2024 11:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875692CCB4;
+	Fri,  5 Jan 2024 11:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="YCGtUSwX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TEYTNkqt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2432C848
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 11:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40e353c8d75so12348465e9.3
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 03:44:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704455089; x=1705059889; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=etXjTKhrSMNmHo1mq6MDLBdcw2n25mPs2Y1ZJz2pFZg=;
-        b=YCGtUSwXB3ywnBR4L/WfQ3WWtvFE8FpmXSOfssWAj3NcIusCJkHPR59E5Nr2FxtUWR
-         eaaJiE1T42W5mW2Ccd2kNgdXFthbm1FF1y/xf08pwO4fdBPN/O62bT9C/9jcPYeTJvr9
-         n1t2/dyMumZRanJKVChBQ/0fak3hW2a4jBhS25vQdTHjiyHsPKuhSyraBbFCoxIMLOxn
-         yPlgA+J15Drsl0+QZYKoGlULRDge8ulrNe8gdNwoSPBeGJS/RY+KueLkXIX9iYuCmK/p
-         gXgGBWEJw6hkU+oLYZ6x04U2K72RG0iq0xOOgnP2yi3f+8XVzQP+0QuszuxGnPmLOVoh
-         jkGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704455089; x=1705059889;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=etXjTKhrSMNmHo1mq6MDLBdcw2n25mPs2Y1ZJz2pFZg=;
-        b=FYE86pq6dQgkfG0SDrjZUPyXAdwx832NqDU8U7sEAwDLFzCRZJXIQjutGemfWg3xRi
-         K/t1wMIsuUmDA7wId0VUCEeBWU+h+gLrgaCfbxK6A9HFwNpF0mE3MPEt48Zx084axLXr
-         djCFzp/3+MGdWqu82PrvW3M4FMORuSBmigc7vrZwiFZM1L66HrApI3bugcEgsuR2Iysc
-         Cf7jWDIANJspNU0jin7by4r6u9Aqu1drIFqtoYPaA8kydNkT/dleGGiWfOOlKtQ7rDdV
-         JjrArQLilATC75BndI8/NWtoXpCT5OQNjGAnRaQ+TStcXuuihSnilEvfOS70u8u+cutm
-         FbgA==
-X-Gm-Message-State: AOJu0YxT2I5WRyK8GuCM1UgE/1N55zvmJRSrSsEwfMaGMjZALdm6yU0p
-	CWGMXS+WJzPgSBm9L+fmHfYCN/s+ORW3iA==
-X-Google-Smtp-Source: AGHT+IFpFiq7esnVsQDvz1IQYGhGCa3Q8sIvasiyhEOmg6g/AWNlZbOlKvoSZZS2QZm66U3FuGpCFQ==
-X-Received: by 2002:a7b:c381:0:b0:40d:5f55:3297 with SMTP id s1-20020a7bc381000000b0040d5f553297mr1034295wmj.22.1704455089342;
-        Fri, 05 Jan 2024 03:44:49 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id w1-20020a5d5441000000b0033674734a58sm1241453wrv.79.2024.01.05.03.44.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 03:44:48 -0800 (PST)
-Date: Fri, 5 Jan 2024 12:44:47 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, pkshih@realtek.com,
-	larry.chiu@realtek.com
-Subject: Re: [PATCH net-next v16 01/13] rtase: Add pci table supported in
- this module
-Message-ID: <ZZfrr8GFWqLs6-A3@nanopsycho>
-References: <20240105112811.380952-1-justinlai0215@realtek.com>
- <20240105112811.380952-2-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB96F2C6AC
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 11:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704455323;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UdkuJrloY5z20GFvK63EYCIWOROt9myvl6AMcuZWPfc=;
+	b=TEYTNkqtZI23FuE/mV8SveIfGzMCY3lkuoM80ghGUMX24Dj75bnegwtxJLhOeD5tGQ4/bp
+	xmnnTPPy8RDE6vCEEvMlaOUYXkPDcR+emOCMEwsrd0AuR/IpdbNyr/ClMCWPw3mvAxkEf9
+	hRDoHxpEnmRM/QqaKx+w6z+r/ICUssI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-6-n4FoMSSDMomKBOZPE4F-pg-1; Fri, 05 Jan 2024 06:48:40 -0500
+X-MC-Unique: n4FoMSSDMomKBOZPE4F-pg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 38878185A780;
+	Fri,  5 Jan 2024 11:48:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 153B51C060AF;
+	Fri,  5 Jan 2024 11:48:35 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <ZZeLAAf6qiieA5fy@casper.infradead.org>
+References: <ZZeLAAf6qiieA5fy@casper.infradead.org> <2202548.1703245791@warthog.procyon.org.uk> <20231221230153.GA1607352@dev-arch.thelio-3990X> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-38-dhowells@redhat.com> <2229136.1703246451@warthog.procyon.org.uk>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: dhowells@redhat.com, Nathan Chancellor <nathan@kernel.org>,
+    Anna Schumaker <Anna.Schumaker@netapp.com>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Fix oops in NFS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240105112811.380952-2-justinlai0215@realtek.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1098678.1704455315.1@warthog.procyon.org.uk>
+Date: Fri, 05 Jan 2024 11:48:35 +0000
+Message-ID: <1098679.1704455315@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Fri, Jan 05, 2024 at 12:27:59PM CET, justinlai0215@realtek.com wrote:
->Add pci table supported in this module, and implement pci_driver function
->to initialize this driver, remove this driver, or shutdown this driver.
->
->Signed-off-by: Justin Lai <justinlai0215@realtek.com>
->---
-> drivers/net/ethernet/realtek/rtase/rtase.h    | 336 ++++++++++
+Do you have CONFIG_NFS_FSCACHE set?  Are you using a cache?
 
-Hmm, you missed to address my feedback to v14
+David
 
-pw-bot: cr
 
