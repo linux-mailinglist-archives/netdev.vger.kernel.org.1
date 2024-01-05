@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-61935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 784C2825459
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:17:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D68F582545D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:18:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27383282C1A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:17:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0955E1C215AC
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:18:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A69C2C866;
-	Fri,  5 Jan 2024 13:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D712CCD8;
+	Fri,  5 Jan 2024 13:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VHzN0NrO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ldi8gPtP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84AF2D61B;
-	Fri,  5 Jan 2024 13:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oYkHg1D15kQrScL6uDog31ucMTQ1gHtOMHhxRiO58Dw=; b=VHzN0NrOusYaSJOab5F/XVEHAy
-	ME9lsChygVo6Tc5hQAtWtSJY3A4paxJCLwtNf1Nmfms1Fl/SsllQS6vVWbEtnJ5zmc+57xlf73Cz4
-	Y//Yd8HNLB+hMjtinImojOy1QQh1SU6eRF/8TaQnghZV+/RZf8/mNDpTbIU4Bfzc46tE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rLk4U-004SGe-Ub; Fri, 05 Jan 2024 14:17:10 +0100
-Date: Fri, 5 Jan 2024 14:17:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v5 07/13] net: ethtool: Introduce a command to
- list PHYs on an interface
-Message-ID: <2c955f94-7c95-4f66-b739-f0967ec9c171@lunn.ch>
-References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
- <20231221180047.1924733-8-maxime.chevallier@bootlin.com>
- <20240104153401.08ff9809@kernel.org>
- <20240105104311.03a35622@device-28.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6082E3F1;
+	Fri,  5 Jan 2024 13:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=lXZ6dhmE/ICvc6we7INUfg+/UsVr/HBiAoyEO42qbxw=; b=ldi8gPtPJVmH9PdcSI9hE76OmP
+	bSn24xnqUB/dIB3NWE1ZGvL1k9CyH/2/b5W1F/xMfNwPeQQB8PA61QIxM+nIJ5tkN5BPmEIKRdLf5
+	AGGnnFACaQ/HDlLDCE1LCLhlSIWVcflkgdChZ+jbY5EcHxk2EqRdKTdDhSsU9gOj+PHEb8nLqdxhd
+	nyO7BW9T/tc2hbvgNfhJN9et9ro64C9it0YlSwWohR/nGEl+9x4Tr/CneDxq+NYe75aC0dykUGEkD
+	/kVD9g/WG/FB8exdmfKBXOKQA2+e97wKF1RCOKeizvhWR5ypDLW4jACYvZs77dCxU5RIdEuHKMR/1
+	q/l2Rjyg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1rLk4u-000FpH-Mk; Fri, 05 Jan 2024 13:17:36 +0000
+Date: Fri, 5 Jan 2024 13:17:36 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Nathan Chancellor <nathan@kernel.org>,
+	Anna Schumaker <Anna.Schumaker@netapp.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Fix oops in NFS
+Message-ID: <ZZgBcJ7OAS7Ui6gi@casper.infradead.org>
+References: <ZZeLAAf6qiieA5fy@casper.infradead.org>
+ <2202548.1703245791@warthog.procyon.org.uk>
+ <20231221230153.GA1607352@dev-arch.thelio-3990X>
+ <20231221132400.1601991-1-dhowells@redhat.com>
+ <20231221132400.1601991-38-dhowells@redhat.com>
+ <2229136.1703246451@warthog.procyon.org.uk>
+ <1094259.1704449575@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,36 +70,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240105104311.03a35622@device-28.home>
+In-Reply-To: <1094259.1704449575@warthog.procyon.org.uk>
 
-> > > +int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
-> > > +{
-> > > +	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
-> > > +	struct net *net = sock_net(skb->sk);
-> > > +	unsigned long ifindex = 1;  
-> > 
-> > This doesn't look right, if dump gets full you gotta pick up
-> > when previous call left off.
+On Fri, Jan 05, 2024 at 10:12:55AM +0000, David Howells wrote:
+> Matthew Wilcox <willy@infradead.org> wrote:
 > 
-> I wasn't aware that this was the expected DUMP behaviour. So I should
-> keep track of the last dev and last phy_index dumped in the dump_ctx I
-> guess ? I'm not sure how I'm going to test this though, I only have
-> devices with at most 2 PHYs :(
+> > This commit (100ccd18bb41 in linux-next 20240104) is bad for me.  After
+> > it, running xfstests gives me first a bunch of errors along these lines:
+> > 
+> > 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-00037-g100ccd18bb41/kernel/fs/gfs2/gfs2.ko: Exec format error
+> > 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-00037-g100ccd18bb41/kernel/fs/zonefs/zonefs.ko: Exec format error
+> > 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-00037-g100ccd18bb41/kernel/security/keys/encrypted-keys/encrypted-keys.ko: Exec format error
+> > 
+> > and then later:
+> > 
+> > 00016 generic/001       run fstests generic/001 at 2024-01-05 04:50:46
+> > 00017 [not run] this test requires a valid $TEST_DEV
+> > 00017 generic/002       run fstests generic/002 at 2024-01-05 04:50:46
+> > 00017 [not run] this test requires a valid $TEST_DEV
+> > 00017 generic/003       run fstests generic/003 at 2024-01-05 04:50:47
+> > 00018 [not run] this test requires a valid $SCRATCH_DEV
+> > ...
+> > 
+> > so I think that's page cache corruption of some kind.
+> 
+> Is that being run on NFS?  Is /lib on NFS?
 
-At a guess....
+No NFS involvement; this is supposed to be an XFS test ...
 
-You are supposed to dump until you are out of space in the buffer. You
-then return what you have, and expect another call so you can continue
-with the rest.
+/dev/sda on / type ext4 (rw,relatime)
+host on /host type 9p (rw,relatime,access=client,trans=virtio)
+/dev/sdb on /mnt/test type xfs (rw,relatime,attr2,inode64,logbufs=8,logbsize=32k,noquota)
 
-Rather than fill the buffer, just hack the code to only put in a
-single PHY, and then return with the same condition of a full
-buffer. Hopefully you should get a second call, and you can then test
-your logic for picking up from where you left off.
+CONFIG_NETFS_SUPPORT=y
+# CONFIG_NETFS_STATS is not set
+# CONFIG_FSCACHE is not set
+CONFIG_NETWORK_FILESYSTEMS=y
+# CONFIG_NFS_FS is not set
+# CONFIG_NFSD is not set
+# CONFIG_CEPH_FS is not set
+# CONFIG_CIFS is not set
+# CONFIG_SMB_SERVER is not set
+# CONFIG_CODA_FS is not set
+# CONFIG_AFS_FS is not set
+CONFIG_9P_FS=y
+# CONFIG_9P_FS_POSIX_ACL is not set
+# CONFIG_9P_FS_SECURITY is not set
+CONFIG_NLS=y
 
-Another option might be to add PHY support to netdevsim. Add a debugfs
-interface to allow you to create arbitrary PHY topologies? You can
-then even add a test script.
-
-     Andrew
 
