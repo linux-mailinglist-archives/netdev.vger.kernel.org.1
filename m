@@ -1,116 +1,287 @@
-Return-Path: <netdev+bounces-61876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A34DD82525C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:49:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8FB9825267
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:51:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44F451F25742
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:49:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EF121F23840
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06BA286B5;
-	Fri,  5 Jan 2024 10:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0F225116;
+	Fri,  5 Jan 2024 10:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Yw7yCwmQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtAjA+qz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24E6250F4
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 10:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33723ad790cso1132775f8f.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 02:49:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1704451741; x=1705056541; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tlC4ZuUnj+RdifBxtkmCVpfFmYxPbtB+oy++4rULk2s=;
-        b=Yw7yCwmQbGLF7FLhimgyS09q27nvjhzN/EBIKgdL2PTxgsYisO7S0F0cKgXCZfrGpK
-         IdoKhW7r4g5ZKYCPaWioF9f5QiplquoleRo8QApsEpo3KQnGc3faNXwdwP5/tsJgGYbN
-         hzDQl33rp8Sj3hLlElLuaOAmFWgBXxUcqGRf13BkUB3uyQ97G3xGQG8T4htW37XFA0bU
-         4jLq/x2meRueLqxMgdEqsGYOVXHC6MWnpg+1KdSCCLujt6DuYAg+JLVCLroGayfzaiLX
-         5oGbSRCQKRZ+XyH6MDJ/vUpAATSnA74uZW14aHeZhCLbeXVc59mKwETpzQCi8yDakIJz
-         oZ/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704451741; x=1705056541;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tlC4ZuUnj+RdifBxtkmCVpfFmYxPbtB+oy++4rULk2s=;
-        b=S6vC0/c5bojF/ArxK2KBk+7/Z4MLxXESrcmXNmuPnvNIrLDjCZD7nNeeRxDiEj3sLv
-         /9m1itQH6gyILOhLCn2L9NaK13j6uhQZ0mxn+p1nYY329YoSoKP0WHo5Gmg3HV+n7X8v
-         DvcnVwOB9Os1WP6IbYzBznRrxn34nkiXazTZzBmIc5tFZw6iEbV+suTNhK1N2LIYbNDL
-         DvcJnBmyLsO6kJT+1tNF+p5aMsrV8Vmj1V3KZnPN7uvcEGkww5boitDFst6X3vEjogXU
-         pUbUKziRTyPdPst0RoX0qIsuPy5xIWbcuetLMpJgT/8GnJxlcmz5BlNxIp3/mNgCsJ94
-         CS2A==
-X-Gm-Message-State: AOJu0YwUiAwNiL1q1nMG6NKO7U8aKMqnDanx9L5I9EFXcYuCsK0SAHZ3
-	xxiDnhstPp3d21ScMoNh/OcvivdxlOdGQw==
-X-Google-Smtp-Source: AGHT+IGnMyI2CaJ1DdQhO2eUFu5ouUQNg8qA3YFljmscugwWggiF/uPVuxsRPFPvqce6KDDYnpofEQ==
-X-Received: by 2002:adf:a48d:0:b0:336:64c0:a1fa with SMTP id g13-20020adfa48d000000b0033664c0a1famr787866wrb.78.1704451740889;
-        Fri, 05 Jan 2024 02:49:00 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:144d:d8d:d728:b78b? ([2a01:e0a:b41:c160:144d:d8d:d728:b78b])
-        by smtp.gmail.com with ESMTPSA id r16-20020a056000015000b003373ef060d5sm1142061wrx.113.2024.01.05.02.48.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jan 2024 02:49:00 -0800 (PST)
-Message-ID: <7fe06d6c-0e4a-41e3-a111-71084972d023@6wind.com>
-Date: Fri, 5 Jan 2024 11:48:59 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B303250ED;
+	Fri,  5 Jan 2024 10:51:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46BD9C433C7;
+	Fri,  5 Jan 2024 10:51:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704451865;
+	bh=5HHiCiAjaAuvHgJa/tj8s1DVpjgUXb7qEvW/V/7Aapw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gtAjA+qznnwWl93QZ9tvOZhxh0Szm0vvtmllgiwfkyfHxLaVVPaFGmyMycpOeP+vr
+	 WpCTG92zlMM4drY5Zt0ek0Yyt1YhpAoNsFDaBKMdTzZmbkCJdQ04WJSQWYuW/+ePtV
+	 0633wfnere8l2LuGu9R3G+PVQTwNbLgfpj5vhvTidKfruSh2fay5O/vHj4F5ZpQrFb
+	 PXJRsGSNKRtz8I082lnvAslQSMKCbSYxkR6fOZy6BYFJ95Yw4A+zgA7J2YPNvh343k
+	 CPUlY39XZr3bGMsabr2LVQpbtd3AccsTbqRjqILZTDq3zh7muN0oWWpeHisBTvo84/
+	 BPIt3vU6dPstg==
+Date: Fri, 5 Jan 2024 10:50:59 +0000
+From: Simon Horman <horms@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
+	vimleshk@marvell.com, sedara@marvell.com, egallen@redhat.com,
+	mschmidt@redhat.com, pabeni@redhat.com, kuba@kernel.org,
+	wizhao@redhat.com, kheib@redhat.com, konguyen@redhat.com,
+	Veerasenareddy Burru <vburru@marvell.com>,
+	Satananda Burla <sburla@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 4/8] octeon_ep_vf: add Tx/Rx ring resource
+ setup and cleanup
+Message-ID: <20240105105059.GS31813@kernel.org>
+References: <20231223134000.2906144-1-srasheed@marvell.com>
+ <20231223134000.2906144-5-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net v3 2/2] selftests: rtnetlink: check enslaving iface in
- a bond
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-References: <20240104164300.3870209-1-nicolas.dichtel@6wind.com>
- <20240104164300.3870209-3-nicolas.dichtel@6wind.com>
- <ZZdow05irUiN1c8x@Laptop-X1>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <ZZdow05irUiN1c8x@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231223134000.2906144-5-srasheed@marvell.com>
 
-Le 05/01/2024 à 03:26, Hangbin Liu a écrit :
-> On Thu, Jan 04, 2024 at 05:43:00PM +0100, Nicolas Dichtel wrote:
->> +kci_test_enslave_bonding()
->> +{
->> +	local testns="testns"
->> +	local bond="bond123"
->> +	local dummy="dummy123"
->> +	local ret=0
->> +
->> +	run_cmd ip netns add "$testns"
->> +	if [ $? -ne 0 ]; then
->> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
->> +		return $ksft_skip
->> +	fi
->> +
->> +	# test native tunnel
->> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
+On Sat, Dec 23, 2023 at 05:39:56AM -0800, Shinas Rasheed wrote:
+> Implement Tx/Rx ring resource allocation and cleanup.
 > 
-> Hi Nicolas,
-> 
-> If you are going to target the patch to net-next. Please update it in the
-> subject. And use `setup_ns` when create new netns.
-As said in the v2 thread, I will send a follow-up once net gets merged into
-net-next.
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 
+Hi Shinas,
 
-Regards,
-Nicolas
+some minor feedback from my side.
+
+...
+
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
+
+...
+
+> +/**
+> + * octep_vf_oq_fill_ring_buffers() - fill initial receive buffers for Rx ring.
+> + *
+> + * @oq: Octeon Rx queue data structure.
+> + *
+> + * Return: 0, if successfully filled receive buffers for all descriptors.
+> + *         -1, if failed to allocate a buffer or failed to map for DMA.
+
+I think it is more idiomatic to use well known error codes
+in kernel code. In this case, perhaps -ENOMEM.
+
+Likewise elsewhere in this patch.
+
+> + */
+> +static int octep_vf_oq_fill_ring_buffers(struct octep_vf_oq *oq)
+> +{
+> +	struct octep_vf_oq_desc_hw *desc_ring = oq->desc_ring;
+> +	struct page *page;
+> +	u32 i;
+> +
+> +	for (i = 0; i < oq->max_count; i++) {
+> +		page = dev_alloc_page();
+> +		if (unlikely(!page)) {
+> +			dev_err(oq->dev, "Rx buffer alloc failed\n");
+> +			goto rx_buf_alloc_err;
+> +		}
+> +		desc_ring[i].buffer_ptr = dma_map_page(oq->dev, page, 0,
+> +						       PAGE_SIZE,
+> +						       DMA_FROM_DEVICE);
+> +		if (dma_mapping_error(oq->dev, desc_ring[i].buffer_ptr)) {
+> +			dev_err(oq->dev,
+> +				"OQ-%d buffer alloc: DMA mapping error!\n",
+> +				oq->q_no);
+> +			put_page(page);
+> +			goto dma_map_err;
+
+nit: I think put_page() can be moved to the dma_map_err label.
+
+> +		}
+> +		oq->buff_info[i].page = page;
+> +	}
+> +
+> +	return 0;
+> +
+> +dma_map_err:
+> +rx_buf_alloc_err:
+> +	while (i) {
+> +		i--;
+> +		dma_unmap_page(oq->dev, desc_ring[i].buffer_ptr, PAGE_SIZE, DMA_FROM_DEVICE);
+> +		put_page(oq->buff_info[i].page);
+> +		oq->buff_info[i].page = NULL;
+> +	}
+> +
+> +	return -1;
+> +}
+> +
+> +/**
+> + * octep_vf_setup_oq() - Setup a Rx queue.
+> + *
+> + * @oct: Octeon device private data structure.
+> + * @q_no: Rx queue number to be setup.
+> + *
+> + * Allocate resources for a Rx queue.
+> + */
+> +static int octep_vf_setup_oq(struct octep_vf_device *oct, int q_no)
+> +{
+> +	struct octep_vf_oq *oq;
+> +	u32 desc_ring_size;
+> +
+> +	oq = vzalloc(sizeof(*oq));
+> +	if (!oq)
+> +		goto create_oq_fail;
+> +	oct->oq[q_no] = oq;
+> +
+> +	oq->octep_vf_dev = oct;
+> +	oq->netdev = oct->netdev;
+> +	oq->dev = &oct->pdev->dev;
+> +	oq->q_no = q_no;
+> +	oq->max_count = CFG_GET_OQ_NUM_DESC(oct->conf);
+> +	oq->ring_size_mask = oq->max_count - 1;
+> +	oq->buffer_size = CFG_GET_OQ_BUF_SIZE(oct->conf);
+> +	oq->max_single_buffer_size = oq->buffer_size - OCTEP_VF_OQ_RESP_HW_SIZE;
+> +
+> +	/* When the hardware/firmware supports additional capabilities,
+> +	 * additional header is filled-in by Octeon after length field in
+> +	 * Rx packets. this header contains additional packet information.
+> +	 */
+> +	if (oct->fw_info.rx_ol_flags)
+> +		oq->max_single_buffer_size -= OCTEP_VF_OQ_RESP_HW_EXT_SIZE;
+> +
+> +	oq->refill_threshold = CFG_GET_OQ_REFILL_THRESHOLD(oct->conf);
+> +
+> +	desc_ring_size = oq->max_count * OCTEP_VF_OQ_DESC_SIZE;
+> +	oq->desc_ring = dma_alloc_coherent(oq->dev, desc_ring_size,
+> +					   &oq->desc_ring_dma, GFP_KERNEL);
+> +
+> +	if (unlikely(!oq->desc_ring)) {
+> +		dev_err(oq->dev,
+> +			"Failed to allocate DMA memory for OQ-%d !!\n", q_no);
+> +		goto desc_dma_alloc_err;
+> +	}
+> +
+> +	oq->buff_info = (struct octep_vf_rx_buffer *)
+> +			vzalloc(oq->max_count * OCTEP_VF_OQ_RECVBUF_SIZE);
+
+nit: there is no need to cast a void pointer.
+
+	oq->buff_info = vzalloc(oq->max_count * OCTEP_VF_OQ_RECVBUF_SIZE);
+
+> +	if (unlikely(!oq->buff_info)) {
+> +		dev_err(&oct->pdev->dev,
+> +			"Failed to allocate buffer info for OQ-%d\n", q_no);
+> +		goto buf_list_err;
+> +	}
+> +
+> +	if (octep_vf_oq_fill_ring_buffers(oq))
+> +		goto oq_fill_buff_err;
+> +
+> +	octep_vf_oq_reset_indices(oq);
+> +	oct->hw_ops.setup_oq_regs(oct, q_no);
+> +	oct->num_oqs++;
+> +
+> +	return 0;
+> +
+> +oq_fill_buff_err:
+> +	vfree(oq->buff_info);
+> +	oq->buff_info = NULL;
+> +buf_list_err:
+> +	dma_free_coherent(oq->dev, desc_ring_size,
+> +			  oq->desc_ring, oq->desc_ring_dma);
+> +	oq->desc_ring = NULL;
+> +desc_dma_alloc_err:
+> +	vfree(oq);
+> +	oct->oq[q_no] = NULL;
+> +create_oq_fail:
+> +	return -1;
+> +}
+
+...
+
+> +/**
+> + * octep_vf_free_oq() - Free Rx queue resources.
+> + *
+> + * @oq: Octeon Rx queue data structure.
+> + *
+> + * Free all resources of a Rx queue.
+> + */
+> +static int octep_vf_free_oq(struct octep_vf_oq *oq)
+> +{
+> +	struct octep_vf_device *oct = oq->octep_vf_dev;
+> +	int q_no = oq->q_no;
+> +
+> +	octep_vf_oq_free_ring_buffers(oq);
+> +
+> +	if (oq->buff_info)
+> +		vfree(oq->buff_info);
+
+nit: there is no need to check for NULL as vfree() can handle
+     a NULL argument.
+
+> +
+> +	if (oq->desc_ring)
+> +		dma_free_coherent(oq->dev,
+> +				  oq->max_count * OCTEP_VF_OQ_DESC_SIZE,
+> +				  oq->desc_ring, oq->desc_ring_dma);
+> +
+> +	vfree(oq);
+> +	oct->oq[q_no] = NULL;
+> +	oct->num_oqs--;
+> +	return 0;
+> +}
+
+...
+
+> +/**
+> + * octep_vf_free_iq() - Free Tx queue resources.
+> + *
+> + * @iq: Octeon Tx queue data structure.
+> + *
+> + * Free all the resources allocated for a Tx queue.
+> + */
+> +static void octep_vf_free_iq(struct octep_vf_iq *iq)
+> +{
+> +	struct octep_vf_device *oct = iq->octep_vf_dev;
+> +	u64 desc_ring_size, sglist_size;
+> +	int q_no = iq->q_no;
+> +
+> +	desc_ring_size = OCTEP_VF_IQ_DESC_SIZE * CFG_GET_IQ_NUM_DESC(oct->conf);
+> +
+> +	if (iq->buff_info)
+> +		vfree(iq->buff_info);
+
+Ditto.
+
+> +
+> +	if (iq->desc_ring)
+> +		dma_free_coherent(iq->dev, desc_ring_size,
+> +				  iq->desc_ring, iq->desc_ring_dma);
+> +
+> +	sglist_size = OCTEP_VF_SGLIST_SIZE_PER_PKT *
+> +		      CFG_GET_IQ_NUM_DESC(oct->conf);
+> +	if (iq->sglist)
+> +		dma_free_coherent(iq->dev, sglist_size,
+> +				  iq->sglist, iq->sglist_dma);
+> +
+> +	vfree(iq);
+> +	oct->iq[q_no] = NULL;
+> +	oct->num_iqs--;
+>  }
+
+...
 
