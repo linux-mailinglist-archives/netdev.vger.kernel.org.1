@@ -1,147 +1,139 @@
-Return-Path: <netdev+bounces-61962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5C8825635
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:57:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4868C825651
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:08:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DA8228109E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:57:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBDA21F22348
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FA02D7B0;
-	Fri,  5 Jan 2024 14:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B6A2E3F3;
+	Fri,  5 Jan 2024 15:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bkhnZRFg"
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="kUDQnBZr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C092E623
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 14:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704466662; x=1736002662;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Uz4F9QznFEpxU+dTtJmWS6LLPxSjHNxwiM+IkJd2BN0=;
-  b=bkhnZRFgrW6i9kFTaBwzU6/vu4zbA+uu+CDlYPp/Jw3rodiEt3nqA/WV
-   KSxesNL+P2B49j/OCXYUcq3y2m5SS2NwgMJFpcp+QDKPjXfbOF+Fy3gUp
-   aXn+Qoii8mHSOiXjRM8BjtOQiZdN4sWPeYkchfGYfWjGYjxq7nXdSrhcZ
-   i0NRwx/XH8Ogasbhtful+q7R6XCkzu5D+3UAlylVYLP8LstF+1TaVbmVF
-   COPOAeTku4BkA5V1qASF5gdsuSW0QABOTmMcRUBkRfFrcwbZ76zryJWBb
-   gavbp3ScYt1NU7cWEmKQleQ0/XtuLL8VO5qgdt+jgKexJyCveVxlwhqS1
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="4282598"
-X-IronPort-AV: E=Sophos;i="6.04,334,1695711600"; 
-   d="scan'208";a="4282598"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 06:57:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="730487093"
-X-IronPort-AV: E=Sophos;i="6.04,334,1695711600"; 
-   d="scan'208";a="730487093"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Jan 2024 06:57:41 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 5 Jan 2024 06:57:40 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 5 Jan 2024 06:57:40 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 5 Jan 2024 06:57:40 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4C12E3F8;
+	Fri,  5 Jan 2024 15:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 405Cg5XQ032535;
+	Fri, 5 Jan 2024 07:08:23 -0800
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2168.outbound.protection.outlook.com [104.47.55.168])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3veaw01mh6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Jan 2024 07:08:23 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J5zMeUM17mpcoWo5qhf4c4U9D6L6RLuiAKDn3ekeOZZ4aecXoHrtQE7Km9UswYTbdXyEJRkjJFiTtOpvLJwQtOMinKa+xRG4AUhfEFOaNJm27KCGTOykKx0OI8H4j+IUT+hQXqqJmxY9QcTIAsgP66S4nu2ORj8oQEXvMbJvs3l6ZzuZSrMIOh+B1MC5cm6HmciZXDpE2NzqzH63ZkdRbP2YqNR+cQnaPyeCccNrgH51WYhc+LvVCe8cc8wN9cZFNXbPqMMrVauG3NGNQmKk+OQYEiTpdo2xwKEE0zq4cnu3YQIYXGczlhuAwGFPnERHvJjosZDIIpVjAJjUkRpZaw==
+ b=A6XvwStz7dEO90Nwo1cSYCs3dVq+gn54PwQ5B4mys+yBq0k8iwvhKhMg7epU6vpEflENf5mhVjOjR9lcFUj7koSKD5yYl+1ixs2f5UbcWU9R85rZjq98MEbT1Sc+ye0Pd6wDtnjh60Gdi+BLMNu+q/IACwqVD3VDbU4D+O+uXz9EXYCz4iCaNr0Wy7MzUlIDU5DJoU0RZwT3TsIuEC5gUUxchJYGhGGHs6HFgif3lEXqa3cnINTY7gGRxqkySFJuUWqEm/eAJagkyIdLw+N3aNVqNhrRkvliew+D5BVEbink9lM7MxsERc7u9NT8YEmfPHQVT0HJoxjSfuRDygPadQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Uz4F9QznFEpxU+dTtJmWS6LLPxSjHNxwiM+IkJd2BN0=;
- b=YtAebkX2d2KCSPnHlxGGF2Uam9Dpav6enUOS66BfDj7SSLMnqkArLVfO9sVge1HFRwciHfidouFx+GQcb/GWBcuBwBPizEOMm3fpG/tSC5lhGP9vYMAOcDT56htwpFkGrEPT8iyP683Enq3c52VlqdeOsJi6AhxExWOPg0XsTXXmvkz0AUVwEb9KipaYjQ54HmsVB0/F5xmxa85lro0fsPrjMRFnhTdh+qKi0MnsgdjjE707yFk1m5/PBxuoGpvZpZ/P1x1o/aZEy0tyh2S+HnLyyWqlK89zIzaa+dH67TCx9OzJrWGZi7IkmOjAl/vEmBgH7a0HUbB5UakT+WW0LA==
+ bh=kTh41LncTEx4xgfwTgat09bhjszOhvGqrolVqkLaw8s=;
+ b=R8UrH14mmoNSOpexOWAEvDCOr2eg1Tv05kzLOUFtMmFY1Tc07gsqlJpiPSnkJ0NfD4sH+5c9tAzqh+4bjol1DWIilt+GaYl75M2ffd6IwY53ZwYNBacWTIIXLKtDekISYNESFB5Ma4GIMoMzFLqB51og9M7iWS6xHZDe4RzxKgb5/FCDElkWn41mfC0HhUe6GP0YXqsXawPblHB++aV+hlP1qiQfKWB+KBkMqMflDEKZUMR0QqMZeuRJ0zmaWgnu22ooHIixcweIpiJdtWDJ2ZA/6Ule+5nNC7qB3yFXtz+Skbs0VqLIo+F13IX6t9tqulV6jR6r/ZArJEDyv1cHwQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
- SJ1PR11MB6276.namprd11.prod.outlook.com (2603:10b6:a03:455::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7159.16; Fri, 5 Jan 2024 14:57:38 +0000
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::89c2:9523:99e2:176a]) by DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::89c2:9523:99e2:176a%6]) with mapi id 15.20.7159.015; Fri, 5 Jan 2024
- 14:57:38 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Jiri Pirko <jiri@resnulli.us>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "vadim.fedorenko@linux.dev"
-	<vadim.fedorenko@linux.dev>, "M, Saeed" <saeedm@nvidia.com>,
-	"leon@kernel.org" <leon@kernel.org>, "Michalik, Michal"
-	<michal.michalik@intel.com>, "rrameshbabu@nvidia.com"
-	<rrameshbabu@nvidia.com>
-Subject: RE: [patch net-next 1/3] dpll: expose fractional frequency offset
- value to user
-Thread-Topic: [patch net-next 1/3] dpll: expose fractional frequency offset
- value to user
-Thread-Index: AQHaPkjaiDPlYuBq0k2gBv76bCVBXLDLOQCwgAAPZYCAAAnjgA==
-Date: Fri, 5 Jan 2024 14:57:38 +0000
-Message-ID: <DM6PR11MB4657613774243D56CD8144409B662@DM6PR11MB4657.namprd11.prod.outlook.com>
-References: <20240103132838.1501801-1-jiri@resnulli.us>
-	<20240103132838.1501801-2-jiri@resnulli.us>
-	<DM6PR11MB46575D0FFEE161D2C32D26C99B662@DM6PR11MB4657.namprd11.prod.outlook.com>
- <20240105062133.17456a14@kernel.org>
-In-Reply-To: <20240105062133.17456a14@kernel.org>
-Accept-Language: pl-PL, en-US
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kTh41LncTEx4xgfwTgat09bhjszOhvGqrolVqkLaw8s=;
+ b=kUDQnBZrFyEekDAS63hBU7G5edFd+G4Lgj6yrYSOtlGLrXNDxzQMCxZ4Gyt+j3loTujvcT8uDIDziItlJY6hlTybfOSPYSBj13ltsQtfLlwEpK1sGIb6XHWYMo31XRaDIfJvQe6CWxz69YEDmfhlxwiDk9g3VKOnfGkvuBP9HhI=
+Received: from PH0PR18MB4734.namprd18.prod.outlook.com (2603:10b6:510:cd::24)
+ by SN7PR18MB3887.namprd18.prod.outlook.com (2603:10b6:806:105::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.9; Fri, 5 Jan
+ 2024 15:08:20 +0000
+Received: from PH0PR18MB4734.namprd18.prod.outlook.com
+ ([fe80::ca1e:e4b2:a920:25a9]) by PH0PR18MB4734.namprd18.prod.outlook.com
+ ([fe80::ca1e:e4b2:a920:25a9%3]) with mapi id 15.20.7181.009; Fri, 5 Jan 2024
+ 15:08:18 +0000
+From: Shinas Rasheed <srasheed@marvell.com>
+To: Simon Horman <horms@kernel.org>
+CC: Jakub Kicinski <kuba@kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        Haseeb Gani <hgani@marvell.com>, Vimlesh
+ Kumar <vimleshk@marvell.com>,
+        Sathesh B Edara <sedara@marvell.com>,
+        "egallen@redhat.com" <egallen@redhat.com>,
+        "mschmidt@redhat.com"
+	<mschmidt@redhat.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "wizhao@redhat.com" <wizhao@redhat.com>,
+        "kheib@redhat.com"
+	<kheib@redhat.com>,
+        "konguyen@redhat.com" <konguyen@redhat.com>,
+        Veerasenareddy Burru <vburru@marvell.com>,
+        Satananda Burla
+	<sburla@marvell.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>
+Subject: RE: [EXT] Re: [PATCH net-next v2 6/8] octeon_ep_vf: add Tx/Rx
+ processing and interrupt support
+Thread-Topic: [EXT] Re: [PATCH net-next v2 6/8] octeon_ep_vf: add Tx/Rx
+ processing and interrupt support
+Thread-Index: AQHaNaXX1bcgGLi5HEmdzaZKEl99WrDKNr0AgACszRCAAD9AAIAAQ9OQ
+Date: Fri, 5 Jan 2024 15:08:18 +0000
+Message-ID: 
+ <PH0PR18MB47342CA6504103E68348AE96C7662@PH0PR18MB4734.namprd18.prod.outlook.com>
+References: <20231223134000.2906144-1-srasheed@marvell.com>
+ <20231223134000.2906144-7-srasheed@marvell.com>
+ <20240104130016.47bc1071@kernel.org>
+ <PH0PR18MB473450986CAA852218F225F0C7662@PH0PR18MB4734.namprd18.prod.outlook.com>
+ <20240105110508.GU31813@kernel.org>
+In-Reply-To: <20240105110508.GU31813@kernel.org>
+Accept-Language: en-US
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|SJ1PR11MB6276:EE_
-x-ms-office365-filtering-correlation-id: c52457cc-0ff3-484b-e44e-08dc0dfea8ef
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-traffictypediagnostic: PH0PR18MB4734:EE_|SN7PR18MB3887:EE_
+x-ms-office365-filtering-correlation-id: 38a79a17-69fa-4246-12ca-08dc0e00267a
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZcT2+S81K8irj+F4c5JmfUHAMCcoHUmMPLJNi2QoRfrjih66+U+qPiR7YefMuO84gafEZjnXIC0v6UvZKh4aMBalNZtFJXVmn0EY2wa8lR/NfyZZrKz+RGNFdd5tQUGCSrtLvPhCJP0sGB/tjM2Da+M2p1m7TG/S1YByZhocgaDtCinyBhGpskDJUPN76QzeSCvxY+L+iEF5kkNzv/+XU5daQqzVTvnO+5dfSHD6dmzNKZEs3sWCQ1W1J8++0m7ZBY3Wv+oNU8oNOws8NMzk7MEraeyqK+NFJj9939x3CDyMTsm6Xa5/UX4T1bFoweJ5meoA0MyfGSsz913mmEEvYM07zWWtpZo3LuzHl8RycCLYL5ZgWW4L8Pl6aXPTumtCkBWABRMRfT0OemCFfiZMJ5Q+ETeP7SJSWGwXEXHNIpH/xN+eUyxjBbujQCi5ucFwlJj8kXzQkykITJxSbdZRDD4magVxbVc7VcCf/w2KysAFFoXk/+Bkj5tLN/duYJGM3ltGtu+REXEkbW4hA3Jn71cWge8NTkuIB/5lDntVKHCeXCi3C/lr/6fgRUVrJ2JW9gSIJvO+JyNrs+z03Kg4/xXV0gK/Yos70nhrlcA+K2g=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(346002)(376002)(39860400002)(136003)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(66476007)(7696005)(478600001)(71200400001)(9686003)(26005)(6506007)(4744005)(7416002)(5660300002)(6916009)(2906002)(41300700001)(66946007)(8676002)(316002)(54906003)(76116006)(66446008)(4326008)(66556008)(52536014)(8936002)(64756008)(86362001)(38100700002)(122000001)(33656002)(38070700009)(82960400001)(83380400001)(55016003);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: 
+ 8iv9W+RXUqGTCjkUzlw8Xvh+1zLHzq8uPkYS71RL603h0B/BLWTclDoK7WQtxM0K+lgmH+mh65dQ4ZhaafaH3JsvsE6rDhheFGzXYdMw5Uab7ckcgDvGOOKO+hbnRZh/NNLB+Rtw1cQSIT+Wgu6Pa6iFTP2Prawn59PeHM3tVY1QygjJ75FvLLylgrsXJ9VLiOF9bpq3WkcmCyj8sznROnUCzYapm889sAvkdnJC1zVxD+oIs4QFSS7sJxxTLqOCt89FbSCo+dT5zwsTsPfZngOHiHIe31GL4twxfNEysQEM0E6Qlta4HQlorzrSYWx0B4ncwjqYAUGYs6UPvyNjloZYl/S0e5wVx+0gSNYr04aF0qbUEs5vX9+DyCfRlkx6VUM6fVqiSKrSn6T141CPW0NUYSd2ab9XnuI5UKepL0MG3B7JWUXNdpnxL5yFODVpZ1eik2voDG8t5B4YvJy3rH0aCX28im+I5u+yJI+7NhZoI/0uydSkpFHbszQMjeXMFsnkBST90qdPXwmRKCj9hN38Eds5qodMbg7lrGCI+N0WbSGNfvC5GMVrbYpuOkPsxIPU/L0xSOyZEAR0nVy0JJs+mmk7WEtx3dfEamt8llVk6sEn1Ijd+SxXKmWeGyDD
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4734.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(39860400002)(366004)(346002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(83380400001)(9686003)(53546011)(38100700002)(26005)(122000001)(316002)(5660300002)(8936002)(8676002)(52536014)(4326008)(7416002)(2906002)(66556008)(66446008)(6506007)(7696005)(71200400001)(54906003)(6916009)(64756008)(66476007)(478600001)(41300700001)(76116006)(66946007)(33656002)(86362001)(38070700009)(55016003);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1v/WqdmCvSHWm5uJ6KXprfx2NBA6eKUHmUHLvpMVwdz9MjjqIkoD9UhsokfM?=
- =?us-ascii?Q?JQc7ykKjITw2n0cctUUn84uKHJISIHxofVMCXOQZWQIjHTSqVh8a5C6L4YjA?=
- =?us-ascii?Q?MHE46/UnUOcdVh4zAEyKa8rmkiVuIa9VE4GgnVKygxVkQx9y3W+x03nEkVcl?=
- =?us-ascii?Q?N8aboKLEnGVUii7wsgaAJPUANt+MYYavMeaSljRYe+U/wnJxiBv5+dvAU6FM?=
- =?us-ascii?Q?AuhNCcAc0Ko87Gc7EL3LLRImWiWGYXqWojaFbvEf+ptGhflvRpW0PkicC95B?=
- =?us-ascii?Q?V2VIV25TUmUjGV3d2yY3KZCttZvc+7fCEa8DFqn9JsnsR/L2DgJf4sikoBHs?=
- =?us-ascii?Q?m9g+Ctp6AowYC23+v5634o88yeA5arsSLLp826+mUj63DLXN58w1+jefXMzK?=
- =?us-ascii?Q?9IKeFBpBmVGI30S+3onrw8604l/v5nyB8AZCvomatVPNmXIWqShmpK7RKk4z?=
- =?us-ascii?Q?ZGlY0HJgqYjRjTRRHAYPIZjJWxucKgyCR6NsOr5FCru4vXAJin44Tvex0YOl?=
- =?us-ascii?Q?TyL/DCL4Ph5i9IqyyFVR9mB69mUZxgMf1HVotsamr/XhPv6CbxsooUWbtXKw?=
- =?us-ascii?Q?KvtJg1YGgZ1Oex4j6Ser9awAZZYf6NCveX4F+rAO6Yu0yLmbY5L0Nj+P1uF9?=
- =?us-ascii?Q?moc+p18gJuOuHAAvezj1aPL/zPShARWrLT32TzFsLNmGzMHLsE/mZWORLqBr?=
- =?us-ascii?Q?EtsQwqJjmEXCMIlyXuyaLDJiLVZw1KVPdUviJSucY5oZE4yqrCEy/8BEc1xM?=
- =?us-ascii?Q?8SWhrWHXEEjp6FG2Z9ibdRj0g6eV3eyweuqaGNR6unHhzJXQ5l68DnAG4Cl+?=
- =?us-ascii?Q?PlqzrQEw8TpaSsskJBjxkoB6FFu4ahdxoN/hkomH28Uw3ST+RsHkdi2QBy+q?=
- =?us-ascii?Q?8C58nK4AMs2gc7GvH3WTGuFq+aRefrI3q8CJHoiTbzEEORhYxvYK1QYDkEFf?=
- =?us-ascii?Q?9W+23JYJ/Xcg42Zlg5lDovXw6T/T1aTQ1yLlIiw7qh8BGDOfhmZG4R4DjcCa?=
- =?us-ascii?Q?j8577RUCABAUWkQKbtnQlywRAUanoPRoypNwiJHBRdRWyHC8mB5VHGkTtFFp?=
- =?us-ascii?Q?IcouHyq5N3PsOaX5HNTKND2Dp+Ixq5CfskO8Ua9tf2wStJGktE0SKy4q0noJ?=
- =?us-ascii?Q?yl7ho7vp7O9TXfKSZHptmecLkwXY538PJXZp7KQnbdqImaW03YZf8nA+stNu?=
- =?us-ascii?Q?ij2RNg96mBNwyCZwDI7pGqWaA3uc38rKhAPijd0leCfl+W8FYQqT4J2YWWXf?=
- =?us-ascii?Q?SrCgSNFixnJ/kuccFggt0X4x4LQKpseCWNFJt2KJIv01NDDFgjXRZ6IewSaN?=
- =?us-ascii?Q?x71WamPTXCPMGbRm5AWnlBWzgv+HuF9fjH4YQRentZutML0yDWrUW25gj9M1?=
- =?us-ascii?Q?tlH/MnplKv844aIsPvepFSyVuad0W+L1bgxTEw1x34sPH2d8Tp0q6XgKvsgj?=
- =?us-ascii?Q?r9T1xtJ5JE6aeFP595GluQlrSoaK1HsN+/LTNC8fZxlYDTpV225k/GFTiKQP?=
- =?us-ascii?Q?1I2iQ3Os46oLLgpkC23d3IEzUutR5lYYiZ/4WYt5WzKp0rFMVNQXjBg5/NVy?=
- =?us-ascii?Q?AHLRdpkDd2/0JuJxKXk6RCYocZ3s2x1g3c9YqupQrIX4c3obpHeu3mIbkrZO?=
- =?us-ascii?Q?kQ=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?NvVB0fr84G3FD3nQjqw4jMEpkI5r0S7FctuIujRqkdBrgGAsgHPBBbSA1fSm?=
+ =?us-ascii?Q?GJZhUXcKwOSJxSKYd5DvBw4QQu94h8M4JSi9QtxD1JUfWV9u57CQLq7ebiEW?=
+ =?us-ascii?Q?wyuNhlzsCUtH8aTbl8hFLN9IGGRFwXjzO25l6vfmTDi9u43OkD2iBQ65pyD+?=
+ =?us-ascii?Q?kKqYImNyFiNoxmjRR1wG3572ctG9a+tIrnz+YJw9N5OpBJq5skRv/xgbEUGB?=
+ =?us-ascii?Q?P0SQZGVziCxjn88Q+XEpPlXIb+Ti8FoHdskLlKLdZHun9a9IukYh8jqf5mzU?=
+ =?us-ascii?Q?C2I/CoJ5PTDGgWfUdrJlp0NWYTiWrkutmfqXrTYOfjMq3+2RoLUkaU/UXR3I?=
+ =?us-ascii?Q?PNmvr4HzqU9v6DV3hr+TogMdebPbOT53bZ/yMwu4nO0Kxmaj1pqR/NYafOIw?=
+ =?us-ascii?Q?7NcDrCN81IbFV6yWRn12ockgdNp+b6tq+1hAZrSsatzNhxS9WB7NzkHIoN8l?=
+ =?us-ascii?Q?D4QpsW+6Anmb6mpWkewnISUorOKcs0hTn5i1FgwXQRDn/Uw+JgqgGKUCLcYY?=
+ =?us-ascii?Q?hgT/pqO2LymgAEhkcfGU+xp8/wnuDGYxaLExv3HTmOV+z0bAGG6eMXQo7ESS?=
+ =?us-ascii?Q?DRUVSziuTb1hwUUs6mZt3FOhDxoR/VZ9MkmIRLbGLLWrkdUOThtzz66qswPS?=
+ =?us-ascii?Q?597hQl0FTlQZeH7ky7Aw3kysI1Eiu2woin2b3YIVmF1VTCwXejt9dX0fEZO/?=
+ =?us-ascii?Q?WLn+fbxMNb1+s/E6y8wu6PqVQ/BheAXBgUbtoB480VLbuLy3nSPXg3zjRTRo?=
+ =?us-ascii?Q?xxz/DPkYg9sypkan3c3GWsUaT4GrPbf9kQIUfPUxziWt0OwM6GjCBzl2crql?=
+ =?us-ascii?Q?dSwlvu7M0V3e4D3StjB5ocEil1hnumY6nB3fqgOaF+/6Ep7lv9ZxNns6jAJo?=
+ =?us-ascii?Q?fUxtw+9UDUi59TWoZ4jbrQRhfyM5R2KljGt1XqKZo7WHTld4QQ4q4n1y3S9Y?=
+ =?us-ascii?Q?w5o/7ZDgX57DSfyXP7x34KSJv0NQD72ddySK3XA8DYLqfhaR4E2QSZqDFHwr?=
+ =?us-ascii?Q?KBEK98I1FEoaSBSe+58kN0XU5io4FOsBjwhJy6eZm/HkPgMWL2IIFVHpVw6J?=
+ =?us-ascii?Q?DbMTcSdRb10mRXnx+ezr7ixAWMLwz9zTxHLTjz5mvr3kwS3oynw7xDEyrsZz?=
+ =?us-ascii?Q?ePYekMRuHxfuGTo22nyY3eAnAR3VmnHuTZrv9UkZOkzMFUWioytS8MT42PFi?=
+ =?us-ascii?Q?grfRiP36Qgf/otpLD76rpGODWd7tT6Xt77f5/ktaCNn9I3CTJIny45C/fK78?=
+ =?us-ascii?Q?YdVZBpnomgYofdtZIZCNjIMbvpKxkh3niTB4piCAqa0jv23NoKxcCu3fHAnf?=
+ =?us-ascii?Q?hBN7SnmkAzAqE2+3namK3VP9nE0R2oNzIZARlfJfpeHrf4mCvog07Ts6fCKP?=
+ =?us-ascii?Q?2PAt75IoDVcONff1f5SrXo+F0av1I2/mYM3AsaNtoDqtXR0m7iwVt6bXO+OF?=
+ =?us-ascii?Q?tfeYWu+gVvYWSaX5J0ZOnlic4N5EXhEBbQ7TEmMMox6Pib5DgzTVdpEBelWY?=
+ =?us-ascii?Q?q7mTh6AlqBwUjX5zEUVTkWXk2M66b2ieYih007ScAtt0v+ywbu+Y988MeOHh?=
+ =?us-ascii?Q?wj3tqEPShEWNmPfv9PjLMagsTtajkW8hS3pbujtB?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -150,30 +142,81 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: marvell.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c52457cc-0ff3-484b-e44e-08dc0dfea8ef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jan 2024 14:57:38.6740
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4734.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38a79a17-69fa-4246-12ca-08dc0e00267a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jan 2024 15:08:18.7712
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rN99gEeElhz6jPPx/5XNxSnUIvbNU4pwsTi9iU+MireJae21BBMtJWK58/YgquYnFA6x6Ph/Aix4kBKp7i5Q50UhrMobjPyww2GXJhm+09M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6276
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-userprincipalname: XGKwWLyMIzV6RyBlhKf0TfjVlnHiX1JpDSEeoJAbEnp4TKsD5gjM7b/cDmy1Q1TOtNScp7XaVbSVsxNM8pIE5Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR18MB3887
+X-Proofpoint-GUID: fnA4DPxSlZsWtXAEqtthAVbhPmKRTGeN
+X-Proofpoint-ORIG-GUID: fnA4DPxSlZsWtXAEqtthAVbhPmKRTGeN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
->From: Jakub Kicinski <kuba@kernel.org>
->Sent: Friday, January 5, 2024 3:22 PM
->
->On Fri, 5 Jan 2024 13:32:00 +0000 Kubalewski, Arkadiusz wrote:
->> But one thing, there is no update to Documentation/driver-api/dpll.rst
->> Why not mention this new netlink attribute and some explanation for
->> the userspace in the non-source-code documentation?
->
->Now that we generate web docs from the specs as well:
->https://docs.kernel.org/next/networking/netlink_spec/dpll.html
->I reckon documenting in the spec may be good enough?
+Thanks Simon for the comments. Will update in v3
 
-Yes, that makes sense. Thanks!
-Arkadiusz
+> -----Original Message-----
+> From: Simon Horman <horms@kernel.org>
+> Sent: Friday, January 5, 2024 4:35 PM
+> To: Shinas Rasheed <srasheed@marvell.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Haseeb Gani <hgani@marvell.com>; Vimlesh Kumar
+> <vimleshk@marvell.com>; Sathesh B Edara <sedara@marvell.com>;
+> egallen@redhat.com; mschmidt@redhat.com; pabeni@redhat.com;
+> wizhao@redhat.com; kheib@redhat.com; konguyen@redhat.com;
+> Veerasenareddy Burru <vburru@marvell.com>; Satananda Burla
+> <sburla@marvell.com>; David S. Miller <davem@davemloft.net>; Eric
+> Dumazet <edumazet@google.com>
+> Subject: Re: [EXT] Re: [PATCH net-next v2 6/8] octeon_ep_vf: add Tx/Rx
+> processing and interrupt support
+>=20
+> On Fri, Jan 05, 2024 at 07:26:14AM +0000, Shinas Rasheed wrote:
+> > Hi Jakub,
+> >
+> > Thanks for the review!
+> >
+> > > > +	rx_done =3D octep_vf_oq_process_rx(ioq_vector->oq, budget);
+> > >
+> > > You should not call Rx processing if budget is 0 at all, please see
+> > > NAPI docs. Looks like the function may try to refill Rx buffers with
+> > > budget of 0.
+> > >
+> > If budget is zero, octep_vf_oq_process_rx just wouldn't try to query hw=
+ for
+> packets. Also since by then, the refill count should have been less than =
+refill
+> threshold, if not it only flushes free buffers back to the ring, (and tel=
+l hw that
+> there are more free buffers available which have been processed from mayb=
+e
+> previous calls - but this seems unlikely and should have been flushed at =
+that
+> time).
+> >
+> > > > @@ -114,8 +158,8 @@ static int octep_vf_setup_oq(struct
+> octep_vf_device
+> > > *oct, int q_no)
+> > > >  		goto desc_dma_alloc_err;
+> > > >  	}
+> > > >
+> > > > -	oq->buff_info =3D (struct octep_vf_rx_buffer *)
+> > > > -			vzalloc(oq->max_count *
+> > > OCTEP_VF_OQ_RECVBUF_SIZE);
+> > > > +	oq->buff_info =3D vzalloc(oq->max_count *
+> > > OCTEP_VF_OQ_RECVBUF_SIZE);
+> > > > +
+> > >
+> > > bad fixup squash?
+> > >
+> > Sorry, I didn't understand. Can you explain?
+>=20
+> I think he means that this change seems to make a minor update
+> to code introduced in a previous patch of this series, and thus should
+> be squashed into that previous patch.
 
