@@ -1,152 +1,143 @@
-Return-Path: <netdev+bounces-62122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88793825C81
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 23:21:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC88A825C86
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 23:28:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0FA71C23278
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 22:21:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27D961F235AB
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 22:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D2A2E82A;
-	Fri,  5 Jan 2024 22:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71AE0321AC;
+	Fri,  5 Jan 2024 22:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhxqkyWF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fPGryJ/J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701EF2E652;
-	Fri,  5 Jan 2024 22:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CE6358B7;
+	Fri,  5 Jan 2024 22:27:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a28ee72913aso182865566b.1;
-        Fri, 05 Jan 2024 14:21:54 -0800 (PST)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-336dcebcdb9so58855f8f.1;
+        Fri, 05 Jan 2024 14:27:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704493312; x=1705098112; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wZ0hQToMiL2pC8J2g9cv5wQzAvm53enMjTa4u23Sm3s=;
-        b=RhxqkyWF/8nu5/cwMZSWqprHr9SS5Y+49pZKmoT7c5WSLLvh3ULwMJ3OmMCxFxniWg
-         XiDVoxcIaeFrk4mxBgqSC4WTQZ82lHONQA1/nGwGNdesoNTvFtAjFLoRh1ot9vcb8grt
-         EfWRdjmo85b+5Kao+zvXP/eVhnsbtHdtcEr+Vv0/++Pt8pnD2anM9mhGaLViaLtt/nYW
-         RC3QRUDHW14FOf9fMh/Z3gl8W/E1Ebzk0FKELq66Dr3yiTd87mpZYYdfJ0+XuAHoQNkJ
-         Pi1eTfzncjJtgi8/7cMtp2wVykB+AKuRyMr311TUz8sj/4RdWbDcq/yJBPMwSfYUDGK2
-         gJqg==
+        d=gmail.com; s=20230601; t=1704493675; x=1705098475; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=INJlDxxMmwnEVeghNo4tVwU1FXS69DXew60SU5MDjaI=;
+        b=fPGryJ/J10d/vCq7lJ51s5ZFWaWNKz+mnYG1BsA43AiMLskFCMDPirBIk20Ye3e/PP
+         kdRmNya0buy1/+212tCHkB/nej7sDDO8gRDLCIdF0VROCD4RP13aVqcnZtIZS9RpkBBp
+         XF6fFGxL3d+8KgVIksz21wPiiDZF5WDh//gPRPHxuMmmZ3EkNuZRMEmLsw3U+ZiO40CW
+         lpvX3qpWpf/suaFcnWmBgx9sCmB2KshiD5uP/Or3xI23TBLUgHwmELtFdpHPIW6fJQby
+         msk/KngB7inioprTvdqdIT28XapEWRmSvnvA8hPkQWHferBJCm0c/ufhSA+PL0Wz5oi6
+         A4hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704493312; x=1705098112;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wZ0hQToMiL2pC8J2g9cv5wQzAvm53enMjTa4u23Sm3s=;
-        b=eJODsh+8mPOaE24Ws7vvVz04Ix/eNp/tLC/rHVJ83/VqXyxX0zlDdyu/VdcY8Aaqz1
-         s42hnnA/9scOLwGTb8dotQOS3vEGLgekg4gBqdKXQ3CNaflHQGqG1qthFlRDZh4a29RV
-         Q43878I1smuvGUSBF9d7026VGsIp4y1/odFLoE48/JSKxgqUvSc/RPWKTDrD0Z+CrCXj
-         miCfuVz0EYOkXk+d48lO+Oz3JwgSHJiEJ0mKcMEFkvARJiVNHjaIxYEp2/wCTTTu8erB
-         cLF5rGAL7jcrHA+IUPnsBv3AO8D/bjU037CwtmVDtVXXeru2ZnEZIC+/HLmVuRxdXEcC
-         bc+g==
-X-Gm-Message-State: AOJu0YwZ2odSVSguUxVZ7RScnQ6K4DJLUizJ2k3/SOD+FWYKm1Dg8Idf
-	3s2lWdAxvVXenRbroi3AOIqy7edTzo4=
-X-Google-Smtp-Source: AGHT+IEdHDqeNPJ5qEDtuy8cw/tgRCeqEXbU3L6RRcIAdYwIWCTLNOy7A8ptxyU/YuDYOnuXz3Ajiw==
-X-Received: by 2002:a17:906:b0da:b0:a29:2668:7bfc with SMTP id bk26-20020a170906b0da00b00a2926687bfcmr159887ejb.65.1704493312376;
-        Fri, 05 Jan 2024 14:21:52 -0800 (PST)
-Received: from ?IPV6:2a02:3100:9506:ff00:f963:33d2:2ad2:b61? (dynamic-2a02-3100-9506-ff00-f963-33d2-2ad2-0b61.310.pool.telefonica.de. [2a02:3100:9506:ff00:f963:33d2:2ad2:b61])
-        by smtp.googlemail.com with ESMTPSA id f11-20020a17090624cb00b00a28a66028bcsm1310296ejb.91.2024.01.05.14.21.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jan 2024 14:21:52 -0800 (PST)
-Message-ID: <b086b296-0a1b-42d4-8e2b-ef6682598185@gmail.com>
-Date: Fri, 5 Jan 2024 23:21:52 +0100
+        d=1e100.net; s=20230601; t=1704493675; x=1705098475;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=INJlDxxMmwnEVeghNo4tVwU1FXS69DXew60SU5MDjaI=;
+        b=p6XeiAVADgF9X6A64lyWnH5wJyWJxCLXhTSJaVzpieUqfidotv7nN8U0aJ2uJWywDv
+         GV8fl1katt1LbWaCKc/P6kjhIvvZtQkcqJs8fSrJwIAS2vY7apaRoSzMJbHW4lJmT/N1
+         M2eiAPdmjUBZ44onG1f7JfP2kfV9AyDu7vhKTEFlBCr/dgxvJcjSsMBYrrFm9ln1kx4O
+         /La30vNLA259AvEjf5BqdUVuWOd+V1LfPUqOJo0uK+SmXBsVGbNxijcEQnC492a5ZvzO
+         jNS4LDrxEWwCtTHQGedQTCf8S7SCUedUjVbXJWjvHi1i/t+Yi1aUyoP7uc7/jVWKyx19
+         QhEA==
+X-Gm-Message-State: AOJu0Ywq1E5sLukL6/kpx0+R/aSGdklt61XN/l0g+/HGVpZkUsou56I8
+	SRiQ8XzcuXZ2jaetFYUA6lPh6Vm8C3zhPJhJ4pE=
+X-Google-Smtp-Source: AGHT+IEis9JsVQd5cr9sPWdTjZxbcDKo7CvWWhF8O4sYE10CPOA5muBQlzUjZ3yqTVjRjVLCRhayPqeXzrvbYgbWBMc=
+X-Received: by 2002:adf:ef89:0:b0:336:6519:86be with SMTP id
+ d9-20020adfef89000000b00336651986bemr28583wro.283.1704493674840; Fri, 05 Jan
+ 2024 14:27:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Woojung Huh <woojung.huh@microchip.com>,
- Microchip Linux Driver Support <UNGLinuxDriver@microchip.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Andrew Lunn <andrew@lunn.ch>,
- Linux USB Mailing List <linux-usb@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] lan78xx: remove redundant statement in
- lan78xx_get_eee
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240103222034.2582628-1-andrii@kernel.org> <20240103222034.2582628-4-andrii@kernel.org>
+ <CAHk-=wi7=fQCgjnex_+KwNiAKuZYS=QOzfD_dSWys0SMmbYOtQ@mail.gmail.com> <CAEf4Bzab84niHTdyAEkMKncNK2kXBPc7dUNpYHuXxubSM-2D4Q@mail.gmail.com>
+In-Reply-To: <CAEf4Bzab84niHTdyAEkMKncNK2kXBPc7dUNpYHuXxubSM-2D4Q@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 5 Jan 2024 14:27:43 -0800
+Message-ID: <CAADnVQ+QP_ZfY6gqEUtW2mYgO5usX+cK9w+X5kaRt1ovf-q1Cw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Linus Torvalds <torvalds@linuxfoundation.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	Paul Moore <paul@paul-moore.com>, Christian Brauner <brauner@kernel.org>, 
+	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, Kernel Team <kernel-team@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-eee_active is set by phy_ethtool_get_eee() already, using the same
-logic plus an additional check against link speed/duplex values.
-See genphy_c45_eee_is_active() for details.
-So we can remove this line.
+On Fri, Jan 5, 2024 at 2:06=E2=80=AFPM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Fri, Jan 5, 2024 at 12:26=E2=80=AFPM Linus Torvalds
+> <torvalds@linuxfoundation.org> wrote:
+> >
+> > I'm still looking through the patches, but in the early parts I do
+> > note this oddity:
+> >
+> > On Wed, 3 Jan 2024 at 14:21, Andrii Nakryiko <andrii@kernel.org> wrote:
+> > >
+> > > +struct bpf_token {
+> > > +       struct work_struct work;
+> > > +       atomic64_t refcnt;
+> > > +       struct user_namespace *userns;
+> > > +       u64 allowed_cmds;
+> > > +};
+> >
+> > Ok, not huge, and makes sense, although I wonder if that
+> >
+> >         atomic64_t refcnt;
+> >
+> > should just be 'atomic_long_t' since presumably on 32-bit
+> > architectures you can't create enough references for a 64-bit atomic
+> > to make much sense.
+> >
+> > Or are there references to tokens that might not use any memory?
+> >
+> > Not a big deal, but 'atomic64_t' is very expensive on 32-bit
+> > architectures, and doesn't seem to make much sense unless you really
+> > specifically need 64 bits for some reason.
+>
+> I used atomic64_t for consistency with other BPF objects (program,
+> etc) and not to have to worry even about hypothetical overflows.
+> 32-bit atomic performance doesn't seem to be a big concern as a token
+> is passed into a pretty heavy-weight operations that create new BPF
+> object (map, program, BTF object), no matter how slow refcounting is
+> it will be lost in the noise for those operations.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/usb/lan78xx.c | 2 --
- 1 file changed, 2 deletions(-)
+To add a bit more context here...
 
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 5add4145d..a6d653ff5 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -1691,8 +1691,6 @@ static int lan78xx_get_eee(struct net_device *net, struct ethtool_eee *edata)
- 	ret = lan78xx_read_reg(dev, MAC_CR, &buf);
- 	if (buf & MAC_CR_EEE_EN_) {
- 		edata->eee_enabled = true;
--		edata->eee_active = !!(edata->advertised &
--				       edata->lp_advertised);
- 		edata->tx_lpi_enabled = true;
- 		/* EEE_TX_LPI_REQ_DLY & tx_lpi_timer are same uSec unit */
- 		ret = lan78xx_read_reg(dev, EEE_TX_LPI_REQ_DLY, &buf);
--- 
-2.43.0
+Back in 2016 Jann managed to overflow 32-bit prog/map counters:
+"
+On a system with >32Gbyte of physical memory,
+the malicious application may overflow 32-bit bpf program refcnt.
+It's also possible to overflow map refcnt on 1Tb system.
+"
+We mitigated that with fixed limits:
+-       atomic_inc(&map->refcnt);
++       if (atomic_inc_return(&map->refcnt) > BPF_MAX_REFCNT) {
++               atomic_dec(&map->refcnt);
++               return ERR_PTR(-EBUSY);
++       }
+but it created quite a lot of error handling pain throughout
+the code, so eventually in 2019 we switched to atomic64_t refcnt
+and never looked back.
+I suspect Jann will be able to overflow 32-bit token refcnt,
+so atomic64 was chosen for simplicity.
+atomic_long_t might work too, but the effort to think it through
+is not worth it at this point, since performance of
+inc/dec doesn't matter here.
 
+Eventually we can do a follow up and consistently update
+all such counters to atomic_long_t.
 
