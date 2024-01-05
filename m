@@ -1,291 +1,233 @@
-Return-Path: <netdev+bounces-61999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7235A8258E9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:17:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5EC98258CF
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:03:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0335F2854A1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:17:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDEAA1C228BA
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616E831735;
-	Fri,  5 Jan 2024 17:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E3E2E85B;
+	Fri,  5 Jan 2024 17:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Dfe5m+t2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Owghbxc3"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C2432187;
-	Fri,  5 Jan 2024 17:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=bWf3yT97gabATZJg4RvJhEH+r1LG8ILH7khMGadV3yo=; b=Dfe5m+t2VMT8qeV9YTsuqgkHjy
-	SPp07U2XxBgiIMqMkE51CwBwUg+QviU0UhmYzvBwN947kUwmncKFf9qKRCr68sCbjLeWNXmPGNO7/
-	bSjggFKW9QfG+d3NuczXqHpMr1dQiqG/GQxcdaRIJx5PY1UYP0hkCCNaAw9YwUi4cGIp9vV3xQTnc
-	9XYw0VJUvulBLcXg1g/fqcYgo8cvzGGCZLanNP1MfNJ8LgXbSc7SNV9Va9ZeolbzL7iPnEcZSmhvc
-	nkAXhBWRQLomimm9F8/gg0E6qjS7+7P5GQZy+IAUBaUPJ1l3cgq0ik9lumvpQMxPuqvtojXdsZtDA
-	ZeMSB2LQ==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rLnZB-000OHO-Te; Fri, 05 Jan 2024 18:01:06 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2024-01-05
-Date: Fri,  5 Jan 2024 18:01:05 +0100
-Message-Id: <20240105170105.21070-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7D131A69
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 17:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbeaf21e069so2295416276.1
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 09:03:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704474195; x=1705078995; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BI25y7OUP0OOtbnQjwp++yy7r1tF+jkjB+PSnSVtMWI=;
+        b=Owghbxc3Ps8oco5W3n1lJQbgRM1R8vs0SJXp6c8rjB7XjXZRSSkOyEkfOPFjpllVzL
+         aha3gnUosyBCKkHIxH68T3BR3i+5ugLPrIh1fpUnmJMNNqpHRsaejQJq+ukcsG2PUXXZ
+         so88LsxdaFLXDKjviQ0uPR1BrUMMflJIDA5AFSGjhkeH+P3rl7cf6WoDTlNYQpPzoQmm
+         ki8kBiHdbQDWuWkvKqT+QEuy8drSka4em7LgwHrhVrfXZVvK7Xb8n738KRHv5mpbP8i3
+         ZIBbvMg7SpmIC2oQ5cZ2GCs3x2ICrXDFvP99jTqv2Cf4zg/9xjRERrDayCOABM1FgDcc
+         4zKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704474195; x=1705078995;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BI25y7OUP0OOtbnQjwp++yy7r1tF+jkjB+PSnSVtMWI=;
+        b=rSKpUPN0l4KGIRZso4TtQqbR/aNNND/gkBG0mPnMGF0chzCD1tRjgAGqinQkrA3ynN
+         QUOPU9DPho90eaWw1ehdljlbn+FGgKGIDQwelrSrK1HpJ4FaGR0S6sPrEOQPk6VsO2Pc
+         G/YopiNU1aiGV0GepevmW9i3sjCEombHMHP0rs7tBAlUXAx+R3sDVv9YfreeBbvlq6Pg
+         i0ZJSGvJQGhr30KS6BjBIgH/RMCGmWc9d03Db5rMstMgTozQOrXlMVQt1rVsk7qpQT+3
+         wTJvSNrk6y23vXybhznbwXjcD0geDnGULd8u4GHN/yWHqBM406UhdVO/PlVsm1byDEQH
+         /Gng==
+X-Gm-Message-State: AOJu0YzDnXAb+85OAK+LjygqSaFLHd88M5moG2E0F3tPqCjiUGqzWiLo
+	w/2hnx3yRTO8dSCbRSgjTNo/BZmpqAVIELDR5vLF
+X-Google-Smtp-Source: AGHT+IE3i0N6VgXQs9LYlHuFyWZPT8YtOYml+H2nkrVaBXR7IsSKujmvNdZ8+pB+g6Qi0GHEaKnngLJZZ3BVug==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:bfc6:0:b0:dbd:b7cb:8a6b with SMTP id
+ q6-20020a25bfc6000000b00dbdb7cb8a6bmr82034ybm.1.1704474194795; Fri, 05 Jan
+ 2024 09:03:14 -0800 (PST)
+Date: Fri,  5 Jan 2024 17:03:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27145/Fri Jan  5 10:40:31 2024)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20240105170313.2946078-1-edumazet@google.com>
+Subject: [PATCH net] ip6_tunnel: fix NEXTHDR_FRAGMENT handling in ip6_tnl_parse_tlv_enc_lim()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+syzbot pointed out [1] that NEXTHDR_FRAGMENT handling is broken.
 
-The following pull-request contains BPF updates for your *net-next* tree.
+Reading frag_off can only be done if we pulled enough bytes
+to skb->head. Currently we might access garbage.
 
-We've added 40 non-merge commits during the last 2 day(s) which contain
-a total of 73 files changed, 1526 insertions(+), 951 deletions(-).
+[1]
+BUG: KMSAN: uninit-value in ip6_tnl_parse_tlv_enc_lim+0x94f/0xbb0
+ip6_tnl_parse_tlv_enc_lim+0x94f/0xbb0
+ipxip6_tnl_xmit net/ipv6/ip6_tunnel.c:1326 [inline]
+ip6_tnl_start_xmit+0xab2/0x1a70 net/ipv6/ip6_tunnel.c:1432
+__netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+xmit_one net/core/dev.c:3548 [inline]
+dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
+__dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
+dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+neigh_connected_output+0x569/0x660 net/core/neighbour.c:1592
+neigh_output include/net/neighbour.h:542 [inline]
+ip6_finish_output2+0x23a9/0x2b30 net/ipv6/ip6_output.c:137
+ip6_finish_output+0x855/0x12b0 net/ipv6/ip6_output.c:222
+NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+ip6_output+0x323/0x610 net/ipv6/ip6_output.c:243
+dst_output include/net/dst.h:451 [inline]
+ip6_local_out+0xe9/0x140 net/ipv6/output_core.c:155
+ip6_send_skb net/ipv6/ip6_output.c:1952 [inline]
+ip6_push_pending_frames+0x1f9/0x560 net/ipv6/ip6_output.c:1972
+rawv6_push_pending_frames+0xbe8/0xdf0 net/ipv6/raw.c:582
+rawv6_sendmsg+0x2b66/0x2e70 net/ipv6/raw.c:920
+inet_sendmsg+0x105/0x190 net/ipv4/af_inet.c:847
+sock_sendmsg_nosec net/socket.c:730 [inline]
+__sock_sendmsg net/socket.c:745 [inline]
+____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+__sys_sendmsg net/socket.c:2667 [inline]
+__do_sys_sendmsg net/socket.c:2676 [inline]
+__se_sys_sendmsg net/socket.c:2674 [inline]
+__x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-The main changes are:
+Uninit was created at:
+slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+slab_alloc_node mm/slub.c:3478 [inline]
+__kmem_cache_alloc_node+0x5c9/0x970 mm/slub.c:3517
+__do_kmalloc_node mm/slab_common.c:1006 [inline]
+__kmalloc_node_track_caller+0x118/0x3c0 mm/slab_common.c:1027
+kmalloc_reserve+0x249/0x4a0 net/core/skbuff.c:582
+pskb_expand_head+0x226/0x1a00 net/core/skbuff.c:2098
+__pskb_pull_tail+0x13b/0x2310 net/core/skbuff.c:2655
+pskb_may_pull_reason include/linux/skbuff.h:2673 [inline]
+pskb_may_pull include/linux/skbuff.h:2681 [inline]
+ip6_tnl_parse_tlv_enc_lim+0x901/0xbb0 net/ipv6/ip6_tunnel.c:408
+ipxip6_tnl_xmit net/ipv6/ip6_tunnel.c:1326 [inline]
+ip6_tnl_start_xmit+0xab2/0x1a70 net/ipv6/ip6_tunnel.c:1432
+__netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+xmit_one net/core/dev.c:3548 [inline]
+dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
+__dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
+dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+neigh_connected_output+0x569/0x660 net/core/neighbour.c:1592
+neigh_output include/net/neighbour.h:542 [inline]
+ip6_finish_output2+0x23a9/0x2b30 net/ipv6/ip6_output.c:137
+ip6_finish_output+0x855/0x12b0 net/ipv6/ip6_output.c:222
+NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+ip6_output+0x323/0x610 net/ipv6/ip6_output.c:243
+dst_output include/net/dst.h:451 [inline]
+ip6_local_out+0xe9/0x140 net/ipv6/output_core.c:155
+ip6_send_skb net/ipv6/ip6_output.c:1952 [inline]
+ip6_push_pending_frames+0x1f9/0x560 net/ipv6/ip6_output.c:1972
+rawv6_push_pending_frames+0xbe8/0xdf0 net/ipv6/raw.c:582
+rawv6_sendmsg+0x2b66/0x2e70 net/ipv6/raw.c:920
+inet_sendmsg+0x105/0x190 net/ipv4/af_inet.c:847
+sock_sendmsg_nosec net/socket.c:730 [inline]
+__sock_sendmsg net/socket.c:745 [inline]
+____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+__sys_sendmsg net/socket.c:2667 [inline]
+__do_sys_sendmsg net/socket.c:2676 [inline]
+__se_sys_sendmsg net/socket.c:2674 [inline]
+__x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-1) Fix a memory leak when streaming AF_UNIX sockets were inserted into multiple
-   sockmap slots/maps, from John Fastabend.
+CPU: 0 PID: 7345 Comm: syz-executor.3 Not tainted 6.7.0-rc8-syzkaller-00024-gac865f00af29 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
 
-2) Fix gotol in s390 BPF JIT with large offsets, from Ilya Leoshkevich.
+Fixes: fbfa743a9d2a ("ipv6: fix ip6_tnl_parse_tlv_enc_lim()")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Willem de Bruijn <willemb@google.com>
+---
+ net/ipv6/ip6_tunnel.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-3) Fix reattachment branch in bpf_tracing_prog_attach() and reject the request
-   if there is no valid attach_btf, from Jiri Olsa.
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 5e80e517f071013410349d1fd93afc00a394e284..46c19bd4899011d53b4feb84e25013c01ddce701 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -399,7 +399,7 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
+ 	const struct ipv6hdr *ipv6h = (const struct ipv6hdr *)raw;
+ 	unsigned int nhoff = raw - skb->data;
+ 	unsigned int off = nhoff + sizeof(*ipv6h);
+-	u8 next, nexthdr = ipv6h->nexthdr;
++	u8 nexthdr = ipv6h->nexthdr;
+ 
+ 	while (ipv6_ext_hdr(nexthdr) && nexthdr != NEXTHDR_NONE) {
+ 		struct ipv6_opt_hdr *hdr;
+@@ -410,25 +410,25 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
+ 
+ 		hdr = (struct ipv6_opt_hdr *)(skb->data + off);
+ 		if (nexthdr == NEXTHDR_FRAGMENT) {
+-			struct frag_hdr *frag_hdr = (struct frag_hdr *) hdr;
+-			if (frag_hdr->frag_off)
+-				break;
+ 			optlen = 8;
+ 		} else if (nexthdr == NEXTHDR_AUTH) {
+ 			optlen = ipv6_authlen(hdr);
+ 		} else {
+ 			optlen = ipv6_optlen(hdr);
+ 		}
+-		/* cache hdr->nexthdr, since pskb_may_pull() might
+-		 * invalidate hdr
+-		 */
+-		next = hdr->nexthdr;
+-		if (nexthdr == NEXTHDR_DEST) {
+-			u16 i = 2;
+ 
+-			/* Remember : hdr is no longer valid at this point. */
+-			if (!pskb_may_pull(skb, off + optlen))
++		if (!pskb_may_pull(skb, off + optlen))
++			break;
++
++		hdr = (struct ipv6_opt_hdr *)(skb->data + off);
++		if (nexthdr == NEXTHDR_FRAGMENT) {
++			struct frag_hdr *frag_hdr = (struct frag_hdr *)hdr;
++
++			if (frag_hdr->frag_off)
+ 				break;
++		}
++		if (nexthdr == NEXTHDR_DEST) {
++			u16 i = 2;
+ 
+ 			while (1) {
+ 				struct ipv6_tlv_tnl_enc_lim *tel;
+@@ -449,7 +449,7 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
+ 					i++;
+ 			}
+ 		}
+-		nexthdr = next;
++		nexthdr = hdr->nexthdr;
+ 		off += optlen;
+ 	}
+ 	return 0;
+-- 
+2.43.0.472.g3155946c3a-goog
 
-4) Remove deprecated bpfilter kernel leftovers given the project is developed
-   in user space (https://github.com/facebook/bpfilter), from Quentin Deslandes.
-
-5) Relax tracing BPF program recursive attach rules given right now it is not
-   possible to create tracing program call cycles, from Dmitrii Dolgov.
-
-6) Fix excessive memory consumption for the bpf_global_percpu_ma for systems
-   with a large number of CPUs, from Yonghong Song.
-
-7) Small x86 BPF JIT cleanup to reuse emit_nops instead of open-coding memcpy
-   of x86_nops, from Leon Hwang.
-
-8) Follow-up for libbpf to support __arg_ctx global function argument tag
-   semantics to complement the merged kernel side, from Andrii Nakryiko.
-
-9) Introduce "volatile compare" macros for BPF selftests in order to make the
-   latter more robust against compiler optimization, from Alexei Starovoitov.
-
-10) Small simplification in verifier's size checking of helper accesses along
-    with additional selftests, from Andrei Matei.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot & happy new year!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Andrii Nakryiko, Daniel Borkmann, Hou Tao, Jakub Sitnicki, Jiri Olsa, 
-John Fastabend, Kumar Kartikeya Dwivedi, Song Liu, Xingwei Lee, Yonghong 
-Song
-
-----------------------------------------------------------------
-
-The following changes since commit 2ab1efad60ad119b616722b81eeb73060728028c:
-
-  net/sched: cls_api: complement tcf_tfilter_dump_policy (2024-01-03 11:54:39 +0000)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to 5fe4ee6ae187523f710f1b93024437a073d88b17:
-
-  Merge branch 'relax-tracing-prog-recursive-attach-rules' (2024-01-04 20:40:54 -0800)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (10):
-      selftests/bpf: Attempt to build BPF programs with -Wsign-compare
-      bpf: Introduce "volatile compare" macros
-      selftests/bpf: Convert exceptions_assert.c to bpf_cmp
-      selftests/bpf: Remove bpf_assert_eq-like macros.
-      bpf: Add bpf_nop_mov() asm macro.
-      selftests/bpf: Convert profiler.c to bpf_cmp.
-      Merge branch 'bpf-reduce-memory-usage-for-bpf_global_percpu_ma'
-      Merge branch 'libbpf-side-__arg_ctx-fallback-support'
-      Merge branch 's390-bpf-fix-gotol-with-large-offsets'
-      Merge branch 'relax-tracing-prog-recursive-attach-rules'
-
-Andrei Matei (2):
-      bpf: Simplify checking size of helper accesses
-      bpf: Add a possibly-zero-sized read test
-
-Andrii Nakryiko (11):
-      Merge branch 'bpf-simplify-checking-size-of-helper-accesses'
-      Merge branch 'bpf-volatile-compare'
-      libbpf: make uniform use of btf__fd() accessor inside libbpf
-      libbpf: use explicit map reuse flag to skip map creation steps
-      libbpf: don't rely on map->fd as an indicator of map being created
-      libbpf: use stable map placeholder FDs
-      libbpf: move exception callbacks assignment logic into relocation step
-      libbpf: move BTF loading step after relocation step
-      libbpf: implement __arg_ctx fallback logic
-      selftests/bpf: add arg:ctx cases to test_global_funcs tests
-      selftests/bpf: add __arg_ctx BTF rewrite test
-
-Dmitrii Dolgov (3):
-      bpf: Relax tracing prog recursive attach rules
-      selftests/bpf: Add test for recursive attachment of tracing progs
-      selftests/bpf: Test re-attachment fix for bpf_tracing_prog_attach
-
-Ilya Leoshkevich (3):
-      s390/bpf: Fix gotol with large offsets
-      selftests/bpf: Double the size of test_loader log
-      selftests/bpf: Test gotol with large offsets
-
-Jiri Olsa (1):
-      bpf: Fix re-attachment branch in bpf_tracing_prog_attach
-
-John Fastabend (5):
-      bpf: sockmap, fix proto update hook to avoid dup calls
-      bpf: sockmap, added comments describing update proto rules
-      bpf: sockmap, add tests for proto updates many to single map
-      bpf: sockmap, add tests for proto updates single socket to many map
-      bpf: sockmap, add tests for proto updates replace socket
-
-Leon Hwang (1):
-      bpf, x86: Use emit_nops to replace memcpy x86_nops
-
-Martin KaFai Lau (1):
-      Merge branch 'fix sockmap + stream  af_unix memleak'
-
-Quentin Deslandes (1):
-      bpfilter: remove bpfilter
-
-Yonghong Song (9):
-      bpf: Avoid unnecessary extra percpu memory allocation
-      bpf: Add objcg to bpf_mem_alloc
-      bpf: Allow per unit prefill for non-fix-size percpu memory allocator
-      bpf: Refill only one percpu element in memalloc
-      bpf: Use smaller low/high marks for percpu allocation
-      bpf: Limit up to 512 bytes for bpf_global_percpu_ma allocation
-      selftests/bpf: Cope with 512 bytes limit with bpf_global_percpu_ma
-      selftests/bpf: Add a selftest with > 512-byte percpu allocation size
-      bpf: Remove unnecessary cpu == 0 check in memalloc
-
- arch/loongarch/configs/loongson3_defconfig         |   1 -
- arch/s390/net/bpf_jit_comp.c                       |   2 +-
- arch/x86/net/bpf_jit_comp.c                        |  47 +-
- include/linux/bpf.h                                |   1 +
- include/linux/bpf_mem_alloc.h                      |   8 +
- include/linux/bpfilter.h                           |  24 -
- include/linux/skmsg.h                              |   5 +
- include/uapi/linux/bpfilter.h                      |  21 -
- kernel/bpf/memalloc.c                              |  93 +++-
- kernel/bpf/syscall.c                               |  32 +-
- kernel/bpf/verifier.c                              |  94 ++--
- net/Kconfig                                        |   2 -
- net/Makefile                                       |   1 -
- net/bpfilter/.gitignore                            |   2 -
- net/bpfilter/Kconfig                               |  23 -
- net/bpfilter/Makefile                              |  20 -
- net/bpfilter/bpfilter_kern.c                       | 136 -----
- net/bpfilter/bpfilter_umh_blob.S                   |   7 -
- net/bpfilter/main.c                                |  64 ---
- net/bpfilter/msgfmt.h                              |  17 -
- net/ipv4/Makefile                                  |   2 -
- net/ipv4/bpfilter/Makefile                         |   2 -
- net/ipv4/bpfilter/sockopt.c                        |  71 ---
- net/ipv4/ip_sockglue.c                             |  12 -
- net/unix/unix_bpf.c                                |  21 +-
- tools/bpf/bpftool/feature.c                        |   4 -
- tools/lib/bpf/libbpf.c                             | 570 ++++++++++++++++-----
- tools/lib/bpf/libbpf_internal.h                    |  14 +
- tools/testing/selftests/bpf/Makefile               |   1 +
- tools/testing/selftests/bpf/bpf_experimental.h     | 220 +++-----
- tools/testing/selftests/bpf/config.aarch64         |   1 -
- tools/testing/selftests/bpf/config.s390x           |   1 -
- tools/testing/selftests/bpf/config.x86_64          |   1 -
- .../selftests/bpf/prog_tests/recursive_attach.c    | 151 ++++++
- .../selftests/bpf/prog_tests/sockmap_basic.c       | 214 +++++++-
- .../testing/selftests/bpf/prog_tests/test_bpf_ma.c |  20 +-
- .../selftests/bpf/prog_tests/test_global_funcs.c   | 106 ++++
- .../bpf/progs/bpf_iter_bpf_percpu_hash_map.c       |   2 +-
- .../selftests/bpf/progs/bpf_iter_task_vmas.c       |   2 +-
- tools/testing/selftests/bpf/progs/bpf_iter_tasks.c |   2 +-
- .../selftests/bpf/progs/bpf_iter_test_kern4.c      |   2 +-
- .../bpf/progs/cgroup_getset_retval_setsockopt.c    |   2 +-
- .../selftests/bpf/progs/cgrp_ls_sleepable.c        |   2 +-
- .../testing/selftests/bpf/progs/cpumask_success.c  |   2 +-
- tools/testing/selftests/bpf/progs/exceptions.c     |  20 +-
- .../selftests/bpf/progs/exceptions_assert.c        |  80 +--
- .../testing/selftests/bpf/progs/fentry_recursive.c |  14 +
- .../selftests/bpf/progs/fentry_recursive_target.c  |  25 +
- tools/testing/selftests/bpf/progs/iters.c          |   4 +-
- tools/testing/selftests/bpf/progs/iters_task_vma.c |   3 +-
- tools/testing/selftests/bpf/progs/linked_funcs1.c  |   2 +-
- tools/testing/selftests/bpf/progs/linked_funcs2.c  |   2 +-
- tools/testing/selftests/bpf/progs/linked_list.c    |   2 +-
- tools/testing/selftests/bpf/progs/local_storage.c  |   2 +-
- tools/testing/selftests/bpf/progs/lsm.c            |   2 +-
- tools/testing/selftests/bpf/progs/normal_map_btf.c |   2 +-
- .../selftests/bpf/progs/percpu_alloc_fail.c        |  18 +
- tools/testing/selftests/bpf/progs/profiler.inc.h   |  68 +--
- .../testing/selftests/bpf/progs/sockopt_inherit.c  |   2 +-
- tools/testing/selftests/bpf/progs/sockopt_multi.c  |   2 +-
- .../selftests/bpf/progs/sockopt_qos_to_cc.c        |   2 +-
- tools/testing/selftests/bpf/progs/test_bpf_ma.c    |  68 +--
- .../selftests/bpf/progs/test_core_reloc_kernel.c   |   2 +-
- .../selftests/bpf/progs/test_core_reloc_module.c   |   8 +-
- tools/testing/selftests/bpf/progs/test_fsverity.c  |   2 +-
- .../bpf/progs/test_global_func_ctx_args.c          |  49 ++
- .../selftests/bpf/progs/test_skc_to_unix_sock.c    |   2 +-
- .../selftests/bpf/progs/test_xdp_do_redirect.c     |   2 +-
- tools/testing/selftests/bpf/progs/verifier_gotol.c |  19 +
- .../bpf/progs/verifier_helper_value_access.c       |  45 +-
- .../selftests/bpf/progs/verifier_raw_stack.c       |   2 +-
- tools/testing/selftests/bpf/test_loader.c          |   2 +-
- tools/testing/selftests/hid/config                 |   1 -
- 73 files changed, 1526 insertions(+), 951 deletions(-)
- delete mode 100644 include/linux/bpfilter.h
- delete mode 100644 include/uapi/linux/bpfilter.h
- delete mode 100644 net/bpfilter/.gitignore
- delete mode 100644 net/bpfilter/Kconfig
- delete mode 100644 net/bpfilter/Makefile
- delete mode 100644 net/bpfilter/bpfilter_kern.c
- delete mode 100644 net/bpfilter/bpfilter_umh_blob.S
- delete mode 100644 net/bpfilter/main.c
- delete mode 100644 net/bpfilter/msgfmt.h
- delete mode 100644 net/ipv4/bpfilter/Makefile
- delete mode 100644 net/ipv4/bpfilter/sockopt.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/recursive_attach.c
- create mode 100644 tools/testing/selftests/bpf/progs/fentry_recursive.c
- create mode 100644 tools/testing/selftests/bpf/progs/fentry_recursive_target.c
 
