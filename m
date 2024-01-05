@@ -1,108 +1,95 @@
-Return-Path: <netdev+bounces-62000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 062668258F2
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:21:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9A7882590A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5463CB2156E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:21:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A55B1F24139
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504BB32197;
-	Fri,  5 Jan 2024 17:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957CA32197;
+	Fri,  5 Jan 2024 17:29:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="tn6PqWq+";
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="CvojuvDV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hn/9KCKo"
 X-Original-To: netdev@vger.kernel.org
-Received: from nautica.notk.org (nautica.notk.org [91.121.71.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F9C32186;
-	Fri,  5 Jan 2024 17:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
-Received: by nautica.notk.org (Postfix, from userid 108)
-	id 47DCEC026; Fri,  5 Jan 2024 18:20:55 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1704475255; bh=G5QLtqgPgUPlhX16D8cxgZSrhZwA8FdHTj67GHw0qi8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=tn6PqWq+0UHN3QxCRZid+V+fJBenvC3IrIIcqOsdUbUgqD8BvhWt2WB90oSw7XpPg
-	 QlUFE2ue/FCeJ/DLCFsWomlZCxMLnpaB0lM3wvwMCs4jctG4fvUBqrc03/wmY/sc0S
-	 8N2iRbE0aTsPVsWcNX4DCgvZISkj+1s2RpUktuXRQ7liHWaMGGelG/otThKmTb5+o9
-	 rqsKWauiSE5eYZH82ZaqL1LP0H6bbwJzQQG77J3sBIpVhHOvH02KIeT/rFE6grRJ9i
-	 cHB85E+b1u50A//1wjlYgDkzEh8xzHxoPl97Y55v0xmCQmwlSI3+S7yRacHEVsWfLm
-	 H0mNlD3NjjkYw==
-X-Spam-Level: 
-Received: from gaia (localhost [127.0.0.1])
-	by nautica.notk.org (Postfix) with ESMTPS id 448ADC009;
-	Fri,  5 Jan 2024 18:20:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1704475254; bh=G5QLtqgPgUPlhX16D8cxgZSrhZwA8FdHTj67GHw0qi8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=CvojuvDVolRZkDDlIyj4uY5hFwD/G9sunkTM46WaLCaS3QIrYNL/Um2wFEN1Efbub
-	 AMgqrgm0WuuDyTu9RFhh8PxIVWprskRaMfCAUwhNw8adtnNMYHs5Bky4OntLrV86/Q
-	 XmU2feeoZdQm8hdpDIY+BLbeIyzFOjK2HbobG5a9E+yEpXx9TfaYR70WhcumYdlH5T
-	 HkCWSMxrchak5K5WPOkEkbPG2H9CmhaW1116sshIwrG/ZnK1AyARzAH5rYoKYuS2Jk
-	 AqxoyHMYpNvvuolbdXa2aaLMFmQjd42lAcZqTp8w5LAgtmHV3I+9GZc8lkKE5jXWtd
-	 swfGIM6q8sjVg==
-Received: from localhost (gaia [local])
-	by gaia (OpenSMTPD) with ESMTPA id 39ce6c8b;
-	Fri, 5 Jan 2024 17:20:44 +0000 (UTC)
-Date: Sat, 6 Jan 2024 02:20:29 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Matthew Wilcox <willy@infradead.org>,
-	David Howells <dhowells@redhat.com>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Anna Schumaker <Anna.Schumaker@netapp.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Fix oops in NFS
-Message-ID: <ZZg6XQOjlOA0CL17@codewreck.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA3C3218C;
+	Fri,  5 Jan 2024 17:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5f093e7c095so1485517b3.1;
+        Fri, 05 Jan 2024 09:29:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704475769; x=1705080569; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=k7QJySwDQ7NTkbKcbw/A3aOLckB6WzzI0AOdXEu2nM4=;
+        b=Hn/9KCKolkqxlhj2B9JUn1eEOeAfpfz1iYRbRzc+BNtO3rYelUgH6tQmKAlHfFNm+W
+         oaVjzpJpCeoBnfMprj8mJ3YQS3GcT7wmZUC8dBMsudey/T2orb/2WuykDZzX+mHw9NRC
+         e4DOoUHLVvCkjtTFv3qpWc4xFWxwilyTElwsifrzVTOFK166ABAwzvAtAHxcicb0dPSB
+         hy4N9QJJpawQzExndRxMt5UKgB1jEEcHPOg+TB13bmS4Gpdrq5miMMg6istJt1XdFJJv
+         K7m2wJApuMhyyqGu9fXUSf7ruK2YrQM7KiU1cQL4rTCZ4i6i2JexWHaS5iARBCbCiO1a
+         o5XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704475769; x=1705080569;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k7QJySwDQ7NTkbKcbw/A3aOLckB6WzzI0AOdXEu2nM4=;
+        b=A5y52TmHhO+4SFjLLKyU3hGiZAIyreitV392oVnIqHlc0pCeWAPcex3YSB1waw6hAl
+         pNx7dzXFpLT4ZUeb42upfnKh+aZLwXLMahkLPqM4pun6X3fzktMZvZqEcqCGh7s7DUj2
+         JAKy+ZkHVSKM9t8vGpaFp88dJb3xv0WleXNSgVy0FVG0xFhkp8B9J9pC9zoTd0Yc2Pdf
+         r5Q86q1OxJ7KOP/IdVhQZZWcpC2HJ4SYdO4QEK3GG/7jMbuJtgHWxV3l16iMP6jseTgq
+         BFO10YPNvLan+eyynlNbBXpAxm7JE31bMD4epDH1h1rxoWZRJAYdqTNEmhT3wHi5EH1F
+         b3nw==
+X-Gm-Message-State: AOJu0YxLsEJfVmUKTMeK835y9eV+1xuitbUhwTBEHaFa9DSoJQN9C7sa
+	g4nkybJbwxEt3zgT7p4ypG594t+eqLc=
+X-Google-Smtp-Source: AGHT+IFUyoTdm8+qIH2Eyd/JHmmDXU24n3J0kViKBI3ezD2Rjd8T8lnpaWkbG4HnJMo/Rw7/6Jei+g==
+X-Received: by 2002:a81:80c2:0:b0:5e9:811:91cb with SMTP id q185-20020a8180c2000000b005e9081191cbmr3877216ywf.5.1704475769285;
+        Fri, 05 Jan 2024 09:29:29 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id r189-20020a8181c6000000b0058fc7604f45sm782659ywf.130.2024.01.05.09.29.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 09:29:28 -0800 (PST)
+Date: Fri, 5 Jan 2024 09:29:26 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Min Li <lnimi@hotmail.com>
+Cc: lee@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: Re: [PATCH net-next v7 1/2] ptp: introduce PTP_CLOCK_EXTOFF event
+ for the measured external offset
+Message-ID: <ZZg8dmWUNB1IfZMF@hoboy.vegasvil.org>
+References: <PH7PR03MB7064E904EEBAAF0992DF42A2A0662@PH7PR03MB7064.namprd03.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1197168.1704465212@warthog.procyon.org.uk>
- <ZZgBcJ7OAS7Ui6gi@casper.infradead.org>
+In-Reply-To: <PH7PR03MB7064E904EEBAAF0992DF42A2A0662@PH7PR03MB7064.namprd03.prod.outlook.com>
 
-Matthew Wilcox wrote on Fri, Jan 05, 2024 at 01:17:36PM +0000:
-> host on /host type 9p (rw,relatime,access=client,trans=virtio)
-
-David Howells wrote on Fri, Jan 05, 2024 at 02:33:32PM +0000:
-> > This commit (100ccd18bb41 in linux-next 20240104) is bad for me.  After
-> > it, running xfstests gives me first a bunch of errors along these lines:
+On Fri, Jan 05, 2024 at 10:23:12AM -0500, Min Li wrote:
+> From: Min Li <min.li.xe@renesas.com>
 > 
-> This may be related to a patch that is in linux-next 20240105, but not
-> 20240104 ("9p: Fix initialisation of netfs_inode for 9p").
+> This change is for the PHC devices that can measure the phase offset
+> between PHC signal and the external signal, such as the 1PPS signal of
+> GNSS. Reporting PTP_CLOCK_EXTOFF to user space will be piggy-backed to
+> the existing ptp_extts_event so that application such as ts2phc can
+> poll the external offset the same way as extts. Hence, ts2phc can use
+> the offset to achieve the alignment between PHC and the external signal
+> by the help of either SW or HW filters.
+> 
+> Signed-off-by: Min Li <min.li.xe@renesas.com>
 
-Yes, you'd be reading zeroes without that patch because the netfs code
-thinks the file has 0 size and doesn't bother reading, that'd explain
-the exec format error loading other modules...
+Since I ack'ed v6, if v7 has no substantial changes, then you should
+have added the following line to the commit message:
 
-One thing that surprised me is that this also affects cache=none, I
-thought we had different file ops going straight to p9_client_read in
-this case?
-But turning my brain on this would be the read-only mmap case that we
-need to support for execs, which module loading also uses, so this came
-biting there alright.
-
--- 
-Dominique Martinet | Asmadeus
+Acked-by: Richard Cochran <richardcochran@gmail.com>
 
