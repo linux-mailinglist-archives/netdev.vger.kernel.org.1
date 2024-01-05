@@ -1,233 +1,206 @@
-Return-Path: <netdev+bounces-61995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5EC98258CF
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:03:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEDA08258D3
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 18:04:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDEAA1C228BA
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:03:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 038AF1C22BB8
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E3E2E85B;
-	Fri,  5 Jan 2024 17:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E55731A69;
+	Fri,  5 Jan 2024 17:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Owghbxc3"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="T3VQ268l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7D131A69
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 17:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbeaf21e069so2295416276.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 09:03:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704474195; x=1705078995; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BI25y7OUP0OOtbnQjwp++yy7r1tF+jkjB+PSnSVtMWI=;
-        b=Owghbxc3Ps8oco5W3n1lJQbgRM1R8vs0SJXp6c8rjB7XjXZRSSkOyEkfOPFjpllVzL
-         aha3gnUosyBCKkHIxH68T3BR3i+5ugLPrIh1fpUnmJMNNqpHRsaejQJq+ukcsG2PUXXZ
-         so88LsxdaFLXDKjviQ0uPR1BrUMMflJIDA5AFSGjhkeH+P3rl7cf6WoDTlNYQpPzoQmm
-         ki8kBiHdbQDWuWkvKqT+QEuy8drSka4em7LgwHrhVrfXZVvK7Xb8n738KRHv5mpbP8i3
-         ZIBbvMg7SpmIC2oQ5cZ2GCs3x2ICrXDFvP99jTqv2Cf4zg/9xjRERrDayCOABM1FgDcc
-         4zKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704474195; x=1705078995;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BI25y7OUP0OOtbnQjwp++yy7r1tF+jkjB+PSnSVtMWI=;
-        b=rSKpUPN0l4KGIRZso4TtQqbR/aNNND/gkBG0mPnMGF0chzCD1tRjgAGqinQkrA3ynN
-         QUOPU9DPho90eaWw1ehdljlbn+FGgKGIDQwelrSrK1HpJ4FaGR0S6sPrEOQPk6VsO2Pc
-         G/YopiNU1aiGV0GepevmW9i3sjCEombHMHP0rs7tBAlUXAx+R3sDVv9YfreeBbvlq6Pg
-         i0ZJSGvJQGhr30KS6BjBIgH/RMCGmWc9d03Db5rMstMgTozQOrXlMVQt1rVsk7qpQT+3
-         wTJvSNrk6y23vXybhznbwXjcD0geDnGULd8u4GHN/yWHqBM406UhdVO/PlVsm1byDEQH
-         /Gng==
-X-Gm-Message-State: AOJu0YzDnXAb+85OAK+LjygqSaFLHd88M5moG2E0F3tPqCjiUGqzWiLo
-	w/2hnx3yRTO8dSCbRSgjTNo/BZmpqAVIELDR5vLF
-X-Google-Smtp-Source: AGHT+IE3i0N6VgXQs9LYlHuFyWZPT8YtOYml+H2nkrVaBXR7IsSKujmvNdZ8+pB+g6Qi0GHEaKnngLJZZ3BVug==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:bfc6:0:b0:dbd:b7cb:8a6b with SMTP id
- q6-20020a25bfc6000000b00dbdb7cb8a6bmr82034ybm.1.1704474194795; Fri, 05 Jan
- 2024 09:03:14 -0800 (PST)
-Date: Fri,  5 Jan 2024 17:03:13 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AC7569F;
+	Fri,  5 Jan 2024 17:04:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 564E7C433C7;
+	Fri,  5 Jan 2024 17:04:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1704474273;
+	bh=4oS5Gy7nNk2JT05LPHZuOQhXnfsquv2G9IeGUiXfG8U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=T3VQ268lo+UMgWIzGusHAGV8Nip+Io8OVCphfoB21H2v6BeKrMLuo8zCiu8N3MBZA
+	 VOrbdKCiM4+7O02lZq3nEB4BYYuhAzp6xJ8nAJhxAMZsko6S4814E/krliNA7DuBQN
+	 lKtP27pY2fMEuQjpu8jkQculySO3eavtmwGMeHpo=
+Date: Fri, 5 Jan 2024 09:04:32 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: "Yin, Fengwei" <fengwei.yin@intel.com>
+Cc: David Hildenbrand <david@redhat.com>, syzbot
+ <syzbot+50ef73537bbc393a25bb@syzkaller.appspotmail.com>,
+ <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+ <ryan.roberts@arm.com>, <syzkaller-bugs@googlegroups.com>, Matthew Wilcox
+ <willy@infradead.org>, netdev@vger.kernel.org
+Subject: Re: [syzbot] [mm?] WARNING in __folio_rmap_sanity_checks
+Message-Id: <20240105090432.041a6f40b4402f0ee00ecc57@linux-foundation.org>
+In-Reply-To: <3feecbd6-b3bd-440c-a4f9-2a7dba3ff8f1@intel.com>
+References: <000000000000014174060e09316e@google.com>
+	<c4e2e700-2d26-492f-8eb2-eb3ab14bc07a@redhat.com>
+	<3feecbd6-b3bd-440c-a4f9-2a7dba3ff8f1@intel.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20240105170313.2946078-1-edumazet@google.com>
-Subject: [PATCH net] ip6_tunnel: fix NEXTHDR_FRAGMENT handling in ip6_tnl_parse_tlv_enc_lim()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-syzbot pointed out [1] that NEXTHDR_FRAGMENT handling is broken.
+(cc netdev)
 
-Reading frag_off can only be done if we pulled enough bytes
-to skb->head. Currently we might access garbage.
+On Wed, 3 Jan 2024 22:16:13 +0800 "Yin, Fengwei" <fengwei.yin@intel.com> wr=
+ote:
 
-[1]
-BUG: KMSAN: uninit-value in ip6_tnl_parse_tlv_enc_lim+0x94f/0xbb0
-ip6_tnl_parse_tlv_enc_lim+0x94f/0xbb0
-ipxip6_tnl_xmit net/ipv6/ip6_tunnel.c:1326 [inline]
-ip6_tnl_start_xmit+0xab2/0x1a70 net/ipv6/ip6_tunnel.c:1432
-__netdev_start_xmit include/linux/netdevice.h:4940 [inline]
-netdev_start_xmit include/linux/netdevice.h:4954 [inline]
-xmit_one net/core/dev.c:3548 [inline]
-dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
-__dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
-dev_queue_xmit include/linux/netdevice.h:3134 [inline]
-neigh_connected_output+0x569/0x660 net/core/neighbour.c:1592
-neigh_output include/net/neighbour.h:542 [inline]
-ip6_finish_output2+0x23a9/0x2b30 net/ipv6/ip6_output.c:137
-ip6_finish_output+0x855/0x12b0 net/ipv6/ip6_output.c:222
-NF_HOOK_COND include/linux/netfilter.h:303 [inline]
-ip6_output+0x323/0x610 net/ipv6/ip6_output.c:243
-dst_output include/net/dst.h:451 [inline]
-ip6_local_out+0xe9/0x140 net/ipv6/output_core.c:155
-ip6_send_skb net/ipv6/ip6_output.c:1952 [inline]
-ip6_push_pending_frames+0x1f9/0x560 net/ipv6/ip6_output.c:1972
-rawv6_push_pending_frames+0xbe8/0xdf0 net/ipv6/raw.c:582
-rawv6_sendmsg+0x2b66/0x2e70 net/ipv6/raw.c:920
-inet_sendmsg+0x105/0x190 net/ipv4/af_inet.c:847
-sock_sendmsg_nosec net/socket.c:730 [inline]
-__sock_sendmsg net/socket.c:745 [inline]
-____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
-___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
-__sys_sendmsg net/socket.c:2667 [inline]
-__do_sys_sendmsg net/socket.c:2676 [inline]
-__se_sys_sendmsg net/socket.c:2674 [inline]
-__x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
-do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
-entry_SYSCALL_64_after_hwframe+0x63/0x6b
+>=20
+>=20
+> On 1/3/2024 8:13 PM, David Hildenbrand wrote:
+> > On 03.01.24 12:48, syzbot wrote:
+> >> Hello,
+> >>
+> >> syzbot found the following issue on:
+> >>
+> >> HEAD commit:=A0=A0=A0 ab0b3e6ef50d Add linux-next specific files for 2=
+0240102
+> >> git tree:=A0=A0=A0=A0=A0=A0 linux-next
+> >> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D17be3e09e8=
+0000
+> >> kernel config: =20
+> >> https://syzkaller.appspot.com/x/.config?x=3Da14a6350374945f9
+> >> dashboard link:=20
+> >> https://syzkaller.appspot.com/bug?extid=3D50ef73537bbc393a25bb
+> >> compiler:=A0=A0=A0=A0=A0=A0 gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU=
+ Binutils=20
+> >> for Debian) 2.40
+> >> syz repro:     =20
+> >> https://syzkaller.appspot.com/x/repro.syz?x=3D14e2256ee80000
+> >> C reproducer:=A0=A0 https://syzkaller.appspot.com/x/repro.c?x=3D17b57d=
+b5e80000
+> >>
+> >> Downloadable assets:
+> >> disk image:=20
+> >> https://storage.googleapis.com/syzbot-assets/4e6376fe5764/disk-ab0b3e6=
+e.raw.xz
+> >> vmlinux:=20
+> >> https://storage.googleapis.com/syzbot-assets/7cb9ecbaf001/vmlinux-ab0b=
+3e6e.xz
+> >> kernel image:=20
+> >> https://storage.googleapis.com/syzbot-assets/2c1a9a6d424f/bzImage-ab0b=
+3e6e.xz
+> >>
+> >> The issue was bisected to:
+> >>
+> >> commit 68f0320824fa59c5429cbc811e6c46e7a30ea32c
+> >> Author: David Hildenbrand <david@redhat.com>
+> >> Date:=A0=A0 Wed Dec 20 22:44:31 2023 +0000
+> >>
+> >> =A0=A0=A0=A0 mm/rmap: convert folio_add_file_rmap_range() into=20
+> >> folio_add_file_rmap_[pte|ptes|pmd]()
+> >>
+> >> bisection log: =20
+> >> https://syzkaller.appspot.com/x/bisect.txt?x=3D10b9e1b1e80000
+> >> final oops:    =20
+> >> https://syzkaller.appspot.com/x/report.txt?x=3D12b9e1b1e80000
+> >> console output: https://syzkaller.appspot.com/x/log.txt?x=3D14b9e1b1e8=
+0000
+> >>
+> >> IMPORTANT: if you fix the issue, please add the following tag to the=20
+> >> commit:
+> >> Reported-by: syzbot+50ef73537bbc393a25bb@syzkaller.appspotmail.com
+> >> Fixes: 68f0320824fa ("mm/rmap: convert folio_add_file_rmap_range()=20
+> >> into folio_add_file_rmap_[pte|ptes|pmd]()")
+> >>
+> >> =A0 kasan_quarantine_reduce+0x18e/0x1d0 mm/kasan/quarantine.c:283
+> >> =A0 __kasan_slab_alloc+0x65/0x90 mm/kasan/common.c:324
+> >> =A0 kasan_slab_alloc include/linux/kasan.h:201 [inline]
+> >> =A0 slab_post_alloc_hook mm/slub.c:3813 [inline]
+> >> =A0 slab_alloc_node mm/slub.c:3860 [inline]
+> >> =A0 kmem_cache_alloc+0x136/0x320 mm/slub.c:3867
+> >> =A0 vm_area_alloc+0x1f/0x220 kernel/fork.c:465
+> >> =A0 mmap_region+0x3ae/0x2a90 mm/mmap.c:2804
+> >> =A0 do_mmap+0x890/0xef0 mm/mmap.c:1379
+> >> =A0 vm_mmap_pgoff+0x1a7/0x3c0 mm/util.c:573
+> >> =A0 ksys_mmap_pgoff+0x421/0x5a0 mm/mmap.c:1425
+> >> =A0 __do_sys_mmap arch/x86/kernel/sys_x86_64.c:93 [inline]
+> >> =A0 __se_sys_mmap arch/x86/kernel/sys_x86_64.c:86 [inline]
+> >> =A0 __x64_sys_mmap+0x125/0x190 arch/x86/kernel/sys_x86_64.c:86
+> >> =A0 do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >> =A0 do_syscall_64+0xd0/0x250 arch/x86/entry/common.c:83
+> >> =A0 entry_SYSCALL_64_after_hwframe+0x62/0x6a
+> >> ------------[ cut here ]------------
+> >> WARNING: CPU: 1 PID: 5059 at include/linux/rmap.h:202=20
+> >> __folio_rmap_sanity_checks+0x4d5/0x630 include/linux/rmap.h:202
+> >> Modules linked in:
+> >> CPU: 1 PID: 5059 Comm: syz-executor115 Not tainted=20
+> >> 6.7.0-rc8-next-20240102-syzkaller #0
+> >> Hardware name: Google Google Compute Engine/Google Compute Engine,=20
+> >> BIOS Google 11/17/2023
+> >> RIP: 0010:__folio_rmap_sanity_checks+0x4d5/0x630 include/linux/rmap.h:=
+202
+> >> Code: 41 83 e4 01 44 89 e6 e8 79 bc b7 ff 45 84 e4 0f 85 08 fc ff ff=20
+> >> e8 3b c1 b7 ff 48 c7 c6 e0 b5 d9 8a 48 89 df e8 5c 12 f7 ff 90 <0f> 0b=
+=20
+> >> 90 e9 eb fb ff ff e8 1e c1 b7 ff be 01 00 00 00 48 89 df e8
+> >> RSP: 0018:ffffc900038df978 EFLAGS: 00010293
+> >> RAX: 0000000000000000 RBX: ffffea00008cde00 RCX: ffffffff81687419
+> >> RDX: ffff88807becbb80 RSI: ffffffff81d06104 RDI: 0000000000000000
+> >> RBP: ffffea00008cde00 R08: 0000000000000000 R09: fffffbfff1e75f6a
+> >> R10: ffffffff8f3afb57 R11: 0000000000000001 R12: 0000000000000000
+> >> R13: 0000000000000001 R14: 0000000000000000 R15: dffffc0000000000
+> >> FS:=A0 0000555556508380(0000) GS:ffff8880b9900000(0000)=20
+> >> knlGS:0000000000000000
+> >> CS:=A0 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> >> CR2: 00000000200000c0 CR3: 0000000079000000 CR4: 00000000003506f0
+> >> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> >> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> >> Call Trace:
+> >> =A0 <TASK>
+> >> =A0 __folio_add_rmap mm/rmap.c:1167 [inline]
+> >> =A0 __folio_add_file_rmap mm/rmap.c:1452 [inline]
+> >> =A0 folio_add_file_rmap_ptes+0x8e/0x2c0 mm/rmap.c:1478
+> >> =A0 insert_page_into_pte_locked.isra.0+0x34d/0x960 mm/memory.c:1874
+> >> =A0 insert_page mm/memory.c:1900 [inline]
+> >> =A0 vm_insert_page+0x62c/0x8c0 mm/memory.c:2053
+> >> =A0 packet_mmap+0x314/0x570 net/packet/af_packet.c:4594
+> >> =A0 call_mmap include/linux/fs.h:2090 [inline]
+> >> =A0 mmap_region+0x745/0x2a90 mm/mmap.c:2819
+> >> =A0 do_mmap+0x890/0xef0 mm/mmap.c:1379
+> >> =A0 vm_mmap_pgoff+0x1a7/0x3c0 mm/util.c:573
+> >> =A0 ksys_mmap_pgoff+0x421/0x5a0 mm/mmap.c:1425
+> >> =A0 __do_sys_mmap arch/x86/kernel/sys_x86_64.c:93 [inline]
+> >> =A0 __se_sys_mmap arch/x86/kernel/sys_x86_64.c:86 [inline]
+> >> =A0 __x64_sys_mmap+0x125/0x190 arch/x86/kernel/sys_x86_64.c:86
+> >> =A0 do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >> =A0 do_syscall_64+0xd0/0x250 arch/x86/entry/common.c:83
+> >> =A0 entry_SYSCALL_64_after_hwframe+0x62/0x6a
+> >=20
+> > If I am not wrong, that triggers:
+> >=20
+> > VM_WARN_ON_FOLIO(folio_test_large(folio) &&
+> >  =A0=A0=A0=A0=A0=A0=A0=A0 !folio_test_large_rmappable(folio), folio);
+> >=20
+> > So we are trying to rmap a large folio that did not go through=20
+> > folio_prep_large_rmappable().
+> >=20
+> > net/packet/af_packet.c calls vm_insert_page() on some pages/folios stoe=
+d=20
+> > in the "struct packet_ring_buffer". No idea where that comes from, but =
+I=20
+> > suspect it's simply some compound allocation.
+> Looks like:
+>   alloc_pg_vec
+>     alloc_one_pg_vec_page
+>          gfp_t gfp_flags =3D GFP_KERNEL | __GFP_COMP |
+>                            __GFP_ZERO | __GFP_NOWARN | __GFP_NORETRY;
+>=20
+>          buffer =3D (char *) __get_free_pages(gfp_flags, order);
+> So you are right here... :).
 
-Uninit was created at:
-slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
-slab_alloc_node mm/slub.c:3478 [inline]
-__kmem_cache_alloc_node+0x5c9/0x970 mm/slub.c:3517
-__do_kmalloc_node mm/slab_common.c:1006 [inline]
-__kmalloc_node_track_caller+0x118/0x3c0 mm/slab_common.c:1027
-kmalloc_reserve+0x249/0x4a0 net/core/skbuff.c:582
-pskb_expand_head+0x226/0x1a00 net/core/skbuff.c:2098
-__pskb_pull_tail+0x13b/0x2310 net/core/skbuff.c:2655
-pskb_may_pull_reason include/linux/skbuff.h:2673 [inline]
-pskb_may_pull include/linux/skbuff.h:2681 [inline]
-ip6_tnl_parse_tlv_enc_lim+0x901/0xbb0 net/ipv6/ip6_tunnel.c:408
-ipxip6_tnl_xmit net/ipv6/ip6_tunnel.c:1326 [inline]
-ip6_tnl_start_xmit+0xab2/0x1a70 net/ipv6/ip6_tunnel.c:1432
-__netdev_start_xmit include/linux/netdevice.h:4940 [inline]
-netdev_start_xmit include/linux/netdevice.h:4954 [inline]
-xmit_one net/core/dev.c:3548 [inline]
-dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
-__dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
-dev_queue_xmit include/linux/netdevice.h:3134 [inline]
-neigh_connected_output+0x569/0x660 net/core/neighbour.c:1592
-neigh_output include/net/neighbour.h:542 [inline]
-ip6_finish_output2+0x23a9/0x2b30 net/ipv6/ip6_output.c:137
-ip6_finish_output+0x855/0x12b0 net/ipv6/ip6_output.c:222
-NF_HOOK_COND include/linux/netfilter.h:303 [inline]
-ip6_output+0x323/0x610 net/ipv6/ip6_output.c:243
-dst_output include/net/dst.h:451 [inline]
-ip6_local_out+0xe9/0x140 net/ipv6/output_core.c:155
-ip6_send_skb net/ipv6/ip6_output.c:1952 [inline]
-ip6_push_pending_frames+0x1f9/0x560 net/ipv6/ip6_output.c:1972
-rawv6_push_pending_frames+0xbe8/0xdf0 net/ipv6/raw.c:582
-rawv6_sendmsg+0x2b66/0x2e70 net/ipv6/raw.c:920
-inet_sendmsg+0x105/0x190 net/ipv4/af_inet.c:847
-sock_sendmsg_nosec net/socket.c:730 [inline]
-__sock_sendmsg net/socket.c:745 [inline]
-____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
-___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
-__sys_sendmsg net/socket.c:2667 [inline]
-__do_sys_sendmsg net/socket.c:2676 [inline]
-__se_sys_sendmsg net/socket.c:2674 [inline]
-__x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
-do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
-entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 0 PID: 7345 Comm: syz-executor.3 Not tainted 6.7.0-rc8-syzkaller-00024-gac865f00af29 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-
-Fixes: fbfa743a9d2a ("ipv6: fix ip6_tnl_parse_tlv_enc_lim()")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
----
- net/ipv6/ip6_tunnel.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
-
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index 5e80e517f071013410349d1fd93afc00a394e284..46c19bd4899011d53b4feb84e25013c01ddce701 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -399,7 +399,7 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
- 	const struct ipv6hdr *ipv6h = (const struct ipv6hdr *)raw;
- 	unsigned int nhoff = raw - skb->data;
- 	unsigned int off = nhoff + sizeof(*ipv6h);
--	u8 next, nexthdr = ipv6h->nexthdr;
-+	u8 nexthdr = ipv6h->nexthdr;
- 
- 	while (ipv6_ext_hdr(nexthdr) && nexthdr != NEXTHDR_NONE) {
- 		struct ipv6_opt_hdr *hdr;
-@@ -410,25 +410,25 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
- 
- 		hdr = (struct ipv6_opt_hdr *)(skb->data + off);
- 		if (nexthdr == NEXTHDR_FRAGMENT) {
--			struct frag_hdr *frag_hdr = (struct frag_hdr *) hdr;
--			if (frag_hdr->frag_off)
--				break;
- 			optlen = 8;
- 		} else if (nexthdr == NEXTHDR_AUTH) {
- 			optlen = ipv6_authlen(hdr);
- 		} else {
- 			optlen = ipv6_optlen(hdr);
- 		}
--		/* cache hdr->nexthdr, since pskb_may_pull() might
--		 * invalidate hdr
--		 */
--		next = hdr->nexthdr;
--		if (nexthdr == NEXTHDR_DEST) {
--			u16 i = 2;
- 
--			/* Remember : hdr is no longer valid at this point. */
--			if (!pskb_may_pull(skb, off + optlen))
-+		if (!pskb_may_pull(skb, off + optlen))
-+			break;
-+
-+		hdr = (struct ipv6_opt_hdr *)(skb->data + off);
-+		if (nexthdr == NEXTHDR_FRAGMENT) {
-+			struct frag_hdr *frag_hdr = (struct frag_hdr *)hdr;
-+
-+			if (frag_hdr->frag_off)
- 				break;
-+		}
-+		if (nexthdr == NEXTHDR_DEST) {
-+			u16 i = 2;
- 
- 			while (1) {
- 				struct ipv6_tlv_tnl_enc_lim *tel;
-@@ -449,7 +449,7 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
- 					i++;
- 			}
- 		}
--		nexthdr = next;
-+		nexthdr = hdr->nexthdr;
- 		off += optlen;
- 	}
- 	return 0;
--- 
-2.43.0.472.g3155946c3a-goog
-
+Can we suggest what af_packet should be doing to avoid this?
 
