@@ -1,105 +1,89 @@
-Return-Path: <netdev+bounces-61759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F22824CE9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 03:26:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D207824CEB
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 03:26:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 927F91C21B93
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:26:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E57E1C21AF1
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 02:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CE11FC4;
-	Fri,  5 Jan 2024 02:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D91B1FC4;
+	Fri,  5 Jan 2024 02:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HBd+5R8o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bA3opElf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF1A1FB4
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 02:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E954C1FB4
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 02:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6dac8955af0so679004b3a.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 18:26:17 -0800 (PST)
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2cd0f4797aaso13440771fa.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 18:26:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704421577; x=1705026377; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=46tIkZqvPiG0RkOGTbp0WUT/21LC14aHSoIc/kyTXKc=;
-        b=HBd+5R8oXXz+M0PAFz0PfIHlx5tdlRc0EjG5Gb4bNwfoDyJyA6th2qOWzJ79xwPKUE
-         KQ/ovL84ERjHkwnEktX/oJkdIZG95eFG2Ut5Yc7ZpQrFuy9yGu0+u2aYCtqKpNvLLpH7
-         wqENgzJt9Lyh9gNTuwekMJ4mutEFoOm5Yj2frlRUetk1v6U/43YxQBU/1lXWxfYd9yYc
-         GDFk0mFaz+AzpencL+olxEyLH1N6Bc/mUHmYqvPjifKev8eET86bYErGjpblNeK51ohY
-         YXhA0WqTkm69367VrlFCQrcgDUFTMoPgSizCWlHDIxxc9Ud4OrnLtgtKGI2eePkqn6W+
-         dnXQ==
+        d=gmail.com; s=20230601; t=1704421602; x=1705026402; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iYLLP5vaUS29qOkVnZYDtpW+xH7SG3TG0JM2AcQcYNU=;
+        b=bA3opElf2d7AYAeLYOui05zrWMtkRNBhpvw7fLOmMNprYrU+QnlT6qP7W4DbkTxG8r
+         rz8Ke+cgvlRxHPoQvCHKgEe/w2aq5zpLCpHoNzz0/wF8ER1WstKpWhX/PkiE0XdGvt1L
+         kpMWly4tUeM0s3qsfRBFtXQM8ffDpO1ELcmoFz58/Y+pReEoAjxMmp/+MX9TsSW9tN+p
+         Ljz7RpwwBATYrJyueVvRQ/ZJj46Jx2WDjhJ3KQaAameR0HtGq6rkbMPZdHCcr5BcXXEj
+         7FvaUrjEltAoxz/z2pswh3sBJI/pMe1sYRVAc1S9kV/LxObpRE/SGH5eeYt2TBoRuPxz
+         wGhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704421577; x=1705026377;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=46tIkZqvPiG0RkOGTbp0WUT/21LC14aHSoIc/kyTXKc=;
-        b=dPJ/xH7c697fy+G7RVdsmen5lAI3XieyGCn/xrsddfVWAdJn6KmB3FBAwVhawdBSyk
-         +c0o3N4Zzkja8tB7rjxIfPpBDMQtFfjWXI4JsnQ5Fp9XGHLsUhqeOk/ahozWqBn4zp0X
-         JoiIfm61DMI32WNxKmZiEwFjYAsAM/fGE1T3xeVbtG94xT0MAq/RCUoWktDsmr9VDHNn
-         yBMe3hs6ba79t6YkbAsAY9ANtrN6snmpKSnoUi1+B0D7R7o+B24f29FC++bYbxyxW2+r
-         8zgqwONAXPxvO8m2VKsN7E8RdJLW8ftXSKs9g3oCh1qYt1TU+HuJUJ2ZCib08GGzN1Tg
-         CdSw==
-X-Gm-Message-State: AOJu0YyOI5SytKIesvPzD/TaKwJdwUmcxKJHyVEE7tLeMUs3P9QpQ4FA
-	PZiLdC8IM3QQFdyLC6DKInEtP4DqhDd1OCgdejY=
-X-Google-Smtp-Source: AGHT+IEkycrgFVn5RyLsdf/0PbylTHpx3lM0rNkPdPSYLJxqFDb5hbjTBOXhji5zusGPZAl0zzPbqQ==
-X-Received: by 2002:a05:6a00:4604:b0:6da:16e9:9b34 with SMTP id ko4-20020a056a00460400b006da16e99b34mr126523pfb.67.1704421576711;
-        Thu, 04 Jan 2024 18:26:16 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id w2-20020a626202000000b006daca8ecb85sm343782pfb.139.2024.01.04.18.26.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 18:26:16 -0800 (PST)
-Date: Fri, 5 Jan 2024 10:26:11 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net v3 2/2] selftests: rtnetlink: check enslaving iface
- in a bond
-Message-ID: <ZZdow05irUiN1c8x@Laptop-X1>
-References: <20240104164300.3870209-1-nicolas.dichtel@6wind.com>
- <20240104164300.3870209-3-nicolas.dichtel@6wind.com>
+        d=1e100.net; s=20230601; t=1704421602; x=1705026402;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iYLLP5vaUS29qOkVnZYDtpW+xH7SG3TG0JM2AcQcYNU=;
+        b=OCPUJW8j3mmJ5EB8CAe4tu7+PDuRfe5j9xWyX9j14UNa/wopIhc+F7iZJCoGJXahKJ
+         131EQRORi7GxjdCDLjwqp30dLX/pw133WIlNrOLXvqRe98FmMyPXleOdsr7K1WhX6smy
+         UFlvJ/A2Al6k7joW45KNeZc2IEg408OOWZeeuwL3sXUTcXwDTLXudK6f2wgvY+9nL2nD
+         ta7hVkktfm7Gin9FwQBcWZA3QYOw1crNNyPvvQC/CNdmuWfKPdK4T3qRXqf6SG4eI4x8
+         3FxrYYU3ZIhPOSTo3qRWi3diR29R4ClIE4DV7/h+UNzqnn2j6DarBwLMvd0b2CQQdU5f
+         86qw==
+X-Gm-Message-State: AOJu0YwnfmG6aUlDnYlgUisEFwIOnziWivA0R5s4Pj0ik/6eTH4xqhIw
+	NUPzCWCTpyDX/6GUkRuAPmb+bL58Ls9vfp45/U0=
+X-Google-Smtp-Source: AGHT+IEZ+ffxtVyL4VRgPWz2ByGRCV1t2ZyO9xey3KwipQdXwGTWKsfk4Mt7Ah/780/+XvIUoM+H+27nZHa4imRxb8Y=
+X-Received: by 2002:a2e:80da:0:b0:2cc:ceb2:372a with SMTP id
+ r26-20020a2e80da000000b002ccceb2372amr689857ljg.96.1704421601857; Thu, 04 Jan
+ 2024 18:26:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104164300.3870209-3-nicolas.dichtel@6wind.com>
+References: <20240104140037.374166-1-vladimir.oltean@nxp.com> <20240104140037.374166-8-vladimir.oltean@nxp.com>
+In-Reply-To: <20240104140037.374166-8-vladimir.oltean@nxp.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Thu, 4 Jan 2024 23:26:30 -0300
+Message-ID: <CAJq09z6f5U166ek4P2Ce4MwhGf5xbW=UrVpvxdhx+pZOeB41bA@mail.gmail.com>
+Subject: Re: [PATCH net-next 07/10] net: dsa: qca8k: consolidate calls to a
+ single devm_of_mdiobus_register()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Linus Walleij <linus.walleij@linaro.org>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Hauke Mehrtens <hauke@hauke-m.de>, Christian Marangi <ansuelsmth@gmail.com>, 
+	=?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jan 04, 2024 at 05:43:00PM +0100, Nicolas Dichtel wrote:
-> +kci_test_enslave_bonding()
-> +{
-> +	local testns="testns"
-> +	local bond="bond123"
-> +	local dummy="dummy123"
-> +	local ret=0
-> +
-> +	run_cmd ip netns add "$testns"
-> +	if [ $? -ne 0 ]; then
-> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
-> +		return $ksft_skip
-> +	fi
-> +
-> +	# test native tunnel
-> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
+> __of_mdiobus_register() already calls __mdiobus_register() if the
+> OF node provided as argument is NULL. We can take advantage of that
+> and simplify the 2 code path, calling devm_of_mdiobus_register() only
+> once for both cases.
+>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Hi Nicolas,
+I should have read all the series before... :-)
 
-If you are going to target the patch to net-next. Please update it in the
-subject. And use `setup_ns` when create new netns.
-
-Thanks
-Hangbin
+Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
