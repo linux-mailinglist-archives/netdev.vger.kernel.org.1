@@ -1,185 +1,176 @@
-Return-Path: <netdev+bounces-61787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF55824FA8
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:21:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7046E824FB2
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:24:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 793A41C22BB8
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 08:21:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F4B5B21824
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 08:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082CC2111A;
-	Fri,  5 Jan 2024 08:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADC820325;
+	Fri,  5 Jan 2024 08:24:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="tT6cNXeG"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="EfLVdZpJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99ABA20DC8;
-	Fri,  5 Jan 2024 08:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 4052tkx3028984;
-	Fri, 5 Jan 2024 09:19:56 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=gxrbGKGX0buop+PvuAmG2IkLu4G/QjEo0CpiUPjSvQ4=; b=tT
-	6cNXeGAKaJftgTWYQ4btXPz25NJkoN6rwQ97Z+A70hxVGPC2EACwY9KlFCdwin7x
-	T0eGIn7cyZvSTfTKL9FDgLEXwhSfQvbd3x/0RqhDxui/1vUCSEUHuwwZr9vaSZe9
-	VdlGf5MOsb+NyVQ6ko42YO9d1nlPanGwO/RF/J4coZ/A/Hk91SlDoU+TcPWpChjc
-	VMqXebLXrELMYSyaqHnkwRK2oyoxdP/Ov8ew4yZ4CDuu4GeqUPTeGL0AxMTR94Qn
-	lXgr3Z1OrXzqkGP1ijFxHO1uxSOuRA4iapRhe6ZvvoZRpbUBJFP4zW8Cc7oNPSVD
-	QPxxMGTmlyF9GBQaTcIw==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ve9dss0v4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jan 2024 09:19:56 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 086FC10002A;
-	Fri,  5 Jan 2024 09:19:52 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C8B17210587;
-	Fri,  5 Jan 2024 09:19:52 +0100 (CET)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 5 Jan
- 2024 09:19:50 +0100
-Message-ID: <9b66bc71-08de-43bd-b7e1-4e7c9defd400@foss.st.com>
-Date: Fri, 5 Jan 2024 09:19:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB24B20DC7
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 08:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2cca5d81826so18990411fa.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 00:24:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1704443043; x=1705047843; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Icu0nhznlhi/9IXXa6Qq8k7wweRMYiE7i3lEY/NKnXs=;
+        b=EfLVdZpJF/Ql7p9jgi1HR1PP3yUzH7GSnBqsiWPJAtSrxaPFwAeSNvQYX/INJJOR4d
+         P3Zlpr5tT/w70TklUgU6EH0DtT6TNFNrW/7Pply3+SpReiQFajlVrU33MzXZO+snkrrs
+         jZFQ6nWrUdc/NCC1CZqW6P9ogEDDiz9L6jDg+LFwFTJ0XoYDpQZswYnYczycgRHEyD+u
+         2ibRG1mf56Y+gt1XOCrkQq1CE0HxYA2RocVjapWQtXKxn/mVP7xsI1PETYmUBdoQ2YwQ
+         gfsOfis/1Wz4GV3TgMs5mNGpARX889Kq1SWiSDZRCZrNMg8J25odTiwBBZKg8482eITi
+         1oFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704443043; x=1705047843;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Icu0nhznlhi/9IXXa6Qq8k7wweRMYiE7i3lEY/NKnXs=;
+        b=froESNgPshGAv/hHH+D96P6Ngwd6SjL2bDeV/g9m1fNLV2S3Sx84tYSjaOTCAvv5Ju
+         JrZ5HJxDXjwT4pp/3b5fYxpIwCa8d1SNtXFIIA9Cx0iMdx/Oo2aNHhrq5QlviNllNI6X
+         KOqrQceQIDD3O02o4CUmF5JMHulbCF2EO92imVq01g112n5MGdtdqnBObLQH2m1Aesnj
+         b3NeIWuSWbub72owsY+Id5VKRu/uhjhyT9OO47Y8Zq+yl+i5wUUkcavKDTLfs9njIr7t
+         251HT7mATjPPDftGaei2vISJwaHR+274DlcCXLRklIDGC2TgxLbuR+/ZyincUuOoXfEs
+         yOqQ==
+X-Gm-Message-State: AOJu0Yy0Cx9ws5uguRuMa+Kcz0xuCU1808LZYgwDk+VDy+yZpIrym2xx
+	BKvAOwTZWfkN8N7EW2G+FD5eDCGlUBLNpQ==
+X-Google-Smtp-Source: AGHT+IFbNxdu031AIJAdzx9eC1qpjPGY9bFmMBjIvbwTzr0BKvdbNfCDYiewNW5L0eyCm2ut183STg==
+X-Received: by 2002:a05:6512:1281:b0:50e:2742:aa6a with SMTP id u1-20020a056512128100b0050e2742aa6amr1110073lfs.97.1704443042626;
+        Fri, 05 Jan 2024 00:24:02 -0800 (PST)
+Received: from claudiu-X670E-Pro-RS.. ([82.78.167.5])
+        by smtp.gmail.com with ESMTPSA id j15-20020a1709064b4f00b00a28e759a447sm596198ejv.213.2024.01.05.00.23.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 00:24:02 -0800 (PST)
+From: Claudiu <claudiu.beznea@tuxon.dev>
+X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	p.zabel@pengutronix.de,
+	yoshihiro.shimoda.uh@renesas.com,
+	wsa+renesas@sang-engineering.com
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	claudiu.beznea@tuxon.dev,
+	geert+renesas@glider.be,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next v3 00/19] net: ravb: Add suspend to RAM and runtime PM support for RZ/G3S
+Date: Fri,  5 Jan 2024 10:23:20 +0200
+Message-Id: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 03/13] dt-bindings: bus: document RIFSC
-To: Rob Herring <robh@kernel.org>
-CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <peng.fan@oss.nxp.com>, <lars@metafoo.de>, <rcsekar@samsung.com>,
-        <wg@grandegger.com>, <mkl@pengutronix.de>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-medi.a@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20231212152356.345703-1-gatien.chevallier@foss.st.com>
- <20231212152356.345703-4-gatien.chevallier@foss.st.com>
- <20231221215316.GA155023-robh@kernel.org>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20231221215316.GA155023-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-05_04,2024-01-05_01,2023-05-22_02
+Content-Transfer-Encoding: 8bit
 
-Hi Rob,
+From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-On 12/21/23 22:53, Rob Herring wrote:
-> On Tue, Dec 12, 2023 at 04:23:46PM +0100, Gatien Chevallier wrote:
->> Document RIFSC (RIF security controller). RIFSC is a firewall controller
->> composed of different kinds of hardware resources.
->>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->> ---
->>
->> Changes in V6:
->> 	- Renamed access-controller to access-controllers
->> 	- Removal of access-control-provider property
->> 	- Removal of access-controller and access-controller-names
->> 	  declaration in the patternProperties field. Add
->> 	  additionalProperties: true in this field.
->>
->> Changes in V5:
->> 	- Renamed feature-domain* to access-control*
->>
->> Changes in V2:
->> 	- Corrected errors highlighted by Rob's robot
->> 	- No longer define the maxItems for the "feature-domains"
->> 	  property
->> 	- Fix example (node name, status)
->> 	- Declare "feature-domain-names" as an optional
->> 	  property for child nodes
->> 	- Fix description of "feature-domains" property
->>
->>   .../bindings/bus/st,stm32mp25-rifsc.yaml      | 96 +++++++++++++++++++
->>   1 file changed, 96 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->>
->> diff --git a/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml b/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->> new file mode 100644
->> index 000000000000..95aa7f04c739
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->> @@ -0,0 +1,96 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/bus/st,stm32mp25-rifsc.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: STM32 Resource isolation framework security controller
->> +
->> +maintainers:
->> +  - Gatien Chevallier <gatien.chevallier@foss.st.com>
->> +
->> +description: |
->> +  Resource isolation framework (RIF) is a comprehensive set of hardware blocks
->> +  designed to enforce and manage isolation of STM32 hardware resources like
->> +  memory and peripherals.
->> +
->> +  The RIFSC (RIF security controller) is composed of three sets of registers,
->> +  each managing a specific set of hardware resources:
->> +    - RISC registers associated with RISUP logic (resource isolation device unit
->> +      for peripherals), assign all non-RIF aware peripherals to zero, one or
->> +      any security domains (secure, privilege, compartment).
->> +    - RIMC registers: associated with RIMU logic (resource isolation master
->> +      unit), assign all non RIF-aware bus master to one security domain by
->> +      setting secure, privileged and compartment information on the system bus.
->> +      Alternatively, the RISUP logic controlling the device port access to a
->> +      peripheral can assign target bus attributes to this peripheral master port
->> +      (supported attribute: CID).
->> +    - RISC registers associated with RISAL logic (resource isolation device unit
->> +      for address space - Lite version), assign address space subregions to one
->> +      security domains (secure, privilege, compartment).
->> +
->> +properties:
->> +  compatible:
->> +    contains:
->> +      const: st,stm32mp25-rifsc
-> 
-> This needs to be exact and include 'simple-bus'. You'll need a custom
-> 'select' with the above to avoid matching all other 'simple-bus' cases.
-> 
-> With that,
-> 
-> Reviewed-by: Rob Herring <robh@kernel.org>
+Hi,
 
-Thank you for the review,
-I'll update this for the next version whilst applying your tag
+This series adds suspend to RAM and runtime PM support for Ethernet
+IP available on the RZ/G3S (R9A08G045) SoC.
 
-Gatien
+As there are IP versions that switch to module standby when disabling
+the clocks, and because of module standby IP switches to reset and
+the register content is lost, to be able to have runtime PM supported
+for all IP variants, the configuration operations were moved all to
+ravb_open()/ravb_close() letting the ravb_probe() and ravb_remove()
+to deal with resource parsing and allocation/free.
+
+The ethtool and IOCTL APIs that could have been run asyncronously
+were adapted to return if the interface is down. As explained in
+each individual commits description, this should be harmless.
+
+Along with it, the series contains preparatory cleanups.
+
+The series has been tested on the boards with the following device trees:
+- r8a7742-iwg21d-q7.dts
+- r8a774a1-hihope-rzg2m-ex.dts 
+- r9a07g043u11-smarc-rzg2ul.dts
+- r9a07g054l2-smarc-rzv2l.dts
+- r9a07g044l2-smarc-rzg2l.dts
+
+Thank you,
+Claudiu Beznea
+
+Changes in v3:
+- collected tags
+- addressed review comments
+- squashed patch 17/21 ("net: ravb: Keep clock request operations grouped
+  together") from v2 in patch 07/19 ("net: ravb: Move reference clock
+  enable/disable on runtime PM APIs") from v3
+- check for ndev->flags & IFF_UP in patch 17/19 and 18/19 instead of
+  checking netif_running()
+- dropped patch 19/21 ("net: ravb: Do not set promiscuous mode if the
+  interface is down") as the changes there are not necessary as
+  ndev->flags & IFF_UP is already checked at the beginning of
+  __dev_set_rx_mode()
+- remove code from ravb_open() introduced by patch 20/21
+  ("net: ravb: Do not apply RX CSUM settings to hardware if the interface
+  is down") from v2 as this is not necessary; driver already takes
+  care of this in ravb_emac_init_rcar()
+
+Changes in v2:
+- rework the driver (mainly, ravb_open() contains now only resource
+  allocation and parsing leaving the settings to ravb_open(); ravb_remove()
+  has been adapted accordingly) to be able to use runtime PM for all
+  IP variants; due to this number of patches increased
+- adjust previous series to review comments
+- collected tags
+- populated driver's own runtime PM ops with enable/disable of reference
+  clock
+
+Claudiu Beznea (19):
+  net: ravb: Let IP-specific receive function to interrogate descriptors
+  net: ravb: Rely on PM domain to enable gptp_clk
+  net: ravb: Make reset controller support mandatory
+  net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() and
+    pm_ptr()
+  net: ravb: Use tabs instead of spaces
+  net: ravb: Assert/de-assert reset on suspend/resume
+  net: ravb: Move reference clock enable/disable on runtime PM APIs
+  net: ravb: Move the IRQs get and request in the probe function
+  net: ravb: Split GTI computation and set operations
+  net: ravb: Move delay mode set in the driver's ndo_open API
+  net: ravb: Move DBAT configuration to the driver's ndo_open API
+  net: ravb: Move PTP initialization in the driver's ndo_open API for
+    ccc_gac platorms
+  net: ravb: Set config mode in ndo_open and reset mode in ndo_close
+  net: ravb: Simplify ravb_suspend()
+  net: ravb: Simplify ravb_resume()
+  net: ravb: Keep the reverse order of operations in ravb_close()
+  net: ravb: Return cached statistics if the interface is down
+  net: ravb: Do not apply RX CSUM settings to hardware if the interface
+    is down
+  net: ravb: Add runtime PM support
+
+ drivers/net/ethernet/renesas/ravb.h      |   6 +-
+ drivers/net/ethernet/renesas/ravb_main.c | 760 +++++++++++------------
+ 2 files changed, 370 insertions(+), 396 deletions(-)
+
+-- 
+2.39.2
+
 
