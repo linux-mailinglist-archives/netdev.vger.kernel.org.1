@@ -1,120 +1,167 @@
-Return-Path: <netdev+bounces-61733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40797824C28
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:33:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83DFE824C2F
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D83B1C21FB0
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:33:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07C74284146
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF7C37C;
-	Fri,  5 Jan 2024 00:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22CB380;
+	Fri,  5 Jan 2024 00:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TTkRQ3qu"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OFEZyNsd"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758971845
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 00:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9f3c86e9-111c-4cf0-ad8b-aafbd301bbb3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1704414791;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yNDHBXBIrjewK6yqLx3Z2BASgstxUcNngkXcOsFlrMM=;
-	b=TTkRQ3qu/6i5Vu9Q8ixFv9B3ldADvT8A6NkNlFLH+PSGzUiooyD80czy/OBcYMeCnu5rRy
-	C1p/x++5Xihcd64SolmqZHAx3XOVAvISoojxlUdYnXmuPepLitstJRzpQ4HK6BQs9O2i6n
-	CiFzHvk168cOj10QWijzgvgZmihS24c=
-Date: Thu, 4 Jan 2024 16:33:04 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2169A110A
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 00:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-28beb1d946fso877585a91.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 16:38:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704415102; x=1705019902; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aeqm6MfkDPgW8joZXvD5HPa2N+HgjnGCsZuUtvcyjcM=;
+        b=OFEZyNsd0iBcFcojw2IrOoJCG6aLtw8ZQqF1WVdUNlwApkHhjZigx0ofK/BwgmEsLZ
+         AZ6Rd7XtkUl12lK91dvbBAvatsaFxjUNs2YQpKIlN3mwRgR0eU2mVKwm6ebRsOGDStud
+         VcSRyj0kbGWlq7yLB1ilsv7eeOaiKyjNQ0QPrZ2NkaCLXQ+mOQJK2n2RGLH7v79b4Jc5
+         JpR5KfazqJjNrxECh3KtoFIBB5mzw7t8UB3hgqGGjQBOEYJjpvrJTphtUBQR6rnvcMXj
+         sLqDS4mBicGncwRJM2Wc0Ld2vBXz264ick0ZDS2H4uXybWkNIifi3EqjsPFebgVRO55Q
+         GNyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704415102; x=1705019902;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aeqm6MfkDPgW8joZXvD5HPa2N+HgjnGCsZuUtvcyjcM=;
+        b=aK+mbLOocjI0CSMinnOvkb0TwQUB28QnkjyEBSD4P6g/2SshT/37+Br8aCJMysZh/c
+         T6krdkQzH/e15eREqGKHOwF1+PbVwuHENEiR4P/2sp2aWOolPl5xNGWZZB3vw0BngSol
+         bI1x+STnCUMh+DIFD7cgqIkI5A7L1+bHe+3TZpO53qIKXeQHbxT1JYpHz1dcATwch+S7
+         VgPZYFjlqxqUFfDej3EOemGNJih8oXnihNKDiy9/VsBi27wn9O+RP/yNuofmfJTm6F34
+         bnvLQ7xdpbRXvh7/gcYC6k0XWp6f3wl08AfcbFO8fRimhX4Nw7Lbr+O16xAszNdt/GKz
+         /b8w==
+X-Gm-Message-State: AOJu0Yxcnx7aV1i+ISdsgn62xQR4ulFXtioYmUXHSlaw7pB00jbohn/N
+	yHUbbM+2bi1oEpE8r8x0sXlYd1l4+qnDubPFkywJsqHy5Ipg
+X-Google-Smtp-Source: AGHT+IE0I4LlOEHfRC54zXiC2nUx9e9GYuQPoWl3MtTmOH+e2Mq2PZjF6bEkRDaImavEpoc8KmoIVw==
+X-Received: by 2002:a17:90a:8a01:b0:286:a502:dfe2 with SMTP id w1-20020a17090a8a0100b00286a502dfe2mr1364230pjn.52.1704415102223;
+        Thu, 04 Jan 2024 16:38:22 -0800 (PST)
+Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id t3-20020a170902e84300b001d3abc86c9fsm196030plg.195.2024.01.04.16.38.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jan 2024 16:38:21 -0800 (PST)
+From: Pedro Tammela <pctammela@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Jiri Pirko <jiri@nvidia.com>
+Subject: [PATCH net-next v2] net/sched: simplify tc_action_load_ops parameters
+Date: Thu,  4 Jan 2024 21:38:10 -0300
+Message-Id: <20240105003810.2056224-1-pctammela@mojatatu.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf 1/2] bpf: Avoid iter->offset making backward progress
- in bpf_iter_udp
-Content-Language: en-US
-To: Aditi Ghag <aditi.ghag@isovalent.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- netdev@vger.kernel.org, kernel-team@meta.com, bpf@vger.kernel.org
-References: <20231219193259.3230692-1-martin.lau@linux.dev>
- <8d15f3a7-b7bc-1a45-0bdf-a0ccc311f576@iogearbox.net>
- <fc1b5650-72bb-4b09-bab4-f61b2186f673@linux.dev>
- <9f3697c1-ed15-4a3d-9113-c4437f421bb3@linux.dev>
- <8787f5c0-fed0-b8fa-997b-4d17d9966f13@iogearbox.net>
- <639b1f3f-cb53-4058-8426-14bd50f2b78f@linux.dev>
- <8AF6C653-61DB-4142-B2B3-5C6A7D966AF8@isovalent.com>
- <41818988-af0e-4d61-8505-4a13782ad61c@linux.dev>
- <61BFE697-3A12-4D0E-A5B9-FA2677D988E2@isovalent.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <61BFE697-3A12-4D0E-A5B9-FA2677D988E2@isovalent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 1/4/24 3:38 PM, Aditi Ghag wrote:
->>> I'm not sure about semantics of the resume operation for certain corner cases like these:
->>> - The BPF UDP sockets iterator was stopped while iterating bucker #X, and the offset was set to 2. bpf_iter_udp_seq_stop then released references to the batched sockets, and marks the bucket X iterator state (aka iter->st_bucket_done) as false.
->>> - Before the iterator is "resumed", the bucket #X was mutated such that the previously iterated sockets were removed, and new sockets were added.  With the current logic, the iterator will skip the first two sockets in the bucket, which isn't right. This is slightly different from the case where sockets were updated in the X -1 bucket *after* it was fully iterated. Since the bucket and sock locks are released, we don't have any guarantees that the underlying sockets table isn't mutated while the userspace has a valid iterator.
->>> What do you think about such cases?
->> I believe it is something orthogonal to the bug fix here but we could use this thread to discuss.
-> 
-> Yes, indeed! But I piggy-backed on the same thread, as one potential option could be to always start iterating from the beginning of a bucket. (More details below.)
->>
->> This is not something specific to the bpf tcp/udp iter which uses the offset as a best effort to resume (e.g. the inet_diag and the /proc/net/{tcp[6],udp} are using similar strategy to resume). To improve it, it will need to introduce some synchronization with the (potentially fast path) writer side (e.g. bind, after 3WHS...etc). Not convinced it is worth it to catch these cases.
-> 
-> Right, synchronizing fast paths with the iterator logic seems like an overkill.
-> 
-> If we change the resume semantics, and make the iterator always start from the beginning of a bucket, it could solve some of these corner cases (and simplify the batching logic). The last I checked, the TCP (BPF) iterator logic was tightly coupled with the 
+Instead of using two bools derived from a flags passed as arguments to
+the parent function of tc_action_load_ops, just pass the flags itself
+to tc_action_load_ops to simplify its parameters.
 
-Always resume from the beginning of the bucket? hmm... then it is making 
-backward progress and will hit the same bug again. or I miss-understood your 
-proposal?
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+---
+ include/net/act_api.h |  3 +--
+ net/sched/act_api.c   | 10 +++++-----
+ net/sched/cls_api.c   |  5 ++---
+ 3 files changed, 8 insertions(+), 10 deletions(-)
 
-> file based iterator (/proc/net/{tcp,udp}), so I'm not sure if it's an easy change if we were to change the resume semantics for both TCP and UDP BFP iterators?
-> Note that, this behavior would be similar to the lseek operation with seq_file [1]. Here is a snippet -
+diff --git a/include/net/act_api.h b/include/net/act_api.h
+index 447985a45ef6..e1e5e72b901e 100644
+--- a/include/net/act_api.h
++++ b/include/net/act_api.h
+@@ -208,8 +208,7 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
+ 		    struct nlattr *est,
+ 		    struct tc_action *actions[], int init_res[], size_t *attr_size,
+ 		    u32 flags, u32 fl_flags, struct netlink_ext_ack *extack);
+-struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, bool police,
+-					 bool rtnl_held,
++struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
+ 					 struct netlink_ext_ack *extack);
+ struct tc_action *tcf_action_init_1(struct net *net, struct tcf_proto *tp,
+ 				    struct nlattr *nla, struct nlattr *est,
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index ef70d4771811..3e30d7260493 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -1324,10 +1324,10 @@ void tcf_idr_insert_many(struct tc_action *actions[], int init_res[])
+ 	}
+ }
+ 
+-struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, bool police,
+-					 bool rtnl_held,
++struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
+ 					 struct netlink_ext_ack *extack)
+ {
++	bool police = flags & TCA_ACT_FLAGS_POLICE;
+ 	struct nlattr *tb[TCA_ACT_MAX + 1];
+ 	struct tc_action_ops *a_o;
+ 	char act_name[IFNAMSIZ];
+@@ -1359,6 +1359,8 @@ struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, bool police,
+ 	a_o = tc_lookup_action_n(act_name);
+ 	if (a_o == NULL) {
+ #ifdef CONFIG_MODULES
++		bool rtnl_held = !(flags & TCA_ACT_FLAGS_NO_RTNL);
++
+ 		if (rtnl_held)
+ 			rtnl_unlock();
+ 		request_module("act_%s", act_name);
+@@ -1475,9 +1477,7 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
+ 	for (i = 1; i <= TCA_ACT_MAX_PRIO && tb[i]; i++) {
+ 		struct tc_action_ops *a_o;
+ 
+-		a_o = tc_action_load_ops(tb[i], flags & TCA_ACT_FLAGS_POLICE,
+-					 !(flags & TCA_ACT_FLAGS_NO_RTNL),
+-					 extack);
++		a_o = tc_action_load_ops(tb[i], flags, extack);
+ 		if (IS_ERR(a_o)) {
+ 			err = PTR_ERR(a_o);
+ 			goto err_mod;
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index adf5de1ff773..4b8ff5b4eb18 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -3300,12 +3300,11 @@ int tcf_exts_validate_ex(struct net *net, struct tcf_proto *tp, struct nlattr **
+ 		if (exts->police && tb[exts->police]) {
+ 			struct tc_action_ops *a_o;
+ 
+-			a_o = tc_action_load_ops(tb[exts->police], true,
+-						 !(flags & TCA_ACT_FLAGS_NO_RTNL),
++			flags |= TCA_ACT_FLAGS_POLICE | TCA_ACT_FLAGS_BIND;
++			a_o = tc_action_load_ops(tb[exts->police], flags,
+ 						 extack);
+ 			if (IS_ERR(a_o))
+ 				return PTR_ERR(a_o);
+-			flags |= TCA_ACT_FLAGS_POLICE | TCA_ACT_FLAGS_BIND;
+ 			act = tcf_action_init_1(net, tp, tb[exts->police],
+ 						rate_tlv, a_o, init_res, flags,
+ 						extack);
+-- 
+2.40.1
 
-bpf_iter does not support lseek.
-
-> 
-> The stop() function closes a session; its job, of course, is to clean up. If dynamic memory is allocated for the iterator, stop() is the place to free it; if a lock was taken by start(), stop() must release that lock. The value that *pos was set to by the last next() call before stop() is remembered, and used for the first start() call of the next session unless lseek() has been called on the file; in that case next start() will be asked to start at position zero
-> 
-> [1] https://docs.kernel.org/filesystems/seq_file.html
-> 
->>
->> For the cases described above, skipped the newer sockets is arguably ok. These two new sockets will not be captured anyway even the batch was not stop()-ed in the middle. I also don't see how it is different semantically if the two new sockets are added to the X-1 bucket: the sockets are added after the bpf-iter scanned it regardless they are added to an earlier bucket or to an earlier location of the same bucket.
->>
->> That said, the bpf_iter_udp_seq_stop() should only happen if the bpf_prog bpf_seq_printf() something AND hit the seq->buf (PAGE_SIZE) << 3) limit or the count in "read(iter_fd, buf, count)" limit.
-> 
-> Thanks for sharing the additional context. Would you have a link for these set of conditions where an iterator can be stopped? It'll be good to document the API semantics so that users are aware of the implications of setting the read size parameter too low.
-
-Most of the conditions should be in bpf_seq_read() in bpf_iter.c.
-
-Again, this resume on offset behavior is not something specific to 
-bpf-{tcp,udp}-iter.
-
-> 
-> 
->> For this case, bpf_iter.c may be improved to capture the whole batch's seq_printf() to seq->buf first even the userspace's buf is full. It would be a separate effort if it is indeed needed.
-> 
-> Interesting proposal... Other option could be to invalidate the userspace iterator if an entire bucket batch is not being captured, so that userspace can retry with a bigger buffer.
-
-Not sure how to invalidate the user buffer without breaking the existing 
-userspace app though.
-
-The earlier idea on seq->buf was a quick thought. I suspect there is still 
-things that need to think through if we did want to explore how to provide 
-better guarantee to allow seq_printf() for one whole batch. I still feel it is 
-overkill.
 
