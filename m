@@ -1,98 +1,124 @@
-Return-Path: <netdev+bounces-61728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 065D4824BFC
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:00:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCF2D824C02
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A776D1F2143A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:00:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65E192866D3
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D23020F1;
-	Fri,  5 Jan 2024 00:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D711FC8;
+	Fri,  5 Jan 2024 00:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kp/z1nIP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mNUcjAqj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968A427447
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 00:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-5f2aab1c0c5so771557b3.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 16:00:51 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376691FBE
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 00:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5ce8a3381a1so949584a12.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 16:07:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704412850; x=1705017650; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iiNmY8n2RqqVzlTLbuX2cKiUEhuYFXEYaWAD9j1qPLQ=;
-        b=Kp/z1nIPHFvPCL8/3Be3OZ74dsGLATjvEbZT2fkIcxBpIh0K2s7Ml5EUq4IEKCrb6C
-         x9KJ+oWsN9nN3GRmFfKoxZadW7OSxI4ajhQi5RqW/0mjSHHdT/FqxfU91rGztj3Hcjit
-         adA2gzY1D6mh6ywAQklWtOfnxSYOFsJmOrSD9KrP0N+gjiqg2lSTejOkkgRyvVJs6iAK
-         9goE3RnmIwqntYw5IgFjogpE2Mo5uLzCSXYl1v5coz0TWNMeR//rbNk4Hce2CiY4rOXU
-         cFt3HjSlzhkCi3jNa5oLVbYO9e9UUJiJjQ0Se9zZreKnzVmlavL4gFngExW/N+vqt71T
-         +jmg==
+        d=google.com; s=20230601; t=1704413222; x=1705018022; darn=vger.kernel.org;
+        h=to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZCm4qbqYLKL0X2tawwVQnjcJ74n/29xH0+vMdcngW8c=;
+        b=mNUcjAqjjvGF5xpDOMseDVfN7pidAvcDn8p7kxy/x5Bdu8hGrAxDFUyALF3G9VVPt9
+         7A9UOgTMNICN4XfcSibsZJFqevzeUebtcwSQ54z76f8/QKtXF2mOdUx63kXLWtH5jzMj
+         G9jnxMyzXf5LzCBZJqoSpSqXjboQAZS8JqOq1E8dShtX2JiCwUhEK83omsumSpSquATp
+         oTWHipD7KjgO1ox5zJ7Nu1SY0K4iQ37eQjuXVjutPMc4WpsAHED/BNMkfb+OvfIr9vxN
+         t5picz7zohze/dJNHm+bs3Q0ebLtvvc0On42MA5jbOQEEzHtug7dYGni8aclLLSaZLl0
+         mpbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704412850; x=1705017650;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iiNmY8n2RqqVzlTLbuX2cKiUEhuYFXEYaWAD9j1qPLQ=;
-        b=aGE3Wt4lqAnODDb6C2uo2kpJvANe6qUBxVRnB4u110IkqLiNC450oQoVIMI9hfHhaI
-         ysPU8Js6NJQqa/t/hixl07gAhyH95wYxDm6JyYQcYxTMB4L28uXx1KlevjrEtMtCxlp/
-         ao7OFD5ClbnCi3AiI7loPlVbMgM0hZhCUrtDxNekhL/o+z/mT+gMIiGWHoRcraPjp5lE
-         7Melnct1DXAT1xg6qpkAUUb1fkG76NUu1vOCBF/3TmXRc+s2yqrHRHRUvGqMoSP0fOU5
-         dy9mbfFhOcLUOfl3DmmqtFmiuDM8RLdE2W2+uEUzi4hPcyG3GFN1zWqis0ESdLvK/Q/A
-         XHVA==
-X-Gm-Message-State: AOJu0Yw7bA+dvcV4Hp6xap1wIwv38sh9+Dlh4eBTN3UnFsxLmbQ+bNQT
-	Sh9wVVDDIIBy1TB+uwUcLnstIBuda8rE9sfvfvJO0j5QCji7B85JsGha9bkj
-X-Google-Smtp-Source: AGHT+IF9xL5qxooPk9FV2ZOmpuScNx+syfGxURZLZm9Jj4hUBPloAoFowvmPncuNINUME87hzJkXSp8Z5tv0rT4F0Lw=
-X-Received: by 2002:a0d:e4c2:0:b0:5f6:117c:a3f9 with SMTP id
- n185-20020a0de4c2000000b005f6117ca3f9mr32709ywe.30.1704412850487; Thu, 04 Jan
- 2024 16:00:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704413222; x=1705018022;
+        h=to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZCm4qbqYLKL0X2tawwVQnjcJ74n/29xH0+vMdcngW8c=;
+        b=uPjSnjZxv751djmJeVsRc/Yk7qIU9WB43uwlihg1SRq2FwrBk32A10K8Q/VfrUk1BH
+         ftKG0sgKB+JKB39KLaeL4CGGQZAt7HB63kZuv+yjYogKz9Gkrg+/47WNBIJ5JaoZQShz
+         TDcDI2g77I9D8EKIvi+kKmgeH2aKa0OTGuoQR/46vIRKaO0PlBIDx8yhRm00FxBgSOyg
+         82yrPeQG8ELBOIhPudgRA1VimVXfndSS/AhVDa93hXxMSaZ2A3N+8yV8ziz0AMRkUdVz
+         ibFlxxbMCSbyE4GNVEVU75f9vp15lU4pTmt4Thw1Od6jjDeGf/QMYFwOMPKVn5mJAosA
+         cD0w==
+X-Gm-Message-State: AOJu0Yyryh/6Gu5KIiP1W/5gBUBvZIlONUKnXMCQZKrQvdRxvj+Uj9bH
+	/jlKMhHF7l8IyiXAm0hDaHG6pFc6dbLcahQCDA==
+X-Google-Smtp-Source: AGHT+IHb6FEqMS6VkQV6gQcy0yPlOOWrS8GMaw7PQjYywVfcrON/vGn0KJ+AFDUgAAOp00kXqWKj3DYnRYM=
+X-Received: from aahila.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2f3])
+ (user=aahila job=sendgmr) by 2002:a05:6a02:491:b0:5ce:474:352b with SMTP id
+ bw17-20020a056a02049100b005ce0474352bmr7789pgb.5.1704413222131; Thu, 04 Jan
+ 2024 16:07:02 -0800 (PST)
+Date: Fri,  5 Jan 2024 00:06:31 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240102-new-gemini-ethernet-regression-v5-0-cf61ab3aa8cd@linaro.org>
- <20240102-new-gemini-ethernet-regression-v5-1-cf61ab3aa8cd@linaro.org> <20240104002449.yx43fvp2ylbxs3wz@skbuf>
-In-Reply-To: <20240104002449.yx43fvp2ylbxs3wz@skbuf>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 5 Jan 2024 01:00:38 +0100
-Message-ID: <CACRpkdZD2tbNLuWXnCbo+L-bqLdF1-FpFjSGsjSjifqxD-Py=A@mail.gmail.com>
-Subject: Re: [PATCH net v5 1/2] net: ethernet: cortina: Drop software checksum
- and TSO
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20240105000632.2484182-1-aahila@google.com>
+Subject: [PATCH 1/2 net-next v2] bonding: Extending LACP MUX State Machine to
+ include a Collecting State.
+From: Aahil Awatramani <aahila@google.com>
+To: Aahil Awatramani <aahila@google.com>, David Dillow <dave@thedillows.org>, 
+	Mahesh Bandewar <maheshb@google.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
+	Andy Gospodarek <andy@greyhouse.net>, "David S . Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Household Cang <canghousehold@aol.com>, Romain Gantois <romain.gantois@bootlin.com>, 
-	netdev@vger.kernel.org
+	Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 4, 2024 at 1:24=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com> =
-wrote:
-> On Tue, Jan 02, 2024 at 09:34:25PM +0100, Linus Walleij wrote:
+Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
+the LACP MUX state machine for separated handling of an initial
+Collecting state before the Collecting and Distributing state. This
+enables a port to be in a state where it can receive incoming packets
+while not still distributing. This is useful for reducing packet loss when
+a port begins distributing before its partner is able to collect.
+Additionally this also brings the 802.3ad bonding driver's implementation
+closer to the LACP specification which already predefined this behaviour,
+that is currently the implementation only supports coupled control.
 
-> > That begs the question why large TCP or UDP packets also have to
-> > bypass the checksumming (like e.g. ICMP does). If the hardware is
-> > splitting it into smaller packets per-MTU setting, and checksumming
-> > them, why is this happening then? I don't know. I know it is needed,
-> > from tests: the OpenWrt webserver uhttpd starts sending big skb:s (up
-> > to 2047 bytes, the max MTU) and above 1514 bytes it starts to fail
-> > and hang unless the bypass bit is set: the frames are not getting
-> > through.
->
-> This uhttpd traffic is plain TCP, or TCP wrapped in DSA?
+Added new functions such as bond_set_slave_tx_disabled_flags and
+bond_set_slave_rx_enabled_flags to precisely manage the port's collecting
+and distributing states. Previously, there was no dedicated method to
+disable TX while keeping RX enabled, which this patch addresses.
 
-Wrapped in DSA, rtl_a_4.
+Note that the regular flow process in the kernel's bonding driver remains
+unaffected by this patch. The extension requires explicit opt-in by the
+user (in order to ensure no disruptions for existing setups) via netlink
+support using the new bonding parameter coupled_control. The default value
+for coupled_control is set to 1 so as to preserve existing behaviour.
 
-Yours,
-Linus Walleij
+Signed-off-by: Aahil Awatramani <aahila@google.com>
+---
+ Documentation/networking/bonding.rst | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
+index f7a73421eb76..cb3e6013605d 100644
+--- a/Documentation/networking/bonding.rst
++++ b/Documentation/networking/bonding.rst
+@@ -444,6 +444,14 @@ arp_missed_max
+ 
+ 	The default value is 2, and the allowable range is 1 - 255.
+ 
++coupled_control
++
++    Specifies whether the LACP state machine's MUX in the 802.3ad mode
++    should have separate Collecting and Distributing states.
++
++    The default value is 1. This setting does not separate the Collecting
++    and Distributing states, maintaining the bond in coupled control.
++
+ downdelay
+ 
+ 	Specifies the time, in milliseconds, to wait before disabling
+-- 
+2.43.0.472.g3155946c3a-goog
+
 
