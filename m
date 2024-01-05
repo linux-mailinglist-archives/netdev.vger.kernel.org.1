@@ -1,121 +1,244 @@
-Return-Path: <netdev+bounces-61936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D68F582545D
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:18:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E361782546F
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0955E1C215AC
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:18:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7BE81C21131
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D712CCD8;
-	Fri,  5 Jan 2024 13:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E9412D622;
+	Fri,  5 Jan 2024 13:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ldi8gPtP"
+	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="sEPs+4UU"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6082E3F1;
-	Fri,  5 Jan 2024 13:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=lXZ6dhmE/ICvc6we7INUfg+/UsVr/HBiAoyEO42qbxw=; b=ldi8gPtPJVmH9PdcSI9hE76OmP
-	bSn24xnqUB/dIB3NWE1ZGvL1k9CyH/2/b5W1F/xMfNwPeQQB8PA61QIxM+nIJ5tkN5BPmEIKRdLf5
-	AGGnnFACaQ/HDlLDCE1LCLhlSIWVcflkgdChZ+jbY5EcHxk2EqRdKTdDhSsU9gOj+PHEb8nLqdxhd
-	nyO7BW9T/tc2hbvgNfhJN9et9ro64C9it0YlSwWohR/nGEl+9x4Tr/CneDxq+NYe75aC0dykUGEkD
-	/kVD9g/WG/FB8exdmfKBXOKQA2+e97wKF1RCOKeizvhWR5ypDLW4jACYvZs77dCxU5RIdEuHKMR/1
-	q/l2Rjyg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rLk4u-000FpH-Mk; Fri, 05 Jan 2024 13:17:36 +0000
-Date: Fri, 5 Jan 2024 13:17:36 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Anna Schumaker <Anna.Schumaker@netapp.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Fix oops in NFS
-Message-ID: <ZZgBcJ7OAS7Ui6gi@casper.infradead.org>
-References: <ZZeLAAf6qiieA5fy@casper.infradead.org>
- <2202548.1703245791@warthog.procyon.org.uk>
- <20231221230153.GA1607352@dev-arch.thelio-3990X>
- <20231221132400.1601991-1-dhowells@redhat.com>
- <20231221132400.1601991-38-dhowells@redhat.com>
- <2229136.1703246451@warthog.procyon.org.uk>
- <1094259.1704449575@warthog.procyon.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76C02D602;
+	Fri,  5 Jan 2024 13:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tesarici.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tesarici.cz
+Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by bee.tesarici.cz (Postfix) with ESMTPSA id E47441A8914;
+	Fri,  5 Jan 2024 14:27:33 +0100 (CET)
+Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
+	t=1704461254; bh=VfEjDVULxnZTjPOjGh9r0e9l+PxMe7It2mzeDxtw0N4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sEPs+4UUZk8mTzK4DRkhLElTK+UqBoy3oQbYnzi3VjJSWZJdjyzDHCTh4o2Sdp03O
+	 FxzXsEQVC4Kv8HnbjMPXwBQt4d4XdUtqWXwYNw2c+gw4c+WoKjZ/euYz9PJVW6wK2g
+	 tjmDJplbWv5/iIKC6yJ9/Tzr9v4a0FOx7eiIccU0sR/4MqzD8HxBOoYnuYgoQJkrpZ
+	 j51+gV6nOX+N5no5YemyORVpAW9HHx/jjsFcIMXBtyEPJAgxvj/SiJgy5rxnsnOn8/
+	 xwAqkPrzxTPYwmX0B3Vcg2umXnpK4tNOt0N6MLGeSCi0YWXKfMDtA1yCYScBJ1ya5G
+	 /MbvYchKUZIoQ==
+Date: Fri, 5 Jan 2024 14:27:32 +0100
+From: Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>, Jernej
+ Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
+ "open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, "moderated
+ list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
+ "moderated list:ARM/STM32 ARCHITECTURE"
+ <linux-arm-kernel@lists.infradead.org>, open list
+ <linux-kernel@vger.kernel.org>, "open list:ARM/Allwinner sunXi SoC support"
+ <linux-sunxi@lists.linux.dev>, Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH] net: stmmac: protect statistics updates with a spinlock
+Message-ID: <20240105142732.1903bc70@meshulam.tesarici.cz>
+In-Reply-To: <20240105121447.11ae80d1@meshulam.tesarici.cz>
+References: <20240105091556.15516-1-petr@tesarici.cz>
+	<CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
+	<20240105113402.0f5f1232@meshulam.tesarici.cz>
+	<CANn89iLEvW9ZS=+WPETPC=mKRyu9AKmueGCWZZOrz9oX3Xef=g@mail.gmail.com>
+	<20240105121447.11ae80d1@meshulam.tesarici.cz>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1094259.1704449575@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 05, 2024 at 10:12:55AM +0000, David Howells wrote:
-> Matthew Wilcox <willy@infradead.org> wrote:
-> 
-> > This commit (100ccd18bb41 in linux-next 20240104) is bad for me.  After
-> > it, running xfstests gives me first a bunch of errors along these lines:
-> > 
-> > 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-00037-g100ccd18bb41/kernel/fs/gfs2/gfs2.ko: Exec format error
-> > 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-00037-g100ccd18bb41/kernel/fs/zonefs/zonefs.ko: Exec format error
-> > 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-00037-g100ccd18bb41/kernel/security/keys/encrypted-keys/encrypted-keys.ko: Exec format error
-> > 
-> > and then later:
-> > 
-> > 00016 generic/001       run fstests generic/001 at 2024-01-05 04:50:46
-> > 00017 [not run] this test requires a valid $TEST_DEV
-> > 00017 generic/002       run fstests generic/002 at 2024-01-05 04:50:46
-> > 00017 [not run] this test requires a valid $TEST_DEV
-> > 00017 generic/003       run fstests generic/003 at 2024-01-05 04:50:47
-> > 00018 [not run] this test requires a valid $SCRATCH_DEV
-> > ...
-> > 
-> > so I think that's page cache corruption of some kind.
-> 
-> Is that being run on NFS?  Is /lib on NFS?
+Hi Eric,
 
-No NFS involvement; this is supposed to be an XFS test ...
+yeah, it's me again...
 
-/dev/sda on / type ext4 (rw,relatime)
-host on /host type 9p (rw,relatime,access=client,trans=virtio)
-/dev/sdb on /mnt/test type xfs (rw,relatime,attr2,inode64,logbufs=8,logbsize=32k,noquota)
+On Fri, 5 Jan 2024 12:14:47 +0100
+Petr Tesa=C5=99=C3=ADk <petr@tesarici.cz> wrote:
 
-CONFIG_NETFS_SUPPORT=y
-# CONFIG_NETFS_STATS is not set
-# CONFIG_FSCACHE is not set
-CONFIG_NETWORK_FILESYSTEMS=y
-# CONFIG_NFS_FS is not set
-# CONFIG_NFSD is not set
-# CONFIG_CEPH_FS is not set
-# CONFIG_CIFS is not set
-# CONFIG_SMB_SERVER is not set
-# CONFIG_CODA_FS is not set
-# CONFIG_AFS_FS is not set
-CONFIG_9P_FS=y
-# CONFIG_9P_FS_POSIX_ACL is not set
-# CONFIG_9P_FS_SECURITY is not set
-CONFIG_NLS=y
+> On Fri, 5 Jan 2024 11:48:19 +0100
+> Eric Dumazet <edumazet@google.com> wrote:
+>=20
+> > On Fri, Jan 5, 2024 at 11:34=E2=80=AFAM Petr Tesa=C5=99=C3=ADk <petr@te=
+sarici.cz> wrote: =20
+> > >
+> > > On Fri, 5 Jan 2024 10:58:42 +0100
+> > > Eric Dumazet <edumazet@google.com> wrote:
+> > >   =20
+> > > > On Fri, Jan 5, 2024 at 10:16=E2=80=AFAM Petr Tesarik <petr@tesarici=
+.cz> wrote:   =20
+> > > > >
+> > > > > Add a spinlock to fix race conditions while updating Tx/Rx statis=
+tics.
+> > > > >
+> > > > > As explained by a comment in <linux/u64_stats_sync.h>, write side=
+ of struct
+> > > > > u64_stats_sync must ensure mutual exclusion, or one seqcount upda=
+te could
+> > > > > be lost on 32-bit platforms, thus blocking readers forever.
+> > > > >
+> > > > > Such lockups have been actually observed on 32-bit Arm after stmm=
+ac_xmit()
+> > > > > on one core raced with stmmac_napi_poll_tx() on another core.
+> > > > >
+> > > > > Signed-off-by: Petr Tesarik <petr@tesarici.cz>   =20
+> > > >
+> > > > This is going to add more costs to 64bit platforms ?   =20
+> > >
+> > > Yes, it adds a (hopefully not too contended) spinlock and in most
+> > > places an interrupt disable/enable pair.
+> > >
+> > > FWIW the race condition is also present on 64-bit platforms, resulting
+> > > in inaccurate statistic counters. I can understand if you consider it=
+ a
+> > > mild annoyance, not worth fixing.
+> > >   =20
+> > > > It seems to me that the same syncp can be used from two different
+> > > > threads : hard irq and napi poller...   =20
+> > >
+> > > Yes, that's exactly the scenario that locks up my system.
+> > >   =20
+> > > > At this point, I do not see why you keep linux/u64_stats_sync.h if =
+you
+> > > > decide to go for a spinlock...   =20
+> > >
+> > > The spinlock does not havce to be taken on the reader side, so the
+> > > seqcounter still adds some value.
+> > >   =20
+> > > > Alternative would use atomic64_t fields for the ones where there is=
+ no
+> > > > mutual exclusion.
+> > > >
+> > > > RX : napi poll is definitely safe (protected by an atomic bit)
+> > > > TX : each TX queue is also safe (protected by an atomic exclusion f=
+or
+> > > > non LLTX drivers)
+> > > >
+> > > > This leaves the fields updated from hardware interrupt context ?   =
+=20
+> > >
+> > > I'm afraid I don't have enough network-stack-foo to follow here.
+> > >
+> > > My issue on 32 bit is that stmmac_xmit() may be called directly from
+> > > process context while another core runs the TX napi on the same chann=
+el
+> > > (in interrupt context). I didn't observe any race on the RX path, but=
+ I
+> > > believe it's possible with NAPI busy polling.
+> > >
+> > > In any case, I don't see the connection with LLTX. Maybe you want to
+> > > say that the TX queue is safe for stmmac (because it is a non-LLTX
+> > > driver), but might not be safe for LLTX drivers?   =20
+> >=20
+> > LLTX drivers (mostly virtual drivers like tunnels...) can have multiple=
+ cpus
+> > running ndo_start_xmit() concurrently. So any use of a 'shared syncp'
+> > would be a bug.
+> > These drivers usually use per-cpu stats, to avoid races and false
+> > sharing anyway.
+> >=20
+> > I think you should split the structures into two separate groups, each
+> > guarded with its own syncp.
+> >=20
+> > No extra spinlocks, no extra costs on 64bit arches...
+> >=20
+> > If TX completion can run in parallel with ndo_start_xmit(), then
+> > clearly we have to split stmmac_txq_stats in two halves: =20
+>=20
+> Oh, now I get it. Yes, that's much better, indeed.
+>=20
+> I mean, the counters have never been consistent (due to the race on the
+> writer side), and nobody is concerned. So, there is no value in taking
+> a consistent snapshot in stmmac_get_ethtool_stats().
+>=20
+> I'm going to rework and retest my patch. Thank you for pointing me in
+> the right direction!
+>=20
+> Petr T
+>=20
+> > Also please note the conversion from u64 to u64_stats_t =20
+>=20
+> Noted. IIUC this will in turn close the update race on 64-bit by using
+> an atomic type and on 32-bit by using a seqlock. Clever.
+>=20
+> Petr T
+>=20
+> > Very partial patch, only to show the split and new structure :
+> >=20
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > index e3f650e88f82f927f0dcf95748fbd10c14c30cbe..702bceea5dc8c875a80f5e3=
+a92b7bb058f373eda
+> > 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > @@ -60,16 +60,22 @@
+> >  /* #define FRAME_FILTER_DEBUG */
+> >=20
+> >  struct stmmac_txq_stats {
+> > -       u64 tx_bytes;
+> > -       u64 tx_packets;
+> > -       u64 tx_pkt_n;
+> > -       u64 tx_normal_irq_n;
+> > -       u64 napi_poll;
+> > -       u64 tx_clean;
+> > -       u64 tx_set_ic_bit;
+> > -       u64 tx_tso_frames;
+> > -       u64 tx_tso_nfrags;
+> > -       struct u64_stats_sync syncp;
+> > +/* First part, updated from ndo_start_xmit(), protected by tx queue lo=
+ck */
+> > +       struct u64_stats_sync syncp_tx;
+> > +       u64_stats_t tx_bytes;
+> > +       u64_stats_t tx_packets;
+> > +       u64_stats_t tx_pkt_n;
+> > +       u64_stats_t tx_tso_frames;
+> > +       u64_stats_t tx_tso_nfrags;
+> > +
+> > +/* Second part, updated from TX completion (protected by NAPI poll log=
+ic) */
+> > +       struct u64_stats_sync syncp_tx_completion;
+> > +       u64_stats_t napi_poll;
+> > +       u64_stats_t tx_clean;
+> > +       u64_stats_t tx_set_ic_bit;
 
+Unfortunately, this field is also updated from ndo_start_xmit():
+
+4572)     if (set_ic)
+4573)             txq_stats->tx_set_ic_bit++;
+
+I feel it would be a shame to introduce a spinlock just for this one
+update. But I think the field could be converted to an atomic64_t.
+
+Which raises a question: Why aren't all stat counters simply atomic64_t? Th=
+ere
+is no guarantee that the reader side takes a consistent snapshot
+(except on 32-bit). So, why do we even bother with u64_stats_sync?
+
+Is it merely because u64_stats_add() should be cheaper than
+atomic64_add()? Or is there anything else I'm missing? If yes, does it
+invalidate my proposal to convert tx_set_ic_bit to an atomic64_t?
+
+Petr T
 
