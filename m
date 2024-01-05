@@ -1,43 +1,72 @@
-Return-Path: <netdev+bounces-61775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D08C0824EC1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 07:46:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F17A1824EF4
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 08:09:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCC271C21697
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 06:46:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2BAA1F2369E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 07:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43BC3D8F;
-	Fri,  5 Jan 2024 06:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07B2134A2;
+	Fri,  5 Jan 2024 07:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ddd73IgM"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6842030C
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 06:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4T5v9C02PZz1wrTK;
-	Fri,  5 Jan 2024 14:45:35 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id B8F7F1800B9;
-	Fri,  5 Jan 2024 14:46:06 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 5 Jan
- 2024 14:46:06 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-	<shaozhengchao@huawei.com>
-Subject: [PATCH net-next] fib: rules: remove repeated assignment in fib_nl2rule
-Date: Fri, 5 Jan 2024 14:56:34 +0800
-Message-ID: <20240105065634.529045-1-shaozhengchao@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0CE1D68F;
+	Fri,  5 Jan 2024 07:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704438585; x=1735974585;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yKUXbdD8qpgSi58w2LiSPZgWQ2PW44f2VTnKYrF/+3I=;
+  b=Ddd73IgMI3QeBzBz/e/BqUCpbAN7ioFEhcqpdKfKR7us7rW9i3l2DqXg
+   +KiVdzUg7jX48a3Koz8dXu1Vzl7c+KTg9dILQpaFyuRD3nyLiCOdCfNjP
+   CZHHNLyEiNx1WVZzMjSaZPx3xE5XhUKEK1uCCApuGg9cCg7uHeU1Nv6A3
+   wGen5nKP2t72Ic982XMgOHBq/n0AXcROsxT2LH0IhLG7Y4ktiMda0CPwR
+   6FCVcRm9oFyZQsans+nYkHEV0xxoCNGtMFeX4f9dgZD1nzrZzf69/+wYz
+   FH1r2+Qe32t09B4Jb8r3nnBqbyFjdO3DsfRDppDTR3MqIQ7GhRlmnJhYh
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="463845803"
+X-IronPort-AV: E=Sophos;i="6.04,333,1695711600"; 
+   d="scan'208";a="463845803"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2024 23:09:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="871167246"
+X-IronPort-AV: E=Sophos;i="6.04,333,1695711600"; 
+   d="scan'208";a="871167246"
+Received: from pg-esw-build.png.intel.com ([10.226.214.65])
+  by FMSMGA003.fm.intel.com with ESMTP; 04 Jan 2024 23:09:39 -0800
+From: Leong Ching Swee <leong.ching.swee@intel.com>
+To: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Swee Leong Ching <leong.ching.swee@intel.com>
+Subject: [PATCH net-next v2 0/4] net: stmmac: Enable Per DMA Channel interrupt
+Date: Fri,  5 Jan 2024 15:09:21 +0800
+Message-Id: <20240105070925.2948871-1-leong.ching.swee@intel.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -46,31 +75,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500026.china.huawei.com (7.185.36.106)
 
-In fib_nl2rule(), 'err' variable has been set to -EINVAL during
-declaration, and no need to set the 'err' variable to -EINVAL again.
-So, remove it.
+From: Swee Leong Ching <leong.ching.swee@intel.com>
 
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- net/core/fib_rules.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index 75282222e0b4..a50a0bde8db1 100644
---- a/net/core/fib_rules.c
-+++ b/net/core/fib_rules.c
-@@ -594,7 +594,6 @@ static int fib_nl2rule(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (tb[FRA_TUN_ID])
- 		nlrule->tun_id = nla_get_be64(tb[FRA_TUN_ID]);
+Hi,
+Add Per DMA Channel interrupt feature for DWXGMAC IP.
  
--	err = -EINVAL;
- 	if (tb[FRA_L3MDEV] &&
- 	    fib_nl2rule_l3mdev(tb[FRA_L3MDEV], nlrule, extack) < 0)
- 		goto errout_free;
+Patchset (link below) contains per DMA channel interrupt, But it was 
+achieved.
+https://lore.kernel.org/lkml/20230821203328.GA2197059-
+robh@kernel.org/t/#m849b529a642e1bff89c05a07efc25d6a94c8bfb4
+ 
+Some of the changes in this patchset are based on reviewer comment on 
+patchset mentioned beforehand.
+
+changelog v2:
+*extend irq_name array to 9
+*add empty line after int i
+*avoid polluting rx_irq/tx_irq array with temporary variable
+*move tx/rx IRQ loop to bottom of stmmac_get_platform_resource()
+*rename stmmac_xx_queue_interrupt() to stmmac_dma_xx_interrupt()
+*fix error message in stmmac_request_irq_multi()
+*move STMMAC_FLAG_MULTI_IRQ_EN handling to glue driver 
+
+Swee Leong Ching (4):
+  dt-bindings: net: snps,dwmac: per channel irq
+  net: stmmac: Make MSI interrupt routine generic
+  net: stmmac: Add support for TX/RX channel interrupt
+  net: stmmac: Use interrupt mode INTM=1 for per channel irq
+
+ .../devicetree/bindings/net/snps,dwmac.yaml   | 24 ++++++++++----
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  4 +--
+ .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  3 ++
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 ++
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 32 +++++++++++--------
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 30 ++++++++---------
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 28 ++++++++++++++++
+ include/linux/stmmac.h                        |  4 +--
+ 9 files changed, 90 insertions(+), 40 deletions(-)
+
 -- 
 2.34.1
 
