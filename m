@@ -1,120 +1,104 @@
-Return-Path: <netdev+bounces-61863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B5182518C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:13:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F238251A9
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2666F1C22D54
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F26391C22EAD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216B224B5F;
-	Fri,  5 Jan 2024 10:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0589424B48;
+	Fri,  5 Jan 2024 10:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NM55j7lb"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UVqyFBGd";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AIt7iYti"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D282555A
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 10:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704449588;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BC624B47;
+	Fri,  5 Jan 2024 10:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1704449721;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ogjygCadqZqQPF0RXbXaEDph9fgsETZY7v/OnrLD3js=;
-	b=NM55j7lbfuBoW0JVbRVLXi4F0XnNJA9bzQvDKnXl/FvFOihf2LaScyl213iT+XJoAqbo49
-	SfaNZ3LVXvvChyFLTZ9Yt6UrnCOpMvT6rs8XYzYpv7kbDkZb9zhTUoHMi0bPE6U9NzP5Wd
-	Gwjg1N4Cx/HoFUxzhI4E7DbnykQy310=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-306-4WUKZcOBNQ-J7NNVXyZBEg-1; Fri,
- 05 Jan 2024 05:13:01 -0500
-X-MC-Unique: 4WUKZcOBNQ-J7NNVXyZBEg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC9E41C05148;
-	Fri,  5 Jan 2024 10:12:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 96FAA40C6EB9;
-	Fri,  5 Jan 2024 10:12:56 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZZeLAAf6qiieA5fy@casper.infradead.org>
-References: <ZZeLAAf6qiieA5fy@casper.infradead.org> <2202548.1703245791@warthog.procyon.org.uk> <20231221230153.GA1607352@dev-arch.thelio-3990X> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-38-dhowells@redhat.com> <2229136.1703246451@warthog.procyon.org.uk>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: dhowells@redhat.com, Nathan Chancellor <nathan@kernel.org>,
-    Anna Schumaker <Anna.Schumaker@netapp.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Fix oops in NFS
+	bh=jO+VO3wXFRu66UkMcvjqElGeC5Sv8WT5wY6xOwIw/S4=;
+	b=UVqyFBGdRkvhbOLA+ppFaGAfNm0Vonvxuottzyh/4XWb7L+OG07Kg6jdcXmeVHoWlI7JLR
+	NKGJ7s5rZ8EwJgk99uiQrQAmz2zcbxx5qbAWIT3ywz/Qx0QS+l9keHU+RwHC9a1b81C+Uo
+	eYXwBmz7dQibvSINhYdtV/vMNzjokYrD4SrJBOxsz16TOwrT29tdeRsOTDcjq84QSJVhJe
+	g1/qxvYVgxjrHXiRLLDsHhoUeqP+FjfYw2ZlCysFpo/d+8xx51bgAPTt916UxE69UHp4PM
+	S4yy5te1FBYR8Dp/opZ5sszDj7MNcvTLPVrpox0TvMvIfCk1KoI2Dvs608hSig==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1704449721;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jO+VO3wXFRu66UkMcvjqElGeC5Sv8WT5wY6xOwIw/S4=;
+	b=AIt7iYtiUvQDrEKJug3LyhX4SHG++vgGesong5Ppvswqs8G7nnWz5dyDPY0iX407QgSYib
+	fhToLweazCrkaWBQ==
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, Jakub
+ Kicinski <kuba@kernel.org>, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, hauke@hauke-m.de, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, arinc.unal@arinc9.com,
+ daniel@makrotopia.org, Landen.Chao@mediatek.com, dqfext@gmail.com,
+ sean.wang@mediatek.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, claudiu.manoil@nxp.com,
+ alexandre.belloni@bootlin.com, clement.leger@bootlin.com,
+ george.mccollister@gmail.com, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for DSA tags
+In-Reply-To: <20240104143759.1318137-1-kuba@kernel.org>
+References: <20240104143759.1318137-1-kuba@kernel.org>
+Date: Fri, 05 Jan 2024 11:15:17 +0100
+Message-ID: <87plygqe6i.fsf@kurt>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1094258.1704449575.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jan 2024 10:12:55 +0000
-Message-ID: <1094259.1704449575@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Matthew Wilcox <willy@infradead.org> wrote:
+--=-=-=
+Content-Type: text/plain
 
-> This commit (100ccd18bb41 in linux-next 20240104) is bad for me.  After
-> it, running xfstests gives me first a bunch of errors along these lines:
-> =
+On Thu Jan 04 2024, Jakub Kicinski wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to all the DSA tag modules.
+>
+> The descriptions are copy/pasted Kconfig names, with s/^Tag/DSA tag/.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-=
-00037-g100ccd18bb41/kernel/fs/gfs2/gfs2.ko: Exec format error
-> 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-=
-00037-g100ccd18bb41/kernel/fs/zonefs/zonefs.ko: Exec format error
-> 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-=
-00037-g100ccd18bb41/kernel/security/keys/encrypted-keys/encrypted-keys.ko:=
- Exec format error
-> =
+Acked-by: Kurt Kanzenbach <kurt@linutronix.de>
 
-> and then later:
-> =
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 00016 generic/001       run fstests generic/001 at 2024-01-05 04:50:46
-> 00017 [not run] this test requires a valid $TEST_DEV
-> 00017 generic/002       run fstests generic/002 at 2024-01-05 04:50:46
-> 00017 [not run] this test requires a valid $TEST_DEV
-> 00017 generic/003       run fstests generic/003 at 2024-01-05 04:50:47
-> 00018 [not run] this test requires a valid $SCRATCH_DEV
-> ...
-> =
+-----BEGIN PGP SIGNATURE-----
 
-> so I think that's page cache corruption of some kind.
-
-Is that being run on NFS?  Is /lib on NFS?
-
-David
-
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmWX1rUTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgk55D/9zqbT5fC7AXgLULEkx0VKj1404ulqK
+ZxXhPu2NW1/G+/+5iFZvce7q0JEJDNcRPG0IVYc0WxkbVN2pLZoFKFO4omzAi1OF
+lHzUaB9SjVp4kS3B1mJbj7q6+JPfU6Lt06d23cWp2GI8O1wp7C7Hu+fSW325k1dx
+ccw8/jfnFyuxKe1VhAPuQfSZ6erM79r6zi8sf1iwwU8l8hUr/WjFD4iREXKyL93j
+G0W6Gw10DwRp4lgwy8WPdydwjvE0sbeMKh7ijtnqCYwnD5j2DCSKZuevoglZXzSR
+fyrSIjUclxys7VbWfQtn3QYa3y6O+mJKMD6Q4DLoAm9X/dyran49xRCboJC3KrUI
+7exTGoXUPVA452Jy5wKZccG+RS+HpQi6AC3L7v1tPWg6mltmusQc/SHK5MVm1riz
+qNTMJP9uCojCUiP+UWbh20HpOt16yHP0+xGRiX3pUBl16RGmyWRtixJPb/4MQz8T
+xiN9HaGi+9jRF0v7I+/iUwWkmMEThaBY+mtl2e8rWInOPyLVC0Bddr/KwzxFJ6fK
+3dmsIztl8lvC47jH86xriXJDp8QXKkjo0bwq/TonB8w4g5OeR04bvZmo/A73M10k
+jn+4pSKyO9c1NHyS7nCs2dpO3Xlrdj9p1HZ2Uv8N1BbogRcU+v5KPeGoe7QYvcOz
+vd9YY2W+WapiiA==
+=U6fC
+-----END PGP SIGNATURE-----
+--=-=-=--
 
