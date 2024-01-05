@@ -1,118 +1,140 @@
-Return-Path: <netdev+bounces-61847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3DC68250E1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:35:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78BD182500A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:32:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DA08283D5E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:35:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F4181C20A80
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 08:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65579241E7;
-	Fri,  5 Jan 2024 09:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A2C21372;
+	Fri,  5 Jan 2024 08:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="lKkhwhSr"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bk8VwQGY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-26.smtpout.orange.fr [80.12.242.26])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E6524B43
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 09:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from pop-os.home ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id LgU0rtez5ELO0LgU7rh96e; Fri, 05 Jan 2024 10:27:24 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1704446844;
-	bh=UNWAgG72CqrXdtBAJ+FNWG2kto2YDA/1pTgcQwka+VI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=lKkhwhSrDn69hiAMrqfNEGcDBu+hjcHBHvmLgWlD3XhybkD2TMKxjZOhx8vwjYLZO
-	 KDJsTMbzRhDehOQqn39m8kwvPbqjK4bAhGGNANlnYVWHtkDRx9hu4GPhZeDHKF1xw/
-	 crY25q3MEt/XE5hn+HAVlT3reY4kPHVdl728AWoOKhFJm57SM+32cYJE7OUL5fIGmj
-	 aJlbDtv5Q43A5M2o8E86BjYRi6mz2hfZsdlDsScOFwUqWvqzTaes8O0gx6kRsRVDvt
-	 j7cV16p93jr4MN4/S0dEDaI/2RWOX7t+0sBoTtLCkJiuYAEXnIylA5NUn0EqPsx4de
-	 D40rup6OL6oyQ==
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Fri, 05 Jan 2024 10:27:24 +0100
-X-ME-IP: 92.140.202.140
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: alexis.lothore@bootlin.com,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	netdev@vger.kernel.org
-Subject: [PATCH 2/2 net-next] ipvlan: Remove usage of the deprecated ida_simple_xx() API
-Date: Fri,  5 Jan 2024 10:27:09 +0100
-Message-Id: <216fe71e690580aede0d3def17b767d9559edd3a.1704446747.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <5adda8a3ce7af63bc980ba6b4b3fbfd6344e336b.1704446747.git.christophe.jaillet@wanadoo.fr>
-References: <5adda8a3ce7af63bc980ba6b4b3fbfd6344e336b.1704446747.git.christophe.jaillet@wanadoo.fr>
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666BF208BD;
+	Fri,  5 Jan 2024 08:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D578C40005;
+	Fri,  5 Jan 2024 08:32:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1704443541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kmyYmzVm/qP7CoTti/7/1uH5HNF3/IzXKxXhez/kx98=;
+	b=bk8VwQGYlzu3Ebd+X3+nP4+BE4bFXE9ZGZCBQp/VY0+vekrlAvi1sqnw9zBzxXbJwSy9ap
+	kbNxKxAMlcat2ng9Dhx/oacFdFEiMzhduDajPQ7sjNcsFiK4SuyMSsAiTQR2H4iPTF04rV
+	XDv9Qc5Wx1LeHhGJuoQi9NOsdk/SjX8/WwBPh7aGVZkn5QhJBrJ5Tq01tAn5noNEtcjlY9
+	i+/wW5+5O1caAfCHluzAKSugHz/+jMpTyGpYXNJBjPIeJsBJOgOg5TNHqQOKtsTHKYtOV4
+	7UnPxsS7wojv9FfAlzELNdVPF60uDafpV75k0D7e+zXGN5Qq+3V3iTfUpDPgWw==
+Date: Fri, 5 Jan 2024 10:29:18 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH net-next v5 01/13] net: phy: Introduce ethernet link
+ topology representation
+Message-ID: <20240105102918.24398552@device-28.home>
+In-Reply-To: <20240104151242.52fa8cb4@kernel.org>
+References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
+	<20231221180047.1924733-2-maxime.chevallier@bootlin.com>
+	<20240104151242.52fa8cb4@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-ida_alloc() and ida_free() should be preferred to the deprecated
-ida_simple_get() and ida_simple_remove().
+Hi Jakub,
 
-This is less verbose.
+On Thu, 4 Jan 2024 15:12:42 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Note that the upper bound of ida_alloc_range() is inclusive while the one
-of ida_simple_get() was exclusive. So calls have been updated accordingly.
+> On Thu, 21 Dec 2023 19:00:34 +0100 Maxime Chevallier wrote:
+> > @@ -2441,6 +2442,7 @@ struct net_device {
+> >  #if IS_ENABLED(CONFIG_CGROUP_NET_PRIO)
+> >  	struct netprio_map __rcu *priomap;
+> >  #endif
+> > +	struct phy_link_topology	link_topo;  
+> 
+> Perhaps others would disagree but can we make this a pointer instead?
+> Only allocate it on demand, when first PHY gets attached?
+> Both saves space and netdevice.h will no longer need to know the
+> definition of the struct.
+>
+> Complete noob question but I thought PHYs get attached at ndo_open
+> time for drivers, don't they? We shouldn't want to re-ID in that case.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- drivers/net/ipvlan/ipvlan_main.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+I'll give it a try, it could be doable to try to keep the index for
+_some_ PHYs. I had a first try at this in the very first iteration, but
+that was lost when converting to xarray for the index management. Since
+the phy_device keeps track of its own index, we can try to re-use it,
+but I can see it becoming difficult if we destroy the topology when all
+PHYs are detached (after ndo_close).
 
-diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-index e080e4fc41e4..df7c43a109e1 100644
---- a/drivers/net/ipvlan/ipvlan_main.c
-+++ b/drivers/net/ipvlan/ipvlan_main.c
-@@ -605,11 +605,11 @@ int ipvlan_link_new(struct net *src_net, struct net_device *dev,
- 	 * Assign IDs between 0x1 and 0xFFFE (used by the master) to each
- 	 * slave link [see addrconf_ifid_eui48()].
- 	 */
--	err = ida_simple_get(&port->ida, port->dev_id_start, 0xFFFE,
--			     GFP_KERNEL);
-+	err = ida_alloc_range(&port->ida, port->dev_id_start, 0xFFFD,
-+			      GFP_KERNEL);
- 	if (err < 0)
--		err = ida_simple_get(&port->ida, 0x1, port->dev_id_start,
--				     GFP_KERNEL);
-+		err = ida_alloc_range(&port->ida, 0x1, port->dev_id_start - 1,
-+				      GFP_KERNEL);
- 	if (err < 0)
- 		goto unregister_netdev;
- 	dev->dev_id = err;
-@@ -641,7 +641,7 @@ int ipvlan_link_new(struct net *src_net, struct net_device *dev,
- unlink_netdev:
- 	netdev_upper_dev_unlink(phy_dev, dev);
- remove_ida:
--	ida_simple_remove(&port->ida, dev->dev_id);
-+	ida_free(&port->ida, dev->dev_id);
- unregister_netdev:
- 	unregister_netdevice(dev);
- 	return err;
-@@ -661,7 +661,7 @@ void ipvlan_link_delete(struct net_device *dev, struct list_head *head)
- 	}
- 	spin_unlock_bh(&ipvlan->addrs_lock);
- 
--	ida_simple_remove(&ipvlan->port->ida, dev->dev_id);
-+	ida_free(&ipvlan->port->ida, dev->dev_id);
- 	list_del_rcu(&ipvlan->pnode);
- 	unregister_netdevice_queue(dev, head);
- 	netdev_upper_dev_unlink(ipvlan->phy_dev, dev);
--- 
-2.34.1
+When re-creating the xarray at the next ndo_open, we would need to know
+what was the previous next_index, and we can't know that until PHYs are
+all re-attached.
 
+For now it would work because in most cases, we only have one PHY
+behind the MAC we can guarantee won't go away, but there are devices
+out-there with 2 PHYs connected to the same MAC with a MUX in the
+middle (that's one thing this series prepares for), and here it would
+be more complex to re-allocate the topology while knowing what's the
+next unused index. Hope that makes sense :)
+
+To summarize, I don't think we can easily both dynamically
+allocate/destroy the topology based only on the presence of at least
+one PHY, and try to keep the PHY index the same for non-hot-pluggable
+PHYs.
+
+> 
+> >  	struct phy_device	*phydev;
+> >  	struct sfp_bus		*sfp_bus;
+> >  	struct lock_class_key	*qdisc_tx_busylock;  
+> 
+> > @@ -10872,6 +10873,8 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+> >  #ifdef CONFIG_NET_SCHED
+> >  	hash_init(dev->qdisc_hash);
+> >  #endif
+> > +	phy_link_topo_init(&dev->link_topo);
+> > +
+> >  	dev->priv_flags = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
+> >  	setup(dev);
+> >    
+> 
+> I think you're missing a call to xa_destroy() somewhere, no?
+
+Arg you're right... I was under the false assumption that because the
+xarray wasn't dynamically allocated, we didn't need to perform any
+cleanup, thanks for spotting this.
+
+Maxime
 
