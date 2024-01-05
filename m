@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-62130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DBD5825D46
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 00:55:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2B8C825D47
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 00:55:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D27511C23225
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 23:55:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 124041F2470D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 23:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6212A360BC;
-	Fri,  5 Jan 2024 23:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C018364C0;
+	Fri,  5 Jan 2024 23:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XgdpPoPf"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xa+RmG7G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF681364AB
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 23:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071C8364B7
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 23:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-42836658198so590071cf.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 15:55:00 -0800 (PST)
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4287791e09dso690391cf.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 15:55:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1704498899; x=1705103699; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1704498901; x=1705103701; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Krmv7CmuXfl7DXk8aTDpoDj3ZUAd1H4d9ePlsNjgV4=;
-        b=XgdpPoPfuLeBoykSDtvf4Y+4l07mtwejZOzlbfete81SI180V2M58LnPWWxxzN6RKR
-         eQEqpHISkUduvK/ZA0E7ilg4X2h1SW/GKxasVGoB5z3XJ96ialzydq0ZFP02eEYK3Emk
-         IbxpT5E6gCNryIHyjqUqiykCuLCoLfbixAfIg=
+        bh=w7wIZBkXxLJs2TL6ymRxvLKL1OMePhdREdeAC7t5pzw=;
+        b=Xa+RmG7GU0dqacSthvB2mVJ3nDnmEKbOsYmbEaCuaQlzp4Cieuw9FQW/1a4qY0hiFi
+         6Cqd7/3+CjtlbzY3ghp/cHMeY/IvfyKehN3M9OiAZRaPShAEZEBWOOYZSwhak8Bv/kmU
+         fxzdniV7DaupKTYsK6pKf6dlonN0gMJ3An9Mc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704498899; x=1705103699;
+        d=1e100.net; s=20230601; t=1704498901; x=1705103701;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Krmv7CmuXfl7DXk8aTDpoDj3ZUAd1H4d9ePlsNjgV4=;
-        b=Hsf9vkfJuIv7yxfBJF6xbYb7rEczTL+pjyEDuYQLgAnQPIgPUXYKGk4ee41k4cb3J+
-         zdPHFUjhKNHXxD/3oMRkhLo96cd/nn8J3O/BSLLgWO3ePYNImJ8KOEvD8BJ/x5MgiDic
-         jwPKn4+aZT6X1iRS++RDoak6D3DFOrDSJQocQCS5R6Ur/1Wn6X0qzNv3/w3B1KLKBOYp
-         OHFm1h7zDAgHiXAU3ygWiw3WcfMxiv/d/QryN5yalM7R3TLBVpi51WQdTe88Bz7JBqdG
-         7R0jyr1TEi0VOlAQ/PqaHDGC/Rlfh8ixGYlNHPej/Fn8EgSaK3bAqZHc9jcgO+0gTsH6
-         T7dQ==
-X-Gm-Message-State: AOJu0YwjdgVqW2HCYszQ4k5AXk0X7gZQSBRXv18UshReWcedxLFFHK+7
-	q15f9sL+mLemCv5cQHZMaDd5kn6VwDD8
-X-Google-Smtp-Source: AGHT+IHOGxl2DJ91VGKdocgJyX85wLVWWnTUncnToxFWx1KOeMiDmWFex6MMMftXmAAofw2rAtSUzA==
-X-Received: by 2002:ac8:7d88:0:b0:429:7b92:4dd8 with SMTP id c8-20020ac87d88000000b004297b924dd8mr284834qtd.91.1704498899436;
-        Fri, 05 Jan 2024 15:54:59 -0800 (PST)
+        bh=w7wIZBkXxLJs2TL6ymRxvLKL1OMePhdREdeAC7t5pzw=;
+        b=lw1aSbndMszjjcet+BVp6kPKC8JqdtkgLnc9URDfucHklfxq1xtE09RvnqrLgYA6nK
+         znoSgufwy6ZY1IUVcAuTDLZ95VyXH9lORVbvf0BFcllVXNu485b27WZEfwkiwTic4cIB
+         MVpGXzj4Vv9UgloxsqEgIuH31GMSQil71Y25wcFN+2/ieOr8JOryRrlqxnlp0LgwWczI
+         MkvTWEl5T6YTHeyJKL4TL15kykiiZZyA8UaFBlKYhPKR/j4r4z9vxyRAQnRG/IAOxpwQ
+         U7tXlNtUYi7uUmHkfDhoCe2K0HZ2fd/WRjj8JFZlWCUuLBks734EjokoyOmiob6S+fyI
+         3zhQ==
+X-Gm-Message-State: AOJu0YzqW5+ViNQa2e2B1xzbceUOWafxmh8XYsW6vUeMhCQkiHypt4is
+	bzA9r5xoXz2T1v37Bm/HyelKkjWER9Z+
+X-Google-Smtp-Source: AGHT+IEiGPkgnm92SezssqFyKr5z6wdty1aRE6jzJG9u7tPvdugIj5mek1QTUY1YaMiAbf+IjbTuZQ==
+X-Received: by 2002:ac8:57ce:0:b0:429:7d6b:4ff with SMTP id w14-20020ac857ce000000b004297d6b04ffmr299409qta.80.1704498900834;
+        Fri, 05 Jan 2024 15:55:00 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id fb27-20020a05622a481b00b00427f0fdcd44sm1185612qtb.1.2024.01.05.15.54.58
+        by smtp.gmail.com with ESMTPSA id fb27-20020a05622a481b00b00427f0fdcd44sm1185612qtb.1.2024.01.05.15.54.59
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jan 2024 15:54:59 -0800 (PST)
+        Fri, 05 Jan 2024 15:55:00 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
 	horms@kernel.org
-Subject: [PATCH net-next 2/3] bnxt_en: Fix RCU locking for ntuple filters in bnxt_srxclsrldel()
-Date: Fri,  5 Jan 2024 15:54:38 -0800
-Message-Id: <20240105235439.28282-3-michael.chan@broadcom.com>
+Subject: [PATCH net-next 3/3] bnxt_en: Fix RCU locking for ntuple filters in bnxt_rx_flow_steer()
+Date: Fri,  5 Jan 2024 15:54:39 -0800
+Message-Id: <20240105235439.28282-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20240105235439.28282-1-michael.chan@broadcom.com>
 References: <20240105235439.28282-1-michael.chan@broadcom.com>
@@ -74,76 +74,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000071d8d8060e3b9399"
+	boundary="00000000000085edc7060e3b937e"
 
---00000000000071d8d8060e3b9399
+--00000000000085edc7060e3b937e
 Content-Transfer-Encoding: 8bit
 
-After looking up an ntuple filter from a RCU hash list, the
-rcu_read_unlock() call should be made after reading the structure,
-or after determining that the filter cannot age out (by aRFS).
-The existing code was calling rcu_read_unlock() too early in
-bnxt_srxclsrldel().
+Similar to the previous patch, RCU locking was released too early
+in bnxt_rx_flow_steer().  Fix it to unlock after reading fltr->base.sw_id
+to guarantee that fltr won't be freed while we are still reading it.
 
-As suggested by Simon Horman, change the code to handle the error
-case of fltr_base not found in the if condition.  The code looks
-cleaner this way.
-
-Fixes: 8d7ba028aa9a ("bnxt_en: Add support for ntuple filter deletion by ethtool.")
-Suggested-by: Simon Horman <horms@kernel.org>
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Link: https://lore.kernel.org/netdev/20240104145955.5a6df702@kernel.org/
+Fixes: cb5bdd292dc0 ("bnxt_en: Add bnxt_lookup_ntp_filter_from_idx() function")
+Reported-by: Simon Horman <horms@kernel.org>
+Link: https://lore.kernel.org/netdev/20231225165653.GH5962@kernel.org/
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 21 ++++++++++---------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 5629ba9f4b2e..27b983c0a8a9 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1345,25 +1345,26 @@ static int bnxt_srxclsrldel(struct bnxt *bp, struct ethtool_rxnfc *cmd)
- {
- 	struct ethtool_rx_flow_spec *fs = &cmd->fs;
- 	struct bnxt_filter_base *fltr_base;
-+	struct bnxt_ntuple_filter *fltr;
- 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index fb5af8a34c8f..0aacd3c6ed5c 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -14020,8 +14020,8 @@ static int bnxt_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
  	rcu_read_lock();
- 	fltr_base = bnxt_get_one_fltr_rcu(bp, bp->ntp_fltr_hash_tbl,
- 					  BNXT_NTP_FLTR_HASH_SIZE,
- 					  fs->location);
--	if (fltr_base) {
--		struct bnxt_ntuple_filter *fltr;
--
--		fltr = container_of(fltr_base, struct bnxt_ntuple_filter, base);
-+	if (!fltr_base) {
- 		rcu_read_unlock();
--		if (!(fltr->base.flags & BNXT_ACT_NO_AGING))
--			return -EINVAL;
--		bnxt_hwrm_cfa_ntuple_filter_free(bp, fltr);
--		bnxt_del_ntp_filter(bp, fltr);
--		return 0;
-+		return -ENOENT;
- 	}
- 
-+	fltr = container_of(fltr_base, struct bnxt_ntuple_filter, base);
-+	if (!(fltr->base.flags & BNXT_ACT_NO_AGING)) {
+ 	fltr = bnxt_lookup_ntp_filter_from_idx(bp, new_fltr, idx);
+ 	if (fltr) {
+-		rcu_read_unlock();
+ 		rc = fltr->base.sw_id;
 +		rcu_read_unlock();
-+		return -EINVAL;
-+	}
+ 		goto err_free;
+ 	}
  	rcu_read_unlock();
--	return -ENOENT;
-+	bnxt_hwrm_cfa_ntuple_filter_free(bp, fltr);
-+	bnxt_del_ntp_filter(bp, fltr);
-+	return 0;
- }
- 
- static u64 get_ethtool_ipv4_rss(struct bnxt *bp)
 -- 
 2.30.1
 
 
---00000000000071d8d8060e3b9399
+--00000000000085edc7060e3b937e
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -214,14 +180,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICnSs9d1zIdO1y7zhw+E6FoL3HE9OYvY
-g9b50i5d67PIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEw
-NTIzNTQ1OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGhmCllhZtWxdiy6aO5fm37Wtzxo/1/D
+8SwulXvkHfHrMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEw
+NTIzNTUwMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAQRRFperAj0ze52Cakc5tnAF+jagj3X++ECo0g89VmKfroNM2F
-sj3NRiZ6WMn0LfK4wlG26eSuD7S3S3OTJSuS9I4XvFd2ERWqSFz6xAQPqOLdK8UFXOZosIWPrRIr
-oFYMbGzEqcrHHrzAVhWSq2tZ/5550geDQiyQ3TA+UmqtR6BESYt8cjxwp/dvvLZZ55sDKL6wdMxC
-UnOtttcHtcpnQf6jc3M1SyymDsGMQNEmXdjlcKTFd9rUMQ3/B29WVzWPP3rxAUwCatado1nTaSh0
-NXRK2YmgTUg7tSLVeREIeq7igU0UBvjmJFoPNDnfv2GrL0H/KiBzsP4QV/wG50bT
---00000000000071d8d8060e3b9399--
+ATANBgkqhkiG9w0BAQEFAASCAQAY7a8BleT7vaMbEov5zqblV/KB1QtEYqsbAXUhdvBOB1qczt0D
+IZUoQzfDdDu1wEO+ucvE5/ToyoJpmCWl0s+CNuadZZqARGiHQfNhl6TZ4YFIzkrQoHYzWFwOtt3A
+TyJmbmeVGpZTkSK66Oxm91AiRK/2ZxTKZfI9GgBU/nOPsugXjVNjoXprd4ugpd0Xo85Yerg6ejCO
+tqSbFOKyGlDCMItJnEjEPIemPf5hhLQb4g70iTcyuRIcb2QLIVtg+xD29QnyJ/AOwyHKx+wFWOEd
+u9dRfbkD6rhE2i+r1OoVXkm/3Hx1IBwiU+yc69FSdTnjOojc5/LA0LQs2FRLpy+d
+--00000000000085edc7060e3b937e--
 
