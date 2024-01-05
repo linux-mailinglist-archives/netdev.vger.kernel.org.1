@@ -1,293 +1,191 @@
-Return-Path: <netdev+bounces-61960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66419825614
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:49:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD89825632
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 15:56:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6205B1C23252
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:49:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 993811F21567
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 14:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C352DF8E;
-	Fri,  5 Jan 2024 14:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DD62D78C;
+	Fri,  5 Jan 2024 14:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="TlsFY3EA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oa/OU5dt"
 X-Original-To: netdev@vger.kernel.org
-Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E0E2E3E8;
-	Fri,  5 Jan 2024 14:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tesarici.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tesarici.cz
-Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by bee.tesarici.cz (Postfix) with ESMTPSA id D6D7D1A80E5;
-	Fri,  5 Jan 2024 15:46:00 +0100 (CET)
-Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
-	t=1704465961; bh=jVPDDlHEkAJsKbkJAQA4OoaB0GVHg6A4zFDVTiaBIYg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TlsFY3EAgOksGz5dkQzISJo3LB919H/zGwZ7MnySbuCYPpPMO21Iw67Ky55BAD1JZ
-	 xCgs0giNLhESBRGjFnLNpHg+k7U+0/U2DwMA03QpJdKwirhUgSuxbnobEv2ivxOAHJ
-	 ryAxkmpPSm+Rc/8dYai77r6orb8sYK5E9NvQoJBZugf5HaQNdsraftGIjAwT6C8c/v
-	 17q07yE550pG6MIIHwsN48rUMyF5FCzEbsFGYlpbls2t3N+UZsdnF1Enw10AmaMxPg
-	 9OMcgobUy4mTBepjqSRQCd6epxIKSNg6cZba497zeV22EswhChOGheuJqsNgIeMGB7
-	 Zo3gzS1cZZH/A==
-Date: Fri, 5 Jan 2024 15:45:58 +0100
-From: Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>, Jernej
- Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
- "open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, "moderated
- list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
- "moderated list:ARM/STM32 ARCHITECTURE"
- <linux-arm-kernel@lists.infradead.org>, open list
- <linux-kernel@vger.kernel.org>, "open list:ARM/Allwinner sunXi SoC support"
- <linux-sunxi@lists.linux.dev>, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [PATCH] net: stmmac: protect statistics updates with a spinlock
-Message-ID: <20240105154558.2ca38aca@meshulam.tesarici.cz>
-In-Reply-To: <CANn89iKWSemsKmfsLjupwWBnyeKjtHH+mZjTzYiJT4G=xyUrNQ@mail.gmail.com>
-References: <20240105091556.15516-1-petr@tesarici.cz>
-	<CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
-	<20240105113402.0f5f1232@meshulam.tesarici.cz>
-	<CANn89iLEvW9ZS=+WPETPC=mKRyu9AKmueGCWZZOrz9oX3Xef=g@mail.gmail.com>
-	<20240105121447.11ae80d1@meshulam.tesarici.cz>
-	<20240105142732.1903bc70@meshulam.tesarici.cz>
-	<CANn89iLHLvGFX_JEYU-en0ZoCUpTvjXPBzFECxLFfa_Jhpcjmg@mail.gmail.com>
-	<CANn89iKWSemsKmfsLjupwWBnyeKjtHH+mZjTzYiJT4G=xyUrNQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-suse-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8D22E3EF
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 14:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704466580; x=1736002580;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=4J9e3gABZKtn1P/CvVYZmAB/O3SQBEos0bu0qJldKug=;
+  b=Oa/OU5dtCdXVZEpBVA12vtLuRuq7rkzjtRZ7/fr5DDMRCxZeqRfsi3GJ
+   ZOZRu4/NdPMCOsdwp9em9c9QIXYkdCd9CBJXsG1DlfDgDBH0i5vGVFobx
+   xoqWR0jsdYmuo+UD4yWBSg8gIJJbylgkWT/WsSLpTKyY/++s1iJgWUHIY
+   r5uY32JJQGMV4DhHE3WI+iZ2zESEo6Xe6X7S0ry1qCHRa0C6uqZp4Ike8
+   fTg+TbWiqKxk+T6AYHODvMF4pf1brlg/0vkHme5aXl1vbx6vHVCTSAQcZ
+   u0Fnj0PEU6qyrlxj+AHnlPZOdW9zgasvGVbtT2ox0IUQUSMVP4UtPkcEb
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="400277204"
+X-IronPort-AV: E=Sophos;i="6.04,334,1695711600"; 
+   d="scan'208";a="400277204"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 06:56:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="899661385"
+X-IronPort-AV: E=Sophos;i="6.04,334,1695711600"; 
+   d="scan'208";a="899661385"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Jan 2024 06:56:19 -0800
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 5 Jan 2024 06:56:19 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 5 Jan 2024 06:56:19 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 5 Jan 2024 06:56:19 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LlpneiJ7eemSD6Z4jVFHS7l66QNmkIl1rBmWITxHu7QzrXoy1zEpTHuZ6Ky4A1+yxakQZ/tPgnqxsoglk3F5RQ9z5nzLxrco3ool2w1b1OQqT/mS9xSsSYXeQApTTI8p1iJrI5LjbaYEJIcMjDtB0DcfZ76dqCt+vZBqLJfEY8zt8Ec2KIYdD449SUD9ILWNwY0rICi+eSSEyzPYP2O0+P9M5rIZYvnmxle9xOZAkez1Vrh0FhlBTi8k8IehF9zsqoV1mgpcbSV2IMvd/qvr4CpRsXX/qA7be2E9ZMU0W1yG6Dq2uIGlJeUOcXMIsRxPbcXo25s2yrJSZMVYh2sV5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sNSMafsVjeR1qrF1tH4Kf6SrdhcgXLZKROBiq/CYK+U=;
+ b=KBDunznGLAFXui2fzONt6SxZ2OzSeNbpbelnGV5ej4usq7Hxf/SbKoOKYTmQvD0M6NUNkGQo1toi9a0+NXCGmEkETtLHRCiAv9CTYdJEEEpG3W0ATMS5gQbG4+k++dk66dAhrMGg/o4WTmX5geWKxEJAlIha8ovLUa+kDgGGlrgL4ccjRUmCflCEwkWAlj3rHX+N8usA59eHUQndDIGLuQo9/vcoDxYxQUJ/QrvZnuAfx4U+cRxXjnrlj5zGbqbVkzyQDFWk09XENUmvQEFgIX5puoQafe5ioKr9sJP1HZoLoASml5B9jGxuZm3oGXAHiQ/bIGGyngribL2AYn6TAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ CO6PR11MB5636.namprd11.prod.outlook.com (2603:10b6:5:357::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7159.13; Fri, 5 Jan 2024 14:56:16 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::89c2:9523:99e2:176a]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::89c2:9523:99e2:176a%6]) with mapi id 15.20.7159.015; Fri, 5 Jan 2024
+ 14:56:16 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "M, Saeed" <saeedm@nvidia.com>,
+	"leon@kernel.org" <leon@kernel.org>, "Michalik, Michal"
+	<michal.michalik@intel.com>, "rrameshbabu@nvidia.com"
+	<rrameshbabu@nvidia.com>
+Subject: RE: [patch net-next 0/3] dpll: expose fractional frequency offset
+ value to user
+Thread-Topic: [patch net-next 0/3] dpll: expose fractional frequency offset
+ value to user
+Thread-Index: AQHaPkjYruZpH6mqNkmhLQ7/TCBdeLDLUbzw
+Date: Fri, 5 Jan 2024 14:56:16 +0000
+Message-ID: <DM6PR11MB4657FA0395E74A28B7A32A719B662@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20240103132838.1501801-1-jiri@resnulli.us>
+In-Reply-To: <20240103132838.1501801-1-jiri@resnulli.us>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|CO6PR11MB5636:EE_
+x-ms-office365-filtering-correlation-id: 0184b734-cb82-48d6-b873-08dc0dfe77fb
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uVIG+XwXbgoc6XkCIyC9zwEyTURmD4YQ4KEUW56rxAVAHw8ztx/88u9UHoqUMc+OJTYg65rrImOU/845rlLlYS1qZ52IsRRSpsJMS4uBdf9+JluSwk8Yimz9m9666sGDdz7InprWyaqaI5g48/slEn8LutRXl3dJ3j5Qf3m4g+jzr6MXcGiBdCl1yvrpu7YiJdyCM65aMmQToVJqR/af7lSmvhTs8FIxSCU/jEZLIUe9mrMcfWg3M/TRETfMaO+L3d0KV8wAOAHnexGCCkpK9j0cWEU7HHzSC1LCCGYzH4149O8wiv7nP6b1dyp7kw9qI2sm085rBKpkgKfziEwoUJvVv2J0830nqyyfEQ6BCzY9vfeqqcvBZ9TbLRzJjldrufv2lgdkaZnADm+ivMzCNi097pSEEMmxKjWvRBpO8Sr/Jix2pwZWsqDopBIeeC78pAoRewkJY+LyexMX3FIIOBypty7E/7/40RUg+0t4BoxIk7iWoacV7gNIsLyuE9Ry62cef/wxzUNY4gn39/3K67XN6EKxAxA2ke0dIFhqMozfVmpZvqhA4gG0Pd6aqetBVFhNsjd05WAFqlCUiaUPZu3WnbXsVGFGOPF+mbWotTKGj9/4WUq6sWtKvWHksu5p
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(376002)(39860400002)(346002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(5660300002)(2906002)(4744005)(7416002)(8936002)(4326008)(8676002)(316002)(52536014)(64756008)(66556008)(55016003)(76116006)(110136005)(66946007)(66476007)(54906003)(66446008)(9686003)(26005)(83380400001)(38100700002)(41300700001)(122000001)(82960400001)(33656002)(86362001)(7696005)(6506007)(478600001)(71200400001)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?IJDcx9C2ZwYTT52Ed8iq94btpVIxWcP+S3/4YoJ6j2JgwWOOnQyvvIRd6SiM?=
+ =?us-ascii?Q?sq6/pQdcMsHXjvPH5PQV4kgMDkibCSbLhye6vfDWNd3ez77lTxmAANUXqSP5?=
+ =?us-ascii?Q?KK1UhCb1OqEBEdorDWq6uMZfMDoQSgFO55F1gP2uCRFgdZFn7tn+3yt7Ewo7?=
+ =?us-ascii?Q?EcciD3nHZQLG+Db7/5/YujrP6V6ZA8m+VHb6QBGQis+WrumyAwduroBmiyR1?=
+ =?us-ascii?Q?ouGUSuTVwfGNrUPXibvy1tHbqvHx4cQJZF72xE5qpjF1iRJtVp77xXIb48/v?=
+ =?us-ascii?Q?BkrkzEcA5S24YMJQKs7iP2u7udL51t1bMmkT7pOvlTEzkzsvChOFOiMIfI+e?=
+ =?us-ascii?Q?49vsmpiqTOWCLoh6WeGe3AY5TqmzMiF7Z9hNc4SL2gySYYdu4UXnMGdvt2+q?=
+ =?us-ascii?Q?oyjHcPGMo/YIDIDhVmYwltKNdc7whohM0HQkuAW3iop/yC2/GL09g1d0L6+P?=
+ =?us-ascii?Q?NdbUflQNkd1tiRERW4ewGLzYASksNiLl0SBSPAd2fdK7XnmF8Vii8qBhFNWp?=
+ =?us-ascii?Q?+256ULdKrCQLRO3xKcMZcRzt9qdyIXs2XlIsjyjc2bNAGHq9sKHT0qdjM0AN?=
+ =?us-ascii?Q?F/S2IVY58SRZ3MzWrZhbHIWI315dwPyG4QTdh/oM6qHztYU7B/y7kCAfo1Rn?=
+ =?us-ascii?Q?yeH5+R45E+fWlLgbwrp4FjzKDUzQSDiAKsGqSs7PFyJQgxaoQPK5WgyRyvYi?=
+ =?us-ascii?Q?J5fu4nrkHTtrHFG707q+OCxaie66vBg9brqehz7X+YTlh/frujiDFBrloz9B?=
+ =?us-ascii?Q?LXHu8vDsHknMSusFP4fk680EQzqB4KWT+8Qj/JQFR5ropWllUxYjC2yy+GyU?=
+ =?us-ascii?Q?OgSV5IQ54iCFu7uiLMlX0JnNBnZbP1oINbmhetcsTpMXbJmioXJ9+FuV0Wsr?=
+ =?us-ascii?Q?wvAu8w2KU6SloRyPmGWD1noGCNC9qlWgWyMrl7elsnTzpFd9QLoeHRdp7kBE?=
+ =?us-ascii?Q?mTxrfHAYfgNCDyKbnetwMuXQgVlr1t18LlQ3g6Hq7c4ToOOquUGz33E2jy7G?=
+ =?us-ascii?Q?kbVwedkEMGPxvpGd/M8oGG0NczPNB8jnTKxAKYXCFwWrpacM44rifiGel86E?=
+ =?us-ascii?Q?GyBpYJUUoYqWqJg7tgXo2vWdhwMIID4OJSZi1P+hEkIIaZ/IvwFiwKr2qX4U?=
+ =?us-ascii?Q?OuWHRZPMktqeySl7hhPuBgseYpNZWHx2Fsm6u4ttUcH/jfuQIJF2mEEYdXn5?=
+ =?us-ascii?Q?1v5ykNlHwDFGjrOltotGELBmc3bG/mpzJeHSNFuqYrKdsOXLWVjQM3iauQm4?=
+ =?us-ascii?Q?1fcpb9nVt0ryyW+O5ru91qTlolgo3JRdepxNTcouVWr/2tjJ2PfxkMy3M+Bj?=
+ =?us-ascii?Q?MN9kgTtH1AVJIN+AaW06YudzqqcUdtn/NxTRLADzh4uqLuhtCrbWyNyPcNzG?=
+ =?us-ascii?Q?MrHzxwbhEfla7EBQaTYkC28bTMpCIT/34r0/z2u31QrfSfiYFQwg7Zs2Qo/a?=
+ =?us-ascii?Q?GJClSsu+CowX4czkqPv/HAHq+Qd130CK5WxfJpBMlAyp3r9IfQYTLIt5p7BP?=
+ =?us-ascii?Q?ZGE2xSzTnsh+K2TOXJ2a+qihuUar0Xyh3Xm9zlhJytNEhToymWtXTGR/JJrQ?=
+ =?us-ascii?Q?LmPXh7xaqp7tK8mDzM0wcepuFhhVec2o6j9dQUSjN/vl3doDsQ4fh7jdjNXC?=
+ =?us-ascii?Q?9w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0184b734-cb82-48d6-b873-08dc0dfe77fb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jan 2024 14:56:16.5128
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hgwvxjjdwuZaQyONOXq7aQ9gGQQFXT7yzPC0we2IuFZC9CKgFWWZJXDiBE+oEc4bZb1ccUQMOLwiVjdu26Z4ZELZ65xvG3nEs4JP62A15zg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR11MB5636
+X-OriginatorOrg: intel.com
 
-On Fri, 5 Jan 2024 15:28:41 +0100
-Eric Dumazet <edumazet@google.com> wrote:
+>From: Jiri Pirko <jiri@resnulli.us>
+>Sent: Wednesday, January 3, 2024 2:29 PM
+>
+>From: Jiri Pirko <jiri@nvidia.com>
+>
+>Allow to expose pin fractional frequency offset value over new DPLL generi=
+c
+>netlink attribute. Add an op to get the value from the driver.
+>Implement this new op in mlx5 driver.
+>
+>Jiri Pirko (3):
+>  dpll: expose fractional frequency offset value to user
+>  net/mlx5: DPLL, Use struct to get values from
+>    mlx5_dpll_synce_status_get()
+>  net/mlx5: DPLL, Implement fractional frequency offset get pin op
+>
+> Documentation/netlink/specs/dpll.yaml         | 11 +++
+> drivers/dpll/dpll_netlink.c                   | 24 +++++
+> .../net/ethernet/mellanox/mlx5/core/dpll.c    | 94 ++++++++++++-------
+> include/linux/dpll.h                          |  3 +
+> include/uapi/linux/dpll.h                     |  1 +
+> 5 files changed, 98 insertions(+), 35 deletions(-)
+>
+>--
+>2.43.0
 
-> On Fri, Jan 5, 2024 at 3:26=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Fri, Jan 5, 2024 at 2:27=E2=80=AFPM Petr Tesa=C5=99=C3=ADk <petr@tes=
-arici.cz> wrote: =20
-> > >
-> > > Hi Eric,
-> > >
-> > > yeah, it's me again...
-> > >
-> > > On Fri, 5 Jan 2024 12:14:47 +0100
-> > > Petr Tesa=C5=99=C3=ADk <petr@tesarici.cz> wrote:
-> > > =20
-> > > > On Fri, 5 Jan 2024 11:48:19 +0100
-> > > > Eric Dumazet <edumazet@google.com> wrote:
-> > > > =20
-> > > > > On Fri, Jan 5, 2024 at 11:34=E2=80=AFAM Petr Tesa=C5=99=C3=ADk <p=
-etr@tesarici.cz> wrote: =20
-> > > > > >
-> > > > > > On Fri, 5 Jan 2024 10:58:42 +0100
-> > > > > > Eric Dumazet <edumazet@google.com> wrote:
-> > > > > > =20
-> > > > > > > On Fri, Jan 5, 2024 at 10:16=E2=80=AFAM Petr Tesarik <petr@te=
-sarici.cz> wrote: =20
-> > > > > > > >
-> > > > > > > > Add a spinlock to fix race conditions while updating Tx/Rx =
-statistics.
-> > > > > > > >
-> > > > > > > > As explained by a comment in <linux/u64_stats_sync.h>, writ=
-e side of struct
-> > > > > > > > u64_stats_sync must ensure mutual exclusion, or one seqcoun=
-t update could
-> > > > > > > > be lost on 32-bit platforms, thus blocking readers forever.
-> > > > > > > >
-> > > > > > > > Such lockups have been actually observed on 32-bit Arm afte=
-r stmmac_xmit()
-> > > > > > > > on one core raced with stmmac_napi_poll_tx() on another cor=
-e.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Petr Tesarik <petr@tesarici.cz> =20
-> > > > > > >
-> > > > > > > This is going to add more costs to 64bit platforms ? =20
-> > > > > >
-> > > > > > Yes, it adds a (hopefully not too contended) spinlock and in mo=
-st
-> > > > > > places an interrupt disable/enable pair.
-> > > > > >
-> > > > > > FWIW the race condition is also present on 64-bit platforms, re=
-sulting
-> > > > > > in inaccurate statistic counters. I can understand if you consi=
-der it a
-> > > > > > mild annoyance, not worth fixing.
-> > > > > > =20
-> > > > > > > It seems to me that the same syncp can be used from two diffe=
-rent
-> > > > > > > threads : hard irq and napi poller... =20
-> > > > > >
-> > > > > > Yes, that's exactly the scenario that locks up my system.
-> > > > > > =20
-> > > > > > > At this point, I do not see why you keep linux/u64_stats_sync=
-.h if you
-> > > > > > > decide to go for a spinlock... =20
-> > > > > >
-> > > > > > The spinlock does not havce to be taken on the reader side, so =
-the
-> > > > > > seqcounter still adds some value.
-> > > > > > =20
-> > > > > > > Alternative would use atomic64_t fields for the ones where th=
-ere is no
-> > > > > > > mutual exclusion.
-> > > > > > >
-> > > > > > > RX : napi poll is definitely safe (protected by an atomic bit)
-> > > > > > > TX : each TX queue is also safe (protected by an atomic exclu=
-sion for
-> > > > > > > non LLTX drivers)
-> > > > > > >
-> > > > > > > This leaves the fields updated from hardware interrupt contex=
-t ? =20
-> > > > > >
-> > > > > > I'm afraid I don't have enough network-stack-foo to follow here.
-> > > > > >
-> > > > > > My issue on 32 bit is that stmmac_xmit() may be called directly=
- from
-> > > > > > process context while another core runs the TX napi on the same=
- channel
-> > > > > > (in interrupt context). I didn't observe any race on the RX pat=
-h, but I
-> > > > > > believe it's possible with NAPI busy polling.
-> > > > > >
-> > > > > > In any case, I don't see the connection with LLTX. Maybe you wa=
-nt to
-> > > > > > say that the TX queue is safe for stmmac (because it is a non-L=
-LTX
-> > > > > > driver), but might not be safe for LLTX drivers? =20
-> > > > >
-> > > > > LLTX drivers (mostly virtual drivers like tunnels...) can have mu=
-ltiple cpus
-> > > > > running ndo_start_xmit() concurrently. So any use of a 'shared sy=
-ncp'
-> > > > > would be a bug.
-> > > > > These drivers usually use per-cpu stats, to avoid races and false
-> > > > > sharing anyway.
-> > > > >
-> > > > > I think you should split the structures into two separate groups,=
- each
-> > > > > guarded with its own syncp.
-> > > > >
-> > > > > No extra spinlocks, no extra costs on 64bit arches...
-> > > > >
-> > > > > If TX completion can run in parallel with ndo_start_xmit(), then
-> > > > > clearly we have to split stmmac_txq_stats in two halves: =20
-> > > >
-> > > > Oh, now I get it. Yes, that's much better, indeed.
-> > > >
-> > > > I mean, the counters have never been consistent (due to the race on=
- the
-> > > > writer side), and nobody is concerned. So, there is no value in tak=
-ing
-> > > > a consistent snapshot in stmmac_get_ethtool_stats().
-> > > >
-> > > > I'm going to rework and retest my patch. Thank you for pointing me =
-in
-> > > > the right direction!
-> > > >
-> > > > Petr T
-> > > > =20
-> > > > > Also please note the conversion from u64 to u64_stats_t =20
-> > > >
-> > > > Noted. IIUC this will in turn close the update race on 64-bit by us=
-ing
-> > > > an atomic type and on 32-bit by using a seqlock. Clever.
-> > > >
-> > > > Petr T
-> > > > =20
-> > > > > Very partial patch, only to show the split and new structure :
-> > > > >
-> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h
-> > > > > b/drivers/net/ethernet/stmicro/stmmac/common.h
-> > > > > index e3f650e88f82f927f0dcf95748fbd10c14c30cbe..702bceea5dc8c875a=
-80f5e3a92b7bb058f373eda
-> > > > > 100644
-> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> > > > > @@ -60,16 +60,22 @@
-> > > > >  /* #define FRAME_FILTER_DEBUG */
-> > > > >
-> > > > >  struct stmmac_txq_stats {
-> > > > > -       u64 tx_bytes;
-> > > > > -       u64 tx_packets;
-> > > > > -       u64 tx_pkt_n;
-> > > > > -       u64 tx_normal_irq_n;
-> > > > > -       u64 napi_poll;
-> > > > > -       u64 tx_clean;
-> > > > > -       u64 tx_set_ic_bit;
-> > > > > -       u64 tx_tso_frames;
-> > > > > -       u64 tx_tso_nfrags;
-> > > > > -       struct u64_stats_sync syncp;
-> > > > > +/* First part, updated from ndo_start_xmit(), protected by tx qu=
-eue lock */
-> > > > > +       struct u64_stats_sync syncp_tx;
-> > > > > +       u64_stats_t tx_bytes;
-> > > > > +       u64_stats_t tx_packets;
-> > > > > +       u64_stats_t tx_pkt_n;
-> > > > > +       u64_stats_t tx_tso_frames;
-> > > > > +       u64_stats_t tx_tso_nfrags;
-> > > > > +
-> > > > > +/* Second part, updated from TX completion (protected by NAPI po=
-ll logic) */
-> > > > > +       struct u64_stats_sync syncp_tx_completion;
-> > > > > +       u64_stats_t napi_poll;
-> > > > > +       u64_stats_t tx_clean;
-> > > > > +       u64_stats_t tx_set_ic_bit; =20
-> > >
-> > > Unfortunately, this field is also updated from ndo_start_xmit():
-> > >
-> > > 4572)     if (set_ic)
-> > > 4573)             txq_stats->tx_set_ic_bit++;
-> > >
-> > > I feel it would be a shame to introduce a spinlock just for this one
-> > > update. But I think the field could be converted to an atomic64_t.
-> > >
-> > > Which raises a question: Why aren't all stat counters simply atomic64=
-_t? There
-> > > is no guarantee that the reader side takes a consistent snapshot
-> > > (except on 32-bit). So, why do we even bother with u64_stats_sync? =20
-> >
-> > This infra was added to have no _lock_ overhead on 64bit arches.
-> >
-> > If a counter must be updated from multiple cpus (regardless of 32/64
-> > bit kernel), then use atomic64_t =20
->=20
-> Or use two different u64_stats_t (each guarded by a different syncp),
-> then fold them at stats gathering time.
+Sure, LGTM.
 
-Oh, right, why didn't I think about it!
-
-This only leaves an atomic_t in hard irq context. I have tried to find
-something that could relax the requirement, but AFAICS at least some
-setups use several interrupts that can be delivered to different CPUs
-simultaneously, and all of them will walk over all channels. So we're
-left with an atomic_t here.
-
-> > > Is it merely because u64_stats_add() should be cheaper than
-> > > atomic64_add()? Or is there anything else I'm missing? If yes,
-> > > does it invalidate my proposal to convert tx_set_ic_bit to an
-> > > atomic64_t? =20
-> >
-> > atomic64_add() is expensive, especially in contexts where updates
-> > are already guarded by a spinlock or something. =20
-
-Yeah, I know atomics can be expensive. I've heard of cases where an Arm
-core was spinning on an atomic operation for several seconds...
-
-Petr T
+Acked-By: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
