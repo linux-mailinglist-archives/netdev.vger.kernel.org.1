@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-61989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47C978257C6
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:10:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B778257EF
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 17:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFCE52848D9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:10:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAC022847C7
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 16:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68C22E84B;
-	Fri,  5 Jan 2024 16:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C352E829;
+	Fri,  5 Jan 2024 16:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwqF3vZ6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JKzJld71"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BCC2E829;
-	Fri,  5 Jan 2024 16:10:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 514BEC433C9;
-	Fri,  5 Jan 2024 16:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139A7569F
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 16:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6808CC433C7;
+	Fri,  5 Jan 2024 16:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704471027;
-	bh=NVV8eMS50jX4SZSXy7FU+fGkb6EANHXXbtII/+nwGcI=;
+	s=k20201202; t=1704471624;
+	bh=J2kT4hySqcltz6dCgHF2wMwz4TZBOMouFcTXJtI1ehI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cwqF3vZ6TuEjS/o8phO9J/g2gjzz8XDCKN/PXBerowgFbc5af3qQ1YxHcOLMRZ3X0
-	 6IlqqupWVnevk48v9qJ/Z07Lb3AzgBjcWDPpAenz0VreeG+2dTn9aZsWPhsSrygzwc
-	 Wkr3cU9WpxMLfHkOvYMdEnFpyhKFIkkEuykvgVbMyDZgWSW4yQ9emD4VggKYVh0cNf
-	 zdrX0k7s/72DadUInz/PJeMjKVVJ+WJZXvFn9jeIXtcfcGwSJE7G2Qzlz1SdFEc1cn
-	 6LW0J1hEHMchPcdsdEgBgOpvMVUcFUzf+7zLSOf36wb8qoFvj7BWdFCA1GEZHR8Drt
-	 fUNZOfonwIQ1Q==
+	b=JKzJld71wwqKsb69pyH4l/OS4NzNl+CPKD+F0w+1Qco6HB/9JoY9N7L8pqvHt3/nX
+	 xJh1/h3mTNopKhUhZKpWjDOFRyH8Oaz3WqHFc8Kx9MLTRpgIB1ePicFTGiMBWSwK6g
+	 pRXN4vMBNNQu6325u/DP07bL9itfRe2ufx/K2kF0gnzfg4vZqZTQIE7ByxXTUdrCpd
+	 gPp8CdeGJwFQ8Mt62FtLqnxJ9NXkobg4U5qGWVKGf6tsvRApmDSEGI0JWI6ObgDuLj
+	 iWyavh4ug2JbqVW9pKAZ1cPXt5yVbSQGEYHjbkkTy+65tMT1KYG8bGCpgIdpPWIrDG
+	 Sn0J1J2Mfvcgg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30A9BDCB6FB;
-	Fri,  5 Jan 2024 16:10:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C093C4167E;
+	Fri,  5 Jan 2024 16:20:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,42 +43,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: fill in MODULE_DESCRIPTION()s for DSA tags
+Subject: Re: [PATCH net] net/sched: act_ct: fix skb leak and crash on ooo frags
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170447102719.8824.15799347638333080691.git-patchwork-notify@kernel.org>
-Date: Fri, 05 Jan 2024 16:10:27 +0000
-References: <20240104143759.1318137-1-kuba@kernel.org>
-In-Reply-To: <20240104143759.1318137-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- hauke@hauke-m.de, kurt@linutronix.de, woojung.huh@microchip.com,
- UNGLinuxDriver@microchip.com, arinc.unal@arinc9.com, daniel@makrotopia.org,
- Landen.Chao@mediatek.com, dqfext@gmail.com, sean.wang@mediatek.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- claudiu.manoil@nxp.com, alexandre.belloni@bootlin.com,
- clement.leger@bootlin.com, george.mccollister@gmail.com,
- linux-renesas-soc@vger.kernel.org
+ <170447162430.14252.14016343998496544271.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Jan 2024 16:20:24 +0000
+References: <20231228081457.936732-1-taoliu828@163.com>
+In-Reply-To: <20231228081457.936732-1-taoliu828@163.com>
+To: Tao Liu <taoliu828@163.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
+ netdev@vger.kernel.org, simon.horman@corigine.com, xiyou.wangcong@gmail.com,
+ pablo@netfilter.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  4 Jan 2024 06:37:59 -0800 you wrote:
-> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to all the DSA tag modules.
+On Thu, 28 Dec 2023 16:14:57 +0800 you wrote:
+> act_ct adds skb->users before defragmentation. If frags arrive in order,
+> the last frag's reference is reset in:
 > 
-> The descriptions are copy/pasted Kconfig names, with s/^Tag/DSA tag/.
+>   inet_frag_reasm_prepare
+>     skb_morph
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> which is not straightforward.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: fill in MODULE_DESCRIPTION()s for DSA tags
-    https://git.kernel.org/netdev/net-next/c/0ed6e95255e7
+  - [net] net/sched: act_ct: fix skb leak and crash on ooo frags
+    https://git.kernel.org/netdev/net/c/3f14b377d01d
 
 You are awesome, thank you!
 -- 
