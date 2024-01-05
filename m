@@ -1,138 +1,104 @@
-Return-Path: <netdev+bounces-61915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DAF82532A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:59:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EEED82532D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 13:00:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A242B284D59
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:59:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1F501C227DF
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 12:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4CB2CCBF;
-	Fri,  5 Jan 2024 11:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F272CCB8;
+	Fri,  5 Jan 2024 12:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="dloLrNjA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Puy2ML8h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D0E2CCBC
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 11:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40e384404e7so5796315e9.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 03:59:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704455966; x=1705060766; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wUwzG5GAodV255BObcMC0Ee1zGNs3NstGJBAQNhp/Nk=;
-        b=dloLrNjAfPfiC6BfHpD9ek6pOj5Mwjn484aZ3kAJTTE2sc0LrhIl9Qpahm/ANBJ3iI
-         Uj5+bCq7kORY5ouQSA8Wu0R9iBRikv7Ol9wvAGlZGs7fl5Wc7Vml0vHli2HBDDv6hy6P
-         a5TIrlpOZgRhfLi+6AnXu65Q31pr4ly+D68s6yQFa0K6vUr9ZcZQUn+geAIX18xVdH8J
-         NDaiOcG9H6X2ok+pA2Y2OdCyYIAR64eZ/ugr0ZtDCTwXru/OeCY3xYmPDblZEtDJyP8A
-         bwFgOyIjnfSOBTXRNhXeIIrK/OMyftbDbbUD5YwyiMVuoV+yxyAf6J3ZArys0GtjovRy
-         FT9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704455966; x=1705060766;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wUwzG5GAodV255BObcMC0Ee1zGNs3NstGJBAQNhp/Nk=;
-        b=p3NtHCLDCPeKmtT0RaSm+29aT0CsZqqdYQRypAT2G1cj3FWKevMP8hBtRNqdY+ZNpS
-         fG9h10b/oreawBXKFXDvTs8a2xQPzXMgunkzEz8JVoC6cLFn4LowG/sdBEkPcCQY7R4S
-         /GVkx5IO3M8Q4rUkeDnSR2Dgru0AkOepyfFWKoO+gEBpG7LqmKtPqfpwAhv0af8wJkwl
-         1coivRnyQzJVwn7VkSmWwdIVaaOp9WDN2PgFsCpjpuLK07DDQ1nWck5I3qfQOWV+dAKa
-         811h6VnRRKVc2J8GrX9C9H4REyD7ELQxK66KWHoWHLpWRm5e3d0rFuznAUvkxsU8gaEm
-         BGNw==
-X-Gm-Message-State: AOJu0YzS0mYj+vopsw+VaruyuXJ+WxqzXoqnAxTtXqy3Yz+Et4xCn5P4
-	J/2SXkKwQvHbuKSj3/mzuotUnE90FznkOA==
-X-Google-Smtp-Source: AGHT+IHypNR3urOgyfI7XDfw3H47tJXj98xYo3KaKlbG8MpMwxjU/6ekG0oMLeWW7Ho6yysYX0KKPg==
-X-Received: by 2002:adf:fc89:0:b0:337:5557:acf5 with SMTP id g9-20020adffc89000000b003375557acf5mr917086wrr.106.1704455966502;
-        Fri, 05 Jan 2024 03:59:26 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id e8-20020a5d5948000000b00336898daceasm1257030wri.96.2024.01.05.03.59.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 03:59:26 -0800 (PST)
-Date: Fri, 5 Jan 2024 12:59:24 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3 1/2] rtnetlink: allow to set iface down before
- enslaving it
-Message-ID: <ZZfvHEIGiL5OvWHk@nanopsycho>
-References: <20240104164300.3870209-1-nicolas.dichtel@6wind.com>
- <20240104164300.3870209-2-nicolas.dichtel@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2668A2CCB2
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 12:00:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A5ADCC433C9;
+	Fri,  5 Jan 2024 12:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704456027;
+	bh=HABBMcf2qpEYNsmdi9LoyknRKlR0TJ1DyoY1ZcAavGY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Puy2ML8h3yb0mrAb50zwF9s06413aoblCqzdPm0ynEMy33o3JvJS79qanlSox3Eny
+	 e539hlVU1MHFSOfjig4kp/m5wa0DeZuUxCAD7eqXId74gykSThWjwKFxqwcr60+j0q
+	 zmEsx8xpnm5rW1lgHovMLm7PJfhU9cb3TD/eVDnaGxF/27CV8n452jQjnPz37HrYas
+	 mGK19j0o9P2a/R/ls3fqFxuZoqUapzEssekfS3lqFmMGOYaaj1TJFlEpCthCtAT4Dp
+	 gTIEI6oSZVvCfnfbWhH9EkltwgA4qLChPaqbV74O/iQUWULrpG280D2CTETjqf5yxp
+	 H0Rz/c683H1Xw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 834B3DCB6D8;
+	Fri,  5 Jan 2024 12:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104164300.3870209-2-nicolas.dichtel@6wind.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/10] ds->user_mii_bus cleanup (part 1)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170445602753.29854.15404184789063719245.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Jan 2024 12:00:27 +0000
+References: <20240104140037.374166-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240104140037.374166-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com,
+ luizluca@gmail.com, alsi@bang-olufsen.dk, linus.walleij@linaro.org,
+ florian.fainelli@broadcom.com, hauke@hauke-m.de, ansuelsmth@gmail.com,
+ arinc.unal@arinc9.com
 
-Thu, Jan 04, 2024 at 05:42:59PM CET, nicolas.dichtel@6wind.com wrote:
->The below commit adds support for:
->> ip link set dummy0 down
->> ip link set dummy0 master bond0 up
->
->but breaks the opposite:
->> ip link set dummy0 up
->> ip link set dummy0 master bond0 down
+Hello:
 
-It is a bit weird to see these 2 and assume some ordering.
-The first one assumes:
-dummy0 master bond 0, dummy0 up
-The second one assumes:
-dummy0 down, dummy0 master bond 0
-But why?
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-What is the practival reason for a4abfa627c38 existence? I mean,
-bond/team bring up the device themselfs when needed. Phil?
-Wouldn't simple revert do better job here?
-
-
->
->Let's add a workaround to have both commands working.
->
->Cc: stable@vger.kernel.org
->Fixes: a4abfa627c38 ("net: rtnetlink: Enslave device before bringing it up")
->Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->Acked-by: Phil Sutter <phil@nwl.cc>
->Reviewed-by: David Ahern <dsahern@kernel.org>
->---
-> net/core/rtnetlink.c | 8 ++++++++
-> 1 file changed, 8 insertions(+)
->
->diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
->index e8431c6c8490..dd79693c2d91 100644
->--- a/net/core/rtnetlink.c
->+++ b/net/core/rtnetlink.c
->@@ -2905,6 +2905,14 @@ static int do_setlink(const struct sk_buff *skb,
-> 		call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
-> 	}
+On Thu,  4 Jan 2024 16:00:27 +0200 you wrote:
+> There are some drivers which assign ds->user_mii_bus when they
+> don't really need its specific functionality, aka non-OF based
+> dsa_user_phy_connect(). There was some confusion regarding the
+> fact that yes, this is why ds->user_mii_bus really exists, so
+> I've started a cleanup series which aims to eliminate the usage
+> of ds->user_mii_bus from drivers when there is nothing to gain
+> from it.
 > 
->+	/* Backward compat: enable to set interface down before enslaving it */
->+	if (!(ifm->ifi_flags & IFF_UP) && ifm->ifi_change & IFF_UP) {
->+		err = dev_change_flags(dev, rtnl_dev_combine_flags(dev, ifm),
->+				       extack);
->+		if (err < 0)
->+			goto errout;
->+	}
->+
-> 	if (tb[IFLA_MASTER]) {
-> 		err = do_set_master(dev, nla_get_u32(tb[IFLA_MASTER]), extack);
-> 		if (err)
->-- 
->2.39.2
->
->
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/10] net: dsa: lantiq_gswip: delete irrelevant use of ds->phys_mii_mask
+    https://git.kernel.org/netdev/net-next/c/fc74b32b4032
+  - [net-next,02/10] net: dsa: lantiq_gswip: use devres for internal MDIO bus, not ds->user_mii_bus
+    https://git.kernel.org/netdev/net-next/c/cd4ba3ecced9
+  - [net-next,03/10] net: dsa: lantiq_gswip: ignore MDIO buses disabled in OF
+    https://git.kernel.org/netdev/net-next/c/7a898539391d
+  - [net-next,04/10] net: dsa: qca8k: put MDIO bus OF node on qca8k_mdio_register() failure
+    https://git.kernel.org/netdev/net-next/c/68e1010cda79
+  - [net-next,05/10] net: dsa: qca8k: skip MDIO bus creation if its OF node has status = "disabled"
+    https://git.kernel.org/netdev/net-next/c/e66bf63a7f67
+  - [net-next,06/10] net: dsa: qca8k: assign ds->user_mii_bus only for the non-OF case
+    https://git.kernel.org/netdev/net-next/c/525366b81f33
+  - [net-next,07/10] net: dsa: qca8k: consolidate calls to a single devm_of_mdiobus_register()
+    https://git.kernel.org/netdev/net-next/c/5c5d6b34b683
+  - [net-next,08/10] net: dsa: qca8k: use "dev" consistently within qca8k_mdio_register()
+    https://git.kernel.org/netdev/net-next/c/c4a1cefdf3bc
+  - [net-next,09/10] net: dsa: bcm_sf2: stop assigning an OF node to the ds->user_mii_bus
+    https://git.kernel.org/netdev/net-next/c/04a4bc9dddc7
+  - [net-next,10/10] net: dsa: bcm_sf2: drop priv->master_mii_dn
+    https://git.kernel.org/netdev/net-next/c/45f62ca5cc48
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
