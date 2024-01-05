@@ -1,123 +1,134 @@
-Return-Path: <netdev+bounces-61848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F25EA8250F9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:39:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B2382512C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F84CB220EF
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:39:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35E971F23747
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 09:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C902377E;
-	Fri,  5 Jan 2024 09:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A99249E9;
+	Fri,  5 Jan 2024 09:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="k53S5+Ch";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="F3veO7d3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C01241E7;
-	Fri,  5 Jan 2024 09:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-5e74b4d5445so12278947b3.1;
-        Fri, 05 Jan 2024 01:39:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704447549; x=1705052349;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ADivkWK4lWs4Zr5dQX009Mb26e7oIT3IDUBbQqeyIfg=;
-        b=nOqYqhs43LlfFJuJRjiotdqHn8KAICw422qKN6oSoKWgKhONbh+foVK/RFLJ4oEGgq
-         MkTtp8ZSHwsV6xghu7u9xCAXaJ1Gc2RaQxlk/wingY27DbHdepsB/+e0WPxYxs9CDHco
-         hvJmO5N1TXWrn3VtGCpsQZMSfZ5lO4UmnWt1mPRHHVLXM/JpFGee5iuXKH+76g0JfYEp
-         dDTKsH6BpnqQTTfK3wxgD75SGMCv51eY718WbqzyqliX1Yk3St49L5mp54QQIYSemERd
-         Mjpvl5vytf3OlvXLyCFr+CN1au8+k//MYFLdEpagwTgX8TLhCpZKyfBWSnksliCyT5rY
-         ycNw==
-X-Gm-Message-State: AOJu0YzRxQ/+pVcqCU3/uv3gwONcaRIwT763vbeb0ImGwi6VglTkbw4M
-	voE5o52YAVrkl4Eqo5PBxH/QIIUH6cT0DA==
-X-Google-Smtp-Source: AGHT+IFYXVbQLCou/QnjuW46WFagGdZwGM0eKmpsLBARP4ZrUW0XtveIfHs6X2UfdHTH+a/Aasv4yA==
-X-Received: by 2002:a81:8701:0:b0:5f0:b992:d5f8 with SMTP id x1-20020a818701000000b005f0b992d5f8mr1946479ywf.64.1704447548942;
-        Fri, 05 Jan 2024 01:39:08 -0800 (PST)
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com. [209.85.128.174])
-        by smtp.gmail.com with ESMTPSA id s62-20020a818241000000b005f48f4e0d4bsm509457ywf.64.2024.01.05.01.39.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jan 2024 01:39:08 -0800 (PST)
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5e734d6cbe4so12338917b3.3;
-        Fri, 05 Jan 2024 01:39:08 -0800 (PST)
-X-Received: by 2002:a0d:f4c1:0:b0:5e8:f2e7:c48a with SMTP id
- d184-20020a0df4c1000000b005e8f2e7c48amr1763943ywf.98.1704447548262; Fri, 05
- Jan 2024 01:39:08 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D5B24B51;
+	Fri,  5 Jan 2024 09:50:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alu.unizg.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alu.unizg.hr
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id D6AE060173;
+	Fri,  5 Jan 2024 10:41:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1704447684; bh=qKJmrnjWkHPbpWrQi3wn/w/6aFlhApN2GLFP70rgZoA=;
+	h=Date:To:From:Cc:Subject:From;
+	b=k53S5+ChiDP5PKAJC0vZtf95BR6ZKhnVNVpPjw6eFHxIIr6u4N/qQ76C21AaRllgh
+	 PoMNi+pWbUfSDyaCLIV0GUiSQEvbHj4wFyBKq7x70X85BHbpLt8C4Rurb5pN1HJV6i
+	 hioUhumkj1oQnXswxLNO8viYPjuMuWpVHnhQ/6cMLrMfdqH5QFzFO5RcoGYBxDd5NN
+	 600QoY023ZgMIEBSA9mG0+iY7nn9AT54S0uAWQv5EqByY1gpti61T+bxrM5GD3nant
+	 nqap+35Taocv8kjgJgWCHp6fBYO9ZbDQiS44Cn5rWG6jaeyAAsvSj4oDP5BJDFGnAe
+	 AmnwypuhNAbxg==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id d_wiY3UvOH3p; Fri,  5 Jan 2024 10:41:22 +0100 (CET)
+Received: from [192.168.94.51] (unknown [212.15.178.51])
+	by domac.alu.hr (Postfix) with ESMTPSA id EF57360161;
+	Fri,  5 Jan 2024 10:41:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1704447682; bh=qKJmrnjWkHPbpWrQi3wn/w/6aFlhApN2GLFP70rgZoA=;
+	h=Date:To:From:Cc:Subject:From;
+	b=F3veO7d3mmYHG8MrgSjoykPb7YrG3/6gh5QlUSwBGSabwGRdKB+ETnbSoib7dDk2W
+	 QbaBSnS2KpMkkWb0sXangRnL9gUtqKoDRuznHNVjCV3vzCmG115CprzXSRkLoIdKIc
+	 1zNr2TFH6mcUol1Nu2dP9tYuJNvo2D1aPRdKWq4UmFNLbKXpOPXfyztZAwE8przJpv
+	 H5/L9caWaivDHTbqPg6PcOy1j3l9vLsu5my5jaIiKvmMH9bhzIZ9jK1XQVmL7UX2+z
+	 pQmco0PxPk/bCvVHW7nv+jG7CIqHgbWTXznrFK6D1r6Wjs71xYh1nztBKy8UY5R7NN
+	 wnGA15EVgrzsg==
+Message-ID: <0b9a2827-c9c5-41d6-a4f1-dbd91262c474@alu.unizg.hr>
+Date: Fri, 5 Jan 2024 10:41:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com> <20240105082339.1468817-4-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20240105082339.1468817-4-claudiu.beznea.uj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 5 Jan 2024 10:38:56 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWTE=AUEd5iqd4Qm04sgFcGtHkbYEQJH9A=qPWph=S4+g@mail.gmail.com>
-Message-ID: <CAMuHMdWTE=AUEd5iqd4Qm04sgFcGtHkbYEQJH9A=qPWph=S4+g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 03/19] net: ravb: Make reset controller
- support mandatory
-To: Claudiu <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com, 
-	p.zabel@pengutronix.de, yoshihiro.shimoda.uh@renesas.com, 
-	wsa+renesas@sang-engineering.com, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	geert+renesas@glider.be, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, hr
+To: LKML <linux-kernel@vger.kernel.org>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: selftest: net: fcnal-test.sh TIMEOUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Claudiu,
+Hi, all,
 
-On Fri, Jan 5, 2024 at 9:24=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> w=
-rote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->
-> On the RZ/G3S SoC the reset controller is mandatory for the IP to work.
-> The device tree binding documentation for the ravb driver specifies that
-> the resets are mandatory. Based on this, make the resets mandatory also i=
-n
-> driver for all ravb devices.
->
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+The default timeout for tools/testing/selftest/net groups of tests is 1500s (25m).
 
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -2645,7 +2645,7 @@ static int ravb_probe(struct platform_device *pdev)
->                 return -EINVAL;
->         }
->
-> -       rstc =3D devm_reset_control_get_optional_exclusive(&pdev->dev, NU=
-LL);
-> +       rstc =3D devm_reset_control_get_exclusive(&pdev->dev, NULL);
->         if (IS_ERR(rstc))
->                 return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
->                                      "failed to get cpg reset\n");
+This is less than half of what is required to run the full fcnal-test.sh on my hardware
+(53m48s).
 
-Upon second look, you also have to make config RAVB select
-RESET_CONTROLLER.
-Currently, you can build an R-Car Gen[234] kernel with RESET_CONTROLLER
-disabled, causing devm_reset_control_get_exclusive() to fail
-unconditionally.
+With the timeout adjusted, tests passed 914 of 914 OK.
 
-Gr{oetje,eeting}s,
+Best regards,
+Mirsad Todorovac
 
-                        Geert
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+diff --git a/tools/testing/selftests/net/settings b/tools/testing/selftests/net/settings
+index dfc27cdc6c05..ed8418e8217a 100644
+--- a/tools/testing/selftests/net/settings
++++ b/tools/testing/selftests/net/settings
+@@ -1 +1 @@
+-timeout=1500
++timeout=3600
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+-----------------------------------------------------------------
+
+[snip]
+#################################################################
+Ping LLA with multiple interfaces
+
+TEST: Pre cycle, ping out ns-B - multicast IP                                 [ OK ]
+TEST: Pre cycle, ping out ns-C - multicast IP                                 [ OK ]
+TEST: Post cycle ns-A eth1, ping out ns-B - multicast IP                      [ OK ]
+TEST: Post cycle ns-A eth1, ping out ns-C - multicast IP                      [ OK ]
+TEST: Post cycle ns-A eth2, ping out ns-B - multicast IP                      [ OK ]
+TEST: Post cycle ns-A eth2, ping out ns-C - multicast IP                      [ OK ]
+
+#################################################################
+SNAT on VRF
+
+TEST: IPv4 TCP connection over VRF with SNAT                                  [ OK ]
+TEST: IPv6 TCP connection over VRF with SNAT                                  [ OK ]
+
+Tests passed: 914
+Tests failed:   0
+
+real	53m48.460s
+user	0m32.885s
+sys	2m41.509s
+root@hostname:/
+
+-- 
+Mirsad Goran Todorovac
+Sistem inženjer
+Grafički fakultet | Akademija likovnih umjetnosti
+Sveučilište u Zagrebu
+ 
+System engineer
+Faculty of Graphic Arts | Academy of Fine Arts
+University of Zagreb, Republic of Croatia
+The European Union
+
+"I see something approaching fast ... Will it be friends with me?"
 
