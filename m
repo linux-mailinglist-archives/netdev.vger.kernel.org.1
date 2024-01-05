@@ -1,176 +1,208 @@
-Return-Path: <netdev+bounces-61873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90015825251
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:46:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C71D825259
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:48:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F2691C23075
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:46:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FB071C22E00
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3F2D286B5;
-	Fri,  5 Jan 2024 10:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9FF24B5D;
+	Fri,  5 Jan 2024 10:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4j7dmrj9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE542C684;
-	Fri,  5 Jan 2024 10:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.104] (178.176.73.147) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 5 Jan
- 2024 13:46:33 +0300
-Subject: Re: [PATCH net] MAINTAINERS: I don't want to review Renesas Ethernet
- Switch driver
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Simon Horman
-	<horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
-References: <6498e2dd-7960-daeb-acce-a8d2207f3404@omp.ru>
- <20240103212822.GA48301@kernel.org>
- <8f9b5376-647a-7b59-886c-142990b8c9e4@omp.ru>
- <TYBPR01MB5341F4C4340200CABBFF5C05D8662@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <ef96eb69-636c-a91c-e7b7-46b02241ad0d@omp.ru>
-Date: Fri, 5 Jan 2024 13:46:32 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429E5250ED
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 10:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso9937a12.0
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 02:48:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704451713; x=1705056513; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2oA+DfvkF/6fqh1TmhIwoR/ZJIBR+b0c6R1YFEKfiMo=;
+        b=4j7dmrj9JPHMWgyvxsbkaV1dTFSw0iO6QZL6hP/hgVOvqPaveF3PANId4ep2dad4cY
+         M4fISu7c58BFe9gmDJ61UrrYAxKCUk5wSLSXBTUu+ITw1Zy05QZCG/k3S7SytxPwm8yY
+         /+jQqE2ibWQHUlHk1hKX8fQoYP2xgEvq/UCJRBkk6chEInMMARwBy3bgfflIhoi9FMMG
+         gfQEvaxE241W1aHWmLuwVB91AEeSP138I5TnqJtHzg3n4i6Fqg3+0TlEDPhXBvy2cum+
+         XL+X/NFGLcPcidwuGkw5SLENpm69NOZ4AXR5U/1QBRWmZUlB1Ikh0rrfyeomF5cow+sG
+         CEMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704451713; x=1705056513;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2oA+DfvkF/6fqh1TmhIwoR/ZJIBR+b0c6R1YFEKfiMo=;
+        b=ADwmrUpS0fTv2yd++KlqCMRJTyrKAZZU7emCXmllUbQ7z5Mt/LMEuY7dPzzElWpT8H
+         qyqN3NrF8hHFkbib49wNHhQe6d3GaKNZMDEE6ATh/Mr9+r5wpsvbt6QBg4Fo0vnSpUC+
+         RwzaiEvTxmQbj/IrsSEczQpD7ZGFdYld8rPm4Nibyf1CusRXUT2btSPPbd2hh88kYBcp
+         pdLtr6h+cWyP5eEpyI9JPoQGbSCBQ9sHMfKGOJaiiNroaW/emQ1vHD5Ammo7PgItgJga
+         ya36OaQ4hHSRSyakMigZj38JyOBxXsYSSUyJ54IcRMc6lsqNvu7+k6iukFbZ+SYaXoHs
+         53bA==
+X-Gm-Message-State: AOJu0YxtxJt6jw7UjwHpTO3igfqsEOYA8lwBT4rBEbGqM/2wX6Zf8hYC
+	yANbl78k61Yvyx5jg0tzbTlAmEr1CGCJBvv3CzUU9zCEA1Oq
+X-Google-Smtp-Source: AGHT+IFv0vnQPWdLPrQsYnDtRDca919RUkeRsM5oeQs2Ots7c0R+6Lp39rU3ebTS/BDKx4md8p4+GBkyTzo7A8Jpejw=
+X-Received: by 2002:a50:c05b:0:b0:554:98aa:f75c with SMTP id
+ u27-20020a50c05b000000b0055498aaf75cmr101190edd.5.1704451713227; Fri, 05 Jan
+ 2024 02:48:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <TYBPR01MB5341F4C4340200CABBFF5C05D8662@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/05/2024 10:35:16
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182464 [Jan 04 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.147 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.147 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.73.147:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.147
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/05/2024 10:40:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/5/2024 9:01:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <20240105091556.15516-1-petr@tesarici.cz> <CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
+ <20240105113402.0f5f1232@meshulam.tesarici.cz>
+In-Reply-To: <20240105113402.0f5f1232@meshulam.tesarici.cz>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 5 Jan 2024 11:48:19 +0100
+Message-ID: <CANn89iLEvW9ZS=+WPETPC=mKRyu9AKmueGCWZZOrz9oX3Xef=g@mail.gmail.com>
+Subject: Re: [PATCH] net: stmmac: protect statistics updates with a spinlock
+To: =?UTF-8?B?UGV0ciBUZXNhxZnDrWs=?= <petr@tesarici.cz>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, 
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>, 
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/5/24 5:42 AM, Yoshihiro Shimoda wrote:
-[...]
+On Fri, Jan 5, 2024 at 11:34=E2=80=AFAM Petr Tesa=C5=99=C3=ADk <petr@tesari=
+ci.cz> wrote:
+>
+> On Fri, 5 Jan 2024 10:58:42 +0100
+> Eric Dumazet <edumazet@google.com> wrote:
+>
+> > On Fri, Jan 5, 2024 at 10:16=E2=80=AFAM Petr Tesarik <petr@tesarici.cz>=
+ wrote:
+> > >
+> > > Add a spinlock to fix race conditions while updating Tx/Rx statistics=
+.
+> > >
+> > > As explained by a comment in <linux/u64_stats_sync.h>, write side of =
+struct
+> > > u64_stats_sync must ensure mutual exclusion, or one seqcount update c=
+ould
+> > > be lost on 32-bit platforms, thus blocking readers forever.
+> > >
+> > > Such lockups have been actually observed on 32-bit Arm after stmmac_x=
+mit()
+> > > on one core raced with stmmac_napi_poll_tx() on another core.
+> > >
+> > > Signed-off-by: Petr Tesarik <petr@tesarici.cz>
+> >
+> > This is going to add more costs to 64bit platforms ?
+>
+> Yes, it adds a (hopefully not too contended) spinlock and in most
+> places an interrupt disable/enable pair.
+>
+> FWIW the race condition is also present on 64-bit platforms, resulting
+> in inaccurate statistic counters. I can understand if you consider it a
+> mild annoyance, not worth fixing.
+>
+> > It seems to me that the same syncp can be used from two different
+> > threads : hard irq and napi poller...
+>
+> Yes, that's exactly the scenario that locks up my system.
+>
+> > At this point, I do not see why you keep linux/u64_stats_sync.h if you
+> > decide to go for a spinlock...
+>
+> The spinlock does not havce to be taken on the reader side, so the
+> seqcounter still adds some value.
+>
+> > Alternative would use atomic64_t fields for the ones where there is no
+> > mutual exclusion.
+> >
+> > RX : napi poll is definitely safe (protected by an atomic bit)
+> > TX : each TX queue is also safe (protected by an atomic exclusion for
+> > non LLTX drivers)
+> >
+> > This leaves the fields updated from hardware interrupt context ?
+>
+> I'm afraid I don't have enough network-stack-foo to follow here.
+>
+> My issue on 32 bit is that stmmac_xmit() may be called directly from
+> process context while another core runs the TX napi on the same channel
+> (in interrupt context). I didn't observe any race on the RX path, but I
+> believe it's possible with NAPI busy polling.
+>
+> In any case, I don't see the connection with LLTX. Maybe you want to
+> say that the TX queue is safe for stmmac (because it is a non-LLTX
+> driver), but might not be safe for LLTX drivers?
 
->>>> I don't know this hardware, I don't have the manuals for it, so I can't
->>>> provide a good review.  Let's exclude the Ethernet Switch related files.
->>>>
->>>> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->>>
->>> Hi Sergey,
->>
->>   Hi Simon, long time, no see... :-)
->>
->>> I don't know the back story to this, if there is one.
->>
->>    Not much of a history: I got a lot of the rswitch patches in my
->> inbox and I mostly ignored them... but kept deferring this patch due
->> to a high load with fixing Svace's reports at work...
->>
->>> But could I suggest that:
->>>
->>> 1. The patch also updates the title MAINTAINERS section to cover the
->>>    remaining two drivers.
->>>
->>>    e.g.: RENESAS ETHERNET DRIVERS ->
->>>          RENESAS ETHERNET AVB AND SUPERH ETHERNET DRIVERS
->>>
->>>    Or alternatively, create separate sections for each driver.
->>
->>    Yeah, this 2nd option seems cleaner. Still not sure about Kconfig/
->> Makefile though...
-> 
-> How about adding "COMMON PARTS" section?
-> 
-> - RENESAS ETHERNET AVB AND SUPERH ETHERNET DRIVERS : For ravb and sh_eth
-> - RENESAS ETHERNET DRIVERS (COMMON PARTS) : For Kconfig/Makefile in drivers/net/ethernet/renesas
-> - RENESAS ETHERNET SWITCH DRIVER : For rswitch
+LLTX drivers (mostly virtual drivers like tunnels...) can have multiple cpu=
+s
+running ndo_start_xmit() concurrently. So any use of a 'shared syncp'
+would be a bug.
+These drivers usually use per-cpu stats, to avoid races and false
+sharing anyway.
 
-   No, this seems too much for these poor little couple files. :-)
-Listing them in each new MAINTAINERS entry should achieve the same goal
-and seems a biut cleaner...
+I think you should split the structures into two separate groups, each
+guarded with its own syncp.
 
->>>    n.b.: This may involve moving sections to maintain alphabetical order
->>>          by section title
->>>
->>> 2. Reaching out to Shimoda-san (CCed) or other relevant parties
->>>    to see if an appropriate maintainer or maintainers for the
->>>    Renesas Ethernet Switch driver can be found.
-> 
-> I'm happy if I'm a maintainer for Renesas Ethernet Switch driver.
+No extra spinlocks, no extra costs on 64bit arches...
 
-   Do you want to be a maintainer or just a reviewer (like me)?
+If TX completion can run in parallel with ndo_start_xmit(), then
+clearly we have to split stmmac_txq_stats in two halves:
 
-> So, if my idea above is acceptable, perhaps the maintainers can be:
-> 
-> - RENESAS ETHERNET AVB AND SUPERH ETHERNET DRIVERS : Sergey
+Also please note the conversion from u64 to u64_stats_t
 
-   There will be separate entries for those...
+Very partial patch, only to show the split and new structure :
 
-> - RENESAS ETHERNET DRIVERS (COMMON PARTS) : Sergey and Shimoda
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h
+b/drivers/net/ethernet/stmicro/stmmac/common.h
+index e3f650e88f82f927f0dcf95748fbd10c14c30cbe..702bceea5dc8c875a80f5e3a92b=
+7bb058f373eda
+100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -60,16 +60,22 @@
+ /* #define FRAME_FILTER_DEBUG */
 
-   I'd like to avoid that... :-)
+ struct stmmac_txq_stats {
+-       u64 tx_bytes;
+-       u64 tx_packets;
+-       u64 tx_pkt_n;
+-       u64 tx_normal_irq_n;
+-       u64 napi_poll;
+-       u64 tx_clean;
+-       u64 tx_set_ic_bit;
+-       u64 tx_tso_frames;
+-       u64 tx_tso_nfrags;
+-       struct u64_stats_sync syncp;
++/* First part, updated from ndo_start_xmit(), protected by tx queue lock *=
+/
++       struct u64_stats_sync syncp_tx;
++       u64_stats_t tx_bytes;
++       u64_stats_t tx_packets;
++       u64_stats_t tx_pkt_n;
++       u64_stats_t tx_tso_frames;
++       u64_stats_t tx_tso_nfrags;
++
++/* Second part, updated from TX completion (protected by NAPI poll logic) =
+*/
++       struct u64_stats_sync syncp_tx_completion;
++       u64_stats_t napi_poll;
++       u64_stats_t tx_clean;
++       u64_stats_t tx_set_ic_bit;
++
++/* Following feld is updated from hard irq context... */
++       atomic64_t tx_normal_irq_n;
+ } ____cacheline_aligned_in_smp;
 
-> - RENESAS ETHERNET SWITCH DRIVER : Shimoda
-
->>>    n.b.: It may still be a holiday period in Japan for the rest of the week.
->>
->>    It's a holiday period here in Russia as well, till the 8th of Jaunary. :-)
-> 
-> I'm back from today, but next Monday (8th) is a holiday in Japan :)
-
-   You're back for 1 day? :-)
-
-> Best regards,
-> Yoshihiro Shimoda
-> 
->>> 3. Rephrase the subject and patch description as splitting out maintenance of
->>>    the Renesas Ethernet Switch driver .
-
-   The question that remains still unaddressed: should I do the MAINTAINERS
-"directory split" with a single patch?
-
-[...]
-
-MBR, Sergey
+ struct stmmac_rxq_stats {
 
