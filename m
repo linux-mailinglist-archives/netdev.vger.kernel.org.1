@@ -1,182 +1,120 @@
-Return-Path: <netdev+bounces-61732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 978A2824C22
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:26:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40797824C28
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 01:33:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DBAB286A0C
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:26:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D83B1C21FB0
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 00:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1DDA32;
-	Fri,  5 Jan 2024 00:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF7C37C;
+	Fri,  5 Jan 2024 00:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gAn/TsDj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TTkRQ3qu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D7C626
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 00:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ccea11b6bbso1051071fa.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jan 2024 16:26:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704414368; x=1705019168; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=g+MdLc+k+XWvHGAXcBSxBQ+6xejfLMr5uzuLuPE9qz0=;
-        b=gAn/TsDjQadazDKwJEX2mymt6/zRcIt+tYaQ8tMB6CW5PYjetUgrgzWSgaQfrbuZo4
-         h6x7Y6CPDTG0GPNQwc57h+jd0uhs5LJMFikvfTrBLIfvnV+TvPmNr3E/VoMycAZGn1IW
-         d+ZCE6nPRlAbxRdUu0grCkf3xRUsI74gIKKnyycrbRs5paJ91ziWyC9NQQDDKAO8a9W3
-         ePau4+SJaRObkFZBdAz6bDhxrkANDAHBUTfWAY57G77bdPuZy1CM6Ey9YluAPzFNR/W2
-         v+EO+iJadp34zKlhWpIKKpcuQJcOrapP2MbjU3a+JGJsU4KiUH7ZZgBp+Sg4AbrQ+MYg
-         BrEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704414368; x=1705019168;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g+MdLc+k+XWvHGAXcBSxBQ+6xejfLMr5uzuLuPE9qz0=;
-        b=mDwAWBo8QLpHuVz+ddwuJ8L1ZUv+Ua7uxJ3t6LuQgyrbRp9AJ9uHXh4GzeuYHT12xW
-         sL8e++11ZuVOYFTc+qiV97GQv0fWRLVvENH+EWsREv0B/y6oy/QWjPQlUEVkGGw+a7jY
-         cTjT2OojiqBfdjQ1mOFL1ccrjQu/pYtZhg6sQFcYcOn26ndxk23+m8KQ0yxjoRf688Yw
-         i9T9B6KQMtw5jIryLkk88UOp8cuauf3M5h5/kQWFUgGhet9kU8YavBDu5nwrbn1wo+it
-         +fFxugm+QKCuS5s3gJjEjB63j7A0N+hQHSx44U8K/tbxVtxHGs5mNqjVU5oVo2VX8nxS
-         iXKQ==
-X-Gm-Message-State: AOJu0Yw9QXgOSaRYzsYzj02LMVunitEr78W06qJTBDxAtqJJRA6X7kz2
-	nE190un/7J1wsMwCA3mdyzSNDehFPH/jtidnJjE=
-X-Google-Smtp-Source: AGHT+IGn624JlKlQnySjxEjO5oa+vL90mBXEkZ0RVLsLpCmA75ftlqffn6z0DM5H1XFuxDidt3bbwQuLdHUtdkYXeMI=
-X-Received: by 2002:a2e:9056:0:b0:2cd:191a:c1bf with SMTP id
- n22-20020a2e9056000000b002cd191ac1bfmr679469ljg.14.1704414368318; Thu, 04 Jan
- 2024 16:26:08 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758971845
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 00:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9f3c86e9-111c-4cf0-ad8b-aafbd301bbb3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1704414791;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yNDHBXBIrjewK6yqLx3Z2BASgstxUcNngkXcOsFlrMM=;
+	b=TTkRQ3qu/6i5Vu9Q8ixFv9B3ldADvT8A6NkNlFLH+PSGzUiooyD80czy/OBcYMeCnu5rRy
+	C1p/x++5Xihcd64SolmqZHAx3XOVAvISoojxlUdYnXmuPepLitstJRzpQ4HK6BQs9O2i6n
+	CiFzHvk168cOj10QWijzgvgZmihS24c=
+Date: Thu, 4 Jan 2024 16:33:04 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104140037.374166-1-vladimir.oltean@nxp.com> <20240104140037.374166-5-vladimir.oltean@nxp.com>
-In-Reply-To: <20240104140037.374166-5-vladimir.oltean@nxp.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 4 Jan 2024 21:25:57 -0300
-Message-ID: <CAJq09z4NbssvqSMcb1aCz0yAjkFhBtCdJfraQo1ijGA9sWb8Tg@mail.gmail.com>
-Subject: Re: [PATCH net-next 04/10] net: dsa: qca8k: put MDIO bus OF node on
- qca8k_mdio_register() failure
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Linus Walleij <linus.walleij@linaro.org>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Hauke Mehrtens <hauke@hauke-m.de>, Christian Marangi <ansuelsmth@gmail.com>, 
-	=?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH bpf 1/2] bpf: Avoid iter->offset making backward progress
+ in bpf_iter_udp
+Content-Language: en-US
+To: Aditi Ghag <aditi.ghag@isovalent.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ netdev@vger.kernel.org, kernel-team@meta.com, bpf@vger.kernel.org
+References: <20231219193259.3230692-1-martin.lau@linux.dev>
+ <8d15f3a7-b7bc-1a45-0bdf-a0ccc311f576@iogearbox.net>
+ <fc1b5650-72bb-4b09-bab4-f61b2186f673@linux.dev>
+ <9f3697c1-ed15-4a3d-9113-c4437f421bb3@linux.dev>
+ <8787f5c0-fed0-b8fa-997b-4d17d9966f13@iogearbox.net>
+ <639b1f3f-cb53-4058-8426-14bd50f2b78f@linux.dev>
+ <8AF6C653-61DB-4142-B2B3-5C6A7D966AF8@isovalent.com>
+ <41818988-af0e-4d61-8505-4a13782ad61c@linux.dev>
+ <61BFE697-3A12-4D0E-A5B9-FA2677D988E2@isovalent.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <61BFE697-3A12-4D0E-A5B9-FA2677D988E2@isovalent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> of_get_child_by_name() gives us an OF node with an elevated refcount,
-> which should be dropped when we're done with it. This is so that,
-> if (of_node_check_flag(node, OF_DYNAMIC)) is true, the node's memory can
-> eventually be freed.
->
-> There are 2 distinct paths to be considered in qca8k_mdio_register():
->
-> - devm_of_mdiobus_register() succeeds: since commit 3b73a7b8ec38 ("net:
->   mdio_bus: add refcounting for fwnodes to mdiobus"), the MDIO core
->   treats this well.
->
-> - devm_of_mdiobus_register() or anything up to that point fails: it is
->   the duty of the qca8k driver to release the OF node.
+On 1/4/24 3:38 PM, Aditi Ghag wrote:
+>>> I'm not sure about semantics of the resume operation for certain corner cases like these:
+>>> - The BPF UDP sockets iterator was stopped while iterating bucker #X, and the offset was set to 2. bpf_iter_udp_seq_stop then released references to the batched sockets, and marks the bucket X iterator state (aka iter->st_bucket_done) as false.
+>>> - Before the iterator is "resumed", the bucket #X was mutated such that the previously iterated sockets were removed, and new sockets were added.  With the current logic, the iterator will skip the first two sockets in the bucket, which isn't right. This is slightly different from the case where sockets were updated in the X -1 bucket *after* it was fully iterated. Since the bucket and sock locks are released, we don't have any guarantees that the underlying sockets table isn't mutated while the userspace has a valid iterator.
+>>> What do you think about such cases?
+>> I believe it is something orthogonal to the bug fix here but we could use this thread to discuss.
+> 
+> Yes, indeed! But I piggy-backed on the same thread, as one potential option could be to always start iterating from the beginning of a bucket. (More details below.)
+>>
+>> This is not something specific to the bpf tcp/udp iter which uses the offset as a best effort to resume (e.g. the inet_diag and the /proc/net/{tcp[6],udp} are using similar strategy to resume). To improve it, it will need to introduce some synchronization with the (potentially fast path) writer side (e.g. bind, after 3WHS...etc). Not convinced it is worth it to catch these cases.
+> 
+> Right, synchronizing fast paths with the iterator logic seems like an overkill.
+> 
+> If we change the resume semantics, and make the iterator always start from the beginning of a bucket, it could solve some of these corner cases (and simplify the batching logic). The last I checked, the TCP (BPF) iterator logic was tightly coupled with the 
 
-In both cases, it is qca8k driver duty to put the OF node.
-3b73a7b8ec38 just allows you to put it just after mdiobus_registration
-and not only after mdiobus_unregistration. This patch does put it
-correctly though.
+Always resume from the beginning of the bucket? hmm... then it is making 
+backward progress and will hit the same bug again. or I miss-understood your 
+proposal?
 
-> This change addresses the second case by making sure that the OF node
-> reference is not leaked.
->
-> The "mdio" node may be NULL, but of_node_put(NULL) is safe.
->
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->  drivers/net/dsa/qca/qca8k-8xxx.c | 21 ++++++++++++++++-----
->  1 file changed, 16 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-> index ec57d9d52072..5f47a290bd6e 100644
-> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
-> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-> @@ -949,10 +949,15 @@ qca8k_mdio_register(struct qca8k_priv *priv)
->         struct dsa_switch *ds = priv->ds;
->         struct device_node *mdio;
->         struct mii_bus *bus;
-> +       int err;
-> +
-> +       mdio = of_get_child_by_name(priv->dev->of_node, "mdio");
+> file based iterator (/proc/net/{tcp,udp}), so I'm not sure if it's an easy change if we were to change the resume semantics for both TCP and UDP BFP iterators?
+> Note that, this behavior would be similar to the lseek operation with seq_file [1]. Here is a snippet -
 
-I couldn't get why you moved this here. It will only be used in
-of_device_is_available()
+bpf_iter does not support lseek.
 
->
->         bus = devm_mdiobus_alloc(ds->dev);
-> -       if (!bus)
-> -               return -ENOMEM;
-> +       if (!bus) {
-> +               err = -ENOMEM;
-> +               goto out_put_node;
-> +       }
->
->         bus->priv = (void *)priv;
->         snprintf(bus->id, MII_BUS_ID_SIZE, "qca8k-%d.%d",
-> @@ -962,12 +967,12 @@ qca8k_mdio_register(struct qca8k_priv *priv)
->         ds->user_mii_bus = bus;
->
->         /* Check if the devicetree declare the port:phy mapping */
-> -       mdio = of_get_child_by_name(priv->dev->of_node, "mdio");
->         if (of_device_is_available(mdio)) {
+> 
+> The stop() function closes a session; its job, of course, is to clean up. If dynamic memory is allocated for the iterator, stop() is the place to free it; if a lock was taken by start(), stop() must release that lock. The value that *pos was set to by the last next() call before stop() is remembered, and used for the first start() call of the next session unless lseek() has been called on the file; in that case next start() will be asked to start at position zero
+> 
+> [1] https://docs.kernel.org/filesystems/seq_file.html
+> 
+>>
+>> For the cases described above, skipped the newer sockets is arguably ok. These two new sockets will not be captured anyway even the batch was not stop()-ed in the middle. I also don't see how it is different semantically if the two new sockets are added to the X-1 bucket: the sockets are added after the bpf-iter scanned it regardless they are added to an earlier bucket or to an earlier location of the same bucket.
+>>
+>> That said, the bpf_iter_udp_seq_stop() should only happen if the bpf_prog bpf_seq_printf() something AND hit the seq->buf (PAGE_SIZE) << 3) limit or the count in "read(iter_fd, buf, count)" limit.
+> 
+> Thanks for sharing the additional context. Would you have a link for these set of conditions where an iterator can be stopped? It'll be good to document the API semantics so that users are aware of the implications of setting the read size parameter too low.
 
-This is off-topic for this patch but it sounds strange to have an mdio
-node marked as disabled. The legacy code seems to cover old
-device-trees that do not have the mdio node. Supporting an existing
-but disabled mdio might point in the wrong direction. Anyway, it would
-be good to have common behavior across drivers. I can update the
-realtek driver to match whatever is the recommended usage.
+Most of the conditions should be in bpf_seq_read() in bpf_iter.c.
 
-As a bonus, if a disabled node should return an error and not fallback
-to the legacy user mii, devm_mdiobus_register could be replaced by
-devm_of_mdiobus_register() as it handles mdio==NULL.
+Again, this resume on offset behavior is not something specific to 
+bpf-{tcp,udp}-iter.
 
->                 bus->name = "qca8k user mii";
->                 bus->read = qca8k_internal_mdio_read;
->                 bus->write = qca8k_internal_mdio_write;
-> -               return devm_of_mdiobus_register(priv->dev, bus, mdio);
-> +               err = devm_of_mdiobus_register(priv->dev, bus, mdio);
-> +               goto out_put_node;
->         }
->
->         /* If a mapping can't be found the legacy mapping is used,
-> @@ -976,7 +981,13 @@ qca8k_mdio_register(struct qca8k_priv *priv)
->         bus->name = "qca8k-legacy user mii";
->         bus->read = qca8k_legacy_mdio_read;
->         bus->write = qca8k_legacy_mdio_write;
-> -       return devm_mdiobus_register(priv->dev, bus);
-> +
-> +       err = devm_mdiobus_register(priv->dev, bus);
-> +
-> +out_put_node:
-> +       of_node_put(mdio);
-> +
-> +       return err;
->  }
->
->  static int
-> --
-> 2.34.1
->
-Regards,
+> 
+> 
+>> For this case, bpf_iter.c may be improved to capture the whole batch's seq_printf() to seq->buf first even the userspace's buf is full. It would be a separate effort if it is indeed needed.
+> 
+> Interesting proposal... Other option could be to invalidate the userspace iterator if an entire bucket batch is not being captured, so that userspace can retry with a bigger buffer.
 
-Luiz
+Not sure how to invalidate the user buffer without breaking the existing 
+userspace app though.
+
+The earlier idea on seq->buf was a quick thought. I suspect there is still 
+things that need to think through if we did want to explore how to provide 
+better guarantee to allow seq_printf() for one whole batch. I still feel it is 
+overkill.
 
