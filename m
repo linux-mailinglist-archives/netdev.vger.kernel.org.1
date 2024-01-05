@@ -1,107 +1,163 @@
-Return-Path: <netdev+bounces-62114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27E99825C31
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 22:45:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5860825C35
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 22:46:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0285284344
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 21:45:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47723B239C4
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 21:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C5A1E4BC;
-	Fri,  5 Jan 2024 21:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A26E225D3;
+	Fri,  5 Jan 2024 21:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXIW9Cjx"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="GOmZ2lDW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E91364A1;
-	Fri,  5 Jan 2024 21:45:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11FD5C433C7;
-	Fri,  5 Jan 2024 21:44:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704491101;
-	bh=S8xwNI2IVLGMzs1d0V3i+KaFfXXiiwzlTAyPMkEB65w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZXIW9CjxpEEA78IVJ1b06aYlo7peW1XEcL1cagcL4tc4I8/O/9rDTpXwwuhkFmGOk
-	 dTVCgdLFYIcXYm2xsgMW539leVlZ44OsnpTYmNaJqL12msHAQJkzfAq8ZHq7aK/40/
-	 qUkxlYOnq5wUfUz2jHUBbCPfqzu+MlM6P5GDGFTsLZdbAqpabOmHDFwqVO9vwGsCsQ
-	 9NLNyYKpbLHmMyi1I7Pf3J7WlvAedt7hKI4c6YZjvNCOS6xJsMydT+sGXNK7gNLTLp
-	 Ac8+IJOXQiLbhBhMmPRTaSAR+mj5KgiKkCjtfSy8uxjsMBRgV+afSBjrc0RB/fbeK+
-	 Bo+h9ppcMiK4Q==
-Date: Fri, 5 Jan 2024 21:44:57 +0000
-From: Simon Horman <horms@kernel.org>
-To: Naveen Mamindlapalli <naveenm@marvell.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sgoutham@marvell.com,
-	Nithin Dabilpuram <ndabilpuram@marvell.com>
-Subject: Re: [net PATCH] octeontx2-af: CN10KB: Fix FIFO length calculation
- for RPM2
-Message-ID: <20240105214457.GD31813@kernel.org>
-References: <20240105065423.714-1-naveenm@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4FF225CF
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 21:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5574e188bedso18460a12.0
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 13:45:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1704491153; x=1705095953; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=yEXiwrq4KNUdt55Ouq+3g5whmUfNY0DSzzUMj+HSUwY=;
+        b=GOmZ2lDWKJjz7amuXRF46WEwGTux/jfJdyxrGfZs9D3tuddraTjj2g2thlHTC1bxKG
+         iKH3UEjQGy4sjb07GpYkX+ZLp1Yool2bhcaRpdqY0t9CJuDkz0nLHk8B+FdAn+nn7O4z
+         9smLMcPHg1JtPUfYTzqHgsC9okA50zfkGbtY8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704491153; x=1705095953;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yEXiwrq4KNUdt55Ouq+3g5whmUfNY0DSzzUMj+HSUwY=;
+        b=LPLmGcwddrVxqOGxBJ9im2LOT+PWUWHu4WBWd0r41hVHEy/93f7+fBqhtXeeoFjXEx
+         ewzAaETO664n5YVCtz5lNfspFsyuh9lzdkPHklnPa9/JNitG1rPM6FlIX4xEe6e2KN1E
+         KLMOt4IOSTi+YGYtYfxeT2McB8k9HfUqFHqckEgcy81KQapQYgRihf0W5lITDH+KqTsT
+         5lBOJk5AbHi9/OZLmdigyfCsoTZ4DPqcqtlZLMq8s7H3IKRF1rUTIbSA0ZE5ghY4ZwXo
+         IgF6iOUyQSXi8N08rTImOzudyh+T3kdG8Syzy93+6a14HJ44JU0A0m+p6fCVX29ekMYS
+         3/8g==
+X-Gm-Message-State: AOJu0YxYqVoJoc63CokdFZLiSWrSHmtrRVfMIxjEb9uU2hbi07sTyOHN
+	sBIxcUje5NR7ccjfhcGglruYvk4Fp+Zun9LBzYEaja4ys5c9TpxO
+X-Google-Smtp-Source: AGHT+IErZKt0CSYk59mX1z4t7JCm+BFpTQZ9mWXBad3KiL9zjJwVzWpK2F0F9dfxJjPswGwxZOW+ZQ==
+X-Received: by 2002:a17:906:e43:b0:a26:8c27:a6c6 with SMTP id q3-20020a1709060e4300b00a268c27a6c6mr10309eji.111.1704491152705;
+        Fri, 05 Jan 2024 13:45:52 -0800 (PST)
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com. [209.85.221.48])
+        by smtp.gmail.com with ESMTPSA id a5-20020a1709063a4500b00a28d309b063sm1275739ejf.220.2024.01.05.13.45.51
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jan 2024 13:45:51 -0800 (PST)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3368b9bbeb4so24686f8f.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 13:45:51 -0800 (PST)
+X-Received: by 2002:a7b:c34d:0:b0:40d:4de8:222c with SMTP id
+ l13-20020a7bc34d000000b0040d4de8222cmr35659wmj.252.1704491151463; Fri, 05 Jan
+ 2024 13:45:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240105065423.714-1-naveenm@marvell.com>
+References: <20240103222034.2582628-1-andrii@kernel.org> <20240103222034.2582628-4-andrii@kernel.org>
+In-Reply-To: <20240103222034.2582628-4-andrii@kernel.org>
+From: Linus Torvalds <torvalds@linuxfoundation.org>
+Date: Fri, 5 Jan 2024 13:45:34 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wgmjr4nhxGheec1OwuYRk02d0+quUAViVk1v+w=Kvg15w@mail.gmail.com>
+Message-ID: <CAHk-=wgmjr4nhxGheec1OwuYRk02d0+quUAViVk1v+w=Kvg15w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
+To: Andrii Nakryiko <andrii@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com, 
+	brauner@kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 05, 2024 at 12:24:23PM +0530, Naveen Mamindlapalli wrote:
-> From: Nithin Dabilpuram <ndabilpuram@marvell.com>
-> 
-> RPM0 and RPM1 on the CN10KB SoC have 8 LMACs each, whereas RPM2
-> has only 4 LMACs. Similarly, the RPM0 and RPM1 have 256KB FIFO,
-> whereas RPM2 has 128KB FIFO. This patch fixes an issue with
-> improper TX credit programming for the RPM2 link.
-> 
-> Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
-> Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
+Ok, I've gone through the whole series now, and I don't find anything
+objectionable.
 
-If this is a fix for a user-visible bug then it should
-have a Fixes tag. Else it should be targeted at net-next.
+Which may only mean that I didn't notice something, of course, but at
+least there's nothing I'd consider obvious.
 
-Also, as a potential follow-up, it looks like this
-file (driver?) could benefit from use of GETMASK/FIELD_GET/FIELD_PREP.
-But, IMHO, there is no need to do that for this change
-which is in a style consistent with the rest of the file.
+I keep coming back to this 03/29 patch, because it's kind of the heart
+of it, and I have one more small nit, but it's also purely stylistic:
 
-> ---
->  drivers/net/ethernet/marvell/octeontx2/af/rpm.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-> index 4728ba34b0e3..76218f1cb459 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-> @@ -506,6 +506,7 @@ u32 rpm2_get_lmac_fifo_len(void *rpmd, int lmac_id)
->  	rpm_t *rpm = rpmd;
->  	u8 num_lmacs;
->  	u32 fifo_len;
-> +	u16 max_lmac;
->  
->  	lmac_info = rpm_read(rpm, 0, RPM2_CMRX_RX_LMACS);
->  	/* LMACs are divided into two groups and each group
-> @@ -513,7 +514,11 @@ u32 rpm2_get_lmac_fifo_len(void *rpmd, int lmac_id)
->  	 * Group0 lmac_id range {0..3}
->  	 * Group1 lmac_id range {4..7}
->  	 */
-> -	fifo_len = rpm->mac_ops->fifo_len / 2;
-> +	max_lmac = (rpm_read(rpm, 0, CGX_CONST) >> 24) & 0xFF;
-> +	if (max_lmac > 4)
-> +		fifo_len = rpm->mac_ops->fifo_len / 2;
-> +	else
-> +		fifo_len = rpm->mac_ops->fifo_len;
->  
->  	if (lmac_id < 4) {
->  		num_lmacs = hweight8(lmac_info & 0xF);
-> -- 
-> 2.39.0.198.ga38d39a4c5
-> 
+On Wed, 3 Jan 2024 at 14:21, Andrii Nakryiko <andrii@kernel.org> wrote:
+>
+> +bool bpf_token_capable(const struct bpf_token *token, int cap)
+> +{
+> +       /* BPF token allows ns_capable() level of capabilities, but only if
+> +        * token's userns is *exactly* the same as current user's userns
+> +        */
+> +       if (token && current_user_ns() == token->userns) {
+> +               if (ns_capable(token->userns, cap))
+> +                       return true;
+> +               if (cap != CAP_SYS_ADMIN && ns_capable(token->userns, CAP_SYS_ADMIN))
+> +                       return true;
+> +       }
+> +       /* otherwise fallback to capable() checks */
+> +       return capable(cap) || (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
+> +}
+
+This *feels* like it should be written as
+
+    bool bpf_token_capable(const struct bpf_token *token, int cap)
+    {
+        struct user_namespace *ns = &init_ns;
+
+        /* BPF token allows ns_capable() level of capabilities, but only if
+         * token's userns is *exactly* the same as current user's userns
+         */
+        if (token && current_user_ns() == token->userns)
+                ns = token->userns;
+        return ns_capable(ns, cap) ||
+                (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
+    }
+
+And yes, I realize that the function will end up later growing a
+
+        security_bpf_token_capable(token, cap)
+
+test inside that 'if (token ..)' statement, and this would change the
+order of that test so that the LSM hook would now be done before the
+capability checks are done, but that all still seems just more of an
+argument for the simplification.
+
+So the end result would be something like
+
+    bool bpf_token_capable(const struct bpf_token *token, int cap)
+    {
+        struct user_namespace *ns = &init_ns;
+
+        if (token && current_user_ns() == token->userns) {
+                if (security_bpf_token_capable(token, cap) < 0)
+                        return false;
+                ns = token->userns;
+        }
+        return ns_capable(ns, cap) ||
+                (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
+    }
+
+although I feel that with that LSM hook, maybe this all should return
+the error code (zero or negative), not a bool for success?
+
+Also, should "current_user_ns() != token->userns" perhaps be an error
+condition, rather than a "fall back to init_ns" condition?
+
+Again, none of this is a big deal. I do think you're dropping the LSM
+error code on the floor, and are duplicating the "ns_capable()" vs
+"capable()" logic as-is, but none of this is a deal breaker, just more
+of my commentary on the patch and about the logic here.
+
+And yeah, I don't exactly love how you say "ok, if there's a token and
+it doesn't match, I'll not use it" rather than "if the token namespace
+doesn't match, it's an error", but maybe there's some usability issue
+here?
+
+              Linus
 
