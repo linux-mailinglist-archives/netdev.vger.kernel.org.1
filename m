@@ -1,208 +1,116 @@
-Return-Path: <netdev+bounces-61874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-61876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C71D825259
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:48:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A34DD82525C
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 11:49:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FB071C22E00
-	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:48:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44F451F25742
+	for <lists+netdev@lfdr.de>; Fri,  5 Jan 2024 10:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9FF24B5D;
-	Fri,  5 Jan 2024 10:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06BA286B5;
+	Fri,  5 Jan 2024 10:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4j7dmrj9"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Yw7yCwmQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429E5250ED
-	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 10:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso9937a12.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 02:48:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24E6250F4
+	for <netdev@vger.kernel.org>; Fri,  5 Jan 2024 10:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33723ad790cso1132775f8f.1
+        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 02:49:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704451713; x=1705056513; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2oA+DfvkF/6fqh1TmhIwoR/ZJIBR+b0c6R1YFEKfiMo=;
-        b=4j7dmrj9JPHMWgyvxsbkaV1dTFSw0iO6QZL6hP/hgVOvqPaveF3PANId4ep2dad4cY
-         M4fISu7c58BFe9gmDJ61UrrYAxKCUk5wSLSXBTUu+ITw1Zy05QZCG/k3S7SytxPwm8yY
-         /+jQqE2ibWQHUlHk1hKX8fQoYP2xgEvq/UCJRBkk6chEInMMARwBy3bgfflIhoi9FMMG
-         gfQEvaxE241W1aHWmLuwVB91AEeSP138I5TnqJtHzg3n4i6Fqg3+0TlEDPhXBvy2cum+
-         XL+X/NFGLcPcidwuGkw5SLENpm69NOZ4AXR5U/1QBRWmZUlB1Ikh0rrfyeomF5cow+sG
-         CEMw==
+        d=6wind.com; s=google; t=1704451741; x=1705056541; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tlC4ZuUnj+RdifBxtkmCVpfFmYxPbtB+oy++4rULk2s=;
+        b=Yw7yCwmQbGLF7FLhimgyS09q27nvjhzN/EBIKgdL2PTxgsYisO7S0F0cKgXCZfrGpK
+         IdoKhW7r4g5ZKYCPaWioF9f5QiplquoleRo8QApsEpo3KQnGc3faNXwdwP5/tsJgGYbN
+         hzDQl33rp8Sj3hLlElLuaOAmFWgBXxUcqGRf13BkUB3uyQ97G3xGQG8T4htW37XFA0bU
+         4jLq/x2meRueLqxMgdEqsGYOVXHC6MWnpg+1KdSCCLujt6DuYAg+JLVCLroGayfzaiLX
+         5oGbSRCQKRZ+XyH6MDJ/vUpAATSnA74uZW14aHeZhCLbeXVc59mKwETpzQCi8yDakIJz
+         oZ/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704451713; x=1705056513;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2oA+DfvkF/6fqh1TmhIwoR/ZJIBR+b0c6R1YFEKfiMo=;
-        b=ADwmrUpS0fTv2yd++KlqCMRJTyrKAZZU7emCXmllUbQ7z5Mt/LMEuY7dPzzElWpT8H
-         qyqN3NrF8hHFkbib49wNHhQe6d3GaKNZMDEE6ATh/Mr9+r5wpsvbt6QBg4Fo0vnSpUC+
-         RwzaiEvTxmQbj/IrsSEczQpD7ZGFdYld8rPm4Nibyf1CusRXUT2btSPPbd2hh88kYBcp
-         pdLtr6h+cWyP5eEpyI9JPoQGbSCBQ9sHMfKGOJaiiNroaW/emQ1vHD5Ammo7PgItgJga
-         ya36OaQ4hHSRSyakMigZj38JyOBxXsYSSUyJ54IcRMc6lsqNvu7+k6iukFbZ+SYaXoHs
-         53bA==
-X-Gm-Message-State: AOJu0YxtxJt6jw7UjwHpTO3igfqsEOYA8lwBT4rBEbGqM/2wX6Zf8hYC
-	yANbl78k61Yvyx5jg0tzbTlAmEr1CGCJBvv3CzUU9zCEA1Oq
-X-Google-Smtp-Source: AGHT+IFv0vnQPWdLPrQsYnDtRDca919RUkeRsM5oeQs2Ots7c0R+6Lp39rU3ebTS/BDKx4md8p4+GBkyTzo7A8Jpejw=
-X-Received: by 2002:a50:c05b:0:b0:554:98aa:f75c with SMTP id
- u27-20020a50c05b000000b0055498aaf75cmr101190edd.5.1704451713227; Fri, 05 Jan
- 2024 02:48:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704451741; x=1705056541;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tlC4ZuUnj+RdifBxtkmCVpfFmYxPbtB+oy++4rULk2s=;
+        b=S6vC0/c5bojF/ArxK2KBk+7/Z4MLxXESrcmXNmuPnvNIrLDjCZD7nNeeRxDiEj3sLv
+         /9m1itQH6gyILOhLCn2L9NaK13j6uhQZ0mxn+p1nYY329YoSoKP0WHo5Gmg3HV+n7X8v
+         DvcnVwOB9Os1WP6IbYzBznRrxn34nkiXazTZzBmIc5tFZw6iEbV+suTNhK1N2LIYbNDL
+         DvcJnBmyLsO6kJT+1tNF+p5aMsrV8Vmj1V3KZnPN7uvcEGkww5boitDFst6X3vEjogXU
+         pUbUKziRTyPdPst0RoX0qIsuPy5xIWbcuetLMpJgT/8GnJxlcmz5BlNxIp3/mNgCsJ94
+         CS2A==
+X-Gm-Message-State: AOJu0YwUiAwNiL1q1nMG6NKO7U8aKMqnDanx9L5I9EFXcYuCsK0SAHZ3
+	xxiDnhstPp3d21ScMoNh/OcvivdxlOdGQw==
+X-Google-Smtp-Source: AGHT+IGnMyI2CaJ1DdQhO2eUFu5ouUQNg8qA3YFljmscugwWggiF/uPVuxsRPFPvqce6KDDYnpofEQ==
+X-Received: by 2002:adf:a48d:0:b0:336:64c0:a1fa with SMTP id g13-20020adfa48d000000b0033664c0a1famr787866wrb.78.1704451740889;
+        Fri, 05 Jan 2024 02:49:00 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:144d:d8d:d728:b78b? ([2a01:e0a:b41:c160:144d:d8d:d728:b78b])
+        by smtp.gmail.com with ESMTPSA id r16-20020a056000015000b003373ef060d5sm1142061wrx.113.2024.01.05.02.48.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jan 2024 02:49:00 -0800 (PST)
+Message-ID: <7fe06d6c-0e4a-41e3-a111-71084972d023@6wind.com>
+Date: Fri, 5 Jan 2024 11:48:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240105091556.15516-1-petr@tesarici.cz> <CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
- <20240105113402.0f5f1232@meshulam.tesarici.cz>
-In-Reply-To: <20240105113402.0f5f1232@meshulam.tesarici.cz>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 5 Jan 2024 11:48:19 +0100
-Message-ID: <CANn89iLEvW9ZS=+WPETPC=mKRyu9AKmueGCWZZOrz9oX3Xef=g@mail.gmail.com>
-Subject: Re: [PATCH] net: stmmac: protect statistics updates with a spinlock
-To: =?UTF-8?B?UGV0ciBUZXNhxZnDrWs=?= <petr@tesarici.cz>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net v3 2/2] selftests: rtnetlink: check enslaving iface in
+ a bond
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+References: <20240104164300.3870209-1-nicolas.dichtel@6wind.com>
+ <20240104164300.3870209-3-nicolas.dichtel@6wind.com>
+ <ZZdow05irUiN1c8x@Laptop-X1>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <ZZdow05irUiN1c8x@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 5, 2024 at 11:34=E2=80=AFAM Petr Tesa=C5=99=C3=ADk <petr@tesari=
-ci.cz> wrote:
->
-> On Fri, 5 Jan 2024 10:58:42 +0100
-> Eric Dumazet <edumazet@google.com> wrote:
->
-> > On Fri, Jan 5, 2024 at 10:16=E2=80=AFAM Petr Tesarik <petr@tesarici.cz>=
- wrote:
-> > >
-> > > Add a spinlock to fix race conditions while updating Tx/Rx statistics=
-.
-> > >
-> > > As explained by a comment in <linux/u64_stats_sync.h>, write side of =
-struct
-> > > u64_stats_sync must ensure mutual exclusion, or one seqcount update c=
-ould
-> > > be lost on 32-bit platforms, thus blocking readers forever.
-> > >
-> > > Such lockups have been actually observed on 32-bit Arm after stmmac_x=
-mit()
-> > > on one core raced with stmmac_napi_poll_tx() on another core.
-> > >
-> > > Signed-off-by: Petr Tesarik <petr@tesarici.cz>
-> >
-> > This is going to add more costs to 64bit platforms ?
->
-> Yes, it adds a (hopefully not too contended) spinlock and in most
-> places an interrupt disable/enable pair.
->
-> FWIW the race condition is also present on 64-bit platforms, resulting
-> in inaccurate statistic counters. I can understand if you consider it a
-> mild annoyance, not worth fixing.
->
-> > It seems to me that the same syncp can be used from two different
-> > threads : hard irq and napi poller...
->
-> Yes, that's exactly the scenario that locks up my system.
->
-> > At this point, I do not see why you keep linux/u64_stats_sync.h if you
-> > decide to go for a spinlock...
->
-> The spinlock does not havce to be taken on the reader side, so the
-> seqcounter still adds some value.
->
-> > Alternative would use atomic64_t fields for the ones where there is no
-> > mutual exclusion.
-> >
-> > RX : napi poll is definitely safe (protected by an atomic bit)
-> > TX : each TX queue is also safe (protected by an atomic exclusion for
-> > non LLTX drivers)
-> >
-> > This leaves the fields updated from hardware interrupt context ?
->
-> I'm afraid I don't have enough network-stack-foo to follow here.
->
-> My issue on 32 bit is that stmmac_xmit() may be called directly from
-> process context while another core runs the TX napi on the same channel
-> (in interrupt context). I didn't observe any race on the RX path, but I
-> believe it's possible with NAPI busy polling.
->
-> In any case, I don't see the connection with LLTX. Maybe you want to
-> say that the TX queue is safe for stmmac (because it is a non-LLTX
-> driver), but might not be safe for LLTX drivers?
+Le 05/01/2024 à 03:26, Hangbin Liu a écrit :
+> On Thu, Jan 04, 2024 at 05:43:00PM +0100, Nicolas Dichtel wrote:
+>> +kci_test_enslave_bonding()
+>> +{
+>> +	local testns="testns"
+>> +	local bond="bond123"
+>> +	local dummy="dummy123"
+>> +	local ret=0
+>> +
+>> +	run_cmd ip netns add "$testns"
+>> +	if [ $? -ne 0 ]; then
+>> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
+>> +		return $ksft_skip
+>> +	fi
+>> +
+>> +	# test native tunnel
+>> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
+> 
+> Hi Nicolas,
+> 
+> If you are going to target the patch to net-next. Please update it in the
+> subject. And use `setup_ns` when create new netns.
+As said in the v2 thread, I will send a follow-up once net gets merged into
+net-next.
 
-LLTX drivers (mostly virtual drivers like tunnels...) can have multiple cpu=
-s
-running ndo_start_xmit() concurrently. So any use of a 'shared syncp'
-would be a bug.
-These drivers usually use per-cpu stats, to avoid races and false
-sharing anyway.
 
-I think you should split the structures into two separate groups, each
-guarded with its own syncp.
-
-No extra spinlocks, no extra costs on 64bit arches...
-
-If TX completion can run in parallel with ndo_start_xmit(), then
-clearly we have to split stmmac_txq_stats in two halves:
-
-Also please note the conversion from u64 to u64_stats_t
-
-Very partial patch, only to show the split and new structure :
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h
-b/drivers/net/ethernet/stmicro/stmmac/common.h
-index e3f650e88f82f927f0dcf95748fbd10c14c30cbe..702bceea5dc8c875a80f5e3a92b=
-7bb058f373eda
-100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -60,16 +60,22 @@
- /* #define FRAME_FILTER_DEBUG */
-
- struct stmmac_txq_stats {
--       u64 tx_bytes;
--       u64 tx_packets;
--       u64 tx_pkt_n;
--       u64 tx_normal_irq_n;
--       u64 napi_poll;
--       u64 tx_clean;
--       u64 tx_set_ic_bit;
--       u64 tx_tso_frames;
--       u64 tx_tso_nfrags;
--       struct u64_stats_sync syncp;
-+/* First part, updated from ndo_start_xmit(), protected by tx queue lock *=
-/
-+       struct u64_stats_sync syncp_tx;
-+       u64_stats_t tx_bytes;
-+       u64_stats_t tx_packets;
-+       u64_stats_t tx_pkt_n;
-+       u64_stats_t tx_tso_frames;
-+       u64_stats_t tx_tso_nfrags;
-+
-+/* Second part, updated from TX completion (protected by NAPI poll logic) =
-*/
-+       struct u64_stats_sync syncp_tx_completion;
-+       u64_stats_t napi_poll;
-+       u64_stats_t tx_clean;
-+       u64_stats_t tx_set_ic_bit;
-+
-+/* Following feld is updated from hard irq context... */
-+       atomic64_t tx_normal_irq_n;
- } ____cacheline_aligned_in_smp;
-
- struct stmmac_rxq_stats {
+Regards,
+Nicolas
 
