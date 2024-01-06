@@ -1,125 +1,111 @@
-Return-Path: <netdev+bounces-62166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5601A826010
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 16:20:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2FE4826014
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 16:21:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7B90284856
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 15:20:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F1FB1F22C14
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 15:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8FC8474;
-	Sat,  6 Jan 2024 15:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E2679E2;
+	Sat,  6 Jan 2024 15:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XJ6+nsSs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bpGqXV5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B42879EC;
-	Sat,  6 Jan 2024 15:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704554421; x=1736090421;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JaXjLa9V7CSKfBnBChZbrxw0v/a5OfTir5VslolG6pc=;
-  b=XJ6+nsSst4aNoYFRh3GmLOEg1iQk8/K16R50ST2Q/EyfS70yQro5H3po
-   +HBU4OjAuNyVPCzHHwFUvSg5RChOOn4vu25kFvk0esS4rqZedVojqMb8c
-   8hk98pqyyykLQ3o00Y3MEoZPbqT2d4SepNH1F5KGyRCvJKPr10eizH9Pr
-   Tn4t5UJ0z7HyeAfaCc3yQ0uI09LW2w/wV5gN5ENjTacAzudpWY82F4/+/
-   Fbo0oG99z21g7HvgBaqcmXvvxMoo3Xt1/fPoIFoS4ApJaaRmN0PEfXw10
-   sTwhzPNEfbFczdqAI6E/DQv72ANAPDBWogqSjPaBjFa0ugtjkn0bUpZhW
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10945"; a="464064405"
-X-IronPort-AV: E=Sophos;i="6.04,337,1695711600"; 
-   d="scan'208";a="464064405"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2024 07:20:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10945"; a="784455554"
-X-IronPort-AV: E=Sophos;i="6.04,337,1695711600"; 
-   d="scan'208";a="784455554"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2024 07:20:14 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rM8T4-0000000BwIF-3F4d;
-	Sat, 06 Jan 2024 17:20:10 +0200
-Date: Sat, 6 Jan 2024 17:20:10 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: lakshmi.sowjanya.d@intel.com
-Cc: tglx@linutronix.de, jstultz@google.com, giometti@enneenne.com,
-	corbet@lwn.net, linux-kernel@vger.kernel.org, x86@kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, eddie.dong@intel.com,
-	christopher.s.hall@intel.com, jesse.brandeburg@intel.com,
-	davem@davemloft.net, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com, perex@perex.cz,
-	linux-sound@vger.kernel.org, anthony.l.nguyen@intel.com,
-	pandith.n@intel.com, mallikarjunappa.sangannavar@intel.com,
-	thejesh.reddy.t.r@intel.com
-Subject: Re: [RFC PATCH v3 00/11] Add support for Intel PPS Generator
-Message-ID: <ZZlvqvYQQuse_P4E@smile.fi.intel.com>
-References: <20240103115602.19044-1-lakshmi.sowjanya.d@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E2479F5
+	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 15:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=O4Bp0dH9mNdHjvVwzFyt+ii47ST6ea16hbZN6epGVjs=; b=bp
+	GqXV5DaEuySFB9Avz3UHEawW5WHAhiF7J78VK0XHqV9yyJhOr5FHY7Rb3L7IqBa37rTNJwEXx8XSf
+	7isbP2ymeJe5sINYsb4GLODbjUceaaMtIUyRUFGnEPVZ1KJmQnpAOy+PS2fd8SrZGSDxs/jcpqaOB
+	G0GPNlgQqehHeeg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rM8TO-004Wlq-9u; Sat, 06 Jan 2024 16:20:30 +0100
+Date: Sat, 6 Jan 2024 16:20:30 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ezra Buehler <ezra@easyb.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Tristram Ha <Tristram.Ha@microchip.com>,
+	Michael Walle <michael@walle.cc>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
+Message-ID: <d6deee54-e5c3-4bdd-8a87-f1afeada8d9b@lunn.ch>
+References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
+ <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com>
+ <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
+ <8eb06ee9-d02d-4113-ba1e-e8ee99acc2fd@gmail.com>
+ <2013fa64-06a1-4b61-90dc-c5bd68d8efed@lunn.ch>
+ <CAM1KZSn0+k4YKc2qy6DEafkL840ybjaun7FbD4OFwOwNZw_LEg@mail.gmail.com>
+ <ZZRct1o21NIKbYX1@shell.armlinux.org.uk>
+ <CAM1KZS=2Drnhx8SKcAbRniGhvy0d85FfKHOgK7MZxNWM7EAEmQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240103115602.19044-1-lakshmi.sowjanya.d@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM1KZS=2Drnhx8SKcAbRniGhvy0d85FfKHOgK7MZxNWM7EAEmQ@mail.gmail.com>
 
-On Wed, Jan 03, 2024 at 05:25:51PM +0530, lakshmi.sowjanya.d@intel.com wrote:
-> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+On Sat, Jan 06, 2024 at 01:41:01PM +0100, Ezra Buehler wrote:
+> On Tue, Jan 2, 2024 at 7:58 PM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> >
+> > Any ideas why the scan is taking so long?
+> >
+> > For each PHY address (of which there are 32) we scan each MMD between
+> > 1 and 31 inclusive. We attempt to read the devices-in-package
+> > registers. That means 32 * 32 * 2 calls to the mdiobus_c45_read(),
+> > which is 2048 calls. Each is two MDIO transactions on the bus, so
+> > that's 4096. Each is 64 bits long including preamble, and at 2.5MHz
+> > (the "old" maximum) it should take about 100ms to scan the each
+> > MMD on each PHY address to determine whether a device is present.
+> >
+> > I'm guessing the MDIO driver you are using is probably using a software
+> > timeout which is extending the latency of each bus frame considerably.
+> > Maybe that is where one should be looking if the timing is not
+> > acceptable?
 > 
-> The goal of the PPS(Pulse Per Second) hardware/software is to generate a
-> signal from the system on a wire so that some third-party hardware can
-> observe that signal and judge how close the system's time is to another
-> system or piece of hardware.
+> When profiling with ftrace, I see that executing macb_mdio_read_c45()
+> takes about 20ms. The function calls  macb_mdio_wait_for_idle() 3 times,
+> where the latter 2 invocations take about 10ms each. The
+> macb_mdio_wait_for_idle() function invokes the read_poll_timeout() macro
+> with a timeout of 1 second, which we obviously do not hit.
 > 
-> Existing methods (like parallel ports) require software to flip a bit at
-> just the right time to create a PPS signal. Many things can prevent
-> software from doing this precisely. This (Timed I/O) method is better
-> because software only "arms" the hardware in advance and then depends on
-> the hardware to "fire" and flip the signal at just the right time.
+> To me it looks like we are simply waiting for the hardware to perform
+> the transaction, i.e. write out the address and read the register (which
+> is read as 0xFFFF).
 > 
-> To generate a PPS signal with this new hardware, the kernel wakes up
-> twice a second, once for 1->0 edge and other for the 0->1 edge. It does
-> this shortly (~10ms) before the actual change in the signal needs to be
-> made. It computes the TSC value at which edge will happen, convert to a
-> value hardware understands and program this value to Timed I/O hardware.
-> The actual edge transition happens without any further action from the
-> kernel.
+> I've checked the MDIO clock, it is at 2MHz.
 > 
-> The result here is a signal coming out of the system that is roughly
-> 1,000 times more accurate than the old methods. If the system is heavily
-> loaded, the difference in accuracy is larger in old methods.
-> Facebook and Google are the customers that use this feature.
-> 
-> Application Interface:
-> The API to use Timed I/O is very simple. It is enabled and disabled by
-> writing a '1' or '0' value to the sysfs enable attribute associated with
-> the Timed I/O PPS device. Each Timed I/O pin is represented by a PPS
-> device. When enabled, a pulse-per-second(PPS) synchronized with the
-> system clock is continuously produced on the Timed I/O pin, otherwise it
-> is pulled low.
-> 
-> The Timed I/O signal on the motherboard is enabled in the BIOS setup.
+> So, any suggestions for what to look into next?
 
-At some point you should announce v1 of the series. RFC is usually being
-neglected by many (busy) maintainers.
+Does a C22 read/write call to macb_mdio_wait_for_idle() take as long?
 
--- 
-With Best Regards,
-Andy Shevchenko
+Could you hack a copy of readx_poll_timeout() and real_poll_timeout()
+into the driver, and extend it to count how many times it goes around
+the loop. Is the usleep_range() actually sleeping for 10ms because you
+don't have any high resolution clocks, and a 100Hz tick? If so, you
+might want to swap to 1000Hz tick, or NO_HZ, or enable a high
+resolution clock, so that usleep_range() can actually sleep for short
+times.
 
-
+	   Andrew
 
