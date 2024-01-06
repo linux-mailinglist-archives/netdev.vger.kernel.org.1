@@ -1,110 +1,103 @@
-Return-Path: <netdev+bounces-62192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E2FD82618C
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 22:02:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A81978261A6
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 22:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA6E1F21AB1
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 21:02:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45F3F1F21B9C
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 21:14:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6BBF4F0;
-	Sat,  6 Jan 2024 21:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173E0F508;
+	Sat,  6 Jan 2024 21:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="dIOLKMKo";
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="Jx1YnUfq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A7o5UU9G"
 X-Original-To: netdev@vger.kernel.org
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6818B101C0;
-	Sat,  6 Jan 2024 21:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alu.unizg.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alu.unizg.hr
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 4A2186017E;
-	Sat,  6 Jan 2024 22:02:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1704574959; bh=BxsZaTTHmQjXlXIaqqVDt2FbBWu5XHnBXUrmPbzAXXo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dIOLKMKonxQR+xdhK+tw8jExuVGCFyDRaRxlliUo9PPGfucFS+k7XW51tWb1QPv8L
-	 jONHZMr6oR1vZLyZwT/EBhr3uKLs88/dcOEwIUXPTSUx/rrMnKgyNJuweXCLJCdGYB
-	 L419HTGmnl2GBusDtjuotP9vUKCVzh8ZQOhegrZXpcNqw9mIU9IujBT9dBazKjj870
-	 Gomb37NmV213J9ZD61Z3RaN2PB49o+X1Y0TlpnCZG/2QI0alH9ya4es1h1Tnbon7zR
-	 idpD7A9QNJN4CJsVhWZ1qy5MfYLNYrQDIgB4aTPSposq2l7e0vwBah/riTQjMUCspk
-	 r/4ZbxSrk/orw==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Kt8goUn3UaCk; Sat,  6 Jan 2024 22:02:37 +0100 (CET)
-Received: from [192.168.92.51] (unknown [95.168.116.36])
-	by domac.alu.hr (Postfix) with ESMTPSA id EFF5A60171;
-	Sat,  6 Jan 2024 22:02:35 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1704574957; bh=BxsZaTTHmQjXlXIaqqVDt2FbBWu5XHnBXUrmPbzAXXo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Jx1YnUfqNzudmwmsJEs5asKbHizYvo4REnMQCZD16CZEUsyPpMgwXkjyHebyMNCko
-	 bVa5aetB28wMyUTLK21O4JhBGiZtXfOrT2vNB51TCdBCEZddpY3EKRdMTlyEbVyvou
-	 n/fZGVNYG1CfMFcyTVeeiCNaJrwXtNlcwRkfFz79CHSOIQ2hC+UwyKPfqFJ3SfnULJ
-	 RmPNEqyr6Sf8wUruyoQNepiBj5HQ7Hit5REyQB4DW//PImVawJ6Ig2ltcPcaZx3Zi7
-	 IX5sX6AbBw8jnPYK2+9I7q4M+Nl3Bf6AB29tPS8FpZ19sB00edADNgreMurUXcZJ63
-	 9i1lWweHRXm2w==
-Message-ID: <5f46cd87-ecad-4cad-bb03-b5bf22dff3b7@alu.unizg.hr>
-Date: Sat, 6 Jan 2024 22:02:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88904F9C2
+	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 21:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-50e7b273352so596900e87.1
+        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 13:14:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704575670; x=1705180470; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2uS87PAYvqfHPa3qIs13iQYjQv0tlskx3fHvEmWKBCE=;
+        b=A7o5UU9Gvz3CdbVat2u1uAYwPv2GgglEwl7Zh9Z6OQR05JTijRELzDnjFb+8hTb+rd
+         rQo88fZ8asVCzilP7CPsGg/jYgIYW0HySDlUdaA8K7+6/PrXuZb2uvvTZD2ZP4BEQM5T
+         0u7Z4DjWaMf9fqcazBZVzBUclAfsduUritW06tzz4bpuj3GuoAJ/MMMQ6+qcMlx+vadA
+         WfM65e0f58Q/FIp0kmPsWMR/NY/rRUZkxCI8o8KaLvPpBtNTanA5g6CZjPphYtU+aDKk
+         jbzXURLautmizR/vlZ4BzwG982O1yUIXBHyY+vC1FvVSVHej2SFXmfP3LzE9cdYzBXtD
+         hCjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704575670; x=1705180470;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2uS87PAYvqfHPa3qIs13iQYjQv0tlskx3fHvEmWKBCE=;
+        b=uBaXakNUS97EIhv0VsNDoHGB2UFsVgzVSm9Ix5+pFMKz7Fwyq/Olfjppt9IFWhIEzi
+         E8peSP9nc42SkiHb7Nqu016xvsi3ns2gTL7r84gnlqUtOnD/gmBBD9QVBSya+VzGco+a
+         lH9slJaUs12eD9zIEvuVSCb+OTtbxNr55RF1GC5QIQMafUEGevqyTVIkkPIk02g5+caa
+         oXFvPl3xoXGCUglU8yLXRkOeQMrnR+3QTE58U2mII6Y0vDJCzXBoqhuScIzJ4YO8pqY+
+         KVCf5Gr1r1v5RMo54rNFnLGl+5wET9ryZVRWQccvgyd6R7xDDekvhCUvKoa+12jx0hBg
+         9TaQ==
+X-Gm-Message-State: AOJu0YwJrjI1ANgH/oteSm95EgReOq0U/N42STW0KBtbtnEE363TCUPY
+	cMabimQbHxa+MKea0Krt30gOvpxJBwIo/A==
+X-Google-Smtp-Source: AGHT+IGoS1PGfXuvLL5f5DdPC9zPgoZAVD3h1BCXDEHWJi2TGwWYvnmXpkaFt9hbOxPa9emgdLgHRg==
+X-Received: by 2002:a05:6512:110c:b0:50e:8119:fb60 with SMTP id l12-20020a056512110c00b0050e8119fb60mr518051lfg.13.1704575669974;
+        Sat, 06 Jan 2024 13:14:29 -0800 (PST)
+Received: from localhost.localdomain (89-109-48-156.dynamic.mts-nn.ru. [89.109.48.156])
+        by smtp.gmail.com with ESMTPSA id q27-20020ac246fb000000b0050e7e5301e1sm628148lfo.183.2024.01.06.13.14.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jan 2024 13:14:29 -0800 (PST)
+From: Maks Mishin <maks.mishinfz@gmail.com>
+X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] maketable: Add check for ZERO for variable sigma2
+Date: Sun,  7 Jan 2024 00:14:22 +0300
+Message-Id: <20240106211422.33967-1-maks.mishinFZ@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: selftest: net: fcnal-test.sh TIMEOUT
-Content-Language: en-US, hr
-To: David Ahern <dsahern@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <0b9a2827-c9c5-41d6-a4f1-dbd91262c474@alu.unizg.hr>
- <e0a52f62-3ea8-48c4-a5c4-307f7642cd45@kernel.org>
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <e0a52f62-3ea8-48c4-a5c4-307f7642cd45@kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 06. 01. 2024. 17:16, David Ahern wrote:
-> On 1/5/24 2:41 AM, Mirsad Todorovac wrote:
->> diff --git a/tools/testing/selftests/net/settings
->> b/tools/testing/selftests/net/settings index dfc27cdc6c05..ed8418e8217a
->> 100644 --- a/tools/testing/selftests/net/settings +++
->> b/tools/testing/selftests/net/settings @@ -1 +1 @@ -timeout=1500
->> +timeout=3600
-> 
-> bumping the timeout is fine to me. that script is running a lot of
-> permutations.
+If variable `limit` == 1, then `n` == 1 and then second for-loop will
+not do because of variable `sigma2` maybe ZERO.
+Added check for ZERO for `sigma2` before it is used as denominator.
 
-Well, aren't bugs best discovered if all cases or permutations are tested?
+Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+---
+ netem/maketable.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-I recall some cases with Giullaume and Ido fixing them the last Summer or so.
-
-Thanks.
-
-Regards,
-Mirsad
-
--- 
-Mirsad Goran Todorovac
-Sistem inženjer
-Grafički fakultet | Akademija likovnih umjetnosti
-Sveučilište u Zagrebu
+diff --git a/netem/maketable.c b/netem/maketable.c
+index ad8620a4..56b1d0bb 100644
+--- a/netem/maketable.c
++++ b/netem/maketable.c
+@@ -68,6 +68,10 @@ arraystats(double *x, int limit, double *mu, double *sigma, double *rho)
+ 		sigma2 += ((double)x[i-1] - *mu)*((double)x[i-1] - *mu);
  
-System engineer
-Faculty of Graphic Arts | Academy of Fine Arts
-University of Zagreb, Republic of Croatia
-The European Union
-
-"I see something approaching fast ... Will it be friends with me?"
+ 	}
++	if (sigma2 == 0) {
++		perror("Division by zero in top/sigma2");
++		exit(3);
++	}
+ 	*rho = top/sigma2;
+ }
+ 
+-- 
+2.34.1
 
 
