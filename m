@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-62164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 045D8825FDF
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 15:34:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A06C826007
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 16:01:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35C17B224C1
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 14:34:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF37EB20BD7
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 15:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89F1A749D;
-	Sat,  6 Jan 2024 14:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBAA79F5;
+	Sat,  6 Jan 2024 15:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="Be2kNutc"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="pSMwvwgc"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD47B8820;
-	Sat,  6 Jan 2024 14:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBD479EC;
+	Sat,  6 Jan 2024 15:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3B016FF803;
-	Sat,  6 Jan 2024 14:33:59 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 567EF60002;
+	Sat,  6 Jan 2024 15:00:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1704551644;
+	t=1704553261;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=O9f0inLiNdvMCgAXDzTOMFJm8AwgD4xAovOKS/w8Rdk=;
-	b=Be2kNutcdju7oMbb8ncEf8YM/PrItPtdRjqrlnG7cw6TyUUav9PHvJ6jwQbyfXhTgsJO8W
-	k1LoS4yVcy+iNJ4cEeBnHsSiKt1iflrelvfXAjxc7P8q9E292mPmfUkZWlTpcohM/dgEe3
-	q6ELEjoYY4JU9TEE8gYio88A7Vq5WRmZo3vEaN69Cbhjy5jaF+dFOIK0zXsnf9EJlZL8NB
-	pQLt99kLI7XB3BYcD45A8ZtaQ9l+AnW33Ex0iqDP2kqQdTIMIsRB7WRki4bebDi4g3xK3f
-	U11zqQdYEUpWVwWKVep6KvzPtSPXtR9ivGJlF8uQj5hRCCvnSRSpeo456xLi+A==
-Message-ID: <6d6169bc-ce33-46e2-8226-0fef9f92949b@arinc9.com>
-Date: Sat, 6 Jan 2024 17:33:56 +0300
+	bh=skoV/MYNvEJ7Q4zca+8v7GcUrjuUMIoeHzDPlkaXyPY=;
+	b=pSMwvwgcVeeUxycO6OHaK+SCwICC7DmsXLDD+dHVpiqvO0ehxBcQ5/MPqdsrxBg/NXWYMM
+	LWoCT1PqXQ24WS2lXN2D5dqv2Vqjli/duePWnVZeanTB3qG0b76eiJlmonD8EHlv7rkxSJ
+	Xh7FC1AtuLcuVZBtJgSYMqofRC9mW3j09DgkAQqE9zR2KePRaDbzjry3Vda0HQw94rQSO5
+	soUQPqFEhdcHl+p2Wme3AP/3ba68cDNQHbbCAMWx1yO35E66jANw6LaREYVSA5xcIZU9rM
+	o1AtHTvKj1UeMjIKlfQRGy4cYpC/AlkfK4WYg8jDYiwdEc42jrmIs/P6U0zWGw==
+Message-ID: <f9ad000a-2e42-4ddf-89a4-9a3ff452dc4b@arinc9.com>
+Date: Sat, 6 Jan 2024 18:00:53 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,8 +45,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/7] net: dsa: mt7530: always trap frames to
- active CPU port on MT7530
+Subject: Re: [PATCH net-next v2 6/7] net: dsa: mt7530: do not set
+ priv->p5_interface on mt7530_setup_port5()
+Content-Language: en-US
 To: Vladimir Oltean <olteanv@gmail.com>
 Cc: Daniel Golle <daniel@makrotopia.org>,
  Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
@@ -63,69 +64,61 @@ Cc: Daniel Golle <daniel@makrotopia.org>,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org
 References: <20231227044347.107291-1-arinc.unal@arinc9.com>
- <20231227044347.107291-1-arinc.unal@arinc9.com>
- <20231227044347.107291-2-arinc.unal@arinc9.com>
- <20231227044347.107291-2-arinc.unal@arinc9.com>
- <20240104152232.jkoqiuwk3rd24rpm@skbuf>
-Content-Language: en-US
+ <20231227044347.107291-7-arinc.unal@arinc9.com>
+ <20240104154241.rxjins4mi5zkbhia@skbuf>
 From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20240104152232.jkoqiuwk3rd24rpm@skbuf>
+In-Reply-To: <20240104154241.rxjins4mi5zkbhia@skbuf>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: arinc.unal@arinc9.com
 
-On 4.01.2024 18:22, Vladimir Oltean wrote:
-> On Wed, Dec 27, 2023 at 07:43:41AM +0300, Arınç ÜNAL wrote:
->> @@ -3075,6 +3071,38 @@ static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
->>   	return 0;
->>   }
->>   
->> +static void
->> +mt753x_conduit_state_change(struct dsa_switch *ds,
->> +			    const struct net_device *conduit,
->> +			    bool operational)
->> +{
->> +	struct dsa_port *cpu_dp = conduit->dsa_ptr;
->> +	struct mt7530_priv *priv = ds->priv;
->> +	u8 mask;
->> +	int val = 0;
+On 4.01.2024 18:42, Vladimir Oltean wrote:
+> On Wed, Dec 27, 2023 at 07:43:46AM +0300, Arınç ÜNAL wrote:
+>> priv->p5_interface and priv->p6_interface are for use on the MT7531 switch.
+>> They prevent the CPU ports of MT7531 to be configured again. They are
+>> useless for MT7530. Therefore, remove setting priv->p5_interface for
+>> MT7530.
+>>
+>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+>> ---
 > 
-> Longest line first.
+> What makes priv->p5_interface and priv->p6_interface useless for MT7530
+> as you say? This code in mt753x_phylink_mac_config() seems executed
+> regardless of switch family:
 > 
->> +
->> +	/* Set the CPU port to trap frames to for MT7530. Trapped frames will be
->> +	 * forwarded to the numerically smallest CPU port which the DSA conduit
->> +	 * interface its affine to is up.
+> 	case 5:
+> 		if (priv->p5_interface == state->interface)
+> 			break;
 > 
-> "first CPU port whose conduit interface is up"
+> 		if (mt753x_mac_config(ds, port, mode, state) < 0)
+> 			goto unsupported;
 > 
->> +	 */
->> +	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
->> +		return;
->> +
->> +	mask = BIT(cpu_dp->index);
->> +
->> +	if (operational)
->> +		priv->active_cpu_ports |= mask;
->> +	else
->> +		priv->active_cpu_ports &= ~mask;
->> +
->> +	if (priv->active_cpu_ports)
->> +		val =
->> +		    CPU_EN |
->> +		    CPU_PORT(__ffs((unsigned long)priv->active_cpu_ports));
+> 		if (priv->p5_intf_sel != P5_DISABLED)
+> 			priv->p5_interface = state->interface;
+> 		break;
+> 	case 6:
+> 		if (priv->p6_interface == state->interface)
+> 			break;
 > 
-> I don't think the type cast is necessary (implicit type promotion takes place).
+> 		mt753x_pad_setup(ds, state);
 > 
-> Also, it is customary to put {} for multi-line "if" blocks, even if they are
-> made up of a single expression.
+> 		if (mt753x_mac_config(ds, port, mode, state) < 0)
+> 			goto unsupported;
 > 
-> But without the type cast, it could look like this.
-> 
-> 	if (priv->active_cpu_ports)
-> 		val = CPU_EN | CPU_PORT(__ffs(priv->active_cpu_ports));
+> 		priv->p6_interface = state->interface;
+> 		break;
 
-Will do. Thanks for dealing with my rookie mistakes. :)
+This is also useless for non-MT7531 switches in the sense that it
+unnecessarily prevents port 5 and 6 from being reconfigured. There's
+nothing wrong with configuring them multiple times. These are the remains
+of before phylink was implemented on this driver so the thought of changing
+phy_interface_t on the fly was non existent. At that time, it was probably
+made to apply to all switch models for convenience, as port 5 and 6 are CPU
+ports so they're highly likely to be fixed links.
+
+The reason I don't deal with this code block now is because I will get rid
+of priv->p5_interface and priv->p6_interface when I also get rid of
+priv->info->cpu_port_config() with a later patch.
 
 Arınç
 
