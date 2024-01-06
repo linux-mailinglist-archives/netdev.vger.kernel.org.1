@@ -1,183 +1,162 @@
-Return-Path: <netdev+bounces-62175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 172D48260FA
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 19:01:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B78A826108
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 19:25:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F8661C20D5E
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 18:01:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FF7E283245
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 18:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207D8C2CF;
-	Sat,  6 Jan 2024 18:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA42D51B;
+	Sat,  6 Jan 2024 18:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="IrwcmRO7"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="nSlxfYqt";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="b3+3KpJV"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C846EC8C3;
-	Sat,  6 Jan 2024 18:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 213CC40004;
-	Sat,  6 Jan 2024 18:01:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1704564092;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rFWawH0E560JxudljiU+bgsrIpK63GPFMn0rSwov+Lc=;
-	b=IrwcmRO7+If4cFKJdvrDmMOZosXpRPRKYskT0KyXZaFeGd7T8DWlFFb+B0jmTYZTPULITg
-	gJ5QfnFCjuUHOtbY4klSUqXA1iEMSE9HRKHX8MJX9epmF2L7DPTN7QqCErD7hsi1aTBBZd
-	4ZFyWjezIaYeLFF86AblzoSZUlFk9AP57ebrE7XFmgCNVZNAhPqv3o4wREhZYsEJGBh/F4
-	tlQj/U9aqQZ+lz14IHVDeMJ7Vx4QCE1XF8qnmkdoDBiuJqBIECYYXi4R+0c91PA3IfM1Lj
-	cDnb8QzRwJBDjWFS4S7PbOJ+NWvGV0aV2ZOYGGYP8wGQFRMzHqsNc/8Y3UiqQw==
-Message-ID: <2ad136ed-be3a-407f-bf3c-5faf664b927c@arinc9.com>
-Date: Sat, 6 Jan 2024 20:01:25 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FB7D517;
+	Sat,  6 Jan 2024 18:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.nyi.internal (Postfix) with ESMTP id BEEB15C01F7;
+	Sat,  6 Jan 2024 13:24:49 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Sat, 06 Jan 2024 13:24:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1704565489; x=1704651889; bh=O+QqJr2WAb6rnS5d3f3K/
+	DUa8bao3pdF0ZTmvmSXi54=; b=nSlxfYqtTJQDcbNuLTrQgszS9JWQG78owNAi+
+	zSEhkctan19C4FEG6xx31H7/uqLhr7cesA1k19u3yPWoTqEsjFQ9yXkYWzOwcrCc
+	uVFm073ba2P4po8CIj0KsQmKiUvyewqrtgGGHYuCsQh9sG9wTVHadAUo0quCq9nh
+	3wn4b3d1hbj+B/ZBZzqNQciP6TjHgoc98zJcDMj167R+hteCx5QxTdQFWmXVzzZW
+	dLZHp2yX3SB79f2KkARUikb1eP9u23YNh795fdJ0UznpK3VR5tdEnA4s15gPY+yc
+	m8kLTyYiJGEIqc1JEboSKWqEtD7xjep48oIUYT69ow17Gai6A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:date:date:feedback-id:feedback-id:from:from:in-reply-to
+	:message-id:mime-version:reply-to:subject:subject:to:to
+	:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1704565489; x=1704651889; bh=O+QqJr2WAb6rnS5d3f3K/DUa8bao
+	3pdF0ZTmvmSXi54=; b=b3+3KpJVeWQPqqPw2/XyIgSWVprhEDWFog7zIhj7juCB
+	2fghtEDXjtChsmjRYm5But8IKubV1CNa4oc4t8RnFO9oYn0LRNPBXCZSj+uBMyoS
+	hqCbZqfAaWnezgz2I9YNwPlBKGmW+OwMM5TKxf+m1k5XACoJwnYaulFkWJXWIeuC
+	G4wTyt1bBYVR3EFQPep8tJMmwO2Z8w/GPAloXq3sTltOn9ht5D9dBpVImQ3kjoaF
+	Kl0wD++fiJfxAfJraal4lPmjZxrlq5azZ6HzjJk0lPs0xKwIWbnwmcNllJA6r0i8
+	Bziwb2eIGshtU8+n9i4yL+sn1ttsvey9hwKh4kj2eQ==
+X-ME-Sender: <xms:8JqZZTa2LWzgZ0-GmgqS5LmLiABXTJV-q6m5pw2KEf52kA-_v2wfMA>
+    <xme:8JqZZSY16TYAWdOZIuP8yKWF5XRgyCIaZj9hCtazJgvb_WXDJT9OoLmN_FIlP23Tb
+    sL0h3wKj1DmLsm58g>
+X-ME-Received: <xmr:8JqZZV8ddNHA1F0_QGF1cpRCX1fLuMSzgKqs_Fg3sXfaUgOpYFT_S3HHautwyc1OmhIwEyCsPi3RRo61vZxpwY8y-vSDxy2GkEZ98QEvFqVpPA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdehuddguddutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhedmnecujfgurhephf
+    fvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceougig
+    uhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepffffgeejudehlefgtdduke
+    eijefggeehheejgfeijeevveetieevueekgfehkeejnecuffhomhgrihhnpehgihhthhhu
+    sgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpegugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:8JqZZZpHSzujnehtNM-9w6SM6ebZxdJiLRzNQZcPYUXvIr1FXoFm8Q>
+    <xmx:8JqZZeqcnauyVxfA1Rp6P8hO1PAbhin9VwCYuUjW_KX7IU7bSpqbDg>
+    <xmx:8JqZZfSntMFC9PDiV8fngNBCBp68lp9CgFnySiCgnfTcNGT64YxhQQ>
+    <xmx:8ZqZZSZbzVDin2kRmp_SLX1xW7XThP5VlZBJyX2zJfv-05ftzvGpwQ>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 6 Jan 2024 13:24:47 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: linux-input@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	fsverity@lists.linux.dev,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	cgroups@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	olsajiri@gmail.com,
+	quentin@isovalent.com,
+	alan.maguire@oracle.com,
+	memxor@gmail.com
+Subject: [PATCH bpf-next v3 0/3] Annotate kfuncs in .BTF_ids section
+Date: Sat,  6 Jan 2024 11:24:07 -0700
+Message-ID: <cover.1704565248.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
- mt7530_setup_port5() if port 5 is disabled
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Simon Horman <horms@kernel.org>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org,
- Frank Wunderlich <frank-w@public-files.de>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com
-References: <20231118123205.266819-1-arinc.unal@arinc9.com>
- <20231118123205.266819-8-arinc.unal@arinc9.com>
- <20231121185358.GA16629@kernel.org>
- <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
- <90fde560-054e-4188-b15c-df2e082d3e33@moroto.mountain>
- <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
- <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
- <20231208184652.k2max4kf7r3fgksg@skbuf>
- <c3a0fc6a-825c-4de3-b5cf-b454a6d4d3cf@arinc9.com>
- <48b664fb-edf9-4170-abde-2eb99e04f0e5@suswa.mountain>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <48b664fb-edf9-4170-abde-2eb99e04f0e5@suswa.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
 
-On 1/2/24 13:16, Dan Carpenter wrote:
-> On Sun, Dec 17, 2023 at 03:22:27PM +0300, Arınç ÜNAL wrote:
->> On 8.12.2023 21:46, Vladimir Oltean wrote:
->>> Hmm, maybe the problem, all along, was that we let the -ENODEV return
->>> code from of_get_phy_mode() pass through? "interface" will really be
->>> uninitialized in that case. It's not a false positive.
->>>
->>> Instead of:
->>>
->>> 	ret = of_get_phy_mode(mac_np, &interface);
->>> 	if (ret && ret != -ENODEV) {
->>> 		...
->>> 		return ret;
->>> 	}
->>>
->>> it should have been like this, to not complain:
->>>
->>> 	ret = of_get_phy_mode(mac_np, &interface);
->>> 	if (ret) {
->>> 		...
->>> 		return ret;
->>> 	}
->>>
->>
->> I just tried this, smatch still reports "interface" as uninitialised.
->>
->> $ export ARCH=mips CROSS_COMPILE=mips-linux-gnu-
->> $ ../smatch/smatch_scripts/kchecker --spammy drivers/net/dsa/mt7530.c
->>
->>    UPD     include/config/kernel.release
->>    UPD     include/generated/utsrelease.h
->>    CHECK   scripts/mod/empty.c
->>    CALL    scripts/checksyscalls.sh
->>    CC      drivers/net/dsa/mt7530.o
->>    CHECK   drivers/net/dsa/mt7530.c
->> drivers/net/dsa/mt7530.c:217 mt7530_mii_read() warn: call of 'warn_slowpath_fmt' with non-constant format argument
->> drivers/net/dsa/mt7530.c:454 mt7530_setup_port6() error: uninitialized symbol 'ncpo1'.
->> drivers/net/dsa/mt7530.c:868 mt7530_set_ageing_time() error: uninitialized symbol 'age_count'.
->> drivers/net/dsa/mt7530.c:868 mt7530_set_ageing_time() error: uninitialized symbol 'age_unit'.
->> drivers/net/dsa/mt7530.c:2324 mt7530_setup() error: uninitialized symbol 'interface'.
-> 
-> That's so strange.
-> 
-> Vladimir was right that I was misreading what he said and also hadn't
-> noticed the break.
-> 
-> For me, his approach silences the warning with or without the cross
-> function DB.  Also of_get_phy_mode() initializes interface on all paths
-> so checking for -EINVAL doesn't matter as far as this warning is
-> concerned.
+=== Description ===
 
-I must be missing something.
+This is a bpf-treewide change that annotates all kfuncs as such inside
+.BTF_ids. This annotation eventually allows us to automatically generate
+kfunc prototypes from bpftool.
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 7f9d63b61168..05ce3face47c 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2325,7 +2325,7 @@ mt7530_setup(struct dsa_switch *ds)
-  
-  			if (phy_node->parent == priv->dev->of_node->parent) {
-  				ret = of_get_phy_mode(mac_np, &interface);
--				if (ret && ret != -ENODEV) {
-+				if (ret) {
-  					of_node_put(mac_np);
-  					of_node_put(phy_node);
-  					return ret;
+We store this metadata inside a yet-unused flags field inside struct
+btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
 
-$ ../smatch/smatch_scripts/kchecker --spammy drivers/net/dsa/mt7530.c
-   CHECK   scripts/mod/empty.c
-   CALL    scripts/checksyscalls.sh
-   DESCEND objtool
-   INSTALL libsubcmd_headers
-   CC      drivers/net/dsa/mt7530.o
-   CHECK   drivers/net/dsa/mt7530.c
-drivers/net/dsa/mt7530.c:469 mt7530_pad_clk_setup() error: uninitialized symbol 'ncpo1'.
-drivers/net/dsa/mt7530.c:895 mt7530_set_ageing_time() error: uninitialized symbol 'age_count'.
-drivers/net/dsa/mt7530.c:895 mt7530_set_ageing_time() error: uninitialized symbol 'age_unit'.
-drivers/net/dsa/mt7530.c:2346 mt7530_setup() error: uninitialized symbol 'interface'.
+More details about the full chain of events are available in commit 3's
+description.
 
-Just so you know, I intend to remove this whole PHY muxing feature once I
-bring changing DSA conduit support to this subdriver. I've got two strong
-reasons for this.
+The accompanying pahole changes (still needs some cleanup) can be viewed
+here on this "frozen" branch [0].
 
-- Changing the DSA conduit achieves the same result with the only overhead
-   being the DSA header included on every frame.
+[0]: https://github.com/danobi/pahole/tree/kfunc_btf-mailed
 
-- There can't be proper dt-bindings for it as the nature of the feature
-   shows that it represents an optional way to operate the hardware, it does
-   not represent a hardware design. Overall, the implementation is a hack to
-   make it work for specific hardware (switch must be connected to gmac1 of
-   a MediaTek SoC, no PHY must be present at address 0 or 4 on the MDIO bus
-   of the SoC. It should rather be configurable on userspace. Which will
-   never happen as it is specific to this switch and the changing DSA
-   conduit feature is the perfect substitute for this.
+=== Changelog ===
 
-Let me know if you've got any suggestions that can get rid of the warning
-without reworking the whole code block. Otherwise, I'm just going to ignore
-it until I get rid of the whole code block.
+Changes from v2:
+* Only WARN() for vmlinux kfuncs
 
-Arınç
+Changes from v1:
+* Move WARN_ON() up a call level
+* Also return error when kfunc set is not properly tagged
+* Use BTF_KFUNCS_START/END instead of flags
+* Rename BTF_SET8_KFUNC to BTF_SET8_KFUNCS
+
+Daniel Xu (3):
+  bpf: btf: Support flags for BTF_SET8 sets
+  bpf: btf: Add BTF_KFUNCS_START/END macro pair
+  bpf: treewide: Annotate BPF kfuncs in BTF
+
+ drivers/hid/bpf/hid_bpf_dispatch.c            |  8 +++----
+ fs/verity/measure.c                           |  4 ++--
+ include/linux/btf_ids.h                       | 21 +++++++++++++++----
+ kernel/bpf/btf.c                              |  8 +++++++
+ kernel/bpf/cpumask.c                          |  4 ++--
+ kernel/bpf/helpers.c                          |  8 +++----
+ kernel/bpf/map_iter.c                         |  4 ++--
+ kernel/cgroup/rstat.c                         |  4 ++--
+ kernel/trace/bpf_trace.c                      |  8 +++----
+ net/bpf/test_run.c                            |  8 +++----
+ net/core/filter.c                             | 16 +++++++-------
+ net/core/xdp.c                                |  4 ++--
+ net/ipv4/bpf_tcp_ca.c                         |  4 ++--
+ net/ipv4/fou_bpf.c                            |  4 ++--
+ net/ipv4/tcp_bbr.c                            |  4 ++--
+ net/ipv4/tcp_cubic.c                          |  4 ++--
+ net/ipv4/tcp_dctcp.c                          |  4 ++--
+ net/netfilter/nf_conntrack_bpf.c              |  4 ++--
+ net/netfilter/nf_nat_bpf.c                    |  4 ++--
+ net/xfrm/xfrm_interface_bpf.c                 |  4 ++--
+ net/xfrm/xfrm_state_bpf.c                     |  4 ++--
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  8 +++----
+ 22 files changed, 81 insertions(+), 60 deletions(-)
+
+-- 
+2.42.1
+
 
