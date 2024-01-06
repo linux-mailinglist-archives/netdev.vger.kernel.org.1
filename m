@@ -1,152 +1,91 @@
-Return-Path: <netdev+bounces-62194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1D28261CC
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 23:03:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 266AA8261DB
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 23:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 480B8B21E7B
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 22:03:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C30711F21895
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 22:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33892F9F9;
-	Sat,  6 Jan 2024 22:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A247BF51D;
+	Sat,  6 Jan 2024 22:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nJQ1aIUW"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="KXw6zpMs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807CAF9EC;
-	Sat,  6 Jan 2024 22:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3368b1e056eso665367f8f.3;
-        Sat, 06 Jan 2024 14:03:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748F9F9D1
+	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 22:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d3ef33e68dso4496035ad.1
+        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 14:10:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704578618; x=1705183418; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Lsex701tK5pEY9KKRutw30UPF14FTBUAFWLK2f3CQHw=;
-        b=nJQ1aIUWgaj80sClMj6gXPIMV3QI8mB4mI7KHOFwb8DEJ7gxixsHnZqVcwEgvzD+PF
-         SvRtaLohc3Myh4aMYP19gZcp0uDT+KknFeT1FbR0yCX4RNdKyoTpjH+NWoPGo9QowcJ9
-         yvVy2QIlAZ+GP+hEm+4ipaPXo9PxSq4naZbrQIOEbNVMhoMcF2KP/iBizO3CkjneveYY
-         Yq6+cWGzeAe2n5P4CAV3dIW/Cspx4KjPUyspdUWmxD5WCJH1NnjmVlKLohF+Kd2xJMnx
-         iUsnP59SHrAnxbxcKl6POQUBdSKJdZi8jZ0TCi+szQ19wUwnVD2EvG/FiYMoollJgUa+
-         mQUQ==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1704579030; x=1705183830; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YntTIELPGPdMHyturrIg20eSWNGHruzw3MIeNxoF7ms=;
+        b=KXw6zpMs7QkRniFQORMbr04g3MhxCrHPiRCPu2UVRrNsCNWabI4lYnno/yvVWvCiu/
+         7gUEgJrKa52Xj6Zx1wyX1/VOlKjipDPw1c16Mqy7qFw/9ueJR0Rpr3wo8dBFT5dUvVwy
+         FI+mjAVkry8vmx1iUCTIRADm3oTCZuvKfuXnYJnUqUwSr+LnolfmwU918rQB4EsZrcSl
+         x8KTJO4DJpZdRsUU51xkcfvnm5tX8uqx8NTDmP8YRMmmnqIWw1TqMiQhLG5FIDQ+PpWj
+         ZXL7fqyXl8UmvD2/kEIY+NMYlJtSAIYj0lzFy1JbloI97F3pqu4ey0GnKHUyf7Tw2/5e
+         bkrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704578618; x=1705183418;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lsex701tK5pEY9KKRutw30UPF14FTBUAFWLK2f3CQHw=;
-        b=laH2UaLNEHvgPYv+RfxQkqwZxtUjCdwP0GB/RVzLkjmqplGbkGMS0GlZhV3Lkc7zhZ
-         GU9evoq0p6dKdpYl+usUuH6h+q3bAZfXPtX1IiW5l/Y895eAnkC56gYRWi80Sganz+5z
-         VFZvLWRaoxrtWKJ+OevWFofENJyt5eNyrz/XgsmgkXhrGbZAl1lnMbBKFbo/1FkieEaJ
-         da8JTJK78QhGgTnYvYTkg333XaN7SEkLrPDXH+/EDl1qiTXhGR1CrV/QbcFSw6fbLwaG
-         35W83ep2w+GRmpQZoqp8iBUlRqhZ1w35Y3yRGpQsGQEQwT95Uchzwrz7AFzCKqbp/E1l
-         QXjg==
-X-Gm-Message-State: AOJu0YzVDZ4TwRd1o3GzC4uDYQzUQWVCsX8zC21cLKQZwtJrnuDzk38v
-	hFvsvFtJs7QqvCWZ1H5jgQw=
-X-Google-Smtp-Source: AGHT+IGDeerTecMM96jf2+5wf4xdFVF5xLpyn984JWv3i9RYFRE/cXWCFvw3+Vz08LFiSgm/8FroqA==
-X-Received: by 2002:a5d:408a:0:b0:337:555b:d320 with SMTP id o10-20020a5d408a000000b00337555bd320mr747108wrp.39.1704578617487;
-        Sat, 06 Jan 2024 14:03:37 -0800 (PST)
-Received: from [192.168.0.3] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id r16-20020a056000015000b003373ef060d5sm4069972wrx.113.2024.01.06.14.03.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Jan 2024 14:03:36 -0800 (PST)
-Message-ID: <1df87389-d78c-48e0-b743-0fd11bd82b85@gmail.com>
-Date: Sun, 7 Jan 2024 00:03:34 +0200
+        d=1e100.net; s=20230601; t=1704579030; x=1705183830;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YntTIELPGPdMHyturrIg20eSWNGHruzw3MIeNxoF7ms=;
+        b=TzYFbXkqUjZ4ApM1sPRjAkF1GLN0dKUFg1yMum6+qR4/lru97prXBf7ErEfkfqGiO8
+         bP5iV8dw4GvJ0nNQijSjnrHQn68JET+8HmlhFPV0IOOZHNwVkSIZIOfHwQZaU/j5u0Ql
+         b9GGZINOzzypLE5VzXLDfRMlMc8Dv+9xAahAJp920tv34ywwaoRgfnJr3J+ZC843fiPh
+         6sVsaSXYhxeFINzYinJvzL+fhSKbc6ZgyY0d689ZOiC42Aef/m6F72FzUBMY7Bmg2fHs
+         e0O0B1grcWKw1nCzs15zXn/s7J4+tToaY9t9MuIhDQShJU5ETPqxyoRf9rJnYRYtl8Ee
+         1hhQ==
+X-Gm-Message-State: AOJu0Yw3NAJg8A1omfwAm6gGhzAkQ96OOVWKgBOOWisJpJMKpKLWT1Tl
+	c1sGKtXdhyZZB7bjJSZ6UiQGZa62FJPGuw==
+X-Google-Smtp-Source: AGHT+IGEJAbaND8uiI4xJF1e8Ek/80nvG/VA0MOQUi23nWwj2YLZ2vFAq+0n6iMUyG/4jE/dAQprPw==
+X-Received: by 2002:a17:902:bb01:b0:1cf:b4bb:9bdc with SMTP id im1-20020a170902bb0100b001cfb4bb9bdcmr1511033plb.9.1704579030136;
+        Sat, 06 Jan 2024 14:10:30 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id jb17-20020a170903259100b001d4725c10f3sm3533951plb.10.2024.01.06.14.10.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jan 2024 14:10:29 -0800 (PST)
+Date: Sat, 6 Jan 2024 14:10:27 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Maks Mishin <maks.mishinfz@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] lnstat: Fix deref of null in print_json() function
+Message-ID: <20240106141027.2ed2f890@hermes.local>
+In-Reply-To: <20240106190423.25385-1-maks.mishinFZ@gmail.com>
+References: <20240106190423.25385-1-maks.mishinFZ@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/5] support ipq5332 platform
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jie Luo <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
- konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_srichara@quicinc.com
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
- <a6a50fb6-871f-424c-a146-12b2628b8b64@gmail.com>
- <cfb04c82-3cc3-49f6-9a8a-1f6d1a22df40@quicinc.com>
- <dd05a599-247a-4516-8ad3-7550ceea99f7@gmail.com>
- <ac1977f5-cd6a-4f16-b0a0-f4322c34c5f5@quicinc.com>
- <bdeca791-f2e5-4256-b386-a75c03f93686@gmail.com>
- <895eadd7-1631-4b6b-8db4-d371f2e52611@lunn.ch>
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <895eadd7-1631-4b6b-8db4-d371f2e52611@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 06.01.2024 17:45, Andrew Lunn wrote:
->> I just realized that the UNIPHY block is a MII (probably SGMII) controller.
->> Isn't it? And I expect that it responsible more then just for clock
->> enabling. It should also activate and perform a basic configuration of MII
->> for actual data transmission. If so, then it should placed somewhere under
->> drivers/net/phy or drivers/net/pcs.
+On Sat,  6 Jan 2024 22:04:23 +0300
+Maks Mishin <maks.mishinfz@gmail.com> wrote:
+
+> Now pointer `jw` is being checked for NULL before using
+> in function `jsonw_start_object`.
+> Added exit from function when `jw==NULL`.
 > 
-> Before we decide that, we need a description of what the UNIPHY
-> actually does, what registers it has, etc. Sometimes blocks like this
-> get split into a generic PHY, aka drivers/phy/ and a PCS driver. This
-> would be true if the UNIPHY is also used for USB SERDES, SATA SERDES
-> etc. The SERDES parts go into a generic PHY driver, and the SGMII on
-> to of the SERDES is placed is a PCS driver.
-
-As far as I understand, UNIPHY only contains SGMII/PSGMII/whatever and a 
-simple clock controller. PCIe & USB phys are implemented in other 
-hardware blocks. See the lately merged USB support code for similar 
-IPQ5018 SoC. But I can only speak to what I found searching online and 
-checking the vendor's qca-ssdk "driver".
-
-https://git.codelinaro.org/clo/qsdk/oss/lklm/qca-ssdk/-/tree/NHSS.QSDK.12.4.5.r3
-
-I hope Luo can clarify with more confidence.
-
-> The problem i have so far is that there is no usable description of
-> any of this hardware, and the developers trying to produce drivers for
-> this hardware don't actually seem to understand the Linux architecture
-> for things like this.
->
->> As far as I understand, we basically agree that clocks configuration can be
->> implemented based on the clock API using a more specialized driver(s) than
->> MDIO. The only obstacle is the PHY chip initialization issue explained
->> below.
->> Thank you for this compact yet detailed summary. Now it much more clear,
->> what this phy chip requires to be initialized.
->>
->> Looks like you need to implement at least two drivers:
->> 1. chip (package) level driver that is responsible for basic "package"
->> initialization;
->> 2. phy driver to handle actual phy capabilities.
+> Found by RASU JSC
 > 
-> Nope. As i keep saying, please look at the work Christian is
-> doing. phylib already has the concept of a PHY package, e.g. look at
-> the MSCC driver, and how it uses devm_phy_package_join(). What is
-> missing is a DT binding which allows package properties to be
-> expressed in DT. And this is what Christian is adding.
+> Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
 
-Andrew, thank you so much for pointing me to that API and Christian's 
-work. I have checked the DT change proposal and it fits this QCA8084 
-case perfectly.
-
-Am I right that all one has to do to solve this QCA8084 initialization 
-case is wrap phys in a ethernet-phy-package node and use 
-devm_phy_package_join() / phy_package_init_once() to do the basic 
-initialization? So simple?
-
-I came to put my 2c in and learnt a couple of new tricks. What a nice day :)
-
---
-Sergey
+Probably not worth fixing.
+If the malloc() of 20 bytes ever fails then something is really wrong.
+The Linux kernel will kill the process first.
 
