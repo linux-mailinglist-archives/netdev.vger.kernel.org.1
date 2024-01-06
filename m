@@ -1,141 +1,121 @@
-Return-Path: <netdev+bounces-62187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11C74826156
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 20:47:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B923A82615E
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 20:59:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C4071C20D9D
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 19:47:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E5C1B21972
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 19:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A3BE57C;
-	Sat,  6 Jan 2024 19:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h6pxIIgz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3450CF4F0;
+	Sat,  6 Jan 2024 19:58:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0104FE575
-	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 19:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ccbf8cbf3aso6957641fa.3
-        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 11:47:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704570442; x=1705175242; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6NiqlUUgRemmGK0dSNYM3Wpnvvf9r0lgF3FPlIZfFYo=;
-        b=h6pxIIgzQtBHrWkO7uZfDdBOH2Di2yeA3T8dtcpuTEunVkDRfi0N1sgVqGnQz8mFSu
-         mNzqk9Om9HKVH4egcp69EbDP2OiliGGbAp0DCfBd9UbbSA6zZjYUfyFXnoV8wCU2Jieu
-         bDCnlH12Hg9dcWjCNuvvY2LiMjOduSuwgmaltUIjrSGnRe5MIv37U2qE1hIXz4NI9OYv
-         96p3C8LZVd7TRAjIXZ5jNoonVwhWIGpfPEMX0yvvFbQJqi3eHeNhbxXvRqvAzbgnJRtt
-         kIlbs6bMFG+slmc70oTfhMnJ0iKM0Da4tVUop8sXL62awGCytbDIZ9A/ZIFCn7A95ApK
-         zPqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704570442; x=1705175242;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6NiqlUUgRemmGK0dSNYM3Wpnvvf9r0lgF3FPlIZfFYo=;
-        b=qDgL76T0+GUSEphu9TFKJXcEaKoiph9f4lGRNuEKwY4wh8aS2ujw0KT3TvI9Rgwdvt
-         K6FfQ2HEG3HCIRb5ppR4Vikl/8XxbpqKKGHfUN3CYeuv0kOPAJuccJD/fvBGnHTh3o7k
-         UeXCh+3kWb+UA1fCQaYZLvy9MIY9atW+TFD6ugoq6n7hY+HjBb4gWWC2R84fN6ARHjMp
-         aEcj2ol/ymxkuM2oFW66udXXF3/SNEW+3QnKok83BcLp7ksR1c6eA6eqeLXM2+FBTKT4
-         tcZMmufFf46oo21PFdFkuaRNTs7CYoXIpW7t2qUZVxHr9gxsN5AIqLZI/VaavaWYUJn8
-         VZ9Q==
-X-Gm-Message-State: AOJu0Yw+meU3MDWpzrHwji1T8AkC+hQDvZ0MxEozW7K99MzXid4mncBz
-	+WD8tsSt/TNxJOTQHKZfQqY1iLUvkWvQ841cm44=
-X-Google-Smtp-Source: AGHT+IFuVfX/aOLB2chEpmzeM3DYRw+ioE9YJL7Unb+EMQIMbpkjfZZUJtmaCiEDjFPScmzFSKwEY4Nh5Td8VgGYS/U=
-X-Received: by 2002:a05:651c:407:b0:2cc:9cf1:aec2 with SMTP id
- 7-20020a05651c040700b002cc9cf1aec2mr497226lja.24.1704570441562; Sat, 06 Jan
- 2024 11:47:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31A0F4E3;
+	Sat,  6 Jan 2024 19:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (31.173.84.255) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 6 Jan
+ 2024 22:58:34 +0300
+Subject: Re: [PATCH net-next v3 09/19] net: ravb: Split GTI computation and
+ set operations
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <geert+renesas@glider.be>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240105082339.1468817-10-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <bdb6fbea-6445-e63f-c0c5-8688037b628a@omp.ru>
+Date: Sat, 6 Jan 2024 22:58:34 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240106184651.3665-1-luizluca@gmail.com>
-In-Reply-To: <20240106184651.3665-1-luizluca@gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sat, 6 Jan 2024 16:47:10 -0300
-Message-ID: <CAJq09z6PE02HEMJF0k8UwLjtMaDs5UVjMB43vVQo6ysLKp_FFQ@mail.gmail.com>
-Subject: Re: [RFC net-next 0/2] net: dsa: realtek: fix LED support for rtl8366rb
-To: ansuelsmth@gmail.com
-Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch, 
-	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20240105082339.1468817-10-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/06/2024 19:41:27
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182473 [Jan 06 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.255 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.255
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/06/2024 19:45:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/6/2024 5:22:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-> The rtl8366rb switch family has 4 LED groups, with one LED from each
-> group for each of its 6 ports. LEDs in this family can be controlled
-> manually using a bitmap or triggered by hardware. It's important to note
-> that hardware triggers are configured at the LED group level, meaning
-> all LEDs in the same group share the same hardware triggers settings.
->
-> The first part of this series involves dropping most of the existing
-> code, as, except for disabling the LEDs, it was not working as expected.
-> If not disabled, the LEDs will retain their default settings after a
-> switch reset, which may be sufficient for many devices.
->
-> The second part introduces the LED driver to control the switch LEDs
-> from sysfs or device-tree. This driver still allows the LEDs to retain
-> their default settings, but it will shift to the software-based OS LED
-> triggers if any configuration is changed. Subsequently, the LEDs will
-> operate as normal LEDs until the switch undergoes another reset.
->
-> Netdev LED trigger supports offloading to hardware triggers.
-> Unfortunately, this isn't possible with the current LED API for this
-> switch family. When the hardware trigger is enabled, it applies to all
-> LEDs in the LED group while the LED API decides to offload based on only
-> the state of a single LED. To avoid inconsistency between LEDs,
-> offloading would need to check if all LEDs in the group share the same
-> compatible settings and atomically enable offload for all LEDs.
+On 1/5/24 11:23 AM, Claudiu wrote:
 
-Hi Christian,
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> ravb_set_gti() was computing the value of GTI based on the reference clock
+> rate and then applied it to register. This was done on the driver's probe
+> function. In order to implement runtime PM for all IP variants (as some IP
+> variants switches to reset mode (and thus the registers content is lost)
+> when module standby is configured through clock APIs) the GTI setup was
+> split in 2 parts: one computing the value of the GTI register (done in the
+> driver's probe function) and one applying the computed value to register
+> (done in the driver's ndo_open API).
+> 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-I tried to implement something close to your work with qca8k and LED
-hw control. However, I couldn't find a solution that would work with
-the existing API. The HW led configuration in realtek switches is
-shared with all LEDs in a group. Before activating the hw control, all
-LEDs in the same group must share the same netdev trigger config, use
-the correct device and also use a compatible netdev trigger settings.
-In order to check that, I would need to expose some internal netdev
-trigger info that is only available through sysfs (and I believe sysfs
-is not suitable to be used from the kernel). Even if I got all LEDs
-with the correct settings, I would need to atomicly switch all LEDs to
-use the hw control or, at least, I would need to stop all update jobs
-because if the OS changes a LED brightness, it might be interpreted as
-the OS disabling the hw control:
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-/*
-...
-* Deactivate hardware blink control by setting brightness to LED_OFF via
-* the brightness_set() callback.
-*
-...
-*/
-int (*hw_control_set)(struct led_classdev *led_cdev,
- unsigned long flags);
+> ---
+> 
+> Changes in v3:
+> - fixed typos in patch description
+> - use u64 instead of uint64_t
 
-Do you have any idea how to implement it?
+   Well, u64 in one place, u32 in another...
 
-BTW, during my tests with a single LED, ignoring the LED group
-situation, I noticed that the OS was sending a brightness_set(LED_OFF)
-after I changed the trigger to netdev, a moment after hw_control_set
-was called. It doesn't make sense to enable hw control just to disable
-it afterwards. The call came from set_brightness_delayed(). Maybe it
-is because my test device is pretty slow and the previous trigger
-event always gets queued. Touching any settings after that worked as
-expected without the spurious brightness_set(LED_OFF). Did you see
-something like this?
+> - remove ravb_wait() for setting GCCR.LTI
 
-Regards,
+[...]
 
-Luiz
+MBR, Sergey
 
