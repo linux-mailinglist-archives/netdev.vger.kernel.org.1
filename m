@@ -1,83 +1,106 @@
-Return-Path: <netdev+bounces-62143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97301825E15
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:30:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49744825E18
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:32:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32B1EB232F0
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 03:30:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F167E1F2274A
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 03:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434711FD9;
-	Sat,  6 Jan 2024 03:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2F015BE;
+	Sat,  6 Jan 2024 03:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEJNHvEc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="jGTP4ySy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219301FAA;
-	Sat,  6 Jan 2024 03:30:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 84A86C433CC;
-	Sat,  6 Jan 2024 03:30:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704511832;
-	bh=5XBExEJP4001NhSJnkiW9XbmuvN5s/G6qmnkrLtYD1c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YEJNHvEcW5bErN8GG97M5O0Ppp0t+vP7u7rlw1kf+hDMPMC0nWVj9D4bd6BuKHI9a
-	 JXqqFkxzH0v+QD6008wdV1MUL1Mccw93+/0ydAqed0PG6Edm7L2+xLHrhFBWbolsoD
-	 mnjqdw/jAnNQA7RJng3pMi8eZIarlREOk7hWdaTigdFCc4TIjMDQ/DSWqdG91A4Gl5
-	 2CFWi6O8q914gWSE0q5OdAQDQKWnX6mWHypCT0/HYZsjMnvsj5t6z2brBlDt6bj0qp
-	 TFDcvp8dB7WZlV/O5cT7uh5t4jKtSo7EMSCcTOZ8qQT5xN+B0+5ZZgTuBpnbemZS6K
-	 D8MSReLGZssww==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6B83DC4167E;
-	Sat,  6 Jan 2024 03:30:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68F415A5;
+	Sat,  6 Jan 2024 03:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=XVoH2bWthC9wKGidUvWdR8qVLzbMp71NddPvjPGWg0M=; b=jGTP4ySyUKF9CKWJsZ5PMS4RFh
+	SxMMa80DZ3npfF/i3Oo8+l01eB97tRQ8Bf6pRMXMaG4+Ri/nqLD1quGKhDALXzZKb/+O/BbnitQtQ
+	/5tjPuyztaAFZ/FNNBpVXtEqiEuqPhdJpbHaZ3X1K1LPMbbloumcGV2JF4Urqw3sjwowWdjl98IKI
+	UgK9J5H/YCQAzI5L0t9SK/s6DbgrHFaJKrSkrf1voMb57wHuN4eaEyxITM5wo1tkwo00UZa4agXEA
+	m8+CjUcC2rw/VuVoN+yHLFZrHjNwTr+q56S0eFZJKMGH8Q9+S3t6gOnevMsgp9wK6opdW3aZBJUGs
+	bTCFVhCw==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97)
+	(envelope-from <phil@nwl.cc>)
+	id 1rLxPw-000000002A1-3nAh;
+	Sat, 06 Jan 2024 04:32:12 +0100
+Date: Sat, 6 Jan 2024 04:32:12 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v3 1/2] rtnetlink: allow to set iface down before
+ enslaving it
+Message-ID: <ZZjJvJY4facvIu8a@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>, Jiri Pirko <jiri@resnulli.us>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	stable@vger.kernel.org
+References: <20240104164300.3870209-1-nicolas.dichtel@6wind.com>
+ <20240104164300.3870209-2-nicolas.dichtel@6wind.com>
+ <ZZfvHEIGiL5OvWHk@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2024-01-05
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170451183243.21355.3142708861258708303.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Jan 2024 03:30:32 +0000
-References: <20240105170105.21070-1-daniel@iogearbox.net>
-In-Reply-To: <20240105170105.21070-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZfvHEIGiL5OvWHk@nanopsycho>
 
-Hello:
+Hi,
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  5 Jan 2024 18:01:05 +0100 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Fri, Jan 05, 2024 at 12:59:24PM +0100, Jiri Pirko wrote:
+> Thu, Jan 04, 2024 at 05:42:59PM CET, nicolas.dichtel@6wind.com wrote:
+> >The below commit adds support for:
+> >> ip link set dummy0 down
+> >> ip link set dummy0 master bond0 up
+> >
+> >but breaks the opposite:
+> >> ip link set dummy0 up
+> >> ip link set dummy0 master bond0 down
 > 
-> The following pull-request contains BPF updates for your *net-next* tree.
+> It is a bit weird to see these 2 and assume some ordering.
+> The first one assumes:
+> dummy0 master bond 0, dummy0 up
+> The second one assumes:
+> dummy0 down, dummy0 master bond 0
+> But why?
 > 
-> We've added 40 non-merge commits during the last 2 day(s) which contain
-> a total of 73 files changed, 1526 insertions(+), 951 deletions(-).
-> 
-> [...]
+> What is the practival reason for a4abfa627c38 existence? I mean,
+> bond/team bring up the device themselfs when needed. Phil?
+> Wouldn't simple revert do better job here?
 
-Here is the summary with links:
-  - pull-request: bpf-next 2024-01-05
-    https://git.kernel.org/netdev/net-next/c/8158a50f9058
+Ah, I wasn't aware bond master manipulates slaves' links itself and thus
+treated all types' link master setting the same by setting the slave up
+afterwards. This is basically what a4abfa627c38 is good for: Enabling
+'ip link set X master Y up' regardless of Y's link type.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+If setting a bond slave up manually is not recommended, the easiest
+solution is probbaly indeed to revert a4abfa627c38 and live with the
+quirk in bond driver.
 
-
+Cheers, Phil
 
