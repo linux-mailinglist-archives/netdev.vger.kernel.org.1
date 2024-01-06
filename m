@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-62200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8908261E9
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 23:19:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B9C8261EA
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 23:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E62571C20A8C
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 22:19:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47424B214DA
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 22:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1BD101C8;
-	Sat,  6 Jan 2024 22:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E59101D0;
+	Sat,  6 Jan 2024 22:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aFg6y30e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gmk0qCnD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95278107B4
-	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 22:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E34B101C8
+	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 22:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a28fb463a28so61532466b.3
-        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 14:19:19 -0800 (PST)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a28cc85e6b5so68616566b.1
+        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 14:20:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704579558; x=1705184358; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704579604; x=1705184404; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fGp4M5A8qKC+xK/tpDyzLTbvYhoM3Rz64mfeAWTgdoM=;
-        b=aFg6y30eEbiOIjk6/J6ikqNpCnw1TlP85ropJBYOBwyds0NoLE3tmI02vCunH4waWC
-         s00zC0M+l+blEGFSspcJV/qSorsULuVub9BaGqRdJes6UwkGA5uq7tP2q628TV7TlSmr
-         L3m667CitZmXh2rTDbs8Ed3iVA1InXrCKCx4GaUkgW8L+aYy74hKfa6mFeaKHpLdZ7fg
-         aYSmQjv/p7jcooSiqCZT/vZFwq5oeX4wYKcyvQhCGr1ZKm9Ebd8BY9aJXSFsYPZfsDgx
-         b4+PedZZvzYBLO0/Jb4dfYWq8/UyfQbIOul5MTwZmhp3Zm2cp6M81aN9y9zmrHAFg5IC
-         RXsA==
+        bh=xVOzlqn6PhWG6juT/UGAVwS7NgHqVAWWoxYO6Y1edCU=;
+        b=Gmk0qCnDjPQu6gKbzU2k8/bugjXqDFAOtfbjKMSFDNlZ0Ldqyfn2Ti33yDZncf+4hv
+         oULWVNp/759V8rr66tYwoLTNOj9LM+DupjgawXYkDFM9Q/MnwDe1iKJGU+Cf+1s7hN62
+         Rbe3szGCERwlHgHqmplp8B06n6HtA6LKAFBbWnGqB3cncWedwr2msFcKnu3VcVFpjJD/
+         FfZK9/ESLC7PZPDzDFgO1SI9it+EZab8VC8Tho4Ga81/yETHUsQ4FbTodN7bt9I5tYxM
+         DGw7OyrU0mxnKMDoU3IoOPWymB2AeDiEJ1kkhHemyugaEsHTttSd7T4LT/dFBNk/nlvt
+         bK4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704579558; x=1705184358;
+        d=1e100.net; s=20230601; t=1704579604; x=1705184404;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fGp4M5A8qKC+xK/tpDyzLTbvYhoM3Rz64mfeAWTgdoM=;
-        b=AEeTaIAaoR500dYDpfTpe5fXFJ8ucDdk5VyqwJA7A786G8hnzGNM8WNc1kYoyDbQOL
-         c0giBt6a4Ox7g5JXaa6QC29Qn+BekA8rOTVG9O6eB5dy/W83CYj/aj4q5BqDKVdiEP6v
-         GsUGa2y4YAeIvsMmGfVdg42Lrez9xrAm2fhJkvh17RVVHcVtmiotlt4H3R98Ye1h+TKJ
-         prkG+OKPoT+l06lSBQQqqL2TaOtECWrOu0HVrenCj/u8Y2vJxUXFbw5zP0OPBRkV8ifq
-         sUWfzVZlSaY+DxPIFeBukR/WtpBAiRu1kneQrD/HgOG+89OgnkFmWuI37INOp7IaM98U
-         Mo7Q==
-X-Gm-Message-State: AOJu0YyRNqROoDW7qR5rC1J6wwOY3lIOajtftRNSZfhbUYYaZmpALOM1
-	lHtemO0pzoc289Lu9GUH8BW+Oj0hOZ0=
-X-Google-Smtp-Source: AGHT+IHjVFnI2TzSuGLLYZttoefZP4fq9Uckumuufthh/IaRnnFeyOwV7zW6LNcrBZ7SRBlEqjEVSQ==
-X-Received: by 2002:a17:906:30c1:b0:a28:abfa:dac3 with SMTP id b1-20020a17090630c100b00a28abfadac3mr557149ejb.153.1704579557253;
-        Sat, 06 Jan 2024 14:19:17 -0800 (PST)
+        bh=xVOzlqn6PhWG6juT/UGAVwS7NgHqVAWWoxYO6Y1edCU=;
+        b=xHOSg1FVOzR4b5cMbMrYH/MHSo5wH9S0T5vGhPvFxLxF6CxA+inPsNVhULRRJdNFwQ
+         iuR/RFYwTcKot8zGk2+5AidC75vtmkNCbwOX3Pzk1KAAtYnw6NP32SqGHK2bmwndZo4O
+         yD+l5mXOF7SHd8ZYMOzTpcSQsdbAgkQOKcnInhs9ZtFmpUUoHR/mH5aCj5IhawdU9S4U
+         b8+Nrn/KCqSb6HWl3cWa6iJc02SZ2NeCl82JY/YQei+UQ6AefLEV9ErcZtESsjQVN0fV
+         uHBas6nIbBTjyGLu8gHqh3tgKH+A0W709ebUvskonQZddXz03TzDV7tbndspSLrRN+r3
+         Sdpw==
+X-Gm-Message-State: AOJu0Yzv4NQe8mUhdmG4JPqQidlTuMEqc5FZb6ystCReP5tqWmsiftp2
+	vlei7AWbMHFGyJwbrbePLsE=
+X-Google-Smtp-Source: AGHT+IHlBNFiYF3gSeRrwx/vMlWBHH7zHGv9Y/q/PHcguwbYe1Vwp/Mm5yrRPRmZlBBOwlfDxKA0bQ==
+X-Received: by 2002:a17:906:c307:b0:a28:a8b9:5e1c with SMTP id s7-20020a170906c30700b00a28a8b95e1cmr377461ejz.53.1704579604156;
+        Sat, 06 Jan 2024 14:20:04 -0800 (PST)
 Received: from ?IPV6:2a01:c22:7310:c700:9da3:cda2:7a2c:5dba? (dynamic-2a01-0c22-7310-c700-9da3-cda2-7a2c-5dba.c22.pool.telefonica.de. [2a01:c22:7310:c700:9da3:cda2:7a2c:5dba])
-        by smtp.googlemail.com with ESMTPSA id x17-20020a170906297100b00a26e4986df8sm2380056ejd.58.2024.01.06.14.19.16
+        by smtp.googlemail.com with ESMTPSA id x17-20020a170906297100b00a26e4986df8sm2380056ejd.58.2024.01.06.14.20.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Jan 2024 14:19:16 -0800 (PST)
-Message-ID: <a63c0856-04c1-4a27-82ef-36173e7bd262@gmail.com>
-Date: Sat, 6 Jan 2024 23:19:17 +0100
+        Sat, 06 Jan 2024 14:20:03 -0800 (PST)
+Message-ID: <ba3105df-74ae-4883-b9e9-d517036a73b3@gmail.com>
+Date: Sat, 6 Jan 2024 23:20:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH v2 RFC 1/5] ethtool: replace struct ethtool_eee with a new
- struct ethtool_keee on kernel side
+Subject: [PATCH v2 RFC 2/5] ethtool: switch back from ethtool_keee to
+ ethtool_eee for ioctl
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>,
@@ -123,1478 +123,102 @@ In-Reply-To: <8d8700c8-75b2-49ba-b303-b8d619008e45@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-In order to pass EEE link modes beyond bit 32 to userspace we have to
-complement the 32 bit bitmaps in struct ethtool_eee with linkmode
-bitmaps. Therefore, similar to ethtool_link_settings and
-ethtool_link_ksettings, add a struct ethtool_keee. In a first step
-it's an identical copy of ethtool_eee. This patch simply does a
-s/ethtool_eee/ethtool_keee/g for all users.
-No functional change intended.
+In order to later extend struct ethtool_keee, we have to decouple it
+from the userspace format represented by struct ethtool_eee.
+Therefore switch back to struct ethtool_eee, representing the userspace
+format, and add conversion between ethtool_eee and ethtool_keee.
+Struct ethtool_keee will be changed in follow-up patches, therefore
+don't do a *keee = *eee here.
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/dsa/b53/b53_common.c                 | 10 +++++-----
- drivers/net/dsa/b53/b53_priv.h                   |  6 +++---
- drivers/net/dsa/bcm_sf2.c                        |  2 +-
- drivers/net/dsa/microchip/ksz_common.c           |  4 ++--
- drivers/net/dsa/mt7530.c                         |  4 ++--
- drivers/net/dsa/mv88e6xxx/chip.c                 |  4 ++--
- drivers/net/dsa/qca/qca8k-common.c               |  4 ++--
- drivers/net/dsa/qca/qca8k.h                      |  4 ++--
- .../net/ethernet/aquantia/atlantic/aq_ethtool.c  |  4 ++--
- drivers/net/ethernet/broadcom/asp2/bcmasp.h      |  2 +-
- .../net/ethernet/broadcom/asp2/bcmasp_ethtool.c  |  8 ++++----
- .../net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c  |  4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt.c        |  8 ++++----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h        |  2 +-
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c    |  6 +++---
- drivers/net/ethernet/broadcom/genet/bcmgenet.c   |  8 ++++----
- drivers/net/ethernet/broadcom/genet/bcmgenet.h   |  2 +-
- drivers/net/ethernet/broadcom/tg3.c              | 10 +++++-----
- drivers/net/ethernet/broadcom/tg3.h              |  2 +-
- drivers/net/ethernet/engleder/tsnep_main.c       |  6 +++---
- drivers/net/ethernet/freescale/enetc/enetc.c     |  4 ++--
- drivers/net/ethernet/freescale/fec.h             |  2 +-
- drivers/net/ethernet/freescale/fec_main.c        | 10 +++++-----
- drivers/net/ethernet/freescale/gianfar.c         |  4 ++--
- drivers/net/ethernet/intel/e1000e/ethtool.c      |  6 +++---
- drivers/net/ethernet/intel/i40e/i40e_ethtool.c   |  6 +++---
- drivers/net/ethernet/intel/igb/igb_ethtool.c     |  8 ++++----
- drivers/net/ethernet/intel/igc/igc.h             |  2 +-
- drivers/net/ethernet/intel/igc/igc_ethtool.c     |  8 ++++----
- drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 10 +++++-----
- drivers/net/ethernet/marvell/mvneta.c            |  4 ++--
- drivers/net/ethernet/microchip/lan743x_ethtool.c |  4 ++--
- drivers/net/ethernet/qlogic/qede/qede_ethtool.c  |  4 ++--
- drivers/net/ethernet/realtek/r8169_main.c        |  4 ++--
- .../net/ethernet/samsung/sxgbe/sxgbe_ethtool.c   |  4 ++--
- .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c |  4 ++--
- drivers/net/ethernet/ti/am65-cpsw-ethtool.c      |  4 ++--
- drivers/net/ethernet/ti/cpsw_ethtool.c           |  4 ++--
- drivers/net/ethernet/ti/cpsw_priv.h              |  4 ++--
- drivers/net/ethernet/ti/icssg/icssg_ethtool.c    |  4 ++--
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c    |  2 +-
- drivers/net/phy/marvell.c                        |  2 +-
- drivers/net/phy/phy-c45.c                        |  8 ++++----
- drivers/net/phy/phy.c                            |  8 ++++----
- drivers/net/phy/phylink.c                        |  8 ++++----
- drivers/net/usb/ax88179_178a.c                   | 10 +++++-----
- drivers/net/usb/lan78xx.c                        |  4 ++--
- drivers/net/usb/r8152.c                          | 14 +++++++-------
- include/linux/ethtool.h                          | 16 ++++++++++++++--
- include/linux/phy.h                              |  8 ++++----
- include/linux/phylink.h                          |  4 ++--
- include/net/dsa.h                                |  4 ++--
- net/dsa/user.c                                   |  4 ++--
- net/ethtool/eee.c                                | 10 +++++-----
- net/ethtool/ioctl.c                              |  6 +++---
- 55 files changed, 160 insertions(+), 148 deletions(-)
+ net/ethtool/ioctl.c | 49 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 40 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 0d628b35f..adc93abf4 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -1257,7 +1257,7 @@ static void b53_adjust_link(struct dsa_switch *ds, int port,
- 			    struct phy_device *phydev)
- {
- 	struct b53_device *dev = ds->priv;
--	struct ethtool_eee *p = &dev->ports[port].eee;
-+	struct ethtool_keee *p = &dev->ports[port].eee;
- 	u8 rgmii_ctrl = 0, reg = 0, off;
- 	bool tx_pause = false;
- 	bool rx_pause = false;
-@@ -2224,10 +2224,10 @@ int b53_eee_init(struct dsa_switch *ds, int port, struct phy_device *phy)
- }
- EXPORT_SYMBOL(b53_eee_init);
- 
--int b53_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e)
-+int b53_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e)
- {
- 	struct b53_device *dev = ds->priv;
--	struct ethtool_eee *p = &dev->ports[port].eee;
-+	struct ethtool_keee *p = &dev->ports[port].eee;
- 	u16 reg;
- 
- 	if (is5325(dev) || is5365(dev))
-@@ -2241,10 +2241,10 @@ int b53_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e)
- }
- EXPORT_SYMBOL(b53_get_mac_eee);
- 
--int b53_set_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e)
-+int b53_set_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e)
- {
- 	struct b53_device *dev = ds->priv;
--	struct ethtool_eee *p = &dev->ports[port].eee;
-+	struct ethtool_keee *p = &dev->ports[port].eee;
- 
- 	if (is5325(dev) || is5365(dev))
- 		return -EOPNOTSUPP;
-diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_priv.h
-index fdcfd5081..c26a03755 100644
---- a/drivers/net/dsa/b53/b53_priv.h
-+++ b/drivers/net/dsa/b53/b53_priv.h
-@@ -95,7 +95,7 @@ struct b53_pcs {
- 
- struct b53_port {
- 	u16		vlan_ctl_mask;
--	struct ethtool_eee eee;
-+	struct ethtool_keee eee;
- };
- 
- struct b53_vlan {
-@@ -397,7 +397,7 @@ void b53_disable_port(struct dsa_switch *ds, int port);
- void b53_brcm_hdr_setup(struct dsa_switch *ds, int port);
- void b53_eee_enable_set(struct dsa_switch *ds, int port, bool enable);
- int b53_eee_init(struct dsa_switch *ds, int port, struct phy_device *phy);
--int b53_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e);
--int b53_set_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e);
-+int b53_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e);
-+int b53_set_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e);
- 
- #endif
-diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
-index cadee5505..85c32d575 100644
---- a/drivers/net/dsa/bcm_sf2.c
-+++ b/drivers/net/dsa/bcm_sf2.c
-@@ -836,7 +836,7 @@ static void bcm_sf2_sw_mac_link_up(struct dsa_switch *ds, int port,
- 				   bool tx_pause, bool rx_pause)
- {
- 	struct bcm_sf2_priv *priv = bcm_sf2_to_priv(ds);
--	struct ethtool_eee *p = &priv->dev->ports[port].eee;
-+	struct ethtool_keee *p = &priv->dev->ports[port].eee;
- 	u32 reg_rgmii_ctrl = 0;
- 	u32 reg, offset;
- 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 245dfb7a7..a7b5ddb86 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2852,7 +2852,7 @@ static int ksz_validate_eee(struct dsa_switch *ds, int port)
- }
- 
- static int ksz_get_mac_eee(struct dsa_switch *ds, int port,
--			   struct ethtool_eee *e)
-+			   struct ethtool_keee *e)
- {
- 	int ret;
- 
-@@ -2872,7 +2872,7 @@ static int ksz_get_mac_eee(struct dsa_switch *ds, int port,
- }
- 
- static int ksz_set_mac_eee(struct dsa_switch *ds, int port,
--			   struct ethtool_eee *e)
-+			   struct ethtool_keee *e)
- {
- 	struct ksz_device *dev = ds->priv;
- 	int ret;
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 391c4dbdf..1d577f268 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -3046,7 +3046,7 @@ mt753x_setup(struct dsa_switch *ds)
- }
- 
- static int mt753x_get_mac_eee(struct dsa_switch *ds, int port,
--			      struct ethtool_eee *e)
-+			      struct ethtool_keee *e)
- {
- 	struct mt7530_priv *priv = ds->priv;
- 	u32 eeecr = mt7530_read(priv, MT7530_PMEEECR_P(port));
-@@ -3058,7 +3058,7 @@ static int mt753x_get_mac_eee(struct dsa_switch *ds, int port,
- }
- 
- static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
--			      struct ethtool_eee *e)
-+			      struct ethtool_keee *e)
- {
- 	struct mt7530_priv *priv = ds->priv;
- 	u32 set, mask = LPI_THRESH_MASK | LPI_MODE_EN;
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 383b3c4d6..8b0079b8e 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -1451,14 +1451,14 @@ static void mv88e6xxx_get_regs(struct dsa_switch *ds, int port,
- }
- 
- static int mv88e6xxx_get_mac_eee(struct dsa_switch *ds, int port,
--				 struct ethtool_eee *e)
-+				 struct ethtool_keee *e)
- {
- 	/* Nothing to do on the port's MAC */
- 	return 0;
- }
- 
- static int mv88e6xxx_set_mac_eee(struct dsa_switch *ds, int port,
--				 struct ethtool_eee *e)
-+				 struct ethtool_keee *e)
- {
- 	/* Nothing to do on the port's MAC */
- 	return 0;
-diff --git a/drivers/net/dsa/qca/qca8k-common.c b/drivers/net/dsa/qca/qca8k-common.c
-index 2358cd399..7f80035c5 100644
---- a/drivers/net/dsa/qca/qca8k-common.c
-+++ b/drivers/net/dsa/qca/qca8k-common.c
-@@ -534,7 +534,7 @@ int qca8k_get_sset_count(struct dsa_switch *ds, int port, int sset)
- }
- 
- int qca8k_set_mac_eee(struct dsa_switch *ds, int port,
--		      struct ethtool_eee *eee)
-+		      struct ethtool_keee *eee)
- {
- 	u32 lpi_en = QCA8K_REG_EEE_CTRL_LPI_EN(port);
- 	struct qca8k_priv *priv = ds->priv;
-@@ -558,7 +558,7 @@ int qca8k_set_mac_eee(struct dsa_switch *ds, int port,
- }
- 
- int qca8k_get_mac_eee(struct dsa_switch *ds, int port,
--		      struct ethtool_eee *e)
-+		      struct ethtool_keee *e)
- {
- 	/* Nothing to do on the port's MAC */
- 	return 0;
-diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
-index 2ac7e88f8..7893d1325 100644
---- a/drivers/net/dsa/qca/qca8k.h
-+++ b/drivers/net/dsa/qca/qca8k.h
-@@ -517,8 +517,8 @@ void qca8k_get_ethtool_stats(struct dsa_switch *ds, int port,
- int qca8k_get_sset_count(struct dsa_switch *ds, int port, int sset);
- 
- /* Common eee function */
--int qca8k_set_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *eee);
--int qca8k_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e);
-+int qca8k_set_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *eee);
-+int qca8k_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e);
- 
- /* Common bridge function */
- void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state);
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-index 18a6c8d99..be865776d 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-@@ -697,7 +697,7 @@ static u32 eee_mask_to_ethtool_mask(u32 speed)
- 	return rate;
- }
- 
--static int aq_ethtool_get_eee(struct net_device *ndev, struct ethtool_eee *eee)
-+static int aq_ethtool_get_eee(struct net_device *ndev, struct ethtool_keee *eee)
- {
- 	struct aq_nic_s *aq_nic = netdev_priv(ndev);
- 	u32 rate, supported_rates;
-@@ -729,7 +729,7 @@ static int aq_ethtool_get_eee(struct net_device *ndev, struct ethtool_eee *eee)
- 	return 0;
- }
- 
--static int aq_ethtool_set_eee(struct net_device *ndev, struct ethtool_eee *eee)
-+static int aq_ethtool_set_eee(struct net_device *ndev, struct ethtool_keee *eee)
- {
- 	struct aq_nic_s *aq_nic = netdev_priv(ndev);
- 	u32 rate, supported_rates;
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.h b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-index ec90add6b..312bf9b65 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-@@ -337,7 +337,7 @@ struct bcmasp_intf {
- 	int				wol_irq;
- 	unsigned int			wol_irq_enabled:1;
- 
--	struct ethtool_eee		eee;
-+	struct ethtool_keee		eee;
- };
- 
- #define NUM_NET_FILTERS				32
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-index ce6a3d56f..2851bed15 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-@@ -363,10 +363,10 @@ void bcmasp_eee_enable_set(struct bcmasp_intf *intf, bool enable)
- 	intf->eee.eee_active = enable;
- }
- 
--static int bcmasp_get_eee(struct net_device *dev, struct ethtool_eee *e)
-+static int bcmasp_get_eee(struct net_device *dev, struct ethtool_keee *e)
- {
- 	struct bcmasp_intf *intf = netdev_priv(dev);
--	struct ethtool_eee *p = &intf->eee;
-+	struct ethtool_keee *p = &intf->eee;
- 
- 	if (!dev->phydev)
- 		return -ENODEV;
-@@ -379,10 +379,10 @@ static int bcmasp_get_eee(struct net_device *dev, struct ethtool_eee *e)
- 	return phy_ethtool_get_eee(dev->phydev, e);
- }
- 
--static int bcmasp_set_eee(struct net_device *dev, struct ethtool_eee *e)
-+static int bcmasp_set_eee(struct net_device *dev, struct ethtool_keee *e)
- {
- 	struct bcmasp_intf *intf = netdev_priv(dev);
--	struct ethtool_eee *p = &intf->eee;
-+	struct ethtool_keee *p = &intf->eee;
- 	int ret;
- 
- 	if (!dev->phydev)
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-index 81d232e6d..c9afb9203 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-@@ -2108,7 +2108,7 @@ static u32 bnx2x_adv_to_eee(u32 modes, u32 shift)
- 	return eee_adv << shift;
- }
- 
--static int bnx2x_get_eee(struct net_device *dev, struct ethtool_eee *edata)
-+static int bnx2x_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
- 	struct bnx2x *bp = netdev_priv(dev);
- 	u32 eee_cfg;
-@@ -2141,7 +2141,7 @@ static int bnx2x_get_eee(struct net_device *dev, struct ethtool_eee *edata)
- 	return 0;
- }
- 
--static int bnx2x_set_eee(struct net_device *dev, struct ethtool_eee *edata)
-+static int bnx2x_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
- 	struct bnx2x *bp = netdev_priv(dev);
- 	u32 eee_cfg;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 827821e89..aca41bafd 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10613,7 +10613,7 @@ static int bnxt_hwrm_phy_qcaps(struct bnxt *bp)
- 
- 	bp->phy_flags = resp->flags | (le16_to_cpu(resp->flags2) << 8);
- 	if (resp->flags & PORT_PHY_QCAPS_RESP_FLAGS_EEE_SUPPORTED) {
--		struct ethtool_eee *eee = &bp->eee;
-+		struct ethtool_keee *eee = &bp->eee;
- 		u16 fw_speeds = le16_to_cpu(resp->supported_speeds_eee_mode);
- 
- 		eee->supported = _bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
-@@ -10758,7 +10758,7 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
- 	link_info->module_status = resp->module_status;
- 
- 	if (bp->phy_flags & BNXT_PHY_FL_EEE_CAP) {
--		struct ethtool_eee *eee = &bp->eee;
-+		struct ethtool_keee *eee = &bp->eee;
- 		u16 fw_speeds;
- 
- 		eee->eee_active = 0;
-@@ -10949,7 +10949,7 @@ int bnxt_hwrm_set_pause(struct bnxt *bp)
- static void bnxt_hwrm_set_eee(struct bnxt *bp,
- 			      struct hwrm_port_phy_cfg_input *req)
- {
--	struct ethtool_eee *eee = &bp->eee;
-+	struct ethtool_keee *eee = &bp->eee;
- 
- 	if (eee->eee_enabled) {
- 		u16 eee_speeds;
-@@ -11314,7 +11314,7 @@ static void bnxt_get_wol_settings(struct bnxt *bp)
- 
- static bool bnxt_eee_config_ok(struct bnxt *bp)
- {
--	struct ethtool_eee *eee = &bp->eee;
-+	struct ethtool_keee *eee = &bp->eee;
- 	struct bnxt_link_info *link_info = &bp->link_info;
- 
- 	if (!(bp->phy_flags & BNXT_PHY_FL_EEE_CAP))
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index b8ef1717c..be2e3b6aa 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2441,7 +2441,7 @@ struct bnxt {
- 	 */
- 	struct mutex		link_lock;
- 	struct bnxt_link_info	link_info;
--	struct ethtool_eee	eee;
-+	struct ethtool_keee	eee;
- 	u32			lpi_tmr_lo;
- 	u32			lpi_tmr_hi;
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 5629ba9f4..719b8f124 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -3882,10 +3882,10 @@ static int bnxt_set_eeprom(struct net_device *dev,
- 				eeprom->len);
- }
- 
--static int bnxt_set_eee(struct net_device *dev, struct ethtool_eee *edata)
-+static int bnxt_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
- 	struct bnxt *bp = netdev_priv(dev);
--	struct ethtool_eee *eee = &bp->eee;
-+	struct ethtool_keee *eee = &bp->eee;
- 	struct bnxt_link_info *link_info = &bp->link_info;
- 	u32 advertising;
- 	int rc = 0;
-@@ -3940,7 +3940,7 @@ static int bnxt_set_eee(struct net_device *dev, struct ethtool_eee *edata)
- 	return rc;
- }
- 
--static int bnxt_get_eee(struct net_device *dev, struct ethtool_eee *edata)
-+static int bnxt_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
- 	struct bnxt *bp = netdev_priv(dev);
- 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 2d7ae7128..051c31fb1 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1317,10 +1317,10 @@ void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
- 	priv->eee.tx_lpi_enabled = tx_lpi_enabled;
- }
- 
--static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_eee *e)
-+static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_keee *e)
- {
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
--	struct ethtool_eee *p = &priv->eee;
-+	struct ethtool_keee *p = &priv->eee;
- 
- 	if (GENET_IS_V1(priv))
- 		return -EOPNOTSUPP;
-@@ -1336,10 +1336,10 @@ static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_eee *e)
- 	return phy_ethtool_get_eee(dev->phydev, e);
- }
- 
--static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_eee *e)
-+static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_keee *e)
- {
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
--	struct ethtool_eee *p = &priv->eee;
-+	struct ethtool_keee *p = &priv->eee;
- 
- 	if (GENET_IS_V1(priv))
- 		return -EOPNOTSUPP;
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.h b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-index 1985c0ec4..7523b60b3 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-@@ -645,7 +645,7 @@ struct bcmgenet_priv {
- 
- 	struct bcmgenet_mib_counters mib;
- 
--	struct ethtool_eee eee;
-+	struct ethtool_keee eee;
- };
- 
- #define GENET_IO_MACRO(name, offset)					\
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 04964bbe0..11054177c 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -2338,10 +2338,10 @@ static void tg3_phy_apply_otp(struct tg3 *tp)
- 	tg3_phy_toggle_auxctl_smdsp(tp, false);
- }
- 
--static void tg3_eee_pull_config(struct tg3 *tp, struct ethtool_eee *eee)
-+static void tg3_eee_pull_config(struct tg3 *tp, struct ethtool_keee *eee)
- {
- 	u32 val;
--	struct ethtool_eee *dest = &tp->eee;
-+	struct ethtool_keee *dest = &tp->eee;
- 
- 	if (!(tp->phy_flags & TG3_PHYFLG_EEE_CAP))
- 		return;
-@@ -4618,7 +4618,7 @@ static int tg3_init_5401phy_dsp(struct tg3 *tp)
- 
- static bool tg3_phy_eee_config_ok(struct tg3 *tp)
- {
--	struct ethtool_eee eee;
-+	struct ethtool_keee eee;
- 
- 	if (!(tp->phy_flags & TG3_PHYFLG_EEE_CAP))
- 		return true;
-@@ -14180,7 +14180,7 @@ static int tg3_set_coalesce(struct net_device *dev,
- 	return 0;
- }
- 
--static int tg3_set_eee(struct net_device *dev, struct ethtool_eee *edata)
-+static int tg3_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
- 	struct tg3 *tp = netdev_priv(dev);
- 
-@@ -14217,7 +14217,7 @@ static int tg3_set_eee(struct net_device *dev, struct ethtool_eee *edata)
- 	return 0;
- }
- 
--static int tg3_get_eee(struct net_device *dev, struct ethtool_eee *edata)
-+static int tg3_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
- 	struct tg3 *tp = netdev_priv(dev);
- 
-diff --git a/drivers/net/ethernet/broadcom/tg3.h b/drivers/net/ethernet/broadcom/tg3.h
-index 5016475e5..cf1b2b123 100644
---- a/drivers/net/ethernet/broadcom/tg3.h
-+++ b/drivers/net/ethernet/broadcom/tg3.h
-@@ -3419,7 +3419,7 @@ struct tg3 {
- 	unsigned int			irq_cnt;
- 
- 	struct ethtool_coalesce		coal;
--	struct ethtool_eee		eee;
-+	struct ethtool_keee		eee;
- 
- 	/* firmware info */
- 	const char			*fw_needed;
-diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
-index df40c720e..351f39e02 100644
---- a/drivers/net/ethernet/engleder/tsnep_main.c
-+++ b/drivers/net/ethernet/engleder/tsnep_main.c
-@@ -238,7 +238,7 @@ static int tsnep_phy_loopback(struct tsnep_adapter *adapter, bool enable)
- static int tsnep_phy_open(struct tsnep_adapter *adapter)
- {
- 	struct phy_device *phydev;
--	struct ethtool_eee ethtool_eee;
-+	struct ethtool_keee ethtool_keee;
- 	int retval;
- 
- 	retval = phy_connect_direct(adapter->netdev, adapter->phydev,
-@@ -257,8 +257,8 @@ static int tsnep_phy_open(struct tsnep_adapter *adapter)
- 	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
- 
- 	/* disable EEE autoneg, EEE not supported by TSNEP */
--	memset(&ethtool_eee, 0, sizeof(ethtool_eee));
--	phy_ethtool_set_eee(adapter->phydev, &ethtool_eee);
-+	memset(&ethtool_keee, 0, sizeof(ethtool_keee));
-+	phy_ethtool_set_eee(adapter->phydev, &ethtool_keee);
- 
- 	adapter->phydev->irq = PHY_MAC_INTERRUPT;
- 	phy_start(adapter->phydev);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index cffbf27c4..ceecda91d 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -2402,7 +2402,7 @@ static void enetc_clear_interrupts(struct enetc_ndev_priv *priv)
- static int enetc_phylink_connect(struct net_device *ndev)
- {
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
--	struct ethtool_eee edata;
-+	struct ethtool_keee edata;
- 	int err;
- 
- 	if (!priv->phylink) {
-@@ -2418,7 +2418,7 @@ static int enetc_phylink_connect(struct net_device *ndev)
- 	}
- 
- 	/* disable EEE autoneg, until ENETC driver supports it */
--	memset(&edata, 0, sizeof(struct ethtool_eee));
-+	memset(&edata, 0, sizeof(struct ethtool_keee));
- 	phylink_ethtool_set_eee(priv->phylink, &edata);
- 
- 	phylink_start(priv->phylink);
-diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
-index a8fbcada6..a19cb2a78 100644
---- a/drivers/net/ethernet/freescale/fec.h
-+++ b/drivers/net/ethernet/freescale/fec.h
-@@ -672,7 +672,7 @@ struct fec_enet_private {
- 	unsigned int itr_clk_rate;
- 
- 	/* tx lpi eee mode */
--	struct ethtool_eee eee;
-+	struct ethtool_keee eee;
- 	unsigned int clk_ref_rate;
- 
- 	/* ptp clock period in ns*/
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index d42594f32..11185754e 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -3120,7 +3120,7 @@ static int fec_enet_us_to_tx_cycle(struct net_device *ndev, int us)
- static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	struct ethtool_eee *p = &fep->eee;
-+	struct ethtool_keee *p = &fep->eee;
- 	unsigned int sleep_cycle, wake_cycle;
- 	int ret = 0;
- 
-@@ -3147,10 +3147,10 @@ static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
- }
- 
- static int
--fec_enet_get_eee(struct net_device *ndev, struct ethtool_eee *edata)
-+fec_enet_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	struct ethtool_eee *p = &fep->eee;
-+	struct ethtool_keee *p = &fep->eee;
- 
- 	if (!(fep->quirks & FEC_QUIRK_HAS_EEE))
- 		return -EOPNOTSUPP;
-@@ -3167,10 +3167,10 @@ fec_enet_get_eee(struct net_device *ndev, struct ethtool_eee *edata)
- }
- 
- static int
--fec_enet_set_eee(struct net_device *ndev, struct ethtool_eee *edata)
-+fec_enet_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	struct ethtool_eee *p = &fep->eee;
-+	struct ethtool_keee *p = &fep->eee;
- 	int ret = 0;
- 
- 	if (!(fep->quirks & FEC_QUIRK_HAS_EEE))
-diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-index e3dfbd7a4..a811238c0 100644
---- a/drivers/net/ethernet/freescale/gianfar.c
-+++ b/drivers/net/ethernet/freescale/gianfar.c
-@@ -1649,7 +1649,7 @@ static int init_phy(struct net_device *dev)
- 	struct gfar_private *priv = netdev_priv(dev);
- 	phy_interface_t interface = priv->interface;
- 	struct phy_device *phydev;
--	struct ethtool_eee edata;
-+	struct ethtool_keee edata;
- 
- 	linkmode_set_bit_array(phy_10_100_features_array,
- 			       ARRAY_SIZE(phy_10_100_features_array),
-@@ -1681,7 +1681,7 @@ static int init_phy(struct net_device *dev)
- 	phy_support_asym_pause(phydev);
- 
- 	/* disable EEE autoneg, EEE not supported by eTSEC */
--	memset(&edata, 0, sizeof(struct ethtool_eee));
-+	memset(&edata, 0, sizeof(struct ethtool_keee));
- 	phy_ethtool_set_eee(phydev, &edata);
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index fc0f98ea6..343f54b2b 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -2186,7 +2186,7 @@ static int e1000_get_rxnfc(struct net_device *netdev,
- 	}
- }
- 
--static int e1000e_get_eee(struct net_device *netdev, struct ethtool_eee *edata)
-+static int e1000e_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- {
- 	struct e1000_adapter *adapter = netdev_priv(netdev);
- 	struct e1000_hw *hw = &adapter->hw;
-@@ -2262,11 +2262,11 @@ static int e1000e_get_eee(struct net_device *netdev, struct ethtool_eee *edata)
- 	return ret_val;
- }
- 
--static int e1000e_set_eee(struct net_device *netdev, struct ethtool_eee *edata)
-+static int e1000e_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
- {
- 	struct e1000_adapter *adapter = netdev_priv(netdev);
- 	struct e1000_hw *hw = &adapter->hw;
--	struct ethtool_eee eee_curr;
-+	struct ethtool_keee eee_curr;
- 	s32 ret_val;
- 
- 	ret_val = e1000e_get_eee(netdev, &eee_curr);
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index 8cc5697e2..2474f26c9 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -5644,7 +5644,7 @@ static int i40e_get_module_eeprom(struct net_device *netdev,
- 	return 0;
- }
- 
--static int i40e_get_eee(struct net_device *netdev, struct ethtool_eee *edata)
-+static int i40e_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- {
- 	struct i40e_netdev_priv *np = netdev_priv(netdev);
- 	struct i40e_aq_get_phy_abilities_resp phy_cfg;
-@@ -5682,7 +5682,7 @@ static int i40e_get_eee(struct net_device *netdev, struct ethtool_eee *edata)
- }
- 
- static int i40e_is_eee_param_supported(struct net_device *netdev,
--				       struct ethtool_eee *edata)
-+				       struct ethtool_keee *edata)
- {
- 	struct i40e_netdev_priv *np = netdev_priv(netdev);
- 	struct i40e_vsi *vsi = np->vsi;
-@@ -5709,7 +5709,7 @@ static int i40e_is_eee_param_supported(struct net_device *netdev,
- 	return 0;
- }
- 
--static int i40e_set_eee(struct net_device *netdev, struct ethtool_eee *edata)
-+static int i40e_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
- {
- 	struct i40e_netdev_priv *np = netdev_priv(netdev);
- 	struct i40e_aq_get_phy_abilities_resp abilities;
-diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-index b66199c9b..778d1e6cf 100644
---- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-@@ -3027,7 +3027,7 @@ static int igb_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
- 	return ret;
- }
- 
--static int igb_get_eee(struct net_device *netdev, struct ethtool_eee *edata)
-+static int igb_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- {
- 	struct igb_adapter *adapter = netdev_priv(netdev);
- 	struct e1000_hw *hw = &adapter->hw;
-@@ -3106,11 +3106,11 @@ static int igb_get_eee(struct net_device *netdev, struct ethtool_eee *edata)
- }
- 
- static int igb_set_eee(struct net_device *netdev,
--		       struct ethtool_eee *edata)
-+		       struct ethtool_keee *edata)
- {
- 	struct igb_adapter *adapter = netdev_priv(netdev);
- 	struct e1000_hw *hw = &adapter->hw;
--	struct ethtool_eee eee_curr;
-+	struct ethtool_keee eee_curr;
- 	bool adv1g_eee = true, adv100m_eee = true;
- 	s32 ret_val;
- 
-@@ -3118,7 +3118,7 @@ static int igb_set_eee(struct net_device *netdev,
- 	    (hw->phy.media_type != e1000_media_type_copper))
- 		return -EOPNOTSUPP;
- 
--	memset(&eee_curr, 0, sizeof(struct ethtool_eee));
-+	memset(&eee_curr, 0, sizeof(struct ethtool_keee));
- 
- 	ret_val = igb_get_eee(netdev, &eee_curr);
- 	if (ret_val)
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index ac7c861e8..63432e779 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -168,7 +168,7 @@ struct igc_ring {
- struct igc_adapter {
- 	struct net_device *netdev;
- 
--	struct ethtool_eee eee;
-+	struct ethtool_keee eee;
- 	u16 eee_advert;
- 
- 	unsigned long state;
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index 684f6f2a0..bb72e4fa1 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1587,7 +1587,7 @@ static int igc_ethtool_set_priv_flags(struct net_device *netdev, u32 priv_flags)
- }
- 
- static int igc_ethtool_get_eee(struct net_device *netdev,
--			       struct ethtool_eee *edata)
-+			       struct ethtool_keee *edata)
- {
- 	struct igc_adapter *adapter = netdev_priv(netdev);
- 	struct igc_hw *hw = &adapter->hw;
-@@ -1628,14 +1628,14 @@ static int igc_ethtool_get_eee(struct net_device *netdev,
- }
- 
- static int igc_ethtool_set_eee(struct net_device *netdev,
--			       struct ethtool_eee *edata)
-+			       struct ethtool_keee *edata)
- {
- 	struct igc_adapter *adapter = netdev_priv(netdev);
- 	struct igc_hw *hw = &adapter->hw;
--	struct ethtool_eee eee_curr;
-+	struct ethtool_keee eee_curr;
- 	s32 ret_val;
- 
--	memset(&eee_curr, 0, sizeof(struct ethtool_eee));
-+	memset(&eee_curr, 0, sizeof(struct ethtool_keee));
- 
- 	ret_val = igc_ethtool_get_eee(netdev, &eee_curr);
- 	if (ret_val) {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index af55f19d5..4c96d7089 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -3425,7 +3425,7 @@ static const struct {
- };
- 
- static int
--ixgbe_get_eee_fw(struct ixgbe_adapter *adapter, struct ethtool_eee *edata)
-+ixgbe_get_eee_fw(struct ixgbe_adapter *adapter, struct ethtool_keee *edata)
- {
- 	u32 info[FW_PHY_ACT_DATA_COUNT] = { 0 };
- 	struct ixgbe_hw *hw = &adapter->hw;
-@@ -3462,7 +3462,7 @@ ixgbe_get_eee_fw(struct ixgbe_adapter *adapter, struct ethtool_eee *edata)
- 	return 0;
- }
- 
--static int ixgbe_get_eee(struct net_device *netdev, struct ethtool_eee *edata)
-+static int ixgbe_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- {
- 	struct ixgbe_adapter *adapter = netdev_priv(netdev);
- 	struct ixgbe_hw *hw = &adapter->hw;
-@@ -3476,17 +3476,17 @@ static int ixgbe_get_eee(struct net_device *netdev, struct ethtool_eee *edata)
- 	return -EOPNOTSUPP;
- }
- 
--static int ixgbe_set_eee(struct net_device *netdev, struct ethtool_eee *edata)
-+static int ixgbe_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
- {
- 	struct ixgbe_adapter *adapter = netdev_priv(netdev);
- 	struct ixgbe_hw *hw = &adapter->hw;
--	struct ethtool_eee eee_data;
-+	struct ethtool_keee eee_data;
- 	s32 ret_val;
- 
- 	if (!(adapter->flags2 & IXGBE_FLAG2_EEE_CAPABLE))
- 		return -EOPNOTSUPP;
- 
--	memset(&eee_data, 0, sizeof(struct ethtool_eee));
-+	memset(&eee_data, 0, sizeof(struct ethtool_keee));
- 
- 	ret_val = ixgbe_get_eee(netdev, &eee_data);
- 	if (ret_val)
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index a641b3534..40a5f1431 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -5097,7 +5097,7 @@ static int mvneta_ethtool_set_wol(struct net_device *dev,
- }
- 
- static int mvneta_ethtool_get_eee(struct net_device *dev,
--				  struct ethtool_eee *eee)
-+				  struct ethtool_keee *eee)
- {
- 	struct mvneta_port *pp = netdev_priv(dev);
- 	u32 lpi_ctl0;
-@@ -5113,7 +5113,7 @@ static int mvneta_ethtool_get_eee(struct net_device *dev,
- }
- 
- static int mvneta_ethtool_set_eee(struct net_device *dev,
--				  struct ethtool_eee *eee)
-+				  struct ethtool_keee *eee)
- {
- 	struct mvneta_port *pp = netdev_priv(dev);
- 	u32 lpi_ctl0;
-diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-index 8c4a2bb6a..ddb45823b 100644
---- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-@@ -1055,7 +1055,7 @@ static int lan743x_ethtool_get_ts_info(struct net_device *netdev,
- }
- 
- static int lan743x_ethtool_get_eee(struct net_device *netdev,
--				   struct ethtool_eee *eee)
-+				   struct ethtool_keee *eee)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(netdev);
- 	struct phy_device *phydev = netdev->phydev;
-@@ -1093,7 +1093,7 @@ static int lan743x_ethtool_get_eee(struct net_device *netdev,
- }
- 
- static int lan743x_ethtool_set_eee(struct net_device *netdev,
--				   struct ethtool_eee *eee)
-+				   struct ethtool_keee *eee)
- {
- 	struct lan743x_adapter *adapter;
- 	struct phy_device *phydev;
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-index 0e240b5ab..77491fb64 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-@@ -1776,7 +1776,7 @@ static int qede_get_tunable(struct net_device *dev,
- 	return 0;
- }
- 
--static int qede_get_eee(struct net_device *dev, struct ethtool_eee *edata)
-+static int qede_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
- 	struct qede_dev *edev = netdev_priv(dev);
- 	struct qed_link_output current_link;
-@@ -1810,7 +1810,7 @@ static int qede_get_eee(struct net_device *dev, struct ethtool_eee *edata)
- 	return 0;
- }
- 
--static int qede_set_eee(struct net_device *dev, struct ethtool_eee *edata)
-+static int qede_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
- 	struct qede_dev *edev = netdev_priv(dev);
- 	struct qed_link_output current_link;
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index bf5c67307..c0bb971e4 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -1974,7 +1974,7 @@ static int rtl_set_coalesce(struct net_device *dev,
- 	return 0;
- }
- 
--static int rtl8169_get_eee(struct net_device *dev, struct ethtool_eee *data)
-+static int rtl8169_get_eee(struct net_device *dev, struct ethtool_keee *data)
- {
- 	struct rtl8169_private *tp = netdev_priv(dev);
- 
-@@ -1984,7 +1984,7 @@ static int rtl8169_get_eee(struct net_device *dev, struct ethtool_eee *data)
- 	return phy_ethtool_get_eee(tp->phydev, data);
- }
- 
--static int rtl8169_set_eee(struct net_device *dev, struct ethtool_eee *data)
-+static int rtl8169_set_eee(struct net_device *dev, struct ethtool_keee *data)
- {
- 	struct rtl8169_private *tp = netdev_priv(dev);
- 	int ret;
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-index 8ba017ec9..d93b628b7 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-@@ -133,7 +133,7 @@ static const struct sxgbe_stats sxgbe_gstrings_stats[] = {
- #define SXGBE_STATS_LEN ARRAY_SIZE(sxgbe_gstrings_stats)
- 
- static int sxgbe_get_eee(struct net_device *dev,
--			 struct ethtool_eee *edata)
-+			 struct ethtool_keee *edata)
- {
- 	struct sxgbe_priv_data *priv = netdev_priv(dev);
- 
-@@ -148,7 +148,7 @@ static int sxgbe_get_eee(struct net_device *dev,
- }
- 
- static int sxgbe_set_eee(struct net_device *dev,
--			 struct ethtool_eee *edata)
-+			 struct ethtool_keee *edata)
- {
- 	struct sxgbe_priv_data *priv = netdev_priv(dev);
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index 8105ce47c..d4067f783 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -849,7 +849,7 @@ static int stmmac_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- }
- 
- static int stmmac_ethtool_op_get_eee(struct net_device *dev,
--				     struct ethtool_eee *edata)
-+				     struct ethtool_keee *edata)
- {
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 
-@@ -865,7 +865,7 @@ static int stmmac_ethtool_op_get_eee(struct net_device *dev,
- }
- 
- static int stmmac_ethtool_op_set_eee(struct net_device *dev,
--				     struct ethtool_eee *edata)
-+				     struct ethtool_keee *edata)
- {
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 	int ret;
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-index 35fceba01..d6ce2c9f0 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-@@ -514,14 +514,14 @@ am65_cpsw_set_link_ksettings(struct net_device *ndev,
- 	return phylink_ethtool_ksettings_set(salve->phylink, ecmd);
- }
- 
--static int am65_cpsw_get_eee(struct net_device *ndev, struct ethtool_eee *edata)
-+static int am65_cpsw_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	struct am65_cpsw_slave_data *salve = am65_ndev_to_slave(ndev);
- 
- 	return phylink_ethtool_get_eee(salve->phylink, edata);
- }
- 
--static int am65_cpsw_set_eee(struct net_device *ndev, struct ethtool_eee *edata)
-+static int am65_cpsw_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	struct am65_cpsw_slave_data *salve = am65_ndev_to_slave(ndev);
- 
-diff --git a/drivers/net/ethernet/ti/cpsw_ethtool.c b/drivers/net/ethernet/ti/cpsw_ethtool.c
-index a557a477d..f7b283353 100644
---- a/drivers/net/ethernet/ti/cpsw_ethtool.c
-+++ b/drivers/net/ethernet/ti/cpsw_ethtool.c
-@@ -422,7 +422,7 @@ int cpsw_set_link_ksettings(struct net_device *ndev,
- 	return phy_ethtool_ksettings_set(cpsw->slaves[slave_no].phy, ecmd);
- }
- 
--int cpsw_get_eee(struct net_device *ndev, struct ethtool_eee *edata)
-+int cpsw_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	struct cpsw_priv *priv = netdev_priv(ndev);
- 	struct cpsw_common *cpsw = priv->cpsw;
-@@ -434,7 +434,7 @@ int cpsw_get_eee(struct net_device *ndev, struct ethtool_eee *edata)
- 		return -EOPNOTSUPP;
- }
- 
--int cpsw_set_eee(struct net_device *ndev, struct ethtool_eee *edata)
-+int cpsw_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	struct cpsw_priv *priv = netdev_priv(ndev);
- 	struct cpsw_common *cpsw = priv->cpsw;
-diff --git a/drivers/net/ethernet/ti/cpsw_priv.h b/drivers/net/ethernet/ti/cpsw_priv.h
-index 0e27c4330..7efa72502 100644
---- a/drivers/net/ethernet/ti/cpsw_priv.h
-+++ b/drivers/net/ethernet/ti/cpsw_priv.h
-@@ -496,8 +496,8 @@ int cpsw_get_link_ksettings(struct net_device *ndev,
- 			    struct ethtool_link_ksettings *ecmd);
- int cpsw_set_link_ksettings(struct net_device *ndev,
- 			    const struct ethtool_link_ksettings *ecmd);
--int cpsw_get_eee(struct net_device *ndev, struct ethtool_eee *edata);
--int cpsw_set_eee(struct net_device *ndev, struct ethtool_eee *edata);
-+int cpsw_get_eee(struct net_device *ndev, struct ethtool_keee *edata);
-+int cpsw_set_eee(struct net_device *ndev, struct ethtool_keee *edata);
- int cpsw_nway_reset(struct net_device *ndev);
- void cpsw_get_ringparam(struct net_device *ndev,
- 			struct ethtool_ringparam *ering,
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-index a27ec1dcc..9a7dd7efc 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-@@ -45,7 +45,7 @@ static int emac_set_link_ksettings(struct net_device *ndev,
- 	return phy_ethtool_set_link_ksettings(ndev, ecmd);
- }
- 
--static int emac_get_eee(struct net_device *ndev, struct ethtool_eee *edata)
-+static int emac_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	if (!ndev->phydev)
- 		return -EOPNOTSUPP;
-@@ -53,7 +53,7 @@ static int emac_get_eee(struct net_device *ndev, struct ethtool_eee *edata)
- 	return phy_ethtool_get_eee(ndev->phydev, edata);
- }
- 
--static int emac_set_eee(struct net_device *ndev, struct ethtool_eee *edata)
-+static int emac_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	if (!ndev->phydev)
- 		return -EOPNOTSUPP;
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-index 6302ecca7..b539a20f4 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-@@ -119,7 +119,7 @@ int ngbe_phy_connect(struct wx *wx)
- static void ngbe_phy_fixup(struct wx *wx)
- {
- 	struct phy_device *phydev = wx->phydev;
--	struct ethtool_eee eee;
-+	struct ethtool_keee eee;
- 
- 	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
- 	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
-index 674e29bce..c26d20bda 100644
---- a/drivers/net/phy/marvell.c
-+++ b/drivers/net/phy/marvell.c
-@@ -1461,7 +1461,7 @@ static int m88e1540_get_fld(struct phy_device *phydev, u8 *msecs)
- 
- static int m88e1540_set_fld(struct phy_device *phydev, const u8 *msecs)
- {
--	struct ethtool_eee eee;
-+	struct ethtool_keee eee;
- 	int val, ret;
- 
- 	if (*msecs == ETHTOOL_PHY_FAST_LINK_DOWN_OFF)
-diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index 747d14bf1..adee5e712 100644
---- a/drivers/net/phy/phy-c45.c
-+++ b/drivers/net/phy/phy-c45.c
-@@ -1443,13 +1443,13 @@ EXPORT_SYMBOL(genphy_c45_eee_is_active);
- /**
-  * genphy_c45_ethtool_get_eee - get EEE supported and status
-  * @phydev: target phy_device struct
-- * @data: ethtool_eee data
-+ * @data: ethtool_keee data
-  *
-  * Description: it reports the Supported/Advertisement/LP Advertisement
-  * capabilities.
-  */
- int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
--			       struct ethtool_eee *data)
-+			       struct ethtool_keee *data)
- {
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(adv) = {};
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(lp) = {};
-@@ -1481,7 +1481,7 @@ EXPORT_SYMBOL(genphy_c45_ethtool_get_eee);
- /**
-  * genphy_c45_ethtool_set_eee - set EEE supported and status
-  * @phydev: target phy_device struct
-- * @data: ethtool_eee data
-+ * @data: ethtool_keee data
-  *
-  * Description: sets the Supported/Advertisement/LP Advertisement
-  * capabilities. If eee_enabled is false, no links modes are
-@@ -1490,7 +1490,7 @@ EXPORT_SYMBOL(genphy_c45_ethtool_get_eee);
-  * non-destructive way.
-  */
- int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
--			       struct ethtool_eee *data)
-+			       struct ethtool_keee *data)
- {
- 	int ret;
- 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 3376e58e2..3b9531143 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1632,12 +1632,12 @@ EXPORT_SYMBOL(phy_get_eee_err);
- /**
-  * phy_ethtool_get_eee - get EEE supported and status
-  * @phydev: target phy_device struct
-- * @data: ethtool_eee data
-+ * @data: ethtool_keee data
-  *
-  * Description: it reportes the Supported/Advertisement/LP Advertisement
-  * capabilities.
-  */
--int phy_ethtool_get_eee(struct phy_device *phydev, struct ethtool_eee *data)
-+int phy_ethtool_get_eee(struct phy_device *phydev, struct ethtool_keee *data)
- {
- 	int ret;
- 
-@@ -1655,11 +1655,11 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
- /**
-  * phy_ethtool_set_eee - set EEE supported and status
-  * @phydev: target phy_device struct
-- * @data: ethtool_eee data
-+ * @data: ethtool_keee data
-  *
-  * Description: it is to program the Advertisement EEE register.
-  */
--int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_eee *data)
-+int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data)
- {
- 	int ret;
- 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 3d25a4a62..f13d08163 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -2698,9 +2698,9 @@ EXPORT_SYMBOL_GPL(phylink_init_eee);
- /**
-  * phylink_ethtool_get_eee() - read the energy efficient ethernet parameters
-  * @pl: a pointer to a &struct phylink returned from phylink_create()
-- * @eee: a pointer to a &struct ethtool_eee for the read parameters
-+ * @eee: a pointer to a &struct ethtool_keee for the read parameters
-  */
--int phylink_ethtool_get_eee(struct phylink *pl, struct ethtool_eee *eee)
-+int phylink_ethtool_get_eee(struct phylink *pl, struct ethtool_keee *eee)
- {
- 	int ret = -EOPNOTSUPP;
- 
-@@ -2716,9 +2716,9 @@ EXPORT_SYMBOL_GPL(phylink_ethtool_get_eee);
- /**
-  * phylink_ethtool_set_eee() - set the energy efficient ethernet parameters
-  * @pl: a pointer to a &struct phylink returned from phylink_create()
-- * @eee: a pointer to a &struct ethtool_eee for the desired parameters
-+ * @eee: a pointer to a &struct ethtool_keee for the desired parameters
-  */
--int phylink_ethtool_set_eee(struct phylink *pl, struct ethtool_eee *eee)
-+int phylink_ethtool_set_eee(struct phylink *pl, struct ethtool_keee *eee)
- {
- 	int ret = -EOPNOTSUPP;
- 
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index d837c1887..3922a9afd 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -667,7 +667,7 @@ static int ax88179_set_link_ksettings(struct net_device *net,
- }
- 
- static int
--ax88179_ethtool_get_eee(struct usbnet *dev, struct ethtool_eee *data)
-+ax88179_ethtool_get_eee(struct usbnet *dev, struct ethtool_keee *data)
- {
- 	int val;
- 
-@@ -696,7 +696,7 @@ ax88179_ethtool_get_eee(struct usbnet *dev, struct ethtool_eee *data)
- }
- 
- static int
--ax88179_ethtool_set_eee(struct usbnet *dev, struct ethtool_eee *data)
-+ax88179_ethtool_set_eee(struct usbnet *dev, struct ethtool_keee *data)
- {
- 	u16 tmp16 = ethtool_adv_to_mmd_eee_adv_t(data->advertised);
- 
-@@ -807,7 +807,7 @@ static void ax88179_enable_eee(struct usbnet *dev)
- 			  GMII_PHY_PAGE_SELECT, 2, &tmp16);
- }
- 
--static int ax88179_get_eee(struct net_device *net, struct ethtool_eee *edata)
-+static int ax88179_get_eee(struct net_device *net, struct ethtool_keee *edata)
- {
- 	struct usbnet *dev = netdev_priv(net);
- 	struct ax88179_data *priv = dev->driver_priv;
-@@ -818,7 +818,7 @@ static int ax88179_get_eee(struct net_device *net, struct ethtool_eee *edata)
- 	return ax88179_ethtool_get_eee(dev, edata);
- }
- 
--static int ax88179_set_eee(struct net_device *net, struct ethtool_eee *edata)
-+static int ax88179_set_eee(struct net_device *net, struct ethtool_keee *edata)
- {
- 	struct usbnet *dev = netdev_priv(net);
- 	struct ax88179_data *priv = dev->driver_priv;
-@@ -1587,7 +1587,7 @@ static int ax88179_reset(struct usbnet *dev)
- 	u16 *tmp16;
- 	u8 *tmp;
- 	struct ax88179_data *ax179_data = dev->driver_priv;
--	struct ethtool_eee eee_data;
-+	struct ethtool_keee eee_data;
- 
- 	tmp16 = (u16 *)buf;
- 	tmp = (u8 *)buf;
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 5add4145d..5b2e98e02 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -1673,7 +1673,7 @@ static int lan78xx_set_wol(struct net_device *netdev,
- 	return ret;
- }
- 
--static int lan78xx_get_eee(struct net_device *net, struct ethtool_eee *edata)
-+static int lan78xx_get_eee(struct net_device *net, struct ethtool_keee *edata)
- {
- 	struct lan78xx_net *dev = netdev_priv(net);
- 	struct phy_device *phydev = net->phydev;
-@@ -1711,7 +1711,7 @@ static int lan78xx_get_eee(struct net_device *net, struct ethtool_eee *edata)
- 	return ret;
- }
- 
--static int lan78xx_set_eee(struct net_device *net, struct ethtool_eee *edata)
-+static int lan78xx_set_eee(struct net_device *net, struct ethtool_keee *edata)
- {
- 	struct lan78xx_net *dev = netdev_priv(net);
- 	int ret;
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 0d0672d2a..dc163b766 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -891,8 +891,8 @@ struct r8152 {
- 		void (*up)(struct r8152 *tp);
- 		void (*down)(struct r8152 *tp);
- 		void (*unload)(struct r8152 *tp);
--		int (*eee_get)(struct r8152 *tp, struct ethtool_eee *eee);
--		int (*eee_set)(struct r8152 *tp, struct ethtool_eee *eee);
-+		int (*eee_get)(struct r8152 *tp, struct ethtool_keee *eee);
-+		int (*eee_set)(struct r8152 *tp, struct ethtool_keee *eee);
- 		bool (*in_nway)(struct r8152 *tp);
- 		void (*hw_phy_cfg)(struct r8152 *tp);
- 		void (*autosuspend_en)(struct r8152 *tp, bool enable);
-@@ -8922,7 +8922,7 @@ static void rtl8152_get_strings(struct net_device *dev, u32 stringset, u8 *data)
- 	}
- }
- 
--static int r8152_get_eee(struct r8152 *tp, struct ethtool_eee *eee)
-+static int r8152_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
- {
- 	u32 lp, adv, supported = 0;
- 	u16 val;
-@@ -8945,7 +8945,7 @@ static int r8152_get_eee(struct r8152 *tp, struct ethtool_eee *eee)
- 	return 0;
- }
- 
--static int r8152_set_eee(struct r8152 *tp, struct ethtool_eee *eee)
-+static int r8152_set_eee(struct r8152 *tp, struct ethtool_keee *eee)
- {
- 	u16 val = ethtool_adv_to_mmd_eee_adv_t(eee->advertised);
- 
-@@ -8957,7 +8957,7 @@ static int r8152_set_eee(struct r8152 *tp, struct ethtool_eee *eee)
- 	return 0;
- }
- 
--static int r8153_get_eee(struct r8152 *tp, struct ethtool_eee *eee)
-+static int r8153_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
- {
- 	u32 lp, adv, supported = 0;
- 	u16 val;
-@@ -8981,7 +8981,7 @@ static int r8153_get_eee(struct r8152 *tp, struct ethtool_eee *eee)
- }
- 
- static int
--rtl_ethtool_get_eee(struct net_device *net, struct ethtool_eee *edata)
-+rtl_ethtool_get_eee(struct net_device *net, struct ethtool_keee *edata)
- {
- 	struct r8152 *tp = netdev_priv(net);
- 	int ret;
-@@ -9008,7 +9008,7 @@ rtl_ethtool_get_eee(struct net_device *net, struct ethtool_eee *edata)
- }
- 
- static int
--rtl_ethtool_set_eee(struct net_device *net, struct ethtool_eee *edata)
-+rtl_ethtool_set_eee(struct net_device *net, struct ethtool_keee *edata)
- {
- 	struct r8152 *tp = netdev_priv(net);
- 	int ret;
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 325e0778e..501dfeb92 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -222,6 +222,18 @@ extern int
- __ethtool_get_link_ksettings(struct net_device *dev,
- 			     struct ethtool_link_ksettings *link_ksettings);
- 
-+struct ethtool_keee {
-+	u32	cmd;
-+	u32	supported;
-+	u32	advertised;
-+	u32	lp_advertised;
-+	u32	eee_active;
-+	u32	eee_enabled;
-+	u32	tx_lpi_enabled;
-+	u32	tx_lpi_timer;
-+	u32	reserved[2];
-+};
-+
- struct kernel_ethtool_coalesce {
- 	u8 use_cqe_mode_tx;
- 	u8 use_cqe_mode_rx;
-@@ -892,8 +904,8 @@ struct ethtool_ops {
- 				   struct ethtool_modinfo *);
- 	int     (*get_module_eeprom)(struct net_device *,
- 				     struct ethtool_eeprom *, u8 *);
--	int	(*get_eee)(struct net_device *, struct ethtool_eee *);
--	int	(*set_eee)(struct net_device *, struct ethtool_eee *);
-+	int	(*get_eee)(struct net_device *, struct ethtool_keee *);
-+	int	(*set_eee)(struct net_device *, struct ethtool_keee *);
- 	int	(*get_tunable)(struct net_device *,
- 			       const struct ethtool_tunable *, void *);
- 	int	(*set_tunable)(struct net_device *,
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 3637bdfc1..1dfe5d2ce 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1892,9 +1892,9 @@ int genphy_c45_plca_get_status(struct phy_device *phydev,
- int genphy_c45_eee_is_active(struct phy_device *phydev, unsigned long *adv,
- 			     unsigned long *lp, bool *is_enabled);
- int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
--			       struct ethtool_eee *data);
-+			       struct ethtool_keee *data);
- int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
--			       struct ethtool_eee *data);
-+			       struct ethtool_keee *data);
- int genphy_c45_write_eee_adv(struct phy_device *phydev, unsigned long *adv);
- int genphy_c45_an_config_eee_aneg(struct phy_device *phydev);
- int genphy_c45_read_eee_adv(struct phy_device *phydev, unsigned long *adv);
-@@ -1972,8 +1972,8 @@ int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
- 
- int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable);
- int phy_get_eee_err(struct phy_device *phydev);
--int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_eee *data);
--int phy_ethtool_get_eee(struct phy_device *phydev, struct ethtool_eee *data);
-+int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data);
-+int phy_ethtool_get_eee(struct phy_device *phydev, struct ethtool_keee *data);
- int phy_ethtool_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol);
- void phy_ethtool_get_wol(struct phy_device *phydev,
- 			 struct ethtool_wolinfo *wol);
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 875439ab4..9499aed4e 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -650,8 +650,8 @@ int phylink_ethtool_set_pauseparam(struct phylink *,
- 				   struct ethtool_pauseparam *);
- int phylink_get_eee_err(struct phylink *);
- int phylink_init_eee(struct phylink *, bool);
--int phylink_ethtool_get_eee(struct phylink *, struct ethtool_eee *);
--int phylink_ethtool_set_eee(struct phylink *, struct ethtool_eee *);
-+int phylink_ethtool_get_eee(struct phylink *, struct ethtool_keee *);
-+int phylink_ethtool_set_eee(struct phylink *, struct ethtool_keee *);
- int phylink_mii_ioctl(struct phylink *, struct ifreq *, int);
- int phylink_speed_down(struct phylink *pl, bool sync);
- int phylink_speed_up(struct phylink *pl);
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 82135fbdb..7c0da9eff 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -991,9 +991,9 @@ struct dsa_switch_ops {
- 	 * Port's MAC EEE settings
- 	 */
- 	int	(*set_mac_eee)(struct dsa_switch *ds, int port,
--			       struct ethtool_eee *e);
-+			       struct ethtool_keee *e);
- 	int	(*get_mac_eee)(struct dsa_switch *ds, int port,
--			       struct ethtool_eee *e);
-+			       struct ethtool_keee *e);
- 
- 	/* EEPROM access */
- 	int	(*get_eeprom_len)(struct dsa_switch *ds);
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index b738a466e..fa09e9389 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1222,7 +1222,7 @@ static int dsa_user_set_wol(struct net_device *dev, struct ethtool_wolinfo *w)
- 	return ret;
- }
- 
--static int dsa_user_set_eee(struct net_device *dev, struct ethtool_eee *e)
-+static int dsa_user_set_eee(struct net_device *dev, struct ethtool_keee *e)
- {
- 	struct dsa_port *dp = dsa_user_to_port(dev);
- 	struct dsa_switch *ds = dp->ds;
-@@ -1242,7 +1242,7 @@ static int dsa_user_set_eee(struct net_device *dev, struct ethtool_eee *e)
- 	return phylink_ethtool_set_eee(dp->pl, e);
- }
- 
--static int dsa_user_get_eee(struct net_device *dev, struct ethtool_eee *e)
-+static int dsa_user_get_eee(struct net_device *dev, struct ethtool_keee *e)
- {
- 	struct dsa_port *dp = dsa_user_to_port(dev);
- 	struct dsa_switch *ds = dp->ds;
-diff --git a/net/ethtool/eee.c b/net/ethtool/eee.c
-index 2853394d0..21b0e845a 100644
---- a/net/ethtool/eee.c
-+++ b/net/ethtool/eee.c
-@@ -5,7 +5,7 @@
- #include "bitset.h"
- 
- #define EEE_MODES_COUNT \
--	(sizeof_field(struct ethtool_eee, supported) * BITS_PER_BYTE)
-+	(sizeof_field(struct ethtool_keee, supported) * BITS_PER_BYTE)
- 
- struct eee_req_info {
- 	struct ethnl_req_info		base;
-@@ -13,7 +13,7 @@ struct eee_req_info {
- 
- struct eee_reply_data {
- 	struct ethnl_reply_data		base;
--	struct ethtool_eee		eee;
-+	struct ethtool_keee		eee;
- };
- 
- #define EEE_REPDATA(__reply_base) \
-@@ -48,7 +48,7 @@ static int eee_reply_size(const struct ethnl_req_info *req_base,
- {
- 	bool compact = req_base->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
- 	const struct eee_reply_data *data = EEE_REPDATA(reply_base);
--	const struct ethtool_eee *eee = &data->eee;
-+	const struct ethtool_keee *eee = &data->eee;
- 	int len = 0;
- 	int ret;
- 
-@@ -84,7 +84,7 @@ static int eee_fill_reply(struct sk_buff *skb,
- {
- 	bool compact = req_base->flags & ETHTOOL_FLAG_COMPACT_BITSETS;
- 	const struct eee_reply_data *data = EEE_REPDATA(reply_base);
--	const struct ethtool_eee *eee = &data->eee;
-+	const struct ethtool_keee *eee = &data->eee;
- 	int ret;
- 
- 	ret = ethnl_put_bitset32(skb, ETHTOOL_A_EEE_MODES_OURS,
-@@ -132,7 +132,7 @@ ethnl_set_eee(struct ethnl_req_info *req_info, struct genl_info *info)
- {
- 	struct net_device *dev = req_info->dev;
- 	struct nlattr **tb = info->attrs;
--	struct ethtool_eee eee = {};
-+	struct ethtool_keee eee = {};
- 	bool mod = false;
- 	int ret;
- 
 diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 4bc9a2a07..099d02e7d 100644
+index 099d02e7d..9222fbeeb 100644
 --- a/net/ethtool/ioctl.c
 +++ b/net/ethtool/ioctl.c
-@@ -1507,13 +1507,13 @@ static int ethtool_set_wol(struct net_device *dev, char __user *useraddr)
+@@ -1505,22 +1505,51 @@ static int ethtool_set_wol(struct net_device *dev, char __user *useraddr)
+ 	return 0;
+ }
  
++static void eee_to_keee(struct ethtool_keee *keee,
++			const struct ethtool_eee *eee)
++{
++	memset(keee, 0, sizeof(*keee));
++
++	keee->supported = eee->supported;
++	keee->advertised = eee->advertised;
++	keee->lp_advertised = eee->lp_advertised;
++	keee->eee_active = eee->eee_active;
++	keee->eee_enabled = eee->eee_enabled;
++	keee->tx_lpi_enabled = eee->tx_lpi_enabled;
++	keee->tx_lpi_timer = eee->tx_lpi_timer;
++}
++
++static void keee_to_eee(struct ethtool_eee *eee,
++			const struct ethtool_keee *keee)
++{
++	memset(eee, 0, sizeof(*eee));
++
++	eee->supported = keee->supported;
++	eee->advertised = keee->advertised;
++	eee->lp_advertised = keee->lp_advertised;
++	eee->eee_active = keee->eee_active;
++	eee->eee_enabled = keee->eee_enabled;
++	eee->tx_lpi_enabled = keee->tx_lpi_enabled;
++	eee->tx_lpi_timer = keee->tx_lpi_timer;
++}
++
  static int ethtool_get_eee(struct net_device *dev, char __user *useraddr)
  {
--	struct ethtool_eee edata;
-+	struct ethtool_keee edata;
+-	struct ethtool_keee edata;
++	struct ethtool_keee keee;
++	struct ethtool_eee eee;
  	int rc;
  
  	if (!dev->ethtool_ops->get_eee)
  		return -EOPNOTSUPP;
  
--	memset(&edata, 0, sizeof(struct ethtool_eee));
-+	memset(&edata, 0, sizeof(struct ethtool_keee));
- 	edata.cmd = ETHTOOL_GEEE;
- 	rc = dev->ethtool_ops->get_eee(dev, &edata);
+-	memset(&edata, 0, sizeof(struct ethtool_keee));
+-	edata.cmd = ETHTOOL_GEEE;
+-	rc = dev->ethtool_ops->get_eee(dev, &edata);
+-
++	memset(&keee, 0, sizeof(keee));
++	rc = dev->ethtool_ops->get_eee(dev, &keee);
+ 	if (rc)
+ 		return rc;
  
-@@ -1528,7 +1528,7 @@ static int ethtool_get_eee(struct net_device *dev, char __user *useraddr)
+-	if (copy_to_user(useraddr, &edata, sizeof(edata)))
++	keee_to_eee(&eee, &keee);
++	eee.cmd = ETHTOOL_GEEE;
++	if (copy_to_user(useraddr, &eee, sizeof(eee)))
+ 		return -EFAULT;
+ 
+ 	return 0;
+@@ -1528,16 +1557,18 @@ static int ethtool_get_eee(struct net_device *dev, char __user *useraddr)
  
  static int ethtool_set_eee(struct net_device *dev, char __user *useraddr)
  {
--	struct ethtool_eee edata;
-+	struct ethtool_keee edata;
+-	struct ethtool_keee edata;
++	struct ethtool_keee keee;
++	struct ethtool_eee eee;
  	int ret;
  
  	if (!dev->ethtool_ops->set_eee)
+ 		return -EOPNOTSUPP;
+ 
+-	if (copy_from_user(&edata, useraddr, sizeof(edata)))
++	if (copy_from_user(&eee, useraddr, sizeof(eee)))
+ 		return -EFAULT;
+ 
+-	ret = dev->ethtool_ops->set_eee(dev, &edata);
++	eee_to_keee(&keee, &eee);
++	ret = dev->ethtool_ops->set_eee(dev, &keee);
+ 	if (!ret)
+ 		ethtool_notify(dev, ETHTOOL_MSG_EEE_NTF, NULL);
+ 	return ret;
 -- 
 2.43.0
 
