@@ -1,124 +1,110 @@
-Return-Path: <netdev+bounces-62191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08CD82617B
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 21:35:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E2FD82618C
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 22:02:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40A7FB21684
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 20:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA6E1F21AB1
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 21:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0039CA70;
-	Sat,  6 Jan 2024 20:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6BBF4F0;
+	Sat,  6 Jan 2024 21:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="dIOLKMKo";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="Jx1YnUfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC63BD514;
-	Sat,  6 Jan 2024 20:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.104] (31.173.84.255) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 6 Jan
- 2024 23:34:46 +0300
-Subject: Re: [PATCH net-next v3 11/19] net: ravb: Move DBAT configuration to
- the driver's ndo_open API
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <geert+renesas@glider.be>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
- <20240105082339.1468817-12-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <e31ba1fd-5242-4dc8-8a92-f4c0150dab6a@omp.ru>
-Date: Sat, 6 Jan 2024 23:34:45 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6818B101C0;
+	Sat,  6 Jan 2024 21:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alu.unizg.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alu.unizg.hr
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 4A2186017E;
+	Sat,  6 Jan 2024 22:02:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1704574959; bh=BxsZaTTHmQjXlXIaqqVDt2FbBWu5XHnBXUrmPbzAXXo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dIOLKMKonxQR+xdhK+tw8jExuVGCFyDRaRxlliUo9PPGfucFS+k7XW51tWb1QPv8L
+	 jONHZMr6oR1vZLyZwT/EBhr3uKLs88/dcOEwIUXPTSUx/rrMnKgyNJuweXCLJCdGYB
+	 L419HTGmnl2GBusDtjuotP9vUKCVzh8ZQOhegrZXpcNqw9mIU9IujBT9dBazKjj870
+	 Gomb37NmV213J9ZD61Z3RaN2PB49o+X1Y0TlpnCZG/2QI0alH9ya4es1h1Tnbon7zR
+	 idpD7A9QNJN4CJsVhWZ1qy5MfYLNYrQDIgB4aTPSposq2l7e0vwBah/riTQjMUCspk
+	 r/4ZbxSrk/orw==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id Kt8goUn3UaCk; Sat,  6 Jan 2024 22:02:37 +0100 (CET)
+Received: from [192.168.92.51] (unknown [95.168.116.36])
+	by domac.alu.hr (Postfix) with ESMTPSA id EFF5A60171;
+	Sat,  6 Jan 2024 22:02:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1704574957; bh=BxsZaTTHmQjXlXIaqqVDt2FbBWu5XHnBXUrmPbzAXXo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Jx1YnUfqNzudmwmsJEs5asKbHizYvo4REnMQCZD16CZEUsyPpMgwXkjyHebyMNCko
+	 bVa5aetB28wMyUTLK21O4JhBGiZtXfOrT2vNB51TCdBCEZddpY3EKRdMTlyEbVyvou
+	 n/fZGVNYG1CfMFcyTVeeiCNaJrwXtNlcwRkfFz79CHSOIQ2hC+UwyKPfqFJ3SfnULJ
+	 RmPNEqyr6Sf8wUruyoQNepiBj5HQ7Hit5REyQB4DW//PImVawJ6Ig2ltcPcaZx3Zi7
+	 IX5sX6AbBw8jnPYK2+9I7q4M+Nl3Bf6AB29tPS8FpZ19sB00edADNgreMurUXcZJ63
+	 9i1lWweHRXm2w==
+Message-ID: <5f46cd87-ecad-4cad-bb03-b5bf22dff3b7@alu.unizg.hr>
+Date: Sat, 6 Jan 2024 22:02:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240105082339.1468817-12-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/06/2024 20:18:48
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182473 [Jan 06 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.255 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.255
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/06/2024 20:24:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/6/2024 6:35:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+User-Agent: Mozilla Thunderbird
+Subject: Re: selftest: net: fcnal-test.sh TIMEOUT
+Content-Language: en-US, hr
+To: David Ahern <dsahern@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <0b9a2827-c9c5-41d6-a4f1-dbd91262c474@alu.unizg.hr>
+ <e0a52f62-3ea8-48c4-a5c4-307f7642cd45@kernel.org>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <e0a52f62-3ea8-48c4-a5c4-307f7642cd45@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 1/5/24 11:23 AM, Claudiu wrote:
-
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On 06. 01. 2024. 17:16, David Ahern wrote:
+> On 1/5/24 2:41 AM, Mirsad Todorovac wrote:
+>> diff --git a/tools/testing/selftests/net/settings
+>> b/tools/testing/selftests/net/settings index dfc27cdc6c05..ed8418e8217a
+>> 100644 --- a/tools/testing/selftests/net/settings +++
+>> b/tools/testing/selftests/net/settings @@ -1 +1 @@ -timeout=1500
+>> +timeout=3600
 > 
-> DBAT setup was done in the driver's probe API. As some IP variants switch
-> to reset mode (and thus registers content is lost) when setting clocks
-> (due to module standby functionality) to be able to implement runtime PM
-> move the DBAT configuration in the driver's ndo_open API.
-> 
-> This commit prepares the code for the addition of runtime PM.
-> 
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-[...]
+> bumping the timeout is fine to me. that script is running a lot of
+> permutations.
 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 946abd7606ca..dbc26c3e95ec 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -1826,6 +1826,7 @@ static int ravb_open(struct net_device *ndev)
->  		napi_enable(&priv->napi[RAVB_NC]);
->  
->  	ravb_set_delay_mode(ndev);
-> +	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+Well, aren't bugs best discovered if all cases or permutations are tested?
 
-   Please do consider moving this to ravb_dmac_init(), at least in
-the future...
+I recall some cases with Giullaume and Ido fixing them the last Summer or so.
 
->  
->  	/* Device init */
->  	error = ravb_dmac_init(ndev);
+Thanks.
 
-MBR, Sergey
+Regards,
+Mirsad
+
+-- 
+Mirsad Goran Todorovac
+Sistem inženjer
+Grafički fakultet | Akademija likovnih umjetnosti
+Sveučilište u Zagrebu
+ 
+System engineer
+Faculty of Graphic Arts | Academy of Fine Arts
+University of Zagreb, Republic of Croatia
+The European Union
+
+"I see something approaching fast ... Will it be friends with me?"
+
 
