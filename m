@@ -1,109 +1,119 @@
-Return-Path: <netdev+bounces-62150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F40825E41
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 06:03:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0DD825E97
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 07:55:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBB1D1F241E1
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 05:03:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A28131F2282C
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 06:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8413E17E1;
-	Sat,  6 Jan 2024 05:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A38617F7;
+	Sat,  6 Jan 2024 06:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f/xf9JXG"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yOcIiVCB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACE51FAB;
-	Sat,  6 Jan 2024 05:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5f3a5b9e09cso510037b3.0;
-        Fri, 05 Jan 2024 21:03:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704517391; x=1705122191; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=S6WQ72yzEWlJPYXcZ4mWVTOsW9/5ZgzPZbDV727HLoM=;
-        b=f/xf9JXGFP2Ti0+fB8RUF+T7p6uWiCAr/GQvBsewuPS6qnLO6mHhbmPD5cHhFq+GhF
-         Vkhg0cdkl2bq5XVDU2VaXYXEc/IxJPTJ0MLjmGkNU4TBst+27UFhIsqgK9naCfC88azN
-         oB29hJtHBp4faiz6GlGooj7DdHkzvTSIVo5FVKrn9dq6hrGDWqFthkZCGe76GS3PRqhu
-         yYkn5elmXgxUtqCRew3xIUyZBSWfwtO6EL7XuP3HYic9LY3DO044cDvtf28UKSTC+gCK
-         waKakDapVTVZizU0mI5udaMAJZqE4c0f8COJbb6L0pxYSrAopDVwtTPHqNe7clBXFJfZ
-         na4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704517391; x=1705122191;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S6WQ72yzEWlJPYXcZ4mWVTOsW9/5ZgzPZbDV727HLoM=;
-        b=jMT+Arz6XKFDKyZ3Sr5BrWaFeFx/ovJSkP4/LjT/B+dIwa0lBUEz311Sx8wpIfFVJL
-         5EEooA5nvMScqaFJhhr5jL46t/5lKdZWx7Zi9XMub9O9cWSLyokvFjXx+E1ZkEvIFjry
-         W+uHzMRbOI7rcAfBq0RegZiGco6YbJa5RRXlFyXMo5S5DZsXAGCjtWMyNIbnBwrntIrD
-         6031LMlXDWgbBYQ3wcZC0RkZkgsXhEOsZQtwfCQcNAPPI/Scs15xcwQD1w/4rv2N0Ct8
-         LiHmxMQ4G8nD//QYG6KE/m+QQor6W5Qgso6bpK7uICg0BRtXifrq1BnNlFszE6/Tsa0O
-         ofoA==
-X-Gm-Message-State: AOJu0YyHHUOO8DSESPNkCXpGXAjjC0C/fkt0jTNHAGAZdmL+SQFuXLi5
-	uIes182CLONo5OW+aCU+Rbo=
-X-Google-Smtp-Source: AGHT+IFr/vi7aARiyYM6iY4rSPLOVL4MWF50+EoxzlpgqAasBcl0pW4oMEkfDMqGstDbshlkp0K+hA==
-X-Received: by 2002:a81:5dc5:0:b0:5ed:902c:602b with SMTP id r188-20020a815dc5000000b005ed902c602bmr445255ywb.1.1704517390958;
-        Fri, 05 Jan 2024 21:03:10 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id p68-20020a0dff47000000b005d4035e6135sm1224047ywf.74.2024.01.05.21.03.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 21:03:10 -0800 (PST)
-Date: Fri, 5 Jan 2024 21:03:07 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Mahesh Bandewar =?utf-8?B?KOCkruCkueClh+CktiDgpKzgpILgpKHgpYfgpLXgpL4=?=
-	=?utf-8?B?4KSwKQ==?= <maheshb@google.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
-	David Miller <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AA728F3;
+	Sat,  6 Jan 2024 06:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=OuVdUPjUvU4/6iSnWx34w41LnQL5QQ6HXu6RyAkm9Bc=; b=yOcIiVCBn/mREvuXDvq8dQNSrM
+	kPMJ1RY531i/cUKvqHE+ZB2V0QsBVn6IGxBpupWpcMJ6FZhHHpzqUtuKBGB9anMFvScHeBUNIHuSI
+	IZtE1+roTYlzY9YZI8ipiAIJYTmwONsXE6TCr5Q5jizWYqZHFPZ+Aat8pAwC+46kmgREZ4cAnMpPN
+	9l/3RgaxloDOjqG4uXTWxLvOncqGs26+qZnd9453JL2wREqcs5Nf8LqLCKGuVxfJp+L8772uMVhkf
+	tKig/QksdHFSwzmiWMWWS0TF2JD2Rp9BnC1jFP+pEiOWMZbIEok63iR4iWEsTFmnURNFtKbq3qsQn
+	c5uHVkhA==;
+Received: from [50.53.46.231] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rM0aw-000rYt-0K;
+	Sat, 06 Jan 2024 06:55:46 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: patches@lists.linux.dev,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
-	Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>,
-	Mahesh Bandewar <mahesh@bandewar.net>,
-	Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCHv3 net-next 2/3] ptp: add ioctl interface for
- ptp_gettimex64any()
-Message-ID: <ZZjfC9LvQFrtwu_x@hoboy.vegasvil.org>
-References: <20240104212439.3276458-1-maheshb@google.com>
- <ZZczNlXzM8lrZgH5@hoboy.vegasvil.org>
- <CAF2d9jga9oc4OST6PMU=C9rz_NDrURCcLGx-1tP31U00z63vbA@mail.gmail.com>
- <ZZjdUlaYyHZSiwSM@hoboy.vegasvil.org>
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH bpf-next] net: filter: fix spelling mistakes
+Date: Fri,  5 Jan 2024 22:55:45 -0800
+Message-ID: <20240106065545.16855-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZZjdUlaYyHZSiwSM@hoboy.vegasvil.org>
 
-On Fri, Jan 05, 2024 at 08:55:46PM -0800, Richard Cochran wrote:
-> On Fri, Jan 05, 2024 at 09:51:40AM -0800, Mahesh Bandewar (महेश बंडेवार) wrote:
-> 
-> > POSIX clocks are employed in this series for syscall width
-> > measurement, potentially leading to misunderstandings about
-> > overlapping functionality. However, their roles are distinct and serve
-> > different purposes.
-> 
-> I don't see any difference in purposes.  The multi_clock_gettime call
-> is a more general solution.  Thus it will obviate the need for any new
-> PTP ioctls.
+Fix spelling errors as reported by codespell.
 
-And to be clear, I object to the third patch, the new ioctl.
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Andrii Nakryiko <andrii@kernel.org>
+Cc: bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+base-commit: 610a9b8f49fbcf1100716370d3b5f6f884a2835a
 
-ptp_clock_info.gettimex64any() can and should be presented as an
-optimized back end for the multi_clock_gettime system call.
+ net/core/filter.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Thanks,
-Richard
+diff -- a/net/core/filter.c b/net/core/filter.c
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -777,7 +777,7 @@ jmp_rest:
+ 			BPF_EMIT_JMP;
+ 			break;
+ 
+-		/* ldxb 4 * ([14] & 0xf) is remaped into 6 insns. */
++		/* ldxb 4 * ([14] & 0xf) is remapped into 6 insns. */
+ 		case BPF_LDX | BPF_MSH | BPF_B: {
+ 			struct sock_filter tmp = {
+ 				.code	= BPF_LD | BPF_ABS | BPF_B,
+@@ -803,7 +803,7 @@ jmp_rest:
+ 			*insn = BPF_MOV64_REG(BPF_REG_A, BPF_REG_TMP);
+ 			break;
+ 		}
+-		/* RET_K is remaped into 2 insns. RET_A case doesn't need an
++		/* RET_K is remapped into 2 insns. RET_A case doesn't need an
+ 		 * extra mov as BPF_REG_0 is already mapped into BPF_REG_A.
+ 		 */
+ 		case BPF_RET | BPF_A:
+@@ -2967,7 +2967,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_m
+ 	 *
+ 	 * Then if B is non-zero AND there is no space allocate space and
+ 	 * compact A, B regions into page. If there is space shift ring to
+-	 * the rigth free'ing the next element in ring to place B, leaving
++	 * the right free'ing the next element in ring to place B, leaving
+ 	 * A untouched except to reduce length.
+ 	 */
+ 	if (start != offset) {
+@@ -8226,7 +8226,7 @@ xdp_func_proto(enum bpf_func_id func_id,
+ #if IS_MODULE(CONFIG_NF_CONNTRACK) && IS_ENABLED(CONFIG_DEBUG_INFO_BTF_MODULES)
+ 	/* The nf_conn___init type is used in the NF_CONNTRACK kfuncs. The
+ 	 * kfuncs are defined in two different modules, and we want to be able
+-	 * to use them interchangably with the same BTF type ID. Because modules
++	 * to use them interchangeably with the same BTF type ID. Because modules
+ 	 * can't de-duplicate BTF IDs between each other, we need the type to be
+ 	 * referenced in the vmlinux BTF or the verifier will get confused about
+ 	 * the different types. So we add this dummy type reference which will
 
