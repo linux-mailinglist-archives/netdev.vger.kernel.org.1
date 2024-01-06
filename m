@@ -1,86 +1,83 @@
-Return-Path: <netdev+bounces-62142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0BFF825E13
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:30:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97301825E15
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BCDC283E6E
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 03:30:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32B1EB232F0
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 03:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF3515BB;
-	Sat,  6 Jan 2024 03:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434711FD9;
+	Sat,  6 Jan 2024 03:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYDIp+Mb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEJNHvEc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC2C15B3;
-	Sat,  6 Jan 2024 03:30:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A09CDC433C7;
-	Sat,  6 Jan 2024 03:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219301FAA;
+	Sat,  6 Jan 2024 03:30:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84A86C433CC;
+	Sat,  6 Jan 2024 03:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704511831;
-	bh=ZZT5W/3OayChCmzDajSxgELxnptLBYGuC7NHIb+7uWU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dYDIp+Mby3VrwUNXuc505hhrUlZWX6YnsTAVt4cp6JDLy3Cz/pqLGQN6+dmvKEmUM
-	 2bedL6TjTCT6R5Sx4kfi5PQ6E4J7L/vPeDv+H2ZW4FI3RUowD8z3DslbcTqNHNpoNZ
-	 ZXNamfRP8ONsklOAVRAkW8fuc+XE39d7oF/R1NHo2RKfHsh0OZWYc6pdBK6uibWJ23
-	 +jCooMpqaBF/RbdMPN75AGF+VYJLlOZvW1yoInTFV+TtxrsESTc5LPiL8/RpPfRQBw
-	 4OmYf1xM5QVcP/N4S/mSmIq7nx/naIBfHsFaIz/z0QBVzDKrlqebewzFQTGkmiK2Ql
-	 r9ZGd6gofQaHQ==
-Date: Fri, 5 Jan 2024 19:30:29 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <hgani@marvell.com>, <vimleshk@marvell.com>, <sedara@marvell.com>,
- <egallen@redhat.com>, <mschmidt@redhat.com>, <pabeni@redhat.com>,
- <horms@kernel.org>, <wizhao@redhat.com>, <kheib@redhat.com>,
- <konguyen@redhat.com>, Veerasenareddy Burru <vburru@marvell.com>, Satananda
- Burla <sburla@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v3 6/8] octeon_ep_vf: add Tx/Rx processing and
- interrupt support
-Message-ID: <20240105193029.004ee174@kernel.org>
-In-Reply-To: <20240105203823.2953604-7-srasheed@marvell.com>
-References: <20240105203823.2953604-1-srasheed@marvell.com>
-	<20240105203823.2953604-7-srasheed@marvell.com>
+	s=k20201202; t=1704511832;
+	bh=5XBExEJP4001NhSJnkiW9XbmuvN5s/G6qmnkrLtYD1c=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YEJNHvEcW5bErN8GG97M5O0Ppp0t+vP7u7rlw1kf+hDMPMC0nWVj9D4bd6BuKHI9a
+	 JXqqFkxzH0v+QD6008wdV1MUL1Mccw93+/0ydAqed0PG6Edm7L2+xLHrhFBWbolsoD
+	 mnjqdw/jAnNQA7RJng3pMi8eZIarlREOk7hWdaTigdFCc4TIjMDQ/DSWqdG91A4Gl5
+	 2CFWi6O8q914gWSE0q5OdAQDQKWnX6mWHypCT0/HYZsjMnvsj5t6z2brBlDt6bj0qp
+	 TFDcvp8dB7WZlV/O5cT7uh5t4jKtSo7EMSCcTOZ8qQT5xN+B0+5ZZgTuBpnbemZS6K
+	 D8MSReLGZssww==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6B83DC4167E;
+	Sat,  6 Jan 2024 03:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf-next 2024-01-05
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170451183243.21355.3142708861258708303.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Jan 2024 03:30:32 +0000
+References: <20240105170105.21070-1-daniel@iogearbox.net>
+In-Reply-To: <20240105170105.21070-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Fri, 5 Jan 2024 12:38:21 -0800 Shinas Rasheed wrote:
-> +static int octep_vf_iq_full_check(struct octep_vf_iq *iq)
-> +{
-> +	if (likely((IQ_INSTR_SPACE(iq)) >
-> +		   OCTEP_VF_WAKE_QUEUE_THRESHOLD))
-> +		return 0;
-> +
-> +	/* Stop the queue if unable to send */
-> +	netif_stop_subqueue(iq->netdev, iq->q_no);
-> +
-> +	/* check again and restart the queue, in case NAPI has just freed
-> +	 * enough Tx ring entries.
-> +	 */
-> +	if (unlikely(IQ_INSTR_SPACE(iq) >
-> +		     OCTEP_VF_WAKE_QUEUE_THRESHOLD)) {
-> +		netif_start_subqueue(iq->netdev, iq->q_no);
-> +		iq->stats.restart_cnt++;
-> +		return 0;
-> +	}
+Hello:
 
-Please use the macros from netdev_queues.h here as well.
-Looks like you may be missing a memory barrier here.
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-And please call this function after queuing an skb to
-make sure NETDEV_TX_BUSY is almost never returned.
-See Documentation/networking/driver.rst
+On Fri,  5 Jan 2024 18:01:05 +0100 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 40 non-merge commits during the last 2 day(s) which contain
+> a total of 73 files changed, 1526 insertions(+), 951 deletions(-).
+> 
+> [...]
+
+Here is the summary with links:
+  - pull-request: bpf-next 2024-01-05
+    https://git.kernel.org/netdev/net-next/c/8158a50f9058
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
