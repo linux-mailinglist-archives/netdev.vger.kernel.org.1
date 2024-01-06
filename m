@@ -1,110 +1,341 @@
-Return-Path: <netdev+bounces-62162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87375825F7E
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 13:41:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95169825F9B
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 14:11:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22DF4282DB2
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 12:41:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABC47283995
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 13:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5595C7475;
-	Sat,  6 Jan 2024 12:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579036FC8;
+	Sat,  6 Jan 2024 13:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=easyb-ch.20230601.gappssmtp.com header.i=@easyb-ch.20230601.gappssmtp.com header.b="lI+DCxnt"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="y3ClUUYl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399987460
-	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 12:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=easyb.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=easyb.ch
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-50eafc5b39eso88801e87.1
-        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 04:41:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4455C6FCB
+	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 13:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5983341fd30so39468eaf.3
+        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 05:11:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=easyb-ch.20230601.gappssmtp.com; s=20230601; t=1704544873; x=1705149673; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3LKyU4sMRsN2Mz2SouvrXP62Yh6z2LtEYbZQG+005M4=;
-        b=lI+DCxntBTW2ScklRB5xJdTGAs448T+RT7Rp01LmjNTO26N7XqRtkVfoD7m/Jq/kBl
-         PLLTcp86MsyY6JPMrdJuo0nXfmjp0Fd/+rs/+kEaTEWSiFLoE9N1Hyu+CST5WCEpFnVT
-         F9AtxXwISMdy7yTqpdICDE03uyVgjp48YdN6zeeE0wxmx0/bnP9Gk9qenLRR5rOLG5e0
-         D5VGW8wZklru9t88mvcAIN2XRWyqkTBwAhJDad7fZfVgfKYpZtzhBXxKByzQSpQuqJZK
-         Ke1kXcp0l0yLi/jSww1tabkgMBJ0DnAlvOkCMyqxnrudp9Qn5YqQ2RUcnPD8EBSjGLot
-         CTOw==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704546693; x=1705151493; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ylEUqgG5u/Dqe8TMOcL3B5H3bQ72WpY1bO29p1ogas=;
+        b=y3ClUUYl6N2lHJF9KWtn1n3cfWt/lol923OBJjXrJlXIuvd5V7zPzRZFjA4dWvvy3g
+         1GE7Y7OSomSmZL5ZhcWEVVZu8jeWTc0cJnw5dnnvYTdIgj3WQTk3of9E9HIJUPQbjdFU
+         /bHHvYDHAE/t+r4bZZxDfybI0QZHV7DiGN41g89W+V3c90L/lgdXOGfuqLQ+5BTIY6hX
+         xGRVKit33ukDz8hXSM6QY841zCp4MW40FJYhiv3NkaQ+wKMvD7O+Y9drCgqK1z4Oa73D
+         TfVD1pLHjhzm1v0UdmfClNkTmScbJcWa+grvFFl3iZa+hPGOt8xia9jLHG43BZJx+mY7
+         e8bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704544873; x=1705149673;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3LKyU4sMRsN2Mz2SouvrXP62Yh6z2LtEYbZQG+005M4=;
-        b=MGxUpbKvx6Sxbqv79QnVObgfUH3kbd+23mkUoZzMLZGVqwmzbnBSI2yqr6aZ4vCjpi
-         3qCuKc3iyBCHm2XAQp/zeLaZrVd0KClP2qDv9exwd2jQhnnDoG1T8rjMPl50mM6kDU1p
-         d0xMxM3gZ7B2SdlWUvFUguE26jnrJ//gOqqKA3aDJbKT35yFoa4K9FqmPvGbX9KsK9YD
-         1DYfGsYwVvYBIb89Rt394rlwtgQIUxGiIVHotJbNlrEyl84ObTtWQeX6D6ZgW1cV/9MO
-         IXkSJV88tTPcHiXmVe07llCajI8+1D4uL04jnT0th5miwqUqmZoC4nP/a8d0KdVP2e9T
-         5YWw==
-X-Gm-Message-State: AOJu0YzuI8lM9mQ9YKVRZtxuhitY5GspVe1pdiZCEP5gryb8fNIpvEgN
-	JFybQoC9wFdorlDRNgn03GM4mKvhSxg0Dtg3tDcl9QvTU8OdnrY0Li7+5qY8jyY=
-X-Google-Smtp-Source: AGHT+IF1LgYWoMqtkgOIQdJp1Rficg1tsMi8hpXCufrZfg6nG+0FcbDIr7YLKyDnamKDCY+1lhinphL8zw15duD9wag=
-X-Received: by 2002:a05:6512:1318:b0:50e:7fb1:6456 with SMTP id
- x24-20020a056512131800b0050e7fb16456mr922742lfu.4.1704544872698; Sat, 06 Jan
- 2024 04:41:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704546693; x=1705151493;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5ylEUqgG5u/Dqe8TMOcL3B5H3bQ72WpY1bO29p1ogas=;
+        b=dBUF9mnjE64oJMi81XfwCSBVAhUxKE5s1L2N28BZPEZq7s4ZkGE0zO2uoGAM5ivUZi
+         JoOQ5/zeOOm1phM11eLvOpeojzh5Wwbi0lm+uh+95DQPT/CNfh/PIBsgyC0Jq32fK4jc
+         YSLUt0d+gpXRGZaHTRqLdpTT/Qa75HkYCA33fTGo1aJqixVLoiEhNRR7Dv7ni92J1j6j
+         /17W+CX6+ib4boeD+ehR/6WY429FlaIKvIDhos/oFscKWfIEEXPtk1kEhMiqU+feL4yN
+         AUa1hlwqWh4mWX1lNKaJoMJe0XeFW/JmKTp6uqWPEgLFKSN8Q46PtwV2ZSQg+nVYzdqU
+         nxpA==
+X-Gm-Message-State: AOJu0YwEYEGzY0vwxLXs/LAgQTKZF6XoWZjozRnoxFUTIEg4KSfJSRSh
+	7oGUYFLTLvNFkNm0zlVc/J9moFvG0ajA
+X-Google-Smtp-Source: AGHT+IHzC2Igva/YfnYpvVLJMMJdklvVIDIjvnkMRf+APujDPQxFomOrx67+TLiAAN0Ou/3EaUT3mg==
+X-Received: by 2002:a05:6359:5c30:b0:175:4c7c:dac4 with SMTP id pu48-20020a0563595c3000b001754c7cdac4mr760808rwb.16.1704546693188;
+        Sat, 06 Jan 2024 05:11:33 -0800 (PST)
+Received: from majuu.waya (bras-base-kntaon1618w-grc-15-174-91-6-24.dsl.bell.ca. [174.91.6.24])
+        by smtp.gmail.com with ESMTPSA id b8-20020ac812c8000000b004281ccccdfcsm1644006qtj.51.2024.01.06.05.11.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jan 2024 05:11:32 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: jiri@resnulli.us,
+	xiyou.wangcong@gmail.com,
+	netdev@vger.kernel.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: [PATCH net-next 1/1] net/sched: Remove ipt action tests
+Date: Sat,  6 Jan 2024 08:11:28 -0500
+Message-Id: <20240106131128.1420186-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
- <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com> <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
- <8eb06ee9-d02d-4113-ba1e-e8ee99acc2fd@gmail.com> <2013fa64-06a1-4b61-90dc-c5bd68d8efed@lunn.ch>
- <CAM1KZSn0+k4YKc2qy6DEafkL840ybjaun7FbD4OFwOwNZw_LEg@mail.gmail.com> <ZZRct1o21NIKbYX1@shell.armlinux.org.uk>
-In-Reply-To: <ZZRct1o21NIKbYX1@shell.armlinux.org.uk>
-From: Ezra Buehler <ezra@easyb.ch>
-Date: Sat, 6 Jan 2024 13:41:01 +0100
-Message-ID: <CAM1KZS=2Drnhx8SKcAbRniGhvy0d85FfKHOgK7MZxNWM7EAEmQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Tristram Ha <Tristram.Ha@microchip.com>, Michael Walle <michael@walle.cc>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 2, 2024 at 7:58=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> Any ideas why the scan is taking so long?
->
-> For each PHY address (of which there are 32) we scan each MMD between
-> 1 and 31 inclusive. We attempt to read the devices-in-package
-> registers. That means 32 * 32 * 2 calls to the mdiobus_c45_read(),
-> which is 2048 calls. Each is two MDIO transactions on the bus, so
-> that's 4096. Each is 64 bits long including preamble, and at 2.5MHz
-> (the "old" maximum) it should take about 100ms to scan the each
-> MMD on each PHY address to determine whether a device is present.
->
-> I'm guessing the MDIO driver you are using is probably using a software
-> timeout which is extending the latency of each bus frame considerably.
-> Maybe that is where one should be looking if the timing is not
-> acceptable?
+Commit ba24ea129126 ("net/sched: Retire ipt action") removed the ipt action
+but not the testcases. This patch removes the outstanding tdc tests.
 
-When profiling with ftrace, I see that executing macb_mdio_read_c45()
-takes about 20ms. The function calls macb_mdio_wait_for_idle() 3 times,
-where the latter 2 invocations take about 10ms each. The
-macb_mdio_wait_for_idle() function invokes the read_poll_timeout() macro
-with a timeout of 1 second, which we obviously do not hit.
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ .../tc-testing/tc-tests/actions/xt.json       | 243 ------------------
+ 1 file changed, 243 deletions(-)
+ delete mode 100644 tools/testing/selftests/tc-testing/tc-tests/actions/xt.json
 
-To me it looks like we are simply waiting for the hardware to perform
-the transaction, i.e. write out the address and read the register (which
-is read as 0xFFFF).
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/xt.json b/tools/testing/selftests/tc-testing/tc-tests/actions/xt.json
+deleted file mode 100644
+index 1a92e8898fec..000000000000
+--- a/tools/testing/selftests/tc-testing/tc-tests/actions/xt.json
++++ /dev/null
+@@ -1,243 +0,0 @@
+-[
+-    {
+-        "id": "2029",
+-        "name": "Add xt action with log-prefix",
+-        "category": [
+-            "actions",
+-            "xt"
+-        ],
+-        "plugins": {
+-           "requires": "nsPlugin"
+-        },
+-        "setup": [
+-            [
+-                "$TC actions flush action xt",
+-                0,
+-                1,
+-                255
+-            ]
+-        ],
+-        "cmdUnderTest": "$TC action add action xt -j LOG --log-prefix PONG index 100",
+-        "expExitCode": "0",
+-        "verifyCmd": "$TC action ls action xt",
+-        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"PONG\".*index 100 ref",
+-        "matchCount": "1",
+-        "teardown": [
+-            "$TC actions flush action xt"
+-        ]
+-    },
+-    {
+-        "id": "3562",
+-        "name": "Replace xt action log-prefix",
+-        "category": [
+-            "actions",
+-            "xt"
+-        ],
+-        "plugins": {
+-           "requires": "nsPlugin"
+-        },
+-        "setup": [
+-            [
+-                "$TC actions flush action xt",
+-                0,
+-                1,
+-                255
+-            ],
+-            [
+-                "$TC action add action xt -j LOG --log-prefix PONG index 1",
+-                0,
+-                1,
+-                255
+-            ]
+-        ],
+-        "cmdUnderTest": "$TC action replace action xt -j LOG --log-prefix WIN index 1",
+-        "expExitCode": "0",
+-        "verifyCmd": "$TC action get action xt index 1",
+-        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"WIN\".*index 1 ref",
+-        "matchCount": "1",
+-        "teardown": [
+-            "$TC action flush action xt"
+-        ]
+-    },
+-    {
+-        "id": "8291",
+-        "name": "Delete xt action with valid index",
+-        "category": [
+-            "actions",
+-            "xt"
+-        ],
+-        "plugins": {
+-           "requires": "nsPlugin"
+-        },
+-        "setup": [
+-            [
+-                "$TC actions flush action xt",
+-                0,
+-                1,
+-                255
+-            ],
+-            [
+-                "$TC action add action xt -j LOG --log-prefix PONG index 1000",
+-                0,
+-                1,
+-                255
+-            ]
+-        ],
+-        "cmdUnderTest": "$TC action delete action xt index 1000",
+-        "expExitCode": "0",
+-        "verifyCmd": "$TC action get action xt index 1000",
+-        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"PONG\".*index 1000 ref",
+-        "matchCount": "0",
+-        "teardown": [
+-            "$TC action flush action xt"
+-        ]
+-    },
+-    {
+-        "id": "5169",
+-        "name": "Delete xt action with invalid index",
+-        "category": [
+-            "actions",
+-            "xt"
+-        ],
+-        "plugins": {
+-           "requires": "nsPlugin"
+-        },
+-        "setup": [
+-            [
+-                "$TC actions flush action xt",
+-                0,
+-                1,
+-                255
+-            ],
+-            [
+-                "$TC action add action xt -j LOG --log-prefix PONG index 1000",
+-                0,
+-                1,
+-                255
+-            ]
+-        ],
+-        "cmdUnderTest": "$TC action delete action xt index 333",
+-        "expExitCode": "255",
+-        "verifyCmd": "$TC action get action xt index 1000",
+-        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"PONG\".*index 1000 ref",
+-        "matchCount": "1",
+-        "teardown": [
+-            "$TC action flush action xt"
+-        ]
+-    },
+-    {
+-        "id": "7284",
+-        "name": "List xt actions",
+-        "category": [
+-            "actions",
+-            "xt"
+-        ],
+-        "plugins": {
+-           "requires": "nsPlugin"
+-        },
+-        "setup": [
+-            [
+-                "$TC action flush action xt",
+-                0,
+-                1,
+-                255
+-            ],
+-            "$TC action add action xt -j LOG --log-prefix PONG index 1001",
+-            "$TC action add action xt -j LOG --log-prefix WIN index 1002",
+-            "$TC action add action xt -j LOG --log-prefix LOSE index 1003"
+-        ],
+-        "cmdUnderTest": "$TC action list action xt",
+-        "expExitCode": "0",
+-        "verifyCmd": "$TC action list action xt",
+-        "matchPattern": "action order [0-9]*: tablename:",
+-        "matchCount": "3",
+-        "teardown": [
+-            "$TC actions flush action xt"
+-        ]
+-    },
+-    {
+-        "id": "5010",
+-        "name": "Flush xt actions",
+-        "category": [
+-            "actions",
+-            "xt"
+-        ],
+-        "plugins": {
+-           "requires": "nsPlugin"
+-        },
+-        "setup": [
+-            [
+-		"$TC actions flush action xt",
+-                0,
+-                1,
+-                255
+-            ],
+-            "$TC action add action xt -j LOG --log-prefix PONG index 1001",
+-            "$TC action add action xt -j LOG --log-prefix WIN index 1002",
+-            "$TC action add action xt -j LOG --log-prefix LOSE index 1003"
+-	],
+-        "cmdUnderTest": "$TC action flush action xt",
+-        "expExitCode": "0",
+-        "verifyCmd": "$TC action list action xt",
+-        "matchPattern": "action order [0-9]*: tablename:",
+-        "matchCount": "0",
+-        "teardown": [
+-            "$TC actions flush action xt"
+-        ]
+-    },
+-    {
+-        "id": "8437",
+-        "name": "Add xt action with duplicate index",
+-        "category": [
+-            "actions",
+-            "xt"
+-        ],
+-        "plugins": {
+-           "requires": "nsPlugin"
+-        },
+-        "setup": [
+-            [
+-                "$TC actions flush action xt",
+-                0,
+-                1,
+-                255
+-            ],
+-            "$TC action add action xt -j LOG --log-prefix PONG index 101"
+-        ],
+-        "cmdUnderTest": "$TC action add action xt -j LOG --log-prefix WIN index 101",
+-        "expExitCode": "255",
+-        "verifyCmd": "$TC action get action xt index 101",
+-        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"PONG\".*index 101",
+-        "matchCount": "1",
+-        "teardown": [
+-            "$TC action flush action xt"
+-        ]
+-    },
+-    {
+-        "id": "2837",
+-        "name": "Add xt action with invalid index",
+-        "category": [
+-            "actions",
+-            "xt"
+-        ],
+-        "plugins": {
+-           "requires": "nsPlugin"
+-        },
+-        "setup": [
+-            [
+-                "$TC actions flush action xt",
+-                0,
+-                1,
+-                255
+-            ]
+-        ],
+-        "cmdUnderTest": "$TC action add action xt -j LOG --log-prefix WIN index 4294967296",
+-        "expExitCode": "255",
+-        "verifyCmd": "$TC action ls action xt",
+-        "matchPattern": "action order [0-9]*:*target  LOG level warning prefix \"WIN\"",
+-        "matchCount": "0",
+-        "teardown": [
+-            "$TC action flush action xt"
+-        ]
+-    }
+-]
+-- 
+2.34.1
 
-I've checked the MDIO clock, it is at 2MHz.
-
-So, any suggestions for what to look into next?
 
