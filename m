@@ -1,119 +1,144 @@
-Return-Path: <netdev+bounces-62151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D0DD825E97
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 07:55:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91ACB825EAD
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 08:16:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A28131F2282C
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 06:55:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78E6D1C23B26
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 07:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A38617F7;
-	Sat,  6 Jan 2024 06:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7931220F7;
+	Sat,  6 Jan 2024 07:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yOcIiVCB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFXeACEH"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AA728F3;
-	Sat,  6 Jan 2024 06:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=OuVdUPjUvU4/6iSnWx34w41LnQL5QQ6HXu6RyAkm9Bc=; b=yOcIiVCBn/mREvuXDvq8dQNSrM
-	kPMJ1RY531i/cUKvqHE+ZB2V0QsBVn6IGxBpupWpcMJ6FZhHHpzqUtuKBGB9anMFvScHeBUNIHuSI
-	IZtE1+roTYlzY9YZI8ipiAIJYTmwONsXE6TCr5Q5jizWYqZHFPZ+Aat8pAwC+46kmgREZ4cAnMpPN
-	9l/3RgaxloDOjqG4uXTWxLvOncqGs26+qZnd9453JL2wREqcs5Nf8LqLCKGuVxfJp+L8772uMVhkf
-	tKig/QksdHFSwzmiWMWWS0TF2JD2Rp9BnC1jFP+pEiOWMZbIEok63iR4iWEsTFmnURNFtKbq3qsQn
-	c5uHVkhA==;
-Received: from [50.53.46.231] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rM0aw-000rYt-0K;
-	Sat, 06 Jan 2024 06:55:46 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: patches@lists.linux.dev,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	bpf@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBA13C15;
+	Sat,  6 Jan 2024 07:16:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9290FC433C7;
+	Sat,  6 Jan 2024 07:16:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704525408;
+	bh=dG0phtdnvCCkXxKsiM0aT+uPfINQvrWi1CxX3oZjNpk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UFXeACEHnSPawP6cd9scXaSiG/L0zYDNa6b03SxmQ06d+UguZqTrXUbK74SEx+QXa
+	 jXkGyoBBeJjY7TO/u0N50pS0Tfc624K+B4RUakx1tZ60wTlblLS+Tc9ZEYPX4z7Alw
+	 AgzgcBeA3CF+LkFyjNODcKMSNCb4oXWfJsu+rJFH7f6F2uQcSIXdroOKp0BB5YGdEw
+	 xOT3zbXOH6VrIY8NMQwd/yH80j4zHFV5kkJ0U8P3SHQwcKL8oHI5MSUHTtGKNlMKZE
+	 ynS31RyIRXfXEug2ZqdRD0jozOi/gP14IYrlGOn2LVYXpJsevBm4O7rPrWfX/jfgG2
+	 4avy2DAskjOyQ==
+Date: Sat, 6 Jan 2024 15:04:01 +0800
+From: Jisheng Zhang <jszhang@kernel.org>
+To: Petr Tesarik <petr@tesarici.cz>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH bpf-next] net: filter: fix spelling mistakes
-Date: Fri,  5 Jan 2024 22:55:45 -0800
-Message-ID: <20240106065545.16855-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.43.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>,
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>,
+	open list <linux-kernel@vger.kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: stmmac: fix ethtool per-queue  statistics
+Message-ID: <ZZj7YfYa3Hl5TW1n@xhacker>
+References: <20240105201642.30904-1-petr@tesarici.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240105201642.30904-1-petr@tesarici.cz>
 
-Fix spelling errors as reported by codespell.
+On Fri, Jan 05, 2024 at 09:16:42PM +0100, Petr Tesarik wrote:
+> Fix per-queue statistics for devices with more than one queue.
+> 
+> The output data pointer is currently reset in each loop iteration,
+> effectively summing all queue statistics in the first four u64 values.
+> 
+> The summary values are not even labeled correctly. For example, if eth0 has
+> 2 queues, ethtool -S eth0 shows:
+> 
+>      q0_tx_pkt_n: 374 (actually tx_pkt_n over all queues)
+>      q0_tx_irq_n: 23  (actually tx_normal_irq_n over all queues)
+>      q1_tx_pkt_n: 462 (actually rx_pkt_n over all queues)
+>      q1_tx_irq_n: 446 (actually rx_normal_irq_n over all queues)
+>      q0_rx_pkt_n: 0
+>      q0_rx_irq_n: 0
+>      q1_rx_pkt_n: 0
+>      q1_rx_irq_n: 0
+> 
+> Fixes: 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics where necessary")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Petr Tesarik <petr@tesarici.cz>
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Andrii Nakryiko <andrii@kernel.org>
-Cc: bpf@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
----
-base-commit: 610a9b8f49fbcf1100716370d3b5f6f884a2835a
+Good catch! I mixed this with the statics sum up for
+stmmac_qstats_string[].
 
- net/core/filter.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Reviewed-by: Jisheng Zhang <jszhang@kernel.org>
 
-diff -- a/net/core/filter.c b/net/core/filter.c
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -777,7 +777,7 @@ jmp_rest:
- 			BPF_EMIT_JMP;
- 			break;
- 
--		/* ldxb 4 * ([14] & 0xf) is remaped into 6 insns. */
-+		/* ldxb 4 * ([14] & 0xf) is remapped into 6 insns. */
- 		case BPF_LDX | BPF_MSH | BPF_B: {
- 			struct sock_filter tmp = {
- 				.code	= BPF_LD | BPF_ABS | BPF_B,
-@@ -803,7 +803,7 @@ jmp_rest:
- 			*insn = BPF_MOV64_REG(BPF_REG_A, BPF_REG_TMP);
- 			break;
- 		}
--		/* RET_K is remaped into 2 insns. RET_A case doesn't need an
-+		/* RET_K is remapped into 2 insns. RET_A case doesn't need an
- 		 * extra mov as BPF_REG_0 is already mapped into BPF_REG_A.
- 		 */
- 		case BPF_RET | BPF_A:
-@@ -2967,7 +2967,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_m
- 	 *
- 	 * Then if B is non-zero AND there is no space allocate space and
- 	 * compact A, B regions into page. If there is space shift ring to
--	 * the rigth free'ing the next element in ring to place B, leaving
-+	 * the right free'ing the next element in ring to place B, leaving
- 	 * A untouched except to reduce length.
- 	 */
- 	if (start != offset) {
-@@ -8226,7 +8226,7 @@ xdp_func_proto(enum bpf_func_id func_id,
- #if IS_MODULE(CONFIG_NF_CONNTRACK) && IS_ENABLED(CONFIG_DEBUG_INFO_BTF_MODULES)
- 	/* The nf_conn___init type is used in the NF_CONNTRACK kfuncs. The
- 	 * kfuncs are defined in two different modules, and we want to be able
--	 * to use them interchangably with the same BTF type ID. Because modules
-+	 * to use them interchangeably with the same BTF type ID. Because modules
- 	 * can't de-duplicate BTF IDs between each other, we need the type to be
- 	 * referenced in the vmlinux BTF or the verifier will get confused about
- 	 * the different types. So we add this dummy type reference which will
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 9 ++-------
+>  1 file changed, 2 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> index f628411ae4ae..112a36a698f1 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> @@ -543,15 +543,12 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
+>  	u32 rx_cnt = priv->plat->rx_queues_to_use;
+>  	unsigned int start;
+>  	int q, stat;
+> -	u64 *pos;
+>  	char *p;
+>  
+> -	pos = data;
+>  	for (q = 0; q < tx_cnt; q++) {
+>  		struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[q];
+>  		struct stmmac_txq_stats snapshot;
+>  
+> -		data = pos;
+>  		do {
+>  			start = u64_stats_fetch_begin(&txq_stats->syncp);
+>  			snapshot = *txq_stats;
+> @@ -559,17 +556,15 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
+>  
+>  		p = (char *)&snapshot + offsetof(struct stmmac_txq_stats, tx_pkt_n);
+>  		for (stat = 0; stat < STMMAC_TXQ_STATS; stat++) {
+> -			*data++ += (*(u64 *)p);
+> +			*data++ = (*(u64 *)p);
+>  			p += sizeof(u64);
+>  		}
+>  	}
+>  
+> -	pos = data;
+>  	for (q = 0; q < rx_cnt; q++) {
+>  		struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[q];
+>  		struct stmmac_rxq_stats snapshot;
+>  
+> -		data = pos;
+>  		do {
+>  			start = u64_stats_fetch_begin(&rxq_stats->syncp);
+>  			snapshot = *rxq_stats;
+> @@ -577,7 +572,7 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
+>  
+>  		p = (char *)&snapshot + offsetof(struct stmmac_rxq_stats, rx_pkt_n);
+>  		for (stat = 0; stat < STMMAC_RXQ_STATS; stat++) {
+> -			*data++ += (*(u64 *)p);
+> +			*data++ = (*(u64 *)p);
+>  			p += sizeof(u64);
+>  		}
+>  	}
+> -- 
+> 2.43.0
+> 
 
