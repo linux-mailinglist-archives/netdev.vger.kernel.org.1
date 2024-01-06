@@ -1,125 +1,99 @@
-Return-Path: <netdev+bounces-62138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D91825DBD
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 02:51:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1497F825E02
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:02:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27C9F1F2396F
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 01:51:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BB44284A19
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 03:02:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E35137B;
-	Sat,  6 Jan 2024 01:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD0F10E5;
+	Sat,  6 Jan 2024 03:02:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aYl4H2UP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OklnS2U+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C45715AB;
-	Sat,  6 Jan 2024 01:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704505866; x=1736041866;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kENHpnKp3Mc72FB3iQsqSSxWwNZF4fgvq/yw+UTQgsk=;
-  b=aYl4H2UPYpJsRBLJvtcQikx89dTDbNxLqEkDHbr9kndpijnp9/TKyNMg
-   cpGNgxJeVWybNPQgQ5FoEGNBUXM4uYKlEuG81sEZnsa09lKhDMms81g0B
-   dsfDIRP8OGvkcTSywI89lQgzSjxyPDaj837xgG9N/5wwoJh/2C5mi3W6y
-   W9T1MoidWjE35cy4uQPAKObSa5BhvCbE5B9pDUH1REqFd38q+oZZkE2vu
-   eLYmLznxh2zKXGm56FHynciRQYdG20hiE7dpjL1niFfcbZcu2Qvi3WW+v
-   +Dz+zvzphb2iFq0sXeOXCR+Xle9Ll663Y0gxc3APqhNAneD5rqhad9BhN
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="4984486"
-X-IronPort-AV: E=Sophos;i="6.04,335,1695711600"; 
-   d="scan'208";a="4984486"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 17:51:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="904298606"
-X-IronPort-AV: E=Sophos;i="6.04,335,1695711600"; 
-   d="scan'208";a="904298606"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 05 Jan 2024 17:51:03 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rLvq0-0001u8-2R;
-	Sat, 06 Jan 2024 01:51:00 +0000
-Date: Sat, 6 Jan 2024 09:50:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Brett Creeley <brett.creeley@amd.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, shannon.nelson@amd.com,
-	brett.creeley@amd.com
-Subject: Re: [PATCH net-next 4/8] pds_core: Prevent race issues involving the
- adminq
-Message-ID: <202401060952.4J8S3LbP-lkp@intel.com>
-References: <20240104171221.31399-5-brett.creeley@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E555B15A5
+	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 03:02:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 126EEC433C7;
+	Sat,  6 Jan 2024 03:02:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704510140;
+	bh=g1rLgRvaqXRKG22LlCTKSDbvy1zRhtLZC88vhhYsc5k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OklnS2U+UUKxuqRxg8JiIL0/FIQy67Bhv8RyL4Ce55mKXLB78hzRdgyh+hrLCkqdA
+	 2ypVtUUxxJxgHCVxtNHxY2dNmoIQ428H49Ycd/rEBKrfOSOMCN0Dsk1ihtE7hHqbkK
+	 2hbOlJcR6osYCdHk7iw9NNBu+p80RT9LBhlPRRs5ZyxFMYpDo9slAXLsdO7ElJVopn
+	 wbd8rhSJkDUObbuz8q6UsTUV1+0Tu4OFhTcVPTLfpF/1ssk5u2UckdsTH3jeQQEz+b
+	 XV5S5xm93+S6DFcQax5nWuSVm0NhCupTFdVK7fiLQ8eAzsOBcMEIfinrY4WR+3Q84V
+	 h+pPGh3rB6Kgw==
+Date: Fri, 5 Jan 2024 19:02:18 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Johannes Berg
+ <johannes@sipsolutions.net>, netdev@vger.kernel.org, Johannes Berg
+ <johannes.berg@intel.com>, Marc MERLIN <marc@merlins.org>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
+Message-ID: <20240105190218.5b69b9f5@kernel.org>
+In-Reply-To: <ZZguXLO3DAX/2Y0/@linux.intel.com>
+References: <20231206113934.8d7819857574.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+	<20231206084448.53b48c49@kernel.org>
+	<ZZU3OaybyLfrAa/0@linux.intel.com>
+	<20240103153405.6b19492a@kernel.org>
+	<ZZZrbUPUCTtDcUFU@linux.intel.com>
+	<9bcfb259-1249-4efc-b581-056fb0a1c144@gmail.com>
+	<20240104081656.67c6030c@kernel.org>
+	<ZZftxhXzQykx8j6b@linux.intel.com>
+	<20240105073001.15f2f3cb@kernel.org>
+	<ZZguXLO3DAX/2Y0/@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104171221.31399-5-brett.creeley@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Brett,
+On Fri, 5 Jan 2024 17:29:16 +0100 Stanislaw Gruszka wrote:
+> > Removing the rpm calls from the core is just going to lead to a
+> > whack-a-mole of bugs in the drivers themselves.
+> >
+> > IOW I look at the RPM calls in the core as a canary for people
+> > doing the wrong thing :(  
+> 
+> Hmm, this one I don't understand, what other bugs could pop up
+> after reverting bd869245a3dcc and others that added rpm calls
+> for the net core?
 
-kernel test robot noticed the following build warnings:
+IDK what igc powers down, but if there's any ndo or ethtool
+callback which needs to access a register that requires power 
+to be resumed - it will deadlock on rtnl exactly the same.
 
-[auto build test WARNING on net-next/main]
+Looking at igc_ethtool I see:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Brett-Creeley/pds_core-Prevent-health-thread-from-running-during-reset-remove/20240105-011706
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240104171221.31399-5-brett.creeley%40amd.com
-patch subject: [PATCH net-next 4/8] pds_core: Prevent race issues involving the adminq
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20240106/202401060952.4J8S3LbP-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240106/202401060952.4J8S3LbP-lkp@intel.com/reproduce)
+static int igc_ethtool_begin(struct net_device *netdev)
+{
+	struct igc_adapter *adapter = netdev_priv(netdev);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401060952.4J8S3LbP-lkp@intel.com/
+	pm_runtime_get_sync(&adapter->pdev->dev);
+	return 0;
+}
 
-All warnings (new ones prefixed by >>):
+static void igc_ethtool_complete(struct net_device *netdev)
+{
+	struct igc_adapter *adapter = netdev_priv(netdev);
 
->> drivers/net/ethernet/amd/pds_core/core.c:518:6: warning: no previous prototype for 'pdsc_adminq_wait_and_dec_once_unused' [-Wmissing-prototypes]
-     518 | void pdsc_adminq_wait_and_dec_once_unused(struct pdsc *pdsc)
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	pm_runtime_put(&adapter->pdev->dev);
+}
 
-
-vim +/pdsc_adminq_wait_and_dec_once_unused +518 drivers/net/ethernet/amd/pds_core/core.c
-
-   517	
- > 518	void pdsc_adminq_wait_and_dec_once_unused(struct pdsc *pdsc)
-   519	{
-   520		/* The driver initializes the adminq_refcnt to 1 when the adminq is
-   521		 * allocated and ready for use. Other users/requesters will increment
-   522		 * the refcnt while in use. If the refcnt is down to 1 then the adminq
-   523		 * is not in use and the refcnt can be cleared and adminq freed. Before
-   524		 * calling this function the driver will set PDSC_S_FW_DEAD, which
-   525		 * prevent subsequent attempts to use the adminq and increment the
-   526		 * refcnt to fail. This guarantees that this function will eventually
-   527		 * exit.
-   528		 */
-   529		while (!refcount_dec_if_one(&pdsc->adminq_refcnt)) {
-   530			dev_dbg_ratelimited(pdsc->dev, "%s: adminq in use\n",
-   531					    __func__);
-   532			cpu_relax();
-   533		}
-   534	}
-   535	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+so unless we think that returning -ENODEV from all ethtool calls
+when cable is not plugged in is okay - removing the PM resume
+from the core doesn't buy us much :(
 
