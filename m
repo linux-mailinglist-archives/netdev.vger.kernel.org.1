@@ -1,82 +1,86 @@
-Return-Path: <netdev+bounces-62141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57EF6825E07
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:10:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0BFF825E13
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00220284F3B
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 03:10:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BCDC283E6E
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 03:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594771396;
-	Sat,  6 Jan 2024 03:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF3515BB;
+	Sat,  6 Jan 2024 03:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A9O4wYk2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYDIp+Mb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F85515B1
-	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 03:10:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B1C4EC433CA;
-	Sat,  6 Jan 2024 03:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC2C15B3;
+	Sat,  6 Jan 2024 03:30:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A09CDC433C7;
+	Sat,  6 Jan 2024 03:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704510624;
-	bh=7dyq80MEV8mmyqq6ZJoZBLnre4YvBxVgXm4bgVO47VQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=A9O4wYk2Oj/pJuJKDm/zH3aQMeH5+xgzLFjlw1ZLSsR0sySkXuxYrO7ccz9OZwGbn
-	 5XeD6CAkbfX6XtF6TerRHLo74ysYzs45PKPlDO357p6gLrbIyp0nlNbUX7bTYBjs9U
-	 8yyFjOO4FBVyy5YdyJJGxGa+yKWfP0RaBjiUbWIEa2OHGBVFLMacyaAMd8X9+nqvHp
-	 SCfWuAaClrHwrxh7whHfiwKH0JV9OkvdzhIiFHgrYI1YYjt/bqDZUKVcuUh8dfECkv
-	 TSWuNkSC01/Qjt0Z6YvxR1qofVyRI/npicaENM/3I8M1PqCjL0iaS4jyx6ltkK9OD8
-	 ce/klEq9Ni8Vg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 98C20C41606;
-	Sat,  6 Jan 2024 03:10:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1704511831;
+	bh=ZZT5W/3OayChCmzDajSxgELxnptLBYGuC7NHIb+7uWU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dYDIp+Mby3VrwUNXuc505hhrUlZWX6YnsTAVt4cp6JDLy3Cz/pqLGQN6+dmvKEmUM
+	 2bedL6TjTCT6R5Sx4kfi5PQ6E4J7L/vPeDv+H2ZW4FI3RUowD8z3DslbcTqNHNpoNZ
+	 ZXNamfRP8ONsklOAVRAkW8fuc+XE39d7oF/R1NHo2RKfHsh0OZWYc6pdBK6uibWJ23
+	 +jCooMpqaBF/RbdMPN75AGF+VYJLlOZvW1yoInTFV+TtxrsESTc5LPiL8/RpPfRQBw
+	 4OmYf1xM5QVcP/N4S/mSmIq7nx/naIBfHsFaIz/z0QBVzDKrlqebewzFQTGkmiK2Ql
+	 r9ZGd6gofQaHQ==
+Date: Fri, 5 Jan 2024 19:30:29 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <hgani@marvell.com>, <vimleshk@marvell.com>, <sedara@marvell.com>,
+ <egallen@redhat.com>, <mschmidt@redhat.com>, <pabeni@redhat.com>,
+ <horms@kernel.org>, <wizhao@redhat.com>, <kheib@redhat.com>,
+ <konguyen@redhat.com>, Veerasenareddy Burru <vburru@marvell.com>, Satananda
+ Burla <sburla@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v3 6/8] octeon_ep_vf: add Tx/Rx processing and
+ interrupt support
+Message-ID: <20240105193029.004ee174@kernel.org>
+In-Reply-To: <20240105203823.2953604-7-srasheed@marvell.com>
+References: <20240105203823.2953604-1-srasheed@marvell.com>
+	<20240105203823.2953604-7-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] geneve: use DEV_STATS_INC()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170451062461.13331.4152922396524392194.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Jan 2024 03:10:24 +0000
-References: <20240104163633.2070538-1-edumazet@google.com>
-In-Reply-To: <20240104163633.2070538-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 5 Jan 2024 12:38:21 -0800 Shinas Rasheed wrote:
+> +static int octep_vf_iq_full_check(struct octep_vf_iq *iq)
+> +{
+> +	if (likely((IQ_INSTR_SPACE(iq)) >
+> +		   OCTEP_VF_WAKE_QUEUE_THRESHOLD))
+> +		return 0;
+> +
+> +	/* Stop the queue if unable to send */
+> +	netif_stop_subqueue(iq->netdev, iq->q_no);
+> +
+> +	/* check again and restart the queue, in case NAPI has just freed
+> +	 * enough Tx ring entries.
+> +	 */
+> +	if (unlikely(IQ_INSTR_SPACE(iq) >
+> +		     OCTEP_VF_WAKE_QUEUE_THRESHOLD)) {
+> +		netif_start_subqueue(iq->netdev, iq->q_no);
+> +		iq->stats.restart_cnt++;
+> +		return 0;
+> +	}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Please use the macros from netdev_queues.h here as well.
+Looks like you may be missing a memory barrier here.
 
-On Thu,  4 Jan 2024 16:36:33 +0000 you wrote:
-> geneve updates dev->stats fields locklessly.
-> 
-> Adopt DEV_STATS_INC() to avoid races.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  drivers/net/geneve.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
-
-Here is the summary with links:
-  - [net-next] geneve: use DEV_STATS_INC()
-    https://git.kernel.org/netdev/net-next/c/c72a657b5cca
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+And please call this function after queuing an skb to
+make sure NETDEV_TX_BUSY is almost never returned.
+See Documentation/networking/driver.rst
 
