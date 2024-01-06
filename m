@@ -1,113 +1,102 @@
-Return-Path: <netdev+bounces-62148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A4E9825E2E
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 05:15:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED3CC825E3A
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 05:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0161F240C6
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:15:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A52DE1F22A86
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 04:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF1E15CE;
-	Sat,  6 Jan 2024 04:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A55915A8;
+	Sat,  6 Jan 2024 04:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeXz7F0N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XhosMP+S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC7117CB
-	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 04:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97AD1842;
+	Sat,  6 Jan 2024 04:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4b74a9a9d4cso75210e0c.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jan 2024 20:15:26 -0800 (PST)
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dbed9659496so12181276.0;
+        Fri, 05 Jan 2024 20:55:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704514526; x=1705119326; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=niR+ENQYYO/xfLAGwHDq1aRyGA75R5+9RceCgIFLuQI=;
-        b=HeXz7F0Nk+FsnrQLGLYwyGrJ1j/bGoFacMV7bEV1l+yYF4X6OBfr1AGi/E8AW0Tmf6
-         FkFNFd8mjlukhT0DmachkHDNDOpgU4ve171V5+NGWNwO06Imf2mjyfg24BQCynxw9xxP
-         ad/hjN2m2iAKcDJQeMOWpvB291aAM0ZSd8hPfJwQDdzYi4MIY6yLaCQyLvS+LsSb4gBO
-         nSIeCkSKuoYFcgucrP9BeDXGBZ3A+vw4CSPI3e3bZmikCixuoonAUStR3hB/7bIo+9YN
-         m4taDvV7hqgCSMDrVQrqfGNSyXIr5bVFo40zU7PBRuO4iuhZNH5/3Z4KjUa6uZXCVeBm
-         xQsw==
+        d=gmail.com; s=20230601; t=1704516954; x=1705121754; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=h1x2gNIr/WIAbQ1ZNzOSYJRRU8w0tdP5X24inX9f+L0=;
+        b=XhosMP+Sqch7YX3avKC95YfiTXdXMDaqfjAJ1IwT3QQYQvwhRzb8Oislb8fh2l4rPI
+         08xwtK8zhZhPN7bnzTh8YDu/oTtfxOJGGuQaDg74x8mDrRb2XVjhh4hOPxRyF4/jFF1O
+         diWQE7riRjXubVrYKGKHGlMNf1ooLCGPTSOoFXzYhhbTrBC0hSexLRY0f8E3v1fni3/V
+         IC6NOxnCm7Ax/FK30I34QilXva93pjxouUMV5xVdjW6TM9T2Y7j6CFM013pdQY8O2aCD
+         1MWIHzIZUDC6JGDs57GVHz9MDdvkvgaqmGc/VPzzj9LfIJgM5Gqzecaax205dx6jxMWB
+         Impg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704514526; x=1705119326;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=niR+ENQYYO/xfLAGwHDq1aRyGA75R5+9RceCgIFLuQI=;
-        b=MKeqtnYZiHoCfhkxyKjTHR6cZzYyvW5tAPmOnBKVvQt5dTqbX37lPcz2klb1a4DdQB
-         JZUeDB/61mI7GETQorEwIvQx+amZJD2pSbvtvWRey9uizdfWcohCsCsMlL+u94o0LVYW
-         9XMxvYZJRBjUTD7Zz8PC1zoiXANOdK18dPoyRxLs3I0J2Ll+6BMco9CBeRM4HmyJTIIQ
-         n3fkTdY1ziPHtqZ/iHsdgwJtEq3OLNqEdNi/0gwj1PscQlcwH1zQeaAx3wEn3NpQIJt/
-         Ds+bLhf8YrW6G5w4sOaF0WtCuFFwmMyB2U7GEIuS4P7gQxbi2iHfyopERJXWb1QmZe45
-         m8Qw==
-X-Gm-Message-State: AOJu0Yw+ANIrPrp4fDrHNZC9D+RjQP5Ia59w8s5Z2zolKVE0mMjjD+iW
-	KHjFYRNKagOfMSJuBI/vDRuGv7IbBecEW42/S+U3xSgPJx0=
-X-Google-Smtp-Source: AGHT+IG1GJIH/AF+uNw8LnoqugY4e+onUOR8bvPNPDdGcwmmL/UfDGC5sObxNfm5jktXnqB3tFEX8/zTutUV2cfvFgQ=
-X-Received: by 2002:a05:6102:3a14:b0:467:2ffb:fe3a with SMTP id
- b20-20020a0561023a1400b004672ffbfe3amr242754vsu.17.1704514525611; Fri, 05 Jan
- 2024 20:15:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704516954; x=1705121754;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h1x2gNIr/WIAbQ1ZNzOSYJRRU8w0tdP5X24inX9f+L0=;
+        b=LttynxTbsJcvNvqYjvPQawiurGV/w+GpBHpyn7r24jHDuiyGYtpVAQsaIdL1rO26Jd
+         dYqigEzpZ/fLdpKHMVFXOG0RG/GFVvqc2mc5WI8Bs82bsUCmlltiJoFwaL3G3nLPBVjT
+         gn9zN6p86ihDcYTwMRISwpYP3iWF1hPmWUIAA5XicYGR8enCn/LfZVOPUXBe1Bvg71XJ
+         yg4fUMG4fehvvHAUfusJon18Bi2euI+jAwvaeIAtBV7TXlHE1GuV1qWibq+P14d/KSKH
+         8acgubDWqsGyEjfoky98GnIqOuh2ct0Ws5fEwaxAR3LFLwqhbaCUkNS3PjCGtr6F+wBu
+         N+OQ==
+X-Gm-Message-State: AOJu0YwC3Iuf3AAs4/BnUu/bZYNB3xJQYyiSm2xyw3FKkKd7LoOua0fw
+	5jTxMPRCx2YVJ25en5c/RyQ=
+X-Google-Smtp-Source: AGHT+IHYXdXHoXXZq/8QrYbujSvvi8QBDHVvlGCiIZr6j5Iy8ItXwxDyfYqpa4yg5R+6xg2DXArkbQ==
+X-Received: by 2002:a0d:e906:0:b0:5f0:d188:8588 with SMTP id s6-20020a0de906000000b005f0d1888588mr438273ywe.3.1704516954633;
+        Fri, 05 Jan 2024 20:55:54 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id z8-20020a81f808000000b005d746ac7f6bsm694386ywm.69.2024.01.05.20.55.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 20:55:54 -0800 (PST)
+Date: Fri, 5 Jan 2024 20:55:46 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Mahesh Bandewar =?utf-8?B?KOCkruCkueClh+CktiDgpKzgpILgpKHgpYfgpLXgpL4=?=
+	=?utf-8?B?4KSwKQ==?= <maheshb@google.com>
+Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
+	Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>,
+	Mahesh Bandewar <mahesh@bandewar.net>,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCHv3 net-next 2/3] ptp: add ioctl interface for
+ ptp_gettimex64any()
+Message-ID: <ZZjdUlaYyHZSiwSM@hoboy.vegasvil.org>
+References: <20240104212439.3276458-1-maheshb@google.com>
+ <ZZczNlXzM8lrZgH5@hoboy.vegasvil.org>
+ <CAF2d9jga9oc4OST6PMU=C9rz_NDrURCcLGx-1tP31U00z63vbA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231226182531.34717-1-stephen@networkplumber.org>
- <CAM0EoMmH-5Afhe1DvhSJzMhsyx=y7AW+FnhR8p3YbveP3UigXA@mail.gmail.com>
- <20240104072552.1de9338f@kernel.org> <CAM0EoMkP18tbOuFyWgr=BaCODcRTJR=rU6hitcQSY_HD9gD87g@mail.gmail.com>
- <CAHsH6Gsz7ANvWo0DcfE7DYZwVzkmXSGSKwKhJMtA=MtOi=QqqA@mail.gmail.com>
- <CAM0EoMnSVQHyQy37OoznsF15+M84o7L2c6UwtKL1Fcuwev4rHA@mail.gmail.com> <20240105060946.221ca96f@kernel.org>
-In-Reply-To: <20240105060946.221ca96f@kernel.org>
-From: Eyal Birger <eyal.birger@gmail.com>
-Date: Fri, 5 Jan 2024 20:15:14 -0800
-Message-ID: <CAHsH6GtbFvWKVy-u0-DvfHz_gs-sDrhfVnJj5mucqMo8jxCs+w@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next v2] remove support for iptables action
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org, 
-	Florian Westphal <fw@strlen.de>, victor@mojatatu.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAF2d9jga9oc4OST6PMU=C9rz_NDrURCcLGx-1tP31U00z63vbA@mail.gmail.com>
 
-On Fri, Jan 5, 2024 at 6:09=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri, 5 Jan 2024 06:20:10 -0500 Jamal Hadi Salim wrote:
-> > > I tested and it looks like the patch doesn't affect em_ipt, as expect=
-ed.
->
-> Thank you!
->
-> > > I did however run into a related issue while testing - seems that
-> > > using the old "ingress" qdisc - that em_ipt iproute2 code still uses =
--
-> > > isn't working, i.e:
-> > >
-> > > $ tc qdisc add dev ipsec1 ingress
-> > > Error: Egress block dev insert failed.
-> > >
-> > > This seems to originate from recent commit 913b47d3424e
-> > > ("net/sched: Introduce tc block netdev tracking infra").
-> > >
-> > > When I disabled that code in my build I was able to use em_ipt
-> > > as expected.
-> >
-> > Resolved in: https://lore.kernel.org/netdev/20240104125844.1522062-1-ji=
-ri@resnulli.us/
-> > Eyal, if you have cycles please give it a try. Jakub, can we get that a=
-pplied?
->
-> FTR it was applied by Dave soon after you asked.
+On Fri, Jan 05, 2024 at 09:51:40AM -0800, Mahesh Bandewar (महेश बंडेवार) wrote:
 
-Verified. With current net-next the problem doesn't happen anymore.
+> POSIX clocks are employed in this series for syscall width
+> measurement, potentially leading to misunderstandings about
+> overlapping functionality. However, their roles are distinct and serve
+> different purposes.
 
-Thanks!
-Eyal.
+I don't see any difference in purposes.  The multi_clock_gettime call
+is a more general solution.  Thus it will obviate the need for any new
+PTP ioctls.
+
+Thanks,
+Richard
 
