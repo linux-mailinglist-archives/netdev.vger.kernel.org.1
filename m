@@ -1,341 +1,131 @@
-Return-Path: <netdev+bounces-62163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95169825F9B
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 14:11:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 045D8825FDF
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 15:34:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABC47283995
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 13:11:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35C17B224C1
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 14:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579036FC8;
-	Sat,  6 Jan 2024 13:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89F1A749D;
+	Sat,  6 Jan 2024 14:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="y3ClUUYl"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="Be2kNutc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4455C6FCB
-	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 13:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5983341fd30so39468eaf.3
-        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 05:11:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704546693; x=1705151493; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ylEUqgG5u/Dqe8TMOcL3B5H3bQ72WpY1bO29p1ogas=;
-        b=y3ClUUYl6N2lHJF9KWtn1n3cfWt/lol923OBJjXrJlXIuvd5V7zPzRZFjA4dWvvy3g
-         1GE7Y7OSomSmZL5ZhcWEVVZu8jeWTc0cJnw5dnnvYTdIgj3WQTk3of9E9HIJUPQbjdFU
-         /bHHvYDHAE/t+r4bZZxDfybI0QZHV7DiGN41g89W+V3c90L/lgdXOGfuqLQ+5BTIY6hX
-         xGRVKit33ukDz8hXSM6QY841zCp4MW40FJYhiv3NkaQ+wKMvD7O+Y9drCgqK1z4Oa73D
-         TfVD1pLHjhzm1v0UdmfClNkTmScbJcWa+grvFFl3iZa+hPGOt8xia9jLHG43BZJx+mY7
-         e8bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704546693; x=1705151493;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5ylEUqgG5u/Dqe8TMOcL3B5H3bQ72WpY1bO29p1ogas=;
-        b=dBUF9mnjE64oJMi81XfwCSBVAhUxKE5s1L2N28BZPEZq7s4ZkGE0zO2uoGAM5ivUZi
-         JoOQ5/zeOOm1phM11eLvOpeojzh5Wwbi0lm+uh+95DQPT/CNfh/PIBsgyC0Jq32fK4jc
-         YSLUt0d+gpXRGZaHTRqLdpTT/Qa75HkYCA33fTGo1aJqixVLoiEhNRR7Dv7ni92J1j6j
-         /17W+CX6+ib4boeD+ehR/6WY429FlaIKvIDhos/oFscKWfIEEXPtk1kEhMiqU+feL4yN
-         AUa1hlwqWh4mWX1lNKaJoMJe0XeFW/JmKTp6uqWPEgLFKSN8Q46PtwV2ZSQg+nVYzdqU
-         nxpA==
-X-Gm-Message-State: AOJu0YwEYEGzY0vwxLXs/LAgQTKZF6XoWZjozRnoxFUTIEg4KSfJSRSh
-	7oGUYFLTLvNFkNm0zlVc/J9moFvG0ajA
-X-Google-Smtp-Source: AGHT+IHzC2Igva/YfnYpvVLJMMJdklvVIDIjvnkMRf+APujDPQxFomOrx67+TLiAAN0Ou/3EaUT3mg==
-X-Received: by 2002:a05:6359:5c30:b0:175:4c7c:dac4 with SMTP id pu48-20020a0563595c3000b001754c7cdac4mr760808rwb.16.1704546693188;
-        Sat, 06 Jan 2024 05:11:33 -0800 (PST)
-Received: from majuu.waya (bras-base-kntaon1618w-grc-15-174-91-6-24.dsl.bell.ca. [174.91.6.24])
-        by smtp.gmail.com with ESMTPSA id b8-20020ac812c8000000b004281ccccdfcsm1644006qtj.51.2024.01.06.05.11.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jan 2024 05:11:32 -0800 (PST)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	netdev@vger.kernel.org,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net-next 1/1] net/sched: Remove ipt action tests
-Date: Sat,  6 Jan 2024 08:11:28 -0500
-Message-Id: <20240106131128.1420186-1-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD47B8820;
+	Sat,  6 Jan 2024 14:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3B016FF803;
+	Sat,  6 Jan 2024 14:33:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1704551644;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O9f0inLiNdvMCgAXDzTOMFJm8AwgD4xAovOKS/w8Rdk=;
+	b=Be2kNutcdju7oMbb8ncEf8YM/PrItPtdRjqrlnG7cw6TyUUav9PHvJ6jwQbyfXhTgsJO8W
+	k1LoS4yVcy+iNJ4cEeBnHsSiKt1iflrelvfXAjxc7P8q9E292mPmfUkZWlTpcohM/dgEe3
+	q6ELEjoYY4JU9TEE8gYio88A7Vq5WRmZo3vEaN69Cbhjy5jaF+dFOIK0zXsnf9EJlZL8NB
+	pQLt99kLI7XB3BYcD45A8ZtaQ9l+AnW33Ex0iqDP2kqQdTIMIsRB7WRki4bebDi4g3xK3f
+	U11zqQdYEUpWVwWKVep6KvzPtSPXtR9ivGJlF8uQj5hRCCvnSRSpeo456xLi+A==
+Message-ID: <6d6169bc-ce33-46e2-8226-0fef9f92949b@arinc9.com>
+Date: Sat, 6 Jan 2024 17:33:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/7] net: dsa: mt7530: always trap frames to
+ active CPU port on MT7530
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20231227044347.107291-1-arinc.unal@arinc9.com>
+ <20231227044347.107291-1-arinc.unal@arinc9.com>
+ <20231227044347.107291-2-arinc.unal@arinc9.com>
+ <20231227044347.107291-2-arinc.unal@arinc9.com>
+ <20240104152232.jkoqiuwk3rd24rpm@skbuf>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240104152232.jkoqiuwk3rd24rpm@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Commit ba24ea129126 ("net/sched: Retire ipt action") removed the ipt action
-but not the testcases. This patch removes the outstanding tdc tests.
+On 4.01.2024 18:22, Vladimir Oltean wrote:
+> On Wed, Dec 27, 2023 at 07:43:41AM +0300, Arınç ÜNAL wrote:
+>> @@ -3075,6 +3071,38 @@ static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
+>>   	return 0;
+>>   }
+>>   
+>> +static void
+>> +mt753x_conduit_state_change(struct dsa_switch *ds,
+>> +			    const struct net_device *conduit,
+>> +			    bool operational)
+>> +{
+>> +	struct dsa_port *cpu_dp = conduit->dsa_ptr;
+>> +	struct mt7530_priv *priv = ds->priv;
+>> +	u8 mask;
+>> +	int val = 0;
+> 
+> Longest line first.
+> 
+>> +
+>> +	/* Set the CPU port to trap frames to for MT7530. Trapped frames will be
+>> +	 * forwarded to the numerically smallest CPU port which the DSA conduit
+>> +	 * interface its affine to is up.
+> 
+> "first CPU port whose conduit interface is up"
+> 
+>> +	 */
+>> +	if (priv->id != ID_MT7530 && priv->id != ID_MT7621)
+>> +		return;
+>> +
+>> +	mask = BIT(cpu_dp->index);
+>> +
+>> +	if (operational)
+>> +		priv->active_cpu_ports |= mask;
+>> +	else
+>> +		priv->active_cpu_ports &= ~mask;
+>> +
+>> +	if (priv->active_cpu_ports)
+>> +		val =
+>> +		    CPU_EN |
+>> +		    CPU_PORT(__ffs((unsigned long)priv->active_cpu_ports));
+> 
+> I don't think the type cast is necessary (implicit type promotion takes place).
+> 
+> Also, it is customary to put {} for multi-line "if" blocks, even if they are
+> made up of a single expression.
+> 
+> But without the type cast, it could look like this.
+> 
+> 	if (priv->active_cpu_ports)
+> 		val = CPU_EN | CPU_PORT(__ffs(priv->active_cpu_ports));
 
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- .../tc-testing/tc-tests/actions/xt.json       | 243 ------------------
- 1 file changed, 243 deletions(-)
- delete mode 100644 tools/testing/selftests/tc-testing/tc-tests/actions/xt.json
+Will do. Thanks for dealing with my rookie mistakes. :)
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/xt.json b/tools/testing/selftests/tc-testing/tc-tests/actions/xt.json
-deleted file mode 100644
-index 1a92e8898fec..000000000000
---- a/tools/testing/selftests/tc-testing/tc-tests/actions/xt.json
-+++ /dev/null
-@@ -1,243 +0,0 @@
--[
--    {
--        "id": "2029",
--        "name": "Add xt action with log-prefix",
--        "category": [
--            "actions",
--            "xt"
--        ],
--        "plugins": {
--           "requires": "nsPlugin"
--        },
--        "setup": [
--            [
--                "$TC actions flush action xt",
--                0,
--                1,
--                255
--            ]
--        ],
--        "cmdUnderTest": "$TC action add action xt -j LOG --log-prefix PONG index 100",
--        "expExitCode": "0",
--        "verifyCmd": "$TC action ls action xt",
--        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"PONG\".*index 100 ref",
--        "matchCount": "1",
--        "teardown": [
--            "$TC actions flush action xt"
--        ]
--    },
--    {
--        "id": "3562",
--        "name": "Replace xt action log-prefix",
--        "category": [
--            "actions",
--            "xt"
--        ],
--        "plugins": {
--           "requires": "nsPlugin"
--        },
--        "setup": [
--            [
--                "$TC actions flush action xt",
--                0,
--                1,
--                255
--            ],
--            [
--                "$TC action add action xt -j LOG --log-prefix PONG index 1",
--                0,
--                1,
--                255
--            ]
--        ],
--        "cmdUnderTest": "$TC action replace action xt -j LOG --log-prefix WIN index 1",
--        "expExitCode": "0",
--        "verifyCmd": "$TC action get action xt index 1",
--        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"WIN\".*index 1 ref",
--        "matchCount": "1",
--        "teardown": [
--            "$TC action flush action xt"
--        ]
--    },
--    {
--        "id": "8291",
--        "name": "Delete xt action with valid index",
--        "category": [
--            "actions",
--            "xt"
--        ],
--        "plugins": {
--           "requires": "nsPlugin"
--        },
--        "setup": [
--            [
--                "$TC actions flush action xt",
--                0,
--                1,
--                255
--            ],
--            [
--                "$TC action add action xt -j LOG --log-prefix PONG index 1000",
--                0,
--                1,
--                255
--            ]
--        ],
--        "cmdUnderTest": "$TC action delete action xt index 1000",
--        "expExitCode": "0",
--        "verifyCmd": "$TC action get action xt index 1000",
--        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"PONG\".*index 1000 ref",
--        "matchCount": "0",
--        "teardown": [
--            "$TC action flush action xt"
--        ]
--    },
--    {
--        "id": "5169",
--        "name": "Delete xt action with invalid index",
--        "category": [
--            "actions",
--            "xt"
--        ],
--        "plugins": {
--           "requires": "nsPlugin"
--        },
--        "setup": [
--            [
--                "$TC actions flush action xt",
--                0,
--                1,
--                255
--            ],
--            [
--                "$TC action add action xt -j LOG --log-prefix PONG index 1000",
--                0,
--                1,
--                255
--            ]
--        ],
--        "cmdUnderTest": "$TC action delete action xt index 333",
--        "expExitCode": "255",
--        "verifyCmd": "$TC action get action xt index 1000",
--        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"PONG\".*index 1000 ref",
--        "matchCount": "1",
--        "teardown": [
--            "$TC action flush action xt"
--        ]
--    },
--    {
--        "id": "7284",
--        "name": "List xt actions",
--        "category": [
--            "actions",
--            "xt"
--        ],
--        "plugins": {
--           "requires": "nsPlugin"
--        },
--        "setup": [
--            [
--                "$TC action flush action xt",
--                0,
--                1,
--                255
--            ],
--            "$TC action add action xt -j LOG --log-prefix PONG index 1001",
--            "$TC action add action xt -j LOG --log-prefix WIN index 1002",
--            "$TC action add action xt -j LOG --log-prefix LOSE index 1003"
--        ],
--        "cmdUnderTest": "$TC action list action xt",
--        "expExitCode": "0",
--        "verifyCmd": "$TC action list action xt",
--        "matchPattern": "action order [0-9]*: tablename:",
--        "matchCount": "3",
--        "teardown": [
--            "$TC actions flush action xt"
--        ]
--    },
--    {
--        "id": "5010",
--        "name": "Flush xt actions",
--        "category": [
--            "actions",
--            "xt"
--        ],
--        "plugins": {
--           "requires": "nsPlugin"
--        },
--        "setup": [
--            [
--		"$TC actions flush action xt",
--                0,
--                1,
--                255
--            ],
--            "$TC action add action xt -j LOG --log-prefix PONG index 1001",
--            "$TC action add action xt -j LOG --log-prefix WIN index 1002",
--            "$TC action add action xt -j LOG --log-prefix LOSE index 1003"
--	],
--        "cmdUnderTest": "$TC action flush action xt",
--        "expExitCode": "0",
--        "verifyCmd": "$TC action list action xt",
--        "matchPattern": "action order [0-9]*: tablename:",
--        "matchCount": "0",
--        "teardown": [
--            "$TC actions flush action xt"
--        ]
--    },
--    {
--        "id": "8437",
--        "name": "Add xt action with duplicate index",
--        "category": [
--            "actions",
--            "xt"
--        ],
--        "plugins": {
--           "requires": "nsPlugin"
--        },
--        "setup": [
--            [
--                "$TC actions flush action xt",
--                0,
--                1,
--                255
--            ],
--            "$TC action add action xt -j LOG --log-prefix PONG index 101"
--        ],
--        "cmdUnderTest": "$TC action add action xt -j LOG --log-prefix WIN index 101",
--        "expExitCode": "255",
--        "verifyCmd": "$TC action get action xt index 101",
--        "matchPattern": "action order [0-9]*:.*target  LOG level warning prefix \"PONG\".*index 101",
--        "matchCount": "1",
--        "teardown": [
--            "$TC action flush action xt"
--        ]
--    },
--    {
--        "id": "2837",
--        "name": "Add xt action with invalid index",
--        "category": [
--            "actions",
--            "xt"
--        ],
--        "plugins": {
--           "requires": "nsPlugin"
--        },
--        "setup": [
--            [
--                "$TC actions flush action xt",
--                0,
--                1,
--                255
--            ]
--        ],
--        "cmdUnderTest": "$TC action add action xt -j LOG --log-prefix WIN index 4294967296",
--        "expExitCode": "255",
--        "verifyCmd": "$TC action ls action xt",
--        "matchPattern": "action order [0-9]*:*target  LOG level warning prefix \"WIN\"",
--        "matchCount": "0",
--        "teardown": [
--            "$TC action flush action xt"
--        ]
--    }
--]
--- 
-2.34.1
-
+Arınç
 
