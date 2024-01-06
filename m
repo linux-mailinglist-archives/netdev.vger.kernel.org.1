@@ -1,121 +1,107 @@
-Return-Path: <netdev+bounces-62188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B923A82615E
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 20:59:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8790682616C
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 21:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E5C1B21972
-	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 19:58:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7464A283057
+	for <lists+netdev@lfdr.de>; Sat,  6 Jan 2024 20:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3450CF4F0;
-	Sat,  6 Jan 2024 19:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9342E579;
+	Sat,  6 Jan 2024 20:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XtmmDXwU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31A0F4E3;
-	Sat,  6 Jan 2024 19:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.104] (31.173.84.255) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 6 Jan
- 2024 22:58:34 +0300
-Subject: Re: [PATCH net-next v3 09/19] net: ravb: Split GTI computation and
- set operations
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <geert+renesas@glider.be>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
- <20240105082339.1468817-10-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <bdb6fbea-6445-e63f-c0c5-8688037b628a@omp.ru>
-Date: Sat, 6 Jan 2024 22:58:34 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABA7F4E7
+	for <netdev@vger.kernel.org>; Sat,  6 Jan 2024 20:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cd0f4f306fso6360691fa.0
+        for <netdev@vger.kernel.org>; Sat, 06 Jan 2024 12:10:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704571831; x=1705176631; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xpJzmZ2WPQTSDYCdCFtmOhKa3kFmNdrH649wYncpyfU=;
+        b=XtmmDXwULAY+piH3hmFzzuyUjZEeUK9+3PqanS0ZpG7OSEt//6sLNi5nQi2+BpGLNT
+         1knDXIiWNersUpC6HzBwPAhPHzvrQIrKaKYcLIBxtHf8M0eChXPcyuKOzRL3fRu+VhII
+         KiEtf649LN1BcDaT59paO65jgAWzfqSDuThGQ3/8DaJ8++3RBwAqCUN/jWQGSooLrKKd
+         KZ7MPIhVO+Srh8t03V52IBuSUN/UZiSFUDWtrJtZWLHz0eSkMUu/ODysoIMwh49kydBG
+         cJ+r/EHy5Hx2mvusX+3Wmdp0Y+/TXoVTTApD7Ho6iycYGBB1Lat2b0LlI0b40y6qWYfg
+         musQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704571831; x=1705176631;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xpJzmZ2WPQTSDYCdCFtmOhKa3kFmNdrH649wYncpyfU=;
+        b=A8yIDKfBiw/Bz56Rpc29yGSdjxmtPlNJp8lQ3ljvJ+nA0ruy2doS4IhjZbUaYObn4P
+         +tFVAE67NsUm7nw2Zh6YtBn+3TbQSry4BkfKTKVL6lBZZbx9Cg/janTzSPFXdcN2daBY
+         md9epCMGWoBMh++svYibxLIeYDgjUcgoLhpeMt79y/DH3gBJsaTGHYAn2wSH/Wstiqo+
+         FFxMtT3MRTj1CRqFME5lEy8mBkxlbyBApRuIIgS+8hBwpYN1cqR5Wx9NVT1CuDAxkoCh
+         duGRKRqBWObqxEGN6/IuqqC4xJkFxNf3b3RsFKH5XObNTBVQWl4PBoUZQsyJqLd7g8Mu
+         SRzw==
+X-Gm-Message-State: AOJu0YxYJmyWnRPfjb96OYjspSygbZX3/RripN3lCwAWrJEILX4IE08J
+	4IXlucxGztjc5+9PadqZ85M=
+X-Google-Smtp-Source: AGHT+IGwFxCM0PZvy/Ifow1Ovk5EdpTBecGcleWOgCqA6P/ayft2dZ8CWC5sGpgDnQuwv4jzheyDHg==
+X-Received: by 2002:a05:651c:1a25:b0:2cc:72af:7cfb with SMTP id by37-20020a05651c1a2500b002cc72af7cfbmr576047ljb.26.1704571831179;
+        Sat, 06 Jan 2024 12:10:31 -0800 (PST)
+Received: from localhost.localdomain (89-109-48-156.dynamic.mts-nn.ru. [89.109.48.156])
+        by smtp.gmail.com with ESMTPSA id k7-20020a2e8887000000b002ccec0a2368sm759180lji.12.2024.01.06.12.10.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jan 2024 12:10:30 -0800 (PST)
+From: Maks Mishin <maks.mishinfz@gmail.com>
+X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] ifstat: Add NULL pointer check for result of ll_index_to_name()
+Date: Sat,  6 Jan 2024 23:10:10 +0300
+Message-Id: <20240106201010.29461-1-maks.mishinFZ@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240105082339.1468817-10-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/06/2024 19:41:27
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182473 [Jan 06 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.255 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.255
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/06/2024 19:45:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/6/2024 5:22:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
 
-On 1/5/24 11:23 AM, Claudiu wrote:
+Result of ll_index_to_name() function do not being checked for NULL
+pointer before using in strdup() function.
+Add intermediate variable `name` for result of ll_index_to_name()
+function. Function result -1 when `name` is NULL.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> ravb_set_gti() was computing the value of GTI based on the reference clock
-> rate and then applied it to register. This was done on the driver's probe
-> function. In order to implement runtime PM for all IP variants (as some IP
-> variants switches to reset mode (and thus the registers content is lost)
-> when module standby is configured through clock APIs) the GTI setup was
-> split in 2 parts: one computing the value of the GTI register (done in the
-> driver's probe function) and one applying the computed value to register
-> (done in the driver's ndo_open API).
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+---
+ misc/ifstat.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+diff --git a/misc/ifstat.c b/misc/ifstat.c
+index f6f9ba50..e6c38812 100644
+--- a/misc/ifstat.c
++++ b/misc/ifstat.c
+@@ -129,7 +129,12 @@ static int get_nlmsg_extended(struct nlmsghdr *m, void *arg)
+ 		abort();
+ 
+ 	n->ifindex = ifsm->ifindex;
+-	n->name = strdup(ll_index_to_name(ifsm->ifindex));
++	
++	const char* name = ll_index_to_name(ifsm->ifindex);
++	if (name == NULL) {
++		return -1;
++	}
++	n->name = strdup(name);
+ 
+ 	if (sub_type == NO_SUB_TYPE) {
+ 		memcpy(&n->val, RTA_DATA(tb[filter_type]), sizeof(n->val));
+-- 
+2.34.1
 
-> ---
-> 
-> Changes in v3:
-> - fixed typos in patch description
-> - use u64 instead of uint64_t
-
-   Well, u64 in one place, u32 in another...
-
-> - remove ravb_wait() for setting GCCR.LTI
-
-[...]
-
-MBR, Sergey
 
