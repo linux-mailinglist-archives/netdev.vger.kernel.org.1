@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-62247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 843BD826565
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 18:50:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D50A82656D
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 241E2281F32
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 501891C20B8E
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 18:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6ADB13AF8;
-	Sun,  7 Jan 2024 17:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853D013FE5;
+	Sun,  7 Jan 2024 18:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GqTQeJ9j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOlCscH+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2914D13FE1
-	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 17:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50F513FE4;
+	Sun,  7 Jan 2024 18:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2cd08f0c12aso10036591fa.0
-        for <netdev@vger.kernel.org>; Sun, 07 Jan 2024 09:50:17 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40e4398266aso7339695e9.0;
+        Sun, 07 Jan 2024 10:00:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704649816; x=1705254616; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=gmail.com; s=20230601; t=1704650438; x=1705255238; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:cc:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=RfZsiZJCtBLveHnOAscVTxLZc9XIM/Ev1sTDExiKZtI=;
-        b=GqTQeJ9jxn12AsuDTZ0Hzrt0OcU7X15xd0fIII3OrKDgncQYAVLRPkJJZnIasALHlK
-         XPZvl84++Hz/M6et2etbcUuMq6kgyT0r1CGJJRZKiV7ZFW6+HCqtPyf/cn4or8U9Oshu
-         EMKo0Vu5VBw2BuDZWVlntDxcn9JpK6Tubyt4mOsPnsbg6HHlIcyeFiiuB9PkrGUoGyeZ
-         24t8aMZfbpNB2oyarQOISxIilWSGr+9dvW/1/f7yRnK+z52NpxHvzWNAuJuz+4vUn2sf
-         CX3nL9AuoeQy30UJ8Pa6+huM9Hzwe0hLLBCWvGFN+PUgvXV3lxid2h7Nl4YBUijZCMos
-         ehEw==
+        bh=PKyStk0haCbQVEo8Al8QRs15264C+ZMsxxJKHUPR7Pc=;
+        b=fOlCscH+/wvZ9wOm2lyS2QqAzIU3M9c5tJ1RhAoYufcNTUvI61VuoalfD67wPmFRd5
+         G1W05GPHUpbWf3Mc+pNGUCy8DRhR35Iw7YucHdZscf0bGPzm47dBVyDAtXIoKxUmg/sU
+         mr+brFjkz/AcH7f/w16J7ygmy6NgUTa84ftQtwQhinpWtl+YvVCr4U475qC4Os3DMBWe
+         aaWqYL/QTBZ3r2xBM3+qbpCuIhhGdwStvDflup7wAaqTvubzDQBHbFf2dSU/xKuf8+WE
+         o1gz2jbncUFKiI6iKNkDX1F+igMOA/0pDT461F5yVVFn1x1kJGBRll+WB33+FqzBZdd1
+         aIrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704649816; x=1705254616;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1704650438; x=1705255238;
+        h=content-transfer-encoding:in-reply-to:from:cc:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RfZsiZJCtBLveHnOAscVTxLZc9XIM/Ev1sTDExiKZtI=;
-        b=RsBGBBzDZXkqTwGzyWNDfX16zff1QJrzIgUpVkIUR5Z9bvwn/ycMoZFzvpzjCs4y76
-         CojLMDVuz0yCMhe+rd34/kUqp5ngO/bUanyesmX4gzXtW5mm0/7uc1oqh268tVa4uyCX
-         MkjGJSYJCi8c289S+Q1r4Q3LwAOZXEaBimo3JgRL2nNFquQqmSCTCjrRv7KFry4GbpgP
-         Vo6XrUTod/PqPnyxj6mBG9Yiu95pXxG0YYojrIyf2l8+lYVuWnBrN1P6/iaNn8prUWLB
-         sKtBfFSlVW9ie0JrZnla2GWTzHm94KASK8Rl1lIWw9iKrTA8/WSxf4FM7Og4wKZFFQxZ
-         6Q9g==
-X-Gm-Message-State: AOJu0YysOjYdknBOQ99jecysm2Z4aZJ2fTLHFrfwgFAZjJitS2bgq9x6
-	GL8UdosSKo17LakK3CxC3lI=
-X-Google-Smtp-Source: AGHT+IH/ES66d+iDChsJSL8i3CZllEZIzuV4eom89coxEsBI3hRr9rLoSEs0oFIJVEbVvq+0G2MbqQ==
-X-Received: by 2002:a05:6512:a91:b0:50e:609c:ab90 with SMTP id m17-20020a0565120a9100b0050e609cab90mr713089lfu.32.1704649815694;
-        Sun, 07 Jan 2024 09:50:15 -0800 (PST)
-Received: from ?IPV6:2a01:c23:c4fa:1c00:e12e:52d:1303:8525? (dynamic-2a01-0c23-c4fa-1c00-e12e-052d-1303-8525.c23.pool.telefonica.de. [2a01:c23:c4fa:1c00:e12e:52d:1303:8525])
-        by smtp.googlemail.com with ESMTPSA id t7-20020a50d707000000b00554d57621eesm3525270edi.90.2024.01.07.09.50.14
+        bh=PKyStk0haCbQVEo8Al8QRs15264C+ZMsxxJKHUPR7Pc=;
+        b=W5uZ9Kg4HNh9CTHImrObKFFqcALXv6yDAqqimTP+QP0AYO3+hnYSFzvzr5NuUGpdyJ
+         8V9TgFEDaXjcn4wGYL5rVoeSAw8pTDn/C4Mo98k9z/ml7jOUanSr7hzoeZlHDm4vT6tG
+         wptVKAJdGrVbDFBNPs8KPNnP1o0BPI8R238B59E3Bn1NKieKA1V0nNRy0qhhnIqdn7Tb
+         DXzcyDwCMlhATXxXFE+4bvzyC9sbXn65pwkRb7DeAxbNLbvspx/zRpi+nP2spwKMhI2V
+         mqjqp1v+eUQWvcMDXidwsJ5afOkwi8s8vtHMt6MMWM+9B7XvNxc7/kcSyQoqua/pVmDD
+         qoag==
+X-Gm-Message-State: AOJu0YxQtq46JEjlw0N7cvTEyRm7VMl6RZ7R4cuuvDj+cnZsY+KPc3MB
+	rGZcH/fWmLEhJWgcmf5ldTY=
+X-Google-Smtp-Source: AGHT+IGhqqCvDdoBIyU84SWyNgbazpRv9+3/tHjLax2Xn+swSXh47IxcWIaFtdx7zrKMSJxkodAKfQ==
+X-Received: by 2002:a05:600c:a05:b0:40d:9237:dada with SMTP id z5-20020a05600c0a0500b0040d9237dadamr1376192wmp.103.1704650437606;
+        Sun, 07 Jan 2024 10:00:37 -0800 (PST)
+Received: from [192.168.0.3] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id u12-20020a5d434c000000b0033761b2de64sm3547257wrr.76.2024.01.07.10.00.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Jan 2024 09:50:15 -0800 (PST)
-Message-ID: <1cf62a4b-9837-4957-bd7a-0b648b8b3cae@gmail.com>
-Date: Sun, 7 Jan 2024 18:50:15 +0100
+        Sun, 07 Jan 2024 10:00:37 -0800 (PST)
+Message-ID: <0926ea46-1ce4-4118-a04c-b6badc0b9e15@gmail.com>
+Date: Sun, 7 Jan 2024 20:00:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,126 +66,198 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 RFC 4/5] ethtool: add linkmode bitmap support to struct
- ethtool_keee
+Subject: Re: [net-next PATCH RFC v3 1/8] dt-bindings: net: document ethernet
+ PHY package nodes
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Russell King <rmk+kernel@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <8d8700c8-75b2-49ba-b303-b8d619008e45@gmail.com>
- <87a063ed-1b06-40b4-9c12-37658f36ea06@gmail.com>
- <802f71b2-8707-4799-8258-89c4315a00c2@lunn.ch>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <802f71b2-8707-4799-8258-89c4315a00c2@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+To: Christian Marangi <ansuelsmth@gmail.com>,
+ Robert Marko <robert.marko@sartura.hr>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh+dt@kernel.org>
+References: <20231126015346.25208-1-ansuelsmth@gmail.com>
+ <20231126015346.25208-2-ansuelsmth@gmail.com>
+Cc: Luo Jie <quic_luoj@quicinc.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20231126015346.25208-2-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 07.01.2024 18:14, Andrew Lunn wrote:
-> On Sat, Jan 06, 2024 at 11:21:31PM +0100, Heiner Kallweit wrote:
->> Add linkmode bitmap members to struct ethtool_keee, but keep the legacy
->> u32 bitmaps for compatibility with existing drivers.
->> Use link_modes.supported not being empty as indicator that a user wants
->> to use the linkmode bitmap members instead of the legacy bitmaps.
-> 
-> So my fear is, the legacy code will never get cleaned up.
-> 
-> How many MAC drivers are there which don't use phylib/phylink?
-> 
-A grep for lp_advertised gives the following, excluding lan78xx and lan743x,
-for which I just submitted patches:
-https://patchwork.kernel.org/project/netdevbpf/patch/3340ff84-8d7a-404b-8268-732c7f281164@gmail.com/
-https://patchwork.kernel.org/project/netdevbpf/patch/b086b296-0a1b-42d4-8e2b-ef6682598185@gmail.com/
+Hi Christian and Robert,
 
-drivers/net/usb/r8152.c
-drivers/net/usb/ax88179_178a.c
-drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-drivers/net/ethernet/broadcom/tg3.c
-drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-drivers/net/ethernet/broadcom/bnxt/bnxt.c
-drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-drivers/net/ethernet/intel/igb/igb_ethtool.c
-drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-drivers/net/ethernet/intel/igc/igc_ethtool.c
-  This one is completely broken, we just talked about it.
-drivers/net/ethernet/intel/e1000e/ethtool.c
-drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+thank you for this great work!
 
-> Maybe i can help out converting them.
-> 
->> +++ b/include/linux/ethtool.h
->> @@ -223,6 +223,11 @@ __ethtool_get_link_ksettings(struct net_device *dev,
->>  			     struct ethtool_link_ksettings *link_ksettings);
->>  
->>  struct ethtool_keee {
->> +	struct {
->> +		__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
->> +		__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
->> +		__ETHTOOL_DECLARE_LINK_MODE_MASK(lp_advertising);
->> +	} link_modes;
->>  	u32	supported;
->>  	u32	advertised;
->>  	u32	lp_advertised;
-> 
-> I don't particularly like having the link_modes struct here. The end
-> goal should be that supported, advertised and lp_advertised become
-> link modes, and all the drivers are changed to use them.
-> 
-> Maybe we have one patch which does another global replace,
-> supported->supported_u32, advertised->advertised_32, etc, making space
-> for link mode symbols. phylib can directly use the new link modes so
-> there is no real change in that code. We can then convert the MAC
-> drivers not using phylib one by one, and then remove the _u32 members
-> at the end.
-> 
-Agreed. I'll add that.
+Let me ask a couple of questions regarding the phy package conception. 
+Please find them below.
 
->       Andrew
+On 26.11.2023 03:53, Christian Marangi wrote:
+> Document ethernet PHY package nodes used to describe PHY shipped in
+> bundle of 4-5 PHY. The special node describe a container of PHY that
+> share common properties. This is a generic schema and PHY package
+> should create specialized version with the required additional shared
+> properties.
+> 
+> Example are PHY package that have some regs only in one PHY of the
+> package and will affect every other PHY in the package, for example
+> related to PHY interface mode calibration or global PHY mode selection.
+> 
+> The PHY package node MUST declare the base address used by the PHY driver
+> for global configuration by calculating the offsets of the global PHY
+> based on the base address of the PHY package and declare the
+> "ethrnet-phy-package" compatible.
+> 
+> Each reg of the PHY defined in the PHY package node is absolute and will
+> reference the real address of the PHY on the bus.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>   .../bindings/net/ethernet-phy-package.yaml    | 75 +++++++++++++++++++
+>   1 file changed, 75 insertions(+)
+>   create mode 100644 Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml b/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
+> new file mode 100644
+> index 000000000000..244d4bc29164
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
+> @@ -0,0 +1,75 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/ethernet-phy-package.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Ethernet PHY Package Common Properties
+> +
+> +maintainers:
+> +  - Christian Marangi <ansuelsmth@gmail.com>
+> +
+> +description:
+> +  This schema describe PHY package as simple container for
+> +  a bundle of PHYs that share the same properties and
+> +  contains the PHYs of the package themself.
+> +
+> +  Each reg of the PHYs defined in the PHY package node is
+> +  absolute and describe the real address of the PHY on the bus.
+> +
+> +properties:
+> +  $nodename:
+> +    pattern: "^ethernet-phy-package(@[a-f0-9]+)?$"
+> +
+> +  compatible:
+> +    const: ethernet-phy-package
+> +
+> +  reg:
+> +    minimum: 0
+> +    maximum: 31
+> +    description:
+> +      The base ID number for the PHY package.
+> +      Commonly the ID of the first PHY in the PHY package.
+> +
+> +      Some PHY in the PHY package might be not defined but
+> +      still exist on the device (just not attached to anything).
+> +      The reg defined in the PHY package node might differ and
+> +      the related PHY might be not defined.
+> +
+> +  '#address-cells':
+> +    const: 1
+> +
+> +  '#size-cells':
+> +    const: 0
+> +
+> +patternProperties:
+> +  ^ethernet-phy(@[a-f0-9]+)?$:
+> +    $ref: ethernet-phy.yaml#
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +additionalProperties: true
+> +
+> +examples:
+> +  - |
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        ethernet-phy-package@16 {
+> +            #address-cells = <1>;
+> +            #size-cells = <0>;
+> +            compatible = "ethernet-phy-package";
+> +            reg = <0x16>;
+> +
+> +            ethernet-phy@16 {
+> +              reg = <0x16>;
+> +            };
+> +
+> +            phy4: ethernet-phy@1a {
+> +              reg = <0x1a>;
+> +            };
+> +        };
+> +    };
 
-Heiner
+So, we ended up on a design where we use the predefined compatible 
+string 'ethernet-phy-package' to recognize a phy package inside the 
+of_mdiobus_register() function. During the V1 discussion, Vladimir came 
+up with the idea of 'ranges' property usage [1]. Can we use 'ranges' to 
+recognize a phy package in of_mdiobus_register()? IMHO this will give us 
+a clear DT solution. I mean 'ranges' clearly indicates that child nodes 
+are in the same address range as the parent node. Also we can list all 
+child addresses in 'reg' to mark them occupied.
+
+   mdio {
+     ...
+
+     ethernet-phy-package@16 {
+       compatible = "qcom,qca8075";
+       reg = <0x16>, <0x17>, <0x18>, <0x19>, <0x1a>;
+       ranges;
+       ...
+
+       ethernet-phy@16 {
+         reg = <0x16>;
+       };
+
+       ethernet-phy@1a {
+         reg = <0x1a>;
+       };
+     };
+   };
+
+Did you find some issues with the 'ranges' conception?
+
+
+And I would like to ask you about another issue raised by Vladimir [1]. 
+These phy chips become SoC with all these built-in PHYs, PCSs, clocks, 
+interrupt controllers, etc. Should we address this now? Or should we go 
+with the proposed solution for now and postpone modeling of other 
+peripherals until we get a real hardware, as Andrew suggested?
+
+I'm asking because it looks like we have got a real hardware. Luo 
+currently trying to push QCA8084 (multi-phy/switch chip) support, and 
+this chip exactly contains a huge clock/reset controller [2,3].
+
+
+1. https://lore.kernel.org/lkml/20231124165923.p2iozsrnwlogjzua@skbuf // 
+Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet PHY 
+package nodes
+2. 
+https://lore.kernel.org/lkml/20231215074005.26976-1-quic_luoj@quicinc.com 
+  // [PATCH v8 00/14] add qca8084 ethernet phy driver
+3. 
+https://lore.kernel.org/lkml/20231104034858.9159-1-quic_luoj@quicinc.com 
+  // [PATCH v12 0/4] add clock controller of qca8386/qca8084
+
+--
+Sergey
 
