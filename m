@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-62228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F4B8264B9
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:30:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A36A08264C9
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18C02B213F4
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 15:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CD971F22ADD
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 15:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82C9134D9;
-	Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D4613AC0;
+	Sun,  7 Jan 2024 15:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lh74H1Sm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQjCu3/D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF3F134B5;
-	Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 510F0C433CA;
-	Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFE5134C9;
+	Sun,  7 Jan 2024 15:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A8DCC433C9;
+	Sun,  7 Jan 2024 15:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704641424;
-	bh=NHzXzRcCX47VNxqlzwG+0OQMD8LeyhKX7n7wbBoheL4=;
+	s=k20201202; t=1704642023;
+	bh=tGn/7dhPk5c9YtVIKGXoYB26prxXPiY1VNsjLYaBRE8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lh74H1SmU7ptyvi1L7eft3F3qflI6bxWOKUX3VoR4TcpkjB52FuWjQ45D76OcP/Nf
-	 CrK7mmXJOIB33qmjleb/RyzME2H0we39F1jCQ0G0kO40xxWQYL4zSqQ1Pii6qBVmNH
-	 gVYxleOx0F2RoJQ/yTcRYlmwv34z6O960SNxau9DNmmv3Zy2+GDw3IIWwL1ErOQccG
-	 zYNM/gc4xkjg2MXXA357nAS/8tu+JJ+6snIsobtUzFAfzziG1fIeSa7Fa5nfIRSzLC
-	 4TqRA7rL2zWYkvAZtvDScL9yH4yql7AWxiC+9kAb8mu+Axgh7mHc/twwzy0M/0XkYU
-	 u/mdFqVeBqH/w==
+	b=BQjCu3/DEsf8YjwDknLvudJ66vUpzVr7VH/qMZriGPIoURm6HCcKV/n6TrA6vghYr
+	 IengT6F3Lb6nLCrUQ1bWTJ1NAuT3iqrE2H2Ezliv07D3VnNgra5nSkyIcz/rP1asY5
+	 pa01kNICfzYfnxb7alV6rl/Y756faSYaZvG1upByepu1wyAMqr+FqRmimhNpDAUR0S
+	 +ElQxZTJzdvF9JdWi30oMZIT8ZT+4NSKcGI4hrX/v6o/nKkLhx3ygDc0agfLqjYzDY
+	 J00pkyAZQBe/k2rG5CV/uHl7tY1HwLCfFwGVsmM0AB6xyUjQAyptgSmz8EEOOKjEWj
+	 3umdidZ0ddjBw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34978C4167F;
-	Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 31777C4167F;
+	Sun,  7 Jan 2024 15:40:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,41 +43,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] mlxbf_gige: Enable the GigE port in mlxbf_gige_open
+Subject: Re: [PATCH net] net: stmmac: fix ethtool per-queue  statistics
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170464142421.16555.13169210527122295576.git-patchwork-notify@kernel.org>
-Date: Sun, 07 Jan 2024 15:30:24 +0000
-References: <20240105160014.23353-1-asmaa@nvidia.com>
-In-Reply-To: <20240105160014.23353-1-asmaa@nvidia.com>
-To: Asmaa Mnebhi <asmaa@nvidia.com>
-Cc: davem@davemloft.net, f.fainelli@gmail.com, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, tbogendoerfer@suse.de, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davthompson@nvidia.com,
- florian.fainelli@broadcom.com
+ <170464202319.22284.15974320807514546693.git-patchwork-notify@kernel.org>
+Date: Sun, 07 Jan 2024 15:40:23 +0000
+References: <20240105201642.30904-1-petr@tesarici.cz>
+In-Reply-To: <20240105201642.30904-1-petr@tesarici.cz>
+To: Petr Tesarik <petr@tesarici.cz>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, jszhang@kernel.org, andrew@lunn.ch,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 5 Jan 2024 11:00:14 -0500 you wrote:
-> At the moment, the GigE port is enabled in the mlxbf_gige_probe
-> function. If the mlxbf_gige_open is not executed, this could cause
-> pause frames to increase in the case where there is high backgroud
-> traffic. This results in clogging the port.
-> So move enabling the OOB port to mlxbf_gige_open.
+On Fri,  5 Jan 2024 21:16:42 +0100 you wrote:
+> Fix per-queue statistics for devices with more than one queue.
 > 
-> Fixes: f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
-> Reviewed-by: David Thompson <davthompson@nvidia.com>
-> Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> The output data pointer is currently reset in each loop iteration,
+> effectively summing all queue statistics in the first four u64 values.
+> 
+> The summary values are not even labeled correctly. For example, if eth0 has
+> 2 queues, ethtool -S eth0 shows:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v4] mlxbf_gige: Enable the GigE port in mlxbf_gige_open
-    https://git.kernel.org/netdev/net/c/a460f4a68451
+  - [net] net: stmmac: fix ethtool per-queue statistics
+    https://git.kernel.org/netdev/net/c/61921bdaa132
 
 You are awesome, thank you!
 -- 
