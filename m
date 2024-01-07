@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-62229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5AD8264BA
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:30:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0368264B8
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:30:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11B0D1F22B4F
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 15:30:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 999DAB213B3
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 15:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DECCC134DE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37BE134D5;
 	Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ktAQ79le"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LvpnBwmO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFB6134C6;
-	Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 45017C433C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF8F134BA
+	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3ADBAC433C9;
 	Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704641424;
-	bh=jkyJQWYGUp32JFxVMXWDRmLGafHoZX1LN1CePYraOyk=;
+	bh=DgJN5ZCSY+8Z49nYLK4xQB4Yk/frwF53i40DqSOqygc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ktAQ79lega1dwahq+Zg8Wqm6wZQdi8g6+1tNkuBdWTMne1u7GLuKzT+/B8NAqpmzU
-	 BivAxfkOLApzLLpNBkrXkqRI4FNew6+6NY3qQvtSzULM5orSoiLYV52CcERgKWl9nV
-	 BYVBFdZWIB6Ao5v6dzhROmruT8OaVXDeGv2NVvrGOj+fUJwPJ/yncraV+cpNVogcRt
-	 nS/szy3PxHaYd6f6tPiHQz2sEszeX3QMfQjEtqdxbhbBkWtobbiLm65zB5QKu5pxKW
-	 G8Xp6IKlgFdRTS6b+ccOFFPuOkx+DC0w3t5SZxUGo9VhHqCDw0RB19+wbvkVkttCFw
-	 hke2dt6ZS/2rA==
+	b=LvpnBwmOpy1ZmexCiOLjfBuEj0cqePUKB3DVEUbL5qqzO9sowIyzvUK4vPlQO/bfL
+	 Cd2LXSfYKQ26sexMBCH+duwMtb8B3jtYvYv9z1wKdzqRDzCTcxGdLbPQ0X4mBOvlpt
+	 C890RXZcxIvbjFoPac2WFtSSb3aYGn1m9YNQ9PjCYYYBajBY9CTU4HMOzKQhOv/Ixp
+	 DhLI+audng1UziZLwhNYMolFpr3QZsvSE+xYV7/5+HMJPQfOPUHoNCWotg1iuv3aId
+	 ng5BMK1m6nOXxpK6XC9aHFPuCB9ZRTkt9txCWsuGagVmHHg9Hco1UxUL4aixJRLR0g
+	 fMgLvv4eRLCqw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 27C4CC41606;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1D664C4167E;
 	Sun,  7 Jan 2024 15:30:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,45 +43,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] rxrpc: Fix skbuff cleanup of call's recvmsg_queue and
- rx_oos_queue
+Subject: Re: [PATCH net] ip6_tunnel: fix NEXTHDR_FRAGMENT handling in
+ ip6_tnl_parse_tlv_enc_lim()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170464142415.16555.4432906949740717296.git-patchwork-notify@kernel.org>
+ <170464142411.16555.11084596873526088210.git-patchwork-notify@kernel.org>
 Date: Sun, 07 Jan 2024 15:30:24 +0000
-References: <1366725.1704474341@warthog.procyon.org.uk>
-In-Reply-To: <1366725.1704474341@warthog.procyon.org.uk>
-To: David Howells <dhowells@redhat.com>
-Cc: marc.dionne@auristor.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-afs@lists.infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240105170313.2946078-1-edumazet@google.com>
+In-Reply-To: <20240105170313.2946078-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, willemb@google.com, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, syzkaller@googlegroups.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 05 Jan 2024 17:05:41 +0000 you wrote:
-> Fix rxrpc_cleanup_ring() to use rxrpc_purge_queue() rather than
-> skb_queue_purge() so that the count of outstanding skbuffs is correctly
-> updated when a failed call is cleaned up.
+On Fri,  5 Jan 2024 17:03:13 +0000 you wrote:
+> syzbot pointed out [1] that NEXTHDR_FRAGMENT handling is broken.
 > 
-> Without this rmmod may hang waiting for rxrpc_n_rx_skbs to become zero.
+> Reading frag_off can only be done if we pulled enough bytes
+> to skb->head. Currently we might access garbage.
 > 
-> Reported-by: Marc Dionne <marc.dionne@auristor.com>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: linux-afs@lists.infradead.org
-> cc: netdev@vger.kernel.org
+> [1]
+> BUG: KMSAN: uninit-value in ip6_tnl_parse_tlv_enc_lim+0x94f/0xbb0
+> ip6_tnl_parse_tlv_enc_lim+0x94f/0xbb0
+> ipxip6_tnl_xmit net/ipv6/ip6_tunnel.c:1326 [inline]
+> ip6_tnl_start_xmit+0xab2/0x1a70 net/ipv6/ip6_tunnel.c:1432
+> __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+> netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+> xmit_one net/core/dev.c:3548 [inline]
+> dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
+> __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
+> dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+> neigh_connected_output+0x569/0x660 net/core/neighbour.c:1592
+> neigh_output include/net/neighbour.h:542 [inline]
+> ip6_finish_output2+0x23a9/0x2b30 net/ipv6/ip6_output.c:137
+> ip6_finish_output+0x855/0x12b0 net/ipv6/ip6_output.c:222
+> NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+> ip6_output+0x323/0x610 net/ipv6/ip6_output.c:243
+> dst_output include/net/dst.h:451 [inline]
+> ip6_local_out+0xe9/0x140 net/ipv6/output_core.c:155
+> ip6_send_skb net/ipv6/ip6_output.c:1952 [inline]
+> ip6_push_pending_frames+0x1f9/0x560 net/ipv6/ip6_output.c:1972
+> rawv6_push_pending_frames+0xbe8/0xdf0 net/ipv6/raw.c:582
+> rawv6_sendmsg+0x2b66/0x2e70 net/ipv6/raw.c:920
+> inet_sendmsg+0x105/0x190 net/ipv4/af_inet.c:847
+> sock_sendmsg_nosec net/socket.c:730 [inline]
+> __sock_sendmsg net/socket.c:745 [inline]
+> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+> __sys_sendmsg net/socket.c:2667 [inline]
+> __do_sys_sendmsg net/socket.c:2676 [inline]
+> __se_sys_sendmsg net/socket.c:2674 [inline]
+> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+> entry_SYSCALL_64_after_hwframe+0x63/0x6b
 > 
 > [...]
 
 Here is the summary with links:
-  - rxrpc: Fix skbuff cleanup of call's recvmsg_queue and rx_oos_queue
-    https://git.kernel.org/netdev/net/c/4fc68c4c1a11
+  - [net] ip6_tunnel: fix NEXTHDR_FRAGMENT handling in ip6_tnl_parse_tlv_enc_lim()
+    https://git.kernel.org/netdev/net/c/d375b98e0248
 
 You are awesome, thank you!
 -- 
