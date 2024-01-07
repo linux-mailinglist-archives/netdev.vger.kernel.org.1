@@ -1,193 +1,132 @@
-Return-Path: <netdev+bounces-62254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03F64826585
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:11:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4C682658E
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:24:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7D141F216EA
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 18:11:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DB8D1F21689
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 18:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3172E13FF5;
-	Sun,  7 Jan 2024 18:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09EA13FF9;
+	Sun,  7 Jan 2024 18:24:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17D813FE7;
-	Sun,  7 Jan 2024 18:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4T7QHB0m0mz9sp6;
-	Sun,  7 Jan 2024 19:11:02 +0100 (CET)
-Message-ID: <f9f638bf-676e-43bf-8d83-256cae8f7bfe@v0yd.nl>
-Date: Sun, 7 Jan 2024 19:10:58 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065F613FE4;
+	Sun,  7 Jan 2024 18:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.104] (31.173.82.35) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sun, 7 Jan
+ 2024 21:24:17 +0300
+Subject: Re: [PATCH net-next v3 08/19] net: ravb: Move the IRQs get and
+ request in the probe function
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <geert+renesas@glider.be>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240105082339.1468817-9-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <02548b1b-d32c-78b1-f1b6-5fdb505d31bb@omp.ru>
+Date: Sun, 7 Jan 2024 21:24:17 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 0/4] Power off HCI devices before rfkilling them
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240102181946.57288-1-verdre@v0yd.nl>
- <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
- <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl>
+In-Reply-To: <20240105082339.1468817-9-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-In-Reply-To: <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/07/2024 18:00:30
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182476 [Jan 07 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.35 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.35 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	31.173.82.35:7.4.1,7.7.3;127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: {cloud_iprep_silent}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.35
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/07/2024 18:06:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/7/2024 5:20:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 1/3/24 13:15, Jonas Dreßler wrote:
-> Hi Luiz,
+On 1/5/24 11:23 AM, Claudiu wrote:
+
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 > 
-> On 1/2/24 19:39, Luiz Augusto von Dentz wrote:
->> Hi Jonas,
->>
->> On Tue, Jan 2, 2024 at 1:19 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
->>>
->>> In theory the firmware is supposed to power off the bluetooth card
->>> when we use rfkill to block it. This doesn't work on a lot of laptops
->>> though, leading to weird issues after turning off bluetooth, like the
->>> connection timing out on the peripherals which were connected, and
->>> bluetooth not connecting properly when the adapter is turned on again
->>> quickly after rfkilling.
->>>
->>> This series hooks into the rfkill driver from the bluetooth subsystem
->>> to send a HCI_POWER_OFF command to the adapter before actually 
->>> submitting
->>> the rfkill to the firmware and killing the HCI connection.
->>>
->>> ---
->>>
->>> v1 -> v2: Fixed commit message title to make CI happy
->>>
->>> Jonas Dreßler (4):
->>>    Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
->>>    Bluetooth: mgmt: Remove leftover queuing of power_off work
->>>    Bluetooth: Add new state HCI_POWERING_DOWN
->>>    Bluetooth: Queue a HCI power-off command before rfkilling adapters
->>
->> Apart from the assumption of RFKILL actually killing the RF
->> immediately or not, I'm fine with these changes, that said it would be
->> great if we can have some proper way to test the behavior of rfkill,
->> perhaps via mgmt-tester, since it should behave like the
->> MGMT_OP_SET_POWERED.
+> The runtime PM implementation will disable clocks at the end of
+> ravb_probe(). As some IP variants switch to reset mode as a result of
+> setting module standby through clock disable APIs, to implement runtime PM
+> the resource parsing and requesting are moved in the probe function and IP
+> settings are moved in the open function. This is done because at the end of
+> the probe some IP variants will switch anyway to reset mode and the
+> registers content is lost. Also keeping only register specific operations
+> in the ravb_open()/ravb_close() functions will make them faster.
 > 
-> Testing this sounds like a good idea, I guess we'd have to teach 
-> mgmt-tester to write to rfkill. The bigger problem seems to be that 
-> there's no MGMT event for power changes and also no MGMT_OP_GET_POWERED, 
-> so that's a bit concerning, could userspace even be notified about 
-> changes to adapter power?
+> Commit moves IRQ requests to ravb_probe() to have all the IRQs ready when
+> the interface is open. As now IRQs gets and requests are in a single place
+> there is no need to keep intermediary data (like ravb_rx_irqs[] and
+> ravb_tx_irqs[] arrays or IRQs in struct ravb_private).
 
-Sent v3 of the patchset now, I didn't add a test to mgmt-tester because 
-it's actually quite tricky to notice the full shutdown sequence happened 
-rather than just closing the device. As long as no devices are 
-connected, the difference is mostly in a few (faily random) events:
+   There's one thing that you probably didn't take into account: after
+you call request_irq(), you should be able to handle your IRQ as it's
+automatically unmasked, unless you pass IRQF_NO_AUTOEN to request_irq().
+Your device may be held i reset or even powered off but if you pass IRQF_SHARED to request_irq() (you do in a single IRQ config), you must
+be prepared to get your device's registers read (in order to ascertain
+whether it's your IRQ or not). And you can't even pass IRQF_NO_AUTOEN
+along with IRQF_SHARED, according to my reading of the IRQ code...
 
-btmon without the patch:
+> This is a preparatory change to add runtime PM support for all IP variants.
 
-@ MGMT Event: Class Of Device Changed (0x0007) plen 3 
- 
-        {0x0001} [hci0] 169.101804
-         Class: 0x000000
-           Major class: Miscellaneous
-           Minor class: 0x00
-@ MGMT Event: New Settings (0x0006) plen 4 
- 
-        {0x0001} [hci0] 169.101820
-         Current settings: 0x00000ac0
-           Secure Simple Pairing
-           BR/EDR
-           Low Energy
-           Secure Connections
+  I don't readily see why this is necessary for the full-fledged RPM
+support...
 
-btmon with the patch:
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1 
- 
-              #109 [hci0] 7.031852
-         Scan enable: No Scans (0x00)
- > HCI Event: Command Complete (0x0e) plen 4 
- 
-               #110 [hci0] 7.033026
-       Write Scan Enable (0x03|0x001a) ncmd 1
-         Status: Success (0x00)
-< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2 
- 
-              #111 [hci0] 7.033055
-         Extended advertising: Disabled (0x00)
-         Number of sets: Disable all sets (0x00)
- > HCI Event: Command Complete (0x0e) plen 4 
- 
-               #112 [hci0] 7.034202
-       LE Set Extended Advertising Enable (0x08|0x0039) ncmd 1
-         Status: Success (0x00)
-< HCI Command: LE Clear Advertising Sets (0x08|0x003d) plen 0 
- 
-              #113 [hci0] 7.034233
- > HCI Event: Command Complete (0x0e) plen 4 
- 
-               #114 [hci0] 7.035527
-       LE Clear Advertising Sets (0x08|0x003d) ncmd 1
-         Status: Success (0x00)
-@ MGMT Event: Class Of Device Changed (0x0007) plen 3 
- 
-          {0x0001} [hci0] 7.035554
-         Class: 0x000000
-           Major class: Miscellaneous
-           Minor class: 0x00
-@ MGMT Event: New Settings (0x0006) plen 4 
- 
-          {0x0001} [hci0] 7.035568
-         Current settings: 0x00000ac0
-           Secure Simple Pairing
-           BR/EDR
-           Low Energy
-           Secure Connections
+   Unfortunately, I have to NAK this patch, at least in its current
+form...
 
-Maybe we could add a fake connection and check whether that is 
-disconnected on the rfkill, but I don't think mgmt-tester supports that..
+[...]
 
-Fwiw, I don't think having a test for this is super important, this is a 
-regression a lot of people would notice very quickly I think.
-
-> 
-> Another thing I'm thinking about now is that queuing the HCI command 
-> using hci_cmd_sync_queue() might not be enough: The command is still 
-> executed async in a thread, and we won't actually block until it has 
-> been sent, so this might be introducing a race (rfkill could kill the 
-> adapter before we actually send the HCI command). The proper way might 
-> be to use a completion and wait until the 
-> set_powered_off_sync_complete() callback is invoked?
-> 
->>
->>>   include/net/bluetooth/hci.h |  2 +-
->>>   net/bluetooth/hci_core.c    | 33 ++++++++++++++++++++++++++++++---
->>>   net/bluetooth/hci_sync.c    | 16 +++++++++++-----
->>>   net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
->>>   4 files changed, 56 insertions(+), 25 deletions(-)
->>>
->>> -- 
->>> 2.43.0
->>>
->>
->>
-> 
-> Cheers,
-> Jonas
-
-Cheers,
-Jonas
+MBR, Sergey
 
