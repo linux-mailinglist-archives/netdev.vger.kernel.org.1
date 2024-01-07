@@ -1,101 +1,147 @@
-Return-Path: <netdev+bounces-62235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28AE88264FD
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:11:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808A5826507
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:18:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B49BF28148B
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:11:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54ABB1C20B43
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8272213AD1;
-	Sun,  7 Jan 2024 16:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="SCDVufUw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F72C13AD9;
+	Sun,  7 Jan 2024 16:18:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03olkn2081.outbound.protection.outlook.com [40.92.59.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC4313AC8;
-	Sun,  7 Jan 2024 16:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Nfh3SPlScpJNbmFJG3AvjHYz4crJ6ErWPuXcGN1GLks=; b=SCDVufUwJZIwyEBZ8yQr0RsD3y
-	lFaH1joDkia+4v8Z3v5GdHoj4lbuPTNvwNRTtcf+6SnmUX9mtkxmgiJnZOOvt9Ca3aJYAfIEodz7r
-	cg0jMMEelJmS84t6X9sszVXiZ1AQgc9lDN75GESstm6Wt1R7n2LJrxl7sMpjetu3yCprCIrMjgqN1
-	TqIYaKjtW9R4x3XkPv2fcmJxAx0aNnusmr/vGhuHwwvfrC6cxfw4/W3Gzir4LG3wBuExvJzvZd1jR
-	q2geFA2iY/djUT/p18XrU602ScW1k+a45rZqNNkfbYq7NllmX16ny/v5YfJuhhKaGHFDkLQQVGonl
-	HRKXqcXw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54952)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rMVjd-0002Fm-0F;
-	Sun, 07 Jan 2024 16:10:49 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rMVje-0002NN-2m; Sun, 07 Jan 2024 16:10:50 +0000
-Date: Sun, 7 Jan 2024 16:10:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Josua Mayer <josua@solid-run.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC5B13AD5;
+	Sun,  7 Jan 2024 16:18:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.it
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YOEhPQ/ydo4e8hH2WDVH0Xdd+i6jpY2ywattcUF6HFr0LXvC7aXrt8mvf2mnDTWdHgfprLY2dvI16bSzhbw3r6bJDWe+uE6lWlJ7k3beUS6vCJEFiR/3AExorHj+KnumEhZVZC9w9bn+vSCLPC2SAgyZ4unZzcRWVq4sPlgkPDfbuuva8y7/DqIw76NfCLzPgSKnORqMXNlwE1WpPKapL2rgp1iPCkTjtx3RdgMq0OeU0cMMxS41MNe8jqIm9Wg1IQjLCHVknQ6tKYKujJw98st64nwAKQIrZ5trW6qVTNqwv/6aFuvQQJ5Emi2Qp25NvlNFUuP8Gojk9o2zHOs9TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tfJ608z6DqTQSEo42Js4e2+l3qdmHBzThX0Rd/+1r94=;
+ b=QJCxfyfWheJYmA8JzvaXp2sbYoEFerPFTJoS1awSTv0c1iEXh/8QcTfZKdDg+kOkdESxn1TjeMfVVDBnOUqlsBHY/TFMzhFNGbC17I8wX/fQILErd6y+LSA28Ii6/ObddCRIcoDCJYfS+XIqRlpGxqtzeVJASlwSQSe3meV6StjDrrll+2+j6nEthZnqrvHWTVXf3TBPpJjGpo3dXrteHRjblKjiOC0evFhn6AqeSFGCQL+h7abNlnh4u/luDvl+0K8ZNSIdNcM5W61SDADufVR2vHpZ15feftpqhngsElwgXWD5KAU7yycFzXE1tb/5jYszYy1WgOspCdn0LCCvUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from AS1PR03MB8189.eurprd03.prod.outlook.com (2603:10a6:20b:47d::10)
+ by DBBPR03MB6729.eurprd03.prod.outlook.com (2603:10a6:10:209::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Sun, 7 Jan
+ 2024 16:18:13 +0000
+Received: from AS1PR03MB8189.eurprd03.prod.outlook.com
+ ([fe80::ffb3:3ff8:6ea9:52b5]) by AS1PR03MB8189.eurprd03.prod.outlook.com
+ ([fe80::ffb3:3ff8:6ea9:52b5%4]) with mapi id 15.20.7159.020; Sun, 7 Jan 2024
+ 16:18:13 +0000
+From: Sergio Palumbo <palumbo.ser@outlook.it>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: sfp: add fixup for tplink 2.5gbase-t rj45 modules
-Message-ID: <ZZrNChuIw0X9fr6Z@shell.armlinux.org.uk>
-References: <20240106-tplink-25gbaset-sfp-fixup-v1-1-8d26696bd2f4@solid-run.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH]     net: sfp: add quirk for DFP-34X-2C2 GPON ONU SFP
+Date: Sun,  7 Jan 2024 17:17:57 +0100
+Message-ID:
+ <AS1PR03MB8189FE82C632EBA97644D70082642@AS1PR03MB8189.eurprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.34.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TMN: [6MiRUswoYghdJmNK6n6kZf8jqOU5B0gM]
+X-ClientProxiedBy: MR2P264CA0095.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:500:32::35) To AS1PR03MB8189.eurprd03.prod.outlook.com
+ (2603:10a6:20b:47d::10)
+X-Microsoft-Original-Message-ID:
+ <20240107161757.6179-1-palumbo.ser@outlook.it>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240106-tplink-25gbaset-sfp-fixup-v1-1-8d26696bd2f4@solid-run.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR03MB8189:EE_|DBBPR03MB6729:EE_
+X-MS-Office365-Filtering-Correlation-Id: 305ee087-f50c-4bd2-9969-08dc0f9c3f15
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	iaO8KmwYBuAhETc1WyH128PY/5FE2Dtej7qCjBIjJ1aIIYOFIMBWLv6DbmxcDZ4j/0QNpijii3d9mQo7m8JmdIENDAA6EqGfHRROTAXVmyoZYNROaCq8F0SUJYGcZoooNsvYUZIN4snJqE1+ZgFZZX/ePNEl+mztBa3/A6cuk14V6GLrCfOIYab4EIM4bZrE9mBqc4WjMJhNHhN7LIh3Q87LFWIRitCxSDcYaEt7D0GPOVnHY77M/oCwpE2qrgXbCVu3VHeRLtKKJ2BI/VwH0VgZm8J3pUPmsJhD7AmVk/saKxB2jqD0JrhORdfSwXu3fnFhhjoZQJPDXGEXrJCsMgvIK+BYe0ZiFJkQU9/DRfwhh1JAate/JzAZsSReTOffuVaZ/iIP130EDQk41vLick1jOgkuZxaroty3NpC8esKS1Qcgi0Fl4wIDnIOLz/dSxX+Gcp2+sHxmokfpx3tfgPu8Nca1D4U2ewBCmeESHwZpG+eyu75Z9DzzlnnH/hw0T7DWTRYrw1EUy/eyF6GuJusE245iclYir/u2K6ZtXgW5jjHdVBz14BVmm4Z5a/Be
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q0Rpdm1CRk5qVW9zODRsd0V5OUVvTU56RDV6NHVMVDJFNFQ0VmhPWjRLazVv?=
+ =?utf-8?B?OGpwR2VHQVNUSzVoOTliTnl2RUlCZWVGS2ozWms2R0x2NkVEK3dPZktVMVVB?=
+ =?utf-8?B?ZXA2bzFHSU91NmlvQWdMVHQrd1N6SndRdmhNTlRRTUV3ZmtIM2lSQlVGUk5C?=
+ =?utf-8?B?cEd4b1VhQ3VFQklhd2pmcnE1a3lYdkNTOEtUTUlVM1NuN2JzQUZoQzZuUWp1?=
+ =?utf-8?B?U016c0duZVBvWm5GbGZKS0xjWmVJRFFTbFArV2YyeGdld1lqT1RTbjZjei9v?=
+ =?utf-8?B?OWloOFJYZEN1RHh0ZVRMYjV2bzRBS1NwZnhvRkRmMzdUZGx2K3FpZndFSS8v?=
+ =?utf-8?B?bC9xeFREcHJWbXIxSTM0VFdZL2lvd2d1RllMb0srZWh1RjFYYzVYeHpDSU1J?=
+ =?utf-8?B?YnN1ZDJDNk5TLzZBSHc5d25JazJnSzRQcGd6aGdhN0o2NFYxcmJYSTV4TXBE?=
+ =?utf-8?B?bDNMd3VCcExKYkpVRjMrN2JDMlFUT0VsVUVQektCZXpIc00vUnNQZUkvaEF4?=
+ =?utf-8?B?NnpvRnUvSjlwY0lqSytXczBacjR4SS9vR1J6S0FMK25RTGJGd1h6Z3c0MEJq?=
+ =?utf-8?B?WlZ2NDdlRHBKcGVnOUZCNW1WY1krL1JRekkwSnpCY3d6SWE2KzgzWnlGMXFV?=
+ =?utf-8?B?Vk9KRzFMNFUvTkpsSFZBR0RLaGJJWXRiSjFLaHcxNlN1aHJIS0NzQ1JKZkpn?=
+ =?utf-8?B?bjRtRGpTYTN1M3ROSXZuZXJVTWlBTkNZbmxMd3Bqd0xabXJOUCtKNWVYYy9m?=
+ =?utf-8?B?Uk5ydC9vOTJhdG54UHUyOE04M3MveVFmTjNtU296QU9Ic3RzZ0FjUUN4Szl5?=
+ =?utf-8?B?MjFNcXBEbHU4WDEyYmxqc00xaHl3MWh0MEdIaTJXUS9DSHQxZG5uVzJlSDlx?=
+ =?utf-8?B?UXVSYVh0Wk14SXl0RWlka0Z2OStseGQxdWRPd0lwRnZnVnZ6VlhHM1FjY1dW?=
+ =?utf-8?B?SVQrcVhkUHdKSG1ZekdJN1lhYW1jRDFZYkM0ZzVhdHpOaU5xUzJwV3UvRThn?=
+ =?utf-8?B?ZmVSWHRtdmkzSjN5NlV1aWJaaHVTeTEvdnpaYkEzSTI3dkR6aXJHS3N6ZnVG?=
+ =?utf-8?B?a3RVRVNBTm9NNHU2dyt1MzVqeDg1bmlpT3dMQm5IUTVKSjBuQ3ZONHk1dUVu?=
+ =?utf-8?B?TDF1andsaG53bjBsZnJrZWpQeFBJS0pwZEFUZFd0VkszZXlIVS9OdFFPZ0k2?=
+ =?utf-8?B?ZVVnY0dNWmVxUytLb0xlWnlzdG42dXhOd2lURUVRSk96YklaSDhiODRIVWN2?=
+ =?utf-8?B?blJNdVJXM2lWZGN4YjU4R1NNeFdDeGFPUDRWY1VNTmRidHJKakJ5dmZiN29y?=
+ =?utf-8?B?bDNIcElyRG5ObytpMEpBZDVubHZhOEZTWTRnZ0U3MzFBOHFzak5abk9ZNkwv?=
+ =?utf-8?B?U09mdGtLVzJFdDhkQW5SVEFXRjNseHlkVklnOW5RdVRPMW5CbGJML3paelFY?=
+ =?utf-8?B?ZGNKVnJucWpZUGVYNkdGS2l6WllxN0hnU2F3ZnJsKzl5aGcxN2lRWllJbktV?=
+ =?utf-8?B?My9LaDNBVldhSWszU0lYbzNZZ1dUNUdwSFVtcFhyODZXUVVDdFcwSy9MY3JD?=
+ =?utf-8?B?cjQzQXQ1WDlJZm5JNzNQaTVoTWZJSUhkaU1mSWtwR0NWY3JYSHBlSEt3TGty?=
+ =?utf-8?Q?iZcZGE/poN0rFij291OvO+vllKqeRGVlAdeRrU4LwKHs=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-76d7b.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 305ee087-f50c-4bd2-9969-08dc0f9c3f15
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR03MB8189.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2024 16:18:13.0775
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR03MB6729
 
-On Sat, Jan 06, 2024 at 05:29:56PM +0100, Josua Mayer wrote:
-> TP-Link TL-SM410U modules are single-rate 2.5GBase-T RJ45 SFP modules.
-> The EEPROM data is lying about connector and extended cc,
-> reporting 25Gbps fiber.
-> 
-> Add fixup for these specific modules forcing RJ45 @ 2.5Gbase-T.
-> 
-> For reference original eeprom data dump from ethtool:
-> 
-> Identifier                : 0x03 (SFP)
-> Extended identifier       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
-> Connector                 : 0x07 (LC)
-> Transceiver codes         : 0x00 0x00 0x00 0x00 0x00 0x00 0x40 0x00 0x00
-> Transceiver type          : FC: Twisted Pair (TP)
-> Encoding                  : 0x01 (8B/10B)
-> BR, Nominal               : 3100MBd
+    Add a quirk for a GPON SFP that identifies itself as "OEM"
+    "DFP-34X-2C2". This module's PHY is accessible at 1000base-X,
+    but can also run at 2500base-X as per specs of the module.
+    After application of the quirk the module is enebled to run both
+    at 1000base-X as well as at 2500base-X interface mode.
 
-This isn't 25Gbps - it's 2.5Gbps!
+Signed-off-by: Sergio Palumbo <palumbo.ser@outlook.it>
+---
+ drivers/net/phy/sfp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-So what actually happens with this module without the quirk? We should
-end up marking it for use as a 2500base-X fibre module which should
-result in it working.
-
-(Please include in the commit message how it works or not without the
-patch.)
-
-Also, patches to netdev need to have "net" (for -rc) or "net-next"
-(for the next merge window) in the "[PATCH ...]" n the subject line.
-
-Thanks.
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index f75c9eb3958e..1a447e3567c8 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -506,6 +506,9 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
++	// DFP-34X-2C2 GPON ONU supports 2500base-X
++	SFP_QUIRK_M("OEM", "DFP-34X-2C2", sfp_quirk_2500basex),
++
+ 	SFP_QUIRK_F("Turris", "RTSFP-10", sfp_fixup_rollball),
+ 	SFP_QUIRK_F("Turris", "RTSFP-10G", sfp_fixup_rollball),
+ };
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
