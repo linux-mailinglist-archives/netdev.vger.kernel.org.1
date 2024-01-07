@@ -1,107 +1,239 @@
-Return-Path: <netdev+bounces-62262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6D58265C9
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 20:27:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9452C8265CD
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 20:41:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 539E5B2100E
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:27:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 870721C209B6
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:41:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB67D10A2B;
-	Sun,  7 Jan 2024 19:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714D910A28;
+	Sun,  7 Jan 2024 19:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=nerdbynature.de header.i=@nerdbynature.de header.b="5/zHpgcH";
-	dkim=permerror (0-bit key) header.d=nerdbynature.de header.i=@nerdbynature.de header.b="nF2yXHd2";
-	dkim=pass (2048-bit key) header.d=nerdbynature.de header.i=@nerdbynature.de header.b="fQAHzeaR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1QkFxda"
 X-Original-To: netdev@vger.kernel.org
-Received: from trent.utfs.org (trent.utfs.org [94.185.90.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9D210A2A;
-	Sun,  7 Jan 2024 19:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nerdbynature.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nerdbynature.de
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/simple;
- d=nerdbynature.de; i=@nerdbynature.de; q=dns/txt; s=key1;
- t=1704655636; h=date : from : to : cc : subject : in-reply-to :
- message-id : references : mime-version : content-type : from;
- bh=BvIoYb/Fn5HQPIN8rIurDtiMGDlWrRB9nG1WDbCuGZ8=;
- b=5/zHpgcHmNmU4ARFrdNiIbEBaMdr2LKfIMwQ/YnTCR4Yw6LNoneY4R6ZQ3RWF3fPsKG5y
- e5xZDHMrbwRLb5pAg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=nerdbynature.de;
-	s=dkim; t=1704655636;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rmQJjEhWMY+tYzgMK5HnZv6TWvOnuPe8JnejlKdQzqU=;
-	b=nF2yXHd2EIy7JsJdxgMDTiXl7PAlF9Rz0f5vnWKIxk7eo3P1tHkr6rg7zy4v+3FbMOA3nk
-	VrcDHSDigm9+vLBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nerdbynature.de;
- i=@nerdbynature.de; q=dns/txt; s=key0; t=1704655636; h=date : from :
- to : cc : subject : in-reply-to : message-id : references :
- mime-version : content-type : from;
- bh=BvIoYb/Fn5HQPIN8rIurDtiMGDlWrRB9nG1WDbCuGZ8=;
- b=fQAHzeaR9TdD0eU4cy0QQwcGqQlm0W8s3DGhE2/Ixnl3K7f2LufEOZzeGtFYbhhak86IL
- aH5E0hzUx7TzLzunDzmQRLazzPd3+OVubewyeTcSQIF4yCyHnOFKNkFY8x61HnKECbGScRZ
- Pf4Ow/ITcBIsZJa9KOv4Dbuk58wlI/B8dkVO7BH29mA+VjLgFTY4Rhr4dQTievtJRnUku6O
- PqCIk5bQB9k3tXMtzaCGHgeWTyiwX7h1PTUzHm33fpQBw6hUJw0kQhYp2U12m1OTNbawVxM
- uHQ1+ssk1cDfqNNC6Az1sP+fS26pGAqqEWEAwNJ9hiwg3DthawnMy8fjnzwA==
-Received: from localhost (localhost [IPv6:::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by trent.utfs.org (Postfix) with ESMTPS id 389755FFAF;
-	Sun,  7 Jan 2024 20:27:16 +0100 (CET)
-Date: Sun, 7 Jan 2024 20:27:16 +0100 (CET)
-From: Christian Kujau <lists@nerdbynature.de>
-To: Dmitry Safonov <dima@arista.com>
-cc: netdev@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>, 
-    Francesco Ruggeri <fruggeri@arista.com>, 
-    Salam Noureddine <noureddine@arista.com>, David Ahern <dsahern@kernel.org>, 
-    linux-kernel@vger.kernel.org
-Subject: Re: syslog spam: TCP segment has incorrect auth options set
-In-Reply-To: <491b1b19-f719-1aa6-7757-ba4168228bbd@nerdbynature.de>
-Message-ID: <65ad94ae-36a9-f128-ea45-26772772ba31@nerdbynature.de>
-References: <f6b59324-1417-566f-a976-ff2402718a8d@nerdbynature.de> <fe1752a6-9866-45e6-b011-92a242304fce@arista.com> <491b1b19-f719-1aa6-7757-ba4168228bbd@nerdbynature.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E5F11183;
+	Sun,  7 Jan 2024 19:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a28bf46ea11so208622366b.1;
+        Sun, 07 Jan 2024 11:41:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704656499; x=1705261299; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ObkI4/hpAc5XCYcrKwgY+Xsx/yEYLmlwpmTk1Flaajo=;
+        b=N1QkFxdaonlWqAhAvqnEQPJMfOpSqkHtd69NmCsRM/D/RHRnQFvFPsbOBeXbkXGLnO
+         AEuo7iedKlNb3hQGoabTZASKtFJFbz+WyIUJy2a8mBa4RdhAOmmqZHBu5XpCKn0JH5wK
+         4jrGX0ow7NTnsPRXhmRp7FT/MiVolHaBislPYn76HqvmxtUFbJYbFLiobtMuX82xsXtU
+         XJXzNZ/SuL6C9ag4d5LMDEG21WOip15gXLdu43RHfOKcmKcd+PyDVW6foOcRbSAsuOsI
+         2GQpRSGrDmMiymkZrblBryg9pe1MxTN/kKLWO3EQuC6qO0vT1iRNaFDpWo5j19cr04qh
+         QhZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704656499; x=1705261299;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ObkI4/hpAc5XCYcrKwgY+Xsx/yEYLmlwpmTk1Flaajo=;
+        b=HNmzACho7kd9W4+7yWzNMAdnGU9ogGoJN/SSfezJIEowLHQrmGZO5S+pl9sMYYhrhQ
+         IgCHibw3lO5bjuxnrYvrM5PoGyi+C44RdIlWkqA3SIIaMmnUN260IHHtpTKZC7JhaFps
+         92BKLosuVF5hu1nlJR4uIJuVENXnePhX/t/9vTLLuagTskN3ntBnClwflx98LICs7bQR
+         DoosLM2/UOAjBvCxEFEot+SAOb47PyI3YXBfKocZlRmrVFcvBvcs6pUTqAiR+Yr8S7uj
+         kIoqVKqi069Ptptm6nAeySDhmGBNqQL/sAfu/yfwGxEfFnFWKjuNfUETuteoS0Pk1cyy
+         qn7Q==
+X-Gm-Message-State: AOJu0YxoRdc8yDd9fcnEtXeC0Jp5QitR8NP32HVeRTtHQbUrI/wSBC8y
+	KQmdDHYUf2GPOXrkTQesMH8=
+X-Google-Smtp-Source: AGHT+IH31Fk17x8DYiIrH3Q0+tye342WuIdmMYNFJs+1QZp0qAs/AH1bgXtFv1zwhGMSkiK+UDQklA==
+X-Received: by 2002:a17:906:27c2:b0:a2a:b797:bde7 with SMTP id k2-20020a17090627c200b00a2ab797bde7mr168993ejc.13.1704656498643;
+        Sun, 07 Jan 2024 11:41:38 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id et9-20020a056402378900b00557884a55efsm1140264edb.9.2024.01.07.11.41.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 07 Jan 2024 11:41:38 -0800 (PST)
+Message-ID: <2c13d157-c8da-4cf4-b8a1-668ab34b803f@gmail.com>
+Date: Sun, 7 Jan 2024 20:41:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next] net: phylink: add quirk for disabling
+ in-band-status for mediatek pcs at 2500base-x
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240102074326.1049179-1-ericwouds@gmail.com>
+ <ZZQDWzYlxAKl0JxI@shell.armlinux.org.uk>
+From: Eric Woudstra <ericwouds@gmail.com>
+In-Reply-To: <ZZQDWzYlxAKl0JxI@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 4 Jan 2024, Christian Kujau wrote:
-> On Thu, 4 Jan 2024, Dmitry Safonov wrote:
-> > Yeah, I guess it's possible to down the severity of these logs, but may
-> > be unexpected by admins: TCP-MD5 messages existed for long time and
-> > there may be userspace that expects them (i.e. in arista there are tests
-> > that look for these specific messages - those would be easy to fix, but
-> > there may be others outside this company).
-> 
-> Understood, thanks for explaining that.
-> 
-> > While thinking on the origin of your issue, it seems that the logs
-> > produced by either TCP-MD5 or TCP-AO are desired by a user when they
-> > add/use the authentication. Could you try this and see if that solves
-> > the issue for you?
-> 
-> Thanks for preparing that patch so quickly, did not expect that :-)
-> 
-> I've applied this on top of 6.7.0-rc8 and will report back if I see those 
-> messages again in the next days.
 
-No messages so far, great!
 
-Tested-by: Christian Kujau <lists@nerdbynature.de>
+On 1/2/24 13:36, Russell King (Oracle) wrote:
 
-Thanks again for fixing this so quickly,
-Christian.
--- 
-BOFH excuse #323:
+> As 6.6 was declared LTS, I think we can now move phylink_pcs_neg_mode()
+> into phylink.c, and thus think about what we should do with:
 
-Your processor has processed too many instructions.  Turn it off immediately, do not type any commands!!
+In the other rfc patch Russell King (Oracle) wrote:
+
+> Since Autoneg is clear, phylink_mii_c22_pcs_decode_state() won't
+> change state->speed and state->duplex, which should already be
+> correctly set.
+
+So the rfc patch now I have changed it to the following. Sure still
+not ready for the real patch, but a few steps closer. The rtl8221b
+can now be used as optical sfp (even without disabling autoneg in the 
+sfp-quirk). Also it can be used with marek's rtl8221b rollball patch,
+that changes interface between 2500base-x and sgmii. This is tested
+on the BananaPi R3. The speed and duplex get are set from phylink. I'm
+not sure what to do with pl->link_config.pause. For now I set it to
+MLO_PAUSE_NONE.
+
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 298dfd6982a5..3f03af290fa3 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1074,6 +1055,108 @@ static void phylink_pcs_an_restart(struct phylink *pl)
+ 		pl->pcs->ops->pcs_an_restart(pl->pcs);
+ }
+ 
++/* This function needs to be changed, not using compatible */
++static bool phylink_basex_no_inband(struct phylink *pl)
++{
++	struct device_node *node = pl->config->dev->of_node;
++
++	if (!node)
++		return false;
++
++	if (!of_device_is_compatible(node, "mediatek,eth-mac"))
++		return false;
++
++	return true;
++}
++
++static void phylink_pcs_neg_mode(struct phylink *pl,
++				 phy_interface_t interface,
++				 const unsigned long *advertising){
++	if ((!!pl->phydev) && phylink_basex_no_inband(pl)) {
++		switch (interface) {
++		case PHY_INTERFACE_MODE_1000BASEX:
++		case PHY_INTERFACE_MODE_2500BASEX:
++			if (pl->cur_link_an_mode == MLO_AN_INBAND)
++				pl->cur_link_an_mode = MLO_AN_PHY;
++			break;
++		default:
++			/* restore mode if it was changed before */
++			if ((pl->cur_link_an_mode == MLO_AN_PHY) &&
++			    (pl->cfg_link_an_mode == MLO_AN_INBAND))
++				pl->cur_link_an_mode = pl->cfg_link_an_mode;
++		}
++	}
++
++	switch (interface) {
++	case PHY_INTERFACE_MODE_SGMII:
++	case PHY_INTERFACE_MODE_QSGMII:
++	case PHY_INTERFACE_MODE_QUSGMII:
++	case PHY_INTERFACE_MODE_USXGMII:
++		/* These protocols are designed for use with a PHY which
++		 * communicates its negotiation result back to the MAC via
++		 * inband communication. Note: there exist PHYs that run
++		 * with SGMII but do not send the inband data.
++		 */
++		if (!phylink_autoneg_inband(pl->cur_link_an_mode))
++			pl->pcs_neg_mode = PHYLINK_PCS_NEG_OUTBAND;
++		else
++			pl->pcs_neg_mode = PHYLINK_PCS_NEG_INBAND_ENABLED;
++		break;
++
++	case PHY_INTERFACE_MODE_1000BASEX:
++	case PHY_INTERFACE_MODE_2500BASEX:
++		/* 1000base-X is designed for use media-side for Fibre
++		 * connections, and thus the Autoneg bit needs to be
++		 * taken into account. We also do this for 2500base-X
++		 * as well, but drivers may not support this, so may
++		 * need to override this.
++		 */
++		if (!phylink_autoneg_inband(pl->cur_link_an_mode))
++			pl->pcs_neg_mode = PHYLINK_PCS_NEG_OUTBAND;
++		else if (linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
++					   advertising) &&
++					   !phylink_basex_no_inband(pl))
++				pl->pcs_neg_mode = PHYLINK_PCS_NEG_INBAND_ENABLED;
++		else {
++			pl->pcs_neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED;
++			linkmode_clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
++					   pl->link_config.advertising);
++			pl->link_config.speed = (interface ==
++			                         PHY_INTERFACE_MODE_1000BASEX) ?
++			                         SPEED_1000 : SPEED_2500;
++			pl->link_config.duplex = DUPLEX_FULL;
++			pl->link_config.pause = MLO_PAUSE_NONE; /* ????? */
++
++		}
++		break;
++
++	default:
++		pl->pcs_neg_mode = PHYLINK_PCS_NEG_NONE;
++		break;
++	}
++
++	return;
++}
++
+ static void phylink_major_config(struct phylink *pl, bool restart,
+ 				  const struct phylink_link_state *state)
+ {
+@@ -1085,9 +1187,7 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 
+ 	phylink_dbg(pl, "major config %s\n", phy_modes(state->interface));
+ 
+-	pl->pcs_neg_mode = phylink_pcs_neg_mode(pl->cur_link_an_mode,
+-						state->interface,
+-						state->advertising);
++	phylink_pcs_neg_mode(pl, state->interface, state->advertising);
+ 
+ 	if (pl->using_mac_select_pcs) {
+ 		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+@@ -1191,9 +1291,9 @@ static int phylink_change_inband_advert(struct phylink *pl)
+ 		    pl->link_config.pause);
+ 
+ 	/* Recompute the PCS neg mode */
+-	pl->pcs_neg_mode = phylink_pcs_neg_mode(pl->cur_link_an_mode,
+-					pl->link_config.interface,
+-					pl->link_config.advertising);
++	phylink_pcs_neg_mode(pl, pl->link_config.interface,
++			    pl->link_config.advertising);
++
+ 
+ 	neg_mode = pl->cur_link_an_mode;
+ 	if (pl->pcs->neg_mode)
+@@ -1222,7 +1322,8 @@ static void phylink_mac_pcs_get_state(struct phylink *pl,
+ 	state->interface = pl->link_config.interface;
+ 	state->rate_matching = pl->link_config.rate_matching;
+ 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+-			      state->advertising)) {
++			      state->advertising) &&
++			      (pl->pcs_neg_mode != PHYLINK_PCS_NEG_INBAND_DISABLED)) {
+ 		state->speed = SPEED_UNKNOWN;
+ 		state->duplex = DUPLEX_UNKNOWN;
+ 		state->pause = MLO_PAUSE_NONE;
 
