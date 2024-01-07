@@ -1,94 +1,90 @@
-Return-Path: <netdev+bounces-62238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2AB2826517
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:29:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9AE82651B
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:30:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 528F8B213C7
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:29:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 513781F227AC
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4A113ADF;
-	Sun,  7 Jan 2024 16:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5444D10A18;
+	Sun,  7 Jan 2024 16:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P0ueCcCX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g95m5o4d"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C90E13AD9
-	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 16:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=r96zCp9sU3iAaynso5Jq8D+X2fqOPP0MUZv1zQt26sc=; b=P0ueCcCXMqNM8Pp1oO7NK8VgxU
-	krcgNo+V09eJ2v8SSwvMPS5XyuMoVs8vqQs9l7wuNUozIAXlcICRLJZrprAdWmc52GzKMraip9kNl
-	A/8D7nNooGOqRE/+DqDrp4kV14Ug6cBhnDnm95/SWzod9pRu4F+hKUJEpbubXFIeNgA4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rMW11-004ZrV-Bc; Sun, 07 Jan 2024 17:28:47 +0100
-Date: Sun, 7 Jan 2024 17:28:47 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King <rmk+kernel@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 RFC 2/5] ethtool: switch back from ethtool_keee to
- ethtool_eee for ioctl
-Message-ID: <d822d4c9-051d-4cc6-aee3-901e9c15c797@lunn.ch>
-References: <8d8700c8-75b2-49ba-b303-b8d619008e45@gmail.com>
- <ba3105df-74ae-4883-b9e9-d517036a73b3@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BA413AE6;
+	Sun,  7 Jan 2024 16:30:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A9953C433C9;
+	Sun,  7 Jan 2024 16:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704645023;
+	bh=eO6iIqGTyaZtpjjGK2t1Bq0svOz8KGKw3irzAkGS1S8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=g95m5o4d1Z7MfoYaZwzctByrNrC73NWKozMjW9YdvdmqaScVUvAIUNZdBDoHsdU7q
+	 wqC0VxwOezHD5pIRUrkgQTWOZyUVoxRo/zRcIwS0dF5+dprfeFiJPDmnhUlAEH1pF+
+	 pEotpYpR7R35QOjZkwLhNUwBXSf9gJgFR98ThwN+eVnyXD/B2UicJTwv6tLVuI54xL
+	 ahN1HluxWYvNQdRpvI9Ln9BT8/yv+sAeWNKBqkhzCdT0kHjokxgaIVTIlJOWKzpp0V
+	 0qj2STEiJedg16aFclfZLeMiCM5JXkZ8ywPGh4runKryxECqhnzXHrSxzqwGNJZ3In
+	 tDmw/LQeweg9Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 90D6AC4167F;
+	Sun,  7 Jan 2024 16:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ba3105df-74ae-4883-b9e9-d517036a73b3@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH v4 0/4] net: phy: at803x: even more generalization
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170464502358.13016.743477267420699601.git-patchwork-notify@kernel.org>
+Date: Sun, 07 Jan 2024 16:30:23 +0000
+References: <20240104213044.4653-1-ansuelsmth@gmail.com>
+In-Reply-To: <20240104213044.4653-1-ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-> +static void eee_to_keee(struct ethtool_keee *keee,
-> +			const struct ethtool_eee *eee)
-> +{
-> +	memset(keee, 0, sizeof(*keee));
-> +
-> +	keee->supported = eee->supported;
-> +	keee->advertised = eee->advertised;
-> +	keee->lp_advertised = eee->lp_advertised;
-> +	keee->eee_active = eee->eee_active;
-> +	keee->eee_enabled = eee->eee_enabled;
-> +	keee->tx_lpi_enabled = eee->tx_lpi_enabled;
-> +	keee->tx_lpi_timer = eee->tx_lpi_timer;
+Hello:
 
-Just to avoid surprises, i would also copy keee->cmd to eee->cmd.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> +}
-> +
-> +static void keee_to_eee(struct ethtool_eee *eee,
-> +			const struct ethtool_keee *keee)
-> +{
-> +	memset(eee, 0, sizeof(*eee));
-> +
-> +	eee->supported = keee->supported;
-> +	eee->advertised = keee->advertised;
-> +	eee->lp_advertised = keee->lp_advertised;
-> +	eee->eee_active = keee->eee_active;
-> +	eee->eee_enabled = keee->eee_enabled;
-> +	eee->tx_lpi_enabled = keee->tx_lpi_enabled;
-> +	eee->tx_lpi_timer = keee->tx_lpi_timer;
+On Thu,  4 Jan 2024 22:30:37 +0100 you wrote:
+> This is part 3 of at803x required patches to split the PHY driver
+> in more specific PHY Family driver.
+> 
+> While adding support for a new PHY Family qca807x it was notice lots
+> of similarities with the qca808x cdt function. Hence this series
+> is done to make things easier in the future when qca807x PHY will be
+> submitted.
+> 
+> [...]
 
-Same here.
+Here is the summary with links:
+  - [net-next,v4,1/4] net: phy: at803x: generalize cdt fault length function
+    https://git.kernel.org/netdev/net-next/c/22eb276098da
+  - [net-next,v4,2/4] net: phy: at803x: refactor qca808x cable test get status function
+    https://git.kernel.org/netdev/net-next/c/e0e9ada1df61
+  - [net-next,v4,3/4] net: phy: at803x: add support for cdt cross short test for qca808x
+    https://git.kernel.org/netdev/net-next/c/ea73e5ea442e
+  - [net-next,v4,4/4] net: phy: at803x: make read_status more generic
+    https://git.kernel.org/netdev/net-next/c/c34d9452d4e5
 
-Since reserved is not supposed to be used, not copying that is O.K.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-	Andrew
+
 
