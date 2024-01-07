@@ -1,172 +1,234 @@
-Return-Path: <netdev+bounces-62281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9C138266C6
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 00:31:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F7CF8266C9
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 00:49:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C69881C20968
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 23:31:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6516281791
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 23:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD04A125A5;
-	Sun,  7 Jan 2024 23:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FBA12B6A;
+	Sun,  7 Jan 2024 23:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="FH+mMiWR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jsl+Je/H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A6613AE3
-	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 23:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cc7b9281d1so14859941fa.1
-        for <netdev@vger.kernel.org>; Sun, 07 Jan 2024 15:31:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A024125A8;
+	Sun,  7 Jan 2024 23:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cd1eac006eso11730751fa.3;
+        Sun, 07 Jan 2024 15:49:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1704670311; x=1705275111; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TS+kykkdltLDRirL+rXcv6MtUIxDqkAkNHKl9TdrtYI=;
-        b=FH+mMiWRvo+omLGpK/Yf7i/M9xTFQPK1VXIpJUzvERiLzeTXrc2VhYxw1lEfGimr86
-         oP/IHTAoiKF2x5fse3o9XvNO99oOI1nrxdz/XO7x70UmVibY7GBR6DlM/bJmMgIpBwmf
-         QG5t6q2a121/4qKIKC4YItW/DZK06CkK4Cxyi0K6oNQN/vmK7O5uIzvSngCCZ2LRv4oE
-         NdcJYfjApczSo8v18FYnrSagwDBqKdv7LKVGgZTmH0jqY0XPTwqz7sibIecsVw7fqbCO
-         7siWgL+T6fa7HqH9aBn6m3OfBfEqBnZQ/jIjLJ++wG4ZaL19evW9aGMLSuxDLbp87zDF
-         WMRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704670311; x=1705275111;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1704671369; x=1705276169; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TS+kykkdltLDRirL+rXcv6MtUIxDqkAkNHKl9TdrtYI=;
-        b=EUj1DZQoZP4ypyY5o7rxr088HUOvDlXVQruacrD/K+KXEeqpA2++GjtSQ8cq0e8ySC
-         EcPgr7Sddk37/wtWZcDJO4wIvTzYS53OSEd3WD+/+8J0ffsssKui0gdwtNBPMsfVlBtQ
-         EnY7qrULGrQaoci0Hl79Lp92kPb303+VEsvCQlLloxb3uiaBkFIEMF3yLtSjNSkqP+j8
-         xMckxsA2y1nrNeLTEZjEsObRmfNSjuCPwDN/mcqNh8hvzJ5wm8sCD0ZU4GgHTAAIMAOo
-         gr6tprFCVN82AmvEo8LzZqzYlrYags/WhtJO05Jv7ygbuw7tKtRe7MvFqAe6zh5hRApc
-         7yXg==
-X-Gm-Message-State: AOJu0YxfbrnOPF1ihSx8Lj0FZUkHn3GTs+ldeKJe0/+UNhGMg2LmjCZW
-	a6RgXcy13Yg4BFTaJzJ9nPkYc7iTVIO4GLOxHzyitqXoikkIsA==
-X-Google-Smtp-Source: AGHT+IFQZnV0vK7G2LO3VqPoRgdasQdOAKBQKbAmNHtWEtSJ4MjSpFvm7zonHd8SkI+wRyuLOWjmnA==
-X-Received: by 2002:a05:651c:547:b0:2cc:ea5b:ba6b with SMTP id q7-20020a05651c054700b002ccea5bba6bmr1177910ljp.26.1704670311344;
-        Sun, 07 Jan 2024 15:31:51 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:0:98ab:a4f3:94cf:e2e3? ([2001:67c:2fbc:0:98ab:a4f3:94cf:e2e3])
-        by smtp.gmail.com with ESMTPSA id s20-20020aa7c554000000b0055537e76e94sm3665691edr.57.2024.01.07.15.31.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Jan 2024 15:31:50 -0800 (PST)
-Message-ID: <68a6d8a0-e98f-4308-a1b8-c11b5fa09fdf@openvpn.net>
-Date: Mon, 8 Jan 2024 00:32:23 +0100
+        bh=pQWucGX8i5M7geCueH7j+J5ARbbBVLCsirvzYyDvJyI=;
+        b=jsl+Je/HcPCh6EpXtzzkpmDxO7Ji6KmGd02u6/S9qXJ2EoD77Z5oi6PMRqq5maejie
+         eMFrae+8qh0lgn0tPm+A65lKDZVaZgZ3FEazgL9bGv7Gr+CyDXq8KFTEhcPrNWuEswPh
+         fEtLFSw8g9zZpndY7LzAEDEXWywIuztc9SlI6SV54rnTXkpBbJmq+NYm5vsi8rENpu7/
+         m1Nj7IObzWTS9u0AYE8owtzmT79Qj7rgCP/GiWZHFU4kNrGLAu3H6NiRQ1Rf9I9MOcKK
+         Knp7G0RjRQKnzMF6TASn8dBavF61xSN5VZN+Cn2T+K0c4lvapAb2K9IhBjjUXJSBiK8e
+         /Ylg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704671369; x=1705276169;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pQWucGX8i5M7geCueH7j+J5ARbbBVLCsirvzYyDvJyI=;
+        b=lLp68MWdCkpz4YeGQvFSQjM+8VxY6eDQgwpnFRwALX0ES6fBBu64V3Lc908WHBiDkL
+         g0hYDoh+dYnKNfadfNivPJjWC9CjFjNICz50LrScMxrDwFjh2zV3qArbwuBw38PN7547
+         0uSSWOwQXxTreXHXqXFLshn6DTIXYfr6hsI3Z4ydXRerrN85OTDspPwRYW4rNQ0pml/Z
+         zMHMEL70FJiDuJWuE+BStXuc5usogDhdghyTMEp2Qoqft4x/SqQWt/wzLlRYkAfF+yfP
+         OaQijzmKGTil5DDmozZgl9z3rnjX1mEPxfuYJnL56p6UDFWwlxoFrOw4IgwYf8V63CjY
+         F1zg==
+X-Gm-Message-State: AOJu0YypS+CNrNZKwaBQyPR8YZ2eQq7+pcFDLePk454oyILe9n5IrVe9
+	RaB8lCdv0Ps72j7JJYKa7aZcMXnj2B00iuQpZtg=
+X-Google-Smtp-Source: AGHT+IFPJH2xLFCsPjV21ID/GJ6Pvx6zTs1vWa5/cqBc0W02pC6fpCI21nVgsaIBLdUbwZdjhdcNtRr3RbwaTRpQ4HQ=
+X-Received: by 2002:a2e:720d:0:b0:2cd:3141:5d43 with SMTP id
+ n13-20020a2e720d000000b002cd31415d43mr671051ljc.0.1704671368815; Sun, 07 Jan
+ 2024 15:49:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/1] Introducing OpenVPN Data Channel Offload
-Content-Language: en-US
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-References: <20240106215740.14770-1-antonio@openvpn.net>
- <d807ea60-c963-43cd-9652-95385258f1ad@gmail.com>
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <d807ea60-c963-43cd-9652-95385258f1ad@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240102181946.57288-1-verdre@v0yd.nl> <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
+ <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl> <f9f638bf-676e-43bf-8d83-256cae8f7bfe@v0yd.nl>
+In-Reply-To: <f9f638bf-676e-43bf-8d83-256cae8f7bfe@v0yd.nl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sun, 7 Jan 2024 18:49:15 -0500
+Message-ID: <CABBYNZL26agc8mDaWZhSpWO1uzhZ78QY96n3OEQW3GJw9+UPYQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] Power off HCI devices before rfkilling them
+To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sergey,
+Hi Jonas,
 
-Thanks for jumping in
+On Sun, Jan 7, 2024 at 1:11=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
+wrote:
+>
+> On 1/3/24 13:15, Jonas Dre=C3=9Fler wrote:
+> > Hi Luiz,
+> >
+> > On 1/2/24 19:39, Luiz Augusto von Dentz wrote:
+> >> Hi Jonas,
+> >>
+> >> On Tue, Jan 2, 2024 at 1:19=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd=
+.nl> wrote:
+> >>>
+> >>> In theory the firmware is supposed to power off the bluetooth card
+> >>> when we use rfkill to block it. This doesn't work on a lot of laptops
+> >>> though, leading to weird issues after turning off bluetooth, like the
+> >>> connection timing out on the peripherals which were connected, and
+> >>> bluetooth not connecting properly when the adapter is turned on again
+> >>> quickly after rfkilling.
+> >>>
+> >>> This series hooks into the rfkill driver from the bluetooth subsystem
+> >>> to send a HCI_POWER_OFF command to the adapter before actually
+> >>> submitting
+> >>> the rfkill to the firmware and killing the HCI connection.
+> >>>
+> >>> ---
+> >>>
+> >>> v1 -> v2: Fixed commit message title to make CI happy
+> >>>
+> >>> Jonas Dre=C3=9Fler (4):
+> >>>    Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
+> >>>    Bluetooth: mgmt: Remove leftover queuing of power_off work
+> >>>    Bluetooth: Add new state HCI_POWERING_DOWN
+> >>>    Bluetooth: Queue a HCI power-off command before rfkilling adapters
+> >>
+> >> Apart from the assumption of RFKILL actually killing the RF
+> >> immediately or not, I'm fine with these changes, that said it would be
+> >> great if we can have some proper way to test the behavior of rfkill,
+> >> perhaps via mgmt-tester, since it should behave like the
+> >> MGMT_OP_SET_POWERED.
+> >
+> > Testing this sounds like a good idea, I guess we'd have to teach
+> > mgmt-tester to write to rfkill. The bigger problem seems to be that
+> > there's no MGMT event for power changes and also no MGMT_OP_GET_POWERED=
+,
+> > so that's a bit concerning, could userspace even be notified about
+> > changes to adapter power?
+>
+> Sent v3 of the patchset now, I didn't add a test to mgmt-tester because
+> it's actually quite tricky to notice the full shutdown sequence happened
+> rather than just closing the device. As long as no devices are
+> connected, the difference is mostly in a few (faily random) events:
+>
+> btmon without the patch:
+>
+> @ MGMT Event: Class Of Device Changed (0x0007) plen 3
+>
+>         {0x0001} [hci0] 169.101804
+>          Class: 0x000000
+>            Major class: Miscellaneous
+>            Minor class: 0x00
+> @ MGMT Event: New Settings (0x0006) plen 4
+>
+>         {0x0001} [hci0] 169.101820
+>          Current settings: 0x00000ac0
+>            Secure Simple Pairing
+>            BR/EDR
+>            Low Energy
+>            Secure Connections
+>
+> btmon with the patch:
+>
+> < HCI Command: Write Scan Enable (0x03|0x001a) plen 1
+>
+>               #109 [hci0] 7.031852
+>          Scan enable: No Scans (0x00)
+>  > HCI Event: Command Complete (0x0e) plen 4
+>
+>                #110 [hci0] 7.033026
+>        Write Scan Enable (0x03|0x001a) ncmd 1
+>          Status: Success (0x00)
+> < HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2
+>
+>               #111 [hci0] 7.033055
+>          Extended advertising: Disabled (0x00)
+>          Number of sets: Disable all sets (0x00)
+>  > HCI Event: Command Complete (0x0e) plen 4
+>
+>                #112 [hci0] 7.034202
+>        LE Set Extended Advertising Enable (0x08|0x0039) ncmd 1
+>          Status: Success (0x00)
+> < HCI Command: LE Clear Advertising Sets (0x08|0x003d) plen 0
+>
+>               #113 [hci0] 7.034233
+>  > HCI Event: Command Complete (0x0e) plen 4
+>
+>                #114 [hci0] 7.035527
+>        LE Clear Advertising Sets (0x08|0x003d) ncmd 1
+>          Status: Success (0x00)
+> @ MGMT Event: Class Of Device Changed (0x0007) plen 3
+>
+>           {0x0001} [hci0] 7.035554
+>          Class: 0x000000
+>            Major class: Miscellaneous
+>            Minor class: 0x00
+> @ MGMT Event: New Settings (0x0006) plen 4
+>
+>           {0x0001} [hci0] 7.035568
+>          Current settings: 0x00000ac0
+>            Secure Simple Pairing
+>            BR/EDR
+>            Low Energy
+>            Secure Connections
+>
+> Maybe we could add a fake connection and check whether that is
+> disconnected on the rfkill, but I don't think mgmt-tester supports that..
+>
+> Fwiw, I don't think having a test for this is super important, this is a
+> regression a lot of people would notice very quickly I think.
 
-On 06/01/2024 23:29, Sergey Ryazanov wrote:
-> Hi Antonio,
-> 
-> On 06.01.2024 23:57, Antonio Quartulli wrote:
->> I tend to agree that a unique large patch is harder to review, but
->> splitting the code into several paches proved to be quite cumbersome,
->> therefore I prefered to not do it. I believe the code can still be
->> reviewed file by file, despite in the same patch.
-> 
-> I am happy to know that project is ongoing. But I had stopped the review 
-> after reading these lines. You need AI to review at once "35 files 
-> changed, 5914 insertions(+)". Last time I checked, I was human. Sorry.
-> 
-> Or you can see it like this: if submitter does not care, then why anyone 
-> else should?
+Afaik we did something similar to suspend to test its sequence when
+suspending while connected, I will look it up tomorrow since I
+responding from my phone.
 
-I am sorry - I did not mean to be careless/sloppy.
+> >
+> > Another thing I'm thinking about now is that queuing the HCI command
+> > using hci_cmd_sync_queue() might not be enough: The command is still
+> > executed async in a thread, and we won't actually block until it has
+> > been sent, so this might be introducing a race (rfkill could kill the
+> > adapter before we actually send the HCI command). The proper way might
+> > be to use a completion and wait until the
+> > set_powered_off_sync_complete() callback is invoked?
+> >
+> >>
+> >>>   include/net/bluetooth/hci.h |  2 +-
+> >>>   net/bluetooth/hci_core.c    | 33 ++++++++++++++++++++++++++++++---
+> >>>   net/bluetooth/hci_sync.c    | 16 +++++++++++-----
+> >>>   net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
+> >>>   4 files changed, 56 insertions(+), 25 deletions(-)
+> >>>
+> >>> --
+> >>> 2.43.0
+> >>>
+> >>
+> >>
+> >
+> > Cheers,
+> > Jonas
+>
+> Cheers,
+> Jonas
 
-I totally understand, but I truly burnt so much time on finding a 
-reasonable way to split this patch that I had to give up at some point.
 
-I get your input, but do you think that turning it into 35 patches of 1 
-file each (just as a random example), will make it easier to digest?
 
-Anyway, I will give it another try (the test robot complained about 
-something, so it seems I need to resend the patch anyway) and I'll see 
-where I land.
-
-Cheers!
-
-> 
->> ** KNOWN ISSUE:
->> Upon module unloading something is not torn down correctly and sometimes
->> new packets hit dangling netdev pointers. This problem did not exist
->> when the RTNL API was implemented (before interface handling was moved
->> to Netlink). I was hoping to get some feedback from the netdev community
->> on anything that may look wrong.
-> 
-> A small hint, if the series is not going to be merged, then it is better 
-> to mark it as RFC.
-> 
-> -- 
-> Sergey
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
+--=20
+Luiz Augusto von Dentz
 
