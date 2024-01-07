@@ -1,83 +1,101 @@
-Return-Path: <netdev+bounces-62234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E3388264FB
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:10:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28AE88264FD
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38443B20F13
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:10:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B49BF28148B
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1383C13AC7;
-	Sun,  7 Jan 2024 16:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8272213AD1;
+	Sun,  7 Jan 2024 16:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pnkvn2gR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="SCDVufUw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE76813AC2
-	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 16:10:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C691C433C8;
-	Sun,  7 Jan 2024 16:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704643823;
-	bh=a7N/ME3IfKvRa1T8hbgY1xBHCwKN9OHZsWbh8mc7uec=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Pnkvn2gRRV7JE/QNFLeLu+rhh07OnVyf8WoHPC57z1AvnOlemMa/egGpNgHhpkwwf
-	 1FTgAxYX+xvHq8mRA2Ob9Zb5ROX4AaI/2kzLGwXdy2oV1upc67cHWpVruerkI1RCAk
-	 UEpygYd17Uc7kjlfWlrwWPp3g8MluxEQBNG0sNCJw86JILrJCpiIAQf6+8r5zB9WqF
-	 f1uc3v9tygvu1kNEM4Eajgjk/QUx47cZoMCnbJ59WKEHu3I8hwAdst+fdK246BDTJH
-	 X3jZ8LOyV4bTmasnd2aIGz7Zownjh8BgG0D5H/6Yx+Jv6I9jvUbaEYucBSblud0ZUO
-	 VIZk2jDHvAIxw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43724C4167F;
-	Sun,  7 Jan 2024 16:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC4313AC8;
+	Sun,  7 Jan 2024 16:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Nfh3SPlScpJNbmFJG3AvjHYz4crJ6ErWPuXcGN1GLks=; b=SCDVufUwJZIwyEBZ8yQr0RsD3y
+	lFaH1joDkia+4v8Z3v5GdHoj4lbuPTNvwNRTtcf+6SnmUX9mtkxmgiJnZOOvt9Ca3aJYAfIEodz7r
+	cg0jMMEelJmS84t6X9sszVXiZ1AQgc9lDN75GESstm6Wt1R7n2LJrxl7sMpjetu3yCprCIrMjgqN1
+	TqIYaKjtW9R4x3XkPv2fcmJxAx0aNnusmr/vGhuHwwvfrC6cxfw4/W3Gzir4LG3wBuExvJzvZd1jR
+	q2geFA2iY/djUT/p18XrU602ScW1k+a45rZqNNkfbYq7NllmX16ny/v5YfJuhhKaGHFDkLQQVGonl
+	HRKXqcXw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54952)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rMVjd-0002Fm-0F;
+	Sun, 07 Jan 2024 16:10:49 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rMVje-0002NN-2m; Sun, 07 Jan 2024 16:10:50 +0000
+Date: Sun, 7 Jan 2024 16:10:50 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Josua Mayer <josua@solid-run.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: sfp: add fixup for tplink 2.5gbase-t rj45 modules
+Message-ID: <ZZrNChuIw0X9fr6Z@shell.armlinux.org.uk>
+References: <20240106-tplink-25gbaset-sfp-fixup-v1-1-8d26696bd2f4@solid-run.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v6] net: ethernet: cortina: Drop TSO support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170464382327.3646.15433229900431891696.git-patchwork-notify@kernel.org>
-Date: Sun, 07 Jan 2024 16:10:23 +0000
-References: <20240106-new-gemini-ethernet-regression-v6-1-889e98d3deb7@linaro.org>
-In-Reply-To: <20240106-new-gemini-ethernet-regression-v6-1-889e98d3deb7@linaro.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: ulli.kroll@googlemail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com, canghousehold@aol.com,
- romain.gantois@bootlin.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240106-tplink-25gbaset-sfp-fixup-v1-1-8d26696bd2f4@solid-run.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Sat, 06 Jan 2024 01:12:22 +0100 you wrote:
-> The recent change to allow large frames without hardware checksumming
-> slotted in software checksumming in the driver if hardware could not
-> do it.
+On Sat, Jan 06, 2024 at 05:29:56PM +0100, Josua Mayer wrote:
+> TP-Link TL-SM410U modules are single-rate 2.5GBase-T RJ45 SFP modules.
+> The EEPROM data is lying about connector and extended cc,
+> reporting 25Gbps fiber.
 > 
-> This will however upset TSO (TCP Segment Offloading). Typical
-> error dumps includes this:
+> Add fixup for these specific modules forcing RJ45 @ 2.5Gbase-T.
 > 
-> [...]
+> For reference original eeprom data dump from ethtool:
+> 
+> Identifier                : 0x03 (SFP)
+> Extended identifier       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+> Connector                 : 0x07 (LC)
+> Transceiver codes         : 0x00 0x00 0x00 0x00 0x00 0x00 0x40 0x00 0x00
+> Transceiver type          : FC: Twisted Pair (TP)
+> Encoding                  : 0x01 (8B/10B)
+> BR, Nominal               : 3100MBd
 
-Here is the summary with links:
-  - [net,v6] net: ethernet: cortina: Drop TSO support
-    https://git.kernel.org/netdev/net/c/ac631873c9e7
+This isn't 25Gbps - it's 2.5Gbps!
 
-You are awesome, thank you!
+So what actually happens with this module without the quirk? We should
+end up marking it for use as a 2500base-X fibre module which should
+result in it working.
+
+(Please include in the commit message how it works or not without the
+patch.)
+
+Also, patches to netdev need to have "net" (for -rc) or "net-next"
+(for the next merge window) in the "[PATCH ...]" n the subject line.
+
+Thanks.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
