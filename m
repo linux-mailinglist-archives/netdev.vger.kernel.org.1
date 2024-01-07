@@ -1,97 +1,143 @@
-Return-Path: <netdev+bounces-62219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1442D82644F
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 14:51:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD567826450
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 14:54:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADCD11F20FBF
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 13:51:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9BAD1C20C4D
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 13:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA5C134A6;
-	Sun,  7 Jan 2024 13:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635D0134AE;
+	Sun,  7 Jan 2024 13:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=easyb-ch.20230601.gappssmtp.com header.i=@easyb-ch.20230601.gappssmtp.com header.b="PPhGuUeH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mZ6fhTrd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DFF134A4
-	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 13:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=easyb.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=easyb.ch
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cce6bb9a74so2325431fa.0
-        for <netdev@vger.kernel.org>; Sun, 07 Jan 2024 05:51:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=easyb-ch.20230601.gappssmtp.com; s=20230601; t=1704635484; x=1705240284; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SSo628uuzkMR1hgsjD+6qxkNpYNVqnJfEw1WaZPhWao=;
-        b=PPhGuUeHNUzn63U2zBUyVhTkLOsCKsrxKyXbEDt+Y5yxTZ2zjTY5BQoYZVMqXfco3+
-         gCxDHvo4zP7CC2F7knPaCmnDz4ARi/+qO2oN1DABa7IkW4aCT/kNfcQ8XrwlVDT9ZWwz
-         mbPdT0m3U6J1zrsFtJSbbmWPO8LHuBvtiETFDyJkbVvB3rxiCQuMAXvHkoyLW6n0aJ/A
-         SK3lj+YEBYUHYLDuqZnYADngJs8HN144Jm19DRnTr6lpvisbBClA30EbbPxF2vC+pIkQ
-         WuvDU2O37st11wdbpHeSWEt9pw7Lt3zr2KLwt35dRY6/iGEQoXc9P4k5EMq0vgdl2rJX
-         hVTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704635484; x=1705240284;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SSo628uuzkMR1hgsjD+6qxkNpYNVqnJfEw1WaZPhWao=;
-        b=D+XpDIb7HpwbgBSjQSlgPule/tu2g2Q2dIIzPpql5nw0NUz/3nrJ0ggLevFLa1WelV
-         a8YheN5iAMgqtFt6CaDcGX8Z0Hn3pfLnzPR8k9ULHF1UM0/e1MZnrn4wvDwhskibAiMr
-         PmrpVAQTw66F/zUSiKf6vaw5hzJ5Cy78tuUP4sKg5ufCS+8ODBBUOU+UPxLYAPn2DDEO
-         T6bL1qGyyFRn/u40hVWfUr6Du1jMJMGFSsAjo9KS/GdYVTrZYp0Wq/u7FG3bsO6ko48f
-         sWzQPBUn41ojTGYhj4LhEUFvd7VoZ5QneSE/vNmk55TFRMIGHAHViQyvw5/7ymgVOJb6
-         C+TQ==
-X-Gm-Message-State: AOJu0YzeFZksnHsz5SB9XR3pbF7+2IKNMJuumX+tSYH6/boG2Tr63Y+C
-	6yWcqX/MNZtB3Iw8QaZw6NuWyVp82C/cwzCdYOjHxM9MTvlpKClZ4ESVOhf7Qqc=
-X-Google-Smtp-Source: AGHT+IFnyRjZ+L+E0/53mVXlxNdmTBE5IpgxliHeMmAM9DYXwpi1pGTAgTu/DuYFbll4NrNJ++7dZg2v2mHKPJKu7t4=
-X-Received: by 2002:a05:6512:3ba1:b0:50e:b2ba:15d with SMTP id
- g33-20020a0565123ba100b0050eb2ba015dmr2062607lfv.1.1704635484018; Sun, 07 Jan
- 2024 05:51:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651E0134A0
+	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 13:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704635652; x=1736171652;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6fC6d7pDwxbTjzrVi/xipif06Ku7BmBlOvBVgsat6lA=;
+  b=mZ6fhTrdntcaN7yY1s4ATDhRZV7gZ/IrcshpGyV3q6OSy8DsZ8ImXVpO
+   OuYlqY8wIyr/5d4W6ZJrqIW8cEBtvJlvakbV6OVKxCUkokOFmSeOSKOG9
+   0OlMwoF9ouu1R1R/1Cx9PVnAgKGFEwX/PKh0JR0HjdERijLKkgBt/Gxoa
+   eLz/60E2mlstw6dcr+EmrwSsrHAlJjcmPRbIWBAEO/H3h23SKfPclkNVH
+   P135+iAHihVbEIq3Be2kAJ3q8EavZJSO/0bV4IZXr+/y61sQbTKhTTWPr
+   D+4y/nvYrfTkX8cuU0WYfNSzqlyVqgljcJ7WWJ65tDOVGqHeNkyF3yA77
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10945"; a="428913756"
+X-IronPort-AV: E=Sophos;i="6.04,339,1695711600"; 
+   d="scan'208";a="428913756"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2024 05:54:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10945"; a="809983359"
+X-IronPort-AV: E=Sophos;i="6.04,339,1695711600"; 
+   d="scan'208";a="809983359"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga008.jf.intel.com with ESMTP; 07 Jan 2024 05:54:09 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rMTbK-0003pU-2i;
+	Sun, 07 Jan 2024 13:54:06 +0000
+Date: Sun, 7 Jan 2024 21:54:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Antonio Quartulli <antonio@openvpn.net>
+Subject: Re: [PATCH net-next 1/1] net: introduce OpenVPN Data Channel Offload
+ (ovpn)
+Message-ID: <202401072136.mmDh9bfe-lkp@intel.com>
+References: <20240106215740.14770-2-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240101213113.626670-1-ezra.buehler@husqvarnagroup.com>
- <77fa1435-58e3-4fe1-b860-288ed143e7bc@gmail.com> <1297166c-38c1-4041-8a7f-403477b871cf@lunn.ch>
- <8eb06ee9-d02d-4113-ba1e-e8ee99acc2fd@gmail.com> <2013fa64-06a1-4b61-90dc-c5bd68d8efed@lunn.ch>
- <CAM1KZSn0+k4YKc2qy6DEafkL840ybjaun7FbD4OFwOwNZw_LEg@mail.gmail.com>
- <ZZRct1o21NIKbYX1@shell.armlinux.org.uk> <CAM1KZS=2Drnhx8SKcAbRniGhvy0d85FfKHOgK7MZxNWM7EAEmQ@mail.gmail.com>
- <d6deee54-e5c3-4bdd-8a87-f1afeada8d9b@lunn.ch>
-In-Reply-To: <d6deee54-e5c3-4bdd-8a87-f1afeada8d9b@lunn.ch>
-From: Ezra Buehler <ezra@easyb.ch>
-Date: Sun, 7 Jan 2024 14:51:12 +0100
-Message-ID: <CAM1KZS=YFuPJJQvsS28dtnZQycjWE6kptf3h2kFGn1D42kJaVg@mail.gmail.com>
-Subject: Re: [PATCH net] net: mdio: Prevent Clause 45 scan on SMSC PHYs
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Tristram Ha <Tristram.Ha@microchip.com>, Michael Walle <michael@walle.cc>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240106215740.14770-2-antonio@openvpn.net>
 
-On Sat, Jan 6, 2024 at 4:20=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
-> Could you hack a copy of readx_poll_timeout() and real_poll_timeout()
-> into the driver, and extend it to count how many times it goes around
-> the loop. Is the usleep_range() actually sleeping for 10ms because you
-> don't have any high resolution clocks, and a 100Hz tick? If so, you
-> might want to swap to 1000Hz tick, or NO_HZ, or enable a high
-> resolution clock, so that usleep_range() can actually sleep for short
-> times.
+Hi Antonio,
 
-You are spot on, simply selecting the 1000Hz tick fixes the issue for me.
-So, no need to change the code I guess.
+kernel test robot noticed the following build errors:
 
-Thank you very much for the help and sorry for wasting your time.
+[auto build test ERROR on net-next/main]
 
-Cheers,
-Ezra.
+url:    https://github.com/intel-lab-lkp/linux/commits/Antonio-Quartulli/net-introduce-OpenVPN-Data-Channel-Offload-ovpn/20240107-061631
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240106215740.14770-2-antonio%40openvpn.net
+patch subject: [PATCH net-next 1/1] net: introduce OpenVPN Data Channel Offload (ovpn)
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20240107/202401072136.mmDh9bfe-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240107/202401072136.mmDh9bfe-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401072136.mmDh9bfe-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+>> drivers/net/ovpn/netlink.c:42:38: error: implicit declaration of function 'NLA_POLICY_MAX_LEN'; did you mean 'NLA_POLICY_MIN_LEN'? [-Werror=implicit-function-declaration]
+      42 |         [OVPN_A_KEYDIR_CIPHER_KEY] = NLA_POLICY_MAX_LEN(U8_MAX),
+         |                                      ^~~~~~~~~~~~~~~~~~
+         |                                      NLA_POLICY_MIN_LEN
+>> drivers/net/ovpn/netlink.c:42:38: error: initializer element is not constant
+   drivers/net/ovpn/netlink.c:42:38: note: (near initialization for 'ovpn_nl_policy_keydir[1].type')
+>> drivers/net/ovpn/netlink.c:41:75: warning: missing braces around initializer [-Wmissing-braces]
+      41 | static const struct nla_policy ovpn_nl_policy_keydir[NUM_OVPN_A_KEYDIR] = {
+         |                                                                           ^
+   drivers/net/ovpn/netlink.c:63:34: error: initializer element is not constant
+      63 |         [OVPN_A_PEER_LOCAL_IP] = NLA_POLICY_MAX_LEN(sizeof(struct in6_addr)),
+         |                                  ^~~~~~~~~~~~~~~~~~
+   drivers/net/ovpn/netlink.c:63:34: note: (near initialization for 'ovpn_nl_policy_peer[8].type')
+   drivers/net/ovpn/netlink.c:64:36: error: initializer element is not constant
+      64 |         [OVPN_A_PEER_LOCAL_PORT] = NLA_POLICY_MAX_LEN(sizeof(u16)),
+         |                                    ^~~~~~~~~~~~~~~~~~
+   drivers/net/ovpn/netlink.c:64:36: note: (near initialization for 'ovpn_nl_policy_peer[9].type')
+   drivers/net/ovpn/netlink.c:57:71: warning: missing braces around initializer [-Wmissing-braces]
+      57 | static const struct nla_policy ovpn_nl_policy_peer[NUM_OVPN_A_PEER] = {
+         |                                                                       ^
+   drivers/net/ovpn/netlink.c:57:71: warning: missing braces around initializer [-Wmissing-braces]
+   drivers/net/ovpn/netlink.c:57:71: warning: missing braces around initializer [-Wmissing-braces]
+   drivers/net/ovpn/netlink.c:57:71: warning: missing braces around initializer [-Wmissing-braces]
+   drivers/net/ovpn/netlink.c:57:71: warning: missing braces around initializer [-Wmissing-braces]
+   drivers/net/ovpn/netlink.c:75:27: error: initializer element is not constant
+      75 |         [OVPN_A_IFNAME] = NLA_POLICY_MAX_LEN(IFNAMSIZ),
+         |                           ^~~~~~~~~~~~~~~~~~
+   drivers/net/ovpn/netlink.c:75:27: note: (near initialization for 'ovpn_nl_policy[2].type')
+   drivers/net/ovpn/netlink.c:73:61: warning: missing braces around initializer [-Wmissing-braces]
+      73 | static const struct nla_policy ovpn_nl_policy[NUM_OVPN_A] = {
+         |                                                             ^
+   drivers/net/ovpn/netlink.c:73:61: warning: missing braces around initializer [-Wmissing-braces]
+   drivers/net/ovpn/netlink.c:73:61: warning: missing braces around initializer [-Wmissing-braces]
+   cc1: some warnings being treated as errors
+
+
+vim +42 drivers/net/ovpn/netlink.c
+
+    39	
+    40	/** KEYDIR policy. Can be used for configuring an encryption and a decryption key */
+  > 41	static const struct nla_policy ovpn_nl_policy_keydir[NUM_OVPN_A_KEYDIR] = {
+  > 42		[OVPN_A_KEYDIR_CIPHER_KEY] = NLA_POLICY_MAX_LEN(U8_MAX),
+    43		[OVPN_A_KEYDIR_NONCE_TAIL] = NLA_POLICY_EXACT_LEN(NONCE_TAIL_SIZE),
+    44	};
+    45	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
