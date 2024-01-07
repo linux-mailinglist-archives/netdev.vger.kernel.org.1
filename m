@@ -1,132 +1,193 @@
-Return-Path: <netdev+bounces-62253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83460826581
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:04:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F64826585
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12F27B2146E
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 18:04:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7D141F216EA
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 18:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7512940B;
-	Sun,  7 Jan 2024 18:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3172E13FF5;
+	Sun,  7 Jan 2024 18:11:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4C414F64;
-	Sun,  7 Jan 2024 18:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17D813FE7;
+	Sun,  7 Jan 2024 18:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
 Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4T7Q644dvhz9srM;
-	Sun,  7 Jan 2024 19:03:08 +0100 (CET)
-From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>,
-	asahi@lists.linux.dev,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v3 4/4] Bluetooth: Disconnect connected devices before rfkilling adapter
-Date: Sun,  7 Jan 2024 19:02:50 +0100
-Message-ID: <20240107180252.73436-5-verdre@v0yd.nl>
-In-Reply-To: <20240107180252.73436-1-verdre@v0yd.nl>
-References: <20240107180252.73436-1-verdre@v0yd.nl>
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4T7QHB0m0mz9sp6;
+	Sun,  7 Jan 2024 19:11:02 +0100 (CET)
+Message-ID: <f9f638bf-676e-43bf-8d83-256cae8f7bfe@v0yd.nl>
+Date: Sun, 7 Jan 2024 19:10:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v2 0/4] Power off HCI devices before rfkilling them
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, verdre@v0yd.nl
+References: <20240102181946.57288-1-verdre@v0yd.nl>
+ <CABBYNZ+sTko6reoJO43W2LHGW58f0kK_8Zgc3mep7xki355=iA@mail.gmail.com>
+ <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl>
+Content-Language: en-US
+From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+In-Reply-To: <548fb407-ef57-4108-aa26-52deafdca55c@v0yd.nl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On a lot of platforms (at least the MS Surface devices, M1 macbooks, and
-a few ThinkPads) firmware doesn't do its job when rfkilling a device
-and the bluetooth adapter is not actually shut down properly on rfkill.
-This leads to connected devices remaining in connected state and the
-bluetooth connection eventually timing out after rfkilling an adapter.
+On 1/3/24 13:15, Jonas Dreßler wrote:
+> Hi Luiz,
+> 
+> On 1/2/24 19:39, Luiz Augusto von Dentz wrote:
+>> Hi Jonas,
+>>
+>> On Tue, Jan 2, 2024 at 1:19 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>>
+>>> In theory the firmware is supposed to power off the bluetooth card
+>>> when we use rfkill to block it. This doesn't work on a lot of laptops
+>>> though, leading to weird issues after turning off bluetooth, like the
+>>> connection timing out on the peripherals which were connected, and
+>>> bluetooth not connecting properly when the adapter is turned on again
+>>> quickly after rfkilling.
+>>>
+>>> This series hooks into the rfkill driver from the bluetooth subsystem
+>>> to send a HCI_POWER_OFF command to the adapter before actually 
+>>> submitting
+>>> the rfkill to the firmware and killing the HCI connection.
+>>>
+>>> ---
+>>>
+>>> v1 -> v2: Fixed commit message title to make CI happy
+>>>
+>>> Jonas Dreßler (4):
+>>>    Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
+>>>    Bluetooth: mgmt: Remove leftover queuing of power_off work
+>>>    Bluetooth: Add new state HCI_POWERING_DOWN
+>>>    Bluetooth: Queue a HCI power-off command before rfkilling adapters
+>>
+>> Apart from the assumption of RFKILL actually killing the RF
+>> immediately or not, I'm fine with these changes, that said it would be
+>> great if we can have some proper way to test the behavior of rfkill,
+>> perhaps via mgmt-tester, since it should behave like the
+>> MGMT_OP_SET_POWERED.
+> 
+> Testing this sounds like a good idea, I guess we'd have to teach 
+> mgmt-tester to write to rfkill. The bigger problem seems to be that 
+> there's no MGMT event for power changes and also no MGMT_OP_GET_POWERED, 
+> so that's a bit concerning, could userspace even be notified about 
+> changes to adapter power?
 
-Use the rfkill hook in the HCI driver to go through the full power-off
-sequence (including stopping scans and disconnecting devices) before
-rfkilling it, just like MGMT_OP_SET_POWERED would do.
+Sent v3 of the patchset now, I didn't add a test to mgmt-tester because 
+it's actually quite tricky to notice the full shutdown sequence happened 
+rather than just closing the device. As long as no devices are 
+connected, the difference is mostly in a few (faily random) events:
 
-In case anything during the larger power-off sequence fails, make sure
-the device is still closed and the rfkill ends up being effective in
-the end.
+btmon without the patch:
 
-Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
----
- net/bluetooth/hci_core.c | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+@ MGMT Event: Class Of Device Changed (0x0007) plen 3 
+ 
+        {0x0001} [hci0] 169.101804
+         Class: 0x000000
+           Major class: Miscellaneous
+           Minor class: 0x00
+@ MGMT Event: New Settings (0x0006) plen 4 
+ 
+        {0x0001} [hci0] 169.101820
+         Current settings: 0x00000ac0
+           Secure Simple Pairing
+           BR/EDR
+           Low Energy
+           Secure Connections
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1ec83985f..43e042338 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -940,20 +940,51 @@ int hci_get_dev_info(void __user *arg)
- 
- /* ---- Interface to HCI drivers ---- */
- 
-+static int hci_dev_do_poweroff(struct hci_dev *hdev)
-+{
-+	int err;
-+
-+	BT_DBG("%s %p", hdev->name, hdev);
-+
-+	hci_req_sync_lock(hdev);
-+
-+	err = hci_set_powered_sync(hdev, false);
-+
-+	hci_req_sync_unlock(hdev);
-+
-+	return err;
-+}
-+
- static int hci_rfkill_set_block(void *data, bool blocked)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
- 
- 	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
- 		return -EBUSY;
- 
-+	if (blocked == hci_dev_test_flag(hdev, HCI_RFKILLED))
-+		return 0;
-+
- 	if (blocked) {
- 		hci_dev_set_flag(hdev, HCI_RFKILLED);
-+
- 		if (!hci_dev_test_flag(hdev, HCI_SETUP) &&
--		    !hci_dev_test_flag(hdev, HCI_CONFIG))
--			hci_dev_do_close(hdev);
-+		    !hci_dev_test_flag(hdev, HCI_CONFIG)) {
-+			err = hci_dev_do_poweroff(hdev);
-+			if (err) {
-+				bt_dev_err(hdev, "Error when powering off device on rfkill (%d)",
-+					   err);
-+
-+				/* Make sure the device is still closed even if
-+				 * anything during power off sequence (eg.
-+				 * disconnecting devices) failed.
-+				 */
-+				hci_dev_do_close(hdev);
-+			}
-+		}
- 	} else {
- 		hci_dev_clear_flag(hdev, HCI_RFKILLED);
- 	}
--- 
-2.43.0
+btmon with the patch:
 
+< HCI Command: Write Scan Enable (0x03|0x001a) plen 1 
+ 
+              #109 [hci0] 7.031852
+         Scan enable: No Scans (0x00)
+ > HCI Event: Command Complete (0x0e) plen 4 
+ 
+               #110 [hci0] 7.033026
+       Write Scan Enable (0x03|0x001a) ncmd 1
+         Status: Success (0x00)
+< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2 
+ 
+              #111 [hci0] 7.033055
+         Extended advertising: Disabled (0x00)
+         Number of sets: Disable all sets (0x00)
+ > HCI Event: Command Complete (0x0e) plen 4 
+ 
+               #112 [hci0] 7.034202
+       LE Set Extended Advertising Enable (0x08|0x0039) ncmd 1
+         Status: Success (0x00)
+< HCI Command: LE Clear Advertising Sets (0x08|0x003d) plen 0 
+ 
+              #113 [hci0] 7.034233
+ > HCI Event: Command Complete (0x0e) plen 4 
+ 
+               #114 [hci0] 7.035527
+       LE Clear Advertising Sets (0x08|0x003d) ncmd 1
+         Status: Success (0x00)
+@ MGMT Event: Class Of Device Changed (0x0007) plen 3 
+ 
+          {0x0001} [hci0] 7.035554
+         Class: 0x000000
+           Major class: Miscellaneous
+           Minor class: 0x00
+@ MGMT Event: New Settings (0x0006) plen 4 
+ 
+          {0x0001} [hci0] 7.035568
+         Current settings: 0x00000ac0
+           Secure Simple Pairing
+           BR/EDR
+           Low Energy
+           Secure Connections
+
+Maybe we could add a fake connection and check whether that is 
+disconnected on the rfkill, but I don't think mgmt-tester supports that..
+
+Fwiw, I don't think having a test for this is super important, this is a 
+regression a lot of people would notice very quickly I think.
+
+> 
+> Another thing I'm thinking about now is that queuing the HCI command 
+> using hci_cmd_sync_queue() might not be enough: The command is still 
+> executed async in a thread, and we won't actually block until it has 
+> been sent, so this might be introducing a race (rfkill could kill the 
+> adapter before we actually send the HCI command). The proper way might 
+> be to use a completion and wait until the 
+> set_powered_off_sync_complete() callback is invoked?
+> 
+>>
+>>>   include/net/bluetooth/hci.h |  2 +-
+>>>   net/bluetooth/hci_core.c    | 33 ++++++++++++++++++++++++++++++---
+>>>   net/bluetooth/hci_sync.c    | 16 +++++++++++-----
+>>>   net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
+>>>   4 files changed, 56 insertions(+), 25 deletions(-)
+>>>
+>>> -- 
+>>> 2.43.0
+>>>
+>>
+>>
+> 
+> Cheers,
+> Jonas
+
+Cheers,
+Jonas
 
