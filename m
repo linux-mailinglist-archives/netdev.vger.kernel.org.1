@@ -1,119 +1,170 @@
-Return-Path: <netdev+bounces-62278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D8A6826642
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 22:57:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B09826656
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 23:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D9021F21338
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 21:57:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2631D1F213D6
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 22:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4791173E;
-	Sun,  7 Jan 2024 21:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XCfsx6x6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E891711C86;
+	Sun,  7 Jan 2024 22:20:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13B411720;
-	Sun,  7 Jan 2024 21:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40d4a7f0c4dso15061685e9.1;
-        Sun, 07 Jan 2024 13:57:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704664631; x=1705269431; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bLoq6sRizyRcu59pZvOPlzI1kGMqU5IkWECCp6ikVIE=;
-        b=XCfsx6x6uHZ9cd4muPOYB2daqahxYUCqlN321uO8FbGfqy1GgE7Lhz0GRlVbORV9VJ
-         6+RvVzCHg3PqxnhT0pmMw78vYY8pUGim0/PTo35VxHVBuHBstEI7Rfopv/qP3cMdVqHp
-         3LOzrCFFQYYqyEAJM+GiAvPETh5STsp2Yal3OrrVv5jbwZt/6a340USi6b+dtJmVBv0t
-         XRmS3R6S1+E7u1dkF2wGcWFJGabAcStEQMb1B2sqdHDDzGz369ErB4bKDcw6aqiVGeti
-         0VgRmgHMeRgFSGGW3g3imIl5neY1O3AlsxGFurLKbz6pZfMagrHON/TN4Te0iY1VoP5Y
-         fqOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704664631; x=1705269431;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bLoq6sRizyRcu59pZvOPlzI1kGMqU5IkWECCp6ikVIE=;
-        b=xHWMf/QexX4vfB5oISkNvu2pFzhhHLHn8WZfxBX6MU3iBMPZmT+HP4Dtxol05bg0Xg
-         LESswUBwx6hOHmqOgH9cJ39xj+8TEAArLb1et2mS/qPTMWjuLd9YUYP8o1x6pEDqkPhj
-         7nwIg8mf7+qdqNI7uF0i/Y3irWq1VKZn5yEcqL3hWTWp2R16a9uI3aHdWyqRrfLnFFMM
-         Tx/T5q9fzWDBdJLWUICNOb8OB2XnCYdNLM7NUvFAJ5wECuirRtyNixr4G6Dy5v4lEeJ+
-         CuFmyNipQXZXlSkAlBJGonSb/9l9gBFlkGR0RKFdVDQj+v8NpbX5jASLTnmWjw35rPKE
-         K1vA==
-X-Gm-Message-State: AOJu0Yyp4OXgTSFdN3Ka3PWhNs/ROXc9Ut+6RDjwxbdUPHvlq2Qcau2I
-	fZ4C9k8DxDN0LaqYfucAwbo=
-X-Google-Smtp-Source: AGHT+IEd0lL/Mt0NfyWGqJx54tynb9F8fZq+SWpqy1QGZIeI1Gw7htPTuqOT6F3XFFxGCTT/RNBHDg==
-X-Received: by 2002:a05:600c:13c3:b0:40d:5b11:50cd with SMTP id e3-20020a05600c13c300b0040d5b1150cdmr1385720wmg.160.1704664630744;
-        Sun, 07 Jan 2024 13:57:10 -0800 (PST)
-Received: from [192.168.0.3] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id i11-20020a5d558b000000b003367bb8898dsm6137213wrv.66.2024.01.07.13.57.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Jan 2024 13:57:10 -0800 (PST)
-Message-ID: <86755f4d-3cae-41c4-8090-09ae83ea7af9@gmail.com>
-Date: Sun, 7 Jan 2024 23:57:07 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4EE11C80;
+	Sun,  7 Jan 2024 22:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4T7Wpl2Spqz9sZF;
+	Sun,  7 Jan 2024 23:20:15 +0100 (CET)
+Message-ID: <9b728113-8bb5-44df-8ba8-b0ee535100c8@v0yd.nl>
+Date: Sun, 7 Jan 2024 23:20:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH RFC v3 1/8] dt-bindings: net: document ethernet
- PHY package nodes
+Subject: Re: [PATCH 3/5] Bluetooth: hci_event: Remove limit of 2 reconnection
+ attempts
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, Christian Marangi <ansuelsmth@gmail.com>
-Cc: Robert Marko <robert.marko@sartura.hr>,
- Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh+dt@kernel.org>,
- Luo Jie <quic_luoj@quicinc.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20231126015346.25208-1-ansuelsmth@gmail.com>
- <20231126015346.25208-2-ansuelsmth@gmail.com>
- <0926ea46-1ce4-4118-a04c-b6badc0b9e15@gmail.com>
- <659aedb1.df0a0220.35691.1853@mx.google.com>
- <a6a155ab-0852-4f08-b49b-952ac74124a8@lunn.ch>
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <a6a155ab-0852-4f08-b49b-952ac74124a8@lunn.ch>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, verdre@v0yd.nl
+References: <20240102185933.64179-1-verdre@v0yd.nl>
+ <20240102185933.64179-4-verdre@v0yd.nl>
+ <CABBYNZLoivEW=yrDtTbu5SjGauESH0zHb7NXs0YaSKSKqre5GQ@mail.gmail.com>
+ <7036c788-7d8c-4e36-8289-64f43a3f8610@v0yd.nl>
+ <CABBYNZLBf24vkTWEgWd8jHBfwh8jA2wDUbZZUW7QGHuUax5jcw@mail.gmail.com>
+From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+In-Reply-To: <CABBYNZLBf24vkTWEgWd8jHBfwh8jA2wDUbZZUW7QGHuUax5jcw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+Hi Luiz,
 
-On 07.01.2024 20:44, Andrew Lunn wrote:
->> Honestly I would postpone untile we have a clear idea of what is
->> actually part of the PHY and what can be handled externally... Example
->> setting the clock in gcc, writing a specific driver...
+On 1/5/24 17:05, Luiz Augusto von Dentz wrote:
+> Hi Jonas,
 > 
-> That is really core of the problem here. We have no reliable
-> description of the hardware. The datasheet often starts with a block
-> diagram of the PHY package. Sometimes there is a product brief with
-> the same diagram. We need that published. I'm not asking for the full
-> data sheet, just the introductory text which gives a high level
-> overview of what the hardware actually is. Then we can sketch out a
-> high level Linux architecture for the PHY package.
+> On Fri, Jan 5, 2024 at 10:54 AM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>
+>> Hi Luiz,
+>>
+>> On 1/3/24 17:05, Luiz Augusto von Dentz wrote:
+>>> Hi Jonas,
+>>>
+>>> On Tue, Jan 2, 2024 at 1:59 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>>>
+>>>> Since commit 4c67bc74f016b0d360b8573e18969c0ff7926974, we retry connecting
+>>>> later when we get a "Command Disallowed" error returned by "Create
+>>>> Connection".
+>>>>
+>>>> In this commit the intention was to retry only once, and give up if we see
+>>>> "Command Disallowed" again on the second try.
+>>>>
+>>>> This made sense back then when the retry was initiated *only* from the
+>>>> "Connect Complete" event. If we received that event, we knew that now the
+>>>> card now must have a "free slot" for a new connection request again. These
+>>>> days we call hci_conn_check_pending() from a few more places though, and
+>>>> in these places we can't really be sure that there's a "free slot" on the
+>>>> card, so the second try to "Create Connection" might fail again.
+>>>>
+>>>> Deal with this by being less strict about these retries and try again
+>>>> every time we get "Command Disallowed" errors, removing the limitation to
+>>>> only two attempts.
+>>>>
+>>>> Since this can potentially cause us to enter an endless cycle of
+>>>> reconnection attempts, we'll add some guarding against that with the next
+>>>> commit.
+>>>
+>>> Don't see where you are doing such guarding, besides you seem to
+>>> assume HCI_ERROR_COMMAND_DISALLOWED would always means the controller
+>>> is busy, or something like that, but it could perform the connection
+>>> later, but that may not always be the case, thus why I think
+>>> reconnecting just a few number of times is better, if you really need
+>>> to keep retrying then this needs to be controlled by a policy in
+>>> userspace not hardcoded in the kernel, well I can even argument that
+>>> perhaps the initial number of reconnection shall be configurable so
+>>> one don't have to recompile the kernel if that needs changing.
+>>
+>> Yes, fair enough, the next commit assumes that COMMAND_DISALLOWED always
+>> means busy. The guarding is that we stop retrying as soon as there's no
+>> (competing) ongoing connection attempt nor an active inquiry, which
+>> should eventually be the case no matter what, no?
+>>
+>> I agree it's probably still better to not rely on this fairly complex
+>> sanity check and keep the checking of attempts nonetheless.
+>>
+>> I think we could keep doing that if we check for
+>> !hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT) &&
+>> !test_bit(HCI_INQUIRY, &hdev->flags) in hci_conn_check_pending() before
+>> we actually retry, to make sure the retry counter doesn't get
+>> incremented wrongly. I'll give that a try.
+> 
+> Perhaps I'm missing something, but it should be possible to block
+> concurrent access to HCI while a command is pending with use of
+> hci_cmd_sync, at least on LE we do that by waiting the connection
+> complete event so connection attempts are serialized but we don't seem
+> to be doing the same for BR/EDR.
+> 
 
-True. I am with you on this. Can we put these words over a mailing list 
-entrance door? It will save tons of time for both maintainers and 
-submitters.
+That's a good point, it might even allow for a nice little cleanup 
+because we can then cancel inquiries in hci_acl_create_connection() 
+synchronously, too.
 
---
-Sergey
+Question is just whether there's any devices out there that actually do 
+support paging with more than a single device at a time and if we want 
+to support that?
+
+> 
+>>>
+>>>> Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
+>>>> ---
+>>>>    net/bluetooth/hci_event.c | 7 ++++---
+>>>>    1 file changed, 4 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>>> index e8b4a0126..e1f5b6f90 100644
+>>>> --- a/net/bluetooth/hci_event.c
+>>>> +++ b/net/bluetooth/hci_event.c
+>>>> @@ -2323,12 +2323,13 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
+>>>>
+>>>>           if (status) {
+>>>>                   if (conn && conn->state == BT_CONNECT) {
+>>>> -                       if (status != HCI_ERROR_COMMAND_DISALLOWED || conn->attempt > 2) {
+>>>> +                       if (status == HCI_ERROR_COMMAND_DISALLOWED) {
+>>>> +                               conn->state = BT_CONNECT2;
+>>>> +                       } else {
+>>>>                                   conn->state = BT_CLOSED;
+>>>>                                   hci_connect_cfm(conn, status);
+>>>>                                   hci_conn_del(conn);
+>>>> -                       } else
+>>>> -                               conn->state = BT_CONNECT2;
+>>>> +                       }
+>>>>                   }
+>>>>           } else {
+>>>>                   if (!conn) {
+>>>> --
+>>>> 2.43.0
+>>>>
+>>>
+>>>
+>>
+>> Cheers,
+>> Jonas
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
 
