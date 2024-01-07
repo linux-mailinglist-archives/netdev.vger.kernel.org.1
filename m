@@ -1,182 +1,107 @@
-Return-Path: <netdev+bounces-62271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F8308265F9
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 21:52:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D9A826604
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 22:08:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAC181C209D9
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 20:52:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A5941F2141F
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 21:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53DB11703;
-	Sun,  7 Jan 2024 20:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BD41171A;
+	Sun,  7 Jan 2024 21:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSpIvbE8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9ec5ptg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1592F11706;
-	Sun,  7 Jan 2024 20:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B0611703;
+	Sun,  7 Jan 2024 21:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e7f58c5fbso1313710e87.1;
-        Sun, 07 Jan 2024 12:52:15 -0800 (PST)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5f3a5b9e09cso1778287b3.0;
+        Sun, 07 Jan 2024 13:07:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704660734; x=1705265534; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e5PMeecEEo3AqtvbhWJChBGMmTa++0S5sl1/vnCPNtk=;
-        b=hSpIvbE8fDC1To4OQpqhgNOcG7GLsR9cA7R0X/ZXGrqCybSTKL+IOtbwqi58eKU2wq
-         ByA2w6cCqL0GBQRe2vHDvTLhw2ITjsszaABXQXL2DHda8qP5nwZRC8biHuIwu8x9k3Nb
-         Fo0MDvmsNcfSXdkcps/tKXgXlf4gzGvWJic2YSVtFTaX7U/x22sA2diSYIfywHaKd4gv
-         3xMr9akn67DgyE7UIXCH0z8MjKj2/vQgAaBCPIkF3O/w7M9znGM3NKNcfVdLsfvRmanl
-         2Vlq3pGM0W4l/Sf0n1QSRMmUGcYDBtL5ygRxblPGTcMavp8ElFMG8DpScQKGwnnDLZBJ
-         eN5A==
+        d=gmail.com; s=20230601; t=1704661676; x=1705266476; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XqFKwxe/g7DE0cTXEUKKeAEz7faDz+ZW7iaTXoLpK84=;
+        b=W9ec5ptgPdVqAliAk2GdrVAJYbPssVEC+ImW7qtNCsFl95MoMFCVmUzxXpdjOFtjJR
+         weGJa0jO07grYUDZE3QovtyH6q34nWfTSAhjZVDxnCSvv916yPs8v2nlukZF89F0sU1/
+         M4IYAq0LmtyqIkBC5y3A7aSSzbRB8Oag6gjhZhrsq8clICl2/7Te/IzDyr7keQbRnn9Z
+         E1/8ej/TP8Bgvooi1NkZXf3yAFz/EUpxiCHu11oLy4t58eAQijqtUyWtaZAYoAxNdd1H
+         94PJkNNeSKF/xzYzqDSbYrBOZk8jR39mTVWSK6KsfEuWPw8BCC7tJQpx4F2OQ4Jt9Iuu
+         O8Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704660734; x=1705265534;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e5PMeecEEo3AqtvbhWJChBGMmTa++0S5sl1/vnCPNtk=;
-        b=ZwlOoO5XWeoYAY6417HeArU+x7Z04cZyfCmobAaXZ9h1oLhyM0RD3L0Gwl3/cwQ4tV
-         t9w4uxAdXfguYbSTV328Ii4VE5X7rt5f4oN06dDXf33cSR+nrc40yfznpIzmPPWMdxjZ
-         iL7Ee6ux/3UMrIpzChuf+7yT6nNJZ+BeJnv9vDjZsu0chjAjROKzS86k0VYEKoK7ov3+
-         v5YtDAosRgKfmfnRv/ruyR5Tu5nl28DMcY9J2xsBw+ufYL4kK80LsMobXCKb7GsaGcu4
-         JcypZoCJcRumxXbjmeZnQoyVCIfDfforWwMqzE0JC+lMHLRbluL/Bp2DZlE9yYz0BwxI
-         STkA==
-X-Gm-Message-State: AOJu0YwwcXUjsOun6+tEdhmthtDKGEjr2bpWHqwbC2Zw3x1Rqc00UxI+
-	0bHDN9tQFjdoH0mTBXURtr4=
-X-Google-Smtp-Source: AGHT+IGJQYWRpMRV/Lg31RH/oBbOsUP/kNiVqW8GI/ctj2lJw+LfzVDraxmhGM4BQagSFwFrbPuZTg==
-X-Received: by 2002:a05:6512:3d05:b0:50e:56b6:593e with SMTP id d5-20020a0565123d0500b0050e56b6593emr1380348lfv.89.1704660733959;
-        Sun, 07 Jan 2024 12:52:13 -0800 (PST)
-Received: from mobilestation ([95.79.203.166])
-        by smtp.gmail.com with ESMTPSA id a8-20020a19ca08000000b0050e810689e5sm950590lfg.33.2024.01.07.12.52.12
+        d=1e100.net; s=20230601; t=1704661676; x=1705266476;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XqFKwxe/g7DE0cTXEUKKeAEz7faDz+ZW7iaTXoLpK84=;
+        b=sLK7QkTVzEqH+smQrsaGkyZUdyYh1mWMu4FMIM6SRxtZvBr3qSDYL9XUZRnAj6QZwo
+         2zpMuBSFddHurtJAiL3M5H1+gvPE7Ppd891qIR3SBWG+DsXkEe/h7E13uk73WnuSsmLG
+         j8S2EtAjeNFKxSQA+buohoR6UYe9f0TXSnEiFtAn42QM4wVp5Z6X9nKug47mrhOB5OXn
+         kHA34OGNJOehIsucaYNZi5cdWW4Ifaq9LwXLeZoevjiRRmldf1sb1UpB3WbuqcQeUosi
+         t1l2JXfBCj9qHnIpQZ/H//7u3kinzRwmJGH4sv34ePtWyiu2gl9yixm+RngTZBS3G2VE
+         cVtg==
+X-Gm-Message-State: AOJu0Ywd8VjLX5PENliBFg++w0H/qnp5ZH2gjPj9jO4KowPKFbHmAiAl
+	vJnyin0K+KBYGiG/8wzZut4=
+X-Google-Smtp-Source: AGHT+IHgoO6dUdsEdmQNWRRdnNI1v5fKLRztD/ue3i/uQsJd0T1Up1P+Rg3Ai34bQ5DYYg8vrEb1Eg==
+X-Received: by 2002:a81:bc4d:0:b0:5f6:e144:3396 with SMTP id b13-20020a81bc4d000000b005f6e1443396mr1244154ywl.4.1704661676655;
+        Sun, 07 Jan 2024 13:07:56 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id x129-20020a818787000000b005ccb2d17ba7sm2588783ywf.101.2024.01.07.13.07.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jan 2024 12:52:13 -0800 (PST)
-Date: Sun, 7 Jan 2024 23:52:11 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Leong Ching Swee <leong.ching.swee@intel.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-Subject: Re: [PATCH net-next v2 4/4] net: stmmac: Use interrupt mode INTM=1
- for per channel irq
-Message-ID: <jvnoq2jo3dzsw3vuqzathjuyox3xipaullzeaur3ppzlmtux5k@v64tckj7pvo2>
-References: <20240105070925.2948871-1-leong.ching.swee@intel.com>
- <20240105070925.2948871-5-leong.ching.swee@intel.com>
+        Sun, 07 Jan 2024 13:07:56 -0800 (PST)
+Date: Sun, 7 Jan 2024 13:07:53 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Mahesh Bandewar =?utf-8?B?KOCkruCkueClh+CktiDgpKzgpILgpKHgpYfgpLXgpL4=?=
+	=?utf-8?B?4KSwKQ==?= <maheshb@google.com>
+Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
+	Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>,
+	Mahesh Bandewar <mahesh@bandewar.net>,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCHv3 net-next 2/3] ptp: add ioctl interface for
+ ptp_gettimex64any()
+Message-ID: <ZZsSqXLjVG16Q7EL@hoboy.vegasvil.org>
+References: <20240104212439.3276458-1-maheshb@google.com>
+ <ZZczNlXzM8lrZgH5@hoboy.vegasvil.org>
+ <CAF2d9jga9oc4OST6PMU=C9rz_NDrURCcLGx-1tP31U00z63vbA@mail.gmail.com>
+ <ZZjdUlaYyHZSiwSM@hoboy.vegasvil.org>
+ <CAF2d9jhnsubL-sw792ZviSXrFB826G-U8OktdEMN1NCe5zuj0Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240105070925.2948871-5-leong.ching.swee@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAF2d9jhnsubL-sw792ZviSXrFB826G-U8OktdEMN1NCe5zuj0Q@mail.gmail.com>
 
-On Fri, Jan 05, 2024 at 03:09:25PM +0800, Leong Ching Swee wrote:
-> From: Swee Leong Ching <leong.ching.swee@intel.com>
-> 
-> Enable per DMA channel interrupt that uses shared peripheral
-> interrupt (SPI), so only per channel TX and RX intr (TI/RI)
-> are handled by TX/RX ISR without calling common interrupt ISR.
-> 
-> Signed-off-by: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
-> Signed-off-by: Swee Leong Ching <leong.ching.swee@intel.com>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 ++
->  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 32 +++++++++++--------
->  2 files changed, 22 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> index 207ff1799f2c..04bf731cb7ea 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> @@ -346,6 +346,9 @@
->  /* DMA Registers */
->  #define XGMAC_DMA_MODE			0x00003000
->  #define XGMAC_SWR			BIT(0)
+On Sat, Jan 06, 2024 at 12:08:57AM -0800, Mahesh Bandewar (महेश बंडेवार) wrote:
 
-> +#define XGMAC_DMA_MODE_INTM_MASK	GENMASK(13, 12)
-> +#define XGMAC_DMA_MODE_INTM_SHIFT	12
-> +#define XGMAC_DMA_MODE_INTM_MODE1	0x1
+> Having a general solution for posix timers is a nice addition.
+> However, expecting a general purpose syscall to eliminate need for
+> device ioctl is an unreasonable expectation.
 
-AFAICS the DW XGMAC module doesn't maintain a convention of having the
-CSR fields macro names prefixed with the CSR name. Let's drop the
-DMA_MODE suffix from the macro name then:
-+#define XGMAC_INTM_MASK		GENMASK(13, 12)
-+#define XGMAC_INTM_SHIFT		12
-+#define XGMAC_INTM_MODE1		0x1
-to have it unified with the rest of the macros in dwxgmac2.h.
+Let me make this clear:
 
-Other than that the change looks good. Thanks.
+There is no reasonable justification for a new PTP ioctl.
 
--Serge(y)
+The system call can and should use the the most accurate method
+internally to the kernel.
 
->  #define XGMAC_DMA_SYSBUS_MODE		0x00003004
->  #define XGMAC_WR_OSR_LMT		GENMASK(29, 24)
->  #define XGMAC_WR_OSR_LMT_SHIFT		24
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> index 3cde695fec91..dcb9f094415d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> @@ -31,6 +31,13 @@ static void dwxgmac2_dma_init(void __iomem *ioaddr,
->  		value |= XGMAC_EAME;
->  
->  	writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
-> +
-> +	if (dma_cfg->multi_irq_en) {
-> +		value = readl(ioaddr + XGMAC_DMA_MODE);
-> +		value &= ~XGMAC_DMA_MODE_INTM_MASK;
-> +		value |= (XGMAC_DMA_MODE_INTM_MODE1 << XGMAC_DMA_MODE_INTM_SHIFT);
-> +		writel(value, ioaddr + XGMAC_DMA_MODE);
-> +	}
->  }
->  
->  static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv,
-> @@ -365,19 +372,18 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
->  	}
->  
->  	/* TX/RX NORMAL interrupts */
-> -	if (likely(intr_status & XGMAC_NIS)) {
-> -		if (likely(intr_status & XGMAC_RI)) {
-> -			u64_stats_update_begin(&rxq_stats->syncp);
-> -			rxq_stats->rx_normal_irq_n++;
-> -			u64_stats_update_end(&rxq_stats->syncp);
-> -			ret |= handle_rx;
-> -		}
-> -		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
-> -			u64_stats_update_begin(&txq_stats->syncp);
-> -			txq_stats->tx_normal_irq_n++;
-> -			u64_stats_update_end(&txq_stats->syncp);
-> -			ret |= handle_tx;
-> -		}
-> +	if (likely(intr_status & XGMAC_RI)) {
-> +		u64_stats_update_begin(&rxq_stats->syncp);
-> +		rxq_stats->rx_normal_irq_n++;
-> +		u64_stats_update_end(&rxq_stats->syncp);
-> +		ret |= handle_rx;
-> +	}
-> +
-> +	if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
-> +		u64_stats_update_begin(&txq_stats->syncp);
-> +		txq_stats->tx_normal_irq_n++;
-> +		u64_stats_update_end(&txq_stats->syncp);
-> +		ret |= handle_tx;
->  	}
->  
->  	/* Clear interrupts */
-> -- 
-> 2.34.1
-> 
-> 
+Thanks,
+Richard
+
 
