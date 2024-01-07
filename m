@@ -1,180 +1,126 @@
-Return-Path: <netdev+bounces-62221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C21E82646D
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 15:06:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AED3C826486
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 15:44:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 882581F2029E
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 14:06:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE090B20A3A
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 14:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594B3134AC;
-	Sun,  7 Jan 2024 14:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D68612B6C;
+	Sun,  7 Jan 2024 14:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGpcLuBm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPhpZAwS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D5A134A4;
-	Sun,  7 Jan 2024 14:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0298E134AF
+	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 14:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5f3da7ba2bfso9208117b3.3;
-        Sun, 07 Jan 2024 06:05:58 -0800 (PST)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28bcc273833so947048a91.1
+        for <netdev@vger.kernel.org>; Sun, 07 Jan 2024 06:44:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704636358; x=1705241158; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=At4cppVUZPK/oi+d0/WXlrlbXmfl3AdgViIm5bbQigc=;
-        b=jGpcLuBmfTRUoDV2bgeNh7eJwF5tig2ZRkIqb1zwoHF+mdU2Xe/jkVwFKPttw/xX+9
-         9ITWoNtkMrZpp2xC03uOnSF/r7pBXPCHAh91HLuhTKLeRpUmuPOhmHZHZ/K5QLbj/EEM
-         6AhtSYJ43cMZ9BDqmVR4hY0W0DKUkOqHUO0e8IEyG2gBj0px+Yt8pdeZiPadW9HNRiPv
-         6vlCG/Pjr3k+rwYB5iB2adIss0AkfjASRVLGOrQ7ksxeB/jwdsvTU2KxT9xwjO7bdil6
-         aspzIgEkyUpdAUM/KRS3Q6MMQQ6uxADgz2SX5Cedg9NZul5uSR8XSGBz2mE5z0Lkbur1
-         yKYw==
+        d=gmail.com; s=20230601; t=1704638657; x=1705243457; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KF8wOxvvHyjJ033nqxI8XaGjC2xUhLRm1zgQcrdC0pc=;
+        b=DPhpZAwSs4uN7fGxNSXP1NmKF3fIJzJaZYPmS7cn4ZadfMlRlm93DftK0wcMSiVR8p
+         0kxySXn9uvcxG7rqJRJ3rlAkhGsBM0cuxTDTDfkyei87Bi7UuA2SaMorsYU7MMRhNEH/
+         LeFnajZXixQ/vPG9UY1FQ2/qf2WI2sp45u3lPpnmEQS1v6YvLKfS3on4rQu5n9sE3h89
+         FJIeNcXuDXi2aDh3qLPI/A3NBWGYQuAlh8wxiUjtaXzmZXjAhC2IE0M3eaRqGkI9PCg2
+         CUW1Vg5RP2WUq7jU9lXuaGHhz2Ste3tLu0eEcXIIJXDVdLqG6nmNwSgHu3iKS9NelpJT
+         vL4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704636358; x=1705241158;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=At4cppVUZPK/oi+d0/WXlrlbXmfl3AdgViIm5bbQigc=;
-        b=OHloTgHGrElxX87fr4gzPQ85D1850havrc8zgSGMiYSSX/gPG/RkPzjt6lhzwnWg3W
-         2wnK/azNtQyFCaQfEt3LC+PIJbn8ZS60t48guj88RpGgmtMXZLLQTSl/w5f9Zq1Xdea7
-         jIr6jjY0Av+svyKx30F4I+1mjBeUkoSmKKAQ4cscD8pn+bEth3bWYI+VLTgDaE2cmeGs
-         nuJRwuZHX27BqgCkJvQt+kD0ZeW6SAaUw1bsKhOYGAZlXZZ9rS7qtbC9Sk+uYJFlzh2l
-         t1VMzzPGI1MoxHT6YN4S2PFHDBIUgDOFLl+5+g5wSPT3FWOU1X2I6J6Vx/OU0QUUVH7w
-         jQNw==
-X-Gm-Message-State: AOJu0YzINCwhUWBJpwOvkboEG856bAM3RgLStf8qjqhjjNeerQ3a9YTd
-	EAhwAq4oBfK3QMuPV54T9KtOvISjo3fUTZWFocY=
-X-Google-Smtp-Source: AGHT+IHHU9hNBXjpC0cTM3U5+wNHBJNsvalMHS1eOBVG8i/atRPxH3yByQ9QrY9bFvkGCWgT49AAnMDYHWqyZ1cQd4s=
-X-Received: by 2002:a81:82c6:0:b0:5ed:7d36:7963 with SMTP id
- s189-20020a8182c6000000b005ed7d367963mr2115024ywf.6.1704636357761; Sun, 07
- Jan 2024 06:05:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704638657; x=1705243457;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KF8wOxvvHyjJ033nqxI8XaGjC2xUhLRm1zgQcrdC0pc=;
+        b=u8jUQujbYqB5CZ1IvIUgBVefYFRGFLxaznZ1f5z8KbB87SPyrMC5WGq03vDskssCcO
+         pieJNrRgfhGEX09SuwnIcI0nmo9z9GU/vLiG6Nddpr8ZbWhm3AzTnEechpMAnjGMGw+r
+         1FxN0JJNpdnhpxfOwv6DeBpUxcxfzY5j6iD5lNbKeKIrNU78tT2c1TIvg5bCRtsHxbOR
+         AmO6P53ahpimOa/ehcBQzkJ6LqU5b/kINY4mC+Iu6lyMJzvwCJaeLgMjiEzLyOnaOuoS
+         lmczt5vrgMq6+FattWMNhIqDW6cFo1Tq7UpPTKeY8XxjyR4A1Zl/syy98PAdCZ1O9fak
+         YP/Q==
+X-Gm-Message-State: AOJu0YzuV4vEy/4JHclb0FinvO44nSg73EHI4FyQSBq13Bi4DgJpfFYS
+	dAYV4K4g0GUUlapYkh2B724=
+X-Google-Smtp-Source: AGHT+IG9iEH2/bNBgM6nbVHdigrRSf1gd8PAUDu4t7xKxtQ6telGr98Osqumi1ZzEmYESDR/n1lS+Q==
+X-Received: by 2002:a17:90a:e544:b0:28b:97af:955b with SMTP id ei4-20020a17090ae54400b0028b97af955bmr993531pjb.38.1704638657172;
+        Sun, 07 Jan 2024 06:44:17 -0800 (PST)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id x3-20020a17090a8a8300b0028d08a472a0sm4479965pjn.57.2024.01.07.06.44.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Jan 2024 06:44:15 -0800 (PST)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: ap420073@gmail.com,
+	paulb@nvidia.com,
+	jhs@mojatatu.com
+Subject: [PATCH net] amt: do not use overwrapped cb area
+Date: Sun,  7 Jan 2024 14:42:41 +0000
+Message-Id: <20240107144241.4169520-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231228122411.3189-1-maimon.sagi@gmail.com> <f254c189-463e-43a3-bc09-9a8869ebf819@app.fastmail.com>
- <CAMuE1bF0Hho4VwO6w3f+9z3j5TtscYzuAjj10MFt2mZXG2P8dQ@mail.gmail.com> <84d8e9d7-09ce-4781-8dfa-a74bb0955ae8@app.fastmail.com>
-In-Reply-To: <84d8e9d7-09ce-4781-8dfa-a74bb0955ae8@app.fastmail.com>
-From: Sagi Maimon <maimon.sagi@gmail.com>
-Date: Sun, 7 Jan 2024 16:05:46 +0200
-Message-ID: <CAMuE1bFQzc4u0X_z7sXyeAn2c4vLPHHJ8aeqC8uYmo2nJpC0wQ@mail.gmail.com>
-Subject: Re: [PATCH v3] posix-timers: add multi_clock_gettime system call
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Richard Cochran <richardcochran@gmail.com>, Andy Lutomirski <luto@kernel.org>, datglx@linutronix.de, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Sohil Mehta <sohil.mehta@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Nhat Pham <nphamcs@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, Kees Cook <keescook@chromium.org>, 
-	Alexey Gladkov <legion@kernel.org>, Mark Rutland <mark.rutland@arm.com>, linux-kernel@vger.kernel.org, 
-	linux-api@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, 
-	Netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 2, 2024 at 1:30=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote:
->
-> On Sun, Dec 31, 2023, at 17:00, Sagi Maimon wrote:
-> > On Fri, Dec 29, 2023 at 5:27=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> w=
-rote:
->
-> >> > +struct __ptp_multi_clock_get {
-> >> > +     unsigned int n_clocks; /* Desired number of clocks. */
-> >> > +     unsigned int n_samples; /* Desired number of measurements per =
-clock. */
-> >> > +     clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock ID=
-s */
-> >> > +     /*
-> >> > +      * Array of list of n_clocks clocks time samples n_samples tim=
-es.
-> >> > +      */
-> >> > +     struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_=
-MAX_CLOCKS];
-> >> > +};
-> >>
-> >> The fixed size arrays here seem to be an unnecessary limitation,
-> >> both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS are small
-> >> enough that one can come up with scenarios where you would want
-> >> a higher number, but at the same time the structure is already
-> >> 808 bytes long, which is more than you'd normally want to put
-> >> on the kernel stack, and which may take a significant time to
-> >> copy to and from userspace.
-> >>
-> >> Since n_clocks and n_samples are always inputs to the syscall,
-> >> you can just pass them as register arguments and use a dynamically
-> >> sized array instead.
-> >>
-> > Both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS are enough of any
-> > usage we can think of,
-> > But I think you are right, it is better to use a dynamically sized
-> > array for future use, plus to use less stack memory.
-> > On patch v4 a dynamically sized array will be used .
-> > I leaving both MULTI_PTP_MAX_SAMPLES and MULTI_PTP_MAX_CLOCKS but
-> > increasing their values, since there should be some limitation.
->
-> I think having an implementation specific limit in the kernel is
-> fine, but it would be nice to hardcode that limit in the API.
->
-> If both clkidarr[] and ts[] are passed as pointer arguments
-> in registers, they can be arbitrarily long in the API and
-> still have a documented maximum that we can extend in the
-> future without changing the interface.
->
-> >> It's not clear to me what you gain from having the n_samples
-> >> argument over just calling the syscall repeatedly. Does
-> >> this offer a benefit for accuracy or is this just meant to
-> >> avoid syscall overhead.
-> > It is mainly to avoid syscall overhead which also slightly
-> > improve the accuracy.
->
-> This is not a big deal as far as I'm concerned, but it
-> would be nice to back this up with some numbers if you
-> think it's worthwhile, as my impression is that the effect
-> is barely measurable: my guess would be that the syscall
-> overhead is always much less than the cost for the hardware
-> access.
->
-> >> On the other hand, this will still give less accuracy than the
-> >> getcrosststamp() callback with ioctl(PTP_SYS_OFFSET_PRECISE),
-> >> so either the last bit of accuracy isn't all that important,
-> >> or you need to refine the interface to actually be an
-> >> improvement over the chardev.
-> >>
-> > I don't understand this comment, please explain.
-> > The ioctl(PTP_SYS_OFFSET_PRECISE) is one specific case that can be
-> > done by multi_clock_gettime syscall (which cover many more cases)
-> > Plus the ioctl(PTP_SYS_OFFSET_PRECISE) works only on drivers that
-> > support this feature.
->
-> My point here is that on drivers that do support
-> PTP_SYS_OFFSET_PRECISE, the extra accuracy should be maintained
-> by the new interface, ideally in a way that does not have any
-> other downsides.
->
-> I think Andy's suggestion of exposing time offsets instead
-> of absolute times would actually achieve that: If the
-> interface is changed to return the offset against
-> CLOCK_MONOTONIC, CLOCK_MONOTONIC_RAW or CLOCK_BOOTTIME
-> (not sure what is best here), then the new syscall can use
-> getcrosststamp() where supported for the best results or
-> fall back to gettimex64() or gettime64() otherwise to
-> provide a consistent user interface.
->
-> Returning an offset would also allow easily calculating an
-> average over multiple calls in the kernel, instead of
-> returning a two-dimensional array.
->
-PTP_SYS_OFFSET_PRECISE returns the systime and PHC time and not offset.
-But you are right , in the next patch I will use this IOCTL .
+amt driver uses skb->cb for storing tunnel information.
+This job is worked before TC layer and then amt driver load tunnel info
+from skb->cb after TC layer.
+So, its cb area should not be overwrapped with CB area used by TC.
+In order to not use cb area used by TC, it skips the biggest cb
+structure used by TC, which was qdisc_skb_cb.
+But it's not anymore.
+Currently, biggest structure of TC's CB is tc_skb_cb.
+So, it should skip size of tc_skb_cb instead of qdisc_skb_cb.
 
->     Arnd
+Fixes: ec624fe740b4 ("net/sched: Extend qdisc control block with tc control block")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
+ drivers/net/amt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/amt.c b/drivers/net/amt.c
+index 53415e83821c..68e79b1272f6 100644
+--- a/drivers/net/amt.c
++++ b/drivers/net/amt.c
+@@ -11,7 +11,7 @@
+ #include <linux/net.h>
+ #include <linux/igmp.h>
+ #include <linux/workqueue.h>
+-#include <net/sch_generic.h>
++#include <net/pkt_sched.h>
+ #include <net/net_namespace.h>
+ #include <net/ip.h>
+ #include <net/udp.h>
+@@ -80,11 +80,11 @@ static struct mld2_grec mldv2_zero_grec;
+ 
+ static struct amt_skb_cb *amt_skb_cb(struct sk_buff *skb)
+ {
+-	BUILD_BUG_ON(sizeof(struct amt_skb_cb) + sizeof(struct qdisc_skb_cb) >
++	BUILD_BUG_ON(sizeof(struct amt_skb_cb) + sizeof(struct tc_skb_cb) >
+ 		     sizeof_field(struct sk_buff, cb));
+ 
+ 	return (struct amt_skb_cb *)((void *)skb->cb +
+-		sizeof(struct qdisc_skb_cb));
++		sizeof(struct tc_skb_cb));
+ }
+ 
+ static void __amt_source_gc_work(void)
+-- 
+2.34.1
+
 
