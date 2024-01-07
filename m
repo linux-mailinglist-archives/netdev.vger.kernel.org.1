@@ -1,175 +1,83 @@
-Return-Path: <netdev+bounces-62233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9CD28264F1
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:09:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E3388264FB
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E4631F215F3
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:09:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38443B20F13
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7322113AD9;
-	Sun,  7 Jan 2024 16:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1383C13AC7;
+	Sun,  7 Jan 2024 16:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Je4QSk1X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pnkvn2gR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B17513AD1;
-	Sun,  7 Jan 2024 16:09:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CDAAC433C8;
-	Sun,  7 Jan 2024 16:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE76813AC2
+	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 16:10:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C691C433C8;
+	Sun,  7 Jan 2024 16:10:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704643764;
-	bh=vtEdJ8x0t9Cig7F/OQ58765CvJpN5U3pnuPNn8bEtX0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Je4QSk1Xsi5jvomPOikxCGlVFwk8iqkAbNF6aVYGaBGYI1jkUw+CADMBs0/wZQr36
-	 xy22SDkRZMP5sMid5EvoeH3h/Kwf68Tcbn77GX8EDm+cjFQlFTs6TguY93Et6BFDPv
-	 UlIs+e2Jheeb2/ck0biFbtZrf0Vw9LMCbIX3TaJmqJZgdrEhhfSfxUMIfjU8lZxJF7
-	 Q+aCdvG3kA6VLZkjLHS+Vga8pwGe2Z6VghL3LobYtAq3sM2rUGAW8uNlztGT7uqIEc
-	 x+WdUyce0Wh+SeZcYOdm2MG39rO2B8pkIyqp3viKoDClILrK1BwA1eJJXlvP2hGICM
-	 kq7yyH7rMCZgg==
-Date: Sun, 7 Jan 2024 16:09:16 +0000
-From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Yiqun Leng <yqleng@linux.alibaba.com>,
-	Jia Zhu <zhujia.zj@bytedance.com>
-Subject: Re: [PATCH 1/5] cachefiles: Fix __cachefiles_prepare_write()
-Message-ID: <20240107160916.GA129355@kernel.org>
-References: <20240103145935.384404-1-dhowells@redhat.com>
- <20240103145935.384404-2-dhowells@redhat.com>
+	s=k20201202; t=1704643823;
+	bh=a7N/ME3IfKvRa1T8hbgY1xBHCwKN9OHZsWbh8mc7uec=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Pnkvn2gRRV7JE/QNFLeLu+rhh07OnVyf8WoHPC57z1AvnOlemMa/egGpNgHhpkwwf
+	 1FTgAxYX+xvHq8mRA2Ob9Zb5ROX4AaI/2kzLGwXdy2oV1upc67cHWpVruerkI1RCAk
+	 UEpygYd17Uc7kjlfWlrwWPp3g8MluxEQBNG0sNCJw86JILrJCpiIAQf6+8r5zB9WqF
+	 f1uc3v9tygvu1kNEM4Eajgjk/QUx47cZoMCnbJ59WKEHu3I8hwAdst+fdK246BDTJH
+	 X3jZ8LOyV4bTmasnd2aIGz7Zownjh8BgG0D5H/6Yx+Jv6I9jvUbaEYucBSblud0ZUO
+	 VIZk2jDHvAIxw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43724C4167F;
+	Sun,  7 Jan 2024 16:10:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240103145935.384404-2-dhowells@redhat.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v6] net: ethernet: cortina: Drop TSO support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170464382327.3646.15433229900431891696.git-patchwork-notify@kernel.org>
+Date: Sun, 07 Jan 2024 16:10:23 +0000
+References: <20240106-new-gemini-ethernet-regression-v6-1-889e98d3deb7@linaro.org>
+In-Reply-To: <20240106-new-gemini-ethernet-regression-v6-1-889e98d3deb7@linaro.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: ulli.kroll@googlemail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com, canghousehold@aol.com,
+ romain.gantois@bootlin.com, netdev@vger.kernel.org
 
-On Wed, Jan 03, 2024 at 02:59:25PM +0000, David Howells wrote:
-> Fix __cachefiles_prepare_write() to correctly determine whether the
-> requested write will fit correctly with the DIO alignment.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Sat, 06 Jan 2024 01:12:22 +0100 you wrote:
+> The recent change to allow large frames without hardware checksumming
+> slotted in software checksumming in the driver if hardware could not
+> do it.
 > 
-> Reported-by: Gao Xiang <hsiangkao@linux.alibaba.com>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Tested-by: Yiqun Leng <yqleng@linux.alibaba.com>
-> Tested-by: Jia Zhu <zhujia.zj@bytedance.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-erofs@lists.ozlabs.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->  fs/cachefiles/io.c | 28 +++++++++++++++++-----------
->  1 file changed, 17 insertions(+), 11 deletions(-)
+> This will however upset TSO (TCP Segment Offloading). Typical
+> error dumps includes this:
 > 
-> diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
-> index bffffedce4a9..7529b40bc95a 100644
-> --- a/fs/cachefiles/io.c
-> +++ b/fs/cachefiles/io.c
-> @@ -522,16 +522,22 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->  			       bool no_space_allocated_yet)
->  {
->  	struct cachefiles_cache *cache = object->volume->cache;
-> -	loff_t start = *_start, pos;
-> -	size_t len = *_len, down;
-> +	unsigned long long start = *_start, pos;
-> +	size_t len = *_len;
->  	int ret;
->  
->  	/* Round to DIO size */
-> -	down = start - round_down(start, PAGE_SIZE);
-> -	*_start = start - down;
-> -	*_len = round_up(down + len, PAGE_SIZE);
-> -	if (down < start || *_len > upper_len)
-> +	start = round_down(*_start, PAGE_SIZE);
-> +	if (start != *_start) {
-> +		kleave(" = -ENOBUFS [down]");
-> +		return -ENOBUFS;
-> +	}
-> +	if (*_len > upper_len) {
-> +		kleave(" = -ENOBUFS [up]");
->  		return -ENOBUFS;
-> +	}
-> +
-> +	*_len = round_up(len, PAGE_SIZE);
->  
->  	/* We need to work out whether there's sufficient disk space to perform
->  	 * the write - but we can skip that check if we have space already
-> @@ -542,7 +548,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->  
->  	pos = cachefiles_inject_read_error();
->  	if (pos == 0)
-> -		pos = vfs_llseek(file, *_start, SEEK_DATA);
-> +		pos = vfs_llseek(file, start, SEEK_DATA);
->  	if (pos < 0 && pos >= (loff_t)-MAX_ERRNO) {
+> [...]
 
-Hi David,
+Here is the summary with links:
+  - [net,v6] net: ethernet: cortina: Drop TSO support
+    https://git.kernel.org/netdev/net/c/ac631873c9e7
 
-I realise these patches have been accepted, but I have a minor nit:
-pos is now unsigned, and so cannot be less than zero.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Flagged by Smatch and Coccinelle.
 
->  		if (pos == -ENXIO)
->  			goto check_space; /* Unallocated tail */
-> @@ -550,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->  					  cachefiles_trace_seek_error);
->  		return pos;
->  	}
-> -	if ((u64)pos >= (u64)*_start + *_len)
-> +	if (pos >= start + *_len)
->  		goto check_space; /* Unallocated region */
->  
->  	/* We have a block that's at least partially filled - if we're low on
-> @@ -563,13 +569,13 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->  
->  	pos = cachefiles_inject_read_error();
->  	if (pos == 0)
-> -		pos = vfs_llseek(file, *_start, SEEK_HOLE);
-> +		pos = vfs_llseek(file, start, SEEK_HOLE);
->  	if (pos < 0 && pos >= (loff_t)-MAX_ERRNO) {
-
-Ditto.
-
->  		trace_cachefiles_io_error(object, file_inode(file), pos,
->  					  cachefiles_trace_seek_error);
->  		return pos;
->  	}
-> -	if ((u64)pos >= (u64)*_start + *_len)
-> +	if (pos >= start + *_len)
->  		return 0; /* Fully allocated */
->  
->  	/* Partially allocated, but insufficient space: cull. */
-> @@ -577,7 +583,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->  	ret = cachefiles_inject_remove_error();
->  	if (ret == 0)
->  		ret = vfs_fallocate(file, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> -				    *_start, *_len);
-> +				    start, *_len);
->  	if (ret < 0) {
->  		trace_cachefiles_io_error(object, file_inode(file), ret,
->  					  cachefiles_trace_fallocate_error);
-> 
 
