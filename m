@@ -1,162 +1,98 @@
-Return-Path: <netdev+bounces-62260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8288265B8
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 20:07:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE0338265C6
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 20:17:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19DF71C20E76
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:07:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2C741C20A73
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 19:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACA01118B;
-	Sun,  7 Jan 2024 19:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BEA10A3E;
+	Sun,  7 Jan 2024 19:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lgtxXvlW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="xjgfuRce"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6E610A36
-	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 19:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-555bd21f9fdso1238073a12.0
-        for <netdev@vger.kernel.org>; Sun, 07 Jan 2024 11:06:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704654418; x=1705259218; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aTPNXQpJ4O39KyDd2HkvT42hjkwINb/udJz5Nmlw+kU=;
-        b=lgtxXvlWKY4V834+2hfPsycD2de3OL8aVPH5XIDNiCpuZzJwSsykSmfTl0Z+YOW1Nn
-         N24ds1JvYRfCQ6UkdcakRoemNu1W2yiYtaTV0GGJK0h86rB2bLEnx38TIb1Z3YC5YxKk
-         c5AeMLHjksfyGvqX0aVz7e9U3sxmwjrFwELV1tek0+Y0RF/EQSwxcxF+ZDhhCIdiC0Vv
-         6Usd1goO2hA37B9ZdQic4eHlUcNaeXRGRI4MDmhBSR1siS6QEX6I0MG31Uh4ozmMCIih
-         ZHCt6HzYxxc5M+sFR3aMow9vwZia92bgihiWVU/UnjNxwgJAs3oWHAFHTe4HR420pZok
-         vQPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704654418; x=1705259218;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aTPNXQpJ4O39KyDd2HkvT42hjkwINb/udJz5Nmlw+kU=;
-        b=kdEOnAHoV34d++e6PDKHAqK356HnTtYobsvpQkQAdpdYq4vTqyRjhNqZ/d20AUOSfx
-         6+DSJFjY1Aupq8CI+Iv1R+gjd/qI0ueV30JTCdJNTVUfWMeanMy9p+CKHSQDBE3koI3j
-         XCznJfNlFsk7ZGnbB4ZrsSDPRhZIJ1QJ958xJtEevRjeth4bWFdF0SGTEp5KLXC86GFS
-         yh2aXtsjEZHn85fktN+n0g0TUmOdPN3FXTisboJ6SLZVDQtf1UxQaC1AKtmV7JnSMS6l
-         R78z5yYRa8YlrYi1jPwo4ZgCAl0O5jHl5eKL6nCJ320+IA4XfYQW3Z5+eYvfXyrOCfD/
-         gPcg==
-X-Gm-Message-State: AOJu0Yy/pUFnTTSpOrb7tPgrZCUhNiXfBqMhg1xJa9KG2N8fz7zld+OU
-	cAiO8R4HSYWld4JVTDnS8WsKSREIVnE/dg==
-X-Google-Smtp-Source: AGHT+IGzR3xBempsgmL7SBQzTLQOMPSwd8z280Em9EHOPwEk56cCkXDNtwAQ4KsVxxWVDU42CK7ysw==
-X-Received: by 2002:a50:950d:0:b0:555:6be0:2f58 with SMTP id u13-20020a50950d000000b005556be02f58mr1723870eda.1.1704654418197;
-        Sun, 07 Jan 2024 11:06:58 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.223.112])
-        by smtp.gmail.com with ESMTPSA id fg12-20020a056402548c00b005579d0f146dsm803483edb.38.2024.01.07.11.06.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Jan 2024 11:06:57 -0800 (PST)
-Message-ID: <2df9fe3e-7971-4aa2-89a9-0e085b3b00d7@linaro.org>
-Date: Sun, 7 Jan 2024 20:06:55 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60B210A3C;
+	Sun,  7 Jan 2024 19:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ShIBqfFvGWvOYEHtMNULgAQ4OuLCr8SgdXz0DO7tAwE=; b=xjgfuRceNwNt8POVHAxhoDta4n
+	Sb50yfK4BEU1CNA4NNOTuQLVNOEeBX3GQ7aEFulG01eDLsd1eGhnD0Zl4qZYefWz+7Gnl1H6xgbfE
+	Vml1QVZS+DgcLQSS2kOkYWutOZsl1W3/J/QurlMTEUn0SIoov15j7qJmz3QFg+tzA4cbP90YhvYhM
+	DNL8GYwbmmccfKXu3NzFk0y80+pJiwHLbWhctnz7RGRy3mxAd0uXNUjcwJQvD5CqGWnOPzkOW6Y7G
+	c+SvvkBNXqN5UG7s8Weav15eoeqbdEsQD+Gdl3dd2dReAGbNF4af/beLKjzlO2OatqcHmvYMFVFn2
+	NpagF3QA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37984)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rMYeJ-0002Ki-1A;
+	Sun, 07 Jan 2024 19:17:31 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rMYeK-0002UL-8f; Sun, 07 Jan 2024 19:17:32 +0000
+Date: Sun, 7 Jan 2024 19:17:32 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sergio Palumbo <palumbo.ser@outlook.it>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH]     net: sfp: add quirk for DFP-34X-2C2 GPON ONU SFP
+Message-ID: <ZZr4zCzEpuzOoIGQ@shell.armlinux.org.uk>
+References: <AS1PR03MB8189FE82C632EBA97644D70082642@AS1PR03MB8189.eurprd03.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/4] net: stmmac: Enable Per DMA Channel
- interrupt
-To: patchwork-bot+netdevbpf@kernel.org,
- Leong Ching Swee <leong.ching.swee@intel.com>
-Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- peppe.cavallaro@st.com, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240105070925.2948871-1-leong.ching.swee@intel.com>
- <170464562363.18664.8264531122295136817.git-patchwork-notify@kernel.org>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <170464562363.18664.8264531122295136817.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AS1PR03MB8189FE82C632EBA97644D70082642@AS1PR03MB8189.eurprd03.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 07/01/2024 17:40, patchwork-bot+netdevbpf@kernel.org wrote:
-> Hello:
+On Sun, Jan 07, 2024 at 05:17:57PM +0100, Sergio Palumbo wrote:
+>     Add a quirk for a GPON SFP that identifies itself as "OEM"
+>     "DFP-34X-2C2". This module's PHY is accessible at 1000base-X,
+>     but can also run at 2500base-X as per specs of the module.
+>     After application of the quirk the module is enebled to run both
+>     at 1000base-X as well as at 2500base-X interface mode.
 > 
-> This series was applied to netdev/net-next.git (main)
-> by David S. Miller <davem@davemloft.net>:
-> 
-> On Fri,  5 Jan 2024 15:09:21 +0800 you wrote:
->> From: Swee Leong Ching <leong.ching.swee@intel.com>
->>
->> Hi,
->> Add Per DMA Channel interrupt feature for DWXGMAC IP.
->>
->> Patchset (link below) contains per DMA channel interrupt, But it was
->> achieved.
->> https://lore.kernel.org/lkml/20230821203328.GA2197059-
->> robh@kernel.org/t/#m849b529a642e1bff89c05a07efc25d6a94c8bfb4
->>
->> [...]
-> 
-> Here is the summary with links:
->   - [net-next,v2,1/4] dt-bindings: net: snps,dwmac: per channel irq
->     https://git.kernel.org/netdev/net-next/c/67d47c8ada0f
+> Signed-off-by: Sergio Palumbo <palumbo.ser@outlook.it>
 
-Please wait for DT bindings review a bit more than one working day (I
-don't count Saturday and Sunday, because we all have some life...).
+There are several issues here:
 
-Best regards,
-Krzysztof
+1. Submitting to netdev needs either [PATCH net] or [PATCH net-next]
+   to indicate which tree is being targetted. As this isn't a fix,
+   net-next is appropriate, but I would also suggest that it is too
+   late in the cycle as v6.7 is due out today.
 
+2. How does the module switch between 1000base-X and 2500base-X?
+   What happens if the module wants to use 2500base-X but the host
+   doesn't support it? Please include these details in the commit
+   message.
+
+3. While I know the Turris Rollball entries are out of order, please
+   try to keep the list alphabetically sorted, first by vendor string
+   and then part string.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
