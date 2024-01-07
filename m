@@ -1,96 +1,80 @@
-Return-Path: <netdev+bounces-62240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54D3826524
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:40:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B905E826526
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 17:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37ED5B2146E
-	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:40:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF76A1C21548
+	for <lists+netdev@lfdr.de>; Sun,  7 Jan 2024 16:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A09B134C0;
-	Sun,  7 Jan 2024 16:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE7A12B60;
+	Sun,  7 Jan 2024 16:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IHbt0KpC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Gh5Mwg+d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5747012B60;
-	Sun,  7 Jan 2024 16:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B727BC433C9;
-	Sun,  7 Jan 2024 16:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704645623;
-	bh=xJqTpdHlsLkBAuHocAoxuNoxLY3qzEXuQy/c9JHk+s0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IHbt0KpCwhjDyH/rAE8sir2BMYQ33KvASkvfBX40YxDm4klh+qK8Dhv2ovn9SbnPk
-	 /Vgj1bKs4H42Uav6qUXPT7Kit1VolhcH4kKGgz23+AoGf/NrE/BNG84NYdWZ7af9GQ
-	 jU69Ka6YW/psTlafj5ivo2+IWXITiIGh/RKtKi+WfcyYG2wq+pw1fjW1YI/4sh/n8r
-	 iaN2XwNKmCVLuPprWw8jcQoJlF7PHsjY8M5/KY+MLcejZzDOUk3x3nCxZNJ7K7gQna
-	 gQhS4IzyWYSPdhK5jNtIC5uVrYtsMrle5dQmYQld45tWuCY0WXYj32S3U36ZHsDkqC
-	 lEwU9n9CSk52Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C3ADC4167E;
-	Sun,  7 Jan 2024 16:40:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF0F13ADE
+	for <netdev@vger.kernel.org>; Sun,  7 Jan 2024 16:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mqlTmwQiLAzIdbPcA/JxSq+0uzGlZHDWhZsN55vYGpk=; b=Gh5Mwg+dBpqjukJzvQrono+0i8
+	IYBO2YnZwV/5V3i1KcoOvj8cA0gGlOia2QKAyMDXW9Tc2nNbkGzPV6W8WSKLatIFV18hCYVfVcwHm
+	jgf1b6aH4tx7gvnyRFEGyZ10vEBenuQV7W6iRpF62CqlR7wsTm+0fmS3rg5N7GCyCyVs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rMWCV-004Ztr-Er; Sun, 07 Jan 2024 17:40:39 +0100
+Date: Sun, 7 Jan 2024 17:40:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King <rmk+kernel@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 RFC 3/5] ethtool: adjust struct ethtool_keee to kernel
+ needs
+Message-ID: <ef42a586-0b5a-41c4-af4a-50a7d839fa1b@lunn.ch>
+References: <8d8700c8-75b2-49ba-b303-b8d619008e45@gmail.com>
+ <bb510240-edc5-4e52-aadb-fe00c0c94708@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/4] net: stmmac: Enable Per DMA Channel interrupt
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170464562363.18664.8264531122295136817.git-patchwork-notify@kernel.org>
-Date: Sun, 07 Jan 2024 16:40:23 +0000
-References: <20240105070925.2948871-1-leong.ching.swee@intel.com>
-In-Reply-To: <20240105070925.2948871-1-leong.ching.swee@intel.com>
-To: Leong Ching Swee <leong.ching.swee@intel.com>
-Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- peppe.cavallaro@st.com, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bb510240-edc5-4e52-aadb-fe00c0c94708@gmail.com>
 
-Hello:
+On Sat, Jan 06, 2024 at 11:20:43PM +0100, Heiner Kallweit wrote:
+> This patch changes the following in struct ethtool_keee
+> - remove member cmd, it's not needed on kernel side
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Ah, O.K. That invalidates most of my comments on the previous
+patch. Please expand the commit message of the previous patch to say
+that keee cmd will be removed in the next patch.
 
-On Fri,  5 Jan 2024 15:09:21 +0800 you wrote:
-> From: Swee Leong Ching <leong.ching.swee@intel.com>
+> - remove reserved fields
+> - switch the semantically boolean members to type bool
 > 
-> Hi,
-> Add Per DMA Channel interrupt feature for DWXGMAC IP.
+> We don't have to change any user of the boolean members due to the
+> implicit casting from/to bool. A small change is needed where a
+> pointer to bool members is used, in addition remove few now unneeded
+> double negations.
 > 
-> Patchset (link below) contains per DMA channel interrupt, But it was
-> achieved.
-> https://lore.kernel.org/lkml/20230821203328.GA2197059-
-> robh@kernel.org/t/#m849b529a642e1bff89c05a07efc25d6a94c8bfb4
-> 
-> [...]
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Here is the summary with links:
-  - [net-next,v2,1/4] dt-bindings: net: snps,dwmac: per channel irq
-    https://git.kernel.org/netdev/net-next/c/67d47c8ada0f
-  - [net-next,v2,2/4] net: stmmac: Make MSI interrupt routine generic
-    https://git.kernel.org/netdev/net-next/c/477bd4beb93b
-  - [net-next,v2,3/4] net: stmmac: Add support for TX/RX channel interrupt
-    https://git.kernel.org/netdev/net-next/c/9072e03d3208
-  - [net-next,v2,4/4] net: stmmac: Use interrupt mode INTM=1 for per channel irq
-    https://git.kernel.org/netdev/net-next/c/36af9f25ddfd
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
