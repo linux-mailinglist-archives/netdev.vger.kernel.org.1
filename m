@@ -1,281 +1,147 @@
-Return-Path: <netdev+bounces-62313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F165B82695E
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:23:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75386826966
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:25:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74FEE1F210B0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:23:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B5391C21BD5
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC639461;
-	Mon,  8 Jan 2024 08:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="qhu/VzqD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229699463;
+	Mon,  8 Jan 2024 08:25:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E33D272
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 08:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50e8ca6c76dso1486253e87.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 00:23:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1704702224; x=1705307024; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cM0TFj8jxeSZZv1W4sPXCNVKXy97CkTU2U3yhoJbBY8=;
-        b=qhu/VzqDtfFgnUz0+l0D5zdaJ7KBPvbNyYpOC02G6uB+3dVjNXv2VsCCLtUuiAwSjL
-         z4VnFv/HZJWxeXD7A6GtCOZjfJnNeOBF+kW3b20yOE7rX767cBhrtuMae+N/SvtFjtWp
-         3PG7vHTBIVjH0pBoeeMikoJmIe6Ts8ksS32IfUdpmc1iqW+3Tl6uknzQYk7E0DM+WKVo
-         CZO41wJCTxJw/imtMLuBMzhtcLMipbZlzJp8Be6XCb7lki5JM/kP0kojPzIQZi1XD2i3
-         RE5zGHR3/+5dtdRsWEfzNPLdyVmCoqNLqdKsteHY0HLD/PHJvUeccstq/tzaZrqbqTJZ
-         E5EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704702224; x=1705307024;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cM0TFj8jxeSZZv1W4sPXCNVKXy97CkTU2U3yhoJbBY8=;
-        b=EY5Ks8pC8h4pQIhNfK8tjf7zEfPhLNkewCDyHS14hJ21cCs9uWG9DLEOY2uOdORd9Z
-         K4KmKNvTHsB8EPo9I/bflu1wQ6jqkvP5nEvoTZftJ3eHGF7XGAYz1tBMhYeWU7XrF3ox
-         ISbOe3ood+4nrbxnw/UM79VRHuyC+gFPvLRaJQqYy9nlr8FyaMgdmNz3+OQcAM5H3csb
-         h7IAf5gbad30CPokA2PA5YwLJmJTb3kBwbvdP0TrGLz3RbescLVT3Uwhr85W7czns9p2
-         jI+e8bgTMVaXGGlMfH8Ppeh3tYt49XyLkJh88lzUg7Qgo+3W+lWGmVcVMB0YFO2HSGwZ
-         XxbA==
-X-Gm-Message-State: AOJu0YwKcFf7hZdiHUt7vBF4WkUeDPRssudzRVfTzQV5kSn1YkQuKCS6
-	zPIO7ZFVzqqrvAkEf17quZmv6A0x6rMwjQ==
-X-Google-Smtp-Source: AGHT+IGSracrlfmURsxZblED6Vb2WigU+HoU7WFjcf863XobKF4zuEjubz30uiCqu5wKqalXN+SvbA==
-X-Received: by 2002:a05:6512:3d94:b0:50e:6d96:4b3c with SMTP id k20-20020a0565123d9400b0050e6d964b3cmr1378695lfv.81.1704702223603;
-        Mon, 08 Jan 2024 00:23:43 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.5])
-        by smtp.gmail.com with ESMTPSA id m14-20020a50ef0e000000b00554930be765sm4019766eds.97.2024.01.08.00.23.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jan 2024 00:23:43 -0800 (PST)
-Message-ID: <2ba1b5d7-cf89-4942-a65e-674347389cbe@tuxon.dev>
-Date: Mon, 8 Jan 2024 10:23:41 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB833C139;
+	Mon,  8 Jan 2024 08:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4T7nCc0ZBmz1gx9K;
+	Mon,  8 Jan 2024 16:24:12 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 07150140384;
+	Mon,  8 Jan 2024 16:25:42 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 8 Jan
+ 2024 16:25:41 +0800
+Subject: Re: [PATCH net-next 2/6] page_frag: unify gfp bits for order 3 page
+ allocation
+To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>, <linux-mm@kvack.org>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+ <20240103095650.25769-3-linyunsheng@huawei.com>
+ <d4947ef05bca8525d04f9943e92b4e43ec82c583.camel@gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <1d40427d-78e3-ef40-a63f-206c0697bda2@huawei.com>
+Date: Mon, 8 Jan 2024 16:25:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 08/19] net: ravb: Move the IRQs get and
- request in the probe function
+In-Reply-To: <d4947ef05bca8525d04f9943e92b4e43ec82c583.camel@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org, geert+renesas@glider.be,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
- <20240105082339.1468817-9-claudiu.beznea.uj@bp.renesas.com>
- <fa9c8db4-ed80-f64d-aae2-8b95281f302e@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <fa9c8db4-ed80-f64d-aae2-8b95281f302e@omp.ru>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-
-
-On 05.01.2024 22:57, Sergey Shtylyov wrote:
-> On 1/5/24 11:23 AM, Claudiu wrote:
-> 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On 2024/1/5 23:35, Alexander H Duyck wrote:
+> On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
+>> Currently there seems to be three page frag implementions
+>> which all try to allocate order 3 page, if that fails, it
+>> then fail back to allocate order 0 page, and each of them
+>> all allow order 3 page allocation to fail under certain
+>> condition by using specific gfp bits.
 >>
->> The runtime PM implementation will disable clocks at the end of
->> ravb_probe(). As some IP variants switch to reset mode as a result of
->> setting module standby through clock disable APIs, to implement runtime PM
->> the resource parsing and requesting are moved in the probe function and IP
->> settings are moved in the open function. This is done because at the end of
->> the probe some IP variants will switch anyway to reset mode and the
->> registers content is lost. Also keeping only register specific operations
->> in the ravb_open()/ravb_close() functions will make them faster.
+>> The gfp bits for order 3 page allocation are different
+>> between different implementation, __GFP_NOMEMALLOC is
+>> or'd to forbid access to emergency reserves memory for
+>> __page_frag_cache_refill(), but it is not or'd in other
+>> implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
+>> direct reclaim in skb_page_frag_refill(), but it is not
+>> masked off in __page_frag_cache_refill().
 >>
->> Commit moves IRQ requests to ravb_probe() to have all the IRQs ready when
->> the interface is open. As now IRQs gets and requests are in a single place
->> there is no need to keep intermediary data (like ravb_rx_irqs[] and
->> ravb_tx_irqs[] arrays or IRQs in struct ravb_private).
+>> This patch unifies the gfp bits used between different
+>> implementions by or'ing __GFP_NOMEMALLOC and masking off
+>> __GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
+>> possible pressure for mm.
 >>
->> This is a preparatory change to add runtime PM support for all IP variants.
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>> ---
+>>  drivers/vhost/net.c | 2 +-
+>>  mm/page_alloc.c     | 4 ++--
+>>  net/core/sock.c     | 2 +-
+>>  3 files changed, 4 insertions(+), 4 deletions(-)
 >>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> [...]
->> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
->> index e0f8276cffed..e3506888cca6 100644
->> --- a/drivers/net/ethernet/renesas/ravb.h
->> +++ b/drivers/net/ethernet/renesas/ravb.h
->> @@ -1089,10 +1089,6 @@ struct ravb_private {
->>  	int msg_enable;
->>  	int speed;
->>  	int emac_irq;
->> -	int erra_irq;
->> -	int mgmta_irq;
->> -	int rx_irqs[NUM_RX_QUEUE];
->> -	int tx_irqs[NUM_TX_QUEUE];
-> 
->    Good! :-)
-> 
-> [...]
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index 4673cc2faec0..ac6488ffa29a 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> [...]
->> @@ -1727,85 +1717,21 @@ static const struct ethtool_ops ravb_ethtool_ops = {
->>  	.set_wol		= ravb_set_wol,
->>  };
+>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+>> index f2ed7167c848..e574e21cc0ca 100644
+>> --- a/drivers/vhost/net.c
+>> +++ b/drivers/vhost/net.c
+>> @@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
+>>  		/* Avoid direct reclaim but allow kswapd to wake */
+>>  		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+>>  					  __GFP_COMP | __GFP_NOWARN |
+>> -					  __GFP_NORETRY,
+>> +					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+>>  					  SKB_FRAG_PAGE_ORDER);
+>>  		if (likely(pfrag->page)) {
+>>  			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+>> index 9a16305cf985..1f0b36dd81b5 100644
+>> --- a/mm/page_alloc.c
+>> +++ b/mm/page_alloc.c
+>> @@ -4693,8 +4693,8 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+>>  	gfp_t gfp = gfp_mask;
 >>  
->> -static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
->> -				struct net_device *ndev, struct device *dev,
->> -				const char *ch)
->> -{
->> -	char *name;
->> -	int error;
->> -
->> -	name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", ndev->name, ch);
+>>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+>> -	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
+>> -		    __GFP_NOMEMALLOC;
+>> +	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+>> +		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+>>  	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+>>  				PAGE_FRAG_CACHE_MAX_ORDER);
+>>  	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+>> diff --git a/net/core/sock.c b/net/core/sock.c
+>> index 446e945f736b..d643332c3ee5 100644
+>> --- a/net/core/sock.c
+>> +++ b/net/core/sock.c
+>> @@ -2900,7 +2900,7 @@ bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
+>>  		/* Avoid direct reclaim but allow kswapd to wake */
+>>  		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+>>  					  __GFP_COMP | __GFP_NOWARN |
+>> -					  __GFP_NORETRY,
+>> +					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+>>  					  SKB_FRAG_PAGE_ORDER);
+>>  		if (likely(pfrag->page)) {
+>>  			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
 > 
->    Ugh! Should've fixed this outrage... :-/
+> Looks fine to me.
 > 
-> [...]
->> @@ -2616,6 +2509,90 @@ static void ravb_parse_delay_mode(struct device_node *np, struct net_device *nde
->>  	}
->>  }
->>  
->> +static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
->> +			  const char *ch, int *irq, irq_handler_t handler)
->> +{
->> +	struct platform_device *pdev = priv->pdev;
->> +	struct net_device *ndev = priv->ndev;
->> +	struct device *dev = &pdev->dev;
->> +	const char *dev_name;
->> +	unsigned long flags;
->> +	int error;
->> +
->> +	if (irq_name) {
->> +		dev_name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", ndev->name, ch);
->> +		if (!dev_name)
->> +			return -ENOMEM;
->> +
->> +		*irq = platform_get_irq_byname(pdev, irq_name);
->> +		flags = 0;
->> +	} else {
->> +		dev_name = ndev->name;
->> +		*irq = platform_get_irq(pdev, 0);
->> +		flags = IRQF_SHARED;
->> +	}
->> +	if (*irq < 0)
->> +		return *irq;
->> +
->> +	error = devm_request_irq(dev, *irq, handler, flags, dev_name, ndev);
->> +	if (error)
->> +		netdev_err(ndev, "cannot request IRQ %s\n", irq_name);
-> 
->    What will be printed when irq_name is NULL? Shouldn't this be dev_name
-> instead?
+> One thing you may want to consider would be to place this all in an
+> inline function that could just consolidate all the code.
 
-Indeed, should have been dev_name.
-
-Maybe better would be to have irq_name and IRQ0 instead as the users of
-this don't request IRQ from buf (where buf is sprintf(buf, "%s:%s",
-ndev->name, ch)) but they request irq_name or IRQ0.
+Do you think it is possible to further unify the implementations of the
+'struct page_frag_cache' and 'struct page_frag', so adding a inline
+function for above is unnecessary?
 
 > 
->> +
->> +	return error;
->> +}
->> +
->> +static int ravb_setup_irqs(struct ravb_private *priv)
->> +{
->> +	const struct ravb_hw_info *info = priv->info;
->> +	struct net_device *ndev = priv->ndev;
->> +	const char *irq_name, *emac_irq_name;
->> +	int error, irq;
->> +
->> +	if (!info->multi_irqs)
->> +		return ravb_setup_irq(priv, NULL, NULL, &ndev->irq, ravb_interrupt);
->> +
->> +	if (info->err_mgmt_irqs) {
->> +		irq_name = "dia";
->> +		emac_irq_name = "line3";
->> +	} else {
->> +		irq_name = "ch22";
->> +		emac_irq_name = "ch24";
->> +	}
->> +
->> +	error = ravb_setup_irq(priv, irq_name, "ch22:multi", &ndev->irq, ravb_multi_interrupt);
->> +	if (error)
->> +		return error;
->> +
->> +	error = ravb_setup_irq(priv, emac_irq_name, "ch24:emac", &priv->emac_irq,
->> +			       ravb_emac_interrupt);
->> +	if (error)
->> +		return error;
->> +
->> +	if (info->err_mgmt_irqs) {
->> +		error = ravb_setup_irq(priv, "err_a", "err_a", &irq, ravb_multi_interrupt);
+> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
 > 
->    Hm, why pass 2 identical names?
-
-1st name is what is used by platform_get_irq_by_name(), 2nd name is used to
-fill the name of the IRQ after it has been requested. Perviously the same
-naming schema was used.
-
+> .
 > 
->> +		if (error)
->> +			return error;
->> +
->> +		error = ravb_setup_irq(priv, "mgmt_a", "mgmt_a", &irq, ravb_multi_interrupt);
-> 
->    Here as well?
-> 
->> +		if (error)
->> +			return error;
->> +	}
->> +
->> +	error = ravb_setup_irq(priv, "ch0", "ch0:rx_be", &irq, ravb_be_interrupt);
-> 
->    Hm, won't this result in "ch0:ch0:rx_be" as IRQ name?
-
-No, first "ch0" is to call:
-platform_get_irq_byname(pdev, "ch0");
-
-"ch0:rx_be" is passed to
-devm_kasprintf(..., "%s:%s", ndev->name, "ch0:rx_be");
-
-and fill the name of IRQ after devm_request_irq(). Previously it was the same.
-
-> 
->> +	if (error)
->> +		return error;
->> +
->> +	error = ravb_setup_irq(priv, "ch1", "ch1:rx_nc", &irq, ravb_nc_interrupt);
-> 
->    Same question...
-> 
->> +	if (error)
->> +		return error;
->> +
->> +	error = ravb_setup_irq(priv, "ch18", "ch18:tx_be", &irq, ravb_be_interrupt);
-> 
->    And here as well...
-> 
->> +	if (error)
->> +		return error;
->> +
->> +	return ravb_setup_irq(priv, "ch19", "ch19:tx_nc", &irq, ravb_nc_interrupt);
-> 
->    Here too...
-> 
-> [...]
-> 
-> MBR, Sergey
 
