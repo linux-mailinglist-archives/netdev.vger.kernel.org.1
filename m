@@ -1,197 +1,122 @@
-Return-Path: <netdev+bounces-62478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A71BE8277E6
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:45:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA26D8277F0
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBA3AB21D6A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:44:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 735F5283FBE
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C34B4175F;
-	Mon,  8 Jan 2024 18:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ABCA25755;
+	Mon,  8 Jan 2024 18:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="V638jDil"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DB055C00;
-	Mon,  8 Jan 2024 18:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4T82zc45Qhz9skj;
-	Mon,  8 Jan 2024 19:44:44 +0100 (CET)
-Message-ID: <5d1f2013-5758-4d6c-8d01-e96a76bb2686@v0yd.nl>
-Date: Mon, 8 Jan 2024 19:44:42 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A3D5576A
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 18:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40e4d6557c2so952865e9.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 10:52:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1704739922; x=1705344722; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1G98vUT1ChYTetTcXeZ4VcG54jTiERw1OKsbY1IV4Sk=;
+        b=V638jDilk8NNWOg4LAEEPLfUTt8IwK4sZ4weR+AGeN+t4HqK9d12IjhVTF0kODg/p1
+         gmfKn3qBRjD7MmSo2zy9tzsB7ENRaST55j+IvxPlWlcNN/HrlGw8mG5BNKo47yqiey62
+         BWaPMWpfugIvTZ3F7DDvoI/7i3dthddXFJUPYzcb+JPU5vypCznW1bnwWGy5618DNX7W
+         TDtQAgLimqmae57okMKH2SuCl9xRqbtyGWM50YHrcEFtbi3B2Y2tNj69euVLUctccqYF
+         BfaEhyVeuNvqCawg1HOkp5LQJ94R5TZ8IesBUbBjeHwWOKsMLKUPa9Y0fx2yoZhRS6wv
+         cSOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704739922; x=1705344722;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1G98vUT1ChYTetTcXeZ4VcG54jTiERw1OKsbY1IV4Sk=;
+        b=PFevWbvxAJbbpggtw5+I4jKL6h8V9Y+ZvKePSdHyLl3K2cxVeu2ELWGYn9kdBNybQN
+         HwSkO8ypHC72cX5ZS74m//QkVDF196x6jKiBx6actovWdJVkj0WYRp3UoizYGzfsHBSh
+         rKuBVooqdFpai2B47GN5Ah/m2MwGDQ+powIx09WF35yuCnn2DCzIa6PpdO/UQoRSuhI2
+         YUMqv02hAsaqFtkAK9xqNq7AuO6MDwBysw9s8xaiJRx7lDavsKsoN6RNojjzo1/0w4KL
+         hmHtayeLQuh73YBmiYvPPMvESzI71h4ptCcdTLYUiE0wmJ0OO2v5z5gJTNBXqU6Uj/9c
+         zSTA==
+X-Gm-Message-State: AOJu0Yy26Wj5nkMecLSDOxwasyncSg7GWGSk1fmAFvfYsik+7nCqIuws
+	yD0ZEQXgTYZ677yQ+pjBcjY7QWJW7ehT
+X-Google-Smtp-Source: AGHT+IFfv7gLg824ujXXVdEWgZKOYWbuP9lzhfxDa1/3KwbJLme3HMqGda0Yyr74xWfeSQGPtQP1Cw==
+X-Received: by 2002:a05:600c:600a:b0:40e:474f:17c8 with SMTP id az10-20020a05600c600a00b0040e474f17c8mr1015345wmb.5.1704739922610;
+        Mon, 08 Jan 2024 10:52:02 -0800 (PST)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id s11-20020a05600c45cb00b0040e395cd20bsm11849397wmo.7.2024.01.08.10.52.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 10:52:01 -0800 (PST)
+Message-ID: <8f50f4e6-d815-46c3-be16-5b3c65a80b4f@arista.com>
+Date: Mon, 8 Jan 2024 18:51:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 4/4] Bluetooth: Remove pending ACL connection attempts
-To: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240108183938.468426-1-verdre@v0yd.nl>
- <20240108183938.468426-5-verdre@v0yd.nl>
+User-Agent: Mozilla Thunderbird
+Subject: Re: syslog spam: TCP segment has incorrect auth options set
 Content-Language: en-US
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-In-Reply-To: <20240108183938.468426-5-verdre@v0yd.nl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4T82zc45Qhz9skj
+To: Christian Kujau <lists@nerdbynature.de>
+Cc: netdev@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
+ Francesco Ruggeri <fruggeri@arista.com>,
+ Salam Noureddine <noureddine@arista.com>, David Ahern <dsahern@kernel.org>,
+ linux-kernel@vger.kernel.org
+References: <f6b59324-1417-566f-a976-ff2402718a8d@nerdbynature.de>
+ <fe1752a6-9866-45e6-b011-92a242304fce@arista.com>
+ <491b1b19-f719-1aa6-7757-ba4168228bbd@nerdbynature.de>
+ <65ad94ae-36a9-f128-ea45-26772772ba31@nerdbynature.de>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <65ad94ae-36a9-f128-ea45-26772772ba31@nerdbynature.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 1/8/24 19:39, Jonas Dreßler wrote:
-> With the last commit we moved to using the hci_sync queue for "Create
-> Connection" requests, removing the need for retrying the paging after
-> finished/failed "Create Connection" requests and after the end of
-> inquiries.
+On 1/7/24 19:27, Christian Kujau wrote:
+> On Thu, 4 Jan 2024, Christian Kujau wrote:
+>> On Thu, 4 Jan 2024, Dmitry Safonov wrote:
+>>> Yeah, I guess it's possible to down the severity of these logs, but may
+>>> be unexpected by admins: TCP-MD5 messages existed for long time and
+>>> there may be userspace that expects them (i.e. in arista there are tests
+>>> that look for these specific messages - those would be easy to fix, but
+>>> there may be others outside this company).
+>>
+>> Understood, thanks for explaining that.
+>>
+>>> While thinking on the origin of your issue, it seems that the logs
+>>> produced by either TCP-MD5 or TCP-AO are desired by a user when they
+>>> add/use the authentication. Could you try this and see if that solves
+>>> the issue for you?
+>>
+>> Thanks for preparing that patch so quickly, did not expect that :-)
+>>
+>> I've applied this on top of 6.7.0-rc8 and will report back if I see those 
+>> messages again in the next days.
 > 
-> hci_conn_check_pending() was used to trigger this retry, we can remove it
-> now.
+> No messages so far, great!
 > 
-> Note that we can also remove the special handling for COMMAND_DISALLOWED
-> errors in the completion handler of "Create Connection", because "Create
-> Connection" requests are now always serialized.
+> Tested-by: Christian Kujau <lists@nerdbynature.de>
 > 
-> This is somewhat reverting commit 4c67bc74f016 ("[Bluetooth] Support
-> concurrent connect requests").
-> 
-> With this, the BT_CONNECT2 state of ACL hci_conn objects should now be
-> back to meaning only one thing: That we received a connection request
-> from another device (see hci_conn_request_evt), but the actual connect
-> should be deferred.
-> ---
->   include/net/bluetooth/hci_core.h |  1 -
->   net/bluetooth/hci_conn.c         | 16 ----------------
->   net/bluetooth/hci_event.c        | 21 ++++-----------------
->   3 files changed, 4 insertions(+), 34 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 2c30834c1..d7483958d 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1330,7 +1330,6 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
->   			      u8 role);
->   void hci_conn_del(struct hci_conn *conn);
->   void hci_conn_hash_flush(struct hci_dev *hdev);
-> -void hci_conn_check_pending(struct hci_dev *hdev);
->   
->   struct hci_chan *hci_chan_create(struct hci_conn *conn);
->   void hci_chan_del(struct hci_chan *chan);
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 541d55301..22033057b 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -2534,22 +2534,6 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
->   	}
->   }
->   
-> -/* Check pending connect attempts */
-> -void hci_conn_check_pending(struct hci_dev *hdev)
-> -{
-> -	struct hci_conn *conn;
-> -
-> -	BT_DBG("hdev %s", hdev->name);
-> -
-> -	hci_dev_lock(hdev);
-> -
-> -	conn = hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
-> -	if (conn)
-> -		hci_cmd_sync_queue(hdev, hci_acl_create_connection_sync, conn, NULL);
-> -
-> -	hci_dev_unlock(hdev);
-> -}
-> -
->   static u32 get_link_mode(struct hci_conn *conn)
->   {
->   	u32 link_mode = 0;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index e8b4a0126..91973d6d1 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -117,8 +117,6 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev *hdev, void *data,
->   		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->   	hci_dev_unlock(hdev);
->   
-> -	hci_conn_check_pending(hdev);
-> -
->   	return rp->status;
->   }
->   
-> @@ -149,8 +147,6 @@ static u8 hci_cc_exit_periodic_inq(struct hci_dev *hdev, void *data,
->   
->   	hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);
->   
-> -	hci_conn_check_pending(hdev);
-> -
->   	return rp->status;
->   }
->   
-> @@ -2296,10 +2292,8 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
->   {
->   	bt_dev_dbg(hdev, "status 0x%2.2x", status);
->   
-> -	if (status) {
-> -		hci_conn_check_pending(hdev);
-> +	if (status)
->   		return;
-> -	}
->   
->   	set_bit(HCI_INQUIRY, &hdev->flags);
->   }
-> @@ -2323,12 +2317,9 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
->   
->   	if (status) {
->   		if (conn && conn->state == BT_CONNECT) {
-> -			if (status != HCI_ERROR_COMMAND_DISALLOWED || conn->attempt > 2) {
-> -				conn->state = BT_CLOSED;
-> -				hci_connect_cfm(conn, status);
-> -				hci_conn_del(conn);
-> -			} else
-> -				conn->state = BT_CONNECT2;
-> +			conn->state = BT_CLOSED;
-> +			hci_connect_cfm(conn, status);
-> +			hci_conn_del(conn);
->   		}
->   	} else {
->   		if (!conn) {
-> @@ -3020,8 +3011,6 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, void *data,
->   
->   	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
->   
-> -	hci_conn_check_pending(hdev);
-> -
->   	if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
->   		return;
->   
-> @@ -3247,8 +3236,6 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
->   
->   unlock:
->   	hci_dev_unlock(hdev);
-> -
-> -	hci_conn_check_pending(hdev);
->   }
->   
->   static void hci_reject_conn(struct hci_dev *hdev, bdaddr_t *bdaddr)
+> Thanks again for fixing this so quickly,
 
-Please take a special look at this one: I'm not sure if I'm breaking the 
-functionality of deferred connecting using BT_CONNECT2 in 
-hci_conn_request_evt() here, as I don't see anywhere where we check for 
-this state and establish a connection later.
+Thank you for the report and the testing.
+It's a bit late to add your tag, but on a good side the patch went in
+v6.7 release, so you will not have to have any out-of-tree fix for
+this :-)
 
-It seems that this is how hci_conn_request_evt() was initially written 
-though, hci_conn_check_pending() only got introduced later and seems 
-unrelated.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4c8530dc7d7d
 
 Thanks,
-Jonas
+            Dmitry
+
 
