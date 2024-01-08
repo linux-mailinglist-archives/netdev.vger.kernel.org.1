@@ -1,117 +1,157 @@
-Return-Path: <netdev+bounces-62425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43490827164
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 15:31:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E36827181
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 15:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB5521F230C3
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 14:31:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA02D2824B6
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 14:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62FC7FF;
-	Mon,  8 Jan 2024 14:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CA06D6E4;
+	Mon,  8 Jan 2024 14:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bMe1P/Xy"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="bD8nXFtj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2062.outbound.protection.outlook.com [40.107.20.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FCD6D6E4
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 14:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a28d25253d2so192204766b.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 06:31:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704724302; x=1705329102; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PM9kipN//5dmi9A5cadQkBtMsfqYlFsxzZhAvhC6a7o=;
-        b=bMe1P/Xynon32C42EBPucdUzBsfjMHaOk6RIdYcCa0Px4NnLAKIb9Ke0sCVUaodNfY
-         SJYoO09Li5SQUdnthxLXgqrQGAlzKPnL4ERs2A2A/yTIvbzsZ53NWSM8UCDwD9RvJ6Xh
-         iDr+cPmoWt/g5LlezssgrP+4eahF7S/0Xy7VER3XImUnyxwdQVcLv3M3rEpW48QuYxma
-         80A9t/vrTDLFnIzAAK8eXH+jnX7zwRAcKt0op9lrLA6E9NEegjkAe8oQOqgEFbzuNatM
-         bXM4O75DuDehVrieamC4a68oFAGmNtOfh9tQWB8Ldjp2yGQD0gL2/8iYBxX4Vv1r1NGN
-         gACQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704724302; x=1705329102;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PM9kipN//5dmi9A5cadQkBtMsfqYlFsxzZhAvhC6a7o=;
-        b=Gfn9Ht1KyAfZh2cwezAP1/a2KF/CBv8j8F4ekz6DQGTDuQAE6ZmCRNXih8idiluFPm
-         HoBJrj+YEWOvLktmqYs5Fl7bItK+6GyRNnsHuxhd7IsXdDRhsk5uJOSNDUzx9+9+M5ub
-         OwJr+8J/6/8u8WMYuUHuuU2ArT6fj2or8jlfN454fzcmDKXl9qDRIjyq8iR8M/+RB39h
-         esiIB7CmhS1/+atAF2JdySuAz1FMNUiSBNUPpPndE8IrWXxYgX3mFwXaLhX6M5ANHg4X
-         bR2wJvcvWCP2grZA0OdisW+EnYMYdVI+k7DMIM66huHnhf3lRdAywKatVMd58SDpPwgh
-         MFxg==
-X-Gm-Message-State: AOJu0YyYaAC5C4jF7GQrPUP22eCUUVVkz+ACGlM+t7xO53vzM9jeKScW
-	xKQJhZWRYpAJKrBnGwjwKao=
-X-Google-Smtp-Source: AGHT+IEIlk6KtKsti1kV8qXyoX07cX7/QPYrir5NKqIFjobjAUhwpW/ZzUJLtr5zkVhNtobgoRgxvQ==
-X-Received: by 2002:a17:906:c295:b0:a28:e077:ce14 with SMTP id r21-20020a170906c29500b00a28e077ce14mr1593339ejz.43.1704724302218;
-        Mon, 08 Jan 2024 06:31:42 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id q1-20020a170906a08100b00a2777219307sm3937178ejy.202.2024.01.08.06.31.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 06:31:41 -0800 (PST)
-Date: Mon, 8 Jan 2024 16:31:39 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	arinc.unal@arinc9.com
-Subject: Re: [PATCH net-next v3 6/8] net: dsa: realtek: migrate user_mii_bus
- setup to realtek-dsa
-Message-ID: <20240108143139.6igg5emhtdj2nh3o@skbuf>
-References: <20231223005253.17891-1-luizluca@gmail.com>
- <20231223005253.17891-1-luizluca@gmail.com>
- <20231223005253.17891-7-luizluca@gmail.com>
- <20231223005253.17891-7-luizluca@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4B346B81;
+	Mon,  8 Jan 2024 14:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YzYHg5r2r9FBG9JAJ+m3cIBIrhX5bwBzjA0zqVQlIy4oLZflKvDCDRcEDt/t6Gy1MU/6GWZwHZVEQP1QUtJmS0j7g8g8t52XcJLIAhMlgCAABEuHVYw9LyzZVNqritijaN7+lvEIvjH9EgDFfUKwec678cuH08D3FzUCjeOgiAvLvGhhJW+Tt69W+NtthnEVLjr8bBKk/R70uTzDxoiUO56janR2ze1YlXb7Ve2DYzZ03ToUJBVHg1B8oF9VsDQCt6jw8FIdmxPE54z6fF+0iz68qJN30M/Mp4NQ7bkrnE+RAFzL4oKKuqoY6zYAzHGw2PM+vTSsdtxPzHgFgcAGKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kl0B91oz0NG6sKsJO57PPLzXhIrKeAFuFL83vdTZPhE=;
+ b=PKCCCnb8Xcx1vd4lFjRaj8tDLWfoJPMZXC3LFqL/cCyyeSpMjtyd20ysi6cxZ7sXCD9IIMa7xoL4/Cui3gXSI2r2DUJmvMEmyBJxrNo9XRkNYI/4mhbbNjBCkQV3AQA+eTWnR+5zLw+0rEVuOtPluD7l3U3zkrKPkyeH3OOXDYIRH0lpAxEv7jkW2/t7rwpVXKad6mOJmRTGQAZX1JqcSjMcGHWqDEBvvRARjeiFD06b6Hedbm0lJRAM28Xu3zUafFbJzOwRAKaqoCos5mIn7jRil/nR05xcHr7K6Kxqu78oquleUhSA1jr6kzb9OsUvfCfo1cTkoFVtE0OcACwMsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kl0B91oz0NG6sKsJO57PPLzXhIrKeAFuFL83vdTZPhE=;
+ b=bD8nXFtjJ++6dPseffyeFUXfSYtHObc4Ew7w5jS7Lg8lGq/Kbcje8W+cNs6grRxOipXFFj+muh5EXLMQ1Ivb1X2XNzaDYm50NW0NfhQoaB0cmdRapJaKHkuiz2fI4JbpT/OQDNVBB6o8BXbYE0iion0We9+jOJZO5hd/bQmcxVg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com (2603:10a6:800:1ac::11)
+ by AM7PR04MB7062.eurprd04.prod.outlook.com (2603:10a6:20b:122::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.13; Mon, 8 Jan
+ 2024 14:36:18 +0000
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::901f:7d8d:f07c:e976]) by VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::901f:7d8d:f07c:e976%3]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
+ 14:36:17 +0000
+Date: Mon, 8 Jan 2024 16:36:14 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Sylvain Girard <sylvain.girard@se.com>,
+	Pascal EBERHARD <pascal.eberhard@se.com>,
+	Richard Tresidder <rtresidd@electromag.com.au>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v3 1/1] net: stmmac: Prevent DSA tags from breaking C
+Message-ID: <20240108143614.ldeizw33o6l7aevi@skbuf>
+References: <20240108130238.j2denbdj3ifasbqi@skbuf>
+ <3c2f6555-53b6-be1c-3d7b-7a6dc95b46fe@bootlin.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3c2f6555-53b6-be1c-3d7b-7a6dc95b46fe@bootlin.com>
+X-ClientProxiedBy: VI1PR0102CA0005.eurprd01.prod.exchangelabs.com
+ (2603:10a6:802::18) To VE1PR04MB7374.eurprd04.prod.outlook.com
+ (2603:10a6:800:1ac::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231223005253.17891-7-luizluca@gmail.com>
- <20231223005253.17891-7-luizluca@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7374:EE_|AM7PR04MB7062:EE_
+X-MS-Office365-Filtering-Correlation-Id: d98479b3-ee5f-4bf8-8854-08dc10572c39
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	WK2RC60ueJPPwNa0P3DuXqJ7QBioqkt6D0dkR7wBAqk6+C8M5SAcocVJ6w7f2nlzCd0+kEBkb5fkrkyPMFlrlCZIf9SFJJn2z8zltv6uhSiiowke62SCL03mJmR6Ya88c/XIXB/AEjuYrnABgpeM6GP5lHUx/DdkXHm2l9Kq04v7+HJYt9cbV6ERbOHwZwVVjUOgp15/FU0uZ370ECzum2zue8c1CbSYtcX2fJGf+gKc/4JcoaRog1zSduhiehKSSFloOlQWIqOUc9ZuzEmQ4n84tf33PPZlXJCziMZ7o0Bkk05Rt7B8fZUZka0GnNhAiV0wek/O16tJaWIUlTZiig8UDWWDA7Fwg2PYXCFtvUxiSLAFiZ3WGT5DZrECeL/e67SQVGi/Pixj3pcowBdsnXWs6I+mikSSAlKMZiGawbAICAYSgM2pblwPVvUltcEeR/3Yj+v7NSzCYgkODQxY4GkhRuLhVtXyiyEovxuNjbOx841fd36eoYp1DFEkqw+gcOJ/dVsY91gI/M5i8BAFj+Sy8th4HBkbOPZeKvGblGfyn+QGLviyaYa/H4UYzyKu
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7374.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(136003)(39860400002)(366004)(396003)(376002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(7416002)(41300700001)(33716001)(4326008)(1076003)(44832011)(26005)(5660300002)(38100700002)(9686003)(316002)(6512007)(6506007)(54906003)(4744005)(6666004)(66476007)(2906002)(6916009)(86362001)(83380400001)(66556008)(66946007)(8936002)(8676002)(6486002)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?AXxVqdQU3CUwmICrgaVVYlthRV4TKDe+dwSVrk3027HjG8G2Swr1o1Vhp23F?=
+ =?us-ascii?Q?Qqkl96PiAzSdpPDnDdM8Gv26sXu2z0azqTGSRvBfHQ3m4fGKWNUgFFad1/g9?=
+ =?us-ascii?Q?kIbVG0lUhUo2k4p9qJY49S9sNZIqsVjwaUIu99U/9PMRQSZ9LG0LNdLv4Sg1?=
+ =?us-ascii?Q?DKoOwDzi5XL0lN/4z2gbiCbahpZ9CD5aWiH4IZ0hLk9Q0Oo8nOCx+RBWw1ss?=
+ =?us-ascii?Q?B7BmV9aAmIiqUwtfia2N+tap3GlEvrtccLrQM5/dBrUvGhOxfrDKNsVc7Y8f?=
+ =?us-ascii?Q?7GUaJPSx2o3HUwLyNugH/VF8eAedtDBn8VvryIKtV/DID1VNLDydPaalCgLx?=
+ =?us-ascii?Q?c3HbEX360f5bcGoMZ7y5FLsxAczvsXuj9/Y9+EqUdy3Hfj9d2VHzlPxOF34z?=
+ =?us-ascii?Q?aWSCTHDT+iHgD1VxgU2EBdZuA+HxDdWy69oRIznwaCCT7fxMm9pIbHx3BWY5?=
+ =?us-ascii?Q?8/ocZQYDRkrTDrHxXcKM4xUxlZloTxuJFSV3FE5wCNBa3XmJ7oyHN95vXRVO?=
+ =?us-ascii?Q?EYk49xdjzgbOLfvVXN7MzDpO48Wj8mFWw9IaBYeetanOSVoH4lywF69arKxc?=
+ =?us-ascii?Q?BB9S/EdTNcqgZ47OmzATi/o9AlKHgYgmMAVsOyuoG5BgAj1VKY8SJfbFLUJl?=
+ =?us-ascii?Q?eHb5gNpcUnOHXRjqUvPyUtDwIM7jP2KI+vtu63JIeu5qNbs1GIuXlMBPOvmQ?=
+ =?us-ascii?Q?1Y2kGJmrep49+hvk0hKmeMzh69oRZOevgdkEUOIjdUf7eGI4+2m1EWXiaLa4?=
+ =?us-ascii?Q?gWgai6e1LVxTeXtCuzJvS938srjWuDyZ9wIVeZE9MTOzauO8nO/NP+QpZoMr?=
+ =?us-ascii?Q?S5VDkjeazjwnB0va7yybP2w+1Em0vrP8EigrPE8lmPzfex7QRZul1fUWp5io?=
+ =?us-ascii?Q?gXKyaZbrUDKA5GZqSZNzyXm884fVtYqSeQ/SxMokIKlbFmfH1xPeKyax2OMZ?=
+ =?us-ascii?Q?apVGdQXfFjY86/QAK7/IyGQIat8JnL6KVV4eFl1k4owIT9VmwTBoegQeQRZ2?=
+ =?us-ascii?Q?e7oK5DqfvfUT7eE6WfAFTXhDG+T9q2QTNTGCMzHyxft2VqEr96PMSUg4nNgE?=
+ =?us-ascii?Q?SZCA7SJGFc+sSAc+A0zZTx/YudLP6Qgk+++FqX6ZYvDP56MW1kHaC/zK5tFC?=
+ =?us-ascii?Q?cVMu32rKyyFWUJVivaxPfg6t0X5keqF+GwEkzMy5yu0RPs+DU/L/75uZjMIo?=
+ =?us-ascii?Q?JhQFRfxwulCPVXYhCn/MqhSkWXXJzOqPfFvgVRZN3pewCVoqv0w1rEvUQ95U?=
+ =?us-ascii?Q?0TQh5QmZjogjm71IDcGPRr4hM+MUN1OBOPUhdLyEFVycNk9ypsOeOKPKVLyd?=
+ =?us-ascii?Q?SSTrebXwuF/1l84GVKq9vMe2PTc0XuovBrhBOESeAEddp0INot50zC9sEzCj?=
+ =?us-ascii?Q?obQr0QPnt0449AOzmtvS9wBluZVfI5w6hO2sGz8DHJy4N3QHDwXZ9Agt6b/X?=
+ =?us-ascii?Q?TZElwohCD9xDX4O7vS3EEhdJGTwc8WN7JnqIgvdjGnmBcx7XD30VYJgFIVm/?=
+ =?us-ascii?Q?ijOyPR9Afs4ernD1lKfWppXoCZCuHpV7GS50PWaOe46N3Ttl4suF+m2CimrP?=
+ =?us-ascii?Q?QmDzg6OqSdZ33wmqmUrYzamZ8oG4a3YJDg3E4Nwj2PAkS+uhH0NRzUJoUEFz?=
+ =?us-ascii?Q?2g=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d98479b3-ee5f-4bf8-8854-08dc10572c39
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7374.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 14:36:17.3862
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nmg4PylvcU/QUIi5iyLKJzBupQYfQpFp7WY5mGM68Q5Vf7WwAHG+/ANYadGHEWDYxn/xKxjXLOeL0cvl+2t55Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7062
 
-On Fri, Dec 22, 2023 at 09:46:34PM -0300, Luiz Angelo Daros de Luca wrote:
-> In the user MDIO driver, despite numerous references to SMI, including
-> its compatible string, there's nothing inherently specific about the SMI
-> interface in the user MDIO bus. Consequently, the code has been migrated
-> to the common module. All references to SMI have been eliminated.
+On Mon, Jan 08, 2024 at 03:23:38PM +0100, Romain Gantois wrote:
+> I see, the kernel docs were indeed enlightening on this point. As a side note, 
+> I've just benchmarked both the "with-inline" and "without-inline" versions. 
+> First of all, objdump seems to confirm that GCC does indeed follow this pragma 
+> in this particular case. Also, RX perfs are better with stmmac_has_ip_ethertype 
+> inlined, but TX perfs are actually consistently worse with this function 
+> inlined, which could very well be caused by cache effects.
 > 
-> The realtek-mdio will now use this driver instead of the generic DSA
-> driver ("dsa user smi"), which should not be used with OF[1].
-> 
-> The driver now looks for the MDIO node searchking for a child node named
-> "mdio" instead of using the compatible string. This requirement is
-> already present in binding docs for both interfaces.
-> 
-> The line assigning dev.of_node in mdio_bus has been removed since the
-> subsequent of_mdiobus_register will always overwrite it.
-> 
-> ds->user_mii_bus is not assigned anymore[2]. It should work as before as
-> long as the switch ports have a valid phy-handle property.
-> 
-> With a single ds_ops for both interfaces, the ds_ops in realtek_priv is
-> no longer necessary. Now, the realtek_variant.ds_ops can be used
-> directly.
-> 
-> The realtek_priv.setup_interface() has been removed as we can directly
-> call the new common function.
-> 
-> The switch unregistration and the MDIO node decrement in refcount were
-> moved into realtek_common_remove() as both interfaces now need to put
-> the MDIO node.
+> In any case, I think it is better to remove the "inline" pragma as you said. 
+> I'll do that in v4.
 
-Can you please make all these individual changes separate patches,
-some before moving the code to realtek_common, and some after?
-There's a lot of stuff happening at once here.
+Are you doing any code instrumentation, or just measuring the results
+and deducing what might cause them?
+
+It might be worth looking at the perf events and seeing what function
+consumes the most amount of time.
+
+CPU_CORE=0
+perf record -e cycles -C $CPU_CORE sleep 10 && perf report
+perf record -e cache-misses -C $CPU_CORE sleep 10 && perf report
 
