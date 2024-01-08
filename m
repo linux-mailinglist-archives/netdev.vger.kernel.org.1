@@ -1,159 +1,88 @@
-Return-Path: <netdev+bounces-62327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E16E826AB8
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:31:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AE09826AD1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:36:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB930282439
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:31:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E41A11F21A70
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BA711C80;
-	Mon,  8 Jan 2024 09:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AAF1170D;
+	Mon,  8 Jan 2024 09:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ivMW7d9X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BQQgQSib"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB4911715;
-	Mon,  8 Jan 2024 09:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4086SBET016678;
-	Mon, 8 Jan 2024 09:30:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=+F8oN0qma4p6Z1qwuUBJZxhgmsCOj1+a0cZVSG0F6nA=; b=iv
-	MW7d9XQ6s90oKbPs5g3fCeBUJj9sng8+PNoHZmBTJrBx4z0K0BNX1uBa6aO36R3R
-	YlJzrPInLUN5FCRMpq4fGMwDhg48/zCCy8sUr9qrz2Daoa2TpPJYexncSdIn4Lds
-	OizWKhKL2YyhVsArW673EQak1Q0NQfreNV4vWIikntUVM0SqoWUrj/m8wbcZa2kg
-	2GMS6QScsf7t3dWa+HoChTDF6jrvtOojE9ZEsWH9IjK7mJyhzqft0gxstuNvq9oz
-	X7OiTcyQLKcefVBfBqdKGEATVVbVJwQM8QFG6WhZQiBJeqJJOjCbRQieJe+MoVXp
-	asEL+uA7y2dmQaeMpTow==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vg97b0jtq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 09:30:43 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4089UgPb018611
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 8 Jan 2024 09:30:42 GMT
-Received: from [10.253.76.26] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 8 Jan
- 2024 01:30:35 -0800
-Message-ID: <f0ccabbd-29db-4a4f-9490-c2ce2cf3e46d@quicinc.com>
-Date: Mon, 8 Jan 2024 17:30:31 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D53A11C87
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 09:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-557bbcaa4c0so3495a12.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 01:36:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704706597; x=1705311397; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lg9hufbVidfHAmI5ZgttAm0DeGef8j22F2L1BuwztS0=;
+        b=BQQgQSibcywtDUA3kOTWAcnuuAZWa4es1Ur9R4XCp60wcEs4Mno6CZtTwFEcRP4BX3
+         4DaV21NO+5dh7j6XOdDJZTQvfxZbdXYBAdrGyzZCZvV7NScMqjoWAaMHcEnYEOGl8to6
+         ItQGfEYXAG0tdiMu/JNwTPQisI4KmsAQnjJLgPlGIYHyh9pZ07lFPfqtNvUUQ8/WGc+G
+         y14Cau8QX5ZSn9sOvVzyz0QBp3/ZMhjlphGKGyr0ggxQaD+emjXl4lcbq2PHm3NTLD4l
+         N7z8lpxV01rkgZLSDivQyppeG0FrrABXrDBJWZX81OkVrVoKHfKv1Mu7nHiuG+fXTEBX
+         DCEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704706597; x=1705311397;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lg9hufbVidfHAmI5ZgttAm0DeGef8j22F2L1BuwztS0=;
+        b=bX8K7G7PHEyWKfaiRHgTf94V0fG7MR6U4JCBR3PEzPtPtn0RBArq6GnwX7Q6s71udM
+         6l9pxAfaLV3Xq8HOVY3J8h/3H83jfCi5Ow/1ymm0R+1VfXoIdC+OZyeBaOF50Sa2u3ZK
+         48I+FUN6bv2KrPQS8cfE2XZI54fVfG9onIZ8chGOS5YPTxDokNXBC4JuvXwJKJfjrQ8H
+         aZlt/w58xaMfLiO8P8j7hCOgB0mFf1GMO1XDuhCZ2GETLQ8T1/iASXBih66zlKtu5+8g
+         JeE3oQzXopr4IwuLPhG9YvD6ZVQq+SjBdaBhCqwn5rJaMNvMho0HNSBHTC2EOCdNLHZu
+         VERQ==
+X-Gm-Message-State: AOJu0YyyECp6X0/foFtejNS1++ogy3zhNNsZMXFl0SQaW+ewPhvDXuZF
+	y8PYwzQK3NyvWmXb3vmztHKG6OS0xSecA4bgWG1IZwluPCat
+X-Google-Smtp-Source: AGHT+IGfDX7JtOJLy6KHjhhk89HG3XMG7mjN2L+LrG5sjsjQNz9K1E8kKp2RSSbrIOPpoP0ts7EhI4bCjZMyzANugsY=
+X-Received: by 2002:a50:c350:0:b0:554:53d0:23f1 with SMTP id
+ q16-20020a50c350000000b0055453d023f1mr264431edb.0.1704706596664; Mon, 08 Jan
+ 2024 01:36:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/5] support ipq5332 platform
-Content-Language: en-US
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
- <a6a50fb6-871f-424c-a146-12b2628b8b64@gmail.com>
- <cfb04c82-3cc3-49f6-9a8a-1f6d1a22df40@quicinc.com>
- <dd05a599-247a-4516-8ad3-7550ceea99f7@gmail.com>
- <8ef607b9-1fc6-485b-a6fb-a8d468cc1954@lunn.ch>
- <d639824c-74e2-45f4-bd8a-7e20fad8d61b@gmail.com>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <d639824c-74e2-45f4-bd8a-7e20fad8d61b@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: dQOIm-i8d_uHfkJhTNceF3j9HV6VVDc8
-X-Proofpoint-ORIG-GUID: dQOIm-i8d_uHfkJhTNceF3j9HV6VVDc8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 phishscore=0 clxscore=1015 mlxscore=0 bulkscore=0
- priorityscore=1501 malwarescore=0 mlxlogscore=999 suspectscore=0
- spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2401080080
+References: <20240105170313.2946078-1-edumazet@google.com> <adb52b11-0a7e-4c62-9516-d29aa88d75df@kernel.org>
+In-Reply-To: <adb52b11-0a7e-4c62-9516-d29aa88d75df@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 8 Jan 2024 10:36:23 +0100
+Message-ID: <CANn89iJ6LERiNz_Uj0NTVLiDCWdHqFjmeMGk=XopF=LgnFj7ig@mail.gmail.com>
+Subject: Re: [PATCH net] ip6_tunnel: fix NEXTHDR_FRAGMENT handling in ip6_tnl_parse_tlv_enc_lim()
+To: David Ahern <dsahern@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Jan 6, 2024 at 5:10=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
+te:
 
+> you dropped the comment above the may_pull which is helpful for reviewers=
+.
+>
 
-On 1/6/2024 4:14 AM, Sergey Ryazanov wrote:
-> Hi Andrew,
-> 
-> On 05.01.2024 15:52, Andrew Lunn wrote:
->> On Fri, Jan 05, 2024 at 04:48:31AM +0200, Sergey Ryazanov wrote:
->>> Hi Luo,
->>>
->>> thank you for explaining the case in such details. I also have 
->>> checked the
->>> related DTSs in the Linaro repository to be more familiar with the 
->>> I/O mem
->>> layout. Specifically I checked these two, hope they are relevant to the
->>> discussion:
->>> https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/blob/NHSS.QSDK.12.4.r3/arch/arm64/boot/dts/qcom/ipq5332.dtsi
->>> https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/blob/NHSS.QSDK.12.4.r3/arch/arm64/boot/dts/qcom/ipq9574.dtsi
->>>
->>> Please find my comments below.
->>
->> Hi Sergey
->>
->> There is a second thread going on, focused around the quad PHY. See:
->>
->> https://lore.kernel.org/netdev/60b9081c-76fa-4122-b7ae-5c3dcf7229f9@lunn.ch/
-> 
-> Yeah. I had read your discussion yesterday before coming back to this 
-> clock discussion. It is a monster chip and looks like you have a hard 
-> time figuring out how it works and looking for a good code/DT model.
+Yes, this is because I reload "hdr =3D (struct ipv6_opt_hdr *)(skb->data
++ off);" right after the pskb_may_pull(),
+so there is no more stale pointer.
 
-qca8084 is indeed a little complex, unlike other qcom PHY chips, qca8084
-also includes the integrated clock controller that generates the
-different clocks for the link of quad PHYs, which leads to some
-misunderstanding of the clocks and resets used by qca8084.
-
-i will refer to Christian's code and base on that to propose the DT
-model of qca8084 for the review.
-
-I am really sorry for the annoyance and misunderstanding caused by my
-patches and replies.
-
-> 
->> Since it is very hard to get consistent information out of Luo, he has
->> annoyed nearly all the PHY maintainers and all the DT maintainers, i'm
->> going back to baby steps, focusing on just the quad pure PHY, and
->> trying to get that understood and correctly described in DT.
->>
->> However, does Linaro have any interest in just taking over this work,
->> or mentoring Luo?
-> 
-> I should clarify here a bit. I found this discussion while looking for a 
-> way to port one open source firmware to my router based on previous IPQ 
-> generation. And since I am a bit familiar with this chip family, I chose 
-> to put my 2c to make implementation discussion more structured. Long 
-> story short, I have no idea about Linaro's plans :)
-> 
-> If I am allowed to speak, the chosen baby steps approach to focus on 
-> pure PHY seems to be the only sane method in that case. Considering 
-> Alex's promise, we can assume that the next release will support this PHY.
-> 
-> -- 
-> Sergey
-
-Thanks for help and guidance.
+Thanks.
 
