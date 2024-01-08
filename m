@@ -1,175 +1,182 @@
-Return-Path: <netdev+bounces-62366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02D67826CA7
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:26:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4FE8826CC6
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:29:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17DC0B21449
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:26:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3892B1F22679
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0E914A8C;
-	Mon,  8 Jan 2024 11:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31BEE2575D;
+	Mon,  8 Jan 2024 11:28:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="G25CXPPn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3GuYmbr"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2100.outbound.protection.outlook.com [40.107.20.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207592940C;
-	Mon,  8 Jan 2024 11:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LQU7LbkRTswMsgBFNRW5wQ53sJrbEMHoFDgf6GCVBEwhFRxs9rvgSzfln03addTkyFwb8REQSQDnql+XtipEjD/oVDFmsPOhaEVCPhnHrZ+yqLvAMPAt6QA+EtVqc72hJzaGHSBbIvhFrf07LaedLT7yZKUE8dZwlSwm47cjh4XEOuy4JGZBX4s4RMGGuAR+xwULEug0mGilU1fYAYGSLDgplKi0QdKmzxzoW5abzi6UDxmaGE4uojImmg3/etfmzNQGjYxWlJLt06pRT8238zIreZmBR4WPFG0BqEiYnkq/w756Q+Xu/Nwu2E1QWVq8V16+bhmNYPop0eCbOUving==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tAsun7zHKnm6AbVuxCVsU8MNxyu6/LDHXpVbaaPdN60=;
- b=U95RxUsLpWsEyZ52uBDvTWPeM/d+YaiMwsf6fawGKywk6Zf/gclT1XkiRgPItygJzVAqtSl1EW3/8Zwu/KdOq1s23xWsnguXyJMEL7ctnHGu7s+5Hwu3S6GINnNQI/s7lLqYcArghBYbl1A23FMiJ9iedffSIpVdo9oLGV2kSpR06s9RlbX4bM84hswJJRhzioYdeFcgP0v8SO7El7j3nM7zK/0yFRc2LrK9w9Vxm2uyjJ1VBgjNGjxcrmnAYaYIjo6DLNwuU/KHKNsrpkfpvv+wYndXiOfNIdruF6OQzu+8uSu8wnH569rcP5YWiSCpQhXF6fU8XI+cstWAUq0CZg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tAsun7zHKnm6AbVuxCVsU8MNxyu6/LDHXpVbaaPdN60=;
- b=G25CXPPnJaUw/jJNUA0xgYO+4F9UEFSf2XN/vRYvc+DHX9KaYSymJfLhyz17ZXbdN2R2tg6Ral7Fnd0orMZgp1aPUTGNeDBMplkg6FhqfLRWSFgZF9ClNXQ1fopbafMe2d7nsE3cN8N4cmEApJo9y8lGolemkZhnwxOvjq5lMLZnS2yuYUYMwsiMunxp6EbG83WVEwTm3xBKIMEr1ySKag6mWq59wvxYAbEN+IyVgyfcFHtFCf3blIWAa9q87GRNMjzuVtzGKIcdC8ccm4EMMA4tjKoq0WTjNK12kp0OtX5Uk5rP72oQHtPoNpUYBvdRw5BpOVR4qjfxPj+7Zcov4w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=virtuozzo.com;
-Received: from DU0PR08MB9003.eurprd08.prod.outlook.com (2603:10a6:10:471::13)
- by AS2PR08MB9522.eurprd08.prod.outlook.com (2603:10a6:20b:60e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Mon, 8 Jan
- 2024 11:26:16 +0000
-Received: from DU0PR08MB9003.eurprd08.prod.outlook.com
- ([fe80::72c4:98fc:4d1b:b9ba]) by DU0PR08MB9003.eurprd08.prod.outlook.com
- ([fe80::72c4:98fc:4d1b:b9ba%5]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
- 11:26:16 +0000
-Message-ID: <a84b2797-2008-45d6-9ca3-c72666d3c419@virtuozzo.com>
-Date: Mon, 8 Jan 2024 19:26:09 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] neighbour: purge nf_bridged skb from foreign device neigh
-Content-Language: en-US
-To: Florian Westphal <fw@strlen.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@openvz.org
-References: <20240108085232.95437-1-ptikhomirov@virtuozzo.com>
- <20240108111504.GA23297@breakpoint.cc>
-From: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
-In-Reply-To: <20240108111504.GA23297@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: KL1PR01CA0082.apcprd01.prod.exchangelabs.com
- (2603:1096:820:2::22) To DU0PR08MB9003.eurprd08.prod.outlook.com
- (2603:10a6:10:471::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAE124A16;
+	Mon,  8 Jan 2024 11:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e7abe4be4so1929367e87.2;
+        Mon, 08 Jan 2024 03:28:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704713334; x=1705318134; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=34+Hh1uk9VxtvZ2GfRjoXGwErtXBneQsLCS3zgd7mFU=;
+        b=R3GuYmbrcV/lEG2tQO50Omd2Vk58f5fUQ2WM+zWfVd6Zw9+d9dx1hzKSMEQP5l8Qhc
+         kfY6Db7Gp4u3AHWOXYYe8Bvvfdr059ximHZ82I5gS9ghrI0AbYSYpPAjc2/Z8IG7qCPR
+         dKQtiziWtznUg4a9RL0PmvW2VDsGJQV4K2RL8/B3Kq6P3Rw7DOoSSkZif96ib9ld0FZW
+         /QptZfp826eXPr40nJW68VIxAY2H4bqdF6PJwDukZDDzK189WBKKHZ9EJY7VvhFW03Uc
+         3Z/RScpO041ZJ3nuOS5nAtP8ZiS1i2Uj1b4JRd1x7VZzvn+kFxY443ujx/xYD6Voi1Z1
+         T2zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704713334; x=1705318134;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=34+Hh1uk9VxtvZ2GfRjoXGwErtXBneQsLCS3zgd7mFU=;
+        b=VBRY+kM4cYBz/Ko7eWJc9qvuYBq3bu4zMHN4sRFcPaSOtcFZ7V3zeMxW0G1lsqSXkO
+         ILwuVPg9fNx7XSwEnuEQzM2stGCmFUKsX+RvaseKti7Y3d8ci6Ztg8RWX2KWIVjjN5wo
+         U+0eXTtYkNwYG1lLxf97wQDr2kurf7/Yc1FivqFrChHtacImiU4EbPyM6wFaoa4Jwash
+         an2mO93O1y34p1p439Foyg0Oiyt1VvVHv7pjTN8JniE+cZyDK/LmaP1zaGFvoO7IT50U
+         rsuHnLhrffPZ7Tet0R1/MVuM9e+6j2PHJpsnIYML75ztG06WXKKAgYb8ykqj5TrTJRZx
+         IP9g==
+X-Gm-Message-State: AOJu0YwlsM+uhmK8ZZ+hk2yUNZm75YUNcAd3t6miK0cCnEpW1u41VonY
+	0I0Ai0D26cj5/bKaq33ezLo=
+X-Google-Smtp-Source: AGHT+IGn/2vZPSk/8n6rmWmLg+R5k7+IUkawAqpMXWY+zlyCYCX3GaqtEIYati7VBNCGFPGHA0vAaw==
+X-Received: by 2002:ac2:48a6:0:b0:50e:beb0:5f96 with SMTP id u6-20020ac248a6000000b0050ebeb05f96mr930361lfg.46.1704713334145;
+        Mon, 08 Jan 2024 03:28:54 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6f31:8f00:9009:65a0:ed7:b9d? (dynamic-2a01-0c22-6f31-8f00-9009-65a0-0ed7-0b9d.c22.pool.telefonica.de. [2a01:c22:6f31:8f00:9009:65a0:ed7:b9d])
+        by smtp.googlemail.com with ESMTPSA id lc8-20020a170906dfe800b00a2b09bfb648sm113600ejc.5.2024.01.08.03.28.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 03:28:53 -0800 (PST)
+Message-ID: <01f4cadb-fdf2-4cc9-a5db-4e0fa2636159@gmail.com>
+Date: Mon, 8 Jan 2024 12:28:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU0PR08MB9003:EE_|AS2PR08MB9522:EE_
-X-MS-Office365-Filtering-Correlation-Id: 285c91a3-2eb1-474f-b794-08dc103ca094
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	HQne/xuNnRCPUGm2lRg5pTs8/mDrDQlLUXdaQaeSCEcfzz/IwtyECi8+lMsL0+AmJ94gDOhBOKqhQtfFQUnQc9/yCczkUXRfPuoZ+boJi3iNzv57jegMBupyBK90GZg/z34vO6OCnXqBVbRgD1o4OFrOCXXyibA0mjroTGk0V58M2tTdkbK/GKwDvlKzIR/osABS3bleysURDVqoiy5i87BR0ZgZWQktnZmvvoqPGUqFD12wTMPhzBJeB74YdgGYRZMp9On+pxFANSsKje0VbYjGrYhrIQtbU2u+8cfoNPeAbKujcuV72nTDr4msrrFBt5Ow7g32qHxMckY2Qlc/dkyTRBwacXeIjvPdT4D+vOA+ojYNjLZG0hMiIXGYb3ux/9zEK6bXWtIK63tNHcegRkr3HOwQEEUt2CVixE3Adu4XeiXRvg4oFx4iVUN1u5SOTBk/p8GgyabfShPfFVIJhDhRw59LebOH/dl1OEJCB1mCnO5M8oQy4v1eD/u6PdMcQX43xqXCeqYRyyUhQOr62h37BpKwUaraczrvvCX7TS1YNpQH9m3wxUoJNIKWSdRUjKhga3PXsawG1PyXHooitiZnYAI9J2X0klSn1iGdHx96UfSqsB4B96XMIRJzGA8kSHD9O8npmXmE3AtQ8yHoMg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR08MB9003.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(366004)(39840400004)(346002)(396003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(4326008)(66946007)(478600001)(38100700002)(6486002)(8676002)(8936002)(83380400001)(2616005)(107886003)(53546011)(6506007)(6512007)(6666004)(66556008)(66476007)(6916009)(54906003)(31686004)(316002)(5660300002)(2906002)(86362001)(31696002)(36756003)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UVNrTXREWnZ1MUE1MWd1bU56VUhFYkwrdU5yMG5Cc09iTDV3RHdLR0dFcDdp?=
- =?utf-8?B?K0pDV1VzMUJwZlYzWG1CWlRiMlp3Tkp2a3ZKWXJ3Ri9BV0FEOHJGcjU2N21o?=
- =?utf-8?B?aWYyVEl3ek5ZbW5MNW5Zdko2YmMwb2RPdU1vaTFIbjlJbmhOZUVxeU9xdm9z?=
- =?utf-8?B?eDlYZzU4STE2OGZCWWZQeFlhaWNCWjdKZXRwNGxZdy9ISmIvM0l0bldzWS9p?=
- =?utf-8?B?Z2piYmlJcXNmYnY0NGRnTFlRb09oQkcrYmZlbjFLODR4akMyeEFWbndTc3p6?=
- =?utf-8?B?c1ZDbnBtcjZVZ1VVN0JrTWNMYmRlazZWcm1RNDVHMEdlYTl3Q3A3MmpoTzA3?=
- =?utf-8?B?N3E4SzlEaUk4UTV3UWFFZTArSTdSSWh0a1RyYTY1K1V6d3IvNVBNL3lNaU9y?=
- =?utf-8?B?WkRwcDUyUktjeXRxZXFDbHlJV1Qxa0RaQ0ExalF1TzlMZy80L0dsK3h2MlFW?=
- =?utf-8?B?a1ZkYXh6akROVXBKd3orVmNDOG9BZ2JwejVZc1JRaXVIUjcxZFVMRzh4QTcv?=
- =?utf-8?B?UlkvV1pRWjRZb1BUaVBwc2tRV05OZ1g3SWcwYUtrRFN2TnQ2U2pWeFUzUGw5?=
- =?utf-8?B?cy9UTEkycnpBT2VWcW5RdjJoSlJYOURsazc3QjNDZ1BWVEVEZmhpY0NpYThv?=
- =?utf-8?B?MUZGSTQzQ0FFTjdWczQwQ2Z0R0U3SURxdzVqY21Sa1IrenREZ0dwUVROSzJH?=
- =?utf-8?B?dWxPL05RdWFCQWladVdSZEg0ZGdOQXhJSEs2b2ZpdWIrNmxZZHA5cEthcmNy?=
- =?utf-8?B?U3MyVHgrc2JvOWlHODJOdzVmNEVOc3ltMUtPUUZXN0xhYzN5d2V4c0l2Ry93?=
- =?utf-8?B?cGdDSythY3k1eU5veExObG01ZVdkSVA2Vm9WbWJ2RmszMTdkNVNWOXBCa0dL?=
- =?utf-8?B?SzlsQVJCNENMRlZVNkhlV05CSjd3ZlNwWmNCelR3cEp4MDZ4TGFlTHNEM1Zt?=
- =?utf-8?B?MnFNUXZFSG15SnhBNzNiTHRsOEtqc3hMUXhoTTU0QWdZV3lKVHg0ZlZKTXZ5?=
- =?utf-8?B?bEtBODdXeHI3ZjhxU2pndWZvWlpvSGIwb2M0VGtNM08rbTFaNnZKQktkRzRt?=
- =?utf-8?B?cFBCa0ZudmV6NGw5cmp6UHpMekVHRC9YMldyZklodTByaDRWOFNkL1A4bEZk?=
- =?utf-8?B?ZmYzbjFkdUlHQnZCeHRIdExhb0dKZnJyY3RsWGhmUWhZOUhsNlFUNEZLbVN2?=
- =?utf-8?B?RTlvUzNBd3d3aVl2Qld2MS9IamZpblNoVHpFMjRtU1VjWjZZZWV2bnJxWkJ4?=
- =?utf-8?B?ajhkaEQ2SkJmTUptcWMrbk96R3NjQk1zTHQzOVJRT2FDc2VJVEV6SUJPUUdD?=
- =?utf-8?B?S0lkaTRWQ1RvNzdrMDZvdnZwNTRTdnJMQ2ticUJ5T2RHTEVCbkFUVWo5UDNw?=
- =?utf-8?B?N01aQUpMSzlLZndxR3hOWWkvVjJMOXBjRHp1LzZHOHlyL0pGT2VLTUlnOUY1?=
- =?utf-8?B?K1Z0WVB0VVBTS1BjODdEVVVLOWtsSFNWMm9tMmttZVFxWDFsRnJnbWUzQVRa?=
- =?utf-8?B?N0tyMjl5WVNlbDhiQnFGeDBKaEx0b1I4d3hrSWlmYnB4alVVVHZLU0VxSWdn?=
- =?utf-8?B?ZW94aitpL1ZxTEdCYWxmK2tIR09tZkF5QTFzWGFEZGRqVm9XaktZOGtWY21P?=
- =?utf-8?B?b2RtWTZJZjJFVjBZa0oxclVZeVhoLzIwZ2w5bWQ3UFVDQ0VKRGUxSms3S0JN?=
- =?utf-8?B?OGRFMHlYSkhsZ0pNb1pEak44NjJUWit3Ty85dlNxY3JybERCb2k3WER3blR6?=
- =?utf-8?B?cVorc2RvTUhlNnNSWVl1YUM2MlhtaVB5V3kyZDJwbTdkMG5XSGZGRXNYVDl2?=
- =?utf-8?B?bmp3RHhhM3ltc0FSRVRpeDlhTnJSd3NJMnZHNXdtcW9TL09RV1NySldpR2NC?=
- =?utf-8?B?dk9EbFZxZ3RESW1UWSswbVNNRE5uYU95SHd2Y3FrNlE1YVlYU0RKc2JVMVI1?=
- =?utf-8?B?Y0FnYlRGT25LL0JYV3hiajEzZXArZDlGVXFwQklRbVk3STJOY2xIcktxVjZj?=
- =?utf-8?B?a24ydDRsdEx1dW1KNC9tQU9EdTJaMkYrbGZOMVRqbHJLVytFMjBvWjVpakpi?=
- =?utf-8?B?bVlBQlduWDdDeTR3K0dCVk9kcmZOUzVyVGxlNnBzZ0tMVWdjV2NkZ0w2dHoz?=
- =?utf-8?B?ZkJqNUJ3clZRWU5IT2g0emxKdmhIR0x5dEl2THhoajRqUjh6MHA5cTEzM1R3?=
- =?utf-8?B?MGVLSXdJY3JHRmlremZZdzNxeTBrdGQvWmJlYmJmSnJ1Q1V3S3RXdWh1aE1u?=
- =?utf-8?B?dWt1dkJwZkFYdGs2V1poa1phQXVBPT0=?=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 285c91a3-2eb1-474f-b794-08dc103ca094
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR08MB9003.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 11:26:16.0576
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +mBFXLPxga2G93KyvHmjcsiDZ4gmJIrmIBC2ITWhBxJRsYh9jRvsWxCqAulCCC+8syO3k+qTi/ofi2N5taByr/8iLbVmeRhKMkisQ3EdC3E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR08MB9522
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 0/5] net: phy: marvell-88q2xxx: add driver for
+ the Marvell 88Q2220 PHY
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240108093702.13476-1-dima.fedrau@gmail.com>
+ <bb44432d-0cde-47cd-a44c-be5e3f11afab@gmail.com>
+ <20240108112418.GA30325@debian>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20240108112418.GA30325@debian>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 08/01/2024 19:15, Florian Westphal wrote:
-> Pavel Tikhomirov <ptikhomirov@virtuozzo.com> wrote:
->> An skb can be added to a neigh->arp_queue while waiting for an arp
->> reply. Where original skb's skb->dev can be different to neigh's
->> neigh->dev. For instance in case of bridging dnated skb from one veth to
->> another, the skb would be added to a neigh->arp_queue of the bridge.
+On 08.01.2024 12:24, Dimitri Fedrau wrote:
+> Am Mon, Jan 08, 2024 at 12:18:30PM +0100 schrieb Heiner Kallweit:
+>> On 08.01.2024 10:36, Dimitri Fedrau wrote:
+>>> Changes in v2:
+>>> 	- used defines MDIO_CTRL1_LPOWER and MDIO_PMA_CTRL1_SPEED1000
+>>> 	  in mv88q222x_config_aneg_preinit
+>>> 	- use genphy_c45_loopback
+>>> 	- mv88q2xxx_read_status reads speed, master or slave state when
+>>> 	  autonegotiation is enabled
+>>> 	- added defines for magic values in mv88q222x_get_sqi
+>>>
+>>> Changes in v3:
+>>> 	- mv88q2xxx_read_status includes autonegotiation case
+>>> 	- add support for 100BT1 and 1000BT1 linkmode advertisement
+>>> 	- use mv88q2xxx_get_sqi and mv88q2xxx_get_sqi_max, remove
+>>> 	  mv88q222x_get_sqi and mv88q222x_get_sqi_max
+>>> 	- fix typo: rename mv88q2xxxx_get_sqi and mv88q2xxxx_get_sqi_max to
+>>> 	  mv88q2xxx_get_sqi and mv88q2xxx_get_sqi
+>>> 	- add define MDIO_MMD_PCS_MV_RX_STAT for magic value 0x8230, documented
+>>> 	  in latest datasheets for both PHYs
+>>>
+>>> Changes in V4:
+>>> 	- clean up init sequence
+>>> 	- separate patch for fixing typos in upstreamed code
+>>>
+>>> Dimitri Fedrau (5):
+>>>   net: phy: Add BaseT1 auto-negotiation constants
+>>>   net: phy: Support 100/1000BT1 linkmode advertisements
+>>>   net: phy: c45: detect 100/1000BASE-T1 linkmode advertisements
+>>>   net: phy: marvell-88q2xxx: fix typos
+>>>   net: phy: marvell-88q2xxx: add driver for the Marvell 88Q2220 PHY
+>>>
+>>>  drivers/net/phy/marvell-88q2xxx.c | 234 +++++++++++++++++++++++++++---
+>>>  drivers/net/phy/phy-c45.c         |   3 +-
+>>>  include/linux/marvell_phy.h       |   1 +
+>>>  include/linux/mdio.h              |   8 +
+>>>  include/uapi/linux/mdio.h         |   2 +
+>>>  5 files changed, 230 insertions(+), 18 deletions(-)
+>>>
+>> net-next is closed. Let's see whether the maintainers still accept your series.
+>> Otherwise you may have to resubmit once net-next opens again.
 >>
->> There is no explicit mechanism that prevents the original skb->dev link
->> of such skb from being freed under us. For instance neigh_flush_dev does
->> not cleanup skbs from different device's neigh queue. But that original
->> link can be used and lead to crash on e.g. this stack:
->>
->> arp_process
->>    neigh_update
->>      skb = __skb_dequeue(&neigh->arp_queue)
->>        neigh_resolve_output(..., skb)
->>          ...
->>            br_nf_dev_xmit
->>              br_nf_pre_routing_finish_bridge_slow
->>                skb->dev = nf_bridge->physindev
->>                br_handle_frame_finish
->>
->> So let's improve neigh_flush_dev to also purge skbs when device
->> equal to their skb->nf_bridge->physindev gets destroyed.
+> Hi Heiner,
 > 
-> Can we fix this by replacing physindev pointer with plain
-> ifindex instead?  There are not too many places that need to
-> peek into the original net_device struct, so I don't think
-> the additional dev_get_by_index_rcu() would be an issue.
+> thanks for the information, next time I will check if net-next is
+> closed.
+> 
+https://lwn.net/Articles/727558/
 
-I will work on it, thanks for a good idea!
+> Best regards,
+> Dimitri Fedrau
 
--- 
-Best regards, Tikhomirov Pavel
-Senior Software Developer, Virtuozzo.
 
