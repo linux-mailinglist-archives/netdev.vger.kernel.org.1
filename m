@@ -1,172 +1,183 @@
-Return-Path: <netdev+bounces-62385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AEDC826E37
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:37:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3A70826E98
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28C5C1C223A2
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:37:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D89031C2229C
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650F84A99A;
-	Mon,  8 Jan 2024 12:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A9D4121E;
+	Mon,  8 Jan 2024 12:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="M4OMuvsk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQ72iHxx"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2060.outbound.protection.outlook.com [40.107.102.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C11495ED
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 12:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G6NSFUYA4WwYY6uC4ZpaxP2xgieZCBR/yPlxD78pwSkSHdVgiB3GsZsqURU8ayndnTZ6SvsQd0nDWPbdf9vvY3kfQZ16S94/VnkBt/c6lMZkxdRvHWbUDaITSrMi8E/CZ1uv5U9wEuCl37qB61uSmYUrMAwOaZZ5yOqU/QW/mm3X0fnAp8Thw70b+nid7wQ8JGTWgbPQBf/karQ10B5giIS6/7IkwI0jX2pdxmXjvKaG+O8i+i/UuvlDtllKDt0CIbghaif5XHpdlhFvpoRhjO14HYn6N0aN/Jf8tPKo6wKmGYiJ4s6NoiUgjfHq0YrvKaYelyDxj014y7q6BXn86w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CSKF8xfUQ5QFOZqtO5SwbY3CJ+WV8sAjrSwqsjDq5wg=;
- b=AGQK/8+0sEgzGsk36kY3qs1OX/YTUPL4YU+7UzAlO8OGAPNPrdhnMJvFKDMYB24TOkl5Z4gNgEvYrYqfsEGIb7b0gypzWR/lTowMCmQeRsfPhQ4aiskaY9tn6IeIxcocCezyFR8L7vOOxjc+Y3MKj10aeD3fPbzhPKVF1DJ1k+A9DdsMbzd1ZV2tAt/BXIljCqdUH5SRGMiP43Ne+Y6Y7QaQpw3LmAEzX7IFkse6Wy1K3Pshrrk+GGD5OtIgjm53AMF++tdrmxQ6LzBHpgidPF547UFDC3GzPm+jlb3elulDXwXQJ2l4sPvxTa8l9RDrvt3nsG//ntQEt5ITU9y+qQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CSKF8xfUQ5QFOZqtO5SwbY3CJ+WV8sAjrSwqsjDq5wg=;
- b=M4OMuvskWZ2Hh9M8dAG2uJq3jCsIzFXVcDZepgQo7cd8XtY8BoGm3uKzw4mVys55XSL2+Cu5EZ1c5t/js57B6pDGRCPZySPqoe+jeIOEPOEkBdlm8bpVdWKWl1tK7858GCBfizOnVP5Qe3cP3IVQxNUd9VTYbniLR6M5SKykflX4NgEtQF1VUUXqJOqw5NKN10j8lnJku1zkryCTWTooDIcekVMp8dE/5DL7/+Pd2yaalvAeJghMCM5zbso7yC6g+CicNSY7a+WosOZcDPk+OsfPbswwUvkyt1JhvDH81pc7qpQrrEnvH62zz0ZQaqEhCqSFxfMwISES/WESL2n42A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
- CH2PR12MB4954.namprd12.prod.outlook.com (2603:10b6:610:63::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7159.23; Mon, 8 Jan 2024 12:31:00 +0000
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::1442:8457:183b:d231]) by DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::1442:8457:183b:d231%5]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
- 12:31:00 +0000
-Message-ID: <effce034-6bc5-4e98-9b21-c80e8d56f705@nvidia.com>
-Date: Mon, 8 Jan 2024 14:30:54 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 10/15] net/mlx5e: Let channels be SD-aware
-To: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-References: <20231221005721.186607-1-saeed@kernel.org>
- <20231221005721.186607-11-saeed@kernel.org>
- <20240104145041.67475695@kernel.org>
-Content-Language: en-US
-From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <20240104145041.67475695@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0338.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:d::14) To DS7PR12MB6288.namprd12.prod.outlook.com
- (2603:10b6:8:93::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3997A44C8C;
+	Mon,  8 Jan 2024 12:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a271a28aeb4so167625666b.2;
+        Mon, 08 Jan 2024 04:34:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704717287; x=1705322087; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=InaA6S2R9U+w0dMzKJ26FvYihdPWx+aFSXWaCzGQox0=;
+        b=JQ72iHxxYpci5xVG9jt9PjYzsrOR2fXpjLTLTKo1JkPdjfFAQQtCWAYF2AK698Wwi6
+         POsQrDdDCUPBYpAFQut+eR0VUmp3qTvq9lZEf+WO2uBrBx4+GIDQpKacuF+ncCzc6h6i
+         Ufbdp9SbCDRBwqCSqN4T6CZVBe5rM4J+C5sR930AYF08wfgWHWct0TM1FHsv97nnCaU2
+         ozt8ZnxJ9bBR7doliVFib7z+9aSiema/dk/+pR0hzCDSq9ct6JSz+NDL4kRSAqMS+5N3
+         xnnv6oYf6RlIFLuvYJ6/eAUE9vA7iQfLCo6OPoxhfLtWRdwEJfXas3AbkucJNdZZ03RF
+         0txA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704717287; x=1705322087;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=InaA6S2R9U+w0dMzKJ26FvYihdPWx+aFSXWaCzGQox0=;
+        b=Ab1JebeeJuoFPkWLmTnXzlZKSf41ADcElo/p1PWf1UA7gH8gfU57ZhRBJmbQ66B4Cq
+         EV/RxitOuu3cfH8QgVKJi2xG8Ux0qgHrOSr3MjU7J+WxC2OteIYbS9jq8J6FweaGlhyx
+         cYreaqBaBwOnnDHdiqEA7ohdHABmxliQBP4dQEbgSD9bz2bZlTjk385uahost8vz2f6p
+         o0FhqFtzwE3PZcZw6fFbizMBO+2Vu3UPIetTGf6Qtgmj0BvqakE/KzJjlsI1mKzqSbJR
+         PjFH5gunmS+gjFjDyR5+uM17/ZHcy5bk7RhFhKQf/Njs3pSEF+wjyZ7zeHz0X8ez3S23
+         hWqg==
+X-Gm-Message-State: AOJu0YxDGAG6lTDrOnr4YsQ0mBZNDI3SnKcynNneszUGXsAZpqO1xDgg
+	FFCE6FtkbKw9eYxtFeu4nA8jgTgbEvSLqQ==
+X-Google-Smtp-Source: AGHT+IGUddrnY5+YKbCei4noQYPHLM7BkRkB2zZCINU5UYnRktijbOTfd3LtC/AkKciXs9PFqbp8wQ==
+X-Received: by 2002:a17:907:770c:b0:a28:e441:7998 with SMTP id kw12-20020a170907770c00b00a28e4417998mr1222461ejc.108.1704717287040;
+        Mon, 08 Jan 2024 04:34:47 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id 1-20020a170906318100b00a2a632e4eebsm1439209ejy.119.2024.01.08.04.34.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jan 2024 04:34:46 -0800 (PST)
+Date: Mon, 8 Jan 2024 14:34:44 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Simon Horman <horms@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	David Bauer <mail@david-bauer.net>, mithat.guner@xeront.com,
+	erkin.bozoglu@xeront.com,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next] net: dsa: mt7530: support OF-based registration
+ of switch MDIO bus
+Message-ID: <20240108123444.r3k4mhgii2yontc4@skbuf>
+References: <20240106122142.235389-1-arinc.unal@arinc9.com>
+ <20240107195241.GB132648@kernel.org>
+ <65274929-fa59-482c-a744-6b9ce162ab46@arinc9.com>
+ <20240108110000.aujqhlufehngtkjj@skbuf>
+ <20240106122142.235389-1-arinc.unal@arinc9.com>
+ <20240107195241.GB132648@kernel.org>
+ <65274929-fa59-482c-a744-6b9ce162ab46@arinc9.com>
+ <20240108110000.aujqhlufehngtkjj@skbuf>
+ <7e89034c-afbd-4180-98e5-50d8cd07f924@arinc9.com>
+ <7e89034c-afbd-4180-98e5-50d8cd07f924@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|CH2PR12MB4954:EE_
-X-MS-Office365-Filtering-Correlation-Id: 34fc64fa-bf3a-4f95-7300-08dc1045ab9e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qPk3iezY5qspp/RemaOHael0+nuAAbJhk7+rYcN/HQRLEx9opi/DuvGjJmh55Fhs+xFr6AixVoGQy6uNTyv7mM0e4NHFPVG9CbBEpEKcHPySGhi8DrA86vM98KXUT0pRJ+fjLZL5inBrTQm/2I6TBN22kKBMFbC3II88kog1FvLalL3Vc2s1yWFXWf8KqA8+2f5RMotuL65iDdJc2S5ZHp9F6gtK46i2TSSerqT/BEpaoHukdhQxm86DiHlnLk9FnEBNJ6ae8v4n3tHdbhyOdZSoePPZurP2KFrovbYePKhIvyMVytTIYI2oIftqDnWRX/Vw9R4aUZH2dIyIo+zvFLIeu/HvhH9fw6yMKPk3exgsA9mqTnacAyJd6cUfRCFEPDdReOH8DtCq3+fJyxMrYWwqElAhrrjWcODqlAUngQqlUgvEUt2kY7Vly/uvH4R6wNq4usIxtHUdRVRHf/xqv3gTySRTAQo+JHemyArxebN6IbUV7D37SLGoTPipfZqsOJJs6LiActElW8IRGOb82pmskVl2hZhsu5rO4PMCFqxhRutv5YSrOEFAkIJF9F8B42jNZ2UgAbXP7QFl+U32xMXSE+auNMAvUUWVd/dSE/YnYLfmUcJ4CPPwdAkN695TQ5kH2tunVdA2yoG7f8LonA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(39860400002)(376002)(346002)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(86362001)(31696002)(36756003)(31686004)(38100700002)(83380400001)(6486002)(26005)(478600001)(53546011)(6666004)(6512007)(6506007)(66556008)(66476007)(66946007)(110136005)(54906003)(316002)(8676002)(8936002)(4326008)(5660300002)(2906002)(41300700001)(2616005)(107886003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SEVReEJRSXhsRWpwZHpUbFkxUEk5UER2MVd5NE1LUlo5K3FJVUo1V3RwaitM?=
- =?utf-8?B?amk2ajdUV1NSY3pST1l1THN0aWxkemFhUUsxbjFBcTU4S0RPMm5OZEZDeU1O?=
- =?utf-8?B?LytBbk5OdlFxSUNTbmRCWVNGZlRHMC9wMHd2MGNyamRkNmxHUmQ0VDh2Y1Rl?=
- =?utf-8?B?cW1iYk44Rm5CQjhYRkxwUDYyQmM3U1pWUHc5cWxVK1hsMXIyTUJiWkQxWDJR?=
- =?utf-8?B?SWRmcjh3V1Y2Q2dtNlpwMVNhT3NNcmdSUXlXc1UzUXUxUGlnMmVyM2FsQTAz?=
- =?utf-8?B?cGdVMGkvd3FYSGN5T0RDWTgxWFJJTGtNZFpuSEY1RjJQblZSTjhFR2hocFZj?=
- =?utf-8?B?UXRaTzEzY2tXSFhFT21EZ1R2VWJJSFdJK2JXaEQyaEhjQjdBemZlbjdLb1ND?=
- =?utf-8?B?d1RUMGRHWnRMcXlZYXBBSXNWM3gvMXh0c3B6c3lkMVg4Mjg0T1RsT3BvR3Z6?=
- =?utf-8?B?blZPeWYyd3Q4OVVGOFkrUVptYUZHZHVKcDFQY1dKT2RBOXVJTExOWXN0eE9q?=
- =?utf-8?B?N1Rua3JrL1pRNmJhR29mMWJ4SW1wZmRYaHBNa3RVL3VrUC9CdUNkVG03akdR?=
- =?utf-8?B?TUZWUXc0SHIvRk44aTd4TTFRNXdYMmdFK2FHbm52MTJtTk9QYXpUNmlEZWdM?=
- =?utf-8?B?SGdnY1RaS2xCODFrRkRQWjhLVmd4Z1M0c1BLUUpaZ3hZdW9oY1hpS2UwWEJF?=
- =?utf-8?B?cFFKY3piN1FBM0Q5dVBTRGRuZnltYWxWRTRoVTJGTnR3U2NCc29SYTZyQzZM?=
- =?utf-8?B?b3dWd054dy9odmtIMUlUbnVGdm0zdWp6WVExVk5WTmhqZWdCNmVGTHZzWHRi?=
- =?utf-8?B?OHRoTHVHQTN5aUNZR2EwV0pKenN1WW1tUDdDdFJwT1FabUNjeC85T2wvTmRP?=
- =?utf-8?B?TkNaNGo4ZGJqMExQdFNaSTlJUkhmb3kvN0VDL1BKdmJSVm80S1J6V1ZpcUtB?=
- =?utf-8?B?RlFoOUttdForaDJUM0gzS0FjYktBY05zNWtpZEQ3RTVvcUNndFBDSXVEQWNl?=
- =?utf-8?B?MW8rdFcwTklyOG9vTGZVcEtRZThBTndoZUszbDJsYjNmTmhPM094MldPaW5n?=
- =?utf-8?B?TW5mdEhvS3l2ajVFb3Vxb0lwdmp2eEZDVHlnYmtHT0UzdDkrb0tlVnpncW45?=
- =?utf-8?B?M1BJRTZCdnNzQ1VPbEgvZGw3RHMzblduQW11eXVORGRVOWo2V2VmUVJrbkN6?=
- =?utf-8?B?ajdhY25PWUNOWFZYUzBkZnV4T3libjdKVmxWZmV5WWlURHJkMkFDdUQ0RmNP?=
- =?utf-8?B?YWNEaFFKMHdaVmlzKzNQd1dwZHVhZkJoN3A2S0U3REd3anplYnVyR2FtaWtS?=
- =?utf-8?B?N29QMXZDR3VNSElNbVFGSWt3c3NsdDl3NytZVGh6dXVVNzhIMGtZZTExakpu?=
- =?utf-8?B?Y2RaWEwweGw1cncxalRCdjJuSHpQQ0FFb2xGNVBkeXNJa2FGemRDL3lIeGJh?=
- =?utf-8?B?UHJJMDFEVWpNckRMS2dMUzdyc1hZRlI5RGlCNTNxOWRVdXVtNjZqMGc3Unli?=
- =?utf-8?B?aFR0UjdEUm9pbTNEZldMWDJsTXZIOHJpeHBnSFBTUTFkaTYvVjFvdElLRTY5?=
- =?utf-8?B?YjEvNzJOYTBCeXh4UXZOT052Mk9hWEVwVnc0eVVtQlpnVDBoQ0wwRzNla3Za?=
- =?utf-8?B?aG55ZE9CUjFHWjZheEx1TGY3dkxSMXF6TGsxZndJYWNBK3dZQlNlS3UyV1B2?=
- =?utf-8?B?UXFEZnErcGV3MURKWTBUazFDR1Jnam1kbjlsSjhPUVFHbEFmOHk3bjhra2Q0?=
- =?utf-8?B?alkwRm5EL2lDTlptVWFPRXdLUlViWndRRy9uOWpYV3JNZ2RjanFobzdyV1M5?=
- =?utf-8?B?bEdmenRsaWFCQTlvanFCNDIxTXpTSHord2VHNTYyc2hMY043S3lwNzA2eHJ5?=
- =?utf-8?B?YVRvckY3azJpWnpNVXBoWjFmT1M2YXhFdTZuRHhOeW1WYzR5dUo1MEpmL1Vw?=
- =?utf-8?B?RGNIWkw1U09nNmhoOW5zYjU4VmxoQmhvTUdMNlJldk5KUUdQK0hUcDE4WXQ4?=
- =?utf-8?B?QzBoVXBzaS9mZHlCRklGbzl2ajhIVUNsR1RpaFZzclJhWEJ3VEEyYW5FQjBu?=
- =?utf-8?B?d01aYzk3UUxiM0xKU1pIUksrV0VSUVhVZWFwSFVGVXhJWm12SnBsTGVURVQx?=
- =?utf-8?Q?zUrnF72U59JU/PM4jybVNl+lu?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34fc64fa-bf3a-4f95-7300-08dc1045ab9e
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 12:31:00.0237
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VpjDF8QkHV2vKkfSX5LP3ld9G0Hn54rlSR5Jy4NP+Lgxqq+MIIT6k81zOp8asEMB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4954
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7e89034c-afbd-4180-98e5-50d8cd07f924@arinc9.com>
+ <7e89034c-afbd-4180-98e5-50d8cd07f924@arinc9.com>
 
-On 05/01/2024 0:50, Jakub Kicinski wrote:
-> On Wed, 20 Dec 2023 16:57:16 -0800 Saeed Mahameed wrote:
->> Example for 2 mdevs and 6 channels:
->> +-------+---------+
->> | ch ix | mdev ix |
->> +-------+---------+
->> |   0   |    0    |
->> |   1   |    1    |
->> |   2   |    0    |
->> |   3   |    1    |
->> |   4   |    0    |
->> |   5   |    1    |
->> +-------+---------+
+On Mon, Jan 08, 2024 at 03:14:45PM +0300, Arınç ÜNAL wrote:
+> I realised that I also miss these:
 > 
-> Meaning Rx queue 0 goes to PF 0, Rx queue 1 goes to PF 1, etc.?
-
-Correct.
-
-> Is the user then expected to magic pixie dust the XPS or some such
-> to get to the right queue?
-
-I'm confused, how are RX queues related to XPS?
-XPS shouldn't be affected, we just make sure that whatever queue XPS
-chose will go out through the "right" PF.
-
-So for example, XPS will choose a queue according to the CPU, and the
-driver will make sure that packets transmitted from this SQ are going
-out through the PF closer to that NUMA.
-
+> - run of_node_put(mnp) if bus = devm_mdiobus_alloc(dev) fails
+> - don't run mt7530_free_mdio_irq if MDIO bus is described on OF
 > 
-> How is this going to get represented in the recently merged Netlink
-> queue API?
+> Please let me know if this addresses everything:
+> 
+> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> index 391c4dbdff42..cf2ff7680c15 100644
+> --- a/drivers/net/dsa/mt7530.c
+> +++ b/drivers/net/dsa/mt7530.c
+> @@ -2146,24 +2146,40 @@ mt7530_free_irq_common(struct mt7530_priv *priv)
+>  static void
+>  mt7530_free_irq(struct mt7530_priv *priv)
+>  {
+> -	mt7530_free_mdio_irq(priv);
+> +	struct device_node *mnp, *np = priv->dev->of_node;
+> +
+> +	mnp = of_get_child_by_name(np, "mdio");
+> +	if (!mnp)
+> +		mt7530_free_mdio_irq(priv);
+> +	of_node_put(mnp);
+> +
+>  	mt7530_free_irq_common(priv);
+>  }
+>  static int
+>  mt7530_setup_mdio(struct mt7530_priv *priv)
+>  {
+> +	struct device_node *mnp, *np = priv->dev->of_node;
+>  	struct dsa_switch *ds = priv->ds;
+>  	struct device *dev = priv->dev;
+>  	struct mii_bus *bus;
+>  	static int idx;
+> -	int ret;
+> +	int ret = 0;
+> +
+> +	mnp = of_get_child_by_name(np, "mdio");
+> +
+> +	if (mnp && !of_device_is_available(mnp))
+> +		goto out;
+>  	bus = devm_mdiobus_alloc(dev);
+> -	if (!bus)
+> -		return -ENOMEM;
+> +	if (!bus) {
+> +		ret = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	if (!mnp)
+> +		ds->user_mii_bus = bus;
+> -	ds->user_mii_bus = bus;
+>  	bus->priv = priv;
+>  	bus->name = KBUILD_MODNAME "-mii";
+>  	snprintf(bus->id, MII_BUS_ID_SIZE, KBUILD_MODNAME "-%d", idx++);
+> @@ -2174,16 +2190,18 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
+>  	bus->parent = dev;
+>  	bus->phy_mask = ~ds->phys_mii_mask;
+> -	if (priv->irq)
+> +	if (priv->irq && !mnp)
+>  		mt7530_setup_mdio_irq(priv);
+> -	ret = devm_mdiobus_register(dev, bus);
+> +	ret = devm_of_mdiobus_register(dev, bus, mnp);
+>  	if (ret) {
+>  		dev_err(dev, "failed to register MDIO bus: %d\n", ret);
+> -		if (priv->irq)
+> +		if (priv->irq && !mnp)
+>  			mt7530_free_mdio_irq(priv);
+>  	}
+> +out:
+> +	of_node_put(mnp);
+>  	return ret;
+>  }
 
-Can you share a link please?
+Looks ok.
 
-All the logic is internal to the driver, so I expect it to be fine, but
-I'd like to double check.
+Please note that net-next has now closed. Sorry that I couldn't bring
+myself to review more during the weekend and the holidays.
+https://lore.kernel.org/netdev/20240107172221.733a7a44@kernel.org/
 
