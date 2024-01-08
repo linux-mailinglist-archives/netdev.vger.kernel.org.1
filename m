@@ -1,111 +1,110 @@
-Return-Path: <netdev+bounces-62454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C762C827651
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:27:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E3C382766D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:39:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F322B2195F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:27:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94F3C282DD3
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01E154665;
-	Mon,  8 Jan 2024 17:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420945476B;
+	Mon,  8 Jan 2024 17:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="dxcbOxKf"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="m5ajLXJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2014054BC7
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 17:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5ce6b5e3c4eso549542a12.2
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 09:27:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1704734855; x=1705339655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ns7VME7gqRmNPy2SUavN6RuAGr3SVvvFBUAf7dtFdRw=;
-        b=dxcbOxKfGkViVPZkog84Mix1/dhu7u4j0Zw/e7PzTBMM+qWBO4cWFWv8Efv3cRw6sc
-         q4JPLhohwVOL/dSRIbvfJbiv0VyWXCaRAn3njx9wRlZDKCE0sSvgBNieiqjhuScKvLkF
-         tQR+iHjgckHctt4s60V3iBKQIT+qajZiy1+P/cC48NasZ5k/fdFd/975P5EFYbNjIPQ6
-         sKr65A1KtqHnuHCJb3UPaAi8hW+Wjb8PiztrYlrpxOCBq42Ge2EyDMYbENd0IL5jkKsB
-         dX5dVGhB3AggSD/Cayxd7YwAsYDPsa2Km/P4NmR9UKmqmfZgYWkIR+mYPgqkDEbeMisz
-         6UWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704734855; x=1705339655;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ns7VME7gqRmNPy2SUavN6RuAGr3SVvvFBUAf7dtFdRw=;
-        b=PLQy64npheaz6xWTH0oDP9TWuWXU8VDFcuxmkI2XYVGymyzb0rBeJZYvlwgFnafLDP
-         9cD9i/z9W6MUgR1Uz9ta0MeXPsB37lzoqZZAFOD5fQ4B2oiAmBUqFq+y6kV99jZDTUQd
-         Qsha94bURXPs4bI8DuWfiPlzJBXbnFbeSHbFryJtIuRbEL+wavuEx9d5StoJesCO0w+v
-         9ZA90PM2bVpUJyfUhBO/mDVQphWGt7UXanaXjWZsi/EYLmohUzgyAKg1GIlhP9pyZn2B
-         nWc/lWkltiqV5Qr7xjRwnEL0vUz2xHDRVhaBjQz1CV0afLYq35yV+bv1WehtzTFF2Hz1
-         Unfg==
-X-Gm-Message-State: AOJu0Ywj4w3Dc8Vd6mo94OQFKwKwdzAqBXSFsmITGTcjYRczXHa4Hwqk
-	nFEgoCH1MutdNafCRXH0w8lUmdiuA1eAQbqQeDKnT1gg+zo=
-X-Google-Smtp-Source: AGHT+IH52g4wbMJAc50l61lS0mTLcvvjiuSJ9S5mC/W6PXo7nAIO6HMVomSdeMP6kBbf3/R5mI7/Mg==
-X-Received: by 2002:a05:6a20:3d17:b0:199:e7bc:7961 with SMTP id y23-20020a056a203d1700b00199e7bc7961mr107290pzi.47.1704734855342;
-        Mon, 08 Jan 2024 09:27:35 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id i1-20020aa78b41000000b006d9af8c25easm128776pfd.84.2024.01.08.09.27.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 09:27:35 -0800 (PST)
-Date: Mon, 8 Jan 2024 09:27:33 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Maks Mishin <maks.mishinfz@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] maketable: Add check for ZERO for variable sigma2
-Message-ID: <20240108092733.5bc8d980@hermes.local>
-In-Reply-To: <20240106211422.33967-1-maks.mishinFZ@gmail.com>
-References: <20240106211422.33967-1-maks.mishinFZ@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5A15576A;
+	Mon,  8 Jan 2024 17:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from [192.168.1.54] (unknown [85.30.205.207])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 286DF40F1DEB;
+	Mon,  8 Jan 2024 17:34:35 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 286DF40F1DEB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1704735275;
+	bh=hRWuIE+2qFwu/n+vsFXIu1/VBVgfBej0lvtPdg99qfs=;
+	h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+	b=m5ajLXJk2I7FoFz07Q7nQtLAg9Q/ozw+ilu15EXO/B2u6a8Pr8ygdcZ5hyJeu/Il8
+	 +GWMZW/ucsbpsxOb6kDBQXZRXWoS10dJhiYGJYJtip0UR/DfC/pBJZr8BVoith1o1z
+	 yKuvp1wmHWlp6JppHO5aNHTahmvECuquP8M3yc9c=
+Subject: Re: [PATCH] iphase: Adding a null pointer check
+To: Andrey Shumilin <shum.sdl@nppct.ru>, 3chas3@gmail.com
+Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+References: <20231107123600.14529-1-shum.sdl@nppct.ru>
+From: Alexey Khoroshilov <khoroshilov@ispras.ru>
+Message-ID: <d8884b3c-bef4-7042-934b-0bcdb4347b97@ispras.ru>
+Date: Mon, 8 Jan 2024 20:28:31 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20231107123600.14529-1-shum.sdl@nppct.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 
-On Sun,  7 Jan 2024 00:14:22 +0300
-Maks Mishin <maks.mishinfz@gmail.com> wrote:
+Proposal for subject:
 
-> If variable `limit` == 1, then `n` == 1 and then second for-loop will
-> not do because of variable `sigma2` maybe ZERO.
-> Added check for ZERO for `sigma2` before it is used as denominator.
+atm: iphase: Move check for NULL before derefence in get_desc()
+
+
+On 07.11.2023 15:36, Andrey Shumilin wrote:
+> The pointer <dev->desc_tbl[i].iavcc> is dereferenced on line 195.
+> Further in the code, it is checked for null on line 204.
+> It is proposed to add a check before dereferencing the pointer.
+
+Line numbers in commit messages are not welcome since they are subject
+for change and a reader of the message likely has other code at that
+lines in his version of the file.
+
 > 
-> Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Signed-off-by: Andrey Shumilin <shum.sdl@nppct.ru>
 > ---
->  netem/maketable.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  drivers/atm/iphase.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> diff --git a/netem/maketable.c b/netem/maketable.c
-> index ad8620a4..56b1d0bb 100644
-> --- a/netem/maketable.c
-> +++ b/netem/maketable.c
-> @@ -68,6 +68,10 @@ arraystats(double *x, int limit, double *mu, double *sigma, double *rho)
->  		sigma2 += ((double)x[i-1] - *mu)*((double)x[i-1] - *mu);
->  
->  	}
-> +	if (sigma2 == 0) {
-> +		perror("Division by zero in top/sigma2");
-> +		exit(3);
+> diff --git a/drivers/atm/iphase.c b/drivers/atm/iphase.c
+> index 324148686953..596422fbfacc 100644
+> --- a/drivers/atm/iphase.c
+> +++ b/drivers/atm/iphase.c
+> @@ -192,6 +192,11 @@ static u16 get_desc (IADEV *dev, struct ia_vcc *iavcc) {
+>             i++;
+>             continue;
+>          }
+> +       if (!(iavcc_r = dev->desc_tbl[i].iavcc)) {
+> +	   printk("Fatal err, desc table vcc or skb is NULL\n");
+> +	   i++;
+> +	   continue;
 > +	}
->  	*rho = top/sigma2;
->  }
->  
 
-This looks like a purely theoretical not practical problem.
-Just tried the tool with input files likely to create the problem (no data, one sample, etc)
-and could not reproduce any problem.
+Error message should be fixed, skb is not check for NULL here.
 
-What input could make this happen?
+>          ltimeout = dev->desc_tbl[i].iavcc->ltimeout; 
+>          delta = jiffies - dev->desc_tbl[i].timestamp;
+>          if (delta >= ltimeout) {
+> 
 
+
+>           if (!dev->desc_tbl[i].txskb || !(iavcc_r =
+dev->desc_tbl[i].iavcc))
+>              printk("Fatal err, desc table vcc or skb is NULL\n");
+
+
+The existing check should be fixed to check for skb only.
+
+--
+Alexey
 
