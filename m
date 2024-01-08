@@ -1,137 +1,114 @@
-Return-Path: <netdev+bounces-62437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED7F482747B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:53:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 689C9827481
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:53:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 898D91F231D8
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 15:52:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 071DD1F23325
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 15:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A9951015;
-	Mon,  8 Jan 2024 15:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67AD5103F;
+	Mon,  8 Jan 2024 15:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NsFiMZc0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="odd55ff7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACA65101D
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 15:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-557a615108eso9153a12.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 07:52:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704729170; x=1705333970; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CnC1nRHdPIGea5afHOCep4P+Uu/fQQgsePCdXyCMMdM=;
-        b=NsFiMZc0lK6KHprUKWawkHd/bcedy96eEF0y/c7q5fCu4DyE1yK5siMnP+VrCnIANY
-         4G1kHQifknYySo0a0mti6DESAQS9+g/LjYFXkxpKzU7hfxdwl2m84aGMRWuaLxcW3ptN
-         bGs9djXcjTjCOzkTLYN6pqM3gmvlxXxJ9f5IMj/8jlDRz9TZXZpVqCnCzcGGu7qRPDqb
-         RHX7dRnOVLrqnxT8rivIuSM84ZfIdgCr3gNTcWYdeVEgEdEomNJY0FpGnDlFEqgGuZuI
-         Ft5XHXhMUq/TmQTENN4r8uTfVF2rGu+n5kAssKek2H79MCACzLNJjgb8onnmzPpo91fx
-         xKvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704729170; x=1705333970;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CnC1nRHdPIGea5afHOCep4P+Uu/fQQgsePCdXyCMMdM=;
-        b=RWNMm+6a6AjNWUXV8RA0lpTn50VeGgztOr+OKL7aAHYxyNGj2CPQXzNV8yH4DQXEha
-         H/jtBAXZlpj/gYkziSs+Pr0G8rSTyBeCCZ3ha9FyqjIPVV5HyLgP9ysRCr5BAsd5luX/
-         OTGA8i0S5UVj6Qz21zWHSY+/a1n8TfxA2Apjb5sFRsXuNscyy3+HzG6xAcqMh8NoY1oS
-         qS3UByDH1J1JepYRKQrKXuEAK6GRlhj6R13YT2gKyIU1Z3VlvmIHNuvNhXYCM3z4sA/i
-         uytIDekgHd63CTDtVYrxxvovh5T29eHLkBAXCqdyC2x12YHJern931Yfjzqf0uXq7BPa
-         Bg2w==
-X-Gm-Message-State: AOJu0Yxy/U9io98TpWlnwqpF0KEsyHkPgBRew2NB74Wfvvw6B/pfSg74
-	ep6A/M0OkhhQ2VIFvYBgQVkgELvSffJffNWrGitBNV3iJdbI
-X-Google-Smtp-Source: AGHT+IF2kb4m5UrGbosCBMjSgyyFPt6cGXJMN0XWA5Zq84JzqVNy33ZVEZsllcFAbosyX0JSlEMyP0zBTv8KFjRMhcM=
-X-Received: by 2002:a50:8a93:0:b0:557:15d:b784 with SMTP id
- j19-20020a508a93000000b00557015db784mr280370edj.2.1704729170271; Mon, 08 Jan
- 2024 07:52:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2E451C30;
+	Mon,  8 Jan 2024 15:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=oyblU9fS9RIJhRfq92DSb7yUSCuEu12wiegVylc2g30=; b=odd55ff7qVX3LGHrloljObiz1O
+	v2p/97U82lb9laxeFxsG3dQ6za8J5Q/HPzXk6Gsv9WaXA3PTPRXeDZOxJPz1XGlTfO82eaZIj14U9
+	JLnVdnniUiBE2p/5QOoIzO32zAzlMcDICGN9t1Ydbx0khVNbx8jgj+4tMgDgEfuprlmYZPAOeaK4W
+	iLe7w3jD18HHkjB6hHS2oh1PTJQraW4OS9BNS94QYqTJ5KsKOeV2fmNUmJhtRlPJErXhc4rbsJIM3
+	Q0llvh+RPy0yoDh3b545p3E4shhJdRF8rug1bfVCVE1BIpOOTiUa2Za278kUvLqAtVCZWm25p4cMC
+	gCS5fKlw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36992)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rMrwC-0003BF-0e;
+	Mon, 08 Jan 2024 15:53:16 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rMrwD-0003MQ-F2; Mon, 08 Jan 2024 15:53:17 +0000
+Date: Mon, 8 Jan 2024 15:53:17 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Jie Luo <quic_luoj@quicinc.com>, agross@kernel.org,
+	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, hkallweit1@gmail.com, robert.marko@sartura.hr,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	quic_srichara@quicinc.com
+Subject: Re: [PATCH v4 0/5] support ipq5332 platform
+Message-ID: <ZZwabT7pmwDof8Cs@shell.armlinux.org.uk>
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <a6a50fb6-871f-424c-a146-12b2628b8b64@gmail.com>
+ <cfb04c82-3cc3-49f6-9a8a-1f6d1a22df40@quicinc.com>
+ <dd05a599-247a-4516-8ad3-7550ceea99f7@gmail.com>
+ <ac1977f5-cd6a-4f16-b0a0-f4322c34c5f5@quicinc.com>
+ <bdeca791-f2e5-4256-b386-a75c03f93686@gmail.com>
+ <895eadd7-1631-4b6b-8db4-d371f2e52611@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com>
-In-Reply-To: <14459261ea9f9c7d7dfb28eb004ce8734fa83ade.1704185904.git.leonro@nvidia.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 8 Jan 2024 16:52:39 +0100
-Message-ID: <CANn89iLNGrZo_z1L184F3WetrWV8bQwYrfyEDgn2-gtnPndDgA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: Revert no longer abort SYN_SENT when
- receiving some ICMP
-To: Leon Romanovsky <leon@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shachar Kagan <skagan@nvidia.com>, 
-	netdev@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>, 
-	"Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>, Neal Cardwell <ncardwell@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <895eadd7-1631-4b6b-8db4-d371f2e52611@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Jan 2, 2024 at 10:01=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
-rote:
->
-> From: Shachar Kagan <skagan@nvidia.com>
->
-> This reverts commit 0a8de364ff7a14558e9676f424283148110384d6.
->
-> Shachar reported that Vagrant (https://www.vagrantup.com/), which is
-> very popular tool to manage fleet of VMs stopped to work after commit
-> citied in Fixes line.
->
-> The issue appears while using Vagrant to manage nested VMs.
-> The steps are:
-> * create vagrant file
-> * vagrant up
-> * vagrant halt (VM is created but shut down)
-> * vagrant up - fail
->
-> Vagrant up stdout:
-> Bringing machine 'player1' up with 'libvirt' provider...
-> =3D=3D> player1: Creating shared folders metadata...
-> =3D=3D> player1: Starting domain.
-> =3D=3D> player1: Domain launching with graphics connection settings...
-> =3D=3D> player1:  -- Graphics Port:      5900
-> =3D=3D> player1:  -- Graphics IP:        127.0.0.1
-> =3D=3D> player1:  -- Graphics Password:  Not defined
-> =3D=3D> player1:  -- Graphics Websocket: 5700
-> =3D=3D> player1: Waiting for domain to get an IP address...
-> =3D=3D> player1: Waiting for machine to boot. This may take a few minutes=
-...
->     player1: SSH address: 192.168.123.61:22
->     player1: SSH username: vagrant
->     player1: SSH auth method: private key
-> =3D=3D> player1: Attempting graceful shutdown of VM...
-> =3D=3D> player1: Attempting graceful shutdown of VM...
-> =3D=3D> player1: Attempting graceful shutdown of VM...
->     player1: Guest communication could not be established! This is usuall=
-y because
->     player1: SSH is not running, the authentication information was chang=
-ed,
->     player1: or some other networking issue. Vagrant will force halt, if
->     player1: capable.
-> =3D=3D> player1: Attempting direct shutdown of domain...
->
-> Fixes: 0a8de364ff7a ("tcp: no longer abort SYN_SENT when receiving some I=
-CMP")
-> Closes: https://lore.kernel.org/all/MN2PR12MB44863139E562A59329E89DBEB982=
-A@MN2PR12MB4486.namprd12.prod.outlook.com
-> Signed-off-by: Shachar Kagan <skagan@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
+On Sat, Jan 06, 2024 at 04:45:08PM +0100, Andrew Lunn wrote:
+> > I just realized that the UNIPHY block is a MII (probably SGMII) controller.
+> > Isn't it? And I expect that it responsible more then just for clock
+> > enabling. It should also activate and perform a basic configuration of MII
+> > for actual data transmission. If so, then it should placed somewhere under
+> > drivers/net/phy or drivers/net/pcs.
+> 
+> Before we decide that, we need a description of what the UNIPHY
+> actually does, what registers it has, etc. Sometimes blocks like this
+> get split into a generic PHY, aka drivers/phy/ and a PCS driver. This
+> would be true if the UNIPHY is also used for USB SERDES, SATA SERDES
+> etc. The SERDES parts go into a generic PHY driver, and the SGMII on
+> to of the SERDES is placed is a PCS driver.
+> 
+> The problem i have so far is that there is no usable description of
+> any of this hardware, and the developers trying to produce drivers for
+> this hardware don't actually seem to understand the Linux architecture
+> for things like this.
 
-While IPv6 code has an issue (not calling tcp_ld_RTO_revert() helper
-for TCP_SYN_SENT as intended,
-I could not find the root cause for your case.
++1. I think it's now more convoluted than ever, and someone needs to
+take a step back, look at the hardware, look at the kernel model, and
+work out how to implement this. It needs to be explained in a clear
+and concise way in _one_ go, not spread over multiple emails. Probably
+with ASCII art diagrams showing the structure.
 
-We will submit the patch again for 6.9, once we get to the root cause.
+If that isn't possible, then someone needs to provide a detailed
+description of the hardware so that the subsystem maintainers get a
+proper view of what this hardware is so they can advise. This is the
+least preferable option due to the maintainer time it takes.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+If neither of these two things happen, then I'm afraid all bets are
+off for getting this into the kernel.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
