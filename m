@@ -1,85 +1,137 @@
-Return-Path: <netdev+bounces-62435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DAC78273AF
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:38:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47907827469
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:47:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3E94B20DD3
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 15:38:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7F7628863C
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 15:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0D951032;
-	Mon,  8 Jan 2024 15:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F252851023;
+	Mon,  8 Jan 2024 15:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FVg52wKX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKiHVVQk"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE39B5101B
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 15:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CJXhJoPPEtYsWdDZuoug7EJKQH8XVN7cv912tWB6rmA=; b=FVg52wKXK0DXNpynQx3W1PonEF
-	RCQx/FE9y1kqwBuWTIecGsWVdNY4pveEiCxrTJg8VRsQIVDyoGF0TJGeXhPgo9l8DHtp/7rGl9QEf
-	7ar5zddwDU5W6cPIeAARDElv+fNPkSTNAicxmKKEZcHumuMKtngHx8ljgdJwTHgMZmRdf6tLp0Pwd
-	az6E0+AJaU5DflTGsbXRss5oQuk39pE9dh504iwbqQHme/O84R+0rfp0yJo/KG3Wtb/wzjuCxU4R5
-	kbCK5o7GbgmjuE92C9alwj9Sz1PkF1vr0Kvzjyc5QBnLL5KkMMDNnYKyQZtISYlCevUe/h2ToID+S
-	Nq5CPPFQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40838)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rMrhb-00039T-2s;
-	Mon, 08 Jan 2024 15:38:11 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rMrhd-0003LP-Kl; Mon, 08 Jan 2024 15:38:13 +0000
-Date: Mon, 8 Jan 2024 15:38:13 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/5] ethtool: add struct ethtool_keee and extend
- struct ethtool_eee
-Message-ID: <ZZwW5e8pZp5XVzZi@shell.armlinux.org.uk>
-References: <783d4a61-2f08-41fc-b91d-bd5f512586a2@gmail.com>
- <a044621e-07f3-4387-9573-015f255db895@gmail.com>
- <f704864d-56bb-4ff4-933d-8771d0bb6c19@lunn.ch>
- <8bfd2b95-2c73-4372-bf63-0c6ab7cd03c8@gmail.com>
- <53909c11-825a-489f-822a-dd4829dc8041@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A6F5103E;
+	Mon,  8 Jan 2024 15:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-28c2b8d6f2aso1084519a91.2;
+        Mon, 08 Jan 2024 07:46:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704728777; x=1705333577; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6ABIEatGvpONoYLEnM8zujVINLyFvWCQbpURBZGHqyc=;
+        b=mKiHVVQktys16d1/b7MkCrWnZpxoc85LXFsbfPNgCTaSKxzoEVLjYAGOJTC3BJs0Ri
+         gL+zJO9U+OG2jhMKU8xNhWqXKGp8UYZ6Mls75foj0jYdK47r0avg7bNJXwnyasj1ZcrO
+         sPnNK6VpmYnJ2QePsIi/5W3xfqVSTnfKppGBvRi5rTMzDwjGLWZsCcLNmjjiCukNDrrG
+         Xj9LJ2k3ZKNFkc9qGPhV68i2yOQ19fwGsCH71zj6BrM09uNKjdtpMBMgzCBwaQH8abz6
+         uF/B2dNgnZRla6DBZSpbl8NQrlIZ9qMgOf1oCtX4Fe2U0ufnceUG6yZ3wF83rYAXWAWS
+         Nr1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704728777; x=1705333577;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6ABIEatGvpONoYLEnM8zujVINLyFvWCQbpURBZGHqyc=;
+        b=DRNJ9ccm3E1JS+xYu+dDCA5ArlD9Har8fv3orStiZ+OfN492TEFY6WyC4n8LOU8xku
+         gzD9wxTHLzgCmtITiazSTStFtLfKSPTeoh7kkaHEqXlpfHnN4JdamoZmcA9SIdljWuxZ
+         fysQjfFNNxyBS/aIF2i7VXotREOT0hL/HWKGMrFjFWfBAkJ8eTvqNos2T/ohDkPauiEk
+         Db9uJ19HX2G82pNEahfFADiwgtNxddbsA2fGYWnSg8T8n8Gd4KC6y9FkvTyVqOteDaQq
+         53op73ytnw9V8zsNwz6HOFA7tEIEvBtrVWAtuiIasoOpCThcQORgFchS27I5DGoO0ET9
+         yZFQ==
+X-Gm-Message-State: AOJu0Yx9imv/mZvKyOkJzI1wnz8vrI37Y4ymdzoeaL/4ZjNNZCWipJWC
+	LQ0/3uAZESRxiyj/6jFaIroZDhLxj7gqcCR8Vm37dVqT
+X-Google-Smtp-Source: AGHT+IHZJe1ZY74k1Lg4LUidpgawMu0QAPQhvu8GZrpY+cE2pAX9oNfGVAG8ljK3e18QPKlpOElMC5jvPt+GMAfHuo0=
+X-Received: by 2002:a17:90a:d315:b0:28c:d85:9807 with SMTP id
+ p21-20020a17090ad31500b0028c0d859807mr1131248pju.78.1704728776801; Mon, 08
+ Jan 2024 07:46:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53909c11-825a-489f-822a-dd4829dc8041@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+ <20240103095650.25769-5-linyunsheng@huawei.com> <1a66f99173de36e1ae639569582feaf76202361d.camel@gmail.com>
+ <705e59c2-6f46-5d39-b8da-8e2310904d71@huawei.com>
+In-Reply-To: <705e59c2-6f46-5d39-b8da-8e2310904d71@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 8 Jan 2024 07:45:40 -0800
+Message-ID: <CAKgT0UdLA820trYGWkgNR8KFX=QbFbiR_AcrWXwFwrmQzaVmKA@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/6] vhost/net: remove vhost_net_page_frag_refill()
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 06, 2024 at 12:15:18AM +0100, Andrew Lunn wrote:
-> I would not do too much refactoring. I have a big patchset which
-> refactors most of the phylib driven drivers code for EEE, removing a
-> lot of it and pushing it into phylib. Its been sat in my repo a while
-> and i need to find the time/energy to post it and get it merged.
+On Mon, Jan 8, 2024 at 1:06=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
+>
+> On 2024/1/6 0:06, Alexander H Duyck wrote:
+> >>
+> >>  static void handle_tx_copy(struct vhost_net *net, struct socket *sock=
+)
+> >> @@ -1353,8 +1318,7 @@ static int vhost_net_open(struct inode *inode, s=
+truct file *f)
+> >>                      vqs[VHOST_NET_VQ_RX]);
+> >>
+> >>      f->private_data =3D n;
+> >> -    n->page_frag.page =3D NULL;
+> >> -    n->refcnt_bias =3D 0;
+> >> +    n->pf_cache.va =3D NULL;
+> >>
+> >>      return 0;
+> >>  }
+> >> @@ -1422,8 +1386,9 @@ static int vhost_net_release(struct inode *inode=
+, struct file *f)
+> >>      kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
+> >>      kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
+> >>      kfree(n->dev.vqs);
+> >> -    if (n->page_frag.page)
+> >> -            __page_frag_cache_drain(n->page_frag.page, n->refcnt_bias=
+);
+> >> +    if (n->pf_cache.va)
+> >> +            __page_frag_cache_drain(virt_to_head_page(n->pf_cache.va)=
+,
+> >> +                                    n->pf_cache.pagecnt_bias);
+> >>      kvfree(n);
+> >>      return 0;
+> >>  }
+> >
+> > I would recommend reordering this patch with patch 5. Then you could
+> > remove the block that is setting "n->pf_cache.va =3D NULL" above and ju=
+st
+> > make use of page_frag_cache_drain in the lower block which would also
+> > return the va to NULL.
+>
+> I am not sure if we can as there is no zeroing for 'struct vhost_net' in
+> vhost_net_open().
+>
+> If we don't have "n->pf_cache.va =3D NULL", don't we use the uninitialize=
+d data
+> when calling page_frag_alloc_align() for the first time?
 
-Strangely, I have similar for phylink... I was thinking about sending it
-out during the last cycle, but I guess next cycle will do.
+I see. So kvmalloc is used instead of kvzalloc when allocating the
+structure. That might be an opportunity to clean things up a bit by
+making that change to reduce the risk of some piece of memory
+initialization being missed.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+That said, I still think reordering the two patches might be useful as
+it would help to make it so that the change you make to vhost_net is
+encapsulated in one patch to fully enable the use of the new page pool
+API.
 
