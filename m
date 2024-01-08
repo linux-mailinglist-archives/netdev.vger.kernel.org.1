@@ -1,198 +1,251 @@
-Return-Path: <netdev+bounces-62487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1181882783F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:14:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DAAE827841
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:14:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32F001C2395C
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:14:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D0561F23CB2
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E7754F9E;
-	Mon,  8 Jan 2024 19:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9227654F9D;
+	Mon,  8 Jan 2024 19:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EqtF3I10"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEFE5577E;
-	Mon,  8 Jan 2024 19:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13CA54F8D;
+	Mon,  8 Jan 2024 19:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50ea9e189ebso2042582e87.3;
-        Mon, 08 Jan 2024 11:13:58 -0800 (PST)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cce6c719caso23626391fa.2;
+        Mon, 08 Jan 2024 11:14:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704741283; x=1705346083; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XNaXoD9prw+TMf7vR3/H5SQrElCx5I5cZfXaOBoOuIs=;
+        b=EqtF3I101xaku751kQycUYruR8v0SRrCFfosA8eip8M2iQ+KuA1zLTt0yocgIIinBt
+         whXMLaKDL1SQI7Mbc3T3MZweR/a7q43/iQ7rE/yefImQrSYPuQXO3uJRkeXi2k8/U9iO
+         kDMP4YqutovCMn8+E794uHBxN8cPkXdN5kCsmrMfufy01kEe84MyVUhbZeBZO2V8TIui
+         XlF19wVE5gocvAmVBLrbs2A9BkjkBaIURL1axSClRGHI+RdI82KXpESWdCVDcpa09twC
+         wKYbnrf2nCZXG3/ymToxYnmXAORGbkabW4Rg9L9a7x2wH6DZDMdnIA8+w0l2ULm8lWed
+         HzAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704741237; x=1705346037;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1704741283; x=1705346083;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mr96nxSAtnMpewJ+DXMrz+M3YAm7Ob7BgC6wNF70L3c=;
-        b=qtAB/alXUpeZFY4KNtiAq7/jOL3Z/GYvGkUWymTtCmiJef1T+xdaTaU7msHxYMQ3Mb
-         wVGQoNc5PoAdPPiWN5boYi3E9Dfq1Cc8S//0ihuGQ6yNzjTTt2qsg10Q5sZf2KU8TO6B
-         HQ2Ke/wlOfzhNvhsxA3d+0ZdQd2lZ8kxr9xtBcNsuQ7N2VNxA08S5268rxJ5NHWHxq8l
-         e81K/PR44pV6K081RXSu0/yiAwrHLqCSy+MjIK1MVIiEXBKzW18geI9KLLzuPMwXUGG8
-         5djMRvrY+mNrrM1Us8NZHnw66wKS+kYSIA7a2Hy2PLg+z3taOirqn8lzff3H7X7Ajei6
-         9Uhg==
-X-Gm-Message-State: AOJu0YyZD67MakvcOlLb+b5tRsNkCja9b7hUqbF9ZajP9PBUGZM4224+
-	udE8WacREraj016iiTTO4UM=
-X-Google-Smtp-Source: AGHT+IFDiy+QOQxWuTe0Q+Zc2cXSKhuHy2tgz3hY0eyco1iXKHjvGzZ6t0YVlvIKg/NwcCvxrhQgzA==
-X-Received: by 2002:a05:6512:15a1:b0:50e:a15c:6b64 with SMTP id bp33-20020a05651215a100b0050ea15c6b64mr1732321lfb.26.1704741236851;
-        Mon, 08 Jan 2024 11:13:56 -0800 (PST)
-Received: from localhost (fwdproxy-lla-117.fbsv.net. [2a03:2880:30ff:75::face:b00c])
-        by smtp.gmail.com with ESMTPSA id g7-20020a056402180700b0055706e6b1f5sm130501edy.89.2024.01.08.11.13.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 11:13:56 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: dsahern@kernel.org,
-	weiwan@google.com,
-	kuba@kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: leit@meta.com,
-	netdev@vger.kernel.org (open list:NETWORKING [IPv4/IPv6]),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 2/2] net/ipv6: resolve warning in ip6_fib.c
-Date: Mon,  8 Jan 2024 11:12:54 -0800
-Message-Id: <20240108191254.3422696-2-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240108191254.3422696-1-leitao@debian.org>
-References: <20240108191254.3422696-1-leitao@debian.org>
+        bh=XNaXoD9prw+TMf7vR3/H5SQrElCx5I5cZfXaOBoOuIs=;
+        b=KVJVCHSUGEulXQrqwGoVVcRQtN7raf8RGxDV8tIGizGfSo1rc6qpT2a42durU++Y8B
+         RtcCRfS7F1HbEzPwR0n+jxfJrzNSLJmU4QC+a7Xmg6mANW+28r5UB8BLg3tIUcjjNQr5
+         yEpIHIG5CMkAHPBYmYLXHkq1+LUWEXbXK1iMIoaqKCZxM3D02nIUtvTkQbeCkg7vXbfw
+         mkFOUSUqsVo+aIsXkcR2qwcYOrCLvYJLjFB9r97u9BBXh4tk/059ITN41K3mxDjWUpAa
+         3QGX/T+Dui2mj67LZ1pikJB8FTrLFr+CwZRQLd/NQW2+j9FVWEEI5NhqtoF/78Jpm+s/
+         wKKA==
+X-Gm-Message-State: AOJu0YwcFA06w6OJFjeSDz5j6TUhW1ocv2Jux/D7f1nQI2WZERY7+5vW
+	zoici1382/89cgtp8Yei+pNWZPR0PI2NcKkDFiQ=
+X-Google-Smtp-Source: AGHT+IFPGxJimeRpzJMd95o6QI8rggtAvEJYoUJJgYP/Mw1L/pgo4qp5I8El6GOtn2hJoGU8wIaydZdRmuDOrEWS49c=
+X-Received: by 2002:a2e:b17c:0:b0:2cc:3f55:a4c1 with SMTP id
+ a28-20020a2eb17c000000b002cc3f55a4c1mr1852426ljm.100.1704741282404; Mon, 08
+ Jan 2024 11:14:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240108183938.468426-1-verdre@v0yd.nl> <20240108183938.468426-5-verdre@v0yd.nl>
+ <5d1f2013-5758-4d6c-8d01-e96a76bb2686@v0yd.nl> <40550fc1-3b5b-438c-891d-2da0f30874f3@v0yd.nl>
+In-Reply-To: <40550fc1-3b5b-438c-891d-2da0f30874f3@v0yd.nl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 8 Jan 2024 14:14:29 -0500
+Message-ID: <CABBYNZKV8SujJ7GFUqTMXUskE=yK0q=opmwvTZNEpPb=JkiQbA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] Bluetooth: Remove pending ACL connection attempts
+To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In some configurations, the 'iter' variable in function
-fib6_repair_tree() is unused, resulting the following warning when
-compiled with W=1.
+Hi Jonas,
 
-    net/ipv6/ip6_fib.c:1781:6: warning: variable 'iter' set but not used [-Wunused-but-set-variable]
-     1781 |         int iter = 0;
-	  |             ^
+On Mon, Jan 8, 2024 at 1:55=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
+wrote:
+>
+> On 1/8/24 19:44, Jonas Dre=C3=9Fler wrote:
+> > On 1/8/24 19:39, Jonas Dre=C3=9Fler wrote:
+> >> With the last commit we moved to using the hci_sync queue for "Create
+> >> Connection" requests, removing the need for retrying the paging after
+> >> finished/failed "Create Connection" requests and after the end of
+> >> inquiries.
+> >>
+> >> hci_conn_check_pending() was used to trigger this retry, we can remove=
+ it
+> >> now.
+> >>
+> >> Note that we can also remove the special handling for COMMAND_DISALLOW=
+ED
+> >> errors in the completion handler of "Create Connection", because "Crea=
+te
+> >> Connection" requests are now always serialized.
+> >>
+> >> This is somewhat reverting commit 4c67bc74f016 ("[Bluetooth] Support
+> >> concurrent connect requests").
+> >>
+> >> With this, the BT_CONNECT2 state of ACL hci_conn objects should now be
+> >> back to meaning only one thing: That we received a connection request
+> >> from another device (see hci_conn_request_evt), but the actual connect
+> >> should be deferred.
+> >> ---
+> >>   include/net/bluetooth/hci_core.h |  1 -
+> >>   net/bluetooth/hci_conn.c         | 16 ----------------
+> >>   net/bluetooth/hci_event.c        | 21 ++++-----------------
+> >>   3 files changed, 4 insertions(+), 34 deletions(-)
+> >>
+> >> diff --git a/include/net/bluetooth/hci_core.h
+> >> b/include/net/bluetooth/hci_core.h
+> >> index 2c30834c1..d7483958d 100644
+> >> --- a/include/net/bluetooth/hci_core.h
+> >> +++ b/include/net/bluetooth/hci_core.h
+> >> @@ -1330,7 +1330,6 @@ struct hci_conn *hci_conn_add(struct hci_dev
+> >> *hdev, int type, bdaddr_t *dst,
+> >>                     u8 role);
+> >>   void hci_conn_del(struct hci_conn *conn);
+> >>   void hci_conn_hash_flush(struct hci_dev *hdev);
+> >> -void hci_conn_check_pending(struct hci_dev *hdev);
+> >>   struct hci_chan *hci_chan_create(struct hci_conn *conn);
+> >>   void hci_chan_del(struct hci_chan *chan);
+> >> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> >> index 541d55301..22033057b 100644
+> >> --- a/net/bluetooth/hci_conn.c
+> >> +++ b/net/bluetooth/hci_conn.c
+> >> @@ -2534,22 +2534,6 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
+> >>       }
+> >>   }
+> >> -/* Check pending connect attempts */
+> >> -void hci_conn_check_pending(struct hci_dev *hdev)
+> >> -{
+> >> -    struct hci_conn *conn;
+> >> -
+> >> -    BT_DBG("hdev %s", hdev->name);
+> >> -
+> >> -    hci_dev_lock(hdev);
+> >> -
+> >> -    conn =3D hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
+> >> -    if (conn)
+> >> -        hci_cmd_sync_queue(hdev, hci_acl_create_connection_sync,
+> >> conn, NULL);
+> >> -
+> >> -    hci_dev_unlock(hdev);
+> >> -}
+> >> -
+> >>   static u32 get_link_mode(struct hci_conn *conn)
+> >>   {
+> >>       u32 link_mode =3D 0;
+> >> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> >> index e8b4a0126..91973d6d1 100644
+> >> --- a/net/bluetooth/hci_event.c
+> >> +++ b/net/bluetooth/hci_event.c
+> >> @@ -117,8 +117,6 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev
+> >> *hdev, void *data,
+> >>           hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> >>       hci_dev_unlock(hdev);
+> >> -    hci_conn_check_pending(hdev);
+> >> -
+> >>       return rp->status;
+> >>   }
+> >> @@ -149,8 +147,6 @@ static u8 hci_cc_exit_periodic_inq(struct hci_dev
+> >> *hdev, void *data,
+> >>       hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);
+> >> -    hci_conn_check_pending(hdev);
+> >> -
+> >>       return rp->status;
+> >>   }
+> >> @@ -2296,10 +2292,8 @@ static void hci_cs_inquiry(struct hci_dev
+> >> *hdev, __u8 status)
+> >>   {
+> >>       bt_dev_dbg(hdev, "status 0x%2.2x", status);
+> >> -    if (status) {
+> >> -        hci_conn_check_pending(hdev);
+> >> +    if (status)
+> >>           return;
+> >> -    }
+> >>       set_bit(HCI_INQUIRY, &hdev->flags);
+> >>   }
+> >> @@ -2323,12 +2317,9 @@ static void hci_cs_create_conn(struct hci_dev
+> >> *hdev, __u8 status)
+> >>       if (status) {
+> >>           if (conn && conn->state =3D=3D BT_CONNECT) {
+> >> -            if (status !=3D HCI_ERROR_COMMAND_DISALLOWED ||
+> >> conn->attempt > 2) {
+> >> -                conn->state =3D BT_CLOSED;
+> >> -                hci_connect_cfm(conn, status);
+> >> -                hci_conn_del(conn);
+> >> -            } else
+> >> -                conn->state =3D BT_CONNECT2;
+> >> +            conn->state =3D BT_CLOSED;
+> >> +            hci_connect_cfm(conn, status);
+> >> +            hci_conn_del(conn);
+> >>           }
+> >>       } else {
+> >>           if (!conn) {
+> >> @@ -3020,8 +3011,6 @@ static void hci_inquiry_complete_evt(struct
+> >> hci_dev *hdev, void *data,
+> >>       bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+> >> -    hci_conn_check_pending(hdev);
+> >> -
+> >>       if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
+> >>           return;
+> >> @@ -3247,8 +3236,6 @@ static void hci_conn_complete_evt(struct hci_dev
+> >> *hdev, void *data,
+> >>   unlock:
+> >>       hci_dev_unlock(hdev);
+> >> -
+> >> -    hci_conn_check_pending(hdev);
+> >>   }
+> >>   static void hci_reject_conn(struct hci_dev *hdev, bdaddr_t *bdaddr)
+> >
+> > Please take a special look at this one: I'm not sure if I'm breaking th=
+e
+> > functionality of deferred connecting using BT_CONNECT2 in
+> > hci_conn_request_evt() here, as I don't see anywhere where we check for
+> > this state and establish a connection later.
+> >
+> > It seems that this is how hci_conn_request_evt() was initially written
+> > though, hci_conn_check_pending() only got introduced later and seems
+> > unrelated.
+>
+> Ahh nevermind... The check for BT_CONNECT2 on "Conn Complete event" got
+> introduced with 4c67bc74f01 ([Bluetooth] Support concurrent connect
+> requests). And later the deferred connection setup on "Conn Request
+> event" got introduced with 20714bfef8 ("Bluetooth: Implement deferred
+> sco socket setup").
+>
+> I assume the latter commit was relying on the "Create Connection"
+> request "Conn Complete event" that got introduced with the former commit
+> then? That would imply that we use BT_CONNECT2 if there's already a
+> "Create Connection" going on when the "Conn Request event" happens, and
+> we must wait for that existing request to finish.. Is that how those
+> deferred connections are supposed to work?
 
-It is unclear what is the advantage of this RT6_TRACE() macro[1], since
-users can control pr_debug() in runtime, which is better than at
-compilation time. Moreover, pr_debug() has no overhead when disabled.
+Well if you are not sure that works we better make sure we have tests
+that cover this, for LE I know for sure it works because we have the
+likes of iso-tester that do connect 2 peers simultaneously, but for
+classic I don't recall having any test that does multiple connections.
 
-Remove the RT6_TRACE() in favor of simple pr_debug() helpers.
+> >
+> > Thanks,
+> > Jonas
 
-[1] Link: https://lore.kernel.org/all/ZZwSEJv2HgI0cD4J@gmail.com/
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- include/net/ip6_fib.h |  6 ------
- net/ipv6/ip6_fib.c    | 15 +++++++++------
- net/ipv6/route.c      |  8 ++++----
- 3 files changed, 13 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 9ba6413fd2e3..360b12e61850 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -30,12 +30,6 @@
- 
- #define RT6_DEBUG 2
- 
--#if RT6_DEBUG >= 3
--#define RT6_TRACE(x...) pr_debug(x)
--#else
--#define RT6_TRACE(x...) do { ; } while (0)
--#endif
--
- struct rt6_info;
- struct fib6_info;
- 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index fb41bec6b4b5..38a0348b1d17 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1801,7 +1801,7 @@ static struct fib6_node *fib6_repair_tree(struct net *net,
- 					    lockdep_is_held(&table->tb6_lock));
- 		struct fib6_info *new_fn_leaf;
- 
--		RT6_TRACE("fixing tree: plen=%d iter=%d\n", fn->fn_bit, iter);
-+		pr_debug("fixing tree: plen=%d iter=%d\n", fn->fn_bit, iter);
- 		iter++;
- 
- 		WARN_ON(fn->fn_flags & RTN_RTINFO);
-@@ -1864,7 +1864,8 @@ static struct fib6_node *fib6_repair_tree(struct net *net,
- 		FOR_WALKERS(net, w) {
- 			if (!child) {
- 				if (w->node == fn) {
--					RT6_TRACE("W %p adjusted by delnode 1, s=%d/%d\n", w, w->state, nstate);
-+					pr_debug("W %p adjusted by delnode 1, s=%d/%d\n",
-+						 w, w->state, nstate);
- 					w->node = pn;
- 					w->state = nstate;
- 				}
-@@ -1872,10 +1873,12 @@ static struct fib6_node *fib6_repair_tree(struct net *net,
- 				if (w->node == fn) {
- 					w->node = child;
- 					if (children&2) {
--						RT6_TRACE("W %p adjusted by delnode 2, s=%d\n", w, w->state);
-+						pr_debug("W %p adjusted by delnode 2, s=%d\n",
-+							 w, w->state);
- 						w->state = w->state >= FWS_R ? FWS_U : FWS_INIT;
- 					} else {
--						RT6_TRACE("W %p adjusted by delnode 2, s=%d\n", w, w->state);
-+						pr_debug("W %p adjusted by delnode 2, s=%d\n",
-+							 w, w->state);
- 						w->state = w->state >= FWS_C ? FWS_U : FWS_INIT;
- 					}
- 				}
-@@ -1951,7 +1954,7 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
- 	read_lock(&net->ipv6.fib6_walker_lock);
- 	FOR_WALKERS(net, w) {
- 		if (w->state == FWS_C && w->leaf == rt) {
--			RT6_TRACE("walker %p adjusted by delroute\n", w);
-+			pr_debug("walker %p adjusted by delroute\n", w);
- 			w->leaf = rcu_dereference_protected(rt->fib6_next,
- 					    lockdep_is_held(&table->tb6_lock));
- 			if (!w->leaf)
-@@ -2289,7 +2292,7 @@ static int fib6_age(struct fib6_info *rt, void *arg)
- 
- 	if (rt->fib6_flags & RTF_EXPIRES && rt->expires) {
- 		if (time_after(now, rt->expires)) {
--			RT6_TRACE("expiring %p\n", rt);
-+			pr_debug("expiring %p\n", rt);
- 			return -1;
- 		}
- 		gc_args->more++;
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index ea1dec8448fc..63b4c6056582 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -2085,12 +2085,12 @@ static void rt6_age_examine_exception(struct rt6_exception_bucket *bucket,
- 	 */
- 	if (!(rt->rt6i_flags & RTF_EXPIRES)) {
- 		if (time_after_eq(now, rt->dst.lastuse + gc_args->timeout)) {
--			RT6_TRACE("aging clone %p\n", rt);
-+			pr_debug("aging clone %p\n", rt);
- 			rt6_remove_exception(bucket, rt6_ex);
- 			return;
- 		}
- 	} else if (time_after(jiffies, rt->dst.expires)) {
--		RT6_TRACE("purging expired route %p\n", rt);
-+		pr_debug("purging expired route %p\n", rt);
- 		rt6_remove_exception(bucket, rt6_ex);
- 		return;
- 	}
-@@ -2101,8 +2101,8 @@ static void rt6_age_examine_exception(struct rt6_exception_bucket *bucket,
- 		neigh = __ipv6_neigh_lookup_noref(rt->dst.dev, &rt->rt6i_gateway);
- 
- 		if (!(neigh && (neigh->flags & NTF_ROUTER))) {
--			RT6_TRACE("purging route %p via non-router but gateway\n",
--				  rt);
-+			pr_debug("purging route %p via non-router but gateway\n",
-+				 rt);
- 			rt6_remove_exception(bucket, rt6_ex);
- 			return;
- 		}
--- 
-2.39.3
 
+--=20
+Luiz Augusto von Dentz
 
