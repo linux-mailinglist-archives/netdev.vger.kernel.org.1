@@ -1,55 +1,53 @@
-Return-Path: <netdev+bounces-62381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0485826E19
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:34:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D096826E25
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:35:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF8B81C225A2
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:34:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE190281E05
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E9245BF7;
-	Mon,  8 Jan 2024 12:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7964645F;
+	Mon,  8 Jan 2024 12:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aH2d0xPi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgYVC5Eb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A9F45BF6;
-	Mon,  8 Jan 2024 12:29:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B22A4C433CB;
-	Mon,  8 Jan 2024 12:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE7F41230;
+	Mon,  8 Jan 2024 12:29:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61B28C433C8;
+	Mon,  8 Jan 2024 12:29:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704716949;
-	bh=jdAa7RkX61eM4KKdasE5RWZTni+X8zkZssrrn6Nazz0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aH2d0xPiGQHHsShQouvDQP4u/TAtdJtk0Sanv7jkfhDKLLzfPJSLB0XBl3Hf2hgI8
-	 0BY8A4FkD/aOOy6DfB6kknr8LzkV8iwpjD6+L7HKsS3ZYVHzDN8uHWES8Z6POyYG8A
-	 aOIWBRdp93cJPED0xxpUeBRY2AWuhjXZehzVoiHOp67ITIpaCk7UbH1XWJOmjptc4r
-	 EQjZJdTki9dOiCZmWUTImOCjcGxLpN7TskHqa4OvpugQQjfmPkL9M1XmJqCyeLCWgi
-	 gJLQi1uyVqWkLUnehA9ngpV4+XIY3XZiRHWc5CuhUMtYzE4mzv8RMwOuLfxG82M88E
-	 FH/bbqRY50mYw==
+	s=k20201202; t=1704716959;
+	bh=0PQA5cRju5SGRkK5zQeqgk1bYVFbY1laOeFoitex2XU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mgYVC5Eb3mNsfQ0Hi/FTG1E4lgyYM3mGxwg6A/CvRz7A5U85hDQHAuuDMugCJrVco
+	 fNebf808UeYmS0BE/fd75haFNie3KpK+18G/km2b2fPomRyeHrqoyZsyUij15MGO9K
+	 opllQwM/REluROkdzP9Gk+ogtiWCPPdXp6sHyjDuf6tUAp0zu1oxmA8FqaiGJiCuz0
+	 luKDxKLzSkjW2XJbrZnF9Lc5W98v2em0SQzMvBOht6CdM5NrK7opPHv8ei49Em7VJn
+	 qlmV6wkIyrKZnL3BZhlIStBLHfX5I3f2kme9y1IJibOL9YbcPr4IOJvbyX/9TxETFc
+	 navqAv8/s253g==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Sarannya S <quic_sarannya@quicinc.com>,
-	Simon Horman <horms@kernel.org>,
+Cc: Siddh Raman Pant <code@siddh.me>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Suman Ghosh <sumang@marvell.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-arm-msm@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 2/3] net: qrtr: ns: Return 0 if server port is not present
-Date: Mon,  8 Jan 2024 07:28:58 -0500
-Message-ID: <20240108122903.2090825-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 1/2] nfc: Do not send datagram if socket state isn't LLCP_BOUND
+Date: Mon,  8 Jan 2024 07:29:12 -0500
+Message-ID: <20240108122915.2090922-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240108122903.2090825-1-sashal@kernel.org>
-References: <20240108122903.2090825-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,46 +56,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.206
+X-stable-base: Linux 5.4.265
 Content-Transfer-Encoding: 8bit
 
-From: Sarannya S <quic_sarannya@quicinc.com>
+From: Siddh Raman Pant <code@siddh.me>
 
-[ Upstream commit 9bf2e9165f90dc9f416af53c902be7e33930f728 ]
+[ Upstream commit 6ec0d7527c4287369b52df3bcefd21a0c4fb2b7c ]
 
-When a 'DEL_CLIENT' message is received from the remote, the corresponding
-server port gets deleted. A DEL_SERVER message is then announced for this
-server. As part of handling the subsequent DEL_SERVER message, the name-
-server attempts to delete the server port which results in a '-ENOENT' error.
-The return value from server_del() is then propagated back to qrtr_ns_worker,
-causing excessive error prints.
-To address this, return 0 from control_cmd_del_server() without checking the
-return value of server_del(), since the above scenario is not an error case
-and hence server_del() doesn't have any other error return value.
+As we know we cannot send the datagram (state can be set to LLCP_CLOSED
+by nfc_llcp_socket_release()), there is no need to proceed further.
 
-Signed-off-by: Sarannya Sasikumar <quic_sarannya@quicinc.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Thus, bail out early from llcp_sock_sendmsg().
+
+Signed-off-by: Siddh Raman Pant <code@siddh.me>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Reviewed-by: Suman Ghosh <sumang@marvell.com>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/qrtr/ns.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/nfc/llcp_sock.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
-index 713e9940d88bb..c92dd960bfefa 100644
---- a/net/qrtr/ns.c
-+++ b/net/qrtr/ns.c
-@@ -577,7 +577,9 @@ static int ctrl_cmd_del_server(struct sockaddr_qrtr *from,
- 	if (!node)
- 		return -ENOENT;
+diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
+index aea337d817025..91f5e3a2df8aa 100644
+--- a/net/nfc/llcp_sock.c
++++ b/net/nfc/llcp_sock.c
+@@ -798,6 +798,11 @@ static int llcp_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	}
  
--	return server_del(node, port, true);
-+	server_del(node, port, true);
+ 	if (sk->sk_type == SOCK_DGRAM) {
++		if (sk->sk_state != LLCP_BOUND) {
++			release_sock(sk);
++			return -ENOTCONN;
++		}
 +
-+	return 0;
- }
+ 		DECLARE_SOCKADDR(struct sockaddr_nfc_llcp *, addr,
+ 				 msg->msg_name);
  
- static int ctrl_cmd_new_lookup(struct sockaddr_qrtr *from,
 -- 
 2.43.0
 
