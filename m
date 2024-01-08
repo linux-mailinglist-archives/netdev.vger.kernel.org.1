@@ -1,128 +1,138 @@
-Return-Path: <netdev+bounces-62458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F7888276C1
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:58:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30FB382770F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:12:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BDB4284820
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:58:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCBFB1F210E5
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A20954BD3;
-	Mon,  8 Jan 2024 17:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D0F54BDD;
+	Mon,  8 Jan 2024 18:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="QCuiJ8OT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HW+5pS6p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqa5JyBj"
 X-Original-To: netdev@vger.kernel.org
-Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735C854BF7;
-	Mon,  8 Jan 2024 17:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.west.internal (Postfix) with ESMTP id C2DC53200D00;
-	Mon,  8 Jan 2024 12:52:53 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Mon, 08 Jan 2024 12:52:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1704736373;
-	 x=1704822773; bh=U5vHpLovxHw2jLbFSMwbVDfMhB5fX3K4zCUa0DIZn9Q=; b=
-	QCuiJ8OTr3lnfrzIujxwe/TZfLN1UIxB9lhaB8yim94u+mOcHro7SQ0ObxmjGCj4
-	Tb5u0npdf4GTBeVq7Cz2aFXmNa+QaEhiPOPcYSTHw5bxB+WNwzuSL0IBboyPK2jL
-	RzROivW2MUr5bdEzhDn/fpTjaPkhuKq7Y2O2FlIsGTSQ9/BiKUju+JyX8yMRXGxy
-	4JPkPMqkebAGZ6X5Oy2CJOJRzQ+gue9Cqa/+eZVCp0qB+sAUPlgY+jxbyGXJVYhe
-	X8V375V1byyUcuQNDBOBnTK7GBHSMhaLYEUU1U0iaoBJMrNlJHxV6qxUG3wMq5B0
-	uH7MPtSQ6xQmfd7oR7iFQQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1704736373; x=
-	1704822773; bh=U5vHpLovxHw2jLbFSMwbVDfMhB5fX3K4zCUa0DIZn9Q=; b=H
-	W+5pS6p8StQO1iOCpRMUGETWwegLC/itEkr0WC7HcpACh+OG0OM0TAGa2hkvGwaP
-	5qvYy2mXuiO0tnh4P2u0crfFK96diRxzgDdqyWzqT/FYexQukTZ6mnUCLxYEbIIM
-	4VlhkzufmFARICF16ChUFz/yOoBP+iZekdv0UswKOkpjR6BNq5VapPZOg1q2qT/C
-	5PveKLQu44B16jB0rftks3B649wadrnfVLj2ZAxOpu0DO54vzbm8rXKi4m1mMfQ9
-	/eYc+hn5aySPRTAK8Hg9gCA/LLAcGWZE7njvQ556WjGBHBu6qQhslWNzlDUkyO8K
-	iQsL/YuJcDENA1Msf1eVA==
-X-ME-Sender: <xms:dDacZcuDTXN6lIEB8WcOO16Pq_Tb_ovk8QZo9ds7l0Lpb-hT7fKQlg>
-    <xme:dDacZZebg42EFk_Dte7vA-bggeXbFkekpX81XBWPhF---MbikwU4NEQAq_cbaMZyt
-    GDLFMocQhEF5-vUZA>
-X-ME-Received: <xmr:dDacZXxBZ9cQLWYl6jdfdcpCufgtDH1LcuUb3pmhHdXoOlL94QlkfynIuxozVxZlTsp7KYObYheOxk2Q_1uOjqeGruABsR5zL19sbLc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdehjedguddtgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefs
-    tddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihii
-    eqnecuggftrfgrthhtvghrnheptdfgueeuueekieekgfeiueekffelteekkeekgeegffev
-    tddvjeeuheeuueelfeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
-    hilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
-X-ME-Proxy: <xmx:dTacZfO1_6ZhFSPZ7zYR_vaSkrh9xyqkFLtjv5fayG8ZpCbkP8Qaxg>
-    <xmx:dTacZc-OoIoBjtWs99QJ3JVhf7MeRx8huVlrpOGlzP4IbiCQjrWwAg>
-    <xmx:dTacZXVkZfDjbk7VxlH_D6LS-Uq5m97mwmnDhWMv7x4tSBRugNGqbw>
-    <xmx:dTacZcOHJTHi1jhIyuq6e13SVSM7x8VZNsMZkqqn0mrcGx9wqqEgzA>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 8 Jan 2024 12:52:51 -0500 (EST)
-Date: Mon, 8 Jan 2024 10:52:49 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Lorenz Bauer <lorenz.bauer@isovalent.com>
-Cc: linux-input@vger.kernel.org, coreteam@netfilter.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-trace-kernel@vger.kernel.org, fsverity@lists.linux.dev, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	cgroups@vger.kernel.org, alexei.starovoitov@gmail.com, olsajiri@gmail.com, 
-	quentin@isovalent.com, alan.maguire@oracle.com, memxor@gmail.com
-Subject: Re: [PATCH bpf-next v3 0/3] Annotate kfuncs in .BTF_ids section
-Message-ID: <6t5bei3t2gwhuycu6ewftrgfuuyfhs26euymkysefqyfabgupa@3od5pe6ajybo>
-References: <cover.1704565248.git.dxu@dxuuu.xyz>
- <CAN+4W8gPeQ2OjoYLKXsNPyhSVTB+vcSaS3Xzw=-M9Rf5MXfKPg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6958555E5A;
+	Mon,  8 Jan 2024 18:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cd0f4f306fso24236581fa.0;
+        Mon, 08 Jan 2024 10:05:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704737114; x=1705341914; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m3UVrTC07ELqxg07etwEf6qXVGPgDZ/12FKTrGxeD48=;
+        b=iqa5JyBj/NyspgcXT0prOt6utH2AET+vn/GX9dWhQbQlZ49J5Nzb8pjLGsCjW0flo/
+         2VlGiLqiLUuqDU8KoyrXFKWpmzifK1vijJB/DTlhyctwWpMe+VrkO4Yp6MQsmOy59s+h
+         o2TeI7xNSvSDSOPzk6F6pu3sCe2TxYi/P0xoHqk05x/Ci27iF8LVu8kaBP8z2Y1OhZnF
+         56YD0NkRBm02Rs5oGvFq8jxi+6ctU/FB2iCGKtubCcx6IujxHj2V1RLk4W6BQSX1H5+p
+         V7cMG1Li7KvdmtXqrDL44OBJDmuuR9xAf62vgmidYJWEmdy4R7V0VtZHDMcBdg6dRTPt
+         MjlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704737114; x=1705341914;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m3UVrTC07ELqxg07etwEf6qXVGPgDZ/12FKTrGxeD48=;
+        b=IOaTt3vLPIX//reiFZSzAjiR9Md/zzEuPwmeAehDw61vX3g/r6gBjAsWmxTSF6DeTD
+         xogqvDYto+CHSLj+yror4vddRJ9oP48VuEgtm6OgLIBTA3mkEQuyXihL2004Qhm3CJ7r
+         2KbVSweq0/w68Ze2NoeCMzsLkFy4YX5eg0lbdvigRnX4Yl8uudAmrWquPmE7ZA2pFgV6
+         rGkscY6wjsA2XAlJl99tqumP2jz3qppyFV+aSk84XfLgB1NUuSpw8YB7eAI7aPif6awn
+         Z0V+1FTj23fSIyJ4+ofiRxWFz8Ih92RnJseQRRUAVu6zsxk8jVKPRhMkHQXlAfmmXJFY
+         AQTQ==
+X-Gm-Message-State: AOJu0YynxOUkauT3V4Z5gihy0wHotc1AyptmeZyrl0R7i2TZwIDcxv7L
+	yEfGJ+omENYLKaRwck5q1qirMh9yOZ8ajbpek60=
+X-Google-Smtp-Source: AGHT+IErJFChwpJeDSy4snncmEsk8rrbMMy7EVL/VN0pAXMi36cdPn2kfH83cxAhZU2KXGm06wd2Xo52ajIW0EozX3A=
+X-Received: by 2002:a2e:b7d5:0:b0:2cc:e68b:ee5e with SMTP id
+ p21-20020a2eb7d5000000b002cce68bee5emr1708726ljo.1.1704737114025; Mon, 08 Jan
+ 2024 10:05:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAN+4W8gPeQ2OjoYLKXsNPyhSVTB+vcSaS3Xzw=-M9Rf5MXfKPg@mail.gmail.com>
+References: <20240107180252.73436-1-verdre@v0yd.nl>
+In-Reply-To: <20240107180252.73436-1-verdre@v0yd.nl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 8 Jan 2024 13:05:01 -0500
+Message-ID: <CABBYNZ+rDo6ftN1+HdeWm6gij14YF_19WGRP7LM4Vjw-UWOTng@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] Disconnect devices before rfkilling adapter
+To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Lorenz,
+Hi Jonas,
 
-On Mon, Jan 08, 2024 at 10:15:45AM +0100, Lorenz Bauer wrote:
-> On Sat, Jan 6, 2024 at 7:25 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> >
-> > === Description ===
-> >
-> > This is a bpf-treewide change that annotates all kfuncs as such inside
-> > .BTF_ids. This annotation eventually allows us to automatically generate
-> > kfunc prototypes from bpftool.
-> >
-> > We store this metadata inside a yet-unused flags field inside struct
-> > btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
-> 
-> This is great, thanks for tackling this. With yout patches we can
-> figure out the full set of kfuncs. Is there a way to extend it so that
-> we can tell which program context a kfunc can be called from?
+On Sun, Jan 7, 2024 at 1:03=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
+wrote:
+>
+> Apparently the firmware is supposed to power off the bluetooth card
+> properly, including disconnecting devices, when we use rfkill to block
+> bluetooth. This doesn't work on a lot of laptops though, leading to weird
+> issues after turning off bluetooth, like the connection timing out on the
+> peripherals which were connected, and bluetooth not connecting properly
+> when the adapter is turned on again after rfkilling.
+>
+> This series uses the rfkill hook in the bluetooth subsystem
+> to execute a few more shutdown commands and make sure that all
+> devices get disconnected before we close the HCI connection to the adapte=
+r.
+>
+> ---
+>
+> v1: https://lore.kernel.org/linux-bluetooth/20240102133311.6712-1-verdre@=
+v0yd.nl/
+> v2: https://lore.kernel.org/linux-bluetooth/20240102181946.57288-1-verdre=
+@v0yd.nl/
+> v3:
+>  - Update commit message titles to reflect what's actually happening
+>    (disconnecting devices, not sending a power-off command).
+>  - Doing the shutdown sequence synchronously instead of async now.
+>  - Move HCI_RFKILLED flag back again to be set before shutdown.
+>  - Added a "fallback" hci_dev_do_close() to the error path because
+>    hci_set_powered_sync() might bail-out early on error.
+>
+> Jonas Dre=C3=9Fler (4):
+>   Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
+>   Bluetooth: mgmt: Remove leftover queuing of power_off work
+>   Bluetooth: Add new state HCI_POWERING_DOWN
+>   Bluetooth: Disconnect connected devices before rfkilling adapter
+>
+>  include/net/bluetooth/hci.h |  2 +-
+>  net/bluetooth/hci_core.c    | 35 +++++++++++++++++++++++++++++++++--
+>  net/bluetooth/hci_sync.c    | 16 +++++++++++-----
+>  net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
+>  4 files changed, 59 insertions(+), 24 deletions(-)
+>
+> --
+> 2.43.0
 
-I think a potential approach would be to extend BTF_ID_FLAGS() with some
-more flags if we want to continue with .BTF_ids parsing technique. But
-it has some issues with program-type-less helpers that are associated with
-attachpoints as well as struct_ops helpers.
+I will probably be applying this sortly, but let's try to add tests to
+mgmt-tester just to make sure we don't introduce regressions later,
+btw it seems there are a few suspend test that do connect, for
+example:
 
-Since it looks like we're in rather early stages of program-type-less
-world, maybe it'd be good to defer solving this problem until more use
-cases are established and we can find a good cut point to design around.
-Even with uapi helpers there was no way before.
+Suspend - Success 5 (Pairing - Legacy) - waiting 1 seconds
+random: crng init done
+  New connection with handle 0x002a
+  Test condition complete, 1 left
+Suspend - Success 5 (Pairing - Legacy) - waiting done
+  Set the system into Suspend via force_suspend
+  New Controller Suspend event received
+  Test condition complete, 0 left
 
-Thanks,
-Daniel
+--=20
+Luiz Augusto von Dentz
 
