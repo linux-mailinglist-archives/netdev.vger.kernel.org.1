@@ -1,89 +1,69 @@
-Return-Path: <netdev+bounces-62406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70556826F6A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 14:13:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8F75826F91
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 14:20:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96E7A1C226D4
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:13:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F6F4B2184E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342B54123C;
-	Mon,  8 Jan 2024 13:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F7B41764;
+	Mon,  8 Jan 2024 13:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OAoSGY28"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oGwAScyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A156E4174D;
-	Mon,  8 Jan 2024 13:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 408ClkX7008664;
-	Mon, 8 Jan 2024 13:13:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=TUkqyDZU2w0pJe2IADGbbappcrOnCPRNodexsVKjT+8=;
- b=OAoSGY28pCKHNAjzJrlgLXmSe/AsB4iZf8ugjpTFG0OxcsC9b2DjyRTdaMr24WBfiREm
- 4hoGrP1gWHyMMPP7SCH1NIqBCGpRlNp2TsgvICA4c111As3MRU+oCMKQl0OlJvj1IDJS
- zotNXl+5uON9ss4zf/lxkZq6niHLf876crLFvBM2CYHSp55tKW0Pwyr2/eKPi336uqcb
- vENdCWRGiHzXxgr7Do/B98PTdcVUeca4jYTm5Z4dw3UX2t5E/znGqTRtKiQmZD8Go+L3
- tYamG7a3JEwQW/j9j5unqnQRcN9O3pfSvVJDa5rMkFsjrCxAyDo7roMwHO/m/72/SRQj qg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vghc3gnh3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 13:13:30 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 408Cm39u009852;
-	Mon, 8 Jan 2024 13:13:30 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vghc3gngk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 13:13:30 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 408B6lwk027006;
-	Mon, 8 Jan 2024 13:13:29 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vfkw1qjnm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 13:13:29 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 408DDRDV40501792
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Jan 2024 13:13:27 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8327920049;
-	Mon,  8 Jan 2024 13:13:27 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 56CFD20040;
-	Mon,  8 Jan 2024 13:13:27 +0000 (GMT)
-Received: from DESKTOP-2CCOB1S. (unknown [9.171.166.51])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon,  8 Jan 2024 13:13:27 +0000 (GMT)
-Date: Mon, 8 Jan 2024 14:13:25 +0100
-From: Tobias Huschle <huschle@linux.ibm.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <ZZv09bLJvA5M/kc7@DESKTOP-2CCOB1S.>
-References: <20231209053443-mutt-send-email-mst@kernel.org>
- <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
- <20231211115329-mutt-send-email-mst@kernel.org>
- <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
- <20231212111433-mutt-send-email-mst@kernel.org>
- <42870.123121305373200110@us-mta-641.us.mimecast.lan>
- <20231213061719-mutt-send-email-mst@kernel.org>
- <25485.123121307454100283@us-mta-18.us.mimecast.lan>
- <20231213094854-mutt-send-email-mst@kernel.org>
- <20231214021328-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D0025754;
+	Mon,  8 Jan 2024 13:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iMQUfhOKGODVKE5j7lmJb9vjYDymD1aXyaIUsVPYuyY=; b=oGwAScyDtVosDA7OHfpyUWlDYZ
+	Ps+1KDLsZouzt7iLOTnSCi7vIfN1KrCCKkPSBx+zOOyTvP8URff4bcbkmgcrHu1efIzf2yR7T7rQ9
+	vSqGltlTLDjW3Zf2g1rUhReSar9xRROmG4h8YTwuMbFHK/ahLt52/bmak5X7nU4OhHbs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rMpXk-004dn5-LD; Mon, 08 Jan 2024 14:19:52 +0100
+Date: Mon, 8 Jan 2024 14:19:52 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next PATCH RFC v3 1/8] dt-bindings: net: document ethernet
+ PHY package nodes
+Message-ID: <841ef784-b27e-4f7a-94f2-f04f93178c61@lunn.ch>
+References: <20231126015346.25208-1-ansuelsmth@gmail.com>
+ <20231126015346.25208-2-ansuelsmth@gmail.com>
+ <0926ea46-1ce4-4118-a04c-b6badc0b9e15@gmail.com>
+ <1437d9df-2868-43f5-aebd-e0c57fe4d905@lunn.ch>
+ <b75e6267-7d54-412e-8882-af4d9a0b54e6@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,65 +72,235 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231214021328-mutt-send-email-mst@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ECAMvZcC_h-gkpU_Pbp9Ecir0gWIPvvz
-X-Proofpoint-GUID: uFGhddQc-GSToOejEHlZ_c_bFqoRBb5C
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-08_04,2024-01-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 mlxlogscore=825 phishscore=0
- clxscore=1011 adultscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2401080113
+In-Reply-To: <b75e6267-7d54-412e-8882-af4d9a0b54e6@quicinc.com>
 
-On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
+> Since qca8075 PHY is also multiple port PHY, which is same as qca8084,
+> but qca8084 also includes the integrated clock controller, this is the
+> first qcom PHY chip integrating the clock controller internally.
+> can we also consider designing the clocks and resets DT models in the
+> PHY package DT.
 > 
-> Peter, would appreciate feedback on this. When is cond_resched()
-> insufficient to give up the CPU? Should Documentation/kernel-hacking/hacking.rst
-> be updated to require schedule() instead?
+> For qca8084 PURE PHY chip, which is the quad PHY chip and two PCSes,
+> it integrates the clock controller that generates the clocks to be used
+> by the link of PHYs, the integrated controller also provides the resets
+> to the PHY,  the clock controller(NSSCC) driver of qca8084 works at the
+> same way of the GCC of SoC(IPQ), qca8084 needs to be initialized with
+> the clocks and resets for the qca8084 PHY package, these clocks and
+> resets are generated by the NSSCC, even for PURE phy chip qca8084, there
+> is also some PHY package level clocks needs to be initialized.
 > 
+> here is the diagram of qca8084.
+> __| |_______________| |__
+> | PCS0 |          |PCS1 |
+> |______|          |_____|
+> |_________________      |
+> |                |      |
+> |     NSSCC      |      |
+> |________________|      |
+> |_______________________|
+> |     |     |     |     |
+> |PHY1 |PHY2 |PHY3 |PHY4 |
+> |_____|_____|_____|_____|
 
-Happy new year everybody!
+Please add to the diagram the external clocks and external resets.
 
-I'd like to bring this thread back to life. To reiterate:
+Additionally, add the resets and clocks between the NSSCC and the
+individual PHYs. Typically, the internal clocks and resets are not in
+DT, at last not for a single PHY. For a quad PHY in a package, it
+might make sense to add them. Before we can decide that, we need a
+clear idea what the hardware looks like.
 
-- The introduction of the EEVDF scheduler revealed a performance
-  regression in a uperf testcase of ~50%.
-- Tracing the scheduler showed that it takes decisions which are
-  in line with its design.
-- The traces showed as well, that a vhost instance might run
-  excessively long on its CPU in some circumstance. Those cause
-  the performance regression as they cause delay times of 100+ms
-  for a kworker which drives the actual network processing.
-- Before EEVDF, the vhost would always be scheduled off its CPU
-  in favor of the kworker, as the kworker was being woken up and
-  the former scheduler was giving more priority to the woken up
-  task. With EEVDF, the kworker, as a long running process, is
-  able to accumulate negative lag, which causes EEVDF to not
-  prefer it on its wake up, leaving the vhost running.
-- If the kworker is not scheduled when being woken up, the vhost
-  continues looping until it is migrated off the CPU.
-- The vhost offers to be scheduled off the CPU by calling 
-  cond_resched(), but, the the need_resched flag is not set,
-  therefore cond_resched() does nothing.
+> let me example the initial clocks and resets for the pure PHY chip qca8084
+> as below, the clocks and resets should be put into the first
+> MDIO node to be initialized firstly before qca8084 PHY will work.
+> 
+> ethernet-phy-package@0 {
+> 
+>         #address-cells = <1>;
+> 
+>         #size-cells = <0>;
+> 
+>         compatible = "ethernet-phy-package";
+> 
+>         reg = <0>;
+> 
+> 
+> 
+>         /* initial PHY package level clocks */
+> 
+>         clocks = <&qca8k_nsscc NSS_CC_APB_BRIDGE_CLK>,
+> 
+>                <&qca8k_nsscc NSS_CC_AHB_CLK>,
+> 
+>                <&qca8k_nsscc NSS_CC_SEC_CTRL_AHB_CLK>,
+> 
+>                <&qca8k_nsscc NSS_CC_TLMM_CLK>,
+> 
+>                <&qca8k_nsscc NSS_CC_TLMM_AHB_CLK>,
+> 
+>                <&qca8k_nsscc NSS_CC_CNOC_AHB_CLK>,
+> 
+>                <&qca8k_nsscc NSS_CC_MDIO_AHB_CLK>;
 
-To solve this, I see the following options 
-  (might not be a complete nor a correct list)
-- Along with the wakeup of the kworker, need_resched needs to
-  be set, such that cond_resched() triggers a reschedule.
-- The vhost calls schedule() instead of cond_resched() to give up
-  the CPU. This would of course be a significantly stricter
-  approach and might limit the performance of vhost in other cases.
-- Preventing the kworker from accumulating negative lag as it is
-  mostly not runnable and if it runs, it only runs for a very short
-  time frame. This might clash with the overall concept of EEVDF.
-- On cond_resched(), verify if the consumed runtime of the caller
-  is outweighing the negative lag of another process (e.g. the 
-  kworker) and schedule the other process. Introduces overhead
-  to cond_resched.
+Device tree effectively defined devices on bus, in a tree, and how
+they interconnect. Does the NSSCC have its own address on the MDIO
+bus? Or does it share an address with one of the PHYs? It could be we
+want to describe the NSSCC as a DT node of its own within the
+package. It is probably both a clock consumer, and a clock provider.
+The individual PHYs are then clock consumers, of the clocks the NSSCC
+exports. Same for resets.
 
-I would be curious on feedback on those ideas and interested in
-alternative approaches.
+> 
+>         clock-names = "apb_bridge",
+> 
+>                 "ahb",
+> 
+>                 "sec_ctrl_ahb",
+> 
+>                 "tlmm",
+> 
+>                 "tlmm_ahb",
+> 
+>                 "cnoc_ahb",
+> 
+>                 "mdio_ahb";
+> 
+> 
+> 
+>         /* initial PHY package level reset */
+> 
+>         resets = <&qca8k_nsscc NSS_CC_DSP_ARES>;
+> 
+>         reset-names = "gephy_dsp";
+> 
+> 
+> 
+>         /* initial clocks and resets for first phy */
+> 
+>         phy0 {
+> 
+>                 reg = <0>;
+> 
+>                 clocks = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_CLK>;
+> 
+>                 clock-names = "gephy0_sys";
+> 
+>                 resets = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_ARES>,
+> 
+>                        <&qca8k_nsscc NSS_CC_GEPHY0_ARES>;
+> 
+>                 reset-names = "gephy0_sys",
+> 
+>                         "gephy0_soft";
+> 
+>         };
+> 
+> 
+> 
+>         /* initial clocks and resets for second phy */
+> 
+>         phy1 {
+> 
+>                 reg = <1>;
+> 
+>                 clocks = <&qca8k_nsscc NSS_CC_GEPHY1_SYS_CLK>;
+> 
+>                 clock-names = "gephy1_sys";
+> 
+>                 resets = <&qca8k_nsscc NSS_CC_GEPHY1_SYS_ARES>,
+> 
+>                        <&qca8k_nsscc NSS_CC_GEPHY1_ARES>;
+> 
+>                 reset-names = "gephy1_sys",
+> 
+>                         "gephy1_soft";
+> 
+>         };
+> 
+> 
+> 
+>         /* initial clocks and resets for third phy */
+> 
+>         phy2 {
+> 
+>                 reg = <2>;
+> 
+>                 clocks = <&qca8k_nsscc NSS_CC_GEPHY2_SYS_CLK>;
+> 
+>                 clock-names = "gephy2_sys";
+>                 resets = <&qca8k_nsscc NSS_CC_GEPHY2_SYS_ARES>,
+> 
+>                        <&qca8k_nsscc NSS_CC_GEPHY2_ARES>;
+> 
+>                 reset-names = "gephy2_sys",
+> 
+>                         "gephy2_soft";
+> 
+>         };
+> 
+> 
+> 
+>         /* initial clocks and resets for fourth phy */
+> 
+>         phy3 {
+> 
+>                 reg = <3>;
+> 
+>                 clocks = <&qca8k_nsscc NSS_CC_GEPHY3_SYS_CLK>;
+> 
+>                 clock-names = "gephy3_sys";
+> 
+>                 resets = <&qca8k_nsscc NSS_CC_GEPHY3_SYS_ARES>,
+> 
+>                        <&qca8k_nsscc NSS_CC_GEPHY3_ARES>;
+> 
+>                 reset-names = "gephy3_sys",
+> 
+>                         "gephy3_soft";
+> 
+>         };
+
+This is starting to look O.K.
+
+>         /* initial clocks and resets for pcs0. */
+> 
+>         pcs0 {
+> 
+>                 reg = <4>;
+> 
+>                 clocks = <&qca8k_nsscc NSS_CC_SRDS0_SYS_CLK>;
+> 
+>                 clock-names = "srds0_sys";
+> 
+>                 resets = <&qca8k_nsscc NSS_CC_SRDS0_SYS_ARES>;
+> 
+>                 reset-names = "srds0_sys";
+> 
+>         };
+> 
+> 
+> 
+>         /* initial clocks and resets for pcs1. */
+> 
+>         pcs1 {
+> 
+>                 reg = <5>;
+> 
+>                 clocks = <&qca8k_nsscc NSS_CC_SRDS1_SYS_CLK>;
+> 
+>                 clock-names = "srds1_sys";
+> 
+>                 resets = <&qca8k_nsscc NSS_CC_SRDS1_SYS_ARES>;
+> 
+>                 reset-names = "srds1_sys";
+> 
+>         };
+
+PCS will need further work and thinking about. Typically, they are not
+described in DT for a PHY. In general, a PCS in a PHY does not have a
+driver of its own, the firmware in the PHY mostly controls it, not
+Linux. For the moment, lets leave them as they are, and we will come
+back to them once we get the clocks and resets correctly described.
+
+     Andrew
 
