@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-62352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98F97826C11
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:05:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 301FD826C31
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C12EA28260E
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:05:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7583B20B41
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5763114011;
-	Mon,  8 Jan 2024 11:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA77014019;
+	Mon,  8 Jan 2024 11:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyGyQ2/m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LkLnXY8u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3778E14A8E;
-	Mon,  8 Jan 2024 11:05:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D6F6C433C8;
-	Mon,  8 Jan 2024 11:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8C11426D;
+	Mon,  8 Jan 2024 11:08:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA26BC433C7;
+	Mon,  8 Jan 2024 11:08:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704711928;
-	bh=hnEEbFLqfApmzetmvDA6gou/ELu0XbyZz3a1X9//NtU=;
+	s=k20201202; t=1704712129;
+	bh=wEJjNDaehk6eNSabXV7AmGugSgejPKqecFRSyFZ8RZc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gyGyQ2/m9W0Pt4XSgbjvLigzqgNRwgpBtqDKyKhFITR9y97Cxtrz/1PlDIGp+IjcA
-	 EuKa9O9B5hd0LAUnR1F/5LzVUTCqCR7SrTv2ayYSUXF9T1bonV074L//hic4FkcYyM
-	 kXENP2DMZ0iC4QLrj1yjvepgS7e3dCT7OB/70YoQ/zdGwcUthVASSxp390vG3ixO0+
-	 OSD7AVyrkOxemfqmI0tu1I3ZtLxm7uhLm8LrjsNSc8XbFYaDMcZduBRiq054oMTc26
-	 vEAxTN3RaQUgIwpUrMefJr1FYoywnUCcZ8mBn5ZpiA0B8vY74O1nfEoJqW5ab9lwbA
-	 7GzNn9CJq5gLw==
-Date: Mon, 8 Jan 2024 11:05:23 +0000
+	b=LkLnXY8u4eI9km5fTHwImF1ktVgLyZ6u2QGrP7Hk+OgzoGS2vG8mnJyRaxXn+91iH
+	 nwC+Dl+c79JuUYMhoX+SsMBWnmT1P9qwWOpSWnHSGJ9ltXJKc6VANm/u95gJgCavAX
+	 dkLmyBLZe+XuRwRJeeCgDzytrVvnp42JLFZ1Zi3vWxteEcdk1pzIFAFB/hQE1nKd4X
+	 j6QH4T4Q3dBf8wKpKhZz8grpjjpFlwEN98upscb41xbxcyTClGu+OiB5+I2rPhKtib
+	 LzdaDjZ26pI6G0rXjjk9UytWHG+rJFOfoWF+c2AFz3n5qhuX0Lih89cMxiUUiqSlub
+	 gSKOzV9j51BIQ==
+Date: Mon, 8 Jan 2024 11:08:44 +0000
 From: Simon Horman <horms@kernel.org>
-To: alexious@zju.edu.cn
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maor Gottlieb <maorg@mellanox.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/mlx5e: fix a double-free in arfs_create_groups
-Message-ID: <20240108110523.GG132648@kernel.org>
-References: <20231224081348.3535146-1-alexious@zju.edu.cn>
- <20240103172254.GB31813@kernel.org>
- <5d93189f.7631f.18ce857ef38.Coremail.alexious@zju.edu.cn>
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 net-next 5/5] net: phy: marvell-88q2xxx: add driver
+ for the Marvell 88Q2220 PHY
+Message-ID: <20240108110844.GH132648@kernel.org>
+References: <20240108093702.13476-1-dima.fedrau@gmail.com>
+ <20240108093702.13476-6-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,71 +55,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5d93189f.7631f.18ce857ef38.Coremail.alexious@zju.edu.cn>
+In-Reply-To: <20240108093702.13476-6-dima.fedrau@gmail.com>
 
-On Mon, Jan 08, 2024 at 05:12:06PM +0800, alexious@zju.edu.cn wrote:
+On Mon, Jan 08, 2024 at 10:37:00AM +0100, Dimitri Fedrau wrote:
+> Add a driver for the Marvell 88Q2220. This driver allows to detect the
+> link, switch between 100BASE-T1 and 1000BASE-T1 and switch between
+> master and slave mode. Autonegoation is supported.
+
+nit: Autonegotiation
+
+> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
+> ---
+>  drivers/net/phy/marvell-88q2xxx.c | 206 +++++++++++++++++++++++++++++-
+>  include/linux/marvell_phy.h       |   1 +
+>  2 files changed, 201 insertions(+), 6 deletions(-)
 > 
-> 
-> > On Sun, Dec 24, 2023 at 04:13:48PM +0800, Zhipeng Lu wrote:
-> > > When `in` allocated by kvzalloc fails, arfs_create_groups will free
-> > > ft->g and return an error. However, arfs_create_table, the only caller of
-> > > arfs_create_groups, will hold this error and call to
-> > > mlx5e_destroy_flow_table, in which the ft->g will be freed again.
-> > > 
-> > > Fixes: 1cabe6b0965e ("net/mlx5e: Create aRFS flow tables")
-> > > Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
-> > 
-> > Thanks,
-> > 
-> > I agree this addresses the issue that you describe.
-> > And as a minimal fix it looks good.
-> > 
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > 
-> > However, I would like to suggest that some clean-up work could
-> > take place as a follow-up.
-> > 
-> > I think that the error handling in this area of the code
-> > is rather fragile. This is because initialisation is not necessarily
-> > unwound on error within the function that initialisation occurs.
-> > 
-> > I think it would be better if arfs_create_groups():
-> > 
-> > 1. Released allocates resources it allocates, including ft->g and
-> >    elements of ft->g, on error.
-> > 2. This was achieved by using a goto unwind ladder.
-> > 3. The caller treated ft->g as uninitialised if
-> >    arfs_create_groups fails.
-> >
+> diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
+
+...
+
+> @@ -29,6 +36,42 @@
 >  
-> Agree, I think a unwind ladder for arfs_create_groups is much better.
-> I'll follow this idea to send a v2 patch later.
+>  #define MDIO_MMD_PCS_MV_RX_STAT			33328
+>  
+> +struct mmd_val {
+> +	int devad;
+> +	u32 regnum;
+> +	u16 val;
+> +};
+> +
+> +const struct mmd_val mv88q222x_revb0_init_seq0[] = {
+> +	{ MDIO_MMD_PCS, 0x8033, 0x6801 },
+> +	{ MDIO_MMD_AN, MDIO_AN_T1_CTRL, 0x0 },
+> +	{ MDIO_MMD_PMAPMD, MDIO_CTRL1,
+> +	  MDIO_CTRL1_LPOWER | MDIO_PMA_CTRL1_SPEED1000 },
+> +	{ MDIO_MMD_PCS, 0xfe1b, 0x48 },
+> +	{ MDIO_MMD_PCS, 0xffe4, 0x6b6 },
+> +	{ MDIO_MMD_PMAPMD, MDIO_CTRL1, 0x0 },
+> +	{ MDIO_MMD_PCS, MDIO_CTRL1, 0x0 },
+> +};
+> +
+> +const struct mmd_val mv88q222x_revb0_init_seq1[] = {
+> +	{ MDIO_MMD_PCS, 0xfe79, 0x0 },
+> +	{ MDIO_MMD_PCS, 0xfe07, 0x125a },
+> +	{ MDIO_MMD_PCS, 0xfe09, 0x1288 },
+> +	{ MDIO_MMD_PCS, 0xfe08, 0x2588 },
+> +	{ MDIO_MMD_PCS, 0xfe11, 0x1105 },
+> +	{ MDIO_MMD_PCS, 0xfe72, 0x042c },
+> +	{ MDIO_MMD_PCS, 0xfbba, 0xcb2 },
+> +	{ MDIO_MMD_PCS, 0xfbbb, 0xc4a },
+> +	{ MDIO_MMD_AN, 0x8032, 0x2020 },
+> +	{ MDIO_MMD_AN, 0x8031, 0xa28 },
+> +	{ MDIO_MMD_AN, 0x8031, 0xc28 },
+> +	{ MDIO_MMD_PCS, 0xffdb, 0xfc10 },
+> +	{ MDIO_MMD_PCS, 0xfe1b, 0x58 },
+> +	{ MDIO_MMD_PCS, 0xfe79, 0x4 },
+> +	{ MDIO_MMD_PCS, 0xfe5f, 0xe8 },
+> +	{ MDIO_MMD_PCS, 0xfe05, 0x755c },
+> +};
 
-Thanks.
+nit: mv88q222x_revb0_init_seq0 and mv88q222x_revb0_init_seq1 seem
+    to only be used in this file. Perhaps they should be static.
 
-> Another comment below.
-> 
-> > Likewise, I think that:
-> > 
-> > * arfs_create_groups, should initialise ft->num_groups
-> > 
-> > And further, logic similar to the above should guide
-> > how arfs_create_table() initialises ft->t and cleans it
-> > up on error.
-> > 
-> 
-> I think that ft->t you mentioned refers to mlx5_create_flow_table.
-> I'd like to make the life cycle of ft->t similar to ft->g in arfs_create_groups, 
-> but it needs to add an argument for mlx5_create_flow_table to transfer ft to 
-> it. However, mlx5_create_flow_table is called in more than 30 different places 
-> throughout the kernel. So such modification could be another refactoring patch
-> but may be out of this fix patch's duty.
-
-I agree there is no need to solve all problems in this patch :)
-
-> > I did not look at the code beyond the scope described above.
-> > But the above are general principles that may well apply in
-> > other nearby code too.
-> > 
-> > ...
+...
 
