@@ -1,276 +1,168 @@
-Return-Path: <netdev+bounces-62525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 841BA827A90
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 23:26:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B56C3827AA1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 23:31:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02AB11F23114
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 22:26:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE84BB22D66
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 22:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342BD56467;
-	Mon,  8 Jan 2024 22:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FDD24642C;
+	Mon,  8 Jan 2024 22:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZ2kbWTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA6855E6C;
-	Mon,  8 Jan 2024 22:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD42E611A
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 22:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704753100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g3fhJdYhF0Jh8djZ9CbUM5+BZiYxRI9hKlm7wmHneNE=;
+	b=OZ2kbWTEKRjY7eLh/D6Pl/LNC4wp20P+DlQGzXqRRcV3H6fXLsrgkoa/RUhyHLVcdRDt8L
+	Z7d/Kaf2lPh4bRlWiVBboEFPQfIJGUkuWdDSNa1akYM0q2wQ6+DVbrEk/rqFw+y4PgSAMu
+	3qIkfa5i8zavapoiHZ7MfjUnQ2G5J2U=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-124-mFt6nnssNiyKD7dLtjUHgg-1; Mon,
+ 08 Jan 2024 17:31:35 -0500
+X-MC-Unique: mFt6nnssNiyKD7dLtjUHgg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4T87tX69Jlz9sWf;
-	Mon,  8 Jan 2024 23:25:40 +0100 (CET)
-Message-ID: <7cee4e74-3a0c-4b7c-9984-696e646160f8@v0yd.nl>
-Date: Mon, 8 Jan 2024 23:25:39 +0100
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4CFBE1C29EAA;
+	Mon,  8 Jan 2024 22:31:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.27])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BECCF1121306;
+	Mon,  8 Jan 2024 22:31:30 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240107160916.GA129355@kernel.org>
+References: <20240107160916.GA129355@kernel.org> <20240103145935.384404-1-dhowells@redhat.com> <20240103145935.384404-2-dhowells@redhat.com>
+To: Simon Horman <horms@kernel.org>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+    Yiqun Leng <yqleng@linux.alibaba.com>,
+    Jia Zhu <zhujia.zj@bytedance.com>
+Subject: Re: [PATCH 1/5] cachefiles: Fix __cachefiles_prepare_write()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Subject: Re: [PATCH v3 0/4] Disconnect devices before rfkilling adapter
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, asahi@lists.linux.dev,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240107180252.73436-1-verdre@v0yd.nl>
- <CABBYNZ+rDo6ftN1+HdeWm6gij14YF_19WGRP7LM4Vjw-UWOTng@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CABBYNZ+rDo6ftN1+HdeWm6gij14YF_19WGRP7LM4Vjw-UWOTng@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4T87tX69Jlz9sWf
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1544729.1704753090.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 Jan 2024 22:31:30 +0000
+Message-ID: <1544730.1704753090@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Hi Luiz,
+Simon Horman <horms@kernel.org> wrote:
 
-On 1/8/24 19:05, Luiz Augusto von Dentz wrote:
-> Hi Jonas,
-> 
-> On Sun, Jan 7, 2024 at 1:03 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
->>
->> Apparently the firmware is supposed to power off the bluetooth card
->> properly, including disconnecting devices, when we use rfkill to block
->> bluetooth. This doesn't work on a lot of laptops though, leading to weird
->> issues after turning off bluetooth, like the connection timing out on the
->> peripherals which were connected, and bluetooth not connecting properly
->> when the adapter is turned on again after rfkilling.
->>
->> This series uses the rfkill hook in the bluetooth subsystem
->> to execute a few more shutdown commands and make sure that all
->> devices get disconnected before we close the HCI connection to the adapter.
->>
->> ---
->>
->> v1: https://lore.kernel.org/linux-bluetooth/20240102133311.6712-1-verdre@v0yd.nl/
->> v2: https://lore.kernel.org/linux-bluetooth/20240102181946.57288-1-verdre@v0yd.nl/
->> v3:
->>   - Update commit message titles to reflect what's actually happening
->>     (disconnecting devices, not sending a power-off command).
->>   - Doing the shutdown sequence synchronously instead of async now.
->>   - Move HCI_RFKILLED flag back again to be set before shutdown.
->>   - Added a "fallback" hci_dev_do_close() to the error path because
->>     hci_set_powered_sync() might bail-out early on error.
->>
->> Jonas Dreßler (4):
->>    Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
->>    Bluetooth: mgmt: Remove leftover queuing of power_off work
->>    Bluetooth: Add new state HCI_POWERING_DOWN
->>    Bluetooth: Disconnect connected devices before rfkilling adapter
->>
->>   include/net/bluetooth/hci.h |  2 +-
->>   net/bluetooth/hci_core.c    | 35 +++++++++++++++++++++++++++++++++--
->>   net/bluetooth/hci_sync.c    | 16 +++++++++++-----
->>   net/bluetooth/mgmt.c        | 30 ++++++++++++++----------------
->>   4 files changed, 59 insertions(+), 24 deletions(-)
->>
->> --
->> 2.43.0
-> 
-> I will probably be applying this sortly, but let's try to add tests to
-> mgmt-tester just to make sure we don't introduce regressions later,
-> btw it seems there are a few suspend test that do connect, for
-> example:
-> 
-> Suspend - Success 5 (Pairing - Legacy) - waiting 1 seconds
-> random: crng init done
->    New connection with handle 0x002a
->    Test condition complete, 1 left
-> Suspend - Success 5 (Pairing - Legacy) - waiting done
->    Set the system into Suspend via force_suspend
->    New Controller Suspend event received
->    Test condition complete, 0 left
-> 
+> I realise these patches have been accepted, but I have a minor nit:
+> pos is now unsigned, and so cannot be less than zero.
 
-Thanks for that hint, I've been starting to write a test and managed to
-write to the rfkill file and it's blocking the device just fine, except
-I've run into what might be a bug in the virtual HCI driver:
+Good point.  How about the attached patch.  Whilst I would prefer to use
+unsigned long long to avoid the casts, it might =
 
-So the power down sequence is initiated on the rfkill as expected and
-hci_set_powered_sync(false) is called. That then calls
-hci_write_scan_enable_sync(), and this HCI command never gets a response
-from the virtual HCI driver. Strangely, BT_HCI_CMD_WRITE_SCAN_ENABLE is
-implemented in btdev.c and the callback does get executed (I checked), it
-just doesn't send the command completed event:
 
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1                                                                                                                                       #1588 [hci1] 12.294234
-         Scan enable: No Scans (0x00)
+David
+---
+cachefiles: Fix signed/unsigned mixup
 
-no response after...
+In __cachefiles_prepare_write(), the start and pos variables were made
+unsigned 64-bit so that the casts in the checking could be got rid of -
+which should be fine since absolute file offsets can't be negative, except
+that an error code may be obtained from vfs_llseek(), which *would* be
+negative.  This breaks the error check.
 
-Below is my current mgmt-tester patch adding the test:
+Fix this for now by reverting pos and start to be signed and putting back
+the casts.  Unfortunately, the error value checks cannot be replaced with
+IS_ERR_VALUE() as long might be 32-bits.
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 7dfd1b0c7..2095b7203 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -12439,6 +12439,30 @@ static const struct generic_data suspend_resume_success_5 = {
-  	.expect_alt_ev_len = sizeof(suspend_state_param_disconnect),
-  };
-  
-+static const uint8_t rfkill_hci_disconnect_device[] = {
-+   0x00, 0x00, 0x01, 0x01, 0xaa, 0x00, 0x00,
-+   0x05,
-+};
-+
-+static const uint8_t rfkill_new_settings_ev[] = {
-+   0x92, 0x00, 0x00, 0x00,
-+};
-+
-+
-+static const struct generic_data rfkill_disconnect_devices = {
-+	.setup_settings = settings_powered_connectable_bondable,
-+	.pin = pair_device_pin,
-+	.pin_len = sizeof(pair_device_pin),
-+	.client_pin = pair_device_pin,
-+	.client_pin_len = sizeof(pair_device_pin),
-+	.expect_hci_command = BT_HCI_CMD_DISCONNECT,
-+	.expect_hci_param = rfkill_hci_disconnect_device,
-+	.expect_hci_len = sizeof(rfkill_hci_disconnect_device),
-+	.expect_alt_ev = MGMT_EV_NEW_SETTINGS,
-+	.expect_alt_ev_param = rfkill_new_settings_ev,
-+	.expect_alt_ev_len = sizeof(rfkill_new_settings_ev),
-+};
-+
-  static void trigger_force_suspend(void *user_data)
-  {
-  	struct test_data *data = tester_get_data();
-@@ -12454,6 +12478,81 @@ static void trigger_force_suspend(void *user_data)
-  	}
-  }
-  
-+enum rfkill_type {
-+	RFKILL_TYPE_ALL = 0,
-+	RFKILL_TYPE_WLAN,
-+	RFKILL_TYPE_BLUETOOTH,
-+	RFKILL_TYPE_UWB,
-+	RFKILL_TYPE_WIMAX,
-+	RFKILL_TYPE_WWAN,
-+};
-+
-+enum rfkill_operation {
-+	RFKILL_OP_ADD = 0,
-+	RFKILL_OP_DEL,
-+	RFKILL_OP_CHANGE,
-+	RFKILL_OP_CHANGE_ALL,
-+};
-+
-+struct rfkill_event {
-+	uint32_t idx;
-+	uint8_t  type;
-+	uint8_t  op;
-+	uint8_t  soft;
-+	uint8_t  hard;
-+};
-+#define RFKILL_EVENT_SIZE_V1    8
-+
-+static void trigger_rfkill(void *user_data)
-+{
-+	int fd;
-+	int latest_rfkill_idx;
-+        struct rfkill_event write_event;
-+        ssize_t l;
-+
-+	tester_print("Triggering rfkill block of hci device");
-+
-+	fd = open("/dev/rfkill", O_RDWR|O_CLOEXEC|O_NOCTTY|O_NONBLOCK);
-+	if (fd < 0) {
-+		tester_warn("Failed to open RFKILL control device");
-+		return;
-+	}
-+
-+	latest_rfkill_idx = -1;
-+	while (1) {
-+		struct rfkill_event event = { 0 };
-+		ssize_t len;
-+
-+		len = read(fd, &event, sizeof(event));
-+		if (len < RFKILL_EVENT_SIZE_V1)
-+			break;
-+
-+		if (event.type == RFKILL_TYPE_BLUETOOTH)
-+			latest_rfkill_idx = event.idx;
-+	}
-+
-+	if (latest_rfkill_idx < 0) {
-+		tester_warn("No rfkill device to block found");
-+		return;
-+	}
-+
-+	write_event.idx = latest_rfkill_idx;
-+	write_event.op = RFKILL_OP_CHANGE;
-+	write_event.soft = true;
-+	
-+        l = write(fd, &write_event, sizeof write_event);
-+
-+	close(fd);
-+
-+	if (l < 0) {
-+		tester_warn("Failed to execute rfkill op");
-+		return;
-+	}
-+
-+	if ((size_t)l < RFKILL_EVENT_SIZE_V1)
-+		tester_warn("Failed to write to rfkill file");
-+}
-+
-  static void trigger_force_resume(void *user_data)
-  {
-  	struct test_data *data = tester_get_data();
-@@ -12475,6 +12574,12 @@ static void test_suspend_resume_success_5(const void *test_data)
-  	tester_wait(1, trigger_force_suspend, NULL);
-  }
-  
-+static void test_disconnect_on_rfkill(const void *test_data)
-+{
-+	test_pairing_acceptor(test_data);
-+	tester_wait(1, trigger_rfkill, NULL);
-+}
-+
-  static const struct generic_data suspend_resume_success_6 = {
-  	.setup_settings = settings_powered_connectable_bondable_ssp,
-  	.client_enable_ssp = true,
-@@ -14534,6 +14639,15 @@ int main(int argc, char *argv[])
-  				&suspend_resume_success_5, NULL,
-  				test_suspend_resume_success_5);
-  
-+	/* Suspend/Resume
-+	 * Setup: Pair.
-+	 * Run: Enable suspend
-+	 * Expect: Receive the Suspend Event
-+	 */
-+	test_bredrle("Rfkill - disconnect devices",
-+				&rfkill_disconnect_devices, NULL,
-+				test_disconnect_on_rfkill);
-+
-  	/* Suspend/Resume
-  	 * Setup: Pair.
-  	 * Run: Enable suspend
+Fixes: 7097c96411d2 ("cachefiles: Fix __cachefiles_prepare_write()")
+Reported-by: Simon Horman <horms@kernel.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202401071152.DbKqMQMu-lkp@in=
+tel.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Gao Xiang <hsiangkao@linux.alibaba.com>
+cc: Yiqun Leng <yqleng@linux.alibaba.com>
+cc: Jia Zhu <zhujia.zj@bytedance.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cachefs@redhat.com
+cc: linux-erofs@lists.ozlabs.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
+---
+ fs/cachefiles/io.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index 3eec26967437..9a2cb2868e90 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -522,7 +522,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ 			       bool no_space_allocated_yet)
+ {
+ 	struct cachefiles_cache *cache =3D object->volume->cache;
+-	unsigned long long start =3D *_start, pos;
++	loff_t start =3D *_start, pos;
+ 	size_t len =3D *_len;
+ 	int ret;
+ =
+
+@@ -556,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ 					  cachefiles_trace_seek_error);
+ 		return pos;
+ 	}
+-	if (pos >=3D start + *_len)
++	if ((u64)pos >=3D (u64)start + *_len)
+ 		goto check_space; /* Unallocated region */
+ =
+
+ 	/* We have a block that's at least partially filled - if we're low on
+@@ -575,7 +575,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ 					  cachefiles_trace_seek_error);
+ 		return pos;
+ 	}
+-	if (pos >=3D start + *_len)
++	if ((u64)pos >=3D (u64)start + *_len)
+ 		return 0; /* Fully allocated */
+ =
+
+ 	/* Partially allocated, but insufficient space: cull. */
+
 
