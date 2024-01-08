@@ -1,328 +1,120 @@
-Return-Path: <netdev+bounces-62504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4E9682794E
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 21:46:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57301827957
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 21:49:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55EFF283E81
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:46:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0562284E34
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DCE46BBD;
-	Mon,  8 Jan 2024 20:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGV8B3lW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E2C537E0;
+	Mon,  8 Jan 2024 20:49:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9446755776;
-	Mon,  8 Jan 2024 20:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cd053d5683so25992911fa.2;
-        Mon, 08 Jan 2024 12:46:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704746796; x=1705351596; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HZQSSuEov1m94GTK+3rCrdLk/BXHqNE/mhue/X0KjOo=;
-        b=TGV8B3lWdzPuZVteIbtemrM1hNcvlQ49mgpREq+mSuLthfFHDx/9acNhf25h0aCXb/
-         Haga3uT8VrLRVMeKugCDebmZ0dyXWDgxy5AyZK40UFrYI//SJg/vBRGnquKqjoHFl5u0
-         8MJNvfVl5CVpPp5SN38B8NsWIX4k8U/b2T/a3ltc09KXVqEN9Et4IzuSQOaeBuSxvusH
-         /AKtFIeyei7TR1oMpAj++BTEUjYcP/5QjvTDrdZTafbSEwEvuyWgg2+rpfL6QXUpuG4c
-         w/bozufNu5NVKUmPkRh/IsM4L0QLlpaGoPTxYuZyvQwf2y4HReMdTI3ux4PFJmxlUbHO
-         lKtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704746796; x=1705351596;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HZQSSuEov1m94GTK+3rCrdLk/BXHqNE/mhue/X0KjOo=;
-        b=CnSF2uYxNUci0YL9+fh3ugDm2X9LI45GDbTWyJhEK4Z7/xXxFtOMlW01ywioPdTQze
-         ZJW026f4UgqX9GkBLc0UFYrqNr0GMOrSfAf9flN4Kk2U/ZMUqENz+Td5ahD2bqUawt2l
-         qncQnCK8IQfHwrgKZmp63BPyvdqZwKaUcTAt9o7C+ohQ9XJoMI3JWOgWhWjQMWE+t8BO
-         /cLCvUMstDafPLl58mN56WHmjE7gcE/AvUY2F9IM9J6Omg9w11O6xYyQ/yFDulE2zvxS
-         vfvAinn5xFTioUqF59G6+0ervzT8hZDmJsyXU1DvJEQb5p6r4lch78IdJHQQO+dy3lGc
-         mC0Q==
-X-Gm-Message-State: AOJu0Yx+3OkzqyALO7+7imPiW6ecaLhp0fgnvUghU140BoohTAJXYx5F
-	zrwFBo+PomuB49cqikldmahrG9AWo/hgoax5WPA=
-X-Google-Smtp-Source: AGHT+IFAd1Im/x73j+HN+fteMR6gcTc/xpPKbDXMlbjrxEb5PxAfwwEoMkT0wU9YgL9OgE+2e+ctSO0isVXTHc6buX8=
-X-Received: by 2002:a05:651c:118f:b0:2cc:eaa3:bb4d with SMTP id
- w15-20020a05651c118f00b002cceaa3bb4dmr1511107ljo.61.1704746796173; Mon, 08
- Jan 2024 12:46:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910E055776;
+	Mon,  8 Jan 2024 20:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.87.204) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 8 Jan
+ 2024 23:49:30 +0300
+Subject: Re: [PATCH net-next v3 18/19] net: ravb: Do not apply RX CSUM
+ settings to hardware if the interface is down
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <geert+renesas@glider.be>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240105082339.1468817-19-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <16361de1-5f90-01e6-7a4a-8faacc0fa056@omp.ru>
+Date: Mon, 8 Jan 2024 23:49:29 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108183938.468426-1-verdre@v0yd.nl> <20240108183938.468426-5-verdre@v0yd.nl>
- <5d1f2013-5758-4d6c-8d01-e96a76bb2686@v0yd.nl> <40550fc1-3b5b-438c-891d-2da0f30874f3@v0yd.nl>
- <CABBYNZKV8SujJ7GFUqTMXUskE=yK0q=opmwvTZNEpPb=JkiQbA@mail.gmail.com>
- <d1e7219f-e7b4-4474-ae89-70925b8787fa@v0yd.nl> <CABBYNZLNeKOT0n=D-PN=aPgfu07xZ-x8nNKitas40X=0Snp4jQ@mail.gmail.com>
- <d7e6ff1d-f69f-4e48-8167-7dbcb0d8093f@v0yd.nl>
-In-Reply-To: <d7e6ff1d-f69f-4e48-8167-7dbcb0d8093f@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Jan 2024 15:46:22 -0500
-Message-ID: <CABBYNZJZ8cA77FBgvXWJeVjVpzjuwzC4Mn4QRR3OsZJn+M=VyQ@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] Bluetooth: Remove pending ACL connection attempts
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240105082339.1468817-19-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/08/2024 20:32:49
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182482 [Jan 08 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.87.204 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.87.204 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	31.173.87.204:7.4.1,7.7.3;omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: {cloud_iprep_silent}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.87.204
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/08/2024 20:37:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/8/2024 7:11:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi Jonas,
+On 1/5/24 11:23 AM, Claudiu wrote:
 
-On Mon, Jan 8, 2024 at 3:26=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
->
-> Hi Luiz,
->
-> On 1/8/24 20:41, Luiz Augusto von Dentz wrote:
-> > Hi Jonas,
-> >
-> > On Mon, Jan 8, 2024 at 2:29=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.=
-nl> wrote:
-> >>
-> >> Hi Luiz,
-> >>
-> >> On 1/8/24 20:14, Luiz Augusto von Dentz wrote:
-> >>> Hi Jonas,
-> >>>
-> >>> On Mon, Jan 8, 2024 at 1:55=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0y=
-d.nl> wrote:
-> >>>>
-> >>>> On 1/8/24 19:44, Jonas Dre=C3=9Fler wrote:
-> >>>>> On 1/8/24 19:39, Jonas Dre=C3=9Fler wrote:
-> >>>>>> With the last commit we moved to using the hci_sync queue for "Cre=
-ate
-> >>>>>> Connection" requests, removing the need for retrying the paging af=
-ter
-> >>>>>> finished/failed "Create Connection" requests and after the end of
-> >>>>>> inquiries.
-> >>>>>>
-> >>>>>> hci_conn_check_pending() was used to trigger this retry, we can re=
-move it
-> >>>>>> now.
-> >>>>>>
-> >>>>>> Note that we can also remove the special handling for COMMAND_DISA=
-LLOWED
-> >>>>>> errors in the completion handler of "Create Connection", because "=
-Create
-> >>>>>> Connection" requests are now always serialized.
-> >>>>>>
-> >>>>>> This is somewhat reverting commit 4c67bc74f016 ("[Bluetooth] Suppo=
-rt
-> >>>>>> concurrent connect requests").
-> >>>>>>
-> >>>>>> With this, the BT_CONNECT2 state of ACL hci_conn objects should no=
-w be
-> >>>>>> back to meaning only one thing: That we received a connection requ=
-est
-> >>>>>> from another device (see hci_conn_request_evt), but the actual con=
-nect
-> >>>>>> should be deferred.
-> >>>>>> ---
-> >>>>>>     include/net/bluetooth/hci_core.h |  1 -
-> >>>>>>     net/bluetooth/hci_conn.c         | 16 ----------------
-> >>>>>>     net/bluetooth/hci_event.c        | 21 ++++-----------------
-> >>>>>>     3 files changed, 4 insertions(+), 34 deletions(-)
-> >>>>>>
-> >>>>>> diff --git a/include/net/bluetooth/hci_core.h
-> >>>>>> b/include/net/bluetooth/hci_core.h
-> >>>>>> index 2c30834c1..d7483958d 100644
-> >>>>>> --- a/include/net/bluetooth/hci_core.h
-> >>>>>> +++ b/include/net/bluetooth/hci_core.h
-> >>>>>> @@ -1330,7 +1330,6 @@ struct hci_conn *hci_conn_add(struct hci_dev
-> >>>>>> *hdev, int type, bdaddr_t *dst,
-> >>>>>>                       u8 role);
-> >>>>>>     void hci_conn_del(struct hci_conn *conn);
-> >>>>>>     void hci_conn_hash_flush(struct hci_dev *hdev);
-> >>>>>> -void hci_conn_check_pending(struct hci_dev *hdev);
-> >>>>>>     struct hci_chan *hci_chan_create(struct hci_conn *conn);
-> >>>>>>     void hci_chan_del(struct hci_chan *chan);
-> >>>>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> >>>>>> index 541d55301..22033057b 100644
-> >>>>>> --- a/net/bluetooth/hci_conn.c
-> >>>>>> +++ b/net/bluetooth/hci_conn.c
-> >>>>>> @@ -2534,22 +2534,6 @@ void hci_conn_hash_flush(struct hci_dev *hd=
-ev)
-> >>>>>>         }
-> >>>>>>     }
-> >>>>>> -/* Check pending connect attempts */
-> >>>>>> -void hci_conn_check_pending(struct hci_dev *hdev)
-> >>>>>> -{
-> >>>>>> -    struct hci_conn *conn;
-> >>>>>> -
-> >>>>>> -    BT_DBG("hdev %s", hdev->name);
-> >>>>>> -
-> >>>>>> -    hci_dev_lock(hdev);
-> >>>>>> -
-> >>>>>> -    conn =3D hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNEC=
-T2);
-> >>>>>> -    if (conn)
-> >>>>>> -        hci_cmd_sync_queue(hdev, hci_acl_create_connection_sync,
-> >>>>>> conn, NULL);
-> >>>>>> -
-> >>>>>> -    hci_dev_unlock(hdev);
-> >>>>>> -}
-> >>>>>> -
-> >>>>>>     static u32 get_link_mode(struct hci_conn *conn)
-> >>>>>>     {
-> >>>>>>         u32 link_mode =3D 0;
-> >>>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> >>>>>> index e8b4a0126..91973d6d1 100644
-> >>>>>> --- a/net/bluetooth/hci_event.c
-> >>>>>> +++ b/net/bluetooth/hci_event.c
-> >>>>>> @@ -117,8 +117,6 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev
-> >>>>>> *hdev, void *data,
-> >>>>>>             hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> >>>>>>         hci_dev_unlock(hdev);
-> >>>>>> -    hci_conn_check_pending(hdev);
-> >>>>>> -
-> >>>>>>         return rp->status;
-> >>>>>>     }
-> >>>>>> @@ -149,8 +147,6 @@ static u8 hci_cc_exit_periodic_inq(struct hci_=
-dev
-> >>>>>> *hdev, void *data,
-> >>>>>>         hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);
-> >>>>>> -    hci_conn_check_pending(hdev);
-> >>>>>> -
-> >>>>>>         return rp->status;
-> >>>>>>     }
-> >>>>>> @@ -2296,10 +2292,8 @@ static void hci_cs_inquiry(struct hci_dev
-> >>>>>> *hdev, __u8 status)
-> >>>>>>     {
-> >>>>>>         bt_dev_dbg(hdev, "status 0x%2.2x", status);
-> >>>>>> -    if (status) {
-> >>>>>> -        hci_conn_check_pending(hdev);
-> >>>>>> +    if (status)
-> >>>>>>             return;
-> >>>>>> -    }
-> >>>>>>         set_bit(HCI_INQUIRY, &hdev->flags);
-> >>>>>>     }
-> >>>>>> @@ -2323,12 +2317,9 @@ static void hci_cs_create_conn(struct hci_d=
-ev
-> >>>>>> *hdev, __u8 status)
-> >>>>>>         if (status) {
-> >>>>>>             if (conn && conn->state =3D=3D BT_CONNECT) {
-> >>>>>> -            if (status !=3D HCI_ERROR_COMMAND_DISALLOWED ||
-> >>>>>> conn->attempt > 2) {
-> >>>>>> -                conn->state =3D BT_CLOSED;
-> >>>>>> -                hci_connect_cfm(conn, status);
-> >>>>>> -                hci_conn_del(conn);
-> >>>>>> -            } else
-> >>>>>> -                conn->state =3D BT_CONNECT2;
-> >>>>>> +            conn->state =3D BT_CLOSED;
-> >>>>>> +            hci_connect_cfm(conn, status);
-> >>>>>> +            hci_conn_del(conn);
-> >>>>>>             }
-> >>>>>>         } else {
-> >>>>>>             if (!conn) {
-> >>>>>> @@ -3020,8 +3011,6 @@ static void hci_inquiry_complete_evt(struct
-> >>>>>> hci_dev *hdev, void *data,
-> >>>>>>         bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
-> >>>>>> -    hci_conn_check_pending(hdev);
-> >>>>>> -
-> >>>>>>         if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
-> >>>>>>             return;
-> >>>>>> @@ -3247,8 +3236,6 @@ static void hci_conn_complete_evt(struct hci=
-_dev
-> >>>>>> *hdev, void *data,
-> >>>>>>     unlock:
-> >>>>>>         hci_dev_unlock(hdev);
-> >>>>>> -
-> >>>>>> -    hci_conn_check_pending(hdev);
-> >>>>>>     }
-> >>>>>>     static void hci_reject_conn(struct hci_dev *hdev, bdaddr_t *bd=
-addr)
-> >>>>>
-> >>>>> Please take a special look at this one: I'm not sure if I'm breakin=
-g the
-> >>>>> functionality of deferred connecting using BT_CONNECT2 in
-> >>>>> hci_conn_request_evt() here, as I don't see anywhere where we check=
- for
-> >>>>> this state and establish a connection later.
-> >>>>>
-> >>>>> It seems that this is how hci_conn_request_evt() was initially writ=
-ten
-> >>>>> though, hci_conn_check_pending() only got introduced later and seem=
-s
-> >>>>> unrelated.
-> >>>>
-> >>>> Ahh nevermind... The check for BT_CONNECT2 on "Conn Complete event" =
-got
-> >>>> introduced with 4c67bc74f01 ([Bluetooth] Support concurrent connect
-> >>>> requests). And later the deferred connection setup on "Conn Request
-> >>>> event" got introduced with 20714bfef8 ("Bluetooth: Implement deferre=
-d
-> >>>> sco socket setup").
-> >>>>
-> >>>> I assume the latter commit was relying on the "Create Connection"
-> >>>> request "Conn Complete event" that got introduced with the former co=
-mmit
-> >>>> then? That would imply that we use BT_CONNECT2 if there's already a
-> >>>> "Create Connection" going on when the "Conn Request event" happens, =
-and
-> >>>> we must wait for that existing request to finish.. Is that how those
-> >>>> deferred connections are supposed to work?
-> >>>
-> >>> Well if you are not sure that works we better make sure we have tests
-> >>> that cover this, for LE I know for sure it works because we have the
-> >>> likes of iso-tester that do connect 2 peers simultaneously, but for
-> >>> classic I don't recall having any test that does multiple connections=
-.
-> >>
-> >> The sequential "Create Connection" logic works, I tested that (of cour=
-se
-> >> I'm happy to add tests if it's not too much work).
-> >>
-> >> What I'm unsure about is if and how incoming connection requests from
-> >> other devices with HCI_PROTO_DEFER flag are supposed to work and wheth=
-er
-> >> they are meant to trigger a "Create Connection" from us?
-> >
-> > For incoming connections on Classic that should result in an
-> > accept/reject connection command, so it should cause another Create
-> > Connection if that is what you are afraid of.
-> >
->
-> Hmm, do you mean it *shouldn't* cause another "Create Connection"?
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Do not apply the RX CSUM settings to hardware if the interface is down. In
 
-Yeah, sorry about that, it is Monday I should probably double check if
-what I wrote makes any sense before sending :D
+   s/CSUM/checksum/?
 
-> I just checked in the spec: It sounds like once we send the "Accept
-> Connection Request" to the controller, the controller takes care of
-> establishing the connection by itself (no "Create Connection"
-> necessary), and will then later give us a "Connection Complete" event to
-> indicate that the connection is done.
+> case runtime PM is enabled, and while the interface is down, the IP will be
+> in reset mode (as for some platforms disabling the clocks will switch the
+> IP to reset mode, which will lead to losing registers content) and applying
+> settings in reset mode is not an option. Instead, cache the RX CSUM
 
-Yep, it will follow up with a Connection Complete.
+   Same here...
 
-> If I'm reading all this correctly, that sounds like my commit is
-> correct, and we had a bug in this logic before by interpreting
-> BT_CONNECT2 in two different ways.
->
-> >>>
-> >>>>>
-> >>>>> Thanks,
-> >>>>> Jonas
-> >>>
-> >>>
-> >>>
-> >
-> >
-> >
+> settings and apply them in ravb_open() though ravb_emac_init().
 
+   Through?
 
+> Commit prepares for the addition of runtime PM.
+> 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
 
---=20
-Luiz Augusto von Dentz
+MBR, Sergey
+
 
