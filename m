@@ -1,54 +1,64 @@
-Return-Path: <netdev+bounces-62315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E65826978
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:27:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64069826980
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC3E5B21537
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:27:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CD48B21A74
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C79589479;
-	Mon,  8 Jan 2024 08:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789589474;
+	Mon,  8 Jan 2024 08:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YJi/vpm5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eXDRizFA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6721F13AC7;
-	Mon,  8 Jan 2024 08:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40860CQ0009945;
-	Mon, 8 Jan 2024 08:27:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=lzYxfaFzQtBCI6PD1UXT0CYm6nKTZBF5UPuLGV0Yrgo=; b=YJ
-	i/vpm5/6dC2ufWheJwfAxzTxCI+H0WFqjiZy0Ft9DAouykkn50415nzsW4agGY0Q
-	STiDfae32c5nK2qypCUw834WiQlHsGSJAkVODiTXiJUQ2P9kACimZH8J69uMMw8Q
-	q6mFxhuT2+W3hBtz9mN5c3hN3RJy40lpmqEK5iX65rmqOcK8e8H9FQlvG8/7Iq7l
-	nFvGA3z0rtScWiFo51kyWX48dwrZCE/n+H6XRUWWgGjtVd0+JuXpu2D9FCT43kT9
-	OFjU0bDReu7pe8WpnHaWNv0hRZLIvVnB5XjH1iuamDLl+ZuOmWN1qjCMNOo9AB0B
-	uvwwWsj52loym3JRYJbg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3veymmbcxg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 08:27:20 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4088R9qm018144
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 8 Jan 2024 08:27:09 GMT
-Received: from [10.253.76.26] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 8 Jan
- 2024 00:27:04 -0800
-Message-ID: <6a7d62fc-a518-4aab-bb28-9289c398b74b@quicinc.com>
-Date: Mon, 8 Jan 2024 16:27:00 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7AA11715
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 08:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a298accc440so151271066b.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 00:28:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704702481; x=1705307281; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KiUaoDpIBFJNm/5JkSkSpwu9lZVeZsGzw4NT5VnaY/Q=;
+        b=eXDRizFAAumLT15Oyu9oJw2FbTkv3dpsPlGNzUR3H0LIQTY/yvuusUWeMXf7sc+tzW
+         SKibz00IxVp290sDb57znOeTkdtOIbeM4pppbletWxO9iVPzAd+bFT2S1L4gYN3slcOT
+         W8qQnW//RBkwySCFtUvSFct63rJNChIMWAGmJPO5Poiugz7pojKCobPR4hHFex3WrFMw
+         t0eEIcXCmI4z0/VdqFeNUQv9SzOLdb1yxtdzY0wynb3/R76aQBPHCUdbslsSB05/sZ66
+         RUQyJr1fCmVRYs2d+cSi6HNTp8EeU6ZJ6hBZ1cjHy/f6YuZwCzanzy34G5eGa5ZtRZjQ
+         yBrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704702481; x=1705307281;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KiUaoDpIBFJNm/5JkSkSpwu9lZVeZsGzw4NT5VnaY/Q=;
+        b=m4tzQqhAUxWoUwSN193upMm9BlXSpog1Vqmk2yLpUUkx35FLuD3N9K9SS0V0o9hqvR
+         VmQvE9d/WQBIKHed7ZXkeCd7aHFw5Q/jY/903mxXXGfP3Vb0hXP4nI/lRYP5g6JJzuxy
+         rNlZcxU00GwHiQa94+L5KBgtwskvTNZpnTTrb8vTy/4rgCKTHD6IHNSecVr2c6cTtDUX
+         TRIQvBmDiTbs9wwg9UZ11VlV2lHzyfDyONZlwikhMhiKuFSKdosItXjgTIJRf17U1kpe
+         Mi0Rl5/LeInybWl7PBwYkevNl46Bezx7apry7PXgo3aXVqK2ogXP5lqJ9fEDwqdx81Ob
+         vGgw==
+X-Gm-Message-State: AOJu0Yx4KLJV9B2X8pySZ7hNaq3XG93T1ggCG5A+uWUQ0w9nE2EVkIK7
+	OKepFONo3KmGfR6wBpcZLUmRWJCntyC3Sg==
+X-Google-Smtp-Source: AGHT+IHI6qYmjvdFZgCYS4DlGuc/m7XCKg/o0Ptv0K7fz1AJIqEKZml7fOpplDjj/ahggJn7qh7fMg==
+X-Received: by 2002:a17:906:3b8f:b0:a23:39e4:ca86 with SMTP id u15-20020a1709063b8f00b00a2339e4ca86mr1339215ejf.74.1704702481538;
+        Mon, 08 Jan 2024 00:28:01 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.112])
+        by smtp.gmail.com with ESMTPSA id t20-20020a170906609400b00a28badcf367sm3716898ejj.54.2024.01.08.00.27.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 00:28:01 -0800 (PST)
+Message-ID: <0aaa3f78-07c5-4c03-bb1b-897020541e7b@linaro.org>
+Date: Mon, 8 Jan 2024 09:27:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,124 +66,152 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 14/14] dt-bindings: net: ar803x: add qca8084 PHY
- properties
+Subject: Re: [PATCH 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add StarFive
+ JH8100 support
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Christian Marangi <ansuelsmth@gmail.com>,
-        "Russell King (Oracle)"
-	<linux@armlinux.org.uk>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <corbet@lwn.net>, <p.zabel@pengutronix.de>,
-        <f.fainelli@gmail.com>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>
-References: <6abe5d6f-9d00-445f-8c81-9c89b9da3e0a@quicinc.com>
- <ZX3LqN8DSdKXqsYc@shell.armlinux.org.uk>
- <1bddd434-024c-45ff-9866-92951a3f555f@quicinc.com>
- <ZZPeHJJU96y1kdlZ@shell.armlinux.org.uk>
- <6593e0a3.050a0220.5c543.8e12@mx.google.com>
- <cee9de2c-bfa4-4ca9-9001-725e2041bc25@quicinc.com>
- <85590a5b-9d5a-40cb-8a0e-a3a3a1c3720a@lunn.ch>
- <c5263daa-b5f4-4b9c-a216-73d68493a802@quicinc.com>
- <50252a5a-e4fb-42d3-b838-9ef04faf4c5c@lunn.ch>
- <b427c89a-81a9-439f-905e-2a6632065b78@quicinc.com>
- <864b0867-06c0-4c6d-ae71-9b5025c8d93a@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <864b0867-06c0-4c6d-ae71-9b5025c8d93a@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Tan Chun Hau <chunhau.tan@starfivetech.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Emil Renner Berthing <kernel@esmil.dk>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Simon Horman <horms@kernel.org>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Andrew Halaney <ahalaney@redhat.com>, Jisheng Zhang <jszhang@kernel.org>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+ Jee Heng Sia <jeeheng.sia@starfivetech.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20240108075810.14161-1-chunhau.tan@starfivetech.com>
+ <20240108075810.14161-2-chunhau.tan@starfivetech.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240108075810.14161-2-chunhau.tan@starfivetech.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: _JTl_QMG-Z0PXhZbt5wiQBTQfpaSIKJ7
-X-Proofpoint-GUID: _JTl_QMG-Z0PXhZbt5wiQBTQfpaSIKJ7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxlogscore=999 spamscore=0 phishscore=0 malwarescore=0 bulkscore=0
- suspectscore=0 adultscore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2401080071
 
-
-
-On 1/5/2024 9:37 PM, Andrew Lunn wrote:
->>> O.K. Since we are getting nowhere at the moment, lets take just the
->>> pure PHY chip, and ignore the rest for the moment.
->>>
->>> For any pure PHY, there is generally one clock input, which might be a
->>> crystal, or an actual clock. If you look at other DT bindings for
->>> PHYs, it is only listed if the clock is expected to come from
->>> somewhere else, like a SoC, and it needs to be turned on before the
->>> PHY will work. And generally, a pure PHY has one defined clock
->>> frequency input. If that is true, there is no need to specify the
->>> clock. If multiple clock input frequencies are supported, then you do
->>> need to specify the clock, so its possible to work out what frequency
->>> it is using. How that clock input is then used internally in the PHY
->>> is not described in DT, but the driver can set any dividers, PLLs
->>> needed etc.
->>
->> Yes, Andrew, there is only one clock input to qca8084(same as qca8386),
->> this input clock rate is 50MHZ, which is from the output clock of CMN
->> PLL block that is configured by the MDIO bus driver patch under review.
+On 08/01/2024 08:58, Tan Chun Hau wrote:
+> Add StarFive JH8100 dwmac support.
+> JH8100 dwmac has one reset signal instead of 2 resets as in JH7110.
 > 
-> Lets concentrate on the pure PHY. All it sees is a clock. It does not
-> care where it come from. All you need in the device tree for the pure
-> PHY is a clock consumer.
-Yes.
-
+> Signed-off-by: Tan Chun Hau <chunhau.tan@starfivetech.com>
+> ---
+>  .../bindings/net/starfive,jh7110-dwmac.yaml   | 28 ++++++++++++-------
+>  1 file changed, 18 insertions(+), 10 deletions(-)
 > 
-> There is one clock input, so its shared by all four instances in the
-> pure PHY package. So you need to use Christians code which extends the
-> PHY DT bindings to allow DT properties for a package of PHYs.
+> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> index 5e7cfbbebce6..3d0447726902 100644
+> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> @@ -17,6 +17,7 @@ select:
+>        contains:
+>          enum:
+>            - starfive,jh7110-dwmac
+> +          - starfive,jh8100-dwmac
 
-OK, will
+I have doubts that you tested it. Missing change to snps,dwmac.
 
-> 
-> What about resets. Is there one reset pin for the pure PHY package, or
-> one per PHY?
+>    required:
+>      - compatible
+>  
+> @@ -25,6 +26,7 @@ properties:
+>      items:
+>        - enum:
+>            - starfive,jh7110-dwmac
+> +          - starfive,jh8100-dwmac
+>        - const: snps,dwmac-5.20
+>  
+>    reg:
+> @@ -54,16 +56,6 @@ properties:
+>      minItems: 3
+>      maxItems: 3
+>  
+> -  resets:
+> -    items:
+> -      - description: MAC Reset signal.
+> -      - description: AHB Reset signal.
+> -
+> -  reset-names:
+> -    items:
+> -      - const: stmmaceth
+> -      - const: ahb
+> -
+>    starfive,tx-use-rgmii-clk:
+>      description:
+>        Tx clock is provided by external rgmii clock.
+> @@ -93,6 +85,22 @@ required:
+>  
+>  allOf:
+>    - $ref: snps,dwmac.yaml#
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - starfive,jh7110-dwmac
+> +    then:
+> +      properties:
+> +        resets:
+> +          items:
+> +            - description: MAC Reset signal.
+> +            - description: AHB Reset signal.
+> +        resets-names:
+> +          items:
+> +            - const: stmmaceth
+> +            - const: ahb
 
-There is only one GPIO hardware reset PIN for the chip qca8084 including
-all 4 PHYs.
+Missing else: narrowing your jh8100.
 
-> 
-> Go find Christians code, understand it, and propose a DT binding for
-> the pure PHY. Include the clock provider and the reset
-> provider. Forget about the MDIO controller, and the PHY integrated
-> into the switch, etc. Baby steps...
-
-Thanks Andrew for pointing me the Christians code, i will keep the
-driver of qca8084 synced with Christian's code before pushing the
-next patch set.
-
-> 
->> In qca8084(same as qca8386), there is a clock controller, let's call it
->> as NSSCC, the logic of NSSCC is same as qualcomm GCC(located in SoC),
->> the NSSCC provides the clocks to the quad PHYs, the initial clocks for
->> quad PHYs need to be configured before PHY to work.
-> 
-> You said above, there is one clock input to the qca8084. Here you use
-> the word clocks, plural. Is there one clock, or multiple clocks?
-> 
->      Andrew
-
-Yes, Andrew, it is multiple clocks.
-These multiple clocks are generated(PLL, divider) and used internally by
-qca8084 CHIP, these clocks are generated by the clock controller of
-qca8084, let's call the clock controller of qca8084 as NSSCC provider,
-which generates the clocks to the PHYs, this NSSCC is located in
-qca8084.
-
-The only one input clock of qca8084 is the clock source of the chip
-qca8084, which is fixed to 50MHZ.
-
-The NSSCC of qca8084 generates different clock rates for the different
-link speed of the PHY, which is the internal block of qca8084.
-
+Best regards,
+Krzysztof
 
 
