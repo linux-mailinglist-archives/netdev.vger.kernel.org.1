@@ -1,159 +1,233 @@
-Return-Path: <netdev+bounces-62309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ACB7826907
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:59:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1D9782690E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:03:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32F9B1C21A15
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 07:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C162281D12
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55C5BE62;
-	Mon,  8 Jan 2024 07:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360E48F65;
+	Mon,  8 Jan 2024 08:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="c9B40Qea"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2085.outbound.protection.partner.outlook.cn [139.219.17.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46679C13C;
-	Mon,  8 Jan 2024 07:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aMnNKv32FjciuGb3gm/Zs44/9L/HRk3a5peRseCDkoHQl6CcDyxLZQSX4JjMkG/iMhnAFLRIbOFdnx70FbfXRyD7T2CT5o6dNW+dQqSYlXqO8QoR2z6mpjDpBX68SegWMo/aT2QzveU+QKZAtbV4qbasIr4UF7FsxZa1zUCA41YbMpx/YVD/9NLjAYzV3FYlHLkILEc4FwDxw5VhtLZHlnXF6PvwnNk3WDhpoR02+B5EQ+BdlWSgl0NrLIS5XojHt17319yvdo7tXa/RWk+rQ7smV54DTv18gq/0RaONrI/J1nQOoqCJpv5O50SpGP2V169qEJaIAOzVnkEpBLv5jw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pCyieCzTlRavi9GHuI4IbkBVIrqJA8fZiMsx95FCsZw=;
- b=dA9mwn6TSrnJyPMLmAX5ZH5wdXS1x+uCns8ZfUI7jJn2drs1/tP2LzDzB+SvPCoPk5phg55uM6LA5k48UX3LKhr1Ud8mUV90JuBvbwexbKAS3OzTD3dvrQrv310gNW5SD47SOudDWrSsC+l9Igijk0COmn87EmALBqM5EgFqC3GxvnAhoXzyxs45Wtq0Klce269ijnGhQXVKbBfPtiikvRQv3A5Kko167Y/Xj5wUYWQ2arUufdUa2xJMgtxZNnZmiYSKBDez6QQ3AD7cTvjLcuYUky2QYroTlRPLrISDM9Dt5bKJNVqWXlVoI14nEqQ5vOTQS7R/ujqFHDUZqSb21A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c211:e::20) by BJSPR01MB0755.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c211:1c::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.32; Mon, 8 Jan
- 2024 07:58:28 +0000
-Received: from BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
- ([fe80::aaac:167d:8e0d:3acb]) by
- BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn ([fe80::aaac:167d:8e0d:3acb%5])
- with mapi id 15.20.6933.032; Mon, 8 Jan 2024 07:58:28 +0000
-From: Tan Chun Hau <chunhau.tan@starfivetech.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Simon Horman <horms@kernel.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Russell King <rmk+kernel@armlinux.org.uk>
-Cc: Ley Foon Tan <leyfoon.tan@starfivetech.com>,
-	Jee Heng Sia <jeeheng.sia@starfivetech.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 2/2] net: stmmac: Add StarFive JH8100 dwmac support
-Date: Sun,  7 Jan 2024 23:58:10 -0800
-Message-Id: <20240108075810.14161-3-chunhau.tan@starfivetech.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240108075810.14161-1-chunhau.tan@starfivetech.com>
-References: <20240108075810.14161-1-chunhau.tan@starfivetech.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ZQ0PR01CA0018.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:5::15) To BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c211:e::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146AE8F55
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 08:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a29058bb2ceso151245866b.0
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 00:03:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1704701015; x=1705305815; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ts+NmJfy37G+YbrxOx7UXF/c1gu0BAsdKnFg/SdX5UE=;
+        b=c9B40Qea9NnejROvXugg8Fbj2n2sLR+6KbJWXOBtfe3op3lD6TDhMl5t/auabIsv06
+         oWdPB6cJAi/GPE5nSikWqVJ+7REQxPN+tweZN2KfkX1KrOIY/9m2CSWqj35ur5xn8eXL
+         4ozKrpuWvClHihErxC/hBjUOo3saf/OJLNm0IJ7q7Q023U0u8GfuhF5SI0XkKf2jL6i4
+         wA7egRtnU1K8PQfVjCBeiXWPsGk0rUQxQplPaGpjS4ujGfntaiBvGtv2+EUA+qnpTfk1
+         pdKbSAovSVs3S13co78AEJgvzX6vx5G4/KZsIJwoUYv1HGn25jq/A9pa/7vjsHrYWOTr
+         wQKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704701015; x=1705305815;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ts+NmJfy37G+YbrxOx7UXF/c1gu0BAsdKnFg/SdX5UE=;
+        b=V86jDJOdjJBKJQ6xvipQNBzyrCvsuHFm9KfozeX1HwHS8mLrZCZN0EzEd0wBlab/1l
+         nRDQi8NAMwLqVvqpeB3DuKyS4pC3EW9iYXXP2i3yMiVkP4VJk9b1F4SEjW3V5Z6t+GCS
+         yeX1gZHKQTpoR8f1YpdUjLSGEZgbwQyP2XxyjJ1t0XX0M+n/iqbg117La3n+Q1ZCwh21
+         uTj0j2/hGktWdAjttmG66ft/5qXDbOtT7ldXHaeXpUhJ/x8PSoeTUqbc8zm29anPSj1o
+         jZNBLmIb7iBjrh1ysaCbbPBcQXAoUwxKPiyGuGKs759yLUdE3pZvBZk5ePxA/lcPZ8ru
+         vMgw==
+X-Gm-Message-State: AOJu0YxVGPX5aQv7WpaDE6CzlqYeeSSnRDZU1JI/NXlMY3noViC2EcQ/
+	wKfLWwTmT92BxbsM1fkbIRQwWjMritgKwQ==
+X-Google-Smtp-Source: AGHT+IFuSsF8lEpiUlBdXk+1cqyfmVZrb2tAeSNo8oho+yu0mHNvEoU4h68vusuwcy+RL5qnUTnvVQ==
+X-Received: by 2002:a17:907:2ccc:b0:a2a:3d65:e871 with SMTP id hg12-20020a1709072ccc00b00a2a3d65e871mr483232ejc.175.1704701015177;
+        Mon, 08 Jan 2024 00:03:35 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.5])
+        by smtp.gmail.com with ESMTPSA id lk16-20020a170906cb1000b00a26afb7fd54sm3740326ejb.15.2024.01.08.00.03.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 00:03:34 -0800 (PST)
+Message-ID: <488abcaa-6f1c-4524-8cd4-375caa5bdf42@tuxon.dev>
+Date: Mon, 8 Jan 2024 10:03:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BJSPR01MB0595:EE_|BJSPR01MB0755:EE_
-X-MS-Office365-Filtering-Correlation-Id: a94bdfaa-2dae-4b24-5a9b-08dc101f9958
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	BMF4lN2zyFS7+TLxuueGctvRat5JaYDOop61a9ic+Zs6lhPaiu17O4tJ47ezNZHuYxblvVtpjpoR8/ebIn0ZJhqX3wWUNkp8EyiIM/AczeR1/WsaChnyuILi0QJEb3CQtZnd8mmcDAuLxXjmfSqncJdU6p00XLLYYi/JG0hbB6XmcTfldQqTCdX2UxAKD/Rl4nm8t45it/GOKx+Sdg5eukzgIhTxcnqYr5iD462fKSrcKJW0nPPnU17QI0dHTt7Qmk8MlHCMxOOvcCLNBkuRezjDKAuK95r1L8R8Dqe/8Uieh6uPPDoEwPFi3zmmmfoQdgnmEzCWhjTJd4KIO5Uhxdm8TKR/OMqKuPuPQDMZxZI+QE8kDfrnWNm399uijkqVMZm/DijJYOSuNF5hiBPmJUwRtrN5UCf1l2j/mtvY+WJEld7G87nfwhU03Y1Ciege9S9JLMB2zVbgSjkDnZiYWcyFGjZQwt5EOIMFGeivLnL31SUn1z5WBjaf400LGlfQmeAYiJo2O2rhMiaIQt6Yz4AKapJOLlWcLG9mK5lp4SIsPCJdExNnd8FbPKrqSua1LgPz7+bjwYn4vmiGwH5CHw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(346002)(39830400003)(396003)(366004)(136003)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(26005)(1076003)(2616005)(38100700002)(41300700001)(8676002)(8936002)(54906003)(110136005)(5660300002)(7416002)(2906002)(4744005)(4326008)(66476007)(6666004)(66556008)(52116002)(66946007)(921011)(508600001)(38350700005)(86362001)(40180700001)(40160700002)(36756003)(41320700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vdAg+F0Em9jokxoc4/Zme+K+McKdHUPbiFcpBbcnuPFMA1tnlUTu/jy+UiZ1?=
- =?us-ascii?Q?vNBLhSX/ZXZArPZSv6puq6k+uJcKfCdJWa8CLJi1QfJxDdIfkUla4unSFqnz?=
- =?us-ascii?Q?wRLbAsoFAGxidawUeN4wZW+2yE6K6UvAM5pEXY0ch52PwqLcabc/SM+E9Gdt?=
- =?us-ascii?Q?SLW8XbtybOotrn0hC7NsdSGWLqX3Y3UijNi5CMQc+l+Wob6aaMr3n9i0mkwW?=
- =?us-ascii?Q?2xk5iWe+KjR7K51BcHWE42Jqrt4m117bq1gdq6OwVlCXMD8sX+sYO953kQ3R?=
- =?us-ascii?Q?4kF4Fyl45Jn0f83Er5605ccOJbcihUD00jbqqydqOLQRmiRGe25no60xSJRd?=
- =?us-ascii?Q?zhCGWQm+OD+JTBv3g3UAzk5P+JyShDymFc4/SBxaojTzNaRRW1Sc1MU3QowD?=
- =?us-ascii?Q?gyZIYwiM4zyeX1DoyfzhdvtaHxIlfr5OJlF32Ymyd4gr6HwY3rGsudKJqyDP?=
- =?us-ascii?Q?oOKh9RLmr9UX4ZjTolLr6FiKHygMk5cAupiQLAINV3wloD5GgydjGQ4MLNe9?=
- =?us-ascii?Q?PQwN3DWCOq5N99NT4z60P+LeTbXrRAbzEpjEa5Gm/Vju89S+rRc8M528tjY1?=
- =?us-ascii?Q?vbk9GBhB8MCQDpB4LCkmXOb+Ho727CPz1cxQWsQEy6SoFqOjdWHKYaUrkPgF?=
- =?us-ascii?Q?1gKLTqqFt+SId2SIPBAihoeBis4jGH0Et4gMs3J1cEua0q1mOYkEol4NthPJ?=
- =?us-ascii?Q?XQg0FJzaRDY9oUAETIEHhQqs3z3q0bKkr6lUbXXMnyKoxdd+4wn0czZsQFpu?=
- =?us-ascii?Q?mU3pfu9VHRtD/cF+LpoEcwDKDw4rGeZuupP6HEnyuaTYaR1y8eFF23BSVk6v?=
- =?us-ascii?Q?9xawZpXC4wC5vKISq4NNcAP6dni6q7pG+dH9SeYu0Es9nvgb/I++Gw6RLLql?=
- =?us-ascii?Q?gbMnYgUEY+wFDtbMym0Jf67JRKS0hMUXbuE7RymGV5oGFYcZJYz77AQq7S2a?=
- =?us-ascii?Q?JKjTdeH1GixtJmfGaE5Fb2M6HtVVd2gFquS/T4iawFYCHVJZTEBYGvFAjcLm?=
- =?us-ascii?Q?OJOVHQ+e190qZhLWZR31IesRxfeNWp8hwFyDwZVd4DGfR5CFj1ONtTBlSjk7?=
- =?us-ascii?Q?AIFjYDgo0+PQtDgdd+5lpTzTHximyzXNHghb8HeTPhyF09DogVmShCrtPaXB?=
- =?us-ascii?Q?xDY8IyQZPGrls/+Eam1QrYeWaLLdKAkaf+LtH7O4rf/lmXCe3RQ2ytWoYuVv?=
- =?us-ascii?Q?etFLo7U0s5+jGnVvvz3OQQ8posBGubdN0R3kyONrFp6eDqLUaewUGlQH2Tn6?=
- =?us-ascii?Q?nGJsNySN5H+L+i2RCPPiBF/9083XiAEE230/26zF2BuDvEJtJoum7oCKn1XK?=
- =?us-ascii?Q?OJztXFQLVC1VYNVf1RPD/nnQUR8sX2XO2acurVOhkaXX9cLRKPlMAeIPM5q8?=
- =?us-ascii?Q?xnm/j0YOEEkVUV/GET1pitG2nRTXF9VUjx2c9QkqSpTmsRndzXS+HxKjZxv5?=
- =?us-ascii?Q?J7oJH90zqU00QZegMbdEid5kvXv74a5NbjrWgBokOI/2XWDAB8j9XJJW59SK?=
- =?us-ascii?Q?+Ioy+QKuLCOr/fds3AWLIkiaUi9/WBDEAQhkVeT1MiS0YU5v4rC0ky4gWZcj?=
- =?us-ascii?Q?vpTL+gUqUeEcr+rIGqC+OWJEJExbkN7TEjGiV5qo1gwyNpqEws7o+DdH323O?=
- =?us-ascii?Q?PA=3D=3D?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a94bdfaa-2dae-4b24-5a9b-08dc101f9958
-X-MS-Exchange-CrossTenant-AuthSource: BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 07:58:28.3533
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0bHayFfxRGyTD/3d3II1JhLJ/P1eubIi8T0JWPFH4e4yjbzh56emBba0w+cSOjKyyhD9v4kpwbAS2vY9uMdjt1MQFL8sXsIPmXJQF+WWPmE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJSPR01MB0755
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 07/19] net: ravb: Move reference clock
+ enable/disable on runtime PM APIs
+Content-Language: en-US
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, geert+renesas@glider.be,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240105082339.1468817-8-claudiu.beznea.uj@bp.renesas.com>
+ <80b7337b-5fc2-07bc-a05f-b583ccaac3da@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <80b7337b-5fc2-07bc-a05f-b583ccaac3da@omp.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add JH8100 dwmac support.
 
-Signed-off-by: Tan Chun Hau <chunhau.tan@starfivetech.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-index 5d630affb4d1..373714f6e382 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-@@ -146,6 +146,7 @@ static int starfive_dwmac_probe(struct platform_device *pdev)
- 
- static const struct of_device_id starfive_dwmac_match[] = {
- 	{ .compatible = "starfive,jh7110-dwmac"	},
-+	{ .compatible = "starfive,jh8100-dwmac"	},
- 	{ /* sentinel */ }
- };
- MODULE_DEVICE_TABLE(of, starfive_dwmac_match);
--- 
-2.25.1
+On 05.01.2024 21:52, Sergey Shtylyov wrote:
+> On 1/5/24 11:23 AM, Claudiu wrote:
+> 
+>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>
+>> Reference clock could be or not part of the power domain. If it is part of
+>> the power domain, the power domain takes care of propertly setting it. In
+>> case it is not part of the power domain and full runtime PM support is
+>> available in driver the clock will not be propertly disabled/enabled at
+>> runtime. For this, keep the prepare/unprepare operations in the driver's
+>> probe()/remove() functions and move the enable/disable in runtime PM
+>> functions.
+>>
+>> Along with it, the other clock request operations were moved close to
+>> reference clock request and prepare to have all the clock requests
+>> specific code grouped together.
+>>
+>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> 
+>    It's not that I reviewed the squashed version of this patch...
 
+I had a Rb on "net: ravb: Move reference clock enable/disable on runtime PM
+APIs" from v2 and an OK from you (no other comments) to do the squash on
+"net: ravb: Keep clock request operations grouped together" from v2 thus I
+consider keeping Rb is OK.
+
+> 
+>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> ---
+>>
+>> Changes in v3:
+>> - squashed with patch 17/21 ("net: ravb: Keep clock request operations grouped
+>>   together") from v2
+>> - collected tags
+>>
+>> Changes in v2:
+>> - this patch is new and follows the recommendations proposed in the
+>>   discussion of patch 08/13 ("net: ravb: Rely on PM domain to enable refclk")
+>>   from v2
+>>
+>>  drivers/net/ethernet/renesas/ravb_main.c | 110 ++++++++++++-----------
+>>  1 file changed, 57 insertions(+), 53 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index 844ac3306e93..4673cc2faec0 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> [...]
+>> @@ -2697,10 +2692,37 @@ static int ravb_probe(struct platform_device *pdev)
+>>  		priv->num_rx_ring[RAVB_NC] = NC_RX_RING_SIZE;
+>>  	}
+>>  
+>> +	priv->clk = devm_clk_get(&pdev->dev, NULL);
+>> +	if (IS_ERR(priv->clk)) {
+>> +		error = PTR_ERR(priv->clk);
+>> +		goto out_reset_assert;
+>> +	}
+>> +
+>> +	if (info->gptp_ref_clk) {
+>> +		priv->gptp_clk = devm_clk_get(&pdev->dev, "gptp");
+>> +		if (IS_ERR(priv->gptp_clk)) {
+>> +			error = PTR_ERR(priv->gptp_clk);
+>> +			goto out_reset_assert;
+>> +		}
+>> +	}
+>> +
+>> +	priv->refclk = devm_clk_get_optional(&pdev->dev, "refclk");
+>> +	if (IS_ERR(priv->refclk)) {
+>> +		error = PTR_ERR(priv->refclk);
+>> +		goto out_reset_assert;
+>> +	}
+>> +	clk_prepare(priv->refclk);
+>> +
+>> +	platform_set_drvdata(pdev, ndev);
+> 
+>    Why exactly you had to move this line?
+
+Calling pm_runtime_resume_and_get() above will implicitly call the
+ravb_runtime_resume() which calls dev_get_drvdata() to get proper data for
+refclk.
+
+> 
+>> +	pm_runtime_enable(&pdev->dev);
+>> +	error = pm_runtime_resume_and_get(&pdev->dev);
+>> +	if (error < 0)
+>> +		goto out_rpm_disable;
+>> +
+>>  	priv->addr = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
+>>  	if (IS_ERR(priv->addr)) {
+>>  		error = PTR_ERR(priv->addr);
+>> -		goto out_release;
+>> +		goto out_rpm_put;
+>>  	}
+>>  
+>>  	/* The Ether-specific entries in the device structure. */
+> [...]
+>> @@ -2871,8 +2872,6 @@ static int ravb_probe(struct platform_device *pdev)
+>>  	netdev_info(ndev, "Base address at %#x, %pM, IRQ %d.\n",
+>>  		    (u32)ndev->base_addr, ndev->dev_addr, ndev->irq);
+>>  
+>> -	platform_set_drvdata(pdev, ndev);
+> 
+>    Hm, wasn't calling it here racy?
+
+Haven't noticed that. Racing with who? AFAICT the only functions that uses
+this are remove, suspend, resume specific ones.
+
+> 
+>> -
+>>  	return 0;
+>>  
+>>  out_napi_del:
+> [...]
+>> @@ -3060,21 +3058,27 @@ static int ravb_resume(struct device *dev)
+>>  	return ret;
+>>  }
+>>  
+>> -static int ravb_runtime_nop(struct device *dev)
+>> +static int ravb_runtime_suspend(struct device *dev)
+>>  {
+>> -	/* Runtime PM callback shared between ->runtime_suspend()
+>> -	 * and ->runtime_resume(). Simply returns success.
+>> -	 *
+>> -	 * This driver re-initializes all registers after
+>> -	 * pm_runtime_get_sync() anyway so there is no need
+>> -	 * to save and restore registers here.
+>> -	 */
+> 
+>    Perhaps even worth a separate patch to completely remove this function
+> which doesn't seem to make sense?
+
+Why? With that the refclk will not be properly enabled/disabled when it
+will not be part of the power domain. Take
+https://elixir.bootlin.com/linux/v6.7/source/arch/arm64/boot/dts/renesas/beacon-renesom-som.dtsi#L57
+as an example. Here refclk is from an external source (not part of power
+domain).
+
+Thank you,
+Claudiu Beznea
+
+> 
+> [...]
+> 
+> MBR, Sergey
 
