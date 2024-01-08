@@ -1,203 +1,128 @@
-Return-Path: <netdev+bounces-62457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B9B382769F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:54:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7888276C1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:58:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F85B1C22EA1
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:54:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BDB4284820
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300F15477C;
-	Mon,  8 Jan 2024 17:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A20954BD3;
+	Mon,  8 Jan 2024 17:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="QwhRj2Ft"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="QCuiJ8OT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HW+5pS6p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A745A54BF8
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 17:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d54b763d15so3717725ad.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 09:47:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1704736032; x=1705340832; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1iaOEh5y9aboYMTed+aamtV3KcDRPhqHF35NpDISIS0=;
-        b=QwhRj2FtTyioiB1KEXatn+TvdZa5OdnVSgILC/GV6O6ieHulE4efs4QdP4WlSquEo1
-         T8sM33G45ft5l90pIIJZu7u+ItJAsS2qQwe0BhvqyPK5EeOYFZO44PHMZCgziSwCPjT4
-         gfvyvrohLX9JOnlQYfRU5dxXHO1JdLfx+cFvFCX64M/rqtckXPv2QpQzZ10/YFCzMwUB
-         XhZS44pby0dLe5ZG+m1R8z+ISn8ut8WYiTvO3XdHnnElYCbd3AsfGqsaSGxCY+gB2N06
-         a9yNGPJFjI8Xvh3ScckoimvfmEcBKBr71NNyyEJPHsGf0+rpq7lIrT7joy1fdbWx+y6b
-         JTCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704736032; x=1705340832;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1iaOEh5y9aboYMTed+aamtV3KcDRPhqHF35NpDISIS0=;
-        b=ooYQUWXO65HfSm55lZ23IFcuWqdoG+kbSHfiHUiLKJ/CV+4axnJuTs3qAhaAuVR7MJ
-         Me3o74g9dCxtw4sR15fXu353/m3s3dwx6DejTSkDtpI1vdnW80SazccOKoPN2RhY+HKH
-         3JCBECflozLlk7Z9iryNnLyggbRExQFRNX5HRPaXZGoMdJ6KzDNM6NR+bVJUilaCJf9I
-         QwhEqXRpNGpxlCompZ1IZvJFD695opOfFemZXUnQhMhOXM5MJQ4U22QS6JzT1h/KTkyU
-         nO+SODClmXb0SgLX7hFRV1CyT/7bi9AE6+/mA3rgtQOtLBcHLrwEPQZaHaOvC6pkKfdn
-         ncXA==
-X-Gm-Message-State: AOJu0YwNboQyvy8gnNIbELfN3AayuK21UTVNHx+R/W8zFLewtNpKxB46
-	zuMFNsaBOQOe/3Cf7pp4ONgEJfnNkO79Vex5jeSCHCH2yEY=
-X-Google-Smtp-Source: AGHT+IG61JCOZrmpJ1uodRk8qF6BcpsWMuZHiBcuhs9pOCsji5mzvHM2db38ZsAl9rOPEC6IUcRT9w==
-X-Received: by 2002:a17:903:454:b0:1d4:3314:d3cb with SMTP id iw20-20020a170903045400b001d43314d3cbmr1367221plb.119.1704736031963;
-        Mon, 08 Jan 2024 09:47:11 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id ay8-20020a1709028b8800b001d49f61cb64sm161008plb.262.2024.01.08.09.47.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 09:47:11 -0800 (PST)
-Date: Mon, 8 Jan 2024 09:47:09 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [ANNOUNCE] iproute2 6.7.0 release
-Message-ID: <20240108094709.050e22bc@hermes.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735C854BF7;
+	Mon,  8 Jan 2024 17:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.west.internal (Postfix) with ESMTP id C2DC53200D00;
+	Mon,  8 Jan 2024 12:52:53 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Mon, 08 Jan 2024 12:52:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1704736373;
+	 x=1704822773; bh=U5vHpLovxHw2jLbFSMwbVDfMhB5fX3K4zCUa0DIZn9Q=; b=
+	QCuiJ8OTr3lnfrzIujxwe/TZfLN1UIxB9lhaB8yim94u+mOcHro7SQ0ObxmjGCj4
+	Tb5u0npdf4GTBeVq7Cz2aFXmNa+QaEhiPOPcYSTHw5bxB+WNwzuSL0IBboyPK2jL
+	RzROivW2MUr5bdEzhDn/fpTjaPkhuKq7Y2O2FlIsGTSQ9/BiKUju+JyX8yMRXGxy
+	4JPkPMqkebAGZ6X5Oy2CJOJRzQ+gue9Cqa/+eZVCp0qB+sAUPlgY+jxbyGXJVYhe
+	X8V375V1byyUcuQNDBOBnTK7GBHSMhaLYEUU1U0iaoBJMrNlJHxV6qxUG3wMq5B0
+	uH7MPtSQ6xQmfd7oR7iFQQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1704736373; x=
+	1704822773; bh=U5vHpLovxHw2jLbFSMwbVDfMhB5fX3K4zCUa0DIZn9Q=; b=H
+	W+5pS6p8StQO1iOCpRMUGETWwegLC/itEkr0WC7HcpACh+OG0OM0TAGa2hkvGwaP
+	5qvYy2mXuiO0tnh4P2u0crfFK96diRxzgDdqyWzqT/FYexQukTZ6mnUCLxYEbIIM
+	4VlhkzufmFARICF16ChUFz/yOoBP+iZekdv0UswKOkpjR6BNq5VapPZOg1q2qT/C
+	5PveKLQu44B16jB0rftks3B649wadrnfVLj2ZAxOpu0DO54vzbm8rXKi4m1mMfQ9
+	/eYc+hn5aySPRTAK8Hg9gCA/LLAcGWZE7njvQ556WjGBHBu6qQhslWNzlDUkyO8K
+	iQsL/YuJcDENA1Msf1eVA==
+X-ME-Sender: <xms:dDacZcuDTXN6lIEB8WcOO16Pq_Tb_ovk8QZo9ds7l0Lpb-hT7fKQlg>
+    <xme:dDacZZebg42EFk_Dte7vA-bggeXbFkekpX81XBWPhF---MbikwU4NEQAq_cbaMZyt
+    GDLFMocQhEF5-vUZA>
+X-ME-Received: <xmr:dDacZXxBZ9cQLWYl6jdfdcpCufgtDH1LcuUb3pmhHdXoOlL94QlkfynIuxozVxZlTsp7KYObYheOxk2Q_1uOjqeGruABsR5zL19sbLc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdehjedguddtgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefs
+    tddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihii
+    eqnecuggftrfgrthhtvghrnheptdfgueeuueekieekgfeiueekffelteekkeekgeegffev
+    tddvjeeuheeuueelfeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    hilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:dTacZfO1_6ZhFSPZ7zYR_vaSkrh9xyqkFLtjv5fayG8ZpCbkP8Qaxg>
+    <xmx:dTacZc-OoIoBjtWs99QJ3JVhf7MeRx8huVlrpOGlzP4IbiCQjrWwAg>
+    <xmx:dTacZXVkZfDjbk7VxlH_D6LS-Uq5m97mwmnDhWMv7x4tSBRugNGqbw>
+    <xmx:dTacZcOHJTHi1jhIyuq6e13SVSM7x8VZNsMZkqqn0mrcGx9wqqEgzA>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Jan 2024 12:52:51 -0500 (EST)
+Date: Mon, 8 Jan 2024 10:52:49 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Lorenz Bauer <lorenz.bauer@isovalent.com>
+Cc: linux-input@vger.kernel.org, coreteam@netfilter.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-trace-kernel@vger.kernel.org, fsverity@lists.linux.dev, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	cgroups@vger.kernel.org, alexei.starovoitov@gmail.com, olsajiri@gmail.com, 
+	quentin@isovalent.com, alan.maguire@oracle.com, memxor@gmail.com
+Subject: Re: [PATCH bpf-next v3 0/3] Annotate kfuncs in .BTF_ids section
+Message-ID: <6t5bei3t2gwhuycu6ewftrgfuuyfhs26euymkysefqyfabgupa@3od5pe6ajybo>
+References: <cover.1704565248.git.dxu@dxuuu.xyz>
+ <CAN+4W8gPeQ2OjoYLKXsNPyhSVTB+vcSaS3Xzw=-M9Rf5MXfKPg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAN+4W8gPeQ2OjoYLKXsNPyhSVTB+vcSaS3Xzw=-M9Rf5MXfKPg@mail.gmail.com>
 
-Update release of iproute2 corresponding to the 6.7 kernel.
-Most of the changes in this release are in bridge and rdma tools.
+Hi Lorenz,
 
-Download:
-    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.7.0.tar.gz
+On Mon, Jan 08, 2024 at 10:15:45AM +0100, Lorenz Bauer wrote:
+> On Sat, Jan 6, 2024 at 7:25 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
+> >
+> > === Description ===
+> >
+> > This is a bpf-treewide change that annotates all kfuncs as such inside
+> > .BTF_ids. This annotation eventually allows us to automatically generate
+> > kfunc prototypes from bpftool.
+> >
+> > We store this metadata inside a yet-unused flags field inside struct
+> > btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
+> 
+> This is great, thanks for tackling this. With yout patches we can
+> figure out the full set of kfuncs. Is there a way to extend it so that
+> we can tell which program context a kfunc can be called from?
 
-Repository for current release
-    https://github.com/shemminger/iproute2.git
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+I think a potential approach would be to extend BTF_ID_FLAGS() with some
+more flags if we want to continue with .BTF_ids parsing technique. But
+it has some issues with program-type-less helpers that are associated with
+attachpoints as well as struct_ops helpers.
 
-And future release (net-next):
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+Since it looks like we're in rather early stages of program-type-less
+world, maybe it'd be good to defer solving this problem until more use
+cases are established and we can find a good cut point to design around.
+Even with uapi helpers there was no way before.
 
-Contributions:
-
-Allen Hubbe (1):
-      vdpa: consume device_features parameter
-
-Amit Cohen (8):
-      bridge: fdb: rename some variables to contain 'brport'
-      bridge: fdb: support match on source VNI in flush command
-      bridge: fdb: support match on nexthop ID in flush command
-      bridge: fdb: support match on destination VNI in flush command
-      bridge: fdb: support match on destination port in flush command
-      bridge: fdb: support match on destination IP in flush command
-      bridge: fdb: support match on [no]router flag in flush command
-      man: bridge: add a note about using 'master' and 'self' with flush
-
-Andrea Claudi (3):
-      configure: add the --color option
-      treewide: use configured value as the default color output
-      Makefile: use /usr/share/iproute2 for config files
-
-Benjamin Poirier (18):
-      bridge: vni: Accept 'del' command
-      bridge: vni: Remove dead code in group argument parsing
-      bridge: vni: Fix duplicate group and remote error messages
-      bridge: vni: Report duplicate vni argument using duparg()
-      bridge: vni: Fix vni filter help strings
-      bridge: vlan: Use printf() to avoid temporary buffer
-      bridge: vlan: Remove paranoid check
-      bridge: vni: Remove print_vnifilter_rtm_filter()
-      bridge: vni: Move open_json_object() within print_vni()
-      bridge: vni: Guard close_vni_port() call
-      bridge: vni: Reverse the logic in print_vnifilter_rtm()
-      bridge: vni: Remove stray newlines after each interface
-      bridge: vni: Replace open-coded instance of print_nl()
-      bridge: vni: Remove unused argument in open_vni_port()
-      bridge: vni: Align output columns
-      bridge: vni: Indent statistics with 2 spaces
-      bridge: Deduplicate print_range()
-      bridge: Provide rta_type()
-
-David Ahern (2):
-      Update kernel headers
-      Update kernel headers
-
-Dima Chumak (2):
-      devlink: Support setting port function ipsec_crypto cap
-      devlink: Support setting port function ipsec_packet cap
-
-Eli Schwartz (1):
-      configure: avoid un-recommended command substitution form
-
-Ido Schimmel (1):
-      bridge: mdb: Add get support
-
-Jiri Pirko (1):
-      mnl_utils: sanitize incoming netlink payload size in callbacks
-
-Johannes Nixdorf (1):
-      iplink: bridge: Add support for bridge FDB learning limits
-
-Junxian Huang (1):
-      rdma: Update uapi headers
-
-Luca Boccassi (1):
-      Revert "Makefile: ensure CONF_USR_DIR honours the libdir config"
-
-Maks Mishin (1):
-      lnstat: Fix deref of null in print_json() function
-
-Max Kunzelmann (1):
-      libnetlink: validate nlmsg header length first
-
-Patrisious Haddad (3):
-      rdma: update uapi headers
-      rdma: Add an option to set privileged QKEY parameter
-      rdma: Adjust man page for rdma system set privileged-qkey command
-
-Phil Sutter (2):
-      man: ip-route.8: Fix typo in rt_protos location spec
-      man: Fix malformatted database file locations
-
-Quentin Deslandes (1):
-      ss: prevent "Process" column from being printed unless requested
-
-Shung-Hsi Yu (2):
-      libbpf: set kernel_log_level when available
-      bpf: increase verifier verbosity when in verbose mode
-
-Stephen Hemminger (18):
-      uapi: update headers from 6.7-rc1
-      ip: move get_failed blocks
-      man: fix man page errors
-      man: allow up to 100 character lines
-      iplink: spelling fix in error message
-      ip: require RTM_NEWLINK
-      uapi: update stddef.h
-      configure: drop test for ATM
-      ip-link: use shorter URL to kernel docs
-      rdma: use print_XXX instead of COLOR_NONE
-      ip: merge duplicate if clauses
-      rdma: shorten print_ lines
-      rdma: use standard flag for json
-      rdma: make pretty behave like other commands
-      rdma: make supress_errors a bit
-      rdma: add oneline flag
-      rdma: do not mix newline and json object
-      v6.7.0
-
-heminhong (2):
-      iproute2: prevent memory leak
-      iproute2: prevent memory leak on error return
-
-wenglianfa (2):
-      rdma: Add support to dump SRQ resource in raw format
-      rdma: Fix the error of accessing string variable outside the lifecycle
-
+Thanks,
+Daniel
 
