@@ -1,78 +1,72 @@
-Return-Path: <netdev+bounces-62489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3291082786E
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:21:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94667827875
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:22:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5D5D1F238DD
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:21:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BD67284E4B
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4889955777;
-	Mon,  8 Jan 2024 19:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8ED455774;
+	Mon,  8 Jan 2024 19:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZy9zvII"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uuhCwomr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A37E55C2E;
-	Mon,  8 Jan 2024 19:20:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48014C433C9;
-	Mon,  8 Jan 2024 19:20:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704741612;
-	bh=0l6P9VORSHKX9C1VVcnePBrBJcdPlZqju9wqjY9MRyU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FZy9zvIIzkrZvDsS+N8wwX5nFskP3q+p2uCn+Ovi+OxSt87RrC7a7vdbVzJ6ZA51Y
-	 dNld5DcscSQbBXPI8d2psa2Xn0bP60pLjdFdI+J+dal5EJcwENA4efiGFloM/3Fw1z
-	 sHOW8BIyMSjRPpq0tYUVm1EqZhe9JqsNHiueXzHxB9ahSdUOq9xSAlnefqVpb/83dR
-	 MHoJc7lNwAuLRrKylFxTv4pAbYjK0TcGADidcale5kgBKhXx4Wziy8Rq9U1gZGFOCk
-	 rYmjlJNX7sQBWNWpbG/eKwoJmwDPNpFKJuECS3ukSlUrKlsPjRAItliJkRuh2XjrlJ
-	 E/NmHaYN05JLQ==
-Message-ID: <716b825f-67b7-4d08-9bd6-41c9bc4deb3d@kernel.org>
-Date: Mon, 8 Jan 2024 12:20:11 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BA055775;
+	Mon,  8 Jan 2024 19:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cAZKhoc1sQaXAZyI0XthhLVPBiZCvaLujckzoEmqp6w=; b=uuhCwomrY3L6fLdraat+dg7C/X
+	mR2Jpw+vZi7E/9/ixt9zJNELThCJB3Ss7Koen0mY7nXlpAOK4rP84gHrTIT4iMM4o1Geu4X7Q66Mv
+	euT6khRIMozafBtozorvtOYX5FzSjeHwEsnyzFhQJQOFydpSWRH6t/v5uihWAvdoX1bw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rMvBH-004fyv-K3; Mon, 08 Jan 2024 20:21:03 +0100
+Date: Mon, 8 Jan 2024 20:21:03 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Alexander Couzens <lynxis@fe80.eu>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org,
+	"open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>
+Subject: Re: [PATCH net-next 10/10] net: fill in MODULE_DESCRIPTION()s for
+ PCS Layer
+Message-ID: <cf825e28-cceb-49e1-9880-7971cc955b2c@lunn.ch>
+References: <20240108181610.2697017-1-leitao@debian.org>
+ <20240108181610.2697017-11-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net/ipv6: Remove unnecessary pr_debug() logs
-Content-Language: en-US
-To: Breno Leitao <leitao@debian.org>, weiwan@google.com, kuba@kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: leit@meta.com, "open list:NETWORKING [IPv4/IPv6]"
- <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-References: <20240108191254.3422696-1-leitao@debian.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240108191254.3422696-1-leitao@debian.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240108181610.2697017-11-leitao@debian.org>
 
-On 1/8/24 12:12 PM, Breno Leitao wrote:
-> In the ipv6 system, we have some logs basically dumping the name of the
-> function that is being called. This is not ideal, since ftrace give it
-> to us "for free". Moreover, checkpatch is not happy when touching that
-> code:
-> 
-> 	WARNING: Unnecessary ftrace-like logging - prefer using ftrace
-> 
-> Remove debug functions that only print the current function name.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  net/ipv6/ip6_fib.c | 4 ----
->  1 file changed, 4 deletions(-)
-> 
+On Mon, Jan 08, 2024 at 10:16:10AM -0800, Breno Leitao wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the LynxI PCS MediaTek's SoC.
 
-net-next is currently closed; repost in 2 weeks once it is re-opened.
-You can add this to both patches:
+Does pcs-lynx.c also have this issue? It can be built at a module.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
+     Andrew
 
