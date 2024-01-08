@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-62499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B3B8278BE
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:50:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9882A8278BD
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B65521C22B8A
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 380A31F23C5A
 	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC5454F9D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787DE53E22;
 	Mon,  8 Jan 2024 19:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="of11SOuH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uXkQnT4G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CEF5577B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CB85577A;
 	Mon,  8 Jan 2024 19:50:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C9D0FC433D9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D11C8C433C9;
 	Mon,  8 Jan 2024 19:50:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704743424;
-	bh=j1K6uvKTfv8SeRcBwXRHL201MxlihPet/CzG7DA+U7Q=;
+	bh=0R3bpc27hcCzzufZYy8bYrLwXlIvquQi9vH4lSu1txc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=of11SOuHwSS+CXYpcp5c8E0tY1FY81lsvT6ujUOK6hbnsG4w6nr1dP0kq/bDofmTH
-	 cnP7TfVGQ9kdUCTuBSXh0xE09NHwfgqxEnB/NXdtlGLnQrKIT2qM4X9g24AUkuyHml
-	 3oyqF0I2bg+4xvP9/zZrp3E9nBYphceLrcs1kETkX2a3TaFx6xuYYJRvSjKazRyqzZ
-	 9lPnBRIYy8FsVO3jd7rmMwFW6QKUuL/eodujIJFEQ+EzpmxTf4SluW+boVS3bu2/O3
-	 RMGtSw6nH+TPpdKV3fpNCVhLquRPRBsvIRbWZ0uUWZtqjTCZMLkvSBB5LPZw1c5m62
-	 TCdhLAfd8Vqcw==
+	b=uXkQnT4GkZK9j3hsFkK7Wa4gCks+oVxf+oU5Bjt9LDpPVP3wzxajXkOJIHKodqO4y
+	 XLKMulzxatP9ASPPWSXiRxcxKdwpXcYFLBG+Y6HFQWyfggeTKhItqZZ6C4bLO6PA44
+	 mSege+o7McbESQCY4arkPh5yrRvlOmFEG0NUZC7Hz17p8duzX7dkT+OvRQ6tgXFJby
+	 OtIKlJtEHqi9oeL/DmWfho33ubkV/r8relvmNGBAClxTlJVK/oBZyKg5AZ2kJuIuSJ
+	 U4tGyVBUCWj5tygSMuBj258m1DosIBguXXzsLk7kNWfq1eZN4AUh5Y3g0AoWBledEf
+	 Y8B0UFXGLddzQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AFAEDDFC690;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8BFBDFC686;
 	Mon,  8 Jan 2024 19:50:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,13 +43,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/4] Power off HCI devices before rfkilling them
+Subject: Re: [PATCH v3 0/4] Disconnect devices before rfkilling adapter
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <170474342471.29412.9439877422079885487.git-patchwork-notify@kernel.org>
+ <170474342475.29412.16996245383427159713.git-patchwork-notify@kernel.org>
 Date: Mon, 08 Jan 2024 19:50:24 +0000
-References: <20240102181946.57288-1-verdre@v0yd.nl>
-In-Reply-To: <20240102181946.57288-1-verdre@v0yd.nl>
+References: <20240107180252.73436-1-verdre@v0yd.nl>
+In-Reply-To: <20240107180252.73436-1-verdre@v0yd.nl>
 To: =?utf-8?q?Jonas_Dre=C3=9Fler_=3Cverdre=40v0yd=2Enl=3E?=@codeaurora.org
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
  asahi@lists.linux.dev, linux-bluetooth@vger.kernel.org,
@@ -60,25 +60,25 @@ Hello:
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  2 Jan 2024 19:19:16 +0100 you wrote:
-> In theory the firmware is supposed to power off the bluetooth card
-> when we use rfkill to block it. This doesn't work on a lot of laptops
-> though, leading to weird issues after turning off bluetooth, like the
-> connection timing out on the peripherals which were connected, and
-> bluetooth not connecting properly when the adapter is turned on again
-> quickly after rfkilling.
+On Sun,  7 Jan 2024 19:02:46 +0100 you wrote:
+> Apparently the firmware is supposed to power off the bluetooth card
+> properly, including disconnecting devices, when we use rfkill to block
+> bluetooth. This doesn't work on a lot of laptops though, leading to weird
+> issues after turning off bluetooth, like the connection timing out on the
+> peripherals which were connected, and bluetooth not connecting properly
+> when the adapter is turned on again after rfkilling.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/4] Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
+  - [v3,1/4] Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
     https://git.kernel.org/bluetooth/bluetooth-next/c/f48705f473ce
-  - [v2,2/4] Bluetooth: mgmt: Remove leftover queuing of power_off work
+  - [v3,2/4] Bluetooth: mgmt: Remove leftover queuing of power_off work
     https://git.kernel.org/bluetooth/bluetooth-next/c/2e7a6a997c9a
-  - [v2,3/4] Bluetooth: Add new state HCI_POWERING_DOWN
+  - [v3,3/4] Bluetooth: Add new state HCI_POWERING_DOWN
     https://git.kernel.org/bluetooth/bluetooth-next/c/2b16c80d8011
-  - [v2,4/4] Bluetooth: Queue a HCI power-off command before rfkilling adapters
-    (no matching commit)
+  - [v3,4/4] Bluetooth: Disconnect connected devices before rfkilling adapter
+    https://git.kernel.org/bluetooth/bluetooth-next/c/088656165c2d
 
 You are awesome, thank you!
 -- 
