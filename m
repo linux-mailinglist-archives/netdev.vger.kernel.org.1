@@ -1,251 +1,78 @@
-Return-Path: <netdev+bounces-62488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DAAE827841
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:14:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3291082786E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D0561F23CB2
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:14:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5D5D1F238DD
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9227654F9D;
-	Mon,  8 Jan 2024 19:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4889955777;
+	Mon,  8 Jan 2024 19:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EqtF3I10"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZy9zvII"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13CA54F8D;
-	Mon,  8 Jan 2024 19:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cce6c719caso23626391fa.2;
-        Mon, 08 Jan 2024 11:14:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704741283; x=1705346083; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XNaXoD9prw+TMf7vR3/H5SQrElCx5I5cZfXaOBoOuIs=;
-        b=EqtF3I101xaku751kQycUYruR8v0SRrCFfosA8eip8M2iQ+KuA1zLTt0yocgIIinBt
-         whXMLaKDL1SQI7Mbc3T3MZweR/a7q43/iQ7rE/yefImQrSYPuQXO3uJRkeXi2k8/U9iO
-         kDMP4YqutovCMn8+E794uHBxN8cPkXdN5kCsmrMfufy01kEe84MyVUhbZeBZO2V8TIui
-         XlF19wVE5gocvAmVBLrbs2A9BkjkBaIURL1axSClRGHI+RdI82KXpESWdCVDcpa09twC
-         wKYbnrf2nCZXG3/ymToxYnmXAORGbkabW4Rg9L9a7x2wH6DZDMdnIA8+w0l2ULm8lWed
-         HzAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704741283; x=1705346083;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XNaXoD9prw+TMf7vR3/H5SQrElCx5I5cZfXaOBoOuIs=;
-        b=KVJVCHSUGEulXQrqwGoVVcRQtN7raf8RGxDV8tIGizGfSo1rc6qpT2a42durU++Y8B
-         RtcCRfS7F1HbEzPwR0n+jxfJrzNSLJmU4QC+a7Xmg6mANW+28r5UB8BLg3tIUcjjNQr5
-         yEpIHIG5CMkAHPBYmYLXHkq1+LUWEXbXK1iMIoaqKCZxM3D02nIUtvTkQbeCkg7vXbfw
-         mkFOUSUqsVo+aIsXkcR2qwcYOrCLvYJLjFB9r97u9BBXh4tk/059ITN41K3mxDjWUpAa
-         3QGX/T+Dui2mj67LZ1pikJB8FTrLFr+CwZRQLd/NQW2+j9FVWEEI5NhqtoF/78Jpm+s/
-         wKKA==
-X-Gm-Message-State: AOJu0YwcFA06w6OJFjeSDz5j6TUhW1ocv2Jux/D7f1nQI2WZERY7+5vW
-	zoici1382/89cgtp8Yei+pNWZPR0PI2NcKkDFiQ=
-X-Google-Smtp-Source: AGHT+IFPGxJimeRpzJMd95o6QI8rggtAvEJYoUJJgYP/Mw1L/pgo4qp5I8El6GOtn2hJoGU8wIaydZdRmuDOrEWS49c=
-X-Received: by 2002:a2e:b17c:0:b0:2cc:3f55:a4c1 with SMTP id
- a28-20020a2eb17c000000b002cc3f55a4c1mr1852426ljm.100.1704741282404; Mon, 08
- Jan 2024 11:14:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A37E55C2E;
+	Mon,  8 Jan 2024 19:20:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48014C433C9;
+	Mon,  8 Jan 2024 19:20:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704741612;
+	bh=0l6P9VORSHKX9C1VVcnePBrBJcdPlZqju9wqjY9MRyU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FZy9zvIIzkrZvDsS+N8wwX5nFskP3q+p2uCn+Ovi+OxSt87RrC7a7vdbVzJ6ZA51Y
+	 dNld5DcscSQbBXPI8d2psa2Xn0bP60pLjdFdI+J+dal5EJcwENA4efiGFloM/3Fw1z
+	 sHOW8BIyMSjRPpq0tYUVm1EqZhe9JqsNHiueXzHxB9ahSdUOq9xSAlnefqVpb/83dR
+	 MHoJc7lNwAuLRrKylFxTv4pAbYjK0TcGADidcale5kgBKhXx4Wziy8Rq9U1gZGFOCk
+	 rYmjlJNX7sQBWNWpbG/eKwoJmwDPNpFKJuECS3ukSlUrKlsPjRAItliJkRuh2XjrlJ
+	 E/NmHaYN05JLQ==
+Message-ID: <716b825f-67b7-4d08-9bd6-41c9bc4deb3d@kernel.org>
+Date: Mon, 8 Jan 2024 12:20:11 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108183938.468426-1-verdre@v0yd.nl> <20240108183938.468426-5-verdre@v0yd.nl>
- <5d1f2013-5758-4d6c-8d01-e96a76bb2686@v0yd.nl> <40550fc1-3b5b-438c-891d-2da0f30874f3@v0yd.nl>
-In-Reply-To: <40550fc1-3b5b-438c-891d-2da0f30874f3@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Jan 2024 14:14:29 -0500
-Message-ID: <CABBYNZKV8SujJ7GFUqTMXUskE=yK0q=opmwvTZNEpPb=JkiQbA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] Bluetooth: Remove pending ACL connection attempts
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net/ipv6: Remove unnecessary pr_debug() logs
+Content-Language: en-US
+To: Breno Leitao <leitao@debian.org>, weiwan@google.com, kuba@kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: leit@meta.com, "open list:NETWORKING [IPv4/IPv6]"
+ <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20240108191254.3422696-1-leitao@debian.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240108191254.3422696-1-leitao@debian.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Jonas,
+On 1/8/24 12:12 PM, Breno Leitao wrote:
+> In the ipv6 system, we have some logs basically dumping the name of the
+> function that is being called. This is not ideal, since ftrace give it
+> to us "for free". Moreover, checkpatch is not happy when touching that
+> code:
+> 
+> 	WARNING: Unnecessary ftrace-like logging - prefer using ftrace
+> 
+> Remove debug functions that only print the current function name.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  net/ipv6/ip6_fib.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
 
-On Mon, Jan 8, 2024 at 1:55=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
->
-> On 1/8/24 19:44, Jonas Dre=C3=9Fler wrote:
-> > On 1/8/24 19:39, Jonas Dre=C3=9Fler wrote:
-> >> With the last commit we moved to using the hci_sync queue for "Create
-> >> Connection" requests, removing the need for retrying the paging after
-> >> finished/failed "Create Connection" requests and after the end of
-> >> inquiries.
-> >>
-> >> hci_conn_check_pending() was used to trigger this retry, we can remove=
- it
-> >> now.
-> >>
-> >> Note that we can also remove the special handling for COMMAND_DISALLOW=
-ED
-> >> errors in the completion handler of "Create Connection", because "Crea=
-te
-> >> Connection" requests are now always serialized.
-> >>
-> >> This is somewhat reverting commit 4c67bc74f016 ("[Bluetooth] Support
-> >> concurrent connect requests").
-> >>
-> >> With this, the BT_CONNECT2 state of ACL hci_conn objects should now be
-> >> back to meaning only one thing: That we received a connection request
-> >> from another device (see hci_conn_request_evt), but the actual connect
-> >> should be deferred.
-> >> ---
-> >>   include/net/bluetooth/hci_core.h |  1 -
-> >>   net/bluetooth/hci_conn.c         | 16 ----------------
-> >>   net/bluetooth/hci_event.c        | 21 ++++-----------------
-> >>   3 files changed, 4 insertions(+), 34 deletions(-)
-> >>
-> >> diff --git a/include/net/bluetooth/hci_core.h
-> >> b/include/net/bluetooth/hci_core.h
-> >> index 2c30834c1..d7483958d 100644
-> >> --- a/include/net/bluetooth/hci_core.h
-> >> +++ b/include/net/bluetooth/hci_core.h
-> >> @@ -1330,7 +1330,6 @@ struct hci_conn *hci_conn_add(struct hci_dev
-> >> *hdev, int type, bdaddr_t *dst,
-> >>                     u8 role);
-> >>   void hci_conn_del(struct hci_conn *conn);
-> >>   void hci_conn_hash_flush(struct hci_dev *hdev);
-> >> -void hci_conn_check_pending(struct hci_dev *hdev);
-> >>   struct hci_chan *hci_chan_create(struct hci_conn *conn);
-> >>   void hci_chan_del(struct hci_chan *chan);
-> >> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> >> index 541d55301..22033057b 100644
-> >> --- a/net/bluetooth/hci_conn.c
-> >> +++ b/net/bluetooth/hci_conn.c
-> >> @@ -2534,22 +2534,6 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
-> >>       }
-> >>   }
-> >> -/* Check pending connect attempts */
-> >> -void hci_conn_check_pending(struct hci_dev *hdev)
-> >> -{
-> >> -    struct hci_conn *conn;
-> >> -
-> >> -    BT_DBG("hdev %s", hdev->name);
-> >> -
-> >> -    hci_dev_lock(hdev);
-> >> -
-> >> -    conn =3D hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
-> >> -    if (conn)
-> >> -        hci_cmd_sync_queue(hdev, hci_acl_create_connection_sync,
-> >> conn, NULL);
-> >> -
-> >> -    hci_dev_unlock(hdev);
-> >> -}
-> >> -
-> >>   static u32 get_link_mode(struct hci_conn *conn)
-> >>   {
-> >>       u32 link_mode =3D 0;
-> >> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> >> index e8b4a0126..91973d6d1 100644
-> >> --- a/net/bluetooth/hci_event.c
-> >> +++ b/net/bluetooth/hci_event.c
-> >> @@ -117,8 +117,6 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev
-> >> *hdev, void *data,
-> >>           hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> >>       hci_dev_unlock(hdev);
-> >> -    hci_conn_check_pending(hdev);
-> >> -
-> >>       return rp->status;
-> >>   }
-> >> @@ -149,8 +147,6 @@ static u8 hci_cc_exit_periodic_inq(struct hci_dev
-> >> *hdev, void *data,
-> >>       hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);
-> >> -    hci_conn_check_pending(hdev);
-> >> -
-> >>       return rp->status;
-> >>   }
-> >> @@ -2296,10 +2292,8 @@ static void hci_cs_inquiry(struct hci_dev
-> >> *hdev, __u8 status)
-> >>   {
-> >>       bt_dev_dbg(hdev, "status 0x%2.2x", status);
-> >> -    if (status) {
-> >> -        hci_conn_check_pending(hdev);
-> >> +    if (status)
-> >>           return;
-> >> -    }
-> >>       set_bit(HCI_INQUIRY, &hdev->flags);
-> >>   }
-> >> @@ -2323,12 +2317,9 @@ static void hci_cs_create_conn(struct hci_dev
-> >> *hdev, __u8 status)
-> >>       if (status) {
-> >>           if (conn && conn->state =3D=3D BT_CONNECT) {
-> >> -            if (status !=3D HCI_ERROR_COMMAND_DISALLOWED ||
-> >> conn->attempt > 2) {
-> >> -                conn->state =3D BT_CLOSED;
-> >> -                hci_connect_cfm(conn, status);
-> >> -                hci_conn_del(conn);
-> >> -            } else
-> >> -                conn->state =3D BT_CONNECT2;
-> >> +            conn->state =3D BT_CLOSED;
-> >> +            hci_connect_cfm(conn, status);
-> >> +            hci_conn_del(conn);
-> >>           }
-> >>       } else {
-> >>           if (!conn) {
-> >> @@ -3020,8 +3011,6 @@ static void hci_inquiry_complete_evt(struct
-> >> hci_dev *hdev, void *data,
-> >>       bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
-> >> -    hci_conn_check_pending(hdev);
-> >> -
-> >>       if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
-> >>           return;
-> >> @@ -3247,8 +3236,6 @@ static void hci_conn_complete_evt(struct hci_dev
-> >> *hdev, void *data,
-> >>   unlock:
-> >>       hci_dev_unlock(hdev);
-> >> -
-> >> -    hci_conn_check_pending(hdev);
-> >>   }
-> >>   static void hci_reject_conn(struct hci_dev *hdev, bdaddr_t *bdaddr)
-> >
-> > Please take a special look at this one: I'm not sure if I'm breaking th=
-e
-> > functionality of deferred connecting using BT_CONNECT2 in
-> > hci_conn_request_evt() here, as I don't see anywhere where we check for
-> > this state and establish a connection later.
-> >
-> > It seems that this is how hci_conn_request_evt() was initially written
-> > though, hci_conn_check_pending() only got introduced later and seems
-> > unrelated.
->
-> Ahh nevermind... The check for BT_CONNECT2 on "Conn Complete event" got
-> introduced with 4c67bc74f01 ([Bluetooth] Support concurrent connect
-> requests). And later the deferred connection setup on "Conn Request
-> event" got introduced with 20714bfef8 ("Bluetooth: Implement deferred
-> sco socket setup").
->
-> I assume the latter commit was relying on the "Create Connection"
-> request "Conn Complete event" that got introduced with the former commit
-> then? That would imply that we use BT_CONNECT2 if there's already a
-> "Create Connection" going on when the "Conn Request event" happens, and
-> we must wait for that existing request to finish.. Is that how those
-> deferred connections are supposed to work?
+net-next is currently closed; repost in 2 weeks once it is re-opened.
+You can add this to both patches:
 
-Well if you are not sure that works we better make sure we have tests
-that cover this, for LE I know for sure it works because we have the
-likes of iso-tester that do connect 2 peers simultaneously, but for
-classic I don't recall having any test that does multiple connections.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-> >
-> > Thanks,
-> > Jonas
-
-
-
---=20
-Luiz Augusto von Dentz
 
