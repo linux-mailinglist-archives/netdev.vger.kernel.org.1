@@ -1,174 +1,99 @@
-Return-Path: <netdev+bounces-62324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 337B7826A52
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:11:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CC31826AC4
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:34:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D39FE1F2259C
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:11:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A29C282427
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE19EAE6;
-	Mon,  8 Jan 2024 09:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SYzS9hHJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA271118D;
+	Mon,  8 Jan 2024 09:34:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F8812B93
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 09:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-557a615108eso4264a12.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 01:10:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704705036; x=1705309836; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uVeISqx1IYuB8q44TarP2V7Hig1f2BS8XZ7W6hewe98=;
-        b=SYzS9hHJZAZYXEfLbNe/GUEIR7fGlAB1KRVPyh2zqVvagxsHiGmtlVQ0rfHfVIUqaB
-         KTv3SZQ6wMfAJmLS7RvgLY8yZm9dKODchYna1eU88EMl4v7xqLoAPp5qKVrt1IzlKm6B
-         CnG6SNPLBzeTKtbgP6q3THBYeZqwSeuk4FZW+umsTmH3XfHhqNHRllEjnVIRJ/Andmcf
-         iuRDYqqyGON5NqnSw/icpG3EnYgIbIMdUPLNBskc5EqT4hPo8wRwofBFyVEf3TIYuCWi
-         TxVe5w70RIycAu8onDmmL4JQUXaDI6Y6LoIbfmSMha2OPQyi/t4oo9wkKcemwEbe9QVb
-         aqvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704705036; x=1705309836;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uVeISqx1IYuB8q44TarP2V7Hig1f2BS8XZ7W6hewe98=;
-        b=ECxV8h8VxNkN8l1jRHwpi+AtdNHXOgLplAJKz8x2VJqgDFw8hZAwRWUwH2TkDvwrbH
-         qU3m8QEerueKpYsJK6wfzlycf4cL7aFUkwbaZadN4wfcW9CUnL3oXiEU2Fdsz8J25y00
-         XTu/hzuNWW8jouhFgNmO0RFVqM6Oa3G9/ZR2xQk4jJQHN79J0u7EbIxy9/vtrnfnnoCp
-         safjFKK+q32y+/DyoH5XLCd+8FoNVZZPJ6MVv0crsPNzxJRhjg7fdVMR7T2CajdZnt7z
-         4V06NfXdqIV+Fvlov7jazErH5AAPfVuytjLwKCUKltxjXh69kuo2O7chhDfwlZL2NTem
-         l1Ww==
-X-Gm-Message-State: AOJu0Yz570HiVyUgO+AlbyJRvWJDZJZNDG8YQU4ce4HyVy/oTnVkRp03
-	fd+VCC1rZdTkM4KJTrFElx+Enh5Bf6bYmJ5ISjGcKio1OLkO
-X-Google-Smtp-Source: AGHT+IHqPHz71QsG0pUS7Sxrs39ixb6yF9R+Cx8SM+f0nSa29nQo0T3GqFRg7JLq7IC1+zqp5TvF2GxZ9wD3A5XklD4=
-X-Received: by 2002:a50:9b1e:0:b0:553:5578:2fc9 with SMTP id
- o30-20020a509b1e000000b0055355782fc9mr204336edi.5.1704705036396; Mon, 08 Jan
- 2024 01:10:36 -0800 (PST)
+Received: from aliyun-sdnproxy-1.icoremail.net (aliyun-cloud.icoremail.net [47.90.88.95])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873D511709;
+	Mon,  8 Jan 2024 09:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from alexious$zju.edu.cn ( [10.190.64.155] ) by
+ ajax-webmail-mail-app4 (Coremail) ; Mon, 8 Jan 2024 17:12:06 +0800
+ (GMT+08:00)
+Date: Mon, 8 Jan 2024 17:12:06 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: alexious@zju.edu.cn
+To: "Simon Horman" <horms@kernel.org>
+Cc: "Saeed Mahameed" <saeedm@nvidia.com>, 
+	"Leon Romanovsky" <leon@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	"Eric Dumazet" <edumazet@google.com>, 
+	"Jakub Kicinski" <kuba@kernel.org>, 
+	"Paolo Abeni" <pabeni@redhat.com>, 
+	"Maor Gottlieb" <maorg@mellanox.com>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net/mlx5e: fix a double-free in arfs_create_groups
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
+ 20230825(e13b6a3b) Copyright (c) 2002-2024 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <20240103172254.GB31813@kernel.org>
+References: <20231224081348.3535146-1-alexious@zju.edu.cn>
+ <20240103172254.GB31813@kernel.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108085232.95437-1-ptikhomirov@virtuozzo.com>
-In-Reply-To: <20240108085232.95437-1-ptikhomirov@virtuozzo.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 8 Jan 2024 10:10:22 +0100
-Message-ID: <CANn89iJv1RjbKrX2wbJKepg24a4t46kwuFV_fRYHpsPHJfi+KA@mail.gmail.com>
-Subject: Re: [PATCH] neighbour: purge nf_bridged skb from foreign device neigh
-To: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel@openvz.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <5d93189f.7631f.18ce857ef38.Coremail.alexious@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cS_KCgBXzSxmvJtlmiOHAA--.8335W
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/1tbiAgwOAGWadaU02gABsA
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Mon, Jan 8, 2024 at 9:52=E2=80=AFAM Pavel Tikhomirov
-<ptikhomirov@virtuozzo.com> wrote:
->
-> An skb can be added to a neigh->arp_queue while waiting for an arp
-> reply. Where original skb's skb->dev can be different to neigh's
-> neigh->dev. For instance in case of bridging dnated skb from one veth to
-> another, the skb would be added to a neigh->arp_queue of the bridge.
->
-> There is no explicit mechanism that prevents the original skb->dev link
-> of such skb from being freed under us. For instance neigh_flush_dev does
-> not cleanup skbs from different device's neigh queue. But that original
-> link can be used and lead to crash on e.g. this stack:
->
-> arp_process
->   neigh_update
->     skb =3D __skb_dequeue(&neigh->arp_queue)
->       neigh_resolve_output(..., skb)
->         ...
->           br_nf_dev_xmit
->             br_nf_pre_routing_finish_bridge_slow
->               skb->dev =3D nf_bridge->physindev
->               br_handle_frame_finish
->
-> So let's improve neigh_flush_dev to also purge skbs when device
-> equal to their skb->nf_bridge->physindev gets destroyed.
->
-> Signed-off-by: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
-> ---
-> I'm not fully sure, but likely it is:
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> ---
->  net/core/neighbour.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->
-> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> index 552719c3bbc3d..47d2d52f17da3 100644
-> --- a/net/core/neighbour.c
-> +++ b/net/core/neighbour.c
-> @@ -39,6 +39,9 @@
->  #include <linux/inetdevice.h>
->  #include <net/addrconf.h>
->
-> +#include <linux/skbuff.h>
-> +#include <linux/netfilter_bridge.h>
-> +
->  #include <trace/events/neigh.h>
->
->  #define NEIGH_DEBUG 1
-> @@ -377,6 +380,28 @@ static void pneigh_queue_purge(struct sk_buff_head *=
-list, struct net *net,
->         }
->  }
->
-> +static void neigh_purge_nf_bridge_dev(struct neighbour *neigh, struct ne=
-t_device *dev)
-> +{
-> +       struct sk_buff_head *list =3D &neigh->arp_queue;
-> +       struct nf_bridge_info *nf_bridge;
-> +       struct sk_buff *skb, *next;
-> +
-> +       write_lock(&neigh->lock);
-> +       skb =3D skb_peek(list);
-> +       while (skb) {
-> +               nf_bridge =3D nf_bridge_info_get(skb);
-
-This depends on CONFIG_BRIDGE_NETFILTER
-
-Can we solve this issue without adding another layer violation ?
-
-> +
-> +               next =3D skb_peek_next(skb, list);
-> +               if (nf_bridge && nf_bridge->physindev =3D=3D dev) {
-> +                       __skb_unlink(skb, list);
-> +                       neigh->arp_queue_len_bytes -=3D skb->truesize;
-> +                       kfree_skb(skb);
-> +               }
-> +               skb =3D next;
-> +       }
-> +       write_unlock(&neigh->lock);
-> +}
-> +
->  static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *=
-dev,
->                             bool skip_perm)
->  {
-> @@ -393,6 +418,7 @@ static void neigh_flush_dev(struct neigh_table *tbl, =
-struct net_device *dev,
->                 while ((n =3D rcu_dereference_protected(*np,
->                                         lockdep_is_held(&tbl->lock))) !=
-=3D NULL) {
->                         if (dev && n->dev !=3D dev) {
-> +                               neigh_purge_nf_bridge_dev(n, dev);
->                                 np =3D &n->next;
->                                 continue;
->                         }
-> --
-> 2.43.0
->
+Cgo+IE9uIFN1biwgRGVjIDI0LCAyMDIzIGF0IDA0OjEzOjQ4UE0gKzA4MDAsIFpoaXBlbmcgTHUg
+d3JvdGU6Cj4gPiBXaGVuIGBpbmAgYWxsb2NhdGVkIGJ5IGt2emFsbG9jIGZhaWxzLCBhcmZzX2Ny
+ZWF0ZV9ncm91cHMgd2lsbCBmcmVlCj4gPiBmdC0+ZyBhbmQgcmV0dXJuIGFuIGVycm9yLiBIb3dl
+dmVyLCBhcmZzX2NyZWF0ZV90YWJsZSwgdGhlIG9ubHkgY2FsbGVyIG9mCj4gPiBhcmZzX2NyZWF0
+ZV9ncm91cHMsIHdpbGwgaG9sZCB0aGlzIGVycm9yIGFuZCBjYWxsIHRvCj4gPiBtbHg1ZV9kZXN0
+cm95X2Zsb3dfdGFibGUsIGluIHdoaWNoIHRoZSBmdC0+ZyB3aWxsIGJlIGZyZWVkIGFnYWluLgo+
+ID4gCj4gPiBGaXhlczogMWNhYmU2YjA5NjVlICgibmV0L21seDVlOiBDcmVhdGUgYVJGUyBmbG93
+IHRhYmxlcyIpCj4gPiBTaWduZWQtb2ZmLWJ5OiBaaGlwZW5nIEx1IDxhbGV4aW91c0B6anUuZWR1
+LmNuPgo+IAo+IFRoYW5rcywKPiAKPiBJIGFncmVlIHRoaXMgYWRkcmVzc2VzIHRoZSBpc3N1ZSB0
+aGF0IHlvdSBkZXNjcmliZS4KPiBBbmQgYXMgYSBtaW5pbWFsIGZpeCBpdCBsb29rcyBnb29kLgo+
+IAo+IFJldmlld2VkLWJ5OiBTaW1vbiBIb3JtYW4gPGhvcm1zQGtlcm5lbC5vcmc+Cj4gCj4gSG93
+ZXZlciwgSSB3b3VsZCBsaWtlIHRvIHN1Z2dlc3QgdGhhdCBzb21lIGNsZWFuLXVwIHdvcmsgY291
+bGQKPiB0YWtlIHBsYWNlIGFzIGEgZm9sbG93LXVwLgo+IAo+IEkgdGhpbmsgdGhhdCB0aGUgZXJy
+b3IgaGFuZGxpbmcgaW4gdGhpcyBhcmVhIG9mIHRoZSBjb2RlCj4gaXMgcmF0aGVyIGZyYWdpbGUu
+IFRoaXMgaXMgYmVjYXVzZSBpbml0aWFsaXNhdGlvbiBpcyBub3QgbmVjZXNzYXJpbHkKPiB1bndv
+dW5kIG9uIGVycm9yIHdpdGhpbiB0aGUgZnVuY3Rpb24gdGhhdCBpbml0aWFsaXNhdGlvbiBvY2N1
+cnMuCj4gCj4gSSB0aGluayBpdCB3b3VsZCBiZSBiZXR0ZXIgaWYgYXJmc19jcmVhdGVfZ3JvdXBz
+KCk6Cj4gCj4gMS4gUmVsZWFzZWQgYWxsb2NhdGVzIHJlc291cmNlcyBpdCBhbGxvY2F0ZXMsIGlu
+Y2x1ZGluZyBmdC0+ZyBhbmQKPiAgICBlbGVtZW50cyBvZiBmdC0+Zywgb24gZXJyb3IuCj4gMi4g
+VGhpcyB3YXMgYWNoaWV2ZWQgYnkgdXNpbmcgYSBnb3RvIHVud2luZCBsYWRkZXIuCj4gMy4gVGhl
+IGNhbGxlciB0cmVhdGVkIGZ0LT5nIGFzIHVuaW5pdGlhbGlzZWQgaWYKPiAgICBhcmZzX2NyZWF0
+ZV9ncm91cHMgZmFpbHMuCj4KIApBZ3JlZSwgSSB0aGluayBhIHVud2luZCBsYWRkZXIgZm9yIGFy
+ZnNfY3JlYXRlX2dyb3VwcyBpcyBtdWNoIGJldHRlci4KSSdsbCBmb2xsb3cgdGhpcyBpZGVhIHRv
+IHNlbmQgYSB2MiBwYXRjaCBsYXRlci4KQW5vdGhlciBjb21tZW50IGJlbG93LgoKPiBMaWtld2lz
+ZSwgSSB0aGluayB0aGF0Ogo+IAo+ICogYXJmc19jcmVhdGVfZ3JvdXBzLCBzaG91bGQgaW5pdGlh
+bGlzZSBmdC0+bnVtX2dyb3Vwcwo+IAo+IEFuZCBmdXJ0aGVyLCBsb2dpYyBzaW1pbGFyIHRvIHRo
+ZSBhYm92ZSBzaG91bGQgZ3VpZGUKPiBob3cgYXJmc19jcmVhdGVfdGFibGUoKSBpbml0aWFsaXNl
+cyBmdC0+dCBhbmQgY2xlYW5zIGl0Cj4gdXAgb24gZXJyb3IuCj4gCgpJIHRoaW5rIHRoYXQgZnQt
+PnQgeW91IG1lbnRpb25lZCByZWZlcnMgdG8gbWx4NV9jcmVhdGVfZmxvd190YWJsZS4KSSdkIGxp
+a2UgdG8gbWFrZSB0aGUgbGlmZSBjeWNsZSBvZiBmdC0+dCBzaW1pbGFyIHRvIGZ0LT5nIGluIGFy
+ZnNfY3JlYXRlX2dyb3VwcywgCmJ1dCBpdCBuZWVkcyB0byBhZGQgYW4gYXJndW1lbnQgZm9yIG1s
+eDVfY3JlYXRlX2Zsb3dfdGFibGUgdG8gdHJhbnNmZXIgZnQgdG8gCml0LiBIb3dldmVyLCBtbHg1
+X2NyZWF0ZV9mbG93X3RhYmxlIGlzIGNhbGxlZCBpbiBtb3JlIHRoYW4gMzAgZGlmZmVyZW50IHBs
+YWNlcyAKdGhyb3VnaG91dCB0aGUga2VybmVsLiBTbyBzdWNoIG1vZGlmaWNhdGlvbiBjb3VsZCBi
+ZSBhbm90aGVyIHJlZmFjdG9yaW5nIHBhdGNoCmJ1dCBtYXkgYmUgb3V0IG9mIHRoaXMgZml4IHBh
+dGNoJ3MgZHV0eS4KCj4gSSBkaWQgbm90IGxvb2sgYXQgdGhlIGNvZGUgYmV5b25kIHRoZSBzY29w
+ZSBkZXNjcmliZWQgYWJvdmUuCj4gQnV0IHRoZSBhYm92ZSBhcmUgZ2VuZXJhbCBwcmluY2lwbGVz
+IHRoYXQgbWF5IHdlbGwgYXBwbHkgaW4KPiBvdGhlciBuZWFyYnkgY29kZSB0b28uCj4gCj4gLi4u
+Cg==
 
