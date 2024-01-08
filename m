@@ -1,390 +1,190 @@
-Return-Path: <netdev+bounces-62335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3466D826AE5
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:40:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E20FF826AEA
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:41:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1D322814BD
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:40:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CA201F221B8
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EEF1429E;
-	Mon,  8 Jan 2024 09:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D5012B6B;
+	Mon,  8 Jan 2024 09:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z3nYco1P"
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="XInpMI66"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8104125A6;
-	Mon,  8 Jan 2024 09:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-55770379ed4so1346973a12.3;
-        Mon, 08 Jan 2024 01:38:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD5011C89;
+	Mon,  8 Jan 2024 09:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4084iuFE020014;
+	Mon, 8 Jan 2024 01:40:10 -0800
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2168.outbound.protection.outlook.com [104.47.57.168])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vga958qsj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 01:40:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MxfUj+IKWCoEICj9/4ruZtTREQS0i4L2usjIkjG+A6JRM7zurG2/YXr9EBgt1BeilsFO0pLFy9LRgM4s8+yyES6fn51OWvuOVi9pqYRlaVlNgcJtCOvIUWcGARIGiX7Z2ve11nyAtTBS4J4W4KbChj7AuChIbD4FB0NbmMni6mnQDYPB1rQnlKqN0yUXDmVi5Cw02Yc0uNvDZpfRVA7xo5Yyv5uOseLVose8tztfaEXLFDb8t68jUG5gXHB0+A86ugS4UULQ0a4X4tqlQm9bDWRQjMd1Oeol7kHcIOviaPYAXnuTQEwqI20gPjzrtzclQ7ZOyGOnYuUTSzkdkJO6TA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VNNtFK21VSQyHfRlubg87HI8hfQLXWkD+Pm6LX7AwEQ=;
+ b=SvDX2Cn1h4ofTGRwfn/0xJkLZqbDEaughIJVEykCBeS57+432MNcn0PgLchwHxmOQOCv7oEctSlpPSo0kp03bPNhweXkX8PR7McAkQL4mBPDa/2qChdIfPpP6WtIoMOoOgQlcDhUoxdRSvCPVAHlZ/eW1rZlqVhV0z3eE9P9NqUadcILpMmXtO77y6kMAu2tI+gkCYH6b/llbNGe9IdUERc2F/bRw/rcFM2TIdy46iS61ilqyaiD23Hofr3Hi1fhwcjUkrUlPBsH263Ek6dysnKpRenrfcgV6l2LcU6OFOzNL45f4/3ybJHZ+Dz+2N1/nuqhkinMg2b5CjPQWGN7Ww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704706735; x=1705311535; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f922AAAvTUPPGAMjuD/HGIUip6YX4Zxif4jpCQOF54Q=;
-        b=Z3nYco1PB8wrEretwoNbX5rl//Q5CNMuJqNYHNYyVKccZTq7DiCcfLcjL37pRmtHFg
-         gsPsFmWUmzxMtYo/O+ej7Xsgjev8mPxt7p/P25CxriWgW2J+mwdRDbTGW5GVZZmONga5
-         1XkD4j2haXVc8J8bxcMArVC2Na369noZpacCqZEgQYp36qEkxw0B/rfKqMnTg8RUvXui
-         yi3pQE3c09t8jSb3vrmna6XniVhqDYmfMfsMwYBQPmcKoavhA+jYUbcea3WTeQUa/3Dz
-         LWUQtv6AL8VUW+jS1TmLtFcCY6JqzxNmHILeqSSt/ki9/Zn0AaXN3kS2+Cms5hPFUlIu
-         GgkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704706735; x=1705311535;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f922AAAvTUPPGAMjuD/HGIUip6YX4Zxif4jpCQOF54Q=;
-        b=eYa/6mMRWjwBKFEYz5IkoRLAKATUPmMlXvl/lpPWkDVWkmKyTU+XazNkHi/GVJ1OqU
-         kxzUXISymfGFkZr7djDj6G/FUQ+NotvyA/VkX9sXRzhtBk5TeZAORtfBYVR7kWCusm14
-         ny1OPttTnuolxteHazV0jBqX0K5FeXRich1NCLd4bSi0hM+KSnI2Cmvl1bccgj3WMNQh
-         JbTxxU554OTYNaBJJHLC4VIv+hgpgIQEQCV5FHjGKKTfyXM5d54Es+qKkw6MhXMVDx2K
-         NJ3Q6QxDxJesvki4Yng0Dz1C+2u2l5ukwtpxI2LNW/e7KY4bf2ERNK3MDlM0PPnQD0r8
-         1kjQ==
-X-Gm-Message-State: AOJu0Yyzuz8vFXctWTWYXP76WIIx5mVCfoSBIm8T0m4RIi1owvPPAtoq
-	rzKwlMU7uOCG+yQ42kRSAnSmBFIhB90+EQ==
-X-Google-Smtp-Source: AGHT+IH2J5bvyAlahRK3WFWSh7+fk+vNfS5rTlvUTI+eJr2X8J7ADz3qdASb7PiB6YGRPg2y62Yfyw==
-X-Received: by 2002:a17:906:2685:b0:a28:b92e:c22a with SMTP id t5-20020a170906268500b00a28b92ec22amr1602842ejc.22.1704706735142;
-        Mon, 08 Jan 2024 01:38:55 -0800 (PST)
-Received: from debian.fritz.box ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id v12-20020a170906338c00b00a2ae71cee2asm326851eja.177.2024.01.08.01.38.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 01:38:54 -0800 (PST)
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: 
-Cc: Dimitri Fedrau <dima.fedrau@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 net-next 5/5] net: phy: marvell-88q2xxx: add driver for the Marvell 88Q2220 PHY
-Date: Mon,  8 Jan 2024 10:37:00 +0100
-Message-Id: <20240108093702.13476-6-dima.fedrau@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240108093702.13476-1-dima.fedrau@gmail.com>
-References: <20240108093702.13476-1-dima.fedrau@gmail.com>
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VNNtFK21VSQyHfRlubg87HI8hfQLXWkD+Pm6LX7AwEQ=;
+ b=XInpMI66dRjP9JVWX2l/PT1yLK/jlH5y3aP9oQ85T3VQoQk0WOERfGSkrMBd0CjDsYyZVv1en2K8FJ07mXaBrQGguXvzlrhXjGbOW6wPKfjC+uQuTWi7Rd8Sgt2cX0UyXldVsTZ0XDLBbrO4iQVvFNt1fp6ag1VMKC2E08mrJR8=
+Received: from PH0PR18MB4734.namprd18.prod.outlook.com (2603:10b6:510:cd::24)
+ by SN7PR18MB3807.namprd18.prod.outlook.com (2603:10b6:806:f7::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.14; Mon, 8 Jan
+ 2024 09:40:07 +0000
+Received: from PH0PR18MB4734.namprd18.prod.outlook.com
+ ([fe80::ca1e:e4b2:a920:25a9]) by PH0PR18MB4734.namprd18.prod.outlook.com
+ ([fe80::ca1e:e4b2:a920:25a9%3]) with mapi id 15.20.7181.015; Mon, 8 Jan 2024
+ 09:40:07 +0000
+From: Shinas Rasheed <srasheed@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Haseeb Gani
+	<hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>,
+        Sathesh B Edara
+	<sedara@marvell.com>,
+        "egallen@redhat.com" <egallen@redhat.com>,
+        "mschmidt@redhat.com" <mschmidt@redhat.com>,
+        "pabeni@redhat.com"
+	<pabeni@redhat.com>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "wizhao@redhat.com" <wizhao@redhat.com>,
+        "kheib@redhat.com"
+	<kheib@redhat.com>,
+        "konguyen@redhat.com" <konguyen@redhat.com>,
+        Veerasenareddy Burru <vburru@marvell.com>,
+        Satananda Burla
+	<sburla@marvell.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>
+Subject: RE: [EXT] Re: [PATCH net-next v3 7/8] octeon_ep_vf: add ethtool
+ support
+Thread-Topic: [EXT] Re: [PATCH net-next v3 7/8] octeon_ep_vf: add ethtool
+ support
+Thread-Index: AQHaQBdBShrkdjKYx0aaWpM69n+DqLDMId6AgAOLKyA=
+Date: Mon, 8 Jan 2024 09:40:07 +0000
+Message-ID: 
+ <PH0PR18MB4734F1FC933FC4E4BAB06934C76B2@PH0PR18MB4734.namprd18.prod.outlook.com>
+References: <20240105203823.2953604-1-srasheed@marvell.com>
+	<20240105203823.2953604-8-srasheed@marvell.com>
+ <20240105193251.028e8eb5@kernel.org>
+In-Reply-To: <20240105193251.028e8eb5@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR18MB4734:EE_|SN7PR18MB3807:EE_
+x-ms-office365-filtering-correlation-id: fed9a327-b21b-4516-b0d4-08dc102dcc89
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ 8FysZBPEuH14O8IFiBm7HW8/6wmM3wC2NHITj6z5e74VS4r4KbYMgCR8SQ5QcWAjL9r6B9JEmObH8abI25GFCuGq7vQJxVLOlznT1omx+bI+8+91/4AzVJkGqCjBN5gUE3VUeIEfZa77+fmwC6PSUEskmVePa8L551lY1KBmhNFwZh1I6c6cxlY6UlyDnfHyD+KtEr4MPFX+k58soNKF207vvP5mUbrMzTd7yNkRdsSITJfDPeeqojXFrTfk3I9KVz5WqwJcbhRXEPmjABMdCbYU53Rl2K37di5AkaIYAzrEn+3AaMMZ0h3h7xYL9ucP4r+03s4Ux6LsUz/ykkSGJHIIxQorECwZ0IvqfCGKN+KKmkokpdXXu6ZxSMXozsHqwt9G7DN0RHxxkva8+ov8lhAmCIxeB3c/T7rjT5pSryxMCu69rapjGSlRZ11t8eliO1O/Xwn0Xdq5w2wPR2A5RyLSdtk2eK3mB0VPc9Ctr44alXCRepeZy3lQfzcBcmCKEfAwio9xCflwu9dzEHD0639HoRyF07D7aDjhXKHwCC+INZv2k6eQlMsEcs0hBt4nkxV4HV94S20kCQUBajM6ct74VcQ1EoGHQxawxIPGvzIcnNrzmO74MtNebzPwUGNULPGSVFGVE1gIHHKetko8jvdjVlSuzlGEgM7EPiHWtmI=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4734.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(396003)(376002)(39860400002)(230922051799003)(230273577357003)(230173577357003)(64100799003)(451199024)(186009)(1800799012)(55016003)(53546011)(26005)(9686003)(6506007)(71200400001)(478600001)(7696005)(122000001)(38100700002)(86362001)(33656002)(2906002)(5660300002)(7416002)(41300700001)(83380400001)(38070700009)(66946007)(6916009)(8676002)(66556008)(66476007)(66446008)(64756008)(316002)(76116006)(54906003)(4326008)(52536014)(8936002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?f5h0Qn/iYK2HKt2XqTy/QxzOWvV4f4hQy8sbVuCPKY6XA5qWEG8DQR0zuXVW?=
+ =?us-ascii?Q?rysgl8jLSVHGfzrzgVmxHYUOfBYsJKSsXNXC42+DzbLd8N6hYsraCJM6mnai?=
+ =?us-ascii?Q?Xq12PTns4BxxaqnAesSzP1BR4ZbCSY9Zre0l3waBX3uCP7Upx/DvSLIyPjug?=
+ =?us-ascii?Q?CIKFzvE+/yVMkVvUnK0+YMa82nViCqDvs8Q/yuUKoISh4S11bBogPrZaOonj?=
+ =?us-ascii?Q?sAV4wcGR5VqC+V8Tpcq3Eukjl25HhAqllAR0cmnKtdIaTIBZsVd2nyutnlPY?=
+ =?us-ascii?Q?vjeuV3PxXbDaPNp5D1AF3vZfE9aSvNBLcFPRTZa73YxiA/07DMnK3OqHB66U?=
+ =?us-ascii?Q?shZswSfMOHnIEe/xZn51ch+G7wIE2G12BUEMT3glIiNicJVgZTYbs/5L+6yu?=
+ =?us-ascii?Q?0ep5Q7kZ+qnJ2FZGLsFmbVa1DO0nr02fBeYpLWhgVod+igzpVpN+uG8jeGkD?=
+ =?us-ascii?Q?kWer6y0IJ0tCcw2K4J+9pQRMXH+xQyVGqHEXTyQHTANbWVDMHtw4KL4SD3Tv?=
+ =?us-ascii?Q?EaxY9TzVQIrJDO9In9144xTGKYJBtzMCpuPEArkbcytdWx7pr+XEAJmf6ouI?=
+ =?us-ascii?Q?eP+N+4hqi9IeDIA1kmhLMUskEN5Y8TeQ/NrixfZJmJ7S75v9JM7IJ2z7bjK3?=
+ =?us-ascii?Q?NVa7G2nsv2BJ/vuGj/NlcgayJlPnpwh8gf8Zt98OaA4K50cySB7piS+TJ/rz?=
+ =?us-ascii?Q?i5d8sPfp+ERC3DWvmufmAi5MFaAfSXTwRfvnXP1YLy1059QXPAZV7Q9lJtTl?=
+ =?us-ascii?Q?SCj5+a0xIS+uDW0ZKyPyFKzUXwWXWjkhtQeRusvrM3Qr2bBezrATUBVg22HP?=
+ =?us-ascii?Q?bFXMGXWr9bUwDUfK9W2NbaEsAZhBzKrWbdKBw/KSrL+lCXrjjO7Db8bJKizH?=
+ =?us-ascii?Q?IG/UmKEpdEVg7qDUhe40RhzkxWNczltMN+RmoJkMLwpLVaz9VUoPiECBghSh?=
+ =?us-ascii?Q?WhRED8yXJOgY6uBh1iVDqFfWPvdMBu4nLRiuACKc9/BVMfqxnBULDAhdVROA?=
+ =?us-ascii?Q?CQkuQj8Of8I6XWJK2HXWTV4aU6SqaA/1qpTE7kaFc4c21J0DCudh2JnWTZP3?=
+ =?us-ascii?Q?jhzcjFGhfFTMITr58Gi2rryso4lkW36zcmR9kDdCY5cdUyplPyVJ1fSX8ECq?=
+ =?us-ascii?Q?HxYWmgJJAt5o5VIlMcUyXBv9lYfeGfw3Y7j6TERNgZXw6Do2gVwoW2eeTr/B?=
+ =?us-ascii?Q?hTEliyxy0eqK2eZA53+Wh1onx3io1AdK1xgIvGa6drwYWKUyXMvBr9wRQ88R?=
+ =?us-ascii?Q?bDi/GUquZQpsl0oKQGr1PjY7TuA2I5bihJLLSim+qY/OB3zwNiomvU//ubLo?=
+ =?us-ascii?Q?jgCms0fTq/1cu/rOH9Ywq58wbU5v+MNLQO2cYzwud7x4Kt1t4plahpU1uNNn?=
+ =?us-ascii?Q?PUqDvTq8ddmuzf+zLjkyPFpSZf/P+FkGdW6u1i2PZSYvsJfcQM4WMpPdee0k?=
+ =?us-ascii?Q?qgur9iKUUKAUWjZbp28au4N+LXzZ2ikv4Fz7MZLbJ77BvqTDuzS5xzipvekq?=
+ =?us-ascii?Q?me2xbFYFa/gbeYWvQSMe5PkMsdoeBq/7khjpuW9PbHzLirZ7Wh4Yeq2aVzcC?=
+ =?us-ascii?Q?k5ZJgbqLx9gkkHLFgkC+9ga6Vpis4tkdFrwSypjm?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4734.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fed9a327-b21b-4516-b0d4-08dc102dcc89
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2024 09:40:07.0771
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xmyXgYGcFvlJ8pLzynAAdHOo/rFfSU+tfYtmKzFqMUFkKtsdltJIiLdnwy6NQT6nDbqWw/xbvr2T9tZvAmy1BQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR18MB3807
+X-Proofpoint-GUID: 2yFOyl6HhOrWc0xuETXCPcb1Q3AH3gOf
+X-Proofpoint-ORIG-GUID: 2yFOyl6HhOrWc0xuETXCPcb1Q3AH3gOf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-Add a driver for the Marvell 88Q2220. This driver allows to detect the
-link, switch between 100BASE-T1 and 1000BASE-T1 and switch between
-master and slave mode. Autonegoation is supported.
+Thanks for your review. Will submit V4 soon
 
-Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
----
- drivers/net/phy/marvell-88q2xxx.c | 206 +++++++++++++++++++++++++++++-
- include/linux/marvell_phy.h       |   1 +
- 2 files changed, 201 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-index dcebb4643aff..8a0dae82ab2d 100644
---- a/drivers/net/phy/marvell-88q2xxx.c
-+++ b/drivers/net/phy/marvell-88q2xxx.c
-@@ -6,6 +6,8 @@
- #include <linux/marvell_phy.h>
- #include <linux/phy.h>
- 
-+#define PHY_ID_88Q2220_REVB0	(MARVELL_PHY_ID_88Q2220 | 0x1)
-+
- #define MDIO_MMD_AN_MV_STAT			32769
- #define MDIO_MMD_AN_MV_STAT_ANEG		0x0100
- #define MDIO_MMD_AN_MV_STAT_LOCAL_RX		0x1000
-@@ -13,6 +15,11 @@
- #define MDIO_MMD_AN_MV_STAT_LOCAL_MASTER	0x4000
- #define MDIO_MMD_AN_MV_STAT_MS_CONF_FAULT	0x8000
- 
-+#define MDIO_MMD_AN_MV_STAT2			32794
-+#define MDIO_MMD_AN_MV_STAT2_AN_RESOLVED	0x0800
-+#define MDIO_MMD_AN_MV_STAT2_100BT1		0x2000
-+#define MDIO_MMD_AN_MV_STAT2_1000BT1		0x4000
-+
- #define MDIO_MMD_PCS_MV_100BT1_STAT1			33032
- #define MDIO_MMD_PCS_MV_100BT1_STAT1_IDLE_ERROR		0x00ff
- #define MDIO_MMD_PCS_MV_100BT1_STAT1_JABBER		0x0100
-@@ -29,6 +36,42 @@
- 
- #define MDIO_MMD_PCS_MV_RX_STAT			33328
- 
-+struct mmd_val {
-+	int devad;
-+	u32 regnum;
-+	u16 val;
-+};
-+
-+const struct mmd_val mv88q222x_revb0_init_seq0[] = {
-+	{ MDIO_MMD_PCS, 0x8033, 0x6801 },
-+	{ MDIO_MMD_AN, MDIO_AN_T1_CTRL, 0x0 },
-+	{ MDIO_MMD_PMAPMD, MDIO_CTRL1,
-+	  MDIO_CTRL1_LPOWER | MDIO_PMA_CTRL1_SPEED1000 },
-+	{ MDIO_MMD_PCS, 0xfe1b, 0x48 },
-+	{ MDIO_MMD_PCS, 0xffe4, 0x6b6 },
-+	{ MDIO_MMD_PMAPMD, MDIO_CTRL1, 0x0 },
-+	{ MDIO_MMD_PCS, MDIO_CTRL1, 0x0 },
-+};
-+
-+const struct mmd_val mv88q222x_revb0_init_seq1[] = {
-+	{ MDIO_MMD_PCS, 0xfe79, 0x0 },
-+	{ MDIO_MMD_PCS, 0xfe07, 0x125a },
-+	{ MDIO_MMD_PCS, 0xfe09, 0x1288 },
-+	{ MDIO_MMD_PCS, 0xfe08, 0x2588 },
-+	{ MDIO_MMD_PCS, 0xfe11, 0x1105 },
-+	{ MDIO_MMD_PCS, 0xfe72, 0x042c },
-+	{ MDIO_MMD_PCS, 0xfbba, 0xcb2 },
-+	{ MDIO_MMD_PCS, 0xfbbb, 0xc4a },
-+	{ MDIO_MMD_AN, 0x8032, 0x2020 },
-+	{ MDIO_MMD_AN, 0x8031, 0xa28 },
-+	{ MDIO_MMD_AN, 0x8031, 0xc28 },
-+	{ MDIO_MMD_PCS, 0xffdb, 0xfc10 },
-+	{ MDIO_MMD_PCS, 0xfe1b, 0x58 },
-+	{ MDIO_MMD_PCS, 0xfe79, 0x4 },
-+	{ MDIO_MMD_PCS, 0xfe5f, 0xe8 },
-+	{ MDIO_MMD_PCS, 0xfe05, 0x755c },
-+};
-+
- static int mv88q2xxx_soft_reset(struct phy_device *phydev)
- {
- 	int ret;
-@@ -125,24 +168,90 @@ static int mv88q2xxx_read_link_100m(struct phy_device *phydev)
- 
- static int mv88q2xxx_read_link(struct phy_device *phydev)
- {
--	int ret;
--
- 	/* The 88Q2XXX PHYs do not have the PMA/PMD status register available,
- 	 * therefore we need to read the link status from the vendor specific
- 	 * registers depending on the speed.
- 	 */
-+
- 	if (phydev->speed == SPEED_1000)
--		ret = mv88q2xxx_read_link_gbit(phydev);
-+		return mv88q2xxx_read_link_gbit(phydev);
-+	else if (phydev->speed == SPEED_100)
-+		return mv88q2xxx_read_link_100m(phydev);
-+
-+	phydev->link = false;
-+	return 0;
-+}
-+
-+static int mv88q2xxx_read_master_slave_state(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
-+	ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_MMD_AN_MV_STAT);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (ret & MDIO_MMD_AN_MV_STAT_LOCAL_MASTER)
-+		phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
- 	else
--		ret = mv88q2xxx_read_link_100m(phydev);
-+		phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
- 
--	return ret;
-+	return 0;
-+}
-+
-+static int mv88q2xxx_read_aneg_speed(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	phydev->speed = SPEED_UNKNOWN;
-+	ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_MMD_AN_MV_STAT2);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (!(ret & MDIO_MMD_AN_MV_STAT2_AN_RESOLVED))
-+		return 0;
-+
-+	if (ret & MDIO_MMD_AN_MV_STAT2_100BT1)
-+		phydev->speed = SPEED_100;
-+	else if (ret & MDIO_MMD_AN_MV_STAT2_1000BT1)
-+		phydev->speed = SPEED_1000;
-+
-+	return 0;
- }
- 
- static int mv88q2xxx_read_status(struct phy_device *phydev)
- {
- 	int ret;
- 
-+	if (phydev->autoneg == AUTONEG_ENABLE) {
-+		/* We have to get the negotiated speed first, otherwise we are
-+		 * not able to read the link.
-+		 */
-+		ret = mv88q2xxx_read_aneg_speed(phydev);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = mv88q2xxx_read_link(phydev);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = genphy_c45_read_lpa(phydev);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = genphy_c45_baset1_read_status(phydev);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = mv88q2xxx_read_master_slave_state(phydev);
-+		if (ret < 0)
-+			return ret;
-+
-+		phy_resolve_aneg_linkmode(phydev);
-+
-+		return 0;
-+	}
-+
- 	ret = mv88q2xxx_read_link(phydev);
- 	if (ret < 0)
- 		return ret;
-@@ -171,7 +280,9 @@ static int mv88q2xxx_get_features(struct phy_device *phydev)
- 	 * sequence provided by Marvell. Disable it for now until a proper
- 	 * workaround is found or a new PHY revision is released.
- 	 */
--	linkmode_clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, phydev->supported);
-+	if (phydev->drv->phy_id == MARVELL_PHY_ID_88Q2110)
-+		linkmode_clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-+				   phydev->supported);
- 
- 	return 0;
- }
-@@ -241,6 +352,75 @@ static int mv88q2xxx_get_sqi_max(struct phy_device *phydev)
- 	return 15;
- }
- 
-+static int mv88q222x_soft_reset(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Enable RESET of DCL */
-+	if (phydev->autoneg == AUTONEG_ENABLE || phydev->speed == SPEED_1000) {
-+		ret = phy_write_mmd(phydev, MDIO_MMD_PCS, 0xfe1b, 0x48);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_1000BT1_CTRL,
-+			    MDIO_PCS_1000BT1_CTRL_RESET);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_PCS, 0xffe4, 0xc);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Disable RESET of DCL */
-+	if (phydev->autoneg == AUTONEG_ENABLE || phydev->speed == SPEED_1000)
-+		return phy_write_mmd(phydev, MDIO_MMD_PCS, 0xfe1b, 0x58);
-+
-+	return 0;
-+}
-+
-+static int mv88q222x_config_aneg(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = genphy_c45_config_aneg(phydev);
-+	if (ret)
-+		return ret;
-+
-+	return mv88q222x_soft_reset(phydev);
-+}
-+
-+static int mv88q222x_revb0_config_init(struct phy_device *phydev)
-+{
-+	int ret, i;
-+
-+	for (i = 0; i < ARRAY_SIZE(mv88q222x_revb0_init_seq0); i++) {
-+		ret = phy_write_mmd(phydev, mv88q222x_revb0_init_seq0[i].devad,
-+				    mv88q222x_revb0_init_seq0[i].regnum,
-+				    mv88q222x_revb0_init_seq0[i].val);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	usleep_range(5000, 10000);
-+
-+	for (i = 0; i < ARRAY_SIZE(mv88q222x_revb0_init_seq1); i++) {
-+		ret = phy_write_mmd(phydev, mv88q222x_revb0_init_seq1[i].devad,
-+				    mv88q222x_revb0_init_seq1[i].regnum,
-+				    mv88q222x_revb0_init_seq1[i].val);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	/* The 88Q2XXX PHYs do have the extended ability register available, but
-+	 * register MDIO_PMA_EXTABLE where they should signalize it does not
-+	 * work according to specification. Therefore, we force it here.
-+	 */
-+	phydev->pma_extable = MDIO_PMA_EXTABLE_BT1;
-+
-+	return 0;
-+}
-+
- static struct phy_driver mv88q2xxx_driver[] = {
- 	{
- 		.phy_id			= MARVELL_PHY_ID_88Q2110,
-@@ -255,12 +435,26 @@ static struct phy_driver mv88q2xxx_driver[] = {
- 		.get_sqi		= mv88q2xxx_get_sqi,
- 		.get_sqi_max		= mv88q2xxx_get_sqi_max,
- 	},
-+	{
-+		PHY_ID_MATCH_EXACT(PHY_ID_88Q2220_REVB0),
-+		.name			= "mv88q2220",
-+		.get_features		= mv88q2xxx_get_features,
-+		.config_aneg		= mv88q222x_config_aneg,
-+		.aneg_done		= genphy_c45_aneg_done,
-+		.config_init		= mv88q222x_revb0_config_init,
-+		.read_status		= mv88q2xxx_read_status,
-+		.soft_reset		= mv88q222x_soft_reset,
-+		.set_loopback		= genphy_c45_loopback,
-+		.get_sqi		= mv88q2xxx_get_sqi,
-+		.get_sqi_max		= mv88q2xxx_get_sqi_max,
-+	},
- };
- 
- module_phy_driver(mv88q2xxx_driver);
- 
- static struct mdio_device_id __maybe_unused mv88q2xxx_tbl[] = {
- 	{ MARVELL_PHY_ID_88Q2110, MARVELL_PHY_ID_MASK },
-+	{ PHY_ID_MATCH_EXACT(PHY_ID_88Q2220_REVB0), },
- 	{ /*sentinel*/ }
- };
- MODULE_DEVICE_TABLE(mdio, mv88q2xxx_tbl);
-diff --git a/include/linux/marvell_phy.h b/include/linux/marvell_phy.h
-index 9b54c4f0677f..693eba9869e4 100644
---- a/include/linux/marvell_phy.h
-+++ b/include/linux/marvell_phy.h
-@@ -26,6 +26,7 @@
- #define MARVELL_PHY_ID_88E2110		0x002b09b0
- #define MARVELL_PHY_ID_88X2222		0x01410f10
- #define MARVELL_PHY_ID_88Q2110		0x002b0980
-+#define MARVELL_PHY_ID_88Q2220		0x002b0b20
- 
- /* Marvel 88E1111 in Finisar SFP module with modified PHY ID */
- #define MARVELL_PHY_ID_88E1111_FINISAR	0x01ff0cc0
--- 
-2.39.2
-
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Saturday, January 6, 2024 9:03 AM
+> To: Shinas Rasheed <srasheed@marvell.com>
+> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Haseeb Gani
+> <hgani@marvell.com>; Vimlesh Kumar <vimleshk@marvell.com>; Sathesh B
+> Edara <sedara@marvell.com>; egallen@redhat.com; mschmidt@redhat.com;
+> pabeni@redhat.com; horms@kernel.org; wizhao@redhat.com;
+> kheib@redhat.com; konguyen@redhat.com; Veerasenareddy Burru
+> <vburru@marvell.com>; Satananda Burla <sburla@marvell.com>; David S.
+> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>
+> Subject: [EXT] Re: [PATCH net-next v3 7/8] octeon_ep_vf: add ethtool supp=
+ort
+>=20
+> External Email
+>=20
+> ----------------------------------------------------------------------
+> On Fri, 5 Jan 2024 12:38:22 -0800 Shinas Rasheed wrote:
+> > +	"rx_dropped",
+> > +	"tx_dropped",
+>=20
+> Please take a close look at rtnl_link_stats64.
+> Anything that fits should really go to standard interface stats.
+> This will benefit the piles of monitoring SW which gather standard
+> stats.
+>=20
+> > +	"rx_dropped_pkts_fifo_full",
+>=20
+> This one is probably rx_missed_errors
 
