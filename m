@@ -1,127 +1,181 @@
-Return-Path: <netdev+bounces-62445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA7E8274AC
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:10:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD22A8274BB
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:14:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB36E1F23528
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:10:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32AEB1F2331F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5776524C7;
-	Mon,  8 Jan 2024 16:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2818524D5;
+	Mon,  8 Jan 2024 16:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IoUa8Hrn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MywWNpE/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D27537F3
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 16:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704730212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cKLHLhBEX8bb9WWT7OqrY212FY4x/L8iopt3fivYrUA=;
-	b=IoUa8HrnPnBv7+km7lZBzWs4WpNZfOxxlWfBOtiO8JfMa/nGZHzp3zkJ1IL3xEoJul2OlN
-	VdoXV+pRKp/LHoRWpD29u/htlMPrJx6sR9D7H22sKIn/wXzju3+f5tOVSCce7hQ09X88Bf
-	SgpKMJJ9yNSVry3HJc5No2+PuMoHp8Q=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-692-5INAJMvfPC-ktcupYqUBOw-1; Mon, 08 Jan 2024 11:10:11 -0500
-X-MC-Unique: 5INAJMvfPC-ktcupYqUBOw-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-680b5b8bd27so23774076d6.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 08:10:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704730210; x=1705335010;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D758524C7;
+	Mon,  8 Jan 2024 16:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-28bc870c540so1755233a91.2;
+        Mon, 08 Jan 2024 08:14:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704730452; x=1705335252; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cKLHLhBEX8bb9WWT7OqrY212FY4x/L8iopt3fivYrUA=;
-        b=A8/FPyagoIs4AedLoZEWTp+BEZlQWmD0lrNKrZsoHJRH/lpJHpAPmtLxYXTzMLZC6B
-         bH1w56Lo+TQ+WkVF2fmGk0GnRCC20PJl85Si3x0G5L1U8MLZyAS4Dy8L5dyxkpuJ//+g
-         1bs8G5qtx3567rfNtnYGrzXZ4rA+rPHVJLlRD1uJXi1jAiQEfu0Z+zTfNQCONiJHCRfO
-         NNkM8ZIUWF+mmx/dE6xj0rs0gNP0lW1cd8WEJJMz0bycf3gYKkecwjW/zwqA0xWlzlv9
-         1IwkabPux2hdsOr5xnoocG0vII4tMjGyTYrN8oYVyLacCet2LSpmbSKHZXW/Om8PLNSZ
-         9Cdg==
-X-Gm-Message-State: AOJu0YxV7z8u2oGOdtezP0wDY0bWF+t+A0y54P2WZyFpVix1U5da6Ef/
-	uFd4CCpR+H4ZRd9w/ZWAZ2oFTPKLfuN2ckO33SeeuR8dPcJ0cFZVnL5yJJZ0UFr2BtBBACTNyu+
-	cCypc7YQ6SKYxQuJmw7DHp+c4
-X-Received: by 2002:ad4:594d:0:b0:681:967:ce0 with SMTP id eo13-20020ad4594d000000b0068109670ce0mr979870qvb.122.1704730210396;
-        Mon, 08 Jan 2024 08:10:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH5zkUshQJQO0Yn7/HhzYaTEGUr4o+kQ0yU3L5LCWG0qqYgnVwhmp7NeTgoPrvq+YKPodSQdQ==
-X-Received: by 2002:ad4:594d:0:b0:681:967:ce0 with SMTP id eo13-20020ad4594d000000b0068109670ce0mr979861qvb.122.1704730210173;
-        Mon, 08 Jan 2024 08:10:10 -0800 (PST)
-Received: from localhost ([37.162.108.53])
-        by smtp.gmail.com with ESMTPSA id l5-20020a056214028500b00680cb3fd476sm81118qvv.43.2024.01.08.08.10.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 08:10:09 -0800 (PST)
-Date: Mon, 8 Jan 2024 17:10:04 +0100
-From: Andrea Claudi <aclaudi@redhat.com>
-To: Junxian Huang <huangjunxian6@hisilicon.com>
-Cc: jgg@ziepe.ca, leon@kernel.org, dsahern@gmail.com,
-	stephen@networkplumber.org,
-	Chengchang Tang <tangchengchang@huawei.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linuxarm@huawei.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iproute2-rc 2/2] rdma: Fix the error of accessing string
- variable outside the lifecycle
-Message-ID: <ZZweXDQ-4ZrlfxBv@renaissance-vector>
-References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
- <20231229065241.554726-3-huangjunxian6@hisilicon.com>
- <fb7c85a4-165d-7eda-740a-d11a32cb86c0@hisilicon.com>
+        bh=unjvTIPzqvEYfu9k31l2UbfWfPgY7ha+9toKsyi5Vr8=;
+        b=MywWNpE/IlArxpylbISQA9Pp0LCB2F/te/IPXa3KAo8flm6rHDuVXRhSQr7qeWzaov
+         muWoDbnsAOZXHq/SYItqe8GPpK3XoVaEgI7dhMPW0QOHToHXSwXxh7pvJvmZV2HIpCrD
+         CpMnUgLWpndWmeI7JStVej4Wzzc4KKwPL/VTRE7SwkX1CrvbUlYMl2Wa/Me1BWF9Ayph
+         H6Ylzcjr3hYRwAJMAlc2LWoEjr+4dgAllGqL9jhKm9VcNRfdWqhngLHnymObmzVDMVGw
+         Q43Lc0jDLRj3sScYLvF/oHt0dOBH0uCyfQfyHER4XPzTN8azMJWv/X2fiEXOYgzoOlpM
+         5/Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704730452; x=1705335252;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=unjvTIPzqvEYfu9k31l2UbfWfPgY7ha+9toKsyi5Vr8=;
+        b=LplKvSuBdOWjc15obiGsfCXIr1vJc7OWyEzdxIWWC3zaXvD7YVFsoyiKvr6VHT/A0w
+         SssLuW+uTsCFT8Iz8SahQYShw+rAh9n7V/5fAAAWuOee2mmWGYl6WSDD4nzdnIXoBIsj
+         Tmgj+F/TqKgNrMLe5sQJpV0TET8eUq1SLtoS9NoR2i4cBoKVgNFy62jn286ZygZd4kU+
+         +ywRVS2YwhSxpw4lm/wQcizcjqxrikLYHmta53blFyXsCHJqt/QAKar1npv4gjWv+3sV
+         KvsUVNXnQXLrJAcPrp/+dQXZYYpAuAre3Ol6pOW4zDZuWHq7EUo82N36sGXuo11vdTPu
+         GdQw==
+X-Gm-Message-State: AOJu0YxMz+mBRabe6dep0LJg5K4pDMROVcH0ftLVkFNTq857GwNGM+P7
+	4lmftSDfpddhDJZs4HOXl4OqLMBhi93T8kTKrdw=
+X-Google-Smtp-Source: AGHT+IGGbd9uEm1HwzeQk0zSJgcIrych+A4ioq0XePO8wLwmpeqipVfchKXfctSdfiFT9SV1RSAuYB49yeFctZANvgM=
+X-Received: by 2002:a17:90a:604e:b0:28d:19d3:8c58 with SMTP id
+ h14-20020a17090a604e00b0028d19d38c58mr1670693pjm.73.1704730452552; Mon, 08
+ Jan 2024 08:14:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fb7c85a4-165d-7eda-740a-d11a32cb86c0@hisilicon.com>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+ <20240103095650.25769-3-linyunsheng@huawei.com> <d4947ef05bca8525d04f9943e92b4e43ec82c583.camel@gmail.com>
+ <1d40427d-78e3-ef40-a63f-206c0697bda2@huawei.com>
+In-Reply-To: <1d40427d-78e3-ef40-a63f-206c0697bda2@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 8 Jan 2024 08:13:35 -0800
+Message-ID: <CAKgT0UdjsJPNLps+JFgjk89oyB9PDuMkw9pYuBg4ArnGh35Osg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/6] page_frag: unify gfp bits for order 3 page allocation
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 08, 2024 at 09:28:52AM +0800, Junxian Huang wrote:
-> 
-> Hi all,
-> 
-> the first patch is replaced by Stephen's latest patches. Are there any
-> comments to this patch?
-> 
-> Thanks,
-> Junxian
+On Mon, Jan 8, 2024 at 12:25=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
 >
-> On 2023/12/29 14:52, Junxian Huang wrote:
-> > From: wenglianfa <wenglianfa@huawei.com>
-> > 
-> > All these SPRINT_BUF(b) definitions are inside the 'if' block, but
-> > accessed outside the 'if' block through the pointers 'comm'. This
-> > leads to empty 'comm' attribute when querying resource information.
-> > So move the definitions to the beginning of the functions to extend
-> > their life cycle.
-> > 
-> > Before:
-> > $ rdma res show srq
-> > dev hns_0 srqn 0 type BASIC lqpn 18 pdn 5 pid 7775 comm
-> > 
-> > After:
-> > $ rdma res show srq
-> > dev hns_0 srqn 0 type BASIC lqpn 18 pdn 5 pid 7775 comm ib_send_bw
-> > 
-> > Fixes: 1808f002dfdd ("lib/fs: fix memory leak in get_task_name()")
-> > Signed-off-by: wenglianfa <wenglianfa@huawei.com>
-> > Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
-> > ---
+> On 2024/1/5 23:35, Alexander H Duyck wrote:
+> > On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
+> >> Currently there seems to be three page frag implementions
+> >> which all try to allocate order 3 page, if that fails, it
+> >> then fail back to allocate order 0 page, and each of them
+> >> all allow order 3 page allocation to fail under certain
+> >> condition by using specific gfp bits.
+> >>
+> >> The gfp bits for order 3 page allocation are different
+> >> between different implementation, __GFP_NOMEMALLOC is
+> >> or'd to forbid access to emergency reserves memory for
+> >> __page_frag_cache_refill(), but it is not or'd in other
+> >> implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
+> >> direct reclaim in skb_page_frag_refill(), but it is not
+> >> masked off in __page_frag_cache_refill().
+> >>
+> >> This patch unifies the gfp bits used between different
+> >> implementions by or'ing __GFP_NOMEMALLOC and masking off
+> >> __GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
+> >> possible pressure for mm.
+> >>
+> >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> >> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> >> ---
+> >>  drivers/vhost/net.c | 2 +-
+> >>  mm/page_alloc.c     | 4 ++--
+> >>  net/core/sock.c     | 2 +-
+> >>  3 files changed, 4 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> >> index f2ed7167c848..e574e21cc0ca 100644
+> >> --- a/drivers/vhost/net.c
+> >> +++ b/drivers/vhost/net.c
+> >> @@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhos=
+t_net *net, unsigned int sz,
+> >>              /* Avoid direct reclaim but allow kswapd to wake */
+> >>              pfrag->page =3D alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM)=
+ |
+> >>                                        __GFP_COMP | __GFP_NOWARN |
+> >> -                                      __GFP_NORETRY,
+> >> +                                      __GFP_NORETRY | __GFP_NOMEMALLO=
+C,
+> >>                                        SKB_FRAG_PAGE_ORDER);
+> >>              if (likely(pfrag->page)) {
+> >>                      pfrag->size =3D PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+> >> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> >> index 9a16305cf985..1f0b36dd81b5 100644
+> >> --- a/mm/page_alloc.c
+> >> +++ b/mm/page_alloc.c
+> >> @@ -4693,8 +4693,8 @@ static struct page *__page_frag_cache_refill(str=
+uct page_frag_cache *nc,
+> >>      gfp_t gfp =3D gfp_mask;
+> >>
+> >>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> >> -    gfp_mask |=3D __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
+> >> -                __GFP_NOMEMALLOC;
+> >> +    gfp_mask =3D (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+> >> +               __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+> >>      page =3D alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+> >>                              PAGE_FRAG_CACHE_MAX_ORDER);
+> >>      nc->size =3D page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+> >> diff --git a/net/core/sock.c b/net/core/sock.c
+> >> index 446e945f736b..d643332c3ee5 100644
+> >> --- a/net/core/sock.c
+> >> +++ b/net/core/sock.c
+> >> @@ -2900,7 +2900,7 @@ bool skb_page_frag_refill(unsigned int sz, struc=
+t page_frag *pfrag, gfp_t gfp)
+> >>              /* Avoid direct reclaim but allow kswapd to wake */
+> >>              pfrag->page =3D alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM)=
+ |
+> >>                                        __GFP_COMP | __GFP_NOWARN |
+> >> -                                      __GFP_NORETRY,
+> >> +                                      __GFP_NORETRY | __GFP_NOMEMALLO=
+C,
+> >>                                        SKB_FRAG_PAGE_ORDER);
+> >>              if (likely(pfrag->page)) {
+> >>                      pfrag->size =3D PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+> >
+> > Looks fine to me.
+> >
+> > One thing you may want to consider would be to place this all in an
+> > inline function that could just consolidate all the code.
+>
+> Do you think it is possible to further unify the implementations of the
+> 'struct page_frag_cache' and 'struct page_frag', so adding a inline
+> function for above is unnecessary?
 
-Hi Junxian,
-For future patches, you can have a faster feedback adding to cc the
-author of the original patch. In this case it's me, so here's my
+Actually the skb_page_frag_refill seems to function more similarly to
+how the Intel drivers do in terms of handling fragments. It is
+basically slicing off pieces until either it runs out of them and
+allocates a new one, or if the page reference count is one without
+pre-allocating the references.
 
-Acked-by: Andrea Claudi <aclaudi@redhat.com>
-
+However, with that said many of the core bits are the same so it might
+be possible to look at unifiying at least pieces of this. For example
+the page_frag has the same first 3 members as the page_frag_cache so
+it might be possible to look at refactoring things further to unify
+more of the frag_refill logic.
 
