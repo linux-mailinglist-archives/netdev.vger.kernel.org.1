@@ -1,95 +1,89 @@
-Return-Path: <netdev+bounces-62325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AD5F826A73
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:16:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F11F826A98
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1F9E1F2021D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:16:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21895B21939
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB5711707;
-	Mon,  8 Jan 2024 09:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96751170D;
+	Mon,  8 Jan 2024 09:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="MzNX37sC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O8HUrfcz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B427A12B98
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 09:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a28bf46ea11so276298866b.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 01:15:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5974612B6B
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 09:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso11844a12.0
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 01:20:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1704705356; x=1705310156; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1704705638; x=1705310438; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TQw0PBv7H3F9npAXhHpc/yO+0aZTdw3iW7XYRioBY9M=;
-        b=MzNX37sCftG06J7zDqRoVr0ASbCiDMbrmnnww9QwIfjHn6v305+3yC4sf5ZhItJ/P9
-         dWgD/FpnTIJwHE4ksSWe0LyKUd6OfMRRTu2GsW3LrzyYIlk1hIm1lWPPTQTB7KlqL7yN
-         TZ4o5IaKMtV94FWQY6kwJIi2YrmviStlCIrez+Ok7YKHBE61mw9794RlBmRCxk8r8RUL
-         VrdvaM3wBX128iDc7clv/XxbWwBql1tdTSo4hEdAuX6o0HA2yEC1qaVMYbdyxbkpNlPz
-         Usmp583j3JFO42mG5KGuZPz8LDrv6DbVyXe7CC8l1Vt6gXrWdave70ArygI0WAZ/X/pQ
-         wOmg==
+        bh=niwqY8K4e/WW0GFXJl7RQRrtTccn+TnvpnQmZx+xTp4=;
+        b=O8HUrfcz+VmzXbYZWmlcQpeo5vkxh3bm9EKCI/VF8lZCORxGK869kOiCEoYWfQ7sS+
+         iv7iE5WVIGZ9PD4sff7eAEmEfNkmKCO4pdJoQQWRw0TMfAzsgDV9AogA1cDlK/YoxfP/
+         auUkN5AQ007odKjiIp09YPbwfl99M/Eb1ViZHtCI8nwSJTzP2hw7hjksXeNVwFg92GIS
+         IGQ8IZC8lWevC1GV59hshNJXDlZWVYey4znDmjZNvpivO6gqR+8FJsNUjm3BxPjsQYNz
+         EwRA/o4XOFNPC/o8XFmjSV6iJ8SfXkavuWW29fsGKnSn8DjzAqBiijlITYoG1QXx2Yml
+         F7TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704705356; x=1705310156;
+        d=1e100.net; s=20230601; t=1704705638; x=1705310438;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TQw0PBv7H3F9npAXhHpc/yO+0aZTdw3iW7XYRioBY9M=;
-        b=hlXSv1FDJyNGutg5k8aUyS72wfer560AsOooIW/VW4qdSXhUGFZGjBY5H9BB5SNycV
-         c+tkaYC9j39nIBq6XEdo0BJ0UF8t7/iZYq9xSqv/eqxvFwCkmkp8DBPPpMnIHlo1ajC6
-         R/hSo6ZG3FFnRreLs7NxzqcTMs5XYtBkg7ZRGopEXONS9cCmRrjfiZDiW4CI9ylQQp3e
-         iasPwI61/4hdXeLwUWqKlkcmfayB8uCz185pdX27hKtDqrzjFm7lxYWc+iPTzsPMScE6
-         QEeHO1pnCxblCK5+2S/KsE2RJlqSmEubH7f8E04kOa9FsFDwJLpOQOlMCt2WuH9YWC/o
-         Lemw==
-X-Gm-Message-State: AOJu0YzYxlc7OYuECWCpp5wvdtK64jpj5nq/EkmLZ41NUbAI4Kvt7OT+
-	aPaF512sKv0ZTfdJCCrWAe7LQ6O74wNAo5hUUhzQBZoClY1ZCw==
-X-Google-Smtp-Source: AGHT+IF5FdPBR02bei/X14Ub000OcoVXRo17m86hQ2MPBeQuC7hWG3H6v1jptH9g+ATyuoxWlGDUexOGIPMl6jmv1Ns=
-X-Received: by 2002:a17:906:1797:b0:a28:bd9c:8363 with SMTP id
- t23-20020a170906179700b00a28bd9c8363mr3034170eje.57.1704705356043; Mon, 08
- Jan 2024 01:15:56 -0800 (PST)
+        bh=niwqY8K4e/WW0GFXJl7RQRrtTccn+TnvpnQmZx+xTp4=;
+        b=PCMzP+Jlu3ucLavQPNCWgQZk8euxd03qxFs7EdAKRGMv+H8+JKvJSRqOwqfnyn/vVz
+         o2x3/WHOfJApNfZo3TR30VX/tDMQiI6lhH1Vzt6AC0rA9oepgB2lkGJ9waqwzmOsgMgL
+         31K2LE9tuVdcQ5bQJb+0tA3uoRjN6/tDpftLdLui/CLnNuALkKzvkfR+NSRUg4PITygh
+         i7lsyp4KoRykOYQklx5bvb1USCU7JXqs83QsCdxXirEP6Y+rWbS3RXH0H7wQX6cI09ai
+         ufy1vS8d4fwjQ2U15/zmNAcgqM5sY8dSOSDjLyVJ3DnFEVgk4TR73HggQdxVpgTWAMmV
+         ppdQ==
+X-Gm-Message-State: AOJu0Yxr8a/5OKvFolf0Atr5/0ZtotcUi2LKxNjeVk+7Wmuo6thohrAb
+	HBSZgC0iT3QomvQEEyGh7I9RnAEjRRQ18/PRx2Qu5WNngqiP
+X-Google-Smtp-Source: AGHT+IHoCnSHzDbJ2ryg9M8x56lHtZdoK4IGjK2m03FlYTHSvkeZ88r7Cnd3Te4ej0F4prpD5WPbosqCIHG9SMmQb8w=
+X-Received: by 2002:a50:9fcd:0:b0:554:1b1c:72c4 with SMTP id
+ c71-20020a509fcd000000b005541b1c72c4mr197017edf.1.1704705638343; Mon, 08 Jan
+ 2024 01:20:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1704565248.git.dxu@dxuuu.xyz>
-In-Reply-To: <cover.1704565248.git.dxu@dxuuu.xyz>
-From: Lorenz Bauer <lorenz.bauer@isovalent.com>
-Date: Mon, 8 Jan 2024 10:15:45 +0100
-Message-ID: <CAN+4W8gPeQ2OjoYLKXsNPyhSVTB+vcSaS3Xzw=-M9Rf5MXfKPg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 0/3] Annotate kfuncs in .BTF_ids section
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: linux-input@vger.kernel.org, coreteam@netfilter.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, fsverity@lists.linux.dev, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, cgroups@vger.kernel.org, 
-	alexei.starovoitov@gmail.com, olsajiri@gmail.com, quentin@isovalent.com, 
-	alan.maguire@oracle.com, memxor@gmail.com
+References: <20240108011131.83295-1-shaozhengchao@huawei.com>
+In-Reply-To: <20240108011131.83295-1-shaozhengchao@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 8 Jan 2024 10:20:27 +0100
+Message-ID: <CANn89iL+JDghoudzGfGgeQkwDrtOHKoDbGiaracs0foWm+Pmpw@mail.gmail.com>
+Subject: Re: [PATCH net-next] fib: rules: use memcmp to simplify code in rule_exists
+To: Zhengchao Shao <shaozhengchao@huawei.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, weiyongjun1@huawei.com, yuehaibing@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 6, 2024 at 7:25=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
+On Mon, Jan 8, 2024 at 2:01=E2=80=AFAM Zhengchao Shao <shaozhengchao@huawei=
+.com> wrote:
 >
-> =3D=3D=3D Description =3D=3D=3D
->
-> This is a bpf-treewide change that annotates all kfuncs as such inside
-> .BTF_ids. This annotation eventually allows us to automatically generate
-> kfunc prototypes from bpftool.
->
-> We store this metadata inside a yet-unused flags field inside struct
-> btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
+> In the fib_rule structure, the member variables 'pref' to 'oifname' are
+> consecutive.
 
-This is great, thanks for tackling this. With yout patches we can
-figure out the full set of kfuncs. Is there a way to extend it so that
-we can tell which program context a kfunc can be called from?
+This could be changed in the future.
+This is error prone for no gain (as David said, this is control path)
+
+ In addition, the newly generated rule uses kzalloc to
+> allocate memory, and all allocated memory is initialized to 0. Therefore,
+> the comparison of two fib_rule structures from 'pref' to 'oifname' can be
+> simplified into the comparison of continuous memory.
+>
 
