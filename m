@@ -1,154 +1,195 @@
-Return-Path: <netdev+bounces-62402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50016826EE9
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:50:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE70A826F23
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 14:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E653928201B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:50:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F498283B96
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D7545BE5;
-	Mon,  8 Jan 2024 12:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C4B40C1B;
+	Mon,  8 Jan 2024 13:02:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gydLyY0V"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="WepI4H2A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2089.outbound.protection.outlook.com [40.107.22.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C1145BEF
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 12:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704718058; x=1736254058;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DLt8lS3kfypvy2ib6O9crHRPJTm4ZgqZ17dBNJqUJv0=;
-  b=gydLyY0VdCDE/zHvBQewGf4Kp5pDcabmgN3SrSQnVYntFQ1qp+Pe6EQj
-   1x7rk8KVLDtb4AqFG71r/0hcxWnIGKmNlvefPWzVuh16k6Xo/r3Djxsj6
-   czK0TkmuUXm0u57N4atIhdKYVTy6UlERma+2yEeKdQOHneSeELoeeoSlX
-   ruLdOLDXutji2oGEZGIOz+BlmdY1hn9wmNND817B99+Dl8kdWT6GqSOn/
-   /WvMY+nMejzkDOucx9QYlAyKedSqyJOO+y2eAPQKpL9pu3QzqXLXQzI4h
-   b2g+mOBjcTlEpjuTxFUkEQQ42+/O9MWziL7CI6qWoyyx3Vkk+5D+dHrni
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="11359607"
-X-IronPort-AV: E=Sophos;i="6.04,341,1695711600"; 
-   d="scan'208";a="11359607"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 04:47:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="904791366"
-X-IronPort-AV: E=Sophos;i="6.04,341,1695711600"; 
-   d="scan'208";a="904791366"
-Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
-  by orsmga004.jf.intel.com with ESMTP; 08 Jan 2024 04:47:34 -0800
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	jesse.brandeburg@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v5 iwl-next 6/6] ice: stop destroying and reinitalizing Tx tracker during reset
-Date: Mon,  8 Jan 2024 13:47:17 +0100
-Message-Id: <20240108124717.1845481-7-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240108124717.1845481-1-karol.kolacinski@intel.com>
-References: <20240108124717.1845481-1-karol.kolacinski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3434174D;
+	Mon,  8 Jan 2024 13:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ecq+TfZdS3zn1ZXqoo9P7TQk9EuU5KgkgywCf790Jy7QcMsSbTa/X9gDMl2MUcs3H8mimnrW/7gjacpY8+J1rdxpIerRAB/bn9CfdT68NenOCmSZy+D1r6In9GwRgpYwzq/M2XA6UGzTthzFwfSOIFZ2oHN7OWQTTS4X3/VmHOe0N16P33cLYtsSLajn1ziH1GlxABusM5ukQx2upZOEy5tX3KXNYdn8LaSdQxiC9IahHfrx0KLJVD/5WKTFT/qnjNzJiMHduszOnpvNlRi+hXJ4Wzp++G4iQsteKFhMZgpZVaONna3y56+HwZmMKwuPEL8Pr+9o6aY0TUq9NpZzvQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZF75R2+yAB3PeaWuYuc9piI7mmq9LrXnqIs2k6uuze8=;
+ b=PrXFbozhZT5TIofOg/UCD2hA44R/9vBhjWNK/rUmamBuSUVb2oTtMGD1wdnI/xaHwYQJ/dNSiVTkMS+R8+Itlg6NYmCYxdScGCCLNB17dH1QPpGK350yvrr6JA79IWCbTb6gIgx3ZmjCvltFnqbhy/1IeExiC0CPBOj/pMRR587/FejS5/aXER+usUipf4F4rudhCmE+k/7ZYasRVCtlwEmE7tp6RX8U2XmryL6N8hLcaYzRtNp+MXJKpnuFFB020YrtWKa9cpRpYtroGCHw+4uKnx7r4+k2zAA8Q9vPL48mbUToIqifvdHSCRTurqk+DJvWbrbmNCGk9kJCk91GiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZF75R2+yAB3PeaWuYuc9piI7mmq9LrXnqIs2k6uuze8=;
+ b=WepI4H2AVjMc6Dyv0Cb90zOsOPvfdy5chtnQA1a+HhpuTglDasu3Qc8WrgFhP/1K3zycfa+QkHE3TbVWDYN1AoAgkYoX1tLhztt5ZzwlRWlmwG5VPxXfsU3M8PXAPeBL8tl9xOh83tpS7TlMmBhASxWVFypC5euU27tOxp+aGVk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com (2603:10a6:800:1ac::11)
+ by AM7PR04MB6854.eurprd04.prod.outlook.com (2603:10a6:20b:10c::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Mon, 8 Jan
+ 2024 13:02:42 +0000
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::901f:7d8d:f07c:e976]) by VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::901f:7d8d:f07c:e976%3]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
+ 13:02:42 +0000
+Date: Mon, 8 Jan 2024 15:02:38 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Sylvain Girard <sylvain.girard@se.com>,
+	Pascal EBERHARD <pascal.eberhard@se.com>,
+	Richard Tresidder <rtresidd@electromag.com.au>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v3 1/1] net: stmmac: Prevent DSA tags from breaking
+ COE
+Message-ID: <20240108130238.j2denbdj3ifasbqi@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240108111747.73872-2-romain.gantois@bootlin.com>
+X-ClientProxiedBy: FR4P281CA0431.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:d1::19) To VE1PR04MB7374.eurprd04.prod.outlook.com
+ (2603:10a6:800:1ac::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7374:EE_|AM7PR04MB6854:EE_
+X-MS-Office365-Filtering-Correlation-Id: 84bbfbf7-7130-4855-feae-08dc104a1969
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	aamzKXk4L+uX9wBVV1E093op4Tmv/GT9+9cYhOULgA71xiB/F5NfO2Wx4soLW4PV/Nbn5UzdS6QYwn6VKuD0GDZy49LRwsbIbl2lZf1mYT7B/o57txInuwGmO40x0iXcZ5qKHCowkNEW+N0wQbj6yEQkE3TD5mQoKzOw9fAUl8MJ/pxt1kSd9UfALYOODYbN+oWTnsJKEJEd9a/07NBIGot+Bm9r12RLo8+KS0Kn8GrD06Gd0HbfDZ2wujbTMaQAiKNBXClfA6n6gHvnhJZFhLyXnUCwh3DqaqjCVPwhrnuZch3POnC+9PpjfcUfzw+drTOby5vfdozntgoz42Hz5a+sXA54+3IZh/xzEoA0k+EduMypX/ctMs367n1KUbFTF/310zR/mxBuHqMepZD3tVvwjaggX1gEcdV+smITa7OCPs7OS5B4tLFUhkyrc6+f95uPOnVzGreGSr1hASybjnte+i27BNOXWoy+BduZXPmzHd9N0/cEUIowctYyeT7JA9il+O143/XU5Xu2FGFt5bRXa5h7MXkOB6Da3WepvwM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7374.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(39860400002)(136003)(366004)(396003)(346002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(6666004)(966005)(478600001)(38100700002)(83380400001)(6512007)(6506007)(9686003)(26005)(8936002)(8676002)(316002)(54906003)(7416002)(44832011)(5660300002)(2906002)(86362001)(4326008)(6916009)(66476007)(66556008)(66946007)(1076003)(41300700001)(33716001)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?vCWDF/GjOddrEUuOsa27u4Oqvv3mH9pkcMNbU8peNLcX385DU3/X3KIg6dmJ?=
+ =?us-ascii?Q?GDnxyP8WPxvoEhR8o9+pLZzcw1+fIXkpoOxe/zuQMbHEofCeW7qYy80iit30?=
+ =?us-ascii?Q?8V/HPiq9GFDAdy7jfphY6RUXFrr+TeuDasDR/6g1avS/HrrRJjHKnRYZVuA1?=
+ =?us-ascii?Q?2445M+fsJ9V2PGB3G/01DK3k9aVDJwbCeuSGGaDbBFxpgF2YtMSm0kFLw9zJ?=
+ =?us-ascii?Q?68XgC6lgwtUe0FvtwhnztbjwD6yLSLs9c7L0wMCTd8cnc4Nw8PzEKpOAiaub?=
+ =?us-ascii?Q?yaOzakcFxcwM6fNLME8jSNLRdnsSDNIYeCv8zBJ95NJ4Dn1FdyLZdc5ZeUIg?=
+ =?us-ascii?Q?cA1vnv4ZCGwKIHxSgUn0Dl0uTneTbNCiv80OYU8lYrRJsD81Ux8sxw0xbb/L?=
+ =?us-ascii?Q?/a4v9VLIPZ3zfQjX+y6uzKJAY7/kqIwbIbm5fcpnkcCRnrT6M4/Myt4Oxx9Z?=
+ =?us-ascii?Q?FmRqtISuDyuEy17qN/MLVO2OIjK7lqMDg4lUNEZ33x8ST5ut03i2W2CUBpag?=
+ =?us-ascii?Q?+q5k7xN6M2HGGmqjm4gsyx7xZOHMrUUNX9DHFJY+cEtzuZ4iPSUge2AEdBtp?=
+ =?us-ascii?Q?OBqVhnSMXnzoGLCj9zZe4Gw0GPW0L3gfuUrOSgL3yb25JSEU7qZ09BoG8JtF?=
+ =?us-ascii?Q?unxmBkSkDKUi5coKUxhoi0mt75D+j7ARZLt7nFnEDx15ZmXdIp2v6n82xavT?=
+ =?us-ascii?Q?8qNdrf/mcROKWtlKl4J4wHfVs3hWu/dr2IlGjjWGnTKzIiqjVsPYeFfIgFHx?=
+ =?us-ascii?Q?EPOB2Xc5LC7CqUEIG1gO5a5kV7TjruQREypKNdZO18zArtL3IvWTe64BGrXz?=
+ =?us-ascii?Q?ciXyUvwVxL8rjIL1HEVRfqRZFlDczXNh/9V7nRtLFZzguXiUgDGzBZOrmQiY?=
+ =?us-ascii?Q?3DkqD/J7Afzt+FgddMrzoSjE6GR1KcCOMsthy1dEzuwrIt2EnA9k0z737RFQ?=
+ =?us-ascii?Q?EIF8AEQE1WddzetpdGcpV0Ne2di/FylHFWJkcF465RDgKuUI/rHsRuIBKIsN?=
+ =?us-ascii?Q?tDb8xUUPRTzZIwTI91qQCKGqviF2rz2nRbI6tFRQiPXOX4YEvymdpUmsVfWf?=
+ =?us-ascii?Q?LqXiADQ5TUeoO+wTLZWVolNR+OBJ3ffkR7WV/twrf70ubn/5a0/gIsKtSSYc?=
+ =?us-ascii?Q?2/g16P6n0Pm9YfQCfv8HFhX+JE8B1iOJnXJzSGUnSbyNpk7XNxsBcn6i0Gv2?=
+ =?us-ascii?Q?+JRWqSOlQSkUx+CjBlyv9GUHmto0MyovD+wy7FoseR3sgZ7au4+sVCntY6ZT?=
+ =?us-ascii?Q?KV6Hj+Mo8hL2kG+32irD2T3CH0vDw+XrNskR8Lh3OaGGKb8BXe6qqHYghueJ?=
+ =?us-ascii?Q?MIwdtE20CeO6jNXshEHzoTpRiMeZ7yLDY9y/UdOURxJoWnz4BDmzd8yA240F?=
+ =?us-ascii?Q?uj9ZmhgqfdWReE0+8uWWDY3bV3K/E/YHxEC7zULFhqH4YRtcwwPHMMaMGMXw?=
+ =?us-ascii?Q?t7Y9WPTDrggvVCmRLs6umBzNcIlvXWUu4qoe1lKj6NOi6Op6LZQoVDzzSNnu?=
+ =?us-ascii?Q?ys30N1v1ggYWwcvP7Vrqsp6f3bsubN9aW7b++I9TBYENmJlL8nNDG1Gz/jE6?=
+ =?us-ascii?Q?klyvR0Q6iRsJw4FTqsnu1CQMEA+fHyIGfsRQCZRAnYkk87/Z0masbdFy83Al?=
+ =?us-ascii?Q?dg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 84bbfbf7-7130-4855-feae-08dc104a1969
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7374.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 13:02:42.5708
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Gi4o4taw4htkv/lv6yUnbNukerHBzWWT3IJ7NQZS/tUo2+JEDZG7vo9Z/kYidKOU8ZDkNCK4vtU3dQV89lNCCw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB6854
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+On Mon, Jan 08, 2024 at 12:17:45PM +0100, Romain Gantois wrote:
+> Some DSA tagging protocols change the EtherType field in the MAC header
+> e.g.  DSA_TAG_PROTO_(DSA/EDSA/BRCM/MTK/RTL4C_A/SJA1105). On TX these tagged
+> frames are ignored by the checksum offload engine and IP header checker of
+> some stmmac cores.
+> 
+> On RX, the stmmac driver wrongly assumes that checksums have been computed
+> for these tagged packets, and sets CHECKSUM_UNNECESSARY.
+> 
+> Add an additional check in the stmmac TX and RX hotpaths so that COE is
+> deactivated for packets with ethertypes that will not trigger the COE and
+> IP header checks.
+> 
+> Fixes: 6b2c6e4a938f ("net: stmmac: propagate feature flags to vlan")
+> Cc: stable@vger.kernel.org
+> Reported-by: Richard Tresidder <rtresidd@electromag.com.au>
+> Link: https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au/
+> Reported-by: Romain Gantois <romain.gantois@bootlin.com>
+> Link: https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com/
+> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+> ---
 
-The ice driver currently attempts to destroy and re-initialize the Tx
-timestamp tracker during the reset flow. The release of the Tx tracker
-only happened during CORE reset or GLOBAL reset. The ice_ptp_rebuild()
-function always calls the ice_ptp_init_tx function which will allocate
-a new tracker data structure, resulting in memory leaks during PF reset.
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Certainly the driver should not be allocating a new tracker without
-removing the old tracker data, as this results in a memory leak.
-Additionally, there's no reason to remove the tracker memory during a
-reset. Remove this logic from the reset and rebuild flow. Instead of
-releasing the Tx tracker, flush outstanding timestamps just before we
-reset the PHY timestamp block in ice_ptp_cfg_phy_interrupt().
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 23 ++++++++++++++++---
+>  1 file changed, 20 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index a9b6b383e863..6797c944a2ac 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -4371,6 +4371,19 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	return NETDEV_TX_OK;
+>  }
+>  
+> +/* Check if ethertype will trigger IP
+> + * header checks/COE in hardware
+> + */
 
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 33 +++++++++++++++---------
- 1 file changed, 21 insertions(+), 12 deletions(-)
+Nitpick: you could render this in kernel-doc format.
+https://docs.kernel.org/doc-guide/kernel-doc.html
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 8a589f853e96..03e91323bdff 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -963,6 +963,22 @@ ice_ptp_mark_tx_tracker_stale(struct ice_ptp_tx *tx)
- 	spin_unlock_irqrestore(&tx->lock, flags);
- }
- 
-+/**
-+ * ice_ptp_flush_all_tx_tracker - Flush all timestamp trackers on this clock
-+ * @pf: Board private structure
-+ *
-+ * Called by the clock owner to flush all the Tx timestamp trackers associated
-+ * with the clock.
-+ */
-+static void
-+ice_ptp_flush_all_tx_tracker(struct ice_pf *pf)
-+{
-+	struct ice_ptp_port *port;
-+
-+	list_for_each_entry(port, &pf->ptp.ports_owner.ports, list_member)
-+		ice_ptp_flush_tx_tracker(ptp_port_to_pf(port), &port->tx);
-+}
-+
- /**
-  * ice_ptp_release_tx_tracker - Release allocated memory for Tx tracker
-  * @pf: Board private structure
-@@ -2715,6 +2731,11 @@ static int ice_ptp_rebuild_owner(struct ice_pf *pf)
- 	/* Release the global hardware lock */
- 	ice_ptp_unlock(hw);
- 
-+	/* Flush software tracking of any outstanding timestamps since we're
-+	 * about to flush the PHY timestamp block.
-+	 */
-+	ice_ptp_flush_all_tx_tracker(pf);
-+
- 	if (!ice_is_e810(hw)) {
- 		/* Enable quad interrupts */
- 		err = ice_ptp_cfg_phy_interrupt(pf, true, 1);
-@@ -2753,18 +2774,6 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 			goto err;
- 	}
- 
--	/* Init Tx structures */
--	if (ice_is_e810(&pf->hw)) {
--		err = ice_ptp_init_tx_e810(pf, &ptp->port.tx);
--	} else {
--		kthread_init_delayed_work(&ptp->port.ov_work,
--					  ice_ptp_wait_for_offsets);
--		err = ice_ptp_init_tx_e82x(pf, &ptp->port.tx,
--					   ptp->port.port_num);
--	}
--	if (err)
--		goto err;
--
- 	ptp->state = ICE_PTP_READY;
- 
- 	/* Start periodic work going */
--- 
-2.40.1
+> +static inline bool stmmac_has_ip_ethertype(struct sk_buff *skb)
 
+Nitpick: in netdev it is preferred not to use the "inline" keyword at
+all in C files, only "static inline" in headers, and to let the compiler
+decide by itself when it is appropriate to inline the code (which it
+does by itself even without the "inline" keyword). For a bit more
+background why, you can view Documentation/process/4.Coding.rst, section
+"Inline functions".
+
+> +{
+> +	int depth = 0;
+> +	__be16 proto;
+> +
+> +	proto = __vlan_get_protocol(skb, eth_header_parse_protocol(skb), &depth);
+> +
+> +	return depth <= ETH_HLEN && (proto == htons(ETH_P_IP) || proto == htons(ETH_P_IPV6));
+> +}
 
