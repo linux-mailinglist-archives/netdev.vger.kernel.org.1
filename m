@@ -1,325 +1,180 @@
-Return-Path: <netdev+bounces-62355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DD8E826C4A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:11:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9BB8826C4D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0303B1F22751
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:11:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98EBF283168
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2359A2577E;
-	Mon,  8 Jan 2024 11:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66EB14AA3;
+	Mon,  8 Jan 2024 11:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pPDDvcPb"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="Q5S5akSd"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2065.outbound.protection.outlook.com [40.107.244.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412972940E;
-	Mon,  8 Jan 2024 11:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G+atkYQS7TpSZqgMyQoOghnMNTSpDgYLSfZhYHBYHEz5MjrbjlEOa4eLKkgI0ISCGaj9vPjP3fphhbX1W8i7gdbj/WV/OrrUIUfQUrZL1GUaRU4ay/z3sRHwJeaaaHCxPzwmEKgf/iNbo75Gq7KGsFikHmg1IXmxfcNL3PrtErXTPI5doHjgIPbW0QkRMpwWkXHxC+j8IMGhPpoR5h5sb+Dp2GDlp+hhxRkhVgvP7jDd7OVQig3XdKvS/CtYtwQhBfIi8l9hVX2C/fMfNDQEXZHB2aDHQH+YIuTo3cM5pY+T0Jx6RNJ4lhS+f7PmGAp+VDxk+4Xz0LzAHZa5PywwZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BNNY/LR1kjpi00vn0zXHCf5GRoDDxIk/5D2yR6EhKYY=;
- b=R4CgCBpQI/uRghI24mI4C+rzibB+r0Vq+wXNgv/XJw1AnRAQ6flxTwWycbsKRu9h2dKV8HVe6sI545WpXyYmu6gPKtmVO09ZrIL2sLw3R5LVvCuuYO6g7BcMpJu4S2NIt899aH3wmYOz3VWwoIsIIQASxum1616JsP8X4jVMVU3ToHflVgJsYbr/waeVvHx4GepyEsU1Rd+eKaXvlqEmC4zP/y2IvIlwKg2TQ/0EQrwaZVwF4AIvtqKJwValln28PIYXbKIN0yZJUdvs9ExgiidrDG21iRemBGxgm9ZNTcbRfFneq1Y+ADcKjxB+o6XTasgzkBJ6rkFtlcXSn0R/Rw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BNNY/LR1kjpi00vn0zXHCf5GRoDDxIk/5D2yR6EhKYY=;
- b=pPDDvcPbjNMkMk1jfYV1mIs9MiEE4iLmQ+pIjprlyMRC4xFXzJc7RAyMcuxDcao2kCiw7HMmsBVl+JBQPVjhR9otTNae5iLdyHpRqPhTohE3jY032wTnpyti8kNwIK/FC30is+y38o49Ge+jbawJg2crW8yKNBpNCkT199dqM/sHblliHZcOxtpBBJlntC34W0fWAiD7NC8UurCbIG02k3k5Rw0DITAyFiPAHN9CUJ5MLKXx3o2GCW9gvF8fuPxYiqBkpZ00H0OvHyIMgzexCu5LYpFjVRyE42iK2fY0xS7NwQL7Ga+E6fCYXzTq0FXZ2LhJTLzCXyWsedYpF9EyXA==
-Received: from PH0PR07CA0075.namprd07.prod.outlook.com (2603:10b6:510:f::20)
- by LV3PR12MB9143.namprd12.prod.outlook.com (2603:10b6:408:19e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Mon, 8 Jan
- 2024 11:10:19 +0000
-Received: from SA2PEPF000015CB.namprd03.prod.outlook.com
- (2603:10b6:510:f:cafe::8c) by PH0PR07CA0075.outlook.office365.com
- (2603:10b6:510:f::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21 via Frontend
- Transport; Mon, 8 Jan 2024 11:10:19 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF000015CB.mail.protection.outlook.com (10.167.241.201) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7181.12 via Frontend Transport; Mon, 8 Jan 2024 11:10:19 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 8 Jan 2024
- 03:10:06 -0800
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 8 Jan 2024
- 03:10:03 -0800
-References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
- <20231229065241.554726-3-huangjunxian6@hisilicon.com>
- <fb7c85a4-165d-7eda-740a-d11a32cb86c0@hisilicon.com>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Junxian Huang <huangjunxian6@hisilicon.com>
-CC: <jgg@ziepe.ca>, <leon@kernel.org>, <dsahern@gmail.com>,
-	<stephen@networkplumber.org>, Chengchang Tang <tangchengchang@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH iproute2-rc 2/2] rdma: Fix the error of accessing string
- variable outside the lifecycle
-Date: Mon, 8 Jan 2024 12:09:04 +0100
-In-Reply-To: <fb7c85a4-165d-7eda-740a-d11a32cb86c0@hisilicon.com>
-Message-ID: <8734v8ozcn.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DB92E650
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 11:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2ccb4adbffbso18324541fa.0
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 03:10:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20230601; t=1704712225; x=1705317025; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HGlwmcHcweDhckO9yQHyIGRRFJGh66YUQEcDbSAmCvI=;
+        b=Q5S5akSd4IlFSPkc+/g4+I2qqLI2QDjVTlHSeIitSCF+WOAMKXBRLJGc328Iwx5K9I
+         zJwH75mvTGOrHPHS+US73c9gMGVVcgxXooT06eSmybdxOxzMpDeic2NHHTg0qJvuXiBs
+         dUwx4OpQH1gRleRoCYdVj+cXNW5QtnQ6YHT+Q9qgg9PSmDZhUI8MpTu5CWUQi2eUCdc8
+         iYBfzWxrkjjA9L2Wy2a5j+Lbz5MqqfwdUEzw1tUKJhrjxCnj/G88lJHB24qDlJSd8LNV
+         hXVakrB6S9fZbW5Yolv0yQjvrnDtDr4CYwO9plEZMy1GOkOcp+A4snzFoAyqEyTivy0+
+         4WJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704712225; x=1705317025;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HGlwmcHcweDhckO9yQHyIGRRFJGh66YUQEcDbSAmCvI=;
+        b=kEaOfIzYxynq1D9T3r5o6JoMUijvmLzd04uAPr+7OxBM7x4HEG4bA9hsJ1ETcbz3xv
+         7SX95VrxE6w94x1apgUNHYDsx+biV1hB2JvmFlVaG5AmjdOCKr5Na0y3kyTq/iGc3dr5
+         pnMY9RPtEDeXGAwwrdTl4OduTWvbBm1i2MbiEvyRqnv0+b1kCslYrjnPjhzWMyOnfZVO
+         lk6v41PlfNVrzXe4gi0GxXYGH9ss90qs8NzPVKd09cZsC4KnQVKD5lZ1yLcuLmYEpg1p
+         ILAyjX1AKDE7qmsaJz6Ei+iQ4DSezTkL4ccyNFoMBn0gnOouEmsLeRCiaBZdKHfJLK+a
+         mDYA==
+X-Gm-Message-State: AOJu0Yx/HHQb4xadYgcIj69oCcqu/iYLvkqZZPNhCe+JlzV0xeV4fnDc
+	kc8OGFBu1PNQO8m1+EQWxEyf/OQaCSA=
+X-Google-Smtp-Source: AGHT+IGIbjjTagiBvZ429Dctn1fhN+nEprE52pZ19fCEGtZbsNqM/+M+UQ2ObOD79ab073LkYkLy8g==
+X-Received: by 2002:a2e:301a:0:b0:2cd:2606:70e2 with SMTP id w26-20020a2e301a000000b002cd260670e2mr1354679ljw.20.1704712224861;
+        Mon, 08 Jan 2024 03:10:24 -0800 (PST)
+Received: from debian_development.DebianHome (dynamic-077-006-145-115.77.6.pool.telefonica.de. [77.6.145.115])
+        by smtp.gmail.com with ESMTPSA id x1-20020a056402414100b00557aa373d71sm1119179eda.45.2024.01.08.03.10.24
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jan 2024 03:10:24 -0800 (PST)
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+To: netdev@vger.kernel.org
+Subject: [PATCH] ss: add option to suppress queue columns
+Date: Mon,  8 Jan 2024 12:10:20 +0100
+Message-ID: <20240108111020.12205-1-cgzones@googlemail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015CB:EE_|LV3PR12MB9143:EE_
-X-MS-Office365-Filtering-Correlation-Id: 402252f7-66c9-4ea6-4c2b-08dc103a6682
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	KpV9Thy+qWzTMTatlst5gXm0fL9pTSE9MPhP6WLXTSqpmkVATOADerNR8ApOVg9iig2Ls0wLvuj1f9VYfILnc28nXAx+ktbdOkprKxPBNlek90HYUTHypZB0wKytS/nOjCExwvMjJvY+YthHE+3wFqiDRk4Gl1K0p0Y/CDm5SNJ9WP75uKPvyOH1dD49AbNnN5r227NmIyV67uWY9zTw8ykBQvJjDVWmVG/6uTYQ9WxUXzmG5YL0qiGVTpGhagc10woD8dW35l4wIUws3IjFL1x9wQT16r2CaILptYvqYFFhmV//lsZ38BVfSmmtpuGA9jn+F+BxCgK0alA93X6VRFMBzRHvveHgRENaceS9TRdoQ75IHqt2/4Oe2pPtCePf+tiygGaoeLQatpdT+fc0QYCq9QR6Hvx7BIrjIT6RygzgZ2yoa/H3sFleFi/AoX8QhbptiPaehLOc9mRLCBng+bSZtkNTUdPmpzfSe0G1zwkchmdiGeXIepVDG4yqsJR8RJbNR+resfqo/+w52HUrg9gnR9elM4/7ZLqWdWxWdUG2w5F9y7+H3Nrzy/jYgZeAu+erwJ1rRsAspB5quOqowUr1jT0BB4Kspo/7PZsX2WvuBHz+aG5uIcLx9yoDVkS276FWtu4h0YvRbHcKFnFqvJqf3r1SshMYxkYbuyJAgoX9uCsOvesSxrVQS/JXYMA8VOjyG5+vxt9bFj6M1AINkgZTsSboekLS63uLuDwBrotry70pawIe6hiSC3MgYTdr
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(396003)(136003)(376002)(230922051799003)(451199024)(186009)(64100799003)(82310400011)(1800799012)(46966006)(40470700004)(36840700001)(4326008)(82740400003)(7416002)(2906002)(5660300002)(47076005)(478600001)(53546011)(83380400001)(26005)(2616005)(336012)(426003)(16526019)(54906003)(316002)(36756003)(70586007)(70206006)(6916009)(36860700001)(8936002)(8676002)(86362001)(41300700001)(356005)(7636003)(40460700003)(40480700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 11:10:19.1699
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 402252f7-66c9-4ea6-4c2b-08dc103a6682
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF000015CB.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9143
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Add a new option `-Q/--no-queues` to ss(8) to suppress the two standard
+columns Send-Q and Recv-Q.  This helps to keep the output steady for
+monitoring purposes (like listening sockets).
 
-Junxian Huang <huangjunxian6@hisilicon.com> writes:
+Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
+---
+v2: rebase to iproute2-next
+---
+ man/man8/ss.8 |  3 +++
+ misc/ss.c     | 24 +++++++++++++++++++-----
+ 2 files changed, 22 insertions(+), 5 deletions(-)
 
-> the first patch is replaced by Stephen's latest patches. Are there any
-> comments to this patch?
-
-Yeah, what the code is currently doing is invalid.
-
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-
-> Thanks,
-> Junxian
->
-> On 2023/12/29 14:52, Junxian Huang wrote:
->> From: wenglianfa <wenglianfa@huawei.com>
->> 
->> All these SPRINT_BUF(b) definitions are inside the 'if' block, but
->> accessed outside the 'if' block through the pointers 'comm'. This
->> leads to empty 'comm' attribute when querying resource information.
->> So move the definitions to the beginning of the functions to extend
->> their life cycle.
->> 
->> Before:
->> $ rdma res show srq
->> dev hns_0 srqn 0 type BASIC lqpn 18 pdn 5 pid 7775 comm
->> 
->> After:
->> $ rdma res show srq
->> dev hns_0 srqn 0 type BASIC lqpn 18 pdn 5 pid 7775 comm ib_send_bw
->> 
->> Fixes: 1808f002dfdd ("lib/fs: fix memory leak in get_task_name()")
->> Signed-off-by: wenglianfa <wenglianfa@huawei.com>
->> Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
->> ---
->>  rdma/res-cmid.c | 3 +--
->>  rdma/res-cq.c   | 3 +--
->>  rdma/res-ctx.c  | 3 +--
->>  rdma/res-mr.c   | 3 +--
->>  rdma/res-pd.c   | 3 +--
->>  rdma/res-qp.c   | 3 +--
->>  rdma/res-srq.c  | 3 +--
->>  rdma/stat.c     | 3 +--
->>  8 files changed, 8 insertions(+), 16 deletions(-)
->> 
->> diff --git a/rdma/res-cmid.c b/rdma/res-cmid.c
->> index 7371c3a6..595af848 100644
->> --- a/rdma/res-cmid.c
->> +++ b/rdma/res-cmid.c
->> @@ -102,6 +102,7 @@ static int res_cm_id_line(struct rd *rd, const char *name, int idx,
->>  	uint32_t lqpn = 0, ps;
->>  	uint32_t cm_idn = 0;
->>  	char *comm = NULL;
->> +	SPRINT_BUF(b);
->>  
->>  	if (!nla_line[RDMA_NLDEV_ATTR_RES_STATE] ||
->>  	    !nla_line[RDMA_NLDEV_ATTR_RES_PS])
->> @@ -159,8 +160,6 @@ static int res_cm_id_line(struct rd *rd, const char *name, int idx,
->>  		goto out;
->>  
->>  	if (nla_line[RDMA_NLDEV_ATTR_RES_PID]) {
->> -		SPRINT_BUF(b);
->> -
->>  		pid = mnl_attr_get_u32(nla_line[RDMA_NLDEV_ATTR_RES_PID]);
->>  		if (!get_task_name(pid, b, sizeof(b)))
->>  			comm = b;
->> diff --git a/rdma/res-cq.c b/rdma/res-cq.c
->> index 2cfa4994..80994a03 100644
->> --- a/rdma/res-cq.c
->> +++ b/rdma/res-cq.c
->> @@ -63,6 +63,7 @@ static int res_cq_line(struct rd *rd, const char *name, int idx,
->>  	uint32_t cqn = 0;
->>  	uint64_t users;
->>  	uint32_t cqe;
->> +	SPRINT_BUF(b);
->>  
->>  	if (!nla_line[RDMA_NLDEV_ATTR_RES_CQE] ||
->>  	    !nla_line[RDMA_NLDEV_ATTR_RES_USECNT])
->> @@ -84,8 +85,6 @@ static int res_cq_line(struct rd *rd, const char *name, int idx,
->>  		goto out;
->>  
->>  	if (nla_line[RDMA_NLDEV_ATTR_RES_PID]) {
->> -		SPRINT_BUF(b);
->> -
->>  		pid = mnl_attr_get_u32(nla_line[RDMA_NLDEV_ATTR_RES_PID]);
->>  		if (!get_task_name(pid, b, sizeof(b)))
->>  			comm = b;
->> diff --git a/rdma/res-ctx.c b/rdma/res-ctx.c
->> index 500186d9..99736ea0 100644
->> --- a/rdma/res-ctx.c
->> +++ b/rdma/res-ctx.c
->> @@ -13,13 +13,12 @@ static int res_ctx_line(struct rd *rd, const char *name, int idx,
->>  	char *comm = NULL;
->>  	uint32_t ctxn = 0;
->>  	uint32_t pid = 0;
->> +	SPRINT_BUF(b);
->>  
->>  	if (!nla_line[RDMA_NLDEV_ATTR_RES_CTXN])
->>  		return MNL_CB_ERROR;
->>  
->>  	if (nla_line[RDMA_NLDEV_ATTR_RES_PID]) {
->> -		SPRINT_BUF(b);
->> -
->>  		pid = mnl_attr_get_u32(nla_line[RDMA_NLDEV_ATTR_RES_PID]);
->>  		if (!get_task_name(pid, b, sizeof(b)))
->>  			comm = b;
->> diff --git a/rdma/res-mr.c b/rdma/res-mr.c
->> index fb48d5df..e6c81d11 100644
->> --- a/rdma/res-mr.c
->> +++ b/rdma/res-mr.c
->> @@ -30,6 +30,7 @@ static int res_mr_line(struct rd *rd, const char *name, int idx,
->>  	uint32_t pdn = 0;
->>  	uint32_t mrn = 0;
->>  	uint32_t pid = 0;
->> +	SPRINT_BUF(b);
->>  
->>  	if (!nla_line[RDMA_NLDEV_ATTR_RES_MRLEN])
->>  		return MNL_CB_ERROR;
->> @@ -47,8 +48,6 @@ static int res_mr_line(struct rd *rd, const char *name, int idx,
->>  		goto out;
->>  
->>  	if (nla_line[RDMA_NLDEV_ATTR_RES_PID]) {
->> -		SPRINT_BUF(b);
->> -
->>  		pid = mnl_attr_get_u32(nla_line[RDMA_NLDEV_ATTR_RES_PID]);
->>  		if (!get_task_name(pid, b, sizeof(b)))
->>  			comm = b;
->> diff --git a/rdma/res-pd.c b/rdma/res-pd.c
->> index 66f91f42..0dbb310a 100644
->> --- a/rdma/res-pd.c
->> +++ b/rdma/res-pd.c
->> @@ -16,6 +16,7 @@ static int res_pd_line(struct rd *rd, const char *name, int idx,
->>  	uint32_t pid = 0;
->>  	uint32_t pdn = 0;
->>  	uint64_t users;
->> +	SPRINT_BUF(b);
->>  
->>  	if (!nla_line[RDMA_NLDEV_ATTR_RES_USECNT])
->>  		return MNL_CB_ERROR;
->> @@ -34,8 +35,6 @@ static int res_pd_line(struct rd *rd, const char *name, int idx,
->>  			nla_line[RDMA_NLDEV_ATTR_RES_UNSAFE_GLOBAL_RKEY]);
->>  
->>  	if (nla_line[RDMA_NLDEV_ATTR_RES_PID]) {
->> -		SPRINT_BUF(b);
->> -
->>  		pid = mnl_attr_get_u32(nla_line[RDMA_NLDEV_ATTR_RES_PID]);
->>  		if (!get_task_name(pid, b, sizeof(b)))
->>  			comm = b;
->> diff --git a/rdma/res-qp.c b/rdma/res-qp.c
->> index c180a97e..cd2f4aa2 100644
->> --- a/rdma/res-qp.c
->> +++ b/rdma/res-qp.c
->> @@ -86,6 +86,7 @@ static int res_qp_line(struct rd *rd, const char *name, int idx,
->>  	uint32_t port = 0, pid = 0;
->>  	uint32_t pdn = 0;
->>  	char *comm = NULL;
->> +	SPRINT_BUF(b);
->>  
->>  	if (!nla_line[RDMA_NLDEV_ATTR_RES_LQPN] ||
->>  	    !nla_line[RDMA_NLDEV_ATTR_RES_SQ_PSN] ||
->> @@ -146,8 +147,6 @@ static int res_qp_line(struct rd *rd, const char *name, int idx,
->>  		goto out;
->>  
->>  	if (nla_line[RDMA_NLDEV_ATTR_RES_PID]) {
->> -		SPRINT_BUF(b);
->> -
->>  		pid = mnl_attr_get_u32(nla_line[RDMA_NLDEV_ATTR_RES_PID]);
->>  		if (!get_task_name(pid, b, sizeof(b)))
->>  			comm = b;
->> diff --git a/rdma/res-srq.c b/rdma/res-srq.c
->> index cf9209d7..758bb193 100644
->> --- a/rdma/res-srq.c
->> +++ b/rdma/res-srq.c
->> @@ -183,13 +183,12 @@ static int res_srq_line(struct rd *rd, const char *name, int idx,
->>  	char qp_str[MAX_QP_STR_LEN] = {};
->>  	char *comm = NULL;
->>  	uint8_t type = 0;
->> +	SPRINT_BUF(b);
->>  
->>  	if (!nla_line[RDMA_NLDEV_ATTR_RES_SRQN])
->>  		return MNL_CB_ERROR;
->>  
->>  	if (nla_line[RDMA_NLDEV_ATTR_RES_PID]) {
->> -		SPRINT_BUF(b);
->> -
->>  		pid = mnl_attr_get_u32(nla_line[RDMA_NLDEV_ATTR_RES_PID]);
->>  		if (!get_task_name(pid, b, sizeof(b)))
->>  			comm = b;
->> diff --git a/rdma/stat.c b/rdma/stat.c
->> index 3df2c98f..c7dde680 100644
->> --- a/rdma/stat.c
->> +++ b/rdma/stat.c
->> @@ -223,6 +223,7 @@ static int res_counter_line(struct rd *rd, const char *name, int index,
->>  	struct nlattr *hwc_table, *qp_table;
->>  	struct nlattr *nla_entry;
->>  	const char *comm = NULL;
->> +	SPRINT_BUF(b);
->>  	bool isfirst;
->>  	int err;
->>  
->> @@ -248,8 +249,6 @@ static int res_counter_line(struct rd *rd, const char *name, int index,
->>  		return MNL_CB_OK;
->>  
->>  	if (nla_line[RDMA_NLDEV_ATTR_RES_PID]) {
->> -		SPRINT_BUF(b);
->> -
->>  		pid = mnl_attr_get_u32(nla_line[RDMA_NLDEV_ATTR_RES_PID]);
->>  		if (!get_task_name(pid, b, sizeof(b)))
->>  			comm = b;
+diff --git a/man/man8/ss.8 b/man/man8/ss.8
+index 4ece41fa..b014cde1 100644
+--- a/man/man8/ss.8
++++ b/man/man8/ss.8
+@@ -24,6 +24,9 @@ Output version information.
+ .B \-H, \-\-no-header
+ Suppress header line.
+ .TP
++.B \-Q, \-\-no-queues
++Suppress sending and receiving queue columns.
++.TP
+ .B \-O, \-\-oneline
+ Print each socket's data on a single line.
+ .TP
+diff --git a/misc/ss.c b/misc/ss.c
+index c220a075..188a8ff9 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -75,6 +75,7 @@
+ int preferred_family = AF_UNSPEC;
+ static int show_options;
+ int show_details;
++static int show_queues = 1;
+ static int show_processes;
+ static int show_threads;
+ static int show_mem;
+@@ -1425,10 +1426,13 @@ static void sock_state_print(struct sockstat *s)
+ 		out("%s", sstate_name[s->state]);
+ 	}
+ 
+-	field_set(COL_RECVQ);
+-	out("%-6d", s->rq);
+-	field_set(COL_SENDQ);
+-	out("%-6d", s->wq);
++	if (show_queues) {
++		field_set(COL_RECVQ);
++		out("%-6d", s->rq);
++		field_set(COL_SENDQ);
++		out("%-6d", s->wq);
++	}
++
+ 	field_set(COL_ADDR);
+ }
+ 
+@@ -5378,6 +5382,7 @@ static void _usage(FILE *dest)
+ "\n"
+ "   -K, --kill          forcibly close sockets, display what was closed\n"
+ "   -H, --no-header     Suppress header line\n"
++"   -Q, --no-queues     Suppress sending and receiving queue columns\n"
+ "   -O, --oneline       socket's data printed on a single line\n"
+ "       --inet-sockopt  show various inet socket options\n"
+ "\n"
+@@ -5521,6 +5526,7 @@ static const struct option long_opts[] = {
+ 	{ "cgroup", 0, 0, OPT_CGROUP },
+ 	{ "kill", 0, 0, 'K' },
+ 	{ "no-header", 0, 0, 'H' },
++	{ "no-queues", 0, 0, 'Q' },
+ 	{ "xdp", 0, 0, OPT_XDPSOCK},
+ 	{ "mptcp", 0, 0, 'M' },
+ 	{ "oneline", 0, 0, 'O' },
+@@ -5540,7 +5546,7 @@ int main(int argc, char *argv[])
+ 	int state_filter = 0;
+ 
+ 	while ((ch = getopt_long(argc, argv,
+-				 "dhalBetuwxnro460spTbEf:mMiA:D:F:vVzZN:KHSO",
++				 "dhalBetuwxnro460spTbEf:mMiA:D:F:vVzZN:KHQSO",
+ 				 long_opts, NULL)) != EOF) {
+ 		switch (ch) {
+ 		case 'n':
+@@ -5724,6 +5730,9 @@ int main(int argc, char *argv[])
+ 		case 'H':
+ 			show_header = 0;
+ 			break;
++		case 'Q':
++			show_queues = 0;
++			break;
+ 		case 'O':
+ 			oneline = 1;
+ 			break;
+@@ -5819,6 +5828,11 @@ int main(int argc, char *argv[])
+ 	if (ssfilter_parse(&current_filter.f, argc, argv, filter_fp))
+ 		usage();
+ 
++	if (!show_queues) {
++		columns[COL_SENDQ].disabled = 1;
++		columns[COL_RECVQ].disabled = 1;
++	}
++
+ 	if (!(current_filter.dbs & (current_filter.dbs - 1)))
+ 		columns[COL_NETID].disabled = 1;
+ 
+-- 
+2.43.0
 
 
