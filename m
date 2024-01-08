@@ -1,154 +1,189 @@
-Return-Path: <netdev+bounces-62370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2984D826D5D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:02:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA75826D8F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:13:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 509711C2234A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:02:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0FE52837E4
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8070C224E9;
-	Mon,  8 Jan 2024 12:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB2A405F0;
+	Mon,  8 Jan 2024 12:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EKtr/gmb"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="B54bK3nI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541F621A06;
-	Mon,  8 Jan 2024 12:02:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6272FC433C8;
-	Mon,  8 Jan 2024 12:02:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704715362;
-	bh=d/qetscOUyX1aNwfJUdo3Ou5VsBil4XgKNRo18oHsvI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EKtr/gmbBS+mVct55+nmFBL4MLHYqCo+eQzf4vI0qxYQyi0GgGqShw1vHjdyq0dvA
-	 GQ18wyDwK+InRF/sx4e7L/AQfeGLuKrSechjRmN5iSRpW+S3TngTbDAYzo7EUNJ181
-	 Ekyi3D7HdInveJi+mQVZpBJ+jfa7SBZFCUXTT+pedkcoQKRtShf7b69EcqaZdCZZac
-	 8PkTBvXR5q5zS5Pc/3PYXnFWzf8h1EdELaKyDEW9QV2CqXLaK0nNjWREMPBhci2PQl
-	 c/sSpU1tGrjRtHbYjJea6ZzakN9dXcpsFn8anRyDOJKfM5qUh1ZTLH0xTovogZXvyW
-	 ACj9zZxCBSYuw==
-Date: Mon, 8 Jan 2024 13:02:37 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Linus Torvalds <torvalds@linuxfoundation.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com, 
-	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
-Message-ID: <20240108-gasheizung-umstand-a36d89ed36b7@brauner>
-References: <20240103222034.2582628-1-andrii@kernel.org>
- <20240103222034.2582628-4-andrii@kernel.org>
- <CAHk-=wgmjr4nhxGheec1OwuYRk02d0+quUAViVk1v+w=Kvg15w@mail.gmail.com>
- <CAEf4Bzb6jnJL98SLPJB7Vjxo_O33W8HjJuAsyP3+6xigZtsTkA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95D740BEC;
+	Mon,  8 Jan 2024 12:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4088i0Ue025355;
+	Mon, 8 Jan 2024 12:11:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=Qfop2lxazPPy
+	BIEDlWJUle6vjdTRq03EI9G5TNA1quk=; b=B54bK3nIKQCpI3H7/X6M2+y+DNnt
+	QFNlCE3QC7kJx1JWhIqocP8mDA9Fd2qoWqE8yopGbKPIDa3yyl0Cayz0OZDlEVdQ
+	2nmKebSfLz4pQDhPy9ymKWDoxo3uOmNfqBDUIXpZVO9v73/dG7AYzn8ywuVK+GgR
+	j7ULnWQcdSIYPLrVhS+w880w6TX/wWQD4ufGZd70bc+AnaphVCN/nf8nUZ9zTF+t
+	PzrREUIAzv4tDxd29ZmL8inzW8KUhOKImGeE8F5rFJePibkx7EXLAlSVPL7v+AlG
+	lQMMYvTfkFK86nLb5ctX2BWk3qADeQDkGFaAh0h1IAioHNB+kMv2ZJr3OQ==
+Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vg8mx919g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 12:11:35 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 408CBVgH012004;
+	Mon, 8 Jan 2024 12:11:31 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 3veyxmppft-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 08 Jan 2024 12:11:31 +0000
+Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 408CBVHY011999;
+	Mon, 8 Jan 2024 12:11:31 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 408CBVJc011996;
+	Mon, 08 Jan 2024 12:11:31 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
+	id 5A94A5001D0; Mon,  8 Jan 2024 17:41:30 +0530 (+0530)
+From: Sneh Shah <quic_snehshah@quicinc.com>
+To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
+        Andrew Halaney <ahalaney@redhat.com>
+Subject: [PATCH v2] net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII
+Date: Mon,  8 Jan 2024 17:41:28 +0530
+Message-Id: <20240108121128.30071-1-quic_snehshah@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: sbuY_wzqfRpihA0fICdVdaQXZKCv-9be
+X-Proofpoint-ORIG-GUID: sbuY_wzqfRpihA0fICdVdaQXZKCv-9be
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ malwarescore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
+ mlxlogscore=999 adultscore=0 impostorscore=0 mlxscore=0 spamscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401080103
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4Bzb6jnJL98SLPJB7Vjxo_O33W8HjJuAsyP3+6xigZtsTkA@mail.gmail.com>
 
-On Fri, Jan 05, 2024 at 02:18:40PM -0800, Andrii Nakryiko wrote:
-> On Fri, Jan 5, 2024 at 1:45 PM Linus Torvalds
-> <torvalds@linuxfoundation.org> wrote:
-> >
-> > Ok, I've gone through the whole series now, and I don't find anything
-> > objectionable.
-> 
-> That's great, thanks for reviewing!
-> 
-> >
-> > Which may only mean that I didn't notice something, of course, but at
-> > least there's nothing I'd consider obvious.
-> >
-> > I keep coming back to this 03/29 patch, because it's kind of the heart
-> > of it, and I have one more small nit, but it's also purely stylistic:
-> >
-> > On Wed, 3 Jan 2024 at 14:21, Andrii Nakryiko <andrii@kernel.org> wrote:
-> > >
-> > > +bool bpf_token_capable(const struct bpf_token *token, int cap)
-> > > +{
-> > > +       /* BPF token allows ns_capable() level of capabilities, but only if
-> > > +        * token's userns is *exactly* the same as current user's userns
-> > > +        */
-> > > +       if (token && current_user_ns() == token->userns) {
-> > > +               if (ns_capable(token->userns, cap))
-> > > +                       return true;
-> > > +               if (cap != CAP_SYS_ADMIN && ns_capable(token->userns, CAP_SYS_ADMIN))
-> > > +                       return true;
-> > > +       }
-> > > +       /* otherwise fallback to capable() checks */
-> > > +       return capable(cap) || (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
-> > > +}
-> >
-> > This *feels* like it should be written as
-> >
-> >     bool bpf_token_capable(const struct bpf_token *token, int cap)
-> >     {
-> >         struct user_namespace *ns = &init_ns;
-> >
-> >         /* BPF token allows ns_capable() level of capabilities, but only if
-> >          * token's userns is *exactly* the same as current user's userns
-> >          */
-> >         if (token && current_user_ns() == token->userns)
-> >                 ns = token->userns;
-> >         return ns_capable(ns, cap) ||
-> >                 (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
-> >     }
-> >
-> > And yes, I realize that the function will end up later growing a
-> >
-> >         security_bpf_token_capable(token, cap)
-> >
-> > test inside that 'if (token ..)' statement, and this would change the
-> > order of that test so that the LSM hook would now be done before the
-> > capability checks are done, but that all still seems just more of an
-> > argument for the simplification.
-> >
-> > So the end result would be something like
-> >
-> >     bool bpf_token_capable(const struct bpf_token *token, int cap)
-> >     {
-> >         struct user_namespace *ns = &init_ns;
-> >
-> >         if (token && current_user_ns() == token->userns) {
-> >                 if (security_bpf_token_capable(token, cap) < 0)
-> >                         return false;
-> >                 ns = token->userns;
-> >         }
-> >         return ns_capable(ns, cap) ||
-> >                 (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
-> >     }
-> 
-> Yep, it makes sense to use ns_capable with init_ns. I'll change those
-> two patches to end up with something like what you suggested here.
-> 
-> >
-> > although I feel that with that LSM hook, maybe this all should return
-> > the error code (zero or negative), not a bool for success?
-> >
-> > Also, should "current_user_ns() != token->userns" perhaps be an error
-> > condition, rather than a "fall back to init_ns" condition?
-> >
-> > Again, none of this is a big deal. I do think you're dropping the LSM
-> > error code on the floor, and are duplicating the "ns_capable()" vs
-> > "capable()" logic as-is, but none of this is a deal breaker, just more
-> > of my commentary on the patch and about the logic here.
-> >
-> > And yeah, I don't exactly love how you say "ok, if there's a token and
-> > it doesn't match, I'll not use it" rather than "if the token namespace
-> > doesn't match, it's an error", but maybe there's some usability issue
-> > here?
-> 
-> Yes, usability was the primary concern. The overall idea with BPF
+Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
+mode for 1G/100M/10M speed.
+Added changes to configure serdes phy and mac based on link speed.
 
-NAK on not restricting this to not erroring out on current_user_ns()
-!= token->user_ns. I've said this multiple times before.
+Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+---
+v2 changelog:
+- updated stmmac_pcs_ane to support autoneg disable
+- Update serdes speed to 1000 for 100M and 10M also
+---
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 27 +++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_pcs.h  |  2 ++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index d3bf42d0fceb..c236c939fbe9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -103,6 +103,7 @@ struct qcom_ethqos {
+ 	struct clk *link_clk;
+ 	struct phy *serdes_phy;
+ 	unsigned int speed;
++	int serdes_speed;
+ 	phy_interface_t phy_mode;
+ 
+ 	const struct ethqos_emac_por *por;
+@@ -602,21 +603,46 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+ {
+ 	int val;
+ 
++	struct platform_device *pdev = ethqos->pdev;
++	struct net_device *dev = platform_get_drvdata(pdev);
++	struct stmmac_priv *priv = netdev_priv(dev);
+ 	val = readl(ethqos->mac_base + MAC_CTRL_REG);
+ 
+ 	switch (ethqos->speed) {
++	case SPEED_2500:
++		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
++		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
++			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
++			      RGMII_IO_MACRO_CONFIG2);
++		if (ethqos->serdes_speed != SPEED_2500)
++			phy_set_speed(ethqos->serdes_phy, SPEED_2500);
++		ethqos->serdes_speed = SPEED_2500;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 0, 0, 0);
++		break;
+ 	case SPEED_1000:
+ 		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+ 		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+ 			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+ 			      RGMII_IO_MACRO_CONFIG2);
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, SPEED_1000);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	case SPEED_100:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, SPEED_1000);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	case SPEED_10:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+ 		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	}
+ 
+@@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+ 				     "Failed to get serdes phy\n");
+ 
+ 	ethqos->speed = SPEED_1000;
++	ethqos->serdes_speed = SPEED_1000;
+ 	ethqos_update_link_clk(ethqos, SPEED_1000);
+ 	ethqos_set_func_clk_en(ethqos);
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+index aefc121464b5..13a30e6df4c1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+@@ -110,6 +110,8 @@ static inline void dwmac_ctrl_ane(void __iomem *ioaddr, u32 reg, bool ane,
+ 	/* Enable and restart the Auto-Negotiation */
+ 	if (ane)
+ 		value |= GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN;
++	else
++		value &= ~GMAC_AN_CTRL_ANE;
+ 
+ 	/* In case of MAC-2-MAC connection, block is configured to operate
+ 	 * according to MAC conf register.
+-- 
+2.17.1
+
 
