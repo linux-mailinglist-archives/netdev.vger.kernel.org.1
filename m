@@ -1,89 +1,109 @@
-Return-Path: <netdev+bounces-62347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C0A4826B97
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:31:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39582826B9D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:35:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B9DB281354
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:31:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48B4D1C22052
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A15263A5;
-	Mon,  8 Jan 2024 10:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Tp9X05Ue"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B30E13AD8;
+	Mon,  8 Jan 2024 10:35:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7118313FF0
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 10:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cd0d05838fso16764741fa.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 02:31:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704709872; x=1705314672; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t08xFHr7Xb15NuDTY59W3WRXFYEHt0zwUBEd40W83NQ=;
-        b=Tp9X05Ue7CWYoNr9cYvCo5c1LPUQuGJWph5UrYRZPhIeRmXQGemMdb3iD9q57gGIf7
-         xQw0vfNpqTxgAdJ19Rt7n0/f+rTYKaN0d2ZG9GxyRNAxpVr6sNVnEho78y+fUdLx670F
-         4qzA/7/6Mpnjk/Qgeeln/sLmBqEOxJvfplEXGiqN4y2xBD9v713jRECirMyiBJMETros
-         sQtqx482WrSxAxRuehOStKkveBZdntE0FY82VyJCnsc8QBdbuEzb0VpIhh2N8lUCl2UP
-         O6aspOevyvsj7e+z3agRP7qFdZQp0y9T7S193e2D2dvP/GVHNljn4QRvxdHn6mZY6Cpl
-         C/qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704709872; x=1705314672;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t08xFHr7Xb15NuDTY59W3WRXFYEHt0zwUBEd40W83NQ=;
-        b=c0EalW1+ALJzFC7ytB8IiditE3g3kqaDxBX/6M4A4cwJJWwg7qYmuRxxyTu902eUQL
-         EwLiLI7L/RqQ+lwJiiGy1mXqtFJR8qzBXGsaztUV4+AWP9EVD8jLngAYRqbVbKAWa2q1
-         A1fE+vXffxUGHeX0Rdd1JMRSyUspkk9cBk1CKNeXrmZ4OdZCWt8udn+RR1rPZBDxGjVJ
-         RXMe0Ai60eeSPXaZXdXJji4Y36p+4TFglaUEcQIV+7mz6/BwPQD060WtbXL0mzDpqbau
-         ez6D+DrB2ZUruwpgJSbCyuv4rzdyiJe2797vfjvzDqpxPvblLh6FVUno37BzxB9ZowtP
-         EiNg==
-X-Gm-Message-State: AOJu0YwaNPLenC7I+XyW2d0bnzN32wDOrgVnnkQuYlrop+S3TkQSYazV
-	VHBSf3bnXp5cAz6orRXAmA6grRHxuF4FpA==
-X-Google-Smtp-Source: AGHT+IH2vRbqNm4A1qlBcHSuWxPBWfU8ozsPU6z4FxN++KiI33gQvjPNCv1CEaDJc3kML2omVml0gw==
-X-Received: by 2002:a2e:be8d:0:b0:2cd:4c5c:7b8b with SMTP id a13-20020a2ebe8d000000b002cd4c5c7b8bmr1023346ljr.34.1704709872364;
-        Mon, 08 Jan 2024 02:31:12 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id v1-20020adfe281000000b003365aa39d30sm7432512wri.11.2024.01.08.02.31.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 02:31:11 -0800 (PST)
-Date: Mon, 8 Jan 2024 11:31:10 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net v4 2/2] selftests: rtnetlink: check enslaving iface
- in a bond
-Message-ID: <ZZvO7lOmdUG9Rpz1@nanopsycho>
-References: <20240108094103.2001224-1-nicolas.dichtel@6wind.com>
- <20240108094103.2001224-3-nicolas.dichtel@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD30613FE4
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 10:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-131-SSdTflTDNiSgu7lU4QYbVg-1; Mon, 08 Jan 2024 10:35:00 +0000
+X-MC-Unique: SSdTflTDNiSgu7lU4QYbVg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 8 Jan
+ 2024 10:34:35 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 8 Jan 2024 10:34:35 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Andrew Lunn' <andrew@lunn.ch>, =?iso-8859-2?Q?Petr_Tesa=F8=EDk?=
+	<petr@tesarici.cz>
+CC: Eric Dumazet <edumazet@google.com>, Alexandre Torgue
+	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, "Chen-Yu
+ Tsai" <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, "Samuel
+ Holland" <samuel@sholland.org>, "open list:STMMAC ETHERNET DRIVER"
+	<netdev@vger.kernel.org>, "moderated list:ARM/STM32 ARCHITECTURE"
+	<linux-stm32@st-md-mailman.stormreply.com>, "moderated list:ARM/STM32
+ ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, open list
+	<linux-kernel@vger.kernel.org>, "open list:ARM/Allwinner sunXi SoC support"
+	<linux-sunxi@lists.linux.dev>, Jiri Pirko <jiri@resnulli.us>
+Subject: RE: [PATCH] net: stmmac: protect statistics updates with a spinlock
+Thread-Topic: [PATCH] net: stmmac: protect statistics updates with a spinlock
+Thread-Index: AQHaP/3Ni9qIc9t6xUGHU0aBdMePobDPuW8A
+Date: Mon, 8 Jan 2024 10:34:35 +0000
+Message-ID: <d05ca29283eb47df9c58838cb87a887c@AcuMS.aculab.com>
+References: <20240105091556.15516-1-petr@tesarici.cz>
+ <CANn89iLuYZBersxq4aH-9Fg_ojD0fh=0xtdLbRdbMrup=nvrkA@mail.gmail.com>
+ <20240105113402.0f5f1232@meshulam.tesarici.cz>
+ <CANn89iLEvW9ZS=+WPETPC=mKRyu9AKmueGCWZZOrz9oX3Xef=g@mail.gmail.com>
+ <20240105121447.11ae80d1@meshulam.tesarici.cz>
+ <20240105142732.1903bc70@meshulam.tesarici.cz>
+ <CANn89iLHLvGFX_JEYU-en0ZoCUpTvjXPBzFECxLFfa_Jhpcjmg@mail.gmail.com>
+ <CANn89iKWSemsKmfsLjupwWBnyeKjtHH+mZjTzYiJT4G=xyUrNQ@mail.gmail.com>
+ <20240105154558.2ca38aca@meshulam.tesarici.cz>
+ <a8bb0eb0-8398-4e7e-8dc5-6ebf2f981ca8@lunn.ch>
+In-Reply-To: <a8bb0eb0-8398-4e7e-8dc5-6ebf2f981ca8@lunn.ch>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240108094103.2001224-3-nicolas.dichtel@6wind.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Mon, Jan 08, 2024 at 10:41:03AM CET, nicolas.dichtel@6wind.com wrote:
->The goal is to check the following two sequences:
->> ip link set dummy0 up
->> ip link set dummy0 master bond0 down
->
->Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+From: Andrew Lunn
+> Sent: 05 January 2024 17:37
+>=20
+> > This only leaves an atomic_t in hard irq context. I have tried to find
+> > something that could relax the requirement, but AFAICS at least some
+> > setups use several interrupts that can be delivered to different CPUs
+> > simultaneously, and all of them will walk over all channels. So we're
+> > left with an atomic_t here.
+>=20
+> You might want to consider per CPU statistics. Since each CPU has its
+> own structure of statistics, you don't need atomic.
+>=20
+> The code actually using the statistics then needs to sum up the per
+> CPU statistics, and using syncp should be sufficient for that.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Doesn't that consume rather a lot of memory on systems with
+'silly numbers' of cpu?
+
+Updating an atomic_t is (pretty much) the same as taking a lock.
+unlock() is also likely to also contain an atomic operation.
+So if you update more than two atomic_t it is likely that a lock
+will be faster.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
