@@ -1,207 +1,149 @@
-Return-Path: <netdev+bounces-62481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41688277F8
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:55:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E225882780A
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 20:01:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAD251C225E6
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 18:55:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95D141F23666
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 19:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC76254BE3;
-	Mon,  8 Jan 2024 18:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE9954F8D;
+	Mon,  8 Jan 2024 19:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="dsl1jFZo";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="L/p7ZIlt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6B054BED;
-	Mon,  8 Jan 2024 18:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4T83D06Bdgz9tQy;
-	Mon,  8 Jan 2024 19:55:28 +0100 (CET)
-Message-ID: <40550fc1-3b5b-438c-891d-2da0f30874f3@v0yd.nl>
-Date: Mon, 8 Jan 2024 19:55:27 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1FD54F86;
+	Mon,  8 Jan 2024 19:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1704740263; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=mbX2NOrWlrdLP/l4MXNn3D0/OxHGs/icq//JzU4nXPxA7QAmoAWjcNDV0YjKXxUIQ+
+    p8wVTd5txLZkvlYFKsAOo8p5s2K2vK8GNBsL0TsWYWOrgjeo+x8GkT/6pD5XHiX7wezH
+    8/R7U+0fZsPQcAren5iirIEis1rNCUwtiBSJCXDGbniIWTBwjg7jJSJ+mhMD+fFBD79I
+    /goKrkkK1D50R5hvPaamQO+cT1QYgazjNt0hv9QInwkMMq9AtqDHY0xoxZqJXoHRGLSM
+    xEWJdyZmyBVo1t8mfZJUmSGF/+FlYxQVRvOoMtzb7TGBN3lHfBRfvIn6j+lBEGM5OCtS
+    t9GQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1704740263;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=J3px+OU0XxKXAITwpaExTX0RE765Q6Bda/x0EbY4UKA=;
+    b=NU+UWhid9y8QPwvk9aG3CRfovQpUzyXWG2KRktQ7mBHa+DI10tchcfylD141E1OzPI
+    9B4Jb1JIOGvboS0+dQEvocFwHgevTO1l80REiaGlWnBaLR9EEiXaZij7TmZHpLekr65u
+    C3/bNmgJ1Xd7bMX5Vl1tTKf3VK6OUvWse/wtk1KjiLOoKq5JDJc26efokX4xyB8lWk6x
+    yqv1F/dnlMcoBE8riSOBbfOBW3WmmBvGEOZ07uk9gUHFK9RStcoAjjh6AWqhodC+8w0w
+    jXAB4fE+L2Wzz57VD3DYgMVM5QLePOmB2PicZSme7/TU5ZVVK1JJ57Xr2JnqDI1RtVuK
+    CHUg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1704740263;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=J3px+OU0XxKXAITwpaExTX0RE765Q6Bda/x0EbY4UKA=;
+    b=dsl1jFZoYwOPTFLdBvLOy2raOacaICxcxbKVjSRMTDks9DVuLaVPk48F8R/2GDp3aF
+    S8AaOxg6d8cJ1MtierySMjtClWs63HwooL2vs+bSqLtczgpRdedBjtUOmLfJEM3WGk0+
+    l0k7EX00xJvlGFNtFtn2IGk243PETZiFRP8bChrbwc9FO0leDGabltouXd2Zz0O86dnl
+    YDI2BFDAJD2Pv9yszHVV9zxjOJN7iWmRcOvKERdo1YJDA/zWwZgtTW/bEfS1UkoG7UUp
+    YQeNdIEKbL3g2EjRxrQPGS4N0unRA0ycN0vuOTL+lDLth6IZ9mHZHa4CXZt6aHHulpXa
+    SIVA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1704740263;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=J3px+OU0XxKXAITwpaExTX0RE765Q6Bda/x0EbY4UKA=;
+    b=L/p7ZIltLSCCwwiG30j1g+sDiJl6K2ptO3qqejk1iy3zWyAN3QKrg/CKb/hCeqWrok
+    1SjhE5MF95YYbJow1uCQ==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFr0USPYLtQZHsrzEmm3snIDlVAt06sCg=="
+Received: from [IPV6:2a00:6020:4a8e:5010:150f:f6b8:d0ef:d443]
+    by smtp.strato.de (RZmta 49.10.2 AUTH)
+    with ESMTPSA id K7b2c2008Ivh0WP
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 8 Jan 2024 19:57:43 +0100 (CET)
+Message-ID: <14e86ea6-e038-4702-957a-39af27bfc280@hartkopp.net>
+Date: Mon, 8 Jan 2024 19:57:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 4/4] Bluetooth: Remove pending ACL connection attempts
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] can: bcm: add recvmsg flags for own, local and remote
+ traffic
+To: Nicolas Maier <nicolas.maier.dev@gmail.com>, mkl@pengutronix.de,
+ linux-can@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, corbet@lwn.net, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1cf96afe-6a27-4fd5-975e-96122f72df2e@gmail.com>
 Content-Language: en-US
-To: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240108183938.468426-1-verdre@v0yd.nl>
- <20240108183938.468426-5-verdre@v0yd.nl>
- <5d1f2013-5758-4d6c-8d01-e96a76bb2686@v0yd.nl>
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-In-Reply-To: <5d1f2013-5758-4d6c-8d01-e96a76bb2686@v0yd.nl>
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <1cf96afe-6a27-4fd5-975e-96122f72df2e@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 1/8/24 19:44, Jonas Dreßler wrote:
-> On 1/8/24 19:39, Jonas Dreßler wrote:
->> With the last commit we moved to using the hci_sync queue for "Create
->> Connection" requests, removing the need for retrying the paging after
->> finished/failed "Create Connection" requests and after the end of
->> inquiries.
->>
->> hci_conn_check_pending() was used to trigger this retry, we can remove it
->> now.
->>
->> Note that we can also remove the special handling for COMMAND_DISALLOWED
->> errors in the completion handler of "Create Connection", because "Create
->> Connection" requests are now always serialized.
->>
->> This is somewhat reverting commit 4c67bc74f016 ("[Bluetooth] Support
->> concurrent connect requests").
->>
->> With this, the BT_CONNECT2 state of ACL hci_conn objects should now be
->> back to meaning only one thing: That we received a connection request
->> from another device (see hci_conn_request_evt), but the actual connect
->> should be deferred.
->> ---
->>   include/net/bluetooth/hci_core.h |  1 -
->>   net/bluetooth/hci_conn.c         | 16 ----------------
->>   net/bluetooth/hci_event.c        | 21 ++++-----------------
->>   3 files changed, 4 insertions(+), 34 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h 
->> b/include/net/bluetooth/hci_core.h
->> index 2c30834c1..d7483958d 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -1330,7 +1330,6 @@ struct hci_conn *hci_conn_add(struct hci_dev 
->> *hdev, int type, bdaddr_t *dst,
->>                     u8 role);
->>   void hci_conn_del(struct hci_conn *conn);
->>   void hci_conn_hash_flush(struct hci_dev *hdev);
->> -void hci_conn_check_pending(struct hci_dev *hdev);
->>   struct hci_chan *hci_chan_create(struct hci_conn *conn);
->>   void hci_chan_del(struct hci_chan *chan);
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index 541d55301..22033057b 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -2534,22 +2534,6 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
->>       }
->>   }
->> -/* Check pending connect attempts */
->> -void hci_conn_check_pending(struct hci_dev *hdev)
->> -{
->> -    struct hci_conn *conn;
->> -
->> -    BT_DBG("hdev %s", hdev->name);
->> -
->> -    hci_dev_lock(hdev);
->> -
->> -    conn = hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
->> -    if (conn)
->> -        hci_cmd_sync_queue(hdev, hci_acl_create_connection_sync, 
->> conn, NULL);
->> -
->> -    hci_dev_unlock(hdev);
->> -}
->> -
->>   static u32 get_link_mode(struct hci_conn *conn)
->>   {
->>       u32 link_mode = 0;
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index e8b4a0126..91973d6d1 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -117,8 +117,6 @@ static u8 hci_cc_inquiry_cancel(struct hci_dev 
->> *hdev, void *data,
->>           hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->>       hci_dev_unlock(hdev);
->> -    hci_conn_check_pending(hdev);
->> -
->>       return rp->status;
->>   }
->> @@ -149,8 +147,6 @@ static u8 hci_cc_exit_periodic_inq(struct hci_dev 
->> *hdev, void *data,
->>       hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);
->> -    hci_conn_check_pending(hdev);
->> -
->>       return rp->status;
->>   }
->> @@ -2296,10 +2292,8 @@ static void hci_cs_inquiry(struct hci_dev 
->> *hdev, __u8 status)
->>   {
->>       bt_dev_dbg(hdev, "status 0x%2.2x", status);
->> -    if (status) {
->> -        hci_conn_check_pending(hdev);
->> +    if (status)
->>           return;
->> -    }
->>       set_bit(HCI_INQUIRY, &hdev->flags);
->>   }
->> @@ -2323,12 +2317,9 @@ static void hci_cs_create_conn(struct hci_dev 
->> *hdev, __u8 status)
->>       if (status) {
->>           if (conn && conn->state == BT_CONNECT) {
->> -            if (status != HCI_ERROR_COMMAND_DISALLOWED || 
->> conn->attempt > 2) {
->> -                conn->state = BT_CLOSED;
->> -                hci_connect_cfm(conn, status);
->> -                hci_conn_del(conn);
->> -            } else
->> -                conn->state = BT_CONNECT2;
->> +            conn->state = BT_CLOSED;
->> +            hci_connect_cfm(conn, status);
->> +            hci_conn_del(conn);
->>           }
->>       } else {
->>           if (!conn) {
->> @@ -3020,8 +3011,6 @@ static void hci_inquiry_complete_evt(struct 
->> hci_dev *hdev, void *data,
->>       bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
->> -    hci_conn_check_pending(hdev);
->> -
->>       if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
->>           return;
->> @@ -3247,8 +3236,6 @@ static void hci_conn_complete_evt(struct hci_dev 
->> *hdev, void *data,
->>   unlock:
->>       hci_dev_unlock(hdev);
->> -
->> -    hci_conn_check_pending(hdev);
->>   }
->>   static void hci_reject_conn(struct hci_dev *hdev, bdaddr_t *bdaddr)
-> 
-> Please take a special look at this one: I'm not sure if I'm breaking the 
-> functionality of deferred connecting using BT_CONNECT2 in 
-> hci_conn_request_evt() here, as I don't see anywhere where we check for 
-> this state and establish a connection later.
-> 
-> It seems that this is how hci_conn_request_evt() was initially written 
-> though, hci_conn_check_pending() only got introduced later and seems 
-> unrelated.
+Hi Nicolas,
 
-Ahh nevermind... The check for BT_CONNECT2 on "Conn Complete event" got 
-introduced with 4c67bc74f01 ([Bluetooth] Support concurrent connect 
-requests). And later the deferred connection setup on "Conn Request 
-event" got introduced with 20714bfef8 ("Bluetooth: Implement deferred 
-sco socket setup").
+thanks for the patch!
 
-I assume the latter commit was relying on the "Create Connection" 
-request "Conn Complete event" that got introduced with the former commit 
-then? That would imply that we use BT_CONNECT2 if there's already a 
-"Create Connection" going on when the "Conn Request event" happens, and 
-we must wait for that existing request to finish.. Is that how those 
-deferred connections are supposed to work?
+On 07.01.24 07:44, Nicolas Maier wrote:
 
-> 
-> Thanks,
-> Jonas
+> @@ -642,7 +666,7 @@ static enum hrtimer_restart bcm_rx_thr_handler(struct hrtimer *hrtimer)
+>   static void bcm_rx_handler(struct sk_buff *skb, void *data)
+>   {
+>   	struct bcm_op *op = (struct bcm_op *)data;
+> -	const struct canfd_frame *rxframe = (struct canfd_frame *)skb->data;
+> +	struct canfd_frame *rxframe = (struct canfd_frame *)skb->data;
+>   	unsigned int i;
+>   
+>   	if (op->can_id != rxframe->can_id)
+> @@ -657,6 +681,13 @@ static void bcm_rx_handler(struct sk_buff *skb, void *data)
+>   			return;
+>   	}
+>   
+> +	/* add flags to distinguish between own/local/remote CAN traffic */
+> +	if (skb->sk) {
+> +		rxframe->flags |= RX_LOCAL;
+> +		if (skb->sk == op->sk)
+> +			rxframe->flags |= RX_OWN;
+> +	}
+> +
+>   	/* disable timeout */
+>   	hrtimer_cancel(&op->timer);
+>   
+
+No. You are writing to a read-only skbuff, which is not yet cloned or 
+copied. The read-only handling of the skb is done in the NET_RX_SOFTIRQ 
+triggering can_rcv_filter() and friends.
+
+See this note:
+
+https://elixir.bootlin.com/linux/v6.7/source/net/can/af_can.c#L430
+
+When you are also changing the CAN frames' content you need to 
+skb_copy() the provided skb, see:
+
+https://elixir.bootlin.com/linux/v6.7/source/net/can/gw.c#L504
+
+So if you want to pass these new flags to the user space you should 
+think of extending the parameter list of bcm_rx_update_and_send() and 
+bcm_rx_cmp_to_index().
+
+But in the first place I'm interested to know what the use-case for this 
+extension is.
+
+Best regards,
+Oliver
 
