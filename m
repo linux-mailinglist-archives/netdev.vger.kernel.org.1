@@ -1,139 +1,81 @@
-Return-Path: <netdev+bounces-62344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18FFC826B84
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:22:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC30A826B87
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:23:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A79B8282C1B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:22:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03552B218F3
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008A013AE0;
-	Mon,  8 Jan 2024 10:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3AD13ACF;
+	Mon,  8 Jan 2024 10:23:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="o8+G7C7L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HYwTZdUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4600113AD8;
-	Mon,  8 Jan 2024 10:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E041240004;
-	Mon,  8 Jan 2024 10:22:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1704709348;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XuJv/OyK8RE0Y94blspywgd4cYFg7aH1NjsPMWEemMY=;
-	b=o8+G7C7L1f0U+TNR9hjwq2dvwbkDeoKwHmYJ/lL98i2S7oyotEB4PbNN8gyDcg5GRlloJ4
-	OciNnaR2VvZAC4nmjTZ+np5PbKkNYYG7o1Cxr7H5Ye6fAga97KSuwf7NsI7zp7idUgQpfg
-	SJ5mMW2o4WK9TYiKJbFjDrnvtHRuIBMM1O5SEMQzc5CfYklj5y1x6IP7YkqlmqWwl+YquJ
-	yqFc4NSjOXsnEZ7IPLJZI/AEBAntp7P30m6zqhukwqjO/1FoLS/c3pMqFGmgUl1G6OssGb
-	psc0qp57ss1dPfKAo2AdfXGmLbT3NcjCQLmbmv/g/I0FcIuhY6aWaSsm1ApBBw==
-Message-ID: <65274929-fa59-482c-a744-6b9ce162ab46@arinc9.com>
-Date: Mon, 8 Jan 2024 13:22:18 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3482E13FE0
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 10:23:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E48EFC433C7;
+	Mon,  8 Jan 2024 10:23:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704709420;
+	bh=CEIAKrzZawUF4QTrbXAB9pWT9IR7/szxVzMiCGSCYK0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HYwTZdUL7jTPbhbxs/eVxl5qSHHNUi6jc18pPfj0PJXLs1uICgTXqqRavKeIldbOz
+	 Sq2WqnJHURBlyNMrGQGUWGloGqRd5y6mYduJoUnBkh+EdQnDby+StdgvmzwGNNKSzy
+	 4NGoHR5hih2DG6utuSj37Ffqf0IwAQPyqy1fqoogQpXSZSpCZnadH9lrnlY/cYyn+i
+	 JGzsZ9qHy//jpZLA+GI2BS1HwdnnrhH1lcNBUAeZgqmp2BPfJc/SQoC17rUw6X05ie
+	 SRMgLbU4mLUlkzagkMzQa6oK2nrOqYFVx6F2guRaNYy7NcaTJmFzUtsknx0xUQcL9z
+	 DDNSEpXhsUuGA==
+Date: Mon, 8 Jan 2024 10:23:35 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com
+Subject: Re: [PATCH net-next 1/3] bnxt_en: Remove unneeded variable in
+ bnxt_hwrm_clear_vnic_filter()
+Message-ID: <20240108102335.GE132648@kernel.org>
+References: <20240105235439.28282-1-michael.chan@broadcom.com>
+ <20240105235439.28282-2-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: dsa: mt7530: support OF-based registration
- of switch MDIO bus
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: Daniel Golle <daniel@makrotopia.org>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- David Bauer <mail@david-bauer.net>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, Luiz Angelo Daros de Luca <luizluca@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20240106122142.235389-1-arinc.unal@arinc9.com>
- <20240107195241.GB132648@kernel.org>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20240107195241.GB132648@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240105235439.28282-2-michael.chan@broadcom.com>
 
-On 7.01.2024 22:52, Simon Horman wrote:
-> On Sat, Jan 06, 2024 at 03:21:42PM +0300, Arınç ÜNAL wrote:
->> From: David Bauer <mail@david-bauer.net>
->>
->> Currently the MDIO bus of the switches the MT7530 DSA subdriver controls
->> can only be registered as non-OF-based. Bring support for registering the
->> bus OF-based.
->>
->> The subdrivers that control switches [with MDIO bus] probed on OF must
->> follow this logic to support all cases properly:
->>
->> No switch MDIO bus defined: Populate ds->user_mii_bus, register the MDIO
->> bus, set the interrupts for PHYs if "interrupt-controller" is defined at
->> the switch node. This case should only be covered for the switches which
->> their dt-bindings documentation didn't document the MDIO bus from the
->> start. This is to keep supporting the device trees that do not describe the
->> MDIO bus on the device tree but the MDIO bus is being used nonetheless.
->>
->> Switch MDIO bus defined: Don't populate ds->user_mii_bus, register the MDIO
->> bus, set the interrupts for PHYs if ["interrupt-controller" is defined at
->> the switch node and "interrupts" is defined at the PHY nodes under the
->> switch MDIO bus node].
->>
->> Switch MDIO bus defined but explicitly disabled: If the device tree says
->> status = "disabled" for the MDIO bus, we shouldn't need an MDIO bus at all.
->> Instead, just exit as early as possible and do not call any MDIO API.
->>
->> The use of ds->user_mii_bus is inappropriate when the MDIO bus of the
->> switch is described on the device tree [1], which is why we don't populate
->> ds->user_mii_bus in that case.
->>
->> Link: https://lore.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/ [1]
->> Suggested-by: David Bauer <mail@david-bauer.net>
->> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
->> ---
->>   drivers/net/dsa/mt7530.c | 18 ++++++++++++++----
->>   1 file changed, 14 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
->> index 391c4dbdff42..39d7e7ad7154 100644
->> --- a/drivers/net/dsa/mt7530.c
->> +++ b/drivers/net/dsa/mt7530.c
->> @@ -2153,17 +2153,25 @@ mt7530_free_irq(struct mt7530_priv *priv)
->>   static int
->>   mt7530_setup_mdio(struct mt7530_priv *priv)
->>   {
->> +	struct device_node *mnp, *np = priv->dev->of_node;
->>   	struct dsa_switch *ds = priv->ds;
->>   	struct device *dev = priv->dev;
->>   	struct mii_bus *bus;
->>   	static int idx;
->> -	int ret;
->> +	int ret = 0;
->> +
->> +	mnp = of_get_child_by_name(np, "mdio");
->> +
->> +	if (mnp && !of_device_is_available(mnp))
->> +		goto out;
+On Fri, Jan 05, 2024 at 03:54:37PM -0800, Michael Chan wrote:
+> After recent refactoring, this function doesn't return error any
+> more.  Remove the unneeded rc variable and change the function to
+> void.  The caller is not checking for the return value.
 > 
-> nit: I think it would easier on the eyes to simply
-> 
-> 		return 0;
+> Fixes: 96c9bedc755e ("bnxt_en: Refactor L2 filter alloc/free firmware commands.")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202401041942.qrB1amZM-lkp@intel.com/
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 
-Will do.
+Hi Michael,
 
-Thanks.
-Arınç
+I'm not sure this is a bug fix, so I might have cited
+the commit using something like "Introduced by commit ..."
+rather than a Fixes tag.
+
+But the fix isn't going to propagate very far anyway,
+as the cited commit is currently only in net-next.
+So perhaps it is fine as is.
+
+In any case, I agree that this is a nice update to the code.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+
 
