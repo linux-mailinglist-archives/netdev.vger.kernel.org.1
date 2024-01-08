@@ -1,129 +1,110 @@
-Return-Path: <netdev+bounces-62303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 469A9826865
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:06:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54EAF826891
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:28:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 390D3B20B1B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 07:06:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77D601C218AE
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 07:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9535879EE;
-	Mon,  8 Jan 2024 07:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74AE38821;
+	Mon,  8 Jan 2024 07:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="phI3eXm5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EsIySqX+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639DFB661
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 07:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cd0f4f306fso15931381fa.0
-        for <netdev@vger.kernel.org>; Sun, 07 Jan 2024 23:06:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1704697559; x=1705302359; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+W5MR0GZTvvVT7Ez94bP6YWkWN8S36H3wYikt4HSl4Q=;
-        b=phI3eXm59qPP0jQ8DwkFvWbXhXYGoID3/wYE1adMQ60hFPVf6xzqQ+lSTk9whbAidC
-         Kjmx36XSDGf+EE+n2rEIXlOMb/CAOidVvXyLYhhA4w1jMg8853SSEOSk+P+mtgVmk5lw
-         kKldn4woAzVrFPtjQD85wE/VDnrQhV8slyl/ttwnrkqDwh+zzQW+Yti9pUcVsowqnIVr
-         Dmdu0tpwtA+XMQL9syRoUcK7f2tjTB0tfzQmFTIi2Ice1U00oX4IGZURPOZQJ4qYiajn
-         puZzodbWzUYfukddEviLWRv7JXXoP/d52KCLGZsZu7PtF8Mea7GZkRruSrYegAUD2FPd
-         lrKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704697559; x=1705302359;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+W5MR0GZTvvVT7Ez94bP6YWkWN8S36H3wYikt4HSl4Q=;
-        b=maTIA9WEVG5Cc/fi9Yc1CZ2LnqQw06ydGosN5C9ERw/7MnxfjWBK+iQ6f+EAXNXrQZ
-         z1+c1RFJz1IX7ccproSY1l6DtB6YcPwyCy6IJPEdFuHd64adB9X4G9xupz7WTv4JNg+m
-         lvx5XyIQ5vyK5gTvp4Re5ltpAwoatsV3YrqYTE9f65C0XhHH4GuG+rMvE4xkkioO0XPO
-         GpyUkpDdpN19VSGX/b794qUhYVLo+Up+JdwLowx7fNK2Gu0z0Bh3PEwYnKOhq1YeJqs6
-         PvvJcjqcjjl+zHM0K0hMKAPwbbeqPAofx+3ZlEwJqyC2RRvhJV6uINjjDZBOuX0q8ESQ
-         fLEg==
-X-Gm-Message-State: AOJu0YzFN1EZ9P2im2qqWy02ZFe2P4NqeX/Tx6Q9qJDYB9K6s9q8rLFV
-	fW6+avmpuLaxcbDjyr6xEY369Lv6HsblJw==
-X-Google-Smtp-Source: AGHT+IF2PtwQKrEqWSIs9T+bjTD2KsvisYFdWZg8Aq53R2YUIdp6yibADBbGYZSvkWNnhjOzoyIUyg==
-X-Received: by 2002:a05:6512:b23:b0:50e:a942:e6f3 with SMTP id w35-20020a0565120b2300b0050ea942e6f3mr1367517lfu.10.1704697559144;
-        Sun, 07 Jan 2024 23:05:59 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.5])
-        by smtp.gmail.com with ESMTPSA id ez10-20020a1709070bca00b00a28a7f56dc4sm1063479ejc.188.2024.01.07.23.05.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Jan 2024 23:05:58 -0800 (PST)
-Message-ID: <bd76083f-c1de-4581-820c-50d9084b3942@tuxon.dev>
-Date: Mon, 8 Jan 2024 09:05:56 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C928BF3;
+	Mon,  8 Jan 2024 07:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DFA39240009;
+	Mon,  8 Jan 2024 07:28:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1704698918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zsyRsr5wVllmTXkOLhKmpaaVCbFdvpUU1HVC9nK9ZEI=;
+	b=EsIySqX+BV/Z4yLXA4rIh+cFQiicFJE/Ycdh1/Vo11UgMCGb/Yj7nLchXngBHsHaZ0qToR
+	KqqQ0x41Ll3eRRDeOVCUeNqntWSGWeWnKZQzjoxwGAk7UgHssFagK/MihM5veYkdn1Pxd3
+	GhZ8xuP04Bjf8+meEa9dIZw5y7Wx0zmNBNvqJ/7WHtxHQ+Z/2UqTdY/KDsPjF++bRTnJmS
+	B48khh0nPxbGMusJTa9tLsWYEnBmHKidNVkd2lTjGKDpSd64oR9vZBjdwNCRvXIGHBSSgA
+	5eIczHGTbYlYOhpRb3Fu9d51DqD/chhljJsI1MizUzz3jkr62aB15RCQ77ECMQ==
+Date: Mon, 8 Jan 2024 08:28:37 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexander Aring
+ <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>,
+ netdev@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: pull-request: ieee802154 for net-next 2023-12-20
+Message-ID: <20240108082837.3507d4d7@xps-13>
+In-Reply-To: <20240104143135.303e049f@kernel.org>
+References: <20231220095556.4d9cef91@xps-13>
+	<20231222152017.729ee12b@xps-13>
+	<20240104143135.303e049f@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 03/19] net: ravb: Make reset controller
- support mandatory
-Content-Language: en-US
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- p.zabel@pengutronix.de, yoshihiro.shimoda.uh@renesas.com,
- wsa+renesas@sang-engineering.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
- geert+renesas@glider.be, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
- <20240105082339.1468817-4-claudiu.beznea.uj@bp.renesas.com>
- <CAMuHMdWTE=AUEd5iqd4Qm04sgFcGtHkbYEQJH9A=qPWph=S4+g@mail.gmail.com>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <CAMuHMdWTE=AUEd5iqd4Qm04sgFcGtHkbYEQJH9A=qPWph=S4+g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi, Geert,
+Hi Jakub,
 
-On 05.01.2024 11:38, Geert Uytterhoeven wrote:
-> Hi Claudiu,
-> 
-> On Fri, Jan 5, 2024 at 9:24 AM Claudiu <claudiu.beznea@tuxon.dev> wrote:
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>
->> On the RZ/G3S SoC the reset controller is mandatory for the IP to work.
->> The device tree binding documentation for the ravb driver specifies that
->> the resets are mandatory. Based on this, make the resets mandatory also in
->> driver for all ravb devices.
->>
->> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->> Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -2645,7 +2645,7 @@ static int ravb_probe(struct platform_device *pdev)
->>                 return -EINVAL;
->>         }
->>
->> -       rstc = devm_reset_control_get_optional_exclusive(&pdev->dev, NULL);
->> +       rstc = devm_reset_control_get_exclusive(&pdev->dev, NULL);
->>         if (IS_ERR(rstc))
->>                 return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
->>                                      "failed to get cpg reset\n");
-> 
-> Upon second look, you also have to make config RAVB select
-> RESET_CONTROLLER.
-> Currently, you can build an R-Car Gen[234] kernel with RESET_CONTROLLER
-> disabled, causing devm_reset_control_get_exclusive() to fail
-> unconditionally.
+kuba@kernel.org wrote on Thu, 4 Jan 2024 14:31:35 -0800:
 
-ok, I'll update it. Thanks!
+> On Fri, 22 Dec 2023 15:20:17 +0100 Miquel Raynal wrote:
+> > miquel.raynal@bootlin.com wrote on Wed, 20 Dec 2023 09:55:56 +0100:
+> >  =20
+> > > Hello Dave, Jakub, Paolo, Eric.
+> > >=20
+> > > This is the ieee802154 pull-request for your *net-next* tree.   =20
+> >=20
+> > I'm sorry for doing this but I saw the e-mail saying net-next would
+> > close tomorrow, I'd like to ensure you received this PR, as you
+> > are usually quite fast at merging them and the deadline approaches. =20
+>=20
+> Sorry for the delay, I only caught up with enough email now :)
 
-> 
-> Gr{oetje,eeting}s,
-> 
->                         Geert
-> 
+No problem with the delay, sometimes e-mails get lost in SPAM folders
+and I was unsure about whether you would pull after closing (and
+possibly re-opening) ne-next.
+
+> > It appears on patchwork, but the "netdev apply" worker failed, I've no
+> > idea why, rebasing on net-next does not show any issue. =20
+>=20
+> That's because the pull URL is:
+>=20
+> git@gitolite.kernel.org:pub ...
+>=20
+> the bot doesn't have SSH access to kernel.org. IIRC you need to set=20
+> the fetch URL in git remote for your repo to be over HTTPS. Only
+> leave push over SSH.
+
+Oh, right, indeed on another repo used to generate pull requests I have
+a different fetch/push remote, but I totally overlooked that one. I will
+update my setup, thanks for the tip!
+
+> > https://patchwork.kernel.org/project/netdevbpf/patch/20231220095556.4d9=
+cef91@xps-13/
+> >=20
+> > Let me know if there is anything wrong. =20
+>=20
+> Pulled now, thanks!
+
+Perfect, thanks!
+
+Miqu=C3=A8l
 
