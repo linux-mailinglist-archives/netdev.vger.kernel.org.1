@@ -1,149 +1,168 @@
-Return-Path: <netdev+bounces-62364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 642A1826C70
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:19:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4A55826C6D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:18:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6FB6B20B21
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:19:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 502AC283283
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE12014A9F;
-	Mon,  8 Jan 2024 11:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77631429E;
+	Mon,  8 Jan 2024 11:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NBL10dFD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8f9VfFC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B78814AB0
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 11:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704712714; x=1736248714;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/Yv6nVbKHnRf+VuivFbkx8+znZLcrl78e/gpLyusyHY=;
-  b=NBL10dFDIiZTRNVPi9toZdRRWaXpKvq5xxCBKSl8u1r5KKJBWQnsJunv
-   iXS0vJ+f9RXhcSzpC40rRCDHX6BrmZ8drVfMKTtgxQ1e5+cTgFoVW8Y3o
-   BQFphzfTh+XIEqq6l4a0dJQq7tTjU7fjfIZj86qXf79MzutDVFMZKQqV5
-   OswsTPV/bXWHC9emPG5yMxTA009Frv0D2q+5XIEpa6Xke7IDOvzjPWYhZ
-   gZ+i48aWZFWrNCtXHG/wiwxOlJRWaayNFcdE0YPn7PFOc4qCfDi1ZjiDu
-   xULB2DT3qx3e1tpgiJpsnPO0tBfuZWv8T9NBdWnvR4urQppcWYVIkQZdX
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="429036666"
-X-IronPort-AV: E=Sophos;i="6.04,340,1695711600"; 
-   d="scan'208";a="429036666"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 03:18:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="871846221"
-X-IronPort-AV: E=Sophos;i="6.04,340,1695711600"; 
-   d="scan'208";a="871846221"
-Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.53.10])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 03:18:31 -0800
-Date: Mon, 8 Jan 2024 12:18:29 +0100
-From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>,
-	Marc MERLIN <marc@merlins.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net v3] net: ethtool: do runtime PM outside RTNL
-Message-ID: <ZZvaBWbmC9X8pgbq@linux.intel.com>
-References: <20231206084448.53b48c49@kernel.org>
- <ZZU3OaybyLfrAa/0@linux.intel.com>
- <20240103153405.6b19492a@kernel.org>
- <ZZZrbUPUCTtDcUFU@linux.intel.com>
- <9bcfb259-1249-4efc-b581-056fb0a1c144@gmail.com>
- <20240104081656.67c6030c@kernel.org>
- <ZZftxhXzQykx8j6b@linux.intel.com>
- <20240105073001.15f2f3cb@kernel.org>
- <ZZguXLO3DAX/2Y0/@linux.intel.com>
- <20240105190218.5b69b9f5@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF8814288;
+	Mon,  8 Jan 2024 11:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a2a225e9449so141871466b.0;
+        Mon, 08 Jan 2024 03:18:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704712710; x=1705317510; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oubx1nXjvpasYUDXx1K/HSxnBXOhuFpwaiFEMhm9n7w=;
+        b=l8f9VfFC8uQNkUiboES4MJVJnAfcYFLYvSflcL4P5en32qjjTXmuGftKbGIOpzLJLD
+         YV98xhpzmwsIvsi46L+j8IchlfwtpkQq8Mewa4LCTvf/uv7L+7+9T5hIRtGz306iE1t1
+         v6OWz95bZAi/EAHm3lDBryyBRR+fLzEkt6duw3vd0Lf9Ok1lzvNvUJ37iPZrPcEPEEUk
+         nJBuq1lzv4fgDK3o1+/LevIQAIqAZoJJ+OTpt1yTHjMAKd8+3IzRDf7edJM9wSs7zurt
+         47s9XPB9bz4NT66XFbM7aVQyq8RmnvTNxgV6ZsjGel4tMrzB4KqsZa1ZR6sfdKaRbaa2
+         aHzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704712710; x=1705317510;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oubx1nXjvpasYUDXx1K/HSxnBXOhuFpwaiFEMhm9n7w=;
+        b=eJv/8U5CrX+snhdW8HhYoFpJJozl/IeA0/WVFaYrbFCrSVWtqoLjts8f5Pg8Rf6MyO
+         81zf48f0wqBghgON4ceaIpF9Et9LHkg//ImbmmoY1vc95pP4IK7tFULZvOjY0zjAiVuO
+         Wj3GvN9DD52kImhFiOnfgRyI79HNYldxUHW+1edR97y2PgaCCMD+sfGHuQP362bNxOtM
+         QRHNtsqOQoQhgmZeSPS3xxL/jIH1k/akF+8fZNhc74PVs7k0p/2iN5b9QZfkMSqVwehJ
+         jeR1mt41ovIrPITHs4IV9Q49MEztItNTB2EE2i6x23iDwrmkOEGpdJsqormw1LYATfaI
+         m2gA==
+X-Gm-Message-State: AOJu0Yzd8QGJC6fN0OBhc8vwV4qWI7liWJ4Zul9MaOCzPiP98SFWG4Q9
+	zFM3J2u0rmwSnKXJFrUDzfU=
+X-Google-Smtp-Source: AGHT+IFnUe1QwnBp1PDuXxhyjgShXu1oS7MQyJps9UWxQ84y7mXpaDB9+t+aKcXBL6dkw2dNkSo1OA==
+X-Received: by 2002:a17:906:74c1:b0:a28:808a:81fb with SMTP id z1-20020a17090674c100b00a28808a81fbmr1710878ejl.7.1704712710166;
+        Mon, 08 Jan 2024 03:18:30 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6f31:8f00:9009:65a0:ed7:b9d? (dynamic-2a01-0c22-6f31-8f00-9009-65a0-0ed7-0b9d.c22.pool.telefonica.de. [2a01:c22:6f31:8f00:9009:65a0:ed7:b9d])
+        by smtp.googlemail.com with ESMTPSA id oq8-20020a170906cc8800b00a293280c16csm3693633ejb.223.2024.01.08.03.18.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 03:18:29 -0800 (PST)
+Message-ID: <bb44432d-0cde-47cd-a44c-be5e3f11afab@gmail.com>
+Date: Mon, 8 Jan 2024 12:18:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240105190218.5b69b9f5@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 0/5] net: phy: marvell-88q2xxx: add driver for
+ the Marvell 88Q2220 PHY
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240108093702.13476-1-dima.fedrau@gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20240108093702.13476-1-dima.fedrau@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 05, 2024 at 07:02:18PM -0800, Jakub Kicinski wrote:
-> On Fri, 5 Jan 2024 17:29:16 +0100 Stanislaw Gruszka wrote:
-> > > Removing the rpm calls from the core is just going to lead to a
-> > > whack-a-mole of bugs in the drivers themselves.
-> > >
-> > > IOW I look at the RPM calls in the core as a canary for people
-> > > doing the wrong thing :(  
-> > 
-> > Hmm, this one I don't understand, what other bugs could pop up
-> > after reverting bd869245a3dcc and others that added rpm calls
-> > for the net core?
+On 08.01.2024 10:36, Dimitri Fedrau wrote:
+> Changes in v2:
+> 	- used defines MDIO_CTRL1_LPOWER and MDIO_PMA_CTRL1_SPEED1000
+> 	  in mv88q222x_config_aneg_preinit
+> 	- use genphy_c45_loopback
+> 	- mv88q2xxx_read_status reads speed, master or slave state when
+> 	  autonegotiation is enabled
+> 	- added defines for magic values in mv88q222x_get_sqi
 > 
-> IDK what igc powers down,
-
-From what I can tell basically everything, it's full shutdown.
-
-> but if there's any ndo or ethtool
-> callback which needs to access a register that requires power 
-> to be resumed - it will deadlock on rtnl exactly the same.
+> Changes in v3:
+> 	- mv88q2xxx_read_status includes autonegotiation case
+> 	- add support for 100BT1 and 1000BT1 linkmode advertisement
+> 	- use mv88q2xxx_get_sqi and mv88q2xxx_get_sqi_max, remove
+> 	  mv88q222x_get_sqi and mv88q222x_get_sqi_max
+> 	- fix typo: rename mv88q2xxxx_get_sqi and mv88q2xxxx_get_sqi_max to
+> 	  mv88q2xxx_get_sqi and mv88q2xxx_get_sqi
+> 	- add define MDIO_MMD_PCS_MV_RX_STAT for magic value 0x8230, documented
+> 	  in latest datasheets for both PHYs
 > 
-> Looking at igc_ethtool I see:
+> Changes in V4:
+> 	- clean up init sequence
+> 	- separate patch for fixing typos in upstreamed code
 > 
-> static int igc_ethtool_begin(struct net_device *netdev)
-> {
-> 	struct igc_adapter *adapter = netdev_priv(netdev);
+> Dimitri Fedrau (5):
+>   net: phy: Add BaseT1 auto-negotiation constants
+>   net: phy: Support 100/1000BT1 linkmode advertisements
+>   net: phy: c45: detect 100/1000BASE-T1 linkmode advertisements
+>   net: phy: marvell-88q2xxx: fix typos
+>   net: phy: marvell-88q2xxx: add driver for the Marvell 88Q2220 PHY
 > 
-> 	pm_runtime_get_sync(&adapter->pdev->dev);
-> 	return 0;
-> }
+>  drivers/net/phy/marvell-88q2xxx.c | 234 +++++++++++++++++++++++++++---
+>  drivers/net/phy/phy-c45.c         |   3 +-
+>  include/linux/marvell_phy.h       |   1 +
+>  include/linux/mdio.h              |   8 +
+>  include/uapi/linux/mdio.h         |   2 +
+>  5 files changed, 230 insertions(+), 18 deletions(-)
 > 
-> static void igc_ethtool_complete(struct net_device *netdev)
-> {
-> 	struct igc_adapter *adapter = netdev_priv(netdev);
-> 
-> 	pm_runtime_put(&adapter->pdev->dev);
-> }
-> 
-> so unless we think that returning -ENODEV from all ethtool calls
-> when cable is not plugged in is okay - removing the PM resume
-> from the core doesn't buy us much :(
+net-next is closed. Let's see whether the maintainers still accept your series.
+Otherwise you may have to resubmit once net-next opens again.
 
-It would address the regression in simple fix that can be send
-to -stable. Event if -ENODEV for all ethtool ops and open is
-not good, it's still better than deadlocking whole system.
-
-I agree RPM for igc is not perfect and has issues that need
-to be fix. People are working on it inspired by e1000e
-implementation. Is should address the main requirement:
-no rtnl_lock on resume path - waking up device when needed
-on ndo/ethtool.
-
-But that would not be simple fix AFICT, more likely it
-will be reimplementation of the whole thing.
-
-Additionally, in context of ethtool, previously each driver 
-that implement RPM, woke up the device for actual HW access,
-and don't when only memory was used. For example e1000e has
-fine tuned ethtool ops. Some others like cadence/macb or 
-renesas/sh_eth went event further and have their 
-pm_runtime_resume_get_sync() in register access functions.
-
-Now a hardware is powered up on every ethtool op regardless
-of actual need.
-
-So I think that the calls are only needed for some drivers, but
-for others are detrimental. Would adding new netdev->priv_flags
-for calling them be acceptable ?
-
-Regards
-Stanislaw
 
