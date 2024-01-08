@@ -1,54 +1,64 @@
-Return-Path: <netdev+bounces-62323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76DEA826A38
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:08:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB62B826A36
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:08:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB3B1C2235C
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:08:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73414282922
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C10AD510;
-	Mon,  8 Jan 2024 09:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8328B11715;
+	Mon,  8 Jan 2024 09:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pF0VyO+o"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oRrbnQio"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F7713FE4;
-	Mon,  8 Jan 2024 09:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4085PPNP010851;
-	Mon, 8 Jan 2024 09:07:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=uVnjU5qE0zN1BVEJIW7uX8TLCXT3C3/9s/FQ7gedwi8=; b=pF
-	0VyO+oDi92UhCCTXHb0kils0LYT2umNDhwqri7MvE+LFuIvSlBXT63jRi5lfsoDJ
-	Zp6f8BETIa5DX7oHLXxvLhfku421InmAB1gXR07vwLVv3LW0ZGLqmWd3n5FvGoKl
-	P/KSV+GCm5xMVzVB49nFnTakZJ8Nbr55ZToeNaQw8/bL5gzyXOWEMsFRwgKMWJ9i
-	23Ek/XFrXeHpYklEUZASxZYQTmzHNixu6u/7UanL3AC5YkAKCxpwE94J+VjKZtX7
-	QavHOWaDKjVAgiFfHcjnhMoR6alJo++YRCDpCJ1+soW9ll/CkEiqdQGlgi7WQl/0
-	psgCVS3fGh/u5+kxYu9A==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3veymmbfae-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 09:07:20 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 408972Kj006927
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 8 Jan 2024 09:07:02 GMT
-Received: from [10.253.76.26] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 8 Jan
- 2024 01:06:55 -0800
-Message-ID: <63219ada-4bc0-44df-9541-2840229febc6@quicinc.com>
-Date: Mon, 8 Jan 2024 17:06:51 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1372125A2
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 09:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5537dd673e5so1275698a12.0
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 01:07:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704704841; x=1705309641; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TfyMZ4uxeLeGNsfgNFg36j0oPv91P95/HsCT857d76o=;
+        b=oRrbnQioNUmPLQ4+or0WHNcU8JSk2uJxuvIQUrjpb6fgbHmj/cZOp6vV7hFK3WNAaf
+         JwdUnpYoyUQOjDLZFXXNwjHB2g2+I0J/HD2GGKEqUdxYrjKzOrl3Hj4vauDEB/kh4i8C
+         FFg1A297GcBQ/CTIw8ZKmy6GvTQW13vNc8nSTHK60hgj4Ex4yuc1eRZ11IavWbfQCdvz
+         S0M2YFSrcx05umI1xsL4iqLvVaae3CEFcc6as8O2hxnYzN3bcS5vj4EXuvk14orxXg+k
+         IGO1UtZG5D+rbnQKIEqLzDqCNV0QFBeOihdWidBCZ4ViEHCB1kqwec8ptg2b75g7Loep
+         V7nA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704704841; x=1705309641;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TfyMZ4uxeLeGNsfgNFg36j0oPv91P95/HsCT857d76o=;
+        b=st2UcPo0twDttBQkCkqZ1JV7oQrLz9JgewBx+k643zlChCjNhZKZHNIi8K+uwP/QTT
+         HD2J1u9fNygCIjd6jmTjkTD8tmfpCFz2SoNEjXDL5TtqlpelA1QdbtnADpFru+ixgRaC
+         se/LxrCBgjv9/eGgrCUCOqSrmxUWeZTnZh5DH3VIuffZBsa4uPGk0YmWKwhPHkaVODxO
+         qrMC2slFVwKnGOP32Vb4FZ8Ft+lK7y+T0hPKaOhFYp1O+F0+oayFtou4oGJi2v855F0/
+         Q84pzv7sYyYyJoLIo+XYNbxVwNkjcM17GAd3l+1CFP+cfTTLNiYA4sVhdQPfWGntcVu5
+         KNMg==
+X-Gm-Message-State: AOJu0Yxr2gmCm+wUPLJPX3hXn4RYVL/Q32kt/36TY0nNevOwlACErYkS
+	OI6RiW5pNp3dgexQyvdQnu0sDHDlwN+3Cg==
+X-Google-Smtp-Source: AGHT+IEj0NqhOqwtk8SyYsnoIn5h7NwVrFcadbe6AbAfRdzxrvmdmqjHXMThsPJrLRshgFdr6wDX0A==
+X-Received: by 2002:a50:cd0f:0:b0:557:3c34:5c0c with SMTP id z15-20020a50cd0f000000b005573c345c0cmr2054684edi.40.1704704841202;
+        Mon, 08 Jan 2024 01:07:21 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.112])
+        by smtp.gmail.com with ESMTPSA id en23-20020a056402529700b00557535489adsm2767091edb.37.2024.01.08.01.07.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 01:07:20 -0800 (PST)
+Message-ID: <1c0474d3-e182-48c8-8ec2-12847c84164b@linaro.org>
+Date: Mon, 8 Jan 2024 10:07:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,118 +66,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/5] support ipq5332 platform
+Subject: Re: [PATCH 2/2] net: stmmac: Add StarFive JH8100 dwmac support
 Content-Language: en-US
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231225084424.30986-1-quic_luoj@quicinc.com>
- <a6a50fb6-871f-424c-a146-12b2628b8b64@gmail.com>
- <cfb04c82-3cc3-49f6-9a8a-1f6d1a22df40@quicinc.com>
- <dd05a599-247a-4516-8ad3-7550ceea99f7@gmail.com>
- <ac1977f5-cd6a-4f16-b0a0-f4322c34c5f5@quicinc.com>
- <bdeca791-f2e5-4256-b386-a75c03f93686@gmail.com>
- <895eadd7-1631-4b6b-8db4-d371f2e52611@lunn.ch>
- <1df87389-d78c-48e0-b743-0fd11bd82b85@gmail.com>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <1df87389-d78c-48e0-b743-0fd11bd82b85@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Tan Chun Hau <chunhau.tan@starfivetech.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Emil Renner Berthing <kernel@esmil.dk>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Simon Horman <horms@kernel.org>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Andrew Halaney <ahalaney@redhat.com>, Jisheng Zhang <jszhang@kernel.org>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+ Jee Heng Sia <jeeheng.sia@starfivetech.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20240108075810.14161-1-chunhau.tan@starfivetech.com>
+ <20240108075810.14161-3-chunhau.tan@starfivetech.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240108075810.14161-3-chunhau.tan@starfivetech.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: dBJMmOueCiwKNiVtb_v-cpc7Q5dzksgV
-X-Proofpoint-GUID: dBJMmOueCiwKNiVtb_v-cpc7Q5dzksgV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxlogscore=829 spamscore=0 phishscore=0 malwarescore=0 bulkscore=0
- suspectscore=0 adultscore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2401080077
 
+On 08/01/2024 08:58, Tan Chun Hau wrote:
+> Add JH8100 dwmac support.
+> 
+> Signed-off-by: Tan Chun Hau <chunhau.tan@starfivetech.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> index 5d630affb4d1..373714f6e382 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> @@ -146,6 +146,7 @@ static int starfive_dwmac_probe(struct platform_device *pdev)
+>  
+>  static const struct of_device_id starfive_dwmac_match[] = {
+>  	{ .compatible = "starfive,jh7110-dwmac"	},
+> +	{ .compatible = "starfive,jh8100-dwmac"	},
 
+No differences? Then why aren't the devices made compatible with each other?
 
-On 1/7/2024 6:03 AM, Sergey Ryazanov wrote:
-> On 06.01.2024 17:45, Andrew Lunn wrote:
->>> I just realized that the UNIPHY block is a MII (probably SGMII) 
->>> controller.
->>> Isn't it? And I expect that it responsible more then just for clock
->>> enabling. It should also activate and perform a basic configuration 
->>> of MII
->>> for actual data transmission. If so, then it should placed somewhere 
->>> under
->>> drivers/net/phy or drivers/net/pcs.
->>
->> Before we decide that, we need a description of what the UNIPHY
->> actually does, what registers it has, etc. Sometimes blocks like this
->> get split into a generic PHY, aka drivers/phy/ and a PCS driver. This
->> would be true if the UNIPHY is also used for USB SERDES, SATA SERDES
->> etc. The SERDES parts go into a generic PHY driver, and the SGMII on
->> to of the SERDES is placed is a PCS driver.
-> 
-> As far as I understand, UNIPHY only contains SGMII/PSGMII/whatever and a 
-> simple clock controller. PCIe & USB phys are implemented in other 
-> hardware blocks. See the lately merged USB support code for similar 
-> IPQ5018 SoC. But I can only speak to what I found searching online and 
-> checking the vendor's qca-ssdk "driver".
-> 
-> https://git.codelinaro.org/clo/qsdk/oss/lklm/qca-ssdk/-/tree/NHSS.QSDK.12.4.5.r3
-> 
-> I hope Luo can clarify with more confidence.
+Best regards,
+Krzysztof
 
-Yes, Sergey. UNIPHY includes the interface mode controller(SGMII/UXGMII
-PSGMII etc.) and the clock controller that provides the clocks to the
-PPE(packet process engine) ports, which is the dedicated UNIPHY(PCS) for
-connecting external PHY(such as qca8084 PHY) and located in the PPE
-hardware block. The UNIPHY of PPE can't be used for PCIE & USB.
-
-> 
->> The problem i have so far is that there is no usable description of
->> any of this hardware, and the developers trying to produce drivers for
->> this hardware don't actually seem to understand the Linux architecture
->> for things like this.
->>
->>> As far as I understand, we basically agree that clocks configuration 
->>> can be
->>> implemented based on the clock API using a more specialized driver(s) 
->>> than
->>> MDIO. The only obstacle is the PHY chip initialization issue explained
->>> below.
->>> Thank you for this compact yet detailed summary. Now it much more clear,
->>> what this phy chip requires to be initialized.
->>>
->>> Looks like you need to implement at least two drivers:
->>> 1. chip (package) level driver that is responsible for basic "package"
->>> initialization;
->>> 2. phy driver to handle actual phy capabilities.
->>
->> Nope. As i keep saying, please look at the work Christian is
->> doing. phylib already has the concept of a PHY package, e.g. look at
->> the MSCC driver, and how it uses devm_phy_package_join(). What is
->> missing is a DT binding which allows package properties to be
->> expressed in DT. And this is what Christian is adding.
-> 
-> Andrew, thank you so much for pointing me to that API and Christian's 
-> work. I have checked the DT change proposal and it fits this QCA8084 
-> case perfectly.
-> 
-> Am I right that all one has to do to solve this QCA8084 initialization 
-> case is wrap phys in a ethernet-phy-package node and use 
-> devm_phy_package_join() / phy_package_init_once() to do the basic 
-> initialization? So simple?
-> 
-> I came to put my 2c in and learnt a couple of new tricks. What a nice 
-> day :)
-> 
-> -- 
-> Sergey
 
