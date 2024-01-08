@@ -1,87 +1,139 @@
-Return-Path: <netdev+bounces-62343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E519A826B83
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:21:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18FFC826B84
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:22:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0438B1C21FF1
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:21:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A79B8282C1B
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C3D13AE2;
-	Mon,  8 Jan 2024 10:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008A013AE0;
+	Mon,  8 Jan 2024 10:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4KBiqmc"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="o8+G7C7L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C6713AE0
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 10:21:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F491C433C8;
-	Mon,  8 Jan 2024 10:21:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704709278;
-	bh=MNj882t9CtCVJPGigAfOfZrh+C2WYSXQq8SiXPGt+TY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V4KBiqmcMfduU4JFQRs9a3nSWyBqP6WUQ71/45JYUgsV2/VDBx0Wk9H57twr2viGR
-	 Z4iK8sikfedZE71N8Z1zINLUwgTV1zD7SBDQz9dHHHrYs99yOR3L4dIwBB+7hVl7jZ
-	 0WeBtONAWoQNsHk9L031vkr94mOrmkwnvXhYfziCYkeGdVsm3/JoxaNQ2Z5edo9Tsg
-	 wfnXBEs8Ep0EgbjD8cOX6Grkpc9M0Yze253/Ljm801Aqs9f9JeokWprvRBE3Tpcyah
-	 /dUXq1A0eP833Mb65mCQbpxYsGkvx12cgAoMxkR+E62UQ3zVoPBJkrwja8RoiuJ2E5
-	 GqQbuee53pk/w==
-Date: Mon, 8 Jan 2024 10:21:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: Re: [PATCH net-next 2/3] bnxt_en: Fix RCU locking for ntuple filters
- in bnxt_srxclsrldel()
-Message-ID: <20240108102113.GD132648@kernel.org>
-References: <20240105235439.28282-1-michael.chan@broadcom.com>
- <20240105235439.28282-3-michael.chan@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4600113AD8;
+	Mon,  8 Jan 2024 10:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E041240004;
+	Mon,  8 Jan 2024 10:22:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1704709348;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XuJv/OyK8RE0Y94blspywgd4cYFg7aH1NjsPMWEemMY=;
+	b=o8+G7C7L1f0U+TNR9hjwq2dvwbkDeoKwHmYJ/lL98i2S7oyotEB4PbNN8gyDcg5GRlloJ4
+	OciNnaR2VvZAC4nmjTZ+np5PbKkNYYG7o1Cxr7H5Ye6fAga97KSuwf7NsI7zp7idUgQpfg
+	SJ5mMW2o4WK9TYiKJbFjDrnvtHRuIBMM1O5SEMQzc5CfYklj5y1x6IP7YkqlmqWwl+YquJ
+	yqFc4NSjOXsnEZ7IPLJZI/AEBAntp7P30m6zqhukwqjO/1FoLS/c3pMqFGmgUl1G6OssGb
+	psc0qp57ss1dPfKAo2AdfXGmLbT3NcjCQLmbmv/g/I0FcIuhY6aWaSsm1ApBBw==
+Message-ID: <65274929-fa59-482c-a744-6b9ce162ab46@arinc9.com>
+Date: Mon, 8 Jan 2024 13:22:18 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240105235439.28282-3-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dsa: mt7530: support OF-based registration
+ of switch MDIO bus
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ David Bauer <mail@david-bauer.net>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20240106122142.235389-1-arinc.unal@arinc9.com>
+ <20240107195241.GB132648@kernel.org>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240107195241.GB132648@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Fri, Jan 05, 2024 at 03:54:38PM -0800, Michael Chan wrote:
-> After looking up an ntuple filter from a RCU hash list, the
-> rcu_read_unlock() call should be made after reading the structure,
-> or after determining that the filter cannot age out (by aRFS).
-> The existing code was calling rcu_read_unlock() too early in
-> bnxt_srxclsrldel().
+On 7.01.2024 22:52, Simon Horman wrote:
+> On Sat, Jan 06, 2024 at 03:21:42PM +0300, Arınç ÜNAL wrote:
+>> From: David Bauer <mail@david-bauer.net>
+>>
+>> Currently the MDIO bus of the switches the MT7530 DSA subdriver controls
+>> can only be registered as non-OF-based. Bring support for registering the
+>> bus OF-based.
+>>
+>> The subdrivers that control switches [with MDIO bus] probed on OF must
+>> follow this logic to support all cases properly:
+>>
+>> No switch MDIO bus defined: Populate ds->user_mii_bus, register the MDIO
+>> bus, set the interrupts for PHYs if "interrupt-controller" is defined at
+>> the switch node. This case should only be covered for the switches which
+>> their dt-bindings documentation didn't document the MDIO bus from the
+>> start. This is to keep supporting the device trees that do not describe the
+>> MDIO bus on the device tree but the MDIO bus is being used nonetheless.
+>>
+>> Switch MDIO bus defined: Don't populate ds->user_mii_bus, register the MDIO
+>> bus, set the interrupts for PHYs if ["interrupt-controller" is defined at
+>> the switch node and "interrupts" is defined at the PHY nodes under the
+>> switch MDIO bus node].
+>>
+>> Switch MDIO bus defined but explicitly disabled: If the device tree says
+>> status = "disabled" for the MDIO bus, we shouldn't need an MDIO bus at all.
+>> Instead, just exit as early as possible and do not call any MDIO API.
+>>
+>> The use of ds->user_mii_bus is inappropriate when the MDIO bus of the
+>> switch is described on the device tree [1], which is why we don't populate
+>> ds->user_mii_bus in that case.
+>>
+>> Link: https://lore.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/ [1]
+>> Suggested-by: David Bauer <mail@david-bauer.net>
+>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+>> ---
+>>   drivers/net/dsa/mt7530.c | 18 ++++++++++++++----
+>>   1 file changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+>> index 391c4dbdff42..39d7e7ad7154 100644
+>> --- a/drivers/net/dsa/mt7530.c
+>> +++ b/drivers/net/dsa/mt7530.c
+>> @@ -2153,17 +2153,25 @@ mt7530_free_irq(struct mt7530_priv *priv)
+>>   static int
+>>   mt7530_setup_mdio(struct mt7530_priv *priv)
+>>   {
+>> +	struct device_node *mnp, *np = priv->dev->of_node;
+>>   	struct dsa_switch *ds = priv->ds;
+>>   	struct device *dev = priv->dev;
+>>   	struct mii_bus *bus;
+>>   	static int idx;
+>> -	int ret;
+>> +	int ret = 0;
+>> +
+>> +	mnp = of_get_child_by_name(np, "mdio");
+>> +
+>> +	if (mnp && !of_device_is_available(mnp))
+>> +		goto out;
 > 
-> As suggested by Simon Horman, change the code to handle the error
-> case of fltr_base not found in the if condition.  The code looks
-> cleaner this way.
+> nit: I think it would easier on the eyes to simply
 > 
-> Fixes: 8d7ba028aa9a ("bnxt_en: Add support for ntuple filter deletion by ethtool.")
-> Suggested-by: Simon Horman <horms@kernel.org>
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> Link: https://lore.kernel.org/netdev/20240104145955.5a6df702@kernel.org/
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> 		return 0;
 
-Thanks Michael,
+Will do.
 
-I agree that this addresses the issue flagged at the Link above.
-That it is a bug-fix, and should have a Fixes tag.
-And that as the cited commit has not propagated beyond net-next
-it is appropriate to target this patch at net-next.
-
-FWIIW, I might have separated the bug fix from the code re-arrangement that
-I suggested. But perhaps that is over doing things as the patch is for
-net-next anyway.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-
+Thanks.
+Arınç
 
