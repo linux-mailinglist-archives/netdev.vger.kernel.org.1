@@ -1,103 +1,173 @@
-Return-Path: <netdev+bounces-62321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26EFE826A27
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:06:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76DEA826A38
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:08:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC4111F230D4
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:06:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB3B1C2235C
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FA6DDBB;
-	Mon,  8 Jan 2024 09:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C10AD510;
+	Mon,  8 Jan 2024 09:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pF0VyO+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78907F516;
-	Mon,  8 Jan 2024 09:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4T7p6R3dCJz1Q7tL;
-	Mon,  8 Jan 2024 17:04:47 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0212E1A0172;
-	Mon,  8 Jan 2024 17:06:18 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 8 Jan
- 2024 17:06:17 +0800
-Subject: Re: [PATCH net-next 4/6] vhost/net: remove
- vhost_net_page_frag_refill()
-To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jason Wang
-	<jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<bpf@vger.kernel.org>
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
- <20240103095650.25769-5-linyunsheng@huawei.com>
- <1a66f99173de36e1ae639569582feaf76202361d.camel@gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <705e59c2-6f46-5d39-b8da-8e2310904d71@huawei.com>
-Date: Mon, 8 Jan 2024 17:06:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F7713FE4;
+	Mon,  8 Jan 2024 09:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4085PPNP010851;
+	Mon, 8 Jan 2024 09:07:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=uVnjU5qE0zN1BVEJIW7uX8TLCXT3C3/9s/FQ7gedwi8=; b=pF
+	0VyO+oDi92UhCCTXHb0kils0LYT2umNDhwqri7MvE+LFuIvSlBXT63jRi5lfsoDJ
+	Zp6f8BETIa5DX7oHLXxvLhfku421InmAB1gXR07vwLVv3LW0ZGLqmWd3n5FvGoKl
+	P/KSV+GCm5xMVzVB49nFnTakZJ8Nbr55ZToeNaQw8/bL5gzyXOWEMsFRwgKMWJ9i
+	23Ek/XFrXeHpYklEUZASxZYQTmzHNixu6u/7UanL3AC5YkAKCxpwE94J+VjKZtX7
+	QavHOWaDKjVAgiFfHcjnhMoR6alJo++YRCDpCJ1+soW9ll/CkEiqdQGlgi7WQl/0
+	psgCVS3fGh/u5+kxYu9A==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3veymmbfae-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 09:07:20 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 408972Kj006927
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 8 Jan 2024 09:07:02 GMT
+Received: from [10.253.76.26] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 8 Jan
+ 2024 01:06:55 -0800
+Message-ID: <63219ada-4bc0-44df-9541-2840229febc6@quicinc.com>
+Date: Mon, 8 Jan 2024 17:06:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1a66f99173de36e1ae639569582feaf76202361d.camel@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/5] support ipq5332 platform
 Content-Language: en-US
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>, Andrew Lunn <andrew@lunn.ch>
+CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
+References: <20231225084424.30986-1-quic_luoj@quicinc.com>
+ <a6a50fb6-871f-424c-a146-12b2628b8b64@gmail.com>
+ <cfb04c82-3cc3-49f6-9a8a-1f6d1a22df40@quicinc.com>
+ <dd05a599-247a-4516-8ad3-7550ceea99f7@gmail.com>
+ <ac1977f5-cd6a-4f16-b0a0-f4322c34c5f5@quicinc.com>
+ <bdeca791-f2e5-4256-b386-a75c03f93686@gmail.com>
+ <895eadd7-1631-4b6b-8db4-d371f2e52611@lunn.ch>
+ <1df87389-d78c-48e0-b743-0fd11bd82b85@gmail.com>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <1df87389-d78c-48e0-b743-0fd11bd82b85@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: dBJMmOueCiwKNiVtb_v-cpc7Q5dzksgV
+X-Proofpoint-GUID: dBJMmOueCiwKNiVtb_v-cpc7Q5dzksgV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ mlxlogscore=829 spamscore=0 phishscore=0 malwarescore=0 bulkscore=0
+ suspectscore=0 adultscore=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401080077
 
-On 2024/1/6 0:06, Alexander H Duyck wrote:
->>  
->>  static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
->> @@ -1353,8 +1318,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
->>  			vqs[VHOST_NET_VQ_RX]);
->>  
->>  	f->private_data = n;
->> -	n->page_frag.page = NULL;
->> -	n->refcnt_bias = 0;
->> +	n->pf_cache.va = NULL;
->>  
->>  	return 0;
->>  }
->> @@ -1422,8 +1386,9 @@ static int vhost_net_release(struct inode *inode, struct file *f)
->>  	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
->>  	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
->>  	kfree(n->dev.vqs);
->> -	if (n->page_frag.page)
->> -		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
->> +	if (n->pf_cache.va)
->> +		__page_frag_cache_drain(virt_to_head_page(n->pf_cache.va),
->> +					n->pf_cache.pagecnt_bias);
->>  	kvfree(n);
->>  	return 0;
->>  }
+
+
+On 1/7/2024 6:03 AM, Sergey Ryazanov wrote:
+> On 06.01.2024 17:45, Andrew Lunn wrote:
+>>> I just realized that the UNIPHY block is a MII (probably SGMII) 
+>>> controller.
+>>> Isn't it? And I expect that it responsible more then just for clock
+>>> enabling. It should also activate and perform a basic configuration 
+>>> of MII
+>>> for actual data transmission. If so, then it should placed somewhere 
+>>> under
+>>> drivers/net/phy or drivers/net/pcs.
+>>
+>> Before we decide that, we need a description of what the UNIPHY
+>> actually does, what registers it has, etc. Sometimes blocks like this
+>> get split into a generic PHY, aka drivers/phy/ and a PCS driver. This
+>> would be true if the UNIPHY is also used for USB SERDES, SATA SERDES
+>> etc. The SERDES parts go into a generic PHY driver, and the SGMII on
+>> to of the SERDES is placed is a PCS driver.
 > 
-> I would recommend reordering this patch with patch 5. Then you could
-> remove the block that is setting "n->pf_cache.va = NULL" above and just
-> make use of page_frag_cache_drain in the lower block which would also
-> return the va to NULL.
-
-I am not sure if we can as there is no zeroing for 'struct vhost_net' in
-vhost_net_open().
-
-If we don't have "n->pf_cache.va = NULL", don't we use the uninitialized data
-when calling page_frag_alloc_align() for the first time?
-
-> .
+> As far as I understand, UNIPHY only contains SGMII/PSGMII/whatever and a 
+> simple clock controller. PCIe & USB phys are implemented in other 
+> hardware blocks. See the lately merged USB support code for similar 
+> IPQ5018 SoC. But I can only speak to what I found searching online and 
+> checking the vendor's qca-ssdk "driver".
 > 
+> https://git.codelinaro.org/clo/qsdk/oss/lklm/qca-ssdk/-/tree/NHSS.QSDK.12.4.5.r3
+> 
+> I hope Luo can clarify with more confidence.
+
+Yes, Sergey. UNIPHY includes the interface mode controller(SGMII/UXGMII
+PSGMII etc.) and the clock controller that provides the clocks to the
+PPE(packet process engine) ports, which is the dedicated UNIPHY(PCS) for
+connecting external PHY(such as qca8084 PHY) and located in the PPE
+hardware block. The UNIPHY of PPE can't be used for PCIE & USB.
+
+> 
+>> The problem i have so far is that there is no usable description of
+>> any of this hardware, and the developers trying to produce drivers for
+>> this hardware don't actually seem to understand the Linux architecture
+>> for things like this.
+>>
+>>> As far as I understand, we basically agree that clocks configuration 
+>>> can be
+>>> implemented based on the clock API using a more specialized driver(s) 
+>>> than
+>>> MDIO. The only obstacle is the PHY chip initialization issue explained
+>>> below.
+>>> Thank you for this compact yet detailed summary. Now it much more clear,
+>>> what this phy chip requires to be initialized.
+>>>
+>>> Looks like you need to implement at least two drivers:
+>>> 1. chip (package) level driver that is responsible for basic "package"
+>>> initialization;
+>>> 2. phy driver to handle actual phy capabilities.
+>>
+>> Nope. As i keep saying, please look at the work Christian is
+>> doing. phylib already has the concept of a PHY package, e.g. look at
+>> the MSCC driver, and how it uses devm_phy_package_join(). What is
+>> missing is a DT binding which allows package properties to be
+>> expressed in DT. And this is what Christian is adding.
+> 
+> Andrew, thank you so much for pointing me to that API and Christian's 
+> work. I have checked the DT change proposal and it fits this QCA8084 
+> case perfectly.
+> 
+> Am I right that all one has to do to solve this QCA8084 initialization 
+> case is wrap phys in a ethernet-phy-package node and use 
+> devm_phy_package_join() / phy_package_init_once() to do the basic 
+> initialization? So simple?
+> 
+> I came to put my 2c in and learnt a couple of new tricks. What a nice 
+> day :)
+> 
+> -- 
+> Sergey
 
