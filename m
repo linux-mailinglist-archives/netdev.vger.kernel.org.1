@@ -1,116 +1,165 @@
-Return-Path: <netdev+bounces-62340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31E9E826B16
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:48:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 100A4826B78
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 11:18:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4A261F20FD0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:48:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8A051F23021
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B09E125DE;
-	Mon,  8 Jan 2024 09:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A57B134AC;
+	Mon,  8 Jan 2024 10:18:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="nZqG+MxH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FN6gRA7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21CB12B6B
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 09:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A557040003;
-	Mon,  8 Jan 2024 09:48:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1704707315;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HpNNywnRnw+56QHyvKQN19iRJaBTEV7iLGpuLYVJtmU=;
-	b=nZqG+MxHbmt4JILeh6E1mhwL7TiW3WEOXPPU2VOJROrXQJE+ur4sO0wlgkUEDWm8p/IL2O
-	3ba6Zb1epIWPBtF1VdTII5Kn2bKYTNzO6foX876Zf2UQTE2p8Pq9RQK61+BV0m1RqyEJ1C
-	dxcj7Dv6u0T8SKY/+dvHE9nQqeZ/+c2of4GZcnWWdgOMuQK4KBFy/uPoevC3JaLoPaIWC5
-	3I7c13HcRnIZvz+zXIZUk/19Fv+rjVlK7d0zZyFaxsG/NFdOdU77kv9px6QbCinroZhDJM
-	3P82UW70bVfW6E4B1HLYE7n3iWUaFWtHJpbyN0C9EtP5Nwm3cSoRORKCqrhB9w==
-Message-ID: <11ea1885-9ee3-46c6-92e5-487df27bebc3@arinc9.com>
-Date: Mon, 8 Jan 2024 12:48:30 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B4113AD8
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 10:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso12509a12.0
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 02:18:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704709109; x=1705313909; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8Qfly6nhl8jFfx0HUMf8kF4M5Jg9zmmCAg6MMJqYeTY=;
+        b=FN6gRA7mALBe1fK1MNNMoNbqZ0Jq3PVgOBum/KdFHf/7817h+DQzTV6h6C5AjoZbg6
+         CcVn8V1xzXT4CrOcdTmNwuQ00RgWg1wKny95A6aB20vZndsXz3tvp6w5veUUnCvTuDIe
+         DnV2aZUtBdC62PikOHFYjjnzQPpmM7nS0UPFG8V4e9NSMci0Wm+q02N+VnYZr5coptA8
+         WnIHZE5GFGU+HWdA1ysBVMgtLpjffa2Q96ZUXJ/iXdC4EJ9MOJNoMVYfZdxBFPVldboq
+         chERDvKNAv0LIPvBxH5LUl3pRaIz1FJbXQ8KqK+5oB7PzM0gRrUZKiAHtvOSXN6152lD
+         IvbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704709109; x=1705313909;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8Qfly6nhl8jFfx0HUMf8kF4M5Jg9zmmCAg6MMJqYeTY=;
+        b=NX+B7Ky2Xm/4ayBIlRqiKJc8YeiZ9PaeBeVfbZfg0MzaR5GF5G89n6bbqWHK26lqO3
+         hYjvR0qmLc0ee+7rC6zGNQgHyxj/oQ8cmQZHUABm7x1RxfqUuMCSH2UyyaMoqWisAWtx
+         PfUOBxAcyJ1XJbxkiHTLtNgX6djRX7X3n6QLZt3xULQsXr4m1AyrjsJjKstMLwkoJQXX
+         TpRk7AgiwvDwT/hg7T66UWWD5edp6KVfuKxK0o1mU+J+kKs1AcVrymOdckJg03fJypan
+         GUwV7O6pYwCIUpdwm20WgmHWkYVQfdI+J8D1nh5+O3M+piIMrZw1e/x9WxaRQUn8cSE6
+         JlSQ==
+X-Gm-Message-State: AOJu0YxUbLv0udlvZljfnL1a238ED8X4+ABeOtZOns5pDwL10z78T42d
+	RyhvqXiELu8eY/JD/yWQyQ5TQevvOxeyUCkj1aAIuhbu3tc3
+X-Google-Smtp-Source: AGHT+IFEWfYqZHIG+LUJ5EaJhMftBDDG9sJmw7KbKz3j+4Pc9Jto7FXpe22zDYZiLa6obmvd316Ar7V7fftFPa1Gtf8=
+X-Received: by 2002:a50:cdd1:0:b0:557:1142:d5bb with SMTP id
+ h17-20020a50cdd1000000b005571142d5bbmr268574edj.4.1704709108543; Mon, 08 Jan
+ 2024 02:18:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 8/8] Revert "net: dsa: OF-ware slave_mii_bus"
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
- andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-References: <20231223005253.17891-1-luizluca@gmail.com>
- <20231223005253.17891-9-luizluca@gmail.com>
- <a638d0de-bfb3-4937-969e-13d494b6a2c3@arinc9.com>
- <7385ca39-182e-42c1-80bf-fd2d0c0aabdd@arinc9.com>
- <92fe7016-8c01-4f82-b7ec-a23f52348059@arinc9.com>
- <CAJq09z46T+uySp7DOLSpmh-Zouk2_CwvdMSmyuqB14bKSYf+jg@mail.gmail.com>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <CAJq09z46T+uySp7DOLSpmh-Zouk2_CwvdMSmyuqB14bKSYf+jg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+References: <20240104232714.619657-1-xzou017@ucr.edu>
+In-Reply-To: <20240104232714.619657-1-xzou017@ucr.edu>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 8 Jan 2024 11:18:15 +0100
+Message-ID: <CANn89iLZKMW4ncpk2TAsGKo=t+fm=Jss9466zF5YQ0NN+M_K9A@mail.gmail.com>
+Subject: Re: [PATCH] net: gre: complete lockless access to dev->needed_headroom
+To: Xiaochen Zou <xzou017@ucr.edu>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8.01.2024 07:44, Luiz Angelo Daros de Luca wrote:
-> Hi Arinç,
-> 
->> It looks like this patch will cause the MDIO bus of the switches probed on
->> OF which are controlled by these subdrivers to only be registered
->> non-OF-based.
->>
->> drivers/net/dsa/b53/b53_common.c
->> drivers/net/dsa/lan9303-core.c
->> drivers/net/dsa/vitesse-vsc73xx-core.c
->>
->> These subdrivers let the DSA driver register the bus OF-based or
->> non-OF-based:
->> - ds->ops->phy_read() and ds->ops->phy_write() are present.
->> - ds->user_mii_bus is not populated.
-> 
-> I checked the changes on those drivers since
-> fe7324b932222574a0721b80e72c6c5fe57960d1 and nothing indicates that
-> they were changing anything related to the user mii bus. I also
-> checked bindings for the mdio node requirement. None of them mentioned
-> the mdio node.
+On Fri, Jan 5, 2024 at 12:26=E2=80=AFAM Xiaochen Zou <xzou017@ucr.edu> wrot=
+e:
+>
+> According to 4b397c06cb9 (net: tunnels: annotate lockless
+> accesses to dev->needed_headroom), we need to use lockless
+> access to protect dev->needed_headroom from data racing.
+> This patch complete the changes in ip(6)_gre.
+>
+> More changes in other modules might be needed for completeness.
+>
+> Signed-off-by: Xiaochen Zou <xzou017@ucr.edu>
+> ---
+>  net/ipv4/ip_gre.c  | 12 ++++++------
+>  net/ipv6/ip6_gre.c | 12 ++++++------
+>  2 files changed, 12 insertions(+), 12 deletions(-)
+>
+> diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+> index 5169c3c72cff..8c979c421d79 100644
+> --- a/net/ipv4/ip_gre.c
+> +++ b/net/ipv4/ip_gre.c
+> @@ -491,7 +491,7 @@ static void gre_fb_xmit(struct sk_buff *skb, struct n=
+et_device *dev,
+>         key =3D &tun_info->key;
+>         tunnel_hlen =3D gre_calc_hlen(key->tun_flags);
+>
+> -       if (skb_cow_head(skb, dev->needed_headroom))
+> +       if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+>                 goto err_free_skb;
+>
+>         /* Push Tunnel header. */
+> @@ -541,7 +541,7 @@ static void erspan_fb_xmit(struct sk_buff *skb, struc=
+t net_device *dev)
+>         version =3D md->version;
+>         tunnel_hlen =3D 8 + erspan_hdr_len(version);
+>
+> -       if (skb_cow_head(skb, dev->needed_headroom))
+> +       if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+>                 goto err_free_skb;
+>
+>         if (gre_handle_offloads(skb, false))
+> @@ -653,7 +653,7 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
+>                     skb_checksum_start(skb) < skb->data)
+>                         goto free_skb;
+>         } else {
+> -               if (skb_cow_head(skb, dev->needed_headroom))
+> +               if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+>                         goto free_skb;
+>
+>                 tnl_params =3D &tunnel->parms.iph;
+> @@ -689,7 +689,7 @@ static netdev_tx_t erspan_xmit(struct sk_buff *skb,
+>         if (gre_handle_offloads(skb, false))
+>                 goto free_skb;
+>
+> -       if (skb_cow_head(skb, dev->needed_headroom))
+> +       if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+>                 goto free_skb;
+>
+>         if (skb->len > dev->mtu + dev->hard_header_len) {
+> @@ -742,7 +742,7 @@ static netdev_tx_t gre_tap_xmit(struct sk_buff *skb,
+>         if (gre_handle_offloads(skb, !!(tunnel->parms.o_flags & TUNNEL_CS=
+UM)))
+>                 goto free_skb;
+>
+> -       if (skb_cow_head(skb, dev->needed_headroom))
+> +       if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom)))
+>                 goto free_skb;
+>
+>         __gre_xmit(skb, dev, &tunnel->parms.iph, htons(ETH_P_TEB));
+> @@ -768,7 +768,7 @@ static void ipgre_link_update(struct net_device *dev,=
+ bool set_mtu)
+>         if (dev->header_ops)
+>                 dev->hard_header_len +=3D len;
+>         else
+> -               dev->needed_headroom +=3D len;
+> +               WRITE_ONCE(dev->needed_headroom, dev->needed_headroom + l=
+en);
 
-Ok, we need to specifically mention the latter on the patch log.
+Can the updates here happen while packets are in flight ?
 
-> 
->> Not being able to register the bus OF-based may cause issues. There is an
->> example for the switch on the MT7988 SoC which is controlled by the MT7530
->> DSA subdriver. Being able to reference the PHYs on the switch MDIO bus is
->> mandatory on MT7988 as calibration data from NVMEM for each PHY is
->> required.
->>
->> I suggest that we hold off on this patch until these subdrivers are made to
->> be capable of registering the MDIO bus as OF-based on their own.
-> 
-> We might be over cautious keeping this for more time after the realtek
-> refactoring gets merged. The using OF with the generic user mii bus
-> driver is just a broken design and probably not in use. Anyway, it is
-> not a requirement for the series. If there is no objection, I can drop
-> it.
+ip6_tnl_xmit() updates definitely could happen while packets are in
+flight, this is why we needed
 
-Sounds good to me. I'd like to take this patch off your hands.
+if (max_headroom > READ_ONCE(dev->needed_headroom))
+     WRITE_ONCE(dev->needed_headroom, max_headroom);
 
-> 
-> I would like to send v4 with the OF node handling simplified by the
-> change in the MDIO API. However, I'm reluctant to send mostly the same
-> code without any reviews.
+Do you have a KCSAN stack trace or something ?
 
-I suppose our conversation here will remind Vladimir and Alvin to review.
+Normally, dev->needed_headroom is only set at setup time,
 
-Arınç
+Commit 8eb30be0352d ("ipv6: Create ip6_tnl_xmit") violated this rule.
 
