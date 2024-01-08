@@ -1,118 +1,100 @@
-Return-Path: <netdev+bounces-62393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A351826ECE
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:48:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67A3D826EE1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A6FE1C225E6
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:48:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07A101F2102E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9A2537E2;
-	Mon,  8 Jan 2024 12:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6078E41767;
+	Mon,  8 Jan 2024 12:47:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="PoFifSp4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UTuehdpX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A18B537F7;
-	Mon,  8 Jan 2024 12:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 407MlM8B003928;
-	Mon, 8 Jan 2024 04:42:51 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	pfpt0220; bh=ILL0lC/Z1d2NsrDLllEhMIE97c6g4s+I/9UGKFUsP5c=; b=PoF
-	ifSp4g0uFBF5XeK0P2A15It+NA8Ci+W/AsiTi4kmRI0bm8Vh6y7wiEM9QqArgsXD
-	blsLuAcVKMAfA4klSV4LB4DDju8PBMcD1fkWtIwNnpqPiWgnadhT8qge7vz4EXDn
-	MkIHR5afVAaAmr9d5G4VYtQQ98FaAu5i/PiwN9Z7NzIxz7xnzrJ6aEZ7Q/UO8xXi
-	Ur6jDvsSKfsgvztLGGtutCdVQayfaIdFKsaL7vgNzQpaOWB5QVWntkuo68Wihuse
-	gXdKvcH4w1mzRP0J7+6B6ihcmmDU3X/pnkgI//JVyCtPzPq6hK0Pm+kwtD32kx45
-	k1jxqC6xqlyUdJOHkDg==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3vf78n4tng-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 04:42:51 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 8 Jan
- 2024 04:42:49 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 8 Jan 2024 04:42:49 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id C5E543F7072;
-	Mon,  8 Jan 2024 04:42:48 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <sedara@marvell.com>,
-        <srasheed@marvell.com>, <egallen@redhat.com>, <mschmidt@redhat.com>,
-        <pabeni@redhat.com>, <kuba@kernel.org>, <horms@kernel.org>,
-        <wizhao@redhat.com>, <kheib@redhat.com>, <konguyen@redhat.com>
-Subject: [PATCH net-next v4 8/8] octeon_ep_vf: update MAINTAINERS
-Date: Mon, 8 Jan 2024 04:42:13 -0800
-Message-ID: <20240108124213.2966536-9-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240108124213.2966536-1-srasheed@marvell.com>
-References: <20240108124213.2966536-1-srasheed@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340F340C1C
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 12:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704718046; x=1736254046;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VGs+ZJUpKX3KvN3rtWTzrwtVsSqIw06Chl2fIx+a8vc=;
+  b=UTuehdpXh3XRwcYwzqUxODqfAdUiTFZ8mQR6EbG5AV3a6xIlyi1kzGOL
+   Kdywj5NKLN9pliO1SXgmGZOc2oquYqDeoEPot2lrXgCplwSK8jibsUvC5
+   q32ueMwLhpphnkdJ72Mk3qOVAW4Cf2f8E29h2pkeU7HO2WMXTRZopVoDt
+   40t/pDKWda5jtKxADi5XeWYFAG2pupROs8+CYw/+ZJXV5VgdUOLseXB5U
+   5Z403wbscHG7Xn6XP+Chg3KxYTOUgzz3OQ3bFKQBsDGT/3HzArD/syIgF
+   yodFtthdoSoZlcceBC3sW5qa2OX73jyvDbLMDP8p+b+TicAyAn47MiYSl
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="11359547"
+X-IronPort-AV: E=Sophos;i="6.04,341,1695711600"; 
+   d="scan'208";a="11359547"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 04:47:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="904791302"
+X-IronPort-AV: E=Sophos;i="6.04,341,1695711600"; 
+   d="scan'208";a="904791302"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
+  by orsmga004.jf.intel.com with ESMTP; 08 Jan 2024 04:47:23 -0800
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v5 iwl-next 0/6] ice: fix timestamping in reset process
+Date: Mon,  8 Jan 2024 13:47:11 +0100
+Message-Id: <20240108124717.1845481-1-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Z6edvBpavIZgrRBVO2wFe0mltnyCdM38
-X-Proofpoint-GUID: Z6edvBpavIZgrRBVO2wFe0mltnyCdM38
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
 
-add MAINTAINERS for octeon_ep_vf driver.
+PTP reset process has multiple places where timestamping can end up in
+an incorrect state.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V4:
-  - No changes
+This series introduces a proper state machine for PTP and refactors
+a large part of the code to ensure that timestamping does not break.
 
-V3: https://lore.kernel.org/all/20240105203823.2953604-9-srasheed@marvell.com/
-  - No changes
+Jacob Keller (5):
+  ice: pass reset type to PTP reset functions
+  ice: rename verify_cached to has_ready_bitmap
+  ice: rename ice_ptp_tx_cfg_intr
+  ice: factor out ice_ptp_rebuild_owner()
+  ice: stop destroying and reinitalizing Tx tracker during reset
 
-V2: https://lore.kernel.org/all/20231223134000.2906144-9-srasheed@marvell.com/
-  - No changes
+Karol Kolacinski (1):
+  ice: introduce PTP state machine
 
-V1: https://lore.kernel.org/all/20231221092844.2885872-9-srasheed@marvell.com/
+V4 -> V5: rebased the series
+V2 -> V3: rebased the series and fixed Tx timestamps missing
+V1 -> V2: rebased the series and dropped already merged patches
 
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/net/ethernet/intel/ice/ice.h         |   1 -
+ drivers/net/ethernet/intel/ice/ice_ethtool.c |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c    |   4 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 231 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ptp.h     |  34 ++-
+ 5 files changed, 166 insertions(+), 106 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0897c8467701..6ae61c14b4d6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12867,6 +12867,15 @@ L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/ethernet/marvell/octeon_ep
- 
-+MARVELL OCTEON ENDPOINT VF DRIVER
-+M:	Veerasenareddy Burru <vburru@marvell.com>
-+M:	Sathesh Edara <sedara@marvell.com>
-+M:	Shinas Rasheed <srasheed@marvell.com>
-+M:	Satananda Burla <sburla@marvell.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	drivers/net/ethernet/marvell/octeon_ep_vf
-+
- MARVELL OCTEONTX2 PHYSICAL FUNCTION DRIVER
- M:	Sunil Goutham <sgoutham@marvell.com>
- M:	Geetha sowjanya <gakula@marvell.com>
+
+base-commit: 006c8fe67ee86e7810f2aa3b365ab6de65cf2299
 -- 
-2.25.1
+2.40.1
 
 
