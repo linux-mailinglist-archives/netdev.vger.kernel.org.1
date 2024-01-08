@@ -1,53 +1,55 @@
-Return-Path: <netdev+bounces-62375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF9A826DDB
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:28:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A948B826DF7
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 13:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8A79283769
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:28:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF2AA1C211EB
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 12:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C893405D8;
-	Mon,  8 Jan 2024 12:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6893D405F6;
+	Mon,  8 Jan 2024 12:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OHz57BZz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ipy6BWUA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAA440C15;
-	Mon,  8 Jan 2024 12:27:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8BDDC433CC;
-	Mon,  8 Jan 2024 12:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492EB4315C;
+	Mon,  8 Jan 2024 12:28:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2792C433C8;
+	Mon,  8 Jan 2024 12:28:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704716874;
-	bh=vCaKEA2Sm/10Plfu11TW70i3phqa0ki6DcDUxsqRki8=;
+	s=k20201202; t=1704716908;
+	bh=+G5b9k2kYr/Ssctr7RTuveDSyQpoCR8qAoBv4tm6mnE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OHz57BZzGNdkT3O/obgVuDy0/SNEFh6ism8+0Eil6f2JPsV76I7uBQRyu0/3LiejL
-	 bg5Gn9sNpepkCkaXaQEsdMFuS3jCgh3Qb5ng/wgXlpz0vk2z79Go50GBahCvuIZzzW
-	 yJp/48FaINcleyg7hoSDzvYZWZyl5DdUq1fcXhfMflvI1z9qH+NxoovcoUoRVCJANz
-	 VpaA6OT9K8bm6W+AROjcPwEdnksJUdpF/KMxABQ5eOSBjrk+pg4bY/CY8Tr3VSF1Ym
-	 vz8M9/hzMkiJQ0dGdahBLkna1TMd2U/SUEkrpxXT/RGtFWxXsPRiVpIBOcB3Z/5DZu
-	 Ljl5yfHkE6eFg==
+	b=Ipy6BWUASE56rTRd92nafCpWn4bQA4KP8fWUcs9G+ouu4LVo+MjesB0JUUyAryO98
+	 uHUudKIuLw0HWy37CmfsBZ9n9XED+PmNMkK1PfE8R/Hid0gJfcoMHQyt21lq7fJQm2
+	 JS5cLRSRO+2qaJvgWywPMWjIAM+4qbskpC/wdAxOh+p3v8ZwGz2a2DnPDuw4/T3QIs
+	 nIOlllS2ev+EU+AOG1x/RWz26I/2a2yqFV/Lt7SZYiek4sDxs6iEJ4ZHlqn5bhykGW
+	 FAbHQYwl1AsDKqoK47n2x7ReFkr8CmuWzEZ+Jc4R03hSs88QgSA8kXcBvWzDUcsFm4
+	 bVy6sDUer7ZdQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: wangkeqi <wangkeqiwang@didiglobal.com>,
+Cc: Siddh Raman Pant <code@siddh.me>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Suman Ghosh <sumang@marvell.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 4/8] connector: Fix proc_event_num_listeners count not cleared
-Date: Mon,  8 Jan 2024 07:27:20 -0500
-Message-ID: <20240108122745.2090122-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 2/5] nfc: Do not send datagram if socket state isn't LLCP_BOUND
+Date: Mon,  8 Jan 2024 07:28:13 -0500
+Message-ID: <20240108122823.2090312-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240108122745.2090122-1-sashal@kernel.org>
-References: <20240108122745.2090122-1-sashal@kernel.org>
+In-Reply-To: <20240108122823.2090312-1-sashal@kernel.org>
+References: <20240108122823.2090312-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,44 +58,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.10
+X-stable-base: Linux 6.1.71
 Content-Transfer-Encoding: 8bit
 
-From: wangkeqi <wangkeqiwang@didiglobal.com>
+From: Siddh Raman Pant <code@siddh.me>
 
-[ Upstream commit c46bfba1337d301661dbb23cfd905d4cb51f27ca ]
+[ Upstream commit 6ec0d7527c4287369b52df3bcefd21a0c4fb2b7c ]
 
-When we register a cn_proc listening event, the proc_event_num_listener
-variable will be incremented by one, but if PROC_CN_MCAST_IGNORE is
-not called, the count will not decrease.
-This will cause the proc_*_connector function to take the wrong path.
-It will reappear when the forkstat tool exits via ctrl + c.
-We solve this problem by determining whether
-there are still listeners to clear proc_event_num_listener.
+As we know we cannot send the datagram (state can be set to LLCP_CLOSED
+by nfc_llcp_socket_release()), there is no need to proceed further.
 
-Signed-off-by: wangkeqi <wangkeqiwang@didiglobal.com>
+Thus, bail out early from llcp_sock_sendmsg().
+
+Signed-off-by: Siddh Raman Pant <code@siddh.me>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Reviewed-by: Suman Ghosh <sumang@marvell.com>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/connector/cn_proc.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/nfc/llcp_sock.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
-index 44b19e6961763..3d5e6d705fc6e 100644
---- a/drivers/connector/cn_proc.c
-+++ b/drivers/connector/cn_proc.c
-@@ -108,8 +108,9 @@ static inline void send_msg(struct cn_msg *msg)
- 		filter_data[1] = 0;
+diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
+index 645677f84dba2..819157bbb5a2c 100644
+--- a/net/nfc/llcp_sock.c
++++ b/net/nfc/llcp_sock.c
+@@ -796,6 +796,11 @@ static int llcp_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  	}
  
--	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
--			     cn_filter, (void *)filter_data);
-+	if (cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
-+			     cn_filter, (void *)filter_data) == -ESRCH)
-+		atomic_set(&proc_event_num_listeners, 0);
+ 	if (sk->sk_type == SOCK_DGRAM) {
++		if (sk->sk_state != LLCP_BOUND) {
++			release_sock(sk);
++			return -ENOTCONN;
++		}
++
+ 		DECLARE_SOCKADDR(struct sockaddr_nfc_llcp *, addr,
+ 				 msg->msg_name);
  
- 	local_unlock(&local_event.lock);
- }
 -- 
 2.43.0
 
