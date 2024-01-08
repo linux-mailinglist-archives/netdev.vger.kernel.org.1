@@ -1,109 +1,281 @@
-Return-Path: <netdev+bounces-62312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9FF9826956
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:21:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F165B82695E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:23:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7682C1F21666
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:21:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74FEE1F210B0
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 08:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145F29461;
-	Mon,  8 Jan 2024 08:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC639461;
+	Mon,  8 Jan 2024 08:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="qhu/VzqD"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520B8B665;
-	Mon,  8 Jan 2024 08:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4T7n761B8HzNkfT;
-	Mon,  8 Jan 2024 16:20:18 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id A18E6140518;
-	Mon,  8 Jan 2024 16:20:53 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 8 Jan
- 2024 16:20:53 +0800
-Subject: Re: [PATCH net-next 1/6] mm/page_alloc: modify
- page_frag_alloc_align() to accept align as an argument
-To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>,
-	<linux-mm@kvack.org>
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
- <20240103095650.25769-2-linyunsheng@huawei.com>
- <3f382fdcacc10cf897df9dc7f17c04271839d81a.camel@gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <a0bd9da0-b7b3-a424-8280-e755a68575e9@huawei.com>
-Date: Mon, 8 Jan 2024 16:20:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E33D272
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 08:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50e8ca6c76dso1486253e87.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 00:23:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1704702224; x=1705307024; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cM0TFj8jxeSZZv1W4sPXCNVKXy97CkTU2U3yhoJbBY8=;
+        b=qhu/VzqDtfFgnUz0+l0D5zdaJ7KBPvbNyYpOC02G6uB+3dVjNXv2VsCCLtUuiAwSjL
+         z4VnFv/HZJWxeXD7A6GtCOZjfJnNeOBF+kW3b20yOE7rX767cBhrtuMae+N/SvtFjtWp
+         3PG7vHTBIVjH0pBoeeMikoJmIe6Ts8ksS32IfUdpmc1iqW+3Tl6uknzQYk7E0DM+WKVo
+         CZO41wJCTxJw/imtMLuBMzhtcLMipbZlzJp8Be6XCb7lki5JM/kP0kojPzIQZi1XD2i3
+         RE5zGHR3/+5dtdRsWEfzNPLdyVmCoqNLqdKsteHY0HLD/PHJvUeccstq/tzaZrqbqTJZ
+         E5EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704702224; x=1705307024;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cM0TFj8jxeSZZv1W4sPXCNVKXy97CkTU2U3yhoJbBY8=;
+        b=EY5Ks8pC8h4pQIhNfK8tjf7zEfPhLNkewCDyHS14hJ21cCs9uWG9DLEOY2uOdORd9Z
+         K4KmKNvTHsB8EPo9I/bflu1wQ6jqkvP5nEvoTZftJ3eHGF7XGAYz1tBMhYeWU7XrF3ox
+         ISbOe3ood+4nrbxnw/UM79VRHuyC+gFPvLRaJQqYy9nlr8FyaMgdmNz3+OQcAM5H3csb
+         h7IAf5gbad30CPokA2PA5YwLJmJTb3kBwbvdP0TrGLz3RbescLVT3Uwhr85W7czns9p2
+         jI+e8bgTMVaXGGlMfH8Ppeh3tYt49XyLkJh88lzUg7Qgo+3W+lWGmVcVMB0YFO2HSGwZ
+         XxbA==
+X-Gm-Message-State: AOJu0YwKcFf7hZdiHUt7vBF4WkUeDPRssudzRVfTzQV5kSn1YkQuKCS6
+	zPIO7ZFVzqqrvAkEf17quZmv6A0x6rMwjQ==
+X-Google-Smtp-Source: AGHT+IGSracrlfmURsxZblED6Vb2WigU+HoU7WFjcf863XobKF4zuEjubz30uiCqu5wKqalXN+SvbA==
+X-Received: by 2002:a05:6512:3d94:b0:50e:6d96:4b3c with SMTP id k20-20020a0565123d9400b0050e6d964b3cmr1378695lfv.81.1704702223603;
+        Mon, 08 Jan 2024 00:23:43 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.5])
+        by smtp.gmail.com with ESMTPSA id m14-20020a50ef0e000000b00554930be765sm4019766eds.97.2024.01.08.00.23.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 00:23:43 -0800 (PST)
+Message-ID: <2ba1b5d7-cf89-4942-a65e-674347389cbe@tuxon.dev>
+Date: Mon, 8 Jan 2024 10:23:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3f382fdcacc10cf897df9dc7f17c04271839d81a.camel@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 08/19] net: ravb: Move the IRQs get and
+ request in the probe function
 Content-Language: en-US
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, geert+renesas@glider.be,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240105082339.1468817-9-claudiu.beznea.uj@bp.renesas.com>
+ <fa9c8db4-ed80-f64d-aae2-8b95281f302e@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <fa9c8db4-ed80-f64d-aae2-8b95281f302e@omp.ru>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 2024/1/5 23:28, Alexander H Duyck wrote:
-> On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
->> napi_alloc_frag_align() and netdev_alloc_frag_align() accept
->> align as an argument, and they are thin wrappers around the
->> __napi_alloc_frag_align() and __netdev_alloc_frag_align() APIs
->> doing the align and align_mask conversion, in order to call
->> page_frag_alloc_align() directly.
+
+
+On 05.01.2024 22:57, Sergey Shtylyov wrote:
+> On 1/5/24 11:23 AM, Claudiu wrote:
+> 
+>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 >>
->> As __napi_alloc_frag_align() and __netdev_alloc_frag_align()
->> APIs are only used by the above thin wrappers, it seems that
->> it makes more sense to remove align and align_mask conversion
->> and call page_frag_alloc_align() directly. By doing that, we
->> can also avoid the confusion between napi_alloc_frag_align()
->> accepting align as an argument and page_frag_alloc_align()
->> accepting align_mask as an argument when they both have the
->> 'align' suffix.
+>> The runtime PM implementation will disable clocks at the end of
+>> ravb_probe(). As some IP variants switch to reset mode as a result of
+>> setting module standby through clock disable APIs, to implement runtime PM
+>> the resource parsing and requesting are moved in the probe function and IP
+>> settings are moved in the open function. This is done because at the end of
+>> the probe some IP variants will switch anyway to reset mode and the
+>> registers content is lost. Also keeping only register specific operations
+>> in the ravb_open()/ravb_close() functions will make them faster.
 >>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>> Commit moves IRQ requests to ravb_probe() to have all the IRQs ready when
+>> the interface is open. As now IRQs gets and requests are in a single place
+>> there is no need to keep intermediary data (like ravb_rx_irqs[] and
+>> ravb_tx_irqs[] arrays or IRQs in struct ravb_private).
+>>
+>> This is a preparatory change to add runtime PM support for all IP variants.
+>>
+>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> [...]
+>> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
+>> index e0f8276cffed..e3506888cca6 100644
+>> --- a/drivers/net/ethernet/renesas/ravb.h
+>> +++ b/drivers/net/ethernet/renesas/ravb.h
+>> @@ -1089,10 +1089,6 @@ struct ravb_private {
+>>  	int msg_enable;
+>>  	int speed;
+>>  	int emac_irq;
+>> -	int erra_irq;
+>> -	int mgmta_irq;
+>> -	int rx_irqs[NUM_RX_QUEUE];
+>> -	int tx_irqs[NUM_TX_QUEUE];
 > 
-> This patch overlooks much of the main reason for having the wrappers.
-> By having the in-line wrapper and passing the argument as a mask we can
-> avoid having to verify the alignment value during execution time since
-> it can usually be handled during compile time.
+>    Good! :-)
+> 
+> [...]
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index 4673cc2faec0..ac6488ffa29a 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> [...]
+>> @@ -1727,85 +1717,21 @@ static const struct ethtool_ops ravb_ethtool_ops = {
+>>  	.set_wol		= ravb_set_wol,
+>>  };
+>>  
+>> -static inline int ravb_hook_irq(unsigned int irq, irq_handler_t handler,
+>> -				struct net_device *ndev, struct device *dev,
+>> -				const char *ch)
+>> -{
+>> -	char *name;
+>> -	int error;
+>> -
+>> -	name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", ndev->name, ch);
+> 
+>    Ugh! Should've fixed this outrage... :-/
+> 
+> [...]
+>> @@ -2616,6 +2509,90 @@ static void ravb_parse_delay_mode(struct device_node *np, struct net_device *nde
+>>  	}
+>>  }
+>>  
+>> +static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
+>> +			  const char *ch, int *irq, irq_handler_t handler)
+>> +{
+>> +	struct platform_device *pdev = priv->pdev;
+>> +	struct net_device *ndev = priv->ndev;
+>> +	struct device *dev = &pdev->dev;
+>> +	const char *dev_name;
+>> +	unsigned long flags;
+>> +	int error;
+>> +
+>> +	if (irq_name) {
+>> +		dev_name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", ndev->name, ch);
+>> +		if (!dev_name)
+>> +			return -ENOMEM;
+>> +
+>> +		*irq = platform_get_irq_byname(pdev, irq_name);
+>> +		flags = 0;
+>> +	} else {
+>> +		dev_name = ndev->name;
+>> +		*irq = platform_get_irq(pdev, 0);
+>> +		flags = IRQF_SHARED;
+>> +	}
+>> +	if (*irq < 0)
+>> +		return *irq;
+>> +
+>> +	error = devm_request_irq(dev, *irq, handler, flags, dev_name, ndev);
+>> +	if (error)
+>> +		netdev_err(ndev, "cannot request IRQ %s\n", irq_name);
+> 
+>    What will be printed when irq_name is NULL? Shouldn't this be dev_name
+> instead?
 
-When it can not be handled during compile time, we might have a bigger
-executable size for kernel, right? doesn't that may defeat some purpose of
-inlining?
+Indeed, should have been dev_name.
 
-But from the callers of those API, it does seems the handling during compile
-time is the ususal case here. Will add a __page_frag_alloc_align which is
-passed with the mask the original function expected as you suggested.
+Maybe better would be to have irq_name and IRQ0 instead as the users of
+this don't request IRQ from buf (where buf is sprintf(buf, "%s:%s",
+ndev->name, ch)) but they request irq_name or IRQ0.
 
 > 
-> By moving it into the function itself we are adding additional CPU
-> overhead per page as we will have to go through and validate the
-> alignment value for every single page instead of when the driver using
-> the function is compiled.
+>> +
+>> +	return error;
+>> +}
+>> +
+>> +static int ravb_setup_irqs(struct ravb_private *priv)
+>> +{
+>> +	const struct ravb_hw_info *info = priv->info;
+>> +	struct net_device *ndev = priv->ndev;
+>> +	const char *irq_name, *emac_irq_name;
+>> +	int error, irq;
+>> +
+>> +	if (!info->multi_irqs)
+>> +		return ravb_setup_irq(priv, NULL, NULL, &ndev->irq, ravb_interrupt);
+>> +
+>> +	if (info->err_mgmt_irqs) {
+>> +		irq_name = "dia";
+>> +		emac_irq_name = "line3";
+>> +	} else {
+>> +		irq_name = "ch22";
+>> +		emac_irq_name = "ch24";
+>> +	}
+>> +
+>> +	error = ravb_setup_irq(priv, irq_name, "ch22:multi", &ndev->irq, ravb_multi_interrupt);
+>> +	if (error)
+>> +		return error;
+>> +
+>> +	error = ravb_setup_irq(priv, emac_irq_name, "ch24:emac", &priv->emac_irq,
+>> +			       ravb_emac_interrupt);
+>> +	if (error)
+>> +		return error;
+>> +
+>> +	if (info->err_mgmt_irqs) {
+>> +		error = ravb_setup_irq(priv, "err_a", "err_a", &irq, ravb_multi_interrupt);
 > 
-> The overhead may not seem like much, but when you are having to deal
-> with it per page and you are processing pages at millions per second it
-> can quickly start to add up.
+>    Hm, why pass 2 identical names?
+
+1st name is what is used by platform_get_irq_by_name(), 2nd name is used to
+fill the name of the IRQ after it has been requested. Perviously the same
+naming schema was used.
+
 > 
-> This is essentially a code cleanup at the cost of some amount of
-> performance.
+>> +		if (error)
+>> +			return error;
+>> +
+>> +		error = ravb_setup_irq(priv, "mgmt_a", "mgmt_a", &irq, ravb_multi_interrupt);
 > 
-> .
+>    Here as well?
 > 
+>> +		if (error)
+>> +			return error;
+>> +	}
+>> +
+>> +	error = ravb_setup_irq(priv, "ch0", "ch0:rx_be", &irq, ravb_be_interrupt);
+> 
+>    Hm, won't this result in "ch0:ch0:rx_be" as IRQ name?
+
+No, first "ch0" is to call:
+platform_get_irq_byname(pdev, "ch0");
+
+"ch0:rx_be" is passed to
+devm_kasprintf(..., "%s:%s", ndev->name, "ch0:rx_be");
+
+and fill the name of IRQ after devm_request_irq(). Previously it was the same.
+
+> 
+>> +	if (error)
+>> +		return error;
+>> +
+>> +	error = ravb_setup_irq(priv, "ch1", "ch1:rx_nc", &irq, ravb_nc_interrupt);
+> 
+>    Same question...
+> 
+>> +	if (error)
+>> +		return error;
+>> +
+>> +	error = ravb_setup_irq(priv, "ch18", "ch18:tx_be", &irq, ravb_be_interrupt);
+> 
+>    And here as well...
+> 
+>> +	if (error)
+>> +		return error;
+>> +
+>> +	return ravb_setup_irq(priv, "ch19", "ch19:tx_nc", &irq, ravb_nc_interrupt);
+> 
+>    Here too...
+> 
+> [...]
+> 
+> MBR, Sergey
 
