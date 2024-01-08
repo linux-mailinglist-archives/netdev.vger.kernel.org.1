@@ -1,99 +1,95 @@
-Return-Path: <netdev+bounces-62328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC31826AC4
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:34:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD5F826A73
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 10:16:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A29C282427
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:34:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1F9E1F2021D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 09:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA271118D;
-	Mon,  8 Jan 2024 09:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB5711707;
+	Mon,  8 Jan 2024 09:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="MzNX37sC"
 X-Original-To: netdev@vger.kernel.org
-Received: from aliyun-sdnproxy-1.icoremail.net (aliyun-cloud.icoremail.net [47.90.88.95])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873D511709;
-	Mon,  8 Jan 2024 09:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from alexious$zju.edu.cn ( [10.190.64.155] ) by
- ajax-webmail-mail-app4 (Coremail) ; Mon, 8 Jan 2024 17:12:06 +0800
- (GMT+08:00)
-Date: Mon, 8 Jan 2024 17:12:06 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: alexious@zju.edu.cn
-To: "Simon Horman" <horms@kernel.org>
-Cc: "Saeed Mahameed" <saeedm@nvidia.com>, 
-	"Leon Romanovsky" <leon@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Paolo Abeni" <pabeni@redhat.com>, 
-	"Maor Gottlieb" <maorg@mellanox.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/mlx5e: fix a double-free in arfs_create_groups
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2024 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20240103172254.GB31813@kernel.org>
-References: <20231224081348.3535146-1-alexious@zju.edu.cn>
- <20240103172254.GB31813@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B427A12B98
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 09:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a28bf46ea11so276298866b.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 01:15:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=isovalent.com; s=google; t=1704705356; x=1705310156; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TQw0PBv7H3F9npAXhHpc/yO+0aZTdw3iW7XYRioBY9M=;
+        b=MzNX37sCftG06J7zDqRoVr0ASbCiDMbrmnnww9QwIfjHn6v305+3yC4sf5ZhItJ/P9
+         dWgD/FpnTIJwHE4ksSWe0LyKUd6OfMRRTu2GsW3LrzyYIlk1hIm1lWPPTQTB7KlqL7yN
+         TZ4o5IaKMtV94FWQY6kwJIi2YrmviStlCIrez+Ok7YKHBE61mw9794RlBmRCxk8r8RUL
+         VrdvaM3wBX128iDc7clv/XxbWwBql1tdTSo4hEdAuX6o0HA2yEC1qaVMYbdyxbkpNlPz
+         Usmp583j3JFO42mG5KGuZPz8LDrv6DbVyXe7CC8l1Vt6gXrWdave70ArygI0WAZ/X/pQ
+         wOmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704705356; x=1705310156;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TQw0PBv7H3F9npAXhHpc/yO+0aZTdw3iW7XYRioBY9M=;
+        b=hlXSv1FDJyNGutg5k8aUyS72wfer560AsOooIW/VW4qdSXhUGFZGjBY5H9BB5SNycV
+         c+tkaYC9j39nIBq6XEdo0BJ0UF8t7/iZYq9xSqv/eqxvFwCkmkp8DBPPpMnIHlo1ajC6
+         R/hSo6ZG3FFnRreLs7NxzqcTMs5XYtBkg7ZRGopEXONS9cCmRrjfiZDiW4CI9ylQQp3e
+         iasPwI61/4hdXeLwUWqKlkcmfayB8uCz185pdX27hKtDqrzjFm7lxYWc+iPTzsPMScE6
+         QEeHO1pnCxblCK5+2S/KsE2RJlqSmEubH7f8E04kOa9FsFDwJLpOQOlMCt2WuH9YWC/o
+         Lemw==
+X-Gm-Message-State: AOJu0YzYxlc7OYuECWCpp5wvdtK64jpj5nq/EkmLZ41NUbAI4Kvt7OT+
+	aPaF512sKv0ZTfdJCCrWAe7LQ6O74wNAo5hUUhzQBZoClY1ZCw==
+X-Google-Smtp-Source: AGHT+IF5FdPBR02bei/X14Ub000OcoVXRo17m86hQ2MPBeQuC7hWG3H6v1jptH9g+ATyuoxWlGDUexOGIPMl6jmv1Ns=
+X-Received: by 2002:a17:906:1797:b0:a28:bd9c:8363 with SMTP id
+ t23-20020a170906179700b00a28bd9c8363mr3034170eje.57.1704705356043; Mon, 08
+ Jan 2024 01:15:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <5d93189f.7631f.18ce857ef38.Coremail.alexious@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgBXzSxmvJtlmiOHAA--.8335W
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/1tbiAgwOAGWadaU02gABsA
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+References: <cover.1704565248.git.dxu@dxuuu.xyz>
+In-Reply-To: <cover.1704565248.git.dxu@dxuuu.xyz>
+From: Lorenz Bauer <lorenz.bauer@isovalent.com>
+Date: Mon, 8 Jan 2024 10:15:45 +0100
+Message-ID: <CAN+4W8gPeQ2OjoYLKXsNPyhSVTB+vcSaS3Xzw=-M9Rf5MXfKPg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 0/3] Annotate kfuncs in .BTF_ids section
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: linux-input@vger.kernel.org, coreteam@netfilter.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, fsverity@lists.linux.dev, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, cgroups@vger.kernel.org, 
+	alexei.starovoitov@gmail.com, olsajiri@gmail.com, quentin@isovalent.com, 
+	alan.maguire@oracle.com, memxor@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Cgo+IE9uIFN1biwgRGVjIDI0LCAyMDIzIGF0IDA0OjEzOjQ4UE0gKzA4MDAsIFpoaXBlbmcgTHUg
-d3JvdGU6Cj4gPiBXaGVuIGBpbmAgYWxsb2NhdGVkIGJ5IGt2emFsbG9jIGZhaWxzLCBhcmZzX2Ny
-ZWF0ZV9ncm91cHMgd2lsbCBmcmVlCj4gPiBmdC0+ZyBhbmQgcmV0dXJuIGFuIGVycm9yLiBIb3dl
-dmVyLCBhcmZzX2NyZWF0ZV90YWJsZSwgdGhlIG9ubHkgY2FsbGVyIG9mCj4gPiBhcmZzX2NyZWF0
-ZV9ncm91cHMsIHdpbGwgaG9sZCB0aGlzIGVycm9yIGFuZCBjYWxsIHRvCj4gPiBtbHg1ZV9kZXN0
-cm95X2Zsb3dfdGFibGUsIGluIHdoaWNoIHRoZSBmdC0+ZyB3aWxsIGJlIGZyZWVkIGFnYWluLgo+
-ID4gCj4gPiBGaXhlczogMWNhYmU2YjA5NjVlICgibmV0L21seDVlOiBDcmVhdGUgYVJGUyBmbG93
-IHRhYmxlcyIpCj4gPiBTaWduZWQtb2ZmLWJ5OiBaaGlwZW5nIEx1IDxhbGV4aW91c0B6anUuZWR1
-LmNuPgo+IAo+IFRoYW5rcywKPiAKPiBJIGFncmVlIHRoaXMgYWRkcmVzc2VzIHRoZSBpc3N1ZSB0
-aGF0IHlvdSBkZXNjcmliZS4KPiBBbmQgYXMgYSBtaW5pbWFsIGZpeCBpdCBsb29rcyBnb29kLgo+
-IAo+IFJldmlld2VkLWJ5OiBTaW1vbiBIb3JtYW4gPGhvcm1zQGtlcm5lbC5vcmc+Cj4gCj4gSG93
-ZXZlciwgSSB3b3VsZCBsaWtlIHRvIHN1Z2dlc3QgdGhhdCBzb21lIGNsZWFuLXVwIHdvcmsgY291
-bGQKPiB0YWtlIHBsYWNlIGFzIGEgZm9sbG93LXVwLgo+IAo+IEkgdGhpbmsgdGhhdCB0aGUgZXJy
-b3IgaGFuZGxpbmcgaW4gdGhpcyBhcmVhIG9mIHRoZSBjb2RlCj4gaXMgcmF0aGVyIGZyYWdpbGUu
-IFRoaXMgaXMgYmVjYXVzZSBpbml0aWFsaXNhdGlvbiBpcyBub3QgbmVjZXNzYXJpbHkKPiB1bndv
-dW5kIG9uIGVycm9yIHdpdGhpbiB0aGUgZnVuY3Rpb24gdGhhdCBpbml0aWFsaXNhdGlvbiBvY2N1
-cnMuCj4gCj4gSSB0aGluayBpdCB3b3VsZCBiZSBiZXR0ZXIgaWYgYXJmc19jcmVhdGVfZ3JvdXBz
-KCk6Cj4gCj4gMS4gUmVsZWFzZWQgYWxsb2NhdGVzIHJlc291cmNlcyBpdCBhbGxvY2F0ZXMsIGlu
-Y2x1ZGluZyBmdC0+ZyBhbmQKPiAgICBlbGVtZW50cyBvZiBmdC0+Zywgb24gZXJyb3IuCj4gMi4g
-VGhpcyB3YXMgYWNoaWV2ZWQgYnkgdXNpbmcgYSBnb3RvIHVud2luZCBsYWRkZXIuCj4gMy4gVGhl
-IGNhbGxlciB0cmVhdGVkIGZ0LT5nIGFzIHVuaW5pdGlhbGlzZWQgaWYKPiAgICBhcmZzX2NyZWF0
-ZV9ncm91cHMgZmFpbHMuCj4KIApBZ3JlZSwgSSB0aGluayBhIHVud2luZCBsYWRkZXIgZm9yIGFy
-ZnNfY3JlYXRlX2dyb3VwcyBpcyBtdWNoIGJldHRlci4KSSdsbCBmb2xsb3cgdGhpcyBpZGVhIHRv
-IHNlbmQgYSB2MiBwYXRjaCBsYXRlci4KQW5vdGhlciBjb21tZW50IGJlbG93LgoKPiBMaWtld2lz
-ZSwgSSB0aGluayB0aGF0Ogo+IAo+ICogYXJmc19jcmVhdGVfZ3JvdXBzLCBzaG91bGQgaW5pdGlh
-bGlzZSBmdC0+bnVtX2dyb3Vwcwo+IAo+IEFuZCBmdXJ0aGVyLCBsb2dpYyBzaW1pbGFyIHRvIHRo
-ZSBhYm92ZSBzaG91bGQgZ3VpZGUKPiBob3cgYXJmc19jcmVhdGVfdGFibGUoKSBpbml0aWFsaXNl
-cyBmdC0+dCBhbmQgY2xlYW5zIGl0Cj4gdXAgb24gZXJyb3IuCj4gCgpJIHRoaW5rIHRoYXQgZnQt
-PnQgeW91IG1lbnRpb25lZCByZWZlcnMgdG8gbWx4NV9jcmVhdGVfZmxvd190YWJsZS4KSSdkIGxp
-a2UgdG8gbWFrZSB0aGUgbGlmZSBjeWNsZSBvZiBmdC0+dCBzaW1pbGFyIHRvIGZ0LT5nIGluIGFy
-ZnNfY3JlYXRlX2dyb3VwcywgCmJ1dCBpdCBuZWVkcyB0byBhZGQgYW4gYXJndW1lbnQgZm9yIG1s
-eDVfY3JlYXRlX2Zsb3dfdGFibGUgdG8gdHJhbnNmZXIgZnQgdG8gCml0LiBIb3dldmVyLCBtbHg1
-X2NyZWF0ZV9mbG93X3RhYmxlIGlzIGNhbGxlZCBpbiBtb3JlIHRoYW4gMzAgZGlmZmVyZW50IHBs
-YWNlcyAKdGhyb3VnaG91dCB0aGUga2VybmVsLiBTbyBzdWNoIG1vZGlmaWNhdGlvbiBjb3VsZCBi
-ZSBhbm90aGVyIHJlZmFjdG9yaW5nIHBhdGNoCmJ1dCBtYXkgYmUgb3V0IG9mIHRoaXMgZml4IHBh
-dGNoJ3MgZHV0eS4KCj4gSSBkaWQgbm90IGxvb2sgYXQgdGhlIGNvZGUgYmV5b25kIHRoZSBzY29w
-ZSBkZXNjcmliZWQgYWJvdmUuCj4gQnV0IHRoZSBhYm92ZSBhcmUgZ2VuZXJhbCBwcmluY2lwbGVz
-IHRoYXQgbWF5IHdlbGwgYXBwbHkgaW4KPiBvdGhlciBuZWFyYnkgY29kZSB0b28uCj4gCj4gLi4u
-Cg==
+On Sat, Jan 6, 2024 at 7:25=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
+>
+> =3D=3D=3D Description =3D=3D=3D
+>
+> This is a bpf-treewide change that annotates all kfuncs as such inside
+> .BTF_ids. This annotation eventually allows us to automatically generate
+> kfunc prototypes from bpftool.
+>
+> We store this metadata inside a yet-unused flags field inside struct
+> btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
+
+This is great, thanks for tackling this. With yout patches we can
+figure out the full set of kfuncs. Is there a way to extend it so that
+we can tell which program context a kfunc can be called from?
 
