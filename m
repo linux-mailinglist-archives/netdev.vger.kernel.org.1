@@ -1,145 +1,134 @@
-Return-Path: <netdev+bounces-62449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960CD827509
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:26:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB28282759D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 17:45:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEEAFB221D6
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:26:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BFFFB22170
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89B052F6F;
-	Mon,  8 Jan 2024 16:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56462101DE;
+	Mon,  8 Jan 2024 16:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W6W7Kac3"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="O/oflqmm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B5052F7E;
-	Mon,  8 Jan 2024 16:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-28bc870c540so1764273a91.2;
-        Mon, 08 Jan 2024 08:26:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC6F53E21
+	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 16:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dbed0710c74so1247223276.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 08:45:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704731162; x=1705335962; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1704732329; x=1705337129; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7c7bb56Fe3/y7pgmJGOLp2UvSxEw8VjV4D0LZYXHKG0=;
-        b=W6W7Kac3rdDV993pob/Xub0ia4nSyjAqRnI6Oq5MVQXmK2722XYdiNzQnQsAdDynph
-         FM92YGjZIYOWFgz9boxg9YFT9UOv2NQvvRyANYiMLyWTRPzjvnD7D/Gm1iknJFjW8hOx
-         DuZXvISuWKBh/hYAnawOynvWenL44EzpyLJUeyT1oM+7JR9A+3n01IREHGW/IRzyngCp
-         krLud1fYrB8fMKNCVI3TVfRJZtu+MmzyW4FjCvHwansQQ6tQOCIVT6nFmmEOYJjAHwMu
-         KEf1QMRgFI+UTCZaSGl23Ri28mT115sEMSTGabJB5ThfD1OTH2F3LhSnaUPNdjS8hxjJ
-         porA==
+        bh=jVuIgnahugRDwfdeFuBbzBR3KYIVwzwbEm3l+2cHWHs=;
+        b=O/oflqmmVGXi/gsBbl5n3jgKfJd7Ucyqf314VgRuqyaxh4WTNEDGyR6bMRATLr61ws
+         ObR534bSwrget/UfQHk4a5y/efFa8lgdETOGSiuV1g4Dl3htj9uWvmN7jsvRCGTPh9+E
+         B0V5NJwkGvmMsMeyChZWtT7pO/eHCH6f5SogLhWNfXPdegvxCwkQa24Un+DgKVuVQ8Ag
+         rJTtKXDOT+9b8+2nxWvTS+OsHdCKzLb5qeSb68d5z09Tvt8MMHpUDJhWjZWYTTuDT6VY
+         a9d9zHIkRZOEM8zlon1whQim2fTEageFYWGsDleI5IUxew8H74HB/HcECD1h3LJndpr2
+         0vPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704731162; x=1705335962;
+        d=1e100.net; s=20230601; t=1704732329; x=1705337129;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7c7bb56Fe3/y7pgmJGOLp2UvSxEw8VjV4D0LZYXHKG0=;
-        b=kUykyJeCBDQy4Mtd3fegOMODeMYkQ+wYhtA3kWhhWr/2peAExTXpz3zsvIEPMf1T4G
-         XvfzevPAxrytP6vz7XE2cCpK2U3FJKil25fan0Zz3t63TK+Z38pfE4w/RSTmqaLdKjas
-         Xn4qZvBaTbjjjmGqU2dmvJ/dxThZVHcdnTUNb2BZ2FpxL9b8vQTxfT5uU+W6NNzRTgKe
-         bq89+h+I15ryATJfBZgny93zyrHWnVKXCt+cQxw5niignCPrHKEm1UH609/WBnM8FZwx
-         jXh/EmdfTNHKth0REkr2gMkZdGdubBLLdHWoTQbxrRkiYRpZTgF3QkHTITZRi8Cs3sZo
-         wePQ==
-X-Gm-Message-State: AOJu0YytdLiquzCRphHyq0TFB9MAigMqy70ZoVftvu5kB063xdi1HUqx
-	ItiqkmIIBL7mQ4De+qUNKFF+WlKWgA5AID3ky6A=
-X-Google-Smtp-Source: AGHT+IF6ceeZSxlz/wlFZ+bbF/0v/1LMUhzHmD+gMxSm5drrqIrCieFYp3vecgYjUA0kN0zffPcMnL1OO1vVFqjTI78=
-X-Received: by 2002:a17:90b:1211:b0:28b:dafb:cc29 with SMTP id
- gl17-20020a17090b121100b0028bdafbcc29mr1720680pjb.26.1704731162168; Mon, 08
- Jan 2024 08:26:02 -0800 (PST)
+        bh=jVuIgnahugRDwfdeFuBbzBR3KYIVwzwbEm3l+2cHWHs=;
+        b=BnBPduDQANnI4HdfoXWP8G97VGqyDQkBl9yyx8X6a5ZPkiXHZIvy3mpIa423EYaagR
+         9BC1Pji8zMMqcGSDWlooQ4enkmr8C1Sczq9jsUaD1nmSehHRPVF5mVf6cGsrQMpAj90K
+         GCDX8Gu/6gcE/SnPXn5C6R7UEc3HWpkYsT4l9vW5HzYL++cPvF98VBDrX4d+qCYF4TNm
+         dPDwZCwZpuwljU6bDAqU/V3gVuwjL+paDCjgpjpvfzYwgQXMQYv2csTYxIW9Wv8JECBT
+         xtbYoHePKNQ5E7P6SduflKwIlSPAhAc5sza+2OLMxD8JpRKQImjAMI1Lkvo2iakWXUsH
+         tALQ==
+X-Gm-Message-State: AOJu0YyBDlo58qv+1ca9jZ1WFASMjyhZuxRZyQA893oBFm39j0aEPkQ+
+	wZy9IyNhtv46HRP7ZghfkqlI6r3MeI0WYaypcj8v61N7PtIaj79iPPz6EhA=
+X-Google-Smtp-Source: AGHT+IFw22iEGTnFRWzmYXtloBMr6VnOd6CaxkdRy6faH/1+2adk2GdZEx6ti0o3TaY8BDjCpQlMpNb3yTSntSVs0DQ=
+X-Received: by 2002:a05:6902:2747:b0:dbe:346b:b97 with SMTP id
+ ea7-20020a056902274700b00dbe346b0b97mr921467ybb.23.1704732328906; Mon, 08 Jan
+ 2024 08:45:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
- <20240103095650.25769-4-linyunsheng@huawei.com> <f4abe71b3439b39d17a6fb2d410180f367cadf5c.camel@gmail.com>
- <74c9a3a1-5204-f79a-95ff-5c108ec6cf2a@huawei.com>
-In-Reply-To: <74c9a3a1-5204-f79a-95ff-5c108ec6cf2a@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 8 Jan 2024 08:25:25 -0800
-Message-ID: <CAKgT0Uf=hFrXLzDFaOxs_j9yYP7aQCmi=wjUyuop3FBv2vzgCA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/6] mm/page_alloc: use initial zero offset for page_frag_alloc_align()
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+References: <20240103222034.2582628-1-andrii@kernel.org> <20240103222034.2582628-4-andrii@kernel.org>
+ <CAHk-=wgmjr4nhxGheec1OwuYRk02d0+quUAViVk1v+w=Kvg15w@mail.gmail.com>
+In-Reply-To: <CAHk-=wgmjr4nhxGheec1OwuYRk02d0+quUAViVk1v+w=Kvg15w@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 8 Jan 2024 11:45:17 -0500
+Message-ID: <CAHC9VhQg7mYnQw-o1TYon_bdtk_CMzJaf6u5FTPosniG-UXK1w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
+To: Linus Torvalds <torvalds@linuxfoundation.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	brauner@kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, kernel-team@meta.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 8, 2024 at 12:59=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2024/1/5 23:42, Alexander H Duyck wrote:
-> > On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
-> >> The next patch is above to use page_frag_alloc_align() to
-> >> replace vhost_net_page_frag_refill(), the main difference
-> >> between those two frag page implementations is whether we
-> >> use a initial zero offset or not.
-> >>
-> >> It seems more nature to use a initial zero offset, as it
-> >> may enable more correct cache prefetching and skb frag
-> >> coalescing in the networking, so change it to use initial
-> >> zero offset.
-> >>
-> >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> >> CC: Alexander Duyck <alexander.duyck@gmail.com>
+On Fri, Jan 5, 2024 at 4:45=E2=80=AFPM Linus Torvalds
+<torvalds@linuxfoundation.org> wrote:
+> On Wed, 3 Jan 2024 at 14:21, Andrii Nakryiko <andrii@kernel.org> wrote:
 > >
-> > There are several advantages to running the offset as a countdown
-> > rather than count-up value.
-> >
-> > 1. Specifically for the size of the chunks we are allocating doing it
-> > from the bottom up doesn't add any value as we are jumping in large
-> > enough amounts and are being used for DMA so being sequential doesn't
-> > add any value.
+> > +bool bpf_token_capable(const struct bpf_token *token, int cap)
+> > +{
+> > +       /* BPF token allows ns_capable() level of capabilities, but onl=
+y if
+> > +        * token's userns is *exactly* the same as current user's usern=
+s
+> > +        */
+> > +       if (token && current_user_ns() =3D=3D token->userns) {
+> > +               if (ns_capable(token->userns, cap))
+> > +                       return true;
+> > +               if (cap !=3D CAP_SYS_ADMIN && ns_capable(token->userns,=
+ CAP_SYS_ADMIN))
+> > +                       return true;
+> > +       }
+> > +       /* otherwise fallback to capable() checks */
+> > +       return capable(cap) || (cap !=3D CAP_SYS_ADMIN && capable(CAP_S=
+YS_ADMIN));
+> > +}
 >
-> What is the expected size of the above chunks in your mind? I suppose
-> that is like NAPI_HAS_SMALL_PAGE_FRAG to avoid excessive truesize
-> underestimation?
+> This *feels* like it should be written as
 >
-> It seems there is no limit for min size of allocation for
-> page_frag_alloc_align() now, and as the page_frag API seems to be only
-> used in networking, should we enforce the min size of allocation at API
-> level?
+>     bool bpf_token_capable(const struct bpf_token *token, int cap)
+>     {
+>         struct user_namespace *ns =3D &init_ns;
+>
+>         /* BPF token allows ns_capable() level of capabilities, but only =
+if
+>          * token's userns is *exactly* the same as current user's userns
+>          */
+>         if (token && current_user_ns() =3D=3D token->userns)
+>                 ns =3D token->userns;
+>         return ns_capable(ns, cap) ||
+>                 (cap !=3D CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
+>     }
+>
+> And yes, I realize that the function will end up later growing a
+>
+>         security_bpf_token_capable(token, cap)
+>
+> test inside that 'if (token ..)' statement, and this would change the
+> order of that test so that the LSM hook would now be done before the
+> capability checks are done, but that all still seems just more of an
+> argument for the simplification.
 
-The primary use case for this is to allocate fragments to be used for
-storing network data. We usually end up allocating a minimum of 1K in
-most cases as you end up having to reserve something like 512B for
-headroom and the skb_shared_info in an skb. In addition the slice
-lengths become very hard to predict as these are usually used for
-network traffic so the size can be as small as 60B for a packet or as
-large as 9KB
+I have no problem with rewriting things, my only ask is that we stick
+with the idea of doing the capability checks before the LSM hook.  The
+DAC-before-MAC (capability-before-LSM) pattern is one we try to stick
+to most everywhere in the kernel and deviating from it here could
+potentially result in some odd/unexpected behavior from a user
+perspective.
 
-> >
-> > 2. By starting at the end and working toward zero we can use built in
-> > functionality of the CPU to only have to check and see if our result
-> > would be signed rather than having to load two registers with the
-> > values and then compare them which saves us a few cycles. In addition
-> > it saves us from having to read both the size and the offset for every
-> > page.
->
-> I suppose the above is ok if we only use the page_frag_alloc*() API to
-> allocate memory for skb->data, not for the frag in skb_shinfo(), as by
-> starting at the end and working toward zero, it means we can not do skb
-> coalescing.
->
-> As page_frag_alloc*() is returning va now, I am assuming most of users
-> is using the API for skb->data, I guess it is ok to drop this patch for
-> now.
->
-> If we allow page_frag_alloc*() to return struct page, we might need this
-> patch to enable coalescing.
-
-I would argue this is not the interface for enabling coalescing. This
-is one of the reasons why this is implemented the way it is. When you
-are aligning fragments you aren't going to be able to coalesce the
-frames anyway as the alignment would push the fragments apart.
+--=20
+paul-moore.com
 
