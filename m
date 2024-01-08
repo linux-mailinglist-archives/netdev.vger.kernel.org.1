@@ -1,206 +1,159 @@
-Return-Path: <netdev+bounces-62432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CBAC8272F3
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:24:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01EA3827317
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 16:29:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDDAF1F23985
-	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 15:24:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9353B1F258C4
+	for <lists+netdev@lfdr.de>; Mon,  8 Jan 2024 15:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62BD74C3DC;
-	Mon,  8 Jan 2024 15:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HfRsZzVp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03B651037;
+	Mon,  8 Jan 2024 15:28:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E3651009
-	for <netdev@vger.kernel.org>; Mon,  8 Jan 2024 15:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e5a9bcec9so2273949e87.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 07:24:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704727486; x=1705332286; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :references:cc:to:content-language:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VDfXxaJLBdAHE/PCKaUTkc4Ha2Yd2YR4JkUzxupj3v0=;
-        b=HfRsZzVpwz7gN1C4c+TM9/cOZ8kaQoM3VdD27geWtxvv2YEovQWTC7auApwsG7sQTI
-         HZTqnrBTHyTfDORhzOjlkSNGvlawYk51wrZeucPuXF/NFwU2QDaNfsKPiQlGdws7oTFg
-         CFLv+02uUINvfdMlN/MTAnVS50d7yAf6pWGVIhaDpRfTurt4yHp6tVhy4XcETpAJT/Qm
-         XzfCzooqf0khLb+zcDw2fXgNkojc79cmcOQbuRwfreTuzMTszmtICANJl2V/I29HZttg
-         y4YPX2aLgdtEJwW8D08E8CI4i+mim1JJMOzTv+E1zIcQEFPiRQ9nAt7ULYPptKvP1g+u
-         VPlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704727486; x=1705332286;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :references:cc:to:content-language:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VDfXxaJLBdAHE/PCKaUTkc4Ha2Yd2YR4JkUzxupj3v0=;
-        b=uks6+nPPW8TgHM5z5ae1kQLd1/hIxu7lP1zJNDYHwvCnR8jOko8TJHTivPZSk3Ki5f
-         J7694Hq+eAMs3ICxKTIKSfcfeA/yUhHJwYIDkWMQi/evrkD0uXsmIsLUMnJxCqXB53wc
-         Q/H9jYvLPsQYxeV0X4T90ME9FvBYBnNHAXCTPPYEJC1TKX8GQBEKRUJxvdf3j20DcUkP
-         7gfeAWBvSsuhWKhVQ+rZEtu1z5Pgsni3f7Veodjviz4t5Xn85kNRUvRm4zy6kzXZ+IHO
-         qepCfDbhibtJEZ9+mERvGsmjCLQVuYk+/SpwP5BWig4ZqEhFidy2h23b/hWp2PMCfg2i
-         YsBA==
-X-Gm-Message-State: AOJu0YyCupsY+nonSAt8tM2EryqCL/Ge9QE5ELQ9IV9JQXVa2vxEgM2S
-	AfphmJPp4JbcMRjWyZuP7lAkhAfHsdLe5w==
-X-Google-Smtp-Source: AGHT+IHYCa4xZPwbtgnWPlFUxuQ1nlQ0aFXos10SnAsRHcyZ7Yew62wRDqXCpkRZOGiwrgwv3o6ftQ==
-X-Received: by 2002:ac2:4822:0:b0:50e:6ddb:551d with SMTP id 2-20020ac24822000000b0050e6ddb551dmr1425719lft.73.1704727485712;
-        Mon, 08 Jan 2024 07:24:45 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:982:cbb0:32b:5e85:79f9:3fde? ([2a01:e0a:982:cbb0:32b:5e85:79f9:3fde])
-        by smtp.gmail.com with ESMTPSA id qu27-20020a170907111b00b00a2af877a85dsm457794ejb.6.2024.01.08.07.24.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jan 2024 07:24:45 -0800 (PST)
-Message-ID: <abefffc7-35d0-4c29-a892-48ec606acbf8@linaro.org>
-Date: Mon, 8 Jan 2024 16:24:40 +0100
+Received: from zg8tmty3ljk5ljewns4xndka.icoremail.net (zg8tmty3ljk5ljewns4xndka.icoremail.net [167.99.105.149])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB44D524D3;
+	Mon,  8 Jan 2024 15:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from luzhipeng.223.5.5.5 (unknown [183.159.171.224])
+	by mail-app2 (Coremail) with SMTP id by_KCgBn+fBKGZxleMgHAA--.4251S2;
+	Mon, 08 Jan 2024 23:48:27 +0800 (CST)
+From: Zhipeng Lu <alexious@zju.edu.cn>
+To: alexious@zju.edu.cn
+Cc: Simon Horman <horms@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maor Gottlieb <maorg@mellanox.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] [v2] net/mlx5e: fix a double-free in arfs_create_groups
+Date: Mon,  8 Jan 2024 23:26:04 +0800
+Message-Id: <20240108152605.3712050-1-alexious@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [RFC 0/9] PCI: introduce the concept of power sequencing of PCIe
- devices
-Content-Language: en-US, fr
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Chris Morgan <macromorgan@hotmail.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
- =?UTF-8?Q?N=C3=ADcolas_F_=2E_R_=2E_A_=2E_Prado?= <nfraprado@collabora.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>,
- Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Terry Bowman <terry.bowman@amd.com>,
- Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
- Srini Kandagatla <srinivas.kandagatla@linaro.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-pci@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-References: <20240104130123.37115-1-brgl@bgdev.pl>
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro Developer Services
-In-Reply-To: <20240104130123.37115-1-brgl@bgdev.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:by_KCgBn+fBKGZxleMgHAA--.4251S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZrWUXrWrXw4kWF48KrWDCFg_yoW5Ar48pF
+	45J34DKFs5Za48XanrA3yvqw1rCa18tayUu3WIv34SqwnFyr4UCFyrK3y3AFyxCFW3ArnF
+	y3Z8Zw1UAFZxArUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
+	J5UUUUU
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
-Hi,
+When `in` allocated by kvzalloc fails, arfs_create_groups will free
+ft->g and return an error. However, arfs_create_table, the only caller of
+arfs_create_groups, will hold this error and call to
+mlx5e_destroy_flow_table, in which the ft->g will be freed again.
 
-On 04/01/2024 14:01, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> During last year's Linux Plumbers we had several discussions centered
-> around the need to power-on PCI devices before they can be detected on
-> the bus.
-> 
-> The consensus during the conference was that we need to introduce a
-> class of "PCI slot drivers" that would handle the power-sequencing.
-> 
-> After some additional brain-storming with Manivannan and the realization
-> that the DT maintainers won't like adding any "fake" nodes not
-> representing actual devices, we decided to reuse the existing
-> infrastructure provided by the PCIe port drivers.
-> 
-> The general idea is to instantiate platform devices for child nodes of
-> the PCIe port DT node. For those nodes for which a power-sequencing
-> driver exists, we bind it and let it probe. The driver then triggers a
-> rescan of the PCI bus with the aim of detecting the now powered-on
-> device. The device will consume the same DT node as the platform,
-> power-sequencing device. We use device links to make the latter become
-> the parent of the former.
-> 
-> The main advantage of this approach is not modifying the existing DT in
-> any way and especially not adding any "fake" platform devices.
+Fixes: 1cabe6b0965e ("net/mlx5e: Create aRFS flow tables")
+Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+Changelog:
 
-I've successfully tested this serie for the WCN7850 Wifi/BT combo onboard chip
-present on the SM8550-QRD and SM8650-QRD boards and it works just fine.
+v2: free ft->g just in arfs_create_groups with a unwind ladde.
+---
+ .../net/ethernet/mellanox/mlx5/core/en_arfs.c   | 17 +++++++++--------
+ drivers/net/ethernet/mellanox/mlx5/core/en_fs.c |  1 -
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-Here's a branch with the wcn7850 vreg table added to the pwrseq driver,
-and the DT changes:
-https://git.codelinaro.org/neil.armstrong/linux/-/commits/topic/sm8x50/wcn7850-wifi-pwrseq/?ref_type=heads
-
-Thanks,
-Neil
-
-> 
-> Bartosz Golaszewski (9):
->    arm64: dts: qcom: sm8250: describe the PCIe port
->    arm64: dts: qcom: qrb5165-rb5: describe the WLAN module of QCA6390
->    PCI/portdrv: create platform devices for child OF nodes
->    PCI: hold the rescan mutex when scanning for the first time
->    PCI/pwrseq: add pwrseq core code
->    dt-bindings: vendor-prefixes: add a PCI prefix for Qualcomm Atheros
->    dt-bindings: wireless: ath11k: describe QCA6390
->    PCI/pwrseq: add a pwrseq driver for QCA6390
->    arm64: defconfig: enable the PCIe power sequencing for QCA6390
-> 
->   .../net/wireless/qcom,ath11k-pci.yaml         |  14 ++
->   .../devicetree/bindings/vendor-prefixes.yaml  |   1 +
->   arch/arm64/boot/dts/qcom/qrb5165-rb5.dts      |  24 +++
->   arch/arm64/boot/dts/qcom/sm8250.dtsi          |  10 +
->   arch/arm64/configs/defconfig                  |   2 +
->   drivers/pci/pcie/Kconfig                      |   2 +
->   drivers/pci/pcie/Makefile                     |   2 +
->   drivers/pci/pcie/portdrv.c                    |   3 +-
->   drivers/pci/pcie/pwrseq/Kconfig               |  19 ++
->   drivers/pci/pcie/pwrseq/Makefile              |   4 +
->   drivers/pci/pcie/pwrseq/pcie-pwrseq-qca6390.c | 197 ++++++++++++++++++
->   drivers/pci/pcie/pwrseq/pwrseq.c              |  83 ++++++++
->   drivers/pci/probe.c                           |   2 +
->   include/linux/pcie-pwrseq.h                   |  24 +++
->   14 files changed, 386 insertions(+), 1 deletion(-)
->   create mode 100644 drivers/pci/pcie/pwrseq/Kconfig
->   create mode 100644 drivers/pci/pcie/pwrseq/Makefile
->   create mode 100644 drivers/pci/pcie/pwrseq/pcie-pwrseq-qca6390.c
->   create mode 100644 drivers/pci/pcie/pwrseq/pwrseq.c
->   create mode 100644 include/linux/pcie-pwrseq.h
-> 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
+index bb7f86c993e5..c96f4c571b63 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
+@@ -252,13 +252,14 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 	int err;
+ 	u8 *mc;
+ 
++	ft->num_groups = 0;
++
+ 	ft->g = kcalloc(MLX5E_ARFS_NUM_GROUPS,
+ 			sizeof(*ft->g), GFP_KERNEL);
+ 	in = kvzalloc(inlen, GFP_KERNEL);
+ 	if  (!in || !ft->g) {
+-		kfree(ft->g);
+-		kvfree(in);
+-		return -ENOMEM;
++		err = -ENOMEM;
++		goto free_ft;
+ 	}
+ 
+ 	mc = MLX5_ADDR_OF(create_flow_group_in, in, match_criteria);
+@@ -278,7 +279,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 		break;
+ 	default:
+ 		err = -EINVAL;
+-		goto out;
++		goto free_ft;
+ 	}
+ 
+ 	switch (type) {
+@@ -300,7 +301,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 		break;
+ 	default:
+ 		err = -EINVAL;
+-		goto out;
++		goto free_ft;
+ 	}
+ 
+ 	MLX5_SET_CFG(in, match_criteria_enable, MLX5_MATCH_OUTER_HEADERS);
+@@ -327,7 +328,9 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ err:
+ 	err = PTR_ERR(ft->g[ft->num_groups]);
+ 	ft->g[ft->num_groups] = NULL;
+-out:
++free_ft:
++	kfree(ft->g);
++	ft->g = NULL;
+ 	kvfree(in);
+ 
+ 	return err;
+@@ -343,8 +346,6 @@ static int arfs_create_table(struct mlx5e_flow_steering *fs,
+ 	struct mlx5_flow_table_attr ft_attr = {};
+ 	int err;
+ 
+-	ft->num_groups = 0;
+-
+ 	ft_attr.max_fte = MLX5E_ARFS_TABLE_SIZE;
+ 	ft_attr.level = MLX5E_ARFS_FT_LEVEL;
+ 	ft_attr.prio = MLX5E_NIC_PRIO;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
+index 777d311d44ef..7b6aa0c8b58d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
+@@ -883,7 +883,6 @@ void mlx5e_fs_init_l2_addr(struct mlx5e_flow_steering *fs, struct net_device *ne
+ void mlx5e_destroy_flow_table(struct mlx5e_flow_table *ft)
+ {
+ 	mlx5e_destroy_groups(ft);
+-	kfree(ft->g);
+ 	mlx5_destroy_flow_table(ft->t);
+ 	ft->t = NULL;
+ }
+-- 
+2.34.1
 
 
