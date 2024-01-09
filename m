@@ -1,269 +1,272 @@
-Return-Path: <netdev+bounces-62563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E94827E03
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 05:57:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D42E827E0A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 06:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33FD71C2348E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 04:57:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D6EFB23709
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 05:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8674663B;
-	Tue,  9 Jan 2024 04:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE0C39B;
+	Tue,  9 Jan 2024 05:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HSn3aEKW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LAQmWzGU"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2118.outbound.protection.outlook.com [40.107.22.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AD8631;
-	Tue,  9 Jan 2024 04:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FyMLkCSO2PgTqI4MXSGwet4lTh6+0SIhKZqMKTknXcsHCvXS7fKkZbfphgoQU6TWTv2BQbB6cL0KmSfhKcuMZzmKcfsY4G0goWDp1Dyjb1DoB91SAnnm4TVdyZ3LQJYmsWsXyFcIcUOXhVRFfsU3eXtIU12SFJIcnFUFDcS+Le056LAIki/jPYFDvNXroIFyyUghLKBUfcGOIftCBHlWP8ptRw3ABaOfEYUyLU22cBSakkf7tF1NMhKbpB1FA8gV0FgVJ8kd5lu+VN2/y9BXsXam13u9EKh3KBfHw+ctsJzfH6gYq/ed5xvLENYA00pjB1BZWG8TCw+5H3kh8wHDGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=coZUox2VA3Yj6OPRWefoYLX7u6RyGIcxYWFhrxVWQhA=;
- b=O4SNaVsG/BSjHl06vC3SUdXtateic0t+ffhScCYThP4IpM/F3q5E90ZPSuyKHt8B7VXZIXj8GgcTRBS9uH1CpFt4i5jgNDle0tHiHRi+o4iTCtvmQqqIqlAwRKIBQsELq25NTbRlqt2xABAeRCp6qTYzRrwNOa7//T72EuiYeldPfxcMIYIaY5xleqYdNiwvPKzVAloW6KsTs1VnfPkTCpino2NWpEU8VX66rwzUqhVVjXYZMl1bUfADXKS1KNm3baqIl3GrCYHuhhL6rPc21mudBDqccLUSz9JMWlHY3lcsITa8PB4kG7ioYeVPCpqdnCddqDq7TnoTuyWFiF9pyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=coZUox2VA3Yj6OPRWefoYLX7u6RyGIcxYWFhrxVWQhA=;
- b=HSn3aEKWHPFtxngg8/hcBE1nhbTGR5bfEEQNV+TeXMZifSP+HB8TAdKmuqQK3hX800iI/67+7SYjcjjCF8GyypUQawSQqrQaSDkfkgNPbrwEn0QX8ir1dCehQEFLUMIhKZ25plxVCM7V1CzU6gu/ObDSciIN1FipGkB2/OZil3qab7RzjnHzsYQ1gMeyVPoUTNhTC9DZzwAjGQYDhZMnaXZ0BUpqj7TFKYD/OOYsjUB9f6p8x9AKM85YzWXAp9w3HdXYXJBI9pBArPKgZgQuNXGnTz/5Xiyy0kMs811Y5+08So4pqUND4x+OT2MxxiUxToqBaunPZZX09tz7RT785w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=virtuozzo.com;
-Received: from DU0PR08MB9003.eurprd08.prod.outlook.com (2603:10a6:10:471::13)
- by DB9PR08MB8410.eurprd08.prod.outlook.com (2603:10a6:10:3d6::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Tue, 9 Jan
- 2024 04:57:44 +0000
-Received: from DU0PR08MB9003.eurprd08.prod.outlook.com
- ([fe80::72c4:98fc:4d1b:b9ba]) by DU0PR08MB9003.eurprd08.prod.outlook.com
- ([fe80::72c4:98fc:4d1b:b9ba%5]) with mapi id 15.20.7159.020; Tue, 9 Jan 2024
- 04:57:44 +0000
-Message-ID: <07490c75-86c3-4488-8adb-7740b14feb30@virtuozzo.com>
-Date: Tue, 9 Jan 2024 12:57:36 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] neighbour: purge nf_bridged skb from foreign device neigh
-Content-Language: en-US
-From: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@openvz.org
-References: <20240108085232.95437-1-ptikhomirov@virtuozzo.com>
- <20240108111504.GA23297@breakpoint.cc>
- <a84b2797-2008-45d6-9ca3-c72666d3c419@virtuozzo.com>
-In-Reply-To: <a84b2797-2008-45d6-9ca3-c72666d3c419@virtuozzo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: KL1P15301CA0027.APCP153.PROD.OUTLOOK.COM
- (2603:1096:820:6::15) To DU0PR08MB9003.eurprd08.prod.outlook.com
- (2603:10a6:10:471::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1167476
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 05:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2cce70ad1a3so28995921fa.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 21:05:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704776741; x=1705381541; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F6VRW6LiblqkEjmRQNsd43ZUW0VC7I25KZYSeGGUaRE=;
+        b=LAQmWzGUb2tAoMe0P4Uj1bbA9M1ZHSds36GN/iUj/GeQdCZyAsyDk58YrCt4PyHB07
+         6aVuib6oI0RR981ctltrd+jZ0zGtbLV2kXVLdu8hVXuIP72oSKSinbHjG+bqhQFWSKul
+         JRG27x7zKqvj47aDquvDHGU4Vn26RNR5sf2J8EEr5ScZjyfZe1HXOUmV7f2I2NxwzE3+
+         aCEFpouVyjykcKOnl9/3jXmGXX0xN5C/SdOLIqR0V5GquPJ/j2k2vrx/scPfkuNFgSiu
+         iAWTCgluEUBdRdOayWQ1zBCWK4HwqrYBrrkiKGHf8XjS9XdaoiRLFZXjOfHZcFMKdpk1
+         lD5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704776741; x=1705381541;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F6VRW6LiblqkEjmRQNsd43ZUW0VC7I25KZYSeGGUaRE=;
+        b=XRu8nbqkGz6obX4qt2im2rMLBkaL77XYH4whIIAzvXeOEveU3w+pjV07cE6VmvKqxT
+         7CrTFDCTyUVS69YvTKI2Syo8rWNL7E5xGhr6YzBDbKcLhV/rgiBKxiRpTqP0OYKu0w9o
+         Z3jTUXt/9yLEf2izsU9t/rBV3PipXakQgqehaDE/z6mbBy3XHxnz6AeE39+3Gw6k+Hdp
+         64fyBmreXaTprKTav1K+mD+WmgW/SdYq1xUbrwAqJeXvcszRQBBFwa1VkDCot0Q695Jk
+         Rr3Y2c4SU0JyB9xyIZs6VSJcWf4MSulil7qrkwKLxaMrISPM9h+WqPFAjfrxcpHmDDgO
+         hMDQ==
+X-Gm-Message-State: AOJu0Yx2y9ZAQE9EN9wzjCd6U2TadaIpbN1mLWPG3MzuXNtX4TgKNBhl
+	BU6cSd9a3hbedsg8WpbT0I2v1D7r5OM0itZj2nI=
+X-Google-Smtp-Source: AGHT+IEp5qR44u3bkC3HoOA8NWK1h6x55dSMex8bPM0KRpW/p2NXiyXORQC3Kfkqf9EYY15e0G9qh7hnt1zJX85uYVw=
+X-Received: by 2002:a05:651c:c1:b0:2cd:34b1:a9ef with SMTP id
+ 1-20020a05651c00c100b002cd34b1a9efmr1825191ljr.90.1704776740700; Mon, 08 Jan
+ 2024 21:05:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU0PR08MB9003:EE_|DB9PR08MB8410:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4e75c128-3fde-45cc-555e-08dc10cf843f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	M3x2iArSltbkTjoRfHUMMxoneg7zdcokyrLZAD1C1Fo/JoK+yqpzzTIqRw/4jfBRNA9RB4MzYjXVz0O3o6dRBwh3piHYbWFQdwRlVoR+AzkWNg0tXo8GK1P4SzqRxZ+Pb97V3gzXL9znSZPv8LJ6ND1L1WJUNdJT20ByjStmI2wC/lrOTJdYG9834PF0jjfeNaFTYk0qqk2nNL7o9fheKxnQ4fW2O2phZeih2N/y2xx/RtHWV9q5afLiaPsFLW+7jnFQjLi21K98wGsbbctIOs+c1j77MAIDxVaB08lWIURjamNCHL7Plm6rPFZdp/O915ur+0Rk87w263lVc96squTn+May/DIaDILooAo266vZyVUri25+TbAjnsZoVqgU+Exf7L2dptp0FaXy9yUPq1HCk7Y5t/lNjO8ywH9YrMZI8rlqoMYJFyQp1EOG9SPNbjeu53e0WNpgL0bq/VzQpTZ8esl3RsNwsAOHMIU78idXrhvZ2RGeuipCxnxSzxNa8eJdymqYCNrB6ZohkhYvCV08M7wq6HWNuzTAoHusfnG9cmwZQOXtKZa3QJFxStDs6BvDN+nm3R8mo5vOCatUv2pzwpzcVanRFe5n4wwy9A3r6h/FctBPZ05xHoGLsRJ3FgpVJhpytQ8kqpXrQMEfXw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR08MB9003.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(376002)(396003)(39850400004)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(2906002)(5660300002)(38100700002)(86362001)(31696002)(41300700001)(6486002)(2616005)(107886003)(66476007)(66556008)(36756003)(6916009)(66946007)(83380400001)(6506007)(53546011)(6512007)(478600001)(31686004)(6666004)(4326008)(8936002)(8676002)(54906003)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Y0lrUG94N3FPam5Wb2Q3Q0JIOC9UYzd0UVpYbTBqWXNFUnBONWoyUjNEWU5m?=
- =?utf-8?B?ZCtJdkJ6WWFESHdteXBrcU9OMVBRYmRlTlRBOGt1M1lKVU4zRnVkRTlleHpW?=
- =?utf-8?B?c3pLRU82bEpvRWhjblFkWjJxLyttdTNPZkhXdmlIV011bVIySGJKRlltTjFN?=
- =?utf-8?B?MkdnZnU4UWdjVkJwd2ltb0NnKytkL3E4NXVBUVc2UWNZQjJhOXRNN0wwT1Z4?=
- =?utf-8?B?K29Fc2RUeG44YXN3d3J4YmhQK09ZQ21BcStkMGc0ZjNIV0crd1RJODY4TVNw?=
- =?utf-8?B?VXhaeWhibWFrK0pKR09pekYxWXpvaWpPOHY4OGIrQnFtWGIwYksreWpQZUZi?=
- =?utf-8?B?TXF5QXg5YmVWWUp6dmpwZGxyWWxsbEpsa2d3bjNLQmZIbm5Sb1ZLcE40amlC?=
- =?utf-8?B?S2djODE5d2lYbnV5WUQ3QjNSVTVCT2RjT0tzUmlZSlVRL1VocXArNk1BaTZJ?=
- =?utf-8?B?YW9OVlhteUkyejZIK0tkZitKVDRKWlFqSWVqMW1XaWVucHJNZmlTMEFaVnVI?=
- =?utf-8?B?dTdGZFRjUVBySUhpM08wcXdWaHhWVWJ1V213emhqeUZLVjNha0JnVm4xdFow?=
- =?utf-8?B?L0pDc1dKNEQ2R3JWY25GaWV4cFR1eFJQZ0s5K1ZBd1g0Sm9lODlpaFB5NTE0?=
- =?utf-8?B?a1Jnd3llOU9iRno2c1BRcE5QMmdmWFBraC9KZWM4QVpWWG4rQ3NDSEdVMW8v?=
- =?utf-8?B?c0MrcWY3RVJpd2F2Z1RhTldnOTVldkdPZStaYTBHZ0hJRGpHMkdDSGdXMTkx?=
- =?utf-8?B?bEFPTE9oQUIzZWx3TDErTDFFV2o2bEFaNlN1dVBINllhNXozRGJsSUVDeGNH?=
- =?utf-8?B?SXNSSnh0ZWxmQ2FKMjk4SWJzL28yRFBlRkdHWHVlanJFVDJBcE4rL3M4aFRP?=
- =?utf-8?B?L0h3NjZMaHZPdXBqck9jNklCSTB2aEd2VkRiK0JpdGQ0eXNZckFRckxjMDdO?=
- =?utf-8?B?RHBqejlFS09HWU1IZDMrcElpbmpLTnN5ZzNWZDg1QXp0dmp1dG84L2l4eE5I?=
- =?utf-8?B?WVJMS1RDaU1Idm1SWmtMcVRyZW9HVWN0dXdxWnhYOUVHczA0ZkcyZHJHenBV?=
- =?utf-8?B?cmhVL0wzTlFoNWpocjBlVlRwQUxEWFJ5ZVFPc0lpSlNMUFNHelRYL1BGclkz?=
- =?utf-8?B?ODVId1dzT1F3N00yWkt2NStDY2dFNXZPa09zVEtTdWdvOUk0amdGT3ozV3pp?=
- =?utf-8?B?cHIzZy82TjlvdmhnZWlUTml0d1hhajFqNlNTQWhJU2gxNStXazdFenc4VHNt?=
- =?utf-8?B?SzVDdm5WNi8yN09qMjJoMkhybXVaQ21ZUDhhL0pxbUNzeW16Szh2dmVmWi9l?=
- =?utf-8?B?OEpEc3ZEOEhGYWRjc2pkKzBHZENpZHNqRHl3RXlUcllqWitTNTZkN2ZNLzFU?=
- =?utf-8?B?UDMxVzJXcUgxNmk1bjRKU3RhUXVMK1F0YnFkcXFuVnUyeDZsQXB1V29BRXZL?=
- =?utf-8?B?MEs0cGovZUs4cUxtd2Q2RDBYT0lna0c5RkdhdVphYktkWmxSZ1liRUdvVS94?=
- =?utf-8?B?MUVYWEhDbWNmY3Z3cXNYRnRzMEM1aUN4TStKYis2c0d5QXc3ZklZUE1udDdB?=
- =?utf-8?B?WXViNk1OWVMxbGNXSWtMcm1lN1NpMGxXRHlabjRQbFFWd05BeUREZGlGMDMr?=
- =?utf-8?B?Rkh0QkZyMzFqcWkxVDJqOUphNnFwcXVNNms5OE03R3pxUGVpUVREdC9KOE8v?=
- =?utf-8?B?emIrUlNHeldEbWVNUG83Y0VZUWYvMUxzNUo5SlhNSjA2Wm1MUnRxRXdKMXZR?=
- =?utf-8?B?OWtPR0p4ditnUk11RmZ1Vk5MMGVHQnlyb0prQndPcGYvL1Fad2E2MWFDNmRK?=
- =?utf-8?B?dHNuQWlwVy90bS9UenVoekp3RFU4NkpPWjVzcmYwVDhWUmUrSk5ybHFRd3NV?=
- =?utf-8?B?QlpNV2dkcHdTVE1CZWhCZml1WW5iUnNGbWF5OCtGaU1XM3pnd2JPS21TaXRY?=
- =?utf-8?B?WGp0WkNudDU5VlpaNDBIMDdKRVNkYmRVM3kwdWRGaWUrdFV3eERHaTU4ZEtY?=
- =?utf-8?B?Y3lsSW01ZGVseWI2Y3hhMHpWTjdwd1hMNUg3K0VhaWZPaHEyR1FYZTlWSHhX?=
- =?utf-8?B?ZDE0VEwxL2RPaERMVWJCVEQ0c1NqOW96aG1TYXhyRkhIOUd1ZFpBNGR6QmhR?=
- =?utf-8?B?K3QrNGFCaEp5WUxILzVueXJkN3lsbGRNRFRGN3k4NzdNS0RGRjhlbkZpUFRU?=
- =?utf-8?B?OVFEMlJLdmxvU282VDdBZ2FieFQzNTNKRzVKelM3aHJITThqQ2trTGlFSjRG?=
- =?utf-8?B?Y3BYQWpxWE92cVVyd3JSc3JJck1RPT0=?=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e75c128-3fde-45cc-555e-08dc10cf843f
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR08MB9003.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2024 04:57:44.5697
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xpznPKVfWDSCzhNnkpkYJGclaTrsdYbbZgkmxWMZOjN/FDpa7NxRMmzuG8sxpqvPRYBRk40uuOvEcUqrHS82asoc+4Dfzl2Sci0kXbh+gmw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB8410
+References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-4-luizluca@gmail.com>
+ <20240108140002.wpf6zj7qv2ftx476@skbuf>
+In-Reply-To: <20240108140002.wpf6zj7qv2ftx476@skbuf>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Tue, 9 Jan 2024 02:05:29 -0300
+Message-ID: <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	arinc.unal@arinc9.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Em seg., 8 de jan. de 2024 =C3=A0s 11:00, Vladimir Oltean
+<olteanv@gmail.com> escreveu:
+>
+> On Fri, Dec 22, 2023 at 09:46:31PM -0300, Luiz Angelo Daros de Luca wrote=
+:
+> > Some code can be shared between both interface modules (MDIO and SMI)
+> > and among variants. These interface functions migrated to a common
+> > module:
+> >
+> > - realtek_common_lock
+> > - realtek_common_unlock
+> > - realtek_common_probe
+> > - realtek_common_register_switch
+> > - realtek_common_remove
+> >
+> > The reset during probe was moved to the end of the common probe. This w=
+ay,
+> > we avoid a reset if anything else fails.
+> >
+> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> > ---
+> > diff --git a/drivers/net/dsa/realtek/realtek-common.c b/drivers/net/dsa=
+/realtek/realtek-common.c
+> > new file mode 100644
+> > index 000000000000..80b37e5fe780
+> > --- /dev/null
+> > +++ b/drivers/net/dsa/realtek/realtek-common.c
+> > @@ -0,0 +1,132 @@
+> > +// SPDX-License-Identifier: GPL-2.0+
+> > +
+> > +#include <linux/module.h>
+> > +
+> > +#include "realtek.h"
+> > +#include "realtek-common.h"
+> > +
+> > +void realtek_common_lock(void *ctx)
+> > +{
+> > +     struct realtek_priv *priv =3D ctx;
+> > +
+> > +     mutex_lock(&priv->map_lock);
+> > +}
+> > +EXPORT_SYMBOL_GPL(realtek_common_lock);
+>
+> Would you mind adding some kernel-doc comments above each of these
+> exported functions? https://docs.kernel.org/doc-guide/kernel-doc.html
+> says "Every function that is exported to loadable modules using
+> EXPORT_SYMBOL or EXPORT_SYMBOL_GPL should have a kernel-doc comment.
+> Functions and data structures in header files which are intended to be
+> used by modules should also have kernel-doc comments."
+>
+> It is something I only recently started paying attention to, so we don't
+> have consistency in this regard. But we should try to adhere to this
+> practice for code we change.
+>
 
+Sure. I'll pay attention to that too.
 
-On 08/01/2024 19:26, Pavel Tikhomirov wrote:
-> 
-> 
-> On 08/01/2024 19:15, Florian Westphal wrote:
->> Pavel Tikhomirov <ptikhomirov@virtuozzo.com> wrote:
->>> An skb can be added to a neigh->arp_queue while waiting for an arp
->>> reply. Where original skb's skb->dev can be different to neigh's
->>> neigh->dev. For instance in case of bridging dnated skb from one veth to
->>> another, the skb would be added to a neigh->arp_queue of the bridge.
->>>
->>> There is no explicit mechanism that prevents the original skb->dev link
->>> of such skb from being freed under us. For instance neigh_flush_dev does
->>> not cleanup skbs from different device's neigh queue. But that original
->>> link can be used and lead to crash on e.g. this stack:
->>>
->>> arp_process
->>>    neigh_update
->>>      skb = __skb_dequeue(&neigh->arp_queue)
->>>        neigh_resolve_output(..., skb)
->>>          ...
->>>            br_nf_dev_xmit
->>>              br_nf_pre_routing_finish_bridge_slow
->>>                skb->dev = nf_bridge->physindev
->>>                br_handle_frame_finish
->>>
->>> So let's improve neigh_flush_dev to also purge skbs when device
->>> equal to their skb->nf_bridge->physindev gets destroyed.
->>
->> Can we fix this by replacing physindev pointer with plain
->> ifindex instead?  There are not too many places that need to
->> peek into the original net_device struct, so I don't think
->> the additional dev_get_by_index_rcu() would be an issue.
-> 
-> I will work on it, thanks for a good idea!
-> 
+> > +
+> > +void realtek_common_unlock(void *ctx)
+> > +{
+> > +     struct realtek_priv *priv =3D ctx;
+> > +
+> > +     mutex_unlock(&priv->map_lock);
+> > +}
+> > +EXPORT_SYMBOL_GPL(realtek_common_unlock);
+> > +
+> > +struct realtek_priv *
+> > +realtek_common_probe(struct device *dev, struct regmap_config rc,
+> > +                  struct regmap_config rc_nolock)
+>
+> Could you use "const struct regmap_config *" as the data types here, to
+> avoid two on-stack variable copies? Regmap will copy the config structure=
+s
+> anyway.
 
-If we replace nf_bridge->physindev completely, we would need to do 
-something like this in every place physindev was used:
+I could do that for rc_nolock but not for rc as we need to modify it
+before passing to regmap. I would still need to duplicate rc, either
+using the stack or heap. What would be the best option?
 
-diff --git a/include/linux/netfilter_bridge.h 
-b/include/linux/netfilter_bridge.h
-index f980edfdd2783..105fbdb029261 100644
---- a/include/linux/netfilter_bridge.h
-+++ b/include/linux/netfilter_bridge.h
-@@ -56,11 +56,15 @@ static inline int nf_bridge_get_physoutif(const 
-struct sk_buff *skb)
-  }
+1) pass two pointers and copy one to stack
+2) pass two pointers and copy one to heap
+3) pass two structs (as it is today)
+4) pass one pointer and one struct
 
-  static inline struct net_device *
--nf_bridge_get_physindev(const struct sk_buff *skb)
-+nf_bridge_get_physindev_rcu(const struct sk_buff *skb)
-  {
-         const struct nf_bridge_info *nf_bridge = nf_bridge_info_get(skb);
-+       struct net_device *dev;
+The old code was using 1) and I'm inclined to adopt it and save a
+hundred and so bytes from the stack, although 2) would save even more.
 
--       return nf_bridge ? nf_bridge->physindev : NULL;
-+       if (!nf_bridge || !skb->dev)
-+               return 0;
-+
-+       return dev_get_by_index_rcu(skb->dev->net, nf_bridge->physindev_if);
-  }
+> > +{
+> > +     const struct realtek_variant *var;
+> > +     struct realtek_priv *priv;
+> > +     int ret;
+> > +
+> > +     var =3D of_device_get_match_data(dev);
+> > +     if (!var)
+> > +             return ERR_PTR(-EINVAL);
+> > +
+> > +     priv =3D devm_kzalloc(dev, size_add(sizeof(*priv), var->chip_data=
+_sz),
+> > +                         GFP_KERNEL);
+> > +     if (!priv)
+> > +             return ERR_PTR(-ENOMEM);
+> > +
+> > +     mutex_init(&priv->map_lock);
+> > +
+> > +     rc.lock_arg =3D priv;
+> > +     priv->map =3D devm_regmap_init(dev, NULL, priv, &rc);
+> > +     if (IS_ERR(priv->map)) {
+> > +             ret =3D PTR_ERR(priv->map);
+> > +             dev_err(dev, "regmap init failed: %d\n", ret);
+> > +             return ERR_PTR(ret);
+> > +     }
+> > +
+> > +     priv->map_nolock =3D devm_regmap_init(dev, NULL, priv, &rc_nolock=
+);
+> > +     if (IS_ERR(priv->map_nolock)) {
+> > +             ret =3D PTR_ERR(priv->map_nolock);
+> > +             dev_err(dev, "regmap init failed: %d\n", ret);
+> > +             return ERR_PTR(ret);
+> > +     }
+> > +
+> > +     /* Link forward and backward */
+> > +     priv->dev =3D dev;
+> > +     priv->variant =3D var;
+> > +     priv->ops =3D var->ops;
+> > +     priv->chip_data =3D (void *)priv + sizeof(*priv);
+> > +
+> > +     dev_set_drvdata(dev, priv);
+> > +     spin_lock_init(&priv->lock);
+> > +
+> > +     priv->leds_disabled =3D of_property_read_bool(dev->of_node,
+> > +                                                 "realtek,disable-leds=
+");
+> > +
+> > +     /* TODO: if power is software controlled, set up any regulators h=
+ere */
+> > +
+> > +     priv->reset =3D devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_L=
+OW);
+> > +     if (IS_ERR(priv->reset)) {
+> > +             dev_err(dev, "failed to get RESET GPIO\n");
+> > +             return ERR_CAST(priv->reset);
+> > +     }
+> > +     if (priv->reset) {
+> > +             gpiod_set_value(priv->reset, 1);
+> > +             dev_dbg(dev, "asserted RESET\n");
+> > +             msleep(REALTEK_HW_STOP_DELAY);
+> > +             gpiod_set_value(priv->reset, 0);
+> > +             msleep(REALTEK_HW_START_DELAY);
+> > +             dev_dbg(dev, "deasserted RESET\n");
+> > +     }
+> > +
+> > +     return priv;
+> > +}
+> > +EXPORT_SYMBOL(realtek_common_probe);
+> > diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realte=
+k/realtek.h
+> > index e9ee778665b2..fbd0616c1df3 100644
+> > --- a/drivers/net/dsa/realtek/realtek.h
+> > +++ b/drivers/net/dsa/realtek/realtek.h
+> > @@ -58,11 +58,9 @@ struct realtek_priv {
+> >       struct mii_bus          *bus;
+> >       int                     mdio_addr;
+> >
+> > -     unsigned int            clk_delay;
+> > -     u8                      cmd_read;
+> > -     u8                      cmd_write;
+> >       spinlock_t              lock; /* Locks around command writes */
+> >       struct dsa_switch       *ds;
+> > +     const struct dsa_switch_ops *ds_ops;
+> >       struct irq_domain       *irqdomain;
+> >       bool                    leds_disabled;
+> >
+> > @@ -79,6 +77,8 @@ struct realtek_priv {
+> >       int                     vlan_enabled;
+> >       int                     vlan4k_enabled;
+> >
+> > +     const struct realtek_variant *variant;
+> > +
+> >       char                    buf[4096];
+> >       void                    *chip_data; /* Per-chip extra variant dat=
+a */
+> >  };
+>
+> Can the changes to struct realtek_priv be a separate patch, to
+> clarify what is being changed, and to leave the noisy code movement
+> more isolated?
 
-  static inline struct net_device *
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index a5ae952454c89..51e7cdf9b51c9 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -295,7 +295,7 @@ struct nf_bridge_info {
-         u8                      bridged_dnat:1;
-         u8                      sabotage_in_done:1;
-         __u16                   frag_max_size;
--       struct net_device       *physindev;
-+       int                     *physindev_if;
+Sure, although it will not be a patch that makes sense by itself. If
+it helps with the review, I'll split it. We can fold it back if
+needed.
 
-         /* always valid & non-NULL from FORWARD on, for physdev match */
-         struct net_device       *physoutdev;
-diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c 
-b/net/ipv4/netfilter/nf_reject_ipv4.c
-index f01b038fc1cda..01b3eb169772e 100644
---- a/net/ipv4/netfilter/nf_reject_ipv4.c
-+++ b/net/ipv4/netfilter/nf_reject_ipv4.c
-@@ -289,7 +289,8 @@ void nf_send_reset(struct net *net, struct sock *sk, 
-struct sk_buff *oldskb,
-          * build the eth header using the original destination's MAC as the
-          * source, and send the RST packet directly.
-          */
--       br_indev = nf_bridge_get_physindev(oldskb);
-+       rcu_read_lock_bh();
-+       br_indev = nf_bridge_get_physindev_rcu(oldskb);
-         if (br_indev) {
-                 struct ethhdr *oeth = eth_hdr(oldskb);
+Regards,
 
-@@ -297,12 +298,19 @@ void nf_send_reset(struct net *net, struct sock 
-*sk, struct sk_buff *oldskb,
-                 niph->tot_len = htons(nskb->len);
-                 ip_send_check(niph);
-                 if (dev_hard_header(nskb, nskb->dev, ntohs(nskb->protocol),
--                                   oeth->h_source, oeth->h_dest, 
-nskb->len) < 0)
-+                                   oeth->h_source, oeth->h_dest, 
-nskb->len) < 0) {
-+                       rcu_read_unlock_bh();
-                         goto free_nskb;
-+               }
-                 dev_queue_xmit(nskb);
--       } else
-+               rcu_read_unlock_bh();
-+       } else {
-+               rcu_read_unlock_bh();
-  #endif
-                 ip_local_out(net, nskb->sk, nskb);
-+#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
-+       }
-+#endif
-
-         return;
-
-Does it sound good?
-
-Or maybe instead we can have extra physindev_if field in addition to 
-existing physindev to only do dev_get_by_index_rcu inside 
-br_nf_pre_routing_finish_bridge_slow to doublecheck the ->physindev link?
-
-Sorry in advance if I'm missing anything obvious.
-
--- 
-Best regards, Tikhomirov Pavel
-Senior Software Developer, Virtuozzo.
+Luiz
 
