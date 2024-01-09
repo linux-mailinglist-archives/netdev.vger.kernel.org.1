@@ -1,124 +1,78 @@
-Return-Path: <netdev+bounces-62690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 060508288CE
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:16:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4D23828912
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:34:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0CB1C24590
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:16:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 068491C23955
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2EE39AFC;
-	Tue,  9 Jan 2024 15:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FDC39FDD;
+	Tue,  9 Jan 2024 15:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VFu75ftC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GDvpf4af"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F3439FC1;
-	Tue,  9 Jan 2024 15:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 543ED20002;
-	Tue,  9 Jan 2024 15:16:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1704813386;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DD03A264
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 15:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704814455;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ssy2NqEQhKlkgPOMZNnArO4w7khdLMgeVZhOT1pVsOI=;
-	b=VFu75ftCyPs7Lt9Z8ASUCZLKtzregIBQ7aO1l9XO0o4PxjAaAZodyeAc62v9jOluNfDemu
-	k3UYeyXIwZv+40VMTA8dbBJ96HLEz1GcKkRFD7hUZ9YA35syoJI0M3P+LZYGF/08ycxnVc
-	hso6sRefCxYy8VW40CxWvbKDZdFfQjw0PJ8q0rbL+a4Y8fcZ+/9tvLsJ8EMPbluacn/FjD
-	GP3DbZjfpODWTrs3T/1J0xL2q6FPFmKGhlQBwYim9+vscLOa2A2cgZWrc9LNHdYZO3S+ma
-	Oo4Ui811n+ADwLMT6aTcnKnAszkX8zPAtIC2pWRcNjiGy9tWl4KoozOfyOye1Q==
-Date: Tue, 9 Jan 2024 16:16:49 +0100 (CET)
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-cc: Romain Gantois <romain.gantois@bootlin.com>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    Miquel Raynal <miquel.raynal@bootlin.com>, 
-    Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-    Sylvain Girard <sylvain.girard@se.com>, 
-    Pascal EBERHARD <pascal.eberhard@se.com>, 
-    Richard Tresidder <rtresidd@electromag.com.au>, 
-    Linus Walleij <linus.walleij@linaro.org>, 
-    Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-    netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v3 1/1] net: stmmac: Prevent DSA tags from breaking
- C
-In-Reply-To: <20240108143614.ldeizw33o6l7aevi@skbuf>
-Message-ID: <7afd8717-4b3a-2104-3581-4cf3440be0f8@bootlin.com>
-References: <20240108130238.j2denbdj3ifasbqi@skbuf> <3c2f6555-53b6-be1c-3d7b-7a6dc95b46fe@bootlin.com> <20240108143614.ldeizw33o6l7aevi@skbuf>
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QSe46n2sgaqVGu+gacWZG06JFpsVFXYHytEZmABVCXw=;
+	b=GDvpf4afppcWy4HnIniMMjH6r9ZwdmZr6RO6QmKiA+xJOuCrU+VZBgtOjpa9kK58peFpts
+	2elM8B+GoopbHmCA2kJuBLueAJV86mZqjUZ9C4vCktmj3UqClsfuhY6qbT9Uw7tN8WGEzC
+	APL/t+dtopF+ZVm56Izp/RH5cSX6G74=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-274-bbPNbgavMtCnFQa3wVctmg-1; Tue,
+ 09 Jan 2024 10:34:12 -0500
+X-MC-Unique: bbPNbgavMtCnFQa3wVctmg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ADF3B1C04B62;
+	Tue,  9 Jan 2024 15:34:11 +0000 (UTC)
+Received: from renaissance-vector.redhat.com (unknown [10.39.193.254])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E58CC492BC7;
+	Tue,  9 Jan 2024 15:34:09 +0000 (UTC)
+From: Andrea Claudi <aclaudi@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jamal Hadi Salim <hadi@cyberus.ca>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>
+Subject: [PATCH iproute2 0/2] Fix typos in two error messages
+Date: Tue,  9 Jan 2024 16:33:52 +0100
+Message-ID: <cover.1704813773.git.aclaudi@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Mon, 8 Jan 2024, Vladimir Oltean wrote:
+Fix spelling for "cannot" in two different places.
 
-> On Mon, Jan 08, 2024 at 03:23:38PM +0100, Romain Gantois wrote:
-> > I see, the kernel docs were indeed enlightening on this point. As a side note, 
-> > I've just benchmarked both the "with-inline" and "without-inline" versions. 
-> > First of all, objdump seems to confirm that GCC does indeed follow this pragma 
-> > in this particular case. Also, RX perfs are better with stmmac_has_ip_ethertype 
-> > inlined, but TX perfs are actually consistently worse with this function 
-> > inlined, which could very well be caused by cache effects.
-> > 
-> > In any case, I think it is better to remove the "inline" pragma as you said. 
-> > I'll do that in v4.
-> 
-> Are you doing any code instrumentation, or just measuring the results
-> and deducing what might cause them?
-> 
-> It might be worth looking at the perf events and seeing what function
-> consumes the most amount of time.
-> 
-> CPU_CORE=0
-> perf record -e cycles -C $CPU_CORE sleep 10 && perf report
-> perf record -e cache-misses -C $CPU_CORE sleep 10 && perf report
-> 
+Andrea Claudi (2):
+  iplink_xstats: spelling fix in error message
+  genl: ctrl.c: spelling fix in error message
 
-Unfortunately my hardware doesn't support these performance metrics, but I did 
-manage to do some instrumentation with the ftrace profiler:
-
-Same test conditions as before, 10 second iperf3 runs with unfragmented UDP 
-packets.
-
-no inline TX
-  average time per call for stmmac_xmit(): 85us
-  average time per call for stmmac_has_ip_ethertype(): 2us
-
-no inline RX
-  average time per call for stmmac_napi_poll_rx(): 8142us
-  average time per call for stmmac_has_ip_ethertype(): 2us
-
-inline TX:
-  average time per call for stmmac_xmit(): 85us
-
-inline RX:
-  average time per call for stmmac_napi_poll_rx(): 8410us
-
-It seems like this time, RX performed slightly worse with the function inline. 
-To be honest, I'm starting to doubt the reproducibility of these tests. In any 
-case it seems better to just remove the "inline" and let gcc do the optimizing.
-
-Best Regards,
+ genl/ctrl.c        | 2 +-
+ ip/iplink_xstats.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 -- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.43.0
+
 
