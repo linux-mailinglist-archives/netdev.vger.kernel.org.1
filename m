@@ -1,84 +1,102 @@
-Return-Path: <netdev+bounces-62558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B093827D5B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 04:30:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6528D827D65
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 04:38:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D4DF1C21956
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 03:30:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 454D31C22029
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 03:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DCC06D6E0;
-	Tue,  9 Jan 2024 03:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0225B3D86;
+	Tue,  9 Jan 2024 03:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EzuwBdwT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fsoj7S3f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F276103
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 03:30:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 15626C43390;
-	Tue,  9 Jan 2024 03:30:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704771025;
-	bh=vTUT5gT93jfAwkNh0PhOb6di58dhiEka8Tg/ZSXZYL0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EzuwBdwTX0JO8nizaUX9grp5LpzKKf18BoIC4RrL5UnrAAOQn0mHDTPfwbVF0x2KT
-	 Wn3EAYfFZJcfnUEjGtGFlZZDDHL4p8I1O+VQXe2bJhH9xkBAJFIVNEvdNyqg+NNt3w
-	 2ctYiC+LwSfeuYGCs4iMDRtnRcTdiL0E8yRBLn5RYneFaImBEOi545ed7dbPv59STF
-	 nCNOtkH7Rqr/2BASTq9rFGilJscN5c4WLjWXjS6KiIn9DkwtGarLGdMDQg8yJ5cGHN
-	 oHkxP/UWRyaWyu/V2Ns6oTLJV2IrLk3md0sL4iSFQJ3xDaePQQsYOWWvAxUHlR558G
-	 RL+TJKvZ2OOPg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F17BCDFC690;
-	Tue,  9 Jan 2024 03:30:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95168259D;
+	Tue,  9 Jan 2024 03:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-6dddfdc3244so383145a34.1;
+        Mon, 08 Jan 2024 19:38:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704771523; x=1705376323; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3eFkTrLnCWs6jCP3r5JBqrIU5a6chwk8A4GmgjiNGkM=;
+        b=Fsoj7S3fXIIYoP7aV5BciboXHSgsx36CvAZAO0dbpbVWEvxriRwg4eGA0gzB+TiFNo
+         XdzUBzhRcZVvRlZp8WkbOCBgA/hDQC5Rr9qUK8M/VFu3Uf+CqRtTjouu+PFbR0v5tEh6
+         WonztObOsg9Ynw/Cb5KJOFjEw5/732cku576KvjI3GR7Qkb/8fZnP2UxtlfUBO8IM8nr
+         JX+91AINrOrHZP+UQ1KpmW636nyhHWkQ+Fn8zFiimyUY45dGH8rfauK2ccIRMaX5doRt
+         uO52pBT0tUDD+OIs9/vYpcycqXSEp59aY48/tp+bcw2Zenzneio1d6TSxPJSoWB5uaqS
+         DbNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704771523; x=1705376323;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3eFkTrLnCWs6jCP3r5JBqrIU5a6chwk8A4GmgjiNGkM=;
+        b=gVHU0bceh0cDf2nT1dyRZAxyH2H9FC95hEVHfG3H/g7MHSRhVKEnSC5ZZ69snf+HiP
+         i24IovlRGBajcFmwyS+8RSsg3d/3i7pwbAXSX3/EFqyVNK+MY+Ah993T0RXh6ojeqJO5
+         Rfa74m/kN86AWYo1w30omEXka+qAvsSXyyA/ZIlJZcUKqZjsxfhxzoKixP3UeZFnrNSp
+         TXacqWGDYwUjDokK7CwlDwfViLx0cd7jECEVwEiNPGfaVcPMklrUSD/J3q1SAebncfvP
+         dLMUpCZBerfznsi5GKSf1VG8UeQjI/gL5oZrg8fcGUvUbAR3NMyEQ47OBngBW3fyHf+s
+         zkGQ==
+X-Gm-Message-State: AOJu0YwZz62qPzgrqZICYShD+6YuMPvxAtHNoieKwxXiWOT02eXgHn69
+	xMuMWGPLHLGEiBb+1FMbidQ=
+X-Google-Smtp-Source: AGHT+IHXJ35OjLmnPpomOFhZywO5zO0pa2axPOWoL5L+gGdnUSQ5TPfkSCVgNSE5/IVKSceocQESsg==
+X-Received: by 2002:a05:6830:1157:b0:6dd:e4d4:bd8f with SMTP id x23-20020a056830115700b006dde4d4bd8fmr162942otq.2.1704771523527;
+        Mon, 08 Jan 2024 19:38:43 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id gx17-20020a056a001e1100b006d9b2682c91sm589339pfb.113.2024.01.08.19.38.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jan 2024 19:38:42 -0800 (PST)
+Date: Tue, 9 Jan 2024 11:38:37 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
+	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v4 1/2] Revert "net: rtnetlink: Enslave device before
+ bringing it up"
+Message-ID: <ZZy_vX_uJgryR-Ti@Laptop-X1>
+References: <20240108094103.2001224-1-nicolas.dichtel@6wind.com>
+ <20240108094103.2001224-2-nicolas.dichtel@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] lan743x: remove redundant statement in
- lan743x_ethtool_get_eee
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170477102498.11770.3025352967118480440.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Jan 2024 03:30:24 +0000
-References: <3340ff84-8d7a-404b-8268-732c7f281164@gmail.com>
-In-Reply-To: <3340ff84-8d7a-404b-8268-732c7f281164@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
- andrew@lunn.ch, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240108094103.2001224-2-nicolas.dichtel@6wind.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 5 Jan 2024 23:19:02 +0100 you wrote:
-> eee_active is set by phy_ethtool_get_eee() already, using the same
-> logic plus an additional check against link speed/duplex values.
-> See genphy_c45_eee_is_active() for details.
-> So we can remove this line.
+On Mon, Jan 08, 2024 at 10:41:02AM +0100, Nicolas Dichtel wrote:
+> This reverts commit a4abfa627c3865c37e036bccb681619a50d3d93c.
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> The patch broke:
+> > ip link set dummy0 up
+> > ip link set dummy0 master bond0 down
 > 
-> [...]
+> This last command is useful to be able to enslave an interface with only
+> one netlink message.
+> 
+> After discussion, there is no good reason to support:
+> > ip link set dummy0 down
+> > ip link set dummy0 master bond0 up
+> because the bond interface already set the slave up when it is up.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: a4abfa627c38 ("net: rtnetlink: Enslave device before bringing it up")
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-Here is the summary with links:
-  - [net-next] lan743x: remove redundant statement in lan743x_ethtool_get_eee
-    https://git.kernel.org/netdev/net-next/c/5733d139a674
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
