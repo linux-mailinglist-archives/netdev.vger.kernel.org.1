@@ -1,167 +1,130 @@
-Return-Path: <netdev+bounces-62659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498FF82861C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:37:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4C7828626
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:41:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE1CF1F24942
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:37:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E39F71C23A0C
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37A6360BD;
-	Tue,  9 Jan 2024 12:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D46381BB;
+	Tue,  9 Jan 2024 12:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GHzULQnn"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="d6F9gXLc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4039826AF7
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 12:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3368ac0f74dso2268734f8f.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 04:37:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704803821; x=1705408621; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7FAzWAT/C+jCQni2zCWQ4AyEq8nrKASrguI0ZEzUC+I=;
-        b=GHzULQnninad+6bJglDFUBJJdICi4ScQc2pV8ONnUtx6I+EBPWyIPq/LTd4VGQzibn
-         VOs2w0HIyHK47kkPaXbX6SviFyZOmoLk0m7K7pubGv3WCGcejhZ/RWns7NFvmabSB9XE
-         GeOyUb6U8LDm6cVTAZGOB58DVCa1hriPIXpMxVOgW9fsZNPsS0ayO0gPneerPEHDHNq0
-         96XmGEb03EUPajS6t06fqaFoJ9bXCN5qlptEYAQ2mfnIMScPwMtRTMjMtc61jzMXzCh2
-         /cehIFRai5gCuyADWmTyCU4sO6xL5RduQxRURyaBASqg5ykDLgbobDru+o3GPktTXtw8
-         Uz8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704803821; x=1705408621;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7FAzWAT/C+jCQni2zCWQ4AyEq8nrKASrguI0ZEzUC+I=;
-        b=gm2NHMfNBbdbSsggw9AzEQVSgoIYIGlsjc+oxRbn6AG6rtnGgka8Y0wVM0yk4aYBdW
-         MKvEfNH0ASXNVDOoFReJNsYkpaRzZO3JPQNc4hXUycEHKXbdzC6PyXOv6xqtPSP60Bqp
-         1zZkCWgJFKjU8rzZHFa97mNZ4oVEI4AbeFvZ2Xc0utnYWraN8zwFi6zUmDDOCx9LyaFP
-         33ZaDozuT4m6w0VJ93t2r/8/0OuLeM1vQS5AebDNUFa8vPAAnPtoxktj83tTbebjEIMr
-         hOTmkn/UFUbpGbDCQ4ZZbPUp8x9OJZ/ZGLdK/qMqWtrMTiFsGJQtOVxcGtfwNZL3C2MZ
-         h77g==
-X-Gm-Message-State: AOJu0Yy0sTbWCu6SuKFymAUILhDl19sSFWWOHdmI0g7NaIU2qhTgcLsc
-	9WEyV5IPCowuhBdnuBFa78g=
-X-Google-Smtp-Source: AGHT+IFaQleOoQWgv9Z4ecMGKHfEzJxNFlbC1vJ/IUKszuLIkNGLPpV8qOVx+5CSiViXCy0vE2ELvA==
-X-Received: by 2002:a5d:5406:0:b0:336:5b14:525f with SMTP id g6-20020a5d5406000000b003365b14525fmr644485wrv.132.1704803821281;
-        Tue, 09 Jan 2024 04:37:01 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id a17-20020a5d4571000000b00336e32338f3sm2307640wrc.70.2024.01.09.04.37.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jan 2024 04:37:01 -0800 (PST)
-Date: Tue, 9 Jan 2024 14:36:58 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	arinc.unal@arinc9.com
-Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa
- module
-Message-ID: <20240109123658.vqftnqsxyd64ik52@skbuf>
-References: <20231223005253.17891-1-luizluca@gmail.com>
- <20231223005253.17891-4-luizluca@gmail.com>
- <20240108140002.wpf6zj7qv2ftx476@skbuf>
- <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC166364A8
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 12:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=P8P2DPgcLIs1U0Ms4I4IOad60OlN5Zw/f7uZrNzp17c=; b=d6F9gXLcIp/A9b2OInYY+STCUJ
+	DhVySTirAi9Ghp7ntbUb/p6JkZOjNUbSIKc5qoR8DirJRnBi4U1lv8kAnBnesBne7kOD296R3cu71
+	OCHTZnSGAT6SkJgWDtRho27DEjvxL9wRjhccL3A2l1+x6WE6QTQ0FrM6wAENS5BFPn+E=;
+Received: from p4ff13178.dip0.t-ipconnect.de ([79.241.49.120] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <nbd@nbd.name>)
+	id 1rNBQS-002S2B-6e; Tue, 09 Jan 2024 13:41:48 +0100
+Message-ID: <bdb86076-d4ce-49b3-8ceb-742f61f05559@nbd.name>
+Date: Tue, 9 Jan 2024 13:41:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: bridge: do not send arp replies if src and
+ target hw addr is the same
+Content-Language: en-US
+To: Nikolay Aleksandrov <razor@blackwall.org>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20240104142501.81092-1-nbd@nbd.name>
+ <6b43ec63a2bbb91e78f7ea7954f6d5148a33df00.camel@redhat.com>
+ <e5d1e7da-0b90-45d7-b7ab-75ce2ef79208@nbd.name>
+ <2b3bbe3a-6796-458c-88f9-1458a449d79c@blackwall.org>
+From: Felix Fietkau <nbd@nbd.name>
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <2b3bbe3a-6796-458c-88f9-1458a449d79c@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 09, 2024 at 02:05:29AM -0300, Luiz Angelo Daros de Luca wrote:
-> > > +struct realtek_priv *
-> > > +realtek_common_probe(struct device *dev, struct regmap_config rc,
-> > > +                  struct regmap_config rc_nolock)
-> >
-> > Could you use "const struct regmap_config *" as the data types here, to
-> > avoid two on-stack variable copies? Regmap will copy the config structures
-> > anyway.
+On 09.01.24 13:02, Nikolay Aleksandrov wrote:
+> On 09/01/2024 13:58, Felix Fietkau wrote:
+>> On 09.01.24 12:36, Paolo Abeni wrote:
+>>> On Thu, 2024-01-04 at 15:25 +0100, Felix Fietkau wrote:
+>>>> There are broken devices in the wild that handle duplicate IP address
+>>>> detection by sending out ARP requests for the IP that they received from a
+>>>> DHCP server and refuse the address if they get a reply.
+>>>> When proxyarp is enabled, they would go into a loop of requesting an address
+>>>> and then NAKing it again.
+>>>
+>>> Can you instead provide the same functionality with some nft/tc
+>>> ingress/ebpf filter?
+>>>
+>>> I feel uneasy to hard code this kind of policy, even if it looks
+>>> sensible. I suspect it could break some other currently working weird
+>>> device behavior.
+>>>
+>>> Otherwise it could be nice provide some arpfilter flag to
+>>> enable/disable this kind filtering.
+>> 
+>> I don't see how it could break anything, because it wouldn't suppress non-proxied responses. nft/arpfilter is just too expensive, and I don't think it makes sense to force the use of tc filters to suppress nonsensical responses generated by the bridge layer.
+>> 
+>> - Felix
+>> 
 > 
-> I could do that for rc_nolock but not for rc as we need to modify it
-> before passing to regmap. I would still need to duplicate rc, either
-> using the stack or heap. What would be the best option?
-> 
-> 1) pass two pointers and copy one to stack
-> 2) pass two pointers and copy one to heap
-> 3) pass two structs (as it is today)
-> 4) pass one pointer and one struct
-> 
-> The old code was using 1) and I'm inclined to adopt it and save a
-> hundred and so bytes from the stack, although 2) would save even more.
+> I also share Paolo's concerns, and I don't think such specific policy
+> should be hardcoded in the bridge. It can already be achieved via tc/nft/ebpf
+> as mentioned. Also please CC bridge maintainers for bridge patches, I saw this
+> one because of Paolo's earlier reply.
 
-I didn't notice the "rc.lock_arg = priv" assignment...
+Why is this 'specific policy'? I'm not changing the bridge to filter 
+quirky ARP responses generated elsewhere. I'm simply changing the bridge 
+code to avoid generating nonsensical ARP responses by itself.
 
-I'm not sure what you mean by "copy to heap". Perform a dynamic memory
-allocation?
+Also, I can't replicate the exact behavior with a nft/tc filter, because 
+a filter can't differentiate between forwarded ARP responses and bogus 
+fake responses generated by the bridge code itself.
 
-Also, the old code was not using exactly 1). It copied both the normal
-and the nolock regmap config to an on-stack local variable, even though
-only the normal regmap config had to be copied (to be fixed up).
+The concern regarding breaking existing devices also makes no sense to 
+me at all. From my perspective, proxyarp is an optimization that you 
+should be able to turn on without breaking breaking existing devices.
+The fact that the current code violates that expectation is something 
+I'm trying to fix.
 
-I went back to study the 4 regmap configs, and only the reg_read() and
-reg_write() methods differ between SMI and MDIO. The rest seems boilerplate
-that can be dynamically constructed by realtek_common_probe(). Sure,
-spelling out 4 regmap_config structures is more flexible, but do we need
-that flexibility? What if realtek_common_probe() takes just the
-reg_read() and reg_write() function prototypes as arguments, rather than
-pointers to regmap_config structures it then has to fix up?
-
-> > > +EXPORT_SYMBOL(realtek_common_probe);
-> > > diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-> > > index e9ee778665b2..fbd0616c1df3 100644
-> > > --- a/drivers/net/dsa/realtek/realtek.h
-> > > +++ b/drivers/net/dsa/realtek/realtek.h
-> > > @@ -58,11 +58,9 @@ struct realtek_priv {
-> > >       struct mii_bus          *bus;
-> > >       int                     mdio_addr;
-> > >
-> > > -     unsigned int            clk_delay;
-> > > -     u8                      cmd_read;
-> > > -     u8                      cmd_write;
-> > >       spinlock_t              lock; /* Locks around command writes */
-> > >       struct dsa_switch       *ds;
-> > > +     const struct dsa_switch_ops *ds_ops;
-> > >       struct irq_domain       *irqdomain;
-> > >       bool                    leds_disabled;
-> > >
-> > > @@ -79,6 +77,8 @@ struct realtek_priv {
-> > >       int                     vlan_enabled;
-> > >       int                     vlan4k_enabled;
-> > >
-> > > +     const struct realtek_variant *variant;
-> > > +
-> > >       char                    buf[4096];
-> > >       void                    *chip_data; /* Per-chip extra variant data */
-> > >  };
-> >
-> > Can the changes to struct realtek_priv be a separate patch, to
-> > clarify what is being changed, and to leave the noisy code movement
-> > more isolated?
-> 
-> Sure, although it will not be a patch that makes sense by itself. If
-> it helps with the review, I'll split it. We can fold it back if
-> needed.
-
-Well, I don't mean only the changes to the private structure, but also
-the code changes that accompany them.
-
-As Andrew usually says, what you want is lots of small patches that are
-each obviously correct, where there is only one thing being changed.
-Code movement with small renames is trivial to review. Consolidation of
-two identical code paths in a single function is also possible to follow.
-The insertion of a new variable and its usage is also easy to review.
-The removal of a variable, the same. But superimposing them all into a
-single patch makes everything much more difficult to follow.
+- Felix
 
