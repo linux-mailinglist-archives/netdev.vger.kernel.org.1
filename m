@@ -1,153 +1,149 @@
-Return-Path: <netdev+bounces-62761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AFAC8290B7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 00:16:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF3518290C6
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 00:22:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C84F6288155
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 23:16:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 015E41C250CF
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 23:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8EC3F8D8;
-	Tue,  9 Jan 2024 23:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266F93E474;
+	Tue,  9 Jan 2024 23:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JXIu1Rfb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HJRf6NN0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA483FB09
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 23:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704841676;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PmsOSA8e0agbmpKIvz+4i4zAbpgfLcQxgusd1VNG7pQ=;
-	b=JXIu1RfbJu/A5Td5xNkKZrIBLu2ITHCfEFTdUnqUvVxQsw5RtCSQIaFt8+QIimSEadGKdQ
-	Am5Qt54RgDCHIFYMGEALRGlWGIg2yPl1tS7bszUeN73enZbZNhzVhPfdvlYv8aE1jBZUpI
-	kHLEBrzI3nhpFPmKck+bMQU7LNpsHNk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-90-qvUcwbMSOQ6bPantIvOy2Q-1; Tue, 09 Jan 2024 18:07:50 -0500
-X-MC-Unique: qvUcwbMSOQ6bPantIvOy2Q-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40d62d3ae0cso31177785e9.2
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 15:07:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704841669; x=1705446469;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FC93E473;
+	Tue,  9 Jan 2024 23:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7ba903342c2so254411739f.3;
+        Tue, 09 Jan 2024 15:22:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704842561; x=1705447361; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PmsOSA8e0agbmpKIvz+4i4zAbpgfLcQxgusd1VNG7pQ=;
-        b=jBkHXSkbpI3UBQrex4/9I05e60Hfiv1QpeED/S8n14d4j+DradhytK7iSallxOC50y
-         s3aDlTPHt9Mb+7oJQFjJP5LK/07Tepm6YKuVzSInq4VIcyZ7INiBNTLOc3i6UlYwNAJI
-         DFVTBuyFoROfF9fsj5SwskC6D/BWTSFADQ6SMwcRLyNvGUHymnB5jHTd0jhxTr3uphuw
-         9T7uO1k1qUxeRWKb2lIVLv0eN+6I4+cuE7DzsgyJJZ7ishAcwoW8DROVZgyIr/X5Nlf1
-         v8xm/dt1aLg7Jb1E0DavnIpVHh79NdOG29uHNJvYAm546TfssZ9mtr+IPWxSgY2NDjMN
-         KoxA==
-X-Gm-Message-State: AOJu0YxYwy88qDfVZWzrfO1vDcwu9htN3rZPvMfu8wPPT71uEL9uZ0oi
-	tXEcrSjfEah/FqjDdWR0LqfMXEGElQPEExQXB9ccfR19ePswDrtsmCUTZ9T7VyGsnzVo1z9ZW0u
-	tjibR5lXThBymL5viTer5Ccjw
-X-Received: by 2002:a05:600c:1603:b0:40e:4800:c91f with SMTP id m3-20020a05600c160300b0040e4800c91fmr31978wmn.9.1704841668813;
-        Tue, 09 Jan 2024 15:07:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEO3FEhMXyQFhkdwPMbAGnlA5UDqENRCt3LgtBWXNMza5r2kTWnZqKT5YT16xPNccXd/SHk6A==
-X-Received: by 2002:a05:600c:1603:b0:40e:4800:c91f with SMTP id m3-20020a05600c160300b0040e4800c91fmr31970wmn.9.1704841668528;
-        Tue, 09 Jan 2024 15:07:48 -0800 (PST)
-Received: from redhat.com ([2.52.133.193])
-        by smtp.gmail.com with ESMTPSA id h5-20020a05600c314500b0040d7c3d5454sm59173wmo.3.2024.01.09.15.07.46
+        bh=uPqy+82fb4SEKR56UmyLvl8CBKyqJEkW6ciRME8Jc5k=;
+        b=HJRf6NN07l+nSl7oMoVB2poxhZ0oZ4mncvxIuaVNCGajDuQ2RlsZdaeUvQ+l9fWbyE
+         ycyUgFH43t4SocYJjF7VN5rFHweo40qIBj3pgot/bUZrCVdnFwBirzKv2C6zdjNgwHNv
+         GbV8VEPV1IhTky4z6FOahlylzp8tDoAkxJNrni01EX8bIKjDM8RhOVwGxFSQXWAUJ4pg
+         ldX6QdkGKLxiOtGM7vX3wxc0yiyg++138l4nfwxkFynAzIgswwosdK/8gc9K5H1Xg7UR
+         S/U8Mz5CdhrbYA09Zfz4eKPrOkvSStePfr9YOZschFm+MRm2VfraJDGUYDrzYCnKBmun
+         W7qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704842561; x=1705447361;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uPqy+82fb4SEKR56UmyLvl8CBKyqJEkW6ciRME8Jc5k=;
+        b=WuqFUPhGuTCURI147zBM9Y/EOP4gOvw8+y37jmVV0CIEoIEM61pKhnD6yZV5AnWuXt
+         by0ikQQ18FFKgvcuxbfEBvLqSkcAWWawsU+aqZhUOeBGmT0QYymazBCUTqH40eQJjEGi
+         oxXoXliyeimFvT9Cb7zYvlUp5QzOMConUbT5/co2GBmKZp9UjTgAME9JiMYVF5vhWRJx
+         pKTKzsYKCzuYlHSIMJjknqVW95WBhCrvoK4bGkn7xIHc8tmX14dBq62wIamLK+6Da15j
+         oOI1EhKTV/nsJsDVXJjWpESiODw7UBg/CuM48qnUwYVcHp5vrEzFTkYRMmlaIm/u6hHk
+         0ZXA==
+X-Gm-Message-State: AOJu0YwvjSzfqd1afrdkOG6yo6yScMmsPy3XVzBNUYpWNUqcL6s570Za
+	7FUDkXNzGJo0OAcQHwJlzpM=
+X-Google-Smtp-Source: AGHT+IGGt6OAJV1oxXGi3mKg/cLI3CBEmG5ulIXCjnOwGBwFESR2ItT+BmBDixngwudJjuOzHAmo5A==
+X-Received: by 2002:a05:6e02:b2d:b0:360:976f:d0b8 with SMTP id e13-20020a056e020b2d00b00360976fd0b8mr210234ilu.44.1704842560724;
+        Tue, 09 Jan 2024 15:22:40 -0800 (PST)
+Received: from localhost ([98.97.116.78])
+        by smtp.gmail.com with ESMTPSA id v3-20020a1709029a0300b001d4c316e3a4sm2303718plp.189.2024.01.09.15.22.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jan 2024 15:07:47 -0800 (PST)
-Date: Tue, 9 Jan 2024 18:07:44 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Tobias Huschle <huschle@linux.ibm.com>
-Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <20240109180706-mutt-send-email-mst@kernel.org>
-References: <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
- <20231211115329-mutt-send-email-mst@kernel.org>
- <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
- <20231212111433-mutt-send-email-mst@kernel.org>
- <42870.123121305373200110@us-mta-641.us.mimecast.lan>
- <20231213061719-mutt-send-email-mst@kernel.org>
- <25485.123121307454100283@us-mta-18.us.mimecast.lan>
- <20231213094854-mutt-send-email-mst@kernel.org>
- <20231214021328-mutt-send-email-mst@kernel.org>
- <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+        Tue, 09 Jan 2024 15:22:40 -0800 (PST)
+Date: Tue, 09 Jan 2024 15:22:39 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Edward Adam Davis <eadavis@qq.com>, 
+ syzbot+f2977222e0e95cec15c8@syzkaller.appspotmail.com
+Cc: andrii@kernel.org, 
+ ast@kernel.org, 
+ borisp@nvidia.com, 
+ bpf@vger.kernel.org, 
+ daniel@iogearbox.net, 
+ davem@davemloft.net, 
+ dhowells@redhat.com, 
+ edumazet@google.com, 
+ jakub@cloudflare.com, 
+ john.fastabend@gmail.com, 
+ kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ syzkaller-bugs@googlegroups.com
+Message-ID: <659dd53f1652b_2796120896@john.notmuch>
+In-Reply-To: <tencent_146C309740E8F6ECD2CC5C7ADA6E202D450A@qq.com>
+References: <000000000000aa2f41060e363b2b@google.com>
+ <tencent_146C309740E8F6ECD2CC5C7ADA6E202D450A@qq.com>
+Subject: RE: [PATCH] tls: fix WARNING in __sk_msg_free
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
-> On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
-> > 
-> > Peter, would appreciate feedback on this. When is cond_resched()
-> > insufficient to give up the CPU? Should Documentation/kernel-hacking/hacking.rst
-> > be updated to require schedule() instead?
-> > 
+Edward Adam Davis wrote:
+> Syzbot constructed 32 scatterlists, and the data members in struct sk_msg_sg 
+> can only store a maximum of MAX_MSG_FRAGS scatterlists.
+> However, the value of MAX_MSG_FRAGS=CONFIG_MAX_SKB_FRAG is less than 32, which
+> leads to the warning reported here.
 > 
-> Happy new year everybody!
+> Prevent similar issues from occurring by checking whether sg.end is greater 
+> than MAX_MSG_FRAGS.
 > 
-> I'd like to bring this thread back to life. To reiterate:
+> Reported-and-tested-by: syzbot+f2977222e0e95cec15c8@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> ---
+>  net/tls/tls_sw.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> - The introduction of the EEVDF scheduler revealed a performance
->   regression in a uperf testcase of ~50%.
-> - Tracing the scheduler showed that it takes decisions which are
->   in line with its design.
-> - The traces showed as well, that a vhost instance might run
->   excessively long on its CPU in some circumstance. Those cause
->   the performance regression as they cause delay times of 100+ms
->   for a kworker which drives the actual network processing.
-> - Before EEVDF, the vhost would always be scheduled off its CPU
->   in favor of the kworker, as the kworker was being woken up and
->   the former scheduler was giving more priority to the woken up
->   task. With EEVDF, the kworker, as a long running process, is
->   able to accumulate negative lag, which causes EEVDF to not
->   prefer it on its wake up, leaving the vhost running.
-> - If the kworker is not scheduled when being woken up, the vhost
->   continues looping until it is migrated off the CPU.
-> - The vhost offers to be scheduled off the CPU by calling 
->   cond_resched(), but, the the need_resched flag is not set,
->   therefore cond_resched() does nothing.
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index e37b4d2e2acd..68dbe821f61d 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -1016,6 +1016,8 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+>  
+>  		msg_pl = &rec->msg_plaintext;
+>  		msg_en = &rec->msg_encrypted;
+> +		if (msg_pl->sg.end >= MAX_MSG_FRAGS)
+> +			return -EINVAL;
+>  
+>  		orig_size = msg_pl->sg.size;
+>  		full_record = false;
+> -- 
+> 2.43.0
 > 
-> To solve this, I see the following options 
->   (might not be a complete nor a correct list)
-> - Along with the wakeup of the kworker, need_resched needs to
->   be set, such that cond_resched() triggers a reschedule.
-> - The vhost calls schedule() instead of cond_resched() to give up
->   the CPU. This would of course be a significantly stricter
->   approach and might limit the performance of vhost in other cases.
 
-And on these two, I asked:
-	Would appreciate feedback on this. When is cond_resched()
-	insufficient to give up the CPU? Should Documentation/kernel-hacking/hacking.rst
-	be updated to require schedule() instead?
+I'll test this in a bit, but I suspect this error is because even
+if the msg_pl is full (the sg.end == MAX_MSG_FRAGS) the code is
+missing a full_record=true set to force the loop to do the send
+and abort. My opinion is we should never iterated the loop if the
+msg_pl was full.
 
+I think something like this is actually needed.
 
-> - Preventing the kworker from accumulating negative lag as it is
->   mostly not runnable and if it runs, it only runs for a very short
->   time frame. This might clash with the overall concept of EEVDF.
-> - On cond_resched(), verify if the consumed runtime of the caller
->   is outweighing the negative lag of another process (e.g. the 
->   kworker) and schedule the other process. Introduces overhead
->   to cond_resched.
-> 
-> I would be curious on feedback on those ideas and interested in
-> alternative approaches.
-
-
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index e37b4d2e2acd..9cfa6f8d51e3 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1052,8 +1052,10 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+                        if (ret < 0)
+                                goto send_end;
+                        tls_ctx->pending_open_record_frags = true;
+-                       if (full_record || eor || sk_msg_full(msg_pl))
++                       if (full_record || eor || sk_msg_full(msg_pl)) {
++                               full_record = true;
+                                goto copied;
++                       }
+                        continue;
+                }
 
