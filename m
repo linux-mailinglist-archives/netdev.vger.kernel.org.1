@@ -1,121 +1,98 @@
-Return-Path: <netdev+bounces-62645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D40E8284E5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:24:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 038918284EA
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:24:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA5512873B3
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 11:24:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94C47282361
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 11:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F1536B04;
-	Tue,  9 Jan 2024 11:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YV8mXsIi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E595381AB;
+	Tue,  9 Jan 2024 11:22:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85D237155
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 11:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704799291;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lTmcWwAowP4sGHH2dBxkB2CC/aMCkpFsy2ZSyWuDsbM=;
-	b=YV8mXsIi4oqcgqt8lZu4wBck1srMwVRMGe12k2laoC+iGzuL7Gqn0oxwAQn2sOeYL18iS4
-	QhpgdhDPCoyzIcZWMg9Alf+VLU1ZzrgE0G+ZCe3wJpqb6KDmGXJV5K/qZDyltTcS41Nv90
-	1gPIcxjloGxQ3dxw0SzDo4iHx/CoEAY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-625-9U04wNMdOJy50uoFoYMuDQ-1; Tue, 09 Jan 2024 06:21:03 -0500
-X-MC-Unique: 9U04wNMdOJy50uoFoYMuDQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DD86385A588;
-	Tue,  9 Jan 2024 11:21:00 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E0990C15E6C;
-	Tue,  9 Jan 2024 11:20:57 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH 6/6] netfs: Fix wrong #ifdef hiding wait
-Date: Tue,  9 Jan 2024 11:20:23 +0000
-Message-ID: <20240109112029.1572463-7-dhowells@redhat.com>
-In-Reply-To: <20240109112029.1572463-1-dhowells@redhat.com>
-References: <20240109112029.1572463-1-dhowells@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489C1381AC;
+	Tue,  9 Jan 2024 11:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4T8T593hd4zvQPy;
+	Tue,  9 Jan 2024 19:21:01 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 90CCE14011F;
+	Tue,  9 Jan 2024 19:22:17 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 9 Jan
+ 2024 19:22:17 +0800
+Subject: Re: [PATCH net-next 3/6] mm/page_alloc: use initial zero offset for
+ page_frag_alloc_align()
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+ <20240103095650.25769-4-linyunsheng@huawei.com>
+ <f4abe71b3439b39d17a6fb2d410180f367cadf5c.camel@gmail.com>
+ <74c9a3a1-5204-f79a-95ff-5c108ec6cf2a@huawei.com>
+ <CAKgT0Uf=hFrXLzDFaOxs_j9yYP7aQCmi=wjUyuop3FBv2vzgCA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <f138193c-30e0-b1ba-1735-5f569230724b@huawei.com>
+Date: Tue, 9 Jan 2024 19:22:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAKgT0Uf=hFrXLzDFaOxs_j9yYP7aQCmi=wjUyuop3FBv2vzgCA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-netfs_writepages_begin() has the wait on the fscache folio conditional on
-CONFIG_NETFS_FSCACHE - which doesn't exist.
+On 2024/1/9 0:25, Alexander Duyck wrote:
+> On Mon, Jan 8, 2024 at 12:59 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 
-Fix it to be conditional on CONFIG_FSCACHE instead.
+...
 
-Fixes: 62c3b7481b9a ("netfs: Provide a writepages implementation")
-Reported-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: linux-afs@lists.infradead.org
-cc: linux-cachefs@redhat.com
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
-Link: https://lore.kernel.org/r/20240109083257.GK132648@kernel.org/
----
- fs/netfs/buffered_write.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+>>>
+>>> 2. By starting at the end and working toward zero we can use built in
+>>> functionality of the CPU to only have to check and see if our result
+>>> would be signed rather than having to load two registers with the
+>>> values and then compare them which saves us a few cycles. In addition
+>>> it saves us from having to read both the size and the offset for every
+>>> page.
+>>
+>> I suppose the above is ok if we only use the page_frag_alloc*() API to
+>> allocate memory for skb->data, not for the frag in skb_shinfo(), as by
+>> starting at the end and working toward zero, it means we can not do skb
+>> coalescing.
+>>
+>> As page_frag_alloc*() is returning va now, I am assuming most of users
+>> is using the API for skb->data, I guess it is ok to drop this patch for
+>> now.
+>>
+>> If we allow page_frag_alloc*() to return struct page, we might need this
+>> patch to enable coalescing.
+> 
+> I would argue this is not the interface for enabling coalescing. This
+> is one of the reasons why this is implemented the way it is. When you
+> are aligning fragments you aren't going to be able to coalesce the
+> frames anyway as the alignment would push the fragments apart.
 
-diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-index 0b2b7a60dabc..de517ca70d91 100644
---- a/fs/netfs/buffered_write.c
-+++ b/fs/netfs/buffered_write.c
-@@ -1076,7 +1076,7 @@ static ssize_t netfs_writepages_begin(struct address_space *mapping,
- 		folio_unlock(folio);
- 		if (wbc->sync_mode != WB_SYNC_NONE) {
- 			folio_wait_writeback(folio);
--#ifdef CONFIG_NETFS_FSCACHE
-+#ifdef CONFIG_FSCACHE
- 			folio_wait_fscache(folio);
- #endif
- 			goto lock_again;
+It seems the alignment requirement is the same for the same user of a page_frag
+instance, so the aligning does not seem to be a problem for coalescing?
 
+> .
+> 
 
