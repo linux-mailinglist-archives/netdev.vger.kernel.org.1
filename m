@@ -1,173 +1,125 @@
-Return-Path: <netdev+bounces-62621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3281828392
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:59:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4FF582839E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 11:03:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE1E21C23E31
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 09:59:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D580C1C23BD7
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BACF35890;
-	Tue,  9 Jan 2024 09:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD6535EE5;
+	Tue,  9 Jan 2024 10:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vj/slGvb"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225AB36AE1
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 09:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rN8rr-0007j3-TQ; Tue, 09 Jan 2024 10:57:55 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rN8rq-001Rg1-Ht; Tue, 09 Jan 2024 10:57:54 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rN8rq-007r0c-1X;
-	Tue, 09 Jan 2024 10:57:54 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [RFC net-next v2 3/3] net: dsa: microchip: implement PHY loopback configuration for KSZ8794 and KSZ8873
-Date: Tue,  9 Jan 2024 10:57:53 +0100
-Message-Id: <20240109095753.1872010-4-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240109095753.1872010-1-o.rempel@pengutronix.de>
-References: <20240109095753.1872010-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EC031A7E;
+	Tue,  9 Jan 2024 10:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-50eabd1c701so3303501e87.3;
+        Tue, 09 Jan 2024 02:03:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704794608; x=1705399408; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Y1yFnGwCxaJ38SAnsqfHX0zi0fQTzVhh1Q60oTmi8w=;
+        b=Vj/slGvbpKPmbdMZGFIqQHfO3GxfCvqhBkpVHCkBlId0Kt86IhWO8GHrbMOK4BuLRE
+         Qq6kEOWPQrFd1RmeBhKVdFPYKoKRtXsLJtd0EwnkO6rliN74ppmigwTn9wfWdIO7bbq6
+         a76NATtxQeUqAJsoWf4L3l1lzb4hfEdVdHKsxb7V/3LWt1Y/wX9oODDR0iXbywixr4IR
+         qainYqZKcyuHuHi5JqI3EHPhO2++frMWv0ASvgMVRmcd6dr0xUSh9CRoltYQKQTTnKQK
+         Lx6luO6hDEYEA89I/MuiBRXnKCEMiJg/7uKw5XgK13Nn6f/tAf1vOYugjTBJLfCkbJ25
+         qbzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704794608; x=1705399408;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3Y1yFnGwCxaJ38SAnsqfHX0zi0fQTzVhh1Q60oTmi8w=;
+        b=S04UNIgYgg3+urITQyg5LHzlf7RfV/a4b1DAYRRQo/plr/NwAb9IY1TL8q7VAERIv/
+         lBjbCce6jclUO20MIIsiMUF9WJjKBlhqLdUpKZAwM7Hp4JyWffOU3KujMaQZZDXb0Sgf
+         CwuYOoGR22LBbLOS/shNgp+Apy5XUpuskysjciccQ6o4JDuXXwObzGNjFIYjfPA3Fj+l
+         4rIHIJyZEeuOqF1KjrSr0GzEEgU2b/qNNThoA8hZrWx4T7YQEAUrJZ1XWdKMyQhRZCMI
+         7IY5Y8N4n5axO7rnqkfmahR5hV97yyx/j9XSGH3Odk05HbSGa6u5IIMaLadJERwM8C/w
+         r1Wg==
+X-Gm-Message-State: AOJu0YwzChWViz8iKzvhncLXGw7cZza5P9WbWLw7TnPL+Bmv50RM0KaV
+	p2mbfkg38OPEplefS06Fb+6VGYsZmj4=
+X-Google-Smtp-Source: AGHT+IELDKUtj3zZFQ4g/uA/k9Dd1nPZ7q9xaP1hCDi7aXAHt6eU1yOMqsoKuchurA11pt/VMNBLFA==
+X-Received: by 2002:a19:e016:0:b0:50e:99fc:3b48 with SMTP id x22-20020a19e016000000b0050e99fc3b48mr1967337lfg.34.1704794608101;
+        Tue, 09 Jan 2024 02:03:28 -0800 (PST)
+Received: from [192.168.26.149] (031011218106.poznan.vectranet.pl. [31.11.218.106])
+        by smtp.googlemail.com with ESMTPSA id u23-20020a1709063b9700b00a26af4d96c6sm856945ejf.4.2024.01.09.02.03.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jan 2024 02:03:27 -0800 (PST)
+Message-ID: <bdf7751b-0421-485d-8382-26c084f09d7d@gmail.com>
+Date: Tue, 9 Jan 2024 11:03:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Subject: Ethernet binding: broken validation parsing of #nvmem-cell-cells ?
+To: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Correct the PHY loopback bit handling in the ksz8_w_phy_bmcr and
-ksz8_r_phy_bmcr functions for KSZ8794 and KSZ8873 variants in the ksz8795
-driver. Previously, the code erroneously used Bit 7 of port register 0xD
-for both chip variants, which is actually for LED configuration. This
-update ensures the correct registers and bits are used for the PHY
-loopback feature:
+Hi,
 
-- For KSZ8794: Use 0xF / Bit 7.
-- For KSZ8873: Use 0xD / Bit 0.
+I'm playing with "dtbs_check" and I stuck on following errors:
 
-The lack of loopback support was seen on KSZ8873 system by using
-"ethtool -t lanX". After this patch, the ethtool selftest will work,
-but only if port is not part of a bridge.
+arch/arm/boot/dts/broadcom/bcm47094-luxul-xwr-3150-v1.dtb: ethernet@24000: nvmem-cells: [[9], [0]] is too long
+         from schema $id: http://devicetree.org/schemas/net/ethernet-controller.yaml#
+arch/arm/boot/dts/broadcom/bcm47094-luxul-xwr-3150-v1.dtb: ethernet-switch@18007000: ports:port@4:nvmem-cells: [[9], [5]] is too long
+         from schema $id: http://devicetree.org/schemas/net/dsa/brcm,b53.yaml#
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz8795.c     | 36 ++++++++++++++++++++-----
- drivers/net/dsa/microchip/ksz8795_reg.h |  1 +
- 2 files changed, 30 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index 51e0194453df..1d8377640a3d 100644
---- a/drivers/net/dsa/microchip/ksz8795.c
-+++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -731,16 +731,25 @@ static int ksz8_r_phy_bmcr(struct ksz_device *dev, u16 port, u16 *val)
- 	if (ret)
- 		return ret;
- 
--	if (restart & PORT_PHY_LOOPBACK)
--		*val |= BMCR_LOOPBACK;
--
- 	if (ctrl & PORT_FORCE_100_MBIT)
- 		*val |= BMCR_SPEED100;
- 
- 	if (ksz_is_ksz88x3(dev)) {
-+		if (restart & KSZ8873_PORT_PHY_LOOPBACK)
-+			*val |= BMCR_LOOPBACK;
-+
- 		if ((ctrl & PORT_AUTO_NEG_ENABLE))
- 			*val |= BMCR_ANENABLE;
- 	} else {
-+		u8 stat3;
-+
-+		ret = ksz_pread8(dev, port, REG_PORT_STATUS_3, &stat3);
-+		if (ret)
-+			return ret;
-+
-+		if (stat3 & PORT_PHY_LOOPBACK)
-+			*val |= BMCR_LOOPBACK;
-+
- 		if (!(ctrl & PORT_AUTO_NEG_DISABLE))
- 			*val |= BMCR_ANENABLE;
- 	}
-@@ -1001,8 +1010,7 @@ static int ksz8_w_phy_bmcr(struct ksz_device *dev, u16 port, u16 val)
- 
- 	restart = 0;
- 	restart_mask = PORT_LED_OFF | PORT_TX_DISABLE | PORT_AUTO_NEG_RESTART |
--		PORT_POWER_DOWN | PORT_AUTO_MDIX_DISABLE | PORT_FORCE_MDIX |
--		PORT_PHY_LOOPBACK;
-+		PORT_POWER_DOWN | PORT_AUTO_MDIX_DISABLE | PORT_FORCE_MDIX;
- 
- 	if (val & KSZ886X_BMCR_DISABLE_LED)
- 		restart |= PORT_LED_OFF;
-@@ -1022,8 +1030,22 @@ static int ksz8_w_phy_bmcr(struct ksz_device *dev, u16 port, u16 val)
- 	if (val & KSZ886X_BMCR_FORCE_MDI)
- 		restart |= PORT_FORCE_MDIX;
- 
--	if (val & BMCR_LOOPBACK)
--		restart |= PORT_PHY_LOOPBACK;
-+	if (ksz_is_ksz88x3(dev)) {
-+		restart_mask |= KSZ8873_PORT_PHY_LOOPBACK;
-+
-+		if (val & BMCR_LOOPBACK)
-+			restart |= KSZ8873_PORT_PHY_LOOPBACK;
-+	} else {
-+		u8 stat3 = 0;
-+
-+		if (val & BMCR_LOOPBACK)
-+			stat3 |= PORT_PHY_LOOPBACK;
-+
-+		ret = ksz_prmw8(dev, port, REG_PORT_STATUS_3, PORT_PHY_LOOPBACK,
-+				stat3);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	return ksz_prmw8(dev, port, regs[P_NEG_RESTART_CTRL], restart_mask,
- 			 restart);
-diff --git a/drivers/net/dsa/microchip/ksz8795_reg.h b/drivers/net/dsa/microchip/ksz8795_reg.h
-index beca974e0171..7c9341ef73b0 100644
---- a/drivers/net/dsa/microchip/ksz8795_reg.h
-+++ b/drivers/net/dsa/microchip/ksz8795_reg.h
-@@ -265,6 +265,7 @@
- #define PORT_AUTO_MDIX_DISABLE		BIT(2)
- #define PORT_FORCE_MDIX			BIT(1)
- #define PORT_MAC_LOOPBACK		BIT(0)
-+#define KSZ8873_PORT_PHY_LOOPBACK	BIT(0)
- 
- #define REG_PORT_1_STATUS_2		0x1E
- #define REG_PORT_2_STATUS_2		0x2E
+Context:
+
+nvram@1eff0000 {
+	compatible = "brcm,nvram";
+	reg = <0x1eff0000 0x10000>;
+
+	et0macaddr: et0macaddr {
+		#nvmem-cell-cells = <1>;
+	};
+};
+
+&gmac0 {
+	nvmem-cells = <&et0macaddr 0>;
+	nvmem-cell-names = "mac-address";
+};
+
+
+The validation error comes from ethernet-controller.yaml which contains:
+
+nvmem-cells:
+   maxItems: 1
+   description:
+     Reference to an nvmem node for the MAC address
+
+
+If I'm not mistaken <&et0macaddr 0> gets treated as two items.
+
+Can someone tell me what's going on here and help me with solving it,
+please? I would expect it to be sth trivial but I can't see any obvious
+mistake.
+
 -- 
-2.39.2
-
+Rafał Miłecki
 
