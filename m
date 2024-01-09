@@ -1,51 +1,47 @@
-Return-Path: <netdev+bounces-62705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BB8828A3D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:45:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 121DB828A3E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:45:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFF4128803B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:45:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6991288311
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F91F3A8D5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7680A3A8E7;
 	Tue,  9 Jan 2024 16:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EC50edTb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a20LX8RC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063BD3A8CA
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 16:45:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08F84C433B1;
-	Tue,  9 Jan 2024 16:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA3B3A8E2
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 16:45:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FCFEC43141;
+	Tue,  9 Jan 2024 16:45:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704818724;
-	bh=UALY/8U9M4ZX7fqMkazOyIQRULQ4mEfTqyNahWnOBzw=;
+	bh=rsbVW/Bl4c+FvBhvhr8wFlpil8bg3GSeHeoxa4mLOY8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EC50edTbP3mPlT32/N4ngFSsyMIKqzPdlfaZ22vF78PtacPty2mtBn8WOSzVKXGLs
-	 H+m1yipauZB+y5YS1QbRXsJPQ189qyGe9PE3IrHOnn55iBoJhG5cosApnx2qX1zdd2
-	 bxnQeZQb2GvV3lf5JnV7OQXs+F/VsS/O5zk969HF21PUTtCaFKzcIgj+XAqZx/By67
-	 S+q9Wdw8dPdqJoR31yqK1qIpkIRMHv/N4k8nVaPY/3ArIWOHIXeDGSq02T0T5Qd/Ey
-	 6gacAXfOd8EaTpTcXKrQ5EjaGhJBdNXA6ufU0ZvYf13AW/+qey9ySVbPfPsdzrYC02
-	 Ogvjdm2KXKayQ==
+	b=a20LX8RCjgH01wprB45AD7M38uO4R7MdgN2l2PpiKzxncWGVt0fdDaTuAZTQC2Dpj
+	 gGA0TDl4Z771JEc6MyGu25QL4Z5wIU1i0Fme4eCRMVsM+0+zW+hk0xTKWnIvTl9oo3
+	 eiC+I22ORgzymPqrdwqhgeKO3XPIkITYCc/WYcFLnYRFKUqw0mGzyjHjI4yZSpME/x
+	 F6FbD6j0DbOev31WHMMBknydyiIB95SKOIwIU/Vt4zrAUrckwnOjfYZi7U10eBEyxw
+	 xg6VqtK2GD06TwHoOd0IRL+TH0i54JYnohaygHsDqFcbbnL5ovbAU+6GyiTXLJs8tF
+	 jE9OeBsEVLHrQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH net 2/7] MAINTAINERS: eth: mt7530: move Landen Chao to CREDITS
-Date: Tue,  9 Jan 2024 08:45:12 -0800
-Message-ID: <20240109164517.3063131-3-kuba@kernel.org>
+	thomas.petazzoni@bootlin.com
+Subject: [PATCH net 3/7] MAINTAINERS: eth: mvneta: move Thomas to CREDITS
+Date: Tue,  9 Jan 2024 08:45:13 -0800
+Message-ID: <20240109164517.3063131-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240109164517.3063131-1-kuba@kernel.org>
 References: <20240109164517.3063131-1-kuba@kernel.org>
@@ -55,74 +51,59 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-mt7530 is a pretty active driver and last we have heard
-from Landen Chao on the list was March. There were total
-of 4 message from them in the last 2.5 years.
-I think it's time to move to CREDITS.
+Thomas is still active in other bits of the kernel and beyond
+but not as much on the Marvell Ethernet devices.
+Our scripts report:
 
-Subsystem MEDIATEK SWITCH DRIVER
-  Changes 94 / 169 (55%)
-  Last activity: 2023-10-11
-  Arınç ÜNAL <arinc.unal@arinc9.com>:
-    Author e94b590abfff 2023-08-19 00:00:00 12
-    Tags e94b590abfff 2023-08-19 00:00:00 16
-  Daniel Golle <daniel@makrotopia.org>:
-    Author 91daa4f62ce8 2023-04-19 00:00:00 17
-    Tags ac49b992578d 2023-10-11 00:00:00 20
-  Landen Chao <Landen.Chao@mediatek.com>:
-  DENG Qingfang <dqfext@gmail.com>:
-    Author 342afce10d6f 2021-10-18 00:00:00 24
-    Tags 342afce10d6f 2021-10-18 00:00:00 25
-  Sean Wang <sean.wang@mediatek.com>:
-    Tags c288575f7810 2020-09-14 00:00:00 5
+Subsystem MARVELL MVNETA ETHERNET DRIVER
+  Changes 54 / 176 (30%)
+  (No activity)
   Top reviewers:
-    [46]: f.fainelli@gmail.com
-    [29]: andrew@lunn.ch
-    [19]: olteanv@gmail.com
-  INACTIVE MAINTAINER Landen Chao <Landen.Chao@mediatek.com>
+    [12]: hawk@kernel.org
+    [9]: toke@redhat.com
+    [9]: john.fastabend@gmail.com
+  INACTIVE MAINTAINER Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: Arınç ÜNAL <arinc.unal@arinc9.com>
-CC: Daniel Golle <daniel@makrotopia.org>
-CC: Landen Chao <Landen.Chao@mediatek.com>
-CC: DENG Qingfang <dqfext@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>
+--
+CC: thomas.petazzoni@bootlin.com
 ---
  CREDITS     | 4 ++++
- MAINTAINERS | 1 -
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ MAINTAINERS | 3 +--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/CREDITS b/CREDITS
-index a80bd154ae38..1c86d25dd131 100644
+index 1c86d25dd131..18ce75d81234 100644
 --- a/CREDITS
 +++ b/CREDITS
-@@ -678,6 +678,10 @@ D: Media subsystem (V4L/DVB) drivers and core
- D: EDAC drivers and EDAC 3.0 core rework
- S: Brazil
+@@ -3038,6 +3038,10 @@ S: Demonstratsii 8-382
+ S: Tula 300000
+ S: Russia
  
-+N: Landen Chao
-+E: Landen.Chao@mediatek.com
-+D: MT7531 Ethernet switch support
++N: Thomas Petazzoni
++E: thomas.petazzoni@bootlin.com
++D: Driver for the Marvell Armada 370/XP network unit.
 +
- N: Raymond Chen
- E: raymondc@microsoft.com
- D: Author of Configure script
+ N: Gordon Peters
+ E: GordPeters@smarttech.com
+ D: Isochronous receive for IEEE 1394 driver (OHCI module).
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 737504c0c432..ee3fbf1723a6 100644
+index ee3fbf1723a6..cad08f4eca0d 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -13619,7 +13619,6 @@ F:	include/soc/mediatek/smi.h
- MEDIATEK SWITCH DRIVER
- M:	Arınç ÜNAL <arinc.unal@arinc9.com>
- M:	Daniel Golle <daniel@makrotopia.org>
--M:	Landen Chao <Landen.Chao@mediatek.com>
- M:	DENG Qingfang <dqfext@gmail.com>
- M:	Sean Wang <sean.wang@mediatek.com>
+@@ -12830,9 +12830,8 @@ S:	Maintained
+ F:	drivers/thermal/armada_thermal.c
+ 
+ MARVELL MVNETA ETHERNET DRIVER
+-M:	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
  L:	netdev@vger.kernel.org
+-S:	Maintained
++S:	Orphan
+ F:	drivers/net/ethernet/marvell/mvneta.*
+ 
+ MARVELL MVPP2 ETHERNET DRIVER
 -- 
 2.43.0
 
