@@ -1,97 +1,119 @@
-Return-Path: <netdev+bounces-62549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4D8F827CAC
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 03:02:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1892A827D1B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 03:56:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4A361C2323E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 02:02:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC34B1F24458
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 02:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639BC17F4;
-	Tue,  9 Jan 2024 02:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A7E259D;
+	Tue,  9 Jan 2024 02:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DA2p6uhz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+gGxxSN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0821C2F
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 02:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1704765718; x=1736301718;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Hg3BbBfsjE6GK8/SPPbj0QX2HlpfOk7ZmPAIZ9DnZNw=;
-  b=DA2p6uhzDcl+9xjPGm3dx60qw8b5Y5iDiM7WdwStKl8x/2BI/jw38v/Z
-   QnPDvf4TMGQPbFvXHcsEIHkMW3etF5eE/PHQBcdBgqIlvdK1kHM+YETH5
-   rXbYau4qPszbiTsIlC7U4LcveiAYPAOO7pEBLFt6I1fSukQ8Oi7wcIGX7
-   4=;
-X-IronPort-AV: E=Sophos;i="6.04,181,1695686400"; 
-   d="scan'208";a="265398985"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 02:01:54 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com (Postfix) with ESMTPS id E67B98A883;
-	Tue,  9 Jan 2024 02:01:53 +0000 (UTC)
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:55789]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.178:2525] with esmtp (Farcaster)
- id ae2addfa-9ca8-4589-aea3-ddb46f8a66ec; Tue, 9 Jan 2024 02:01:53 +0000 (UTC)
-X-Farcaster-Flow-ID: ae2addfa-9ca8-4589-aea3-ddb46f8a66ec
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 9 Jan 2024 02:01:53 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.5) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 9 Jan 2024 02:01:50 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <ivan@cloudflare.com>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v4 net-next 0/4] af_unix: Random improvements for GC.
-Date: Mon, 8 Jan 2024 18:01:41 -0800
-Message-ID: <20240109020141.42967-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240102152911.20171dee@kernel.org>
-References: <20240102152911.20171dee@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EFC5665;
+	Tue,  9 Jan 2024 02:56:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80EB9C43390;
+	Tue,  9 Jan 2024 02:56:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704768993;
+	bh=b4jGBQYI3SAR2SqDXJaYSqlSOJc84bSHKk28Q7eQgnw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=I+gGxxSNtyHRtO2VzhAKG1nYxNlizcmiZoXKFCvtLD/bgKnVZGF5THvcV9vOW7Y05
+	 yUZgE0r1M3irhKm3qay8Y69ltwwDSXV2AI9B0sipIr/4srk23nvmBjZoTL8WoIafpO
+	 WG29mqY7ZkOyanTcGEs7uBduM+Wt+Yj2iEKdthTMAljDgW50WynNYvHtr6dn4ffuH/
+	 llRnMeOprdU7EPuL1qqzKYnVFUNQrpzul6nnayxvMmngpwI1P2cmQYo64JNrKFFfZ/
+	 Vi+k4ksax1JmRik1uyJnNoXTg9oTqQrmjMIX1W/sTViYDlaqk0PBgvorXSKtuIrIyI
+	 sFImw2+6UsTCQ==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2ccec119587so28352311fa.0;
+        Mon, 08 Jan 2024 18:56:33 -0800 (PST)
+X-Gm-Message-State: AOJu0Yzze1mVJlQ+S04p1QibOWengBh4t3O5kMef8019KWu8RJc5fHYg
+	n0zNzitpLos038mBSSW1/tj3aXJHUkk/3o1ZkA==
+X-Google-Smtp-Source: AGHT+IFHEy7UAVttPiN+sVOsHl8ngscwYS/9Rb/gv44VqIDfv2qtD5du9ju0uTnDbeescX9gPj6PS5hAvBUURaQ0pxw=
+X-Received: by 2002:a2e:b7d5:0:b0:2cc:7814:11b with SMTP id
+ p21-20020a2eb7d5000000b002cc7814011bmr2061459ljo.65.1704768991715; Mon, 08
+ Jan 2024 18:56:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+References: <20240104130123.37115-1-brgl@bgdev.pl> <20240104130123.37115-7-brgl@bgdev.pl>
+ <20240108191052.GA1893484-robh@kernel.org> <CAMRc=Mc7D1rVHaA4yoOC2DHDkkCptF4wjAm=24Rr=kkqM1ztjg@mail.gmail.com>
+In-Reply-To: <CAMRc=Mc7D1rVHaA4yoOC2DHDkkCptF4wjAm=24Rr=kkqM1ztjg@mail.gmail.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 8 Jan 2024 19:56:19 -0700
+X-Gmail-Original-Message-ID: <CAL_JsqKGrW-v=fr_9NYKg-8cho_-XbVQ92eXpjYYC1ma0_8UuA@mail.gmail.com>
+Message-ID: <CAL_JsqKGrW-v=fr_9NYKg-8cho_-XbVQ92eXpjYYC1ma0_8UuA@mail.gmail.com>
+Subject: Re: [RFC 6/9] dt-bindings: vendor-prefixes: add a PCI prefix for
+ Qualcomm Atheros
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Terry Bowman <terry.bowman@amd.com>, 
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, 
+	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Tue, 2 Jan 2024 15:29:11 -0800
-> On Tue, 19 Dec 2023 12:00:58 +0900 Kuniyuki Iwashima wrote:
-> > If more than 16000 inflight AF_UNIX sockets exist on a host, each
-> > sendmsg() will be forced to wait for unix_gc() even if a process
-> > is not sending any FD.
-> > 
-> > This series tries not to impose such a penalty on sane users who
-> > do not send AF_UNIX FDs or do not have inflight sockets more than
-> > SCM_MAX_FD * 8.
-> > 
-> > Cleanup patches for commit 69db702c8387 ("io_uring/af_unix: disable
-> > sending io_uring over sockets") will be posted later as noted in [0].
-> 
-> Could you repost? I tried to revive it in patchwork but I think 
-> it keeps getting Archived because it's more than 2 weeks old :(
+On Mon, Jan 8, 2024 at 12:22=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.pl>=
+ wrote:
+>
+> On Mon, Jan 8, 2024 at 8:10=E2=80=AFPM Rob Herring <robh@kernel.org> wrot=
+e:
+> >
+> > On Thu, Jan 04, 2024 at 02:01:20PM +0100, Bartosz Golaszewski wrote:
+> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > >
+> > > Document the PCI vendor prefix for Qualcomm Atheros so that we can
+> > > define the QCA PCI devices on device tree.
+> >
+> > Why? vendor-prefixes.yaml is only applied to property names. 'qca'
+> > should be the prefix for those.
+> >
+> > Rob
+>
+> I didn't have any better idea. PCI devices on DT are defined by their
+> "pci<vendor ID>,<model ID>" compatible, not regular human-readable
+> strings and this makes checkpatch.pl complain.
+>
+> I'm open to suggestions.
 
-Sure, will repost it.
+The checkpatch.pl check predates schemas and we could consider just
+dropping it. The only thing it provides is checking a patch rather
+than the tree (which the schema do). It's pretty hacky because it just
+greps the tree for a compatible string which is not entirely accurate.
+Also, we can extract an exact list of compatibles with
+"dt-extract-compatibles" which would make a better check, but I'm not
+sure making dtschema a dependency on checkpatch would be good.
 
-Thanks! and happy new year!
+The other option is just ignore the warning. PCI compatibles are fairly rar=
+e.
+
+Rob
 
