@@ -1,110 +1,114 @@
-Return-Path: <netdev+bounces-62681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596D4828866
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:43:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B8C828869
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:44:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E821F287245
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:43:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFE201F24CD0
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4960B39AD6;
-	Tue,  9 Jan 2024 14:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C25339ACB;
+	Tue,  9 Jan 2024 14:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HcP9Zxmu"
 X-Original-To: netdev@vger.kernel.org
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDE1A41;
-	Tue,  9 Jan 2024 14:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id B616B100DA1A2;
-	Tue,  9 Jan 2024 15:43:27 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 875212C3E10; Tue,  9 Jan 2024 15:43:27 +0100 (CET)
-Date: Tue, 9 Jan 2024 15:43:27 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Chris Morgan <macromorgan@hotmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	=?iso-8859-1?Q?N=EDcolas_F_=2E_R_=2E_A_=2E?= Prado <nfraprado@collabora.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Terry Bowman <terry.bowman@amd.com>,
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [RFC 3/9] PCI/portdrv: create platform devices for child OF nodes
-Message-ID: <20240109144327.GA10780@wunner.de>
-References: <20240104130123.37115-1-brgl@bgdev.pl>
- <20240104130123.37115-4-brgl@bgdev.pl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71ABC39FED
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 14:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so10477a12.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 06:43:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704811425; x=1705416225; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7hTSp/621JuWdOzYoBlVmVqh7hDK5oBkPf++B3jV4j8=;
+        b=HcP9Zxmu9/16084eHJ+NmuGWlYUcc3QFeS8uSSZikkoUXQ2UL34hLVUWuyh8LCzKqo
+         cjOWd9oOovsMQdqebHbAnSNlQ4dwOvx579RlYjeYArqv8zP1jgbFYBC/GxZ4UryfpigA
+         iKnRxmjHY1Sv0SMZpzdwk+E/sxXNheVudyV4VghUE6HoJ1gf2p7pruFQVUPiOPcqzH+m
+         Hc3Ca43z67IPYoB/WQCIYSOrKh5zR17Ajyx+qZKltH/zKdWuAhpZTt4YUWmlSw0fkjJj
+         wqBbs67uGIg65/6wc0iL7qeaU/vz+2uWc6RQkQVu7fSPF0CMqzsSUEMA/Br6QS/wjKQg
+         KgNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704811425; x=1705416225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7hTSp/621JuWdOzYoBlVmVqh7hDK5oBkPf++B3jV4j8=;
+        b=cz2MxjM5lgP23LTEEq1/IQ8HjCftrZRJ4wJnrt1+ETb2lqSgKy+qaI5V4Y2cHpMoRM
+         QJMqb3X5vJTT3wFpbJat0tHPesmfuVRm1gQjcwuZleaxlhlMkDJnyjSEvkHQ2Z/NzmZp
+         nRBExE1OOVyM5c5FsI6tScKZqsfjqjACu5qNcLgcrva8RgIS2n3PveqKL0/H1nC9RrpK
+         NR6X4+BdMzgjzlYVVKwcbbf1qS+/uVvZ8IYcvT7eQlg1QCWGBYvSP/lmdNxR9jBBCg0A
+         Iuiy6gbPvUOjiBACO4IJzXIZH3Ivav9cdnbFDaLj1t/w+yRE6JBM6o5EdWCHnzwCS5Ui
+         +8RA==
+X-Gm-Message-State: AOJu0YwDMgvDXEECg9iSq4CtJUXPGzZMjtjPcAdJzaiyAQZDtCGL/xFP
+	bHu+vkNAuGweqcon03bSZ6rUlscV7ekmqf33ojNf/7miX9lW
+X-Google-Smtp-Source: AGHT+IGCzpJkHmbkISlJEaLGwgFS/54jBbdaQxFTLs2DxUORYa3GyuTiAnd2AjxmVJ16Ps8zGgj4wzF+PsKfXzpopCc=
+X-Received: by 2002:a50:9548:0:b0:554:1b1c:72c4 with SMTP id
+ v8-20020a509548000000b005541b1c72c4mr101455eda.1.1704811424481; Tue, 09 Jan
+ 2024 06:43:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104130123.37115-4-brgl@bgdev.pl>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20231223025554.2316836-1-aleksander.lobakin@intel.com> <20231223025554.2316836-6-aleksander.lobakin@intel.com>
+In-Reply-To: <20231223025554.2316836-6-aleksander.lobakin@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 9 Jan 2024 15:43:30 +0100
+Message-ID: <CANn89iLbRnakLSuuoAF7eeN8KGqc7wy0bEgCmHCP1mU6LB912A@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next 05/34] idpf: convert header split mode to
+ libie + napi_build_skb()
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+	Michal Kubiak <michal.kubiak@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 04, 2024 at 02:01:17PM +0100, Bartosz Golaszewski wrote:
-> In order to introduce PCIe power-sequencing, we need to create platform
-> devices for child nodes of the port driver node. They will get matched
-> against the pwrseq drivers (if one exists) and then the actuak PCIe
-> device will reuse the node once it's detected on the bus.
-[...]
-> --- a/drivers/pci/pcie/portdrv.c
-> +++ b/drivers/pci/pcie/portdrv.c
-> @@ -715,7 +716,7 @@ static int pcie_portdrv_probe(struct pci_dev *dev,
->  		pm_runtime_allow(&dev->dev);
->  	}
->  
-> -	return 0;
-> +	return devm_of_platform_populate(&dev->dev);
->  }
+On Sat, Dec 23, 2023 at 3:58=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> Currently, idpf uses the following model for the header buffers:
+>
+> * buffers are allocated via dma_alloc_coherent();
+> * when receiving, napi_alloc_skb() is called and then the header is
+>   copied to the newly allocated linear part.
+>
+> This is far from optimal as DMA coherent zone is slow on many systems
+> and memcpy() neutralizes the idea and benefits of the header split.
+> Instead, use libie to create page_pools for the header buffers, allocate
+> them dynamically and then build an skb via napi_build_skb() around them
+> with no memory copy. With one exception...
+> When you enable header split, you except you'll always have a separate
+> header buffer, so that you could reserve headroom and tailroom only
+> there and then use full buffers for the data. For example, this is how
+> TCP zerocopy works -- you have to have the payload aligned to PAGE_SIZE.
+> The current hardware running idpf does *not* guarantee that you'll
+> always have headers placed separately. For example, on my setup, even
+> ICMP packets are written as one piece to the data buffers. You can't
+> build a valid skb around a data buffer in this case.
+> To not complicate things and not lose TCP zerocopy etc., when such thing
+> happens, use the empty header buffer and pull either full frame (if it's
+> short) or the Ethernet header there and build an skb around it. GRO
+> layer will pull more from the data buffer later. This W/A will hopefully
+> be removed one day.
 
-I think this belongs in of_pci_make_dev_node(), portdrv seems totally
-the wrong place.  Note that you're currently calling this for RCECs
-(Root Complex Event Collectors) as well, which is likely not what
-you want.
+We definitely want performance numbers here, for systems that truly matter.
 
-devm functions can't be used in the PCI core, so symmetrically call
-of_platform_unpopulate() from of_pci_remove_node().
+We spent a lot of time trying to make idpf slightly better than it
+was, we do not want regressions.
 
-Thanks,
-
-Lukas
+Thank you.
 
