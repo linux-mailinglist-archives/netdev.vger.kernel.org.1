@@ -1,128 +1,142 @@
-Return-Path: <netdev+bounces-62573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20BF827E41
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 06:14:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12A7A827E5F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 06:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 475D4285A08
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 05:14:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B77A1C235AF
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 05:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74734639;
-	Tue,  9 Jan 2024 05:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3519A15A4;
+	Tue,  9 Jan 2024 05:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RBeSIAQd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eWnyV9Ht"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEABF17C2
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 05:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cd5c55d6b8so14051511fa.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 21:11:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704777117; x=1705381917; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZhLW/BM9w95Q+LN6sI7NIblVT4LYut/ZNisgzb4yJNw=;
-        b=RBeSIAQd3v57ki/+8GGoeCeX7wtLyGJXwiIqAgWolnABhGGamDb499kksoCGQP9Ddc
-         rFaE0G58C5nPF0P8Zm07NZYxPpjTryk677Q/9VlM848f7dJxjuJuiXJ/WtXTbGyW7Tw0
-         B5I8SWdvo2EDsZ0SNCjADeISQzrD43uHeXTADmlI+vcCJWj5mrqZMOA+42SIiiNSVxU6
-         vX8IoWoLPZLYFWyxKRbc9BlLePJyyzhimMoQ4ey33qNYzfQITuQM9AJZ2ZCctu1dA6hd
-         X4kxGejT4GQ0sUZHwE79tfjdWRNKx3u/QDsp5DdBXaIWi2O0Ryz0qLMb+YjS77WIotW4
-         PBpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704777117; x=1705381917;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZhLW/BM9w95Q+LN6sI7NIblVT4LYut/ZNisgzb4yJNw=;
-        b=aI6IuF4axbl0q0qx67aE3ttyTj5d83YtF7FEqyQVn+HYiuZ1wOYt2j/sMB9wuT1m5u
-         oq7d0kegwit0YQNWgz7kCDvwO7vse1XMxbbKX6EZ/L5zfQ8Vm32sZWWLyH+FI2px2r5q
-         C5AFGtYBRYNp1/n5cX24ELeo5mXiS/JkCuOmim6jEfbBzYWX90o1aCR9kbNINh9QZXX2
-         0ZoF2x0kZQhP/gB1YW85t3VOpFR0iXzacLLoYAs2s/HaJxtP13uMRsLJ2M+sLUGn6Lk+
-         fvAmDH8dH1KedgkjCtdM3DvpNZ/O9Cs0viiaPUBu+Mk1SbR33irNaWYv5gvfC3DQfXC9
-         xCTg==
-X-Gm-Message-State: AOJu0Ywi/zGCwPyyQc6XnoQCQP0SGJ/S8n5JeCwbtIeKdsaKukwh8nv8
-	vWfGratLZEfIqp+yCTSgY6DTTe2AIoCHxjod87E=
-X-Google-Smtp-Source: AGHT+IEP4hCcLiqGj2HJpUZoPvrxYvNxdgl69L7vb8dB68Rsygy6I03eub8qLAfJo68h24O7wfL7oV5/y5t3LrmsjVw=
-X-Received: by 2002:a2e:9d09:0:b0:2cd:dfe:74ca with SMTP id
- t9-20020a2e9d09000000b002cd0dfe74camr1177841lji.19.1704777116667; Mon, 08 Jan
- 2024 21:11:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAEFEB8;
+	Tue,  9 Jan 2024 05:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704778701; x=1736314701;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CgJq6F0MGiPa6WJ6Qx/8sBe+HFCDqHLZLfSIpRgNR8U=;
+  b=eWnyV9HtTQFUQwNEaJIqRANKAgnIUG3ltKhr0sZq2kUcHoyxPMYGRBOt
+   blYCkqaumyC8ttQ2Pbh6nwslEWXWpOZHY+3Rrt0wTbXKrf6SvTXOSfQxX
+   mXhMMvJ1m72OVjNhYBXuZy9/uxOcv9kWdiUcTnBih/DS202JweLrTf2xt
+   7UtjUfHpZIRODoq3ajDHr8+tj8o+sTl6hephdVg4KKRHXUxORRXxCLQQx
+   8TMRr+xi+ZTv+qDb6YeLew0CbSaF3ba+QUoKPTiFOMavL/MMZOdAaZ1EU
+   3RC2lhyCU4BbNim+wukW3oeLzNmdvaWRCEZDqzeEBFh/r51X7NHMoFehL
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="484267133"
+X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
+   d="scan'208";a="484267133"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 21:38:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="757867910"
+X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
+   d="scan'208";a="757867910"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga006.jf.intel.com with ESMTP; 08 Jan 2024 21:38:17 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rN4oY-0005VO-2x;
+	Tue, 09 Jan 2024 05:38:14 +0000
+Date: Tue, 9 Jan 2024 13:38:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@openvz.org,
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+Subject: Re: [PATCH] neighbour: purge nf_bridged skb from foreign device neigh
+Message-ID: <202401091351.CqYRoau7-lkp@intel.com>
+References: <20240108085232.95437-1-ptikhomirov@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-5-luizluca@gmail.com>
- <20240108141103.cxjh44upubhpi34o@skbuf>
-In-Reply-To: <20240108141103.cxjh44upubhpi34o@skbuf>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Tue, 9 Jan 2024 02:11:45 -0300
-Message-ID: <CAJq09z56YYBOe=N8be-4MPzXEMx7jUbWyEDcs=fgxe088A-a3g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 4/8] net: dsa: realtek: merge common and
- interface modules into realtek-dsa
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240108085232.95437-1-ptikhomirov@virtuozzo.com>
 
-> > +++ b/drivers/net/dsa/realtek/Makefile
-> > @@ -1,8 +1,9 @@
-> >  # SPDX-License-Identifier: GPL-2.0
-> >  obj-$(CONFIG_NET_DSA_REALTEK)                += realtek-dsa.o
-> > -realtek-dsa-objs                     := realtek-common.o
-> > -obj-$(CONFIG_NET_DSA_REALTEK_MDIO)   += realtek-mdio.o
-> > -obj-$(CONFIG_NET_DSA_REALTEK_SMI)    += realtek-smi.o
-> > +realtek-dsa-objs-y                   := realtek-common.o
-> > +realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_MDIO) += realtek-mdio.o
-> > +realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_SMI) += realtek-smi.o
-> > +realtek-dsa-objs                     := $(realtek-dsa-objs-y)
-> >  obj-$(CONFIG_NET_DSA_REALTEK_RTL8366RB) += rtl8366.o
-> >  rtl8366-objs                                 := rtl8366-core.o rtl8366rb.o
-> >  obj-$(CONFIG_NET_DSA_REALTEK_RTL8365MB) += rtl8365mb.o
->
-> Does "realtek-dsa-objs-y" have any particular meaning in the Kbuild
-> system, or is it just a random variable name?
->
-> Am I the only one for whom this is clearer in intent?
->
-> diff --git a/drivers/net/dsa/realtek/Makefile b/drivers/net/dsa/realtek/Makefile
-> index cea0e761d20f..418f8bff77b8 100644
-> --- a/drivers/net/dsa/realtek/Makefile
-> +++ b/drivers/net/dsa/realtek/Makefile
-> @@ -1,9 +1,15 @@
->  # SPDX-License-Identifier: GPL-2.0
->  obj-$(CONFIG_NET_DSA_REALTEK)          += realtek-dsa.o
-> -realtek-dsa-objs-y                     := realtek-common.o
-> -realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_MDIO) += realtek-mdio.o
-> -realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_SMI) += realtek-smi.o
-> -realtek-dsa-objs                       := $(realtek-dsa-objs-y)
-> +realtek-dsa-objs                       := realtek-common.o
-> +
-> +ifdef CONFIG_NET_DSA_REALTEK_MDIO
-> +realtek-dsa-objs += realtek-mdio.o
-> +endif
-> +
-> +ifdef CONFIG_NET_DSA_REALTEK_SMI
-> +realtek-dsa-objs += realtek-smi.o
-> +endif
-> +
->  obj-$(CONFIG_NET_DSA_REALTEK_RTL8366RB) += rtl8366.o
->  rtl8366-objs                           := rtl8366-core.o rtl8366rb.o
->  obj-$(CONFIG_NET_DSA_REALTEK_RTL8365MB) += rtl8365mb.o
+Hi Pavel,
 
-I also prefer ifdef but it was suggested to use the realtek-dsa-objs-y
-magic and nobody argued about that. It is an easy fix.
+kernel test robot noticed the following build warnings:
 
-Regards,
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master horms-ipvs/master v6.7 next-20240108]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Luiz
+url:    https://github.com/intel-lab-lkp/linux/commits/Pavel-Tikhomirov/neighbour-purge-nf_bridged-skb-from-foreign-device-neigh/20240108-165551
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240108085232.95437-1-ptikhomirov%40virtuozzo.com
+patch subject: [PATCH] neighbour: purge nf_bridged skb from foreign device neigh
+config: x86_64-defconfig (https://download.01.org/0day-ci/archive/20240109/202401091351.CqYRoau7-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240109/202401091351.CqYRoau7-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401091351.CqYRoau7-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/core/neighbour.c: In function 'neigh_purge_nf_bridge_dev':
+   net/core/neighbour.c:392:29: error: implicit declaration of function 'nf_bridge_info_get' [-Werror=implicit-function-declaration]
+     392 |                 nf_bridge = nf_bridge_info_get(skb);
+         |                             ^~~~~~~~~~~~~~~~~~
+>> net/core/neighbour.c:392:27: warning: assignment to 'struct nf_bridge_info *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     392 |                 nf_bridge = nf_bridge_info_get(skb);
+         |                           ^
+   net/core/neighbour.c:395:43: error: invalid use of undefined type 'struct nf_bridge_info'
+     395 |                 if (nf_bridge && nf_bridge->physindev == dev) {
+         |                                           ^~
+   cc1: some warnings being treated as errors
+
+
+vim +392 net/core/neighbour.c
+
+   382	
+   383	static void neigh_purge_nf_bridge_dev(struct neighbour *neigh, struct net_device *dev)
+   384	{
+   385		struct sk_buff_head *list = &neigh->arp_queue;
+   386		struct nf_bridge_info *nf_bridge;
+   387		struct sk_buff *skb, *next;
+   388	
+   389		write_lock(&neigh->lock);
+   390		skb = skb_peek(list);
+   391		while (skb) {
+ > 392			nf_bridge = nf_bridge_info_get(skb);
+   393	
+   394			next = skb_peek_next(skb, list);
+   395			if (nf_bridge && nf_bridge->physindev == dev) {
+   396				__skb_unlink(skb, list);
+   397				neigh->arp_queue_len_bytes -= skb->truesize;
+   398				kfree_skb(skb);
+   399			}
+   400			skb = next;
+   401		}
+   402		write_unlock(&neigh->lock);
+   403	}
+   404	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
