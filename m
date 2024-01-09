@@ -1,272 +1,172 @@
-Return-Path: <netdev+bounces-62564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D42E827E0A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 06:05:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF70827E17
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 06:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D6EFB23709
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 05:05:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE9921F2252B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 05:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE0C39B;
-	Tue,  9 Jan 2024 05:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A25639;
+	Tue,  9 Jan 2024 05:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LAQmWzGU"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Lu49z6Oe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1167476
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 05:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2cce70ad1a3so28995921fa.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 21:05:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0598E17C3
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 05:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-28beb1d946fso2283577a91.0
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 21:10:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704776741; x=1705381541; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F6VRW6LiblqkEjmRQNsd43ZUW0VC7I25KZYSeGGUaRE=;
-        b=LAQmWzGUb2tAoMe0P4Uj1bbA9M1ZHSds36GN/iUj/GeQdCZyAsyDk58YrCt4PyHB07
-         6aVuib6oI0RR981ctltrd+jZ0zGtbLV2kXVLdu8hVXuIP72oSKSinbHjG+bqhQFWSKul
-         JRG27x7zKqvj47aDquvDHGU4Vn26RNR5sf2J8EEr5ScZjyfZe1HXOUmV7f2I2NxwzE3+
-         aCEFpouVyjykcKOnl9/3jXmGXX0xN5C/SdOLIqR0V5GquPJ/j2k2vrx/scPfkuNFgSiu
-         iAWTCgluEUBdRdOayWQ1zBCWK4HwqrYBrrkiKGHf8XjS9XdaoiRLFZXjOfHZcFMKdpk1
-         lD5A==
+        d=broadcom.com; s=google; t=1704777027; x=1705381827; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wlf90X0P+vhU5VZcrW3yZ6fVUCCORon75ZKxjDtkw8Q=;
+        b=Lu49z6OeN3jBfHdMxZJ4P/LnBNSDl+iPqlVeXQSZBWd1+HqQ5AqVECrACVG8SEiTxB
+         shA/N87rv7UlIlep18kBJekX+9YvuYHx/nTzc/lxTlBt3Os3hI7cDE3xV0clwDiKEMC8
+         9hcG3Rq5gMCqk4YqkpRM2LBxTI1U004s+hwyk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704776741; x=1705381541;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F6VRW6LiblqkEjmRQNsd43ZUW0VC7I25KZYSeGGUaRE=;
-        b=XRu8nbqkGz6obX4qt2im2rMLBkaL77XYH4whIIAzvXeOEveU3w+pjV07cE6VmvKqxT
-         7CrTFDCTyUVS69YvTKI2Syo8rWNL7E5xGhr6YzBDbKcLhV/rgiBKxiRpTqP0OYKu0w9o
-         Z3jTUXt/9yLEf2izsU9t/rBV3PipXakQgqehaDE/z6mbBy3XHxnz6AeE39+3Gw6k+Hdp
-         64fyBmreXaTprKTav1K+mD+WmgW/SdYq1xUbrwAqJeXvcszRQBBFwa1VkDCot0Q695Jk
-         Rr3Y2c4SU0JyB9xyIZs6VSJcWf4MSulil7qrkwKLxaMrISPM9h+WqPFAjfrxcpHmDDgO
-         hMDQ==
-X-Gm-Message-State: AOJu0Yx2y9ZAQE9EN9wzjCd6U2TadaIpbN1mLWPG3MzuXNtX4TgKNBhl
-	BU6cSd9a3hbedsg8WpbT0I2v1D7r5OM0itZj2nI=
-X-Google-Smtp-Source: AGHT+IEp5qR44u3bkC3HoOA8NWK1h6x55dSMex8bPM0KRpW/p2NXiyXORQC3Kfkqf9EYY15e0G9qh7hnt1zJX85uYVw=
-X-Received: by 2002:a05:651c:c1:b0:2cd:34b1:a9ef with SMTP id
- 1-20020a05651c00c100b002cd34b1a9efmr1825191ljr.90.1704776740700; Mon, 08 Jan
- 2024 21:05:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704777027; x=1705381827;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wlf90X0P+vhU5VZcrW3yZ6fVUCCORon75ZKxjDtkw8Q=;
+        b=ArG1VsNN8OsENKkCuRQiMMhjTL0QLFAYrHy2Q0TRZNFEIuUYN8YEkpM/k5DZ3Lz324
+         vZv1vyp6Z9RBj33/oHlkV0ox+qNgvFcrxeNIYsBJG5WFyzKghds7S98mDkzsRQVVE+IJ
+         0Yx52Ax/2FMaWauXjkfL1q+1SYrLnctMQgYjMx/5kvRZdPdbjA2JUQSgBg3Q0pPJmpod
+         QNEWkEA+2ZEpv+9ok64xS5wy/qob3zKpxt8XDND/Ptl7N9airmWLWw4ZZCHO6C7EhPHJ
+         zE+4QkKPXETXqPQgJc9qVGKEPU7VpiqOa4v0bpv9NAcZXxdkF+TzEZbqaVTfaxReym2m
+         tAhw==
+X-Gm-Message-State: AOJu0Yx0ZBB4lVdnXhTZ5IxQmHufK3nFOzfBj8ek/1+dKRTCv27OQnam
+	xfyv+5QaJ3t18O5FXkoyr7hJVRbBa7yK
+X-Google-Smtp-Source: AGHT+IGUxIhi/Ohyh8UO7pb7HZLar6dLBl7zwZDR2s74XJO53hdYfENhj0xjsjxfEi8PSyjsYe/GXQ==
+X-Received: by 2002:a17:90b:1e03:b0:28d:1365:baff with SMTP id pg3-20020a17090b1e0300b0028d1365baffmr2647537pjb.32.1704777027291;
+        Mon, 08 Jan 2024 21:10:27 -0800 (PST)
+Received: from amakhalov-build-vm.eng.vmware.com ([128.177.82.146])
+        by smtp.gmail.com with ESMTPSA id u12-20020a17090ac88c00b0028aecd6b29fsm7344115pjt.3.2024.01.08.21.10.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jan 2024 21:10:27 -0800 (PST)
+From: Alexey Makhalov <alexey.makhalov@broadcom.com>
+X-Google-Original-From: Alexey Makhalov <amakhalov@vmware.com>
+To: linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	bp@alien8.de,
+	hpa@zytor.com,
+	dave.hansen@linux.intel.com,
+	mingo@redhat.com,
+	tglx@linutronix.de
+Cc: x86@kernel.org,
+	netdev@vger.kernel.org,
+	richardcochran@gmail.com,
+	linux-input@vger.kernel.org,
+	dmitry.torokhov@gmail.com,
+	zackr@vmware.com,
+	linux-graphics-maintainer@vmware.com,
+	pv-drivers@vmware.com,
+	namit@vmware.com,
+	timothym@vmware.com,
+	akaher@vmware.com,
+	jsipek@vmware.com,
+	dri-devel@lists.freedesktop.org,
+	daniel@ffwll.ch,
+	airlied@gmail.com,
+	tzimmermann@suse.de,
+	mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com,
+	horms@kernel.org,
+	kirill.shutemov@linux.intel.com
+Subject: [PATCH v5 0/7] VMware hypercalls enhancements
+Date: Mon,  8 Jan 2024 21:10:10 -0800
+Message-Id: <20240109051017.58167-1-amakhalov@vmware.com>
+X-Mailer: git-send-email 2.39.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-4-luizluca@gmail.com>
- <20240108140002.wpf6zj7qv2ftx476@skbuf>
-In-Reply-To: <20240108140002.wpf6zj7qv2ftx476@skbuf>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Tue, 9 Jan 2024 02:05:29 -0300
-Message-ID: <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Em seg., 8 de jan. de 2024 =C3=A0s 11:00, Vladimir Oltean
-<olteanv@gmail.com> escreveu:
->
-> On Fri, Dec 22, 2023 at 09:46:31PM -0300, Luiz Angelo Daros de Luca wrote=
-:
-> > Some code can be shared between both interface modules (MDIO and SMI)
-> > and among variants. These interface functions migrated to a common
-> > module:
-> >
-> > - realtek_common_lock
-> > - realtek_common_unlock
-> > - realtek_common_probe
-> > - realtek_common_register_switch
-> > - realtek_common_remove
-> >
-> > The reset during probe was moved to the end of the common probe. This w=
-ay,
-> > we avoid a reset if anything else fails.
-> >
-> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> > ---
-> > diff --git a/drivers/net/dsa/realtek/realtek-common.c b/drivers/net/dsa=
-/realtek/realtek-common.c
-> > new file mode 100644
-> > index 000000000000..80b37e5fe780
-> > --- /dev/null
-> > +++ b/drivers/net/dsa/realtek/realtek-common.c
-> > @@ -0,0 +1,132 @@
-> > +// SPDX-License-Identifier: GPL-2.0+
-> > +
-> > +#include <linux/module.h>
-> > +
-> > +#include "realtek.h"
-> > +#include "realtek-common.h"
-> > +
-> > +void realtek_common_lock(void *ctx)
-> > +{
-> > +     struct realtek_priv *priv =3D ctx;
-> > +
-> > +     mutex_lock(&priv->map_lock);
-> > +}
-> > +EXPORT_SYMBOL_GPL(realtek_common_lock);
->
-> Would you mind adding some kernel-doc comments above each of these
-> exported functions? https://docs.kernel.org/doc-guide/kernel-doc.html
-> says "Every function that is exported to loadable modules using
-> EXPORT_SYMBOL or EXPORT_SYMBOL_GPL should have a kernel-doc comment.
-> Functions and data structures in header files which are intended to be
-> used by modules should also have kernel-doc comments."
->
-> It is something I only recently started paying attention to, so we don't
-> have consistency in this regard. But we should try to adhere to this
-> practice for code we change.
->
+VMware hypercalls invocations were all spread out across the kernel
+implementing same ABI as in-place asm-inline. With encrypted memory
+and confidential computing it became harder to maintain every changes
+in these hypercall implementations.
 
-Sure. I'll pay attention to that too.
+Intention of this patchset is to introduce arch independent VMware
+hypercall API layer other subsystems such as device drivers can call
+to, while hiding architecture specific implementation behind.
 
-> > +
-> > +void realtek_common_unlock(void *ctx)
-> > +{
-> > +     struct realtek_priv *priv =3D ctx;
-> > +
-> > +     mutex_unlock(&priv->map_lock);
-> > +}
-> > +EXPORT_SYMBOL_GPL(realtek_common_unlock);
-> > +
-> > +struct realtek_priv *
-> > +realtek_common_probe(struct device *dev, struct regmap_config rc,
-> > +                  struct regmap_config rc_nolock)
->
-> Could you use "const struct regmap_config *" as the data types here, to
-> avoid two on-stack variable copies? Regmap will copy the config structure=
-s
-> anyway.
+Second patch introduces the vmware_hypercall low and high bandwidth
+families of functions, with little enhancements there.
+Sixth patch adds tdx hypercall support
 
-I could do that for rc_nolock but not for rc as we need to modify it
-before passing to regmap. I would still need to duplicate rc, either
-using the stack or heap. What would be the best option?
+arm64 implementation of vmware_hypercalls is in drivers/gpu/drm/
+vmwgfx/vmwgfx_msg_arm64.h and going to be moved to arch/arm64 with
+a separate patchset with the introduction of VMware Linux guest
+support for arm64.
 
-1) pass two pointers and copy one to stack
-2) pass two pointers and copy one to heap
-3) pass two structs (as it is today)
-4) pass one pointer and one struct
+No functional changes in drivers/input/mouse/vmmouse.c and
+drivers/ptp/ptp_vmw.c
 
-The old code was using 1) and I'm inclined to adopt it and save a
-hundred and so bytes from the stack, although 2) would save even more.
+v4->v5 changes:
+  [patch 2]:
+- Fixed the problem reported by Simon Horman where build fails after
+  patch 2 application. Do not undefine VMWARE_HYPERCALL for now, and
+  update vmwgfx, vmmouse and ptp_vmw code for new VMWARE_HYPERCALL macro.
+- Introduce new patch 6 to undefine VMWARE_HYPERCALL, which is safe to do
+  after patches 3 to 5.
+- [patch 7 (former patch 6)]: Add missing r15 (CPL) initialization.
 
-> > +{
-> > +     const struct realtek_variant *var;
-> > +     struct realtek_priv *priv;
-> > +     int ret;
-> > +
-> > +     var =3D of_device_get_match_data(dev);
-> > +     if (!var)
-> > +             return ERR_PTR(-EINVAL);
-> > +
-> > +     priv =3D devm_kzalloc(dev, size_add(sizeof(*priv), var->chip_data=
-_sz),
-> > +                         GFP_KERNEL);
-> > +     if (!priv)
-> > +             return ERR_PTR(-ENOMEM);
-> > +
-> > +     mutex_init(&priv->map_lock);
-> > +
-> > +     rc.lock_arg =3D priv;
-> > +     priv->map =3D devm_regmap_init(dev, NULL, priv, &rc);
-> > +     if (IS_ERR(priv->map)) {
-> > +             ret =3D PTR_ERR(priv->map);
-> > +             dev_err(dev, "regmap init failed: %d\n", ret);
-> > +             return ERR_PTR(ret);
-> > +     }
-> > +
-> > +     priv->map_nolock =3D devm_regmap_init(dev, NULL, priv, &rc_nolock=
-);
-> > +     if (IS_ERR(priv->map_nolock)) {
-> > +             ret =3D PTR_ERR(priv->map_nolock);
-> > +             dev_err(dev, "regmap init failed: %d\n", ret);
-> > +             return ERR_PTR(ret);
-> > +     }
-> > +
-> > +     /* Link forward and backward */
-> > +     priv->dev =3D dev;
-> > +     priv->variant =3D var;
-> > +     priv->ops =3D var->ops;
-> > +     priv->chip_data =3D (void *)priv + sizeof(*priv);
-> > +
-> > +     dev_set_drvdata(dev, priv);
-> > +     spin_lock_init(&priv->lock);
-> > +
-> > +     priv->leds_disabled =3D of_property_read_bool(dev->of_node,
-> > +                                                 "realtek,disable-leds=
-");
-> > +
-> > +     /* TODO: if power is software controlled, set up any regulators h=
-ere */
-> > +
-> > +     priv->reset =3D devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_L=
-OW);
-> > +     if (IS_ERR(priv->reset)) {
-> > +             dev_err(dev, "failed to get RESET GPIO\n");
-> > +             return ERR_CAST(priv->reset);
-> > +     }
-> > +     if (priv->reset) {
-> > +             gpiod_set_value(priv->reset, 1);
-> > +             dev_dbg(dev, "asserted RESET\n");
-> > +             msleep(REALTEK_HW_STOP_DELAY);
-> > +             gpiod_set_value(priv->reset, 0);
-> > +             msleep(REALTEK_HW_START_DELAY);
-> > +             dev_dbg(dev, "deasserted RESET\n");
-> > +     }
-> > +
-> > +     return priv;
-> > +}
-> > +EXPORT_SYMBOL(realtek_common_probe);
-> > diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realte=
-k/realtek.h
-> > index e9ee778665b2..fbd0616c1df3 100644
-> > --- a/drivers/net/dsa/realtek/realtek.h
-> > +++ b/drivers/net/dsa/realtek/realtek.h
-> > @@ -58,11 +58,9 @@ struct realtek_priv {
-> >       struct mii_bus          *bus;
-> >       int                     mdio_addr;
-> >
-> > -     unsigned int            clk_delay;
-> > -     u8                      cmd_read;
-> > -     u8                      cmd_write;
-> >       spinlock_t              lock; /* Locks around command writes */
-> >       struct dsa_switch       *ds;
-> > +     const struct dsa_switch_ops *ds_ops;
-> >       struct irq_domain       *irqdomain;
-> >       bool                    leds_disabled;
-> >
-> > @@ -79,6 +77,8 @@ struct realtek_priv {
-> >       int                     vlan_enabled;
-> >       int                     vlan4k_enabled;
-> >
-> > +     const struct realtek_variant *variant;
-> > +
-> >       char                    buf[4096];
-> >       void                    *chip_data; /* Per-chip extra variant dat=
-a */
-> >  };
->
-> Can the changes to struct realtek_priv be a separate patch, to
-> clarify what is being changed, and to leave the noisy code movement
-> more isolated?
+v3->v4 changes: (no functional changes in patches 1-5)
+  [patch 2]:
+- Added the comment with VMware hypercall ABI description.
+  [patch 6]:
+- vmware_tdx_hypercall_args remove in6/out6 arguments as excessive.
+- vmware_tdx_hypercall return ULONG_MAX on error to mimic bad hypercall
+  command error from the hypervisor.
+- Replaced pr_warn by pr_warn_once as pointed by Kirill Shutemov.
+- Fixed the warning reported by Intel's kernel test robot.
+- Added the comment describing VMware TDX hypercall ABI.
 
-Sure, although it will not be a patch that makes sense by itself. If
-it helps with the review, I'll split it. We can fold it back if
-needed.
+v2->v3 changes: (no functional changes in patches 1-5)
+- Improved commit message in patches 1, 2 and 5 as was suggested by
+  Borislav Petkov.
+- To address Dave Hansen's concern, patch 6 was reorganized to avoid
+  exporting bare __tdx_hypercall and to make exported vmware_tdx_hypercall
+  VMWare guest specific.
 
-Regards,
+v1->v2 changes (no functional changes):
+- Improved commit message in patches 2 and 5.
+- Added Reviewed-by for all patches.
+- Added Ack from Dmitry Torokhov in patch 4. No fixes regarding reported
+  by Simon Horman gcc error in this patch.
 
-Luiz
+Alexey Makhalov (7):
+  x86/vmware: Move common macros to vmware.h
+  x86/vmware: Introduce VMware hypercall API
+  ptp/vmware: Use VMware hypercall API
+  input/vmmouse: Use VMware hypercall API
+  drm/vmwgfx: Use VMware hypercall API
+  x86/vmware: Undefine VMWARE_HYPERCALL
+  x86/vmware: Add TDX hypercall support
+
+ arch/x86/include/asm/vmware.h             | 364 ++++++++++++++++++++--
+ arch/x86/kernel/cpu/vmware.c              | 117 +++----
+ drivers/gpu/drm/vmwgfx/vmwgfx_msg.c       | 173 ++++------
+ drivers/gpu/drm/vmwgfx/vmwgfx_msg_arm64.h | 197 ++++++++----
+ drivers/gpu/drm/vmwgfx/vmwgfx_msg_x86.h   | 185 -----------
+ drivers/input/mouse/vmmouse.c             |  76 ++---
+ drivers/ptp/ptp_vmw.c                     |  12 +-
+ 7 files changed, 599 insertions(+), 525 deletions(-)
+
+-- 
+2.39.0
+
 
