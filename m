@@ -1,249 +1,228 @@
-Return-Path: <netdev+bounces-62679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9541382882B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:34:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F9D82885E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:42:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99B481C24452
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:34:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEB90286FBD
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90DD3608F;
-	Tue,  9 Jan 2024 14:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629AF38FAD;
+	Tue,  9 Jan 2024 14:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Eud9dH6v";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="sw0Iadw9"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ewWGbq+Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13AF26AFD;
-	Tue,  9 Jan 2024 14:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1704810841; x=1736346841;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=W9gtB9M/6bmNG1V+o+E3V6GIKF2NU3Itw3HPeKrLAPM=;
-  b=Eud9dH6vs/F7yLI3d5NzbY2xo7vppdiZfB+UKPo6et3IrGMYqzn1LQGC
-   Q0cDfspciII5VpW+gbIEND8Kgiu5Or8LXizsqUgPLe2/k8AVIPWLbRIJ8
-   dgK3zOvCOxS/22IVSrIX3ZGVQTkzj5qHrQiYxp7QkpnxzrsS5NifLWhKO
-   JbUdILUC4ol6zZa32x9bkZzu6e/p2xZMp+lxzcwi+uvIvHmvpwuqevSfa
-   d0z0VeoNuTK4YxWbY/rNNcyouSE6FeRfmmdM8r8WiRSUNYTPAztQFPj7A
-   qLeKc9avBaM6EGtRdUkbBMWL62e1imptCnDzsg8O9G1mbcxRG9d29RxIk
-   g==;
-X-CSE-ConnectionGUID: HanqUjDTSDSsoho4SZL0xA==
-X-CSE-MsgGUID: JrV/FzjmQi+HZupCW2a86A==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
-   d="scan'208";a="15590973"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jan 2024 07:34:00 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 9 Jan 2024 07:33:50 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 9 Jan 2024 07:33:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BoAJuK4Pjf0CfarCQwZ7mLwOTe8mXdg24698e8c2cNU6q3igjG4g2EtEalOj0n7EbCZBZ6rI9Yzi79T2k8TeMJ3yU9PmJSOux1bp3WiZUWKvP4ta9TKsUhjNxEmWdwPEy5p4GJCRKn3AJrGLnfhrAvINS+Wfo8+WXhhcHE7jj4cBzCXNbHUfctZYpd82NzmC0GIYnyX6aPX9u8yXWky/AM0RoLP58wElbXNqHFlbsXubCoKh+aJuDrX7XRcS01ScF0QHrfdRdjcoKmCXhfuCDMN6/FEk8+hWC60Ougb9PXMWKWClA46eBoerrcinE+jQqtyHQFek++oEElTXy+e8Uw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W9gtB9M/6bmNG1V+o+E3V6GIKF2NU3Itw3HPeKrLAPM=;
- b=XeW/nyyFVYgWzwF6+6xpTZTHq/On4m+eIVAkH+9scfQhDN/l89rJ4omLwEl7eUw9CTdWiLnxdK7iivD5ui4una7YBW5nhSQpoBLrPtmxRYUPAkauCtE+q6fTzMWgVZp7edI9+LQiijA4ZbNUpndbrOgjpUm7vfnJwWSl/HAfPnU0K9+Min/uul0oCzRmfiG8KTR10Bt7MISZzhAk9FIjdsC0wUd9TbQ1fnCI0jjPYvNaenj5LJ+CE6JOjgCbID+7kZZXXkI927WFMUBMweUxEO7H6mh1ih+BepXLCBvQMjl8EqSFz4HgvyvedIBqysS6x3IK/eRxCrIM3Uh3XPp+4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W9gtB9M/6bmNG1V+o+E3V6GIKF2NU3Itw3HPeKrLAPM=;
- b=sw0Iadw9llc6k+ke2oVDkHMe/kKBQjX3CsqT7pjZhBf19ObvWMCsaWO3nJUG8gAcrRc5Q/caUW1azCPEKGvGXeKVEn5bUn1sQq3m03L8BKIeX+sBdfNvriVcKCqfEDkFbjrG4NI4A1XZTmq6whFcHpBsVpA52VMOvR5QLdV3noj0wBvdKjxPLOB/6i0DTNppOt3pkaj5IqYyaXKGj1tCdLBxzQuzhw3/L4SD9i5ys7n5+M8tCbhUJh8JLkyc0Fbcy6ibHx8dx+nTwxLniRVAiuuDQsO/wrHv17nvF1/59QQj5Rg19TsfjFe/wyD9vSz1nQtTusjtYPaq7agLH9eYhg==
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com (2603:10b6:510:246::12)
- by DM6PR11MB4531.namprd11.prod.outlook.com (2603:10b6:5:2a5::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Tue, 9 Jan
- 2024 14:33:47 +0000
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::18cb:134a:e51a:2ce4]) by PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::18cb:134a:e51a:2ce4%7]) with mapi id 15.20.7159.020; Tue, 9 Jan 2024
- 14:33:47 +0000
-From: <Arun.Ramadoss@microchip.com>
-To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-	<Woojung.Huh@microchip.com>, <pabeni@redhat.com>, <o.rempel@pengutronix.de>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>
-CC: <kernel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [RFC net-next v2 3/3] net: dsa: microchip: implement PHY loopback
- configuration for KSZ8794 and KSZ8873
-Thread-Topic: [RFC net-next v2 3/3] net: dsa: microchip: implement PHY
- loopback configuration for KSZ8794 and KSZ8873
-Thread-Index: AQHaQuKDdRf0GJR4lECCtTi9M42NLbDRjCmA
-Date: Tue, 9 Jan 2024 14:33:47 +0000
-Message-ID: <5adfec6cbd3ba5fa7c36474d9f395839a2b5b590.camel@microchip.com>
-References: <20240109095753.1872010-1-o.rempel@pengutronix.de>
-	 <20240109095753.1872010-4-o.rempel@pengutronix.de>
-In-Reply-To: <20240109095753.1872010-4-o.rempel@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.36.5-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB8033:EE_|DM6PR11MB4531:EE_
-x-ms-office365-filtering-correlation-id: 72ef0c4e-ae34-4d17-fbb4-08dc111ffd9a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: O2sabSqfptWk4antNHhGJ/WNjzpPHpiH5Vs4f39MkhemFFsA+cBdxYj+O2rqtM3XGanHcxnCGBrssMlqb8IBBT3Jm+kxbnjl5jPWFjd/EluosgdraVCv1EQOLJjN9trORG5RKRFWdMQwDOWvYYv/LM+WY/NgpKswqZ+3OREwZdl+0PtkY8f2Ku6stsDPf08GUN6kXhDb8db+imFDvWxaRlURepep5M5M4DaDNVMBwph7L3TE4yZ4+HsFzlSRfRQDuSmwxJgsic1NmfL9jjxzrkqtEFZpTu2rRpge9lBw6a4X7dEDQe3pn8y3M6hCWnrkAQZh+Sg+G8HnTxYPueDsYvqaMz3Z1D8BHTB1S+mFzJlCsg34+DBVm0+R2mbcUKv/umXNK2OOVzcLauPZMsezK6/4QooV/a006diabhxKaVsSAKlWJYqUXCkRcECVQtkXOgdWujynvCDpyQh+S7sx2++YisSr9/Z8M5ZdkUlSF9d0vvWRURaQL68/0SxJUgy0g2/4n3Po8sSS9Om6+IkM/uPEwXYpLjDukLTRbWQ0o29QJUh8D4UBgo676muUG9fRPzAuJIAJuRL/MLuwaYveKMSn/ajX1r+YyE2rXOvLO4dmedceiFl8eXNTVbvUQMOAxTlR2tC18hZK3JFW2dIlh8PHjxn5Gc44wpXkEUqRpNk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8033.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(39860400002)(346002)(376002)(136003)(230922051799003)(230273577357003)(230173577357003)(64100799003)(451199024)(1800799012)(186009)(2616005)(26005)(71200400001)(6506007)(478600001)(6486002)(6512007)(122000001)(38100700002)(36756003)(86362001)(5660300002)(7416002)(76116006)(41300700001)(83380400001)(38070700009)(107886003)(2906002)(91956017)(110136005)(66556008)(4326008)(54906003)(66476007)(64756008)(66446008)(316002)(8936002)(8676002)(66946007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?L2FVVmhiQkRtTTJtUmZyREZkZFFzc3RQcXlnRTFVa3I0N015d3hHMG54RFhN?=
- =?utf-8?B?TWhxUUhWWFQ3S3NacXNpSlQwOHdUc1JhTkZRMkxKMG9iTWEyQmpGamx6MEd4?=
- =?utf-8?B?dm1vNVR3RTFxQklaTlphOEh4NXVmZHpjVHdsdXVhRkJBRktMZXl5NHZnclZx?=
- =?utf-8?B?ejRuYlkvZ09PMW5GUlhIcXBKai80d2pwK3R4M1hZb0NoVkF1ZW5aTVhjeEUw?=
- =?utf-8?B?T3ZDVVAyZ0Q3RzZZOUJkZk1uQnQ3dk11anZoekJJZjNyRTRWdlBaUFBQckxG?=
- =?utf-8?B?TGV1aGpmSWlKYksyTlJWS2VLMWZvalpWTjdoRVdha0U1NEloQXJhSGNtWUFK?=
- =?utf-8?B?RmpNeXZtcTJnS1dPT3NhZHMzVFNYOHFFSGFMYUF0Rk9rU3FqVXpZS2hOWWJD?=
- =?utf-8?B?dnVIckI4Q0dMWlFjRW5uZCtMcTdlcmRtQTJaOWZHbSs5WlpWOXBlakxITmY3?=
- =?utf-8?B?bzJ0VTFDNjZySHhUa29zNkxSYytlZHl6MEdsbjdGZzNvWGZsejVYcEdGZWRy?=
- =?utf-8?B?SHI4N2d0T2Z6MlRFcnlWS3dBejFUVkVLcVIwU09UcFJZbWhBU3JPVU5lTTlE?=
- =?utf-8?B?bVpqcEZFNndYdVcvSVNSZDFOam1Ka05JOVFlbHRBc2JVYjdQY2tONTQ5enFl?=
- =?utf-8?B?RnhEVElDTlAzWC9YSzlZOHpXeU5jV1YyTHd1Ym9MK1F2dXpmbkdoWklDeVA2?=
- =?utf-8?B?R01PZHBGSUwya2Vxd3p1UExjYlJLbUVpS01xVGVmTjR6Y2NpY1cyZUZpSWVI?=
- =?utf-8?B?czV0SXBnbnJTZi9RbnFaZ2J4akhlK0NaV3VlZ3Y1MnhGL3dJN1dwa0twY1Bm?=
- =?utf-8?B?Qi9Bb1hYb2EyaGpzQ2JqblBEVS9Gc3o1dGJYcGx2QXRWbjV6dVFpd3lHNnFu?=
- =?utf-8?B?M0g1dGc3NlZoWHNuM1hUS1FuSFg3NzZrQzR5Q3BJbTF6d09tenFyQ0hwU3dD?=
- =?utf-8?B?eDFpUzRWT2o1VWNaMks2VU9HV0IrMjZPakpIUGtyTnIyd0ZQdm9PWU1meHlk?=
- =?utf-8?B?emJQYWRPMG12QVFXa1VHNkFzMjN1UXozRWM1b2tnV2R4ZGJvMVpEWkxlTEh5?=
- =?utf-8?B?VE1rWDQxVkoraHdGWTlwWENEUDZSL3RWN1IycityajJqSFMyb3NLalVRdnhj?=
- =?utf-8?B?VmVUbHpoSEtKckRkVEM5NHF4eEZLTVVVK1NKQjkrUFFTWDZXVlYrTXJseGN2?=
- =?utf-8?B?enpaZmZ2K3czZWxENGs5MWhneXlNejZpdkNqdytvNW93bGpRcTBMMENSOGdw?=
- =?utf-8?B?TjIwck5Lc28yRThOaS85U3ZJa0Q2a1V5Wk9rd2J4RFNreDVSRjBhelQvemxq?=
- =?utf-8?B?RjFCNm0zNldoMmZDZ3hXc0t1Lzdtc3FIeW1ueEdWVy9ncTFLbmJvVHEzd0xT?=
- =?utf-8?B?bFZPY1cyaG9WLzNIUGZpaWhiVWVXZWJHQS9WUmwzSVViU0JmQnNXYm9CVkZu?=
- =?utf-8?B?SFJQWC9Oc0U4M29BOG5hT2ZwN1BIUUc4b2NyMXowVjJwZi9KbnUrcEprRnV2?=
- =?utf-8?B?SFhyZmZYM2oyMGRFR0R4YWZaYzl3TmJ6VU1TVURCcFVlb0Y0RURnSkdVVlFx?=
- =?utf-8?B?eTU2OGJHaXJCYnczZURoZFVZNVdtOFEzekJ1ZlJVSzBkZkhpdXFjcFQzMExj?=
- =?utf-8?B?Qk5QRHcyNjg5cjFsN3l1WVU5V3pBd28rcWR5ZUo1SWtUV3R5dkJ1OW9XNyt3?=
- =?utf-8?B?bkRQRnZRNWszRHZuV3VndmVESG5mcEFveU9Nc2lIeU9FeXRzQzFvbjZ0Z3dv?=
- =?utf-8?B?ZFlxS0Rtd3JkbEEwMVN3R0ZJRVI5YTlzNS9LVElvQlJkSzQwQVdLVkpsZUlV?=
- =?utf-8?B?SUVEVGM4OW1YTkczak1xTnFJUWpsN05BSUxJY2R2MWNZRWVQblE5OU9NYXNu?=
- =?utf-8?B?bS9YbWx1OUEwSDZwc3lWeThrelNlQzZVTm1qcUZpdFpiaGxmR2RXelhzMHgz?=
- =?utf-8?B?WUFDKzJhbFdJSHZIWHZvTjFubjFIdVJ2L1NJSWNJTXNVOW9HQzE2c1ZFeGNp?=
- =?utf-8?B?a1kyQlZ1U251Y0RobDBZQWlZNUJlZ1dkZ0tjQ3dtZyt3clJRdFhNSGtxd25C?=
- =?utf-8?B?TUxLa1dsV0JHMTRiVUppMHY1ek1adll4NVM0VU5SZ0pMWEtNc2tpTlBrREx1?=
- =?utf-8?B?TURKa2hMdGhCd001b1BWNGpYZUtISjNjTjBJNi9VY0cyZnpEbFpEckZla3ZS?=
- =?utf-8?B?QkE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EA4A86975242694CAAD7FBA57BF064F5@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F021381DA;
+	Tue,  9 Jan 2024 14:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E765420019;
+	Tue,  9 Jan 2024 14:42:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1704811338;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ln2A5S2uPwhRPFIFACLIF7C474ATGhYS0EjHcevuV6U=;
+	b=ewWGbq+QrelWcWMziazToS3wyO48WRiyjvn4SdkqXTGhnOeHWBBm57rF0UAfOpycM1/WEH
+	0ns02HFbOgZOsV9+ccbWA/8u3CwRTBEQ0Xd2CwIhjWnxTjSnsdt7K1bjUFeb/Opa/G094n
+	lE+X4WPqrxfdqUfCzyQLKfeVGBeUDUyUCO3lfhopTOE6zTUYpFtNWxhTR2jUO5bTzS1R7h
+	KEfRDJdG+gGdOCql6gOALwNZLUx+wvOZyYmnUEgETYADwV9u+Dj+l/2bfDryxp7z3+XXhl
+	GCw0xZgMxEfhaH6C351RsoYXIXCpcO6Or8ZhdxH3EjDLGUjhZ/8DJB6Mn8F8Hg==
+From: Romain Gantois <romain.gantois@bootlin.com>
+Date: Tue, 09 Jan 2024 15:42:35 +0100
+Subject: [PATCH v4] net: stmmac: Prevent DSA tags from breaking COE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8033.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 72ef0c4e-ae34-4d17-fbb4-08dc111ffd9a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jan 2024 14:33:47.5799
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Hqb0iGgkCRxlSMHmytXqjouLo0y6dgkgTmkTyjbM2IDCMqInGBSL7JpdiMIPWP6mQOQozcPwpBrpnQuGjYPoUOqR8lMQd1UEbsX2oPkX/Rg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4531
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240109-prevent_dsa_tags-v4-1-f888771fa2f6@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIAFtbnWUC/1XMQQrDIBCF4auEWdegVjB01XuUEDSOZqDRolIKI
+ Xfv0F2XH/zvHdCwEja4DQdUfFOjkhnmMsC6uZxQUGCDltpIJSfx4gpzX0JzS3epCeu9DBhl8JM
+ CnnEQ6fO7fMzsWMsu+lbR/R0ppayxo71OVgstOHKUx+RyL9TuvpT+ZK9lh/P8AuitioimAAAA
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Miquel Raynal <miquel.raynal@bootlin.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Sylvain Girard <sylvain.girard@se.com>, 
+ Pascal EBERHARD <pascal.eberhard@se.com>, 
+ Richard Tresidder <rtresidd@electromag.com.au>, 
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, 
+ Romain Gantois <romain.gantois@bootlin.com>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+X-Mailer: b4 0.12.4
+X-GND-Sasl: romain.gantois@bootlin.com
 
-T24gVHVlLCAyMDI0LTAxLTA5IGF0IDEwOjU3ICswMTAwLCBPbGVrc2lqIFJlbXBlbCB3cm90ZToN
-Cj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRz
-IHVubGVzcyB5b3UNCj4ga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPiBDb3JyZWN0IHRo
-ZSBQSFkgbG9vcGJhY2sgYml0IGhhbmRsaW5nIGluIHRoZSBrc3o4X3dfcGh5X2JtY3IgYW5kDQo+
-IGtzejhfcl9waHlfYm1jciBmdW5jdGlvbnMgZm9yIEtTWjg3OTQgYW5kIEtTWjg4NzMgdmFyaWFu
-dHMgaW4gdGhlDQo+IGtzejg3OTUNCj4gZHJpdmVyLiBQcmV2aW91c2x5LCB0aGUgY29kZSBlcnJv
-bmVvdXNseSB1c2VkIEJpdCA3IG9mIHBvcnQgcmVnaXN0ZXINCj4gMHhEDQo+IGZvciBib3RoIGNo
-aXAgdmFyaWFudHMsIHdoaWNoIGlzIGFjdHVhbGx5IGZvciBMRUQgY29uZmlndXJhdGlvbi4gVGhp
-cw0KPiB1cGRhdGUgZW5zdXJlcyB0aGUgY29ycmVjdCByZWdpc3RlcnMgYW5kIGJpdHMgYXJlIHVz
-ZWQgZm9yIHRoZSBQSFkNCj4gbG9vcGJhY2sgZmVhdHVyZToNCj4gDQo+IC0gRm9yIEtTWjg3OTQ6
-IFVzZSAweEYgLyBCaXQgNy4NCj4gLSBGb3IgS1NaODg3MzogVXNlIDB4RCAvIEJpdCAwLg0KPiAN
-Cj4gVGhlIGxhY2sgb2YgbG9vcGJhY2sgc3VwcG9ydCB3YXMgc2VlbiBvbiBLU1o4ODczIHN5c3Rl
-bSBieSB1c2luZw0KPiAiZXRodG9vbCAtdCBsYW5YIi4gQWZ0ZXIgdGhpcyBwYXRjaCwgdGhlIGV0
-aHRvb2wgc2VsZnRlc3Qgd2lsbCB3b3JrLA0KPiBidXQgb25seSBpZiBwb3J0IGlzIG5vdCBwYXJ0
-IG9mIGEgYnJpZGdlLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogT2xla3NpaiBSZW1wZWwgPG8ucmVt
-cGVsQHBlbmd1dHJvbml4LmRlPg0KPiAtLS0NCj4gIGRyaXZlcnMvbmV0L2RzYS9taWNyb2NoaXAv
-a3N6ODc5NS5jICAgICB8IDM2ICsrKysrKysrKysrKysrKysrKysrLS0tDQo+IC0tDQo+ICBkcml2
-ZXJzL25ldC9kc2EvbWljcm9jaGlwL2tzejg3OTVfcmVnLmggfCAgMSArDQo+ICAyIGZpbGVzIGNo
-YW5nZWQsIDMwIGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0
-IGEvZHJpdmVycy9uZXQvZHNhL21pY3JvY2hpcC9rc3o4Nzk1LmMNCj4gYi9kcml2ZXJzL25ldC9k
-c2EvbWljcm9jaGlwL2tzejg3OTUuYw0KPiBpbmRleCA1MWUwMTk0NDUzZGYuLjFkODM3NzY0MGEz
-ZCAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9uZXQvZHNhL21pY3JvY2hpcC9rc3o4Nzk1LmMNCj4g
-KysrIGIvZHJpdmVycy9uZXQvZHNhL21pY3JvY2hpcC9rc3o4Nzk1LmMNCj4gQEAgLTczMSwxNiAr
-NzMxLDI1IEBAIHN0YXRpYyBpbnQga3N6OF9yX3BoeV9ibWNyKHN0cnVjdCBrc3pfZGV2aWNlDQo+
-ICpkZXYsIHUxNiBwb3J0LCB1MTYgKnZhbCkNCj4gICAgICAgICBpZiAocmV0KQ0KPiAgICAgICAg
-ICAgICAgICAgcmV0dXJuIHJldDsNCj4gDQo+IC0gICAgICAgaWYgKHJlc3RhcnQgJiBQT1JUX1BI
-WV9MT09QQkFDSykNCj4gLSAgICAgICAgICAgICAgICp2YWwgfD0gQk1DUl9MT09QQkFDSzsNCj4g
-LQ0KPiAgICAgICAgIGlmIChjdHJsICYgUE9SVF9GT1JDRV8xMDBfTUJJVCkNCj4gICAgICAgICAg
-ICAgICAgICp2YWwgfD0gQk1DUl9TUEVFRDEwMDsNCj4gDQo+ICAgICAgICAgaWYgKGtzel9pc19r
-c3o4OHgzKGRldikpIHsNCj4gKyAgICAgICAgICAgICAgIGlmIChyZXN0YXJ0ICYgS1NaODg3M19Q
-T1JUX1BIWV9MT09QQkFDSykNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgKnZhbCB8PSBCTUNS
-X0xPT1BCQUNLOw0KPiArDQo+ICAgICAgICAgICAgICAgICBpZiAoKGN0cmwgJiBQT1JUX0FVVE9f
-TkVHX0VOQUJMRSkpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICp2YWwgfD0gQk1DUl9BTkVO
-QUJMRTsNCj4gICAgICAgICB9IGVsc2Ugew0KPiArICAgICAgICAgICAgICAgdTggc3RhdDM7DQo+
-ICsNCj4gKyAgICAgICAgICAgICAgIHJldCA9IGtzel9wcmVhZDgoZGV2LCBwb3J0LCBSRUdfUE9S
-VF9TVEFUVVNfMywNCj4gJnN0YXQzKTsNCj4gKyAgICAgICAgICAgICAgIGlmIChyZXQpDQo+ICsg
-ICAgICAgICAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ICsNCj4gKyAgICAgICAgICAgICAg
-IGlmIChzdGF0MyAmIFBPUlRfUEhZX0xPT1BCQUNLKQ0KPiArICAgICAgICAgICAgICAgICAgICAg
-ICAqdmFsIHw9IEJNQ1JfTE9PUEJBQ0s7DQo+ICsNCj4gICAgICAgICAgICAgICAgIGlmICghKGN0
-cmwgJiBQT1JUX0FVVE9fTkVHX0RJU0FCTEUpKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAq
-dmFsIHw9IEJNQ1JfQU5FTkFCTEU7DQo+ICAgICAgICAgfQ0KPiBAQCAtMTAwMSw4ICsxMDEwLDcg
-QEAgc3RhdGljIGludCBrc3o4X3dfcGh5X2JtY3Ioc3RydWN0IGtzel9kZXZpY2UNCj4gKmRldiwg
-dTE2IHBvcnQsIHUxNiB2YWwpDQo+IA0KPiAgICAgICAgIHJlc3RhcnQgPSAwOw0KPiAgICAgICAg
-IHJlc3RhcnRfbWFzayA9IFBPUlRfTEVEX09GRiB8IFBPUlRfVFhfRElTQUJMRSB8DQo+IFBPUlRf
-QVVUT19ORUdfUkVTVEFSVCB8DQo+IC0gICAgICAgICAgICAgICBQT1JUX1BPV0VSX0RPV04gfCBQ
-T1JUX0FVVE9fTURJWF9ESVNBQkxFIHwNCj4gUE9SVF9GT1JDRV9NRElYIHwNCj4gLSAgICAgICAg
-ICAgICAgIFBPUlRfUEhZX0xPT1BCQUNLOw0KPiArICAgICAgICAgICAgICAgUE9SVF9QT1dFUl9E
-T1dOIHwgUE9SVF9BVVRPX01ESVhfRElTQUJMRSB8DQo+IFBPUlRfRk9SQ0VfTURJWDsNCj4gDQo+
-ICAgICAgICAgaWYgKHZhbCAmIEtTWjg4NlhfQk1DUl9ESVNBQkxFX0xFRCkNCj4gICAgICAgICAg
-ICAgICAgIHJlc3RhcnQgfD0gUE9SVF9MRURfT0ZGOw0KPiBAQCAtMTAyMiw4ICsxMDMwLDIyIEBA
-IHN0YXRpYyBpbnQga3N6OF93X3BoeV9ibWNyKHN0cnVjdCBrc3pfZGV2aWNlDQo+ICpkZXYsIHUx
-NiBwb3J0LCB1MTYgdmFsKQ0KPiAgICAgICAgIGlmICh2YWwgJiBLU1o4ODZYX0JNQ1JfRk9SQ0Vf
-TURJKQ0KPiAgICAgICAgICAgICAgICAgcmVzdGFydCB8PSBQT1JUX0ZPUkNFX01ESVg7DQo+IA0K
-PiAtICAgICAgIGlmICh2YWwgJiBCTUNSX0xPT1BCQUNLKQ0KPiAtICAgICAgICAgICAgICAgcmVz
-dGFydCB8PSBQT1JUX1BIWV9MT09QQkFDSzsNCj4gKyAgICAgICBpZiAoa3N6X2lzX2tzejg4eDMo
-ZGV2KSkgew0KPiArICAgICAgICAgICAgICAgcmVzdGFydF9tYXNrIHw9IEtTWjg4NzNfUE9SVF9Q
-SFlfTE9PUEJBQ0s7DQo+ICsNCj4gKyAgICAgICAgICAgICAgIGlmICh2YWwgJiBCTUNSX0xPT1BC
-QUNLKQ0KPiArICAgICAgICAgICAgICAgICAgICAgICByZXN0YXJ0IHw9IEtTWjg4NzNfUE9SVF9Q
-SFlfTE9PUEJBQ0s7DQo+ICsgICAgICAgfSBlbHNlIHsNCj4gKyAgICAgICAgICAgICAgIHU4IHN0
-YXQzID0gMDsNCj4gKw0KPiArICAgICAgICAgICAgICAgaWYgKHZhbCAmIEJNQ1JfTE9PUEJBQ0sp
-DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIHN0YXQzIHw9IFBPUlRfUEhZX0xPT1BCQUNLOw0K
-PiArDQo+ICsgICAgICAgICAgICAgICByZXQgPSBrc3pfcHJtdzgoZGV2LCBwb3J0LCBSRUdfUE9S
-VF9TVEFUVVNfMywNCj4gUE9SVF9QSFlfTE9PUEJBQ0ssDQo+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgc3RhdDMpOw0KPiArICAgICAgICAgICAgICAgaWYgKHJldCkNCj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgcmV0dXJuIHJldDsNCg0Kbml0cGljazogQXMgaXQgaXMgaW5kZXBl
-bmRlbnQgdGhpbmcsIGl0IHdpbGwgYmUgZ29vZCB0byBoYXZlIHdyYXBwZXINCmZ1bmN0aW9uIGZv
-ciB3cml0aW5nIGFuZCByZWFkaW5nIHBoeSBsb29wYmFjayBpbiBzdGF0MyByZWdpc3Rlci4gDQoN
-Cj4gKyAgICAgICB9DQo+IA0KPiAgICAgICAgIHJldHVybiBrc3pfcHJtdzgoZGV2LCBwb3J0LCBy
-ZWdzW1BfTkVHX1JFU1RBUlRfQ1RSTF0sDQo+IHJlc3RhcnRfbWFzaywNCj4gICAgICAgICAgICAg
-ICAgICAgICAgICAgIHJlc3RhcnQpOw0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZHNhL21p
-Y3JvY2hpcC9rc3o4Nzk1X3JlZy5oDQo+IGIvZHJpdmVycy9uZXQvZHNhL21pY3JvY2hpcC9rc3o4
-Nzk1X3JlZy5oDQo+IGluZGV4IGJlY2E5NzRlMDE3MS4uN2M5MzQxZWY3M2IwIDEwMDY0NA0KPiAt
-LS0gYS9kcml2ZXJzL25ldC9kc2EvbWljcm9jaGlwL2tzejg3OTVfcmVnLmgNCj4gKysrIGIvZHJp
-dmVycy9uZXQvZHNhL21pY3JvY2hpcC9rc3o4Nzk1X3JlZy5oDQo+IEBAIC0yNjUsNiArMjY1LDcg
-QEANCj4gICNkZWZpbmUgUE9SVF9BVVRPX01ESVhfRElTQUJMRSAgICAgICAgIEJJVCgyKQ0KPiAg
-I2RlZmluZSBQT1JUX0ZPUkNFX01ESVggICAgICAgICAgICAgICAgICAgICAgICBCSVQoMSkNCj4g
-ICNkZWZpbmUgUE9SVF9NQUNfTE9PUEJBQ0sgICAgICAgICAgICAgIEJJVCgwKQ0KPiArI2RlZmlu
-ZSBLU1o4ODczX1BPUlRfUEhZX0xPT1BCQUNLICAgICAgQklUKDApDQo+IA0KPiAgI2RlZmluZSBS
-RUdfUE9SVF8xX1NUQVRVU18yICAgICAgICAgICAgMHgxRQ0KPiAgI2RlZmluZSBSRUdfUE9SVF8y
-X1NUQVRVU18yICAgICAgICAgICAgMHgyRQ0KPiAtLQ0KPiAyLjM5LjINCj4gDQo=
+Some DSA tagging protocols change the EtherType field in the MAC header
+e.g.  DSA_TAG_PROTO_(DSA/EDSA/BRCM/MTK/RTL4C_A/SJA1105). On TX these tagged
+frames are ignored by the checksum offload engine and IP header checker of
+some stmmac cores.
+
+On RX, the stmmac driver wrongly assumes that checksums have been computed
+for these tagged packets, and sets CHECKSUM_UNNECESSARY.
+
+Add an additional check in the stmmac TX and RX hotpaths so that COE is
+deactivated for packets with ethertypes that will not trigger the COE and
+IP header checks.
+
+Fixes: 6b2c6e4a938f ("net: stmmac: propagate feature flags to vlan")
+Cc:  <stable@vger.kernel.org>
+Reported-by: Richard Tresidder <rtresidd@electromag.com.au>
+Link: https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au/
+Reported-by: Romain Gantois <romain.gantois@bootlin.com>
+Link: https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com/
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+---
+Hello everyone,
+
+This is the fourth version of my proposed fix for the stmmac checksum
+offloading issue that has recently been reported.
+
+significant changes in v4:
+- Removed "inline" from declaration of stmmac_has_ip_ethertype
+
+significant changes in v3:
+- Use __vlan_get_protocol to make sure that 8021Q-encapsulated
+  traffic is checked correctly.
+
+significant changes in v2:
+- Replaced the stmmac_link_up-based fix with an ethertype check in the TX
+  and RX hotpaths.
+
+The Checksum Offloading Engine of some stmmac cores (e.g. DWMAC1000)
+computes an incorrect checksum when presented with DSA-tagged packets. This
+causes all TCP/UDP transfers to break when the stmmac device is connected
+to the CPU port of a DSA switch.
+
+I ran some tests using different tagging protocols with DSA_LOOP, and all
+of the protocols that set a custom ethertype field in the MAC header caused
+the checksum offload engine to ignore the tagged packets. On TX, this
+caused packets to egress with incorrect checksums. On RX, these packets
+were similarly ignored by the COE, yet the stmmac driver set
+CHECKSUM_UNNECESSARY, wrongly assuming that their checksums had been
+verified in hardware.
+
+Version 2 of this patch series fixes this issue by checking ethertype
+fields in both the TX and RX hotpaths of the stmmac driver. On TX, if a
+non-IP ethertype is detected, the packet is checksummed in software.  On
+RX, the same condition causes stmmac to avoid setting CHECKSUM_UNNECESSARY.
+
+To measure the performance degradation to the TX/RX hotpaths, I did some
+iperf3 runs with 512-byte unfragmented UDP packets.
+
+measured degradation on TX: -466 pps (-0.2%) on RX: -338 pps (-1.2%)
+original performances on TX: 22kpps on RX: 27kpps
+
+The performance hit on the RX path can be partly explained by the fact that
+the stmmac driver doesn't set CHECKSUM_UNNECESSARY anymore.
+
+The TX performance degradation observed in v2 seems to have improved.
+It's not entirely clear to me why that is.
+
+Best Regards,
+
+Romain
+
+Romain Gantois (1):
+  net: stmmac: Prevent DSA tags from breaking COE
+
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 23 ++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+--
+2.43.0
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 29 ++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 37e64283f910..b30dba06dbd1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -4371,6 +4371,25 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	return NETDEV_TX_OK;
+ }
+ 
++/**
++ * stmmac_has_ip_ethertype() - Check if packet has IP ethertype
++ * @skb: socket buffer to check
++ *
++ * Check if a packet has an ethertype that will trigger the IP header checks
++ * and IP/TCP checksum engine of the stmmac core.
++ *
++ * Return: true if the ethertype can trigger the checksum engine, false otherwise
++ */
++static bool stmmac_has_ip_ethertype(struct sk_buff *skb)
++{
++	int depth = 0;
++	__be16 proto;
++
++	proto = __vlan_get_protocol(skb, eth_header_parse_protocol(skb), &depth);
++
++	return (depth <= ETH_HLEN) && (proto == htons(ETH_P_IP) || proto == htons(ETH_P_IPV6));
++}
++
+ /**
+  *  stmmac_xmit - Tx entry point of the driver
+  *  @skb : the socket buffer
+@@ -4435,9 +4454,13 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	/* DWMAC IPs can be synthesized to support tx coe only for a few tx
+ 	 * queues. In that case, checksum offloading for those queues that don't
+ 	 * support tx coe needs to fallback to software checksum calculation.
++	 *
++	 * Packets that won't trigger the COE e.g. most DSA-tagged packets will
++	 * also have to be checksummed in software.
+ 	 */
+ 	if (csum_insertion &&
+-	    priv->plat->tx_queues_cfg[queue].coe_unsupported) {
++	    (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
++	    !stmmac_has_ip_ethertype(skb))) {
+ 		if (unlikely(skb_checksum_help(skb)))
+ 			goto dma_map_err;
+ 		csum_insertion = !csum_insertion;
+@@ -4997,7 +5020,7 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
+ 	stmmac_rx_vlan(priv->dev, skb);
+ 	skb->protocol = eth_type_trans(skb, priv->dev);
+ 
+-	if (unlikely(!coe))
++	if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb))
+ 		skb_checksum_none_assert(skb);
+ 	else
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+@@ -5513,7 +5536,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+ 		stmmac_rx_vlan(priv->dev, skb);
+ 		skb->protocol = eth_type_trans(skb, priv->dev);
+ 
+-		if (unlikely(!coe))
++		if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb))
+ 			skb_checksum_none_assert(skb);
+ 		else
+ 			skb->ip_summed = CHECKSUM_UNNECESSARY;
+
+---
+base-commit: ac631873c9e7a50d2a8de457cfc4b9f86666403e
+change-id: 20240108-prevent_dsa_tags-7bb0def0db81
+
+Best regards,
+-- 
+Romain Gantois <romain.gantois@bootlin.com>
+
 
