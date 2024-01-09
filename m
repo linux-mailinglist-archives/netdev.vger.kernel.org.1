@@ -1,161 +1,125 @@
-Return-Path: <netdev+bounces-62754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66ECD828F57
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 22:58:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DFCD828F93
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 23:17:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3571B20A3A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 21:58:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9ECE21F26873
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 22:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A56A3DB90;
-	Tue,  9 Jan 2024 21:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E8C3DBB9;
+	Tue,  9 Jan 2024 22:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qB46A5Sp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E0D3DB84;
-	Tue,  9 Jan 2024 21:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4T8lCw6nPKz9sd0;
-	Tue,  9 Jan 2024 22:57:48 +0100 (CET)
-Message-ID: <efcc7b97-6bfc-4e5d-8e73-78f2b190fa02@v0yd.nl>
-Date: Tue, 9 Jan 2024 22:57:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D393C6A4;
+	Tue,  9 Jan 2024 22:16:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA61FC433F1;
+	Tue,  9 Jan 2024 22:16:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704838610;
+	bh=EHvco0VkqOSJGuxdue1TEtXAL00jI8VZrVZxCAuX2+E=;
+	h=From:Subject:Date:To:Cc:From;
+	b=qB46A5SpFD/NpmrZNfvwVgTddKr4FozL/Nm6NTWqjJuavIDeYbyWj8WbTz/AJAYAd
+	 rCq1xH2+lrNbAzymhVqtxXCmJQYKKBtigLbuskx+y07oOM7Fuhn5KtE5lAQldU86ff
+	 zsHlTOsJZDWVdq5RMMJKOsWvG0Sf8ZHgtVjZur4CTnnCh2KmHRiE+g9IYh0N3JSxTK
+	 HD8CBIbqmmGPG+MOnwgxTifgp44rGjZZFXk0l6vXeduRl6TLk9LScel7oWlPR5uz1g
+	 UsvtcwNt/LBd82QaDZxv1VzpZC3HDPVzq86WEch1mZNDSm/ODiPUOVtCeJtXC34hlE
+	 7d2vmCHDFTLIQ==
+From: Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH 0/3] Update LLVM Phabricator and Bugzilla links
+Date: Tue, 09 Jan 2024 15:16:28 -0700
+Message-Id: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Subject: Re: [PATCH v3 0/4] Bluetooth: Improve retrying of connection attempts
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, verdre@v0yd.nl
-References: <20240108224614.56900-1-verdre@v0yd.nl>
- <CABBYNZKV176teECGnGKTCNNo45ZYbCRs=YddETOUMUsJQX5PdA@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CABBYNZKV176teECGnGKTCNNo45ZYbCRs=YddETOUMUsJQX5PdA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4T8lCw6nPKz9sd0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALzFnWUC/x3MQQqAIBBA0avErBtQi8CuEi0kpxoyCy0JwrsnL
+ d/i/xciBaYIffVCoMSRD18g6wqm1fiFkG0xKKFaIYXG+7TmInQu7ejYbxGtaGZtu1aTJCjdGWj
+ m538OY84fszs+Z2MAAAA=
+To: akpm@linux-foundation.org
+Cc: llvm@lists.linux.dev, patches@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+ linux-riscv@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
+ linux-s390@vger.kernel.org, linux-pm@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org, 
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+ linux-media@vger.kernel.org, linux-arch@vger.kernel.org, 
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, bridge@lists.linux.dev, 
+ netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>, 
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, mykolal@fb.com, 
+ bpf@vger.kernel.org
+X-Mailer: b4 0.13-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2460; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=EHvco0VkqOSJGuxdue1TEtXAL00jI8VZrVZxCAuX2+E=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDKlzj17YHOFbeqmmzSTv+Yl3Dvc2pO2+wn2gftPWtOlmz
+ ZFzErc87ShlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQATcYlj+J+VsOtwv+FtLr6v
+ L2ptJLoTJ1xwvPM+afI7W55fz9vnRocyMsxLsi56rXP33S6VMzNvVJ4tXR/xeu4ma9Zvvc8ruWO
+ PdPIDAA==
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Hi Luiz,
+This series updates all instances of LLVM Phabricator and Bugzilla links
+to point to GitHub commits directly and LLVM's Bugzilla to GitHub issue
+shortlinks respectively.
 
-On 1/9/24 18:53, Luiz Augusto von Dentz wrote:
-> Hi Jonas,
-> 
-> On Mon, Jan 8, 2024 at 5:46 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
->>
->> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
->> requests"), the kernel supports trying to connect again in case the
->> bluetooth card is busy and fails to connect.
->>
->> The logic that should handle this became a bit spotty over time, and also
->> cards these days appear to fail with more errors than just "Command
->> Disallowed".
->>
->> This series refactores the handling of concurrent connection requests
->> by serializing all "Create Connection" commands for ACL connections
->> similar to how we do it for LE connections.
->>
->> ---
->>
->> v1: https://lore.kernel.org/linux-bluetooth/20240102185933.64179-1-verdre@v0yd.nl/
->> v2: https://lore.kernel.org/linux-bluetooth/20240108183938.468426-1-verdre@v0yd.nl/
->> v3:
->>    - Move the new sync function to hci_sync.c as requested by review
->>    - Abort connection on failure using hci_abort_conn_sync() instead of
->>      hci_abort_conn()
->>    - Make the last commit message a bit more precise regarding the meaning
->>      of BT_CONNECT2 state
->>
->> Jonas Dreßler (4):
->>    Bluetooth: Remove superfluous call to hci_conn_check_pending()
->>    Bluetooth: hci_event: Use HCI error defines instead of magic values
->>    Bluetooth: hci_conn: Only do ACL connections sequentially
->>    Bluetooth: Remove pending ACL connection attempts
->>
->>   include/net/bluetooth/hci.h      |  3 ++
->>   include/net/bluetooth/hci_core.h |  1 -
->>   include/net/bluetooth/hci_sync.h |  3 ++
->>   net/bluetooth/hci_conn.c         | 83 +++-----------------------------
->>   net/bluetooth/hci_event.c        | 29 +++--------
->>   net/bluetooth/hci_sync.c         | 72 +++++++++++++++++++++++++++
->>   6 files changed, 93 insertions(+), 98 deletions(-)
->>
->> --
->> 2.43.0
-> 
-> After rebasing and fixing a little bit here and there, see v4, looks
-> like this changes is affecting the following mgmt-tester -s "Pair
-> Device - Power off 1":
-> 
-> Pair Device - Power off 1 - init
->    Read Version callback
->      Status: Success (0x00)
->      Version 1.22
->    Read Commands callback
->      Status: Success (0x00)
->    Read Index List callback
->      Status: Success (0x00)
->    Index Added callback
->      Index: 0x0000
->    Enable management Mesh interface
->    Enabling Mesh feature
->    Read Info callback
->      Status: Success (0x00)
->      Address: 00:AA:01:00:00:00
->      Version: 0x09
->      Manufacturer: 0x05f1
->      Supported settings: 0x0001bfff
->      Current settings: 0x00000080
->      Class: 0x000000
->      Name:
->      Short name:
->    Mesh feature is enabled
-> Pair Device - Power off 1 - setup
->    Setup sending Set Bondable (0x0009)
->    Setup sending Set Powered (0x0005)
->    Initial settings completed
->    Test setup condition added, total 1
->    Client set connectable: Success (0x00)
->    Test setup condition complete, 0 left
-> Pair Device - Power off 1 - setup complete
-> Pair Device - Power off 1 - run
->    Sending Pair Device (0x0019)
-> Bluetooth: hci0: command 0x0405 tx timeout
-> Bluetooth: hci0: command 0x0408 tx timeout
->    Test condition added, total 1
-> Pair Device - Power off 1 - test timed out
->    Pair Device (0x0019): Disconnected (0x0e)
-> Pair Device - Power off 1 - test not run
-> Pair Device - Power off 1 - teardown
-> Pair Device - Power off 1 - teardown
->    Index Removed callback
->      Index: 0x0000
-> Pair Device - Power off 1 - teardown complete
-> Pair Device - Power off 1 - done
-> 
+I split up the Phabricator patch into BPF selftests and the rest of the
+kernel in case the BPF folks want to take it separately from the rest of
+the series, there are obviously no dependency issues in that case. The
+Bugzilla change was mechanical enough and should have no conflicts.
 
-Thanks for landing the first two commits!
+I am aiming this at Andrew and CC'ing other lists, in case maintainers
+want to chime in, but I think this is pretty uncontroversial (famous
+last words...).
 
-I think this is actually the same issue causing the test failure
-as in the other issue I had:
-https://lore.kernel.org/linux-bluetooth/7cee4e74-3a0c-4b7c-9984-696e646160f8@v0yd.nl/
+---
+Nathan Chancellor (3):
+      selftests/bpf: Update LLVM Phabricator links
+      arch and include: Update LLVM Phabricator links
+      treewide: Update LLVM Bugzilla links
 
-It seems that the emulator is unable to reply to HCI commands sent
-from the hci_sync machinery, possibly because that is sending things
-on a separate thread?
+ arch/arm64/Kconfig                                 |  4 +--
+ arch/powerpc/Makefile                              |  4 +--
+ arch/powerpc/kvm/book3s_hv_nested.c                |  2 +-
+ arch/riscv/Kconfig                                 |  2 +-
+ arch/riscv/include/asm/ftrace.h                    |  2 +-
+ arch/s390/include/asm/ftrace.h                     |  2 +-
+ arch/x86/power/Makefile                            |  2 +-
+ crypto/blake2b_generic.c                           |  2 +-
+ drivers/firmware/efi/libstub/Makefile              |  2 +-
+ drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c           |  2 +-
+ drivers/media/test-drivers/vicodec/codec-fwht.c    |  2 +-
+ drivers/regulator/Kconfig                          |  2 +-
+ include/asm-generic/vmlinux.lds.h                  |  2 +-
+ include/linux/compiler-clang.h                     |  2 +-
+ lib/Kconfig.kasan                                  |  2 +-
+ lib/raid6/Makefile                                 |  2 +-
+ lib/stackinit_kunit.c                              |  2 +-
+ mm/slab_common.c                                   |  2 +-
+ net/bridge/br_multicast.c                          |  2 +-
+ security/Kconfig                                   |  2 +-
+ tools/testing/selftests/bpf/README.rst             | 32 +++++++++++-----------
+ tools/testing/selftests/bpf/prog_tests/xdpwall.c   |  2 +-
+ .../selftests/bpf/progs/test_core_reloc_type_id.c  |  2 +-
+ 23 files changed, 40 insertions(+), 40 deletions(-)
+---
+base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
+change-id: 20240109-update-llvm-links-d03f9d649e1e
 
-Cheers,
-Jonas
+Best regards,
+-- 
+Nathan Chancellor <nathan@kernel.org>
+
 
