@@ -1,203 +1,113 @@
-Return-Path: <netdev+bounces-62688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0962C8288C1
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:11:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E79C48288C6
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:14:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEE7F1C234DA
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:11:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68FD8287178
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B97F39AEA;
-	Tue,  9 Jan 2024 15:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D90739FC1;
+	Tue,  9 Jan 2024 15:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J2bgDOGb"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EhgJ5JBZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD4B39FFA
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 15:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704813056;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tkpr1RhaJrAP/oNWGGaaG9PEfXHE0nB87Qi7Q623/H0=;
-	b=J2bgDOGbCaqAOflZtg7Drv3oa24NYsc9lKpO0LVCKDy+wLeuBogvCin9R45raUsplJqDYK
-	DxQtudzRAsblmUe0w/uED1OudkVsbfYtHVDhUOni042vSQirZ3V4deWju1tpppNlUTUa5j
-	FxFhBHi8pvvVjd+OUyINJl4pzdBY/OQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-LZhzqSeqNpqZ_akE8bFssQ-1; Tue, 09 Jan 2024 10:10:50 -0500
-X-MC-Unique: LZhzqSeqNpqZ_akE8bFssQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 78429185A780;
-	Tue,  9 Jan 2024 15:10:50 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1F8031121306;
-	Tue,  9 Jan 2024 15:10:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Marc Dionne <marc.dionne@auristor.com>
-cc: dhowells@redhat.com, "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] rxrpc: Fix use of Don't Fragment flag
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D948D39AE8;
+	Tue,  9 Jan 2024 15:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gRiZiJWOoVL6Oa5TlXweb+aZfLgTD3/mvROJ7Dpd6vo=; b=EhgJ5JBZ0knWO1CRq06h9bTbXZ
+	ZF4H3dqITWvmqEbmUSX+49PXuSy0FBPA26c2MLmyPJtmBFYFq3bUYA6VFLywYgnE7ZlX/jh2JCA/X
+	34HRmL1Sy/FR2AmKPpCon150+fczB7SXbtw4EgxEsc4X31/Dw4HSYckK4+DxBc+dvTEk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rNDng-004qNW-I3; Tue, 09 Jan 2024 16:13:56 +0100
+Date: Tue, 9 Jan 2024 16:13:56 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sneh Shah <quic_snehshah@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>
+Subject: Re: [PATCH v2] net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G
+ SGMII
+Message-ID: <c9290a44-a239-4ccf-9e14-4647b68aac2f@lunn.ch>
+References: <20240108121128.30071-1-quic_snehshah@quicinc.com>
+ <4216bcbb-730d-4c51-a9ce-d3f0a0846e31@lunn.ch>
+ <6f97e753-435e-4b86-bd47-290097f6a3f0@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1581851.1704813048.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jan 2024 15:10:48 +0000
-Message-ID: <1581852.1704813048@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6f97e753-435e-4b86-bd47-290097f6a3f0@quicinc.com>
 
-    =
+On Tue, Jan 09, 2024 at 08:22:40PM +0530, Sneh Shah wrote:
+> 
+> 
+> On 1/9/2024 1:00 AM, Andrew Lunn wrote:
+> > On Mon, Jan 08, 2024 at 05:41:28PM +0530, Sneh Shah wrote:
+> >> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
+> >> mode for 1G/100M/10M speed.
+> >> Added changes to configure serdes phy and mac based on link speed.
+> > 
+> > Please take a look at:
+> > 
+> > https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+> > 
+> > The Subject is missing which tree this is for. Also, net-next is
+> > closed at the moment.
+> 
+> It was supposed to be net-next. Missed updating in subject.
+> Sorry for that!
+> If net-next is closed at the moment, how to proceed further?
+> Should I wait until it gets reopened?
 
-rxrpc normally has the Don't Fragment flag set on the UDP packets it
-transmits, except when it has decided that DATA packets aren't getting
-through - in which case it turns it off just for the DATA transmissions.
-This can be a problem, however, for RESPONSE packets that convey
-authentication and crypto data from the client to the server as ticket may
-be larger than can fit in the MTU.
+Yes, please repost in two weeks time.
 
-In such a case, rxrpc gets itself into an infinite loop as the sendmsg
-returns an error (EMSGSIZE), which causes rxkad_send_response() to return
--EAGAIN - and the CHALLENGE packet is put back on the Rx queue to retry,
-leading to the I/O thread endlessly attempting to perform the transmission=
-.
+> >>  	switch (ethqos->speed) {
+> >> +	case SPEED_2500:
+> >> +		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+> >> +		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> >> +			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> >> +			      RGMII_IO_MACRO_CONFIG2);
+> >> +		if (ethqos->serdes_speed != SPEED_2500)
+> >> +			phy_set_speed(ethqos->serdes_phy, SPEED_2500);
+> > 
+> > Is calling phy_set_speed() expensive? Why not just unconditionally
+> > call it?
+> > 
+> It reconfigures whole serdes phy block, with lots of register read/writes.
+> So I feel it is better to avoid doing this unconditionally
 
-Fix this by disabling DF on RESPONSE packets for now.  The use of DF and
-best data MTU determination needs reconsidering at some point in the
-future.
+O.K, please add this to the commit message.
 
-Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by =
-userspace and kernel both")
-Reported-by: Marc Dionne <marc.dionne@auristor.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/ar-internal.h  |    1 +
- net/rxrpc/local_object.c |   13 ++++++++++++-
- net/rxrpc/output.c       |    6 ++----
- net/rxrpc/rxkad.c        |    2 ++
- 4 files changed, 17 insertions(+), 5 deletions(-)
+Part of the purpose of the commit message is to try to answer
+questions the reviewers are going to ask when they look at the
+code. Its better to put more in the commit message than less, it helps
+get your code merged faster, and reduces the load on reviewers.
 
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index e8e14c6f904d..e8b43408136a 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -1076,6 +1076,7 @@ void rxrpc_send_version_request(struct rxrpc_local *=
-local,
- /*
-  * local_object.c
-  */
-+void rxrpc_local_dont_fragment(const struct rxrpc_local *local, bool set)=
-;
- struct rxrpc_local *rxrpc_lookup_local(struct net *, const struct sockadd=
-r_rxrpc *);
- struct rxrpc_local *rxrpc_get_local(struct rxrpc_local *, enum rxrpc_loca=
-l_trace);
- struct rxrpc_local *rxrpc_get_local_maybe(struct rxrpc_local *, enum rxrp=
-c_local_trace);
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index c553a30e9c83..34d307368135 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -36,6 +36,17 @@ static void rxrpc_encap_err_rcv(struct sock *sk, struct=
- sk_buff *skb, int err,
- 		return ipv6_icmp_error(sk, skb, err, port, info, payload);
- }
- =
-
-+/*
-+ * Set or clear the Don't Fragment flag on a socket.
-+ */
-+void rxrpc_local_dont_fragment(const struct rxrpc_local *local, bool set)
-+{
-+	if (set)
-+		ip_sock_set_mtu_discover(local->socket->sk, IP_PMTUDISC_DO);
-+	else
-+		ip_sock_set_mtu_discover(local->socket->sk, IP_PMTUDISC_DONT);
-+}
-+
- /*
-  * Compare a local to an address.  Return -ve, 0 or +ve to indicate less =
-than,
-  * same or greater than.
-@@ -203,7 +214,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local=
-, struct net *net)
- 		ip_sock_set_recverr(usk);
- =
-
- 		/* we want to set the don't fragment bit */
--		ip_sock_set_mtu_discover(usk, IP_PMTUDISC_DO);
-+		rxrpc_local_dont_fragment(local, true);
- =
-
- 		/* We want receive timestamps. */
- 		sock_enable_timestamps(usk);
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 5e53429c6922..a0906145e829 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -494,14 +494,12 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, =
-struct rxrpc_txbuf *txb)
- 	switch (conn->local->srx.transport.family) {
- 	case AF_INET6:
- 	case AF_INET:
--		ip_sock_set_mtu_discover(conn->local->socket->sk,
--					 IP_PMTUDISC_DONT);
-+		rxrpc_local_dont_fragment(conn->local, false);
- 		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_frag);
- 		ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
- 		conn->peer->last_tx_at =3D ktime_get_seconds();
- =
-
--		ip_sock_set_mtu_discover(conn->local->socket->sk,
--					 IP_PMTUDISC_DO);
-+		rxrpc_local_dont_fragment(conn->local, true);
- 		break;
- =
-
- 	default:
-diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
-index 1bf571a66e02..b52dedcebce0 100644
---- a/net/rxrpc/rxkad.c
-+++ b/net/rxrpc/rxkad.c
-@@ -724,7 +724,9 @@ static int rxkad_send_response(struct rxrpc_connection=
- *conn,
- 	serial =3D atomic_inc_return(&conn->serial);
- 	whdr.serial =3D htonl(serial);
- =
-
-+	rxrpc_local_dont_fragment(conn->local, false);
- 	ret =3D kernel_sendmsg(conn->local->socket, &msg, iov, 3, len);
-+	rxrpc_local_dont_fragment(conn->local, true);
- 	if (ret < 0) {
- 		trace_rxrpc_tx_fail(conn->debug_id, serial, ret,
- 				    rxrpc_tx_point_rxkad_response);
-
+     Andrew
 
