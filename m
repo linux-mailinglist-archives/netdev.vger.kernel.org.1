@@ -1,175 +1,108 @@
-Return-Path: <netdev+bounces-62717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823AA828B89
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 18:54:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F1A4828BC0
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 19:02:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 348B41F25DF9
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:54:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F739B2471D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 18:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4063B799;
-	Tue,  9 Jan 2024 17:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2763C47A;
+	Tue,  9 Jan 2024 18:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XMT42gRL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YMAtrrms"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1AF3BB53;
-	Tue,  9 Jan 2024 17:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ccea11b6bbso30559701fa.0;
-        Tue, 09 Jan 2024 09:54:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704822849; x=1705427649; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gIbyrPSKsQbDcDQfXkpDHHC7/9eaZRTzW2YiXQnsBHA=;
-        b=XMT42gRLyyTFYpjM96K12626QWAiAgXekewyZ2Jogf88gRAu9OYhWNTyK3aocMFiU1
-         T1tqYO9cUXBq0LrtsSG97sqhw62W9HROwsvdATzbLzAZkdJDpTnGf1Hn7iQ0YNx6B/DB
-         9sjASChdO0ra8pXyOhQrwSOChdgCVzbyylzGNKv4aOZDdMw9bDRYQhzyYKYvQbEYxE3o
-         VZmDvISrYNtoLCXPPMdKGJg8uMMBe7KVRHYjlyYd6tGrf/UJmvyaJy8dMknEZO1FVF+h
-         TwBtD+C4+xD7JX591zgqwnH5OYiHQQ0oeJjQdHsKVR8k7SB9q2uPU7YyfDUseu1Kf/6m
-         1nXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704822849; x=1705427649;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gIbyrPSKsQbDcDQfXkpDHHC7/9eaZRTzW2YiXQnsBHA=;
-        b=OwkjTJv90kQbpFiX+a6dYAMwPBoCcbsbVey4r7yn0rh8pDhq1XrT2OLOquNmZRVVg1
-         EJ9Le1naKUmRqRpW2xqP4wyAdm7ivA3HTvRmccyCfueZYEw5xmEICvUZtbeJNnraR5Wn
-         pwXwZnzojOQKyzH82OP0zfaBLaqfKMrqb1AexD+uQInK6Ja9wDbi1Pa8+6xHMEeaWfvj
-         wVcMrZTf2F9BXb0f3jfo1qFs7meEiSmkpz8MzzcvUq9YgPLEUtdypePYNPOYEK9qCe4g
-         uuMXHDJqCkDFhydOshLTATlynKTdDO1KIiEEP43o8zQhtD5l7EWyE4z3PvKFuMzEvNIQ
-         d/7g==
-X-Gm-Message-State: AOJu0YztWfbquwU8kwdOa6ivSTG3CptSKAmL/SlkE3Rcl9EiLTEM3DLo
-	fVwtcUcYIRXFUIaV8N2lcRx/EKwbBppilV5yXhs=
-X-Google-Smtp-Source: AGHT+IEAquitmm4I7dlVh6YzzaFvZ4MIqaJQdk5o3aYdijgf7VIyZgpHMCQj8qGGmTYobON22fBPCxUBWMEY6+X144o=
-X-Received: by 2002:a2e:9606:0:b0:2cc:78b7:1ef0 with SMTP id
- v6-20020a2e9606000000b002cc78b71ef0mr738949ljh.4.1704822849013; Tue, 09 Jan
- 2024 09:54:09 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91843C468
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 18:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704823289;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4rPNlP6PBry4nxR9lAPdbGmX8a9PuS5yG2z2I/UMBB8=;
+	b=YMAtrrmsrzrmIrDcyEnNIJ6UDBP40bRliFO1+Gp8fqUJbD8xqQG+yqWQt1W28bXIMzTyOE
+	y/J+Fil2DT1SHrq6SOpdlh+oRjwW8U+8Kqo3ccuIZimxO3O884F31zK+YAW1Yo7lJkPmnP
+	sCWN1fX8p+z0C2s3ZdAKhahfOATJnvM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-602-8EMcpOkJM7mLdtUraGzNaQ-1; Tue, 09 Jan 2024 13:01:27 -0500
+X-MC-Unique: 8EMcpOkJM7mLdtUraGzNaQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ADDF5800074;
+	Tue,  9 Jan 2024 18:01:25 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CAA253C39;
+	Tue,  9 Jan 2024 18:01:22 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] netfs, afs, erofs, cifs: Don't use certain internal folio_*() functions
+Date: Tue,  9 Jan 2024 18:01:11 +0000
+Message-ID: <20240109180117.1669008-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108224614.56900-1-verdre@v0yd.nl>
-In-Reply-To: <20240108224614.56900-1-verdre@v0yd.nl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 9 Jan 2024 12:53:56 -0500
-Message-ID: <CABBYNZKV176teECGnGKTCNNo45ZYbCRs=YddETOUMUsJQX5PdA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] Bluetooth: Improve retrying of connection attempts
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Hi Jonas,
+Hi Christian, Willy,
 
-On Mon, Jan 8, 2024 at 5:46=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl> =
-wrote:
->
-> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
-> requests"), the kernel supports trying to connect again in case the
-> bluetooth card is busy and fails to connect.
->
-> The logic that should handle this became a bit spotty over time, and also
-> cards these days appear to fail with more errors than just "Command
-> Disallowed".
->
-> This series refactores the handling of concurrent connection requests
-> by serializing all "Create Connection" commands for ACL connections
-> similar to how we do it for LE connections.
->
-> ---
->
-> v1: https://lore.kernel.org/linux-bluetooth/20240102185933.64179-1-verdre=
-@v0yd.nl/
-> v2: https://lore.kernel.org/linux-bluetooth/20240108183938.468426-1-verdr=
-e@v0yd.nl/
-> v3:
->   - Move the new sync function to hci_sync.c as requested by review
->   - Abort connection on failure using hci_abort_conn_sync() instead of
->     hci_abort_conn()
->   - Make the last commit message a bit more precise regarding the meaning
->     of BT_CONNECT2 state
->
-> Jonas Dre=C3=9Fler (4):
->   Bluetooth: Remove superfluous call to hci_conn_check_pending()
->   Bluetooth: hci_event: Use HCI error defines instead of magic values
->   Bluetooth: hci_conn: Only do ACL connections sequentially
->   Bluetooth: Remove pending ACL connection attempts
->
->  include/net/bluetooth/hci.h      |  3 ++
->  include/net/bluetooth/hci_core.h |  1 -
->  include/net/bluetooth/hci_sync.h |  3 ++
->  net/bluetooth/hci_conn.c         | 83 +++-----------------------------
->  net/bluetooth/hci_event.c        | 29 +++--------
->  net/bluetooth/hci_sync.c         | 72 +++++++++++++++++++++++++++
->  6 files changed, 93 insertions(+), 98 deletions(-)
->
-> --
-> 2.43.0
+Here are some patches that replace the use of folio_index(),
+folio_mapping() and folio_file_mapping() in some filesystem code.  I'll add
+them to my netfs-lib branch.
 
-After rebasing and fixing a little bit here and there, see v4, looks
-like this changes is affecting the following mgmt-tester -s "Pair
-Device - Power off 1":
+David
 
-Pair Device - Power off 1 - init
-  Read Version callback
-    Status: Success (0x00)
-    Version 1.22
-  Read Commands callback
-    Status: Success (0x00)
-  Read Index List callback
-    Status: Success (0x00)
-  Index Added callback
-    Index: 0x0000
-  Enable management Mesh interface
-  Enabling Mesh feature
-  Read Info callback
-    Status: Success (0x00)
-    Address: 00:AA:01:00:00:00
-    Version: 0x09
-    Manufacturer: 0x05f1
-    Supported settings: 0x0001bfff
-    Current settings: 0x00000080
-    Class: 0x000000
-    Name:
-    Short name:
-  Mesh feature is enabled
-Pair Device - Power off 1 - setup
-  Setup sending Set Bondable (0x0009)
-  Setup sending Set Powered (0x0005)
-  Initial settings completed
-  Test setup condition added, total 1
-  Client set connectable: Success (0x00)
-  Test setup condition complete, 0 left
-Pair Device - Power off 1 - setup complete
-Pair Device - Power off 1 - run
-  Sending Pair Device (0x0019)
-Bluetooth: hci0: command 0x0405 tx timeout
-Bluetooth: hci0: command 0x0408 tx timeout
-  Test condition added, total 1
-Pair Device - Power off 1 - test timed out
-  Pair Device (0x0019): Disconnected (0x0e)
-Pair Device - Power off 1 - test not run
-Pair Device - Power off 1 - teardown
-Pair Device - Power off 1 - teardown
-  Index Removed callback
-    Index: 0x0000
-Pair Device - Power off 1 - teardown complete
-Pair Device - Power off 1 - done
+David Howells (4):
+  netfs: Don't use certain internal folio_*() functions
+  afs: Don't use certain internal folio_*() functions
+  erofs: Don't use certain internal folio_*() functions
+  cifs: Don't use certain internal folio_*() functions
 
---=20
-Luiz Augusto von Dentz
+ fs/afs/dir.c              | 10 +++++-----
+ fs/erofs/fscache.c        |  6 +++---
+ fs/netfs/buffered_read.c  | 12 ++++++------
+ fs/netfs/buffered_write.c | 10 +++++-----
+ fs/netfs/io.c             |  2 +-
+ fs/netfs/misc.c           |  2 +-
+ fs/smb/client/file.c      | 10 +++++-----
+ 7 files changed, 26 insertions(+), 26 deletions(-)
+
 
