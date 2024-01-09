@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-62668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C27E828760
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:48:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99EC2828776
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:55:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D38286645
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:48:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46C771F254A0
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DCE38FB0;
-	Tue,  9 Jan 2024 13:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FBE38FBC;
+	Tue,  9 Jan 2024 13:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GH4SbNxa"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GLm0jjhZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED9F38FA3;
-	Tue,  9 Jan 2024 13:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F272038F9A;
+	Tue,  9 Jan 2024 13:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -27,45 +27,40 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wvVG2KQV/oETOX0CukFpt/vsd01F13tBQ9AIaAYqp6w=; b=GH4SbNxaChv564U3M/bDK7+b6W
-	e4yuHL2BbR4aMHapx53lmIvMyxVTYAtqrdRkQYktWCIpUKceG2nUrXqGw2/b97QNGnEZNL4DgCO+j
-	9qS+8VnvXTjPKZu+ILIS9TiPBkLrHFksXOg3/HhB2VxLn1JefXhhBq2PT6SUrN1OF6DY=;
+	bh=HOt3XKn1cL8RiCwi3hZoWQh0woHeYDJpEgyYREq1Hn8=; b=GLm0jjhZJxgMyW7v6lQku4aFI4
+	TUuwdUGIHq8de+u+1HY0EehjLNVA7Ml2PKh38t2EALGEVtRhVv2qCZ25Y3hxoucW5Vt47LrElXYGQ
+	/RnVBvMn0bXWArRk/lkUTbVPGd9X6LEd9nWTeTxLP/UeVxZJ48zx0A5iOT8cdPW/UyFw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rNCSm-004pw9-Bx; Tue, 09 Jan 2024 14:48:16 +0100
-Date: Tue, 9 Jan 2024 14:48:16 +0100
+	id 1rNCZi-004pz2-4i; Tue, 09 Jan 2024 14:55:26 +0100
+Date: Tue, 9 Jan 2024 14:55:26 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	William Zhang <william.zhang@broadcom.com>,
+	Anand Gore <anand.gore@broadcom.com>,
+	Kursad Oney <kursad.oney@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next PATCH RFC v3 1/8] dt-bindings: net: document ethernet
- PHY package nodes
-Message-ID: <2f2328ee-205b-4b4f-a683-2df4fbb22dde@lunn.ch>
-References: <20231126015346.25208-1-ansuelsmth@gmail.com>
- <20231126015346.25208-2-ansuelsmth@gmail.com>
- <0926ea46-1ce4-4118-a04c-b6badc0b9e15@gmail.com>
- <1437d9df-2868-43f5-aebd-e0c57fe4d905@lunn.ch>
- <b75e6267-7d54-412e-8882-af4d9a0b54e6@quicinc.com>
- <841ef784-b27e-4f7a-94f2-f04f93178c61@lunn.ch>
- <07c01c11-0cc2-4837-b371-1404f2ce3359@quicinc.com>
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
+	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
+	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v9 0/5] net: phy: generic polarity + LED support
+ for qca808x
+Message-ID: <edfd300f-224f-4ce6-930c-d9419a2077ab@lunn.ch>
+References: <20240105142719.11042-1-ansuelsmth@gmail.com>
+ <20240108191427.6455185a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,67 +69,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <07c01c11-0cc2-4837-b371-1404f2ce3359@quicinc.com>
+In-Reply-To: <20240108191427.6455185a@kernel.org>
 
-> 
-> __| |_______________| |__
-> | PCS0 |          |PCS1 |
-> |______|          |_____|
-> |_______                |<---- REF clock 50MHZ
-> |      |------------    |
-> |NSSCC |    |clks  |rsts|<---- GPIO reset
-> |______|    |      |    |
-> |           V      V    |
-> |_______________________|
-> |     |     |     |     |
-> |PHY1 |PHY2 |PHY3 |PHY4 |
-> |_____|_____|_____|_____|
+> Looks like we're missing some tags from DTB maintainers here.
+> Andrew, is there some urgency in getting this merged or can we
+> defer until v6.9?
 
-Not the best of improvements. So the ref clock goes to the package,
-and then magically somehow gets to the NSSCC? Are there any more
-blocks it goes through before reaching the NSSCC? How does the GPIO
-reset get converted into multiple reset inside the package? Details,
-details, details.
+It can wait.
 
-> There are difference clock trees generated from NSSCC for the different
-> PHYs, all clocks and resets for qca8084 CHIP working are internally
-> provided by the NSSCC.
-
-So show this in the block diagram.
-
-> Yes, Andrew, the NSSCC provider driver is probed based on the MDIO
-> device, the PHY CHIP occupies the MDIO addresses, so the NSSCC is
-> registered as the MDIO device.
-> 
-> DT of the NSSCC device node:
-> mdio {
->       #address-cells = <1>;
->       #size-cells = <0>;
-> 
->       clock-controller@18 {
->         compatible = "qcom,qca8084-nsscc";
->         reg = <0x18>;
->         clocks = <&qca8k_xo>,
->                  <&qca8k_uniphy0_rx>,
->                  <&qca8k_uniphy0_tx>,
->                  <&qca8k_uniphy1_rx>,
->                  <&qca8k_uniphy1_tx>,
->                  <&qca8k_uniphy1_rx312p5m>,
->                  <&qca8k_uniphy1_tx312p5m>;
->         #clock-cells = <1>;
->         #reset-cells = <1>;
->         #power-domain-cells = <1>;
->       };
->     };
- 
-This does not make any sense. You have one clock input, 50MHz. So why
-are you listing 6 consumer clocks, not one? And where are the clocks
-this clock controller provides, clock-output-names=<...>;
-
-I give up. Please consider this PHY driver NACKed.
-
-Get Linaro, or some other organisation with a lot of experience with
-mainline to take over the work.
-
-	 Andrew
+	Andrew
 
