@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-62704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5148828A3C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:45:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52BB8828A3D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:45:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81B5428829E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:45:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFF4128803B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640BA3A8C1;
-	Tue,  9 Jan 2024 16:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F91F3A8D5;
+	Tue,  9 Jan 2024 16:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZIy+IygD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EC50edTb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1E23A294
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063BD3A8CA
 	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 16:45:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63E46C43394;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08F84C433B1;
 	Tue,  9 Jan 2024 16:45:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704818723;
-	bh=3UW1BaI4F+h29/KDXw3mBVbUNtoJTtkiw9/DXnzKfS0=;
+	s=k20201202; t=1704818724;
+	bh=UALY/8U9M4ZX7fqMkazOyIQRULQ4mEfTqyNahWnOBzw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZIy+IygDIiVA1ghOWc1WjU0dKTrcf6kZOkVZ7mC2I2vcSO6KQtAZD01DDfIvB4dbF
-	 4xzaCYX+NUBll1EBJDItQnLPbsOA7gwuF3J3CG1zinXsZxL1u+EiUXDixSCpvrsFKZ
-	 YG51Ls6Wijn1EZOIFPotec8q7VUoiHNbRTbCiiA4fc6CJopDsqJqeC5n7JYuZ39ZM8
-	 NIblbp6XwxIaKS5tAQRLYqUVZsLGFpCHb5WA+CTF8gHkA0PLtO7eWdQpqq6cnqDsR1
-	 h5B1xkvZ10IznO4nysbIfZbyora6He8XpmX+gzOd5w6yLFWAqeP+2J29pScLXprpmY
-	 sK+u2/A+67HNQ==
+	b=EC50edTbP3mPlT32/N4ngFSsyMIKqzPdlfaZ22vF78PtacPty2mtBn8WOSzVKXGLs
+	 H+m1yipauZB+y5YS1QbRXsJPQ189qyGe9PE3IrHOnn55iBoJhG5cosApnx2qX1zdd2
+	 bxnQeZQb2GvV3lf5JnV7OQXs+F/VsS/O5zk969HF21PUTtCaFKzcIgj+XAqZx/By67
+	 S+q9Wdw8dPdqJoR31yqK1qIpkIRMHv/N4k8nVaPY/3ArIWOHIXeDGSq02T0T5Qd/Ey
+	 6gacAXfOd8EaTpTcXKrQ5EjaGhJBdNXA6ufU0ZvYf13AW/+qey9ySVbPfPsdzrYC02
+	 Ogvjdm2KXKayQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	John Crispin <john@phrozen.org>,
-	Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [PATCH net 1/7] MAINTAINERS: eth: mtk: move John to CREDITS
-Date: Tue,  9 Jan 2024 08:45:11 -0800
-Message-ID: <20240109164517.3063131-2-kuba@kernel.org>
+	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>
+Subject: [PATCH net 2/7] MAINTAINERS: eth: mt7530: move Landen Chao to CREDITS
+Date: Tue,  9 Jan 2024 08:45:12 -0800
+Message-ID: <20240109164517.3063131-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240109164517.3063131-1-kuba@kernel.org>
 References: <20240109164517.3063131-1-kuba@kernel.org>
@@ -55,72 +55,74 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-John is still active in other bits of the kernel but not much
-on the MediaTek ethernet switch side. Our scripts report:
+mt7530 is a pretty active driver and last we have heard
+from Landen Chao on the list was March. There were total
+of 4 message from them in the last 2.5 years.
+I think it's time to move to CREDITS.
 
-Subsystem MEDIATEK ETHERNET DRIVER
-  Changes 81 / 384 (21%)
-  Last activity: 2023-12-21
-  Felix Fietkau <nbd@nbd.name>:
-    Author c6d96df9fa2c 2023-05-02 00:00:00 42
-    Tags c6d96df9fa2c 2023-05-02 00:00:00 48
-  John Crispin <john@phrozen.org>:
+Subsystem MEDIATEK SWITCH DRIVER
+  Changes 94 / 169 (55%)
+  Last activity: 2023-10-11
+  Arınç ÜNAL <arinc.unal@arinc9.com>:
+    Author e94b590abfff 2023-08-19 00:00:00 12
+    Tags e94b590abfff 2023-08-19 00:00:00 16
+  Daniel Golle <daniel@makrotopia.org>:
+    Author 91daa4f62ce8 2023-04-19 00:00:00 17
+    Tags ac49b992578d 2023-10-11 00:00:00 20
+  Landen Chao <Landen.Chao@mediatek.com>:
+  DENG Qingfang <dqfext@gmail.com>:
+    Author 342afce10d6f 2021-10-18 00:00:00 24
+    Tags 342afce10d6f 2021-10-18 00:00:00 25
   Sean Wang <sean.wang@mediatek.com>:
-    Author 880c2d4b2fdf 2019-06-03 00:00:00 5
-    Tags a5d75538295b 2020-04-07 00:00:00 7
-  Mark Lee <Mark-MC.Lee@mediatek.com>:
-    Author 8d66a8183d0c 2019-11-14 00:00:00 4
-    Tags 8d66a8183d0c 2019-11-14 00:00:00 4
-  Lorenzo Bianconi <lorenzo@kernel.org>:
-    Author 7cb8cd4daacf 2023-12-21 00:00:00 98
-    Tags 7cb8cd4daacf 2023-12-21 00:00:00 112
+    Tags c288575f7810 2020-09-14 00:00:00 5
   Top reviewers:
-    [18]: horms@kernel.org
-    [15]: leonro@nvidia.com
-    [8]: rmk+kernel@armlinux.org.uk
-  INACTIVE MAINTAINER John Crispin <john@phrozen.org>
+    [46]: f.fainelli@gmail.com
+    [29]: andrew@lunn.ch
+    [19]: olteanv@gmail.com
+  INACTIVE MAINTAINER Landen Chao <Landen.Chao@mediatek.com>
 
-Signed-off-by: John Crispin <john@phrozen.org>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: Felix Fietkau <nbd@nbd.name>
+CC: Arınç ÜNAL <arinc.unal@arinc9.com>
+CC: Daniel Golle <daniel@makrotopia.org>
+CC: Landen Chao <Landen.Chao@mediatek.com>
+CC: DENG Qingfang <dqfext@gmail.com>
 CC: Sean Wang <sean.wang@mediatek.com>
-CC: Mark Lee <Mark-MC.Lee@mediatek.com>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
  CREDITS     | 4 ++++
  MAINTAINERS | 1 -
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/CREDITS b/CREDITS
-index 6b4b06bb683b..a80bd154ae38 100644
+index a80bd154ae38..1c86d25dd131 100644
 --- a/CREDITS
 +++ b/CREDITS
-@@ -815,6 +815,10 @@ D: Support for Xircom PGSDB9 (firmware and host driver)
- S: Bucharest
- S: Romania
+@@ -678,6 +678,10 @@ D: Media subsystem (V4L/DVB) drivers and core
+ D: EDAC drivers and EDAC 3.0 core rework
+ S: Brazil
  
-+N: John Crispin
-+E: john@phrozen.org
-+D: MediaTek MT7623 Gigabit ethernet support
++N: Landen Chao
++E: Landen.Chao@mediatek.com
++D: MT7531 Ethernet switch support
 +
- N: Laurence Culhane
- E: loz@holmes.demon.co.uk
- D: Wrote the initial alpha SLIP code
+ N: Raymond Chen
+ E: raymondc@microsoft.com
+ D: Author of Configure script
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 014ad90d0872..737504c0c432 100644
+index 737504c0c432..ee3fbf1723a6 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -13464,7 +13464,6 @@ F:	drivers/dma/mediatek/
- 
- MEDIATEK ETHERNET DRIVER
- M:	Felix Fietkau <nbd@nbd.name>
--M:	John Crispin <john@phrozen.org>
+@@ -13619,7 +13619,6 @@ F:	include/soc/mediatek/smi.h
+ MEDIATEK SWITCH DRIVER
+ M:	Arınç ÜNAL <arinc.unal@arinc9.com>
+ M:	Daniel Golle <daniel@makrotopia.org>
+-M:	Landen Chao <Landen.Chao@mediatek.com>
+ M:	DENG Qingfang <dqfext@gmail.com>
  M:	Sean Wang <sean.wang@mediatek.com>
- M:	Mark Lee <Mark-MC.Lee@mediatek.com>
- M:	Lorenzo Bianconi <lorenzo@kernel.org>
+ L:	netdev@vger.kernel.org
 -- 
 2.43.0
 
