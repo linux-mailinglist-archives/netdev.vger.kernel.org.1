@@ -1,110 +1,88 @@
-Return-Path: <netdev+bounces-62552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07080827D3C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 04:08:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C17827D41
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 04:08:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BA4DB21437
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 03:08:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF5C11F24470
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 03:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A3E6D6CE;
-	Tue,  9 Jan 2024 03:08:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59CF257B;
+	Tue,  9 Jan 2024 03:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PHmUXMWg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWF/8z7g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2FF4688
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 03:08:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50BA6C43399;
-	Tue,  9 Jan 2024 03:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C2C28F5;
+	Tue,  9 Jan 2024 03:08:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5EC1C43390;
+	Tue,  9 Jan 2024 03:08:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704769692;
-	bh=yw5QREq+A+Nr9092ABpoRq94SdCjuOT5qA8Jd44VWUo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PHmUXMWgrwWFuKaH4NAdBzQoTj3jyfbH3efVBfJPyUhMaUWZIN0cQDjV6DfYIfCkQ
-	 ACe0ogSj4yUNg7SSFuxzGN6aOSBtBgqtxJLoSRFZ2Nk4XQUH/3e2uzwxdyIEnQh1gb
-	 ALqumT7bPlDiab88Uk9dZElXmpNrheLPOk4YN9Wlb9QCMs7jjaL/WLHQboiPiB397b
-	 JZbqoAJkDVQo+UDam7uWLzhiOyPovsfNRILvio98o5f2YvP3j4kMKFSz0QhR2vN1am
-	 wWDzq7I3KQq7rhYw+JJpw91q70BtcyJKXC9UKmw6rF++cd1Rza3uNScjdXnwOwUkYp
-	 anM2uNdRAE0UQ==
-Date: Mon, 8 Jan 2024 19:08:11 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [net-next 10/15] net/mlx5e: Let channels be SD-aware
-Message-ID: <20240108190811.3ad5d259@kernel.org>
-In-Reply-To: <effce034-6bc5-4e98-9b21-c80e8d56f705@nvidia.com>
-References: <20231221005721.186607-1-saeed@kernel.org>
-	<20231221005721.186607-11-saeed@kernel.org>
-	<20240104145041.67475695@kernel.org>
-	<effce034-6bc5-4e98-9b21-c80e8d56f705@nvidia.com>
+	s=k20201202; t=1704769722;
+	bh=X7kLVVcgvRdRs5HuITPBpohSYBsG52ZbQ+d0igx0eEI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cWF/8z7gvhelK5fSDl6ViLjJPYNYtDbFAc8ELim8A8FX7vyieyQNDAnNCvQG89/wX
+	 kX8dhcDPob67N9nBWsmfXToLZ6UZYrblaARW/qxu3cAaTe13iPiiD2BQ4M3EefPCCj
+	 X4mEFCRxdpGg67nJc7Oe8jRLaF2a4JGv9zjOBv7kVCMiHWaF2L19/nSvqqw79IJf+2
+	 KOQ4ff9CejwvUR85cmPF+m+lZH1ywGaNBOjAl1yLPGDBlslWTyEtac5CwAVNMLVvrB
+	 qNv31l+35GFN0t0yfNaVk9tGZYi37irlAC9d9goP8himHObfAf0o+LDuWKfHWvMCmH
+	 NeyatUY26gaiA==
+Received: (nullmailer pid 2468474 invoked by uid 1000);
+	Tue, 09 Jan 2024 03:08:40 -0000
+Date: Mon, 8 Jan 2024 20:08:40 -0700
+From: Rob Herring <robh@kernel.org>
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Emil Renner Berthing <kernel@esmil.dk>, devicetree@vger.kernel.org, Alexandre Torgue <alexandre.torgue@foss.st.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, linux-stm32@st-md-mailman.stormreply.com, Jose Abreu <joabreu@synopsys.com>, Conor Dooley <conor+dt@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Samin Guo <samin.guo@starfivetech.com>, linux-arm-kernel@lists.infradead.org, Jacob Keller <jacob.e.keller@intel.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, kernel@collabora.com
+Subject: Re: [PATCH v3 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+Message-ID: <170476971804.2467890.1994452217560064962.robh@kernel.org>
+References: <20231222101001.2541758-1-cristian.ciocaltea@collabora.com>
+ <20231222101001.2541758-2-cristian.ciocaltea@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231222101001.2541758-2-cristian.ciocaltea@collabora.com>
 
-On Mon, 8 Jan 2024 14:30:54 +0200 Gal Pressman wrote:
-> On 05/01/2024 0:50, Jakub Kicinski wrote:
-> > On Wed, 20 Dec 2023 16:57:16 -0800 Saeed Mahameed wrote:  
-> >> Example for 2 mdevs and 6 channels:
-> >> +-------+---------+
-> >> | ch ix | mdev ix |
-> >> +-------+---------+
-> >> |   0   |    0    |
-> >> |   1   |    1    |
-> >> |   2   |    0    |
-> >> |   3   |    1    |
-> >> |   4   |    0    |
-> >> |   5   |    1    |
-> >> +-------+---------+  
-> > 
-> > Meaning Rx queue 0 goes to PF 0, Rx queue 1 goes to PF 1, etc.?  
+
+On Fri, 22 Dec 2023 12:09:59 +0200, Cristian Ciocaltea wrote:
+> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
+> similar to the newer JH7110, but it requires only two interrupts and a
+> single reset line, which is 'ahb' instead of the commonly used
+> 'stmmaceth'.
 > 
-> Correct.
+> Since the common binding 'snps,dwmac' allows selecting 'ahb' only in
+> conjunction with 'stmmaceth', extend the logic to also permit exclusive
+> usage of the 'ahb' reset name.  This ensures the following use cases are
+> supported:
 > 
-> > Is the user then expected to magic pixie dust the XPS or some such
-> > to get to the right queue?  
+>   JH7110: reset-names = "stmmaceth", "ahb";
+>   JH7100: reset-names = "ahb";
+>   other:  reset-names = "stmmaceth";
 > 
-> I'm confused, how are RX queues related to XPS?
-
-Separate sentence, perhaps I should be more verbose..
-
-> XPS shouldn't be affected, we just make sure that whatever queue XPS
-> chose will go out through the "right" PF.
-
-But you said "correct" to queue 0 going to PF 0 and queue 1 to PF 1.
-The queue IDs in my question refer to the queue mapping form the stacks
-perspective. If user wants to send everything to queue 0 will it use
-both PFs?
-
-> So for example, XPS will choose a queue according to the CPU, and the
-> driver will make sure that packets transmitted from this SQ are going
-> out through the PF closer to that NUMA.
-
-Sounds like queue 0 is duplicated in both PFs, then?
-
-> > How is this going to get represented in the recently merged Netlink
-> > queue API?  
+> Also note the need to use a different dwmac fallback, as v5.20 applies
+> to JH7110 only, while JH7100 relies on v3.7x.
 > 
-> Can you share a link please?
+> Additionally, drop the reset description items from top-level binding as
+> they are already provided by the included snps,dwmac schema.
+> 
+> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   | 11 +--
+>  .../bindings/net/starfive,jh7110-dwmac.yaml   | 72 +++++++++++++------
+>  2 files changed, 57 insertions(+), 26 deletions(-)
+> 
 
-commit a90d56049acc45802f67cd7d4c058ac45b1bc26f
- 
-> All the logic is internal to the driver, so I expect it to be fine, but
-> I'd like to double check.
+Reviewed-by: Rob Herring <robh@kernel.org>
 
-Herm, "internal to the driver" is a bit of a landmine. It will be fine
-for iperf testing but real users will want to configure the NIC.
 
