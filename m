@@ -1,133 +1,228 @@
-Return-Path: <netdev+bounces-62685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 579BF828884
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:53:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1156082887F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:53:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA41F1F253EB
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:53:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B097528748A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:53:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79EC39ADD;
-	Tue,  9 Jan 2024 14:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707B439ADD;
+	Tue,  9 Jan 2024 14:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="TM0gbXfk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Od8BLm4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783ED36AFB;
-	Tue,  9 Jan 2024 14:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 409ENnvR002340;
-	Tue, 9 Jan 2024 14:52:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=RbGkMtmcIUmZkCSQgfI1agSfOQGEQ2UE0CzkFakTXzc=; b=TM
-	0gbXfkPZkdtMwWSkuL7CMDHMvE6r8eXQL582MHFNCyYjZj8jhPmAM9bdUblXV9ya
-	pu8QHF/s7Pua8211juDTZ02eHiZTJB9e/veU9grgcg+6u1EQFJLE5HGqRmq7OJWh
-	anyZIUjjn80CiA+NfMDIgJSU94wHt2cBlFproeQT8asBFdBtQnE8wQkmF7IP1PEf
-	EM/llUr0M03qHFjLuUyum8oBKwurNaA+0pDZep2Rhja/lwR0C4aHlYxR53lcySkT
-	DbDGZHhj+ZzB190yUnUoWDLrCjQNLfzuAx9sEwno42aTClxufI2nu1iPQhkaJED0
-	7D0klDfHzgze8VeRsDsw==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vh234gs7u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jan 2024 14:52:54 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 409EqrOm027611
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 9 Jan 2024 14:52:53 GMT
-Received: from [10.216.4.210] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 9 Jan
- 2024 06:52:44 -0800
-Message-ID: <6f97e753-435e-4b86-bd47-290097f6a3f0@quicinc.com>
-Date: Tue, 9 Jan 2024 20:22:40 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B4A39FC1;
+	Tue,  9 Jan 2024 14:52:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27460C43390;
+	Tue,  9 Jan 2024 14:52:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704811977;
+	bh=S90JwoGqrhYDr8dwbZL7cRnsaQPQaOCVstXRiwl3lH0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Od8BLm4R6W2jaUoX63vvjEQdd5HSaJQykSfDxxa4o9KF7rkujYCjG1DEPqEWOa3PQ
+	 WvXLBQ3Q+XRSYjupjqUO8q+s12ZVEiCyBFG7Wxma+imeDJXpJl7L1tAEF2ARwYRrx+
+	 thD58aL1NcZ6aesFheGbOpaM9OjWsHBL0byZCcgp7JmJmZs+Sj26kBB6udH6KVvNkt
+	 IcHgh59sAIyBOCUGPEzAI1ju7R1HjDdaP3gWZZBMG3UJyczkByLJskjvX3uMaVlwbF
+	 Y1WSEXB0kOWp2WhLvRszFRhlN6pTCIPf6oncI5yetluqQZk5B4SRZ95622fZqrJWD0
+	 i6VGl+IHiCuGQ==
+Date: Tue, 9 Jan 2024 15:52:52 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Linus Torvalds <torvalds@linuxfoundation.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com, 
+	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
+Message-ID: <20240109-tausend-tropenhelm-2a9914326249@brauner>
+References: <20240103222034.2582628-1-andrii@kernel.org>
+ <20240103222034.2582628-4-andrii@kernel.org>
+ <CAHk-=wgmjr4nhxGheec1OwuYRk02d0+quUAViVk1v+w=Kvg15w@mail.gmail.com>
+ <CAEf4Bzb6jnJL98SLPJB7Vjxo_O33W8HjJuAsyP3+6xigZtsTkA@mail.gmail.com>
+ <20240108-gasheizung-umstand-a36d89ed36b7@brauner>
+ <CAEf4Bzb+7NzYs5ScggtgAJ6A5-oU5GymvdoEbpfNVOG-XmWZig@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G
- SGMII
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>
-References: <20240108121128.30071-1-quic_snehshah@quicinc.com>
- <4216bcbb-730d-4c51-a9ce-d3f0a0846e31@lunn.ch>
-From: Sneh Shah <quic_snehshah@quicinc.com>
-In-Reply-To: <4216bcbb-730d-4c51-a9ce-d3f0a0846e31@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: DBji45IuvE3EsiejT6zlKGf0MYzIiDJt
-X-Proofpoint-GUID: DBji45IuvE3EsiejT6zlKGf0MYzIiDJt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 malwarescore=0 bulkscore=0 phishscore=0
- mlxscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=638 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
- definitions=main-2401090122
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4Bzb+7NzYs5ScggtgAJ6A5-oU5GymvdoEbpfNVOG-XmWZig@mail.gmail.com>
 
+On Mon, Jan 08, 2024 at 03:58:47PM -0800, Andrii Nakryiko wrote:
+> On Mon, Jan 8, 2024 at 4:02 AM Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > On Fri, Jan 05, 2024 at 02:18:40PM -0800, Andrii Nakryiko wrote:
+> > > On Fri, Jan 5, 2024 at 1:45 PM Linus Torvalds
+> > > <torvalds@linuxfoundation.org> wrote:
+> > > >
+> > > > Ok, I've gone through the whole series now, and I don't find anything
+> > > > objectionable.
+> > >
+> > > That's great, thanks for reviewing!
+> > >
+> > > >
+> > > > Which may only mean that I didn't notice something, of course, but at
+> > > > least there's nothing I'd consider obvious.
+> > > >
+> > > > I keep coming back to this 03/29 patch, because it's kind of the heart
+> > > > of it, and I have one more small nit, but it's also purely stylistic:
+> > > >
+> > > > On Wed, 3 Jan 2024 at 14:21, Andrii Nakryiko <andrii@kernel.org> wrote:
+> > > > >
+> > > > > +bool bpf_token_capable(const struct bpf_token *token, int cap)
+> > > > > +{
+> > > > > +       /* BPF token allows ns_capable() level of capabilities, but only if
+> > > > > +        * token's userns is *exactly* the same as current user's userns
+> > > > > +        */
+> > > > > +       if (token && current_user_ns() == token->userns) {
+> > > > > +               if (ns_capable(token->userns, cap))
+> > > > > +                       return true;
+> > > > > +               if (cap != CAP_SYS_ADMIN && ns_capable(token->userns, CAP_SYS_ADMIN))
+> > > > > +                       return true;
+> > > > > +       }
+> > > > > +       /* otherwise fallback to capable() checks */
+> > > > > +       return capable(cap) || (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
+> > > > > +}
+> > > >
+> > > > This *feels* like it should be written as
+> > > >
+> > > >     bool bpf_token_capable(const struct bpf_token *token, int cap)
+> > > >     {
+> > > >         struct user_namespace *ns = &init_ns;
+> > > >
+> > > >         /* BPF token allows ns_capable() level of capabilities, but only if
+> > > >          * token's userns is *exactly* the same as current user's userns
+> > > >          */
+> > > >         if (token && current_user_ns() == token->userns)
+> > > >                 ns = token->userns;
+> > > >         return ns_capable(ns, cap) ||
+> > > >                 (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
+> > > >     }
+> > > >
+> > > > And yes, I realize that the function will end up later growing a
+> > > >
+> > > >         security_bpf_token_capable(token, cap)
+> > > >
+> > > > test inside that 'if (token ..)' statement, and this would change the
+> > > > order of that test so that the LSM hook would now be done before the
+> > > > capability checks are done, but that all still seems just more of an
+> > > > argument for the simplification.
+> > > >
+> > > > So the end result would be something like
+> > > >
+> > > >     bool bpf_token_capable(const struct bpf_token *token, int cap)
+> > > >     {
+> > > >         struct user_namespace *ns = &init_ns;
+> > > >
+> > > >         if (token && current_user_ns() == token->userns) {
+> > > >                 if (security_bpf_token_capable(token, cap) < 0)
+> > > >                         return false;
+> > > >                 ns = token->userns;
+> > > >         }
+> > > >         return ns_capable(ns, cap) ||
+> > > >                 (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
+> > > >     }
+> > >
+> > > Yep, it makes sense to use ns_capable with init_ns. I'll change those
+> > > two patches to end up with something like what you suggested here.
+> > >
+> > > >
+> > > > although I feel that with that LSM hook, maybe this all should return
+> > > > the error code (zero or negative), not a bool for success?
+> > > >
+> > > > Also, should "current_user_ns() != token->userns" perhaps be an error
+> > > > condition, rather than a "fall back to init_ns" condition?
+> > > >
+> > > > Again, none of this is a big deal. I do think you're dropping the LSM
+> > > > error code on the floor, and are duplicating the "ns_capable()" vs
+> > > > "capable()" logic as-is, but none of this is a deal breaker, just more
+> > > > of my commentary on the patch and about the logic here.
+> > > >
+> > > > And yeah, I don't exactly love how you say "ok, if there's a token and
+> > > > it doesn't match, I'll not use it" rather than "if the token namespace
+> > > > doesn't match, it's an error", but maybe there's some usability issue
+> > > > here?
+> > >
+> > > Yes, usability was the primary concern. The overall idea with BPF
+> >
+> > NAK on not restricting this to not erroring out on current_user_ns()
+> > != token->user_ns. I've said this multiple times before.
+> 
+> I do restrict token usage to *exact* userns in which the token was
+> created. See bpf_token_capable()'s
+> 
+> if (token && current_user_ns() == token->userns) { ... }
+> 
+> and in bpf_token_allow_cmd():
+> 
+> if (!token || current_user_ns() != token->userns)
+>     return false;
+> 
+> So I followed what you asked in [1] (just like I said I will in [2]),
+> unless I made some stupid mistake which I cannot even see.
+> 
+> 
+> What we are discussing here is a different question. It's the
+> difference between erroring out (that is, failing whatever BPF
+> operation was attempted with such token, i.e., program loading or map
+> creation) vs ignoring the token altogether and just using
+> init_ns-based capable() checks. And the latter is vastly more user
 
+Look at this:
 
-On 1/9/2024 1:00 AM, Andrew Lunn wrote:
-> On Mon, Jan 08, 2024 at 05:41:28PM +0530, Sneh Shah wrote:
->> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
->> mode for 1G/100M/10M speed.
->> Added changes to configure serdes phy and mac based on link speed.
-> 
-> Please take a look at:
-> 
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
-> 
-> The Subject is missing which tree this is for. Also, net-next is
-> closed at the moment.
++bool bpf_token_capable(const struct bpf_token *token, int cap)
++{
++       /* BPF token allows ns_capable() level of capabilities, but only if
++        * token's userns is *exactly* the same as current user's userns
++        */
++       if (token && current_user_ns() == token->userns) {
++               if (ns_capable(token->userns, cap))
++                       return true;
++               if (cap != CAP_SYS_ADMIN && ns_capable(token->userns, CAP_SYS_ADMIN))
++                       return true;
++       }
++       /* otherwise fallback to capable() checks */
++       return capable(cap) || (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
++}
 
-It was supposed to be net-next. Missed updating in subject.
-Sorry for that!
-If net-next is closed at the moment, how to proceed further?
-Should I wait until it gets reopened?
-> 
->>  	switch (ethqos->speed) {
->> +	case SPEED_2500:
->> +		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
->> +		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->> +			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
->> +			      RGMII_IO_MACRO_CONFIG2);
->> +		if (ethqos->serdes_speed != SPEED_2500)
->> +			phy_set_speed(ethqos->serdes_phy, SPEED_2500);
-> 
-> Is calling phy_set_speed() expensive? Why not just unconditionally
-> call it?
-> 
-It reconfigures whole serdes phy block, with lots of register read/writes.
-So I feel it is better to avoid doing this unconditionally
->      Andrew
+How on earth is it possible that the calling task is in a user namespace
+aka current_user_ns() == token->userns while at the same time being
+capable in the initial user namespace? When you enter an
+unprivileged user namespace you lose all capabilities against your
+ancestor user namespace and you can't reenter your ancestor user
+namespace.
+
+IOW, if current_user_ns() == token->userns and token->userns !=
+init_user_ns, then current_user_ns() != init_user_ns. And therefore that
+thing is essentially always false for all interesting cases, no?
+
+Aside from that it would be semantically completely unclean. The user
+has specified a token and permission checking should be based on that
+token and not magically fallback to a capable check in the inital user
+namespace even if that worked.
+
+Because the only scenario where that is maybe useful is if an
+unprivileged container has dropped _both_ CAP_BPF and CAP_SYS_ADMIN from
+the user namespace of the container.
+
+First of, why? What thread model do you have then? Second, if you do
+stupid stuff like that then you don't get bpf in the container via bpf
+tokens. Period.
+
+Restrict the meaning and validity of a bpf token to the user namespace
+and do not include escape hatches such as this. Especially not in this
+initial version, please.
+
+I'm not trying to be difficult but it's clear that the implications of
+user namespaces aren't well understood here. And historicaly they are
+exploit facilitators as much as exploit preventers.
 
