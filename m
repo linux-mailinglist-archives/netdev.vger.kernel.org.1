@@ -1,230 +1,146 @@
-Return-Path: <netdev+bounces-62584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4636F827F9B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 08:43:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D891827FAD
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 08:46:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E41A8281381
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 07:43:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3CB12866D1
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 07:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6D1947A;
-	Tue,  9 Jan 2024 07:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335C09471;
+	Tue,  9 Jan 2024 07:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rzR+v8jR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RxQ7DWhY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D79944D
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 07:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-28cb3bc3fe7so1800326a91.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 23:42:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704786179; x=1705390979; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hbh9aOHx7+CSCvz+p9Wnk1Alp9/EgNmTd2TSmQXJErs=;
-        b=rzR+v8jRYlcV6Du2wjV9SWn/leGlSxC2xqyL2rlmiqdSltIK5DjRyYmjpE/pmpJK+O
-         sydKGwyjCh4x6VFYcjoKMhTXDZlJj9k1+ttsomsQxlGv2k8mI5j1nqlxeGIGORjfPq7d
-         JLhDFFHFU1d957w5czZAy/H68MUIK7COMZsSXXn2w2MlrFxq1ERIoWZUfrw3QWfiPdPp
-         U6QWmOWa6jDNlPT0zVTjRFzS2vZWeh/GfW125WTC4ltk7LQ5/Y6R2Xm5zsxLEgGGNpAP
-         d3jQLu4SHPkh+dju8hNV7IiQDsXDzOFzKxRRWlk1pjj73nn/0SiobOs+x7MwDNEyxTaa
-         +A6g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858CF9455
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 07:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704786382;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=QGFHDC9oHxTINUdDMjSvkJISj41ABGmGm6sZiEEVDbg=;
+	b=RxQ7DWhYgb9WqCebeu5YLOvJlfsOq7ISMjWwOvj2XN+0lxMP/Q9263eU/dKFkukCpuE8eL
+	pIvlFP+BnYdxfH9cWfGVd1PKM9Uug/mYSkdpbV9H1eYIo8/sU+z/gRlTbg5hay+4WIEHZ0
+	vaFmGfLzm/UOe7c7Gn5l3neoBpwMYO0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-177-OrWHkbEdNSSXqOjrHIAYwQ-1; Tue, 09 Jan 2024 02:46:21 -0500
+X-MC-Unique: OrWHkbEdNSSXqOjrHIAYwQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a29de6a12adso48028166b.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jan 2024 23:46:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704786179; x=1705390979;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1704786380; x=1705391180;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbh9aOHx7+CSCvz+p9Wnk1Alp9/EgNmTd2TSmQXJErs=;
-        b=GfZZMM8pAqpzdZ3UE/iRAqW6D70rLjkjWrRkv6+VFkJw23Wzpujkqggq1czA2vtWsw
-         7aVi5t1VLQm2xPsttO9a7lQU5vF3jMHSEvSEtQPkG4U/Eg63U3WwO2CxYdDqv5YkJWwy
-         EPZnQthkQioMehwRkwf/kwsu5WLWZFZa53wmFUPjF6nabPzqLwQoHnslK54mw5/iQQGr
-         XnFqFYB7XpBKQSvvwsWD8pqLBNWbsE8bknf2Xv75eZWXK4bKsKbgzoZDhLrblwqFaE0e
-         250oytHGKTYpzAFEl+qqZDWc5NU70Ma2mLJfrmlS9BawME3OBmGqwDGEyNXhyCBVf4bx
-         ZJpw==
-X-Gm-Message-State: AOJu0YxHgBPJMARDjvU8frqh87gEZVrZKt/lRNxRQgvxMSB8bSjXk0MJ
-	UR2tibEXdcQx/CwJSEmwq4CTigPxbZIj
-X-Google-Smtp-Source: AGHT+IFcxvhYW0JAZdJq+N+9m95XOtUpUXsjOgoxUB/mRwSbbeb71nZBw7f0ddc9ml/vx8VlhUFUbA==
-X-Received: by 2002:a17:90b:f0f:b0:28d:9b5b:e70b with SMTP id br15-20020a17090b0f0f00b0028d9b5be70bmr429191pjb.0.1704786178748;
-        Mon, 08 Jan 2024 23:42:58 -0800 (PST)
-Received: from thinkpad ([117.213.102.45])
-        by smtp.gmail.com with ESMTPSA id g7-20020a1709029f8700b001d425d495c9sm1083349plq.190.2024.01.08.23.41.29
+        bh=QGFHDC9oHxTINUdDMjSvkJISj41ABGmGm6sZiEEVDbg=;
+        b=ixchg4bh9uJ2k41UJOUMbcySDyyH4BQxehQKALjNCmU3YO/XgHYBUwKlUWF5LUjvy8
+         jGoo49JG3qETpIiOKZ5sHhl/t50c0kmJ81BennpJ39QhZk/gNRcUnAHlOwNnHsV98Fwr
+         AP8VB/XMQm1dFIFK6dyzp0UnkDRd1YqD8/QiLYIFLztN62Zi1SOAXO4jeb7wQ7Qmc+Sj
+         eab1xcaFX+qf7ezAyy1GQV9T1F6eARihVAHy9YjfMk8+YOkWXWHVay4QJlqCnrkolEgU
+         cdeSH6sYkLPsSw9nMbv5qUOb21V3Ym8z1YkU0+9q+K4bfpCO87CGzlCJryvOg5WICzKr
+         q5NQ==
+X-Gm-Message-State: AOJu0YxMmBlIHTXK4ftFKMR0LfmIJRBtSlOzFQ5zSEiSwm4WwhVXa0uc
+	WQJZtHHjmn9Q3x++HQLaUwc+T2mSTy9QGFwOJ6H/IbYNkpSO0nd2WuaD8Kydqpe5F6R8j3Mb4Cf
+	/Ix6nxA/rohrUHArmtsICePsB
+X-Received: by 2002:a17:907:7288:b0:a2a:6916:60de with SMTP id dt8-20020a170907728800b00a2a691660demr3699819ejc.4.1704786380026;
+        Mon, 08 Jan 2024 23:46:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGkhvEn8orHAZqTQA3hc4oarELhBfB09RFGV8IweDJ4ETUZb05mm6NMPSZT1LGbifnVVnGW+Q==
+X-Received: by 2002:a17:907:7288:b0:a2a:6916:60de with SMTP id dt8-20020a170907728800b00a2a691660demr3699807ejc.4.1704786379697;
+        Mon, 08 Jan 2024 23:46:19 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-252-40.dyn.eolo.it. [146.241.252.40])
+        by smtp.gmail.com with ESMTPSA id u18-20020a17090617d200b00a26e490e3f2sm731824eje.181.2024.01.08.23.46.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 23:42:57 -0800 (PST)
-Date: Tue, 9 Jan 2024 13:11:24 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Chen-Yu Tsai <wenst@chromium.org>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Chris Morgan <macromorgan@hotmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	=?iso-8859-1?Q?N=EDcolas_F_=2E_R_=2E_A_=2E?= Prado <nfraprado@collabora.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Terry Bowman <terry.bowman@amd.com>,
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jim Quinlan <jim2101024@gmail.com>, james.quinlan@broadcom.com,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [RFC 0/9] PCI: introduce the concept of power sequencing of PCIe
- devices
-Message-ID: <20240109074124.GA3303@thinkpad>
-References: <20240104130123.37115-1-brgl@bgdev.pl>
- <a85dbfc3-e327-442a-9aab-5115f86944f7@gmail.com>
- <CAGXv+5EtvMgbr9oZ7cfnDCDN15BKqgpuiacHHf8_T5kLqYJpJw@mail.gmail.com>
+        Mon, 08 Jan 2024 23:46:19 -0800 (PST)
+Message-ID: <8a06f42e3a7028f88920764d5a70637a6a174eac.camel@redhat.com>
+Subject: Re: [PATCH net-next v7 1/5] ptp: clockmatrix: support 32-bit
+ address space
+From: Paolo Abeni <pabeni@redhat.com>
+To: Min Li <lnimi@hotmail.com>, richardcochran@gmail.com, lee@kernel.org
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Min Li
+	 <min.li.xe@renesas.com>
+Date: Tue, 09 Jan 2024 08:46:17 +0100
+In-Reply-To: <PH7PR03MB7064B821752DCD99610ED72CA0672@PH7PR03MB7064.namprd03.prod.outlook.com>
+References: 
+	<PH7PR03MB7064B821752DCD99610ED72CA0672@PH7PR03MB7064.namprd03.prod.outlook.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGXv+5EtvMgbr9oZ7cfnDCDN15BKqgpuiacHHf8_T5kLqYJpJw@mail.gmail.com>
 
-On Tue, Jan 09, 2024 at 03:08:32PM +0800, Chen-Yu Tsai wrote:
-> On Tue, Jan 9, 2024 at 12:09 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
-> >
-> > Hello,
-> >
-> > On 1/4/2024 5:01 AM, Bartosz Golaszewski wrote:
-> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > >
-> > > During last year's Linux Plumbers we had several discussions centered
-> > > around the need to power-on PCI devices before they can be detected on
-> > > the bus.
-> > >
-> > > The consensus during the conference was that we need to introduce a
-> > > class of "PCI slot drivers" that would handle the power-sequencing.
-> > >
-> > > After some additional brain-storming with Manivannan and the realization
-> > > that the DT maintainers won't like adding any "fake" nodes not
-> > > representing actual devices, we decided to reuse the existing
-> > > infrastructure provided by the PCIe port drivers.
-> > >
-> > > The general idea is to instantiate platform devices for child nodes of
-> > > the PCIe port DT node. For those nodes for which a power-sequencing
-> > > driver exists, we bind it and let it probe. The driver then triggers a
-> > > rescan of the PCI bus with the aim of detecting the now powered-on
-> > > device. The device will consume the same DT node as the platform,
-> > > power-sequencing device. We use device links to make the latter become
-> > > the parent of the former.
-> > >
-> > > The main advantage of this approach is not modifying the existing DT in
-> > > any way and especially not adding any "fake" platform devices.
-> >
-> > There is prior work in that area which was applied, but eventually reverted:
-> >
-> > https://www.spinics.net/lists/linux-pci/msg119136.html
-> >
-> > and finally re-applied albeit in a different shape:
-> >
-> > https://lore.kernel.org/all/20220716222454.29914-1-jim2101024@gmail.com/
-> >
-> > so we might want to think about how to have pcie-brcmstb.c converted
-> > over your proposed approach. AFAIR there is also pcie-rockchip.c which
-> > has some rudimentary support for voltage regulators of PCIe end-points.
-> 
-> I think the current in-tree approaches mostly target either PCIe slots,
-> whether full size or mini-PCIe or M.2, or soldered-on components that
-> either only have a single power rail, have internal regulators, or have
-> surrounding circuitry that would be incorporated on a PCIe card.
-> 
-> These all have standardized power rails (+12V, +3.3V, +3.3V aux, etc.).
-> 
+On Thu, 2024-01-04 at 11:36 -0500, Min Li wrote:
+> @@ -553,11 +554,11 @@ static int _sync_pll_output(struct idtcm *idtcm,
+>  	val =3D SYNCTRL1_MASTER_SYNC_RST;
+> =20
+>  	/* Place master sync in reset */
+> -	err =3D idtcm_write(idtcm, 0, sync_ctrl1, &val, sizeof(val));
+> +	err =3D idtcm_write(idtcm, sync_ctrl1, 0, &val, sizeof(val));
+>  	if (err)
+>  		return err;
 
-Right. But ideally, they should also be converted to use this power sequencing
-driver at some point in the future.
+I'm sorry for the late feedback: I lost track the last replies in the
+previous revision and later I was on PTO.
 
-> > What does not yet appear in this RFC is support for suspend/resume,
-> > especially for power states where both the RC and the EP might be losing
-> > power. There also needs to be some thoughts given to wake-up enabled
-> > PCIe devices like Wi-Fi which might need to remain powered on to service
-> > Wake-on-WLAN frames if nothing else.
-> >
+Let me extract the relevant slice from such thread:
 
-I don't think it is necessary to add PM support in this series itself. Even
-though PM support is always nice to have or even necessary for controllers
-pulling the power plug during suspend, it makes sense to merge this basic
-implementation and add features on top.
+On  Wed, 13 Dec 2023 21:04:07 +0000 Min Li wrote:
+> > My reading is that this patch reverses the usage of module and regaddr.
+> > F.e. the following hunk:
+> >=20
+> > @@ -553,11 +554,11 @@ static int _sync_pll_output(struct idtcm *idtcm,
+> > 	val =3D SYNCTRL1_MASTER_SYNC_RST;
+> >=20
+> > 	/* Place master sync in reset */
+> > 	err =3D idtcm_write(idtcm, 0, sync_ctrl1, &val, sizeof(val));
+> > 	err =3D idtcm_write(idtcm, sync_ctrl1, 0, &val, sizeof(val));
+> > 	if (err)
+> > 		return err;
+> >=20
+> > 	err =3D idtcm_write(idtcm, 0, sync_ctrl0, &sync_src, sizeof(sync_src))=
+;
+> > 	err =3D idtcm_write(idtcm, sync_ctrl0, 0, &sync_src, sizeof(sync_src))=
+;
+> > 	if (err)
+> > 		return err;
+> >=20
+> > If that is really intended I think it needs to be explained, or possibl=
+y a
+> > separate patch.
+>
+> Hi Simon
+> sync_ctrl0/1 was meant to be a module and it was in a wrong place.=C2=A0
+> And this patch is just correcting it.
 
-It should be noted that both the controller drivers and the power sequencing
-drivers should be in sync during suspend i.e., if the controller driver decides
-to put the device into D3Cold and turning off the controller power supplies,
-then this driver should also power off the device. But if the controller driver
-decides to keep the device in low power states (ASPM), then this driver
-_should_not_ turn off the device power.
+Then you need to move this chunk (and all the later on swapping the
+'address' and the 'module' argument in a separate patch. Mixing this
+fix and  the address space extension is confusing.
 
-Right now, there is no global policy for controller drivers and each one does a
-different job. IMO this should also be fixed, but that also requires an
-agreement from PM folks.
+Additionally we are currently preparing the net-next PR for 6.8 and I
+don't feel very confident to apply such a large refactor this late. I
+think it should be better postpone to the next cycle.
 
-(Well there is one more entity in this loop, PCIe device drivers... sigh)
+Cheers,
 
-> > I sense a potential for a lot of custom power sequencing drivers being
-> > added and ultimately leading to the decision to create a "generic" one
-> > which is entirely driven by Device Tree properties...
-> 
-> We can have one "generic" slot power sequencing driver, which just
-> enables all the power rails together. I would very much like to see that.
-> 
+Paolo
 
-Yeah. And that "generic" driver could be used for simple usecases mentioned
-above.
-
-> I believe the power sequencing in this series is currently targeting more
-> tightly coupled designs that use power rails directly from the PMIC, and
-> thus require more explicit power sequencing.
-> 
-
-Precisely!
-
-- Mani
-
-> ChenYu
-> 
-> 
-> > Thanks for doing this!
-> > --
-> > Florian
-> >
-> > _______________________________________________
-> > linux-arm-kernel mailing list
-> > linux-arm-kernel@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
-
--- 
-மணிவண்ணன் சதாசிவம்
 
