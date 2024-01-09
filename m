@@ -1,160 +1,125 @@
-Return-Path: <netdev+bounces-62695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EFC282897E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:56:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130FE82898B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:00:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 161361F2469B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:56:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FDAE288037
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1D239FE7;
-	Tue,  9 Jan 2024 15:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C5F839FF4;
+	Tue,  9 Jan 2024 16:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UIiIIieR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MPfBG4mg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF0E3987C
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 15:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704815754; x=1736351754;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=j+FfbNldsdXKfmLLTsfbXrR2j6FSXyUY9HQQw8FrL5E=;
-  b=UIiIIieR8X5YtrWrUa7MTMIbRm5eugW4kwC9CHzAxadyzik85H5d8dGF
-   ARsykt+S7fHhlgcnzYXoxFY0pZlMBH1ec4DJk8Ujn/IqYrGWCzTkjwId/
-   2H+sBk8zw3JXaioRzh5X3njSh5AdT/oSPJ/fC+oQJ4lwcd/y7ll+LhzlC
-   uToAqneROJHEv4gYoyGfjFkJKGWbDZ0hwRqvTMGCIQ8jiZJLxDkyHFQVl
-   TUGCB1VeWq+7iy+uzyetZbwUSELSWgwRh/oK/hmwHxCE59aSmXnni7m2y
-   AVZzmzw2BZ6PzJiLrGj6tQrRduTBJGlsq7KMV37eIXbJpk8qt9kyV5gbR
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="397097141"
-X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
-   d="scan'208";a="397097141"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 07:55:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="781846219"
-X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
-   d="scan'208";a="781846219"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orsmga002.jf.intel.com with ESMTP; 09 Jan 2024 07:55:48 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH ethtool-next] ethtool: add support for setting TCP data split
-Date: Tue,  9 Jan 2024 16:55:30 +0100
-Message-ID: <20240109155530.9661-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C89A958
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 16:00:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBCB1C433C7;
+	Tue,  9 Jan 2024 16:00:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704816037;
+	bh=Kjf6wMa3nRm2ssw7w+d3a3xIXZ0iopYF7rgjTrwYpCg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MPfBG4mg5xvAUCR0QZ8ws1FhAo/xp6pVjR8GQ8mLrfcrYlopYrGW8JhI39uyjyfZe
+	 QiZgSyaH8EC/6Q88lRdfm3/5yRW0MEMKtL3ct71tmkHrnZvdRFft/PX1Dzv6UJU+Vm
+	 BEbxP0hth7t61CfeeSiIMHhIvepJOtnk3AkLD3tuJkLg9EzDMd//1HL34rDATdPq2U
+	 E+hOnvPQPRXBieVLC5sFMLOy3QZZM5K7YY0A/lZ7hqHp4WR4EK1uZCX3CKQ75JZY/e
+	 VDE4rIb1c7D14UjZhirdslssPEdY1O31Y6zMnDlE6/YDg/TWr1s80F6UAaIwBYfyFr
+	 dasSTVUjmp2Mw==
+Date: Tue, 9 Jan 2024 08:00:36 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [net-next 10/15] net/mlx5e: Let channels be SD-aware
+Message-ID: <20240109080036.65634705@kernel.org>
+In-Reply-To: <d0ce07a6-2ca7-4604-84a8-550b1c87f602@nvidia.com>
+References: <20231221005721.186607-1-saeed@kernel.org>
+	<20231221005721.186607-11-saeed@kernel.org>
+	<20240104145041.67475695@kernel.org>
+	<effce034-6bc5-4e98-9b21-c80e8d56f705@nvidia.com>
+	<20240108190811.3ad5d259@kernel.org>
+	<d0ce07a6-2ca7-4604-84a8-550b1c87f602@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Add support for controlling header split (aka TCP data split) feature,
-backed by kernel commit 50d73710715d ("ethtool: add SET for
-TCP_DATA_SPLIT ringparam"). Command format:
+On Tue, 9 Jan 2024 16:15:50 +0200 Gal Pressman wrote:
+> >> I'm confused, how are RX queues related to XPS? =20
+> >=20
+> > Separate sentence, perhaps I should be more verbose.. =20
+>=20
+> Sorry, yes, your understanding is correct.
+> If a packet is received on RQ 0 then it is from PF 0, RQ 1 came from PF
+> 1, etc. Though this is all from the same wire/port.
+>=20
+> You can enable arfs for example, which will make sure that packets that
+> are destined to a certain CPU will be received by the PF that is closer
+> to it.
 
-ethtool -G|--set-ring devname tcp-data-split [ auto|on|off ]
+Got it.
 
-"auto" is defined solely by device's driver.
+> >> XPS shouldn't be affected, we just make sure that whatever queue XPS
+> >> chose will go out through the "right" PF. =20
+> >=20
+> > But you said "correct" to queue 0 going to PF 0 and queue 1 to PF 1.
+> > The queue IDs in my question refer to the queue mapping form the stacks
+> > perspective. If user wants to send everything to queue 0 will it use
+> > both PFs? =20
+>=20
+> If all traffic is transmitted through queue 0, it will go out from PF 0
+> (the PF that is closer to CPU 0 numa).
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- ethtool.8.in    |  4 ++++
- ethtool.c       |  1 +
- netlink/rings.c | 23 +++++++++++++++++++++++
- 3 files changed, 28 insertions(+)
+Okay, but earlier you said: "whatever queue XPS chose will go out
+through the "right" PF." - which I read as PF will be chosen based
+on CPU locality regardless of XPS logic.
 
-diff --git a/ethtool.8.in b/ethtool.8.in
-index ef0c4bcabf37..dc7d4df4fcc1 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -202,6 +202,7 @@ ethtool \- query or control network driver and hardware settings
- .BN rx\-jumbo
- .BN tx
- .BN rx\-buf\-len
-+.B3 tcp\-data\-split auto on off
- .BN cqe\-size
- .BN tx\-push
- .BN rx\-push
-@@ -629,6 +630,9 @@ Changes the number of ring entries for the Tx ring.
- .BI rx\-buf\-len \ N
- Changes the size of a buffer in the Rx ring.
- .TP
-+.BI tcp\-data\-split \ auto|on|off
-+Specifies the state of TCP data split.
-+.TP
- .BI cqe\-size \ N
- Changes the size of completion queue event.
- .TP
-diff --git a/ethtool.c b/ethtool.c
-index af51220b63cc..3ac15a7e54f6 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -5748,6 +5748,7 @@ static const struct option args[] = {
- 			  "		[ rx-jumbo N ]\n"
- 			  "		[ tx N ]\n"
- 			  "		[ rx-buf-len N ]\n"
-+			  "		[ tcp-data-split auto|on|off ]\n"
- 			  "		[ cqe-size N ]\n"
- 			  "		[ tx-push on|off ]\n"
- 			  "		[ rx-push on|off ]\n"
-diff --git a/netlink/rings.c b/netlink/rings.c
-index 51d28c2ab055..f9eb67a4bc28 100644
---- a/netlink/rings.c
-+++ b/netlink/rings.c
-@@ -116,6 +116,22 @@ int nl_gring(struct cmd_context *ctx)
- 
- /* RINGS_SET */
- 
-+static const struct lookup_entry_u8 tcp_data_split_values[] = {
-+	{
-+		.arg		= "auto",
-+		.val		= ETHTOOL_TCP_DATA_SPLIT_UNKNOWN,
-+	},
-+	{
-+		.arg		= "off",
-+		.val		= ETHTOOL_TCP_DATA_SPLIT_DISABLED,
-+	},
-+	{
-+		.arg		= "on",
-+		.val		= ETHTOOL_TCP_DATA_SPLIT_ENABLED,
-+	},
-+	{}
-+};
-+
- static const struct param_parser sring_params[] = {
- 	{
- 		.arg		= "rx",
-@@ -153,6 +169,13 @@ static const struct param_parser sring_params[] = {
- 		.handler        = nl_parse_direct_u32,
- 		.min_argc       = 1,
- 	},
-+	{
-+		.arg		= "tcp-data-split",
-+		.type		= ETHTOOL_A_RINGS_TCP_DATA_SPLIT,
-+		.handler	= nl_parse_lookup_u8,
-+		.handler_data	= tcp_data_split_values,
-+		.min_argc	= 1,
-+	},
- 	{
- 		.arg            = "cqe-size",
- 		.type           = ETHTOOL_A_RINGS_CQE_SIZE,
--- 
-2.43.0
+If queue 0 =3D> PF 0, then user has to set up XPS to make CPUs from NUMA
+node which has PF 0 use even number queues, and PF 1 to use odd number
+queues. Correct?
 
+> >> So for example, XPS will choose a queue according to the CPU, and the
+> >> driver will make sure that packets transmitted from this SQ are going
+> >> out through the PF closer to that NUMA. =20
+> >=20
+> > Sounds like queue 0 is duplicated in both PFs, then? =20
+>=20
+> Depends on how you look at it, each PF has X queues, the netdev has 2X
+> queues.
+
+I'm asking how it looks from the user perspective, to be clear.
+=46rom above I gather than the answer is no - queue 0 maps directly=20
+to PF 0 / queue 0, nothing on PF 1 will ever see traffic of queue 0.
+
+> >> Can you share a link please? =20
+> >=20
+> > commit a90d56049acc45802f67cd7d4c058ac45b1bc26f =20
+>=20
+> Thanks, will take a look.
+>=20
+> >> All the logic is internal to the driver, so I expect it to be fine, but
+> >> I'd like to double check.
+> >=20
+> > Herm, "internal to the driver" is a bit of a landmine. It will be fine
+> > for iperf testing but real users will want to configure the NIC.
+>=20
+> What kind of configuration are you thinking of?
+
+Well, I was hoping you'd do the legwork and show how user configuration
+logic has to be augmented for all relevant stack features to work with
+multi-PF devices. I can list the APIs that come to mind while writing
+this email, but that won't be exhaustive :(
 
