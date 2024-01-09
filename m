@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-62713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C4D4828A8F
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:58:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00BFE828A90
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:58:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4E161F24C7A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:58:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85259B21E0F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35D63A1D4;
-	Tue,  9 Jan 2024 16:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E557A3A8C5;
+	Tue,  9 Jan 2024 16:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="RUgHr1nZ"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ufvvK4J6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4842D621
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 16:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870A72D621
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 16:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d3e2972f65so10962395ad.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 08:58:02 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d3f3ee00a2so14419825ad.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 08:58:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1704819482; x=1705424282; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1704819503; x=1705424303; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=3i4U5T2qK3drvXnIzh95NqDrXtOKODn4t71aPM48HQM=;
-        b=RUgHr1nZ65wruV04Ze1O3YY608w98Fzt1IYms0IFxCF0I2CZsKqkAWfZRvMj/EO+Y8
-         7NNtmxcMnO8YUCjCRI5WUg+FbAc2gBZ2df33qdFO7dkIiK++Nn5Nh6LEDZ3voVq0vmPj
-         gYccjjhnB5NnoLYeHueNlKCGJcOsxoliS30u83Q94ia009s+KgxTu2VR4HHWOGlGUE2G
-         VdGH7hTjDxfcRwMmC2ryZ8oZEbTC8R8qMlCgxsE9o+U0jEf+RNu7DFh/0oS/7GkiE6GS
-         M5qi6BHwGdSbpbtAqdLeN3TVrGpdVJdTo9BMX2oQJbMe6wvSPyptuxIw7qYYfrEgZok1
-         oDCw==
+        bh=/JLLk+9bKmnSuCvyOKaTeOPorNycA/8Lxr3gtDisPk0=;
+        b=ufvvK4J62HF/TjrZv/RvyR8vupxKGzj5VPvIiRKqeQHat5yqXcf/Qyw1OrF6l4lhq9
+         EtJSKk1D1JUehpCSI9HVUHIHV6yzJnEI/ETRr6n/VQlNbJYRglcxe8Oi9e3DE6v8K1rJ
+         NMFGgFY5oF1FaWKcQoEESkZ+StqF59HthHb6LQdfo2xS53+d9+H4wMHBrpq5KVXA7IVm
+         4BHPK+JU2aeHMzJcNuFXatrqrerq1HmdM4IKNkwpUXBtyFKh07TrmZbck3LgByPU+SXq
+         uJwnXy9AX2uAStWhahLkQTJpOE7J/+WjLgbPqNuUMlzJsvG8GABFH8CZKTJefvm5BXoW
+         fXug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704819482; x=1705424282;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1704819503; x=1705424303;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3i4U5T2qK3drvXnIzh95NqDrXtOKODn4t71aPM48HQM=;
-        b=HW5QEe/Ce4iAYODdPG0nO2057hKW0O2txPypotpG01k3m5HCJqaTjOgye8R7HxvTvX
-         vROnppgEHJHcNl+kHysmu4Cj9cp2nzsj1p2jv9NO83z9y3qj5VsuWiHZ5R69SxDt8NQE
-         hzqAtFeYHIeHyl3JghrNRU+wv3zQnwNRw2oHzjBKLenf3+6SYHDq7JH/hFHD4oPuUb67
-         DGvrDJV41MuHfoHwmzoWNJJwAap1gSmonFSjoTNmFcG5HDsWV87JeGb80x/ildyZfTtp
-         eh50jRNDyycxGYbCh6kyOxK2CGhi0bAaG96u0doSgX3PxVhp+BnCEUVZYaBQuoLhWeyc
-         BtKQ==
-X-Gm-Message-State: AOJu0YxuagCb31q1PU3b8LnIst3R94ijoIoI7z9gxLGX9GvLibWmCN0Z
-	WgM2LcIoi2thZ6W+iTQX1R0qJxdFPTAv/2yTQnsMw0XzR6k=
-X-Google-Smtp-Source: AGHT+IHKQIRFLN9owgwTU6rvvKCBZ9KjKefCp1c+M4zseJIRBmhOyLX4mJS5/xnWsIOG3Y2PHO8YaQ==
-X-Received: by 2002:a17:902:a3c5:b0:1d5:5991:affe with SMTP id q5-20020a170902a3c500b001d55991affemr875660plb.2.1704819481836;
-        Tue, 09 Jan 2024 08:58:01 -0800 (PST)
+        bh=/JLLk+9bKmnSuCvyOKaTeOPorNycA/8Lxr3gtDisPk0=;
+        b=ECk3NfWxyyeF7HBvGQp3XViKKTQRgyz1e9aLu2HwJ85niAR8lju7G9CRU9AUWxuvcf
+         6X+MchPHF/UW8YHs4RK1eSPnI93KmZ0jIkxOgc+da5GOsar0f9qFtER10ni1+By4XApQ
+         M+vFWjGZKQ6gwAHZQ8jGIOVLaHoalZU5lHlfOOjj8p2EGeTOtMbkJpg8rQZf7vl/Rubf
+         vt5MaDcmvngBRLebwVTnRSs7ciYf9+vequc3lmWw85d+2VfDGMijwnxz/HjuUuvbr7u+
+         qN5Kv4HK95jg8yoYkeIYOKGTqZKcgptoVZQ3sg3dqSKoIkAAwEufdn43eUol2xWFghcU
+         ueKw==
+X-Gm-Message-State: AOJu0Yy7SGsi8ONH45PSS5RvcRCY+j41bgP5y8IJRCc3OKEJMfvagykt
+	4k9tsqq+CLHbZqGG8pgj0bN8xNmSi0M3Sw==
+X-Google-Smtp-Source: AGHT+IEci60OdHsMBuZvgZp1jFQTQJ9gyZUmEsbKI3zOCpcBl5lRH3h+n6TN7HALCWv+H93d8/FR5g==
+X-Received: by 2002:a17:903:252:b0:1d4:368d:3d6a with SMTP id j18-20020a170903025200b001d4368d3d6amr2890413plh.17.1704819502713;
+        Tue, 09 Jan 2024 08:58:22 -0800 (PST)
 Received: from ?IPV6:2a03:83e0:1156:1:1cbd:da2b:a9f2:881? ([2620:10d:c090:500::4:ea02])
-        by smtp.gmail.com with ESMTPSA id az5-20020a170902a58500b001d398889d4dsm2010576plb.127.2024.01.09.08.58.00
+        by smtp.gmail.com with ESMTPSA id az5-20020a170902a58500b001d398889d4dsm2010576plb.127.2024.01.09.08.58.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jan 2024 08:58:01 -0800 (PST)
-Message-ID: <725ad89a-038a-45bb-b710-24c2798f0dba@davidwei.uk>
-Date: Tue, 9 Jan 2024 08:57:59 -0800
+        Tue, 09 Jan 2024 08:58:22 -0800 (PST)
+Message-ID: <08910686-138c-4722-a807-9636df5ccd03@davidwei.uk>
+Date: Tue, 9 Jan 2024 08:58:21 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,113 +66,161 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/5] netdevsim: allow two netdevsim ports to
- be connected
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+Subject: Re: [PATCH net-next v5 3/5] netdevsim: forward skbs from one
+ connected port to another
+Content-Language: en-GB
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
  netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
 References: <20231228014633.3256862-1-dw@davidwei.uk>
- <20231228014633.3256862-3-dw@davidwei.uk>
- <20240103173928.76264ebe@kernel.org>
-Content-Language: en-GB
+ <20231228014633.3256862-4-dw@davidwei.uk> <ZZPv42K9VRTao735@nanopsycho>
+ <bf4760df-a78f-431d-8c33-b7a2f7fb393d@davidwei.uk>
+ <ZZZ7C0dhg2KzaNfi@nanopsycho>
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240103173928.76264ebe@kernel.org>
+In-Reply-To: <ZZZ7C0dhg2KzaNfi@nanopsycho>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2024-01-03 17:39, Jakub Kicinski wrote:
-> On Wed, 27 Dec 2023 17:46:30 -0800 David Wei wrote:
->> +static ssize_t nsim_dev_peer_write(struct file *file,
->> +				   const char __user *data,
->> +				   size_t count, loff_t *ppos)
->> +{
->> +	struct nsim_dev_port *nsim_dev_port, *peer_dev_port;
->> +	struct nsim_dev *peer_dev;
->> +	unsigned int id, port;
->> +	char buf[22];
->> +	ssize_t ret;
->> +
->> +	if (count >= sizeof(buf))
->> +		return -ENOSPC;
->> +
->> +	ret = copy_from_user(buf, data, count);
->> +	if (ret)
->> +		return -EFAULT;
->> +	buf[count] = '\0';
->> +
->> +	ret = sscanf(buf, "%u %u", &id, &port);
->> +	if (ret != 2) {
->> +		pr_err("Format is peer netdevsim \"id port\" (uint uint)\n");
+On 2024-01-04 01:31, Jiri Pirko wrote:
+> Wed, Jan 03, 2024 at 11:36:36PM CET, dw@davidwei.uk wrote:
+>> On 2024-01-02 03:13, Jiri Pirko wrote:
+>>> Thu, Dec 28, 2023 at 02:46:31AM CET, dw@davidwei.uk wrote:
+>>>> Forward skbs sent from one netdevsim port to its connected netdevsim
+>>>> port using dev_forward_skb, in a spirit similar to veth.
+>>>>
+>>>> Add a tx_dropped variable to struct netdevsim, tracking the number of
+>>>> skbs that could not be forwarded using dev_forward_skb().
+>>>>
+>>>> The xmit() function accessing the peer ptr is protected by an RCU read
+>>>> critical section. The rcu_read_lock() is functionally redundant as since
+>>>> v5.0 all softirqs are implicitly RCU read critical sections; but it is
+>>>> useful for human readers.
+>>>>
+>>>> If another CPU is concurrently in nsim_destroy(), then it will first set
+>>>> the peer ptr to NULL. This does not affect any existing readers that
+>>>> dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
+>>>> a synchronize_rcu() before the netdev is actually unregistered and
+>>>> freed. This ensures that any readers i.e. xmit() that got a non-NULL
+>>>> peer will complete before the netdev is freed.
+>>>>
+>>>> Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
+>>>> will dereference NULL, making it safe.
+>>>>
+>>>> The codepath to nsim_destroy() and nsim_create() takes both the newly
+>>>> added nsim_dev_list_lock and rtnl_lock. This makes it safe with
+>>>
+>>> I don't see the rtnl_lock take in those functions.
+>>>
+>>>
+>>> Otherwise, this patch looks fine to me.
+>>
+>> For nsim_create(), rtnl_lock is taken in nsim_init_netdevsim(). For
+>> nsim_destroy(), rtnl_lock is taken directly in the function.
+>>
+>> What I mean here is, in the netdevsim device modification paths locks
+>> are taken in this order:
+>>
+>> devl_lock -> rtnl_lock
+>>
+>> nsim_dev_list_lock is taken outside (not nested) of these.
+>>
+>> In nsim_dev_peer_write() where two ports are linked, locks are taken in
+>> this order:
+>>
+>> nsim_dev_list_lock -> devl_lock -> rtnl_lock
+>>
+>> This will not cause deadlocks and ensures that two ports being linked
+>> are both valid.
 > 
-> netif_err() or dev_err() ? Granted the rest of the file seems to use
-> pr_err(), but I'm not sure why...
+> Okay. Perhaps would be good to document this in a comment somewhere in
+> the code?
 
-I can change it to use one of these two in this patchset, then I can
-chnage the others separately in another patch. How does that sound?
+Yep, I'll add this.
 
 > 
->> +		return -EINVAL;
->> +	}
 > 
-> Could you put a sleep() here and test removing the device while some
-> thread is stuck here? I don't recall exactly but I thought debugfs
-> remove waits for concurrent reads and writes which could be problematic
-> given we take all the locks under the sun here..
-
-Yep, I'll test this.
-
-> 
->> +	ret = -EINVAL;
->> +	mutex_lock(&nsim_dev_list_lock);
->> +	peer_dev = nsim_dev_find_by_id(id);
->> +	if (!peer_dev) {
->> +		pr_err("Peer netdevsim %u does not exist\n", id);
->> +		goto out_mutex;
->> +	}
->> +
->> +	devl_lock(priv_to_devlink(peer_dev));
->> +	rtnl_lock();
->> +	nsim_dev_port = file->private_data;
->> +	peer_dev_port = __nsim_dev_port_lookup(peer_dev, NSIM_DEV_PORT_TYPE_PF,
->> +					       port);
->> +	if (!peer_dev_port) {
->> +		pr_err("Peer netdevsim %u port %u does not exist\n", id, port);
->> +		goto out_devl;
->> +	}
->> +
->> +	if (nsim_dev_port == peer_dev_port) {
->> +		pr_err("Cannot link netdevsim to itself\n");
->> +		goto out_devl;
->> +	}
->> +
->> +	rcu_assign_pointer(nsim_dev_port->ns->peer, peer_dev_port->ns);
->> +	rcu_assign_pointer(peer_dev_port->ns->peer, nsim_dev_port->ns);
->> +	ret = count;
->> +
->> +out_devl:
-> 
-> out_unlock_rtnl
-> 
->> +	rtnl_unlock();
->> +	devl_unlock(priv_to_devlink(peer_dev));
->> +out_mutex:
-> 
-> out_unlock_dev_list
-> 
->> +	mutex_unlock(&nsim_dev_list_lock);
->> +
->> +	return ret;
->> +}
->> +
->> +static const struct file_operations nsim_dev_peer_fops = {
->> +	.open = simple_open,
->> +	.read = nsim_dev_peer_read,
->> +	.write = nsim_dev_peer_write,
->> +	.llseek = generic_file_llseek,
-> 
-> You don't support seek, you want some form of no_seek here.
-> 
->> +	.owner = THIS_MODULE,
->> +};
+>>
+>>>
+>>>
+>>>> concurrent calls to linking two netdevsims together.
+>>>>
+>>>> Signed-off-by: David Wei <dw@davidwei.uk>
+>>>> ---
+>>>> drivers/net/netdevsim/netdev.c    | 21 ++++++++++++++++++---
+>>>> drivers/net/netdevsim/netdevsim.h |  1 +
+>>>> 2 files changed, 19 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+>>>> index 434322f6a565..0009d0f1243f 100644
+>>>> --- a/drivers/net/netdevsim/netdev.c
+>> +++ b/drivers/net/netdevsim/netdev.c
+>>>> @@ -29,19 +29,34 @@
+>>>> static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>> {
+>>>> 	struct netdevsim *ns = netdev_priv(dev);
+>>>> +	struct netdevsim *peer_ns;
+>>>> +	int ret = NETDEV_TX_OK;
+>>>>
+>>>> 	if (!nsim_ipsec_tx(ns, skb))
+>>>> 		goto out;
+>>>>
+>>>> +	rcu_read_lock();
+>>>> +	peer_ns = rcu_dereference(ns->peer);
+>>>> +	if (!peer_ns)
+>>>> +		goto out_stats;
+>>>> +
+>>>> +	skb_tx_timestamp(skb);
+>>>> +	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP))
+>>>> +		ret = NET_XMIT_DROP;
+>>>> +
+>>>> +out_stats:
+>>>> +	rcu_read_unlock();
+>>>> 	u64_stats_update_begin(&ns->syncp);
+>>>> 	ns->tx_packets++;
+>>>> 	ns->tx_bytes += skb->len;
+>>>> +	if (ret == NET_XMIT_DROP)
+>>>> +		ns->tx_dropped++;
+>>>> 	u64_stats_update_end(&ns->syncp);
+>>>> +	return ret;
+>>>>
+>>>> out:
+>>>> 	dev_kfree_skb(skb);
+>>>> -
+>>>> -	return NETDEV_TX_OK;
+>>>> +	return ret;
+>>>> }
+>>>>
+>>>> static void nsim_set_rx_mode(struct net_device *dev)
+>>>> @@ -70,6 +85,7 @@ nsim_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+>>>> 		start = u64_stats_fetch_begin(&ns->syncp);
+>>>> 		stats->tx_bytes = ns->tx_bytes;
+>>>> 		stats->tx_packets = ns->tx_packets;
+>>>> +		stats->tx_dropped = ns->tx_dropped;
+>>>> 	} while (u64_stats_fetch_retry(&ns->syncp, start));
+>>>> }
+>>>>
+>>>> @@ -302,7 +318,6 @@ static void nsim_setup(struct net_device *dev)
+>>>> 	eth_hw_addr_random(dev);
+>>>>
+>>>> 	dev->tx_queue_len = 0;
+>>>> -	dev->flags |= IFF_NOARP;
+>>>> 	dev->flags &= ~IFF_MULTICAST;
+>>>> 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
+>>>> 			   IFF_NO_QUEUE;
+>>>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+>>>> index 24fc3fbda791..083b1ee7a1a2 100644
+>>>> --- a/drivers/net/netdevsim/netdevsim.h
+>>>> +++ b/drivers/net/netdevsim/netdevsim.h
+>>>> @@ -98,6 +98,7 @@ struct netdevsim {
+>>>>
+>>>> 	u64 tx_packets;
+>>>> 	u64 tx_bytes;
+>>>> +	u64 tx_dropped;
+>>>> 	struct u64_stats_sync syncp;
+>>>>
+>>>> 	struct nsim_bus_dev *nsim_bus_dev;
+>>>> -- 
+>>>> 2.39.3
+>>>>
 
