@@ -1,167 +1,187 @@
-Return-Path: <netdev+bounces-62670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593EB82877B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:59:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5235E8287B1
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:04:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03193286553
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:59:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB8811F24716
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 14:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52FC39843;
-	Tue,  9 Jan 2024 13:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E51B39AC8;
+	Tue,  9 Jan 2024 14:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePEaYJhs"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="b2dNUIwq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FAA38FBB;
-	Tue,  9 Jan 2024 13:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78104f6f692so241039085a.1;
-        Tue, 09 Jan 2024 05:59:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704808768; x=1705413568; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1zbwLQvCGi9ayqIqzz1ygZ1oEKO7pDe3S64K7yitgQ0=;
-        b=ePEaYJhspVqzmTmxEkAm9U4segPzUmfrJ4+49viIDJ7CscrC+xxJIkuQFFUAqowX6g
-         d7VmePvYwd101z8Doxu+WXtaYGENTirSxJ0peKKAUaa6Bs4mY3dRSZdOK85pICg9y6CQ
-         VZCiyLpjgpqprKnYAbTZb7YQI3mUrSods7sm5CcFByxfzxr4k0YYHpuFYckypjJPVepi
-         2iwncRG0xurpaHRxnPiELRlWAXXQMzROoZAtzsgl0rWj97X5WNo05PLSmQsKoKigcUK0
-         dNK/AMUZklL3ujoXLa4NXP8bLp4Vox0STs9UMjUafAtJXIklGJC6mfW9sGSrRjenwm5Q
-         HCnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704808768; x=1705413568;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=1zbwLQvCGi9ayqIqzz1ygZ1oEKO7pDe3S64K7yitgQ0=;
-        b=RGO/3ATU5lPLVBDlNLV4/WUKYEIJHVvzNiRs/Przh643WJbClgl25NkAclAj1I+1vx
-         GVBOFdVL719v8tRkhzyJQl61Bvp3ZId2A7xHlkhkY/K6ejgC5utDBipsTuz0T3fQTzq/
-         VUAzpo/IcfvMVXlCwXysOQAx+dOQOlUrqOrhcVNGNM2GRjgXT4Xk1HSyYgIukm1Wo/G+
-         zhumonLMQwC+Fq2fgkQ63IRZdRgQTyYQqj1KwI7GG7w89mdTCEypjox49DMgf4jQDMcs
-         ynG3CGDyoW9NGX4l/Woo0DgYk2t+/ednj2/3SaeOPiPfEXOGQpNzkyWLBcYwS4otlrJb
-         wdVA==
-X-Gm-Message-State: AOJu0YxgjPQkc3mF/SpdMMm1Px1PcdxQIMJ6LOhyCohKuZo07givpco9
-	OY4uudbsI1l4A+SnyrOvRgA=
-X-Google-Smtp-Source: AGHT+IEp3BCu3ZUnezV9NlJAZ4Av/aGNhE95t0mHb+RdY60yS9YRLqg9GZv6zhC84yBE+s+uuyLI4Q==
-X-Received: by 2002:a37:c20d:0:b0:781:21c6:83a6 with SMTP id i13-20020a37c20d000000b0078121c683a6mr1019863qkm.12.1704808767992;
-        Tue, 09 Jan 2024 05:59:27 -0800 (PST)
-Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
-        by smtp.gmail.com with ESMTPSA id b2-20020a05620a118200b0076db5b792basm806838qkk.75.2024.01.09.05.59.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jan 2024 05:59:27 -0800 (PST)
-Date: Tue, 09 Jan 2024 08:59:27 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Michal Kubiak <michal.kubiak@intel.com>, 
- Larysa Zaremba <larysa.zaremba@intel.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- intel-wired-lan@lists.osuosl.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <659d513f5c0f6_161283294f5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <c4afc32c-e9c7-47de-9bc4-243df95644a3@intel.com>
-References: <20231223025554.2316836-1-aleksander.lobakin@intel.com>
- <20231223025554.2316836-6-aleksander.lobakin@intel.com>
- <658c4328425f7_a33e629412@willemb.c.googlers.com.notmuch>
- <c4afc32c-e9c7-47de-9bc4-243df95644a3@intel.com>
-Subject: Re: [PATCH RFC net-next 05/34] idpf: convert header split mode to
- libie + napi_build_skb()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7F239863
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 14:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 78EB2876D3;
+	Tue,  9 Jan 2024 15:04:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1704809061;
+	bh=65vmodEbxT37RXPRPcn/ziOGhr5691GdQHIVu11Ip5w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b2dNUIwqkLprQJT5Tm+xo9b8L+jl9TY8Hs6bBYlJtFHibbTBB1hTYB0+SEHFR/nVj
+	 j3mV+4P1V7R9tDq91Mi+ix/2TEbNvZxq4OD2EbVv+yCEkiqt5FG7Ojw2PIxzbFBrcv
+	 nf0XM3zxY4WaFwloVH2x1BtApLH4qsXC3Cjpie8r5v4ZDCU2DP0GovsdixwT2bW7mE
+	 vSqiEHcsxRzaafXjBMFM1YlGYP4Rd7BbRNB2x4my8hc/u8MqjLh7b3+KFXSJv6nNMg
+	 3+ouh0g1dAH2Rn7JExFygX7tl6CD+2AmKm7qX0peA4n4LU91Wgs1tQDuyvEfr8tni7
+	 3NEt1xFgwFK2Q==
+Date: Tue, 9 Jan 2024 15:04:14 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Tristram.Ha@microchip.com, Oleksij Rempel
+ <o.rempel@pengutronix.de>, UNGLinuxDriver@microchip.com,
+ netdev@vger.kernel.org, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ George McCollister <george.mccollister@gmail.com>
+Subject: Re: [net][hsr] Question regarding HSR RedBox functionality
+ implementation (preferably on KSZ9477)
+Message-ID: <20240109150414.6a402fec@wsk>
+In-Reply-To: <20240109125205.u6yc3z4neter24ae@skbuf>
+References: <20230928124127.379115e6@wsk>
+	<20231003095832.4bec4c72@wsk>
+	<20231003104410.dhngn3vvdfdcurga@skbuf>
+	<20230922133108.2090612-1-lukma@denx.de>
+	<20230926225401.bganxwmtrgkiz2di@skbuf>
+	<20230928124127.379115e6@wsk>
+	<20231003095832.4bec4c72@wsk>
+	<20231003104410.dhngn3vvdfdcurga@skbuf>
+	<20240109133234.74c47dcd@wsk>
+	<20240109133234.74c47dcd@wsk>
+	<20240109125205.u6yc3z4neter24ae@skbuf>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/CX7kIaysj4g35Cj_n0+SIAH";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Alexander Lobakin wrote:
-> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
-> Date: Wed, 27 Dec 2023 10:30:48 -0500
-> 
-> > Alexander Lobakin wrote:
-> >> Currently, idpf uses the following model for the header buffers:
-> >>
-> >> * buffers are allocated via dma_alloc_coherent();
-> >> * when receiving, napi_alloc_skb() is called and then the header is
-> >>   copied to the newly allocated linear part.
-> >>
-> >> This is far from optimal as DMA coherent zone is slow on many systems
-> >> and memcpy() neutralizes the idea and benefits of the header split.
-> > 
-> > Do you have data showing this?
-> 
-> Showing slow coherent DMA or memcpy()?
-> Try MIPS for the first one.
-> For the second -- try comparing performance on ice with the "legacy-rx"
-> private flag disabled and enabled.
-> 
-> > 
-> > The assumption for the current model is that the headers will be
-> > touched shortly after, so the copy just primes the cache.
-> 
-> They won't be touched in many cases. E.g. XDP_DROP.
-> Or headers can be long. memcpy(32) != memcpy(128).
-> The current model allocates a new skb with a linear part, which is a
-> real memory allocation. napi_build_skb() doesn't allocate anything
-> except struct sk_buff, which is usually available in the NAPI percpu cache.
-> If build_skb() wasn't more effective, it wouldn't be introduced.
-> The current model just assumes default socket traffic with ~40-byte
-> headers and no XDP etc.
-> 
-> > 
-> > The single coherently allocated region for all headers reduces
-> > IOTLB pressure.
-> 
-> page_pool pages are mapped once at allocation.
-> 
-> > 
-> > It is possible that the alternative model is faster. But that is not
-> > trivially obvious.
-> > 
-> > I think patches like this can stand on their own. Probably best to
-> > leave them out of the dependency series to enable XDP and AF_XDP.
-> 
-> You can't do XDP on DMA coherent zone. To do this memcpy(), you need
-> allocate a new skb with a linear part, which is usually done after XDP,
-> otherwise it's too much overhead and little-to-no benefits comparing to
-> generic skb XDP.
-> The current idpf code is just not compatible with the XDP code in this
-> series, it's pointless to do double work.
-> 
-> Disabling header split when XDP is enabled (alternative option) means
-> disabling TCP zerocopy and worse performance in general, I don't
-> consider this.
+--Sig_/CX7kIaysj4g35Cj_n0+SIAH
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-My concern is if optimizations for XDP might degrade the TCP/IP common
-path. XDP_DROP and all of XDP even is a niche feature by comparison.
+Hi Vladimir,
 
-The current driver behavior was not the first for IDPF, but arrived
-at based on extensive performance debugging. An earlier iteration used
-separate header buffers. Switching to a single coherent allocated
-buffer region significantly increased throughput / narrowed the gap
-between header-split and non-header-split mode.
+> Hi Lukasz,
+>=20
+> On Tue, Jan 09, 2024 at 01:32:34PM +0100, Lukasz Majewski wrote:
+> > However, I'm wondering how the mainline Linux kernel could handle
+> > HSR RedBox functionality (on document [1], Figure 2. we do have
+> > "bridge" - OSI L2).
+> >=20
+> > To be more interesting - br0 can be created between hsr0 and e.g.
+> > lan3. But as expected communication breaks on both directions (to
+> > SAN and to HSR ring). =20
+>=20
+> Yes, I suppose this is how a RedBox should be modeled. In principle
+> it's identical to how bridging with LAG ports (bond, team) works -
+> either in software or offloaded.=20
+> The trouble is that the HSR driver
+> seems to only work with the DANH/DANP roles (as also mentioned in
+> Documentation/networking/dsa/dsa.rst). I don't remember what doesn't
+> work (or if I ever knew at all).
 
-I follow your argument and the heuristics are reasonable. My request
-is only that this decision is based on real data for this driver and
-modern platforms. We cannot regress TCP/IP hot path performance.
+In the newest net-next only PRP_TLV_REDBOX_MAC is defined, which seems
+to be REDBOX for DAN P (PRP).
+
+> It might be the address substitution
+> from hsr_xmit() that masks the MAC address of the SAN side device?
+>=20
+
+This needs to be further investigated.
+
+> > Is there a similar functionality already present in the Linux kernel
+> > (so this approach could be reused)?
+> >=20
+> > My (very rough idea) would be to extend KSZ9477 bridge join
+> > functions to check if HSR capable interface is "bridged" and then
+> > handle frames in a special way.
+> >=20
+> > However, I would like to first ask for as much input as possible -
+> > to avoid any unnecessary work. =20
+>=20
+> First I'd figure out why the software data path isn't working, and if
+> it can be fixed.=20
+
++1
+
+> Then, fix that if possible, and add a new selftest to
+> tools/testing/selftests/net/forwarding/, that should pass using veth
+> interfaces as lower ports.
+>=20
+> Then, offloading something that has a clear model in software should
+> be relatively easy, though you might need to add some logic to DSA.
+> This is one place that needs to be edited, there may be others.
+>=20
+> 	/* dsa_port_pre_hsr_leave is not yet necessary since hsr
+> devices cannot
+> 	 * meaningfully placed under a bridge yet
+> 	 */
+>=20
+
+Ok, the LAG approach in /net/dsa/user.c can be used as an example.
+
+Thanks for shedding some light on this issue :-)
+
+> >=20
+> > Thanks in advance for help :-)
+> >=20
+> > Link:
+> >=20
+> > [1] -
+> > https://ww1.microchip.com/downloads/en/Appnotes/AN3474-KSZ9477-High-Ava=
+ilability-Seamless-Redundancy-Application-Note-00003474A.pdf
+> >=20
+> >=20
+> > Best regards,
+> >=20
+> > Lukasz Majewski =20
 
 
 
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/CX7kIaysj4g35Cj_n0+SIAH
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmWdUl4ACgkQAR8vZIA0
+zr0Y6AgAqGeco9AMJ7JZdOAI/J9gNSVQ4TYYRZ/Rl6sospR8XcrHwaLfSqsLMxUh
+mMiES3RWR9UIGb4bTmE9y6kDmdYpZcCogwx50VFcgpwyQQFwo7gLxGTUkRfu3DmP
+taOhG+40I2hPDbYzspw1VqS+gjLG2PNnsKWM+DIFjLiGWMfQ5DBOHM4Yfq1GQJpA
+HJIV6qu9tNg3VjYv88HbUc6y5GSWnEfXBr0CmI5LvpSY1oJxjCkweG4sgZd6fWrp
+MueJsgS5Qzel7TYYVe+9vX+Rc300JdDKsZ5BX7vSxe5ewb4Yd5VpEozF6ktJYDZN
+PWiKSGAH4vj9U0nJxKPKbTbSczxdng==
+=F7nT
+-----END PGP SIGNATURE-----
+
+--Sig_/CX7kIaysj4g35Cj_n0+SIAH--
 
