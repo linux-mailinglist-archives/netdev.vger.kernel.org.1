@@ -1,116 +1,140 @@
-Return-Path: <netdev+bounces-62739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7538E828E4D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 21:00:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE97828E40
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 20:54:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D379DB219FD
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 20:00:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F2F11C24E69
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 19:54:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7538B3D559;
-	Tue,  9 Jan 2024 20:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA21C3D546;
+	Tue,  9 Jan 2024 19:54:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from authsmtp.register.it (authsmtp01.register.it [81.88.48.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B2B3B782
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 20:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eventsense.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eventsense.it
-Received: from krn.. ([138.197.190.30])
-	by cmsmtp with ESMTPSA
-	id NI3PrbEZDI6zQNI3UrWDYw; Tue, 09 Jan 2024 20:46:33 +0100
-X-Rid: andrea.fois@eventsense.it@138.197.190.30
-From: Andrea Fois <andrea.fois@eventsense.it>
-To: 
-Cc: andrea.fois@eventsense.it,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	George Shuklin <george.shuklin@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] tg3: add new module param to force device power down on reboot
-Date: Tue,  9 Jan 2024 19:45:51 +0000
-Message-Id: <20240109194551.17666-1-andrea.fois@eventsense.it>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554363D969;
+	Tue,  9 Jan 2024 19:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.83.101) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 9 Jan
+ 2024 22:53:49 +0300
+Subject: Re: [PATCH net-next v3 19/19] net: ravb: Add runtime PM support
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <geert+renesas@glider.be>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240105082339.1468817-20-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <6c53095c-2d63-d6d3-e233-a7709a6e48b1@omp.ru>
+Date: Tue, 9 Jan 2024 22:53:48 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfPQXaKfWonfFB+huClQ/fRPZupeMxuV2ZGs2JvtZNp6KWdzBy33NZVJ5hWxdsJ0tjVWKiZk64ih5pAuh7HWzC536Jepm3XfweVct7qH53x+FUCMfRxLs
- CuzwR4jkEzE/ew5VpS9clVLigiJOPjNt3FINZMABfH8P70Ak60f138aQX1KtZhnJsAlUts/2A8cHh6VCtuA+aRZVu/fSObtdzN12rjtiVwLSdTiMtFF80pUt
- Th0ZWC4F/G98kYRyLzRP0+qxFAYfRwuVkIh/SRdmHfTuas2hNzyeU/Ps2jcKVIWnYfL/yPGuwsPdIIgUlKBa+YhoE05zLltwoDkogR+wmfVPaDLshljeWVGg
- nz5BaZ+5wDL6E13ZoHouCt/C7ZckrWE2VXRFJUI6aQ4JcnHnrQX2eNe50aPfgvqOaERd+LyeFXk8R6R193K8Iw26BVDXgiOBPwwo0Poxk0PvzxSZfhovrZ6X
- CizoNs56EXflwoE3
+In-Reply-To: <20240105082339.1468817-20-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/09/2024 19:41:39
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 182518 [Jan 09 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.83.101
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/09/2024 19:46:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/9/2024 2:55:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-The bug #1917471 was fixed in commit 2ca1c94ce0b6 ("tg3: Disable tg3
-device on system reboot to avoid triggering AER") but was reintroduced
-by commit 9fc3bc764334 ("tg3: power down device only on
-SYSTEM_POWER_OFF").
+On 1/5/24 11:23 AM, Claudiu wrote:
 
-The problem described in #1917471 is still consistently replicable on
-reboots on Dell Servers (i.e. R750xs with BCM5720 LOM), causing NMIs
-(i.e. NMI received for unknown reason 38 on cpu 0) after 9fc3bc764334
-was committed.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Add runtime PM support for the ravb driver. As the driver is used by
+> different IP variants, with different behaviors, to be able to have the
+> runtime PM support available for all devices, the preparatory commits
+> moved all the resources parsing and allocations in the driver's probe
+> function and kept the settings for ravb_open(). This is due to the fact
+> that on some IP variants-platforms tuples disabling/enabling the clocks
+> will switch the IP to the reset operation mode where registers' content is
+> lost and reconfiguration needs to be done. For this the rabv_open()
+> function enables the clocks, switches the IP to configuration mode, applies
+> all the registers settings and switches the IP to the operational mode. At
+> the end of ravb_open() IP is ready to send/receive data.
+> 
+> In ravb_close() necessary reverts are done (compared with ravb_open()), the
+> IP is switched to reset mode and clocks are disabled.
+> 
+> The ethtool APIs or IOCTLs that might execute while the interface is down
+> are either cached (and applied in ravb_open()) or rejected (as at that time
+> the IP is in reset mode). Keeping the IP in the reset mode also increases
+> the power saved (according to the hardware manual).
+> 
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
 
-The problem is detected also by the Lifecycle controller and logged as
-a PCI Bus Error for the device.
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index e909960fbc30..e99351fe8d7f 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+> @@ -2233,7 +2243,14 @@ static int ravb_close(struct net_device *ndev)
+>  	ravb_get_stats(ndev);
+>  
+>  	/* Set reset mode. */
+> -	return ravb_set_opmode(ndev, CCC_OPC_RESET);
+> +	error = ravb_set_opmode(ndev, CCC_OPC_RESET);
+> +	if (error)
+> +		return error;
+> +
+> +	pm_runtime_mark_last_busy(dev);
+> +	pm_runtime_put_autosuspend(dev);
 
-As the problems addressed by 2ca1c94ce0b6 and by 9fc3bc764334 requires
-opposite strategies, a new module param "force_pwr_down_on_reboot"
-<bool> is introduced to fix both scenarios:
+   BTW, doesn't make sense to check/return the result?
 
-	force_pwr_down_on_reboot = 0/N/n = disable, keep the current
-									   behavior, don't force dev
-									   power down on reboot
+> +
+> +	return 0;
+>  }
+>  
+>  static int ravb_hwtstamp_get(struct net_device *ndev, struct ifreq *req)
+[...]
 
-	force_pwr_down_on_reboot = 1/Y/y = enable, revert to the
-									   behavior of 2ca1c94ce0b6,
-									   force dev power down on reboot
-
-Fixes: 9fc3bc764334 ("tg3: power down device only on SYSTEM_POWER_OFF")
-Signed-off-by: Andrea Fois <andrea.fois@eventsense.it>
----
- drivers/net/ethernet/broadcom/tg3.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index f52830dfb26a..287786357c9b 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -233,6 +233,12 @@ static int tg3_debug = -1;	/* -1 == use TG3_DEF_MSG_ENABLE as value */
- module_param(tg3_debug, int, 0);
- MODULE_PARM_DESC(tg3_debug, "Tigon3 bitmapped debugging message enable value");
- 
-+static bool force_pwr_down_on_reboot;	/* false == Don't force the power down of
-+					 * the device during reboot, only on SYSTEM_POWER_OFF
-+					 */
-+module_param(force_pwr_down_on_reboot, bool, 0x644);
-+MODULE_PARM_DESC(force_pwr_down_on_reboot, "Tigon3 force power down of the device on reboot enable value");
-+
- #define TG3_DRV_DATA_FLAG_10_100_ONLY	0x0001
- #define TG3_DRV_DATA_FLAG_5705_10_100	0x0002
- 
-@@ -18197,7 +18203,7 @@ static void tg3_shutdown(struct pci_dev *pdev)
- 	if (netif_running(dev))
- 		dev_close(dev);
- 
--	if (system_state == SYSTEM_POWER_OFF)
-+	if (system_state == SYSTEM_POWER_OFF || force_pwr_down_on_reboot)
- 		tg3_power_down(tp);
- 
- 	rtnl_unlock();
--- 
-2.40.1
-
+MBR, Sergey
 
