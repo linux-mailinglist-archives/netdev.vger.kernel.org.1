@@ -1,226 +1,153 @@
-Return-Path: <netdev+bounces-62714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00BFE828A90
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:58:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ECDA828AC1
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 18:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85259B21E0F
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:58:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 446AE1C23D22
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E557A3A8C5;
-	Tue,  9 Jan 2024 16:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ufvvK4J6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5953A8EA;
+	Tue,  9 Jan 2024 17:11:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870A72D621
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 16:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d3f3ee00a2so14419825ad.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 08:58:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1704819503; x=1705424303; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/JLLk+9bKmnSuCvyOKaTeOPorNycA/8Lxr3gtDisPk0=;
-        b=ufvvK4J62HF/TjrZv/RvyR8vupxKGzj5VPvIiRKqeQHat5yqXcf/Qyw1OrF6l4lhq9
-         EtJSKk1D1JUehpCSI9HVUHIHV6yzJnEI/ETRr6n/VQlNbJYRglcxe8Oi9e3DE6v8K1rJ
-         NMFGgFY5oF1FaWKcQoEESkZ+StqF59HthHb6LQdfo2xS53+d9+H4wMHBrpq5KVXA7IVm
-         4BHPK+JU2aeHMzJcNuFXatrqrerq1HmdM4IKNkwpUXBtyFKh07TrmZbck3LgByPU+SXq
-         uJwnXy9AX2uAStWhahLkQTJpOE7J/+WjLgbPqNuUMlzJsvG8GABFH8CZKTJefvm5BXoW
-         fXug==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91273B18E;
+	Tue,  9 Jan 2024 17:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=auristor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40d87df95ddso33516145e9.0;
+        Tue, 09 Jan 2024 09:11:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704819503; x=1705424303;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/JLLk+9bKmnSuCvyOKaTeOPorNycA/8Lxr3gtDisPk0=;
-        b=ECk3NfWxyyeF7HBvGQp3XViKKTQRgyz1e9aLu2HwJ85niAR8lju7G9CRU9AUWxuvcf
-         6X+MchPHF/UW8YHs4RK1eSPnI93KmZ0jIkxOgc+da5GOsar0f9qFtER10ni1+By4XApQ
-         M+vFWjGZKQ6gwAHZQ8jGIOVLaHoalZU5lHlfOOjj8p2EGeTOtMbkJpg8rQZf7vl/Rubf
-         vt5MaDcmvngBRLebwVTnRSs7ciYf9+vequc3lmWw85d+2VfDGMijwnxz/HjuUuvbr7u+
-         qN5Kv4HK95jg8yoYkeIYOKGTqZKcgptoVZQ3sg3dqSKoIkAAwEufdn43eUol2xWFghcU
-         ueKw==
-X-Gm-Message-State: AOJu0Yy7SGsi8ONH45PSS5RvcRCY+j41bgP5y8IJRCc3OKEJMfvagykt
-	4k9tsqq+CLHbZqGG8pgj0bN8xNmSi0M3Sw==
-X-Google-Smtp-Source: AGHT+IEci60OdHsMBuZvgZp1jFQTQJ9gyZUmEsbKI3zOCpcBl5lRH3h+n6TN7HALCWv+H93d8/FR5g==
-X-Received: by 2002:a17:903:252:b0:1d4:368d:3d6a with SMTP id j18-20020a170903025200b001d4368d3d6amr2890413plh.17.1704819502713;
-        Tue, 09 Jan 2024 08:58:22 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1156:1:1cbd:da2b:a9f2:881? ([2620:10d:c090:500::4:ea02])
-        by smtp.gmail.com with ESMTPSA id az5-20020a170902a58500b001d398889d4dsm2010576plb.127.2024.01.09.08.58.21
+        d=1e100.net; s=20230601; t=1704820312; x=1705425112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=74pgZ+nMyMyCi7Q0sf1ChPH+6TyfRgWiK4L8xKykjS8=;
+        b=GnFrthI2RBRtog0nPtZWOBaNg9bje2KZUGLypvDGOwW2XFCk+uKLUmVE3fA71XyXN0
+         l0iLSew9vf6HIHPtSalEz1IkoM3Hyenqu+EwtybxuVNg3UBOQ6ARIj8Jr+VDQXkj3Cwn
+         8sSRnaXce04fDK6GtyW19LSPTslynGVOjjr2i+/fE7vPIbTZ3zRHjb6gMFN++99YJ5V8
+         xj1TA1HLWE4Upb+YOIjouMTc9sOH/DdLGxJjIEz/Ho0soknB0AX/deNe7wRP8O3TgSOK
+         DW7WnPUJF4+jEmXY9lMOu3t/CmAEotaBfwZ/nqZVatBSu4d68eOjT8La0VCYmUgGONFg
+         GSdA==
+X-Gm-Message-State: AOJu0YzC9c8vfY9J44hgHmCXmpqpev8kAtE5hreOROutPRj9gFhnDLLs
+	RBluz/dIjaUAZYvEseTroVZvVqB2VqrEe9fB
+X-Google-Smtp-Source: AGHT+IGIJos/i3ipnkFdLmYM2EEGbfIzf/lnl4N7OeDdNGtTp5964SxNKeNBrFk3MQ87L6RBTC7++g==
+X-Received: by 2002:a05:600c:4ecc:b0:40e:4b1d:753 with SMTP id g12-20020a05600c4ecc00b0040e4b1d0753mr581661wmq.181.1704820311991;
+        Tue, 09 Jan 2024 09:11:51 -0800 (PST)
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com. [209.85.218.41])
+        by smtp.gmail.com with ESMTPSA id se12-20020a170906ce4c00b00a1d5c52d628sm1236183ejb.3.2024.01.09.09.11.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jan 2024 08:58:22 -0800 (PST)
-Message-ID: <08910686-138c-4722-a807-9636df5ccd03@davidwei.uk>
-Date: Tue, 9 Jan 2024 08:58:21 -0800
+        Tue, 09 Jan 2024 09:11:51 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a294295dda3so364442366b.0;
+        Tue, 09 Jan 2024 09:11:51 -0800 (PST)
+X-Received: by 2002:a17:907:1c19:b0:a27:5397:74ed with SMTP id
+ nc25-20020a1709071c1900b00a27539774edmr523050ejc.175.1704820311478; Tue, 09
+ Jan 2024 09:11:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/5] netdevsim: forward skbs from one
- connected port to another
-Content-Language: en-GB
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-References: <20231228014633.3256862-1-dw@davidwei.uk>
- <20231228014633.3256862-4-dw@davidwei.uk> <ZZPv42K9VRTao735@nanopsycho>
- <bf4760df-a78f-431d-8c33-b7a2f7fb393d@davidwei.uk>
- <ZZZ7C0dhg2KzaNfi@nanopsycho>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <ZZZ7C0dhg2KzaNfi@nanopsycho>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240109112029.1572463-1-dhowells@redhat.com>
+In-Reply-To: <20240109112029.1572463-1-dhowells@redhat.com>
+From: Marc Dionne <marc.dionne@auristor.com>
+Date: Tue, 9 Jan 2024 13:11:39 -0400
+X-Gmail-Original-Message-ID: <CAB9dFdt0haftd1LPo=_GmtcZvFR84w81eaARfUKW2KMSM5gxqg@mail.gmail.com>
+Message-ID: <CAB9dFdt0haftd1LPo=_GmtcZvFR84w81eaARfUKW2KMSM5gxqg@mail.gmail.com>
+Subject: Re: [PATCH 0/6] netfs, cachefiles: More additional patches
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, Jeff Layton <jlayton@kernel.org>, 
+	Gao Xiang <hsiangkao@linux.alibaba.com>, Dominique Martinet <asmadeus@codewreck.org>, 
+	Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com, 
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-01-04 01:31, Jiri Pirko wrote:
-> Wed, Jan 03, 2024 at 11:36:36PM CET, dw@davidwei.uk wrote:
->> On 2024-01-02 03:13, Jiri Pirko wrote:
->>> Thu, Dec 28, 2023 at 02:46:31AM CET, dw@davidwei.uk wrote:
->>>> Forward skbs sent from one netdevsim port to its connected netdevsim
->>>> port using dev_forward_skb, in a spirit similar to veth.
->>>>
->>>> Add a tx_dropped variable to struct netdevsim, tracking the number of
->>>> skbs that could not be forwarded using dev_forward_skb().
->>>>
->>>> The xmit() function accessing the peer ptr is protected by an RCU read
->>>> critical section. The rcu_read_lock() is functionally redundant as since
->>>> v5.0 all softirqs are implicitly RCU read critical sections; but it is
->>>> useful for human readers.
->>>>
->>>> If another CPU is concurrently in nsim_destroy(), then it will first set
->>>> the peer ptr to NULL. This does not affect any existing readers that
->>>> dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
->>>> a synchronize_rcu() before the netdev is actually unregistered and
->>>> freed. This ensures that any readers i.e. xmit() that got a non-NULL
->>>> peer will complete before the netdev is freed.
->>>>
->>>> Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
->>>> will dereference NULL, making it safe.
->>>>
->>>> The codepath to nsim_destroy() and nsim_create() takes both the newly
->>>> added nsim_dev_list_lock and rtnl_lock. This makes it safe with
->>>
->>> I don't see the rtnl_lock take in those functions.
->>>
->>>
->>> Otherwise, this patch looks fine to me.
->>
->> For nsim_create(), rtnl_lock is taken in nsim_init_netdevsim(). For
->> nsim_destroy(), rtnl_lock is taken directly in the function.
->>
->> What I mean here is, in the netdevsim device modification paths locks
->> are taken in this order:
->>
->> devl_lock -> rtnl_lock
->>
->> nsim_dev_list_lock is taken outside (not nested) of these.
->>
->> In nsim_dev_peer_write() where two ports are linked, locks are taken in
->> this order:
->>
->> nsim_dev_list_lock -> devl_lock -> rtnl_lock
->>
->> This will not cause deadlocks and ensures that two ports being linked
->> are both valid.
-> 
-> Okay. Perhaps would be good to document this in a comment somewhere in
-> the code?
+On Tue, Jan 9, 2024 at 7:20=E2=80=AFAM David Howells <dhowells@redhat.com> =
+wrote:
+>
+> Hi Christian, Jeff, Gao,
+>
+> Here are some additional patches for my netfs-lib tree:
+>
+>  (1) Mark netfs_unbuffered_write_iter_locked() static as it's only used i=
+n
+>      the file in which it is defined.
+>
+>  (2) Display a counter for DIO writes in /proc/fs/netfs/stats.
+>
+>  (3) Fix the interaction between write-streaming (dirty data in
+>      non-uptodate pages) and the culling of a cache file trying to write
+>      that to the cache.
+>
+>  (4) Fix the loop that unmarks folios after writing to the cache.  The
+>      xarray iterator only advances the index by 1, so if we unmarked a
+>      multipage folio and that got split before we advance to the next
+>      folio, we see a repeat of a fragment of the folio.
+>
+>  (5) Fix a mixup with signed/unsigned offsets when prepping for writing t=
+o
+>      the cache that leads to missing error detection.
+>
+>  (6) Fix a wrong ifdef hiding a wait.
+>
+> David
+>
+> The netfslib postings:
+> Link: https://lore.kernel.org/r/20231013160423.2218093-1-dhowells@redhat.=
+com/ # v1
+> Link: https://lore.kernel.org/r/20231117211544.1740466-1-dhowells@redhat.=
+com/ # v2
+> Link: https://lore.kernel.org/r/20231207212206.1379128-1-dhowells@redhat.=
+com/ # v3
+> Link: https://lore.kernel.org/r/20231213152350.431591-1-dhowells@redhat.c=
+om/ # v4
+> Link: https://lore.kernel.org/r/20231221132400.1601991-1-dhowells@redhat.=
+com/ # v5
+> Link: https://lore.kernel.org/r/20240103145935.384404-1-dhowells@redhat.c=
+om/ # added patches
+>
+> David Howells (6):
+>   netfs: Mark netfs_unbuffered_write_iter_locked() static
+>   netfs: Count DIO writes
+>   netfs: Fix interaction between write-streaming and cachefiles culling
+>   netfs: Fix the loop that unmarks folios after writing to the cache
+>   cachefiles: Fix signed/unsigned mixup
+>   netfs: Fix wrong #ifdef hiding wait
+>
+>  fs/cachefiles/io.c            | 18 +++++++++---------
+>  fs/netfs/buffered_write.c     | 27 ++++++++++++++++++++++-----
+>  fs/netfs/direct_write.c       |  5 +++--
+>  fs/netfs/fscache_stats.c      |  9 ++++++---
+>  fs/netfs/internal.h           |  8 ++------
+>  fs/netfs/io.c                 |  2 +-
+>  fs/netfs/stats.c              | 13 +++++++++----
+>  include/linux/fscache-cache.h |  3 +++
+>  include/linux/netfs.h         |  1 +
+>  9 files changed, 56 insertions(+), 30 deletions(-)
+>
+> --
+> You received this message because you are subscribed to the Google Groups=
+ "linux-cachefs@redhat.com" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to linux-cachefs+unsubscribe@redhat.com.
 
-Yep, I'll add this.
+This passes our kafs tests where a few of the issues fixed here had been se=
+en.
+I made the framework use 9p and no related issues were seen there either.
 
-> 
-> 
->>
->>>
->>>
->>>> concurrent calls to linking two netdevsims together.
->>>>
->>>> Signed-off-by: David Wei <dw@davidwei.uk>
->>>> ---
->>>> drivers/net/netdevsim/netdev.c    | 21 ++++++++++++++++++---
->>>> drivers/net/netdevsim/netdevsim.h |  1 +
->>>> 2 files changed, 19 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
->>>> index 434322f6a565..0009d0f1243f 100644
->>>> --- a/drivers/net/netdevsim/netdev.c
->> +++ b/drivers/net/netdevsim/netdev.c
->>>> @@ -29,19 +29,34 @@
->>>> static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
->>>> {
->>>> 	struct netdevsim *ns = netdev_priv(dev);
->>>> +	struct netdevsim *peer_ns;
->>>> +	int ret = NETDEV_TX_OK;
->>>>
->>>> 	if (!nsim_ipsec_tx(ns, skb))
->>>> 		goto out;
->>>>
->>>> +	rcu_read_lock();
->>>> +	peer_ns = rcu_dereference(ns->peer);
->>>> +	if (!peer_ns)
->>>> +		goto out_stats;
->>>> +
->>>> +	skb_tx_timestamp(skb);
->>>> +	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP))
->>>> +		ret = NET_XMIT_DROP;
->>>> +
->>>> +out_stats:
->>>> +	rcu_read_unlock();
->>>> 	u64_stats_update_begin(&ns->syncp);
->>>> 	ns->tx_packets++;
->>>> 	ns->tx_bytes += skb->len;
->>>> +	if (ret == NET_XMIT_DROP)
->>>> +		ns->tx_dropped++;
->>>> 	u64_stats_update_end(&ns->syncp);
->>>> +	return ret;
->>>>
->>>> out:
->>>> 	dev_kfree_skb(skb);
->>>> -
->>>> -	return NETDEV_TX_OK;
->>>> +	return ret;
->>>> }
->>>>
->>>> static void nsim_set_rx_mode(struct net_device *dev)
->>>> @@ -70,6 +85,7 @@ nsim_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
->>>> 		start = u64_stats_fetch_begin(&ns->syncp);
->>>> 		stats->tx_bytes = ns->tx_bytes;
->>>> 		stats->tx_packets = ns->tx_packets;
->>>> +		stats->tx_dropped = ns->tx_dropped;
->>>> 	} while (u64_stats_fetch_retry(&ns->syncp, start));
->>>> }
->>>>
->>>> @@ -302,7 +318,6 @@ static void nsim_setup(struct net_device *dev)
->>>> 	eth_hw_addr_random(dev);
->>>>
->>>> 	dev->tx_queue_len = 0;
->>>> -	dev->flags |= IFF_NOARP;
->>>> 	dev->flags &= ~IFF_MULTICAST;
->>>> 	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
->>>> 			   IFF_NO_QUEUE;
->>>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
->>>> index 24fc3fbda791..083b1ee7a1a2 100644
->>>> --- a/drivers/net/netdevsim/netdevsim.h
->>>> +++ b/drivers/net/netdevsim/netdevsim.h
->>>> @@ -98,6 +98,7 @@ struct netdevsim {
->>>>
->>>> 	u64 tx_packets;
->>>> 	u64 tx_bytes;
->>>> +	u64 tx_dropped;
->>>> 	struct u64_stats_sync syncp;
->>>>
->>>> 	struct nsim_bus_dev *nsim_bus_dev;
->>>> -- 
->>>> 2.39.3
->>>>
+Tested-by: Marc Dionne <marc.dionne@auristor.com>
+
+Marc
 
