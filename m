@@ -1,47 +1,49 @@
-Return-Path: <netdev+bounces-62706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 121DB828A3E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:45:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25C26828A3F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:45:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6991288311
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:45:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5CD52881BF
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7680A3A8E7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B970B3A8F1;
 	Tue,  9 Jan 2024 16:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a20LX8RC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hdIPaf8S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA3B3A8E2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02AD3A294
 	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 16:45:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FCFEC43141;
-	Tue,  9 Jan 2024 16:45:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E8E9C43390;
+	Tue,  9 Jan 2024 16:45:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704818724;
-	bh=rsbVW/Bl4c+FvBhvhr8wFlpil8bg3GSeHeoxa4mLOY8=;
+	s=k20201202; t=1704818725;
+	bh=sw6k7zADRODS6erdAlfREByAQRGc7rQRKFenjeofIz8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=a20LX8RCjgH01wprB45AD7M38uO4R7MdgN2l2PpiKzxncWGVt0fdDaTuAZTQC2Dpj
-	 gGA0TDl4Z771JEc6MyGu25QL4Z5wIU1i0Fme4eCRMVsM+0+zW+hk0xTKWnIvTl9oo3
-	 eiC+I22ORgzymPqrdwqhgeKO3XPIkITYCc/WYcFLnYRFKUqw0mGzyjHjI4yZSpME/x
-	 F6FbD6j0DbOev31WHMMBknydyiIB95SKOIwIU/Vt4zrAUrckwnOjfYZi7U10eBEyxw
-	 xg6VqtK2GD06TwHoOd0IRL+TH0i54JYnohaygHsDqFcbbnL5ovbAU+6GyiTXLJs8tF
-	 jE9OeBsEVLHrQ==
+	b=hdIPaf8SOtVvQX7pJEg35FQxToFmL+1ZF0+Nz28HrJSMTqYNxuY+zulmZdLC7yWGV
+	 AEYkcH1lpPuTdw/xENhdNTY1q08uAuY0IUKvA8fWFk4EifBkxX61oK37NbZwVzyKxR
+	 KkKv15yJbg04Osc44sl4qgpGEiVa3lqwB8Qcn1V6ZFV3Fh8I1jWUSWVw6/a4cpSRe5
+	 NITgCW1QKOrd4t6oGHLJwwQkWlRA+sZyVWj0sAK8wPtNxsaT4QVPN6krsU7sMZDWOy
+	 JJ1ohZ2u+trixcxop1Rrwlm/za/SP9z3ZMZyf0/zs8yHM9Vme9FjnIGueuc/loLDOP
+	 49Er3EBhwtJAQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	thomas.petazzoni@bootlin.com
-Subject: [PATCH net 3/7] MAINTAINERS: eth: mvneta: move Thomas to CREDITS
-Date: Tue,  9 Jan 2024 08:45:13 -0800
-Message-ID: <20240109164517.3063131-4-kuba@kernel.org>
+	Derek Chickles <dchickles@marvell.com>,
+	Satanand Burla <sburla@marvell.com>,
+	Felix Manlunas <fmanlunas@marvell.com>
+Subject: [PATCH net 4/7] MAINTAINERS: eth: mark Cavium liquidio as an Orphan
+Date: Tue,  9 Jan 2024 08:45:14 -0800
+Message-ID: <20240109164517.3063131-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240109164517.3063131-1-kuba@kernel.org>
 References: <20240109164517.3063131-1-kuba@kernel.org>
@@ -53,57 +55,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Thomas is still active in other bits of the kernel and beyond
-but not as much on the Marvell Ethernet devices.
+We haven't seen much review activity from the liquidio
+maintainers for years. Reflect that reality in MAINTAINERS.
 Our scripts report:
 
-Subsystem MARVELL MVNETA ETHERNET DRIVER
-  Changes 54 / 176 (30%)
-  (No activity)
+Subsystem CAVIUM LIQUIDIO NETWORK DRIVER
+  Changes 30 / 87 (34%)
+  Last activity: 2019-01-28
+  Derek Chickles <dchickles@marvell.com>:
+    Tags ac93e2fa8550 2019-01-28 00:00:00 1
+  Satanand Burla <sburla@marvell.com>:
+  Felix Manlunas <fmanlunas@marvell.com>:
+    Tags ac93e2fa8550 2019-01-28 00:00:00 1
   Top reviewers:
-    [12]: hawk@kernel.org
-    [9]: toke@redhat.com
-    [9]: john.fastabend@gmail.com
-  INACTIVE MAINTAINER Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+    [5]: simon.horman@corigine.com
+    [4]: keescook@chromium.org
+    [4]: jiri@nvidia.com
+  INACTIVE MAINTAINER Satanand Burla <sburla@marvell.com>
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-CC: thomas.petazzoni@bootlin.com
 ---
- CREDITS     | 4 ++++
- MAINTAINERS | 3 +--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+CC: Derek Chickles <dchickles@marvell.com>
+CC: Satanand Burla <sburla@marvell.com>
+CC: Felix Manlunas <fmanlunas@marvell.com>
+---
+ MAINTAINERS | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/CREDITS b/CREDITS
-index 1c86d25dd131..18ce75d81234 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -3038,6 +3038,10 @@ S: Demonstratsii 8-382
- S: Tula 300000
- S: Russia
- 
-+N: Thomas Petazzoni
-+E: thomas.petazzoni@bootlin.com
-+D: Driver for the Marvell Armada 370/XP network unit.
-+
- N: Gordon Peters
- E: GordPeters@smarttech.com
- D: Isochronous receive for IEEE 1394 driver (OHCI module).
 diff --git a/MAINTAINERS b/MAINTAINERS
-index ee3fbf1723a6..cad08f4eca0d 100644
+index cad08f4eca0d..1e375699ebb7 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -12830,9 +12830,8 @@ S:	Maintained
- F:	drivers/thermal/armada_thermal.c
+@@ -4683,11 +4683,8 @@ F:	drivers/i2c/busses/i2c-octeon*
+ F:	drivers/i2c/busses/i2c-thunderx*
  
- MARVELL MVNETA ETHERNET DRIVER
--M:	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+ CAVIUM LIQUIDIO NETWORK DRIVER
+-M:	Derek Chickles <dchickles@marvell.com>
+-M:	Satanand Burla <sburla@marvell.com>
+-M:	Felix Manlunas <fmanlunas@marvell.com>
  L:	netdev@vger.kernel.org
--S:	Maintained
+-S:	Supported
 +S:	Orphan
- F:	drivers/net/ethernet/marvell/mvneta.*
+ W:	http://www.marvell.com
+ F:	drivers/net/ethernet/cavium/liquidio/
  
- MARVELL MVPP2 ETHERNET DRIVER
 -- 
 2.43.0
 
