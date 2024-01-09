@@ -1,132 +1,103 @@
-Return-Path: <netdev+bounces-62662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBFA382863E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:49:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D46D82863F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:49:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFD971C2424A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:49:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26D4BB22AE8
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649B3381CD;
-	Tue,  9 Jan 2024 12:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA9338DC9;
+	Tue,  9 Jan 2024 12:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PX6D52mS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G+Wu+ee7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089BE381C3
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 12:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5cdbc4334edso1108085a12.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 04:49:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A71F381BB
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 12:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5f2d4aaa2fdso29668847b3.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 04:49:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704804568; x=1705409368; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704804569; x=1705409369; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WAkldLmJP+jhXx3OHkr4R9KxZfIleT5fdaW5nG+qqF4=;
-        b=PX6D52mSyuU45wLHoYnD1S/PlGKz58z8/sVCqT4m37pT1cPyJS5c77x4rW0cWnVoXK
-         68oQj4ekHGulEBUpwK3AeDtFEmIMlaMm5fH1AFQj6vAzZK9LWUufsVM95V3jBFNBrOvV
-         51ycaDZQf0traAmSb3rDFB4efqDcZu+Mx2MMxkNc13xN/+VnttRhGJJ7dBD+CvN54WPh
-         b1TIJ28KGOjThZj2s76dBRxQ7WVOtfUrT0L8mBmyGekXUTNhygYmSwd5GJkkgRsZlpyY
-         nPwah0KILx++DrRgQHrdbkWlpU+efZhTDmePTMqqcqcub0B5ONfNknQeYRuYoMbb1CJP
-         87+w==
+        bh=yh8XLdDq/BTPS3YlBc+SIpy7Jy6WuYwqaxjYX/Z9Bbc=;
+        b=G+Wu+ee7n7VuDIFhLgs/KgdUg5g8sYfXW+f0bCXH+LJsyyC7T2AzzpztfSSk4OxA6f
+         PPJ5dKeYQ1iHmYcdaD1YAMOeaDtrtF1AGZvNyqS3Rd7oXVRxeU+3/d5KlGJ4m2v8XlrA
+         VW8fpjt5RhbjXzapW0IPripsAeQmhcpFOtUKYrrt6YsttjnU/yeJ6jshhr8bCseCD1FD
+         DD8hW5lVFqFlqk0dco7wFCR7fak5Ku8F2vXt6eviqUropYKcpPxsF0rRxh5579Z09E/k
+         Vomzf8E8+N+i1vZLMGW39UgwfOtbSpUqzY9gm8jSIZgjXiKcc+E61STJaKZYUmeT1Fcz
+         HW8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704804568; x=1705409368;
+        d=1e100.net; s=20230601; t=1704804569; x=1705409369;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WAkldLmJP+jhXx3OHkr4R9KxZfIleT5fdaW5nG+qqF4=;
-        b=S9TBBbGpT8EuLJuaoB/eKtr7WtHjwRd8lmGuxE+8kVrgpRqDYvZkws8W12NMhvTP5u
-         GvyoXPgKYTJpzY4eflS29qZlzYDxn2AZoDq7ltIkh8JXPrZw4060j+XiaAqc+O2fl2mv
-         n0LRa7l2jcB/bcEtTOdiYecAxt0GDLJzTZc5AKCQQgI/N2r8kkYZ4zHWWBrnRApquCIk
-         bUFb8Ez7OwhjUZ4f9gRT9AqdNtv5Uw1+hAtcQNalBD0wAJnGwWgWCJp76yuoZOc6VTvf
-         T0X3GiVtV7xCe91+N9HaM0m0h5beBTgTYU0mR+dn8QkgyUsxqN+QGxYXI5TNV8LNTGY0
-         VQ9Q==
-X-Gm-Message-State: AOJu0YzUJ5KDeHodYUsns3HwX1r/inRpRdx3MSPo+DDiAwUfXA9gsH/1
-	Vce+86V+SOe53oNWgKf7o9OYvbvXqHFNFo+fu/0=
-X-Google-Smtp-Source: AGHT+IE3N/leCg8yTcjdIECXgC2zw+euyZgzMb7vc2vew8/fBlyIeuws52TdgchHdSdaiGBc0BBOxvuWPXLk3CfUbxg=
-X-Received: by 2002:a05:6a20:61d:b0:199:99b2:f072 with SMTP id
- 29-20020a056a20061d00b0019999b2f072mr1924936pzl.20.1704804568204; Tue, 09 Jan
- 2024 04:49:28 -0800 (PST)
+        bh=yh8XLdDq/BTPS3YlBc+SIpy7Jy6WuYwqaxjYX/Z9Bbc=;
+        b=EFCr1HHWm+CU8IxDEceSMlVhytfjyfhtzSR1dICFxRNc1Zy5S6oNfTNic9ZtCMLFPF
+         XipPQ/aWxk2QURALdhXPqDsOHFYGQ1f7GRtEIi6RPHYqhC1ZqidEzTMkPYxJAhjE/36Q
+         E2V0al7d0OsKU7YDyJ56Go3MN2QxM/AeUdQ7JTklrCuv0DYEyjCHM3X0GTXvl/bDEY42
+         FWGI1dD4AaB12RX5MS/QmCUGMlsTlaupOhgtXSgcU3F1nXQgiATzia3Z6dEEVIsbnjLv
+         627LNLI6o+cfNpDJ0lYD39YE9kHNN4He2uW4f3t7IlJ8KczeeHpbnKClBTO5dggZcP6v
+         d04w==
+X-Gm-Message-State: AOJu0Yw5d86afYXqzt7h+ox5lb6JcGgv85WszyYf8pOLuEsBNWcM0wF9
+	kn12+WJ3PWUGAG0MfEC2KxAtLHJ+0tOy0Mnp2JR1J2Zr1Tg2JQ==
+X-Google-Smtp-Source: AGHT+IFnWJ1a+SxEIOr6msm1T5lg4IqUUZf0DVvKgWcwm+MGscS7q34ZdZTHKFDA+jnDexoYM2n5cTkBIhkROLuy9Mg=
+X-Received: by 2002:a81:4f8f:0:b0:5f5:97c6:3f73 with SMTP id
+ d137-20020a814f8f000000b005f597c63f73mr3873867ywb.53.1704804569096; Tue, 09
+ Jan 2024 04:49:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104142501.81092-1-nbd@nbd.name>
-In-Reply-To: <20240104142501.81092-1-nbd@nbd.name>
-From: Dave Taht <dave.taht@gmail.com>
-Date: Tue, 9 Jan 2024 07:49:16 -0500
-Message-ID: <CAA93jw5w5eQEHVQWsKyQghELUdQVpefQHr2JcjdA5eyTxPr_Ng@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: bridge: do not send arp replies if src and
- target hw addr is the same
-To: Felix Fietkau <nbd@nbd.name>
-Cc: netdev@vger.kernel.org
+References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-5-luizluca@gmail.com>
+ <20240108141103.cxjh44upubhpi34o@skbuf>
+In-Reply-To: <20240108141103.cxjh44upubhpi34o@skbuf>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 9 Jan 2024 13:49:17 +0100
+Message-ID: <CACRpkdbU=jtYd4XgHZnwcgm66S-VOHp_XyfSKFYz0xU78KdPrQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 4/8] net: dsa: realtek: merge common and
+ interface modules into realtek-dsa
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org, alsi@bang-olufsen.dk, 
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	arinc.unal@arinc9.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 4, 2024 at 9:54=E2=80=AFAM Felix Fietkau <nbd@nbd.name> wrote:
->
-> There are broken devices in the wild that handle duplicate IP address
-> detection by sending out ARP requests for the IP that they received from =
-a
-> DHCP server and refuse the address if they get a reply.
-> When proxyarp is enabled, they would go into a loop of requesting an addr=
-ess
-> and then NAKing it again.
->
-> Link: https://github.com/openwrt/openwrt/issues/14309
-> Signed-off-by: Felix Fietkau <nbd@nbd.name>
-> ---
->  net/bridge/br_arp_nd_proxy.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
-> index c7869a286df4..3a2770938374 100644
-> --- a/net/bridge/br_arp_nd_proxy.c
-> +++ b/net/bridge/br_arp_nd_proxy.c
-> @@ -204,7 +204,10 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, s=
-truct net_bridge *br,
->                         if ((p && (p->flags & BR_PROXYARP)) ||
->                             (f->dst && (f->dst->flags & BR_PROXYARP_WIFI)=
-) ||
->                             br_is_neigh_suppress_enabled(f->dst, vid)) {
-> -                               if (!vid)
-> +                               replied =3D true;
-> +                               if (!memcmp(n->ha, sha, dev->addr_len))
-> +                                       replied =3D false;
-> +                               else if (!vid)
->                                         br_arp_send(br, p, skb->dev, sip,=
- tip,
->                                                     sha, n->ha, sha, 0, 0=
-);
->                                 else
-> @@ -212,7 +215,6 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, st=
-ruct net_bridge *br,
->                                                     sha, n->ha, sha,
->                                                     skb->vlan_proto,
->                                                     skb_vlan_tag_get(skb)=
-);
-> -                               replied =3D true;
->                         }
->
->                         /* If we have replied or as long as we know the
-> --
-> 2.43.0
->
->
+On Mon, Jan 8, 2024 at 3:11=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com> =
+wrote:
+> On Fri, Dec 22, 2023 at 09:46:32PM -0300, Luiz Angelo Daros de Luca wrote=
+:
 
-Acked-by: Dave Taht <dave.taht@gmail.com>
+> > +realtek-dsa-objs-y                   :=3D realtek-common.o
+> > +realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_MDIO) +=3D realtek-mdio.o
+> > +realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_SMI) +=3D realtek-smi.o
+> > +realtek-dsa-objs                     :=3D $(realtek-dsa-objs-y)
+> >  obj-$(CONFIG_NET_DSA_REALTEK_RTL8366RB) +=3D rtl8366.o
+> >  rtl8366-objs                                 :=3D rtl8366-core.o rtl83=
+66rb.o
+> >  obj-$(CONFIG_NET_DSA_REALTEK_RTL8365MB) +=3D rtl8365mb.o
+>
+> Does "realtek-dsa-objs-y" have any particular meaning in the Kbuild
+> system, or is it just a random variable name?
 
---=20
-40 years of net history, a couple songs:
-https://www.youtube.com/watch?v=3DD9RGX6QFm5E
-Dave T=C3=A4ht CSO, LibreQos
+It's a Makefile naming convention, meaning this is always enabled.
+
+linux$ git grep 'objs\-y'  | wc -l
+52
+
+Yours,
+Linus Walleij
 
