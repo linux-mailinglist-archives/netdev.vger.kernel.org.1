@@ -1,110 +1,174 @@
-Return-Path: <netdev+bounces-62626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE1868283E4
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 11:22:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEF358283FE
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 11:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACC0B1C243AE
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:22:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 539B0B2385E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF8C3609A;
-	Tue,  9 Jan 2024 10:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC30B364D9;
+	Tue,  9 Jan 2024 10:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="C6+AM1CU"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VhkYgAMh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAEA36AE1;
-	Tue,  9 Jan 2024 10:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3C33540E0196;
-	Tue,  9 Jan 2024 10:21:58 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id n29gUFQZ12Kl; Tue,  9 Jan 2024 10:21:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704795715; bh=xjuqUo1N9un7QD2OXvyR+5fIfImqWhSyt6kzFoGIsSI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C6+AM1CUovm2+HNjxZyX+e4EIKEIps6SduVpK8vGtpGYTqJPSLpmUesTeMBRYtC/l
-	 ncstqX3pXn8srWdzIdVsdEKq8ooWFHdCSaJvj1AQAGPytLN1msAn3y+y1MgL6Djb5m
-	 lBtxP1+/M5nS1WhPCIIc6T23ro5CTW9UHQCw4UwRS+sCzB2HzY9oobVxcH93eT4ZY1
-	 qxlNQqdozYylfVrn9n+ZK6sNc/Yw0iTaKOmklZ/lOA3zc1ywZB0lvPNy8Rz5WOKViX
-	 qeG7s/66rfaIrNP9qJdAk2eIOWYE62hpFVxD0YKsKiq+wpEY7Fnzu59mFxY/JQbI0F
-	 IkV5PllliIvA+/lAhfJgDqXjpbkRSWGjJSz+v4UhymUp4gHatNfK3VmRRLR5xBYJ/b
-	 Gr0UXBYuwxvokdHt7ta0E7Kd0RHMW8VGUe3Nkc9ZgwU4KzpOXS+zfNGsR3HSvC5x+z
-	 TNaIuhT76gqu8sXGV4OzVoA2faEwSbMK12i5lb9BHwZH5If8QWiMSF6V7gcZLZlvOL
-	 nNx7pex887OQ3TJO7erJ3ljOVbRVnAKtWgsdYUBebxYgE9lul/RU7WYc2Nk1YboaXc
-	 aMFr95IfvEdRMlN0UaeDskrX02L0lJlG5QGnS9BTd8Gi6dtM8hPzlY5Q/Sk5OZ2RrG
-	 kJcYCWFSUzab6KPrW90pG7EM=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 68D2740E016C;
-	Tue,  9 Jan 2024 10:21:28 +0000 (UTC)
-Date: Tue, 9 Jan 2024 11:21:21 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
-	tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
-	richardcochran@gmail.com, linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com, zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
-	namit@vmware.com, timothym@vmware.com, akaher@vmware.com,
-	jsipek@vmware.com, dri-devel@lists.freedesktop.org, daniel@ffwll.ch,
-	airlied@gmail.com, tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org,
-	kirill.shutemov@linux.intel.com
-Subject: Re: [PATCH v6 0/7] VMware hypercalls enhancements
-Message-ID: <20240109102121.GAZZ0eIZXV03k52jDX@fat_crate.local>
-References: <20240109084052.58661-1-amakhalov@vmware.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61644364BB
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 10:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2cd33336b32so36156791fa.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 02:27:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1704796019; x=1705400819; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KqCs7xVcoH/Y335TS6+AvlQypI4PD3ESEDIAEMa+9Hk=;
+        b=VhkYgAMhO7m5TnvRWFXeaN2j+exrFFMz8//NhnccrsQpqArRU14OviQGQvA1MwKXnr
+         gqFoaFUaj9/R/5kFHRT9SnSjTWEHKis1grFmiExoXzBomhK7+m3JA9oqUkfR37s+MekT
+         ECIdVndwnRfI3TwD8B17VCb07O2FKUDlDBf2U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704796019; x=1705400819;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KqCs7xVcoH/Y335TS6+AvlQypI4PD3ESEDIAEMa+9Hk=;
+        b=oVa+FN7y7VsRrt5d9RrhKvoXttMAWuqSVuUC57PR4YNJog8+nNpiXUZ/HI3MTEK+mz
+         RN1amVwxQTgqtvgfDvHrU8gNnwiLyf06T3s21G+uC9/tlHCQX5j65eV/RiMzhnDvucir
+         5VJaiDnxF6mdv927DqPN4jW+AVsiDQ8WgW7cARYCW50gWKa5UJ2dxaeipgsYuO2F5dSp
+         B56S9n5aYO3GYziC+ap3mHLaNHyn2e+BmmTiitlwgePhE+XOORw3gDdhL6Xx5zucBhC6
+         yUGF6HDxVDLt6DkzmlgwCsWS3odFl6Vkogo6173N6iqrX8+68o3oEUfKaz7YIpHHOUXh
+         BuFw==
+X-Gm-Message-State: AOJu0YxLzqQ8YtyWtua2JAUP/E8/jrkx0EQB2D/ULazHWsjMq/Gy2KI9
+	6Re+gnpIhuhHtP8NeCdRnaM1V+hkKr3vdJlt1BnEuXpn53L/
+X-Google-Smtp-Source: AGHT+IGQso15KMjS2y4XlmEYUeEkRxHzMQ28n8NcqMI0p1GE1exj8UpVAFn8ANEkOOkgRsxqhphrTsJBnkvvGkjEwO8=
+X-Received: by 2002:a2e:c42:0:b0:2cc:9882:4cb5 with SMTP id
+ o2-20020a2e0c42000000b002cc98824cb5mr2242827ljd.45.1704796019352; Tue, 09 Jan
+ 2024 02:26:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240109084052.58661-1-amakhalov@vmware.com>
+References: <20240104130123.37115-1-brgl@bgdev.pl> <20240104130123.37115-9-brgl@bgdev.pl>
+ <15443d5d-6544-45d0-afeb-b23e6a041ecf@quicinc.com> <87jzoizwz7.fsf@kernel.org>
+ <CAGXv+5FhYY+qyyT8wxY5DggvWPibfM2ypHVKQbsJZ30VkZDAkQ@mail.gmail.com>
+ <87bk9uzum9.fsf@kernel.org> <5904461c-ca3c-4eb1-a44a-876872234545@app.fastmail.com>
+In-Reply-To: <5904461c-ca3c-4eb1-a44a-876872234545@app.fastmail.com>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Tue, 9 Jan 2024 18:26:48 +0800
+Message-ID: <CAGXv+5EHc08sv5+=tnFmoDAQhbD7ZS+XBOyaiSndaiSFhMksAA@mail.gmail.com>
+Subject: Re: [RFC 8/9] PCI/pwrseq: add a pwrseq driver for QCA6390
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, =?UTF-8?Q?Heiko_St=C3=BCbner?= <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, 
+	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-wireless@vger.kernel.org, 
+	Netdev <netdev@vger.kernel.org>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 09, 2024 at 12:40:45AM -0800, Alexey Makhalov wrote:
-> v5->v6 change:
-> - Added ack by Kirill A. Shutemov in patch 7.
+On Tue, Jan 9, 2024 at 6:15=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Tue, Jan 9, 2024, at 11:09, Kalle Valo wrote:
+> > Chen-Yu Tsai <wenst@chromium.org> writes:
+> >> On Tue, Jan 9, 2024 at 5:18=E2=80=AFPM Kalle Valo <kvalo@kernel.org> w=
+rote:
+> >>> Jeff Johnson <quic_jjohnson@quicinc.com> writes:
+> >>>
+> >>> > On 1/4/2024 5:01 AM, Bartosz Golaszewski wrote:
+> >>> >> diff --git a/drivers/pci/pcie/pwrseq/Kconfig b/drivers/pci/pcie/pw=
+rseq/Kconfig
+> >>> >> index 010e31f432c9..f9fe555b8506 100644
+> >>> >> --- a/drivers/pci/pcie/pwrseq/Kconfig
+> >>> >> +++ b/drivers/pci/pcie/pwrseq/Kconfig
+> >>> >> @@ -6,3 +6,14 @@ menuconfig PCIE_PWRSEQ
+> >>> >>      help
+> >>> >>        Say yes here to enable support for PCIe power sequencing
+> >>> >>        drivers.
+> >>> >> +
+> >>> >> +if PCIE_PWRSEQ
+> >>> >> +
+> >>> >> +config PCIE_PWRSEQ_QCA6390
+> >>> >> +    tristate "PCIe Power Sequencing driver for QCA6390"
+> >>> >> +    depends on ARCH_QCOM || COMPILE_TEST
+> >>> >> +    help
+> >>> >> +      Enable support for the PCIe power sequencing driver for the
+> >>> >> +      ath11k module of the QCA6390 WLAN/BT chip.
+> >>> >> +
+> >>> >> +endif
+> >>> >
+> >>> > As I mentioned in the 5/9 patch I'm concerned that the current
+> >>> > definition of PCIE_PWRSEQ and PCIE_PWRSEQ_QCA6390 will effectively =
+hide
+> >>> > the fact that QCA6390 may need additional configuration since the m=
+enu
+> >>> > item will only show up if you have already enabled PCIE_PWRSEQ.
+> >>> > Yes I see that these are set in the defconfig in 9/9 but I'm concer=
+ned
+> >>> > about the more generic case.
+> >>> >
+> >>> > I'm wondering if there should be a separate config QCA6390 within a=
+th11k
+> >>> > which would then select PCIE_PWRSEQ and PCIE_PWRSEQ_QCA6390
+> >>>
+> >>> Or is it possible to provide an optional dependency in Kconfig (I gue=
+ss
+> >>
+> >> imply PCIE_PWRSEQ
+> >> imply PCIE_PWRSEQ_QCA6390
+> >> ?
+> >
+> > Nice, I had forgotten imply altogether. Would 'imply
+> > PCIE_PWRSEQ_QCA6390' in ath11k Kconfig be enough to address Jeff's
+> > concern?
+>
+> Please don't use imply (ever), it doesn't normally do
+> what you want. In this case, the only effect the
+> 'imply' has is to change the default of the PCIE_PWRSEQ_QCA6390
+> option when a defconfig contains QCA6390.
+>
+> If this is indeed what you want, it's still better to do the
+> equivalent expression in PCIE_PWRSEQ_QCA6390 rather than ATH11K:
+>
+> config PCIE_PWRSEQ_QCA6390
+>       tristate "PCIe Power Sequencing driver for QCA6390"
+>       default ATH11K && ARCH_QCOM
 
-Please do not spam. Adding someone's Ack does not mean you have to
-resend the whole thing immediately again.
+PCIE_PWRSEQ_QCA6390 is also guarded by PCIE_PWRSEQ though. That would
+require the default statement to be duplicated to the PCIE_PWRSEQ option
+as well.
 
-While waiting, please read Documentation/process/submitting-patches.rst
+Presumably we'd get a few more power sequencing drivers, and the list of
+default statements for PCIE_PWRSEQ would grow.
 
-and especially:
+If that's acceptable then Arnd's proposal plus duplicating it to
+PCIE_PWRSEQ should work as described.
 
-"Don't get discouraged - or impatient
-------------------------------------
-
-After you have submitted your change, be patient and wait.  Reviewers are
-busy people and may not get to your patch right away.
-
-Once upon a time, patches used to disappear into the void without comment,
-but the development process works more smoothly than that now.  You should
-receive comments within a few weeks (typically 2-3); if that does not
-happen, make sure that you have sent your patches to the right place.
-Wait for a minimum of one week before resubmitting or pinging reviewers
-- possibly longer during busy times like merge windows."
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+ChenYu
 
