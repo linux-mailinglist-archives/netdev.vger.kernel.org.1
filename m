@@ -1,135 +1,120 @@
-Return-Path: <netdev+bounces-62637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DCA4828457
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 11:53:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 752D4828499
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:12:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BE951F250E9
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:53:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 211001F25857
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 11:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32942364CD;
-	Tue,  9 Jan 2024 10:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZR/4A7Be"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4159B36AE7;
+	Tue,  9 Jan 2024 11:12:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F7D364D1
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 10:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-557bbcaa4c0so6670a12.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 02:51:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704797513; x=1705402313; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tiwbQNCGqwvkwVGIyxOERPHojQ0ySbwGZlUkLfThSSk=;
-        b=ZR/4A7Beb1Xwuc6mLAl2arCfpS7gqba0glgeCWkM9306jplN2IXMH6TGdzPJp6brIT
-         AqZNE00Ai3anQIAvweLn34fKnDJnsk5Euq39055ksZz0Eq1nsY9XutvOxOfe+kloefbd
-         jTTCATFkXjn+oCrrZ2xnzaOHwcoWaIsVbcULKT5rIHvIObtLBBvBTNXI6jlvCteAQ/B9
-         SMGdlEpuNkjPmfkughJb55MlDAZGBXIqJXSoQdecVOoQ4eTsyOhKhGWO1HtsZP75aPK2
-         Tq1qXbob03p9pkX9gO6qp1AXPhJdUgxVp+IgqJrYbY18KAb/9o3Mdc5cR8fY5tMDleqJ
-         93ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704797513; x=1705402313;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tiwbQNCGqwvkwVGIyxOERPHojQ0ySbwGZlUkLfThSSk=;
-        b=geUCRlpkyWKZtJdH+Tn6cktPIYKLUeFJdyVSSnyKGqmp9Oe0jdlfoRIdB0DU89uhGq
-         io+ZL2XS6ll+IydWxaKBKWobU0AWDRH1YdjLEWtUqp01CBM8Z+9k8SNMEQ2e5Nv9F2RL
-         kCyflQqkPzqh0OsHYkbaLT2hkSBfDJ5K+HZ2Y6vHGszRqvJA8q3VN6Ss27+b1cb+TkNd
-         8FuFL3Ox42n8eYZMkL6q6SEUuzkPLlJLy7qjrX9JARHabeZbA0ekaE0u3940fAYBGmYF
-         K3KRyIx4pzYOzPBfvaWkFm8J+FldKv6g3CTxJXykMZvr6AQ4veZhz8qK1zFLLWCEFq4U
-         8hvw==
-X-Gm-Message-State: AOJu0Yx1lA5GS/njpLlcZPNFXpOXoCDz3kCz8TDPkvQu+lsVS23ZGdNZ
-	/27gxbj2ye8glkz/dnDCAze3Gx9u2ENoLgfvw9tQ061zyZju
-X-Google-Smtp-Source: AGHT+IEfdAEQsKgMz9EBx9oYhy6URxgl9oe/+rXcuKg7ikGBOGRnh+CBkwfsyFrh8IeIsRiIA/1ZvT+fjIyzaaacPi0=
-X-Received: by 2002:a50:cd45:0:b0:553:9d94:9f6a with SMTP id
- d5-20020a50cd45000000b005539d949f6amr58420edj.7.1704797512617; Tue, 09 Jan
- 2024 02:51:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBB337159;
+	Tue,  9 Jan 2024 11:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rNA20-0000Mw-VC; Tue, 09 Jan 2024 12:12:28 +0100
+Date: Tue, 9 Jan 2024 12:12:28 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+Cc: Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel@openvz.org
+Subject: Re: [PATCH] neighbour: purge nf_bridged skb from foreign device neigh
+Message-ID: <20240109111228.GA7664@breakpoint.cc>
+References: <20240108085232.95437-1-ptikhomirov@virtuozzo.com>
+ <20240108111504.GA23297@breakpoint.cc>
+ <a84b2797-2008-45d6-9ca3-c72666d3c419@virtuozzo.com>
+ <07490c75-86c3-4488-8adb-7740b14feb30@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108231349.9919-1-jmaxwell37@gmail.com> <72f54aa95c3fad328b00b8196ca7f878c5d0a627.camel@redhat.com>
- <CANn89iLn0VK2kfq2m56kcaLGE6U-=p5eOr8=EFUqTr5bkONDiA@mail.gmail.com>
-In-Reply-To: <CANn89iLn0VK2kfq2m56kcaLGE6U-=p5eOr8=EFUqTr5bkONDiA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Jan 2024 11:51:41 +0100
-Message-ID: <CANn89iLrU57dmE2ezdFPwLTVgo2kcVFcGGSQrbON-o7s2Tfy9g@mail.gmail.com>
-Subject: Re: [net-next] tcp: Avoid sending an erroneous RST due to RCU race
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jon Maxwell <jmaxwell37@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
-	dsahern@kernel.org, netdev@vger.kernel.org, 
-	Davide Caratti <dcaratti@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07490c75-86c3-4488-8adb-7740b14feb30@virtuozzo.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Jan 9, 2024 at 11:36=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Jan 9, 2024 at 8:24=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
-> >
-> > On Tue, 2024-01-09 at 10:13 +1100, Jon Maxwell wrote:
-> > > There are 2 cases where a socket lookup races due to RCU and finds a
-> > > LISTEN socket instead of an ESTABLISHED or a TIME-WAIT socket. As the=
- ACK flag
-> > > is set this will generate an erroneous RST.
-> > >
-> > > There are 2 scenarios, one where 2 ACKs (one for the 3 way handshake =
-and
-> > > another with the same sequence number carrying data) are sent with a =
-very
-> > > small time interval between them. In this case the 2 ACKs can race wh=
-ile being
-> > > processed on different CPUs and the latter may find the LISTEN socket=
- instead
-> > > of the ESTABLISHED socket. That will make the one end of the TCP conn=
-ection
-> > > out of sync with the other and cause a break in communications. The o=
-ther
-> > > scenario is a "FIN ACK" racing with an ACK which may also find the LI=
-STEN
-> > > socket instead of the TIME_WAIT socket. Instead of getting ignored th=
-at
-> > > generates an invalid RST.
-> > >
-> > > Instead of the next connection attempt succeeding. The client then ge=
-ts an
-> > > ECONNREFUSED error on the next connection attempt when it finds a soc=
-ket in
-> > > the FIN_WAIT_2 state as discussed here:
-> > >
-> > > https://lore.kernel.org/netdev/20230606064306.9192-1-duanmuquan@baidu=
-.com/
-> > >
-> > > Modeled on Erics idea, introduce __inet_lookup_skb_locked() and
-> > > __inet6_lookup_skb_locked()  to fix this by doing a locked lookup onl=
-y for
-> > > these rare cases to avoid finding the LISTEN socket.
-> >
-> > I think Eric's idea was to keep the bucket lock held after such lookup,
-> > to avoid possibly re-acquiring it for time-wait sockets.
->
-> Yes, I think a real fix needs more work/refactoring, I can work on
-> this in the next cycle.
+Pavel Tikhomirov <ptikhomirov@virtuozzo.com> wrote:
+> index f980edfdd2783..105fbdb029261 100644
+> --- a/include/linux/netfilter_bridge.h
+> +++ b/include/linux/netfilter_bridge.h
+> @@ -56,11 +56,15 @@ static inline int nf_bridge_get_physoutif(const struct
+> sk_buff *skb)
+>  }
+> 
+>  static inline struct net_device *
+> -nf_bridge_get_physindev(const struct sk_buff *skb)
+> +nf_bridge_get_physindev_rcu(const struct sk_buff *skb)
+>  {
+>         const struct nf_bridge_info *nf_bridge = nf_bridge_info_get(skb);
+> +       struct net_device *dev;
+> 
+> -       return nf_bridge ? nf_bridge->physindev : NULL;
+> +       if (!nf_bridge || !skb->dev)
+> +               return 0;
+> +
+> +       return dev_get_by_index_rcu(skb->dev->net, nf_bridge->physindev_if);
 
-BTW,  a way to work around the issue on a network device without RSS
-is to enable RPS
-to make sure all packets of a flow are handled by the same cpu.
+You could use dev_net(skb->dev), yes.
 
-For instance for loopback device
+Or create a preparation patch that does:
 
-cat /sys/class/net/lo/queues/rx-0/rps_cpus|tr '[0-9a-f]' f
->/sys/class/net/lo/queues/rx-0/rps_cpus
+-nf_bridge_get_physindev(const struct sk_buff *skb)
++nf_bridge_get_physindev(const struct sk_buff *skb, struct net *net)
+
+(all callers have a struct net available).
+
+No need to rename the function, see below.
+
+> -       br_indev = nf_bridge_get_physindev(oldskb);
+> +       rcu_read_lock_bh();
+> +       br_indev = nf_bridge_get_physindev_rcu(oldskb);
+
+No need for rcu read lock, all netfilter hooks run inside
+rcu_read_lock().
+
+> Does it sound good?
+
+Yes, seems ok to me.
+
+> Or maybe instead we can have extra physindev_if field in addition to
+> existing physindev to only do dev_get_by_index_rcu inside
+> br_nf_pre_routing_finish_bridge_slow to doublecheck the ->physindev link?
+> 
+> Sorry in advance if I'm missing anything obvious.
+
+Alternative would be to add a 'br_nf_unreg_serno' that gets incremented
+from brnf_device_event(), then store that in nf_bridge_info struct and
+compare to current value before net_device deref. If not equal, toss skb.
+
+Problem is that we'd need some indirection to retrieve the current
+value, otherwise places like nfnetlink_log() gain a module dependency on
+br_netfilter :-(
+
+We'd likely need
+const atomic_t *br_nf_unreg_serno __read_mostly;
+EXPORT_SYMBOL_GPL(br_nf_unreg_serno);
+
+in net/netfilter/core.c for this, then set/clear the
+pointer from br_netfilter_hooks.c.
+
+I can't say/don't know which of the two options is better/worse.
+
+s/struct net_device */int// has the benefit of shrinking nf_bridge_info,
+so I'd try that first.
 
