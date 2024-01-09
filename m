@@ -1,214 +1,134 @@
-Return-Path: <netdev+bounces-62724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5B49828C54
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 19:18:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12340828C65
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 19:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B87C1F27389
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 18:18:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 224AC1C2580A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 18:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49583BB51;
-	Tue,  9 Jan 2024 18:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0D83C08A;
+	Tue,  9 Jan 2024 18:20:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07D43C06B
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 18:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96B93B7AC
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 18:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bca27fcc4eso230289739f.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 10:17:35 -0800 (PST)
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7bbc2d52f98so181758239f.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 10:20:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704824255; x=1705429055;
+        d=1e100.net; s=20230601; t=1704824430; x=1705429230;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=e//zebCdP1aM3VgfN4zB3VLlfO5wvvl+ARsfab1Q5tg=;
-        b=b1aIKPDfX30LC+Ph/lffmnjNUZ8+JX1iY0jWjK1fhTnksUetTBwKB89R95SFfivRmz
-         13vzPJ3FagWhczUlWotR5Zkm0A9uyh0oVfEbjK+5CZrQGkz2wOV5H3WCM6Zf3xgU03Ik
-         Q6GMxJx18V4Ch5OM+uEY1CGOvMa1dT30H+otN9lev957fdcEAo7rgZqTbcSDWYZgMtLM
-         43wx12PbPKBoG5mrSAbG1ibWXhmqq36zXxJP8vZlgOnwLHu/p6UsLxH6Uod2XFdrPYw5
-         mxXEl+DXEGMk2oHZIWsj9S9PhdHjIuZl0vrt2RU58R3LKce+O1M6x9Bg3GAFQZMu531d
-         WHvA==
-X-Gm-Message-State: AOJu0Ywx/uvyVixGy4XOoqGx9GCFaJbkk9EvC0CCVCABMd72LuD6448l
-	I44Qbk7iqtazWNP96LrXEFXteiHHkvlpF/BCy+5SA5+lmq9Q
-X-Google-Smtp-Source: AGHT+IFh57uvnCIoNa9lSgi848SBeP5GuHiYoTjGQTVlyCNAeuXRyXYcMe8feyUFtPSdh8lRgyBpHdXv4GGnzL/o3I/IVrQybraR
+        bh=8Tr1aIIWsVt//WG/Z51hhDuQCyR30G6igbYh+x2XRxA=;
+        b=BcXOk5I7gP2DEP92uAyFhH4XCv0tO4VSWRXamqi3BiUQSJ2TbvLeFWwC6ELqfUPBtt
+         WHzJf7Axm0x7jDl4clz1RVN0HLL6qq4ZzvPIWEII+ZtV+7sV3kySuoweb2B55GMT+eMv
+         vNuB0c1X9AgEzybfhZWrqByaw9/0+77iKp/RfdllHeOFzW0n5jEwa2Kj2fRAlCL9JdAE
+         x8Q2J8cNBbrD+Kn1V76zQzIeVnAvBQBqTKTbaz+KUsfYjKkaxTAx/dwdGLLE++uJ4S9T
+         VGrBKLkxUv7PVEwyZ0EBs1XD+PyFoNMPQ9dfZejgfaUBFTsuErKO41qrgz4N6anoH6te
+         SU2A==
+X-Gm-Message-State: AOJu0YzeOGlu03X06JG4LQ3OnlRqc/Ct3Y8dDBOsh35lvePnvxK0KZc0
+	0+OewfAF6JIUnoHcmB3x2hpvtFPIlYQr39iNjJxPjePO2We0
+X-Google-Smtp-Source: AGHT+IHqa0NlqwbwjIezxAumM3nzDK1GGtqOkAJEHlw/qe/PfUY6XEpcX7Iv2ZpPENr15hQdlhVfIJv+q5Fpt10KBXmqBRZBGMwV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:152b:b0:360:620a:24eb with SMTP id
- i11-20020a056e02152b00b00360620a24ebmr803448ilu.4.1704824254839; Tue, 09 Jan
- 2024 10:17:34 -0800 (PST)
-Date: Tue, 09 Jan 2024 10:17:34 -0800
+X-Received: by 2002:a05:6638:3e06:b0:46e:3b5e:70d0 with SMTP id
+ co6-20020a0566383e0600b0046e3b5e70d0mr81788jab.3.1704824430144; Tue, 09 Jan
+ 2024 10:20:30 -0800 (PST)
+Date: Tue, 09 Jan 2024 10:20:30 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001d4255060e87545c@google.com>
-Subject: [syzbot] [net?] KASAN: slab-out-of-bounds Read in dsa_user_changeupper
-From: syzbot <syzbot+d81bcd883824180500c8@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, lixiaoyan@google.com, netdev@vger.kernel.org, 
-	olteanv@gmail.com, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Message-ID: <000000000000903473060e875e9e@google.com>
+Subject: [syzbot] [hams?] KMSAN: uninit-value in nr_route_frame
+From: syzbot <syzbot+f770ce3566e60e5573ac@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, ralf@linux-mips.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    9fb3dc1e9af2 Merge branch 'phy-listing-link_topology-track..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=11269ba5e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4e9ca8e3c104d2a
-dashboard link: https://syzkaller.appspot.com/bug?extid=d81bcd883824180500c8
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1267ba7ee80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=151ed731e80000
+HEAD commit:    f5837722ffec Merge tag 'mm-hotfixes-stable-2023-12-27-15-0..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11b07dcee80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d4130d4bb32c48ef
+dashboard link: https://syzkaller.appspot.com/bug?extid=f770ce3566e60e5573ac
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/08a6d58357f2/disk-9fb3dc1e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/390509d5ee5f/vmlinux-9fb3dc1e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d7efcbce1f12/bzImage-9fb3dc1e.xz
-
-The issue was bisected to:
-
-commit 43a71cd66b9c0a4af3d15d8644359fde35bdbed0
-Author: Coco Li <lixiaoyan@google.com>
-Date:   Mon Dec 4 20:12:30 2023 +0000
-
-    net-device: reorganize net_device fast path variables
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17832409e80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=14432409e80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10432409e80000
+disk image: https://storage.googleapis.com/syzbot-assets/d07cf63b077e/disk-f5837722.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/444db9c07b7a/vmlinux-f5837722.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7ed4733987d7/bzImage-f5837722.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d81bcd883824180500c8@syzkaller.appspotmail.com
-Fixes: 43a71cd66b9c ("net-device: reorganize net_device fast path variables")
+Reported-by: syzbot+f770ce3566e60e5573ac@syzkaller.appspotmail.com
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in dsa_user_to_port net/dsa/user.h:58 [inline]
-BUG: KASAN: slab-out-of-bounds in dsa_user_changeupper+0x61a/0x6e0 net/dsa/user.c:2809
-Read of size 8 at addr ffff888015ebecf0 by task syz-executor278/5066
-
-CPU: 1 PID: 5066 Comm: syz-executor278 Not tainted 6.7.0-rc6-syzkaller-01740-g9fb3dc1e9af2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:364 [inline]
- print_report+0xc4/0x620 mm/kasan/report.c:475
- kasan_report+0xda/0x110 mm/kasan/report.c:588
- dsa_user_to_port net/dsa/user.h:58 [inline]
- dsa_user_changeupper+0x61a/0x6e0 net/dsa/user.c:2809
- dsa_user_netdevice_event+0xd04/0x3480 net/dsa/user.c:3345
- notifier_call_chain+0xb6/0x3b0 kernel/notifier.c:93
- call_netdevice_notifiers_info+0xbe/0x130 net/core/dev.c:1967
- __netdev_upper_dev_link+0x439/0x850 net/core/dev.c:7760
- netdev_upper_dev_link+0x92/0xc0 net/core/dev.c:7801
- register_vlan_dev+0x396/0x940 net/8021q/vlan.c:183
- register_vlan_device net/8021q/vlan.c:277 [inline]
- vlan_ioctl_handler+0x8dd/0xa70 net/8021q/vlan.c:621
- sock_ioctl+0x4bd/0x6b0 net/socket.c:1303
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:871 [inline]
- __se_sys_ioctl fs/ioctl.c:857 [inline]
- __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
+=====================================================
+BUG: KMSAN: uninit-value in nr_route_frame+0x4a9/0xfc0 net/netrom/nr_route.c:787
+ nr_route_frame+0x4a9/0xfc0 net/netrom/nr_route.c:787
+ nr_xmit+0x5a/0x1c0 net/netrom/nr_dev.c:144
+ __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+ xmit_one net/core/dev.c:3548 [inline]
+ dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
+ __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
+ dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+ raw_sendmsg+0x654/0xc10 net/ieee802154/socket.c:299
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f0a94e172e9
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffeda224968 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007ffeda224b38 RCX: 00007f0a94e172e9
-RDX: 0000000020000380 RSI: 0000000000008982 RDI: 0000000000000003
-RBP: 00007f0a94e8a610 R08: 0000000000000000 R09: 00007ffeda224b38
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffeda224b28 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
 
-Allocated by task 1:
- kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
- kasan_kmalloc include/linux/kasan.h:198 [inline]
- __do_kmalloc_node mm/slab_common.c:1007 [inline]
- __kmalloc_node+0x5c/0x90 mm/slab_common.c:1014
- kmalloc_node include/linux/slab.h:620 [inline]
- kvmalloc_node+0x99/0x1a0 mm/util.c:617
- kvmalloc include/linux/slab.h:738 [inline]
- kvzalloc include/linux/slab.h:746 [inline]
- alloc_netdev_mqs+0xb3/0x1360 net/core/dev.c:10827
- dummy_init_one drivers/net/dummy.c:158 [inline]
- dummy_init_module+0xcf/0x1b0 drivers/net/dummy.c:184
- do_one_initcall+0x11c/0x650 init/main.c:1236
- do_initcall_level init/main.c:1298 [inline]
- do_initcalls init/main.c:1314 [inline]
- do_basic_setup init/main.c:1333 [inline]
- kernel_init_freeable+0x687/0xc10 init/main.c:1551
- kernel_init+0x1c/0x2a0 init/main.c:1441
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+Uninit was created at:
+ slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6334
+ sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2780
+ sock_alloc_send_skb include/net/sock.h:1884 [inline]
+ raw_sendmsg+0x36d/0xc10 net/ieee802154/socket.c:282
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-The buggy address belongs to the object at ffff888015ebe000
- which belongs to the cache kmalloc-cg-4k of size 4096
-The buggy address is located 3312 bytes inside of
- allocated 3319-byte region [ffff888015ebe000, ffff888015ebecf7)
-
-The buggy address belongs to the physical page:
-page:ffffea000057ae00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x15eb8
-head:ffffea000057ae00 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000840(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000000840 ffff88801304f500 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000000040004 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd60c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_RETRY_MAYFAIL|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid 1 (swapper/0), ts 4608693968, free_ts 0
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x2d0/0x350 mm/page_alloc.c:1544
- prep_new_page mm/page_alloc.c:1551 [inline]
- get_page_from_freelist+0xa28/0x3730 mm/page_alloc.c:3319
- __alloc_pages+0x22e/0x2420 mm/page_alloc.c:4575
- alloc_pages_mpol+0x258/0x5f0 mm/mempolicy.c:2133
- alloc_slab_page mm/slub.c:1870 [inline]
- allocate_slab mm/slub.c:2017 [inline]
- new_slab+0x283/0x3c0 mm/slub.c:2070
- ___slab_alloc+0x979/0x1500 mm/slub.c:3223
- __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3322
- __slab_alloc_node mm/slub.c:3375 [inline]
- slab_alloc_node mm/slub.c:3468 [inline]
- __kmem_cache_alloc_node+0x131/0x310 mm/slub.c:3517
- __do_kmalloc_node mm/slab_common.c:1006 [inline]
- __kmalloc_node+0x4c/0x90 mm/slab_common.c:1014
- kmalloc_node include/linux/slab.h:620 [inline]
- kvmalloc_node+0x99/0x1a0 mm/util.c:617
- kvmalloc include/linux/slab.h:738 [inline]
- kvzalloc include/linux/slab.h:746 [inline]
- alloc_netdev_mqs+0xb3/0x1360 net/core/dev.c:10827
- loopback_net_init+0x38/0x170 drivers/net/loopback.c:214
- ops_init+0xb9/0x650 net/core/net_namespace.c:136
- __register_pernet_operations net/core/net_namespace.c:1214 [inline]
- register_pernet_operations+0x34b/0x820 net/core/net_namespace.c:1283
- register_pernet_device+0x29/0x70 net/core/net_namespace.c:1370
- net_dev_init+0x7b1/0xaa0 net/core/dev.c:11747
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff888015ebeb80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff888015ebec00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff888015ebec80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07 fc
-                                                             ^
- ffff888015ebed00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888015ebed80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+CPU: 1 PID: 9891 Comm: syz-executor.5 Not tainted 6.7.0-rc7-syzkaller-00016-gf5837722ffec #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+=====================================================
 
 
 ---
@@ -218,14 +138,9 @@ syzbot engineers can be reached at syzkaller@googlegroups.com.
 
 syzbot will keep track of this issue. See:
 https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
 If you want to overwrite report's subsystems, reply with:
 #syz set subsystems: new-subsystem
