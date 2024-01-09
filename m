@@ -1,370 +1,435 @@
-Return-Path: <netdev+bounces-62750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61238828EF5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 22:36:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED00C828F11
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 22:42:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1237B1C21063
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 21:36:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03CA11C241A2
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 21:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6033C3DB84;
-	Tue,  9 Jan 2024 21:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF1941229;
+	Tue,  9 Jan 2024 21:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="LTx8FU8F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LSL6G2O6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C474E39AC6
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 21:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 409Bvus1018296;
-	Tue, 9 Jan 2024 13:36:11 -0800
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2100.outbound.protection.outlook.com [104.47.58.100])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vh5qt24sr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jan 2024 13:36:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=evFIUbHl16Xvj+xKOY6lm4MKWgDGR2bOSuBFyCvs84B2C83al+xtIZCK9x3fE4Eb2QW8qBqO50B9mv/0yT0mvBJBtKckFX8W0QAs1iqULK5HnviOD+IUT8nIMu33CQ1OGIBuOW9A7+TmX+55hsuE4gLkJMNA4A4CfqN4/MY43hiFl0ubLnY4tPM0gUxS+3vXG478JBOrvUQhlEVNo2r6P9p3iU2oepCEvBAjbtFbj7E2qOho7qq3MU0y572uxkcjbJ8VYrJTrL4AP6Je+aGs+Wxs7JdnLq/1TBez777oOphYBStXFiSRnKqmZXzWUB4Y2S4l5+tiQDJhAwAhcxgqDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6zccucESRwHmb5w6YPj5bXvFx3aKIRinrRkNsyBIbBY=;
- b=C3liIRWxCeE16YTlb/FxU0W3Iv9dFgODFem0X2SKrPdVoGAt4mHmWvHDm+zwGDDz4MJiSnmlNjDE7rl3m4qSP27S3YlFVeEktErYf2YUiFKRk4JswGQXR5PmnMla0IQywnFb/yUFHYAWG753AITBzMWmrJMDEYVuJ8xEBH76oVRFESFOTQ9WD1RYHO2NCXyh+WZlexb0wVmWxQSr0wsBPcbFmrvbgxeVUGvf5ArONjWOvU8fjQVf7k1ojuL6H0yWQmRwJmPFXz5ODkEdF0Z8iYsmf2MKp2PFLLq2+i1Y0/yDMQQbpgIbzraQxbN/Z5ZSjpITAeDvU7Aaxx3L12kwpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55ECD40C06;
+	Tue,  9 Jan 2024 21:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ccabf5a4beso38561731fa.2;
+        Tue, 09 Jan 2024 13:40:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6zccucESRwHmb5w6YPj5bXvFx3aKIRinrRkNsyBIbBY=;
- b=LTx8FU8Fmh5pkcEWVtAG9XjI7kj6mCsqacTV2rPonj1Y97hIG+CvKWragrIm2eLaFqtvb1MAwRSQRz7/mL+yY1il9k671Umgj1OCuq1Etm1gkIdBDpi8UqRcUkFGGiUQ1ySprF1xVBDyG+2SoAXJ0f8iI5bB/1dPG3ZHkK1Ikc0=
-Received: from BY3PR18MB4785.namprd18.prod.outlook.com (2603:10b6:a03:3cc::18)
- by LV8PR18MB5605.namprd18.prod.outlook.com (2603:10b6:408:18f::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.17; Tue, 9 Jan
- 2024 21:36:08 +0000
-Received: from BY3PR18MB4785.namprd18.prod.outlook.com
- ([fe80::f02d:25e3:c3e9:ed3f]) by BY3PR18MB4785.namprd18.prod.outlook.com
- ([fe80::f02d:25e3:c3e9:ed3f%4]) with mapi id 15.20.7181.015; Tue, 9 Jan 2024
- 21:36:08 +0000
-From: Derek Chickles <dchickles@marvell.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        Satananda
- Burla <sburla@marvell.com>,
-        Felix Manlunas <fmanlunas@marvell.com>
-Subject: RE: [PATCH net 4/7] MAINTAINERS: eth: mark Cavium liquidio as an
- Orphan
-Thread-Topic: [PATCH net 4/7] MAINTAINERS: eth: mark Cavium liquidio as an
- Orphan
-Thread-Index: AQHaQ0Pb74i3i6vTpEO06z7ptEw01w==
-Date: Tue, 9 Jan 2024 21:36:08 +0000
-Message-ID: 
- <BY3PR18MB478511496F192231A71F824CAC6A2@BY3PR18MB4785.namprd18.prod.outlook.com>
-References: <20240109164517.3063131-1-kuba@kernel.org>
- <20240109164517.3063131-5-kuba@kernel.org>
-In-Reply-To: <20240109164517.3063131-5-kuba@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-dg-ref: 
- =?us-ascii?Q?PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcZGNoaWNrbGVz?=
- =?us-ascii?Q?XGFwcGRhdGFccm9hbWluZ1wwOWQ4NDliNi0zMmQzLTRhNDAtODVlZS02Yjg0?=
- =?us-ascii?Q?YmEyOWUzNWJcbXNnc1xtc2ctMTg0ZDZkZGItYWYzNy0xMWVlLThjNjUtMDQ3?=
- =?us-ascii?Q?YmNiYmQ1Y2U5XGFtZS10ZXN0XDE4NGQ2ZGRjLWFmMzctMTFlZS04YzY1LTA0?=
- =?us-ascii?Q?N2JjYmJkNWNlOWJvZHkudHh0IiBzej0iNDMyOCIgdD0iMTMzNDkzMDk3Njcy?=
- =?us-ascii?Q?ODgwMDkwIiBoPSJRQmZmWWNFRHBNY1p1S1FQM1RqZnp0dWxyUFk9IiBpZD0i?=
- =?us-ascii?Q?IiBibD0iMCIgYm89IjEiIGNpPSJjQUFBQUVSSFUxUlNSVUZOQ2dVQUFLSVRB?=
- =?us-ascii?Q?QURhTDhMYVEwUGFBWkZ6QWp3T3piR0RrWE1DUEE3TnNZTVdBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBSEFBQUFDVURRQUFCQTRBQUo0RkFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBRUFBUUVCQUFBQXZEQk91Z0NBQVFBQUFBQUFBQUFBQUo0QUFBQmhBR1FB?=
- =?us-ascii?Q?WkFCeUFHVUFjd0J6QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUdNQWRRQnpBSFFBYndCdEFGOEFj?=
- =?us-ascii?Q?QUJsQUhJQWN3QnZBRzRBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNB?=
- =?us-ascii?Q?QUFBQUFDZUFBQUFZd0IxQUhNQWRBQnZBRzBBWHdCd0FHZ0Fid0J1QUdVQWJn?=
- =?us-ascii?Q?QjFBRzBBWWdCbEFISUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCakFI?=
- =?us-ascii?Q?VUFjd0IwQUc4QWJRQmZBSE1BY3dCdUFGOEFaQUJoQUhNQWFBQmZBSFlBTUFB?=
- =?us-ascii?Q?eUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-refone: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFBQUFBQUFBZ0FBQUFBQW5nQUFB?=
- =?us-ascii?Q?R01BZFFCekFIUUFid0J0QUY4QWN3QnpBRzRBWHdCckFHVUFlUUIzQUc4QWNn?=
- =?us-ascii?Q?QmtBSE1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNlQUFBQVl3QjFBSE1BZEFCdkFH?=
- =?us-ascii?Q?MEFYd0J6QUhNQWJnQmZBRzRBYndCa0FHVUFiQUJwQUcwQWFRQjBBR1VBY2dC?=
- =?us-ascii?Q?ZkFIWUFNQUF5QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQUFBQUFB?=
- =?us-ascii?Q?QUFBQUlBQUFBQUFKNEFBQUJqQUhVQWN3QjBBRzhBYlFCZkFITUFjd0J1QUY4?=
- =?us-ascii?Q?QWN3QndBR0VBWXdCbEFGOEFkZ0F3QURJQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFnQUFBQUFBbmdB?=
- =?us-ascii?Q?QUFHUUFiQUJ3QUY4QWN3QnJBSGtBY0FCbEFGOEFZd0JvQUdFQWRBQmZBRzBB?=
- =?us-ascii?Q?WlFCekFITUFZUUJuQUdVQVh3QjJBREFBTWdBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VBQUFBWkFCc0FIQUFYd0J6?=
- =?us-ascii?Q?QUd3QVlRQmpBR3NBWHdCakFHZ0FZUUIwQUY4QWJRQmxBSE1BY3dCaEFHY0Fa?=
- =?us-ascii?Q?UUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-reftwo: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUJBQUFBQUFBQUFBSUFBQUFBQUo0QUFBQmtBR3dBY0FC?=
- =?us-ascii?Q?ZkFIUUFaUUJoQUcwQWN3QmZBRzhBYmdCbEFHUUFjZ0JwQUhZQVpRQmZBR1lB?=
- =?us-ascii?Q?YVFCc0FHVUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFF?=
- =?us-ascii?Q?QUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUdVQWJRQmhBR2tBYkFCZkFHRUFaQUJr?=
- =?us-ascii?Q?QUhJQVpRQnpBSE1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUdRQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNBQUFB?=
- =?us-ascii?Q?QUFDZUFBQUFiUUJoQUhJQWRnQmxBR3dBWHdCd0FISUFid0JxQUdVQVl3QjBB?=
- =?us-ascii?Q?RjhBYmdCaEFHMEFaUUJ6QUY4QVl3QnZBRzRBWmdCcEFHUUFaUUJ1QUhRQWFR?=
- =?us-ascii?Q?QmhBR3dBWHdCaEFHd0Fid0J1QUdVQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCdEFHRUFj?=
- =?us-ascii?Q?Z0IyQUdVQWJBQmZBSEFBY2dCdkFHb0FaUUJqQUhRQVh3QnVBR0VBYlFCbEFI?=
- =?us-ascii?Q?TUFYd0J5QUdVQWN3QjBBSElBYVFCakFIUUFaUUJrQUY4QVlRQnNBRzhBYmdC?=
- =?us-ascii?Q?bEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUVBQUFBQUFBQUFBZ0FBQUFBQW5nQUFBRzBBWVFCeUFIWUFaUUJzQUY4QWNB?=
- =?us-ascii?Q?QnlBRzhBYWdCbEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFISUFaUUJ6QUhR?=
- =?us-ascii?Q?QWNnQnBBR01BZEFCbEFHUUFYd0JvQUdVQWVBQmpBRzhBWkFCbEFITUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FB?=
- =?us-ascii?Q?QUFBQUNlQUFBQWJRQmhBSElBZGdCbEFHd0FiQUJmQUdFQWNnQnRBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-rorf: true
-x-dg-refthree: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQUFBQUFBQUFB?=
- =?us-ascii?Q?QUlBQUFBQUFKNEFBQUJ0QUdFQWNnQjJBR1VBYkFCc0FGOEFad0J2QUc4QVp3?=
- =?us-ascii?Q?QnNBR1VBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFnQUFBQUFBbmdBQUFH?=
- =?us-ascii?Q?MEFZUUJ5QUhZQVpRQnNBR3dBWHdCd0FISUFid0JxQUdVQVl3QjBBRjhBYmdC?=
- =?us-ascii?Q?aEFHMEFaUUJ6QUY4QVl3QnZBRzRBWmdCcEFHUUFaUUJ1QUhRQWFRQmhBR3dB?=
- =?us-ascii?Q?WHdCdEFHRUFjZ0IyQUdVQWJBQnNBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VBQUFBYlFCaEFISUFkZ0JsQUd3?=
- =?us-ascii?Q?QWJBQmZBSEFBY2dCdkFHb0FaUUJqQUhRQVh3QnVBR0VBYlFCbEFITUFYd0Jq?=
- =?us-ascii?Q?QUc4QWJnQm1BR2tBWkFCbEFHNEFkQUJwQUdFQWJBQmZBRzBBWVFCeUFIWUFa?=
- =?us-ascii?Q?UUJzQUd3QVh3QnZBSElBWHdCaEFISUFiUUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJBQUFBQUFB?=
- =?us-ascii?Q?QUFBSUFBQUFBQUo0QUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QWNBQnlBRzhB?=
- =?us-ascii?Q?YWdCbEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFHTUFid0J1QUdZQWFRQmtB?=
- =?us-ascii?Q?R1VBYmdCMEFHa0FZUUJzQUY4QWJRQmhBSElBZGdCbEFHd0FiQUJmQUc4QWNn?=
- =?us-ascii?Q?QmZBR2NBYndCdkFHY0FiQUJsQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FB?=
- =?us-ascii?Q?QUcwQVlRQnlBSFlBWlFCc0FHd0FYd0J3QUhJQWJ3QnFBR1VBWXdCMEFGOEFi?=
- =?us-ascii?Q?Z0JoQUcwQVpRQnpBRjhBY2dCbEFITUFkQUJ5QUdrQVl3QjBBR1VBWkFCZkFH?=
- =?us-ascii?Q?MEFZUUJ5QUhZQVpRQnNBR3dBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
-x-dg-reffour: 
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNBQUFBQUFD?=
- =?us-ascii?Q?ZUFBQUFiUUJoQUhJQWRnQmxBR3dBYkFCZkFIQUFjZ0J2QUdvQVpRQmpBSFFB?=
- =?us-ascii?Q?WHdCdUFHRUFiUUJsQUhNQVh3QnlBR1VBY3dCMEFISUFhUUJqQUhRQVpRQmtB?=
- =?us-ascii?Q?RjhBYlFCaEFISUFkZ0JsQUd3QWJBQmZBRzhBY2dCZkFHRUFjZ0J0QUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCdEFHRUFjZ0Iy?=
- =?us-ascii?Q?QUdVQWJBQnNBRjhBZHdCdkFISUFaQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFBQUFBQUVB?=
- =?us-ascii?Q?QUFBQUFBQUFBZ0FBQUFBQW5nVUFBQUFBQUFBSUFBQUFBQUFBQUFnQUFBQUFB?=
- =?us-ascii?Q?QUFBQ0FBQUFBQUFBQUIrQlFBQUZnQUFBQmdBQUFBQUFBQUFZUUJrQUdRQWNn?=
- =?us-ascii?Q?QmxBSE1BY3dBQUFDUUFBQUFBQUFBQVl3QjFBSE1BZEFCdkFHMEFYd0J3QUdV?=
- =?us-ascii?Q?QWNnQnpBRzhBYmdBQUFDNEFBQUFBQUFBQVl3QjFBSE1BZEFCdkFHMEFYd0J3?=
- =?us-ascii?Q?QUdnQWJ3QnVBR1VBYmdCMUFHMEFZZ0JsQUhJQUFBQXdBQUFBQUFBQUFHTUFk?=
- =?us-ascii?Q?UUJ6QUhRQWJ3QnRBRjhBY3dCekFHNEFYd0JrQUdFQWN3Qm9BRjhBZGdBd0FE?=
- =?us-ascii?Q?SUFBQUF3QUFBQUFBQUFBR01BZFFCekFIUUFid0J0QUY4QWN3QnpBRzRBWHdC?=
- =?us-ascii?Q?ckFHVUFlUUIzQUc4QWNnQmtBSE1BQUFBK0FBQUFBQUFBQUdNQWRRQnpBSFFB?=
- =?us-ascii?Q?YndCdEFGOEFjd0J6QUc0QVh3QnVBRzhBWkFCbEFHd0FhUUJ0QUdrQWRBQmxB?=
- =?us-ascii?Q?SElBWHdCMkFEQUFNZ0FBQURJQUFBQUFBQUFBWXdCMUFITUFkQUJ2QUcwQVh3?=
- =?us-ascii?Q?QnpBSE1BYmdCZkFITUFjQUJoQUdNQVpRQmZBSFlBTUFBeUFBQUFQZ0FBQUFB?=
- =?us-ascii?Q?QUFBQmtBR3dBY0FCZkFITUFhd0I1QUhBQVpRQmZBR01BYUFCaEFIUUFYd0J0?=
- =?us-ascii?Q?QUdVQWN3QnpBR0VBWndCbEFGOEFkZ0F3QURJQUFBQTJBQUFBQUFBQUFHUUFi?=
- =?us-ascii?Q?QUJ3QUY4QWN3QnNBR0VBWXdCckFGOEFZd0JvQUdFQWRBQmZBRzBBWlFCekFI?=
- =?us-ascii?Q?TUFZUUJuQUdVQUFBQTRBQUFBQUFBQUFHUUFiQUJ3QUY4QWRBQmxBR0VBYlFC?=
- =?us-ascii?Q?ekFGOEFid0J1QUdVQVpBQnlBR2tBZGdCbEFG?=
-x-dg-reffive: 
- =?us-ascii?Q?OEFaZ0JwQUd3QVpRQUFBQ1FBQUFBWkFBQUFaUUJ0QUdFQWFRQnNBRjhBWVFC?=
- =?us-ascii?Q?a0FHUUFjZ0JsQUhNQWN3QUFBRmdBQUFBQUFBQUFiUUJoQUhJQWRnQmxBR3dB?=
- =?us-ascii?Q?WHdCd0FISUFid0JxQUdVQVl3QjBBRjhBYmdCaEFHMEFaUUJ6QUY4QVl3QnZB?=
- =?us-ascii?Q?RzRBWmdCcEFHUUFaUUJ1QUhRQWFRQmhBR3dBWHdCaEFHd0Fid0J1QUdVQUFB?=
- =?us-ascii?Q?QlVBQUFBQUFBQUFHMEFZUUJ5QUhZQVpRQnNBRjhBY0FCeUFHOEFhZ0JsQUdN?=
- =?us-ascii?Q?QWRBQmZBRzRBWVFCdEFHVUFjd0JmQUhJQVpRQnpBSFFBY2dCcEFHTUFkQUJs?=
- =?us-ascii?Q?QUdRQVh3QmhBR3dBYndCdUFHVUFBQUJhQUFBQUFBQUFBRzBBWVFCeUFIWUFa?=
- =?us-ascii?Q?UUJzQUY4QWNBQnlBRzhBYWdCbEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFI?=
- =?us-ascii?Q?SUFaUUJ6QUhRQWNnQnBBR01BZEFCbEFHUUFYd0JvQUdVQWVBQmpBRzhBWkFC?=
- =?us-ascii?Q?bEFITUFBQUFnQUFBQUFBQUFBRzBBWVFCeUFIWUFaUUJzQUd3QVh3QmhBSElB?=
- =?us-ascii?Q?YlFBQUFDWUFBQUFBQUFBQWJRQmhBSElBZGdCbEFHd0FiQUJmQUdjQWJ3QnZB?=
- =?us-ascii?Q?R2NBYkFCbEFBQUFYZ0FBQUFBQUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QWNB?=
- =?us-ascii?Q?QnlBRzhBYWdCbEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFHTUFid0J1QUdZ?=
- =?us-ascii?Q?QWFRQmtBR1VBYmdCMEFHa0FZUUJzQUY4QWJRQmhBSElBZGdCbEFHd0FiQUFB?=
- =?us-ascii?Q?QUd3QUFBQUFBQUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBSEFBY2dCdkFHb0Fa?=
- =?us-ascii?Q?UUJqQUhRQVh3QnVBR0VBYlFCbEFITUFYd0JqQUc4QWJnQm1BR2tBWkFCbEFH?=
- =?us-ascii?Q?NEFkQUJwQUdFQWJBQmZBRzBBWVFCeUFIWUFaUUJzQUd3QVh3QnZBSElBWHdC?=
- =?us-ascii?Q?aEFISUFiUUFBQUhJQUFBQUFBQUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBSEFB?=
- =?us-ascii?Q?Y2dCdkFHb0FaUUJqQUhRQVh3QnVBR0VBYlFCbEFITUFYd0JqQUc4QWJnQm1B?=
- =?us-ascii?Q?R2tBWkFCbEFHNEFkQUJwQUdFQWJBQmZBRzBBWVFCeUFIWUFaUUJzQUd3QVh3?=
- =?us-ascii?Q?QnZBSElBWHdCbkFHOEFid0JuQUd3QVpRQUFBRm9BQUFBQUFBQUFiUUJoQUhJ?=
- =?us-ascii?Q?QWRnQmxBR3dBYkFCZkFIQUFjZ0J2QUdvQVpRQmpBSFFBWHdCdUFHRUFiUUJs?=
- =?us-ascii?Q?QUhNQVh3QnlBR1VBY3dCMEFISUFhUUJqQUhRQVpRQmtBRjhBYlFCaEFISUFk?=
- =?us-ascii?Q?Z0JsQUd3QWJBQUFBR2dBQUFBQUFBQUFiUUJoQUhJQWRnQmxBR3dBYkFCZkFI?=
- =?us-ascii?Q?QUFjZ0J2QUdvQVpRQmpBSFFBWHdCdUFHRUFiUUJsQUhNQVh3QnlBR1VBY3dC?=
- =?us-ascii?Q?MEFISUFhUUJqQUhRQVpRQmtBRjhBYlFCaEFI?=
-x-dg-refsix: 
- SUFkZ0JsQUd3QWJBQmZBRzhBY2dCZkFHRUFjZ0J0QUFBQUlnQUFBQUVBQUFCdEFHRUFjZ0IyQUdVQWJBQnNBRjhBZHdCdkFISUFaQUFBQUE9PSIvPjwvbWV0YT4=
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR18MB4785:EE_|LV8PR18MB5605:EE_
-x-ms-office365-filtering-correlation-id: b3907773-11be-4df3-0872-08dc115afdea
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- PAxsVJPt+xjwWHIslnGNlrvzWsOA7Onr8ve+ahhVjmTLPxBjPV5tEPZtZQlKJTDW7JGtPC+GSfgWrU9SVDx3gK1P3aK6sMuEALxNf3Mwfa4n7GBkJ29xb5LGS29/CEA/bpne8EuqAziZZ8kfd/1WVaTd5pHTnLNSKsU0imM+Y6ahhOFDkXsrYFS8csWxtdyX3cITRmXjCa4G1Tp1Kdrd1nVW78NHTzjvalFcKSiR6mWqhkr62bDcxEBlQb0UlN3IcSVtFXq1M3SFA2rp9WQx3WWX7Sj0m9KW+fe+fjQnHNpQsIoB8gh6on56F6ju/Kcd2xlMlJb/xkJfros4w/5giTYNnidSOrlPuH3TYKukDtpFlyyqSL2B3dGM64rpFOcOtgIPkMtXKRJiT8OXBk04p3XbI09iOzI3OqGXhZ2P+EGFwjhJTcDCykANR1TcY5UH7rvGbDTO3GG2LMoN6ZPutqjDTmLH3z3bkYmu1l2I2F9tugAx1cggshbBQpE3vPCANHQEYQuWz9+mD1s1oaT1qGYhPdp/YEU3kfykeTvr5sE77dVmfKitm7oq8UMqhdC89QiIDFuI+O1K3EQnBoFag93wRSBcro9nHs6L+EbAl7Y=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4785.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(136003)(366004)(346002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(52536014)(8936002)(5660300002)(966005)(8676002)(4326008)(316002)(478600001)(66946007)(66446008)(64756008)(66556008)(54906003)(76116006)(66476007)(110136005)(2906002)(38070700009)(122000001)(38100700002)(86362001)(71200400001)(26005)(6506007)(53546011)(9686003)(33656002)(7696005)(83380400001)(107886003)(41300700001)(55016003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?7fM1k4/rXeZ91GUr1JJMYp7a01Znai3TnQEX5tSscX1N0xqyqrfix+aKftCZ?=
- =?us-ascii?Q?A+trt5JOUM/oZrhZe3xiyqgvy2HmNjoQ3sEEbUZzWq4sPPN6QjG2X+2D7ice?=
- =?us-ascii?Q?5jBGFcdBjyN3aIlyuN50RePIXEkCLM9hk5lOHMigWrbEDKDyZGNevJPRESyX?=
- =?us-ascii?Q?nwkfXoWRrCF++UF6ZKyyQdRmlRQ7gyGFl1dk8fHrkeaHeXNyy7E983ygKtTZ?=
- =?us-ascii?Q?OmHzgp50+inC3u9ma76NnhLvh35Cf7mQ5UjKY00xaAk2xS7xhu+BHc/zzZW4?=
- =?us-ascii?Q?BKxCqSpt/VDfL+qcd9Fvtrks9sXJmQIOqL1zifcMD5jp6s9IDjQttAaWlU8B?=
- =?us-ascii?Q?JMdpoAa20ETRXZj8NWO0QAmZV26VolhYB2K7/wBO/VhGuLAzABtvv7HbcW9t?=
- =?us-ascii?Q?vpwTmMf3XLB2j+DL0plOjZnNBYS+mUXG2hjU9Bhjws4mAbtE1FBPRWIc+Sx7?=
- =?us-ascii?Q?i7sMmTh230wLbi1egjgZPmUY7r8y1z28kiMUX7JVWudTqIImiQme87Q+qhGg?=
- =?us-ascii?Q?p9R4Mlnts7g3NU3esMAYvrSJlqWmo1cKym/2dOeYTdnxhf7Vya5tlykmXJVv?=
- =?us-ascii?Q?BalYlQKBBgo9myI6IWskgscA+ilfeQyT4R4QEU/ZfAPJndBOYKuRAE4+08cT?=
- =?us-ascii?Q?3NsqSnejL8+320JGTECbwBr2G0zCrzTmWk2W6zXPrnbuVYbpVGaVMYQZtWa8?=
- =?us-ascii?Q?JMUpDR6l8bsEJxPAAhNfK/xJP6hO4eEjuw6PZbon1DppFeWa9gNFKiQ0QkTk?=
- =?us-ascii?Q?VULitj+98CnF3fZwkuSzJzQcWedG3QoUug1zA9HaRjP9v4sWoJs1sQMOEciS?=
- =?us-ascii?Q?d3MaptPXoa4m+GcOkHEED5ViruBzNooWk4pMqUvKNVuS7mOq2d2HKLTH6ERR?=
- =?us-ascii?Q?I79hzHxwzHLvO9mWOCvlLu6xUMic7lwOnIqSbtaJaDLxzq7v8BTMRwgI5lKW?=
- =?us-ascii?Q?QRQKZwR3zSb2+BbZvcoQX07qs4TcVgFlHzrlV9P0dPt+dj1qfIlLRU6VI/ll?=
- =?us-ascii?Q?hRy7B/xmWFUL3jIPansOa3Z3lH+hdYvpaEK728ZNm9JGB0X/RUhNP5v7lbCJ?=
- =?us-ascii?Q?OneJHATAE4CHgSovlo6Pc+oUIy4xyhpiOrT0YQpsqE7CtxzUFJO5kEXASiva?=
- =?us-ascii?Q?ApQl0j+ctASS0F1kmulJkdn4pVsoI9mY2sKloiA4g/ld5lQlzmGTKnbWc9Ta?=
- =?us-ascii?Q?TTCs+6hmLgcFYKCMgY/qUqKzHTMdQNocy6rUe1emoyr0prcUV5esSdvSgL9w?=
- =?us-ascii?Q?5XLH4BhGP+0rTIy67x/btHN9g3imc6bddX15gXNxykgrLS0thiFa3CBEULkT?=
- =?us-ascii?Q?qBB9D7JaniaKkKRYikZW3u8sTgIupxkSbF2eTAKAL6YYcptymmkmndps79oc?=
- =?us-ascii?Q?B0kaIuhsDBFpEj0s6ExCfhI/AUxPwLgK72x6+eL0911FI1JNCZJUyFF2w/dN?=
- =?us-ascii?Q?+sXvZsaQxxeegy0yszMfmCPz9mYyovmyz2GvgaoP64Xhmrxbb3dJTYDwYA5w?=
- =?us-ascii?Q?3YxLM6XIukhOYAz2hbQFyWhYjpLQa9vHfcGA7kfVu48DmNR6x+EDRLh1AjCP?=
- =?us-ascii?Q?v7xmxGtz3oNKQk6IbIiawfeYqwMduP+2e5xuGAIr?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20230601; t=1704836442; x=1705441242; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kk11E4I+ud88q7971jNFPQkxrkhyZznXcwCWKBbhv9s=;
+        b=LSL6G2O6qXst2fDMxGFVOXaGaUK2nQkOa2IM4d47a5nB8NZtgW3FoQPHmkdUH+kNS+
+         oX4R48T2hSrOQX3IJXQcoq2cnjixMZ55F6XcNEnyW8GV0wZlwkft0oushvU2/NRBi4aB
+         KKTk/T8yGZ7XuuDkJUqtfCdnuOS0D639cQI8lE/UDU5nYWEORkUjJkFUyDxZQ0Ku4Du7
+         WTF7hc0l2lFy05sl1XJtLbJOmGGkoANjqxCdXi1zadWXNB8exUGkXq54aLhO9WEn/LHr
+         K8hhSsbDfBYrPQw01mNOEPIaW/7NaQ8XOpKUyGiG/EQNEFKUa2rxE33RFhsD6nSQIHB0
+         SE1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704836442; x=1705441242;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kk11E4I+ud88q7971jNFPQkxrkhyZznXcwCWKBbhv9s=;
+        b=DFwYqrTKIP76fhxfBbewyrFdq25OlZZZsLQMK7cgvZBzlLbB/eSH8UGFMipp13nVHN
+         Ai0js8FIDw/t6XCuYv4NapA5VAgiQIXTh+SsPGupteUfo9Ug7iBmBkECiyxeowJNTW21
+         sQTTOsP7Mw9KqhV/lDsPk3U3ZH4Nj3yYmpQaVrYI3cvPotFAMsEfHoPVkrthPyHiJ3a9
+         eH/ts/LdQzLaRCzSaDl5QnPNewvGijczB8S/t22cLDL0gT8RO6TH0g6JAAxtDt0ZII9E
+         WTYz5duvii9HE0UAXn9Vf/+W8uOoS06Zz2jQj1DKD/dYoLo0cOK5BMajt9B95F71IZ3w
+         axqw==
+X-Gm-Message-State: AOJu0YxofSsLWqYeXgLOfpvw7iQ67h77ZaGQLCOEJkIDy8jj+W6YYHQh
+	NSIyYdwcWmLgs4viuSJDcP8=
+X-Google-Smtp-Source: AGHT+IHz3kuUh4WJQa9NzM3rgjNYq3rfX5NXxrkeFVruSyx+ZQ29Xr+0DrZB6bFz56DadpI9kTxIZg==
+X-Received: by 2002:a05:651c:32a:b0:2cc:defa:9847 with SMTP id b10-20020a05651c032a00b002ccdefa9847mr2918ljp.172.1704836441970;
+        Tue, 09 Jan 2024 13:40:41 -0800 (PST)
+Received: from mobilestation ([95.79.203.166])
+        by smtp.gmail.com with ESMTPSA id v7-20020a2e2f07000000b002ccbc1f97c1sm537059ljv.52.2024.01.09.13.40.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jan 2024 13:40:41 -0800 (PST)
+Date: Wed, 10 Jan 2024 00:40:38 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	Prasad Sodagudi <psodagud@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>, 
+	Rob Herring <robh@kernel.org>, kernel@quicinc.com
+Subject: Re: [PATCH net-next v8 3/3] net: stmmac: Add driver support for
+ DWMAC5 common safety IRQ
+Message-ID: <owvy3j3n7azuergsthctpl5be6oz6cadzccjygkmpykdl5vgv6@4a2jefzpsf4r>
+References: <20231221073620.232619-1-quic_jsuraj@quicinc.com>
+ <20231221073620.232619-4-quic_jsuraj@quicinc.com>
+ <yromhtr73rwsr6hizr4tq37vfvyzfue7wzpmufqyscwspzffza@uhfcrn573acd>
+ <aec2dc6a-ffa4-4753-a764-77dfe1af995a@quicinc.com>
+ <xdcrwxh7e4t2zkgdcfwzjr2z4ouwgv3vr4drwvshadxmpwyqkd@j3kj3p2u7nd7>
+ <2685432c-a086-4730-9dd6-8b8da1070697@quicinc.com>
+ <bb77706b-0685-4992-b49e-49bef0d11800@quicinc.com>
+ <6tog5feuvgsfootirmbidgl7gakort7tax2gponudo3l574dam@jzdavh4wmkc4>
+ <689f7d06-54db-4634-9986-f0a0b0998a34@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4785.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3907773-11be-4df3-0872-08dc115afdea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jan 2024 21:36:08.4452
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dfevFCwUKdH/xmUnqwurt+Ar/quusziA+XLxDC+Le6qFXsZcLz9fEl+hcq9dZvgwz8vYba9YR5c7rY4v+iR4Sg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR18MB5605
-X-Proofpoint-ORIG-GUID: vT5SPKhsQaDbARv12zg1D9TnXSUaEXAZ
-X-Proofpoint-GUID: vT5SPKhsQaDbARv12zg1D9TnXSUaEXAZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <689f7d06-54db-4634-9986-f0a0b0998a34@quicinc.com>
 
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Tuesday, January 9, 2024 8:45 AM
-> To: davem@davemloft.net
-> Cc: netdev@vger.kernel.org; edumazet@google.com; pabeni@redhat.com;
-> Jakub Kicinski <kuba@kernel.org>; Derek Chickles <dchickles@marvell.com>;
-> Satananda Burla <sburla@marvell.com>; Felix Manlunas
-> <fmanlunas@marvell.com>
-> Subject: [EXT] [PATCH net 4/7] MAINTAINERS: eth: mark Cavium liquidio as
-> an Orphan
->=20
-> ----------------------------------------------------------------------
-> We haven't seen much review activity from the liquidio maintainers for
-> years. Reflect that reality in MAINTAINERS.
-> Our scripts report:
->=20
-> Subsystem CAVIUM LIQUIDIO NETWORK DRIVER
->   Changes 30 / 87 (34%)
->   Last activity: 2019-01-28
->   Derek Chickles <dchickles@marvell.com>:
->     Tags ac93e2fa8550 2019-01-28 00:00:00 1
->   Satanand Burla <sburla@marvell.com>:
->   Felix Manlunas <fmanlunas@marvell.com>:
->     Tags ac93e2fa8550 2019-01-28 00:00:00 1
->   Top reviewers:
->     [5]: simon.horman@corigine.com
->     [4]: keescook@chromium.org
->     [4]: jiri@nvidia.com
->   INACTIVE MAINTAINER Satanand Burla <sburla@marvell.com>
->=20
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: Derek Chickles <dchickles@marvell.com>
-> CC: Satanand Burla <sburla@marvell.com>
-> CC: Felix Manlunas <fmanlunas@marvell.com>
-> ---
->  MAINTAINERS | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index cad08f4eca0d..1e375699ebb7 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -4683,11 +4683,8 @@ F:	drivers/i2c/busses/i2c-octeon*
->  F:	drivers/i2c/busses/i2c-thunderx*
->=20
->  CAVIUM LIQUIDIO NETWORK DRIVER
-> -M:	Derek Chickles <dchickles@marvell.com>
-> -M:	Satanand Burla <sburla@marvell.com>
-> -M:	Felix Manlunas <fmanlunas@marvell.com>
->  L:	netdev@vger.kernel.org
-> -S:	Supported
-> +S:	Orphan
->  W:	http://www.marvell.com
->  F:	drivers/net/ethernet/cavium/liquidio/
->=20
-> --
-> 2.43.0
+On Mon, Jan 08, 2024 at 04:27:57PM +0530, Suraj Jaiswal wrote:
+> Hi Seren,
+> Please find updated comment.
+> 
+> Thanks
+> Suraj
+> 
+> On 1/8/2024 1:23 AM, Serge Semin wrote:
+> > On Wed, Dec 27, 2023 at 04:33:33PM +0530, Suraj Jaiswal wrote:
+> >> Hi Seren,
+> >> please find the updated comment .
+> >>
+> >> Thanks
+> >> Suraj
+> >>
+> >> On 12/26/2023 4:40 PM, Suraj Jaiswal wrote:
+> >>> Hi seren
+> >>> let me check below on test setup once & get back
+> >>>
+> >>> Thanks
+> >>> Suraj
+> >>>
+> >>> On 12/22/2023 8:05 PM, Serge Semin wrote:
+> >>>> On Fri, Dec 22, 2023 at 02:13:49PM +0530, Suraj Jaiswal wrote:
+> >>>>> HI Serge,
+> >>>>> please find commnet inline.
+> >>>>>
+> >>>>> Thanks
+> >>>>> Suraj
+> >>>>>
+> >>>>> On 12/21/2023 6:19 PM, Serge Semin wrote:
+> >>>>>> Hi Suraj
+> >>>>>>
+> >>>>>> On Thu, Dec 21, 2023 at 01:06:20PM +0530, Suraj Jaiswal wrote:
+> >>>>>>> Add support to listen HW safety IRQ like ECC(error
+> >>>>>>> correction code), DPP(data path parity), FSM(finite state
+> >>>>>>> machine) fault in common IRQ line.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+> >>>>>>
+> >>>>>> Thanks for taking my notes into account. One more comment is further
+> >>>>>> below.
+> >>>>>>
+> >>>>>>> ---
+> >>>>>>>  drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+> >>>>>>>  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  3 ++
+> >>>>>>>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 37 +++++++++++++++++++
+> >>>>>>>  .../ethernet/stmicro/stmmac/stmmac_platform.c |  8 ++++
+> >>>>>>>  4 files changed, 49 insertions(+)
+> >>>>>>>
+> >>>>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> >>>>>>> index 721c1f8e892f..b9233b09b80f 100644
+> >>>>>>> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> >>>>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> >>>>>>> @@ -344,6 +344,7 @@ enum request_irq_err {
+> >>>>>>>  	REQ_IRQ_ERR_ALL,
+> >>>>>>>  	REQ_IRQ_ERR_TX,
+> >>>>>>>  	REQ_IRQ_ERR_RX,
+> >>>>>>> +	REQ_IRQ_ERR_SFTY,
+> >>>>>>>  	REQ_IRQ_ERR_SFTY_UE,
+> >>>>>>>  	REQ_IRQ_ERR_SFTY_CE,
+> >>>>>>>  	REQ_IRQ_ERR_LPI,
+> >>>>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> >>>>>>> index 9f89acf31050..ca3d93851bed 100644
+> >>>>>>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> >>>>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> >>>>>>> @@ -31,6 +31,7 @@ struct stmmac_resources {
+> >>>>>>>  	int wol_irq;
+> >>>>>>>  	int lpi_irq;
+> >>>>>>>  	int irq;
+> >>>>>>> +	int sfty_irq;
+> >>>>>>>  	int sfty_ce_irq;
+> >>>>>>>  	int sfty_ue_irq;
+> >>>>>>>  	int rx_irq[MTL_MAX_RX_QUEUES];
+> >>>>>>> @@ -297,6 +298,7 @@ struct stmmac_priv {
+> >>>>>>>  	void __iomem *ptpaddr;
+> >>>>>>>  	void __iomem *estaddr;
+> >>>>>>>  	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
+> >>>>>>> +	int sfty_irq;
+> >>>>>>>  	int sfty_ce_irq;
+> >>>>>>>  	int sfty_ue_irq;
+> >>>>>>>  	int rx_irq[MTL_MAX_RX_QUEUES];
+> >>>>>>> @@ -305,6 +307,7 @@ struct stmmac_priv {
+> >>>>>>>  	char int_name_mac[IFNAMSIZ + 9];
+> >>>>>>>  	char int_name_wol[IFNAMSIZ + 9];
+> >>>>>>>  	char int_name_lpi[IFNAMSIZ + 9];
+> >>>>>>> +	char int_name_sfty[IFNAMSIZ + 10];
+> >>>>>>>  	char int_name_sfty_ce[IFNAMSIZ + 10];
+> >>>>>>>  	char int_name_sfty_ue[IFNAMSIZ + 10];
+> >>>>>>>  	char int_name_rx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 14];
+> >>>>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> >>>>>>> index 47de466e432c..7d4e827dfeab 100644
+> >>>>>>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> >>>>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> >>>>>>> @@ -3592,6 +3592,10 @@ static void stmmac_free_irq(struct net_device *dev,
+> >>>>>>>  		if (priv->wol_irq > 0 && priv->wol_irq != dev->irq)
+> >>>>>>>  			free_irq(priv->wol_irq, dev);
+> >>>>>>>  		fallthrough;
+> >>>>>>> +	case REQ_IRQ_ERR_SFTY:
+> >>>>>>> +		if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq)
+> >>>>>>> +			free_irq(priv->sfty_irq, dev);
+> >>>>>>> +		fallthrough;
+> >>>>>>>  	case REQ_IRQ_ERR_WOL:
+> >>>>>>>  		free_irq(dev->irq, dev);
+> >>>>>>>  		fallthrough;
+> >>>>>>> @@ -3661,6 +3665,23 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+> >>>>>>>  		}
+> >>>>>>>  	}
+> >>>>>>>  
+> >>>>>>> +	/* Request the common Safety Feature Correctible/Uncorrectible
+> >>>>>>> +	 * Error line in case of another line is used
+> >>>>>>> +	 */
+> >>>>>>> +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
+> >>>>>>> +		int_name = priv->int_name_sfty;
+> >>>>>>> +		sprintf(int_name, "%s:%s", dev->name, "safety");
+> >>>>>>> +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
+> >>>>>>> +				  0, int_name, dev);
+> >>>>>>> +		if (unlikely(ret < 0)) {
+> >>>>>>> +			netdev_err(priv->dev,
+> >>>>>>> +				   "%s: alloc sfty MSI %d (error: %d)\n",
+> >>>>>>> +				   __func__, priv->sfty_irq, ret);
+> >>>>>>> +			irq_err = REQ_IRQ_ERR_SFTY;
+> >>>>>>> +			goto irq_error;
+> >>>>>>> +		}
+> >>>>>>> +	}
+> >>>>>>> +
+> >>>>>>>  	/* Request the Safety Feature Correctible Error line in
+> >>>>>>>  	 * case of another line is used
+> >>>>>>>  	 */
+> >>>>>>> @@ -3798,6 +3819,21 @@ static int stmmac_request_irq_single(struct net_device *dev)
+> >>>>>>>  		}
+> >>>>>>>  	}
+> >>>>>>>  
+> >>>>>>> +	/* Request the common Safety Feature Correctible/Uncorrectible
+> >>>>>>> +	 * Error line in case of another line is used
+> >>>>>>> +	 */
+> >>>>>>> +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
+> >>>>>>
+> >>>>>>> +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
+> >>>>>>> +				  IRQF_SHARED, dev->name, dev);
+> >>>>>>
+> >>>>>> Just noticed yesterday that stmmac_safety_interrupt() is also called
+> >>>>>> from the stmmac_interrupt() handler which is supposed to be registered
+> >>>>>> on the generic "mac" IRQ. Won't it cause races around the CSRs
+> >>>>>> (doubtfully but still worth to note) and the errors handling
+> >>>>>> (stmmac_global_err()) in case if both IRQs are raised simultaneously?
+> >>>>>> At the very least it looks suspicious and worth double-checking.
+> >>>>>>
+> >>>>>> I also found out that nobody seemed to care that the same handler is
+> >>>>>> registered on MAC, WoL and LPI IRQ lines. Hmm, no race-related
+> >>>>>> problems have been reported so far for the platforms with separate
+> >>>>>> WoL/LPI IRQs. It's either a lucky coincident or the IRQs are always
+> >>>>>> assigned to the same CPU or the IRQs handle is indeed free of races.
+> >>>>>> In anyway it looks suspicious too. At the very least AFAICS the DMA
+> >>>>>> IRQ-handler is indeed racy on the status CSR access. It isn't
+> >>>>>> cleared-on-read, but write-one-to-clear. So the statistics might be
+> >>>>>> calculated more than once for the same CSR state. There might be some
+> >>>>>> other problems I failed to spot on the first glance.
+> >>>>>>
+> >>>>>> David, Eric, Jacub, Paolo, your opinion about the note above?
+> >>>>>>
+> >>>>>> -Serge(y)
+> >>>>>>
+> >>>>
+> >>>>> <Suraj> We are adding common IRQ similar to already present code for correcteable/uncorrecable https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L3592.
+> >>>>
+> >>>> From that perspective your change in stmmac_request_irq_multi_msi() is
+> >>>> correct, but stmmac_request_irq_single() is another story. The first
+> >>>> one method implies assigning the individual IRQ handlers to all
+> >>>> available lines. The later method assigns the _common_ handler to all
+> >>>> the lines. The common handler already calls the Safety IRQ handler -
+> >>>> stmmac_safety_feat_interrupt(). So should the safety IRQ line is
+> >>>> separately available it's possible to have the Safety IRQ handlers
+> >>>> executed concurrently - in framework of the common IRQ events handling
+> >>>> (if safety IRQ is raised during the common IRQ being handled) and
+> >>>> individual Safety IRQ. It's prune to the race condition I pointed out
+> >>>> to in my message above. Did you consider that problem?
+> >>>>
+> >>>>> Also, we need the sfty IRQ handling as soon as the fault occured & that can only be handled if we have handler attached with sfty IRQ.
+> >>>>> stmmac_interrupt() will only be triggerd when interrupt triggered for rx/tx packet .
+> >>>>> while registerting with sfty IRQ will get triggered as soon as emac HW detect the fault. 
+> >>>>
+> >>>> Please read my comment more carefully. The safety IRQ can be raised
+> >>>> during the common IRQ handling, thus the
+> >>>> stmmac_safety_feat_interrupt() method might get to be concurrently
+> >>>> executed.
+> >>>>
+> >>>> -Serge(y)
+> >>>>
+> >> <Suraj> Have testing this on device . We have added print in the both the places stmmac_interrupt() as well as sfty interrupt handler.
+> >> We can see that sfty interrupt handler is getting triggred first & stmmac_safety_feat_interrupt () code added in stmmac_intterupt() is not getting triggred because looks like interrupt status bit register is already getting cleared as part of sfty interrupt handler. So it looks good . Please let us know if any further comment. 
+> >>
+> >> Please find the log below .
+> >>
+> >>
+> >> / # [ 1505.602173] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1505.607274] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'RXCES: MTL RX Memory Error'
+> >> [ 1505.617395] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1505.622494] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'TXCES: MTL TX Memory Error'
+> >> [ 1505.888913] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1505.894010] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'RXCES: MTL RX Memory Error'
+> >> [ 1506.605821] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1506.610919] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'RXCES: MTL RX Memory Error'
+> >> [ 1506.621034] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1506.626131] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'TXCES: MTL TX Memory Error'
+> >> [ 1507.613036] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1507.618133] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'RXCES: MTL RX Memory Error'
+> >> [ 1507.628249] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1507.633346] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'TXCES: MTL TX Memory Error'
+> >> [ 1508.619034] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1508.624132] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'RXCES: MTL RX Memory Error'
+> >> [ 1508.634245] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1508.639343] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'TXCES: MTL TX Memory Error'
+> >> [ 1509.631151] sj: stmmac_safety_interrupt from sfty IRQ handler
+> >> [ 1509.636249] qcom-ethqos 23040000.ethernet eth1: Found correctable error in MTL: 'RXCES: MTL RX Memory Error'
+> >>
+> > 
+> > The log and the way you were trying to model out the problem don't
+> > prove that the race condition doesn't exist. They just indicate that
+> > your test-case doesn't catch the simultaneous MAC and Safety IRQs
+> > handling.
+> > 
+> > Moreover AFAICS from the way the stmmac_ops->safety_feat_irq_status()
+> > callbacks are defined in DW QoS Eth and DW XGMAC modules, the race is
+> > there. Both
+> > dwmac5_safety_feat_irq_status()
+> > and
+> > dwxgmac3_safety_feat_irq_status()
+> > get to read the MTL and DMA Safety Interrupts Status register in order
+> > to check whether the Correctable/Uncorrectable errors have actually
+> > happened. After that the respective MAC, MTL or DMA error handlers are
+> > called, which get to clear the IRQs statue by reading and then writing
+> > the respective MAC DPP FRM, MTL/DMA ECC IRQ status registers. So if
+> > the stmmac_safety_feat_interrupt() method is concurrently called the
+> > driver at the very least may end up with printing the errors twice.
+> > 
+> > -Serge(y)
+> > 
+> <Suraj> We did not see issue reported 2 time in the verfication. 
+> Also, we can add below change to completetly avoid call of sfty hadling as part of stmmac interrupt if irq is already defined like
+> below . Let me if below looks good .
+> 
 
-Acked by: Derek Chickles <dchickles@marvell.com>
+> static irqreturn_t stmmac_interrupt(int irq, void *dev_id)
+> {
+> 	struct net_device *dev = (struct net_device *)dev_id;
+> 	struct stmmac_priv *priv = netdev_priv(dev);
+> 
+> 	/* Check if adapter is up */
+> 	if (test_bit(STMMAC_DOWN, &priv->state))
+> 		return IRQ_HANDLED;
+> 
+> 	+ if (priv->sfty_irq <=0) {
+> 		/* Check if a fatal error happened */
+> 		if (stmmac_safety_feat_interrupt(priv))
+> 			return IRQ_HANDLED;
+> 	+ }
+> 	/* To handle Common interrupts */
+> 	stmmac_common_interrupt(priv);
+> 
+> 	/* To handle DMA interrupts */
+> 	stmmac_dma_interrupt(priv);
+> 
+> 	return IRQ_HANDLED;
+> }
+
+This isn't ideal but at least it will prevent the race condition.
+
+Since the solution isn't that much elegant let's make it a bit more
+verbose:
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+  		return IRQ_HANDLED;
+ 
+-	/* Check if a fatal error happened */
+-	if (stmmac_safety_feat_interrupt(priv))
++	/* Check ASP error if it isn't delivered via an individual IRQ */
++	if (priv->sfty_irq <= 0 && stmmac_safety_feat_interrupt(priv))
+ 		return IRQ_HANDLED;
+ 
+ 	/* To handle Common interrupts */
+
+The ideal solution would be to refactor the entire IRQs handling code
+by converting the common MAC IRQ handler to calling the respective
+event handlers only if no individual IRQ was specified, joining in the
+multi and single IRQs request/handling methods, dropping the
+STMMAC_FLAG_MULTI_IRQ_EN flag, etc. To be honest with no all the
+Synopsys DW *MAC IP-core HW manuals at hands it won't be an easy task
+with a high risk to break stuff or create code even more complicated
+than it already is.
+
+-Serge(y)
+
+> 
+> >>>>>    
+> >>>>>>> +		if (unlikely(ret < 0)) {
+> >>>>>>> +			netdev_err(priv->dev,
+> >>>>>>> +				   "%s: ERROR: allocating the sfty IRQ %d (%d)\n",
+> >>>>>>> +				   __func__, priv->sfty_irq, ret);
+> >>>>>>> +			irq_err = REQ_IRQ_ERR_SFTY;
+> >>>>>>> +			goto irq_error;
+> >>>>>>> +		}
+> >>>>>>> +	}
+> >>>>>>> +
+> >>>>>>>  	return 0;
+> >>>>>>>  
+> >>>>>>>  irq_error:
+> >>>>>>> @@ -7462,6 +7498,7 @@ int stmmac_dvr_probe(struct device *device,
+> >>>>>>>  	priv->dev->irq = res->irq;
+> >>>>>>>  	priv->wol_irq = res->wol_irq;
+> >>>>>>>  	priv->lpi_irq = res->lpi_irq;
+> >>>>>>> +	priv->sfty_irq = res->sfty_irq;
+> >>>>>>>  	priv->sfty_ce_irq = res->sfty_ce_irq;
+> >>>>>>>  	priv->sfty_ue_irq = res->sfty_ue_irq;
+> >>>>>>>  	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
+> >>>>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> >>>>>>> index 70eadc83ca68..ab250161fd79 100644
+> >>>>>>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> >>>>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> >>>>>>> @@ -743,6 +743,14 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+> >>>>>>>  		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
+> >>>>>>>  	}
+> >>>>>>>  
+> >>>>>>> +	stmmac_res->sfty_irq =
+> >>>>>>> +		platform_get_irq_byname_optional(pdev, "sfty");
+> >>>>>>> +	if (stmmac_res->sfty_irq < 0) {
+> >>>>>>> +		if (stmmac_res->sfty_irq == -EPROBE_DEFER)
+> >>>>>>> +			return -EPROBE_DEFER;
+> >>>>>>> +		dev_info(&pdev->dev, "IRQ safety IRQ not found\n");
+> >>>>>>> +	}
+> >>>>>>> +
+> >>>>>>>  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
+> >>>>>>>  
+> >>>>>>>  	return PTR_ERR_OR_ZERO(stmmac_res->addr);
+> >>>>>>> -- 
+> >>>>>>> 2.25.1
+> >>>>>>>
+> >>>>>>>
+> >>>
 
