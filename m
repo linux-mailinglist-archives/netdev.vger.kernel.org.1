@@ -1,50 +1,48 @@
-Return-Path: <netdev+bounces-62708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E15C828A40
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63151828A41
 	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 17:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFB30287FC1
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:45:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 151261F260A7
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CB73AC34;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B833B193;
 	Tue,  9 Jan 2024 16:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ix9Y77Z6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XXWvp3RF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792D63AC24;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F953B18A;
 	Tue,  9 Jan 2024 16:45:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4571C433B1;
-	Tue,  9 Jan 2024 16:45:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AB90C43609;
+	Tue,  9 Jan 2024 16:45:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1704818726;
-	bh=ng8hG7XvXxuBXqWkTVtckgnpL1hNaS8M8BBMxELykF0=;
+	bh=BoIauk8diS1msR+j6h/3IjO6Ifvwea1xzmanxnMUhKI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ix9Y77Z6oJ80/ZCA/7vON8O9Fv9tjqqPS1f6f14rcowhFxdxipFrbz6DT1TrCWX0e
-	 h8FpGiPxIm0/6JQVsY8VtRcNgeL/uXeXOPLqUoRIEnpRY4qbxLp8Y3NwUlRPMDsXS7
-	 fARXW95G3OcPAzWFAfQ/aJYdfYHk/y+xOgLGmkzcQmJWFTqnhymyWSgfL9VUnG2m1v
-	 meriOz9TxzzTVyFWD7PAIjoBAm6g+x//m/0d6iQtcPhd0im0S+B5O/jN2bmpWUtJzE
-	 9dsC980W0lc9t+eyeMQr8g1Jfw1Fbx+fiC2/MTWiW8p2q8dGBqWLBSVrQZDu2oYfAs
-	 oOmdEyhVzCTPQ==
+	b=XXWvp3RF9wsXr1MiMoovoQ/ADTPSNTBHuCdv8vp6UmfII40oZQZHXdSsDOhcpmZHT
+	 aRlUacg2b8fRAVkDojry/FkgHP6wUSSqBQIPYc0STarTLLqPh+9obPtFk3LpjUiVN9
+	 BL2ofTpPERQuKMwwWDkithrSPtpzT5z5GEtgOdgmcCy/WulzDnmbQdqv0KtfEtkQGP
+	 Exue6QIRiF6WXJrac3VIfPr8Czfe8w4tiUGqg3lqTqUM34CByS6YiKfv37q8cKMvs/
+	 TBVLRISxNfs+FmD9C7TrtLKzBj4QxTy4D7UOoh4oyKh+1Ml/bN47hu8uboGWeqMoOs
+	 C3xUWaywoD96A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH net 5/7] MAINTAINERS: Bluetooth: retire Johan (for now?)
-Date: Tue,  9 Jan 2024 08:45:15 -0800
-Message-ID: <20240109164517.3063131-6-kuba@kernel.org>
+	Ralf Baechle <ralf@linux-mips.org>,
+	linux-hams@vger.kernel.org
+Subject: [PATCH net 6/7] MAINTAINERS: mark ax25 as Orphan
+Date: Tue,  9 Jan 2024 08:45:16 -0800
+Message-ID: <20240109164517.3063131-7-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240109164517.3063131-1-kuba@kernel.org>
 References: <20240109164517.3063131-1-kuba@kernel.org>
@@ -56,68 +54,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Johan moved to maintaining the Zephyr Bluetooth stack,
-and we haven't heard from him on the ML in 3 years
-(according to lore), and seen any tags in git in 4 years.
-Trade the MAINTAINER entry for CREDITS, we can revert
-whenever Johan comes back to Linux hacking :)
+We haven't heard from Ralf for two years, according to lore.
+We get a constant stream of "fixes" to ax25 from people using
+code analysis tools. Nobody is reviewing those, let's reflect
+this reality in MAINTAINERS.
 
-Subsystem BLUETOOTH SUBSYSTEM
-  Changes 173 / 986 (17%)
-  Last activity: 2023-12-22
-  Marcel Holtmann <marcel@holtmann.org>:
-    Author 91cb4c19118a 2022-01-27 00:00:00 52
-    Committer edcb185fa9c4 2022-05-23 00:00:00 446
-    Tags 000c2fa2c144 2023-04-23 00:00:00 523
-  Johan Hedberg <johan.hedberg@gmail.com>:
-  Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-    Author d03376c18592 2023-12-22 00:00:00 241
-    Committer da9065caa594 2023-12-22 00:00:00 341
-    Tags da9065caa594 2023-12-22 00:00:00 493
+Subsystem AX.25 NETWORK LAYER
+  Changes 9 / 59 (15%)
+  (No activity)
   Top reviewers:
-    [33]: alainm@chromium.org
-    [31]: mcchou@chromium.org
-    [27]: abhishekpandit@chromium.org
-  INACTIVE MAINTAINER Johan Hedberg <johan.hedberg@gmail.com>
+    [2]: mkl@pengutronix.de
+    [2]: edumazet@google.com
+    [2]: stefan@datenfreihafen.org
+  INACTIVE MAINTAINER Ralf Baechle <ralf@linux-mips.org>
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: Marcel Holtmann <marcel@holtmann.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
+CC: Ralf Baechle <ralf@linux-mips.org>
+CC: linux-hams@vger.kernel.org
 ---
- CREDITS     | 4 ++++
- MAINTAINERS | 1 -
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ CREDITS     | 1 +
+ MAINTAINERS | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/CREDITS b/CREDITS
-index 18ce75d81234..1228f96110c4 100644
+index 1228f96110c4..8a483505e6b1 100644
 --- a/CREDITS
 +++ b/CREDITS
-@@ -1543,6 +1543,10 @@ N: Andrew Haylett
- E: ajh@primag.co.uk
- D: Selection mechanism
- 
-+N: Johan Hedberg
-+E: johan.hedberg@gmail.com
-+D: Bluetooth subsystem maintainer
-+
- N: Andre Hedrick
- E: andre@linux-ide.org
- E: andre@linuxdiskcert.org
+@@ -183,6 +183,7 @@ E: ralf@gnu.org
+ P: 1024/AF7B30C1 CF 97 C2 CC 6D AE A7 FE  C8 BA 9C FC 88 DE 32 C3
+ D: Linux/MIPS port
+ D: Linux/68k hacker
++D: AX25 maintainer
+ S: Hauptstrasse 19
+ S: 79837 St. Blasien
+ S: Germany
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 1e375699ebb7..388fe7baf89a 100644
+index 388fe7baf89a..c8636166740f 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -3595,7 +3595,6 @@ F:	drivers/mtd/devices/block2mtd.c
+@@ -3372,9 +3372,8 @@ F:	Documentation/devicetree/bindings/iio/adc/avia-hx711.yaml
+ F:	drivers/iio/adc/hx711.c
  
- BLUETOOTH DRIVERS
- M:	Marcel Holtmann <marcel@holtmann.org>
--M:	Johan Hedberg <johan.hedberg@gmail.com>
- M:	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
- L:	linux-bluetooth@vger.kernel.org
- S:	Supported
+ AX.25 NETWORK LAYER
+-M:	Ralf Baechle <ralf@linux-mips.org>
+ L:	linux-hams@vger.kernel.org
+-S:	Maintained
++S:	Orphan
+ W:	https://linux-ax25.in-berlin.de
+ F:	include/net/ax25.h
+ F:	include/uapi/linux/ax25.h
 -- 
 2.43.0
 
