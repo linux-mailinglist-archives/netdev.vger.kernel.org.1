@@ -1,144 +1,111 @@
-Return-Path: <netdev+bounces-62614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74D3828332
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:30:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD024828358
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:38:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AB4B1C23E75
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 09:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F51E1C25013
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 09:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B05233CD6;
-	Tue,  9 Jan 2024 09:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7076533CF4;
+	Tue,  9 Jan 2024 09:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="OiWUbppT"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="JYu9tX9H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-240.mail.qq.com (out203-205-221-240.mail.qq.com [203.205.221.240])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8EAE2EB1A
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 09:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-4678161e4cfso670603137.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 01:30:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1704792627; x=1705397427; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b5Mv0Nl8yaYPCz0vAzjt1yZi38rbxQe3qLZ0/Dp0y6Y=;
-        b=OiWUbppTWd8ByIVIdFWSBoDLEVWTHXqrCyWlFClMgQ3YoyaAkq1vSvW9siv1dzKwu9
-         xyB3hEDAN5ftmhma+YkectTj6fsFtPyQiYMsCSUjvgpLHamS6JURN5gx6ZLR53AAubP0
-         OznoRPara4vPKPARQmJ6NhIQPMrPbXIxJzI3JVK6rFp1/iywkouASqsbcistOirQJ0zP
-         p++XPCDhI5woLkWWOAnhPazqtc0uwxmghTLvtbEDqkEkerIQ0cwBx9HT5pOhBbnFzzjy
-         s4/ELTPtfsLtSM6YULIhWe2bs0OCGcSf7zvCSEvia4zkbDPHp5eo5th9xKCT98SEmS8E
-         plmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704792627; x=1705397427;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b5Mv0Nl8yaYPCz0vAzjt1yZi38rbxQe3qLZ0/Dp0y6Y=;
-        b=eL59qtK+bxoPfA1SWqWkYkWClubwC60XorvTxwsa/h3z2SR0vNCGrWAw2Doq5QHS8G
-         fj1z30ziqPBcVQb3LHZ7rPtLkCoUZnoB00sVMFtZohgSFEnSR09Ty06IUCUrY0Y+l8y+
-         6QjTO+rG3sz3n1tOfAtIzo+mMlX2O6OFFPQ2xvRAOn1u4lDJzd3zxWHt1k37miblnHB1
-         nPALhQwJ18wXCnEgKbXDEefDJxHTjoI9Zzqr4KQhWXVx1+eU12rU55jhCSstQmfpJl3X
-         Qlc4LhfkaSugq5nbIRqQ0X+8Ca/Glr1Q6+5a9Su/p3ShuIfU6leW+adoRdRvJ8x8W/5L
-         qkDg==
-X-Gm-Message-State: AOJu0YxvsjJDcYS92P8KtFGDpV3x+23qQ1yKjx8jlmfFLKQ9jsVfgCDI
-	zH65BYyQO8I8N5INgV475ab7QwPqgJnexidS7hLlJZGPA3KSNw==
-X-Google-Smtp-Source: AGHT+IEnh+p9dVhhp4GsPf85OaSuUfAr/hUhqX3r3kxg1wHgmsrumWNQGZCR9EvDSRlqvmMKLX62tyOlBKfNRwBkGSw=
-X-Received: by 2002:a05:6102:d89:b0:467:dda2:825c with SMTP id
- d9-20020a0561020d8900b00467dda2825cmr1755368vst.26.1704792627714; Tue, 09 Jan
- 2024 01:30:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C6733CED;
+	Tue,  9 Jan 2024 09:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1704793121; bh=AzERsTe4iifZ3yUxSLa14M3+lHAO7HrXuc1YkqElR1I=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=JYu9tX9HyQ6ZzgNrIz1+4dLBY7BdEZvoAKZg+mBz3Li748ZbeSI8mIUrSyx1PDODp
+	 dkgXAN5H/oMOMxuZo/5wI5pF+WH4N8m++DkOVNwPQzFBZl/Myixc/VytEjMlI3jchm
+	 6o0P9fwk26UCXsSB3ZeKOL5aodC01ICtc4DDnG6w=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.215])
+	by newxmesmtplogicsvrszc5-1.qq.com (NewEsmtp) with SMTP
+	id 82294E65; Tue, 09 Jan 2024 17:32:34 +0800
+X-QQ-mid: xmsmtpt1704792754tcw7rzjbi
+Message-ID: <tencent_146C309740E8F6ECD2CC5C7ADA6E202D450A@qq.com>
+X-QQ-XMAILINFO: MIAHdi1iQo+zj8Otn7YvBohfHC0fy23kZUcjScuxcWltv+1S+IIhq/kbnNDf5T
+	 GhanIkVQQJXJU7tPy0AJTngditIH2sJHKy7HQHmHrLAyqdBL5AHzgc+q6Uu0GYF1pIfJQdkv2U50
+	 UcbVHHEX6hYCV2MOLUOI8XoJDISPmYBW9423K3jiIfEW0hEu9I9c0XzwC38f9F2x9Jvlq0OXzuby
+	 egR29jdSZBvqh6tnEyHTW7AFUfcAzT5Y1dqmZTXgXvSmxf6cwMgYtVXHJNr9zYcY7mICncpeG9aY
+	 6mc2Ez0iql9DxmacuRJih9b/ysD3o3hl04EJRkG4GOxbPG0U4sup8ImCDplbnmbqhOnAWfCzNr/e
+	 0RFsAI0Mo/TdMN04/4UXm0Tgv7KbvqEMjsI/y7qtoAd/cPlT2hLcOIhiFUbOpCr1IqXRYds97Dch
+	 qDSnD/62T2VoGE49XJzDaYJa4vbCD27EZFV7PqugTXb166AOEJYJLRD4d7YqtGv0AcdQ8ZnjL+cC
+	 iY93pghBzpGkYyOBa0j6D7Voq1j4RVI9SV1JS0vucBnvTp5Sj9MpHHEPykOGvpAN8UNVueek6IHc
+	 vXitgVbHJOeMFklNkzDeov/fZqpWdpxuHThmFdfWrF4PXzAtyvDUlzQ9W5Tm2edhYyCC5awAvPZs
+	 GJmRqvoX32loEPDTBCm0w5oJh7As4Lzn6WlI9ATzhyUbAN5stO+/o7q8JB/Cdt0UjCm9iF+nzK5p
+	 0QT0fKlXprk17TJ0Y9b7gYHGhPMbp7PxZmhHBY85OFNPw7jK+RAbTwI9HJLm5w5+kqNi5KfyVTp6
+	 kKX6DUM4pqobwatVJFGEve0JP/GU0Qj/I3eNH+rUukLc6V3SjAc/e2N3eno0rHuki3yqGzBrEQ7G
+	 jc9NQda98nQ7TnPQHZLaw0hYFIikBZH+GtZS3a38LYwSxfzAMRDSWexgE4Lj1LoLzIyslX/f0F
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+f2977222e0e95cec15c8@syzkaller.appspotmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	borisp@nvidia.com,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	dhowells@redhat.com,
+	edumazet@google.com,
+	jakub@cloudflare.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] tls: fix WARNING in __sk_msg_free
+Date: Tue,  9 Jan 2024 17:32:35 +0800
+X-OQ-MSGID: <20240109093234.561184-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <000000000000aa2f41060e363b2b@google.com>
+References: <000000000000aa2f41060e363b2b@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104130123.37115-1-brgl@bgdev.pl> <20240104130123.37115-7-brgl@bgdev.pl>
- <20240108191052.GA1893484-robh@kernel.org> <CAMRc=Mc7D1rVHaA4yoOC2DHDkkCptF4wjAm=24Rr=kkqM1ztjg@mail.gmail.com>
- <CAL_JsqKGrW-v=fr_9NYKg-8cho_-XbVQ92eXpjYYC1ma0_8UuA@mail.gmail.com> <ac2a2370-322c-4cdd-a940-a07ba99dae06@linaro.org>
-In-Reply-To: <ac2a2370-322c-4cdd-a940-a07ba99dae06@linaro.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 9 Jan 2024 10:30:16 +0100
-Message-ID: <CAMRc=MfaupJnT4qfjX-qe5THSRMpJkzceaPSL-cU0yFZ4iSwBw@mail.gmail.com>
-Subject: Re: [RFC 6/9] dt-bindings: vendor-prefixes: add a PCI prefix for
- Qualcomm Atheros
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Rob Herring <robh@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
-	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Terry Bowman <terry.bowman@amd.com>, 
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 9, 2024 at 10:17=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 09/01/2024 03:56, Rob Herring wrote:
-> > On Mon, Jan 8, 2024 at 12:22=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev=
-.pl> wrote:
-> >>
-> >> On Mon, Jan 8, 2024 at 8:10=E2=80=AFPM Rob Herring <robh@kernel.org> w=
-rote:
-> >>>
-> >>> On Thu, Jan 04, 2024 at 02:01:20PM +0100, Bartosz Golaszewski wrote:
-> >>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>>>
-> >>>> Document the PCI vendor prefix for Qualcomm Atheros so that we can
-> >>>> define the QCA PCI devices on device tree.
-> >>>
-> >>> Why? vendor-prefixes.yaml is only applied to property names. 'qca'
-> >>> should be the prefix for those.
-> >>>
-> >>> Rob
-> >>
-> >> I didn't have any better idea. PCI devices on DT are defined by their
-> >> "pci<vendor ID>,<model ID>" compatible, not regular human-readable
-> >> strings and this makes checkpatch.pl complain.
-> >>
-> >> I'm open to suggestions.
-> >
-> > The checkpatch.pl check predates schemas and we could consider just
-> > dropping it. The only thing it provides is checking a patch rather
-> > than the tree (which the schema do). It's pretty hacky because it just
-> > greps the tree for a compatible string which is not entirely accurate.
-> > Also, we can extract an exact list of compatibles with
-> > "dt-extract-compatibles" which would make a better check, but I'm not
-> > sure making dtschema a dependency on checkpatch would be good.
-> >
-> > The other option is just ignore the warning. PCI compatibles are fairly=
- rare.
->
-> Yep, the same warnings are for EEPROM and USB VID/PID compatibles, and
-> we live with these, so I don't think PCI should be treated differently.
->
+Syzbot constructed 32 scatterlists, and the data members in struct sk_msg_sg 
+can only store a maximum of MAX_MSG_FRAGS scatterlists.
+However, the value of MAX_MSG_FRAGS=CONFIG_MAX_SKB_FRAG is less than 32, which
+leads to the warning reported here.
 
-Got it, I will drop this patch.
+Prevent similar issues from occurring by checking whether sg.end is greater 
+than MAX_MSG_FRAGS.
 
-Bart
+Reported-and-tested-by: syzbot+f2977222e0e95cec15c8@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/tls/tls_sw.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index e37b4d2e2acd..68dbe821f61d 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1016,6 +1016,8 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+ 
+ 		msg_pl = &rec->msg_plaintext;
+ 		msg_en = &rec->msg_encrypted;
++		if (msg_pl->sg.end >= MAX_MSG_FRAGS)
++			return -EINVAL;
+ 
+ 		orig_size = msg_pl->sg.size;
+ 		full_record = false;
+-- 
+2.43.0
+
 
