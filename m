@@ -1,103 +1,145 @@
-Return-Path: <netdev+bounces-62663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D46D82863F
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:49:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C46882864C
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:52:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26D4BB22AE8
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:49:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF3111F24955
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA9338DC9;
-	Tue,  9 Jan 2024 12:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3325381CF;
+	Tue,  9 Jan 2024 12:52:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G+Wu+ee7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfNTKuqe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A71F381BB
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 12:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5f2d4aaa2fdso29668847b3.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 04:49:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4A338DCD
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 12:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3376f71fcbbso1352736f8f.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 04:52:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704804569; x=1705409369; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yh8XLdDq/BTPS3YlBc+SIpy7Jy6WuYwqaxjYX/Z9Bbc=;
-        b=G+Wu+ee7n7VuDIFhLgs/KgdUg5g8sYfXW+f0bCXH+LJsyyC7T2AzzpztfSSk4OxA6f
-         PPJ5dKeYQ1iHmYcdaD1YAMOeaDtrtF1AGZvNyqS3Rd7oXVRxeU+3/d5KlGJ4m2v8XlrA
-         VW8fpjt5RhbjXzapW0IPripsAeQmhcpFOtUKYrrt6YsttjnU/yeJ6jshhr8bCseCD1FD
-         DD8hW5lVFqFlqk0dco7wFCR7fak5Ku8F2vXt6eviqUropYKcpPxsF0rRxh5579Z09E/k
-         Vomzf8E8+N+i1vZLMGW39UgwfOtbSpUqzY9gm8jSIZgjXiKcc+E61STJaKZYUmeT1Fcz
-         HW8g==
+        d=gmail.com; s=20230601; t=1704804727; x=1705409527; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZUfn3A6LMXwVtxZJmmWLULXnR+7Lbby3BO0v8WupMT4=;
+        b=mfNTKuqeK/7QlJcp4mDOwMhOmyyLgfHe0NV6GVvWR5saDRTrErod4gsnegW5/q/Y16
+         MIcWAn9e8AepeeI1aI16QiPU4v3Upor0Df1rYzrImICLUvsNjzySooh9aTBL9QLbH7ug
+         MGjG8+UkshPfCmP7QJEC1RNJ2c1RXBd/Gypy9KgmveV5S/U/Kz/tvzwDOKXvIk9+IQnr
+         bNyj8UvOePQ7hhRNVFzU9i3TD9VsGHF1oZn8S6IGTEcE3CODOjpo2iROW+yLmudOC5B3
+         U9/evxxEC7vH+uq0R0l9mEBMY0h3p8hLuIKdF/0KM82idofwMt4X3nVU2hEQbBPuuMr+
+         fQLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704804569; x=1705409369;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yh8XLdDq/BTPS3YlBc+SIpy7Jy6WuYwqaxjYX/Z9Bbc=;
-        b=EFCr1HHWm+CU8IxDEceSMlVhytfjyfhtzSR1dICFxRNc1Zy5S6oNfTNic9ZtCMLFPF
-         XipPQ/aWxk2QURALdhXPqDsOHFYGQ1f7GRtEIi6RPHYqhC1ZqidEzTMkPYxJAhjE/36Q
-         E2V0al7d0OsKU7YDyJ56Go3MN2QxM/AeUdQ7JTklrCuv0DYEyjCHM3X0GTXvl/bDEY42
-         FWGI1dD4AaB12RX5MS/QmCUGMlsTlaupOhgtXSgcU3F1nXQgiATzia3Z6dEEVIsbnjLv
-         627LNLI6o+cfNpDJ0lYD39YE9kHNN4He2uW4f3t7IlJ8KczeeHpbnKClBTO5dggZcP6v
-         d04w==
-X-Gm-Message-State: AOJu0Yw5d86afYXqzt7h+ox5lb6JcGgv85WszyYf8pOLuEsBNWcM0wF9
-	kn12+WJ3PWUGAG0MfEC2KxAtLHJ+0tOy0Mnp2JR1J2Zr1Tg2JQ==
-X-Google-Smtp-Source: AGHT+IFnWJ1a+SxEIOr6msm1T5lg4IqUUZf0DVvKgWcwm+MGscS7q34ZdZTHKFDA+jnDexoYM2n5cTkBIhkROLuy9Mg=
-X-Received: by 2002:a81:4f8f:0:b0:5f5:97c6:3f73 with SMTP id
- d137-20020a814f8f000000b005f597c63f73mr3873867ywb.53.1704804569096; Tue, 09
- Jan 2024 04:49:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704804727; x=1705409527;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZUfn3A6LMXwVtxZJmmWLULXnR+7Lbby3BO0v8WupMT4=;
+        b=EiYVl40+kTZL95ITfklIZMgYI7tziBYwEy8cRCl1UIDIeKPjK2mbDDfYFjnAHZnHL1
+         wPKDQwvdvwqi/AL5ofBG4JmwSfOC0Hgd3lky8aktHbCbmafnugO3UimE/bcASg2DlZmd
+         HDI8YzfpOXJ5CqS9tUZ977SgMlXdhnVzqQwwZ/i4PKIji/UVsRdXh7BWTLlzb4yeNipk
+         2d0xWkXZsd6aW7qBM7vh4ODKkU8emlhzPPrj4A1nKcEWfyzxND7ONaBxwFkYzBYEpEm8
+         1jEIlqkN+sgwHnfK8Wd7kVLoZ+0n4OjQTDHWxmnAHSTLcT7p24X4MNL7ic93hkyKf+0Z
+         tWoA==
+X-Gm-Message-State: AOJu0Yxg2S7OqDe/lf/E4Xz+8lWECMbVwsBBakwwQApVjVgp8VhUapg/
+	lj1PwB3LBHLTQqWm8XT2d88=
+X-Google-Smtp-Source: AGHT+IGKdDJeCF7FCJS/mrVeeK2YzY6sKx0ddSilLLQRFV30aY+or2nILTLQf1bZgDtIkH9lorqjEw==
+X-Received: by 2002:a5d:6d84:0:b0:337:5554:9f71 with SMTP id l4-20020a5d6d84000000b0033755549f71mr350622wrs.28.1704804727259;
+        Tue, 09 Jan 2024 04:52:07 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id bf2-20020a0560001cc200b0033763a9ea2dsm2350576wrb.63.2024.01.09.04.52.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jan 2024 04:52:07 -0800 (PST)
+Date: Tue, 9 Jan 2024 14:52:05 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Tristram.Ha@microchip.com,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	George McCollister <george.mccollister@gmail.com>
+Subject: Re: [net][hsr] Question regarding HSR RedBox functionality
+ implementation (preferably on KSZ9477)
+Message-ID: <20240109125205.u6yc3z4neter24ae@skbuf>
+References: <20230928124127.379115e6@wsk>
+ <20231003095832.4bec4c72@wsk>
+ <20231003104410.dhngn3vvdfdcurga@skbuf>
+ <20230922133108.2090612-1-lukma@denx.de>
+ <20230926225401.bganxwmtrgkiz2di@skbuf>
+ <20230928124127.379115e6@wsk>
+ <20231003095832.4bec4c72@wsk>
+ <20231003104410.dhngn3vvdfdcurga@skbuf>
+ <20240109133234.74c47dcd@wsk>
+ <20240109133234.74c47dcd@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-5-luizluca@gmail.com>
- <20240108141103.cxjh44upubhpi34o@skbuf>
-In-Reply-To: <20240108141103.cxjh44upubhpi34o@skbuf>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 9 Jan 2024 13:49:17 +0100
-Message-ID: <CACRpkdbU=jtYd4XgHZnwcgm66S-VOHp_XyfSKFYz0xU78KdPrQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 4/8] net: dsa: realtek: merge common and
- interface modules into realtek-dsa
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240109133234.74c47dcd@wsk>
+ <20240109133234.74c47dcd@wsk>
 
-On Mon, Jan 8, 2024 at 3:11=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com> =
-wrote:
-> On Fri, Dec 22, 2023 at 09:46:32PM -0300, Luiz Angelo Daros de Luca wrote=
-:
+Hi Lukasz,
 
-> > +realtek-dsa-objs-y                   :=3D realtek-common.o
-> > +realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_MDIO) +=3D realtek-mdio.o
-> > +realtek-dsa-objs-$(CONFIG_NET_DSA_REALTEK_SMI) +=3D realtek-smi.o
-> > +realtek-dsa-objs                     :=3D $(realtek-dsa-objs-y)
-> >  obj-$(CONFIG_NET_DSA_REALTEK_RTL8366RB) +=3D rtl8366.o
-> >  rtl8366-objs                                 :=3D rtl8366-core.o rtl83=
-66rb.o
-> >  obj-$(CONFIG_NET_DSA_REALTEK_RTL8365MB) +=3D rtl8365mb.o
->
-> Does "realtek-dsa-objs-y" have any particular meaning in the Kbuild
-> system, or is it just a random variable name?
+On Tue, Jan 09, 2024 at 01:32:34PM +0100, Lukasz Majewski wrote:
+> However, I'm wondering how the mainline Linux kernel could handle HSR
+> RedBox functionality (on document [1], Figure 2. we do have "bridge" -
+> OSI L2).
+> 
+> To be more interesting - br0 can be created between hsr0 and e.g. lan3.
+> But as expected communication breaks on both directions (to SAN and to
+> HSR ring).
 
-It's a Makefile naming convention, meaning this is always enabled.
+Yes, I suppose this is how a RedBox should be modeled. In principle it's
+identical to how bridging with LAG ports (bond, team) works - either in
+software or offloaded. The trouble is that the HSR driver seems to only
+work with the DANH/DANP roles (as also mentioned in
+Documentation/networking/dsa/dsa.rst). I don't remember what doesn't
+work (or if I ever knew at all). It might be the address substitution
+from hsr_xmit() that masks the MAC address of the SAN side device?
 
-linux$ git grep 'objs\-y'  | wc -l
-52
+> Is there a similar functionality already present in the Linux kernel
+> (so this approach could be reused)?
+> 
+> My (very rough idea) would be to extend KSZ9477 bridge join functions
+> to check if HSR capable interface is "bridged" and then handle frames
+> in a special way.
+> 
+> However, I would like to first ask for as much input as possible - to
+> avoid any unnecessary work.
 
-Yours,
-Linus Walleij
+First I'd figure out why the software data path isn't working, and if it
+can be fixed. Then, fix that if possible, and add a new selftest to
+tools/testing/selftests/net/forwarding/, that should pass using veth
+interfaces as lower ports.
+
+Then, offloading something that has a clear model in software should be
+relatively easy, though you might need to add some logic to DSA. This is
+one place that needs to be edited, there may be others.
+
+	/* dsa_port_pre_hsr_leave is not yet necessary since hsr devices cannot
+	 * meaningfully placed under a bridge yet
+	 */
+
+> 
+> Thanks in advance for help :-)
+> 
+> Link:
+> 
+> [1] -
+> https://ww1.microchip.com/downloads/en/Appnotes/AN3474-KSZ9477-High-Availability-Seamless-Redundancy-Application-Note-00003474A.pdf
+> 
+> 
+> Best regards,
+> 
+> Lukasz Majewski
 
