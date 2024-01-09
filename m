@@ -1,111 +1,126 @@
-Return-Path: <netdev+bounces-62544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A005827C80
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 02:20:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 974CA827C8D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 02:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A19D1C2329D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 01:20:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC6561C21BA7
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 01:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28FE139D;
-	Tue,  9 Jan 2024 01:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC9710E4;
+	Tue,  9 Jan 2024 01:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Av6YPCMA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XVGIEwtU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3A428EC;
-	Tue,  9 Jan 2024 01:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6BtEmCtYZmMHFCY50bU7DnIDw00PYo7ASFK/qSsw0RM=; b=Av6YPCMAPr8U6MpxUhGmP7ljKc
-	10TfumncpOYXF5qldqNoR4q/HRNHL/y+zucm855Y0H2ITU/eXyfdCWKEmQXHF/9hhvCcfNR3zjrkp
-	Bxy/Tl58bcpAAHTdiaxbeHgXYTDfvhCwSuHCMO96sClL1DtEcUu7qBilt3hv7X9ZwD3g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rN0mt-004hLR-HN; Tue, 09 Jan 2024 02:20:15 +0100
-Date: Tue, 9 Jan 2024 02:20:15 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	William Zhang <william.zhang@broadcom.com>,
-	Anand Gore <anand.gore@broadcom.com>,
-	Kursad Oney <kursad.oney@broadcom.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
-	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
-	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v9 5/5] net: phy: at803x: add LED support for
- qca808x
-Message-ID: <c138382e-096c-4ce0-87bd-4e42e6236972@lunn.ch>
-References: <20240105142719.11042-1-ansuelsmth@gmail.com>
- <20240105142719.11042-6-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCC22573
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 01:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704764004; x=1736300004;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=y1EHdcSBQkUWe+wb/IxTiGJCa2LDP0InuuawIHC0vLQ=;
+  b=XVGIEwtU5fg3WyM6SrRv4Dk9X2jDAG8mhNF4lnQRGbVtt+Rpre7ZV3sd
+   vQvSrWenw+KVFN9Kb1XxJdP5Zr1eH2KMYGtU9vc76R0En+A0ftVuut0Vn
+   Iy2p7/pmEqga9TCzuQvyWIHqO3BhV9KpPcYrmWu/xtlWwV1zjmAgvN0Sv
+   r2kd972ZPml+vokBaNaEz7s9g1IY2vfrulMuU6Ur8r9bpxZkN2SIrn+Ae
+   zM9Dnk7ftwTEng6uTaY+CMchPiWL90WEnLxYbqLZnhthE9433W2lMzhkb
+   dHDYRcCePSvDWITJIJCK72RRRfxGA/H5r6ps/XLPnrEW3EVzrAlGGA8wb
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="429238071"
+X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
+   d="scan'208";a="429238071"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 17:33:23 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
+   d="scan'208";a="23375456"
+Received: from unknown (HELO localhost.jf.intel.com) ([10.166.80.24])
+  by orviesa002.jf.intel.com with ESMTP; 08 Jan 2024 17:33:23 -0800
+From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	pmenzel@molgen.mpg.de,
+	emil.s.tantilov@intel.com,
+	horms@kernel.org,
+	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH iwl-net v3] idpf: avoid compiler padding in virtchnl2_ptype struct
+Date: Mon,  8 Jan 2024 17:32:29 -0800
+Message-ID: <20240109013229.773552-1-pavan.kumar.linga@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240105142719.11042-6-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 05, 2024 at 03:27:17PM +0100, Christian Marangi wrote:
-> Add LED support for QCA8081 PHY.
-> 
-> Documentation for this LEDs PHY is very scarce even with NDA access
-> to Documentation for OEMs. Only the blink pattern are documented and are
-> very confusing most of the time. No documentation is present about
-> forcing the LED on/off or to always blink.
-> 
-> Those settings were reversed by poking the regs and trying to find the
-> correct bits to trigger these modes. Some bits mode are not clear and
-> maybe the documentation option are not 100% correct. For the sake of LED
-> support the reversed option are enough to add support for current LED
-> APIs.
-> 
-> Supported HW control modes are:
-> - tx
-> - rx
-> - link10
-> - link100
-> - link1000
-> - half_duplex
-> - full_duplex
-> 
-> Also add support for LED polarity set to set LED polarity to active
-> high or low. QSDK sets this value to high by default but PHY reset value
-> doesn't have this enabled by default.
-> 
-> QSDK also sets 2 additional bits but their usage is not clear, info about
-> this is added in the header. It was verified that for correct function
-> of the LED if active high is needed, only BIT 6 is needed.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+In the arm random config file, kconfig option 'CONFIG_AEABI' is
+disabled which results in adding the compiler flag '-mabi=apcs-gnu'.
+This causes the compiler to add padding in virtchnl2_ptype
+structure to align it to 8 bytes, resulting in the following
+size check failure:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+include/linux/build_bug.h:78:41: error: static assertion failed: "(6) == sizeof(struct virtchnl2_ptype)"
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                         ^~~~~~~~~~~~~~
+include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
+      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
+         |                                  ^~~~~~~~~~~~~~~
+drivers/net/ethernet/intel/idpf/virtchnl2.h:26:9: note: in expansion of macro 'static_assert'
+      26 |         static_assert((n) == sizeof(struct X))
+         |         ^~~~~~~~~~~~~
+drivers/net/ethernet/intel/idpf/virtchnl2.h:982:1: note: in expansion of macro 'VIRTCHNL2_CHECK_STRUCT_LEN'
+     982 | VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Andrew
+Avoid the compiler padding by using "__packed" structure
+attribute for the virtchnl2_ptype struct. Also align the
+structure by using "__aligned(2)" for better code optimization.
+
+Fixes: 0d7502a9b4a7 ("virtchnl: add virtchnl version 2 ops")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202312220250.ufEm8doQ-lkp@intel.com
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+
+---
+v3:
+ - add "__aligned(2)" structure attribute for better code optimization
+
+v2:
+ - add the kconfig option causing the compile failure to the commit message
+---
+ drivers/net/ethernet/intel/idpf/virtchnl2.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
+index 8dc83788972..4a3c4454d25 100644
+--- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
++++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
+@@ -978,7 +978,7 @@ struct virtchnl2_ptype {
+ 	u8 proto_id_count;
+ 	__le16 pad;
+ 	__le16 proto_id[];
+-};
++} __packed __aligned(2);
+ VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
+ 
+ /**
+-- 
+2.43.0
+
 
