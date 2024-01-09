@@ -1,250 +1,193 @@
-Return-Path: <netdev+bounces-62742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7EB9828E75
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 21:20:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71EB3828E84
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 21:31:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DF93B22014
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 20:20:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D8A2283006
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 20:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DC53D961;
-	Tue,  9 Jan 2024 20:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8753A297;
+	Tue,  9 Jan 2024 20:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="GJqIo1Sf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c9zA+c9y"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW2PR02CU001.outbound.protection.outlook.com (mail-westus2azon11022027.outbound.protection.outlook.com [52.101.48.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2356B3D960;
-	Tue,  9 Jan 2024 20:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ovf1agRxy/Hi4nELPPtEVvKsWAt3fYz5A4F7fX2myeRwRugXN4WvH6i6EUQ2969iFg4w1JlijLv7CWelfyxcECSQkE4P6eW3+JIZcKk3euI3tgxPNDIrtBWVTW4IRWluKd8I23OrXs20UCszm9OlsI9VDHK1ZXnhy9LDpdTvHwmcD7Aapwe4Dby31K73mWoIfYIUBGTOgoijxCKHvPclwKnsPkwHX3mSLRqVH16zOkiueVHLpwphYo+2h2wWwU/imjCFbveLPTfVkG6pGSAPHr4P+JC3pBOTfgUZEsih6OiORVyK6zsIM8NQiUMUPwzGDID6JYUZeKNlDVhMqV6kjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eKzGFp9FgW3wR9OyfRAXhDBtiqppm9rPvsv5h3AL63M=;
- b=BK1dN9bbGsrud5gwXjkhaxuuUWxsWGbT5rZg5TOvQ0xLrpGcGhWEHG102Wua4Fi+Ub3C9E/37yHeMmPazWbcGL6gQQu625tCUgP9r7/zzfP6JjECkBP/oUwzxuTGv/DLf7x/k4eOeDPaIDWoSlEl3Cq7Ee+bKcClqBREY6aGa3NokdCalFH+xppS38Iyg4DLoaG3Qhdbl9MIKp8tQoiMcbkqHI0Hp1bueyMFhxjdQa/PikMXol5tSNkABopz3lb9V9fmuHBssXxPbwsP3SYwakNReQSghFC9+Abb+XYAvl0CK8Ti4CnBoA4y+lpiUQwXI1YmJefdtdUi/0zyLNwD8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eKzGFp9FgW3wR9OyfRAXhDBtiqppm9rPvsv5h3AL63M=;
- b=GJqIo1SfQAPSbdt4tPFQIX58qR1aX4MTDJJ6jynecEgLSXoTvjaGZMwk6Lv0E/+Sd5mwjGcLLzFFDszEC88gZ83YRQ3IS+EaPtXaqRcUyW1xs8zc17/V0Z4RvvlAmiANT+3Fw+zNiNSxwOE2RXnR5LRJbzxw+zoQWwIQwq67UI4=
-Received: from MW1PEPF0000E691.namprd21.prod.outlook.com
- (2603:10b6:329:400:0:2:0:15) by DM6PR21MB1513.namprd21.prod.outlook.com
- (2603:10b6:5:25c::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.8; Tue, 9 Jan
- 2024 20:20:31 +0000
-Received: from MW1PEPF0000E691.namprd21.prod.outlook.com
- ([fe80::a93b:72df:f1d8:6026]) by MW1PEPF0000E691.namprd21.prod.outlook.com
- ([fe80::a93b:72df:f1d8:6026%4]) with mapi id 15.20.7181.004; Tue, 9 Jan 2024
- 20:20:31 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Michael Kelley <mhklinux@outlook.com>, Souradeep Chakrabarti
-	<schakrabarti@linux.microsoft.com>, KY Srinivasan <kys@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
-	"yury.norov@gmail.com" <yury.norov@gmail.com>, "leon@kernel.org"
-	<leon@kernel.org>, "cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>
-CC: Souradeep Chakrabarti <schakrabarti@microsoft.com>, Paul Rosswurm
-	<paulros@microsoft.com>
-Subject: RE: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs per
- CPUs
-Thread-Topic: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs
- per CPUs
-Thread-Index: AQHaQunR3RrbavDz00+r/Bf4otFslrDR3JYAgAAND8A=
-Date: Tue, 9 Jan 2024 20:20:31 +0000
-Message-ID:
- <MW1PEPF0000E6910254736DF77F99E04DD4CA6A2@MW1PEPF0000E691.namprd21.prod.outlook.com>
-References:
- <1704797478-32377-1-git-send-email-schakrabarti@linux.microsoft.com>
- <1704797478-32377-4-git-send-email-schakrabarti@linux.microsoft.com>
- <SN6PR02MB4157CB3CB55A17255AE61BF6D46A2@SN6PR02MB4157.namprd02.prod.outlook.com>
-In-Reply-To:
- <SN6PR02MB4157CB3CB55A17255AE61BF6D46A2@SN6PR02MB4157.namprd02.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=5a560160-a342-4beb-ac00-2af74747d2e4;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-01-09T20:09:22Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW1PEPF0000E691:EE_|DM6PR21MB1513:EE_
-x-ms-office365-filtering-correlation-id: a9c9686e-c6c1-4eae-41f2-08dc11506ddc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- VBMopLyw0pSeXlriJxmz6C/nRJ0ihN2wYJR//niZVLAjb5zHZ7kDwLcLr8n8GTHsZi3I21SKbUjSoYAZ+/lB0VV4wtK5JxZBhfi89XwwCfnSr8td6CSnpS5VoP/rH1EvIDGBv/VhO98Vhz/Fav+jaTTKMV/IVKmFPfYCpgKyZr3XqoACRofHp48irmm+mdfT760TqUe5gaNRHGm2fiMsa6/Dj/Ul4dkxXVTrbGVzfzPl5xtxIluNULhXu1ITP21OsW1CsqBKTNU2PsILlccgm489hb0ptJGLcZ0t6zfQhVERx74eOWDBMA6IP3e077H4BlHHOpb4fdDPH7RWY+3Y5E/rg4tTJe/aXAMSqy0y97R3hAUL66a5ZqV4p7/jR9T9azqHGhjRamIEsROgPR3N8TAIfOmQioJsm0Ikg/KDJke9NJl9Xhax5fXQnEzhOBSX1NZjosKrnhLY0R3X8AbM7FMuGaD4d9U7/DdLvmbvNI/8XMG9InVvhFa2ZWj8srUdAQ+gNyTj/oCzM993JIYTcrNgWCdy+UQjRQIWcBxmsTOJwiuxgT0kgTSmtlL0WR9rdIyR82/k87GB3KEDqfmOtpNAry6vyzjU6ZGxcYRet68AZU+RXKuP9fCJP9NykwZ21OVDabsAI+czsYgu/8K/BYusUE3ofGECmWQH74ctaAWclouaxOiRKU/5KVV8ziG9ZkSzGB5TmmAKZ8jncGAgufM5r6wxoV4pm4oNIi5x15k=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW1PEPF0000E691.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(346002)(39860400002)(376002)(396003)(230922051799003)(230173577357003)(230273577357003)(64100799003)(451199024)(1800799012)(186009)(966005)(7416002)(478600001)(5660300002)(71200400001)(82950400001)(33656002)(10290500003)(6506007)(86362001)(107886003)(53546011)(8676002)(7696005)(9686003)(66446008)(8936002)(316002)(41300700001)(54906003)(76116006)(66556008)(66476007)(64756008)(66946007)(122000001)(38100700002)(83380400001)(26005)(82960400001)(4326008)(110136005)(38070700009)(52536014)(921011)(55016003)(8990500004)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?A015Rdkr+AqbMNqk+4ztZhFAUDkDkFWdZLk6Q+p45aKrVB8h9eStLfH8Kixc?=
- =?us-ascii?Q?9vRT52dKld4trsFz8/cbk2l8jAzrEe/SsmRDhKLcVE8KFTd+CpxrxQqWyM54?=
- =?us-ascii?Q?bsEfHhtkPzntBnW3zw8xmHAzAxvzYSkjcq6PKLuEDyYSnBnJ1cx3Su0SK3ED?=
- =?us-ascii?Q?twp4DWUreuyqvTCVHnN6WeEwHqoW/aaMF3no6URDlBGJTA9+l313iX4S0wfa?=
- =?us-ascii?Q?RYEUNFozhpLbN+pmw5HfuTN6M5M5B5bKeoyHEhEPjVohVyp4W2jwR6Qv1ndp?=
- =?us-ascii?Q?lqASqRPvDgiqN0vSlVfD3YwZqlsXPK1XbhrZuPFJ4iobwgd249QwsXXVcC7s?=
- =?us-ascii?Q?qm91JhUXq7sITKUm5+q3C8UCm4krNWuk9oNOWQ4JHduN0CU0vYhaWVz3Z3pQ?=
- =?us-ascii?Q?SSYfF5iYlEZO5vHH35co79ww3L8AHuf0VGeLPb9YBwJ70kB3wR1L5fgsmMfu?=
- =?us-ascii?Q?20MhuGnLAWhbd0B5Pm7h60RSm4THVpnvY4G+nr/tc9/haQ+FEOeONrP5yrII?=
- =?us-ascii?Q?uEwvPVOuQ4EO3iBcc+Jckq5uM8nJ7tnznWyVDf0SGCun/ALi6Nna3BFTOQvv?=
- =?us-ascii?Q?VyMf8lOWTxAbbHa5UWF6JoZa/g4e2gWAC8nwTNFP+aZJ129SmQp7rus5/OFZ?=
- =?us-ascii?Q?PqDfVHUm1Uvs5rkN5GV2+i/9CeBrJ9guVEK1G6m1bxuVN0hIA1QMASMT3nNR?=
- =?us-ascii?Q?ff5U9+jznGwyCm2Pp61sfK30nrO4I2g5XyUgWHFFdvmdQILGJbvUytbDKCYW?=
- =?us-ascii?Q?ZDL7Yuf0kjxa74nPvmGC7jaG5DtAlZqVV9uhrqtiQvaKODOdBPVWzW2AtC4R?=
- =?us-ascii?Q?/CHpu/AwDExyOibpZb6yyXsT9HNbYf+pSq5o5NCgeyhJ3HyhxvmMwuDxodzq?=
- =?us-ascii?Q?F7/bQtmGNu0w25I02sbks0gAcU9dUZG5xubsksq46W7f7l4t5LLlArpIaXes?=
- =?us-ascii?Q?7N00JSpogT3ukZJAfR+mdmRDFllHb12CY+tGThq6wlALtMXZ0ZoOJGYGkbeO?=
- =?us-ascii?Q?XPBe4yGJl1t7lignTjdtvuetd2EdIURtD3fIjdT6Lt5jJo/2R+O3+Ou0sFOQ?=
- =?us-ascii?Q?FvJOlXMxN10pE1OqetEmadpNu1lgiG7ZyNmNmfLfMz3lPwdPt48gSwvi6n/t?=
- =?us-ascii?Q?gWjMKpXinRcH5lqer2L9yRIpdQkDn0cjYb7MQyjVheJdx+J4H8OU3eIfSdWY?=
- =?us-ascii?Q?BZv2x5V4qXjDTmb28Jtr9Eh4WWzOIgLoAsSztycHGEvAZkM8zSEe5Z8OsbMK?=
- =?us-ascii?Q?dDix3DN/CyzSp9fciT3gb7JSrRoqoWEfuUhUTn8uM+AQbcpRBvGVVDUvou5N?=
- =?us-ascii?Q?bLZstuM40hJuU+/FWVjNORI1pYwWQllfBRZEDNVwR5Ch5FKTzYE7YScrJOcK?=
- =?us-ascii?Q?C1gRltVCYcWwHzVf2Ai+M/qgUYPnEVPv4pknDi8XCdb3qwHLBrE137oIXSEt?=
- =?us-ascii?Q?N1uWCa/zGgbdmtbmd9n9nPXYItY9hfoyJXecKIsgC6QTLF2XGXQmGs7i/wMp?=
- =?us-ascii?Q?00zf2xvY0bNr+paXiRW/El39eGjuiWuF8c6VAOb2NSAxGeIjzXhmK+qz/YY2?=
- =?us-ascii?Q?m9rjELApG9nkAx6TGH/zsSn4NykrmUM3TNfcGahJ?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2024220E7;
+	Tue,  9 Jan 2024 20:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5578485fc0eso2499388a12.1;
+        Tue, 09 Jan 2024 12:31:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704832286; x=1705437086; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Zy227x7o0Ll4yDIdnlPh8FgO9tgNZWkKoSg5mlIm//U=;
+        b=c9zA+c9yUFhlyP3rfhUsKCj6awFLhbJS6P1PqrDICsqySR63snd6urX8ZzcIYojmy4
+         Y9+wTq1o9BkJPpYqYmgxMPLzZOu7c4MzqygAr0dSQGdgmI0YCCB20eL3mg8nvx6yh7cY
+         t79IsHp56XHmExVyNnEzVEsrIeeGGs1ny6afrRLhUXkJk3zNgIPtt0xoNGB2qHZgqHqn
+         Ty74tBhZv2+cqPy6y0yW2xAEUUIpZYakb7wvpcpfIY0A6haWNJK0rltmf2mBWqcF43S2
+         SyM1aE8nOo6X3hupaHjQpS209jdJIPh5NHTxsl7nwSTUw3d1bx8rO+uJDXL1IXmkMuKy
+         UUYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704832286; x=1705437086;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zy227x7o0Ll4yDIdnlPh8FgO9tgNZWkKoSg5mlIm//U=;
+        b=gUfB0TL2h03lclKkQZu8wtvztp1lQnfXdfRtfSLNe5d7SZ8yvrMTM0tHwXb0HRhS04
+         /bqxUGCr7gXDZoP+fEPyT0N3ztTGPFtEfLQVfWAqtKSPkHwj9KYOT1zwgT5oxoxqlMEy
+         tZ5d0/QhOiUfrIkvFNCnPsdKA19gStka3/EE8MS+j/NqUYLnuMEYW+VXxnvoU8ZEnmNN
+         IzZEKrjgXUBItVMHE4TdK9ClVNLLomBwGAboGfWmVB0RJdcAo65dznqk8KANio/Q+04Z
+         JKf2jXZwS23VtWSLjPKsS+o2tvT0GnWNf49MYncMUjdG6qNT/wHXO/bePEZn3Kxx8V6P
+         UE1w==
+X-Gm-Message-State: AOJu0Yx6B4+kr8DKdtciVHd0xB1pp2DQIyfRwlrVKj8e6RIuYfAHD/BZ
+	fX/rM42p+9v1QbvmJWtGb5U=
+X-Google-Smtp-Source: AGHT+IEhKtpTXJ1m7RpKcdYH1ZpccgeGef5Z558w35b+uYVdVfzGVHOF2tqL7DSNVdVDWI05h4l5Nw==
+X-Received: by 2002:a05:6402:1818:b0:558:2110:5ab0 with SMTP id g24-20020a056402181800b0055821105ab0mr700053edy.72.1704832286097;
+        Tue, 09 Jan 2024 12:31:26 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6ec5:5b00:2949:ac5c:4096:8128? (dynamic-2a01-0c22-6ec5-5b00-2949-ac5c-4096-8128.c22.pool.telefonica.de. [2a01:c22:6ec5:5b00:2949:ac5c:4096:8128])
+        by smtp.googlemail.com with ESMTPSA id er10-20020a056402448a00b005572a1159b9sm1269937edb.22.2024.01.09.12.31.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jan 2024 12:31:25 -0800 (PST)
+Message-ID: <d8ed4af1-5c83-4895-9fc3-9aea25724fd9@gmail.com>
+Date: Tue, 9 Jan 2024 21:31:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW1PEPF0000E691.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9c9686e-c6c1-4eae-41f2-08dc11506ddc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jan 2024 20:20:31.7615
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KA9tbIuXQYbayE15rR7SFvGqMWwJGWk/EbExkZXygxekKjgRXnPqhge21fbwk5ylJc4I6ALWV/Wgiqyzj2Dv3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR21MB1513
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] tg3: add new module param to force device power down on
+ reboot
+Content-Language: en-US
+To: Andrea Fois <andrea.fois@eventsense.it>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Michael Chan <mchan@broadcom.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, George Shuklin <george.shuklin@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240109194551.17666-1-andrea.fois@eventsense.it>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20240109194551.17666-1-andrea.fois@eventsense.it>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 09.01.2024 20:45, Andrea Fois wrote:
+> The bug #1917471 was fixed in commit 2ca1c94ce0b6 ("tg3: Disable tg3
+> device on system reboot to avoid triggering AER") but was reintroduced
+> by commit 9fc3bc764334 ("tg3: power down device only on
+> SYSTEM_POWER_OFF").
+> 
+> The problem described in #1917471 is still consistently replicable on
+> reboots on Dell Servers (i.e. R750xs with BCM5720 LOM), causing NMIs
+> (i.e. NMI received for unknown reason 38 on cpu 0) after 9fc3bc764334
+> was committed.
+> 
+> The problem is detected also by the Lifecycle controller and logged as
+> a PCI Bus Error for the device.
+> 
+> As the problems addressed by 2ca1c94ce0b6 and by 9fc3bc764334 requires
+> opposite strategies, a new module param "force_pwr_down_on_reboot"
+> <bool> is introduced to fix both scenarios:
+> 
+Adding module parameters is discouraged. What I see could try:
 
+- limit 9fc3bc764334 to the specific machine type mentioned in the
+  commit message (based DMI info)
+- 2ca1c94ce0b6 performs two actions: power down tg3 and disable device
+  Based on the commit description disabling the device might be sufficient.
 
-> -----Original Message-----
-> From: Michael Kelley <mhklinux@outlook.com>
-> Sent: Tuesday, January 9, 2024 2:23 PM
-> To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>; KY Srinivas=
-an
-> <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.com>;
-> wei.liu@kernel.org; Dexuan Cui <decui@microsoft.com>;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com; Long Li <longli@microsoft.com>; yury.norov@gmail.com;
-> leon@kernel.org; cai.huoqing@linux.dev; ssengar@linux.microsoft.com;
-> vkuznets@redhat.com; tglx@linutronix.de; linux-hyperv@vger.kernel.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
-> rdma@vger.kernel.org
-> Cc: Souradeep Chakrabarti <schakrabarti@microsoft.com>; Paul Rosswurm
-> <paulros@microsoft.com>
-> Subject: RE: [PATCH 3/4 net-next] net: mana: add a function to spread IRQ=
-s per
-> CPUs
->=20
-> [Some people who received this message don't often get email from
-> mhklinux@outlook.com. Learn why this is important at
-> https://aka.ms/LearnAboutSenderIdentification ]
->=20
-> From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com> Sent:
-> Tuesday, January 9, 2024 2:51 AM
-> >
-> > From: Yury Norov <yury.norov@gmail.com>
-> >
-> > Souradeep investigated that the driver performs faster if IRQs are
-> > spread on CPUs with the following heuristics:
-> >
-> > 1. No more than one IRQ per CPU, if possible;
-> > 2. NUMA locality is the second priority;
-> > 3. Sibling dislocality is the last priority.
-> >
-> > Let's consider this topology:
-> >
-> > Node            0               1
-> > Core        0       1       2       3
-> > CPU       0   1   2   3   4   5   6   7
-> >
-> > The most performant IRQ distribution based on the above topology
-> > and heuristics may look like this:
-> >
-> > IRQ     Nodes   Cores   CPUs
-> > 0       1       0       0-1
-> > 1       1       1       2-3
-> > 2       1       0       0-1
-> > 3       1       1       2-3
-> > 4       2       2       4-5
-> > 5       2       3       6-7
-> > 6       2       2       4-5
-> > 7       2       3       6-7
->=20
-> I didn't pay attention to the detailed discussion of this issue
-> over the past 2 to 3 weeks during the holidays in the U.S., but
-> the above doesn't align with the original problem as I understood
-> it.  I thought the original problem was to avoid putting IRQs on
-> both hyper-threads in the same core, and that the perf
-> improvements are based on that configuration.  At least that's
-> what the commit message for Patch 4/4 in this series says.
->=20
-> The above chart results in 8 IRQs being assigned to the 8 CPUs,
-> probably with 1 IRQ per CPU.   At least on x86, if the affinity
-> mask for an IRQ contains multiple CPUs, matrix_find_best_cpu()
-> should balance the IRQ assignments between the CPUs in the mask.
-> So the original problem is still present because both hyper-threads
-> in a core are likely to have an IRQ assigned.
->=20
-> Of course, this example has 8 IRQs and 8 CPUs, so assigning an
-> IRQ to every hyper-thread may be the only choice.  If that's the
-> case, maybe this just isn't a good example to illustrate the
-> original problem and solution.  But even with a better example
-> where the # of IRQs is <=3D half the # of CPUs in a NUMA node,
-> I don't think the code below accomplishes the original intent.
->=20
-> Maybe I've missed something along the way in getting to this
-> version of the patch.  Please feel free to set me straight. :-)
->=20
-> Michael
-
-I have the same question as Michael. Also, I'm asking Souradeep
-in another channel: So, the algorithm still uses up all current=20
-NUMA node before moving on to the next NUMA node, right?
-
-Except each IRQ is affinitized to 2 CPUs.=20
-For example, a system with 2 IRQs:
-IRQ     Nodes   Cores  CPUs
-0       1       0      0-1
-1       1       1      2-3
-=20
-Is this performing better than the algorithm in earlier patches? like below=
-:
-IRQ     Nodes   Cores  CPUs
-0       1       0      0
-1       1       1      2
-
-Thanks,
-- Haiyang
+> 	force_pwr_down_on_reboot = 0/N/n = disable, keep the current
+> 									   behavior, don't force dev
+> 									   power down on reboot
+> 
+> 	force_pwr_down_on_reboot = 1/Y/y = enable, revert to the
+> 									   behavior of 2ca1c94ce0b6,
+> 									   force dev power down on reboot
+> 
+> Fixes: 9fc3bc764334 ("tg3: power down device only on SYSTEM_POWER_OFF")
+> Signed-off-by: Andrea Fois <andrea.fois@eventsense.it>
+> ---
+>  drivers/net/ethernet/broadcom/tg3.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+> index f52830dfb26a..287786357c9b 100644
+> --- a/drivers/net/ethernet/broadcom/tg3.c
+> +++ b/drivers/net/ethernet/broadcom/tg3.c
+> @@ -233,6 +233,12 @@ static int tg3_debug = -1;	/* -1 == use TG3_DEF_MSG_ENABLE as value */
+>  module_param(tg3_debug, int, 0);
+>  MODULE_PARM_DESC(tg3_debug, "Tigon3 bitmapped debugging message enable value");
+>  
+> +static bool force_pwr_down_on_reboot;	/* false == Don't force the power down of
+> +					 * the device during reboot, only on SYSTEM_POWER_OFF
+> +					 */
+> +module_param(force_pwr_down_on_reboot, bool, 0x644);
+> +MODULE_PARM_DESC(force_pwr_down_on_reboot, "Tigon3 force power down of the device on reboot enable value");
+> +
+>  #define TG3_DRV_DATA_FLAG_10_100_ONLY	0x0001
+>  #define TG3_DRV_DATA_FLAG_5705_10_100	0x0002
+>  
+> @@ -18197,7 +18203,7 @@ static void tg3_shutdown(struct pci_dev *pdev)
+>  	if (netif_running(dev))
+>  		dev_close(dev);
+>  
+> -	if (system_state == SYSTEM_POWER_OFF)
+> +	if (system_state == SYSTEM_POWER_OFF || force_pwr_down_on_reboot)
+>  		tg3_power_down(tp);
+>  
+>  	rtnl_unlock();
 
 
