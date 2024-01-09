@@ -1,126 +1,107 @@
-Return-Path: <netdev+bounces-62545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 974CA827C8D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 02:33:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0235827C92
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 02:37:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC6561C21BA7
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 01:33:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A89E52853C1
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 01:37:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC9710E4;
-	Tue,  9 Jan 2024 01:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XVGIEwtU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C4215AE;
+	Tue,  9 Jan 2024 01:37:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCC22573
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 01:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704764004; x=1736300004;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=y1EHdcSBQkUWe+wb/IxTiGJCa2LDP0InuuawIHC0vLQ=;
-  b=XVGIEwtU5fg3WyM6SrRv4Dk9X2jDAG8mhNF4lnQRGbVtt+Rpre7ZV3sd
-   vQvSrWenw+KVFN9Kb1XxJdP5Zr1eH2KMYGtU9vc76R0En+A0ftVuut0Vn
-   Iy2p7/pmEqga9TCzuQvyWIHqO3BhV9KpPcYrmWu/xtlWwV1zjmAgvN0Sv
-   r2kd972ZPml+vokBaNaEz7s9g1IY2vfrulMuU6Ur8r9bpxZkN2SIrn+Ae
-   zM9Dnk7ftwTEng6uTaY+CMchPiWL90WEnLxYbqLZnhthE9433W2lMzhkb
-   dHDYRcCePSvDWITJIJCK72RRRfxGA/H5r6ps/XLPnrEW3EVzrAlGGA8wb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="429238071"
-X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
-   d="scan'208";a="429238071"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 17:33:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
-   d="scan'208";a="23375456"
-Received: from unknown (HELO localhost.jf.intel.com) ([10.166.80.24])
-  by orviesa002.jf.intel.com with ESMTP; 08 Jan 2024 17:33:23 -0800
-From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	pmenzel@molgen.mpg.de,
-	emil.s.tantilov@intel.com,
-	horms@kernel.org,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH iwl-net v3] idpf: avoid compiler padding in virtchnl2_ptype struct
-Date: Mon,  8 Jan 2024 17:32:29 -0800
-Message-ID: <20240109013229.773552-1-pavan.kumar.linga@intel.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4072D10E4;
+	Tue,  9 Jan 2024 01:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4T8D5L2nbZz1Q7qb;
+	Tue,  9 Jan 2024 09:35:18 +0800 (CST)
+Received: from kwepemi500006.china.huawei.com (unknown [7.221.188.68])
+	by mail.maildlp.com (Postfix) with ESMTPS id 748BD1A0172;
+	Tue,  9 Jan 2024 09:36:49 +0800 (CST)
+Received: from [10.67.120.168] (10.67.120.168) by
+ kwepemi500006.china.huawei.com (7.221.188.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 9 Jan 2024 09:36:48 +0800
+Message-ID: <b23fb661-4a04-edb0-70fb-2d2c89d822d3@hisilicon.com>
+Date: Tue, 9 Jan 2024 09:36:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.0
+Subject: Re: [PATCH iproute2-rc 2/2] rdma: Fix the error of accessing string
+ variable outside the lifecycle
+Content-Language: en-US
+To: Andrea Claudi <aclaudi@redhat.com>
+CC: <jgg@ziepe.ca>, <leon@kernel.org>, <dsahern@gmail.com>,
+	<stephen@networkplumber.org>, Chengchang Tang <tangchengchang@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>
+References: <20231229065241.554726-1-huangjunxian6@hisilicon.com>
+ <20231229065241.554726-3-huangjunxian6@hisilicon.com>
+ <fb7c85a4-165d-7eda-740a-d11a32cb86c0@hisilicon.com>
+ <ZZweXDQ-4ZrlfxBv@renaissance-vector>
+From: Junxian Huang <huangjunxian6@hisilicon.com>
+In-Reply-To: <ZZweXDQ-4ZrlfxBv@renaissance-vector>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemi500006.china.huawei.com (7.221.188.68)
 
-In the arm random config file, kconfig option 'CONFIG_AEABI' is
-disabled which results in adding the compiler flag '-mabi=apcs-gnu'.
-This causes the compiler to add padding in virtchnl2_ptype
-structure to align it to 8 bytes, resulting in the following
-size check failure:
 
-include/linux/build_bug.h:78:41: error: static assertion failed: "(6) == sizeof(struct virtchnl2_ptype)"
-      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
-         |                                         ^~~~~~~~~~~~~~
-include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
-      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
-         |                                  ^~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/idpf/virtchnl2.h:26:9: note: in expansion of macro 'static_assert'
-      26 |         static_assert((n) == sizeof(struct X))
-         |         ^~~~~~~~~~~~~
-drivers/net/ethernet/intel/idpf/virtchnl2.h:982:1: note: in expansion of macro 'VIRTCHNL2_CHECK_STRUCT_LEN'
-     982 | VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
-         | ^~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Avoid the compiler padding by using "__packed" structure
-attribute for the virtchnl2_ptype struct. Also align the
-structure by using "__aligned(2)" for better code optimization.
+On 2024/1/9 0:10, Andrea Claudi wrote:
+> On Mon, Jan 08, 2024 at 09:28:52AM +0800, Junxian Huang wrote:
+>>
+>> Hi all,
+>>
+>> the first patch is replaced by Stephen's latest patches. Are there any
+>> comments to this patch?
+>>
+>> Thanks,
+>> Junxian
+>>
+>> On 2023/12/29 14:52, Junxian Huang wrote:
+>>> From: wenglianfa <wenglianfa@huawei.com>
+>>>
+>>> All these SPRINT_BUF(b) definitions are inside the 'if' block, but
+>>> accessed outside the 'if' block through the pointers 'comm'. This
+>>> leads to empty 'comm' attribute when querying resource information.
+>>> So move the definitions to the beginning of the functions to extend
+>>> their life cycle.
+>>>
+>>> Before:
+>>> $ rdma res show srq
+>>> dev hns_0 srqn 0 type BASIC lqpn 18 pdn 5 pid 7775 comm
+>>>
+>>> After:
+>>> $ rdma res show srq
+>>> dev hns_0 srqn 0 type BASIC lqpn 18 pdn 5 pid 7775 comm ib_send_bw
+>>>
+>>> Fixes: 1808f002dfdd ("lib/fs: fix memory leak in get_task_name()")
+>>> Signed-off-by: wenglianfa <wenglianfa@huawei.com>
+>>> Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
+>>> ---
+> 
+> Hi Junxian,
+> For future patches, you can have a faster feedback adding to cc the
+> author of the original patch. In this case it's me, so here's my
+> 
+> Acked-by: Andrea Claudi <aclaudi@redhat.com>
+> 
 
-Fixes: 0d7502a9b4a7 ("virtchnl: add virtchnl version 2 ops")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202312220250.ufEm8doQ-lkp@intel.com
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Thanks for the advice!
 
----
-v3:
- - add "__aligned(2)" structure attribute for better code optimization
-
-v2:
- - add the kconfig option causing the compile failure to the commit message
----
- drivers/net/ethernet/intel/idpf/virtchnl2.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-index 8dc83788972..4a3c4454d25 100644
---- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
-+++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-@@ -978,7 +978,7 @@ struct virtchnl2_ptype {
- 	u8 proto_id_count;
- 	__le16 pad;
- 	__le16 proto_id[];
--};
-+} __packed __aligned(2);
- VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
- 
- /**
--- 
-2.43.0
-
+Junxian
 
