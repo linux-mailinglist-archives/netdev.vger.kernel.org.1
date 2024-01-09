@@ -1,133 +1,160 @@
-Return-Path: <netdev+bounces-62694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86C5782891E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:38:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFC282897E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 16:56:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABD8B1C23BE4
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:38:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 161361F2469B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 15:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EC039FE6;
-	Tue,  9 Jan 2024 15:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1D239FE7;
+	Tue,  9 Jan 2024 15:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TvN3Fyf6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UIiIIieR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917F639FDD;
-	Tue,  9 Jan 2024 15:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5cedfc32250so1257731a12.0;
-        Tue, 09 Jan 2024 07:38:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704814703; x=1705419503; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WczyQ1l8jHhZlEcIGinjqLaLiGU6nueDfrDaoUhkza8=;
-        b=TvN3Fyf6k87SR+zPi7lOYo0zUO6Rv3MAgXwjlQyl0CUb6SHjRgit8iSKrqf7qaMZEC
-         dZXEnTGOm9KhOhSco+tRffNUy/Po/SnQjN1+OWOQ1yqKafXD74H0DblVW4LjHkwuCuqF
-         mvcgim21VkCuBNI3zTGSBXiVgDoOEYDGEqzuWiFnM38A38BuCXvKYyZwzu1NAfIp0a8J
-         I6WtoV0q7JhJhr3kNdjQNJ9c3ksbohaNQ0UwT1Y4rrxzsWSnG1SGk9gJe14aXFTMIzWb
-         C4ggJPcB9Ss0HpFNhf3WqX3xbcBfQui/bBLBNSJ55pKvaAK8vv4gOiEtmGzqLvGWPwVx
-         Q1aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704814703; x=1705419503;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WczyQ1l8jHhZlEcIGinjqLaLiGU6nueDfrDaoUhkza8=;
-        b=J7f87pZOOidt0rawALuGNKEV/yI91teMPTuk5BKrn02HZWytyE0al0GS6SJANZ1v7n
-         Qb1eleeVZH/Towrf0z495OvVvMgYBraexDyRoz1hVPZbOt7VDCRB8B5GpYmY8fnHfuya
-         u3V2A2c4NYX0Xuf4I6PVyVbQd8soyyTqD40IEp+UfTW6W4IZjGx0pllLLg34ThyI990p
-         1qSfgqF1IAUVHANKVpmn+HXXv5FY4nEa6EGuYDQ1dsSd4lSM0dFNEKKXaQQnZfaaXImx
-         pt/sSW+766ABqnPkKl/E02Odu82+ewxR9Kg4uF/r1F3/KoVeB3Oxmep928879eGZAWs6
-         I5AQ==
-X-Gm-Message-State: AOJu0YzMzXwwEXJsXKFGLdra60Pooch9smSQqCZxY2xzi41z78ktGY/W
-	7idQTdT0ZW5TAmb4i+T4G0Mnvwro7hTsZD5LNvPY6kbi
-X-Google-Smtp-Source: AGHT+IHqR/5JV65k1KfF5hME9odf6td4CQBJxUxdK4tDc79VgoizfxPtfCJOhfd0MhXfSkP+QdpawpbmNCQ8m+sKO5A=
-X-Received: by 2002:a17:90b:364c:b0:28d:7947:1da0 with SMTP id
- nh12-20020a17090b364c00b0028d79471da0mr1816952pjb.29.1704814702732; Tue, 09
- Jan 2024 07:38:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF0E3987C
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 15:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704815754; x=1736351754;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=j+FfbNldsdXKfmLLTsfbXrR2j6FSXyUY9HQQw8FrL5E=;
+  b=UIiIIieR8X5YtrWrUa7MTMIbRm5eugW4kwC9CHzAxadyzik85H5d8dGF
+   ARsykt+S7fHhlgcnzYXoxFY0pZlMBH1ec4DJk8Ujn/IqYrGWCzTkjwId/
+   2H+sBk8zw3JXaioRzh5X3njSh5AdT/oSPJ/fC+oQJ4lwcd/y7ll+LhzlC
+   uToAqneROJHEv4gYoyGfjFkJKGWbDZ0hwRqvTMGCIQ8jiZJLxDkyHFQVl
+   TUGCB1VeWq+7iy+uzyetZbwUSELSWgwRh/oK/hmwHxCE59aSmXnni7m2y
+   AVZzmzw2BZ6PzJiLrGj6tQrRduTBJGlsq7KMV37eIXbJpk8qt9kyV5gbR
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="397097141"
+X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
+   d="scan'208";a="397097141"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 07:55:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="781846219"
+X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
+   d="scan'208";a="781846219"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orsmga002.jf.intel.com with ESMTP; 09 Jan 2024 07:55:48 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH ethtool-next] ethtool: add support for setting TCP data split
+Date: Tue,  9 Jan 2024 16:55:30 +0100
+Message-ID: <20240109155530.9661-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
- <20240103095650.25769-4-linyunsheng@huawei.com> <f4abe71b3439b39d17a6fb2d410180f367cadf5c.camel@gmail.com>
- <74c9a3a1-5204-f79a-95ff-5c108ec6cf2a@huawei.com> <CAKgT0Uf=hFrXLzDFaOxs_j9yYP7aQCmi=wjUyuop3FBv2vzgCA@mail.gmail.com>
- <f138193c-30e0-b1ba-1735-5f569230724b@huawei.com>
-In-Reply-To: <f138193c-30e0-b1ba-1735-5f569230724b@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 9 Jan 2024 07:37:46 -0800
-Message-ID: <CAKgT0UcujEktOnHx7mxWd+Jah1J9mHFWnTx35vc3x25uUadxaA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/6] mm/page_alloc: use initial zero offset for page_frag_alloc_align()
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 9, 2024 at 3:22=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> On 2024/1/9 0:25, Alexander Duyck wrote:
-> > On Mon, Jan 8, 2024 at 12:59=E2=80=AFAM Yunsheng Lin <linyunsheng@huawe=
-i.com> wrote:
->
-> ...
->
-> >
-> >>>
-> >>> 2. By starting at the end and working toward zero we can use built in
-> >>> functionality of the CPU to only have to check and see if our result
-> >>> would be signed rather than having to load two registers with the
-> >>> values and then compare them which saves us a few cycles. In addition
-> >>> it saves us from having to read both the size and the offset for ever=
-y
-> >>> page.
-> >>
-> >> I suppose the above is ok if we only use the page_frag_alloc*() API to
-> >> allocate memory for skb->data, not for the frag in skb_shinfo(), as by
-> >> starting at the end and working toward zero, it means we can not do sk=
-b
-> >> coalescing.
-> >>
-> >> As page_frag_alloc*() is returning va now, I am assuming most of users
-> >> is using the API for skb->data, I guess it is ok to drop this patch fo=
-r
-> >> now.
-> >>
-> >> If we allow page_frag_alloc*() to return struct page, we might need th=
-is
-> >> patch to enable coalescing.
-> >
-> > I would argue this is not the interface for enabling coalescing. This
-> > is one of the reasons why this is implemented the way it is. When you
-> > are aligning fragments you aren't going to be able to coalesce the
-> > frames anyway as the alignment would push the fragments apart.
->
-> It seems the alignment requirement is the same for the same user of a pag=
-e_frag
-> instance, so the aligning does not seem to be a problem for coalescing?
+Add support for controlling header split (aka TCP data split) feature,
+backed by kernel commit 50d73710715d ("ethtool: add SET for
+TCP_DATA_SPLIT ringparam"). Command format:
 
-I'm a bit confused as to what coalescing you are referring to. If you
-can provide a link it would be useful.
+ethtool -G|--set-ring devname tcp-data-split [ auto|on|off ]
 
-The problem is page_frag is a very generic item and can be generated
-from a regular page on NICs that can internally reuse the same page
-instance for multiple buffers. So it is possible to coalesce page
-frags, however it is very unlikely to be coalescing them in the case
-of them being used for skb buffers since it would require aligned
-payloads on the network in order to really make it work without
-hardware intervention of some sort and on such devices they are likely
-allocating entire pages instead of page frags for the buffers.
+"auto" is defined solely by device's driver.
+
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+ ethtool.8.in    |  4 ++++
+ ethtool.c       |  1 +
+ netlink/rings.c | 23 +++++++++++++++++++++++
+ 3 files changed, 28 insertions(+)
+
+diff --git a/ethtool.8.in b/ethtool.8.in
+index ef0c4bcabf37..dc7d4df4fcc1 100644
+--- a/ethtool.8.in
++++ b/ethtool.8.in
+@@ -202,6 +202,7 @@ ethtool \- query or control network driver and hardware settings
+ .BN rx\-jumbo
+ .BN tx
+ .BN rx\-buf\-len
++.B3 tcp\-data\-split auto on off
+ .BN cqe\-size
+ .BN tx\-push
+ .BN rx\-push
+@@ -629,6 +630,9 @@ Changes the number of ring entries for the Tx ring.
+ .BI rx\-buf\-len \ N
+ Changes the size of a buffer in the Rx ring.
+ .TP
++.BI tcp\-data\-split \ auto|on|off
++Specifies the state of TCP data split.
++.TP
+ .BI cqe\-size \ N
+ Changes the size of completion queue event.
+ .TP
+diff --git a/ethtool.c b/ethtool.c
+index af51220b63cc..3ac15a7e54f6 100644
+--- a/ethtool.c
++++ b/ethtool.c
+@@ -5748,6 +5748,7 @@ static const struct option args[] = {
+ 			  "		[ rx-jumbo N ]\n"
+ 			  "		[ tx N ]\n"
+ 			  "		[ rx-buf-len N ]\n"
++			  "		[ tcp-data-split auto|on|off ]\n"
+ 			  "		[ cqe-size N ]\n"
+ 			  "		[ tx-push on|off ]\n"
+ 			  "		[ rx-push on|off ]\n"
+diff --git a/netlink/rings.c b/netlink/rings.c
+index 51d28c2ab055..f9eb67a4bc28 100644
+--- a/netlink/rings.c
++++ b/netlink/rings.c
+@@ -116,6 +116,22 @@ int nl_gring(struct cmd_context *ctx)
+ 
+ /* RINGS_SET */
+ 
++static const struct lookup_entry_u8 tcp_data_split_values[] = {
++	{
++		.arg		= "auto",
++		.val		= ETHTOOL_TCP_DATA_SPLIT_UNKNOWN,
++	},
++	{
++		.arg		= "off",
++		.val		= ETHTOOL_TCP_DATA_SPLIT_DISABLED,
++	},
++	{
++		.arg		= "on",
++		.val		= ETHTOOL_TCP_DATA_SPLIT_ENABLED,
++	},
++	{}
++};
++
+ static const struct param_parser sring_params[] = {
+ 	{
+ 		.arg		= "rx",
+@@ -153,6 +169,13 @@ static const struct param_parser sring_params[] = {
+ 		.handler        = nl_parse_direct_u32,
+ 		.min_argc       = 1,
+ 	},
++	{
++		.arg		= "tcp-data-split",
++		.type		= ETHTOOL_A_RINGS_TCP_DATA_SPLIT,
++		.handler	= nl_parse_lookup_u8,
++		.handler_data	= tcp_data_split_values,
++		.min_argc	= 1,
++	},
+ 	{
+ 		.arg            = "cqe-size",
+ 		.type           = ETHTOOL_A_RINGS_CQE_SIZE,
+-- 
+2.43.0
+
 
