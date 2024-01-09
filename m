@@ -1,116 +1,116 @@
-Return-Path: <netdev+bounces-62735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0024828E1A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 20:48:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7538E828E4D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 21:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 116231C24A18
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 19:48:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D379DB219FD
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 20:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3D23D3BB;
-	Tue,  9 Jan 2024 19:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fLrETZHQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7538B3D559;
+	Tue,  9 Jan 2024 20:00:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from authsmtp.register.it (authsmtp01.register.it [81.88.48.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251D43D3AB
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 19:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <82f55c0e-0ec8-4fe1-8d8c-b1de07558ad9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1704829243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zsdEHeEwRYmVyFsFYFedUjisXdYoKaXuYf8Fki4RZuY=;
-	b=fLrETZHQx/JZZ5zipm54JSKGvNoZAzqY4Q1B1yXvx7aG5TlMzcJI+FIHGUyYoj8nwCVXsd
-	3DvHJf549YTYpCopq4+lVeCE9GTiqRg3M58jdh93gZoFxTJspRAYpXxV2gUBCNT6c+nEN9
-	vTgJpWSNyH3RkT0KAyG8OaW3hHShm08=
-Date: Tue, 9 Jan 2024 11:40:38 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B2B3B782
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 20:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eventsense.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eventsense.it
+Received: from krn.. ([138.197.190.30])
+	by cmsmtp with ESMTPSA
+	id NI3PrbEZDI6zQNI3UrWDYw; Tue, 09 Jan 2024 20:46:33 +0100
+X-Rid: andrea.fois@eventsense.it@138.197.190.30
+From: Andrea Fois <andrea.fois@eventsense.it>
+To: 
+Cc: andrea.fois@eventsense.it,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	George Shuklin <george.shuklin@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] tg3: add new module param to force device power down on reboot
+Date: Tue,  9 Jan 2024 19:45:51 +0000
+Message-Id: <20240109194551.17666-1-andrea.fois@eventsense.it>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] selftests/bpf: fix potential premature unload in
- bpf_testmod
-Content-Language: en-GB
-To: Artem Savkov <asavkov@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, jolsa@kernel.org
-Cc: linux-kernel@vger.kernel.org
-References: <20240109164317.16371-1-asavkov@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20240109164317.16371-1-asavkov@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfPQXaKfWonfFB+huClQ/fRPZupeMxuV2ZGs2JvtZNp6KWdzBy33NZVJ5hWxdsJ0tjVWKiZk64ih5pAuh7HWzC536Jepm3XfweVct7qH53x+FUCMfRxLs
+ CuzwR4jkEzE/ew5VpS9clVLigiJOPjNt3FINZMABfH8P70Ak60f138aQX1KtZhnJsAlUts/2A8cHh6VCtuA+aRZVu/fSObtdzN12rjtiVwLSdTiMtFF80pUt
+ Th0ZWC4F/G98kYRyLzRP0+qxFAYfRwuVkIh/SRdmHfTuas2hNzyeU/Ps2jcKVIWnYfL/yPGuwsPdIIgUlKBa+YhoE05zLltwoDkogR+wmfVPaDLshljeWVGg
+ nz5BaZ+5wDL6E13ZoHouCt/C7ZckrWE2VXRFJUI6aQ4JcnHnrQX2eNe50aPfgvqOaERd+LyeFXk8R6R193K8Iw26BVDXgiOBPwwo0Poxk0PvzxSZfhovrZ6X
+ CizoNs56EXflwoE3
 
+The bug #1917471 was fixed in commit 2ca1c94ce0b6 ("tg3: Disable tg3
+device on system reboot to avoid triggering AER") but was reintroduced
+by commit 9fc3bc764334 ("tg3: power down device only on
+SYSTEM_POWER_OFF").
 
-On 1/9/24 8:43 AM, Artem Savkov wrote:
-> It is possible for bpf_kfunc_call_test_release() to be called from
-> bpf_map_free_deferred() when bpf_testmod is already unloaded and
-> perf_test_stuct.cnt which it tries to decrease is no longer in memory.
-> This patch tries to fix the issue by waiting for all references to be
-> dropped in bpf_testmod_exit().
->
-> The issue can be triggered by running 'test_progs -t map_kptr' in 6.5,
-> but is obscured in 6.6 by d119357d07435 ("rcu-tasks: Treat only
-> synchronous grace periods urgently").
->
-> Fixes: 65eb006d85a2a ("bpf: Move kernel test kfuncs to bpf_testmod")
+The problem described in #1917471 is still consistently replicable on
+reboots on Dell Servers (i.e. R750xs with BCM5720 LOM), causing NMIs
+(i.e. NMI received for unknown reason 38 on cpu 0) after 9fc3bc764334
+was committed.
 
-Please add your Signed-off-by tag.
+The problem is detected also by the Lifecycle controller and logged as
+a PCI Bus Error for the device.
 
-I think the root cause is that bpf_kfunc_call_test_acquire() kfunc
-is defined in bpf_testmod and the kfunc returns some data in bpf_testmod.
-But the release function bpf_kfunc_call_test_release() is in the kernel.
-The release func tries to access some data in bpf_testmod which might
-have been unloaded. The prog_test_ref_kfunc is defined in the kernel, so
-no bpf_testmod btf reference is hold so bpf_testmod can be unloaded before
-bpf_kfunc_call_test_release().
-As you mentioned, we won't have this issue if bpf_kfunc_call_test_acquire()
-is also in the kernel.
+As the problems addressed by 2ca1c94ce0b6 and by 9fc3bc764334 requires
+opposite strategies, a new module param "force_pwr_down_on_reboot"
+<bool> is introduced to fix both scenarios:
 
-I think putting bpf_kfunc_call_test_acquire() in bpf_testmod and
-bpf_kfunc_call_test_release() in kernel is not a good idea and confusing.
-But since this is only for tests, I guess we can live with that. With that,
+	force_pwr_down_on_reboot = 0/N/n = disable, keep the current
+									   behavior, don't force dev
+									   power down on reboot
 
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
+	force_pwr_down_on_reboot = 1/Y/y = enable, revert to the
+									   behavior of 2ca1c94ce0b6,
+									   force dev power down on reboot
 
-> ---
->   tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c | 4 ++++
->   1 file changed, 4 insertions(+)
->
-> diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> index 91907b321f913..63f0dbd016703 100644
-> --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> @@ -2,6 +2,7 @@
->   /* Copyright (c) 2020 Facebook */
->   #include <linux/btf.h>
->   #include <linux/btf_ids.h>
-> +#include <linux/delay.h>
->   #include <linux/error-injection.h>
->   #include <linux/init.h>
->   #include <linux/module.h>
-> @@ -544,6 +545,9 @@ static int bpf_testmod_init(void)
->   
->   static void bpf_testmod_exit(void)
->   {
-> +	while (refcount_read(&prog_test_struct.cnt) > 1)
-> +		msleep(20);
-> +
->   	return sysfs_remove_bin_file(kernel_kobj, &bin_attr_bpf_testmod_file);
->   }
->   
+Fixes: 9fc3bc764334 ("tg3: power down device only on SYSTEM_POWER_OFF")
+Signed-off-by: Andrea Fois <andrea.fois@eventsense.it>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index f52830dfb26a..287786357c9b 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -233,6 +233,12 @@ static int tg3_debug = -1;	/* -1 == use TG3_DEF_MSG_ENABLE as value */
+ module_param(tg3_debug, int, 0);
+ MODULE_PARM_DESC(tg3_debug, "Tigon3 bitmapped debugging message enable value");
+ 
++static bool force_pwr_down_on_reboot;	/* false == Don't force the power down of
++					 * the device during reboot, only on SYSTEM_POWER_OFF
++					 */
++module_param(force_pwr_down_on_reboot, bool, 0x644);
++MODULE_PARM_DESC(force_pwr_down_on_reboot, "Tigon3 force power down of the device on reboot enable value");
++
+ #define TG3_DRV_DATA_FLAG_10_100_ONLY	0x0001
+ #define TG3_DRV_DATA_FLAG_5705_10_100	0x0002
+ 
+@@ -18197,7 +18203,7 @@ static void tg3_shutdown(struct pci_dev *pdev)
+ 	if (netif_running(dev))
+ 		dev_close(dev);
+ 
+-	if (system_state == SYSTEM_POWER_OFF)
++	if (system_state == SYSTEM_POWER_OFF || force_pwr_down_on_reboot)
+ 		tg3_power_down(tp);
+ 
+ 	rtnl_unlock();
+-- 
+2.40.1
+
 
