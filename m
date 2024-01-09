@@ -1,102 +1,161 @@
-Return-Path: <netdev+bounces-62561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6528D827D65
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 04:38:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44DB5827DBC
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 05:08:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 454D31C22029
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 03:38:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C30CE1F2452E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 04:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0225B3D86;
-	Tue,  9 Jan 2024 03:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C65567E;
+	Tue,  9 Jan 2024 04:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fsoj7S3f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mzQpVpKe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95168259D;
-	Tue,  9 Jan 2024 03:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CF813AF8;
+	Tue,  9 Jan 2024 04:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-6dddfdc3244so383145a34.1;
-        Mon, 08 Jan 2024 19:38:44 -0800 (PST)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d3e416f303so7056215ad.0;
+        Mon, 08 Jan 2024 20:08:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704771523; x=1705376323; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3eFkTrLnCWs6jCP3r5JBqrIU5a6chwk8A4GmgjiNGkM=;
-        b=Fsoj7S3fXIIYoP7aV5BciboXHSgsx36CvAZAO0dbpbVWEvxriRwg4eGA0gzB+TiFNo
-         XdzUBzhRcZVvRlZp8WkbOCBgA/hDQC5Rr9qUK8M/VFu3Uf+CqRtTjouu+PFbR0v5tEh6
-         WonztObOsg9Ynw/Cb5KJOFjEw5/732cku576KvjI3GR7Qkb/8fZnP2UxtlfUBO8IM8nr
-         JX+91AINrOrHZP+UQ1KpmW636nyhHWkQ+Fn8zFiimyUY45dGH8rfauK2ccIRMaX5doRt
-         uO52pBT0tUDD+OIs9/vYpcycqXSEp59aY48/tp+bcw2Zenzneio1d6TSxPJSoWB5uaqS
-         DbNw==
+        d=gmail.com; s=20230601; t=1704773318; x=1705378118; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I/XC7+Hzrqaul1JzDjqFzwqKQMzBB3vpvjl8qHZ5in8=;
+        b=mzQpVpKeXwKSKcLWKuNiVogLVrykrSt+T9LetCfOZdRtvCZEodDvqYjY581i7y5Vu/
+         6bgdpjnR4R6AWDeKAG07+BtF2VyDe1J13/De7jLDPBRsLBnQqjPu3LrRrzMSqN3iug51
+         T02KBWeNwZk2ntZAXW51sfabCLnavW9Rp8k2KEz5uE89yWg/9BOwgvb6huoby+LwTUny
+         TjBIWpeR9Xyrzcfx6bOMTAu2Cuk0m7ZmDK7Ar3kVmKoSwYeBglmVEc5ZbXGnrUZp94PR
+         VR1WfYEKtStPNx4ecMRK3tb/Azk6TvJKKJypAHKJZdmoEe1fDSCGD3PlGe9IyRNMmCfI
+         Buzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704771523; x=1705376323;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3eFkTrLnCWs6jCP3r5JBqrIU5a6chwk8A4GmgjiNGkM=;
-        b=gVHU0bceh0cDf2nT1dyRZAxyH2H9FC95hEVHfG3H/g7MHSRhVKEnSC5ZZ69snf+HiP
-         i24IovlRGBajcFmwyS+8RSsg3d/3i7pwbAXSX3/EFqyVNK+MY+Ah993T0RXh6ojeqJO5
-         Rfa74m/kN86AWYo1w30omEXka+qAvsSXyyA/ZIlJZcUKqZjsxfhxzoKixP3UeZFnrNSp
-         TXacqWGDYwUjDokK7CwlDwfViLx0cd7jECEVwEiNPGfaVcPMklrUSD/J3q1SAebncfvP
-         dLMUpCZBerfznsi5GKSf1VG8UeQjI/gL5oZrg8fcGUvUbAR3NMyEQ47OBngBW3fyHf+s
-         zkGQ==
-X-Gm-Message-State: AOJu0YwZz62qPzgrqZICYShD+6YuMPvxAtHNoieKwxXiWOT02eXgHn69
-	xMuMWGPLHLGEiBb+1FMbidQ=
-X-Google-Smtp-Source: AGHT+IHXJ35OjLmnPpomOFhZywO5zO0pa2axPOWoL5L+gGdnUSQ5TPfkSCVgNSE5/IVKSceocQESsg==
-X-Received: by 2002:a05:6830:1157:b0:6dd:e4d4:bd8f with SMTP id x23-20020a056830115700b006dde4d4bd8fmr162942otq.2.1704771523527;
-        Mon, 08 Jan 2024 19:38:43 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id gx17-20020a056a001e1100b006d9b2682c91sm589339pfb.113.2024.01.08.19.38.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 19:38:42 -0800 (PST)
-Date: Tue, 9 Jan 2024 11:38:37 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v4 1/2] Revert "net: rtnetlink: Enslave device before
- bringing it up"
-Message-ID: <ZZy_vX_uJgryR-Ti@Laptop-X1>
-References: <20240108094103.2001224-1-nicolas.dichtel@6wind.com>
- <20240108094103.2001224-2-nicolas.dichtel@6wind.com>
+        d=1e100.net; s=20230601; t=1704773318; x=1705378118;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I/XC7+Hzrqaul1JzDjqFzwqKQMzBB3vpvjl8qHZ5in8=;
+        b=hohrWUeNRgY+MVbEFwWM9ItMTuLR2pqP/Qdapj/sR6DJO9CiRmNsrEi1UDySHJZVVT
+         clwajkP9RLspWFj62wttbC8xBaIaNKszOhwFbB0lR3n2mHquLcjCSlFt2jkTZ5Emg5/1
+         D3HE0d4Yailxth98CiLKjJ646PrZrTQD9wVH4G1FgLD9GyLl4cZ52U+dQwukoPxewYWo
+         R7x8BrgeDcVpzhSDUA5KYU3KcqMwVTJcLJMxi+DSdsbHe86CuZ5o90jr2y03yVcdnI/D
+         tSdEt1sKQdtQC3qU2HsUjk1/9ial+BVtHVOi7ogLIwvGIyAIuoYAB9/R9TJCKFZtyAc2
+         9XUA==
+X-Gm-Message-State: AOJu0Yxa6XUBETVailmVRUk8oVO8q4Y0iW4BxY0kTUWg3zJjMhHLf0pO
+	yhxBn8x4Q0f9jBc2YHJYtGg=
+X-Google-Smtp-Source: AGHT+IHY1ya+YrOLTHexV8PosRb/mNRrliidXjZM2nUEIVPtdG0nc7kbSmQlzxZRWYZv+xROvd6Tgg==
+X-Received: by 2002:a17:902:dac8:b0:1d4:524d:96cb with SMTP id q8-20020a170902dac800b001d4524d96cbmr2692987plx.109.1704773317516;
+        Mon, 08 Jan 2024 20:08:37 -0800 (PST)
+Received: from ?IPV6:2600:8802:b00:ba1:c927:f415:d49b:1377? ([2600:8802:b00:ba1:c927:f415:d49b:1377])
+        by smtp.gmail.com with ESMTPSA id z3-20020a170902834300b001d1d6f6b67dsm651885pln.147.2024.01.08.20.08.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 20:08:36 -0800 (PST)
+Message-ID: <a85dbfc3-e327-442a-9aab-5115f86944f7@gmail.com>
+Date: Mon, 8 Jan 2024 20:08:33 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240108094103.2001224-2-nicolas.dichtel@6wind.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/9] PCI: introduce the concept of power sequencing of PCIe
+ devices
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>,
+ Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Chris Morgan <macromorgan@hotmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ =?UTF-8?Q?N=C3=ADcolas_F_=2E_R_=2E_A_=2E_Prado?= <nfraprado@collabora.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>,
+ Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Terry Bowman <terry.bowman@amd.com>,
+ Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jim Quinlan <jim2101024@gmail.com>, james.quinlan@broadcom.com
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-pci@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240104130123.37115-1-brgl@bgdev.pl>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240104130123.37115-1-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 08, 2024 at 10:41:02AM +0100, Nicolas Dichtel wrote:
-> This reverts commit a4abfa627c3865c37e036bccb681619a50d3d93c.
-> 
-> The patch broke:
-> > ip link set dummy0 up
-> > ip link set dummy0 master bond0 down
-> 
-> This last command is useful to be able to enslave an interface with only
-> one netlink message.
-> 
-> After discussion, there is no good reason to support:
-> > ip link set dummy0 down
-> > ip link set dummy0 master bond0 up
-> because the bond interface already set the slave up when it is up.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: a4abfa627c38 ("net: rtnetlink: Enslave device before bringing it up")
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Hello,
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+On 1/4/2024 5:01 AM, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> During last year's Linux Plumbers we had several discussions centered
+> around the need to power-on PCI devices before they can be detected on
+> the bus.
+> 
+> The consensus during the conference was that we need to introduce a
+> class of "PCI slot drivers" that would handle the power-sequencing.
+> 
+> After some additional brain-storming with Manivannan and the realization
+> that the DT maintainers won't like adding any "fake" nodes not
+> representing actual devices, we decided to reuse the existing
+> infrastructure provided by the PCIe port drivers.
+> 
+> The general idea is to instantiate platform devices for child nodes of
+> the PCIe port DT node. For those nodes for which a power-sequencing
+> driver exists, we bind it and let it probe. The driver then triggers a
+> rescan of the PCI bus with the aim of detecting the now powered-on
+> device. The device will consume the same DT node as the platform,
+> power-sequencing device. We use device links to make the latter become
+> the parent of the former.
+> 
+> The main advantage of this approach is not modifying the existing DT in
+> any way and especially not adding any "fake" platform devices.
+
+There is prior work in that area which was applied, but eventually reverted:
+
+https://www.spinics.net/lists/linux-pci/msg119136.html
+
+and finally re-applied albeit in a different shape:
+
+https://lore.kernel.org/all/20220716222454.29914-1-jim2101024@gmail.com/
+
+so we might want to think about how to have pcie-brcmstb.c converted 
+over your proposed approach. AFAIR there is also pcie-rockchip.c which 
+has some rudimentary support for voltage regulators of PCIe end-points.
+
+What does not yet appear in this RFC is support for suspend/resume, 
+especially for power states where both the RC and the EP might be losing 
+power. There also needs to be some thoughts given to wake-up enabled 
+PCIe devices like Wi-Fi which might need to remain powered on to service 
+Wake-on-WLAN frames if nothing else.
+
+I sense a potential for a lot of custom power sequencing drivers being 
+added and ultimately leading to the decision to create a "generic" one 
+which is entirely driven by Device Tree properties...
+
+Thanks for doing this!
+-- 
+Florian
 
