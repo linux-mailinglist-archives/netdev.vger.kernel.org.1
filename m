@@ -1,157 +1,179 @@
-Return-Path: <netdev+bounces-62765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB72A8290E0
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 00:34:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D78698290F1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 00:43:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2894A1F26772
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 23:34:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7191A1F26A23
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 23:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A7A3E47C;
-	Tue,  9 Jan 2024 23:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B313E49F;
+	Tue,  9 Jan 2024 23:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TwcmJ5H/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2X/fCjnp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601F93EA62;
-	Tue,  9 Jan 2024 23:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a29058bb2ceso384788166b.0;
-        Tue, 09 Jan 2024 15:34:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9034C3F8CC
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 23:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3606de7f4bdso17033105ab.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 15:42:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704843259; x=1705448059; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qX1ewcRi9+LjX0JTHbz7fHSdfXgrgBVhsz1cgwry0mw=;
-        b=TwcmJ5H/CCBejHsbSJsUIIXXe1NoJWDPThyVQL4Hj1qmh6g2vH3Wl2lRPaZOErBxN7
-         wJa1PuKdk2/LpZtycgbFIBOrKMhbDK7VcMxzjCs1F+u0ToKnMnS0PREEXUYn+jOxewY4
-         ULQCUgwwYVjXkGr6xvRz0AMKu6Eoo0lIvAr67OtXzwFVHBkNIz0nIgOAH3IdThf4b0ay
-         BLwirky1BzLxATdplPprCeOb3eWgpYyab+SYrSw9QwHYuOHrkw4MIXA9INLsxSexs0Wr
-         FoadUIPKeNgKjHRulboWNMYZunLHrueit+lwWAyA8utnK4tAiLaqxxG1lliNIcOIrhJK
-         X5EQ==
+        d=google.com; s=20230601; t=1704843764; x=1705448564; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QIcPXVK1fYFTemMdjpiQGc+AOvdzW3M34c5/yKhDtd4=;
+        b=2X/fCjnpWleyUM89aPH0FD6rDIWGbLtUc2Mv15EvJVL5FPT0TO2L7pFdzX4GOsfqP4
+         rS18DElgEhNV9dk7NrG1b9UIO6YNdjbBNVjYcjCkpFHGhTqTnjfDzIUMBSq1AVUHRP0f
+         yOb4rReEGaiwkslthXZHh9oquvcRXfjeTNELlvIK+JsvTLj0Nmh9AbLPY30wyHZjGfXH
+         RbuDC/2hgS6QASD09oWCvr+nTnUu6tof+TYCbfEndNUAR79cj7rPD0zkS+g3if8uX55X
+         +95LXNWegkGPPnzW6K9c+/dhd0EmumJtnhedDaR42BlVkOS7Vpj8vlRzq7u+TiyiV6xe
+         +QDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704843259; x=1705448059;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qX1ewcRi9+LjX0JTHbz7fHSdfXgrgBVhsz1cgwry0mw=;
-        b=IZVYc0JA+HBu72/dG61uKj2ThP0cxNtVOqaIjs0kEa7NgRzN7XghPXoPwQgIlnv7rQ
-         cJndTgN+XgQv9vUdmUpqXUe+oQg4NH2ZnXWcPcB2rlEchpv2nTfgzNWmNfZPYKrPKeBH
-         CPSVsEOTMcvTyl3/wBwWwqqwTUfoxx6jMAwdJtieQGL777EaYIgcXaINFqu3oQ57eYYa
-         krxhgCFM4tLFeJswCAgIVvIxG0zA9ZX3jHYmA24i/bNBtdpNgLnwz2GAc9Qh6cs8Eda8
-         87Yqt/FrZoEaLHlSvse2QKZ7f5xwpK3YYCaJGFsPaLNKq7nE6K58PlyAR46PAzTMW/zx
-         fzag==
-X-Gm-Message-State: AOJu0YxJpZTK2Kr5x6JcGny0/JxMgpf7kSbLBhlS45peJF5CJcFz2kyn
-	WtiP53JY0G/99sN42lsxs4sCTZ1iznZ3IWWEHWs=
-X-Google-Smtp-Source: AGHT+IEolD6rNbK/9LXoRCkzJISyZmEC/n35sT5Uk5TZ3EjiNF6a8fznWwfsfr1WTmumc14WcGyOsNBDBULSDfyEVkc=
-X-Received: by 2002:a17:906:e095:b0:a2a:c162:4e8b with SMTP id
- gh21-20020a170906e09500b00a2ac1624e8bmr58196ejb.207.1704843259335; Tue, 09
- Jan 2024 15:34:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704843764; x=1705448564;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QIcPXVK1fYFTemMdjpiQGc+AOvdzW3M34c5/yKhDtd4=;
+        b=JuASs9XtSSEivj9l/1jsSYXkl83jCNPSRlHcd4RSh4D9ANhNwxLWN2YVA7udcfT2uQ
+         wp7jEJMSFFXj8HaRRpJaqLl0oFKigm6Y+ZlpW+nrBK2AIgwg4yorMBWIbRqfI2416Q9q
+         lPcxQVr0e97JItRDEt+pYIeCqwyEp19viCe7d/dNAonzVQ6EpJOGUePA/0uzgDxngDUL
+         FEAnwRnMDoDN/apwPpeEiCPGFHnLUkuiM7eJHQbTn8TzX8zLRjNZug5mSf+j85Vs2C2y
+         7jQk2/voG626bpHyy9Rr86wetpFHsnzHrYwRrRa4J/D6y28Td5UbGy0N4yKoK25Wd9/a
+         L+Iw==
+X-Gm-Message-State: AOJu0Yy2rkHyOEI3AuXRppAa0DRgVMgpjJDCY4STzNz8xhmEzx3kvMkO
+	REuSPealq6WJHnaaPHxwkWwfhhVWQf8U
+X-Google-Smtp-Source: AGHT+IFcCSzwyXxCeIeRPodhTFSjdMhuIXovQrmFwVT7Gt7z1oM7wbSewwsMzzo7BrlWgSVFYS5jcw==
+X-Received: by 2002:a05:6e02:3208:b0:360:5cd9:a73e with SMTP id cd8-20020a056e02320800b003605cd9a73emr300419ilb.6.1704843764645;
+        Tue, 09 Jan 2024 15:42:44 -0800 (PST)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id em17-20020a0566384db100b0046ceccc798asm954664jab.6.2024.01.09.15.42.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jan 2024 15:42:44 -0800 (PST)
+Date: Tue, 9 Jan 2024 23:42:41 +0000
+From: Justin Stitt <justinstitt@google.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: kernel test robot <lkp@intel.com>, virtualization@lists.linux.dev,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Gonglei <arei.gonglei@huawei.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, llvm@lists.linux.dev,
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr
+Subject: Re: [PATCH v2] crypto: virtio - Less function calls in
+ __virtio_crypto_akcipher_do_req() after error detection
+Message-ID: <20240109234241.4q3ueqdjz5o54oan@google.com>
+References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
+ <202312260852.0ge5O8IL-lkp@intel.com>
+ <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108205209.838365-1-maxtram95@gmail.com> <20240108205209.838365-10-maxtram95@gmail.com>
-In-Reply-To: <20240108205209.838365-10-maxtram95@gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 9 Jan 2024 15:34:07 -0800
-Message-ID: <CAEf4Bzb4Gy1CTE7ebjA6b2vtZ7dhZnpsw25YnGTx6y2rYYFmcw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 09/15] selftests/bpf: Test assigning ID to
- scalars on spill
-To: Maxim Mikityanskiy <maxtram95@gmail.com>
-Cc: Eduard Zingerman <eddyz87@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Shung-Hsi Yu <shung-hsi.yu@suse.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
 
-On Mon, Jan 8, 2024 at 12:53=E2=80=AFPM Maxim Mikityanskiy <maxtram95@gmail=
-.com> wrote:
+Hi,
+
+On Tue, Dec 26, 2023 at 11:12:23AM +0100, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Tue, 26 Dec 2023 11:00:20 +0100
 >
-> From: Maxim Mikityanskiy <maxim@isovalent.com>
+> The kfree() function was called in up to two cases by the
+> __virtio_crypto_akcipher_do_req() function during error handling
+> even if the passed variable contained a null pointer.
+> This issue was detected by using the Coccinelle software.
+
+If the script is short and simple would you mind, in the future,
+including it below the fold -- this may help others do similar work down
+the line -- Or you could also link to a git-managed version like what
+Kees has been doing with his __counted_by patches [1].
+
 >
-> The previous commit implemented assigning IDs to registers holding
-> scalars before spill. Add the test cases to check the new functionality.
+> * Adjust jump targets.
 >
-> Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
-> Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+> * Delete two initialisations which became unnecessary
+>   with this refactoring.
+>
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 > ---
->  .../selftests/bpf/progs/verifier_spill_fill.c | 133 ++++++++++++++++++
->  1 file changed, 133 insertions(+)
+
+Nonetheless,
+
+Reviewed-by: Justin Stitt <justinstitt@google.com>
 >
-> diff --git a/tools/testing/selftests/bpf/progs/verifier_spill_fill.c b/to=
-ols/testing/selftests/bpf/progs/verifier_spill_fill.c
-> index f303ac19cf41..b05aab925ee5 100644
-> --- a/tools/testing/selftests/bpf/progs/verifier_spill_fill.c
-> +++ b/tools/testing/selftests/bpf/progs/verifier_spill_fill.c
-> @@ -766,4 +766,137 @@ l0_%=3D:    r0 =3D 0;                              =
-           \
->         : __clobber_all);
+> v2:
+> A typo was fixed for the delimiter of a label.
+>
+>  drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> index 2621ff8a9376..057da5bd8d30 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> @@ -224,11 +224,11 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
+>  	struct virtio_crypto *vcrypto = ctx->vcrypto;
+>  	struct virtio_crypto_op_data_req *req_data = vc_req->req_data;
+>  	struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
+> -	void *src_buf = NULL, *dst_buf = NULL;
+> +	void *src_buf, *dst_buf = NULL;
+>  	unsigned int num_out = 0, num_in = 0;
+>  	int node = dev_to_node(&vcrypto->vdev->dev);
+>  	unsigned long flags;
+> -	int ret = -ENOMEM;
+> +	int ret;
+>  	bool verify = vc_akcipher_req->opcode == VIRTIO_CRYPTO_AKCIPHER_VERIFY;
+>  	unsigned int src_len = verify ? req->src_len + req->dst_len : req->src_len;
+>
+> @@ -239,7 +239,7 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
+>  	/* src data */
+>  	src_buf = kcalloc_node(src_len, 1, GFP_KERNEL, node);
+>  	if (!src_buf)
+> -		goto err;
+> +		return -ENOMEM;
+>
+>  	if (verify) {
+>  		/* for verify operation, both src and dst data work as OUT direction */
+> @@ -254,7 +254,7 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
+>  		/* dst data */
+>  		dst_buf = kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
+>  		if (!dst_buf)
+> -			goto err;
+> +			goto free_src;
+>
+>  		sg_init_one(&dstdata_sg, dst_buf, req->dst_len);
+>  		sgs[num_out + num_in++] = &dstdata_sg;
+> @@ -277,9 +277,9 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
+>  	return 0;
+>
+>  err:
+> -	kfree(src_buf);
+>  	kfree(dst_buf);
+> -
+> +free_src:
+> +	kfree(src_buf);
+>  	return -ENOMEM;
 >  }
 >
-
-[...]
-
-> +
-> +SEC("xdp")
-> +__description("8-bit spill of 8-bit reg should assign ID")
-> +__success __retval(0)
-> +__naked void spill_8bit_of_8bit_ok(void)
-> +{
-> +       asm volatile ("                                 \
-> +       /* Roll one bit to make the register inexact. */\
-> +       call %[bpf_get_prandom_u32];                    \
-> +       r0 &=3D 0x80;                                     \
-> +       /* 8-bit spill r0 to stack - should assign an ID. */\
-> +       *(u8*)(r10 - 8) =3D r0;                           \
-> +       /* 8-bit fill r1 from stack - should preserve the ID. */\
-> +       r1 =3D *(u8*)(r10 - 8);                           \
-> +       /* Compare r1 with another register to trigger find_equal_scalars=
-.\
-> +        * Having one random bit is important here, otherwise the verifie=
-r cuts\
-> +        * the corners.                                 \
-> +        */                                             \
-> +       r2 =3D 0;                                         \
-> +       if r1 !=3D r2 goto l0_%=3D;                         \
-> +       /* The result of this comparison is predefined. */\
-> +       if r0 =3D=3D r2 goto l0_%=3D;                         \
-> +       /* Dead branch: the verifier should prune it. Do an invalid memor=
-y\
-> +        * access if the verifier follows it.           \
-> +        */                                             \
-> +       r0 =3D *(u64*)(r9 + 0);                           \
-> +       exit;                                           \
-> +l0_%=3D: r0 =3D 0;                                         \
-> +       exit;                                           \
-> +"      :
-> +       : __imm(bpf_get_prandom_u32)
-> +       : __clobber_all);
-> +}
-> +
-
-Can you add a test where we spill register of one size and fill a
-different size? And what should the behavior be? Should we or should
-we not preserve linked IDs in such situation?
-
->  char _license[] SEC("license") =3D "GPL";
 > --
 > 2.43.0
 >
+
+[1]: https://lore.kernel.org/all/20230922175023.work.239-kees@kernel.org/
+
+Thanks
+Justin
 
