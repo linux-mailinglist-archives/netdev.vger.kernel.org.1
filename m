@@ -1,91 +1,89 @@
-Return-Path: <netdev+bounces-62617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86BF782834D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:36:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3995B828393
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 10:59:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C2671F21ED3
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 09:36:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF1FCB22A54
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 09:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33CE3399D;
-	Tue,  9 Jan 2024 09:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kY4Q7ANt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF1A36AF5;
+	Tue,  9 Jan 2024 09:58:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB1B2E650;
-	Tue,  9 Jan 2024 09:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OdqzZjfPihD8+HAjcrPs6VxIF0BP9O0oEYSSObMVmwM=; b=kY4Q7ANtAKQyWVEnwcsX8lvWjn
-	RqXPViI3icGXcSBHCKEJV/DfpqSZV5LK3wTekFKqLNq2sEXp7AuifzqEvAnrlHx38e92b5KMSzMYO
-	NM2uzOklo5iF+XPpcxy5pt8djMw57C5LxD1ih+v9P6zyc267spyPHzKDVBXlcg5D/OmADrlZex+yj
-	nYsSyGjPIHC55rwONu/9cY6H3zt+bljipIoaGb8A8daCC+mSZCjPQeUoyVmdjb8piYtrXW/qSGTrF
-	nlJpBLHmefxBdvjs0dD8/M7pxMS8z4/7qKq7kEZyN/R/WEbrseMI3G4SAjvFoLrpeMZvuAIxkIuoE
-	VuDkr/Bw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37974)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rN8WV-0003wa-24;
-	Tue, 09 Jan 2024 09:35:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rN8WU-00049r-MQ; Tue, 09 Jan 2024 09:35:50 +0000
-Date: Tue, 9 Jan 2024 09:35:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jakub Kicinski <kuba@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EB036AE7
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 09:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rN8rr-0007j1-TQ; Tue, 09 Jan 2024 10:57:55 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rN8rq-001Rfy-Fo; Tue, 09 Jan 2024 10:57:54 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rN8rq-007r08-1I;
+	Tue, 09 Jan 2024 10:57:54 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
 	Andrew Lunn <andrew@lunn.ch>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] wangxunx: select CONFIG_PHYLINK where needed
-Message-ID: <ZZ0TdiIDE2lqHE+8@shell.armlinux.org.uk>
-References: <20240109075656.2656359-1-arnd@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: [RFC net-next v2 0/3] net: dsa: microchip: implement PHY loopback 
+Date: Tue,  9 Jan 2024 10:57:50 +0100
+Message-Id: <20240109095753.1872010-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240109075656.2656359-1-arnd@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Jan 09, 2024 at 08:56:21AM +0100, Arnd Bergmann wrote:
-> diff --git a/drivers/net/ethernet/wangxun/Kconfig b/drivers/net/ethernet/wangxun/Kconfig
-> index 23cd610bd376..46630f05d8dd 100644
-> --- a/drivers/net/ethernet/wangxun/Kconfig
-> +++ b/drivers/net/ethernet/wangxun/Kconfig
-> @@ -26,6 +26,7 @@ config NGBE
->  	tristate "Wangxun(R) GbE PCI Express adapters support"
->  	depends on PCI
->  	select LIBWX
-> +	select PHYLINK
->  	select PHYLIB
+changes v2:
+- add Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com> to first 2
+  patches
+- make sure reverse x-mas tree is present in all patches
+- add new lines between if statements
+- reword commit message of the 3. patch 
 
-You can drop PHYLIB when adding PHYLINK.
+Oleksij Rempel (3):
+  net: dsa: microchip: ksz8: move BMCR specific code to separate
+    function
+  net: dsa: microchip: Remove redundant optimization in ksz8_w_phy_bmcr
+  net: dsa: microchip: implement PHY loopback configuration for KSZ8794
+    and KSZ8873
 
-Thanks.
+ drivers/net/dsa/microchip/ksz8795.c     | 360 +++++++++++++++---------
+ drivers/net/dsa/microchip/ksz8795_reg.h |   1 +
+ 2 files changed, 230 insertions(+), 131 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
 
