@@ -1,138 +1,167 @@
-Return-Path: <netdev+bounces-62660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0E6782861F
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:38:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 498FF82861C
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 13:37:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 407081F2492E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:38:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE1CF1F24942
+	for <lists+netdev@lfdr.de>; Tue,  9 Jan 2024 12:37:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C327364C6;
-	Tue,  9 Jan 2024 12:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37A6360BD;
+	Tue,  9 Jan 2024 12:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="MvUvSlDy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GHzULQnn"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CF4364A8
-	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 12:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id B999787800;
-	Tue,  9 Jan 2024 13:32:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1704803561;
-	bh=edbNa+fah7HbWGEb+lguywsx9JjgnyEiDD6QO/Z8H9o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MvUvSlDyskcGY+HiMr38oQqBpBy7cp2bMvoeZJ7E7ullU+g8c4fx3frIWbuJyrilI
-	 QHNlr+0tQ6tR2qptiIXZXSsbY5bsICdhu8qfDOt5Vy5BBFuPaOGXJqKbRthF7ZNGYe
-	 wgouMeNx6AtPCIH3UvoCKtcVj7MI04pF8dhsk4a/i628Z7ZDzN0kgBYMDZh7e9+oQP
-	 nXOXb0JIKZE9EbXN005sb/uwJDdNGj2SMYhiESXRqoZ++LJlo5AS9+dN3lY6EQbDus
-	 Ug/bbwfKekiF60Gpc1cynsvMRTKirljX83Vl0juTzJOlM/bL0wjc3miHvr9BgqYW1J
-	 vRRYnqJodv4bg==
-Date: Tue, 9 Jan 2024 13:32:34 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: Tristram.Ha@microchip.com, Oleksij Rempel <o.rempel@pengutronix.de>,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>
-Subject: [net][hsr] Question regarding HSR RedBox functionality
- implementation (preferably on KSZ9477)
-Message-ID: <20240109133234.74c47dcd@wsk>
-In-Reply-To: <20231003104410.dhngn3vvdfdcurga@skbuf>
-References: <20230922133108.2090612-1-lukma@denx.de>
-	<20230926225401.bganxwmtrgkiz2di@skbuf>
-	<20230928124127.379115e6@wsk>
-	<20231003095832.4bec4c72@wsk>
-	<20231003104410.dhngn3vvdfdcurga@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4039826AF7
+	for <netdev@vger.kernel.org>; Tue,  9 Jan 2024 12:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3368ac0f74dso2268734f8f.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jan 2024 04:37:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704803821; x=1705408621; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7FAzWAT/C+jCQni2zCWQ4AyEq8nrKASrguI0ZEzUC+I=;
+        b=GHzULQnninad+6bJglDFUBJJdICi4ScQc2pV8ONnUtx6I+EBPWyIPq/LTd4VGQzibn
+         VOs2w0HIyHK47kkPaXbX6SviFyZOmoLk0m7K7pubGv3WCGcejhZ/RWns7NFvmabSB9XE
+         GeOyUb6U8LDm6cVTAZGOB58DVCa1hriPIXpMxVOgW9fsZNPsS0ayO0gPneerPEHDHNq0
+         96XmGEb03EUPajS6t06fqaFoJ9bXCN5qlptEYAQ2mfnIMScPwMtRTMjMtc61jzMXzCh2
+         /cehIFRai5gCuyADWmTyCU4sO6xL5RduQxRURyaBASqg5ykDLgbobDru+o3GPktTXtw8
+         Uz8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704803821; x=1705408621;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7FAzWAT/C+jCQni2zCWQ4AyEq8nrKASrguI0ZEzUC+I=;
+        b=gm2NHMfNBbdbSsggw9AzEQVSgoIYIGlsjc+oxRbn6AG6rtnGgka8Y0wVM0yk4aYBdW
+         MKvEfNH0ASXNVDOoFReJNsYkpaRzZO3JPQNc4hXUycEHKXbdzC6PyXOv6xqtPSP60Bqp
+         1zZkCWgJFKjU8rzZHFa97mNZ4oVEI4AbeFvZ2Xc0utnYWraN8zwFi6zUmDDOCx9LyaFP
+         33ZaDozuT4m6w0VJ93t2r/8/0OuLeM1vQS5AebDNUFa8vPAAnPtoxktj83tTbebjEIMr
+         hOTmkn/UFUbpGbDCQ4ZZbPUp8x9OJZ/ZGLdK/qMqWtrMTiFsGJQtOVxcGtfwNZL3C2MZ
+         h77g==
+X-Gm-Message-State: AOJu0Yy0sTbWCu6SuKFymAUILhDl19sSFWWOHdmI0g7NaIU2qhTgcLsc
+	9WEyV5IPCowuhBdnuBFa78g=
+X-Google-Smtp-Source: AGHT+IFaQleOoQWgv9Z4ecMGKHfEzJxNFlbC1vJ/IUKszuLIkNGLPpV8qOVx+5CSiViXCy0vE2ELvA==
+X-Received: by 2002:a5d:5406:0:b0:336:5b14:525f with SMTP id g6-20020a5d5406000000b003365b14525fmr644485wrv.132.1704803821281;
+        Tue, 09 Jan 2024 04:37:01 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id a17-20020a5d4571000000b00336e32338f3sm2307640wrc.70.2024.01.09.04.37.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jan 2024 04:37:01 -0800 (PST)
+Date: Tue, 9 Jan 2024 14:36:58 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	arinc.unal@arinc9.com
+Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa
+ module
+Message-ID: <20240109123658.vqftnqsxyd64ik52@skbuf>
+References: <20231223005253.17891-1-luizluca@gmail.com>
+ <20231223005253.17891-4-luizluca@gmail.com>
+ <20240108140002.wpf6zj7qv2ftx476@skbuf>
+ <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/mIp0pM3xcMQUeaqq5JOJtet";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
 
---Sig_/mIp0pM3xcMQUeaqq5JOJtet
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 09, 2024 at 02:05:29AM -0300, Luiz Angelo Daros de Luca wrote:
+> > > +struct realtek_priv *
+> > > +realtek_common_probe(struct device *dev, struct regmap_config rc,
+> > > +                  struct regmap_config rc_nolock)
+> >
+> > Could you use "const struct regmap_config *" as the data types here, to
+> > avoid two on-stack variable copies? Regmap will copy the config structures
+> > anyway.
+> 
+> I could do that for rc_nolock but not for rc as we need to modify it
+> before passing to regmap. I would still need to duplicate rc, either
+> using the stack or heap. What would be the best option?
+> 
+> 1) pass two pointers and copy one to stack
+> 2) pass two pointers and copy one to heap
+> 3) pass two structs (as it is today)
+> 4) pass one pointer and one struct
+> 
+> The old code was using 1) and I'm inclined to adopt it and save a
+> hundred and so bytes from the stack, although 2) would save even more.
 
-Dear Community,
+I didn't notice the "rc.lock_arg = priv" assignment...
 
-I would like to ask you for some help regarding HSR mainline
-implementation.
+I'm not sure what you mean by "copy to heap". Perform a dynamic memory
+allocation?
 
-As of now for KSZ9477 we do have working hsr0 (as offloading HW) for
-HSR ring operation and some other ports for this IC (like lan3,4,5).
+Also, the old code was not using exactly 1). It copied both the normal
+and the nolock regmap config to an on-stack local variable, even though
+only the normal regmap config had to be copied (to be fixed up).
 
-With current setup it is possible to forward packets from HSR ring to
-non-HSR network (i.e. plain ethernet) with L3 routing.
+I went back to study the 4 regmap configs, and only the reg_read() and
+reg_write() methods differ between SMI and MDIO. The rest seems boilerplate
+that can be dynamically constructed by realtek_common_probe(). Sure,
+spelling out 4 regmap_config structures is more flexible, but do we need
+that flexibility? What if realtek_common_probe() takes just the
+reg_read() and reg_write() function prototypes as arguments, rather than
+pointers to regmap_config structures it then has to fix up?
 
-However, I'm wondering how the mainline Linux kernel could handle HSR
-RedBox functionality (on document [1], Figure 2. we do have "bridge" -
-OSI L2).
+> > > +EXPORT_SYMBOL(realtek_common_probe);
+> > > diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+> > > index e9ee778665b2..fbd0616c1df3 100644
+> > > --- a/drivers/net/dsa/realtek/realtek.h
+> > > +++ b/drivers/net/dsa/realtek/realtek.h
+> > > @@ -58,11 +58,9 @@ struct realtek_priv {
+> > >       struct mii_bus          *bus;
+> > >       int                     mdio_addr;
+> > >
+> > > -     unsigned int            clk_delay;
+> > > -     u8                      cmd_read;
+> > > -     u8                      cmd_write;
+> > >       spinlock_t              lock; /* Locks around command writes */
+> > >       struct dsa_switch       *ds;
+> > > +     const struct dsa_switch_ops *ds_ops;
+> > >       struct irq_domain       *irqdomain;
+> > >       bool                    leds_disabled;
+> > >
+> > > @@ -79,6 +77,8 @@ struct realtek_priv {
+> > >       int                     vlan_enabled;
+> > >       int                     vlan4k_enabled;
+> > >
+> > > +     const struct realtek_variant *variant;
+> > > +
+> > >       char                    buf[4096];
+> > >       void                    *chip_data; /* Per-chip extra variant data */
+> > >  };
+> >
+> > Can the changes to struct realtek_priv be a separate patch, to
+> > clarify what is being changed, and to leave the noisy code movement
+> > more isolated?
+> 
+> Sure, although it will not be a patch that makes sense by itself. If
+> it helps with the review, I'll split it. We can fold it back if
+> needed.
 
-To be more interesting - br0 can be created between hsr0 and e.g. lan3.
-But as expected communication breaks on both directions (to SAN and to
-HSR ring).
+Well, I don't mean only the changes to the private structure, but also
+the code changes that accompany them.
 
-Is there a similar functionality already present in the Linux kernel
-(so this approach could be reused)?
-
-My (very rough idea) would be to extend KSZ9477 bridge join functions
-to check if HSR capable interface is "bridged" and then handle frames
-in a special way.
-
-However, I would like to first ask for as much input as possible - to
-avoid any unnecessary work.
-
-Thanks in advance for help :-)
-
-Link:
-
-[1] -
-https://ww1.microchip.com/downloads/en/Appnotes/AN3474-KSZ9477-High-Availab=
-ility-Seamless-Redundancy-Application-Note-00003474A.pdf
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/mIp0pM3xcMQUeaqq5JOJtet
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmWdPOIACgkQAR8vZIA0
-zr3KdwgArDhN6Uj3SziFT2/zLsYLhUKeuJxNmSXOFe4Fu6TNRdffUACNLYVdwdyl
-bQ5CKcfMBEQ37x9aQrAfjJE3Q18cv9713dn6WP1/EVwOTSOqv1bQTDM1sBq165ai
-qrl7gkusOmuoN4YkeqpKxSF4YZwWAoJjuQYyBZJz5btBXhQiG9zanWJFN6RBRNeT
-6IJyF1ZyKa9w6rev37gcZxVVPNQNnGYe8HAXt2bAZ8srYkkzOFbSafA6wdZ6FgMe
-NdIqL70usbPLL2E9LAbOSFQPHCKMAjpBPFpV00mTXRiHLFMigo5t8jrTR4fi44UA
-cWnTu/3vDK5iTNz8MQkwwsjcQ/CzbA==
-=Nl6G
------END PGP SIGNATURE-----
-
---Sig_/mIp0pM3xcMQUeaqq5JOJtet--
+As Andrew usually says, what you want is lots of small patches that are
+each obviously correct, where there is only one thing being changed.
+Code movement with small renames is trivial to review. Consolidation of
+two identical code paths in a single function is also possible to follow.
+The insertion of a new variable and its usage is also easy to review.
+The removal of a variable, the same. But superimposing them all into a
+single patch makes everything much more difficult to follow.
 
