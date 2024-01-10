@@ -1,178 +1,212 @@
-Return-Path: <netdev+bounces-62934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC7E829EDA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 18:01:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A104B829EED
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 18:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C52C1F2306B
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 17:01:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03DCEB26636
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 17:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7A34CDF3;
-	Wed, 10 Jan 2024 17:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA2C4CE0E;
+	Wed, 10 Jan 2024 17:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AcKZ+YNC"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="FhyoUe+u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C232482DC
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 17:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-55590da560dso5468515a12.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 09:01:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1704906100; x=1705510900; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FhFnHkhNzXwK723mCCMsfus+/MY5U2TnnZU+5b1l2Cg=;
-        b=AcKZ+YNCw27TzjDL5725WyWxW48tdspzOtzLc8GPEh2hbMp38Q+Af/OPkavwi3GFse
-         Mj79e5dIGxUdsR5AZc1ak4nCnJcipmel8rVtyFBKK6QC3X9ntoS1wmYoYfJyCHJL0/E0
-         1t3BwjUkbysVG78sQrZAkhvkdr2IsJB9U07sI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704906100; x=1705510900;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FhFnHkhNzXwK723mCCMsfus+/MY5U2TnnZU+5b1l2Cg=;
-        b=Q/Jvntv5n/minIEyvRYPRbvDV4b4Cx7Xw1TSwOYrAp65NtuNHoFYBX4IPIk3kVXyzG
-         qfj7mCpogGiRDt6CgfSXd+69rLvhhaT9X7F8a1zpE1m9Bwo/twUcFnjkw+qcmDaOxz3t
-         8L8VVZKFgSETdkLZNhgY6U1oU8b3H3yYR61iIdA4JF3tvptLZOyhfqln6iADG05AuxMw
-         UxYl8mobXBKVeDbNZYQOoJokKAq0EDYAN/EYXYhaJ8jz0EWGbIeHoMP3WzMMqtmcg+ut
-         +QvWf6EgWjmxh0d8bNhU+t0HNLd0Sup2M4GcJjJSx0lKCFOy/qxv4J9/ONlSYrrVXFdb
-         hm5A==
-X-Gm-Message-State: AOJu0YzaMxFKSU4flfJzw+cex9jq9Qrh6ayFqWvwyYHiJUFpgkD9OuPV
-	JyNOHDNClTvo1vWEZfh8Zt+KCRTFcyCdlEW9X7uX24oJSpT1
-X-Google-Smtp-Source: AGHT+IGMR6nkZR8XmOCgalYT73K20vWVRxvFQMTipLDtaHrm/bgp3dwiqktX9a1QZN7TsQrxKvIQ/0Ae9JjXBZ3T68Q=
-X-Received: by 2002:a50:8719:0:b0:553:73c4:87db with SMTP id
- i25-20020a508719000000b0055373c487dbmr732827edb.15.1704906099507; Wed, 10 Jan
- 2024 09:01:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6D94CDFE;
+	Wed, 10 Jan 2024 17:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6D7B920009;
+	Wed, 10 Jan 2024 17:15:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1704906926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vzyB6wNv+2OfPxh+xHT2t9nufYyVx1z7KimPJQBeCd4=;
+	b=FhyoUe+uhfXEbbPmVmUKDsCpxcLYkCRNx9NhccrAdUIVvERMQfLEi0eYwgz5xHVxY9fXgQ
+	7F3czjEK5tQuAdEp55gj2cBNSrWxC5vGSDjAvdyEplcUhDAIqU835V3GAIo/5hecRsw+Sw
+	uO6SNk0Ce0/9ySAJiij7+VtpUH8KqMRdzmsjj5uLDaxR+ab6sFMP6YzMJmBSOBnr7cSqLM
+	nKbnpd9InTunvQ018zUqSO0CnLSht97hCHpuJ7Wu51v4lL567CqtMGmKwRNnQ9SycsLhq9
+	k/ughPTxFkRir/0vwvF33wA1mAvpBL2HdZ/TwKYseKmvQR309H2rwyeyjbXJNQ==
+Message-ID: <b47311f8-315d-46d9-bd5b-757141708a3f@arinc9.com>
+Date: Wed, 10 Jan 2024 20:15:20 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240109194551.17666-1-andrea.fois@eventsense.it>
- <d8ed4af1-5c83-4895-9fc3-9aea25724fd9@gmail.com> <CALs4sv2_JZd5K-ZgBkjL=QpXVEXnoJrjuqwwKg0+jo2-4taHJw@mail.gmail.com>
- <18249a21-7aec-4a66-bc5a-3aa077c2b190@gmail.com> <CACKFLinZ=pkRn7oertS8W96bGmMjr8T+BvqSAN3BZ7SiEm5gxQ@mail.gmail.com>
- <a26b3079-f5fa-47b0-8b83-42db9fbbf3c4@gmail.com>
-In-Reply-To: <a26b3079-f5fa-47b0-8b83-42db9fbbf3c4@gmail.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Wed, 10 Jan 2024 09:01:28 -0800
-Message-ID: <CACKFLikZoXq17tp_152Oi4eYPd8BQLAv+LTxDgb4sHxX+8XiSA@mail.gmail.com>
-Subject: Re: [PATCH] tg3: add new module param to force device power down on reboot
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrea Fois <andrea.fois@eventsense.it>, 
-	Michael Chan <mchan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	George Shuklin <george.shuklin@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007786aa060e9a6255"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 08/30] net: dsa: mt7530: change p{5,6}_interface
+ to p{5,6}_configured
+Content-Language: en-US
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Sean Wang <sean.wang@mediatek.com>, Landen Chao <Landen.Chao@mediatek.com>,
+ DENG Qingfang <dqfext@gmail.com>, Daniel Golle <daniel@makrotopia.org>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Richard van Schagen <richard@routerhints.com>,
+ Richard van Schagen <vschagen@cs.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, erkin.bozoglu@xeront.com,
+ mithat.guner@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <d269ac88-9923-c00c-8047-cc8c9f94ef2c@arinc9.com>
+ <ZHyqI2oOI4KkvgB8@shell.armlinux.org.uk>
+ <ZHy1C7wzqaj5KCmy@shell.armlinux.org.uk>
+ <ZHy2jQLesdYFMQtO@shell.armlinux.org.uk>
+ <0542e150-5ff4-5f74-361a-1a531d19eb7d@arinc9.com>
+ <7c224663-7588-988d-56cb-b9de5b43b504@arinc9.com>
+ <20230610175553.hle2josd5s5jfhjo@skbuf>
+ <22fba48c-054d-ff0a-ae2c-b38f192b26f7@arinc9.com>
+ <9308fa1a-6de3-490b-9aeb-eb207b0432df@arinc9.com>
+ <9308fa1a-6de3-490b-9aeb-eb207b0432df@arinc9.com>
+ <20240110142721.vuthnnwhmuvghiw4@skbuf>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240110142721.vuthnnwhmuvghiw4@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
---0000000000007786aa060e9a6255
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 10.01.2024 17:27, Vladimir Oltean wrote:
+> On Wed, Jan 10, 2024 at 02:15:57PM +0300, Arınç ÜNAL wrote:
+>> I have finally tested this.
+> 
+> Replying to a question from 6 months ago is nice of you, like replying
+> to any question is. But everybody's short memory is by now hit like a
+> cold cache, everything has been forgotten. I don't even have this thread
+> in my inbox anymore, it's in the "seen" folder.
+> 
+> There's something to be said about having to re-read a long thread and
+> the code for 30 minutes, just to reply "Ok".
+> 
+> I think you need to develop a better feeling for when to let go of past
+> discussions when they become stale, summarize the essence in the commit
+> description of a patch, and then just resubmit that new patch. People
+> will have to open the code and make a fresh analysis anyway, so just
+> help them skip reading past discussions and just focus on the conclusion.
 
-On Tue, Jan 9, 2024 at 11:34=E2=80=AFPM Heiner Kallweit <hkallweit1@gmail.c=
-om> wrote:
->
-> On 10.01.2024 08:17, Michael Chan wrote:
-> > We already call dev_close() which will call tg3_close() -> tg3_stop()
-> > a few lines above.
->
-> tg3_stop() calls tg3_disable_ints(), so I wonder how a MSI interrupt can
-> occur after that. Does tg3_disable_ints() disable interrupts synchronousl=
-y?
-> Or maybe some kind of commit is needed?
->
+I agree, thanks for bearing with me here.
 
-Yes, it is synchronous.  The tg3_full_lock() call before
-tg3_disable_ints() makes it synchronous.
+> 
+> FYI, you can prefix your prints with something like this to make the log
+> easier to follow in terms of code paths taken.
+> 
+> 	"%s called from %pS <- %pS: ...\n",
+> 		__func__, __builtin_return_address(0), __builtin_return_address(1)
 
---0000000000007786aa060e9a6255
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+__builtin_return_address(1) doesn't seem to work. I'm running this on
+arm64. Apart from that, it works well. Thank you.
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILDwouOXhYz6E6+MC17XVrizGdKLjqCb
-cUN5zImETymzMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEx
-MDE3MDE0MFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQA0LCnontmIZMbpPFdck2xF9hyEJg3cie9jCA4hvPvUTXdZuefA
-mjksmAp/jmLlOZkEVcaWUqGN/BwTDV8KVnakS225fZQSOjPxgkedHaMXhpgPix84bguppW01+ROk
-iVCQpg/bihB9xlpNi4xkURDavNG39XWi/mJTpfgkcFKOOZ3C78SxVmndIMEkhon3XTEyxsJzfK6S
-Uo/GVKAPtDAnAqKOag89Ushu1vpGBCXjrjyeMpadLRwZ+Lu+i8HD2K62u4+Dl4PU/OEmTmrWn+7u
-Y7BD7BMew1nNI9DYvJw/Kz+cjh6zonf1DK7AnXl8OzBWfN9FG4aUbu5lXenvFx/R
---0000000000007786aa060e9a6255--
+[    1.863034] mt7530-mdio mdio-bus:00: mt753x_cpu_port_enable called from mt7531_setup_common+0x32c/0x370 <- 0x0: running cpu_port_config()
+[    1.875736] mt7530-mdio mdio-bus:00: mt7531_cpu_port_config called from mt753x_cpu_port_enable+0x64/0x23c <- 0x0: MT7530_PMCR_P5 PMCR_CPU_PORT_SETTING is set
+[    1.889922] mt7530-mdio mdio-bus:00: mt753x_phylink_mac_link_up called from mt7531_cpu_port_config+0xe8/0x12c <- 0x0: MT7530_PMCR_P5 PMCR_LINK_SETTINGS_MASK equivalent is set
+[    1.905491] mt7530-mdio mdio-bus:00: cpu_port_config() ran
+[    1.912336] mt7530-mdio mdio-bus:00: mt753x_cpu_port_enable called from mt7531_setup_common+0x32c/0x370 <- 0x0: running cpu_port_config()
+[    1.924777] mt7530-mdio mdio-bus:00: mt7531_cpu_port_config called from mt753x_cpu_port_enable+0x64/0x23c <- 0x0: MT7530_PMCR_P6 PMCR_CPU_PORT_SETTING is set
+[    1.938953] mt7530-mdio mdio-bus:00: mt753x_phylink_mac_link_up called from mt7531_cpu_port_config+0xe8/0x12c <- 0x0: MT7530_PMCR_P6 PMCR_LINK_SETTINGS_MASK equivalent is set
+[    1.954525] mt7530-mdio mdio-bus:00: cpu_port_config() ran
+[    1.985409] mt7530-mdio mdio-bus:00: mt7530_port_enable called from dsa_port_enable_rt+0x2c/0x98 <- 0x0: MT7530_PMCR_P5 PMCR_LINK_SETTINGS_MASK is cleared
+[    1.999378] mt7530-mdio mdio-bus:00: configuring for fixed/rgmii link mode
+[    2.006347] mt7530-mdio mdio-bus:00: mt753x_phylink_mac_config called from dsa_port_phylink_mac_config+0x30/0x3c <- 0x0: MT7530_PMCR_P5 PMCR_CPU_PORT_SETTING equivalent is set
+[    2.022197] mt7530-mdio mdio-bus:00: mt753x_phylink_mac_link_up called from dsa_port_phylink_mac_link_up+0x48/0x74 <- 0x0: MT7530_PMCR_P5 PMCR_LINK_SETTINGS_MASK equivalent is set
+[    2.022645] mt7530-mdio mdio-bus:00: mt7530_port_enable called from dsa_port_enable_rt+0x2c/0x98 <- 0x0: MT7530_PMCR_P6 PMCR_LINK_SETTINGS_MASK is cleared
+[    2.038203] mt7530-mdio mdio-bus:00: Link is Up - 1Gbps/Full - flow control rx/tx
+[    2.052090] mt7530-mdio mdio-bus:00: configuring for fixed/2500base-x link mode
+[    2.066894] mt7530-mdio mdio-bus:00: mt753x_phylink_mac_config called from dsa_port_phylink_mac_config+0x30/0x3c <- 0x0: MT7530_PMCR_P6 PMCR_CPU_PORT_SETTING equivalent is set
+[    2.084406] mt7530-mdio mdio-bus:00: mt753x_phylink_mac_link_up called from dsa_port_phylink_mac_link_up+0x48/0x74 <- 0x0: MT7530_PMCR_P6 PMCR_LINK_SETTINGS_MASK equivalent is set
+[    2.095093] mt7530-mdio mdio-bus:00 wan (uninitialized): PHY [mt7530-0:00] driver [MediaTek MT7531 PHY] (irq=137)
+[    2.100427] mt7530-mdio mdio-bus:00: Link is Up - 2.5Gbps/Full - flow control rx/tx
+
+> 
+>> [    1.763066] mt7530-mdio mdio-bus:00: running cpu_port_config()
+>> [    1.769237] mt7530-mdio mdio-bus:00: MT7530_PMCR_P5 PMCR_CPU_PORT_SETTING is set
+>> [    1.776724] mt7530-mdio mdio-bus:00: MT7530_PMCR_P5 PMCR_LINK_SETTINGS_MASK equivalent is set
+>> [    1.785254] mt7530-mdio mdio-bus:00: cpu_port_config() ran
+> 
+> This is from mt7531_setup_common(), for port 5.
+> 
+>> [    1.792098] mt7530-mdio mdio-bus:00: running cpu_port_config()
+>> [    1.798019] mt7530-mdio mdio-bus:00: MT7530_PMCR_P6 PMCR_CPU_PORT_SETTING is set
+>> [    1.805502] mt7530-mdio mdio-bus:00: MT7530_PMCR_P6 PMCR_LINK_SETTINGS_MASK equivalent is set
+>> [    1.814023] mt7530-mdio mdio-bus:00: cpu_port_config() ran
+> 
+> This is from mt7531_setup_common(), for port 6.
+> 
+>> [    1.844941] mt7530-mdio mdio-bus:00: MT7530_PMCR_P5 PMCR_LINK_SETTINGS_MASK is cleared
+> 
+> This is from mt7530_port_enable() for port 5, undoing what mt7531_setup_common() has done.
+> It also seems bogus BTW, the enable() function is doing the same "clear"
+> as mt7530_port_disable() is doing, rather than mt7530_set(). Were it not
+> for what's to come [1], this would be a bug with an actual user impact.
+> 
+>> [    1.852972] mt7530-mdio mdio-bus:00: configuring for fixed/rgmii link mode
+>> [    1.859944] mt7530-mdio mdio-bus:00: MT7530_PMCR_P5 PMCR_CPU_PORT_SETTING equivalent is set
+> 
+> This is from mt753x_phylink_mac_config(), for port 5, partially
+> overwriting what mt7531_setup_common() has done.
+> 
+>> [    1.868658] mt7530-mdio mdio-bus:00: MT7530_PMCR_P5 PMCR_LINK_SETTINGS_MASK equivalent is set
+> 
+> [1] This is from mt753x_phylink_mac_link_up(), for port 5, overwriting what
+> mt7530_port_enable() has done. I suspect that, in addition to Russell's
+> analysis, modifying PMCR_LINK_SETTINGS_MASK from the port_enable()/
+> port_disable() ops is also something that can be removed.
+> 
+>> [    1.868913] mt7530-mdio mdio-bus:00: MT7530_PMCR_P6 PMCR_LINK_SETTINGS_MASK is cleared
+>> [    1.877190] mt7530-mdio mdio-bus:00: Link is Up - 1Gbps/Full - flow control rx/tx
+>> [    1.885179] mt7530-mdio mdio-bus:00: configuring for fixed/2500base-x link mode
+>> [    1.899973] mt7530-mdio mdio-bus:00: MT7530_PMCR_P6 PMCR_CPU_PORT_SETTING equivalent is set
+>> [    1.910147] mt7530-mdio mdio-bus:00: MT7530_PMCR_P6 PMCR_LINK_SETTINGS_MASK equivalent is set
+>> [    1.918681] mt7530-mdio mdio-bus:00: Link is Up - 2.5Gbps/Full - flow control rx/tx
+>> [    1.920654] mt7530-mdio mdio-bus:00 wan (uninitialized): PHY [mt7530-0:00] driver [MediaTek MT7531 PHY] (irq=137)
+>> [    1.948453] mt7530-mdio mdio-bus:00 lan0 (uninitialized): PHY [mt7530-0:01] driver [MediaTek MT7531 PHY] (irq=138)
+>> [    1.970382] mt7530-mdio mdio-bus:00 lan1 (uninitialized): PHY [mt7530-0:02] driver [MediaTek MT7531 PHY] (irq=139)
+>> [    1.992423] mt7530-mdio mdio-bus:00 lan2 (uninitialized): PHY [mt7530-0:03] driver [MediaTek MT7531 PHY] (irq=140)
+>> [    2.014310] mt7530-mdio mdio-bus:00 lan3 (uninitialized): PHY [mt7530-0:04] driver [MediaTek MT7531 PHY] (irq=141)
+>> [    2.025396] mtk_soc_eth 1b100000.ethernet eth1: entered promiscuous mode
+>> [    2.032160] mtk_soc_eth 1b100000.ethernet eth0: entered promiscuous mode
+>> [    2.038912] DSA: tree 0 setup
+>>
+>> Arınç
+> 
+> And this is all the same for port 6.
+> 
+> So yes, it would be good to consolidate the code to follow a simple principle.
+> Any register fields should be modified only by the set of methods that
+> they pertain to. In this case, MT7530_PMCR_P appears to only hold link
+> control information, so it pertains to phylink's methods. Otherwise,
+> the natural consequence is that they will get unexpectedly overwritten.
+> 
+> It seems outside of the competence of ds->ops->port_enable() and
+> ds->ops->port_disable(). Those would be appropriate, for example, to
+> control the switching matrix settings between a user port and its
+> corresponding CPU port (but not any more switching matrix settings -
+> those pertain to port_bridge_join() and port_bridge_leave()).
+> 
+> I hope this helps.
+
+This is very helpful, thank you very much. This is what I deduct I should
+do:
+
+First patch: Get rid of cpu_port_config().
+
+Second patch: Collect port link control register operations from
+port_enable/port_disable and phylink_mac_config to
+phylink_mac_link_up/phylink_mac_link_down.
+
+Arınç
 
