@@ -1,115 +1,115 @@
-Return-Path: <netdev+bounces-62946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AEA082A049
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 19:31:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09AF982A061
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 19:45:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F0881C2248D
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 18:31:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EC341F22D81
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 18:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5EA1E4A6;
-	Wed, 10 Jan 2024 18:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D03F4D586;
+	Wed, 10 Jan 2024 18:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Altj7fFE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TTVXsC5F"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375A44D582;
-	Wed, 10 Jan 2024 18:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ygJO/yfS/kYURGo632XL+UAKC6HRU0bCt+QfkkSA/jQ=; b=Altj7fFEgmnst3pkUyvqp/ev10
-	l8KOLFzehOuc1jSUkQ/pKC5Dr5WSCqjyO67puXiqXG1Sz+x+DYTyX5m1XDJsdvqRFRJdccIXFuwtZ
-	f3qUcAw+XChvxpSGtvl7S7pfLiUaFbjj+Xh2mm6OKniuh+4h3rSm82IA/KeANy4uD3lgyUrGlgcyF
-	lQCz+bnsqvqzTHaGbcXe4jrGT1DPToEkIdTYVW9oRXAgc0gJxQ/fofdHYIA902JAW0+rMS/wQvQ3E
-	/FDlBX3atzL92Ci3v6VVOqAagyqzTsYJq57SCv1sASq7QTsfYPsFsATL+ejKr+3FsxbtfXePkCoy8
-	vxb/pohQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40166)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rNdMB-0005hi-25;
-	Wed, 10 Jan 2024 18:31:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rNdM7-0005XE-DA; Wed, 10 Jan 2024 18:31:11 +0000
-Date: Wed, 10 Jan 2024 18:31:11 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Richard van Schagen <richard@routerhints.com>,
-	Richard van Schagen <vschagen@cs.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	erkin.bozoglu@xeront.com, mithat.guner@xeront.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next 08/30] net: dsa: mt7530: change p{5,6}_interface
- to p{5,6}_configured
-Message-ID: <ZZ7ib5WWyH4TyirS@shell.armlinux.org.uk>
-References: <ZHy2jQLesdYFMQtO@shell.armlinux.org.uk>
- <0542e150-5ff4-5f74-361a-1a531d19eb7d@arinc9.com>
- <7c224663-7588-988d-56cb-b9de5b43b504@arinc9.com>
- <20230610175553.hle2josd5s5jfhjo@skbuf>
- <22fba48c-054d-ff0a-ae2c-b38f192b26f7@arinc9.com>
- <9308fa1a-6de3-490b-9aeb-eb207b0432df@arinc9.com>
- <9308fa1a-6de3-490b-9aeb-eb207b0432df@arinc9.com>
- <20240110142721.vuthnnwhmuvghiw4@skbuf>
- <b47311f8-315d-46d9-bd5b-757141708a3f@arinc9.com>
- <20240110180525.wwxkkoqam37oqm2f@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8224CE05
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 18:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4298fa85baeso15291cf.1
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 10:45:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704912315; x=1705517115; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r3Eh3vWd3uLjS4vTvLciXZgkfWKFz3UWutS6XF/j3R4=;
+        b=TTVXsC5Fh6eVl8Sh95GDMtjgMD/b2rBDi6chTfjGFBM6OoMekEw3KnEckkRXOgSj04
+         O+wFZVM6JxT+fG2Tmzu6PvNOSnKShZ5rIyKEFTCXkn/eNEkfB7IL3L8bw0hM9rgbAyvB
+         W+y+6hdkxb5jjeKNE1YSqlkuzaIa0NeRqbXSlSzOrmg/Q+XyJ5oiSU/YpLJDmpVwFd0X
+         +8ByoXimM0g+s1rFOmurdfYS3lLgcWCgRQfW2O99Sp6sXjNv3Ohvoz3euXitGMaxWrLJ
+         4naYTbQ5544BgX+D5Von5RRvZWBMRB82OcomWaLiNbJqxe+kt9KCOzFSNpRtHmvWujrM
+         Qr6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704912315; x=1705517115;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r3Eh3vWd3uLjS4vTvLciXZgkfWKFz3UWutS6XF/j3R4=;
+        b=hcBVldxjBaZEBS5R+Xm2D0COhzPfcdtJiK7y2enVn1nyeLTCQo0tUu5IJ/qUDAqWaN
+         HBeKxdOjhJ0NV19zZQemmpIbDc9Jklj4mGGlDrs3+oKTwx14KIuAbKT0wMun5n0f9LOZ
+         Ta/Ncr68RmFdtQdQyEn4djJu33hbBQye35WKVrjR/01bnkDAZe/4NnQs6a7qNWIgdRFa
+         SyTOMGyWCFzIk4NErmP71vqCPZ9c/ryl34Dz8IV+38nLa0DuIt+hnEV+6yZITCSfm4R1
+         hsrQAUL2Yd3HfwT5HNRWmH1ECNgOwAqSxTH9wL8wjLzhMMaB10G80+5/ijxpZZyqaLu3
+         BJ4g==
+X-Gm-Message-State: AOJu0Yy6jYnNgtLrOA9mFw42A0VBZm2poW0EhncYSDcb8fC8jvfDH75k
+	Kgp41WRPY7ZLPFrI+G97xgKwEbbmUe8x9vyLCy40nOGvbdno
+X-Google-Smtp-Source: AGHT+IH1g5oAkA/mXv6S15A1WyjlDf9P6tGy0rPvYtU+BuRDJsscMQ1qY1dsO/ODnyLO6ERHe77CJ8mkYXE3Bk4LEFE=
+X-Received: by 2002:ac8:5d4b:0:b0:429:8c96:3710 with SMTP id
+ g11-20020ac85d4b000000b004298c963710mr14700qtx.9.1704912314663; Wed, 10 Jan
+ 2024 10:45:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240110180525.wwxkkoqam37oqm2f@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20240109011455.1061529-1-almasrymina@google.com> <20240109011455.1061529-2-almasrymina@google.com>
+In-Reply-To: <20240109011455.1061529-2-almasrymina@google.com>
+From: Shakeel Butt <shakeelb@google.com>
+Date: Wed, 10 Jan 2024 10:45:00 -0800
+Message-ID: <CALvZod4Ngqn0scEM9JhRCav88ZFB=LLmTiLj9fd_04moCLTsyg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v5 1/2] net: introduce abstraction for
+ network memory
+To: Mina Almasry <almasrymina@google.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 10, 2024 at 08:05:25PM +0200, Vladimir Oltean wrote:
-> On Wed, Jan 10, 2024 at 08:15:20PM +0300, Arınç ÜNAL wrote:
-> > __builtin_return_address(1) doesn't seem to work. I'm running this on arm64.
-> 
-> I can't tell you why either, I'm sorry. I can just point to the
-> documentation, which does specify that "On some machines it may be
-> impossible to determine the return address of any function other than
-> the current one". If somebody knows what this depends on, feel free to
-> interject.
-> https://gcc.gnu.org/onlinedocs/gcc/Return-Address.html
-> 
-> On my NXP LS1028A (also arm64) plus clang-16 compiler, __builtin_return_address()
-> does work with multiple nesting levels.
+On Mon, Jan 8, 2024 at 5:15=E2=80=AFPM Mina Almasry <almasrymina@google.com=
+> wrote:
+>
+> Add the netmem_ref type, an abstraction for network memory.
+>
+> To add support for new memory types to the net stack, we must first
+> abstract the current memory type. Currently parts of the net stack
+> use struct page directly:
+>
+> - page_pool
+> - drivers
+> - skb_frag_t
+>
+> Originally the plan was to reuse struct page* for the new memory types,
+> and to set the LSB on the page* to indicate it's not really a page.
+> However, for compiler type checking we need to introduce a new type.
+>
+> netmem_ref is introduced to abstract the underlying memory type.
+> Currently it's a no-op abstraction that is always a struct page
+> underneath. In parallel there is an undergoing effort to add support
+> for devmem to the net stack:
+>
+> https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@googl=
+e.com/
+>
+> netmem_ref can be pointers to different underlying memory types, and the
+> low bits are set to indicate the memory type. Helpers are provided
+> to convert netmem pointers to the underlying memory type (currently only
+> struct page). In the devmem series helpers are provided so that calling
+> code can use netmem without worrying about the underlying memory type
+> unless absolutely necessary.
+>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>
 
-gcc will probably need to be using frame pointers so it can walk the
-stack, if gcc even implements non-zero values to
-__builtin_return_address(). Without frame pointers, it would need an
-unwinder.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Shakeel Butt <shakeelb@google.com>
 
