@@ -1,144 +1,101 @@
-Return-Path: <netdev+bounces-62891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E29829ABA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:55:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18FDE829AD6
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:01:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AC6CB26234
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:55:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBF8B1F25F88
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C325A48787;
-	Wed, 10 Jan 2024 12:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E6D4878D;
+	Wed, 10 Jan 2024 13:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="s20dKFSX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hUFVSIkb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551E7482FF
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 12:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4674ca1a2dbso919335137.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 04:55:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1704891329; x=1705496129; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Ee+hHkfAfIFS6WHvmIg35YEx3vQHJAhovJ3w3cPXwo=;
-        b=s20dKFSXv9X0Dth46Eq9po8i1zw++gJAeAovANgJUWtSt/94qMDdNE6z161bIEdp2Z
-         atELqW/ToP33dGrkoHBTOChulkv8Cw7Kv4FTMAuyypFZUkfrX5/Kh6YB3DlBueZvYdEp
-         hzs/zmifuFPCqPeNZwb1WQVnPJHOBHxMIazawurhzd9sIsPVuFMU+IygCX8PilCPsQUr
-         6rZIP5SHmB3SL+0nfD6hPl1tSEpU7f7BOl8k2oh7MKxCiO5WWpJ4hE5B1l1pVP8bf94c
-         1gmLonYfjIGcPzZ8dzA2N7wL0S6x5gcjnngKgw86LHphKpQvU/fy+Ut4dVwNSwtJoZS8
-         MS1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704891329; x=1705496129;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7Ee+hHkfAfIFS6WHvmIg35YEx3vQHJAhovJ3w3cPXwo=;
-        b=OxU5mMz5LW3S7Pu3ssc5DXIHLxvf2cedlD8UcBSBOqQrnAy7IW+zJazr9C1MJOEXz9
-         XQtsqOGfRcUdHn+h94Z7M+vkr7zO/mwKtXOGoQP97CHF/qNDSychdOOMk/QFqP9FiaT/
-         6N9LN41Ob1ciwNYcxbVnjqQuOc8qRJNiTVn39TkJj32KunWhMD27NB/aE+IUhJp1v9nt
-         fpon5x7zBhhrGEsap3Ipr/7odGIBKeP25lvafVX1ub7k+yBb2YEIe+/EWT4q6gZe9odS
-         a6LGLconPFZcBKZeCx1JlYul9F4oYJsZdy4IIKvZ7uzDKKXVOeH/pr/8d1dmfBZHhqef
-         YazQ==
-X-Gm-Message-State: AOJu0YzZjNY9I22ecds5qOO2EFpmoUojrpYSQ/ooILM8a1B5L7V6excL
-	U/xigomMkiOYp53P5PP8eF+o4D5T/gFQ7G2IHWkD8uN/TH7hdQ==
-X-Google-Smtp-Source: AGHT+IFJf1lA0zydsqWg4MMlDwI7GY7aqZwXYX8MZwXUGKbgxRrG/GbjToxomMdYf3iIjG2NRkt8G9T0sjS/5fZgDGY=
-X-Received: by 2002:a05:6102:6248:b0:466:fd31:def8 with SMTP id
- gd8-20020a056102624800b00466fd31def8mr866005vsb.55.1704891329157; Wed, 10 Jan
- 2024 04:55:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480EE208A4;
+	Wed, 10 Jan 2024 13:01:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CA3AC433F1;
+	Wed, 10 Jan 2024 13:01:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704891689;
+	bh=lObChVFu8SVeU0CpWZS6IsckF37c9pF9oZGVe4pxJac=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=hUFVSIkb8pTGra0V4ilZBHzmGcdS+r5wRCSoniOe8c2PpqnvKcyIXbzdMFC47XuP1
+	 Ak/lEEquN9Rb5/sv4dfqTlSISU9kWVSTB9Er9I+ZkYCkksmo03ySUiJqsa0yTlw21T
+	 qXMGmCEAJJbkLa8lx0CBX3qWsFbRavAZY5PSK3HJNffYoe2kjLzx7Ryynkxg5BLrMa
+	 PG4caHupbmxWKB8IB9Uq3NVGKyoXKe3C/8MS8YzIkdLv2DI2fuIdqyA/ftgbEAImiY
+	 EEEi70eIi+cxfMSVzT8y4Twm5is5hINR40jau4PoCA2vDUwXWZ/C/uxH37B5LNIlYT
+	 aAKuIWgZq3lSQ==
+Received: (nullmailer pid 1231852 invoked by uid 1000);
+	Wed, 10 Jan 2024 13:01:24 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104130123.37115-1-brgl@bgdev.pl> <20240104130123.37115-4-brgl@bgdev.pl>
- <20240109144327.GA10780@wunner.de>
-In-Reply-To: <20240109144327.GA10780@wunner.de>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 10 Jan 2024 13:55:18 +0100
-Message-ID: <CAMRc=MdXO6c6asvRSn_Z8-oFS48hroT+dazGKB6WWY1_Zu7f1Q@mail.gmail.com>
-Subject: Re: [RFC 3/9] PCI/portdrv: create platform devices for child OF nodes
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
-	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Rob Herring <robh@kernel.org>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: corbet@lwn.net, linux-kernel@vger.kernel.org, will@kernel.org, quic_leiwei@quicinc.com, quic_souravp@quicinc.com, m.szyprowski@samsung.com, quic_linchen@quicinc.com, u-kumar1@ti.com, quic_kkumarcs@quicinc.com, devicetree@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org, rrameshbabu@nvidia.com, quic_suruchia@quicinc.com, geert+renesas@glider.be, davem@davemloft.net, nfraprado@collabora.com, arnd@arndb.de, linux-arm-msm@vger.kernel.org, quic_soni@quicinc.com, p.zabel@pengutronix.de, andrew@lunn.ch, edumazet@google.com, catalin.marinas@arm.com, conor+dt@kernel.org, brett.creeley@amd.com, pabeni@redhat.com, linux-doc@vger.kernel.org, neil.armstrong@linaro.org, jasowang@redhat.com, dmitry.baryshkov@linaro.org, agross@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org, kuba@kernel.org, andersson@kernel.org, anthony.l.nguyen@intel.com, ansuelsmth@gmail.com, linux-arm-kernel@lists.infradead.org, joshua.a.hay@intel.com, jacob.e.keller@intel.com, ryazanov.s.a@gmail.com, quic_pavir
+ @quicinc.com, shannon.nelson@amd.com, robh+dt@kernel.org, konrad.dybcio@linaro.org
+In-Reply-To: <20240110114033.32575-3-quic_luoj@quicinc.com>
+References: <20240110114033.32575-1-quic_luoj@quicinc.com>
+ <20240110114033.32575-3-quic_luoj@quicinc.com>
+Message-Id: <170489168445.1231814.13885812844445449165.robh@kernel.org>
+Subject: Re: [PATCH net-next 02/20] dt-bindings: net: qcom,ppe: Add
+ bindings yaml file
+Date: Wed, 10 Jan 2024 07:01:24 -0600
 
-On Tue, Jan 9, 2024 at 3:43=E2=80=AFPM Lukas Wunner <lukas@wunner.de> wrote=
-:
->
-> On Thu, Jan 04, 2024 at 02:01:17PM +0100, Bartosz Golaszewski wrote:
-> > In order to introduce PCIe power-sequencing, we need to create platform
-> > devices for child nodes of the port driver node. They will get matched
-> > against the pwrseq drivers (if one exists) and then the actuak PCIe
-> > device will reuse the node once it's detected on the bus.
-> [...]
-> > --- a/drivers/pci/pcie/portdrv.c
-> > +++ b/drivers/pci/pcie/portdrv.c
-> > @@ -715,7 +716,7 @@ static int pcie_portdrv_probe(struct pci_dev *dev,
-> >               pm_runtime_allow(&dev->dev);
-> >       }
-> >
-> > -     return 0;
-> > +     return devm_of_platform_populate(&dev->dev);
-> >  }
->
-> I think this belongs in of_pci_make_dev_node(), portdrv seems totally
-> the wrong place.  Note that you're currently calling this for RCECs
-> (Root Complex Event Collectors) as well, which is likely not what
-> you want.
->
 
-of_pci_make_dev_node() is only called when the relevant PCI device is
-instantiated which doesn't happen until it's powered-up and scanned -
-precisely the problem I'm trying to address.
+On Wed, 10 Jan 2024 19:40:14 +0800, Luo Jie wrote:
+> Qualcomm PPE(packet process engine) is supported on
+> IPQ SOC platform.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  .../devicetree/bindings/net/qcom,ppe.yaml     | 1330 +++++++++++++++++
+>  1 file changed, 1330 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/qcom,ppe.yaml
+> 
 
-Calling this for whomever isn't really a problem though, is it? We
-will create a platform device alright - if it's defined on the DT -
-and at worst it won't match against any driver. It seems harmless IMO.
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-> devm functions can't be used in the PCI core, so symmetrically call
-> of_platform_unpopulate() from of_pci_remove_node().
+yamllint warnings/errors:
 
-I don't doubt what you're saying is true (I've seen worse things) but
-this is the probe() callback of a driver using the driver model. Why
-wouldn't devres work?
+dtschema/dtc warnings/errors:
+Documentation/devicetree/bindings/net/qcom,ppe.example.dts:20:18: fatal error: dt-bindings/clock/qcom,ipq9574-nsscc.h: No such file or directory
+   20 |         #include <dt-bindings/clock/qcom,ipq9574-nsscc.h>
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[2]: *** [scripts/Makefile.lib:419: Documentation/devicetree/bindings/net/qcom,ppe.example.dtb] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1424: dt_binding_check] Error 2
+make: *** [Makefile:234: __sub-make] Error 2
 
-Bart
+doc reference errors (make refcheckdocs):
 
->
-> Thanks,
->
-> Lukas
->
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240110114033.32575-3-quic_luoj@quicinc.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
