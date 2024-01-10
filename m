@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-62900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51560829B6C
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:36:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D9C829B71
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:37:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01A95281899
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:36:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0ABEB2448B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1408C48CD8;
-	Wed, 10 Jan 2024 13:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624B748CD0;
+	Wed, 10 Jan 2024 13:34:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9FE4CB5B;
-	Wed, 10 Jan 2024 13:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A844B5B8;
+	Wed, 10 Jan 2024 13:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
 Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
 	(envelope-from <fw@strlen.de>)
-	id 1rNYi5-0000Y9-0c; Wed, 10 Jan 2024 14:33:33 +0100
-Date: Wed, 10 Jan 2024 14:33:33 +0100
+	id 1rNYj5-0000Z0-PZ; Wed, 10 Jan 2024 14:34:35 +0100
+Date: Wed, 10 Jan 2024 14:34:35 +0100
 From: Florian Westphal <fw@strlen.de>
 To: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -31,11 +31,10 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, kernel@openvz.org
-Subject: Re: [PATCH 1/4] netfilter: nfnetlink_log: use proper helper for
- fetching physinif
-Message-ID: <20240110133333.GA24888@breakpoint.cc>
+Subject: Re: [PATCH 3/4] netfilter: propagate net to nf_bridge_get_physindev
+Message-ID: <20240110133435.GB24888@breakpoint.cc>
 References: <20240110110451.5473-1-ptikhomirov@virtuozzo.com>
- <20240110110451.5473-2-ptikhomirov@virtuozzo.com>
+ <20240110110451.5473-4-ptikhomirov@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,44 +43,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240110110451.5473-2-ptikhomirov@virtuozzo.com>
+In-Reply-To: <20240110110451.5473-4-ptikhomirov@virtuozzo.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
 Pavel Tikhomirov <ptikhomirov@virtuozzo.com> wrote:
-> We don't use physindev in __build_packet_message except for getting
-> physinif from it. So let's switch to nf_bridge_get_physinif to get what
-> we want directly.
-> 
-> Signed-off-by: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
-> ---
->  net/netfilter/nfnetlink_log.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/netfilter/nfnetlink_log.c b/net/netfilter/nfnetlink_log.c
-> index f03f4d4d7d889..134e05d31061e 100644
-> --- a/net/netfilter/nfnetlink_log.c
-> +++ b/net/netfilter/nfnetlink_log.c
-> @@ -508,7 +508,7 @@ __build_packet_message(struct nfnl_log_net *log,
->  					 htonl(br_port_get_rcu(indev)->br->dev->ifindex)))
->  				goto nla_put_failure;
->  		} else {
-> -			struct net_device *physindev;
-> +			int physinif;
->  
->  			/* Case 2: indev is bridge group, we need to look for
->  			 * physical device (when called from ipv4) */
-> @@ -516,10 +516,10 @@ __build_packet_message(struct nfnl_log_net *log,
->  					 htonl(indev->ifindex)))
->  				goto nla_put_failure;
->  
-> -			physindev = nf_bridge_get_physindev(skb);
-> -			if (physindev &&
-> +			physinif = nf_bridge_get_physinif(skb);
-> +			if (physinif &&
->  			    nla_put_be32(inst->skb, NFULA_IFINDEX_PHYSINDEV,
-> -					 htonl(physindev->ifindex)))
-> +					 htonl(physinif)))
+> This is a preparation patch for replacing physindev with physinif on
+> nf_bridge_info structure. We will use dev_get_by_index_rcu to resolve
+> device, when needed, and it requires net.
 
-I think you can drop this patch and make the last patch pass
-nf_bridge_info->physinif directly.
+Acked-by: Florian Westphal <fw@strlen.de>
 
