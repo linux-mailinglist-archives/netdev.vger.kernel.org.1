@@ -1,65 +1,44 @@
-Return-Path: <netdev+bounces-62802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E878A829464
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 08:34:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0F1829478
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 08:47:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AE0DB249B8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 07:34:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD3D91C258BB
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 07:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234703C47B;
-	Wed, 10 Jan 2024 07:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF013A1BE;
+	Wed, 10 Jan 2024 07:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gWromA1R"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="RDDlycAb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A50139FC9;
-	Wed, 10 Jan 2024 07:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-50ea98440a7so3744069e87.1;
-        Tue, 09 Jan 2024 23:34:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704872059; x=1705476859; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cQA4kBLC3kUcpyDzl1NuAb1PXWAP5vnpOabzjxLoYKg=;
-        b=gWromA1RzoREvoWlVZRsd2/gXsNr9ZL43Cq7uQB9YuZxmdnLoEUsIgc2cZyy/tN6ec
-         SvWKazaeyMjSVxMW4aOiL33qrqGU/kkM7LrFN6yofy9A0/v1QWuqlZVmM+pPfarsPkiJ
-         ZthOzasIHeoZQywMdq2/hreEoLLLC1nLvUrB/g4IF/jfQxG74GaQY91zJ2Gnq3ngaHrZ
-         KWfbONGDGVu/umJjvvn+PQnr7X9vw0TFdV9TCtZnz+tinCLMSURd7E6lETf9mLQB26KX
-         6LY0crbmgOstX2tf9yxv/0kprYgbivBlObYrBzYL2sD2uqrnhquTcadua5lY1cUjKxnI
-         +ekA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704872059; x=1705476859;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cQA4kBLC3kUcpyDzl1NuAb1PXWAP5vnpOabzjxLoYKg=;
-        b=pKuO8deenJCAR0Ixhp4ivOOo9OXekMgbccJEpfI99UQ+cwDo44JM3wjU/94AAsHLWn
-         AkZ3yrBveQ/zDpiMncovzf+z3i8tKeeugHn+ahEiBpKIdutjvc2JURlIXzWZhjbCRs2p
-         PY3J3a+oy+QtMD1VAu7U/UaWGo9rDGoE7WS1bEBkj0BoTPT/QtFQ6HJZ9YmfUo3Hu+eF
-         e5H5m9tE04shNb7Tgc50OZfqBuOpzjbe2/In1nlLW/m/wlpSaxM3FAS/VBl6Ii4ZQvYg
-         jhLoryP9iLjmmyMvuP2GPp1ORdKwdCSJxgZ+b85lEOmOkwvfsTfxvt6TGBnuovmWMSMh
-         vJIQ==
-X-Gm-Message-State: AOJu0YzyWqyx0N5ZbM7SZsY33zbDfOGTMUwmani0ID4RekaC+29XhCuA
-	WuT67l/BiYEvsfYBtAF5pY0=
-X-Google-Smtp-Source: AGHT+IHD5xzkS8rzCE2o7LPbimN/ogtXkBJtgVX/UYmDiJjHSh2Zk64/TA7jJYVWhxN6mphokXaKiQ==
-X-Received: by 2002:ac2:43bb:0:b0:50e:7b34:c17b with SMTP id t27-20020ac243bb000000b0050e7b34c17bmr95771lfl.74.1704872059131;
-        Tue, 09 Jan 2024 23:34:19 -0800 (PST)
-Received: from ?IPV6:2a01:c23:bd4e:3500:d880:5055:4cea:107c? (dynamic-2a01-0c23-bd4e-3500-d880-5055-4cea-107c.c23.pool.telefonica.de. [2a01:c23:bd4e:3500:d880:5055:4cea:107c])
-        by smtp.googlemail.com with ESMTPSA id p10-20020a170906a00a00b00a28479fcb8esm1802025ejy.103.2024.01.09.23.34.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jan 2024 23:34:17 -0800 (PST)
-Message-ID: <a26b3079-f5fa-47b0-8b83-42db9fbbf3c4@gmail.com>
-Date: Wed, 10 Jan 2024 08:34:18 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CA533981;
+	Wed, 10 Jan 2024 07:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1704872802; x=1705477602; i=markus.elfring@web.de;
+	bh=hhPaJcyeSBxTfwuEoDUTo5lm2LbnDI4Sufrw3CS2k2s=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=RDDlycAbIBjqIBZhciOaoMzfl8tat1ml5+qzKdoiHfMJreRpIHAbWIXRnPKwlnhr
+	 w0vse/ZAZ3cCwQ7mccrHYN9VDuoVlfWNQ8uIZoL8s+3TUf5O7ga+mecRtASez08rI
+	 07w8aaKfxzw/exDThF6Fkwkrpnv/ZCpWbCcynR7vWOWhUdijv5Jjt3cQq8mcyTSJI
+	 RT4OMizwoUpYzSXNWSPBgXIEHsEDQQyf5YMDWTPeDR7HY/BXT9aPGL5XZp7AaYCwy
+	 ZrYY/gILsaXbNsNlUzLE3Ss51DRCGO3dBL1NNgDiVupzBTuhoQdAYuR6EDnClKaee
+	 2l1JfThVel14fi8LUQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.86.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MC0LH-1rTH7H11Th-00CKiQ; Wed, 10
+ Jan 2024 08:46:42 +0100
+Message-ID: <0d7a06f0-7a0e-47c8-b89e-c3122b46d93e@web.de>
+Date: Wed, 10 Jan 2024 08:46:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,92 +46,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] tg3: add new module param to force device power down on
- reboot
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Andrea Fois <andrea.fois@eventsense.it>, Michael Chan <mchan@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- George Shuklin <george.shuklin@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240109194551.17666-1-andrea.fois@eventsense.it>
- <d8ed4af1-5c83-4895-9fc3-9aea25724fd9@gmail.com>
- <CALs4sv2_JZd5K-ZgBkjL=QpXVEXnoJrjuqwwKg0+jo2-4taHJw@mail.gmail.com>
- <18249a21-7aec-4a66-bc5a-3aa077c2b190@gmail.com>
- <CACKFLinZ=pkRn7oertS8W96bGmMjr8T+BvqSAN3BZ7SiEm5gxQ@mail.gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <CACKFLinZ=pkRn7oertS8W96bGmMjr8T+BvqSAN3BZ7SiEm5gxQ@mail.gmail.com>
+Subject: Re: crypto: virtio - Less function calls in
+ __virtio_crypto_akcipher_do_req() after error detection
+To: Justin Stitt <justinstitt@google.com>, virtualization@lists.linux.dev,
+ linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ netdev@vger.kernel.org, cocci@inria.fr
+Cc: kernel test robot <lkp@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, Gonglei <arei.gonglei@huawei.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, llvm@lists.linux.dev,
+ oe-kbuild-all@lists.linux.dev, LKML <linux-kernel@vger.kernel.org>
+References: <2413f22f-f0c3-45e0-9f6b-a551bdf0f54c@web.de>
+ <202312260852.0ge5O8IL-lkp@intel.com>
+ <7bf9a4fa-1675-45a6-88dd-82549ae2c6e0@web.de>
+ <20240109234241.4q3ueqdjz5o54oan@google.com>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240109234241.4q3ueqdjz5o54oan@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:uYjo0zmC9Bv8IGNYZK4OcE5zWAU90y0/cZTEhqTTR+46QfZcrke
+ tgvURLyjA9lTvet4ThfCVXnv8xkFz5vm5k/faG0SI34wHLmSeb4+ISwwXtzGVUNyei+sko3
+ imEXpQg0tfMnY2jPBNEQpi1Nej6dOCS3XWYf+0+cvT6Tzo9nqafppm62vyx/roH5eUamaVt
+ V+cwMMwdBpWwOAkMutt1A==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:S0h3qRtm9JU=;wWqjC0b120yckKxNsgoQLwgkgBW
+ TANfswLwhLmaw2f/tPyZEWPKAcRWd062YgXcSl/MJ2qJRU1QKDsfT2ThjEWt9E72pzH0XbipK
+ ek+fzGIiWGzIJsPlXIujThtScJKp1023bSnfHXoawQA9pX+pihbfTuFGFlAUTWqVRcAWqrqli
+ 0nCKkRvwtVBpgQQHcOkSiZz2JlCRwk57Shx+Gvg6y5bk4L3PH3AlWQ8tO6Xp3nleW9MR0s7si
+ MSvzw7RCAFeB6LwjIZwmlOEOjjPLPbYUs521VFEI/yO6FjCahBvoh12NcXhyV06gTwrZxYSeE
+ b8pBwfLUgR/Esz4UAIkpBHYPrX/bWsRwmcnQHgEEK4xgOgGDjqsiyPzEp2Y2Efcn2/R/EF712
+ VQk246045auIbeX9HAJOCho2yLaMsyEH1f6EHNTxHg0+SqFqDWpwoGio4SkvRb3I8VuZ3pxn4
+ pKeUq4c1gFEumr07bBhEG4mi/NUQgnLyhdgW6BwDdFk4VwWYt4+ogSIr5ka7LK0XE9enEulDt
+ FYzDmGriybFkbMm6TBpDciJx5Sh6BnEUu+Et3jr/Wo5juVLgYVUD68PVkhXYCB9kXCZBCdsVV
+ ugIrdZ0ILSXTq7qyQMj80Xqu7K02gBTP9d/ghsEIPcwB8ADu4LuJO6tT7jydAQmru2Q2FVJk1
+ ivWlGskt+2ukhVot4diVbYzhRSU40RAEtZ+czNRSy7ThyCDOja3gPdwSQvyCuhQFKR8wgwG9b
+ XrqtDCFIWRfjgOes6u/gzPr5TaEA4NNxHUyub1v+1OAf9I203fen86ea5RIg7ATId3YwnrbNF
+ CPYepQfCHStuUHXi9ghJSc64B7/bq4g0XeNcJeCEkljhWyB2+P2eOjuzJeW/QqYtSYA6LzvEr
+ oZ4SBkMQ7rrO/7shvLlLjbwtqb6JDHUcnuYj1+D6YDz0o8p6Hfvl/T+rJqJzOzUkuEamvmJ98
+ B+3jVJr1HhEYCoxIDT4FjRo5reo=
 
-On 10.01.2024 08:17, Michael Chan wrote:
-> On Tue, Jan 9, 2024 at 11:09 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
->>
->> On 10.01.2024 05:12, Pavan Chebbi wrote:
->>> I think the second suggestion could be a better solution. Helps to
->>> solve the issue 9fc3bc764334 is trying to fix.
->>> But I am not sure how easy it is to test. As I recall, Goerge was
->>> unable to reach out to the author of 2ca1c94ce0b6 when he wanted to
->>> test his patch for regression.
->>> We did discuss the risk of this regression.
->>> https://patchwork.kernel.org/project/netdevbpf/patch/20231101130418.44164-1-george.shuklin@gmail.com/
->>> Unfortunately, looks like it has come true :(
->>
->> If the culprit is an unexpected MSI interrupt, then you may also address
->> this directly by disabling interrupts in the device. tg3_stop() may be
->> a candidate here.
->>
-> 
-> We already call dev_close() which will call tg3_close() -> tg3_stop()
-> a few lines above.
+>> The kfree() function was called in up to two cases by the
+>> __virtio_crypto_akcipher_do_req() function during error handling
+>> even if the passed variable contained a null pointer.
+>> This issue was detected by using the Coccinelle software.
+>
+> If the script is short and simple would you mind, in the future,
+> including it below the fold -- this may help others do similar work down
+> the line -- Or =E2=80=A6
 
-tg3_stop() calls tg3_disable_ints(), so I wonder how a MSI interrupt can
-occur after that. Does tg3_disable_ints() disable interrupts synchronously?
-Or maybe some kind of commit is needed?
+Would you like to take another look at the clarification approach
+=E2=80=9CReconsidering kfree() calls for null pointers (with SmPL)=E2=80=
+=9D?
+https://lore.kernel.org/cocci/6cbcf640-55e5-2f11-4a09-716fe681c0d2@web.de/
+https://sympa.inria.fr/sympa/arc/cocci/2023-03/msg00096.html
 
+Regards,
+Markus
 
