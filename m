@@ -1,135 +1,156 @@
-Return-Path: <netdev+bounces-62958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA5BC82A31E
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 22:12:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E2482A353
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 22:34:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A0FCB21ED0
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 21:12:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4BD41F239DE
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 21:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44FA54F5F4;
-	Wed, 10 Jan 2024 21:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305934F5F8;
+	Wed, 10 Jan 2024 21:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QoLm859f"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="eISlyelm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041714F216
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 21:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704921109;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gbbBO9lNpJR0MfDA9zvC1wgSIs185cCcwjZiJnDa0wI=;
-	b=QoLm859fShKGJHtWJ76uFdl5TjlGsdTUT0+2EAfyZy/smpkYlsZC96UnIWyHH6V5JMJirk
-	ctWbhwOJzYgiNPEcLd8TkJHtlLqdyCMIcsF/1s/OpQcrlgIiUjEGw/OqYEoqSiGYFUPgYL
-	h+jwN5gyUWy/Rzm20BXpfdY8xYAcPcw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-99-OxrgtCRHNg-my24eDO2Ukg-1; Wed, 10 Jan 2024 16:11:45 -0500
-X-MC-Unique: OxrgtCRHNg-my24eDO2Ukg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 421108371C0;
-	Wed, 10 Jan 2024 21:11:44 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 795C61121306;
-	Wed, 10 Jan 2024 21:11:41 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-    Edward Adam Davis <eadavis@qq.com>,
-    Pengfei Xu <pengfei.xu@intel.com>
-Cc: dhowells@redhat.com, Simon Horman <horms@kernel.org>,
-    Markus Suvanto <markus.suvanto@gmail.com>,
-    Jeffrey E Altman <jaltman@auristor.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
-    Steve French <smfrench@gmail.com>,
-    Jarkko Sakkinen <jarkko@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
-    keyrings@vger.kernel.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH] keys, dns: Fix size check of V1 server-list header
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678364F883
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 21:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3366e78d872so4931332f8f.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 13:34:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1704922457; x=1705527257; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ULJlgsbYbFdx3cKG7esKuUDjzGCjCZ7y1LhDjw4dP0A=;
+        b=eISlyelm/bqLfb6AhL8zLj51CBIuxKZ9rfdDrVZzuRe4l/CXHePYiSpGDj+MoNKjBQ
+         mASKJsKalWq2Cj36U0MnUiF8W2/mZZu+VDxE0p2FASb7TmWRi+xi0LITuBUT41N1nB5F
+         lhG5Ubi8GOLOUJ4WvEd19YtTdL9MOFclADguEpwD/uzmR9eG/YXGX4zH8GO39oPW1r5R
+         D/dvzw158H5wpOQ2wL4HIcxwED6KfRv7/wPCPfAUn1unppVzEo6gqt8KlnCdG6bqQk2Z
+         TBpMphxItqV8jc26ZV3zpZJZ7le2yVJDRIkCxtHudhQO4unZWDr+83/W8CMIWd1OP59Q
+         PBCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704922457; x=1705527257;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ULJlgsbYbFdx3cKG7esKuUDjzGCjCZ7y1LhDjw4dP0A=;
+        b=DP6mTitXTnAyHTi8Z0P8Nur98Nor972vXmNttnhBOJBCgSG5IybpYazxUv20lOxnuC
+         Fkg/3XHNEmfk9obBcqYXQYTJlfEo9EkIUy9k1ZFCq3UZV5pcwdqOic/Z598t9YigYwGd
+         C8IbEiO1L0Xg+w0xLRIK0fTXAvdhC1V09xBmJ4T7ifBiJ7KF53zT344AvpVyHmOrgml/
+         WhttX+SOwWs1Q9mYnTuHHWychGp3fFYvLNaGkOL8y2l4LM+DjMI6jbLM3a7MPnYjCFrv
+         mlj0I2RNjUZVhsuE2M/Zyr9ZvvGDXl5qF8LdYwtx1/enEcIOq3gRIX9w8enSJOL4L+WR
+         KKWA==
+X-Gm-Message-State: AOJu0YzBRVXzKZDzFBAj4mB9wzBV8CgbqSxU34AjMSZ0HTzzj3jzW0I2
+	DycM29/PD/4tyCJ1hRLlqnyyc9y5junt
+X-Google-Smtp-Source: AGHT+IGHWhbaDD4IwqxDfw9jHTHkuUKjQBNNUmn/8eVs+uq7aRefvD7j/ILYF+UvNVbHn3mv4iVq8A==
+X-Received: by 2002:adf:f64f:0:b0:336:c434:5c20 with SMTP id x15-20020adff64f000000b00336c4345c20mr25026wrp.149.1704922457598;
+        Wed, 10 Jan 2024 13:34:17 -0800 (PST)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id j17-20020adfea51000000b0033660f75d08sm5686611wrn.116.2024.01.10.13.34.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jan 2024 13:34:16 -0800 (PST)
+From: Dmitry Safonov <dima@arista.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Dmitry Safonov <dima@arista.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel test robot <lkp@intel.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>
+Subject: [PATCH] selftests/net/tcp-ao: Use LDLIBS instead of LDFLAGS
+Date: Wed, 10 Jan 2024 21:34:10 +0000
+Message-ID: <20240110-tcp_ao-selftests-makefile-v1-1-aa07d043f052@arista.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1850030.1704921100.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Jan 2024 21:11:40 +0000
-Message-ID: <1850031.1704921100@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain; charset="utf-8"
+X-Mailer: b4 0.13-dev-b6b4b
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1704922450; l=2675; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=jOEuqyTW483yTy2cXCaxWhi99+o9vEjXDhzO6CQSOWA=; b=fC9CsSMSOCG1M+izUI7BZ21j+Sjv1Pv5AgqclfGnYKUnkC+G4GIygOQfa85B570ArTNpDdeOe avefNzHNYi9DgxCtqYgoAHI9MmxtdzMXB4Hd9iy6lHxZ+QElE3iTFk7
+X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
+Content-Transfer-Encoding: 8bit
 
-    =
+The rules to link selftests are:
 
-Fix the size check added to dns_resolver_preparse() for the V1 server-list
-header so that it doesn't give EINVAL if the size supplied is the same as
-the size of the header struct (which should be valid).
+> $(OUTPUT)/%_ipv4: %.c
+> 	$(LINK.c) $^ $(LDLIBS) -o $@
+>
+> $(OUTPUT)/%_ipv6: %.c
+> 	$(LINK.c) -DIPV6_TEST $^ $(LDLIBS) -o $@
 
-This can be tested with:
+The intel test robot uses only selftest's Makefile, not the top linux
+Makefile:
 
-        echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
+> make W=1 O=/tmp/kselftest -C tools/testing/selftests
 
-which will give "add_key: Invalid argument" without this fix.
+So, $(LINK.c) is determined by environment, rather than by kernel
+Makefiles. On my machine (as well as other people that ran tcp-ao
+selftests) GNU/Make implicit definition does use $(LDFLAGS):
 
-Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-list =
-header")
-Reported-by: Pengfei Xu <pengfei.xu@intel.com>
-Link: https://lore.kernel.org/r/ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Edward Adam Davis <eadavis@qq.com>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: Simon Horman <horms@kernel.org>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Jeffrey E Altman <jaltman@auristor.com>
-Cc: Wang Lei <wang840925@gmail.com>
-Cc: Jeff Layton <jlayton@redhat.com>
-Cc: Steve French <sfrench@us.ibm.com>
-Cc: Marc Dionne <marc.dionne@auristor.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
+> [dima@Mindolluin ~]$ make -p -f/dev/null | grep '^LINK.c\>'
+> make: *** No targets.  Stop.
+> LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+
+But, according to build robot report, it's not the case for them.
+While I could just avoid using pre-defined $(LINK.c), it's also used by
+selftests/lib.mk by default.
+
+Anyways, according to GNU/Make documentation [1], I should have used
+$(LDLIBS) instead of $(LDFLAGS) in the first place, so let's just do it:
+
+> LDFLAGS
+>     Extra flags to give to compilers when they are supposed to invoke
+>     the linker, ‘ld’, such as -L. Libraries (-lfoo) should be added
+>     to the LDLIBS variable instead.
+> LDLIBS
+>     Library flags or names given to compilers when they are supposed
+>     to invoke the linker, ‘ld’. LOADLIBES is a deprecated (but still
+>     supported) alternative to LDLIBS. Non-library linker flags, such
+>     as -L, should go in the LDFLAGS variable.
+
+[1]: https://www.gnu.org/software/make/manual/html_node/Implicit-Variables.html
+
+Fixes: cfbab37b3da0 ("selftests/net: Add TCP-AO library")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202401011151.veyYTJzq-lkp@intel.com/
+Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- net/dns_resolver/dns_key.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/net/tcp_ao/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-index f18ca02aa95a..c42ddd85ff1f 100644
---- a/net/dns_resolver/dns_key.c
-+++ b/net/dns_resolver/dns_key.c
-@@ -104,7 +104,7 @@ dns_resolver_preparse(struct key_preparsed_payload *pr=
-ep)
- 		const struct dns_server_list_v1_header *v1;
- =
+diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
+index 8e60bae67aa9..522d991e310e 100644
+--- a/tools/testing/selftests/net/tcp_ao/Makefile
++++ b/tools/testing/selftests/net/tcp_ao/Makefile
+@@ -52,5 +52,5 @@ $(OUTPUT)/%_ipv6: %.c
+ 
+ $(OUTPUT)/icmps-accept_ipv4: CFLAGS+= -DTEST_ICMPS_ACCEPT
+ $(OUTPUT)/icmps-accept_ipv6: CFLAGS+= -DTEST_ICMPS_ACCEPT
+-$(OUTPUT)/bench-lookups_ipv4: LDFLAGS+= -lm
+-$(OUTPUT)/bench-lookups_ipv6: LDFLAGS+= -lm
++$(OUTPUT)/bench-lookups_ipv4: LDLIBS+= -lm
++$(OUTPUT)/bench-lookups_ipv6: LDLIBS+= -lm
 
- 		/* It may be a server list. */
--		if (datalen <=3D sizeof(*v1))
-+		if (datalen < sizeof(*v1))
- 			return -EINVAL;
- =
+---
+base-commit: 8cb47d7cd090a690c1785385b2f3d407d4a53ad0
+change-id: 20240110-tcp_ao-selftests-makefile-3dafb1e96df8
 
- 		v1 =3D (const struct dns_server_list_v1_header *)data;
+Best regards,
+-- 
+Dmitry Safonov <dima@arista.com>
 
 
