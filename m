@@ -1,140 +1,177 @@
-Return-Path: <netdev+bounces-62810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE1F8295D6
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 10:09:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88D878295C6
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 10:08:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C890F1C20D35
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 09:09:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DFFC284404
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 09:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0B13C484;
-	Wed, 10 Jan 2024 09:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B573B7A9;
+	Wed, 10 Jan 2024 09:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="BuAxzrXT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094D03BB43;
-	Wed, 10 Jan 2024 09:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4299a70d0a7so14917521cf.3;
-        Wed, 10 Jan 2024 01:09:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704877745; x=1705482545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v2Qk0JS/X/M+iSFJkteLpcJbyzGhmpZqpSZNg5QY+TE=;
-        b=MXQacc1/SeAtAhpQ6GZYl4WNkxHzGOuKesQTqOTq2D0wG13B9sCgP/EMI6216nr3zZ
-         ZSZas4PvdF55ML8/anUphpB6ZaWfSIY4h80PIF+6UutnNd+boHBuXsz/4q9Zu9p1FZxc
-         xWSptQcPLCBJDAqzP9SLatdKWTnwvxeip3GInn4c4JJFJ0nhVNdY/gxTcI6xPxI3g+ui
-         VGMbqTYwl4JKvXZsZ9xT7UE1ilAM1deda5wMWYVUYcz6P97iwS3v7d8aslxLK4lSg5wE
-         jMQTMp0pklRYeh2yLo/T3ntCf996cSQfTPDwYkOweF+xZ9CLRQhj51DgPkrPNCNxQWrt
-         8+ZA==
-X-Gm-Message-State: AOJu0Yx/i3HoCadj8e3xLNVXhxLBl0G7hvnNIgZAKCb9nDSkD7WUKiir
-	hKZQoi4Jep9GArltCKL4ekP2udPp/aBF3Ii6
-X-Google-Smtp-Source: AGHT+IEUsCKPkoPS/e8/7saFk4TAecb9vR4YBKqRPFns5V18kVBjAPaIMgszLlEUrW0ooK7L0pQYDA==
-X-Received: by 2002:ac8:4e49:0:b0:429:b266:c9a7 with SMTP id e9-20020ac84e49000000b00429b266c9a7mr1095985qtw.124.1704877745657;
-        Wed, 10 Jan 2024 01:09:05 -0800 (PST)
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com. [209.85.160.169])
-        by smtp.gmail.com with ESMTPSA id bv10-20020a05622a0a0a00b00429a0688f8fsm1615777qtb.68.2024.01.10.01.09.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 01:09:05 -0800 (PST)
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42989016014so23231471cf.0;
-        Wed, 10 Jan 2024 01:09:05 -0800 (PST)
-X-Received: by 2002:a81:9843:0:b0:5fa:7e0a:b133 with SMTP id
- p64-20020a819843000000b005fa7e0ab133mr127729ywg.79.1704877413506; Wed, 10 Jan
- 2024 01:03:33 -0800 (PST)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B863B199;
+	Wed, 10 Jan 2024 09:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id D83FA20B3CC1; Wed, 10 Jan 2024 01:08:19 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D83FA20B3CC1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1704877699;
+	bh=VGPAJ+VlAmIxbqE8tAHckUZUwj1fM6R7OZbw7bjWzS8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BuAxzrXTnPC0ZeAKe/PvtdnWrbkAIpLsexS72rloAJrewEhopaweCME4r5BwZRptA
+	 gYFE9eMieWSfoUvTFmvUM29QV5ovH8/8qZGpPWGr9JqI6kWok81hDPXl5piWT+99zO
+	 XA9NZ17spy7tGGiVBmZRsQXbWwICS7wJJeqHeDiw=
+Date: Wed, 10 Jan 2024 01:08:19 -0800
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Michael Kelley <mhklinux@outlook.com>,
+	KY Srinivasan <kys@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	"yury.norov@gmail.com" <yury.norov@gmail.com>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Souradeep Chakrabarti <schakrabarti@microsoft.com>,
+	Paul Rosswurm <paulros@microsoft.com>
+Subject: Re: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs
+ per CPUs
+Message-ID: <20240110090819.GA5436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1704797478-32377-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <1704797478-32377-4-git-send-email-schakrabarti@linux.microsoft.com>
+ <SN6PR02MB4157CB3CB55A17255AE61BF6D46A2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <MW1PEPF0000E6910254736DF77F99E04DD4CA6A2@MW1PEPF0000E691.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231108125843.3806765-1-arnd@kernel.org> <20231108125843.3806765-9-arnd@kernel.org>
-In-Reply-To: <20231108125843.3806765-9-arnd@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 10 Jan 2024 10:03:20 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdV8uFKntiMfwwmnFpd4Dcx8vJDwS6r1iBLtkh40N71dbw@mail.gmail.com>
-Message-ID: <CAMuHMdV8uFKntiMfwwmnFpd4Dcx8vJDwS6r1iBLtkh40N71dbw@mail.gmail.com>
-Subject: Re: [PATCH 08/22] [v2] arch: consolidate arch_irq_work_raise prototypes
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, 
-	Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, 
-	Arnd Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Guo Ren <guoren@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Ard Biesheuvel <ardb@kernel.org>, 
-	Huacai Chen <chenhuacai@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>, 
-	Michal Simek <monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Dinh Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Geoff Levand <geoff@infradead.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, 
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, "David S. Miller" <davem@davemloft.net>, 
-	Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	x86@kernel.org, Helge Deller <deller@gmx.de>, 
-	Sudip Mukherjee <sudipm.mukherjee@gmail.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Timur Tabi <timur@kernel.org>, 
-	Kent Overstreet <kent.overstreet@linux.dev>, David Woodhouse <dwmw2@infradead.org>, 
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
-	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>, Kees Cook <keescook@chromium.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Nicolas Schier <nicolas@fjasle.eu>, 
-	Al Viro <viro@zeniv.linux.org.uk>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
-	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
-	linux-csky@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
-	sparclinux@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-bcachefs@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	Palmer Dabbelt <palmer@rivosinc.com>, Alexander Gordeev <agordeev@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MW1PEPF0000E6910254736DF77F99E04DD4CA6A2@MW1PEPF0000E691.namprd21.prod.outlook.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Nov 8, 2023 at 2:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wrot=
-e:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> The prototype was hidden in an #ifdef on x86, which causes a warning:
->
-> kernel/irq_work.c:72:13: error: no previous prototype for 'arch_irq_work_=
-raise' [-Werror=3Dmissing-prototypes]
-
-This issue is now present upstream.
-
-> Some architectures have a working prototype, while others don't.
-> Fix this by providing it in only one place that is always visible.
->
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
-> Acked-by: Guo Ren <guoren@kernel.org>
-> Reviewed-by: Alexander Gordeev <agordeev@linux.ibm.com>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-
-Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+On Tue, Jan 09, 2024 at 08:20:31PM +0000, Haiyang Zhang wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Michael Kelley <mhklinux@outlook.com>
+> > Sent: Tuesday, January 9, 2024 2:23 PM
+> > To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>; KY Srinivasan
+> > <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.com>;
+> > wei.liu@kernel.org; Dexuan Cui <decui@microsoft.com>;
+> > davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> > pabeni@redhat.com; Long Li <longli@microsoft.com>; yury.norov@gmail.com;
+> > leon@kernel.org; cai.huoqing@linux.dev; ssengar@linux.microsoft.com;
+> > vkuznets@redhat.com; tglx@linutronix.de; linux-hyperv@vger.kernel.org;
+> > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
+> > rdma@vger.kernel.org
+> > Cc: Souradeep Chakrabarti <schakrabarti@microsoft.com>; Paul Rosswurm
+> > <paulros@microsoft.com>
+> > Subject: RE: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs per
+> > CPUs
+> > 
+> > [Some people who received this message don't often get email from
+> > mhklinux@outlook.com. Learn why this is important at
+> > https://aka.ms/LearnAboutSenderIdentification ]
+> > 
+> > From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com> Sent:
+> > Tuesday, January 9, 2024 2:51 AM
+> > >
+> > > From: Yury Norov <yury.norov@gmail.com>
+> > >
+> > > Souradeep investigated that the driver performs faster if IRQs are
+> > > spread on CPUs with the following heuristics:
+> > >
+> > > 1. No more than one IRQ per CPU, if possible;
+> > > 2. NUMA locality is the second priority;
+> > > 3. Sibling dislocality is the last priority.
+> > >
+> > > Let's consider this topology:
+> > >
+> > > Node            0               1
+> > > Core        0       1       2       3
+> > > CPU       0   1   2   3   4   5   6   7
+> > >
+> > > The most performant IRQ distribution based on the above topology
+> > > and heuristics may look like this:
+> > >
+> > > IRQ     Nodes   Cores   CPUs
+> > > 0       1       0       0-1
+> > > 1       1       1       2-3
+> > > 2       1       0       0-1
+> > > 3       1       1       2-3
+> > > 4       2       2       4-5
+> > > 5       2       3       6-7
+> > > 6       2       2       4-5
+> > > 7       2       3       6-7
+> > 
+> > I didn't pay attention to the detailed discussion of this issue
+> > over the past 2 to 3 weeks during the holidays in the U.S., but
+> > the above doesn't align with the original problem as I understood
+> > it.  I thought the original problem was to avoid putting IRQs on
+> > both hyper-threads in the same core, and that the perf
+> > improvements are based on that configuration.  At least that's
+> > what the commit message for Patch 4/4 in this series says.
+> > 
+> > The above chart results in 8 IRQs being assigned to the 8 CPUs,
+> > probably with 1 IRQ per CPU.   At least on x86, if the affinity
+> > mask for an IRQ contains multiple CPUs, matrix_find_best_cpu()
+> > should balance the IRQ assignments between the CPUs in the mask.
+> > So the original problem is still present because both hyper-threads
+> > in a core are likely to have an IRQ assigned.
+> > 
+> > Of course, this example has 8 IRQs and 8 CPUs, so assigning an
+> > IRQ to every hyper-thread may be the only choice.  If that's the
+> > case, maybe this just isn't a good example to illustrate the
+> > original problem and solution.  But even with a better example
+> > where the # of IRQs is <= half the # of CPUs in a NUMA node,
+> > I don't think the code below accomplishes the original intent.
+> > 
+> > Maybe I've missed something along the way in getting to this
+> > version of the patch.  Please feel free to set me straight. :-)
+> > 
+> > Michael
+> 
+> I have the same question as Michael. Also, I'm asking Souradeep
+> in another channel: So, the algorithm still uses up all current 
+> NUMA node before moving on to the next NUMA node, right?
+> 
+> Except each IRQ is affinitized to 2 CPUs. 
+> For example, a system with 2 IRQs:
+> IRQ     Nodes   Cores  CPUs
+> 0       1       0      0-1
+> 1       1       1      2-3
+>  
+> Is this performing better than the algorithm in earlier patches? like below:
+> IRQ     Nodes   Cores  CPUs
+> 0       1       0      0
+> 1       1       1      2
+> 
+The details for this approach has been shared by Yury later in this thread.
+The main intention with this approach is kernel may pick any
+sibling for the IRQ.
+> Thanks,
+> - Haiyang
 
