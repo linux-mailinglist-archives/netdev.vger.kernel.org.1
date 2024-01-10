@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-62769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3487829137
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 01:22:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC94B829158
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 01:28:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C9011C2516F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 00:22:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FB7B288F64
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 00:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BCD389;
-	Wed, 10 Jan 2024 00:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD09182;
+	Wed, 10 Jan 2024 00:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEOASrjV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mJddKhGs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB54D18A;
-	Wed, 10 Jan 2024 00:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E23A5A;
+	Wed, 10 Jan 2024 00:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-336755f1688so3267452f8f.0;
-        Tue, 09 Jan 2024 16:22:44 -0800 (PST)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5578485fc0eso2658433a12.1;
+        Tue, 09 Jan 2024 16:27:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704846163; x=1705450963; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1704846470; x=1705451270; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=//4jWgfQ5Fh7VrpoQ0ByJkNQD3sR20k+3Su+DVlmwJ4=;
-        b=HEOASrjVxUlKhT9CyG9FuuPat4ArLrdhv/LLju78i5CgQYaUUJ4NwqxS74+pOqeBoQ
-         8vH4Gf6nIL0baRAfDm3FXVyLIdbFkmytIjKjE8GqIFwbze75qTGx3tnmBJkm6Py7bxgp
-         LaDteFTTKzwfH1bG9cbfvBIYlKP14nA7kk48A1BVDXMtPUutfuoug4BAhMTPSH26bTSD
-         98zV2MKWYQn++zOr8K/2FvaA+faNc/xUvoUrcGtD2NqM5/HpJFtsA92PnDYimMGVA4Zf
-         08c+DAtDB1vdmNi6YhgnvmM0a8GOEM35nDz26MRSXpp5cZXvqjHZHEyHBh4MIuHph2Wt
-         LQiQ==
+        bh=Hy7+jUvQqoJloYURgKxR3EyjkKVp9Y3cK5plR19wMMg=;
+        b=mJddKhGsXsQs2l2b7zygNgzGt+JzuTE4CpJCwsa9Qtq5d0gooRGG4WwNBQddp3Rkza
+         uC5/L9Ctigy3gslI5fRa+OrR4fHFK0IvTJ3ac43fOjbKA1eev4bbW8haUK4dEyhHr2KN
+         HgkmzxEtIM3ElcGM5M7AHtohtt7lC3SU+i1ZNeLWP9NIS9i882mLS0hB4MGMBMVl6yx7
+         YopjpxlUCp1P4ZypzBnqMB54jtfdIRWwRwDRHVqaPZQLQf/Tns/s9d3T/UEM5EpXQaFg
+         SaZ3Nd5msS0ak1Ev7ERB2e20pUX75XaYHrgZEO64ZQevj0RSsQfHeLNVh2zyVUFGjPWk
+         iwpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704846163; x=1705450963;
+        d=1e100.net; s=20230601; t=1704846470; x=1705451270;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=//4jWgfQ5Fh7VrpoQ0ByJkNQD3sR20k+3Su+DVlmwJ4=;
-        b=K3GSpyQ8yDcEcpKLzotPC3XAJ7u29zfixTGJXlAe7cW7UaWDdnkrJY8EY85dLZPA0t
-         HHNuzSsnGPFnByraTST690SW18wfnzC8wzUhDVGEVECJ2ixV+xj5P4rpQBQbNoGRcRhz
-         voe+HDCHQAburHPoOgMzaze71GO8euaQcdp4NZNcbvdTUOY+k3+9W5WEvUh5rpp32yE5
-         Bmh5Zpq15g7qSHUSWYGvGZgdVwW1r2U+KJ5U5cpDwxBI5SiXbxT3gdwWlfOxxuebhEbA
-         D1NjJeoXtBSwg00EGAXHQbsUbJaroNx/zsG35PWwbWOdOH2Qp7s92ULQ16sHgjATXEA5
-         PuoA==
-X-Gm-Message-State: AOJu0Yz4485okUMp7Q/YtLWWnAQNb31iaawgPuNPX6z0zCrjXFaiBiXJ
-	NhiI9fiBwd3+0ztzkLVgpf32cBDMVeQ5aVMk2qM=
-X-Google-Smtp-Source: AGHT+IFJu4pcuWWDwwPzsPS+GtYejENavAEoRXZDRagJ95uoP6CMoV93PRbhGbpMGrX34B6cs7g5kdS2u7LfPfOQ19c=
-X-Received: by 2002:adf:f34a:0:b0:337:5479:991d with SMTP id
- e10-20020adff34a000000b003375479991dmr75053wrp.71.1704846162827; Tue, 09 Jan
- 2024 16:22:42 -0800 (PST)
+        bh=Hy7+jUvQqoJloYURgKxR3EyjkKVp9Y3cK5plR19wMMg=;
+        b=EZRIU5kq5m0yCY41lqn2swJZ5R8kc6pe7FgK06XUnRdEt504e3aY08bA+T02RLUCJH
+         m95o4+jjb2zPqTtLuYGJsExGs7+4wlAAPz/4nBv8RTKlFWnlSZ6sqMKxHRCqwqr3tOOl
+         XtZ+6+mYyuf5fFrfHO7wHA46l8r26H4MY/QAtJAF7E9hdFhjCuZ4nIeF2VxxVkukWHYm
+         NdMvbnev3KfhKiM7jDu/F74Ytg3sR7AttuS9j91xGcEYbQ3YjUsrR1tQU3txHouQtSKr
+         Xzu3d3F8FGT4nwFA0950Gtt66n4DbWc1/J8rj2BiJoiK6f5FR0opc7ULTDyDKijbkNta
+         GIQg==
+X-Gm-Message-State: AOJu0Yzehsl3wS2BkpF7cQzgK5HgBDF5TY/ju0mi0hbnqn1IatEzmamT
+	kTiQGxPLKiCmGMGG5DhO1HPRPG8YSvYPaCOg5ik=
+X-Google-Smtp-Source: AGHT+IEk5DOXT7M1TFgsCjoko9tnbdQiej14HTFPW5wLCelnSKCdq+bXiQ16vSt5wVZYwU+n+dpOQMLytlytwykmR3M=
+X-Received: by 2002:aa7:c9cc:0:b0:558:25a3:145a with SMTP id
+ i12-20020aa7c9cc000000b0055825a3145amr105769edt.30.1704846469992; Tue, 09 Jan
+ 2024 16:27:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108205209.838365-1-maxtram95@gmail.com> <20240108205209.838365-15-maxtram95@gmail.com>
-In-Reply-To: <20240108205209.838365-15-maxtram95@gmail.com>
+References: <20240108205209.838365-1-maxtram95@gmail.com> <20240108205209.838365-16-maxtram95@gmail.com>
+In-Reply-To: <20240108205209.838365-16-maxtram95@gmail.com>
 From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 9 Jan 2024 16:22:30 -0800
-Message-ID: <CAEf4BzYizLHHYPg0yKu-no3toMLS3wSyA2V_wtnHAyn6Burofg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 14/15] bpf: Optimize state pruning for spilled scalars
+Date: Tue, 9 Jan 2024 16:27:38 -0800
+Message-ID: <CAEf4BzaQzWLJqMuOtBX+wmH4EH43nYjTcuVun5nGUwEY_6E7RA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 15/15] selftests/bpf: states pruning checks
+ for scalar vs STACK_{MISC,ZERO}
 To: Maxim Mikityanskiy <maxtram95@gmail.com>
 Cc: Eduard Zingerman <eddyz87@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
 	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
@@ -85,196 +86,233 @@ On Mon, Jan 8, 2024 at 12:53=E2=80=AFPM Maxim Mikityanskiy <maxtram95@gmail=
 >
 > From: Eduard Zingerman <eddyz87@gmail.com>
 >
-> Changes for scalar ID tracking of spilled unbound scalars lead to
-> certain verification performance regression. This commit mitigates the
-> regression by exploiting the following properties maintained by
-> check_stack_read_fixed_off():
-> - a mix of STACK_MISC, STACK_ZERO and STACK_INVALID marks is read as
->   unbounded scalar register;
-> - spi with all slots marked STACK_ZERO is read as scalar register with
->   value zero.
->
-> This commit modifies stacksafe() to consider situations above
-> equivalent.
->
-> Veristat results after this patch show significant gains:
->
-> $ ./veristat -e file,prog,states -f '!states_pct<10' -f '!states_b<10' -C=
- not-opt after
-> File              Program   States (A)  States (B)  States    (DIFF)
-> ----------------  --------  ----------  ----------  ----------------
-> pyperf180.bpf.o   on_event       10456        8422   -2034 (-19.45%)
-> pyperf600.bpf.o   on_event       37319       22519  -14800 (-39.66%)
-> strobemeta.bpf.o  on_event       13435        4703   -8732 (-64.99%)
+> Check that stacksafe() considers the following old vs cur stack spill
+> state combinations equivalent:
+> - spill of unbound scalar vs combination of STACK_{MISC,ZERO,INVALID}
+> - STACK_MISC vs spill of unbound scalar
+> - spill of scalar 0 vs STACK_ZERO
+> - STACK_ZERO vs spill of scalar 0
 >
 > Signed-off-by: Eduard Zingerman <eddyz87@gmail.com>
 > ---
->  kernel/bpf/verifier.c | 83 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 83 insertions(+)
+>  .../selftests/bpf/progs/verifier_spill_fill.c | 192 ++++++++++++++++++
+>  1 file changed, 192 insertions(+)
 >
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index aeb3e198a5ea..cb82f8d4226f 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -1170,6 +1170,12 @@ static void mark_stack_slot_misc(struct bpf_verifi=
-er_env *env, u8 *stype)
->         *stype =3D STACK_MISC;
+> diff --git a/tools/testing/selftests/bpf/progs/verifier_spill_fill.c b/to=
+ols/testing/selftests/bpf/progs/verifier_spill_fill.c
+> index 3764111d190d..3cd3fe30357f 100644
+> --- a/tools/testing/selftests/bpf/progs/verifier_spill_fill.c
+> +++ b/tools/testing/selftests/bpf/progs/verifier_spill_fill.c
+> @@ -1044,4 +1044,196 @@ l0_%=3D:  r1 >>=3D 32;                           =
+           \
+>         : __clobber_all);
 >  }
 >
-> +static bool is_spilled_scalar_reg64(const struct bpf_stack_state *stack)
+> +/* stacksafe(): check if spill of unbound scalar in old state is
+> + * considered equivalent to any state of the spill in the current state.
+> + *
+> + * On the first verification path an unbound scalar is written for
+> + * fp-8 and later marked precise.
+> + * On the second verification path a mix of STACK_MISC/ZERO/INVALID is
+> + * written to fp-8. These should be considered equivalent.
+> + */
+> +SEC("socket")
+> +__success __log_level(2)
+> +__msg("10: (79) r0 =3D *(u64 *)(r10 -8)")
+> +__msg("10: safe")
+> +__msg("processed 16 insns")
+> +__flag(BPF_F_TEST_STATE_FREQ)
+> +__naked void old_unbound_scalar_vs_cur_anything(void)
 > +{
-> +       return stack->slot_type[0] =3D=3D STACK_SPILL &&
-> +              stack->spilled_ptr.type =3D=3D SCALAR_VALUE;
+> +       asm volatile(
+> +       /* get a random value for branching */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "r7 =3D r0;"
+> +       /* get a random value for storing at fp-8 */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "if r7 =3D=3D 0 goto 1f;"
+> +       /* unbound scalar written to fp-8 */
+> +       "*(u64*)(r10 - 8) =3D r0;"
+> +       "goto 2f;"
+> +"1:"
+> +       /* mark fp-8 as mix of STACK_MISC/ZERO/INVALID */
+> +       "r1 =3D 0;"
+> +       "*(u8*)(r10 - 8) =3D r0;"
+
+this is actually a spilled register, not STACK_ZERO. Is it important?
+
+> +       "*(u8*)(r10 - 7) =3D r1;"
+> +       /* fp-2..fp-6 remain STACK_INVALID */
+> +       "*(u8*)(r10 - 1) =3D r0;"
+> +"2:"
+> +       /* read fp-8 and force it precise, should be considered safe
+> +        * on second visit
+> +        */
+> +       "r0 =3D *(u64*)(r10 - 8);"
+> +       "r0 &=3D 0xff;"
+> +       "r1 =3D r10;"
+> +       "r1 +=3D r0;"
+> +       "exit;"
+> +       :
+> +       : __imm(bpf_ktime_get_ns)
+> +       : __clobber_all);
 > +}
 > +
->  static void scrub_spilled_slot(u8 *stype)
->  {
->         if (*stype !=3D STACK_INVALID)
-> @@ -16459,11 +16465,45 @@ static bool regsafe(struct bpf_verifier_env *en=
-v, struct bpf_reg_state *rold,
->         }
->  }
->
-> +static bool is_stack_zero64(struct bpf_stack_state *stack)
+> +/* stacksafe(): check if STACK_MISC in old state is considered
+> + * equivalent to stack spill of unbound scalar in cur state.
+> + */
+> +SEC("socket")
+> +__success __log_level(2)
+> +__msg("8: (79) r0 =3D *(u64 *)(r10 -8)         ; R0_w=3Dscalar(id=3D1) R=
+10=3Dfp0 fp-8=3Dscalar(id=3D1)")
+> +__msg("8: safe")
+> +__msg("processed 11 insns")
+> +__flag(BPF_F_TEST_STATE_FREQ)
+> +__naked void old_unbound_scalar_vs_cur_stack_misc(void)
 > +{
-> +       u32 i;
-> +
-> +       for (i =3D 0; i < ARRAY_SIZE(stack->slot_type); ++i)
-> +               if (stack->slot_type[i] !=3D STACK_ZERO)
-> +                       return false;
-> +       return true;
+> +       asm volatile(
+> +       /* get a random value for branching */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "if r0 =3D=3D 0 goto 1f;"
+> +       /* conjure unbound scalar at fp-8 */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "*(u64*)(r10 - 8) =3D r0;"
+> +       "goto 2f;"
+> +"1:"
+> +       /* conjure STACK_MISC at fp-8 */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "*(u64*)(r10 - 8) =3D r0;"
+> +       "*(u32*)(r10 - 4) =3D r0;"
+> +"2:"
+> +       /* read fp-8, should be considered safe on second visit */
+> +       "r0 =3D *(u64*)(r10 - 8);"
+> +       "exit;"
+> +       :
+> +       : __imm(bpf_ktime_get_ns)
+> +       : __clobber_all);
 > +}
 > +
-> +static bool is_stack_unbound_slot64(struct bpf_verifier_env *env,
-> +                                   struct bpf_stack_state *stack)
+> +/* stacksafe(): check if stack spill of unbound scalar in old state is
+> + * considered equivalent to STACK_MISC in cur state.
+> + */
+> +SEC("socket")
+> +__success  __log_level(2)
+> +__msg("8: (79) r0 =3D *(u64 *)(r10 -8)         ; R0_w=3Dscalar() R10=3Df=
+p0 fp-8=3Dmmmmmmmm")
+> +__msg("8: safe")
+> +__msg("processed 11 insns")
+> +__flag(BPF_F_TEST_STATE_FREQ)
+> +__naked void old_stack_misc_vs_cur_unbound_scalar(void)
 > +{
-> +       u32 i;
-> +
-> +       for (i =3D 0; i < ARRAY_SIZE(stack->slot_type); ++i)
-> +               if (stack->slot_type[i] !=3D STACK_ZERO &&
-> +                   stack->slot_type[i] !=3D STACK_MISC &&
-> +                   (!env->allow_uninit_stack || stack->slot_type[i] !=3D=
- STACK_INVALID))
-> +                       return false;
-> +       return true;
+> +       asm volatile(
+> +       /* get a random value for branching */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "if r0 =3D=3D 0 goto 1f;"
+> +       /* conjure STACK_MISC at fp-8 */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "*(u64*)(r10 - 8) =3D r0;"
+> +       "*(u32*)(r10 - 4) =3D r0;"
+> +       "goto 2f;"
+> +"1:"
+> +       /* conjure unbound scalar at fp-8 */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "*(u64*)(r10 - 8) =3D r0;"
+> +"2:"
+> +       /* read fp-8, should be considered safe on second visit */
+> +       "r0 =3D *(u64*)(r10 - 8);"
+> +       "exit;"
+> +       :
+> +       : __imm(bpf_ktime_get_ns)
+> +       : __clobber_all);
 > +}
 > +
-> +static bool is_spilled_unbound_scalar_reg64(struct bpf_stack_state *stac=
-k)
+> +/* stacksafe(): check if spill of register with value 0 in old state
+> + * is considered equivalent to STACK_ZERO.
+> + */
+> +SEC("socket")
+> +__success __log_level(2)
+> +__msg("9: (79) r0 =3D *(u64 *)(r10 -8)")
+> +__msg("9: safe")
+> +__msg("processed 15 insns")
+> +__flag(BPF_F_TEST_STATE_FREQ)
+> +__naked void old_spill_zero_vs_stack_zero(void)
 > +{
-> +       return is_spilled_scalar_reg64(stack) && __is_scalar_unbounded(&s=
-tack->spilled_ptr);
+> +       asm volatile(
+> +       /* get a random value for branching */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "r7 =3D r0;"
+> +       /* get a random value for storing at fp-8 */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "if r7 =3D=3D 0 goto 1f;"
+> +       /* conjure spilled register with value 0 at fp-8 */
+> +       "*(u64*)(r10 - 8) =3D r0;"
+> +       "if r0 !=3D 0 goto 3f;"
+> +       "goto 2f;"
+> +"1:"
+> +       /* conjure STACK_ZERO at fp-8 */
+> +       "r1 =3D 0;"
+> +       "*(u64*)(r10 - 8) =3D r1;"
+
+this is not STACK_ZERO, it's full register spill
+
+> +"2:"
+> +       /* read fp-8 and force it precise, should be considered safe
+> +        * on second visit
+> +        */
+> +       "r0 =3D *(u64*)(r10 - 8);"
+> +       "r1 =3D r10;"
+> +       "r1 +=3D r0;"
+> +"3:"
+> +       "exit;"
+> +       :
+> +       : __imm(bpf_ktime_get_ns)
+> +       : __clobber_all);
 > +}
 > +
->  static bool stacksafe(struct bpf_verifier_env *env, struct bpf_func_stat=
-e *old,
->                       struct bpf_func_state *cur, struct bpf_idmap *idmap=
-, bool exact)
->  {
-> +       struct bpf_reg_state unbound_reg =3D {};
-> +       struct bpf_reg_state zero_reg =3D {};
->         int i, spi;
->
-> +       __mark_reg_unknown(env, &unbound_reg);
-> +       __mark_reg_const_zero(env, &zero_reg);
-> +       zero_reg.precise =3D true;
+> +/* stacksafe(): similar to old_spill_zero_vs_stack_zero() but the
+> + * other way around: check if STACK_ZERO is considered equivalent to
+> + * spill of register with value 0.
+> + */
+> +SEC("socket")
+> +__success __log_level(2)
+> +__msg("8: (79) r0 =3D *(u64 *)(r10 -8)")
+> +__msg("8: safe")
+> +__msg("processed 14 insns")
+> +__flag(BPF_F_TEST_STATE_FREQ)
+> +__naked void old_stack_zero_vs_spill_zero(void)
+> +{
+> +       asm volatile(
+> +       /* get a random value for branching */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "if r0 =3D=3D 0 goto 1f;"
+> +       /* conjure STACK_ZERO at fp-8 */
+> +       "r1 =3D 0;"
+> +       "*(u64*)(r10 - 8) =3D r1;"
 
-these are immutable, right? Would it make sense to set them up just
-once as static variables instead of initializing on each check?
+same, please double check this STACK_xxx assumptions, as now we spill
+registers instead of STACK_ZERO in a lot of cases
 
+> +       "goto 2f;"
+> +"1:"
+> +       /* conjure spilled register with value 0 at fp-8 */
+> +       "call %[bpf_ktime_get_ns];"
+> +       "*(u64*)(r10 - 8) =3D r0;"
+> +       "if r0 !=3D 0 goto 3f;"
+> +"2:"
+> +       /* read fp-8 and force it precise, should be considered safe
+> +        * on second visit
+> +        */
+> +       "r0 =3D *(u64*)(r10 - 8);"
+> +       "r1 =3D r10;"
+> +       "r1 +=3D r0;"
+> +"3:"
+> +       "exit;"
+> +       :
+> +       : __imm(bpf_ktime_get_ns)
+> +       : __clobber_all);
+> +}
 > +
->         /* walk slots of the explored stack and ignore any additional
->          * slots in the current stack, since explored(safe) state
->          * didn't use them
-> @@ -16484,6 +16524,49 @@ static bool stacksafe(struct bpf_verifier_env *e=
-nv, struct bpf_func_state *old,
->                         continue;
->                 }
->
-
-we didn't check that cur->stack[spi] is ok to access yet, it's done a
-bit later with `if (i >=3D cur->allocated_stack)`, if I'm not mistaken.
-So these checks would need to be moved a bit lower, probably.
-
-> +               /* load of stack value with all MISC and ZERO slots produ=
-ces unbounded
-> +                * scalar value, call regsafe to ensure scalar ids are co=
-mpared.
-> +                */
-> +               if (is_spilled_unbound_scalar_reg64(&old->stack[spi]) &&
-> +                   is_stack_unbound_slot64(env, &cur->stack[spi])) {
-> +                       i +=3D BPF_REG_SIZE - 1;
-> +                       if (!regsafe(env, &old->stack[spi].spilled_ptr, &=
-unbound_reg,
-> +                                    idmap, exact))
-> +                               return false;
-> +                       continue;
-> +               }
-> +
-> +               if (is_stack_unbound_slot64(env, &old->stack[spi]) &&
-> +                   is_spilled_unbound_scalar_reg64(&cur->stack[spi])) {
-> +                       i +=3D BPF_REG_SIZE - 1;
-> +                       if (!regsafe(env,  &unbound_reg, &cur->stack[spi]=
-.spilled_ptr,
-> +                                    idmap, exact))
-> +                               return false;
-> +                       continue;
-> +               }
-
-scalar_old =3D scalar_cur =3D NULL;
-if (is_spilled_unbound64(&old->..))
-    scalar_old =3D old->stack[spi].slot_type[0] =3D=3D STACK_SPILL ?
-&old->stack[spi].spilled_ptr : &unbound_reg;
-if (is_spilled_unbound64(&cur->..))
-    scalar_cur =3D cur->stack[spi].slot_type[0] =3D=3D STACK_SPILL ?
-&cur->stack[spi].spilled_ptr : &unbound_reg;
-if (scalar_old && scalar_cur) {
-    if (!regsafe(env, scalar_old, scalar_new, idmap, exact)
-        return false;
-    i +=3D BPF_REG_SIZE - 1;
-    continue;
-}
-
-where is_spilled_unbound64() would be basically `return
-is_spilled_unbound_scalar_reg64(&old->..) ||
-is_stack_unbound_slot64(&old->...)`;
-
-Similarly for zero case? Though I'm wondering if zero case should be
-checked first, as it's actually a subset of is_spilled_unbound64 when
-it comes to STACK_ZERO/STACK_MISC mixes, no?
-
-
-> +
-> +               /* load of stack value with all ZERO slots produces scala=
-r value 0,
-> +                * call regsafe to ensure scalar ids are compared and pre=
-cision
-> +                * flags are taken into account.
-> +                */
-> +               if (is_spilled_scalar_reg64(&old->stack[spi]) &&
-> +                   is_stack_zero64(&cur->stack[spi])) {
-> +                       if (!regsafe(env, &old->stack[spi].spilled_ptr, &=
-zero_reg,
-> +                                    idmap, exact))
-> +                               return false;
-> +                       i +=3D BPF_REG_SIZE - 1;
-> +                       continue;
-> +               }
-> +
-> +               if (is_stack_zero64(&old->stack[spi]) &&
-> +                   is_spilled_scalar_reg64(&cur->stack[spi])) {
-> +                       if (!regsafe(env, &zero_reg, &cur->stack[spi].spi=
-lled_ptr,
-> +                                    idmap, exact))
-> +                               return false;
-> +                       i +=3D BPF_REG_SIZE - 1;
-> +                       continue;
-> +               }
-> +
->                 if (old->stack[spi].slot_type[i % BPF_REG_SIZE] =3D=3D ST=
-ACK_INVALID)
->                         continue;
->
+>  char _license[] SEC("license") =3D "GPL";
 > --
 > 2.43.0
 >
