@@ -1,76 +1,74 @@
-Return-Path: <netdev+bounces-62909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81B0B829C29
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 15:13:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86430829C5C
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 15:19:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1662228776E
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:13:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EDB21C247E1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DE04B5D7;
-	Wed, 10 Jan 2024 14:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4BB4B5BA;
+	Wed, 10 Jan 2024 14:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HaIqZOBF"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tNtNSxPv"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2059.outbound.protection.outlook.com [40.107.220.59])
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2111.outbound.protection.outlook.com [40.107.7.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA284B5DA
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 14:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB6A4B5AF;
+	Wed, 10 Jan 2024 14:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DZaNrRhrdNtiSGGfRKUDmt+0R1BfWl9e+lPsgW4Syka6cbmstKb3EgiSLZXCbGkxHmicQJ2UkM5nHWwl6aIcV12X/AVIuPnw0bRIEXEe2cvZ+br7CEvaEKo+dV6Y1yeS3DPN2oKS/1leKcWfPJukQEABw6SVLxARUUvABv1WKu58QL0gvRpZpyqk6lOoYbF/k65XpwFvCrcnc2Rj8il7Ca7vZoDjn9x0aG+5R5wL8HU0jlhv0pqKJyLh48FHkraCQ1E+0NG4tVQvEVYr2EVFGtWdJrLJjyAnqXsWcuextYEHRgLC2A2hsn40/h5neN0SMBoddTLo6SMTbPT8brO/Qg==
+ b=PiP4er+fG9fp5LcTreIdh+WyFTaEmqnnflZRqVIdPnfgLl9f2Hv7htV0wIs2DnzP/H/jN/w+fRw80DnXYVnZB5viADKqvn1I35Dg5TMJFVCh9nTix1Aazne9UsECNXWnEHh8O68PklC8A1/xig/lrStM+Fe2hgwzEkGqgd4tf03N7SnogoQg87x4cf8WgmL2Np4j0WHVkHxmTyQUT6ya0Q832Aj0uX1I+uU3DhWwLLN+ktTrxqNNIfRJQPGG/wS5Vv6YIJIVkkLOIrLGZdi0l4R8U9D3GyI8/SzvXIg/z6QRGjA9pUQ7DuVcXLZqbs98tWZWJIYjQoFKGnThvsF4cw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XXkKTYm6AqpYbKJcE+6//NAotlcro/DCWV7mUZSSVoI=;
- b=KFKmjfFqRMp5LVCgf8FWdzOFqTC5nPUKCdUHBrcHgDeZaUBiPCp3Voh89Tcr15Ez9wkCCLiLhk9tNa61m0SsIx4qjciS3oKhLqurz7SYFdHILjRgV7+pzZOU+TM2kccJQp+RWCz0CmaTuuqcv9ZoETNDkJPp8rKaVzBYPbC9TC7CyX37ts1/Q//lthI5tMu5UKFFW8/IERS3njnzJuHRU6Gyeh5P0L4QDFu72hCl7ck2kbD+kuCQjgL5cpMy7aDZf6EZoItKeOVjq71bwDKBfENWYFLWT/1EDUkv2aTKonHV+9/H2NSH9fAG2D8jc93hMyqxi03nah14T02sEZHzPQ==
+ bh=Y4NwxlJedQ0ViagwLWRxjwGMdLz7Ows/lbaapIOMz74=;
+ b=k1OI13qupHppDtMkMOtLOkJSYOS3DRtvZwm4X1kfmGPoo/Imytu3D0mdmG194xXKdD2c1FF/zIC/uwhPovOR0IzrdUGzZtGefMNVb8Wkf6871Eqnzd8x0rGsT2qrsEW0WCOGURsnouDzOMoZ+jP4BlamBj9n7e2KR61Ut3j09RY5jftPjBQz3XoAAlreepD2cdZ6lQADcDX/0xI3zHiiNh2KDhaVKBF+7MHCjps1yPOCHofpg7puI0ry3pmAS2MckMfGO1syKFC1vs05ZjW2b99FZnZX8vOZAkbIsAQts0Ks591OftAYwi29aLmt4xIkX0gab6WT6xqigsz2afc9ZA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XXkKTYm6AqpYbKJcE+6//NAotlcro/DCWV7mUZSSVoI=;
- b=HaIqZOBFlHmBEy9xLMnkz+1s4jvSaGEVWr6IzNp/IVDGWPEbYNXwAz66ui4mofXrr2V59KonQ2W7cFUXhcgrIgfa1Ls3wcD07okPKhUtRnFQkAf/NqUJ2Wp0xbRGFuk+A+YjiY0vE2z6IIlDzqHgpXgwvr+JJnszwPXP8aHXJjwNMpLDUigkbfeCzusE2T6MmAsJ4Z2UnElC3nu7DpKx4fuQKDWLgkLFUnpIkVvr9so3WcZ2NxpMXD2LDYuMn3dW6FeIQKC99vQwnKS5P/cAj4hbMXCbaV7fD05J+m8H82I9A6atVAIS1SFlGBEq26fpwzvw6LZssjUngAcciUeRSA==
+ bh=Y4NwxlJedQ0ViagwLWRxjwGMdLz7Ows/lbaapIOMz74=;
+ b=tNtNSxPvaNorSzYqWJuONDx0nk4av35ZUhcxcKKVGCIA3RLPR54Nk1Wx0jbwS9UNoJa8th1FxiO8J6GrbPnOvwlIClzSieDIi06CSNArFrNH9quBvBRYx3L0KwihbNYYBojx5QA/srudCUkxmCfJ9dxDa/QKH6F0IPxMc7P4xJYTWxdXlbQ1SiaiDMQclnNOFl4wQUfk6eCHarUp+/PX9cyYhg7plmdVBNF6AtUbkx2DzNBpGSkySs5KEu+bFDvMfSuioQp/MIL/penjwfSPZ5gTw3bpTpuhclDx9izVdTTNKj+36tIo3czdRzaDYoFRjFYdLuzmsua2j/F8LRIHPA==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
- DM6PR12MB4283.namprd12.prod.outlook.com (2603:10b6:5:211::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7159.24; Wed, 10 Jan 2024 14:09:58 +0000
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::1442:8457:183b:d231]) by DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::1442:8457:183b:d231%5]) with mapi id 15.20.7159.020; Wed, 10 Jan 2024
- 14:09:58 +0000
-Message-ID: <9d29e624-fc02-44cd-9a92-01f813e66eed@nvidia.com>
-Date: Wed, 10 Jan 2024 16:09:52 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 10/15] net/mlx5e: Let channels be SD-aware
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-References: <20231221005721.186607-1-saeed@kernel.org>
- <20231221005721.186607-11-saeed@kernel.org>
- <20240104145041.67475695@kernel.org>
- <effce034-6bc5-4e98-9b21-c80e8d56f705@nvidia.com>
- <20240108190811.3ad5d259@kernel.org>
- <d0ce07a6-2ca7-4604-84a8-550b1c87f602@nvidia.com>
- <20240109080036.65634705@kernel.org>
-Content-Language: en-US
-From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <20240109080036.65634705@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0073.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:190::6) To DS7PR12MB6288.namprd12.prod.outlook.com
- (2603:10b6:8:93::7)
+ header.d=none;dmarc=none action=none header.from=virtuozzo.com;
+Received: from DU0PR08MB9003.eurprd08.prod.outlook.com (2603:10a6:10:471::13)
+ by GV2PR08MB8680.eurprd08.prod.outlook.com (2603:10a6:150:c2::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Wed, 10 Jan
+ 2024 14:15:11 +0000
+Received: from DU0PR08MB9003.eurprd08.prod.outlook.com
+ ([fe80::72c4:98fc:4d1b:b9ba]) by DU0PR08MB9003.eurprd08.prod.outlook.com
+ ([fe80::72c4:98fc:4d1b:b9ba%5]) with mapi id 15.20.7181.015; Wed, 10 Jan 2024
+ 14:15:11 +0000
+From: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel@openvz.org,
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+Subject: [PATCH v2 3/4] netfilter: propagate net to nf_bridge_get_physindev
+Date: Wed, 10 Jan 2024 22:14:24 +0800
+Message-ID: <20240110141457.17205-1-ptikhomirov@virtuozzo.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240110110451.5473-4-ptikhomirov@virtuozzo.com>
+References: <20240110110451.5473-4-ptikhomirov@virtuozzo.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: KL1P15301CA0051.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:820:3d::23) To DU0PR08MB9003.eurprd08.prod.outlook.com
+ (2603:10a6:10:471::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,155 +76,234 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|DM6PR12MB4283:EE_
-X-MS-Office365-Filtering-Correlation-Id: caafdad0-1fa7-46ea-076a-08dc11e5d3de
+X-MS-TrafficTypeDiagnostic: DU0PR08MB9003:EE_|GV2PR08MB8680:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3af2b745-d758-48f1-525c-08dc11e68e6c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	hnecadP8tPGSygq03BleSU1pzUe2TmTRILe0Nij1wfq+d8LosIYkMEilW73nOrAwyAmGDl4RRaOBff0kvmIK+88wSrPh+t8pcMKrHMKdWZPTl/xdlUUpDDnx7mfOyAFjU4DCS4A1JYcW3iFxgvI/50eVTveEQXutF8IzVbN1B5TOHVVCJzVqfEdSIgOtT9jL1Rb694x5TZROA7oe4uQCuuZb084ijpN99ynGIcKBlM/d3FPwpXLArvjNTYAYda+TiFj+Yj5ykvd926e84hcPA+FTjceMxXaKkgH1xezckyDyVygwZU0pJqoxKD+UtOWy6LoF4Ph3mtIW8V1RxE4g2o8sYMgA6Q7qXBAxUk7vGiQrQJITi3cTYs1xXHipttbN/MdCpLlTjTMix6F7KzATEagFlk/lIMsPmuuyuX3FsrUlUAhbEfkI2E1dQW1nED7XEMO9WaU0AgN8vmU2ItRHbf5Qycp5oyBMHH/CGvoR/P8yGVX2EWzfkeaF2oYwY8OcLBFH1wo7rDD9DgaZIcudGE5D3OKtC198RoUlGfiivi7q1AvQ8WasIXjvgDvd/PlID+KFu7tQQw4I7zPetzAm7xlFW+JK4WJ18NTHlE+2EwQzUHLaf7HAHrhSVl4fjQs/bO27L0SzupWWkM6hEaz+Aw==
+	yox5mENy8wsVcQCE+CJE/9k0pdaMcRM2xU8ihwMTPmlggAk5IZixxoHDtLrbTo77MyZ2PZ3FXGiyg7evdXny+ZoFGPJc0+cyg4Ro+3xY/C2h/zHhM45mMVD4dyaxtK/HMssq+XUmUhLicNhXt9bja7xVaujfc853QWUFew/gy4ITVpllcwHPCZUZKRZksKFo6Du/LNJeSc9UezWNe0KVk+7nu25OBWQ306sAC21eYHpccWYHvO/b/EM/azRGFtFdcdl1sZ+TQyr7c31ajolZtiSzHNPKo/8mR5T5UBloWWGV5U2uXpk8NxXPrQxlHgRF+sdxKexn9BCHjZ2nR5I2fGODK/XP5aIJkT+eZNZBAmOZk0zDlLiEuE10bj2V9GyMvQGUI+DeRtP0cF6xObGSrfvq/fa3+YCqgE5cvMWVJB+9oDUVlHR4mf7Dt+HBOTg2kv5weMIXbIQTtzmk0hd4LMAXISpavPuILlmCHhPIgYQna2DAM/g9vzJEt7moVpbCjEkxz0y5nxFpiTQzOstGi96FwyQgYXphvTjOKJGn1403IrNK7Gdz1vmJuGOa+Ql3
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(376002)(136003)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(478600001)(5660300002)(6666004)(6486002)(31696002)(107886003)(6512007)(86362001)(6506007)(2616005)(53546011)(8676002)(66556008)(66476007)(316002)(41300700001)(8936002)(66946007)(54906003)(36756003)(6916009)(38100700002)(83380400001)(26005)(4326008)(31686004)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR08MB9003.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(396003)(39850400004)(136003)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(2906002)(107886003)(2616005)(1076003)(66556008)(66476007)(6486002)(66946007)(41300700001)(52116002)(86362001)(36756003)(5660300002)(4326008)(83380400001)(110136005)(6512007)(6666004)(478600001)(6506007)(316002)(8936002)(8676002)(38100700002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bFZUbnN6eG1GR0s0L3VxVVRvTHJZbE11cWZyOVNXMm5pdzhxWGo2TElDaldR?=
- =?utf-8?B?WVBEWFNXOGZIcUh1akpPOXJyWTFORjVRZUtGNTNHYlRGaEFNUlhsZ0ExY3ls?=
- =?utf-8?B?eThUK1FDM1p2dCtWTklKL2VNT3FZdFUrR0dOdHUzTEk0R202L1VlWmNmTENo?=
- =?utf-8?B?amZNWnZTdGlWYzVwUmlDNjlJL3N5bkNSWXVLc3V6NDlvNGZkVTBuN3d6VU5F?=
- =?utf-8?B?Y1pGWkxRQjlpMmV5WG5MR2d2eFNtbjVuUEFaVUtPSEg0YmYzMnJqZHFFTUlM?=
- =?utf-8?B?K1ZhbmJlRWlsbFJhclgwUitueG9NcjB1UnNKTXF1WGVFQTk0VHB5bXBBeWl6?=
- =?utf-8?B?MWNaeEtLVDNtVG9UWnBLanUzdkx3VWNIWGZDWFFGVm40OXk0YU5DVXgzejIw?=
- =?utf-8?B?M2xlc2NwZlN3VjAxRnVucmY3T0RjWExLbGpCbWxuMjk5M054YXFCM2ZjNDVH?=
- =?utf-8?B?WGdzSkNLdEZiMWlneE9TcG1XZHN0VlRpRk1tY2oxK2I4V1h3VjJxd3JqMmNx?=
- =?utf-8?B?MlFLSVV1NTQwT0dZWThJTWVqdTliODVYUm83ekQ3cUFCZVJ6TUh3WUs0dnZ2?=
- =?utf-8?B?WFEydUVQajAwbjdhSHMyQkV5bU5qSXJBbnpQTTRzUXBEVS9LU3hpWDNsekc0?=
- =?utf-8?B?RkZxZW5nMlJSaDAvMnNVcnJOV1dIV09pSnVQWHJPMmVPTWhJbmJzVHc2dncr?=
- =?utf-8?B?cUEzVExlUUwzemg0akZDa0pBa0JFL01JQ1lvWkIvaXk2OGd5cGJ1Zkc3MHBq?=
- =?utf-8?B?cDl2ZXJtU2ZSUDRSTk1CdFpEeHFYSEROMDVqOUIyTmxkekNFb3pENDBrVU4v?=
- =?utf-8?B?VjBUVENrTjVKMk5WbTlzTThOTlV5TFJvcHBvT1VWKzNpTXlNQi9JMFdpdnpK?=
- =?utf-8?B?dVVFeFpISUpkdGF4OE5YdUNhUUU2RHQ5WnFNblg1Mm4rQkltSWpsaFhYQzJu?=
- =?utf-8?B?Q3pDYnRwdStpYjBsbnFpTUF0ZW1uVEJQWGxyTEFnbWRibHpWNUxZeWMwYXBw?=
- =?utf-8?B?RnJqcUN4SlRPalQwNDZkeENkMTRDYUR6Znh2aURUK01aZG1SZEM3WDJNQTRV?=
- =?utf-8?B?OXV3ajJQWjZXTVhYQ2RnQ1MxaEVqWkVNeHlNVS9BWTRpUm1WN1cvOFFzYWJO?=
- =?utf-8?B?UXNsMTc3SXJnbC9vRXhnVjNsbVR2V01TT1dUODN0am55OXNDQk5nUjBGQmN6?=
- =?utf-8?B?eEFYV1k0V0xUMG1DZmozMXF2aVFYTjM4N3Nob0V1akZDQUlXWEM5b2dRdGpM?=
- =?utf-8?B?Q0tiZHZ3cVVKUVo3ZDZ1Z3ZNamdOQnFlVGY2ZW0yNzhBWWM0RG05eDZtekVj?=
- =?utf-8?B?aUpMN0VMRFRyR29McGZ0bXYxN0NRc0lyK0hjNFh1SUFIempwQlRyTmlOOEEy?=
- =?utf-8?B?V1M3aUhhekp0Q1BWMDVqMk9ZOEd5NmZ2ZVpSZTRDQS9lRVNrODh2T3BhQVcv?=
- =?utf-8?B?QnZNM2Y2ZDd4TENncVJkT0wyYzhyYmFLTG1ZQzlMSko0MDVycU1TdTNZV25O?=
- =?utf-8?B?bGtzb3VCMmI3UW9nUmpac2Q4RTVoakRnL0RqQVZYdlltbEN0bHI0TjFRRUgv?=
- =?utf-8?B?TnRnc0FGRVRaV2ppZ29aT2FFSlNmd3l1YkV3MXZTV1IzZiszeGFWNUNIMjVE?=
- =?utf-8?B?TU0zNW9oMnRydFFpV2ZwR3BqdUZUNzA1SGRjNlFnTGlzditPYlBIOTFWTFNa?=
- =?utf-8?B?TlJQcHJQS0cxa2pqRThUNE5BT0E2Z3lPK3F1OFI1ak1VeDRCWUphdUcyRWFj?=
- =?utf-8?B?V1gxWW5wUC80cGFFQ2V1ckVycWUvbFdDcjJtcFFyenZGbm40RU94N2x2U21H?=
- =?utf-8?B?OHIvczRXQWxvZXhFRm5XbHkxcXNCdGFKTDMzRGYrUVBQVk41bmlEdDlsc0lN?=
- =?utf-8?B?MXJZQ0RFRWFyT3o1NzhoYXJNL2gxZmQvQzVPQW1xUldvSzdYNXF0SjRZT2Fr?=
- =?utf-8?B?elJQMkttekJUTUFVaXlKL1Z1Y1lIb2U3NEVodEFNSE9vU3QvVkxNdnJxZmJr?=
- =?utf-8?B?a3FmR1VaM2xLZDgrQ2FscHFZOENKQmFDUStzRnJnZ1JNdWs5bUJRN0FHU1Jx?=
- =?utf-8?B?RWdQb1NQbkxFM2RjRmFJL09kNUlDR1lJc3lUL0pkUFNKZ05Ic0EwSnArKzMw?=
- =?utf-8?Q?IJuXSM52LzjqV9VyjFYT5RuKI?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: caafdad0-1fa7-46ea-076a-08dc11e5d3de
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
+	=?us-ascii?Q?+sU+Zk56614ReLfnHmzBGO/23qvilrzPPvIcY3whH6K+LZcxsjM4xuOgF6gj?=
+ =?us-ascii?Q?nCT42gsH+7ODSqUAeD4S43hmuKjpMS4V9cAFqQbsF/cUs7S0zf3zjC8bVNBN?=
+ =?us-ascii?Q?Uhf6IjMr4Y43HjFYxJSFh+v1WSSeFkffITTxckh/UDf111dFFqqhqMFUL1J4?=
+ =?us-ascii?Q?WG4UyaE/g7W3rBgUMVMtwnGCTgAoOHhzsJM5JvY46QxvaEqGm6QdxbNXEwcg?=
+ =?us-ascii?Q?XMKaSFsYfuSd4ueUhE9AQeAU1Tcunm/hWDp0Qg55UXhElVfpylXUn1HoC+PJ?=
+ =?us-ascii?Q?KXYbaMUlO627xJQWY3rdBSXT/Qp6uAE46pws4fMMxdbGwp/3Alq/+B2X1gfX?=
+ =?us-ascii?Q?1N02rly0odEuyvCTdv+icYhMIjlTdF7Fil9xY9m2QU02PxSTUZ5oD7A2fupQ?=
+ =?us-ascii?Q?flMqnv6wg21dZyTyj4gbTxnJ8Pb9LzfP08G7u/oNEgPSKFZP+d6S8yvGngj7?=
+ =?us-ascii?Q?zTi7pcxd2h+Ey/uszoCMj92d8bU5iFRJ0sF+bfpxywCgH74rYz2zw8S8M49A?=
+ =?us-ascii?Q?1xON00jNqdERS13LdllZynVC4GMUczvHveXBU9CvvYLXKaAB5j2TSaQX5Uu4?=
+ =?us-ascii?Q?cVTAChVyLqwmJy9Pa5PZpNF46kSp05P0+gZpNCbj/aOAmv4DKDNEXypyJz0m?=
+ =?us-ascii?Q?PbJxCGDDEwIytQTBRn8QZc0uTZFXdsCE++6fkNr+gPBTDCIAMZsIe51BtJuR?=
+ =?us-ascii?Q?Xv7cuIvgDUnGLYImJhRpsIis0iAYGl9r23fI0DOVOO61D2kYKptBWY/cCdX1?=
+ =?us-ascii?Q?smQe+rLx1fn4aeUF7aKiqR2CmJUM17t6asnpPmAOAvf2ZxlD9FbfeKbrFau7?=
+ =?us-ascii?Q?N1fiYe3usimMnHdqNbfY8HHM5hIhXRmjibAcGW3DTRHk4KWzUR+cFZ5Sg0P7?=
+ =?us-ascii?Q?K7u4kMBYGOJH2oUQQbUbmDicqoHc5RoMV81RnXMj+aT9gwTMoQYGmypFer87?=
+ =?us-ascii?Q?9LtPw4qyp4Pv7d6Mo5LeECBHxRQG3i+BfyVp91EyzLY+lFPmHdCr554SEz9Y?=
+ =?us-ascii?Q?T3a8lKn4OxSe/4F3Smosv4+SiPltwWddj3M8H3Ym2yckNIhX86mOCkUlniMu?=
+ =?us-ascii?Q?dacACdN6dAF1R2wkZWqwG2UhwHmuIfZwFeVCG/CUoVh4IAqujZNxU8oBNePi?=
+ =?us-ascii?Q?0ikZwvbe0Mv3GyhVfvvLgZzXi7GjX9GAMgqzixZlttKf93Z67Sd3m5EkUuFa?=
+ =?us-ascii?Q?VMJmZ5lNP/Q9qI+fVrpoiWjYOvyuzrXJnI6QhjEAhPu4K3RIG83xOPV9t46U?=
+ =?us-ascii?Q?TOVaHyOHqHDn0acsvJkHnr+czxOR68XGhwC7eAyhLaBshB/zeh68Bp+//Xup?=
+ =?us-ascii?Q?OM1jpj0Rm8iiBjt+zWeOJ9lNWdwe0iWOHhhhV3wObqb7fcnaobzrMa68ie3D?=
+ =?us-ascii?Q?0ov/UB4RjwzKsC9ukVy7NHf6v1YLWU4MFnF3FUkYtWa06IhZ7QPHRhffbIsY?=
+ =?us-ascii?Q?TO6112kVMSSrD19XG9nGewPJo0QkZfQjp+1ZQI8dZQwsusV+FGEkSIPX6hPI?=
+ =?us-ascii?Q?em5Eqbwn+2geLnXsc63fPVFn+SKliqtBnzFXbP8zMPDNyA7TR5d4tavoY1Ua?=
+ =?us-ascii?Q?cOD3vuAfub/2oePuSed2w8ou0Kgf5dGcPbkELe/CasyIKWHMTiEH5rwxmPAB?=
+ =?us-ascii?Q?c3lYr6QICEJ+yff9YQK9HwV0gmhnNvJAJwN4zQh9IfE3QvaVbpU4LSJl/gZn?=
+ =?us-ascii?Q?B07LHQ=3D=3D?=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3af2b745-d758-48f1-525c-08dc11e68e6c
+X-MS-Exchange-CrossTenant-AuthSource: DU0PR08MB9003.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2024 14:09:58.1990
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2024 14:15:11.0816
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4GfjkgP3iyQgc108bHlvnJCW1M+IzmHbJzDE86Bmcmhe+lwEoMIvs1G9P8nzOCmP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4283
+X-MS-Exchange-CrossTenant-UserPrincipalName: UmQViXR9pioJRuf/uxpAMZn/0fVWXRGaBqdaCzBWwgiGxCcCiyCerR76e01fzpJrTc5K7E/6kWz8duQi+n4srnBlj4i9hs2UKwU19APOi9s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR08MB8680
 
-On 09/01/2024 18:00, Jakub Kicinski wrote:
-> On Tue, 9 Jan 2024 16:15:50 +0200 Gal Pressman wrote:
->>>> I'm confused, how are RX queues related to XPS?  
->>>
->>> Separate sentence, perhaps I should be more verbose..  
->>
->> Sorry, yes, your understanding is correct.
->> If a packet is received on RQ 0 then it is from PF 0, RQ 1 came from PF
->> 1, etc. Though this is all from the same wire/port.
->>
->> You can enable arfs for example, which will make sure that packets that
->> are destined to a certain CPU will be received by the PF that is closer
->> to it.
-> 
-> Got it.
-> 
->>>> XPS shouldn't be affected, we just make sure that whatever queue XPS
->>>> chose will go out through the "right" PF.  
->>>
->>> But you said "correct" to queue 0 going to PF 0 and queue 1 to PF 1.
->>> The queue IDs in my question refer to the queue mapping form the stacks
->>> perspective. If user wants to send everything to queue 0 will it use
->>> both PFs?  
->>
->> If all traffic is transmitted through queue 0, it will go out from PF 0
->> (the PF that is closer to CPU 0 numa).
-> 
-> Okay, but earlier you said: "whatever queue XPS chose will go out
-> through the "right" PF." - which I read as PF will be chosen based
-> on CPU locality regardless of XPS logic.
-> 
-> If queue 0 => PF 0, then user has to set up XPS to make CPUs from NUMA
-> node which has PF 0 use even number queues, and PF 1 to use odd number
-> queues. Correct?
+This is a preparation patch for replacing physindev with physinif on
+nf_bridge_info structure. We will use dev_get_by_index_rcu to resolve
+device, when needed, and it requires net to be available.
 
-I think it is based on the default xps configuration, but I don't want
-to get the details wrong, checking with Tariq and will reply (he's OOO).
+Signed-off-by: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+---
+v2: remove leftover net propagation to __build_packet_message
+---
+ include/linux/netfilter_bridge.h           |  2 +-
+ net/ipv4/netfilter/nf_reject_ipv4.c        |  2 +-
+ net/ipv6/netfilter/nf_reject_ipv6.c        |  2 +-
+ net/netfilter/ipset/ip_set_hash_netiface.c |  8 ++++----
+ net/netfilter/nf_log_syslog.c              | 13 +++++++------
+ net/netfilter/nf_queue.c                   |  2 +-
+ net/netfilter/xt_physdev.c                 |  2 +-
+ 7 files changed, 16 insertions(+), 15 deletions(-)
 
->>>> So for example, XPS will choose a queue according to the CPU, and the
->>>> driver will make sure that packets transmitted from this SQ are going
->>>> out through the PF closer to that NUMA.  
->>>
->>> Sounds like queue 0 is duplicated in both PFs, then?  
->>
->> Depends on how you look at it, each PF has X queues, the netdev has 2X
->> queues.
-> 
-> I'm asking how it looks from the user perspective, to be clear.
+diff --git a/include/linux/netfilter_bridge.h b/include/linux/netfilter_bridge.h
+index f980edfdd2783..e927b9a15a556 100644
+--- a/include/linux/netfilter_bridge.h
++++ b/include/linux/netfilter_bridge.h
+@@ -56,7 +56,7 @@ static inline int nf_bridge_get_physoutif(const struct sk_buff *skb)
+ }
+ 
+ static inline struct net_device *
+-nf_bridge_get_physindev(const struct sk_buff *skb)
++nf_bridge_get_physindev(const struct sk_buff *skb, struct net *net)
+ {
+ 	const struct nf_bridge_info *nf_bridge = nf_bridge_info_get(skb);
+ 
+diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
+index f01b038fc1cda..86e7d390671af 100644
+--- a/net/ipv4/netfilter/nf_reject_ipv4.c
++++ b/net/ipv4/netfilter/nf_reject_ipv4.c
+@@ -289,7 +289,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	 * build the eth header using the original destination's MAC as the
+ 	 * source, and send the RST packet directly.
+ 	 */
+-	br_indev = nf_bridge_get_physindev(oldskb);
++	br_indev = nf_bridge_get_physindev(oldskb, net);
+ 	if (br_indev) {
+ 		struct ethhdr *oeth = eth_hdr(oldskb);
+ 
+diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
+index d45bc54b7ea55..27b2164f4c439 100644
+--- a/net/ipv6/netfilter/nf_reject_ipv6.c
++++ b/net/ipv6/netfilter/nf_reject_ipv6.c
+@@ -354,7 +354,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	 * build the eth header using the original destination's MAC as the
+ 	 * source, and send the RST packet directly.
+ 	 */
+-	br_indev = nf_bridge_get_physindev(oldskb);
++	br_indev = nf_bridge_get_physindev(oldskb, net);
+ 	if (br_indev) {
+ 		struct ethhdr *oeth = eth_hdr(oldskb);
+ 
+diff --git a/net/netfilter/ipset/ip_set_hash_netiface.c b/net/netfilter/ipset/ip_set_hash_netiface.c
+index 95aeb31c60e0d..30a655e5c4fdc 100644
+--- a/net/netfilter/ipset/ip_set_hash_netiface.c
++++ b/net/netfilter/ipset/ip_set_hash_netiface.c
+@@ -138,9 +138,9 @@ hash_netiface4_data_next(struct hash_netiface4_elem *next,
+ #include "ip_set_hash_gen.h"
+ 
+ #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+-static const char *get_physindev_name(const struct sk_buff *skb)
++static const char *get_physindev_name(const struct sk_buff *skb, struct net *net)
+ {
+-	struct net_device *dev = nf_bridge_get_physindev(skb);
++	struct net_device *dev = nf_bridge_get_physindev(skb, net);
+ 
+ 	return dev ? dev->name : NULL;
+ }
+@@ -177,7 +177,7 @@ hash_netiface4_kadt(struct ip_set *set, const struct sk_buff *skb,
+ 
+ 	if (opt->cmdflags & IPSET_FLAG_PHYSDEV) {
+ #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+-		const char *eiface = SRCDIR ? get_physindev_name(skb) :
++		const char *eiface = SRCDIR ? get_physindev_name(skb, xt_net(par)) :
+ 					      get_physoutdev_name(skb);
+ 
+ 		if (!eiface)
+@@ -395,7 +395,7 @@ hash_netiface6_kadt(struct ip_set *set, const struct sk_buff *skb,
+ 
+ 	if (opt->cmdflags & IPSET_FLAG_PHYSDEV) {
+ #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+-		const char *eiface = SRCDIR ? get_physindev_name(skb) :
++		const char *eiface = SRCDIR ? get_physindev_name(skb, xt_net(par)) :
+ 					      get_physoutdev_name(skb);
+ 
+ 		if (!eiface)
+diff --git a/net/netfilter/nf_log_syslog.c b/net/netfilter/nf_log_syslog.c
+index c66689ad2b491..58402226045e8 100644
+--- a/net/netfilter/nf_log_syslog.c
++++ b/net/netfilter/nf_log_syslog.c
+@@ -111,7 +111,8 @@ nf_log_dump_packet_common(struct nf_log_buf *m, u8 pf,
+ 			  unsigned int hooknum, const struct sk_buff *skb,
+ 			  const struct net_device *in,
+ 			  const struct net_device *out,
+-			  const struct nf_loginfo *loginfo, const char *prefix)
++			  const struct nf_loginfo *loginfo, const char *prefix,
++			  struct net *net)
+ {
+ 	const struct net_device *physoutdev __maybe_unused;
+ 	const struct net_device *physindev __maybe_unused;
+@@ -121,7 +122,7 @@ nf_log_dump_packet_common(struct nf_log_buf *m, u8 pf,
+ 			in ? in->name : "",
+ 			out ? out->name : "");
+ #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+-	physindev = nf_bridge_get_physindev(skb);
++	physindev = nf_bridge_get_physindev(skb, net);
+ 	if (physindev && in != physindev)
+ 		nf_log_buf_add(m, "PHYSIN=%s ", physindev->name);
+ 	physoutdev = nf_bridge_get_physoutdev(skb);
+@@ -148,7 +149,7 @@ static void nf_log_arp_packet(struct net *net, u_int8_t pf,
+ 		loginfo = &default_loginfo;
+ 
+ 	nf_log_dump_packet_common(m, pf, hooknum, skb, in, out, loginfo,
+-				  prefix);
++				  prefix, net);
+ 	dump_arp_packet(m, loginfo, skb, skb_network_offset(skb));
+ 
+ 	nf_log_buf_close(m);
+@@ -845,7 +846,7 @@ static void nf_log_ip_packet(struct net *net, u_int8_t pf,
+ 		loginfo = &default_loginfo;
+ 
+ 	nf_log_dump_packet_common(m, pf, hooknum, skb, in,
+-				  out, loginfo, prefix);
++				  out, loginfo, prefix, net);
+ 
+ 	if (in)
+ 		dump_mac_header(m, loginfo, skb);
+@@ -880,7 +881,7 @@ static void nf_log_ip6_packet(struct net *net, u_int8_t pf,
+ 		loginfo = &default_loginfo;
+ 
+ 	nf_log_dump_packet_common(m, pf, hooknum, skb, in, out,
+-				  loginfo, prefix);
++				  loginfo, prefix, net);
+ 
+ 	if (in)
+ 		dump_mac_header(m, loginfo, skb);
+@@ -916,7 +917,7 @@ static void nf_log_unknown_packet(struct net *net, u_int8_t pf,
+ 		loginfo = &default_loginfo;
+ 
+ 	nf_log_dump_packet_common(m, pf, hooknum, skb, in, out, loginfo,
+-				  prefix);
++				  prefix, net);
+ 
+ 	dump_mac_header(m, loginfo, skb);
+ 
+diff --git a/net/netfilter/nf_queue.c b/net/netfilter/nf_queue.c
+index 3dfcb3ac5cb44..e2f334f70281f 100644
+--- a/net/netfilter/nf_queue.c
++++ b/net/netfilter/nf_queue.c
+@@ -84,7 +84,7 @@ static void __nf_queue_entry_init_physdevs(struct nf_queue_entry *entry)
+ 	const struct sk_buff *skb = entry->skb;
+ 
+ 	if (nf_bridge_info_exists(skb)) {
+-		entry->physin = nf_bridge_get_physindev(skb);
++		entry->physin = nf_bridge_get_physindev(skb, entry->state.net);
+ 		entry->physout = nf_bridge_get_physoutdev(skb);
+ 	} else {
+ 		entry->physin = NULL;
+diff --git a/net/netfilter/xt_physdev.c b/net/netfilter/xt_physdev.c
+index ec6ed6fda96c5..343e65f377d44 100644
+--- a/net/netfilter/xt_physdev.c
++++ b/net/netfilter/xt_physdev.c
+@@ -59,7 +59,7 @@ physdev_mt(const struct sk_buff *skb, struct xt_action_param *par)
+ 	    (!!outdev ^ !(info->invert & XT_PHYSDEV_OP_BRIDGED)))
+ 		return false;
+ 
+-	physdev = nf_bridge_get_physindev(skb);
++	physdev = nf_bridge_get_physindev(skb, xt_net(par));
+ 	indev = physdev ? physdev->name : NULL;
+ 
+ 	if ((info->bitmask & XT_PHYSDEV_OP_ISIN &&
+-- 
+2.43.0
 
-From the user's perspective there is a single netdev, the PFs separation
-is internal to the driver and transparent to the user.
-The user configures the number of queues, and the driver splits them
-between the PF.
-
-Same for other features, the user configures the netdev like any other
-netdev, it is up to the driver to make sure that the netdev model is
-working.
-
-> From above I gather than the answer is no - queue 0 maps directly 
-> to PF 0 / queue 0, nothing on PF 1 will ever see traffic of queue 0.
-
-Right, traffic received on RQ 0 is traffic that was processed by PF 0.
-RQ 1 is in fact (PF 1, RQ 0).
-
->>>> Can you share a link please?  
->>>
->>> commit a90d56049acc45802f67cd7d4c058ac45b1bc26f  
->>
->> Thanks, will take a look.
->>
->>>> All the logic is internal to the driver, so I expect it to be fine, but
->>>> I'd like to double check.
->>>
->>> Herm, "internal to the driver" is a bit of a landmine. It will be fine
->>> for iperf testing but real users will want to configure the NIC.
->>
->> What kind of configuration are you thinking of?
-> 
-> Well, I was hoping you'd do the legwork and show how user configuration
-> logic has to be augmented for all relevant stack features to work with
-> multi-PF devices. I can list the APIs that come to mind while writing
-> this email, but that won't be exhaustive :(
-
-We have been working on this feature for a long time, we did think of
-the different configurations and potential issues, and backed that up
-with our testing.
-
-TLS for example is explicitly blocked in this series for such netdevices
-as we identified it as problematic.
-
-There is always potential that we missed things, that's why I was
-genuinely curious to hear if you had anything specific in mind.
 
