@@ -1,64 +1,84 @@
-Return-Path: <netdev+bounces-62881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C38C829A26
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:06:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E6F0829A2E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:07:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D2711C22196
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:06:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5AAE1F27E5A
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63E6481DA;
-	Wed, 10 Jan 2024 12:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0A247F7B;
+	Wed, 10 Jan 2024 12:07:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="PJtUFaYl"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GXo0dVIc";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="A7gouSP8";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qkiPF+SU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5HbnFhyF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FFD47F74
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 12:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6d9a79a1ad4so1972367b3a.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 04:06:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1704888363; x=1705493163; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l8cKztzv2ZktLOe0dzMuixqOyjC0S8dozIynxhbNLCA=;
-        b=PJtUFaYlvrO5pZ/l4ETd5F/BPGWcdK9syqEBKz7ARCHtTxn3QP/aujLMCw3/Dejj/r
-         abT6WdbwqedaIU90uhQbNbR0zGVsaEOavXLAe+teunPX13SkyMbgWujpBdSEWWg1uMV2
-         A4ja+jyQdgycjg7qmn65D3XBbG8529pbOsdlFAWzhXAmePHu6cdBkx3mTIGz5p9aTASC
-         Oi7GTnY5REMW+srPlJ2buiPKuL3+smB+duhsJv4ocXGfOa1h5FC16XBeOwO9iJ6XJ8ce
-         a8a+yY1XLWZc4/wXe8QzNtDp7iWFGuf9/+yLHMm/vdpT/IfP/ukSEqxdX2iVHWqsz/Ho
-         CzIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704888363; x=1705493163;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=l8cKztzv2ZktLOe0dzMuixqOyjC0S8dozIynxhbNLCA=;
-        b=xH7uxAhK1r5m4j1F03nGboAsfdx/ErwycSfuEf5a4DSI7Ofbz89zHviXdRzhkMYN2T
-         zUHL3E+rwz+BId0r5w3kFBs4mgHpDLpAbVoq8obUIbH+6L8PQwPS1S1fszC8mOC9tGi7
-         x6infUyIRI3CI04Yuk45StB6xtzThMnUm0+cABKCngX8fCckG/d7lQdl5e0b2rBGHeiD
-         bJSj70NxODtssIvbynt9E+iLZLwtQqvNsPdsHzg9R4OxU3AmJmurOkoP6O3/hSeYK5oy
-         YD7ekxwXOK0aNXORCxYl7wiQ/eHn4eJLVRXEIWe/ldxKyDpOgLhsZMUTEkCHbBWXxjFo
-         6ZLw==
-X-Gm-Message-State: AOJu0YzvFnmrJanaZVliOZ/Uu53zb4kYp8U6M2GDDZ2GNX53wrg6YrhG
-	Gj608DEn7Ofl+j1olN5jXlpze5WQFqOoLQ==
-X-Google-Smtp-Source: AGHT+IFsVj/4XzAFKalFZR2COx2846rqnoRx+GhgwtyxD4J0CYsNkiv/V9CNEvpVyo59dEDH4l9dyw==
-X-Received: by 2002:a05:6a00:3204:b0:6da:63a5:3f32 with SMTP id bm4-20020a056a00320400b006da63a53f32mr612723pfb.66.1704888362874;
-        Wed, 10 Jan 2024 04:06:02 -0800 (PST)
-Received: from [10.255.187.86] ([139.177.225.245])
-        by smtp.gmail.com with ESMTPSA id i128-20020a625486000000b006d99056c4edsm3470845pfb.187.2024.01.10.04.05.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 04:06:02 -0800 (PST)
-Message-ID: <abcc18ec-4006-4c51-96a8-e61d0ec2f092@bytedance.com>
-Date: Wed, 10 Jan 2024 20:05:50 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAE947A7D;
+	Wed, 10 Jan 2024 12:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B0C2421B33;
+	Wed, 10 Jan 2024 12:07:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1704888453; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GkPRohHGBk2H8lU4le6T3CfYLQeGNdahHf4aZdqwAOQ=;
+	b=GXo0dVIcry/Ug2colfyMyFtyaGMPbcSfOJ0dPgkWWTIWjEgJgKW4BLQdKRLBFIyazoWkqn
+	IFbOUPGQhm+jVB5Iw3p9Yrq5KYy2npwLzbgOjn6cgfexccABIpxyad2FoBKGrrrYAj7/Dl
+	1/XoQhEXyLj4WZlHQb23dubAB6qQSlM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1704888453;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GkPRohHGBk2H8lU4le6T3CfYLQeGNdahHf4aZdqwAOQ=;
+	b=A7gouSP8isLENUdI3ZjSwa44IRvIjtey3+W0j7WVVFvuxxHlSuFLzKDgL2SMGCJBJL6s8O
+	fU14qFbLpebdmAAw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1704888452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GkPRohHGBk2H8lU4le6T3CfYLQeGNdahHf4aZdqwAOQ=;
+	b=qkiPF+SUTo1bBsfQ4nDCJvuHKTQBZq3t4O4/PUTWlL+LO8AMf5Kz/3q7/tP4lPDwylWwH8
+	Tku2YPxze68USwyBVeeZQKfdYnJrbY0JCFySOa9fboZ5eJXeY1u4ettVoDydKnBOgPUFgJ
+	NiBRWpSdrWD78Z70dcM/eD1o6v8Xw2Q=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1704888452;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GkPRohHGBk2H8lU4le6T3CfYLQeGNdahHf4aZdqwAOQ=;
+	b=5HbnFhyFjuLRk17+6YWbxDDXkVuIsgo/Da+Gio8/OTYLUWOSLETdUXw6BLZCJQsmd04xvv
+	Erm1wrMFiTTWGTCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1113E1398A;
+	Wed, 10 Jan 2024 12:07:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TRJ9AIOInmV3GgAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Wed, 10 Jan 2024 12:07:31 +0000
+Message-ID: <633ff61d-f73d-4221-a2fd-79f913880761@suse.de>
+Date: Wed, 10 Jan 2024 15:07:30 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,90 +86,225 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [External] [PATCH 5/6] cachefiles: Fix signed/unsigned mixup
-To: David Howells <dhowells@redhat.com>,
- Christian Brauner <christian@brauner.io>, Jeff Layton <jlayton@kernel.org>,
- Gao Xiang <hsiangkao@linux.alibaba.com>,
- Dominique Martinet <asmadeus@codewreck.org>
-Cc: Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
- Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>, kernel test robot <lkp@intel.com>,
- Yiqun Leng <yqleng@linux.alibaba.com>, zhujia.zj@bytedance.com
-References: <20240109112029.1572463-1-dhowells@redhat.com>
- <20240109112029.1572463-6-dhowells@redhat.com>
-From: Jia Zhu <zhujia.zj@bytedance.com>
-In-Reply-To: <20240109112029.1572463-6-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v9 3/3] net: stmmac: Add driver support for
+ DWMAC5 common safety IRQ
+Content-Language: en-US
+To: Suraj Jaiswal <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ Prasad Sodagudi <psodagud@quicinc.com>, Andrew Halaney
+ <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>
+Cc: kernel@quicinc.com
+References: <20240110111649.2256450-1-quic_jsuraj@quicinc.com>
+ <20240110111649.2256450-4-quic_jsuraj@quicinc.com>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <20240110111649.2256450-4-quic_jsuraj@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	 TO_DN_SOME(0.00)[];
+	 R_RATELIMIT(0.00)[to_ip_from(RLxjbr97tr36oppoipqx4dezfa)];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 FREEMAIL_TO(0.00)[quicinc.com,kernel.org,linaro.org,davemloft.net,google.com,foss.st.com,synopsys.com,gmail.com,vger.kernel.org,st-md-mailman.stormreply.com,redhat.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_MATCH_FROM(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%];
+	 ARC_NA(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 FROM_HAS_DN(0.00)[];
+	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TAGGED_RCPT(0.00)[dt];
+	 MIME_GOOD(-0.10)[text/plain];
+	 TO_MATCH_ENVRCPT_SOME(0.00)[];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[24];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,quicinc.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_TLS_ALL(0.00)[];
+	 SUSPICIOUS_RECIPS(1.50)[];
+	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from]
+X-Spam-Score: -3.80
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: B0C2421B33
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=qkiPF+SU;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=5HbnFhyF
 
-Tested-by: Jia Zhu <zhujia.zj@bytedance.com>
 
-在 2024/1/9 19:20, David Howells 写道:
-> In __cachefiles_prepare_write(), the start and pos variables were made
-> unsigned 64-bit so that the casts in the checking could be got rid of -
-> which should be fine since absolute file offsets can't be negative, except
-> that an error code may be obtained from vfs_llseek(), which *would* be
-> negative.  This breaks the error check.
+
+On 1/10/24 14:16, Suraj Jaiswal wrote:
+> Add support to listen HW safety IRQ like ECC(error
+> correction code), DPP(data path parity), FSM(finite state
+> machine) fault in common IRQ line.
+
+As I see .safety_feat_irq_status available not just in dwmac5 but 
+in dwxgmac2_core and that means that the subject line is not just about dwmac5
+
 > 
-> Fix this for now by reverting pos and start to be signed and putting back
-> the casts.  Unfortunately, the error value checks cannot be replaced with
-> IS_ERR_VALUE() as long might be 32-bits.
-> 
-> Fixes: 7097c96411d2 ("cachefiles: Fix __cachefiles_prepare_write()")
-> Reported-by: Simon Horman <horms@kernel.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202401071152.DbKqMQMu-lkp@intel.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> cc: Gao Xiang <hsiangkao@linux.alibaba.com>
-> cc: Yiqun Leng <yqleng@linux.alibaba.com>
-> cc: Jia Zhu <zhujia.zj@bytedance.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-erofs@lists.ozlabs.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
+> Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
 > ---
->   fs/cachefiles/io.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+>  drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  3 ++
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 41 ++++++++++++++++++-
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c |  8 ++++
+>  4 files changed, 51 insertions(+), 2 deletions(-)
 > 
-> diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
-> index 3eec26967437..9a2cb2868e90 100644
-> --- a/fs/cachefiles/io.c
-> +++ b/fs/cachefiles/io.c
-> @@ -522,7 +522,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   			       bool no_space_allocated_yet)
->   {
->   	struct cachefiles_cache *cache = object->volume->cache;
-> -	unsigned long long start = *_start, pos;
-> +	loff_t start = *_start, pos;
->   	size_t len = *_len;
->   	int ret;
->   
-> @@ -556,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   					  cachefiles_trace_seek_error);
->   		return pos;
->   	}
-> -	if (pos >= start + *_len)
-> +	if ((u64)pos >= (u64)start + *_len)
->   		goto check_space; /* Unallocated region */
->   
->   	/* We have a block that's at least partially filled - if we're low on
-> @@ -575,7 +575,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   					  cachefiles_trace_seek_error);
->   		return pos;
->   	}
-> -	if (pos >= start + *_len)
-> +	if ((u64)pos >= (u64)start + *_len)
->   		return 0; /* Fully allocated */
->   
->   	/* Partially allocated, but insufficient space: cull. */
-> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> index 721c1f8e892f..b9233b09b80f 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> @@ -344,6 +344,7 @@ enum request_irq_err {
+>  	REQ_IRQ_ERR_ALL,
+>  	REQ_IRQ_ERR_TX,
+>  	REQ_IRQ_ERR_RX,
+> +	REQ_IRQ_ERR_SFTY,
+>  	REQ_IRQ_ERR_SFTY_UE,
+>  	REQ_IRQ_ERR_SFTY_CE,
+>  	REQ_IRQ_ERR_LPI,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> index 9f89acf31050..ca3d93851bed 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> @@ -31,6 +31,7 @@ struct stmmac_resources {
+>  	int wol_irq;
+>  	int lpi_irq;
+>  	int irq;
+> +	int sfty_irq;
+>  	int sfty_ce_irq;
+>  	int sfty_ue_irq;
+>  	int rx_irq[MTL_MAX_RX_QUEUES];
+> @@ -297,6 +298,7 @@ struct stmmac_priv {
+>  	void __iomem *ptpaddr;
+>  	void __iomem *estaddr;
+>  	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
+> +	int sfty_irq;
+>  	int sfty_ce_irq;
+>  	int sfty_ue_irq;
+>  	int rx_irq[MTL_MAX_RX_QUEUES];
+> @@ -305,6 +307,7 @@ struct stmmac_priv {
+>  	char int_name_mac[IFNAMSIZ + 9];
+>  	char int_name_wol[IFNAMSIZ + 9];
+>  	char int_name_lpi[IFNAMSIZ + 9];
+> +	char int_name_sfty[IFNAMSIZ + 10];
+>  	char int_name_sfty_ce[IFNAMSIZ + 10];
+>  	char int_name_sfty_ue[IFNAMSIZ + 10];
+>  	char int_name_rx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 14];
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 47de466e432c..e0192a282121 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -3592,6 +3592,10 @@ static void stmmac_free_irq(struct net_device *dev,
+>  		if (priv->wol_irq > 0 && priv->wol_irq != dev->irq)
+>  			free_irq(priv->wol_irq, dev);
+>  		fallthrough;
+> +	case REQ_IRQ_ERR_SFTY:
+> +		if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq)
+> +			free_irq(priv->sfty_irq, dev);
+> +		fallthrough;
+>  	case REQ_IRQ_ERR_WOL:
+>  		free_irq(dev->irq, dev);
+>  		fallthrough;
+> @@ -3661,6 +3665,23 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  		}
+>  	}
+>  
+> +	/* Request the common Safety Feature Correctible/Uncorrectible
+> +	 * Error line in case of another line is used
+> +	 */
+> +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
+> +		int_name = priv->int_name_sfty;
+> +		sprintf(int_name, "%s:%s", dev->name, "safety");
+> +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
+> +				  0, int_name, dev);
+> +		if (unlikely(ret < 0)) {
+> +			netdev_err(priv->dev,
+> +				   "%s: alloc sfty MSI %d (error: %d)\n",
+> +				   __func__, priv->sfty_irq, ret);
+> +			irq_err = REQ_IRQ_ERR_SFTY;
+> +			goto irq_error;
+> +		}
+> +	}
+> +
+>  	/* Request the Safety Feature Correctible Error line in
+>  	 * case of another line is used
+>  	 */
+> @@ -3798,6 +3819,21 @@ static int stmmac_request_irq_single(struct net_device *dev)
+>  		}
+>  	}
+>  
+> +	/* Request the common Safety Feature Correctible/Uncorrectible
+> +	 * Error line in case of another line is used
+> +	 */
+> +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
+> +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
+> +				  IRQF_SHARED, dev->name, dev);
+> +		if (unlikely(ret < 0)) {
+> +			netdev_err(priv->dev,
+> +				   "%s: ERROR: allocating the sfty IRQ %d (%d)\n",
+> +				   __func__, priv->sfty_irq, ret);
+> +			irq_err = REQ_IRQ_ERR_SFTY;
+> +			goto irq_error;
+> +		}
+> +	}
+> +
+>  	return 0;
+>  
+>  irq_error:
+> @@ -6022,8 +6058,8 @@ static irqreturn_t stmmac_interrupt(int irq, void *dev_id)
+>  	if (test_bit(STMMAC_DOWN, &priv->state))
+>  		return IRQ_HANDLED;
+>  
+> -	/* Check if a fatal error happened */
+> -	if (stmmac_safety_feat_interrupt(priv))
+> +	/* Check ASP error if it isn't delivered via an individual IRQ */
+> +	if (priv->sfty_irq <= 0 && stmmac_safety_feat_interrupt(priv))
+>  		return IRQ_HANDLED;
+>  
+>  	/* To handle Common interrupts */
+> @@ -7462,6 +7498,7 @@ int stmmac_dvr_probe(struct device *device,
+>  	priv->dev->irq = res->irq;
+>  	priv->wol_irq = res->wol_irq;
+>  	priv->lpi_irq = res->lpi_irq;
+> +	priv->sfty_irq = res->sfty_irq;
+>  	priv->sfty_ce_irq = res->sfty_ce_irq;
+>  	priv->sfty_ue_irq = res->sfty_ue_irq;
+>  	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index 70eadc83ca68..ab250161fd79 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -743,6 +743,14 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+>  		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
+>  	}
+>  
+> +	stmmac_res->sfty_irq =
+> +		platform_get_irq_byname_optional(pdev, "sfty");
+> +	if (stmmac_res->sfty_irq < 0) {
+> +		if (stmmac_res->sfty_irq == -EPROBE_DEFER)
+> +			return -EPROBE_DEFER;
+> +		dev_info(&pdev->dev, "IRQ safety IRQ not found\n");
+> +	}
+> +
+>  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
+>  
+>  	return PTR_ERR_OR_ZERO(stmmac_res->addr);
 
