@@ -1,131 +1,158 @@
-Return-Path: <netdev+bounces-62883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12CE829A31
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:10:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E240829A43
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:14:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC7C1B237A3
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:10:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09DA7B21057
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98977482CA;
-	Wed, 10 Jan 2024 12:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EBC481D6;
+	Wed, 10 Jan 2024 12:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="v8cV/GhV"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JeWMA7V/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50A9481D6
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 12:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.nyi.internal (Postfix) with ESMTP id D23945C00B5;
-	Wed, 10 Jan 2024 07:10:00 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Wed, 10 Jan 2024 07:10:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1704888600; x=1704975000; bh=Q3Pp+hpTFNoGoAOBgcPw3l2yX4+D
-	5yZWhUErGbZ3JWk=; b=v8cV/GhVSpKGzIT60qmbsMQoTcJWPPYIkqvULzdEyxJF
-	Nsd008uo1ucNBg65e1gYDpjF4fJDOFeWJeuB/Fe3PaWkWbpxbbsS/PkBylY6aGZy
-	Bp0jUKNc3W/tgroZOprNWeRBIbtqzNWMMoxZfBmr1GbBzWVh/YLkT1db/BQU8UaU
-	BwPOmLcRbjTMybqGrIBwCE1lsuxPu65ET+hCHdehdOmZVmWx43BWkEcUNwar3vow
-	6lYNGibmq2xQnAvQLoROL+mpfWrExM5UVdHGufXRhvVRXhsunqIUlSNcSYkfD3Ze
-	fCbCGpkMBNdrBOUrWiMQYqyEIZ9PSyK+9IMQfdjrZA==
-X-ME-Sender: <xms:GImeZelo8AZJVJlLuNSDvSRURzgfdIY_BjZXWAzs_4E2ozXFjNZaqA>
-    <xme:GImeZV0dYP-wflmZ9iKzE7pFkYg7CnD_4pGQtFZ-ZASlgMRIuKIrQ46J_GqvMEi4Q
-    Axaqfq2k-RGRQw>
-X-ME-Received: <xmr:GImeZcpmasXHkY2-r7t_8kzRj5-qMdhFtKzUafl0qQUDZqcoVshA4JbzcmMd>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeiuddgfeehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfh
-    jeeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:GImeZSmswtlaI7Yl7aJrhcfwLVT1Xi7cT-YfzG0VwbxcVCP9nyhH0Q>
-    <xmx:GImeZc3nnx5VIa17keuWVQntHxqwWsG_thPxAb9wQklufgakl3lfPw>
-    <xmx:GImeZZt8OqzKOKaNZeFj9n44BzOUBjQh582XLajR5zbKjiB-pCHxhg>
-    <xmx:GImeZVsHtH_vnhU5Q1xKJRP_HPLu1f4ioqTVQjZGzX1z4zgScREfmA>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 10 Jan 2024 07:09:59 -0500 (EST)
-Date: Wed, 10 Jan 2024 14:09:55 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, victor@mojatatu.com,
-	pctammela@mojatatu.com, mleitner@redhat.com, vladbu@nvidia.com,
-	paulb@nvidia.com
-Subject: Re: [patch net-next] net: sched: move block device tracking into
- tcf_block_get/put_ext()
-Message-ID: <ZZ6JE0odnu1lLPtu@shredder>
-References: <20240104125844.1522062-1-jiri@resnulli.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B30B481BD
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 12:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40e4d64a3d8so25529565e9.0
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 04:14:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704888841; x=1705493641; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SsQ3rn/rM2YAAgrA+elPEtB83uaUKdkc1ov3OY/ym/Q=;
+        b=JeWMA7V/YDK8VUFijfgeaLZ23eaqWQl3EHMGeaGsO79lTm4hUMv353ARNL3xfuPzB/
+         71xJqE7fqSDZGc0sCHwHKrtvBj/NOiFW67SC/EPnaM8TV1XZTpy4nqIxr3o+UQu+0p25
+         EYiCnbjfh44B4y4JM6UitbPmPl/ysFzxXs9YeaEKvHzr70wNi2BqwsCOwd+4u6Qtp3g7
+         x3n0przOPQ5XSbnsWNejTOdPIMLWvZnfHo70AbYx1sG3uCXKcirAOJTL8ISDoL9a8PE4
+         NF8viVPahzhFWVuCdMqmezlOWAuuH6xzqwOKgzD8fEpqGkEP3mbkMXtj4BWzUntdnM5M
+         Xo6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704888841; x=1705493641;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SsQ3rn/rM2YAAgrA+elPEtB83uaUKdkc1ov3OY/ym/Q=;
+        b=Up4U3FQAWvDuxwliaGTRfe8D+vraLMTEsH+5fKNqLOgdb5VFgTzkKjstetfKmm+Fni
+         xuNp5pEfwoW0HHm54vXyUt7WLEgKni1gBHvaTSRuZFk1I8SKJoBplzgkuAMeJHovRXpw
+         9knDNGkZaGM59ObcZDGzEYP4drOj6OvBVR5q+TLIMo0h/iNs3mwKFnlJi8dM3fWyNyOi
+         qzjl1mKLe9zWdvl59XE0EScAoK0zRgQGdzDD7M3ZB4s9m28KYrSlgC7HaAjrq/lE/5Ni
+         ZMxXveBdJE4/C6cmCyrXf0/rDGxCndCHu2svAnqfTaz0Ckg+g9ZXiUFItIzbNSW8OrUK
+         QJOQ==
+X-Gm-Message-State: AOJu0Yy4PdyUL1hfXtXS4M98Me8ziowL7gMRkqDODCmBlW8g5wsLSKCM
+	51P1RTL4RcNVhV27xJSxcajR4oXdtZjKwg==
+X-Google-Smtp-Source: AGHT+IHXB8FIoN/BqHOSM4SXlaedpMXDdRqNcLWkGEQB6dkpB+xS+piLFG/BsL3LiczGaLcDvMqc9Q==
+X-Received: by 2002:a05:600c:1c85:b0:40e:5972:4970 with SMTP id k5-20020a05600c1c8500b0040e59724970mr157656wms.109.1704888841400;
+        Wed, 10 Jan 2024 04:14:01 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.112])
+        by smtp.gmail.com with ESMTPSA id je3-20020a05600c1f8300b0040d87100733sm2000936wmb.39.2024.01.10.04.13.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jan 2024 04:14:00 -0800 (PST)
+Message-ID: <458ded82-b200-4946-9b22-31cda68f1c8c@linaro.org>
+Date: Wed, 10 Jan 2024 13:13:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104125844.1522062-1-jiri@resnulli.us>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] Add PPE device tree node for Qualcomm IPQ SoC
+Content-Language: en-US
+To: Luo Jie <quic_luoj@quicinc.com>, andersson@kernel.org,
+ konrad.dybcio@linaro.org, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com, quic_soni@quicinc.com,
+ quic_pavir@quicinc.com, quic_souravp@quicinc.com, quic_linchen@quicinc.com,
+ quic_leiwei@quicinc.com
+References: <20240110112059.2498-1-quic_luoj@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240110112059.2498-1-quic_luoj@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 04, 2024 at 01:58:44PM +0100, Jiri Pirko wrote:
-> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> index adf5de1ff773..253b26f2eddd 100644
-> --- a/net/sched/cls_api.c
-> +++ b/net/sched/cls_api.c
-> @@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
->  		      struct tcf_block_ext_info *ei,
->  		      struct netlink_ext_ack *extack)
->  {
-> +	struct net_device *dev = qdisc_dev(q);
->  	struct net *net = qdisc_net(q);
->  	struct tcf_block *block = NULL;
->  	int err;
-> @@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
->  	if (err)
->  		goto err_block_offload_bind;
->  
-> +	if (tcf_block_shared(block)) {
-> +		err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
-> +		if (err) {
-> +			NL_SET_ERR_MSG(extack, "block dev insert failed");
-> +			goto err_dev_insert;
-> +		}
-> +	}
+On 10/01/2024 12:20, Luo Jie wrote:
+> The PPE(packet process engine) hardware block is supported by Qualcomm
+> IPQ platforms, such as IPQ9574 and IPQ5332. The PPE includes the various
+> packet processing modules such as the routing and bridging flow engines,
+> L2 switch capability, VLAN and tunnels. Also included are integrated
+> ethernet MAC and PCS(uniphy), which is used to connect with the external
+> PHY devices by PCS.
+> 
+> This patch series enables support for the following DTSI functionality
+> for Qualcomm IPQ9574 and IPQ5332 chipsets. 
+> 
+> 1. Add PPE (Packet Processing Engine) HW support
+> 
+> 2. Add IPQ9574 RDP433 board support, where the PPE is connected
+>    with qca8075 PHY and AQ PHY.
+> 
+> 3. Add IPQ5332 RDP441 board support, where the PPE is connected
+>    with qca8386 and SFP
+> 
+> PPE DTS depends on the NSSCC clock driver below, which provides the
+> clocks for the PPE driver.
 
-While this patch fixes the original issue, it creates another one:
+DTS cannot depend on clock drivers. Maybe you meant that it depends on
+NSSCC clock controller DTS changes, which would be fine. However
+depending on drivers is neither necessary nor allowed.
 
-# ip link add name swp1 type dummy
-# tc qdisc replace dev swp1 root handle 10: prio bands 8 priomap 7 6 5 4 3 2 1
-# tc qdisc add dev swp1 parent 10:8 handle 108: red limit 1000000 min 200000 max 200001 probability 1.0 avpkt 8000 burst 38 qevent early_drop block 10
-RED: set bandwidth to 10Mbit
-# tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 min 500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent early_drop block 10
-RED: set bandwidth to 10Mbit
-Error: block dev insert failed.
+Best regards,
+Krzysztof
 
-The reproducer does not fail if I revert this patch and apply Victor's
-[1] instead.
-
-[1] https://lore.kernel.org/netdev/20231231172320.245375-1-victor@mojatatu.com/
-
-> +
->  	*p_block = block;
->  	return 0;
->  
-> +err_dev_insert:
->  err_block_offload_bind:
->  	tcf_chain0_head_change_cb_del(block, ei);
->  err_chain0_head_change_cb_add:
 
