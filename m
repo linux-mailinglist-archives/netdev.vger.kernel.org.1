@@ -1,158 +1,214 @@
-Return-Path: <netdev+bounces-62950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDE7C82A107
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 20:29:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5869982A20F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 21:19:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0072B1C21384
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 19:29:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0250C28DE4A
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 20:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C354E1C2;
-	Wed, 10 Jan 2024 19:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1842D4F1E5;
+	Wed, 10 Jan 2024 20:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="G+XYTink"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="LQhgAxeN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7005A4EB21
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 19:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dbf2b5556f9so824733276.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 11:29:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABF34EB5D
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 20:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-4674ca1a2dbso1079006137.0
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 12:18:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1704914952; x=1705519752; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m2bUkBReQfwT0sc5eOtWAQzD2wRXCAw4oZctMGXmfqA=;
-        b=G+XYTinkLzMcMauK1gKR4FV7TPeD7bVuzFl8MMHRGCwyHOmDwdcEMPmdM8CkTFPLP6
-         ot/ms0tP7qAWiUNpFwTQYw37RWXBThOge3nFb6ghS8/DfAWxKoaPVfxxCCLWz4oI5ugb
-         W8VKt+0HAsDJ+FvM8X8dZFSCGKQX+FVLjVE0UpedV56zh7lBbK2wk3PMfgQFeojW05LO
-         uwH4qPZexSwGlwYQ5TYlzSTXY//Pib2TN9ngVhiN4yhDwYmw+ABGjWVFch6aAnRdbrLY
-         kcl5kuAP5J+7BviFMMcz37MYmzxytit7aJp8oElqvb9dMlVQ/qZYhbn8cUD2ISFoogdf
-         jAHQ==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1704917911; x=1705522711; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xCx5QwVa70fzd8rquMw4I6kP8SoNutWIPIfWbbVPnLc=;
+        b=LQhgAxeNKXARlYaz9p+WirSIlWc1OggKmi2zS4oGjM32ATv5aRdAV3V22iqAdbVIVw
+         Ynjx4nY3CdMQwe40l+d/r/39PuGOniZT8ZYYOX/gw1g/eqIaa6GajUBQGwpm6ux07C7T
+         vNqpGbMZpuP4NB6wq422gmdNErWaEPd9zFSQEipLqoHBHDn6KBOdtqJ+n/2FQKHGT0oc
+         tveRy38ZS3qGMxZtaPJ9fCnn1jqnTspJ/rR3k07pIl13N1F8SfuUXnYF2ghm58gi3s+j
+         qAjYjk9m5fPYJE5SCF2JmemjU1DHxha3QiFeDzN3OswGjvgGVbusdOj1JSMbPaVpvXZD
+         5jXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704914952; x=1705519752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m2bUkBReQfwT0sc5eOtWAQzD2wRXCAw4oZctMGXmfqA=;
-        b=K2cpCyekwGr6KBtsOMM0MMGHbzLsI8+Bo/kdwV7ebw0gIaniqu4Er92lbMTb3dV4kz
-         EVtbqFWT8hxU/iadednpkaFw8GHGy2rqPQvzi3w036HMRDYQbNZHobBSIrAnQR6p5EaX
-         F+hyElP86VDr4O2U1DXMN97hHAPFLPhJCnDcx29xjeJmfrg85DfdSUE2MujVreCfNK+r
-         W7bIAILXYIvvJvQV2teB4q6CUJXr2v2jrNXWK5T0bTEsOp0VitYMh/ApYzG3zMA4i0aG
-         LrQcJ0/VEOt/vX4U3ICfHKbtvYwx/TRvZ2n7s8UsaDqS6JPfE447joynCd6x3WyUrGeq
-         +8hw==
-X-Gm-Message-State: AOJu0YzV/CmsSgmmrZ5BgXr+rSZ+cJIzgYVPUg5FrnAgRHcwhqvuDkvA
-	u07Bdm8EJSuSk3dtxu2NVi56QcE21WrEVrEq0jrqBCoxvGQz
-X-Google-Smtp-Source: AGHT+IENkShTLrasuj44rt3GZfsru9Ag3PqXQaVV0uRZGTzjhLtSeGCrgh6CtzW8WZ+1gk6FgSd94t1Z7lGq3aTsqKc=
-X-Received: by 2002:a25:b318:0:b0:db5:3b45:3776 with SMTP id
- l24-20020a25b318000000b00db53b453776mr133956ybj.36.1704914952383; Wed, 10 Jan
- 2024 11:29:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704917911; x=1705522711;
+        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xCx5QwVa70fzd8rquMw4I6kP8SoNutWIPIfWbbVPnLc=;
+        b=k93ddSQXbExKr0OA48FTq+eAMWAQkGFD8VWVcCnsc5YXEvrg7dykuyqQk/PnT7BXva
+         euSEBJJ/aJAqFZWEcTnmDGCO1ubLV5fsCQOy9gqJvFwn3a9v6nsEY66NSujUY6S1Qqj1
+         mtbXHkkmbuBLldOLDljHS/PllwrWoF6nQoE23+52AZQJRLcYBMyPdWeJ3R5KFK71mcKy
+         zJcbX2z/8+0HKlBhkVLRfR6zeFjvQXTdYSmkOY9WYU6XPK+xO25MXOiEIPvrz3vj3qoY
+         ytjf6WvgvNTluydAr4hDZ0BaXQB3XqoPzcwAB0Hf48WoQVt5YcM8lEYYS5hr3efICvVv
+         XlzA==
+X-Gm-Message-State: AOJu0YzPyR90kNbLsqqGdXJxLRQ3xgPkORX6YboRpRkEryKAlf3sdU8q
+	PhUueVoZJEBYf3/T75nC1rCkePLQfILYcUmD9pnHjVZoz1gEKg==
+X-Google-Smtp-Source: AGHT+IE6zVAzl+4qyb1eQ51qm1s0EUGP2M/u9h85sqLJbME/ZYvgt4XDXmjce7aWTNg2Jl0ci+FP580NRa/9d4ocW0c=
+X-Received: by 2002:a05:6102:570b:b0:467:1ffb:d6a1 with SMTP id
+ dg11-20020a056102570b00b004671ffbd6a1mr68609vsb.26.1704917911195; Wed, 10 Jan
+ 2024 12:18:31 -0800 (PST)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 10 Jan 2024 14:18:30 -0600
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+In-Reply-To: <20240110164105.GA13451@wunner.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103222034.2582628-1-andrii@kernel.org> <20240103222034.2582628-4-andrii@kernel.org>
- <CAHk-=wgmjr4nhxGheec1OwuYRk02d0+quUAViVk1v+w=Kvg15w@mail.gmail.com>
- <CAHC9VhQg7mYnQw-o1TYon_bdtk_CMzJaf6u5FTPosniG-UXK1w@mail.gmail.com> <CAEf4BzYMrvtTjkBUWOk1TKi8qiBbwv1xv=eJeF3j3QrY1M=h3g@mail.gmail.com>
-In-Reply-To: <CAEf4BzYMrvtTjkBUWOk1TKi8qiBbwv1xv=eJeF3j3QrY1M=h3g@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 10 Jan 2024 14:29:01 -0500
-Message-ID: <CAHC9VhSwgY8cCX+eR7=+gb=-Q2pC9Z_jstf0xHD4kMA7vpiDOw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Linus Torvalds <torvalds@linuxfoundation.org>, Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, brauner@kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, kernel-team@meta.com
+References: <20240104130123.37115-1-brgl@bgdev.pl> <20240104130123.37115-4-brgl@bgdev.pl>
+ <20240109144327.GA10780@wunner.de> <CAMRc=MdXO6c6asvRSn_Z8-oFS48hroT+dazGKB6WWY1_Zu7f1Q@mail.gmail.com>
+ <20240110132853.GA6860@wunner.de> <CAMRc=MdBSAb_kEO2r7r-vwLuRAEv7pMODOMtZoCCRAd=zsQb_w@mail.gmail.com>
+ <20240110164105.GA13451@wunner.de>
+Date: Wed, 10 Jan 2024 14:18:30 -0600
+Message-ID: <CAMRc=MdQKPN8UbagmswjFx7_JvmJuBeuq8+9=z-+GBNUmdpWEA@mail.gmail.com>
+Subject: Re: [RFC 3/9] PCI/portdrv: create platform devices for child OF nodes
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, 
+	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 8, 2024 at 7:07=E2=80=AFPM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
-> On Mon, Jan 8, 2024 at 8:45=E2=80=AFAM Paul Moore <paul@paul-moore.com> w=
-rote:
-> >
-> > On Fri, Jan 5, 2024 at 4:45=E2=80=AFPM Linus Torvalds
-> > <torvalds@linuxfoundation.org> wrote:
-> > > On Wed, 3 Jan 2024 at 14:21, Andrii Nakryiko <andrii@kernel.org> wrot=
-e:
-> > > >
-> > > > +bool bpf_token_capable(const struct bpf_token *token, int cap)
-> > > > +{
-> > > > +       /* BPF token allows ns_capable() level of capabilities, but=
- only if
-> > > > +        * token's userns is *exactly* the same as current user's u=
-serns
-> > > > +        */
-> > > > +       if (token && current_user_ns() =3D=3D token->userns) {
-> > > > +               if (ns_capable(token->userns, cap))
-> > > > +                       return true;
-> > > > +               if (cap !=3D CAP_SYS_ADMIN && ns_capable(token->use=
-rns, CAP_SYS_ADMIN))
-> > > > +                       return true;
-> > > > +       }
-> > > > +       /* otherwise fallback to capable() checks */
-> > > > +       return capable(cap) || (cap !=3D CAP_SYS_ADMIN && capable(C=
-AP_SYS_ADMIN));
-> > > > +}
-> > >
-> > > This *feels* like it should be written as
-> > >
-> > >     bool bpf_token_capable(const struct bpf_token *token, int cap)
-> > >     {
-> > >         struct user_namespace *ns =3D &init_ns;
-> > >
-> > >         /* BPF token allows ns_capable() level of capabilities, but o=
-nly if
-> > >          * token's userns is *exactly* the same as current user's use=
-rns
-> > >          */
-> > >         if (token && current_user_ns() =3D=3D token->userns)
-> > >                 ns =3D token->userns;
-> > >         return ns_capable(ns, cap) ||
-> > >                 (cap !=3D CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
-> > >     }
-> > >
-> > > And yes, I realize that the function will end up later growing a
-> > >
-> > >         security_bpf_token_capable(token, cap)
-> > >
-> > > test inside that 'if (token ..)' statement, and this would change the
-> > > order of that test so that the LSM hook would now be done before the
-> > > capability checks are done, but that all still seems just more of an
-> > > argument for the simplification.
-> >
-> > I have no problem with rewriting things, my only ask is that we stick
-> > with the idea of doing the capability checks before the LSM hook.  The
-> > DAC-before-MAC (capability-before-LSM) pattern is one we try to stick
-> > to most everywhere in the kernel and deviating from it here could
-> > potentially result in some odd/unexpected behavior from a user
-> > perspective.
+On Wed, 10 Jan 2024 17:41:05 +0100, Lukas Wunner <lukas@wunner.de> said:
+> On Wed, Jan 10, 2024 at 05:26:52PM +0100, Bartosz Golaszewski wrote:
+>> Seems like the following must be true but isn't in my case (from
+>> pci_bus_add_device()):
+>>
+>>     if (pci_is_bridge(dev))
+>>         of_pci_make_dev_node(dev);
+>>
+>> Shouldn't it evaluate to true for ports?
 >
-> Makes sense, Paul. With the suggested rewrite we'll get an LSM call
-> before we get to ns_capable() (which we avoid doing in BPF code base,
-> generally speaking, after someone called this out earlier). Hmm...
+> It should.
 >
-> I guess it will be better to keep this logic as is then, I believe it
-> was more of a subjective stylistical nit from Linus, so it probably is
-> ok to keep existing code.
+> What does "lspci -vvvvxxxx -s BB:DD.F" say for the port in question?
+>
 
-I didn't read Linus' reply as a mandate, more as a
-this-would-be-nice-to-have, and considering the access control
-ordering I would just stick with what you have (ignoring Christian's
-concerns, I'm only commenting on the LSM related stuff here).
+I cut out the hexdump part, let me know if you really need it. Output follows.
 
-If Linus is *really* upset with how the code is written I suspect
-we'll hear from him on that.
+Bart
 
---=20
-paul-moore.com
+--
+
+# lspci -vvvvxxxx -s  0000:00:00.0
+0000:00:00.0 PCI bridge: Qualcomm Technologies, Inc Device 010b
+(prog-if 00 [Normal decode])
+	Device tree node: /sys/firmware/devicetree/base/soc@0/pcie@1c00000/pcie@0
+	Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
+Stepping- SERR+ FastB2B- DisINTx+
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort-
+<TAbort- <MAbort- >SERR- <PERR- INTx-
+	Latency: 0
+	Interrupt: pin A routed to IRQ 176
+	IOMMU group: 8
+	Region 0: Memory at 60300000 (32-bit, non-prefetchable) [size=4K]
+	Bus: primary=00, secondary=01, subordinate=ff, sec-latency=0
+	I/O behind bridge: f000-0fff [disabled] [16-bit]
+	Memory behind bridge: 60400000-604fffff [size=1M] [32-bit]
+	Prefetchable memory behind bridge: 00000000fff00000-00000000000fffff
+[disabled] [64-bit]
+	Secondary status: 66MHz- FastB2B- ParErr- DEVSEL=fast >TAbort-
+<TAbort- <MAbort- <SERR- <PERR-
+	BridgeCtl: Parity- SERR+ NoISA- VGA- VGA16- MAbort- >Reset- FastB2B-
+		PriDiscTmr- SecDiscTmr- DiscTmrStat- DiscTmrSERREn-
+	Capabilities: [40] Power Management version 3
+		Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0+,D1-,D2-,D3hot+,D3cold+)
+		Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
+	Capabilities: [50] MSI: Enable+ Count=1/32 Maskable+ 64bit+
+		Address: 00000000a1c3f000  Data: 0000
+		Masking: fffffffe  Pending: 00000000
+	Capabilities: [70] Express (v2) Root Port (Slot+), MSI 00
+		DevCap:	MaxPayload 128 bytes, PhantFunc 0
+			ExtTag- RBE+
+		DevCtl:	CorrErr+ NonFatalErr+ FatalErr+ UnsupReq+
+			RlxdOrd+ ExtTag- PhantFunc- AuxPwr- NoSnoop+
+			MaxPayload 128 bytes, MaxReadReq 512 bytes
+		DevSta:	CorrErr- NonFatalErr- FatalErr- UnsupReq- AuxPwr+ TransPend-
+		LnkCap:	Port #0, Speed 8GT/s, Width x1, ASPM L0s L1, Exit Latency
+L0s <1us, L1 <64us
+			ClockPM- Surprise+ LLActRep+ BwNot+ ASPMOptComp+
+		LnkCtl:	ASPM Disabled; RCB 128 bytes, Disabled- CommClk+
+			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+		LnkSta:	Speed 5GT/s, Width x1
+			TrErr- Train- SlotClk+ DLActive+ BWMgmt+ ABWMgmt+
+		SltCap:	AttnBtn+ PwrCtrl+ MRL+ AttnInd+ PwrInd+ HotPlug- Surprise+
+			Slot #0, PowerLimit 0W; Interlock+ NoCompl-
+		SltCtl:	Enable: AttnBtn- PwrFlt- MRL- PresDet- CmdCplt- HPIrq- LinkChg-
+			Control: AttnInd Off, PwrInd Off, Power- Interlock-
+		SltSta:	Status: AttnBtn- PowerFlt- MRL- CmdCplt- PresDet- Interlock-
+			Changed: MRL- PresDet- LinkState-
+		RootCap: CRSVisible+
+		RootCtl: ErrCorrectable- ErrNon-Fatal- ErrFatal- PMEIntEna+ CRSVisible+
+		RootSta: PME ReqID 0000, PMEStatus- PMEPending-
+		DevCap2: Completion Timeout: Range ABCD, TimeoutDis+ NROPrPrP+ LTR+
+			 10BitTagComp- 10BitTagReq- OBFF Not Supported, ExtFmt- EETLPPrefix-
+			 EmergencyPowerReduction Not Supported, EmergencyPowerReductionInit-
+			 FRS- LN System CLS Not Supported, TPHComp+ ExtTPHComp- ARIFwd-
+			 AtomicOpsCap: Routing- 32bit- 64bit- 128bitCAS-
+		DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis- LTR+
+10BitTagReq- OBFF Disabled, ARIFwd-
+			 AtomicOpsCtl: ReqEn- EgressBlck-
+		LnkCap2: Supported Link Speeds: 2.5-8GT/s, Crosslink- Retimer- 2Retimers- DRS-
+		LnkCtl2: Target Link Speed: 8GT/s, EnterCompliance- SpeedDis-
+			 Transmit Margin: Normal Operating Range, EnterModifiedCompliance-
+ComplianceSOS-
+			 Compliance Preset/De-emphasis: -6dB de-emphasis, 0dB preshoot
+		LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete-
+EqualizationPhase1-
+			 EqualizationPhase2- EqualizationPhase3- LinkEqualizationRequest-
+			 Retimer- 2Retimers- CrosslinkRes: unsupported
+	Capabilities: [100 v2] Advanced Error Reporting
+		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
+MalfTLP- ECRC- UnsupReq- ACSViol-
+		UEMsk:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
+MalfTLP- ECRC- UnsupReq- ACSViol-
+		UESvrt:	DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+
+MalfTLP+ ECRC- UnsupReq- ACSViol-
+		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr-
+		CEMsk:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
+		AERCap:	First Error Pointer: 00, ECRCGenCap+ ECRCGenEn- ECRCChkCap+ ECRCChkEn-
+			MultHdrRecCap- MultHdrRecEn- TLPPfxPres- HdrLogCap-
+		HeaderLog: 00000000 00000000 00000000 00000000
+		RootCmd: CERptEn+ NFERptEn+ FERptEn+
+		RootSta: CERcvd- MultCERcvd- UERcvd- MultUERcvd-
+			 FirstFatal- NonFatalMsg- FatalMsg- IntMsg 0
+		ErrorSrc: ERR_COR: 0000 ERR_FATAL/NONFATAL: 0000
+	Capabilities: [148 v1] Secondary PCI Express
+		LnkCtl3: LnkEquIntrruptEn- PerformEqu-
+		LaneErrStat: 0
+	Capabilities: [168 v1] Transaction Processing Hints
+		No steering table available
+	Capabilities: [1fc v1] L1 PM Substates
+		L1SubCap: PCI-PM_L1.2+ PCI-PM_L1.1+ ASPM_L1.2+ ASPM_L1.1+ L1_PM_Substates+
+			  PortCommonModeRestoreTime=70us PortTPowerOnTime=0us
+		L1SubCtl1: PCI-PM_L1.2- PCI-PM_L1.1- ASPM_L1.2- ASPM_L1.1-
+			   T_CommonMode=70us LTR1.2_Threshold=76800ns
+		L1SubCtl2: T_PwrOn=0us
+	Kernel driver in use: pcieport
 
