@@ -1,142 +1,133 @@
-Return-Path: <netdev+bounces-62806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8128294E5
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 09:15:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A691829559
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 09:47:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76624B230F0
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 08:15:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2605D1F278F8
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 08:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B49D3D968;
-	Wed, 10 Jan 2024 08:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B97281F164;
+	Wed, 10 Jan 2024 08:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CkvimHaQ"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Mth3+QK9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E288C2A1D2
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 08:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704874496;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QGG/2geE26TRJsrsVr6H+l4Msp6AEXHSx5RkZnJct/Y=;
-	b=CkvimHaQBznzFi0Vw4I7wolX+p1IiyHDzdxoemmuvrCAWisIYurgw0AEdWIXv65EX0QjTf
-	eBv3ZbCwBWMpE5JFEX1HF42pgvISJCuMwoE1G8rx6cDjubpZ/fZjOrH6BAVGr1X8Doa+1w
-	ZsLiLxvAAJ3UhptT+zMtVmWms1PzJq0=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-462-Sa_Xnn_eOqS4KaK6Q35JPQ-1; Wed,
- 10 Jan 2024 03:14:55 -0500
-X-MC-Unique: Sa_Xnn_eOqS4KaK6Q35JPQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7724A1C0514A;
-	Wed, 10 Jan 2024 08:14:54 +0000 (UTC)
-Received: from wtfbox.lan (unknown [10.45.225.130])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 24DA140C6EB9;
-	Wed, 10 Jan 2024 08:14:53 +0000 (UTC)
-Date: Wed, 10 Jan 2024 09:14:51 +0100
-From: Artem Savkov <asavkov@redhat.com>
-To: Yonghong Song <yonghong.song@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, jolsa@kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next] selftests/bpf: fix potential premature unload
- in bpf_testmod
-Message-ID: <ZZ5R-3FAHNoDStqc@wtfbox.lan>
-References: <20240109164317.16371-1-asavkov@redhat.com>
- <82f55c0e-0ec8-4fe1-8d8c-b1de07558ad9@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8813C46B
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 08:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6da6b0eb2d4so2008214b3a.1
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 00:47:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1704876436; x=1705481236; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xrFYtdFHy0dekIS+EQHaYj3FzdnI4ZilQGeBdruHSrs=;
+        b=Mth3+QK94wnW5+Wpr/qnJKk3X3/AKUfNLHmCOAOwLEXZcpXQIOFSE+tgdW9Upv4jHg
+         kowW0jwrzyC8Kla+RMl8r81Vbf40OWtevjcriBNxBV2S0F5Y3WgDbPob6NR3ntrniKSm
+         vAvvHwHbraPMBcJqKdAkllVq1KMZXpPdm56N+X0iipkLrPIkEC5zS2fGnYXN8+xIHfI2
+         I+jK4mBcZ3tS9vBaocVZNixBoOInCe94Clvjt5hCFBeKgF16s+V0tckoXnONaWcG1QtX
+         /F4TIi7UxsdS1QriuJz/EBBEY1G4CBJQyalpRuymcvvZsxnSmoG/kiq9GzvmPasxb3KL
+         v5dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704876436; x=1705481236;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xrFYtdFHy0dekIS+EQHaYj3FzdnI4ZilQGeBdruHSrs=;
+        b=FihnXIXLM9fZgya9cJTMw5UzFyE6yrWUlmGPs1Fm7/poe/cIJbaAhwj5dJ3cSq+JJo
+         Lk6G6FMQm9PNZglWdioUgBQL0TRatieAw+E9PszNwvbbEQSWLOrHRFb2lFiBZ6lkbdX+
+         +lntxXz1LO3MnyQPYPdEuU8Yf+QiUTJDygv6iUYOtlxIcwVbFOEBm2fJ3slUn6ny37mM
+         l6y+E3oJTKxlj7VfSd7Xd63vS+Q4CRyOG/0bkv4fFHA+Jq6l3VbYhfd4C2VYMtpS7Qw4
+         k5CcqVpzinakjyS3uUymSELz36gBVbF8Z9+Pae+TlZy26SbKrg9Th5jY91LgdWQMrwrh
+         SQzA==
+X-Gm-Message-State: AOJu0Yx7QPQnyznw9DBOioo20lfr+xdz64vy8BGoBdWpvh+P2yvIZWCv
+	LOxlBPHfKTuT1eREb8sJ963s7lCs2C2L1A==
+X-Google-Smtp-Source: AGHT+IGELo8LQap2T2LTUajAaEUMGUUrnUSXc0oi668dRr6EXDUBlg2FFO0Me00p9KLkNBUBveR4FA==
+X-Received: by 2002:a05:6a00:1490:b0:6d9:9dde:8999 with SMTP id v16-20020a056a00149000b006d99dde8999mr604312pfu.58.1704876434354;
+        Wed, 10 Jan 2024 00:47:14 -0800 (PST)
+Received: from 3PW47C3.bytedance.net ([203.208.189.10])
+        by smtp.gmail.com with ESMTPSA id x21-20020aa793b5000000b006dabe67bb85sm2973690pff.216.2024.01.10.00.47.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jan 2024 00:47:14 -0800 (PST)
+From: Bin Zhong <zhongbin@bytedance.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kuniyu@amazon.com,
+	alexander@mihalicyn.com,
+	dhowells@redhat.com,
+	john.fastabend@gmail.com,
+	daan.j.demeyer@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	liubo.0617@bytedance.com,
+	zhangjinshan.smile@bytedance.com,
+	Bin Zhong <zhongbin@bytedance.com>
+Subject: [PATCH net] af_unix: Avoid a wakeup if data has been not arrived
+Date: Wed, 10 Jan 2024 16:47:03 +0800
+Message-Id: <20240110084703.2708053-1-zhongbin@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <82f55c0e-0ec8-4fe1-8d8c-b1de07558ad9@linux.dev>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 09, 2024 at 11:40:38AM -0800, Yonghong Song wrote:
-> 
-> On 1/9/24 8:43 AM, Artem Savkov wrote:
-> > It is possible for bpf_kfunc_call_test_release() to be called from
-> > bpf_map_free_deferred() when bpf_testmod is already unloaded and
-> > perf_test_stuct.cnt which it tries to decrease is no longer in memory.
-> > This patch tries to fix the issue by waiting for all references to be
-> > dropped in bpf_testmod_exit().
-> > 
-> > The issue can be triggered by running 'test_progs -t map_kptr' in 6.5,
-> > but is obscured in 6.6 by d119357d07435 ("rcu-tasks: Treat only
-> > synchronous grace periods urgently").
-> > 
-> > Fixes: 65eb006d85a2a ("bpf: Move kernel test kfuncs to bpf_testmod")
-> 
-> Please add your Signed-off-by tag.
+In the following scenarios, unnecessary wake-up may occur.
+When a thread sends a piece of data and then immediately
+calls recv to wait for the server's data, the server, upon
+receiving this thread's data, calls back unix_write_space
+to wake up this thread.
 
-Thanks for noticing. Will resend with signed-off-by and your ack.
+Therefore, add the filtering conditions of EPOLLIN and
+EPOLLERR in the callback function of the waiting queue in
+the unix_stream_data_wait function to reduce unnecessary
+wake-ups.
 
-> I think the root cause is that bpf_kfunc_call_test_acquire() kfunc
-> is defined in bpf_testmod and the kfunc returns some data in bpf_testmod.
-> But the release function bpf_kfunc_call_test_release() is in the kernel.
-> The release func tries to access some data in bpf_testmod which might
-> have been unloaded. The prog_test_ref_kfunc is defined in the kernel, so
-> no bpf_testmod btf reference is hold so bpf_testmod can be unloaded before
-> bpf_kfunc_call_test_release().
-> As you mentioned, we won't have this issue if bpf_kfunc_call_test_acquire()
-> is also in the kernel.
-> 
-> I think putting bpf_kfunc_call_test_acquire() in bpf_testmod and
-> bpf_kfunc_call_test_release() in kernel is not a good idea and confusing.
-> But since this is only for tests, I guess we can live with that. With that,
+Signed-off-by: Bin Zhong <zhongbin@bytedance.com>
+---
+ net/unix/af_unix.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Correct. 65eb006d85a2a ("bpf: Move kernel test kfuncs to bpf_testmod")
-also mentions why bpf_kfunc_call_test_release() is not in the module and
-states that this is temporary. I'll add a comment in v2 so the wait can
-be removed once the functions are re-united.
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index ac1f2bc18fc9..bd4e7beb02d5 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2500,6 +2500,14 @@ static int unix_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+ 	return recv_actor(sk, skb);
+ }
  
-> Acked-by: Yonghong Song <yonghong.song@linux.dev>
-> 
-> > ---
-> >   tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c | 4 ++++
-> >   1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> > index 91907b321f913..63f0dbd016703 100644
-> > --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> > +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> > @@ -2,6 +2,7 @@
-> >   /* Copyright (c) 2020 Facebook */
-> >   #include <linux/btf.h>
-> >   #include <linux/btf_ids.h>
-> > +#include <linux/delay.h>
-> >   #include <linux/error-injection.h>
-> >   #include <linux/init.h>
-> >   #include <linux/module.h>
-> > @@ -544,6 +545,9 @@ static int bpf_testmod_init(void)
-> >   static void bpf_testmod_exit(void)
-> >   {
-> > +	while (refcount_read(&prog_test_struct.cnt) > 1)
-> > +		msleep(20);
-> > +
-> >   	return sysfs_remove_bin_file(kernel_kobj, &bin_attr_bpf_testmod_file);
-> >   }
-> 
-
++static int unix_stream_data_wake_function(wait_queue_entry_t *wait, unsigned int mode,
++					int sync, void *key)
++{
++	if (key && !(key_to_poll(key) & (EPOLLIN | EPOLLERR)))
++		return 0;
++	return autoremove_wake_function(wait, mode, sync, key);
++}
++
+ /*
+  *	Sleep until more data has arrived. But check for races..
+  */
+@@ -2509,7 +2517,7 @@ static long unix_stream_data_wait(struct sock *sk, long timeo,
+ {
+ 	unsigned int state = TASK_INTERRUPTIBLE | freezable * TASK_FREEZABLE;
+ 	struct sk_buff *tail;
+-	DEFINE_WAIT(wait);
++	DEFINE_WAIT_FUNC(wait, unix_stream_data_wake_function);
+ 
+ 	unix_state_lock(sk);
+ 
 -- 
-Regards,
-  Artem
+2.25.1
 
 
