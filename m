@@ -1,214 +1,214 @@
-Return-Path: <netdev+bounces-62951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5869982A20F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 21:19:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5704982A22B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 21:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0250C28DE4A
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 20:19:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD1F32897AA
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 20:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1842D4F1E5;
-	Wed, 10 Jan 2024 20:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581E14F887;
+	Wed, 10 Jan 2024 20:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="LQhgAxeN"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kUEFH0Y1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABF34EB5D
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 20:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-4674ca1a2dbso1079006137.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 12:18:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1704917911; x=1705522711; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xCx5QwVa70fzd8rquMw4I6kP8SoNutWIPIfWbbVPnLc=;
-        b=LQhgAxeNKXARlYaz9p+WirSIlWc1OggKmi2zS4oGjM32ATv5aRdAV3V22iqAdbVIVw
-         Ynjx4nY3CdMQwe40l+d/r/39PuGOniZT8ZYYOX/gw1g/eqIaa6GajUBQGwpm6ux07C7T
-         vNqpGbMZpuP4NB6wq422gmdNErWaEPd9zFSQEipLqoHBHDn6KBOdtqJ+n/2FQKHGT0oc
-         tveRy38ZS3qGMxZtaPJ9fCnn1jqnTspJ/rR3k07pIl13N1F8SfuUXnYF2ghm58gi3s+j
-         qAjYjk9m5fPYJE5SCF2JmemjU1DHxha3QiFeDzN3OswGjvgGVbusdOj1JSMbPaVpvXZD
-         5jXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704917911; x=1705522711;
-        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xCx5QwVa70fzd8rquMw4I6kP8SoNutWIPIfWbbVPnLc=;
-        b=k93ddSQXbExKr0OA48FTq+eAMWAQkGFD8VWVcCnsc5YXEvrg7dykuyqQk/PnT7BXva
-         euSEBJJ/aJAqFZWEcTnmDGCO1ubLV5fsCQOy9gqJvFwn3a9v6nsEY66NSujUY6S1Qqj1
-         mtbXHkkmbuBLldOLDljHS/PllwrWoF6nQoE23+52AZQJRLcYBMyPdWeJ3R5KFK71mcKy
-         zJcbX2z/8+0HKlBhkVLRfR6zeFjvQXTdYSmkOY9WYU6XPK+xO25MXOiEIPvrz3vj3qoY
-         ytjf6WvgvNTluydAr4hDZ0BaXQB3XqoPzcwAB0Hf48WoQVt5YcM8lEYYS5hr3efICvVv
-         XlzA==
-X-Gm-Message-State: AOJu0YzPyR90kNbLsqqGdXJxLRQ3xgPkORX6YboRpRkEryKAlf3sdU8q
-	PhUueVoZJEBYf3/T75nC1rCkePLQfILYcUmD9pnHjVZoz1gEKg==
-X-Google-Smtp-Source: AGHT+IE6zVAzl+4qyb1eQ51qm1s0EUGP2M/u9h85sqLJbME/ZYvgt4XDXmjce7aWTNg2Jl0ci+FP580NRa/9d4ocW0c=
-X-Received: by 2002:a05:6102:570b:b0:467:1ffb:d6a1 with SMTP id
- dg11-20020a056102570b00b004671ffbd6a1mr68609vsb.26.1704917911195; Wed, 10 Jan
- 2024 12:18:31 -0800 (PST)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 10 Jan 2024 14:18:30 -0600
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-In-Reply-To: <20240110164105.GA13451@wunner.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C7F4F885;
+	Wed, 10 Jan 2024 20:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40AK8qBa015886;
+	Wed, 10 Jan 2024 20:19:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=NgCE54sEzeUce6C/KiC9M0zAoiO6fbBzNGjrx8pUiLE=; b=kU
+	EFH0Y134OQMi7pJYBTNbEfdPmPPZm6O4eDm1+ykwDemfQtUjJhSnXu1HuQ0ZABTs
+	YlicfOOsaJIvhGs47dMrSbQZAXTvzs8CltbbPKcWILtqs/mj00Gv2i7Jkstg2/vr
+	xqZNQ5+5prVw+VlaswHXT7APWdnbDvbgzzD3xMailYwlbbSkw7H2+VgievYgR5uD
+	sOXK4WgLXbdiD82daOBH18rYbuF4gXbKtvEa8OvyLY/QRGsPEiKm6s/okOzpiwAE
+	g4IUQIsFICGbCp6KmPRzVd0Dejdin36EMBVWvLuPYrwasUFTTdfrVPmc4LzPe0Zs
+	EQR4EnO4FTUKPIs5qvKA==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vhsb2hf1w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jan 2024 20:19:56 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40AKJtXW026511
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jan 2024 20:19:55 GMT
+Received: from [10.110.5.89] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 10 Jan
+ 2024 12:19:53 -0800
+Message-ID: <92892988-bb77-4075-812e-19f6112f436e@quicinc.com>
+Date: Wed, 10 Jan 2024 12:19:29 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104130123.37115-1-brgl@bgdev.pl> <20240104130123.37115-4-brgl@bgdev.pl>
- <20240109144327.GA10780@wunner.de> <CAMRc=MdXO6c6asvRSn_Z8-oFS48hroT+dazGKB6WWY1_Zu7f1Q@mail.gmail.com>
- <20240110132853.GA6860@wunner.de> <CAMRc=MdBSAb_kEO2r7r-vwLuRAEv7pMODOMtZoCCRAd=zsQb_w@mail.gmail.com>
- <20240110164105.GA13451@wunner.de>
-Date: Wed, 10 Jan 2024 14:18:30 -0600
-Message-ID: <CAMRc=MdQKPN8UbagmswjFx7_JvmJuBeuq8+9=z-+GBNUmdpWEA@mail.gmail.com>
-Subject: Re: [RFC 3/9] PCI/portdrv: create platform devices for child OF nodes
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
-	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] net: stmmac: TBS support for platform driver
+Content-Language: en-US
+To: Rohan G Thomas <rohan.g.thomas@intel.com>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        "Jose
+ Abreu" <joabreu@synopsys.com>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        "Serge
+ Semin" <fancer.lancer@gmail.com>,
+        Andrew Halaney <ahalaney@redhat.com>, <elder@linaro.org>
+CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_bhaviks@quicinc.com>,
+        <kernel.upstream@quicinc.com>
+References: <20230927130919.25683-1-rohan.g.thomas@intel.com>
+ <20230927130919.25683-3-rohan.g.thomas@intel.com>
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <20230927130919.25683-3-rohan.g.thomas@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: -pA_WXnVrm5JzPP1OM40hLBadBDWBoIa
+X-Proofpoint-GUID: -pA_WXnVrm5JzPP1OM40hLBadBDWBoIa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=999 spamscore=0 malwarescore=0 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 clxscore=1011 mlxscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401100161
 
-On Wed, 10 Jan 2024 17:41:05 +0100, Lukas Wunner <lukas@wunner.de> said:
-> On Wed, Jan 10, 2024 at 05:26:52PM +0100, Bartosz Golaszewski wrote:
->> Seems like the following must be true but isn't in my case (from
->> pci_bus_add_device()):
->>
->>     if (pci_is_bridge(dev))
->>         of_pci_make_dev_node(dev);
->>
->> Shouldn't it evaluate to true for ports?
->
-> It should.
->
-> What does "lspci -vvvvxxxx -s BB:DD.F" say for the port in question?
->
+Qualcomm had similar discussions with respect to enabling of TBS for a particular queue. 
+We had similar discussion on these terms yesterday with Redhat. Adding Andrew from Redhat here 
 
-I cut out the hexdump part, let me know if you really need it. Output follows.
+What we discovered as part of the discussions is listed below. 
 
-Bart
+1. Today upstream stmmac code is designed in such a way that TBS flag is put as
+part of queue configurations(see below snippet) and as well know that stmmac queue 
+configuration comes from the dtsi file. 
 
---
+//ndo_open => stmmac_open
+int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;(comes from tx_queues_cfg)
 
-# lspci -vvvvxxxx -s  0000:00:00.0
-0000:00:00.0 PCI bridge: Qualcomm Technologies, Inc Device 010b
-(prog-if 00 [Normal decode])
-	Device tree node: /sys/firmware/devicetree/base/soc@0/pcie@1c00000/pcie@0
-	Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
-Stepping- SERR+ FastB2B- DisINTx+
-	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort-
-<TAbort- <MAbort- >SERR- <PERR- INTx-
-	Latency: 0
-	Interrupt: pin A routed to IRQ 176
-	IOMMU group: 8
-	Region 0: Memory at 60300000 (32-bit, non-prefetchable) [size=4K]
-	Bus: primary=00, secondary=01, subordinate=ff, sec-latency=0
-	I/O behind bridge: f000-0fff [disabled] [16-bit]
-	Memory behind bridge: 60400000-604fffff [size=1M] [32-bit]
-	Prefetchable memory behind bridge: 00000000fff00000-00000000000fffff
-[disabled] [64-bit]
-	Secondary status: 66MHz- FastB2B- ParErr- DEVSEL=fast >TAbort-
-<TAbort- <MAbort- <SERR- <PERR-
-	BridgeCtl: Parity- SERR+ NoISA- VGA- VGA16- MAbort- >Reset- FastB2B-
-		PriDiscTmr- SecDiscTmr- DiscTmrStat- DiscTmrSERREn-
-	Capabilities: [40] Power Management version 3
-		Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0+,D1-,D2-,D3hot+,D3cold+)
-		Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
-	Capabilities: [50] MSI: Enable+ Count=1/32 Maskable+ 64bit+
-		Address: 00000000a1c3f000  Data: 0000
-		Masking: fffffffe  Pending: 00000000
-	Capabilities: [70] Express (v2) Root Port (Slot+), MSI 00
-		DevCap:	MaxPayload 128 bytes, PhantFunc 0
-			ExtTag- RBE+
-		DevCtl:	CorrErr+ NonFatalErr+ FatalErr+ UnsupReq+
-			RlxdOrd+ ExtTag- PhantFunc- AuxPwr- NoSnoop+
-			MaxPayload 128 bytes, MaxReadReq 512 bytes
-		DevSta:	CorrErr- NonFatalErr- FatalErr- UnsupReq- AuxPwr+ TransPend-
-		LnkCap:	Port #0, Speed 8GT/s, Width x1, ASPM L0s L1, Exit Latency
-L0s <1us, L1 <64us
-			ClockPM- Surprise+ LLActRep+ BwNot+ ASPMOptComp+
-		LnkCtl:	ASPM Disabled; RCB 128 bytes, Disabled- CommClk+
-			ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-		LnkSta:	Speed 5GT/s, Width x1
-			TrErr- Train- SlotClk+ DLActive+ BWMgmt+ ABWMgmt+
-		SltCap:	AttnBtn+ PwrCtrl+ MRL+ AttnInd+ PwrInd+ HotPlug- Surprise+
-			Slot #0, PowerLimit 0W; Interlock+ NoCompl-
-		SltCtl:	Enable: AttnBtn- PwrFlt- MRL- PresDet- CmdCplt- HPIrq- LinkChg-
-			Control: AttnInd Off, PwrInd Off, Power- Interlock-
-		SltSta:	Status: AttnBtn- PowerFlt- MRL- CmdCplt- PresDet- Interlock-
-			Changed: MRL- PresDet- LinkState-
-		RootCap: CRSVisible+
-		RootCtl: ErrCorrectable- ErrNon-Fatal- ErrFatal- PMEIntEna+ CRSVisible+
-		RootSta: PME ReqID 0000, PMEStatus- PMEPending-
-		DevCap2: Completion Timeout: Range ABCD, TimeoutDis+ NROPrPrP+ LTR+
-			 10BitTagComp- 10BitTagReq- OBFF Not Supported, ExtFmt- EETLPPrefix-
-			 EmergencyPowerReduction Not Supported, EmergencyPowerReductionInit-
-			 FRS- LN System CLS Not Supported, TPHComp+ ExtTPHComp- ARIFwd-
-			 AtomicOpsCap: Routing- 32bit- 64bit- 128bitCAS-
-		DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis- LTR+
-10BitTagReq- OBFF Disabled, ARIFwd-
-			 AtomicOpsCtl: ReqEn- EgressBlck-
-		LnkCap2: Supported Link Speeds: 2.5-8GT/s, Crosslink- Retimer- 2Retimers- DRS-
-		LnkCtl2: Target Link Speed: 8GT/s, EnterCompliance- SpeedDis-
-			 Transmit Margin: Normal Operating Range, EnterModifiedCompliance-
-ComplianceSOS-
-			 Compliance Preset/De-emphasis: -6dB de-emphasis, 0dB preshoot
-		LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete-
-EqualizationPhase1-
-			 EqualizationPhase2- EqualizationPhase3- LinkEqualizationRequest-
-			 Retimer- 2Retimers- CrosslinkRes: unsupported
-	Capabilities: [100 v2] Advanced Error Reporting
-		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
-MalfTLP- ECRC- UnsupReq- ACSViol-
-		UEMsk:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF-
-MalfTLP- ECRC- UnsupReq- ACSViol-
-		UESvrt:	DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+
-MalfTLP+ ECRC- UnsupReq- ACSViol-
-		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr-
-		CEMsk:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
-		AERCap:	First Error Pointer: 00, ECRCGenCap+ ECRCGenEn- ECRCChkCap+ ECRCChkEn-
-			MultHdrRecCap- MultHdrRecEn- TLPPfxPres- HdrLogCap-
-		HeaderLog: 00000000 00000000 00000000 00000000
-		RootCmd: CERptEn+ NFERptEn+ FERptEn+
-		RootSta: CERcvd- MultCERcvd- UERcvd- MultUERcvd-
-			 FirstFatal- NonFatalMsg- FatalMsg- IntMsg 0
-		ErrorSrc: ERR_COR: 0000 ERR_FATAL/NONFATAL: 0000
-	Capabilities: [148 v1] Secondary PCI Express
-		LnkCtl3: LnkEquIntrruptEn- PerformEqu-
-		LaneErrStat: 0
-	Capabilities: [168 v1] Transaction Processing Hints
-		No steering table available
-	Capabilities: [1fc v1] L1 PM Substates
-		L1SubCap: PCI-PM_L1.2+ PCI-PM_L1.1+ ASPM_L1.2+ ASPM_L1.1+ L1_PM_Substates+
-			  PortCommonModeRestoreTime=70us PortTPowerOnTime=0us
-		L1SubCtl1: PCI-PM_L1.2- PCI-PM_L1.1- ASPM_L1.2- ASPM_L1.1-
-			   T_CommonMode=70us LTR1.2_Threshold=76800ns
-		L1SubCtl2: T_PwrOn=0us
-	Kernel driver in use: pcieport
+/* Setup per-TXQ tbs flag before TX descriptor alloc */
+tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+
+2. There is a no way to do this dynamically from user space because we don't have any 
+API exposed which can do it from user space and also TBS rely on special descriptors 
+aka enhanced desc this cannot be done run time and stmmac has to be aware of it before 
+we do DMA/MAC/MTL start. To do this dynamically would only mean stopping DMA/MAC/MTL 
+realloc resources for enhanced desc and the starting MAC/DMA/MTL. This means we are 
+disrupting other traffic(By stopping MAC block).
+
+3. I dont think there is a way we can enable this dynamically today. I would like upstream 
+community to share your thoughts as well.
+
+4. I agree with Rohan's patch here and want upstream community to accept it. This will allow
+use to configure the queues where TBS needs to be enabled as hardcoding in the code unless upstream
+has better way to this using userspace.
+
+Please let us know if you think otherwise. 
+
+
+On 9/27/2023 6:09 AM, Rohan G Thomas wrote:
+> Enable Time Based Scheduling(TBS) support for Tx queues through the
+> stmmac platform driver. For this a new per-queue tx-config property,
+> tbs-enabled is added to the devicetree.
+> 
+> Commit 7eadf57290ec ("net: stmmac: pci: Enable TBS on GMAC5 IPK PCI
+> entry") enables similar support for the stmmac pci driver.
+> 
+> Also add check whether TBS support is available for a Tx DMA channel
+> before enabling TBS support for that Tx DMA channel.
+> 
+> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
+> ---
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++++++++++----
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c |  4 +++
+>  2 files changed, 24 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 81b6f3ecdf92..7333f0640b3d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -3773,12 +3773,18 @@ stmmac_setup_dma_desc(struct stmmac_priv *priv, unsigned int mtu)
+>  		dma_conf->dma_rx_size = DMA_DEFAULT_RX_SIZE;
+>  
+>  	/* Earlier check for TBS */
+> -	for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++) {
+> -		struct stmmac_tx_queue *tx_q = &dma_conf->tx_queue[chan];
+> -		int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;
+> +	if (priv->dma_cap.tbssel) {
+> +		/* TBS is available only for tbs_ch_num of Tx DMA channels,
+> +		 * starting from the highest Tx DMA channel.
+> +		 */
+> +		chan = priv->dma_cap.number_tx_channel - priv->dma_cap.tbs_ch_num;
+> +		for (; chan < priv->plat->tx_queues_to_use; chan++) {
+> +			struct stmmac_tx_queue *tx_q = &dma_conf->tx_queue[chan];
+> +			int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;
+>  
+> -		/* Setup per-TXQ tbs flag before TX descriptor alloc */
+> -		tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+> +			/* Setup per-TXQ tbs flag before TX descriptor alloc */
+> +			tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+> +		}
+>  	}
+>  
+>  	ret = alloc_dma_desc_resources(priv, dma_conf);
+> @@ -7505,6 +7511,15 @@ int stmmac_dvr_probe(struct device *device,
+>  		}
+>  	}
+>  
+> +	/* If TBS feature is supported(i.e. tbssel is true), then at least 1 Tx
+> +	 * DMA channel supports TBS. So if tbs_ch_num is 0 and tbssel is true,
+> +	 * assume all Tx DMA channels support TBS. TBS_CH field, which gives
+> +	 * number of Tx DMA channels with TBS support is only available only for
+> +	 * DW xGMAC IP. For other DWMAC IPs all Tx DMA channels can support TBS.
+> +	 */
+> +	if (priv->dma_cap.tbssel && !priv->dma_cap.tbs_ch_num)
+> +		priv->dma_cap.tbs_ch_num = priv->dma_cap.number_tx_channel;
+> +
+>  	ndev->features |= ndev->hw_features | NETIF_F_HIGHDMA;
+>  	ndev->watchdog_timeo = msecs_to_jiffies(watchdog);
+>  #ifdef STMMAC_VLAN_TAG_USED
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index 843bd8804bfa..6c0191c84071 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -279,6 +279,10 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
+>  		plat->tx_queues_cfg[queue].coe_unsupported =
+>  			of_property_read_bool(q_node, "snps,coe-unsupported");
+>  
+> +		/* Select TBS for supported queues */
+> +		plat->tx_queues_cfg[queue].tbs_en =
+> +			of_property_read_bool(q_node, "snps,tbs-enabled");
+> +
+>  		queue++;
+>  	}
+>  	if (queue != plat->tx_queues_to_use) {
 
