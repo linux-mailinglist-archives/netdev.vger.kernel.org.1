@@ -1,347 +1,461 @@
-Return-Path: <netdev+bounces-62791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8BE882937D
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 06:53:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA6C829378
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 06:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FC6A1F26DB1
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 05:53:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84ED82890AB
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 05:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD67DF71;
-	Wed, 10 Jan 2024 05:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CE4DF5C;
+	Wed, 10 Jan 2024 05:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZMuXfhE7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OVeJeEvO"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E373DDDF;
-	Wed, 10 Jan 2024 05:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B419EDDD5;
+	Wed, 10 Jan 2024 05:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704865980; x=1736401980;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=MU/M0RIFLxm4vZmWD78eW7Y2luXLd1c1xv6CL+pjGFw=;
-  b=ZMuXfhE7dmWQs7WDB2yoVnJp8rBxI9x3MUWFH3zRYG2C01/bGCbqVv1B
-   O9fav3+bfmebS4eRGRU1d4elqiw2tyvosXwE7deWocWc6dBWPjyAl0K/N
-   6XYFZZ+Z7we8CPlgAT6vB98lOjLaPX2ptSAK7KIngXYj2Mxr4Jlix0WaF
-   v4ph3Wpwy8gVI8NFh7QR59/ePBJzsjlsGPDGHriF/j7bFkSuRI7PbE9Yf
-   g2l9lKGYveHvogXjvKGpAEB2jdiNorFGN32NxaGTzeBBFobJk5c8yuDQu
-   CSPS0jgR/5/xC9IyfCtfcvznoKrm50kyWdtZKT/pf7m3ehF+suB1KpjI2
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="397272956"
+  t=1704865907; x=1736401907;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=HBpCQfx2nLYB6dHcr+44bhKfXXHstQYhciu5iUkdoTs=;
+  b=OVeJeEvOHsIhV1/+hWclfPb77SQBmvPjcTNzX8HcFbr7fUDjuXRAfFJC
+   f71c8Np0rIbu69rblAqlvXdn9plBMmSYdip3qDqgK5OqbLykpQ4dYXXkR
+   o4OuzInoe+mcuDn0uLAdNfFiVKPOc/g+2pgo8KwfSEFnKKcrL/zrqjQBD
+   2Qf+DzqaLqUpw6fZH6SOMBhly23x2YM5WBQUGG1bs+sDPdczxGQ6yd1L0
+   TqmP9euKq4WOvbJgJ6LgIQ83l7L4nn7VRqB6fBPnrjoLn57LLOsn5kO1d
+   Jb0+Li632cmne+r5iXpkmE4DhJc45tbDb0mNb/zYZ5sqNGS2hb54L/bqi
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="397272623"
 X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
-   d="scan'208";a="397272956"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 21:52:58 -0800
+   d="scan'208";a="397272623"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 21:51:46 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="852432581"
 X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
-   d="scan'208";a="24139200"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Jan 2024 21:52:58 -0800
+   d="scan'208";a="852432581"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Jan 2024 21:51:46 -0800
 Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 9 Jan 2024 21:52:57 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 9 Jan 2024 21:52:57 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ 15.1.2507.35; Tue, 9 Jan 2024 21:51:45 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
  orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 9 Jan 2024 21:52:57 -0800
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ 15.1.2507.35 via Frontend Transport; Tue, 9 Jan 2024 21:51:45 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 9 Jan 2024 21:52:56 -0800
+ 15.1.2507.35; Tue, 9 Jan 2024 21:51:45 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F9sOj91KStqVBvMbxRmoL/92ZxF5nc8oIx1mhp4DeoqWAW2S9QRDb5Fr+tUbPQPuhvg9TzxJ7VsylFxv/5dw8/xgQQNlr2RFF6FoGiyLjJJgTHs39NpxvR/y0OZHM25UYOgZI7BKpZ2Vy4I4F/Q5O2bn6B7v3wyoNa/pptUD5e6/juiAnVqzuwUZU/xhxh/ymdC6s3DrTC27J/h62l230IpURHHb/x6KRubwiOvJ06Gr3avuuNB0AgKYXVOfeMbBGrx16zHQtugsR51iTqKHpumttjat2dk/ixvj8TLSjFOI1QDWPBeeOQK01XK90GKvjpCJ7UTjQb1BpUKRptTCpw==
+ b=A0oqpOEgXlteF/GBobVrI3albJlksPHHJt+YJ03R5bqgoKlkGeBNY2T9ojWvKFPwbLys2BpSiulaG4IuYflh2UUf43iu0UPFbUsjMVtnHXSOBEreXztGKg9ZKopwNLl0EO78ZVn8IkkUl819DCoYAQiHz4JYunkBcObpd5Gfo/rnz+q92xlc2H83VtfglpTvRLkYQKDnsrDqKtrCz3oTcEHBag0WpHu70dYP4yygV+0tcDrlZs9lJEntxy+V/OEmx1dwJL3aQ+IUe6ycUn6l9rL+J8AXTPektp3H+bBguScfxfE/fzL4Rb+NtzJ2pmskBan19zZF+Lbp13Gu3bhw4g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BjKmFps2wR/YZorn0z85XB+Onm2aTOpzfNl8Nd6z2uM=;
- b=kfdTLS02dqeylZcOwlbPSC0kZgb88dRUAXgG/AzvLSRiQ+uXEovoFSzNqXMBo5V/+85RotYMCocRnjqUv06rsdPd/mgM10jW1+rsH76EfOOdzPbZeGG2LKaHqyFE5N1U/QvjUhyFi2RDQkNwfC6k/zFmkxEb4eGYuJ3f4V2EqG64SQYF9zdZ5JWOVXFug7Sl5xeIIHcg6j59eg9Kz5BTNA1Cgdet1tGKbapaZWtdbyN/TUQaAv5N54WZlQMxyaj2MRSjQS8XvGj4q8lLAw/gbMRZHbUkZLj1Uca0mClvAbTzPAhxe7jsV8sBXjHoA8cSJW+y841LBjW2q1ZxUbF1ww==
+ bh=nRFVS8dZzygfmnweZ5F26tfbafOJ4aATPOcL+EjjeAY=;
+ b=KpNCRtSLQlBdiDwySz+CBmG5d42OnwEHPdjDLwiUMXJuhpntTVzLgoapGfdVCu7WuBcO6I8hL0dmGaUH8pJH4cjIhrYLKug7m/jPWF+EMwNNtVbHXGI+nG2FdBBrvnK317Hrf4NaJraVdwaAsm8+GYFJapjcSSQn5xLYs4Esqr7mhJ2gz+/n1VQUUzVekwfEmp1P01IyBvERZqJJJhw8XVcPgkGbICxU7seO4bTfmD+Z/ayEulJlz+fTcJuyprK93ZG0e7ATDiV3swrsZX2BZAXPSx6OVeMseZ3NA34dA639i5ZOnw+aSHpT03mFZ5AsuZcMy6LdJzTmef3MEwWBvg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4839.namprd11.prod.outlook.com (2603:10b6:510:42::18)
- by DS7PR11MB6127.namprd11.prod.outlook.com (2603:10b6:8:9d::15) with
+Received: from CH0PR11MB5490.namprd11.prod.outlook.com (2603:10b6:610:d5::6)
+ by BL1PR11MB5239.namprd11.prod.outlook.com (2603:10b6:208:31a::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Wed, 10 Jan
- 2024 05:52:54 +0000
-Received: from PH0PR11MB4839.namprd11.prod.outlook.com
- ([fe80::25c4:9c11:c628:1283]) by PH0PR11MB4839.namprd11.prod.outlook.com
- ([fe80::25c4:9c11:c628:1283%4]) with mapi id 15.20.7181.015; Wed, 10 Jan 2024
- 05:52:54 +0000
-Date: Wed, 10 Jan 2024 13:47:20 +0800
-From: Pengfei Xu <pengfei.xu@intel.com>
-To: Edward Adam Davis <eadavis@qq.com>
-CC: <ceph-devel@vger.kernel.org>, <davem@davemloft.net>,
-	<dhowells@redhat.com>, <edumazet@google.com>, <heng.su@intel.com>,
-	<horms@kernel.org>, <jaltman@auristor.com>, <jarkko@kernel.org>,
-	<jlayton@redhat.com>, <keyrings@vger.kernel.org>, <kuba@kernel.org>,
-	<linux-afs@lists.infradead.org>, <linux-cifs@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <marc.dionne@auristor.com>,
-	<markus.suvanto@gmail.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<smfrench@gmail.com>, <torvalds@linux-foundation.org>, <wang840925@gmail.com>
-Subject: Re: [PATCH] keys, dns: Fix missing size check of V1 server-list
- header
-Message-ID: <ZZ4vaJMN2w/ilkR3@xpf.sh.intel.com>
-References: <ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com>
- <tencent_CF4FEF0D9B25A08DD7920E5D93DDBC194E07@qq.com>
+ 2024 05:51:38 +0000
+Received: from CH0PR11MB5490.namprd11.prod.outlook.com
+ ([fe80::9afc:fa9d:5f42:8fd7]) by CH0PR11MB5490.namprd11.prod.outlook.com
+ ([fe80::9afc:fa9d:5f42:8fd7%7]) with mapi id 15.20.7159.020; Wed, 10 Jan 2024
+ 05:51:37 +0000
+From: "Swee, Leong Ching" <leong.ching.swee@intel.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+CC: Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh+dt@kernel.org>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, Teoh Ji Sheng <ji.sheng.teoh@intel.com>
+Subject: RE: [PATCH net-next v2 2/4] net: stmmac: Make MSI interrupt routine
+ generic
+Thread-Topic: [PATCH net-next v2 2/4] net: stmmac: Make MSI interrupt routine
+ generic
+Thread-Index: AQHaP6Y3nBOT49XQoEmBgv/Tuhxh/7DO0J2AgAPApkA=
+Date: Wed, 10 Jan 2024 05:51:37 +0000
+Message-ID: <CH0PR11MB54909CC4F6E791FFF063BA17CF692@CH0PR11MB5490.namprd11.prod.outlook.com>
+References: <20240105070925.2948871-1-leong.ching.swee@intel.com>
+ <20240105070925.2948871-3-leong.ching.swee@intel.com>
+ <7euscw66rss3iux2cvf7fkvfburmlf6lo4arfx76k42gihspkz@xm3klojs4e26>
+In-Reply-To: <7euscw66rss3iux2cvf7fkvfburmlf6lo4arfx76k42gihspkz@xm3klojs4e26>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH0PR11MB5490:EE_|BL1PR11MB5239:EE_
+x-ms-office365-filtering-correlation-id: cac48e4c-b4dc-42dd-d40d-08dc11a035f7
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: HC2GwH0xMu625Dmlbf/N45G0VIgF4Ah9NKIFwpsdPmZEmROst6C6kBgRkwiVhU1nDSk/katq9yVS7yrejNJ34jW7bwAk/gix06IJeuFJIWo3eS0R58hjaJ6l5GorQ8GplB1+jHha7Ziij9bbuAY9lFqnEilCS2P/7c/2ITmuuzFHhW829Bgdv2Kc3Ge54qIqM0bc8LroUf206yUCLjKFkiwkVCVOdUXaffBIMPRzQ1oLmwjRqPP69+Tgwz90PMhbV64Atcuebs8GthB0o2AGtiMOTSIwTG7Rn0ycI2HeWPXPHQGi+DddHHHj02mMs2YG4f5sLITGLSck0ItpDZVmqVbaN5g0tOITjJ/OZ5PjekE9ueks3mJdJo+HQbeNuvUVpDi41LyCtQDlNVrnF8yTRc2KEWdPzFUB5tR8blFqV/ExQLDkT52/n2QoeUPTtbSj6IDHV0TzDn9WkjDsIlUbkTROM4VVnxAFlzamN9g9qhWKHhAmMokf1mv0VydEzC7uY/Gs6NaLSOSHKeRz0J6kj+bVKdsQqP1Qpid2cJZyMsU9ec7t8mYbG4rKFLNsvecLW31OoCtaM2lVqxYyNrj0HxdF9wq4JFWojhGz+wipm0qvSP7h0KHghciw/gpzfR5KZvZNBv59Vq1N8SAE/MM8Eg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB5490.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(346002)(39860400002)(366004)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(83380400001)(26005)(53546011)(6506007)(9686003)(107886003)(122000001)(5660300002)(38100700002)(8936002)(4326008)(8676002)(30864003)(7416002)(52536014)(2906002)(66446008)(478600001)(7696005)(54906003)(71200400001)(66476007)(66556008)(6916009)(316002)(64756008)(76116006)(66946007)(41300700001)(38070700009)(82960400001)(86362001)(33656002)(55016003)(41533002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TrR3fUcsiAdLqfKjEkJiluWb0HGIBJmhF0JUTZ8QJib57FV0LBoRmAV8fFcH?=
+ =?us-ascii?Q?mgoq1YeAaUZbD/2uj1X6a+lSZQAnkpxAI0Pxum+hq2vBmWCNObUw6Y+Mdk7+?=
+ =?us-ascii?Q?d+I/kfCVersoQimkmgqiagevx4mRmekF3+04rwEH9D5O7oxMGzVkJLVJqIWa?=
+ =?us-ascii?Q?QO+Ot/2RLPqga4OFZ192RtW4jqjRNQvWm6YWXjqYesdQjhFh8hV/kORsgUF4?=
+ =?us-ascii?Q?e6/m9MWUsqSjGC8d0wIyL0BQh8FrXdTWAiLW+sV5p5GRN3/W/u7lW3N4eRWM?=
+ =?us-ascii?Q?U8eSYAkPgTeu/55gCzdxnqoOO60qzCrtIdXF863/WBNTvC/uZ1OOWNYgMsi1?=
+ =?us-ascii?Q?8Xxux+iADlR7q4T1it9l3I9H5bcYD6EWI+u3CuXd7SdT9eg8TFvKjQjKkmdg?=
+ =?us-ascii?Q?QPCOyIH8RTBlWNtVix5BFZ0SMj/xqsO5bQe/efcGAlXeStK9+dpGA1SbLGr5?=
+ =?us-ascii?Q?AeV9r1E1neXIHbWtqIBmziKqOjovHtZLqw6wLpF6hUmyRgEImE0/oaHkxkAS?=
+ =?us-ascii?Q?wxj6qOk7cauKHZIuqvMcpt6E0TvpKDLYovTE/Y4pfI+X4sJeIo3tzettKLJt?=
+ =?us-ascii?Q?LoYUgcTvOExMI07YkS2XglMYcysL6vc+rJDbBoq6tlNqL3ZeOsNKNxzFlwQs?=
+ =?us-ascii?Q?c6YT548A1MgSoHlu7fu8KqnHUPsbq3OWe1r6/tUCrg28oIdFC4fPcM12ok8y?=
+ =?us-ascii?Q?KkYjzTI0QudO/NbwwAllV1LoVrc51447qjT+he0uhWMkw4PosBe0qemfW8Jv?=
+ =?us-ascii?Q?yvVQPrKXlZE17Imc3Ia1zTvRhAjHKd45bqAkiTyk7sAgS8pl1A4LE7K+5Ns1?=
+ =?us-ascii?Q?rQKTMLnsDweoH34bDGQpRJ54rs6/GMJR/UmDnwT7KQlKQnXbz7SXQQwX/K+k?=
+ =?us-ascii?Q?h9Th5S3CdXa3jjwacvT4gNDgXDxk87CN7FlT7/LFfXWvqPzYKvtr4+qkffSK?=
+ =?us-ascii?Q?QcJ1bvccU8dZdmFkeL9arHsC6OznbopQNvdRT5i2O7XwQaCRV6X6HokMBPSA?=
+ =?us-ascii?Q?72tOQofZthCw1yMeAgTHKzAOe2LSA2kteAUX06vIvrAvBMy5DU3fS4/c+dKQ?=
+ =?us-ascii?Q?euzqb7OWtFtVVFo4SxcSmE/7vmleciVUaPPz2Y6zEfHcpGg0LkVc8kCljAT/?=
+ =?us-ascii?Q?QXFNBhUPO34+V0ayGAnlJ+pfb87IehjHMVw6uczTuEYzF5OoAl8BldW71Ivb?=
+ =?us-ascii?Q?hLI674dZ8ss8Fh5HU9gTX7+j6elQzWax2MN3JtV9J7iDcCAzvCWl2QgDbCQb?=
+ =?us-ascii?Q?0pB/s5JFd/CY7OU1DJuDMjdwuhIQ+CRRWUDn4QixHd9r88K3mrmMx601WRo7?=
+ =?us-ascii?Q?wJxPS7brI6prsmwIsFDFwuHqZ8VEjCuj3ncXnUkG24SpDuPc0N+fthbAmxQJ?=
+ =?us-ascii?Q?b0gTv0uqkVGHxe9P+cpMf6kfaTEIEoY5umnJzBpFINdyYSCqyIvkNrIW8HI0?=
+ =?us-ascii?Q?AzB0/hCST18Ks4zAqlsKst3MJSYt3mY/smoo3xAtbVSLJ7ozM9hShMnbFruR?=
+ =?us-ascii?Q?iKo3UnL3AziciW+TMADrrz/25POiiuYFvfmhfnzefAvemeyRII41s+PBlKtj?=
+ =?us-ascii?Q?lzvQ5d5DWut/qXixv/loXjRoCNdF8TSsqTAE2cV3tM/if0jWd3L1CjAoUXqx?=
+ =?us-ascii?Q?gw=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <tencent_CF4FEF0D9B25A08DD7920E5D93DDBC194E07@qq.com>
-X-ClientProxiedBy: SI1PR02CA0056.apcprd02.prod.outlook.com
- (2603:1096:4:1f5::7) To PH0PR11MB4839.namprd11.prod.outlook.com
- (2603:10b6:510:42::18)
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4839:EE_|DS7PR11MB6127:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9dfa95f0-763b-4a1a-f530-08dc11a0634e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wKeX8t0e+BfZ6rf0cTR/MwD6Vn8G81CVM0KHJRplPkcF3aGz4Tb4u0M3FDeLCitH/jVfL18g5Xn/0OG10ZqAeorIAW7yzKZNsHnA2sm/7Dpqt4F3KB3qV7Fhx9q5vermEovuL8C7pLCZdyGBNkW/4AggKVZELUcJB/wJdRWAH3FCKdU5nZF/DpdjIgP1sYjVCJV0hc/sPFUySX0wz2fhBYmcCd3IQsABMu0h/CtZLXjkZKJw5OmLewcwCBRniD8i/YBMEu2Eep0vYpm5JYFqJri3Zun8GATGAgbZLQcw+9f6SBxat1uThGlbIexIRskX4eSPE4mvLj5iVxJlirmg5Xe5ZAW4fceATnbVkxw03ynpX+19D63s7VhShtinK9kRvja2pEt3c8qiHiBDiOMNuFUYALIFgzb1AxOByYGWccmTdoLqs1o25lWH5uxrYUoQHMCKPmeSEEmkEQPe5QQer8nxMCEB+bWWxwp+gQc0fw3hy+mOuN99ggEpHRVTHxEoMTmtw988IjAdoLf9CujDyzLzsuOey7HgUwsTUTiTusw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4839.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(136003)(366004)(396003)(376002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(66899024)(2906002)(5660300002)(7416002)(38100700002)(44832011)(82960400001)(26005)(4326008)(6666004)(8676002)(8936002)(6486002)(41300700001)(316002)(478600001)(86362001)(6916009)(966005)(66556008)(66476007)(66946007)(53546011)(6512007)(83380400001)(6506007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4Ply4IGCCwy+huPRVnOGftpyh2q+LybKRWrmGX/3mwYQivTc3oOBthLd5dUz?=
- =?us-ascii?Q?/0hsrFkHwfHm/Kx34ezSB1JUqTavwkfv8ZjW7iauVJQDjB1e9Hp11mSXdevI?=
- =?us-ascii?Q?3nCOnnl43VpvlS4MbEB4WGyZ4DUIubCM3nfSs1uLYY8+H+Wjo0wrMikeDk3W?=
- =?us-ascii?Q?+zla+EzdU0lIeEnby2+ejOHBMiFaSHsoy2+Xdz627Gv+l0DLMKx5f/T2ZiAI?=
- =?us-ascii?Q?srlFRK0QCts5UdY5ae227XqJ7ZrY2/bjf+Hzq+/cMc+QmJUaMiT11njvuCbc?=
- =?us-ascii?Q?4bF14DIj3hSE0FFd4Luhk7u8nIO7c0zvLAAFfPjJpCIVzkghJlBW8J9w+JDN?=
- =?us-ascii?Q?/RhS9rUvJ69zW5hOwF3+Palvmzsb+cr76J1LWIR8Ac2HDDSBdS2TUNUNuic8?=
- =?us-ascii?Q?ajTH35AFpLIoIdOfuN1ENd0STjONT7dhkjNN5vhvJZr32O4uwVZefHm3kDHt?=
- =?us-ascii?Q?2t2pgayxgs2OkbqylclsI91mmP1imMCBpy7xOSA/Tzpy6EHQ8nANt50mZuHi?=
- =?us-ascii?Q?E7hFWfXLaC6Unw+zQmVTD1W+oQ2Iq9jXL3h6skiiOy98HsDbPr4+qaNHG1cN?=
- =?us-ascii?Q?nZjROEOUSzcaB9AqFqzQUUGB+Hu9Vv0HlzQbcRwTjo8G+c4tzGYOSPsEOhWq?=
- =?us-ascii?Q?VfWvI/rsvAQfZ95izwPTyK/QZRVZB9UcUUBBThn49NyTUlmJ1jtLS9KonbCv?=
- =?us-ascii?Q?8zGcQZV9RacMgVmwDNiLgWhx/j40LmAzk/72IoWE178HVntGUDcNcaP4Hlua?=
- =?us-ascii?Q?TIbpnZpbNEo2Xa+fmWax5j0YVeRtBB2o5m/bUSQ7ap8hG+pDyXds7PN1HGV9?=
- =?us-ascii?Q?xlzCrYR8mMHPlksaxPE4BFcrjVqDIIW9DIoQ1Shosor/lIDZSqLdYIrNK1AL?=
- =?us-ascii?Q?CSaZBgE+CdEkBMNjGJ+UE5iBfU1kiDsJi38nNMl+S/pPL9eeiUqleYKUkI+I?=
- =?us-ascii?Q?9C0QE6C4c9HURNm4dTpbpWYxWEBbdIR7Djp+eyfvrW0/xY4+f4FV/JLickgZ?=
- =?us-ascii?Q?xG8a+KXvceWi3nNUuB+716E7HVCzS2EFjznzantkFrSwAOmhQBGrBbJaYBDg?=
- =?us-ascii?Q?Anu6WT4QXMqA4sNjHdZuUFjvEFskDqy+60YHNY0jip/cbN7oCHTcmwCvlD2Y?=
- =?us-ascii?Q?o989yanN7ivJKBKpwy/K8KZWboedrXy9ekq5KSZCrmWsusZqzgPKPeTegV2N?=
- =?us-ascii?Q?tlAXP+CU9Mqcwczn0lvweHphywD/9kXiPL7a4nP6OlwlUV8buPrZ5jCoYOMe?=
- =?us-ascii?Q?vW3xqrtatVtRqZERFTQrF0t+HOpbdD6vzWg9MgY2/CbF5t9osM43L7kHKYmn?=
- =?us-ascii?Q?PNnpOwl6ex1x7cNGkvbHOQf/gqV5pZVgZiWZEPf6U14b79x4NVS+5xrTXveG?=
- =?us-ascii?Q?EHkQO/LN22uX4VXk/Ds0R+USkzM57bUcUHq1jZVDcTVQ7g12pawxBMHfid2I?=
- =?us-ascii?Q?8v+j+/8S9Z7WdMVCrFPB2A2YS7LAs+T25XHds4gOzyPAPIAyXSKOrA0f5uXJ?=
- =?us-ascii?Q?u462KJxrU4UvNqYANIjexVMfe6R+PUi8L6zbDE1/Ecjrg0KQeaCiCFBdSMEI?=
- =?us-ascii?Q?cG4nSHeaePqy14dJJcu6Z2ImYkbdBtmJgl0C9Oxu?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9dfa95f0-763b-4a1a-f530-08dc11a0634e
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4839.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2024 05:52:53.9413
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB5490.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cac48e4c-b4dc-42dd-d40d-08dc11a035f7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jan 2024 05:51:37.7347
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QMQ6MYGugQR/ZDOewSlucsXKg+oOx1r+XmepAOlp5/qWIN6N4vDsLi8ec3Se5N8+rE91PIYrPeheOX0DXEtfBA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6127
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dtMzcxIj0fDx8VJrcBZDvj7WZNNtaUNBXx0TxPR0p8n1t3w8JrX2bVxp27YoY42zszd2xCialA4Pbj2df6a3vDPEOXSqzywcy1JChiUcfJE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5239
 X-OriginatorOrg: intel.com
 
-On 2024-01-10 at 13:19:49 +0800, Edward Adam Davis wrote:
-> On Wed, 10 Jan 2024 12:40:41 +0800, Pengfei Xu wrote:
-> > > Hi Linus, Edward,
-> > >
-> > > Here's Linus's patch dressed up with a commit message.  I would marginally
-> > > prefer just to insert the missing size check, but I'm also fine with Linus's
-> > > approach for now until we have different content types or newer versions.
-> > >
-> > > Note that I'm not sure whether I should require Linus's S-o-b since he made
-> > > modifications or whether I should use a Codeveloped-by line for him.
-> > >
-> > > David
-> > > ---
-> > > From: Edward Adam Davis <eadavis@qq.com>
-> > >
-> > > keys, dns: Fix missing size check of V1 server-list header
-> > >
-> > > The dns_resolver_preparse() function has a check on the size of the payload
-> > > for the basic header of the binary-style payload, but is missing a check
-> > > for the size of the V1 server-list payload header after determining that's
-> > > what we've been given.
-> > >
-> > > Fix this by getting rid of the the pointer to the basic header and just
-> > > assuming that we have a V1 server-list payload and moving the V1 server
-> > > list pointer inside the if-statement.  Dealing with other types and
-> > > versions can be left for when such have been defined.
-> > >
-> > > This can be tested by doing the following with KASAN enabled:
-> > >
-> > >         echo -n -e '\x0\x0\x1\x2' | keyctl padd dns_resolver foo @p
-> > >
-> > > and produces an oops like the following:
-> > >
-> > >         BUG: KASAN: slab-out-of-bounds in dns_resolver_preparse+0xc9f/0xd60 net/dns_resolver/dns_key.c:127
-> > >         Read of size 1 at addr ffff888028894084 by task syz-executor265/5069
-> > >         ...
-> > >         Call Trace:
-> > >          <TASK>
-> > >          __dump_stack lib/dump_stack.c:88 [inline]
-> > >          dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
-> > >          print_address_description mm/kasan/report.c:377 [inline]
-> > >          print_report+0xc3/0x620 mm/kasan/report.c:488
-> > >          kasan_report+0xd9/0x110 mm/kasan/report.c:601
-> > >          dns_resolver_preparse+0xc9f/0xd60 net/dns_resolver/dns_key.c:127
-> > >          __key_create_or_update+0x453/0xdf0 security/keys/key.c:842
-> > >          key_create_or_update+0x42/0x50 security/keys/key.c:1007
-> > >          __do_sys_add_key+0x29c/0x450 security/keys/keyctl.c:134
-> > >          do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> > >          do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
-> > >          entry_SYSCALL_64_after_hwframe+0x62/0x6a
-> > >
-> > > This patch was originally by Edward Adam Davis, but was modified by Linus.
-> > >
-> > > Fixes: b946001d3bb1 ("keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry")
-> > > Reported-and-tested-by: syzbot+94bbb75204a05da3d89f@syzkaller.appspotmail.com
-> > > Link: https://lore.kernel.org/r/0000000000009b39bc060c73e209@google.com/
-> > > Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-> > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> > > Signed-off-by: David Howells <dhowells@redhat.com>
-> > > Tested-by: David Howells <dhowells@redhat.com>
-> > > cc: Edward Adam Davis <eadavis@qq.com>
-> > > cc: Simon Horman <horms@kernel.org>
-> > > cc: Linus Torvalds <torvalds@linux-foundation.org>
-> > > cc: Jarkko Sakkinen <jarkko@kernel.org>
-> > > cc: Jeffrey E Altman <jaltman@auristor.com>
-> > > cc: Wang Lei <wang840925@gmail.com>
-> > > cc: Jeff Layton <jlayton@redhat.com>
-> > > cc: Steve French <sfrench@us.ibm.com>
-> > > cc: Marc Dionne <marc.dionne@auristor.com>
-> > > cc: "David S. Miller" <davem@davemloft.net>
-> > > cc: Eric Dumazet <edumazet@google.com>
-> > > cc: Jakub Kicinski <kuba@kernel.org>
-> > > cc: Paolo Abeni <pabeni@redhat.com>
-> > > cc: linux-afs@lists.infradead.org
-> > > cc: linux-cifs@vger.kernel.org
-> > > cc: linux-nfs@vger.kernel.org
-> > > cc: ceph-devel@vger.kernel.org
-> > > cc: keyrings@vger.kernel.org
-> > > cc: netdev@vger.kernel.org
-> > > ---
-> > >  net/dns_resolver/dns_key.c |   19 +++++++++----------
-> > >  1 file changed, 9 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-> > > index 2a6d363763a2..f18ca02aa95a 100644
-> > > --- a/net/dns_resolver/dns_key.c
-> > > +++ b/net/dns_resolver/dns_key.c
-> > > @@ -91,8 +91,6 @@ const struct cred *dns_resolver_cache;
-> > >  static int
-> > >  dns_resolver_preparse(struct key_preparsed_payload *prep)
-> > >  {
-> > > -	const struct dns_server_list_v1_header *v1;
-> > > -	const struct dns_payload_header *bin;
-> > >  	struct user_key_payload *upayload;
-> > >  	unsigned long derrno;
-> > >  	int ret;
-> > > @@ -103,27 +101,28 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
-> > >  		return -EINVAL;
-> > >
-> > >  	if (data[0] == 0) {
-> > > +		const struct dns_server_list_v1_header *v1;
-> > > +
-> > >  		/* It may be a server list. */
-> > > -		if (datalen <= sizeof(*bin))
-> > > +		if (datalen <= sizeof(*v1))
-> > >  			return -EINVAL;
-> > >
-> > > -		bin = (const struct dns_payload_header *)data;
-> > > -		kenter("[%u,%u],%u", bin->content, bin->version, datalen);
-> > > -		if (bin->content != DNS_PAYLOAD_IS_SERVER_LIST) {
-> > > +		v1 = (const struct dns_server_list_v1_header *)data;
-> > > +		kenter("[%u,%u],%u", v1->hdr.content, v1->hdr.version, datalen);
-> > > +		if (v1->hdr.content != DNS_PAYLOAD_IS_SERVER_LIST) {
-> > >  			pr_warn_ratelimited(
-> > >  				"dns_resolver: Unsupported content type (%u)\n",
-> > > -				bin->content);
-> > > +				v1->hdr.content);
-> > >  			return -EINVAL;
-> > >  		}
-> > >
-> > > -		if (bin->version != 1) {
-> > > +		if (v1->hdr.version != 1) {
-> > >  			pr_warn_ratelimited(
-> > >  				"dns_resolver: Unsupported server list version (%u)\n",
-> > > -				bin->version);
-> > > +				v1->hdr.version);
-> > >  			return -EINVAL;
-> > >  		}
-> > >
-> > > -		v1 = (const struct dns_server_list_v1_header *)bin;
-> > >  		if ((v1->status != DNS_LOOKUP_GOOD &&
-> > >  		     v1->status != DNS_LOOKUP_GOOD_WITH_BAD)) {
-> > >  			if (prep->expiry == TIME64_MAX)
-> > >
-> > 
-> > Hi Edward and kernel experts,
-> > 
-> >   Above patch(upstream commit: 1997b3cb4217b09) seems causing a keyctl05 case
-> > to fail in LTP:
-> > https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/syscalls/keyctl/keyctl05.c
-> > 
-> > It could be reproduced on a bare metal platform.
-> > Kconfig: https://raw.githubusercontent.com/xupengfe/kconfig_diff/main/config_v6.7-rc8
-> > Seems general kconfig could reproduce this issue.
-> > 
-> >   Bisected info between v6.7-rc7(keyctl05 passed) and v6.7-rc8(keyctl05 failed)
-> > is in attached.
-> > 
-> > keyctl05 failed in add_key with type "dns_resolver" syscall step tracked
-> > by strace:
-> > "
-> > [pid 863107] add_key("dns_resolver", "desc", "\0\0\1\377\0", 5, KEY_SPEC_SESSION_KEYRING <unfinished ...>
-> > [pid 863106] <... alarm resumed>)       = 30
-> > [pid 863107] <... add_key resumed>)     = -1 EINVAL (Invalid argument)
-> The reason for the failure of add_key() is that the length of the incoming data
-> is 5, which is less than sizeof(*v1), so keyctl05.c failed.
-> Suggest modifying keyctl05.c to increase the length of the incoming data to 6 
-> bytes or more.
+> -----Original Message-----
+> From: Serge Semin <fancer.lancer@gmail.com>
+> Sent: Monday, January 8, 2024 4:28 AM
+> To: Swee, Leong Ching <leong.ching.swee@intel.com>
+> Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>; Alexandre Torgue
+> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
+> David S . Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Rob Herring <robh+dt@kernel.org>; Krzysztof
+> Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Conor Dooley
+> <conor+dt@kernel.org>; Giuseppe Cavallaro <peppe.cavallaro@st.com>;
+> linux-stm32@st-md-mailman.stormreply.com; linux-arm-
+> kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
+> netdev@vger.kernel.org; devicetree@vger.kernel.org; Teoh Ji Sheng
+> <ji.sheng.teoh@intel.com>
+> Subject: Re: [PATCH net-next v2 2/4] net: stmmac: Make MSI interrupt
+> routine generic
+>=20
+> On Fri, Jan 05, 2024 at 03:09:23PM +0800, Leong Ching Swee wrote:
+> > From: Swee Leong Ching <leong.ching.swee@intel.com>
+> >
+> > There is no support for per DMA channel interrupt for non-MSI
+> > platform, where the MAC's per channel interrupt hooks up to interrupt
+> > controller(GIC) through shared peripheral interrupt(SPI) to handle
+> > interrupt from TX/RX transmit channel.
+> >
+> > This patch generalize the existing MSI ISR to also support non-MSI
+> > platform.
+>=20
+> Basically this patch just fixes the individual IRQ handling code names.
+>
+Will change the commit log to below, please check if it sounds ok?
+net: stmmac: Fixes individual IRQ handling code names
 
-Thanks for your suggestion!
-dns_server_list_v1_header struct is 6 u8 data instead of previous bin.
-
-After increased the dns_res_payload to 7 bytes(6 bytes was still failed),
-keyctl05 could be passed.
-"
-static char dns_res_payload[] = { 0x00, 0x00, 0x01, 0xff, 0x00, 0x00, 0x00 };
-"
-
-I will improve the case in LTP.
-
-Thanks!
-
-> > "
-> > 
-> > Passed behavior in v6.7-rc7 kernel:
-> > "
-> > [pid  6726] add_key("dns_resolver", "desc", "\0\0\1\377\0", 5, KEY_SPEC_SESSION_KEYRING <unfinished ...>
-> > [pid  6725] rt_sigreturn({mask=[]})     = 61
-> > [pid  6726] <... add_key resumed>)      = 1029222644
-> > "
-> > 
-> > Do you mind to take a look for above issue?
-> Edward,
-> BR
-> 
+Individual IRQ can also be used for non-MSI platform,=20
+today some of the code name for individual IRQ has
+msi naming, so change msi naming to irq to make it common
+for both platforms.
+=20
+> >
+> > Signed-off-by: Teoh Ji Sheng <ji.sheng.teoh@intel.com>
+> > Signed-off-by: Swee Leong Ching <leong.ching.swee@intel.com>
+> > ---
+> >  .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  4 +--
+> >  .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  3 ++
+> >  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  2 +-
+> > .../net/ethernet/stmicro/stmmac/stmmac_main.c | 30 +++++++++----------
+> >  include/linux/stmmac.h                        |  4 +--
+> >  5 files changed, 23 insertions(+), 20 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> > b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> > index 60283543ffc8..f0ec69af96c9 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> > @@ -952,7 +952,7 @@ static int stmmac_config_single_msi(struct pci_dev
+> > *pdev,
+> >
+> >  	res->irq =3D pci_irq_vector(pdev, 0);
+> >  	res->wol_irq =3D res->irq;
+> > -	plat->flags &=3D ~STMMAC_FLAG_MULTI_MSI_EN;
+> > +	plat->flags &=3D ~STMMAC_FLAG_MULTI_IRQ_EN;
+> >  	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
+> >  		 __func__);
+> >
+> > @@ -1004,7 +1004,7 @@ static int stmmac_config_multi_msi(struct
+> pci_dev *pdev,
+> >  	if (plat->msi_sfty_ue_vec < STMMAC_MSI_VEC_MAX)
+> >  		res->sfty_ue_irq =3D pci_irq_vector(pdev, plat-
+> >msi_sfty_ue_vec);
+> >
+> > -	plat->flags |=3D STMMAC_FLAG_MULTI_MSI_EN;
+> > +	plat->flags |=3D STMMAC_FLAG_MULTI_IRQ_EN;
+> >  	dev_info(&pdev->dev, "%s: multi MSI enablement successful\n",
+> > __func__);
+> >
+> >  	return 0;
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> > b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> > index ba2ce776bd4d..cf43fb3c6cc5 100644
+>=20
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> > @@ -427,6 +427,9 @@ static int socfpga_dwmac_probe(struct
+> platform_device *pdev)
+> >  	plat_dat->bsp_priv =3D dwmac;
+> >  	plat_dat->fix_mac_speed =3D socfpga_dwmac_fix_mac_speed;
+> >
+> > +	if (stmmac_res.rx_irq[0] > 0 && stmmac_res.tx_irq[0] > 0)
+> > +		plat_dat->flags |=3D STMMAC_FLAG_MULTI_IRQ_EN;
+> > +
+> >  	ret =3D stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+> >  	if (ret)
+> >  		return ret;
+>=20
+> This is unrelated change. It adds the individual DMA IRQs support for the=
+ SoC
+> FPGA platform, which AFAICS doesn't have it supported at the moment.
+> Please move this into a separate patch with the commit log describing the
+> change.
+>=20
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> > b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> > index 84d3a8551b03..5f649106ffcd 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+> > @@ -175,7 +175,7 @@ static void dwmac4_dma_init(void __iomem
+> *ioaddr,
+> >
+> >  	value =3D readl(ioaddr + DMA_BUS_MODE);
+> >
+> > -	if (dma_cfg->multi_msi_en) {
+> > +	if (dma_cfg->multi_irq_en) {
+> >  		value &=3D ~DMA_BUS_MODE_INTM_MASK;
+> >  		value |=3D (DMA_BUS_MODE_INTM_MODE1 <<
+> DMA_BUS_MODE_INTM_SHIFT);
+> >  	}
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index 47de466e432c..57873b879b33 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -129,8 +129,8 @@ static irqreturn_t stmmac_interrupt(int irq, void
+> > *dev_id);
+> >  /* For MSI interrupts handling */
+> >  static irqreturn_t stmmac_mac_interrupt(int irq, void *dev_id);
+> > static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id);
+> > -static irqreturn_t stmmac_msi_intr_tx(int irq, void *data); -static
+> > irqreturn_t stmmac_msi_intr_rx(int irq, void *data);
+> > +static irqreturn_t stmmac_dma_tx_interrupt(int irq, void *data);
+> > +static irqreturn_t stmmac_dma_rx_interrupt(int irq, void *data);
+> >  static void stmmac_reset_rx_queue(struct stmmac_priv *priv, u32
+> > queue);  static void stmmac_reset_tx_queue(struct stmmac_priv *priv,
+> > u32 queue);  static void stmmac_reset_queues_param(struct stmmac_priv
+> > *priv); @@ -3602,7 +3602,7 @@ static void stmmac_free_irq(struct
+> net_device *dev,
+> >  	}
+> >  }
+> >
+> > -static int stmmac_request_irq_multi_msi(struct net_device *dev)
+> > +static int stmmac_request_irq_multi(struct net_device *dev)
+> >  {
+> >  	struct stmmac_priv *priv =3D netdev_priv(dev);
+> >  	enum request_irq_err irq_err;
+> > @@ -3697,7 +3697,7 @@ static int stmmac_request_irq_multi_msi(struct
+> net_device *dev)
+> >  		}
+> >  	}
+> >
+> > -	/* Request Rx MSI irq */
+>=20
+> > +	/* Request Rx irq */
+>=20
+> s/irq/IRQ
+> (capitalize)
+Sure, rework on v3.=20
+>=20
+> >  	for (i =3D 0; i < priv->plat->rx_queues_to_use; i++) {
+> >  		if (i >=3D MTL_MAX_RX_QUEUES)
+> >  			break;
+> > @@ -3707,11 +3707,11 @@ static int stmmac_request_irq_multi_msi(struct
+> net_device *dev)
+> >  		int_name =3D priv->int_name_rx_irq[i];
+> >  		sprintf(int_name, "%s:%s-%d", dev->name, "rx", i);
+> >  		ret =3D request_irq(priv->rx_irq[i],
+> > -				  stmmac_msi_intr_rx,
+> > +				  stmmac_dma_rx_interrupt,
+> >  				  0, int_name, &priv-
+> >dma_conf.rx_queue[i]);
+> >  		if (unlikely(ret < 0)) {
+> >  			netdev_err(priv->dev,
+> > -				   "%s: alloc rx-%d  MSI %d (error: %d)\n",
+>=20
+> > +				   "%s: alloc rx-%d  dma rx_irq %d (error:
+> %d)\n",
+>=20
+> s/ dma/DMA
+> (capitalize and drop extra space)
+>=20
+Thanks, rework on v3.
+> >  				   __func__, i, priv->rx_irq[i], ret);
+> >  			irq_err =3D REQ_IRQ_ERR_RX;
+> >  			irq_idx =3D i;
+> > @@ -3722,7 +3722,7 @@ static int stmmac_request_irq_multi_msi(struct
+> net_device *dev)
+> >  		irq_set_affinity_hint(priv->rx_irq[i], &cpu_mask);
+> >  	}
+> >
+> > -	/* Request Tx MSI irq */
+>=20
+> > +	/* Request Tx irq */
+>=20
+> s/irq/IRQ
+>=20
+rework on v3.
+> >  	for (i =3D 0; i < priv->plat->tx_queues_to_use; i++) {
+> >  		if (i >=3D MTL_MAX_TX_QUEUES)
+> >  			break;
+> > @@ -3732,11 +3732,11 @@ static int stmmac_request_irq_multi_msi(struct
+> net_device *dev)
+> >  		int_name =3D priv->int_name_tx_irq[i];
+> >  		sprintf(int_name, "%s:%s-%d", dev->name, "tx", i);
+> >  		ret =3D request_irq(priv->tx_irq[i],
+> > -				  stmmac_msi_intr_tx,
+> > +				  stmmac_dma_tx_interrupt,
+> >  				  0, int_name, &priv-
+> >dma_conf.tx_queue[i]);
+> >  		if (unlikely(ret < 0)) {
+> >  			netdev_err(priv->dev,
+> > -				   "%s: alloc tx-%d  MSI %d (error: %d)\n",
+>=20
+> > +				   "%s: alloc tx-%d  dma tx_irq %d (error:
+> %d)\n",
+>=20
+> s/ dma/DMA
+>=20
+> -Serge(y)
+>=20
+rework on v3.
+> >  				   __func__, i, priv->tx_irq[i], ret);
+> >  			irq_err =3D REQ_IRQ_ERR_TX;
+> >  			irq_idx =3D i;
+> > @@ -3811,8 +3811,8 @@ static int stmmac_request_irq(struct net_device
+> *dev)
+> >  	int ret;
+> >
+> >  	/* Request the IRQ lines */
+> > -	if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN)
+> > -		ret =3D stmmac_request_irq_multi_msi(dev);
+> > +	if (priv->plat->flags & STMMAC_FLAG_MULTI_IRQ_EN)
+> > +		ret =3D stmmac_request_irq_multi(dev);
+> >  	else
+> >  		ret =3D stmmac_request_irq_single(dev);
+> >
+> > @@ -6075,7 +6075,7 @@ static irqreturn_t stmmac_safety_interrupt(int
+> irq, void *dev_id)
+> >  	return IRQ_HANDLED;
+> >  }
+> >
+> > -static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
+> > +static irqreturn_t stmmac_dma_tx_interrupt(int irq, void *data)
+> >  {
+> >  	struct stmmac_tx_queue *tx_q =3D (struct stmmac_tx_queue *)data;
+> >  	struct stmmac_dma_conf *dma_conf;
+> > @@ -6107,7 +6107,7 @@ static irqreturn_t stmmac_msi_intr_tx(int irq,
+> void *data)
+> >  	return IRQ_HANDLED;
+> >  }
+> >
+> > -static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
+> > +static irqreturn_t stmmac_dma_rx_interrupt(int irq, void *data)
+> >  {
+> >  	struct stmmac_rx_queue *rx_q =3D (struct stmmac_rx_queue *)data;
+> >  	struct stmmac_dma_conf *dma_conf;
+> > @@ -7456,8 +7456,8 @@ int stmmac_dvr_probe(struct device *device,
+> >  	priv->plat =3D plat_dat;
+> >  	priv->ioaddr =3D res->addr;
+> >  	priv->dev->base_addr =3D (unsigned long)res->addr;
+> > -	priv->plat->dma_cfg->multi_msi_en =3D
+> > -		(priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN);
+> > +	priv->plat->dma_cfg->multi_irq_en =3D
+> > +		(priv->plat->flags & STMMAC_FLAG_MULTI_IRQ_EN);
+> >
+> >  	priv->dev->irq =3D res->irq;
+> >  	priv->wol_irq =3D res->wol_irq;
+> > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h index
+> > dee5ad6e48c5..b950e6f9761d 100644
+> > --- a/include/linux/stmmac.h
+> > +++ b/include/linux/stmmac.h
+> > @@ -98,7 +98,7 @@ struct stmmac_dma_cfg {
+> >  	int mixed_burst;
+> >  	bool aal;
+> >  	bool eame;
+> > -	bool multi_msi_en;
+> > +	bool multi_irq_en;
+> >  	bool dche;
+> >  };
+> >
+> > @@ -215,7 +215,7 @@ struct dwmac4_addrs {
+> >  #define STMMAC_FLAG_TSO_EN			BIT(4)
+> >  #define STMMAC_FLAG_SERDES_UP_AFTER_PHY_LINKUP	BIT(5)
+> >  #define STMMAC_FLAG_VLAN_FAIL_Q_EN		BIT(6)
+> > -#define STMMAC_FLAG_MULTI_MSI_EN		BIT(7)
+> > +#define STMMAC_FLAG_MULTI_IRQ_EN		BIT(7)
+> >  #define STMMAC_FLAG_EXT_SNAPSHOT_EN		BIT(8)
+> >  #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
+> >  #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+> > --
+> > 2.34.1
+> >
+> >
 
