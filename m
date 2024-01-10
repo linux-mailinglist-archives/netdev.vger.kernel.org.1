@@ -1,220 +1,100 @@
-Return-Path: <netdev+bounces-62811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FF318295E3
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 10:09:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB4D82961E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 10:19:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56546B24F6C
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 09:09:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD8441C21A91
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 09:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1765C3C067;
-	Wed, 10 Jan 2024 09:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="DP3RQn8U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FA53DBB9;
+	Wed, 10 Jan 2024 09:19:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967193B780;
-	Wed, 10 Jan 2024 09:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 3E43220B3CC1; Wed, 10 Jan 2024 01:09:31 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3E43220B3CC1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1704877771;
-	bh=Qpi7R7m3O+gdQIXeh5+h30ohlFKpfJGH9jVSMmph+NQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DP3RQn8UQ6QZwWzhzOHllflTcYyMB1LSjXmplQT+aEN1cYfPiXn0GbmCDSB/Qzwyo
-	 h81vxTkaCx/tFW7un6bYYzBi5vrh55NIcr2RyQ7b8ktsL4+9g0TmmQn9TXQZ8WH8Ld
-	 iPikSa8PwX53ln3Z/nHE/aewUoXaLoXQRsmYls98=
-Date: Wed, 10 Jan 2024 01:09:31 -0800
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: Michael Kelley <mhklinux@outlook.com>,
-	"kys@microsoft.com" <kys@microsoft.com>,
-	"haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"decui@microsoft.com" <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"longli@microsoft.com" <longli@microsoft.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"schakrabarti@microsoft.com" <schakrabarti@microsoft.com>,
-	"paulros@microsoft.com" <paulros@microsoft.com>
-Subject: Re: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs
- per CPUs
-Message-ID: <20240110090931.GB5436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1704797478-32377-1-git-send-email-schakrabarti@linux.microsoft.com>
- <1704797478-32377-4-git-send-email-schakrabarti@linux.microsoft.com>
- <SN6PR02MB4157CB3CB55A17255AE61BF6D46A2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <ZZ3Wsxq8rHShTUdA@yury-ThinkPad>
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6123EA6D;
+	Wed, 10 Jan 2024 09:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a2a1a584e8bso387532266b.1;
+        Wed, 10 Jan 2024 01:19:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704878350; x=1705483150;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d54gLTRIUhxQmAyd3Y0D+5lpnbD9pU1y8y4VXzOVS+I=;
+        b=etbj9V6H6Y5smMl1rryfFQhGw2xKBjya2Tu1h/DDCp0+uLU9RDU2dhtGp1zMkpuuNL
+         rFICrmgd8phKfB7bzyJ9VyOuTHYcrXzpTVgC4AFzx0OE5QCWZfWQ9jcXBnpEWxSjBCFf
+         TsxaJUAv0+eyvfrr44dMCLsoxOz8+VQ8M0hdjo6VJ/ff+KOfOYttZfl9AjDp0SAEZe3H
+         bZgc0pN+n1WJ4IWf0n2kS/owTgKRe0b4Y8+7W8UKnvbIglnOEwAPFSCLsIL1+sgjZfkd
+         0EIFWvIxZdTPZot8hszr01U/0a47/FYZ27lVFBXadjAUjloFJwMMgs8WGwbIcSjYeJQu
+         OtGQ==
+X-Gm-Message-State: AOJu0Yxt0SllZwg8iF1MBEe6xeiGCeaReBsIMKJOsvatvbrQQFmRw4T+
+	0MDig2sauedIPNdSESNE2/g=
+X-Google-Smtp-Source: AGHT+IEzsF8UjIovugDbKuXSrbkdmWWxQOLjiU1IVWHL5k0JilfiUilfpm6ulNaIWqvJIXUXctTuLw==
+X-Received: by 2002:a17:907:96a2:b0:a23:49d9:7e9e with SMTP id hd34-20020a17090796a200b00a2349d97e9emr451172ejc.12.1704878349869;
+        Wed, 10 Jan 2024 01:19:09 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-020.fbsv.net. [2a03:2880:31ff:14::face:b00c])
+        by smtp.gmail.com with ESMTPSA id mf25-20020a170906cb9900b00a28fa7838a1sm1924229ejb.172.2024.01.10.01.19.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jan 2024 01:19:09 -0800 (PST)
+Date: Wed, 10 Jan 2024 01:19:07 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Alexander Aring <alex.aring@gmail.com>,
+	netdev@vger.kernel.org,
+	"open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)" <linux-bluetooth@vger.kernel.org>,
+	"open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)" <linux-wpan@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 07/10] net: fill in MODULE_DESCRIPTION()s for
+ 6LoWPAN
+Message-ID: <ZZ5hC5SGiUIEZPdm@gmail.com>
+References: <20240108181610.2697017-1-leitao@debian.org>
+ <20240108181610.2697017-8-leitao@debian.org>
+ <CAK-6q+jy-0+bZRUKhRsB2RMtpJ=Sw1A5qHk+rpnYaOzV8WFD5A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZZ3Wsxq8rHShTUdA@yury-ThinkPad>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK-6q+jy-0+bZRUKhRsB2RMtpJ=Sw1A5qHk+rpnYaOzV8WFD5A@mail.gmail.com>
 
-On Tue, Jan 09, 2024 at 03:28:59PM -0800, Yury Norov wrote:
-> Hi Michael,
+On Tue, Jan 09, 2024 at 08:04:47PM -0500, Alexander Aring wrote:
+> Hi,
 > 
-> So, I'm just a guy who helped to formulate the heuristics in an
-> itemized form, and implement them using the existing kernel API.
-> I have no access to MANA machines and I ran no performance tests
-> myself.
+> On Mon, Jan 8, 2024 at 1:21 PM Breno Leitao <leitao@debian.org> wrote:
+> >
+> > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> > Add descriptions to IPv6 over Low power Wireless Personal Area Network.
+> >
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  net/6lowpan/core.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> > index 7b3341cef926..80d83151ef29 100644
+> > --- a/net/6lowpan/core.c
+> > +++ b/net/6lowpan/core.c
+> > @@ -178,5 +178,5 @@ static void __exit lowpan_module_exit(void)
+> >
+> >  module_init(lowpan_module_init);
+> >  module_exit(lowpan_module_exit);
+> > -
+> > +MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network module");
 > 
-> On Tue, Jan 09, 2024 at 07:22:38PM +0000, Michael Kelley wrote:
-> > From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com> Sent: Tuesday, January 9, 2024 2:51 AM
-> > > 
-> > > From: Yury Norov <yury.norov@gmail.com>
-> > > 
-> > > Souradeep investigated that the driver performs faster if IRQs are
-> > > spread on CPUs with the following heuristics:
-> > > 
-> > > 1. No more than one IRQ per CPU, if possible;
-> > > 2. NUMA locality is the second priority;
-> > > 3. Sibling dislocality is the last priority.
-> > > 
-> > > Let's consider this topology:
-> > > 
-> > > Node            0               1
-> > > Core        0       1       2       3
-> > > CPU       0   1   2   3   4   5   6   7
-> > > 
-> > > The most performant IRQ distribution based on the above topology
-> > > and heuristics may look like this:
-> > > 
-> > > IRQ     Nodes   Cores   CPUs
-> > > 0       1       0       0-1
-> > > 1       1       1       2-3
-> > > 2       1       0       0-1
-> > > 3       1       1       2-3
-> > > 4       2       2       4-5
-> > > 5       2       3       6-7
-> > > 6       2       2       4-5
-> > > 7       2       3       6-7
-> > 
-> > I didn't pay attention to the detailed discussion of this issue
-> > over the past 2 to 3 weeks during the holidays in the U.S., but
-> > the above doesn't align with the original problem as I understood
-> > it.  I thought the original problem was to avoid putting IRQs on
-> > both hyper-threads in the same core, and that the perf
-> > improvements are based on that configuration.  At least that's
-> > what the commit message for Patch 4/4 in this series says.
-> 
-> Yes, and the original distribution suggested by Souradeep looks very
-> similar:
-> 
->   IRQ     Nodes   Cores   CPUs
->   0       1       0       0
->   1       1       1       2
->   2       1       0       1
->   3       1       1       3
->   4       2       2       4
->   5       2       3       6
->   6       2       2       5
->   7       2       3       7
-> 
-> I just added a bit more flexibility, so that kernel may pick any
-> sibling for the IRQ. As I understand, both approaches have similar
-> performance. Probably my fine-tune added another half-percent...
-> 
-> Souradeep, can you please share the exact numbers on this?
-> 
-> > The above chart results in 8 IRQs being assigned to the 8 CPUs,
-> > probably with 1 IRQ per CPU.   At least on x86, if the affinity
-> > mask for an IRQ contains multiple CPUs, matrix_find_best_cpu()
-> > should balance the IRQ assignments between the CPUs in the mask.
-> > So the original problem is still present because both hyper-threads
-> > in a core are likely to have an IRQ assigned.
-> 
-> That's what I think, if the topology makes us to put IRQs in the
-> same sibling group, the best thing we can to is to rely on existing
-> balancing mechanisms in a hope that they will do their job well.
-> 
-> > Of course, this example has 8 IRQs and 8 CPUs, so assigning an
-> > IRQ to every hyper-thread may be the only choice.  If that's the
-> > case, maybe this just isn't a good example to illustrate the
-> > original problem and solution.
-> 
-> Yeah... This example illustrates the order of IRQ distribution.
-> I really doubt that if we distribute IRQs like in the above example,
-> there would be any difference in performance. But I think it's quite
-> a good illustration. I could write the title for the table like this:
-> 
->         The order of IRQ distribution for the best performance
->         based on [...] may look like this.
-> 
-> > But even with a better example
-> > where the # of IRQs is <= half the # of CPUs in a NUMA node,
-> > I don't think the code below accomplishes the original intent.
-> > 
-> > Maybe I've missed something along the way in getting to this
-> > version of the patch.  Please feel free to set me straight. :-)
-> 
-> Hmm. So if the number of IRQs is the half # of CPUs in the nodes,
-> which is 2 in the example above, the distribution will look like
-> this:
-> 
->   IRQ     Nodes   Cores   CPUs
->   0       1       0       0-1
->   1       1       1       2-3
-> 
-> And each IRQ belongs to a different sibling group. This follows
-> the rules above.
-> 
-> I think of it like we assign an IRQ to a group of 2 CPUs, so from
-> the heuristic #1 perspective, each CPU is assigned with 1/2 of the
-> IRQ.
-> 
-> If I add one more IRQ, then according to the heuristics, NUMA locality
-> trumps sibling dislocality, so we'd assign IRO to the same node on any
-> core. My algorithm assigns it to the core #0:
-> 
->   2       1       0       0-1
-> 
-> This doubles # of IRQs for the CPUs 0 and 1: from 1/2 to 1.
-> 
-> The next IRQ should be assigned to the same node again, and we've got
-> the only choice:
-> 
-> 
->   3       1       1       2-3
-> 
-> Starting from IRQ #5, the node #1 is full - each CPU is assigned with
-> exactly one IRQ, and the heuristic #1 makes us to switch to the other
-> node; and then do the same thing:
-> 
->   4       2       2       4-5
->   5       2       3       6-7
->   6       2       2       4-5
->   7       2       3       6-7
-> 
-> So I think the algorithm is correct... Really hope the above makes
-> sense. :) If so, I can add it to the commit message for patch #3.
-> 
-> Nevertheless... Souradeep, in addition to the performance numbers, can
-> you share your topology and actual IRQ distribution that gains 15%? I
-> think it should be added to the patch #4 commit message.
-Sure I will add my topology in #4 commit message. Thanks for the suggestion.
-> 
-> Thanks,
-> Yury
+> Here is a nitpick as well. The correct acronym [0] is "IPv6 over
+> Low-Power Wireless Personal Area Network", otherwise it is okay.
+
+Thanks. I will update.
 
