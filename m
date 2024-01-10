@@ -1,158 +1,174 @@
-Return-Path: <netdev+bounces-62931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D5C6829EA7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 17:32:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC6C0829EAD
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 17:36:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D77286FF2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 16:32:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55FC61F250E1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 16:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6033A4CDEC;
-	Wed, 10 Jan 2024 16:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E258B4CE11;
+	Wed, 10 Jan 2024 16:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ul80SHaO"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="A3ZJ7n8N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2080.outbound.protection.outlook.com [40.107.21.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BDD433C0
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 16:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-55642663ac4so4948280a12.1
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 08:32:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704904358; x=1705509158; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qw6sqCsRLXOTZBxcH2QDjDIvOAhestSnQEBPI9xVsMU=;
-        b=ul80SHaOA9BEWpK3//kZVGh8z97V4xwiCIwueuLt/httZbtCgIqtZkfSk1yO1qNXt5
-         ACv1LaqhuFN69sUyt9WIfVlACHuE5pCHPuFvULS9C75ub7NwWbMpF5Kp5MEeMtFE3s52
-         r9Pdin1oTRH0fmwFsk8cvF0WQ7E0iptXNkU9KEo3hute75d7SnGyjiqV3IBJWkZcLSlA
-         HOVZDZA3H4jND8r5hqyVem2i/5F7iGEBhtChk8WOY7VM3TMx1OBlEpHEAis/64HrPjld
-         gGB93K/WCitXTP4BOwesIWT3EVYbngoei1ZbdI1mTfX59OByD2Igy/3HtPERAiqCfXQ2
-         NOkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704904358; x=1705509158;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qw6sqCsRLXOTZBxcH2QDjDIvOAhestSnQEBPI9xVsMU=;
-        b=cc3hvLucU6WRmRBRVvSu8PbZeIJbwSs43fgOH5LtRawIuOnXVBs91A2uEbZTh736Fs
-         Wi1s8oQEnrrvNfKzOwAzl3WCgrrNzhnd5Px/+58NBUKhw4KwZRHTm0KD45AH/g/AvbEJ
-         Ic/w0O2HhMfRc4wcDnDEu2sVtwre6C1KlTz/HQ4Do4eTto3574JUwi2mVTaIDMU/BTkL
-         iCRdM4KlwMr1l/droFM/Hcs9UQ4jyRQ+K51uajeGk3klvEAFoLBjNRUQ85TPYuTr7jCl
-         XXkkvOQYGZthauf1gv4pXCl32hkunFB55AW87fHZm8H+uMoIl2P0Wru83lMNYNRmV4lp
-         RJUg==
-X-Gm-Message-State: AOJu0Yylp1PWLMD7Rk3b2FSp/ODN+iKSnehuCdkBnFq3YQcuuZnOak9r
-	o+GrILGkyBziBFTavJHZCmocw7Iqhk3Oow==
-X-Google-Smtp-Source: AGHT+IGkRx43IbE6erT6jpTixBSiBu9Z8tPzgRjElhhOR9pTbivGBzdwnwFs1MZ6B4vwrRVqGKzFZw==
-X-Received: by 2002:a50:9b1a:0:b0:540:4c04:ab94 with SMTP id o26-20020a509b1a000000b005404c04ab94mr620640edi.42.1704904357603;
-        Wed, 10 Jan 2024 08:32:37 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id i12-20020a05640200cc00b005557a9395e1sm2136484edu.47.2024.01.10.08.32.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jan 2024 08:32:36 -0800 (PST)
-Date: Wed, 10 Jan 2024 17:32:35 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Lin Ma <linma@zju.edu.cn>
-Cc: quic_subashab@quicinc.com, quic_stranche@quicinc.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1] net: qualcomm: rmnet: fix global oob in
- rmnet_policy
-Message-ID: <ZZ7Go2Y2fURBU974@nanopsycho>
-References: <20240110061400.3356108-1-linma@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9AC4C600
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 16:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PQgKoCtG+jcy1ard8GXwoFfIO2GY5AxWcyrdCn62bn54VIFb6ZgeC7QI7MNwnNBcIp/uZwTGWFp6IepVUjXg48s1PU/RC+s58Hq0GbGArANNZjAB6eVfF8eH9pErNkMfylCW4PdtXGbzLkh8kyq6e1K1FKgK4bNXlWPtXmbyVmOzI3guSEEhlmrqvOyuXfDX+OUYI6YcON/n6ADLuANscdKFH/hQypTjOGWAiY1PMOGrqxujroYGd1ihnmyHD9Zk39noiCxKCpVRIkaO0BlnLsdpDXWPjAXE5gUzW2kjwBu72NTzXG7JMcQESDDcVGV9c/brve3qfWhC8zocaHHNiA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aArhjpl9Px+A3L7uvpJDeRN5Ifua3hcG8VQ9J7NdB0U=;
+ b=Wl/tZElW6QKk1L0JRJeWXG5RjDxf2EbcPWa04tfwd3Cu/ekkRUVqsGeEfRv5b4Jg59tOCImqZsgthCDyMMJov7E2guHy0S8XVTuAk+gRZpvsJIJ9vnASYiCZr8IqkQ0lfZxxW+deVuqzDsKu9cGo1dqmJz4UO1z3qBfYDO2UfjQo8IwShXfpPMpZevDstpZ2mLFtbCWCiiD9VoRGt2Srw6VS5g9rpCsYcGwGdBEzbuR/AjmUo6ztwUz7JiW3NCAf6LNo8dGSe0Nxi+Vn1nHGMSN4iQLAcmZudY2q2qdwHmu2mDuR4+b5FHAk69h4BnJcvAd5up9sGrrq65xxWU3OfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aArhjpl9Px+A3L7uvpJDeRN5Ifua3hcG8VQ9J7NdB0U=;
+ b=A3ZJ7n8NPg/mWLWkYl5UTAvBTNW5YhlGL9IUbAu4D1F70hFfu7sekiJrlJGOpPe76vNcuKeZm8rTM3d0L05RjSw34SIdPuNgRFDRoAaf+cxHrTBaWQjOd8ExX+Jaq9e48G2QqSnq/JmgZ5LEYXyMqyehCjj4lQjSfgx+P13oR6k=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com (2603:10a6:800:1ac::11)
+ by VI1PR04MB10003.eurprd04.prod.outlook.com (2603:10a6:800:1e1::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Wed, 10 Jan
+ 2024 16:35:55 +0000
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::901f:7d8d:f07c:e976]) by VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::901f:7d8d:f07c:e976%3]) with mapi id 15.20.7159.020; Wed, 10 Jan 2024
+ 16:35:55 +0000
+Date: Wed, 10 Jan 2024 18:35:51 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Subject: Re: [PATCH net-next 05/10] net: dsa: qca8k: skip MDIO bus creation
+ if its OF node has status = "disabled"
+Message-ID: <20240110163551.ceemrjwfvavmodqi@skbuf>
+References: <20240104140037.374166-1-vladimir.oltean@nxp.com>
+ <20240104140037.374166-6-vladimir.oltean@nxp.com>
+ <CAJq09z4--Ug+3FAmp=EimQ8HTQYOWOuVon-PUMGB5a1N=RPv4g@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJq09z4--Ug+3FAmp=EimQ8HTQYOWOuVon-PUMGB5a1N=RPv4g@mail.gmail.com>
+X-ClientProxiedBy: VI1PR03CA0053.eurprd03.prod.outlook.com
+ (2603:10a6:803:50::24) To VE1PR04MB7374.eurprd04.prod.outlook.com
+ (2603:10a6:800:1ac::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240110061400.3356108-1-linma@zju.edu.cn>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7374:EE_|VI1PR04MB10003:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99400d09-6192-458f-c94e-08dc11fa3762
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	3c4mX8EaSt8GUpV5GXQeFzc0S1ZImRat/r2/mMP4+5emifBH7zYv5jvJWUZdJxJSx8Uzlkympj4vSoMPUyFBqR2qmVpwiavbl16Wt31ebtWwy9ThNru6YoSd6WxYczLB8VRHFdNr7a4YMP6jQWhGuapEL3fEGz4maFsf+IOZbgYb9l8Z/zFRBK9cFeJGMhMmmXJ5ANbGKtLFXG8Dzzb+t34Y9X6qXM0324m/vQ+mZgf1eexaERljk7yZTm8h6uBU5F/IBgh3c7fWbupn49gYfTDqlpeT0KV6gs0vpOLRI9gGNOmAa3E5TNp+lr95txRRQNNHhnKC1OqYeuXdOlDbX25J1xRTdaDWHVjF7Z1KntV++PvIorbyrdMIApsQtPzYBc2I0z2RvUeBEmHfUkX53Z61ImJ4NXNckqArthaHrJ9D9IfEIQMr3fQJsiLTeSA1HOMtwQ3wcDXo4x/sMkUw72Ke0cEWYOxjY0nCUhO9nb4Vrd2aadbFi9h2lxzeDOWJNRcs1O/KW6c5tZDrJIg6hJFjoIpgrwC12LCCoXokDPMflaa2UBDEu/QJcQZDgndJO2bKFpYXgLOSM9sHCRsM6pzS/XHCFiXYh+UuHXlKscc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7374.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(346002)(396003)(376002)(366004)(39860400002)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(54906003)(478600001)(4326008)(6916009)(6486002)(83380400001)(1076003)(66556008)(26005)(66476007)(6506007)(6666004)(6512007)(9686003)(8676002)(316002)(66946007)(3716004)(8936002)(44832011)(7416002)(5660300002)(2906002)(33716001)(41300700001)(38100700002)(86362001)(32563001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?dMY8Wsm+Qa2DamdERNe/233PQGXfvblSIz2GmOG7n2FUsNANSLPakPIYqtLR?=
+ =?us-ascii?Q?Jmh0/JEaLMGpMz182tLyMzg+hMZUFmbrpSJJULEFRuCfevzicVy3PcW/CMGW?=
+ =?us-ascii?Q?vSgL3cd/HYb9x2UwaXDIupwMsQLLQM02+7RAbxVIFD8FkACeEnUi/KnIFA3+?=
+ =?us-ascii?Q?oAsGXhTSDhRv536Jipr1y34xNV5AYe2Nng4aE+HNOpIReFx4g9A7Va672SCQ?=
+ =?us-ascii?Q?jTLgvPX9d3iuxB3rajlxamyPFNaxAhpIj37Dskx9y04Gd/gVX8gtfP6lvFLS?=
+ =?us-ascii?Q?XM9KEQ12oV4r80l+ozkufxSa2oKpeA6l7+to30ZYOJi6o5MUaHHVOAszU/uz?=
+ =?us-ascii?Q?EB3GW3AB7xh8qvcjP9HcFxfauWYXeJgOO0OsqroZsq1E6UIMlaE2qABD72JL?=
+ =?us-ascii?Q?fd+Dbfe5AKjLwTE8G9kCGRg1CLIaDOZQdLT6FV61Zfh9dEGMkL9pttH3gkwB?=
+ =?us-ascii?Q?UQK7vx+7gE17xlSkJcqDbsaZ1bovQitZPVevd1PyDvgaeKQ2GxMHOC6FyD8C?=
+ =?us-ascii?Q?JXwK9MbXlJR2xMPfz/gITEIxjq0mrggyXpiCmGMb8cbQrHvyJR6FsnKM+fSi?=
+ =?us-ascii?Q?zfGAhQFlGP7QJt0cUBYwKWl/taIAduTCF2fMnwHwWxZ3t77E7HnndL2eDuWI?=
+ =?us-ascii?Q?zQdwH9oX+1zHfyLlCaRmA7HDtzY+wTgnCg2JtTHjXfbJwROopv0QqLga+UL9?=
+ =?us-ascii?Q?Ibk1TI4EcsyW1nRGywmoGwe5Bc8FI5X1T2erp1HkE7QCRm+QpNE68F0YSEa1?=
+ =?us-ascii?Q?S5M671oe1dC5SlvVEVNwQE0ZNwKIEooJLwm6RIBGUL76KW2mXV1y08L7Jhsi?=
+ =?us-ascii?Q?8ycjVwPvZ0ERphCmJ3gBsVLtbUIks4zX9ZDSd+SbR/mRo4wO4HsLRlC8/nGt?=
+ =?us-ascii?Q?SQGuVUdz84sgWH77K/bImSbejkRixmRT4JjNV6yQH3XuLm3MaKDfn1Fktgqw?=
+ =?us-ascii?Q?Pk0vHSdYq3/r82aXRK5JuXJL0bC0XZw0SdmFk2cAqXvcMiklKEbX2lwmak90?=
+ =?us-ascii?Q?CgEnDYHohSs8DtWApMJcSFqQCu63YWEZrc/93gjyS564npxeCMUCph2nzCwi?=
+ =?us-ascii?Q?Zz5HTasxZwTRmVe69HcGrQw7AG+jkA3X4ueNf5Fo/6n9orqBp8Qx7XAq2pTu?=
+ =?us-ascii?Q?Sm1KF/y0alUzECmtZ7lLqsMX8wSyfsbFk/mGny6fHJ7dvE/TXBL+i0KignuL?=
+ =?us-ascii?Q?G57W13qp6DUCWZvn7aJFTgcUUM8QfuHUqFSTnfSPCSiq33lYvu1AKnNL14o4?=
+ =?us-ascii?Q?C18OKRieZJGXhhJ1OqRFIaQ401oTOO8SUR4bSkXheZMVixttRBAWw/sBcp+N?=
+ =?us-ascii?Q?jmUyHbklwFjOdAKHs21n0WFoyCgNV5adh1e5XRsq0RsKY9kLZqejYLtPbl2f?=
+ =?us-ascii?Q?rr4ubujiO6zWtkI+2PgGKlcpnpNRWLFo8U7I40Jo76MEFRW2K3TTC/2WuMRt?=
+ =?us-ascii?Q?ikp3ZSoIzJbj8xb3UOSW+bIs2yGMN9gc9+XibE4p5OUxqGYKNgnq7HUd9VnZ?=
+ =?us-ascii?Q?iYFj+JD+3QOx8qTBh2Qt1l5/7zy+Nq6zHtPta71uf9fE0bO2RmMtHh7eqJEN?=
+ =?us-ascii?Q?W8QpY1Y+y3qFMokPFNsn3FPcYcsMd4P7+YZ+d0RvNPhmi9HLZU7EuWLejtrz?=
+ =?us-ascii?Q?Dw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99400d09-6192-458f-c94e-08dc11fa3762
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7374.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2024 16:35:55.1101
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xDpiU89OJTrU//Js3BMU65tkLOQ65u6TxaAGNft1AhbtssAL/uhircaY5aV6+tyKyZBPlOHuLw1x9bXkVv4N9A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB10003
 
-Wed, Jan 10, 2024 at 07:14:00AM CET, linma@zju.edu.cn wrote:
->The variable rmnet_link_ops assign a *bigger* maxtype which leads to a
->global out-of-bounds read when parsing the netlink attributes. See bug
->trace below:
->
->==================================================================
->BUG: KASAN: global-out-of-bounds in validate_nla lib/nlattr.c:386 [inline]
->BUG: KASAN: global-out-of-bounds in __nla_validate_parse+0x24af/0x2750 lib/nlattr.c:600
->Read of size 1 at addr ffffffff92c438d0 by task syz-executor.6/84207
->
->CPU: 0 PID: 84207 Comm: syz-executor.6 Tainted: G                 N 6.1.0 #3
->Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
->Call Trace:
-> <TASK>
-> __dump_stack lib/dump_stack.c:88 [inline]
-> dump_stack_lvl+0x8b/0xb3 lib/dump_stack.c:106
-> print_address_description mm/kasan/report.c:284 [inline]
-> print_report+0x172/0x475 mm/kasan/report.c:395
-> kasan_report+0xbb/0x1c0 mm/kasan/report.c:495
-> validate_nla lib/nlattr.c:386 [inline]
-> __nla_validate_parse+0x24af/0x2750 lib/nlattr.c:600
-> __nla_parse+0x3e/0x50 lib/nlattr.c:697
-> nla_parse_nested_deprecated include/net/netlink.h:1248 [inline]
-> __rtnl_newlink+0x50a/0x1880 net/core/rtnetlink.c:3485
-> rtnl_newlink+0x64/0xa0 net/core/rtnetlink.c:3594
-> rtnetlink_rcv_msg+0x43c/0xd70 net/core/rtnetlink.c:6091
-> netlink_rcv_skb+0x14f/0x410 net/netlink/af_netlink.c:2540
-> netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
-> netlink_unicast+0x54e/0x800 net/netlink/af_netlink.c:1345
-> netlink_sendmsg+0x930/0xe50 net/netlink/af_netlink.c:1921
-> sock_sendmsg_nosec net/socket.c:714 [inline]
-> sock_sendmsg+0x154/0x190 net/socket.c:734
-> ____sys_sendmsg+0x6df/0x840 net/socket.c:2482
-> ___sys_sendmsg+0x110/0x1b0 net/socket.c:2536
-> __sys_sendmsg+0xf3/0x1c0 net/socket.c:2565
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x3b/0x90 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
->RIP: 0033:0x7fdcf2072359
->Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
->RSP: 002b:00007fdcf13e3168 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
->RAX: ffffffffffffffda RBX: 00007fdcf219ff80 RCX: 00007fdcf2072359
->RDX: 0000000000000000 RSI: 0000000020000200 RDI: 0000000000000003
->RBP: 00007fdcf20bd493 R08: 0000000000000000 R09: 0000000000000000
->R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
->R13: 00007fffbb8d7bdf R14: 00007fdcf13e3300 R15: 0000000000022000
-> </TASK>
->
->The buggy address belongs to the variable:
-> rmnet_policy+0x30/0xe0
->
->The buggy address belongs to the physical page:
->page:0000000065bdeb3c refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x155243
->flags: 0x200000000001000(reserved|node=0|zone=2)
->raw: 0200000000001000 ffffea00055490c8 ffffea00055490c8 0000000000000000
->raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
->page dumped because: kasan: bad access detected
->
->Memory state around the buggy address:
-> ffffffff92c43780: f9 f9 f9 f9 00 00 00 02 f9 f9 f9 f9 00 00 00 07
-> ffffffff92c43800: f9 f9 f9 f9 00 00 00 05 f9 f9 f9 f9 06 f9 f9 f9
->>ffffffff92c43880: f9 f9 f9 f9 00 00 00 00 00 00 f9 f9 f9 f9 f9 f9
->                                                 ^
-> ffffffff92c43900: 00 00 00 00 00 00 00 00 07 f9 f9 f9 f9 f9 f9 f9
-> ffffffff92c43980: 00 00 00 07 f9 f9 f9 f9 00 00 00 05 f9 f9 f9 f9
->
->According to the comment of `nla_parse_nested_deprecated`, the maxtype
->should be len(destination array) - 1. Hence use `IFLA_RMNET_MAX` here.
->
->Fixes: 14452ca3b5ce ("net: qualcomm: rmnet: Export mux_id and flags to netlink")
->Signed-off-by: Lin Ma <linma@zju.edu.cn>
+On Thu, Jan 04, 2024 at 11:19:20PM -0300, Luiz Angelo Daros de Luca wrote:
+> Don't you still need to put the node that is not available? Just put
+> it unconditionally whenever you exit this function after you get it.
+> of_node_put() can handle even NULL.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+You're right. I've prepared a patch to handle this case correctly.
+I don't think it's worth sending to 'net' now that 'net-next' has
+closed, because as you say below, it's quite possible that the
+!of_device_is_available() code path is never exercised by existing
+device trees. So the bug is like the tree that falls in the forest but
+nobody hears it. I will submit the correction when net-next reopens,
+together with Alvin's suggested "err" -> "ret" renaming.
 
-Btw, any idea why this rmnet thing, which clearly looks like a
-softdevice, is in vendor directory where drivers for real devices should
-reside?
+> I'm not sure if this and other simple switches can be useful without a
+> valid MDIO.
 
+Will that always be the case? As implausible as this may sound, I've
+received DSA questions from people using the sja1105 as a two-port
+adapter between MII on the CPU side and RMII on the PHY side. It was the
+cheapest way of adapting their SoC to RMII, using a switch as not even a
+port multiplier. I see that AR8237 has 1x RGMII and 1x SerDes, so maybe
+somebody would want to use it that way, and sidestep the internal PHYs?
+I don't know.
+
+> Anyway, wouldn't it be equivalent to having an empty mdio
+> node? It looks like it would work as well but without a specific code
+> path.
+
+I guess you could also express this that way too. Although, in case it
+matters, an 'empty node' has to pass schema validation (has to have all
+required properties), and a disabled one doesn't.
+
+The idea with this patch was to deliberately change the status = "disabled"
+handling that the driver already had, to make things more consistent
+across the board. Each driver binding has its own unique interpretation
+of an absent MDIO OF node already. Some consider the OF node optional
+and thus register it anyway, some say that absent means it's not needed.
+But I think status = "disabled" should be an unambiguous way to specify
+through DT that the hardware component is disabled. This is not how
+qca8k was interpreting it prior to this change.
 
