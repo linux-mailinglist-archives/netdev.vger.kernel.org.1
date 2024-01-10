@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-62872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F324F8299DF
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:55:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C97B8299E5
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:56:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACEC31F21E51
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 11:55:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB726B234D0
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 11:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7FD433BA;
-	Wed, 10 Jan 2024 11:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58B747F5F;
+	Wed, 10 Jan 2024 11:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="aXWv6Vmz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xJn0oLbp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1BF47F46
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 11:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40e5535b8cfso8411695e9.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 03:55:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04F047F4B
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 11:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40e4582ed74so33046175e9.1
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 03:56:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1704887722; x=1705492522; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1704887784; x=1705492584; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=p22+unadpjiuSy6RGYATC6dS70dMkUd0mDAJ61uro9I=;
-        b=aXWv6VmzjH5x7RWHFSyBQC5qfCLssOfMva95/wI6S21LP0NBkVvstfZR+Gqm1V6dow
-         KwsUt7hIY+F6IUPzZm1B2HAGtVmARYUMAO2Hx1Wx/i4jyWSRYgrKjr2Uq1WMbm53/Rw/
-         Ro8oQlAI6R8ATShhNYSEF/LBT4CLSR3ED3A7JL1F1EcT9uYYXuCXWcN9XRRYisPH+Kxf
-         sxG0vLB5BW7rfn9ddWHmAHWfLnPz2AJpm5kDjQu9Df7RbAuZNb2A3kbFjbpk/Wpuo+sw
-         jFwbXWEyex7fi5dwz+eDjCQuBxUFwfg26XM1x3iRM8CL9DZfzsqTKdKt/hi8+GKJlvfj
-         LelQ==
+        bh=j8X+6kH/sTAxoiX8X++svYG/4xSOreLNr4wrTCJ6Uq4=;
+        b=xJn0oLbpNhAh7YSbfUOIPpeEFJKAQciZSHg/i62KJzuRO3/K5qRXQeCy1Qv5KlamII
+         y5IM/9y3JR9oK7eNgHdI0bm4EVGUA8TYZWIZQC00XEiAqG9E9t7S+pBuSnhe4aFA8GVh
+         acKkk9xHM465PAZwXI/XAgA1b3pfpsE88twN54yPofRhdqkgE86v6gi7KbxVzAwC/ZaI
+         tqIm2m7AfbRB72Z8QB0LeNK6iZxCrPRBspA7C1wcp4ScvaOXzX9lC2o6wN8sLeZ/YiNK
+         a+bOGd/O3w/VpGxjGR6vQy4kZGo6BSuVkQMwPzmJ2eXCWYIYfDcTURACpgTRMX/wsRYQ
+         1OMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704887722; x=1705492522;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1704887784; x=1705492584;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p22+unadpjiuSy6RGYATC6dS70dMkUd0mDAJ61uro9I=;
-        b=JmdB2iARgP3du54gXlTGt4vGNGiNdAy9nySdRDKlyRBVHebefCrs8aut14SaW+KQb6
-         PqztiVXt2lSZLPoikaJFu5RGjPhVSltbBYPZvjhnaYzqITYgxEPh9PoDMw0Z8zq2J1bQ
-         MnLf8UmJmn+iL91XMhQfwcoGl5aOlzcrDW4uNnK+6M381Vsy1TOt8HpJxmbQfL802f6W
-         pVLUc6xMN9wIUz0l1V4TAqrzHpWPfg2QgUyGyvhdDNzGiimevq1QpiwI6UzqT1ahES9O
-         tehqxmDRThdbJR7nXhnd22vAqEDZhg0gi0R+iXML+7yetxskrQEBfMNnnA0Z4JEE0876
-         YAZg==
-X-Gm-Message-State: AOJu0Ywo5oazva5Bu0rgn1Bws7TLnYN95foa8HYZGZyt0E5y05DsvsP4
-	ysYa42hODpsBNvCcvU7cXVjIYMVtExp1RA==
-X-Google-Smtp-Source: AGHT+IEce4ODuGwcEn2BKXeEu1OoSU3T5p4yP+WdC1xjqjakHlYuOMiREbeBunnkwWykVuXti0AI4A==
-X-Received: by 2002:a05:600c:84ca:b0:40e:52ce:f05 with SMTP id er10-20020a05600c84ca00b0040e52ce0f05mr482062wmb.70.1704887721880;
-        Wed, 10 Jan 2024 03:55:21 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.5])
-        by smtp.gmail.com with ESMTPSA id g4-20020adfa484000000b00336344c3c3fsm4739160wrb.90.2024.01.10.03.55.20
+        bh=j8X+6kH/sTAxoiX8X++svYG/4xSOreLNr4wrTCJ6Uq4=;
+        b=Uj8pJIsDqv0IaroQGefuf0vQg8Dh9tQfx0Qm3xsFigque+JS8KWMvshuN5P5YCWDUv
+         kaoSn5uaStfRL1vnR+rwpvv2LPprIAOuczAOF6SBKXf3sZCRWtHGSMU/23ms53r0EIxM
+         +1W7vsp4JXTdmHCZXCBvL2Lsg4k56Odv5qZNZhN1GNnhRKEUxAojW3s0ukniYN+Jkkca
+         te+qtiCcWtWazummNs44fD7mMVsai5QCKNJQjOq3A48CtvpA15s59RRQ2X9N956qM8Ce
+         8+q6ikUDUfK1EFcHj1Nd07/rOEY7O8iKSGuxhRkL5abnzbifQiGJatVgOZJmELqUjD44
+         9JPw==
+X-Gm-Message-State: AOJu0YwgGaoaS69tCDS2i6J5uEsipg1cE51N3w2OC2kYLnGCeLtllqix
+	rSJq279OKBor6MJUO8RfQ0/uyAoU5H0PNQ==
+X-Google-Smtp-Source: AGHT+IHN4TNKpJHiJFm7ckSuP6Sbd3nSmLmY+pb+cbxfYoQklK1wSWFhpH/Y2tP4S5qkUuvQ56BOTg==
+X-Received: by 2002:a05:600c:280b:b0:40e:4cc6:9ff3 with SMTP id m11-20020a05600c280b00b0040e4cc69ff3mr247735wmb.84.1704887784274;
+        Wed, 10 Jan 2024 03:56:24 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.112])
+        by smtp.gmail.com with ESMTPSA id j17-20020a05600c1c1100b0040c46719966sm1973854wms.25.2024.01.10.03.56.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 03:55:21 -0800 (PST)
-Message-ID: <3e430f8e-b327-485f-ae19-6f1938083dd3@tuxon.dev>
-Date: Wed, 10 Jan 2024 13:55:18 +0200
+        Wed, 10 Jan 2024 03:56:23 -0800 (PST)
+Message-ID: <9b44a04d-3d04-4fdb-a51c-b0e4b72af558@linaro.org>
+Date: Wed, 10 Jan 2024 12:56:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,89 +66,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 08/19] net: ravb: Move the IRQs get and
- request in the probe function
+Subject: Re: [PATCH 3/6] arm64: dts: qcom: ipq5332: Add MDIO device tree
 Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org, geert+renesas@glider.be,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
- <20240105082339.1468817-9-claudiu.beznea.uj@bp.renesas.com>
- <02548b1b-d32c-78b1-f1b6-5fdb505d31bb@omp.ru>
- <ee783b61-95fc-44ab-a311-0ca7d058ac39@tuxon.dev>
- <dce944a1-9557-9ab0-d30d-7a51a47c6d96@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <dce944a1-9557-9ab0-d30d-7a51a47c6d96@omp.ru>
+To: Luo Jie <quic_luoj@quicinc.com>, andersson@kernel.org,
+ konrad.dybcio@linaro.org, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com, quic_soni@quicinc.com,
+ quic_pavir@quicinc.com, quic_souravp@quicinc.com, quic_linchen@quicinc.com,
+ quic_leiwei@quicinc.com
+References: <20240110112059.2498-1-quic_luoj@quicinc.com>
+ <20240110112059.2498-4-quic_luoj@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240110112059.2498-4-quic_luoj@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+On 10/01/2024 12:20, Luo Jie wrote:
+> Add the MDIO device tree of ipq5332.
+
+Subject: drop "device tree", it is obvious. Commit msg: say something
+more instead of copying the subject. Or better squash the entire patch.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  arch/arm64/boot/dts/qcom/ipq5332.dtsi | 44 +++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/ipq5332.dtsi b/arch/arm64/boot/dts/qcom/ipq5332.dtsi
+> index bc89480820cb..e6c780e69d6e 100644
+> --- a/arch/arm64/boot/dts/qcom/ipq5332.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/ipq5332.dtsi
+> @@ -214,6 +214,38 @@ serial_0_pins: serial0-state {
+>  				drive-strength = <8>;
+>  				bias-pull-up;
+>  			};
+> +
+> +			mdio0_pins: mdio0-state {
+> +				mux_0 {
+
+This wasn't tested...
+
+It does not look like you tested the DTS against bindings. Please run
+`make dtbs_check W=1` (see
+Documentation/devicetree/bindings/writing-schema.rst or
+https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
+for instructions).
 
 
-On 09.01.2024 22:47, Sergey Shtylyov wrote:
-> On 1/8/24 11:58 AM, claudiu beznea wrote:
-> 
-> [...]
->>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>>
->>>> The runtime PM implementation will disable clocks at the end of
->>>> ravb_probe(). As some IP variants switch to reset mode as a result of
->>>> setting module standby through clock disable APIs, to implement runtime PM
->>>> the resource parsing and requesting are moved in the probe function and IP
->>>> settings are moved in the open function. This is done because at the end of
->>>> the probe some IP variants will switch anyway to reset mode and the
->>>> registers content is lost. Also keeping only register specific operations
->>>> in the ravb_open()/ravb_close() functions will make them faster.
->>>>
->>>> Commit moves IRQ requests to ravb_probe() to have all the IRQs ready when
->>>> the interface is open. As now IRQs gets and requests are in a single place
->>>> there is no need to keep intermediary data (like ravb_rx_irqs[] and
->>>> ravb_tx_irqs[] arrays or IRQs in struct ravb_private).
->>>
->>>    There's one thing that you probably didn't take into account: after
->>> you call request_irq(), you should be able to handle your IRQ as it's
->>> automatically unmasked, unless you pass IRQF_NO_AUTOEN to request_irq().
->>> Your device may be held i reset or even powered off but if you pass IRQF_SHARED to request_irq() (you do in a single IRQ config), you must
->>> be prepared to get your device's registers read (in order to ascertain
-> 
->    And, at least on arm32, reading a powered off (or not clocked?) device's
-> register causes an imprecise external abort exception -- which results in a
-> kernel oops...
-> 
->>> whether it's your IRQ or not). And you can't even pass IRQF_NO_AUTOEN
->>> along with IRQF_SHARED, according to my reading of the IRQ code...
->>
->> Good point!
->>
->>>> This is a preparatory change to add runtime PM support for all IP variants.
->>>
->>>   I don't readily see why this is necessary for the full-fledged RPM
->>> support...
->>
->> I tried to speed up the ravb_open()/ravb_close() but missed the IRQF_SHARED
-> 
->    I doubt that optimizing ravb_{open,close}() is worth pursuing, frankly...
-> 
->> IRQ. As there is only one IRQ requested w/ IRQF_SHARED, are you OK with
->> still keeping the rest of IRQs handled as proposed by this patch?
-> 
->    I'm not, as this doesn't really seem necessary for your main goal.
-> It's not clear in what state U-Boot leaves EtherAVB...
+Best regards,
+Krzysztof
 
-Ok. One other reason I did this is, as commit message states, to keep
-resource parsing and allocation/freeing in probe/remove and hardware
-settings in open/close.
-
-Anyway, I'll revert all the changes IRQ related.
-
-Thank you,
-Claudiu Beznea
-
-> 
-> [...]
-> 
-> MBR, Sergey
 
