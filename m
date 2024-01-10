@@ -1,139 +1,95 @@
-Return-Path: <netdev+bounces-62893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6330F829B10
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:17:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B98E829B19
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:19:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03744B21167
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:17:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDDD51F25A04
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4034A4879B;
-	Wed, 10 Jan 2024 13:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504E3487A4;
+	Wed, 10 Jan 2024 13:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="mhD0fveQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xr++cHrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A913748CC0
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 13:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3376555b756so2376651f8f.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 05:17:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D0848CC0
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 13:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso8577a12.0
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 05:19:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1704892659; x=1705497459; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vszx2G9uELuU9hK0zj2S4/o3kowknqBc1/GUoklXrQI=;
-        b=mhD0fveQa7CF90Ky9sh1YCxbb3rlxicaqTGfktrGiPCkLetzcuZ2kkJjWINHjNedZi
-         /eTXv5QcR1H47zBlFYItCeuJBTWHnORKSaiCCf+AWv6wTMj0KQpvF+q2aRElBf9TPIfa
-         nPH6QwJfdC7hb9FmhtgG7aR891OF4R7zvwgTcBFewmaOnw9Mlu6ONQ9CSBrX9IRleyj7
-         cFeBBIPgAIVG9WOpPxmMKHmnHQx5y1cyFybyO/hRBXsoIOw5KWJIBrnuGT5xT6m7dCG4
-         dLgkYZjY3Rw4FJ67pQEcHK5Xxf2+eJgAYWVh/++CuzZ3yplVokvyfRuignYc2bLvh3ss
-         xJgg==
+        d=google.com; s=20230601; t=1704892782; x=1705497582; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zcuZSATt3D9i3sz2m/7ESdTYVVlDzAh2DZuioh5b1go=;
+        b=Xr++cHrCfY2nmGSmBlHPXPutbvIeIZdtQAlIjdP8OkDl/XYCRHa688FNx6MCv52vvk
+         0Y7EQwCYS/4BAvj8ZWO/meOIiZTS6UHnikoYsW0bAMHD0JxwnWAsT/hP2EXS/sXFRMQh
+         WBE3X8u3UXF53stoZlZGv8cPpgBhNoHcANBXyJCsxRiy5od2wvbUMZ5Pm8b671gwRPs1
+         cvNDaqATXg07oYvBhI3u65si5dTIbO2PvC2ADR/gMMADV0hNAkVHX/BVNR41V4jp/nup
+         BFI326rO5IyO8Ut9W0eI0wJK4aXDrfY1vHjdUmMVgti7fiUaNarqc76wxSurr8vMTPXh
+         utiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704892659; x=1705497459;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vszx2G9uELuU9hK0zj2S4/o3kowknqBc1/GUoklXrQI=;
-        b=UTrmzOU1qKXqRUsaEoLQRoG3dKkZo+mR1SR1SfZGDfrSmZ8MqFiszqPWJv5cyRdOMO
-         ST2tK7yyN9ZQxZ28ydTOCA6isPVqkkIWL5dopaKUBomzMzuQpSZYjTvEdipfuZ2v5JRw
-         iPr4vYiHKhRrR+2J8D/7JhoeSMX2CyXekPe0cMg2nQIMTzZGjvz3+TOd+fbtd5mqCCaw
-         2lLtn7BuR+VGS5Y4e7Cpqg/MwBSlUOFLwh8WrNsKFkY9XChwC+//YlzD4rYhJCkEryH/
-         RuVaOofwnzkXOoE3YFnCp51MVuSOcJbBBpFyDugO5ZrD3xg8UKzs+z+eXOB2J9jMkvom
-         Ed3g==
-X-Gm-Message-State: AOJu0Yys5hBMqmKy0WZ11kHi6ExJBmf50F0uWrdh4fnVNWnNufBOrati
-	ZurEk8NaQ3A/lgu9gYvfACttPgu7Vx555Q==
-X-Google-Smtp-Source: AGHT+IG0xqvK/uM4BvzNCZURD1QaAj22eknZfkbaekHf4jMRg2ppp46KcuhVFANDknFKAjAN6yVkKg==
-X-Received: by 2002:adf:b182:0:b0:336:5b1e:ee66 with SMTP id q2-20020adfb182000000b003365b1eee66mr20524wra.31.1704892658708;
-        Wed, 10 Jan 2024 05:17:38 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.5])
-        by smtp.gmail.com with ESMTPSA id z15-20020adff74f000000b0033740e109adsm4920854wrp.75.2024.01.10.05.17.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 05:17:38 -0800 (PST)
-Message-ID: <aed6534b-ad5e-4f5c-9861-9a784968adcc@tuxon.dev>
-Date: Wed, 10 Jan 2024 15:17:36 +0200
+        d=1e100.net; s=20230601; t=1704892782; x=1705497582;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zcuZSATt3D9i3sz2m/7ESdTYVVlDzAh2DZuioh5b1go=;
+        b=frsUWTb4W4EghQRzkQPg3MXFVVkZoFKUqtkv+Fw9MH+pcoihf8UnnCINyGuHlNQ6aj
+         JbxeGTRTvRsRYkI9JzqVwLfzXrgVowNp0rQachBM4YMdWKweSJmSTHSznLkDTIi91tNX
+         CYcgNbi5BPqPfkyNW1sIVh7nU6WcEkRHnUEC2X5gTCx1MPGEWGIZ+iXPWFB6NniwVHOC
+         g/gk2+5DpF1HaewHUyFdIHb0/ElhBzKv9g4G8VioMyaHzFrxnjiz09ebMkY+rdDwjhDQ
+         q7q75mm73qVbbPRSL9RrteDll8uHyJt9qiW7nnlMiHfH2KSuBDR5z8RFhoYV5UJvpuEG
+         JmZw==
+X-Gm-Message-State: AOJu0YwaOAyH/a3NEraVUp+S1zLfItUvYa22UqCf4QTIfSb5JWVJJzHf
+	V6JO6JGbqsIaB3P6uhXMjG2sVevDxTGZ4N+hcqaov1ArKeRw
+X-Google-Smtp-Source: AGHT+IHJdzRVQ/HNy+Y8ND4FKtirTIDvgGHGQ+lw68pOah+nb9egtkyQeJgtFA8fm/ASpg2iVQjSXGMdCy2GdGEqAcA=
+X-Received: by 2002:a50:d650:0:b0:557:24d:6135 with SMTP id
+ c16-20020a50d650000000b00557024d6135mr15481edj.4.1704892781683; Wed, 10 Jan
+ 2024 05:19:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 17/19] net: ravb: Return cached statistics if
- the interface is down
-Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org, geert+renesas@glider.be,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
- <20240105082339.1468817-18-claudiu.beznea.uj@bp.renesas.com>
- <af5ab82e-5904-c33b-983e-b37844dab3f5@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <af5ab82e-5904-c33b-983e-b37844dab3f5@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240110003354.2796778-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240110003354.2796778-1-vladimir.oltean@nxp.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 10 Jan 2024 14:19:27 +0100
+Message-ID: <CANn89iK20iBqPvMv6xrjPK4ybVKx9VKAUXZJQJHVzLxVFg+RAA@mail.gmail.com>
+Subject: Re: [PATCH net] net: dsa: fix netdev_priv() dereference before check
+ on non-DSA netdevice events
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Dan Carpenter <dan.carpenter@oracle.com>, 
+	syzbot+d81bcd883824180500c8@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jan 10, 2024 at 1:34=E2=80=AFAM Vladimir Oltean <vladimir.oltean@nx=
+p.com> wrote:
+>
+> After the blamed commit, we started doing this dereference for every
+> NETDEV_CHANGEUPPER and NETDEV_PRECHANGEUPPER event in the system.
+>
+> static inline struct dsa_port *dsa_user_to_port(const struct net_device *=
+dev)
+> {
+>         struct dsa_user_priv *p =3D netdev_priv(dev);
+>
+>         return p->dp;
+> }
 
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-On 08.01.2024 22:22, Sergey Shtylyov wrote:
-> On 1/5/24 11:23 AM, Claudiu wrote:
-> 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>
->> Return the cached statistics in case the interface is down. There should be
->> no drawback to this, as cached statistics are updated in ravb_close().
->>
->> The commit prepares the code for the addition of runtime PM support.
->>
->> Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> [...]
-> 
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index 76035afd4054..168b6208db37 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -2117,6 +2117,9 @@ static struct net_device_stats *ravb_get_stats(struct net_device *ndev)
->>  	const struct ravb_hw_info *info = priv->info;
->>  	struct net_device_stats *nstats, *stats0, *stats1;
->>  
->> +	if (!(ndev->flags & IFF_UP))
-> 
->    Well, I guess it's OK to read the counters in the reset mode... BUT
-> won't this race with pm_runtime_put_autosuspend() when its call gets added
-> to ravb_close()?
-
-I re-checked it and, yes, this is true. A sync runtime suspend would be
-better here. But, as of my current investigation, even with this
-ravb_get_stats() can still race with ravb_open()/ravb_close() as they are
-called though different locking scheme (ravb_open()/ravb_close() is called
-with rtnl locked while ravb_get_stats() can be called only with
-dev_base_lock rwlock locked for reading).
-
-A mutex in the driver should to help with this.
-
-Thank you,
-Claudiu Beznea
-
-> 
->> +		return &ndev->stats;
->> +
->>  	nstats = &ndev->stats;
->>  	stats0 = &priv->stats[RAVB_BE];
->>  
-> [...]
-> 
-> MBR, Sergey
-> 
+Thanks for the fix !
 
