@@ -1,123 +1,177 @@
-Return-Path: <netdev+bounces-62817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3408A829714
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 11:14:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32579829739
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 11:20:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE9411F21525
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 10:14:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCA0D28AA83
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 10:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460A93FB1A;
-	Wed, 10 Jan 2024 10:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DA03FB2F;
+	Wed, 10 Jan 2024 10:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QW9/ez6b"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="myiiLqUC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="3aLv+tsR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from wnew4-smtp.messagingengine.com (wnew4-smtp.messagingengine.com [64.147.123.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E273FB08
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 10:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704881677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N8fyAvLcym3lieO4wYcel0i1AGhFIX/f3clpYmcSXdA=;
-	b=QW9/ez6bQXNcSy+gf/e8e+US/t6/PNd1zmtCi1p4RbTDmb3t775+dT8RK0YiOv6rZnaevy
-	h7OP6XIsWb4UoPCvcDokA5Se4CwaXZ+IHmmxd+fbmWdswPKZv8HNlLiYvl8wkZsnX0qM6T
-	7q3GF6gkpivM0HajI/RrTZjaxljWh+E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-546-OvzGbcwzPAGBkz83m5jLww-1; Wed, 10 Jan 2024 05:14:33 -0500
-X-MC-Unique: OvzGbcwzPAGBkz83m5jLww-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 63AC78945A7;
-	Wed, 10 Jan 2024 10:14:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3D79E2026D6F;
-	Wed, 10 Jan 2024 10:14:29 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com>
-References: <ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com> <CAHk-=wgJz36ZE66_8gXjP_TofkkugXBZEpTr_Dtc_JANsH1SEw@mail.gmail.com> <1843374.1703172614@warthog.procyon.org.uk> <20231223172858.GI201037@kernel.org> <2592945.1703376169@warthog.procyon.org.uk>
-To: Pengfei Xu <pengfei.xu@intel.com>
-Cc: dhowells@redhat.com, eadavis@qq.com,
-    Linus Torvalds <torvalds@linux-foundation.org>,
-    Simon Horman <horms@kernel.org>,
-    Markus Suvanto <markus.suvanto@gmail.com>,
-    Jeffrey E Altman <jaltman@auristor.com>,
-    "Marc
- Dionne" <marc.dionne@auristor.com>,
-    Wang Lei <wang840925@gmail.com>, "Jeff
- Layton" <jlayton@redhat.com>,
-    Steve French <smfrench@gmail.com>,
-    "Jarkko
- Sakkinen" <jarkko@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    "Eric
- Dumazet" <edumazet@google.com>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    linux-afs@lists.infradead.org, keyrings@vger.kernel.org,
-    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-    ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-    heng.su@intel.com
-Subject: Re: [PATCH] keys, dns: Fix missing size check of V1 server-list header
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B613FB08;
+	Wed, 10 Jan 2024 10:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailnew.west.internal (Postfix) with ESMTP id 1CEA32B005B1;
+	Wed, 10 Jan 2024 05:20:33 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 10 Jan 2024 05:20:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1704882032;
+	 x=1704889232; bh=syE5UlqFQxkc/rlq6eSMNsD1Ft+dm/4kEwr9kygNnZw=; b=
+	myiiLqUCaOFNyy0KGz1/79d3HRMOpqenCIcjtVp8MIMXNuuxs7r3pdnpfmWhoqoR
+	IQ7N3YbmF9nJffZH4HS8LkIh22Vv3wG2sjpK27f9XTmmoCr2Kc68Xrl4dw5To32W
+	7oTNxvKqrQNHtDvW+wa87N9N90pn8A9G+LrTYmcdO105B4Zsmftj7IvnAIh1E8zz
+	Q2WU5G/3jk+uFyxgwtiyCxFAwp4RGMAhxKlU9P6WBbVa8LUUGhnX9TdNNUh1DUbx
+	zmCG1MYbF7h4hfd2TJzbdJ+Q1Rify5IxLv96YznkO8r5UDdnw/B35FP/X80ijL7V
+	BaGn8hEWLg1dYwSkCYndvA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1704882032; x=
+	1704889232; bh=syE5UlqFQxkc/rlq6eSMNsD1Ft+dm/4kEwr9kygNnZw=; b=3
+	aLv+tsROFR55+fPEzkAuUR1EYdQ2HX99dqCRlz/JfV2MsJtp0CGFqmB6tAMDy72A
+	ZrX+AdDDWBNTrrW7sMzvvfEP8gUJIpMLLtVrp/teui+cU+9KRRCxKXkanMetlfcj
+	FBkFKDgNOVxh6ZGz33H1r+Dke653H3inbaS1l5dzm3/T9LKzj/zhFl3mBIhvpN+a
+	i/+bZg97tvEz1ahcWMOXb7cxJW8wSehQ2OGnZNijfKOPiOkazb67CX7p6n/QsClV
+	xFUVOUH+ktgc0Wsof32P0kt85rwvOomYqUIMGJg3KdbRUBngGNzPJwoAUnUqfuOk
+	0otxMsg6CfS2J4mWRF6QA==
+X-ME-Sender: <xms:b2-eZfbb8jU7eUbhVM8ptUPbFBsqxwkHmtQmk9r-V5K41TRFTBKjlA>
+    <xme:b2-eZebHxIw1Fjp3BqSzuovwQbyqtk2C5hrRG6PAfO8XS-kw0MYGTAjpPxl57hAYq
+    -Augo6FuvTHj0uSGNU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeiuddgudegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeegfeejhedvledvffeijeeijeeivddvhfeliedvleevheejleetgedukedt
+    gfejveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:b2-eZR8Zym7T_ixwwEfoUeE2EDbxpF4y1T6da7RnK6yyA1qx7ynaAQ>
+    <xmx:b2-eZVr4FQ5uhgAwkslmh14i6fuaYanuuxC2M5Z2QAp-pF9q7WvfTw>
+    <xmx:b2-eZapet_e5NSzPInuoxvdn0YzOepAI8Xf2d7B8XgPzF98nJjvgIg>
+    <xmx:cG-eZeqOJGWBxdm_kxnLomgMKhRJk3BAFc59xS0XCWHMebF1Iw26jJaiRpM>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 64819B6008D; Wed, 10 Jan 2024 05:20:31 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1364-ga51d5fd3b7-fm-20231219.001-ga51d5fd3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1694630.1704881668.1@warthog.procyon.org.uk>
+Message-Id: <fdf707b9-f39d-4f5a-a8bf-1bcb8cc6594f@app.fastmail.com>
+In-Reply-To: 
+ <CAMuHMdV8uFKntiMfwwmnFpd4Dcx8vJDwS6r1iBLtkh40N71dbw@mail.gmail.com>
+References: <20231108125843.3806765-1-arnd@kernel.org>
+ <20231108125843.3806765-9-arnd@kernel.org>
+ <CAMuHMdV8uFKntiMfwwmnFpd4Dcx8vJDwS6r1iBLtkh40N71dbw@mail.gmail.com>
+Date: Wed, 10 Jan 2024 11:20:10 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Andrew Morton" <akpm@linux-foundation.org>,
+ linux-kernel@vger.kernel.org, "Masahiro Yamada" <masahiroy@kernel.org>,
+ linux-kbuild@vger.kernel.org, "Matt Turner" <mattst88@gmail.com>,
+ "Vineet Gupta" <vgupta@kernel.org>,
+ "Russell King" <linux@armlinux.org.uk>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Will Deacon" <will@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>, guoren <guoren@kernel.org>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Ard Biesheuvel" <ardb@kernel.org>,
+ "Huacai Chen" <chenhuacai@kernel.org>,
+ "Greg Ungerer" <gerg@linux-m68k.org>, "Michal Simek" <monstr@monstr.eu>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "Dinh Nguyen" <dinguyen@kernel.org>,
+ "Michael Ellerman" <mpe@ellerman.id.au>,
+ "Nicholas Piggin" <npiggin@gmail.com>,
+ "Christophe Leroy" <christophe.leroy@csgroup.eu>,
+ "Geoff Levand" <geoff@infradead.org>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Andy Lutomirski" <luto@kernel.org>,
+ "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
+ x86@kernel.org, "Helge Deller" <deller@gmx.de>,
+ "Sudip Mukherjee" <sudipm.mukherjee@gmail.com>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Timur Tabi" <timur@kernel.org>,
+ "Kent Overstreet" <kent.overstreet@linux.dev>,
+ "David Woodhouse" <dwmw2@infradead.org>,
+ "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ "Anil S Keshavamurthy" <anil.s.keshavamurthy@intel.com>,
+ "Kees Cook" <keescook@chromium.org>,
+ "Vincenzo Frascino" <vincenzo.frascino@arm.com>,
+ "Juri Lelli" <juri.lelli@redhat.com>,
+ "Vincent Guittot" <vincent.guittot@linaro.org>,
+ "Nathan Chancellor" <nathan@kernel.org>,
+ "Nick Desaulniers" <ndesaulniers@google.com>,
+ "Nicolas Schier" <nicolas@fjasle.eu>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+ "linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
+ loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+ Netdev <netdev@vger.kernel.org>, linux-parisc@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org,
+ "linux-bcachefs@vger.kernel.org" <linux-bcachefs@vger.kernel.org>,
+ linux-mtd@lists.infradead.org, "Palmer Dabbelt" <palmer@rivosinc.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>
+Subject: Re: [PATCH 08/22] [v2] arch: consolidate arch_irq_work_raise prototypes
+Content-Type: text/plain;charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Jan 2024 10:14:28 +0000
-Message-ID: <1694631.1704881668@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-Pengfei Xu <pengfei.xu@intel.com> wrote:
+On Wed, Jan 10, 2024, at 10:03, Geert Uytterhoeven wrote:
+> On Wed, Nov 8, 2023 at 2:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org>=
+ wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>>
+>> The prototype was hidden in an #ifdef on x86, which causes a warning:
+>>
+>> kernel/irq_work.c:72:13: error: no previous prototype for 'arch_irq_w=
+ork_raise' [-Werror=3Dmissing-prototypes]
+>
+> This issue is now present upstream.
+>
+>> Some architectures have a working prototype, while others don't.
+>> Fix this by providing it in only one place that is always visible.
+>>
+>> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+>> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+>> Acked-by: Guo Ren <guoren@kernel.org>
+>> Reviewed-by: Alexander Gordeev <agordeev@linux.ibm.com>
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>
+> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
->   Bisected info between v6.7-rc7(keyctl05 passed) and v6.7-rc8(keyctl05 =
-failed)
-> is in attached.
-> =
+I've sent out the asm-generic pull request now,
+that contains the fix. Thanks for the reminder.
 
-> keyctl05 failed in add_key with type "dns_resolver" syscall step tracked
-> by strace:
-> "
-> [pid 863107] add_key("dns_resolver", "desc", "\0\0\1\377\0", 5, KEY_SPEC=
-_SESSION_KEYRING <unfinished ...>
-> [pid 863106] <... alarm resumed>)       =3D 30
-> [pid 863107] <... add_key resumed>)     =3D -1 EINVAL (Invalid argument)
-> "
-
-It should fail as the payload is actually invalid.  The payload specifies =
-a
-version 1 format - and that requires a 6-byte header.  The bug the patched
-fixes is that whilst there is a length check for the basic 3-byte header,
-there was no length check for the extended v1 header.
-
-> After increased the dns_res_payload to 7 bytes(6 bytes was still failed)=
-,
-
-The following doesn't work for you?
-
-	echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
-
-David
-
+      Arnd
 
