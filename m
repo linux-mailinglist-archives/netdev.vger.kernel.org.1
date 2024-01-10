@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-62876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 225F68299F9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:59:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C38C829A26
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91A34B25AC8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 11:58:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D2711C22196
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B45481BC;
-	Wed, 10 Jan 2024 11:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63E6481DA;
+	Wed, 10 Jan 2024 12:06:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mWFAff6h"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="PJtUFaYl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E4748783
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 11:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40e4d64a431so19289515e9.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 03:57:59 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FFD47F74
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 12:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6d9a79a1ad4so1972367b3a.2
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 04:06:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704887878; x=1705492678; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nk5CcraP8tb0HLUYKKWn5feJXh3b9PprQEz09+8nh94=;
-        b=mWFAff6hlAJfcJYKtTHBD1ri2vNE7cjYzc7coMBpTdkhNuoGBf1sB9L8Kfv7na/jTr
-         mFPibPdlc5snztvZAd7xkh6iVRXMNYiRWESbz5BCJPsONt9GkEABdZB4gwHjGvca3SOS
-         vqnbv3DPOXWyCnG+oGg7b57Og0yNfPz1BjO3QtZbsCTLLnHb7r2TkFbUgZ2T6dM2+mjp
-         OPUNFjo84BuTeUj1hg1G++sbpkA7sc5dVhW9L4apx2uVJV88UPizj1uedezwhOZuxeLf
-         wnYhoiMua/cYY0bMeDTNKruy2KLSJMX/b5VIBjkpLcF7Bi9PbYQcJCrKbjsj7VSsjt9e
-         iq0w==
+        d=bytedance.com; s=google; t=1704888363; x=1705493163; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l8cKztzv2ZktLOe0dzMuixqOyjC0S8dozIynxhbNLCA=;
+        b=PJtUFaYlvrO5pZ/l4ETd5F/BPGWcdK9syqEBKz7ARCHtTxn3QP/aujLMCw3/Dejj/r
+         abT6WdbwqedaIU90uhQbNbR0zGVsaEOavXLAe+teunPX13SkyMbgWujpBdSEWWg1uMV2
+         A4ja+jyQdgycjg7qmn65D3XBbG8529pbOsdlFAWzhXAmePHu6cdBkx3mTIGz5p9aTASC
+         Oi7GTnY5REMW+srPlJ2buiPKuL3+smB+duhsJv4ocXGfOa1h5FC16XBeOwO9iJ6XJ8ce
+         a8a+yY1XLWZc4/wXe8QzNtDp7iWFGuf9/+yLHMm/vdpT/IfP/ukSEqxdX2iVHWqsz/Ho
+         CzIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704887878; x=1705492678;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nk5CcraP8tb0HLUYKKWn5feJXh3b9PprQEz09+8nh94=;
-        b=Yh74OGbsnsRGn65yANFFB5W67RLfdfBMp679tfqt5Weyb0Ycz8g0W6fBSGbCLQcxeD
-         tmyfyXH0/2n8is1BvOr8ARrPHkLgYNiPsSArdKBB9Ayu3ntQbyHs2qzig9ma6eOFywgg
-         Lc/NlGSYEysR8StwTR2Y/QhqbI3qbFsdlDEaQeC2lfgE8wcZteX9ZKdv8w5JivNDUPp0
-         c5+GIluSjmlsbPrVIpNDw5IDOrHJ/liB6tQ73j988xjqp/vJ9NfCQvstw8QPR3YD1Ja6
-         3cujJzBk6dnYL3LocuPt3DwFa6xAPpIErA+S7vW9lOYC7Uu031/TRd8d10B+QvPUmiPy
-         Ddtg==
-X-Gm-Message-State: AOJu0Yy80Yzj5hEgwPNwsE2CZ7awcbKjpbSv0n1odQrWxpI0KECq6LqX
-	mLMz6EOSEWbeizk4c1BIPYqSsWmyabtuug==
-X-Google-Smtp-Source: AGHT+IHspS3WBHNq8pc7wZVlvwZCg/EF5lgWNe6VwhEdGt3wjVjh3C6jYUZHj3niz7zmNxfUOpodKw==
-X-Received: by 2002:a05:600c:1c13:b0:40e:5332:1939 with SMTP id j19-20020a05600c1c1300b0040e53321939mr598054wms.50.1704887877866;
-        Wed, 10 Jan 2024 03:57:57 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.223.112])
-        by smtp.gmail.com with ESMTPSA id j17-20020a05600c1c1100b0040c46719966sm1973854wms.25.2024.01.10.03.57.55
+        d=1e100.net; s=20230601; t=1704888363; x=1705493163;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=l8cKztzv2ZktLOe0dzMuixqOyjC0S8dozIynxhbNLCA=;
+        b=xH7uxAhK1r5m4j1F03nGboAsfdx/ErwycSfuEf5a4DSI7Ofbz89zHviXdRzhkMYN2T
+         zUHL3E+rwz+BId0r5w3kFBs4mgHpDLpAbVoq8obUIbH+6L8PQwPS1S1fszC8mOC9tGi7
+         x6infUyIRI3CI04Yuk45StB6xtzThMnUm0+cABKCngX8fCckG/d7lQdl5e0b2rBGHeiD
+         bJSj70NxODtssIvbynt9E+iLZLwtQqvNsPdsHzg9R4OxU3AmJmurOkoP6O3/hSeYK5oy
+         YD7ekxwXOK0aNXORCxYl7wiQ/eHn4eJLVRXEIWe/ldxKyDpOgLhsZMUTEkCHbBWXxjFo
+         6ZLw==
+X-Gm-Message-State: AOJu0YzvFnmrJanaZVliOZ/Uu53zb4kYp8U6M2GDDZ2GNX53wrg6YrhG
+	Gj608DEn7Ofl+j1olN5jXlpze5WQFqOoLQ==
+X-Google-Smtp-Source: AGHT+IFsVj/4XzAFKalFZR2COx2846rqnoRx+GhgwtyxD4J0CYsNkiv/V9CNEvpVyo59dEDH4l9dyw==
+X-Received: by 2002:a05:6a00:3204:b0:6da:63a5:3f32 with SMTP id bm4-20020a056a00320400b006da63a53f32mr612723pfb.66.1704888362874;
+        Wed, 10 Jan 2024 04:06:02 -0800 (PST)
+Received: from [10.255.187.86] ([139.177.225.245])
+        by smtp.gmail.com with ESMTPSA id i128-20020a625486000000b006d99056c4edsm3470845pfb.187.2024.01.10.04.05.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 03:57:57 -0800 (PST)
-Message-ID: <3f18b997-46a7-466c-ad89-10dbafe2708d@linaro.org>
-Date: Wed, 10 Jan 2024 12:57:54 +0100
+        Wed, 10 Jan 2024 04:06:02 -0800 (PST)
+Message-ID: <abcc18ec-4006-4c51-96a8-e61d0ec2f092@bytedance.com>
+Date: Wed, 10 Jan 2024 20:05:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,122 +66,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/6] arm64: dts: qcom: ipq5332: Add RDP441 board device
- tree
-Content-Language: en-US
-To: Luo Jie <quic_luoj@quicinc.com>, andersson@kernel.org,
- konrad.dybcio@linaro.org, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com, quic_soni@quicinc.com,
- quic_pavir@quicinc.com, quic_souravp@quicinc.com, quic_linchen@quicinc.com,
- quic_leiwei@quicinc.com
-References: <20240110112059.2498-1-quic_luoj@quicinc.com>
- <20240110112059.2498-6-quic_luoj@quicinc.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240110112059.2498-6-quic_luoj@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [External] [PATCH 5/6] cachefiles: Fix signed/unsigned mixup
+To: David Howells <dhowells@redhat.com>,
+ Christian Brauner <christian@brauner.io>, Jeff Layton <jlayton@kernel.org>,
+ Gao Xiang <hsiangkao@linux.alibaba.com>,
+ Dominique Martinet <asmadeus@codewreck.org>
+Cc: Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
+ Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
+ linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Simon Horman <horms@kernel.org>, kernel test robot <lkp@intel.com>,
+ Yiqun Leng <yqleng@linux.alibaba.com>, zhujia.zj@bytedance.com
+References: <20240109112029.1572463-1-dhowells@redhat.com>
+ <20240109112029.1572463-6-dhowells@redhat.com>
+From: Jia Zhu <zhujia.zj@bytedance.com>
+In-Reply-To: <20240109112029.1572463-6-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 10/01/2024 12:20, Luo Jie wrote:
-> From: Lei Wei <quic_leiwei@quicinc.com>
+Tested-by: Jia Zhu <zhujia.zj@bytedance.com>
+
+在 2024/1/9 19:20, David Howells 写道:
+> In __cachefiles_prepare_write(), the start and pos variables were made
+> unsigned 64-bit so that the casts in the checking could be got rid of -
+> which should be fine since absolute file offsets can't be negative, except
+> that an error code may be obtained from vfs_llseek(), which *would* be
+> negative.  This breaks the error check.
 > 
-> RDP441 board has onboard QCA8386 switch and 10G SFP port.
+> Fix this for now by reverting pos and start to be signed and putting back
+> the casts.  Unfortunately, the error value checks cannot be replaced with
+> IS_ERR_VALUE() as long might be 32-bits.
 > 
-> Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> Fixes: 7097c96411d2 ("cachefiles: Fix __cachefiles_prepare_write()")
+> Reported-by: Simon Horman <horms@kernel.org>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202401071152.DbKqMQMu-lkp@intel.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> cc: Gao Xiang <hsiangkao@linux.alibaba.com>
+> cc: Yiqun Leng <yqleng@linux.alibaba.com>
+> cc: Jia Zhu <zhujia.zj@bytedance.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cachefs@redhat.com
+> cc: linux-erofs@lists.ozlabs.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
 > ---
->  arch/arm64/boot/dts/qcom/ipq5332-rdp441.dts | 51 +++++++++++++++++++++
->  1 file changed, 51 insertions(+)
+>   fs/cachefiles/io.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/boot/dts/qcom/ipq5332-rdp441.dts b/arch/arm64/boot/dts/qcom/ipq5332-rdp441.dts
-> index 846413817e9a..d51968e9d601 100644
-> --- a/arch/arm64/boot/dts/qcom/ipq5332-rdp441.dts
-> +++ b/arch/arm64/boot/dts/qcom/ipq5332-rdp441.dts
-> @@ -12,6 +12,15 @@
->  / {
->  	model = "Qualcomm Technologies, Inc. IPQ5332 MI01.2";
->  	compatible = "qcom,ipq5332-ap-mi01.2", "qcom,ipq5332";
-> +
-> +	soc@0 {
-
-Nope, DTS does not define soc nodes.
-
-> +		sfp1: sfp-1 {
-
-Why is this soc? Where is the MMIO address?
-
-> +			compatible = "sff,sfp";
-> +			i2c-bus = <&blsp1_i2c1>;
-> +			los-gpios = <&tlmm 45 GPIO_ACTIVE_HIGH>;
-> +			tx-disable-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
-> +		};
-> +	};
->  };
->  
->  &blsp1_i2c1 {
-> @@ -63,3 +72,45 @@ data-pins {
->  		};
->  	};
->  };
-> +
-> +&qcom_ppe {
-> +	qcom,port_phyinfo {
-
-Eh... We talk now about basics: please don't post downstream code, but
-first clean it up from all the junk. All the basic issues which you have
-in downstream and which we do not accept upstream.
-
-I do not believe that this code passed internal review.
-
-NAK.
-
-Best regards,
-Krzysztof
-
+> diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+> index 3eec26967437..9a2cb2868e90 100644
+> --- a/fs/cachefiles/io.c
+> +++ b/fs/cachefiles/io.c
+> @@ -522,7 +522,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+>   			       bool no_space_allocated_yet)
+>   {
+>   	struct cachefiles_cache *cache = object->volume->cache;
+> -	unsigned long long start = *_start, pos;
+> +	loff_t start = *_start, pos;
+>   	size_t len = *_len;
+>   	int ret;
+>   
+> @@ -556,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+>   					  cachefiles_trace_seek_error);
+>   		return pos;
+>   	}
+> -	if (pos >= start + *_len)
+> +	if ((u64)pos >= (u64)start + *_len)
+>   		goto check_space; /* Unallocated region */
+>   
+>   	/* We have a block that's at least partially filled - if we're low on
+> @@ -575,7 +575,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+>   					  cachefiles_trace_seek_error);
+>   		return pos;
+>   	}
+> -	if (pos >= start + *_len)
+> +	if ((u64)pos >= (u64)start + *_len)
+>   		return 0; /* Fully allocated */
+>   
+>   	/* Partially allocated, but insufficient space: cull. */
+> 
 
