@@ -1,116 +1,70 @@
-Return-Path: <netdev+bounces-62906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2095E829BE2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:57:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C23AE829BF1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 15:01:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACA22284941
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 13:57:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61626B220C1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 14:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC6448CFD;
-	Wed, 10 Jan 2024 13:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hjet6GO3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE1C495E0;
+	Wed, 10 Jan 2024 14:01:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C24048CD0;
-	Wed, 10 Jan 2024 13:57:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86DB3C433C7;
-	Wed, 10 Jan 2024 13:57:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704895026;
-	bh=KX4nMw3GLOvc32C67PKcjUg1rWDpL+ovEal4aND4JEw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hjet6GO3YR2W/KNak5Dfzl4DlIFe81vwMyh5cdGSuKAmJo1bsESDB8fTLfmFUi2qL
-	 UgYjMA/dOQ79uKwHJHIA0N7ZPqo2zNGyamShnHfn8rrTIFZm2kgHGG3OiBj1aBLVr1
-	 IshXzjOubebWFuCpULUHCd5yZCFi047L05OSWtdYA/Ev0oYyHbwoDeaEaExYTNPGfs
-	 v43xRDSRL1qe7SSNUaNL6iiOw9b5MPxWvdrUfsXo5cBkGQMMTTh7C8hY6zxm6loNlO
-	 Ozuuv8aCoOBsjXQtL8M3Bf6zDth0/5iLlqi/J8NA8jzcaWZjiFlq3pHuMsMkp5Hhnb
-	 jE99hI63dNV6A==
-Date: Wed, 10 Jan 2024 13:57:01 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-Cc: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@collabora.com
-Subject: Re: [PATCH v6 0/4] Enable networking support for StarFive JH7100 SoC
-Message-ID: <20240110-quaking-unlisted-dcae7229a9f8@spud>
-References: <20231220211743.2490518-1-cristian.ciocaltea@collabora.com>
- <CAJM55Z9tKQ_hpxrGUq1Rx1kxzzs-dyd=4yT1z=8B7KQ=CZ4mjA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C18A23CE;
+	Wed, 10 Jan 2024 14:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rNZ8z-0000jz-0g; Wed, 10 Jan 2024 15:01:21 +0100
+Date: Wed, 10 Jan 2024 15:01:21 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+Cc: Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel@openvz.org
+Subject: Re: [PATCH 1/4] netfilter: nfnetlink_log: use proper helper for
+ fetching physinif
+Message-ID: <20240110140121.GA28014@breakpoint.cc>
+References: <20240110110451.5473-1-ptikhomirov@virtuozzo.com>
+ <20240110110451.5473-2-ptikhomirov@virtuozzo.com>
+ <20240110133333.GA24888@breakpoint.cc>
+ <367b1642-c09a-4bc6-ac63-7692b716174d@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tCGlZoctadBRtAPJ"
-Content-Disposition: inline
-In-Reply-To: <CAJM55Z9tKQ_hpxrGUq1Rx1kxzzs-dyd=4yT1z=8B7KQ=CZ4mjA@mail.gmail.com>
-
-
---tCGlZoctadBRtAPJ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <367b1642-c09a-4bc6-ac63-7692b716174d@virtuozzo.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Dec 26, 2023 at 02:38:26PM -0600, Emil Renner Berthing wrote:
-> Cristian Ciocaltea wrote:
-> > This patch series adds ethernet support for the StarFive JH7100 SoC and
-> > makes it available for the StarFive VisionFive V1 and BeagleV Starlight
-> > boards, although I could only validate on the former SBC.  Thank you Em=
-il
-> > and Geert for helping with tests on BeagleV!
-> >
-> > The work is heavily based on the reference implementation [1] and depen=
-ds
-> > on the SiFive Composable Cache controller and non-coherent DMA support
-> > provided by Emil via [2] and [3].
-> >
-> > *Update 1*: As of next-20231214, dependencies [2] & [3] have been merge=
-d.
-> >
-> > *Update 2*: Since v5, the dwmac patches will be handled via [4], while =
-the
-> >             clock patches subset via [5].
->=20
-> I'm not sure my rb my sense when I'm listed as a co-developer, but this v=
-ersion
-> looks good to me:
->=20
-> Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Pavel Tikhomirov <ptikhomirov@virtuozzo.com> wrote:
+> On 10/01/2024 21:33, Florian Westphal wrote:
+> > Pavel Tikhomirov <ptikhomirov@virtuozzo.com> wrote:
+> > I think you can drop this patch and make the last patch pass
+> > nf_bridge_info->physinif directly.
+> 
+> The whole Idea of this patch was to replace nf_bridge_get_physindev with
+> nf_bridge_get_physinif before the patch which propagates net, so that we
+> don't need to propagate net first and then in later patch remove it when
+> replacing with nf_bridge_get_physinif.
+> 
+> But I spoiled it by forgetting to remove net propagation to
+> __build_packet_message...
+> 
+> Is it ok if I leave this patch as is, but instead remove:
 
-Cool, thanks. Cristian, can you ping this series once the binding gets
-picked up by the netdev folks after the merge window closes?
-
-Cheers,
-Conor.
-
---tCGlZoctadBRtAPJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZZ6iLQAKCRB4tDGHoIJi
-0kbPAP0dbSyLIRPKeMG1shbfbFYtzw73fBt52A+2sdrLbJM5aAD+PQu/udrSe+dz
-2BrPH1XVoW3NkL079PPlz/HGQidT8AA=
-=z7mA
------END PGP SIGNATURE-----
-
---tCGlZoctadBRtAPJ--
+Yes, thats fine.
 
