@@ -1,129 +1,120 @@
-Return-Path: <netdev+bounces-62846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D5FB829932
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:32:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F7382993C
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 12:37:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F44CB24B42
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 11:32:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46946285A90
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 11:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E884A47A59;
-	Wed, 10 Jan 2024 11:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D67647A5F;
+	Wed, 10 Jan 2024 11:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="myUJcrFj"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="cTr9mjEx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EF047F41
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 11:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50e67f70f34so4068121e87.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 03:32:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704886349; x=1705491149; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pEYNQVl4EfVcsy1yzh6J8gEcbt+r98QebOoStpii/nY=;
-        b=myUJcrFjTl9ZqjZf7AcZxgux1afGCi1RuGuZNA6BAkNg7IcuTQlAvncxiGN/IcgLuc
-         N/xpTyqAyRFd6722pthMi06bm0j+YydQOjTVxUpFje2mWl49K9nT2OuzpPmNQQhfn3h4
-         pqv6bGVKNLMfeHz8eMV5QDsj2J+6tY4KmWxKj0/Q/NvbKRzG3wsRds5lDyZ0uLLypF9r
-         sj4Rf8/VkrbbNET82v2RtNd9DqkxZEMvKVmUiu96/y/tqGfZEP1XGR1/k0DxXi2vW9kc
-         mZXSiXwdEEhIel7W1XTq+B7chKRzlCS7JO/44mV4NMlUx1TpnNZzHlCV9QXoTvt8fHFb
-         DU1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704886349; x=1705491149;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pEYNQVl4EfVcsy1yzh6J8gEcbt+r98QebOoStpii/nY=;
-        b=UtjFT41UzOp6PD381Ij1fRFq+0MDw+B2eAx5hu2TRofePDQYTd7OkWlX7M+ECIOHtE
-         XiKKh9Y7Vo3wXC0GAwTQH9zR2NUYohBxgNR8dXt+04oKRha6KfQEOGI/ECrvV0EYnOcH
-         SKo5ts9y6tPxmMMNfVPwckBYjvjNeXnD2mmh3/jH5FOajgHPkXr2/q7cBav3q0CoEocq
-         dZFnvRYEXGoMETEZvWwMqjMmO1jE57kruEtxI2uDkNQqLhx8fXq2WsYBmht+cU5YQtNF
-         lTezVY+gNtl9a9DrDYk8T6eYOc7CmQNCQLoFwhiMWxgyHzJyByHBzA9e+2W3EBrs2ztf
-         N6og==
-X-Gm-Message-State: AOJu0YzS5ALOg/+5IR8OfWv8JbgRSFXU3ntLYoXer/OCqE0yLgn/Nm6N
-	wLDOa/6pkn1GkIQfcU/i8grwWj+G8Jdpgw==
-X-Google-Smtp-Source: AGHT+IGAMkvcpAUqyxRbD5/R78Qb2kagPxgsXLcXC0AOuJ2ThqexDzA5wsbcuzXqLXPlb2wTFi9INw==
-X-Received: by 2002:a19:3856:0:b0:50e:8487:1ec6 with SMTP id d22-20020a193856000000b0050e84871ec6mr253105lfj.56.1704886349316;
-        Wed, 10 Jan 2024 03:32:29 -0800 (PST)
-Received: from [172.30.205.119] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
-        by smtp.gmail.com with ESMTPSA id z22-20020ac25df6000000b0050e6df07728sm629214lfq.180.2024.01.10.03.32.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 03:32:28 -0800 (PST)
-Message-ID: <0ac211de-e3d4-4a41-b0ed-d2bf393e58cb@linaro.org>
-Date: Wed, 10 Jan 2024 12:32:25 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6C447F40;
+	Wed, 10 Jan 2024 11:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1704886672; x=1736422672;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T78Tl1qTZBEDtDopMTraFY8YsyTlW8PPISWExCLGH0k=;
+  b=cTr9mjEx4iSdjuj3up2agluOZslc1IfwidokV7fppHgonOy2qaRdqmYa
+   9UIAfMiqLHzfBqJTsSbdVi3N6wFdy/Euigqc8jD1gj2uPJvLKIdcKmF7M
+   BLoanQxDSf5loe0dxmfVrT6MmOsGsUEkjvh0/w3cGZzV+dggZ7s3ViF8c
+   GquN7mDZ4Uxpp7l5OdlB8hxB8llwdsQnH+yGaCvqFR9iWCL1Wf6BtrNI6
+   Z93jJUBTsxQ8EiLvPGg8/RgoX2PJZ1L91UthixVbA9XdB2RNuAUCZPuV4
+   2jyOmTrsI+VoMXiw3xgoV1dys2tBuQ8khD3qiZs3vCnkqV4GKtF8zK57g
+   Q==;
+X-CSE-ConnectionGUID: /AVVYdDBSmGfb5OcBoykfA==
+X-CSE-MsgGUID: O5IgCn1lRnC2SJLAFDZmAQ==
+X-ThreatScanner-Verdict: Negative
+X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
+   d="scan'208";a="14975477"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jan 2024 04:37:49 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 10 Jan 2024 04:37:36 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 10 Jan 2024 04:37:34 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<horatiu.vultur@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<UNGLinuxDriver@microchip.com>
+Subject: [PATCH net] net: micrel: Fix PTP frame parsing for lan8841
+Date: Wed, 10 Jan 2024 12:37:30 +0100
+Message-ID: <20240110113730.3704712-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/6] Add PPE device tree node for Qualcomm IPQ SoC
-Content-Language: en-US
-To: Luo Jie <quic_luoj@quicinc.com>, andersson@kernel.org,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com, quic_soni@quicinc.com,
- quic_pavir@quicinc.com, quic_souravp@quicinc.com, quic_linchen@quicinc.com,
- quic_leiwei@quicinc.com
-References: <20240110112059.2498-1-quic_luoj@quicinc.com>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <20240110112059.2498-1-quic_luoj@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+The HW has the capability to check each frame if it is a PTP frame,
+which domain it is, which ptp frame type it is, different ip address in
+the frame. And if one of these checks fail then the frame is not
+timestamp. Most of these checks were disabled except checking the field
+minorVersionPTP inside the PTP header. Meaning that once a partner sends
+a frame compliant to 8021AS which has minorVersionPTP set to 1, then the
+frame was not timestamp because the HW expected by default a value of 0
+in minorVersionPTP.
+Fix this issue by removing this check so the userspace can decide on this.
 
+Fixes: cafc3662ee3f ("net: micrel: Add PHC support for lan8841")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/phy/micrel.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-On 1/10/24 12:20, Luo Jie wrote:
-> The PPE(packet process engine) hardware block is supported by Qualcomm
-> IPQ platforms, such as IPQ9574 and IPQ5332. The PPE includes the various
-> packet processing modules such as the routing and bridging flow engines,
-> L2 switch capability, VLAN and tunnels. Also included are integrated
-> ethernet MAC and PCS(uniphy), which is used to connect with the external
-> PHY devices by PCS.
-> 
-> This patch series enables support for the following DTSI functionality
-> for Qualcomm IPQ9574 and IPQ5332 chipsets.
-> 
-> 1. Add PPE (Packet Processing Engine) HW support
-> 
-> 2. Add IPQ9574 RDP433 board support, where the PPE is connected
->     with qca8075 PHY and AQ PHY.
-> 
-> 3. Add IPQ5332 RDP441 board support, where the PPE is connected
->     with qca8386 and SFP
-> 
-> PPE DTS depends on the NSSCC clock driver below, which provides the
-> clocks for the PPE driver.
-> https://lore.kernel.org/linux-arm-msm/20230825091234.32713-1-quic_devipriy@quicinc.com/
-> https://lore.kernel.org/linux-arm-msm/20231211-ipq5332-nsscc-v3-0-ad13bef9b137@quicinc.com/
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 9035c7f55d1bf..0f064d784e33b 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -3609,8 +3609,10 @@ static int lan8814_probe(struct phy_device *phydev)
+ #define LAN8841_ADC_CHANNEL_MASK		198
+ #define LAN8841_PTP_RX_PARSE_L2_ADDR_EN		370
+ #define LAN8841_PTP_RX_PARSE_IP_ADDR_EN		371
++#define LAN8841_PTP_RX_VERSION			374
+ #define LAN8841_PTP_TX_PARSE_L2_ADDR_EN		434
+ #define LAN8841_PTP_TX_PARSE_IP_ADDR_EN		435
++#define LAN8841_PTP_TX_VERSION			438
+ #define LAN8841_PTP_CMD_CTL			256
+ #define LAN8841_PTP_CMD_CTL_PTP_ENABLE		BIT(2)
+ #define LAN8841_PTP_CMD_CTL_PTP_DISABLE		BIT(1)
+@@ -3654,6 +3656,12 @@ static int lan8841_config_init(struct phy_device *phydev)
+ 	phy_write_mmd(phydev, KSZ9131RN_MMD_COMMON_CTRL_REG,
+ 		      LAN8841_PTP_RX_PARSE_IP_ADDR_EN, 0);
+ 
++	/* Disable checking for minorVersionPTP field */
++	phy_write_mmd(phydev, KSZ9131RN_MMD_COMMON_CTRL_REG,
++		      LAN8841_PTP_RX_VERSION, 0xff00);
++	phy_write_mmd(phydev, KSZ9131RN_MMD_COMMON_CTRL_REG,
++		      LAN8841_PTP_TX_VERSION, 0xff00);
++
+ 	/* 100BT Clause 40 improvenent errata */
+ 	phy_write_mmd(phydev, LAN8841_MMD_ANALOG_REG,
+ 		      LAN8841_ANALOG_CONTROL_1,
+-- 
+2.34.1
 
-None of these describe (or even use) the compatible in the first
-patch of this series ("qcom,ipq9574-ppe"). I didn't check the
-subsequent ones, as I assume it's the same situtation, so this
-is a NAK.
-
-> Lei Wei (2):
->    arm64: dts: qcom: ipq5332: Add RDP441 board device tree
->    arm64: dts: qcom: ipq9574: Add RDP433 board device tree
-
-These two look unrelated?
-
-> 
-> Luo Jie (4):
->    arm64: dts: qcom: ipq9574: Add PPE device tree node
->    arm64: dts: qcom: ipq5332: Add PPE device tree node
->    arm64: dts: qcom: ipq5332: Add MDIO device tree
->    arm64: dts: qcom: ipq9574: Add MDIO device tree
-
-Konrad
 
