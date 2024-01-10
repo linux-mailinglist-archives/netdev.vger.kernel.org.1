@@ -1,125 +1,148 @@
-Return-Path: <netdev+bounces-62929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD816829E7F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 17:25:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D3B829E93
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 17:27:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84D6F289933
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 16:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87C281C2252B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 16:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3D84CB49;
-	Wed, 10 Jan 2024 16:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08969495D9;
+	Wed, 10 Jan 2024 16:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ufudp8Qg"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="O/O01Pjz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB76F4CB41;
-	Wed, 10 Jan 2024 16:24:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DF93C41674;
-	Wed, 10 Jan 2024 16:24:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704903891;
-	bh=F/rRPZEP4jt4dv94N+GBp79mg97U/mDxSAOx1+gJl7c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ufudp8Qg9VLe8RnLKEopFn0JZ6i4YfvSuUASRNwS1p+YfsHir98+Pu8BXPbZZc2KG
-	 qLuFVVyEP8CtAoCKLGZCMujLGWnETj5HMal8pJXodKRnMma/oaTpfPSVdDU34G6nJP
-	 jb/dcWrmweLhMbTldpOm3dBEzr6LKpGCvtTV1SFY6pmZFagrT5lQhlTP0NweR4Zaa+
-	 f4+H++RQYiroFkBCcvlvjS7rPQ2kusPg8pXQF2vZKxTxrD2njcv5bdFezUT1U4TGjB
-	 NRjrWTlkAWkkxncDUxHzf3sNgmEeU9BgyigMJC3067oJ0npjmu6ikXlz6nSK+M/q+X
-	 LatT7sy5QW2ng==
-Date: Wed, 10 Jan 2024 16:24:46 +0000
-From: Simon Horman <horms@kernel.org>
-To: alexious@zju.edu.cn
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maor Gottlieb <maorg@mellanox.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [v2] net/mlx5e: fix a double-free in arfs_create_groups
-Message-ID: <20240110162446.GJ9296@kernel.org>
-References: <20240108152605.3712050-1-alexious@zju.edu.cn>
- <20240109081837.GJ132648@kernel.org>
- <49a38639.7d59b.18cf38ab939.Coremail.alexious@zju.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833894CDE5
+	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 16:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4b87d79a7d8so762001e0c.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 08:27:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1704904023; x=1705508823; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7uB53QA0E7F+IhblD19yUURwvGBMy4pSNNv3aj7aRQ8=;
+        b=O/O01PjzdBA0CMwQh6BnBjoqZZTOQ6ncSWNIHlFtZ+Gj745Ech4CipC6PSpbfurRcM
+         Z0euVyZuW4FgFjufAW4VRUB//m7Z1C/QF5h5hwqoNJ4M6UcO+aDkPZ7gA8HvDiMdXTaS
+         cCs2n/XO6jMVttyHaUkmW9xjJK0pLmhEipXuo/SUSNBWMBCcO901yZbZCrPIfO9dvS5C
+         yh/278g8Exy//M0VWusCqml4q1whH1jtZC5qvlRYOhq7C7szWj3U0mp3q+I6pRriCbGr
+         LFZ8wGhBrQo/1rmsXcLFVxKnzVroAW6kq5+T5TqMeMg+i0HGMlrKWIUnJQmv2KHKaxLE
+         oTyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704904023; x=1705508823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7uB53QA0E7F+IhblD19yUURwvGBMy4pSNNv3aj7aRQ8=;
+        b=VNRZyX/etJqffiWpL/vm9uq25TDHO61BS7ZyaTMtxiPHH54oUi+ntkgFyle5G2UxPY
+         L0gmd2rT5dtLKOCTKVOJl0JH0EPHUlLfvVxTmoZjDCQIi7/k0CKKugBF8PGPC1KxvU38
+         IajAds5hlS580q8XdRgdwJUS1AeGs8uL+mOK/9Jf6aZlIR+k7cRd8SJ4LXKdRCv7l6QW
+         xc1bvfBLNWskYgMHOIb9w45wQ8JspKUk0fGc0WQyCWbnPKEb2t0TgMqaGplMyPFdEZJ2
+         ArXTUhLPOTzzT7rNprCQGGBo0MmeEqzHgZsoSJSGRTaSRHiqOmbrHphFI2caNzBl7UCR
+         CnoQ==
+X-Gm-Message-State: AOJu0Yz+sWC7bgG7p/z+G1osvBZGTZ9sGgZQT+ChlsEs8v77cbsewZEd
+	BiojcrfSWX8ozxXW3hzwmqpzvJrEL0CJQD5QU4JfpPHINzXDBw==
+X-Google-Smtp-Source: AGHT+IG/6gqAtxJZLTTUV4O4tvffOZMmP4epLvYL4XaS5IigP6LYO/TVheroyq15hW5HpD2+n4VCIuSdCWqd7g4P8XE=
+X-Received: by 2002:a05:6122:270c:b0:4b6:aeb7:3f1d with SMTP id
+ ej12-20020a056122270c00b004b6aeb73f1dmr611316vkb.9.1704904023230; Wed, 10 Jan
+ 2024 08:27:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <49a38639.7d59b.18cf38ab939.Coremail.alexious@zju.edu.cn>
+References: <20240104130123.37115-1-brgl@bgdev.pl> <20240104130123.37115-4-brgl@bgdev.pl>
+ <20240109144327.GA10780@wunner.de> <CAMRc=MdXO6c6asvRSn_Z8-oFS48hroT+dazGKB6WWY1_Zu7f1Q@mail.gmail.com>
+ <20240110132853.GA6860@wunner.de>
+In-Reply-To: <20240110132853.GA6860@wunner.de>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 10 Jan 2024 17:26:52 +0100
+Message-ID: <CAMRc=MdBSAb_kEO2r7r-vwLuRAEv7pMODOMtZoCCRAd=zsQb_w@mail.gmail.com>
+Subject: Re: [RFC 3/9] PCI/portdrv: create platform devices for child OF nodes
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>, 
+	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 10, 2024 at 09:23:24PM +0800, alexious@zju.edu.cn wrote:
-> > On Mon, Jan 08, 2024 at 11:26:04PM +0800, Zhipeng Lu wrote:
-> > > When `in` allocated by kvzalloc fails, arfs_create_groups will free
-> > > ft->g and return an error. However, arfs_create_table, the only caller of
-> > > arfs_create_groups, will hold this error and call to
-> > > mlx5e_destroy_flow_table, in which the ft->g will be freed again.
-> > > 
-> > > Fixes: 1cabe6b0965e ("net/mlx5e: Create aRFS flow tables")
-> > > Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
-> > > Reviewed-by: Simon Horman <horms@kernel.org>
-> > 
-> > When working on netdev (and probably elsewhere)
-> > Please don't include Reviewed-by or other tags
-> > that were explicitly supplied by someone: I don't recall
-> > supplying the tag above so please drop it.
-> 
-> I apologize, but it appears that you included a "reviewed-by" 
-> tag along with certain suggestions for version 1 of this patch 
-> in the first review email(about 6 days before). 
+On Wed, Jan 10, 2024 at 2:28=E2=80=AFPM Lukas Wunner <lukas@wunner.de> wrot=
+e:
+>
+> On Wed, Jan 10, 2024 at 01:55:18PM +0100, Bartosz Golaszewski wrote:
+> > On Tue, Jan 9, 2024 at 3:43???PM Lukas Wunner <lukas@wunner.de> wrote:
+> > > On Thu, Jan 04, 2024 at 02:01:17PM +0100, Bartosz Golaszewski wrote:
+> > > > In order to introduce PCIe power-sequencing, we need to create plat=
+form
+> > > > devices for child nodes of the port driver node. They will get matc=
+hed
+> > > > against the pwrseq drivers (if one exists) and then the actuak PCIe
+> > > > device will reuse the node once it's detected on the bus.
+> > > [...]
+> > > > --- a/drivers/pci/pcie/portdrv.c
+> > > > +++ b/drivers/pci/pcie/portdrv.c
+> > > > @@ -715,7 +716,7 @@ static int pcie_portdrv_probe(struct pci_dev *d=
+ev,
+> > > >               pm_runtime_allow(&dev->dev);
+> > > >       }
+> > > >
+> > > > -     return 0;
+> > > > +     return devm_of_platform_populate(&dev->dev);
+> > > >  }
+> > >
+> > > I think this belongs in of_pci_make_dev_node(), portdrv seems totally
+> > > the wrong place.  Note that you're currently calling this for RCECs
+> > > (Root Complex Event Collectors) as well, which is likely not what
+> > > you want.
+> > >
+> >
+> > of_pci_make_dev_node() is only called when the relevant PCI device is
+> > instantiated which doesn't happen until it's powered-up and scanned -
+> > precisely the problem I'm trying to address.
+>
+> No, of_pci_make_dev_node() is called *before* device_attach(),
+> i.e. before portdrv has even probed.  So it seems this should
+> work perfectly well for your use case.
+>
 
-Yes, sorry. My statement above is not correct:
-I now see that I did supply the tag.
+Seems like the following must be true but isn't in my case (from
+pci_bus_add_device()):
 
-> In response, after a short discussion, I followed some of 
-> those suggestions and send this v2 patch.
-> I referred to the "Dealing with tags" section in this KernelNewbies 
-> tips: https://kernelnewbies.org/PatchTipsAndTricks and thought 
-> that I should include that tag in v1 email to this v2 patch.
-> So now I'm a little bit confused here: if the tag rule has changed 
-> or I got some misunderstanding on existing rules? Your clarification 
-> on this matter would be greatly appreciated.
+    if (pci_is_bridge(dev))
+        of_pci_make_dev_node(dev);
 
-I think in this case my statement above was incorrect,
-and indeed the rule above is correct AFAIK
+Shouldn't it evaluate to true for ports?
 
-But it probably would have been best not to include the tag
-in v2, because there were significant changes between v1 and v2.
+Bartosz
 
-> I'll send a new version of this patch after correcting the tag 
-> issue and taking your suggestions into consideration.
-> 
-> Several comments below.
-
-...
-
-> > > @@ -883,7 +883,6 @@ void mlx5e_fs_init_l2_addr(struct mlx5e_flow_steering *fs, struct net_device *ne
-> > >  void mlx5e_destroy_flow_table(struct mlx5e_flow_table *ft)
-> > >  {
-> > >  	mlx5e_destroy_groups(ft);
-> > > -	kfree(ft->g);
-> > >  	mlx5_destroy_flow_table(ft->t);
-> > >  	ft->t = NULL;
-> > 
-> > Is the above still needed in some cases, and safe in all cases?
-> 
-> Well, in fact the kfree(ft->g) in mlx5e_destroy_flow_table causes 
-> double frees in different functions such as fs_udp_create_table, 
-> not only in arfs_create_groups. But you are right, with a more 
-> detailed check I found that in some other functions, like 
-> accel_fs_tcp_create_table, removing such free will cause memleak.
-> So it could be a better idea to leave mlx5e_destroy_flow_table 
-> as it used to be. And that follows the "one patch for one change" idea.
-
-Right, I think it would be best to focus on fixing arfs_create_groups().
-And making sure that neither leaks nor double frees occur. And I think
-that at this point that includes ensuring ft->g is NULL if it has been freed.
+[snip]
 
