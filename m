@@ -1,151 +1,93 @@
-Return-Path: <netdev+bounces-62779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E5EC8292AB
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 04:09:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA458292B0
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 04:12:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4911B25A66
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 03:09:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32AD72894CE
+	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 03:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52906210B;
-	Wed, 10 Jan 2024 03:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fle9INwo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741E41FA6;
+	Wed, 10 Jan 2024 03:12:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D5A23D5;
-	Wed, 10 Jan 2024 03:08:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-dbdc7ff087fso2876794276.2;
-        Tue, 09 Jan 2024 19:08:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704856115; x=1705460915; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MFF4djnEjNRjNb/Z2lhzWjzj1NHxohVp1JZl91La+1g=;
-        b=fle9INwotfwTOsSaBtUyxkLmiV2ebl2+6PlZxiKohlwCBmwFC7L7PqKvvJoLRbb4+I
-         sF0uXNvFAH/vOLVDi+spw0toppvLIpxDHPNF8lXMOkIJ3fobDn0wffBfJP45UYMjaE1B
-         rGpOP/Ev33RiP49E6nDfcqSRyctMy1FmXfi7uxsORDWjl8Z9W2BlsWSKR76zSu6EfuJk
-         OOBW5ebvE++lZ9d32msUKsCTktgj7IhJH+RyLBSRhIpDmuMKuNeZFi03+7RvyDP7A9pa
-         ly79JZjpuVZBSeampL7vIPP+ndhN/ltGNi3DO1A6TYWeVQcUNRmYYHU7rESF2GGC7eJW
-         Pd1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704856115; x=1705460915;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MFF4djnEjNRjNb/Z2lhzWjzj1NHxohVp1JZl91La+1g=;
-        b=EAzr4NMNAEfrtWKtFmwMqmPn7nYPKh9m6j1GQW5oS6vvp8d4YgXeDZ8ahFdb36eVnS
-         gsjITWFt2tBmCUwvoU7Byj9Iln7P0pFhqguYe7jgNFLlebr2Wehf2teroEn8cGjiz9yu
-         ZaXzjFKWvJt7faq44P+Yt9vfQ5V8vmHUC2UEh6+XhSmrudqlkNlkPseiKWbl8ejc2m9S
-         WMQhC1WSy2BtiuZ4GCCRHnJaXFlmFVOmZUEIMXL/X8Ks3sdOA5hpfgSj28sHLkmayXfj
-         dTQ0UAn8ZLA93eulmHu8C6xpCAgBiWC0+hNugmtfQTYZ9dbvqqQWTsOJgSjJhKdjwjdH
-         mYtA==
-X-Gm-Message-State: AOJu0Yx5XlHob6Iv/iLnuHdlStahvqVfu917mm2lfyxsS/cTf11wTy6u
-	cx5Vkp9TSQ8Jk6bZxlcmBQc4zNsXmVTBKdkXIQ6DW5fxHiqp66wM
-X-Google-Smtp-Source: AGHT+IGrzlkbOChlJ1fL+Av9xopiJJoeeo9wO6yazpGlFCCuK5Me2frpoYSokfDFh0bDQxSzqciQ7NNZAP3FJV+pTvs=
-X-Received: by 2002:a5b:808:0:b0:dbd:b176:5796 with SMTP id
- x8-20020a5b0808000000b00dbdb1765796mr253001ybp.86.1704856114764; Tue, 09 Jan
- 2024 19:08:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75886107;
+	Wed, 10 Jan 2024 03:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 40A3C8j04796102, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 40A3C8j04796102
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Jan 2024 11:12:08 +0800
+Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Wed, 10 Jan 2024 11:12:08 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 10 Jan 2024 11:12:07 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::e4c4:c4f:4e4c:d23c]) by
+ RTEXMBS04.realtek.com.tw ([fe80::e4c4:c4f:4e4c:d23c%5]) with mapi id
+ 15.01.2507.035; Wed, 10 Jan 2024 11:12:07 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "andrew@lunn.ch" <andrew@lunn.ch>, Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v16 01/13] rtase: Add pci table supported in this module
+Thread-Topic: [PATCH net-next v16 01/13] rtase: Add pci table supported in
+ this module
+Thread-Index: AQHaP8pOX82F4oW9aUSB3eoR04kasLDKk3mAgAfSBNA=
+Date: Wed, 10 Jan 2024 03:12:07 +0000
+Message-ID: <b4c270c222844733be97e39dae010f92@realtek.com>
+References: <20240105112811.380952-1-justinlai0215@realtek.com>
+ <20240105112811.380952-2-justinlai0215@realtek.com>
+ <ZZfrr8GFWqLs6-A3@nanopsycho>
+In-Reply-To: <ZZfrr8GFWqLs6-A3@nanopsycho>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXDAG01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240109031204.15552-1-menglong8.dong@gmail.com>
-In-Reply-To: <20240109031204.15552-1-menglong8.dong@gmail.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Wed, 10 Jan 2024 11:08:23 +0800
-Message-ID: <CADxym3azdds6dRDdvofHj1cxZ1QxcN1S8EkrLtYtKy4opoPrFw@mail.gmail.com>
-Subject: Re: [PATCH] net: tcp: accept old ack during closing
-To: edumazet@google.com
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Tue, Jan 9, 2024 at 11:12=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
-.com> wrote:
->
-> For now, the packet with an old ack is not accepted if we are in
-> FIN_WAIT1 state, which can cause retransmission. Taking the following
-> case as an example:
->
->     Client                               Server
->       |                                    |
->   FIN_WAIT1(Send FIN, seq=3D10)          FIN_WAIT1(Send FIN, seq=3D20, ac=
-k=3D10)
->       |                                    |
->       |                                Send ACK(seq=3D21, ack=3D11)
->    Recv ACK(seq=3D21, ack=3D11)
->       |
->    Recv FIN(seq=3D20, ack=3D10)
->
-> In the case above, simultaneous close is happening, and the FIN and ACK
-> packet that send from the server is out of order. Then, the FIN will be
-> dropped by the client, as it has an old ack. Then, the server has to
-> retransmit the FIN, which can cause delay if the server has set the
-> SO_LINGER on the socket.
->
-> Old ack is accepted in the ESTABLISHED and TIME_WAIT state, and I think
-> it should be better to keep the same logic.
->
-> In this commit, we accept old ack in FIN_WAIT1/FIN_WAIT2/CLOSING/LAST_ACK
-> states. Maybe we should limit it to FIN_WAIT1 for now?
->
-> Signed-off-by: Menglong Dong <menglong8.dong@gmail.com>
-> ---
->  net/ipv4/tcp_input.c | 18 +++++++++++-------
->  1 file changed, 11 insertions(+), 7 deletions(-)
->
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index df7b13f0e5e0..b2b19421de8b 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -6699,17 +6699,21 @@ int tcp_rcv_state_process(struct sock *sk, struct=
- sk_buff *skb)
->                 return 0;
->
->         /* step 5: check the ACK field */
-> -       acceptable =3D tcp_ack(sk, skb, FLAG_SLOWPATH |
-> -                                     FLAG_UPDATE_TS_RECENT |
-> -                                     FLAG_NO_CHALLENGE_ACK) > 0;
-> +       reason =3D tcp_ack(sk, skb, FLAG_SLOWPATH |
-> +                                 FLAG_UPDATE_TS_RECENT |
-> +                                 FLAG_NO_CHALLENGE_ACK);
->
-> -       if (!acceptable) {
-> +       if (reason <=3D 0) {
->                 if (sk->sk_state =3D=3D TCP_SYN_RECV)
->                         return 1;       /* send one RST */
-> -               tcp_send_challenge_ack(sk);
-> -               SKB_DR_SET(reason, TCP_OLD_ACK);
-> -               goto discard;
-> +               /* accept old ack during closing */
-> +               if (reason < 0) {
-> +                       tcp_send_challenge_ack(sk);
-> +                       reason =3D -reason;
-> +                       goto discard;
-> +               }
->         }
-> +       SKB_DR_SET(NOT_SPECIFIED);
+> Fri, Jan 05, 2024 at 12:27:59PM CET, justinlai0215@realtek.com wrote:
+> >Add pci table supported in this module, and implement pci_driver
+> >function to initialize this driver, remove this driver, or shutdown this=
+ driver.
+> >
+> >Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> >---
+> > drivers/net/ethernet/realtek/rtase/rtase.h    | 336 ++++++++++
+>=20
+> Hmm, you missed to address my feedback to v14
+>=20
+> pw-bot: cr
 
-Oops, It should be "SKB_DR_SET(reason, NOT_SPECIFIED);" here.
-Sorry that I shouldn't be too confident to compile it.
-
->         switch (sk->sk_state) {
->         case TCP_SYN_RECV:
->                 tp->delivered++; /* SYN-ACK delivery isn't tracked in tcp=
-_ack */
-> --
-> 2.39.2
->
+Sorry, I have gone back and read your comment.
+I will make changes in the next version.
 
