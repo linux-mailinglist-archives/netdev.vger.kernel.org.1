@@ -1,310 +1,234 @@
-Return-Path: <netdev+bounces-63066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C1F182B0EF
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 15:50:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B29EC82B12B
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 15:58:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBD761F23EA1
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 14:50:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 305A92816D9
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 14:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1D84BAB0;
-	Thu, 11 Jan 2024 14:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0975342069;
+	Thu, 11 Jan 2024 14:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="q4Rd2nzR"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MyZXJOcj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828D64A98E
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 14:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50ed808db11so2404264e87.2
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 06:50:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704984615; x=1705589415; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bEyGSllYt9OxPetcB8D76c/PruL4Th1B1cxlxtL+brQ=;
-        b=q4Rd2nzRzqb0LCvVFZGyTRYoUNIm9bZty5rEobxjYDQuq+b4AVrpEEI2dH4KeIaHro
-         SysdjD1CBFXVG3fqVKKVfVrTfRkxZcAcd35BVo9wHZQcAojCujkpOURZK60wzTHgtTbf
-         9ranOxaEX9KAJXIzUVae/6kE2aJC/e3BDAke0qcZF7wg6MjxWHWgXKAvamWdA6DoSUUD
-         O/926NNtNyjizKuhFl8Fnq8qzNgXBUHrpUPS5aU/6O+Q6CPkqzYdBvgaS6sczErd916U
-         TUrlKOq74z3BC/Fr7M+5U6g4PAOk7OFhkWTm45FR74Oyrmf5Pl/um0FO0me8Q9vWPjig
-         64gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704984615; x=1705589415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bEyGSllYt9OxPetcB8D76c/PruL4Th1B1cxlxtL+brQ=;
-        b=SlwctXKc9XmMT9tPcnkpFSw8bwpezB6gHQ+d0oNjVfUAepBFYaq5YmqAIfRbDMLu5P
-         bTHqA9YmxFjFbQjv8Dp4UsAr6LyWFXTi2YollFENMp95nk9aZ/MxdOSeA/+1stRQOcFo
-         9uD2/OfXsimlw+XFge1XJ6VMbRuo00vriiKcFGkDEgTHYwspdiErsVrGHoh0/gRKeVdW
-         1bjr1ljxTX3cNu64AztBQr3dYtqirvmD8SZZdIOvhGpVBYQVtnfSJEyDJ/d5h0D68wu1
-         ve/0mx8o+g2v8pJLBdogQkIHtPppsbhJSyNR/fZb11AFCuMAWvX+aAsQzwYgxh1vbKeS
-         yEEA==
-X-Gm-Message-State: AOJu0YzYgQWfhEUJS07J9GkZjJfp+9Tkf/kUdophClt45mVL3ogjrneQ
-	dqZuqzjYS0ltAD97SkTX02R7V5oroTFEpSUHHi8/QQM6kGw=
-X-Google-Smtp-Source: AGHT+IGYiLKyvOgTCBH2tHlSIlEVKsqb/0h126uTNT0yhvgBpzrEefbBWxF2tBiv6r0AT9hzP59cwA==
-X-Received: by 2002:ac2:44a7:0:b0:50e:7709:a06e with SMTP id c7-20020ac244a7000000b0050e7709a06emr661289lfm.99.1704984615162;
-        Thu, 11 Jan 2024 06:50:15 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id j15-20020a1709066dcf00b00a2a6e8f693esm654747ejt.152.2024.01.11.06.50.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 06:50:13 -0800 (PST)
-Date: Thu, 11 Jan 2024 15:50:12 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
-	gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	jaka@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
-	alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
- SMC-D
-Message-ID: <ZaAAJDiQ3bPGGRFK@nanopsycho>
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575A415EBE;
+	Thu, 11 Jan 2024 14:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id F196BC0002;
+	Thu, 11 Jan 2024 14:58:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1704985113;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=R2bbJVq+6aJv4+RN9gD8jwYvKFV5uKbbfrkkWD/CfRk=;
+	b=MyZXJOcjfpxkuDWgNYFkienl9aktx2n25MGLI+87VxLE2qHZJgcjOIcpIP7FVK7aOdqnZn
+	Yko4so3kFlgow8ciqN8tQj7ISHmpEsfArJ/xtrbn/YcJ1JS/jpu6u37lHUhZSaPA0v50xC
+	TUyIAKizs96izTpSo0jWft0qQLhhy3o05jrRkUgnO6l8k6aXg43nwXDXuiWxWJBf+Uuwza
+	DAs++aWtaa7bjzGxDfcKAcy0fsvMkC2d5iBGwYMvFvDZbhwmRPTnvFODkPaR2Eqi7s7olA
+	LbJJuRYpKhnZ8w6OL8Xk+hDsOGmRV6xk7J3jQiBoecU8XLxBocGVyY4AL3M8PQ==
+From: Romain Gantois <romain.gantois@bootlin.com>
+Date: Thu, 11 Jan 2024 15:58:51 +0100
+Subject: [PATCH net v5] net: stmmac: Prevent DSA tags from breaking COE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240111120036.109903-1-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240111-prevent_dsa_tags-v5-1-63e795a4d129@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIACoCoGUC/2WO0QrCIBSGX2V4nUPN0rrqPWIM3XQ70DRURjH27
+ p1GN6PL7/Cdj38h2SVwmVyrhSQ3Q4YYEE6HinSjCYOj0CMTwYRknGn6RMuF0vbZtMUMmSprWe8
+ 8663mBN9Q8PDakncSXCENHn2KEy1jcmZX45wrqWp11EpQQVEyEOrBhBIh32yM5YHcxekbHiGXm
+ N7b1Flu+V/n8r9qlpRTr7VWinsj/HlXa9Z1/QCpe2qL+wAAAA==
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Miquel Raynal <miquel.raynal@bootlin.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Sylvain Girard <sylvain.girard@se.com>, 
+ Pascal EBERHARD <pascal.eberhard@se.com>, 
+ Richard Tresidder <rtresidd@electromag.com.au>, 
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, 
+ Romain Gantois <romain.gantois@bootlin.com>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+X-Mailer: b4 0.12.4
+X-GND-Sasl: romain.gantois@bootlin.com
 
-Thu, Jan 11, 2024 at 01:00:21PM CET, guwen@linux.alibaba.com wrote:
->This patch set acts as the second part of the new version of [1] (The first
->part can be referred from [2]), the updated things of this version are listed
->at the end.
->
-># Background
->
->SMC-D is now used in IBM z with ISM function to optimize network interconnect
->for intra-CPC communications. Inspired by this, we try to make SMC-D available
+Some DSA tagging protocols change the EtherType field in the MAC header
+e.g.  DSA_TAG_PROTO_(DSA/EDSA/BRCM/MTK/RTL4C_A/SJA1105). On TX these tagged
+frames are ignored by the checksum offload engine and IP header checker of
+some stmmac cores.
 
-Care to provide more details about what ISM and intra-CPC is and what it
-it good for?
+On RX, the stmmac driver wrongly assumes that checksums have been computed
+for these tagged packets, and sets CHECKSUM_UNNECESSARY.
 
+Add an additional check in the stmmac TX and RX hotpaths so that COE is
+deactivated for packets with ethertypes that will not trigger the COE and
+IP header checks.
 
->on the non-s390 architecture through a software-implemented virtual ISM device,
->that is the loopback-ism device here, to accelerate inter-process or
+Fixes: 6b2c6e4a938f ("net: stmmac: propagate feature flags to vlan")
+Cc:  <stable@vger.kernel.org>
+Reported-by: Richard Tresidder <rtresidd@electromag.com.au>
+Link: https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au/
+Reported-by: Romain Gantois <romain.gantois@bootlin.com>
+Link: https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com/
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+---
+Hello everyone,
 
-I see no such device. Is it a netdevice?
+This is the fifth version of my proposed fix for the stmmac checksum
+offloading issue that has recently been reported.
 
-If it is "software-implemented", why is it part of smc driver and not
-separate soft-device driver? If there is some smc specific code, I guess
-there should be some level of separation. Can't this be implemented by
-other devices too?
+significant changes in v4:
+- Removed "inline" from declaration of stmmac_has_ip_ethertype
 
+significant changes in v3:
+- Use __vlan_get_protocol to make sure that 8021Q-encapsulated
+  traffic is checked correctly.
 
+significant changes in v2:
+- Replaced the stmmac_link_up-based fix with an ethertype check in the TX
+  and RX hotpaths.
 
->inter-containers communication within the same OS instance.
->
-># Design
->
->This patch set includes 3 parts:
->
-> - Patch #1-#2: some prepare work for loopback-ism.
-> - Patch #3-#9: implement loopback-ism device.
-> - Patch #10-#15: memory copy optimization for loopback scenario.
->
->The loopback-ism device is designed as a ISMv2 device and not be limited to
->a specific net namespace, ends of both inter-process connection (1/1' in diagram
->below) or inter-container connection (2/2' in diagram below) can find the same
->available loopback-ism and choose it during the CLC handshake.
->
-> Container 1 (ns1)                              Container 2 (ns2)
-> +-----------------------------------------+    +-------------------------+
-> | +-------+      +-------+      +-------+ |    |        +-------+        |
-> | | App A |      | App B |      | App C | |    |        | App D |<-+     |
-> | +-------+      +---^---+      +-------+ |    |        +-------+  |(2') |
-> |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|     |
-> |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+ |
-> |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  | |
-> +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+-+
->              |   |           |                                  |
-> Kernel       |   |           |                                  |
-> +----+-------v---+-----------v----------------------------------+---+----+
-> |    |                            TCP                               |    |
-> |    |                                                              |    |
-> |    +--------------------------------------------------------------+    |
-> |                                                                        |
-> |                           +--------------+                             |
-> |                           | smc loopback |                             |
-> +---------------------------+--------------+-----------------------------+
->
->loopback-ism device creates DMBs (shared memory) for each connection peer.
->Since data transfer occurs within the same kernel, the sndbuf of each peer
->is only a descriptor and point to the same memory region as peer DMB, so that
->the data copy from sndbuf to peer DMB can be avoided in loopback-ism case.
->
-> Container 1 (ns1)                              Container 2 (ns2)
-> +-----------------------------------------+    +-------------------------+
-> | +-------+                               |    |        +-------+        |
-> | | App C |-----+                         |    |        | App D |        |
-> | +-------+     |                         |    |        +-^-----+        |
-> |               |                         |    |          |              |
-> |           (2) |                         |    |     (2') |              |
-> |               |                         |    |          |              |
-> +---------------|-------------------------+    +----------|--------------+
->                 |                                         |
-> Kernel          |                                         |
-> +---------------|-----------------------------------------|--------------+
-> | +--------+ +--v-----+                           +--------+ +--------+  |
-> | |dmb_desc| |snd_desc|                           |dmb_desc| |snd_desc|  |
-> | +-----|--+ +--|-----+                           +-----|--+ +--------+  |
-> | +-----|--+    |                                 +-----|--+             |
-> | | DMB C  |    +---------------------------------| DMB D  |             |
-> | +--------+                                      +--------+             |
-> |                                                                        |
-> |                           +--------------+                             |
-> |                           | smc loopback |                             |
-> +---------------------------+--------------+-----------------------------+
->
-># Benchmark Test
->
-> * Test environments:
->      - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
->      - SMC sndbuf/DMB size 1MB.
->      - /sys/devices/virtual/smc/loopback-ism/dmb_copy is set to default 0,
->        which means sndbuf and DMB are merged and no data copied between them.
->      - /sys/devices/virtual/smc/loopback-ism/dmb_type is set to default 0,
+The Checksum Offloading Engine of some stmmac cores (e.g. DWMAC1000)
+computes an incorrect checksum when presented with DSA-tagged packets. This
+causes all TCP/UDP transfers to break when the stmmac device is connected
+to the CPU port of a DSA switch.
 
-Exposing any configuration knobs and statistics over sysfs for
-softdevices does not look correct at all :/ Could you please avoid
-sysfs?
+I ran some tests using different tagging protocols with DSA_LOOP, and all
+of the protocols that set a custom ethertype field in the MAC header caused
+the checksum offload engine to ignore the tagged packets. On TX, this
+caused packets to egress with incorrect checksums. On RX, these packets
+were similarly ignored by the COE, yet the stmmac driver set
+CHECKSUM_UNNECESSARY, wrongly assuming that their checksums had been
+verified in hardware.
 
+Version 2 of this patch series fixes this issue by checking ethertype
+fields in both the TX and RX hotpaths of the stmmac driver. On TX, if a
+non-IP ethertype is detected, the packet is checksummed in software.  On
+RX, the same condition causes stmmac to avoid setting CHECKSUM_UNNECESSARY.
 
->        which means DMB is physically contiguous buffer.
->
-> * Test object:
->      - TCP: run on TCP loopback.
->      - SMC lo: run on SMC loopback device.
->
->1. ipc-benchmark (see [3])
->
-> - ./<foo> -c 1000000 -s 100
->
->                            TCP                  SMC-lo
->Message
->rate (msg/s)              80636                  149515(+85.42%)
->
->2. sockperf
->
-> - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
-> - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
->
->                            TCP                  SMC-lo
->Bandwidth(MBps)         4909.36                 8197.57(+66.98%)
->Latency(us)               6.098                   3.383(-44.52%)
->
->3. nginx/wrk
->
-> - serv: <smc_run> nginx
-> - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
->
->                           TCP                   SMC-lo
->Requests/s           181685.74                246447.77(+35.65%)
->
->4. redis-benchmark
->
-> - serv: <smc_run> redis-server
-> - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
->
->                           TCP                   SMC-lo
->GET(Requests/s)       85855.34                118553.64(+38.09%)
->SET(Requests/s)       86824.40                125944.58(+45.06%)
->
->
->Change log:
->
->v1->RFC:
->- Patch #9: merge rx_bytes and tx_bytes as xfer_bytes statistics:
->  /sys/devices/virtual/smc/loopback-ism/xfer_bytes
->- Patch #10: add support_dmb_nocopy operation to check if SMC-D device supports
->  merging sndbuf with peer DMB.
->- Patch #13 & #14: introduce loopback-ism device control of DMB memory type and
->  control of whether to merge sndbuf and DMB. They can be respectively set by:
->  /sys/devices/virtual/smc/loopback-ism/dmb_type
->  /sys/devices/virtual/smc/loopback-ism/dmb_copy
->  The motivation for these two control is that a performance bottleneck was
->  found when using vzalloced DMB and sndbuf is merged with DMB, and there are
->  many CPUs and CONFIG_HARDENED_USERCOPY is set [4]. The bottleneck is caused
->  by the lock contention in vmap_area_lock [5] which is involved in memcpy_from_msg()
->  or memcpy_to_msg(). Currently, Uladzislau Rezki is working on mitigating the
->  vmap lock contention [6]. It has significant effects, but using virtual memory
->  still has additional overhead compared to using physical memory.
->  So this new version provides controls of dmb_type and dmb_copy to suit
->  different scenarios.
->- Some minor changes and comments improvements.
->
->RFC->old version([1]):
->Link: https://lore.kernel.org/netdev/1702214654-32069-1-git-send-email-guwen@linux.alibaba.com/
->- Patch #1: improve the loopback-ism dump, it shows as follows now:
->  # smcd d
->  FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
->  0000 0     loopback-ism  ffff   No        0
->- Patch #3: introduce the smc_ism_set_v2_capable() helper and set
->  smc_ism_v2_capable when ISMv2 or virtual ISM is registered,
->  regardless of whether there is already a device in smcd device list.
->- Patch #3: loopback-ism will be added into /sys/devices/virtual/smc/loopback-ism/.
->- Patch #8: introduce the runtime switch /sys/devices/virtual/smc/loopback-ism/active
->  to activate or deactivate the loopback-ism.
->- Patch #9: introduce the statistics of loopback-ism by
->  /sys/devices/virtual/smc/loopback-ism/{{tx|rx}_tytes|dmbs_cnt}.
->- Some minor changes and comments improvements.
->
->[1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
->[2] https://lore.kernel.org/netdev/20231219142616.80697-1-guwen@linux.alibaba.com/
->[3] https://github.com/goldsborough/ipc-bench
->[4] https://lore.kernel.org/all/3189e342-c38f-6076-b730-19a6efd732a5@linux.alibaba.com/
->[5] https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
->[6] https://lore.kernel.org/all/20240102184633.748113-1-urezki@gmail.com/
->
->Wen Gu (15):
->  net/smc: improve SMC-D device dump for virtual ISM
->  net/smc: decouple specialized struct from SMC-D DMB registration
->  net/smc: introduce virtual ISM device loopback-ism
->  net/smc: implement ID-related operations of loopback-ism
->  net/smc: implement some unsupported operations of loopback-ism
->  net/smc: implement DMB-related operations of loopback-ism
->  net/smc: register loopback-ism into SMC-D device list
->  net/smc: introduce loopback-ism runtime switch
->  net/smc: introduce loopback-ism statistics attributes
->  net/smc: add operations to merge sndbuf with peer DMB
->  net/smc: attach or detach ghost sndbuf to peer DMB
->  net/smc: adapt cursor update when sndbuf and peer DMB are merged
->  net/smc: introduce loopback-ism DMB type control
->  net/smc: introduce loopback-ism DMB data copy control
->  net/smc: implement DMB-merged operations of loopback-ism
->
-> drivers/s390/net/ism_drv.c |   2 +-
-> include/net/smc.h          |   7 +-
-> net/smc/Kconfig            |  13 +
-> net/smc/Makefile           |   2 +-
-> net/smc/af_smc.c           |  28 +-
-> net/smc/smc_cdc.c          |  58 ++-
-> net/smc/smc_cdc.h          |   1 +
-> net/smc/smc_core.c         |  61 +++-
-> net/smc/smc_core.h         |   1 +
-> net/smc/smc_ism.c          |  71 +++-
-> net/smc/smc_ism.h          |   5 +
-> net/smc/smc_loopback.c     | 718 +++++++++++++++++++++++++++++++++++++
-> net/smc/smc_loopback.h     |  88 +++++
-> 13 files changed, 1026 insertions(+), 29 deletions(-)
-> create mode 100644 net/smc/smc_loopback.c
-> create mode 100644 net/smc/smc_loopback.h
->
->-- 
->2.32.0.3.g01195cf9f
->
->
+To measure the performance degradation to the TX/RX hotpaths, I did some
+iperf3 runs with 512-byte unfragmented UDP packets.
+
+measured degradation on TX: -466 pps (-0.2%) on RX: -338 pps (-1.2%)
+original performances on TX: 22kpps on RX: 27kpps
+
+The performance hit on the RX path can be partly explained by the fact that
+the stmmac driver doesn't set CHECKSUM_UNNECESSARY anymore.
+
+The TX performance degradation observed in v2 seems to have improved.
+It's not entirely clear to me why that is.
+
+Best Regards,
+
+Romain
+
+Romain Gantois (1):
+  net: stmmac: Prevent DSA tags from breaking COE
+
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 23 ++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+--
+2.43.0
+---
+Changes in v5:
+- Added missing "net" tag to subject of patch series
+- Link to v4: https://lore.kernel.org/r/20240109-prevent_dsa_tags-v4-1-f888771fa2f6@bootlin.com
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 29 ++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 37e64283f910..b30dba06dbd1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -4371,6 +4371,25 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	return NETDEV_TX_OK;
+ }
+ 
++/**
++ * stmmac_has_ip_ethertype() - Check if packet has IP ethertype
++ * @skb: socket buffer to check
++ *
++ * Check if a packet has an ethertype that will trigger the IP header checks
++ * and IP/TCP checksum engine of the stmmac core.
++ *
++ * Return: true if the ethertype can trigger the checksum engine, false otherwise
++ */
++static bool stmmac_has_ip_ethertype(struct sk_buff *skb)
++{
++	int depth = 0;
++	__be16 proto;
++
++	proto = __vlan_get_protocol(skb, eth_header_parse_protocol(skb), &depth);
++
++	return (depth <= ETH_HLEN) && (proto == htons(ETH_P_IP) || proto == htons(ETH_P_IPV6));
++}
++
+ /**
+  *  stmmac_xmit - Tx entry point of the driver
+  *  @skb : the socket buffer
+@@ -4435,9 +4454,13 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	/* DWMAC IPs can be synthesized to support tx coe only for a few tx
+ 	 * queues. In that case, checksum offloading for those queues that don't
+ 	 * support tx coe needs to fallback to software checksum calculation.
++	 *
++	 * Packets that won't trigger the COE e.g. most DSA-tagged packets will
++	 * also have to be checksummed in software.
+ 	 */
+ 	if (csum_insertion &&
+-	    priv->plat->tx_queues_cfg[queue].coe_unsupported) {
++	    (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
++	    !stmmac_has_ip_ethertype(skb))) {
+ 		if (unlikely(skb_checksum_help(skb)))
+ 			goto dma_map_err;
+ 		csum_insertion = !csum_insertion;
+@@ -4997,7 +5020,7 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
+ 	stmmac_rx_vlan(priv->dev, skb);
+ 	skb->protocol = eth_type_trans(skb, priv->dev);
+ 
+-	if (unlikely(!coe))
++	if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb))
+ 		skb_checksum_none_assert(skb);
+ 	else
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
+@@ -5513,7 +5536,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+ 		stmmac_rx_vlan(priv->dev, skb);
+ 		skb->protocol = eth_type_trans(skb, priv->dev);
+ 
+-		if (unlikely(!coe))
++		if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb))
+ 			skb_checksum_none_assert(skb);
+ 		else
+ 			skb->ip_summed = CHECKSUM_UNNECESSARY;
+
+---
+base-commit: ac631873c9e7a50d2a8de457cfc4b9f86666403e
+change-id: 20240108-prevent_dsa_tags-7bb0def0db81
+
+Best regards,
+-- 
+Romain Gantois <romain.gantois@bootlin.com>
+
 
