@@ -1,54 +1,84 @@
-Return-Path: <netdev+bounces-63000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9896282AB2C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:47:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF4A082AB40
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C7F11F21F43
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 09:47:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6218BB233AA
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 09:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C251172D;
-	Thu, 11 Jan 2024 09:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0985511737;
+	Thu, 11 Jan 2024 09:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="sc/mq8zK"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="R2jrJVbE";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/IsAC9Kk";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="R2jrJVbE";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/IsAC9Kk"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B00211722;
-	Thu, 11 Jan 2024 09:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 40B9kViR007843;
-	Thu, 11 Jan 2024 03:46:31 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1704966391;
-	bh=BkKV7jODf3A3P8yk03zMcE0wRaE/PUSWXFjUCTWGGoI=;
-	h=Date:CC:Subject:To:References:From:In-Reply-To;
-	b=sc/mq8zKVJsO+Y5zP8ISQ3K15joW/OKIWn9Iyy8JBHxhDKHntOEHRG2CUdqSXhmHU
-	 5LgJs6Gm22IzGbg4eAkGsXGQdAG4yKLIlNJFDrsmFQ+T4GWMyQGAXC7WiBrWevurYc
-	 E3j3r66qNTKuv8JTFNj7pci4IPrIE/XcyPtd4538=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 40B9kVTx014661
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 11 Jan 2024 03:46:31 -0600
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 11
- Jan 2024 03:46:31 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 11 Jan 2024 03:46:31 -0600
-Received: from [172.24.227.9] (uda0492258.dhcp.ti.com [172.24.227.9])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 40B9kSoY029834;
-	Thu, 11 Jan 2024 03:46:28 -0600
-Message-ID: <524ea592-02d6-4a1d-899a-feaa7fd11914@ti.com>
-Date: Thu, 11 Jan 2024 15:16:27 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A9811727
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 09:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7608522119;
+	Thu, 11 Jan 2024 09:49:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1704966587; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JytHxARXy0r9VrhHqph8a4GdqTwaDDDxAgVQaMBuTQ4=;
+	b=R2jrJVbE+hYRrLc1e0c34dvSLR4RlqXdXTf08LiHZlEtZQXI/Is/YmubIgvQwgAMtTa+wE
+	L5f+UvGcZdbI5SGTCPrYYi2tMYrxJLbxaexAbQEtXde1oHtHu7O9Tgzd8K2hEP8aNiJi38
+	65cSgb3ga7JyRdAHxylMf/Nqv/FIsu0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1704966587;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JytHxARXy0r9VrhHqph8a4GdqTwaDDDxAgVQaMBuTQ4=;
+	b=/IsAC9KkVMf67JJJMg26J7d0ihOpCcL86+VtmqGUpzheb1kNBf1VYyrxQkM49mFy+JQAib
+	TkBUPn11BtVvP4DQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1704966587; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JytHxARXy0r9VrhHqph8a4GdqTwaDDDxAgVQaMBuTQ4=;
+	b=R2jrJVbE+hYRrLc1e0c34dvSLR4RlqXdXTf08LiHZlEtZQXI/Is/YmubIgvQwgAMtTa+wE
+	L5f+UvGcZdbI5SGTCPrYYi2tMYrxJLbxaexAbQEtXde1oHtHu7O9Tgzd8K2hEP8aNiJi38
+	65cSgb3ga7JyRdAHxylMf/Nqv/FIsu0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1704966587;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JytHxARXy0r9VrhHqph8a4GdqTwaDDDxAgVQaMBuTQ4=;
+	b=/IsAC9KkVMf67JJJMg26J7d0ihOpCcL86+VtmqGUpzheb1kNBf1VYyrxQkM49mFy+JQAib
+	TkBUPn11BtVvP4DQ==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id CC587138E5;
+	Thu, 11 Jan 2024 09:48:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id /ALILm65n2VXMgAAn2gu4w
+	(envelope-from <dkirjanov@suse.de>); Thu, 11 Jan 2024 09:48:30 +0000
+Message-ID: <a0ae5d06-30d6-4a0c-b844-9dc34cf193e3@suse.de>
+Date: Thu, 11 Jan 2024 12:49:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,85 +86,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        <s-vadapalli@ti.com>
-Subject: Re: [PATCH net v2 1/1] net: ethernet: ti: am65-cpsw: Fix max mtu to
- fit ethernet frames
+Subject: Re: [PATCH] ifstat: Add NULL pointer check for argument of strdup()
 Content-Language: en-US
-To: =?UTF-8?B?U2FuanXDoW4gR2FyY8OtYSwgSm9yZ2U=?=
-	<Jorge.SanjuanGarcia@duagon.com>,
-        "andrew@lunn.ch" <andrew@lunn.ch>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>
-References: <20240105085530.14070-1-jorge.sanjuangarcia@duagon.com>
- <c025f2f9-ca2c-4fdb-adb1-803745fded0c.a613f387-0b3b-49fd-9401-3a0ed0c1f80e.2e3f49f4-dbd1-4269-9bd1-2d3ffbda767f@emailsignatures365.codetwo.com>
- <20240105085530.14070-2-jorge.sanjuangarcia@duagon.com>
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-In-Reply-To: <20240105085530.14070-2-jorge.sanjuangarcia@duagon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+To: Maks Mishin <maks.mishinfz@gmail.com>,
+ Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+References: <20240110205252.20870-1-maks.mishinFZ@gmail.com>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <20240110205252.20870-1-maks.mishinFZ@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -1.29
+X-Spamd-Result: default: False [-1.29 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[3];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 TAGGED_RCPT(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 TO_DN_SOME(0.00)[];
+	 BAYES_HAM(-0.00)[27.16%];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FREEMAIL_TO(0.00)[gmail.com,networkplumber.org];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Flag: NO
 
 
 
-On 05/01/24 14:25, Sanjuán García, Jorge wrote:
-> The value of AM65_CPSW_MAX_PACKET_SIZE represents the maximum length
-> of a received frame. This value is written to the register
-> AM65_CPSW_PORT_REG_RX_MAXLEN.
+On 1/10/24 23:52, Maks Mishin wrote:
+> When calling a strdup() function its argument do not being checked
+> for NULL pointer.
+> Added NULL pointer checks in body of get_nlmsg_extended(), get_nlmsg() and
+> load_raw_data() functions.
 > 
-> The maximum MTU configured on the network device should then leave
-> some room for the ethernet headers and frame check. Otherwise, if
-> the network interface is configured to its maximum mtu possible,
-> the frames will be larger than AM65_CPSW_MAX_PACKET_SIZE and will
-> get dropped as oversized.
-> 
-> The switch supports ethernet frame sizes between 64 and 2024 bytes
-> (including VLAN) as stated in the technical reference manual, so
-> define AM65_CPSW_MAX_PACKET_SIZE with that maximum size.
-> 
-> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth 
-> subsystem driver")
-> Signed-off-by: Jorge Sanjuan Garcia <jorge.sanjuangarcia@duagon.com>
-
-Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-
+> Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
 > ---
->   drivers/net/ethernet/ti/am65-cpsw-nuss.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
+>  misc/ifstat.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c 
-> b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index 7651f90f51f2..3c7854537cb5 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -56,7 +56,7 @@
->   #define AM65_CPSW_MAX_PORTS     8
-> 
->   #define AM65_CPSW_MIN_PACKET_SIZE       VLAN_ETH_ZLEN
-> -#define AM65_CPSW_MAX_PACKET_SIZE      (VLAN_ETH_FRAME_LEN + ETH_FCS_LEN)
-> +#define AM65_CPSW_MAX_PACKET_SIZE      2024
-> 
->   #define AM65_CPSW_REG_CTL               0x004
->   #define AM65_CPSW_REG_STAT_PORT_EN      0x014
-> @@ -2196,7 +2196,8 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common 
-> *common, u32 port_idx)
->           eth_hw_addr_set(port->ndev, port->slave.mac_addr);
-> 
->           port->ndev->min_mtu = AM65_CPSW_MIN_PACKET_SIZE;
-> -       port->ndev->max_mtu = AM65_CPSW_MAX_PACKET_SIZE;
-> +       port->ndev->max_mtu = AM65_CPSW_MAX_PACKET_SIZE -
-> +                             (VLAN_ETH_HLEN + ETH_FCS_LEN);
->           port->ndev->hw_features = NETIF_F_SG |
->                                     NETIF_F_RXCSUM |
->                                     NETIF_F_HW_CSUM |
+> diff --git a/misc/ifstat.c b/misc/ifstat.c
+> index f6f9ba50..ee301799 100644
+> --- a/misc/ifstat.c
+> +++ b/misc/ifstat.c
+> @@ -129,7 +129,12 @@ static int get_nlmsg_extended(struct nlmsghdr *m, void *arg)
+>  		abort();
+>  
+>  	n->ifindex = ifsm->ifindex;
+> -	n->name = strdup(ll_index_to_name(ifsm->ifindex));
+> +	const char *name = ll_index_to_name(ifsm->ifindex);
+> +
+> +	if (name == NULL)
+> +		return -1;
+> +
+> +	n->name = strdup(name);
+>  
+>  	if (sub_type == NO_SUB_TYPE) {
+>  		memcpy(&n->val, RTA_DATA(tb[filter_type]), sizeof(n->val));
+> @@ -175,7 +180,12 @@ static int get_nlmsg(struct nlmsghdr *m, void *arg)
+>  	if (!n)
+>  		abort();
+>  	n->ifindex = ifi->ifi_index;
+> -	n->name = strdup(RTA_DATA(tb[IFLA_IFNAME]));
+> +	const char *name = RTA_DATA(tb[IFLA_IFNAME]);
+> +
+> +	if (name == NULL)
+> +		return -1;
+> +
+> +	n->name = strdup(name);
+>  	memcpy(&n->ival, RTA_DATA(tb[IFLA_STATS]), sizeof(n->ival));
+>  	memset(&n->rate, 0, sizeof(n->rate));
+>  	for (i = 0; i < MAXS; i++)
 
-...
+In the above cases it makes more sense to adjust errno to EINVAL in the case of the invalid argument
+for strdup. 
 
--- 
-Regards,
-Siddharth.
+> @@ -263,6 +273,9 @@ static void load_raw_table(FILE *fp)
+>  			abort();
+>  		*next++ = 0;
+>  
+> +		if (p == NULL)
+> +			abort();
+> +
+>  		n->name = strdup(p);
+>  		p = next;
+>  
 
