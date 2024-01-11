@@ -1,117 +1,99 @@
-Return-Path: <netdev+bounces-63138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC4982B54E
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:40:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF0AE82B556
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:40:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C4B51F26F63
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:40:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DECA28382A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575AC5674B;
-	Thu, 11 Jan 2024 19:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE3155E57;
+	Thu, 11 Jan 2024 19:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SPPtBjPT"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ZaQfr2qs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D985955C18;
-	Thu, 11 Jan 2024 19:40:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFE49C433C7;
-	Thu, 11 Jan 2024 19:40:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705002004;
-	bh=DmkLUwPO5pHCJHvVcwPy1P4sgjTzQNNak+Eq1cUdG4A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SPPtBjPT+YAd4ocTNd3PGbSKeEby62sm5DsaPgCv2HqVIW9AA61WpCKjUG1nFowUj
-	 3KfWsd59L33mr3lPW1pODJ4DxPp3c0FvcL65M+M43Xd0dsozkiXoWTzMQXYyp+ok+1
-	 Cb30aWs3Sxk5AodiSlMI4eMG+NABT1HgniB893pjpYDswpLiHA/yPSOP9UoGeJLbKt
-	 bnTkQNlGsDQqy8YOmI7KSXeLlghLdU+zlsbZoTu+RaMYkcWjxf+xdeMOQ8myzu+KXS
-	 4DFQ7cH+eAqKWFGmhszUBwC2NDKu/wiPRUDEP+5/MhjNc4xXnfccYuJTOa5a8NwKDV
-	 Z7nFRX4xsl/qg==
-Date: Thu, 11 Jan 2024 12:40:01 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Yonghong Song <yonghong.song@linux.dev>, akpm@linux-foundation.org
-Cc: llvm@lists.linux.dev, patches@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-pm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linux-arch@vger.kernel.org,
-	kasan-dev@googlegroups.com, linux-mm@kvack.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, mykolal@fb.com,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH 1/3] selftests/bpf: Update LLVM Phabricator links
-Message-ID: <20240111194001.GA3805856@dev-arch.thelio-3990X>
-References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
- <20240109-update-llvm-links-v1-1-eb09b59db071@kernel.org>
- <6a655e9f-9878-4292-9d16-f988c4bdfc73@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FC9524AB
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 19:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d4ca2fd2fbso31925615ad.2
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:40:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1705002037; x=1705606837; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=19d4BlLYusPhYqHBHSEuyZrSTiiD3yUoLp/zgt2wYfA=;
+        b=ZaQfr2qs/Whsl0siLf87Vl3fOR5bMWNdfXsK0U0WcYPfwkCLhvr8WA2TQOXfcA37KH
+         YjG1lP+D1Gu6/muMaSlmYmgjxULq9o+LA74VPpin7ksRK8uz13EXTjE4j+8Eq1pH01rg
+         TXxpGwXOB7YX/5ZIf09Fl18uQ9i/gvPCQre1lq/n5fReW6xYVMKZ89dZNMaGDNMCNXz3
+         pnVTyblsqulHyhmSZNXfcVeGCT/Tj3JqgC/hY/bOsJsE5raTIVpCwCp1mdWYzWQ5AXUg
+         pdvdiYgwfLtgX/DuNGOzfAdq51NTnPj5wzv9MIG/xr37F9jq2pXqFUA0pDHVMZsdIocJ
+         apfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705002037; x=1705606837;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=19d4BlLYusPhYqHBHSEuyZrSTiiD3yUoLp/zgt2wYfA=;
+        b=p1HbWEoU9sxgxdvWdR9KToxm1yYMcPhwmHXZeZ9MDwp+/clgczlrct57EG/htxIRBk
+         4b/nmcoXcHm9q6oOaDHfqmMcvgVM0oMBKIydFAxQKRByhqiBHyfW5l301Uksqi0lesIn
+         3t6jpXlAEEeku+8NZ641YYbote8FnkZEom/Q8Na0uIgnEwgEDGsX5EBIKtbh+4Uuhh1S
+         4jmwM9qzRjEJrG3aPvEb9S0d66xRgIUboAk8QbiJc3cFca+EiR2ih7AE9R4f1twqIFsI
+         oA8yZDUuJSc0WkgdnyGaRjgmLGABmkY/ZUtwhdpFBOLWGgnJQcWYbKelS/WJAkzJOczn
+         E6PA==
+X-Gm-Message-State: AOJu0YyPGgM2gUKemT8iub+I3QQrl7L+GD9p+bfIq5Ue1CqmYDCNP8UG
+	CgnwZR14c0TnD2BNJSM2ah6ddQ8IH+EC/A==
+X-Google-Smtp-Source: AGHT+IF5zMEJOlJHHCSsD8Hr2hRd4hym49LHNbsOruJDkqOfdgFG1n0S2oaLKYA5sf91UTZAPLQ4hw==
+X-Received: by 2002:a17:903:130c:b0:1d4:be64:263f with SMTP id iy12-20020a170903130c00b001d4be64263fmr189050plb.120.1705002036959;
+        Thu, 11 Jan 2024 11:40:36 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id iy12-20020a170903130c00b001d536a910fasm1529028plb.77.2024.01.11.11.40.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jan 2024 11:40:36 -0800 (PST)
+Date: Thu, 11 Jan 2024 11:40:35 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Andrea Claudi <aclaudi@redhat.com>
+Cc: netdev@vger.kernel.org, Leon Romanovsky <leon@kernel.org>, Jiri Pirko
+ <jiri@resnulli.us>, Jon Maloy <jmaloy@redhat.com>, David Ahern
+ <dsahern@gmail.com>
+Subject: Re: [PATCH iproute2 2/2] treewide: fix typos in various comments
+Message-ID: <20240111114035.4dc407dd@hermes.local>
+In-Reply-To: <f384c3720a340ca5302ee0f97d5e2127e246ce01.1704816744.git.aclaudi@redhat.com>
+References: <cover.1704816744.git.aclaudi@redhat.com>
+	<f384c3720a340ca5302ee0f97d5e2127e246ce01.1704816744.git.aclaudi@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6a655e9f-9878-4292-9d16-f988c4bdfc73@linux.dev>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Yonghong,
+On Tue,  9 Jan 2024 17:32:35 +0100
+Andrea Claudi <aclaudi@redhat.com> wrote:
 
-On Wed, Jan 10, 2024 at 08:05:36PM -0800, Yonghong Song wrote:
-> 
-> On 1/9/24 2:16 PM, Nathan Chancellor wrote:
-> > reviews.llvm.org was LLVM's Phabricator instances for code review. It
-> > has been abandoned in favor of GitHub pull requests. While the majority
-> > of links in the kernel sources still work because of the work Fangrui
-> > has done turning the dynamic Phabricator instance into a static archive,
-> > there are some issues with that work, so preemptively convert all the
-> > links in the kernel sources to point to the commit on GitHub.
-> > 
-> > Most of the commits have the corresponding differential review link in
-> > the commit message itself so there should not be any loss of fidelity in
-> > the relevant information.
-> > 
-> > Additionally, fix a typo in the xdpwall.c print ("LLMV" -> "LLVM") while
-> > in the area.
-> > 
-> > Link: https://discourse.llvm.org/t/update-on-github-pull-requests/71540/172
-> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> 
-> Ack with one nit below.
-> 
-> Acked-by: Yonghong Song <yonghong.song@linux.dev>
+> diff --git a/include/libiptc/libiptc.h b/include/libiptc/libiptc.h
+> index 1bfe4e18..89dce2f9 100644
+> --- a/include/libiptc/libiptc.h
+> +++ b/include/libiptc/libiptc.h
+> @@ -80,7 +80,7 @@ int iptc_append_entry(const xt_chainlabel chain,
+>  		      const struct ipt_entry *e,
+>  		      struct xtc_handle *handle);
+>  
+> -/* Check whether a mathching rule exists */
+> +/* Check whether a matching rule exists */
+>  int iptc_check_entry(const xt_chainlabel chain,
+>  		      const struct ipt_entry *origfw,
+>  		      unsigned char *matchmask,
 
-<snip>
-
-> > @@ -304,6 +304,6 @@ from running test_progs will look like:
-> >   .. code-block:: console
-> > -  test_xdpwall:FAIL:Does LLVM have https://reviews.llvm.org/D109073? unexpected error: -4007
-> > +  test_xdpwall:FAIL:Does LLVM have https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5? unexpected error: -4007
-> > -__ https://reviews.llvm.org/D109073
-> > +__ https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d
-> 
-> To be consistent with other links, could you add the missing last alnum '5' to the above link?
-
-Thanks a lot for catching this and providing an ack. Andrew, could you
-squash this update into selftests-bpf-update-llvm-phabricator-links.patch?
-
-diff --git a/tools/testing/selftests/bpf/README.rst b/tools/testing/selftests/bpf/README.rst
-index b9a493f66557..e56034abb3c2 100644
---- a/tools/testing/selftests/bpf/README.rst
-+++ b/tools/testing/selftests/bpf/README.rst
-@@ -306,4 +306,4 @@ from running test_progs will look like:
- 
-   test_xdpwall:FAIL:Does LLVM have https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5? unexpected error: -4007
- 
--__ https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d
-+__ https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5
+This is no longer in current code tree.
+Please rebase and resubmit
 
