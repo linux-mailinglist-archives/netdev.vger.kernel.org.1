@@ -1,108 +1,71 @@
-Return-Path: <netdev+bounces-63124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C8E82B4B0
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:20:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A93982B4BF
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5A731F25BC4
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71E441C26EFC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5D453813;
-	Thu, 11 Jan 2024 18:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088DD54278;
+	Thu, 11 Jan 2024 18:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="f5f17p5i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GdY7ZZCa"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C1552F74;
-	Thu, 11 Jan 2024 18:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1704997198;
-	bh=rdyPLDn+13S8BwUHnP7YxTnuD0iUYoq80Xm8fz63qzo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=f5f17p5iX/IKt6UN9Jwhpvty5sF74a26euidP8Pxt2/AltKRl6P2rYTZeD83Ejeds
-	 /dMXSUYZNHdOLM6nKJPpCgQhPvzM0eBkPkFgeTBinDrx6Vs+BQbIbEkBoj0W3VVxR3
-	 agxPbZcpLNRMMfn2q/p85xQq9cgf1sHxDs36uqkaW1DGrPl1hqnKf3bjEAti51u+IB
-	 5JKTT4TlxopMAwm2pQ7vhXLIdpsdF6Lp17eVWH70y/matvJbG46IP3s3JkGtk+PEp2
-	 oLqifpP4etBYdVOMdXc4kp4M64NZp7d8obqjLFjqFk0fz8qWtN+fg6x2JNi2n2yiXG
-	 L7oJjibzUlfsA==
-Received: from [IPV6:fd00::3:29cf] (cola.collaboradmins.com [IPv6:2a01:4f8:1c1c:5717::1])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 587143781184;
-	Thu, 11 Jan 2024 18:19:49 +0000 (UTC)
-Message-ID: <e821e651-2074-41c2-82c1-0fc88b3f5664@collabora.com>
-Date: Thu, 11 Jan 2024 20:19:38 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEEC53816;
+	Thu, 11 Jan 2024 18:28:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4084EC433F1;
+	Thu, 11 Jan 2024 18:28:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704997735;
+	bh=4aGcqMK/V5dD7XBvdzd9k6jev900k7daZdY5FAr2B7k=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=GdY7ZZCauGLFZFX0VX9Vg+/26COAWpI5BssIHZXh47T/xdhZ8ivVVOkpU4gXYY2oX
+	 xtUIsWk0Os2nqX3B9akQP23ivK2wxS60IcR1q7F4M+pIqNY0SGweeRZGsbW5aPx7bD
+	 FoczlfeXkzyLLPRiwvkn8WkEUBhMrjvAVv14+QqFj1ydapVaRD6EUD64r8uV0XORb1
+	 dCwK3F8TxO/MQx3Ohhpzx7gKBNrL+HB/H7CqoMn4FqL1BdWOeguDQWMr1M4nYdz4ZD
+	 5fd9SxapyY/wAFasG49ID9dyfFd2bacKK3z4tHB1cI8oZtR7IUfYgMGTTbRH3ciftO
+	 pCWMOtPcKkzTA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2FCBCDFC698;
+	Thu, 11 Jan 2024 18:28:55 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.8
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240109162323.427562-1-pabeni@redhat.com>
+References: <20240109162323.427562-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <bpf.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240109162323.427562-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.8
+X-PR-Tracked-Commit-Id: a7fe0881d9b78d402bbd9067dd4503a57c57a1d9
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3e7aeb78ab01c2c2f0e1f784e5ddec88fcd3d106
+Message-Id: <170499773518.335.12508178869407488578.pr-tracker-bot@kernel.org>
+Date: Thu, 11 Jan 2024 18:28:55 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] dt-bindings: net: starfive,jh7110-dwmac: Add
- StarFive JH8100 support
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Tan Chun Hau <chunhau.tan@starfivetech.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Emil Renner Berthing <kernel@esmil.dk>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Simon Horman <horms@kernel.org>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Andrew Halaney <ahalaney@redhat.com>, Jisheng Zhang <jszhang@kernel.org>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Russell King <rmk+kernel@armlinux.org.uk>
-Cc: Ley Foon Tan <leyfoon.tan@starfivetech.com>,
- Jee Heng Sia <jeeheng.sia@starfivetech.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org
-References: <20240111025531.2875-1-chunhau.tan@starfivetech.com>
- <20240111025531.2875-2-chunhau.tan@starfivetech.com>
- <59bb488f-f2ad-44b0-87fa-206ae3b1c33f@collabora.com>
- <3c552324-2ebf-41c2-b310-70341ebfdd9a@linaro.org>
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <3c552324-2ebf-41c2-b310-70341ebfdd9a@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 1/11/24 20:15, Krzysztof Kozlowski wrote:
-> On 11/01/2024 19:07, Cristian Ciocaltea wrote:
->> On 1/11/24 04:55, Tan Chun Hau wrote:
->>> Add StarFive JH8100 dwmac support.
->>> JH8100 dwmac has one reset signal instead of 2 resets as in JH7110.
->>>
->>> Signed-off-by: Tan Chun Hau <chunhau.tan@starfivetech.com>
->>> ---
->>>  .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
->>>  .../bindings/net/starfive,jh7110-dwmac.yaml   | 50 +++++++++++++------
->>>  2 files changed, 37 insertions(+), 14 deletions(-)
->>
->> [...]
->>
->> Please note this is going to conflict with the about-to-be-merged changes
-> 
-> They weren't picked up, so how they can be merged? If you mean applied,
-> then you suggest your patchset has some kind of preference, but this
-> needs explanation why.
+The pull request you sent on Tue,  9 Jan 2024 17:23:23 +0100:
 
-I just meant they got reviewed and should be ready to be applied.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.8
 
-> Best regards,
-> Krzysztof
-> 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3e7aeb78ab01c2c2f0e1f784e5ddec88fcd3d106
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
