@@ -1,147 +1,90 @@
-Return-Path: <netdev+bounces-63149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B203782B5A2
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:01:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E92AD82B5AD
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C21361C24793
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:01:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 153411C21254
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B1B56777;
-	Thu, 11 Jan 2024 20:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385DC56761;
+	Thu, 11 Jan 2024 20:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yjw9k24/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XBLD3yxM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1548C4CDE9;
-	Thu, 11 Jan 2024 20:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F3756751
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 20:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40e5521dab6so23923475e9.1;
-        Thu, 11 Jan 2024 12:01:03 -0800 (PST)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40e636fd3d2so1320835e9.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:05:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705003262; x=1705608062; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HAL60ZiXYTrQWwc6XvTjBF7mU0s/R7MUfIaHS38evWw=;
-        b=Yjw9k24/aZTgNRl5he5a0Vg8/Yy0jMdXZhoAoSPnfwwvUeMA4Qn31c1XiLN+UPgtQ1
-         WAqFFGlMxMdz6CvMXVfYXdZjGEUbjbODFAZ/3WnesaHK6Qip6LgxG1+n1CEFQoG5UFbR
-         Qo7LLWAHQPG+H3feGi+VlGRPq5PHJKsp2OnM/PVDW9My+47hbJbJHPkJZekb8rvIxxOb
-         9oFUGl5Yck2WXBPkm+D9OVI/k/zj90X5IrV8oysRtblRZwep3WUf+sIUye8RFv7070XP
-         m7yTGU4XXn4jSoac3RZCUdLraX2PgLIxAClGpmm9d4SHIE2KGyZZ7GW9hS36UM1CMBtU
-         CVlg==
+        d=gmail.com; s=20230601; t=1705003515; x=1705608315; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ahYYkZR358AVuImX9h/FxjAqnr1ZW/9Bcn6OlnpBRp0=;
+        b=XBLD3yxMkGUKIQMR+SeFPCMKgDQvjJetzSrx4rioDSKpFhEE+UAjn5HP+DFUStRKE/
+         Tj8VdEuYaVctigpPxMLWP2VCe5cu4FkOqVnNhf1iSTBRjuGxjHA9MbrR37CqqpAuQTUA
+         DchfQrcJyMFdeiwkqxL0hYfZnw6YPocGlmrgLED8QC0fSkROJFvJdQHtvttDHs9iJTFY
+         4Oi0UdTx5VVdPD87GJ8adAgmp2j8tsm3GVbBVEVQi4GXChVbC/TqJ92AajnrbUXfxMPw
+         KxA3lPs1KIPH6sjX5zf4IYHQcw0ae2g0d1KYrzFcds/IYGUn4uzu3hpf5tv5yjIUBCyP
+         J2dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705003262; x=1705608062;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HAL60ZiXYTrQWwc6XvTjBF7mU0s/R7MUfIaHS38evWw=;
-        b=rkKohqDrUywf2Jd0QPkLqApPa7xT6SM4Y+8RZtjHoQsEMbINVfyAEyM+lxuf/glYBP
-         MCcXC3lqP6j3TGDYF8r0dGaat+vUZC2/4+yWTOdabmDHfyaBvDxX3HqqNf7dpss8O0df
-         WYXL1cueeisGe52zeElZ05TSGHBHOnQ5QgxPY/p+WjjLHiHEb8r/5EwBhqsQMBckyn0o
-         lv4pxCbDypMlVyNvH7MkwpMCD0p1QQPkdAGnYx/XG1cSWdC0tvHjGERQLbXMD+UY2Bb1
-         fgJGCoei9nFslllazNysPeIIi/tOWxEU9UdXtpTNtxSZTvL+jW/LJ2l1uAsG81v8Y5f7
-         RKeQ==
-X-Gm-Message-State: AOJu0YwHN1EVUHNOdmfd/DgEwfvWBYKvTWjr+L9yjgzlWTg5cwTXIWLy
-	WEhcs3pgJzZ+9h36uWki82ckH2MvBYn192NgLqQ=
-X-Google-Smtp-Source: AGHT+IEuD70YW9odmSJBW0ovp3CIEuHoCB7eupgpN0U69zefCCa6AEpsUHBsIEtkfYtc2dUZae2qy6ZzWQ5YfFTTiDA=
-X-Received: by 2002:a05:600c:6548:b0:40e:52a7:ac58 with SMTP id
- dn8-20020a05600c654800b0040e52a7ac58mr243439wmb.65.1705003261872; Thu, 11 Jan
- 2024 12:01:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705003515; x=1705608315;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ahYYkZR358AVuImX9h/FxjAqnr1ZW/9Bcn6OlnpBRp0=;
+        b=UPNyFEdXakYcXIq5r4Spq5TLgIR9rejus7zoqhspBWWJUhgVq3GIRmjbnJ2cOFarOo
+         B6sHaBrdFZhUutRW3vjHZUYOhO8mjaAyU2UWtLbcdw8CFTMnSSMTuybGpOE6LSVtGnY7
+         GHnWdKQtPXR6i4rz/VxdbWqIb6rFnXLuGFtKnSMVqu8auvha7NwKa8zA/F1mhF/PK5su
+         N//WnsX2huMHKTT9nz4QskmxFGv3ieYESy0IrD6fmM58NcAafMOzpVUnlNHZLjFUL/KI
+         VpPlAjbOhW/6PdR9JmWU3oLrqCds5F/3iRXnESq2yBBxSDzvnpZjzqQAg7vlqPVv7fWX
+         CDsg==
+X-Gm-Message-State: AOJu0YzicRRojptHxSQ6pAt6rvmOg0nu/GLbk1+lkuzP+x84g817elec
+	m6bPk80sADdS0vEMcRAjYyI=
+X-Google-Smtp-Source: AGHT+IGUYaVGJ4yGIxoCuUIvzVVY1DATd79VN7Si06VvzXgb68pwbkLSA7sCkfFTpE018KxCT8mVXg==
+X-Received: by 2002:a05:600c:63d2:b0:40e:43e4:a015 with SMTP id dx18-20020a05600c63d200b0040e43e4a015mr206361wmb.74.1705003514615;
+        Thu, 11 Jan 2024 12:05:14 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id fc19-20020a05600c525300b0040d839e7bb3sm7074553wmb.19.2024.01.11.12.05.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jan 2024 12:05:14 -0800 (PST)
+Date: Thu, 11 Jan 2024 22:05:11 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	arinc.unal@arinc9.com
+Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa
+ module
+Message-ID: <20240111200511.coe26yxqhcwiiy4y@skbuf>
+References: <20231223005253.17891-1-luizluca@gmail.com>
+ <20231223005253.17891-4-luizluca@gmail.com>
+ <20240111095125.vtsjpzyj5rrag3sq@skbuf>
+ <CAJq09z7rba+7LCrFSYk5FjJSPvfSS0gocRCTPiy4v8V5BxfW+A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
- <20240109-update-llvm-links-v1-1-eb09b59db071@kernel.org> <6a655e9f-9878-4292-9d16-f988c4bdfc73@linux.dev>
- <20240111194001.GA3805856@dev-arch.thelio-3990X>
-In-Reply-To: <20240111194001.GA3805856@dev-arch.thelio-3990X>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 11 Jan 2024 12:00:50 -0800
-Message-ID: <CAADnVQKFv2DKE=Um=+kcEzSWYCp9USQT_VpTawzNY6eRaUdu5g@mail.gmail.com>
-Subject: Re: [PATCH 1/3] selftests/bpf: Update LLVM Phabricator links
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Yonghong Song <yonghong.song@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, patches@lists.linux.dev, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	ppc-dev <linuxppc-dev@lists.ozlabs.org>, kvm@vger.kernel.org, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-trace-kernel@vger.kernel.org, 
-	linux-s390 <linux-s390@vger.kernel.org>, 
-	Linux Power Management <linux-pm@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-efi <linux-efi@vger.kernel.org>, 
-	amd-gfx list <amd-gfx@lists.freedesktop.org>, dri-devel@lists.freedesktop.org, 
-	linux-media@vger.kernel.org, linux-arch <linux-arch@vger.kernel.org>, 
-	kasan-dev <kasan-dev@googlegroups.com>, linux-mm <linux-mm@kvack.org>, bridge@lists.linux.dev, 
-	Network Development <netdev@vger.kernel.org>, LSM List <linux-security-module@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Mykola Lysenko <mykolal@fb.com>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJq09z7rba+7LCrFSYk5FjJSPvfSS0gocRCTPiy4v8V5BxfW+A@mail.gmail.com>
 
-On Thu, Jan 11, 2024 at 11:40=E2=80=AFAM Nathan Chancellor <nathan@kernel.o=
-rg> wrote:
->
-> Hi Yonghong,
->
-> On Wed, Jan 10, 2024 at 08:05:36PM -0800, Yonghong Song wrote:
-> >
-> > On 1/9/24 2:16 PM, Nathan Chancellor wrote:
-> > > reviews.llvm.org was LLVM's Phabricator instances for code review. It
-> > > has been abandoned in favor of GitHub pull requests. While the majori=
-ty
-> > > of links in the kernel sources still work because of the work Fangrui
-> > > has done turning the dynamic Phabricator instance into a static archi=
-ve,
-> > > there are some issues with that work, so preemptively convert all the
-> > > links in the kernel sources to point to the commit on GitHub.
-> > >
-> > > Most of the commits have the corresponding differential review link i=
-n
-> > > the commit message itself so there should not be any loss of fidelity=
- in
-> > > the relevant information.
-> > >
-> > > Additionally, fix a typo in the xdpwall.c print ("LLMV" -> "LLVM") wh=
-ile
-> > > in the area.
-> > >
-> > > Link: https://discourse.llvm.org/t/update-on-github-pull-requests/715=
-40/172
-> > > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> >
-> > Ack with one nit below.
-> >
-> > Acked-by: Yonghong Song <yonghong.song@linux.dev>
->
-> <snip>
->
-> > > @@ -304,6 +304,6 @@ from running test_progs will look like:
-> > >   .. code-block:: console
-> > > -  test_xdpwall:FAIL:Does LLVM have https://reviews.llvm.org/D109073?=
- unexpected error: -4007
-> > > +  test_xdpwall:FAIL:Does LLVM have https://github.com/llvm/llvm-proj=
-ect/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5? unexpected error: -400=
-7
-> > > -__ https://reviews.llvm.org/D109073
-> > > +__ https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf4=
-1d121afa5d031b319d
-> >
-> > To be consistent with other links, could you add the missing last alnum=
- '5' to the above link?
->
-> Thanks a lot for catching this and providing an ack. Andrew, could you
-> squash this update into selftests-bpf-update-llvm-phabricator-links.patch=
-?
+On Thu, Jan 11, 2024 at 04:53:01PM -0300, Luiz Angelo Daros de Luca wrote:
+> What do you mean by dropping the "common"? Use "realtek_probe" or
+> "realtek_dsa_probe"?
 
-Please send a new patch.
-We'd like to take all bpf patches through the bpf tree to avoid conflicts.
+Yes, I meant "realtek_probe()" etc. It's just that the word "common" has
+no added value in function names, and I can't come up with something
+good to replace it with.
 
