@@ -1,101 +1,197 @@
-Return-Path: <netdev+bounces-63147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1726A82B579
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:53:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D31982B57C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:55:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3649F1C219A7
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:53:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EF391C2441E
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BA956747;
-	Thu, 11 Jan 2024 19:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738675674D;
+	Thu, 11 Jan 2024 19:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WEoPqMu0"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OqbX3yUl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FF156741
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 19:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2cd17a979bcso64743121fa.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:53:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE6314F7A
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 19:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5e734251f48so45441007b3.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:55:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705002793; x=1705607593; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lmniem6wSkSsUvwWz68jc030pRYxGECq931U1PqLReY=;
-        b=WEoPqMu0HJaMn4fRN2big0W4hsRZ3/c1T9jFuWPyVY5IHM5lbxaydXtBGqAki3ZFdS
-         Nziwho/3QgwqzWNQFiTipyK8ydEfktqFZ103shrQAvdMkgPibdBW4TtwJPBjxK4kIujj
-         GYx9OZkz8DOlOSF51hFg+cotTGohf+lrjUkw1DUt7OzqHsdsfC8J1p1nGesD5TVdxtZK
-         gYF7+p9d8RaNUsGr8dZtEIoPSeVnMz0CT60YGATKwl7SMm5qIR3nToMHKZzTWT3Kq8kQ
-         e2u/uO73uyj97eeqvkiuAK+NLewsu+5d3d8fnwDPDtA0yEZKWkTJrvvtGQF4TeSSUHM1
-         s7VQ==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705002916; x=1705607716; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=13rw39O97Yd5BxpZ+F1nH/mYbFkgcCKR9n2vzZLrrgk=;
+        b=OqbX3yUlC1SVbWvnGdZ/pycrtp9Au3BAxzEgLs+1jPSXH0yH2Mu3n/A5G4eJ9nrEGf
+         nkIRUE2Nh1wQmWj6vs+oQDPFbgRyf4stJTGAoGh7IdhU9owdVX3V++fUxrLtCFY/O18x
+         uFreNlbgG3epHKVEwuoEuOMNXrePRlYiLiHaeYsjXfFZCW/Mb8gLIgC4ARcXPleniQTs
+         duNNlmuwCEDF7EJe8mnhR7mgvi5c2iP3a7Wlexc8wAAqqnu22DQECfI6TCq/dyUvCDtB
+         vQ+TvFZtEkPWJ/fXX+o8cAc3xJ5L8j08bhAHHrzZdzlE4HXoA6JN6gcTaZlREKMhcsz3
+         l7+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705002793; x=1705607593;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Lmniem6wSkSsUvwWz68jc030pRYxGECq931U1PqLReY=;
-        b=gQE9lVXuuJwxgV5jG6ffuatfgroyXFZkBEhEkDlFjHLw8z49gU82Dd0PNWZhnBqHuX
-         gm7I7psNjurxhbAyILEpKYhOvn6OhzkGZCo2oyt0X372pgs567eBHMLORF/rkdb0HWB1
-         R2byhgmqLwi9ZGI8ZN8QpqqC+FoVBiUTvRP0/uSxydnVz5srpnF8vp48TFZMppOuBoid
-         Ov/fhyeuy2kOWA5sq9nqHzOCTGdCRsM5peDxrFlp8otUbDhJwyf4DeEswrftmqwo3zUd
-         zPJO14uqa89dat/XwbRoY+Fvoc3DUmLJTp01RkQLcypJsiQsp8gTiXMjTvGz6DcbwymL
-         Wdcg==
-X-Gm-Message-State: AOJu0Yz/nmUcK/RSqBfG1PYye/iAo38MlRE1DVAkCeJKuFDaGgwqt8sd
-	t+5PK1thJ9uuedQdvXkyxuhYbYWyGYgZdnZVPkU=
-X-Google-Smtp-Source: AGHT+IEsWAE6aX5aZIgzjR5h62Eik03BFcCg8t2iz+zVKsrzXuHtE1g2ufSusQWz88ChK8RPm/8HDwVQXBWPtl7dXPI=
-X-Received: by 2002:a05:651c:10a9:b0:2cd:7a4c:5a70 with SMTP id
- k9-20020a05651c10a900b002cd7a4c5a70mr74285ljn.8.1705002792922; Thu, 11 Jan
- 2024 11:53:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705002916; x=1705607716;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=13rw39O97Yd5BxpZ+F1nH/mYbFkgcCKR9n2vzZLrrgk=;
+        b=Qnmz9zKmJgHU3fp+zJAnaixYwhT7zwfxbhsFZvEjAI1Rl6nXi4rmenqukKnPLhQ2EL
+         JTzVQV/2Zlc+UprYC7NSn0gIsBYFaOOhqm9A5yGSQGd3VObhTpuyOIArtpDLOYW6D2Ro
+         0YtzQdrQFdDhJoixKU4eVI/wWLWmVyEkqmgWE9Ez6ORWr/EjxXsZDQEP0juXrXLEWWna
+         rxIgknsW4D2nw/7oksnGh9MKE8un74mV0yprtXpXPyKPkStpcGQ0kTe5O9s9vDo0kk/t
+         vLuSQFSKEpYx0o5BTPn3VqaJ81fgnqYKrrba5KZs8kL0SIBI3WmrXd/vQm13BbX0lKL7
+         UAag==
+X-Gm-Message-State: AOJu0Yz/dINZFRL6UoYe8H8Nkbym9wMQgtv2EsdcuUwPy7oMwikDzF3i
+	Z19vrdCD1scneI3KIX11qndjEWFblaN2pkOkbZmXZaUtzvhV4FqZNap+KqH/cg==
+X-Google-Smtp-Source: AGHT+IHXPxzs9iCj/GkGEV+mA0/90xujWPzHoabK1OTrUJ3mKLV76ANldmtgvIe5MDhz+ekmwE2FsiGuGTudXFwuc9Q=
+X-Received: by 2002:a0d:d603:0:b0:5df:c224:fb44 with SMTP id
+ y3-20020a0dd603000000b005dfc224fb44mr730704ywd.23.1705002916501; Thu, 11 Jan
+ 2024 11:55:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-4-luizluca@gmail.com>
- <20240111095125.vtsjpzyj5rrag3sq@skbuf>
-In-Reply-To: <20240111095125.vtsjpzyj5rrag3sq@skbuf>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 11 Jan 2024 16:53:01 -0300
-Message-ID: <CAJq09z7rba+7LCrFSYk5FjJSPvfSS0gocRCTPiy4v8V5BxfW+A@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com
+References: <20240104125844.1522062-1-jiri@resnulli.us> <ZZ6JE0odnu1lLPtu@shredder>
+ <CAM0EoM=AGxO0gdeHPi7ST0+-YVuT20ysPbrFkYVXLqGv39oR7Q@mail.gmail.com>
+ <CAM0EoMkpzsEWXMw27xgsfzwA2g4CNeDYQ9niTJAkgu3=Kgp81g@mail.gmail.com> <878r4volo0.fsf@nvidia.com>
+In-Reply-To: <878r4volo0.fsf@nvidia.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 11 Jan 2024 14:55:04 -0500
+Message-ID: <CAM0EoMkFkJBGc5wsYec+1QZ_o6tEi6vm_KjAJV8SWB4EOPcppg@mail.gmail.com>
+Subject: Re: [patch net-next] net: sched: move block device tracking into tcf_block_get/put_ext()
+To: Petr Machata <petrm@nvidia.com>
+Cc: Ido Schimmel <idosch@idosch.org>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, edumazet@google.com, 
+	xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com, 
+	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, Dec 22, 2023 at 09:46:31PM -0300, Luiz Angelo Daros de Luca wrote:
-> > +EXPORT_SYMBOL_GPL(realtek_common_lock);
-> > +EXPORT_SYMBOL_GPL(realtek_common_unlock);
-> > +EXPORT_SYMBOL(realtek_common_probe);
-> > +EXPORT_SYMBOL(realtek_common_register_switch);
-> > +EXPORT_SYMBOL(realtek_common_remove);
+On Thu, Jan 11, 2024 at 11:55=E2=80=AFAM Petr Machata <petrm@nvidia.com> wr=
+ote:
 >
-> Is there any reason for the lack of consistency between GPL and non-GPL
-> symbols?
+>
+> Jamal Hadi Salim <jhs@mojatatu.com> writes:
+>
+> > On Thu, Jan 11, 2024 at 10:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu=
+.com> wrote:
+> >>
+> >> On Wed, Jan 10, 2024 at 7:10=E2=80=AFAM Ido Schimmel <idosch@idosch.or=
+g> wrote:
+> >> >
+> >> > On Thu, Jan 04, 2024 at 01:58:44PM +0100, Jiri Pirko wrote:
+> >> > > diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> >> > > index adf5de1ff773..253b26f2eddd 100644
+> >> > > --- a/net/sched/cls_api.c
+> >> > > +++ b/net/sched/cls_api.c
+> >> > > @@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **p_b=
+lock, struct Qdisc *q,
+> >> > >                     struct tcf_block_ext_info *ei,
+> >> > >                     struct netlink_ext_ack *extack)
+> >> > >  {
+> >> > > +     struct net_device *dev =3D qdisc_dev(q);
+> >> > >       struct net *net =3D qdisc_net(q);
+> >> > >       struct tcf_block *block =3D NULL;
+> >> > >       int err;
+> >> > > @@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block **p_=
+block, struct Qdisc *q,
+> >> > >       if (err)
+> >> > >               goto err_block_offload_bind;
+> >> > >
+> >> > > +     if (tcf_block_shared(block)) {
+> >> > > +             err =3D xa_insert(&block->ports, dev->ifindex, dev, =
+GFP_KERNEL);
+> >> > > +             if (err) {
+> >> > > +                     NL_SET_ERR_MSG(extack, "block dev insert fai=
+led");
+> >> > > +                     goto err_dev_insert;
+> >> > > +             }
+> >> > > +     }
+> >> >
+> >> > While this patch fixes the original issue, it creates another one:
+> >> >
+> >> > # ip link add name swp1 type dummy
+> >> > # tc qdisc replace dev swp1 root handle 10: prio bands 8 priomap 7 6=
+ 5 4 3 2 1
+> >> > # tc qdisc add dev swp1 parent 10:8 handle 108: red limit 1000000 mi=
+n 200000 max 200001 probability 1.0 avpkt 8000 burst 38 qevent early_drop b=
+lock 10
+> >> > RED: set bandwidth to 10Mbit
+> >> > # tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 mi=
+n 500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent early_drop b=
+lock 10
+> >> > RED: set bandwidth to 10Mbit
+> >> > Error: block dev insert failed.
+> >> >
+> >>
+> >>
+> >> +cc Petr
+> >> We'll add a testcase on tdc - it doesnt seem we have any for qevents.
+> >> If you have others that are related let us know.
+> >> But how does this work? I see no mention of block on red code and i
+>
+> Look for qe_early_drop and qe_mark in sch_red.c.
+>
 
-No. I might have just copied the string from the wrong example.
+I see it...
 
-> Also, I don't like too much the naming of symbols like "realtek_common_probe",
-> exported to the entire kernel. I wonder if it would be better to drop
-> the word "common" altogether, and use EXPORT_SYMBOL_NS_GPL(*, REALTEK_DSA) +
-> MODULE_IMPORT_NS(REALTEK_DSA) instead of plain EXPORT_SYMBOL_GPL()?
+> >> see no mention of block on the reproducer above.
+> >
+> > Context: Yes, i see it on red setup but i dont see any block being setu=
+p.
+>
+> qevents are binding locations for blocks, similar in principle to
+> clsact's ingress_block / egress_block. So the way to create a block is
+> the same: just mention the block number for the first time.
+>
+> What qevents there are depends on the qdisc. They are supposed to
+> reflect events that are somehow interesting, from the point of view of
+> an skb within a qdisc. Thus RED has two qevents: early_drop for packets
+> that were chosen to be, well, dropped early, and mark for packets that
+> are ECN-marked. So when a packet is, say, early-dropped, the RED qdisc
+> passes it through the TC block bound at that qevent (if any).
+>
 
-Introducing a namespace seems to be a nice ideia. Let the series grow :-)
+Ok, the confusing part was the missing block command. I am assuming in
+addition to Ido's example one would need to create block 10 and then
+attach a filter to it?
+Something like:
+tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 min
+500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent
+early_drop block 10
+tc filter add block 10 ...
 
-What do you mean by dropping the "common"? Use "realtek_probe" or
-"realtek_dsa_probe"?
+So a packet tagged for early drop will end up being processed in some
+filter chain with some specified actions. So in the case of offload,
+does it mean early drops will be sent to the kernel and land at the
+specific chain? Also trying to understand (in retrospect, not armchair
+lawyering): why was a block necessary? feels like the goto chain
+action could have worked, no? i.e something like: qevent early_drop
+goto chain x.. Is the block perhaps tied to something in the h/w or is
+it just some clever metainfo that is used to jump to tc block when the
+exceptions happen?
 
-Regards,
+Important thing is we need tests so we can catch these regressions in
+the future.  If you can, point me to some (outside of the ones Ido
+posted) and we'll put them on tdc.
 
-Luiz
+> > Also: Is it only Red or other qdiscs could behave this way?
+>
+> Currently only red supports any qevents at all, but in principle the
+> mechanism is reusable. With my mlxsw hat on, an obvious next candidate
+> would be tail_drop on FIFO qdisc.
+
+Sounds cool. I can see use even for s/w only dpath.
+
+cheers,
+jamal
 
