@@ -1,134 +1,116 @@
-Return-Path: <netdev+bounces-63079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAB9282B1FA
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 16:41:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE0F82B1FC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 16:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8552B1F22F04
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 15:41:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F12721F22D56
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 15:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2B94CB5E;
-	Thu, 11 Jan 2024 15:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ctgq38ti"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40894D128;
+	Thu, 11 Jan 2024 15:41:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A51D4F8A9
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 15:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dbed85ec5b5so4222170276.3
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 07:41:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1704987686; x=1705592486; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x8n+c5+HaqoTUQWw0ne60S6+hbNv8V2JRQGhKX31H9I=;
-        b=ctgq38til8se3rXQG1c1tTQyoAJhHqT9oAYLN6Jum3B/Kbx9wZYfUnQj+20QFJSCr/
-         SNRYz1HGITgTa6asuMHAq4GzABhCYQ8t20JQbSFmvo7BjKwGmf1eV/XFcOPTksdK24ME
-         wrwlRFt2ctW1hoYx4ByPuoEu0SB/uyfbojfmOteXiyCZGUSJ7oNNrjr1QK7zOfvheRSl
-         B4HKkxLAYd4vHpUkiaVIvrRfSJ4FMUX16sNOQP+qJ0QG3pSgUOaarDoP5UGkUuuNdSi5
-         NIhzJv34btUpc0vg/Oy/Q2qz1lvV8xmNofESSH4Ju3KSn/QkVNTSslUrs0xsPqsNXkeA
-         c41g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704987686; x=1705592486;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x8n+c5+HaqoTUQWw0ne60S6+hbNv8V2JRQGhKX31H9I=;
-        b=AAOGiDGl31aPks6iJOjdJt9kp7NUo2fwMsmVAlNF9ynHBguC9DOSdwqZSbfN/0jVjE
-         p0ZqQUOtKviZndShB3Cb4k/SAW0EFcnSjydLeMYM+1E+bK7WGdz8pIOJkqCFr/eIpvNR
-         C19PZ9sm9+rKXEHFnVXV53X8XMjmTNvKBO++8Ao41wm5iselZsxmyv4x1F1Cy58opogn
-         0MJG7Kn8F87ceV65M9FA3G1gKtwC+/F0+fr/p+6aDc67Wwko+jPCXumxfW8BBOqISqfY
-         W2Z8AzgUnqeqLgwDVn1QbQsY0v9NNX84ojebFSnob1xYo2dH/AYI6L8KerT3BM1D6JJt
-         OOTg==
-X-Gm-Message-State: AOJu0YzohYHR0RgDOJw0OgG5HQ2g/hEzzSpGO5RPEplFv0eMZWlqiw+o
-	AtAkcFFgL2Wg/SMwv8cDLr9Q3z1+8ioUKNk2zPlekDuNIU4X
-X-Google-Smtp-Source: AGHT+IFv8yrrWHwJQClVUEnh98sUkfiSgaipbiVhPLDzQpA0H9PpcrnSDeYIOcab05ymzcBLghcBsyW9c7+NaDP4VIA=
-X-Received: by 2002:a25:ad05:0:b0:dbe:a706:a244 with SMTP id
- y5-20020a25ad05000000b00dbea706a244mr1048618ybi.66.1704987685908; Thu, 11 Jan
- 2024 07:41:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2D94D13A;
+	Thu, 11 Jan 2024 15:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Thu, 11 Jan
+ 2024 18:41:44 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Thu, 11 Jan
+ 2024 18:41:43 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<wireguard@lists.zx2c4.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, syzbot <syzkaller@googlegroups.com>,
+	<syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com>
+Subject: [PATCH net] wireguard: receive: annotate data-race around receiving_counter.counter
+Date: Thu, 11 Jan 2024 07:41:38 -0800
+Message-ID: <20240111154138.7605-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240107144241.4169520-1-ap420073@gmail.com>
-In-Reply-To: <20240107144241.4169520-1-ap420073@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 11 Jan 2024 10:41:14 -0500
-Message-ID: <CAM0EoMncuSGfU3u_x+15X66PSXMmGPDzpBP0F5_RtMLPY+iu5Q@mail.gmail.com>
-Subject: Re: [PATCH net] amt: do not use overwrapped cb area
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, netdev@vger.kernel.org, paulb@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-On Sun, Jan 7, 2024 at 9:44=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wrot=
-e:
->
-> amt driver uses skb->cb for storing tunnel information.
-> This job is worked before TC layer and then amt driver load tunnel info
-> from skb->cb after TC layer.
-> So, its cb area should not be overwrapped with CB area used by TC.
-> In order to not use cb area used by TC, it skips the biggest cb
-> structure used by TC, which was qdisc_skb_cb.
-> But it's not anymore.
-> Currently, biggest structure of TC's CB is tc_skb_cb.
-> So, it should skip size of tc_skb_cb instead of qdisc_skb_cb.
->
-> Fixes: ec624fe740b4 ("net/sched: Extend qdisc control block with tc contr=
-ol block")
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+Syzkaller with KCSAN identified a data-race issue [1] when accessing
+keypair->receiving_counter.counter.
 
+This patch uses READ_ONCE() and WRITE_ONCE() annotations to fix the
+problem.
 
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+[1]
+BUG: KCSAN: data-race in wg_packet_decrypt_worker / wg_packet_rx_poll
 
-cheers,
-jamal
+write to 0xffff888107765888 of 8 bytes by interrupt on cpu 0:
+ counter_validate drivers/net/wireguard/receive.c:321 [inline]
+ wg_packet_rx_poll+0x3ac/0xf00 drivers/net/wireguard/receive.c:461
+ __napi_poll+0x60/0x3b0 net/core/dev.c:6536
+ napi_poll net/core/dev.c:6605 [inline]
+ net_rx_action+0x32b/0x750 net/core/dev.c:6738
+ __do_softirq+0xc4/0x279 kernel/softirq.c:553
+ do_softirq+0x5e/0x90 kernel/softirq.c:454
+ __local_bh_enable_ip+0x64/0x70 kernel/softirq.c:381
+ __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
+ _raw_spin_unlock_bh+0x36/0x40 kernel/locking/spinlock.c:210
+ spin_unlock_bh include/linux/spinlock.h:396 [inline]
+ ptr_ring_consume_bh include/linux/ptr_ring.h:367 [inline]
+ wg_packet_decrypt_worker+0x6c5/0x700 drivers/net/wireguard/receive.c:499
+ process_one_work kernel/workqueue.c:2633 [inline]
+ ...
 
-> ---
->  drivers/net/amt.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-> index 53415e83821c..68e79b1272f6 100644
-> --- a/drivers/net/amt.c
-> +++ b/drivers/net/amt.c
-> @@ -11,7 +11,7 @@
->  #include <linux/net.h>
->  #include <linux/igmp.h>
->  #include <linux/workqueue.h>
-> -#include <net/sch_generic.h>
-> +#include <net/pkt_sched.h>
->  #include <net/net_namespace.h>
->  #include <net/ip.h>
->  #include <net/udp.h>
-> @@ -80,11 +80,11 @@ static struct mld2_grec mldv2_zero_grec;
->
->  static struct amt_skb_cb *amt_skb_cb(struct sk_buff *skb)
->  {
-> -       BUILD_BUG_ON(sizeof(struct amt_skb_cb) + sizeof(struct qdisc_skb_=
-cb) >
-> +       BUILD_BUG_ON(sizeof(struct amt_skb_cb) + sizeof(struct tc_skb_cb)=
- >
->                      sizeof_field(struct sk_buff, cb));
->
->         return (struct amt_skb_cb *)((void *)skb->cb +
-> -               sizeof(struct qdisc_skb_cb));
-> +               sizeof(struct tc_skb_cb));
->  }
->
->  static void __amt_source_gc_work(void)
-> --
-> 2.34.1
->
+read to 0xffff888107765888 of 8 bytes by task 3196 on cpu 1:
+ decrypt_packet drivers/net/wireguard/receive.c:252 [inline]
+ wg_packet_decrypt_worker+0x220/0x700 drivers/net/wireguard/receive.c:501
+ process_one_work kernel/workqueue.c:2633 [inline]
+ process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2706
+ worker_thread+0x525/0x730 kernel/workqueue.c:2787
+ ...
+
+Fixes: a9e90d9931f3 ("wireguard: noise: separate receive counter from send counter")
+Reported-by: syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com
+Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+---
+ drivers/net/wireguard/receive.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receive.c
+index a176653c8861..d91383afb6e2 100644
+--- a/drivers/net/wireguard/receive.c
++++ b/drivers/net/wireguard/receive.c
+@@ -251,7 +251,7 @@ static bool decrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
+ 
+ 	if (unlikely(!READ_ONCE(keypair->receiving.is_valid) ||
+ 		  wg_birthdate_has_expired(keypair->receiving.birthdate, REJECT_AFTER_TIME) ||
+-		  keypair->receiving_counter.counter >= REJECT_AFTER_MESSAGES)) {
++		  READ_ONCE(keypair->receiving_counter.counter) >= REJECT_AFTER_MESSAGES)) {
+ 		WRITE_ONCE(keypair->receiving.is_valid, false);
+ 		return false;
+ 	}
+@@ -318,7 +318,7 @@ static bool counter_validate(struct noise_replay_counter *counter, u64 their_cou
+ 		for (i = 1; i <= top; ++i)
+ 			counter->backtrack[(i + index_current) &
+ 				((COUNTER_BITS_TOTAL / BITS_PER_LONG) - 1)] = 0;
+-		counter->counter = their_counter;
++		WRITE_ONCE(counter->counter, their_counter);
+ 	}
+ 
+ 	index &= (COUNTER_BITS_TOTAL / BITS_PER_LONG) - 1;
 
