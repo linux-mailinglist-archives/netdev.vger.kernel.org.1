@@ -1,297 +1,112 @@
-Return-Path: <netdev+bounces-63120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE17282B445
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:41:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED34D82B44F
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:47:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08B2DB272CA
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:41:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAE4328443E
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320D9524D0;
-	Thu, 11 Jan 2024 17:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D0D524D2;
+	Thu, 11 Jan 2024 17:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eWTcBB+y"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="lxouuzcz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578BA51C4C;
-	Thu, 11 Jan 2024 17:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5534dcfdd61so9924119a12.0;
-        Thu, 11 Jan 2024 09:41:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EA350276
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 17:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d4a980fdedso48920385ad.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 09:47:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704994897; x=1705599697; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tuJEDEzgsrAlWEpcwu29d3X8FwhM96NJmWu9mpjiNXc=;
-        b=eWTcBB+y9ICxnyTcYgvG4iB/1/cnj9t8CHfI+rS9fXZkODjUo2QrEqDKWi5aQYjySJ
-         HAJEI8ff2Qt0759yyz4buRfXBKRK9ll67QABHyiqiVBHuNhRLTZAajOalTtiV+bw7IIT
-         DL6zTiEiSiDNHj71EEegNqauuGlXdKhJfILs5adXh1lYA++ApWB7+arKbmAH0dWS+jiN
-         P0L6twkxMki+jIK1CZL1H9o3QyzQecfVsN4Eenscc+rN/QuLka8BTZsR367qurNkKKJE
-         6AI8TWWv/LC2n7g7ClAfCNOdq61CxWkVYu6ys7BF5+k3h2yLDyJ4//bQCYts3sarT+at
-         2Axw==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1704995265; x=1705600065; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mY6Rn808eaVli/D2Z7cXkvA5RQLFLC1HHn5Qzf9fE/c=;
+        b=lxouuzczLc42XAYnyK2/9K3RCJbhkxJ0g+rE9230MQnnteqjGSPpxiCX7OITDUIphG
+         BccjxuyUKUCHQMvX/QNDxphBUGQ4NouUZgFSJztMW63G1L1l7l3kFoWLhIwbeikUr//d
+         eozrGUP+40ylrIgXhchp2JEJVLOkBoOYWU1/lzFCckjHnRxgYx1hxheralPS52DlZI6W
+         MAi5sG9kHAQoBiu6CpF/yD343mrP7vx1XH2GN6WB5tgjFQxfRBE2Z/IfFnPfKlYISXN0
+         +Yegsvfz8q1CEWEfJY36Ire028FDBrnEF6hOgsSzS+kEC09JQ/KCwUqWas2/0avrGSXp
+         eTqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704994897; x=1705599697;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tuJEDEzgsrAlWEpcwu29d3X8FwhM96NJmWu9mpjiNXc=;
-        b=RIKgPOaZICZ1qSRw0b2RjrMIk2LAOa6A6+vKC4eOzKdxNLzDFYGmCWuy3uljzl51DM
-         HzX9IjdVXkn3M3ZMpGlc8TqsHHyOwFy3+WwntVumX5MYu4qYWbbsQWZvpmKtonjKCo3t
-         EpEx5CuH2V7NClCaEyBgpJCxqnjB9l9dTacgGld8sTdGnL2WENNKSElKzWgHmnPBY2Hi
-         zd2wHNAJieuxV8PhCJI5hr+n2tCnhFe3pvkVVwbQE3mGlfiAbBjpqqTHfeUOxqIUNmQk
-         aqeMOTP25brzokMiy7el1OEJHgZ1REHo8hP0jMnjGD0Mvc3xa23+wyCUFFNDwzzIK7PU
-         wcEw==
-X-Gm-Message-State: AOJu0Yx/CRUN8u98XQ/WjstPrz05qPX5QyLjQ4HmH72ZAEhvEdIbt0Rp
-	lpQY6Q9y5I6oWXdlm+uJVHMuG9FSpShncdjI4YU=
-X-Google-Smtp-Source: AGHT+IH8ewJTHtdgd/w1SUvdMSS/sACCnnMmuT/t/C9EGuj1sCMr8S+hOphcsCg3XXTz6hu+mKfCQ2Wtt2MEs/f8eJ4=
-X-Received: by 2002:a50:ec82:0:b0:554:4bb2:9a6e with SMTP id
- e2-20020a50ec82000000b005544bb29a6emr205632edr.11.1704994897361; Thu, 11 Jan
- 2024 09:41:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704995265; x=1705600065;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mY6Rn808eaVli/D2Z7cXkvA5RQLFLC1HHn5Qzf9fE/c=;
+        b=nbYk9SRl7aIvMfn5jFHxyq4FXlokmlNqsM97mHQW4cTt/O0XFZIUymkpVz7Oi+9xFa
+         ExMn8uO4yW3WA+f94oiacyQfewAabbB7xxiOZGMmpl+/RmurhQXF8O552/GM9waL+nRe
+         /j9bpqG/4e/tlgzn6fssIXprebEv7TQjl+a5Fmc2C6W0TjzQXqURtGzhDL/0lV38t+mo
+         /Lc+YCq3ONAT0yVhq2KT9c2s4zq75rbYK+XfH+DSAlT1Wv2vHw5tWW02iZ4EpZnJrjXA
+         X+s3Ss2U8HGHhHxhIdp5OM8yyR1/Iyh0aNm2FNX+qYFPMOZ7aK3dbSWzw7rFVzfr2EEQ
+         dx5Q==
+X-Gm-Message-State: AOJu0YyZj5v/A3N8qCQl/kCMfnqKJXKgSCKJzkQTy7GYPOHsEjYdKn/b
+	tmVSo6GTKjvNKl44MBuDeXMxH5e9oAKH5GxN1XWdX/SZG2WOrw==
+X-Google-Smtp-Source: AGHT+IGf1tdl6kSs19WSwc0vVsopO9k+ofUi2H83CuOzaySE5OEJA7qocj6o39ax1WKbXVjJJQA2jg==
+X-Received: by 2002:a17:903:110d:b0:1d3:b167:7da9 with SMTP id n13-20020a170903110d00b001d3b1677da9mr111618plh.58.1704995265124;
+        Thu, 11 Jan 2024 09:47:45 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id ku15-20020a170903288f00b001d3b258e04bsm1437853plb.248.2024.01.11.09.47.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jan 2024 09:47:44 -0800 (PST)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2] man: drop references to ifconfig
+Date: Thu, 11 Jan 2024 09:47:25 -0800
+Message-ID: <20240111174734.46091-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103222034.2582628-1-andrii@kernel.org> <20240103222034.2582628-4-andrii@kernel.org>
- <CAHk-=wgmjr4nhxGheec1OwuYRk02d0+quUAViVk1v+w=Kvg15w@mail.gmail.com>
- <CAEf4Bzb6jnJL98SLPJB7Vjxo_O33W8HjJuAsyP3+6xigZtsTkA@mail.gmail.com>
- <20240108-gasheizung-umstand-a36d89ed36b7@brauner> <CAEf4Bzb+7NzYs5ScggtgAJ6A5-oU5GymvdoEbpfNVOG-XmWZig@mail.gmail.com>
- <20240109-tausend-tropenhelm-2a9914326249@brauner> <CAEf4BzaAoXYb=qnj6rvDw8VewhvYNrs5oxe=q7VBe0jjWXivhg@mail.gmail.com>
- <20240110-nervt-monopol-6d307e2518f4@brauner> <CAEf4BzYOU5ZVqnTDTEmrHL-+tYY76kz4LO_0XauWibnhtzCFXg@mail.gmail.com>
- <20240111-amten-stiefel-043027f9520f@brauner>
-In-Reply-To: <20240111-amten-stiefel-043027f9520f@brauner>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Thu, 11 Jan 2024 09:41:25 -0800
-Message-ID: <CAEf4BzYcec97posh6N3LM8tJLsxrSLiFYq9csRWcy8=VnTJ23A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
-To: Christian Brauner <brauner@kernel.org>
-Cc: Linus Torvalds <torvalds@linuxfoundation.org>, Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, paul@paul-moore.com, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 11, 2024 at 2:38=E2=80=AFAM Christian Brauner <brauner@kernel.o=
-rg> wrote:
->
-> > > The current check is inconsisent. It special-cases init_user_ns. The
-> > > correct thing to do for what you're intending imho is:
-> > >
-> > > bool bpf_token_capable(const struct bpf_token *token, int cap)
-> > > {
-> > >         struct user_namespace *userns =3D &init_user_ns;
-> > >
-> > >         if (token)
-> > >                 userns =3D token->userns;
-> > >         if (ns_capable(userns, cap))
-> > >                 return true;
-> > >         return cap !=3D CAP_SYS_ADMIN && ns_capable(userns, CAP_SYS_A=
-DMIN))
-> > >
-> > > }
-> >
-> > Unfortunately the above becomes significantly more hairy when LSM
-> > (security_bpf_token_capable) gets involved, while preserving the rule
-> > "if token doesn't give rights, fall back to init userns checks".
->
-> Why? Please explain your reasoning in detail.
+The documentation does not need to have any references to the
+legacy command ifconfig.
 
-Why which part? About LSM interaction making this much hairier? Then see be=
-low.
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ man/man8/tc-bfifo.8      | 2 --
+ man/man8/tc-pfifo_fast.8 | 2 --
+ 2 files changed, 4 deletions(-)
 
-But if your "why?" is about "pretend no token, if token doesn't give
-rights", then that's what I tried to explain in my last email(s). It
-significantly alters (for the worse) user-space integration story
-(providing a token can be a regression, so now it's not safe to
-opportunistically try to create and use BPF token; on the other hand,
-automatically retrying inside libbpf makes for confusing user
-experience and inefficiencies). Please let me know which parts are not
-clear.
+diff --git a/man/man8/tc-bfifo.8 b/man/man8/tc-bfifo.8
+index 3e290322f603..bc05ef4d8bb6 100644
+--- a/man/man8/tc-bfifo.8
++++ b/man/man8/tc-bfifo.8
+@@ -37,8 +37,6 @@ If the list is too long, no further packets are allowed on. This is called 'tail
+ limit
+ Maximum queue size. Specified in bytes for bfifo, in packets for pfifo. For pfifo, defaults
+ to the interface txqueuelen, as specified with
+-.BR ifconfig (8)
+-or
+ .BR ip (8).
+ The range for this parameter is [0, UINT32_MAX].
+ 
+diff --git a/man/man8/tc-pfifo_fast.8 b/man/man8/tc-pfifo_fast.8
+index baf34b1df089..09bceb78bab3 100644
+--- a/man/man8/tc-pfifo_fast.8
++++ b/man/man8/tc-pfifo_fast.8
+@@ -27,8 +27,6 @@ have traffic, higher bands are never dequeued. This can be used to
+ prioritize interactive traffic or penalize 'lowest cost' traffic.
+ 
+ Each band can be txqueuelen packets long, as configured with
+-.BR ifconfig (8)
+-or
+ .BR ip (8).
+ Additional packets coming in are not enqueued but are instead dropped.
+ 
+-- 
+2.43.0
 
->
-> >
-> > I'm happy to accommodate any implementation of bpf_token_capable() as
-> > long as it behaves as discussed above and also satisfies Paul's
-> > requirement that capability checks should happen before LSM checks.
-> >
-> > >
-> > > Because any caller located in an ancestor user namespace of
-> > > token->user_ns will be privileged wrt to the token's userns as long a=
-s
-> > > they have that capability in their user namespace.
-> >
-> > And with `current_user_ns() =3D=3D token->userns` check we won't be usi=
-ng
-> > token->userns while the caller is in ancestor user namespace, we'll
-> > use capable() check, which will succeed only in init user_ns, assuming
-> > corresponding CAP_xxx is actually set.
->
-> Why? This isn't how any of our ns_capable() logic works.
->
-> This basically argues that anyone in an ancestor user namespace is not
-> allowed to operate on any of their descendant child namespaces unless
-> they are in the init_user_ns.
->
-> But that's nonsense as I'm trying to tell you. Any process in an
-> ancestor user namespace that is privileged over the child namespace can
-> just setns() into it and then pass that bpf_token_capable() check by
-> supplying the token.
->
-> At this point just do it properly and allow callers that are privileged
-> in the token user namespace to load bpf programs. It also means you get
-> user namespace nesting done properly.
-
-Ok, I see. This `current_user_ns() =3D=3D token->userns` check prevents
-this part of cap_capable() to ever be exercised:
-
- if ((ns->parent =3D=3D cred->user_ns) && uid_eq(ns->owner, cred->euid))
-    return 0;
-
-Got it. I'm all for not adding any unnecessary restrictions.
-
->
-> >
-> > >
-> > > For example, if the caller is in the init_user_ns and permissions
-> > > for CAP_WHATEVER is checked for in token->user_ns and the caller has
-> > > CAP_WHATEVER in init_user_ns then they also have it in all
-> > > descendant user namespaces.
-> >
-> > Right, so if they didn't use a token they would still pass
-> > capable(CAP_WHATEVER), right?
->
-> Yes, I'm trying to accomodate your request but making it work
-> consistently.
->
-> >
-> > >
-> > > The original intention had been to align with what we require during
-> > > token creation meaning that once a token has been created interacting
-> > > with this token is specifically confined to caller's located in the
-> > > token's user namespace.
-> > >
-> > > If that's not the case then it doesn't make sense to not allow
-> > > permission checking based on regular capability semantics. IOW, why
-> > > special case init_user_ns if you're breaking the confinement restrict=
-ion
-> > > anyway.
-> >
-> > I'm sorry, perhaps I'm dense, but with `current_user_ns() =3D=3D
-> > token->userns` check I think we do fulfill the intention to not allow
-> > using a token in a userns different from the one in which it was
-> > created. If that condition isn't satisfied, the token is immediately
->
-> My request originally was about never being able to interact with a
-> token outside of that userns. This is different as you provide an escape
-> hatch to init_user_ns. But if you need that and ignore the token then
-> please do it properly. That's what I'm trying to tell you. See below.
-
-Yes, I do need that. Thanks for providing the full code implementation
-(including LSM), it's much easier this way to converge. Let's see
-below.
-
->
-> > ignored. So you can't use a token from another userns for anything,
-> > it's just not there, effectively.
-> >
-> > And as I tried to explain above, I do think that ignoring the token
-> > instead of erroring out early is what we want to provide good
-> > user-space ecosystem integration of BPF token.
->
-> There is no erroring out early in. It's:
->
-> (1) Has a token been provided and is the caller capable wrt to the
->     namespace of the token? Any caller in an ancestor user namespace
->     that has the capability in that user namespace is capable wrt to
->     that token. That __includes__ a callers in the init_user_ns. IOW,
->     you don't need to fallback to any special checking for init_user_ns.
->     It is literally covered in the if (token) branch with the added
->     consistency that a process in an ancestor user namespace is
->     privileged wrt to that token as well.
->
-> (2) No token has been provided. Then do what we always did and perform
->     the capability checks based on the initial user namespace.
->
-> The only thing that you then still need is add that token_capable() hook
-> in there:
->
-> bool bpf_token_capable(const struct bpf_token *token, int cap)
-> {
->         bool has_cap;
->         struct user_namespace *userns =3D &init_user_ns;
->
->         if (token)
->                 userns =3D token->userns;
->         if (ns_capable(userns, cap))
-
-Here, we still need to check security_bpf_token_capable(token, cap)
-result (and only if token !=3D NULL). And if LSM returns < 0, then drop
-the token and do the original init userns check.
-
-And I just realized that my original implementation has the same
-problem. In my current implementation if we have a token we will
-terminate at LSM call, regardless if LSM allows or disallows the
-token. But that's inconsistent behavior and shouldn't be like that.
-
-I will add new tests that validate LSM interactions in the next revision.
-
->                 return true;
->         if (cap !=3D CAP_SYS_ADMIN && ns_capable(userns, CAP_SYS_ADMIN))
->                 return token ? security_bpf_token_capable(token, cap) =3D=
-=3D 0 : true;
-
-here as well, even if we have a token which passes ns_capable() check,
-but LSM rejects this token, we still need to forget about the token
-and do capable() checks in init userns.
-
->         return false;
-> }
->
-> Or write it however you like. I think this is way more consistent and
-> gives you a more flexible permission model.
-
-Yes, I like it, thanks. Taking into account fixed LSM interactions,
-here's what I came up with. Yell if you can spot anything wrong (or
-just hate the style). I did have a version without extra function,
-just setting the token to NULL and "goto again" approach, but I think
-it's way less readable and harder to follow. So this is my version
-right now:
-
-static bool bpf_ns_capable(struct user_namespace *ns, int cap)
-{
-        return ns_capable(ns, cap) || (cap !=3D CAP_SYS_ADMIN &&
-ns_capable(ns, CAP_SYS_ADMIN));
-}
-
-static bool token_capable(const struct bpf_token *token, int cap)
-{
-        struct user_namespace *userns;
-
-        userns =3D token ? token->userns : &init_user_ns;
-        if (!bpf_ns_capable(userns, cap))
-                return false;
-        if (token && security_bpf_token_capable(token, cap) < 0)
-                return false;
-        return true;
-}
-
-bool bpf_token_capable(const struct bpf_token *token, int cap)
-{
-        /* BPF token allows ns_capable() level of capabilities, but if it
-         * doesn't grant required capabilities, ignore token and fallback t=
-o
-         * init userns-based checks
-         */
-        if (token && token_capable(token, cap))
-                return true;
-        return token_capable(NULL, cap);
-}
 
