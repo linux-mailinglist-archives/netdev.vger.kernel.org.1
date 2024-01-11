@@ -1,92 +1,135 @@
-Return-Path: <netdev+bounces-62989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FBF682A98A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 09:51:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F4F782AA5C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:04:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F49B1C22295
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 08:51:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A165BB2465A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 09:04:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26ACEAFA;
-	Thu, 11 Jan 2024 08:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E772BFC01;
+	Thu, 11 Jan 2024 09:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="xU3tZdNi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b2/SKDGA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB01EADD
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 08:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailout.nyi.internal (Postfix) with ESMTP id 09B055C00A5;
-	Thu, 11 Jan 2024 03:51:39 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Thu, 11 Jan 2024 03:51:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1704963099; x=1705049499; bh=fcGbkQfDGCmxUjDYrTIuTDpZFxWQ
-	QHWXQSis0y1FoH4=; b=xU3tZdNiH1fet/cl6mjixUqc8KcmFtIujeVBBx6jper3
-	l/nQddpUoYHsloNA1bB0N44AMXIhg4a6RBO+GbZNrJd0vwbJ8JPJ5VGuKJCGIIJS
-	tKVh30tKGcZitXP4IryFPIw+eVjVw5o1A4SOpD022CuBI1vNWw8zL69KqZHGd379
-	elUNkkF7ON0eX1eTQPKWzWgB/a9QbRcoP2xIKLGaLjF6FZ1k7eyGI2NS0i4a1AAS
-	ahQ6Izx/eU8cHzAwnHkPMXL0ixSmQpT9L42+Kp8lqcr5EGO/1DnOOFz8JDBXhVM9
-	fb8moRMNFSqkMG9JkObEBIrDoWskTWI65iNWy0VZxQ==
-X-ME-Sender: <xms:GqyfZbpwYTJVrlMbpYc2tOYK-MM4La7U8qcPlMKVTjE1_cZzaLQo0w>
-    <xme:GqyfZVo3Mn4_l5AJmhFLnPTTXUOwBrk8pDg0Asac0P19nJteUlpHxIGeAfF-tXPxd
-    x4MN9CL03sCmEk>
-X-ME-Received: <xmr:GqyfZYPFdOOvZBF2WwUeIFadjUExOE_OXQVcg4jyN05gEAdxKsJUbkvl1_L5>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeivddguddvudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkugho
-    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeej
-    geeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:GqyfZe4207WYjYHgR2eQmDDDJlVh-sfL4pS_-xHvcIQWkw-NljuxMQ>
-    <xmx:GqyfZa7783FCzGfC-P0B9tRv0MjXLtkuVicPbJCkkGmPWJybtlv85g>
-    <xmx:GqyfZWgZTyKJm-shZT27raKy843dAS5Fl-Hqi-206OX5GbNfMVq-ug>
-    <xmx:G6yfZXzVKLK7pt0putDsqgxg1pPTcfvoX9WXbLgzrBkLo1Y2u-G4VQ>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 11 Jan 2024 03:51:37 -0500 (EST)
-Date: Thu, 11 Jan 2024 10:51:35 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, victor@mojatatu.com,
-	pctammela@mojatatu.com, mleitner@redhat.com, vladbu@nvidia.com,
-	paulb@nvidia.com
-Subject: Re: [patch net-next] net: sched: move block device tracking into
- tcf_block_get/put_ext()
-Message-ID: <ZZ-sF8zVqzqwOAy_@shredder>
-References: <20240104125844.1522062-1-jiri@resnulli.us>
- <ZZ6JE0odnu1lLPtu@shredder>
- <ZZ7DLvAwXcQit3Ar@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781A1168AC
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 09:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704963789;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fiVGhyMQqpemmt2172xI1+ogtFZA6yGakCsHppFUzcE=;
+	b=b2/SKDGA6xPEdQiosC5UBe1Azh2hBQURDvtzGDPszeOgqtIrHkcp8z/Uu0Kyj1F4iEetOO
+	xe+pRhUfjAugCNQ279ijqF8VC/2Av7rP914tr1RO3AuaqwEihlb+MPXGrHjPzwZe5PyeRY
+	HHPXNZOW/iGCseVBluEWELqb0KherNE=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-526-C5dnWat8PtWKjuRCuk0nPg-1; Thu, 11 Jan 2024 04:03:07 -0500
+X-MC-Unique: C5dnWat8PtWKjuRCuk0nPg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a2b699cadb7so127151066b.2
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 01:03:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704963786; x=1705568586;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fiVGhyMQqpemmt2172xI1+ogtFZA6yGakCsHppFUzcE=;
+        b=J+3ewMIc8tpJKU5E9vj2uG0iO4frtVjy4nTGU98b8Q7SugSB93xBK6bibyIM0/i1p1
+         wsxwylgWuV7IBR5aEpgn6IRCLhygJon+n/+d9Nx6kNsgrzqBlW6sp3n7MWSvVTLmKORQ
+         oGP4OmQMA5PKihG84ii0huYMoYEO46flgq8bB/w6EM3Nl+/NakUwk4RRqOk1FTBHwNn0
+         0mM17GwmrCVE0Kf5h8movLHxO7Q92EUvZh1eZNAFh6F3ecnmmM5BKWO4fUQ2Dbs8xhzR
+         sW9/nqVedLTgDzvb19VJVxevvQ106czybupEf7NckehQKR0IyvgGliCbTVkeyhaC811z
+         TVzw==
+X-Gm-Message-State: AOJu0YxRQeOtvZ0pefggZRWAX1Dng2FGPzWO9K5vWkTcv5t0ahS6/g4U
+	SjJ3VjRDofMimjdaRztXHaC0lK3zW3RcU7jg0UKr7XmCKj3RaM4t5BgjY6o5AlPR1OifC+4aBh2
+	Nvj9ncUti8sZJj/GD+zEVxDZNVSmW7mSooMvNeHbP
+X-Received: by 2002:a17:906:3542:b0:a29:40fe:254d with SMTP id s2-20020a170906354200b00a2940fe254dmr364317eja.69.1704963786583;
+        Thu, 11 Jan 2024 01:03:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHK7Ui4uGInFgVXo+NZqkjdPTK8VVW9Bqv6J5hojrs+GmhQPMTzNaI+7+HiAGH04fzV7CRFN3n0SvAxRkyMRTk=
+X-Received: by 2002:a17:906:3542:b0:a29:40fe:254d with SMTP id
+ s2-20020a170906354200b00a2940fe254dmr364310eja.69.1704963786312; Thu, 11 Jan
+ 2024 01:03:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZ7DLvAwXcQit3Ar@nanopsycho>
+References: <20231103171641.1703146-1-lulu@redhat.com> <20240110172459-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240110172459-mutt-send-email-mst@kernel.org>
+From: Cindy Lu <lulu@redhat.com>
+Date: Thu, 11 Jan 2024 17:02:27 +0800
+Message-ID: <CACLfguVpiJY2h9MXEfJBEtaEeqaRnScp3X-SoAn7anPjqi9WiQ@mail.gmail.com>
+Subject: Re: [RFC v1 0/8] vhost-vdpa: add support for iommufd
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 10, 2024 at 05:17:50PM +0100, Jiri Pirko wrote:
-> Feel free to text following patch. Since I believe it is not possible
-> to send fixes to net-next now, I will send it once net-next merges
-> into net.
+On Thu, Jan 11, 2024 at 6:25=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Sat, Nov 04, 2023 at 01:16:33AM +0800, Cindy Lu wrote:
+> >
+> > Hi All
+> > This code provides the iommufd support for vdpa device
+> > This code fixes the bugs from the last version and also add the asid su=
+pport. rebase on kernel
+> > v6,6-rc3
+> > Test passed in the physical device (vp_vdpa), but  there are still some=
+ problems in the emulated device (vdpa_sim_net),
+> > I will continue working on it
+> >
+> > The kernel code is
+> > https://gitlab.com/lulu6/vhost/-/tree/iommufdRFC_v1
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+>
+> Was this abandoned?
+>
+Thanks Micheal. I'm really sorry for the delay. I will continue working on =
+this
+Thanks
+Cindy
+> >
+> > Cindy Lu (8):
+> >   vhost/iommufd: Add the functions support iommufd
+> >   Kconfig: Add the new file vhost/iommufd
+> >   vhost: Add 3 new uapi to support iommufd
+> >   vdpa: Add new vdpa_config_ops to support iommufd
+> >   vdpa_sim :Add support for iommufd
+> >   vdpa: change the map/unmap process to support iommufd
+> >   vp_vdpa::Add support for iommufd
+> >   iommu: expose the function iommu_device_use_default_domain
+> >
+> >  drivers/iommu/iommu.c             |   2 +
+> >  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   8 ++
+> >  drivers/vdpa/virtio_pci/vp_vdpa.c |   4 +
+> >  drivers/vhost/Kconfig             |   1 +
+> >  drivers/vhost/Makefile            |   1 +
+> >  drivers/vhost/iommufd.c           | 178 +++++++++++++++++++++++++
+> >  drivers/vhost/vdpa.c              | 210 +++++++++++++++++++++++++++++-
+> >  drivers/vhost/vhost.h             |  21 +++
+> >  include/linux/vdpa.h              |  38 +++++-
+> >  include/uapi/linux/vhost.h        |  66 ++++++++++
+> >  10 files changed, 525 insertions(+), 4 deletions(-)
+> >  create mode 100644 drivers/vhost/iommufd.c
+> >
+> > --
+> > 2.34.3
+>
 
-Looks good, thanks. I will run it through regression to make sure no
-other issues pop up.
 
