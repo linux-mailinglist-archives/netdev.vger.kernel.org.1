@@ -1,127 +1,129 @@
-Return-Path: <netdev+bounces-62965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597E382A3EB
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 23:25:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D0482A543
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 01:39:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3CDE28A0E9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jan 2024 22:25:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC72828973A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 00:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833484F89C;
-	Wed, 10 Jan 2024 22:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E29136A;
+	Thu, 11 Jan 2024 00:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCO2jIRI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RWrXDJWb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB3A4F88A
-	for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 22:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704925525;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LbvHor4sr0xWUt5flKWQxxo/1Tbqrvytr+t1oavL/pw=;
-	b=eCO2jIRIut2UlVaoH93BzJg5itwQbnNx4ZvLhZ4JCIVk2pQjaOy9CV1TnapkYAg1mnZxIX
-	kfXhxokPUz/svHSIBheEwFy0naDBrRGL/MrtbMGtDyIFsBmkHNCoX4GGQUQtngD8mGBJpP
-	6Zg1p2uIoDFVFXaX0cUnUeLrS2zHL6I=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-625-r4DCnfiBN4io1pHhKualdw-1; Wed, 10 Jan 2024 17:25:23 -0500
-X-MC-Unique: r4DCnfiBN4io1pHhKualdw-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3367c893deeso2700161f8f.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 14:25:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704925522; x=1705530322;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LbvHor4sr0xWUt5flKWQxxo/1Tbqrvytr+t1oavL/pw=;
-        b=IZX1AeDL3qP/+1ZbFvoWxcQJoDgPJ8AkT9Es+XrtlEh3rYJKzYOlqTcqgHYecJU/zL
-         tsdYsX8GM8sqoqlGF/GWLqAhQkCsVvvwSA2LLcVn90weSmTx6l2ApiP4ZiBMFzfRAxmM
-         fGnFIg5WFCKewy2lvbpbZG5mcGT9C0OuYImLJFOCgRvqgQmp3FhlymYMf5pBA97ALQ/N
-         CvhP/kiSuQwfk0AciCBeqKl2bpUjgMDkmFpWXZb1ZNUVoiO0LwETT8QxTj6zIJGVmlTn
-         xzpG+ExBKmU1sMKYLi2e7MBEw9FD0GNbCTcFW619n6Wv5BmTaSaLmPOm3Nuo5VvHd3I0
-         i5Tg==
-X-Gm-Message-State: AOJu0Yze40knbTwvDeGKPYXnNFk3QotONOluq63JGj3hdonyDeT0G9of
-	+ZRYXJ1TVSSE/WtKGjAHKlwkWr/+MSBebT/mMHMMjD1t0fR5uKYrO+9Pjj4ixdjaQGeL5lWzfl3
-	MZNVhxAL6i9MMTx5Oju/m1Aw9
-X-Received: by 2002:a05:6000:18d1:b0:336:6c01:4a92 with SMTP id w17-20020a05600018d100b003366c014a92mr75188wrq.1.1704925522589;
-        Wed, 10 Jan 2024 14:25:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG4bG5HIN2EOROQjKy4ly5IS5OGPCjThp6MgjKpTRQ9pvJ7CGd8hXcoyJdZJ1RPWE28zwrdpA==
-X-Received: by 2002:a05:6000:18d1:b0:336:6c01:4a92 with SMTP id w17-20020a05600018d100b003366c014a92mr75179wrq.1.1704925522280;
-        Wed, 10 Jan 2024 14:25:22 -0800 (PST)
-Received: from redhat.com ([2a06:c701:73ef:4100:2cf6:9475:f85:181e])
-        by smtp.gmail.com with ESMTPSA id b9-20020a5d4b89000000b003366aad3564sm5807985wrt.30.2024.01.10.14.25.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jan 2024 14:25:21 -0800 (PST)
-Date: Wed, 10 Jan 2024 17:25:19 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [RFC v1 0/8] vhost-vdpa: add support for iommufd
-Message-ID: <20240110172459-mutt-send-email-mst@kernel.org>
-References: <20231103171641.1703146-1-lulu@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666A010EC
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 00:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704933574; x=1736469574;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Y/k+h6lnl1bMRJ1SN6oCoe9x96SxlH6BTXelJNumA84=;
+  b=RWrXDJWbcrRuj/oAmu1PHg0PeoABy2nhIOx250bkuAjit2IzZl0M12Md
+   JAPPqC4tIq8bDLoDCJktqOEKodvkVGM4tu3ygeRhy5G5iPtTpX0c+TLYe
+   nPOhiL10DS2QoxOw6COjrrwEdejrHl9WUXMtuqcdhnyUDNj/EeZNOuV2O
+   6NozXlBf2tNS9rt7nKhDPr76vtACZR8ATFztB+pRpcrzZyFvO65yQB9Zx
+   Tc0noakfukpAQUy/KovcU0VeJE+OBSnD3QUXaudysnE2OdM5M5bxc6LhZ
+   cWUpWezP457Etww/tRGiQJ2dx32OrB+KNOP4LjgN0HnzAwaNmlG7z8kfV
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10949"; a="398390877"
+X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
+   d="scan'208";a="398390877"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2024 16:39:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10949"; a="905739364"
+X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
+   d="scan'208";a="905739364"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orsmga004.jf.intel.com with ESMTP; 10 Jan 2024 16:39:33 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	ivecera@redhat.com,
+	netdev@vger.kernel.org,
+	Martin Zaharinov <micron10@gmail.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: [PATCH iwl-net] i40e: Include types.h to some headers
+Date: Wed, 10 Jan 2024 16:39:25 -0800
+Message-ID: <20240111003927.2362752-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231103171641.1703146-1-lulu@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 04, 2023 at 01:16:33AM +0800, Cindy Lu wrote:
-> 
-> Hi All
-> This code provides the iommufd support for vdpa device
-> This code fixes the bugs from the last version and also add the asid support. rebase on kernel
-> v6,6-rc3
-> Test passed in the physical device (vp_vdpa), but  there are still some problems in the emulated device (vdpa_sim_net), 
-> I will continue working on it
-> 
-> The kernel code is
-> https://gitlab.com/lulu6/vhost/-/tree/iommufdRFC_v1
-> 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
+Commit 56df345917c0 ("i40e: Remove circular header dependencies and fix
+headers") redistributed a number of includes from one large header file
+to the locations they were needed. In some environments, types.h is not
+included and causing compile issues. The driver should not rely on
+implicit inclusion from other locations; explicitly include it to these
+files.
 
-Was this abandoned?
+Snippet of issue. Entire log can be seen through the Closes: link.
 
-> 
-> Cindy Lu (8):
->   vhost/iommufd: Add the functions support iommufd
->   Kconfig: Add the new file vhost/iommufd
->   vhost: Add 3 new uapi to support iommufd
->   vdpa: Add new vdpa_config_ops to support iommufd
->   vdpa_sim :Add support for iommufd
->   vdpa: change the map/unmap process to support iommufd
->   vp_vdpa::Add support for iommufd
->   iommu: expose the function iommu_device_use_default_domain
-> 
->  drivers/iommu/iommu.c             |   2 +
->  drivers/vdpa/vdpa_sim/vdpa_sim.c  |   8 ++
->  drivers/vdpa/virtio_pci/vp_vdpa.c |   4 +
->  drivers/vhost/Kconfig             |   1 +
->  drivers/vhost/Makefile            |   1 +
->  drivers/vhost/iommufd.c           | 178 +++++++++++++++++++++++++
->  drivers/vhost/vdpa.c              | 210 +++++++++++++++++++++++++++++-
->  drivers/vhost/vhost.h             |  21 +++
->  include/linux/vdpa.h              |  38 +++++-
->  include/uapi/linux/vhost.h        |  66 ++++++++++
->  10 files changed, 525 insertions(+), 4 deletions(-)
->  create mode 100644 drivers/vhost/iommufd.c
-> 
-> -- 
-> 2.34.3
+In file included from drivers/net/ethernet/intel/i40e/i40e_diag.h:7,
+                 from drivers/net/ethernet/intel/i40e/i40e_diag.c:4:
+drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h:33:9: error: unknown type name '__le16'
+   33 |         __le16 flags;
+      |         ^~~~~~
+drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h:34:9: error: unknown type name '__le16'
+   34 |         __le16 opcode;
+      |         ^~~~~~
+...
+drivers/net/ethernet/intel/i40e/i40e_diag.h:22:9: error: unknown type name 'u32'
+   22 |         u32 elements;   /* number of elements if array */
+      |         ^~~
+drivers/net/ethernet/intel/i40e/i40e_diag.h:23:9: error: unknown type name 'u32'
+   23 |         u32 stride;     /* bytes between each element */
+
+Reported-by: Martin Zaharinov <micron10@gmail.com>
+Closes: https://lore.kernel.org/netdev/21BBD62A-F874-4E42-B347-93087EEA8126@gmail.com/
+Fixes: 56df345917c0 ("i40e: Remove circular header dependencies and fix headers")
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h | 1 +
+ drivers/net/ethernet/intel/i40e/i40e_diag.h       | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+index 18a1c3b6d72c..c8f35d4de271 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+@@ -5,6 +5,7 @@
+ #define _I40E_ADMINQ_CMD_H_
+ 
+ #include <linux/bits.h>
++#include <linux/types.h>
+ 
+ /* This header file defines the i40e Admin Queue commands and is shared between
+  * i40e Firmware and Software.
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_diag.h b/drivers/net/ethernet/intel/i40e/i40e_diag.h
+index ece3a6b9a5c6..ab20202a3da3 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_diag.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_diag.h
+@@ -4,6 +4,7 @@
+ #ifndef _I40E_DIAG_H_
+ #define _I40E_DIAG_H_
+ 
++#include <linux/types.h>
+ #include "i40e_adminq_cmd.h"
+ 
+ /* forward-declare the HW struct for the compiler */
+-- 
+2.41.0
 
 
