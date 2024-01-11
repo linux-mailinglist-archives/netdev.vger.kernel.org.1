@@ -1,179 +1,195 @@
-Return-Path: <netdev+bounces-63052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80FF682AED4
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:37:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D384F82AEDD
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EACF3B231AC
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:37:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EC3BB23FD8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1052156FD;
-	Thu, 11 Jan 2024 12:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516F115AEE;
+	Thu, 11 Jan 2024 12:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I7L9pOnj"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7FE15E85;
-	Thu, 11 Jan 2024 12:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4T9kgj6n8Yz1Q7kX;
-	Thu, 11 Jan 2024 20:36:49 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id B5CB4140555;
-	Thu, 11 Jan 2024 20:37:20 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 11 Jan
- 2024 20:37:20 +0800
-Subject: Re: [PATCH net-next 3/6] mm/page_alloc: use initial zero offset for
- page_frag_alloc_align()
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
- <20240103095650.25769-4-linyunsheng@huawei.com>
- <f4abe71b3439b39d17a6fb2d410180f367cadf5c.camel@gmail.com>
- <74c9a3a1-5204-f79a-95ff-5c108ec6cf2a@huawei.com>
- <CAKgT0Uf=hFrXLzDFaOxs_j9yYP7aQCmi=wjUyuop3FBv2vzgCA@mail.gmail.com>
- <f138193c-30e0-b1ba-1735-5f569230724b@huawei.com>
- <CAKgT0UcujEktOnHx7mxWd+Jah1J9mHFWnTx35vc3x25uUadxaA@mail.gmail.com>
- <b77ef32e-64b9-2e4f-8041-ccb46dea4caa@huawei.com>
- <CAKgT0UfXv-2GrPY99-ZVZgjGEHvDqww6qLLT_Fben=_oNJM+xg@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <02377589-0b2d-d924-4dca-3552e0b4913d@huawei.com>
-Date: Thu, 11 Jan 2024 20:37:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8BE15ADB
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-28ca63fd071so2787939a91.3
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 04:40:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704976825; x=1705581625; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lUjrrZ3Jg1GUMAie5ebnK4hlRzI9jSk+yPsyIMgP7Cg=;
+        b=I7L9pOnj2gmHPXX3UUbnrWYfZH2x5047cV/fypzF3Y4ux3Y0oF/TgcPKblFJhFqyfN
+         uRt+i6HwRmtVLCXSAecx2Ihe27aeeuvT5TpzeIlMY+pOieEKi5vEYiIqh8Yh10B/i7CD
+         RswIwp5eHwjY6N1qjV8nIrBBXxP6J14XSk3vW2Bn7p6zOzOIE/PEiBwUrY0QGlV1B3uq
+         5jloVDT1ujj9h5SuzxJPTboxkF1HAHNqZEefAsPr+DxEp2kTY7JW+n/TN6Iti8VvdcC1
+         B9JbnzOo84Tyhq4z4XFf3s4P+tBtYNJme3NJUYiuB1DgqPvdhTHQvmnigGmTOd/jg4fy
+         8JSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704976825; x=1705581625;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lUjrrZ3Jg1GUMAie5ebnK4hlRzI9jSk+yPsyIMgP7Cg=;
+        b=w/0mJ1UhxeezaSVtIy4gg1xKY886HxxeBF5gffs4++urFFYMVdVazj3WI3BQOpE85E
+         11goMAdY8NPRSmHFurYcSDgPcnm+uaF36xbag3bYimoJmceWru2YaCjHsmnIDGgqp/sP
+         ej15zNgZLJDs0xNmD7GtybQBr8IORYs0imeqscXczgvB0fxQbkEXLkslshQUJSDFwmzV
+         qHK1Ut6NVXtMyxo9h3Ioc0El2QIXog/uCNV4knvFl4k1fI+kMwUqqqT7mcNfrBlhaYYe
+         7Q8jlxXg6QZ71mllySbyYIcESkv0zYkQLrfe72U1yZIOGxNBPhvJ4VNROirEEH7tJZ/u
+         YO7Q==
+X-Gm-Message-State: AOJu0YzOamPFkpbLkkNN9Co9EsvnexUfsCc4hSS0q8f8hUgzaAC92Y+e
+	o7djc2Au+Rf2F4z8gWAiuSSUJZ3fIB7e
+X-Google-Smtp-Source: AGHT+IFlzCZDk+7khh2nGY76iLSM3Y0+E3O+l032jjoiVmXYGJDOGVhuEwa5Sr5OwMDDcz8NiN7tAg==
+X-Received: by 2002:a17:90a:4984:b0:28c:f1f3:4dcb with SMTP id d4-20020a17090a498400b0028cf1f34dcbmr914767pjh.69.1704976825101;
+        Thu, 11 Jan 2024 04:40:25 -0800 (PST)
+Received: from thinkpad ([202.131.159.18])
+        by smtp.gmail.com with ESMTPSA id mf15-20020a17090b184f00b0028cef2025ddsm1418530pjb.15.2024.01.11.04.40.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jan 2024 04:40:24 -0800 (PST)
+Date: Thu, 11 Jan 2024 18:10:09 +0530
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Lukas Wunner <lukas@wunner.de>, Bartosz Golaszewski <brgl@bgdev.pl>,
+	Kalle Valo <kvalo@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Chris Morgan <macromorgan@hotmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	=?iso-8859-1?Q?N=EDcolas_F_=2E_R_=2E_A_=2E?= Prado <nfraprado@collabora.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Terry Bowman <terry.bowman@amd.com>,
+	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [RFC 3/9] PCI/portdrv: create platform devices for child OF nodes
+Message-ID: <20240111124009.GA3003@thinkpad>
+References: <20240104130123.37115-1-brgl@bgdev.pl>
+ <20240104130123.37115-4-brgl@bgdev.pl>
+ <20240109144327.GA10780@wunner.de>
+ <CAMRc=MdXO6c6asvRSn_Z8-oFS48hroT+dazGKB6WWY1_Zu7f1Q@mail.gmail.com>
+ <20240110132853.GA6860@wunner.de>
+ <659f00ed271b3_5cee2942@dwillia2-xfh.jf.intel.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UfXv-2GrPY99-ZVZgjGEHvDqww6qLLT_Fben=_oNJM+xg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <659f00ed271b3_5cee2942@dwillia2-xfh.jf.intel.com.notmuch>
 
-On 2024/1/11 0:21, Alexander Duyck wrote:
-
-...
-
->>
->> The main usecase in my mind is the page_frag used in the tx part for
->> networking if we are able to unify the page_frag and page_frag_cache in
->> the future:
->> https://elixir.bootlin.com/linux/v6.7-rc8/source/net/ipv4/tcp.c#L1183
->>
->> Do you think if it makes sense to unify them using below unified struct,
->> and provide API for returning 'page' and 'va' as page_pool does now?
+On Wed, Jan 10, 2024 at 12:41:17PM -0800, Dan Williams wrote:
+> [ add Terry ]
 > 
-> Short answer is no. The difference between the two is the use case,
-> and combining page and va in the same struct just ends up generating
-> indirect data duplication. So one step would be to look at seeing what
-> we could do to either convert page to va or va to page without taking
-> a significant penalty in either page_frag or page_frag_cache use case.
-
-I think we might do something like the page_pool using some unused fields
-in 'struct page' as the metadata of page_frag/page_frag_cache, and reduce
-page_frag or page_frag_cache to a single pointer of 'struct page'?
-
-I looked the the fields used by page_pool in 'struct page', it seems it is
-enough for page_frag case too.
-
-> I had opted for using the virtual address as the Rx path has a strong
-> need for accessing the memory as soon as it is written to begin basic
-> parsing tasks and the like. In addition it is usually cheaper to go
-> from a virtual to a page rather than the other way around.
-
-Is there a reason why it is usually cheaper to go from a virtual to a page
-rather than the other way around? I looked the implementations of them, But
-had not figured why yet.
-
 > 
-> As for the rest of the fields we have essentially 2 main use cases.
-> The first is the Rx path which usually implies DMA and not knowing
-> what size of the incoming frame is and the need to have allocation
-> succeed to avoid jamming up a device. So basically it is always doing
-> something like allocating 2K although it may only receive somewhere
-> between 60B to 1514B, and it is always allocating from reserves. For
-> something like Tx keeping the pagecnt_bias and pfmemalloc values
-
-I am not so sure I understand why it is ok to keep reusing a pfmemalloc
-page for Tx yet?
-
-I am assuming the pfmemalloc is not about a specific page, but about the
-state of mm system when a page is allocated under memory pressure?
-The pfmemalloc is used to drop some rx packet which is not helpful for
-reducing the memory pressure? And tx does not need to handle the pfmemalloc
-case?
-
-> doesn't make much sense as neither is really needed for the Tx use
-> case. Instead they can just make calls to page_get as they slice off
-
-I think for small packet, the bias may help to avoid some atomic
-operations and some cache bouncing?
-
-> pieces of the page, and they have the option of failing if they cannot
-> get enough memory to put the skb together.
+> Lukas Wunner wrote:
+> > On Wed, Jan 10, 2024 at 01:55:18PM +0100, Bartosz Golaszewski wrote:
+> > > On Tue, Jan 9, 2024 at 3:43???PM Lukas Wunner <lukas@wunner.de> wrote:
+> > > > On Thu, Jan 04, 2024 at 02:01:17PM +0100, Bartosz Golaszewski wrote:
+> > > > > In order to introduce PCIe power-sequencing, we need to create platform
+> > > > > devices for child nodes of the port driver node. They will get matched
+> > > > > against the pwrseq drivers (if one exists) and then the actuak PCIe
+> > > > > device will reuse the node once it's detected on the bus.
+> > > > [...]
+> > > > > --- a/drivers/pci/pcie/portdrv.c
+> > > > > +++ b/drivers/pci/pcie/portdrv.c
+> > > > > @@ -715,7 +716,7 @@ static int pcie_portdrv_probe(struct pci_dev *dev,
+> > > > >               pm_runtime_allow(&dev->dev);
+> > > > >       }
+> > > > >
+> > > > > -     return 0;
+> > > > > +     return devm_of_platform_populate(&dev->dev);
+> > > > >  }
+> > > >
+> > > > I think this belongs in of_pci_make_dev_node(), portdrv seems totally
+> > > > the wrong place.  Note that you're currently calling this for RCECs
+> > > > (Root Complex Event Collectors) as well, which is likely not what
+> > > > you want.
+> > > >
+> > > 
+> > > of_pci_make_dev_node() is only called when the relevant PCI device is
+> > > instantiated which doesn't happen until it's powered-up and scanned -
+> > > precisely the problem I'm trying to address.
+> > 
+> > No, of_pci_make_dev_node() is called *before* device_attach(),
+> > i.e. before portdrv has even probed.  So it seems this should
+> > work perfectly well for your use case.
+> > 
+> > 
+> > > > devm functions can't be used in the PCI core, so symmetrically call
+> > > > of_platform_unpopulate() from of_pci_remove_node().
+> > > 
+> > > I don't doubt what you're saying is true (I've seen worse things) but
+> > > this is the probe() callback of a driver using the driver model. Why
+> > > wouldn't devres work?
+> > 
+> > The long term plan is to move the functionality in portdrv to
+> > the PCI core.  Because devm functions can't be used in the PCI
+> > core, adding new ones to portdrv will *add* a new roadblock to
+> > migrating portdrv to the PCI core.  In other words, it makes
+> > future maintenance more difficult.
+> > 
+> > Generally, only PCIe port services which share the same interrupt
+> > (hotplug, PME, bandwith notification, flit error counter, ...)
+> > need to live in portdrv.  Arbitrary other stuff should not be
+> > shoehorned into portdrv.
 > 
->> It may mean we need to add one pointer to the new struct and are not able
->> do some trick for performance, I suppose that is ok as there are always
->> some trade off for maintainability and evolvability?
->>
->> struct page_frag {
->>         struct *page;
->>         void *va;
->> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->>         __u16 offset;
->>         __u16 size;
->> #else
->>         __u32 offset;
->> #endif
->>         /* we maintain a pagecount bias, so that we dont dirty cache line
->>          * containing page->_refcount every time we allocate a fragment.
->>          */
->>         unsigned int            pagecnt_bias;
->>         bool pfmemalloc;
->> };
+> I came here to say the same thing. It is already the case that portdrv
+> is not a good model to build new functionality upon [1], and PCI core
+> enlightenment should be considered first.
 > 
-> My general thought was to instead just make the page_frag a member of
-> the page_frag_cache since those two blocks would be the same. Then we
-> could see how we evolve things from there. By doing that there should
-> essentially be no code change
 
-Yes, that is a possible way to evolve things. But I seems to perfer to
-use the unused fields in 'struct page' for now, WDYT?
+The primary reason for plugging the power sequencing into portdrv is due to
+portdrv binding with all the bridge devices and acting as management driver for
+the bridges. This is where exactly the power sequencing part needs to be plugged
+in IMO. But if the idea of the portdrv is just to expose services based on
+interrupts, then please suggest a better place to plug this power sequencing
+part.
 
+- Mani
+
+> The portdrv model is impeding Terry's CXL Port error handling effort, so
+> I am on the lookout for portdrv growing new entanglements to unwind
+> later.
 > 
->> Another usecase that is not really related is: hw may be configured with
->> a small BD buf size, for 2K and configured with a big mtu size or have
->> hw gro enabled, for 4K pagesize, that means we may be able to reduce the
->> number of the frag num to half as it is usually the case that two
->> consecutive BD pointing to the same page. I implemented a POC in hns3
->> long time ago using the frag implememtation in page_pool, it did show
->> some obvious peformance gain, But as the priority shifts, I have not
->> been able to continue that POC yet.
+> [1]: http://lore.kernel.org/r/20221025232535.GA579167@bhelgaas
 > 
-> The main issue for that use case is that in order to make it work you
-> are having to usually copybreak the headers out of the page frags as
-> you won't be able to save the space for the skb tailroom. Either that
-> or you are using header/data split and in that case the data portion
-> should really be written to full pages instead of page fragments
 
-I am not sure how hw implement the header/data split yet, is the hw able
-to not enabling header/data split for small packets and enabling header/data
-split for medium/big packets for the same queue, maybe spaning data part on
-multi-bd for big packets, so that we have least memory usages and performance
-penalty for small/medium/big packets received in the same queue?
-
-> anyway and be making use of page pool instead.
+-- 
+மணிவண்ணன் சதாசிவம்
 
