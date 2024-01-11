@@ -1,176 +1,162 @@
-Return-Path: <netdev+bounces-63093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6648582B2E6
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:26:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C480D82B2E8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C41BE1F25AAD
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 16:26:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E92241C21CD6
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 16:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B294F5FB;
-	Thu, 11 Jan 2024 16:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1674F5FB;
+	Thu, 11 Jan 2024 16:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K56N9zw2"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NTm3gxkW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375C1495D5
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 16:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso12830a12.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 08:26:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFBC28E33
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 16:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40b5155e154so70921645e9.3
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 08:27:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704990388; x=1705595188; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K30QLyCbHCL75IsyofqnBHA8mjC9PVkRkBbAX6BkpK0=;
-        b=K56N9zw2RDj3lCyryyCKgmAdYOxn1ZqayPiOdpCfBB8N6EYYd6lejGumKg/Wv10lvh
-         8HfA4zd0EI3xqkYxC27QyW8NUsl6o4Jckk7TR3WrBN5Te8IVOGAF0g/KKXSJX17aVDpO
-         5Audfjxq2nC+Bqz6WNPxLY6oWC0iHyiROwz1vh54dpVJt+V9k6CWDD4oNjhWwk605hnQ
-         eU+jEznaumA8qzAXHLrY94V5Hs3+fSIkxaG8XWJnbMljKPNH1NriUPl6hWh5YqVDa3UE
-         BhsI5uPUNUwLjTeiFpAn70owliUFnPMoiHYSBud0/Ks10N1aGUnVZpgHXorJ6A8Ch8uQ
-         c79g==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1704990451; x=1705595251; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=pce3TyUU1ijjK5OCvutHzeGTlpt2KdritH1L2p2VA40=;
+        b=NTm3gxkWpdgoVTk5SKoPTuBRw/3tzXRh0ZjwGTnDWh0NNDpnuL40P12FF2b4sZglE5
+         I3GdCirp8nkvgih4WZVErD9Gag8MbUqFOCVL4qZyVyzBzWPxZRIki2ZYYP5H2FiNKBDk
+         gJQh/EikZCjSr3ADovjo92CkIWdY/35y/1yABNGlMkKtuEEIOc5t8CrJAsgoF/bGo/Fo
+         yOSVz/CddwQEpzDJxNIMojab8Ut/QzMSdosR/CgpGwnYpkVr4/8zVhy6ggsWmYB2EQlj
+         ITTYVg/ru3UTwHyV0QRm8SX0hGz4kpjoaCQaCzG1VIQEUfatXVZyfHeiDr0lE5JL4N/W
+         4BPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704990388; x=1705595188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K30QLyCbHCL75IsyofqnBHA8mjC9PVkRkBbAX6BkpK0=;
-        b=jcaNDB+G/9XabLqrTedREQ8LZNfHL6rHoLOQYAPXe+OM5AoS878yiWAXwkgFKLoNnh
-         gpIiVKlL18uN7227960bAbi2NNqpCqb4Hqwog7pAyFfw609OKG3boGqE8DS8PqqCwY8K
-         qQrVnuabwmfJ3fce4qOT9USkTSxQBtNWXD0VZE9nD+yDRDZLwpP4gM1LpyEaneLnd51c
-         tg0J4LUoGfEGNFQ9misL63X8xZvcdV863C1mngxyGGXfJyGmfsyBk49RkkkYw1Wr2wKO
-         maq5idQqhgRm++pqAZSs5yRjXim1dE3skVTx8DtSkXR7sNOymjm4B8ZJF0oEKco1pRdz
-         tu+g==
-X-Gm-Message-State: AOJu0Yxxc9aBumvaVbec8NbMVmnM7F5rTO12NBL4ucUfRZjOrT7uevyQ
-	E9dNesC2tS6rSUYWoIQ/MkKXKn6BudTVR5FbuxmgTpXwBdTq
-X-Google-Smtp-Source: AGHT+IGG/epSnevZ3tibTtsyj6ljbUTjIpunG+bc1R+QOl/x0GDHrqpNq3C6hvaHo8gUIsrVp/EukS3BSyyLaI9hNG4=
-X-Received: by 2002:aa7:c411:0:b0:558:b501:1d2a with SMTP id
- j17-20020aa7c411000000b00558b5011d2amr49800edq.6.1704990388229; Thu, 11 Jan
- 2024 08:26:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704990451; x=1705595251;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pce3TyUU1ijjK5OCvutHzeGTlpt2KdritH1L2p2VA40=;
+        b=G17tDBe+PrsTr3eJDZPSFIRbs6aflLccZbgSETF48xnNDZcjGDVYgfYHalVGwq0vgd
+         3NoH/K/6rQ/OARJNS4hb68RwB5QYTATziAAH81AjkAOFzmeUG8NJqy5Hsm1GPjSGFXZf
+         kOFG7GoIEKtUDA0hutfoAjQrJA2A9p6fLIlLZx70BXD3K0ydIHvZlu3B5OqfRK9ZVJBw
+         zsOgLAWsByyMW36aak2QinKJyNpbDtg8lUn0hIOUfJyqIpoHf8KPPgXc8/KONoGiJKFO
+         n//plIsq+gwtJi0aFb2qJZ2UwxVwuHEkGGLdiK2o0qyAElFZUGfxZmnrBtH20H201Obx
+         MmnA==
+X-Gm-Message-State: AOJu0YyLy9ggqzCpJFJzp/9wqfkFTErNumN3HbFUyV01YXK9LesnDhig
+	axfkd+HsRDoZOdEKM1nQqTU6feRZwJzS5w==
+X-Google-Smtp-Source: AGHT+IE4s2OBZd8FiVG8lCHxy4Bn0cVUJHSgVb74LzsrFySznRxpB437lu4+N+bW8Wssk9Gf8di7Lg==
+X-Received: by 2002:a05:600c:314a:b0:40b:5e21:bddf with SMTP id h10-20020a05600c314a00b0040b5e21bddfmr42236wmo.110.1704990451134;
+        Thu, 11 Jan 2024 08:27:31 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id p21-20020a05600c359500b0040e3488f16dsm2493689wmq.12.2024.01.11.08.27.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jan 2024 08:27:30 -0800 (PST)
+Date: Thu, 11 Jan 2024 17:27:29 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, xiyou.wangcong@gmail.com, victor@mojatatu.com,
+	pctammela@mojatatu.com, mleitner@redhat.com, vladbu@nvidia.com,
+	paulb@nvidia.com, Petr Machata <petrm@nvidia.com>
+Subject: Re: [patch net-next] net: sched: move block device tracking into
+ tcf_block_get/put_ext()
+Message-ID: <ZaAW8fRkfcDmfFCn@nanopsycho>
+References: <20240104125844.1522062-1-jiri@resnulli.us>
+ <ZZ6JE0odnu1lLPtu@shredder>
+ <CAM0EoM=AGxO0gdeHPi7ST0+-YVuT20ysPbrFkYVXLqGv39oR7Q@mail.gmail.com>
+ <CAM0EoMkpzsEWXMw27xgsfzwA2g4CNeDYQ9niTJAkgu3=Kgp81g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240111154138.7605-1-n.zhandarovich@fintech.ru>
-In-Reply-To: <20240111154138.7605-1-n.zhandarovich@fintech.ru>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 11 Jan 2024 17:26:17 +0100
-Message-ID: <CANn89iJaxTFGNFqmCJSQfr9nwHUPK6DBnK1oZ1sJ2Gm6eqebag@mail.gmail.com>
-Subject: Re: [PATCH net] wireguard: receive: annotate data-race around receiving_counter.counter
-To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, wireguard@lists.zx2c4.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot <syzkaller@googlegroups.com>, 
-	syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMkpzsEWXMw27xgsfzwA2g4CNeDYQ9niTJAkgu3=Kgp81g@mail.gmail.com>
 
-On Thu, Jan 11, 2024 at 4:41=E2=80=AFPM Nikita Zhandarovich
-<n.zhandarovich@fintech.ru> wrote:
+Thu, Jan 11, 2024 at 04:42:55PM CET, jhs@mojatatu.com wrote:
+>On Thu, Jan 11, 2024 at 10:40 AM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+>>
+>> On Wed, Jan 10, 2024 at 7:10 AM Ido Schimmel <idosch@idosch.org> wrote:
+>> >
+>> > On Thu, Jan 04, 2024 at 01:58:44PM +0100, Jiri Pirko wrote:
+>> > > diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+>> > > index adf5de1ff773..253b26f2eddd 100644
+>> > > --- a/net/sched/cls_api.c
+>> > > +++ b/net/sched/cls_api.c
+>> > > @@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
+>> > >                     struct tcf_block_ext_info *ei,
+>> > >                     struct netlink_ext_ack *extack)
+>> > >  {
+>> > > +     struct net_device *dev = qdisc_dev(q);
+>> > >       struct net *net = qdisc_net(q);
+>> > >       struct tcf_block *block = NULL;
+>> > >       int err;
+>> > > @@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block **p_block, struct Qdisc *q,
+>> > >       if (err)
+>> > >               goto err_block_offload_bind;
+>> > >
+>> > > +     if (tcf_block_shared(block)) {
+>> > > +             err = xa_insert(&block->ports, dev->ifindex, dev, GFP_KERNEL);
+>> > > +             if (err) {
+>> > > +                     NL_SET_ERR_MSG(extack, "block dev insert failed");
+>> > > +                     goto err_dev_insert;
+>> > > +             }
+>> > > +     }
+>> >
+>> > While this patch fixes the original issue, it creates another one:
+>> >
+>> > # ip link add name swp1 type dummy
+>> > # tc qdisc replace dev swp1 root handle 10: prio bands 8 priomap 7 6 5 4 3 2 1
+>> > # tc qdisc add dev swp1 parent 10:8 handle 108: red limit 1000000 min 200000 max 200001 probability 1.0 avpkt 8000 burst 38 qevent early_drop block 10
+>> > RED: set bandwidth to 10Mbit
+>> > # tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 min 500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent early_drop block 10
+>> > RED: set bandwidth to 10Mbit
+>> > Error: block dev insert failed.
+>> >
+>>
+>>
+>> +cc Petr
+>> We'll add a testcase on tdc - it doesnt seem we have any for qevents.
+>> If you have others that are related let us know.
+>> But how does this work? I see no mention of block on red code and i
+>> see no mention of block on the reproducer above.
 >
-> Syzkaller with KCSAN identified a data-race issue [1] when accessing
-> keypair->receiving_counter.counter.
->
-> This patch uses READ_ONCE() and WRITE_ONCE() annotations to fix the
-> problem.
->
-> [1]
-> BUG: KCSAN: data-race in wg_packet_decrypt_worker / wg_packet_rx_poll
->
-> write to 0xffff888107765888 of 8 bytes by interrupt on cpu 0:
->  counter_validate drivers/net/wireguard/receive.c:321 [inline]
->  wg_packet_rx_poll+0x3ac/0xf00 drivers/net/wireguard/receive.c:461
->  __napi_poll+0x60/0x3b0 net/core/dev.c:6536
->  napi_poll net/core/dev.c:6605 [inline]
->  net_rx_action+0x32b/0x750 net/core/dev.c:6738
->  __do_softirq+0xc4/0x279 kernel/softirq.c:553
->  do_softirq+0x5e/0x90 kernel/softirq.c:454
->  __local_bh_enable_ip+0x64/0x70 kernel/softirq.c:381
->  __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
->  _raw_spin_unlock_bh+0x36/0x40 kernel/locking/spinlock.c:210
->  spin_unlock_bh include/linux/spinlock.h:396 [inline]
->  ptr_ring_consume_bh include/linux/ptr_ring.h:367 [inline]
->  wg_packet_decrypt_worker+0x6c5/0x700 drivers/net/wireguard/receive.c:499
->  process_one_work kernel/workqueue.c:2633 [inline]
->  ...
->
-> read to 0xffff888107765888 of 8 bytes by task 3196 on cpu 1:
->  decrypt_packet drivers/net/wireguard/receive.c:252 [inline]
->  wg_packet_decrypt_worker+0x220/0x700 drivers/net/wireguard/receive.c:501
->  process_one_work kernel/workqueue.c:2633 [inline]
->  process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2706
->  worker_thread+0x525/0x730 kernel/workqueue.c:2787
->  ...
->
-> Fixes: a9e90d9931f3 ("wireguard: noise: separate receive counter from sen=
-d counter")
-> Reported-by: syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com
-> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-> ---
->  drivers/net/wireguard/receive.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/rece=
-ive.c
-> index a176653c8861..d91383afb6e2 100644
-> --- a/drivers/net/wireguard/receive.c
-> +++ b/drivers/net/wireguard/receive.c
-> @@ -251,7 +251,7 @@ static bool decrypt_packet(struct sk_buff *skb, struc=
-t noise_keypair *keypair)
->
->         if (unlikely(!READ_ONCE(keypair->receiving.is_valid) ||
->                   wg_birthdate_has_expired(keypair->receiving.birthdate, =
-REJECT_AFTER_TIME) ||
-> -                 keypair->receiving_counter.counter >=3D REJECT_AFTER_ME=
-SSAGES)) {
-> +                 READ_ONCE(keypair->receiving_counter.counter) >=3D REJE=
-CT_AFTER_MESSAGES)) {
->                 WRITE_ONCE(keypair->receiving.is_valid, false);
->                 return false;
->         }
-> @@ -318,7 +318,7 @@ static bool counter_validate(struct noise_replay_coun=
-ter *counter, u64 their_cou
->                 for (i =3D 1; i <=3D top; ++i)
->                         counter->backtrack[(i + index_current) &
->                                 ((COUNTER_BITS_TOTAL / BITS_PER_LONG) - 1=
-)] =3D 0;
-> -               counter->counter =3D their_counter;
-> +               WRITE_ONCE(counter->counter, their_counter);
->         }
->
->         index &=3D (COUNTER_BITS_TOTAL / BITS_PER_LONG) - 1;
+>Context: Yes, i see it on red setup but i dont see any block being setup.
+>Also: Is it only Red or other qdiscs could behave this way?
 
-It seems you forgot to add this as well ?
+Just red.
 
-diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receiv=
-e.c
-index a176653c88616b1bc871fe52fcea778b5e189f69..a1493c94cea042165f8523a4dac=
-573800a6d03c4
-100644
---- a/drivers/net/wireguard/receive.c
-+++ b/drivers/net/wireguard/receive.c
-@@ -463,7 +463,7 @@ int wg_packet_rx_poll(struct napi_struct *napi, int bud=
-get)
-                        net_dbg_ratelimited("%s: Packet has invalid
-nonce %llu (max %llu)\n",
-                                            peer->device->dev->name,
-                                            PACKET_CB(skb)->nonce,
--                                           keypair->receiving_counter.coun=
-ter);
-+
-READ_ONCE(keypair->receiving_counter.counter));
-                        goto next;
-                }
-
-Thanks.
+>
+>cheers,
+>jamal
+>> Are the qevents exception packets from the hardware? Is there a good
+>> description of what qevents do?
+>>
+>> cheers,
+>> jamal
+>>
+>>
+>> > The reproducer does not fail if I revert this patch and apply Victor's
+>> > [1] instead.
+>> >
+>> > [1] https://lore.kernel.org/netdev/20231231172320.245375-1-victor@mojatatu.com/
+>> >
+>> > > +
+>> > >       *p_block = block;
+>> > >       return 0;
+>> > >
+>> > > +err_dev_insert:
+>> > >  err_block_offload_bind:
+>> > >       tcf_chain0_head_change_cb_del(block, ei);
+>> > >  err_chain0_head_change_cb_add:
 
