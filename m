@@ -1,122 +1,106 @@
-Return-Path: <netdev+bounces-63082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B0F82B209
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 16:46:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A756582B218
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 16:50:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE0771F22204
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 15:46:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9F251C24E6D
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 15:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D374CE09;
-	Thu, 11 Jan 2024 15:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 565224CE0A;
+	Thu, 11 Jan 2024 15:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8hMKgJh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="p8TWB1u4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F5B3C6A4;
-	Thu, 11 Jan 2024 15:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d3e6c86868so46284245ad.1;
-        Thu, 11 Jan 2024 07:45:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704987953; x=1705592753; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2HOcCkRQ8RUlCHwekXL0t9bf+BGZ+oRXfDovBJVhrCE=;
-        b=m8hMKgJhyVdPVAC1EOa2eftpTRXO2KQE4zNsk1OGhsfx9iZKcD9Ukz8SVqVu/PZQ13
-         SP6egcclNMz3OVeIagzpZDMczvoFWSLUXvXPLOendVeg3LI8/Q9wh68nqCUwpmZrQEEB
-         Ih6riixtMPdmOXiWA825kA0qGtNoDLGdpmtfuboG6DVyjHvplNwfQsI/8tcHA1JMYUu8
-         Yq9DFfU/736X90CWL9P+lbSBaOedKF9brjFXEOKMEYCqbEb+yDNsvrCEz5OhdQYCzRGw
-         senODlyqzIpd0nOhoN8Tb8Z3cCMSu2Os2Ytz36/ywtHGAfoZ0LTo2vkDO1Ci1YqFEF/H
-         JIQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704987953; x=1705592753;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2HOcCkRQ8RUlCHwekXL0t9bf+BGZ+oRXfDovBJVhrCE=;
-        b=LmYAzeDPsmqAjGw5ou/UjURwP1kqoSsPO9CEOYi4yZoWlPeQNy37E6vaMAnWayZBsE
-         3Bx6ki4k1624tTvXk2JXKl28X0PCJU0sH35l4Y60/ucz8Tnq7iHe5bw7cDph35+O0zGM
-         VEKYTjdSVOlq4Dx59kwVkf+HVg79Y8pCJvp7jLwCvqfd3E+uZQOL3wC7zH74DQwdfCdz
-         D3AqnYWCnZhhscHGIBQmQhhMJWsmVaPXuqp4FQ0oawYMGJHt9g2uLc0Kj8L/pSIQCeyC
-         LsPYXHfEQ/dXu0MR0OozxZFl4ZWcCeqpR+ecEF0hrrOMcRiCZ4GxeWbqi0SpAxjqwJ7X
-         Zzrg==
-X-Gm-Message-State: AOJu0YyLT6u47MnRqzRJR5guLJHzjN2ij5VLHySM4czBhZBv+qV0Jki4
-	TRFrhLvcwbA3fP1Oxlb0DBYmMiUHAZdpQBpqFgJeNVG3DSyG7g==
-X-Google-Smtp-Source: AGHT+IEpMq5ueY2T2g3FufB5jge5ph/ptuma+HeDVUyaslsYbOsDidp+6aopdvdC74fd1bxz1BrIUaf2+XA0B1c/Xh8=
-X-Received: by 2002:a17:902:db0c:b0:1d3:7f26:b3b0 with SMTP id
- m12-20020a170902db0c00b001d37f26b3b0mr1867562plx.104.1704987953031; Thu, 11
- Jan 2024 07:45:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B824CDE9;
+	Thu, 11 Jan 2024 15:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=SXSMgPvMG1CFS/vVmNC+AEGMC+mPoePNedwOvprq5p4=; b=p8TWB1u4BW/lAVnu4oUzzYpbM6
+	+aSgn62SfVcrxtWrnRiH1ZBBIYTxVpREw2RrtEUsrYKEIsi/RvOU+ErhrhEH7Z9yUljXDS/e5ZX4n
+	nm5edQpJTeUukcYcvt/8fTCOUlH+KUAImWdnjmriYOaQ31etZENvjMSItVpt62HAFV9jE40K/2B8y
+	VnEJ1X76NkH8oixaGE2kGB04MNbSxqVcFPt2OMBJtvGLaTUlRc+Y/z3kw0MlGj4q/suNyK9gOnv+r
+	Tap60Wah3r675cvaQKJhXJbKUsV2SygULeIqwjOpUlbBqo/NB1SH6ImsDbAOlsjw019g/ktd4loWG
+	nT3CfRlw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56152)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rNxJS-0006iZ-32;
+	Thu, 11 Jan 2024 15:49:46 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rNxJP-0006Ts-R5; Thu, 11 Jan 2024 15:49:44 +0000
+Date: Thu, 11 Jan 2024 15:49:43 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jakub Kicinski <kuba@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] wangxunx: select CONFIG_PHYLINK where needed
+Message-ID: <ZaAOF/esan+HnufM@shell.armlinux.org.uk>
+References: <20240109075656.2656359-1-arnd@kernel.org>
+ <ZZ0TdiIDE2lqHE+8@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240109164517.3063131-1-kuba@kernel.org> <20240109164517.3063131-7-kuba@kernel.org>
- <20240110152200.GE9296@kernel.org> <95dc4923-9796-4007-b132-599555ed9eab@gmail.com>
- <ca2de714f0a5ae5eb70e7b471fad9daad1a56da0.camel@redhat.com>
-In-Reply-To: <ca2de714f0a5ae5eb70e7b471fad9daad1a56da0.camel@redhat.com>
-From: Michael <mikecress@gmail.com>
-Date: Thu, 11 Jan 2024 10:45:59 -0500
-Message-ID: <CAG9xq4Gc0y3gkhforr+6DdQaMGZkBSUoS5atnpwRnKoR0+MmSA@mail.gmail.com>
-Subject: Re: [PATCH net 6/7] MAINTAINERS: mark ax25 as Orphan
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Johnson <micromashor@gmail.com>, Simon Horman <horms@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
-	edumazet@google.com, Ralf Baechle <ralf@linux-mips.org>, linux-hams@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZ0TdiIDE2lqHE+8@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Thank you for your email Paolo. Would you mind taking a moment to
-address the questions in my email?
+On Tue, Jan 09, 2024 at 09:35:50AM +0000, Russell King (Oracle) wrote:
+> On Tue, Jan 09, 2024 at 08:56:21AM +0100, Arnd Bergmann wrote:
+> > diff --git a/drivers/net/ethernet/wangxun/Kconfig b/drivers/net/ethernet/wangxun/Kconfig
+> > index 23cd610bd376..46630f05d8dd 100644
+> > --- a/drivers/net/ethernet/wangxun/Kconfig
+> > +++ b/drivers/net/ethernet/wangxun/Kconfig
+> > @@ -26,6 +26,7 @@ config NGBE
+> >  	tristate "Wangxun(R) GbE PCI Express adapters support"
+> >  	depends on PCI
+> >  	select LIBWX
+> > +	select PHYLINK
+> >  	select PHYLIB
+> 
+> You can drop PHYLIB when adding PHYLINK.
 
-Thank you,
+Arnd,
 
-Michael
+There are repeated complaints from the kernel build bot about this, and
+it would be good to get it solved. Could we have an updated patch
+submitted to netdev please? This is in net-next only at the moment,
+so I think that means it needs to be submitted with:
 
-On Thu, Jan 11, 2024 at 6:39=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Wed, 2024-01-10 at 21:11 -0600, Eric Johnson wrote:
-> > On Wed 10 Jan 2024 09:22 -0600, Simon Horman wrote:
-> > > On Tue, Jan 09, 2024 at 08:45:16AM -0800, Jakub Kicinski wrote:
-> > > > We haven't heard from Ralf for two years, according to lore.
-> > > > We get a constant stream of "fixes" to ax25 from people using
-> > > > code analysis tools. Nobody is reviewing those, let's reflect
-> > > > this reality in MAINTAINERS.
-> > > >
-> > > > Subsystem AX.25 NETWORK LAYER
-> > > >   Changes 9 / 59 (15%)
-> > > >   (No activity)
-> > > >   Top reviewers:
-> > > >     [2]: mkl@pengutronix.de
-> > > >     [2]: edumazet@google.com
-> > > >     [2]: stefan@datenfreihafen.org
-> > > >   INACTIVE MAINTAINER Ralf Baechle <ralf@linux-mips.org>
-> > > >
-> > > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > > Reviewed-by: Simon Horman <horms@kernel.org>
-> > >
-> > I didn't realize this wasn't actively being maintained, but I am
-> > familiar with the code in the AX.25 layer. I use it pretty frequently,
-> > so I would happily look after this if nobody else is interested.
->
-> Unfortunately both lore and the git log show no trace of your activity.
->
-> Before stepping-in as a maintainer, you should start providing reviews
-> on the ML and looking after the not so infrequent syzkaller report.
->
-> Thanks,
->
-> Paolo
->
->
+	[PATCH net-next ...]
+
+and please make it clear that it is a fix for code only in net-next.
+(However, netdev folk may request it to be referred until net-next is
+merged and then against the net tree...)
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
