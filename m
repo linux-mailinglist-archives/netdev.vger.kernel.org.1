@@ -1,140 +1,101 @@
-Return-Path: <netdev+bounces-63146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B73E482B56D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:49:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1726A82B579
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:53:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C71231C23016
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:49:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3649F1C219A7
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D495256B67;
-	Thu, 11 Jan 2024 19:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BA956747;
+	Thu, 11 Jan 2024 19:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ARQd3Hra"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WEoPqMu0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1FA5677F
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 19:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5f6f51cd7e8so81574637b3.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:49:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FF156741
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 19:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2cd17a979bcso64743121fa.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:53:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705002567; x=1705607367; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IPffbaTQeiScmhZdf7GWlu53R9SRyOOzwHb/Jph0b8Y=;
-        b=ARQd3HrajwEntaQb01lneYI6yieKbOMj5dfihL+szHONfx31r3gQpFj6cPuHe6MNAR
-         /EHxtGPS+EPB9RjbVM60eRq7/MUda4UNawwYCYSmKHZpGP9dg/Fk0WEEb2o7iZ4qpFl4
-         kZ9qzQbeGxdQ68v4/QSqX8rOcPX4UF+FfEoKnDYeR7dcOIXN8H35cxtPcrKx68YwKsBa
-         9PLw/g+hEXwvUObQh6iSPIP0XBGW9KEbfsusFnF9ew074IOQFTIAs7k7y6HWZiFPGxhu
-         /RXQ5wEuVdlG6/Iyh2/LIUCIIXphKfTn6FuOwGA/wv+1zl3cLcdWra93U+7vFuRLtW7+
-         1TBw==
+        d=gmail.com; s=20230601; t=1705002793; x=1705607593; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lmniem6wSkSsUvwWz68jc030pRYxGECq931U1PqLReY=;
+        b=WEoPqMu0HJaMn4fRN2big0W4hsRZ3/c1T9jFuWPyVY5IHM5lbxaydXtBGqAki3ZFdS
+         Nziwho/3QgwqzWNQFiTipyK8ydEfktqFZ103shrQAvdMkgPibdBW4TtwJPBjxK4kIujj
+         GYx9OZkz8DOlOSF51hFg+cotTGohf+lrjUkw1DUt7OzqHsdsfC8J1p1nGesD5TVdxtZK
+         gYF7+p9d8RaNUsGr8dZtEIoPSeVnMz0CT60YGATKwl7SMm5qIR3nToMHKZzTWT3Kq8kQ
+         e2u/uO73uyj97eeqvkiuAK+NLewsu+5d3d8fnwDPDtA0yEZKWkTJrvvtGQF4TeSSUHM1
+         s7VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705002567; x=1705607367;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IPffbaTQeiScmhZdf7GWlu53R9SRyOOzwHb/Jph0b8Y=;
-        b=kMeHIIE3/My3U42Op7AWUV/voXy8HJF6ZR/T1PJQr+LFjrib15V/70Jps4s4IBr5tS
-         /8ZJZntApkrPwvN+dNv98kK5+7IBOX0f5lr3fYSVg4Sb3ZJ2nS/ip3DXRsJ14mNqXx+0
-         9P2iZhe6RORHC5VP+ZUMVpE3g1vJOhvFr5GT6YX/DHkDCxPjk5Zrv4j6pyScIc0rm6Y+
-         CyCg/f6fqJmWhViqseC2LumS5ik3y5o1IXUInd7GcBU37COJD7x0CESfAKJpdMMUy0BX
-         1uQlj5ukdCdQpCTFTyLecC/c01mKOn254ziMG7WrVBXuzPas+Nfk9+/CAKu9BzEQj21v
-         /0Aw==
-X-Gm-Message-State: AOJu0YzwOpYR1E8mDhSjeI76s3WgFCRQWGDkxbp2eacf/eE5Xt67z7L4
-	h0QUAAaHSN+UYfNwwNeAKtjFX3povtLB/EwvwWwi
-X-Google-Smtp-Source: AGHT+IGoOG3n/cPCgDfEtOkWALyRrb3WW5ZJsglOoLF4AvaXOutoE47aYdTpmfqm80qNghACALNyzn0XTGyerA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a0d:f602:0:b0:5f8:e803:4b0d with SMTP id
- g2-20020a0df602000000b005f8e8034b0dmr120886ywf.2.1705002567547; Thu, 11 Jan
- 2024 11:49:27 -0800 (PST)
-Date: Thu, 11 Jan 2024 19:49:17 +0000
-In-Reply-To: <20240111194917.4044654-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1705002793; x=1705607593;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lmniem6wSkSsUvwWz68jc030pRYxGECq931U1PqLReY=;
+        b=gQE9lVXuuJwxgV5jG6ffuatfgroyXFZkBEhEkDlFjHLw8z49gU82Dd0PNWZhnBqHuX
+         gm7I7psNjurxhbAyILEpKYhOvn6OhzkGZCo2oyt0X372pgs567eBHMLORF/rkdb0HWB1
+         R2byhgmqLwi9ZGI8ZN8QpqqC+FoVBiUTvRP0/uSxydnVz5srpnF8vp48TFZMppOuBoid
+         Ov/fhyeuy2kOWA5sq9nqHzOCTGdCRsM5peDxrFlp8otUbDhJwyf4DeEswrftmqwo3zUd
+         zPJO14uqa89dat/XwbRoY+Fvoc3DUmLJTp01RkQLcypJsiQsp8gTiXMjTvGz6DcbwymL
+         Wdcg==
+X-Gm-Message-State: AOJu0Yz/nmUcK/RSqBfG1PYye/iAo38MlRE1DVAkCeJKuFDaGgwqt8sd
+	t+5PK1thJ9uuedQdvXkyxuhYbYWyGYgZdnZVPkU=
+X-Google-Smtp-Source: AGHT+IEsWAE6aX5aZIgzjR5h62Eik03BFcCg8t2iz+zVKsrzXuHtE1g2ufSusQWz88ChK8RPm/8HDwVQXBWPtl7dXPI=
+X-Received: by 2002:a05:651c:10a9:b0:2cd:7a4c:5a70 with SMTP id
+ k9-20020a05651c10a900b002cd7a4c5a70mr74285ljn.8.1705002792922; Thu, 11 Jan
+ 2024 11:53:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240111194917.4044654-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.275.g3460e3d667-goog
-Message-ID: <20240111194917.4044654-6-edumazet@google.com>
-Subject: [PATCH net 5/5] mptcp: refine opt_mp_capable determination
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-4-luizluca@gmail.com>
+ <20240111095125.vtsjpzyj5rrag3sq@skbuf>
+In-Reply-To: <20240111095125.vtsjpzyj5rrag3sq@skbuf>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Thu, 11 Jan 2024 16:53:01 -0300
+Message-ID: <CAJq09z7rba+7LCrFSYk5FjJSPvfSS0gocRCTPiy4v8V5BxfW+A@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	arinc.unal@arinc9.com
 Content-Type: text/plain; charset="UTF-8"
 
-OPTIONS_MPTCP_MPC is a combination of three flags.
+> On Fri, Dec 22, 2023 at 09:46:31PM -0300, Luiz Angelo Daros de Luca wrote:
+> > +EXPORT_SYMBOL_GPL(realtek_common_lock);
+> > +EXPORT_SYMBOL_GPL(realtek_common_unlock);
+> > +EXPORT_SYMBOL(realtek_common_probe);
+> > +EXPORT_SYMBOL(realtek_common_register_switch);
+> > +EXPORT_SYMBOL(realtek_common_remove);
+>
+> Is there any reason for the lack of consistency between GPL and non-GPL
+> symbols?
 
-It would be better to be strict about testing what
-flag is expected, at least for code readability.
+No. I might have just copied the string from the wrong example.
 
-mptcp_parse_option() already makes the distinction.
+> Also, I don't like too much the naming of symbols like "realtek_common_probe",
+> exported to the entire kernel. I wonder if it would be better to drop
+> the word "common" altogether, and use EXPORT_SYMBOL_NS_GPL(*, REALTEK_DSA) +
+> MODULE_IMPORT_NS(REALTEK_DSA) instead of plain EXPORT_SYMBOL_GPL()?
 
-- subflow_check_req() should use OPTION_MPTCP_MPC_SYN.
+Introducing a namespace seems to be a nice ideia. Let the series grow :-)
 
-- mptcp_subflow_init_cookie_req() should use OPTION_MPTCP_MPC_ACK.
+What do you mean by dropping the "common"? Use "realtek_probe" or
+"realtek_dsa_probe"?
 
-- subflow_finish_connect() should use OPTION_MPTCP_MPC_SYNACK
+Regards,
 
-- subflow_syn_recv_sock should use OPTION_MPTCP_MPC_ACK
-
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/mptcp/subflow.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index 13039ac8d1ab641fb9b22b621ac011e6a7bc9e37..1117d1e84274a5ea1ede990566f67c0073fd86a0 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -157,7 +157,7 @@ static int subflow_check_req(struct request_sock *req,
- 
- 	mptcp_get_options(skb, &mp_opt);
- 
--	opt_mp_capable = !!(mp_opt.suboptions & OPTIONS_MPTCP_MPC);
-+	opt_mp_capable = !!(mp_opt.suboptions & OPTION_MPTCP_MPC_SYN);
- 	opt_mp_join = !!(mp_opt.suboptions & OPTION_MPTCP_MPJ_SYN);
- 	if (opt_mp_capable) {
- 		SUBFLOW_REQ_INC_STATS(req, MPTCP_MIB_MPCAPABLEPASSIVE);
-@@ -254,7 +254,7 @@ int mptcp_subflow_init_cookie_req(struct request_sock *req,
- 	subflow_init_req(req, sk_listener);
- 	mptcp_get_options(skb, &mp_opt);
- 
--	opt_mp_capable = !!(mp_opt.suboptions & OPTIONS_MPTCP_MPC);
-+	opt_mp_capable = !!(mp_opt.suboptions & OPTION_MPTCP_MPC_ACK);
- 	opt_mp_join = !!(mp_opt.suboptions & OPTION_MPTCP_MPJ_ACK);
- 	if (opt_mp_capable && opt_mp_join)
- 		return -EINVAL;
-@@ -486,7 +486,7 @@ static void subflow_finish_connect(struct sock *sk, const struct sk_buff *skb)
- 
- 	mptcp_get_options(skb, &mp_opt);
- 	if (subflow->request_mptcp) {
--		if (!(mp_opt.suboptions & OPTIONS_MPTCP_MPC)) {
-+		if (!(mp_opt.suboptions & OPTION_MPTCP_MPC_SYNACK)) {
- 			MPTCP_INC_STATS(sock_net(sk),
- 					MPTCP_MIB_MPCAPABLEACTIVEFALLBACK);
- 			mptcp_do_fallback(sk);
-@@ -783,7 +783,7 @@ static struct sock *subflow_syn_recv_sock(const struct sock *sk,
- 		 * options.
- 		 */
- 		mptcp_get_options(skb, &mp_opt);
--		if (!(mp_opt.suboptions & OPTIONS_MPTCP_MPC))
-+		if (!(mp_opt.suboptions & OPTION_MPTCP_MPC_ACK))
- 			fallback = true;
- 
- 	} else if (subflow_req->mp_join) {
--- 
-2.43.0.275.g3460e3d667-goog
-
+Luiz
 
