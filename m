@@ -1,158 +1,279 @@
-Return-Path: <netdev+bounces-62976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC86482A75A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 06:59:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEEAE82A772
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 07:13:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CC16288168
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 05:59:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3847281DFF
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 06:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52F523AD;
-	Thu, 11 Jan 2024 05:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2962E2116;
+	Thu, 11 Jan 2024 06:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CzqZMzEZ"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="F4ppTMFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5DE5382;
-	Thu, 11 Jan 2024 05:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50eaa8b447bso5330201e87.1;
-        Wed, 10 Jan 2024 21:59:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704952764; x=1705557564; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FJ87IotFFb22oBVL3yLTlm/KMv2+8lgNVJRq/vObCyk=;
-        b=CzqZMzEZtvDdKV5J1zvfpPjPR0wILxDKt26BQKl6dgvHwvuCdUpx9zofNRErh3RHcX
-         4RuSBM6WZWJ1QKGW+9aiqdcuZ62e09X44gxoTRBDE+voHnFnRDsr+edQ5ck1zC7LsJhN
-         EMK1qwLK1bRNnbMuChx86E3Azw77svFukz6fqTpXK3bsM2rTrEDn7RijQtfJzRULk5fh
-         03jquwf/rzboIOEKrCR16L4yr1+Xatxw99hk68jjfEH+31e9vDr7ITE8LCsNPBfAQQpH
-         P6UrE+PD1kzUZiHQ0KvBiTXXqrktw2yk9LaQhbiPyPJxRxnNuSars1Af7vD/wPL9xNN4
-         4M3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704952764; x=1705557564;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FJ87IotFFb22oBVL3yLTlm/KMv2+8lgNVJRq/vObCyk=;
-        b=PZikC1qFb00UIl7giDpbUhRi+PwG7WMGC2I2TAEF1QH5b8owBpy+p/8rvT3vq+CCsV
-         V461beb9lR8JKSyJ8vearvFNjmrLIwdr8iJQp047Rwx+y81rtRcoq5yQ/yYSOHA76ehV
-         lG2l3qp7uLV1MfLdNTGrt1s2zyKLXu7rjfQwT4PmnAXsQMnVUVqx3nnKa0jZFzbUvrOX
-         s/zCJhOF6LAB2tHaRWCdKxPTPkGzCPKp2F8Xet1nwZI0SRPETfv9nGa3Y0Ltqxv7XDHQ
-         MJ8M7lvivuv4Xh6kXxoODM4mc+k54GZl5vBHmg5W8oItq7JtStAu94AtWAezRC/u+uR9
-         5KZQ==
-X-Gm-Message-State: AOJu0YyVqvzD5u0f/yOoNxYT7dq5ZdTTUXgj+AXRBVyKnTXhwC7XN5aF
-	/LgPOEbucY8bFWak009t9Uj9eZlnQaX9WuTMcro=
-X-Google-Smtp-Source: AGHT+IGQ5ZV/gXo7v/rJ2auVyXpmqs0QYfi3tBSjxW2wUQzS96ysR1EG48kjTCbHRzoOg/0bxoYvPzkVO6R5r9tJSuk=
-X-Received: by 2002:a05:6512:3990:b0:50e:2e5d:10a8 with SMTP id
- j16-20020a056512399000b0050e2e5d10a8mr136706lfu.133.1704952763509; Wed, 10
- Jan 2024 21:59:23 -0800 (PST)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9456C5382;
+	Thu, 11 Jan 2024 06:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 7A36A209C43A; Wed, 10 Jan 2024 22:13:19 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7A36A209C43A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1704953599;
+	bh=Vx6uwJdgmYeQ9YCQC3Gj9uTpE/Inxmh3nP0kQERH+Cs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F4ppTMFLicty7Ad4PVvjI+E3NO/r6Mx6EgTdjLUiDZxrRcX4ztiUXZlY76P9z3EEg
+	 1gnXNyMrQ3FnE4aSOYMK8WKwXEy3RN6o4TpI6SANKlk4H8UwCSKirPUch22vAsvXjr
+	 6c4N1IcWWNeQLsTlBakVSokhRjGDSJ0Svpo1x6FQ=
+Date: Wed, 10 Jan 2024 22:13:19 -0800
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Yury Norov <yury.norov@gmail.com>,
+	"kys@microsoft.com" <kys@microsoft.com>,
+	"haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	"decui@microsoft.com" <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"longli@microsoft.com" <longli@microsoft.com>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"schakrabarti@microsoft.com" <schakrabarti@microsoft.com>,
+	"paulros@microsoft.com" <paulros@microsoft.com>
+Subject: Re: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs
+ per CPUs
+Message-ID: <20240111061319.GC5436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1704797478-32377-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <1704797478-32377-4-git-send-email-schakrabarti@linux.microsoft.com>
+ <SN6PR02MB4157CB3CB55A17255AE61BF6D46A2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <ZZ3Wsxq8rHShTUdA@yury-ThinkPad>
+ <SN6PR02MB415704D36B82D5793CC4558FD4692@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1850031.1704921100@warthog.procyon.org.uk>
-In-Reply-To: <1850031.1704921100@warthog.procyon.org.uk>
-Reply-To: sedat.dilek@gmail.com
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Thu, 11 Jan 2024 06:58:46 +0100
-Message-ID: <CA+icZUUc_0M_6JU3dZzVqrUUrWJceY1uD8dO2yFMCwtHtkaa_Q@mail.gmail.com>
-Subject: Re: [PATCH] keys, dns: Fix size check of V1 server-list header
-To: David Howells <dhowells@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Edward Adam Davis <eadavis@qq.com>, 
-	Pengfei Xu <pengfei.xu@intel.com>, Simon Horman <horms@kernel.org>, 
-	Markus Suvanto <markus.suvanto@gmail.com>, Jeffrey E Altman <jaltman@auristor.com>, 
-	Marc Dionne <marc.dionne@auristor.com>, Wang Lei <wang840925@gmail.com>, 
-	Jeff Layton <jlayton@redhat.com>, Steve French <smfrench@gmail.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-afs@lists.infradead.org, keyrings@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR02MB415704D36B82D5793CC4558FD4692@SN6PR02MB4157.namprd02.prod.outlook.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Jan 10, 2024 at 10:12=E2=80=AFPM David Howells <dhowells@redhat.com=
-> wrote:
->
->
-> Fix the size check added to dns_resolver_preparse() for the V1 server-lis=
-t
-> header so that it doesn't give EINVAL if the size supplied is the same as
-> the size of the header struct (which should be valid).
->
-> This can be tested with:
->
->         echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
->
-> which will give "add_key: Invalid argument" without this fix.
->
-> Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-list=
- header")
+On Wed, Jan 10, 2024 at 12:27:54AM +0000, Michael Kelley wrote:
+> From: Yury Norov <yury.norov@gmail.com> Sent: Tuesday, January 9, 2024 3:29 PM
+> > 
+> > Hi Michael,
+> > 
+> > So, I'm just a guy who helped to formulate the heuristics in an
+> > itemized form, and implement them using the existing kernel API.
+> > I have no access to MANA machines and I ran no performance tests
+> > myself.
+> 
+> Agreed. :-)   Given the heritage of the patch, I should have clarified
+> that my question was directed to Souradeep.  Regardless, your work
+> on the cpumask manipulation made everything better and clearer.
+> 
+> > 
+> > On Tue, Jan 09, 2024 at 07:22:38PM +0000, Michael Kelley wrote:
+> > > From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com> Sent:
+> > Tuesday, January 9, 2024 2:51 AM
+> > > >
+> > > > From: Yury Norov <yury.norov@gmail.com>
+> > > >
+> > > > Souradeep investigated that the driver performs faster if IRQs are
+> > > > spread on CPUs with the following heuristics:
+> > > >
+> > > > 1. No more than one IRQ per CPU, if possible;
+> > > > 2. NUMA locality is the second priority;
+> > > > 3. Sibling dislocality is the last priority.
+> > > >
+> > > > Let's consider this topology:
+> > > >
+> > > > Node            0               1
+> > > > Core        0       1       2       3
+> > > > CPU       0   1   2   3   4   5   6   7
+> > > >
+> > > > The most performant IRQ distribution based on the above topology
+> > > > and heuristics may look like this:
+> > > >
+> > > > IRQ     Nodes   Cores   CPUs
+> > > > 0       1       0       0-1
+> > > > 1       1       1       2-3
+> > > > 2       1       0       0-1
+> > > > 3       1       1       2-3
+> > > > 4       2       2       4-5
+> > > > 5       2       3       6-7
+> > > > 6       2       2       4-5
+> > > > 7       2       3       6-7
+> > >
+> > > I didn't pay attention to the detailed discussion of this issue
+> > > over the past 2 to 3 weeks during the holidays in the U.S., but
+> > > the above doesn't align with the original problem as I understood
+> > > it.  I thought the original problem was to avoid putting IRQs on
+> > > both hyper-threads in the same core, and that the perf
+> > > improvements are based on that configuration.  At least that's
+> > > what the commit message for Patch 4/4 in this series says.
+> > 
+> > Yes, and the original distribution suggested by Souradeep looks very
+> > similar:
+> > 
+> >   IRQ     Nodes   Cores   CPUs
+> >   0       1       0       0
+> >   1       1       1       2
+> >   2       1       0       1
+> >   3       1       1       3
+> >   4       2       2       4
+> >   5       2       3       6
+> >   6       2       2       5
+> >   7       2       3       7
+> > 
+> > I just added a bit more flexibility, so that kernel may pick any
+> > sibling for the IRQ. As I understand, both approaches have similar
+> > performance. Probably my fine-tune added another half-percent...
+> > 
+> > Souradeep, can you please share the exact numbers on this?
+> > 
+> > > The above chart results in 8 IRQs being assigned to the 8 CPUs,
+> > > probably with 1 IRQ per CPU.   At least on x86, if the affinity
+> > > mask for an IRQ contains multiple CPUs, matrix_find_best_cpu()
+> > > should balance the IRQ assignments between the CPUs in the mask.
+> > > So the original problem is still present because both hyper-threads
+> > > in a core are likely to have an IRQ assigned.
+> > 
+> > That's what I think, if the topology makes us to put IRQs in the
+> > same sibling group, the best thing we can to is to rely on existing
+> > balancing mechanisms in a hope that they will do their job well.
+> > 
+> > > Of course, this example has 8 IRQs and 8 CPUs, so assigning an
+> > > IRQ to every hyper-thread may be the only choice.  If that's the
+> > > case, maybe this just isn't a good example to illustrate the
+> > > original problem and solution.
+> > 
+> > Yeah... This example illustrates the order of IRQ distribution.
+> > I really doubt that if we distribute IRQs like in the above example,
+> > there would be any difference in performance. But I think it's quite
+> > a good illustration. I could write the title for the table like this:
+> > 
+> >         The order of IRQ distribution for the best performance
+> >         based on [...] may look like this.
+> > 
+> > > But even with a better example
+> > > where the # of IRQs is <= half the # of CPUs in a NUMA node,
+> > > I don't think the code below accomplishes the original intent.
+> > >
+> > > Maybe I've missed something along the way in getting to this
+> > > version of the patch.  Please feel free to set me straight. :-)
+> > 
+> > Hmm. So if the number of IRQs is the half # of CPUs in the nodes,
+> > which is 2 in the example above, the distribution will look like
+> > this:
+> > 
+> >   IRQ     Nodes   Cores   CPUs
+> >   0       1       0       0-1
+> >   1       1       1       2-3
+> > 
+> > And each IRQ belongs to a different sibling group. This follows
+> > the rules above.
+> > 
+> > I think of it like we assign an IRQ to a group of 2 CPUs, so from
+> > the heuristic #1 perspective, each CPU is assigned with 1/2 of the
+> > IRQ.
+> > 
+> > If I add one more IRQ, then according to the heuristics, NUMA locality
+> > trumps sibling dislocality, so we'd assign IRO to the same node on any
+> > core. My algorithm assigns it to the core #0:
+> > 
+> >   2       1       0       0-1
+> > 
+> > This doubles # of IRQs for the CPUs 0 and 1: from 1/2 to 1.
+> > 
+> > The next IRQ should be assigned to the same node again, and we've got
+> > the only choice:
+> > 
+> > 
+> >   3       1       1       2-3
+> > 
+> > Starting from IRQ #5, the node #1 is full - each CPU is assigned with
+> > exactly one IRQ, and the heuristic #1 makes us to switch to the other
+> > node; and then do the same thing:
+> > 
+> >   4       2       2       4-5
+> >   5       2       3       6-7
+> >   6       2       2       4-5
+> >   7       2       3       6-7
+> > 
+> > So I think the algorithm is correct... Really hope the above makes
+> > sense. :) If so, I can add it to the commit message for patch #3.
+> 
+> Thinking about it further, I agree with you.  If we want NUMA
+> locality to trump avoiding hyper-threads in the same core, then
+> I'm good with the algorithm.   If I think of the "weight" variable
+> in your function as the "number of IRQs to assign to CPUs in
+> this NUMA hop", then it makes sense to decrement it by 1
+> each time irq_set_affinity_and_hint() is called.  I was confused
+> by likely removing multiple cpus from the "cpus" cpumask
+> juxtaposed with decrementing "weight" by only 1, and by my
+> preconception that to get the perf benefit we wanted to avoid
+> hyper-threads in the same core.
+> 
+> > 
+> > Nevertheless... Souradeep, in addition to the performance numbers, can
+> > you share your topology and actual IRQ distribution that gains 15%? I
+> > think it should be added to the patch #4 commit message.
+> 
+> Yes -- this is the key thing for me.  What is the configuration that
+> shows the 15% performance gain?  Patch 3/4 and Patch 4/4 in the
+> series need to be consistent in describing when there's a performance
+> benefit and when there's no significant difference.   In Patch 4/4,
+> the mana driver creates IRQs equal to the # of CPUs, up to
+> MANA_MAX_NUM_QUEUES, which is 64.  So the new algorithm
+> still assigns IRQs to both hyper-threads in cores in the local NUMA
+> node (unless the node is bigger than 64 CPUs, which I don't think
+> happens in Azure today).  For the first hop from the local NUMA
+> node, IRQs might get assigned to only one hyper-thread in a core
+> if the total CPU count in the VM is more than 64.
+The test topology was used to check the performance between
+cpu_local_spread() and the new approach is :
+Case 1
+IRQ     Nodes  Cores CPUs
+0       1      0     0-1
+1       1      1     2-3
+2       1      2     4-5
+3       1      3     6-7
 
-[ CC stable@vger.kernel.org ]
+and with existing cpu_local_spread()
+Case 2
+IRQ    Nodes  Cores CPUs
+0      1      0     0
+1      1      0     1
+2      1      1     2
+3      1      1     3
 
-Your (follow-up) patch is now upstream.
+Total 4 channels were used, which was set up by ethtool.
+case 1 with ntttcp has given 15 percent better performance, than
+case 2. During the test irqbalance was disabled as well.
 
-https://git.kernel.org/linus/acc657692aed438e9931438f8c923b2b107aebf9
+Also you are right, with 64CPU system this approach will spread
+the irqs like the cpu_local_spread() but in the future we will offer
+MANA nodes, with more than 64 CPUs. There it this new design will 
+give better performance.
 
-This misses CC: Stable Tag as suggested by Linus.
-
-Looks like linux-6.1.y and linux-6.6.y needs it, too.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=
-=3Dv6.6.11&id=3Dda89365158f6f656b28bcdbcbbe9eaf97c63c474
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=
-=3Dv6.1.72&id=3D079eefaecfd7bbb8fcc30eccb0dfdf50c91f1805
-
-BG,
--Sedat-
-
-> Reported-by: Pengfei Xu <pengfei.xu@intel.com>
-> Link: https://lore.kernel.org/r/ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Edward Adam Davis <eadavis@qq.com>
-> cc: Linus Torvalds <torvalds@linux-foundation.org>
-> cc: Simon Horman <horms@kernel.org>
-> Cc: Jarkko Sakkinen <jarkko@kernel.org>
-> Cc: Jeffrey E Altman <jaltman@auristor.com>
-> Cc: Wang Lei <wang840925@gmail.com>
-> Cc: Jeff Layton <jlayton@redhat.com>
-> Cc: Steve French <sfrench@us.ibm.com>
-> Cc: Marc Dionne <marc.dionne@auristor.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> ---
->  net/dns_resolver/dns_key.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
-> index f18ca02aa95a..c42ddd85ff1f 100644
-> --- a/net/dns_resolver/dns_key.c
-> +++ b/net/dns_resolver/dns_key.c
-> @@ -104,7 +104,7 @@ dns_resolver_preparse(struct key_preparsed_payload *p=
-rep)
->                 const struct dns_server_list_v1_header *v1;
->
->                 /* It may be a server list. */
-> -               if (datalen <=3D sizeof(*v1))
-> +               if (datalen < sizeof(*v1))
->                         return -EINVAL;
->
->                 v1 =3D (const struct dns_server_list_v1_header *)data;
->
->
+I will add this performance benefit details in commit message of
+next version.
+> 
+> Michael
 
