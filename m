@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-63164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 940FA82B70F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 23:23:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B62782B7C9
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 00:01:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 136FF1F26391
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 22:23:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E07E01F23C79
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 23:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009AC58AB7;
-	Thu, 11 Jan 2024 22:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E5B57314;
+	Thu, 11 Jan 2024 23:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PC7UvpaN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="byD78Rre"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1212958AA6
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 22:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E5D52F83
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 23:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705011777;
+	s=mimecast20190719; t=1705014065;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=ldBbjlNyvJpqRT8UVQ1uTP+X4LUowOkKJYCUus9dCR8=;
-	b=PC7UvpaNqXhp+bpgdKvECnepA9014x35vgaRrv0CCYG3VVv7r5JzqC8N6TevKVQw2Mupw9
-	yzIQRGeC8BtcCELGFYZcuJ1CrnNkzQFRdxyHIdPbRPNQX8kMBOtzvY1hdCxf4GHUVVcOzT
-	rmwoxFYHnnRst7uSzfI84bgLB0y/Xng=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-KKIJZG1QMgCO-LRzswimeQ-1; Thu, 11 Jan 2024 17:22:56 -0500
-X-MC-Unique: KKIJZG1QMgCO-LRzswimeQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	bh=4XBZCH2IB3cgGdzeMDyvYADDxkcNsfZ/GQKdDYFlm0Q=;
+	b=byD78RrenfvHjDvO21OEJn9QkNCRFC+SIKMh2F8GAy56qZouyfGW2yM5Q6rm7KipR9TNTU
+	7RG1Siq1/Wos+XMnCB4ueP2wskUjYP4CdDmX98fEeb36nJ1+6TNn5QCCpKXQXbjHMdJKtp
+	YxCfG2Y/Ag9Zdr8AS7pud5QyjuP4jTo=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-iJDXyuoSN1SuEMheoNamrA-1; Thu,
+ 11 Jan 2024 18:01:02 -0500
+X-MC-Unique: iJDXyuoSN1SuEMheoNamrA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2586185A783;
-	Thu, 11 Jan 2024 22:22:55 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A3E7C2932498;
+	Thu, 11 Jan 2024 23:01:01 +0000 (UTC)
 Received: from fenrir.redhat.com (unknown [10.22.16.242])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 696FD51D5;
-	Thu, 11 Jan 2024 22:22:55 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 09D85492BF0;
+	Thu, 11 Jan 2024 23:01:00 +0000 (UTC)
 From: jmaloy@redhat.com
 To: netdev@vger.kernel.org,
 	davem@davemloft.net
@@ -55,8 +55,8 @@ Cc: kuba@kernel.org,
 	lvivier@redhat.com,
 	dgibson@redhat.com
 Subject: [RFC net-next] tcp: add support for read with offset when using MSG_PEEK
-Date: Thu, 11 Jan 2024 17:22:52 -0500
-Message-ID: <20240111222252.221693-1-jmaloy@redhat.com>
+Date: Thu, 11 Jan 2024 18:00:56 -0500
+Message-ID: <20240111230057.305672-1-jmaloy@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,110 +64,144 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
 From: Jon Maloy <jmaloy@redhat.com>
 
-When reading received messages with MSG_PEEK, we sometines have to read
-the leading bytes of the stream several times, only to reach the bytes
-we really want. This is clearly non-optimal.
-
-What we would want is something similar to pread/preadv(), but working
-even for tcp sockets. At the same time, we don't want to add any new
-arguments to the recv/recvmsg() calls.
+When reading received messages from a socket with MSG_PEEK, we may want
+to read the contents with an offset, like we can do with pread/preadv()
+when reading files. Currently, it is not possible to do that.
 
 In this commit, we allow the user to set iovec.iov_base in the first
 vector entry to NULL. This tells the socket to skip the first entry,
 hence letting the iov_len field of that entry indicate the offset value.
 This way, there is no need to add any new arguments or flags.
 
-In the iperf3 logs examples shown below, we can observe a throughput
-improvement of ~20 % in the direction host->namespace when using the
-protocol splicer 'passt'. This is a consistent result.
+In the iperf3 log examples shown below, we can observe a throughput
+improvement of ~15 % in the direction host->namespace when using the
+protocol splicer 'pasta' (https://passt.top).
+This is a consistent result.
 
-$ ./passt/passt/pasta --config-net  -f
-MSG_PEEK with offset not supported.
-[root@fedora37 ~]# perf record iperf3 -s
+pasta(1) and passt(1) implement user-mode networking for network
+namespaces (containers) and virtual machines by means of a translation
+layer between Layer-2 network interface and native Layer-4 sockets
+(TCP, UDP, ICMP/ICMPv6 echo).
+
+Received, pending TCP data to the container/guest is kept in kernel
+buffers until acknowledged, so the tool routinely needs to fetch new
+data from socket, skipping data that was already sent.
+
+At the moment this is implemented using a dummy buffer passed to
+recvmsg(). With this change, we don't need a dummy buffer and the
+related buffer copy (copy_to_user()) anymore.
+
+passt and pasta are supported in KubeVirt and libvirt/qemu.
+
+jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
+MSG_PEEK with offset not supported by kernel.
+
+jmaloy@freyr:~/passt# iperf3 -s
 -----------------------------------------------------------
 Server listening on 5201 (test #1)
 -----------------------------------------------------------
-Accepted connection from 192.168.122.1, port 60344
-[  6] local 192.168.122.163 port 5201 connected to 192.168.122.1 port 60360
+Accepted connection from 192.168.122.1, port 44822
+[  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 44832
 [ ID] Interval           Transfer     Bitrate
-{...]
-[  6]  13.00-14.00  sec  2.54 GBytes  21.8 Gbits/sec
-[  6]  14.00-15.00  sec  2.52 GBytes  21.7 Gbits/sec
-[  6]  15.00-16.00  sec  2.50 GBytes  21.5 Gbits/sec
-[  6]  16.00-17.00  sec  2.49 GBytes  21.4 Gbits/sec
-[  6]  17.00-18.00  sec  2.51 GBytes  21.6 Gbits/sec
-[  6]  18.00-19.00  sec  2.48 GBytes  21.3 Gbits/sec
-[  6]  19.00-20.00  sec  2.49 GBytes  21.4 Gbits/sec
-[  6]  20.00-20.04  sec  87.4 MBytes  19.2 Gbits/sec
+[  5]   0.00-1.00   sec  1.02 GBytes  8.78 Gbits/sec
+[  5]   1.00-2.00   sec  1.06 GBytes  9.08 Gbits/sec
+[  5]   2.00-3.00   sec  1.07 GBytes  9.15 Gbits/sec
+[  5]   3.00-4.00   sec  1.10 GBytes  9.46 Gbits/sec
+[  5]   4.00-5.00   sec  1.03 GBytes  8.85 Gbits/sec
+[  5]   5.00-6.00   sec  1.10 GBytes  9.44 Gbits/sec
+[  5]   6.00-7.00   sec  1.11 GBytes  9.56 Gbits/sec
+[  5]   7.00-8.00   sec  1.07 GBytes  9.20 Gbits/sec
+[  5]   8.00-9.00   sec   667 MBytes  5.59 Gbits/sec
+[  5]   9.00-10.00  sec  1.03 GBytes  8.83 Gbits/sec
+[  5]  10.00-10.04  sec  30.1 MBytes  6.36 Gbits/sec
 - - - - - - - - - - - - - - - - - - - - - - - - -
 [ ID] Interval           Transfer     Bitrate
-[  6]   0.00-20.04  sec  48.9 GBytes  21.0 Gbits/sec receiver
+[  5]   0.00-10.04  sec  10.3 GBytes  8.78 Gbits/sec   receiver
 -----------------------------------------------------------
+Server listening on 5201 (test #2)
+-----------------------------------------------------------
+^Ciperf3: interrupt - the server has terminated
+jmaloy@freyr:~/passt#
+logout
+[ perf record: Woken up 23 times to write data ]
+[ perf record: Captured and wrote 5.696 MB perf.data (35580 samples) ]
+jmaloy@freyr:~/passt$
 
-[jmaloy@fedora37 ~]$ ./passt/passt/pasta --config-net  -f
-MSG_PEEK with offset supported.
-[root@fedora37 ~]# perf record iperf3 -s
+jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
+MSG_PEEK with offset supported by kernel.
+
+jmaloy@freyr:~/passt# iperf3 -s
 -----------------------------------------------------------
 Server listening on 5201 (test #1)
 -----------------------------------------------------------
-Accepted connection from 192.168.122.1, port 46362
-[  6] local 192.168.122.163 port 5201 connected to 192.168.122.1 port 46374
+Accepted connection from 192.168.122.1, port 40854
+[  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 40862
 [ ID] Interval           Transfer     Bitrate
-[...]
-[  6]  12.00-13.00  sec  3.18 GBytes  27.3 Gbits/sec
-[  6]  13.00-14.00  sec  3.17 GBytes  27.3 Gbits/sec
-[  6]  14.00-15.00  sec  3.13 GBytes  26.9 Gbits/sec
-[  6]  15.00-16.00  sec  3.17 GBytes  27.3 Gbits/sec
-[  6]  16.00-17.00  sec  3.17 GBytes  27.2 Gbits/sec
-[  6]  17.00-18.00  sec  3.14 GBytes  27.0 Gbits/sec
-[  6]  18.00-19.00  sec  3.17 GBytes  27.2 Gbits/sec
-[  6]  19.00-20.00  sec  3.12 GBytes  26.8 Gbits/sec
-[  6]  20.00-20.04  sec   119 MBytes  25.5 Gbits/sec
+[  5]   0.00-1.00   sec  1.22 GBytes  10.5 Gbits/sec
+[  5]   1.00-2.00   sec  1.19 GBytes  10.2 Gbits/sec
+[  5]   2.00-3.00   sec  1.22 GBytes  10.5 Gbits/sec
+[  5]   3.00-4.00   sec  1.11 GBytes  9.56 Gbits/sec
+[  5]   4.00-5.00   sec  1.20 GBytes  10.3 Gbits/sec
+[  5]   5.00-6.00   sec  1.14 GBytes  9.80 Gbits/sec
+[  5]   6.00-7.00   sec  1.17 GBytes  10.0 Gbits/sec
+[  5]   7.00-8.00   sec  1.12 GBytes  9.61 Gbits/sec
+[  5]   8.00-9.00   sec  1.13 GBytes  9.74 Gbits/sec
+[  5]   9.00-10.00  sec  1.26 GBytes  10.8 Gbits/sec
 - - - - - - - - - - - - - - - - - - - - - - - - -
 [ ID] Interval           Transfer     Bitrate
-[  6]   0.00-20.04  sec  59.4 GBytes  25.4 Gbits/sec receiver
+[  5]   0.00-10.04  sec  11.8 GBytes  10.1 Gbits/sec   receiver
 -----------------------------------------------------------
+Server listening on 5201 (test #2)
+-----------------------------------------------------------
+^Ciperf3: interrupt - the server has terminated
+logout
+[ perf record: Woken up 20 times to write data ]
+[ perf record: Captured and wrote 5.040 MB perf.data (33411 samples) ]
+jmaloy@freyr:~/passt$
 
-Passt is used to support VMs in containers, such as KubeVirt, and
-is also generally supported in libvirt/QEMU since release 9.2 / 7.2.
+The perf record confirms this result. Below, we can observe that the
+CPU spends significantly less time in the function ____sys_recvmsg()
+when we have offset support.
 
+Without offset support:
+----------------------
+jmaloy@freyr:~/passt$ perf report -q --symbol-filter=do_syscall_64 -p ____sys_recvmsg -x --stdio -i  perf.data | head -1
+    46.32%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____sys_recvmsg
+
+With offset support:
+----------------------
+jmaloy@freyr:~/passt$ perf report -q --symbol-filter=do_syscall_64 -p ____sys_recvmsg -x --stdio -i  perf.data | head -1
+   27.24%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____sys_recvmsg
+
+Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
 Signed-off-by: Jon Maloy <jmaloy@redhat.com>
-Signed-off-by: Jon Paul Maloy <jmaloy@redhat.com>
 ---
- net/ipv4/tcp.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ net/ipv4/tcp.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 53bcc17c91e4..e9d3b5bf2f66 100644
+index 1baa484d2190..82e1da3f0f98 100644
 --- a/net/ipv4/tcp.c
 +++ b/net/ipv4/tcp.c
-@@ -2310,6 +2310,7 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
- 			      int *cmsg_flags)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
-+	size_t peek_offset;
- 	int copied = 0;
- 	u32 peek_seq;
- 	u32 *seq;
-@@ -2353,6 +2354,20 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
+@@ -2351,6 +2351,20 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
  	if (flags & MSG_PEEK) {
  		peek_seq = tp->copied_seq;
  		seq = &peek_seq;
 +		if (!msg->msg_iter.__iov[0].iov_base) {
++			size_t peek_offset;
++
++			if (msg->msg_iter.nr_segs < 2) {
++				err = -EINVAL;
++				goto out;
++			}
 +			peek_offset = msg->msg_iter.__iov[0].iov_len;
 +			msg->msg_iter.__iov = &msg->msg_iter.__iov[1];
-+			if (msg->msg_iter.nr_segs <= 1)
-+				goto out;
 +			msg->msg_iter.nr_segs -= 1;
-+			if (msg->msg_iter.count <= peek_offset)
-+				goto out;
 +			msg->msg_iter.count -= peek_offset;
-+			if (len <= peek_offset)
-+				goto out;
 +			len -= peek_offset;
 +			*seq += peek_offset;
 +		}
@@ -175,6 +209,6 @@ index 53bcc17c91e4..e9d3b5bf2f66 100644
  
  	target = sock_rcvlowat(sk, flags & MSG_WAITALL, len);
 -- 
-2.39.0
+2.42.0
 
 
