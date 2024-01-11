@@ -1,217 +1,179 @@
-Return-Path: <netdev+bounces-63051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A919B82AEA5
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:23:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80FF682AED4
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:37:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 267F728255D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:23:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EACF3B231AC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E29156FD;
-	Thu, 11 Jan 2024 12:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1052156FD;
+	Thu, 11 Jan 2024 12:37:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD0C15AC1
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-35fc70bd879so42167375ab.3
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 04:23:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704975807; x=1705580607;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C+Do2wLekHyOSCIJUK3h/DUjhFiTmTBs0NQIfxE6tXs=;
-        b=eX+A7oGjU7DzeUztMuJmdB/3kZWLnqmvCKCUUhXz1E9fvikaBmkZfHWlpd8z9DXfIP
-         DdjD+o/krFhjchq2IAxcmrl1EIjwoj8qKj/KRbDOSJqwBKM7g3ry640DpjtjzMOWnzNx
-         Db4KjZIv2SAvWkl1HiX82BRPzwMxy470mumqbAGXldWHC169lD9IDr4sgB+1obidnFU2
-         eNgeiYV4NdszMlbIbAxVNZRPPokx4Cbm8Ajssndze1r7m2KvgmIo3YRVJBujCYSoLDu1
-         vCbXl/xn9KBtufLPFxwvKy7ZvbOCvKcFiJQaQxkJpszC1IO6GRriz57IgF1dWZDEJbkf
-         AH/g==
-X-Gm-Message-State: AOJu0YzoLlp6/x1maIOY+5Dc21i71b01ap/V3xfLmZitQNJk05xwkQml
-	xkBOlRAWXHmHIQo5ACU0r5vkkBOEhqnk9sKTpyytDVmGa+Xg
-X-Google-Smtp-Source: AGHT+IEOL4YeE4wbgAcDOYdGqJ9PUjvQ4D6o/XE7rUpmKpy6r3CX4iz/JQLWeTrC8A4y69HqggnOTe+W/4Tn9uRXqjFw2QKY6yfQ
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7FE15E85;
+	Thu, 11 Jan 2024 12:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4T9kgj6n8Yz1Q7kX;
+	Thu, 11 Jan 2024 20:36:49 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id B5CB4140555;
+	Thu, 11 Jan 2024 20:37:20 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 11 Jan
+ 2024 20:37:20 +0800
+Subject: Re: [PATCH net-next 3/6] mm/page_alloc: use initial zero offset for
+ page_frag_alloc_align()
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+ <20240103095650.25769-4-linyunsheng@huawei.com>
+ <f4abe71b3439b39d17a6fb2d410180f367cadf5c.camel@gmail.com>
+ <74c9a3a1-5204-f79a-95ff-5c108ec6cf2a@huawei.com>
+ <CAKgT0Uf=hFrXLzDFaOxs_j9yYP7aQCmi=wjUyuop3FBv2vzgCA@mail.gmail.com>
+ <f138193c-30e0-b1ba-1735-5f569230724b@huawei.com>
+ <CAKgT0UcujEktOnHx7mxWd+Jah1J9mHFWnTx35vc3x25uUadxaA@mail.gmail.com>
+ <b77ef32e-64b9-2e4f-8041-ccb46dea4caa@huawei.com>
+ <CAKgT0UfXv-2GrPY99-ZVZgjGEHvDqww6qLLT_Fben=_oNJM+xg@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <02377589-0b2d-d924-4dca-3552e0b4913d@huawei.com>
+Date: Thu, 11 Jan 2024 20:37:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1ba4:b0:35f:affb:bd7b with SMTP id
- n4-20020a056e021ba400b0035faffbbd7bmr139929ili.2.1704975807167; Thu, 11 Jan
- 2024 04:23:27 -0800 (PST)
-Date: Thu, 11 Jan 2024 04:23:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005644b8060eaa9d6e@google.com>
-Subject: [syzbot] [can?] memory leak in can_create (2)
-From: syzbot <syzbot+521ac15269e89d8546e8@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kernel@pengutronix.de, 
-	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mkl@pengutronix.de, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
-	pabeni@redhat.com, robin@protonic.nl, socketcan@hartkopp.net, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAKgT0UfXv-2GrPY99-ZVZgjGEHvDqww6qLLT_Fben=_oNJM+xg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Hello,
+On 2024/1/11 0:21, Alexander Duyck wrote:
 
-syzbot found the following issue on:
+...
 
-HEAD commit:    52b1853b080a Merge tag 'i2c-for-6.7-final' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17315deee80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dcb7609da8da79e3
-dashboard link: https://syzkaller.appspot.com/bug?extid=521ac15269e89d8546e8
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14aa5a41e80000
+>>
+>> The main usecase in my mind is the page_frag used in the tx part for
+>> networking if we are able to unify the page_frag and page_frag_cache in
+>> the future:
+>> https://elixir.bootlin.com/linux/v6.7-rc8/source/net/ipv4/tcp.c#L1183
+>>
+>> Do you think if it makes sense to unify them using below unified struct,
+>> and provide API for returning 'page' and 'va' as page_pool does now?
+> 
+> Short answer is no. The difference between the two is the use case,
+> and combining page and va in the same struct just ends up generating
+> indirect data duplication. So one step would be to look at seeing what
+> we could do to either convert page to va or va to page without taking
+> a significant penalty in either page_frag or page_frag_cache use case.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0f9568a404dd/disk-52b1853b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e339a63284ed/vmlinux-52b1853b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8aae66c13215/bzImage-52b1853b.xz
+I think we might do something like the page_pool using some unused fields
+in 'struct page' as the metadata of page_frag/page_frag_cache, and reduce
+page_frag or page_frag_cache to a single pointer of 'struct page'?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+521ac15269e89d8546e8@syzkaller.appspotmail.com
+I looked the the fields used by page_pool in 'struct page', it seems it is
+enough for page_frag case too.
 
-BUG: memory leak
-unreferenced object 0xffff88811f2c8400 (size 1024):
-  comm "syz-executor.6", pid 5653, jiffies 4295068840 (age 14.060s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    1d 00 07 41 00 00 00 00 00 00 00 00 00 00 00 00  ...A............
-  backtrace:
-    [<ffffffff8163470d>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
-    [<ffffffff8163470d>] slab_post_alloc_hook mm/slab.h:766 [inline]
-    [<ffffffff8163470d>] slab_alloc_node mm/slub.c:3478 [inline]
-    [<ffffffff8163470d>] __kmem_cache_alloc_node+0x2dd/0x3f0 mm/slub.c:3517
-    [<ffffffff8157f9db>] __do_kmalloc_node mm/slab_common.c:1006 [inline]
-    [<ffffffff8157f9db>] __kmalloc+0x4b/0x150 mm/slab_common.c:1020
-    [<ffffffff83eccc42>] kmalloc include/linux/slab.h:604 [inline]
-    [<ffffffff83eccc42>] sk_prot_alloc+0x112/0x1b0 net/core/sock.c:2082
-    [<ffffffff83ecffb6>] sk_alloc+0x36/0x2f0 net/core/sock.c:2135
-    [<ffffffff84535474>] can_create+0x194/0x320 net/can/af_can.c:158
-    [<ffffffff83ec53cf>] __sock_create+0x19f/0x2e0 net/socket.c:1571
-    [<ffffffff83ec8c58>] sock_create net/socket.c:1622 [inline]
-    [<ffffffff83ec8c58>] __sys_socket_create net/socket.c:1659 [inline]
-    [<ffffffff83ec8c58>] __sys_socket+0xb8/0x1a0 net/socket.c:1706
-    [<ffffffff83ec8d5b>] __do_sys_socket net/socket.c:1720 [inline]
-    [<ffffffff83ec8d5b>] __se_sys_socket net/socket.c:1718 [inline]
-    [<ffffffff83ec8d5b>] __x64_sys_socket+0x1b/0x20 net/socket.c:1718
-    [<ffffffff84b71e0f>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-    [<ffffffff84b71e0f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
-    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> I had opted for using the virtual address as the Rx path has a strong
+> need for accessing the memory as soon as it is written to begin basic
+> parsing tasks and the like. In addition it is usually cheaper to go
+> from a virtual to a page rather than the other way around.
 
-BUG: memory leak
-unreferenced object 0xffff888120161490 (size 16):
-  comm "syz-executor.6", pid 5653, jiffies 4295068840 (age 14.060s)
-  hex dump (first 16 bytes):
-    00 c3 87 00 81 88 ff ff 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff8163470d>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
-    [<ffffffff8163470d>] slab_post_alloc_hook mm/slab.h:766 [inline]
-    [<ffffffff8163470d>] slab_alloc_node mm/slub.c:3478 [inline]
-    [<ffffffff8163470d>] __kmem_cache_alloc_node+0x2dd/0x3f0 mm/slub.c:3517
-    [<ffffffff8157f335>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1098
-    [<ffffffff823a7a92>] kmalloc include/linux/slab.h:600 [inline]
-    [<ffffffff823a7a92>] kzalloc include/linux/slab.h:721 [inline]
-    [<ffffffff823a7a92>] apparmor_sk_alloc_security+0x52/0xd0 security/apparmor/lsm.c:997
-    [<ffffffff8236b887>] security_sk_alloc+0x47/0x80 security/security.c:4411
-    [<ffffffff83eccc5d>] sk_prot_alloc+0x12d/0x1b0 net/core/sock.c:2085
-    [<ffffffff83ecffb6>] sk_alloc+0x36/0x2f0 net/core/sock.c:2135
-    [<ffffffff84535474>] can_create+0x194/0x320 net/can/af_can.c:158
-    [<ffffffff83ec53cf>] __sock_create+0x19f/0x2e0 net/socket.c:1571
-    [<ffffffff83ec8c58>] sock_create net/socket.c:1622 [inline]
-    [<ffffffff83ec8c58>] __sys_socket_create net/socket.c:1659 [inline]
-    [<ffffffff83ec8c58>] __sys_socket+0xb8/0x1a0 net/socket.c:1706
-    [<ffffffff83ec8d5b>] __do_sys_socket net/socket.c:1720 [inline]
-    [<ffffffff83ec8d5b>] __se_sys_socket net/socket.c:1718 [inline]
-    [<ffffffff83ec8d5b>] __x64_sys_socket+0x1b/0x20 net/socket.c:1718
-    [<ffffffff84b71e0f>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-    [<ffffffff84b71e0f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
-    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+Is there a reason why it is usually cheaper to go from a virtual to a page
+rather than the other way around? I looked the implementations of them, But
+had not figured why yet.
 
-BUG: memory leak
-unreferenced object 0xffff88811fbf2000 (size 8192):
-  comm "syz-executor.6", pid 5653, jiffies 4295068840 (age 14.060s)
-  hex dump (first 32 bytes):
-    00 20 bf 1f 81 88 ff ff 00 20 bf 1f 81 88 ff ff  . ....... ......
-    00 00 00 00 00 00 00 00 00 00 5f 1b 81 88 ff ff  .........._.....
-  backtrace:
-    [<ffffffff8163470d>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
-    [<ffffffff8163470d>] slab_post_alloc_hook mm/slab.h:766 [inline]
-    [<ffffffff8163470d>] slab_alloc_node mm/slub.c:3478 [inline]
-    [<ffffffff8163470d>] __kmem_cache_alloc_node+0x2dd/0x3f0 mm/slub.c:3517
-    [<ffffffff8157f335>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1098
-    [<ffffffff845437c9>] kmalloc include/linux/slab.h:600 [inline]
-    [<ffffffff845437c9>] kzalloc include/linux/slab.h:721 [inline]
-    [<ffffffff845437c9>] j1939_priv_create net/can/j1939/main.c:135 [inline]
-    [<ffffffff845437c9>] j1939_netdev_start+0x159/0x6f0 net/can/j1939/main.c:272
-    [<ffffffff8454540e>] j1939_sk_bind+0x21e/0x550 net/can/j1939/socket.c:485
-    [<ffffffff83ec926c>] __sys_bind+0x11c/0x130 net/socket.c:1847
-    [<ffffffff83ec929c>] __do_sys_bind net/socket.c:1858 [inline]
-    [<ffffffff83ec929c>] __se_sys_bind net/socket.c:1856 [inline]
-    [<ffffffff83ec929c>] __x64_sys_bind+0x1c/0x20 net/socket.c:1856
-    [<ffffffff84b71e0f>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-    [<ffffffff84b71e0f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
-    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> 
+> As for the rest of the fields we have essentially 2 main use cases.
+> The first is the Rx path which usually implies DMA and not knowing
+> what size of the incoming frame is and the need to have allocation
+> succeed to avoid jamming up a device. So basically it is always doing
+> something like allocating 2K although it may only receive somewhere
+> between 60B to 1514B, and it is always allocating from reserves. For
+> something like Tx keeping the pagecnt_bias and pfmemalloc values
 
-BUG: memory leak
-unreferenced object 0xffff888120daf700 (size 240):
-  comm "syz-executor.6", pid 5653, jiffies 4295068840 (age 14.060s)
-  hex dump (first 32 bytes):
-    68 aa 12 1e 81 88 ff ff 68 aa 12 1e 81 88 ff ff  h.......h.......
-    00 00 5f 1b 81 88 ff ff 00 84 2c 1f 81 88 ff ff  .._.......,.....
-  backtrace:
-    [<ffffffff81632177>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
-    [<ffffffff81632177>] slab_post_alloc_hook mm/slab.h:766 [inline]
-    [<ffffffff81632177>] slab_alloc_node mm/slub.c:3478 [inline]
-    [<ffffffff81632177>] kmem_cache_alloc_node+0x2c7/0x450 mm/slub.c:3523
-    [<ffffffff83edcb9f>] __alloc_skb+0x1ef/0x230 net/core/skbuff.c:641
-    [<ffffffff83ee6111>] alloc_skb include/linux/skbuff.h:1286 [inline]
-    [<ffffffff83ee6111>] alloc_skb_with_frags+0x71/0x3a0 net/core/skbuff.c:6334
-    [<ffffffff83ed0c4b>] sock_alloc_send_pskb+0x3ab/0x3e0 net/core/sock.c:2787
-    [<ffffffff84545de8>] sock_alloc_send_skb include/net/sock.h:1884 [inline]
-    [<ffffffff84545de8>] j1939_sk_alloc_skb net/can/j1939/socket.c:864 [inline]
-    [<ffffffff84545de8>] j1939_sk_send_loop net/can/j1939/socket.c:1128 [inline]
-    [<ffffffff84545de8>] j1939_sk_sendmsg+0x2f8/0x7f0 net/can/j1939/socket.c:1263
-    [<ffffffff83ec6c92>] sock_sendmsg_nosec net/socket.c:730 [inline]
-    [<ffffffff83ec6c92>] __sock_sendmsg+0x52/0xa0 net/socket.c:745
-    [<ffffffff83ec72f5>] ____sys_sendmsg+0x365/0x470 net/socket.c:2586
-    [<ffffffff83ecb019>] ___sys_sendmsg+0xc9/0x130 net/socket.c:2640
-    [<ffffffff83ecb1c6>] __sys_sendmsg+0xa6/0x120 net/socket.c:2669
-    [<ffffffff84b71e0f>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-    [<ffffffff84b71e0f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
-    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+I am not so sure I understand why it is ok to keep reusing a pfmemalloc
+page for Tx yet?
 
+I am assuming the pfmemalloc is not about a specific page, but about the
+state of mm system when a page is allocated under memory pressure?
+The pfmemalloc is used to drop some rx packet which is not helpful for
+reducing the memory pressure? And tx does not need to handle the pfmemalloc
+case?
 
+> doesn't make much sense as neither is really needed for the Tx use
+> case. Instead they can just make calls to page_get as they slice off
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+I think for small packet, the bias may help to avoid some atomic
+operations and some cache bouncing?
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> pieces of the page, and they have the option of failing if they cannot
+> get enough memory to put the skb together.
+> 
+>> It may mean we need to add one pointer to the new struct and are not able
+>> do some trick for performance, I suppose that is ok as there are always
+>> some trade off for maintainability and evolvability?
+>>
+>> struct page_frag {
+>>         struct *page;
+>>         void *va;
+>> #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+>>         __u16 offset;
+>>         __u16 size;
+>> #else
+>>         __u32 offset;
+>> #endif
+>>         /* we maintain a pagecount bias, so that we dont dirty cache line
+>>          * containing page->_refcount every time we allocate a fragment.
+>>          */
+>>         unsigned int            pagecnt_bias;
+>>         bool pfmemalloc;
+>> };
+> 
+> My general thought was to instead just make the page_frag a member of
+> the page_frag_cache since those two blocks would be the same. Then we
+> could see how we evolve things from there. By doing that there should
+> essentially be no code change
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Yes, that is a possible way to evolve things. But I seems to perfer to
+use the unused fields in 'struct page' for now, WDYT?
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+>> Another usecase that is not really related is: hw may be configured with
+>> a small BD buf size, for 2K and configured with a big mtu size or have
+>> hw gro enabled, for 4K pagesize, that means we may be able to reduce the
+>> number of the frag num to half as it is usually the case that two
+>> consecutive BD pointing to the same page. I implemented a POC in hns3
+>> long time ago using the frag implememtation in page_pool, it did show
+>> some obvious peformance gain, But as the priority shifts, I have not
+>> been able to continue that POC yet.
+> 
+> The main issue for that use case is that in order to make it work you
+> are having to usually copybreak the headers out of the page frags as
+> you won't be able to save the space for the skb tailroom. Either that
+> or you are using header/data split and in that case the data portion
+> should really be written to full pages instead of page fragments
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+I am not sure how hw implement the header/data split yet, is the hw able
+to not enabling header/data split for small packets and enabling header/data
+split for medium/big packets for the same queue, maybe spaning data part on
+multi-bd for big packets, so that we have least memory usages and performance
+penalty for small/medium/big packets received in the same queue?
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> anyway and be making use of page pool instead.
 
