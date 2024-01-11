@@ -1,168 +1,93 @@
-Return-Path: <netdev+bounces-63160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A932082B60E
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:35:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25EC982B655
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 22:01:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38C5DB25956
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:35:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3F96B24223
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C7258200;
-	Thu, 11 Jan 2024 20:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E0E58113;
+	Thu, 11 Jan 2024 21:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yA1hq8y5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tkxn0tUo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE8F5812B
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 20:34:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40e4afe9ea7so13955e9.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:34:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705005269; x=1705610069; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZhucuI11iLm9jZSo5DyrLuQREbxS6U88O/YNonTCxz8=;
-        b=yA1hq8y5Uw2ph0oQijZJOjlee/RLujzmEgrk2cYBtYcVwt8VYVyE1UKUGGuzqCD5Lu
-         rPSGYMQ6dlpLWyWFnOgRCaLhmKjQHFW3mB5j8VkXAog/iiTViA0xf3NMaTb832m+jdKZ
-         smKWjXXOys0Vt+In1nWTlhAjFPCIWtDoDzrQ3ieCHFIP4nvUiFT/By1z1q2xYDF3ZdpL
-         wZwl1N6rkjckZwaYLbi1iP3E0RMQtEY/wjVBpYFqIUzMkte7WgJEnanv6N6tDPiBNm1M
-         s5kPk3RVbjBl8CeIXXEGEQhoRiQ5D5HOC4SI2Nt9R3FghdBCpNy2cEel0bU8Y4AT33I2
-         V7NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705005269; x=1705610069;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZhucuI11iLm9jZSo5DyrLuQREbxS6U88O/YNonTCxz8=;
-        b=DAJXsm+XshYUTIVnQ3AmTeXZ/JxYqQXZFuO7Yao0N6koeAwk2UEyQfvuu7PDphZBTV
-         DfYZA78zJBJUabFSBK/VNphvFeqVCtMRwUhNXtnMSKEnz8cpZIqI1fn6IaE2D1G0q8oj
-         ZkXb7kKMTB2gCPVETOIvFodRtbKinvPJlBjt0nLI2wR4CtyqHLQu/KxBYaLluqeokyy0
-         DGT6wVp/70LTcXURZ863MHgrT15EsRH6pmUYP3Io7vQmHl8k5m3nq3gCJdx1zCkqgPFH
-         uk/KaofyALEklUwmvEoQDSZaHeY79LAeq+Ay4TP9LD8Zay/lFISMvIehEaG+CB8r61rj
-         +fZw==
-X-Gm-Message-State: AOJu0YyjecINI6CE98Lg91/GMqVHuqaXrDMM0uKnkLuUVbX2rs+sRM45
-	Y5lie5uVfDZWjajV2xHwQ5rrONoWAy4hDjEAg8qbdNLqtCyJ
-X-Google-Smtp-Source: AGHT+IEwsvtKygl+nvSOgn3WrpQlaoPEPZDIYAeAvmwuubPmfNOdEKX4uyCZcs5X4QVXtXNLJ5Llz2AVykCfzYGX6ws=
-X-Received: by 2002:a05:600c:1d1f:b0:40e:61cf:af91 with SMTP id
- l31-20020a05600c1d1f00b0040e61cfaf91mr127026wms.7.1705005268801; Thu, 11 Jan
- 2024 12:34:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B394058200;
+	Thu, 11 Jan 2024 21:01:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5169C433F1;
+	Thu, 11 Jan 2024 21:01:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705006897;
+	bh=TpTMUcGngsj0a++aLiUb+VrDJ8lG4VgGRR5tkzcIA7U=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=tkxn0tUo7fvebx5LCPrlZvYAWlVP5wedD3yKqA5Gc4zJifhqAYU6lhNWOA0cspXgG
+	 ISXDPoothAx9TAOkgVVUYIC75GdKcH8/BB06tknIuAK1QRQIB5rbc3JgTd68WK7pX6
+	 d2c9dBg5tYBi53WnRy+AY+w51lKCKafgSO26bvONoRbmChjIIIJp50JYGziUz31ea4
+	 dfPLjUnACK1twGXr7fu6oUGylX5Cy6UlYI4YFt3guPBOCEc6QfViDlxhmcHyOE8zMg
+	 JIExEQtmgR3Tjy6NgDSyLKtqu01CrkFQous+xQsXS3cD7+ZWoHdpDPhfBlzY0uPYdw
+	 ZnI+Kh1uXGNWA==
+Date: Thu, 11 Jan 2024 15:01:35 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org> <202401101645.ED161519BA@keescook>
-In-Reply-To: <202401101645.ED161519BA@keescook>
-From: Fangrui Song <maskray@google.com>
-Date: Thu, 11 Jan 2024 12:34:17 -0800
-Message-ID: <CAFP8O3+947djoRjnVPuPhHUHbHv_9CugufuXQ+c=N03yLsaEcA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Update LLVM Phabricator and Bugzilla links
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>, akpm@linux-foundation.org, llvm@lists.linux.dev, 
-	patches@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-trace-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-efi@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
-	linux-arch@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, 
-	bridge@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, mykolal@fb.com, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Rob Herring <robh@kernel.org>
+To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Cc: davem@davemloft.net, kuba@kernel.org, devicetree@vger.kernel.org, 
+ robh+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk, 
+ krzysztof.kozlowski+dt@linaro.org, andrew@lunn.ch, edumazet@google.com, 
+ pabeni@redhat.com, linux-kernel@vger.kernel.org, afd@ti.com, 
+ netdev@vger.kernel.org, conor+dt@kernel.org
+In-Reply-To: <20240111161927.3689084-1-catalin.popescu@leica-geosystems.com>
+References: <20240111161927.3689084-1-catalin.popescu@leica-geosystems.com>
+Message-Id: <170500673265.1110563.4649305262591407339.robh@kernel.org>
+Subject: Re: [PATCH 1/3] dt-bindings: net: dp83826: add ti,cfg-dac-minus
+ binding
 
-On Wed, Jan 10, 2024 at 4:46=E2=80=AFPM Kees Cook <keescook@chromium.org> w=
-rote:
->
-> On Tue, Jan 09, 2024 at 03:16:28PM -0700, Nathan Chancellor wrote:
-> > This series updates all instances of LLVM Phabricator and Bugzilla link=
-s
-> > to point to GitHub commits directly and LLVM's Bugzilla to GitHub issue
-> > shortlinks respectively.
-> >
-> > I split up the Phabricator patch into BPF selftests and the rest of the
-> > kernel in case the BPF folks want to take it separately from the rest o=
-f
-> > the series, there are obviously no dependency issues in that case. The
-> > Bugzilla change was mechanical enough and should have no conflicts.
-> >
-> > I am aiming this at Andrew and CC'ing other lists, in case maintainers
-> > want to chime in, but I think this is pretty uncontroversial (famous
-> > last words...).
-> >
-> > ---
-> > Nathan Chancellor (3):
-> >       selftests/bpf: Update LLVM Phabricator links
-> >       arch and include: Update LLVM Phabricator links
-> >       treewide: Update LLVM Bugzilla links
-> >
-> >  arch/arm64/Kconfig                                 |  4 +--
-> >  arch/powerpc/Makefile                              |  4 +--
-> >  arch/powerpc/kvm/book3s_hv_nested.c                |  2 +-
-> >  arch/riscv/Kconfig                                 |  2 +-
-> >  arch/riscv/include/asm/ftrace.h                    |  2 +-
-> >  arch/s390/include/asm/ftrace.h                     |  2 +-
-> >  arch/x86/power/Makefile                            |  2 +-
-> >  crypto/blake2b_generic.c                           |  2 +-
-> >  drivers/firmware/efi/libstub/Makefile              |  2 +-
-> >  drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c           |  2 +-
-> >  drivers/media/test-drivers/vicodec/codec-fwht.c    |  2 +-
-> >  drivers/regulator/Kconfig                          |  2 +-
-> >  include/asm-generic/vmlinux.lds.h                  |  2 +-
-> >  include/linux/compiler-clang.h                     |  2 +-
-> >  lib/Kconfig.kasan                                  |  2 +-
-> >  lib/raid6/Makefile                                 |  2 +-
-> >  lib/stackinit_kunit.c                              |  2 +-
-> >  mm/slab_common.c                                   |  2 +-
-> >  net/bridge/br_multicast.c                          |  2 +-
-> >  security/Kconfig                                   |  2 +-
-> >  tools/testing/selftests/bpf/README.rst             | 32 +++++++++++---=
---------
-> >  tools/testing/selftests/bpf/prog_tests/xdpwall.c   |  2 +-
-> >  .../selftests/bpf/progs/test_core_reloc_type_id.c  |  2 +-
-> >  23 files changed, 40 insertions(+), 40 deletions(-)
-> > ---
-> > base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
-> > change-id: 20240109-update-llvm-links-d03f9d649e1e
-> >
-> > Best regards,
-> > --
-> > Nathan Chancellor <nathan@kernel.org>
-> >
->
-> Excellent! Thanks for doing this. I spot checked a handful I was
-> familiar with and everything looks good to me.
->
-> Reviewed-by: Kees Cook <keescook@chromium.org>
->
-> --
-> Kees Cook
->
 
-These reviews.llvm.org links would definitely be kept like
-https://lists.llvm.org/pipermail/llvm-dev/ or cfe-dev links
-(discussions have been migrated to Discourse).
-However, I agree that the github repo link looks more official. I have
-clicked a few links and they look good.
+On Thu, 11 Jan 2024 17:19:25 +0100, Catalin Popescu wrote:
+> Add property ti,cfg-dac-minus to allow for voltage tuning
+> of logical level -1 of the MLT-3 encoded data.
+> 
+> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+> ---
+>  Documentation/devicetree/bindings/net/ti,dp83822.yaml | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
 
-Since I maintain reviews.llvm.org and created the static archive [1],
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-Acked-by: Fangrui Song <maskray@google.com>
+yamllint warnings/errors:
 
-[1]: https://discourse.llvm.org/t/llvm-phabricator-turndown/76137
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/ti,dp83822.yaml: ti,cfg-dac-minus: missing type definition
 
---=20
-=E5=AE=8B=E6=96=B9=E7=9D=BF
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240111161927.3689084-1-catalin.popescu@leica-geosystems.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
