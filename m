@@ -1,88 +1,101 @@
-Return-Path: <netdev+bounces-63140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB1C82B561
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:42:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CD5982B567
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:49:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 379C71F269DD
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:42:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 297031F240C0
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B554256462;
-	Thu, 11 Jan 2024 19:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0691756464;
+	Thu, 11 Jan 2024 19:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CnJ9wOM0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YJpqdSKo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DB055E57;
-	Thu, 11 Jan 2024 19:42:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EFDC4C43390;
-	Thu, 11 Jan 2024 19:42:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705002145;
-	bh=G6YfkMTfrKpVPvbMcmkuGZLdsfUoy300U8rWYOdWe18=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CnJ9wOM0M04q4k6yTtky3njirZDHFD2rwKAwmQHFyZvvzDNMV7i49R6tGp/tvIDZ/
-	 ZohzSuGN5efjalzw7QthYyhhfoQIrvnSlzTVWeDAnn0iWXaZ9Dn0LjnY5HnGxK484j
-	 elmSl9mLi+FYcTBX3fL4kM7x289lDlTxdn1+70ZPAYOdzOdO0ptui3oT0XwsCtHS0f
-	 gp1phOebrBOtm1weU5qFrc9n2T7rImNIJTEmLE4gs3YHjzW4hhSoOsAUlWCCGSw8PQ
-	 akhlUzDoTUxXuwQXTO6v+PQgTt/vW6tDM74scSq1S4qLFocvG6gwMPJaXk0iCdvt6l
-	 gTtfxsIU0e9mA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D56A4D8C972;
-	Thu, 11 Jan 2024 19:42:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E667524AB
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 19:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-680139b1990so109526426d6.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:49:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705002559; x=1705607359; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2UU24CyUllNWEZc0HSA09IUivf5QA30f9lF0pR+FVKw=;
+        b=YJpqdSKoSN8GdncbqecXEpfhTuK7DBCTDYaVkc2o1cbTw7QC/lrajDbx2sMePtEAEh
+         9Yv8SjOcBzTuJkbhXvkUFgY2S1YvIiQRT4xjuCCL9NEaM+Dhqw3HhpvXcm3OqySNkvGA
+         YLYzEn3sLgSAx8Nu3/pa30fQnMGJ/nqik1wEHYE+elmW7MJTcJ9MXvOd6V4EOBSDco2m
+         oL0foR0scXoh6uPBws1AfgX5UVdHcURpDONV/TTiBEEu/Vpd9uhBmN1rXJVvHmZFjgC7
+         R25tMYNyCPmuZc7T+trEElVw7aOGeZcC9LGhbR6ZOH+jke0E/l+89JjeRnJ+CgtaRzIh
+         /O4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705002559; x=1705607359;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2UU24CyUllNWEZc0HSA09IUivf5QA30f9lF0pR+FVKw=;
+        b=gKzJsh9MA0hBYYsk4rPxvfRTEYgGwaHqClYpPMJDmgkoRCZBhkKLLJac7czY38bbCV
+         FUeW6PXlFlhdjh8bb0T1TRQMCZcctCxy1Nk5Nov6aHCXr5fR7DYg5Cq8chHt3I7sCZBY
+         1NtaMp8C054K9C8TIlcCkgG6g4FRNV6DLr4UpjddyKEk/ElfiFULhb3VLzF/AiYiFzxX
+         +32wpK+kdn0tyz/LrHLR+OIt8KXVsrPgCjuFmbSHm10nhvrex7sjj6N1TeNizOWV0ZMq
+         JUyWCc1a7XQRYLTuBg0Xa63mQoWwykjmCuy6pCjtn46BKIA+U1AqozrZon29n4D0XOTi
+         eyhw==
+X-Gm-Message-State: AOJu0YyTcb0VItoeiv5YVf84/IlQZE1zN8AkcoOnHiNMQmS0QRL+W5pn
+	61AzPeLhE6WS0GgqbPci1g75kW9I34uMZk/Sc9yU
+X-Google-Smtp-Source: AGHT+IFUUYGP7avDl1lN3//EoZFfplneyU6EcXgMS55vxAQ9QmCG57K49huOEy8gwmUx2z7LS47yReuQJeVGpg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:ad4:4ea6:0:b0:67f:a0a5:80b8 with SMTP id
+ ed6-20020ad44ea6000000b0067fa0a580b8mr645qvb.13.1705002559314; Thu, 11 Jan
+ 2024 11:49:19 -0800 (PST)
+Date: Thu, 11 Jan 2024 19:49:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] selftests: net: Small fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170500214487.3715.485449323936860902.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jan 2024 19:42:24 +0000
-References: <20240110141436.157419-1-bpoirier@nvidia.com>
-In-Reply-To: <20240110141436.157419-1-bpoirier@nvidia.com>
-To: Benjamin Poirier <bpoirier@nvidia.com>
-Cc: netdev@vger.kernel.org, j.vosburgh@gmail.com, andy@greyhouse.net,
- shuah@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, petrm@nvidia.com, razor@blackwall.org,
- liuhangbin@gmail.com, idosch@nvidia.com, vladimir.oltean@nxp.com,
- jon.toppins+linux@gmail.com, troglobit@gmail.com,
- linux-kselftest@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.275.g3460e3d667-goog
+Message-ID: <20240111194917.4044654-1-edumazet@google.com>
+Subject: [PATCH net 0/5] mptcp: better validation of MPTCPOPT_MP_JOIN option
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Based on a syzbot report (see 4th patch in the series).
 
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+We need to be more explicit about which one of the
+following flag is set by mptcp_parse_option():
 
-On Wed, 10 Jan 2024 09:14:34 -0500 you wrote:
-> From: Benjamin Poirier <benjamin.poirier@gmail.com>
-> 
-> Two small fixes for net selftests.
-> 
-> These patches were carved out of the following RFC series:
-> https://lore.kernel.org/netdev/20231222135836.992841-1-bpoirier@nvidia.com/
-> 
-> [...]
+- OPTION_MPTCP_MPJ_SYN
+- OPTION_MPTCP_MPJ_SYNACK
+- OPTION_MPTCP_MPJ_ACK
 
-Here is the summary with links:
-  - [net,1/2] selftests: bonding: Change script interpreter
-    (no matching commit)
-  - [net,2/2] selftests: forwarding: Remove executable bits from lib.sh
-    https://git.kernel.org/netdev/net/c/1ad04b795cc3
+Then select the appropriate values instead of OPTIONS_MPTCP_MPJ
 
-You are awesome, thank you!
+Paolo suggested to do the same for OPTIONS_MPTCP_MPC (5th patch)
+
+Eric Dumazet (5):
+  mptcp: mptcp_parse_option() fix for MPTCPOPT_MP_JOIN
+  mptcp: strict validation before using mp_opt->hmac
+  mptcp: use OPTION_MPTCP_MPJ_SYNACK in subflow_finish_connect()
+  mptcp: use OPTION_MPTCP_MPJ_SYN in subflow_check_req()
+  mptcp: refine opt_mp_capable determination
+
+ net/mptcp/options.c |  6 +++---
+ net/mptcp/subflow.c | 16 ++++++++--------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0.275.g3460e3d667-goog
 
 
