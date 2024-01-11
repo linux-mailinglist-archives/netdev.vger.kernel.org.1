@@ -1,195 +1,89 @@
-Return-Path: <netdev+bounces-63053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D384F82AEDD
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:40:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6576C82AEE8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:45:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EC3BB23FD8
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:40:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12A551F24930
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516F115AEE;
-	Thu, 11 Jan 2024 12:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I7L9pOnj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF97D15ADF;
+	Thu, 11 Jan 2024 12:44:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8BE15ADB
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-28ca63fd071so2787939a91.3
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 04:40:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704976825; x=1705581625; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lUjrrZ3Jg1GUMAie5ebnK4hlRzI9jSk+yPsyIMgP7Cg=;
-        b=I7L9pOnj2gmHPXX3UUbnrWYfZH2x5047cV/fypzF3Y4ux3Y0oF/TgcPKblFJhFqyfN
-         uRt+i6HwRmtVLCXSAecx2Ihe27aeeuvT5TpzeIlMY+pOieEKi5vEYiIqh8Yh10B/i7CD
-         RswIwp5eHwjY6N1qjV8nIrBBXxP6J14XSk3vW2Bn7p6zOzOIE/PEiBwUrY0QGlV1B3uq
-         5jloVDT1ujj9h5SuzxJPTboxkF1HAHNqZEefAsPr+DxEp2kTY7JW+n/TN6Iti8VvdcC1
-         B9JbnzOo84Tyhq4z4XFf3s4P+tBtYNJme3NJUYiuB1DgqPvdhTHQvmnigGmTOd/jg4fy
-         8JSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704976825; x=1705581625;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lUjrrZ3Jg1GUMAie5ebnK4hlRzI9jSk+yPsyIMgP7Cg=;
-        b=w/0mJ1UhxeezaSVtIy4gg1xKY886HxxeBF5gffs4++urFFYMVdVazj3WI3BQOpE85E
-         11goMAdY8NPRSmHFurYcSDgPcnm+uaF36xbag3bYimoJmceWru2YaCjHsmnIDGgqp/sP
-         ej15zNgZLJDs0xNmD7GtybQBr8IORYs0imeqscXczgvB0fxQbkEXLkslshQUJSDFwmzV
-         qHK1Ut6NVXtMyxo9h3Ioc0El2QIXog/uCNV4knvFl4k1fI+kMwUqqqT7mcNfrBlhaYYe
-         7Q8jlxXg6QZ71mllySbyYIcESkv0zYkQLrfe72U1yZIOGxNBPhvJ4VNROirEEH7tJZ/u
-         YO7Q==
-X-Gm-Message-State: AOJu0YzOamPFkpbLkkNN9Co9EsvnexUfsCc4hSS0q8f8hUgzaAC92Y+e
-	o7djc2Au+Rf2F4z8gWAiuSSUJZ3fIB7e
-X-Google-Smtp-Source: AGHT+IFlzCZDk+7khh2nGY76iLSM3Y0+E3O+l032jjoiVmXYGJDOGVhuEwa5Sr5OwMDDcz8NiN7tAg==
-X-Received: by 2002:a17:90a:4984:b0:28c:f1f3:4dcb with SMTP id d4-20020a17090a498400b0028cf1f34dcbmr914767pjh.69.1704976825101;
-        Thu, 11 Jan 2024 04:40:25 -0800 (PST)
-Received: from thinkpad ([202.131.159.18])
-        by smtp.gmail.com with ESMTPSA id mf15-20020a17090b184f00b0028cef2025ddsm1418530pjb.15.2024.01.11.04.40.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 04:40:24 -0800 (PST)
-Date: Thu, 11 Jan 2024 18:10:09 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Bartosz Golaszewski <brgl@bgdev.pl>,
-	Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Chris Morgan <macromorgan@hotmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	=?iso-8859-1?Q?N=EDcolas_F_=2E_R_=2E_A_=2E?= Prado <nfraprado@collabora.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Terry Bowman <terry.bowman@amd.com>,
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [RFC 3/9] PCI/portdrv: create platform devices for child OF nodes
-Message-ID: <20240111124009.GA3003@thinkpad>
-References: <20240104130123.37115-1-brgl@bgdev.pl>
- <20240104130123.37115-4-brgl@bgdev.pl>
- <20240109144327.GA10780@wunner.de>
- <CAMRc=MdXO6c6asvRSn_Z8-oFS48hroT+dazGKB6WWY1_Zu7f1Q@mail.gmail.com>
- <20240110132853.GA6860@wunner.de>
- <659f00ed271b3_5cee2942@dwillia2-xfh.jf.intel.com.notmuch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F0D15EA1;
+	Thu, 11 Jan 2024 12:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4T9kqC2vWhz1Q8B5;
+	Thu, 11 Jan 2024 20:43:19 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id A4EFC1A0190;
+	Thu, 11 Jan 2024 20:44:52 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 11 Jan
+ 2024 20:44:52 +0800
+Subject: Re: [RFC PATCH net-next v5 2/2] net: add netmem to skb_frag_t
+To: Mina Almasry <almasrymina@google.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>,
+	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Shakeel Butt
+	<shakeelb@google.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20240109011455.1061529-1-almasrymina@google.com>
+ <20240109011455.1061529-3-almasrymina@google.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <5219f2cd-6854-0134-560d-8ae3f363b53f@huawei.com>
+Date: Thu, 11 Jan 2024 20:44:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <659f00ed271b3_5cee2942@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <20240109011455.1061529-3-almasrymina@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On Wed, Jan 10, 2024 at 12:41:17PM -0800, Dan Williams wrote:
-> [ add Terry ]
-> 
-> 
-> Lukas Wunner wrote:
-> > On Wed, Jan 10, 2024 at 01:55:18PM +0100, Bartosz Golaszewski wrote:
-> > > On Tue, Jan 9, 2024 at 3:43???PM Lukas Wunner <lukas@wunner.de> wrote:
-> > > > On Thu, Jan 04, 2024 at 02:01:17PM +0100, Bartosz Golaszewski wrote:
-> > > > > In order to introduce PCIe power-sequencing, we need to create platform
-> > > > > devices for child nodes of the port driver node. They will get matched
-> > > > > against the pwrseq drivers (if one exists) and then the actuak PCIe
-> > > > > device will reuse the node once it's detected on the bus.
-> > > > [...]
-> > > > > --- a/drivers/pci/pcie/portdrv.c
-> > > > > +++ b/drivers/pci/pcie/portdrv.c
-> > > > > @@ -715,7 +716,7 @@ static int pcie_portdrv_probe(struct pci_dev *dev,
-> > > > >               pm_runtime_allow(&dev->dev);
-> > > > >       }
-> > > > >
-> > > > > -     return 0;
-> > > > > +     return devm_of_platform_populate(&dev->dev);
-> > > > >  }
-> > > >
-> > > > I think this belongs in of_pci_make_dev_node(), portdrv seems totally
-> > > > the wrong place.  Note that you're currently calling this for RCECs
-> > > > (Root Complex Event Collectors) as well, which is likely not what
-> > > > you want.
-> > > >
-> > > 
-> > > of_pci_make_dev_node() is only called when the relevant PCI device is
-> > > instantiated which doesn't happen until it's powered-up and scanned -
-> > > precisely the problem I'm trying to address.
-> > 
-> > No, of_pci_make_dev_node() is called *before* device_attach(),
-> > i.e. before portdrv has even probed.  So it seems this should
-> > work perfectly well for your use case.
-> > 
-> > 
-> > > > devm functions can't be used in the PCI core, so symmetrically call
-> > > > of_platform_unpopulate() from of_pci_remove_node().
-> > > 
-> > > I don't doubt what you're saying is true (I've seen worse things) but
-> > > this is the probe() callback of a driver using the driver model. Why
-> > > wouldn't devres work?
-> > 
-> > The long term plan is to move the functionality in portdrv to
-> > the PCI core.  Because devm functions can't be used in the PCI
-> > core, adding new ones to portdrv will *add* a new roadblock to
-> > migrating portdrv to the PCI core.  In other words, it makes
-> > future maintenance more difficult.
-> > 
-> > Generally, only PCIe port services which share the same interrupt
-> > (hotplug, PME, bandwith notification, flit error counter, ...)
-> > need to live in portdrv.  Arbitrary other stuff should not be
-> > shoehorned into portdrv.
-> 
-> I came here to say the same thing. It is already the case that portdrv
-> is not a good model to build new functionality upon [1], and PCI core
-> enlightenment should be considered first.
-> 
+On 2024/1/9 9:14, Mina Almasry wrote:
 
-The primary reason for plugging the power sequencing into portdrv is due to
-portdrv binding with all the bridge devices and acting as management driver for
-the bridges. This is where exactly the power sequencing part needs to be plugged
-in IMO. But if the idea of the portdrv is just to expose services based on
-interrupts, then please suggest a better place to plug this power sequencing
-part.
+...
 
-- Mani
+>  
+> +		if (WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0]))) {
 
-> The portdrv model is impeding Terry's CXL Port error handling effort, so
-> I am on the lookout for portdrv growing new entanglements to unwind
-> later.
+I am really hate to bring it up again.
+If you are not willing to introduce a new helper, do you care to use some
+existing API like skb_frag_address_safe()?
+
+> +			ret = -EINVAL;
+> +			goto out;
+> +		}
+> +
+>  		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE,
+> -			      skb_shinfo(skb)->frags, skb_shinfo(skb)->nr_frags,
+> -			      msize);
+> +			      (const struct bio_vec *)skb_shinfo(skb)->frags,
+> +			      skb_shinfo(skb)->nr_frags, msize);
+
+I think we need to use some built-time checking to ensure some consistency
+between skb_frag_t and bio_vec.
+
+>  		iov_iter_advance(&msg.msg_iter, txm->frag_offset);
+>  
+>  		do {
 > 
-> [1]: http://lore.kernel.org/r/20221025232535.GA579167@bhelgaas
-> 
-
--- 
-மணிவண்ணன் சதாசிவம்
 
