@@ -1,197 +1,147 @@
-Return-Path: <netdev+bounces-63148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D31982B57C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:55:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B203782B5A2
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:01:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EF391C2441E
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:55:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C21361C24793
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738675674D;
-	Thu, 11 Jan 2024 19:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B1B56777;
+	Thu, 11 Jan 2024 20:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OqbX3yUl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yjw9k24/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE6314F7A
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 19:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-5e734251f48so45441007b3.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:55:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1548C4CDE9;
+	Thu, 11 Jan 2024 20:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40e5521dab6so23923475e9.1;
+        Thu, 11 Jan 2024 12:01:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705002916; x=1705607716; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1705003262; x=1705608062; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=13rw39O97Yd5BxpZ+F1nH/mYbFkgcCKR9n2vzZLrrgk=;
-        b=OqbX3yUlC1SVbWvnGdZ/pycrtp9Au3BAxzEgLs+1jPSXH0yH2Mu3n/A5G4eJ9nrEGf
-         nkIRUE2Nh1wQmWj6vs+oQDPFbgRyf4stJTGAoGh7IdhU9owdVX3V++fUxrLtCFY/O18x
-         uFreNlbgG3epHKVEwuoEuOMNXrePRlYiLiHaeYsjXfFZCW/Mb8gLIgC4ARcXPleniQTs
-         duNNlmuwCEDF7EJe8mnhR7mgvi5c2iP3a7Wlexc8wAAqqnu22DQECfI6TCq/dyUvCDtB
-         vQ+TvFZtEkPWJ/fXX+o8cAc3xJ5L8j08bhAHHrzZdzlE4HXoA6JN6gcTaZlREKMhcsz3
-         l7+Q==
+        bh=HAL60ZiXYTrQWwc6XvTjBF7mU0s/R7MUfIaHS38evWw=;
+        b=Yjw9k24/aZTgNRl5he5a0Vg8/Yy0jMdXZhoAoSPnfwwvUeMA4Qn31c1XiLN+UPgtQ1
+         WAqFFGlMxMdz6CvMXVfYXdZjGEUbjbODFAZ/3WnesaHK6Qip6LgxG1+n1CEFQoG5UFbR
+         Qo7LLWAHQPG+H3feGi+VlGRPq5PHJKsp2OnM/PVDW9My+47hbJbJHPkJZekb8rvIxxOb
+         9oFUGl5Yck2WXBPkm+D9OVI/k/zj90X5IrV8oysRtblRZwep3WUf+sIUye8RFv7070XP
+         m7yTGU4XXn4jSoac3RZCUdLraX2PgLIxAClGpmm9d4SHIE2KGyZZ7GW9hS36UM1CMBtU
+         CVlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705002916; x=1705607716;
+        d=1e100.net; s=20230601; t=1705003262; x=1705608062;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=13rw39O97Yd5BxpZ+F1nH/mYbFkgcCKR9n2vzZLrrgk=;
-        b=Qnmz9zKmJgHU3fp+zJAnaixYwhT7zwfxbhsFZvEjAI1Rl6nXi4rmenqukKnPLhQ2EL
-         JTzVQV/2Zlc+UprYC7NSn0gIsBYFaOOhqm9A5yGSQGd3VObhTpuyOIArtpDLOYW6D2Ro
-         0YtzQdrQFdDhJoixKU4eVI/wWLWmVyEkqmgWE9Ez6ORWr/EjxXsZDQEP0juXrXLEWWna
-         rxIgknsW4D2nw/7oksnGh9MKE8un74mV0yprtXpXPyKPkStpcGQ0kTe5O9s9vDo0kk/t
-         vLuSQFSKEpYx0o5BTPn3VqaJ81fgnqYKrrba5KZs8kL0SIBI3WmrXd/vQm13BbX0lKL7
-         UAag==
-X-Gm-Message-State: AOJu0Yz/dINZFRL6UoYe8H8Nkbym9wMQgtv2EsdcuUwPy7oMwikDzF3i
-	Z19vrdCD1scneI3KIX11qndjEWFblaN2pkOkbZmXZaUtzvhV4FqZNap+KqH/cg==
-X-Google-Smtp-Source: AGHT+IHXPxzs9iCj/GkGEV+mA0/90xujWPzHoabK1OTrUJ3mKLV76ANldmtgvIe5MDhz+ekmwE2FsiGuGTudXFwuc9Q=
-X-Received: by 2002:a0d:d603:0:b0:5df:c224:fb44 with SMTP id
- y3-20020a0dd603000000b005dfc224fb44mr730704ywd.23.1705002916501; Thu, 11 Jan
- 2024 11:55:16 -0800 (PST)
+        bh=HAL60ZiXYTrQWwc6XvTjBF7mU0s/R7MUfIaHS38evWw=;
+        b=rkKohqDrUywf2Jd0QPkLqApPa7xT6SM4Y+8RZtjHoQsEMbINVfyAEyM+lxuf/glYBP
+         MCcXC3lqP6j3TGDYF8r0dGaat+vUZC2/4+yWTOdabmDHfyaBvDxX3HqqNf7dpss8O0df
+         WYXL1cueeisGe52zeElZ05TSGHBHOnQ5QgxPY/p+WjjLHiHEb8r/5EwBhqsQMBckyn0o
+         lv4pxCbDypMlVyNvH7MkwpMCD0p1QQPkdAGnYx/XG1cSWdC0tvHjGERQLbXMD+UY2Bb1
+         fgJGCoei9nFslllazNysPeIIi/tOWxEU9UdXtpTNtxSZTvL+jW/LJ2l1uAsG81v8Y5f7
+         RKeQ==
+X-Gm-Message-State: AOJu0YwHN1EVUHNOdmfd/DgEwfvWBYKvTWjr+L9yjgzlWTg5cwTXIWLy
+	WEhcs3pgJzZ+9h36uWki82ckH2MvBYn192NgLqQ=
+X-Google-Smtp-Source: AGHT+IEuD70YW9odmSJBW0ovp3CIEuHoCB7eupgpN0U69zefCCa6AEpsUHBsIEtkfYtc2dUZae2qy6ZzWQ5YfFTTiDA=
+X-Received: by 2002:a05:600c:6548:b0:40e:52a7:ac58 with SMTP id
+ dn8-20020a05600c654800b0040e52a7ac58mr243439wmb.65.1705003261872; Thu, 11 Jan
+ 2024 12:01:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104125844.1522062-1-jiri@resnulli.us> <ZZ6JE0odnu1lLPtu@shredder>
- <CAM0EoM=AGxO0gdeHPi7ST0+-YVuT20ysPbrFkYVXLqGv39oR7Q@mail.gmail.com>
- <CAM0EoMkpzsEWXMw27xgsfzwA2g4CNeDYQ9niTJAkgu3=Kgp81g@mail.gmail.com> <878r4volo0.fsf@nvidia.com>
-In-Reply-To: <878r4volo0.fsf@nvidia.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 11 Jan 2024 14:55:04 -0500
-Message-ID: <CAM0EoMkFkJBGc5wsYec+1QZ_o6tEi6vm_KjAJV8SWB4EOPcppg@mail.gmail.com>
-Subject: Re: [patch net-next] net: sched: move block device tracking into tcf_block_get/put_ext()
-To: Petr Machata <petrm@nvidia.com>
-Cc: Ido Schimmel <idosch@idosch.org>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, edumazet@google.com, 
-	xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com, 
-	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com
+References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
+ <20240109-update-llvm-links-v1-1-eb09b59db071@kernel.org> <6a655e9f-9878-4292-9d16-f988c4bdfc73@linux.dev>
+ <20240111194001.GA3805856@dev-arch.thelio-3990X>
+In-Reply-To: <20240111194001.GA3805856@dev-arch.thelio-3990X>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 11 Jan 2024 12:00:50 -0800
+Message-ID: <CAADnVQKFv2DKE=Um=+kcEzSWYCp9USQT_VpTawzNY6eRaUdu5g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] selftests/bpf: Update LLVM Phabricator links
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Yonghong Song <yonghong.song@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
+	clang-built-linux <llvm@lists.linux.dev>, patches@lists.linux.dev, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	ppc-dev <linuxppc-dev@lists.ozlabs.org>, kvm@vger.kernel.org, 
+	linux-riscv <linux-riscv@lists.infradead.org>, linux-trace-kernel@vger.kernel.org, 
+	linux-s390 <linux-s390@vger.kernel.org>, 
+	Linux Power Management <linux-pm@vger.kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-efi <linux-efi@vger.kernel.org>, 
+	amd-gfx list <amd-gfx@lists.freedesktop.org>, dri-devel@lists.freedesktop.org, 
+	linux-media@vger.kernel.org, linux-arch <linux-arch@vger.kernel.org>, 
+	kasan-dev <kasan-dev@googlegroups.com>, linux-mm <linux-mm@kvack.org>, bridge@lists.linux.dev, 
+	Network Development <netdev@vger.kernel.org>, LSM List <linux-security-module@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Mykola Lysenko <mykolal@fb.com>, bpf <bpf@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 11, 2024 at 11:55=E2=80=AFAM Petr Machata <petrm@nvidia.com> wr=
-ote:
+On Thu, Jan 11, 2024 at 11:40=E2=80=AFAM Nathan Chancellor <nathan@kernel.o=
+rg> wrote:
 >
+> Hi Yonghong,
 >
-> Jamal Hadi Salim <jhs@mojatatu.com> writes:
->
-> > On Thu, Jan 11, 2024 at 10:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu=
-.com> wrote:
-> >>
-> >> On Wed, Jan 10, 2024 at 7:10=E2=80=AFAM Ido Schimmel <idosch@idosch.or=
-g> wrote:
-> >> >
-> >> > On Thu, Jan 04, 2024 at 01:58:44PM +0100, Jiri Pirko wrote:
-> >> > > diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> >> > > index adf5de1ff773..253b26f2eddd 100644
-> >> > > --- a/net/sched/cls_api.c
-> >> > > +++ b/net/sched/cls_api.c
-> >> > > @@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **p_b=
-lock, struct Qdisc *q,
-> >> > >                     struct tcf_block_ext_info *ei,
-> >> > >                     struct netlink_ext_ack *extack)
-> >> > >  {
-> >> > > +     struct net_device *dev =3D qdisc_dev(q);
-> >> > >       struct net *net =3D qdisc_net(q);
-> >> > >       struct tcf_block *block =3D NULL;
-> >> > >       int err;
-> >> > > @@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block **p_=
-block, struct Qdisc *q,
-> >> > >       if (err)
-> >> > >               goto err_block_offload_bind;
-> >> > >
-> >> > > +     if (tcf_block_shared(block)) {
-> >> > > +             err =3D xa_insert(&block->ports, dev->ifindex, dev, =
-GFP_KERNEL);
-> >> > > +             if (err) {
-> >> > > +                     NL_SET_ERR_MSG(extack, "block dev insert fai=
-led");
-> >> > > +                     goto err_dev_insert;
-> >> > > +             }
-> >> > > +     }
-> >> >
-> >> > While this patch fixes the original issue, it creates another one:
-> >> >
-> >> > # ip link add name swp1 type dummy
-> >> > # tc qdisc replace dev swp1 root handle 10: prio bands 8 priomap 7 6=
- 5 4 3 2 1
-> >> > # tc qdisc add dev swp1 parent 10:8 handle 108: red limit 1000000 mi=
-n 200000 max 200001 probability 1.0 avpkt 8000 burst 38 qevent early_drop b=
-lock 10
-> >> > RED: set bandwidth to 10Mbit
-> >> > # tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 mi=
-n 500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent early_drop b=
-lock 10
-> >> > RED: set bandwidth to 10Mbit
-> >> > Error: block dev insert failed.
-> >> >
-> >>
-> >>
-> >> +cc Petr
-> >> We'll add a testcase on tdc - it doesnt seem we have any for qevents.
-> >> If you have others that are related let us know.
-> >> But how does this work? I see no mention of block on red code and i
->
-> Look for qe_early_drop and qe_mark in sch_red.c.
->
-
-I see it...
-
-> >> see no mention of block on the reproducer above.
+> On Wed, Jan 10, 2024 at 08:05:36PM -0800, Yonghong Song wrote:
 > >
-> > Context: Yes, i see it on red setup but i dont see any block being setu=
-p.
+> > On 1/9/24 2:16 PM, Nathan Chancellor wrote:
+> > > reviews.llvm.org was LLVM's Phabricator instances for code review. It
+> > > has been abandoned in favor of GitHub pull requests. While the majori=
+ty
+> > > of links in the kernel sources still work because of the work Fangrui
+> > > has done turning the dynamic Phabricator instance into a static archi=
+ve,
+> > > there are some issues with that work, so preemptively convert all the
+> > > links in the kernel sources to point to the commit on GitHub.
+> > >
+> > > Most of the commits have the corresponding differential review link i=
+n
+> > > the commit message itself so there should not be any loss of fidelity=
+ in
+> > > the relevant information.
+> > >
+> > > Additionally, fix a typo in the xdpwall.c print ("LLMV" -> "LLVM") wh=
+ile
+> > > in the area.
+> > >
+> > > Link: https://discourse.llvm.org/t/update-on-github-pull-requests/715=
+40/172
+> > > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> >
+> > Ack with one nit below.
+> >
+> > Acked-by: Yonghong Song <yonghong.song@linux.dev>
 >
-> qevents are binding locations for blocks, similar in principle to
-> clsact's ingress_block / egress_block. So the way to create a block is
-> the same: just mention the block number for the first time.
+> <snip>
 >
-> What qevents there are depends on the qdisc. They are supposed to
-> reflect events that are somehow interesting, from the point of view of
-> an skb within a qdisc. Thus RED has two qevents: early_drop for packets
-> that were chosen to be, well, dropped early, and mark for packets that
-> are ECN-marked. So when a packet is, say, early-dropped, the RED qdisc
-> passes it through the TC block bound at that qevent (if any).
+> > > @@ -304,6 +304,6 @@ from running test_progs will look like:
+> > >   .. code-block:: console
+> > > -  test_xdpwall:FAIL:Does LLVM have https://reviews.llvm.org/D109073?=
+ unexpected error: -4007
+> > > +  test_xdpwall:FAIL:Does LLVM have https://github.com/llvm/llvm-proj=
+ect/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5? unexpected error: -400=
+7
+> > > -__ https://reviews.llvm.org/D109073
+> > > +__ https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf4=
+1d121afa5d031b319d
+> >
+> > To be consistent with other links, could you add the missing last alnum=
+ '5' to the above link?
 >
+> Thanks a lot for catching this and providing an ack. Andrew, could you
+> squash this update into selftests-bpf-update-llvm-phabricator-links.patch=
+?
 
-Ok, the confusing part was the missing block command. I am assuming in
-addition to Ido's example one would need to create block 10 and then
-attach a filter to it?
-Something like:
-tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 min
-500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent
-early_drop block 10
-tc filter add block 10 ...
-
-So a packet tagged for early drop will end up being processed in some
-filter chain with some specified actions. So in the case of offload,
-does it mean early drops will be sent to the kernel and land at the
-specific chain? Also trying to understand (in retrospect, not armchair
-lawyering): why was a block necessary? feels like the goto chain
-action could have worked, no? i.e something like: qevent early_drop
-goto chain x.. Is the block perhaps tied to something in the h/w or is
-it just some clever metainfo that is used to jump to tc block when the
-exceptions happen?
-
-Important thing is we need tests so we can catch these regressions in
-the future.  If you can, point me to some (outside of the ones Ido
-posted) and we'll put them on tdc.
-
-> > Also: Is it only Red or other qdiscs could behave this way?
->
-> Currently only red supports any qevents at all, but in principle the
-> mechanism is reusable. With my mlxsw hat on, an obvious next candidate
-> would be tail_drop on FIFO qdisc.
-
-Sounds cool. I can see use even for s/w only dpath.
-
-cheers,
-jamal
+Please send a new patch.
+We'd like to take all bpf patches through the bpf tree to avoid conflicts.
 
