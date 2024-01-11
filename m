@@ -1,214 +1,258 @@
-Return-Path: <netdev+bounces-63165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B62782B7C9
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 00:01:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0C982B7F5
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 00:22:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E07E01F23C79
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 23:01:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D06BC1C24373
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 23:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E5B57314;
-	Thu, 11 Jan 2024 23:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67B158205;
+	Thu, 11 Jan 2024 23:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="byD78Rre"
+	dkim=pass (2048-bit key) header.d=pmachata.org header.i=@pmachata.org header.b="fgWTFVfr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E5D52F83
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 23:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705014065;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=4XBZCH2IB3cgGdzeMDyvYADDxkcNsfZ/GQKdDYFlm0Q=;
-	b=byD78RrenfvHjDvO21OEJn9QkNCRFC+SIKMh2F8GAy56qZouyfGW2yM5Q6rm7KipR9TNTU
-	7RG1Siq1/Wos+XMnCB4ueP2wskUjYP4CdDmX98fEeb36nJ1+6TNn5QCCpKXQXbjHMdJKtp
-	YxCfG2Y/Ag9Zdr8AS7pud5QyjuP4jTo=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-iJDXyuoSN1SuEMheoNamrA-1; Thu,
- 11 Jan 2024 18:01:02 -0500
-X-MC-Unique: iJDXyuoSN1SuEMheoNamrA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E51B5811F
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 23:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pmachata.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pmachata.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A3E7C2932498;
-	Thu, 11 Jan 2024 23:01:01 +0000 (UTC)
-Received: from fenrir.redhat.com (unknown [10.22.16.242])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 09D85492BF0;
-	Thu, 11 Jan 2024 23:01:00 +0000 (UTC)
-From: jmaloy@redhat.com
-To: netdev@vger.kernel.org,
-	davem@davemloft.net
-Cc: kuba@kernel.org,
-	passt-dev@passt.top,
-	jmaloy@redhat.com,
-	sbrivio@redhat.com,
-	lvivier@redhat.com,
-	dgibson@redhat.com
-Subject: [RFC net-next] tcp: add support for read with offset when using MSG_PEEK
-Date: Thu, 11 Jan 2024 18:00:56 -0500
-Message-ID: <20240111230057.305672-1-jmaloy@redhat.com>
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4TB10Z1092z9sk1;
+	Fri, 12 Jan 2024 00:22:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pmachata.org;
+	s=MBO0001; t=1705015342;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=292RVt104+OIsiME6wvx5i4mxWEfS8jlaDtxDDpNIlU=;
+	b=fgWTFVfrHuFkAMHNJd6dK9XHwy+xtq8CVgXEGFP3m2T7piXrL1/8o0+27I68u9qa/vZP8q
+	ncX5SQhdLhVgbajCC6MLM815Z8jagQ8rnvT8+qDH9/KIbe9q10YZEYESOwbHe7cHsRgmOZ
+	qoGFnvu2TxxCi8g0bV436Yy6u8C2fP4GlXePQsXw9xj6x71M2meI0m6wTJRIDThYQeW9DS
+	J6dPsUiX0vbcCWdT7P9ERE5s9pma104XKT4iEyqy7A1/Weot6YfAy16Vx5S4l7X0ntSFJA
+	cbTzN84NSZxAX1R06jXGjaeS1LUSCd1Jld2gSOBaUd874rNi09aVQlViEWrVww==
+References: <20240104125844.1522062-1-jiri@resnulli.us>
+ <ZZ6JE0odnu1lLPtu@shredder>
+ <CAM0EoM=AGxO0gdeHPi7ST0+-YVuT20ysPbrFkYVXLqGv39oR7Q@mail.gmail.com>
+ <CAM0EoMkpzsEWXMw27xgsfzwA2g4CNeDYQ9niTJAkgu3=Kgp81g@mail.gmail.com>
+ <878r4volo0.fsf@nvidia.com>
+ <CAM0EoMkFkJBGc5wsYec+1QZ_o6tEi6vm_KjAJV8SWB4EOPcppg@mail.gmail.com>
+From: Petr Machata <me@pmachata.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@idosch.org>, Jiri
+ Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+ xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com,
+ mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com
+Subject: Re: [patch net-next] net: sched: move block device tracking into
+ tcf_block_get/put_ext()
+Date: Thu, 11 Jan 2024 22:44:52 +0100
+In-reply-to: <CAM0EoMkFkJBGc5wsYec+1QZ_o6tEi6vm_KjAJV8SWB4EOPcppg@mail.gmail.com>
+Message-ID: <87zfxbmp5i.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Jon Maloy <jmaloy@redhat.com>
 
-When reading received messages from a socket with MSG_PEEK, we may want
-to read the contents with an offset, like we can do with pread/preadv()
-when reading files. Currently, it is not possible to do that.
+Jamal Hadi Salim <jhs@mojatatu.com> writes:
 
-In this commit, we allow the user to set iovec.iov_base in the first
-vector entry to NULL. This tells the socket to skip the first entry,
-hence letting the iov_len field of that entry indicate the offset value.
-This way, there is no need to add any new arguments or flags.
+> On Thu, Jan 11, 2024 at 11:55=E2=80=AFAM Petr Machata <petrm@nvidia.com> =
+wrote:
+>>
+>>
+>> Jamal Hadi Salim <jhs@mojatatu.com> writes:
+>>
+>> > On Thu, Jan 11, 2024 at 10:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojatat=
+u.com> wrote:
+>> >>
+>> >> On Wed, Jan 10, 2024 at 7:10=E2=80=AFAM Ido Schimmel <idosch@idosch.o=
+rg> wrote:
+>> >> >
+>> >> > On Thu, Jan 04, 2024 at 01:58:44PM +0100, Jiri Pirko wrote:
+>> >> > > diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+>> >> > > index adf5de1ff773..253b26f2eddd 100644
+>> >> > > --- a/net/sched/cls_api.c
+>> >> > > +++ b/net/sched/cls_api.c
+>> >> > > @@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **p_=
+block, struct Qdisc *q,
+>> >> > >                     struct tcf_block_ext_info *ei,
+>> >> > >                     struct netlink_ext_ack *extack)
+>> >> > >  {
+>> >> > > +     struct net_device *dev =3D qdisc_dev(q);
+>> >> > >       struct net *net =3D qdisc_net(q);
+>> >> > >       struct tcf_block *block =3D NULL;
+>> >> > >       int err;
+>> >> > > @@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block **p=
+_block, struct Qdisc *q,
+>> >> > >       if (err)
+>> >> > >               goto err_block_offload_bind;
+>> >> > >
+>> >> > > +     if (tcf_block_shared(block)) {
+>> >> > > +             err =3D xa_insert(&block->ports, dev->ifindex, dev,=
+ GFP_KERNEL);
+>> >> > > +             if (err) {
+>> >> > > +                     NL_SET_ERR_MSG(extack, "block dev insert fa=
+iled");
+>> >> > > +                     goto err_dev_insert;
+>> >> > > +             }
+>> >> > > +     }
+>> >> >
+>> >> > While this patch fixes the original issue, it creates another one:
+>> >> >
+>> >> > # ip link add name swp1 type dummy
+>> >> > # tc qdisc replace dev swp1 root handle 10: prio bands 8 priomap 7 =
+6 5 4 3 2 1
+>> >> > # tc qdisc add dev swp1 parent 10:8 handle 108: red limit 1000000 m=
+in 200000 max 200001 probability 1.0 avpkt 8000 burst 38 qevent early_drop =
+block 10
+>> >> > RED: set bandwidth to 10Mbit
+>> >> > # tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 m=
+in 500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent early_drop =
+block 10
+>> >> > RED: set bandwidth to 10Mbit
+>> >> > Error: block dev insert failed.
+>> >> >
+>> >>
+>> >>
+>> >> +cc Petr
+>> >> We'll add a testcase on tdc - it doesnt seem we have any for qevents.
+>> >> If you have others that are related let us know.
+>> >> But how does this work? I see no mention of block on red code and i
+>>
+>> Look for qe_early_drop and qe_mark in sch_red.c.
+>>
+>
+> I see it...
+>
+>> >> see no mention of block on the reproducer above.
+>> >
+>> > Context: Yes, i see it on red setup but i dont see any block being set=
+up.
+>>
+>> qevents are binding locations for blocks, similar in principle to
+>> clsact's ingress_block / egress_block. So the way to create a block is
+>> the same: just mention the block number for the first time.
+>>
+>> What qevents there are depends on the qdisc. They are supposed to
+>> reflect events that are somehow interesting, from the point of view of
+>> an skb within a qdisc. Thus RED has two qevents: early_drop for packets
+>> that were chosen to be, well, dropped early, and mark for packets that
+>> are ECN-marked. So when a packet is, say, early-dropped, the RED qdisc
+>> passes it through the TC block bound at that qevent (if any).
+>>
+>
+> Ok, the confusing part was the missing block command. I am assuming in
+> addition to Ido's example one would need to create block 10 and then
+> attach a filter to it?
+> Something like:
+> tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 min
+> 500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent
+> early_drop block 10
+> tc filter add block 10 ...
 
-In the iperf3 log examples shown below, we can observe a throughput
-improvement of ~15 % in the direction host->namespace when using the
-protocol splicer 'pasta' (https://passt.top).
-This is a consistent result.
+Yes, correct.
 
-pasta(1) and passt(1) implement user-mode networking for network
-namespaces (containers) and virtual machines by means of a translation
-layer between Layer-2 network interface and native Layer-4 sockets
-(TCP, UDP, ICMP/ICMPv6 echo).
+> So a packet tagged for early drop will end up being processed in some
+> filter chain with some specified actions. So in the case of offload,
+> does it mean early drops will be sent to the kernel and land at the
+> specific chain? Also trying to understand (in retrospect, not armchair
 
-Received, pending TCP data to the container/guest is kept in kernel
-buffers until acknowledged, so the tool routinely needs to fetch new
-data from socket, skipping data that was already sent.
+For offload, the idea is that the silicon is configured to do the things
+that the user configures at the qevent.
 
-At the moment this is implemented using a dummy buffer passed to
-recvmsg(). With this change, we don't need a dummy buffer and the
-related buffer copy (copy_to_user()) anymore.
+In the particular case of mlxsw, we only permit adding one chain with
+one filter, which has to be a matchall, and the action has to be either
+a mirred or trap, plus it needs to have hw_stats disabled. Because the
+HW is limited like that, it can't do much in that context.
 
-passt and pasta are supported in KubeVirt and libvirt/qemu.
+> lawyering): why was a block necessary? feels like the goto chain
+> action could have worked, no? i.e something like: qevent early_drop
+> goto chain x.. Is the block perhaps tied to something in the h/w or is
+> it just some clever metainfo that is used to jump to tc block when the
+> exceptions happen?
 
-jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
-MSG_PEEK with offset not supported by kernel.
+So yeah, blocks are super fancy compared to what the HW can actually do.
+The initial idea was to have a single action, but then what if the HW
+can do more than that? And qdiscs still exist as SW entitites obviously,
+why limit ourselves to a single action in SW? OK, so maybe we can make
+that one action a goto chain, where the real stuff is, but where would
+it look the chain up? On ingress? Egress? So say that we know where to
+look it up, but then also you'll end up with totally unhinged actions on
+an ingress / egress qdisc that are there just as jump targets of some
+qevent. Plus the set of actions permissible on ingress / egress can be
+arbitrarily different from the set of actions permissible on a qevent,
+which makes the validation in an offloading driver difficult. And chain
+reuse is really not a thing in Linux TC, so keeping a chain on its own
+seems wrong. Plus the goto chain is still unclear in that scenario.
 
-jmaloy@freyr:~/passt# iperf3 -s
------------------------------------------------------------
-Server listening on 5201 (test #1)
------------------------------------------------------------
-Accepted connection from 192.168.122.1, port 44822
-[  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 44832
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec  1.02 GBytes  8.78 Gbits/sec
-[  5]   1.00-2.00   sec  1.06 GBytes  9.08 Gbits/sec
-[  5]   2.00-3.00   sec  1.07 GBytes  9.15 Gbits/sec
-[  5]   3.00-4.00   sec  1.10 GBytes  9.46 Gbits/sec
-[  5]   4.00-5.00   sec  1.03 GBytes  8.85 Gbits/sec
-[  5]   5.00-6.00   sec  1.10 GBytes  9.44 Gbits/sec
-[  5]   6.00-7.00   sec  1.11 GBytes  9.56 Gbits/sec
-[  5]   7.00-8.00   sec  1.07 GBytes  9.20 Gbits/sec
-[  5]   8.00-9.00   sec   667 MBytes  5.59 Gbits/sec
-[  5]   9.00-10.00  sec  1.03 GBytes  8.83 Gbits/sec
-[  5]  10.00-10.04  sec  30.1 MBytes  6.36 Gbits/sec
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-10.04  sec  10.3 GBytes  8.78 Gbits/sec   receiver
------------------------------------------------------------
-Server listening on 5201 (test #2)
------------------------------------------------------------
-^Ciperf3: interrupt - the server has terminated
-jmaloy@freyr:~/passt#
-logout
-[ perf record: Woken up 23 times to write data ]
-[ perf record: Captured and wrote 5.696 MB perf.data (35580 samples) ]
-jmaloy@freyr:~/passt$
+Blocks have no such issues, they are self-contained. They are heavy
+compared to what we need, true. But that's not really an issue -- the
+driver can bounce invalid configuration just fine. And there's no risk
+of making another driver or SW datapath user unhappy because their set
+of constrants is something we didn't anticipate. Conceptually it's
+cleaner than if we had just one action / one rule / one chain, because
+you can point at e.g. ingress_block and say, this, it's the same as
+this, except instead of all ingress packets, only those that are
+early_dropped are passed through.
 
-jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
-MSG_PEEK with offset supported by kernel.
+BTW, newer Spectrum chips actually allow (some?) ACL matching to run in
+the qevent context, so we may end up relaxing the matchall requirement
+in the future and do a more complex offload of qevents.
 
-jmaloy@freyr:~/passt# iperf3 -s
------------------------------------------------------------
-Server listening on 5201 (test #1)
------------------------------------------------------------
-Accepted connection from 192.168.122.1, port 40854
-[  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 40862
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec  1.22 GBytes  10.5 Gbits/sec
-[  5]   1.00-2.00   sec  1.19 GBytes  10.2 Gbits/sec
-[  5]   2.00-3.00   sec  1.22 GBytes  10.5 Gbits/sec
-[  5]   3.00-4.00   sec  1.11 GBytes  9.56 Gbits/sec
-[  5]   4.00-5.00   sec  1.20 GBytes  10.3 Gbits/sec
-[  5]   5.00-6.00   sec  1.14 GBytes  9.80 Gbits/sec
-[  5]   6.00-7.00   sec  1.17 GBytes  10.0 Gbits/sec
-[  5]   7.00-8.00   sec  1.12 GBytes  9.61 Gbits/sec
-[  5]   8.00-9.00   sec  1.13 GBytes  9.74 Gbits/sec
-[  5]   9.00-10.00  sec  1.26 GBytes  10.8 Gbits/sec
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-10.04  sec  11.8 GBytes  10.1 Gbits/sec   receiver
------------------------------------------------------------
-Server listening on 5201 (test #2)
------------------------------------------------------------
-^Ciperf3: interrupt - the server has terminated
-logout
-[ perf record: Woken up 20 times to write data ]
-[ perf record: Captured and wrote 5.040 MB perf.data (33411 samples) ]
-jmaloy@freyr:~/passt$
+> Important thing is we need tests so we can catch these regressions in
+> the future.  If you can, point me to some (outside of the ones Ido
+> posted) and we'll put them on tdc.
 
-The perf record confirms this result. Below, we can observe that the
-CPU spends significantly less time in the function ____sys_recvmsg()
-when we have offset support.
+We just have the followin. Pretty sure that's where Ido's come from:
 
-Without offset support:
-----------------------
-jmaloy@freyr:~/passt$ perf report -q --symbol-filter=do_syscall_64 -p ____sys_recvmsg -x --stdio -i  perf.data | head -1
-    46.32%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____sys_recvmsg
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/tools/testing/selftests/drivers/net/mlxsw/sch_red_core.sh
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/tools/testing/selftests/drivers/net/mlxsw/sch_red_root.sh
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/tools/testing/selftests/drivers/net/mlxsw/sch_red_ets.sh
 
-With offset support:
-----------------------
-jmaloy@freyr:~/passt$ perf report -q --symbol-filter=do_syscall_64 -p ____sys_recvmsg -x --stdio -i  perf.data | head -1
-   27.24%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____sys_recvmsg
+Which is doing this (or s/early_drop/mark/ instead):
 
-Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-Signed-off-by: Jon Maloy <jmaloy@redhat.com>
----
- net/ipv4/tcp.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+    tc qdisc add dev $swp3 parent 1: handle 108: red \
+            limit 1000000 min $BACKLOG max $((BACKLOG + 1)) \
+            probability 1.0 avpkt 8000 burst 38 qevent early_drop block 10
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 1baa484d2190..82e1da3f0f98 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2351,6 +2351,20 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
- 	if (flags & MSG_PEEK) {
- 		peek_seq = tp->copied_seq;
- 		seq = &peek_seq;
-+		if (!msg->msg_iter.__iov[0].iov_base) {
-+			size_t peek_offset;
-+
-+			if (msg->msg_iter.nr_segs < 2) {
-+				err = -EINVAL;
-+				goto out;
-+			}
-+			peek_offset = msg->msg_iter.__iov[0].iov_len;
-+			msg->msg_iter.__iov = &msg->msg_iter.__iov[1];
-+			msg->msg_iter.nr_segs -= 1;
-+			msg->msg_iter.count -= peek_offset;
-+			len -= peek_offset;
-+			*seq += peek_offset;
-+		}
- 	}
- 
- 	target = sock_rcvlowat(sk, flags & MSG_WAITALL, len);
--- 
-2.42.0
+And then installing a rule like one of these:
 
+    tc filter add block 10 pref 1234 handle 102 matchall skip_sw \
+            action mirred egress mirror dev $swp2 hw_stats disabled
+    tc filter add block 10 pref 1234 handle 102 matchall skip_sw \
+            action trap hw_stats disabled
+    tc filter add block 10 pref 1234 handle 102 matchall skip_sw \
+            action trap_fwd hw_stats disabled
+
+Then in runs traffic and checks the right amount gets mirrored or trapped.
+
+>> > Also: Is it only Red or other qdiscs could behave this way?
+>>
+>> Currently only red supports any qevents at all, but in principle the
+>> mechanism is reusable. With my mlxsw hat on, an obvious next candidate
+>> would be tail_drop on FIFO qdisc.
+>
+> Sounds cool. I can see use even for s/w only dpath.
+
+FIFO is tricky to extend BTW. I wrote some patches way back before it
+got backburner'd, and the only payloads that are currently bounced are
+those that are <=3D3 bytes. Everything else is interpreted to mean
+something, extra garbage is ignored, etc. Fun fun.
 
