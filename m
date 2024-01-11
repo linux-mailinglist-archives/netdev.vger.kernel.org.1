@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-62984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83FBF82A8A7
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 09:02:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBCAD82A8AE
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 09:03:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 961F41C21C9B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 08:02:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF6421C23506
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 08:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5C0D2F3;
-	Thu, 11 Jan 2024 08:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72965D512;
+	Thu, 11 Jan 2024 08:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lz6luGRm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PzGEjSll"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C38DDA8
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 08:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FECEAE2
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 08:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40e60e135a7so1570435e9.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 00:02:41 -0800 (PST)
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cca8eb0509so59876821fa.3
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 00:03:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704960160; x=1705564960; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nOs8ElCNg87jQmX45kA4nx4fL2ObfWYIgH0hZlRiouc=;
-        b=Lz6luGRmDWTaXH+rUEoAhdcBOLUmkMwhVaQJHiuyUyvM0/zAM/qtR6C9AFBIP2bXci
-         5R7IW/+ca/AZzujbDTzxLHmlqroQ2iptI9THKpv0okpNrEmyDqt+sVcVNpJefVSu3VM9
-         a5C2da0F+fdY5CbUqExvxSQhGSbFQw7EEwPvvjRT76VhuVGz02Y5MrFihhxW0bUo+KCo
-         Dor7EnXPIKAWmWzJjEBj7fUImXpgT65KzuWBcTabv1kiqA4QBvI8NwLO3qRDA0GxxA2g
-         BTmZDFe2/yeIfIstA6F2QRJUcOyykPH23tnGL3l8rM1IOjEg/39fNG0LdTrkQOX4lbVl
-         dJ8g==
+        d=linaro.org; s=google; t=1704960193; x=1705564993; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=pcKGnulWg1x9xGacYURYT9ojLBDWsl47Nhd+rQGtKAo=;
+        b=PzGEjSllpU97fYZIpSQW9+i7l+0baWzcwY7eU8DlAy6h8s1zcuSA7PuNvOrf2jkscQ
+         S2MZULOLhnlD0hzeUditOvdJ0e2uoiUHNSl1jp/vILYkEVrMksyTbczfxNSnLEyTL7nc
+         VBNcdsa4EqF9fvPT3B8BGa6Ht8HJLBCu1jgwRsA7yE8PdGFYbtOkYVfk6oMPpkKo3bUi
+         Gxc0beY7bcd3sBvhq2mCF2hjaHMBy2l+yTFP4+sOCL1B7/jh2jEQvgKWcb6hCbHAH0CX
+         kYgs5h5qUKmShRdDr06ZngAm6pzw0KW2fpM/dwQHXp5qRdUOiZKjgvIXUWIaDDaRrtLY
+         Ar0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704960160; x=1705564960;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nOs8ElCNg87jQmX45kA4nx4fL2ObfWYIgH0hZlRiouc=;
-        b=HXuPfDOJT2cgWn3b2EaXAu6oTF+RycYlAQHiopzL65elEfVUQtysAjanEg3utoWDiL
-         qpORkRk1D6kgT6lHOBMkb/mMEPx8bShn5Bw+ixYiewMk0EcwIjwOVMtFoQAn6ugUpwLd
-         SZHY40mJE5e1BpehpRLgrj8DhDdZbd8q/fPqtXeQ06pi3f6YpZJZeSU6eCZ9xYnocLsX
-         leXBConpVqJLl8iGtENfbDwY5HtuTk83zXfuowj9AWHEDz9ch/hcfetP4a/Y/42bOceq
-         PAOeTwTCZRIA0TH6AKfPeMhfL5b++aL2z0jrOkxaz4ZAieB6D/jYU01ey6zoA9MXKwpK
-         m4Eg==
-X-Gm-Message-State: AOJu0YwqRBtCmY+HAsKZePKCLwMqTwFiv0vRx8yjgI7Q7iEh/YbpCtD3
-	W5iTUEEDxehX+B0wNFMhOWs9LUeAa8+UgA==
-X-Google-Smtp-Source: AGHT+IHXbnjKU8bSb5Ny89gL2tpyW8KRBTJY/gyvEDtTzcimfSUbytjVuIb1ESZm670MsDTiF6vbCQ==
-X-Received: by 2002:a05:600c:3eca:b0:40e:51bf:cd18 with SMTP id ek10-20020a05600c3eca00b0040e51bfcd18mr189309wmb.119.1704960160470;
-        Thu, 11 Jan 2024 00:02:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704960193; x=1705564993;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pcKGnulWg1x9xGacYURYT9ojLBDWsl47Nhd+rQGtKAo=;
+        b=MIRXi/H5ipoHipy/yqfEzqTXOcR2cclgjtdXZz5Zg8mcZPYi/9MRaM68BXBTHXEIER
+         yY3zVEBrBlpRiPKXOJVWVnbJuNXeoDEPIKe1iSqDUfPbE6xSG51FxkDe/z6moNDPqTRm
+         ljMyoep2FObH9ukKy7PkVLKfTKi9PMcsApKbe1bsaGQabL5Uuu8Shtb8q7KC//74H+vA
+         r65DX3W6rCe9qPcoqFQOvcI6qvkmYYXz5ULh+PxNVtSTVSsEjBzH2dQEGVjLGM6nqHta
+         4VnHkMVhnm6RsN7uxkt3wpixnT5hlrrNkvH2jBOMyQQNpM5L5VcB9KhMYLvIc7UplgYJ
+         EvXA==
+X-Gm-Message-State: AOJu0Yxkm2iT49ATFy8wylhcD76+kgMl9/e5CCvvHR0WANI8dNsyL4LT
+	ZXascOsbuzsd5HRCpDOLOx9hxvKCMP+Q9A==
+X-Google-Smtp-Source: AGHT+IEihIhJwQ+dHFEqxuvf7GI4SFNX+Ex6fA9F/yNRbmrRi4mHHjOHjMsU5Vuixh684HDMrtQbgg==
+X-Received: by 2002:a2e:3010:0:b0:2cc:df53:5321 with SMTP id w16-20020a2e3010000000b002ccdf535321mr141627ljw.3.1704960192689;
+        Thu, 11 Jan 2024 00:03:12 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.223.112])
-        by smtp.gmail.com with ESMTPSA id a8-20020a5d5088000000b003364a0e6983sm508176wrt.62.2024.01.11.00.02.37
+        by smtp.gmail.com with ESMTPSA id a8-20020a5d5088000000b003364a0e6983sm508176wrt.62.2024.01.11.00.03.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 00:02:39 -0800 (PST)
-Message-ID: <5e2b83c5-8b13-4d95-8346-1ad36a937129@linaro.org>
-Date: Thu, 11 Jan 2024 09:02:37 +0100
+        Thu, 11 Jan 2024 00:03:12 -0800 (PST)
+Message-ID: <7a25ce75-e4da-42b5-92ca-3e46b8e1ffba@linaro.org>
+Date: Thu, 11 Jan 2024 09:03:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,6 +69,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 0/1] Add StarFive JH8100 dwmac support
 Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 To: Tan Chun Hau <chunhau.tan@starfivetech.com>,
  "David S . Miller" <davem@davemloft.net>, Eric Dumazet
  <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -88,7 +90,7 @@ Cc: Ley Foon Tan <leyfoon.tan@starfivetech.com>,
  linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org
 References: <20240111025531.2875-1-chunhau.tan@starfivetech.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+ <5e2b83c5-8b13-4d95-8346-1ad36a937129@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
@@ -133,18 +135,21 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240111025531.2875-1-chunhau.tan@starfivetech.com>
+In-Reply-To: <5e2b83c5-8b13-4d95-8346-1ad36a937129@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/01/2024 03:55, Tan Chun Hau wrote:
-> Add StarFive JH8100 dwmac support.
-> JH8100 dwmac has one reset signal instead of 2 resets as in JH7110.
+On 11/01/2024 09:02, Krzysztof Kozlowski wrote:
+> On 11/01/2024 03:55, Tan Chun Hau wrote:
+>> Add StarFive JH8100 dwmac support.
+>> JH8100 dwmac has one reset signal instead of 2 resets as in JH7110.
+>>
+>> Changes in v2:
+>> - Drop driver patch.
 > 
-> Changes in v2:
-> - Drop driver patch.
+> ? But devices are not compatible, so how can it work?
 
-? But devices are not compatible, so how can it work?
+Wait, your select confused me... later you made them compatible.
 
 Best regards,
 Krzysztof
