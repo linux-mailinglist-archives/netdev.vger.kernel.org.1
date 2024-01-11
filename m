@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-63059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77FA382AFDC
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 14:41:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD1182AF90
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 14:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17911B22006
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:41:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 320EC1C20B0F
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C8B18047;
-	Thu, 11 Jan 2024 13:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E276017757;
+	Thu, 11 Jan 2024 13:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Mi/7EUkk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lplxwR3L"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF62B1802D;
-	Thu, 11 Jan 2024 13:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=il+w8FtfhJHoKZMk6/3PRsXBylrA/EgWONxoBacvEFk=; b=Mi/7EUkk+96Fu+e4grIj30OKjw
-	s9UyrmWftnrF5wN6Wzm7wk3Z+2ni4VbciRb89fFHNdz7XOhm6n6z8y4JbQdPiM695s0KR7w/ilFeA
-	XRWAAsLwqU88g7nnIBgdyaaEn9mfjf3/lxxelTjQKnISiOWvECOfxFpBj0eCdTv5gTDI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rNuvm-00506I-0z; Thu, 11 Jan 2024 14:17:10 +0100
-Date: Thu, 11 Jan 2024 14:17:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Gan, Yi Fang" <yi.fang.gan@intel.com>
-Cc: Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6981774C;
+	Thu, 11 Jan 2024 13:19:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E03DAC433C7;
+	Thu, 11 Jan 2024 13:19:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704979197;
+	bh=Py9GZW6bz3Ftsp/kWmIWKLoUxUT/lIEhBD9mMIzmipM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lplxwR3L2EEdttM8HHLNSmBUrM7UmVYJ8JMB3tYBFb2pbmHM+jW/hnjg8kB0Uimnq
+	 z4k2rT+zgutaqfuShuj66anIZ74QRnXXjuvSE1kIXvTojHtgHgZjIqFJNFNN2ObjUH
+	 xG0uQ5jME6E9bZVTZHxP/qbyRh+mZhHm+7Yg1Dizpfd9hWpzu53d26RDNk5RA1z5CD
+	 kOzA4xNomfp6jMctsw8PVNWKlbVjl2LUP4P1nt8ypgHtsktI7/lHq0D1zKjvn+R0WL
+	 YeqK+ANinUKtrg9Px7dl9QTuIfDrCFuQ3XRa2Q9gmO1vmEGwgJyqqvRdT/2dA1jcm4
+	 gjdkPqmdct2bQ==
+Date: Thu, 11 Jan 2024 13:19:50 +0000
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Edward Adam Davis <eadavis@qq.com>,
+	Pengfei Xu <pengfei.xu@intel.com>,
+	Markus Suvanto <markus.suvanto@gmail.com>,
+	Jeffrey E Altman <jaltman@auristor.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Looi, Hong Aun" <hong.aun.looi@intel.com>,
-	"Voon, Weifeng" <weifeng.voon@intel.com>,
-	"Song, Yoong Siang" <yoong.siang.song@intel.com>,
-	"Choong, Yong Liang" <yong.liang.choong@intel.com>
-Subject: Re: [PATCH net v3 1/1] net: phylink: Add module_exit()
-Message-ID: <3e87a5f7-e637-401c-8fe1-9b0c5e6d8289@lunn.ch>
-References: <20240104101255.3056090-1-yi.fang.gan@intel.com>
- <fb1cc3a4-8615-4cee-8fe7-29966c4cb7c7@lunn.ch>
- <MW6PR11MB8310698247DD950C5EBF5F2CB9682@MW6PR11MB8310.namprd11.prod.outlook.com>
+	linux-afs@lists.infradead.org, keyrings@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] keys, dns: Fix size check of V1 server-list header
+Message-ID: <20240111131950.GB45291@kernel.org>
+References: <1850031.1704921100@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,36 +62,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MW6PR11MB8310698247DD950C5EBF5F2CB9682@MW6PR11MB8310.namprd11.prod.outlook.com>
+In-Reply-To: <1850031.1704921100@warthog.procyon.org.uk>
 
-> Hi Andrew,
+On Wed, Jan 10, 2024 at 09:11:40PM +0000, David Howells wrote:
+>     
+> Fix the size check added to dns_resolver_preparse() for the V1 server-list
+> header so that it doesn't give EINVAL if the size supplied is the same as
+> the size of the header struct (which should be valid).
 > 
-> Regarding the justification on why it is safe to remove phylink, 
-> we had done some memory leak check when unloading the phylink module.
->  
-> root@localhost:~# lsmod | grep "phylink"
-> phylink               73728  0
-> root@localhost:~# rmmod phylink
-> root@localhost:~# echo scan > /sys/kernel/debug/kmemleak
-> root@localhost:~# cat /sys/kernel/debug/kmemleak
-> root@localhost:~#
->  
-> So far, we didn't observe any memory leaking happened when unloading
-> phylink module. Is it sufficient or do you have any other suggestions to check 
-> on whether the module is safe to remove?
+> This can be tested with:
+> 
+>         echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
+> 
+> which will give "add_key: Invalid argument" without this fix.
+> 
+> Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-list header")
+> Reported-by: Pengfei Xu <pengfei.xu@intel.com>
+> Link: https://lore.kernel.org/r/ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-In general, leaked memory is safe. Being leaked, nothing is using
-it. If nothing is using it, how can it cause an opps, corrupt a file
-system, etc.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-What you need to do is review all users of phylink, and determine if
-any of them retains a pointer to anything which phylink manages and
-will not be freed or uninitialized when it is unloaded. Is all polling
-of GPIOs cleanly stopped? Are interrupt handlers disabled and
-removed. Are PCS and MAC drivers cleanly unloaded first? Are hwmon
-entries cleanly removed, taking into account that user space might
-have them open? All ethtool ioctl/netlink calls are out of the code
-before it is removed, etc.
-
-     Andrew
 
