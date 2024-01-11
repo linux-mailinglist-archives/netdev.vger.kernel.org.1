@@ -1,275 +1,127 @@
-Return-Path: <netdev+bounces-63030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7898A82ADA9
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:37:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE8B982ADB1
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:39:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D728283B67
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:37:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59CD71F2342D
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF10B8F62;
-	Thu, 11 Jan 2024 11:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63EA814007;
+	Thu, 11 Jan 2024 11:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b="YuM4JmWf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g8rq6gQH"
 X-Original-To: netdev@vger.kernel.org
-Received: from refb02.tmes.trendmicro.eu (refb02.tmes.trendmicro.eu [18.185.115.60])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CB3156C4
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensynergy.com
-Received: from 104.47.11.168_.trendmicro.com (unknown [172.21.10.134])
-	by refb02.tmes.trendmicro.eu (Postfix) with ESMTPS id 7C2E3101CE76F;
-	Thu, 11 Jan 2024 11:35:08 +0000 (UTC)
-Received: from 104.47.11.168_.trendmicro.com (unknown [172.21.165.80])
-	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id 1BEF810001FC1;
-	Thu, 11 Jan 2024 11:35:01 +0000 (UTC)
-X-TM-MAIL-RECEIVED-TIME: 1704972900.518000
-X-TM-MAIL-UUID: e2589c17-a7a0-496b-8fe4-d2ccfd8d5875
-Received: from DEU01-FR2-obe.outbound.protection.outlook.com (unknown [104.47.11.168])
-	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id 7E9CA10000E54;
-	Thu, 11 Jan 2024 11:35:00 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i5/8ByuaM4RRmY+mLSSVBD9raS9j/cE2Ei7TrDwvnmYGbwhReshKD0Op0URwH9W0pKDz3SUqV5GNj2k1gwhzQiX3qty65KxRkWn0JMAAYNFl8Evj5BpXWwA23HV2uyN2/967YVCsptgsTemPOOBCVmHONWtSeefM3yK8/liUNP0c+g4jGAw2fHIH8f9IW+NJgS0+tRi3xoVffhqSTItqiWzJ0+GW8953d5au1zZWtzlZ/C3du33MzFTQHImHr26bbMp1i+/Ek2mCEU8nOnQwaeQoEAe5lP3pMj3eNSmPrRI2IbjGBE62NREpbVwWA4CIMqL2TCfBSVLFQ/FAgVBZXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fJfbe+QLg7WEQ5j2KCoXWBewKp+g+yPqTxXDxqwPDDQ=;
- b=Gj/b1kcgugq/hvAJnMadGzVXh5h6IAbmcu1BJuKkY+B/m+uk1Enh6mQLMPtrud/0OT7SxzDTAj6etvRpn6rg7KE6DMePu9mD2COXuExXOsK0QdLGW5c6JEzd/LRyn2gGY52QL68o+rtFUQaP9sK9TmbsBNp4KIY7OluT6R1LRZ8igZrZrUR3P3zte6bF0q+FzuX1HH6xglOxgSb4aSH5Yyrmz9mNX5XuteL/Y5vl/wza3FjS1cknl1ovfWAyRnW2v+LnILfX+eK4OD0KK94wJ0BJXD53gq15KEgg/j19pkGXYjTU13u23WbW1wOBvw+L2sDAvp4VjH51TKzsso8cxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=opensynergy.com; dmarc=pass action=none
- header.from=opensynergy.com; dkim=pass header.d=opensynergy.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=opensynergy.com;
-Message-ID: <03b8e9d3-ef57-4883-b02c-94b003398b61@opensynergy.com>
-Date: Thu, 11 Jan 2024 12:34:57 +0100
-From: Peter Hilber <peter.hilber@opensynergy.com>
-Subject: Re: [RFC PATCH v2 2/7] x86/tsc: Add clocksource ID, set
- system_counterval_t.cs_id
-To: Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
- "D, Lakshmi Sowjanya" <lakshmi.sowjanya.d@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, jstultz@google.com,
- giometti@enneenne.com, corbet@lwn.net, andriy.shevchenko@linux.intel.com,
- "Dong, Eddie" <eddie.dong@intel.com>,
- "Hall, Christopher S" <christopher.s.hall@intel.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Wanpeng Li <wanpengli@tencent.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Richard Cochran <richardcochran@gmail.com>, kvm@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20231215220612.173603-1-peter.hilber@opensynergy.com>
- <20231215220612.173603-3-peter.hilber@opensynergy.com>
- <20231224162709.GA230301@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=peter.hilber@opensynergy.com; keydata=
- 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
-In-Reply-To: <20231224162709.GA230301@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0097.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a1::15) To BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:77::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E1D15488
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 11:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704973181;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=kMKCIpE0wiCp7+YtFSxYYd2cnjckEjaYhS/9FJcVna4=;
+	b=g8rq6gQH5lmg/PRTNJpZzYpc3awNotHeXCOVum1h3mS0ck1U9Jom+eTnQsaEmyEGFVDi4n
+	Db5CSmcMlw6b+TpcawI29BWDX4f24mI3royMxr0sy/74C7Aoq5FrVhIgHd9JB0d99R8VjG
+	2IH+a/nQhSv9EYj5OwHbvRBtPdmGFBE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-191-2SDLfF6VOOWLqssDVNV7ww-1; Thu, 11 Jan 2024 06:39:40 -0500
+X-MC-Unique: 2SDLfF6VOOWLqssDVNV7ww-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40e43ed5940so7534745e9.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 03:39:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704973179; x=1705577979;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kMKCIpE0wiCp7+YtFSxYYd2cnjckEjaYhS/9FJcVna4=;
+        b=Qb5w1kRaan+sZAFGLwRoS56Q+jsrIiPUK/FSpagtln5dwfPMLv5N+jJUJWp5LKyLIZ
+         2k1Izhql5MhegkwzHgRmrsHeL8SUITEUneqh1eCeKFv9gisz7tBH/vSHE91XG/rdc/DM
+         D5U6oddFnA76xt3im/cGgieX2dfzNGB7UOYsDS2jzAESAD+2EvZQzaFpQd6e3/B06vPY
+         0OC81V7wCL4jwNuY+Df5YD/kEe5OIAx+YbRUvTdXJDIdd2dqUqlzwCkYHCTKGLb4RFGy
+         FFfSt/KY2kmK8qVpu1ja4LOCDWu0mULCl55/medj3FTY4GF8jFWMlOqRiBxYj4y/v8bT
+         u5aA==
+X-Gm-Message-State: AOJu0Ywln9Gc5VF/uozCXU1vtTPzLeMac5xCn50hwWkLr+aJ1wEavt5Y
+	LDnFJxgIpv4FW2AjIYcnQQ6R06cyKL48RWcV4Zh1K1j0pL+taY9C7kFwcI+6Gl49+dz5w55ICI7
+	vNwzmLMC6i28hig3Gy/kDqU40
+X-Received: by 2002:a5d:530b:0:b0:336:8103:6ce9 with SMTP id e11-20020a5d530b000000b0033681036ce9mr766165wrv.7.1704973179325;
+        Thu, 11 Jan 2024 03:39:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG5kz32VLP3PNrE5R/FOU6wBZGTNLs9edmqQTpdY/fMBI7v/AmV9aNhXzXVGWCtGYTSGySNgA==
+X-Received: by 2002:a5d:530b:0:b0:336:8103:6ce9 with SMTP id e11-20020a5d530b000000b0033681036ce9mr766146wrv.7.1704973178979;
+        Thu, 11 Jan 2024 03:39:38 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-244-191.dyn.eolo.it. [146.241.244.191])
+        by smtp.gmail.com with ESMTPSA id a14-20020a056000100e00b003371e7113d4sm1014793wrx.24.2024.01.11.03.39.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jan 2024 03:39:38 -0800 (PST)
+Message-ID: <ca2de714f0a5ae5eb70e7b471fad9daad1a56da0.camel@redhat.com>
+Subject: Re: [PATCH net 6/7] MAINTAINERS: mark ax25 as Orphan
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Johnson <micromashor@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, Ralf
+	Baechle <ralf@linux-mips.org>, linux-hams@vger.kernel.org
+Date: Thu, 11 Jan 2024 12:39:37 +0100
+In-Reply-To: <95dc4923-9796-4007-b132-599555ed9eab@gmail.com>
+References: <20240109164517.3063131-1-kuba@kernel.org>
+	 <20240109164517.3063131-7-kuba@kernel.org>
+	 <20240110152200.GE9296@kernel.org>
+	 <95dc4923-9796-4007-b132-599555ed9eab@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BEZP281MB3267:EE_|FR3P281MB2252:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41aff268-be22-44c7-e2c2-08dc129957e5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	tbQAPoC7DcA0i+OcZcXP0dT/fHg1xtAxduQ26y8Bdf9HLyUlC3MY7dDQFMLALyo5erMgn2GR2t5WLB47RwwzbMGlnZwufdNsF7eJUqBWPuWqRPtJkVKa2aWVS3DEz/dgxlSf/u7pO3vGwbFJTydMLZOh5DIOjaXUonOil40JW8JpkvixDewp0CZ7VHVJzsHmwQB9amqNrr9R321pG4CXVZA8f9P1OLQL9y3P30biBPiR+HsS/dy4K41OU+5JcxvLAuTRNwG2/nGHEmlk+/oTdSeTybfZ3uJfG9FfVkd1DqbqT0rtiWsrky4HUd9icFR47ZAy8Hg7hIQ/6Tbz8NWSVlK//sfir7PFUskiqzRxbbwnN6kVQEm9+bGSC0ioyO5i1oAEYWt3AJn5TwcsQfkhBWw0SXcGco+d/Z7Ox/ayYRoBCyRwyEPicLDn+iUtTcqGUR92D3Gnd2mTrXI3fqCWBmfVcGBVfL6tvYCVWgrB7PSxpjwFyW72BshnqvWLwqT2rif4zavJihU9X5GHnTMithMCKR9qNlOg1U8i30UVHJNnitQE8wWEVH5FP4CpcGJDG6zOBJTQDulhoQCMnyrG+QFc/Sd+YNdze3RBLyWEbPA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(39840400004)(396003)(366004)(346002)(376002)(136003)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(316002)(8676002)(8936002)(2906002)(7416002)(5660300002)(38100700002)(44832011)(4326008)(31686004)(83380400001)(2616005)(478600001)(26005)(53546011)(66476007)(41300700001)(66946007)(66556008)(6916009)(86362001)(31696002)(42186006)(54906003)(36756003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WVhXbnhreHlkTHFwRXQ2Y2pOR3pZTTc0SlBSMkdjTVRha2lIeFk1MDZHTlZw?=
- =?utf-8?B?eEpIZ2dyMDBCVXNoajBBTldRWUpMYzJiaHJYeDU1NlBZaGJ2WjhFc2ZSMFF6?=
- =?utf-8?B?czdqeVJvc3J5ekQvd1FBOEx0TVJsUHpsVU0zRE5kUml2Z2JNVEZPTmFmOXFn?=
- =?utf-8?B?RzZxMjZ6bWZ5UXVCa0p2d082cXZLYVk0djVsQ1M4UTJBcUphbHFKM1hFcFNJ?=
- =?utf-8?B?TEluU2VkWXVYdCtieGQxUnVaZ3VYaWN4ek5nMWhkUVVFYk9QSXljOGFnM3Ew?=
- =?utf-8?B?dGJuUERxMEhYaWtmMy9zeXlsVGppTGhlVy9oUGhYTDI3NFcvMXk5TWlSSmVx?=
- =?utf-8?B?TXUyaldJMjhaTmdWbXRCQ0FwRWt1MkRLM2ZadDRYc2V0S25CTmZxSmtlRmZ1?=
- =?utf-8?B?cEh6WFE2bEJ3bGhBQUZSaThlcDhMcHZlRCsxd3Y1ZUVYRkYwRVZ5NlB4MldL?=
- =?utf-8?B?SnF4ckNWTnpzbWxDZUk5Tm42eURFK1pkaG9UNi9CaW9ubUZMZEhrY2lKL2Fm?=
- =?utf-8?B?WG1QKzhEUFRNT2lRampiaE1ScmtYZVpWOFFVaCtoUElhTHgwbDlTejF0eHpS?=
- =?utf-8?B?ek9xa01EQTRmZ0NLWG5ad0xLNlp2ZGZkOUgyakJDemdJZDcwZk9LYVAzczdo?=
- =?utf-8?B?Q29Dd1Y4UkVjK2tzR1dHK25zZThJVnZpTVZ3bzBqT0UxRGhoZUdnSkM5K1dz?=
- =?utf-8?B?dWYwaUl4b0JjaW80ZjdBaS9VeDdkYWlLT2RzQ2NrdDgzaHRWKzVEOHRIdUZx?=
- =?utf-8?B?dzhaNnhHR3Q3eUtvZlVjb3lyMXhyWEttMGk5SDZpaVQ0RDEyYUtQbG1OWWwx?=
- =?utf-8?B?K0hpYWpEdEpxM3FVM1BURG9FQTVQN3lNZ25ybnRkSnVLaUtHQzRnOFFNeFVU?=
- =?utf-8?B?dk03VDNnSWU2NGtCUDAraWNkSWNDcmdLQ3FxSUpLVmtnM2RVT3crWWF6a2Y5?=
- =?utf-8?B?bVhaNzFtR1Y4eTd6d0prY3p6YWhDZDUvVEdGL280a3BwL0JnRUk2aUlDZ3lZ?=
- =?utf-8?B?aVY0cWR4SUsxeFZUV2s4aXhsb2E2aTZNQ2YzYkphbGQzVUtxVkNIenFHeU1F?=
- =?utf-8?B?Z2VJUHZKeDFlN1lrNUliVWlHYjZzQ09NN2RlWkJNYmN5NTBCbm5zaEpXdkZa?=
- =?utf-8?B?VTNueFd3OU5ZREpaOTdDY3pvNmxvUitJR3pRdWRLVEwrYmFLN3pIQTJ0Z3RZ?=
- =?utf-8?B?ZjRZd0pxU0NrNzlSNXBoNUJsdkM4V2hEUkRSaUVONGpYZDNKb3pjMjh6K3dh?=
- =?utf-8?B?WERZQm5RL09rZStrRXZxdk01WUtETkhmUUNhUVl4UHhCSEswcDZ0eXBVVmlw?=
- =?utf-8?B?N3VaSEpUQ2V4ZkFDSisxeHBZc0xsblRpb0g0N2k2eUNKMmdSckxMcmUvczB1?=
- =?utf-8?B?ZHZQTU15SmhpVkoxMUk5MXVDUWxqaXdRRlVRL2ljeCt2ajNEbVNGWkNDanUw?=
- =?utf-8?B?UnBnUWkrWVNrSUtKZFpXQnJnR0xoL3hndXI5dkVuYWM0bnZhL0Y5T0VscjV2?=
- =?utf-8?B?YVBLNWVROHRJWFRoRkZ1dkdQaytxbVc0VHJmS01Lb3pTVS9PSithRmJDWXFo?=
- =?utf-8?B?am9qUHNiMGV0RXVBMW1kWmdRdXBXdGxZWDk5eGtaRm1KaDRHYUE1YWpGSmFX?=
- =?utf-8?B?VmYvWXZWZnhCbGtvemlySlJ3aXlGaFg3MkxOUmhhYnEzOTg4ODNUd2JuNklv?=
- =?utf-8?B?ZXQ3UndqZ0p0SjJacTNQdHBlaTNmMkJqNlZqcUpNYk41Y0M2YVQ1WTdkeU8r?=
- =?utf-8?B?YUs1NDl1SUVTWWVZUDV4MmtVQXRIMnNCVW9JOWZaYXdsZW40YXdQOUpIaVlV?=
- =?utf-8?B?cHVUTzRhdlQwalJnaEgzUkVPczRsd054VXFoVitZYzhMV2Z4T0swbUtwNGpj?=
- =?utf-8?B?aEdSaDJyK3dFclorMGlRc0djNnNibm9WeFlYV01QdElpSi8wbUcwRE96TlVl?=
- =?utf-8?B?cUdxTWVaQU1nWjB0eFFWRGhKL2ZwRDllYmh5TjBJNU9rYmF4c3NKcm1LekVF?=
- =?utf-8?B?WGRlMlVQTXJLY3gyWW1Qa3BFY3NPZzg1eC9WdTZvOXl5S3NsYmRSSk5tMmM5?=
- =?utf-8?B?VjI5ckpZQm9wTXBzejdjbEN2eWZEZjhFN3MxQ0lpdytsL2dFZUZBVjRrbTJk?=
- =?utf-8?Q?TEfpXkLBFSsARanSl0neifrRW?=
-X-OriginatorOrg: opensynergy.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41aff268-be22-44c7-e2c2-08dc129957e5
-X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2024 11:34:59.5041
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6QR0eqdOmKY/+zLv6f/NO1WBQBHbPRuz/GEtIlfAVFKOmdMH2TMKsCI/1O9dQVSSozTTYG9uatRZ5OvPPITaOg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR3P281MB2252
-X-TM-AS-ERS: 104.47.11.168-0.0.0.0
-X-TMASE-Version: StarCloud-1.3-9.1.1015-28112.006
-X-TMASE-Result: 10--19.927500-4.000000
-X-TMASE-MatchedRID: hls5oAVArl/5ETspAEX/ngw4DIWv1jSVbU+XbFYs1xK9i+/f9tLGG9T8
-	nzhI7jct08q4PMUbAPinyNbHJWoNRSbbwRdGbc5Ehi2C7dlNKWoSRRLwSueD2gHzrV7k27Q/P1b
-	i6L5FWkPf3jJm6h2Ae5uIb9c3VdbGmisT+ybs5MYI1pqhes/vCcEYnQj44hfD86dFkmAkYZ+ECn
-	xZMJxvURqoqV74MuLyPkO5+0gZtdsM177w97hxZmwEEr52PwDFm5eMQpabFXYhkL0gCMh6Ds+c7
-	BOZ9lQf31w1NnIhFDLCoxkUJ0PNYWiJ+5GHGsyDJPlTeUnhPwqs0m4CN4NCDVo7GmCOJYd1AqYB
-	E3k9Mpw=
-X-TMASE-XGENCLOUD: 49bc9f4c-0eb1-4a58-b079-7d4ed6cb64c6-0-0-200-0
-X-TM-Deliver-Signature: 74113D733E3B975245E7D4B75044E1C8
-X-TM-Addin-Auth: Xk7WKXqnBn1/Y+8jl1AOGBP9KgPVZrLdC2d9+GIrP6Fgoe6DkztInLjsm0g
-	ISfth25SzfbRedBKRZj3phNL6nlW/XtyUu275rfqGyjQ6uH2mM8ff7YFyvReOj/a8V4Coqs0Czc
-	oNmTWUWZhiScrdx0N+PTzn51KfCL9/4i7jW++qMWtSFS0KEeFqY2O7mgJZksRB37nQjyJc6oStT
-	e6WohBq3VyB9pHkhvKAPmBWegcPu0glqa+RKEVRriGiLZX1BGhy+0OMH9kl+xg0+hIF+symmHDi
-	O71V7F5V4bxNaX8=.F2DcIaIW9hEWHO8iAPI4p1W0L5uXtVGLXjRiwSXj9gnImF57fPGAhm9ROy
-	rTMroWsnLKamR7AuVgSYdx/PpiLb9EsCmGThumEnO36zaVj0gzDdngrfNQg08v3AEC91J8qK7BX
-	hIMdxb3ydF5fHlmn/PmNCGYrjxAXodWajQZyUB9k5bnft6x+aIDCgIA/QGxtRgp2D/OFerkVjLg
-	eyMFuIiaNcplTG6C1j2/u66/7MsVZKptGACGQUywsGgWXSISFI+se56tF+RgwWq4nF7O2Fnie3/
-	ANgeOPd9jITBgnvLoynEC5u9rKKYEgAQuewY9jOKbCNOTzpEi2TQ3pjQQig==
-X-TM-Addin-ProductCode: EMS
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
-	s=TM-DKIM-20210503141657; t=1704972900;
-	bh=eW+fpyWlizLYaNIzPsjX8SDD0TLigdxu7I2fvM0OzlI=; l=2533;
-	h=Date:From:To;
-	b=YuM4JmWfmZUSW/R0Mpa2WnlCRSC/ZbHvM4hPbLd0hdmBhzbuuMstL2lYn98Ylvx5b
-	 qrb/agEkjwSOL/c3So01eIyiNx7prAKxvubS8uoHRupMDlslYKFVGikPXlShasTmjk
-	 9xVCmJn9dw0Kd2aa7CGpf7c7yutJYwBPJYv+5pTZ8uzYEPHg0ddbZfudp4fqmYMSAX
-	 CRUXlbLecSHBPuvfa9fwZeylO7hwpCZiSpP0t4A2ynSgzru8m0tQ6vvsWaY9wUnLrM
-	 lg+4yyNnklvfHFLLQ6rfkIRFrbB0aag0NpNN++Rl45cI5Rj26rlDjanXldekc+FdtQ
-	 U2DKEWhYtlIaQ==
 
-On 24.12.23 17:27, Simon Horman wrote:
-> On Fri, Dec 15, 2023 at 11:06:07PM +0100, Peter Hilber wrote:
->> Add a clocksource ID for TSC and a distinct one for the early TSC.
->>
->> Use distinct IDs for TSC and early TSC, since those also have distinct
->> clocksource structs. This should help to keep existing semantics when
->> comparing clocksources.
->>
->> Also, set the recently added struct system_counterval_t member cs_id to the
->> TSC ID in the cases where the clocksource member is being set to the TSC
->> clocksource. In the future, this will keep get_device_system_crosststamp()
->> working, when it will compare the clocksource id in struct
->> system_counterval_t, rather than the clocksource.
->>
->> For the x86 ART related code, system_counterval_t.cs == NULL corresponds to
->> system_counterval_t.cs_id == CSID_GENERIC (0).
->>
->> Signed-off-by: Peter Hilber <peter.hilber@opensynergy.com>
-> 
-> Hi Peter,
-> 
-> some minor feedback from my side that you may consider for
-> a future revision.
-> 
->> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-> 
-> ...
-> 
->> @@ -1327,12 +1334,15 @@ EXPORT_SYMBOL(convert_art_to_tsc);
->>   * that this flag is set before conversion to TSC is attempted.
->>   *
->>   * Return:
->> - * struct system_counterval_t - system counter value with the pointer to the
->> + * struct system_counterval_t - system counter value with the ID of the
->>   *	corresponding clocksource
->>   *	@cycles:	System counter value
->>   *	@cs:		Clocksource corresponding to system counter value. Used
->>   *			by timekeeping code to verify comparability of two cycle
->>   *			values.
->> + *	@cs_id:		Clocksource ID corresponding to system counter value.
->> + *			Used by timekeeping code to verify comparability of two
->> + *			cycle values.
-> 
-> None of the documented parameters to convert_art_ns_to_tsc() above
-> correspond to the parameters of convert_art_ns_to_tsc() below.
-> 
-> I would suggest a separate patch to address this.
-> And dropping this hunk from this patch.
-> 
+On Wed, 2024-01-10 at 21:11 -0600, Eric Johnson wrote:
+> On Wed 10 Jan 2024 09:22 -0600, Simon Horman wrote:
+> > On Tue, Jan 09, 2024 at 08:45:16AM -0800, Jakub Kicinski wrote:
+> > > We haven't heard from Ralf for two years, according to lore.
+> > > We get a constant stream of "fixes" to ax25 from people using
+> > > code analysis tools. Nobody is reviewing those, let's reflect
+> > > this reality in MAINTAINERS.
+> > >=20
+> > > Subsystem AX.25 NETWORK LAYER
+> > >   Changes 9 / 59 (15%)
+> > >   (No activity)
+> > >   Top reviewers:
+> > >     [2]: mkl@pengutronix.de
+> > >     [2]: edumazet@google.com
+> > >     [2]: stefan@datenfreihafen.org
+> > >   INACTIVE MAINTAINER Ralf Baechle <ralf@linux-mips.org>
+> > >=20
+> > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > Reviewed-by: Simon Horman <horms@kernel.org>
+> >=20
+> I didn't realize this wasn't actively being maintained, but I am
+> familiar with the code in the AX.25 layer. I use it pretty frequently,
+> so I would happily look after this if nobody else is interested.
 
-In the quoted documentation, @cycles, @cs and @cs_id document members of
-the return type struct system_counterval_t (not parameters). I will just
-drop the members documentation, since they are documented at the struct
-definition site anyway.
+Unfortunately both lore and the git log show no trace of your activity.
 
-> The same patch that corrects the kernel doc for convert_art_ns_to_tsc()
-> could also correct the kernel doc for tsc_refine_calibration_work()
-> by documenting it's work parameter.
-> 
+Before stepping-in as a maintainer, you should start providing reviews
+on the ML and looking after the not so infrequent syzkaller report.
 
-OK.
+Thanks,
 
-Thanks for the comments,
+Paolo
 
-Peter
 
