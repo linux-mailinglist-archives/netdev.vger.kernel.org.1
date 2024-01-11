@@ -1,73 +1,85 @@
-Return-Path: <netdev+bounces-63117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3BE382B40F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:28:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6BC82B417
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83F6E1C24223
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:28:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03F09B23C0E
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B000E51C5F;
-	Thu, 11 Jan 2024 17:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39DE51C4C;
+	Thu, 11 Jan 2024 17:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="JRGixTjk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QNxrVUKz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7270251C52;
-	Thu, 11 Jan 2024 17:28:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92B1AC433C7;
-	Thu, 11 Jan 2024 17:28:32 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="JRGixTjk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1704994110;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VQU+/B75My8JCV9QOfAoQaVoiZZKMfAX5WlSXQ7LsZ8=;
-	b=JRGixTjkJkyB+Uod9GaN7lLh08tBREHRQxoQZ7jj0Nbgau90+b3coSzYv9vG7TbWLxoScs
-	T7qUKY8z2bd5EF8gAw37yDEzxi8dxMibEfBH1ucidj0WndEwTeHR5zQa10wXvjYT+bOOqz
-	xE+wnZ8NnWt5rjp5I/1MNgkKTSnXTIA=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ec4b128a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 11 Jan 2024 17:28:30 +0000 (UTC)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5f75aee31d2so51263487b3.2;
-        Thu, 11 Jan 2024 09:28:29 -0800 (PST)
-X-Gm-Message-State: AOJu0Yzw2F+oyllVMWQLaoxnnemY4vERvIeEj911+u6v0awcx7JugZSI
-	bEkDwbSbIdU0AJ9iXDf7SAai7azt5JbaxgYWpQ4=
-X-Google-Smtp-Source: AGHT+IEuXaZRUafKB+5MH5F4r3WLlEO3IABB/ps1mlnaPrmjQdZWPBNDATAze8zyWp0pwB0VoEqbgAvv8SD47XTIM4M=
-X-Received: by 2002:a81:ae53:0:b0:5fa:f8b7:80d4 with SMTP id
- g19-20020a81ae53000000b005faf8b780d4mr116484ywk.89.1704994108587; Thu, 11 Jan
- 2024 09:28:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A81E51C33
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 17:30:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EEF34C433F1;
+	Thu, 11 Jan 2024 17:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704994227;
+	bh=5dtLtUj+pWWXQtcfdm/n2g2U+ihJXWy7+Q8oXM55yWg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QNxrVUKzglDM54Zuz/Qse7tjQT+JAj9wJ1uaZuR4ZdCSDFhs3hCAf0QP00xVlKPYr
+	 iP20tSv8EJ5ltBbgge+DgdduYaunUANmVuMrhbLCdWLLLwdoIJQaTmiM7Kra7vrAz9
+	 j200Iv2f4NPvhi4N81XjnEtQ7TWWn7RfjYEpUfnreA/Z0ekawBtAtiknIrOK0XxUUX
+	 pFq3QzfSlOxqdlgQDQaJrFqClMBkL20is8UwN6gva3QLalZXFUhovmdrwA63klAJIv
+	 nJlqr0rEWyfWPux4ocKMXsCEGLW624w40RXUhT+biMzDhTl7xQe6eJYaL7lUivPsuD
+	 nb5hS6+eXb3JA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D4E9DD8C96E;
+	Thu, 11 Jan 2024 17:30:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240111154138.7605-1-n.zhandarovich@fintech.ru>
-In-Reply-To: <20240111154138.7605-1-n.zhandarovich@fintech.ru>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 11 Jan 2024 18:28:16 +0100
-X-Gmail-Original-Message-ID: <CAHmME9o9ZzdWCOmg_s4K4zUUb0BitE+9F7Ox-hCnSHaFQahGtA@mail.gmail.com>
-Message-ID: <CAHmME9o9ZzdWCOmg_s4K4zUUb0BitE+9F7Ox-hCnSHaFQahGtA@mail.gmail.com>
-Subject: Re: [PATCH net] wireguard: receive: annotate data-race around receiving_counter.counter
-To: n.zhandarovich@fintech.ru
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, wireguard@lists.zx2c4.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot <syzkaller@googlegroups.com>, 
-	syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2 0/2] Fix typos in two error messages
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170499422686.16240.15466600665607630798.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jan 2024 17:30:26 +0000
+References: <cover.1704813773.git.aclaudi@redhat.com>
+In-Reply-To: <cover.1704813773.git.aclaudi@redhat.com>
+To: Andrea Claudi <aclaudi@redhat.com>
+Cc: netdev@vger.kernel.org, hadi@cyberus.ca, stephen@networkplumber.org,
+ dsahern@gmail.com
 
-Thanks. Jann pointed me at this a few days ago and I was just looking into it.
+Hello:
 
-Send a v2 with Eric's suggestion and I'll queue it up?
+This series was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-Jason
+On Tue,  9 Jan 2024 16:33:52 +0100 you wrote:
+> Fix spelling for "cannot" in two different places.
+> 
+> Andrea Claudi (2):
+>   iplink_xstats: spelling fix in error message
+>   genl: ctrl.c: spelling fix in error message
+> 
+>  genl/ctrl.c        | 2 +-
+>  ip/iplink_xstats.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+
+Here is the summary with links:
+  - [iproute2,1/2] iplink_xstats: spelling fix in error message
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=ba0d6e6d7dac
+  - [iproute2,2/2] genl: ctrl.c: spelling fix in error message
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=05a4fc72587f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
