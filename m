@@ -1,155 +1,152 @@
-Return-Path: <netdev+bounces-63153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4EF482B5E2
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:27:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24CE182B5EB
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:32:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1236EB25161
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:27:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDAA61F258BA
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0262156B80;
-	Thu, 11 Jan 2024 20:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7583D5674A;
+	Thu, 11 Jan 2024 20:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ltr8fsN1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A70F54BDD
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 20:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7bef3fcd7e7so198584739f.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:27:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032A9EED4
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 20:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-680a13af19bso36027046d6.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:31:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705005116; x=1705609916; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z9v1NFTHcR0PFfn+r4hJa5u54W9vDrXz8u4VmSjEIjg=;
+        b=Ltr8fsN1A8aMtkhC30hwNySjQvaUxZH6mZbcS6qv5WYToL5ArvXrVMS1jTWFeKCpVn
+         qJN6c+7OMUKG+7yTsVaMD+cnSfLu3q+fEUHOjfVlEYGNlNtHf8+rySMZVAebDwXA5Too
+         fv0ceNKEDdG8biIOfCuzIFzt1vKvMRAoPw/AkMxhj7y1QOPhRggkh/miiCK6A7RsXZH4
+         Dvwf873cfg9d/dRvnnA5/mgBnHrgM3FX4idInwi5Cp7wEpvO1NUop2YUkT4TbJC2uHIl
+         /kdeBCM5g4PbtDozgdMr2HQCaB3f7m6KWaSenhF0YlX+IgrQpS7h788TAqbIHtUvtuG9
+         6xeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705004848; x=1705609648;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C8svosqoSrjqEkx0abdvk5EwD+zLRhlWhZ5r9PiuMmU=;
-        b=Z8+WtQqG/dc1Bq1TPQHliW7uCkkMvwUHxU4lYmB2UibZGILtSbcw60FuwZC+XjysLE
-         2kTliMb6hDys+Da+Rb0OC7XjJgsAXu7hEC7moOPerUDV3o1BWRauq2zTuiiBhvj2CNOE
-         MushYlMLOV17wIzeAymtizvd6OjkI3wbMaOSDSpt9IgOcKjr2eqgfdbWxN4E9a3lRSLd
-         gGPDHlgfWtFLm7ETVQCoAo/1cHKoFxYABh/EYJ6Kb8hwZz5CA3C9Tuf2ub6LlZEk6LoJ
-         KK9/M9tCZbqP4+ZIZ8D8fRX4J5i3DuxSx3FqNQnKDIgMLiVGYpgzaXuZfpVFVz8oQpuu
-         hGLA==
-X-Gm-Message-State: AOJu0Yzm+wNe4cCirLsGKfgesbqiFTBGc1Pra1aHv+BLtm/ZA2ldZvl1
-	LLv2AGIlM54xaTd8zXmFM8utTk0DBMgi8v5oql4W2XZsNlD0
-X-Google-Smtp-Source: AGHT+IHuSI+GwPQGAqzI7++qtXbUZk+UZKA2HyufKjHPIU7LQhsQ6zoTr8GBA5TWEyIb7NFlKrsATBW83sQo7jHYAKycB4dL+j19
+        d=1e100.net; s=20230601; t=1705005116; x=1705609916;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z9v1NFTHcR0PFfn+r4hJa5u54W9vDrXz8u4VmSjEIjg=;
+        b=CBnUy96m/qzMgPul0n3MupXkZmM71fVELxMQLhb7dp+8g5q1XiwwuxMEF1Pv4IoGMx
+         aT6oaHknJNDkpb16Mui2Sea7qO+FjXYLEe66NRWkvjrA6MIA2udSJ9EHajDJPEAfhIpA
+         JB5sHadhZRzK4Jbjj0EZwRdNrZ0lOoGhA9PTCTxT9nCI+JIFTNrz9WOBc7F0DxE4FXLw
+         OS/Vs0WrhwjdjDKYc0OiVrMuekaf/scFkJs7Qs/VbmasmB6VgkRKPTBjYDfLSSHWi/U7
+         YWlRiLGylUucJ/ZftNrsRVwwhxRzeT0lLOkT42Y4M2fRWGlm9yyR23fMcACwLwkEO/Fi
+         G4cg==
+X-Gm-Message-State: AOJu0Yypb3IzZSgX2S+jfQRf+5MhS8VBE/kS8ACeUE8MnnV8+z+TJ7xd
+	Cdq5EP8xIBxvIivpWqG1OJ5QJnSt8oCvCS1WlsxRtWMa7YSG
+X-Google-Smtp-Source: AGHT+IEaPigOQUighUf564h+mIju3h1tqlGOCIihT5St5OVdcRsGLhm83w1LHEdQpzWgz1UQ1sDqt1+deiwEBEhxGpA=
+X-Received: by 2002:ad4:5dca:0:b0:680:c0ef:a56a with SMTP id
+ m10-20020ad45dca000000b00680c0efa56amr243726qvh.122.1705005115736; Thu, 11
+ Jan 2024 12:31:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1ca1:b0:360:6649:29da with SMTP id
- x1-20020a056e021ca100b00360664929damr22873ill.3.1705004848821; Thu, 11 Jan
- 2024 12:27:28 -0800 (PST)
-Date: Thu, 11 Jan 2024 12:27:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005abd7b060eb160cd@google.com>
-Subject: [syzbot] [net?] KMSAN: uninit-value in validate_xmit_skb
-From: syzbot <syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, willemdebruijn.kernel@gmail.com
+References: <20240105000632.2484182-1-aahila@google.com> <11317.1704418732@famine>
+ <ZZtwKFu4GQLQ5AXM@Laptop-X1> <26173.1704830028@famine>
+In-Reply-To: <26173.1704830028@famine>
+From: Aahil Awatramani <aahila@google.com>
+Date: Thu, 11 Jan 2024 12:31:44 -0800
+Message-ID: <CAGfWUPzQuk8cw0BRVSCc1gK+_V_MLxCDhAH-=X0LgTSMF9RWKw@mail.gmail.com>
+Subject: Re: [PATCH 1/2 net-next v2] bonding: Extending LACP MUX State Machine
+ to include a Collecting State.
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, David Dillow <dave@thedillows.org>, 
+	Mahesh Bandewar <maheshb@google.com>, Andy Gospodarek <andy@greyhouse.net>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+> > >>    Please reference the standard in the description; this is
+> > >> implementing the independent control state machine per IEEE 802.1AX-=
+2008
+> > >> 5.4.15 in addition to the existing coupled control state machine.
+> > >
+> > >The status of IEEE 802.1AX-2008[1] is "Superseded Standard". Maybe we =
+should
+> > >use IEEE 802.1AX-2020[2].
+> > >
+> > >[1] https://standards.ieee.org/ieee/802.1AX/4176/
+> > >[2] https://standards.ieee.org/ieee/802.1AX/6768/
+> >
+> >       I'm fine to still reference the 2008 (or 2014) standard even
+> > though it's superseded; the 2020 standard is much more complicated, and
+> > I find it harder to follow (particularly for the coupled / independent
+> > control sections, the older standard explains them more clearly in my
+> > reading).  Bonding does not implement any of the new things added for
+> > the 2020 version, so we're not really missing anything.
+> >
+> >       That said, as long as the citations are for the correct section
+> > (the numbering is not consistent between versions) any version is
+> > acceptable.
 
-syzbot found the following issue on:
-
-HEAD commit:    fbafc3e621c3 Merge tag 'for_linus' of git://git.kernel.org..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1135ab95e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e0c7078a6b901aa3
-dashboard link: https://syzkaller.appspot.com/bug?extid=7f4d0ea3df4d4fa9a65f
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e15379e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=170f6981e80000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1520f7b6daa4/disk-fbafc3e6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8b490af009d5/vmlinux-fbafc3e6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/202ca200f4a4/bzImage-fbafc3e6.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in skb_gso_segment include/net/gso.h:83 [inline]
-BUG: KMSAN: uninit-value in validate_xmit_skb+0x10f2/0x1930 net/core/dev.c:3629
- skb_gso_segment include/net/gso.h:83 [inline]
- validate_xmit_skb+0x10f2/0x1930 net/core/dev.c:3629
- __dev_queue_xmit+0x1eac/0x5130 net/core/dev.c:4341
- dev_queue_xmit include/linux/netdevice.h:3134 [inline]
- packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3087 [inline]
- packet_sendmsg+0x8b1d/0x9f30 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x318/0x740 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6334
- sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2780
- packet_alloc_skb net/packet/af_packet.c:2936 [inline]
- packet_snd net/packet/af_packet.c:3030 [inline]
- packet_sendmsg+0x70e8/0x9f30 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 0 PID: 5025 Comm: syz-executor279 Not tainted 6.7.0-rc7-syzkaller-00003-gfbafc3e621c3 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-=====================================================
+I have gone ahead and referenced 2008 in the documentation.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+On Tue, Jan 9, 2024 at 11:53=E2=80=AFAM Jay Vosburgh <jay.vosburgh@canonica=
+l.com> wrote:
+>
+> Hangbin Liu <liuhangbin@gmail.com> wrote:
+>
+> >On Thu, Jan 04, 2024 at 05:38:52PM -0800, Jay Vosburgh wrote:
+> >> >+coupled_control
+> >> >+
+> >> >+    Specifies whether the LACP state machine's MUX in the 802.3ad mo=
+de
+> >> >+    should have separate Collecting and Distributing states.
+> >> >+
+> >> >+    The default value is 1. This setting does not separate the Colle=
+cting
+> >> >+    and Distributing states, maintaining the bond in coupled control=
+.
+> >> >+
+> >>
+> >>      Please reference the standard in the description; this is
+> >> implementing the independent control state machine per IEEE 802.1AX-20=
+08
+> >> 5.4.15 in addition to the existing coupled control state machine.
+> >
+> >The status of IEEE 802.1AX-2008[1] is "Superseded Standard". Maybe we sh=
+ould
+> >use IEEE 802.1AX-2020[2].
+> >
+> >[1] https://standards.ieee.org/ieee/802.1AX/4176/
+> >[2] https://standards.ieee.org/ieee/802.1AX/6768/
+>
+>         I'm fine to still reference the 2008 (or 2014) standard even
+> though it's superseded; the 2020 standard is much more complicated, and
+> I find it harder to follow (particularly for the coupled / independent
+> control sections, the older standard explains them more clearly in my
+> reading).  Bonding does not implement any of the new things added for
+> the 2020 version, so we're not really missing anything.
+>
+>         That said, as long as the citations are for the correct section
+> (the numbering is not consistent between versions) any version is
+> acceptable.
+>
+>         -J
+>
+> ---
+>         -Jay Vosburgh, jay.vosburgh@canonical.com
 
