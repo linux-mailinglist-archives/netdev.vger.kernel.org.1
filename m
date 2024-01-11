@@ -1,176 +1,174 @@
-Return-Path: <netdev+bounces-63112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51D1F82B3A6
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:06:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43C4582B3E0
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:20:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7FC6B23B2F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:06:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F5611F22E88
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A2B51C2A;
-	Thu, 11 Jan 2024 17:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A2551C56;
+	Thu, 11 Jan 2024 17:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="C00PceO7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nP9wpPCF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8faa.mail.infomaniak.ch (smtp-8faa.mail.infomaniak.ch [83.166.143.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C817251013;
-	Thu, 11 Jan 2024 17:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4T9rfT3DXCzMqg4J;
-	Thu, 11 Jan 2024 17:06:09 +0000 (UTC)
-Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4T9rfS5TXFzMpnPq;
-	Thu, 11 Jan 2024 18:06:08 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1704992769;
-	bh=CdZUhqEL7svMMrUJY9jftLzMS4Q7hSQStmanF07Q0tg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C00PceO7t8u42aro/+NUTCIvBumZPfEs0m1+vuN+zihn/JyNXAKQV5Uhe69xXehUJ
-	 E+4kFeF1sr+Dlr9LFv93uHg4tIIjzDnuK5JRehMW5c/C3VTQ8pxkxzArdlW53uZY2t
-	 v+aflDjFyPBd9qTmsJHKSyvixN9ChzyJPwDBy4Wo=
-Date: Thu, 11 Jan 2024 18:06:07 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: Eric Dumazet <edumazet@google.com>, 
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, 
-	"open list : KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, bpf@vger.kernel.org
-Subject: Re: Re: [PATCH v14 10/12] selftests/landlock: Add network tests
-Message-ID: <20240111.pah8ip0Ahv0f@digikod.net>
-References: <20231026014751.414649-1-konstantin.meskhidze@huawei.com>
- <20231026014751.414649-11-konstantin.meskhidze@huawei.com>
- <0584f91c-537c-4188-9e4f-04f192565667@collabora.com>
- <20231219.ig7ih7hof4Eu@digikod.net>
- <bc365e13-f02d-4518-801a-a02e51f4f72e@collabora.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5575025F
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 17:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40e6296635cso4153855e9.2
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 09:20:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1704993633; x=1705598433; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6s3qiPwrXyAwGU9WfN6p4EwpZ2YgT483oI4li09j9iQ=;
+        b=nP9wpPCFVPg4RS8l2EoGXg9IwbnYRnLvPQrzYZii0PtMaUYb8TnIgQfLBJwmecJ8BC
+         ReI/jijjnWmFlYzeaA7BwRmV8HCuxyyKreDH9s6x8YCeO6JxcLcdM6MlvcpiusGgcv90
+         CT3SFBwcSp4Sqqr5GCDDz9bf4ZpVvF0HI45PcM13GFjG/yCvXzir8X7xLHbRjgboMNg8
+         +T4d0v+aEOKrOSWmhKNyqnNvn9+7Exk+E5GN6CKksGe9DNRXxu5Wt/Z++sHgXfntq2k0
+         pv4o+gpi+NOWQ5Pq6D2P9fOi/n/DqPHzUQSWAGaND6Xy6TVZObn7TQIuki3zL7opXfWI
+         52tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704993633; x=1705598433;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6s3qiPwrXyAwGU9WfN6p4EwpZ2YgT483oI4li09j9iQ=;
+        b=Ts8jrvtbv9qXd2t2Z1/GF7hUnM4ZsbomFR49eMp/y0b/0T95YFpvIzU/pxlaPjKrEa
+         wrffvYHnIxzT1qAj4ZBpUSRQBvaHViFmnDOkVnffNfI924QqK5333Thg8lzbuDYf1LUS
+         m4TNdngs+ZlQsSYOaejn8JbuHXDZ53GPv8UMl13hPFnxsfYG5eRoOhfXfpFTM7ZotRnO
+         ec6ZJP3PEztXPUlgDTXGa/wd9k2zK7YvC/RJYGNEBDi5jKMHxsVhtWdNSEaf1lwuKqAO
+         witzm3MA/N/W52gRYOkTxLkLXCyfBB5whyWsltfRqGfvZCkizCQzixNS+vdC5+o+eRdG
+         e7cQ==
+X-Gm-Message-State: AOJu0YwwUf31r72ms0Y8e7qquRIcGtX/sC4+MbLQw82JlcmVa3+5vSRW
+	HYxksE43hkqyeVDpl3KHq+oBk1bdwCYSuQ==
+X-Google-Smtp-Source: AGHT+IFm3GMILTY23wXs8VUd4tWNwejKkPgaXuPR0sV8BhPYXcZmhJ0QM7fAqEXtNCihcjoZGJEOUA==
+X-Received: by 2002:a1c:7705:0:b0:40e:5f23:413 with SMTP id t5-20020a1c7705000000b0040e5f230413mr85378wmi.177.1704993633469;
+        Thu, 11 Jan 2024 09:20:33 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.112])
+        by smtp.gmail.com with ESMTPSA id d18-20020a5d6452000000b0033761b2de64sm1673897wrw.76.2024.01.11.09.20.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Jan 2024 09:20:32 -0800 (PST)
+Message-ID: <b6bc84f9-2ff6-40b6-8c1f-90a12f8d9149@linaro.org>
+Date: Thu, 11 Jan 2024 18:20:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bc365e13-f02d-4518-801a-a02e51f4f72e@collabora.com>
-X-Infomaniak-Routing: alpha
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] dt-bindings: net: dp83826: add ti,cfg-dac-minus
+ binding
+Content-Language: en-US
+To: Catalin Popescu <catalin.popescu@leica-geosystems.com>,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, afd@ti.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111161927.3689084-1-catalin.popescu@leica-geosystems.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240111161927.3689084-1-catalin.popescu@leica-geosystems.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks for the report and the test Muhammad, the fix is now merged:
-https://git.kernel.org/torvalds/c/bbf5a1d0e5d0fb3bdf90205aa872636122692a50
+On 11/01/2024 17:19, Catalin Popescu wrote:
+> Add property ti,cfg-dac-minus to allow for voltage tuning
+> of logical level -1 of the MLT-3 encoded data.
 
-See https://lore.kernel.org/all/20240103163415.304358-1-mic@digikod.net/
-
-On Wed, Dec 20, 2023 at 04:19:44PM +0500, Muhammad Usama Anjum wrote:
-> On 12/20/23 2:17 PM, Mickaël Salaün wrote:
-> > Hi Muhammad,
-> > 
-> > Thanks for the report.
-> > 
-> > On Tue, Dec 19, 2023 at 03:38:55PM +0500, Muhammad Usama Anjum wrote:
-> >> Hi Konstantin,
-> >>
-> >> There are some errors being reported in KernelCI:
-> >> https://linux.kernelci.org/test/plan/id/657ab2240c761c0bd1e134ee/
-> >>
-> >> The following sub-tests are failing:
-> >> landlock_net_test_protocol_no_sandbox_with_ipv6_tcp_bind_unspec
-> >> landlock_net_test_protocol_no_sandbox_with_ipv6_udp_bind_unspec
-> >> landlock_net_test_protocol_tcp_sandbox_with_ipv6_udp_bind_unspec
-> >>
-> >> From my initial investigation, I can see that these failures are coming
-> >> from just finding the wrong return error code (-97 instead of -22). It may
-> >> be test's issue or the kernel's, not sure yet.
-> > 
-> > I cannot reproduce these errors (with the same kernel commit), the
-> > Defconfig URL is broken. Could you please share the config used for
-> > tests?
-> I've also attached the config. I'm generated the config by following:
-> make defconfig && make kvm_guest.config
-> scripts/kconfig/merge_config.sh .config tools/testing/selftests/landlock/config
+A nit, subject: drop second/last, redundant "binding". The "dt-bindings"
+prefix is already stating that these are bindings.
+See also:
+https://elixir.bootlin.com/linux/v6.7-rc8/source/Documentation/devicetree/bindings/submitting-patches.rst#L18
 > 
-> > 
-> > According to the failing tests, it looks like the network stack returns
-> > EAFNOSUPPORT instead of EINVAL, which should happen because addr_len <
-> > SIN6_LEN_RFC2133 (cf. inet6_bind_sk).  I then think that the issue comes
-> > from an inconsistent error priority with the prot->bind() call in
-> > inet6_bind_sk() that may return EAFNOSUPPORT when uaddr contains
-> > AF_UNSPEC. I didn't find such bind() implementations though.
-> > 
-> > Could you please validate this theory by removing this call in
-> > inet6_bind_sk() and run the tests again?
-> I'll have a look if I can find anything.
+> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+> ---
+>  Documentation/devicetree/bindings/net/ti,dp83822.yaml | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+
+Don't add properties one by one. Especially if they are related.
+
 > 
-> > 
-> > Eric, do you know where are such struct proto bind() implementations and
-> > why they may return EAFNOSUPPORT?
-> > 
-> > Regards,
-> >  Mickaël
-> > 
-> > 
-> >>
-> >> Thanks,
-> >> Usama
-> >>
-> >> On 10/26/23 6:47 AM, Konstantin Meskhidze wrote:
-> >>> Add 82 test suites to check edge cases related to bind() and connect()
-> >>> actions. They are defined with 6 fixtures and their variants:
-> >>>
-> >>> The "protocol" fixture is extended with 12 variants defined as a matrix
-> >>> of: sandboxed/not-sandboxed, IPv4/IPv6/unix network domain, and
-> >>> stream/datagram socket. 4 related tests suites are defined:
-> >>> * bind: Tests with non-landlocked/landlocked ipv4, ipv6 and unix sockets.
-> >>> * connect: Tests with non-landlocked/landlocked ipv4, ipv6 and unix
-> >>> sockets.
-> >>> * bind_unspec: Tests with non-landlocked/landlocked restrictions
-> >>> for bind action with AF_UNSPEC socket family.
-> >>> * connect_unspec: Tests with non-landlocked/landlocked restrictions
-> >>> for connect action with AF_UNSPEC socket family.
-> >>>
-> >>> The "ipv4" fixture is extended with 4 variants defined as a matrix
-> >>> of: sandboxed/not-sandboxed, IPv4/unix network domain, and
-> >>> stream/datagram socket. 1 related test suite is defined:
-> >>> * from_unix_to_inet: Tests to make sure unix sockets' actions are not
-> >>> restricted by Landlock rules applied to TCP ones.
-> >>>
-> >>> The "tcp_layers" fixture is extended with 8 variants defined as a matrix
-> >>> of: IPv4/IPv6 network domain, and different number of landlock rule layers.
-> >>> 2 related tests suites are defined:
-> >>> * ruleset_overlap.
-> >>> * ruleset_expand.
-> >>>
-> >>> In the "mini" fixture 4 tests suites are defined:
-> >>> * network_access_rights: Tests with legitimate access values.
-> >>> * unknown_access_rights: Tests with invalid attributes, out of access
-> >>>   range.
-> >>> * inval:
-> >>>   - unhandled allowed access.
-> >>>   - zero access value.
-> >>> * tcp_port_overflow: Tests with wrong port values more than U16_MAX.
-> >>>
-> >>> In the "ipv4_tcp" fixture supports IPv4 network domain, stream socket.
-> >>> 2 tests suites are defined:
-> >>> * port_endianness: Tests with big/little endian port formats.
-> >>> * with_fs: Tests with network bind() socket action within
-> >>> filesystem directory access test.
-> >>>
-> >>> The "port_specific" fixture is extended with 4 variants defined
-> >>> as a matrix of: sandboxed/not-sandboxed, IPv4/IPv6 network domain,
-> >>> and stream socket. 2 related tests suites are defined:
-> >>> * bind_connect_zero: Tests with port 0 value.
-> >>> * bind_connect_1023: Tests with port 1023 value.
-> >>>
-> >>> Test coverage for security/landlock is 94.5% of 932 lines according to
-> >>> gcc/gcov-9.
-> >>>
-> >>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> >>> Co-developed-by: Mickaël Salaün <mic@digikod.net>
-> >>> Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> >>> ---
+> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> index db74474207ed..2f010333be49 100644
+> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> @@ -62,6 +62,15 @@ properties:
+>         for the PHY.  The internal delay for the PHY is fixed to 3.5ns relative
+>         to transmit data.
+>  
+> +  ti,cfg-dac-minus:
+> +    description: |
+> +       DP83826 PHY only.
+> +       Sets the voltage ratio of the logical level -1 for the MLT-3 encoded data.
+
+ratio between what and what?
+
+> +       0 = 50%, 1 = 56.25%, 2 = 62.50%, 3 = 68.75%, 4 = 75%, 5 = 81.25%, 6 = 87.50%,
+> +       7 = 93.75%, 8 = 100%, 9 = 106.25%, 10 = 112.50%, 11 = 118.75%, 12 = 125%,
+> +       13 = 131.25%, 14 = 137.50%, 15 = 143.75%, 16 = 150%.
+> +    enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+Missing: "default:"
+
+
+>  
+
+Best regards,
+Krzysztof
+
 
